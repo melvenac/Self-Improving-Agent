@@ -1,6 +1,6 @@
 # Learning System — Known Gaps & Improvement Backlog
 
-> Last updated: 2026-03-18 — reflects v2.0 Obsidian-based architecture.
+> Last updated: 2026-03-20 — reflects v2.1 with compound feedback loop.
 
 ## Completed
 
@@ -35,9 +35,10 @@
 **Was:** Auto-extracted experiences were generic ("Workaround or fix applied related to error") because extraction used keyword spray across all text.
 **Fix:** Rewrote extraction to use structured session data (decision events and gotcha detections). Added quality gates: min 40 char length, max 3 per session, actual content in Action field instead of boilerplate, `source: auto-extracted` tag for easy review. Manually written experiences via `/end` are still higher quality but auto-extracted ones are now useful.
 
-### ~~3. Skill Distillation Is Manual~~ — AUTOMATED
+### ~~3. Skill Distillation Is Manual~~ — FULLY AUTOMATED
 **Was:** The "3+ similar experiences → propose skill" pipeline required Clark to notice the pattern during retrieval.
-**Fix:** `vault-skill-scan.mjs` clusters experiences by tag, project, and type. Outputs `SKILL-CANDIDATES.md` with WikiLinks. Retrieval protocol now checks candidates at session start and proposes relevant clusters to Aaron. Run on-demand via `node vault-skill-scan.mjs`.
+**Fix (v1):** `vault-skill-scan.mjs` clusters experiences by tag, project, and type. Outputs `SKILL-CANDIDATES.md` with WikiLinks. Run on-demand.
+**Fix (v2, 2026-03-20):** `skill-scan.mjs` SessionEnd hook runs automatically after vault-writer. Diffs against previous scan, detects new/growing clusters, writes pending proposals to `.skill-proposals-pending.json`. No manual scanning needed — the compound feedback loop detects patterns as experiences accumulate.
 
 ---
 
