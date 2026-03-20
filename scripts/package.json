@@ -1,0 +1,9 @@
+{
+  "name": "learning-system-hooks",
+  "version": "2.1.0",
+  "type": "module",
+  "description": "SessionEnd hook scripts for the self-improving agent learning system",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0"
+  }
+}

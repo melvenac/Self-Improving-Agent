@@ -60,9 +60,16 @@ The hook scripts run automatically at session end. Copy them to your Claude Code
 # Create the scripts directory
 mkdir -p ~/.claude/knowledge-mcp/scripts
 
-# Copy the skill-scan hook
+# Copy the skill-scan hook and package.json
 cp scripts/skill-scan.mjs ~/.claude/knowledge-mcp/scripts/
+cp scripts/package.json ~/.claude/knowledge-mcp/scripts/
+
+# Install dependencies (needed by vault-writer and auto-index hooks)
+cd ~/.claude/knowledge-mcp/scripts
+npm install
 ```
+
+The `npm install` step is required — `vault-writer.mjs` and `auto-index.mjs` depend on `better-sqlite3` for reading session databases. `skill-scan.mjs` only uses Node.js built-ins, but the other hooks in the pipeline need this dependency.
 
 For vault-writer.mjs (the session capture hook), see the [Open Brain repo](https://github.com/melvenac/open-brain-knowledge) — it's bundled there.
 
