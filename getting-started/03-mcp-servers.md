@@ -38,19 +38,13 @@ You can find more details about Open Brain at its repository: [github.com/melven
 
 Smart Connections enables semantic search. Instead of only matching exact keywords, it understands meaning. For example, if you search for "database error handling," it can find an experience you wrote about "Convex mutation failure recovery" because the concepts are related.
 
-1. First, install the package globally:
-
-```bash
-npm install -g @anthropic-ai/smart-connections-mcp
-```
-
-2. Then register it as an MCP server in Claude Code:
+Register it as an MCP server in Claude Code:
 
 ```bash
 claude mcp add -s user smart-connections -- npx -y @yejianye/smart-connections-mcp
 ```
 
-3. Configure Smart Connections to know about your vault. You need to tell it where your Obsidian vault is located. See the [Smart Connections MCP repository](https://github.com/yejianye/smart-connections-mcp) for the latest configuration instructions.
+After registering, configure Smart Connections to know about your vault. You need to tell it where your Obsidian vault is located. See the [Smart Connections MCP repository](https://github.com/yejianye/smart-connections-mcp) for the latest configuration instructions.
 
 ---
 
@@ -99,7 +93,7 @@ Claude Code should call the Smart Connections search tool. If your vault is empt
 - Check that Node.js is installed (`node --version` should print a version number).
 
 **If Smart Connections does not work:**
-- Verify the npm install succeeded: run `npm list -g @anthropic-ai/smart-connections-mcp` and check it is listed.
+- Verify the MCP server is registered: run `claude mcp list` and check that `smart-connections` appears.
 - Restart Claude Code after adding the MCP server.
 - Check the [Smart Connections MCP repo](https://github.com/yejianye/smart-connections-mcp) for troubleshooting steps.
 

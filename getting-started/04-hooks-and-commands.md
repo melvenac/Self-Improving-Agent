@@ -33,11 +33,20 @@ mkdir -p ~/.claude/knowledge-mcp/scripts
 Now copy the scripts from the repository. Make sure you are in the Self-Improving-Agent directory (where you cloned the repo), then run:
 
 ```bash
+cp scripts/vault-writer.mjs ~/.claude/knowledge-mcp/scripts/
+cp scripts/vault-utils.mjs ~/.claude/knowledge-mcp/scripts/
 cp scripts/skill-scan.mjs ~/.claude/knowledge-mcp/scripts/
 cp scripts/package.json ~/.claude/knowledge-mcp/scripts/
 ```
 
-The `vault-writer.mjs` script (which captures session data) is bundled with the Open Brain MCP server you installed in Step 3. See the [Open Brain repository](https://github.com/melvenac/open-brain-knowledge) for its location.
+This copies all four files needed by the SessionEnd hooks:
+
+| File | Purpose |
+|---|---|
+| `vault-writer.mjs` | Captures session logs and experiences to your Obsidian vault |
+| `vault-utils.mjs` | Shared utilities used by vault-writer |
+| `skill-scan.mjs` | Detects experience clusters and proposes reusable skills |
+| `package.json` | Declares npm dependencies for the hook scripts |
 
 Now install the dependencies that the hook scripts need:
 
@@ -113,15 +122,17 @@ mkdir -p ~/.claude/commands
 2. Copy the command files from the repository (make sure you are in the Self-Improving-Agent directory):
 
 ```bash
+cp commands/start.md ~/.claude/commands/
 cp commands/recall.md ~/.claude/commands/
 cp commands/skill-scan.md ~/.claude/commands/
 cp commands/end.md ~/.claude/commands/
 ```
 
-This gives you three commands:
+This gives you four commands:
 
 | Command | What it does |
 |---|---|
+| `/start` | Full session start protocol -- retrieves experiences, checks skills, sets context. |
 | `/recall` | Searches your vault for experiences relevant to your current project. Use this at the start of a session. |
 | `/skill-scan` | Scans your experiences for clusters that could become reusable skills. |
 | `/end` | Manually captures lessons from the current session. Supplements the automatic SessionEnd hook. |
@@ -148,7 +159,7 @@ To confirm the slash commands are installed:
 ls ~/.claude/commands/
 ```
 
-You should see `recall.md`, `skill-scan.md`, and `end.md`.
+You should see `start.md`, `recall.md`, `skill-scan.md`, and `end.md`.
 
 ---
 

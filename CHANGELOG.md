@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.2.0] - 2026-03-21
+
+### Fixed
+- Step 04: Added missing `vault-writer.mjs` and `vault-utils.mjs` copy commands — previously told users to find vault-writer in the Open Brain repo even though it ships in `scripts/`
+- Step 04: Added missing `/start` command to the copy instructions (was shipping 4 commands but only documenting 3)
+- Step 03: Fixed inconsistent Smart Connections package names (was referencing two different npm packages)
+- Step 03: Removed unnecessary global npm install step for Smart Connections
+
+### Added
+- `.gitignore` — prevents `node_modules/`, `.env`, logs, and OS files from being committed
+- Script purpose table in Step 04 explaining what each hook file does
+
 ## [v3.1.0] - 2026-03-21
 
 ### Added
