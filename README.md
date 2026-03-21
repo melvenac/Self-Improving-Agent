@@ -1,106 +1,74 @@
-# Learning System
+# Self-Improving Agent
 
-**A self-improving agent protocol that gives AI coding agents persistent memory, pattern recognition, and compound learning across sessions.**
-
-Built on [Open Brain](https://github.com/melvenac/open-brain-knowledge) (MCP memory server) + [Obsidian](https://obsidian.md/) (knowledge graph) + Claude Code hooks.
+*A full-stack AI development environment that learns across sessions.*
 
 ---
 
-## What This Is
+## What is this?
 
-Most AI coding sessions start from zero. The agent doesn't remember what you built yesterday, what gotchas you hit, or what patterns work in your stack. This system fixes that with three layers:
+You install this system once and get persistent AI memory across all your projects. Each coding session makes the agent smarter -- it accumulates lessons, detects patterns, and distills reusable skills automatically. Over time, the agent stops repeating mistakes, surfaces relevant knowledge exactly when you need it, and builds a growing library of best practices tailored to your stack.
 
-| Layer | What It Does | How |
+This repo includes everything you need: the memory protocol, automation hooks, slash commands, and a project template for structuring new codebases with AI-readable context.
+
+## How it works
+
+Every session follows a three-phase feedback loop. The output of each session feeds into the next, creating compound learning over time.
+
+```
+    +---------------------------------------------+
+    |                                              |
+    v                                              |
+RETRIEVAL (session start)                          |
+  Surface relevant experiences                     |
+  and skills from memory                           |
+    |                                              |
+    v                                              |
+DEVELOPMENT (normal coding)                        |
+  Work as usual -- the agent                       |
+  has context from past sessions                   |
+    |                                              |
+    v                                              |
+ACCUMULATION (session end)                         |
+  Auto-capture lessons learned                     |
+  Detect emerging patterns ---------> feeds back --+
+```
+
+Knowledge is organized in three tiers:
+
+| Tier | Location | Purpose |
 |---|---|---|
-| **Memory** | Persistent knowledge across sessions | Open Brain MCP + Obsidian Vault |
-| **Accumulation** | Auto-captures lessons from every session | SessionEnd hooks (vault-writer + skill-scan) |
-| **Retrieval** | Surfaces relevant knowledge at session start | `/recall` command + Smart Connections |
+| **Global** | Obsidian Vault | Cross-project experiences, reusable skills, user preferences |
+| **Domain** | Tagged experiences in the vault | Stack-specific knowledge ("Convex patterns", "Stripe gotchas") |
+| **Project** | `.agents/` folder in each repo | Project-specific context (PRD, tasks, session logs) |
 
-The result: **compound loops that accumulate value over time.** Each session adds experiences. The skill-scan hook detects emerging patterns. When enough experiences cluster around a topic, it proposes distilling them into a reusable skill. The agent gets smarter with every session.
+## What you'll set up
+
+- **Claude Code CLI** -- AI coding agent that runs in your terminal
+- **VS Code** (or any editor) -- your development environment
+- **Node.js (LTS)** -- runs the automation hooks that capture knowledge
+- **Git + GitHub** -- version control for your projects
+- **Obsidian** -- desktop app for browsing and editing your knowledge vault
+- **Open Brain MCP** -- persistent memory storage server for the AI agent
+- **Smart Connections MCP** -- semantic search over your knowledge vault
+
+## Getting Started
+
+Follow the step-by-step guide to set up your environment.
+
+See [getting-started/01-prerequisites.md](getting-started/01-prerequisites.md)
 
 ## Architecture
 
-```
-Session Start                          Session End
-    |                                      |
-    v                                      v
- /recall                            vault-writer.mjs
-    |                                   |     |
-    v                                   v     v
- Open Brain ---------> Obsidian    Sessions/  Experiences/
- (kb_recall)           Vault           |          |
-    |                    |             v          v
-    v                    v        skill-scan.mjs
- Smart Connections   SKILL-INDEX      |
- (semantic search)       |            v
-    |                    v    SKILL-CANDIDATES.md
-    v               Inject        (proposals)
- Surface 3 experiences
- + 2 skills as guidance
-```
+Learn how the memory layer, accumulation hooks, and skill distillation work together.
 
-### The Three "Lego Bricks" (from [this video](https://www.youtube.com/watch?v=vqnAOV8NMZ4))
+See [how-it-works/overview.md](how-it-works/overview.md)
 
-An autonomous agent needs three building blocks:
+## Project Template
 
-1. **Memory** — persistent knowledge that survives across sessions
-2. **Tools** — MCP servers that let the agent act (file I/O, APIs, knowledge stores)
-3. **Proactivity** — the agent acts without being asked (hooks, `/loop`, scheduled scans)
+New projects benefit from a standard folder structure that gives the AI agent immediate context about your codebase. The included project template sets up an `.agents/` directory with a PRD, task tracking, and session logs so the agent can orient itself from the first session.
 
-Combine all three and you get **compound loops** — each cycle stores observations, subsequent cycles pattern-match against history, and value accumulates over time.
+See [project-template/README.md](project-template/README.md)
 
-## Quick Start
+## License
 
-See **[setup.md](setup.md)** for the full installation guide. The short version:
-
-1. Install [Open Brain MCP](https://github.com/melvenac/open-brain-knowledge) for persistent memory
-2. Set up an Obsidian vault with the folder structure below
-3. Install the SessionEnd hooks (vault-writer + skill-scan)
-4. Copy the slash commands (`/recall`, `/skill-scan`, `/end`) to `~/.claude/commands/`
-5. Optionally install [Smart Connections MCP](https://github.com/yejianye/smart-connections-mcp) for semantic search
-
-## Vault Structure
-
-```
-~/Obsidian Vault/
-├── Experiences/          ← Individual lessons (gotchas, patterns, decisions, fixes)
-├── Sessions/             ← Auto-generated session logs
-├── Topics/               ← Auto-linked topic notes
-├── Projects/             ← Synced project docs (PRD, README, Summary)
-├── Guidelines/           ← Distilled skills + candidates
-│   ├── SKILL-INDEX.md    ← Registry of production skills
-│   └── SKILL-CANDIDATES.md  ← Auto-detected clusters
-└── .vault-writer.log     ← Hook execution log
-```
-
-## Key Files in This Repo
-
-| File | Purpose |
-|---|---|
-| [SELF-IMPROVING-AGENT.md](SELF-IMPROVING-AGENT.md) | Protocol quick reference for AI agents |
-| [current-protocols.md](current-protocols.md) | Detailed protocol documentation |
-| [gaps.md](gaps.md) | Known gaps and improvement backlog |
-| [setup.md](setup.md) | Step-by-step installation guide |
-| [scripts/skill-scan.mjs](scripts/skill-scan.mjs) | SessionEnd hook — pattern recognition loop |
-| [commands/recall.md](commands/recall.md) | `/recall` slash command — knowledge retrieval |
-| [commands/skill-scan.md](commands/skill-scan.md) | `/skill-scan` slash command — manual cluster scan |
-| [commands/end.md](commands/end.md) | `/end` slash command — knowledge capture |
-
-## How It Works In Practice
-
-**Session 1-5:** You work normally. vault-writer captures gotchas and decisions as experiences.
-
-**Session 6:** skill-scan detects 3 experiences tagged "convex" — proposes a skill.
-
-**Session 10:** You approve. A "Convex Patterns" skill is distilled from 5 experiences. Future sessions surface it automatically.
-
-**Session 20:** A new developer joins. `/recall` surfaces the accumulated knowledge — they don't start from zero.
-
-## Related Projects
-
-- [Open Brain](https://github.com/melvenac/open-brain-knowledge) — the MCP memory server
-- [AI-First Development Framework](https://github.com/melvenac/AI-First-Development-Framework) — project scaffold (`.agents/` structure)
-
----
-
-Inspired by the compound loop architecture described in [this video](https://www.youtube.com/watch?v=vqnAOV8NMZ4) by AI News & Strategy Daily.
+MIT
