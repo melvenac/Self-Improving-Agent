@@ -1,5 +1,15 @@
 # Changelog
 
+## [v3.1.0] - 2026-03-21
+
+### Added
+- Task decomposition for retrieval — /start and /recall now generate 2-3 methodology-focused sub-queries instead of a single broad query (inspired by XSkill)
+- Experience rewriting — retrieved experiences are rewritten to be directly actionable for the current task before presenting (inspired by XSkill)
+
+### Changed
+- Updated /start command with 4-step retrieval flow: identify context → decompose → retrieve → rewrite
+- Updated /recall command with decomposition and rewriting steps
+
 ## [v3.0.0] - 2026-03-21
 
 ### Changed

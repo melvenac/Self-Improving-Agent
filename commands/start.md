@@ -10,11 +10,29 @@ Say hello to Aaron by name. You are Clark. Keep it brief — one line.
 
 ### 2. Recall knowledge
 
-Run the `/recall` protocol:
+Run the `/recall` protocol with **decomposition and adaptation**:
+
+**a) Identify context**
 - Determine the current working directory and project
 - Look up domain tags from `~/.claude/CLAUDE.md` (Project Domain Tags table)
-- Run `kb_recall` with the project name + domain tags to surface relevant experiences
+- Read `.agents/TASKS/INBOX.md` (or equivalent) to understand today's likely work
+
+**b) Decompose into sub-queries**
+- Based on the project, domain tags, and pending tasks, generate **2-3 methodology-focused queries** that abstract away from specifics
+- Focus on *how* (techniques, patterns, pitfalls) not *what* (specific files or features)
+- Example: task "add Stripe webhooks to Convex app" → queries: `"Stripe webhook signature verification patterns"`, `"Convex HTTP action design for external webhooks"`, `"error handling for async payment flows"`
+
+**c) Retrieve**
+- Run `kb_recall` once with all sub-queries (batch in a single call)
+- Also run `mcp__smart-connections__lookup` with the most specific sub-query for vault coverage
 - Read `~/Obsidian Vault/Guidelines/SKILL-INDEX.md` for matching skills
+- Deduplicate across results — keep the highest-relevance version if duplicates appear
+
+**d) Rewrite for today's task**
+- For each retrieved experience, rewrite it to be **directly actionable** for the current task
+- Transform abstract tips into concrete guidance: "When using X" → "For your [specific task], do X because Y"
+- **Drop** any experience that looked relevant by keyword but isn't actually useful in context
+- Don't modify the vault — only rewrite what you present in this session
 - Surface at most **3 experiences** and **2 skills** as non-prescriptive context
 
 ### 3. Read project state
