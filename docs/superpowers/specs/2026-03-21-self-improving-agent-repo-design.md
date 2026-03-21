@@ -196,12 +196,12 @@ Scripts are configured as SessionEnd hooks in `settings.json`. Commands are copi
 5. Move `setup.md` content into `getting-started/` guides (rewrite for beginners)
 6. Archive or remove existing planning artifacts (`docs/superpowers/`, `superpowers/`) — this spec moves to `reference/` once implementation is complete
 
-### Phase 2: Create framework template
-> **Note:** The AI-First Framework repo contains documentation (README, CLAUDE.md) describing the `.agents/` structure, but the scaffold files themselves were never materialized as a standalone directory. This phase creates the template from the documented spec, not by copying existing files.
+### Phase 2: Import framework template
+> **Note:** The AI-First Framework repo contains the complete `.agents/` scaffold with all files. This phase copies them into the template, stripping personal config.
 
-1. Create `project-template/.agents/` directory structure based on the framework spec
-2. Create all template files: FRAMEWORK.md, SYSTEM/ docs, TASKS/, SESSIONS/, skills/, workflows/
-3. Create `project-template/.claude/commands/` and `project-template/.gemini/commands/`
+1. Copy `.agents/` structure from `AI-First-Developement-Framwork` into `project-template/` (excluding META/ and session logs)
+2. Copy `.claude/commands/`, `.gemini/commands/`, `.clinerules/` into `project-template/`
+3. Rename existing `scripts/skill-scan.mjs` to `scripts/vault-skill-scan.mjs` (aligning with spec naming)
 4. Strip any personal config (Obsidian paths, Open Brain references) — template is project-scoped only
 5. Write template README
 
@@ -230,7 +230,7 @@ Scripts are configured as SessionEnd hooks in `settings.json`. Commands are copi
 | Assumption | Impact if wrong |
 |---|---|
 | `vault-writer.mjs` needs to be authored as a standalone script (currently behavior is in Claude Code settings/hooks, not a repo file) | Phase 3 scope increases — need to extract or write the hook logic |
-| The `.agents/` template structure needs to be created from the framework's documented spec, not copied from existing files | Phase 2 is authoring work, not a file copy |
+| The `.agents/` template files exist in the framework repo and can be copied directly | If files are incomplete, we'd need to author missing pieces |
 | The existing `superpowers/` and `docs/superpowers/` planning artifacts can be archived after implementation | If they're referenced elsewhere, we need redirects |
 | Smart Connections can be configured to index directories outside the vault | If not, we fall back to symlinks or copying how-it-works docs into the vault |
 
