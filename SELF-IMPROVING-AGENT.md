@@ -1,6 +1,6 @@
 # Self-Improving Agent Protocol
 
-> Quick reference for AI agents. For the full guide, see `~/Obsidian Vault/Guidelines/SELF-IMPROVING-AGENT-GUIDE.md`.
+> Quick reference for AI agents. For detailed docs, see [how-it-works/](how-it-works/overview.md). For setup, see [getting-started/](getting-started/01-prerequisites.md).
 
 ## Architecture
 

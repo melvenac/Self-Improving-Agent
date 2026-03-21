@@ -1,5 +1,22 @@
 # Changelog
 
+## [v3.0.0] - 2026-03-21
+
+### Changed
+- Restructured repo as Self-Improving-Agent (consolidated with AI-First Framework)
+- Reorganized docs into getting-started/, how-it-works/, reference/
+- Moved AI-First Framework into project-template/
+- Updated SELF-IMPROVING-AGENT.md links to new doc locations
+
+### Added
+- Beginner-friendly getting started guides (5 docs)
+- Architecture documentation in how-it-works/ (5 docs)
+- vault-writer.mjs and vault-skill-scan.mjs SessionEnd hooks
+- vault-utils.mjs shared utilities
+- /start global slash command
+- project-template/ with complete .agents/ scaffold
+- reference/advanced-config.md
+
 ## [v2.2.0] - 2026-03-21
 
 ### Added
