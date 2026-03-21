@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.2.0] - 2026-03-21
+
+### Added
+- `getting-started/01-prerequisites.md` — install guide for all required tools
+- `getting-started/02-clone-and-configure.md` — repo cloning and Obsidian vault setup
+- `getting-started/03-mcp-servers.md` — Open Brain and Smart Connections MCP installation
+- `getting-started/04-hooks-and-commands.md` — SessionEnd hooks and slash command setup
+- `getting-started/05-verify-installation.md` — guided first-session walkthrough
+
+### Removed
+- `getting-started/.gitkeep` — replaced by actual guide files
+
 ## [v2.1.0] - 2026-03-20
 
 ### Added
