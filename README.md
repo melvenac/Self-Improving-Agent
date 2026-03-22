@@ -41,6 +41,15 @@ Knowledge is organized in three tiers:
 | **Domain** | Tagged experiences in the vault | Stack-specific knowledge ("Convex patterns", "Stripe gotchas") |
 | **Project** | `.agents/` folder in each repo | Project-specific context (PRD, tasks, session logs) |
 
+## Repository Structure Note
+
+The `hub/` and `wrapper/` directories are **not part of the core Self-Improving Agent setup**. They are a separate A2A (Agent-to-Agent) communication system used by the project maintainers for remote troubleshooting and knowledge accumulation.
+
+- **`hub/`** — The A2A Intelligent Hub server (deployed centrally, not needed locally). You do not need to install or run this.
+- **`wrapper/`** — Optional local agent that connects to the Hub for collaborative troubleshooting. Only needed if a maintainer asks you to connect for debugging support.
+
+**If you're installing the Self-Improving Agent, ignore both directories.** Follow the setup guide below.
+
 ## What you'll set up
 
 - **Claude Code CLI** -- AI coding agent that runs in your terminal
