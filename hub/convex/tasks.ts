@@ -54,3 +54,40 @@ export const getByTaskId = query({
       .first();
   },
 });
+
+export const addMessage = mutation({
+  args: {
+    taskId: v.string(),
+    role: v.string(),
+    content: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const task = await ctx.db
+      .query("tasks")
+      .filter((q) => q.eq(q.field("taskId"), args.taskId))
+      .first();
+    if (task) {
+      await ctx.db.patch(task._id, {
+        messages: [...task.messages, { role: args.role, content: args.content, timestamp: Date.now() }],
+      });
+    }
+  },
+});
+
+export const getPending = query({
+  args: { agentName: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("tasks")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("assignedAgent"), args.agentName),
+          q.or(
+            q.eq(q.field("status"), "pending"),
+            q.eq(q.field("status"), "escalated")
+          )
+        )
+      )
+      .collect();
+  },
+});
