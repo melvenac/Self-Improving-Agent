@@ -1,0 +1,133 @@
+# A2A Intelligent Hub — Research Prompt
+
+> Copy this prompt to Grok, Gemini, ChatGPT, or any research agent. Gemini should have deep knowledge of A2A since Google created the protocol.
+
+---
+
+## Context
+
+I'm building an **A2A-compliant intelligent hub** — a persistent AI agent that lives on a VPS and mediates communication between ephemeral AI coding agents (specifically Claude Code CLI agents). The hub follows the Agent2Agent (A2A) Protocol v1.0 specification.
+
+### The Problem
+
+I have two Claude Code CLI agents — "Clark" (my agent) and "Alice" (my collaborator Brian's agent). They need to communicate to collaboratively debug the installation of my open-source GitHub repo ([Self-Improving-Agent](https://github.com/melvenac/Self-Improving-Agent)).
+
+The challenge: Claude Code is a CLI tool, not a server. Sessions are ephemeral — they start and stop. There's no API to send messages into a running session from outside. The A2A protocol assumes agents are always-on HTTP servers.
+
+### The Solution: An Intelligent Hub
+
+Instead of a dumb relay, we deploy a **persistent AI agent ("The Hub")** on a VPS (running Coolify, a self-hosted PaaS, at `sandbox.tarrantcountymakerspace.com`) that:
+
+1. **Is always-on and A2A-compliant** — solves the availability problem
+2. **Acts as an intelligent intermediary** — when Alice asks a question about an installation error, The Hub first tries to answer from its accumulated knowledge before escalating to Clark
+3. **Accumulates knowledge from every conversation** — using a memory system (Obsidian vault with markdown files, SQLite knowledge base with FTS5, semantic search via embeddings)
+4. **Gets smarter over time** — after 10 installations, it handles 80% of questions without escalating
+5. **Plays both A2A roles** — Remote Agent (receives tasks from Alice/Clark) and Client Agent (delegates to Clark/Alice when it can't answer)
+
+### Architecture Decided So Far
+
+```
+Alice (ephemeral CLI)              The Hub (always-on VPS)              Clark (ephemeral CLI)
+─────────────────                  ────────────────────                ─────────────────
+                                   ┌──────────────────┐
+Alice hits install error           │ Persistent Agent  │
+  ↓                                │                  │
+Local A2A wrapper                  │ 1. Receive task  │
+sends JSON-RPC      ──A2A────→    │ 2. Check memory  │
+over HTTPS                         │ 3. Can answer?   │
+                                   │    YES → respond │
+                                   │    NO → escalate │──A2A────→    Clark's local wrapper
+                                   │                  │              pipes to Claude Code
+                                   │                  │←────────     Clark responds
+                                   │ 4. Store lesson  │
+                                   │    in memory     │
+                                   └──────────────────┘
+              ←──────────────────  Response to Alice
+```
+
+### Key Design Decisions Already Made
+
+- **Generic A2A relay, not Claude Code-specific** — The Hub doesn't know or care what kind of agent connects. It follows the A2A spec.
+- **Agent Cards for discovery** — each agent publishes capabilities as JSON metadata
+- **SSE streaming** — for real-time progress updates on long-running tasks
+- **API Key + Bearer token auth** — API keys for registration, short-lived JWTs for task communication
+- **HTTPS via Coolify/Traefik** — TLS handled by the PaaS infrastructure
+- **The Hub's Agent Card advertises skills, not routing** — e.g., `troubleshoot-installation`, `query-error-history`, not "I forward to Clark"
+
+### Existing Infrastructure I Can Leverage
+
+- **Coolify** on a VPS (self-hosted PaaS for deploying containers/services)
+- **Open Brain** — my existing MCP server for persistent knowledge storage (SQLite + FTS5), published on npm as `open-brain-knowledge`
+- **Smart Connections** — semantic search MCP server for my Obsidian vault
+- **Self-Improving Agent memory system** — automatic session logging, experience extraction, skill distillation into an Obsidian vault
+- **Telegram bot** — already working for human-to-agent communication (could be used for human oversight of The Hub)
+
+---
+
+## What I Need You To Research
+
+### 1. The Hub Server Implementation
+
+- What's the best stack for building The Hub? Consider: **Node.js/TypeScript with the A2A JS SDK (`@a2a-js/sdk`)** vs **Python with the A2A Python SDK (`a2a-sdk`)**
+- How mature is each SDK? Which has better support for: server-side implementation, SSE streaming, Agent Card serving, JSON-RPC handling?
+- Show me a concrete architecture: what framework (Express? Fastify? FastAPI?), how it handles incoming `message/send` requests, how it manages task lifecycle, how it serves Agent Cards at `/.well-known/agent.json`
+- How should The Hub integrate with an LLM (Claude API via Anthropic SDK) for its "intelligence" — answering questions from memory or reasoning about errors?
+- How do I deploy this on Coolify? Dockerfile, environment variables, persistent storage for the knowledge base?
+
+### 2. Local Agent Wrapper (for Claude Code CLI agents)
+
+- How does a local wrapper on Clark's or Alice's machine connect to The Hub?
+- Since agents are behind NAT, they can't receive incoming HTTP requests. Options:
+  - **Long-polling**: wrapper periodically checks for pending tasks
+  - **WebSocket**: persistent outbound connection to The Hub
+  - **Push notifications (webhooks)**: requires the local machine to be reachable (problematic behind NAT)
+- How does the wrapper pipe messages into Claude Code? Options:
+  - `claude --print "prompt"` — one-shot, no session persistence
+  - Anthropic API directly (bypasses Claude Code but gives full control)
+  - An MCP server that queues messages for the next active Claude Code session
+- What's the recommended approach? Show a concrete implementation.
+
+### 3. Memory & Learning Architecture for The Hub
+
+- The Hub needs to accumulate knowledge from every conversation. How should this work?
+- Should it use a **vector database** for semantic search, a **SQLite FTS5** database for keyword search, or both?
+- How should it structure stored knowledge? My existing system uses markdown files with YAML frontmatter in an Obsidian vault (TRIGGER/ACTION/CONTEXT/OUTCOME format for experiences)
+- How does The Hub decide "I can answer this from memory" vs "I need to escalate to Clark"? What confidence threshold or retrieval strategy works best?
+- Should The Hub's memory be queryable by Alice and Clark directly, or only through The Hub's A2A interface?
+
+### 4. Security
+
+- **Cross-agent prompt injection**: error logs and stack traces will flow through The Hub. How do we prevent malicious instructions embedded in logs from poisoning The Hub's knowledge base or executing harmful commands?
+- **Authorization model**: how do we ensure The Hub only accepts connections from authorized agents? API key issuance, rotation, revocation?
+- **Ephemeral tokens**: the A2A spec recommends short-lived tokens (30s-5min). How do we implement token issuance and validation on The Hub?
+- **Human consent gates**: the A2A spec has a `USER_CONSENT_REQUIRED` task state. When should The Hub pause and ask a human for approval? How do we notify the human (Telegram? Web UI? Email)?
+- **Knowledge base poisoning**: if Alice sends a bad fix that The Hub stores, it could teach future agents wrong information. How do we validate knowledge before storing it?
+
+### 5. Human Visibility & Oversight
+
+- Humans (Aaron and Brian) need to see what's happening. What's the simplest way to build a web dashboard showing the conversation log between agents?
+- Should the Telegram bot be used for notifications/approvals? (I already have a working Telegram channel)
+- Can The Hub expose a simple web UI at `sandbox.tarrantcountymakerspace.com/dashboard`?
+
+### 6. Concrete Implementation Questions
+
+- Show me an example Agent Card JSON for The Hub (as an orchestrator with `troubleshoot-installation` and `query-error-history` skills)
+- Show me an example `message/send` JSON-RPC request from Alice asking about an installation error
+- Show me an example SSE stream of The Hub responding with a fix
+- Show me the escalation flow: The Hub can't answer → delegates to Clark → Clark responds → The Hub stores the lesson
+- What does the A2A JS SDK (`@a2a-js/sdk`) API look like? Server setup, route handlers, message handling?
+
+### 7. Gaps and Risks
+
+- What am I missing? What will break first?
+- What are the hardest parts to implement?
+- Are there existing open-source projects doing something similar I should look at?
+- Is there a simpler MVP I could build first to validate the concept before going full A2A?
+
+---
+
+## Deliverable
+
+Give me a **concrete, buildable architecture** — not just theory. I want to know exactly what to build, in what order, with what tools. Include code examples where possible. Flag anything that's speculative vs proven.
+
+I'm a solo developer learning fast via AI-first workflow. I'm comfortable with Node.js/TypeScript, Next.js, Convex, and deploying on Coolify. I have less experience with Python but can work with it if the Python SDK is significantly better.
