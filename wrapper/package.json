@@ -1,0 +1,22 @@
+{
+  "name": "a2a-local-wrapper",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Local wrapper that bridges Claude Code CLI to an A2A Hub",
+  "bin": { "a2a-wrapper": "dist/index.js" },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "commander": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "tsx": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}
