@@ -1,5 +1,15 @@
 # Changelog
 
+## [v4.0.0] - 2026-03-21
+
+### Added
+- A2A Intelligent Hub — persistent A2A-compliant agent for agent-to-agent communication
+- Local wrapper for bridging Claude Code CLI to the Hub
+- Convex-backed knowledge base with experience storage and search
+- Telegram mirror for human visibility and repo fix approvals
+- Self-correcting repo loop — Hub proposes and commits doc/script fixes
+- LLM root cause classifier for installation issues
+
 ## [v3.2.0] - 2026-03-21
 
 ### Fixed
