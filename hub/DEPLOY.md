@@ -194,6 +194,21 @@ git push origin master --tags
 
 ---
 
+## Future: Eliminate API Key Dependency
+
+Currently the Hub makes two small API calls via `ANTHROPIC_API_KEY`:
+- **Classifier** (`classifier.ts`) — 50 tokens max per call, categorizes root causes
+- **Repo Fixer** (`repo-fixer.ts`) — 2000 tokens max, drafts doc fixes (occasional)
+
+All heavy LLM work already runs through Claude Max subscription via wrapper `claude --print`.
+
+**Options to evaluate later:**
+1. **Route through wrappers** — Hub sends classification/fix-drafting tasks to a connected wrapper agent instead of calling the API directly. Zero API cost, all LLM calls use subscription.
+2. **Install Claude Code on VPS** — Hub uses `claude --print` on the server. Requires authenticating Claude Code there.
+3. **Keep hybrid** — Current approach. API costs are ~$0.01/day at moderate usage.
+
+---
+
 ## Troubleshooting
 
 | Issue | Fix |
