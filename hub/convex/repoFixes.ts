@@ -31,7 +31,8 @@ export const reject = mutation({
 });
 
 export const listPending = query({
-  handler: async (ctx) => {
+  args: {},
+  handler: async (ctx): Promise<any[]> => {
     return await ctx.db
       .query("repoFixes")
       .withIndex("by_status", (q) => q.eq("status", "pending"))

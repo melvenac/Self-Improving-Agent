@@ -30,7 +30,8 @@ export const heartbeat = mutation({
 });
 
 export const listOnline = query({
-  handler: async (ctx) => {
+  args: {},
+  handler: async (ctx): Promise<any[]> => {
     return await ctx.db
       .query("agents")
       .filter((q) => q.eq(q.field("status"), "online"))
