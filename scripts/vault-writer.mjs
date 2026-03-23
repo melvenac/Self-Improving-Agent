@@ -413,10 +413,10 @@ function mirrorToOpenBrain(experienceFilePaths) {
   const now = new Date().toISOString();
   const selectStmt = db.prepare('SELECT id FROM knowledge WHERE key = ? AND source = ?');
   const updateStmt = db.prepare(
-    'UPDATE knowledge SET content = ?, tags = ?, updated_at = ? WHERE id = ?'
+    'UPDATE knowledge SET content = ?, tags = ?, updated_at = ?, project_dir = ? WHERE id = ?'
   );
   const insertStmt = db.prepare(
-    'INSERT INTO knowledge (key, content, tags, source, permanent, created_at, updated_at) VALUES (?, ?, ?, ?, 1, ?, ?)'
+    'INSERT INTO knowledge (key, content, tags, source, permanent, created_at, updated_at, project_dir) VALUES (?, ?, ?, ?, 1, ?, ?, ?)'
   );
 
   let mirrored = 0;
@@ -440,11 +440,13 @@ function mirrorToOpenBrain(experienceFilePaths) {
       // Add vault-mirror tag to distinguish these entries
       const tagStr = tags ? `${tags}, vault-mirror` : 'vault-mirror';
 
+      const projectDir = frontmatter.project || null;
+
       const existing = selectStmt.get(filename, 'vault-mirror');
       if (existing) {
-        updateStmt.run(body, tagStr, now, existing.id);
+        updateStmt.run(body, tagStr, now, projectDir, existing.id);
       } else {
-        insertStmt.run(filename, body, tagStr, 'vault-mirror', now, now);
+        insertStmt.run(filename, body, tagStr, 'vault-mirror', now, now, projectDir);
       }
       mirrored++;
     } catch (err) {
