@@ -12,13 +12,18 @@
    - Based on what Aaron wants to work on (or pending tasks), generate **2-3 methodology-focused queries** — focus on techniques and patterns, not specific files
    - If no specific project or task yet, use broad queries based on what Aaron says
 
-3. **Retrieve:**
-   - Run `kb_recall` with all sub-queries batched in a single call
+3. **Federated search (run all three in parallel):**
+   - **Open Brain [OB]:** `kb_recall(queries: [Q1, Q2], project: cwd, limit: 5)` — FTS5 across sessions, knowledge, summaries
+   - **Smart Connections [SC]:** `mcp__smart-connections__lookup(query: Q1, limit: 5)` — semantic search across vault
+   - **CC Memory [CC]:** Scan MEMORY.md index descriptions for keyword matches
+   - **Fallback:** If Smart Connections errors, `grep -rl` over `~/Obsidian Vault/Experiences/` and `Guidelines/`
    - Read `~/Obsidian Vault/Guidelines/SKILL-INDEX.md` for matching skills
-   - Deduplicate if the same experience appears across queries
 
-4. **Rewrite and present:**
-   - For each retrieved experience, rewrite it to be **directly actionable** for the current context — turn abstract tips into concrete guidance
+4. **Merge, deduplicate, and present:**
+   - If same decision appears in [OB] (mirror) and [SC] (primary), keep the Obsidian version
+   - Tag results with source `[OB]`/`[SC]`/`[CC]` for provenance
+   - Rank: FTS5 keyword matches first, then semantic, then CC memory
+   - For each result, rewrite to be **directly actionable** — turn abstract tips into concrete guidance
    - **Drop** anything that isn't actually useful despite matching by keyword
    - Don't modify the vault — only rewrite what you present
    - Surface at most **3 experiences** and **2 skills** as context
