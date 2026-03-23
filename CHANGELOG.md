@@ -1,14 +1,10 @@
 # Changelog
 
-## [v4.0.0] - 2026-03-21
+## [v4.0.0] - 2026-03-22
 
-### Added
-- A2A Intelligent Hub — persistent A2A-compliant agent for agent-to-agent communication
-- Local wrapper for bridging Claude Code CLI to the Hub
-- Convex-backed knowledge base with experience storage and search
-- Telegram mirror for human visibility and repo fix approvals
-- Self-correcting repo loop — Hub proposes and commits doc/script fixes
-- LLM root cause classifier for installation issues
+### Removed
+- Extracted A2A Intelligent Hub (hub/, wrapper/, reference/) to standalone project at `~/Projects/A2A-Hub/`
+- Hub, wrapper, Convex schema, Telegram mirror, repo fixer, and all A2A research docs now live independently
 
 ## [v3.2.0] - 2026-03-21
 
