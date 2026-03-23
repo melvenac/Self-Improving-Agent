@@ -19,6 +19,8 @@ import {
 } from './vault-utils.mjs';
 import { syncProjects } from './vault-sync-projects.mjs';
 
+const KNOWLEDGE_DB_PATH = join(homedir(), '.claude', 'context-mode', 'knowledge.db');
+
 const SESSIONS_DB_DIR = join(homedir(), '.claude', 'context-mode', 'sessions');
 
 // Minimum quality thresholds for auto-extracted experiences
@@ -28,11 +30,38 @@ const MAX_EXPERIENCES_PER_SESSION = 3;  // cap to avoid noise
 const DEDUP_SIMILARITY_THRESHOLD = 0.80;  // skip if existing experience is this similar
 const VAULT_PATH_FOR_CLI = join(homedir(), 'Obsidian Vault');
 
-try {
-  main();
-} catch (err) {
-  log(`FATAL: ${err.message}\n${err.stack}`);
-  logErrorToVault(err);
+// --- CLI entry point ---
+if (process.argv.includes('--backfill')) {
+  try {
+    backfillMirror();
+  } catch (err) {
+    log(`FATAL (backfill): ${err.message}\n${err.stack}`);
+    logErrorToVault(err);
+  }
+} else {
+  try {
+    main();
+  } catch (err) {
+    log(`FATAL: ${err.message}\n${err.stack}`);
+    logErrorToVault(err);
+  }
+}
+
+/**
+ * Backfill mode: mirror ALL existing experience files to Open Brain.
+ */
+function backfillMirror() {
+  if (!existsSync(EXPERIENCES_DIR)) {
+    log('BACKFILL: No Experiences directory found');
+    return;
+  }
+  const files = readdirSync(EXPERIENCES_DIR)
+    .filter(f => f.endsWith('.md'))
+    .map(f => join(EXPERIENCES_DIR, f));
+
+  log(`BACKFILL: Found ${files.length} experience files to mirror`);
+  mirrorToOpenBrain(files);
+  log('BACKFILL: Complete');
 }
 
 /**
@@ -166,6 +195,12 @@ ${wikiLinks(mentions) || '(no topics matched)'}
   const experienceFiles = [];
 
   extractStructuredExperiences(decisions, gotchas, project, dateStr, mentions, experienceFiles);
+
+  // --- Stage 2.5: Mirror experiences to Open Brain (knowledge.db) ---
+  if (experienceFiles.length > 0) {
+    const expPaths = experienceFiles.map(e => join(EXPERIENCES_DIR, `${e.slug}.md`));
+    mirrorToOpenBrain(expPaths);
+  }
 
   // --- Stage 3: Topic Linking ---
   // Link session file to topics
@@ -323,6 +358,103 @@ ${wikiLinks(topics) || '(no topics matched)'}
       count++;
     }
   }
+}
+
+/**
+ * Parse YAML frontmatter from a markdown file.
+ * Returns { frontmatter: {}, body: string }.
+ */
+function parseFrontmatter(text) {
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  if (!match) return { frontmatter: {}, body: text };
+
+  const yamlBlock = match[1];
+  const body = match[2];
+  const frontmatter = {};
+
+  for (const line of yamlBlock.split('\n')) {
+    const colonIdx = line.indexOf(':');
+    if (colonIdx === -1) continue;
+    const key = line.slice(0, colonIdx).trim();
+    let value = line.slice(colonIdx + 1).trim();
+
+    // Handle YAML arrays like [tag1, tag2]
+    if (value.startsWith('[') && value.endsWith(']')) {
+      value = value.slice(1, -1).split(',').map(s => s.trim()).filter(Boolean);
+    }
+    // Handle quoted strings
+    if (typeof value === 'string' && /^["'].*["']$/.test(value)) {
+      value = value.slice(1, -1);
+    }
+    frontmatter[key] = value;
+  }
+
+  return { frontmatter, body };
+}
+
+/**
+ * Mirror experience files into Open Brain's knowledge.db for FTS5 search via kb_recall.
+ * Uses UPSERT pattern: check if key exists, then UPDATE or INSERT.
+ */
+function mirrorToOpenBrain(experienceFilePaths) {
+  if (!existsSync(KNOWLEDGE_DB_PATH)) {
+    log(`MIRROR SKIP: knowledge.db not found at ${KNOWLEDGE_DB_PATH}`);
+    return;
+  }
+
+  let db;
+  try {
+    db = new Database(KNOWLEDGE_DB_PATH);
+  } catch (err) {
+    log(`MIRROR ERROR: could not open knowledge.db: ${err.message}`);
+    return;
+  }
+
+  const now = new Date().toISOString();
+  const selectStmt = db.prepare('SELECT id FROM knowledge WHERE key = ? AND source = ?');
+  const updateStmt = db.prepare(
+    'UPDATE knowledge SET content = ?, tags = ?, updated_at = ? WHERE id = ?'
+  );
+  const insertStmt = db.prepare(
+    'INSERT INTO knowledge (key, content, tags, source, permanent, created_at, updated_at) VALUES (?, ?, ?, ?, 1, ?, ?)'
+  );
+
+  let mirrored = 0;
+  let errors = 0;
+
+  for (const filePath of experienceFilePaths) {
+    try {
+      if (!existsSync(filePath)) {
+        log(`MIRROR WARN: file not found: ${filePath}`);
+        continue;
+      }
+
+      const raw = readFileSync(filePath, 'utf-8');
+      const { frontmatter, body } = parseFrontmatter(raw);
+
+      const filename = filePath.split(/[\\/]/).pop().replace(/\.md$/, '');
+      const tags = Array.isArray(frontmatter.tags)
+        ? frontmatter.tags.join(', ')
+        : (frontmatter.tags || '');
+
+      // Add vault-mirror tag to distinguish these entries
+      const tagStr = tags ? `${tags}, vault-mirror` : 'vault-mirror';
+
+      const existing = selectStmt.get(filename, 'vault-mirror');
+      if (existing) {
+        updateStmt.run(body, tagStr, now, existing.id);
+      } else {
+        insertStmt.run(filename, body, tagStr, 'vault-mirror', now, now);
+      }
+      mirrored++;
+    } catch (err) {
+      log(`MIRROR ERROR: ${filePath}: ${err.message}`);
+      errors++;
+    }
+  }
+
+  db.close();
+  log(`MIRROR: ${mirrored} experiences mirrored to Open Brain (${errors} errors)`);
 }
 
 /**
