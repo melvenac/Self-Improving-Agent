@@ -5,7 +5,7 @@
 ## Completed
 
 ### ~~1. No Automatic Session Capture Safety Net~~ — DONE
-**Was:** If Aaron forgets to run `/end` or a session crashes, that session's knowledge is lost.
+**Was:** If you forget to run `/end` or a session crashes, that session's knowledge is lost.
 **Fix:** `SessionEnd` hook (`vault-writer.mjs`) auto-writes session logs and experience files to the Obsidian Vault after every Claude Code session. No manual `/end` required for capture.
 
 ### ~~2. No Visual Knowledge Graph~~ — DONE
@@ -15,7 +15,7 @@
 ### ~~3. No Conversation Import~~ — DONE
 **Was:** Historical Claude Code conversations not captured — only sessions where `/end` was explicitly run.
 **Fix:** Two migration scripts cover all session sources:
-- `vault-migration.mjs` — migrated 10 sessions + 16 experiences from Open Brain MCP (SQLite/context-mode .db files)
+- `vault-migration.mjs` — migrated 10 sessions + 16 experiences from Knowledge MCP (SQLite .db files)
 - `vault-migrate-jsonl.mjs` — migrated 79 sessions from Claude Code's native JSONL transcripts (`~/.claude/projects/*/*.jsonl`)
 - **Total: 89 sessions** in the vault, dating back to 2026-03-07
 
@@ -36,7 +36,7 @@
 **Fix:** Rewrote extraction to use structured session data (decision events and gotcha detections). Added quality gates: min 40 char length, max 3 per session, actual content in Action field instead of boilerplate, `source: auto-extracted` tag for easy review. Manually written experiences via `/end` are still higher quality but auto-extracted ones are now useful.
 
 ### ~~3. Skill Distillation Is Manual~~ — FULLY AUTOMATED
-**Was:** The "3+ similar experiences → propose skill" pipeline required Clark to notice the pattern during retrieval.
+**Was:** The "3+ similar experiences → propose skill" pipeline required the agent to notice the pattern during retrieval.
 **Fix (v1):** `vault-skill-scan.mjs` clusters experiences by tag, project, and type. Outputs `SKILL-CANDIDATES.md` with WikiLinks. Run on-demand.
 **Fix (v2, 2026-03-20):** `skill-scan.mjs` SessionEnd hook runs automatically after vault-writer. Diffs against previous scan, detects new/growing clusters, writes pending proposals to `.skill-proposals-pending.json`. No manual scanning needed — the compound feedback loop detects patterns as experiences accumulate.
 
@@ -65,7 +65,7 @@
 **Fix:** Retrieval protocol now updates `last-used` (date) and `retrieval-count` (integer) in experience frontmatter each time one is surfaced. Enables future pruning of stale experiences and prioritization of frequently used ones.
 
 ### 8. No Cross-Machine Sync — DEFERRED
-**Status:** Not needed — Aaron uses one machine. If a second machine is added, use git-based sync (already uses GitHub + `gh` CLI for VPS push/pull). Obsidian Sync is an alternative. Originated from the-obsidian-prompt-v4.0.3.md reference architecture.
+**Status:** Deferred. If a second machine is added, use git-based sync or Obsidian Sync.
 
 ### ~~9. Empty Vault Folders~~ — DONE
 **Was:** `Projects/`, `Context/`, `Logs/` folders were empty and unused.

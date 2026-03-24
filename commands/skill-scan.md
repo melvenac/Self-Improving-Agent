@@ -38,7 +38,7 @@ Rewrite `~/Obsidian Vault/Guidelines/SKILL-CANDIDATES.md` with:
 ### 5. Notify if actionable
 
 If any **new cluster crossed the 3+ threshold** this cycle:
-- Store a notification in Open Brain via `kb_store`:
+- Store a notification via `kb_store`:
   - Key: `skill-proposal-{tag}-{date}`
   - Content: "Skill proposal: {tag} has {count} experiences. Files: {list}. Consider distilling into a skill."
   - Tags: `["skill-proposal", "{tag}"]`
@@ -56,7 +56,7 @@ Growth: {list or "none"}
 
 ## Rules
 
-- **Never auto-create skills.** Only propose — Aaron decides.
+- **Never auto-create skills.** Only propose — the user decides.
 - **Don't modify experience files.** Read-only scan.
 - **Keep it fast.** This runs on a loop — no deep analysis, just counting and diffing.
 - **Be quiet if nothing changed.** If no new clusters or growth, just print the scan count and "no changes."

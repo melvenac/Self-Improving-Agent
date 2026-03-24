@@ -1,10 +1,10 @@
 /**
  * skill-scan.mjs — SessionEnd hook (runs after vault-writer)
  * Scans Obsidian Experiences/ for tag clusters, diffs against SKILL-CANDIDATES.md,
- * and stores proposals in Open Brain when new clusters cross the 3+ threshold.
+ * and stores proposals in Knowledge MCP when new clusters cross the 3+ threshold.
  *
  * This is the "pattern recognition" layer of the self-improving agent:
- * Memory (experiences) + Proactivity (SessionEnd hook) + Tools (file I/O + Open Brain)
+ * Memory (experiences) + Proactivity (SessionEnd hook) + Tools (file I/O + Knowledge MCP)
  */
 
 import { existsSync, readdirSync, readFileSync, writeFileSync, appendFileSync } from 'fs';
@@ -216,7 +216,7 @@ function main() {
 
   for (const line of summary) log(line);
 
-  // 6. If new clusters, note it for Open Brain pickup
+  // 6. If new clusters, note it for Knowledge MCP pickup
   // (Can't call MCP from a hook script, so we write a marker file that /recall can check)
   if (newClusters.length > 0) {
     const markerPath = join(VAULT, '.skill-proposals-pending.json');

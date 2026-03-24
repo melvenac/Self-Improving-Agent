@@ -54,7 +54,7 @@ Every experience file uses YAML frontmatter for metadata and a structured body f
 ```yaml
 ---
 title: Convex validator must wrap entire args object
-project: Open Brain
+project: My Project
 domain: convex
 date: 2026-03-15
 type: gotcha
@@ -87,7 +87,7 @@ Always use `args: v.object({ field1: v.string(), field2: v.number() })`
 rather than `args: { field1: v.string(), field2: v.number() }`.
 
 ## CONTEXT
-Building the knowledge base API for Open Brain. The mutation silently
+Building the knowledge base API for My Project. The mutation silently
 accepted any input when args weren't wrapped in v.object(), which caused
 data integrity issues that only surfaced later.
 
@@ -96,7 +96,7 @@ Wrapping args in v.object() caught invalid inputs at the API boundary
 immediately. Applied this pattern to all 12 Convex functions in the project.
 
 ## Links
-[[Open Brain]] [[Convex Patterns]]
+[[My Project]] [[Convex Patterns]]
 ```
 
 Each section serves a specific purpose:
@@ -111,7 +111,7 @@ Each section serves a specific purpose:
 Session logs use WikiLinks to reference the experiences they generated:
 
 ```markdown
-# Session: Open Brain API Refactor (2026-03-15)
+# Session: My Project API Refactor (2026-03-15)
 
 Refactored all Convex functions to use proper validator patterns.
 

@@ -100,7 +100,7 @@ Now open Obsidian and look at your vault. You should see new files:
 
 **MCP server errors:**
 - Run `claude mcp list` to see registered servers.
-- Make sure both `open-brain-knowledge` and `smart-connections` appear in the list.
+- Make sure both `knowledge-mcp` and `smart-connections` appear in the list.
 - If one is missing, re-run the `claude mcp add` command from Step 3.
 
 ---
@@ -116,3 +116,5 @@ Congratulations. Your self-improving agent is set up and running. From now on, e
 To understand how the system works under the hood -- how experiences are stored, how retrieval works, and how skills get distilled -- read the **[Architecture Guide](../how-it-works/overview.md)**.
 
 To start a new project with an AI-ready structure that integrates with this system, see the **[Project Template](../project-template/README.md)**.
+
+To run multiple coordinated agents across machines, see the **[A2A Wrapper](../how-it-works/multi-agent.md)**. This is optional -- the core learning system works great on its own. The wrapper adds multi-agent coordination when you need it.

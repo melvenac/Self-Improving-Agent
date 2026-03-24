@@ -4,7 +4,7 @@
 
 ## Architecture
 
-3-tier hub-and-spoke: **Global** (CLAUDE.md + Open Brain + Obsidian) → **Domain** (tagged experiences) → **Project** (.claude + .agents).
+3-tier hub-and-spoke: **Global** (CLAUDE.md + Knowledge MCP + Obsidian) → **Domain** (tagged experiences) → **Project** (.claude + .agents).
 
 ## Retrieval (via /recall or project /start)
 
@@ -19,7 +19,7 @@
 2. Format as `[EXPERIENCE]` block (PROJECT, DOMAIN, DATE, TYPE, TRIGGER, ACTION, CONTEXT, OUTCOME)
 3. Dedup via `kb_recall` before `kb_store`
 4. Store session summary via `kb_store_summary`
-5. If 3+ similar experiences → propose skill to Aaron (never auto-create)
+5. If 3+ similar experiences → propose skill to user (never auto-create)
 
 ## Experience Format
 

@@ -61,7 +61,7 @@ The most important files to fill in first are **PRD.md**, **ENTITIES.md**, and *
 
 ## Connection to the Learning System
 
-This template is part of the [Self-Improving Agent](https://github.com/melve-org/Self-Improving-Agent) learning system. When used with the full system:
+This template is part of the [Self-Improving Agent](https://github.com/melvenac/Self-Improving-Agent) learning system. When used with the full system:
 
 - **Sessions** feed experiences back into your knowledge vault
 - **Decisions** accumulate into reusable skills over time

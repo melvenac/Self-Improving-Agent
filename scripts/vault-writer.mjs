@@ -19,9 +19,9 @@ import {
 } from './vault-utils.mjs';
 import { syncProjects } from './vault-sync-projects.mjs';
 
-const KNOWLEDGE_DB_PATH = join(homedir(), '.claude', 'context-mode', 'knowledge.db');
+const KNOWLEDGE_DB_PATH = join(homedir(), '.claude', 'knowledge-mcp', 'knowledge.db');
 
-const SESSIONS_DB_DIR = join(homedir(), '.claude', 'context-mode', 'sessions');
+const SESSIONS_DB_DIR = join(homedir(), '.claude', 'knowledge-mcp', 'sessions');
 
 // Minimum quality thresholds for auto-extracted experiences
 const MIN_DECISION_LENGTH = 40;  // decisions shorter than this are too vague
@@ -48,7 +48,7 @@ if (process.argv.includes('--backfill')) {
 }
 
 /**
- * Backfill mode: mirror ALL existing experience files to Open Brain.
+ * Backfill mode: mirror ALL existing experience files to Knowledge MCP.
  */
 function backfillMirror() {
   if (!existsSync(EXPERIENCES_DIR)) {
@@ -196,7 +196,7 @@ ${wikiLinks(mentions) || '(no topics matched)'}
 
   extractStructuredExperiences(decisions, gotchas, project, dateStr, mentions, experienceFiles);
 
-  // --- Stage 2.5: Mirror experiences to Open Brain (knowledge.db) ---
+  // --- Stage 2.5: Mirror experiences to Knowledge MCP (knowledge.db) ---
   if (experienceFiles.length > 0) {
     const expPaths = experienceFiles.map(e => join(EXPERIENCES_DIR, `${e.slug}.md`));
     mirrorToOpenBrain(expPaths);
@@ -393,7 +393,7 @@ function parseFrontmatter(text) {
 }
 
 /**
- * Mirror experience files into Open Brain's knowledge.db for FTS5 search via kb_recall.
+ * Mirror experience files into Knowledge MCP's knowledge.db for FTS5 search via kb_recall.
  * Uses UPSERT pattern: check if key exists, then UPDATE or INSERT.
  */
 function mirrorToOpenBrain(experienceFilePaths) {
@@ -456,7 +456,7 @@ function mirrorToOpenBrain(experienceFilePaths) {
   }
 
   db.close();
-  log(`MIRROR: ${mirrored} experiences mirrored to Open Brain (${errors} errors)`);
+  log(`MIRROR: ${mirrored} experiences mirrored to Knowledge MCP (${errors} errors)`);
 }
 
 /**

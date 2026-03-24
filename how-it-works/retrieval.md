@@ -14,12 +14,11 @@ The agent queries the vault using the current project name combined with its dom
 
 | Project | Domain Tags |
 |---|---|
-| Open Brain | convex, nextjs, mcp, sqlite |
-| Makerspace Site | convex, nextjs, stripe, ui |
-| AI-First Framework | framework, meta, agents |
-| Mail Server | php, roundcube, gemini |
-| Banderwocky Pipeline | python, etsy, automation, blender |
-| Learning System | learning-system, protocols, meta, agents, memory |
+| My SaaS App | nextjs, stripe, postgres, auth |
+| Data Pipeline | python, etl, automation |
+| Mobile Backend | convex, react-native, mcp |
+
+> **Note:** You define your own project/tag mappings in `~/.claude/CLAUDE.md`. The table above is just an example.
 
 Example queries: `"convex validator gotcha"`, `"stripe convex action"`, or just the project name directly.
 
@@ -81,7 +80,7 @@ Over time, these fields create a natural ranking that helps the retrieval system
 
 ## Example: What a Session Start Looks Like
 
-When you run `/start` in the Open Brain project, the agent might surface:
+When you run `/start` in a Convex project, the agent might surface:
 
 ```
 Retrieved for this session:

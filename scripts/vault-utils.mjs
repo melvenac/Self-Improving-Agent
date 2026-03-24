@@ -10,22 +10,16 @@ const SUMMARIES_DIR = join(VAULT_PATH, 'Summaries');
 const LOGS_DIR = join(VAULT_PATH, 'Logs');
 const LOG_PATH = join(VAULT_PATH, '.vault-writer.log');
 
-// Initial seed topics — derived from project domain tags and known tools
+// Seed topics for topic detection. Add your own projects and tools here.
+// These help the vault-writer auto-link experiences to topic notes.
+// Format: { name: 'topic-slug', type: 'tool'|'concept'|'project', description: '...' }
 const SEED_TOPICS = [
-  { name: 'convex', type: 'tool', description: 'Reactive backend-as-a-service used across multiple projects' },
-  { name: 'nextjs', type: 'tool', description: 'React framework for web apps' },
-  { name: 'stripe', type: 'tool', description: 'Payment processing for makerspace memberships' },
-  { name: 'sqlite', type: 'tool', description: 'Embedded database used by Open Brain and context-mode' },
-  { name: 'docker', type: 'tool', description: 'Container platform for VPS deployments' },
-  { name: 'python', type: 'tool', description: 'Used for CLI pipelines and automation' },
-  { name: 'blender', type: 'tool', description: '3D modeling tool used in Banderwocky pipeline' },
-  { name: 'roundcube', type: 'tool', description: 'Webmail client on mail server VPS' },
-  { name: 'gemini', type: 'tool', description: 'Google AI model used for mail server AI reply' },
+  // Common tools (add/remove based on your stack)
+  { name: 'sqlite', type: 'tool', description: 'Embedded database used by knowledge-mcp' },
+  { name: 'docker', type: 'tool', description: 'Container platform for deployments' },
   { name: 'mcp', type: 'concept', description: 'Model Context Protocol — tool interface for AI agents' },
-  { name: 'tarrant-county-makerspace', type: 'project', description: 'Community makerspace owned by Aaron — website rebuild in progress' },
-  { name: 'open-brain', type: 'project', description: 'Personal AI memory/database system (Next.js + Convex + MCP)' },
-  { name: 'banderwocky-pipeline', type: 'project', description: "Brian's Etsy laser-cut design pipeline" },
-  { name: 'voice-assistant', type: 'project', description: 'Self-hosted voice assistant competing with Alexa' },
+  // Add your projects below, e.g.:
+  // { name: 'my-project', type: 'project', description: 'Description of your project' },
 ];
 
 export { VAULT_PATH, SESSIONS_DIR, EXPERIENCES_DIR, TOPICS_DIR, SUMMARIES_DIR, LOGS_DIR, LOG_PATH, SEED_TOPICS };

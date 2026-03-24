@@ -25,8 +25,10 @@ If you are not using VS Code, you can open any terminal application:
 "Cloning" means downloading a copy of the project from GitHub to your computer. Run this command in your terminal:
 
 ```bash
-git clone https://github.com/melvenac/Self-Improving-Agent.git
+git clone https://github.com/YOUR_USERNAME/Self-Improving-Agent.git
 ```
+
+> **Note:** Replace `YOUR_USERNAME` with the GitHub account you forked this repo to. If you haven't forked it yet, you can clone the original: `git clone https://github.com/melvenac/Self-Improving-Agent.git`
 
 This creates a new folder called `Self-Improving-Agent` in whatever directory your terminal is currently in. Now move into that folder:
 
@@ -55,6 +57,8 @@ Here is what each folder in the project is for:
 | `project-template/` | A starter template you can copy when beginning a new AI-assisted project. |
 | `scripts/` | Hook scripts that run automatically to capture what you learn. |
 | `commands/` | Slash command files that add shortcuts to Claude Code (like `/recall`). |
+| `knowledge-mcp/` | Persistent memory MCP server -- stores and searches session knowledge. |
+| `a2a-wrapper/` | Lightweight agent wrapper for multi-agent coordination (optional). |
 | `reference/` | Legacy setup docs and protocol snapshots -- kept for historical reference. |
 
 ---

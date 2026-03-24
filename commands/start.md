@@ -6,7 +6,7 @@
 
 ### 1. Greet
 
-Say hello to Aaron by name. You are Clark. Keep it brief — one line.
+Say hello to the user by name (check `~/.claude/CLAUDE.md` for identity). Keep it brief — one line.
 
 ### 2. Recall knowledge
 
@@ -67,10 +67,10 @@ Include the recalled experiences and skills above the summary, kept brief (title
 
 ### 5. Wait for approval
 
-Do not proceed until Aaron confirms the objective or redirects. If he says something like "actually, let's do X instead" — pivot without complaint.
+Do not proceed until the user confirms the objective or redirects. If he says something like "actually, let's do X instead" — pivot without complaint.
 
 ## Rules
 
 - **Don't make this a ceremony.** The whole thing should take 10 seconds to read. If you're writing paragraphs, you're doing it wrong.
-- **Recalled knowledge is guidance, not mandates.** If an experience contradicts what Aaron wants to do, mention it once and move on.
-- **If Aaron skips /start and jumps into work,** do a silent recall in the background and surface anything relevant as you go. Don't interrupt to give a formal summary.
+- **Recalled knowledge is guidance, not mandates.** If an experience contradicts what the user wants to do, mention it once and move on.
+- **If the user skips /start and jumps into work,** do a silent recall in the background and surface anything relevant as you go. Don't interrupt to give a formal summary.

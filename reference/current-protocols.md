@@ -1,7 +1,7 @@
 # Current Protocols — v2.0 (Obsidian-Based)
 
 > Snapshot of the learning system as it exists today (2026-03-18).
-> Architecture migrated from Open Brain MCP (SQLite) to Obsidian Vault (markdown files).
+> Architecture migrated from SQLite-only storage to Obsidian Vault (markdown files) + Knowledge MCP (FTS5 search).
 
 ## Retrieval Protocol (Session Start)
 
@@ -19,12 +19,9 @@
 
 | Project | Tags |
 |---|---|
-| Open Brain | convex, nextjs, mcp, sqlite |
-| Makerspace Site | convex, nextjs, stripe, ui |
-| AI-First Framework | framework, meta, agents |
-| Mail Server | php, roundcube, gemini |
-| Banderwocky Pipeline | python, etsy, automation, blender |
-| Learning System | learning-system, protocols, meta, agents, memory |
+| *(your projects)* | *(your domain tags)* |
+
+> Define your own project/tag mappings in `~/.claude/CLAUDE.md`.
 
 ## Accumulation Protocol (Session End)
 
@@ -71,7 +68,7 @@ type: {gotcha | pattern | decision | fix | optimization}
 
 - **Context cap:** Max 3 experiences + 2 skills per session start
 - **Dedup:** Search vault before writing — merge if >90% similar
-- **Skill gate:** Never auto-create — propose to Aaron, 3-experience minimum
+- **Skill gate:** Never auto-create — propose to user, 3-experience minimum
 - **Non-prescriptive:** Retrieved knowledge is guidance, not mandates
 - **Monthly pruning:** Review and archive stale experience files in vault
 

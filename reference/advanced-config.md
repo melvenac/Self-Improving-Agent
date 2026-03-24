@@ -77,10 +77,10 @@ Tags should be specific enough to be useful but broad enough to match related ex
 ### Retrieval sources
 
 The system retrieves from two sources:
-1. **Open Brain** (`kb_recall`) — semantic search over stored experiences
+1. **Knowledge MCP** (`kb_recall`) — FTS5 search over stored experiences
 2. **Skill Index** (`~/Obsidian Vault/Guidelines/SKILL-INDEX.md`) — curated pattern docs
 
-If Open Brain MCP is unavailable, retrieval falls back to reading experience files directly from `~/Obsidian Vault/Experiences/`.
+If Knowledge MCP is unavailable, retrieval falls back to reading experience files directly from `~/Obsidian Vault/Experiences/`.
 
 ## Adding New Slash Commands
 

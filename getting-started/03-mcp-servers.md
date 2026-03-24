@@ -12,25 +12,35 @@ Without these plugins, Claude Code is a smart assistant but it has no memory bet
 
 You will install two MCP servers:
 
-1. **Open Brain** -- gives Claude Code tools to store and retrieve knowledge (like `kb_store` and `kb_recall`).
+1. **Knowledge MCP** -- gives Claude Code tools to store and retrieve knowledge (like `kb_store` and `kb_recall`). It is bundled in this repository under `knowledge-mcp/`.
 2. **Smart Connections** -- enables semantic search across your vault, so Claude can find relevant past experiences even if the exact words do not match.
 
 ---
 
-## Install Open Brain MCP
+## Install Knowledge MCP
 
-Open Brain is the persistent memory layer. It gives Claude Code commands like `kb_store` (save a piece of knowledge) and `kb_recall` (search for relevant knowledge).
+Knowledge MCP is the persistent memory layer. It gives Claude Code commands like `kb_store` (save a piece of knowledge) and `kb_recall` (search for relevant knowledge). It is included in this repository, so you build it locally.
 
-1. Open a terminal.
-2. Run this command:
+1. Open a terminal and navigate to the knowledge-mcp directory inside the cloned repo:
 
 ```bash
-claude mcp add -s user open-brain-knowledge -- npx -y open-brain-knowledge
+cd Self-Improving-Agent/knowledge-mcp
+npm install
+npm run build
 ```
 
-**What this command does:** It tells Claude Code to register a new MCP server called `open-brain-knowledge`. The `-s user` flag means it is installed for your user account (available in all projects, not just one). The `npx -y` part downloads and runs the server automatically.
+2. Register it as an MCP server in Claude Code. Use the **absolute path** to the built server file:
 
-You can find more details about Open Brain at its repository: [github.com/melvenac/open-brain-knowledge](https://github.com/melvenac/open-brain-knowledge)
+```bash
+claude mcp add -s user knowledge-mcp -- node /ABSOLUTE/PATH/TO/Self-Improving-Agent/knowledge-mcp/build/server.js
+```
+
+> **Replace the path** with the actual location on your system:
+> - **Windows:** `node C:/Users/YourName/Self-Improving-Agent/knowledge-mcp/build/server.js`
+> - **macOS:** `node /Users/YourName/Self-Improving-Agent/knowledge-mcp/build/server.js`
+> - **Linux:** `node /home/YourName/Self-Improving-Agent/knowledge-mcp/build/server.js`
+
+**What this command does:** It tells Claude Code to register a new MCP server called `knowledge-mcp`. The `-s user` flag means it is installed for your user account (available in all projects, not just one).
 
 ---
 
@@ -71,10 +81,10 @@ Now let's confirm everything is connected.
 claude
 ```
 
-2. Once Claude Code is running, ask it to test Open Brain:
+2. Once Claude Code is running, ask it to test the Knowledge MCP:
 
 ```
-Can you use kb_list to show what's in Open Brain?
+Can you use kb_list to show what's in the knowledge base?
 ```
 
 You should see Claude Code call the `kb_list` tool and return a result. Since your knowledge base is new, it will likely say there are no entries yet. That is expected.
@@ -87,8 +97,9 @@ Can you use Smart Connections to search for "getting started"?
 
 Claude Code should call the Smart Connections search tool. If your vault is empty, it may return few or no results -- that is fine. The important thing is that the tool call succeeds without an error.
 
-**If Open Brain does not work:**
-- Make sure you ran the `claude mcp add` command exactly as shown above.
+**If Knowledge MCP does not work:**
+- Make sure you ran `npm run build` in the `knowledge-mcp/` directory and it completed without errors.
+- Make sure the path in your `claude mcp add` command points to the actual `build/server.js` file.
 - Restart Claude Code (close it and run `claude` again).
 - Check that Node.js is installed (`node --version` should print a version number).
 

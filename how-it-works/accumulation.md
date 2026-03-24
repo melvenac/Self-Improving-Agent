@@ -30,7 +30,7 @@ The writer creates a new file in `~/Obsidian Vault/Sessions/` with YAML frontmat
 ```yaml
 ---
 date: 2026-03-15
-project: Open Brain
+project: My Project
 tags: [convex, api, refactor]
 ---
 ```
@@ -46,7 +46,7 @@ Each experience follows the standard format:
 ```yaml
 ---
 title: Convex scheduled functions need explicit error handling
-project: Open Brain
+project: My Project
 domain: convex
 date: 2026-03-15
 type: gotcha

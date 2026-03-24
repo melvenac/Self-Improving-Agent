@@ -85,6 +85,8 @@ Each part of the cycle has its own documentation:
 
 - **[Skill Distillation](skill-distillation.md)** -- how individual experiences cluster into reusable skills over time, with a human approval gate to ensure quality.
 
+- **[Multi-Agent Coordination](multi-agent.md)** -- how the A2A wrapper lets multiple Claude Code agents coordinate through a shared hub, with each agent benefiting from the same learning system.
+
 ## Why It Works
 
 The system works because it is:

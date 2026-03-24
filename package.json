@@ -1,8 +1,8 @@
 {
-  "name": "learning-system-hooks",
-  "version": "2.1.0",
+  "name": "self-improving-agent",
+  "version": "0.1.0",
   "type": "module",
-  "description": "SessionEnd hook scripts for the self-improving agent learning system",
+  "description": "AI development environment that learns across sessions — memory protocol, automation hooks, and multi-agent coordination",
   "dependencies": {
     "better-sqlite3": "^11.0.0"
   }

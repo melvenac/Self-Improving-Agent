@@ -151,7 +151,7 @@ To confirm Claude Code knows about your hooks:
 ls ~/.claude/knowledge-mcp/scripts/
 ```
 
-You should see `skill-scan.mjs`, `package.json`, and a `node_modules/` folder.
+You should see `vault-writer.mjs`, `vault-utils.mjs`, `skill-scan.mjs`, `package.json`, and a `node_modules/` folder.
 
 To confirm the slash commands are installed:
 

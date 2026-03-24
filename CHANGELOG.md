@@ -1,6 +1,33 @@
 # Changelog
 
-## [v4.0.0] - 2026-03-22
+## [v0.1.0] - 2026-03-23
+
+First public pre-release. The system is functional and tested but the API surface may change.
+
+### Added
+- `knowledge-mcp/` — bundled Knowledge MCP server (persistent FTS5 search over sessions and stored knowledge)
+- `a2a-wrapper/` — lightweight agent wrapper for multi-agent coordination via A2A Hub
+- `how-it-works/multi-agent.md` — architecture docs for the A2A wrapper
+
+### Changed
+- Renamed all "Open Brain" references to "Knowledge MCP" across docs, scripts, and commands
+- Templated all user-specific content — repo is now cloneable by anyone
+- Getting-started guide 03 now points to bundled `knowledge-mcp/` instead of external npm package
+- Replaced hardcoded project domain tags with generic examples
+- Replaced personal SEED_TOPICS in `vault-utils.mjs` with minimal generic set
+- Aligned all DB paths to `~/.claude/knowledge-mcp/`
+- Updated package.json name to `self-improving-agent`, version reset to 0.1.0
+
+### Fixed
+- Duplicate "Obsidian vault orphan audit" entry in `.agents/TASKS/INBOX.md`
+- Added INBOX reconciliation step to `/start` command to catch future drift
+- Missing files in step 04 verification checklist
+
+---
+
+*Prior versions (v2.0–v4.0) were internal development iterations.*
+
+## [v4.0.0] - 2026-03-22 (internal)
 
 ### Removed
 - Extracted A2A Intelligent Hub (hub/, wrapper/, reference/) to standalone project at `~/Projects/A2A-Hub/`
@@ -9,7 +36,7 @@
 ## [v3.2.0] - 2026-03-21
 
 ### Fixed
-- Step 04: Added missing `vault-writer.mjs` and `vault-utils.mjs` copy commands — previously told users to find vault-writer in the Open Brain repo even though it ships in `scripts/`
+- Step 04: Added missing `vault-writer.mjs` and `vault-utils.mjs` copy commands — previously told users to find vault-writer elsewhere even though it ships in `scripts/`
 - Step 04: Added missing `/start` command to the copy instructions (was shipping 4 commands but only documenting 3)
 - Step 03: Fixed inconsistent Smart Connections package names (was referencing two different npm packages)
 - Step 03: Removed unnecessary global npm install step for Smart Connections
@@ -50,7 +77,7 @@
 ### Added
 - `getting-started/01-prerequisites.md` — install guide for all required tools
 - `getting-started/02-clone-and-configure.md` — repo cloning and Obsidian vault setup
-- `getting-started/03-mcp-servers.md` — Open Brain and Smart Connections MCP installation
+- `getting-started/03-mcp-servers.md` — Knowledge MCP and Smart Connections MCP installation
 - `getting-started/04-hooks-and-commands.md` — SessionEnd hooks and slash command setup
 - `getting-started/05-verify-installation.md` — guided first-session walkthrough
 
@@ -80,4 +107,4 @@
 - `SELF-IMPROVING-AGENT.md` — protocol quick reference
 - `current-protocols.md` — detailed retrieval and accumulation protocols
 - `gaps.md` — known gaps and improvement backlog
-- Obsidian-based architecture (migrated from Open Brain-only approach)
+- Obsidian-based architecture (migrated from SQLite-only approach)
