@@ -9,17 +9,16 @@ Step-by-step instructions to set up the self-improving agent learning system.
 - [Obsidian](https://obsidian.md/) installed (free)
 - Git + GitHub CLI (`gh`) for version control
 
-## 1. Install Open Brain MCP
+## 1. Install Knowledge MCP
 
-Open Brain is the persistent memory layer. Install it as a Claude Code MCP server:
+Knowledge MCP is the persistent memory layer. It's bundled in this repo under `knowledge-mcp/`. Build and register it:
 
 ```bash
-claude mcp add -s user open-brain-knowledge -- npx -y open-brain-knowledge
+cd knowledge-mcp && npm install && npm run build && cd ..
+claude mcp add -s user knowledge-mcp -- node knowledge-mcp/build/server.js
 ```
 
 This gives your agent `kb_store`, `kb_recall`, `kb_list`, and other memory tools.
-
-Repo: [github.com/melvenac/open-brain-knowledge](https://github.com/melvenac/open-brain-knowledge)
 
 ## 2. Create the Obsidian Vault
 
@@ -46,8 +45,7 @@ EOF
 Enables semantic search across your vault — much better retrieval than keyword matching:
 
 ```bash
-npm install -g @anthropic-ai/smart-connections-mcp
-claude mcp add -s user smart-connections -- npx -y @yejianye/smart-connections-mcp
+claude mcp add -s user smart-connections -- npx -y @anthropic-ai/smart-connections-mcp
 ```
 
 Configure it to point at your vault. See the [Smart Connections MCP repo](https://github.com/yejianye/smart-connections-mcp) for details.
@@ -71,7 +69,7 @@ npm install
 
 The `npm install` step is required — `vault-writer.mjs` and `auto-index.mjs` depend on `better-sqlite3` for reading session databases. `skill-scan.mjs` only uses Node.js built-ins, but the other hooks in the pipeline need this dependency.
 
-For vault-writer.mjs (the session capture hook), see the [Open Brain repo](https://github.com/melvenac/open-brain-knowledge) — it's bundled there.
+The `vault-writer.mjs` session capture hook ships in `scripts/` — copy it alongside the others.
 
 ## 5. Configure SessionEnd Hooks
 
@@ -146,7 +144,7 @@ Session capture is automatic — vault-writer + skill-scan run after every sessi
 ## 8. Verify It Works
 
 1. Start a new Claude Code session
-2. Run `/recall` — should greet you and search Open Brain
+2. Run `/recall` — should greet you and search Knowledge MCP
 3. Do some work, hit a gotcha or make a decision
 4. End the session — check `~/Obsidian Vault/Sessions/` for a new log
 5. Check `~/Obsidian Vault/Experiences/` for auto-extracted lessons
