@@ -6,20 +6,45 @@
 
 3-tier hub-and-spoke: **Global** (CLAUDE.md + Knowledge MCP + Obsidian) → **Domain** (tagged experiences) → **Project** (.claude + .agents).
 
-## Retrieval (via /recall or project /start)
+Three stores with write authority (ADR-005): Obsidian Vault (experiences/skills), Knowledge MCP SQLite (sessions/ephemeral), CC Memory (identity/bootstrap).
 
-1. `kb_recall` with project name + domain tags → max 3 experiences
-2. Read `~/Obsidian Vault/Guidelines/SKILL-INDEX.md` → max 2 skills
-3. Check `.skill-proposals-pending.json` for new cluster notifications
-4. Present as non-prescriptive guidance
+## Commands
 
-## Accumulation (at /end, steps 9-10)
+Two commands, both with smart routing:
 
-1. Extract gotchas/lessons from session log
-2. Format as `[EXPERIENCE]` block (PROJECT, DOMAIN, DATE, TYPE, TRIGGER, ACTION, CONTEXT, OUTCOME)
-3. Dedup via `kb_recall` before `kb_store`
-4. Store session summary via `kb_store_summary`
-5. If 3+ similar experiences → propose skill to user (never auto-create)
+| Command | What it does |
+|---|---|
+| `/start` | Detects `.agents/` → full project startup + knowledge recall, or lightweight recall only |
+| `/end` | Detects `.agents/` → full project close-out + knowledge capture, or lightweight capture only |
+
+`/recall` has been merged into `/start` (Part B).
+
+## Session Lifecycle
+
+### Start (via `/start` or automatic `session-bootstrap.mjs` hook)
+
+1. **Bootstrap hook** (automatic) — detects project, reads `next-session.md` handoff, checks backup freshness, checks skill proposals
+2. **Federated search** — Knowledge MCP (FTS5) + Smart Connections (semantic) in parallel → max 3 experiences + 2 skills
+3. **Project state** (if `.agents/` exists) — reads SUMMARY.md, INBOX.md, reconciles task drift, generates CLAUDE.md if missing
+4. **Context budget** — keeps startup injection under 5% of context window
+5. **Present summary** — project state + proposed objective + relevant knowledge → await approval
+
+### End (via `/end`)
+
+1. **Project close-out** (if `.agents/`) — update session log, SUMMARY.md, DECISIONS.md, INBOX.md, task.md
+2. **Next-session handoff** — write `next-session.md` with pick-up-here notes, gotchas, open questions
+3. **Knowledge capture** — review what hooks will miss, store supplemental experiences via `kb_store`
+4. **Session summary** — `kb_store_summary` with 2-3 sentence recap
+
+## Accumulation (automatic via SessionEnd hooks)
+
+Hook order: `auto-index.mjs` → `vault-writer.mjs` → `skill-scan.mjs`
+
+1. **auto-index** — indexes session data into Knowledge MCP SQLite
+2. **vault-writer** — creates session log in Obsidian, extracts experiences (TRIGGER/ACTION/CONTEXT/OUTCOME), mirrors to Knowledge MCP, updates topic backlinks. Stage 5 safety net auto-fills `.agents/` logs when `/end` is skipped.
+3. **skill-scan** — clusters experiences by tags, diffs against `SKILL-CANDIDATES.md`, writes `.skill-proposals-pending.json` when clusters cross 3+ threshold
+
+**The `/end` command complements these hooks** — it captures what automation misses (cross-project insights, context about _why_ decisions were made, corrections to existing experiences).
 
 ## Experience Format
 
@@ -36,20 +61,9 @@ CONTEXT: {what was happening}
 OUTCOME: {what happened}
 ```
 
-## Feedback Loop (automatic via SessionEnd hook)
+## Feedback Loop (compound, automatic)
 
-The skill-scan hook runs after vault-writer at every session end:
-
-1. Scan all `~/Obsidian Vault/Experiences/*.md` files
-2. Cluster by frontmatter tags (filter noise tags like `gotcha`, `test`)
-3. Diff against `SKILL-CANDIDATES.md` — detect new/growing clusters
-4. Update `SKILL-CANDIDATES.md` with fresh scan results + diff table
-5. Write `.skill-proposals-pending.json` if new clusters cross 3+ threshold
-6. Log scan summary to `.vault-writer.log`
-
-**This is the compound loop:** each session adds experiences → skill-scan detects emerging patterns → proposes skills when clusters form → agent gets smarter over time.
-
-Hook order: `auto-index.mjs` → `vault-writer.mjs` → `skill-scan.mjs`
+Each session adds experiences → skill-scan detects emerging patterns → proposes skills when clusters form → agent gets smarter over time.
 
 ## Guardrails
 
@@ -57,4 +71,5 @@ Hook order: `auto-index.mjs` → `vault-writer.mjs` → `skill-scan.mjs`
 - Always dedup before storing
 - Never auto-create skills (ask user, 3-experience minimum)
 - Non-prescriptive — all retrieved knowledge is guidance
-- Monthly `kb_prune`
+- Startup injection < 5% of context window
+- Monthly `kb_prune` + stale experience flagging (retrieval-count: 0, last-used > 90d)

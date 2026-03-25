@@ -1,5 +1,29 @@
 # Changelog
 
+## [v0.2.0] - 2026-03-25
+
+Session lifecycle improvements: unified commands, automatic bootstrap, and session handoff.
+
+### Added
+- `session-bootstrap.mjs` — SessionStart hook that auto-detects project context, reads next-session handoff, checks Obsidian backup freshness, checks pending skill proposals
+- Next-session handoff — `/end` writes `.agents/SESSIONS/next-session.md` with pick-up-here notes, gotchas, and open questions; `/start` and bootstrap hook read it
+- Context budget check — `/start` keeps startup injection under 5% of context window
+- Stale experience pruning — monthly flagging of experiences with `retrieval-count: 0` and `last-used` > 90 days
+- Per-project CLAUDE.md generation — `/start` offers to generate a project CLAUDE.md from `.agents/` state if missing
+- Federated search in retrieval — Knowledge MCP (FTS5) + Smart Connections (semantic) + CC Memory in parallel
+
+### Changed
+- Merged `/recall` into `/start` (Part B) — two commands instead of three (`/start` + `/end`)
+- `/start` now uses smart routing (matches `/end` pattern) — full project startup if `.agents/` exists, lightweight recall otherwise
+- `/end` Part B now complements hooks instead of duplicating them — focuses on what automation misses
+- Updated `SELF-IMPROVING-AGENT.md` with session lifecycle, federated search, and commands table
+- Updated `how-it-works/retrieval.md` with federated search, handoff, context budget, stale pruning
+- Updated `how-it-works/accumulation.md` with hooks-complementary /end, next-session handoff, Knowledge MCP mirroring
+- Updated `getting-started/04-hooks-and-commands.md` with SessionStart hook setup, removed /recall references
+
+### Removed
+- `/recall` command — merged into `/start` Part B
+
 ## [v0.1.0] - 2026-03-23
 
 First public pre-release. The system is functional and tested but the API surface may change.

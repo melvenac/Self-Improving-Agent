@@ -1,6 +1,6 @@
 # Accumulation: How Knowledge Gets Captured
 
-Accumulation is the process of turning session work into persistent knowledge. It happens automatically at the end of every Claude Code session via hooks -- you don't need to remember to save anything.
+Accumulation is the process of turning session work into persistent knowledge. It happens in two complementary ways: automatic hooks at session end, and the manual `/end` command for what automation misses.
 
 ## What Happens at Session End
 
@@ -10,10 +10,10 @@ Three hooks fire in sequence when a session ends:
 Session ends
     |
     v
-auto-index.mjs    -- indexes new/changed files
+auto-index.mjs    -- indexes session data into Knowledge MCP SQLite
     |
     v
-vault-writer.mjs  -- captures session data as markdown
+vault-writer.mjs  -- captures session data as markdown in Obsidian
     |
     v
 skill-scan.mjs    -- checks for emerging skill clusters
@@ -62,15 +62,23 @@ Not every session produces experiences. The writer looks for:
 - **Fixes** -- a bug fix with a non-obvious root cause
 - **Optimizations** -- a performance or workflow improvement
 
-### Step 3: Update Topic Notes
+### Step 3: Mirror to Knowledge MCP
 
-When a new experience is created, the writer checks if a relevant topic note exists in `~/Obsidian Vault/Topics/`. If it does, a new WikiLink backlink is added to the topic's "See Also" section. This keeps topics current as new experiences accumulate.
+Each new experience is UPSERTed into the Knowledge MCP SQLite `knowledge` table with `source='vault-mirror'`. This ensures `kb_recall` can find experiences via FTS5 search, not just Smart Connections semantic search.
 
-### Step 4: Dedup Check
+### Step 4: Update Topic Notes
 
-Before creating a new experience, the writer searches existing experiences for near-duplicates (>90% similar content). If a match is found, the existing experience is updated rather than creating a duplicate. This prevents the vault from filling with redundant entries.
+When a new experience is created, the writer checks if a relevant topic note exists in `~/Obsidian Vault/Topics/`. If it does, a new WikiLink backlink is added to the topic's "See Also" section.
 
-## vault-skill-scan.mjs
+### Step 5: Safety Net (Stage 5)
+
+If the user skipped `/end` in a project with `.agents/`, the vault-writer auto-fills empty sections in `.agents/SESSIONS/Session_N.md`. This ensures project state is never silently lost. It only fills empty sections — if `/end` already wrote content, that content is preserved.
+
+### Step 6: Dedup Check
+
+Before creating a new experience, the writer searches existing experiences for near-duplicates (>90% similar content). If a match is found, the existing experience is updated rather than creating a duplicate.
+
+## skill-scan.mjs
 
 This hook runs after `vault-writer.mjs` and looks for patterns across experiences that might warrant distillation into a reusable skill.
 
@@ -81,33 +89,38 @@ This hook runs after `vault-writer.mjs` and looks for patterns across experience
 3. **Detects clusters** -- identifies groups of 3+ experiences with similar triggers or contexts
 4. **Diffs against existing candidates** -- compares current clusters to `~/Obsidian Vault/Guidelines/SKILL-CANDIDATES.md` to detect new or growing clusters
 5. **Updates SKILL-CANDIDATES.md** -- writes fresh scan results with a diff table showing what changed
-6. **Writes proposal notifications** -- if new clusters cross the 3+ threshold, writes `.skill-proposals-pending.json` so the agent can propose them at the next session start
+6. **Writes proposal notifications** -- if new clusters cross the 3+ threshold, writes `.skill-proposals-pending.json` so the agent can surface them at the next session start
 7. **Logs results** -- scan summary is appended to `~/Obsidian Vault/.vault-writer.log`
 
-### Example Output in SKILL-CANDIDATES.md
-
-```markdown
-## Cluster: convex (5 experiences)
-- Convex validator must wrap entire args object
-- Convex query functions cannot use mutations internally
-- Convex scheduled functions need explicit error handling
-- Convex action retries need idempotency keys
-- Convex schema changes require explicit migration
-
-Status: NEW (crossed 3+ threshold this scan)
-```
-
 See [Skill Distillation](skill-distillation.md) for what happens after a cluster is detected.
+
+## The /end Command: Complementing Hooks
+
+The `/end` command is designed to capture what the automatic hooks miss:
+
+- **Subtle cross-step patterns** that emerged across multiple conversation turns
+- **Context about _why_** a decision was made that isn't obvious from the code
+- **Cross-project insights** ("this pattern from project X applies to project Y")
+- **Corrections** to existing experiences that turned out to be wrong
+
+`/end` also handles project close-out if `.agents/` exists: updating session logs, SUMMARY.md, INBOX.md, and writing the `next-session.md` handoff file for the next `/start`.
+
+## Next-Session Handoff
+
+At `/end`, the agent writes `.agents/SESSIONS/next-session.md` containing:
+- **Pick up here:** what was in progress or next in line
+- **Watch out for:** any gotchas the next session should know
+- **Open questions:** anything unresolved needing input
+
+This file is read by both the `session-bootstrap.mjs` hook (automatically) and `/start` (manually). It's overwritten each session — a relay baton, not a log.
 
 ## Guardrails
 
 The accumulation system has several safeguards:
 
-- **Dedup** -- always checks for similar existing experiences before creating new ones. Updates the existing file if the match is >90% similar.
-- **Skill gate** -- the scanner NEVER auto-creates skills. It only proposes candidates. A human must approve before a skill is created. See [Skill Distillation](skill-distillation.md).
-- **Context cap** -- at retrieval time, a maximum of 3 experiences + 2 skills are surfaced per session start. This prevents information overload even as the vault grows. See [Retrieval](retrieval.md).
-- **Logging** -- errors and scan results are logged to `~/Obsidian Vault/.vault-writer.log` for debugging.
-
-## Manual Supplement: /end
-
-The `/end` skill can be run manually during a session to trigger a review pass. This supplements the automatic capture -- it doesn't replace it. Use it when you want to explicitly capture something mid-session or review what the automatic system extracted.
+- **Dedup** -- always checks for similar existing experiences before creating new ones
+- **Skill gate** -- the scanner NEVER auto-creates skills. It only proposes candidates. A human must approve.
+- **Context cap** -- at retrieval time, a maximum of 3 experiences + 2 skills are surfaced per session start
+- **Context budget** -- startup injection must stay under 5% of context window
+- **Logging** -- errors and scan results are logged to `~/Obsidian Vault/.vault-writer.log`
+- **Stale pruning** -- monthly flagging of experiences with `retrieval-count: 0` and `last-used` > 90 days
