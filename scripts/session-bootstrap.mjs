@@ -65,6 +65,46 @@ if (existsSync(join(vaultPath, '.git'))) {
   } catch (e) { /* git not available or not a repo */ }
 }
 
+// Vault-writer health check — verify recent sessions are being captured
+const sessionsDbDir = join(home, '.claude', 'context-mode', 'sessions');
+const vaultSessionsDir = join(vaultPath, 'Sessions');
+if (existsSync(sessionsDbDir) && existsSync(vaultSessionsDir)) {
+  try {
+    // Find most recent .db file
+    const { readdirSync } = await import('fs');
+    const dbFiles = readdirSync(sessionsDbDir).filter(f => f.endsWith('.db'));
+    let newestDb = null;
+    let newestMtime = 0;
+    for (const f of dbFiles) {
+      const s = statSync(join(sessionsDbDir, f));
+      if (s.mtimeMs > newestMtime) { newestMtime = s.mtimeMs; newestDb = f; }
+    }
+
+    if (newestDb) {
+      // Check if this .db has a corresponding Obsidian session (search source_db in frontmatter)
+      const vaultFiles = readdirSync(vaultSessionsDir).filter(f => f.endsWith('.md'));
+      let found = false;
+      for (const vf of vaultFiles) {
+        try {
+          const content = readFileSync(join(vaultSessionsDir, vf), 'utf-8').slice(0, 500);
+          if (content.includes(newestDb)) { found = true; break; }
+        } catch { /* skip */ }
+      }
+
+      if (!found) {
+        const hoursStale = (Date.now() - newestMtime) / (1000 * 60 * 60);
+        // Only warn if the .db is old enough that vault-writer should have processed it
+        // (skip if it's the current session's .db which hasn't ended yet)
+        if (hoursStale > 1) {
+          lines.push('');
+          lines.push(`WARNING: vault-writer may be failing — session ${newestDb} (${Math.round(hoursStale)}h old) has no Obsidian capture.`);
+          lines.push('Check ~/Obsidian Vault/.vault-writer.log or run: node ~/.claude/knowledge-mcp/scripts/vault-writer.mjs --backfill-sessions');
+        }
+      }
+    }
+  } catch (e) { /* don't block startup on health check failures */ }
+}
+
 // Check for pending skill proposals
 const pendingPath = join(home, 'Obsidian Vault', '.skill-proposals-pending.json');
 if (existsSync(pendingPath)) {

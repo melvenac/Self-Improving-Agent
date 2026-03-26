@@ -1,5 +1,16 @@
 # Changelog
 
+## [v0.2.2] - 2026-03-26
+
+Session backfill, noise filtering, and automated health checks.
+
+### Added
+- `--backfill-sessions` flag on vault-writer — processes all .db files, skips already-captured ones
+- Vault-writer health check in `session-bootstrap.mjs` — warns at session start if recent sessions aren't being captured to Obsidian
+- System noise filter for user prompts and gotcha detection — skips `<system-reminder>`, `<command-name>`, etc.
+- Empty session detection — skips vault write when session has no meaningful content
+- Windows path normalization for `isDirectRun` CLI guard
+
 ## [v0.2.1] - 2026-03-26
 
 Bug fixes from first external tester (Alice) running v0.2.0 on a fresh machine.

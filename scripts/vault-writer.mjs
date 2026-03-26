@@ -29,20 +29,33 @@ const MAX_EXPERIENCES_PER_SESSION = 3;  // cap to avoid noise
 const DEDUP_SIMILARITY_THRESHOLD = 0.80;  // skip if existing experience is this similar
 const VAULT_PATH_FOR_CLI = join(homedir(), 'Obsidian Vault');
 
-// --- CLI entry point ---
-if (process.argv.includes('--backfill')) {
-  try {
-    backfillMirror();
-  } catch (err) {
-    log(`FATAL (backfill): ${err.message}\n${err.stack}`);
-    logErrorToVault(err);
-  }
-} else {
-  try {
-    main();
-  } catch (err) {
-    log(`FATAL: ${err.message}\n${err.stack}`);
-    logErrorToVault(err);
+// --- CLI entry point (guarded for safe imports) ---
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const isDirectRun = process.argv[1] && __filename.replace(/\\/g, '/').toLowerCase() === process.argv[1].replace(/\\/g, '/').toLowerCase();
+
+if (isDirectRun) {
+  if (process.argv.includes('--backfill')) {
+    try {
+      backfillMirror();
+    } catch (err) {
+      log(`FATAL (backfill): ${err.message}\n${err.stack}`);
+      logErrorToVault(err);
+    }
+  } else if (process.argv.includes('--backfill-sessions')) {
+    try {
+      backfillSessions();
+    } catch (err) {
+      log(`FATAL (backfill-sessions): ${err.message}\n${err.stack}`);
+      logErrorToVault(err);
+    }
+  } else {
+    try {
+      main();
+    } catch (err) {
+      log(`FATAL: ${err.message}\n${err.stack}`);
+      logErrorToVault(err);
+    }
   }
 }
 
@@ -64,6 +77,61 @@ function backfillMirror() {
 }
 
 /**
+ * Backfill sessions: process ALL .db files, skipping those already captured in Obsidian.
+ * Checks for existing session files by matching source_db in frontmatter.
+ */
+function backfillSessions() {
+  if (!existsSync(SESSIONS_DB_DIR)) {
+    log('BACKFILL-SESSIONS: No sessions directory found');
+    return;
+  }
+
+  const dbFiles = readdirSync(SESSIONS_DB_DIR)
+    .filter(f => f.endsWith('.db'))
+    .map(f => join(SESSIONS_DB_DIR, f));
+
+  if (dbFiles.length === 0) {
+    log('BACKFILL-SESSIONS: No .db files found');
+    return;
+  }
+
+  // Build set of already-captured source_db filenames from existing Obsidian sessions
+  const alreadyCaptured = new Set();
+  if (existsSync(SESSIONS_DIR)) {
+    for (const file of readdirSync(SESSIONS_DIR).filter(f => f.endsWith('.md'))) {
+      try {
+        const content = readFileSync(join(SESSIONS_DIR, file), 'utf-8');
+        const match = content.match(/source_db:\s*"?([^"\n]+)"?/);
+        if (match) alreadyCaptured.add(match[1].trim());
+      } catch { /* skip unreadable files */ }
+    }
+  }
+
+  log(`BACKFILL-SESSIONS: ${dbFiles.length} .db files, ${alreadyCaptured.size} already captured`);
+
+  let processed = 0;
+  let skipped = 0;
+
+  for (const dbPath of dbFiles) {
+    const dbFilename = dbPath.split(/[\\/]/).pop();
+    if (alreadyCaptured.has(dbFilename)) {
+      skipped++;
+      continue;
+    }
+
+    try {
+      log(`BACKFILL-SESSIONS: Processing ${dbFilename}`);
+      main(dbPath);
+      processed++;
+    } catch (err) {
+      log(`BACKFILL-SESSIONS: ERROR on ${dbFilename}: ${err.message}`);
+    }
+  }
+
+  log(`BACKFILL-SESSIONS: Done — ${processed} processed, ${skipped} skipped (already captured)`);
+}
+
+/**
  * Write error to a visible Obsidian note in Logs/ so it shows in the graph.
  */
 function logErrorToVault(err) {
@@ -81,9 +149,9 @@ function logErrorToVault(err) {
   } catch { /* don't throw from error handler */ }
 }
 
-function main() {
-  // --- Stage 1: Find most recent .db and extract session log ---
-  const dbPath = findMostRecentDb();
+function main(overrideDbPath) {
+  // --- Stage 1: Find .db and extract session log ---
+  const dbPath = overrideDbPath || findMostRecentDb();
   if (!dbPath) {
     log('No session .db files found — skipping vault write');
     return;
@@ -119,11 +187,14 @@ function main() {
   for (const event of allEvents) {
     const text = event.data || '';
 
-    // User prompts — raw text
+    // User prompts — raw text (filter system noise)
     if (event.type === 'user_prompt') {
-      allText += ' ' + text;
-      if (text.length > 10) {
-        whatWasDone.push('- ' + text.trim().split('\n')[0].slice(0, 200));
+      const isNoise = /^<local-command|^<command-name|^<command-message|^<local-command-stdout|^<system-reminder/i.test(text.trim());
+      if (!isNoise) {
+        allText += ' ' + text;
+        if (text.length > 10) {
+          whatWasDone.push('- ' + text.trim().split('\n')[0].slice(0, 200));
+        }
       }
     }
 
@@ -145,12 +216,20 @@ function main() {
       allText += ' ' + text.slice(0, 500);
     }
 
-    // Gotcha detection
-    if (/gotcha|caveat|careful|watch out|doesn't work|broke|failed|workaround|bug|error/i.test(text) && text.length > 20 && text.length < 500) {
+    // Gotcha detection (skip system noise that contains trigger words)
+    const isSystemNoise = /^<local-command|^<command-name|^<system-reminder/i.test(text.trim());
+    if (!isSystemNoise && /gotcha|caveat|careful|watch out|doesn't work|broke|failed|workaround|bug|error/i.test(text) && text.length > 20 && text.length < 500) {
       if (event.category !== 'file') {
         gotchas.push(text.trim().split('\n')[0].slice(0, 200));
       }
     }
+  }
+
+  // Skip session if nothing meaningful was captured
+  const hasContent = whatWasDone.length > 0 || filesChanged.length > 0 || decisions.length > 0 || gotchas.length > 0;
+  if (!hasContent) {
+    log('Session had no meaningful content (only system noise) — skipping vault write');
+    return;
   }
 
   // Build filename
