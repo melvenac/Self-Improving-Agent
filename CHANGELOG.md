@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.2.1] - 2026-03-26
+
+Bug fixes from first external tester (Alice) running v0.2.0 on a fresh machine.
+
+### Fixed
+- Removed phantom `vault-sync-projects.mjs` import that crashed vault-writer on every SessionEnd
+- Fixed `SESSIONS_DB_DIR` path — was pointing to `~/.claude/knowledge-mcp/sessions/` but context-mode writes to `~/.claude/context-mode/sessions/`
+- Fixed `KNOWLEDGE_DB_PATH` — was pointing to `~/.claude/knowledge-mcp/knowledge.db` but the DB lives at `~/.claude/context-mode/knowledge.db`
+- Added Stage 4 safety net (`updateAgentsSessionLog`) to repo copy — was only in installed copy, missing from distributed source
+- Removed dead Stage 4 (project sync) that depended on the non-existent module
+
+### Known Issues
+- `better-sqlite3` may need `npm rebuild` if compiled against a different Node version — Node v24 also causes issues with the Smart Connections Obsidian plugin, so Node v22 LTS is recommended
+
 ## [v0.2.0] - 2026-03-25
 
 Session lifecycle improvements: unified commands, automatic bootstrap, and session handoff.

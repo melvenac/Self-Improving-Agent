@@ -5,6 +5,7 @@
  * Stage 1: Session Log — extract events from most recent .db, write to Sessions/
  * Stage 2: Experience Extraction — scan for decisions/gotchas, write to Experiences/
  * Stage 3: Topic Linking — update Topics/ See Also sections with backlinks
+ * Stage 4: Safety Net — auto-fill .agents/SESSIONS/Session_N.md if /end was skipped
  */
 
 import { existsSync, readdirSync, statSync, writeFileSync, readFileSync, appendFileSync } from 'fs';
@@ -17,11 +18,9 @@ import {
   slugify, today, log, writeIfNew, projectFromDir,
   getExistingTopics, findTopicMentions, linkToTopic, wikiLinks
 } from './vault-utils.mjs';
-import { syncProjects } from './vault-sync-projects.mjs';
+const KNOWLEDGE_DB_PATH = join(homedir(), '.claude', 'context-mode', 'knowledge.db');
 
-const KNOWLEDGE_DB_PATH = join(homedir(), '.claude', 'knowledge-mcp', 'knowledge.db');
-
-const SESSIONS_DB_DIR = join(homedir(), '.claude', 'knowledge-mcp', 'sessions');
+const SESSIONS_DB_DIR = join(homedir(), '.claude', 'context-mode', 'sessions');
 
 // Minimum quality thresholds for auto-extracted experiences
 const MIN_DECISION_LENGTH = 40;  // decisions shorter than this are too vague
@@ -217,14 +216,11 @@ ${wikiLinks(mentions) || '(no topics matched)'}
     }
   }
 
-  // --- Stage 4: Sync project docs ---
+  // --- Stage 4: .agents/ session log safety net ---
   try {
-    const syncResult = syncProjects();
-    if (syncResult.synced > 0) {
-      log(`Synced ${syncResult.synced} project docs to vault`);
-    }
+    updateAgentsSessionLog(meta.project_dir, whatWasDone, filesChanged, decisions, gotchas);
   } catch (err) {
-    log(`WARN: project sync failed: ${err.message}`);
+    log(`WARN: Stage 4 failed: ${err.message}`);
   }
 
   log(`Done — session: ${sessionSlug}, experiences: ${experienceFiles.length}, topic links: ${mentions.length}`);
@@ -491,4 +487,156 @@ function findSemanticDuplicate(text) {
     log(`DEDUP WARN: smart-cli failed: ${err.message}`);
   }
   return null;
+}
+
+/**
+ * Stage 4: Safety net — update .agents/SESSIONS/Session_N.md with mechanical data.
+ * Only fills sections that still contain empty template placeholders.
+ * Skips silently if no .agents/ or no in-progress session.
+ */
+export function updateAgentsSessionLog(projectDir, whatWasDone, filesChanged, decisions, gotchas) {
+  const sessionsDir = join(projectDir, '.agents', 'SESSIONS');
+  if (!existsSync(sessionsDir)) {
+    log('Stage 4: no .agents/SESSIONS/ — skipping');
+    return;
+  }
+
+  // Find highest-numbered in-progress session
+  const sessionFiles = readdirSync(sessionsDir)
+    .filter(f => /^Session_\d+\.md$/.test(f))
+    .sort((a, b) => {
+      const numA = parseInt(a.match(/\d+/)[0]);
+      const numB = parseInt(b.match(/\d+/)[0]);
+      return numB - numA; // descending
+    });
+
+  let targetFile = null;
+  let content = null;
+
+  for (const file of sessionFiles) {
+    const filePath = join(sessionsDir, file);
+    const text = readFileSync(filePath, 'utf-8');
+    if (/\*\*Status:\*\*\s*In Progress/i.test(text)) {
+      targetFile = filePath;
+      content = text;
+      break;
+    }
+  }
+
+  if (!targetFile) {
+    log('Stage 4: no in-progress session found — skipping');
+    return;
+  }
+
+  log(`Stage 4: updating ${targetFile.split(/[\\/]/).pop()}`);
+
+  const EMPTY_PLACEHOLDER = /^\s*-\s*$/;
+  const filled = [];
+  const skipped = [];
+
+  // Helper: check if a section's content is just empty placeholders
+  function isSectionEmpty(sectionContent) {
+    const lines = sectionContent.split('\n').filter(l => l.trim().length > 0);
+    // Ignore HTML comments (<!-- ... -->) when checking emptiness
+    const meaningful = lines.filter(l => !/^\s*<!--.*-->\s*$/.test(l));
+    return meaningful.length === 0 || meaningful.every(l => EMPTY_PLACEHOLDER.test(l));
+  }
+
+  // Helper: replace section content between heading and next heading/---
+  function fillSection(text, headingPattern, newContent, sectionName) {
+    const lines = text.split('\n');
+    let startIdx = -1;
+    let endIdx = lines.length;
+    let headingLevel = 0;
+
+    // Find the heading
+    for (let i = 0; i < lines.length; i++) {
+      if (headingPattern.test(lines[i])) {
+        startIdx = i;
+        headingLevel = (lines[i].match(/^#+/) || [''])[0].length;
+        break;
+      }
+    }
+
+    if (startIdx === -1) {
+      skipped.push(sectionName + ' (heading not found)');
+      return text;
+    }
+
+    // Find end of section (next heading of same or higher level, or ---)
+    for (let i = startIdx + 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (/^---\s*$/.test(line)) {
+        endIdx = i;
+        break;
+      }
+      const match = line.match(/^(#+)\s/);
+      if (match && match[1].length <= headingLevel) {
+        endIdx = i;
+        break;
+      }
+    }
+
+    // Extract section content (between heading and end)
+    const sectionLines = lines.slice(startIdx + 1, endIdx).join('\n');
+
+    if (!isSectionEmpty(sectionLines)) {
+      skipped.push(sectionName + ' (already populated)');
+      return text;
+    }
+
+    // Replace only empty placeholder lines, keeping comments and blank lines
+    const sectionLinesArr = lines.slice(startIdx + 1, endIdx);
+    const kept = sectionLinesArr.filter(l => {
+      // Keep blank lines, comments; drop empty placeholders
+      if (EMPTY_PLACEHOLDER.test(l)) return false;
+      return true;
+    });
+    const newLines = [
+      ...lines.slice(0, startIdx + 1),
+      ...kept,
+      newContent,
+      '',
+      ...lines.slice(endIdx)
+    ];
+    filled.push(sectionName + ` (${newContent.split('\n').filter(l => l.trim()).length} items)`);
+    return newLines.join('\n');
+  }
+
+  // Fill each section if empty
+  if (whatWasDone.length > 0) {
+    content = fillSection(content, /^###\s+What Was Done/, whatWasDone.slice(0, 10).join('\n'), 'What Was Done');
+  }
+  if (filesChanged.length > 0) {
+    const fileLines = filesChanged.slice(0, 15).map(f => '- `' + f + '`').join('\n');
+    content = fillSection(content, /^###\s+Files Modified/, fileLines, 'Files Modified');
+  }
+  if (gotchas.length > 0) {
+    const gotchaLines = gotchas.slice(0, 5).map(g => '- ' + g).join('\n');
+    content = fillSection(content, /^##\s+Gotchas/, gotchaLines, 'Gotchas');
+  }
+  if (decisions.length > 0) {
+    const decisionLines = decisions.slice(0, 5).map(d => '- ' + d).join('\n');
+    content = fillSection(content, /^##\s+Decisions Made/, decisionLines, 'Decisions');
+  }
+
+  // Mark status as Completed
+  content = content.replace(
+    /(\*\*Status:\*\*)\s*In Progress/i,
+    '$1 Completed'
+  );
+
+  // Check off session log checkbox
+  content = content.replace(
+    /- \[ \] Session log completed \(this file\)/,
+    '- [x] Session log completed (this file)'
+  );
+
+  // Add safety net note at bottom
+  if (!content.includes('Auto-completed by vault-writer')) {
+    content = content.trimEnd() + '\n\n> *Auto-completed by vault-writer safety net. Run /end for full close-out (SUMMARY, INBOX, DECISIONS).*\n';
+  }
+
+  writeFileSync(targetFile, content);
+  log(`Stage 4: filled [${filled.join(', ')}], skipped [${skipped.join(', ')}]`);
 }
