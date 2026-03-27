@@ -11,17 +11,18 @@ Retrieval runs automatically in two ways:
 
 ## The Retrieval Protocol
 
-### Step 1: Federated Search (run in parallel)
+### Step 1: Knowledge Recall
 
-The agent queries multiple knowledge stores simultaneously:
+The agent queries the Knowledge MCP using recency-weighted BM25 ranking:
 
 | Store | Tool | What it searches |
 |---|---|---|
-| **Knowledge MCP** | `kb_recall(queries, project, limit: 5)` | FTS5 index of sessions, stored knowledge, summaries |
-| **Smart Connections** | `mcp__smart-connections__lookup(query, limit: 5)` | Semantic search across entire Obsidian vault |
+| **Knowledge MCP** | `kb_recall(queries, project, limit: 5)` | FTS5 index of sessions, experiences, stored knowledge, summaries — recency-weighted |
 | **CC Memory** | Scan MEMORY.md index | In-context identity, preferences, project status |
 
-**Fallback:** If Smart Connections MCP is unavailable, the agent falls back to `grep -rl` over `~/Obsidian Vault/Experiences/` and `~/Obsidian Vault/Guidelines/`.
+`kb_recall` first searches within the current project scope. If fewer than 3 results are found, it automatically broadens to a global search across all projects.
+
+**Note on Smart Connections:** Smart Connections MCP is no longer part of the agent retrieval path. It remains available for personal Obsidian browsing and manual vault exploration, but `/start` uses `kb_recall` exclusively.
 
 ### Step 2: Check Skills and Proposals
 

@@ -7,7 +7,7 @@ The memory layer is an Obsidian Vault -- a directory of plain-text markdown file
 - **Portable** -- no vendor lock-in, no database to manage. It's just files.
 - **Human-readable** -- you can browse, edit, and search your knowledge base directly in Obsidian or any text editor.
 - **Git-friendly** -- version control works naturally with markdown.
-- **Searchable** -- Smart Connections MCP provides semantic search; standard grep works as a fallback.
+- **Searchable** -- Knowledge MCP provides recency-weighted FTS5 search; Smart Connections is available for personal Obsidian browsing.
 - **Linkable** -- Obsidian's `[[WikiLink]]` syntax creates a navigable knowledge graph.
 
 ## Directory Structure
@@ -25,13 +25,9 @@ The memory layer is an Obsidian Vault -- a directory of plain-text markdown file
 
 ### Sessions/
 
-Each session gets a log file named by date and project. These are written automatically by `vault-writer.mjs` at session end.
+Sessions are no longer written as markdown files to this folder. As of v0.3.0, session data is indexed directly into the Knowledge MCP SQLite database by `vault-writer.mjs`. This makes sessions searchable via `kb_recall` without adding noise to the Obsidian vault.
 
-A session log records:
-- What was worked on
-- Key decisions made
-- Problems encountered and how they were resolved
-- Links to experiences extracted from the session
+The `Sessions/` folder may contain legacy files from earlier versions but is no longer actively written to.
 
 ### Experiences/
 
@@ -57,7 +53,9 @@ title: Convex validator must wrap entire args object
 project: My Project
 domain: convex
 date: 2026-03-15
-type: gotcha
+subtype: gotcha
+outcome: positive
+files: [src/convex/api.ts]
 last-used: 2026-03-20
 retrieval-count: 3
 ---
@@ -69,42 +67,36 @@ retrieval-count: 3
 | `project` | Which project this came from |
 | `domain` | Technology/pattern tag for retrieval grouping |
 | `date` | When the experience was captured |
-| `type` | Category: `gotcha`, `pattern`, `decision`, `fix`, `optimization` |
+| `subtype` | Category: `gotcha`, `pattern`, `decision`, `fix`, `optimization` |
+| `outcome` | Result: `positive`, `negative`, or `mixed` |
+| `files` | Files touched during the session — enables file-level tagging |
 | `last-used` | Updated each time the experience is surfaced during retrieval |
 | `retrieval-count` | Incremented each time the experience is surfaced |
 
 The `last-used` and `retrieval-count` fields enable relevance scoring. Frequently retrieved experiences are clearly valuable; experiences that haven't been used in months may be candidates for pruning.
 
-### Body Structure: TRIGGER / ACTION / CONTEXT / OUTCOME
+### Body Structure: Structured Tuple
 
-```markdown
-## TRIGGER
-When defining Convex function arguments using `v.object()`, the validator
-must wrap the entire args definition -- not individual fields.
-
-## ACTION
-Always use `args: v.object({ field1: v.string(), field2: v.number() })`
-rather than `args: { field1: v.string(), field2: v.number() }`.
-
-## CONTEXT
-Building the knowledge base API for My Project. The mutation silently
-accepted any input when args weren't wrapped in v.object(), which caused
-data integrity issues that only surfaced later.
-
-## OUTCOME
-Wrapping args in v.object() caught invalid inputs at the API boundary
-immediately. Applied this pattern to all 12 Convex functions in the project.
+```yaml
+situation: When defining Convex function arguments using v.object(), the validator
+  must wrap the entire args definition -- not individual fields
+action: Always use `args: v.object({ field1: v.string(), field2: v.number() })`
+  rather than `args: { field1: v.string(), field2: v.number() }`
+outcome_detail: Wrapping args in v.object() caught invalid inputs at the API boundary
+  immediately. Applied this pattern to all 12 Convex functions in the project.
+learned: Convex validator requires explicit v.object() wrapping — bare object literals
+  are silently accepted but bypass validation
 
 ## Links
 [[My Project]] [[Convex Patterns]]
 ```
 
-Each section serves a specific purpose:
+Each tuple field serves a specific purpose:
 
-- **TRIGGER** -- when is this relevant? What situation would make this useful to surface? This is what the retrieval system matches against.
-- **ACTION** -- what should you do? The concrete advice.
-- **CONTEXT** -- what was happening when this was learned? Helps the reader (human or agent) judge whether the advice applies to their current situation.
-- **OUTCOME** -- what happened when the action was taken? Success or failure. This grounds the advice in reality.
+- **situation** -- when is this relevant? What context would make this useful to surface?
+- **action** -- what was done? The concrete approach taken.
+- **outcome_detail** -- what happened as a result? Grounds the lesson in reality.
+- **learned** -- the distilled takeaway — what to remember for next time.
 
 ## How Sessions Link to Experiences
 

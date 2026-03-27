@@ -6,14 +6,14 @@ The self-improving agent is a three-layer feedback loop that makes your AI codin
 
 ```
     +------------------+
-    |   MEMORY LAYER   |  Obsidian Vault: experiences, skills, sessions
-    |  (Obsidian Vault)|
+    |   MEMORY LAYER   |  Obsidian Vault (experiences/skills) +
+    |  (Vault + MCP)   |  Knowledge MCP SQLite (sessions)
     +--------+---------+
              |
              v
     +------------------+
     |    RETRIEVAL      |  Session start: surface relevant knowledge
-    | (/start, /recall) |
+    |     (/start)      |
     +--------+---------+
              |
              v
@@ -30,8 +30,8 @@ The self-improving agent is a three-layer feedback loop that makes your AI codin
              |
              v
     +------------------+
-    |   MEMORY LAYER   |  Updated with new experiences and sessions
-    |  (Obsidian Vault)|
+    |   MEMORY LAYER   |  Updated: new experiences in vault,
+    |  (Vault + MCP)   |  sessions indexed in Knowledge MCP
     +------------------+
 ```
 
@@ -41,14 +41,14 @@ Each session feeds the next. The agent retrieves what it learned before, uses it
 
 The system organizes knowledge in three tiers, from broadest to most specific.
 
-### Global Tier -- Obsidian Vault
+### Global Tier -- Obsidian Vault + Knowledge MCP
 
-The Obsidian Vault (`~/Obsidian Vault/`) is the central knowledge store. It holds:
+The Obsidian Vault (`~/Obsidian Vault/`) and Knowledge MCP SQLite database together form the central knowledge store:
 
-- **Experiences** -- individual lessons learned from past sessions
-- **Skills** -- reusable patterns distilled from multiple experiences
-- **Sessions** -- chronological logs of what happened
-- **Topics** -- aggregation notes that group related experiences
+- **Experiences** -- individual lessons learned from past sessions (written to Obsidian vault for QC and browsing)
+- **Skills** -- reusable patterns distilled from multiple experiences (Obsidian vault)
+- **Sessions** -- indexed in Knowledge MCP SQLite (not written as vault files)
+- **Topics** -- aggregation notes that group related experiences (Obsidian vault)
 
 This tier persists across ALL projects. A lesson learned in your Stripe integration helps when you build another payment flow months later.
 
@@ -81,7 +81,7 @@ Each part of the cycle has its own documentation:
 
 - **[Accumulation](accumulation.md)** -- how `vault-writer.mjs` and `vault-skill-scan.mjs` automatically capture knowledge at session end, with guardrails to prevent noise.
 
-- **[Retrieval](retrieval.md)** -- how the agent surfaces relevant experiences and skills at session start, using semantic search and domain tags.
+- **[Retrieval](retrieval.md)** -- how the agent surfaces relevant experiences and skills at session start, using recency-weighted `kb_recall` search against the Knowledge MCP database.
 
 - **[Skill Distillation](skill-distillation.md)** -- how individual experiences cluster into reusable skills over time, with a human approval gate to ensure quality.
 

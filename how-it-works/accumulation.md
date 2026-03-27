@@ -21,27 +21,21 @@ skill-scan.mjs    -- checks for emerging skill clusters
 
 ## vault-writer.mjs
 
-This is the primary accumulation engine. It runs as a `SessionEnd` hook and writes to the Obsidian Vault.
+This is the primary accumulation engine. It runs as a `SessionEnd` hook.
 
-### Step 1: Create a Session Log
+### Session Quality Gate
 
-The writer creates a new file in `~/Obsidian Vault/Sessions/` with YAML frontmatter:
+Before processing, the writer checks whether the session has enough substance to be worth indexing. Thin sessions (very short, no meaningful tool use, no decisions) are skipped entirely. This prevents noise from accumulating in the knowledge base.
 
-```yaml
----
-date: 2026-03-15
-project: My Project
-tags: [convex, api, refactor]
----
-```
+### Step 1: Index Session in Knowledge MCP
 
-The session log records what was worked on, key decisions, and problems encountered. It includes WikiLinks to any experiences extracted (see step 2).
+The writer indexes the session into the Knowledge MCP SQLite database (not as a file in Obsidian). Session data is searchable via `kb_recall` but does not appear as a markdown file in `~/Obsidian Vault/Sessions/`.
 
 ### Step 2: Extract Experiences
 
-Significant lessons -- decisions, gotchas, patterns, fixes -- get extracted into individual files in `~/Obsidian Vault/Experiences/`.
+Significant lessons -- decisions, gotchas, patterns, fixes -- get extracted into individual files in `~/Obsidian Vault/Experiences/`. Experiences are written to the vault for quality control and human browsing in Obsidian.
 
-Each experience follows the standard format:
+Each experience uses structured tuple format with YAML frontmatter:
 
 ```yaml
 ---
@@ -49,11 +43,19 @@ title: Convex scheduled functions need explicit error handling
 project: My Project
 domain: convex
 date: 2026-03-15
-type: gotcha
+subtype: gotcha
+outcome: positive
+files: [src/convex/scheduler.ts]
 ---
+situation: Working on scheduled Convex functions that silently swallowed errors
+action: Added explicit try/catch with error logging in all scheduled function bodies
+outcome_detail: Errors now surface immediately instead of failing silently
+learned: Convex scheduled functions do not propagate errors to callers — always add explicit error handling
 ```
 
-With a body containing TRIGGER / ACTION / CONTEXT / OUTCOME sections. See [The Memory Layer](memory-layer.md) for the full format specification and examples.
+See [The Memory Layer](memory-layer.md) for the full format specification and examples.
+
+Experiences are also tagged with the files that were touched during the session (`files` field), enabling file-level retrieval filtering.
 
 Not every session produces experiences. The writer looks for:
 - **Gotchas** -- something that was surprising or counterintuitive
@@ -64,7 +66,7 @@ Not every session produces experiences. The writer looks for:
 
 ### Step 3: Mirror to Knowledge MCP
 
-Each new experience is UPSERTed into the Knowledge MCP SQLite `knowledge` table with `source='vault-mirror'`. This ensures `kb_recall` can find experiences via FTS5 search, not just Smart Connections semantic search.
+Each new experience is UPSERTed into the Knowledge MCP SQLite `knowledge` table with `source='vault-mirror'`. This ensures `kb_recall` can find experiences via recency-weighted FTS5 search.
 
 ### Step 4: Update Topic Notes
 

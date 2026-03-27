@@ -11,7 +11,7 @@ Hooks are scripts that run automatically at specific moments -- like when a sess
 There are two types of hooks in this system:
 
 - **SessionStart hooks** -- run when you open a new Claude Code session. The `session-bootstrap.mjs` hook detects your project, reads the last session's handoff notes, and checks system health.
-- **SessionEnd hooks** -- run when a session closes. Three hooks fire in sequence: `auto-index.mjs` indexes data, `vault-writer.mjs` captures sessions and experiences to your Obsidian vault, and `skill-scan.mjs` detects experience patterns.
+- **SessionEnd hooks** -- run when a session closes. Three hooks fire in sequence: `auto-index.mjs` indexes data, `vault-writer.mjs` extracts experiences to your Obsidian vault and indexes sessions in Knowledge MCP, and `skill-scan.mjs` detects experience patterns.
 
 ---
 
@@ -51,7 +51,7 @@ This copies the files needed by the hooks:
 
 | File | Hook Type | Purpose |
 |---|---|---|
-| `vault-writer.mjs` | SessionEnd | Captures session logs and experiences to your Obsidian vault |
+| `vault-writer.mjs` | SessionEnd | Extracts experiences to your Obsidian vault and indexes sessions in Knowledge MCP |
 | `vault-utils.mjs` | SessionEnd | Shared utilities used by vault-writer |
 | `skill-scan.mjs` | SessionEnd | Detects experience clusters and proposes reusable skills |
 | `package.json` | SessionEnd | Declares npm dependencies for the hook scripts |

@@ -25,17 +25,17 @@ You should see Claude Code start up and wait for your input.
 
 ---
 
-## Test the Recall Command
+## Test the Start Command
 
 Type the following in Claude Code:
 
 ```
-/recall
+/start
 ```
 
-Since your vault is brand new and empty, you should see something like "no relevant experiences found" or a message indicating the vault has no content yet. This is correct. It means the `/recall` command is working -- it successfully searched your vault and found nothing (because there is nothing to find yet).
+Since your vault is brand new and empty, you should see something like "no relevant experiences found" or a message indicating the knowledge base has no content yet. This is correct. It means the `/start` command is working -- it successfully searched the knowledge base and found nothing (because there is nothing to find yet).
 
-**If `/recall` is not recognized:**
+**If `/start` is not recognized:**
 - Make sure you copied the command files to `~/.claude/commands/` in Step 4.
 - Restart Claude Code (close it and run `claude` again).
 
@@ -70,9 +70,13 @@ Now open Obsidian and look at your vault. You should see new files:
 
 ### Check Sessions
 
-1. In Obsidian's left sidebar, open the `Sessions/` folder.
-2. You should see a new markdown file with today's date in the filename (something like `2026-03-21-session.md`).
-3. Click on it. It should contain a summary of what happened in your session -- the project directory, what you worked on, and what Claude Code did.
+Sessions are stored in the Knowledge MCP database, not as files in Obsidian. To verify a session was captured, you can run `kb_recall` with a query matching what you worked on, or check the vault-writer log:
+
+```bash
+cat "~/Obsidian Vault/.vault-writer.log"
+```
+
+You should see an entry showing the session was processed.
 
 ### Check Experiences
 
@@ -94,8 +98,8 @@ Now open Obsidian and look at your vault. You should see new files:
 - Check for error logs at `~/Obsidian Vault/.vault-writer.log`.
 - Make sure `vault-writer.mjs` exists in the path specified in your settings.
 
-**`/recall` command not found:**
-- Verify the files exist: `ls ~/.claude/commands/` should show `recall.md`, `skill-scan.md`, and `end.md`.
+**`/start` command not found:**
+- Verify the files exist: `ls ~/.claude/commands/` should show `start.md`, `skill-scan.md`, and `end.md`.
 - Restart Claude Code.
 
 **MCP server errors:**

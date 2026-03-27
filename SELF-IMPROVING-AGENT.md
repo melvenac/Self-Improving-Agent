@@ -17,14 +17,14 @@ Two commands, both with smart routing:
 | `/start` | Detects `.agents/` → full project startup + knowledge recall, or lightweight recall only |
 | `/end` | Detects `.agents/` → full project close-out + knowledge capture, or lightweight capture only |
 
-`/recall` has been merged into `/start` (Part B).
+`/recall` was merged into `/start` in v0.2.0 and is no longer a separate command.
 
 ## Session Lifecycle
 
 ### Start (via `/start` or automatic `session-bootstrap.mjs` hook)
 
 1. **Bootstrap hook** (automatic) — detects project, reads `next-session.md` handoff, checks backup freshness, checks skill proposals
-2. **Federated search** — Knowledge MCP (FTS5) + Smart Connections (semantic) in parallel → max 3 experiences + 2 skills
+2. **Knowledge recall** — `kb_recall` with recency-weighted BM25 ranking; searches project scope first, auto-broadens to global if results < 3 → max 3 experiences + 2 skills. Smart Connections is NOT used for agent retrieval (kept for personal Obsidian browsing only).
 3. **Project state** (if `.agents/` exists) — reads SUMMARY.md, INBOX.md, reconciles task drift, generates CLAUDE.md if missing
 4. **Context budget** — keeps startup injection under 5% of context window
 5. **Present summary** — project state + proposed objective + relevant knowledge → await approval
@@ -41,24 +41,29 @@ Two commands, both with smart routing:
 Hook order: `auto-index.mjs` → `vault-writer.mjs` → `skill-scan.mjs`
 
 1. **auto-index** — indexes session data into Knowledge MCP SQLite
-2. **vault-writer** — creates session log in Obsidian, extracts experiences (TRIGGER/ACTION/CONTEXT/OUTCOME), mirrors to Knowledge MCP, updates topic backlinks. Stage 5 safety net auto-fills `.agents/` logs when `/end` is skipped.
+2. **vault-writer** — checks session quality gate (thin sessions skipped), indexes session in Knowledge MCP (NOT written as Obsidian file), extracts experiences as structured tuples (situation/action/outcome_detail/learned) to Obsidian vault for QC, mirrors to Knowledge MCP, updates topic backlinks, tags experiences with touched files. Stage 5 safety net auto-fills `.agents/` logs when `/end` is skipped.
 3. **skill-scan** — clusters experiences by tags, diffs against `SKILL-CANDIDATES.md`, writes `.skill-proposals-pending.json` when clusters cross 3+ threshold
 
 **The `/end` command complements these hooks** — it captures what automation misses (cross-project insights, context about _why_ decisions were made, corrections to existing experiences).
 
 ## Experience Format
 
-```
-[EXPERIENCE] {short-title}
-PROJECT: {name}
-DOMAIN: {tags}
-DATE: {YYYY-MM-DD}
-TYPE: {gotcha | pattern | decision | fix | optimization}
+Experiences use structured YAML tuples with frontmatter:
 
-TRIGGER: {when relevant}
-ACTION: {what to do}
-CONTEXT: {what was happening}
-OUTCOME: {what happened}
+```yaml
+---
+title: {short-title}
+project: {name}
+domain: {tags}
+date: {YYYY-MM-DD}
+subtype: {gotcha | pattern | decision | fix | optimization}
+outcome: {positive | negative | mixed}
+files: [{file1}, {file2}]
+---
+situation: {when/context this is relevant}
+action: {what was done}
+outcome_detail: {what happened as a result}
+learned: {distilled takeaway}
 ```
 
 ## Feedback Loop (compound, automatic)

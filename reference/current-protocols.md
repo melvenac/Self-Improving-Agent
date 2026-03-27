@@ -1,6 +1,8 @@
 # Current Protocols — v2.0 (Obsidian-Based)
 
-> Snapshot of the learning system as it exists today (2026-03-18).
+> **Note: This document describes the v2.0 protocol. For current behavior (v0.3.0), see [how-it-works/](../how-it-works/overview.md) documentation.**
+
+> Snapshot of the learning system as it existed at v2.0 (2026-03-18).
 > Architecture migrated from SQLite-only storage to Obsidian Vault (markdown files) + Knowledge MCP (FTS5 search).
 
 ## Retrieval Protocol (Session Start)
