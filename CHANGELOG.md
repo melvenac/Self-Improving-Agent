@@ -1,12 +1,26 @@
 # Changelog
 
-## [v0.2.3] - 2026-03-26
+## [v0.3.0] - 2026-03-27
 
-Session quality gate and structured experience format.
+Knowledge retrieval redesign: recency weighting, structured experiences, quality gate.
 
 ### Added
-- Quality gate in `vault-writer.mjs` — skips sessions with fewer than 3 meaningful prompts, no files+prompts, no decisions, and no gotchas, or less than 200 chars total text; logs detailed skip reason
-- Structured experience format — decision and gotcha templates now use YAML frontmatter with `type: experience`, `subtype`, `files`, and `outcome` fields plus flat `situation`/`action`/`outcome_detail`/`learned` key-value pairs instead of markdown sections
+- Recency-weighted ranking in kb_recall — recent results rank higher via time-decay on BM25 scores (chunks/summaries decay at 0.02, curated knowledge at 0.005)
+- File-touch tagging — experiences include basenames of modified files as tags for file-aware retrieval
+- Session quality gate — vault-writer skips sessions below substance thresholds (logs detailed skip reason)
+- Structured experience format — situation/action/outcome tuples replace prose templates (YAML frontmatter with subtype, files, outcome fields)
+- Recall count tracking on knowledge entries (recall_count, last_recalled columns)
+- Aging session helpers — `getAgingSessions()` and `pruneChunksForSummarizedSessions()` for future summarization pipeline
+
+### Changed
+- kb_recall uses unified recency-weighted sort instead of type-based ordering
+- Vault-writer no longer writes session files to Obsidian vault (FTS5 is primary store)
+- `/start` uses single kb_recall retrieval path with auto-broadening (Smart Connections removed from agent retrieval)
+- Experience mirror includes structured metadata (subtype, files, outcome) in FTS5 tags
+
+### Removed
+- Smart Connections from `/start` federated search (kept for personal Obsidian browsing)
+- Session markdown files no longer written to Obsidian Sessions/ directory
 
 ## [v0.2.2] - 2026-03-26
 
