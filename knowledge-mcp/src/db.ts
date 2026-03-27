@@ -212,6 +212,7 @@ export interface RecallResult {
   created_at: string;
   tags: string[];
   result_type: "chunk" | "knowledge" | "summary";
+  weighted_rank: number;
 }
 
 function sanitizeFtsQuery(query: string): string {
@@ -251,7 +252,8 @@ export function recall(
         c.content,
         s.started_at as session_started,
         s.project_dir,
-        c.created_at
+        c.created_at,
+        (bm25(chunks_fts) / (1.0 + (julianday('now') - julianday(c.created_at)) * 0.02)) as weighted_rank
       FROM chunks_fts
       JOIN chunks c ON c.id = chunks_fts.rowid
       JOIN sessions s ON s.id = c.session_id
@@ -281,7 +283,7 @@ export function recall(
       params.push(...options.tags);
     }
 
-    sql += ` ORDER BY bm25(chunks_fts) LIMIT ?`;
+    sql += ` ORDER BY weighted_rank LIMIT ?`;
     params.push(limit);
 
     const rows = db.prepare(sql).all(...params) as Array<{
@@ -293,6 +295,7 @@ export function recall(
       session_started: string;
       project_dir: string | null;
       created_at: string;
+      weighted_rank: number;
     }>;
 
     // Fetch tags for each result
@@ -315,6 +318,7 @@ export function recall(
         created_at: row.created_at,
         tags: chunkTags,
         result_type: "chunk",
+        weighted_rank: row.weighted_rank,
       });
     }
   }
@@ -332,7 +336,8 @@ export function recall(
         k.source,
         k.project_dir,
         snippet(knowledge_fts, 1, '>>', '<<', '...', 128) as snippet,
-        k.created_at
+        k.created_at,
+        (bm25(knowledge_fts) / (1.0 + (julianday('now') - julianday(k.created_at)) * 0.005)) as weighted_rank
       FROM knowledge_fts
       JOIN knowledge k ON k.id = knowledge_fts.rowid
       WHERE knowledge_fts MATCH ?
@@ -345,7 +350,7 @@ export function recall(
       kParams.push(`%${options.project}%`);
     }
 
-    knowledgeSql += ` ORDER BY bm25(knowledge_fts) LIMIT ?`;
+    knowledgeSql += ` ORDER BY weighted_rank LIMIT ?`;
     kParams.push(limit);
 
     try {
@@ -358,6 +363,7 @@ export function recall(
         project_dir: string | null;
         snippet: string;
         created_at: string;
+        weighted_rank: number;
       }>;
 
       for (const row of kRows) {
@@ -371,6 +377,7 @@ export function recall(
           created_at: row.created_at,
           tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
           result_type: "knowledge",
+          weighted_rank: row.weighted_rank,
         });
       }
     } catch {
@@ -390,12 +397,13 @@ export function recall(
             s.started_at as session_started,
             s.project_dir,
             sm.created_at,
-            sm.model
+            sm.model,
+            (bm25(summaries_fts) / (1.0 + (julianday('now') - julianday(sm.created_at)) * 0.02)) as weighted_rank
           FROM summaries_fts
           JOIN summaries sm ON sm.id = summaries_fts.rowid
           JOIN sessions s ON s.id = sm.session_id
           WHERE summaries_fts MATCH ?
-          ORDER BY bm25(summaries_fts)
+          ORDER BY weighted_rank
           LIMIT ?
         `
         )
@@ -406,6 +414,7 @@ export function recall(
         project_dir: string | null;
         created_at: string;
         model: string | null;
+        weighted_rank: number;
       }>;
 
       for (const row of sumRows) {
@@ -419,6 +428,7 @@ export function recall(
           created_at: row.created_at,
           tags: [],
           result_type: "summary",
+          weighted_rank: row.weighted_rank,
         });
       }
     } catch {
@@ -426,11 +436,8 @@ export function recall(
     }
   }
 
-  // Sort all results: summaries and knowledge get a slight boost
-  results.sort((a, b) => {
-    const typeOrder = { summary: 0, knowledge: 1, chunk: 2 };
-    return typeOrder[a.result_type] - typeOrder[b.result_type];
-  });
+  // Sort all results by weighted rank (more negative = better match)
+  results.sort((a, b) => a.weighted_rank - b.weighted_rank);
 
   return results.slice(0, limit);
 }
