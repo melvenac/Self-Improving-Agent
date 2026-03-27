@@ -45,6 +45,8 @@ Knowledge is organized in three tiers:
 
 ## Commands
 
+These are slash commands you install during setup (see [Step 4](getting-started/04-hooks-and-commands.md)).
+
 | Command | When | What it does |
 |---|---|---|
 | `/start` | Session start | Reads project state, recalls relevant knowledge, creates session log |
@@ -53,10 +55,12 @@ Knowledge is organized in three tiers:
 
 ## Automation hooks
 
+These run automatically once configured (see [Step 4](getting-started/04-hooks-and-commands.md)).
+
 | Hook | Trigger | What it does |
 |---|---|---|
 | `session-bootstrap.mjs` | SessionStart | Auto-detects project, reads handoff, checks vault-writer health |
-| `vault-writer.mjs` | SessionEnd | Extracts experiences from session DB, writes to Obsidian vault |
+| `vault-writer.mjs` | SessionEnd | Extracts experiences from session DB, writes to Knowledge MCP |
 | `vault-skill-scan.mjs` | SessionEnd | Detects experience clusters, proposes skills |
 
 ## What you'll set up
