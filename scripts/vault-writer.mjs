@@ -272,7 +272,7 @@ ${wikiLinks(mentions) || '(no topics matched)'}
   // --- Stage 2: Experience Extraction ---
   const experienceFiles = [];
 
-  extractStructuredExperiences(decisions, gotchas, project, dateStr, mentions, experienceFiles);
+  extractStructuredExperiences(decisions, gotchas, project, dateStr, mentions, experienceFiles, filesChanged);
 
   // --- Stage 2.5: Mirror experiences to Knowledge MCP (knowledge.db) ---
   if (experienceFiles.length > 0) {
@@ -333,8 +333,16 @@ function findMostRecentDb() {
  * Extract experiences from structured session data (decisions and gotchas).
  * Only writes experiences that meet minimum quality thresholds.
  */
-function extractStructuredExperiences(decisions, gotchas, project, dateStr, topics, experienceFiles) {
+function extractStructuredExperiences(decisions, gotchas, project, dateStr, topics, experienceFiles, filesChanged = []) {
   let count = 0;
+
+  // Extract basenames from file paths for tagging
+  const fileTags = [...new Set(
+    filesChanged
+      .map(f => f.split(/[\\/]/).pop())  // basename
+      .filter(f => f && !f.startsWith('.'))
+      .map(f => f.toLowerCase())
+  )].slice(0, 10);  // cap at 10 file tags
 
   // Process decisions — these are from the agent's decision events
   for (const text of decisions) {
@@ -349,7 +357,7 @@ function extractStructuredExperiences(decisions, gotchas, project, dateStr, topi
 date: ${dateStr}
 project: ${project}
 type: decision
-tags: [${topics.join(', ')}]
+tags: [${[...topics, ...fileTags].join(', ')}]
 source: auto-extracted
 ---
 
@@ -405,7 +413,7 @@ ${wikiLinks(topics) || '(no topics matched)'}
 date: ${dateStr}
 project: ${project}
 type: gotcha
-tags: [${topics.join(', ')}]
+tags: [${[...topics, ...fileTags].join(', ')}]
 source: auto-extracted
 ---
 
