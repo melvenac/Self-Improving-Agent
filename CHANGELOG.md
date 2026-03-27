@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.2.3] - 2026-03-26
+
+Session quality gate and structured experience format.
+
+### Added
+- Quality gate in `vault-writer.mjs` — skips sessions with fewer than 3 meaningful prompts, no files+prompts, no decisions, and no gotchas, or less than 200 chars total text; logs detailed skip reason
+- Structured experience format — decision and gotcha templates now use YAML frontmatter with `type: experience`, `subtype`, `files`, and `outcome` fields plus flat `situation`/`action`/`outcome_detail`/`learned` key-value pairs instead of markdown sections
+
 ## [v0.2.2] - 2026-03-26
 
 Session backfill, noise filtering, and automated health checks.

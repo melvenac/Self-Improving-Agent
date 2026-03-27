@@ -225,10 +225,19 @@ function main(overrideDbPath) {
     }
   }
 
-  // Skip session if nothing meaningful was captured
-  const hasContent = whatWasDone.length > 0 || filesChanged.length > 0 || decisions.length > 0 || gotchas.length > 0;
-  if (!hasContent) {
-    log('Session had no meaningful content (only system noise) — skipping vault write');
+  // Quality gate: skip sessions that don't meet minimum substance thresholds
+  const meaningfulPrompts = whatWasDone.filter(line => line.length > 22); // "- " + 20 chars
+  const totalTextLength = allText.trim().length;
+
+  const passesQualityGate = (
+    (meaningfulPrompts.length >= 3) ||
+    (filesChanged.length >= 1 && meaningfulPrompts.length >= 1) ||
+    (decisions.length >= 1) ||
+    (gotchas.length >= 1)
+  ) && totalTextLength > 200;
+
+  if (!passesQualityGate) {
+    log(`SKIP: session too thin (prompts=${meaningfulPrompts.length}, files=${filesChanged.length}, decisions=${decisions.length}, gotchas=${gotchas.length}, text=${totalTextLength}chars)`);
     return;
   }
 
@@ -356,25 +365,21 @@ function extractStructuredExperiences(decisions, gotchas, project, dateStr, topi
     const content = `---
 date: ${dateStr}
 project: ${project}
-type: decision
+type: experience
+subtype: decision
 tags: [${[...topics, ...fileTags].join(', ')}]
+files: [${filesChanged.slice(0, 5).map(f => f.split(/[\\/]/).pop()).join(', ')}]
+outcome: unknown
 source: auto-extracted
 ---
 
-## Trigger
-${firstLine}
+situation: "${firstLine.replace(/"/g, '\\"')}"
 
-## Action
-${text.slice(0, 500)}
+action: "${text.slice(0, 500).replace(/"/g, '\\"').replace(/\n/g, ' ')}"
 
-## Context
-Session on ${dateStr} in **${project}**.
+outcome_detail: "Auto-captured. Review and enrich with actual outcome."
 
-## Outcome
-Auto-captured. Review and enrich if this decision had significant impact.
-
-## See Also
-${wikiLinks(topics) || '(no topics matched)'}
+learned: "Auto-captured. Add the key takeaway from this decision."
 `;
 
     // Semantic dedup check
@@ -412,25 +417,21 @@ ${wikiLinks(topics) || '(no topics matched)'}
     const content = `---
 date: ${dateStr}
 project: ${project}
-type: gotcha
+type: experience
+subtype: gotcha
 tags: [${[...topics, ...fileTags].join(', ')}]
+files: [${filesChanged.slice(0, 5).map(f => f.split(/[\\/]/).pop()).join(', ')}]
+outcome: failure
 source: auto-extracted
 ---
 
-## Trigger
-${firstLine}
+situation: "${firstLine.replace(/"/g, '\\"')}"
 
-## Action
-${text.slice(0, 500)}
+action: "${text.slice(0, 500).replace(/"/g, '\\"').replace(/\n/g, ' ')}"
 
-## Context
-Encountered during session on ${dateStr} in **${project}**.
+outcome_detail: "Auto-captured. Review and enrich with the fix or workaround."
 
-## Outcome
-Auto-captured. Review and enrich with the specific fix or workaround.
-
-## See Also
-${wikiLinks(topics) || '(no topics matched)'}
+learned: "Auto-captured. Add what to do differently next time."
 `;
 
     const expFile = join(EXPERIENCES_DIR, `${slug}.md`);
