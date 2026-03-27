@@ -196,6 +196,18 @@ function runMigrations(db: Database.Database): void {
   } catch {
     // Column already exists — ignore
   }
+
+  // Migration: add recall tracking to knowledge
+  try {
+    db.exec("ALTER TABLE knowledge ADD COLUMN recall_count INTEGER DEFAULT 0");
+  } catch {
+    // Column already exists — ignore
+  }
+  try {
+    db.exec("ALTER TABLE knowledge ADD COLUMN last_recalled TEXT");
+  } catch {
+    // Column already exists — ignore
+  }
 }
 
 // ============================================================
@@ -380,6 +392,15 @@ export function recall(
           result_type: "knowledge",
           weighted_rank: row.weighted_rank,
         });
+      }
+      // Track recall hits for knowledge entries
+      if (kRows.length > 0) {
+        const updateRecall = db.prepare(
+          "UPDATE knowledge SET recall_count = COALESCE(recall_count, 0) + 1, last_recalled = datetime('now') WHERE id = ?"
+        );
+        for (const row of kRows) {
+          updateRecall.run(row.id);
+        }
       }
     } catch {
       // knowledge_fts may not have data yet — ignore
@@ -756,6 +777,44 @@ export function getSessionChunks(sessionId: string): Array<{
     category: string;
     content: string;
   }>;
+}
+
+export function getAgingSessions(olderThanDays: number = 7): Array<{
+  id: string;
+  project_dir: string | null;
+  started_at: string;
+  chunk_count: number;
+}> {
+  const db = getKnowledgeDb();
+  return db.prepare(`
+    SELECT s.id, s.project_dir, s.started_at,
+           (SELECT COUNT(*) FROM chunks WHERE session_id = s.id) as chunk_count
+    FROM sessions s
+    LEFT JOIN summaries sm ON sm.session_id = s.id
+    WHERE sm.id IS NULL
+    AND julianday('now') - julianday(s.started_at) > ?
+    AND s.event_count >= 3
+    ORDER BY s.started_at ASC
+    LIMIT 10
+  `).all(olderThanDays) as Array<{
+    id: string;
+    project_dir: string | null;
+    started_at: string;
+    chunk_count: number;
+  }>;
+}
+
+export function pruneChunksForSummarizedSessions(olderThanDays: number = 30): number {
+  const db = getKnowledgeDb();
+  const result = db.prepare(`
+    DELETE FROM chunks
+    WHERE session_id IN (
+      SELECT s.id FROM sessions s
+      JOIN summaries sm ON sm.session_id = s.id
+      WHERE julianday('now') - julianday(s.started_at) > ?
+    )
+  `).run(olderThanDays);
+  return result.changes;
 }
 
 // ============================================================
