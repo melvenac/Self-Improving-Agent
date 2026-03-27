@@ -253,7 +253,7 @@ export function recall(
         s.started_at as session_started,
         s.project_dir,
         c.created_at,
-        (bm25(chunks_fts) / (1.0 + (julianday('now') - julianday(c.created_at)) * 0.02)) as weighted_rank
+        (bm25(chunks_fts) * (1.0 + MAX(0, julianday('now') - julianday(c.created_at)) * 0.02)) as weighted_rank
       FROM chunks_fts
       JOIN chunks c ON c.id = chunks_fts.rowid
       JOIN sessions s ON s.id = c.session_id
@@ -327,6 +327,7 @@ export function recall(
   // Knowledge with project_dir IS NULL is global (always returned).
   // Knowledge with a project_dir is only returned when searching that project or globally.
   {
+    // Knowledge entries use slower decay (0.005 vs 0.02) — curated content ages better than raw session chunks
     let knowledgeSql = `
       SELECT
         k.id,
@@ -337,7 +338,7 @@ export function recall(
         k.project_dir,
         snippet(knowledge_fts, 1, '>>', '<<', '...', 128) as snippet,
         k.created_at,
-        (bm25(knowledge_fts) / (1.0 + (julianday('now') - julianday(k.created_at)) * 0.005)) as weighted_rank
+        (bm25(knowledge_fts) * (1.0 + MAX(0, julianday('now') - julianday(k.created_at)) * 0.005)) as weighted_rank
       FROM knowledge_fts
       JOIN knowledge k ON k.id = knowledge_fts.rowid
       WHERE knowledge_fts MATCH ?
@@ -398,7 +399,7 @@ export function recall(
             s.project_dir,
             sm.created_at,
             sm.model,
-            (bm25(summaries_fts) / (1.0 + (julianday('now') - julianday(sm.created_at)) * 0.02)) as weighted_rank
+            (bm25(summaries_fts) * (1.0 + MAX(0, julianday('now') - julianday(sm.created_at)) * 0.02)) as weighted_rank
           FROM summaries_fts
           JOIN summaries sm ON sm.id = summaries_fts.rowid
           JOIN sessions s ON s.id = sm.session_id
