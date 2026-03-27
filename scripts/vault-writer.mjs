@@ -274,9 +274,7 @@ ${gotchas.slice(0, 5).map(g => '- ' + g).join('\n') || '(none extracted)'}
 ${wikiLinks(mentions) || '(no topics matched)'}
 `;
 
-  const sessionFile = join(SESSIONS_DIR, `${sessionSlug}.md`);
-  const wrote = writeIfNew(sessionFile, sessionBody);
-  if (wrote) log(`Wrote session log: ${sessionFile}`);
+  log(`Session processed: ${sessionSlug} (prompts=${whatWasDone.length}, files=${filesChanged.length}, decisions=${decisions.length}, gotchas=${gotchas.length})`);
 
   // --- Stage 2: Experience Extraction ---
   const experienceFiles = [];
@@ -290,11 +288,6 @@ ${wikiLinks(mentions) || '(no topics matched)'}
   }
 
   // --- Stage 3: Topic Linking ---
-  // Link session file to topics
-  for (const topicName of mentions) {
-    linkToTopic(topicName, sessionSlug);
-  }
-
   // Link experience files to topics
   for (const { slug, content } of experienceFiles) {
     const expTopics = getExistingTopics();
@@ -524,13 +517,21 @@ function mirrorToOpenBrain(experienceFilePaths) {
       // Add vault-mirror tag to distinguish these entries
       const tagStr = tags ? `${tags}, vault-mirror` : 'vault-mirror';
 
+      // Include structured metadata in tags for better FTS5 retrieval
+      const subtype = frontmatter.subtype || '';
+      const outcome = frontmatter.outcome || '';
+      const files = Array.isArray(frontmatter.files)
+        ? frontmatter.files.join(', ')
+        : (frontmatter.files || '');
+      const enrichedTagStr = [tagStr, subtype, outcome, files].filter(Boolean).join(', ');
+
       const projectDir = frontmatter.project || null;
 
       const existing = selectStmt.get(filename, 'vault-mirror');
       if (existing) {
-        updateStmt.run(body, tagStr, now, projectDir, existing.id);
+        updateStmt.run(body, enrichedTagStr, now, projectDir, existing.id);
       } else {
-        insertStmt.run(filename, body, tagStr, 'vault-mirror', now, now, projectDir);
+        insertStmt.run(filename, body, enrichedTagStr, 'vault-mirror', now, now, projectDir);
       }
       mirrored++;
     } catch (err) {
