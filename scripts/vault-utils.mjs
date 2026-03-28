@@ -8,7 +8,7 @@ const EXPERIENCES_DIR = join(VAULT_PATH, 'Experiences');
 const TOPICS_DIR = join(VAULT_PATH, 'Topics');
 const SUMMARIES_DIR = join(VAULT_PATH, 'Summaries');
 const LOGS_DIR = join(VAULT_PATH, 'Logs');
-const LOG_PATH = join(VAULT_PATH, '.vault-writer.log');
+const LOG_PATH = join(LOGS_DIR, 'vault-writer.log');
 
 // Seed topics for topic detection. Add your own projects and tools here.
 // These help the vault-writer auto-link experiences to topic notes.
@@ -150,6 +150,52 @@ export function writeIfNew(filePath, content) {
   }
   writeFileSync(filePath, content);
   return true;
+}
+
+/**
+ * Generate an Obsidian .md mirror from a knowledge.db experience entry.
+ * Overwrites if exists — knowledge.db is source of truth.
+ * @param {object} entry - { key, content, tags, source, project, date, subtype, files, outcome }
+ */
+export function mirrorToObsidian(entry) {
+  const { key, content, tags, source, project, date, subtype, files, outcome } = entry;
+
+  // Parse tags string into array
+  const tagList = (tags || '').split(',').map(t => t.trim()).filter(Boolean);
+
+  // Build YAML frontmatter
+  const frontmatter = [
+    '---',
+    `date: ${date || today()}`,
+    `project: ${project || 'unknown'}`,
+    `type: experience`,
+    `subtype: ${subtype || 'decision'}`,
+    `tags: [${tagList.join(', ')}]`,
+    files ? `files: [${files.split(',').map(f => f.trim()).filter(Boolean).join(', ')}]` : null,
+    `outcome: ${outcome || 'unknown'}`,
+    `source: ${source || 'vault-writer'}`,
+    '---',
+  ].filter(Boolean).join('\n');
+
+  // Convert structured text body to markdown sections
+  const body = content
+    .replace(/^TRIGGER:\s*/m, '## Trigger\n')
+    .replace(/^ACTION:\s*/m, '## Action\n')
+    .replace(/^CONTEXT:\s*/m, '## Context\n')
+    .replace(/^OUTCOME:\s*/m, '## Outcome\n')
+    // Strip the header lines that are now in frontmatter
+    .replace(/^\[EXPERIENCE\].*\n/m, '')
+    .replace(/^PROJECT:.*\n/m, '')
+    .replace(/^DOMAIN:.*\n/m, '')
+    .replace(/^DATE:.*\n/m, '')
+    .replace(/^TYPE:.*\n/m, '')
+    .replace(/^SOURCE:.*\n/m, '')
+    .trim();
+
+  const mdContent = `${frontmatter}\n\n${body}\n`;
+  const filePath = join(EXPERIENCES_DIR, `${key}.md`);
+  writeFileSync(filePath, mdContent);
+  return filePath;
 }
 
 /**

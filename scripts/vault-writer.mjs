@@ -16,18 +16,74 @@ import Database from 'better-sqlite3';
 import {
   SESSIONS_DIR, EXPERIENCES_DIR, LOGS_DIR,
   slugify, today, log, writeIfNew, projectFromDir,
-  getExistingTopics, findTopicMentions, linkToTopic, wikiLinks
+  getExistingTopics, findTopicMentions, linkToTopic, wikiLinks,
+  mirrorToObsidian
 } from './vault-utils.mjs';
 const KNOWLEDGE_DB_PATH = join(homedir(), '.claude', 'context-mode', 'knowledge.db');
 
 const SESSIONS_DB_DIR = join(homedir(), '.claude', 'context-mode', 'sessions');
 
 // Minimum quality thresholds for auto-extracted experiences
-const MIN_DECISION_LENGTH = 40;  // decisions shorter than this are too vague
-const MIN_GOTCHA_LENGTH = 40;
+const MIN_DECISION_LENGTH = 25;  // lowered from 40 — monitor via Obsidian
+const MIN_GOTCHA_LENGTH = 25;
 const MAX_EXPERIENCES_PER_SESSION = 3;  // cap to avoid noise
 const DEDUP_SIMILARITY_THRESHOLD = 0.80;  // skip if existing experience is this similar
 const VAULT_PATH_FOR_CLI = join(homedir(), 'Obsidian Vault');
+
+// --- Conversation scanning patterns (hybrid extraction) ---
+const PLANNING_PATTERNS = [
+  /\blet'?s go with\b/i,
+  /\bthe approach is\b/i,
+  /\bwe decided\b/i,
+  /\bthe plan is\b/i,
+  /\bI want to build\b/i,
+  /\bshould we\b/i,
+  /\bI('m| am) thinking\b/i,
+  /\bthe strategy\b/i,
+];
+
+const ARCHITECTURE_PATTERNS = [
+  /\bchose .{3,30} over\b/i,
+  /\btrade-?off\b/i,
+  /\bbecause\b/i,
+  /\binstead of\b/i,
+  /\bthe reason (?:is|was)\b/i,
+  /\barchitecture\b/i,
+  /\bdata flow\b/i,
+];
+
+const WORKAROUND_PATTERNS = [
+  /\bworkaround\b/i,
+  /\bhack\b/i,
+  /\btemporary fix\b/i,
+  /\buntil we\b/i,
+  /\bfor now we\b/i,
+  /\bfixed by\b/i,
+];
+
+const ROOT_CAUSE_PATTERNS = [
+  /\broot cause\b/i,
+  /\bthe issue was\b/i,
+  /\bturns out\b/i,
+  /\bthe problem (?:is|was)\b/i,
+  /\bdoesn'?t support\b/i,
+  /\bincompatible\b/i,
+];
+
+const EXPLICIT_MARKERS = [
+  /\bremember this\b/i,
+  /\bnote that\b/i,
+  /\bimportant:/i,
+  /\blesson learned\b/i,
+];
+
+const CONVERSATION_PATTERNS = [
+  { patterns: PLANNING_PATTERNS, subtype: 'planning' },
+  { patterns: ARCHITECTURE_PATTERNS, subtype: 'decision' },
+  { patterns: WORKAROUND_PATTERNS, subtype: 'workaround' },
+  { patterns: ROOT_CAUSE_PATTERNS, subtype: 'gotcha' },
+  { patterns: EXPLICIT_MARKERS, subtype: 'pattern' },
+];
 
 // --- CLI entry point (guarded for safe imports) ---
 import { fileURLToPath } from 'url';
@@ -71,9 +127,29 @@ function backfillMirror() {
     .filter(f => f.endsWith('.md'))
     .map(f => join(EXPERIENCES_DIR, f));
 
-  log(`BACKFILL: Found ${files.length} experience files to mirror`);
-  mirrorToOpenBrain(files);
-  log('BACKFILL: Complete');
+  log(`BACKFILL: Found ${files.length} experience files to re-mirror`);
+  let count = 0;
+  for (const filePath of files) {
+    try {
+      const raw = readFileSync(filePath, 'utf-8');
+      const filename = filePath.split(/[\\/]/).pop().replace(/\.md$/, '');
+      mirrorToObsidian({
+        key: filename,
+        content: raw,
+        tags: 'backfill',
+        source: 'vault-writer',
+        project: 'unknown',
+        date: today(),
+        subtype: 'decision',
+        files: '',
+        outcome: 'unknown',
+      });
+      count++;
+    } catch (err) {
+      log(`BACKFILL ERROR: ${filePath}: ${err.message}`);
+    }
+  }
+  log(`BACKFILL: Complete — ${count} files mirrored`);
 }
 
 /**
@@ -183,9 +259,11 @@ function main(overrideDbPath) {
   const gotchas = [];
   const filesChanged = [];
   let allText = '';
+  const conversationMatches = [];  // { text, subtype, matchedPattern, userPrompt }
 
   for (const event of allEvents) {
     const text = event.data || '';
+    const isSystemNoise = /^<local-command|^<command-name|^<system-reminder/i.test(text.trim());
 
     // User prompts — raw text (filter system noise)
     if (event.type === 'user_prompt') {
@@ -217,10 +295,44 @@ function main(overrideDbPath) {
     }
 
     // Gotcha detection (skip system noise that contains trigger words)
-    const isSystemNoise = /^<local-command|^<command-name|^<system-reminder/i.test(text.trim());
     if (!isSystemNoise && /gotcha|caveat|careful|watch out|doesn't work|broke|failed|workaround|bug|error/i.test(text) && text.length > 20 && text.length < 500) {
       if (event.category !== 'file') {
         gotchas.push(text.trim().split('\n')[0].slice(0, 200));
+      }
+    }
+
+    // --- Conversation scanning (hybrid extraction) ---
+    if (!isSystemNoise && text.length > 25 && text.length < 2000) {
+      for (const { patterns, subtype } of CONVERSATION_PATTERNS) {
+        for (const regex of patterns) {
+          if (regex.test(text)) {
+            conversationMatches.push({
+              text: text.trim(),
+              subtype,
+              matchedPattern: regex.source,
+            });
+            break;  // one match per pattern group per event
+          }
+        }
+      }
+    }
+  }
+
+  // Attach most recent user prompt to each conversation match for context
+  const promptTexts = [];
+  let lastPrompt = '';
+  for (const event of allEvents) {
+    const text = event.data || '';
+    if (event.type === 'user_prompt') {
+      const isNoise = /^<local-command|^<command-name|^<command-message|^<local-command-stdout|^<system-reminder/i.test(text.trim());
+      if (!isNoise && text.length > 10) {
+        lastPrompt = text.trim().split('\n').slice(0, 5).join('\n').slice(0, 500);
+      }
+    }
+    // Tag conversation matches with the most recent user prompt
+    for (const match of conversationMatches) {
+      if (!match.userPrompt && match.text === text.trim()) {
+        match.userPrompt = lastPrompt;
       }
     }
   }
@@ -250,42 +362,13 @@ function main(overrideDbPath) {
   const existingTopics = getExistingTopics();
   const mentions = findTopicMentions(allText, existingTopics);
 
-  const sessionBody = `---
-date: ${dateStr}
-project: ${project}
-tags: [${mentions.join(', ')}]
-type: session
-source_db: "${dbFilename}"
----
-
-## What Was Done
-${whatWasDone.slice(0, 10).join('\n') || '(no prompts captured)'}
-
-## Files Changed
-${filesChanged.slice(0, 15).map(f => '- \`' + f + '\`').join('\n') || '(none)'}
-
-## Key Decisions
-${decisions.slice(0, 5).map(d => '- ' + d).join('\n') || '(none extracted)'}
-
-## Gotchas
-${gotchas.slice(0, 5).map(g => '- ' + g).join('\n') || '(none extracted)'}
-
-## See Also
-${wikiLinks(mentions) || '(no topics matched)'}
-`;
-
-  log(`Session processed: ${sessionSlug} (prompts=${whatWasDone.length}, files=${filesChanged.length}, decisions=${decisions.length}, gotchas=${gotchas.length})`);
+  // Session data stays in knowledge.db (via auto-index.mjs) — no Obsidian session file
+  log(`Session processed: ${sessionSlug} (prompts=${whatWasDone.length}, files=${filesChanged.length}, decisions=${decisions.length}, gotchas=${gotchas.length}, conversation=${conversationMatches.length})`);
 
   // --- Stage 2: Experience Extraction ---
   const experienceFiles = [];
 
-  extractStructuredExperiences(decisions, gotchas, project, dateStr, mentions, experienceFiles, filesChanged);
-
-  // --- Stage 2.5: Mirror experiences to Knowledge MCP (knowledge.db) ---
-  if (experienceFiles.length > 0) {
-    const expPaths = experienceFiles.map(e => join(EXPERIENCES_DIR, `${e.slug}.md`));
-    mirrorToOpenBrain(expPaths);
-  }
+  extractStructuredExperiences(decisions, gotchas, conversationMatches, project, dateStr, mentions, experienceFiles, filesChanged);
 
   // --- Stage 3: Topic Linking ---
   // Link experience files to topics
@@ -332,10 +415,80 @@ function findMostRecentDb() {
 }
 
 /**
- * Extract experiences from structured session data (decisions and gotchas).
+ * Write an experience to knowledge.db in unified structured text format.
+ * Then generate an Obsidian .md mirror.
+ * Returns { key, written: true/false }.
+ */
+function writeExperienceToDb(opts) {
+  const { title, project, date, subtype, tags, files, trigger, action, context, outcome } = opts;
+  const key = `${date}-${subtype}-${slugify(title)}`;
+
+  // Build FTS5-optimized structured text
+  const content = [
+    `[EXPERIENCE] ${title}`,
+    `PROJECT: ${project}`,
+    `DOMAIN: ${tags}`,
+    `DATE: ${date}`,
+    `TYPE: ${subtype}`,
+    `SOURCE: vault-writer`,
+    '',
+    `TRIGGER: ${trigger}`,
+    `ACTION: ${action}`,
+    `CONTEXT: ${context}`,
+    `OUTCOME: ${outcome}`,
+  ].join('\n');
+
+  // Write to knowledge.db
+  if (!existsSync(KNOWLEDGE_DB_PATH)) {
+    log(`DB SKIP: knowledge.db not found at ${KNOWLEDGE_DB_PATH}`);
+    return { key, written: false };
+  }
+
+  let db;
+  try {
+    db = new Database(KNOWLEDGE_DB_PATH);
+  } catch (err) {
+    log(`DB ERROR: could not open knowledge.db: ${err.message}`);
+    return { key, written: false };
+  }
+
+  try {
+    const existing = db.prepare('SELECT id FROM knowledge WHERE key = ? AND source = ?').get(key, 'vault-writer');
+    const now = new Date().toISOString();
+    const enrichedTags = [tags, `file-touch:${(files || []).join(',')}`, subtype].filter(Boolean).join(', ');
+
+    if (existing) {
+      db.prepare('UPDATE knowledge SET content = ?, tags = ?, updated_at = ?, project_dir = ? WHERE id = ?')
+        .run(content, enrichedTags, now, project, existing.id);
+      log(`DB UPDATE: ${key}`);
+    } else {
+      db.prepare('INSERT INTO knowledge (key, content, tags, source, permanent, created_at, updated_at, project_dir) VALUES (?, ?, ?, ?, 1, ?, ?, ?)')
+        .run(key, content, enrichedTags, 'vault-writer', now, now, project);
+      log(`DB INSERT: ${key}`);
+    }
+
+    // Generate Obsidian mirror
+    const fileList = Array.isArray(files) ? files.join(', ') : (files || '');
+    const mdPath = mirrorToObsidian({
+      key, content, tags: enrichedTags, source: 'vault-writer',
+      project, date, subtype, files: fileList, outcome: outcome || 'unknown'
+    });
+    log(`MIRROR: ${mdPath}`);
+
+    return { key, written: true };
+  } catch (err) {
+    log(`DB ERROR: ${key}: ${err.message}`);
+    return { key, written: false };
+  } finally {
+    db.close();
+  }
+}
+
+/**
+ * Extract experiences from structured session data (decisions, gotchas, and conversation matches).
  * Only writes experiences that meet minimum quality thresholds.
  */
-function extractStructuredExperiences(decisions, gotchas, project, dateStr, topics, experienceFiles, filesChanged = []) {
+function extractStructuredExperiences(decisions, gotchas, conversationMatches, project, dateStr, topics, experienceFiles, filesChanged = []) {
   let count = 0;
 
   // Extract basenames from file paths for tagging
@@ -346,202 +499,138 @@ function extractStructuredExperiences(decisions, gotchas, project, dateStr, topi
       .map(f => f.toLowerCase())
   )].slice(0, 10);  // cap at 10 file tags
 
+  const tagStr = [...topics, ...fileTags].join(', ');
+  const fileBasenames = filesChanged.slice(0, 5).map(f => f.split(/[\\/]/).pop());
+
   // Process decisions — these are from the agent's decision events
   for (const text of decisions) {
-    if (count >= MAX_EXPERIENCES_PER_SESSION) break;
-    if (text.length < MIN_DECISION_LENGTH) continue;
+    if (count >= MAX_EXPERIENCES_PER_SESSION) {
+      log(`SKIP (decision): MAX_CAP reached (${count}/${MAX_EXPERIENCES_PER_SESSION})`);
+      break;
+    }
+    if (text.length < MIN_DECISION_LENGTH) {
+      log(`SKIP (decision): LENGTH ${text.length} < ${MIN_DECISION_LENGTH}: "${text.slice(0, 40)}"`);
+      continue;
+    }
 
     const firstLine = text.split('\n')[0].slice(0, 200);
-    const title = slugify(firstLine.slice(0, 50));
-    const slug = `${dateStr}-decision-${title}`;
-
-    const content = `---
-date: ${dateStr}
-project: ${project}
-type: experience
-subtype: decision
-tags: [${[...topics, ...fileTags].join(', ')}]
-files: [${filesChanged.slice(0, 5).map(f => f.split(/[\\/]/).pop()).join(', ')}]
-outcome: unknown
-source: auto-extracted
----
-
-situation: "${firstLine.replace(/"/g, '\\"')}"
-
-action: "${text.slice(0, 500).replace(/"/g, '\\"').replace(/\n/g, ' ')}"
-
-outcome_detail: "Auto-captured. Review and enrich with actual outcome."
-
-learned: "Auto-captured. Add the key takeaway from this decision."
-`;
 
     // Semantic dedup check
     const dupMatch = findSemanticDuplicate(firstLine);
     if (dupMatch) {
-      log(`DEDUP SKIP (decision): "${firstLine.slice(0, 60)}..." similar to ${dupMatch.path} (${dupMatch.similarity})`);
+      log(`SKIP (decision): DEDUP ${dupMatch.score} similar to ${dupMatch.path}: "${firstLine.slice(0, 60)}"`);
       continue;
     }
 
-    const expFile = join(EXPERIENCES_DIR, `${slug}.md`);
-    const wrote = writeIfNew(expFile, content);
-    if (wrote) {
-      log(`Wrote decision experience: ${expFile}`);
-      experienceFiles.push({ slug, content });
+    const result = writeExperienceToDb({
+      title: firstLine.slice(0, 80),
+      project,
+      date: dateStr,
+      subtype: 'decision',
+      tags: tagStr,
+      files: fileBasenames,
+      trigger: firstLine,
+      action: text.slice(0, 500).replace(/\n/g, ' '),
+      context: 'Auto-extracted from decision event category.',
+      outcome: 'Review and enrich with actual outcome.',
+    });
+    if (result.written) {
+      experienceFiles.push({ slug: result.key, content: text });
       count++;
     }
   }
 
   // Process gotchas — these are lines matching gotcha/error patterns
   for (const text of gotchas) {
-    if (count >= MAX_EXPERIENCES_PER_SESSION) break;
-    if (text.length < MIN_GOTCHA_LENGTH) continue;
+    if (count >= MAX_EXPERIENCES_PER_SESSION) {
+      log(`SKIP (gotcha): MAX_CAP reached (${count}/${MAX_EXPERIENCES_PER_SESSION})`);
+      break;
+    }
+    if (text.length < MIN_GOTCHA_LENGTH) {
+      log(`SKIP (gotcha): LENGTH ${text.length} < ${MIN_GOTCHA_LENGTH}: "${text.slice(0, 40)}"`);
+      continue;
+    }
 
     const firstLine = text.split('\n')[0].slice(0, 200);
-    const title = slugify(firstLine.slice(0, 50));
-    const slug = `${dateStr}-gotcha-${title}`;
 
     // Semantic dedup check
     const dupMatch = findSemanticDuplicate(firstLine);
     if (dupMatch) {
-      log(`DEDUP SKIP (gotcha): "${firstLine.slice(0, 60)}..." similar to ${dupMatch.path} (${dupMatch.similarity})`);
+      log(`SKIP (gotcha): DEDUP ${dupMatch.score} similar to ${dupMatch.path}: "${firstLine.slice(0, 60)}"`);
       continue;
     }
 
-    const content = `---
-date: ${dateStr}
-project: ${project}
-type: experience
-subtype: gotcha
-tags: [${[...topics, ...fileTags].join(', ')}]
-files: [${filesChanged.slice(0, 5).map(f => f.split(/[\\/]/).pop()).join(', ')}]
-outcome: failure
-source: auto-extracted
----
-
-situation: "${firstLine.replace(/"/g, '\\"')}"
-
-action: "${text.slice(0, 500).replace(/"/g, '\\"').replace(/\n/g, ' ')}"
-
-outcome_detail: "Auto-captured. Review and enrich with the fix or workaround."
-
-learned: "Auto-captured. Add what to do differently next time."
-`;
-
-    const expFile = join(EXPERIENCES_DIR, `${slug}.md`);
-    const wrote = writeIfNew(expFile, content);
-    if (wrote) {
-      log(`Wrote gotcha experience: ${expFile}`);
-      experienceFiles.push({ slug, content });
+    const result = writeExperienceToDb({
+      title: firstLine.slice(0, 80),
+      project,
+      date: dateStr,
+      subtype: 'gotcha',
+      tags: tagStr,
+      files: fileBasenames,
+      trigger: firstLine,
+      action: text.slice(0, 500).replace(/\n/g, ' '),
+      context: 'Auto-extracted from gotcha/error pattern match.',
+      outcome: 'Review and enrich with actual outcome.',
+    });
+    if (result.written) {
+      experienceFiles.push({ slug: result.key, content: text });
       count++;
     }
   }
-}
 
-/**
- * Parse YAML frontmatter from a markdown file.
- * Returns { frontmatter: {}, body: string }.
- */
-function parseFrontmatter(text) {
-  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
-  if (!match) return { frontmatter: {}, body: text };
-
-  const yamlBlock = match[1];
-  const body = match[2];
-  const frontmatter = {};
-
-  for (const line of yamlBlock.split('\n')) {
-    const colonIdx = line.indexOf(':');
-    if (colonIdx === -1) continue;
-    const key = line.slice(0, colonIdx).trim();
-    let value = line.slice(colonIdx + 1).trim();
-
-    // Handle YAML arrays like [tag1, tag2]
-    if (value.startsWith('[') && value.endsWith(']')) {
-      value = value.slice(1, -1).split(',').map(s => s.trim()).filter(Boolean);
+  // Process conversation matches — hybrid extraction from user/agent text
+  for (const match of conversationMatches) {
+    if (count >= MAX_EXPERIENCES_PER_SESSION) {
+      log(`SKIP (${match.subtype}): MAX_CAP reached (${count}/${MAX_EXPERIENCES_PER_SESSION})`);
+      break;
     }
-    // Handle quoted strings
-    if (typeof value === 'string' && /^["'].*["']$/.test(value)) {
-      value = value.slice(1, -1);
+
+    const text = match.text;
+    const firstLine = text.split('\n')[0].slice(0, 200);
+    const fingerprint = text.slice(0, 80);
+
+    // Intra-session dedup: skip if first 80 chars match an already-extracted experience
+    const intraDup = experienceFiles.some(e => e.content.slice(0, 80) === fingerprint);
+    if (intraDup) {
+      log(`SKIP (${match.subtype}): INTRA_SESSION dup: "${firstLine.slice(0, 60)}"`);
+      continue;
     }
-    frontmatter[key] = value;
-  }
 
-  return { frontmatter, body };
-}
+    if (text.length < MIN_DECISION_LENGTH) {
+      log(`SKIP (${match.subtype}): LENGTH ${text.length} < ${MIN_DECISION_LENGTH}: "${text.slice(0, 40)}"`);
+      continue;
+    }
 
-/**
- * Mirror experience files into Knowledge MCP's knowledge.db for FTS5 search via kb_recall.
- * Uses UPSERT pattern: check if key exists, then UPDATE or INSERT.
- */
-function mirrorToOpenBrain(experienceFilePaths) {
-  if (!existsSync(KNOWLEDGE_DB_PATH)) {
-    log(`MIRROR SKIP: knowledge.db not found at ${KNOWLEDGE_DB_PATH}`);
-    return;
-  }
+    // Semantic dedup check
+    const dupMatch = findSemanticDuplicate(firstLine);
+    if (dupMatch) {
+      log(`SKIP (${match.subtype}): DEDUP ${dupMatch.score} similar to ${dupMatch.path}: "${firstLine.slice(0, 60)}"`);
+      continue;
+    }
 
-  let db;
-  try {
-    db = new Database(KNOWLEDGE_DB_PATH);
-  } catch (err) {
-    log(`MIRROR ERROR: could not open knowledge.db: ${err.message}`);
-    return;
-  }
+    const contextStr = match.userPrompt
+      ? `User asked: ${match.userPrompt}\n\nAgent response: ${match.text.slice(0, 1000)}`
+      : match.text.slice(0, 1000);
 
-  const now = new Date().toISOString();
-  const selectStmt = db.prepare('SELECT id FROM knowledge WHERE key = ? AND source = ?');
-  const updateStmt = db.prepare(
-    'UPDATE knowledge SET content = ?, tags = ?, updated_at = ?, project_dir = ? WHERE id = ?'
-  );
-  const insertStmt = db.prepare(
-    'INSERT INTO knowledge (key, content, tags, source, permanent, created_at, updated_at, project_dir) VALUES (?, ?, ?, ?, 1, ?, ?, ?)'
-  );
-
-  let mirrored = 0;
-  let errors = 0;
-
-  for (const filePath of experienceFilePaths) {
-    try {
-      if (!existsSync(filePath)) {
-        log(`MIRROR WARN: file not found: ${filePath}`);
-        continue;
-      }
-
-      const raw = readFileSync(filePath, 'utf-8');
-      const { frontmatter, body } = parseFrontmatter(raw);
-
-      const filename = filePath.split(/[\\/]/).pop().replace(/\.md$/, '');
-      const tags = Array.isArray(frontmatter.tags)
-        ? frontmatter.tags.join(', ')
-        : (frontmatter.tags || '');
-
-      // Add vault-mirror tag to distinguish these entries
-      const tagStr = tags ? `${tags}, vault-mirror` : 'vault-mirror';
-
-      // Include structured metadata in tags for better FTS5 retrieval
-      const subtype = frontmatter.subtype || '';
-      const outcome = frontmatter.outcome || '';
-      const files = Array.isArray(frontmatter.files)
-        ? frontmatter.files.join(', ')
-        : (frontmatter.files || '');
-      const enrichedTagStr = [tagStr, subtype, outcome, files].filter(Boolean).join(', ');
-
-      const projectDir = frontmatter.project || null;
-
-      const existing = selectStmt.get(filename, 'vault-mirror');
-      if (existing) {
-        updateStmt.run(body, enrichedTagStr, now, projectDir, existing.id);
-      } else {
-        insertStmt.run(filename, body, enrichedTagStr, 'vault-mirror', now, now, projectDir);
-      }
-      mirrored++;
-    } catch (err) {
-      log(`MIRROR ERROR: ${filePath}: ${err.message}`);
-      errors++;
+    const result = writeExperienceToDb({
+      title: firstLine.slice(0, 80),
+      project,
+      date: dateStr,
+      subtype: match.subtype,
+      tags: tagStr,
+      files: fileBasenames,
+      trigger: firstLine,
+      action: text.slice(0, 500).replace(/\n/g, ' '),
+      context: contextStr,
+      outcome: 'Review and enrich with actual outcome.',
+    });
+    if (result.written) {
+      experienceFiles.push({ slug: result.key, content: text });
+      count++;
     }
   }
 
-  db.close();
-  log(`MIRROR: ${mirrored} experiences mirrored to Knowledge MCP (${errors} errors)`);
+  log(`Extraction complete: ${count} experiences written (decisions=${decisions.length}, gotchas=${gotchas.length}, conversation=${conversationMatches.length})`);
 }
 
 /**
