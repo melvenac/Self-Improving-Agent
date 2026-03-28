@@ -8,4 +8,8 @@ Thumbs.db
 # Local development framework (not distributed)
 /.agents/
 /.claude/
+/docs/
 CLAUDE.md
+
+# WIP — not ready for public repo yet
+/a2a-wrapper/

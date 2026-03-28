@@ -2,7 +2,7 @@
 
 *A memory protocol that enables AI coding agents to learn across sessions.*
 
-**Latest: v0.3.2** · [Changelog](CHANGELOG.md)
+**Latest: v0.3.3** · [Changelog](CHANGELOG.md)
 
 ---
 
@@ -52,6 +52,26 @@ Knowledge is organized in three tiers:
 - **VS Code** (or any editor)
 
 ## Getting Started
+
+### Quick Start (recommended)
+
+```bash
+git clone https://github.com/melvenac/Self-Improving-Agent.git
+cd Self-Improving-Agent
+node scripts/setup.mjs
+```
+
+This installs the Knowledge MCP server, registers hooks, copies slash commands, and scaffolds the Obsidian vault. Restart Claude Code after running.
+
+For framework developers (symlinks source for live editing):
+```bash
+node scripts/setup.mjs --dev
+```
+
+### Manual Setup
+
+<details>
+<summary>Step-by-step instructions (if you prefer manual control)</summary>
 
 ### 1. Clone and install
 
@@ -149,6 +169,8 @@ Start a Claude Code session and run `/start`. You should see:
 - Session bootstrap hook fires (project detection, handoff check)
 - Knowledge recall attempts (may be empty on first run)
 - Session log created
+
+</details>
 
 ## Commands
 

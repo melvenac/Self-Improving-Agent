@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.3.3] - 2026-03-28
+
+One-command setup for new users and framework developers.
+
+### Added
+- `scripts/setup.mjs` — automated setup: installs Knowledge MCP server, registers hooks, copies slash commands, scaffolds Obsidian vault
+- `--dev` flag for framework developers (symlinks `src/` and `scripts/` instead of copying for live editing)
+- Idempotent design — safe to re-run, skips anything already configured
+- README Quick Start section with `node scripts/setup.mjs` as the recommended path
+
 ## [v0.3.2] - 2026-03-28
 
 Fix kb_recall returning zero results, Windows path normalization, repo/installed sync.
