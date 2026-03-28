@@ -1,0 +1,238 @@
+/**
+ * skill-scan.mjs — SessionEnd hook (runs after vault-writer)
+ * Scans Obsidian Experiences/ for tag clusters, diffs against SKILL-CANDIDATES.md,
+ * and stores proposals in Open Brain when new clusters cross the 3+ threshold.
+ *
+ * This is the "pattern recognition" layer of the self-improving agent:
+ * Memory (experiences) + Proactivity (SessionEnd hook) + Tools (file I/O + Open Brain)
+ */
+
+import { existsSync, readdirSync, readFileSync, writeFileSync, appendFileSync } from 'fs';
+import { join } from 'path';
+import { homedir } from 'os';
+
+const VAULT = join(homedir(), 'Obsidian Vault');
+const EXPERIENCES_DIR = join(VAULT, 'Experiences');
+const CANDIDATES_FILE = join(VAULT, 'Guidelines', 'SKILL-CANDIDATES.md');
+const SKILL_INDEX_FILE = join(VAULT, 'Guidelines', 'SKILL-INDEX.md');
+const LOG_FILE = join(VAULT, '.vault-writer.log');
+const CLUSTER_THRESHOLD = 3;
+
+function log(msg) {
+  const line = `[skill-scan] ${new Date().toISOString()} ${msg}\n`;
+  try { appendFileSync(LOG_FILE, line); } catch {}
+}
+
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+
+/**
+ * Parse frontmatter tags from an experience .md file
+ */
+function parseTags(content) {
+  const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+  if (!fmMatch) return [];
+  const tagsMatch = fmMatch[1].match(/tags:\s*\[([^\]]*)\]/);
+  if (!tagsMatch) return [];
+  return tagsMatch[1].split(',').map(t => t.trim().replace(/['"]/g, '')).filter(Boolean);
+}
+
+/**
+ * Parse previous candidates file to get last scan's cluster counts
+ */
+function parsePreviousCounts(content) {
+  const counts = {};
+  const dateMatch = content.match(/date:\s*(\S+)/);
+  const previousDate = dateMatch ? dateMatch[1] : null;
+
+  // Match lines like "### convex (6 experiences)"
+  const clusterRegex = /###\s+(\S+)\s+\((\d+)\s+experiences?\)/g;
+  let match;
+  while ((match = clusterRegex.exec(content)) !== null) {
+    const tag = match[1];
+    const count = parseInt(match[2]);
+    // Only track the first occurrence (By Tag section)
+    if (!counts[tag]) counts[tag] = count;
+  }
+  return { counts, previousDate };
+}
+
+/**
+ * Check which skills already exist in SKILL-INDEX.md
+ */
+function parseExistingSkills(content) {
+  const skills = [];
+  // Match skill names/tags mentioned in the index
+  const lower = content.toLowerCase();
+  const knownTags = ['convex', 'docker', 'deployment', 'python', 'ai-first', 'replicate', 'coolify', 'stripe'];
+  for (const tag of knownTags) {
+    if (lower.includes(tag)) skills.push(tag);
+  }
+  return skills;
+}
+
+/**
+ * Noise tags that don't represent skill-worthy domains
+ */
+const NOISE_TAGS = new Set([
+  'test', 'marker', 'green-flamingo', 'purple-octopus',
+  'session-summary', 'gotcha', 'pattern', 'decision', 'fix', 'optimization'
+]);
+
+function main() {
+  log('Starting skill scan');
+
+  // 1. Scan experiences
+  if (!existsSync(EXPERIENCES_DIR)) {
+    log('Experiences directory not found — skipping');
+    return;
+  }
+
+  const files = readdirSync(EXPERIENCES_DIR).filter(f => f.endsWith('.md'));
+  const clusters = {};
+
+  for (const file of files) {
+    try {
+      const content = readFileSync(join(EXPERIENCES_DIR, file), 'utf8');
+      const tags = parseTags(content);
+      for (const tag of tags) {
+        if (NOISE_TAGS.has(tag)) continue;
+        if (!clusters[tag]) clusters[tag] = [];
+        clusters[tag].push(file.replace('.md', ''));
+      }
+    } catch (err) {
+      log(`Error reading ${file}: ${err.message}`);
+    }
+  }
+
+  // 2. Filter to significant clusters
+  const significant = Object.entries(clusters)
+    .filter(([_, files]) => files.length >= CLUSTER_THRESHOLD)
+    .sort((a, b) => b[1].length - a[1].length);
+
+  const approaching = Object.entries(clusters)
+    .filter(([_, files]) => files.length === CLUSTER_THRESHOLD - 1)
+    .sort((a, b) => a[0].localeCompare(b[0]));
+
+  // 3. Diff against previous scan
+  let previousCounts = {};
+  let previousDate = null;
+  if (existsSync(CANDIDATES_FILE)) {
+    try {
+      const prev = readFileSync(CANDIDATES_FILE, 'utf8');
+      const parsed = parsePreviousCounts(prev);
+      previousCounts = parsed.counts;
+      previousDate = parsed.previousDate;
+    } catch {}
+  }
+
+  // Check existing skills
+  let existingSkills = [];
+  if (existsSync(SKILL_INDEX_FILE)) {
+    try {
+      existingSkills = parseExistingSkills(readFileSync(SKILL_INDEX_FILE, 'utf8'));
+    } catch {}
+  }
+
+  const newClusters = [];
+  const growingClusters = [];
+
+  for (const [tag, tagFiles] of significant) {
+    const prevCount = previousCounts[tag] || 0;
+    if (prevCount === 0) {
+      newClusters.push({ tag, count: tagFiles.length, files: tagFiles });
+    } else if (tagFiles.length > prevCount) {
+      growingClusters.push({ tag, count: tagFiles.length, prevCount, files: tagFiles });
+    }
+  }
+
+  // 4. Write updated SKILL-CANDIDATES.md
+  let md = `---\ndate: ${today()}\ntype: skill-scan\nprevious-scan: ${previousDate || 'none'}\n---\n\n`;
+  md += `# Skill Candidates\n\n`;
+  md += `> Auto-generated by \`skill-scan.mjs\` on ${today()}.\n`;
+  md += `> Clusters of ${CLUSTER_THRESHOLD}+ experiences suggest a reusable skill could be distilled.\n\n`;
+  md += `## By Tag\n\n`;
+
+  for (const [tag, tagFiles] of significant) {
+    const hasSkill = existingSkills.includes(tag);
+    const isNew = !previousCounts[tag];
+    const isGrowing = previousCounts[tag] && tagFiles.length > previousCounts[tag];
+    const status = [];
+    if (hasSkill) status.push('has skill');
+    if (isNew) status.push('NEW');
+    if (isGrowing) status.push('growing');
+
+    md += `### ${tag} (${tagFiles.length} experiences)${status.length ? ' — ' + status.join(', ') : ''}\n\n`;
+    if (hasSkill) {
+      md += `**Status:** Skill exists — consider updating if new experiences add novel patterns\n\n`;
+    } else {
+      md += `**Potential skill:** "${tag}" patterns and gotchas\n\n`;
+    }
+    for (const f of tagFiles) {
+      md += `- [[${f}]]\n`;
+    }
+    md += '\n';
+  }
+
+  if (approaching.length > 0) {
+    md += `## Approaching Threshold (${CLUSTER_THRESHOLD - 1} experiences)\n\n`;
+    for (const [tag, tagFiles] of approaching) {
+      if (NOISE_TAGS.has(tag)) continue;
+      md += `- **${tag}** (${tagFiles.length}) — one more experience triggers proposal\n`;
+    }
+    md += '\n';
+  }
+
+  // Diff table
+  if (previousDate) {
+    md += `## Scan Diff (vs ${previousDate})\n\n`;
+    md += `| Cluster | Previous | Current | Change |\n|---|---|---|---|\n`;
+    const allTags = new Set([...Object.keys(previousCounts), ...significant.map(([t]) => t)]);
+    for (const tag of [...allTags].sort()) {
+      const prev = previousCounts[tag] || 0;
+      const curr = clusters[tag]?.length || 0;
+      if (curr < CLUSTER_THRESHOLD && prev < CLUSTER_THRESHOLD) continue;
+      const change = prev === 0 ? 'NEW' : curr === prev ? 'unchanged' : `+${curr - prev}`;
+      md += `| ${tag} | ${prev || '—'} | ${curr} | ${change} |\n`;
+    }
+    md += '\n';
+  }
+
+  md += `---\n\n*Last scan: ${today()}. Runs automatically at session end via skill-scan.mjs hook.*\n`;
+
+  writeFileSync(CANDIDATES_FILE, md);
+  log(`Updated SKILL-CANDIDATES.md — ${significant.length} clusters, ${newClusters.length} new, ${growingClusters.length} growing`);
+
+  // 5. Log summary
+  const summary = [
+    `[skill-scan] ${today()}`,
+    `Experiences scanned: ${files.length}`,
+    `Clusters (${CLUSTER_THRESHOLD}+): ${significant.map(([t, f]) => `${t}(${f.length})`).join(', ') || 'none'}`,
+    `New proposals: ${newClusters.map(c => `${c.tag}(${c.count})`).join(', ') || 'none'}`,
+    `Growth: ${growingClusters.map(c => `${c.tag} ${c.prevCount}→${c.count}`).join(', ') || 'none'}`,
+    `Approaching: ${approaching.filter(([t]) => !NOISE_TAGS.has(t)).map(([t, f]) => `${t}(${f.length})`).join(', ') || 'none'}`
+  ];
+
+  for (const line of summary) log(line);
+
+  // 6. If new clusters, note it for Open Brain pickup
+  // (Can't call MCP from a hook script, so we write a marker file that /recall can check)
+  if (newClusters.length > 0) {
+    const markerPath = join(VAULT, '.skill-proposals-pending.json');
+    const proposals = newClusters.map(c => ({
+      tag: c.tag,
+      count: c.count,
+      files: c.files,
+      date: today()
+    }));
+    writeFileSync(markerPath, JSON.stringify(proposals, null, 2));
+    log(`Wrote ${newClusters.length} pending proposal(s) to .skill-proposals-pending.json`);
+  }
+}
+
+try {
+  main();
+} catch (err) {
+  log(`FATAL: ${err.message}\n${err.stack}`);
+}

@@ -8,3 +8,4 @@ Thumbs.db
 # Local development framework (not distributed)
 /.agents/
 /.claude/
+CLAUDE.md

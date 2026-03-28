@@ -1,5 +1,32 @@
 # Changelog
 
+## [v0.3.2] - 2026-03-28
+
+Fix kb_recall returning zero results, Windows path normalization, repo/installed sync.
+
+### Fixed
+- kb_recall returning zero results — `build/db.js` had stale `KB_DIR` pointing to `knowledge-mcp/` instead of `context-mode/` (source was correct but build wasn't recompiled)
+- Windows path normalization — `normalizePath()` helper ensures `project_dir` uses forward slashes on read (`recall`) and write (`insertSession`, `insertKnowledge`), so Git Bash and PowerShell users get consistent behavior
+- Repo/installed copy drift — synced 11 scripts (`scripts/*.mjs`) from installed copy into repo, synced v0.3.0 source updates (`indexer.ts`, `server.ts`, `tags.ts`) to installed copy, reconciled `package.json` identity (`knowledge-mcp` v0.3.0)
+- Cleaned up stale `summarizer.*` build artifacts from installed copy
+- Added `recall_count`/`last_recalled` migration and `weighted_rank` to `RecallResult` type in `db.ts`
+
+### Added
+- `scripts/sync-docs.mjs` — reads authoritative sources (package.json, CHANGELOG, SUMMARY), updates downstream files (README, PRD, knowledge-mcp/package.json). Supports `--check` mode for pre-commit validation.
+- `/sync` slash command — runs sync-docs.mjs on demand
+- `CLAUDE.md` — project-level instructions loaded at every session start (run /sync before commits, architecture overview, key rules)
+- README.md rewritten as single source of setup instructions (clone → install → verify)
+
+### Changed
+- `.claude/rules/` added to project-template with path-specific rule files (frontend, backend, database, testing, agents)
+- `.clinerules/` removed from project-template FRAMEWORK.md (replaced by `.claude/rules/`)
+
+### Removed
+- `getting-started/` directory (5 files) — stale, hard to maintain during rapid iteration; README is now the setup guide
+- `how-it-works/` directory (6 files) — stale; architecture is documented in README and `.agents/SYSTEM/`
+- `reference/` directory (4 files) — stale legacy docs
+- `SELF-IMPROVING-AGENT.md` — redundant with README
+
 ## [v0.3.1] - 2026-03-28
 
 Widen extraction patterns, unified experience format, SQLite-first data flow.

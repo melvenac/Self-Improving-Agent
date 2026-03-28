@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 
-const KB_DIR = join(homedir(), ".claude", "knowledge-mcp");
+const KB_DIR = join(homedir(), ".claude", "context-mode");
 const KB_PATH = join(KB_DIR, "knowledge.db");
 
 let _db: Database.Database | null = null;
@@ -227,6 +227,10 @@ export interface RecallResult {
   weighted_rank: number;
 }
 
+function normalizePath(p: string | null | undefined): string | null {
+  return p ? p.replace(/\\/g, "/") : null;
+}
+
 function sanitizeFtsQuery(query: string): string {
   return query
     .split(/\s+/)
@@ -251,6 +255,7 @@ export function recall(
   const db = getKnowledgeDb();
   const limit = options?.limit ?? 5;
   const safeQuery = sanitizeFtsQuery(query);
+  if (options?.project) options.project = normalizePath(options.project)!;
   const results: RecallResult[] = [];
 
   // --- Search chunks ---
@@ -587,7 +592,7 @@ export function insertSession(
   db.prepare(
     `INSERT OR IGNORE INTO sessions (id, db_file, project_dir, started_at, ended_at, event_count, indexed_at, event_count_at_index)
      VALUES (?, ?, ?, ?, ?, ?, datetime('now'), ?)`
-  ).run(id, dbFile, projectDir, startedAt, endedAt, eventCount, eventCount);
+  ).run(id, dbFile, normalizePath(projectDir), startedAt, endedAt, eventCount, eventCount);
 }
 
 export function updateSessionEventCount(
@@ -661,7 +666,7 @@ export function insertKnowledge(
       `INSERT INTO knowledge (key, content, tags, source, permanent, created_at, updated_at, project_dir)
        VALUES (?, ?, ?, ?, 1, ?, ?, ?)`
     )
-    .run(key || null, content, tagsStr, source || "manual", now, now, projectDir || null);
+    .run(key || null, content, tagsStr, source || "manual", now, now, normalizePath(projectDir));
   return Number(result.lastInsertRowid);
 }
 

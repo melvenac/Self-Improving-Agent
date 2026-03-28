@@ -1,0 +1,820 @@
+/**
+ * vault-writer.mjs — SessionEnd hook
+ * Auto-captures Claude Code sessions into the Obsidian vault.
+ *
+ * Stage 1: Session Log — extract events from most recent .db, write to Sessions/
+ * Stage 2: Experience Extraction — scan for decisions/gotchas, write to Experiences/
+ * Stage 3: Topic Linking — update Topics/ See Also sections with backlinks
+ * Stage 4: Safety Net — auto-fill .agents/SESSIONS/Session_N.md if /end was skipped
+ */
+
+import { existsSync, readdirSync, statSync, writeFileSync, readFileSync, appendFileSync } from 'fs';
+import { join } from 'path';
+import { homedir } from 'os';
+import { execSync } from 'child_process';
+import Database from 'better-sqlite3';
+import {
+  SESSIONS_DIR, EXPERIENCES_DIR, LOGS_DIR,
+  slugify, today, log, writeIfNew, projectFromDir,
+  getExistingTopics, findTopicMentions, linkToTopic, wikiLinks,
+  mirrorToObsidian
+} from './vault-utils.mjs';
+const KNOWLEDGE_DB_PATH = join(homedir(), '.claude', 'context-mode', 'knowledge.db');
+
+const SESSIONS_DB_DIR = join(homedir(), '.claude', 'context-mode', 'sessions');
+
+// Minimum quality thresholds for auto-extracted experiences
+const MIN_DECISION_LENGTH = 25;  // lowered from 40 — monitor via Obsidian
+const MIN_GOTCHA_LENGTH = 25;
+const MAX_EXPERIENCES_PER_SESSION = 3;  // cap to avoid noise
+const DEDUP_SIMILARITY_THRESHOLD = 0.80;  // skip if existing experience is this similar
+const VAULT_PATH_FOR_CLI = join(homedir(), 'Obsidian Vault');
+
+// --- Conversation scanning patterns (hybrid extraction) ---
+const PLANNING_PATTERNS = [
+  /\blet'?s go with\b/i,
+  /\bthe approach is\b/i,
+  /\bwe decided\b/i,
+  /\bthe plan is\b/i,
+  /\bI want to build\b/i,
+  /\bshould we\b/i,
+  /\bI('m| am) thinking\b/i,
+  /\bthe strategy\b/i,
+];
+
+const ARCHITECTURE_PATTERNS = [
+  /\bchose .{3,30} over\b/i,
+  /\btrade-?off\b/i,
+  /\bbecause\b/i,
+  /\binstead of\b/i,
+  /\bthe reason (?:is|was)\b/i,
+  /\barchitecture\b/i,
+  /\bdata flow\b/i,
+];
+
+const WORKAROUND_PATTERNS = [
+  /\bworkaround\b/i,
+  /\bhack\b/i,
+  /\btemporary fix\b/i,
+  /\buntil we\b/i,
+  /\bfor now we\b/i,
+  /\bfixed by\b/i,
+];
+
+const ROOT_CAUSE_PATTERNS = [
+  /\broot cause\b/i,
+  /\bthe issue was\b/i,
+  /\bturns out\b/i,
+  /\bthe problem (?:is|was)\b/i,
+  /\bdoesn'?t support\b/i,
+  /\bincompatible\b/i,
+];
+
+const EXPLICIT_MARKERS = [
+  /\bremember this\b/i,
+  /\bnote that\b/i,
+  /\bimportant:/i,
+  /\blesson learned\b/i,
+];
+
+const CONVERSATION_PATTERNS = [
+  { patterns: PLANNING_PATTERNS, subtype: 'planning' },
+  { patterns: ARCHITECTURE_PATTERNS, subtype: 'decision' },
+  { patterns: WORKAROUND_PATTERNS, subtype: 'workaround' },
+  { patterns: ROOT_CAUSE_PATTERNS, subtype: 'gotcha' },
+  { patterns: EXPLICIT_MARKERS, subtype: 'pattern' },
+];
+
+// --- CLI entry point (guarded for safe imports) ---
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const isDirectRun = process.argv[1] && __filename.replace(/\\/g, '/').toLowerCase() === process.argv[1].replace(/\\/g, '/').toLowerCase();
+
+if (isDirectRun) {
+  if (process.argv.includes('--backfill')) {
+    try {
+      backfillMirror();
+    } catch (err) {
+      log(`FATAL (backfill): ${err.message}\n${err.stack}`);
+      logErrorToVault(err);
+    }
+  } else if (process.argv.includes('--backfill-sessions')) {
+    try {
+      backfillSessions();
+    } catch (err) {
+      log(`FATAL (backfill-sessions): ${err.message}\n${err.stack}`);
+      logErrorToVault(err);
+    }
+  } else {
+    try {
+      main();
+    } catch (err) {
+      log(`FATAL: ${err.message}\n${err.stack}`);
+      logErrorToVault(err);
+    }
+  }
+}
+
+/**
+ * Backfill mode: mirror ALL existing experience files to Knowledge MCP.
+ */
+function backfillMirror() {
+  if (!existsSync(EXPERIENCES_DIR)) {
+    log('BACKFILL: No Experiences directory found');
+    return;
+  }
+  const files = readdirSync(EXPERIENCES_DIR)
+    .filter(f => f.endsWith('.md'))
+    .map(f => join(EXPERIENCES_DIR, f));
+
+  log(`BACKFILL: Found ${files.length} experience files to re-mirror`);
+  let count = 0;
+  for (const filePath of files) {
+    try {
+      const raw = readFileSync(filePath, 'utf-8');
+      const filename = filePath.split(/[\\/]/).pop().replace(/\.md$/, '');
+      mirrorToObsidian({
+        key: filename,
+        content: raw,
+        tags: 'backfill',
+        source: 'vault-writer',
+        project: 'unknown',
+        date: today(),
+        subtype: 'decision',
+        files: '',
+        outcome: 'unknown',
+      });
+      count++;
+    } catch (err) {
+      log(`BACKFILL ERROR: ${filePath}: ${err.message}`);
+    }
+  }
+  log(`BACKFILL: Complete — ${count} files mirrored`);
+}
+
+/**
+ * Backfill sessions: process ALL .db files, skipping those already captured in Obsidian.
+ * Checks for existing session files by matching source_db in frontmatter.
+ */
+function backfillSessions() {
+  if (!existsSync(SESSIONS_DB_DIR)) {
+    log('BACKFILL-SESSIONS: No sessions directory found');
+    return;
+  }
+
+  const dbFiles = readdirSync(SESSIONS_DB_DIR)
+    .filter(f => f.endsWith('.db'))
+    .map(f => join(SESSIONS_DB_DIR, f));
+
+  if (dbFiles.length === 0) {
+    log('BACKFILL-SESSIONS: No .db files found');
+    return;
+  }
+
+  // Build set of already-captured source_db filenames from existing Obsidian sessions
+  const alreadyCaptured = new Set();
+  if (existsSync(SESSIONS_DIR)) {
+    for (const file of readdirSync(SESSIONS_DIR).filter(f => f.endsWith('.md'))) {
+      try {
+        const content = readFileSync(join(SESSIONS_DIR, file), 'utf-8');
+        const match = content.match(/source_db:\s*"?([^"\n]+)"?/);
+        if (match) alreadyCaptured.add(match[1].trim());
+      } catch { /* skip unreadable files */ }
+    }
+  }
+
+  log(`BACKFILL-SESSIONS: ${dbFiles.length} .db files, ${alreadyCaptured.size} already captured`);
+
+  let processed = 0;
+  let skipped = 0;
+
+  for (const dbPath of dbFiles) {
+    const dbFilename = dbPath.split(/[\\/]/).pop();
+    if (alreadyCaptured.has(dbFilename)) {
+      skipped++;
+      continue;
+    }
+
+    try {
+      log(`BACKFILL-SESSIONS: Processing ${dbFilename}`);
+      main(dbPath);
+      processed++;
+    } catch (err) {
+      log(`BACKFILL-SESSIONS: ERROR on ${dbFilename}: ${err.message}`);
+    }
+  }
+
+  log(`BACKFILL-SESSIONS: Done — ${processed} processed, ${skipped} skipped (already captured)`);
+}
+
+/**
+ * Write error to a visible Obsidian note in Logs/ so it shows in the graph.
+ */
+function logErrorToVault(err) {
+  try {
+    const errorFile = join(LOGS_DIR, 'vault-writer-errors.md');
+    const timestamp = new Date().toISOString();
+    const entry = `\n### ${timestamp}\n\`\`\`\n${err.message}\n${err.stack?.slice(0, 500) || ''}\n\`\`\`\n`;
+
+    if (existsSync(errorFile)) {
+      appendFileSync(errorFile, entry);
+    } else {
+      const header = `---\ntype: error-log\n---\n\n# Vault Writer Errors\n\nAuto-captured errors from \`vault-writer.mjs\`. If this file appears in your graph, check what went wrong.\n`;
+      writeFileSync(errorFile, header + entry);
+    }
+  } catch { /* don't throw from error handler */ }
+}
+
+function main(overrideDbPath) {
+  // --- Stage 1: Find .db and extract session log ---
+  const dbPath = overrideDbPath || findMostRecentDb();
+  if (!dbPath) {
+    log('No session .db files found — skipping vault write');
+    return;
+  }
+
+  log(`Processing: ${dbPath}`);
+  const db = new Database(dbPath, { readonly: true });
+
+  const meta = db.prepare('SELECT * FROM session_meta ORDER BY last_event_at DESC LIMIT 1').get();
+  if (!meta) {
+    log('No session_meta rows — skipping');
+    db.close();
+    return;
+  }
+
+  const allEvents = db.prepare(
+    'SELECT type, category, data FROM session_events ORDER BY id'
+  ).all();
+
+  const dbFilename = dbPath.split(/[\\/]/).pop();
+  db.close();
+
+  const project = projectFromDir(meta.project_dir);
+  const dateStr = today();
+
+  // Extract meaningful content from events (raw text, not JSON)
+  const whatWasDone = [];
+  const decisions = [];
+  const gotchas = [];
+  const filesChanged = [];
+  let allText = '';
+  const conversationMatches = [];  // { text, subtype, matchedPattern, userPrompt }
+
+  for (const event of allEvents) {
+    const text = event.data || '';
+    const isSystemNoise = /^<local-command|^<command-name|^<system-reminder/i.test(text.trim());
+
+    // User prompts — raw text (filter system noise)
+    if (event.type === 'user_prompt') {
+      const isNoise = /^<local-command|^<command-name|^<command-message|^<local-command-stdout|^<system-reminder/i.test(text.trim());
+      if (!isNoise) {
+        allText += ' ' + text;
+        if (text.length > 10) {
+          whatWasDone.push('- ' + text.trim().split('\n')[0].slice(0, 200));
+        }
+      }
+    }
+
+    // Decisions — raw text from the agent
+    if (event.category === 'decision') {
+      allText += ' ' + text;
+      if (text.length > 10) {
+        decisions.push(text.trim().split('\n')[0].slice(0, 200));
+      }
+    }
+
+    // File operations — data is the file path
+    if (event.category === 'file' && (event.type === 'file_edit' || event.type === 'file_write')) {
+      filesChanged.push(text.trim());
+    }
+
+    // Subagent completions
+    if (event.type === 'subagent_completed') {
+      allText += ' ' + text.slice(0, 500);
+    }
+
+    // Gotcha detection (skip system noise that contains trigger words)
+    if (!isSystemNoise && /gotcha|caveat|careful|watch out|doesn't work|broke|failed|workaround|bug|error/i.test(text) && text.length > 20 && text.length < 500) {
+      if (event.category !== 'file') {
+        gotchas.push(text.trim().split('\n')[0].slice(0, 200));
+      }
+    }
+
+    // --- Conversation scanning (hybrid extraction) ---
+    if (!isSystemNoise && text.length > 25 && text.length < 2000) {
+      for (const { patterns, subtype } of CONVERSATION_PATTERNS) {
+        for (const regex of patterns) {
+          if (regex.test(text)) {
+            conversationMatches.push({
+              text: text.trim(),
+              subtype,
+              matchedPattern: regex.source,
+            });
+            break;  // one match per pattern group per event
+          }
+        }
+      }
+    }
+  }
+
+  // Attach most recent user prompt to each conversation match for context
+  const promptTexts = [];
+  let lastPrompt = '';
+  for (const event of allEvents) {
+    const text = event.data || '';
+    if (event.type === 'user_prompt') {
+      const isNoise = /^<local-command|^<command-name|^<command-message|^<local-command-stdout|^<system-reminder/i.test(text.trim());
+      if (!isNoise && text.length > 10) {
+        lastPrompt = text.trim().split('\n').slice(0, 5).join('\n').slice(0, 500);
+      }
+    }
+    // Tag conversation matches with the most recent user prompt
+    for (const match of conversationMatches) {
+      if (!match.userPrompt && match.text === text.trim()) {
+        match.userPrompt = lastPrompt;
+      }
+    }
+  }
+
+  // Quality gate: skip sessions that don't meet minimum substance thresholds
+  const meaningfulPrompts = whatWasDone.filter(line => line.length > 22); // "- " + 20 chars
+  const totalTextLength = allText.trim().length;
+
+  const passesQualityGate = (
+    (meaningfulPrompts.length >= 3) ||
+    (filesChanged.length >= 1 && meaningfulPrompts.length >= 1) ||
+    (decisions.length >= 1) ||
+    (gotchas.length >= 1)
+  ) && totalTextLength > 200;
+
+  if (!passesQualityGate) {
+    log(`SKIP: session too thin (prompts=${meaningfulPrompts.length}, files=${filesChanged.length}, decisions=${decisions.length}, gotchas=${gotchas.length}, text=${totalTextLength}chars)`);
+    return;
+  }
+
+  // Build filename
+  const briefTopic = slugify(whatWasDone[0]?.slice(2, 50) || 'session');
+  const idSuffix = meta.session_id ? meta.session_id.slice(0, 8) : Math.random().toString(36).slice(2, 10);
+  const sessionSlug = `${dateStr}-${project}-${briefTopic}-${idSuffix}`;
+
+  // Detect topics
+  const existingTopics = getExistingTopics();
+  const mentions = findTopicMentions(allText, existingTopics);
+
+  // Session data stays in knowledge.db (via auto-index.mjs) — no Obsidian session file
+  log(`Session processed: ${sessionSlug} (prompts=${whatWasDone.length}, files=${filesChanged.length}, decisions=${decisions.length}, gotchas=${gotchas.length}, conversation=${conversationMatches.length})`);
+
+  // --- Stage 2: Experience Extraction ---
+  const experienceFiles = [];
+
+  extractStructuredExperiences(decisions, gotchas, conversationMatches, project, dateStr, mentions, experienceFiles, filesChanged);
+
+  // --- Stage 3: Topic Linking ---
+  // Link experience files to topics
+  for (const { slug, content } of experienceFiles) {
+    const expTopics = getExistingTopics();
+    const expMentions = findTopicMentions(content, expTopics);
+    for (const topicName of expMentions) {
+      linkToTopic(topicName, slug);
+    }
+  }
+
+  // --- Stage 4: .agents/ session log safety net ---
+  try {
+    updateAgentsSessionLog(meta.project_dir, whatWasDone, filesChanged, decisions, gotchas);
+  } catch (err) {
+    log(`WARN: Stage 4 failed: ${err.message}`);
+  }
+
+  log(`Done — session: ${sessionSlug}, experiences: ${experienceFiles.length}, topic links: ${mentions.length}`);
+}
+
+/**
+ * Find the most recently modified .db file in the sessions directory.
+ */
+function findMostRecentDb() {
+  if (!existsSync(SESSIONS_DB_DIR)) return null;
+
+  const files = readdirSync(SESSIONS_DB_DIR).filter(f => f.endsWith('.db'));
+  if (files.length === 0) return null;
+
+  let newest = null;
+  let newestMtime = 0;
+
+  for (const file of files) {
+    const fullPath = join(SESSIONS_DB_DIR, file);
+    const stat = statSync(fullPath);
+    if (stat.mtimeMs > newestMtime) {
+      newestMtime = stat.mtimeMs;
+      newest = fullPath;
+    }
+  }
+
+  return newest;
+}
+
+/**
+ * Write an experience to knowledge.db in unified structured text format.
+ * Then generate an Obsidian .md mirror.
+ * Returns { key, written: true/false }.
+ */
+function writeExperienceToDb(opts) {
+  const { title, project, date, subtype, tags, files, trigger, action, context, outcome } = opts;
+  const key = `${date}-${subtype}-${slugify(title)}`;
+
+  // Build FTS5-optimized structured text
+  const content = [
+    `[EXPERIENCE] ${title}`,
+    `PROJECT: ${project}`,
+    `DOMAIN: ${tags}`,
+    `DATE: ${date}`,
+    `TYPE: ${subtype}`,
+    `SOURCE: vault-writer`,
+    '',
+    `TRIGGER: ${trigger}`,
+    `ACTION: ${action}`,
+    `CONTEXT: ${context}`,
+    `OUTCOME: ${outcome}`,
+  ].join('\n');
+
+  // Write to knowledge.db
+  if (!existsSync(KNOWLEDGE_DB_PATH)) {
+    log(`DB SKIP: knowledge.db not found at ${KNOWLEDGE_DB_PATH}`);
+    return { key, written: false };
+  }
+
+  let db;
+  try {
+    db = new Database(KNOWLEDGE_DB_PATH);
+  } catch (err) {
+    log(`DB ERROR: could not open knowledge.db: ${err.message}`);
+    return { key, written: false };
+  }
+
+  try {
+    const existing = db.prepare('SELECT id FROM knowledge WHERE key = ? AND source = ?').get(key, 'vault-writer');
+    const now = new Date().toISOString();
+    const enrichedTags = [tags, `file-touch:${(files || []).join(',')}`, subtype].filter(Boolean).join(', ');
+
+    if (existing) {
+      db.prepare('UPDATE knowledge SET content = ?, tags = ?, updated_at = ?, project_dir = ? WHERE id = ?')
+        .run(content, enrichedTags, now, project, existing.id);
+      log(`DB UPDATE: ${key}`);
+    } else {
+      db.prepare('INSERT INTO knowledge (key, content, tags, source, permanent, created_at, updated_at, project_dir) VALUES (?, ?, ?, ?, 1, ?, ?, ?)')
+        .run(key, content, enrichedTags, 'vault-writer', now, now, project);
+      log(`DB INSERT: ${key}`);
+    }
+
+    // Generate Obsidian mirror
+    const fileList = Array.isArray(files) ? files.join(', ') : (files || '');
+    const mdPath = mirrorToObsidian({
+      key, content, tags: enrichedTags, source: 'vault-writer',
+      project, date, subtype, files: fileList, outcome: outcome || 'unknown'
+    });
+    log(`MIRROR: ${mdPath}`);
+
+    return { key, written: true };
+  } catch (err) {
+    log(`DB ERROR: ${key}: ${err.message}`);
+    return { key, written: false };
+  } finally {
+    db.close();
+  }
+}
+
+/**
+ * Extract experiences from structured session data (decisions, gotchas, and conversation matches).
+ * Only writes experiences that meet minimum quality thresholds.
+ */
+function extractStructuredExperiences(decisions, gotchas, conversationMatches, project, dateStr, topics, experienceFiles, filesChanged = []) {
+  let count = 0;
+
+  // Extract basenames from file paths for tagging
+  const fileTags = [...new Set(
+    filesChanged
+      .map(f => f.split(/[\\/]/).pop())  // basename
+      .filter(f => f && !f.startsWith('.'))
+      .map(f => f.toLowerCase())
+  )].slice(0, 10);  // cap at 10 file tags
+
+  const tagStr = [...topics, ...fileTags].join(', ');
+  const fileBasenames = filesChanged.slice(0, 5).map(f => f.split(/[\\/]/).pop());
+
+  // Process decisions — these are from the agent's decision events
+  for (const text of decisions) {
+    if (count >= MAX_EXPERIENCES_PER_SESSION) {
+      log(`SKIP (decision): MAX_CAP reached (${count}/${MAX_EXPERIENCES_PER_SESSION})`);
+      break;
+    }
+    if (text.length < MIN_DECISION_LENGTH) {
+      log(`SKIP (decision): LENGTH ${text.length} < ${MIN_DECISION_LENGTH}: "${text.slice(0, 40)}"`);
+      continue;
+    }
+
+    const firstLine = text.split('\n')[0].slice(0, 200);
+
+    // Semantic dedup check
+    const dupMatch = findSemanticDuplicate(firstLine);
+    if (dupMatch) {
+      log(`SKIP (decision): DEDUP ${dupMatch.score} similar to ${dupMatch.path}: "${firstLine.slice(0, 60)}"`);
+      continue;
+    }
+
+    const result = writeExperienceToDb({
+      title: firstLine.slice(0, 80),
+      project,
+      date: dateStr,
+      subtype: 'decision',
+      tags: tagStr,
+      files: fileBasenames,
+      trigger: firstLine,
+      action: text.slice(0, 500).replace(/\n/g, ' '),
+      context: 'Auto-extracted from decision event category.',
+      outcome: 'Review and enrich with actual outcome.',
+    });
+    if (result.written) {
+      experienceFiles.push({ slug: result.key, content: text });
+      count++;
+    }
+  }
+
+  // Process gotchas — these are lines matching gotcha/error patterns
+  for (const text of gotchas) {
+    if (count >= MAX_EXPERIENCES_PER_SESSION) {
+      log(`SKIP (gotcha): MAX_CAP reached (${count}/${MAX_EXPERIENCES_PER_SESSION})`);
+      break;
+    }
+    if (text.length < MIN_GOTCHA_LENGTH) {
+      log(`SKIP (gotcha): LENGTH ${text.length} < ${MIN_GOTCHA_LENGTH}: "${text.slice(0, 40)}"`);
+      continue;
+    }
+
+    const firstLine = text.split('\n')[0].slice(0, 200);
+
+    // Semantic dedup check
+    const dupMatch = findSemanticDuplicate(firstLine);
+    if (dupMatch) {
+      log(`SKIP (gotcha): DEDUP ${dupMatch.score} similar to ${dupMatch.path}: "${firstLine.slice(0, 60)}"`);
+      continue;
+    }
+
+    const result = writeExperienceToDb({
+      title: firstLine.slice(0, 80),
+      project,
+      date: dateStr,
+      subtype: 'gotcha',
+      tags: tagStr,
+      files: fileBasenames,
+      trigger: firstLine,
+      action: text.slice(0, 500).replace(/\n/g, ' '),
+      context: 'Auto-extracted from gotcha/error pattern match.',
+      outcome: 'Review and enrich with actual outcome.',
+    });
+    if (result.written) {
+      experienceFiles.push({ slug: result.key, content: text });
+      count++;
+    }
+  }
+
+  // Process conversation matches — hybrid extraction from user/agent text
+  for (const match of conversationMatches) {
+    if (count >= MAX_EXPERIENCES_PER_SESSION) {
+      log(`SKIP (${match.subtype}): MAX_CAP reached (${count}/${MAX_EXPERIENCES_PER_SESSION})`);
+      break;
+    }
+
+    const text = match.text;
+    const firstLine = text.split('\n')[0].slice(0, 200);
+    const fingerprint = text.slice(0, 80);
+
+    // Intra-session dedup: skip if first 80 chars match an already-extracted experience
+    const intraDup = experienceFiles.some(e => e.content.slice(0, 80) === fingerprint);
+    if (intraDup) {
+      log(`SKIP (${match.subtype}): INTRA_SESSION dup: "${firstLine.slice(0, 60)}"`);
+      continue;
+    }
+
+    if (text.length < MIN_DECISION_LENGTH) {
+      log(`SKIP (${match.subtype}): LENGTH ${text.length} < ${MIN_DECISION_LENGTH}: "${text.slice(0, 40)}"`);
+      continue;
+    }
+
+    // Semantic dedup check
+    const dupMatch = findSemanticDuplicate(firstLine);
+    if (dupMatch) {
+      log(`SKIP (${match.subtype}): DEDUP ${dupMatch.score} similar to ${dupMatch.path}: "${firstLine.slice(0, 60)}"`);
+      continue;
+    }
+
+    const contextStr = match.userPrompt
+      ? `User asked: ${match.userPrompt}\n\nAgent response: ${match.text.slice(0, 1000)}`
+      : match.text.slice(0, 1000);
+
+    const result = writeExperienceToDb({
+      title: firstLine.slice(0, 80),
+      project,
+      date: dateStr,
+      subtype: match.subtype,
+      tags: tagStr,
+      files: fileBasenames,
+      trigger: firstLine,
+      action: text.slice(0, 500).replace(/\n/g, ' '),
+      context: contextStr,
+      outcome: 'Review and enrich with actual outcome.',
+    });
+    if (result.written) {
+      experienceFiles.push({ slug: result.key, content: text });
+      count++;
+    }
+  }
+
+  log(`Extraction complete: ${count} experiences written (decisions=${decisions.length}, gotchas=${gotchas.length}, conversation=${conversationMatches.length})`);
+}
+
+/**
+ * Check if a similar experience already exists using Smart Connections CLI.
+ * Returns { path, score } if a duplicate is found above threshold, null otherwise.
+ */
+function findSemanticDuplicate(text) {
+  try {
+    const query = text.slice(0, 100).replace(/["`$\\]/g, '');
+    const result = execSync(
+      `smart-cli lookup "${query}" --limit=3 --format=json`,
+      { env: { ...process.env, OBSIDIAN_VAULT: VAULT_PATH_FOR_CLI }, timeout: 15000, encoding: 'utf-8' }
+    );
+
+    // Extract JSON array from mixed output (model loading lines precede it)
+    const jsonStart = result.indexOf('[');
+    if (jsonStart === -1) return null;
+    const jsonStr = result.slice(jsonStart);
+    const parsed = JSON.parse(jsonStr);
+
+    if (parsed && parsed.length > 0) {
+      // Find the first result that's in Experiences/ (not a block reference)
+      for (const item of parsed) {
+        const path = item.path || '';
+        if (path.includes('Experiences/') && !path.includes('#') && item.score >= DEDUP_SIMILARITY_THRESHOLD) {
+          return { path, score: item.score.toFixed(2) };
+        }
+      }
+    }
+  } catch (err) {
+    // If smart-cli fails, skip dedup and allow the write
+    log(`DEDUP WARN: smart-cli failed: ${err.message}`);
+  }
+  return null;
+}
+
+/**
+ * Stage 4: Safety net — update .agents/SESSIONS/Session_N.md with mechanical data.
+ * Only fills sections that still contain empty template placeholders.
+ * Skips silently if no .agents/ or no in-progress session.
+ */
+export function updateAgentsSessionLog(projectDir, whatWasDone, filesChanged, decisions, gotchas) {
+  const sessionsDir = join(projectDir, '.agents', 'SESSIONS');
+  if (!existsSync(sessionsDir)) {
+    log('Stage 4: no .agents/SESSIONS/ — skipping');
+    return;
+  }
+
+  // Find highest-numbered in-progress session
+  const sessionFiles = readdirSync(sessionsDir)
+    .filter(f => /^Session_\d+\.md$/.test(f))
+    .sort((a, b) => {
+      const numA = parseInt(a.match(/\d+/)[0]);
+      const numB = parseInt(b.match(/\d+/)[0]);
+      return numB - numA; // descending
+    });
+
+  let targetFile = null;
+  let content = null;
+
+  for (const file of sessionFiles) {
+    const filePath = join(sessionsDir, file);
+    const text = readFileSync(filePath, 'utf-8');
+    if (/\*\*Status:\*\*\s*In Progress/i.test(text)) {
+      targetFile = filePath;
+      content = text;
+      break;
+    }
+  }
+
+  if (!targetFile) {
+    log('Stage 4: no in-progress session found — skipping');
+    return;
+  }
+
+  log(`Stage 4: updating ${targetFile.split(/[\\/]/).pop()}`);
+
+  const EMPTY_PLACEHOLDER = /^\s*-\s*$/;
+  const filled = [];
+  const skipped = [];
+
+  // Helper: check if a section's content is just empty placeholders
+  function isSectionEmpty(sectionContent) {
+    const lines = sectionContent.split('\n').filter(l => l.trim().length > 0);
+    // Ignore HTML comments (<!-- ... -->) when checking emptiness
+    const meaningful = lines.filter(l => !/^\s*<!--.*-->\s*$/.test(l));
+    return meaningful.length === 0 || meaningful.every(l => EMPTY_PLACEHOLDER.test(l));
+  }
+
+  // Helper: replace section content between heading and next heading/---
+  function fillSection(text, headingPattern, newContent, sectionName) {
+    const lines = text.split('\n');
+    let startIdx = -1;
+    let endIdx = lines.length;
+    let headingLevel = 0;
+
+    // Find the heading
+    for (let i = 0; i < lines.length; i++) {
+      if (headingPattern.test(lines[i])) {
+        startIdx = i;
+        headingLevel = (lines[i].match(/^#+/) || [''])[0].length;
+        break;
+      }
+    }
+
+    if (startIdx === -1) {
+      skipped.push(sectionName + ' (heading not found)');
+      return text;
+    }
+
+    // Find end of section (next heading of same or higher level, or ---)
+    for (let i = startIdx + 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (/^---\s*$/.test(line)) {
+        endIdx = i;
+        break;
+      }
+      const match = line.match(/^(#+)\s/);
+      if (match && match[1].length <= headingLevel) {
+        endIdx = i;
+        break;
+      }
+    }
+
+    // Extract section content (between heading and end)
+    const sectionLines = lines.slice(startIdx + 1, endIdx).join('\n');
+
+    if (!isSectionEmpty(sectionLines)) {
+      skipped.push(sectionName + ' (already populated)');
+      return text;
+    }
+
+    // Replace only empty placeholder lines, keeping comments and blank lines
+    const sectionLinesArr = lines.slice(startIdx + 1, endIdx);
+    const kept = sectionLinesArr.filter(l => {
+      // Keep blank lines, comments; drop empty placeholders
+      if (EMPTY_PLACEHOLDER.test(l)) return false;
+      return true;
+    });
+    const newLines = [
+      ...lines.slice(0, startIdx + 1),
+      ...kept,
+      newContent,
+      '',
+      ...lines.slice(endIdx)
+    ];
+    filled.push(sectionName + ` (${newContent.split('\n').filter(l => l.trim()).length} items)`);
+    return newLines.join('\n');
+  }
+
+  // Fill each section if empty
+  if (whatWasDone.length > 0) {
+    content = fillSection(content, /^###\s+What Was Done/, whatWasDone.slice(0, 10).join('\n'), 'What Was Done');
+  }
+  if (filesChanged.length > 0) {
+    const fileLines = filesChanged.slice(0, 15).map(f => '- `' + f + '`').join('\n');
+    content = fillSection(content, /^###\s+Files Modified/, fileLines, 'Files Modified');
+  }
+  if (gotchas.length > 0) {
+    const gotchaLines = gotchas.slice(0, 5).map(g => '- ' + g).join('\n');
+    content = fillSection(content, /^##\s+Gotchas/, gotchaLines, 'Gotchas');
+  }
+  if (decisions.length > 0) {
+    const decisionLines = decisions.slice(0, 5).map(d => '- ' + d).join('\n');
+    content = fillSection(content, /^##\s+Decisions Made/, decisionLines, 'Decisions');
+  }
+
+  // Mark status as Completed
+  content = content.replace(
+    /(\*\*Status:\*\*)\s*In Progress/i,
+    '$1 Completed'
+  );
+
+  // Check off session log checkbox
+  content = content.replace(
+    /- \[ \] Session log completed \(this file\)/,
+    '- [x] Session log completed (this file)'
+  );
+
+  // Add safety net note at bottom
+  if (!content.includes('Auto-completed by vault-writer')) {
+    content = content.trimEnd() + '\n\n> *Auto-completed by vault-writer safety net. Run /end for full close-out (SUMMARY, INBOX, DECISIONS).*\n';
+  }
+
+  writeFileSync(targetFile, content);
+  log(`Stage 4: filled [${filled.join(', ')}], skipped [${skipped.join(', ')}]`);
+}
