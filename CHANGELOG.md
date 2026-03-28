@@ -1,5 +1,31 @@
 # Changelog
 
+## [v0.3.1] - 2026-03-28
+
+Widen extraction patterns, unified experience format, SQLite-first data flow.
+
+### Added
+- Hybrid conversation scanning — planning, architecture, workaround, root cause, and explicit marker patterns supplement existing decision/gotcha extraction
+- `writeExperienceToDb()` — SQLite-first writer that writes to knowledge.db then generates Obsidian `.md` mirrors
+- `mirrorToObsidian()` — generates YAML-frontmattered `.md` files from knowledge.db entries
+- Filter logging — every SKIP logged with reason (LENGTH, DEDUP, MAX_CAP, INTRA_SESSION)
+- `/end` skill updated with unified format including `SOURCE: agent` and expanded TYPE options (planning, workaround)
+
+### Changed
+- Data flow reversed: knowledge.db is source of truth, Obsidian files are read-only mirrors (was: Obsidian first, mirror to DB)
+- Unified experience format: structured text for FTS5 (`[EXPERIENCE]`, `TRIGGER:`, `ACTION:`, `CONTEXT:`, `OUTCOME:`), YAML frontmatter for Obsidian
+- MIN_DECISION_LENGTH and MIN_GOTCHA_LENGTH lowered from 40 to 25 chars
+- Log file moved from vault root (`~/Obsidian Vault/.vault-writer.log`) to `~/Obsidian Vault/Logs/vault-writer.log`
+
+### Removed
+- `mirrorToOpenBrain()` — replaced by `writeExperienceToDb()` + `mirrorToObsidian()`
+- `parseFrontmatter()` — only used by removed mirror function
+- Session markdown writes to Obsidian Sessions/ (already in knowledge.db via auto-index)
+
+### Fixed
+- `recall_count`/`last_recalled` removed from SUMMARY.md claims — columns were never added to schema
+- `backfillMirror()` updated to use `mirrorToObsidian` instead of deleted `mirrorToOpenBrain`
+
 ## [v0.3.0] - 2026-03-27
 
 Knowledge retrieval redesign: recency weighting, structured experiences, quality gate.
