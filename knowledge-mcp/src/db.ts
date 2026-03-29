@@ -208,6 +208,33 @@ function runMigrations(db: Database.Database): void {
   } catch {
     // Column already exists — ignore
   }
+
+  // Migration: add outcome tracking columns to knowledge
+  try {
+    db.exec("ALTER TABLE knowledge ADD COLUMN helpful_count INTEGER NOT NULL DEFAULT 0");
+  } catch {
+    // Column already exists — ignore
+  }
+  try {
+    db.exec("ALTER TABLE knowledge ADD COLUMN harmful_count INTEGER NOT NULL DEFAULT 0");
+  } catch {
+    // Column already exists — ignore
+  }
+  try {
+    db.exec("ALTER TABLE knowledge ADD COLUMN neutral_count INTEGER NOT NULL DEFAULT 0");
+  } catch {
+    // Column already exists — ignore
+  }
+  try {
+    db.exec("ALTER TABLE knowledge ADD COLUMN success_rate REAL DEFAULT NULL");
+  } catch {
+    // Column already exists — ignore
+  }
+  try {
+    db.exec("ALTER TABLE knowledge ADD COLUMN maturity TEXT NOT NULL DEFAULT 'progenitor'");
+  } catch {
+    // Column already exists — ignore
+  }
 }
 
 // ============================================================
