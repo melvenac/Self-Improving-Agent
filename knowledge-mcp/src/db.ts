@@ -2,6 +2,7 @@ import Database from "better-sqlite3";
 import { existsSync, mkdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
+import { maturityBoost, type Maturity } from "./lifecycle.js";
 
 const KB_DIR = join(homedir(), ".claude", "context-mode");
 const KB_PATH = join(KB_DIR, "knowledge.db");
@@ -392,6 +393,8 @@ export function recall(
         k.tags,
         k.source,
         k.project_dir,
+        k.maturity,
+        k.success_rate,
         snippet(knowledge_fts, 1, '>>', '<<', '...', 128) as snippet,
         k.created_at,
         (bm25(knowledge_fts) * (1.0 + MAX(0, julianday('now') - julianday(k.created_at)) * 0.005)) as weighted_rank
@@ -418,12 +421,19 @@ export function recall(
         tags: string | null;
         source: string;
         project_dir: string | null;
+        maturity: string;
+        success_rate: number | null;
         snippet: string;
         created_at: string;
         weighted_rank: number;
       }>;
 
       for (const row of kRows) {
+        // Apply maturity boost: divide weighted_rank by boost (lower rank = better)
+        const boost = maturityBoost(
+          (row.maturity || "progenitor") as Maturity,
+          row.success_rate,
+        );
         results.push({
           source: row.key || row.source || "stored knowledge",
           category: "knowledge",
@@ -434,7 +444,7 @@ export function recall(
           created_at: row.created_at,
           tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
           result_type: "knowledge",
-          weighted_rank: row.weighted_rank,
+          weighted_rank: row.weighted_rank / boost,
         });
       }
       // Track recall hits for knowledge entries
@@ -525,6 +535,7 @@ export interface KbStats {
   sessions_by_project: Array<{ project_dir: string; count: number }>;
   chunks_by_category: Array<{ category: string; count: number }>;
   top_tags: Array<{ tag: string; count: number }>;
+  maturity_distribution: Array<{ maturity: string; count: number }>;
 }
 
 export function getStats(): KbStats {
@@ -571,6 +582,12 @@ export function getStats(): KbStats {
     )
     .all() as Array<{ tag: string; count: number }>;
 
+  const maturityDist = db
+    .prepare(
+      "SELECT COALESCE(maturity, 'progenitor') as maturity, COUNT(*) as count FROM knowledge GROUP BY maturity ORDER BY count DESC"
+    )
+    .all() as Array<{ maturity: string; count: number }>;
+
   let dbSize = 0;
   try {
     dbSize = statSync(KB_PATH).size;
@@ -590,6 +607,7 @@ export function getStats(): KbStats {
     sessions_by_project: byProject,
     chunks_by_category: byCategory,
     top_tags: topTags,
+    maturity_distribution: maturityDist,
   };
 }
 
@@ -793,13 +811,15 @@ export function listKnowledge(limit: number = 20, project?: string): Array<{
   source: string;
   project_dir: string | null;
   created_at: string;
+  maturity: string;
+  success_rate: number | null;
 }> {
   const db = getKnowledgeDb();
 
   if (project) {
     return db
       .prepare(
-        "SELECT id, key, content, tags, source, project_dir, created_at FROM knowledge WHERE project_dir IS NULL OR project_dir LIKE ? ORDER BY created_at DESC LIMIT ?"
+        "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge WHERE project_dir IS NULL OR project_dir LIKE ? ORDER BY created_at DESC LIMIT ?"
       )
       .all(`%${project}%`, limit) as Array<{
       id: number;
@@ -809,12 +829,14 @@ export function listKnowledge(limit: number = 20, project?: string): Array<{
       source: string;
       project_dir: string | null;
       created_at: string;
+      maturity: string;
+      success_rate: number | null;
     }>;
   }
 
   return db
     .prepare(
-      "SELECT id, key, content, tags, source, project_dir, created_at FROM knowledge ORDER BY created_at DESC LIMIT ?"
+      "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge ORDER BY created_at DESC LIMIT ?"
     )
     .all(limit) as Array<{
     id: number;
@@ -824,6 +846,8 @@ export function listKnowledge(limit: number = 20, project?: string): Array<{
     source: string;
     project_dir: string | null;
     created_at: string;
+    maturity: string;
+    success_rate: number | null;
   }>;
 }
 

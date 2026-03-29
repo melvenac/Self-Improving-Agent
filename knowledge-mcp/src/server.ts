@@ -254,6 +254,14 @@ server.tool(
       }
     }
 
+    if (stats.maturity_distribution.length > 0) {
+      lines.push("");
+      lines.push("### Knowledge Maturity");
+      for (const m of stats.maturity_distribution) {
+        lines.push(`- ${m.maturity}: ${m.count}`);
+      }
+    }
+
     return {
       content: [{ type: "text" as const, text: lines.join("\n") }],
     };
@@ -395,8 +403,10 @@ server.tool(
     const lines = ["## Stored Knowledge", ""];
     for (const e of entries) {
       const scopeLabel = e.project_dir ? `[project]` : `[global]`;
+      const matLabel = e.maturity !== "progenitor" ? ` [${e.maturity}]` : "";
+      const rateLabel = e.success_rate !== null ? ` (${(e.success_rate * 100).toFixed(0)}%)` : "";
       lines.push(
-        `**[${e.id}]** ${scopeLabel} ${e.key ? `\`${e.key}\` — ` : ""}${e.content.length > 120 ? e.content.substring(0, 120) + "..." : e.content}`
+        `**[${e.id}]** ${scopeLabel}${matLabel}${rateLabel} ${e.key ? `\`${e.key}\` — ` : ""}${e.content.length > 120 ? e.content.substring(0, 120) + "..." : e.content}`
       );
       if (e.tags) lines.push(`  Tags: ${e.tags}`);
       lines.push(`  Source: ${e.source} | Created: ${e.created_at}${e.project_dir ? ` | Project: ${e.project_dir}` : ""}`);
