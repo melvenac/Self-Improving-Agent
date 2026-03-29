@@ -560,6 +560,17 @@ server.tool(
 
     if (result.autoDelete) {
       deleteKnowledgeById(id);
+      // Log apoptosis to vault-writer log
+      try {
+        const { appendFileSync } = await import("node:fs");
+        const { join } = await import("node:path");
+        const { homedir } = await import("node:os");
+        const logPath = join(homedir(), "Obsidian Vault", ".vault-writer.log");
+        const logLine = `[${new Date().toISOString()}] APOPTOSIS: id=${id} key="${entry.key || ""}" ${result.transitionMessage}\n`;
+        appendFileSync(logPath, logLine);
+      } catch {
+        // Log file may not exist — non-critical
+      }
       return {
         content: [
           {

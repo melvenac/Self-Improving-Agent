@@ -43,7 +43,6 @@ export function evaluateLifecycle(
   // Increment counts
   const helpful = entry.helpful_count + (rating === "helpful" ? 1 : 0);
   const harmful = entry.harmful_count + (rating === "harmful" ? 1 : 0);
-  const neutral = entry.neutral_count + (rating === "neutral" ? 1 : 0);
   const nonNeutral = helpful + harmful;
 
   // Recalculate success rate (null if only neutral ratings)
