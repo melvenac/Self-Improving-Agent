@@ -38,23 +38,17 @@ Without this framework, every AI session starts from zero. With it, agents:
 ├── SESSIONS/                     ← Session history
 │   ├── SESSION_TEMPLATE.md       ← Template for new sessions
 │   └── Session_N.md              ← Individual session logs
-├── skills/                       ← Reusable agent skills
-│   ├── INDEX.md                  ← Skill registry
-│   └── <skill-name>/SKILL.md    ← Individual skill instructions
-└── workflows/                    ← Lifecycle commands
-    ├── start.md                  ← Session start protocol
-    ├── end.md                    ← Session end protocol
-    ├── test.md                   ← Zero-token E2E testing protocol
-    └── task.md                   ← Next task selection protocol
+└── skills/                       ← Reusable agent skills
+    ├── INDEX.md                  ← Skill registry
+    └── <skill-name>/SKILL.md    ← Individual skill instructions
 
-.claude/commands/                 ← Claude Code slash commands (mirrors workflows/)
+.claude/commands/                 ← Slash commands (/start, /end, /sync, /task, /test, etc.)
 .claude/rules/                    ← Path-specific rules (loaded on file read)
 │   ├── frontend.md               ← Loaded when reading UI/component files
 │   ├── backend.md                ← Loaded when reading API/server files
 │   ├── database.md               ← Loaded when reading schema/migration files
 │   ├── testing.md                ← Loaded when reading test files
 │   └── agents.md                 ← Loaded when reading .agents/ files
-.gemini/commands/                 ← Gemini slash commands (mirrors workflows/)
 CLAUDE.md                         ← Claude Code entry point
 ```
 
@@ -66,7 +60,7 @@ CLAUDE.md                         ← Claude Code entry point
 | **TASKS/** | What needs to be DONE | Every session |
 | **SESSIONS/** | What WAS done | Append-only log |
 
-**Skills** are reusable patterns. **Workflows** are lifecycle hooks.
+**Skills** are reusable patterns. **Slash commands** (`/start`, `/end`, `/task`, `/test`) handle the session lifecycle.
 
 ---
 
@@ -77,16 +71,14 @@ CLAUDE.md                         ← Claude Code entry point
 Copy the framework skeleton. Everything below is **tech-stack agnostic**:
 
 ```bash
-mkdir -p .agents/SYSTEM .agents/TASKS .agents/SESSIONS .agents/skills .agents/workflows
-mkdir -p .claude/commands .claude/rules .gemini/commands
+mkdir -p .agents/SYSTEM .agents/TASKS .agents/SESSIONS .agents/skills
+mkdir -p .claude/commands .claude/rules
 ```
 
 Copy these files **as-is** (they're universal):
 - `.agents/SESSIONS/SESSION_TEMPLATE.md`
-- `.agents/workflows/start.md`
-- `.agents/workflows/end.md`
-- `.claude/commands/start.md` and `end.md`
-- `.gemini/commands/start.md` and `end.md`
+- `.claude/commands/` (start, end, sync, task, test, skill-scan, transcript)
+- `.claude/rules/` (agents, backend, frontend, database, testing)
 
 ### Phase 2: Write the PRD (30-60 minutes)
 
@@ -422,7 +414,7 @@ Glob patterns use standard glob syntax: `**` matches directories, `*` matches fi
 - [ ] Create INBOX.md with initial task backlog from PRD
 - [ ] Create skills/INDEX.md (empty table, fill as skills emerge)
 - [ ] Create session-manager skill (universal)
-- [ ] Wire up CLAUDE.md / .clinerules to point to .agents/
+- [ ] Wire up CLAUDE.md to point to .agents/
 - [ ] Start Session 1 with /start
 - [ ] Create first tech-specific skill after Session 2-3
 - [ ] Add validation scripts after Session 5+
@@ -480,9 +472,8 @@ As you use this across projects, you'll improve it. Keep a "framework template" 
 ```
 ai-first-framework/
 ├── .agents/           ← Universal skeleton (no project-specific content)
-├── .claude/           ← Universal slash commands
-├── .gemini/           ← Universal slash commands
-├── CLAUDE.md          ← Universal entry point template
+├── .claude/           ← Slash commands and path-specific rules
+├── CLAUDE.md          ← Claude Code entry point template
 ├── README.md          ← GitHub-facing onboarding guide
 └── .gitignore         ← Excludes META/, sessions, build artifacts
 ```
