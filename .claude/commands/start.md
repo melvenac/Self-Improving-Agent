@@ -1,0 +1,174 @@
+# /start — Session Start (Smart Routing)
+
+> **One command, context-aware.** Detects whether you're in a project (`.agents/` exists) or a general session, and runs the appropriate startup.
+
+## Step 0: Detect Context
+
+Check if `.agents/` directory exists in the current working directory.
+
+- **If `.agents/` exists** → Run **Full Project Startup** (Part A + Part B)
+- **If no `.agents/`** → Run **Lightweight Startup** (Part B only)
+
+---
+
+## Part A: Project Startup (only if `.agents/` exists)
+
+> Read project state so you can pick up where the last session left off.
+
+### Meta Mode Detection
+
+If `.agents/META/` exists, this is the **framework template repo itself**. In meta mode:
+- Read state from `META/` files, NOT the `SYSTEM/` templates
+- Only reference `SYSTEM/` files when working on template content
+
+### A1. Read current state
+```
+If META/ exists:  Read: .agents/META/SUMMARY.md
+Otherwise:        Read: .agents/SYSTEM/SUMMARY.md
+```
+Understand where the project is — what's working, what's broken, what's next.
+
+### A2. Read task priorities
+```
+If META/ exists:  Read: .agents/META/INBOX.md
+Otherwise:        Read: .agents/TASKS/INBOX.md
+```
+Also read `.agents/TASKS/task.md` to understand current sprint focus.
+
+### A3. Reconcile INBOX vs task.md
+- Compare items marked "Done" in `task.md` against INBOX.md status
+- If any task.md "Done" items are still `[ ]` in INBOX, flag them and fix before proceeding
+- This catches drift from prior sessions where `/end` missed an INBOX update
+
+### A4. Check project skills
+```
+Read: .agents/skills/INDEX.md (if it exists)
+```
+Note any project-specific skills relevant to today's work.
+
+### A5. Generate project CLAUDE.md (if missing)
+If the project has `.agents/` but no `CLAUDE.md` in the project root, offer to generate one:
+- Read SUMMARY.md for project description
+- Read ENTITIES.md for data model context
+- Read INBOX.md for current priorities
+- Generate a lightweight `CLAUDE.md` with:
+  - Project name and one-line description
+  - Tech stack (from package.json, etc.)
+  - Key conventions from `.agents/SYSTEM/RULES.md` if it exists
+  - Pointer to `.agents/` for full context
+- Ask Aaron before writing: "No CLAUDE.md found — want me to generate one from .agents/ state?"
+
+### A6. Create session log
+```
+Copy: .agents/SESSIONS/SESSION_TEMPLATE.md → .agents/SESSIONS/Session_N.md (next number)
+```
+Fill in the date. Leave objective blank until Aaron approves.
+
+---
+
+## Part B: Knowledge Recall (always runs)
+
+> Surface relevant experiences and skills so you don't start from zero.
+> Full protocol details: `~/docs/self-improving-agent-reference.md`
+
+### B1. Greet
+Greet Aaron by name. You are Clark.
+
+### B2. Identify context
+- Determine the current working directory and project
+- Look up domain tags from `~/.claude/CLAUDE.md` (Guardrails section) or `~/docs/self-improving-agent-reference.md` (Domain Tags table)
+- If `.agents/` exists, use INBOX.md to understand today's likely work
+
+### B3. Knowledge recall
+- **Knowledge MCP:** `kb_recall(queries: [Q1, Q2], project: cwd, limit: 5)` — methodology-focused queries, not file-specific
+- Results are recency-weighted — recent experiences rank higher automatically
+- If results < 3 for project scope, broaden: `kb_recall(queries: [Q1, Q2], global: true, limit: 5)`
+
+### B4. Skills check
+- Read `~/Obsidian Vault/Guidelines/SKILL-INDEX.md` for matching skills
+- Check `.skill-proposals-pending.json` — if new clusters exist, mention them to Aaron
+
+### B5. Rewrite for today's task
+- Rewrite each experience as **directly actionable** guidance for today's context
+- Drop anything that matched by keyword but isn't actually useful
+- Surface max **3 experiences** + **2 skills** as non-prescriptive context
+
+### B6. Context budget check
+Before injecting, estimate the context cost:
+- If SUMMARY.md is over 50 lines, summarize it to 3-5 sentences instead of injecting raw
+- If more than 3 experiences matched, pick the top 3 by relevance — don't inject all
+- If the session will involve large files (e.g., full codebase review), keep startup injection minimal
+- Goal: startup should consume <5% of the context window
+
+---
+
+## Step 1: Check for next-session handoff
+
+If `.agents/SESSIONS/next-session.md` exists, read it and include in the summary. This file is written by `/end` and contains:
+- What was in progress
+- Gotchas to watch for
+- Open questions
+
+The bootstrap hook (`session-bootstrap.mjs`) may have already surfaced this — don't duplicate it, just incorporate.
+
+---
+
+## Present Summary
+
+**If project session (Part A + B):**
+```
+Session N — [Date]
+Project State: [1-2 sentences from SUMMARY.md]
+Proposed Objective: [highest priority incomplete task from INBOX.md]
+
+Relevant Knowledge:
+- [experience title] — [one-line actionable rewrite]
+- [skill name] — [why it's relevant]
+
+Awaiting approval...
+```
+
+**If lightweight session (Part B only):**
+```
+Hey Aaron — [Date]
+
+Relevant Knowledge:
+- [experience title] — [one-line rewrite]
+- [skill name] — [why it's relevant]
+
+What would you like to work on?
+```
+
+---
+
+## Periodic maintenance (run monthly or when prompted)
+
+If it's the first session of the month, or Aaron asks for a health check:
+
+### Session aging pipeline
+1. Call `kb_summarize()` to find unsummarized sessions
+2. For each (up to 5 per maintenance run):
+   - Read the session chunks
+   - Summarize into 3-5 sentences capturing: what was done, key decisions, gotchas
+   - Call `kb_store_summary(session_id, summary, model)` to persist
+3. Report: "Summarized N aging sessions"
+4. If any summarized sessions are older than 30 days, note that their raw chunks can be pruned on next run
+
+### Stale experience pruning
+- Use `kb_list` to find knowledge entries with `recall_count = 0`
+- Flag any not recalled in 90+ days
+- Present the stale list to Aaron: "These experiences haven't been useful — prune them?"
+- Only delete with Aaron's approval
+
+### Skill candidate check
+- Read `~/Obsidian Vault/Guidelines/SKILL-CANDIDATES.md`
+- If any cluster has 3+ experiences and hasn't been acted on, remind Aaron
+
+---
+
+## Judgment calls
+
+- If Aaron jumps straight into a task, adapt. Read state in the background and surface anything relevant as you go. The protocol serves the work, not the other way around.
+- Not every session needs recalled knowledge. If nothing is relevant, say so — don't force it.
+- Keep the greeting and summary to **5 lines max**. Don't dump walls of text.
+- **If Aaron says "skip" or starts talking about work**, drop the protocol and get to work.
