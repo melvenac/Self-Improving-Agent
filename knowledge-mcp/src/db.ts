@@ -237,6 +237,18 @@ function runMigrations(db: Database.Database): void {
   }
 }
 
+// Session-scoped set of knowledge IDs recalled this session.
+// Reset when MCP server restarts (acceptable — feedback is best-effort).
+const _recalledKnowledgeIds = new Set<number>();
+
+export function getRecalledKnowledgeIds(): number[] {
+  return [..._recalledKnowledgeIds];
+}
+
+export function clearRecalledKnowledgeIds(): void {
+  _recalledKnowledgeIds.clear();
+}
+
 // ============================================================
 // Recall (search)
 // ============================================================
@@ -432,6 +444,7 @@ export function recall(
         );
         for (const row of kRows) {
           updateRecall.run(row.id);
+          _recalledKnowledgeIds.add(row.id);
         }
       }
     } catch {
@@ -711,6 +724,65 @@ export function deleteKnowledge(options: {
       .changes;
   }
   return 0;
+}
+
+export function getKnowledgeById(id: number): {
+  id: number;
+  key: string | null;
+  content: string;
+  tags: string | null;
+  source: string;
+  helpful_count: number;
+  harmful_count: number;
+  neutral_count: number;
+  success_rate: number | null;
+  maturity: string;
+} | undefined {
+  const db = getKnowledgeDb();
+  return db
+    .prepare(
+      "SELECT id, key, content, tags, source, helpful_count, harmful_count, neutral_count, success_rate, maturity FROM knowledge WHERE id = ?"
+    )
+    .get(id) as {
+    id: number;
+    key: string | null;
+    content: string;
+    tags: string | null;
+    source: string;
+    helpful_count: number;
+    harmful_count: number;
+    neutral_count: number;
+    success_rate: number | null;
+    maturity: string;
+  } | undefined;
+}
+
+export function recordFeedback(
+  id: number,
+  rating: "helpful" | "harmful" | "neutral",
+  newSuccessRate: number | null,
+  newMaturity: string,
+): void {
+  const db = getKnowledgeDb();
+  const col =
+    rating === "helpful" ? "helpful_count"
+    : rating === "harmful" ? "harmful_count"
+    : "neutral_count";
+
+  db.prepare(
+    `UPDATE knowledge
+     SET ${col} = ${col} + 1,
+         success_rate = ?,
+         maturity = ?,
+         updated_at = datetime('now')
+     WHERE id = ?`
+  ).run(newSuccessRate, newMaturity, id);
+}
+
+export function deleteKnowledgeById(id: number): boolean {
+  const db = getKnowledgeDb();
+  const result = db.prepare("DELETE FROM knowledge WHERE id = ?").run(id);
+  return result.changes > 0;
 }
 
 export function listKnowledge(limit: number = 20, project?: string): Array<{
