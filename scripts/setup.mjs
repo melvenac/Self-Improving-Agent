@@ -250,7 +250,7 @@ function copySlashCommands() {
   const destDir = path.join(CLAUDE_DIR, 'commands');
   ensureDir(destDir);
 
-  const repoCommandsDir = path.join(REPO_ROOT, '.claude', 'commands');
+  const repoCommandsDir = path.join(REPO_ROOT, 'project-template', '.claude', 'commands');
 
   if (!fs.existsSync(repoCommandsDir)) {
     log(SKIP, 'No .claude/commands/ in repo \u2014 skipped');
