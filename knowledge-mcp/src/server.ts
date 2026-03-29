@@ -9,11 +9,17 @@ import {
   getKnowledgeDb,
   insertKnowledge,
   deleteKnowledge,
+  deleteKnowledgeById,
   listKnowledge,
   insertSummary,
   getUnsummarizedSessionIds,
   getSessionChunks,
+  getKnowledgeById,
+  recordFeedback,
+  getRecalledKnowledgeIds,
+  clearRecalledKnowledgeIds,
 } from "./db.js";
+import { evaluateLifecycle, type Rating, type FeedbackEntry } from "./lifecycle.js";
 import { indexSessionFile, indexAllUnindexed } from "./indexer.js";
 
 const server = new McpServer({
@@ -504,6 +510,103 @@ server.tool(
         isError: true,
       };
     }
+  }
+);
+
+// --- kb_feedback: Record outcome feedback for a knowledge entry ---
+server.tool(
+  "kb_feedback",
+  "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Used during /end or mid-session to track outcome quality. Drives maturity promotion and apoptosis.",
+  {
+    id: z
+      .number()
+      .describe("Knowledge entry ID"),
+    rating: z
+      .enum(["helpful", "harmful", "neutral"])
+      .describe("Was this knowledge entry helpful, harmful, or neutral?"),
+  },
+  async ({ id, rating }) => {
+    const entry = getKnowledgeById(id);
+    if (!entry) {
+      return {
+        content: [
+          { type: "text" as const, text: `Error: no knowledge entry with id ${id}.` },
+        ],
+        isError: true,
+      };
+    }
+
+    const feedbackEntry: FeedbackEntry = {
+      id: entry.id,
+      helpful_count: entry.helpful_count,
+      harmful_count: entry.harmful_count,
+      neutral_count: entry.neutral_count,
+      success_rate: entry.success_rate,
+      maturity: entry.maturity as FeedbackEntry["maturity"],
+      source: entry.source,
+    };
+
+    const result = evaluateLifecycle(feedbackEntry, rating as Rating);
+
+    if (result.autoDelete) {
+      deleteKnowledgeById(id);
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `${result.transitionMessage}\nEntry ${id} (${entry.key || "no key"}) has been removed.`,
+          },
+        ],
+      };
+    }
+
+    recordFeedback(id, rating as Rating, result.newSuccessRate, result.newMaturity);
+
+    const lines = [
+      `Feedback recorded for entry ${id} (${entry.key || "no key"}): ${rating}`,
+      `Counts: ${entry.helpful_count + (rating === "helpful" ? 1 : 0)} helpful, ${entry.harmful_count + (rating === "harmful" ? 1 : 0)} harmful, ${entry.neutral_count + (rating === "neutral" ? 1 : 0)} neutral`,
+      `Success rate: ${result.newSuccessRate !== null ? result.newSuccessRate.toFixed(2) : "N/A"}`,
+      `Maturity: ${result.newMaturity}`,
+    ];
+
+    if (result.transitionMessage) {
+      lines.push(`Lifecycle: ${result.transitionMessage}`);
+    }
+
+    return {
+      content: [{ type: "text" as const, text: lines.join("\n") }],
+    };
+  }
+);
+
+// --- kb_recalled: List knowledge entries recalled this session ---
+server.tool(
+  "kb_recalled",
+  "List knowledge entry IDs recalled during this session. Use at /end time to know which entries to ask for feedback on.",
+  {},
+  async () => {
+    const ids = getRecalledKnowledgeIds();
+    if (ids.length === 0) {
+      return {
+        content: [
+          { type: "text" as const, text: "No knowledge entries were recalled this session." },
+        ],
+      };
+    }
+
+    const lines = ["## Recalled This Session", ""];
+    for (const id of ids) {
+      const entry = getKnowledgeById(id);
+      if (entry) {
+        lines.push(
+          `- **[${id}]** ${entry.key || "(no key)"} — maturity: ${entry.maturity}, success_rate: ${entry.success_rate !== null ? entry.success_rate.toFixed(2) : "N/A"}`
+        );
+      }
+    }
+
+    return {
+      content: [{ type: "text" as const, text: lines.join("\n") }],
+    };
   }
 );
 
