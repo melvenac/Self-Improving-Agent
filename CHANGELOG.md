@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.4.0] - 2026-03-29
+
+Outcome tracking and skill lifecycle — knowledge entries now have quality feedback and maturity stages.
+
+### Added
+- **Outcome tracking:** `kb_feedback` tool records helpful/harmful/neutral ratings for knowledge entries
+- **Skill lifecycle:** Maturity stages (progenitor → proven → mature) with automatic promotion based on helpful ratings
+- **Apoptosis:** Auto-prunes non-manual knowledge entries below 0.3 success rate after 5 ratings; manual entries flagged for approval
+- **Maturity boost:** `kb_recall` ranks mature entries 1.5x higher, proven 1.2x; low-success entries penalized 0.5x
+- **Session recall tracking:** `kb_recalled` tool lists which entries were recalled this session (for `/end` feedback collection)
+- **Stats enhancement:** `kb_stats` shows maturity distribution; `kb_list` shows maturity badge and success rate
+
 ## [v0.3.3] - 2026-03-28
 
 One-command setup for new users and framework developers.

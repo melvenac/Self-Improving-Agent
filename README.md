@@ -2,7 +2,7 @@
 
 *A memory protocol that enables AI coding agents to learn across sessions.*
 
-**Latest: v0.3.3** · [Changelog](CHANGELOG.md)
+**Latest: v0.4.0** · [Changelog](CHANGELOG.md)
 
 ---
 
@@ -82,7 +82,7 @@ cd Self-Improving-Agent
 
 ### 2. Set up Knowledge MCP
 
-The knowledge MCP server provides persistent memory (kb_recall, kb_store, kb_stats).
+The knowledge MCP server provides persistent memory (kb_recall, kb_store, kb_feedback, kb_stats).
 
 ```bash
 # Install to the Claude Code MCP directory
