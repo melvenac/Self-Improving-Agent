@@ -87,7 +87,7 @@ server.tool(
 
     for (const query of queries) {
       try {
-        const matches = recall(query, {
+        const matches = await recall(query, {
           since,
           category,
           project: globalSearch ? undefined : project,
@@ -319,7 +319,7 @@ server.tool(
   },
   async ({ content, key, tags, source, scope, project_dir }) => {
     const effectiveProjectDir = scope === "project" ? project_dir || null : null;
-    const id = insertKnowledge(content, key, tags, source, effectiveProjectDir || undefined);
+    const id = await insertKnowledge(content, key, tags, source, effectiveProjectDir || undefined);
     const scopeLabel = effectiveProjectDir ? ` [project: ${effectiveProjectDir}]` : " [global]";
     return {
       content: [
@@ -500,7 +500,7 @@ server.tool(
   },
   async ({ session_id, summary }) => {
     try {
-      insertSummary(session_id, summary, "agent-generated");
+      await insertSummary(session_id, summary, "agent-generated");
       return {
         content: [
           {

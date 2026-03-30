@@ -1,8 +1,16 @@
 import Database from "better-sqlite3";
+import * as sqliteVec from "sqlite-vec";
 import { existsSync, mkdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { maturityBoost, type Maturity } from "./lifecycle.js";
+import {
+  initEmbeddings,
+  embedText,
+  vecToBuffer,
+  embeddingsAvailable,
+  EMBEDDING_DIM,
+} from "./embed.js";
 
 const KB_DIR = join(homedir(), ".claude", "context-mode");
 const KB_PATH = join(KB_DIR, "knowledge.db");
@@ -20,8 +28,32 @@ export function getKnowledgeDb(): Database.Database {
   _db.pragma("journal_mode = WAL");
   _db.pragma("foreign_keys = ON");
 
+  // Load sqlite-vec extension for vector search
+  try {
+    sqliteVec.load(_db);
+  } catch (err) {
+    console.error(
+      `[db] sqlite-vec load failed: ${err instanceof Error ? err.message : String(err)}`
+    );
+  }
+
   initSchema(_db);
   runMigrations(_db);
+
+  // Create vector table (after schema init so it doesn't conflict)
+  try {
+    _db.exec(
+      `CREATE VIRTUAL TABLE IF NOT EXISTS knowledge_vec USING vec0(embedding float[${EMBEDDING_DIM}])`
+    );
+  } catch (err) {
+    console.error(
+      `[db] knowledge_vec creation failed: ${err instanceof Error ? err.message : String(err)}`
+    );
+  }
+
+  // Init embeddings in background (non-blocking)
+  initEmbeddings();
+
   return _db;
 }
 
@@ -279,7 +311,7 @@ function sanitizeFtsQuery(query: string): string {
     .join(" ");
 }
 
-export function recall(
+export async function recall(
   query: string,
   options?: {
     sessions?: number;
@@ -291,96 +323,16 @@ export function recall(
     verbose?: boolean;
     global?: boolean;
   }
-): RecallResult[] {
+): Promise<RecallResult[]> {
   const db = getKnowledgeDb();
   const limit = options?.limit ?? 5;
   const safeQuery = sanitizeFtsQuery(query);
   if (options?.project) options.project = normalizePath(options.project)!;
-  const results: RecallResult[] = [];
 
-  // --- Search chunks ---
-  {
-    let sql = `
-      SELECT
-        c.id as chunk_id,
-        c.source,
-        c.category,
-        snippet(chunks_fts, 2, '>>', '<<', '...', 128) as snippet,
-        c.content,
-        s.started_at as session_started,
-        s.project_dir,
-        c.created_at,
-        (bm25(chunks_fts) * (1.0 + MAX(0, julianday('now') - julianday(c.created_at)) * 0.02)) as weighted_rank
-      FROM chunks_fts
-      JOIN chunks c ON c.id = chunks_fts.rowid
-      JOIN sessions s ON s.id = c.session_id
-      WHERE chunks_fts MATCH ?
-    `;
+  // Collect FTS results keyed by "type:id" for RRF merge
+  const ftsRanked: Array<{ key: string; result: RecallResult }> = [];
 
-    const params: unknown[] = [safeQuery];
-
-    if (options?.since) {
-      sql += ` AND s.started_at > datetime('now', ?)`;
-      params.push(`-${options.since}`);
-    }
-
-    if (options?.category) {
-      sql += ` AND c.category = ?`;
-      params.push(options.category);
-    }
-
-    if (options?.project) {
-      sql += ` AND s.project_dir LIKE ?`;
-      params.push(`%${options.project}%`);
-    }
-
-    if (options?.tags && options.tags.length > 0) {
-      const placeholders = options.tags.map(() => "?").join(", ");
-      sql += ` AND c.id IN (SELECT chunk_id FROM tags WHERE tag IN (${placeholders}))`;
-      params.push(...options.tags);
-    }
-
-    sql += ` ORDER BY weighted_rank LIMIT ?`;
-    params.push(limit);
-
-    const rows = db.prepare(sql).all(...params) as Array<{
-      chunk_id: number;
-      source: string;
-      category: string;
-      snippet: string;
-      content: string;
-      session_started: string;
-      project_dir: string | null;
-      created_at: string;
-      weighted_rank: number;
-    }>;
-
-    // Fetch tags for each result
-    const tagStmt = db.prepare(
-      "SELECT tag FROM tags WHERE chunk_id = ?"
-    );
-
-    for (const row of rows) {
-      const chunkTags = (
-        tagStmt.all(row.chunk_id) as Array<{ tag: string }>
-      ).map((t) => t.tag);
-
-      results.push({
-        source: row.source,
-        category: row.category,
-        snippet: row.snippet,
-        content: row.content,
-        session_started: row.session_started,
-        project_dir: row.project_dir,
-        created_at: row.created_at,
-        tags: chunkTags,
-        result_type: "chunk",
-        weighted_rank: row.weighted_rank,
-      });
-    }
-  }
-
-  // --- Search knowledge ---
+  // --- FTS: Search knowledge ---
   // Knowledge with project_dir IS NULL is global (always returned).
   // Knowledge with a project_dir is only returned when searching that project or globally.
   {
@@ -411,7 +363,7 @@ export function recall(
     }
 
     knowledgeSql += ` ORDER BY weighted_rank LIMIT ?`;
-    kParams.push(limit);
+    kParams.push(limit * 2); // fetch extra for RRF merge
 
     try {
       const kRows = db.prepare(knowledgeSql).all(...kParams) as Array<{
@@ -429,22 +381,24 @@ export function recall(
       }>;
 
       for (const row of kRows) {
-        // Apply maturity boost: divide weighted_rank by boost (lower rank = better)
         const boost = maturityBoost(
           (row.maturity || "progenitor") as Maturity,
           row.success_rate,
         );
-        results.push({
-          source: row.key || row.source || "stored knowledge",
-          category: "knowledge",
-          snippet: row.snippet,
-          content: row.content,
-          session_started: row.created_at,
-          project_dir: row.project_dir,
-          created_at: row.created_at,
-          tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
-          result_type: "knowledge",
-          weighted_rank: row.weighted_rank / boost,
+        ftsRanked.push({
+          key: `knowledge:${row.id}`,
+          result: {
+            source: row.key || row.source || "stored knowledge",
+            category: "knowledge",
+            snippet: row.snippet,
+            content: row.content,
+            session_started: row.created_at,
+            project_dir: row.project_dir,
+            created_at: row.created_at,
+            tags: row.tags ? row.tags.split(",").map((t) => t.trim()) : [],
+            result_type: "knowledge",
+            weighted_rank: row.weighted_rank / boost,
+          },
         });
       }
       // Track recall hits for knowledge entries
@@ -462,13 +416,14 @@ export function recall(
     }
   }
 
-  // --- Search summaries ---
+  // --- FTS: Search summaries ---
   {
     try {
       const sumRows = db
         .prepare(
           `
           SELECT
+            sm.id,
             sm.summary,
             snippet(summaries_fts, 0, '>>', '<<', '...', 128) as snippet,
             s.started_at as session_started,
@@ -484,7 +439,8 @@ export function recall(
           LIMIT ?
         `
         )
-        .all(safeQuery, limit) as Array<{
+        .all(safeQuery, limit * 2) as Array<{
+        id: number;
         summary: string;
         snippet: string;
         session_started: string;
@@ -495,17 +451,20 @@ export function recall(
       }>;
 
       for (const row of sumRows) {
-        results.push({
-          source: "session summary",
-          category: "summary",
-          snippet: row.snippet,
-          content: row.summary,
-          session_started: row.session_started,
-          project_dir: row.project_dir,
-          created_at: row.created_at,
-          tags: [],
-          result_type: "summary",
-          weighted_rank: row.weighted_rank,
+        ftsRanked.push({
+          key: `summary:${row.id}`,
+          result: {
+            source: "session summary",
+            category: "summary",
+            snippet: row.snippet,
+            content: row.summary,
+            session_started: row.session_started,
+            project_dir: row.project_dir,
+            created_at: row.created_at,
+            tags: [],
+            result_type: "summary",
+            weighted_rank: row.weighted_rank,
+          },
         });
       }
     } catch {
@@ -513,10 +472,181 @@ export function recall(
     }
   }
 
-  // Sort all results by weighted rank (more negative = better match)
-  results.sort((a, b) => a.weighted_rank - b.weighted_rank);
+  // --- Vector search leg ---
+  const vecRanked: Array<{ key: string; result: RecallResult }> = [];
+  let vecAvailable = false;
 
-  return results.slice(0, limit);
+  if (embeddingsAvailable()) {
+    try {
+      const queryVec = await embedText(query);
+      if (queryVec) {
+        vecAvailable = true;
+        const vecRows = db
+          .prepare(
+            `SELECT rowid, distance
+             FROM knowledge_vec
+             WHERE embedding MATCH ?
+             ORDER BY distance
+             LIMIT ?`
+          )
+          .all(vecToBuffer(queryVec), limit * 3) as Array<{
+          rowid: number | bigint;
+          distance: number;
+        }>;
+
+        for (const row of vecRows) {
+          const rid = Number(row.rowid);
+
+          if (rid > 0) {
+            // Positive rowid = knowledge entry
+            const k = db
+              .prepare(
+                "SELECT id, key, content, tags, source, project_dir, maturity, success_rate, created_at FROM knowledge WHERE id = ?"
+              )
+              .get(rid) as {
+              id: number;
+              key: string | null;
+              content: string;
+              tags: string | null;
+              source: string;
+              project_dir: string | null;
+              maturity: string;
+              success_rate: number | null;
+              created_at: string;
+            } | undefined;
+
+            if (!k) continue;
+
+            // Apply project filter
+            if (!options?.global && options?.project) {
+              if (k.project_dir && !k.project_dir.includes(options.project!)) {
+                continue;
+              }
+            }
+
+            const boost = maturityBoost(
+              (k.maturity || "progenitor") as Maturity,
+              k.success_rate,
+            );
+            const snippetText =
+              k.content.length > 128
+                ? k.content.substring(0, 128) + "..."
+                : k.content;
+
+            vecRanked.push({
+              key: `knowledge:${k.id}`,
+              result: {
+                source: k.key || k.source || "stored knowledge",
+                category: "knowledge",
+                snippet: snippetText,
+                content: k.content,
+                session_started: k.created_at,
+                project_dir: k.project_dir,
+                created_at: k.created_at,
+                tags: k.tags ? k.tags.split(",").map((t) => t.trim()) : [],
+                result_type: "knowledge",
+                weighted_rank: row.distance / boost,
+              },
+            });
+
+            // Track recall
+            _recalledKnowledgeIds.add(k.id);
+          } else {
+            // Negative rowid = summary (negate to get actual id)
+            const actualId = -rid;
+            const sm = db
+              .prepare(
+                `SELECT sm.id, sm.summary, sm.created_at, s.started_at as session_started, s.project_dir
+                 FROM summaries sm
+                 JOIN sessions s ON s.id = sm.session_id
+                 WHERE sm.id = ?`
+              )
+              .get(actualId) as {
+              id: number;
+              summary: string;
+              created_at: string;
+              session_started: string;
+              project_dir: string | null;
+            } | undefined;
+
+            if (!sm) continue;
+
+            const snippetText =
+              sm.summary.length > 128
+                ? sm.summary.substring(0, 128) + "..."
+                : sm.summary;
+
+            vecRanked.push({
+              key: `summary:${sm.id}`,
+              result: {
+                source: "session summary",
+                category: "summary",
+                snippet: snippetText,
+                content: sm.summary,
+                session_started: sm.session_started,
+                project_dir: sm.project_dir,
+                created_at: sm.created_at,
+                tags: [],
+                result_type: "summary",
+                weighted_rank: row.distance,
+              },
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.error(
+        `[recall] vector search failed: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  }
+
+  // --- Merge via Reciprocal Rank Fusion (RRF) ---
+  // If vector search unavailable, fall back to FTS-only ranking
+  if (!vecAvailable) {
+    const results = ftsRanked.map((r) => r.result);
+    results.sort((a, b) => a.weighted_rank - b.weighted_rank);
+    return results.slice(0, limit);
+  }
+
+  // Build rank maps (0-indexed rank within each list)
+  const ftsRankMap = new Map<string, number>();
+  for (let i = 0; i < ftsRanked.length; i++) {
+    ftsRankMap.set(ftsRanked[i].key, i);
+  }
+  const vecRankMap = new Map<string, number>();
+  for (let i = 0; i < vecRanked.length; i++) {
+    vecRankMap.set(vecRanked[i].key, i);
+  }
+
+  // Collect all unique keys and their best result object
+  const allResults = new Map<string, RecallResult>();
+  for (const r of ftsRanked) allResults.set(r.key, r.result);
+  for (const r of vecRanked) {
+    if (!allResults.has(r.key)) allResults.set(r.key, r.result);
+  }
+
+  // Compute RRF score: score = 1/(k + rank_fts) + 1/(k + rank_vec), k=60
+  const K = 60;
+  const scored: Array<{ key: string; result: RecallResult; rrfScore: number }> =
+    [];
+  for (const [key, result] of allResults) {
+    let score = 0;
+    const ftsRank = ftsRankMap.get(key);
+    const vecRank = vecRankMap.get(key);
+    if (ftsRank !== undefined) score += 1 / (K + ftsRank);
+    if (vecRank !== undefined) score += 1 / (K + vecRank);
+    scored.push({ key, result, rrfScore: score });
+  }
+
+  // Higher RRF score = better
+  scored.sort((a, b) => b.rrfScore - a.rrfScore);
+
+  // Update weighted_rank to reflect RRF ordering (for downstream consumers)
+  return scored.slice(0, limit).map((s, i) => ({
+    ...s.result,
+    weighted_rank: -(s.rrfScore), // negative so lower = better convention holds
+  }));
 }
 
 // ============================================================
@@ -709,13 +839,13 @@ export function insertTags(chunkId: number, tags: string[]): void {
 // Knowledge (manual storage)
 // ============================================================
 
-export function insertKnowledge(
+export async function insertKnowledge(
   content: string,
   key?: string,
   tags?: string[],
   source?: string,
   projectDir?: string
-): number {
+): Promise<number> {
   const db = getKnowledgeDb();
   const now = new Date().toISOString();
   const tagsStr = tags ? tags.join(", ") : null;
@@ -725,7 +855,25 @@ export function insertKnowledge(
        VALUES (?, ?, ?, ?, 1, ?, ?, ?)`
     )
     .run(key || null, content, tagsStr, source || "manual", now, now, normalizePath(projectDir));
-  return Number(result.lastInsertRowid);
+  const rowid = Number(result.lastInsertRowid);
+
+  // Embed and store vector (best-effort)
+  if (embeddingsAvailable()) {
+    try {
+      const vec = await embedText(content);
+      if (vec) {
+        db.prepare(
+          "INSERT OR REPLACE INTO knowledge_vec (rowid, embedding) VALUES (?, ?)"
+        ).run(BigInt(rowid), vecToBuffer(vec));
+      }
+    } catch (err) {
+      console.error(
+        `[db] embed-on-write failed for knowledge ${rowid}: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  }
+
+  return rowid;
 }
 
 export function deleteKnowledge(options: {
@@ -855,11 +1003,11 @@ export function listKnowledge(limit: number = 20, project?: string): Array<{
 // Summaries
 // ============================================================
 
-export function insertSummary(
+export async function insertSummary(
   sessionId: string,
   summary: string,
   model: string
-): void {
+): Promise<void> {
   const db = getKnowledgeDb();
   // Ensure session exists to satisfy FOREIGN KEY constraint.
   // When called from /end, the session may not have been indexed yet.
@@ -870,10 +1018,27 @@ export function insertSummary(
        VALUES (?, '', NULL, datetime('now'), NULL, 0, datetime('now'), 0)`
     ).run(sessionId);
   }
-  db.prepare(
+  const result = db.prepare(
     `INSERT OR REPLACE INTO summaries (session_id, summary, model, created_at)
      VALUES (?, ?, ?, datetime('now'))`
   ).run(sessionId, summary, model);
+  const rowid = Number(result.lastInsertRowid);
+
+  // Embed with NEGATIVE rowid to avoid collision with knowledge rowids
+  if (embeddingsAvailable()) {
+    try {
+      const vec = await embedText(summary);
+      if (vec) {
+        db.prepare(
+          "INSERT OR REPLACE INTO knowledge_vec (rowid, embedding) VALUES (?, ?)"
+        ).run(BigInt(-rowid), vecToBuffer(vec));
+      }
+    } catch (err) {
+      console.error(
+        `[db] embed-on-write failed for summary ${rowid}: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  }
 }
 
 export function getUnsummarizedSessionIds(): string[] {
