@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
+    "@yarflam/potion-base-32m": "^1.1.5",
     "better-sqlite3": "^12.6.2",
+    "sqlite-vec": "^0.1.8",
     "zod": "^3.25.0"
   },
   "devDependencies": {
