@@ -207,9 +207,7 @@ function registerHooks() {
       path.join(scriptsBase, 'session-bootstrap.mjs')
     ],
     SessionEnd: [
-      path.join(scriptsBase, 'auto-index.mjs'),
-      path.join(scriptsBase, 'vault-writer.mjs'),
-      path.join(scriptsBase, 'skill-scan.mjs')
+      path.join(scriptsBase, 'session-end.mjs')
     ]
   };
 
