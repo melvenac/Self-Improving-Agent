@@ -5,7 +5,6 @@
  * Pipeline:
  *   Stage 1: Index — session events → knowledge.db chunks
  *   Stage 2: Skill scan — cluster experiences for skill candidates
- *   Stage 3: Safety net — auto-fill .agents/SESSIONS/Session_N.md if /end was skipped
  *
  * CLI flags:
  *   --backfill-sessions    Reprocess all .db files
@@ -13,10 +12,11 @@
  *   --backfill-vectors     Embed all knowledge + summaries into knowledge_vec
  */
 
-import { existsSync, readdirSync, readFileSync, writeFileSync, appendFileSync, statSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync, appendFileSync, statSync, unlinkSync } from 'fs';
 import { join, basename } from 'path';
 import { homedir } from 'os';
 import Database from 'better-sqlite3';
+import * as sqliteVec from 'sqlite-vec';
 
 // ---------------------------------------------------------------------------
 // Paths
@@ -345,203 +345,6 @@ function runStage2SkillScan() {
 }
 
 // ---------------------------------------------------------------------------
-// Stage 3: Safety net — auto-fill .agents/SESSIONS/Session_N.md
-// ---------------------------------------------------------------------------
-
-function updateAgentsSessionLog(projectDir, whatWasDone, filesChanged, decisions, gotchas) {
-  const sessionsDir = join(projectDir, '.agents', 'SESSIONS');
-  if (!existsSync(sessionsDir)) {
-    log('Stage 3: no .agents/SESSIONS/ — skipping');
-    return;
-  }
-
-  const sessionFiles = readdirSync(sessionsDir)
-    .filter(f => /^Session_\d+\.md$/.test(f))
-    .sort((a, b) => {
-      const numA = parseInt(a.match(/\d+/)[0]);
-      const numB = parseInt(b.match(/\d+/)[0]);
-      return numB - numA;
-    });
-
-  let targetFile = null;
-  let content = null;
-
-  for (const file of sessionFiles) {
-    const filePath = join(sessionsDir, file);
-    const text = readFileSync(filePath, 'utf-8');
-    if (/\*\*Status:\*\*\s*In Progress/i.test(text)) {
-      targetFile = filePath;
-      content = text;
-      break;
-    }
-  }
-
-  if (!targetFile) {
-    log('Stage 3: no in-progress session found — skipping');
-    return;
-  }
-
-  log(`Stage 3: updating ${targetFile.split(/[\\/]/).pop()}`);
-
-  const EMPTY_PLACEHOLDER = /^\s*-\s*$/;
-  const filled = [];
-  const skipped = [];
-
-  function isSectionEmpty(sectionContent) {
-    const lines = sectionContent.split('\n').filter(l => l.trim().length > 0);
-    const meaningful = lines.filter(l => !/^\s*<!--.*-->\s*$/.test(l));
-    return meaningful.length === 0 || meaningful.every(l => EMPTY_PLACEHOLDER.test(l));
-  }
-
-  function fillSection(text, headingPattern, newContent, sectionName) {
-    const lines = text.split('\n');
-    let startIdx = -1;
-    let endIdx = lines.length;
-    let headingLevel = 0;
-
-    for (let i = 0; i < lines.length; i++) {
-      if (headingPattern.test(lines[i])) {
-        startIdx = i;
-        headingLevel = (lines[i].match(/^#+/) || [''])[0].length;
-        break;
-      }
-    }
-
-    if (startIdx === -1) {
-      skipped.push(sectionName + ' (heading not found)');
-      return text;
-    }
-
-    for (let i = startIdx + 1; i < lines.length; i++) {
-      const line = lines[i];
-      if (/^---\s*$/.test(line)) { endIdx = i; break; }
-      const match = line.match(/^(#+)\s/);
-      if (match && match[1].length <= headingLevel) { endIdx = i; break; }
-    }
-
-    const sectionLines = lines.slice(startIdx + 1, endIdx).join('\n');
-    if (!isSectionEmpty(sectionLines)) {
-      skipped.push(sectionName + ' (already populated)');
-      return text;
-    }
-
-    const sectionLinesArr = lines.slice(startIdx + 1, endIdx);
-    const kept = sectionLinesArr.filter(l => !EMPTY_PLACEHOLDER.test(l));
-    const newLines = [
-      ...lines.slice(0, startIdx + 1),
-      ...kept,
-      newContent,
-      '',
-      ...lines.slice(endIdx)
-    ];
-    filled.push(sectionName + ` (${newContent.split('\n').filter(l => l.trim()).length} items)`);
-    return newLines.join('\n');
-  }
-
-  if (whatWasDone.length > 0) {
-    content = fillSection(content, /^###\s+What Was Done/, whatWasDone.slice(0, 10).join('\n'), 'What Was Done');
-  }
-  if (filesChanged.length > 0) {
-    const fileLines = filesChanged.slice(0, 15).map(f => '- `' + f + '`').join('\n');
-    content = fillSection(content, /^###\s+Files Modified/, fileLines, 'Files Modified');
-  }
-  if (gotchas.length > 0) {
-    const gotchaLines = gotchas.slice(0, 5).map(g => '- ' + g).join('\n');
-    content = fillSection(content, /^##\s+Gotchas/, gotchaLines, 'Gotchas');
-  }
-  if (decisions.length > 0) {
-    const decisionLines = decisions.slice(0, 5).map(d => '- ' + d).join('\n');
-    content = fillSection(content, /^##\s+Decisions Made/, decisionLines, 'Decisions');
-  }
-
-  content = content.replace(/(\*\*Status:\*\*)\s*In Progress/i, '$1 Completed');
-  content = content.replace(
-    /- \[ \] Session log completed \(this file\)/,
-    '- [x] Session log completed (this file)'
-  );
-
-  if (!content.includes('Auto-completed by session-end')) {
-    content = content.trimEnd() + '\n\n> *Auto-completed by session-end safety net. Run /end for full close-out (SUMMARY, INBOX, DECISIONS).*\n';
-  }
-
-  writeFileSync(targetFile, content);
-  log(`Stage 3: filled [${filled.join(', ')}], skipped [${skipped.join(', ')}]`);
-}
-
-function runStage3SafetyNet() {
-  log('Stage 3: Safety net — auto-fill .agents/SESSIONS/ if /end was skipped');
-
-  const dbPath = findMostRecentDb();
-  if (!dbPath) {
-    log('Stage 3: No session .db files found — skipping');
-    return;
-  }
-
-  const db = new Database(dbPath, { readonly: true });
-  const meta = db.prepare('SELECT * FROM session_meta ORDER BY last_event_at DESC LIMIT 1').get();
-  if (!meta) {
-    log('Stage 3: No session_meta rows — skipping');
-    db.close();
-    return;
-  }
-
-  const allEvents = db.prepare('SELECT type, category, data FROM session_events ORDER BY id').all();
-  db.close();
-
-  // Extract meaningful content from events
-  const whatWasDone = [];
-  const decisions = [];
-  const gotchas = [];
-  const filesChanged = [];
-
-  for (const event of allEvents) {
-    const text = event.data || '';
-    const isSystemNoise = /^<local-command|^<command-name|^<system-reminder/i.test(text.trim());
-
-    if (event.type === 'user_prompt') {
-      const isNoise = /^<local-command|^<command-name|^<command-message|^<local-command-stdout|^<system-reminder/i.test(text.trim());
-      if (!isNoise && text.length > 10) {
-        whatWasDone.push('- ' + text.trim().split('\n')[0].slice(0, 200));
-      }
-    }
-
-    if (event.category === 'decision' && text.length > 10) {
-      decisions.push(text.trim().split('\n')[0].slice(0, 200));
-    }
-
-    if (event.category === 'file' && (event.type === 'file_edit' || event.type === 'file_write')) {
-      filesChanged.push(text.trim());
-    }
-
-    if (!isSystemNoise && /gotcha|caveat|careful|watch out|doesn't work|broke|failed|workaround|bug|error/i.test(text) && text.length > 20 && text.length < 500) {
-      if (event.category !== 'file') {
-        gotchas.push(text.trim().split('\n')[0].slice(0, 200));
-      }
-    }
-  }
-
-  // Quality gate
-  const meaningfulPrompts = whatWasDone.filter(line => line.length > 22);
-  const passesQualityGate = (
-    (meaningfulPrompts.length >= 3) ||
-    (filesChanged.length >= 1 && meaningfulPrompts.length >= 1) ||
-    (decisions.length >= 1) ||
-    (gotchas.length >= 1)
-  );
-
-  if (!passesQualityGate) {
-    log(`Stage 3: session too thin (prompts=${meaningfulPrompts.length}, files=${filesChanged.length}) — skipping`);
-    return;
-  }
-
-  try {
-    updateAgentsSessionLog(meta.project_dir, whatWasDone, filesChanged, decisions, gotchas);
-  } catch (err) {
-    log(`Stage 3: WARN: ${err.message}`);
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Shared helpers
 // ---------------------------------------------------------------------------
 
@@ -728,6 +531,13 @@ async function backfillVectors() {
   }
 
   const db = new Database(KB_PATH);
+  try {
+    sqliteVec.load(db);
+  } catch (err) {
+    log(`Backfill vectors: sqlite-vec load failed: ${err.message}`);
+    db.close();
+    return;
+  }
 
   // Embed knowledge entries
   let knowledgeRows;
@@ -740,12 +550,16 @@ async function backfillVectors() {
   let kEmbedded = 0;
   for (const row of knowledgeRows) {
     try {
-      const existing = db.prepare('SELECT rowid FROM knowledge_vec WHERE rowid = ?').get(BigInt(row.id));
-      if (existing) continue;
+      if (!process.argv.includes('--force')) {
+        const existing = db.prepare('SELECT rowid FROM knowledge_vec WHERE rowid = ?').get(BigInt(row.id));
+        if (existing) continue;
+      }
 
       const vec = await embedText(row.content);
       if (vec) {
-        db.prepare('INSERT OR REPLACE INTO knowledge_vec (rowid, embedding) VALUES (?, ?)').run(BigInt(row.id), vecToBuffer(vec));
+        const rid = BigInt(row.id);
+        db.prepare('DELETE FROM knowledge_vec WHERE rowid = ?').run(rid);
+        db.prepare('INSERT INTO knowledge_vec (rowid, embedding) VALUES (?, ?)').run(rid, vecToBuffer(vec));
         kEmbedded++;
       }
     } catch (err) {
@@ -765,14 +579,17 @@ async function backfillVectors() {
   for (const row of summaryRows) {
     try {
       const negId = BigInt(-row.id);
-      const existing = db.prepare('SELECT rowid FROM knowledge_vec WHERE rowid = ?').get(negId);
-      if (existing) continue;
+      if (!process.argv.includes('--force')) {
+        const existing = db.prepare('SELECT rowid FROM knowledge_vec WHERE rowid = ?').get(negId);
+        if (existing) continue;
+      }
 
       const text = row.summary || row.content || '';
       if (!text) continue;
       const vec = await embedText(text);
       if (vec) {
-        db.prepare('INSERT OR REPLACE INTO knowledge_vec (rowid, embedding) VALUES (?, ?)').run(negId, vecToBuffer(vec));
+        db.prepare('DELETE FROM knowledge_vec WHERE rowid = ?').run(negId);
+        db.prepare('INSERT INTO knowledge_vec (rowid, embedding) VALUES (?, ?)').run(negId, vecToBuffer(vec));
         sEmbedded++;
       }
     } catch (err) {
@@ -782,6 +599,101 @@ async function backfillVectors() {
 
   db.close();
   log(`Backfill vectors: ${kEmbedded} knowledge + ${sEmbedded} summaries embedded`);
+}
+
+// ---------------------------------------------------------------------------
+// Auto-feedback: rate recalled entries based on summary domain overlap
+// ---------------------------------------------------------------------------
+
+async function autoFeedback() {
+  const recalledPath = join(HOME, '.claude', 'context-mode', '.recalled-entries.json');
+  if (!existsSync(recalledPath)) {
+    log('Auto-feedback: no .recalled-entries.json — skipping');
+    return;
+  }
+
+  let recalled;
+  try {
+    recalled = JSON.parse(readFileSync(recalledPath, 'utf8'));
+  } catch (err) {
+    log(`Auto-feedback: failed to parse recalled entries: ${err.message}`);
+    return;
+  }
+
+  if (!recalled.entries || recalled.entries.length === 0) {
+    log('Auto-feedback: no recalled entries to rate');
+    return;
+  }
+
+  // Find the most recent session summary
+  const db = new Database(KB_PATH, { readonly: true });
+  let summary;
+  try {
+    summary = db.prepare(
+      'SELECT sm.summary FROM summaries sm ORDER BY sm.created_at DESC LIMIT 1'
+    ).get();
+  } catch {
+    log('Auto-feedback: no summaries found');
+    db.close();
+    return;
+  }
+  db.close();
+
+  if (!summary || !summary.summary) {
+    log('Auto-feedback: latest summary is empty');
+    return;
+  }
+
+  const summaryLower = summary.summary.toLowerCase();
+
+  // Rate each recalled knowledge entry
+  const dbWrite = new Database(KB_PATH);
+  let rated = 0;
+
+  for (const entry of recalled.entries) {
+    if (entry.source !== 'knowledge' || !entry.id) continue;
+
+    // Get the entry's tags and current feedback counts
+    const row = dbWrite.prepare(
+      'SELECT tags, helpful_count, harmful_count, neutral_count FROM knowledge WHERE id = ?'
+    ).get(entry.id);
+
+    if (!row) continue;
+
+    const tags = row.tags ? row.tags.split(',').map(t => t.trim().toLowerCase()) : [];
+
+    // Check if any tag (longer than 2 chars) appears in the summary
+    const overlap = tags.some(tag => tag.length > 2 && summaryLower.includes(tag));
+    const rating = overlap ? 'helpful' : 'neutral';
+
+    // Calculate new success rate and maturity
+    const helpful = (row.helpful_count || 0) + (rating === 'helpful' ? 1 : 0);
+    const harmful = row.harmful_count || 0;
+    const neutral = (row.neutral_count || 0) + (rating === 'neutral' ? 1 : 0);
+    const total = helpful + harmful + neutral;
+    const successRate = total > 0 ? helpful / total : null;
+
+    // Maturity progression: Progenitor → Proven (3 helpful, ≥0.5 rate) → Mature (7 helpful)
+    let maturity = 'progenitor';
+    if (helpful >= 7) maturity = 'mature';
+    else if (helpful >= 3 && successRate >= 0.5) maturity = 'proven';
+
+    // Update the knowledge entry
+    const col = rating === 'helpful' ? 'helpful_count' : 'neutral_count';
+    dbWrite.prepare(
+      `UPDATE knowledge SET ${col} = ${col} + 1, success_rate = ?, maturity = ?, updated_at = datetime('now') WHERE id = ?`
+    ).run(successRate, maturity, entry.id);
+
+    log(`Auto-feedback: ${entry.key || entry.id} → ${rating} (${maturity}, rate=${successRate?.toFixed(2)})`);
+    rated++;
+  }
+
+  dbWrite.close();
+
+  // Clean up the recalled entries file
+  try { unlinkSync(recalledPath); } catch {}
+
+  log(`Auto-feedback: rated ${rated} entries`);
 }
 
 // ---------------------------------------------------------------------------
@@ -814,7 +726,7 @@ if (isDirectRun) {
       log(`FATAL (backfill-vectors): ${err.message}\n${err.stack}`);
     }
   } else {
-    // Normal pipeline: Stage 1 → Stage 2 → Stage 3
+    // Normal pipeline: Stage 1 → Stage 2
     try {
       runStage1Index();
     } catch (err) {
@@ -828,9 +740,9 @@ if (isDirectRun) {
     }
 
     try {
-      runStage3SafetyNet();
+      await autoFeedback();
     } catch (err) {
-      log(`Stage 3 FAILED: ${err.message}\n${err.stack}`);
+      log(`Auto-feedback FAILED: ${err.message}\n${err.stack}`);
     }
 
     log('Pipeline complete');
@@ -838,4 +750,4 @@ if (isDirectRun) {
 }
 
 // Export for potential programmatic use
-export { runStage1Index, runStage2SkillScan, runStage3SafetyNet, updateAgentsSessionLog };
+export { runStage1Index, runStage2SkillScan };

@@ -1,5 +1,29 @@
 # Changelog
 
+## [v0.5.1] - 2026-03-30
+
+Pipeline simplification, knowledge quality improvements, and auto-feedback.
+
+### Added
+- **Auto-feedback:** `session-end.mjs` automatically rates recalled knowledge entries helpful/neutral based on session summary domain overlap, feeding the maturity lifecycle
+- **Obsidian dual-writes:** `/end` B1 and B3 now write research to `Research/` and experiences to `Experiences/` for Smart Connections semantic search
+- **CONCEPTS line:** New field in experience format for plain English domain description, improving semantic search matching
+- **Domain concept tags:** `kb_store` guidance and `/end` templates now include broader domain tags (e.g., `payments` alongside `stripe`)
+- **Recalled entry tracking:** `/start` B3 writes recalled entry IDs to `.recalled-entries.json` for auto-feedback consumption
+- **`--force` flag:** `--backfill-vectors` can now re-embed existing entries (not just new ones)
+
+### Changed
+- **Removed chunk indexing:** Deleted `auto-index.mjs` hook and all 6,928 chunks — tool metadata had zero retrieval value
+- **Removed Stage 5 safety net:** `/end` is consistently used; auto-fill of `.agents/SESSIONS/` was unused complexity
+- **Removed `chunks_fts` table:** No longer created or searched in `kb_recall`
+- **SessionEnd hooks:** 4 → 3 (removed `auto-index.mjs`)
+
+### Fixed
+- **sqlite-vec upsert bug:** `INSERT OR REPLACE` doesn't work on `vec0` virtual tables — changed to `DELETE` + `INSERT` in both `db.ts` and `session-end.mjs`
+- **sqlite-vec not loaded in scripts:** `session-end.mjs` now loads the `sqlite-vec` extension for `--backfill-vectors`
+- **Knowledge quality:** Pruned 65 low-value entries (169 → 104), backfilled CONCEPTS lines and domain tags on all 104, re-embedded all vectors
+- **Stale Obsidian Experiences/:** Deleted 38 auto-extracted files from removed pipeline
+
 ## [v0.5.0] - 2026-03-30
 
 Hybrid search, summary vault writing, and pipeline consolidation.

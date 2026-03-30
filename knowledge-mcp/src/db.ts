@@ -93,36 +93,6 @@ function initSchema(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_tags_tag ON tags(tag);
   `);
 
-  // Create FTS5 table if it doesn't exist
-  const ftsExists = db
-    .prepare(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='chunks_fts'"
-    )
-    .get();
-
-  if (!ftsExists) {
-    db.exec(`
-      CREATE VIRTUAL TABLE chunks_fts USING fts5(
-        source,
-        category,
-        content,
-        content=chunks,
-        content_rowid=id,
-        tokenize='porter unicode61'
-      );
-
-      CREATE TRIGGER chunks_ai AFTER INSERT ON chunks BEGIN
-        INSERT INTO chunks_fts(rowid, source, category, content)
-        VALUES (new.id, new.source, new.category, new.content);
-      END;
-
-      CREATE TRIGGER chunks_ad AFTER DELETE ON chunks BEGIN
-        INSERT INTO chunks_fts(chunks_fts, rowid, source, category, content)
-        VALUES ('delete', old.id, old.source, old.category, old.content);
-      END;
-    `);
-  }
-
   // --- Knowledge table (manual knowledge storage) ---
   db.exec(`
     CREATE TABLE IF NOT EXISTS knowledge (
@@ -862,9 +832,11 @@ export async function insertKnowledge(
     try {
       const vec = await embedText(content);
       if (vec) {
+        const rid = BigInt(rowid);
+        db.prepare("DELETE FROM knowledge_vec WHERE rowid = ?").run(rid);
         db.prepare(
-          "INSERT OR REPLACE INTO knowledge_vec (rowid, embedding) VALUES (?, ?)"
-        ).run(BigInt(rowid), vecToBuffer(vec));
+          "INSERT INTO knowledge_vec (rowid, embedding) VALUES (?, ?)"
+        ).run(rid, vecToBuffer(vec));
       }
     } catch (err) {
       console.error(
@@ -1029,9 +1001,11 @@ export async function insertSummary(
     try {
       const vec = await embedText(summary);
       if (vec) {
+        const negId = BigInt(-rowid);
+        db.prepare("DELETE FROM knowledge_vec WHERE rowid = ?").run(negId);
         db.prepare(
-          "INSERT OR REPLACE INTO knowledge_vec (rowid, embedding) VALUES (?, ?)"
-        ).run(BigInt(-rowid), vecToBuffer(vec));
+          "INSERT INTO knowledge_vec (rowid, embedding) VALUES (?, ?)"
+        ).run(negId, vecToBuffer(vec));
       }
     } catch (err) {
       console.error(

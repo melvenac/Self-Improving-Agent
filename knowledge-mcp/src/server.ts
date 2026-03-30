@@ -289,7 +289,7 @@ server.tool(
 // --- kb_store: Store arbitrary knowledge ---
 server.tool(
   "kb_store",
-  "Store a piece of knowledge in the knowledge base. Use for facts, notes, preferences, or anything worth remembering permanently. By default, knowledge is stored globally (available across all projects). Set scope to 'project' and pass your working directory as project_dir to scope it to a specific project.",
+  "Store a piece of knowledge in the knowledge base. Use for facts, notes, preferences, or anything worth remembering permanently. By default, knowledge is stored globally (available across all projects). Set scope to 'project' and pass your working directory as project_dir to scope it to a specific project.\n\n**Tag guidance:** Include BOTH implementation-specific tags (e.g., 'stripe', 'convex') AND broader domain concept tags (e.g., 'payments', 'billing', 'authentication', 'deployment'). Domain tags enable recall via natural language queries like 'how did we handle payments?' even when the specific tool name isn't mentioned.\n\n**Content guidance for experiences:** Include a CONCEPTS line — a plain English sentence describing the problem domain, not just implementation details. Example: 'CONCEPTS: Processing subscription payments via Stripe in a serverless Convex backend'. This improves semantic search matching.",
   {
     content: z
       .string()
