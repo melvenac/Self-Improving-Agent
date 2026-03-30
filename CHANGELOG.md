@@ -1,5 +1,29 @@
 # Changelog
 
+## [v0.5.0] - 2026-03-30
+
+Hybrid search, summary vault writing, and pipeline consolidation.
+
+### Added
+- **Hybrid `kb_recall`:** FTS5 keyword + sqlite-vec semantic search merged via Reciprocal Rank Fusion — one tool call, both search modes
+- **Enriched session summaries:** Written to `~/Obsidian Vault/Summaries/` (semantic search via Smart Connections) and SQLite (keyword search via `kb_recall`). Structured format: What/Why/How/Lessons with project tags and relative file paths
+- **Research capture:** `/end` B1 explicitly prompts for external research (GitHub repos, YouTube, docs, NotebookLM) with standardized source tags
+- **kb_feedback wiring:** `/end` B5 collects helpful/harmful/neutral ratings for recalled knowledge
+- **Local embeddings:** `@yarflam/potion-base-32m` for 32-dimensional vectors — no API key needed
+- **Consolidated SessionEnd pipeline:** `session-end.mjs` replaces 5 separate scripts (auto-index, vault-writer, vault-utils, skill-scan, vault-sync-projects)
+
+### Changed
+- `kb_recall` no longer searches raw chunks — only knowledge entries + summaries
+- `kb_store` and `kb_store_summary` embed content on write for vector search
+- `/end` summary format: structured What/Why/How/Lessons with project tags and relative file paths
+
+### Removed
+- Auto-extracted experiences (vault-writer regex patterns) — zero retrieval value confirmed via audit
+- Obsidian mirroring (`mirrorToObsidian()`) — replaced by summary vault writing
+- Topic linking (dependent on auto-extraction)
+- `SESSIONS_DIR` constant — nothing writes to `~/Obsidian Vault/Sessions/`
+- 10 deprecated scripts moved to `docs/temp/`
+
 ## [v0.4.0] - 2026-03-29
 
 Outcome tracking and skill lifecycle — knowledge entries now have quality feedback and maturity stages.

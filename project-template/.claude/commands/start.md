@@ -40,6 +40,13 @@ Also read `.agents/TASKS/task.md` to understand current sprint focus.
 - If any task.md "Done" items are still `[ ]` in INBOX, flag them and fix before proceeding
 - This catches drift from prior sessions where `/end` missed an INBOX update
 
+### A3b. Check SUMMARY.md for staleness
+- Compare the version in SUMMARY.md status line against `package.json` version
+- Compare "What's broken or incomplete" against completed INBOX items — if something marked `[x]` in INBOX is still listed as broken in SUMMARY, fix it
+- Compare "What's next" against current INBOX priorities — if they don't match, update SUMMARY
+- If any drift is found, fix SUMMARY.md immediately before proceeding
+- This is the safety net for `/end` missing the SUMMARY update
+
 ### A4. Check project skills
 ```
 Read: .agents/skills/INDEX.md (if it exists)
