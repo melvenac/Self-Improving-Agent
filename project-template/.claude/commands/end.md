@@ -39,10 +39,14 @@ Fill in:
 If META/ exists:  Update: .agents/META/SUMMARY.md
 Otherwise:        Update: .agents/SYSTEM/SUMMARY.md
 ```
-Overwrite the "Current State" section with:
-- What's working NOW
-- What's broken / blocked NOW
-- What's next
+**CRITICAL — this is where staleness happens if you skip details.**
+
+1. **Update the status line** — bump the version if a release was tagged this session, update the one-line status description
+2. **Update "What's working"** — add new features/fixes from this session at the top of the list. Remove items that moved to a higher version bullet.
+3. **Update "What's broken or incomplete"** — remove items that were fixed this session. Add any new issues discovered.
+4. **Update "What's next"** — must match the top pending items in INBOX.md. If INBOX priorities changed, reflect that here.
+
+The status line format: `> **Status:** vX.Y.Z Released — short description of current state`
 
 ### A3. Update DECISIONS.md (if applicable)
 ```
@@ -125,15 +129,34 @@ If this session changed features, commands, or architecture:
 >
 > The hooks (`vault-writer.mjs` → `skill-scan.mjs`) automatically capture session logs and extract experiences to the Obsidian Vault + Knowledge MCP. Your job here is to catch what automation misses.
 
-### B1. Review for non-obvious lessons
+### B1. Capture external research
+If any external research was done this session (GitHub repos, YouTube videos, website docs, NotebookLM content), store a knowledge entry for each source using `kb_store`:
+
+```
+[RESEARCH] {title} — {source type} Summary
+SOURCE: {url or reference}
+DATE: {today}
+DOMAIN: {relevant tags}
+
+FINDINGS: {key takeaways — what was learned}
+DECISION: {what was decided — adopted, rejected, deferred, and why}
+RELEVANCE: {how this connects to current work}
+```
+
+Use standardized source tags: `youtube-transcript`, `github-repo`, `notebooklm`, `docs`.
+
+Even research that concluded "not useful right now" should be captured — it records the reasoning and prevents re-evaluation later. If no external research was done, skip this step.
+
+### B2. Review for non-obvious lessons
 The hooks extract experiences from explicit gotcha/decision patterns. Look for things they'd miss:
 - Subtle patterns that emerged across multiple steps (not a single "aha" moment)
 - Context about _why_ a decision was made that isn't obvious from the code
 - Cross-project insights ("this pattern from project X applies to project Y")
 - Corrections to existing experiences that turned out to be wrong
 
-### B2. Store supplemental experiences
-For anything the hooks would miss, use `kb_store` directly:
+### B3. Store supplemental experiences
+For anything the hooks would miss, use `kb_store` directly. **Dedup first:** run `kb_recall` with each experience title before storing — skip if >90% similar already exists, update if there's meaningful new detail.
+
 ```
 [EXPERIENCE] {short-title}
 PROJECT: {project-name or "general"}
@@ -148,11 +171,46 @@ CONTEXT: {the full exchange — what was the user asking, what reasoning led her
 OUTCOME: {what happened, what to do differently}
 ```
 
-### B3. Dedup check
-Run `kb_recall` with each experience title before storing. Skip if >90% similar already exists. Update if there's meaningful new detail.
+### B4. Write session summary (dual-store)
 
-### B4. Session summary
-Use `kb_store_summary` with a 2-3 sentence summary of what was accomplished.
+Write the session summary to **both** stores:
+
+1. **SQLite:** `kb_store_summary(session_id, summary_text)` — for keyword search via `kb_recall`
+2. **Obsidian:** Use the Write tool to create `~/Obsidian Vault/Summaries/YYYY-MM-DD-{project-slug}.md` — for semantic search via Smart Connections
+
+Use the enriched summary format:
+
+```yaml
+---
+date: {YYYY-MM-DD}
+project: {project-slug from cwd basename}
+session: {N, if .agents/ project}
+session_id: {session-id from current session}
+type: summary
+tags: [{project-slug}, {domain-tags}]
+files: [{project-relative paths of files changed}]
+---
+```
+
+Body sections:
+- **## What** — What was accomplished (actions and outcomes)
+- **## Why** — What motivated the work (INBOX item, problem, user request)
+- **## How** — What approach was taken (key decisions, tradeoffs, tools)
+- **## Lessons** — What was learned (gotchas, surprises, corrections)
+
+No "Unresolved" or "What's next" section — that's SUMMARY.md's job. Use project-relative file paths (e.g., `src/components/BookingDrawer.tsx`).
+
+### B5. Collect knowledge feedback
+
+If knowledge was recalled during `/start` B3, collect feedback to improve future retrieval:
+
+1. List each recalled entry by title
+2. For each, ask: helpful, harmful, or neutral?
+3. Call `kb_feedback(entry_id, rating)` for each rated entry
+
+This feeds the maturity lifecycle (Progenitor → Proven → Mature) and apoptosis (auto-prune below 0.3 success rate after 5 ratings).
+
+If no knowledge was recalled, or the user wants to skip, move on.
 
 ---
 
