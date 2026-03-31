@@ -25,19 +25,19 @@ const HOME = homedir();
 const VAULT_PATH = join(HOME, 'Obsidian Vault');
 const EXPERIENCES_DIR = join(VAULT_PATH, 'Experiences');
 const LOGS_DIR = join(VAULT_PATH, 'Logs');
-const LOG_PATH = join(LOGS_DIR, 'vault-writer.log');
+const LOG_PATH = join(LOGS_DIR, 'session-end.log');
 
 const KB_DIR = join(HOME, '.claude', 'context-mode');
 const KB_PATH = join(KB_DIR, 'knowledge.db');
 const SESSIONS_DB_DIR = join(KB_DIR, 'sessions');
 
 // Skill-scan paths
-const CANDIDATES_FILE = join(VAULT_PATH, 'Guidelines', 'SKILL-CANDIDATES.md');
-const SKILL_INDEX_FILE = join(VAULT_PATH, 'Guidelines', 'SKILL-INDEX.md');
+const CANDIDATES_FILE = join(VAULT_PATH, 'Skill-Candidates', 'SKILL-CANDIDATES.md');
+const SKILL_INDEX_FILE = join(VAULT_PATH, 'Skill-Candidates', 'SKILL-INDEX.md');
 const CLUSTER_THRESHOLD = 3;
 
 // ---------------------------------------------------------------------------
-// Inlined utilities (from vault-utils.mjs)
+// Utilities
 // ---------------------------------------------------------------------------
 
 function slugify(text) {

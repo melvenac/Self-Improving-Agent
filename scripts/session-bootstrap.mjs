@@ -93,12 +93,12 @@ if (existsSync(sessionsDbDir) && existsSync(vaultSessionsDir)) {
 
       if (!found) {
         const hoursStale = (Date.now() - newestMtime) / (1000 * 60 * 60);
-        // Only warn if the .db is old enough that vault-writer should have processed it
+        // Only warn if the .db is old enough that session-end should have processed it
         // (skip if it's the current session's .db which hasn't ended yet)
         if (hoursStale > 1) {
           lines.push('');
-          lines.push(`WARNING: vault-writer may be failing — session ${newestDb} (${Math.round(hoursStale)}h old) has no Obsidian capture.`);
-          lines.push('Check ~/Obsidian Vault/.vault-writer.log or run: node ~/.claude/knowledge-mcp/scripts/vault-writer.mjs --backfill-sessions');
+          lines.push(`WARNING: session-end may be failing — session ${newestDb} (${Math.round(hoursStale)}h old) has no Obsidian capture.`);
+          lines.push('Check ~/Obsidian Vault/Logs/session-end.log or run: node ~/.claude/knowledge-mcp/scripts/session-end.mjs --backfill-sessions');
         }
       }
     }

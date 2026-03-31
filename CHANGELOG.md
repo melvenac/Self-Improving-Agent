@@ -1,5 +1,28 @@
 # Changelog
 
+## [v0.5.3] - 2026-03-31
+
+Unified sync pipeline, structural consistency checks, and code maintainability cleanup. Inspired by Meta-Harness (Lee et al., 2026).
+
+### Added
+- **Unified `sync.mjs`:** Consolidated `sync-docs.mjs` (version sync) + `harness-eval.mjs` (structural checks) into single script — 31 checks covering versions, file references, hook configs, vault structure, and template consistency
+- **`/harness-audit` command:** Scope 2 deep semantic consistency audit — LLM agent cross-references all protocol documents for contradictions and drift. Run at minor/major releases
+- **Release checklist in RULES.md:** Scope 1 (every commit), Scope 2 (Y/X bumps), Scope 3 (quarterly)
+
+### Changed
+- **`/sync` command:** Now runs unified `sync.mjs` instead of `sync-docs.mjs` — one command for all consistency checks
+- **SessionEnd hook order fixed:** `session-end.mjs` now runs before `skill-scan.mjs` in settings.json (was wrong order)
+- **`session-end.mjs` paths:** `Guidelines/` → `Skill-Candidates/`, log file renamed from `vault-writer.log` → `session-end.log`
+- **`session-bootstrap.mjs`:** Updated health check warnings to reference `session-end.mjs` instead of removed `vault-writer.mjs`
+
+### Removed
+- **`sync-docs.mjs`:** Merged into `sync.mjs`
+- **`harness-eval.mjs`:** Merged into `sync.mjs`
+- **`/harness-eval` command:** Checks absorbed by `/sync`
+- **`vault-utils.mjs`:** Dead code — 12 exported functions, zero consumers since v0.5.0 consolidation
+- **`vault-writer.mjs` hook:** Removed dead reference from settings.json SessionEnd hooks
+- **Duplicate `session-bootstrap.mjs` hook:** Removed wrong-path duplicate from settings.json SessionStart hooks
+
 ## [v0.5.2] - 2026-03-31
 
 Skill-scan domain scoping, skill architecture cleanup, and enhanced skill rewrites.
