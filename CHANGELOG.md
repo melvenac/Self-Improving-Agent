@@ -1,5 +1,25 @@
 # Changelog
 
+## [v0.5.2] - 2026-03-31
+
+Skill-scan domain scoping, skill architecture cleanup, and enhanced skill rewrites.
+
+### Added
+- **Domain-scoped skill-scan:** `skill-scan.mjs` reads `.agents/SYSTEM/domains.json` to filter clusters to project-relevant domains (58 → 15 clusters for this project)
+- **`domains.json` config:** Projects define relevant domain tags; skill-scan uses forward-only TAG_EXPANSION to include related tags without pulling in unrelated stacks
+- **Enhanced convex skill:** `convex-development-patterns` v2.0 in `~/.claude/skills/` — 11 source experiences, severity tags, dual checklists, debugging decision tree
+- **Enhanced docker skill:** `docker-vps-deployment` v2.0 in `~/.claude/skills/` — 11 source experiences, severity tags, dual checklists, debugging decision tree
+- **Setup migration:** `setup.mjs` auto-renames `Guidelines/` → `Skill-Candidates/` on upgrade, registers `skill-scan.mjs` hook
+
+### Changed
+- **Skill architecture:** Global skills live in `~/.claude/skills/`, project skills in `.agents/skills/`, scan output in `~/Obsidian Vault/Skill-Candidates/` (was `Guidelines/`)
+- **skill-scan.mjs promoted:** Moved from `docs/temp/` draft to canonical `knowledge-mcp/scripts/`, installed copy synced
+- **All references updated:** `/start`, `/skill-scan`, `setup.mjs`, project-template commands, memory files, gap-analysis doc
+
+### Removed
+- **`docs/temp/` directory:** 9 deprecated draft scripts cleaned up
+- **`Guidelines/` folder:** Renamed to `Skill-Candidates/` for clarity; skills migrated to proper locations
+
 ## [v0.5.1] - 2026-03-30
 
 Pipeline simplification, knowledge quality improvements, and auto-feedback.

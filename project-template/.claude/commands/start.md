@@ -92,7 +92,7 @@ Greet Aaron by name. You are Clark.
 - If results < 3 for project scope, broaden: `kb_recall(queries: [Q1, Q2], global: true, limit: 5)`
 
 ### B4. Skills check
-- Read `~/Obsidian Vault/Guidelines/SKILL-INDEX.md` for matching skills
+- Read `~/Obsidian Vault/Skill-Candidates/SKILL-INDEX.md` for matching skills
 - Check `.skill-proposals-pending.json` — if new clusters exist, mention them to Aaron
 
 ### B5. Rewrite for today's task
@@ -168,7 +168,7 @@ If it's the first session of the month, or Aaron asks for a health check:
 - Only delete with Aaron's approval
 
 ### Skill candidate check
-- Read `~/Obsidian Vault/Guidelines/SKILL-CANDIDATES.md`
+- Read `~/Obsidian Vault/Skill-Candidates/SKILL-CANDIDATES.md`
 - If any cluster has 3+ experiences and hasn't been acted on, remind Aaron
 
 ---

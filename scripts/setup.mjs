@@ -207,7 +207,8 @@ function registerHooks() {
       path.join(scriptsBase, 'session-bootstrap.mjs')
     ],
     SessionEnd: [
-      path.join(scriptsBase, 'session-end.mjs')
+      path.join(scriptsBase, 'session-end.mjs'),
+      path.join(scriptsBase, 'skill-scan.mjs')
     ]
   };
 
@@ -272,13 +273,21 @@ function copySlashCommands() {
 
 function setupObsidianVault() {
   const vaultRoot = path.join(HOME, 'Obsidian Vault');
-  const dirs = ['Experiences', 'Guidelines', 'Sessions', 'Topics'];
+  const dirs = ['Experiences', 'Skill-Candidates', 'Sessions', 'Topics'];
   const templateFiles = {
-    [path.join(vaultRoot, 'Guidelines', 'SKILL-INDEX.md')]:
+    [path.join(vaultRoot, 'Skill-Candidates', 'SKILL-INDEX.md')]:
       '# Skill Index\n\n> Approved, reusable skills distilled from experience patterns.\n\n(none yet)\n',
-    [path.join(vaultRoot, 'Guidelines', 'SKILL-CANDIDATES.md')]:
+    [path.join(vaultRoot, 'Skill-Candidates', 'SKILL-CANDIDATES.md')]:
       '# Skill Candidates\n\n> Experience clusters that may be worth distilling into skills.\n\n(none yet)\n'
   };
+
+  // Migration: rename Guidelines/ → Skill-Candidates/ if the old name exists
+  const oldDir = path.join(vaultRoot, 'Guidelines');
+  const newDir = path.join(vaultRoot, 'Skill-Candidates');
+  if (fs.existsSync(oldDir) && !fs.existsSync(newDir)) {
+    fs.renameSync(oldDir, newDir);
+    log(OK, 'Migrated Guidelines/ → Skill-Candidates/');
+  }
 
   let created = 0;
 

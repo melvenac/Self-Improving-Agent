@@ -19,8 +19,8 @@ Group experiences by tag. Count how many experiences share each tag. Only keep c
 
 ### 3. Diff against current state
 
-- Read `~/Obsidian Vault/Guidelines/SKILL-INDEX.md` — note which skills already exist
-- Read `~/Obsidian Vault/Guidelines/SKILL-CANDIDATES.md` — note previous candidates and their counts
+- Read `~/Obsidian Vault/Skill-Candidates/SKILL-INDEX.md` — note which skills already exist
+- Read `~/Obsidian Vault/Skill-Candidates/SKILL-CANDIDATES.md` — note previous candidates and their counts
 
 Compare your fresh scan against SKILL-CANDIDATES.md:
 - **New cluster:** a tag crossed the 3+ threshold since last scan → flag it
@@ -29,7 +29,7 @@ Compare your fresh scan against SKILL-CANDIDATES.md:
 
 ### 4. Update SKILL-CANDIDATES.md
 
-Rewrite `~/Obsidian Vault/Guidelines/SKILL-CANDIDATES.md` with:
+Rewrite `~/Obsidian Vault/Skill-Candidates/SKILL-CANDIDATES.md` with:
 - Current date at the top
 - All clusters with 3+ experiences, sorted by count descending
 - For each cluster: tag name, count, list of experience filenames
