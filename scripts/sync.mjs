@@ -29,6 +29,7 @@ import { readFileSync, writeFileSync, existsSync, statSync, appendFileSync } fro
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
+import { createRequire } from "node:module";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -459,12 +460,279 @@ function printScoreHistory() {
   console.log();
 }
 
-// Stub scoring functions — filled in by subsequent tasks
-function scoreConfigStructure() {}
-function scoreKnowledgeQuality() {}
-function scoreStaleness() {}
-function scoreCoverage() {}
-function scorePipelineHealth() {}
+// ── DB helper ─────────────────────────────────────────────────────────
+
+function openKnowledgeDb() {
+  const dbPath = join(HOME, ".claude", "context-mode", "knowledge.db");
+  if (!existsSync(dbPath)) return null;
+  try {
+    // Resolve better-sqlite3 from knowledge-mcp's node_modules
+    const kmcpPkgPath = join(HOME, ".claude", "knowledge-mcp", "package.json");
+    let Database;
+    if (existsSync(kmcpPkgPath)) {
+      const require = createRequire(kmcpPkgPath);
+      Database = require("better-sqlite3");
+    } else {
+      // Fallback: try repo-local knowledge-mcp
+      const localPkgPath = join(ROOT, "knowledge-mcp", "package.json");
+      const require = createRequire(localPkgPath);
+      Database = require("better-sqlite3");
+    }
+    return new Database(dbPath, { readonly: true });
+  } catch (err) {
+    console.error(`[score] Failed to open knowledge.db: ${err.message}`);
+    return null;
+  }
+}
+
+// ── Scoring functions ─────────────────────────────────────────────────
+
+function scoreConfigStructure() {
+  const totalChecks = passed.length + issues.length + warnings.length;
+  if (totalChecks === 0) {
+    score("config", 0, 25, "no checks ran");
+    return;
+  }
+  const effectivePassed = passed.length + warnings.length * 0.5;
+  const points = Math.round((effectivePassed / totalChecks) * 25);
+  score("config", points, 25,
+    points < 25 ? `${issues.length} issues, ${warnings.length} warnings` : "all checks pass"
+  );
+}
+
+function scoreKnowledgeQuality() {
+  const db = openKnowledgeDb();
+  if (!db) { score("knowledge", 0, 25, "knowledge.db not found"); return; }
+
+  try {
+    // Recall precision: % of feedback-rated entries marked helpful (10 pts)
+    const feedback = db.prepare(`
+      SELECT
+        SUM(helpful_count) as helpful,
+        SUM(harmful_count) as harmful,
+        SUM(neutral_count) as neutral
+      FROM knowledge
+      WHERE helpful_count + harmful_count + neutral_count > 0
+    `).get();
+
+    if (feedback && (feedback.helpful + feedback.harmful + feedback.neutral) > 0) {
+      const total = feedback.helpful + feedback.harmful + feedback.neutral;
+      const precision = feedback.helpful / total;
+      const pts = Math.round(precision * 10);
+      score("knowledge", pts, 10, pts < 10 ? `${Math.round(precision * 100)}% recall precision` : "high recall precision");
+    } else {
+      score("knowledge", 5, 10, "no feedback data yet");
+    }
+
+    // Feedback coverage: % of entries with at least 1 rating (8 pts)
+    const totalK = db.prepare("SELECT COUNT(*) as c FROM knowledge").get();
+    const rated = db.prepare("SELECT COUNT(*) as c FROM knowledge WHERE helpful_count + harmful_count + neutral_count > 0").get();
+
+    if (totalK.c > 0) {
+      const coverage = rated.c / totalK.c;
+      const pts = Math.round(coverage * 8);
+      score("knowledge", pts, 8, pts < 8 ? `${rated.c}/${totalK.c} entries have feedback` : "good feedback coverage");
+    } else {
+      score("knowledge", 0, 8, "no knowledge entries");
+    }
+
+    // Dedup check (7 pts)
+    const dupes = db.prepare(`
+      SELECT COUNT(*) as c FROM (
+        SELECT SUBSTR(key, 1, 20) as prefix
+        FROM knowledge WHERE key IS NOT NULL
+        GROUP BY prefix HAVING COUNT(*) > 1
+      )
+    `).get();
+
+    const dupePenalty = Math.min(dupes.c * 2, 7);
+    score("knowledge", 7 - dupePenalty, 7, dupes.c > 0 ? `${dupes.c} potential duplicate clusters` : "no duplicates detected");
+  } catch (err) {
+    score("knowledge", 0, 25, `query error: ${err.message}`);
+  } finally {
+    db.close();
+  }
+}
+
+function scoreStaleness() {
+  const db = openKnowledgeDb();
+  if (!db) { score("staleness", 0, 20, "knowledge.db not found"); return; }
+
+  try {
+    // Never-recalled entries 90+ days old (10 pts)
+    const staleEntries = db.prepare("SELECT COUNT(*) as c FROM knowledge WHERE recall_count = 0 AND created_at < datetime('now', '-90 days')").get();
+    const totalK = db.prepare("SELECT COUNT(*) as c FROM knowledge").get();
+
+    if (totalK.c > 0) {
+      const staleRatio = staleEntries.c / totalK.c;
+      const pts = Math.round((1 - Math.min(staleRatio * 2, 1)) * 10);
+      score("staleness", pts, 10, staleEntries.c > 0 ? `${staleEntries.c} entries never recalled (90+ days)` : "no stale entries");
+    } else {
+      score("staleness", 10, 10, "no entries to check");
+    }
+
+    // Low success rate entries (5 pts)
+    const lowRate = db.prepare("SELECT COUNT(*) as c FROM knowledge WHERE success_rate IS NOT NULL AND success_rate < 0.3 AND helpful_count + harmful_count + neutral_count >= 3").get();
+    const pts2 = lowRate.c === 0 ? 5 : Math.max(0, 5 - lowRate.c);
+    score("staleness", pts2, 5, lowRate.c > 0 ? `${lowRate.c} entries below 0.3 success rate` : "no low-quality entries");
+
+    // Summary coverage (5 pts)
+    const totalSessions = db.prepare("SELECT COUNT(*) as c FROM sessions WHERE event_count >= 3").get();
+    const summarized = db.prepare("SELECT COUNT(*) as c FROM summaries").get();
+
+    if (totalSessions.c > 0) {
+      const ratio = summarized.c / totalSessions.c;
+      const pts3 = Math.round(ratio * 5);
+      score("staleness", pts3, 5, pts3 < 5 ? `${summarized.c}/${totalSessions.c} sessions summarized` : "all sessions summarized");
+    } else {
+      score("staleness", 5, 5, "no sessions to check");
+    }
+  } catch (err) {
+    score("staleness", 0, 20, `query error: ${err.message}`);
+  } finally {
+    db.close();
+  }
+}
+
+function scoreCoverage() {
+  const db = openKnowledgeDb();
+  if (!db) { score("coverage", 0, 20, "knowledge.db not found"); return; }
+
+  try {
+    // Domain coverage from domains.json (10 pts)
+    const domainsPath = join(ROOT, ".agents", "SYSTEM", "domains.json");
+    if (existsSync(domainsPath)) {
+      const domains = JSON.parse(readFileSync(domainsPath, "utf-8"));
+      const domainTags = domains.tags || [];
+      let covered = 0;
+      for (const tag of domainTags) {
+        const match = db.prepare("SELECT COUNT(*) as c FROM knowledge WHERE tags LIKE ?").get(`%${tag}%`);
+        if (match.c >= 2) covered++;
+      }
+      if (domainTags.length > 0) {
+        const ratio = covered / domainTags.length;
+        const pts = Math.round(ratio * 10);
+        score("coverage", pts, 10, pts < 10 ? `${covered}/${domainTags.length} domains have 2+ experiences` : "all domains covered");
+      } else {
+        score("coverage", 5, 10, "no domains.json tags defined");
+      }
+    } else {
+      score("coverage", 5, 10, "no domains.json found");
+    }
+
+    // Maturity distribution (5 pts)
+    const maturity = db.prepare("SELECT COUNT(CASE WHEN maturity = 'mature' THEN 1 END) as mature, COUNT(CASE WHEN maturity = 'proven' THEN 1 END) as proven, COUNT(*) as total FROM knowledge").get();
+    if (maturity.total > 0) {
+      const matureRatio = (maturity.mature + maturity.proven * 0.5) / maturity.total;
+      const pts = Math.round(Math.min(matureRatio * 2, 1) * 5);
+      score("coverage", pts, 5, `${maturity.mature} mature, ${maturity.proven} proven of ${maturity.total}`);
+    } else {
+      score("coverage", 0, 5, "no knowledge entries");
+    }
+
+    // Skill conversion (5 pts)
+    const VAULT_PATH = join(HOME, "Obsidian Vault");
+    const candidatesPath = join(VAULT_PATH, "Skill-Candidates", "SKILL-CANDIDATES.md");
+    const skillIndexPath = join(VAULT_PATH, "Skill-Candidates", "SKILL-INDEX.md");
+    let clusterCount = 0;
+    let skillCount = 0;
+    if (existsSync(candidatesPath)) {
+      const content = readFileSync(candidatesPath, "utf-8");
+      clusterCount = (content.match(/### \S+ \(\d+ experiences?\)/g) || []).length;
+    }
+    if (existsSync(skillIndexPath)) {
+      const content = readFileSync(skillIndexPath, "utf-8");
+      skillCount = (content.match(/has skill/g) || []).length;
+    }
+    if (clusterCount > 0) {
+      const ratio = skillCount / clusterCount;
+      const pts = Math.round(Math.min(ratio * 2, 1) * 5);
+      score("coverage", pts, 5, `${skillCount}/${clusterCount} clusters have skills`);
+    } else {
+      score("coverage", 5, 5, "no skill clusters yet");
+    }
+  } catch (err) {
+    score("coverage", 0, 20, `error: ${err.message}`);
+  } finally {
+    db.close();
+  }
+}
+
+function scorePipelineHealth() {
+  // SessionEnd hooks ran recently (4 pts)
+  const logPath = join(HOME, "Obsidian Vault", "Logs", "session-end.log");
+  if (existsSync(logPath)) {
+    try {
+      const stat = statSync(logPath);
+      const hoursAgo = (Date.now() - stat.mtimeMs) / (1000 * 60 * 60);
+      if (hoursAgo <= 24) {
+        score("pipeline", 4, 4, "hooks ran within 24h");
+      } else if (hoursAgo <= 168) {
+        score("pipeline", 2, 4, `hooks last ran ${Math.round(hoursAgo)}h ago`);
+      } else {
+        score("pipeline", 0, 4, `hooks last ran ${Math.round(hoursAgo / 24)}d ago`);
+      }
+    } catch {
+      score("pipeline", 0, 4, "cannot read log file");
+    }
+  } else {
+    score("pipeline", 0, 4, "no session-end.log found");
+  }
+
+  // Score trend (3 pts)
+  const historyPath = join(HOME, ".claude", "knowledge-mcp", "score-history.jsonl");
+  if (existsSync(historyPath)) {
+    try {
+      const lines = readFileSync(historyPath, "utf-8").trim().split("\n").filter(Boolean);
+      const entries = lines.slice(-5).map(l => JSON.parse(l));
+      if (entries.length >= 2) {
+        const first = entries[0].total;
+        const last = entries[entries.length - 1].total;
+        const diff = last - first;
+        if (diff > 0) score("pipeline", 3, 3, `improving (+${diff} over ${entries.length} sessions)`);
+        else if (diff === 0) score("pipeline", 2, 3, "stable");
+        else score("pipeline", 1, 3, `declining (${diff} over ${entries.length} sessions)`);
+      } else {
+        score("pipeline", 1, 3, "not enough history for trend");
+      }
+    } catch {
+      score("pipeline", 0, 3, "cannot read score history");
+    }
+  } else {
+    score("pipeline", 1, 3, "no score history yet");
+  }
+
+  // Shadow-recall log (3 pts)
+  const shadowPath = join(HOME, ".claude", "knowledge-mcp", "shadow-recall.jsonl");
+  if (existsSync(shadowPath)) {
+    try {
+      const stat = statSync(shadowPath);
+      const hoursAgo = (Date.now() - stat.mtimeMs) / (1000 * 60 * 60);
+      score("pipeline", hoursAgo <= 168 ? 3 : 1, 3, hoursAgo <= 168 ? "shadow-recall data is recent" : "shadow-recall data is stale");
+    } catch {
+      score("pipeline", 0, 3, "cannot read shadow-recall log");
+    }
+  } else {
+    score("pipeline", 0, 3, "no shadow-recall data yet");
+  }
+}
+
+function appendScoreHistory(sessionNumber) {
+  const total = Object.values(scoreCategories).reduce((s, c) => s + Math.min(c.points, c.max), 0);
+  const entry = {
+    date: new Date().toISOString().slice(0, 10),
+    session: sessionNumber || null,
+    project: "self-improving-agent",
+    total,
+    config: Math.min(scoreCategories.config.points, scoreCategories.config.max),
+    knowledge: Math.min(scoreCategories.knowledge.points, scoreCategories.knowledge.max),
+    staleness: Math.min(scoreCategories.staleness.points, scoreCategories.staleness.max),
+    coverage: Math.min(scoreCategories.coverage.points, scoreCategories.coverage.max),
+    pipeline: Math.min(scoreCategories.pipeline.points, scoreCategories.pipeline.max),
+  };
+  const historyPath = join(HOME, ".claude", "knowledge-mcp", "score-history.jsonl");
+  appendFileSync(historyPath, JSON.stringify(entry) + "\n");
+}
 
 // ── Run all checks ─────────────────────────────────────────────────
 
@@ -492,6 +760,9 @@ if (scoreMode) {
   scoreCoverage();
   scorePipelineHealth();
   printScoreReport();
+  if (!scoreJson) {
+    appendScoreHistory();
+  }
 } else {
   // ── Report ─────────────────────────────────────────────────────────
   console.log();
