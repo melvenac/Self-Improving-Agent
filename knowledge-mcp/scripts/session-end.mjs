@@ -5,6 +5,7 @@
  * Pipeline:
  *   Stage 1: Index — session events → knowledge.db chunks
  *   Stage 2: Skill scan — cluster experiences for skill candidates
+ *   Stage 3: Shadow-recall — replay queries with alternative search strategies
  *
  * CLI flags:
  *   --backfill-sessions    Reprocess all .db files
@@ -35,6 +36,10 @@ const SESSIONS_DB_DIR = join(KB_DIR, 'sessions');
 const CANDIDATES_FILE = join(VAULT_PATH, 'Skill-Candidates', 'SKILL-CANDIDATES.md');
 const SKILL_INDEX_FILE = join(VAULT_PATH, 'Skill-Candidates', 'SKILL-INDEX.md');
 const CLUSTER_THRESHOLD = 3;
+
+// Shadow-recall paths
+const SHADOW_LOG_PATH = join(HOME, '.claude', 'knowledge-mcp', 'shadow-recall.jsonl');
+const RECALLED_ENTRIES_PATH = join(HOME, '.claude', 'context-mode', '.recalled-entries.json');
 
 // ---------------------------------------------------------------------------
 // Utilities
@@ -342,6 +347,192 @@ function runStage2SkillScan() {
   }
 
   log(`Stage 2: Complete — ${significant.length} clusters, ${newClusters.length} new, ${growingClusters.length} growing (scanned ${files.length} experiences)`);
+}
+
+// ---------------------------------------------------------------------------
+// Stage 3: Shadow-recall — replay queries with alternative strategies
+// ---------------------------------------------------------------------------
+
+function sanitizeFtsQuery(query) {
+  return query
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(word => `"${word.replace(/"/g, '""')}"`)
+    .join(' ');
+}
+
+function ftsOnlySearch(db, query, limit = 5) {
+  const safeQuery = sanitizeFtsQuery(query);
+  try {
+    return db.prepare(`
+      SELECT k.id, k.key,
+        (bm25(knowledge_fts) * (1.0 + MAX(0, julianday('now') - julianday(k.created_at)) * 0.005)) as score
+      FROM knowledge_fts
+      JOIN knowledge k ON k.id = knowledge_fts.rowid
+      WHERE knowledge_fts MATCH ?
+      ORDER BY score
+      LIMIT ?
+    `).all(safeQuery, limit).map((r, i) => ({ id: r.id, key: r.key, rank: i + 1 }));
+  } catch {
+    return [];
+  }
+}
+
+function vectorOnlySearch(db, queryVec, vecToBufferFn, limit = 5) {
+  try {
+    const rows = db.prepare(`
+      SELECT rowid, distance
+      FROM knowledge_vec
+      WHERE embedding MATCH ?
+      ORDER BY distance
+      LIMIT ?
+    `).all(vecToBufferFn(queryVec), limit);
+
+    return rows
+      .filter(r => Number(r.rowid) > 0)
+      .map((r, i) => {
+        const k = db.prepare("SELECT id, key FROM knowledge WHERE id = ?").get(Number(r.rowid));
+        return k ? { id: k.id, key: k.key, rank: i + 1 } : null;
+      })
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function weightedRrf(ftsResults, vecResults, ftsWeight = 1.0, vecWeight = 1.0, K = 60, limit = 5) {
+  const ftsRankMap = new Map();
+  ftsResults.forEach((r, i) => ftsRankMap.set(r.id, i));
+
+  const vecRankMap = new Map();
+  vecResults.forEach((r, i) => vecRankMap.set(r.id, i));
+
+  const allIds = new Set([...ftsResults.map(r => r.id), ...vecResults.map(r => r.id)]);
+  const scored = [];
+
+  for (const id of allIds) {
+    let rrfScore = 0;
+    const ftsRank = ftsRankMap.get(id);
+    const vecRank = vecRankMap.get(id);
+    if (ftsRank !== undefined) rrfScore += ftsWeight * (1 / (K + ftsRank));
+    if (vecRank !== undefined) rrfScore += vecWeight * (1 / (K + vecRank));
+
+    const entry = ftsResults.find(r => r.id === id) || vecResults.find(r => r.id === id);
+    scored.push({ id: entry.id, key: entry.key, rrfScore });
+  }
+
+  scored.sort((a, b) => b.rrfScore - a.rrfScore);
+  return scored.slice(0, limit).map((r, i) => ({ id: r.id, key: r.key, rank: i + 1 }));
+}
+
+async function runStage3ShadowRecall() {
+  log('Stage 3: Shadow-recall — replay queries with alternative strategies');
+
+  if (!existsSync(RECALLED_ENTRIES_PATH)) {
+    log('Stage 3: No .recalled-entries.json — skipping (no recalls this session)');
+    return;
+  }
+
+  let recalled;
+  try {
+    recalled = JSON.parse(readFileSync(RECALLED_ENTRIES_PATH, 'utf8'));
+  } catch (err) {
+    log(`Stage 3: Failed to parse recalled entries: ${err.message}`);
+    return;
+  }
+
+  if (!recalled.queries || recalled.queries.length === 0) {
+    log('Stage 3: No queries recorded in .recalled-entries.json — skipping');
+    return;
+  }
+
+  if (!existsSync(KB_PATH)) {
+    log('Stage 3: Knowledge DB not found — skipping');
+    return;
+  }
+
+  const db = new Database(KB_PATH, { readonly: true });
+  let vecAvailable = false;
+  let embedTextFn = null;
+  let vecToBufferFn = null;
+
+  try {
+    sqliteVec.load(db);
+  } catch {
+    log('Stage 3: sqlite-vec not available — vector strategies will be skipped');
+  }
+
+  try {
+    const embedModule = await import('../build/embed.js');
+    await embedModule.initEmbeddings();
+    if (embedModule.embeddingsAvailable()) {
+      embedTextFn = embedModule.embedText;
+      vecToBufferFn = embedModule.vecToBuffer;
+      vecAvailable = true;
+    }
+  } catch {
+    log('Stage 3: Embeddings not available — vector strategies will be skipped');
+  }
+
+  const limit = 5;
+  const entry = {
+    date: today(),
+    session_id: recalled.session_start || new Date().toISOString(),
+    queries: recalled.queries,
+    strategies: {
+      current: { results: [], helpful_count: null },
+      fts5_only: { results: [], helpful_count: null },
+      vector_only: { results: [], helpful_count: null },
+      rrf_70_30: { results: [], helpful_count: null },
+      rrf_30_70: { results: [], helpful_count: null },
+    },
+  };
+
+  for (const query of recalled.queries) {
+    const ftsResults = ftsOnlySearch(db, query, limit * 2);
+
+    let vecResults = [];
+    if (vecAvailable) {
+      try {
+        const queryVec = await embedTextFn(query);
+        if (queryVec) {
+          vecResults = vectorOnlySearch(db, queryVec, vecToBufferFn, limit * 2);
+        }
+      } catch {}
+    }
+
+    if (vecAvailable && vecResults.length > 0) {
+      entry.strategies.current.results.push(...weightedRrf(ftsResults, vecResults, 1.0, 1.0, 60, limit));
+      entry.strategies.rrf_70_30.results.push(...weightedRrf(ftsResults, vecResults, 0.7, 0.3, 60, limit));
+      entry.strategies.rrf_30_70.results.push(...weightedRrf(ftsResults, vecResults, 0.3, 0.7, 60, limit));
+    } else {
+      entry.strategies.current.results.push(...ftsResults.slice(0, limit));
+    }
+
+    entry.strategies.fts5_only.results.push(...ftsResults.slice(0, limit));
+    entry.strategies.vector_only.results.push(...vecResults.slice(0, limit));
+  }
+
+  // Backfill helpful_count from feedback data
+  for (const [, strategy] of Object.entries(entry.strategies)) {
+    let helpfulCount = 0;
+    for (const result of strategy.results) {
+      try {
+        const fb = db.prepare('SELECT helpful_count FROM knowledge WHERE id = ? AND helpful_count > 0').get(result.id);
+        if (fb) helpfulCount++;
+      } catch {}
+    }
+    strategy.helpful_count = helpfulCount;
+  }
+
+  db.close();
+
+  try {
+    appendFileSync(SHADOW_LOG_PATH, JSON.stringify(entry) + '\n');
+    log(`Stage 3: Shadow-recall logged ${Object.keys(entry.strategies).length} strategies for ${recalled.queries.length} queries`);
+  } catch (err) {
+    log(`Stage 3: Failed to write shadow log: ${err.message}`);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -745,9 +936,15 @@ if (isDirectRun) {
       log(`Auto-feedback FAILED: ${err.message}\n${err.stack}`);
     }
 
+    try {
+      await runStage3ShadowRecall();
+    } catch (err) {
+      log(`Stage 3 FAILED: ${err.message}\n${err.stack}`);
+    }
+
     log('Pipeline complete');
   }
 }
 
 // Export for potential programmatic use
-export { runStage1Index, runStage2SkillScan };
+export { runStage1Index, runStage2SkillScan, runStage3ShadowRecall };
