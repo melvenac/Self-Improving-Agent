@@ -31,7 +31,7 @@
  *   node scripts/sync.mjs --history    # score trend across sessions
  */
 
-import { readFileSync, writeFileSync, existsSync, statSync, appendFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, statSync, appendFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
@@ -736,7 +736,9 @@ function appendScoreHistory(sessionNumber) {
     coverage: Math.min(scoreCategories.coverage.points, scoreCategories.coverage.max),
     pipeline: Math.min(scoreCategories.pipeline.points, scoreCategories.pipeline.max),
   };
-  const historyPath = join(HOME, ".claude", "knowledge-mcp", "score-history.jsonl");
+  const historyDir = join(HOME, ".claude", "knowledge-mcp");
+  if (!existsSync(historyDir)) { mkdirSync(historyDir, { recursive: true }); }
+  const historyPath = join(historyDir, "score-history.jsonl");
   appendFileSync(historyPath, JSON.stringify(entry) + "\n");
 }
 

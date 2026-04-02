@@ -13,7 +13,7 @@
  *   --backfill-vectors     Embed all knowledge + summaries into knowledge_vec
  */
 
-import { existsSync, readdirSync, readFileSync, writeFileSync, appendFileSync, statSync, unlinkSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync, appendFileSync, statSync, unlinkSync, mkdirSync } from 'fs';
 import { join, basename } from 'path';
 import { homedir } from 'os';
 import Database from 'better-sqlite3';
@@ -361,18 +361,30 @@ function sanitizeFtsQuery(query) {
     .join(' ');
 }
 
+function maturityBoostFactor(maturity, successRate) {
+  if (maturity === 'mature') return 1.5;
+  if (maturity === 'proven') return 1.2;
+  if (successRate !== null && successRate < 0.3) return 0.5;
+  return 1.0;
+}
+
 function ftsOnlySearch(db, query, limit = 5) {
   const safeQuery = sanitizeFtsQuery(query);
   try {
     return db.prepare(`
-      SELECT k.id, k.key,
+      SELECT k.id, k.key, k.maturity, k.success_rate,
         (bm25(knowledge_fts) * (1.0 + MAX(0, julianday('now') - julianday(k.created_at)) * 0.005)) as score
       FROM knowledge_fts
       JOIN knowledge k ON k.id = knowledge_fts.rowid
       WHERE knowledge_fts MATCH ?
       ORDER BY score
       LIMIT ?
-    `).all(safeQuery, limit).map((r, i) => ({ id: r.id, key: r.key, rank: i + 1 }));
+    `).all(safeQuery, limit).map((r, i) => ({
+      id: r.id,
+      key: r.key,
+      rank: i + 1,
+      boost: maturityBoostFactor(r.maturity, r.success_rate),
+    }));
   } catch {
     return [];
   }
@@ -391,8 +403,8 @@ function vectorOnlySearch(db, queryVec, vecToBufferFn, limit = 5) {
     return rows
       .filter(r => Number(r.rowid) > 0)
       .map((r, i) => {
-        const k = db.prepare("SELECT id, key FROM knowledge WHERE id = ?").get(Number(r.rowid));
-        return k ? { id: k.id, key: k.key, rank: i + 1 } : null;
+        const k = db.prepare("SELECT id, key, maturity, success_rate FROM knowledge WHERE id = ?").get(Number(r.rowid));
+        return k ? { id: k.id, key: k.key, rank: i + 1, boost: maturityBoostFactor(k.maturity, k.success_rate) } : null;
       })
       .filter(Boolean);
   } catch {
@@ -418,7 +430,8 @@ function weightedRrf(ftsResults, vecResults, ftsWeight = 1.0, vecWeight = 1.0, K
     if (vecRank !== undefined) rrfScore += vecWeight * (1 / (K + vecRank));
 
     const entry = ftsResults.find(r => r.id === id) || vecResults.find(r => r.id === id);
-    scored.push({ id: entry.id, key: entry.key, rrfScore });
+    const boost = entry.boost || 1.0;
+    scored.push({ id: entry.id, key: entry.key, rrfScore: rrfScore * boost });
   }
 
   scored.sort((a, b) => b.rrfScore - a.rrfScore);
@@ -528,6 +541,8 @@ async function runStage3ShadowRecall() {
   db.close();
 
   try {
+    const shadowDir = join(HOME, '.claude', 'knowledge-mcp');
+    if (!existsSync(shadowDir)) { mkdirSync(shadowDir, { recursive: true }); }
     appendFileSync(SHADOW_LOG_PATH, JSON.stringify(entry) + '\n');
     log(`Stage 3: Shadow-recall logged ${Object.keys(entry.strategies).length} strategies for ${recalled.queries.length} queries`);
   } catch (err) {
