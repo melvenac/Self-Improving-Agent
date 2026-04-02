@@ -1,5 +1,16 @@
 # Changelog
 
+## [v0.5.4] - 2026-04-02
+
+### Added
+- **Protocol health scoring:** `sync.mjs --score` computes a deterministic 0-100 health score across 5 categories (config & structure, knowledge quality, staleness, coverage, pipeline health). `--score --json` for machine-readable output. `--history` shows trend across sessions.
+- **Shadow-recall:** `session-end.mjs` Stage 3 replays recall queries with alternative search strategies (FTS-only, vector-only, weighted RRF variants) and logs comparisons to `shadow-recall.jsonl` for future proposer analysis.
+- **Score history:** Each `--score` run auto-appends to `~/.claude/knowledge-mcp/score-history.jsonl` for trend tracking.
+- **`/start` updated:** Monthly maintenance now includes protocol health score reporting. `.recalled-entries.json` now includes `queries` array for shadow-recall replay.
+
+### Fixed
+- **Stale references:** Fixed 8 references to removed scripts (`sync-docs.mjs`, `vault-writer.mjs`, `harness-eval.mjs`) across 6 files including global commands, project template, CLAUDE.md, and session-bootstrap.mjs.
+
 ## [v0.5.3] - 2026-03-31
 
 Unified sync pipeline, structural consistency checks, and code maintainability cleanup. Inspired by Meta-Harness (Lee et al., 2026).

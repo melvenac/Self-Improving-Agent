@@ -1,15 +1,11 @@
 #!/usr/bin/env node
 /**
- * sync.mjs — Unified consistency checker for the Self-Improving Agent
+ * sync.mjs — Unified consistency checker + protocol health scoring
  *
- * Combines version synchronization (formerly sync-docs.mjs) with structural
- * consistency checks (formerly harness-eval.mjs) into a single script.
+ * Combines version synchronization, structural consistency checks,
+ * and protocol health scoring into a single script.
  *
- * Inspired by Meta-Harness (Lee et al., 2026): don't compress diagnostic signal.
- * Traces file references, version numbers, hook configs, and cross-document
- * consistency across the entire protocol.
- *
- * Checks:
+ * Checks (31):
  *   1. Version sync — package.json → README, PRD, knowledge-mcp/package.json
  *   2. CHANGELOG — entry exists for current version
  *   3. README — all referenced scripts/files exist, no stale references
@@ -20,9 +16,19 @@
  *   8. Obsidian vault — expected directories exist
  *   9. Template — project-template/ mirrors expected structure
  *
+ * Scoring (5 categories, 100 pts):
+ *   Config & Structure (25) — existing checks normalized
+ *   Knowledge Quality (25) — recall precision, feedback coverage, dedup
+ *   Staleness (20) — unrecalled entries, low success rate, summary gaps
+ *   Coverage (20) — domain coverage, maturity distribution, skill conversion
+ *   Pipeline Health (10) — hook recency, score trend, shadow-recall data
+ *
  * Usage:
- *   node scripts/sync.mjs          # auto-fix versions + full report
- *   node scripts/sync.mjs --check  # report only, exit 1 if issues found
+ *   node scripts/sync.mjs              # auto-fix versions + full report
+ *   node scripts/sync.mjs --check      # report only, exit 1 if issues found
+ *   node scripts/sync.mjs --score      # protocol health score (queries knowledge.db)
+ *   node scripts/sync.mjs --score --json  # machine-readable score
+ *   node scripts/sync.mjs --history    # score trend across sessions
  */
 
 import { readFileSync, writeFileSync, existsSync, statSync, appendFileSync } from "node:fs";
