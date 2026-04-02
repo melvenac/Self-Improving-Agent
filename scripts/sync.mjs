@@ -25,7 +25,7 @@
  *   node scripts/sync.mjs --check  # report only, exit 1 if issues found
  */
 
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, statSync, appendFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
@@ -34,6 +34,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const HOME = homedir();
 const checkOnly = process.argv.includes("--check");
+const scoreMode = process.argv.includes("--score");
+const historyMode = process.argv.includes("--history");
+const scoreJson = scoreMode && process.argv.includes("--json");
 
 const issues = [];
 const warnings = [];
@@ -70,6 +73,22 @@ function fix(category, field, from, to) {
 
 function pass(category, message) {
   passed.push({ category, message });
+}
+
+// ── Scoring ────────────────────────────────────────────────────────
+const scoreCategories = {
+  config:    { points: 0, max: 25, details: [] },
+  knowledge: { points: 0, max: 25, details: [] },
+  staleness: { points: 0, max: 20, details: [] },
+  coverage:  { points: 0, max: 20, details: [] },
+  pipeline:  { points: 0, max: 10, details: [] },
+};
+
+function score(category, points, max, detail) {
+  const cat = scoreCategories[category];
+  if (!cat) return;
+  cat.points += points;
+  cat.details.push({ points, max, detail });
 }
 
 // ── Read authoritative source ───────────────────────────────────────
@@ -381,7 +400,78 @@ function checkTemplate() {
   }
 }
 
+function printScoreReport() {
+  const total = Object.values(scoreCategories).reduce((s, c) => s + Math.min(c.points, c.max), 0);
+  const maxTotal = Object.values(scoreCategories).reduce((s, c) => s + c.max, 0);
+
+  if (scoreJson) {
+    const result = {
+      date: new Date().toISOString().slice(0, 10),
+      total,
+      config: Math.min(scoreCategories.config.points, scoreCategories.config.max),
+      knowledge: Math.min(scoreCategories.knowledge.points, scoreCategories.knowledge.max),
+      staleness: Math.min(scoreCategories.staleness.points, scoreCategories.staleness.max),
+      coverage: Math.min(scoreCategories.coverage.points, scoreCategories.coverage.max),
+      pipeline: Math.min(scoreCategories.pipeline.points, scoreCategories.pipeline.max),
+      details: scoreCategories,
+    };
+    console.log(JSON.stringify(result));
+    return;
+  }
+
+  console.log(`\nProtocol Health Score: ${total}/${maxTotal}\n`);
+  for (const [name, cat] of Object.entries(scoreCategories)) {
+    const catScore = Math.min(cat.points, cat.max);
+    const bar = "\u2588".repeat(Math.round(catScore / cat.max * 20)).padEnd(20, "\u2591");
+    const detailSummary = cat.details.filter(d => d.points < d.max).map(d => d.detail).join(", ");
+    console.log(`  ${name.padEnd(18)} ${String(catScore).padStart(2)}/${cat.max}  ${bar}  ${detailSummary ? `(${detailSummary})` : ""}`);
+  }
+  console.log();
+}
+
+function printScoreHistory() {
+  const historyPath = join(HOME, ".claude", "knowledge-mcp", "score-history.jsonl");
+  if (!existsSync(historyPath)) {
+    console.log("No score history found. Run --score to start tracking.");
+    return;
+  }
+  const lines = readFileSync(historyPath, "utf-8").trim().split("\n").filter(Boolean);
+  if (lines.length === 0) {
+    console.log("Score history is empty.");
+    return;
+  }
+
+  console.log("\nProtocol Health Score History:\n");
+  const entries = lines.map(l => JSON.parse(l));
+  for (const e of entries) {
+    const bar = "\u2588".repeat(Math.round(e.total / 100 * 30)).padEnd(30, "\u2591");
+    const session = e.session ? `Session ${String(e.session).padStart(2)}` : e.date;
+    console.log(`  ${session}: ${String(e.total).padStart(3)}  ${bar}`);
+  }
+
+  if (entries.length >= 2) {
+    const first = entries[0].total;
+    const last = entries[entries.length - 1].total;
+    const diff = last - first;
+    const trend = diff > 0 ? `+${diff} (improving)` : diff < 0 ? `${diff} (declining)` : "unchanged";
+    console.log(`\n  Trend: ${trend} over ${entries.length} sessions`);
+  }
+  console.log();
+}
+
+// Stub scoring functions — filled in by subsequent tasks
+function scoreConfigStructure() {}
+function scoreKnowledgeQuality() {}
+function scoreStaleness() {}
+function scoreCoverage() {}
+function scorePipelineHealth() {}
+
 // ── Run all checks ─────────────────────────────────────────────────
+
+if (historyMode) {
+  printScoreHistory();
+  process.exit(0);
+}
 
 syncReadmeVersion();
 syncPrdVersion();
@@ -395,42 +485,50 @@ checkClaudeMd();
 checkObsidianVault();
 checkTemplate();
 
-// ── Report ─────────────────────────────────────────────────────────
+if (scoreMode) {
+  scoreConfigStructure();
+  scoreKnowledgeQuality();
+  scoreStaleness();
+  scoreCoverage();
+  scorePipelineHealth();
+  printScoreReport();
+} else {
+  // ── Report ─────────────────────────────────────────────────────────
+  console.log();
 
-console.log();
-
-if (fixes.length > 0) {
-  console.log(`🔧 FIXED (${fixes.length}):\n`);
-  for (const f of fixes) {
-    console.log(`  [${f.category}] ${f.field}: "${f.from}" → "${f.to}"`);
+  if (fixes.length > 0) {
+    console.log(`\u{1f527} FIXED (${fixes.length}):\n`);
+    for (const f of fixes) {
+      console.log(`  [${f.category}] ${f.field}: "${f.from}" \u2192 "${f.to}"`);
+    }
+    console.log();
   }
+
+  if (issues.length > 0) {
+    console.log(`\u274c ISSUES (${issues.length}):\n`);
+    for (const i of issues) {
+      console.log(`  [${i.category}] ${i.message}`);
+      if (i.detail) console.log(`    \u2192 ${i.detail}`);
+    }
+    console.log();
+  }
+
+  if (warnings.length > 0) {
+    console.log(`\u26a0\ufe0f  WARNINGS (${warnings.length}):\n`);
+    for (const w of warnings) {
+      console.log(`  [${w.category}] ${w.message}`);
+      if (w.detail) console.log(`    \u2192 ${w.detail}`);
+    }
+    console.log();
+  }
+
+  const totalIssues = issues.length - fixes.length;
+  console.log(`\u2705 PASSED: ${passed.length} checks`);
+  console.log(`\u{1f527} FIXED: ${fixes.length}`);
+  console.log(`\u26a0\ufe0f  WARNINGS: ${warnings.length}`);
+  console.log(`\u274c ISSUES: ${totalIssues > 0 ? totalIssues : 0}`);
   console.log();
 }
-
-if (issues.length > 0) {
-  console.log(`❌ ISSUES (${issues.length}):\n`);
-  for (const i of issues) {
-    console.log(`  [${i.category}] ${i.message}`);
-    if (i.detail) console.log(`    → ${i.detail}`);
-  }
-  console.log();
-}
-
-if (warnings.length > 0) {
-  console.log(`⚠️  WARNINGS (${warnings.length}):\n`);
-  for (const w of warnings) {
-    console.log(`  [${w.category}] ${w.message}`);
-    if (w.detail) console.log(`    → ${w.detail}`);
-  }
-  console.log();
-}
-
-const totalIssues = issues.length - fixes.length; // fixed issues don't count
-console.log(`✅ PASSED: ${passed.length} checks`);
-console.log(`🔧 FIXED: ${fixes.length}`);
-console.log(`⚠️  WARNINGS: ${warnings.length}`);
-console.log(`❌ ISSUES: ${totalIssues > 0 ? totalIssues : 0}`);
-console.log();
 
 if (checkOnly && issues.length > 0) {
   process.exit(1);
