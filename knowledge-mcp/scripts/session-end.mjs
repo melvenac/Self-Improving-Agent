@@ -808,6 +808,44 @@ async function backfillVectors() {
 }
 
 // ---------------------------------------------------------------------------
+// Reference detection: scan session chunks for explicit KB entry mentions
+// ---------------------------------------------------------------------------
+
+/**
+ * Scan session chunks for explicit references to recalled knowledge entries.
+ * Returns a Map of entry ID → boolean (was it referenced?).
+ */
+function detectReferences(chunks, recalledEntries) {
+  const results = new Map();
+  const searchableChunks = chunks
+    .filter(c => !['error', 'file_read'].includes(c.category))
+    .map(c => c.content.toLowerCase());
+
+  for (const entry of recalledEntries) {
+    let found = false;
+
+    // Match by key (e.g., "stripe-lazy-init-convex")
+    if (entry.key) {
+      const keyLower = entry.key.toLowerCase();
+      if (searchableChunks.some(c => c.includes(keyLower))) {
+        found = true;
+      }
+    }
+
+    // Match by ID patterns: "kb #42", "kb#42", or standalone "#42" with word boundaries
+    if (!found) {
+      const idStr = String(entry.id);
+      // Single regex handles all ID patterns with boundary guard to prevent #42 matching #420
+      const idRegex = new RegExp(`(?:kb\\s?#${idStr}|(?:^|\\s)#${idStr})(?:\\s|$|[,.)\\\]])`, 'm');
+      found = searchableChunks.some(c => idRegex.test(c));
+    }
+
+    results.set(entry.id, found);
+  }
+  return results;
+}
+
+// ---------------------------------------------------------------------------
 // Auto-feedback: rate recalled entries based on summary domain overlap
 // ---------------------------------------------------------------------------
 
@@ -829,6 +867,25 @@ async function autoFeedback() {
   if (!recalled.entries || recalled.entries.length === 0) {
     log('Auto-feedback: no recalled entries to rate');
     return;
+  }
+
+  // Load session chunks for reference detection
+  let referenceMap = new Map();
+  try {
+    const db = new Database(KB_PATH, { readonly: true });
+    const latestSession = db.prepare(
+      'SELECT id FROM sessions ORDER BY created_at DESC LIMIT 1'
+    ).get();
+    if (latestSession) {
+      const chunks = db.prepare(
+        'SELECT source, category, content FROM chunks WHERE session_id = ? ORDER BY id'
+      ).all(latestSession.id);
+      const knowledgeEntries = recalled.entries.filter(e => e.source === 'knowledge');
+      referenceMap = detectReferences(chunks, knowledgeEntries);
+    }
+    db.close();
+  } catch (err) {
+    console.error('[auto-feedback] Reference detection failed (non-fatal):', err.message);
   }
 
   // Find the most recent session summary
@@ -886,11 +943,18 @@ async function autoFeedback() {
 
     // Update the knowledge entry
     const col = rating === 'helpful' ? 'helpful_count' : 'neutral_count';
+    const wasReferenced = referenceMap.get(entry.id) || false;
     dbWrite.prepare(
-      `UPDATE knowledge SET ${col} = ${col} + 1, success_rate = ?, maturity = ?, updated_at = datetime('now') WHERE id = ?`
-    ).run(successRate, maturity, entry.id);
+      `UPDATE knowledge
+       SET ${col} = ${col} + 1,
+           success_rate = ?,
+           maturity = ?,
+           reference_count = CASE WHEN ? THEN reference_count + 1 ELSE reference_count END,
+           updated_at = datetime('now')
+       WHERE id = ?`
+    ).run(successRate, maturity, wasReferenced ? 1 : 0, entry.id);
 
-    log(`Auto-feedback: ${entry.key || entry.id} → ${rating} (${maturity}, rate=${successRate?.toFixed(2)})`);
+    console.log(`[auto-feedback] #${entry.id} (${entry.key || 'no-key'}): ${rating}, referenced: ${wasReferenced}`);
     rated++;
   }
 
