@@ -534,8 +534,10 @@ server.tool(
     rating: z
       .enum(["helpful", "harmful", "neutral"])
       .describe("Was this knowledge entry helpful, harmful, or neutral?"),
+    referenced: z.boolean().optional()
+      .describe("Was this knowledge entry explicitly referenced/cited during the session?"),
   },
-  async ({ id, rating }) => {
+  async ({ id, rating, referenced }) => {
     const entry = getKnowledgeById(id);
     if (!entry) {
       return {
@@ -581,7 +583,7 @@ server.tool(
       };
     }
 
-    recordFeedback(id, rating as Rating, result.newSuccessRate, result.newMaturity);
+    recordFeedback(id, rating as Rating, result.newSuccessRate, result.newMaturity, referenced);
 
     const lines = [
       `Feedback recorded for entry ${id} (${entry.key || "no key"}): ${rating}`,
