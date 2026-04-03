@@ -238,6 +238,15 @@ function runMigrations(db: Database.Database): void {
   } catch {
     // Column already exists — ignore
   }
+
+  // Migration: add reference_count to knowledge
+  try {
+    db.exec(
+      "ALTER TABLE knowledge ADD COLUMN reference_count INTEGER NOT NULL DEFAULT 0",
+    );
+  } catch {
+    /* column already exists */
+  }
 }
 
 // Session-scoped set of knowledge IDs recalled this session.
@@ -900,6 +909,7 @@ export function recordFeedback(
   rating: "helpful" | "harmful" | "neutral",
   newSuccessRate: number | null,
   newMaturity: string,
+  referenced?: boolean,
 ): void {
   const db = getKnowledgeDb();
   const col =
@@ -912,9 +922,10 @@ export function recordFeedback(
      SET ${col} = ${col} + 1,
          success_rate = ?,
          maturity = ?,
+         reference_count = CASE WHEN ? THEN reference_count + 1 ELSE reference_count END,
          updated_at = datetime('now')
      WHERE id = ?`
-  ).run(newSuccessRate, newMaturity, id);
+  ).run(newSuccessRate, newMaturity, referenced ? 1 : 0, id);
 }
 
 export function deleteKnowledgeById(id: number): boolean {
