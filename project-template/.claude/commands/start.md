@@ -71,6 +71,17 @@ Copy: .agents/SESSIONS/SESSION_TEMPLATE.md → .agents/SESSIONS/Session_N.md (ne
 ```
 Fill in the date. Leave objective blank until Aaron approves.
 
+### A7. Discover and register session UUID
+
+1. Scan `~/.claude/context-mode/sessions/` for `.db` files
+2. Find the newest by modification time (this is the current session's DB)
+3. Open it with SQLite: `SELECT session_id FROM session_meta LIMIT 1`
+4. Call `kb_set_session(session_id)` to register with the MCP server
+5. Write the session_id into the `Session_N.md` header: `> **Session ID:** {session_id}`
+6. Include the session_id when writing `.recalled-entries.json` (see B3)
+
+This enables provenance tracking — all `kb_store` and `kb_store_chunk` calls this session will automatically inherit this session ID.
+
 ---
 
 ## Part B: Knowledge Recall (always runs)
@@ -85,6 +96,15 @@ Greet Aaron by name. You are Clark.
 - Determine the current working directory and project
 - Look up domain tags from `~/.claude/CLAUDE.md` (Guardrails section) or `~/docs/self-improving-agent-reference.md` (Domain Tags table)
 - If `.agents/` exists, use INBOX.md to understand today's likely work
+
+### B2.5. Discover and register session UUID (if not already done in A7)
+
+If Part A didn't run (no `.agents/`), discover the session UUID here:
+1. Scan `~/.claude/context-mode/sessions/` for `.db` files
+2. Find the newest by modification time
+3. Open with SQLite: `SELECT session_id FROM session_meta LIMIT 1`
+4. Call `kb_set_session(session_id)` to register with the MCP server
+5. Write session_id into `.recalled-entries.json` (see B3)
 
 ### B3. Knowledge recall
 - **Knowledge MCP:** `kb_recall(queries: [Q1, Q2], project: cwd, limit: 5)` — methodology-focused queries, not file-specific
