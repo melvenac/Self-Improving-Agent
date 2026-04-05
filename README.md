@@ -82,7 +82,7 @@ cd Self-Improving-Agent
 
 ### 2. Set up Knowledge MCP
 
-The knowledge MCP server provides persistent memory (kb_recall, kb_store, kb_feedback, kb_stats).
+The knowledge MCP server provides persistent memory (14 tools including kb_recall, kb_store, kb_store_chunk, kb_feedback, kb_set_session, kb_stats, and more).
 
 ```bash
 # Install to the Claude Code MCP directory
@@ -113,10 +113,10 @@ Copy the hook scripts to your Claude Code scripts directory:
 
 ```bash
 cp -r knowledge-mcp/scripts ~/.claude/knowledge-mcp/scripts
-cp scripts/session-bootstrap.mjs ~/.claude/knowledge-mcp/scripts/
+cp scripts/session-bootstrap.mjs ~/.claude/scripts/
 ```
 
-This installs the automation scripts: `session-end.mjs` (summaries, vectors, auto-feedback), `skill-scan.mjs` (experience clustering), plus the session bootstrap hook.
+This installs the automation scripts: `session-end.mjs` (session indexing, summaries, vectors, auto-feedback, shadow-recall), `skill-scan.mjs` (experience clustering), plus the session bootstrap hook.
 
 Add hooks to your Claude Code settings (`~/.claude/settings.json`):
 
@@ -157,7 +157,7 @@ node scripts/setup.mjs
 Create the vault directory structure:
 
 ```bash
-mkdir -p ~/Obsidian\ Vault/{Experiences,Sessions,Skill-Candidates,Summaries,Research,Topics,Logs}
+mkdir -p ~/Obsidian\ Vault/{Experiences,Sessions,Skill-Candidates,Topics}
 ```
 
 Open this folder in Obsidian as a vault. Install the **Smart Connections** plugin for semantic search (optional but recommended).
@@ -175,18 +175,29 @@ Start a Claude Code session and run `/start`. You should see:
 
 | Command | When | What it does |
 |---|---|---|
-| `/start` | Session start | Reads project state, recalls relevant knowledge, creates session log |
+| `/start` | Session start | Reads project state, recalls relevant knowledge, registers session UUID, creates session log |
 | `/end` | Session end | Captures lessons, updates project state, writes handoff notes |
-| `/sync` | Before commits | Validates version consistency across all doc files |
+| `/checkpoint` | Mid-session | Captures phase-level work context before `/compact`, enabling multi-phase sessions |
+| `/sync` | Before commits | Validates version consistency, structural integrity, and installed copy drift (38 checks) |
 | `/skill-scan` | On demand | Scans experience clusters and proposes reusable skills |
 
 ## Automation hooks
 
 | Hook | Trigger | What it does |
 |---|---|---|
-| `session-bootstrap.mjs` | SessionStart | Auto-detects project, reads handoff, surfaces next-session notes |
-| `session-end.mjs` | SessionEnd | Generates summaries, embeds vectors, runs auto-feedback on recalled entries |
+| `session-bootstrap.mjs` | SessionStart | Auto-detects project, checks backup freshness, surfaces skill proposals |
+| `session-end.mjs` | SessionEnd | Indexes sessions, generates summaries, embeds vectors, runs auto-feedback and shadow-recall |
 | `skill-scan.mjs` | SessionEnd | Detects experience clusters, proposes skills (domain-filtered) |
+
+## Key Features
+
+| Feature | Since | What it does |
+|---|---|---|
+| **Session manifest** | v0.5.5 | Threads Claude's session UUID across all memory layers for full provenance tracking |
+| **Outcome tracking** | v0.4.0 | Ternary feedback (helpful/harmful/neutral) on recalled knowledge with maturity lifecycle |
+| **Protocol health** | v0.5.4 | `node scripts/sync.mjs --score` — deterministic 0-100 health score across 5 categories |
+| **Shadow recall** | v0.5.4 | Replays queries with alternative search strategies to measure retrieval quality |
+| **Dashboard** | v0.5.3 | `node knowledge-mcp/scripts/dashboard.mjs` — browse sessions, chunks, knowledge at localhost:3456 |
 
 ## Project Template
 
