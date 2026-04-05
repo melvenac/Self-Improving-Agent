@@ -5,7 +5,7 @@
  * Combines version synchronization, structural consistency checks,
  * and protocol health scoring into a single script.
  *
- * Checks (31):
+ * Checks (32):
  *   1. Version sync — package.json → README, PRD, knowledge-mcp/package.json
  *   2. CHANGELOG — entry exists for current version
  *   3. README — all referenced scripts/files exist, no stale references
@@ -15,6 +15,7 @@
  *   7. CLAUDE.md — referenced paths exist
  *   8. Obsidian vault — expected directories exist
  *   9. Template — project-template/ mirrors expected structure
+ *  10. Installed drift — repo files match ~/.claude/ installed copies
  *
  * Scoring (5 categories, 100 pts):
  *   Config & Structure (25) — existing checks normalized
@@ -407,6 +408,42 @@ function checkTemplate() {
   }
 }
 
+// ── 12. Installed copy drift ───────────────────────────────────────
+
+const MIRRORED_FILES = [
+  { repo: "scripts/session-bootstrap.mjs", installed: join(HOME, ".claude", "scripts", "session-bootstrap.mjs") },
+  { repo: "knowledge-mcp/src/db.ts",       installed: join(HOME, ".claude", "knowledge-mcp", "src", "db.ts") },
+  { repo: "knowledge-mcp/src/embed.ts",    installed: join(HOME, ".claude", "knowledge-mcp", "src", "embed.ts") },
+  { repo: "knowledge-mcp/src/indexer.ts",  installed: join(HOME, ".claude", "knowledge-mcp", "src", "indexer.ts") },
+  { repo: "knowledge-mcp/src/lifecycle.ts", installed: join(HOME, ".claude", "knowledge-mcp", "src", "lifecycle.ts") },
+  { repo: "knowledge-mcp/src/server.ts",   installed: join(HOME, ".claude", "knowledge-mcp", "src", "server.ts") },
+  { repo: "knowledge-mcp/src/tags.ts",     installed: join(HOME, ".claude", "knowledge-mcp", "src", "tags.ts") },
+];
+
+function checkInstalledDrift() {
+  for (const { repo, installed } of MIRRORED_FILES) {
+    const repoContent = read(repo);
+    if (repoContent === null) continue; // repo file doesn't exist, skip
+
+    if (!existsSync(installed)) {
+      issue("DRIFT", `Installed copy missing: ${installed}`, `Source: ${repo}`);
+      continue;
+    }
+
+    const installedContent = readFileSync(installed, "utf-8");
+    if (repoContent !== installedContent) {
+      if (checkOnly) {
+        issue("DRIFT", `${repo} differs from installed copy`, `Run: cp ${repo} ${installed}`);
+      } else {
+        writeFileSync(installed, repoContent, "utf-8");
+        fix("DRIFT", repo, "out of sync", "copied to installed");
+      }
+    } else {
+      pass("DRIFT", `\`${repo}\` matches installed copy`);
+    }
+  }
+}
+
 function printScoreReport() {
   const total = Object.values(scoreCategories).reduce((s, c) => s + Math.min(c.points, c.max), 0);
   const maxTotal = Object.values(scoreCategories).reduce((s, c) => s + c.max, 0);
@@ -760,6 +797,7 @@ checkSummary();
 checkClaudeMd();
 checkObsidianVault();
 checkTemplate();
+checkInstalledDrift();
 
 if (scoreMode) {
   scoreConfigStructure();

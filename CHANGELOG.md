@@ -1,5 +1,22 @@
 # Changelog
 
+## [v0.5.5] - 2026-04-05
+
+### Added
+- **Session manifest:** Unified session UUID threading across all memory layers — chunks, knowledge, and summaries are now traceable back to the session that created them
+- **`kb_set_session` MCP tool:** Register the active session ID at startup; all subsequent `kb_store` and `kb_store_chunk` calls auto-inherit session provenance
+- **Knowledge provenance:** `created_by_session` and `updated_by_session` columns on knowledge table
+- **`updateKnowledge()` function:** Update existing knowledge entries with session stamping
+- **`/start` session discovery:** A7/B2.5 steps discover Claude's session UUID from `.db` files and register via `kb_set_session`
+
+### Changed
+- **`kb_store_chunk` fallback:** Replaced `checkpoint-YYYY-MM-DD` synthetic IDs with active session fallback, then `local-YYYY-MM-DD-HHMM` (local time) as last resort
+- **Sessions table cleaned:** Removed 143 orphaned sessions and renamed legacy checkpoint sessions
+
+### Fixed
+- **Session ID collisions:** Multiple sessions on the same day no longer share a single `checkpoint-YYYY-MM-DD` ID
+- **UTC off-by-one:** Checkpoint IDs no longer show next day after ~7pm CDT
+
 ## [v0.5.4] - 2026-04-02
 
 ### Added

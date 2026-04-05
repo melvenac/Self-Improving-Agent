@@ -101,9 +101,9 @@ Run the automated doc sync, then check for any remaining drift this session's ch
 
 **Step 1: Run sync script**
 ```bash
-node scripts/sync-docs.mjs
+node scripts/sync.mjs
 ```
-This automatically fixes version drift across README.md, PRD.md, and knowledge-mcp/package.json using package.json as the source of truth.
+This automatically fixes version drift and runs structural consistency checks using package.json as the source of truth.
 
 **Step 2: Manual check for behavioral drift**
 If this session changed features, commands, or architecture:
@@ -127,7 +127,7 @@ If this session changed features, commands, or architecture:
 
 > Review what the SessionEnd hooks will auto-capture, and supplement with anything they'd miss.
 >
-> The hooks (`vault-writer.mjs` → `skill-scan.mjs`) automatically capture session logs and extract experiences to the Obsidian Vault + Knowledge MCP. Your job here is to catch what automation misses.
+> The hooks (`session-end.mjs` → `skill-scan.mjs`) automatically capture session logs and extract experiences to the Obsidian Vault + Knowledge MCP. Your job here is to catch what automation misses.
 
 ### B1. Capture external research
 If any external research was done this session (GitHub repos, YouTube videos, website docs, NotebookLM content), store a knowledge entry for each source using `kb_store`:

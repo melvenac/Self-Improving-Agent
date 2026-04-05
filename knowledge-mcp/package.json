@@ -1,6 +1,6 @@
 {
   "name": "knowledge-mcp",
-  "version": "0.5.3",
+  "version": "0.5.5",
   "type": "module",
   "description": "Persistent cross-session knowledge base MCP server for the Self-Improving Agent",
   "main": "./build/server.js",

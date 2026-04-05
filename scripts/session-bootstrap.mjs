@@ -29,19 +29,6 @@ const hasMeta = hasAgents && existsSync(join(cwd, '.agents', 'META'));
 if (hasAgents) {
   lines.push(`Project detected: ${cwd} (.agents/ found${hasMeta ? ', META mode' : ''})`);
 
-  // Read next-session handoff if it exists
-  const handoff = join(cwd, '.agents', 'SESSIONS', 'next-session.md');
-  if (existsSync(handoff)) {
-    try {
-      const content = readFileSync(handoff, 'utf-8').trim();
-      if (content) {
-        lines.push('');
-        lines.push('Previous session handoff:');
-        lines.push(content);
-      }
-    } catch (e) { /* ignore read errors */ }
-  }
-
   lines.push('');
   lines.push('Run /start for full project startup, or jump straight into work.');
 } else {

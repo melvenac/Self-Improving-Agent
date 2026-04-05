@@ -3,7 +3,7 @@ Run the doc sync script to ensure all downstream files match the authoritative s
 
 ## Steps
 
-1. Run: `node scripts/sync-docs.mjs`
+1. Run: `node scripts/sync.mjs`
 2. Report the output to the user
 3. If any files were updated, show the list
 4. If any items need manual attention, flag them
