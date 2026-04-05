@@ -9,21 +9,25 @@ import {
   getKnowledgeDb,
   insertKnowledge,
   deleteKnowledge,
-  deleteKnowledgeById,
   listKnowledge,
   insertSummary,
   getUnsummarizedSessionIds,
   getSessionChunks,
+  insertChunk,
+  insertTags,
   getKnowledgeById,
   recordFeedback,
   getRecalledKnowledgeIds,
   clearRecalledKnowledgeIds,
+  deleteKnowledgeById,
+  setActiveSession,
+  getActiveSession,
 } from "./db.js";
 import { evaluateLifecycle, type Rating, type FeedbackEntry } from "./lifecycle.js";
 import { indexSessionFile, indexAllUnindexed } from "./indexer.js";
 
 const server = new McpServer({
-  name: "knowledge-mcp",
+  name: "open-brain-knowledge",
   version: "0.3.0",
 });
 
@@ -207,6 +211,37 @@ server.tool(
   }
 );
 
+// --- kb_set_session: Register the active session ID ---
+server.tool(
+  "kb_set_session",
+  "Register the active session ID. Call once at session start. All subsequent kb_store and kb_store_chunk calls will inherit this session ID for provenance tracking.",
+  {
+    session_id: z.string().describe("The Claude session UUID from the active .db file"),
+  },
+  async ({ session_id }) => {
+    const db = getKnowledgeDb();
+    setActiveSession(session_id);
+
+    // Ensure session row exists
+    const exists = db.prepare("SELECT 1 FROM sessions WHERE id = ?").get(session_id);
+    if (!exists) {
+      db.prepare(
+        `INSERT OR IGNORE INTO sessions (id, db_file, project_dir, started_at, ended_at, event_count, indexed_at, event_count_at_index)
+         VALUES (?, '', NULL, datetime('now'), NULL, 0, datetime('now'), 0)`
+      ).run(session_id);
+    }
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: `Active session set: ${session_id}`,
+        },
+      ],
+    };
+  }
+);
+
 // --- kb_stats: Show knowledge base statistics ---
 server.tool(
   "kb_stats",
@@ -254,14 +289,6 @@ server.tool(
       }
     }
 
-    if (stats.maturity_distribution.length > 0) {
-      lines.push("");
-      lines.push("### Knowledge Maturity");
-      for (const m of stats.maturity_distribution) {
-        lines.push(`- ${m.maturity}: ${m.count}`);
-      }
-    }
-
     return {
       content: [{ type: "text" as const, text: lines.join("\n") }],
     };
@@ -289,7 +316,7 @@ server.tool(
 // --- kb_store: Store arbitrary knowledge ---
 server.tool(
   "kb_store",
-  "Store a piece of knowledge in the knowledge base. Use for facts, notes, preferences, or anything worth remembering permanently. By default, knowledge is stored globally (available across all projects). Set scope to 'project' and pass your working directory as project_dir to scope it to a specific project.\n\n**Tag guidance:** Include BOTH implementation-specific tags (e.g., 'stripe', 'convex') AND broader domain concept tags (e.g., 'payments', 'billing', 'authentication', 'deployment'). Domain tags enable recall via natural language queries like 'how did we handle payments?' even when the specific tool name isn't mentioned.\n\n**Content guidance for experiences:** Include a CONCEPTS line — a plain English sentence describing the problem domain, not just implementation details. Example: 'CONCEPTS: Processing subscription payments via Stripe in a serverless Convex backend'. This improves semantic search matching.",
+  "Store a piece of knowledge in the brain. Use for facts, notes, preferences, or anything worth remembering permanently. By default, knowledge is stored globally (available across all projects). Set scope to 'project' and pass your working directory as project_dir to scope it to a specific project.",
   {
     content: z
       .string()
@@ -316,10 +343,11 @@ server.tool(
       .string()
       .optional()
       .describe("Project directory to scope this knowledge to (only used when scope is 'project')"),
+    session_id: z.string().optional().describe("Session ID for provenance. Falls back to active session if omitted."),
   },
-  async ({ content, key, tags, source, scope, project_dir }) => {
+  async ({ content, key, tags, source, scope, project_dir, session_id }) => {
     const effectiveProjectDir = scope === "project" ? project_dir || null : null;
-    const id = await insertKnowledge(content, key, tags, source, effectiveProjectDir || undefined);
+    const id = await insertKnowledge(content, key, tags, source, effectiveProjectDir || undefined, session_id);
     const scopeLabel = effectiveProjectDir ? ` [project: ${effectiveProjectDir}]` : " [global]";
     return {
       content: [
@@ -403,10 +431,8 @@ server.tool(
     const lines = ["## Stored Knowledge", ""];
     for (const e of entries) {
       const scopeLabel = e.project_dir ? `[project]` : `[global]`;
-      const matLabel = e.maturity !== "progenitor" ? ` [${e.maturity}]` : "";
-      const rateLabel = e.success_rate !== null ? ` (${(e.success_rate * 100).toFixed(0)}%)` : "";
       lines.push(
-        `**[${e.id}]** ${scopeLabel}${matLabel}${rateLabel} ${e.key ? `\`${e.key}\` — ` : ""}${e.content.length > 120 ? e.content.substring(0, 120) + "..." : e.content}`
+        `**[${e.id}]** ${scopeLabel} ${e.key ? `\`${e.key}\` — ` : ""}${e.content.length > 120 ? e.content.substring(0, 120) + "..." : e.content}`
       );
       if (e.tags) lines.push(`  Tags: ${e.tags}`);
       lines.push(`  Source: ${e.source} | Created: ${e.created_at}${e.project_dir ? ` | Project: ${e.project_dir}` : ""}`);
@@ -500,7 +526,7 @@ server.tool(
   },
   async ({ session_id, summary }) => {
     try {
-      await insertSummary(session_id, summary, "agent-generated");
+      insertSummary(session_id, summary, "agent-generated");
       return {
         content: [
           {
@@ -523,13 +549,104 @@ server.tool(
   }
 );
 
-// --- kb_feedback: Record outcome feedback for a knowledge entry ---
+// --- kb_store_chunk: Store a tagged chunk linked to a session ---
+server.tool(
+  "kb_store_chunk",
+  "Store a tagged chunk in the knowledge base, linked to a session. Use for checkpoints and other session-scoped data that should be searchable but separate from permanent knowledge. If no session_id is provided, a synthetic checkpoint session is created for today's date.",
+  {
+    content: z
+      .string()
+      .describe("The chunk content to store"),
+    source: z
+      .string()
+      .optional()
+      .default("checkpoint")
+      .describe("Where this chunk came from (e.g. 'checkpoint', 'agent')"),
+    category: z
+      .string()
+      .optional()
+      .default("checkpoint")
+      .describe("Chunk category (e.g. 'checkpoint', 'note', 'context')"),
+    tags: z
+      .array(z.string())
+      .optional()
+      .describe("Tags for categorization and filtering"),
+    metadata: z
+      .string()
+      .optional()
+      .describe("Optional JSON metadata string"),
+    session_id: z
+      .string()
+      .optional()
+      .describe("Session ID to link this chunk to. If omitted, uses/creates a checkpoint session for today."),
+    project_dir: z
+      .string()
+      .optional()
+      .describe("Project directory — used for scoping and for creating the session row if needed"),
+  },
+  async ({ content, source, category, tags, metadata, session_id, project_dir }) => {
+    try {
+      const db = getKnowledgeDb();
+
+      // Resolve session: explicit > active > local-time fallback
+      const effectiveSessionId = session_id || getActiveSession() || (() => {
+        const now = new Date();
+        const pad = (n: number) => String(n).padStart(2, "0");
+        return `local-${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+      })();
+      const exists = db.prepare("SELECT 1 FROM sessions WHERE id = ?").get(effectiveSessionId);
+      if (!exists) {
+        db.prepare(
+          `INSERT OR IGNORE INTO sessions (id, db_file, project_dir, started_at, ended_at, event_count, indexed_at, event_count_at_index)
+           VALUES (?, '', ?, datetime('now'), NULL, 0, datetime('now'), 0)`
+        ).run(effectiveSessionId, project_dir || null);
+      }
+
+      // Insert chunk
+      const chunkId = insertChunk(
+        effectiveSessionId,
+        source || "checkpoint",
+        category || "checkpoint",
+        content,
+        metadata || null,
+        new Date().toISOString()
+      );
+
+      // Insert tags
+      if (tags && tags.length > 0) {
+        insertTags(chunkId, tags);
+      }
+
+      const tagStr = tags && tags.length > 0 ? ` — tags: ${tags.join(", ")}` : "";
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `Stored chunk (id: ${chunkId}) in session "${effectiveSessionId}"${tagStr}`,
+          },
+        ],
+      };
+    } catch (err) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `Error storing chunk: ${err instanceof Error ? err.message : String(err)}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+);
+
+// --- kb_feedback: Record outcome rating on recalled knowledge ---
 server.tool(
   "kb_feedback",
   "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Used during /end or mid-session to track outcome quality. Drives maturity promotion and apoptosis.",
   {
     id: z
-      .number()
+      .coerce.number()
       .describe("Knowledge entry ID"),
     rating: z
       .enum(["helpful", "harmful", "neutral"])
@@ -637,7 +754,7 @@ server.tool(
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Knowledge MCP server v0.3.0 running on stdio");
+  console.error("Open Brain Knowledge MCP server v0.3.0 running on stdio");
 }
 
 main().catch((err) => {
