@@ -199,7 +199,8 @@ export function indexSessionFile(dbFilePath: string): {
           priority: event.priority,
           event_id: event.id,
         }),
-        event.created_at
+        event.created_at,
+        meta.project_dir
       );
       chunksCreated++;
 

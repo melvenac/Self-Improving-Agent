@@ -73,14 +73,19 @@ Fill in the date. Leave objective blank until Aaron approves.
 
 ### A7. Discover and register session UUID
 
-1. Scan `~/.claude/context-mode/sessions/` for `.db` files
-2. Find the newest by modification time (this is the current session's DB)
-3. Open it with SQLite: `SELECT session_id FROM session_meta LIMIT 1`
-4. Call `kb_set_session(session_id)` to register with the MCP server
-5. Write the session_id into the `Session_N.md` header: `> **Session ID:** {session_id}`
-6. Include the session_id when writing `.recalled-entries.json` (see B3)
+Claude Code stores session data under `~/.claude/projects/<project-key>/<session-uuid>/`. The project key is derived from the cwd (e.g., `C:\Users\melve\Projects\Foo` → `C--Users-melve-Projects-Foo`), but casing varies. Discovery algorithm:
 
-This enables provenance tracking — all `kb_store` and `kb_store_chunk` calls this session will automatically inherit this session ID.
+1. **Derive expected key:** Take cwd, replace `:\` with `--`, remaining `\` or `/` with `-`
+2. **Case-insensitive match:** Find the directory under `~/.claude/projects/` whose name matches (case-insensitive)
+3. **Find newest session:** List `.jsonl` files in that directory, sort by mtime descending. The newest `.jsonl` filename (minus extension) is the current session UUID.
+   - Filter to UUID-shaped names only (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`) — skip `memory/` and other non-UUID entries.
+4. **Register:** Call `kb_set_session(session_id)` with the discovered UUID
+5. **Record:** Write the session_id into `Session_N.md` header: `> **Session ID:** {session_id}`
+6. **Include** the session_id when writing `.recalled-entries.json` (see B3)
+
+**If discovery fails:** Do NOT fabricate a UUID. Log a warning: "UUID discovery failed — provenance tracking disabled for this session." Continue without calling `kb_set_session`.
+
+> **Platform note (Windows only):** This algorithm assumes Windows paths with drive letters (`C:\...`). Mac/Linux paths (`/home/user/...`, `/Users/user/...`) will need a different key derivation — no drive letter, no `:\` to replace. This is a future TODO for cross-platform support.
 
 ---
 
@@ -99,12 +104,13 @@ Greet Aaron by name. You are Clark.
 
 ### B2.5. Discover and register session UUID (if not already done in A7)
 
-If Part A didn't run (no `.agents/`), discover the session UUID here:
-1. Scan `~/.claude/context-mode/sessions/` for `.db` files
-2. Find the newest by modification time
-3. Open with SQLite: `SELECT session_id FROM session_meta LIMIT 1`
-4. Call `kb_set_session(session_id)` to register with the MCP server
-5. Write session_id into `.recalled-entries.json` (see B3)
+If Part A didn't run (no `.agents/`), discover the session UUID here using the same algorithm as A7:
+1. Derive project key from cwd, case-insensitive match under `~/.claude/projects/`
+2. Find newest UUID-shaped `.jsonl` file by mtime
+3. Call `kb_set_session(session_id)` to register with the MCP server
+4. Write session_id into `.recalled-entries.json` (see B3)
+
+**If discovery fails:** Do NOT fabricate a UUID. Skip silently and continue without provenance.
 
 ### B3. Knowledge recall
 - **Knowledge MCP:** `kb_recall(queries: [Q1, Q2], project: cwd, limit: 5)` — methodology-focused queries, not file-specific

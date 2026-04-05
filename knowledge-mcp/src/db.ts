@@ -285,6 +285,26 @@ function runMigrations(db: Database.Database): void {
   try {
     db.exec(`ALTER TABLE knowledge ADD COLUMN updated_by_session TEXT`);
   } catch { /* column already exists */ }
+
+  // Migration: add project_dir to chunks for self-describing rows
+  try {
+    db.exec("ALTER TABLE chunks ADD COLUMN project_dir TEXT");
+  } catch { /* column already exists */ }
+
+  // Migration: add project_dir to summaries for self-describing rows
+  try {
+    db.exec("ALTER TABLE summaries ADD COLUMN project_dir TEXT");
+  } catch { /* column already exists */ }
+
+  // Backfill project_dir on chunks and summaries from their linked session
+  db.exec(`
+    UPDATE chunks SET project_dir = (
+      SELECT project_dir FROM sessions WHERE id = chunks.session_id
+    ) WHERE project_dir IS NULL;
+    UPDATE summaries SET project_dir = (
+      SELECT project_dir FROM sessions WHERE id = summaries.session_id
+    ) WHERE project_dir IS NULL;
+  `);
 }
 
 // Session-scoped set of knowledge IDs recalled this session.
@@ -845,15 +865,27 @@ export function insertChunk(
   category: string,
   content: string,
   metadata: string | null,
-  createdAt: string
+  createdAt: string,
+  projectDir?: string | null
 ): number {
   const db = getKnowledgeDb();
+
+  // Enrich metadata JSON with provenance context
+  let enrichedMeta: Record<string, unknown> = {};
+  if (metadata) {
+    try { enrichedMeta = JSON.parse(metadata); } catch { enrichedMeta = { raw: metadata }; }
+  }
+  enrichedMeta.session_id = enrichedMeta.session_id || sessionId;
+  if (projectDir) enrichedMeta.project_dir = normalizePath(projectDir);
+  enrichedMeta.source_tool = enrichedMeta.source_tool || source;
+  const metaStr = JSON.stringify(enrichedMeta);
+
   const result = db
     .prepare(
-      `INSERT INTO chunks (session_id, source, category, content, metadata, created_at, indexed_at)
-     VALUES (?, ?, ?, ?, ?, ?, datetime('now'))`
+      `INSERT INTO chunks (session_id, source, category, content, metadata, created_at, indexed_at, project_dir)
+     VALUES (?, ?, ?, ?, ?, ?, datetime('now'), ?)`
     )
-    .run(sessionId, source, category, content, metadata, createdAt);
+    .run(sessionId, source, category, content, metaStr, createdAt, normalizePath(projectDir) || null);
   return Number(result.lastInsertRowid);
 }
 
@@ -1062,22 +1094,29 @@ export function listKnowledge(limit: number = 20, project?: string): Array<{
 export async function insertSummary(
   sessionId: string,
   summary: string,
-  model: string
+  model: string,
+  projectDir?: string | null
 ): Promise<void> {
   const db = getKnowledgeDb();
+  const normalizedDir = normalizePath(projectDir) || null;
   // Ensure session exists to satisfy FOREIGN KEY constraint.
   // When called from /end, the session may not have been indexed yet.
   const exists = db.prepare("SELECT 1 FROM sessions WHERE id = ?").get(sessionId);
   if (!exists) {
     db.prepare(
       `INSERT OR IGNORE INTO sessions (id, db_file, project_dir, started_at, ended_at, event_count, indexed_at, event_count_at_index)
-       VALUES (?, '', NULL, datetime('now'), NULL, 0, datetime('now'), 0)`
-    ).run(sessionId);
+       VALUES (?, '', ?, datetime('now'), NULL, 0, datetime('now'), 0)`
+    ).run(sessionId, normalizedDir);
+  } else if (normalizedDir) {
+    // Backfill project_dir if it was previously null
+    db.prepare(
+      `UPDATE sessions SET project_dir = ? WHERE id = ? AND project_dir IS NULL`
+    ).run(normalizedDir, sessionId);
   }
   const result = db.prepare(
-    `INSERT OR REPLACE INTO summaries (session_id, summary, model, created_at)
-     VALUES (?, ?, ?, datetime('now'))`
-  ).run(sessionId, summary, model);
+    `INSERT OR REPLACE INTO summaries (session_id, summary, model, created_at, project_dir)
+     VALUES (?, ?, ?, datetime('now'), ?)`
+  ).run(sessionId, summary, model, normalizedDir);
   const rowid = Number(result.lastInsertRowid);
 
   // Embed with NEGATIVE rowid to avoid collision with knowledge rowids

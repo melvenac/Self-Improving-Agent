@@ -159,13 +159,13 @@ function runStage1Index() {
         const source = labelSource(event);
         const chunks = chunk(event.data);
         for (const c of chunks) {
+          const metaJson = JSON.stringify({ type: event.type, source_hook: event.source_hook, priority: event.priority, event_id: event.id, session_id: meta.session_id, project_dir: meta.project_dir, source_tool: "session-end" });
           kb.prepare(
-            `INSERT INTO chunks (session_id, source, category, content, metadata, created_at, indexed_at)
-             VALUES (?, ?, ?, ?, ?, ?, datetime('now'))`
+            `INSERT INTO chunks (session_id, source, category, content, metadata, created_at, indexed_at, project_dir)
+             VALUES (?, ?, ?, ?, ?, ?, datetime('now'), ?)`
           ).run(
-            meta.session_id, source, category, c,
-            JSON.stringify({ type: event.type, source_hook: event.source_hook, priority: event.priority, event_id: event.id }),
-            event.created_at
+            meta.session_id, source, category, c, metaJson,
+            event.created_at, meta.project_dir || null
           );
         }
       }
@@ -624,13 +624,13 @@ function backfillSessions() {
         const source = labelSource(event);
         const chunks = chunk(event.data);
         for (const c of chunks) {
+          const metaJson = JSON.stringify({ type: event.type, source_hook: event.source_hook, priority: event.priority, event_id: event.id, session_id: meta.session_id, project_dir: meta.project_dir, source_tool: "session-end-backfill" });
           kb.prepare(
-            `INSERT INTO chunks (session_id, source, category, content, metadata, created_at, indexed_at)
-             VALUES (?, ?, ?, ?, ?, ?, datetime('now'))`
+            `INSERT INTO chunks (session_id, source, category, content, metadata, created_at, indexed_at, project_dir)
+             VALUES (?, ?, ?, ?, ?, ?, datetime('now'), ?)`
           ).run(
-            meta.session_id, source, category, c,
-            JSON.stringify({ type: event.type, source_hook: event.source_hook, priority: event.priority, event_id: event.id }),
-            event.created_at
+            meta.session_id, source, category, c, metaJson,
+            event.created_at, meta.project_dir || null
           );
         }
       }

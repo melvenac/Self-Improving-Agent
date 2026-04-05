@@ -217,8 +217,9 @@ server.tool(
   "Register the active session ID. Call once at session start. All subsequent kb_store and kb_store_chunk calls will inherit this session ID for provenance tracking.",
   {
     session_id: z.string().describe("The Claude session UUID from the active .db file"),
+    project_dir: z.string().optional().describe("Current working directory — used to populate the session row's project_dir"),
   },
-  async ({ session_id }) => {
+  async ({ session_id, project_dir }) => {
     const db = getKnowledgeDb();
     setActiveSession(session_id);
 
@@ -227,15 +228,20 @@ server.tool(
     if (!exists) {
       db.prepare(
         `INSERT OR IGNORE INTO sessions (id, db_file, project_dir, started_at, ended_at, event_count, indexed_at, event_count_at_index)
-         VALUES (?, '', NULL, datetime('now'), NULL, 0, datetime('now'), 0)`
-      ).run(session_id);
+         VALUES (?, '', ?, datetime('now'), NULL, 0, datetime('now'), 0)`
+      ).run(session_id, project_dir || null);
+    } else if (project_dir) {
+      // Update project_dir if it was previously null
+      db.prepare(
+        `UPDATE sessions SET project_dir = ? WHERE id = ? AND project_dir IS NULL`
+      ).run(project_dir, session_id);
     }
 
     return {
       content: [
         {
           type: "text" as const,
-          text: `Active session set: ${session_id}`,
+          text: `Active session set: ${session_id}${project_dir ? ` (project: ${project_dir})` : ""}`,
         },
       ],
     };
@@ -523,10 +529,14 @@ server.tool(
     summary: z
       .string()
       .describe("The summary text (3-8 sentences)"),
+    project_dir: z
+      .string()
+      .optional()
+      .describe("Project directory — populates project_dir on the summary and backfills the session row"),
   },
-  async ({ session_id, summary }) => {
+  async ({ session_id, summary, project_dir }) => {
     try {
-      insertSummary(session_id, summary, "agent-generated");
+      insertSummary(session_id, summary, "agent-generated", project_dir);
       return {
         content: [
           {
@@ -594,12 +604,18 @@ server.tool(
         const pad = (n: number) => String(n).padStart(2, "0");
         return `local-${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
       })();
+      const normalizedDir = project_dir ? project_dir.replace(/\\/g, "/") : null;
       const exists = db.prepare("SELECT 1 FROM sessions WHERE id = ?").get(effectiveSessionId);
       if (!exists) {
         db.prepare(
           `INSERT OR IGNORE INTO sessions (id, db_file, project_dir, started_at, ended_at, event_count, indexed_at, event_count_at_index)
            VALUES (?, '', ?, datetime('now'), NULL, 0, datetime('now'), 0)`
-        ).run(effectiveSessionId, project_dir || null);
+        ).run(effectiveSessionId, normalizedDir);
+      } else if (normalizedDir) {
+        // Backfill project_dir if it was previously null
+        db.prepare(
+          `UPDATE sessions SET project_dir = ? WHERE id = ? AND project_dir IS NULL`
+        ).run(normalizedDir, effectiveSessionId);
       }
 
       // Insert chunk
@@ -609,7 +625,8 @@ server.tool(
         category || "checkpoint",
         content,
         metadata || null,
-        new Date().toISOString()
+        new Date().toISOString(),
+        normalizedDir
       );
 
       // Insert tags
