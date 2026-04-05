@@ -876,17 +876,19 @@ export async function insertKnowledge(
   key?: string,
   tags?: string[],
   source?: string,
-  projectDir?: string
+  projectDir?: string,
+  sessionId?: string
 ): Promise<number> {
   const db = getKnowledgeDb();
   const now = new Date().toISOString();
   const tagsStr = tags ? tags.join(", ") : null;
+  const effectiveSession = sessionId || getActiveSession() || null;
   const result = db
     .prepare(
-      `INSERT INTO knowledge (key, content, tags, source, permanent, created_at, updated_at, project_dir)
-       VALUES (?, ?, ?, ?, 1, ?, ?, ?)`
+      `INSERT INTO knowledge (key, content, tags, source, permanent, created_at, updated_at, project_dir, created_by_session)
+       VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?)`
     )
-    .run(key || null, content, tagsStr, source || "manual", now, now, normalizePath(projectDir));
+    .run(key || null, content, tagsStr, source || "manual", now, now, normalizePath(projectDir), effectiveSession);
   const rowid = Number(result.lastInsertRowid);
 
   // Embed and store vector (best-effort)
@@ -908,6 +910,24 @@ export async function insertKnowledge(
   }
 
   return rowid;
+}
+
+export function updateKnowledge(
+  id: number,
+  content: string,
+  key?: string,
+  tags?: string[],
+  source?: string,
+  sessionId?: string
+): void {
+  const db = getKnowledgeDb();
+  const now = new Date().toISOString();
+  const tagsStr = tags ? tags.join(", ") : null;
+  const effectiveSession = sessionId || getActiveSession() || null;
+  db.prepare(
+    `UPDATE knowledge SET content = ?, key = ?, tags = ?, source = ?, updated_at = ?, updated_by_session = ?
+     WHERE id = ?`
+  ).run(content, key || null, tagsStr, source || "manual", now, effectiveSession, id);
 }
 
 export function deleteKnowledge(options: {
