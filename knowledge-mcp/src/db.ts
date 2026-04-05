@@ -183,6 +183,36 @@ function initSchema(db: Database.Database): void {
       END;
     `);
   }
+
+  // --- Chunks FTS (full-text search on chunks for checkpoint/session data) ---
+  const chunksFtsExists = db
+    .prepare(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='chunks_fts'"
+    )
+    .get();
+
+  if (!chunksFtsExists) {
+    db.exec(`
+      CREATE VIRTUAL TABLE chunks_fts USING fts5(
+        source,
+        category,
+        content,
+        content=chunks,
+        content_rowid=id,
+        tokenize='porter unicode61'
+      );
+
+      CREATE TRIGGER IF NOT EXISTS chunks_ai AFTER INSERT ON chunks BEGIN
+        INSERT INTO chunks_fts(rowid, source, category, content)
+        VALUES (new.id, new.source, new.category, new.content);
+      END;
+
+      CREATE TRIGGER IF NOT EXISTS chunks_ad AFTER DELETE ON chunks BEGIN
+        INSERT INTO chunks_fts(chunks_fts, rowid, source, category, content)
+        VALUES ('delete', old.id, old.source, old.category, old.content);
+      END;
+    `);
+  }
 }
 
 function runMigrations(db: Database.Database): void {
@@ -247,6 +277,14 @@ function runMigrations(db: Database.Database): void {
   } catch {
     /* column already exists */
   }
+
+  try {
+    db.exec(`ALTER TABLE knowledge ADD COLUMN created_by_session TEXT`);
+  } catch { /* column already exists */ }
+
+  try {
+    db.exec(`ALTER TABLE knowledge ADD COLUMN updated_by_session TEXT`);
+  } catch { /* column already exists */ }
 }
 
 // Session-scoped set of knowledge IDs recalled this session.
@@ -259,6 +297,21 @@ export function getRecalledKnowledgeIds(): number[] {
 
 export function clearRecalledKnowledgeIds(): void {
   _recalledKnowledgeIds.clear();
+}
+
+// ── Active session tracking ──────────────────────────────────────────
+let _activeSessionId: string | null = null;
+
+export function setActiveSession(id: string): void {
+  _activeSessionId = id;
+}
+
+export function getActiveSession(): string | null {
+  return _activeSessionId;
+}
+
+export function clearActiveSession(): void {
+  _activeSessionId = null;
 }
 
 // ============================================================
