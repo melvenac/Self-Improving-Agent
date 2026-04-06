@@ -305,6 +305,13 @@ function runMigrations(db: Database.Database): void {
       SELECT project_dir FROM sessions WHERE id = summaries.session_id
     ) WHERE project_dir IS NULL;
   `);
+
+  // Migration: add archived_into column for knowledge consolidation
+  try {
+    db.exec("ALTER TABLE knowledge ADD COLUMN archived_into INTEGER DEFAULT NULL");
+  } catch {
+    // Column already exists — ignore
+  }
 }
 
 // Session-scoped set of knowledge IDs recalled this session.
@@ -406,6 +413,7 @@ export async function recall(
       FROM knowledge_fts
       JOIN knowledge k ON k.id = knowledge_fts.rowid
       WHERE knowledge_fts MATCH ?
+      AND k.archived_into IS NULL
     `;
     const kParams: unknown[] = [safeQuery];
 
@@ -556,7 +564,7 @@ export async function recall(
             // Positive rowid = knowledge entry
             const k = db
               .prepare(
-                "SELECT id, key, content, tags, source, project_dir, maturity, success_rate, created_at FROM knowledge WHERE id = ?"
+                "SELECT id, key, content, tags, source, project_dir, maturity, success_rate, created_at FROM knowledge WHERE id = ? AND archived_into IS NULL"
               )
               .get(rid) as {
               id: number;
@@ -1129,7 +1137,7 @@ export function listKnowledge(limit: number = 20, project?: string): Array<{
   if (project) {
     return db
       .prepare(
-        "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge WHERE project_dir IS NULL OR project_dir LIKE ? ORDER BY created_at DESC LIMIT ?"
+        "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge WHERE (project_dir IS NULL OR project_dir LIKE ?) AND archived_into IS NULL ORDER BY created_at DESC LIMIT ?"
       )
       .all(`%${project}%`, limit) as Array<{
       id: number;
@@ -1146,7 +1154,7 @@ export function listKnowledge(limit: number = 20, project?: string): Array<{
 
   return db
     .prepare(
-      "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge ORDER BY created_at DESC LIMIT ?"
+      "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge WHERE archived_into IS NULL ORDER BY created_at DESC LIMIT ?"
     )
     .all(limit) as Array<{
     id: number;
