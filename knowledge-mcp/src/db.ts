@@ -860,6 +860,11 @@ export function deleteSummaryForSession(sessionId: string): void {
   db.prepare("DELETE FROM summaries WHERE session_id = ?").run(sessionId);
 }
 
+export function deleteChunk(chunkId: number): number {
+  const db = getKnowledgeDb();
+  return db.prepare("DELETE FROM chunks WHERE id = ?").run(chunkId).changes;
+}
+
 // ============================================================
 // Chunks & Tags
 // ============================================================

@@ -22,6 +22,7 @@ import {
   deleteKnowledgeById,
   setActiveSession,
   getActiveSession,
+  deleteChunk,
 } from "./db.js";
 import { evaluateLifecycle, type Rating, type FeedbackEntry } from "./lifecycle.js";
 import { indexSessionFile, indexAllUnindexed } from "./indexer.js";
@@ -403,6 +404,28 @@ server.tool(
             deleted > 0
               ? `Removed ${deleted} knowledge entry(ies).`
               : `No knowledge found with ${id ? `id ${id}` : `key "${key}"`}.`,
+        },
+      ],
+    };
+  }
+);
+
+// --- kb_forget_chunk: Remove a specific chunk by ID ---
+server.tool(
+  "kb_forget_chunk",
+  "Remove a specific chunk by ID. Use for cleaning up test artifacts or unwanted chunks.",
+  {
+    id: z.number().describe("Chunk ID to delete"),
+  },
+  async ({ id }) => {
+    const deleted = deleteChunk(id);
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: deleted > 0
+            ? `Deleted chunk ${id}.`
+            : `Chunk ${id} not found.`,
         },
       ],
     };
