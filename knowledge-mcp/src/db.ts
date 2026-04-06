@@ -416,7 +416,7 @@ export async function recall(
     }
 
     knowledgeSql += ` ORDER BY weighted_rank LIMIT ?`;
-    kParams.push(limit * 2); // fetch extra for RRF merge
+    kParams.push(limit * 3); // fetch extra for RRF merge + diversity filter
 
     try {
       const kRows = db.prepare(knowledgeSql).all(...kParams) as Array<{
@@ -493,7 +493,7 @@ export async function recall(
           LIMIT ?
         `
         )
-        .all(safeQuery, limit * 2) as Array<{
+        .all(safeQuery, limit * 3) as Array<{
         id: number;
         summary: string;
         snippet: string;
@@ -663,7 +663,7 @@ export async function recall(
   if (!vecAvailable) {
     const results = ftsRanked.map((r) => r.result);
     results.sort((a, b) => a.weighted_rank - b.weighted_rank);
-    return results.slice(0, limit);
+    return diversifyResults(results, limit);
   }
 
   // Build rank maps (0-indexed rank within each list)
@@ -699,11 +699,12 @@ export async function recall(
   // Higher RRF score = better
   scored.sort((a, b) => b.rrfScore - a.rrfScore);
 
-  // Update weighted_rank to reflect RRF ordering (for downstream consumers)
-  return scored.slice(0, limit).map((s, i) => ({
+  // Over-fetch then diversify: pass all scored results, filter down to limit
+  const allRanked = scored.map((s) => ({
     ...s.result,
     weighted_rank: -(s.rrfScore), // negative so lower = better convention holds
   }));
+  return diversifyResults(allRanked, limit);
 }
 
 // ============================================================
