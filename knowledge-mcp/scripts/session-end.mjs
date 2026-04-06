@@ -39,7 +39,16 @@ const CLUSTER_THRESHOLD = 3;
 
 // Shadow-recall paths
 const SHADOW_LOG_PATH = join(HOME, '.claude', 'knowledge-mcp', 'shadow-recall.jsonl');
-const RECALLED_ENTRIES_PATH = join(HOME, '.claude', 'context-mode', '.recalled-entries.json');
+
+// .recalled-entries.json can be in the project root (written by /start) or context-mode dir (legacy)
+function findRecalledEntriesPath() {
+  const candidates = [
+    join(process.cwd(), '.recalled-entries.json'),
+    join(HOME, '.claude', 'context-mode', '.recalled-entries.json'),
+  ];
+  return candidates.find(p => existsSync(p)) || null;
+}
+const RECALLED_ENTRIES_PATH = findRecalledEntriesPath();
 
 // ---------------------------------------------------------------------------
 // Utilities
@@ -441,7 +450,7 @@ function weightedRrf(ftsResults, vecResults, ftsWeight = 1.0, vecWeight = 1.0, K
 async function runStage3ShadowRecall() {
   log('Stage 3: Shadow-recall — replay queries with alternative strategies');
 
-  if (!existsSync(RECALLED_ENTRIES_PATH)) {
+  if (!RECALLED_ENTRIES_PATH) {
     log('Stage 3: No .recalled-entries.json — skipping (no recalls this session)');
     return;
   }
@@ -850,8 +859,8 @@ function detectReferences(chunks, recalledEntries) {
 // ---------------------------------------------------------------------------
 
 async function autoFeedback() {
-  const recalledPath = join(HOME, '.claude', 'context-mode', '.recalled-entries.json');
-  if (!existsSync(recalledPath)) {
+  const recalledPath = findRecalledEntriesPath();
+  if (!recalledPath) {
     log('Auto-feedback: no .recalled-entries.json — skipping');
     return;
   }
@@ -868,6 +877,17 @@ async function autoFeedback() {
     log('Auto-feedback: no recalled entries to rate');
     return;
   }
+
+  // Resolve IDs for all entries upfront (needed by both reference detection and rating)
+  const dbLookup = new Database(KB_PATH, { readonly: true });
+  for (const entry of recalled.entries) {
+    if (entry.source !== 'knowledge') continue;
+    if (!entry.id && entry.key) {
+      const lookup = dbLookup.prepare('SELECT id FROM knowledge WHERE key = ?').get(entry.key);
+      if (lookup) entry.id = lookup.id;
+    }
+  }
+  dbLookup.close();
 
   // Load session chunks for reference detection
   let referenceMap = new Map();
@@ -915,11 +935,12 @@ async function autoFeedback() {
 
   for (const entry of recalled.entries) {
     if (entry.source !== 'knowledge' || !entry.id) continue;
+    const entryId = entry.id;
 
     // Get the entry's tags and current feedback counts
     const row = dbWrite.prepare(
       'SELECT tags, helpful_count, harmful_count, neutral_count FROM knowledge WHERE id = ?'
-    ).get(entry.id);
+    ).get(entryId);
 
     if (!row) continue;
 
@@ -943,7 +964,7 @@ async function autoFeedback() {
 
     // Update the knowledge entry
     const col = rating === 'helpful' ? 'helpful_count' : 'neutral_count';
-    const wasReferenced = referenceMap.get(entry.id) || false;
+    const wasReferenced = referenceMap.get(entryId) || false;
     dbWrite.prepare(
       `UPDATE knowledge
        SET ${col} = ${col} + 1,
@@ -952,9 +973,9 @@ async function autoFeedback() {
            reference_count = CASE WHEN ? THEN reference_count + 1 ELSE reference_count END,
            updated_at = datetime('now')
        WHERE id = ?`
-    ).run(successRate, maturity, wasReferenced ? 1 : 0, entry.id);
+    ).run(successRate, maturity, wasReferenced ? 1 : 0, entryId);
 
-    console.log(`[auto-feedback] #${entry.id} (${entry.key || 'no-key'}): ${rating}, referenced: ${wasReferenced}`);
+    console.log(`[auto-feedback] #${entryId} (${entry.key || 'no-key'}): ${rating}, referenced: ${wasReferenced}`);
     rated++;
   }
 

@@ -115,7 +115,8 @@ server.tool(
                 ? "[session summary]"
                 : `[${match.category}]`;
 
-          results.push(`### ${typeLabel} ${match.source}`);
+          const idTag = match.id != null ? ` (id: ${match.id})` : "";
+          results.push(`### ${typeLabel} ${match.source}${idTag}`);
           results.push(
             `Session: ${match.session_started} | Project: ${match.project_dir || "unknown"}`
           );

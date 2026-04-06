@@ -12,7 +12,7 @@ import {
   EMBEDDING_DIM,
 } from "./embed.js";
 
-const KB_DIR = join(homedir(), ".claude", "context-mode");
+const KB_DIR = process.env.KB_DIR || join(homedir(), ".claude", "context-mode");
 const KB_PATH = join(KB_DIR, "knowledge.db");
 
 let _db: Database.Database | null = null;
@@ -339,6 +339,7 @@ export function clearActiveSession(): void {
 // ============================================================
 
 export interface RecallResult {
+  id: number | null;
   source: string;
   category: string;
   snippet: string;
@@ -440,6 +441,7 @@ export async function recall(
         ftsRanked.push({
           key: `knowledge:${row.id}`,
           result: {
+            id: row.id,
             source: row.key || row.source || "stored knowledge",
             category: "knowledge",
             snippet: row.snippet,
@@ -506,6 +508,7 @@ export async function recall(
         ftsRanked.push({
           key: `summary:${row.id}`,
           result: {
+            id: null,
             source: "session summary",
             category: "summary",
             snippet: row.snippet,
@@ -588,6 +591,7 @@ export async function recall(
             vecRanked.push({
               key: `knowledge:${k.id}`,
               result: {
+                id: k.id,
                 source: k.key || k.source || "stored knowledge",
                 category: "knowledge",
                 snippet: snippetText,
@@ -631,6 +635,7 @@ export async function recall(
             vecRanked.push({
               key: `summary:${sm.id}`,
               result: {
+                id: null,
                 source: "session summary",
                 category: "summary",
                 snippet: snippetText,
