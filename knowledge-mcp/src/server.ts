@@ -23,6 +23,8 @@ import {
   setActiveSession,
   getActiveSession,
   deleteChunk,
+  findSimilarityClusters,
+  getStaleKnowledge,
 } from "./db.js";
 import { evaluateLifecycle, type Rating, type FeedbackEntry } from "./lifecycle.js";
 import { indexSessionFile, indexAllUnindexed } from "./indexer.js";
@@ -752,6 +754,53 @@ server.tool(
 
     if (result.transitionMessage) {
       lines.push(`Lifecycle: ${result.transitionMessage}`);
+    }
+
+    return {
+      content: [{ type: "text" as const, text: lines.join("\n") }],
+    };
+  }
+);
+
+// --- kb_recall_report: Knowledge quality analysis ---
+server.tool(
+  "kb_recall_report",
+  "Analyze knowledge base quality: find duplicate clusters, stale entries, and consolidation candidates. Returns a markdown report.",
+  {
+    threshold: z.number().optional().describe("Similarity threshold for clustering (default: 0.85)"),
+    stale_days: z.number().optional().describe("Days without recall to consider stale (default: 30)"),
+  },
+  async ({ threshold, stale_days }) => {
+    const simThreshold = threshold ?? 0.85;
+    const staleDays = stale_days ?? 30;
+
+    const clusters = findSimilarityClusters(simThreshold);
+    const stale = getStaleKnowledge(staleDays);
+
+    const lines: string[] = ["# Knowledge Quality Report", ""];
+
+    lines.push(`## Consolidation Candidates (${clusters.length} clusters at >${(simThreshold * 100).toFixed(0)}% similarity)`);
+    lines.push("");
+    if (clusters.length === 0) {
+      lines.push("No duplicate clusters found.");
+    } else {
+      for (const cluster of clusters) {
+        lines.push(`**Cluster** (similarity: ${(cluster.maxSimilarity * 100).toFixed(1)}%):`);
+        for (const e of cluster.entries) {
+          lines.push(`  - [${e.id}] ${e.key || "(no key)"}`);
+        }
+        lines.push("");
+      }
+    }
+
+    lines.push(`## Stale Entries (${stale.length} entries, 0 recalls in ${staleDays}+ days)`);
+    lines.push("");
+    if (stale.length === 0) {
+      lines.push("No stale entries found.");
+    } else {
+      for (const s of stale) {
+        lines.push(`- [${s.id}] ${s.key || "(no key)"} — created: ${s.created_at.split("T")[0]}`);
+      }
     }
 
     return {

@@ -779,6 +779,69 @@ function diversifyResults(
 }
 
 // ============================================================
+// Recall quality report
+// ============================================================
+
+export function getAllKnowledgeEmbeddings(): Array<{ id: number; key: string | null; embedding: Float32Array }> {
+  const db = getKnowledgeDb();
+  const rows = db.prepare(`
+    SELECT k.id, k.key, v.embedding
+    FROM knowledge k
+    JOIN knowledge_vec v ON v.rowid = k.id
+    WHERE k.archived_into IS NULL
+  `).all() as Array<{ id: number; key: string | null; embedding: Buffer }>;
+
+  return rows.map((r) => ({
+    id: r.id,
+    key: r.key,
+    embedding: new Float32Array(r.embedding.buffer, r.embedding.byteOffset, r.embedding.byteLength / 4),
+  }));
+}
+
+export function findSimilarityClusters(
+  threshold: number = 0.85
+): Array<{ entries: Array<{ id: number; key: string | null }>; maxSimilarity: number }> {
+  const all = getAllKnowledgeEmbeddings();
+  const clustered = new Set<number>();
+  const clusters: Array<{ entries: Array<{ id: number; key: string | null }>; maxSimilarity: number }> = [];
+
+  for (let i = 0; i < all.length; i++) {
+    if (clustered.has(all[i].id)) continue;
+    const cluster: Array<{ id: number; key: string | null }> = [{ id: all[i].id, key: all[i].key }];
+    let maxSim = 0;
+
+    for (let j = i + 1; j < all.length; j++) {
+      if (clustered.has(all[j].id)) continue;
+      const sim = cosineSimilarity(all[i].embedding, all[j].embedding);
+      if (sim > threshold) {
+        cluster.push({ id: all[j].id, key: all[j].key });
+        clustered.add(all[j].id);
+        if (sim > maxSim) maxSim = sim;
+      }
+    }
+
+    if (cluster.length > 1) {
+      clustered.add(all[i].id);
+      clusters.push({ entries: cluster, maxSimilarity: maxSim });
+    }
+  }
+
+  return clusters;
+}
+
+export function getStaleKnowledge(olderThanDays: number = 30): Array<{ id: number; key: string | null; created_at: string; recall_count: number }> {
+  const db = getKnowledgeDb();
+  return db.prepare(`
+    SELECT id, key, created_at, recall_count
+    FROM knowledge
+    WHERE archived_into IS NULL
+      AND recall_count = 0
+      AND created_at < datetime('now', '-' || ? || ' days')
+    ORDER BY created_at ASC
+  `).all(olderThanDays) as Array<{ id: number; key: string | null; created_at: string; recall_count: number }>;
+}
+
+// ============================================================
 // Stats
 // ============================================================
 
