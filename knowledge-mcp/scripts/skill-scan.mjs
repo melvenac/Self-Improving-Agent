@@ -171,6 +171,49 @@ function parseExistingSkills(content) {
   return skills;
 }
 
+function clusterFileOverlap(a, b) {
+  const filesA = new Set(a.files || []);
+  const filesB = new Set(b.files || []);
+  if (filesA.size === 0 || filesB.size === 0) return 0;
+  const intersection = [...filesA].filter(f => filesB.has(f));
+  return intersection.length / Math.min(filesA.size, filesB.size);
+}
+
+function consolidateClusters(clusters, overlapThreshold = 0.6) {
+  const merged = [...clusters.map(c => ({
+    tags: c.tags || [c.tag],
+    count: c.count || (c.files ? c.files.length : 0),
+    files: [...(c.files || [])],
+    date: new Date().toISOString().split('T')[0],
+    consolidated_from: 1,
+  }))];
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (let i = 0; i < merged.length; i++) {
+      for (let j = i + 1; j < merged.length; j++) {
+        const overlap = clusterFileOverlap(merged[i], merged[j]);
+        if (overlap > overlapThreshold) {
+          merged[i] = {
+            tags: [...new Set([...merged[i].tags, ...merged[j].tags])],
+            count: new Set([...merged[i].files, ...merged[j].files]).size,
+            files: [...new Set([...merged[i].files, ...merged[j].files])],
+            date: merged[i].date,
+            consolidated_from: merged[i].consolidated_from + merged[j].consolidated_from,
+          };
+          merged.splice(j, 1);
+          changed = true;
+          break;
+        }
+      }
+      if (changed) break;
+    }
+  }
+
+  return merged;
+}
+
 function main() {
   log('Starting skill scan');
 
@@ -344,14 +387,10 @@ function main() {
 
   // 6. Write proposals marker if new clusters found
   if (newClusters.length > 0) {
-    const proposals = newClusters.map(c => ({
-      tag: c.tag,
-      count: c.count,
-      files: c.files,
-      date: today()
-    }));
-    writeFileSync(PROPOSALS_FILE, JSON.stringify(proposals, null, 2));
-    log(`Wrote ${newClusters.length} pending proposal(s) to .skill-proposals-pending.json`);
+    const consolidated = consolidateClusters(newClusters);
+    log(`Consolidated ${newClusters.length} tag clusters → ${consolidated.length} groups`);
+    writeFileSync(PROPOSALS_FILE, JSON.stringify(consolidated, null, 2));
+    log(`Wrote ${consolidated.length} pending proposal(s) to .skill-proposals-pending.json`);
   }
 
   // Print summary to stdout for hook output
