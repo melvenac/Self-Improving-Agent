@@ -5,7 +5,7 @@
  * Combines version synchronization, structural consistency checks,
  * and protocol health scoring into a single script.
  *
- * Checks (32):
+ * Checks:
  *   1. Version sync — package.json → README, PRD, knowledge-mcp/package.json
  *   2. CHANGELOG — entry exists for current version
  *   3. README — all referenced scripts/files exist, no stale references
@@ -16,6 +16,7 @@
  *   8. Obsidian vault — expected directories exist
  *   9. Template — project-template/ mirrors expected structure
  *  10. Installed drift — repo files match ~/.claude/ installed copies
+ *  11. Spec provenance — docs/superpowers/specs/*.md tracked as knowledge chunks
  *
  * Scoring (5 categories, 100 pts):
  *   Config & Structure (25) — existing checks normalized
@@ -32,7 +33,7 @@
  *   node scripts/sync.mjs --history    # score trend across sessions
  */
 
-import { readFileSync, writeFileSync, existsSync, statSync, appendFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, statSync, appendFileSync, mkdirSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
@@ -444,6 +445,59 @@ function checkInstalledDrift() {
   }
 }
 
+// ── 13. Spec provenance ────────────────────────────────────────────
+
+function checkSpecProvenance() {
+  const specsDir = join(ROOT, "docs", "superpowers", "specs");
+  if (!existsSync(specsDir)) {
+    warn("SPECS", "docs/superpowers/specs/ not found — skipping spec provenance check");
+    return;
+  }
+
+  let specFiles;
+  try {
+    specFiles = readdirSync(specsDir).filter(f => f.endsWith(".md"));
+  } catch (err) {
+    warn("SPECS", `Failed to list spec files: ${err.message}`);
+    return;
+  }
+
+  if (specFiles.length === 0) {
+    pass("SPECS", "No spec files found (nothing to track)");
+    return;
+  }
+
+  const db = openKnowledgeDb();
+  if (!db) {
+    warn("SPECS", `${specFiles.length} spec file(s) found but knowledge.db unavailable — cannot verify provenance`);
+    return;
+  }
+
+  try {
+    const untracked = [];
+    for (const filename of specFiles) {
+      const row = db.prepare(
+        "SELECT 1 FROM chunks WHERE category = 'spec' AND content LIKE ? LIMIT 1"
+      ).get(`%${filename}%`);
+      if (!row) {
+        untracked.push(filename);
+      }
+    }
+
+    if (untracked.length === 0) {
+      pass("SPECS", `All ${specFiles.length} spec file(s) have corresponding knowledge chunks`);
+    } else {
+      for (const f of untracked) {
+        warn("SPECS", `Spec not tracked as knowledge chunk: ${f}`, "Run kb_store_chunk with category='spec' to index it");
+      }
+    }
+  } catch (err) {
+    warn("SPECS", `Spec provenance query failed: ${err.message}`);
+  } finally {
+    db.close();
+  }
+}
+
 function printScoreReport() {
   const total = Object.values(scoreCategories).reduce((s, c) => s + Math.min(c.points, c.max), 0);
   const maxTotal = Object.values(scoreCategories).reduce((s, c) => s + c.max, 0);
@@ -798,6 +852,7 @@ checkClaudeMd();
 checkObsidianVault();
 checkTemplate();
 checkInstalledDrift();
+checkSpecProvenance();
 
 if (scoreMode) {
   scoreConfigStructure();
