@@ -707,6 +707,69 @@ export async function recall(
 }
 
 // ============================================================
+// Diversity helpers
+// ============================================================
+
+function cosineSimilarity(a: Float32Array, b: Float32Array): number {
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  const denom = Math.sqrt(normA) * Math.sqrt(normB);
+  return denom === 0 ? 0 : dot / denom;
+}
+
+function getEmbeddingForId(id: number): Float32Array | null {
+  try {
+    const db = getKnowledgeDb();
+    const row = db.prepare(
+      "SELECT embedding FROM knowledge_vec WHERE rowid = ?"
+    ).get(id) as { embedding: Buffer } | undefined;
+    if (!row) return null;
+    return new Float32Array(row.embedding.buffer, row.embedding.byteOffset, row.embedding.byteLength / 4);
+  } catch {
+    return null;
+  }
+}
+
+function diversifyResults(
+  ranked: RecallResult[],
+  limit: number,
+  threshold: number = 0.85
+): RecallResult[] {
+  const selected: RecallResult[] = [];
+  const selectedVecs: Float32Array[] = [];
+
+  for (const result of ranked) {
+    if (selected.length >= limit) break;
+
+    // Only diversify knowledge-type results that have embeddings
+    if (result.result_type !== "knowledge" || !result.id) {
+      selected.push(result);
+      continue;
+    }
+
+    const vec = getEmbeddingForId(result.id);
+    if (!vec) {
+      selected.push(result);
+      continue;
+    }
+
+    const tooSimilar = selectedVecs.some(
+      (sv) => cosineSimilarity(vec, sv) > threshold
+    );
+    if (tooSimilar) continue;
+
+    selected.push(result);
+    selectedVecs.push(vec);
+  }
+
+  return selected;
+}
+
+// ============================================================
 // Stats
 // ============================================================
 
