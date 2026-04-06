@@ -1184,6 +1184,46 @@ export function deleteKnowledgeById(id: number): boolean {
   return result.changes > 0;
 }
 
+export function archiveKnowledge(sourceIds: number[], newEntryId: number): number {
+  const db = getKnowledgeDb();
+  const stmt = db.prepare(
+    "UPDATE knowledge SET archived_into = ?, updated_at = ? WHERE id = ? AND archived_into IS NULL"
+  );
+  const now = new Date().toISOString();
+  let count = 0;
+  for (const id of sourceIds) {
+    count += stmt.run(newEntryId, now, id).changes;
+  }
+  return count;
+}
+
+export function inheritFeedbackCounts(targetId: number, sourceIds: number[]): void {
+  const db = getKnowledgeDb();
+  let helpful = 0, harmful = 0, neutral = 0;
+
+  for (const id of sourceIds) {
+    const entry = getKnowledgeById(id);
+    if (entry) {
+      helpful += entry.helpful_count;
+      harmful += entry.harmful_count;
+      neutral += entry.neutral_count;
+    }
+  }
+
+  const total = helpful + harmful + neutral;
+  const successRate = total > 0 ? helpful / total : null;
+  let maturity = "progenitor";
+  if (helpful >= 7 && successRate !== null && successRate >= 0.5) maturity = "mature";
+  else if (helpful >= 3 && successRate !== null && successRate >= 0.5) maturity = "proven";
+
+  db.prepare(`
+    UPDATE knowledge
+    SET helpful_count = ?, harmful_count = ?, neutral_count = ?,
+        success_rate = ?, maturity = ?, updated_at = ?
+    WHERE id = ?
+  `).run(helpful, harmful, neutral, successRate, maturity, new Date().toISOString(), targetId);
+}
+
 export function listKnowledge(limit: number = 20, project?: string): Array<{
   id: number;
   key: string | null;

@@ -25,6 +25,8 @@ import {
   deleteChunk,
   findSimilarityClusters,
   getStaleKnowledge,
+  archiveKnowledge,
+  inheritFeedbackCounts,
 } from "./db.js";
 import { evaluateLifecycle, type Rating, type FeedbackEntry } from "./lifecycle.js";
 import { indexSessionFile, indexAllUnindexed } from "./indexer.js";
@@ -758,6 +760,49 @@ server.tool(
 
     return {
       content: [{ type: "text" as const, text: lines.join("\n") }],
+    };
+  }
+);
+
+// --- kb_consolidate: Archive source entries into a consolidated entry ---
+server.tool(
+  "kb_consolidate",
+  "Archive multiple knowledge entries into a new consolidated entry. The new entry should already be stored via kb_store. This tool archives the originals and inherits their feedback counts.",
+  {
+    source_ids: z
+      .array(z.number())
+      .describe("IDs of the knowledge entries to archive"),
+    consolidated_id: z
+      .number()
+      .describe("ID of the new consolidated entry (already created via kb_store)"),
+  },
+  async ({ source_ids, consolidated_id }) => {
+    const target = getKnowledgeById(consolidated_id);
+    if (!target) {
+      return {
+        content: [
+          { type: "text" as const, text: `Error: consolidated entry ${consolidated_id} not found. Create it via kb_store first.` },
+        ],
+        isError: true,
+      };
+    }
+
+    const archived = archiveKnowledge(source_ids, consolidated_id);
+    inheritFeedbackCounts(consolidated_id, source_ids);
+
+    const updated = getKnowledgeById(consolidated_id);
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: [
+            `Consolidated ${archived} entries into #${consolidated_id} (${target.key || "no key"}).`,
+            `Inherited maturity: ${updated?.maturity || "unknown"} (${updated?.helpful_count || 0} helpful, ${updated?.harmful_count || 0} harmful)`,
+            `Archived source IDs: ${source_ids.join(", ")}`,
+          ].join("\n"),
+        },
+      ],
     };
   }
 );
