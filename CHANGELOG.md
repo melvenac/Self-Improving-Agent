@@ -1,5 +1,21 @@
 # Changelog
 
+## [v0.6.0] - 2026-04-06
+
+### Added
+- **Recall-time diversity filter:** Post-RRF cosine similarity check (threshold 0.85) skips near-duplicate results, ensuring agents get diverse knowledge. Over-fetches 3x then filters down.
+- **`kb_recall_report` MCP tool:** Analyzes knowledge base quality — finds duplicate clusters by vector similarity, lists stale entries with zero recalls. Configurable threshold and staleness window.
+- **`kb_consolidate` MCP tool:** Archives multiple overlapping knowledge entries into a single consolidated entry. Inherits feedback counts and maturity from sources. Originals soft-deleted via `archived_into` column.
+- **`kb_forget_chunk` MCP tool:** Delete individual chunks by ID for fine-grained cleanup.
+- **Storage-time dedup:** `kb_store` checks for similar existing entries (Jaccard >50%) and logs near-duplicates to `~/.claude/knowledge-mcp/dedup-review.json` with a warning. Non-blocking — entries still stored.
+- **Skill proposal consolidation:** `skill-scan.mjs` merges tag-based clusters with >60% file overlap, reducing noise (e.g., 51 clusters → ~15 groups).
+- **Spec provenance tracking:** `/sync` validates that design specs in `docs/superpowers/specs/` have corresponding knowledge chunks with `category: "spec"`.
+- **Subagent /start loop fix:** Lock file mechanism (`.agents/.start-lock`) prevents recursive `/start` invocation when Explore subagents trigger SessionStart hooks.
+
+### Changed
+- **`archived_into` schema migration:** New nullable column on knowledge table. Archived entries excluded from `recall()` and `listKnowledge()`.
+- **`recall()` over-fetches:** FTS and vector queries now fetch `limit * 3` candidates, then diversity-filter down to `limit`.
+
 ## [v0.5.5] - 2026-04-05
 
 ### Added
