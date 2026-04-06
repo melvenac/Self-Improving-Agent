@@ -27,6 +27,7 @@ import {
   getStaleKnowledge,
   archiveKnowledge,
   inheritFeedbackCounts,
+  findSimilarKnowledge,
 } from "./db.js";
 import { evaluateLifecycle, type Rating, type FeedbackEntry } from "./lifecycle.js";
 import { indexSessionFile, indexAllUnindexed } from "./indexer.js";
@@ -359,13 +360,49 @@ server.tool(
   },
   async ({ content, key, tags, source, scope, project_dir, session_id }) => {
     const effectiveProjectDir = scope === "project" ? project_dir || null : null;
+
+    // Storage-time dedup: check for similar existing entries
+    const similar = findSimilarKnowledge(content);
+    if (similar.length > 0) {
+      const top = similar[0];
+      // Log to dedup-review.json instead of blocking
+      try {
+        const { readFileSync, writeFileSync } = await import("node:fs");
+        const { join } = await import("node:path");
+        const { homedir } = await import("node:os");
+        const reviewPath = join(homedir(), ".claude", "knowledge-mcp", "dedup-review.json");
+        let reviews: any[] = [];
+        try { reviews = JSON.parse(readFileSync(reviewPath, "utf8")); } catch { }
+        reviews.push({
+          date: new Date().toISOString(),
+          new_key: key || null,
+          new_content_preview: content.slice(0, 200),
+          similar_to: { id: top.id, key: top.key, overlap: Math.round(top.overlap * 100) / 100 },
+          action: "pending",
+        });
+        writeFileSync(reviewPath, JSON.stringify(reviews, null, 2));
+      } catch { /* non-critical */ }
+
+      // Still store the entry, but include a warning in the response
+      // (propose-and-approve means we flag, not block)
+    }
+
     const id = await insertKnowledge(content, key, tags, source, effectiveProjectDir || undefined, session_id);
     const scopeLabel = effectiveProjectDir ? ` [project: ${effectiveProjectDir}]` : " [global]";
+
+    let responseText = `Stored knowledge entry ${id}${key ? ` (key: "${key}")` : ""}`;
+    if (similar.length > 0) {
+      const top = similar[0];
+      responseText += `\n⚠️ Similar to existing [${top.id}] ${top.key || "(no key)"} (${Math.round(top.overlap * 100)}% overlap). Review at ~/.claude/knowledge-mcp/dedup-review.json`;
+    } else {
+      responseText = `Stored knowledge (id: ${id})${key ? ` with key "${key}"` : ""}${scopeLabel}${tags && tags.length > 0 ? ` — tags: ${tags.join(", ")}` : ""}`;
+    }
+
     return {
       content: [
         {
           type: "text" as const,
-          text: `Stored knowledge (id: ${id})${key ? ` with key "${key}"` : ""}${scopeLabel}${tags && tags.length > 0 ? ` — tags: ${tags.join(", ")}` : ""}`,
+          text: responseText,
         },
       ],
     };

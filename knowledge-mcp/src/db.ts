@@ -842,6 +842,40 @@ export function getStaleKnowledge(olderThanDays: number = 30): Array<{ id: numbe
 }
 
 // ============================================================
+// Storage-time dedup
+// ============================================================
+
+export function contentOverlap(a: string, b: string): number {
+  const wordsA = new Set(a.toLowerCase().split(/\s+/).filter(w => w.length > 4));
+  const wordsB = new Set(b.toLowerCase().split(/\s+/).filter(w => w.length > 4));
+  if (wordsA.size === 0 || wordsB.size === 0) return 0;
+  const intersection = [...wordsA].filter(w => wordsB.has(w));
+  const union = new Set([...wordsA, ...wordsB]);
+  return intersection.length / union.size;
+}
+
+export function findSimilarKnowledge(content: string, limit: number = 3): Array<{ id: number; key: string | null; content: string; overlap: number }> {
+  const db = getKnowledgeDb();
+  const entries = db.prepare(`
+    SELECT id, key, content FROM knowledge
+    WHERE archived_into IS NULL
+    ORDER BY created_at DESC
+    LIMIT 100
+  `).all() as Array<{ id: number; key: string | null; content: string }>;
+
+  const results: Array<{ id: number; key: string | null; content: string; overlap: number }> = [];
+  for (const entry of entries) {
+    const overlap = contentOverlap(content, entry.content);
+    if (overlap > 0.5) {
+      results.push({ ...entry, overlap });
+    }
+  }
+
+  results.sort((a, b) => b.overlap - a.overlap);
+  return results.slice(0, limit);
+}
+
+// ============================================================
 // Stats
 // ============================================================
 
