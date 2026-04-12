@@ -54,7 +54,7 @@ export function scoreConfigStructure(checks: CheckResult[]): CategoryScore {
     }
   }
 
-  const score = Math.round((passed + warned * 0.5) / checks.length * 25);
+  const score = Math.min(Math.round((passed + warned * 0.5) / checks.length * 25), 25);
   return {
     name: "Config & Structure",
     score,
@@ -75,7 +75,7 @@ export function scoreKnowledgeQuality(input: KnowledgeQualityInput): CategorySco
   const coverage = totalEntries > 0 ? (ratedEntries / totalEntries) * 8 : 0;
   const dedup = 7 - Math.min(duplicateClusters * 2, 7);
 
-  const score = Math.round(precision + coverage + dedup);
+  const score = Math.min(Math.round(precision + coverage + dedup), 25);
   return {
     name: "Knowledge Quality",
     score,
@@ -95,7 +95,7 @@ export function scoreStaleness(input: StalenessInput): CategoryScore {
   const lowSuccess = Math.max(0, 5 - lowSuccessCount);
   const summaryGap = eligibleSessions > 0 ? (summarizedSessions / eligibleSessions) * 5 : 5;
 
-  const score = Math.round(stale + lowSuccess + summaryGap);
+  const score = Math.min(Math.round(stale + lowSuccess + summaryGap), 20);
   return {
     name: "Staleness",
     score,
@@ -119,7 +119,7 @@ export function scoreCoverage(input: CoverageInput): CategoryScore {
     ? Math.round(Math.min(skillsImplemented / proposalClusters * 2, 1) * 5)
     : 5;
 
-  const score = Math.round(domain + maturity + skillConversion);
+  const score = Math.min(Math.round(domain + maturity + skillConversion), 20);
   return {
     name: "Coverage",
     score,
@@ -155,7 +155,7 @@ export function scorePipelineHealth(input: PipelineHealthInput): CategoryScore {
     shadowScore = age <= d7 ? 3 : 1;
   }
 
-  const score = hookRecency + trendScore + shadowScore;
+  const score = Math.min(hookRecency + trendScore + shadowScore, 10);
   return {
     name: "Pipeline Health",
     score,

@@ -5,7 +5,8 @@
   "description": "Unified knowledge pipeline — the v2 brain",
   "main": "./build/cli.js",
   "bin": {
-    "open-brain": "./build/cli.js"
+    "open-brain": "./build/cli.js",
+    "open-brain-server": "./build/server.js"
   },
   "scripts": {
     "build": "tsc",
@@ -14,13 +15,15 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "better-sqlite3": "^12.6.2"
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "better-sqlite3": "^12.6.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.19.11",
-    "typescript": "^5.7.0",
     "tsx": "^4.21.0",
+    "typescript": "^5.7.0",
     "vitest": "^3.2.1"
   }
 }
