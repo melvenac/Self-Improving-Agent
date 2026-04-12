@@ -211,6 +211,7 @@ describe("validation checks", () => {
     });
 
     it("warns when SUMMARY.md is missing", () => {
+      rmSync(join(tempDir, ".agents", "SYSTEM", "SUMMARY.md"), { force: true });
       const result = checkSummary("0.6.0", tempDir);
       expect(result.severity).toBe("warn");
     });
