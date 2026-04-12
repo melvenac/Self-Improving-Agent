@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { createDb, OpenBrainDb } from "../src/db.js";
+import { createDb, OpenBrainDb, KnowledgeStats, StalenessStats, CoverageStats } from "../src/db.js";
 
 let db: OpenBrainDb;
 
@@ -315,5 +315,132 @@ describe("Summaries", () => {
     db.insertSummary(session.id, "Done");
     const ids = db.getUnsummarizedSessionIds();
     expect(ids).toEqual([]);
+  });
+});
+
+// D5 — Stats Queries
+describe("getKnowledgeStats", () => {
+  it("returns zeros for empty database", () => {
+    const stats: KnowledgeStats = db.getKnowledgeStats();
+    expect(stats.totalEntries).toBe(0);
+    expect(stats.ratedEntries).toBe(0);
+    expect(stats.helpful).toBe(0);
+    expect(stats.harmful).toBe(0);
+    expect(stats.neutral).toBe(0);
+    expect(stats.duplicateClusters).toBe(0);
+  });
+
+  it("returns correct counts after inserting and rating entries", () => {
+    const id1 = db.insertKnowledge("Entry one");
+    const id2 = db.insertKnowledge("Entry two");
+    db.updateFeedback(id1, "helpful");
+    db.updateFeedback(id1, "helpful");
+    db.updateFeedback(id1, "harmful");
+    db.updateFeedback(id2, "neutral");
+
+    const stats: KnowledgeStats = db.getKnowledgeStats();
+    expect(stats.totalEntries).toBe(2);
+    expect(stats.ratedEntries).toBe(2);
+    expect(stats.helpful).toBe(2);
+    expect(stats.harmful).toBe(1);
+    expect(stats.neutral).toBe(1);
+    expect(stats.duplicateClusters).toBe(0);
+  });
+
+  it("excludes archived entries from totalEntries", () => {
+    const id1 = db.insertKnowledge("Active entry");
+    const id2 = db.insertKnowledge("Archived entry");
+    db.raw.prepare("UPDATE knowledge SET archived_into = ? WHERE id = ?").run(id1, id2);
+
+    const stats: KnowledgeStats = db.getKnowledgeStats();
+    expect(stats.totalEntries).toBe(1);
+  });
+});
+
+describe("getStalenessStats", () => {
+  const session1 = {
+    id: "stale-sess-001",
+    db_file: "/a.sqlite",
+    project_dir: "/proj",
+    started_at: "2026-01-01T00:00:00Z",
+    ended_at: "2026-01-01T01:00:00Z",
+    event_count: 2,
+  };
+  const session2 = { ...session1, id: "stale-sess-002", db_file: "/b.sqlite" };
+
+  it("returns zeros for empty database", () => {
+    const stats: StalenessStats = db.getStalenessStats();
+    expect(stats.staleRatio).toBe(0);
+    expect(stats.lowSuccessCount).toBe(0);
+    expect(stats.summarizedSessions).toBe(0);
+    expect(stats.eligibleSessions).toBe(0);
+  });
+
+  it("counts stale entries and session summaries", () => {
+    db.insertKnowledge("Entry with no recalls");        // recall_count=0 → stale
+    const id2 = db.insertKnowledge("Entry with recall");
+    db.raw.prepare("UPDATE knowledge SET recall_count = 3 WHERE id = ?").run(id2);
+
+    db.insertSession(session1);
+    db.insertSession(session2);
+    db.insertSummary(session1.id, "Summary for session 1");
+
+    const stats: StalenessStats = db.getStalenessStats();
+    expect(stats.staleRatio).toBeCloseTo(0.5);   // 1 of 2 entries has recall_count=0
+    expect(stats.summarizedSessions).toBe(1);
+    expect(stats.eligibleSessions).toBe(2);
+  });
+
+  it("counts lowSuccessCount entries with success_rate < 0.3 and >= 5 ratings", () => {
+    const id = db.insertKnowledge("Low quality entry");
+    // 1 helpful, 5 harmful → success_rate = 1/6 ≈ 0.167, total = 6 >= 5
+    db.updateFeedback(id, "helpful");
+    for (let i = 0; i < 5; i++) db.updateFeedback(id, "harmful");
+
+    const stats: StalenessStats = db.getStalenessStats();
+    expect(stats.lowSuccessCount).toBe(1);
+  });
+});
+
+describe("getCoverageStats", () => {
+  it("returns zeros for empty database with passed totalDomains", () => {
+    const stats: CoverageStats = db.getCoverageStats(10);
+    expect(stats.domainsWithEntries).toBe(0);
+    expect(stats.totalDomains).toBe(10);
+    expect(stats.matureCount).toBe(0);
+    expect(stats.provenCount).toBe(0);
+    expect(stats.totalEntries).toBe(0);
+    expect(stats.skillsImplemented).toBe(0);
+    expect(stats.proposalClusters).toBe(0);
+  });
+
+  it("counts distinct tags across entries", () => {
+    db.insertKnowledge("Entry A", { tags: ["typescript", "node"] });
+    db.insertKnowledge("Entry B", { tags: ["typescript", "python"] });
+    db.insertKnowledge("Entry C", { tags: ["rust"] });
+
+    const stats: CoverageStats = db.getCoverageStats(20);
+    // unique tags: typescript, node, python, rust = 4
+    expect(stats.domainsWithEntries).toBe(4);
+    expect(stats.totalDomains).toBe(20);
+    expect(stats.totalEntries).toBe(3);
+  });
+
+  it("counts maturity levels correctly", () => {
+    const id1 = db.insertKnowledge("Mature entry");
+    const id2 = db.insertKnowledge("Proven entry");
+    const id3 = db.insertKnowledge("Progenitor entry");
+    db.raw.prepare("UPDATE knowledge SET maturity = 'mature' WHERE id = ?").run(id1);
+    db.raw.prepare("UPDATE knowledge SET maturity = 'proven' WHERE id = ?").run(id2);
+
+    const stats: CoverageStats = db.getCoverageStats(5);
+    expect(stats.matureCount).toBe(1);
+    expect(stats.provenCount).toBe(1);
+    expect(stats.totalEntries).toBe(3);
+  });
+
+  it("totalDomains echoes the parameter", () => {
+    const stats: CoverageStats = db.getCoverageStats(42);
+    expect(stats.totalDomains).toBe(42);
   });
 });

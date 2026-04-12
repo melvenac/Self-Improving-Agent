@@ -8,6 +8,32 @@ import type {
   SessionRow,
 } from "./pipelines/session-end/types.js";
 
+export interface KnowledgeStats {
+  totalEntries: number;
+  ratedEntries: number;
+  helpful: number;
+  harmful: number;
+  neutral: number;
+  duplicateClusters: number;
+}
+
+export interface StalenessStats {
+  staleRatio: number;
+  lowSuccessCount: number;
+  summarizedSessions: number;
+  eligibleSessions: number;
+}
+
+export interface CoverageStats {
+  domainsWithEntries: number;
+  totalDomains: number;
+  matureCount: number;
+  provenCount: number;
+  totalEntries: number;
+  skillsImplemented: number;
+  proposalClusters: number;
+}
+
 export interface OpenBrainDb extends ChunkStore, KnowledgeStore {
   raw: Database.Database;
   close(): void;
@@ -26,6 +52,9 @@ export interface OpenBrainDb extends ChunkStore, KnowledgeStore {
   search(query: string, options?: { projectDir?: string; limit?: number }): KnowledgeEntry[];
   insertSummary(sessionId: string, summary: string, model?: string, projectDir?: string): void;
   getUnsummarizedSessionIds(): string[];
+  getKnowledgeStats(): KnowledgeStats;
+  getStalenessStats(): StalenessStats;
+  getCoverageStats(totalDomains: number): CoverageStats;
 }
 
 const SCHEMA = `
@@ -364,6 +393,87 @@ export function createDb(dbPath: string): OpenBrainDb {
     getUnsummarizedSessionIds(): string[] {
       const rows = getUnsummarizedSessionIdsStmt.all() as { id: string }[];
       return rows.map((r) => r.id);
+    },
+
+    getKnowledgeStats(): KnowledgeStats {
+      const row = raw.prepare(`
+        SELECT
+          COUNT(*) AS totalEntries,
+          SUM(CASE WHEN helpful_count + harmful_count + neutral_count > 0 THEN 1 ELSE 0 END) AS ratedEntries,
+          SUM(helpful_count) AS helpful,
+          SUM(harmful_count) AS harmful,
+          SUM(neutral_count) AS neutral
+        FROM knowledge
+        WHERE archived_into IS NULL
+      `).get() as { totalEntries: number; ratedEntries: number; helpful: number; harmful: number; neutral: number };
+      return {
+        totalEntries: row.totalEntries ?? 0,
+        ratedEntries: row.ratedEntries ?? 0,
+        helpful: row.helpful ?? 0,
+        harmful: row.harmful ?? 0,
+        neutral: row.neutral ?? 0,
+        duplicateClusters: 0,
+      };
+    },
+
+    getStalenessStats(): StalenessStats {
+      const staleRow = raw.prepare(`
+        SELECT
+          COUNT(*) AS total,
+          SUM(CASE WHEN recall_count = 0 THEN 1 ELSE 0 END) AS stale,
+          SUM(CASE WHEN success_rate < 0.3 AND (helpful_count + harmful_count) >= 5 THEN 1 ELSE 0 END) AS lowSuccess
+        FROM knowledge
+        WHERE archived_into IS NULL
+      `).get() as { total: number; stale: number; lowSuccess: number };
+
+      const sessionRow = raw.prepare(`
+        SELECT
+          COUNT(*) AS total,
+          COUNT(summaries.id) AS summarized
+        FROM sessions
+        LEFT JOIN summaries ON sessions.id = summaries.session_id
+      `).get() as { total: number; summarized: number };
+
+      const total = staleRow.total ?? 0;
+      return {
+        staleRatio: total > 0 ? (staleRow.stale ?? 0) / total : 0,
+        lowSuccessCount: staleRow.lowSuccess ?? 0,
+        summarizedSessions: sessionRow.summarized ?? 0,
+        eligibleSessions: sessionRow.total ?? 0,
+      };
+    },
+
+    getCoverageStats(totalDomains: number): CoverageStats {
+      const rows = raw.prepare(`
+        SELECT tags FROM knowledge WHERE archived_into IS NULL AND tags IS NOT NULL
+      `).all() as { tags: string }[];
+
+      const uniqueTags = new Set<string>();
+      for (const row of rows) {
+        for (const tag of row.tags.split(",")) {
+          const t = tag.trim();
+          if (t) uniqueTags.add(t);
+        }
+      }
+
+      const maturityRow = raw.prepare(`
+        SELECT
+          COUNT(*) AS totalEntries,
+          SUM(CASE WHEN maturity = 'mature' THEN 1 ELSE 0 END) AS matureCount,
+          SUM(CASE WHEN maturity = 'proven' THEN 1 ELSE 0 END) AS provenCount
+        FROM knowledge
+        WHERE archived_into IS NULL
+      `).get() as { totalEntries: number; matureCount: number; provenCount: number };
+
+      return {
+        domainsWithEntries: uniqueTags.size,
+        totalDomains,
+        matureCount: maturityRow.matureCount ?? 0,
+        provenCount: maturityRow.provenCount ?? 0,
+        totalEntries: maturityRow.totalEntries ?? 0,
+        skillsImplemented: 0,
+        proposalClusters: 0,
+      };
     },
   };
 }
