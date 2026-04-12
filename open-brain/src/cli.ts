@@ -68,23 +68,36 @@ if (command === "sync") {
 
   if (score) {
     const paths = resolvePaths(projectRoot);
+    const { existsSync } = await import("node:fs");
     const configScore = scoreConfigStructure(result.checks);
 
-    // DB-dependent categories use placeholder inputs when DB is unavailable
-    // These will be wired to real DB queries when the db module is built
-    const qualityScore = scoreKnowledgeQuality({
-      helpful: 0, harmful: 0, neutral: 0,
-      totalEntries: 0, ratedEntries: 0, duplicateClusters: 0,
-    });
-    const stalenessScore = scoreStaleness({
-      staleRatio: 0, lowSuccessCount: 0,
-      summarizedSessions: 0, eligibleSessions: 0,
-    });
-    const coverageScore = scoreCoverage({
-      domainsWithEntries: 0, totalDomains: 0,
-      matureCount: 0, provenCount: 0, totalEntries: 0,
-      skillsImplemented: 0, proposalClusters: 0,
-    });
+    // Try to use real DB queries; fall back to zeros if DB missing
+    let qualityScore, stalenessScore, coverageScore;
+    if (existsSync(paths.knowledgeDb)) {
+      const { createDb } = await import("./db.js");
+      const db = createDb(paths.knowledgeDb);
+      try {
+        qualityScore = scoreKnowledgeQuality(db.getKnowledgeStats());
+        stalenessScore = scoreStaleness(db.getStalenessStats());
+        coverageScore = scoreCoverage(db.getCoverageStats(10));
+      } finally {
+        db.close();
+      }
+    } else {
+      qualityScore = scoreKnowledgeQuality({
+        helpful: 0, harmful: 0, neutral: 0,
+        totalEntries: 0, ratedEntries: 0, duplicateClusters: 0,
+      });
+      stalenessScore = scoreStaleness({
+        staleRatio: 0, lowSuccessCount: 0,
+        summarizedSessions: 0, eligibleSessions: 0,
+      });
+      coverageScore = scoreCoverage({
+        domainsWithEntries: 0, totalDomains: 0,
+        matureCount: 0, provenCount: 0, totalEntries: 0,
+        skillsImplemented: 0, proposalClusters: 0,
+      });
+    }
 
     const historyEntries = readHistory(paths.scoreHistory);
     const trend = calculateTrend(historyEntries);
