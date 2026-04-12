@@ -119,10 +119,36 @@ if (command === "sync") {
   if (checkOnly && result.issues.length > 0) {
     process.exit(1);
   }
+} else if (command === "start") {
+  const projectRoot = resolve(args.find((a) => !a.startsWith("--") && a !== "start") ?? ".");
+
+  // Dynamic import to avoid loading session-start code when running sync
+  const { sessionStart } = await import("./pipelines/session-start/index.js");
+  const { homedir } = await import("node:os");
+  const result = sessionStart({ projectRoot, homePath: homedir() });
+
+  console.log(`\nSession Start — ${result.state.mode} mode`);
+  console.log(`Project: v${result.state.version}`);
+
+  if (result.drift.length > 0) {
+    console.log(`\nDrift detected:`);
+    for (const d of result.drift) {
+      console.log(`  ${d.field}: expected ${d.expected}, got ${d.actual}`);
+    }
+  }
+
+  if (result.session.logPath) {
+    console.log(`\nSession log: ${result.session.logPath}`);
+    console.log(`Session ID: ${result.session.sessionId ?? "discovery failed"}`);
+  }
+
+  console.log(`\nState: ${result.state.summary ? "SUMMARY loaded" : "no SUMMARY"}`);
+  console.log(`Inbox: ${result.state.inbox ? "INBOX loaded" : "no INBOX"}`);
 } else {
   console.log("Usage: open-brain <command> [options]");
   console.log("");
   console.log("Commands:");
   console.log("  sync [--check] [--score [--json]] [--history]");
+  console.log("  start                                     Start a session");
   process.exit(1);
 }
