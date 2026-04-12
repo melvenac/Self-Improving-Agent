@@ -83,7 +83,9 @@ export function syncFrontmatter(
 
   for (const [id, fb] of seen) {
     try {
-      const filePath = `${vaultExperiencesPath}/${id}-${fb.key}.md`;
+      // Sanitize key for filesystem safety (keys should be slugs, but guard against slashes/specials)
+      const safeKey = fb.key.replace(/[<>:"/\\|?*]/g, "-");
+      const filePath = `${vaultExperiencesPath}/${id}-${safeKey}.md`;
 
       // Get latest counters from DB
       const counters = getCounters(id);
