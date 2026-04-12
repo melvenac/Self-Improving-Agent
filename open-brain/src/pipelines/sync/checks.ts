@@ -76,6 +76,10 @@ export function syncKmcpVersion(
 
   const pkg = JSON.parse(readFileSync(kmcpPath, "utf-8"));
 
+  if (pkg.version === undefined) {
+    return { name: "kmcp-version", severity: "warn", message: "No version field in knowledge-mcp/package.json" };
+  }
+
   if (pkg.version === version) {
     return { name: "kmcp-version", severity: "pass", message: `knowledge-mcp version matches ${version}` };
   }
