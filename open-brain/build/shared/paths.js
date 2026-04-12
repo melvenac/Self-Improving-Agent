@@ -1,0 +1,21 @@
+import { resolve, join } from "node:path";
+import { homedir } from "node:os";
+export function resolvePaths(projectRoot) {
+    const home = homedir();
+    return {
+        projectRoot: resolve(projectRoot),
+        packageJson: join(projectRoot, "package.json"),
+        readme: join(projectRoot, "README.md"),
+        changelog: join(projectRoot, "CHANGELOG.md"),
+        claudeMd: join(projectRoot, "CLAUDE.md"),
+        prd: join(projectRoot, "docs", "PRD.md"),
+        knowledgeMcpPackageJson: join(projectRoot, "knowledge-mcp", "package.json"),
+        settingsJson: join(home, ".claude", "settings.json"),
+        obsidianVault: join(home, "Obsidian Vault"),
+        knowledgeDb: join(home, ".claude", "context-mode", "knowledge.db"),
+        scoreHistory: join(home, ".claude", "knowledge-mcp", "score-history.jsonl"),
+        projectTemplate: join(projectRoot, "project-template"),
+        hooksDir: join(projectRoot, "knowledge-mcp", "scripts"),
+    };
+}
+//# sourceMappingURL=paths.js.map
