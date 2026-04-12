@@ -189,3 +189,131 @@ describe("KnowledgeStore", () => {
     expect(counters!.maturity).toBe("progenitor");
   });
 });
+
+// D4 — Knowledge CRUD
+describe("Knowledge CRUD", () => {
+  it("listKnowledge returns all entries", () => {
+    db.insertKnowledge("Entry one");
+    db.insertKnowledge("Entry two");
+    const entries = db.listKnowledge();
+    expect(entries.length).toBe(2);
+  });
+
+  it("listKnowledge respects limit", () => {
+    db.insertKnowledge("Entry one");
+    db.insertKnowledge("Entry two");
+    db.insertKnowledge("Entry three");
+    const entries = db.listKnowledge(2);
+    expect(entries.length).toBe(2);
+  });
+
+  it("deleteKnowledge removes entry and returns true", () => {
+    const id = db.insertKnowledge("To be deleted");
+    const result = db.deleteKnowledge(id);
+    expect(result).toBe(true);
+    const entries = db.listKnowledge();
+    expect(entries.find((e) => e.id === id)).toBeUndefined();
+  });
+
+  it("deleteKnowledge returns false for missing id", () => {
+    const result = db.deleteKnowledge(99999);
+    expect(result).toBe(false);
+  });
+
+  it("deleted entry not returned by getEntry", () => {
+    const id = db.insertKnowledge("Gone");
+    db.deleteKnowledge(id);
+    const entry = db.getEntry(id);
+    expect(entry).toBeNull();
+  });
+});
+
+// D4 — FTS5 Search
+describe("FTS5 Search", () => {
+  it("finds entry by content keyword", () => {
+    db.insertKnowledge("The quick brown fox");
+    const results = db.search("quick");
+    expect(results.length).toBe(1);
+    expect(results[0].content).toBe("The quick brown fox");
+  });
+
+  it("finds entry by tag", () => {
+    db.insertKnowledge("Some content", { tags: ["typescript", "node"] });
+    const results = db.search("typescript");
+    expect(results.length).toBe(1);
+  });
+
+  it("finds entry by key", () => {
+    db.insertKnowledge("Some content", { key: "my-special-key" });
+    const results = db.search("special");
+    expect(results.length).toBeGreaterThanOrEqual(1);
+    expect(results.some((e) => e.key === "my-special-key")).toBe(true);
+  });
+
+  it("returns empty for no match", () => {
+    db.insertKnowledge("Hello world");
+    const results = db.search("zzznomatch");
+    expect(results).toEqual([]);
+  });
+
+  it("respects limit", () => {
+    db.insertKnowledge("alpha beta gamma one");
+    db.insertKnowledge("alpha beta gamma two");
+    db.insertKnowledge("alpha beta gamma three");
+    const results = db.search("alpha", { limit: 2 });
+    expect(results.length).toBe(2);
+  });
+
+  it("filters by projectDir — excludes other project, includes global", () => {
+    db.insertKnowledge("project A entry", { projectDir: "/project-a" });
+    db.insertKnowledge("global entry");  // null project_dir
+    const results = db.search("entry", { projectDir: "/project-b" });
+    // project-a entry should NOT appear; global entry SHOULD appear
+    expect(results.find((e) => e.content === "project A entry")).toBeUndefined();
+    expect(results.find((e) => e.content === "global entry")).toBeDefined();
+  });
+
+  it("handles FTS5 syntax errors gracefully", () => {
+    db.insertKnowledge("some content");
+    // Unbalanced quote is an FTS5 syntax error
+    const results = db.search('"unbalanced');
+    expect(results).toEqual([]);
+  });
+});
+
+// D4 — Summaries
+describe("Summaries", () => {
+  const session = {
+    id: "sum-sess-001",
+    db_file: "/path/to/db.sqlite",
+    project_dir: "/project",
+    started_at: "2026-01-01T00:00:00Z",
+    ended_at: "2026-01-01T01:00:00Z",
+    event_count: 3,
+  };
+
+  it("insertSummary stores summary", () => {
+    db.insertSession(session);
+    db.insertSummary(session.id, "This is a summary", "claude-3", "/project");
+    const row = db.raw.prepare("SELECT * FROM summaries WHERE session_id = ?").get(session.id) as { summary: string; model: string } | undefined;
+    expect(row).toBeDefined();
+    expect(row!.summary).toBe("This is a summary");
+    expect(row!.model).toBe("claude-3");
+  });
+
+  it("getUnsummarizedSessionIds returns sessions without summaries", () => {
+    db.insertSession(session);
+    db.insertSession({ ...session, id: "sum-sess-002", db_file: "/other.sqlite" });
+    db.insertSummary("sum-sess-001", "Summarized");
+    const ids = db.getUnsummarizedSessionIds();
+    expect(ids).toContain("sum-sess-002");
+    expect(ids).not.toContain("sum-sess-001");
+  });
+
+  it("getUnsummarizedSessionIds returns empty when all summarized", () => {
+    db.insertSession(session);
+    db.insertSummary(session.id, "Done");
+    const ids = db.getUnsummarizedSessionIds();
+    expect(ids).toEqual([]);
+  });
+});

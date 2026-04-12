@@ -21,6 +21,11 @@ export interface OpenBrainDb extends ChunkStore, KnowledgeStore {
       sessionId?: string;
     }
   ): number;
+  listKnowledge(limit?: number): KnowledgeEntry[];
+  deleteKnowledge(id: number): boolean;
+  search(query: string, options?: { projectDir?: string; limit?: number }): KnowledgeEntry[];
+  insertSummary(sessionId: string, summary: string, model?: string, projectDir?: string): void;
+  getUnsummarizedSessionIds(): string[];
 }
 
 const SCHEMA = `
@@ -159,6 +164,25 @@ export function createDb(dbPath: string): OpenBrainDb {
     WHERE id = ?
   `);
 
+  const listKnowledgeStmt = raw.prepare(`
+    SELECT * FROM knowledge WHERE archived_into IS NULL ORDER BY created_at DESC LIMIT ?
+  `);
+
+  const deleteKnowledgeStmt = raw.prepare(
+    "DELETE FROM knowledge WHERE id = ?"
+  );
+
+  const insertSummaryStmt = raw.prepare(`
+    INSERT INTO summaries (session_id, summary, model, created_at, project_dir)
+    VALUES (@session_id, @summary, @model, @created_at, @project_dir)
+  `);
+
+  const getUnsummarizedSessionIdsStmt = raw.prepare(`
+    SELECT sessions.id FROM sessions
+    LEFT JOIN summaries ON sessions.id = summaries.session_id
+    WHERE summaries.id IS NULL
+  `);
+
   function now(): string {
     return new Date().toISOString();
   }
@@ -256,6 +280,90 @@ export function createDb(dbPath: string): OpenBrainDb {
           }
         | undefined;
       return row ?? null;
+    },
+
+    listKnowledge(limit = 100): KnowledgeEntry[] {
+      const rows = listKnowledgeStmt.all(limit) as Record<string, unknown>[];
+      return rows.map((row) => ({
+        id: row.id as number,
+        key: row.key as string,
+        content: row.content as string,
+        tags: row.tags as string,
+        helpful_count: row.helpful_count as number,
+        harmful_count: row.harmful_count as number,
+        neutral_count: row.neutral_count as number,
+        success_rate: row.success_rate as number,
+        maturity: row.maturity as string,
+        recall_count: row.recall_count as number,
+        source: row.source as string,
+        created_at: row.created_at as string,
+      }));
+    },
+
+    deleteKnowledge(id: number): boolean {
+      const result = deleteKnowledgeStmt.run(id);
+      return result.changes > 0;
+    },
+
+    search(query: string, options?: { projectDir?: string; limit?: number }): KnowledgeEntry[] {
+      const limit = options?.limit ?? 10;
+      try {
+        let sql: string;
+        let params: unknown[];
+        if (options?.projectDir !== undefined) {
+          sql = `
+            SELECT k.* FROM knowledge k
+            INNER JOIN knowledge_fts fts ON fts.rowid = k.id
+            WHERE knowledge_fts MATCH ?
+              AND (k.project_dir = ? OR k.project_dir IS NULL)
+              AND k.archived_into IS NULL
+            LIMIT ?
+          `;
+          params = [query, options.projectDir, limit];
+        } else {
+          sql = `
+            SELECT k.* FROM knowledge k
+            INNER JOIN knowledge_fts fts ON fts.rowid = k.id
+            WHERE knowledge_fts MATCH ?
+              AND k.archived_into IS NULL
+            LIMIT ?
+          `;
+          params = [query, limit];
+        }
+        const rows = raw.prepare(sql).all(...params) as Record<string, unknown>[];
+        return rows.map((row) => ({
+          id: row.id as number,
+          key: row.key as string,
+          content: row.content as string,
+          tags: row.tags as string,
+          helpful_count: row.helpful_count as number,
+          harmful_count: row.harmful_count as number,
+          neutral_count: row.neutral_count as number,
+          success_rate: row.success_rate as number,
+          maturity: row.maturity as string,
+          recall_count: row.recall_count as number,
+          source: row.source as string,
+          created_at: row.created_at as string,
+        }));
+      } catch {
+        // FTS5 syntax errors (unbalanced quotes, etc.) return empty results
+        return [];
+      }
+    },
+
+    insertSummary(sessionId: string, summary: string, model?: string, projectDir?: string): void {
+      insertSummaryStmt.run({
+        session_id: sessionId,
+        summary,
+        model: model ?? null,
+        created_at: now(),
+        project_dir: projectDir ?? null,
+      });
+    },
+
+    getUnsummarizedSessionIds(): string[] {
+      const rows = getUnsummarizedSessionIdsStmt.all() as { id: string }[];
+      return rows.map((r) => r.id);
     },
   };
 }
