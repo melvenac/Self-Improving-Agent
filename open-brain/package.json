@@ -1,0 +1,26 @@
+{
+  "name": "open-brain",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Unified knowledge pipeline — the v2 brain",
+  "main": "./build/cli.js",
+  "bin": {
+    "open-brain": "./build/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "npx tsx src/cli.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.19.11",
+    "typescript": "^5.7.0",
+    "tsx": "^4.21.0",
+    "vitest": "^3.2.1"
+  }
+}
