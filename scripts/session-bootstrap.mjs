@@ -18,22 +18,30 @@ import { readFileSync, existsSync, statSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
 
-const cwd = process.cwd();
+// DETERMINISTIC ANTI-LOOP: Read hook input from stdin to detect subagent context.
+// Claude Code includes `agent_id` in the hook input JSON when the hook fires inside
+// a subagent. If present, exit immediately — zero output means zero chance the LLM
+// acts on it. This replaces the fragile .start-lock file approach.
+// See: https://code.claude.com/docs/en/hooks#common-input-fields
+let hookInput = {};
+try {
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(chunk);
+  const raw = Buffer.concat(chunks).toString().trim();
+  if (raw) hookInput = JSON.parse(raw);
+} catch { /* stdin unavailable or not JSON — continue as main session */ }
+
+if (hookInput.agent_id) {
+  process.exit(0);
+}
+
+const cwd = hookInput.cwd || process.cwd();
 const home = process.env.HOME || process.env.USERPROFILE;
 const lines = [];
 
 // Detect project context
 const hasAgents = existsSync(join(cwd, '.agents'));
 const hasMeta = hasAgents && existsSync(join(cwd, '.agents', 'META'));
-const hasStartLock = hasAgents && existsSync(join(cwd, '.agents', '.start-lock'));
-
-// DETERMINISTIC ANTI-LOOP: If .start-lock exists, this is a subagent spawned during
-// /start. Output NOTHING — zero text means zero chance the LLM acts on it.
-// This is the only reliable way to prevent loops; prompt-level "don't do X" instructions
-// are non-deterministic because the superpowers plugin can override them.
-if (hasStartLock) {
-  process.exit(0);
-}
 
 if (hasAgents) {
   // IMPORTANT: No imperative instructions here (no "Run /start", no "invoke skills").
