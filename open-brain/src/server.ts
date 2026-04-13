@@ -19,6 +19,8 @@ import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/histo
 import { sessionStart } from "./pipelines/session-start/index.js";
 import { sessionEnd } from "./pipelines/session-end/index.js";
 import { createDb } from "./db.js";
+import { openV2Database } from "./db-v2.js";
+import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolvePaths } from "./shared/paths.js";
 import { readJson } from "./shared/fs-utils.js";
 import type { CategoryScore, ScoreResult } from "./pipelines/sync/types.js";
@@ -118,11 +120,39 @@ export interface EndArgs {
   session_summary?: string;
   recalled_entry_ids?: number[];
   dry_run?: boolean;
+  v2_db_path?: string;
+  v2_vault_path?: string;
 }
 
 export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
   try {
     const projectRoot = resolve(args.project_root ?? ".");
+
+    // v2 path — opt-in via v2_db_path + v2_vault_path
+    if (args.v2_db_path && args.v2_vault_path) {
+      const v2db = openV2Database(args.v2_db_path);
+      try {
+        const result = sessionEndV2({
+          db: v2db,
+          vaultDir: args.v2_vault_path,
+          agentsDir: resolve(projectRoot, ".agents"),
+          sessionId: args.session_id || "",
+          sessionSummary: args.session_summary || "",
+          project: projectRoot.split(/[/\\]/).filter(Boolean).pop() || "General",
+          recalledEntryIds: args.recalled_entry_ids || [],
+          dryRun: args.dry_run || false,
+        });
+        return {
+          content: [{
+            type: "text",
+            text: `Session End (v2):\n  Summary: ${result.summary.written ? "written" : "skipped"}\n  Feedback: ${result.feedback.processed} entries rated\n  Reflection: ${result.reflection.flagged} clusters flagged`,
+          }],
+        };
+      } finally {
+        v2db.close();
+      }
+    }
+
     const paths = resolvePaths(projectRoot);
     const home = homedir();
     const dryRun = args.dry_run ?? false;
@@ -283,6 +313,8 @@ server.tool(
     session_summary: z.string().optional().default("").describe("Session summary text for tag matching"),
     recalled_entry_ids: z.array(z.number()).optional().default([]).describe("IDs of knowledge entries recalled this session"),
     dry_run: z.boolean().optional().default(false).describe("Run feedback but skip vault writes"),
+    v2_db_path: z.string().optional().describe("Path to v2 SQLite DB — enables v2 session-end pipeline"),
+    v2_vault_path: z.string().optional().describe("Path to v2 vault directory — required when v2_db_path is set"),
   },
   async (args) => handleEnd(args)
 );
