@@ -25,9 +25,9 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// better-sqlite3 is CJS — use createRequire
-const require = createRequire(import.meta.url);
-const Database = require('better-sqlite3');
+// better-sqlite3 is CJS in open-brain/node_modules — resolve from there
+const openBrainRequire = createRequire(join(__dirname, '..', 'open-brain', 'package.json'));
+const Database = openBrainRequire('better-sqlite3');
 
 // ─── Imports from open-brain build output ───────────────────────────────────
 
@@ -177,8 +177,11 @@ const insertFts = newDb.prepare(`
   VALUES (?, ?, ?, ?)
 `);
 
+const allToMigrate = [...migrate, ...maybe];
+log(`Migrating ${allToMigrate.length} entries (${migrate.length} migrate + ${maybe.length} maybe)`);
+
 const writeTransaction = newDb.transaction(() => {
-  for (const entry of migrate) {
+  for (const entry of allToMigrate) {
     const project = inferProject(entry);
     const tags = entry.tags
       ? entry.tags.split(',').map(t => t.trim()).filter(Boolean)
