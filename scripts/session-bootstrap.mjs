@@ -25,15 +25,24 @@ const lines = [];
 // Detect project context
 const hasAgents = existsSync(join(cwd, '.agents'));
 const hasMeta = hasAgents && existsSync(join(cwd, '.agents', 'META'));
+const hasStartLock = hasAgents && existsSync(join(cwd, '.agents', '.start-lock'));
+
+// DETERMINISTIC ANTI-LOOP: If .start-lock exists, this is a subagent spawned during
+// /start. Output NOTHING — zero text means zero chance the LLM acts on it.
+// This is the only reliable way to prevent loops; prompt-level "don't do X" instructions
+// are non-deterministic because the superpowers plugin can override them.
+if (hasStartLock) {
+  process.exit(0);
+}
 
 if (hasAgents) {
+  // IMPORTANT: No imperative instructions here (no "Run /start", no "invoke skills").
+  // All subagents inherit SessionStart hook output. Any imperative gets amplified by
+  // the superpowers plugin and causes recursive /start launches.
+  // The human user knows the protocol — just state facts.
   lines.push(`Project detected: ${cwd} (.agents/ found${hasMeta ? ', META mode' : ''})`);
-
-  lines.push('');
-  lines.push('Run /start for full project startup, or jump straight into work.');
 } else {
   lines.push('No .agents/ detected — general session.');
-  lines.push('Run /start for knowledge recall, or jump straight into work.');
 }
 
 // Check nightly Obsidian backup freshness
