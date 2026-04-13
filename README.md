@@ -35,12 +35,14 @@ ACCUMULATION (session end)                         |
   Detect emerging patterns ---------> feeds back --+
 ```
 
-Knowledge is organized in three tiers:
+Knowledge is organized in four tiers:
 
 | Tier | Location | Purpose |
 |---|---|---|
-| **Global** | Obsidian Vault | Cross-project experiences, reusable skills, user preferences |
-| **Domain** | Tagged experiences in the vault | Stack-specific knowledge ("Convex patterns", "Stripe gotchas") |
+| **Core** | `CLAUDE.md` (always loaded) | Identity, global rules, bootstrap instructions |
+| **Hot** | Obsidian Vault v2 `Experiences/`, `Skills/` | Cross-project lessons and reusable skills; Smart Connections semantic search |
+| **Warm** | Obsidian Vault `Summaries/`, `Archive/` | Session summaries, older experiences for broader recall |
+| **Cold** | SQLite `knowledge-v2.db` `chunks` table | Ephemeral session chunks; metadata index only (no content) |
 | **Project** | `.agents/` folder in each repo | Project-specific context (PRD, tasks, session logs) |
 
 ## Prerequisites
@@ -186,15 +188,17 @@ Start a Claude Code session and run `/start`. You should see:
 | Hook | Trigger | What it does |
 |---|---|---|
 | `session-bootstrap.mjs` | SessionStart | Auto-detects project, checks backup freshness, surfaces skill proposals |
-| `session-end.mjs` | SessionEnd | Indexes sessions, generates summaries, embeds vectors, runs auto-feedback and shadow-recall |
+| `session-end.mjs` | SessionEnd | Indexes sessions, generates summaries, embeds vectors, runs auto-feedback and shadow-recall (v1 — active during 30-day parallel) |
+| `session-end-v2.mjs` | SessionEnd | Vault-first accumulation: writes .md to Obsidian, indexes metadata in SQLite, flags reflection clusters (v2) |
 | `skill-scan.mjs` | SessionEnd | Detects experience clusters, proposes skills (domain-filtered) |
 
 ## Key Features
 
 | Feature | Since | What it does |
 |---|---|---|
+| **Tiered Memory** | v0.6.0 | 4-tier access (Core/Hot/Warm/Cold); Obsidian Vault as SOT; Smart Connections semantic search replaces sqlite-vec; vault-first store pipeline; reflection cycle for experience distillation |
 | **Session manifest** | v0.5.5 | Threads Claude's session UUID across all memory layers for full provenance tracking |
-| **Outcome tracking** | v0.4.0 | Ternary feedback (helpful/harmful/neutral) on recalled knowledge with maturity lifecycle |
+| **Outcome tracking** | v0.4.0 | Ternary feedback (helpful/harmful/neutral) on recalled knowledge with maturity lifecycle (1.5x Mature, 1.2x Proven, 1.3x Failures) |
 | **Protocol health** | v0.5.4 | `node scripts/sync.mjs --score` — deterministic 0-100 health score across 5 categories |
 | **Shadow recall** | v0.5.4 | Replays queries with alternative search strategies to measure retrieval quality |
 | **Dashboard** | v0.5.3 | `node knowledge-mcp/scripts/dashboard.mjs` — browse sessions, chunks, knowledge at localhost:3456 |
