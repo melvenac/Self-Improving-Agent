@@ -6,7 +6,7 @@
 
 Check if `.agents/` directory exists in the current working directory.
 
-- **If `.agents/` exists** → Run **Full Project Close-Out** (Part A + Part B)
+- **If `.agents/` exists** → Run **Full Project Close-Out** (Part A only)
 - **If no `.agents/`** → Run **Lightweight Knowledge Capture** (Part B only)
 
 ---
@@ -121,15 +121,9 @@ If this session changed features, commands, or architecture:
 - Don't rewrite docs for style — only fix factual inaccuracies
 - If a doc file wasn't affected by session changes, skip it
 
----
+### A10. Capture external research
 
-## Part B: Knowledge Capture (always runs)
-
-> Review what the SessionEnd hooks will auto-capture, and supplement with anything they'd miss.
->
-> The hooks (`session-end.mjs` → `skill-scan.mjs`) automatically capture session logs and extract experiences to the Obsidian Vault + Knowledge MCP. Your job here is to catch what automation misses.
-
-### B1. Capture external research
+> The SessionEnd hooks (`session-end.mjs` → `skill-scan.mjs`) auto-capture session logs and extract experiences. Steps A10-A14 catch what automation misses.
 If any external research was done this session (GitHub repos, YouTube videos, website docs, NotebookLM content), store a knowledge entry for each source using `kb_store`:
 
 ```
@@ -147,14 +141,14 @@ Use standardized source tags: `youtube-transcript`, `github-repo`, `notebooklm`,
 
 Even research that concluded "not useful right now" should be captured — it records the reasoning and prevents re-evaluation later. If no external research was done, skip this step.
 
-### B2. Review for non-obvious lessons
+### A11. Review for non-obvious lessons
 The hooks extract experiences from explicit gotcha/decision patterns. Look for things they'd miss:
 - Subtle patterns that emerged across multiple steps (not a single "aha" moment)
 - Context about _why_ a decision was made that isn't obvious from the code
 - Cross-project insights ("this pattern from project X applies to project Y")
 - Corrections to existing experiences that turned out to be wrong
 
-### B3. Store supplemental experiences
+### A12. Store supplemental experiences
 For anything the hooks would miss, use `kb_store` directly. **Dedup first:** run `kb_recall` with each experience title before storing — skip if >90% similar already exists, update if there's meaningful new detail.
 
 ```
@@ -171,7 +165,7 @@ CONTEXT: {the full exchange — what was the user asking, what reasoning led her
 OUTCOME: {what happened, what to do differently}
 ```
 
-### B4. Write session summary (dual-store)
+### A13. Write session summary (dual-store)
 
 Write the session summary to **both** stores:
 
@@ -200,23 +194,67 @@ Body sections:
 
 No "Unresolved" or "What's next" section — that's SUMMARY.md's job. Use project-relative file paths (e.g., `src/components/BookingDrawer.tsx`).
 
-### B5. Collect knowledge feedback
+### A14. Collect knowledge feedback (agent self-evaluation)
 
-If knowledge was recalled during `/start` B3, collect feedback to improve future retrieval:
+If knowledge was recalled during `/start`, self-evaluate each entry — don't ask Aaron.
 
-1. List each recalled entry by title
-2. For each, ask: helpful, harmful, or neutral?
-3. Call `kb_feedback(entry_id, rating)` for each rated entry
+1. Read `.recalled-entries.json` to get the recalled entry IDs and keys
+2. For each entry, self-assess:
+   - Did I reference this in my reasoning or approach?
+   - Did it change how I tackled a problem?
+   - Did it lead me astray or waste time?
+3. Rate accordingly:
+   - **helpful** — actively informed a decision or prevented a mistake
+   - **harmful** — misled reasoning or caused wasted effort
+   - **neutral** — recalled but not referenced or used
+4. Call `kb_feedback(entry_id, rating, referenced)` for each
+5. Report ratings to Aaron (he can override if needed)
+
+**Why self-evaluate:** Aaron can't see whether recalled knowledge helped the agent's internal reasoning. The agent that consumed it is the only one who knows.
 
 This feeds the maturity lifecycle (Progenitor → Proven → Mature) and apoptosis (auto-prune below 0.3 success rate after 5 ratings).
 
-If no knowledge was recalled, or the user wants to skip, move on.
+If no knowledge was recalled, skip this step.
+
+### A15. Call ob_end with v2 pipeline args
+
+After all knowledge capture and feedback steps are complete, call `ob_end` to finalize the session in the Open Brain pipeline. Pass the v2 paths so the session lands in the new stores:
+
+```
+ob_end(
+  v2_db_path:    "~/.claude/open-brain/knowledge-v2.db",
+  v2_vault_path: "~/Obsidian Vault v2"
+)
+```
+
+This writes the session summary and any extracted experiences into the v2 SQLite database and v2 Obsidian vault. If `ob_end` returns an error, log a warning but do not block the rest of the close-out.
+
+---
+
+## Part B: Knowledge Capture (no `.agents/`)
+
+> For non-project sessions, run knowledge capture directly. Steps B1-B5 mirror A10-A14 above.
+
+### B1. Capture external research
+_(Same format as A10)_
+
+### B2. Review for non-obvious lessons
+_(Same format as A11)_
+
+### B3. Store supplemental experiences
+_(Same format as A12)_
+
+### B4. Write session summary (dual-store)
+_(Same format as A13)_
+
+### B5. Collect knowledge feedback
+_(Same format as A14)_
 
 ---
 
 ## Present Summary
 
-**If project session (Part A + B):**
+**If project session (Part A):**
 ```
 Session N Complete — [Date]
 
