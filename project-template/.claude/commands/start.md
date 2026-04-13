@@ -6,7 +6,7 @@
 
 Check if `.agents/` directory exists in the current working directory.
 
-- **If `.agents/` exists** → Run **Full Project Startup** (Part A + Part B)
+- **If `.agents/` exists** → Run **Full Project Startup** (Part A only)
 - **If no `.agents/`** → Run **Lightweight Startup** (Part B only)
 
 ---
@@ -157,7 +157,30 @@ Proposed Objective: [highest priority incomplete task from INBOX.md]
 Relevant Knowledge:
 - [experience title] — [one-line actionable rewrite]
 - [skill name] — [why it's relevant]
+```
 
+### Reflection Queue
+
+Before awaiting approval, check for pending experience distillations:
+
+1. Check if `.agents/reflection-queue.json` exists
+2. If it exists, read and parse it — it is an array of cluster objects, each with `tag`, `count`, and `files` fields
+3. For each cluster, report:
+   ```
+   Reflection ready: {count} experiences tagged '{tag}' — want me to synthesize a principle?
+   ```
+4. If Aaron approves for a cluster:
+   - Read all vault `.md` files listed in the cluster's `files` array
+   - Synthesize a concise, reusable principle from the common patterns across those experiences
+   - Present the proposed principle title and body for Aaron's review
+   - If Aaron approves the principle:
+     - Write it to `~/Obsidian Vault/Skills/{tag}-principle.md` (or a name Aaron provides)
+     - Log the outcome: call `ob_end` or write directly to the reflection log marking status `approved` with the cluster tag and date
+   - If Aaron rejects the principle: log status `rejected` with the cluster tag, date, and a 30-day re-flag embargo
+5. If Aaron rejects synthesizing for a cluster (step 4 not entered): log status `rejected` the same way
+6. After processing all clusters (approved or rejected), delete `.agents/reflection-queue.json`
+
+```
 Awaiting approval...
 ```
 
