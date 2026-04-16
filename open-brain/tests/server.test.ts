@@ -76,8 +76,8 @@ describe("server handlers", () => {
       });
 
       const text = getText(res);
-      expect(text).toContain("Session End (dry run)");
-      expect(text).toContain("Chunks:");
+      expect(text).toContain("Session End:");
+      expect(text).toContain("Summary:");
       expect(text).toContain("Feedback: 0 entries rated");
     });
 

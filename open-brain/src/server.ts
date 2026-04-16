@@ -18,8 +18,7 @@ import {
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { sessionStart } from "./pipelines/session-start/index.js";
-import { createDb } from "./db.js";
-import { openV2Database } from "./db-v2.js";
+import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2 } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolvePaths } from "./shared/paths.js";
 import { readJson } from "./shared/fs-utils.js";
@@ -179,7 +178,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     return {
       content: [{
         type: "text",
-        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n  Feedback: ${result.feedback.processed} entries rated\n  Reflection: ${result.reflection.flagged} clusters flagged`,
+        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n  Feedback: ${result.feedback.processed} entries rated\n  Reflection: ${result.reflection.flagged} clusters flagged\n  Invocations: ${result.invocations.logged} logged\n  Skill scan: ${result.skillScan.clusters} clusters (${result.skillScan.pendingProposals} pending proposals)`,
       }],
     };
   } catch (err) {
@@ -704,31 +703,39 @@ export function computeScore(projectRoot: string, checks: import("./pipelines/sy
   const paths = resolvePaths(projectRoot);
   const configScore = scoreConfigStructure(checks);
 
-  let qualityScore, stalenessScore, coverageScore;
-  if (existsSync(paths.knowledgeDb)) {
-    const db = createDb(paths.knowledgeDb);
+  // Read domain tags from domains.json
+  const domainsPath = join(projectRoot, ".agents", "SYSTEM", "domains.json");
+  let domainTags: string[] = [];
+  if (existsSync(domainsPath)) {
     try {
-      qualityScore = scoreKnowledgeQuality(db.getKnowledgeStats());
-      stalenessScore = scoreStaleness(db.getStalenessStats());
-      coverageScore = scoreCoverage(db.getCoverageStats(10));
-    } finally {
-      db.close();
-    }
-  } else {
-    qualityScore = scoreKnowledgeQuality({
-      helpful: 0, harmful: 0, neutral: 0,
-      totalEntries: 0, ratedEntries: 0, duplicateClusters: 0,
-    });
-    stalenessScore = scoreStaleness({
-      staleRatio: 0, lowSuccessCount: 0,
-      summarizedSessions: 0, eligibleSessions: 0,
-    });
-    coverageScore = scoreCoverage({
-      domainsWithEntries: 0, totalDomains: 0,
-      matureCount: 0, provenCount: 0, totalEntries: 0,
-      skillsImplemented: 0, proposalClusters: 0,
-    });
+      const domains = JSON.parse(readFileSync(domainsPath, "utf-8"));
+      domainTags = domains.domains ?? domains.tags ?? [];
+    } catch { /* ignore */ }
   }
+
+  // Read skill proposal counts from vault
+  const vaultPath = join(homedir(), "Obsidian Vault");
+  let skillsImplemented = 0;
+  let proposalClusters = 0;
+  const candidatesPath = join(vaultPath, "Skill-Candidates", "SKILL-CANDIDATES.md");
+  const skillIndexPath = join(vaultPath, "Skill-Candidates", "SKILL-INDEX.md");
+  if (existsSync(candidatesPath)) {
+    const content = readFileSync(candidatesPath, "utf-8");
+    proposalClusters = (content.match(/### \S+ \(\d+ experiences?\)/g) || []).length;
+  }
+  if (existsSync(skillIndexPath)) {
+    const content = readFileSync(skillIndexPath, "utf-8");
+    skillsImplemented = (content.match(/has skill/g) || []).length;
+  }
+
+  const v2db = getV2Db();
+  const qualityStats = getKnowledgeQualityStats(v2db);
+  const qualityScore = scoreKnowledgeQuality(qualityStats);
+  const stalenessScore = scoreStaleness(getStalenessStats(v2db));
+  const coverageRaw = getCoverageStatsV2(v2db, domainTags);
+  coverageRaw.skillsImplemented = skillsImplemented;
+  coverageRaw.proposalClusters = proposalClusters;
+  const coverageScore = scoreCoverage(coverageRaw);
 
   const historyEntries = readHistory(paths.scoreHistory);
   const trend = calculateTrend(historyEntries);

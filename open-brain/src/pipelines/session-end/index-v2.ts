@@ -4,6 +4,8 @@ import { writeSummary } from "../../vault-writer.js";
 import { updateFeedbackV2 } from "../../db-v2.js";
 import { flagReflectionClusters } from "./reflection.js";
 import { getSessionSummary } from "./session-summary.js";
+import { logInvocations } from "./invocation-logger.js";
+import { runSkillScanPipeline } from "./skill-scan-runner.js";
 
 export interface SessionEndV2Input {
   db: Database.Database;
@@ -20,6 +22,8 @@ interface SessionEndV2Result {
   summary: { written: boolean; selfGenerated: boolean };
   feedback: { processed: number; ratings: Array<{ id: number; rating: string }> };
   reflection: { flagged: number };
+  invocations: { logged: number; skippedSessions: number };
+  skillScan: { clusters: number; pendingProposals: number; approaching: number };
 }
 
 interface KnowledgeIndexRow {
@@ -86,9 +90,19 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     flagged = result.flagged;
   }
 
+  // ── Stage 4: Invocation logging ──────────────────────────────────────────────
+  const invocationResult = dryRun ? { logged: 0, skippedSessions: 0 } : logInvocations();
+
+  // ── Stage 5: Skill scan ─────────────────────────────────────────────────────
+  const skillScanResult = dryRun
+    ? { clusters: 0, pendingProposals: 0, approaching: 0 }
+    : runSkillScanPipeline();
+
   return {
     summary: { written: summaryWritten, selfGenerated },
     feedback: { processed: ratings.length, ratings },
     reflection: { flagged },
+    invocations: invocationResult,
+    skillScan: skillScanResult,
   };
 }

@@ -188,6 +188,122 @@ export function updateFeedbackV2(db: Database.Database, vaultPath: string, ratin
   `).run(now, vaultPath);
 }
 
+// --- Stats for scorer ---
+
+export interface KnowledgeQualityStats {
+  helpful: number;
+  harmful: number;
+  neutral: number;
+  totalEntries: number;
+  ratedEntries: number;
+  duplicateClusters: number;
+}
+
+export interface StalenessStats {
+  staleRatio: number;
+  lowSuccessCount: number;
+  summarizedSessions: number;
+  eligibleSessions: number;
+}
+
+export interface CoverageStats {
+  domainsWithEntries: number;
+  totalDomains: number;
+  matureCount: number;
+  provenCount: number;
+  totalEntries: number;
+  skillsImplemented: number;
+  proposalClusters: number;
+}
+
+export function getKnowledgeQualityStats(db: Database.Database): KnowledgeQualityStats {
+  const row = db.prepare(`
+    SELECT
+      COUNT(*) AS totalEntries,
+      SUM(helpful) AS helpful,
+      SUM(harmful) AS harmful,
+      SUM(neutral) AS neutral,
+      SUM(CASE WHEN helpful + harmful + neutral > 0 THEN 1 ELSE 0 END) AS ratedEntries
+    FROM knowledge_index
+    WHERE archived_into IS NULL
+  `).get() as { totalEntries: number; helpful: number; harmful: number; neutral: number; ratedEntries: number };
+
+  // Duplicate clusters: tags appearing on 5+ entries (potential redundancy)
+  const tags = db.prepare(`SELECT tags FROM knowledge_index WHERE tags IS NOT NULL AND tags != '' AND archived_into IS NULL`).all() as { tags: string }[];
+  const counts = new Map<string, number>();
+  for (const r of tags) {
+    for (const t of r.tags.split(',').map(s => s.trim()).filter(Boolean)) {
+      counts.set(t, (counts.get(t) ?? 0) + 1);
+    }
+  }
+  const duplicateClusters = Array.from(counts.values()).filter(c => c >= 5).length;
+
+  return {
+    helpful: row.helpful ?? 0,
+    harmful: row.harmful ?? 0,
+    neutral: row.neutral ?? 0,
+    totalEntries: row.totalEntries ?? 0,
+    ratedEntries: row.ratedEntries ?? 0,
+    duplicateClusters,
+  };
+}
+
+export function getStalenessStats(db: Database.Database): StalenessStats {
+  const total = db.prepare(`SELECT COUNT(*) AS c FROM knowledge_index WHERE archived_into IS NULL`).get() as { c: number };
+  const stale = db.prepare(`
+    SELECT COUNT(*) AS c FROM knowledge_index
+    WHERE archived_into IS NULL
+      AND recall_count = 0
+      AND created_at < datetime('now', '-60 days')
+  `).get() as { c: number };
+  const lowSuccess = db.prepare(`
+    SELECT COUNT(*) AS c FROM knowledge_index
+    WHERE archived_into IS NULL
+      AND success_rate IS NOT NULL
+      AND success_rate < 0.3
+      AND (helpful + harmful + neutral) >= 5
+  `).get() as { c: number };
+
+  return {
+    staleRatio: total.c > 0 ? stale.c / total.c : 0,
+    lowSuccessCount: lowSuccess.c,
+    summarizedSessions: 0, // v2 sessions table not yet populated
+    eligibleSessions: 0,
+  };
+}
+
+export function getCoverageStats(db: Database.Database, domainTags: string[]): CoverageStats {
+  const totalDomains = domainTags.length;
+  let domainsWithEntries = 0;
+
+  for (const tag of domainTags) {
+    const match = db.prepare(`
+      SELECT COUNT(*) AS c FROM knowledge_index
+      WHERE archived_into IS NULL AND tags LIKE ?
+    `).get(`%${tag}%`) as { c: number };
+    if (match.c >= 2) domainsWithEntries++;
+  }
+
+  const maturityRow = db.prepare(`
+    SELECT
+      COUNT(*) AS totalEntries,
+      SUM(CASE WHEN maturity = 'mature' THEN 1 ELSE 0 END) AS matureCount,
+      SUM(CASE WHEN maturity = 'proven' THEN 1 ELSE 0 END) AS provenCount
+    FROM knowledge_index
+    WHERE archived_into IS NULL
+  `).get() as { totalEntries: number; matureCount: number; provenCount: number };
+
+  return {
+    domainsWithEntries,
+    totalDomains,
+    matureCount: maturityRow.matureCount ?? 0,
+    provenCount: maturityRow.provenCount ?? 0,
+    totalEntries: maturityRow.totalEntries ?? 0,
+    skillsImplemented: 0,
+    proposalClusters: 0,
+  };
+}
+
 export function getClusterCandidates(db: Database.Database): ClusterCandidate[] {
   const rows = db.prepare(`SELECT tags FROM knowledge_index WHERE tags IS NOT NULL AND tags != ''`).all() as { tags: string }[];
   const counts = new Map<string, number>();
