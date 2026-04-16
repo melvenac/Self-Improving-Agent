@@ -29,9 +29,15 @@ export interface SessionInfo {
   logPath: string;
 }
 
+export interface HealthCheckResult {
+  warnings: Array<{ category: string; message: string }>;
+  pendingSkillProposals: number;
+}
+
 export interface SessionStartResult {
   state: ProjectState;
   drift: DriftResult[];
   session: SessionInfo;
+  health: HealthCheckResult;
   recalledEntryIds: number[];
 }

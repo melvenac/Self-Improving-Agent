@@ -2,12 +2,14 @@ import { readProjectState } from "./state-reader.js";
 import { discoverSessionUuid } from "./session-discovery.js";
 import { detectDrift } from "./drift-detector.js";
 import { findNextSessionNumber, createSessionLog } from "./session-log.js";
+import { runHealthChecks } from "./health-checks.js";
 import type { SessionStartOptions, SessionStartResult } from "./types.js";
 
 export function sessionStart(options: SessionStartOptions): SessionStartResult {
   const state = readProjectState(options.projectRoot);
   const drift = detectDrift(state);
   const sessionId = discoverSessionUuid(options.projectRoot, options.homePath);
+  const health = runHealthChecks(options.homePath);
 
   let session = { sessionId, sessionNumber: 0, logPath: "" };
 
@@ -18,7 +20,7 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
     session = { sessionId, sessionNumber, logPath };
   }
 
-  return { state, drift, session, recalledEntryIds: [] };
+  return { state, drift, session, health, recalledEntryIds: [] };
 }
 
 export type { SessionStartOptions, SessionStartResult } from "./types.js";

@@ -144,7 +144,7 @@ function registerHooks() {
 
   if (!settings.hooks) settings.hooks = {};
 
-  const bootstrapPath = path.join(REPO_ROOT, 'scripts', 'session-bootstrap.mjs');
+  const bootstrapPath = path.join(OPEN_BRAIN_DIR, 'build', 'cli-bootstrap.js');
   const command = `node "${bootstrapPath}"`;
 
   // SessionStart hook for bootstrap
@@ -167,7 +167,19 @@ function registerHooks() {
     }]
   });
 
-  // Remove stale knowledge-mcp SessionEnd hooks if present
+  // Remove stale session-bootstrap.mjs and knowledge-mcp hooks
+  if (settings.hooks.SessionStart) {
+    const beforeStart = settings.hooks.SessionStart.length;
+    settings.hooks.SessionStart = settings.hooks.SessionStart.filter(entry => {
+      const cmds = entry.hooks?.map(h => h.command) || [];
+      return !cmds.some(c => c.includes('session-bootstrap.mjs'));
+    });
+    const removedStart = beforeStart - settings.hooks.SessionStart.length;
+    if (removedStart > 0) {
+      log(OK, `Removed ${removedStart} stale session-bootstrap.mjs hook(s)`);
+    }
+  }
+
   if (settings.hooks.SessionEnd) {
     const before = settings.hooks.SessionEnd.length;
     settings.hooks.SessionEnd = settings.hooks.SessionEnd.filter(entry => {

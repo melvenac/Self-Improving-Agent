@@ -134,6 +134,17 @@ export async function handleStart(args: {
     lines.push(`\nState: ${result.state.summary ? "SUMMARY loaded" : "no SUMMARY"}`);
     lines.push(`Inbox: ${result.state.inbox ? "INBOX loaded" : "no INBOX"}`);
 
+    if (result.health.warnings.length > 0) {
+      lines.push(`\nWarnings:`);
+      for (const w of result.health.warnings) {
+        lines.push(`  [${w.category}] ${w.message}`);
+      }
+    }
+
+    if (result.health.pendingSkillProposals > 0) {
+      lines.push(`\nSkill proposals pending: ${result.health.pendingSkillProposals} cluster(s) ready for review.`);
+    }
+
     return { content: [{ type: "text", text: lines.join("\n") }] };
   } catch (err) {
     return {
