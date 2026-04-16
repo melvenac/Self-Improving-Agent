@@ -749,9 +749,9 @@ server.tool(
 
     const feedbackEntry: FeedbackEntry = {
       id: entry.id,
-      helpful_count: entry.helpful_count,
-      harmful_count: entry.harmful_count,
-      neutral_count: entry.neutral_count,
+      helpful: entry.helpful,
+      harmful: entry.harmful,
+      neutral: entry.neutral,
       success_rate: entry.success_rate,
       maturity: entry.maturity as FeedbackEntry["maturity"],
       source: entry.source,
@@ -786,7 +786,7 @@ server.tool(
 
     const lines = [
       `Feedback recorded for entry ${id} (${entry.key || "no key"}): ${rating}`,
-      `Counts: ${entry.helpful_count + (rating === "helpful" ? 1 : 0)} helpful, ${entry.harmful_count + (rating === "harmful" ? 1 : 0)} harmful, ${entry.neutral_count + (rating === "neutral" ? 1 : 0)} neutral`,
+      `Counts: ${entry.helpful + (rating === "helpful" ? 1 : 0)} helpful, ${entry.harmful + (rating === "harmful" ? 1 : 0)} harmful, ${entry.neutral + (rating === "neutral" ? 1 : 0)} neutral`,
       `Success rate: ${result.newSuccessRate !== null ? result.newSuccessRate.toFixed(2) : "N/A"}`,
       `Maturity: ${result.newMaturity}`,
     ];
@@ -835,7 +835,7 @@ server.tool(
           type: "text" as const,
           text: [
             `Consolidated ${archived} entries into #${consolidated_id} (${target.key || "no key"}).`,
-            `Inherited maturity: ${updated?.maturity || "unknown"} (${updated?.helpful_count || 0} helpful, ${updated?.harmful_count || 0} harmful)`,
+            `Inherited maturity: ${updated?.maturity || "unknown"} (${updated?.helpful || 0} helpful, ${updated?.harmful || 0} harmful)`,
             `Archived source IDs: ${source_ids.join(", ")}`,
           ].join("\n"),
         },

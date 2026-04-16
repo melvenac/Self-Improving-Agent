@@ -15,6 +15,24 @@ import {
 const KB_DIR = process.env.KB_DIR || join(homedir(), ".claude", "context-mode");
 const KB_PATH = join(KB_DIR, "knowledge.db");
 
+// V2 knowledge database — owns all knowledge_index reads/writes
+const V2_DB_PATH = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
+let _v2db: Database.Database | null = null;
+
+export function getV2Db(): Database.Database {
+  if (_v2db) return _v2db;
+
+  const v2Dir = join(homedir(), ".claude", "open-brain");
+  if (!existsSync(v2Dir)) {
+    mkdirSync(v2Dir, { recursive: true });
+  }
+
+  _v2db = new Database(V2_DB_PATH);
+  _v2db.pragma("journal_mode = WAL");
+  _v2db.pragma("foreign_keys = ON");
+  return _v2db;
+}
+
 let _db: Database.Database | null = null;
 
 export function getKnowledgeDb(): Database.Database {
@@ -392,10 +410,11 @@ export async function recall(
   // Collect FTS results keyed by "type:id" for RRF merge
   const ftsRanked: Array<{ key: string; result: RecallResult }> = [];
 
-  // --- FTS: Search knowledge ---
+  // --- FTS: Search knowledge (V2 database) ---
   // Knowledge with project_dir IS NULL is global (always returned).
   // Knowledge with a project_dir is only returned when searching that project or globally.
   {
+    const v2db = getV2Db();
     // Knowledge entries use slower decay (0.005 vs 0.02) — curated content ages better than raw session chunks
     let knowledgeSql = `
       SELECT
@@ -411,7 +430,7 @@ export async function recall(
         k.created_at,
         (bm25(knowledge_fts) * (1.0 + MAX(0, julianday('now') - julianday(k.created_at)) * 0.005)) as weighted_rank
       FROM knowledge_fts
-      JOIN knowledge k ON k.id = knowledge_fts.rowid
+      JOIN knowledge_index k ON k.id = knowledge_fts.rowid
       WHERE knowledge_fts MATCH ?
       AND k.archived_into IS NULL
     `;
@@ -427,7 +446,7 @@ export async function recall(
     kParams.push(limit * 3); // fetch extra for RRF merge + diversity filter
 
     try {
-      const kRows = db.prepare(knowledgeSql).all(...kParams) as Array<{
+      const kRows = v2db.prepare(knowledgeSql).all(...kParams) as Array<{
         id: number;
         key: string | null;
         content: string;
@@ -463,10 +482,10 @@ export async function recall(
           },
         });
       }
-      // Track recall hits for knowledge entries
+      // Track recall hits for knowledge entries (v2)
       if (kRows.length > 0) {
-        const updateRecall = db.prepare(
-          "UPDATE knowledge SET recall_count = COALESCE(recall_count, 0) + 1, last_recalled = datetime('now') WHERE id = ?"
+        const updateRecall = v2db.prepare(
+          "UPDATE knowledge_index SET recall_count = COALESCE(recall_count, 0) + 1, last_recalled_at = datetime('now') WHERE id = ?"
         );
         for (const row of kRows) {
           updateRecall.run(row.id);
@@ -561,60 +580,10 @@ export async function recall(
           const rid = Number(row.rowid);
 
           if (rid > 0) {
-            // Positive rowid = knowledge entry
-            const k = db
-              .prepare(
-                "SELECT id, key, content, tags, source, project_dir, maturity, success_rate, created_at FROM knowledge WHERE id = ? AND archived_into IS NULL"
-              )
-              .get(rid) as {
-              id: number;
-              key: string | null;
-              content: string;
-              tags: string | null;
-              source: string;
-              project_dir: string | null;
-              maturity: string;
-              success_rate: number | null;
-              created_at: string;
-            } | undefined;
-
-            if (!k) continue;
-
-            // Apply project filter
-            if (!options?.global && options?.project) {
-              if (k.project_dir && !k.project_dir.includes(options.project!)) {
-                continue;
-              }
-            }
-
-            const boost = maturityBoost(
-              (k.maturity || "progenitor") as Maturity,
-              k.success_rate,
-            );
-            const snippetText =
-              k.content.length > 128
-                ? k.content.substring(0, 128) + "..."
-                : k.content;
-
-            vecRanked.push({
-              key: `knowledge:${k.id}`,
-              result: {
-                id: k.id,
-                source: k.key || k.source || "stored knowledge",
-                category: "knowledge",
-                snippet: snippetText,
-                content: k.content,
-                session_started: k.created_at,
-                project_dir: k.project_dir,
-                created_at: k.created_at,
-                tags: k.tags ? k.tags.split(",").map((t) => t.trim()) : [],
-                result_type: "knowledge",
-                weighted_rank: row.distance / boost,
-              },
-            });
-
-            // Track recall
-            _recalledKnowledgeIds.add(k.id);
+            // Positive rowid = knowledge entry — skip, knowledge_vec maps to v1 IDs
+            // which don't match v2 knowledge_index IDs. Knowledge recall is handled
+            // by v2 FTS above. Vec embeddings for v2 can be rebuilt later.
+            continue;
           } else {
             // Negative rowid = summary (negate to get actual id)
             const actualId = -rid;
@@ -855,9 +824,9 @@ export function contentOverlap(a: string, b: string): number {
 }
 
 export function findSimilarKnowledge(content: string, limit: number = 3): Array<{ id: number; key: string | null; content: string; overlap: number }> {
-  const db = getKnowledgeDb();
-  const entries = db.prepare(`
-    SELECT id, key, content FROM knowledge
+  const v2db = getV2Db();
+  const entries = v2db.prepare(`
+    SELECT id, key, content FROM knowledge_index
     WHERE archived_into IS NULL
     ORDER BY created_at DESC
     LIMIT 100
@@ -906,8 +875,8 @@ export function getStats(): KbStats {
   const tags = db
     .prepare("SELECT COUNT(DISTINCT tag) as c FROM tags")
     .get() as { c: number };
-  const knowledge = db
-    .prepare("SELECT COUNT(*) as c FROM knowledge")
+  const knowledge = getV2Db()
+    .prepare("SELECT COUNT(*) as c FROM knowledge_index WHERE archived_into IS NULL")
     .get() as { c: number };
   const summaries = db
     .prepare("SELECT COUNT(*) as c FROM summaries")
@@ -938,9 +907,9 @@ export function getStats(): KbStats {
     )
     .all() as Array<{ tag: string; count: number }>;
 
-  const maturityDist = db
+  const maturityDist = getV2Db()
     .prepare(
-      "SELECT COALESCE(maturity, 'progenitor') as maturity, COUNT(*) as count FROM knowledge GROUP BY maturity ORDER BY count DESC"
+      "SELECT COALESCE(maturity, 'progenitor') as maturity, COUNT(*) as count FROM knowledge_index WHERE archived_into IS NULL GROUP BY maturity ORDER BY count DESC"
     )
     .all() as Array<{ maturity: string; count: number }>;
 
@@ -1088,39 +1057,33 @@ export async function insertKnowledge(
   tags?: string[],
   source?: string,
   projectDir?: string,
-  sessionId?: string
+  _sessionId?: string
 ): Promise<number> {
-  const db = getKnowledgeDb();
+  const v2db = getV2Db();
   const now = new Date().toISOString();
   const tagsStr = tags ? tags.join(", ") : null;
-  const effectiveSession = sessionId || getActiveSession() || null;
-  const result = db
+  const normalizedDir = normalizePath(projectDir) || null;
+
+  // Generate vault path for the new entry
+  const slug = (key || "unnamed")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  const project = normalizedDir
+    ? normalizedDir.replace(/\\/g, "/").split("/").pop() || "General"
+    : "General";
+  const vaultPath = join(homedir(), "Obsidian Vault v2", "Experiences", project, `${slug}.md`);
+
+  const result = v2db
     .prepare(
-      `INSERT INTO knowledge (key, content, tags, source, permanent, created_at, updated_at, project_dir, created_by_session)
-       VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?)`
+      `INSERT INTO knowledge_index (vault_path, key, content, tags, source, project_dir, maturity, helpful, harmful, neutral, success_rate, recall_count, last_recalled_at, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, 'progenitor', 0, 0, 0, NULL, 0, NULL, ?, ?)`
     )
-    .run(key || null, content, tagsStr, source || "manual", now, now, normalizePath(projectDir), effectiveSession);
-  const rowid = Number(result.lastInsertRowid);
+    .run(vaultPath, key || null, content, tagsStr, source || "manual", normalizedDir, now, now);
+  // FTS auto-populated by INSERT trigger
 
-  // Embed and store vector (best-effort)
-  if (embeddingsAvailable()) {
-    try {
-      const vec = await embedText(content);
-      if (vec) {
-        const rid = BigInt(rowid);
-        db.prepare("DELETE FROM knowledge_vec WHERE rowid = ?").run(rid);
-        db.prepare(
-          "INSERT INTO knowledge_vec (rowid, embedding) VALUES (?, ?)"
-        ).run(rid, vecToBuffer(vec));
-      }
-    } catch (err) {
-      console.error(
-        `[db] embed-on-write failed for knowledge ${rowid}: ${err instanceof Error ? err.message : String(err)}`
-      );
-    }
-  }
-
-  return rowid;
+  return Number(result.lastInsertRowid);
 }
 
 export function updateKnowledge(
@@ -1129,29 +1092,29 @@ export function updateKnowledge(
   key?: string,
   tags?: string[],
   source?: string,
-  sessionId?: string
+  _sessionId?: string
 ): void {
-  const db = getKnowledgeDb();
+  const v2db = getV2Db();
   const now = new Date().toISOString();
   const tagsStr = tags ? tags.join(", ") : null;
-  const effectiveSession = sessionId || getActiveSession() || null;
-  db.prepare(
-    `UPDATE knowledge SET content = ?, key = ?, tags = ?, source = ?, updated_at = ?, updated_by_session = ?
+  v2db.prepare(
+    `UPDATE knowledge_index SET content = ?, key = ?, tags = ?, source = ?, updated_at = ?
      WHERE id = ?`
-  ).run(content, key || null, tagsStr, source || "manual", now, effectiveSession, id);
+  ).run(content, key || null, tagsStr, source || "manual", now, id);
+  // FTS auto-updated by UPDATE trigger
 }
 
 export function deleteKnowledge(options: {
   id?: number;
   key?: string;
 }): number {
-  const db = getKnowledgeDb();
+  const v2db = getV2Db();
   if (options.id) {
-    return db.prepare("DELETE FROM knowledge WHERE id = ?").run(options.id)
+    return v2db.prepare("DELETE FROM knowledge_index WHERE id = ?").run(options.id)
       .changes;
   }
   if (options.key) {
-    return db.prepare("DELETE FROM knowledge WHERE key = ?").run(options.key)
+    return v2db.prepare("DELETE FROM knowledge_index WHERE key = ?").run(options.key)
       .changes;
   }
   return 0;
@@ -1163,16 +1126,16 @@ export function getKnowledgeById(id: number): {
   content: string;
   tags: string | null;
   source: string;
-  helpful_count: number;
-  harmful_count: number;
-  neutral_count: number;
+  helpful: number;
+  harmful: number;
+  neutral: number;
   success_rate: number | null;
   maturity: string;
 } | undefined {
-  const db = getKnowledgeDb();
-  return db
+  const v2db = getV2Db();
+  return v2db
     .prepare(
-      "SELECT id, key, content, tags, source, helpful_count, harmful_count, neutral_count, success_rate, maturity FROM knowledge WHERE id = ?"
+      "SELECT id, key, content, tags, source, helpful, harmful, neutral, success_rate, maturity FROM knowledge_index WHERE id = ?"
     )
     .get(id) as {
     id: number;
@@ -1180,9 +1143,9 @@ export function getKnowledgeById(id: number): {
     content: string;
     tags: string | null;
     source: string;
-    helpful_count: number;
-    harmful_count: number;
-    neutral_count: number;
+    helpful: number;
+    harmful: number;
+    neutral: number;
     success_rate: number | null;
     maturity: string;
   } | undefined;
@@ -1193,35 +1156,31 @@ export function recordFeedback(
   rating: "helpful" | "harmful" | "neutral",
   newSuccessRate: number | null,
   newMaturity: string,
-  referenced?: boolean,
+  _referenced?: boolean,
 ): void {
-  const db = getKnowledgeDb();
-  const col =
-    rating === "helpful" ? "helpful_count"
-    : rating === "harmful" ? "harmful_count"
-    : "neutral_count";
+  const v2db = getV2Db();
+  const col = rating; // v2 columns are just "helpful", "harmful", "neutral"
 
-  db.prepare(
-    `UPDATE knowledge
+  v2db.prepare(
+    `UPDATE knowledge_index
      SET ${col} = ${col} + 1,
          success_rate = ?,
          maturity = ?,
-         reference_count = CASE WHEN ? THEN reference_count + 1 ELSE reference_count END,
          updated_at = datetime('now')
      WHERE id = ?`
-  ).run(newSuccessRate, newMaturity, referenced ? 1 : 0, id);
+  ).run(newSuccessRate, newMaturity, id);
 }
 
 export function deleteKnowledgeById(id: number): boolean {
-  const db = getKnowledgeDb();
-  const result = db.prepare("DELETE FROM knowledge WHERE id = ?").run(id);
+  const v2db = getV2Db();
+  const result = v2db.prepare("DELETE FROM knowledge_index WHERE id = ?").run(id);
   return result.changes > 0;
 }
 
 export function archiveKnowledge(sourceIds: number[], newEntryId: number): number {
-  const db = getKnowledgeDb();
-  const stmt = db.prepare(
-    "UPDATE knowledge SET archived_into = ?, updated_at = ? WHERE id = ? AND archived_into IS NULL"
+  const v2db = getV2Db();
+  const stmt = v2db.prepare(
+    "UPDATE knowledge_index SET archived_into = ?, updated_at = ? WHERE id = ? AND archived_into IS NULL"
   );
   const now = new Date().toISOString();
   let count = 0;
@@ -1232,15 +1191,15 @@ export function archiveKnowledge(sourceIds: number[], newEntryId: number): numbe
 }
 
 export function inheritFeedbackCounts(targetId: number, sourceIds: number[]): void {
-  const db = getKnowledgeDb();
+  const v2db = getV2Db();
   let helpful = 0, harmful = 0, neutral = 0;
 
   for (const id of sourceIds) {
     const entry = getKnowledgeById(id);
     if (entry) {
-      helpful += entry.helpful_count;
-      harmful += entry.harmful_count;
-      neutral += entry.neutral_count;
+      helpful += entry.helpful;
+      harmful += entry.harmful;
+      neutral += entry.neutral;
     }
   }
 
@@ -1250,9 +1209,9 @@ export function inheritFeedbackCounts(targetId: number, sourceIds: number[]): vo
   if (helpful >= 7 && successRate !== null && successRate >= 0.5) maturity = "mature";
   else if (helpful >= 3 && successRate !== null && successRate >= 0.5) maturity = "proven";
 
-  db.prepare(`
-    UPDATE knowledge
-    SET helpful_count = ?, harmful_count = ?, neutral_count = ?,
+  v2db.prepare(`
+    UPDATE knowledge_index
+    SET helpful = ?, harmful = ?, neutral = ?,
         success_rate = ?, maturity = ?, updated_at = ?
     WHERE id = ?
   `).run(helpful, harmful, neutral, successRate, maturity, new Date().toISOString(), targetId);
@@ -1269,12 +1228,12 @@ export function listKnowledge(limit: number = 20, project?: string): Array<{
   maturity: string;
   success_rate: number | null;
 }> {
-  const db = getKnowledgeDb();
+  const v2db = getV2Db();
 
   if (project) {
-    return db
+    return v2db
       .prepare(
-        "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge WHERE (project_dir IS NULL OR project_dir LIKE ?) AND archived_into IS NULL ORDER BY created_at DESC LIMIT ?"
+        "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge_index WHERE (project_dir IS NULL OR project_dir LIKE ?) AND archived_into IS NULL ORDER BY created_at DESC LIMIT ?"
       )
       .all(`%${project}%`, limit) as Array<{
       id: number;
@@ -1289,9 +1248,9 @@ export function listKnowledge(limit: number = 20, project?: string): Array<{
     }>;
   }
 
-  return db
+  return v2db
     .prepare(
-      "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge WHERE archived_into IS NULL ORDER BY created_at DESC LIMIT ?"
+      "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge_index WHERE archived_into IS NULL ORDER BY created_at DESC LIMIT ?"
     )
     .all(limit) as Array<{
     id: number;

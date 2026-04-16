@@ -6,6 +6,7 @@
  *   Stage 1: Index — session events → knowledge.db chunks
  *   Stage 2: Skill scan — cluster experiences for skill candidates
  *   Stage 3: Shadow-recall — replay queries with alternative search strategies
+ *   Stage 4: Invocation log — extract skill/command usage for pruning lifecycle
  *
  * CLI flags:
  *   --backfill-sessions    Reprocess all .db files
@@ -39,6 +40,9 @@ const CLUSTER_THRESHOLD = 3;
 
 // Shadow-recall paths
 const SHADOW_LOG_PATH = join(HOME, '.claude', 'knowledge-mcp', 'shadow-recall.jsonl');
+
+// Invocation log path (skill/command/hook usage tracking)
+const INVOCATION_LOG_PATH = join(HOME, '.claude', 'knowledge-mcp', 'skill-invocations.jsonl');
 
 // .recalled-entries.json can be in the project root (written by /start) or context-mode dir (legacy)
 function findRecalledEntriesPath() {
@@ -560,6 +564,105 @@ async function runStage3ShadowRecall() {
 }
 
 // ---------------------------------------------------------------------------
+// Stage 4: Invocation log — extract skill/command usage for pruning lifecycle
+// ---------------------------------------------------------------------------
+
+function runStage4InvocationLog() {
+  log('Stage 4: Invocation log — extract skill/command usage');
+
+  if (!existsSync(SESSIONS_DB_DIR)) {
+    log('Stage 4: No sessions directory — skipping');
+    return;
+  }
+
+  // Read already-logged session IDs to avoid duplicates
+  const loggedSessions = new Set();
+  if (existsSync(INVOCATION_LOG_PATH)) {
+    try {
+      const lines = readFileSync(INVOCATION_LOG_PATH, 'utf8').split('\n').filter(Boolean);
+      for (const line of lines) {
+        try {
+          const entry = JSON.parse(line);
+          if (entry.session) loggedSessions.add(entry.session);
+        } catch {}
+      }
+    } catch {}
+  }
+
+  const dbFiles = readdirSync(SESSIONS_DB_DIR).filter(f => f.endsWith('.db'));
+  let totalLogged = 0;
+
+  for (const file of dbFiles) {
+    const filePath = join(SESSIONS_DB_DIR, file);
+    try {
+      const sessionDb = new Database(filePath, { readonly: true });
+
+      const hasEvents = sessionDb
+        .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='session_events'")
+        .get();
+      if (!hasEvents) { sessionDb.close(); continue; }
+
+      const meta = sessionDb.prepare('SELECT * FROM session_meta LIMIT 1').get();
+      if (!meta || loggedSessions.has(meta.session_id)) { sessionDb.close(); continue; }
+
+      // Extract skill invocations, MCP tool calls, and slash commands from user prompts
+      const invocations = sessionDb.prepare(
+        "SELECT type, data, created_at FROM session_events WHERE type IN ('skill', 'mcp') OR (type = 'user_prompt' AND data LIKE '/%') ORDER BY id"
+      ).all();
+      sessionDb.close();
+
+      const project = projectFromDir(meta.project_dir);
+      const seenCommands = new Set(); // dedup slash commands already captured as skill events
+
+      for (const inv of invocations) {
+        const rawData = (inv.data || '').trim();
+        if (!rawData) continue;
+
+        let invType, name;
+        if (inv.type === 'skill') {
+          invType = 'skill';
+          name = rawData;
+          seenCommands.add(name);
+        } else if (inv.type === 'mcp') {
+          // MCP events look like "kb_recall: ..." or "kb_set_session: ..."
+          invType = 'mcp';
+          name = rawData.split(':')[0].trim();
+        } else if (inv.type === 'user_prompt' && rawData.startsWith('/')) {
+          // Slash command typed directly — extract command name
+          const cmdMatch = rawData.match(/^\/(\S+)/);
+          if (!cmdMatch) continue;
+          name = cmdMatch[1];
+          // Skip if this command was already captured as a skill event in this session
+          if (seenCommands.has(name)) continue;
+          invType = 'command';
+        } else {
+          continue;
+        }
+
+        const entry = {
+          ts: inv.created_at,
+          type: invType,
+          name,
+          session: meta.session_id,
+          project,
+        };
+
+        try {
+          appendFileSync(INVOCATION_LOG_PATH, JSON.stringify(entry) + '\n');
+          totalLogged++;
+        } catch (err) {
+          log(`Stage 4: Failed to append: ${err.message}`);
+        }
+      }
+    } catch (err) {
+      log(`Stage 4: Error reading ${file}: ${err.message}`);
+    }
+  }
+
+  log(`Stage 4: Complete — ${totalLogged} invocations logged`);
+}
+
+// ---------------------------------------------------------------------------
 // Shared helpers
 // ---------------------------------------------------------------------------
 
@@ -1042,9 +1145,15 @@ if (isDirectRun) {
       log(`Stage 3 FAILED: ${err.message}\n${err.stack}`);
     }
 
+    try {
+      runStage4InvocationLog();
+    } catch (err) {
+      log(`Stage 4 FAILED: ${err.message}\n${err.stack}`);
+    }
+
     log('Pipeline complete');
   }
 }
 
 // Export for potential programmatic use
-export { runStage1Index, runStage2SkillScan, runStage3ShadowRecall };
+export { runStage1Index, runStage2SkillScan, runStage3ShadowRecall, runStage4InvocationLog };

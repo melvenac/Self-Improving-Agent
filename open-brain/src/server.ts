@@ -3,9 +3,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { resolve } from "node:path";
+import { resolve, join, dirname } from "node:path";
 import { homedir } from "node:os";
-import { existsSync, readFileSync, writeFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, appendFileSync, statSync } from "node:fs";
+import type Database from "better-sqlite3";
 
 import { runSync } from "./pipelines/sync/index.js";
 import {
@@ -17,13 +18,42 @@ import {
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { sessionStart } from "./pipelines/session-start/index.js";
-import { sessionEnd } from "./pipelines/session-end/index.js";
 import { createDb } from "./db.js";
 import { openV2Database } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolvePaths } from "./shared/paths.js";
 import { readJson } from "./shared/fs-utils.js";
+import { slugify, writeExperience } from "./vault-writer.js";
+import { evaluateLifecycle, maturityBoost, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
 import type { CategoryScore, ScoreResult } from "./pipelines/sync/types.js";
+
+// --- V2 Database singleton ---
+
+const V2_DB_PATH = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
+const V2_VAULT_DIR = join(homedir(), "Obsidian Vault v2");
+
+let _v2db: Database.Database | null = null;
+function getV2Db(): Database.Database {
+  if (_v2db) return _v2db;
+  _v2db = openV2Database(V2_DB_PATH);
+  return _v2db;
+}
+
+let _activeSessionId: string | null = null;
+const _recalledKnowledgeIds = new Set<number>();
+
+function sanitizeFtsQuery(query: string): string {
+  return query
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => `"${word.replace(/"/g, '""')}"`)
+    .join(" ");
+}
+
+function normalizePath(p?: string | null): string | null {
+  if (!p) return null;
+  return p.replace(/\\/g, "/");
+}
 
 // --- Exported handler functions (testable without MCP transport) ---
 
@@ -120,102 +150,38 @@ export interface EndArgs {
   session_summary?: string;
   recalled_entry_ids?: number[];
   dry_run?: boolean;
-  v2_db_path?: string;
-  v2_vault_path?: string;
 }
 
 export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
   try {
     const projectRoot = resolve(args.project_root ?? ".");
-
-    // v2 path — opt-in via v2_db_path + v2_vault_path
-    if (args.v2_db_path && args.v2_vault_path) {
-      const v2db = openV2Database(args.v2_db_path);
-      try {
-        const result = sessionEndV2({
-          db: v2db,
-          vaultDir: args.v2_vault_path,
-          agentsDir: resolve(projectRoot, ".agents"),
-          sessionId: args.session_id || "",
-          sessionSummary: args.session_summary || "",
-          project: projectRoot.split(/[/\\]/).filter(Boolean).pop() || "General",
-          recalledEntryIds: args.recalled_entry_ids || [],
-          dryRun: args.dry_run || false,
-        });
-        return {
-          content: [{
-            type: "text",
-            text: `Session End (v2):\n  Summary: ${result.summary.written ? "written" : "skipped"}\n  Feedback: ${result.feedback.processed} entries rated\n  Reflection: ${result.reflection.flagged} clusters flagged`,
-          }],
-        };
-      } finally {
-        v2db.close();
-      }
-    }
-
-    const paths = resolvePaths(projectRoot);
-    const home = homedir();
-    const dryRun = args.dry_run ?? false;
+    const v2db = getV2Db();
 
     // Read recalled entries from file if none provided
     let recalledIds = args.recalled_entry_ids ?? [];
     if (recalledIds.length === 0) {
-      const recalledPath = resolve(projectRoot, ".agents", ".recalled-entries.json");
+      const recalledPath = resolve(projectRoot, ".recalled-entries.json");
       const recalled = readJson<{ entries: { id: number }[] }>(recalledPath);
       recalledIds = recalled?.entries.map((e) => e.id) ?? [];
     }
 
-    // Read experience files from vault
-    const experiencesPath = resolve(paths.obsidianVault, "experiences");
-    let experienceFiles: { name: string; content: string }[] = [];
-    if (existsSync(experiencesPath)) {
-      const files = readdirSync(experiencesPath).filter((f: string) => f.endsWith(".md"));
-      experienceFiles = files.map((f: string) => ({
-        name: f,
-        content: readFileSync(resolve(experiencesPath, f), "utf-8"),
-      }));
-    }
+    const result = sessionEndV2({
+      db: v2db,
+      vaultDir: V2_VAULT_DIR,
+      agentsDir: resolve(projectRoot, ".agents"),
+      sessionId: args.session_id || "",
+      sessionSummary: args.session_summary || "",
+      project: projectRoot.split(/[/\\]/).filter(Boolean).pop() || "General",
+      recalledEntryIds: recalledIds,
+      dryRun: args.dry_run || false,
+    });
 
-    // Previous skill counts — placeholder until wired to real parser
-    const previousSkillCounts = new Map<string, number>();
-
-    // Open DB for real stores
-    const db = createDb(paths.knowledgeDb);
-    try {
-      const result = sessionEnd({
-        options: { projectRoot, homePath: home, sessionId: args.session_id ?? null, recalledEntryIds: recalledIds, dryRun },
-        sessionSummary: args.session_summary ?? "",
-        sessionFiles: [],
-        experienceFiles,
-        previousSkillCounts,
-        chunkStore: db,
-        knowledgeStore: db,
-        vaultExperiencesPath: experiencesPath,
-        readVaultFile: (p: string) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
-        writeVaultFile: (p: string, c: string) => { if (!dryRun) writeFileSync(p, c, "utf-8"); },
-      });
-
-      const lines: string[] = [];
-      lines.push(`Session End${dryRun ? " (dry run)" : ""}`);
-      lines.push(`Chunks: ${result.chunks.sessionsIndexed} sessions, ${result.chunks.chunksCreated} chunks`);
-      lines.push(`Feedback: ${result.feedback.processed} entries rated`);
-      lines.push(`Frontmatter: ${result.frontmatter.filesUpdated} files updated`);
-      lines.push(`Skills: ${result.skills.clusters.length} clusters, ${result.skills.pendingProposals} proposals, ${result.skills.approaching} approaching`);
-
-      const errors = [
-        ...result.chunks.errors.map((e) => `chunk: ${e}`),
-        ...result.feedback.errors.map((e) => `feedback: ${e}`),
-        ...result.frontmatter.errors.map((e) => `frontmatter: ${e}`),
-      ];
-      if (errors.length > 0) {
-        lines.push(`\nErrors:`);
-        for (const e of errors) lines.push(`  ${e}`);
-      }
-
-      return { content: [{ type: "text", text: lines.join("\n") }] };
-    } finally {
-      db.close();
-    }
+    return {
+      content: [{
+        type: "text",
+        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n  Feedback: ${result.feedback.processed} entries rated\n  Reflection: ${result.reflection.flagged} clusters flagged`,
+      }],
+    };
   } catch (err) {
     return {
       content: [{ type: "text", text: `ob_end error: ${err instanceof Error ? err.message : String(err)}` }],
@@ -306,15 +272,13 @@ server.tool(
 
 server.tool(
   "ob_end",
-  "End a session — index chunks, auto-rate recalled knowledge, sync frontmatter to vault, scan for skill candidates.",
+  "End a session — self-generate summary from session .db, auto-rate recalled knowledge, write vault summary, flag reflection clusters.",
   {
     project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
     session_id: z.string().nullable().optional().default(null).describe("Session UUID (null if unknown)"),
-    session_summary: z.string().optional().default("").describe("Session summary text for tag matching"),
+    session_summary: z.string().optional().default("").describe("Session summary text for tag matching (self-generates if empty)"),
     recalled_entry_ids: z.array(z.number()).optional().default([]).describe("IDs of knowledge entries recalled this session"),
     dry_run: z.boolean().optional().default(false).describe("Run feedback but skip vault writes"),
-    v2_db_path: z.string().optional().describe("Path to v2 SQLite DB — enables v2 session-end pipeline"),
-    v2_vault_path: z.string().optional().describe("Path to v2 vault directory — required when v2_db_path is set"),
   },
   async (args) => handleEnd(args)
 );
@@ -327,6 +291,345 @@ server.tool(
     history_only: z.boolean().optional().default(false).describe("Only show score history, don't compute new score"),
   },
   async (args) => handleScore(args)
+);
+
+// ============================================================
+// kb_* tools — knowledge lifecycle (absorbed from knowledge-mcp)
+// ============================================================
+
+// --- kb_set_session ---
+server.tool(
+  "kb_set_session",
+  "Register the active session ID. Call once at session start for provenance tracking.",
+  {
+    session_id: z.string().describe("The Claude session UUID"),
+    project_dir: z.string().optional().describe("Current working directory"),
+  },
+  async ({ session_id, project_dir }) => {
+    _activeSessionId = session_id;
+    return {
+      content: [{ type: "text" as const, text: `Session registered: ${session_id}${project_dir ? ` (${project_dir})` : ""}` }],
+    };
+  }
+);
+
+// --- kb_recall ---
+server.tool(
+  "kb_recall",
+  "Search across all stored knowledge. Returns ranked results. By default, results are scoped to the project you specify. Set `global: true` to search across all projects.",
+  {
+    queries: z.array(z.string()).min(1).describe("Search queries — batch all questions in one call"),
+    project: z.string().optional().describe("Your current working directory — used to scope results"),
+    global: z.boolean().optional().default(false).describe("If true, search across ALL projects"),
+    tags: z.array(z.string()).optional().describe("Filter by tags"),
+    verbose: z.boolean().optional().default(false).describe("If true, return full content instead of snippets"),
+    limit: z.number().optional().default(5).describe("Results per query (default: 5)"),
+  },
+  async ({ queries, project, global: globalSearch, tags, verbose, limit }) => {
+    const v2db = getV2Db();
+    const normalizedProject = normalizePath(project);
+    const results: string[] = [];
+
+    for (const query of queries) {
+      const safeQuery = sanitizeFtsQuery(query);
+
+      let sql = `
+        SELECT
+          k.id, k.key, k.content, k.tags, k.source, k.project_dir,
+          k.maturity, k.success_rate,
+          snippet(knowledge_fts, 1, '>>', '<<', '...', 128) as snippet,
+          k.created_at,
+          (bm25(knowledge_fts) * (1.0 + MAX(0, julianday('now') - julianday(k.created_at)) * 0.005)) as weighted_rank
+        FROM knowledge_fts
+        JOIN knowledge_index k ON k.id = knowledge_fts.rowid
+        WHERE knowledge_fts MATCH ?
+        AND k.archived_into IS NULL
+      `;
+      const params: unknown[] = [safeQuery];
+
+      if (!globalSearch && normalizedProject) {
+        sql += ` AND (k.project_dir IS NULL OR k.project_dir LIKE ?)`;
+        params.push(`%${normalizedProject}%`);
+      }
+
+      if (tags && tags.length > 0) {
+        for (const tag of tags) {
+          sql += ` AND k.tags LIKE ?`;
+          params.push(`%${tag}%`);
+        }
+      }
+
+      sql += ` ORDER BY weighted_rank LIMIT ?`;
+      params.push(limit);
+
+      try {
+        const rows = v2db.prepare(sql).all(...params) as Array<{
+          id: number; key: string | null; content: string; tags: string | null;
+          source: string; project_dir: string | null; maturity: string;
+          success_rate: number | null; snippet: string; created_at: string;
+          weighted_rank: number;
+        }>;
+
+        results.push(`## ${query}`);
+        if (rows.length === 0) {
+          results.push("No results found.\n");
+          continue;
+        }
+
+        // Track recall hits
+        const updateRecall = v2db.prepare(
+          "UPDATE knowledge_index SET recall_count = COALESCE(recall_count, 0) + 1, last_recalled_at = datetime('now') WHERE id = ?"
+        );
+        for (const row of rows) {
+          updateRecall.run(row.id);
+          _recalledKnowledgeIds.add(row.id);
+
+          const boost = maturityBoost((row.maturity || "progenitor") as Maturity, row.success_rate);
+          const idTag = ` (id: ${row.id})`;
+          results.push(`### [stored knowledge] ${row.key || row.source}${idTag}`);
+          results.push(`Session: ${row.created_at} | Project: ${row.project_dir || "unknown"}`);
+          results.push(verbose ? row.content : row.snippet);
+          if (row.tags) results.push(`Tags: ${row.tags}`);
+          results.push("");
+        }
+      } catch {
+        results.push(`## ${query}\nFTS search error — index may be empty.\n`);
+      }
+    }
+
+    return { content: [{ type: "text" as const, text: results.join("\n") }] };
+  }
+);
+
+// --- kb_store ---
+server.tool(
+  "kb_store",
+  "Store a piece of knowledge. By default stored globally. Set scope to 'project' and pass project_dir to scope it.",
+  {
+    content: z.string().describe("The knowledge to store"),
+    key: z.string().optional().describe("Short label for easy retrieval"),
+    tags: z.array(z.string()).optional().describe("Tags for categorization"),
+    source: z.string().optional().default("manual").describe("Where this knowledge came from"),
+    scope: z.enum(["global", "project"]).optional().default("global").describe("Scope: global or project"),
+    project_dir: z.string().optional().describe("Project directory (only when scope is 'project')"),
+  },
+  async ({ content, key, tags, source, scope, project_dir }) => {
+    const v2db = getV2Db();
+    const now = new Date().toISOString();
+    const tagsStr = tags ? tags.join(", ") : "";
+    const effectiveProject = scope === "project" ? normalizePath(project_dir) : null;
+
+    // Derive vault path
+    const slug = slugify(key || "unnamed");
+    const projectName = effectiveProject
+      ? effectiveProject.replace(/\\/g, "/").split("/").pop() || "General"
+      : "General";
+    const vaultPath = join(V2_VAULT_DIR, "Experiences", projectName, `${slug}.md`);
+
+    // Write vault file
+    writeExperience(V2_VAULT_DIR, {
+      key: key || "unnamed",
+      tags: tags || [],
+      content,
+      created: now,
+      maturity: "progenitor",
+      helpful: 0, harmful: 0, neutral: 0,
+      project: projectName,
+      source: source || "manual",
+    });
+
+    // Insert into DB (FTS auto-populated by trigger)
+    const result = v2db.prepare(`
+      INSERT INTO knowledge_index
+        (vault_path, key, content, tags, source, project_dir, maturity,
+         helpful, harmful, neutral, success_rate, recall_count, last_recalled_at, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, 'progenitor', 0, 0, 0, NULL, 0, NULL, ?, ?)
+    `).run(vaultPath, key || null, content, tagsStr, source || "manual", effectiveProject, now, now);
+
+    const id = Number(result.lastInsertRowid);
+    const scopeLabel = effectiveProject ? ` [project: ${effectiveProject}]` : " [global]";
+
+    return {
+      content: [{ type: "text" as const, text: `Stored knowledge (id: ${id})${key ? ` with key "${key}"` : ""}${scopeLabel}${tags && tags.length > 0 ? ` — tags: ${tags.join(", ")}` : ""}` }],
+    };
+  }
+);
+
+// --- kb_feedback ---
+server.tool(
+  "kb_feedback",
+  "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Drives maturity promotion and apoptosis.",
+  {
+    id: z.coerce.number().describe("Knowledge entry ID"),
+    rating: z.enum(["helpful", "harmful", "neutral"]).describe("Was this knowledge helpful, harmful, or neutral?"),
+  },
+  async ({ id, rating }) => {
+    const v2db = getV2Db();
+    const entry = v2db.prepare(
+      "SELECT id, key, content, tags, source, helpful, harmful, neutral, success_rate, maturity FROM knowledge_index WHERE id = ?"
+    ).get(id) as {
+      id: number; key: string | null; content: string; tags: string | null; source: string;
+      helpful: number; harmful: number; neutral: number; success_rate: number | null; maturity: string;
+    } | undefined;
+
+    if (!entry) {
+      return { content: [{ type: "text" as const, text: `Error: no knowledge entry with id ${id}.` }], isError: true };
+    }
+
+    const feedbackEntry: FeedbackEntry = {
+      id: entry.id, helpful: entry.helpful, harmful: entry.harmful, neutral: entry.neutral,
+      success_rate: entry.success_rate, maturity: entry.maturity as Maturity, source: entry.source,
+    };
+
+    const result = evaluateLifecycle(feedbackEntry, rating as Rating);
+
+    if (result.autoDelete) {
+      v2db.prepare("DELETE FROM knowledge_index WHERE id = ?").run(id);
+      try {
+        const logPath = join(homedir(), "Obsidian Vault", ".vault-writer.log");
+        appendFileSync(logPath, `[${new Date().toISOString()}] APOPTOSIS: id=${id} key="${entry.key || ""}" ${result.transitionMessage}\n`);
+      } catch { /* non-critical */ }
+      return { content: [{ type: "text" as const, text: `${result.transitionMessage}\nEntry ${id} (${entry.key || "no key"}) has been removed.` }] };
+    }
+
+    const col = rating; // v2 columns: helpful, harmful, neutral
+    v2db.prepare(`
+      UPDATE knowledge_index SET ${col} = ${col} + 1, success_rate = ?, maturity = ?, updated_at = datetime('now') WHERE id = ?
+    `).run(result.newSuccessRate, result.newMaturity, id);
+
+    const lines = [
+      `Feedback recorded for entry ${id} (${entry.key || "no key"}): ${rating}`,
+      `Counts: ${entry.helpful + (rating === "helpful" ? 1 : 0)} helpful, ${entry.harmful + (rating === "harmful" ? 1 : 0)} harmful, ${entry.neutral + (rating === "neutral" ? 1 : 0)} neutral`,
+      `Success rate: ${result.newSuccessRate !== null ? result.newSuccessRate.toFixed(2) : "N/A"}`,
+      `Maturity: ${result.newMaturity}`,
+    ];
+    if (result.transitionMessage) lines.push(`Lifecycle: ${result.transitionMessage}`);
+
+    return { content: [{ type: "text" as const, text: lines.join("\n") }] };
+  }
+);
+
+// --- kb_forget ---
+server.tool(
+  "kb_forget",
+  "Remove a piece of stored knowledge by ID or key.",
+  {
+    id: z.number().optional().describe("Knowledge entry ID to remove"),
+    key: z.string().optional().describe("Knowledge key to remove"),
+  },
+  async ({ id, key }) => {
+    if (!id && !key) {
+      return { content: [{ type: "text" as const, text: "Error: provide either an id or key to delete." }], isError: true };
+    }
+    const v2db = getV2Db();
+    let deleted = 0;
+    if (id) deleted = v2db.prepare("DELETE FROM knowledge_index WHERE id = ?").run(id).changes;
+    else if (key) deleted = v2db.prepare("DELETE FROM knowledge_index WHERE key = ?").run(key).changes;
+
+    return {
+      content: [{ type: "text" as const, text: deleted > 0 ? `Removed ${deleted} knowledge entry(ies).` : `No knowledge found with ${id ? `id ${id}` : `key "${key}"`}.` }],
+    };
+  }
+);
+
+// --- kb_list ---
+server.tool(
+  "kb_list",
+  "List stored knowledge entries. Pass project to see only global + project-scoped entries.",
+  {
+    limit: z.number().optional().default(20).describe("Max entries to return"),
+    project: z.string().optional().describe("Filter to global + this project's entries"),
+  },
+  async ({ limit, project }) => {
+    const v2db = getV2Db();
+    const normalizedProject = normalizePath(project);
+
+    let sql = "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge_index WHERE archived_into IS NULL";
+    const params: unknown[] = [];
+    if (normalizedProject) {
+      sql += " AND (project_dir IS NULL OR project_dir LIKE ?)";
+      params.push(`%${normalizedProject}%`);
+    }
+    sql += " ORDER BY created_at DESC LIMIT ?";
+    params.push(limit);
+
+    const entries = v2db.prepare(sql).all(...params) as Array<{
+      id: number; key: string | null; content: string; tags: string | null;
+      source: string; project_dir: string | null; created_at: string;
+      maturity: string; success_rate: number | null;
+    }>;
+
+    if (entries.length === 0) {
+      return { content: [{ type: "text" as const, text: "No stored knowledge entries yet." }] };
+    }
+
+    const lines = ["## Stored Knowledge", ""];
+    for (const e of entries) {
+      const scopeLabel = e.project_dir ? `[project]` : `[global]`;
+      lines.push(`**[${e.id}]** ${scopeLabel} ${e.key ? `\`${e.key}\` — ` : ""}${e.content.length > 120 ? e.content.substring(0, 120) + "..." : e.content}`);
+      if (e.tags) lines.push(`  Tags: ${e.tags}`);
+      lines.push(`  Source: ${e.source} | Created: ${e.created_at}${e.project_dir ? ` | Project: ${e.project_dir}` : ""}`);
+      lines.push("");
+    }
+
+    return { content: [{ type: "text" as const, text: lines.join("\n") }] };
+  }
+);
+
+// --- kb_stats ---
+server.tool(
+  "kb_stats",
+  "Show knowledge database statistics.",
+  {},
+  async () => {
+    const v2db = getV2Db();
+    const knowledge = v2db.prepare("SELECT COUNT(*) as c FROM knowledge_index WHERE archived_into IS NULL").get() as { c: number };
+    const maturityDist = v2db.prepare(
+      "SELECT COALESCE(maturity, 'progenitor') as maturity, COUNT(*) as count FROM knowledge_index WHERE archived_into IS NULL GROUP BY maturity ORDER BY count DESC"
+    ).all() as Array<{ maturity: string; count: number }>;
+
+    const rated = v2db.prepare(
+      "SELECT COUNT(*) as c FROM knowledge_index WHERE (helpful + harmful + neutral) > 0 AND archived_into IS NULL"
+    ).get() as { c: number };
+
+    let dbSize = 0;
+    try { dbSize = statSync(V2_DB_PATH).size; } catch { /* ignore */ }
+
+    const lines = [
+      `## Knowledge Stats`,
+      `Total entries: ${knowledge.c}`,
+      `Rated entries: ${rated.c}`,
+      `Database: ${V2_DB_PATH} (${(dbSize / 1024).toFixed(0)} KB)`,
+      ``,
+      `Maturity distribution:`,
+      ...maturityDist.map(m => `  ${m.maturity}: ${m.count}`),
+    ];
+
+    return { content: [{ type: "text" as const, text: lines.join("\n") }] };
+  }
+);
+
+// --- kb_recalled ---
+server.tool(
+  "kb_recalled",
+  "List knowledge entry IDs recalled this session. Used by session-end for auto-feedback.",
+  {},
+  async () => {
+    const ids = Array.from(_recalledKnowledgeIds);
+    if (ids.length === 0) {
+      return { content: [{ type: "text" as const, text: "No knowledge entries recalled this session." }] };
+    }
+
+    const v2db = getV2Db();
+    const lines = [`Recalled ${ids.length} entries this session:`, ""];
+    for (const id of ids) {
+      const entry = v2db.prepare("SELECT id, key, maturity FROM knowledge_index WHERE id = ?").get(id) as { id: number; key: string | null; maturity: string } | undefined;
+      if (entry) lines.push(`  [${entry.id}] ${entry.key || "(no key)"} — ${entry.maturity}`);
+      else lines.push(`  [${id}] (deleted)`);
+    }
+
+    return { content: [{ type: "text" as const, text: lines.join("\n") }] };
+  }
 );
 
 // --- Shared scoring logic ---

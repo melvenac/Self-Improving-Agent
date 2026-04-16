@@ -30,7 +30,6 @@ export interface SummaryInput {
   sessionId: string;
   project: string;
   date: string;
-  model: string;
   content: string;
 }
 
@@ -188,7 +187,6 @@ export function writeSummary(
     `sessionId: ${input.sessionId}`,
     `project: ${input.project}`,
     `date: ${input.date}`,
-    `model: ${input.model}`,
     "---",
   ].join("\n");
 

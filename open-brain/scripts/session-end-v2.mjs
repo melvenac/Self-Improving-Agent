@@ -23,14 +23,20 @@ try {
   const sessionId = process.env.CLAUDE_SESSION_ID || '';
   const agentsDir = join(projectDir, '.agents');
 
-  // Read recalled entries
+  // Read recalled entries — check project root first, then legacy path
   let recalledIds = [];
-  const recalledPath = join(homedir(), '.claude', 'context-mode', '.recalled-entries.json');
-  if (existsSync(recalledPath)) {
-    try {
-      const data = JSON.parse(readFileSync(recalledPath, 'utf-8'));
-      recalledIds = (data.entries || []).map(e => e.id).filter(Boolean);
-    } catch {}
+  const recalledCandidates = [
+    join(projectDir, '.recalled-entries.json'),
+    join(homedir(), '.claude', 'context-mode', '.recalled-entries.json'),
+  ];
+  for (const recalledPath of recalledCandidates) {
+    if (existsSync(recalledPath)) {
+      try {
+        const data = JSON.parse(readFileSync(recalledPath, 'utf-8'));
+        recalledIds = (data.entries || []).map(e => e.id).filter(Boolean);
+        break;
+      } catch {}
+    }
   }
 
   // Infer project name from path
@@ -43,13 +49,14 @@ try {
       vaultDir: V2_VAULT,
       agentsDir,
       sessionId,
-      sessionSummary: '', // Hook doesn't have access to session summary
+      sessionSummary: '', // v2 self-generates from session .db when empty
       project,
       recalledEntryIds: recalledIds,
       dryRun: false,
     });
 
-    console.log(`[session-end-v2] Summary: ${result.summary.written ? 'written' : 'skipped'}`);
+    const genLabel = result.summary.selfGenerated ? ' (self-generated)' : '';
+    console.log(`[session-end-v2] Summary: ${result.summary.written ? 'written' : 'skipped'}${genLabel}`);
     console.log(`[session-end-v2] Feedback: ${result.feedback.processed} entries`);
     console.log(`[session-end-v2] Reflection: ${result.reflection.flagged} clusters flagged`);
   } finally {

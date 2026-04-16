@@ -24,13 +24,18 @@ export function initSchemaV2(db: Database.Database): void {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       vault_path TEXT NOT NULL UNIQUE,
       key TEXT NOT NULL UNIQUE,
+      content TEXT NOT NULL DEFAULT '',
       tags TEXT DEFAULT '',
+      source TEXT DEFAULT 'manual',
+      project_dir TEXT,
       maturity TEXT DEFAULT 'progenitor' CHECK(maturity IN ('progenitor', 'proven', 'mature')),
       helpful INTEGER DEFAULT 0,
       harmful INTEGER DEFAULT 0,
       neutral INTEGER DEFAULT 0,
+      success_rate REAL DEFAULT NULL,
       recall_count INTEGER DEFAULT 0,
       last_recalled_at TEXT,
+      archived_into INTEGER DEFAULT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -49,8 +54,28 @@ export function initSchemaV2(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_knowledge_index_key ON knowledge_index(key);
 
     CREATE VIRTUAL TABLE IF NOT EXISTS knowledge_fts USING fts5(
-      key, content, tags, content='', contentless_delete=1
+      key, content, tags,
+      content=knowledge_index,
+      content_rowid=id,
+      tokenize='porter unicode61'
     );
+
+    CREATE TRIGGER IF NOT EXISTS ki_ai AFTER INSERT ON knowledge_index BEGIN
+      INSERT INTO knowledge_fts(rowid, key, content, tags)
+      VALUES (new.id, new.key, new.content, new.tags);
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS ki_ad AFTER DELETE ON knowledge_index BEGIN
+      INSERT INTO knowledge_fts(knowledge_fts, rowid, key, content, tags)
+      VALUES ('delete', old.id, old.key, old.content, old.tags);
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS ki_au AFTER UPDATE ON knowledge_index BEGIN
+      INSERT INTO knowledge_fts(knowledge_fts, rowid, key, content, tags)
+      VALUES ('delete', old.id, old.key, old.content, old.tags);
+      INSERT INTO knowledge_fts(rowid, key, content, tags)
+      VALUES (new.id, new.key, new.content, new.tags);
+    END;
   `);
 }
 
@@ -67,23 +92,31 @@ export interface KnowledgeIndexInput {
   key: string;
   tags: string;
   content: string;
+  source?: string;
+  projectDir?: string;
   maturity?: string;
   helpful?: number;
   harmful?: number;
   neutral?: number;
+  successRate?: number | null;
 }
 
 export interface KnowledgeIndexRow {
   id: number;
   vault_path: string;
   key: string;
+  content: string;
   tags: string;
+  source: string;
+  project_dir: string | null;
   maturity: string;
   helpful: number;
   harmful: number;
   neutral: number;
+  success_rate: number | null;
   recall_count: number;
   last_recalled_at: string | null;
+  archived_into: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -105,29 +138,23 @@ export function indexKnowledge(db: Database.Database, input: KnowledgeIndexInput
   const helpful = input.helpful ?? 0;
   const harmful = input.harmful ?? 0;
   const neutral = input.neutral ?? 0;
+  const successRate = input.successRate ?? null;
 
-  const result = db.prepare(`
+  db.prepare(`
     INSERT OR REPLACE INTO knowledge_index
-      (vault_path, key, tags, maturity, helpful, harmful, neutral, recall_count, last_recalled_at, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, 0, NULL, ?, ?)
-  `).run(input.vaultPath, input.key, input.tags, maturity, helpful, harmful, neutral, now, now);
-
-  const rowId = result.lastInsertRowid as number;
-
-  // Upsert into FTS using knowledge_index rowid so JOIN works reliably
-  db.prepare(`INSERT OR REPLACE INTO knowledge_fts (rowid, key, content, tags) VALUES (?, ?, ?, ?)`).run(
-    rowId,
-    input.key,
-    input.content,
-    input.tags
+      (vault_path, key, content, tags, source, project_dir, maturity, helpful, harmful, neutral, success_rate, recall_count, last_recalled_at, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NULL, ?, ?)
+  `).run(
+    input.vaultPath, input.key, input.content, input.tags,
+    input.source ?? 'manual', input.projectDir ?? null,
+    maturity, helpful, harmful, neutral, successRate, now, now
   );
+  // FTS is populated automatically via INSERT trigger (content-backed)
 }
 
 export function searchFts(db: Database.Database, query: string): FtsResult[] {
-  // knowledge_fts is contentless — column values are null on SELECT.
-  // Use rowid stored in knowledge_fts_data shadow table via the rowid column,
-  // which maps to knowledge_index.id (inserted in the same order).
-  // We store key in position 0; retrieve via rowid JOIN to knowledge_index.
+  // knowledge_fts is content-backed (content=knowledge_index, content_rowid=id).
+  // JOIN to knowledge_index for full metadata.
   const rows = db.prepare(`
     SELECT ki.key, ki.vault_path, f.rank
     FROM knowledge_fts f

@@ -3,6 +3,7 @@ import { join } from "path";
 import { writeSummary } from "../../vault-writer.js";
 import { updateFeedbackV2 } from "../../db-v2.js";
 import { flagReflectionClusters } from "./reflection.js";
+import { getSessionSummary } from "./session-summary.js";
 
 export interface SessionEndV2Input {
   db: Database.Database;
@@ -16,7 +17,7 @@ export interface SessionEndV2Input {
 }
 
 interface SessionEndV2Result {
-  summary: { written: boolean };
+  summary: { written: boolean; selfGenerated: boolean };
   feedback: { processed: number; ratings: Array<{ id: number; rating: string }> };
   reflection: { flagged: number };
 }
@@ -28,17 +29,27 @@ interface KnowledgeIndexRow {
 }
 
 export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
-  const { db, vaultDir, agentsDir, sessionId, sessionSummary, project, recalledEntryIds, dryRun } = input;
+  const { db, vaultDir, agentsDir, sessionId, project, recalledEntryIds, dryRun } = input;
+  let { sessionSummary } = input;
+
+  // ── Self-generate summary if not provided ─────────────────────────────────
+  let selfGenerated = false;
+  if (!sessionSummary) {
+    const result = getSessionSummary(sessionId || undefined);
+    if (result) {
+      sessionSummary = result.summary;
+      selfGenerated = true;
+    }
+  }
 
   // ── Stage 1: Write session summary ──────────────────────────────────────────
   let summaryWritten = false;
-  if (!dryRun) {
+  if (!dryRun && sessionSummary) {
     const date = new Date().toISOString().slice(0, 10);
     const written = writeSummary(vaultDir, {
       sessionId,
       project,
       date,
-      model: "unknown",
       content: sessionSummary,
     });
     summaryWritten = written !== null;
@@ -76,7 +87,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   }
 
   return {
-    summary: { written: summaryWritten },
+    summary: { written: summaryWritten, selfGenerated },
     feedback: { processed: ratings.length, ratings },
     reflection: { flagged },
   };
