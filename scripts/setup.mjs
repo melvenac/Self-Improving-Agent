@@ -2,11 +2,10 @@
 
 /**
  * Self-Improving Agent — Setup Script
- * Installs Knowledge MCP server, hooks, slash commands, and Obsidian vault.
+ * Builds open-brain MCP server, registers hooks, copies slash commands, and scaffolds the Obsidian vault.
  *
  * Usage:
- *   node scripts/setup.mjs          # normal install (copies files)
- *   node scripts/setup.mjs --dev    # dev install (symlinks src/ and scripts/)
+ *   node scripts/setup.mjs          # normal install
  */
 
 import fs from 'node:fs';
@@ -15,12 +14,10 @@ import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 
-const DEV_MODE = process.argv.includes('--dev');
 const HOME = os.homedir();
 const CLAUDE_DIR = path.join(HOME, '.claude');
-const INSTALL_DIR = path.join(CLAUDE_DIR, 'knowledge-mcp');
 const REPO_ROOT = path.resolve(path.join(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Z]:)/, '$1'), '..'));
-const REPO_KMC = path.join(REPO_ROOT, 'knowledge-mcp');
+const OPEN_BRAIN_DIR = path.join(REPO_ROOT, 'open-brain');
 
 // Status indicators
 const OK = '\u2713';
@@ -34,14 +31,12 @@ function log(icon, msg) {
 }
 
 function checkPrerequisites() {
-  // Node version
   const major = parseInt(process.version.slice(1).split('.')[0], 10);
   if (major < 22) {
     log(FAIL, `Node v22+ required, found ${process.version}`);
     process.exit(1);
   }
 
-  // npm available
   try {
     execSync('npm --version', { stdio: 'pipe' });
   } catch {
@@ -49,9 +44,8 @@ function checkPrerequisites() {
     process.exit(1);
   }
 
-  // Running from repo root
-  if (!fs.existsSync(REPO_KMC)) {
-    log(FAIL, `Cannot find knowledge-mcp/ — run this from the repo root`);
+  if (!fs.existsSync(OPEN_BRAIN_DIR)) {
+    log(FAIL, `Cannot find open-brain/ — run this from the repo root`);
     process.exit(1);
   }
 
@@ -81,87 +75,26 @@ function copyFileIfChanged(src, dest) {
   return true;
 }
 
-function copyDirRecursive(src, dest) {
-  let changed = false;
-  ensureDir(dest);
-  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-    if (entry.isDirectory()) {
-      if (copyDirRecursive(srcPath, destPath)) changed = true;
-    } else {
-      if (copyFileIfChanged(srcPath, destPath)) changed = true;
-    }
-  }
-  return changed;
-}
+function buildOpenBrain() {
+  const serverJs = path.join(OPEN_BRAIN_DIR, 'build', 'server.js');
 
-function isSymlinkTo(linkPath, targetPath) {
   try {
-    const stat = fs.lstatSync(linkPath);
-    if (!stat.isSymbolicLink()) return false;
-    const resolved = fs.realpathSync(linkPath);
-    return path.resolve(resolved) === path.resolve(targetPath);
-  } catch {
-    return false;
-  }
-}
-
-function createSymlinkOrJunction(target, linkPath) {
-  // Remove existing (file, dir, or stale symlink)
-  try {
-    const stat = fs.lstatSync(linkPath);
-    if (stat) fs.rmSync(linkPath, { recursive: true, force: true });
-  } catch {
-    // doesn't exist — fine
-  }
-  const type = process.platform === 'win32' ? 'junction' : 'dir';
-  fs.symlinkSync(target, linkPath, type);
-}
-
-function installKnowledgeMcp() {
-  ensureDir(INSTALL_DIR);
-
-  const srcDir = path.join(REPO_KMC, 'src');
-  const scriptsDir = path.join(REPO_KMC, 'scripts');
-  const destSrc = path.join(INSTALL_DIR, 'src');
-  const destScripts = path.join(INSTALL_DIR, 'scripts');
-
-  let changed = false;
-
-  if (DEV_MODE) {
-    if (!isSymlinkTo(destSrc, srcDir)) {
-      createSymlinkOrJunction(srcDir, destSrc);
-      changed = true;
+    // Install dependencies if node_modules is missing
+    if (!fs.existsSync(path.join(OPEN_BRAIN_DIR, 'node_modules'))) {
+      execSync('npm install', { cwd: OPEN_BRAIN_DIR, stdio: 'pipe' });
     }
-    if (!isSymlinkTo(destScripts, scriptsDir)) {
-      createSymlinkOrJunction(scriptsDir, destScripts);
-      changed = true;
-    }
-    if (copyFileIfChanged(path.join(REPO_KMC, 'package.json'), path.join(INSTALL_DIR, 'package.json'))) changed = true;
-    if (copyFileIfChanged(path.join(REPO_KMC, 'tsconfig.json'), path.join(INSTALL_DIR, 'tsconfig.json'))) changed = true;
-  } else {
-    if (copyDirRecursive(srcDir, destSrc)) changed = true;
-    if (copyDirRecursive(scriptsDir, destScripts)) changed = true;
-    if (copyFileIfChanged(path.join(REPO_KMC, 'package.json'), path.join(INSTALL_DIR, 'package.json'))) changed = true;
-    if (copyFileIfChanged(path.join(REPO_KMC, 'tsconfig.json'), path.join(INSTALL_DIR, 'tsconfig.json'))) changed = true;
-  }
-
-  // npm install + build
-  try {
-    execSync('npm install', { cwd: INSTALL_DIR, stdio: 'pipe' });
-    execSync('npm run build', { cwd: INSTALL_DIR, stdio: 'pipe' });
+    execSync('npm run build', { cwd: OPEN_BRAIN_DIR, stdio: 'pipe' });
   } catch (e) {
-    log(FAIL, `Knowledge MCP build failed: ${e.message}`);
+    log(FAIL, `open-brain build failed: ${e.message}`);
     hadFailure = true;
     return;
   }
 
-  if (changed) {
-    const mode = DEV_MODE ? '(dev \u2014 symlinked)' : '(copied)';
-    log(OK, `Knowledge MCP installed ${mode} \u2192 ${INSTALL_DIR}`);
+  if (fs.existsSync(serverJs)) {
+    log(OK, `open-brain built \u2192 ${OPEN_BRAIN_DIR}/build/`);
   } else {
-    log(SKIP, `Knowledge MCP already up to date \u2014 skipped`);
+    log(FAIL, 'open-brain build completed but server.js not found');
+    hadFailure = true;
   }
 }
 
@@ -175,13 +108,24 @@ function registerMcpServer() {
 
   if (!config.mcpServers) config.mcpServers = {};
 
+  const serverPath = path.join(OPEN_BRAIN_DIR, 'build', 'server.js');
+
+  // Remove stale knowledge-mcp entry if present
   if (config.mcpServers['open-brain-knowledge']) {
-    log(SKIP, 'MCP server already registered in .mcp.json \u2014 skipped');
-    return;
+    delete config.mcpServers['open-brain-knowledge'];
+    log(OK, 'Removed stale open-brain-knowledge MCP entry');
   }
 
-  const serverPath = path.join(INSTALL_DIR, 'build', 'server.js');
-  config.mcpServers['open-brain-knowledge'] = {
+  if (config.mcpServers['open-brain']) {
+    // Check if path is current
+    const existing = config.mcpServers['open-brain'];
+    if (existing.args?.[0] === serverPath) {
+      log(SKIP, 'MCP server already registered in .mcp.json \u2014 skipped');
+      return;
+    }
+  }
+
+  config.mcpServers['open-brain'] = {
     command: 'node',
     args: [serverPath]
   };
@@ -200,49 +144,44 @@ function registerHooks() {
 
   if (!settings.hooks) settings.hooks = {};
 
-  const scriptsBase = path.join(INSTALL_DIR, 'scripts');
+  const bootstrapPath = path.join(REPO_ROOT, 'scripts', 'session-bootstrap.mjs');
+  const command = `node "${bootstrapPath}"`;
 
-  const hooksToRegister = {
-    SessionStart: [
-      path.join(scriptsBase, 'session-bootstrap.mjs')
-    ],
-    SessionEnd: [
-      path.join(scriptsBase, 'session-end.mjs'),
-      path.join(scriptsBase, 'skill-scan.mjs')
-    ]
-  };
+  // SessionStart hook for bootstrap
+  if (!settings.hooks.SessionStart) settings.hooks.SessionStart = [];
 
-  let added = 0;
+  const alreadyExists = settings.hooks.SessionStart.some(entry =>
+    entry.hooks?.some(h => h.command === command)
+  );
 
-  for (const [event, scriptPaths] of Object.entries(hooksToRegister)) {
-    if (!settings.hooks[event]) settings.hooks[event] = [];
+  if (alreadyExists) {
+    log(SKIP, 'Hooks already configured \u2014 skipped');
+    return;
+  }
 
-    for (const scriptPath of scriptPaths) {
-      const command = `node "${scriptPath}"`;
+  settings.hooks.SessionStart.push({
+    matcher: '',
+    hooks: [{
+      type: 'command',
+      command
+    }]
+  });
 
-      const alreadyExists = settings.hooks[event].some(entry =>
-        entry.hooks?.some(h => h.command === command)
-      );
-
-      if (alreadyExists) continue;
-
-      settings.hooks[event].push({
-        matcher: '',
-        hooks: [{
-          type: 'command',
-          command
-        }]
-      });
-      added++;
+  // Remove stale knowledge-mcp SessionEnd hooks if present
+  if (settings.hooks.SessionEnd) {
+    const before = settings.hooks.SessionEnd.length;
+    settings.hooks.SessionEnd = settings.hooks.SessionEnd.filter(entry => {
+      const cmds = entry.hooks?.map(h => h.command) || [];
+      return !cmds.some(c => c.includes('knowledge-mcp'));
+    });
+    const removed = before - settings.hooks.SessionEnd.length;
+    if (removed > 0) {
+      log(OK, `Removed ${removed} stale knowledge-mcp SessionEnd hook(s)`);
     }
   }
 
-  if (added > 0) {
-    fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n');
-    log(OK, `${added} hook(s) registered in settings.json`);
-  } else {
-    log(SKIP, 'Hooks already configured \u2014 skipped');
-  }
+  fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n');
+  log(OK, 'SessionStart hook registered in settings.json');
 }
 
 function copySlashCommands() {
@@ -315,10 +254,10 @@ function setupObsidianVault() {
 }
 
 function main() {
-  console.log(`\nSelf-Improving Agent Setup${DEV_MODE ? ' (dev mode)' : ''}\n`);
+  console.log('\nSelf-Improving Agent Setup\n');
 
   checkPrerequisites();
-  installKnowledgeMcp();
+  buildOpenBrain();
   registerMcpServer();
   registerHooks();
   copySlashCommands();
