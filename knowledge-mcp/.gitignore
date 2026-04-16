@@ -1,6 +1,0 @@
-node_modules/
-build/
-*.db
-*.db-wal
-*.db-shm
-.DS_Store

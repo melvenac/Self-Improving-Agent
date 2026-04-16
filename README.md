@@ -63,7 +63,7 @@ cd Self-Improving-Agent
 node scripts/setup.mjs
 ```
 
-This installs the Knowledge MCP server, registers hooks, copies slash commands, and scaffolds the Obsidian vault. Restart Claude Code after running.
+This installs the open-brain MCP server, registers hooks, copies slash commands, and scaffolds the Obsidian vault. Restart Claude Code after running.
 
 For framework developers (symlinks source for live editing):
 ```bash
@@ -82,28 +82,24 @@ git clone https://github.com/melvenac/Self-Improving-Agent.git
 cd Self-Improving-Agent
 ```
 
-### 2. Set up Knowledge MCP
+### 2. Set up open-brain MCP server
 
-The open-brain MCP server provides persistent memory (12 tools including ob_recall, ob_store, ob_store_chunk, ob_feedback, ob_set_session, ob_stats, and more).
+The open-brain MCP server provides persistent memory (9 tools: ob_recall, ob_store, ob_store_chunk, ob_feedback, ob_forget, ob_list, ob_stats, ob_set_session, ob_recalled).
 
 ```bash
-# Install to the Claude Code MCP directory
-mkdir -p ~/.claude/knowledge-mcp
-cp -r knowledge-mcp/src knowledge-mcp/package.json knowledge-mcp/tsconfig.json ~/.claude/knowledge-mcp/
-cp -r knowledge-mcp/scripts ~/.claude/knowledge-mcp/
-cd ~/.claude/knowledge-mcp
+cd open-brain
 npm install
 npm run build
 ```
 
-Register it in your Claude Code MCP settings (`~/.claude/settings.json`):
+Register it in your Claude Code MCP settings (`~/.claude/.mcp.json` or `~/.claude/settings.json`):
 
 ```json
 {
   "mcpServers": {
-    "open-brain-knowledge": {
+    "open-brain": {
       "command": "node",
-      "args": ["~/.claude/knowledge-mcp/build/server.js"]
+      "args": ["<path-to-repo>/open-brain/build/server.js"]
     }
   }
 }
@@ -111,38 +107,13 @@ Register it in your Claude Code MCP settings (`~/.claude/settings.json`):
 
 ### 3. Set up automation hooks
 
-Copy the hook scripts to your Claude Code scripts directory:
+Copy the session bootstrap hook:
 
 ```bash
-cp -r knowledge-mcp/scripts ~/.claude/knowledge-mcp/scripts
 cp scripts/session-bootstrap.mjs ~/.claude/scripts/
 ```
 
-This installs the automation scripts: `session-end.mjs` (session indexing, summaries, vectors, auto-feedback, shadow-recall), `skill-scan.mjs` (experience clustering), plus the session bootstrap hook.
-
-Add hooks to your Claude Code settings (`~/.claude/settings.json`):
-
-```json
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [{ "type": "command", "command": "node ~/.claude/knowledge-mcp/scripts/session-bootstrap.mjs" }]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          { "type": "command", "command": "node ~/.claude/knowledge-mcp/scripts/session-end.mjs" },
-          { "type": "command", "command": "node ~/.claude/knowledge-mcp/scripts/skill-scan.mjs" }
-        ]
-      }
-    ]
-  }
-}
-```
+Session-end automation (summary, auto-feedback, reflection, invocation logging, skill-scan) is handled by the open-brain MCP server's `ob_end` tool — called by the `/end` slash command. No separate hook scripts needed.
 
 ### 4. Set up slash commands
 
@@ -188,9 +159,7 @@ Start a Claude Code session and run `/start`. You should see:
 | Hook | Trigger | What it does |
 |---|---|---|
 | `session-bootstrap.mjs` | SessionStart | Auto-detects project, checks backup freshness, surfaces skill proposals |
-| `session-end.mjs` | SessionEnd | Indexes sessions, generates summaries, embeds vectors, runs auto-feedback and shadow-recall (v1 — active during 30-day parallel) |
-| `session-end-v2.mjs` | SessionEnd | Vault-first accumulation: writes .md to Obsidian, indexes metadata in SQLite, flags reflection clusters (v2) |
-| `skill-scan.mjs` | SessionEnd | Detects experience clusters, proposes skills (domain-filtered) |
+| `ob_end` (via `/end`) | Session end | 5-stage pipeline: vault summary, auto-feedback, reflection clusters, invocation logging, skill-scan |
 
 ## Key Features
 
@@ -199,9 +168,7 @@ Start a Claude Code session and run `/start`. You should see:
 | **Tiered Memory** | v0.6.0 | 4-tier access (Core/Hot/Warm/Cold); Obsidian Vault as SOT; Smart Connections semantic search replaces sqlite-vec; vault-first store pipeline; reflection cycle for experience distillation |
 | **Session manifest** | v0.5.5 | Threads Claude's session UUID across all memory layers for full provenance tracking |
 | **Outcome tracking** | v0.4.0 | Ternary feedback (helpful/harmful/neutral) on recalled knowledge with maturity lifecycle (1.5x Mature, 1.2x Proven, 1.3x Failures) |
-| **Protocol health** | v0.5.4 | `node scripts/sync.mjs --score` — deterministic 0-100 health score across 5 categories |
-| **Shadow recall** | v0.5.4 | Replays queries with alternative search strategies to measure retrieval quality |
-| **Dashboard** | v0.5.3 | `node knowledge-mcp/scripts/dashboard.mjs` — browse sessions, chunks, knowledge at localhost:3456 |
+| **Protocol health** | v0.5.4 | `ob_score` — deterministic 0-100 health score across 5 categories |
 
 ## Project Template
 
