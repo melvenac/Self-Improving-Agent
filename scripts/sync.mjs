@@ -488,7 +488,7 @@ function checkSpecProvenance() {
       pass("SPECS", `All ${specFiles.length} spec file(s) have corresponding knowledge chunks`);
     } else {
       for (const f of untracked) {
-        warn("SPECS", `Spec not tracked as knowledge chunk: ${f}`, "Run kb_store_chunk with category='spec' to index it");
+        warn("SPECS", `Spec not tracked as knowledge chunk: ${f}`, "Run ob_store_chunk with category='spec' to index it");
       }
     }
   } catch (err) {

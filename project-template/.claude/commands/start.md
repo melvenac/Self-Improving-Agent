@@ -79,11 +79,11 @@ Claude Code stores session data under `~/.claude/projects/<project-key>/<session
 2. **Case-insensitive match:** Find the directory under `~/.claude/projects/` whose name matches (case-insensitive)
 3. **Find newest session:** List `.jsonl` files in that directory, sort by mtime descending. The newest `.jsonl` filename (minus extension) is the current session UUID.
    - Filter to UUID-shaped names only (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`) — skip `memory/` and other non-UUID entries.
-4. **Register:** Call `kb_set_session(session_id)` with the discovered UUID
+4. **Register:** Call `ob_set_session(session_id)` with the discovered UUID
 5. **Record:** Write the session_id into `Session_N.md` header: `> **Session ID:** {session_id}`
 6. **Include** the session_id when writing `.recalled-entries.json` (see B3)
 
-**If discovery fails:** Do NOT fabricate a UUID. Log a warning: "UUID discovery failed — provenance tracking disabled for this session." Continue without calling `kb_set_session`.
+**If discovery fails:** Do NOT fabricate a UUID. Log a warning: "UUID discovery failed — provenance tracking disabled for this session." Continue without calling `ob_set_session`.
 
 > **Platform note (Windows only):** This algorithm assumes Windows paths with drive letters (`C:\...`). Mac/Linux paths (`/home/user/...`, `/Users/user/...`) will need a different key derivation — no drive letter, no `:\` to replace. This is a future TODO for cross-platform support.
 
@@ -107,15 +107,15 @@ Greet Aaron by name. You are Clark.
 If Part A didn't run (no `.agents/`), discover the session UUID here using the same algorithm as A7:
 1. Derive project key from cwd, case-insensitive match under `~/.claude/projects/`
 2. Find newest UUID-shaped `.jsonl` file by mtime
-3. Call `kb_set_session(session_id)` to register with the MCP server
+3. Call `ob_set_session(session_id)` to register with the MCP server
 4. Write session_id into `.recalled-entries.json` (see B3)
 
 **If discovery fails:** Do NOT fabricate a UUID. Skip silently and continue without provenance.
 
 ### B3. Knowledge recall
-- **Knowledge MCP:** `kb_recall(queries: [Q1, Q2], project: cwd, limit: 5)` — methodology-focused queries, not file-specific
+- **Knowledge MCP:** `ob_recall(queries: [Q1, Q2], project: cwd, limit: 5)` — methodology-focused queries, not file-specific
 - Results are recency-weighted — recent experiences rank higher automatically
-- If results < 3 for project scope, broaden: `kb_recall(queries: [Q1, Q2], global: true, limit: 5)`
+- If results < 3 for project scope, broaden: `ob_recall(queries: [Q1, Q2], global: true, limit: 5)`
 
 ### B4. Skills check
 - Read `~/Obsidian Vault/Skill-Candidates/SKILL-INDEX.md` for matching skills
@@ -202,16 +202,16 @@ What would you like to work on?
 If it's the first session of the month, or Aaron asks for a health check:
 
 ### Session aging pipeline
-1. Call `kb_summarize()` to find unsummarized sessions
+1. Call `ob_summarize()` to find unsummarized sessions
 2. For each (up to 5 per maintenance run):
    - Read the session chunks
    - Summarize into 3-5 sentences capturing: what was done, key decisions, gotchas
-   - Call `kb_store_summary(session_id, summary, model)` to persist
+   - Call `ob_store_summary(session_id, summary, model)` to persist
 3. Report: "Summarized N aging sessions"
 4. If any summarized sessions are older than 30 days, note that their raw chunks can be pruned on next run
 
 ### Stale experience pruning
-- Use `kb_list` to find knowledge entries with `recall_count = 0`
+- Use `ob_list` to find knowledge entries with `recall_count = 0`
 - Flag any not recalled in 90+ days
 - Present the stale list to Aaron: "These experiences haven't been useful — prune them?"
 - Only delete with Aaron's approval

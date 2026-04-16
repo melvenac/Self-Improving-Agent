@@ -47,7 +47,7 @@ export function store(input: StoreInput): StoreResult {
     harmful: 0,
     neutral: 0,
     project,
-    source: 'kb_store',
+    source: 'ob_store',
   });
 
   if (vaultPath === null) {

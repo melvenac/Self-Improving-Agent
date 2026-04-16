@@ -84,7 +84,7 @@ cd Self-Improving-Agent
 
 ### 2. Set up Knowledge MCP
 
-The knowledge MCP server provides persistent memory (14 tools including kb_recall, kb_store, kb_store_chunk, kb_feedback, kb_set_session, kb_stats, and more).
+The open-brain MCP server provides persistent memory (12 tools including ob_recall, ob_store, ob_store_chunk, ob_feedback, ob_set_session, ob_stats, and more).
 
 ```bash
 # Install to the Claude Code MCP directory

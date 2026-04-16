@@ -124,7 +124,7 @@ If this session changed features, commands, or architecture:
 ### A10. Capture external research
 
 > The SessionEnd hooks (`session-end.mjs` → `skill-scan.mjs`) auto-capture session logs and extract experiences. Steps A10-A14 catch what automation misses.
-If any external research was done this session (GitHub repos, YouTube videos, website docs, NotebookLM content), store a knowledge entry for each source using `kb_store`:
+If any external research was done this session (GitHub repos, YouTube videos, website docs, NotebookLM content), store a knowledge entry for each source using `ob_store`:
 
 ```
 [RESEARCH] {title} — {source type} Summary
@@ -149,7 +149,7 @@ The hooks extract experiences from explicit gotcha/decision patterns. Look for t
 - Corrections to existing experiences that turned out to be wrong
 
 ### A12. Store supplemental experiences
-For anything the hooks would miss, use `kb_store` directly. **Dedup first:** run `kb_recall` with each experience title before storing — skip if >90% similar already exists, update if there's meaningful new detail.
+For anything the hooks would miss, use `ob_store` directly. **Dedup first:** run `ob_recall` with each experience title before storing — skip if >90% similar already exists, update if there's meaningful new detail.
 
 ```
 [EXPERIENCE] {short-title}
@@ -169,7 +169,7 @@ OUTCOME: {what happened, what to do differently}
 
 Write the session summary to **both** stores:
 
-1. **SQLite:** `kb_store_summary(session_id, summary_text)` — for keyword search via `kb_recall`
+1. **SQLite:** `ob_store_summary(session_id, summary_text)` — for keyword search via `ob_recall`
 2. **Obsidian:** Use the Write tool to create `~/Obsidian Vault/Summaries/YYYY-MM-DD-{project-slug}.md` — for semantic search via Smart Connections
 
 Use the enriched summary format:
@@ -207,7 +207,7 @@ If knowledge was recalled during `/start`, self-evaluate each entry — don't as
    - **helpful** — actively informed a decision or prevented a mistake
    - **harmful** — misled reasoning or caused wasted effort
    - **neutral** — recalled but not referenced or used
-4. Call `kb_feedback(entry_id, rating, referenced)` for each
+4. Call `ob_feedback(entry_id, rating, referenced)` for each
 5. Report ratings to Aaron (he can override if needed)
 
 **Why self-evaluate:** Aaron can't see whether recalled knowledge helped the agent's internal reasoning. The agent that consumed it is the only one who knows.

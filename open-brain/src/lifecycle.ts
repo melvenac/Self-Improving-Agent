@@ -80,7 +80,7 @@ export function evaluateLifecycle(
 }
 
 /**
- * Maturity boost multiplier for kb_recall ranking.
+ * Maturity boost multiplier for ob_recall ranking.
  * Applied to BM25 weighted_rank (lower = better match, so we divide by boost).
  */
 export function maturityBoost(maturity: Maturity, successRate: number | null): number {

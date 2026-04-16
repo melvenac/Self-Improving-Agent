@@ -22,4 +22,4 @@ Replace `VIDEO_ID` with the actual video ID.
 
 4. **Search** the indexed content with ctx_search for any specific details needed to make the summary accurate
 
-5. **Ask "Worth saving?"** — If the content is substantial/useful, offer to persist a structured summary to Open Brain (`kb_store`) with appropriate tags. Don't ask for trivial/short videos.
+5. **Ask "Worth saving?"** — If the content is substantial/useful, offer to persist a structured summary to Open Brain (`ob_store`) with appropriate tags. Don't ask for trivial/short videos.

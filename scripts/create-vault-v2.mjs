@@ -79,7 +79,7 @@ maturity: progenitor   # progenitor | proven | mature
 
 - **SQLite + FTS5** (\`knowledge.db\`) indexes this vault for fast keyword recall.
 - **Smart Connections** provides semantic (vector) search across all files.
-- The Knowledge MCP server (\`kb_recall\`) federates across both indexes.
+- The Knowledge MCP server (\`ob_recall\`) federates across both indexes.
 
 ## Migration Note
 
@@ -98,4 +98,4 @@ console.log('  2. Install the Smart Connections plugin if not already installed.
 console.log('  3. In Smart Connections settings, point it at this vault directory.');
 console.log('  4. Run the Knowledge MCP indexer to seed the SQLite index:');
 console.log('       KB_DIR="~/Obsidian Vault v2" node ~/.claude/knowledge-mcp/scripts/session-end.mjs');
-console.log('  5. Verify recall works: kb_recall("test query") in a new session.');
+console.log('  5. Verify recall works: ob_recall("test query") in a new session.');

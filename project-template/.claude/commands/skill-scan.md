@@ -38,7 +38,7 @@ Rewrite `~/Obsidian Vault/Skill-Candidates/SKILL-CANDIDATES.md` with:
 ### 5. Notify if actionable
 
 If any **new cluster crossed the 3+ threshold** this cycle:
-- Store a notification in Open Brain via `kb_store`:
+- Store a notification in Open Brain via `ob_store`:
   - Key: `skill-proposal-{tag}-{date}`
   - Content: "Skill proposal: {tag} has {count} experiences. Files: {list}. Consider distilling into a skill."
   - Tags: `["skill-proposal", "{tag}"]`

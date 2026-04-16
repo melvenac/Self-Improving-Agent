@@ -294,10 +294,10 @@ server.tool(
 );
 
 // ============================================================
-// kb_* tools — knowledge lifecycle (absorbed from knowledge-mcp)
+// ob_* tools — knowledge lifecycle
 // ============================================================
 
-// --- kb_set_session ---
+// --- ob_set_session ---
 server.tool(
   "ob_set_session",
   "Register the active session ID. Call once at session start for provenance tracking.",
@@ -313,7 +313,7 @@ server.tool(
   }
 );
 
-// --- kb_recall ---
+// --- ob_recall ---
 server.tool(
   "ob_recall",
   "Search across all stored knowledge. Returns ranked results. By default, results are scoped to the project you specify. Set `global: true` to search across all projects.",
@@ -401,7 +401,7 @@ server.tool(
   }
 );
 
-// --- kb_store ---
+// --- ob_store ---
 server.tool(
   "ob_store",
   "Store a piece of knowledge. By default stored globally. Set scope to 'project' and pass project_dir to scope it.",
@@ -455,7 +455,7 @@ server.tool(
   }
 );
 
-// --- kb_feedback ---
+// --- ob_feedback ---
 server.tool(
   "ob_feedback",
   "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Drives maturity promotion and apoptosis.",
@@ -509,7 +509,7 @@ server.tool(
   }
 );
 
-// --- kb_forget ---
+// --- ob_forget ---
 server.tool(
   "ob_forget",
   "Remove a piece of stored knowledge by ID or key.",
@@ -532,7 +532,7 @@ server.tool(
   }
 );
 
-// --- kb_list ---
+// --- ob_list ---
 server.tool(
   "ob_list",
   "List stored knowledge entries. Pass project to see only global + project-scoped entries.",
@@ -576,7 +576,7 @@ server.tool(
   }
 );
 
-// --- kb_stats ---
+// --- ob_stats ---
 server.tool(
   "ob_stats",
   "Show knowledge database statistics.",
@@ -609,7 +609,7 @@ server.tool(
   }
 );
 
-// --- kb_recalled ---
+// --- ob_recalled ---
 server.tool(
   "ob_recalled",
   "List knowledge entry IDs recalled this session. Used by session-end for auto-feedback.",
