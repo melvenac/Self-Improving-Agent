@@ -5,7 +5,6 @@ import type { SyncOptions, SyncResult, CheckResult } from "./types.js";
 import {
   syncReadmeVersion,
   syncPrdVersion,
-  syncKmcpVersion,
   checkChangelog,
   checkReadmeRefs,
   checkHookConfigs,
@@ -13,7 +12,6 @@ import {
   checkClaudeMd,
   checkObsidianVault,
   checkTemplate,
-  checkInstalledDrift,
   checkSpecProvenance,
   checkRules,
 } from "./checks.js";
@@ -30,7 +28,6 @@ export function runSync(options: SyncOptions): SyncResult {
   // Auto-fix checks
   checks.push(syncReadmeVersion(version, options.projectRoot, options.checkOnly));
   checks.push(syncPrdVersion(version, options.projectRoot, options.checkOnly));
-  checks.push(syncKmcpVersion(version, options.projectRoot, options.checkOnly));
 
   // Validation checks
   checks.push(checkChangelog(version, options.projectRoot));
@@ -40,7 +37,6 @@ export function runSync(options: SyncOptions): SyncResult {
   checks.push(checkClaudeMd(options.projectRoot));
   checks.push(checkObsidianVault(paths.obsidianVault));
   checks.push(checkTemplate(options.projectRoot));
-  checks.push(checkInstalledDrift(options.projectRoot, home, options.checkOnly));
   checks.push(checkSpecProvenance(options.projectRoot, paths.knowledgeDb));
   checks.push(checkRules(options.projectRoot));
 

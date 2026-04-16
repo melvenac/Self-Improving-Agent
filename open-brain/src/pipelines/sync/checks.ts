@@ -64,35 +64,6 @@ export function syncPrdVersion(
   return { name: "prd-version", severity: "fixed", message: `PRD version updated to ${version}`, autoFixed: true };
 }
 
-export function syncKmcpVersion(
-  version: string,
-  projectRoot: string,
-  checkOnly: boolean
-): CheckResult {
-  const kmcpPath = join(projectRoot, "knowledge-mcp", "package.json");
-  if (!existsSync(kmcpPath)) {
-    return { name: "kmcp-version", severity: "warn", message: "knowledge-mcp/package.json not found" };
-  }
-
-  const pkg = JSON.parse(readFileSync(kmcpPath, "utf-8"));
-
-  if (pkg.version === undefined) {
-    return { name: "kmcp-version", severity: "warn", message: "No version field in knowledge-mcp/package.json" };
-  }
-
-  if (pkg.version === version) {
-    return { name: "kmcp-version", severity: "pass", message: `knowledge-mcp version matches ${version}` };
-  }
-
-  if (checkOnly) {
-    return { name: "kmcp-version", severity: "issue", message: `knowledge-mcp version ${pkg.version} does not match ${version}` };
-  }
-
-  pkg.version = version;
-  writeFileSync(kmcpPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
-  return { name: "kmcp-version", severity: "fixed", message: `knowledge-mcp version updated to ${version}`, autoFixed: true };
-}
-
 export function checkChangelog(version: string, projectRoot: string): CheckResult {
   const changelogPath = join(projectRoot, "CHANGELOG.md");
   if (!existsSync(changelogPath)) {
@@ -206,41 +177,6 @@ export function checkTemplate(projectRoot: string): CheckResult {
     return { name: "template", severity: "issue", message: `project-template/ missing: ${missing.join(", ")}` };
   }
   return { name: "template", severity: "pass", message: "project-template/ has .agents and .claude" };
-}
-
-export function checkInstalledDrift(projectRoot: string, homePath: string, checkOnly: boolean): CheckResult {
-  const repoSrc = join(projectRoot, "knowledge-mcp", "src");
-  const installedSrc = join(homePath, ".claude", "knowledge-mcp", "src");
-  const repoScripts = join(projectRoot, "knowledge-mcp", "scripts");
-  const installedScripts = join(homePath, ".claude", "knowledge-mcp", "scripts");
-
-  const drifted: string[] = [];
-
-  for (const [repoDir, instDir, exts] of [
-    [repoSrc, installedSrc, [".ts"]],
-    [repoScripts, installedScripts, [".mjs"]],
-  ] as [string, string, string[]][]) {
-    if (!existsSync(repoDir) || !existsSync(instDir)) continue;
-    const files = readdirSync(repoDir).filter((f) => exts.some((e) => f.endsWith(e)));
-    for (const file of files) {
-      const repoContent = readFileSync(join(repoDir, file), "utf-8");
-      const instPath = join(instDir, file);
-      if (!existsSync(instPath)) {
-        drifted.push(file);
-        continue;
-      }
-      const instContent = readFileSync(instPath, "utf-8");
-      if (repoContent !== instContent) {
-        drifted.push(file);
-      }
-    }
-  }
-
-  if (drifted.length === 0) {
-    return { name: "installed-drift", severity: "pass", message: "Repo and installed knowledge-mcp files are in sync" };
-  }
-  const severity = checkOnly ? "issue" : "warn";
-  return { name: "installed-drift", severity, message: `Drift detected in: ${drifted.join(", ")}` };
 }
 
 export function checkSpecProvenance(projectRoot: string, dbPath: string): CheckResult {
