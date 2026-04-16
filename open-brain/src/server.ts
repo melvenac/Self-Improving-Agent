@@ -299,7 +299,7 @@ server.tool(
 
 // --- kb_set_session ---
 server.tool(
-  "kb_set_session",
+  "ob_set_session",
   "Register the active session ID. Call once at session start for provenance tracking.",
   {
     session_id: z.string().describe("The Claude session UUID"),
@@ -315,7 +315,7 @@ server.tool(
 
 // --- kb_recall ---
 server.tool(
-  "kb_recall",
+  "ob_recall",
   "Search across all stored knowledge. Returns ranked results. By default, results are scoped to the project you specify. Set `global: true` to search across all projects.",
   {
     queries: z.array(z.string()).min(1).describe("Search queries — batch all questions in one call"),
@@ -403,7 +403,7 @@ server.tool(
 
 // --- kb_store ---
 server.tool(
-  "kb_store",
+  "ob_store",
   "Store a piece of knowledge. By default stored globally. Set scope to 'project' and pass project_dir to scope it.",
   {
     content: z.string().describe("The knowledge to store"),
@@ -457,7 +457,7 @@ server.tool(
 
 // --- kb_feedback ---
 server.tool(
-  "kb_feedback",
+  "ob_feedback",
   "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Drives maturity promotion and apoptosis.",
   {
     id: z.coerce.number().describe("Knowledge entry ID"),
@@ -511,7 +511,7 @@ server.tool(
 
 // --- kb_forget ---
 server.tool(
-  "kb_forget",
+  "ob_forget",
   "Remove a piece of stored knowledge by ID or key.",
   {
     id: z.number().optional().describe("Knowledge entry ID to remove"),
@@ -534,7 +534,7 @@ server.tool(
 
 // --- kb_list ---
 server.tool(
-  "kb_list",
+  "ob_list",
   "List stored knowledge entries. Pass project to see only global + project-scoped entries.",
   {
     limit: z.number().optional().default(20).describe("Max entries to return"),
@@ -578,7 +578,7 @@ server.tool(
 
 // --- kb_stats ---
 server.tool(
-  "kb_stats",
+  "ob_stats",
   "Show knowledge database statistics.",
   {},
   async () => {
@@ -611,7 +611,7 @@ server.tool(
 
 // --- kb_recalled ---
 server.tool(
-  "kb_recalled",
+  "ob_recalled",
   "List knowledge entry IDs recalled this session. Used by session-end for auto-feedback.",
   {},
   async () => {
@@ -629,6 +629,73 @@ server.tool(
     }
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };
+  }
+);
+
+// --- ob_store_chunk: vault-first checkpoint/chunk storage ---
+server.tool(
+  "ob_store_chunk",
+  "Store a checkpoint or knowledge chunk as a vault markdown file with DB index. Vault-first: the file is the source of truth, the DB entry is a rebuildable index.",
+  {
+    content: z.string().describe("The checkpoint content (what was accomplished, key context, files touched)"),
+    key: z.string().describe("Short identifier (e.g. 'auth-refactor-phase-1')"),
+    tags: z.array(z.string()).optional().describe("Tags for categorization"),
+    category: z.enum(["checkpoint", "spec", "note", "other"]).optional().default("checkpoint").describe("Chunk category"),
+    project_dir: z.string().optional().describe("Project working directory"),
+    session_id: z.string().optional().describe("Session UUID for provenance"),
+    phase: z.number().optional().describe("Phase number for multi-phase work"),
+  },
+  async ({ content, key, tags, category, project_dir, session_id, phase }) => {
+    const v2db = getV2Db();
+    const now = new Date().toISOString();
+    const date = now.slice(0, 10);
+    const tagsStr = tags ? tags.join(", ") : "";
+    const normalizedProject = normalizePath(project_dir);
+    const projectSlug = normalizedProject
+      ? normalizedProject.replace(/\\/g, "/").split("/").pop() || "general"
+      : "general";
+    const slug = slugify(key);
+    const phaseStr = phase != null ? `-phase-${phase}` : "";
+
+    // Vault-first: write markdown file
+    const categoryDir = category === "checkpoint" ? "Checkpoints" : category === "spec" ? "Specs" : "Chunks";
+    const fileName = `${date}-${projectSlug}-${slug}${phaseStr}.md`;
+    const vaultPath = join(V2_VAULT_DIR, categoryDir, fileName);
+
+    const frontmatter = [
+      "---",
+      `type: ${category}`,
+      `key: ${key}`,
+      `project: ${projectSlug}`,
+      `date: ${date}`,
+      ...(session_id ? [`session: ${session_id}`] : []),
+      ...(phase != null ? [`phase: ${phase}`] : []),
+      `tags: [${[category, ...tags || []].join(", ")}]`,
+      ...(normalizedProject ? [`working_dir: ${normalizedProject}`] : []),
+      "---",
+    ].join("\n");
+
+    const fileContent = `${frontmatter}\n\n${content}\n`;
+
+    mkdirSync(join(V2_VAULT_DIR, categoryDir), { recursive: true });
+    writeFileSync(vaultPath, fileContent, "utf-8");
+
+    // DB index: store in knowledge_index so ob_recall can find it
+    const result = v2db.prepare(`
+      INSERT INTO knowledge_index
+        (vault_path, key, content, tags, source, project_dir, maturity,
+         helpful, harmful, neutral, success_rate, recall_count, last_recalled_at, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, 'progenitor', 0, 0, 0, NULL, 0, NULL, ?, ?)
+    `).run(vaultPath, key, content, [category, ...tags || []].join(", "), category, normalizedProject, now, now);
+
+    const id = Number(result.lastInsertRowid);
+
+    return {
+      content: [{
+        type: "text" as const,
+        text: `${category === "checkpoint" ? "Checkpoint" : "Chunk"} stored (id: ${id}):\n  Key: ${key}\n  Vault: ${vaultPath}\n  Tags: ${[category, ...tags || []].join(", ")}`,
+      }],
+    };
   }
 );
 
