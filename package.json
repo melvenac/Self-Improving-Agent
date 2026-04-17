@@ -1,6 +1,6 @@
 {
   "name": "self-improving-agent",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "module",
   "description": "AI development environment that learns across sessions — memory protocol, automation hooks, and multi-agent coordination",
   "dependencies": {

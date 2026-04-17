@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.6.1] - 2026-04-17
+
+### Fixed
+- **cli-bootstrap now emits `SESSION_UUID`** so `/start` can scope recalls + writes to the right session. `discoverSessionUuid()` was already built in `pipelines/session-start/session-discovery.ts` but was never wired into the SessionStart hook entry — resulting in `/start` reading "none" and silently skipping `ob_set_session`. Fix wires it in and pushes `SESSION_UUID: <uuid>` into the hook's output lines when non-null.
+
 ## [v0.6.0] - 2026-04-06
 
 ### Added

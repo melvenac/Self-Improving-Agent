@@ -2,7 +2,7 @@
 
 *A memory protocol that enables AI coding agents to learn across sessions.*
 
-**Latest: v0.6.0** · [Changelog](CHANGELOG.md)
+**Latest: v0.6.1** · [Changelog](CHANGELOG.md)
 
 ---
 
@@ -107,10 +107,15 @@ Register it in your Claude Code MCP settings (`~/.claude/.mcp.json` or `~/.claud
 
 ### 3. Set up automation hooks
 
-Copy the session bootstrap hook:
+The session bootstrap and session-end hooks are compiled TypeScript under `open-brain/build/`. After installing dependencies and building (`cd open-brain && npm install && npm run build`), register the hooks in `~/.claude/settings.json`:
 
-```bash
-cp scripts/session-bootstrap.mjs ~/.claude/scripts/
+```jsonc
+{
+  "hooks": {
+    "SessionStart": [{ "matcher": "", "hooks": [{ "type": "command", "command": "node \"/abs/path/to/open-brain/build/cli-bootstrap.js\"" }] }],
+    "SessionEnd":   [{ "matcher": "", "hooks": [{ "type": "command", "command": "node \"/abs/path/to/open-brain/build/cli-session-end.js\"" }] }]
+  }
+}
 ```
 
 Session-end automation (summary, auto-feedback, reflection, invocation logging, skill-scan) is handled by the open-brain MCP server's `ob_end` tool — called by the `/end` slash command. No separate hook scripts needed.
@@ -158,8 +163,8 @@ Start a Claude Code session and run `/start`. You should see:
 
 | Hook | Trigger | What it does |
 |---|---|---|
-| `session-bootstrap.mjs` | SessionStart | Auto-detects project, checks backup freshness, surfaces skill proposals |
-| `ob_end` (via `/end`) | Session end | 5-stage pipeline: vault summary, auto-feedback, reflection clusters, invocation logging, skill-scan |
+| `open-brain/build/cli-bootstrap.js` | SessionStart | Auto-detects project, emits `SESSION_UUID`, runs health checks, surfaces skill proposals |
+| `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: vault summary, auto-feedback, reflection clusters, invocation logging, skill-scan |
 
 ## Key Features
 

@@ -11,6 +11,7 @@
 import { existsSync } from "fs";
 import { join } from "path";
 import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
+import { discoverSessionUuid } from "./pipelines/session-start/session-discovery.js";
 
 // Anti-loop: read hook input from stdin to detect subagent context.
 // Claude Code includes `agent_id` when the hook fires inside a subagent.
@@ -38,6 +39,12 @@ if (hasAgents) {
   lines.push(`Project detected: ${cwd} (.agents/ found${hasMeta ? ", META mode" : ""})`);
 } else {
   lines.push("No .agents/ detected — general session.");
+}
+
+// Session UUID discovery — emit so /start can pick it up and call ob_set_session.
+const sessionUuid = discoverSessionUuid(cwd, home);
+if (sessionUuid) {
+  lines.push(`SESSION_UUID: ${sessionUuid}`);
 }
 
 // Health checks
