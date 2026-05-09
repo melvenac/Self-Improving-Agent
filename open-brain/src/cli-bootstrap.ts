@@ -12,6 +12,7 @@ import { existsSync } from "fs";
 import { join } from "path";
 import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
 import { discoverSessionUuid } from "./pipelines/session-start/session-discovery.js";
+import { readAgentIdentity, readMailboxState } from "./pipelines/session-start/agent-identity.js";
 
 // Anti-loop: read hook input from stdin to detect subagent context.
 // Claude Code includes `agent_id` when the hook fires inside a subagent.
@@ -45,6 +46,25 @@ if (hasAgents) {
 const sessionUuid = discoverSessionUuid(cwd, home);
 if (sessionUuid) {
   lines.push(`SESSION_UUID: ${sessionUuid}`);
+}
+
+// Agent identity — read .agents/AGENT.md if present and emit identity + mailbox state.
+const identity = readAgentIdentity(cwd);
+if (identity) {
+  const partner = identity.partner ? `partner: ${identity.partner}` : "no partner";
+  const channel = identity.mailbox_channel ? `channel: ${identity.mailbox_channel}` : "no channel";
+  lines.push(`Agent: ${identity.name} (${identity.role}) — ${partner}, ${channel}`);
+
+  if (identity.mailbox_channel && identity.partner) {
+    const mailbox = readMailboxState(home, identity.mailbox_channel, identity.name, identity.partner);
+    if (mailbox) {
+      const msg = mailbox.messageCount > 0
+        ? `${mailbox.messageCount} message${mailbox.messageCount === 1 ? "" : "s"} in ${mailbox.inboxFile}`
+        : `no new messages`;
+      const dec = mailbox.lastDecision ? `, last decision ${mailbox.lastDecision}` : "";
+      lines.push(`Mailbox: ${msg}${dec}`);
+    }
+  }
 }
 
 // Health checks

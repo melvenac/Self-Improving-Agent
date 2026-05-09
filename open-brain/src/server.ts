@@ -20,7 +20,7 @@ import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/histo
 import { sessionStart } from "./pipelines/session-start/index.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2 } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
-import { resolvePaths } from "./shared/paths.js";
+import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
 import { readJson } from "./shared/fs-utils.js";
 import { slugify, writeExperience } from "./vault-writer.js";
 import { evaluateLifecycle, maturityBoost, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
@@ -47,11 +47,6 @@ function sanitizeFtsQuery(query: string): string {
     .filter(Boolean)
     .map((word) => `"${word.replace(/"/g, '""')}"`)
     .join(" ");
-}
-
-function normalizePath(p?: string | null): string | null {
-  if (!p) return null;
-  return p.replace(/\\/g, "/");
 }
 
 // --- Exported handler functions (testable without MCP transport) ---
@@ -337,7 +332,7 @@ server.tool(
   },
   async ({ queries, project, global: globalSearch, tags, verbose, limit }) => {
     const v2db = getV2Db();
-    const normalizedProject = normalizePath(project);
+    const normalizedProject = canonicalizeProjectDir(project);
     const results: string[] = [];
 
     for (const query of queries) {
@@ -427,12 +422,12 @@ server.tool(
     const v2db = getV2Db();
     const now = new Date().toISOString();
     const tagsStr = tags ? tags.join(", ") : "";
-    const effectiveProject = scope === "project" ? normalizePath(project_dir) : null;
+    const effectiveProject = scope === "project" ? canonicalizeProjectDir(project_dir) : null;
 
     // Derive vault path
     const slug = slugify(key || "unnamed");
     const projectName = effectiveProject
-      ? effectiveProject.replace(/\\/g, "/").split("/").pop() || "General"
+      ? effectiveProject.split("/").pop() || "General"
       : "General";
     const vaultPath = join(V2_VAULT_DIR, "Experiences", projectName, `${slug}.md`);
 
@@ -552,7 +547,7 @@ server.tool(
   },
   async ({ limit, project }) => {
     const v2db = getV2Db();
-    const normalizedProject = normalizePath(project);
+    const normalizedProject = canonicalizeProjectDir(project);
 
     let sql = "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge_index WHERE archived_into IS NULL";
     const params: unknown[] = [];
@@ -660,9 +655,9 @@ server.tool(
     const now = new Date().toISOString();
     const date = now.slice(0, 10);
     const tagsStr = tags ? tags.join(", ") : "";
-    const normalizedProject = normalizePath(project_dir);
+    const normalizedProject = canonicalizeProjectDir(project_dir);
     const projectSlug = normalizedProject
-      ? normalizedProject.replace(/\\/g, "/").split("/").pop() || "general"
+      ? normalizedProject.split("/").pop() || "general"
       : "general";
     const slug = slugify(key);
     const phaseStr = phase != null ? `-phase-${phase}` : "";

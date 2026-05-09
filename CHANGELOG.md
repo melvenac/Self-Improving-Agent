@@ -1,5 +1,23 @@
 # Changelog
 
+## [v0.7.0] - 2026-04-17
+
+### Fixed
+- **`project_dir` path canonicalization** — the server previously did partial normalization (backslash → forward-slash only), which caused the same project to be stored under up to 5 different keys (drive-case, path-case, double-slash variants). `ob_recall` missed 15 of 33 entries when queried with the canonical form. New `canonicalizeProjectDir()` in `shared/paths.ts` produces a single canonical form: lowercase drive + forward slashes + collapsed `/+` + trimmed trailing slash (Windows paths fully lowercased; non-drive paths preserve case for POSIX filesystems). Applied at both write (`ob_store`, `ob_store_chunk`, vault-path derivation) and query (`ob_recall`, `ob_list`) boundaries.
+- **One-shot migration** on database open canonicalizes all existing `project_dir` values. 74 non-NULL rows collapsed from ~25 variants down to 12 canonical values (one per real project). Idempotent — second run changes 0 rows.
+- **Redundant inlined backslash replays removed** from `server.ts` (lines 435, 665) — they duplicated what `normalizePath()` already did, now fully handled by the single canonicalizer.
+
+### Added
+- **`.agents/AGENT.md` convention** — declarative agent persona file (YAML frontmatter: `name`, `role`, `partner`, `mailbox_channel`). Keeps persona data out of `CLAUDE.md` and gives every project a predictable slot. Blank template with placeholders shipped in `project-template/.agents/AGENT.md`.
+- **SessionStart hook emits identity line** — `cli-bootstrap.ts` reads `.agents/AGENT.md` via a new `agent-identity.ts` helper (regex frontmatter, no YAML dep) and emits `Agent: {name} ({role}) — partner: {partner}, channel: {channel}` after `SESSION_UUID`. Graceful skip if AGENT.md absent.
+- **SessionStart hook surfaces mailbox state** — when `mailbox_channel` is declared, emits `Mailbox: N message(s) in {inbox-file}, last decision {date}`. Reads `~/.agents/mailbox/channels/{channel}/{partner}-to-{name}.md` (message count = `## [` header count) and `decisions.md` (latest `## YYYY-MM-DD` header).
+- **`/start` reads mailbox before greeting** — the `/start` startup subagent now reads the inbox + decisions log if a mailbox_channel is declared, and surfaces the newest message subject + latest decision date in its GREETING. Projects without `AGENT.md` or without a channel get the unchanged greeting.
+
+### Changed
+- **Slash commands now ship through `project-template/`** — previously all `/start`, `/end`, `/sync`, `/task`, `/test`, `/skill-scan`, `/checkpoint`, `/bootstrap` evolution lived only in Aaron's user-global `~/.claude/commands/` and never reached template consumers. Cloning SIA and using the template today would have given a mid-2026-02 version of `/start` with no subagent dispatch, no mailbox logic, no AGENT.md parsing. Mirror rule established: `~/.claude/commands/` is the upstream live-scratch source; SIA-specific commands mirror to `project-template/.claude/commands/` (distribution channel) and SIA repo-root `.claude/commands/` (SIA dogfooding). Personal/generic commands (`/notebooklm`, `/transcript`) stay user-global only. v0.7.1 will add deterministic drift-detection (`/sync` parity check or pre-commit hook) so this class of drift cannot recur silently.
+- **`/start` decision-date extraction disambiguated** — prompt previously said "grab the most recent `## YYYY-MM-DD` header," which the subagent interpreted positionally (last-in-file) rather than by date. Now: "parse all `## YYYY-MM-DD` headers, sort descending by date string (ISO format sorts correctly lexically), take the first result." Hook logic (`cli-bootstrap.ts`) was already correct; only the slash-command prompt needed clarification.
+- **Live `/sync` command cleaned** — removed stale reference to `knowledge-mcp/package.json` as a downstream file (the `knowledge-mcp/` directory was deleted in commit `7696953`).
+
 ## [v0.6.1] - 2026-04-17
 
 ### Fixed

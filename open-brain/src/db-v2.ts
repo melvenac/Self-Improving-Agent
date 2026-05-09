@@ -1,4 +1,24 @@
 import Database from 'better-sqlite3';
+import { canonicalizeProjectDir } from './shared/paths.js';
+
+export function migrateProjectDirToCanonical(db: Database.Database): number {
+  const rows = db.prepare(
+    `SELECT DISTINCT project_dir FROM knowledge_index WHERE project_dir IS NOT NULL`
+  ).all() as { project_dir: string }[];
+
+  const stmt = db.prepare(
+    `UPDATE knowledge_index SET project_dir = ? WHERE project_dir = ?`
+  );
+  let updated = 0;
+  for (const { project_dir } of rows) {
+    const canonical = canonicalizeProjectDir(project_dir);
+    if (canonical && canonical !== project_dir) {
+      const result = stmt.run(canonical, project_dir);
+      updated += Number(result.changes);
+    }
+  }
+  return updated;
+}
 
 export function initSchemaV2(db: Database.Database): void {
   db.exec(`
@@ -84,6 +104,7 @@ export function openV2Database(dbPath: string): Database.Database {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   initSchemaV2(db);
+  migrateProjectDirToCanonical(db);
   return db;
 }
 

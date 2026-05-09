@@ -82,6 +82,9 @@ Update: .agents/TASKS/task.md
 ```
 Write: .agents/SESSIONS/next-session.md
 ```
+
+**Important:** This file already exists from the prior session. You MUST Read it first before using the Write tool (the Write tool refuses to overwrite unread files as a safety guard). Read it, then overwrite with the new content.
+
 A short scratchpad for the next `/start` to read. Include:
 - **Pick up here:** what was in progress or next in line
 - **Watch out for:** any gotchas or blockers the next session should know
@@ -99,11 +102,9 @@ Run: validate:session:post (if it exists)
 
 Run the automated doc sync, then check for any remaining drift this session's changes may have caused.
 
-**Step 1: Run sync script**
-```bash
-node scripts/sync.mjs
-```
-This automatically fixes version drift and runs structural consistency checks using package.json as the source of truth.
+**Step 1: Run consistency checker via MCP**
+
+Call the `ob_sync` tool. This runs version-drift auto-fix + structural consistency checks using `package.json` as the source of truth. (Formerly `node scripts/sync.mjs` — the standalone script was retired in Session 33 and the logic moved into `open-brain` as `ob_sync`.)
 
 **Step 2: Manual check for behavioral drift**
 If this session changed features, commands, or architecture:
@@ -131,13 +132,33 @@ If any external research was done this session (GitHub repos, YouTube videos, we
 SOURCE: {url or reference}
 DATE: {today}
 DOMAIN: {relevant tags}
+CONCEPTS: {plain English sentence describing the topic area — enables semantic search}
 
 FINDINGS: {key takeaways — what was learned}
 DECISION: {what was decided — adopted, rejected, deferred, and why}
 RELEVANCE: {how this connects to current work}
 ```
 
-Use standardized source tags: `youtube-transcript`, `github-repo`, `notebooklm`, `docs`.
+Use standardized source tags: `youtube-transcript`, `github-repo`, `notebooklm`, `docs`. Also include domain concept tags (e.g., `payments`, `deployment`, `memory-systems`) alongside implementation tags.
+
+**Obsidian dual-write:** After storing via `ob_store`, also write the research entry to Obsidian using the Write tool:
+
+**Path:** `~/Obsidian Vault/Research/{key}.md`
+
+Format:
+```yaml
+---
+date: {YYYY-MM-DD}
+source: {url or reference}
+type: research
+domain: [{domain-tags, comma-separated}]
+tags: [{all-tags-including-domain-concepts}]
+---
+```
+
+Body: The full research content (same as what was passed to `ob_store`).
+
+Create the `Research/` folder if it doesn't exist.
 
 Even research that concluded "not useful right now" should be captured — it records the reasoning and prevents re-evaluation later. If no external research was done, skip this step.
 
@@ -158,6 +179,7 @@ DOMAIN: {domain-tags}
 DATE: {today's date}
 TYPE: {gotcha | pattern | decision | planning | workaround | fix | optimization}
 SOURCE: agent
+CONCEPTS: {plain English sentence describing the problem domain — e.g., "Processing subscription payments via Stripe in a serverless Convex backend". This line is critical for semantic search — it lets recall match on natural language queries like "how did we handle payments?" even when specific tool names aren't mentioned.}
 
 TRIGGER: {when this is relevant}
 ACTION: {what to do or what was decided}
@@ -165,12 +187,32 @@ CONTEXT: {the full exchange — what was the user asking, what reasoning led her
 OUTCOME: {what happened, what to do differently}
 ```
 
-### A13. Write session summary (dual-store)
+**Tag guidance:** Always include BOTH implementation tags (specific tools/libraries: `stripe`, `convex`, `clerk`) AND domain concept tags (what problem area: `payments`, `billing`, `authentication`, `deployment`, `styling`). Domain tags enable fuzzy recall — someone searching "how did we handle auth?" should find Clerk experiences even without knowing we use Clerk.
 
-Write the session summary to **both** stores:
+**Obsidian dual-write:** After storing via `ob_store`, also write the experience to Obsidian using the Write tool:
 
-1. **SQLite:** `ob_store_summary(session_id, summary_text)` — for keyword search via `ob_recall`
-2. **Obsidian:** Use the Write tool to create `~/Obsidian Vault/Summaries/YYYY-MM-DD-{project-slug}.md` — for semantic search via Smart Connections
+**Path:** `~/Obsidian Vault/Experiences/{key}.md`
+
+Format:
+```yaml
+---
+date: {YYYY-MM-DD}
+project: {project-slug}
+type: {gotcha|pattern|decision|planning|workaround|fix|optimization}
+domain: [{domain-tags, comma-separated}]
+tags: [{all-tags-including-domain-concepts}]
+---
+```
+
+Body: The full experience content (same as what was passed to `ob_store`).
+
+**Dedup:** If the file already exists, only overwrite if the new content is meaningfully different. Skip if >90% similar.
+
+### A13. Write session summary (Obsidian side only — SQLite is automatic)
+
+The session-end hook's `writeSummary` stage already stores the SQLite summary automatically — no tool call needed here. This step handles only the **Obsidian dual-write** for semantic search via Smart Connections.
+
+Use the Write tool to create `~/Obsidian Vault/Summaries/YYYY-MM-DD-{project-slug}.md`. **If the file already exists** (e.g., multiple sessions on the same date), Read it first, then Write with a session-suffixed filename (`YYYY-MM-DD-{project-slug}-s{N}.md`) to avoid overwriting the earlier summary.
 
 Use the enriched summary format:
 
@@ -215,19 +257,6 @@ If knowledge was recalled during `/start`, self-evaluate each entry — don't as
 This feeds the maturity lifecycle (Progenitor → Proven → Mature) and apoptosis (auto-prune below 0.3 success rate after 5 ratings).
 
 If no knowledge was recalled, skip this step.
-
-### A15. Call ob_end with v2 pipeline args
-
-After all knowledge capture and feedback steps are complete, call `ob_end` to finalize the session in the Open Brain pipeline. Pass the v2 paths so the session lands in the new stores:
-
-```
-ob_end(
-  v2_db_path:    "~/.claude/open-brain/knowledge-v2.db",
-  v2_vault_path: "~/Obsidian Vault v2"
-)
-```
-
-This writes the session summary and any extracted experiences into the v2 SQLite database and v2 Obsidian vault. If `ob_end` returns an error, log a warning but do not block the rest of the close-out.
 
 ---
 

@@ -1,6 +1,24 @@
 import { resolve, join } from "node:path";
 import { homedir } from "node:os";
 
+export function canonicalizeProjectDir(p?: string | null): string | null {
+  if (!p) return null;
+  const trimmed = p.trim();
+  if (!trimmed) return null;
+
+  let result = trimmed.replace(/\\/g, "/").replace(/\/+/g, "/");
+
+  if (/^[a-zA-Z]:/.test(result)) {
+    result = result.toLowerCase();
+  }
+
+  if (result.length > 3 && result.endsWith("/")) {
+    result = result.replace(/\/+$/, "");
+  }
+
+  return result;
+}
+
 export interface ResolvedPaths {
   projectRoot: string;
   packageJson: string;
