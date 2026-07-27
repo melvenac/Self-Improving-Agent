@@ -91,7 +91,7 @@ export function runSkillScanPipeline(): SkillScanPipelineResult {
   writeCandidatesFile(result.clusters, previousCounts, previousDate, existingSkills);
 
   // Write pending proposals marker
-  const newClusters = result.clusters.filter((c) => c.status === "new");
+  const newClusters = result.clusters.filter((c) => c.status === "new" && !c.oversized);
   if (newClusters.length > 0) {
     const markerPath = join(VAULT_PATH, ".skill-proposals-pending.json");
     const proposals = newClusters.map((c) => ({ tag: c.tag, count: c.count, files: c.files, date: today() }));
@@ -121,12 +121,15 @@ function writeCandidatesFile(
     const hasSkill = existingSkills.has(cluster.tag.toLowerCase());
     const status: string[] = [];
     if (hasSkill) status.push("has skill");
-    if (cluster.status === "new") status.push("NEW");
+    if (cluster.oversized) status.push("TOO LARGE");
+    else if (cluster.status === "new") status.push("NEW");
     if (cluster.status === "growing") status.push("growing");
     if (cluster.consolidatedFrom?.length) status.push(`merged: ${cluster.consolidatedFrom.join(", ")}`);
 
     md += `### ${cluster.tag} (${cluster.count} experiences)${status.length ? " — " + status.join(", ") : ""}\n\n`;
-    if (hasSkill) {
+    if (cluster.oversized) {
+      md += `**Status:** Too broad to distil into one skill — split into narrower tags before proposing\n\n`;
+    } else if (hasSkill) {
       md += `**Status:** Skill exists — consider updating if new experiences add novel patterns\n\n`;
     } else {
       md += `**Potential skill:** "${cluster.tag}" patterns and gotchas\n\n`;

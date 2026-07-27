@@ -49,6 +49,8 @@ export interface SkillCluster {
   files: string[];
   status: "new" | "growing" | "stable" | "approaching";
   consolidatedFrom?: string[];
+  /** Too many experiences to distill into one skill — needs splitting, not proposing. */
+  oversized?: boolean;
 }
 
 export interface SkillScanResult {
