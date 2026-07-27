@@ -1,6 +1,11 @@
 export interface SessionStartOptions {
   projectRoot: string;
   homePath: string;
+  /**
+   * Authoritative session UUID, when the caller already knows it (hook payload
+   * or a prior ob_set_session). Falls back to transcript discovery if omitted.
+   */
+  sessionId?: string | null;
 }
 
 export type SessionMode = "project" | "lightweight" | "meta";

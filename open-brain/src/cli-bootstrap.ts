@@ -11,12 +11,12 @@
 import { existsSync } from "fs";
 import { join } from "path";
 import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
-import { discoverSessionUuid } from "./pipelines/session-start/session-discovery.js";
 import { readAgentIdentity, readMailboxState } from "./pipelines/session-start/agent-identity.js";
 
 // Anti-loop: read hook input from stdin to detect subagent context.
 // Claude Code includes `agent_id` when the hook fires inside a subagent.
-let hookInput: { agent_id?: string; cwd?: string } = {};
+// The same payload carries `session_id` — the authoritative session UUID.
+let hookInput: { agent_id?: string; cwd?: string; session_id?: string } = {};
 try {
   const chunks: Buffer[] = [];
   for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
@@ -42,10 +42,13 @@ if (hasAgents) {
   lines.push("No .agents/ detected — general session.");
 }
 
-// Session UUID discovery — emit so /start can pick it up and call ob_set_session.
-const sessionUuid = discoverSessionUuid(cwd, home);
-if (sessionUuid) {
-  lines.push(`SESSION_UUID: ${sessionUuid}`);
+// Session UUID — emit so /start can pick it up and call ob_set_session.
+// Taken from the hook payload, never from a filesystem scan: at SessionStart
+// this session's transcript .jsonl does not exist yet, so scanning
+// ~/.claude/projects/ by mtime either finds nothing or — worse — returns the
+// PREVIOUS session's UUID and mis-attributes everything stored this session.
+if (hookInput.session_id) {
+  lines.push(`SESSION_UUID: ${hookInput.session_id}`);
 }
 
 // Agent identity — read .agents/AGENT.md if present and emit identity + mailbox state.

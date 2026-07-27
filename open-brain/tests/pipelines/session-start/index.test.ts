@@ -38,6 +38,20 @@ describe("sessionStart", () => {
     expect(result.session.sessionId).toBeNull();
   });
 
+  it("uses the caller-supplied session ID instead of transcript discovery", () => {
+    const result = sessionStart({
+      projectRoot: tempDir,
+      homePath: tempDir,
+      sessionId: "11111111-2222-3333-4444-555555555555",
+    });
+    expect(result.session.sessionId).toBe("11111111-2222-3333-4444-555555555555");
+  });
+
+  it("falls back to discovery when the supplied session ID is null", () => {
+    const result = sessionStart({ projectRoot: tempDir, homePath: tempDir, sessionId: null });
+    expect(result.session.sessionId).toBeNull();
+  });
+
   it("skips session log creation in lightweight mode", () => {
     rmSync(join(tempDir, ".agents"), { recursive: true, force: true });
     const result = sessionStart({ projectRoot: tempDir, homePath: tempDir });

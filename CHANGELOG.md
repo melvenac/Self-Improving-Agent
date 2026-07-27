@@ -1,5 +1,21 @@
 # Changelog
 
+## [v0.7.1] - 2026-07-27
+
+### Fixed
+- **Skill-scan cluster consolidation measured containment, not similarity** — `consolidateClusters` normalized file overlap by `Math.min(sizeA, sizeB)`, so any small cluster fully inside a large one scored 1.0 and merged unconditionally. One seed cluster then snowballed through the vault: the 2026-07-25 scan produced a 23-file cluster labeled `clerk` (only 2 of 23 files were Clerk-related) and a 22-file `node` cluster that was really "everything I hit on Windows". Now uses Jaccard (`intersection / union`) — the same 3-in-20 case scores 0.15 and is left alone.
+- **Merged clusters were named after `tags[0]`** — whichever tag happened to come first out of the cluster map, which is why a Convex/VPS cluster was labeled `clerk`. Merged clusters now take the tag covering the largest share of the merged file set; the rest are recorded in `consolidatedFrom`.
+- **Tag quoting was never stripped** in `parseExperienceTags` — `"deployment"` and `deployment` clustered separately (40 and 15 files), and quoted noise tags bypassed `NOISE_TAGS` entirely (`"gotcha"` reached 45 files). Surrounding quotes are now stripped before noise-filtering and deduplication.
+- **Session UUID was discovered by filesystem mtime scan** — `cli-bootstrap.ts` scanned `~/.claude/projects/*.jsonl` for the newest transcript, but at SessionStart the current session's transcript does not exist yet. The hook either emitted nothing (provenance silently disabled for the session) or returned the *previous* session's UUID, mis-attributing everything stored. Now reads `session_id` from the hook's stdin payload; emits nothing rather than a wrong UUID if absent.
+
+### Added
+- **Merged-cluster size cap (8)** — a merge whose result would exceed `MAX_CLUSTER_SIZE` is refused. A skill distilled from 20+ experiences is not reviewable, so it gets skipped every scan and re-proposed the next one.
+- **`oversized` flag on `SkillCluster`** — a single broad tag can exceed the cap without any merging (`deployment` 40, `convex` 36, `windows` 33 in the current vault). These are now flagged "TOO LARGE — split into narrower tags" in `SKILL-CANDIDATES.md` and excluded from both `pendingProposals` and `.skill-proposals-pending.json`, instead of being proposed as skills.
+- **`dedupeClusters`** — a cluster whose files are ≥75% covered by a larger one is dropped rather than proposed alongside it. Consolidation deliberately leaves these alone (their Jaccard overlap is low), but proposing both spends two review cycles on the same material.
+
+### Changed
+- **`sessionStart()` accepts an optional `sessionId`** — callers that already know the UUID (hook payload, prior `ob_set_session`) pass it directly; `ob_start` now passes the registered session ID. Transcript discovery remains only as a mid-session fallback.
+
 ## [v0.7.0] - 2026-04-17
 
 ### Fixed

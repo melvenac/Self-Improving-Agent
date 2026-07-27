@@ -8,7 +8,11 @@ import type { SessionStartOptions, SessionStartResult } from "./types.js";
 export function sessionStart(options: SessionStartOptions): SessionStartResult {
   const state = readProjectState(options.projectRoot);
   const drift = detectDrift(state);
-  const sessionId = discoverSessionUuid(options.projectRoot, options.homePath);
+  // Prefer a UUID the caller already knows. Transcript discovery is a fallback
+  // for mid-session callers only — it cannot identify a session that has not
+  // written its .jsonl yet, and picks the newest by mtime regardless of owner.
+  const sessionId =
+    options.sessionId ?? discoverSessionUuid(options.projectRoot, options.homePath);
   const health = runHealthChecks(options.homePath);
 
   let session = { sessionId, sessionNumber: 0, logPath: "" };

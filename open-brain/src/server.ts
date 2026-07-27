@@ -107,7 +107,7 @@ export async function handleStart(args: {
 }): Promise<ToolResponse> {
   try {
     const projectRoot = resolve(args.project_root ?? ".");
-    const result = sessionStart({ projectRoot, homePath: homedir() });
+    const result = sessionStart({ projectRoot, homePath: homedir(), sessionId: _activeSessionId });
 
     const lines: string[] = [];
     lines.push(`Session Start — ${result.state.mode} mode`);
