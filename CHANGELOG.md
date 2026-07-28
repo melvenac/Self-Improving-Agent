@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [v0.7.2] - 2026-07-28
 
 ### Fixed
 - **`ob_recall` ranked older entries higher, not newer** — the weighted rank multiplied `bm25()` (negative, more-negative = better) by a factor that *grew* with age, so every day an entry aged it gained ~0.5% ranking advantage and at 200 days its score doubled. Documented as "recency-weighted BM25" since v0.3.0; it was anti-recency weighted. Now divides by the age term. Measured on the live 315-entry database, average age of top-5 results dropped from 123d to 44d.
