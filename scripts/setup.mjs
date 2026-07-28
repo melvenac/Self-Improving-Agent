@@ -153,13 +153,34 @@ function registerHooks() {
   // SessionStart hook for bootstrap
   if (!settings.hooks.SessionStart) settings.hooks.SessionStart = [];
 
+  // Compare normalised, not literal. path.join yields backslashes on Windows
+  // while an earlier install may have written forward slashes; exact-string
+  // matching then misses the existing entry and appends a SECOND registration,
+  // so the SessionStart hook fires twice and SESSION_UUID is emitted twice.
+  // (This is exactly what a re-run of setup.mjs did on 2026-07-28.)
+  const norm = (s) => String(s || '').replace(/\\/g, '/').toLowerCase();
+  const target = norm(command);
+
   const alreadyExists = settings.hooks.SessionStart.some(entry =>
-    entry.hooks?.some(h => h.command === command)
+    entry.hooks?.some(h => norm(h.command) === target)
   );
 
   if (alreadyExists) {
     log(SKIP, 'Hooks already configured \u2014 skipped');
     return;
+  }
+
+  // Drop any prior cli-bootstrap registration that differs only by path
+  // spelling, so a re-run repairs a duplicate rather than adding to it.
+  let removedDupes = 0;
+  settings.hooks.SessionStart = settings.hooks.SessionStart.filter(entry => {
+    const cmds = (entry.hooks || []).map(h => norm(h.command));
+    const isBootstrap = cmds.some(c => c.includes('cli-bootstrap.js'));
+    if (isBootstrap) removedDupes++;
+    return !isBootstrap;
+  });
+  if (removedDupes > 0) {
+    log(OK, `Replaced ${removedDupes} cli-bootstrap SessionStart registration(s) differing by path spelling`);
   }
 
   settings.hooks.SessionStart.push({
@@ -238,14 +259,22 @@ function registerCursorMcp() {
   const serverPath = OPEN_BRAIN_SERVER.replace(/\\/g, '/');
   const existing = config.mcpServers['open-brain'];
 
-  if (existing?.command === 'node' && existing.args?.[0]?.replace(/\\/g, '/') === serverPath) {
+  // OPEN_BRAIN_IDE scopes this session's slot in active-session.json. Without
+  // it, Claude Code and Cursor on the same repo share one slot and whichever
+  // started last wins \u2014 the other silently adopts its session UUID and files
+  // recalls under it. The skip check requires the tag, so existing installs
+  // get upgraded rather than skipped.
+  const tagged = existing?.env?.OPEN_BRAIN_IDE === 'cursor';
+
+  if (existing?.command === 'node' && existing.args?.[0]?.replace(/\\/g, '/') === serverPath && tagged) {
     log(SKIP, 'Cursor open-brain MCP already registered \u2014 skipped');
     return;
   }
 
   config.mcpServers['open-brain'] = {
     command: 'node',
-    args: [OPEN_BRAIN_SERVER]
+    args: [OPEN_BRAIN_SERVER],
+    env: { ...(existing?.env || {}), OPEN_BRAIN_IDE: 'cursor' }
   };
 
   ensureDir(CURSOR_DIR);
@@ -255,7 +284,8 @@ function registerCursorMcp() {
 
 function registerCursorHooks() {
   const hooksPath = path.join(CURSOR_DIR, 'hooks.json');
-  const bootstrapCmd = `node "${OPEN_BRAIN_BOOTSTRAP.replace(/\\/g, '/')}"`;
+  // `--ide cursor` keys this session's slot separately from Claude Code's.
+  const bootstrapCmd = `node "${OPEN_BRAIN_BOOTSTRAP.replace(/\\/g, '/')}" --ide cursor`;
 
   let config = { version: 1, hooks: {} };
   if (fs.existsSync(hooksPath)) {
@@ -265,12 +295,17 @@ function registerCursorHooks() {
 
   if (!config.hooks.sessionStart) config.hooks.sessionStart = [];
 
-  const alreadyExists = config.hooks.sessionStart.some(entry =>
-    entry.command === bootstrapCmd ||
-    entry.command?.includes('cli-bootstrap.js')
+  // An untagged entry from an earlier install is REPLACED, not left alongside \u2014
+  // two sessionStart entries would fire the hook twice.
+  const stale = config.hooks.sessionStart.filter(entry =>
+    entry.command?.includes('cli-bootstrap.js') && !entry.command.includes('--ide')
   );
+  if (stale.length > 0) {
+    config.hooks.sessionStart = config.hooks.sessionStart.filter(e => !stale.includes(e));
+    log(OK, `Upgraded ${stale.length} untagged Cursor sessionStart hook entry(ies)`);
+  }
 
-  if (alreadyExists) {
+  if (config.hooks.sessionStart.some(entry => entry.command === bootstrapCmd)) {
     log(SKIP, 'Cursor sessionStart hook already configured \u2014 skipped');
     return;
   }

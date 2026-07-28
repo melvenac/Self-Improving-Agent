@@ -1,5 +1,27 @@
 # Changelog
 
+## [v0.8.1] - 2026-07-28
+
+v0.8.0 claimed Cursor support that had never once been executed. Verifying it end to end — a Claude Code session and a Cursor session working the same repo simultaneously — found that Cursor sessions recorded no provenance at all, and surfaced two further bugs that degrade Claude Code as well.
+
+### Fixed
+- **Cursor sessions registered no session UUID, so shadow recall could never evaluate them.** `cli-bootstrap` read only Claude Code's `session_id` payload field *and* relied on the hook's stdout reaching agent context. Cursor satisfies neither: it does not inject SessionStart stdout at all. `ob_set_session` was therefore never called, `recall_log` and `feedback_log` stayed empty, and the harness had no ground truth. The UUID is now written to `~/.claude/open-brain/active-session.json` by the hook and read back by the server, so nothing has to survive a trip through an agent's context.
+- **Two IDEs on one repo silently shared a session identity.** Slots were keyed by project directory alone. Observed live: a Claude Code *resume* rewrote the slot, after which the Cursor session read back the Claude session's UUID and filed six recalls under it — no error, no warning, both sessions looking healthy. Keys are now `<project>::<ide>`. This was never the rare race it was first documented as; two IDEs on one repo is a normal setup, and every session start including a resume rewrites the slot.
+- **A Cursor session could still mislabel itself as Claude Code.** Cursor also executes the hooks in `~/.claude/settings.json`, and that registration carries no `--ide` flag — so registration alone was not a reliable host signal, and the mislabelled write would overwrite a genuine Claude Code slot. The host is now detected from the payload's `cursor_version`, which is authoritative regardless of which config invoked the hook. Confirmed in production: the slot that proved the fix was written by the Claude-registered hook (`hook_cwd` = `~/.claude`) and correctly labelled `cursor`.
+- **Cursor keyed slots to the wrong project.** Cursor invokes hooks with cwd set to its *config* directory (`~/.cursor`), not the open workspace, so the slot landed under a path that `ob_set_session` never looks up. The workspace now comes from the payload's `workspace_roots`.
+- **`setup.mjs` created duplicate SessionStart registrations.** Dedup compared command strings literally while `path.join` emits backslashes on Windows, so a re-run missed an existing forward-slash entry and appended a second — making the Claude Code hook fire twice per session. Comparison is now separator-normalised, and a re-run *replaces* prior `cli-bootstrap` registrations rather than adding to them. `checkHookRegistration` caught this on the first `/sync`, on a duplicate shape it had never seen.
+- **`checkMirrorParity` reported permanent false drift.** A file copied on Windows picks up CRLF while the repo copy stays LF; byte-for-byte comparison called two identical files different. Comparison is now content-normalised.
+
+### Added
+- **`shared/active-session.ts`** — the IDE-agnostic session handoff: `resolveSessionId`, `detectIde`, `resolveWorkspaceDir`, and per-IDE slot keying. A UUID is generated when the host supplies none, because the system needs a stable per-session key, not the IDE's own identifier.
+- **Cursor's real SessionStart payload as a test fixture**, captured from a live hook fire and annotated as observed rather than invented. An earlier *inference* about this shape (`conversation_id`, no `session_id`) was wrong and cost two verification cycles; Cursor in fact sends both, and `session_id` is preferred.
+- **`is_background_agent` anti-loop**, alongside Claude Code's `agent_id`, so Cursor background agents do not register sessions.
+- **`CURSOR_COMMAND_SET`** asserted by `checkMirrorParity` — the Cursor command subset is now machine-checked, since pairwise mirror comparison only sees files present on both sides and could never flag one silently dropped.
+
+### Notes
+- **Cursor hooks require PowerShell as the shell on Windows.** Cursor wraps hook commands in PowerShell syntax; with bash configured as the default shell the wrapper dies on `&` before reaching node, and SessionStart fails silently because nothing surfaces its stderr. This single mechanism explained every symptom — global and project-level hook configs both correct yet never firing, while the binary worked perfectly when invoked by hand.
+- **Shadow recall has its first real evaluated session**, produced by a Cursor session end to end. The presentation bias documented in v0.8.0 is confirmed on live data: `live` carried 6 of 10 labeled results against 4–6 for the variants, and won on nDCG — which remains weak evidence, exactly as predicted, because the metric favours the incumbent by construction. Two variants beat `live` on MRR while losing on nDCG. Still correctly gated behind "sample too small".
+
 ## [v0.8.0] - 2026-07-28
 
 ### Added

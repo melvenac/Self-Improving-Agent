@@ -31,6 +31,7 @@ export interface ResolvedPaths {
   knowledgeV2Db: string;
   scoreHistory: string;
   shadowLog: string;
+  activeSession: string;
   projectTemplate: string;
 }
 
@@ -65,6 +66,10 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {
     // mixing them into the new history would average incomparable numbers.
     shadowLog: process.env.OPEN_BRAIN_SHADOW_LOG
       || join(home, ".claude", "open-brain", "shadow-recall.jsonl"),
+    // Written by the SessionStart hook, read by ob_set_session when the agent
+    // has no UUID to pass — the IDE-agnostic path. See shared/active-session.ts.
+    activeSession: process.env.OPEN_BRAIN_ACTIVE_SESSION
+      || join(home, ".claude", "open-brain", "active-session.json"),
     projectTemplate: join(projectRoot, "project-template"),
   };
 }

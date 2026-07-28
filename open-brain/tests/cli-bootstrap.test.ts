@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -56,9 +56,30 @@ describe("cli-bootstrap SESSION_UUID contract", () => {
     expect(uuidLines(run({ cwd, session_id: id }))[0]).toContain(id);
   });
 
-  it("emits no SESSION_UUID line when session_id is absent", () => {
-    // Better to emit nothing than to emit a wrong id.
-    expect(uuidLines(run({ cwd }))).toHaveLength(0);
+  it("accepts payload fields other than Claude Code's session_id", () => {
+    // Cursor sessions produced no UUID at all because only `session_id` was
+    // read, so ob_set_session was never called and provenance was empty.
+    expect(uuidLines(run({ cwd, conversation_id: "conv-1" }))[0]).toContain("conv-1");
+  });
+
+  it("generates a UUID when the IDE supplies none", () => {
+    // Contract change (Session 42): this used to emit nothing, on the grounds
+    // that no id beats a wrong id. That guard was aimed at the mtime SCAN,
+    // which returned a DIFFERENT REAL session's UUID and mis-attributed data.
+    // A generated UUID cannot collide with another session — what the system
+    // needs is a stable per-session key, not the IDE's own id — so the choice
+    // is between synthetic provenance and none at all.
+    const lines = uuidLines(run({ cwd }));
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatch(
+      /^SESSION_UUID: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    );
+  });
+
+  it("generates a DIFFERENT uuid each run, never a reused one", () => {
+    const first = uuidLines(run({ cwd }))[0];
+    const second = uuidLines(run({ cwd }))[0];
+    expect(first).not.toBe(second);
   });
 
   it("stays silent in a subagent context (anti-loop)", () => {
@@ -75,6 +96,18 @@ describe("cli-bootstrap SESSION_UUID contract", () => {
       env: { ...process.env, HOME: home, USERPROFILE: home },
       shell: process.platform === "win32",
     });
-    expect(uuidLines(out)).toHaveLength(0);
+    // Malformed stdin means no usable payload, so a UUID is generated rather
+    // than the session losing provenance entirely.
+    expect(uuidLines(out)).toHaveLength(1);
+  });
+
+  it("still refuses to guess an id from the filesystem", () => {
+    // The mtime-scan regression this suite exists for: a prior session's
+    // transcript in HOME must never become this session's UUID.
+    const stale = "99999999-9999-9999-9999-999999999999";
+    mkdirSync(join(home, ".claude", "projects", "x"), { recursive: true });
+    writeFileSync(join(home, ".claude", "projects", "x", `${stale}.jsonl`), "{}\n");
+
+    expect(uuidLines(run({ cwd }))[0]).not.toContain(stale);
   });
 });

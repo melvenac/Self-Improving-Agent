@@ -23,6 +23,7 @@ import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
+import { readActiveSession, activeSessionKey, currentIde } from "./shared/active-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { readJson } from "./shared/fs-utils.js";
 import { slugify, writeExperience } from "./vault-writer.js";
@@ -319,10 +320,42 @@ server.tool(
   "ob_set_session",
   "Register the active session ID. Call once at session start for provenance tracking.",
   {
-    session_id: z.string().describe("The Claude session UUID"),
+    session_id: z.string().optional().describe(
+      "The session UUID. Omit (or pass \"none\") when the IDE does not surface one — "
+      + "the UUID recorded by the SessionStart hook is used instead."
+    ),
     project_dir: z.string().optional().describe("Current working directory"),
   },
   async ({ session_id, project_dir }) => {
+    const cwd = project_dir || process.cwd();
+
+    // Fall back to the hook's file handoff. Cursor does not reliably put the
+    // hook's stdout into agent context, so a Cursor agent has no UUID to pass
+    // and previously registered nothing at all — leaving recall_log and
+    // feedback_log empty and shadow recall with no ground truth.
+    let resolvedFrom = "argument";
+    if (!session_id || session_id === "none") {
+      const ide = currentIde();
+      const active = readActiveSession(
+        resolvePaths(cwd).activeSession,
+        activeSessionKey(canonicalizeProjectDir(cwd) || cwd, ide),
+      );
+      if (!active) {
+        return {
+          content: [{
+            type: "text" as const,
+            text: `Error: no session_id given and no active session recorded for `
+              + `ide "${ide}" in this project. Check that the SessionStart hook is `
+              + `registered for this IDE, and that its MCP registration sets `
+              + `OPEN_BRAIN_IDE. Re-run scripts/setup.mjs if unsure.`,
+          }],
+          isError: true,
+        };
+      }
+      session_id = active.uuid;
+      resolvedFrom = `hook file (${active.source}, ide ${active.ide ?? "unset"})`;
+    }
+
     _activeSessionId = session_id;
 
     // Persist as well as hold in memory: an in-memory-only registration left no
@@ -340,6 +373,7 @@ server.tool(
       content: [{
         type: "text" as const,
         text: `Session registered: ${session_id}${project_dir ? ` (${project_dir})` : ""}`
+          + ` [via ${resolvedFrom}]`
           + (persisted ? "" : " — warning: not persisted to the sessions table"),
       }],
     };

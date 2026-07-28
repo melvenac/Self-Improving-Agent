@@ -17,3 +17,4 @@ const stateDir = mkdtempSync(join(tmpdir(), "open-brain-test-state-"));
 // Filenames are kept identical to production — tests assert on them.
 process.env.OPEN_BRAIN_SCORE_HISTORY = join(stateDir, "score-history.jsonl");
 process.env.OPEN_BRAIN_SHADOW_LOG = join(stateDir, "shadow-recall.jsonl");
+process.env.OPEN_BRAIN_ACTIVE_SESSION = join(stateDir, "active-session.json");
