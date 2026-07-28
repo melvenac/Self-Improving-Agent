@@ -103,7 +103,7 @@ describe("scorePipelineHealth", () => {
     const result = scorePipelineHealth({
       lastHookRun: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
       scoreTrend: "improving",
-      lastShadowRecall: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      shadowSessions: 10,
     });
     expect(result.max).toBe(10);
     expect(result.score).toBe(10);

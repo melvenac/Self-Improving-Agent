@@ -1,5 +1,30 @@
 # Changelog
 
+## [v0.8.0] - 2026-07-28
+
+### Added
+- **Multi-IDE support — the framework installs into Cursor as well as Claude Code.** `scripts/setup.mjs` now registers the `open-brain` MCP server in `~/.cursor/mcp.json`, wires a `sessionStart` hook in `~/.cursor/hooks.json`, and copies the Cursor slash commands to `~/.cursor/commands/`. All three steps are idempotent — re-running skips anything already configured. `FRAMEWORK.md` and both READMEs document the two-layer model and the new setup flow.
+- **`CURSOR_COMMAND_SET`** — Cursor deliberately receives the session-lifecycle subset (`start`, `end`, `sync`, `checkpoint`) and not `bootstrap`, `skill-scan`, `task` or `test`, which are Claude Code workflows with no Cursor equivalent. The set is asserted by `checkMirrorParity` rather than left implicit: pairwise mirror comparison only sees files present on both sides, so a command silently dropped from the template would never have been flagged, and a deliberate omission was indistinguishable from a forgotten one.
+- **Shadow recall — an offline A/B harness for retrieval ranking.** Revived from the retired v1 `session-end.mjs` Stage 3, re-aimed and rebuilt. At session end it replays the session's own recall queries under six ranking strategies and scores each against the relevance labels that same session assigned, appending one JSONL line per session to `~/.claude/open-brain/shadow-recall.jsonl`. Nothing is shown mid-session and live ranking is unaffected.
+
+  Every ranking constant (`recencyDecayPerDay`, `matureBoost`, `provenBoost`, `failureBoost`, `lowSuccessPenalty`) was an unvalidated guess — v0.7.2 changed ranking three times and verified each by eyeballing top-5 results on a handful of queries. This is the instrumentation that replaces that with evidence.
+- **`recallRankExpr(alias, overrides)`** — ranking strategies are now config overrides of the *live* expression, not parallel implementations. The v1 harness carried its own RRF/vector ranking code, so it measured a path production never used and died with that path.
+- **`recall_log` and `feedback_log` tables** — `knowledge_index` holds only aggregate counters with no timestamps and no record of which session assigned each rating, so retrieval quality could not be reconstructed retrospectively. These capture the query → ranked results → rating chain as it happens. Also makes historical replay unnecessary: evaluation runs forward from here.
+- **`shared/fts.ts`** — `sanitizeFtsQuery`/`broadenFtsQuery` extracted from `server.ts` so the harness builds MATCH expressions identically to `ob_recall` without importing the MCP server.
+- **36 tests** across strategy parameterisation, scoring metrics, ground-truth logging, and the session-end stage.
+
+### Removed
+- **`project-template/.cursor/hooks.json.template`** — its `{{OPEN_BRAIN_BOOTSTRAP}}` placeholder was never substituted by anything. `registerCursorHooks()` builds the identical structure programmatically, so the file was config that nothing consumed while reading as though it were live.
+
+### Changed
+- **Pipeline Health scores shadow recall again** (hook recency 4 / trend 3 / shadow 3). The component was removed in v0.7.2 because it could never score above 0. It returns on a *ramp* — one evaluated session already earns a point, 5 earns two, 10 earns three — so it cannot silently cap the category the way the all-or-nothing version did. Expect 8/10 until sessions accumulate; that is the harness honestly reporting it has no sample yet.
+- **Auto-feedback in `sessionEndV2` now logs rating events.** It calls `updateFeedbackV2` directly rather than going through `ob_feedback`, so without this its labels would never reach the harness and most sessions would score as having no ground truth at all.
+
+### Notes
+- **The obvious quality metric is backwards and was deliberately not ported.** v1 scored a strategy by how many of its results already carried positive feedback. Ratings accrue to entries that have been recalled before, so that rewards resurfacing old, frequently-recalled knowledge — it would likely have scored the age-inverted ranking bug of v0.7.2 as *better* than the fix. Labels are scoped to the session being replayed instead.
+- **Presentation bias is asymmetric and favours the incumbent.** Labels only exist for entries `live` actually displayed, so `live` starts with more of its results labeled than any variant (7/15 vs 4–6/15 measured on the live 315-entry database). A variant beating `live` is therefore strong evidence; a variant tying or losing is weak evidence and does not establish that `live` is optimal. The report names candidates only and never adopts one automatically.
+- **No verdict below 10 evaluated sessions.** The v1 harness collected 7 and no conclusion was ever drawn from it.
+
 ## [v0.7.2] - 2026-07-28
 
 ### Fixed

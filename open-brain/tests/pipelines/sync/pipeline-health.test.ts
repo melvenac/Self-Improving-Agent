@@ -10,17 +10,42 @@ const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
 describe("scorePipelineHealth", () => {
-  it("awards full marks for a hook run within 24h and an improving trend", () => {
-    const r = scorePipelineHealth({ lastHookRun: iso(2 * HOUR), scoreTrend: "improving" });
+  it("awards full marks for a recent hook run, improving trend, and shadow data", () => {
+    const r = scorePipelineHealth({
+      lastHookRun: iso(2 * HOUR),
+      scoreTrend: "improving",
+      shadowSessions: 10,
+    });
     expect(r.score).toBe(10);
     expect(r.max).toBe(10);
   });
 
   it("is reachable — the category can actually hit its maximum", () => {
     // Regression guard: a dead shadow-recall component used to make 10/10
-    // impossible, silently capping this category at 7.
-    const best = scorePipelineHealth({ lastHookRun: iso(1 * HOUR), scoreTrend: "improving" });
+    // impossible, silently capping this category at 7. The component is back,
+    // so this test must keep proving every point is earnable.
+    const best = scorePipelineHealth({
+      lastHookRun: iso(1 * HOUR),
+      scoreTrend: "improving",
+      shadowSessions: 10,
+    });
     expect(best.score).toBe(best.max);
+  });
+
+  it("ramps shadow credit so one evaluated session already scores", () => {
+    // The v1 component was all-or-nothing and therefore stuck at 0 forever.
+    const at = (shadowSessions: number) =>
+      scorePipelineHealth({ lastHookRun: null, scoreTrend: "unknown", shadowSessions }).score;
+    expect(at(0)).toBe(0);
+    expect(at(1)).toBeGreaterThan(at(0));
+    expect(at(5)).toBeGreaterThan(at(1));
+    expect(at(10)).toBeGreaterThan(at(5));
+    expect(at(500)).toBe(at(10)); // saturates rather than overflowing
+  });
+
+  it("treats an absent shadowSessions as no data rather than throwing", () => {
+    const r = scorePipelineHealth({ lastHookRun: null, scoreTrend: "unknown" });
+    expect(r.details).toMatchObject({ shadowScore: 0 });
   });
 
   it("scores a hook run inside 7 days below a same-day run", () => {

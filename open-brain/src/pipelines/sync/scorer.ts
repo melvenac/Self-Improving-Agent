@@ -29,6 +29,9 @@ export interface CoverageInput {
 export interface PipelineHealthInput {
   lastHookRun: string | null;
   scoreTrend: "improving" | "stable" | "declining" | "unknown";
+  /** Sessions the shadow-recall harness has evaluated. Optional so existing
+   *  callers keep compiling; absent is treated as "no data yet", scoring 0. */
+  shadowSessions?: number;
 }
 
 // Category 1: Config & Structure (25 pts max)
@@ -128,17 +131,19 @@ export function scoreCoverage(input: CoverageInput): CategoryScore {
 }
 
 // Category 5: Pipeline Health (10 pts max)
-// Hook recency (6 pts): ≤24h → 6, ≤7d → 3, else 0
-// Score trend  (4 pts): improving → 4, stable → 3, declining → 1, unknown → 0
+// Hook recency  (4 pts): ≤24h → 4, ≤7d → 2, else 0
+// Score trend   (3 pts): improving → 3, stable → 2, declining → 1, unknown → 0
+// Shadow recall (3 pts): ramped on evaluated sessions — see below
 //
-// A shadow-recall component used to hold 3 of these points, but nothing has
-// written shadow-recall.jsonl since the v1→v2 TypeScript port (Apr 2026), so it
-// could never score above 0 and silently capped the category at 7/10. Rather
-// than score a signal that no longer exists, its points were redistributed to
-// the two components that are actually measured. If shadow recall is revived,
-// re-add it here and rebalance.
+// The shadow component was removed in Session 41 because nothing had written
+// shadow-recall.jsonl since the v1→v2 port, so it scored a permanent 0 and
+// silently capped the category at 7/10. It returns here only because the
+// harness is wired again — and on a RAMP rather than all-or-nothing, so it
+// cannot repeat that failure: one evaluated session already earns a point.
+// Expect this category to sit at 8/10 until sessions accumulate; that is the
+// instrumentation honestly reporting it has no sample yet, not a regression.
 export function scorePipelineHealth(input: PipelineHealthInput): CategoryScore {
-  const { lastHookRun, scoreTrend } = input;
+  const { lastHookRun, scoreTrend, shadowSessions = 0 } = input;
   const now = Date.now();
   const h24 = 24 * 60 * 60 * 1000;
   const d7 = 7 * 24 * 60 * 60 * 1000;
@@ -146,19 +151,24 @@ export function scorePipelineHealth(input: PipelineHealthInput): CategoryScore {
   let hookRecency = 0;
   if (lastHookRun !== null) {
     const age = now - new Date(lastHookRun).getTime();
-    hookRecency = age <= h24 ? 6 : age <= d7 ? 3 : 0;
+    hookRecency = age <= h24 ? 4 : age <= d7 ? 2 : 0;
   }
 
   const trendScore =
-    scoreTrend === "improving" ? 4 :
-    scoreTrend === "stable" ? 3 :
+    scoreTrend === "improving" ? 3 :
+    scoreTrend === "stable" ? 2 :
     scoreTrend === "declining" ? 1 : 0;
 
-  const score = Math.min(hookRecency + trendScore, 10);
+  const shadowScore =
+    shadowSessions >= 10 ? 3 :
+    shadowSessions >= 5 ? 2 :
+    shadowSessions >= 1 ? 1 : 0;
+
+  const score = Math.min(hookRecency + trendScore + shadowScore, 10);
   return {
     name: "Pipeline Health",
     score,
     max: 10,
-    details: { hookRecency, trendScore },
+    details: { hookRecency, trendScore, shadowScore, shadowSessions },
   };
 }

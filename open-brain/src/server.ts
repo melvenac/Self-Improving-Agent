@@ -18,11 +18,12 @@ import {
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { sessionStart } from "./pipelines/session-start/index.js";
-import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk } from "./db-v2.js";
+import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
+import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { readJson } from "./shared/fs-utils.js";
 import { slugify, writeExperience } from "./vault-writer.js";
 import { evaluateLifecycle, recallRankExpr, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
@@ -43,28 +44,11 @@ function getV2Db(): Database.Database {
 let _activeSessionId: string | null = null;
 const _recalledKnowledgeIds = new Set<number>();
 
-export function sanitizeFtsQuery(query: string): string {
-  return query
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) => `"${word.replace(/"/g, '""')}"`)
-    .join(" ");
-}
-
-/**
- * Same terms, OR-joined instead of the FTS5 default AND.
- *
- * Multi-word queries are conjunctive by default, so "knowledge maturity
- * feedback loop" required all four terms in one entry and returned nothing —
- * while the OR form matched 86 entries. The /start protocol asks agents for
- * "methodology-focused" queries, which are exactly the multi-word shape that
- * silently returned zero results.
- */
-export function broadenFtsQuery(query: string): string | null {
-  const words = query.split(/\s+/).filter(Boolean);
-  if (words.length < 2) return null; // single term: AND and OR are identical
-  return words.map((word) => `"${word.replace(/"/g, '""')}"`).join(" OR ");
-}
+// Re-exported so existing importers (and tests) keep working; the shadow
+// harness imports them from shared/fts.js directly. `export ... from` alone
+// would not bind these names in this module's scope, so import as well.
+import { sanitizeFtsQuery, broadenFtsQuery } from "./shared/fts.js";
+export { sanitizeFtsQuery, broadenFtsQuery };
 
 // --- Exported handler functions (testable without MCP transport) ---
 
@@ -200,12 +184,19 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       project: projectRoot.split(/[/\\]/).filter(Boolean).pop() || "General",
       recalledEntryIds: recalledIds,
       dryRun: args.dry_run || false,
+      shadowLogPath: resolvePaths(projectRoot).shadowLog,
     });
+
+    const shadowLine = result.shadow.evaluated
+      ? `  Shadow recall: ${result.shadow.strategies} strategies over ${result.shadow.queries} queries (best: ${result.shadow.leader})`
+      : `  Shadow recall: skipped (${result.shadow.skipped})`;
+
+    const shadowReport = formatShadowReport(readShadowLog(resolvePaths(projectRoot).shadowLog));
 
     return {
       content: [{
         type: "text",
-        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n  Feedback: ${result.feedback.processed} entries rated\n  Reflection: ${result.reflection.flagged} clusters flagged\n  Invocations: ${result.invocations.logged} logged\n  Skill scan: ${result.skillScan.clusters} clusters (${result.skillScan.pendingProposals} pending proposals)`,
+        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n  Feedback: ${result.feedback.processed} entries rated\n  Reflection: ${result.reflection.flagged} clusters flagged\n  Invocations: ${result.invocations.logged} logged\n  Skill scan: ${result.skillScan.clusters} clusters (${result.skillScan.pendingProposals} pending proposals)\n${shadowLine}\n\n${shadowReport}`,
       }],
     };
   } catch (err) {
@@ -450,6 +441,15 @@ server.tool(
           results.push("_(some results matched only part of the query)_");
         }
 
+        // Ground truth for the shadow-recall harness: what this query returned,
+        // in the order the agent saw it. Best-effort — a logging failure must
+        // never break a recall.
+        if (_activeSessionId) {
+          try {
+            recordRecallEvent(v2db, _activeSessionId, query, rows.map((r) => r.id));
+          } catch { /* non-critical */ }
+        }
+
         // Track recall hits
         const updateRecall = v2db.prepare(
           "UPDATE knowledge_index SET recall_count = COALESCE(recall_count, 0) + 1, last_recalled_at = datetime('now') WHERE id = ?"
@@ -557,6 +557,15 @@ server.tool(
     };
 
     const result = evaluateLifecycle(feedbackEntry, rating as Rating);
+
+    // Log the rating as an event before any apoptosis delete — the aggregate
+    // counters carry no timestamps and no session, so this is the only record
+    // that can tell the shadow harness which session judged what.
+    if (_activeSessionId) {
+      try {
+        recordFeedbackEvent(v2db, _activeSessionId, id, rating as Rating);
+      } catch { /* non-critical */ }
+    }
 
     if (result.autoDelete) {
       v2db.prepare("DELETE FROM knowledge_index WHERE id = ?").run(id);

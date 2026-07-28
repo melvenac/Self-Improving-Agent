@@ -68,6 +68,32 @@ export function initSchemaV2(db: Database.Database): void {
       created_at TEXT NOT NULL
     );
 
+    -- Ground truth for the shadow-recall harness.
+    --
+    -- knowledge_index carries only aggregate counters (helpful/harmful/neutral)
+    -- with no timestamps and no record of which session assigned each rating,
+    -- so retrieval quality cannot be reconstructed from it after the fact.
+    -- These two tables capture the (query -> ranked results -> rating) chain as
+    -- it happens, which is the only way to score a ranking change honestly.
+    CREATE TABLE IF NOT EXISTS recall_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_uuid TEXT NOT NULL,
+      query TEXT NOT NULL,
+      knowledge_id INTEGER NOT NULL,
+      rank INTEGER NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS feedback_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_uuid TEXT NOT NULL,
+      knowledge_id INTEGER NOT NULL,
+      rating TEXT NOT NULL CHECK(rating IN ('helpful', 'harmful', 'neutral')),
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_recall_log_session ON recall_log(session_uuid);
+    CREATE INDEX IF NOT EXISTS idx_feedback_log_session ON feedback_log(session_uuid);
     CREATE INDEX IF NOT EXISTS idx_chunks_session ON chunks(session_id);
     CREATE INDEX IF NOT EXISTS idx_chunks_category ON chunks(category);
     CREATE INDEX IF NOT EXISTS idx_knowledge_index_maturity ON knowledge_index(maturity);
@@ -419,4 +445,87 @@ export function getChunksForSession(db: Database.Database, uuid: string): Array<
     WHERE s.uuid = ?
     ORDER BY c.created_at
   `).all(uuid) as Array<{ id: number; category: string; content: string; metadata: string; created_at: string }>;
+}
+
+// --- Shadow-recall ground truth ---
+
+export type ShadowRating = 'helpful' | 'harmful' | 'neutral';
+
+/**
+ * Record what a live recall actually returned, in rank order.
+ *
+ * `rank` is 1-based position as the agent saw it. Without it there is no way to
+ * ask "did the variant put the useful entry higher than production did".
+ */
+export function recordRecallEvent(
+  db: Database.Database,
+  sessionUuid: string,
+  query: string,
+  entryIds: number[],
+): void {
+  if (!sessionUuid || entryIds.length === 0) return;
+  const now = new Date().toISOString();
+  const stmt = db.prepare(`
+    INSERT INTO recall_log (session_uuid, query, knowledge_id, rank, created_at)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+  const insertAll = db.transaction((ids: number[]) => {
+    ids.forEach((id, i) => stmt.run(sessionUuid, query, id, i + 1, now));
+  });
+  insertAll(entryIds);
+}
+
+/** Record a rating as an event, alongside the aggregate counters. */
+export function recordFeedbackEvent(
+  db: Database.Database,
+  sessionUuid: string,
+  knowledgeId: number,
+  rating: ShadowRating,
+): void {
+  if (!sessionUuid) return;
+  db.prepare(`
+    INSERT INTO feedback_log (session_uuid, knowledge_id, rating, created_at)
+    VALUES (?, ?, ?, ?)
+  `).run(sessionUuid, knowledgeId, rating, new Date().toISOString());
+}
+
+/** Distinct queries this session issued, in first-use order. */
+export function getSessionQueries(db: Database.Database, sessionUuid: string): string[] {
+  const rows = db.prepare(`
+    SELECT query FROM recall_log WHERE session_uuid = ?
+    GROUP BY query ORDER BY MIN(id)
+  `).all(sessionUuid) as Array<{ query: string }>;
+  return rows.map((r) => r.query);
+}
+
+/**
+ * Relevance labels assigned during this session.
+ *
+ * Deliberately scoped to one session: ratings accrue over time to entries that
+ * have been recalled before, so scoring against all-time feedback would reward
+ * a ranking for resurfacing old, frequently-recalled knowledge — the exact bias
+ * removed from recallRankExpr. If an entry is rated more than once in a
+ * session, the last rating wins.
+ */
+export function getSessionLabels(
+  db: Database.Database,
+  sessionUuid: string,
+): Map<number, ShadowRating> {
+  const rows = db.prepare(`
+    SELECT knowledge_id, rating FROM feedback_log
+    WHERE session_uuid = ? ORDER BY id
+  `).all(sessionUuid) as Array<{ knowledge_id: number; rating: ShadowRating }>;
+  const labels = new Map<number, ShadowRating>();
+  for (const row of rows) labels.set(row.knowledge_id, row.rating);
+  return labels;
+}
+
+/** Sessions that have both queries and ratings — the only ones worth scoring. */
+export function getEvaluableSessions(db: Database.Database): string[] {
+  const rows = db.prepare(`
+    SELECT DISTINCT r.session_uuid AS uuid FROM recall_log r
+    WHERE EXISTS (SELECT 1 FROM feedback_log f WHERE f.session_uuid = r.session_uuid)
+    ORDER BY r.session_uuid
+  `).all() as Array<{ uuid: string }>;
+  return rows.map((r) => r.uuid);
 }

@@ -1,11 +1,12 @@
 import Database from "better-sqlite3";
 import { join } from "path";
 import { writeSummary } from "../../vault-writer.js";
-import { updateFeedbackV2 } from "../../db-v2.js";
+import { updateFeedbackV2, recordFeedbackEvent } from "../../db-v2.js";
 import { flagReflectionClusters } from "./reflection.js";
 import { getSessionSummary } from "./session-summary.js";
 import { logInvocations } from "./invocation-logger.js";
 import { runSkillScanPipeline } from "./skill-scan-runner.js";
+import { runShadowStage, type ShadowStageResult } from "../shadow/index.js";
 
 export interface SessionEndV2Input {
   db: Database.Database;
@@ -16,6 +17,9 @@ export interface SessionEndV2Input {
   project: string;
   recalledEntryIds: number[];
   dryRun: boolean;
+  /** Where the shadow-recall history is appended. Injected rather than resolved
+   *  here so tests cannot write into the real ~/.claude history. */
+  shadowLogPath?: string;
 }
 
 interface SessionEndV2Result {
@@ -24,6 +28,7 @@ interface SessionEndV2Result {
   reflection: { flagged: number };
   invocations: { logged: number; skippedSessions: number };
   skillScan: { clusters: number; pendingProposals: number; approaching: number };
+  shadow: ShadowStageResult;
 }
 
 interface KnowledgeIndexRow {
@@ -79,6 +84,14 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     const rating: "helpful" | "neutral" = matched ? "helpful" : "neutral";
 
     updateFeedbackV2(db, row.vault_path, rating);
+    // This path bypasses ob_feedback, so log the event explicitly — otherwise
+    // auto-feedback labels never reach the shadow harness and most sessions
+    // would score as having no ground truth at all.
+    if (sessionId) {
+      try {
+        recordFeedbackEvent(db, sessionId, id, rating);
+      } catch { /* non-critical */ }
+    }
     ratings.push({ id, rating });
   }
 
@@ -98,11 +111,25 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     ? { clusters: 0, pendingProposals: 0, approaching: 0 }
     : runSkillScanPipeline();
 
+  // ── Stage 6: Shadow recall ──────────────────────────────────────────────────
+  // Must run after Stage 2 so this session's own relevance labels already exist.
+  const shadow =
+    dryRun || !input.shadowLogPath
+      ? {
+          evaluated: false,
+          skipped: dryRun ? "dry run" : "no shadow log path",
+          strategies: 0,
+          queries: 0,
+          leader: null,
+        }
+      : runShadowStage({ db, sessionUuid: sessionId, logPath: input.shadowLogPath });
+
   return {
     summary: { written: summaryWritten, selfGenerated },
     feedback: { processed: ratings.length, ratings },
     reflection: { flagged },
     invocations: invocationResult,
     skillScan: skillScanResult,
+    shadow,
   };
 }

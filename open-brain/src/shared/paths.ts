@@ -30,6 +30,7 @@ export interface ResolvedPaths {
   knowledgeDb: string;
   knowledgeV2Db: string;
   scoreHistory: string;
+  shadowLog: string;
   projectTemplate: string;
 }
 
@@ -52,7 +53,18 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {
     // they previously read different databases and reported different scores.
     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB
       || join(home, ".claude", "open-brain", "knowledge-v2.db"),
-    scoreHistory: join(home, ".claude", "open-brain", "score-history.jsonl"),
+    // These two are keyed off $HOME, not projectRoot, so a caller passing a temp
+    // project_root still writes to the real history. The env overrides exist so
+    // tests can redirect them — without one, running the test suite appended a
+    // junk entry to the production score history on every run, corrupting the
+    // trend that Pipeline Health scores.
+    scoreHistory: process.env.OPEN_BRAIN_SCORE_HISTORY
+      || join(home, ".claude", "open-brain", "score-history.jsonl"),
+    // Deliberately NOT the v1 path (~/.claude/knowledge-mcp/shadow-recall.jsonl).
+    // Those 7 entries score a different metric against a retired ranking engine;
+    // mixing them into the new history would average incomparable numbers.
+    shadowLog: process.env.OPEN_BRAIN_SHADOW_LOG
+      || join(home, ".claude", "open-brain", "shadow-recall.jsonl"),
     projectTemplate: join(projectRoot, "project-template"),
   };
 }

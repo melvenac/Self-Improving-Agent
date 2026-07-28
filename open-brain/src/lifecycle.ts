@@ -107,6 +107,23 @@ export function maturityBoost(maturity: Maturity, successRate: number | null): n
 }
 
 /**
+ * The subset of LIFECYCLE_CONFIG that shapes recall ranking.
+ *
+ * Widened to `number` on purpose: LIFECYCLE_CONFIG is `as const`, so deriving
+ * this with Pick<> would give literal types (`0.005`, `1.5`) and reject every
+ * override a shadow strategy exists to supply.
+ */
+export type RankConfig = Record<
+  | "matureBoost"
+  | "provenBoost"
+  | "lowSuccessPenalty"
+  | "apoptosisThreshold"
+  | "recencyDecayPerDay"
+  | "failureBoost",
+  number
+>;
+
+/**
  * SQL ranking expression for ob_recall, built from LIFECYCLE_CONFIG so the
  * query and maturityBoost() cannot drift apart.
  *
@@ -114,9 +131,14 @@ export function maturityBoost(maturity: Maturity, successRate: number | null): n
  * sorts ASCENDING. So a factor that should IMPROVE rank must make the value
  * more negative (multiply), and a factor that should DEMOTE must make it less
  * negative (divide).
+ *
+ * `overrides` exists so the shadow-recall harness can evaluate alternative
+ * weightings without a second ranking implementation — a strategy that does not
+ * share this code path measures something users never see. Overrides are merged
+ * into a fresh object; LIFECYCLE_CONFIG is never mutated.
  */
-export function recallRankExpr(alias = "k"): string {
-  const c = LIFECYCLE_CONFIG;
+export function recallRankExpr(alias = "k", overrides: Partial<RankConfig> = {}): string {
+  const c: RankConfig = { ...LIFECYCLE_CONFIG, ...overrides };
   const maturity =
     `(CASE ${alias}.maturity ` +
     `WHEN 'mature' THEN ${c.matureBoost} ` +

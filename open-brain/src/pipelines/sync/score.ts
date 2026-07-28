@@ -18,6 +18,7 @@ import {
   getCoverageStats as getCoverageStatsV2,
 } from "../../db-v2.js";
 import { readLastInvocationTs } from "../session-end/invocation-logger.js";
+import { readShadowLog } from "../shadow/index.js";
 import { resolvePaths } from "../../shared/paths.js";
 
 /**
@@ -76,6 +77,7 @@ export function computeScore(
   const healthScore = scorePipelineHealth({
     lastHookRun: readLastInvocationTs(),
     scoreTrend: trend,
+    shadowSessions: readShadowLog(paths.shadowLog).length,
   });
 
   const categories: CategoryScore[] = [
