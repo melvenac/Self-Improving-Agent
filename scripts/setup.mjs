@@ -16,8 +16,11 @@ import { createHash } from 'node:crypto';
 
 const HOME = os.homedir();
 const CLAUDE_DIR = path.join(HOME, '.claude');
+const CURSOR_DIR = path.join(HOME, '.cursor');
 const REPO_ROOT = path.resolve(path.join(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Z]:)/, '$1'), '..'));
 const OPEN_BRAIN_DIR = path.join(REPO_ROOT, 'open-brain');
+const OPEN_BRAIN_SERVER = path.join(OPEN_BRAIN_DIR, 'build', 'server.js');
+const OPEN_BRAIN_BOOTSTRAP = path.join(OPEN_BRAIN_DIR, 'build', 'cli-bootstrap.js');
 
 // Status indicators
 const OK = '\u2713';
@@ -216,9 +219,91 @@ function copySlashCommands() {
   }
 
   if (copied > 0) {
-    log(OK, `${copied} slash command(s) copied \u2192 ${destDir}`);
+    log(OK, `${copied} Claude slash command(s) copied \u2192 ${destDir}`);
   } else {
-    log(SKIP, 'Slash commands already up to date \u2014 skipped');
+    log(SKIP, 'Claude slash commands already up to date \u2014 skipped');
+  }
+}
+
+function registerCursorMcp() {
+  const mcpJsonPath = path.join(CURSOR_DIR, 'mcp.json');
+  let config = {};
+
+  if (fs.existsSync(mcpJsonPath)) {
+    config = JSON.parse(fs.readFileSync(mcpJsonPath, 'utf-8'));
+  }
+
+  if (!config.mcpServers) config.mcpServers = {};
+
+  const serverPath = OPEN_BRAIN_SERVER.replace(/\\/g, '/');
+  const existing = config.mcpServers['open-brain'];
+
+  if (existing?.command === 'node' && existing.args?.[0]?.replace(/\\/g, '/') === serverPath) {
+    log(SKIP, 'Cursor open-brain MCP already registered \u2014 skipped');
+    return;
+  }
+
+  config.mcpServers['open-brain'] = {
+    command: 'node',
+    args: [OPEN_BRAIN_SERVER]
+  };
+
+  ensureDir(CURSOR_DIR);
+  fs.writeFileSync(mcpJsonPath, JSON.stringify(config, null, 2) + '\n');
+  log(OK, 'open-brain registered in ~/.cursor/mcp.json');
+}
+
+function registerCursorHooks() {
+  const hooksPath = path.join(CURSOR_DIR, 'hooks.json');
+  const bootstrapCmd = `node "${OPEN_BRAIN_BOOTSTRAP.replace(/\\/g, '/')}"`;
+
+  let config = { version: 1, hooks: {} };
+  if (fs.existsSync(hooksPath)) {
+    config = JSON.parse(fs.readFileSync(hooksPath, 'utf-8'));
+    if (!config.hooks) config.hooks = {};
+  }
+
+  if (!config.hooks.sessionStart) config.hooks.sessionStart = [];
+
+  const alreadyExists = config.hooks.sessionStart.some(entry =>
+    entry.command === bootstrapCmd ||
+    entry.command?.includes('cli-bootstrap.js')
+  );
+
+  if (alreadyExists) {
+    log(SKIP, 'Cursor sessionStart hook already configured \u2014 skipped');
+    return;
+  }
+
+  config.hooks.sessionStart.push({ command: bootstrapCmd });
+
+  ensureDir(CURSOR_DIR);
+  fs.writeFileSync(hooksPath, JSON.stringify(config, null, 2) + '\n');
+  log(OK, 'Cursor sessionStart hook registered in ~/.cursor/hooks.json');
+}
+
+function copyCursorSlashCommands() {
+  const destDir = path.join(CURSOR_DIR, 'commands');
+  const repoCommandsDir = path.join(REPO_ROOT, 'project-template', '.cursor', 'commands');
+
+  if (!fs.existsSync(repoCommandsDir)) {
+    log(SKIP, 'No project-template/.cursor/commands/ in repo \u2014 skipped');
+    return;
+  }
+
+  ensureDir(destDir);
+  let copied = 0;
+  for (const file of fs.readdirSync(repoCommandsDir)) {
+    if (!file.endsWith('.md')) continue;
+    const src = path.join(repoCommandsDir, file);
+    const dest = path.join(destDir, file);
+    if (copyFileIfChanged(src, dest)) copied++;
+  }
+
+  if (copied > 0) {
+    log(OK, `${copied} Cursor slash command(s) copied \u2192 ${destDir}`);
+  } else {
+    log(SKIP, 'Cursor slash commands already up to date \u2014 skipped');
   }
 }
 
@@ -273,6 +358,9 @@ function main() {
   registerMcpServer();
   registerHooks();
   copySlashCommands();
+  registerCursorMcp();
+  registerCursorHooks();
+  copyCursorSlashCommands();
   setupObsidianVault();
 
   console.log('');
@@ -280,7 +368,7 @@ function main() {
     console.log('Setup completed with errors. Review the output above.');
     process.exit(1);
   } else {
-    console.log('Setup complete! Restart Claude Code to activate the MCP server.');
+    console.log('Setup complete! Restart Claude Code and Cursor to activate MCP + hooks.');
   }
 }
 

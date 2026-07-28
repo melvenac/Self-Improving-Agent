@@ -1,58 +1,124 @@
 # Framework Guide
-**Version 1.0 — Portable Agent Architecture**
+**Version 1.1 — Portable Agent Architecture**
 
-> This document explains the framework, how to use it, and how to duplicate it for any project with any tech stack.
+> **Part of [Self-Improving Agent](https://github.com/melvenac/Self-Improving-Agent).** This file documents the **project-level** scaffold (`.agents/`). Session lifecycle and cross-project memory are handled by SIA globally — see [Two-Layer Model](#two-layer-model-sia--project) below.
 
 ---
 
 ## What Is This?
 
-This is an **AI-first development framework** — a structured set of markdown documents, workflows, and validation scripts that give AI coding agents (Cline, Claude Code, Gemini, Cursor, etc.) persistent memory, consistent behavior, and guardrails across sessions.
+This is the **project-level AI-first development framework** — structured markdown, skills, and validation scripts that give coding agents persistent **per-repo** context, consistent behavior, and guardrails across sessions.
 
-Without this framework, every AI session starts from zero. With it, agents:
-- Know what was built, what's broken, and what's next
+Without this scaffold, every AI session starts from zero on that project. With it, agents:
+- Know what was built, what's broken, and what's next **for this codebase**
 - Follow consistent coding standards
-- Don't repeat mistakes (gotchas are documented)
-- Update their own documentation as they work
-- Can be validated for protocol compliance
+- Don't repeat mistakes (gotchas are documented in `DECISIONS.md`)
+- Update project documentation as they work
+- Can be validated for protocol compliance (`validate:session`, `validate:entities`)
+
+**SIA adds cross-project learning on top** — experiences, skill emergence, and recall across all your repos.
 
 ---
 
-## Framework Architecture
+## Two-Layer Model (SIA + Project)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  SIA — install once (Self-Improving-Agent repo)              │
+│  ~/.claude/commands/  →  /start /end /sync /checkpoint …    │
+│  ~/.cursor/commands/  →  same protocol (Cursor Composer)     │
+│  SessionStart hooks  →  open-brain MCP bootstrap (both IDEs) │
+│  Obsidian vault  →  cross-project experiences & skills       │
+│  a2a-wrapper  →  optional hub-connected remote agents        │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ reads/writes on every session
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Project — copy per repo (this template's .agents/)          │
+│  SYSTEM/   →  PRD, SUMMARY, ENTITIES, RULES, DECISIONS…      │
+│  TASKS/    →  INBOX (live queue) + task.md (phase ledger)    │
+│  SESSIONS/ →  append-only session logs                       │
+│  skills/   →  stack-specific reusable patterns               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+| Layer | Location | Owns |
+|-------|----------|------|
+| **SIA (global)** | `~/.claude/`, open-brain, Obsidian | Session protocol, cross-project memory, skill-scan, health score |
+| **Framework (project)** | `.agents/` in each repo | Project truth, tasks, decisions, stack skills |
+
+**Slash commands do not live in the project.** Install them once:
+
+```bash
+git clone https://github.com/melvenac/Self-Improving-Agent.git
+cd Self-Improving-Agent && node scripts/setup.mjs
+```
+
+Restart Claude Code and Cursor. Commands appear globally in every project.
+
+### SIA feedback loop (cross-project)
+
+```
+RETRIEVAL (/start)  →  surface relevant experiences from vault
+DEVELOPMENT         →  agent works with project .agents/ context
+ACCUMULATION (/end) →  lessons flow back to open-brain + vault
+```
+
+### Agent entry points
+
+| Tool | Reads |
+|------|--------|
+| **Claude Code** | `CLAUDE.md` + global `/start` |
+| **Cursor** | `AGENTS.md` + `.agents/SYSTEM/SUMMARY.md` (no global hooks unless wired) |
+| **Cline** | `.clinerules/` + `.agents/` |
+| **Gemini** | Project `CLAUDE.md` or equivalent |
+
+---
+
+## Framework Architecture (Project Layer)
 
 ```
 .agents/                          ← Agent-readable project brain
-├── FRAMEWORK.md                  ← This file (how to use & duplicate)
+├── FRAMEWORK.md                  ← This file
 ├── SYSTEM/                       ← Project truth documents
 │   ├── PRD.md                    ← Product requirements
-│   ├── SUMMARY.md                ← Current state (overwritten each session)
+│   ├── SUMMARY.md                ← Current state (CURRENT STATE block overwritten each session)
 │   ├── ENTITIES.md               ← Data model documentation
 │   ├── DECISIONS.md              ← Architectural decision log
 │   ├── RULES.md                  ← Coding standards & conventions
 │   ├── TESTING.md                ← Testing strategy
 │   ├── RUNBOOK.md                ← Production operations
 │   └── SECURITY.md               ← Security audit checklist
-├── TASKS/                        ← Work tracking
-│   ├── INBOX.md                  ← Prioritized task backlog
-│   └── task.md                   ← Current sprint/focus
-├── SESSIONS/                     ← Session history
-│   ├── SESSION_TEMPLATE.md       ← Template for new sessions
-│   └── Session_N.md              ← Individual session logs
-└── skills/                       ← Reusable agent skills
-    ├── INDEX.md                  ← Skill registry
-    └── <skill-name>/SKILL.md    ← Individual skill instructions
+├── TASKS/
+│   ├── INBOX.md                  ← Live prioritized task queue (agents edit freely)
+│   └── task.md                   ← Phase completion ledger (append-only history)
+├── SESSIONS/                     ← Session history (append-only)
+│   ├── SESSION_TEMPLATE.md
+│   └── YYYY-MM-DD.md or Session_N.md
+├── skills/                       ← Stack-specific reusable patterns
+│   ├── INDEX.md
+│   └── <skill-name>/SKILL.md
+└── a2a/                          ← Optional: multi-agent mailbox (mature projects)
 
-.claude/commands/                 ← Slash commands (/start, /end, /sync, /task, /test, etc.)
-.claude/rules/                    ← Path-specific rules (loaded on file read)
-│   ├── frontend.md               ← Loaded when reading UI/component files
-│   ├── backend.md                ← Loaded when reading API/server files
-│   ├── database.md               ← Loaded when reading schema/migration files
-│   ├── testing.md                ← Loaded when reading test files
-│   └── agents.md                 ← Loaded when reading .agents/ files
-CLAUDE.md                         ← Claude Code entry point
+.claude/rules/                    ← Optional: path-triggered rules (Claude Code only)
+CLAUDE.md                         ← Project entry point for Claude Code
+AGENTS.md                         ← Project entry point for Cursor / other agents
 ```
 
-### The Three Layers
+**Not in the project:** `/start`, `/end`, `/sync` — global via SIA (`~/.claude/commands/`).
+
+### Optional SYSTEM docs (add as projects mature)
+
+| Doc | When to add |
+|-----|-------------|
+| `ARCHITECTURE.md` | Multi-component or non-obvious stack |
+| `DESIGN_SYSTEM.md` | UI-heavy apps |
+| `PAGES.md` | 20+ routes |
+| `MIGRATION.md` | One-shot data migrations |
+| `ENVIRONMENTS.md` | local / staging / prod env matrices |
+| `deploy.md` | Custom VPS or multi-stage cutover |
+
+### The Three Layers (within `.agents/`)
 
 | Layer | Purpose | Changes How Often |
 |---|---|---|
@@ -60,7 +126,7 @@ CLAUDE.md                         ← Claude Code entry point
 | **TASKS/** | What needs to be DONE | Every session |
 | **SESSIONS/** | What WAS done | Append-only log |
 
-**Skills** are reusable patterns. **Slash commands** (`/start`, `/end`, `/task`, `/test`) handle the session lifecycle.
+**Skills** are reusable patterns (create after repeating a workflow 3+ times). **Session lifecycle** is global SIA (`/start`, `/end`).
 
 ---
 
@@ -68,17 +134,28 @@ CLAUDE.md                         ← Claude Code entry point
 
 ### Phase 1: Scaffold (5 minutes)
 
-Copy the framework skeleton. Everything below is **tech-stack agnostic**:
+**With SIA (recommended):**
+
+```bash
+# One-time global setup
+git clone https://github.com/melvenac/Self-Improving-Agent.git
+cd Self-Improving-Agent && node scripts/setup.mjs
+
+# Per new project
+cp -r project-template/.agents /path/to/your-project/
+cp -r project-template/.claude/rules /path/to/your-project/.claude/   # optional
+cp project-template/CLAUDE.md /path/to/your-project/                   # customize
+```
+
+**Standalone (no SIA):** Copy `.agents/` only. You lose global `/start`/`/end`, open-brain recall, and cross-project skill emergence — but the project scaffold still works if agents manually read SUMMARY + INBOX.
 
 ```bash
 mkdir -p .agents/SYSTEM .agents/TASKS .agents/SESSIONS .agents/skills
-mkdir -p .claude/commands .claude/rules
 ```
 
-Copy these files **as-is** (they're universal):
+Copy these files **as-is**:
 - `.agents/SESSIONS/SESSION_TEMPLATE.md`
-- `.claude/commands/` (start, end, sync, task, test, skill-scan, transcript)
-- `.claude/rules/` (agents, backend, frontend, database, testing)
+- `.claude/rules/` (optional — Claude Code path-triggered rules)
 
 ### Phase 2: Write the PRD (30-60 minutes)
 
@@ -156,12 +233,12 @@ If your project has a data model documentation file (like ENTITIES.md), create a
 The framework is **90% tech-agnostic**. Here's what changes per stack:
 
 ### What's Universal (Copy As-Is)
-- Session lifecycle (start/end workflows)
-- SUMMARY.md structure
+- SUMMARY.md structure (CURRENT STATE block at top)
 - DECISIONS.md format
-- TASKS/ structure
+- TASKS/ structure (INBOX = live queue, task.md = phase ledger)
 - SESSION_TEMPLATE.md
-- SECURITY.md structure (customize the checklist items)
+- SECURITY.md structure (customize checklist items)
+- Session lifecycle **when SIA installed** — global `/start` and `/end`
 
 ### What's Tech-Specific (Must Customize)
 
@@ -215,15 +292,16 @@ The framework is **90% tech-agnostic**. Here's what changes per stack:
 
 ## The Session Lifecycle
 
-Every development session follows this pattern:
+With SIA installed, every development session follows this pattern. Commands live in `~/.claude/commands/` — not in the project repo.
 
 ```
-/start
-  ├── Read SUMMARY.md (current state)
-  ├── Read INBOX.md (priorities)
+/start  (global — ~/.claude/commands/start.md)
+  ├── open-brain recall (cross-project experiences)
+  ├── Read SUMMARY.md CURRENT STATE block
+  ├── Read INBOX.md (top priorities)
   ├── Read ENTITIES.md (if schema work)
-  ├── Create session log
-  ├── Run validate:session:pre
+  ├── Create session log in .agents/SESSIONS/
+  ├── Run validate:session:pre (if project has it)
   └── State objective → get approval → code
 
 ... development work ...
@@ -235,18 +313,21 @@ Every development session follows this pattern:
   ├── Fix loop (max 3 attempts per failure)
   └── Report → feeds into /end session summary
 
-/end
+/end  (global — ~/.claude/commands/end.md)
   ├── Update session log (accomplishments, files, gotchas)
-  ├── Update SUMMARY.md (current state block)
+  ├── Update SUMMARY.md CURRENT STATE block
   ├── Update DECISIONS.md (if applicable)
   ├── Update ENTITIES.md (if schema changed)
   ├── Run validate:entities (if schema changed)
   ├── Mark tasks done in INBOX.md
-  ├── Run validate:session:post
+  ├── Run validate:session:post (if project has it)
+  ├── open-brain accumulation (lessons → vault)
   └── Present summary to user
 ```
 
-This lifecycle is what gives agents **continuity across sessions**. Without it, every session is a cold start.
+**Cursor / IDE without global hooks:** Manually read SUMMARY → INBOX at start; update SUMMARY + INBOX + session log at end. Wire open-brain MCP for full SIA parity.
+
+This lifecycle gives agents **continuity across sessions**. Without `/end`, the next session is a cold start.
 
 ---
 
@@ -394,7 +475,9 @@ Glob patterns use standard glob syntax: `**` matches directories, `*` matches fi
 |---|---|---|
 | Writing all skills upfront | Skills without real usage are speculative and wrong | Create skills when you've repeated a pattern 3+ times |
 | Putting code in SYSTEM docs | SYSTEM docs are for agents to READ, not execute | Keep code in `src/scripts/`, reference from docs |
-| Skipping /end | Next session starts from zero, loses all context | Always run /end, even for short sessions |
+| Skipping /end | Next session starts from zero, loses all context | Always run /end (global command), even for short sessions |
+| Copying slash commands into each project | Drift across repos; 12KB end.md duplicated everywhere | Install SIA once; commands stay in ~/.claude/commands/ |
+| Confusing INBOX with task.md | Agents edit the wrong file | INBOX = live queue; task.md = append-only phase ledger |
 | Making SUMMARY.md too long | Agents waste tokens reading history | Archive old milestones, keep SUMMARY focused on NOW |
 | Tech-specific rules in universal docs | Makes the framework non-portable | Keep tech rules in RULES.md and skills, not in workflows |
 | One giant RULES.md | Too much to read every session | Split into `.claude/rules/` (path-triggered) + skills (on demand) |
@@ -404,18 +487,19 @@ Glob patterns use standard glob syntax: `**` matches directories, `*` matches fi
 ## Quick Start Checklist for a New Project
 
 ```markdown
-- [ ] Copy framework skeleton (mkdir + copy universal files)
+- [ ] Install SIA globally (node scripts/setup.mjs) OR accept standalone mode
+- [ ] Copy project-template/.agents/ into new repo
 - [ ] Write PRD.md (the foundation — spend time here)
 - [ ] Create ENTITIES.md from PRD data model section
 - [ ] Create RULES.md with tech-stack-specific coding standards
-- [ ] Uncomment relevant stack rules in `.claude/rules/` files
-- [ ] Create SUMMARY.md with initial project state
+- [ ] Uncomment relevant stack rules in `.claude/rules/` files (optional)
+- [ ] Create SUMMARY.md with initial CURRENT STATE block
 - [ ] Create empty DECISIONS.md
 - [ ] Create INBOX.md with initial task backlog from PRD
+- [ ] Create empty task.md phase ledger (or copy template)
 - [ ] Create skills/INDEX.md (empty table, fill as skills emerge)
-- [ ] Create session-manager skill (universal)
-- [ ] Wire up CLAUDE.md to point to .agents/
-- [ ] Start Session 1 with /start
+- [ ] Wire up CLAUDE.md + AGENTS.md to point to .agents/
+- [ ] Start Session 1 with /start (or manual SUMMARY + INBOX read)
 - [ ] Create first tech-specific skill after Session 2-3
 - [ ] Add validation scripts after Session 5+
 - [ ] Create TESTING.md after first feature ships
@@ -467,15 +551,18 @@ The key rule: **`/end` writes tracking data to META/. You manually edit SYSTEM/ 
 
 ## Versioning This Framework
 
-As you use this across projects, you'll improve it. Keep a "framework template" repo (like this one):
+The canonical template lives in the **[Self-Improving-Agent](https://github.com/melvenac/Self-Improving-Agent)** repo:
 
 ```
-ai-first-framework/
-├── .agents/           ← Universal skeleton (no project-specific content)
-├── .claude/           ← Slash commands and path-specific rules
-├── CLAUDE.md          ← Claude Code entry point template
-├── README.md          ← GitHub-facing onboarding guide
-└── .gitignore         ← Excludes META/, sessions, build artifacts
+Self-Improving-Agent/
+├── open-brain/              ← MCP server + session hooks
+├── scripts/setup.mjs        ← Installs global commands + hooks
+├── project-template/
+│   ├── .agents/             ← Copy this into new projects
+│   └── .claude/rules/       ← Optional path-triggered rules
+└── README.md                ← SIA setup guide
 ```
 
-Then for each new project: clone the repo, reset git history, write the PRD, and let the framework grow organically. See README.md for the step-by-step setup.
+**Per-project copies** (e.g. Makerspace) should keep a short `FRAMEWORK.md` stub pointing here — not a full duplicate of this file.
+
+When the framework evolves: update `project-template/.agents/FRAMEWORK.md` in SIA, bump version, run `/sync`. Individual projects inherit on next template sync or manually.

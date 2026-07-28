@@ -11,6 +11,11 @@ Thumbs.db
 /docs/
 CLAUDE.md
 
+# Runtime artifacts (session-local / regenerated)
+/.recalled-entries.json
+/open-brain/.agents/
+AGENTS.md
+
 # WIP — not ready for public repo yet
 /a2a-wrapper/
 .gitnexus

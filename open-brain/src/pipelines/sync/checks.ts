@@ -15,6 +15,18 @@ export const MIRROR_EXCEPTIONS: Record<string, string> = {
   "bootstrap.md": "template only — consumers scaffold with it, SIA does not",
 };
 
+/**
+ * The slash commands Cursor is meant to receive.
+ *
+ * Cursor deliberately gets the session-lifecycle subset, not every command:
+ * `bootstrap`, `skill-scan`, `task` and `test` are Claude Code workflows that
+ * have no Cursor equivalent. Declared here rather than left implicit, because a
+ * deliberate omission and a forgotten one are indistinguishable by looking at
+ * the directory — mirror parity only compares files present in both sides, so
+ * a command silently dropped from the template would never be flagged.
+ */
+export const CURSOR_COMMAND_SET = ["checkpoint.md", "end.md", "start.md", "sync.md"];
+
 export function syncReadmeVersion(
   version: string,
   projectRoot: string,
@@ -301,6 +313,21 @@ export function checkMirrorParity(projectRoot: string, home = homedir()): CheckR
   const problems: string[] = [];
   let compared = 0;
 
+  // The template's Cursor set is asserted against an explicit list, since the
+  // pairwise comparison below can only see files that exist on both sides.
+  if (existsSync(templateCursor)) {
+    const actual = readdirSync(templateCursor).filter((f) => f.endsWith(".md")).sort();
+    const expected = [...CURSOR_COMMAND_SET].sort();
+    for (const file of expected) {
+      if (!actual.includes(file)) problems.push(`template (.cursor): ${file} missing`);
+    }
+    for (const file of actual) {
+      if (!expected.includes(file)) {
+        problems.push(`template (.cursor): ${file} unexpected — add it to CURSOR_COMMAND_SET if intended`);
+      }
+    }
+  }
+
   for (const { label, a, b, required } of pairs) {
     const aExists = existsSync(a);
     const bExists = existsSync(b);
@@ -325,7 +352,13 @@ export function checkMirrorParity(projectRoot: string, home = homedir()): CheckR
       if (!inB) { problems.push(`${label}: ${file} missing from ${b}`); continue; }
 
       compared++;
-      if (readFileSync(join(a, file), "utf-8") !== readFileSync(join(b, file), "utf-8")) {
+      // Compare content, not bytes. A file copied on Windows picks up CRLF
+      // while the repo copy stays LF, which a byte-for-byte check reports as
+      // drift forever even though the two files say exactly the same thing.
+      // Trailing-newline differences are noise for the same reason.
+      const norm = (p: string) =>
+        readFileSync(p, "utf-8").replace(/\r\n/g, "\n").replace(/\s+$/, "");
+      if (norm(join(a, file)) !== norm(join(b, file))) {
         problems.push(`${label}: ${file} differs`);
       }
     }

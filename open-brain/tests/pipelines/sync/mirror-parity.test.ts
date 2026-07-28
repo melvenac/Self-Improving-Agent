@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { checkMirrorParity, MIRROR_EXCEPTIONS } from "../../../src/pipelines/sync/checks.js";
+import { checkMirrorParity, MIRROR_EXCEPTIONS, CURSOR_COMMAND_SET } from "../../../src/pipelines/sync/checks.js";
 
 describe("checkMirrorParity", () => {
   let root: string;
@@ -10,6 +10,7 @@ describe("checkMirrorParity", () => {
 
   const repoCmds = () => join(root, ".claude", "commands");
   const tmplCmds = () => join(root, "project-template", ".claude", "commands");
+  const cursorCmds = () => join(root, "project-template", ".cursor", "commands");
 
   beforeEach(() => {
     root = mkdtempSync(join(tmpdir(), "ob-mirror-root-"));
@@ -17,6 +18,8 @@ describe("checkMirrorParity", () => {
     home = mkdtempSync(join(tmpdir(), "ob-mirror-home-"));
     mkdirSync(repoCmds(), { recursive: true });
     mkdirSync(tmplCmds(), { recursive: true });
+    // .cursor is NOT created here: the Cursor set is only asserted when the
+    // template actually ships a .cursor dir, so consumers without one are fine.
   });
 
   afterEach(() => {
@@ -25,6 +28,7 @@ describe("checkMirrorParity", () => {
   });
 
   function write(dir: string, file: string, body: string) {
+    mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, file), body, "utf-8");
   }
 
@@ -35,6 +39,55 @@ describe("checkMirrorParity", () => {
     const result = checkMirrorParity(root, home);
     expect(result.severity).toBe("pass");
     expect(result.message).toContain("1 file comparison");
+  });
+
+  it("flags a Cursor command dropped from the template", () => {
+    // Pairwise comparison cannot catch this: if the file is absent from both
+    // the template and the live dir, there is nothing to compare.
+    write(cursorCmds(), "start.md", "# /start\n");
+    write(cursorCmds(), "end.md", "# /end\n");
+    write(cursorCmds(), "sync.md", "# /sync\n");
+    // checkpoint.md deliberately omitted
+
+    const result = checkMirrorParity(root, home);
+    expect(result.severity).toBe("issue");
+    expect(result.message).toContain("checkpoint.md missing");
+  });
+
+  it("flags an unexpected Cursor command so the set stays deliberate", () => {
+    for (const f of CURSOR_COMMAND_SET) write(cursorCmds(), f, `# ${f}\n`);
+    write(cursorCmds(), "skill-scan.md", "# /skill-scan\n");
+
+    const result = checkMirrorParity(root, home);
+    expect(result.severity).toBe("issue");
+    expect(result.message).toContain("skill-scan.md unexpected");
+  });
+
+  it("passes when the template carries exactly the declared Cursor set", () => {
+    for (const f of CURSOR_COMMAND_SET) write(cursorCmds(), f, `# ${f}\n`);
+    expect(checkMirrorParity(root, home).severity).toBe("pass");
+  });
+
+  it("tolerates CRLF vs LF — a copy made on Windows is not drift", () => {
+    write(repoCmds(), "sync.md", "# /sync\nsame content\n");
+    write(tmplCmds(), "sync.md", "# /sync\r\nsame content\r\n");
+
+    const result = checkMirrorParity(root, home);
+    expect(result.severity).toBe("pass");
+  });
+
+  it("tolerates a differing trailing newline", () => {
+    write(repoCmds(), "sync.md", "# /sync\nsame content\n\n");
+    write(tmplCmds(), "sync.md", "# /sync\nsame content");
+
+    expect(checkMirrorParity(root, home).severity).toBe("pass");
+  });
+
+  it("still flags a real difference that is not whitespace", () => {
+    write(repoCmds(), "sync.md", "# /sync\r\nrepo version\r\n");
+    write(tmplCmds(), "sync.md", "# /sync\ntemplate version\n");
+
+    expect(checkMirrorParity(root, home).severity).toBe("issue");
   });
 
   it("flags a file whose contents drifted", () => {
