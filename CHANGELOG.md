@@ -12,6 +12,8 @@
 - **Telemetry was written into a retired component's directory** — score history and the skill-invocation log lived under `~/.claude/knowledge-mcp/`, which is slated for deletion. Both moved to `~/.claude/open-brain/` (877 invocation entries and score history preserved).
 - **Windows test teardown raced intermittently** — `ENOTEMPTY` on recursive `rmSync` failed a different test on roughly half of runs. 14 teardown sites now pass `maxRetries`/`retryDelay`.
 
+- **Multi-word recall queries returned nothing** — FTS5 joins bare terms with AND, so `ob_recall(["knowledge maturity feedback loop"])` required all four terms in one entry and returned zero, while 86 entries matched some of them. `/start` instructs agents to use "methodology-focused" queries, which are exactly that shape, so the most common query form was the one that silently failed. `ob_recall` now retries with the terms OR-joined when the precise query returns fewer than `limit` results, keeping precise hits ranked first and labelling partial matches. Strictly additive — it can only fill empty slots, never displace an exact hit. Measured against the live database: `deterministic verification` 0 → 5, `test coverage strategy` 0 → 5.
+
 ### Added
 - **CI workflow** (`.github/workflows/ci.yml`) — Node 22, `npm ci` → typecheck → test. The repo had no CI, which is why 7 tests stayed red for 3.5 months.
 - **Root `npm test` / `build` / `typecheck` scripts** — the root `package.json` had no scripts, so `npm test` from the repo root was a no-op and tests only ran from `open-brain/`.

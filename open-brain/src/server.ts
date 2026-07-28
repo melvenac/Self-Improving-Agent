@@ -43,12 +43,27 @@ function getV2Db(): Database.Database {
 let _activeSessionId: string | null = null;
 const _recalledKnowledgeIds = new Set<number>();
 
-function sanitizeFtsQuery(query: string): string {
+export function sanitizeFtsQuery(query: string): string {
   return query
     .split(/\s+/)
     .filter(Boolean)
     .map((word) => `"${word.replace(/"/g, '""')}"`)
     .join(" ");
+}
+
+/**
+ * Same terms, OR-joined instead of the FTS5 default AND.
+ *
+ * Multi-word queries are conjunctive by default, so "knowledge maturity
+ * feedback loop" required all four terms in one entry and returned nothing —
+ * while the OR form matched 86 entries. The /start protocol asks agents for
+ * "methodology-focused" queries, which are exactly the multi-word shape that
+ * silently returned zero results.
+ */
+export function broadenFtsQuery(query: string): string | null {
+  const words = query.split(/\s+/).filter(Boolean);
+  if (words.length < 2) return null; // single term: AND and OR are identical
+  return words.map((word) => `"${word.replace(/"/g, '""')}"`).join(" OR ");
 }
 
 // --- Exported handler functions (testable without MCP transport) ---
@@ -358,9 +373,10 @@ server.tool(
     const results: string[] = [];
 
     for (const query of queries) {
-      const safeQuery = sanitizeFtsQuery(query);
-
-      let sql = `
+      // Build the query once; only the MATCH expression differs between the
+      // precise (AND) attempt and the broadened (OR) fallback.
+      const buildSql = () => {
+        let sql = `
         SELECT
           k.id, k.key, k.content, k.tags, k.source, k.project_dir,
           k.maturity, k.success_rate,
@@ -372,35 +388,66 @@ server.tool(
         WHERE knowledge_fts MATCH ?
         AND k.archived_into IS NULL
       `;
-      const params: unknown[] = [safeQuery];
+        const params: unknown[] = [];
 
-      if (!globalSearch && normalizedProject) {
-        sql += ` AND (k.project_dir IS NULL OR k.project_dir LIKE ?)`;
-        params.push(`%${normalizedProject}%`);
-      }
-
-      if (tags && tags.length > 0) {
-        for (const tag of tags) {
-          sql += ` AND k.tags LIKE ?`;
-          params.push(`%${tag}%`);
+        if (!globalSearch && normalizedProject) {
+          sql += ` AND (k.project_dir IS NULL OR k.project_dir LIKE ?)`;
+          params.push(`%${normalizedProject}%`);
         }
-      }
 
-      sql += ` ORDER BY weighted_rank LIMIT ?`;
-      params.push(limit);
+        if (tags && tags.length > 0) {
+          for (const tag of tags) {
+            sql += ` AND k.tags LIKE ?`;
+            params.push(`%${tag}%`);
+          }
+        }
+
+        sql += ` ORDER BY weighted_rank LIMIT ?`;
+        params.push(limit);
+        return { sql, params };
+      };
+
+      type RecallRow = {
+        id: number; key: string | null; content: string; tags: string | null;
+        source: string; project_dir: string | null; maturity: string;
+        success_rate: number | null; snippet: string; created_at: string;
+        weighted_rank: number;
+      };
+
+      const run = (matchExpr: string): RecallRow[] => {
+        const { sql, params } = buildSql();
+        return v2db.prepare(sql).all(matchExpr, ...params) as RecallRow[];
+      };
 
       try {
-        const rows = v2db.prepare(sql).all(...params) as Array<{
-          id: number; key: string | null; content: string; tags: string | null;
-          source: string; project_dir: string | null; maturity: string;
-          success_rate: number | null; snippet: string; created_at: string;
-          weighted_rank: number;
-        }>;
+        let rows = run(sanitizeFtsQuery(query));
+
+        // Precision first, recall second: a multi-word query is conjunctive in
+        // FTS5, so an exact-match miss is common and used to surface as "no
+        // results" even when dozens of entries matched most of the terms.
+        // Only widens when the precise query underfilled — never removes a hit.
+        let broadened = false;
+        if (rows.length < limit) {
+          const orQuery = broadenFtsQuery(query);
+          if (orQuery) {
+            const seen = new Set(rows.map((r) => r.id));
+            for (const row of run(orQuery)) {
+              if (rows.length >= limit) break;
+              if (seen.has(row.id)) continue;
+              seen.add(row.id);
+              rows.push(row);
+              broadened = true;
+            }
+          }
+        }
 
         results.push(`## ${query}`);
         if (rows.length === 0) {
           results.push("No results found.\n");
           continue;
+        }
+        if (broadened) {
+          results.push("_(some results matched only part of the query)_");
         }
 
         // Track recall hits
