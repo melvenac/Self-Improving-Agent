@@ -24,8 +24,13 @@ export function runHealthChecks(homePath: string): HealthCheckResult {
   const vaultPath = join(homePath, "Obsidian Vault");
   if (existsSync(join(vaultPath, ".git"))) {
     try {
-      const lastCommit = execSync(`git -C "${vaultPath}" log -1 --format=%ct 2>/dev/null`, {
+      // Suppress git's stderr via stdio, not a `2>/dev/null` redirect: execSync
+      // runs through cmd.exe on Windows, where /dev/null is not a path, so the
+      // redirect printed "The system cannot find the path specified." on every
+      // SessionStart while failing to suppress anything.
+      const lastCommit = execSync(`git -C "${vaultPath}" log -1 --format=%ct`, {
         encoding: "utf-8",
+        stdio: ["ignore", "pipe", "ignore"],
       }).trim();
       if (lastCommit) {
         const hoursAgo = (Date.now() - parseInt(lastCommit) * 1000) / (1000 * 60 * 60);
