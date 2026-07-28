@@ -13,7 +13,7 @@ describe("runSync", () => {
   });
 
   afterEach(() => {
-    rmSync(tempDir, { recursive: true, force: true });
+    rmSync(tempDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
   });
 
   it("runs all checks and returns structured result", () => {

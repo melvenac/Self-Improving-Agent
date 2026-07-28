@@ -8,12 +8,14 @@ import {
   checkChangelog,
   checkReadmeRefs,
   checkHookConfigs,
+  checkHookRegistration,
   checkSummary,
   checkClaudeMd,
   checkObsidianVault,
   checkTemplate,
   checkSpecProvenance,
   checkRules,
+  checkMirrorParity,
 } from "./checks.js";
 
 export function runSync(options: SyncOptions): SyncResult {
@@ -33,12 +35,14 @@ export function runSync(options: SyncOptions): SyncResult {
   checks.push(checkChangelog(version, options.projectRoot));
   checks.push(checkReadmeRefs(options.projectRoot));
   checks.push(checkHookConfigs(paths.settingsJson));
+  checks.push(checkHookRegistration(paths.settingsJson));
   checks.push(checkSummary(version, options.projectRoot));
   checks.push(checkClaudeMd(options.projectRoot));
   checks.push(checkObsidianVault(paths.obsidianVault));
   checks.push(checkTemplate(options.projectRoot));
-  checks.push(checkSpecProvenance(options.projectRoot, paths.knowledgeDb));
+  checks.push(checkSpecProvenance(options.projectRoot));
   checks.push(checkRules(options.projectRoot));
+  checks.push(checkMirrorParity(options.projectRoot));
 
   const fixed = checks.filter((c) => c.severity === "fixed");
   const issues = checks.filter((c) => c.severity === "issue");

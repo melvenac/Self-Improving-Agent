@@ -6,7 +6,6 @@ import { rmSync } from "node:fs";
 import {
   syncReadmeVersion,
   syncPrdVersion,
-  syncKmcpVersion,
   checkChangelog,
   checkClaudeMd,
   checkTemplate,
@@ -15,8 +14,8 @@ import {
   checkReadmeRefs,
   checkHookConfigs,
   checkSummary,
-  checkInstalledDrift,
   checkSpecProvenance,
+  resolveDocPath,
 } from "../../../src/pipelines/sync/checks.js";
 
 const fixturesDir = join(import.meta.dirname, "../../fixtures");
@@ -30,7 +29,7 @@ describe("version sync checks", () => {
   });
 
   afterEach(() => {
-    rmSync(tempDir, { recursive: true, force: true });
+    rmSync(tempDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
   });
 
   describe("syncReadmeVersion", () => {
@@ -93,33 +92,6 @@ describe("version sync checks", () => {
     });
   });
 
-  describe("syncKmcpVersion", () => {
-    it("detects knowledge-mcp version mismatch and fixes it", () => {
-      const result = syncKmcpVersion("0.6.0", tempDir, false);
-      expect(result.severity).toBe("fixed");
-      const kmcp = JSON.parse(
-        readFileSync(join(tempDir, "knowledge-mcp", "package.json"), "utf-8")
-      );
-      expect(kmcp.version).toBe("0.6.0");
-    });
-
-    it("passes when versions match", () => {
-      const result = syncKmcpVersion("0.5.0", tempDir, false);
-      expect(result.severity).toBe("pass");
-    });
-
-    it("reports mismatch without fixing in check-only mode", () => {
-      const result = syncKmcpVersion("0.6.0", tempDir, true);
-      expect(result.severity).toBe("issue");
-      const kmcp = JSON.parse(readFileSync(join(tempDir, "knowledge-mcp", "package.json"), "utf-8"));
-      expect(kmcp.version).toBe("0.5.0");
-    });
-
-    it("warns when knowledge-mcp/package.json is missing", () => {
-      const result = syncKmcpVersion("0.6.0", join(tempDir, "nonexistent"), false);
-      expect(result.severity).toBe("warn");
-    });
-  });
 });
 
 describe("validation checks", () => {
@@ -131,7 +103,7 @@ describe("validation checks", () => {
   });
 
   afterEach(() => {
-    rmSync(tempDir, { recursive: true, force: true });
+    rmSync(tempDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
   });
 
   describe("checkChangelog", () => {
@@ -273,23 +245,88 @@ describe("validation checks", () => {
     });
   });
 
-  describe("checkInstalledDrift", () => {
-    it("passes when there are no source files to compare", () => {
-      const result = checkInstalledDrift(join(tempDir, "nonexistent"), tmpdir(), true);
-      expect(result.severity).toBe("pass");
+  describe("syncPrdVersion formats", () => {
+    it("matches a bolded label with a v-prefixed version", () => {
+      mkdirSync(join(tempDir, ".agents", "SYSTEM"), { recursive: true });
+      writeFileSync(
+        join(tempDir, ".agents", "SYSTEM", "PRD.md"),
+        "| Field | Value |\n|---|---|\n| **Version** | v0.7.1 |\n"
+      );
+
+      expect(syncPrdVersion("0.7.1", tempDir, true).severity).toBe("pass");
+    });
+
+    it("preserves bolding and the v-prefix when auto-fixing", () => {
+      mkdirSync(join(tempDir, ".agents", "SYSTEM"), { recursive: true });
+      const prd = join(tempDir, ".agents", "SYSTEM", "PRD.md");
+      writeFileSync(prd, "| **Version** | v0.6.0 |\n");
+
+      const result = syncPrdVersion("0.7.1", tempDir, false);
+
+      expect(result.severity).toBe("fixed");
+      expect(readFileSync(prd, "utf-8")).toContain("| **Version** | v0.7.1 |");
+    });
+
+    it("still handles the plain unbolded style", () => {
+      mkdirSync(join(tempDir, ".agents", "SYSTEM"), { recursive: true });
+      const prd = join(tempDir, ".agents", "SYSTEM", "PRD.md");
+      writeFileSync(prd, "| Version | 0.6.0 |\n");
+
+      expect(syncPrdVersion("0.7.1", tempDir, false).severity).toBe("fixed");
+      expect(readFileSync(prd, "utf-8")).toContain("| Version | 0.7.1 |");
+    });
+  });
+
+  describe("resolveDocPath", () => {
+    it("prefers .agents/SYSTEM/ over docs/ and the repo root", () => {
+      mkdirSync(join(tempDir, ".agents", "SYSTEM"), { recursive: true });
+      mkdirSync(join(tempDir, "docs"), { recursive: true });
+      writeFileSync(join(tempDir, ".agents", "SYSTEM", "PRD.md"), "system\n");
+      writeFileSync(join(tempDir, "docs", "PRD.md"), "docs\n");
+      writeFileSync(join(tempDir, "PRD.md"), "root\n");
+
+      expect(resolveDocPath(tempDir, "PRD.md")).toBe(
+        join(tempDir, ".agents", "SYSTEM", "PRD.md")
+      );
+    });
+
+    it("falls back to docs/ when .agents/SYSTEM/ has no copy", () => {
+      mkdirSync(join(tempDir, "docs"), { recursive: true });
+      writeFileSync(join(tempDir, "docs", "RULES.md"), "docs\n");
+
+      expect(resolveDocPath(tempDir, "RULES.md")).toBe(join(tempDir, "docs", "RULES.md"));
+    });
+
+    it("falls back to the repo root as the last resort", () => {
+      writeFileSync(join(tempDir, "RULES.md"), "root\n");
+
+      expect(resolveDocPath(tempDir, "RULES.md")).toBe(join(tempDir, "RULES.md"));
+    });
+
+    it("returns null when the document exists nowhere", () => {
+      expect(resolveDocPath(tempDir, "NOPE.md")).toBeNull();
+    });
+  });
+
+  describe("checkRules", () => {
+    it("passes when RULES.md lives in .agents/SYSTEM/", () => {
+      mkdirSync(join(tempDir, ".agents", "SYSTEM"), { recursive: true });
+      writeFileSync(join(tempDir, ".agents", "SYSTEM", "RULES.md"), "# Rules\n");
+
+      expect(checkRules(tempDir).severity).toBe("pass");
     });
   });
 
   describe("checkSpecProvenance", () => {
     it("warns when specs/ directory is missing", () => {
-      const result = checkSpecProvenance(tempDir, "");
+      const result = checkSpecProvenance(tempDir);
       expect(result.severity).toBe("warn");
     });
 
     it("passes when specs/ directory exists", () => {
       mkdirSync(join(tempDir, "specs"), { recursive: true });
       writeFileSync(join(tempDir, "specs", "example.md"), "# Spec\n");
-      const result = checkSpecProvenance(tempDir, "");
+      const result = checkSpecProvenance(tempDir);
       expect(result.severity).toBe("pass");
     });
   });

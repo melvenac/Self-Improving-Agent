@@ -13,7 +13,7 @@ describe("readProjectState", () => {
   });
 
   afterEach(() => {
-    rmSync(tempDir, { recursive: true, force: true });
+    rmSync(tempDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
   });
 
   it("detects project mode when .agents/ exists", () => {
@@ -23,7 +23,7 @@ describe("readProjectState", () => {
   });
 
   it("detects lightweight mode when .agents/ is absent", () => {
-    rmSync(join(tempDir, ".agents"), { recursive: true, force: true });
+    rmSync(join(tempDir, ".agents"), { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
     const state = readProjectState(tempDir);
     expect(state.mode).toBe("lightweight");
     expect(state.hasAgents).toBe(false);

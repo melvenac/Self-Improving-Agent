@@ -24,7 +24,7 @@ describe('store pipeline', () => {
 
   afterEach(() => {
     db.close();
-    rmSync(vaultDir, { recursive: true, force: true });
+    rmSync(vaultDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
   });
 
   it('writes vault file AND indexes in SQLite', () => {

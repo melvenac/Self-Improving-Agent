@@ -18,12 +18,14 @@ import {
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { sessionStart } from "./pipelines/session-start/index.js";
-import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2 } from "./db-v2.js";
+import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
+import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
+import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
 import { readJson } from "./shared/fs-utils.js";
 import { slugify, writeExperience } from "./vault-writer.js";
-import { evaluateLifecycle, maturityBoost, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
+import { evaluateLifecycle, recallRankExpr, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
 import type { CategoryScore, ScoreResult } from "./pipelines/sync/types.js";
 
 // --- V2 Database singleton ---
@@ -91,6 +93,10 @@ export async function handleSync(args: {
         const pct = Math.round((cat.score / cat.max) * 100);
         lines.push(`  ${cat.name}: ${cat.score}/${cat.max} (${pct}%)`);
       }
+      // /sync --score is the route actually used in practice; without this the
+      // trend history silently stopped collecting (no entries Apr–Jul 2026).
+      appendScore(resolvePaths(projectRoot).scoreHistory, scoreResult);
+      lines.push(`\nAppended to score history.`);
     }
 
     return { content: [{ type: "text", text: lines.join("\n") }] };
@@ -312,8 +318,24 @@ server.tool(
   },
   async ({ session_id, project_dir }) => {
     _activeSessionId = session_id;
+
+    // Persist as well as hold in memory: an in-memory-only registration left no
+    // record to verify against after the session ended, which is why the
+    // SESSION_UUID wiring had to be checked by hand every time.
+    let persisted = false;
+    try {
+      recordSession(getV2Db(), session_id, canonicalizeProjectDir(project_dir));
+      persisted = true;
+    } catch {
+      // Registration must not fail the session if the DB is unavailable.
+    }
+
     return {
-      content: [{ type: "text" as const, text: `Session registered: ${session_id}${project_dir ? ` (${project_dir})` : ""}` }],
+      content: [{
+        type: "text" as const,
+        text: `Session registered: ${session_id}${project_dir ? ` (${project_dir})` : ""}`
+          + (persisted ? "" : " — warning: not persisted to the sessions table"),
+      }],
     };
   }
 );
@@ -344,7 +366,7 @@ server.tool(
           k.maturity, k.success_rate,
           snippet(knowledge_fts, 1, '>>', '<<', '...', 128) as snippet,
           k.created_at,
-          (bm25(knowledge_fts) * (1.0 + MAX(0, julianday('now') - julianday(k.created_at)) * 0.005)) as weighted_rank
+          ${recallRankExpr("k")} as weighted_rank
         FROM knowledge_fts
         JOIN knowledge_index k ON k.id = knowledge_fts.rowid
         WHERE knowledge_fts MATCH ?
@@ -389,7 +411,8 @@ server.tool(
           updateRecall.run(row.id);
           _recalledKnowledgeIds.add(row.id);
 
-          const boost = maturityBoost((row.maturity || "progenitor") as Maturity, row.success_rate);
+          // Maturity and recency are applied in weighted_rank (see recallRankExpr),
+          // so ordering is already correct here — nothing further to compute.
           const idTag = ` (id: ${row.id})`;
           results.push(`### [stored knowledge] ${row.key || row.source}${idTag}`);
           results.push(`Session: ${row.created_at} | Project: ${row.project_dir || "unknown"}`);
@@ -695,70 +718,39 @@ server.tool(
 
     const id = Number(result.lastInsertRowid);
 
+    // Session provenance: knowledge_index has no session column, so link the
+    // artifact to its producing session here. Stores the vault path, not a
+    // second copy of the text — the vault file stays the source of truth.
+    const sessionUuid = session_id ?? _activeSessionId;
+    let linkedToSession = false;
+    if (sessionUuid) {
+      try {
+        const sessionRowId = recordSession(v2db, sessionUuid, normalizedProject);
+        recordChunk(v2db, sessionRowId, category, vaultPath, { key, knowledge_index_id: id, phase });
+        linkedToSession = true;
+      } catch {
+        // Provenance is additive — never fail the store because of it.
+      }
+    }
+
     return {
       content: [{
         type: "text" as const,
-        text: `${category === "checkpoint" ? "Checkpoint" : "Chunk"} stored (id: ${id}):\n  Key: ${key}\n  Vault: ${vaultPath}\n  Tags: ${[category, ...tags || []].join(", ")}`,
+        text: `${category === "checkpoint" ? "Checkpoint" : "Chunk"} stored (id: ${id}):\n  Key: ${key}\n  Vault: ${vaultPath}\n  Tags: ${[category, ...tags || []].join(", ")}`
+          + (linkedToSession ? `\n  Session: ${sessionUuid}` : ""),
       }],
     };
   }
 );
 
 // --- Shared scoring logic ---
-export function computeScore(projectRoot: string, checks: import("./pipelines/sync/types.js").CheckResult[]): ScoreResult {
-  const paths = resolvePaths(projectRoot);
-  const configScore = scoreConfigStructure(checks);
-
-  // Read domain tags from domains.json
-  const domainsPath = join(projectRoot, ".agents", "SYSTEM", "domains.json");
-  let domainTags: string[] = [];
-  if (existsSync(domainsPath)) {
-    try {
-      const domains = JSON.parse(readFileSync(domainsPath, "utf-8"));
-      domainTags = domains.domains ?? domains.tags ?? [];
-    } catch { /* ignore */ }
-  }
-
-  // Read skill proposal counts from vault
-  const vaultPath = join(homedir(), "Obsidian Vault");
-  let skillsImplemented = 0;
-  let proposalClusters = 0;
-  const candidatesPath = join(vaultPath, "Skill-Candidates", "SKILL-CANDIDATES.md");
-  const skillIndexPath = join(vaultPath, "Skill-Candidates", "SKILL-INDEX.md");
-  if (existsSync(candidatesPath)) {
-    const content = readFileSync(candidatesPath, "utf-8");
-    proposalClusters = (content.match(/### \S+ \(\d+ experiences?\)/g) || []).length;
-  }
-  if (existsSync(skillIndexPath)) {
-    const content = readFileSync(skillIndexPath, "utf-8");
-    skillsImplemented = (content.match(/has skill/g) || []).length;
-  }
-
-  const v2db = getV2Db();
-  const qualityStats = getKnowledgeQualityStats(v2db);
-  const qualityScore = scoreKnowledgeQuality(qualityStats);
-  const stalenessScore = scoreStaleness(getStalenessStats(v2db));
-  const coverageRaw = getCoverageStatsV2(v2db, domainTags);
-  coverageRaw.skillsImplemented = skillsImplemented;
-  coverageRaw.proposalClusters = proposalClusters;
-  const coverageScore = scoreCoverage(coverageRaw);
-
-  const historyEntries = readHistory(paths.scoreHistory);
-  const trend = calculateTrend(historyEntries);
-  const healthScore = scorePipelineHealth({
-    lastHookRun: null, scoreTrend: trend, lastShadowRecall: null,
-  });
-
-  const categories: CategoryScore[] = [
-    configScore, qualityScore, stalenessScore, coverageScore, healthScore,
-  ];
-  const total = categories.reduce((sum, c) => sum + c.score, 0);
-
-  return {
-    total,
-    categories,
-    date: new Date().toISOString().split("T")[0],
-  };
+// The implementation lives in pipelines/sync/score.ts so the CLI uses the same
+// one. This wrapper just supplies the server's open v2 database handle.
+export function computeScore(
+  projectRoot: string,
+  checks: import("./pipelines/sync/types.js").CheckResult[],
+): ScoreResult {
+  return computeScoreShared(projectRoot, checks, getV2Db());
 }
 
 // --- Server startup (only when run directly, not when imported) ---

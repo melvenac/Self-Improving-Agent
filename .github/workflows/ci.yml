@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node 22 LTS — v24 breaks the Smart Connections Obsidian plugin, so the
+      # project pins 22 everywhere to keep local and CI on the same runtime.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: open-brain/package-lock.json
+
+      - name: Install
+        working-directory: open-brain
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: open-brain
+        run: npx tsc --noEmit
+
+      - name: Test
+        working-directory: open-brain
+        run: npm test

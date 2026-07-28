@@ -24,3 +24,19 @@ Run the ob_sync tool to ensure all downstream files match the authoritative sour
 - After bumping version in package.json
 - After updating CHANGELOG.md
 - When `/end` runs
+
+## Doc sync map
+
+Authoritative sources → downstream consumers:
+
+```
+package.json (version)  ──→ README.md, PRD.md
+CHANGELOG.md (features) ──→ README.md (manual — script flags missing entries)
+SUMMARY.md (status)     ──→ Referenced by /start, not auto-synced
+```
+
+Run `/sync` (calls `ob_sync`) to detect drift without fixing.
+
+## Protocol health
+
+`ob_score` or `ob_sync --score` — deterministic 0-100 health score across 5 categories (config, knowledge quality, staleness, coverage, pipeline health). Score auto-appends to history. `ob_score --history_only` shows trend.

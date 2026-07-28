@@ -46,7 +46,42 @@ function projectFromDir(dir: string | null): string {
 
 // ─── Core ───────────────────────────────────────────────────────────────────
 
-const INVOCATION_LOG_PATH = join(homedir(), ".claude", "knowledge-mcp", "skill-invocations.jsonl");
+const INVOCATION_LOG_PATH = join(homedir(), ".claude", "open-brain", "skill-invocations.jsonl");
+
+/**
+ * Timestamp of the most recent logged invocation, or null if the log is missing
+ * or unreadable. This is the SessionEnd pipeline's own write marker, so it is
+ * the most direct evidence available that the hook actually ran — used by the
+ * Pipeline Health score, which previously hardcoded null and could never score.
+ *
+ * Scans all entries rather than trusting the last line: entries are appended per
+ * session and backfill can write older sessions after newer ones.
+ */
+export function readLastInvocationTs(logPath: string = INVOCATION_LOG_PATH): string | null {
+  if (!existsSync(logPath)) return null;
+  try {
+    const lines = readFileSync(logPath, "utf8").split("\n").filter(Boolean);
+    let newest: number | null = null;
+    let newestRaw: string | null = null;
+    for (const line of lines) {
+      try {
+        const ts = (JSON.parse(line) as Partial<InvocationEntry>).ts;
+        if (!ts) continue;
+        const parsed = new Date(ts).getTime();
+        if (Number.isNaN(parsed)) continue;
+        if (newest === null || parsed > newest) {
+          newest = parsed;
+          newestRaw = ts;
+        }
+      } catch {
+        // Skip malformed lines rather than failing the whole score.
+      }
+    }
+    return newestRaw;
+  } catch {
+    return null;
+  }
+}
 const SESSIONS_DB_DIR = join(homedir(), ".claude", "context-mode", "sessions");
 
 /**

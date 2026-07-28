@@ -13,7 +13,7 @@ describe("findNextSessionNumber", () => {
   });
 
   afterEach(() => {
-    rmSync(tempDir, { recursive: true, force: true });
+    rmSync(tempDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
   });
 
   it("returns 1 when no session logs exist", () => {
@@ -43,7 +43,7 @@ describe("createSessionLog", () => {
   });
 
   afterEach(() => {
-    rmSync(tempDir, { recursive: true, force: true });
+    rmSync(tempDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
   });
 
   it("creates a session log file with filled metadata", () => {

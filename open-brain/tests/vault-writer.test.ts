@@ -20,7 +20,7 @@ function makeTmp(): string {
 
 afterEach(() => {
   for (const d of tmpDirs) {
-    rmSync(d, { recursive: true, force: true });
+    rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
   }
   tmpDirs = [];
 });

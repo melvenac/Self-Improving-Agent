@@ -3,6 +3,11 @@
   "version": "0.7.1",
   "type": "module",
   "description": "AI development environment that learns across sessions — memory protocol, automation hooks, and multi-agent coordination",
+  "scripts": {
+    "test": "npm --prefix open-brain test",
+    "build": "npm --prefix open-brain run build",
+    "typecheck": "npm --prefix open-brain run typecheck"
+  },
   "dependencies": {
     "better-sqlite3": "^11.0.0"
   }

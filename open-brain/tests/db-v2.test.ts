@@ -48,7 +48,26 @@ describe('db-v2 schema', () => {
     expect(columns).toContain('neutral');
     expect(columns).toContain('recall_count');
     expect(columns).toContain('last_recalled_at');
-    expect(columns).not.toContain('content'); // Content lives in vault, not DB
+
+    // `content` is required here, despite the vault being the source of truth
+    // for knowledge content. knowledge_fts is an external-content FTS5 table
+    // (content=knowledge_index, content_rowid=id) and its sync triggers read
+    // new.content / old.content — SQLite refuses to drop the column while they
+    // exist. Removing it would break the FTS index, searchFts, and ob_recall.
+    // This assertion was inverted until v0.6.0 made FTS content-backed.
+    expect(columns).toContain('content');
+  });
+
+  it('keeps knowledge_fts wired to knowledge_index as external content', () => {
+    initSchemaV2(db);
+
+    const sql = db
+      .prepare(`SELECT sql FROM sqlite_master WHERE name = 'knowledge_fts'`)
+      .get() as { sql: string };
+
+    // Guards the coupling that makes the `content` column mandatory above.
+    expect(sql.sql).toContain('content=knowledge_index');
+    expect(sql.sql).toContain('content_rowid=id');
   });
 
   it('creates FTS5 index for keyword search', () => {

@@ -12,6 +12,16 @@ export const LIFECYCLE_CONFIG = {
   matureMinHelpful: 7,
   /** Minimum success rate to advance maturity */
   advanceMinSuccessRate: 0.5,
+  /** Recall ranking multiplier for mature entries */
+  matureBoost: 1.5,
+  /** Recall ranking multiplier for proven entries */
+  provenBoost: 1.2,
+  /** Recall ranking penalty for entries below the apoptosis threshold */
+  lowSuccessPenalty: 0.5,
+  /** Per-day recency decay applied to recall ranking */
+  recencyDecayPerDay: 0.005,
+  /** Recall ranking multiplier for entries tagged 'failure' */
+  failureBoost: 1.3,
 } as const;
 
 export type Maturity = "progenitor" | "proven" | "mature";
@@ -85,13 +95,47 @@ export function evaluateLifecycle(
  */
 export function maturityBoost(maturity: Maturity, successRate: number | null): number {
   let boost = 1.0;
-  if (maturity === "mature") boost = 1.5;
-  else if (maturity === "proven") boost = 1.2;
+  if (maturity === "mature") boost = LIFECYCLE_CONFIG.matureBoost;
+  else if (maturity === "proven") boost = LIFECYCLE_CONFIG.provenBoost;
 
   // Penalty for low success rate (but not yet at apoptosis)
   if (successRate !== null && successRate < LIFECYCLE_CONFIG.apoptosisThreshold) {
-    boost *= 0.5;
+    boost *= LIFECYCLE_CONFIG.lowSuccessPenalty;
   }
 
   return boost;
+}
+
+/**
+ * SQL ranking expression for ob_recall, built from LIFECYCLE_CONFIG so the
+ * query and maturityBoost() cannot drift apart.
+ *
+ * bm25() is NEGATIVE and more-negative means a better match, and the query
+ * sorts ASCENDING. So a factor that should IMPROVE rank must make the value
+ * more negative (multiply), and a factor that should DEMOTE must make it less
+ * negative (divide).
+ */
+export function recallRankExpr(alias = "k"): string {
+  const c = LIFECYCLE_CONFIG;
+  const maturity =
+    `(CASE ${alias}.maturity ` +
+    `WHEN 'mature' THEN ${c.matureBoost} ` +
+    `WHEN 'proven' THEN ${c.provenBoost} ` +
+    `ELSE 1.0 END)`;
+  const penalty =
+    `(CASE WHEN ${alias}.success_rate IS NOT NULL ` +
+    `AND ${alias}.success_rate < ${c.apoptosisThreshold} ` +
+    `THEN ${c.lowSuccessPenalty} ELSE 1.0 END)`;
+  // Exact tag-token match: normalize "a, b, failure" to ",a,b,failure," so we
+  // match ",failure," and not substrings like "failures" or "no-failure".
+  const failure =
+    `(CASE WHEN ',' || REPLACE(COALESCE(${alias}.tags, ''), ' ', '') || ',' ` +
+    `LIKE '%,failure,%' THEN ${c.failureBoost} ELSE 1.0 END)`;
+  const ageDays = `MAX(0, julianday('now') - julianday(${alias}.created_at))`;
+  const recency = `(1.0 + ${ageDays} * ${c.recencyDecayPerDay})`;
+
+  // Divide by the recency term: older entries get a larger divisor, pulling the
+  // (negative) score toward zero so they sort later. Multiplying here — as the
+  // original expression did — inverted this and promoted stale knowledge.
+  return `(bm25(knowledge_fts) * ${maturity} * ${penalty} * ${failure} / ${recency})`;
 }

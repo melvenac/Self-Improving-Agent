@@ -24,7 +24,7 @@ describe("discoverSessionUuid", () => {
   });
 
   afterEach(() => {
-    rmSync(tempHome, { recursive: true, force: true });
+    rmSync(tempHome, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
   });
 
   it("finds the newest UUID-shaped JSONL file", () => {

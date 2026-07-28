@@ -17,7 +17,7 @@ beforeEach(() => {
 
 afterEach(() => {
   db.close();
-  fs.rmSync(tmpDir, { recursive: true, force: true });
+  fs.rmSync(tmpDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
 });
 
 function seedKnowledge(tag: string, count: number): void {

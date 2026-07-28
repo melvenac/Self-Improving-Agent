@@ -13,7 +13,7 @@ describe("sessionStart", () => {
   });
 
   afterEach(() => {
-    rmSync(tempDir, { recursive: true, force: true });
+    rmSync(tempDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
   });
 
   it("returns project state with correct mode", () => {
@@ -53,7 +53,7 @@ describe("sessionStart", () => {
   });
 
   it("skips session log creation in lightweight mode", () => {
-    rmSync(join(tempDir, ".agents"), { recursive: true, force: true });
+    rmSync(join(tempDir, ".agents"), { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
     const result = sessionStart({ projectRoot: tempDir, homePath: tempDir });
     expect(result.state.mode).toBe("lightweight");
     expect(result.session.logPath).toBe("");

@@ -25,14 +25,12 @@ export interface ResolvedPaths {
   readme: string;
   changelog: string;
   claudeMd: string;
-  prd: string;
-  knowledgeMcpPackageJson: string;
   settingsJson: string;
   obsidianVault: string;
   knowledgeDb: string;
+  knowledgeV2Db: string;
   scoreHistory: string;
   projectTemplate: string;
-  hooksDir: string;
 }
 
 export function resolvePaths(projectRoot: string): ResolvedPaths {
@@ -43,13 +41,18 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {
     readme: join(projectRoot, "README.md"),
     changelog: join(projectRoot, "CHANGELOG.md"),
     claudeMd: join(projectRoot, "CLAUDE.md"),
-    prd: join(projectRoot, "docs", "PRD.md"),
-    knowledgeMcpPackageJson: join(projectRoot, "knowledge-mcp", "package.json"),
     settingsJson: join(home, ".claude", "settings.json"),
     obsidianVault: join(home, "Obsidian Vault"),
+    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring
+    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2
+    // is tracked separately — do not repoint this without migrating that caller,
+    // which expects the v1 schema via createDb().
     knowledgeDb: join(home, ".claude", "context-mode", "knowledge.db"),
-    scoreHistory: join(home, ".claude", "knowledge-mcp", "score-history.jsonl"),
+    // The live v2 database. Both the MCP server and the CLI score against this;
+    // they previously read different databases and reported different scores.
+    knowledgeV2Db: process.env.KNOWLEDGE_V2_DB
+      || join(home, ".claude", "open-brain", "knowledge-v2.db"),
+    scoreHistory: join(home, ".claude", "open-brain", "score-history.jsonl"),
     projectTemplate: join(projectRoot, "project-template"),
-    hooksDir: join(projectRoot, "knowledge-mcp", "scripts"),
   };
 }

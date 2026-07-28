@@ -338,3 +338,85 @@ export function getClusterCandidates(db: Database.Database): ClusterCandidate[] 
     .filter(([, count]) => count >= 3)
     .map(([tag, count]) => ({ tag, count }));
 }
+
+// ─── Session provenance ─────────────────────────────────────────────────────
+// The sessions and chunks tables shipped in the v2 schema but nothing ever
+// wrote to them, so there was no persisted record of which session produced
+// what. That is why verifying the SESSION_UUID wiring required watching a live
+// session by hand — there was nothing to inspect afterwards.
+
+export interface SessionRow {
+  id: number;
+  uuid: string;
+  project_dir: string;
+  started_at: string;
+  ended_at: string | null;
+  event_count: number;
+}
+
+/**
+ * Register a session, returning its row id. Idempotent: calling it again for
+ * the same uuid updates the project_dir (which may arrive later than the uuid)
+ * rather than creating a duplicate.
+ */
+export function recordSession(
+  db: Database.Database,
+  uuid: string,
+  projectDir: string | null,
+): number {
+  const now = new Date().toISOString();
+  // project_dir is NOT NULL in the schema; callers may legitimately not know it.
+  const dir = projectDir ?? 'unknown';
+
+  db.prepare(`
+    INSERT INTO sessions (uuid, project_dir, started_at)
+    VALUES (?, ?, ?)
+    ON CONFLICT(uuid) DO UPDATE SET
+      project_dir = CASE
+        WHEN excluded.project_dir != 'unknown' THEN excluded.project_dir
+        ELSE sessions.project_dir
+      END
+  `).run(uuid, dir, now);
+
+  const row = db.prepare(`SELECT id FROM sessions WHERE uuid = ?`).get(uuid) as { id: number };
+  return row.id;
+}
+
+export function getSessionByUuid(db: Database.Database, uuid: string): SessionRow | undefined {
+  return db.prepare(`SELECT * FROM sessions WHERE uuid = ?`).get(uuid) as SessionRow | undefined;
+}
+
+/**
+ * Link an artifact to the session that produced it. knowledge_index has no
+ * session column, so this table is what makes "what did session X produce?"
+ * answerable. `content` holds a pointer (vault path) rather than a second copy
+ * of the text — the vault file remains the source of truth.
+ */
+export function recordChunk(
+  db: Database.Database,
+  sessionId: number,
+  category: string,
+  content: string,
+  metadata: Record<string, unknown> = {},
+): number {
+  const now = new Date().toISOString();
+  const info = db.prepare(`
+    INSERT INTO chunks (session_id, category, content, metadata, created_at)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(sessionId, category, content, JSON.stringify(metadata), now);
+
+  db.prepare(`UPDATE sessions SET event_count = event_count + 1 WHERE id = ?`).run(sessionId);
+  return info.lastInsertRowid as number;
+}
+
+export function getChunksForSession(db: Database.Database, uuid: string): Array<{
+  id: number; category: string; content: string; metadata: string; created_at: string;
+}> {
+  return db.prepare(`
+    SELECT c.id, c.category, c.content, c.metadata, c.created_at
+    FROM chunks c
+    JOIN sessions s ON s.id = c.session_id
+    WHERE s.uuid = ?
+    ORDER BY c.created_at
+  `).all(uuid) as Array<{ id: number; category: string; content: string; metadata: string; created_at: string }>;
+}

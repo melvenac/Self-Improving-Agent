@@ -1,5 +1,35 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- **`ob_recall` ranked older entries higher, not newer** — the weighted rank multiplied `bm25()` (negative, more-negative = better) by a factor that *grew* with age, so every day an entry aged it gained ~0.5% ranking advantage and at 200 days its score doubled. Documented as "recency-weighted BM25" since v0.3.0; it was anti-recency weighted. Now divides by the age term. Measured on the live 315-entry database, average age of top-5 results dropped from 123d to 44d.
+- **Maturity boost was computed and discarded** — `server.ts` called `maturityBoost()` into a variable that was never read, and the SQL `ORDER BY` never referenced maturity. The 1.5x/1.2x boosts had never applied to a real recall. Maturity, the low-success-rate penalty, and the 1.3x failure boost are now part of the ranking expression, so they affect selection rather than just display order.
+- **PRD and RULES checks could never pass** — `syncPrdVersion` and `checkRules` hardcoded `docs/` and the repo root while the framework convention (and `checkSummary`) use `.agents/SYSTEM/`. The PRD drifted three versions unnoticed because the drift detector was looking in the wrong place. New `resolveDocPath()` resolves `.agents/SYSTEM/` → `docs/` → root. The version pattern now tolerates `| **Version** | v0.7.1 |` as well as `| Version | 0.7.1 |`, preserving the author's style when auto-fixing.
+- **Pipeline Health could not score above 3/10** — `lastHookRun` and `lastShadowRecall` were hardcoded `null` at both call sites, and nothing has written shadow-recall data since the v1→v2 port. Hook recency now reads the SessionEnd pipeline's own write marker; the dead shadow component was removed and its points redistributed.
+- **`ob_sync --score` never recorded history** — only `ob_score` appended, so the trend stopped collecting in April despite `/sync` being the route in actual use.
+- **CLI and MCP server reported different health scores** for the same repo — the CLI scored against the retired v1 `knowledge.db` (frozen since April) while the server used v2. `computeScore` now lives in `pipelines/sync/score.ts` and both call it.
+- **Telemetry was written into a retired component's directory** — score history and the skill-invocation log lived under `~/.claude/knowledge-mcp/`, which is slated for deletion. Both moved to `~/.claude/open-brain/` (877 invocation entries and score history preserved).
+- **Windows test teardown raced intermittently** — `ENOTEMPTY` on recursive `rmSync` failed a different test on roughly half of runs. 14 teardown sites now pass `maxRetries`/`retryDelay`.
+
+### Added
+- **CI workflow** (`.github/workflows/ci.yml`) — Node 22, `npm ci` → typecheck → test. The repo had no CI, which is why 7 tests stayed red for 3.5 months.
+- **Root `npm test` / `build` / `typecheck` scripts** — the root `package.json` had no scripts, so `npm test` from the repo root was a no-op and tests only ran from `open-brain/`.
+- **`checkMirrorParity`** — byte-for-byte parity across repo, template, and live `~/.claude` + `~/.cursor` command directories, with `MIRROR_EXCEPTIONS` documenting each intentional non-mirror. Distribution drift recurred across 12 sessions because parity was only ever checked by eye.
+- **`checkHookRegistration`** — counts hook registrations per event and flags duplicates. A duplicate SessionStart entry made the bootstrap hook emit `SESSION_UUID` twice.
+- **Session provenance** — `recordSession`, `recordChunk`, `getSessionByUuid`, `getChunksForSession`. The `sessions` and `chunks` tables shipped in the v2 schema but nothing ever wrote to them, so `ob_set_session` only held the UUID in memory and there was no record to verify after a session ended. This is why SESSION_UUID verification stayed manual across 10 sessions.
+- **Contract tests for `cli-bootstrap.ts`** — the most repeatedly-fixed file in the repo had no tests. Five tests assert the SESSION_UUID emission contract against the real entry point.
+- **Ranking regression tests** — recency, maturity, success-rate penalty, exact failure-tag matching, and TS/SQL agreement, generated from one `LIFECYCLE_CONFIG` so the SQL and `maturityBoost()` cannot drift.
+
+### Removed
+- **`src/pipelines/recall/`** — `recall()` and `mergeAndRank()` were never imported by anything. The module held the only implementation of the semantic/keyword hybrid and failure boost, appeared in the architecture map as a cohesion-1.0 cluster, and had passing tests — for code that never ran. The failure boost was ported into the live ranking expression.
+- **5 orphaned tests** in `checks.test.ts` for `syncKmcpVersion` and `checkInstalledDrift`, deleted from `src/` in April but left behind in tests.
+- **Dead `paths.ts` keys** (`prd`, `knowledgeMcpPackageJson`, `hooksDir`) and the unused `dbPath` parameter on `checkSpecProvenance`.
+
+### Changed
+- **PRD reconciled against the code** — version corrected to v0.7.1, retired `knowledge-mcp`/`sqlite-vec` references removed, the expired "v1/v2 parallel until May 13" claim corrected, and a "Not currently implemented" section added naming four documented-but-absent features (semantic/keyword hybrid, RRF, cosine diversity filter, vector search).
+- **Working cadence guidance** added to `RUNBOOK.md`.
+
 ## [v0.7.1] - 2026-07-27
 
 ### Fixed

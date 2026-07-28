@@ -69,51 +69,33 @@ if (command === "sync") {
   if (score) {
     const paths = resolvePaths(projectRoot);
     const { existsSync } = await import("node:fs");
-    const configScore = scoreConfigStructure(result.checks);
 
-    // Try to use real DB queries; fall back to zeros if DB missing
-    let qualityScore, stalenessScore, coverageScore;
-    if (existsSync(paths.knowledgeDb)) {
-      const { createDb } = await import("./db.js");
-      const db = createDb(paths.knowledgeDb);
-      try {
-        qualityScore = scoreKnowledgeQuality(db.getKnowledgeStats());
-        stalenessScore = scoreStaleness(db.getStalenessStats());
-        coverageScore = scoreCoverage(db.getCoverageStats(10));
-      } finally {
-        db.close();
-      }
-    } else {
-      qualityScore = scoreKnowledgeQuality({
-        helpful: 0, harmful: 0, neutral: 0,
-        totalEntries: 0, ratedEntries: 0, duplicateClusters: 0,
-      });
-      stalenessScore = scoreStaleness({
-        staleRatio: 0, lowSuccessCount: 0,
-        summarizedSessions: 0, eligibleSessions: 0,
-      });
-      coverageScore = scoreCoverage({
-        domainsWithEntries: 0, totalDomains: 0,
-        matureCount: 0, provenCount: 0, totalEntries: 0,
-        skillsImplemented: 0, proposalClusters: 0,
-      });
+    // Score against the same v2 database the MCP server uses. This path used to
+    // open the retired v1 knowledge.db, so `open-brain sync --score` and
+    // `ob_score` reported different totals for the same repo.
+    const { computeScore } = await import("./pipelines/sync/score.js");
+    const { openV2Database } = await import("./db-v2.js");
+
+    if (!existsSync(paths.knowledgeV2Db)) {
+      console.error(`Knowledge database not found at ${paths.knowledgeV2Db} — cannot score.`);
+      process.exit(1);
     }
 
-    const historyEntries = readHistory(paths.scoreHistory);
-    const trend = calculateTrend(historyEntries);
-    const healthScore = scorePipelineHealth({
-      lastHookRun: null, scoreTrend: trend, lastShadowRecall: null,
-    });
+    const v2db = openV2Database(paths.knowledgeV2Db);
+    let computed: ScoreResult;
+    try {
+      computed = computeScore(projectRoot, result.checks, v2db);
+    } finally {
+      v2db.close();
+    }
 
-    const categories: CategoryScore[] = [
-      configScore, qualityScore, stalenessScore, coverageScore, healthScore,
-    ];
-    const total = categories.reduce((sum, c) => sum + c.score, 0);
+    const categories: CategoryScore[] = computed.categories;
+    const total = computed.total;
 
     const scoreResult: ScoreResult = {
       total,
       categories,
-      date: new Date().toISOString().split("T")[0],
+      date: computed.date,
     };
 
     if (scoreJson) {
