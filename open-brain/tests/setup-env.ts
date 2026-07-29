@@ -18,3 +18,12 @@ const stateDir = mkdtempSync(join(tmpdir(), "open-brain-test-state-"));
 process.env.OPEN_BRAIN_SCORE_HISTORY = join(stateDir, "score-history.jsonl");
 process.env.OPEN_BRAIN_SHADOW_LOG = join(stateDir, "shadow-recall.jsonl");
 process.env.OPEN_BRAIN_ACTIVE_SESSION = join(stateDir, "active-session.json");
+
+// The v2 DB was the one piece of state still left pointing at $HOME, which made
+// the suite environment-dependent in both directions: on a machine with a real
+// ~/.claude/open-brain/ the score tests read production stats (Knowledge Quality
+// could push the total past 100), and on one without it — a CI runner, a fresh
+// clone — better-sqlite3 threw "Cannot open database because the directory does
+// not exist" and four tests in server.test.ts failed. server.ts reads this at
+// import time, so it must be set here rather than inside a test.
+process.env.KNOWLEDGE_V2_DB = join(stateDir, "knowledge-v2.db");

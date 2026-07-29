@@ -1,4 +1,6 @@
 import Database from 'better-sqlite3';
+import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { canonicalizeProjectDir } from './shared/paths.js';
 
 export function migrateProjectDirToCanonical(db: Database.Database): number {
@@ -126,6 +128,12 @@ export function initSchemaV2(db: Database.Database): void {
 }
 
 export function openV2Database(dbPath: string): Database.Database {
+  // better-sqlite3 creates the file but not its parent, so on a machine where
+  // ~/.claude/open-brain/ does not exist yet — a fresh clone of the template, a
+  // CI runner — every caller died with "Cannot open database because the
+  // directory does not exist" on the first ob_* call. Nothing else in the repo
+  // creates this directory. Recursive mkdir is a no-op once it exists.
+  mkdirSync(dirname(dbPath), { recursive: true });
   const db = new Database(dbPath);
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');

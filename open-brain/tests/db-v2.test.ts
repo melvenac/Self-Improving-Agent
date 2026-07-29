@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Database from 'better-sqlite3';
+import { mkdtempSync, rmSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { tmpdir } from 'node:os';
 import {
+  openV2Database,
   initSchemaV2,
   indexKnowledge,
   searchFts,
@@ -243,5 +247,53 @@ describe('query helpers', () => {
     expect(tagMap['typescript']).toBe(4);
     expect(tagMap['testing']).toBeUndefined(); // only 2, below threshold
     expect(tagMap['python']).toBeUndefined();  // only 2, below threshold
+  });
+});
+
+describe('openV2Database first-run', () => {
+  let tmp: string;
+
+  beforeEach(() => {
+    tmp = mkdtempSync(join(tmpdir(), 'ob-dbv2-'));
+  });
+
+  afterEach(() => {
+    try { rmSync(tmp, { recursive: true }); } catch { /* Windows race */ }
+  });
+
+  it('creates the parent directory instead of throwing', () => {
+    // The v0.8.1 first-run failure: better-sqlite3 creates the file but not the
+    // directory, and nothing in the repo creates ~/.claude/open-brain/.
+    const dbPath = join(tmp, 'does-not-exist-yet', 'knowledge-v2.db');
+    expect(existsSync(dirname(dbPath))).toBe(false);
+
+    const db = openV2Database(dbPath);
+    try {
+      expect(existsSync(dbPath)).toBe(true);
+      // Schema init must have run against the newly created file.
+      const tables = db
+        .prepare("SELECT name FROM sqlite_master WHERE type='table'")
+        .all()
+        .map((r: any) => r.name);
+      expect(tables).toContain('knowledge_index');
+    } finally {
+      db.close();
+    }
+  });
+
+  it('is a no-op when the directory already exists', () => {
+    const dbPath = join(tmp, 'knowledge-v2.db');
+    const first = openV2Database(dbPath);
+    indexKnowledge(first, { vaultPath: '/vault/a.md', key: 'a', tags: 'testing', content: 'a' });
+    first.close();
+
+    // Reopening must not clobber the existing file.
+    const second = openV2Database(dbPath);
+    try {
+      const row = second.prepare('SELECT COUNT(*) as c FROM knowledge_index').get() as { c: number };
+      expect(row.c).toBe(1);
+    } finally {
+      second.close();
+    }
   });
 });

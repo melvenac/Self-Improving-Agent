@@ -66,8 +66,9 @@ describe("server handlers", () => {
       db.insertKnowledge("test entry about auth", { key: "auth-test", tags: ["auth"] });
       db.close();
 
-      // handleEnd will open its own DB — but it uses resolvePaths which points to ~/.claude/context-mode/knowledge.db
-      // So for this test, we test the dry_run with no recalled entries (no DB access needed)
+      // handleEnd opens its own DB at $KNOWLEDGE_V2_DB, which setup-env.ts points
+      // at a temp dir — so this exercises the dry-run path against a scratch DB,
+      // not the one created above and not the real ~/.claude one.
       const res = await handleEnd({
         project_root: tmp,
         dry_run: true,
@@ -122,7 +123,8 @@ describe("server handlers", () => {
 
       const res = await handleScore({ project_root: tmp, history_only: true });
       const text = getText(res);
-      // May find real history from ~/.claude/ or report empty — both are valid
+      // Reads the redirected history from setup-env.ts — empty unless an earlier
+      // test in this worker appended, so both outcomes are valid.
       expect(text).toMatch(/Score History|No score history found/);
     });
   });
@@ -136,9 +138,10 @@ describe("server handlers", () => {
       ];
 
       const result = computeScore(tmp, checks);
-      // Total may exceed 100 if real ~/.claude/context-mode/knowledge.db has inflated stats
-      // The important thing is it doesn't crash and returns all 5 categories
+      // Scores against the empty temp DB from setup-env.ts, so the total is
+      // bounded — it used to read production stats and could exceed 100.
       expect(result.total).toBeGreaterThanOrEqual(0);
+      expect(result.total).toBeLessThanOrEqual(100);
       expect(result.categories).toHaveLength(5);
       expect(result.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
 
@@ -157,12 +160,11 @@ describe("server handlers", () => {
       }
     });
 
-    it("uses real DB stats when knowledge.db exists", () => {
+    it("falls back to zeros when the DB has no knowledge entries", () => {
       writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "1.0.0" }));
 
-      // Create DB at the path computeScore will look for
-      // Since computeScore uses resolvePaths which hardcodes ~/.claude/context-mode/knowledge.db,
-      // we can't easily redirect it. But we can verify the fallback path works.
+      // setup-env.ts points $KNOWLEDGE_V2_DB at an empty temp DB, so this is the
+      // no-entries path: Knowledge Quality must degrade to a score, not throw.
       const checks = [
         { name: "test", severity: "pass" as const, message: "ok" },
       ];

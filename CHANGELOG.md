@@ -1,5 +1,20 @@
 # Changelog
 
+## [v0.8.2] - 2026-07-28
+
+The CI workflow added in v0.8.1 failed on its first and only run. The four failures were real, but they were failures of the test harness rather than of the code under test: the suite could only pass on a machine that already had a populated `~/.claude`. Chasing that surfaced the same assumption in shipped code — the server could not open its own database on a machine where the directory did not exist yet, which is every fresh clone of this template.
+
+### Fixed
+- **First run on a machine without `~/.claude/open-brain/` crashed.** `openV2Database` called `new Database(dbPath)` directly; better-sqlite3 creates the database file but not its parent directory, and nothing in `scripts/`, `setup.mjs`, or the server created that directory. Anyone cloning the template hit `Cannot open database because the directory does not exist` on their first `ob_*` call, with no indication of what to create. `openV2Database` now does a recursive `mkdirSync` on the parent — a no-op once it exists, so no existing install changes behaviour. Verified against a bare `$USERPROFILE`: the directory is created and `computeScore` returns 57/100 where it previously threw.
+- **Four `server.test.ts` tests depended on the developer's home directory.** `server.ts` resolves the v2 database at import time from `$KNOWLEDGE_V2_DB || ~/.claude/open-brain/knowledge-v2.db`, and `tests/setup-env.ts` redirected score history, the shadow log, and the active-session slot but not the database. On a GitHub runner that directory does not exist, so better-sqlite3 threw `Cannot open database because the directory does not exist` and `handleEnd`, `handleSync --score`, and both `computeScore` tests failed. The redirect now covers the database as well.
+- **The same coupling read production data on developer machines.** With the DB resolving to the real `~/.claude/open-brain/knowledge-v2.db`, the score tests were scoring against live Knowledge Quality stats — the test file's own comment conceded the total "may exceed 100". Scoring now runs against an empty temp DB and the total is asserted within `[0, 100]`, which the old path could not guarantee.
+- **Comments in `server.test.ts` documented the removed coupling as permanent** ("we can't easily redirect it"), and one test named for behaviour it never exercised — it asserted the no-entries fallback, not real DB stats. Both corrected.
+
+### Added
+- **Two `openV2Database` first-run tests** — that a missing parent directory is created and the schema initialises against the new file, and that reopening an existing database does not clobber it. The first would have failed before this release; nothing covered the open path itself, only in-memory databases.
+
+Verified by running the full suite against a bare `$USERPROFILE`, which reproduces the runner: 455 tests across 35 files, all passing. Note that `HOME` alone does not work for this on Windows — `os.homedir()` reads `USERPROFILE`.
+
 ## [v0.8.1] - 2026-07-28
 
 v0.8.0 claimed Cursor support that had never once been executed. Verifying it end to end — a Claude Code session and a Cursor session working the same repo simultaneously — found that Cursor sessions recorded no provenance at all, and surfaced two further bugs that degrade Claude Code as well.
