@@ -19,6 +19,22 @@ export function canonicalizeProjectDir(p?: string | null): string | null {
   return result;
 }
 
+/**
+ * The live Obsidian vault. Single source of truth — every caller imports this
+ * instead of re-joining the literal.
+ *
+ * The v2 rebuild was a clean slate, not a migration, so both vaults still exist
+ * on disk with near-identical names. Code that hard-coded the old name kept
+ * resolving to the abandoned v1 directory: session captures landed in v2 while
+ * the health check looked for them in v1, so SessionStart reported "session-end
+ * may be failing" on every launch for months while the pipeline was healthy.
+ * Keeping the string in one place is what makes that class of bug impossible
+ * rather than merely fixed.
+ */
+export function obsidianVaultDir(home: string = homedir()): string {
+  return process.env.OPEN_BRAIN_VAULT_DIR || join(home, "Obsidian Vault v2");
+}
+
 export interface ResolvedPaths {
   projectRoot: string;
   packageJson: string;
@@ -44,7 +60,7 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {
     changelog: join(projectRoot, "CHANGELOG.md"),
     claudeMd: join(projectRoot, "CLAUDE.md"),
     settingsJson: join(home, ".claude", "settings.json"),
-    obsidianVault: join(home, "Obsidian Vault"),
+    obsidianVault: obsidianVaultDir(home),
     // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring
     // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2
     // is tracked separately — do not repoint this without migrating that caller,

@@ -13,9 +13,10 @@ import { join } from "path";
 import { homedir } from "os";
 import { openV2Database } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
+import { obsidianVaultDir } from "./shared/paths.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
-const V2_VAULT = join(homedir(), "Obsidian Vault v2");
+const V2_VAULT = obsidianVaultDir();
 
 try {
   if (!existsSync(V2_DB)) {

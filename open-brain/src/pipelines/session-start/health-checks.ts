@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "fs";
 import { join } from "path";
 import { execSync } from "child_process";
+import { obsidianVaultDir } from "../../shared/paths.js";
 
 export interface HealthWarning {
   category: string;
@@ -21,7 +22,7 @@ export function runHealthChecks(homePath: string): HealthCheckResult {
   let pendingSkillProposals = 0;
 
   // 1. Obsidian backup freshness
-  const vaultPath = join(homePath, "Obsidian Vault");
+  const vaultPath = obsidianVaultDir(homePath);
   if (existsSync(join(vaultPath, ".git"))) {
     try {
       // Suppress git's stderr via stdio, not a `2>/dev/null` redirect: execSync
@@ -44,41 +45,62 @@ export function runHealthChecks(homePath: string): HealthCheckResult {
     } catch { /* git not available */ }
   }
 
-  // 2. Vault-writer health — check if recent sessions are being captured
-  const sessionsDbDir = join(homePath, ".claude", "context-mode", "sessions");
-  const vaultSessionsDir = join(vaultPath, "Sessions");
-  if (existsSync(sessionsDbDir) && existsSync(vaultSessionsDir)) {
+  // 2. Vault-writer health — is the most recent session actually being captured?
+  //
+  // This keyed off context-mode session .db filenames matched against a
+  // Sessions/ folder. Neither is how v2 works: captures are written to
+  // Summaries/ with the session UUID in frontmatter, and v2 has no Sessions/
+  // directory at all. The old shape therefore reported a permanent false
+  // "session-end may be failing", and once the vault path was corrected it
+  // silently stopped running instead — an existsSync guard over a directory
+  // that never exists is a check that can only ever pass.
+  //
+  // Session identity here is the transcript UUID under ~/.claude/projects.
+  const transcriptsDir = join(homePath, ".claude", "projects");
+  const summariesDir = join(vaultPath, "Summaries");
+  if (existsSync(transcriptsDir)) {
     try {
-      const dbFiles = readdirSync(sessionsDbDir).filter((f) => f.endsWith(".db"));
-      let newestDb: string | null = null;
+      let newestSession: string | null = null;
       let newestMtime = 0;
-      for (const f of dbFiles) {
-        const s = statSync(join(sessionsDbDir, f));
-        if (s.mtimeMs > newestMtime) {
-          newestMtime = s.mtimeMs;
-          newestDb = f;
+      for (const projectDir of readdirSync(transcriptsDir)) {
+        const full = join(transcriptsDir, projectDir);
+        let files: string[];
+        try {
+          files = readdirSync(full).filter((f) => f.endsWith(".jsonl"));
+        } catch { continue; }
+        for (const f of files) {
+          const s = statSync(join(full, f));
+          if (s.mtimeMs > newestMtime) {
+            newestMtime = s.mtimeMs;
+            newestSession = f.replace(/\.jsonl$/, "");
+          }
         }
       }
 
-      if (newestDb) {
-        const vaultFiles = readdirSync(vaultSessionsDir).filter((f) => f.endsWith(".md"));
-        let found = false;
-        for (const vf of vaultFiles) {
-          try {
-            const content = readFileSync(join(vaultSessionsDir, vf), "utf-8").slice(0, 500);
-            if (content.includes(newestDb)) {
-              found = true;
-              break;
-            }
-          } catch { /* skip */ }
-        }
+      const hoursStale = (Date.now() - newestMtime) / (1000 * 60 * 60);
 
-        if (!found) {
-          const hoursStale = (Date.now() - newestMtime) / (1000 * 60 * 60);
-          if (hoursStale > 1) {
+      // The current session is still open and has no summary yet by definition,
+      // so only judge a transcript once it has gone quiet for an hour.
+      if (newestSession && hoursStale > 1) {
+        if (!existsSync(summariesDir)) {
+          warnings.push({
+            category: "pipeline",
+            message: `vault has no Summaries/ directory at ${summariesDir} — session captures cannot be verified.`,
+          });
+        } else {
+          let found = false;
+          for (const sf of readdirSync(summariesDir).filter((f) => f.endsWith(".md"))) {
+            try {
+              if (readFileSync(join(summariesDir, sf), "utf-8").slice(0, 500).includes(newestSession)) {
+                found = true;
+                break;
+              }
+            } catch { /* skip unreadable */ }
+          }
+          if (!found) {
             warnings.push({
               category: "pipeline",
-              message: `session-end may be failing — session ${newestDb} (${Math.round(hoursStale)}h old) has no Obsidian capture.`,
+              message: `session-end may be failing — session ${newestSession} (${Math.round(hoursStale)}h old) has no Obsidian capture.`,
             });
           }
         }

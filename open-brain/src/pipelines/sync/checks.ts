@@ -202,7 +202,10 @@ export function checkObsidianVault(vaultPath: string): CheckResult {
   if (!existsSync(vaultPath)) {
     return { name: "obsidian-vault", severity: "warn", message: `Vault directory not found: ${vaultPath}` };
   }
-  const expectedDirs = ["Experiences", "Sessions", "Skill-Candidates", "Summaries"];
+  // "Sessions" was a v1 folder. v2 records each session as a note in Summaries/
+  // with the session UUID in frontmatter, so requiring Sessions/ warned on every
+  // sync against a correctly-shaped vault.
+  const expectedDirs = ["Experiences", "Skill-Candidates", "Summaries"];
   const missing = expectedDirs.filter((d) => !existsSync(join(vaultPath, d)));
   if (missing.length > 0) {
     return { name: "obsidian-vault", severity: "warn", message: `Vault missing directories: ${missing.join(", ")}` };

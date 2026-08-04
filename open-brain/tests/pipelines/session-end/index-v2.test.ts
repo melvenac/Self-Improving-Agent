@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import Database from "better-sqlite3";
 import * as fs from "fs";
 import * as os from "os";
@@ -44,6 +44,15 @@ describe("sessionEndV2", () => {
     db = makeDb();
     vaultDir = makeTempDir();
     agentsDir = makeTempDir();
+    // The skill-scan stage resolves the vault from the environment rather than
+    // from the vaultDir argument, so without this it writes SKILL-CANDIDATES.md
+    // into the real vault whenever the suite runs. Same reason score-history and
+    // shadow-log carry env overrides — see shared/paths.ts.
+    process.env.OPEN_BRAIN_VAULT_DIR = vaultDir;
+  });
+
+  afterEach(() => {
+    delete process.env.OPEN_BRAIN_VAULT_DIR;
   });
 
   it("writes session summary to vault Summaries/ dir", () => {

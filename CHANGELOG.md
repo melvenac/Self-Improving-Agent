@@ -1,5 +1,18 @@
 # Changelog
 
+## [v0.8.3] - 2026-08-03
+
+The v2 rebuild was a clean slate rather than a migration, so two vault directories have existed side by side since April with near-identical names. Six code sites re-joined the vault path as a string literal, and they did not agree on which vault they meant: session captures were written to v2 while the health checks looked for them in v1. Every SessionStart therefore reported `session-end may be failing` against a pipeline that was working correctly, and the recommended response to that warning — investigate session-end — led away from the actual fault every time.
+
+Consolidating the path onto one accessor made three further faults visible, each of which had been masked by a check that could only ever pass.
+
+### Fixed
+- **The vault path existed as a literal in six places across two different vaults.** `cli-session-end.ts` and `server.ts` resolved v2; `health-checks.ts`, `skill-scan-runner.ts`, `sync/score.ts`, and `paths.ts` resolved v1. All six now call `obsidianVaultDir()`, the sole remaining occurrence of the string, with an `OPEN_BRAIN_VAULT_DIR` override in the style of the existing score-history and shadow-log redirects. Startup warnings went from two — both false — to zero.
+- **The skill scan read 1 of 399 experiences.** `runSkillScanPipeline` used a flat `readdirSync`, which was correct for v1's flat `Experiences/` but not for v2, which files notes under a project subdirectory. Pointing the scan at v2 therefore reported "0 clusters", indistinguishable from a healthy scan finding nothing worth clustering. The walk is now recursive: 118 clusters where the flat read found none. Covered by `skill-scan-runner.test.ts` against both layouts.
+- **The session-capture health check could not fail.** It matched context-mode session `.db` filenames against a `Sessions/` folder. v2 has no `Sessions/` folder and identifies sessions by transcript UUID, so the `existsSync` guard skipped the whole check — silently, which is how a permanent false positive became a permanent no-op once the path was corrected. It now reads the newest transcript UUID from `~/.claude/projects` and looks for it in `Summaries/` frontmatter, and warns rather than skipping when the expected directory is absent.
+- **`/sync` required a `Sessions/` directory that v2 does not use**, warning on every run against a correctly-shaped vault.
+- **The test suite wrote into the user's real Obsidian vault.** Vault paths were module-level constants frozen at import, so `OPEN_BRAIN_VAULT_DIR` could not take effect no matter where it was set. Every full test run deposited a session summary named for its temp project; 57 `ob-server-*` files had accumulated in `Summaries/` since April, and were pushed to the backup remote before being spotted. Paths are now resolved per call, and `tests/setup-env.ts` redirects the vault globally, so a test that forgets to override leaks into a temp directory rather than into the user's notes. The 57 files have been removed.
+
 ## [v0.8.2] - 2026-07-28
 
 The CI workflow added in v0.8.1 failed on its first and only run. The four failures were real, but they were failures of the test harness rather than of the code under test: the suite could only pass on a machine that already had a populated `~/.claude`. Chasing that surfaced the same assumption in shipped code — the server could not open its own database on a machine where the directory did not exist yet, which is every fresh clone of this template.

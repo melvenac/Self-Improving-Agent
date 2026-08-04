@@ -22,7 +22,7 @@ import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverag
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
-import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
+import { resolvePaths, canonicalizeProjectDir, obsidianVaultDir } from "./shared/paths.js";
 import { readActiveSession, activeSessionKey, currentIde } from "./shared/active-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { readJson } from "./shared/fs-utils.js";
@@ -33,7 +33,11 @@ import type { CategoryScore, ScoreResult } from "./pipelines/sync/types.js";
 // --- V2 Database singleton ---
 
 const V2_DB_PATH = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
-const V2_VAULT_DIR = join(homedir(), "Obsidian Vault v2");
+// Resolved per call, not once at import. As a frozen const this ignored
+// OPEN_BRAIN_VAULT_DIR, so the server tests wrote summaries for their temp
+// projects into the real vault — 57 `ob-server-*` files had accumulated there
+// since April before anyone noticed.
+const v2VaultDir = () => obsidianVaultDir();
 
 let _v2db: Database.Database | null = null;
 function getV2Db(): Database.Database {
@@ -178,7 +182,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
 
     const result = sessionEndV2({
       db: v2db,
-      vaultDir: V2_VAULT_DIR,
+      vaultDir: v2VaultDir(),
       agentsDir: resolve(projectRoot, ".agents"),
       sessionId: args.session_id || "",
       sessionSummary: args.session_summary || "",
@@ -533,10 +537,10 @@ server.tool(
     const projectName = effectiveProject
       ? effectiveProject.split("/").pop() || "General"
       : "General";
-    const vaultPath = join(V2_VAULT_DIR, "Experiences", projectName, `${slug}.md`);
+    const vaultPath = join(v2VaultDir(), "Experiences", projectName, `${slug}.md`);
 
     // Write vault file
-    writeExperience(V2_VAULT_DIR, {
+    writeExperience(v2VaultDir(), {
       key: key || "unnamed",
       tags: tags || [],
       content,
@@ -604,7 +608,7 @@ server.tool(
     if (result.autoDelete) {
       v2db.prepare("DELETE FROM knowledge_index WHERE id = ?").run(id);
       try {
-        const logPath = join(homedir(), "Obsidian Vault", ".vault-writer.log");
+        const logPath = join(v2VaultDir(), ".vault-writer.log");
         appendFileSync(logPath, `[${new Date().toISOString()}] APOPTOSIS: id=${id} key="${entry.key || ""}" ${result.transitionMessage}\n`);
       } catch { /* non-critical */ }
       return { content: [{ type: "text" as const, text: `${result.transitionMessage}\nEntry ${id} (${entry.key || "no key"}) has been removed.` }] };
@@ -778,7 +782,7 @@ server.tool(
     // Vault-first: write markdown file
     const categoryDir = category === "checkpoint" ? "Checkpoints" : category === "spec" ? "Specs" : "Chunks";
     const fileName = `${date}-${projectSlug}-${slug}${phaseStr}.md`;
-    const vaultPath = join(V2_VAULT_DIR, categoryDir, fileName);
+    const vaultPath = join(v2VaultDir(), categoryDir, fileName);
 
     const frontmatter = [
       "---",
@@ -795,7 +799,7 @@ server.tool(
 
     const fileContent = `${frontmatter}\n\n${content}\n`;
 
-    mkdirSync(join(V2_VAULT_DIR, categoryDir), { recursive: true });
+    mkdirSync(join(v2VaultDir(), categoryDir), { recursive: true });
     writeFileSync(vaultPath, fileContent, "utf-8");
 
     // DB index: store in knowledge_index so ob_recall can find it

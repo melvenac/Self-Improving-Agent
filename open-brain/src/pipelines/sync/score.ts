@@ -1,6 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { homedir } from "node:os";
 import type Database from "better-sqlite3";
 
 import {
@@ -19,7 +18,7 @@ import {
 } from "../../db-v2.js";
 import { readLastInvocationTs } from "../session-end/invocation-logger.js";
 import { readShadowLog } from "../shadow/index.js";
-import { resolvePaths } from "../../shared/paths.js";
+import { resolvePaths, obsidianVaultDir } from "../../shared/paths.js";
 
 /**
  * Compute the 0-100 protocol health score.
@@ -51,7 +50,7 @@ export function computeScore(
   }
 
   // Skill proposal counts come from the vault, not the DB.
-  const vaultPath = join(homedir(), "Obsidian Vault");
+  const vaultPath = obsidianVaultDir();
   let skillsImplemented = 0;
   let proposalClusters = 0;
   const candidatesPath = join(vaultPath, "Skill-Candidates", "SKILL-CANDIDATES.md");

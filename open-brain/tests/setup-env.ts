@@ -27,3 +27,12 @@ process.env.OPEN_BRAIN_ACTIVE_SESSION = join(stateDir, "active-session.json");
 // not exist" and four tests in server.test.ts failed. server.ts reads this at
 // import time, so it must be set here rather than inside a test.
 process.env.KNOWLEDGE_V2_DB = join(stateDir, "knowledge-v2.db");
+
+// The vault was the last unredirected write target. Every session-end run writes
+// a summary named after its project, so the server tests — which use temp
+// projects like `ob-server-rhgw2s` — had been depositing summaries straight into
+// the real Obsidian vault since April; 57 had accumulated, and they were pushed
+// to the backup remote before anyone spotted them. Individual tests can still
+// point OPEN_BRAIN_VAULT_DIR at their own fixture, but the default is isolated,
+// so forgetting to override leaks into tmp rather than into the user's notes.
+process.env.OPEN_BRAIN_VAULT_DIR = join(stateDir, "vault");

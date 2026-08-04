@@ -1,15 +1,58 @@
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "fs";
-import { join } from "path";
-import { homedir } from "os";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "fs";
+import { dirname, join } from "path";
 import { scanForSkills, type ExperienceFile } from "./skill-scan.js";
+import { obsidianVaultDir } from "../../shared/paths.js";
 import type { SkillCluster } from "./types.js";
 
-// ─── Constants ──────────────────────────────────────────────────────────────
+// ─── Paths ──────────────────────────────────────────────────────────────────
+//
+// Resolved per call, not once at import. These were module-level consts, which
+// froze the vault location before a caller could set OPEN_BRAIN_VAULT_DIR — so
+// the test suite wrote SKILL-CANDIDATES.md into the real vault on every run.
+// Reading the env at use time is what makes the override actually work.
 
-const VAULT_PATH = join(homedir(), "Obsidian Vault");
-const EXPERIENCES_DIR = join(VAULT_PATH, "Experiences");
-const CANDIDATES_FILE = join(VAULT_PATH, "Skill-Candidates", "SKILL-CANDIDATES.md");
-const SKILL_INDEX_FILE = join(VAULT_PATH, "Skill-Candidates", "SKILL-INDEX.md");
+const vaultPath = () => obsidianVaultDir();
+const experiencesDir = () => join(vaultPath(), "Experiences");
+const candidatesFile = () => join(vaultPath(), "Skill-Candidates", "SKILL-CANDIDATES.md");
+const skillIndexFile = () => join(vaultPath(), "Skill-Candidates", "SKILL-INDEX.md");
+
+/** The vault is a user-managed directory; Skill-Candidates/ may not exist yet. */
+function writeVaultFile(path: string, contents: string): void {
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, contents);
+}
+
+/**
+ * Collect experience notes recursively.
+ *
+ * v1 kept every experience flat in Experiences/; v2 files them under a project
+ * subdirectory (Experiences/General/, Experiences/A2A-Hub/, …). A flat readdir
+ * saw 1 of 399 notes and reported zero clusters — a silent no-op, since an empty
+ * scan is indistinguishable from "nothing worth clustering".
+ *
+ * Names stay basenames: they become [[wikilinks]], which Obsidian resolves by
+ * basename regardless of folder depth.
+ */
+function collectExperiences(dir: string): ExperienceFile[] {
+  const out: ExperienceFile[] = [];
+  let entries;
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return out;
+  }
+  for (const entry of entries) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      out.push(...collectExperiences(full));
+    } else if (entry.name.endsWith(".md")) {
+      try {
+        out.push({ name: entry.name.replace(/\.md$/, ""), content: readFileSync(full, "utf8") });
+      } catch { /* skip unreadable */ }
+    }
+  }
+  return out;
+}
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -51,26 +94,18 @@ export interface SkillScanPipelineResult {
  * Full skill-scan pipeline: read experiences from vault, run scan, write SKILL-CANDIDATES.md.
  */
 export function runSkillScanPipeline(): SkillScanPipelineResult {
-  if (!existsSync(EXPERIENCES_DIR)) {
+  if (!existsSync(experiencesDir())) {
     return { clusters: 0, pendingProposals: 0, approaching: 0 };
   }
 
-  // Read experience files
-  const files = readdirSync(EXPERIENCES_DIR).filter((f) => f.endsWith(".md"));
-  const experienceFiles: ExperienceFile[] = [];
-  for (const file of files) {
-    try {
-      const content = readFileSync(join(EXPERIENCES_DIR, file), "utf8");
-      experienceFiles.push({ name: file.replace(".md", ""), content });
-    } catch { /* skip unreadable */ }
-  }
+  const experienceFiles = collectExperiences(experiencesDir());
 
   // Read previous scan state
   let previousCounts = new Map<string, number>();
   let previousDate: string | null = null;
-  if (existsSync(CANDIDATES_FILE)) {
+  if (existsSync(candidatesFile())) {
     try {
-      const parsed = parsePreviousCounts(readFileSync(CANDIDATES_FILE, "utf8"));
+      const parsed = parsePreviousCounts(readFileSync(candidatesFile(), "utf8"));
       previousCounts = parsed.counts;
       previousDate = parsed.previousDate;
     } catch { /* ignore */ }
@@ -78,9 +113,9 @@ export function runSkillScanPipeline(): SkillScanPipelineResult {
 
   // Read existing skills
   let existingSkills = new Set<string>();
-  if (existsSync(SKILL_INDEX_FILE)) {
+  if (existsSync(skillIndexFile())) {
     try {
-      existingSkills = parseExistingSkills(readFileSync(SKILL_INDEX_FILE, "utf8"));
+      existingSkills = parseExistingSkills(readFileSync(skillIndexFile(), "utf8"));
     } catch { /* ignore */ }
   }
 
@@ -93,9 +128,9 @@ export function runSkillScanPipeline(): SkillScanPipelineResult {
   // Write pending proposals marker
   const newClusters = result.clusters.filter((c) => c.status === "new" && !c.oversized);
   if (newClusters.length > 0) {
-    const markerPath = join(VAULT_PATH, ".skill-proposals-pending.json");
+    const markerPath = join(vaultPath(), ".skill-proposals-pending.json");
     const proposals = newClusters.map((c) => ({ tag: c.tag, count: c.count, files: c.files, date: today() }));
-    writeFileSync(markerPath, JSON.stringify(proposals, null, 2));
+    writeVaultFile(markerPath, JSON.stringify(proposals, null, 2));
   }
 
   return {
@@ -156,5 +191,5 @@ function writeCandidatesFile(
 
   md += `---\n\n*Last scan: ${today()}. Runs automatically at session end via open-brain pipeline.*\n`;
 
-  writeFileSync(CANDIDATES_FILE, md);
+  writeVaultFile(candidatesFile(), md);
 }
