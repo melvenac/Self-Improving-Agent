@@ -1,5 +1,21 @@
 # Changelog
 
+## [Unreleased]
+
+Foundations for `dream` — a scheduled pass that reconciles memory across sessions, catching the patterns that in-band writes structurally cannot see. Design: `.agents/SYSTEM/dream-design.md`. Not yet wired to the CLI; these are the deterministic parts, all pure functions with no clock and no model.
+
+Both defaults were set by measurement against the live corpus rather than inherited from the reference implementation, and in each case the measurement contradicted the initial choice.
+
+### Added
+- **`pipelines/dream/transcripts.ts`** — reads `~/.claude/projects/<project>/<uuid>.jsonl`, keeping only `user` and `assistant` rows. A 500-line transcript is mostly `mode`, `permission-mode`, `attachment` and `file-history-*` noise. Tool calls are dropped from message content: quoting them as evidence of what the user said would be misleading. Malformed trailing lines are skipped rather than thrown on, since an open session's last line is routinely a partial write — failing there would make dream unable to run precisely when there is most to reconcile.
+- **`pipelines/dream/rules.ts`** — `findDuplicates` and `findStale` over `knowledge_index`. Both propose only; apoptosis retains sole authority to delete, so `findStale` deliberately ignores success rate and looks purely at disuse, which apoptosis does not consider.
+- **Every candidate carries checkable evidence by type**, not by convention — a transcript quote with session id and line, or an entry excerpt with its id. A proposal a human cannot check is one they can only accept on trust.
+
+### Notes on calibration
+- **The window is 7 days, not the reference implementation's 24h — and not the 72h first proposed here.** Counting real sessions: 24h → 2, 72h → 2, 7d → 17. 72h and 24h currently return the identical set, and a window that collapses onto a single day is in-band memory with extra steps.
+- **Duplicate detection keys off the entry key, not content.** Across all 54,946 pairs in the live corpus, content overlap tops out at 0.386 — and that pair (`traefik-docker-api-version` / `traefik-docker-29-api-version`, a genuine near-duplicate) is indistinguishable from one at 0.379 sharing only a topic. Notes about one stack reuse its vocabulary whether or not they say the same thing. Key overlap ranked that pair at 1.00 and left the neighbours well below. Yields 7 candidates where content alone yielded 0 at every threshold tried.
+- **Staleness defaults to 120 days rather than 90.** At 90 the rule flags 167 of 332 entries — half the knowledge base, which is not a report anyone reviews. 120 gives 86, still high: the corpus spans only ~140 days, so any disuse threshold below its own age flags a large fraction by construction. The report layer will need to cap and disclose what it dropped.
+
 ## [v0.8.3] - 2026-08-03
 
 The v2 rebuild was a clean slate rather than a migration, so two vault directories have existed side by side since April with near-identical names. Six code sites re-joined the vault path as a string literal, and they did not agree on which vault they meant: session captures were written to v2 while the health checks looked for them in v1. Every SessionStart therefore reported `session-end may be failing` against a pipeline that was working correctly, and the recommended response to that warning — investigate session-end — led away from the actual fault every time.
