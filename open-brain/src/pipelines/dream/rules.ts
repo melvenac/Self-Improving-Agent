@@ -147,6 +147,144 @@ export function findDuplicates(
   return candidates.sort((x, y) => y.confidence - x.confidence);
 }
 
+/**
+ * Infrastructure that has been retired, with what replaced it.
+ *
+ * Curated rather than inferred. A regex over content is precise here because
+ * these are proper nouns — file and server names that either exist or do not —
+ * whereas guessing obsolescence from prose would reintroduce exactly the
+ * confidently-wrong proposals this rule exists to avoid.
+ */
+export interface RetiredReference {
+  label: string;
+  pattern: RegExp;
+  replacement: string;
+}
+
+/**
+ * Patterns match a *path*, not a mention.
+ *
+ * The first version matched the bare name anywhere, which flagged entries that
+ * were entirely correct: notes naming the vault as one of three stores, and one
+ * describing a historical bug in which a build pointed at the old directory.
+ * Both reference retired infrastructure on purpose. Requiring an adjacent path
+ * separator distinguishes an instruction to use the old thing — the only case
+ * worth rewriting — from prose that merely names it.
+ */
+export const RETIRED_REFERENCES: RetiredReference[] = [
+  {
+    label: "knowledge-mcp",
+    pattern: /knowledge-mcp[\\/]/i,
+    replacement: "the open-brain server (ob_* tools)",
+  },
+  {
+    label: "vault-utils.mjs",
+    pattern: /vault-utils\.mjs/i,
+    replacement: "removed in v0.5.3; see vault-writer.ts",
+  },
+  {
+    label: "session-end-v2.mjs",
+    pattern: /session-end-v2\.mjs|scripts[\\/]session-end/i,
+    replacement: "build/cli-session-end.js",
+  },
+  {
+    label: "v1 knowledge.db",
+    pattern: /context-mode[\\/]knowledge\.db/i,
+    replacement: "~/.claude/open-brain/knowledge-v2.db",
+  },
+  {
+    label: "v1 vault path",
+    // The v1 vault still exists as an archive, so this is a stale pointer
+    // rather than a broken one — worth rewriting, not worth alarm. Only counts
+    // when written as a path: `~/Obsidian Vault/…` or `Obsidian Vault\…`.
+    pattern: /(?:~[\\/]|[A-Za-z]:[\\/](?:[^\s"']*[\\/])?)Obsidian Vault(?! v2)|Obsidian Vault(?! v2)[\\/]/,
+    replacement: "~/Obsidian Vault v2",
+  },
+];
+
+export interface ObsoleteOptions {
+  retired?: RetiredReference[];
+}
+
+/**
+ * Entries citing infrastructure that no longer exists.
+ *
+ * This is the staleness signal that can actually be verified. `findStale`
+ * infers that an entry has outlived its use from disuse, but `ob_recall`
+ * returned nothing for multi-word queries until July 2026 — so for most of this
+ * corpus's life a low recall count records that an entry was unfindable, not
+ * that it was unwanted. A reference to a deleted file carries no such
+ * ambiguity.
+ *
+ * Proposes a rewrite, never a deletion: an entry whose lesson is still sound
+ * but whose paths have moved wants updating, not removing.
+ */
+export function findObsoleteReferences(
+  entries: KnowledgeIndexRow[],
+  options: ObsoleteOptions = {},
+): Candidate[] {
+  const retired = options.retired ?? RETIRED_REFERENCES;
+  const candidates: Candidate[] = [];
+
+  for (const e of live(entries)) {
+    const content = e.content ?? "";
+    const hits = retired.filter((r) => r.pattern.test(content));
+    if (hits.length === 0) continue;
+
+    candidates.push({
+      kind: "obsolete-reference",
+      targetIds: [e.id],
+      summary:
+        `Entry ${e.id} ("${e.key}") cites ` +
+        hits.map((h) => `${h.label} → ${h.replacement}`).join("; ") +
+        `.`,
+      evidence: hits.map((h) => ({
+        source: "entry" as const,
+        entryId: e.id,
+        key: e.key ?? null,
+        // Quote the sentence the reference sits in, so the proposal can be
+        // judged without opening the entry.
+        quote: excerpt(matchingSentence(content, h.pattern)),
+      })),
+      // Verifiable, so confident — but a rewrite still needs a human to decide
+      // what the corrected text should say.
+      confidence: retirementNarrated(content, hits) ? 0.35 : 0.8,
+    });
+  }
+
+  return candidates.sort((a, b) => b.confidence - a.confidence);
+}
+
+/**
+ * Language suggesting the entry is recounting a retirement rather than relying
+ * on the retired thing.
+ *
+ * Some of the most valuable entries cite an old path precisely because they
+ * record its removal — "Deleted knowledge-mcp/", "dead vault-utils.mjs", "v1 …
+ * used SQLite". Rewriting those would destroy the very history they exist to
+ * preserve.
+ *
+ * This cannot be settled deterministically: separating "uses the old path" from
+ * "narrates that the old path went away" is a semantic judgment, and that is
+ * the model's job. So this lowers confidence rather than filtering, which keeps
+ * the candidate visible for review while ranking it below the pointers that are
+ * genuinely stale. Nothing auto-applies, so a mis-ranked candidate costs a
+ * moment's reading, not a lost entry.
+ */
+function retirementNarrated(content: string, hits: RetiredReference[]): boolean {
+  const markers =
+    /\b(deleted|removed|dead|retired|legacy|deprecated|no longer|used to|formerly|old path|v1 of|replaced by|migrated (?:from|away))\b/i;
+  return hits.some((h) => markers.test(matchingSentence(content, h.pattern)));
+}
+
+/** The sentence containing the first match, falling back to the whole text. */
+function matchingSentence(text: string, pattern: RegExp): string {
+  for (const sentence of text.split(/(?<=[.!?])\s+|\n+/)) {
+    if (pattern.test(sentence)) return sentence;
+  }
+  return text;
+}
+
 export interface StaleOptions {
   /** Evaluation time, passed in so the rule stays pure and reproducible. */
   now: Date;

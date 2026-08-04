@@ -40,6 +40,13 @@ export interface TranscriptRef {
 export type CandidateKind =
   | "duplicate"
   | "contradiction"
+  /**
+   * Cites infrastructure that no longer exists. Preferred over inferring
+   * worthlessness from disuse: recall was broken until July 2026, so a low
+   * recall count may mean an entry was unfindable rather than unwanted. A
+   * missing file is checkable; disuse is not.
+   */
+  | "obsolete-reference"
   | "stale"
   | "correction"
   | "unstored";
@@ -71,11 +78,28 @@ export interface Candidate {
   confidence: number;
 }
 
+/**
+ * What a capped section left out.
+ *
+ * A report that silently truncates reads as "this is everything", which is a
+ * worse failure than a long report — the reader draws a conclusion the data
+ * does not support. Anything dropped is counted here and stated in the output.
+ */
+export interface Omission {
+  kind: CandidateKind;
+  shown: number;
+  omitted: number;
+  /** Confidence of the highest-scoring candidate that did not make the cut. */
+  highestOmittedConfidence: number;
+}
+
 export interface DreamReport {
   /** ISO timestamp, passed in rather than read from the clock, so runs are reproducible. */
   generatedAt: string;
-  /** Lower bound of the window examined. */
+  /** Lower bound of the window examined; "all" for a full-corpus audit. */
   since: string;
   sessionsExamined: string[];
+  entriesExamined: number;
   candidates: Candidate[];
+  omissions: Omission[];
 }
