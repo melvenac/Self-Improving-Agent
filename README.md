@@ -2,7 +2,7 @@
 
 *A memory protocol that enables AI coding agents to learn across sessions.*
 
-**Latest: v0.8.3** · [Changelog](CHANGELOG.md)
+**Latest: v0.9.0** · [Changelog](CHANGELOG.md)
 
 ---
 
@@ -166,10 +166,28 @@ Start a Claude Code session and run `/start`. You should see:
 | `open-brain/build/cli-bootstrap.js` | SessionStart | Auto-detects project, emits `SESSION_UUID`, runs health checks, surfaces skill proposals |
 | `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: vault summary, auto-feedback, reflection clusters, invocation logging, skill-scan |
 
+## Dashboard
+
+A read-only web viewer for the knowledge base.
+
+```bash
+node open-brain/scripts/dashboard.mjs      # http://localhost:3456
+```
+
+Browse sessions, chunks, knowledge entries with their maturity lifecycle, CC memory, and config files. Nothing is ever written — the database is opened read-only.
+
+| Env var | Default | Purpose |
+|---|---|---|
+| `OPEN_BRAIN_DB` | `~/.claude/open-brain/knowledge-v2.db` | Database to view |
+| `DASHBOARD_PORT` | `3456` | Port to serve on |
+
+> The viewer predates the v2 schema and still queries v1 table names (`knowledge`, `summaries`, `tags`, `chunks_fts`). A shim maps these to `knowledge_index` and empty stand-ins using **TEMP views scoped to the connection**, so `knowledge-v2.db` is never modified. The `summaries` tab is empty by design — v2 has no summaries table.
+
 ## Key Features
 
 | Feature | Since | What it does |
 |---|---|---|
+| **Dashboard** | v0.9.0 | Read-only web viewer at `localhost:3456`; surfaces the maturity lifecycle (progenitor/proven/mature), which the v1 schema could not represent |
 | **Tiered Memory** | v0.6.0 | 4-tier access (Core/Hot/Warm/Cold); Obsidian Vault as SOT; Smart Connections semantic search replaces sqlite-vec; vault-first store pipeline; reflection cycle for experience distillation |
 | **Session manifest** | v0.5.5 | Threads Claude's session UUID across all memory layers for full provenance tracking |
 | **Outcome tracking** | v0.4.0 | Ternary feedback (helpful/harmful/neutral) on recalled knowledge with maturity lifecycle (1.5x Mature, 1.2x Proven, 1.3x Failures) |

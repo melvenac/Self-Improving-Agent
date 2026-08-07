@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [v0.9.0] - 2026-08-07
 
 Foundations for `dream` — a scheduled pass that reconciles memory across sessions, catching the patterns that in-band writes structurally cannot see. Design: `.agents/SYSTEM/dream-design.md`. Not yet wired to the CLI; these are the deterministic parts, all pure functions with no clock and no model.
 
@@ -12,7 +12,17 @@ Both defaults were set by measurement against the live corpus rather than inheri
 - **Every candidate carries checkable evidence by type**, not by convention — a transcript quote with session id and line, or an entry excerpt with its id. A proposal a human cannot check is one they can only accept on trust.
 
 - **`obsolete-reference` rule** — entries citing infrastructure that no longer exists, preferred over `findStale`. Staleness-by-disuse is inferential over a contaminated signal: `ob_recall` returned nothing for multi-word queries until July 2026, so for most of this corpus's life a low recall count records that an entry was *unfindable*, not unwanted. A missing path is checkable. Proposes a rewrite, never a deletion.
+- **`open-brain/scripts/dashboard.mjs`** — read-only web viewer for `knowledge-v2.db`, recovered from the retired v1 tree. Reads `~/.claude/open-brain/knowledge-v2.db`, overridable via `OPEN_BRAIN_DB`; port via `DASHBOARD_PORT` (default 3456). Surfaces the maturity lifecycle — progenitor/proven/mature counts — which the v1 schema had no column for and which therefore has never been visible.
+- **v1→v2 compatibility shim in the dashboard** — the viewer was written against the v1 schema (`knowledge`, `summaries`, `tags`, `chunks_fts`), none of which exist in v2. The shim creates these as **TEMP views and a TEMP FTS table scoped to the connection**, so `knowledge-v2.db` is never written to. Temp rather than persistent views is deliberate: `src/db.ts` still issues `INSERT INTO knowledge`, and a persistent view under that name would convert a loud failure into a silent one.
 - **`pipelines/dream/report.ts`** — ranks, caps per kind, and states what it dropped. An uncapped 86-item list reads as noise and gets ignored wholesale; a capped list that says nothing about the cap reads as "this is everything". Both mislead, so sections are capped *and* the omission is reported, with the highest omitted confidence so the reader knows what they are not seeing. Output is byte-stable across runs on unchanged input, so a no-op run looks like one.
+
+### Fixed
+- **The dashboard had been reading the retired v1 database.** `KB_PATH` pointed at `~/.claude/context-mode/knowledge.db`, whose `chunks` table stopped being written on 2026-04-16 when v1 was retired in Session 33. Every figure the dashboard displayed was a April snapshot, not live state. It now reads `knowledge-v2.db`. The v1 path resolving to a real, populated file is what let this go unnoticed — a dead reference that still returns data reads as a working one.
+
+### Removed
+- **`~/.claude/knowledge-mcp/` (573 MB) deleted** after auditing every file for a live equivalent. `session-end.mjs` → `pipelines/session-end/` (11 stages), `skill-scan.mjs` → `skill-scan.ts` + `skill-scan-runner.ts`, `dashboard.mjs` → `open-brain/scripts/`; the two `backfill-*.mjs` are one-time migrations already run, and all five are in git history.
+- **Data files were verified by exact record-set comparison, not by count.** `skill-invocations.jsonl` (799) and `score-history.jsonl` (5) were confirmed strict subsets of their v2 counterparts. `shadow-recall.jsonl` was **not** — v2 held a single 2026-07-28 record while v1 held six unique April ones, so the sets were merged before deletion. Counts alone would have shown v2 ahead on two of three files and hidden the gap on the third.
+- **2,437 legacy chunks purged from `context-mode/knowledge.db`** (6,436 KB → 1,160 KB). 69% were under 100 characters — bare filepaths, single-word git refs, tool names indexed as BM25 documents. The 40 `checkpoint` chunks were migrated into v2 with `legacy_chunk_id` provenance and exported to `Obsidian Vault/Checkpoints/` as markdown, since v2's `chunks` table has no FTS index and they would otherwise have been unsearchable.
 
 ### Notes on calibration
 - **The window is 7 days, not the reference implementation's 24h — and not the 72h first proposed here.** Counting real sessions: 24h → 2, 72h → 2, 7d → 17. 72h and 24h currently return the identical set, and a window that collapses onto a single day is in-band memory with extra steps.
