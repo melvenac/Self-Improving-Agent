@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, cpSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { rmSync } from "node:fs";
 import {
@@ -10,6 +10,7 @@ import {
   checkClaudeMd,
   checkTemplate,
   checkObsidianVault,
+  checkVaultPathRefs,
   checkRules,
   checkReadmeRefs,
   checkHookConfigs,
@@ -217,6 +218,63 @@ describe("validation checks", () => {
       writeFileSync(join(tempDir, "CLAUDE.md"), "# Claude\nNo directory refs here.\n");
       const result = checkClaudeMd(tempDir);
       expect(result.severity).toBe("pass");
+    });
+  });
+
+  describe("checkVaultPathRefs", () => {
+    /**
+     * An isolated fake home, so the check never reads the developer's real
+     * ~/.claude and the result cannot depend on the machine it runs on.
+     */
+    function writeDoc(root: string, rel: string, body: string): void {
+      const full = join(root, rel);
+      mkdirSync(dirname(full), { recursive: true });
+      writeFileSync(full, body);
+    }
+
+    let home: string;
+    beforeEach(() => {
+      home = mkdtempSync(join(tmpdir(), "ob-vaultrefs-home-"));
+    });
+
+    it("passes when nothing references the v1 vault", () => {
+      writeDoc(tempDir, "scripts/notes.md", "Reads `~/Obsidian Vault v2/Experiences/`.");
+      expect(checkVaultPathRefs(tempDir, home).severity).toBe("pass");
+    });
+
+    it("flags a v1 reference in a slash command", () => {
+      writeDoc(tempDir, ".claude/commands/start.md", "Read ~/Obsidian Vault/Skill-Candidates/SKILL-INDEX.md");
+      const result = checkVaultPathRefs(tempDir, home);
+      expect(result.severity).toBe("issue");
+      expect(result.message).toContain("start.md");
+    });
+
+    it("does not mistake the v2 path for a v1 reference", () => {
+      writeDoc(tempDir, "project-template/guide.md", "~/Obsidian Vault v2/Summaries/ and Obsidian Vault v2\\Experiences");
+      expect(checkVaultPathRefs(tempDir, home).severity).toBe("pass");
+    });
+
+    it("ignores a bare mention with no path separator", () => {
+      writeDoc(tempDir, "scripts/prose.md", "The Obsidian Vault holds every experience note.");
+      expect(checkVaultPathRefs(tempDir, home).severity).toBe("pass");
+    });
+
+    it("exempts records of what was true then, not stale instructions", () => {
+      writeDoc(tempDir, "project-template/CHANGELOG.md", "Exported to `Obsidian Vault/Checkpoints/` in v1.");
+      writeDoc(tempDir, "scripts/tests/fixture.md", "Path: ~/Obsidian Vault/Experiences");
+      writeDoc(tempDir, "project-template/superpowers/plans/2026-03-26-x.md", "Write to ~/Obsidian Vault/Sessions/");
+      expect(checkVaultPathRefs(tempDir, home).severity).toBe("pass");
+    });
+
+    it("scans live user directories outside the repo", () => {
+      writeDoc(home, ".cursor/commands/start.md", "Read ~/Obsidian Vault/.skill-proposals-pending.json");
+      const result = checkVaultPathRefs(tempDir, home);
+      expect(result.severity).toBe("issue");
+      expect(result.message).toContain("~");
+    });
+
+    it("tolerates absent directories rather than throwing", () => {
+      expect(() => checkVaultPathRefs(join(tempDir, "nope"), join(home, "nope"))).not.toThrow();
     });
   });
 

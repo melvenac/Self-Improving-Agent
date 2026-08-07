@@ -218,6 +218,71 @@ export function checkObsidianVault(vaultPath: string): CheckResult {
   return { name: "obsidian-vault", severity: "pass", message: "Vault has all expected directories" };
 }
 
+/**
+ * Markdown still pointing at the abandoned v1 vault.
+ *
+ * This bug class has recurred in every layer independently: slash commands in
+ * four mirrors, setup.mjs, the guide skill, the reference doc. obsidianVaultDir()
+ * contains it for code, but prose has no such chokepoint — a stale path in a
+ * command file is read by an agent and acted on exactly as if it were current,
+ * and nothing fails. A grep nobody remembers to run is not a guard; this is.
+ *
+ * Excluded by design, all for one reason — a record of what was true then is not
+ * a stale instruction: CHANGELOG.md *should* say `Obsidian Vault/` when
+ * describing what v1 did, the dream tests use v1 paths as fixtures for the rule
+ * that detects them, and `docs/superpowers/plans/` holds dated plan documents
+ * belonging to another plugin. Rewriting any of those would falsify the record.
+ */
+const V1_VAULT_REF = /Obsidian Vault(?! v2)[/\\]/;
+
+export function checkVaultPathRefs(projectRoot: string, home = homedir()): CheckResult {
+  const roots = [
+    join(projectRoot, ".claude", "commands"),
+    join(projectRoot, ".agents", "skills"),
+    join(projectRoot, "project-template"),
+    join(projectRoot, "scripts"),
+    join(home, ".claude", "commands"),
+    join(home, ".cursor", "commands"),
+    join(home, "docs"),
+  ];
+  const skipDirs = new Set(["node_modules", "build", ".git", "tests", "superpowers"]);
+  const skipFiles = new Set(["CHANGELOG.md"]);
+  const hits: string[] = [];
+
+  const walk = (dir: string): void => {
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return; // absent live dir — same tolerance as the parity check
+    }
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        if (!skipDirs.has(entry.name)) walk(join(dir, entry.name));
+        continue;
+      }
+      if (!entry.name.endsWith(".md") || skipFiles.has(entry.name)) continue;
+      const full = join(dir, entry.name);
+      try {
+        if (V1_VAULT_REF.test(readFileSync(full, "utf8"))) hits.push(full);
+      } catch { /* unreadable — not this check's business */ }
+    }
+  };
+
+  for (const root of roots) walk(root);
+
+  if (hits.length > 0) {
+    const shown = hits.slice(0, 5).map((h) => h.replace(projectRoot, ".").replace(home, "~"));
+    const more = hits.length > 5 ? ` (+${hits.length - 5} more)` : "";
+    return {
+      name: "vault-path-refs",
+      severity: "issue",
+      message: `Docs reference the retired v1 vault: ${shown.join(", ")}${more}`,
+    };
+  }
+  return { name: "vault-path-refs", severity: "pass", message: "No v1-vault references in docs or commands" };
+}
+
 export function checkTemplate(projectRoot: string): CheckResult {
   const templatePath = join(projectRoot, "project-template");
   if (!existsSync(templatePath)) {

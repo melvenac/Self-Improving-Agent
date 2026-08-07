@@ -1,5 +1,28 @@
 # Changelog
 
+## [v0.11.0] - 2026-08-07
+
+`sync` now fails on references to the retired v1 vault, and the documentation layer that had been quietly describing v1 for months was rewritten against the running system.
+
+v0.10.1 fixed the v1-vault references in the slash commands. That was treating instances of a class. The class itself had already recurred in `setup.mjs`, four command mirrors, the guide skill, and the canonical reference doc — because `obsidianVaultDir()` contains the path for *code*, and prose has no equivalent chokepoint. A stale path in a command file is read by an agent and acted on exactly as if it were current, and nothing fails. A grep nobody remembers to run is not a guard.
+
+### Added
+- **`checkVaultPathRefs`** — a sync check scanning markdown under `.claude/commands/`, `.agents/skills/`, `project-template/`, `scripts/`, and the live `~/.claude`, `~/.cursor`, `~/docs` trees for `Obsidian Vault` followed by a path separator and not ` v2`. Fails as an issue. Live directories are tolerated when absent, matching `checkMirrorParity`.
+  - Exempt, all for one reason — *a record of what was true then is not a stale instruction*: `CHANGELOG.md` should say `Obsidian Vault/` when describing what v1 did, the dream tests use v1 paths as fixtures for the rule that detects them, and `docs/superpowers/plans/` holds dated plans belonging to another plugin. Rewriting any of those would falsify the record.
+  - It immediately found three files beyond the known list, including plan documents nobody had connected to the v2 rebuild.
+
+### Changed
+- **`self-improving-agent-guide/SKILL.md` rewritten.** It was a v1 document end to end, not merely one with stale paths: it described `vault-writer.mjs` in `~/.claude/knowledge-mcp/scripts/` (a directory that does not exist), three chained SessionEnd hooks (there is one, `cli-session-end.js`), Smart Connections as the retrieval path (it is `ob_recall`), and `Sessions/`, `Topics/`, `Guidelines/` (none exist in v2). Now documents the three-store split, the maturity lifecycle, state-vs-event, the real hook wiring, and the actual v2 vault layout — every claim checked against disk or `settings.json` rather than carried forward.
+- **`~/docs/self-improving-agent-reference.md` rewritten.** CLAUDE.md points at this as canonical, and it still described `kb_recall` and the three-hook chain. Now carries the current tool list, CLI surface, and key paths, plus the two findings most likely to be re-derived the hard way: `.recalled-entries.json` must be checked against the live session id, and disuse is not evidence of low value because multi-word recall was broken for most of this corpus's life.
+
+### Fixed
+- **`SKILL-INDEX.md` pointed at a `Templates/SKILL-TEMPLATE.md` that does not exist in v2** — introduced in v0.10.1 by carrying the v1 header forward unchecked. Replaced with where skills actually live, `~/.claude/skills/<name>/SKILL.md`.
+- **`notebooklm.md`** archived to the v1 vault.
+
+### Notes
+- Writing the reference doc tripped the new check: describing the retired path required writing it. Reworded to name the directory without a separator rather than adding an exemption — the check is about paths that could be *acted on*, and an exemption would have blunted it for the one document most likely to be copied from.
+- CLAUDE.md still describes accumulation as `session-end.mjs` → `skill-scan.mjs`. Neither file exists; it is one registered hook. Left unchanged — it is a user-level file outside this repo.
+
 ## [v0.10.1] - 2026-08-07
 
 Skill graduation was dead in two independent ways, and the two hid each other.

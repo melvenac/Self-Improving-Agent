@@ -12,6 +12,7 @@ import {
   checkSummary,
   checkClaudeMd,
   checkObsidianVault,
+  checkVaultPathRefs,
   checkTemplate,
   checkSpecProvenance,
   checkRules,
@@ -39,6 +40,7 @@ export function runSync(options: SyncOptions): SyncResult {
   checks.push(checkSummary(version, options.projectRoot));
   checks.push(checkClaudeMd(options.projectRoot));
   checks.push(checkObsidianVault(paths.obsidianVault));
+  checks.push(checkVaultPathRefs(options.projectRoot));
   checks.push(checkTemplate(options.projectRoot));
   checks.push(checkSpecProvenance(options.projectRoot));
   checks.push(checkRules(options.projectRoot));
