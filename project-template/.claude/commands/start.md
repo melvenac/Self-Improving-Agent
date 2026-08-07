@@ -210,7 +210,7 @@ If it's the first session of the month, or Aaron asks for a health check:
 - If any cluster has 3+ experiences and hasn't been acted on, remind Aaron
 
 ### Protocol health score
-1. If in the Self-Improving-Agent project, run `node scripts/sync.mjs --score`
+1. If in the Self-Improving-Agent project, run `node open-brain/build/cli.js sync --score`
 2. Report the score and per-category breakdown
 3. If any category is below 50%, flag it: "Knowledge quality needs attention — only X% recall precision"
 4. Show trend if history exists: "Score: 72 (+4 from last month)"

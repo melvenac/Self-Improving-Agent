@@ -273,6 +273,18 @@ describe("validation checks", () => {
       expect(result.message).toContain("~");
     });
 
+    it("flags the global CLAUDE.md, which is read as standing instruction", () => {
+      writeDoc(home, ".claude/CLAUDE.md", "- **Vault writer log:** `~/Obsidian Vault/.vault-writer.log`");
+      const result = checkVaultPathRefs(tempDir, home);
+      expect(result.severity).toBe("issue");
+      expect(result.message).toContain("CLAUDE.md");
+    });
+
+    it("flags the project CLAUDE.md too", () => {
+      writeDoc(tempDir, "CLAUDE.md", "Knowledge lives in ~/Obsidian Vault/Experiences/");
+      expect(checkVaultPathRefs(tempDir, home).severity).toBe("issue");
+    });
+
     it("tolerates absent directories rather than throwing", () => {
       expect(() => checkVaultPathRefs(join(tempDir, "nope"), join(home, "nope"))).not.toThrow();
     });

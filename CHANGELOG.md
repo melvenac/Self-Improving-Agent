@@ -1,5 +1,21 @@
 # Changelog
 
+## [v0.11.1] - 2026-08-07
+
+The v0.11.0 check scanned command and doc trees but not `CLAUDE.md` — the file loaded into every session, and so the highest-leverage place for a stale path to sit. A stale reference in a doc is followed when someone reads that doc; a stale reference in `CLAUDE.md` is standing instruction in every session from then on.
+
+### Changed
+- **`checkVaultPathRefs` now scans `~/.claude/CLAUDE.md` and the project `CLAUDE.md`.** Named explicitly rather than walked, since neither sits in a directory worth traversing whole. On its first run it caught a v1 reference that manual review had already missed twice.
+
+### Fixed
+- **Global `CLAUDE.md` described accumulation as `session-end.mjs` → `skill-scan.mjs`.** Neither file exists; it is one registered hook, `open-brain/build/cli-session-end.js`, which captures the session, runs auto-feedback, and runs the skill scan.
+- **The Guardrails section pointed at `~/Obsidian Vault/.vault-writer.log`** — a v1 path, for a log written by a hook that no longer exists. Replaced with the vault location and the reason the two names are dangerous to confuse.
+- **`/start`'s monthly maintenance ran `node scripts/sync.mjs --score`** in three copies. That script was retired in Session 33; it is `node open-brain/build/cli.js sync --score`. (`/end` already documented the retirement correctly and was left alone.)
+
+### Notes
+- `CLAUDE.md` also pointed at `~/Obsidian Vault/Research/karpathy-skills-claude-md-repo.md` — a live reference note that existed only in the retired vault, and v2 has no `Research/`. The pointer could not simply be rewritten, so the note was **copied** (not moved) into `~/Obsidian Vault v2/Research/`. Copied because v1 is frozen: leaving the original in place keeps the change reversible and costs nothing.
+- This is the third consecutive release to find v1 references after the previous one claimed to have cleared them — manual review found instances, the check found the class. Every instance since v0.11.0 has been found by the check rather than by reading.
+
 ## [v0.11.0] - 2026-08-07
 
 `sync` now fails on references to the retired v1 vault, and the documentation layer that had been quietly describing v1 for months was rewritten against the running system.

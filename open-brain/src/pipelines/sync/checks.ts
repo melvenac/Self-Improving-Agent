@@ -245,9 +245,22 @@ export function checkVaultPathRefs(projectRoot: string, home = homedir()): Check
     join(home, ".cursor", "commands"),
     join(home, "docs"),
   ];
+  // Loaded into every session and therefore the highest-leverage place for a
+  // stale path to sit: it is read as standing instruction, not as reference.
+  // Named explicitly because neither lives in a directory worth walking whole.
+  const files = [
+    join(home, ".claude", "CLAUDE.md"),
+    join(projectRoot, "CLAUDE.md"),
+  ];
   const skipDirs = new Set(["node_modules", "build", ".git", "tests", "superpowers"]);
   const skipFiles = new Set(["CHANGELOG.md"]);
   const hits: string[] = [];
+
+  const scan = (full: string): void => {
+    try {
+      if (V1_VAULT_REF.test(readFileSync(full, "utf8"))) hits.push(full);
+    } catch { /* absent or unreadable — not this check's business */ }
+  };
 
   const walk = (dir: string): void => {
     let entries;
@@ -262,14 +275,12 @@ export function checkVaultPathRefs(projectRoot: string, home = homedir()): Check
         continue;
       }
       if (!entry.name.endsWith(".md") || skipFiles.has(entry.name)) continue;
-      const full = join(dir, entry.name);
-      try {
-        if (V1_VAULT_REF.test(readFileSync(full, "utf8"))) hits.push(full);
-      } catch { /* unreadable — not this check's business */ }
+      scan(join(dir, entry.name));
     }
   };
 
   for (const root of roots) walk(root);
+  for (const file of files) scan(file);
 
   if (hits.length > 0) {
     const shown = hits.slice(0, 5).map((h) => h.replace(projectRoot, ".").replace(home, "~"));
