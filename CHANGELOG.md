@@ -1,5 +1,28 @@
 # Changelog
 
+## [v0.10.1] - 2026-08-07
+
+Skill graduation was dead in two independent ways, and the two hid each other.
+
+`SKILL-INDEX.md` is the registry that tells `skill-scan` which experience clusters have already been distilled into a skill. Both of its readers matched `### tag (N experiences) … has skill` — the shape of `SKILL-CANDIDATES.md`, not the index, which is a markdown table. The pattern could never match, so **a fully populated index and a missing one produced byte-identical output**. That is what made it survive: there was no observable difference to notice.
+
+Underneath that, the v2 vault had no index at all to read. `setup.mjs` still seeded `~/Obsidian Vault`, abandoned since the v2 rebuild — the same hardcoded-path class that `obsidianVaultDir()` exists to prevent, in the one file that never adopted it. So every distilled skill kept being re-proposed as an undistilled candidate, indefinitely.
+
+### Fixed
+- **`parseExistingSkills` never matched the file it read.** Now parses the `## Skills` table's **Domain** column, which is what the caller compares against `cluster.tag` — the human-facing Name was never the right field. A cell may list several tags (`docker, traefik`) and each graduates independently. `## Pending Proposals` has a Domain column too and is deliberately excluded: reading it would graduate candidates that were merely proposed.
+- **The protocol health score counted `has skill` in the index**, a marker written only into `SKILL-CANDIDATES.md`. `skillsImplemented` was therefore always 0, silently understating the score. It now counts table rows.
+- **`setup.mjs` seeded the v1 vault**, so no v2 install ever received a `SKILL-INDEX.md`. Now resolves `OPEN_BRAIN_VAULT_DIR` or `Obsidian Vault v2`, mirroring `obsidianVaultDir()`, and scaffolds the v2 directory set (`Archive`, `Checkpoints`, `Experiences`, `Skill-Candidates`, `Skills`, `Summaries`) instead of the v1 set. The seeded index now carries the real table header, so the format is self-documenting rather than a prose stub the parser reads as empty. The dead `Guidelines/ → Skill-Candidates/` migration is removed: it could only ever fire against a v1 vault this function no longer touches.
+- **`/start` and `/skill-scan` read the abandoned v1 vault** — 29 references across three copies each (repo `.claude/commands/`, `project-template/.claude/commands/`, live `~/.claude/commands/`) plus `.cursor/`, and the stale `Guidelines/` path in `.agents/skills/INDEX.md`. `copySlashCommands` distributes from `project-template/`, so fixing only the live copy would have been undone by the next `setup.mjs` run.
+
+### Added
+- **`shared/skill-index.ts`** — `parseSkillDomains` and `countSkills`, one definition of the index format. The two readers drifted because each parsed the file independently; this is the same containment argument as `obsidianVaultDir()`.
+- **Regression cover for graduation** (`skill-scan-runner.test.ts`) — there was none, which is the direct reason a parser that matched nothing shipped. Asserts a listed domain graduates, multi-domain cells split, and neither the header/separator rows nor `## Pending Proposals` graduate anything.
+
+### Notes
+- The first fix used `(?=^##\s|\z)` to bound the section. **JavaScript has no `\z`** — it degrades to a literal `z`, so a trailing `## Skills` section with no heading after it never terminated and the parser returned empty. The new tests caught it before it landed; the extractor now splits on headings rather than anchoring.
+- `python-cli-pipeline` was carried in the v1 index but has no directory under `~/.claude/skills/`. It was dropped rather than migrated — registering a skill that does not exist would suppress its cluster forever.
+- **Graduated clusters are still written to `.skill-proposals-pending.json`.** `hasSkill` sets the status label in `SKILL-CANDIDATES.md` but does not filter the pending marker, which gates only on `status === "new" && !oversized`. None of the 5 current proposals correspond to an existing skill, so nothing is being mis-flagged today — but the filter is arguably wrong and is left unchanged here.
+
 ## [v0.10.0] - 2026-08-07
 
 `dream` is wired to the CLI, and the state-vs-event distinction it needed is now recorded on every entry. Concept from `coleam00/skills`; it turned out to *define* the `superseded` rule rather than sit beside it.

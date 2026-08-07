@@ -36,8 +36,8 @@ Read these files (skip missing):
 4. `.agents/SESSIONS/next-session.md`
 5. `.agents/skills/INDEX.md`
 6. `package.json` (version field only)
-7. `~/Obsidian Vault/Skill-Candidates/SKILL-INDEX.md`
-8. `~/Obsidian Vault/.skill-proposals-pending.json`
+7. `~/Obsidian Vault v2/Skill-Candidates/SKILL-INDEX.md`
+8. `~/Obsidian Vault v2/.skill-proposals-pending.json`
 9. `.agents/SYSTEM/domains.json`
 10. `.agents/AGENT.md` — YAML frontmatter: name, role, partner, mailbox_channel
 

@@ -19,6 +19,7 @@ import {
 import { readLastInvocationTs } from "../session-end/invocation-logger.js";
 import { readShadowLog } from "../shadow/index.js";
 import { resolvePaths, obsidianVaultDir } from "../../shared/paths.js";
+import { countSkills } from "../../shared/skill-index.js";
 
 /**
  * Compute the 0-100 protocol health score.
@@ -60,8 +61,9 @@ export function computeScore(
     proposalClusters = (content.match(/### \S+ \(\d+ experiences?\)/g) || []).length;
   }
   if (existsSync(skillIndexPath)) {
-    const content = readFileSync(skillIndexPath, "utf-8");
-    skillsImplemented = (content.match(/has skill/g) || []).length;
+    // `has skill` is a SKILL-CANDIDATES.md marker that never appears in the
+    // index, so this counted 0 skills forever. The index is a table: count rows.
+    skillsImplemented = countSkills(readFileSync(skillIndexPath, "utf-8"));
   }
 
   const qualityScore = scoreKnowledgeQuality(getKnowledgeQualityStats(v2db));

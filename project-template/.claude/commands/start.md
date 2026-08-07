@@ -48,8 +48,8 @@ Read these files (skip any that don't exist):
 4. .agents/SESSIONS/next-session.md
 5. .agents/skills/INDEX.md
 6. package.json (version field only)
-7. ~/Obsidian Vault/Skill-Candidates/SKILL-INDEX.md
-8. ~/Obsidian Vault/.skill-proposals-pending.json
+7. ~/Obsidian Vault v2/Skill-Candidates/SKILL-INDEX.md
+8. ~/Obsidian Vault v2/.skill-proposals-pending.json
 9. .agents/SYSTEM/domains.json
 10. .agents/AGENT.md — parse YAML frontmatter for name, role, partner, mailbox_channel (skip silently if absent)
 
@@ -155,8 +155,8 @@ Merge new recalled entries (deduplicate by id, only result_type: "knowledge").
 Write merged result with session_id, session_start, queries, entries.
 
 ## 4. Skills check
-Read ~/Obsidian Vault/Skill-Candidates/SKILL-INDEX.md
-Read ~/Obsidian Vault/.skill-proposals-pending.json
+Read ~/Obsidian Vault v2/Skill-Candidates/SKILL-INDEX.md
+Read ~/Obsidian Vault v2/.skill-proposals-pending.json
 
 ## 5. Return ONLY:
 
@@ -206,7 +206,7 @@ If it's the first session of the month, or Aaron asks for a health check:
 - Only delete with Aaron's approval
 
 ### Skill candidate check
-- Read `~/Obsidian Vault/Skill-Candidates/SKILL-CANDIDATES.md`
+- Read `~/Obsidian Vault v2/Skill-Candidates/SKILL-CANDIDATES.md`
 - If any cluster has 3+ experiences and hasn't been acted on, remind Aaron
 
 ### Protocol health score

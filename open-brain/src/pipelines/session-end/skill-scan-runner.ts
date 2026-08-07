@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { dirname, join } from "path";
 import { scanForSkills, type ExperienceFile } from "./skill-scan.js";
 import { obsidianVaultDir } from "../../shared/paths.js";
+import { parseSkillDomains } from "../../shared/skill-index.js";
 import type { SkillCluster } from "./types.js";
 
 // ─── Paths ──────────────────────────────────────────────────────────────────
@@ -72,16 +73,6 @@ function parsePreviousCounts(content: string): { counts: Map<string, number>; pr
   return { counts, previousDate };
 }
 
-function parseExistingSkills(content: string): Set<string> {
-  const skills = new Set<string>();
-  const regex = /###\s+(\S+)\s+\(\d+\s+experiences?\)[^]*?has skill/gi;
-  let match;
-  while ((match = regex.exec(content)) !== null) {
-    skills.add(match[1].toLowerCase());
-  }
-  return skills;
-}
-
 // ─── Runner ─────────────────────────────────────────────────────────────────
 
 export interface SkillScanPipelineResult {
@@ -115,7 +106,7 @@ export function runSkillScanPipeline(): SkillScanPipelineResult {
   let existingSkills = new Set<string>();
   if (existsSync(skillIndexFile())) {
     try {
-      existingSkills = parseExistingSkills(readFileSync(skillIndexFile(), "utf8"));
+      existingSkills = parseSkillDomains(readFileSync(skillIndexFile(), "utf8"));
     } catch { /* ignore */ }
   }
 

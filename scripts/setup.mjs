@@ -343,22 +343,26 @@ function copyCursorSlashCommands() {
 }
 
 function setupObsidianVault() {
-  const vaultRoot = path.join(HOME, 'Obsidian Vault');
-  const dirs = ['Experiences', 'Skill-Candidates', 'Sessions', 'Topics'];
+  // Mirrors obsidianVaultDir() in open-brain/src/shared/paths.ts. This was
+  // hardcoded to the abandoned v1 vault, so a v2 install never got a seeded
+  // SKILL-INDEX.md — and skill-scan silently treats a missing index as
+  // "no skills exist yet", re-proposing every distilled skill forever.
+  const vaultRoot = process.env.OPEN_BRAIN_VAULT_DIR || path.join(HOME, 'Obsidian Vault v2');
+  const dirs = ['Archive', 'Checkpoints', 'Experiences', 'Skill-Candidates', 'Skills', 'Summaries'];
   const templateFiles = {
+    // The Domain column is the contract: parseExistingSkills() reads it to
+    // decide which candidate clusters have already graduated into a skill.
     [path.join(vaultRoot, 'Skill-Candidates', 'SKILL-INDEX.md')]:
-      '# Skill Index\n\n> Approved, reusable skills distilled from experience patterns.\n\n(none yet)\n',
+      '# Skill Index\n\n> Approved, reusable skills distilled from experience patterns.\n\n'
+      + '## Skills\n\n'
+      + '| Name | File | Domain | Problem Class | Source Project | Version |\n'
+      + '|---|---|---|---|---|---|\n\n'
+      + '## Pending Proposals\n\n'
+      + '| Proposed Skill | Related Experiences | Domain | Status |\n'
+      + '|---|---|---|---|\n',
     [path.join(vaultRoot, 'Skill-Candidates', 'SKILL-CANDIDATES.md')]:
       '# Skill Candidates\n\n> Experience clusters that may be worth distilling into skills.\n\n(none yet)\n'
   };
-
-  // Migration: rename Guidelines/ → Skill-Candidates/ if the old name exists
-  const oldDir = path.join(vaultRoot, 'Guidelines');
-  const newDir = path.join(vaultRoot, 'Skill-Candidates');
-  if (fs.existsSync(oldDir) && !fs.existsSync(newDir)) {
-    fs.renameSync(oldDir, newDir);
-    log(OK, 'Migrated Guidelines/ → Skill-Candidates/');
-  }
 
   let created = 0;
 
