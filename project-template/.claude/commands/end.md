@@ -141,24 +141,9 @@ RELEVANCE: {how this connects to current work}
 
 Use standardized source tags: `youtube-transcript`, `github-repo`, `notebooklm`, `docs`. Also include domain concept tags (e.g., `payments`, `deployment`, `memory-systems`) alongside implementation tags.
 
-**Obsidian dual-write:** After storing via `ob_store`, also write the research entry to Obsidian using the Write tool:
-
-**Path:** `~/Obsidian Vault/Research/{key}.md`
-
-Format:
-```yaml
----
-date: {YYYY-MM-DD}
-source: {url or reference}
-type: research
-domain: [{domain-tags, comma-separated}]
-tags: [{all-tags-including-domain-concepts}]
----
-```
-
-Body: The full research content (same as what was passed to `ob_store`).
-
-Create the `Research/` folder if it doesn't exist.
+**Do not write the vault note yourself.** `ob_store` has been vault-first since
+v0.6.0 — it writes `Experiences/{project}/{key}.md` and then indexes the row.
+A second Write creates a duplicate at a path nothing reads.
 
 Even research that concluded "not useful right now" should be captured — it records the reasoning and prevents re-evaluation later. If no external research was done, skip this step.
 
@@ -189,30 +174,27 @@ OUTCOME: {what happened, what to do differently}
 
 **Tag guidance:** Always include BOTH implementation tags (specific tools/libraries: `stripe`, `convex`, `clerk`) AND domain concept tags (what problem area: `payments`, `billing`, `authentication`, `deployment`, `styling`). Domain tags enable fuzzy recall — someone searching "how did we handle auth?" should find Clerk experiences even without knowing we use Clerk.
 
-**Obsidian dual-write:** After storing via `ob_store`, also write the experience to Obsidian using the Write tool:
+**Do not write the vault note yourself.** `ob_store` writes
+`Experiences/{project}/{key}.md` — **nested under the project**, which is the
+layout `skill-scan` walks. Writing a flat `Experiences/{key}.md` alongside it
+produces a duplicate that the scan reads as a separate experience.
 
-**Path:** `~/Obsidian Vault/Experiences/{key}.md`
+Verify the store landed rather than trusting the success message: a rebuilt MCP
+server that has not restarted yet will strip any newly-added parameter and still
+report success. Read the row back if you passed something new.
 
-Format:
-```yaml
----
-date: {YYYY-MM-DD}
-project: {project-slug}
-type: {gotcha|pattern|decision|planning|workaround|fix|optimization}
-domain: [{domain-tags, comma-separated}]
-tags: [{all-tags-including-domain-concepts}]
----
-```
+### A13. Write session summary (Obsidian)
 
-Body: The full experience content (same as what was passed to `ob_store`).
+Write the enriched summary to
+**`~/Obsidian Vault v2/Summaries/YYYY-MM-DD-{project-slug}.md`** with the Write tool.
 
-**Dedup:** If the file already exists, only overwrite if the new content is meaningfully different. Skip if >90% similar.
-
-### A13. Write session summary (Obsidian side only — SQLite is automatic)
-
-The session-end hook's `writeSummary` stage already stores the SQLite summary automatically — no tool call needed here. This step handles only the **Obsidian dual-write** for semantic search via Smart Connections.
-
-Use the Write tool to create `~/Obsidian Vault/Summaries/YYYY-MM-DD-{project-slug}.md`. **If the file already exists** (e.g., multiple sessions on the same date), Read it first, then Write with a session-suffixed filename (`YYYY-MM-DD-{project-slug}-s{N}.md`) to avoid overwriting the earlier summary.
+The SessionEnd hook writes this same path via `writeSummary`, but it **returns
+null if the file already exists** — so the enriched version written here wins,
+and the hook's thinner one is only a fallback for a session that skipped `/end`.
+That is the intended order; do not skip this step on the assumption the hook has
+it covered. **If the file already exists** (a second session on one date), Read
+it first, then Write to `YYYY-MM-DD-{project-slug}-s{N}.md` so the earlier
+summary survives.
 
 Use the enriched summary format:
 
@@ -273,7 +255,7 @@ _(Same format as A11)_
 ### B3. Store supplemental experiences
 _(Same format as A12)_
 
-### B4. Write session summary (dual-store)
+### B4. Write session summary
 _(Same format as A13)_
 
 ### B5. Collect knowledge feedback

@@ -72,13 +72,13 @@ npm run validate:session:post  # if script exists
 
 ### A10–A14. Knowledge capture
 
-**A10 Research** — `ob_store` for external research (GitHub, docs, NotebookLM) + Obsidian dual-write to `~/Obsidian Vault/Research/{key}.md`
+**A10 Research** — `ob_store` for external research (GitHub, docs, NotebookLM). **Do not write the vault note yourself** — `ob_store` is vault-first and writes `Experiences/{project}/{key}.md` itself; a second Write is a duplicate at a path nothing reads.
 
 **A11** — Review for non-obvious lessons hooks would miss
 
-**A12 Experiences** — `ob_recall` dedup first, then `ob_store` with `[EXPERIENCE]` format + Obsidian `~/Obsidian Vault/Experiences/{key}.md`
+**A12 Experiences** — `ob_recall` dedup first, then `ob_store` with `[EXPERIENCE]` format. Again no manual vault write: `ob_store` nests under the project, and a flat `Experiences/{key}.md` beside it is read by `skill-scan` as a separate experience.
 
-**A13 Summary** — Obsidian `~/Obsidian Vault/Summaries/YYYY-MM-DD-{project-slug}.md` (What / Why / How / Lessons)
+**A13 Summary** — Write `~/Obsidian Vault v2/Summaries/YYYY-MM-DD-{project-slug}.md` (What / Why / How / Lessons). The SessionEnd hook writes the same path but yields to an existing file, so this enriched version wins.
 
 **A14 Feedback** — Read `.recalled-entries.json`; `ob_feedback(entry_id, rating, referenced)` for each recalled entry (helpful / harmful / neutral)
 
