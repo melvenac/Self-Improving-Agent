@@ -18,6 +18,7 @@ function entry(over: Partial<KnowledgeIndexRow> & { id: number }): KnowledgeInde
     recall_count: 0,
     last_recalled_at: null,
     archived_into: null,
+    fact_kind: null,
     created_at: "2026-04-01T00:00:00.000Z",
     updated_at: "2026-04-01T00:00:00.000Z",
     ...over,

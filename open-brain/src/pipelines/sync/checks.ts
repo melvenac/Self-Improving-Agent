@@ -127,7 +127,12 @@ export function checkReadmeRefs(projectRoot: string): CheckResult {
     return { name: "readme-refs", severity: "warn", message: "README.md not found" };
   }
   const content = readFileSync(readmePath, "utf-8");
-  const refPattern = /(?:scripts\/[\w./\-]+|knowledge-mcp\/scripts\/[\w./\-]+)/g;
+  // Leading segments are part of the path, not context around it. The old
+  // pattern started at `scripts/`, so `open-brain/scripts/dashboard.mjs` matched
+  // only its tail and was then resolved from the repo root, where nothing sits —
+  // reporting a file that had *moved into a subdirectory* as one that had been
+  // deleted. The lookbehind stops a match beginning mid-path.
+  const refPattern = /(?<![\w/.-])(?:[\w.-]+\/)*scripts\/[\w./-]+/g;
   const refs = [...new Set(content.match(refPattern) ?? [])];
   const missing = refs.filter((ref) => !existsSync(join(projectRoot, ref)));
   if (missing.length > 0) {

@@ -140,6 +140,24 @@ describe("validation checks", () => {
       const result = checkReadmeRefs(join(tempDir, "nonexistent"));
       expect(result.severity).toBe("warn");
     });
+
+    it("resolves a script nested under a subdirectory", () => {
+      // The Session 47 dashboard move exposed this: matching from `scripts/`
+      // onward left the leading segment behind, and the tail resolved nowhere.
+      mkdirSync(join(tempDir, "open-brain", "scripts"), { recursive: true });
+      writeFileSync(join(tempDir, "open-brain", "scripts", "dashboard.mjs"), "// x\n");
+      writeFileSync(join(tempDir, "README.md"), "Run `node open-brain/scripts/dashboard.mjs` to start.\n");
+
+      const result = checkReadmeRefs(tempDir);
+      expect(result.severity).toBe("pass");
+    });
+
+    it("still catches a missing script under a subdirectory", () => {
+      writeFileSync(join(tempDir, "README.md"), "Run `node open-brain/scripts/gone.mjs`.\n");
+      const result = checkReadmeRefs(tempDir);
+      expect(result.severity).toBe("issue");
+      expect(result.message).toContain("open-brain/scripts/gone.mjs");
+    });
   });
 
   describe("checkHookConfigs", () => {

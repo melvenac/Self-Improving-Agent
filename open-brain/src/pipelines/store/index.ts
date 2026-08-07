@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3';
 import { writeExperience, writeFailure } from '../../vault-writer.js';
-import { indexKnowledge } from '../../db-v2.js';
+import { indexKnowledge, type FactKind } from '../../db-v2.js';
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -10,7 +10,20 @@ export interface StoreInput {
   key: string;
   tags: string[];
   content: string;
+  /** Vault subdirectory name — a display label, not a path. */
   project: string;
+  /**
+   * Canonical project directory, or null for a global entry.
+   *
+   * Distinct from `project` above and easy to confuse: that one names a vault
+   * folder, this one is the value `ob_recall` filters on. Omitting it is how
+   * 62% of rows ended up with a NULL `project_dir` and out of reach of every
+   * project-scoped query.
+   */
+  projectDir?: string | null;
+  source?: string;
+  /** See `FactKind`. Omitted leaves the entry unclassified. */
+  factKind?: FactKind | null;
 }
 
 export interface StoreFailureInput {
@@ -36,6 +49,7 @@ export interface StoreResult {
  */
 export function store(input: StoreInput): StoreResult {
   const { db, vaultDir, key, tags, content, project } = input;
+  const source = input.source ?? 'ob_store';
 
   const vaultPath = writeExperience(vaultDir, {
     key,
@@ -47,9 +61,14 @@ export function store(input: StoreInput): StoreResult {
     harmful: 0,
     neutral: 0,
     project,
-    source: 'ob_store',
+    source,
   });
 
+  // `writeExperience` refuses to overwrite, so an existing note means this key
+  // was already stored. Callers must report that rather than treat it as a
+  // write — and this is the exact line replace-on-write for `state` facts will
+  // have to change, once the classification has been shown correct on the live
+  // corpus.
   if (vaultPath === null) {
     return { vaultPath: null };
   }
@@ -59,6 +78,9 @@ export function store(input: StoreInput): StoreResult {
     key,
     tags: tags.join(','),
     content,
+    source,
+    projectDir: input.projectDir ?? undefined,
+    factKind: input.factKind ?? null,
   });
 
   return { vaultPath };

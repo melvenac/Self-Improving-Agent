@@ -1,5 +1,33 @@
 # Changelog
 
+## [v0.10.0] - 2026-08-07
+
+`dream` is wired to the CLI, and the state-vs-event distinction it needed is now recorded on every entry. Concept from `coleam00/skills`; it turned out to *define* the `superseded` rule rather than sit beside it.
+
+Every fact is one of two kinds. **State** is one current value that changes — a path, a version, a port — and wants replacing. **Event** is a timestamped thing that happened — a gotcha, a decision, a lesson — and wants appending. The update rules are opposites: replacing an event destroys history, and appending a state leaves two live answers to one question with nothing marking which is current. `knowledge_index` can only append, so every changed state fact has left its predecessor recallable.
+
+**Nothing about the write path changed.** `ob_store` records the label; storing still appends either way. Replace-on-write waits until the classification is shown correct on real entries, per the design doc's "auto-apply nothing initially".
+
+### Added
+- **`open-brain dream`** — `--dry-run` is the default rather than a flag, so an overnight run that forgets one reports instead of mutating. `--apply` exits non-zero with an explanation: there is no write path yet, and exiting 0 would let a caller believe changes landed. `--since=<days>` defaults to 7, `--json` for machine output.
+- **`knowledge_index.fact_kind`** — nullable, and **NULL means unclassified, not `event`**. All 341 existing rows are unclassified; backfilling a guess is the failure this feature exists to fix.
+- **A column-migration mechanism** (`migrateAddedColumns`). There was none: `CREATE TABLE IF NOT EXISTS` reaches new installs only, so editing the DDL would have left every existing database without the column and killed the first query naming it. Additive only, by design — SQLite's `ALTER TABLE` cannot add a CHECK or alter a column, and anything needing more requires a table rebuild that should be written explicitly rather than hidden in a list.
+- **`pipelines/dream/classify.ts`** — tiered state/event classifier. Returns `null` freely: an entry that reads as both, or as neither, produces no proposal, because a wrong label costs more than a missing one.
+- **`findMisfiled`** — `[CHECKPOINT]`/`[SUMMARY]` rows sitting in `knowledge_index` against the ruling of entry #138. Returns the 4 the corpus audit predicted.
+- **`findSuperseded`** — two paths. *Narration*: one entry names another as out of date and the other carries no pointer forward (returns the audited #232←#234). *State pair*: two `state` entries, same subject, different content — the general case, which fires whether or not anyone wrote "this replaces X".
+- **`kind` parameter on `ob_store`** — `state` or `event`, recorded to `fact_kind`. `effectiveKind` prefers a recorded label over anything inferred, so the heuristic decays in importance as real labels accumulate.
+
+### Fixed
+- **`ob_store` crashed on re-storing an existing key.** It bypassed the `store()` pipeline and issued a bare `INSERT` where the pipeline uses `INSERT OR REPLACE`; since `vault_path` and `key` are both `UNIQUE`, a repeat store raised `UNIQUE constraint failed` — and re-storing an existing key is precisely what a state fact does. Now routed through the pipeline, which is also the single place replace-on-write will later change.
+- **`ob_store` crashed when `key` was omitted**, despite `key` being optional in its own schema and `NOT NULL` in the table. A placeholder would have collided on the *second* keyless store; the key is now derived from the content, so two stores deriving the same key are similar enough that dedup is the right outcome.
+- **`store()` silently dropped `project_dir` and `source`.** Any caller routed through it would have written a globally-scoped row, out of reach of every project-scoped query — the same defect that once left 62% of rows with a NULL `project_dir`.
+
+### Notes on calibration
+- **The experience template is a prior, not a finding, and was demoted mid-implementation.** `TRIGGER:`/`OUTCOME:` scored as a high-confidence structural signal until the live corpus showed it matching **287 of 341 entries** — it is simply how nearly everything here is written. At 0.9 confidence it produced "86% of this corpus is events", which only ever supported the far weaker claim "86% uses the template". It now ranks *below* word choice and breaks ties only, which moved the count from 8 state / 294 event to **41 state / 261 event / 39 unclassified**. A signal firing on 84% of a corpus separates nothing.
+- **State-side precision is roughly 50–60%, measured by reading all 41.** About 15–20 are genuinely state (`port is`, `use notebook_url not`); the rest are lessons that *mention* a value, where `path is` or `threshold is` catches the mention inside an event narrative. Distinguishing "about the value" from "mentions the value" is semantic and belongs to the model leg. The fix is real labels via `ob_store kind`, not sharper regexes.
+- **The state-pair path found zero on the live corpus, and that is a real zero.** Across all 820 state pairs the highest subject overlap is 0.29 against a 0.50 threshold — no two state entries currently describe the same subject. The path is proven by unit tests and unexercised in production; its value is prospective.
+- **`obsolete-reference` returns 7, not the 0 the design doc claims.** Five are the low-confidence kind that narrate a retirement (correctly ranked at 0.35). Two are genuine live stale pointers present in both the database *and* the vault note: #184 instructs the reader to update `Projects/Self-Improving-Agent/knowledge-mcp/`, deleted in Session 47, and #303 cites `knowledge-mcp/scripts/skill-scan`. The doc has been corrected.
+
 ## [v0.9.0] - 2026-08-07
 
 Foundations for `dream` — a scheduled pass that reconciles memory across sessions, catching the patterns that in-band writes structurally cannot see. Design: `.agents/SYSTEM/dream-design.md`. Not yet wired to the CLI; these are the deterministic parts, all pure functions with no clock and no model.

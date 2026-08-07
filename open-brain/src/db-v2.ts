@@ -58,6 +58,14 @@ export function initSchemaV2(db: Database.Database): void {
       recall_count INTEGER DEFAULT 0,
       last_recalled_at TEXT,
       archived_into INTEGER DEFAULT NULL,
+      -- 'state' | 'event' | NULL. Deliberately unconstrained: SQLite cannot add
+      -- a CHECK via ALTER TABLE, so a constraint here would hold on fresh
+      -- databases and not on migrated ones. One shape everywhere beats a
+      -- guarantee that half the installs do not have; validation lives in TS.
+      --
+      -- NULL means *unclassified*, which is the honest state for every entry
+      -- written before this column existed. It is not a synonym for 'event'.
+      fact_kind TEXT DEFAULT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -127,6 +135,49 @@ export function initSchemaV2(db: Database.Database): void {
   `);
 }
 
+/**
+ * Columns added after the initial schema shipped.
+ *
+ * `CREATE TABLE IF NOT EXISTS` no-ops on a database that already holds the
+ * table, so editing the DDL above reaches new installs *only* — every existing
+ * database keeps the old shape and the first query naming the new column dies
+ * with "no such column". Nothing in this repo had ever added a column before
+ * `fact_kind`, so this is the mechanism, kept in the same call-on-open position
+ * as `migrateProjectDirToCanonical`.
+ *
+ * Additive only, and intentionally so. SQLite's `ALTER TABLE` can append a
+ * column and little else — no CHECK, no type change, no drop — and anything
+ * needing more than an append needs a full table rebuild, which is a different
+ * and far more dangerous operation than this list implies. Do not grow this
+ * into a general migration framework; add the rebuild explicitly when something
+ * actually requires one.
+ *
+ * Both paths must stay in sync: a column added here also belongs in the DDL, so
+ * fresh and migrated databases converge on one shape.
+ */
+interface AddedColumn {
+  table: string;
+  column: string;
+  /** Type and default only — see the constraint note above. */
+  ddl: string;
+}
+
+const ADDED_COLUMNS: AddedColumn[] = [
+  { table: 'knowledge_index', column: 'fact_kind', ddl: 'TEXT DEFAULT NULL' },
+];
+
+/** Returns the columns it added, so a caller can report a first-run migration. */
+export function migrateAddedColumns(db: Database.Database): string[] {
+  const added: string[] = [];
+  for (const target of ADDED_COLUMNS) {
+    const existing = db.prepare(`PRAGMA table_info(${target.table})`).all() as { name: string }[];
+    if (existing.some((c) => c.name === target.column)) continue;
+    db.exec(`ALTER TABLE ${target.table} ADD COLUMN ${target.column} ${target.ddl}`);
+    added.push(`${target.table}.${target.column}`);
+  }
+  return added;
+}
+
 export function openV2Database(dbPath: string): Database.Database {
   // better-sqlite3 creates the file but not its parent, so on a machine where
   // ~/.claude/open-brain/ does not exist yet — a fresh clone of the template, a
@@ -138,8 +189,32 @@ export function openV2Database(dbPath: string): Database.Database {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   initSchemaV2(db);
+  migrateAddedColumns(db);
   migrateProjectDirToCanonical(db);
   return db;
+}
+
+/**
+ * Which update rule a stored fact obeys.
+ *
+ * - `state` — one current value that changes: a path, a version, an owner, a
+ *   threshold. Correct update is to **replace**.
+ * - `event` — a timestamped thing that happened: a gotcha, a decision, a lesson
+ *   learned. Correct update is to **append**.
+ *
+ * The rules are opposites, which is why the distinction matters more than it
+ * first appears. Appending a state leaves two answers to one question with
+ * nothing marking which is current — and `ob_recall` may return either.
+ * Replacing an event destroys history that cannot be recovered.
+ *
+ * `knowledge_index` can only append, so today every changed state fact leaves
+ * its predecessor live and recallable. Recording the kind is the first step;
+ * acting on it at write time is deliberately not yet done.
+ */
+export type FactKind = 'state' | 'event';
+
+export function isFactKind(value: unknown): value is FactKind {
+  return value === 'state' || value === 'event';
 }
 
 export interface KnowledgeIndexInput {
@@ -154,6 +229,8 @@ export interface KnowledgeIndexInput {
   harmful?: number;
   neutral?: number;
   successRate?: number | null;
+  /** Omitted leaves the entry unclassified, which is not the same as `event`. */
+  factKind?: FactKind | null;
 }
 
 export interface KnowledgeIndexRow {
@@ -172,6 +249,8 @@ export interface KnowledgeIndexRow {
   recall_count: number;
   last_recalled_at: string | null;
   archived_into: number | null;
+  /** NULL = unclassified. Not validated by the schema; see `isFactKind`. */
+  fact_kind: FactKind | null;
   created_at: string;
   updated_at: string;
 }
@@ -197,12 +276,13 @@ export function indexKnowledge(db: Database.Database, input: KnowledgeIndexInput
 
   db.prepare(`
     INSERT OR REPLACE INTO knowledge_index
-      (vault_path, key, content, tags, source, project_dir, maturity, helpful, harmful, neutral, success_rate, recall_count, last_recalled_at, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NULL, ?, ?)
+      (vault_path, key, content, tags, source, project_dir, maturity, helpful, harmful, neutral, success_rate, recall_count, last_recalled_at, fact_kind, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NULL, ?, ?, ?)
   `).run(
     input.vaultPath, input.key, input.content, input.tags,
     input.source ?? 'manual', input.projectDir ?? null,
-    maturity, helpful, harmful, neutral, successRate, now, now
+    maturity, helpful, harmful, neutral, successRate,
+    input.factKind ?? null, now, now
   );
   // FTS is populated automatically via INSERT trigger (content-backed)
 }

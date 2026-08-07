@@ -26,7 +26,7 @@ import { resolvePaths, canonicalizeProjectDir, obsidianVaultDir } from "./shared
 import { readActiveSession, activeSessionKey, currentIde } from "./shared/active-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { readJson } from "./shared/fs-utils.js";
-import { slugify, writeExperience } from "./vault-writer.js";
+import { slugify } from "./vault-writer.js";
 import { evaluateLifecycle, recallRankExpr, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
 import type { CategoryScore, ScoreResult } from "./pipelines/sync/types.js";
 
@@ -525,48 +525,76 @@ server.tool(
     source: z.string().optional().default("manual").describe("Where this knowledge came from"),
     scope: z.enum(["global", "project"]).optional().default("global").describe("Scope: global or project"),
     project_dir: z.string().optional().describe("Project directory (only when scope is 'project')"),
+    kind: z.enum(["state", "event"]).optional().describe(
+      "'state' = one current value that changes (a path, a version, an owner) — replace it. " +
+      "'event' = a timestamped thing that happened (a gotcha, a decision, a lesson) — append it. " +
+      "Recorded for reconciliation; storing still appends either way."
+    ),
   },
-  async ({ content, key, tags, source, scope, project_dir }) => {
+  async ({ content, key, tags, source, scope, project_dir, kind }) => {
     const v2db = getV2Db();
-    const now = new Date().toISOString();
-    const tagsStr = tags ? tags.join(", ") : "";
     const effectiveProject = scope === "project" ? canonicalizeProjectDir(project_dir) : null;
-
-    // Derive vault path
-    const slug = slugify(key || "unnamed");
     const projectName = effectiveProject
       ? effectiveProject.split("/").pop() || "General"
       : "General";
-    const vaultPath = join(v2VaultDir(), "Experiences", projectName, `${slug}.md`);
 
-    // Write vault file
-    writeExperience(v2VaultDir(), {
-      key: key || "unnamed",
+    // `key` is optional in this schema but NOT NULL UNIQUE in the table, so a
+    // keyless store used to die on the constraint — and a placeholder would die
+    // on the *second* one, since two "unnamed" rows collide. Derive something
+    // stable from the content instead: two stores that derive the same key are
+    // saying near-enough the same thing that dedup is the right outcome.
+    const effectiveKey = key || deriveKey(content);
+
+    // Routed through the store pipeline rather than writing here. This tool used
+    // to issue its own bare INSERT while the pipeline used INSERT OR REPLACE, so
+    // re-storing an existing key raised "UNIQUE constraint failed" — and
+    // re-storing an existing key is precisely what a `state` fact does.
+    const { store } = await import("./pipelines/store/index.js");
+    const result = store({
+      db: v2db,
+      vaultDir: v2VaultDir(),
+      key: effectiveKey,
       tags: tags || [],
       content,
-      created: now,
-      maturity: "progenitor",
-      helpful: 0, harmful: 0, neutral: 0,
       project: projectName,
+      projectDir: effectiveProject,
       source: source || "manual",
+      factKind: kind ?? null,
     });
 
-    // Insert into DB (FTS auto-populated by trigger)
-    const result = v2db.prepare(`
-      INSERT INTO knowledge_index
-        (vault_path, key, content, tags, source, project_dir, maturity,
-         helpful, harmful, neutral, success_rate, recall_count, last_recalled_at, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, 'progenitor', 0, 0, 0, NULL, 0, NULL, ?, ?)
-    `).run(vaultPath, key || null, content, tagsStr, source || "manual", effectiveProject, now, now);
-
-    const id = Number(result.lastInsertRowid);
     const scopeLabel = effectiveProject ? ` [project: ${effectiveProject}]` : " [global]";
 
+    if (result.vaultPath === null) {
+      return {
+        content: [{
+          type: "text" as const,
+          text:
+            `Not stored — "${effectiveKey}" already exists in the vault${scopeLabel}. ` +
+            `Nothing was written. Store under a different key, or use ob_forget first if you meant to replace it.`,
+        }],
+      };
+    }
+
+    const row = v2db.prepare(`SELECT id FROM knowledge_index WHERE vault_path = ?`)
+      .get(result.vaultPath) as { id: number } | undefined;
+
+    const kindLabel = kind ? ` — kind: ${kind}` : "";
     return {
-      content: [{ type: "text" as const, text: `Stored knowledge (id: ${id})${key ? ` with key "${key}"` : ""}${scopeLabel}${tags && tags.length > 0 ? ` — tags: ${tags.join(", ")}` : ""}` }],
+      content: [{ type: "text" as const, text: `Stored knowledge (id: ${row?.id ?? "?"}) with key "${effectiveKey}"${scopeLabel}${tags && tags.length > 0 ? ` — tags: ${tags.join(", ")}` : ""}${kindLabel}` }],
     };
   }
 );
+
+/** First few meaningful words of the content, as a fallback key. */
+function deriveKey(content: string): string {
+  const words = content
+    .replace(/[^\p{L}\p{N}\s-]/gu, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 2)
+    .slice(0, 6)
+    .join("-");
+  return slugify(words) || "unnamed";
+}
 
 // --- ob_feedback ---
 server.tool(

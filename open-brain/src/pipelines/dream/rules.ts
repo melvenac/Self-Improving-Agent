@@ -1,4 +1,5 @@
 import type { KnowledgeIndexRow } from "../../db-v2.js";
+import { effectiveKind } from "./classify.js";
 import type { Candidate, Evidence } from "./types.js";
 
 /**
@@ -283,6 +284,239 @@ function matchingSentence(text: string, pattern: RegExp): string {
     if (pattern.test(sentence)) return sentence;
   }
   return text;
+}
+
+/**
+ * Row shapes that belong in another store.
+ *
+ * Entry #138 — the most-recalled entry in the corpus — rules that checkpoints
+ * and session summaries are ephemeral session state and belong in `chunks`, not
+ * in `knowledge_index` alongside durable knowledge. Four rows contradict it.
+ *
+ * Matched on the marker the writers actually emit rather than on `source`,
+ * which has been written inconsistently across the tools that produce these
+ * rows and would miss the hand-stored ones.
+ */
+const MISFILED_MARKERS: { label: string; pattern: RegExp; belongs: string }[] = [
+  { label: "[CHECKPOINT]", pattern: /^\s*\[CHECKPOINT\]/i, belongs: "chunks (category `checkpoint`)" },
+  { label: "[SUMMARY]", pattern: /^\s*\[SUMMARY\]/i, belongs: "chunks (category `summary`)" },
+];
+
+/**
+ * Entries sitting in the wrong store.
+ *
+ * The one rule here that proposes a *move* rather than a rewrite or an archive.
+ * Nothing is wrong with the content — a checkpoint is a perfectly good
+ * checkpoint — so neither `duplicate` nor `stale` describes the problem, and
+ * neither fix would help. Filed against a policy the corpus wrote down, which is
+ * what makes it fully checkable and why confidence is high.
+ */
+export function findMisfiled(entries: KnowledgeIndexRow[]): Candidate[] {
+  const candidates: Candidate[] = [];
+
+  for (const e of live(entries)) {
+    const content = e.content ?? "";
+    const key = e.key ?? "";
+    const hit = MISFILED_MARKERS.find((m) => m.pattern.test(content) || m.pattern.test(key));
+    if (!hit) continue;
+
+    candidates.push({
+      kind: "misfiled",
+      targetIds: [e.id],
+      summary:
+        `Entry ${e.id} ("${e.key}") is a ${hit.label} row in knowledge_index; ` +
+        `per entry #138 it belongs in ${hit.belongs}.`,
+      evidence: [entryEvidence(e)],
+      // A marker either opens the row or it does not; there is no judgment in
+      // the detection. The judgment is whether to move or drop it.
+      confidence: 0.9,
+    });
+  }
+
+  return candidates.sort((a, b) => b.confidence - a.confidence);
+}
+
+/** Language in which one entry declares another out of date. */
+const SUPERSESSION_MARKERS =
+  /\b(supersedes?|superseded|replaces?|replaced by|obsoletes?|outdated|out of date|no longer (?:accurate|correct|true|valid)|deprecated in favou?r of)\b/i;
+
+export interface SupersededOptions {
+  /** Key overlap at or above this counts as "the same subject". */
+  subjectThreshold?: number;
+  /**
+   * Content overlap at or below this counts as "a different answer".
+   *
+   * Well under `findDuplicates`' content threshold on purpose: the gap between
+   * them is the whole discriminator, and a pair that is merely *similar* should
+   * fall through both rather than be claimed by the wrong one.
+   */
+  contentCeiling?: number;
+  /** Minimum classifier confidence before a state-pair is proposed. */
+  minKindConfidence?: number;
+}
+
+/**
+ * One question with two live answers.
+ *
+ * Two detection paths, deliberately kept together because they are the same
+ * finding arrived at differently:
+ *
+ * 1. **Narration** — one entry says in words that another is out of date, and
+ *    the other carries no forward pointer back. Needs no classifier and is the
+ *    only path with verified ground truth in this corpus (#232 ← #234), so it
+ *    scores highest.
+ * 2. **State pair** — two entries both classified `state`, about the same
+ *    subject, saying different things. This is the general case: it fires
+ *    whether or not anyone thought to write "this replaces X", which is the
+ *    reason the narration path alone found exactly one hit in 329 entries.
+ *
+ * Where both fire on one pair, the agreement is worth something — it is a free
+ * check on the classifier, since the narration path reached the same verdict
+ * without it.
+ *
+ * **A pair may also appear under `duplicate`.** That is not a bug and is not
+ * suppressed: the rules are independent by design, and the two propose genuinely
+ * different actions — merge the pair, or keep the newer and archive the older.
+ * A reviewer seeing both learns more than one seeing whichever rule ran first.
+ *
+ * Order within `targetIds` is meaningful: `[superseded, superseding]`, oldest
+ * first, so the proposal reads in the direction the fix would be applied.
+ */
+export function findSuperseded(
+  entries: KnowledgeIndexRow[],
+  options: SupersededOptions = {},
+): Candidate[] {
+  const subjectThreshold = options.subjectThreshold ?? 0.5;
+  const contentCeiling = options.contentCeiling ?? 0.35;
+  const minKindConfidence = options.minKindConfidence ?? 0.4;
+
+  const rows = live(entries);
+  const ctok = new Map<number, Set<string>>();
+  const ktok = new Map<number, Set<string>>();
+  const kind = new Map<number, ReturnType<typeof effectiveKind>>();
+  for (const e of rows) {
+    ctok.set(e.id, tokenise(e.content));
+    ktok.set(e.id, keyTokens(e.key));
+    kind.set(e.id, effectiveKind(e));
+  }
+
+  const candidates: Candidate[] = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    for (let j = i + 1; j < rows.length; j++) {
+      const [older, newer] = orderByAge(rows[i], rows[j]);
+
+      // Path 1: narration. Directional — B naming A means A is the stale one,
+      // regardless of which was written first, so this overrides age ordering.
+      const narrated = narratedSupersession(rows[i], rows[j]);
+      if (narrated) {
+        candidates.push({
+          kind: "superseded",
+          targetIds: [narrated.stale.id, narrated.current.id],
+          summary:
+            `Entry ${narrated.stale.id} ("${narrated.stale.key}") is named as out of date by ` +
+            `entry ${narrated.current.id} ("${narrated.current.key}"), and carries no pointer forward.`,
+          evidence: [
+            { source: "entry", entryId: narrated.current.id, key: narrated.current.key ?? null, quote: excerpt(narrated.sentence) },
+            entryEvidence(narrated.stale),
+          ],
+          confidence: 0.85,
+        });
+        continue;
+      }
+
+      // Path 2: state pair.
+      const ka = kind.get(rows[i].id)!;
+      const kb = kind.get(rows[j].id)!;
+      if (ka.kind !== "state" || kb.kind !== "state") continue;
+      const kindConfidence = Math.min(ka.confidence, kb.confidence);
+      if (kindConfidence < minKindConfidence) continue;
+
+      const subjectSim = similarity(ktok.get(rows[i].id)!, ktok.get(rows[j].id)!);
+      const contentSim = similarity(ctok.get(rows[i].id)!, ctok.get(rows[j].id)!);
+      if (subjectSim < subjectThreshold || contentSim > contentCeiling) continue;
+
+      candidates.push({
+        kind: "superseded",
+        targetIds: [older.id, newer.id],
+        summary:
+          `Entries ${older.id} ("${older.key}") and ${newer.id} ("${newer.key}") both state a ` +
+          `current value for the same subject (${Math.round(subjectSim * 100)}% key overlap) but ` +
+          `disagree (${Math.round(contentSim * 100)}% content overlap). ${newer.id} is newer.`,
+        evidence: [
+          entryEvidence(older),
+          entryEvidence(newer),
+          ...stateSignalEvidence(older, kind.get(older.id)!),
+          ...stateSignalEvidence(newer, kind.get(newer.id)!),
+        ],
+        // Ranked below narration: this pair was inferred to be state, where the
+        // narration path was told.
+        confidence: Math.min(0.75, subjectSim * 0.6 + kindConfidence * 0.4),
+      });
+    }
+  }
+
+  return candidates.sort((a, b) => b.confidence - a.confidence);
+}
+
+/** Oldest first. `created_at` is NOT NULL, so an unparseable value is the only gap. */
+function orderByAge(a: KnowledgeIndexRow, b: KnowledgeIndexRow): [KnowledgeIndexRow, KnowledgeIndexRow] {
+  const ta = Date.parse(a.created_at ?? "");
+  const tb = Date.parse(b.created_at ?? "");
+  if (Number.isNaN(ta) || Number.isNaN(tb)) return [a, b];
+  return ta <= tb ? [a, b] : [b, a];
+}
+
+/**
+ * One entry naming the other as out of date, in the same sentence.
+ *
+ * Requiring the key and the marker to share a sentence is what keeps this from
+ * firing on an entry that merely mentions another and separately uses the word
+ * "outdated" about something else.
+ *
+ * The reverse direction is checked and disqualifies the pair: if A also points
+ * at B, the two already reference each other and there is nothing to repair —
+ * which is precisely what "carries no forward pointer" means in the audit spec.
+ */
+function narratedSupersession(
+  a: KnowledgeIndexRow,
+  b: KnowledgeIndexRow,
+): { stale: KnowledgeIndexRow; current: KnowledgeIndexRow; sentence: string } | null {
+  const aNamesB = namingSentence(a, b);
+  const bNamesA = namingSentence(b, a);
+  if (aNamesB && bNamesA) return null;
+  if (bNamesA) return { stale: a, current: b, sentence: bNamesA };
+  if (aNamesB) return { stale: b, current: a, sentence: aNamesB };
+  return null;
+}
+
+/** The sentence in `source` that names `target`'s key alongside a supersession marker. */
+function namingSentence(source: KnowledgeIndexRow, target: KnowledgeIndexRow): string | null {
+  const key = normaliseKey(target.key);
+  if (key.length < 4) return null;
+  // Match the key as written or in its normalised spelling — entries reference
+  // each other both ways.
+  const spellings = new Set([key, key.replace(/-/g, " "), target.key ?? ""].filter((s) => s.length >= 4));
+
+  for (const sentence of (source.content ?? "").split(/(?<=[.!?])\s+|\n+/)) {
+    if (!SUPERSESSION_MARKERS.test(sentence)) continue;
+    const flat = sentence.toLowerCase();
+    for (const spelling of spellings) {
+      if (flat.includes(spelling.toLowerCase())) return sentence;
+    }
+  }
+  return null;
+}
+
+/** Quote what made the classifier call an entry `state`, so the call is reviewable. */
+function stateSignalEvidence(e: KnowledgeIndexRow, k: { signals: string[] }): Evidence[] {
+  if (k.signals.length === 0) return [];
+  return [{
+    source: "entry",
+    entryId: e.id,
+    key: e.key ?? null,
+    quote: `state signals: ${k.signals.join("; ")}`,
+  }];
 }
 
 export interface StaleOptions {

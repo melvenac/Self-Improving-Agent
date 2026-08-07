@@ -47,9 +47,33 @@ export type CandidateKind =
    * missing file is checkable; disuse is not.
    */
   | "obsolete-reference"
+  /**
+   * A state fact whose current value is recorded somewhere else, leaving two
+   * live answers to one question.
+   *
+   * Distinct from `duplicate` on one axis: a duplicate says the *same* thing
+   * twice, a supersession says a *different* thing about the same subject. High
+   * subject overlap with low content overlap separates them.
+   */
+  | "superseded"
+  /**
+   * Filed in the wrong store. A different axis from everything else here —
+   * nothing is wrong with the content, it is the location that contradicts
+   * policy, so the fix is a move rather than a rewrite.
+   */
+  | "misfiled"
   | "stale"
   | "correction"
   | "unstored";
+
+/**
+ * Re-exported from the schema layer, where the column lives.
+ *
+ * `db-v2.ts` owns the definition because `knowledge_index.fact_kind` is what
+ * makes it real; a pipeline importing downward is the right direction, and the
+ * reverse would leave the schema depending on one of its consumers.
+ */
+export type { FactKind } from "../../db-v2.js";
 
 /**
  * A verbatim quote plus the location it came from.

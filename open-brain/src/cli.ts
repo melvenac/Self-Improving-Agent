@@ -215,6 +215,71 @@ if (command === "sync") {
   if (result.frontmatter.errors.length > 0) {
     console.log(`Frontmatter errors: ${result.frontmatter.errors.join(", ")}`);
   }
+} else if (command === "dream") {
+  const { runDream } = await import("./pipelines/dream/index.js");
+  const { formatReport } = await import("./pipelines/dream/report.js");
+  const { openV2Database } = await import("./db-v2.js");
+  const { existsSync } = await import("node:fs");
+
+  const asJson = args.includes("--json");
+
+  // `--dry-run` is the default rather than an option, so an overnight run that
+  // forgets a flag reports instead of mutating. `--apply` is the only way to
+  // reach a write path, and there is none yet — say so plainly rather than
+  // exiting 0 and letting the caller believe changes landed.
+  if (args.includes("--apply")) {
+    console.error(
+      "dream --apply: nothing to apply. The deterministic pass proposes only;\n" +
+      "adjudication and application belong to the model leg, which is not built.\n" +
+      "Run without --apply to see the report."
+    );
+    process.exit(1);
+  }
+
+  // 7 days, not the reference implementation's 24h. Measured session counts on
+  // this corpus: 24h -> 2, 72h -> 2, 7d -> 17. A window that collapses onto a
+  // single day cannot show the cross-session patterns dreaming exists to find.
+  const sinceArg = args.find((a) => a.startsWith("--since="));
+  const days = sinceArg ? Number(sinceArg.slice("--since=".length)) : 7;
+  if (!Number.isFinite(days) || days <= 0) {
+    console.error(`Invalid --since: expected a positive number of days, got "${sinceArg}".`);
+    process.exit(1);
+  }
+
+  const paths = resolvePaths(resolve("."));
+  if (!existsSync(paths.knowledgeV2Db)) {
+    console.error(`Knowledge database not found at ${paths.knowledgeV2Db} — nothing to reconcile.`);
+    process.exit(1);
+  }
+
+  const now = new Date();
+  const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+  const db = openV2Database(paths.knowledgeV2Db);
+  let result;
+  try {
+    result = runDream({ db, now, since, maxPerKind: 20 });
+  } finally {
+    db.close();
+  }
+
+  if (asJson) {
+    console.log(JSON.stringify(result, null, 2));
+  } else {
+    const { report, kindCensus } = result;
+    console.log(`\nDream — ${report.entriesExamined} live entries, ${report.sessionsExamined.length} sessions since ${since.toISOString().slice(0, 10)}\n`);
+
+    // Printed before the candidates because it is what says whether to trust
+    // them: a classifier calling nothing `state` yields no state-pair proposals,
+    // and a report of zero would otherwise read as a clean corpus.
+    console.log(
+      `Fact kinds: ${kindCensus.state} state, ${kindCensus.event} event, ` +
+      `${kindCensus.unclassified} unclassified (${kindCensus.recorded} recorded, rest inferred)\n`
+    );
+
+    console.log(report.candidates.length === 0 ? "No candidates." : formatReport(report));
+    console.log(`\nRead-only. Nothing was written.`);
+  }
 } else {
   console.log("Usage: open-brain <command> [options]");
   console.log("");
@@ -222,5 +287,6 @@ if (command === "sync") {
   console.log("  sync [--check] [--score [--json]] [--history]");
   console.log("  start                                     Start a session");
   console.log("  end [--dry-run]                            End a session");
+  console.log("  dream [--since=<days>] [--json]            Reconcile stored memory (read-only)");
   process.exit(1);
 }
