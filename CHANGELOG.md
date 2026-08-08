@@ -1,5 +1,35 @@
 # Changelog
 
+## [v0.12.0] - 2026-08-08
+
+An audit of all 13 MCP tools found every core contract holding. It also found that the vault and its index had silently diverged, and that the divergence is inflating skill proposals.
+
+`checkVaultIndexParity` reports the divergence. It was built before fixing any instance, deliberately: the drift had **three unrelated producers**, and a detector catches all three plus whatever comes next. It paid for itself on the first run — reading the vault by hand had missed the main problem twice.
+
+### Added
+- **`checkVaultIndexParity`** — compares notes under `Experiences/` and `Checkpoints/` against `knowledge_index.vault_path`, classifying the result into **duplicates** (same note under two folders), **unindexed** (file with no row), and **dangling** (row with no file). `Summaries/` is excluded: session-end writes it and never indexes it, so scanning it is all noise.
+  - Reported as a **warning**, not an issue. This is data state needing per-note triage, it cannot be auto-fixed, and an unrelated commit should not be blocked by it.
+  - The classification is the point. An earlier version reported one undifferentiated count, which hid the duplicates entirely — the only class with active damage.
+
+### Found
+- **60 duplicate notes**, each filed under both `Experiences/General/` and `Experiences/<Project>/`, one copy indexed and one not. `skill-scan` reads the directory recursively and counts **both**, inflating the cluster sizes that gate skill proposals. Three of the five pending proposals are affected: `template` 7→4 unique, `esm` 5→4, `revenue` 5→3. `revenue` lands exactly on the 3-file threshold that decides whether a cluster is proposed at all.
+- **10 unindexed notes** — in the vault, absent from the index, so invisible to `ob_recall` while still feeding `skill-scan`. Sources: 5 `migration-v1`, 2 `agent`, 1 `e2e-test` (a test suite that wrote into the real vault), 1 with no frontmatter.
+- **Deletion orphans a note.** `ob_forget` and apoptosis auto-prune remove the row and leave the markdown. Reproduced in a sandbox; zero live instances. Real, but not the cause of the above.
+
+### Audit result
+All 13 tools do what they were designed to do, verified against DB rows and vault files rather than their own success messages, with the server pointed at a temp DB and vault so destructive tools could not reach real knowledge. Isolation was proven before testing rather than assumed.
+
+Three behaviours diverge from documented design, none of them a broken contract:
+- `ob_recall` with neither `project` nor `global` returns other projects' scoped entries, though the description says the default is scoped. Passing `project` filters correctly — it is the default that is permissive.
+- An apoptosis flag on a manual entry leaves no durable trace: no column is set and no tool surfaces it, so "flagged for approval" cannot be enumerated. Derivable in SQL only.
+- `CLAUDE.md` documents 9 tools; 13 are registered.
+
+Full report: `.agents/SYSTEM/mcp-tool-audit-2026-08-08.md`.
+
+### Notes
+- Two findings in the first pass were wrong and were corrected by checking rather than reasoning. `ob_store` refusing a duplicate key was read as a silent discard — it returns an explicit refusal naming `ob_forget`. Apoptosis auto-prune was read as silent — it reports *"Entry N has been removed."* Both were regexes matching the wrong text, not tool defects.
+- The orphan count itself was wrong twice: matching by basename gave 9, by full path 70. The gap was the 60 duplicates, which basename matching cannot see by construction.
+
 ## [v0.11.1] - 2026-08-07
 
 The v0.11.0 check scanned command and doc trees but not `CLAUDE.md` — the file loaded into every session, and so the highest-leverage place for a stale path to sit. A stale reference in a doc is followed when someone reads that doc; a stale reference in `CLAUDE.md` is standing instruction in every session from then on.

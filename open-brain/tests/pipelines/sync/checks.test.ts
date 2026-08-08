@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, cpSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
+import DatabaseCtor from "better-sqlite3";
 import { rmSync } from "node:fs";
 import {
   syncReadmeVersion,
@@ -10,6 +11,7 @@ import {
   checkClaudeMd,
   checkTemplate,
   checkObsidianVault,
+  checkVaultIndexParity,
   checkVaultPathRefs,
   checkRules,
   checkReadmeRefs,
@@ -218,6 +220,76 @@ describe("validation checks", () => {
       writeFileSync(join(tempDir, "CLAUDE.md"), "# Claude\nNo directory refs here.\n");
       const result = checkClaudeMd(tempDir);
       expect(result.severity).toBe("pass");
+    });
+  });
+
+  describe("checkVaultIndexParity", () => {
+    /**
+     * Builds a vault + a knowledge_index containing only the rows given, so each
+     * divergence class can be produced deliberately rather than hoped for.
+     */
+    function scenario(notes: string[], indexedPaths: string[]): { vault: string; db: string } {
+      const vault = mkdtempSync(join(tmpdir(), "ob-parity-vault-"));
+      const db = join(mkdtempSync(join(tmpdir(), "ob-parity-db-")), "k.db");
+      for (const n of notes) {
+        const full = join(vault, n);
+        mkdirSync(dirname(full), { recursive: true });
+        writeFileSync(full, "# note\n");
+      }
+      const d = new DatabaseCtor(db);
+      d.exec("CREATE TABLE knowledge_index (id INTEGER PRIMARY KEY, key TEXT, vault_path TEXT)");
+      const ins = d.prepare("INSERT INTO knowledge_index (key, vault_path) VALUES (?, ?)");
+      for (const p of indexedPaths) ins.run(p.replace(/[\\/]/g, "-"), join(vault, p));
+      d.close();
+      return { vault, db };
+    }
+
+    it("passes when every note has a matching index row", () => {
+      const { vault, db } = scenario(["Experiences/General/a.md"], ["Experiences/General/a.md"]);
+      const r = checkVaultIndexParity(vault, db);
+      expect(r.severity).toBe("pass");
+    });
+
+    it("reports a duplicate when the same note is filed under two folders", () => {
+      const { vault, db } = scenario(
+        ["Experiences/General/a.md", "Experiences/ProjX/a.md"],
+        ["Experiences/ProjX/a.md"],
+      );
+      const r = checkVaultIndexParity(vault, db);
+      expect(r.severity).toBe("warn");
+      expect(r.message).toContain("1 duplicate note");
+      expect(r.message).toContain("counts it twice");
+      expect(r.message).not.toContain("unindexed note");
+    });
+
+    it("reports an unindexed note distinctly from a duplicate", () => {
+      const { vault, db } = scenario(
+        ["Experiences/General/a.md", "Experiences/General/lonely.md"],
+        ["Experiences/General/a.md"],
+      );
+      const r = checkVaultIndexParity(vault, db);
+      expect(r.message).toContain("1 unindexed note");
+      expect(r.message).not.toContain("duplicate note");
+    });
+
+    it("reports an index row whose vault file is gone", () => {
+      const { vault, db } = scenario(["Experiences/General/a.md"], ["Experiences/General/a.md", "Experiences/General/deleted.md"]);
+      const r = checkVaultIndexParity(vault, db);
+      expect(r.message).toContain("1 index row");
+    });
+
+    it("ignores Summaries/, which session-end writes and never indexes", () => {
+      const { vault, db } = scenario(
+        ["Experiences/General/a.md", "Summaries/2026-08-08-proj.md"],
+        ["Experiences/General/a.md"],
+      );
+      expect(checkVaultIndexParity(vault, db).severity).toBe("pass");
+    });
+
+    it("is not applicable rather than failing when the DB does not exist", () => {
+      const vault = mkdtempSync(join(tmpdir(), "ob-parity-novault-"));
+      const r = checkVaultIndexParity(vault, join(vault, "nope.db"));
+      expect(r.severity).toBe("pass");
     });
   });
 

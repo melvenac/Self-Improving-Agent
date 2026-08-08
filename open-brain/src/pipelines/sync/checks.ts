@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
+import Database from "better-sqlite3";
 import type { CheckResult } from "./types.js";
 
 /**
@@ -292,6 +293,90 @@ export function checkVaultPathRefs(projectRoot: string, home = homedir()): Check
     };
   }
   return { name: "vault-path-refs", severity: "pass", message: "No v1-vault references in docs or commands" };
+}
+
+/**
+ * Vault notes and their index rows drifting apart.
+ *
+ * The vault is documented vault-first: the markdown is the source of truth and
+ * the DB indexes it. Nothing enforced that, and the two diverge silently in both
+ * directions. Three unrelated producers were found in one audit — the v1->v2
+ * migration wrote notes without indexing them, a test suite wrote into the real
+ * vault, and deleting an entry removes the row while leaving the file.
+ *
+ * The damage is not that a row is missing. `skill-scan` reads `Experiences/`
+ * recursively, so an unindexed note still drives skill clustering while being
+ * invisible to `ob_recall` — knowledge that shapes proposals but can never be
+ * retrieved. One such note was driving a live skill proposal when this was
+ * written.
+ *
+ * Reported as a warning, not an issue: this is data state needing per-note
+ * triage (index it, or delete it), not something a commit should block on, and
+ * unlike the version checks it cannot be auto-fixed.
+ */
+export function checkVaultIndexParity(vaultPath: string, dbPath: string): CheckResult {
+  if (!existsSync(vaultPath) || !existsSync(dbPath)) {
+    return { name: "vault-index-parity", severity: "pass", message: "Vault or knowledge DB absent — parity not applicable" };
+  }
+
+  const norm = (p: string) => p.replace(/\\/g, "/").toLowerCase();
+
+  let indexed: Set<string>;
+  let rows: Array<{ vault_path: string }>;
+  try {
+    const db = new Database(dbPath, { readonly: true, fileMustExist: true });
+    rows = db.prepare("SELECT vault_path FROM knowledge_index WHERE vault_path IS NOT NULL").all() as Array<{ vault_path: string }>;
+    db.close();
+    indexed = new Set(rows.map((r) => norm(r.vault_path)));
+  } catch (err) {
+    return { name: "vault-index-parity", severity: "warn", message: `Could not read knowledge DB: ${(err as Error).message}` };
+  }
+
+  // Only the directories the ob_ tools write and index. Summaries/ is written by
+  // session-end and deliberately not indexed, so scanning it would be all noise.
+  const scanned = ["Experiences", "Checkpoints"];
+  const walk = (dir: string): string[] => {
+    const out: string[] = [];
+    let entries;
+    try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return out; }
+    for (const e of entries) {
+      const full = join(dir, e.name);
+      if (e.isDirectory()) out.push(...walk(full));
+      else if (e.name.endsWith(".md")) out.push(full);
+    }
+    return out;
+  };
+
+  const files = scanned.flatMap((d) => walk(join(vaultPath, d)));
+  const unmatched = files.filter((f) => !indexed.has(norm(f)));
+  const dangling = rows.filter((r) => !existsSync(r.vault_path));
+
+  // An unmatched file whose *basename* is indexed under a different folder is a
+  // second copy of an indexed note, not an unindexed one. The distinction is the
+  // whole point: a duplicate is counted twice by skill-scan and inflates the
+  // cluster sizes that gate skill proposals, while an unindexed note is simply
+  // unreachable. Reporting both as "not in the index" hides the first entirely.
+  const indexedNames = new Set([...indexed].map((p) => p.slice(p.lastIndexOf("/") + 1)));
+  const nameOf = (f: string) => norm(f).slice(norm(f).lastIndexOf("/") + 1);
+  const duplicates = unmatched.filter((f) => indexedNames.has(nameOf(f)));
+  const unindexed = unmatched.filter((f) => !indexedNames.has(nameOf(f)));
+
+  if (unmatched.length === 0 && dangling.length === 0) {
+    return { name: "vault-index-parity", severity: "pass", message: `Vault and index agree (${files.length} notes)` };
+  }
+
+  const rel = (f: string) => f.replace(vaultPath, "").replace(/\\/g, "/").replace(/^\//, "");
+  const parts: string[] = [];
+  if (duplicates.length > 0) {
+    parts.push(`${duplicates.length} duplicate note(s) — same note filed under two folders, so skill-scan counts it twice: ${rel(duplicates[0])}`);
+  }
+  if (unindexed.length > 0) {
+    parts.push(`${unindexed.length} unindexed note(s) — feed skill-scan but unreachable by ob_recall: ${rel(unindexed[0])}`);
+  }
+  if (dangling.length > 0) {
+    parts.push(`${dangling.length} index row(s) whose vault file is missing`);
+  }
+  return { name: "vault-index-parity", severity: "warn", message: parts.join("; ") };
 }
 
 export function checkTemplate(projectRoot: string): CheckResult {
