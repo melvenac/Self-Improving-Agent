@@ -163,6 +163,36 @@ export function apoptosisFlaggedExpr(alias = "k"): string {
   );
 }
 
+export interface ApoptosisCandidate {
+  id: number;
+  key: string | null;
+  helpful: number;
+  harmful: number;
+  success_rate: number;
+}
+
+/**
+ * Render the apoptosis review queue as report lines — **including at zero**.
+ *
+ * v0.14.0 printed this block only when the queue was non-empty, so an empty
+ * queue and a server too old to have the block at all produced byte-identical
+ * output. That is the same "absence is indistinguishable from success" shape
+ * the block was added to fix, reintroduced by the fix itself. The count line is
+ * therefore unconditional; only the per-entry detail and the removal hint are
+ * gated, because those genuinely have nothing to say at zero.
+ */
+export function formatApoptosisQueue(rows: ApoptosisCandidate[], limit = 10): string[] {
+  const lines = [``, `Apoptosis candidates awaiting review: ${rows.length}`];
+  for (const r of rows.slice(0, limit)) {
+    lines.push(`  [${r.id}] ${r.key ?? "no key"} — ${r.helpful} helpful, ${r.harmful} harmful, rate ${r.success_rate.toFixed(2)}`);
+  }
+  if (rows.length > limit) lines.push(`  ... +${rows.length - limit} more`);
+  if (rows.length > 0) {
+    lines.push(`  Manual entries are never auto-pruned. Use ob_forget to remove one (its note moves to Archive/).`);
+  }
+  return lines;
+}
+
 export function recallRankExpr(alias = "k", overrides: Partial<RankConfig> = {}): string {
   const c: RankConfig = { ...LIFECYCLE_CONFIG, ...overrides };
   const maturity =

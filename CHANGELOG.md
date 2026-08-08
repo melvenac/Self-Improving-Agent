@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.14.1] - 2026-08-08
+
+### Fixed
+- **`ob_stats` reported the apoptosis review queue only when it was non-empty**, so an empty queue and a server running pre-v0.14.0 code printed byte-identical output. That is the exact shape v0.14.0 was written to fix — *"flagged for review" named a queue that could not be listed* — reintroduced by the fix itself, one release later. The count line is now unconditional; only the per-entry detail and the removal hint stay gated, since those genuinely have nothing to say at zero. Found while verifying that `/mcp reconnect` had picked up a rebuild: a missing section could not distinguish "none flagged" from "stale server", so the check that was supposed to confirm the reconnect could not confirm anything.
+- Formatting extracted to **`formatApoptosisQueue`** in `lifecycle.ts` and covered directly — the block previously lived inline in the `ob_stats` handler, which is registered via `server.tool()` and therefore reachable only through the MCP transport. `apoptosisFlaggedExpr` gained its first tests at the same time, including one asserting every column is alias-qualified.
+
 ## [v0.14.0] - 2026-08-08
 
 Closes the last three findings from the MCP tool audit. All 13 tools now match their documented behaviour.
