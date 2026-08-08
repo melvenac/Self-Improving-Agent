@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.14.2] - 2026-08-08
+
+### Fixed
+- **`ob_store` and `ob_store_chunk` built the vault folder name out of the canonicalized path.** `canonicalizeProjectDir` lowercases the *entire* string when it starts with a drive letter — by design, since it produces an identity key — so `effectiveProject.split("/").pop()` yielded `self-improving-agent` where the real directory is `Self-Improving-Agent`. New `projectDisplayName` in `shared/paths.ts` derives the name from the **raw** directory instead, and both call sites use it. The rule it encodes: **a canonical form is for comparison, not for display** — rebuilding a human-facing name from a deliberately lossy key propagates the loss.
+- **Invisible on Windows, corrupting on Linux and macOS.** A case-insensitive filesystem resolves both spellings to one directory, so `checkVaultIndexParity` passed, nothing dangled, and the defect was unobservable on the machine that wrote it. On a case-sensitive filesystem the same code creates a *second* project folder that `skill-scan` counts as a separate project — reproducing the 60-duplicate divergence repaired in v0.12.0.
+- **19 existing rows repointed** across 5 projects (`General`, `Self-Improving-Agent`, `A2A-Hub`, `Tarrant County Makerspace`, `Tarrant-County-Makerspace`), each verified to exist at the corrected path before writing. The first pass reported "no rows need repointing" from a broken filter — `LIKE '%\Experiences\%' ESCAPE '\'` reads the trailing `\%` as a literal percent sign, so it matched nothing and looked like a clean result. Verified after: 0 rows with a lowercased folder segment.
+- Tests: `projectDisplayName` covered at 6 cases including an explicit assertion that it **disagrees** with a name rebuilt from the canonical form. **610 tests / 46 files.**
+
 ## [v0.14.1] - 2026-08-08
 
 ### Fixed

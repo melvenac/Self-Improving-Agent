@@ -1,6 +1,43 @@
 import { describe, it, expect } from "vitest";
 import { join } from "node:path";
-import { resolvePaths, obsidianVaultDir } from "../../src/shared/paths.js";
+import { resolvePaths, obsidianVaultDir, canonicalizeProjectDir, projectDisplayName } from "../../src/shared/paths.js";
+
+describe("projectDisplayName", () => {
+  // The regression: the display name used to be rebuilt from the canonical
+  // path, which is fully lowercased on Windows, so vault notes landed in
+  // Experiences/self-improving-agent/ next to Experiences/Self-Improving-Agent/.
+  it("preserves the case of the directory name", () => {
+    expect(projectDisplayName("C:/Users/melve/Projects/Self-Improving-Agent"))
+      .toBe("Self-Improving-Agent");
+  });
+
+  it("does NOT agree with a name rebuilt from the canonical form", () => {
+    const raw = "C:/Users/melve/Projects/Self-Improving-Agent";
+    const fromCanonical = canonicalizeProjectDir(raw)!.split("/").pop();
+
+    expect(fromCanonical).toBe("self-improving-agent");
+    expect(projectDisplayName(raw)).not.toBe(fromCanonical);
+  });
+
+  it("handles backslashes", () => {
+    expect(projectDisplayName("C:\\Users\\melve\\Projects\\A2A-Hub")).toBe("A2A-Hub");
+  });
+
+  it("ignores a trailing separator", () => {
+    expect(projectDisplayName("C:/Users/melve/Projects/Mail-Server/")).toBe("Mail-Server");
+    expect(projectDisplayName("C:/Users/melve/Projects/Mail-Server\\")).toBe("Mail-Server");
+  });
+
+  it("collapses repeated separators", () => {
+    expect(projectDisplayName("C://Users//melve//Projects//Trading-Bot")).toBe("Trading-Bot");
+  });
+
+  it("falls back when there is nothing to derive from", () => {
+    expect(projectDisplayName(null)).toBe("General");
+    expect(projectDisplayName("")).toBe("General");
+    expect(projectDisplayName(undefined, "general")).toBe("general");
+  });
+});
 
 describe("resolvePaths", () => {
   it("resolves project root from a given directory", () => {

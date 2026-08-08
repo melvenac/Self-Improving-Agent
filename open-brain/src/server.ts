@@ -22,7 +22,7 @@ import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverag
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
-import { resolvePaths, canonicalizeProjectDir, obsidianVaultDir } from "./shared/paths.js";
+import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVaultDir } from "./shared/paths.js";
 import { readActiveSession, activeSessionKey, currentIde } from "./shared/active-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { readJson } from "./shared/fs-utils.js";
@@ -534,9 +534,8 @@ server.tool(
   async ({ content, key, tags, source, scope, project_dir, kind }) => {
     const v2db = getV2Db();
     const effectiveProject = scope === "project" ? canonicalizeProjectDir(project_dir) : null;
-    const projectName = effectiveProject
-      ? effectiveProject.split("/").pop() || "General"
-      : "General";
+    // From the raw dir, not `effectiveProject` — see projectDisplayName.
+    const projectName = effectiveProject ? projectDisplayName(project_dir) : "General";
 
     // `key` is optional in this schema but NOT NULL UNIQUE in the table, so a
     // keyless store used to die on the constraint — and a placeholder would die
@@ -862,9 +861,9 @@ server.tool(
     const date = now.slice(0, 10);
     const tagsStr = tags ? tags.join(", ") : "";
     const normalizedProject = canonicalizeProjectDir(project_dir);
-    const projectSlug = normalizedProject
-      ? normalizedProject.split("/").pop() || "general"
-      : "general";
+    // Same rule as ob_store: the canonical path is lowercased, so the display
+    // name comes from the raw dir. Matches existing checkpoint filenames.
+    const projectSlug = normalizedProject ? projectDisplayName(project_dir, "general") : "general";
     const slug = slugify(key);
     const phaseStr = phase != null ? `-phase-${phase}` : "";
 

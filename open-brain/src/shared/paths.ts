@@ -20,6 +20,27 @@ export function canonicalizeProjectDir(p?: string | null): string | null {
 }
 
 /**
+ * Human-facing project name for vault folders, filenames and frontmatter.
+ *
+ * Takes the **raw** project directory, never the canonical one. A canonical form
+ * is for comparison, not display: `canonicalizeProjectDir` lowercases the entire
+ * path when it starts with a drive letter, so rebuilding a name from its output
+ * yields `self-improving-agent` where the real directory is
+ * `Self-Improving-Agent`.
+ *
+ * That mistake is invisible on Windows — the filesystem is case-insensitive, so
+ * both spellings resolve to one folder, parity checks pass and nothing dangles.
+ * On Linux or macOS it silently creates a *second* project folder, which
+ * `skill-scan` then counts as a separate project. Two rows (#235, #365) were
+ * written that way before this existed.
+ */
+export function projectDisplayName(rawProjectDir?: string | null, fallback = "General"): string {
+  if (!rawProjectDir) return fallback;
+  const segments = rawProjectDir.replace(/[/\\]+$/, "").split(/[/\\]/).filter(Boolean);
+  return segments.pop() || fallback;
+}
+
+/**
  * The live Obsidian vault. Single source of truth — every caller imports this
  * instead of re-joining the literal.
  *
