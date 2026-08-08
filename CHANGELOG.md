@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.14.0] - 2026-08-08
+
+Closes the last three findings from the MCP tool audit. All 13 tools now match their documented behaviour.
+
+### Added
+- **`apoptosisFlaggedExpr`**, and `ob_stats` now lists **apoptosis candidates awaiting review**. `evaluateLifecycle` reported *"flagged for review"* in the single `ob_feedback` response that crossed the threshold and recorded nothing — no column changed — so "flagged for approval" named a review step whose queue could not be listed. It is now derived from the columns rather than stored: a stored flag would be a second source of truth able to fall out of step with the counts that define it. Built from `LIFECYCLE_CONFIG` so it cannot drift from `evaluateLifecycle`, and it counts `helpful + harmful` excluding neutral, matching `nonNeutral` there. Only `source = 'manual'` can appear — everything else is auto-pruned on the rating that crosses the line, so a survivor is manual by construction. The live DB currently has **0**, making this preventive rather than remedial.
+
+### Fixed
+- **`ob_recall`'s description contradicted its behaviour.** It claimed "by default, results are scoped to the project you specify"; with no `project` argument there is nothing to scope to and the search covers every project. The description now says so.
+  - **The description was corrected rather than the behaviour, deliberately.** Making the default scope to the active session's project would silently *narrow* recall for every existing caller that omits `project` — and this system's documented failure mode is retrieval returning too little, not too much (see the Session 46 finding that multi-word recall returned zero for most of this corpus's life). Widening is recoverable; silent narrowing is the failure that hid for months. The behaviour was never wrong, only undocumented.
+- **`CLAUDE.md` claimed 9 MCP tools.** There are 13, now listed by name rather than counted.
+
 ## [v0.13.0] - 2026-08-08
 
 The index is now a projection of the vault rather than a parallel store that happens to agree. v0.12.0 detected the divergence; this closes the two seams that produced it — a way out and a way in.

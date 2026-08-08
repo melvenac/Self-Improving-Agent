@@ -137,6 +137,32 @@ export type RankConfig = Record<
  * share this code path measures something users never see. Overrides are merged
  * into a fresh object; LIFECYCLE_CONFIG is never mutated.
  */
+/**
+ * SQL predicate for entries flagged for apoptosis but still present.
+ *
+ * `evaluateLifecycle` reports "Apoptosis candidate: flagged for review" in the
+ * single `ob_feedback` response that crosses the threshold, and nothing records
+ * it: no column changes, `archived_into` stays NULL. So "flagged for approval"
+ * described a review step whose queue could not be listed. Derived rather than
+ * stored, because the inputs are already columns and a stored flag would be a
+ * second source of truth that can fall out of step with them.
+ *
+ * Only `source = 'manual'` can appear: everything else is auto-pruned on the
+ * rating that crosses the threshold, so a surviving candidate is manual by
+ * construction. Built from LIFECYCLE_CONFIG so this and evaluateLifecycle
+ * cannot drift — and note it counts `helpful + harmful`, excluding neutral,
+ * matching `nonNeutral` there.
+ */
+export function apoptosisFlaggedExpr(alias = "k"): string {
+  const c = LIFECYCLE_CONFIG;
+  return (
+    `${alias}.source = 'manual' ` +
+    `AND ${alias}.success_rate IS NOT NULL ` +
+    `AND ${alias}.success_rate < ${c.apoptosisThreshold} ` +
+    `AND (${alias}.helpful + ${alias}.harmful) >= ${c.apoptosisMinActivations}`
+  );
+}
+
 export function recallRankExpr(alias = "k", overrides: Partial<RankConfig> = {}): string {
   const c: RankConfig = { ...LIFECYCLE_CONFIG, ...overrides };
   const maturity =

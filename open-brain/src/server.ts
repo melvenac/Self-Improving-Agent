@@ -27,7 +27,7 @@ import { readActiveSession, activeSessionKey, currentIde } from "./shared/active
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { readJson } from "./shared/fs-utils.js";
 import { slugify, archiveVaultNote } from "./vault-writer.js";
-import { evaluateLifecycle, recallRankExpr, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
+import { evaluateLifecycle, apoptosisFlaggedExpr, recallRankExpr, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
 import type { CategoryScore, ScoreResult } from "./pipelines/sync/types.js";
 
 // --- V2 Database singleton ---
@@ -387,7 +387,7 @@ server.tool(
 // --- ob_recall ---
 server.tool(
   "ob_recall",
-  "Search across all stored knowledge. Returns ranked results. By default, results are scoped to the project you specify. Set `global: true` to search across all projects.",
+  "Search across all stored knowledge. Returns ranked results. Passing `project` scopes results to that project's entries plus global ones. Omitting `project` searches every project — the same reach as `global: true` — so pass it when you want scoping.",
   {
     queries: z.array(z.string()).min(1).describe("Search queries — batch all questions in one call"),
     project: z.string().optional().describe("Your current working directory — used to scope results"),
@@ -803,6 +803,25 @@ server.tool(
       `Maturity distribution:`,
       ...maturityDist.map(m => `  ${m.maturity}: ${m.count}`),
     ];
+
+    // Entries that crossed the apoptosis threshold and survived because they
+    // were stored manually. Until now "flagged for review" appeared only in the
+    // one ob_feedback response that crossed the line, so the review queue could
+    // not be listed at all.
+    const flagged = v2db.prepare(
+      `SELECT id, key, helpful, harmful, success_rate FROM knowledge_index k
+       WHERE archived_into IS NULL AND ${apoptosisFlaggedExpr("k")}
+       ORDER BY success_rate ASC, (helpful + harmful) DESC`
+    ).all() as { id: number; key: string | null; helpful: number; harmful: number; success_rate: number }[];
+
+    if (flagged.length > 0) {
+      lines.push(``, `Apoptosis candidates awaiting review: ${flagged.length}`);
+      for (const f of flagged.slice(0, 10)) {
+        lines.push(`  [${f.id}] ${f.key ?? "no key"} — ${f.helpful} helpful, ${f.harmful} harmful, rate ${f.success_rate.toFixed(2)}`);
+      }
+      if (flagged.length > 10) lines.push(`  ... +${flagged.length - 10} more`);
+      lines.push(`  Manual entries are never auto-pruned. Use ob_forget to remove one (its note moves to Archive/).`);
+    }
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };
   }
