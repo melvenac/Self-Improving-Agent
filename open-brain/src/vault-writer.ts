@@ -1,5 +1,5 @@
-import { mkdirSync, writeFileSync, existsSync } from "fs";
-import { join, dirname } from "path";
+import { mkdirSync, writeFileSync, existsSync, renameSync } from "fs";
+import { join, dirname, relative, isAbsolute } from "path";
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -86,12 +86,54 @@ export function parseFrontmatter(raw: string): Record<string, unknown> {
 
 // ─── writeExperience ─────────────────────────────────────────────────────────
 
+/**
+ * Where an experience note for this key lives.
+ *
+ * Exported because a caller that gets `null` from `writeExperience` needs to
+ * know *which* file blocked it — an existing note is only a real conflict if
+ * the index also knows about it.
+ */
+export function experiencePath(vaultDir: string, project: string, key: string): string {
+  return join(vaultDir, "Experiences", project, `${slugify(key)}.md`);
+}
+
+/**
+ * Move a note out of the active corpus into `Archive/`, preserving its relative
+ * path, and return the new location.
+ *
+ * Deleting the index row while leaving the markdown was the divergence found in
+ * the v0.12.0 audit: `skill-scan` reads `Experiences/` recursively, so a deleted
+ * entry kept inflating skill clusters while being unreachable by `ob_recall`.
+ * Moving rather than unlinking is deliberate — apoptosis fires automatically,
+ * and irreversibly destroying a human-readable note with no human in the loop is
+ * the wrong default. `Archive/` sits outside the scanned directories, so nothing
+ * downstream has to remember to skip it.
+ *
+ * Returns null when there is nothing to move, or when the path lies outside the
+ * vault — a row pointing elsewhere is not this function's to relocate.
+ */
+export function archiveVaultNote(vaultDir: string, vaultPath: string | null): string | null {
+  if (!vaultPath || !existsSync(vaultPath)) return null;
+
+  const rel = relative(vaultDir, vaultPath);
+  if (!rel || rel.startsWith("..") || isAbsolute(rel)) return null;
+
+  const base = join(vaultDir, "Archive", rel);
+  mkdirSync(dirname(base), { recursive: true });
+
+  // Two notes of the same name archived from different folders must not collide.
+  let dest = base;
+  for (let n = 1; existsSync(dest); n++) dest = base.replace(/\.md$/, `-${n}.md`);
+
+  renameSync(vaultPath, dest);
+  return dest;
+}
+
 export function writeExperience(
   vaultDir: string,
   input: ExperienceInput
 ): string | null {
-  const keySlug = slugify(input.key);
-  const filePath = join(vaultDir, "Experiences", input.project, `${keySlug}.md`);
+  const filePath = experiencePath(vaultDir, input.project, input.key);
 
   if (existsSync(filePath)) return null;
 

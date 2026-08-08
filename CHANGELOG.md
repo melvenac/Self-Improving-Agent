@@ -1,5 +1,25 @@
 # Changelog
 
+## [v0.13.0] - 2026-08-08
+
+The index is now a projection of the vault rather than a parallel store that happens to agree. v0.12.0 detected the divergence; this closes the two seams that produced it — a way out and a way in.
+
+### Added
+- **`archiveVaultNote`** — moves a note into `Archive/`, preserving its relative path, and returns the new location. Wired into both deletion paths, `ob_forget` and apoptosis auto-prune, which previously dropped the row and left the markdown in `Experiences/` where `skill-scan` kept counting it.
+  - **Moves rather than unlinks, deliberately.** Apoptosis fires automatically with no human in the loop, and irreversibly destroying a readable note under those conditions is the wrong default. `Archive/` also sits outside the scanned directories, so nothing downstream has to remember to skip it — the file simply stops being in the corpus.
+  - Collision-safe: two notes of the same basename archived from different folders do not overwrite each other.
+  - Refuses to relocate a path outside the vault. A row pointing elsewhere is not this function's to move.
+- **`experiencePath`** — exported so a caller that gets `null` from `writeExperience` can tell *which* file blocked it.
+
+### Changed
+- **`ob_store` adopts an unindexed note instead of refusing it.** An existing file is a real conflict only when the index already knows about it; otherwise the right move is to index it in place. Previously there was no tool path at all from a vault note to an index row — the 10 notes indexed in v0.12.0 had to go in by hand-written SQL, which is not a workflow.
+  - **The file's content is indexed, not the caller's**, and the response says so plainly. Vault-first means the markdown wins; silently indexing different text than the note holds would recreate the divergence in a subtler form.
+  - A genuine duplicate — file present *and* indexed — is still refused exactly as before.
+
+### Notes
+- **`archived_into` was not used, and should not be.** It looked like the natural home for this (always NULL, obviously designed for something) but it is an INTEGER referencing another entry's id, and `WHERE archived_into IS NULL` already filters archived entries out of stats, listing and recall. Repurposing it to mean "file moved to Archive/" would have corrupted those filters. Deletion removes the row anyway, so nothing needs marking — only the file needs to move.
+- **The unit tests passed while the wiring was broken.** `archiveVaultNote` was correct and covered, but the apoptosis branch read `vault_path` from a row that never selected it, so it archived nothing. Only the end-to-end pass over the real MCP server caught it. The column is now selected explicitly, with a comment saying why: after the `DELETE` there is nothing left to look the path up from.
+
 ## [v0.12.0] - 2026-08-08
 
 An audit of all 13 MCP tools found every core contract holding. It also found that the vault and its index had silently diverged, and that the divergence is inflating skill proposals.

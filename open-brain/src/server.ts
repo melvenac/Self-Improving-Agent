@@ -26,7 +26,7 @@ import { resolvePaths, canonicalizeProjectDir, obsidianVaultDir } from "./shared
 import { readActiveSession, activeSessionKey, currentIde } from "./shared/active-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { readJson } from "./shared/fs-utils.js";
-import { slugify } from "./vault-writer.js";
+import { slugify, archiveVaultNote } from "./vault-writer.js";
 import { evaluateLifecycle, recallRankExpr, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
 import type { CategoryScore, ScoreResult } from "./pipelines/sync/types.js";
 
@@ -564,6 +564,17 @@ server.tool(
 
     const scopeLabel = effectiveProject ? ` [project: ${effectiveProject}]` : " [global]";
 
+    if (result.adopted) {
+      return {
+        content: [{
+          type: "text" as const,
+          text:
+            `Indexed existing vault note "${effectiveKey}"${scopeLabel} — the file was already on disk but absent from the index. ` +
+            `Its own content was indexed, not the text passed here (the vault is the source of truth).\n  Vault: ${result.vaultPath}`,
+        }],
+      };
+    }
+
     if (result.vaultPath === null) {
       return {
         content: [{
@@ -607,10 +618,14 @@ server.tool(
   async ({ id, rating }) => {
     const v2db = getV2Db();
     const entry = v2db.prepare(
-      "SELECT id, key, content, tags, source, helpful, harmful, neutral, success_rate, maturity FROM knowledge_index WHERE id = ?"
+      // vault_path is selected for the apoptosis branch: the note has to be
+      // archived before the row goes, and after the DELETE there is nothing
+      // left to look it up from.
+      "SELECT id, key, content, tags, source, helpful, harmful, neutral, success_rate, maturity, vault_path FROM knowledge_index WHERE id = ?"
     ).get(id) as {
       id: number; key: string | null; content: string; tags: string | null; source: string;
       helpful: number; harmful: number; neutral: number; success_rate: number | null; maturity: string;
+      vault_path: string | null;
     } | undefined;
 
     if (!entry) {
@@ -634,12 +649,25 @@ server.tool(
     }
 
     if (result.autoDelete) {
+      // Archive rather than unlink: apoptosis fires with no human in the loop,
+      // so destroying a readable note automatically is the wrong default.
+      let archivedTo: string | null = null;
+      try {
+        archivedTo = archiveVaultNote(v2VaultDir(), entry.vault_path);
+      } catch { /* non-critical — still drop the row */ }
+
       v2db.prepare("DELETE FROM knowledge_index WHERE id = ?").run(id);
       try {
         const logPath = join(v2VaultDir(), ".vault-writer.log");
-        appendFileSync(logPath, `[${new Date().toISOString()}] APOPTOSIS: id=${id} key="${entry.key || ""}" ${result.transitionMessage}\n`);
+        appendFileSync(logPath, `[${new Date().toISOString()}] APOPTOSIS: id=${id} key="${entry.key || ""}" ${result.transitionMessage}${archivedTo ? ` archived=${archivedTo}` : ""}\n`);
       } catch { /* non-critical */ }
-      return { content: [{ type: "text" as const, text: `${result.transitionMessage}\nEntry ${id} (${entry.key || "no key"}) has been removed.` }] };
+      return {
+        content: [{
+          type: "text" as const,
+          text: `${result.transitionMessage}\nEntry ${id} (${entry.key || "no key"}) has been removed.`
+            + (archivedTo ? `\nIts note was moved to Archive/ — nothing was destroyed.` : ""),
+        }],
+      };
     }
 
     const col = rating; // v2 columns: helpful, harmful, neutral
@@ -672,12 +700,33 @@ server.tool(
       return { content: [{ type: "text" as const, text: "Error: provide either an id or key to delete." }], isError: true };
     }
     const v2db = getV2Db();
+
+    // Archive the notes before dropping the rows. Deleting the row alone left
+    // the markdown in `Experiences/`, where skill-scan kept counting it while
+    // ob_recall could no longer reach it.
+    const doomed = (id
+      ? v2db.prepare("SELECT vault_path FROM knowledge_index WHERE id = ?").all(id)
+      : v2db.prepare("SELECT vault_path FROM knowledge_index WHERE key = ?").all(key)
+    ) as { vault_path: string | null }[];
+
+    let archived = 0;
+    for (const row of doomed) {
+      try {
+        if (archiveVaultNote(v2VaultDir(), row.vault_path)) archived++;
+      } catch { /* a note we cannot move must not block removing the row */ }
+    }
+
     let deleted = 0;
     if (id) deleted = v2db.prepare("DELETE FROM knowledge_index WHERE id = ?").run(id).changes;
     else if (key) deleted = v2db.prepare("DELETE FROM knowledge_index WHERE key = ?").run(key).changes;
 
     return {
-      content: [{ type: "text" as const, text: deleted > 0 ? `Removed ${deleted} knowledge entry(ies).` : `No knowledge found with ${id ? `id ${id}` : `key "${key}"`}.` }],
+      content: [{
+        type: "text" as const,
+        text: deleted > 0
+          ? `Removed ${deleted} knowledge entry(ies).${archived > 0 ? ` Moved ${archived} vault note(s) to Archive/.` : ""}`
+          : `No knowledge found with ${id ? `id ${id}` : `key "${key}"`}.`,
+      }],
     };
   }
 );
