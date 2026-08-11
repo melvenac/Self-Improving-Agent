@@ -164,6 +164,7 @@ export interface EndArgs {
   session_id?: string | null;
   session_summary?: string;
   recalled_entry_ids?: number[];
+  entry_ratings?: Record<string, "helpful" | "harmful" | "neutral">;
   dry_run?: boolean;
 }
 
@@ -188,6 +189,12 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       sessionSummary: args.session_summary || "",
       project: projectRoot.split(/[/\\]/).filter(Boolean).pop() || "General",
       recalledEntryIds: recalledIds,
+      // JSON object keys arrive as strings; the pipeline keys by entry id.
+      entryRatings: args.entry_ratings
+        ? Object.fromEntries(
+            Object.entries(args.entry_ratings).map(([id, r]) => [Number(id), r])
+          )
+        : undefined,
       dryRun: args.dry_run || false,
       shadowLogPath: resolvePaths(projectRoot).shadowLog,
     });
@@ -300,6 +307,7 @@ server.tool(
     session_id: z.string().nullable().optional().default(null).describe("Session UUID (null if unknown)"),
     session_summary: z.string().optional().default("").describe("Session summary text for tag matching (self-generates if empty)"),
     recalled_entry_ids: z.array(z.number()).optional().default([]).describe("IDs of knowledge entries recalled this session"),
+    entry_ratings: z.record(z.string(), z.enum(["helpful", "harmful", "neutral"])).optional().describe("Explicit per-entry judgments keyed by entry ID, e.g. {\"42\": \"harmful\"}. Rate an entry harmful when it was applied and proved wrong or misleading — not merely when it went unused. Entries omitted here fall back to tag matching against the summary."),
     dry_run: z.boolean().optional().default(false).describe("Run feedback but skip vault writes"),
   },
   async (args) => handleEnd(args)

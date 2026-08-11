@@ -313,12 +313,37 @@ export function recordRecall(db: Database.Database, vaultPath: string): void {
   `).run(now, now, vaultPath);
 }
 
+/**
+ * Record one rating and recompute `success_rate` in the same statement.
+ *
+ * Until v0.15.0 this only bumped the counter column, so `success_rate` kept its
+ * insert-time value — NULL for 304 of 364 live entries. Since `NULL < 0.3` is
+ * never true, apoptosis could not fire and `maturityBoost` ranked on a rate that
+ * had never been computed. The counter and the rate derived from it must move
+ * together or they drift by construction.
+ *
+ * The rate is `helpful / (helpful + harmful)`, matching `evaluateLifecycle` in
+ * lifecycle.ts and `apoptosisFlaggedExpr` — neutral is excluded from both
+ * numerator and denominator. A neutral rating therefore leaves the rate
+ * untouched (NULL stays NULL): "the session summary didn't mention this entry"
+ * is not evidence that it failed.
+ *
+ * SQLite evaluates the SET expressions against the pre-UPDATE row, so the
+ * increment is applied explicitly via the deltas rather than read back.
+ */
 export function updateFeedbackV2(db: Database.Database, vaultPath: string, rating: 'helpful' | 'harmful' | 'neutral'): void {
   const now = new Date().toISOString();
   const col = rating === 'helpful' ? 'helpful' : rating === 'harmful' ? 'harmful' : 'neutral';
+  const helpfulDelta = rating === 'helpful' ? 1 : 0;
+  const nonNeutralDelta = rating === 'neutral' ? 0 : 1;
   db.prepare(`
     UPDATE knowledge_index
-    SET ${col} = ${col} + 1, updated_at = ?
+    SET ${col} = ${col} + 1,
+        success_rate = CASE
+          WHEN (helpful + harmful + ${nonNeutralDelta}) = 0 THEN NULL
+          ELSE CAST(helpful + ${helpfulDelta} AS REAL) / (helpful + harmful + ${nonNeutralDelta})
+        END,
+        updated_at = ?
     WHERE vault_path = ?
   `).run(now, vaultPath);
 }

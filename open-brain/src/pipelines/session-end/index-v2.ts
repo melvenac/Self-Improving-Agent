@@ -8,6 +8,8 @@ import { logInvocations } from "./invocation-logger.js";
 import { runSkillScanPipeline } from "./skill-scan-runner.js";
 import { runShadowStage, type ShadowStageResult } from "../shadow/index.js";
 
+export type FeedbackRating = "helpful" | "harmful" | "neutral";
+
 export interface SessionEndV2Input {
   db: Database.Database;
   vaultDir: string;
@@ -16,6 +18,18 @@ export interface SessionEndV2Input {
   sessionSummary: string;
   project: string;
   recalledEntryIds: number[];
+  /**
+   * Per-entry ratings the agent judged explicitly at /end, keyed by entry id.
+   *
+   * The tag-match fallback below can only answer "did the summary mention this
+   * entry's tags", which has no way to express that a recalled entry was acted
+   * on and turned out to be wrong. That left `harmful` unreachable on the only
+   * path that runs at scale, and an unreachable rating made the apoptosis
+   * threshold unsatisfiable rather than merely unmet. Entries absent from this
+   * map still fall back to the heuristic, so a session that supplies nothing
+   * behaves exactly as before.
+   */
+  entryRatings?: Record<number, FeedbackRating>;
   dryRun: boolean;
   /** Where the shadow-recall history is appended. Injected rather than resolved
    *  here so tests cannot write into the real ~/.claude history. */
@@ -80,8 +94,11 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
       .map((t: string) => t.trim())
       .filter(Boolean);
 
+    // An explicit judgment always wins over the substring heuristic — it is the
+    // only input that can carry a negative signal.
+    const supplied = input.entryRatings?.[id];
     const matched = tags.some((tag) => summaryLower.includes(tag.toLowerCase()));
-    const rating: "helpful" | "neutral" = matched ? "helpful" : "neutral";
+    const rating: FeedbackRating = supplied ?? (matched ? "helpful" : "neutral");
 
     updateFeedbackV2(db, row.vault_path, rating);
     // This path bypasses ob_feedback, so log the event explicitly — otherwise

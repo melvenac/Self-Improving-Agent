@@ -28,9 +28,13 @@ function mockKnowledgeStore(
         if (rating === "helpful") entry.helpful_count++;
         else if (rating === "harmful") entry.harmful_count++;
         else entry.neutral_count++;
-        const total =
-          entry.helpful_count + entry.harmful_count + entry.neutral_count;
-        entry.success_rate = total > 0 ? entry.helpful_count / total : 0;
+        // Must match evaluateLifecycle in lifecycle.ts: neutral is excluded
+        // from the denominator. This mock previously divided by all three, so
+        // the suite asserted a different success_rate definition than the one
+        // production uses and could not have caught the two drifting apart.
+        const nonNeutral = entry.helpful_count + entry.harmful_count;
+        entry.success_rate =
+          nonNeutral > 0 ? entry.helpful_count / nonNeutral : 0;
       }
     },
     getEntryCounters: (id) => {

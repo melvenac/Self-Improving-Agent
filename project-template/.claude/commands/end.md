@@ -234,6 +234,19 @@ If knowledge was recalled during `/start`, self-evaluate each entry — don't as
 4. Call `ob_feedback(entry_id, rating, referenced)` for each
 5. Report ratings to Aaron (he can override if needed)
 
+**`harmful` must be genuinely reachable, not just documented.** Across the first
+760 ratings not one was `harmful`, and that zero was read as health. It was not:
+the automatic SessionEnd path could only emit `helpful`/`neutral`, so the
+apoptosis threshold was unsatisfiable rather than merely unmet. If an entry
+actually misled you, rate it `harmful` — a rating vocabulary nothing ever uses
+measures nothing. Equally, do **not** reach for `harmful` to mean "unused":
+that is `neutral`. Not being mentioned is not evidence of harm.
+
+Alternatively, pass all judgments in one call via
+`ob_end(entry_ratings: {"42": "harmful", ...})`. That records counters and
+`success_rate` but does **not** run maturity promotion or apoptosis — use
+`ob_feedback` for any entry you expect to cross a lifecycle threshold.
+
 **Why self-evaluate:** Aaron can't see whether recalled knowledge helped the agent's internal reasoning. The agent that consumed it is the only one who knows.
 
 This feeds the maturity lifecycle (Progenitor → Proven → Mature) and apoptosis (auto-prune below 0.3 success rate after 5 ratings).

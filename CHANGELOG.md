@@ -1,5 +1,24 @@
 # Changelog
 
+## [v0.15.0] - 2026-08-11
+
+### Fixed
+- **The apoptosis prune signal had never been able to fire.** v0.14.x read "0 harmful across ~760 ratings" as health. It was not health — on the automatic SessionEnd path the flag condition was *unsatisfiable*, so the zero measured nothing. Three independent defects, each sufficient on its own:
+  - **`index-v2.ts` typed its rating as `"helpful" | "neutral"`.** The path responsible for ~820 of the counter increments could not express a negative outcome at all. With `harmful` pinned at 0, `success_rate` reduces to `helpful/helpful = 1.0`, so reaching the 5-activation floor *forces* the rate to 1.0 and `< 0.3` can never co-occur. The threshold was not merely unmet; no input existed that could meet it.
+  - **`updateFeedbackV2` incremented the counter column and never recomputed `success_rate`.** It now writes both in one statement. Counter and derived rate must move together or they drift by construction.
+  - **Two different definitions of `success_rate` were in play.** `lifecycle.ts` divides by `helpful + harmful`; the mock in `auto-feedback.test.ts` divided by `helpful + harmful + neutral`. The suite therefore asserted semantics production did not use and could not have caught the divergence. The mock now matches `evaluateLifecycle`.
+- **Three entries were being demoted in recall ranking for going unmentioned.** Rows with only neutral ratings scored `0.000` under the old formula, tripping `maturityBoost`'s `lowSuccessPenalty` (`success_rate < 0.3`). "Not referenced in the summary" is not evidence of failure — those rows correctly carry NULL now.
+- **26 rows corrected** by `scripts/backfill-success-rate.mjs`: 18 that never had a rate computed, and 8 restated off the neutral-inclusive formula. Notably *not* 304 — for 286 rows NULL was already correct, since an entry with no non-neutral ratings has no defined rate. The script recomputes only; it prunes and flags nothing, because every counter in the DB was recorded while the negative signal was unreachable, and a low rate today reflects a broken instrument rather than a bad entry. Verified: 0 rows fall below the apoptosis threshold afterwards.
+
+### Added
+- **`ob_end(entry_ratings)`** — explicit per-entry judgments keyed by entry ID, letting the agent's own assessment override the tag-match heuristic in one batched call. Entries omitted still fall back to the heuristic, so a session supplying nothing behaves exactly as before. Records counters and `success_rate`; maturity promotion and apoptosis remain `ob_feedback`'s job.
+- `scripts/backfill-success-rate.mjs` — dry-run by default, `--apply` to write.
+- Tests: `apoptosis-reachability.test.ts`, 7 cases pinning the dead condition and the repaired path, including an assertion that helpful+neutral alone can *never* satisfy the threshold. **617 tests / 47 files.**
+
+### Known gaps
+- The automatic path records ratings but does not evaluate the maturity lifecycle, so promotion still only happens via `ob_feedback`. Pre-existing, not introduced here.
+- GitNexus MCP tools were unavailable this session; impact analysis was done by direct caller inspection instead.
+
 ## [v0.14.2] - 2026-08-08
 
 ### Fixed
