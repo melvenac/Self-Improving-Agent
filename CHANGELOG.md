@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.15.1] - 2026-08-11
+
+### Fixed
+- **`/end` rated whatever `.recalled-entries.json` happened to contain, without checking whose session it described.** The file carries a `session_id` and nothing compared it to the session being ended, so a session whose startup never rewrote the file inherited the previous one's entries. Found live: on 2026-08-11 the copy on disk still described session `2fb67133` from 2026-08-07 — **two sessions stale**, so it demonstrably does not self-heal.
+- **v0.15.0 is what made this urgent.** While auto-feedback only bumped a counter nobody read, mis-attribution was noise. Now the same ratings move `success_rate`, which gates apoptosis and feeds `maturityBoost` ranking — so rating the wrong entries writes wrong numbers into the column that decides what gets pruned and what ranks first. The fix that made the signal real is what made its input worth guarding.
+- **Fixed structurally rather than by validating the file.** `recall_log` already records every `ob_recall` hit against the live session uuid, so when the session is known the file is not consulted at all — a stale file cannot contribute because nothing reads it. New `getSessionRecalledIds` (db-v2) and `resolveRecalledIds` (pipelines/session-end), with precedence: explicit ids → `recall_log` → the file *only* when it names this session → nothing. When the session is unknown, an id-bearing file is refused outright; an unattributed one is still accepted.
+- **Both readers now share one implementation.** `server.ts` (`ob_end`) and `cli-session-end.ts` (the unattended SessionEnd hook) had separate inline copies of the read-and-trust logic. This repo has twice shipped bugs from two implementations of one rule — two `evaluateLifecycle`s and two `success_rate` formulas, the latter fixed in v0.15.0. The hook path also now logs which file it ignored and why, so a refusal is visible rather than silent.
+- Removed a now-unused `readJson` import from `server.ts`.
+- Tests: `recalled-ids.test.ts`, 12 cases including the exact live failure and an assertion that the file is **not read at all** when `recall_log` answers. **629 tests / 48 files.**
+
 ## [v0.15.0] - 2026-08-11
 
 ### Fixed

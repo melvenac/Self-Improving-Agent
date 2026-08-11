@@ -20,12 +20,12 @@ import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/histo
 import { sessionStart } from "./pipelines/session-start/index.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
+import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVaultDir } from "./shared/paths.js";
 import { readActiveSession, activeSessionKey, currentIde } from "./shared/active-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
-import { readJson } from "./shared/fs-utils.js";
 import { slugify, archiveVaultNote } from "./vault-writer.js";
 import { evaluateLifecycle, apoptosisFlaggedExpr, formatApoptosisQueue, recallRankExpr, type ApoptosisCandidate, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
 import type { CategoryScore, ScoreResult } from "./pipelines/sync/types.js";
@@ -173,13 +173,16 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     const projectRoot = resolve(args.project_root ?? ".");
     const v2db = getV2Db();
 
-    // Read recalled entries from file if none provided
-    let recalledIds = args.recalled_entry_ids ?? [];
-    if (recalledIds.length === 0) {
-      const recalledPath = resolve(projectRoot, ".recalled-entries.json");
-      const recalled = readJson<{ entries: { id: number }[] }>(recalledPath);
-      recalledIds = recalled?.entries.map((e) => e.id) ?? [];
-    }
+    // recall_log is authoritative when the session is known; the file is only
+    // consulted when it names this same session. See resolveRecalledIds.
+    const resolved = resolveRecalledIds({
+      db: v2db,
+      sessionId: args.session_id || null,
+      explicitIds: args.recalled_entry_ids,
+      filePaths: [resolve(projectRoot, ".recalled-entries.json")],
+      readFile: (p) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
+    });
+    const recalledIds = resolved.ids;
 
     const result = sessionEndV2({
       db: v2db,

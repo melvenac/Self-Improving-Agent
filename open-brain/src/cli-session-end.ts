@@ -13,6 +13,7 @@ import { join } from "path";
 import { homedir } from "os";
 import { openV2Database } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
+import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
 import { obsidianVaultDir } from "./shared/paths.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
@@ -32,26 +33,26 @@ try {
   const sessionId = process.env.CLAUDE_SESSION_ID || "";
   const agentsDir = join(projectDir, ".agents");
 
-  // Read recalled entries — check project root first, then legacy path
-  let recalledIds: number[] = [];
-  const recalledCandidates = [
-    join(projectDir, ".recalled-entries.json"),
-    join(homedir(), ".claude", "context-mode", ".recalled-entries.json"),
-  ];
-  for (const recalledPath of recalledCandidates) {
-    if (existsSync(recalledPath)) {
-      try {
-        const data = JSON.parse(readFileSync(recalledPath, "utf-8"));
-        recalledIds = (data.entries || []).map((e: { id?: number }) => e.id).filter(Boolean);
-        break;
-      } catch { /* skip */ }
-    }
-  }
-
   const project = projectDir.split(/[/\\]/).filter(Boolean).pop() || "General";
 
   const db = openV2Database(V2_DB);
   try {
+    // recall_log for this session wins; the file is consulted only when it
+    // names this same session. See resolveRecalledIds — the copy on disk had
+    // been two sessions stale and was being rated as if it were current.
+    const resolved = resolveRecalledIds({
+      db,
+      sessionId: sessionId || null,
+      filePaths: [
+        join(projectDir, ".recalled-entries.json"),
+        join(homedir(), ".claude", "context-mode", ".recalled-entries.json"),
+      ],
+      readFile: (p) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
+    });
+    const recalledIds = resolved.ids;
+    if (resolved.rejected) {
+      console.log(`[session-end] Ignored ${resolved.rejected.path}: ${resolved.rejected.reason}`);
+    }
     const result = sessionEndV2({
       db,
       vaultDir: V2_VAULT,

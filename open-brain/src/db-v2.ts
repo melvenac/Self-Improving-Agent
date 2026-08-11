@@ -588,6 +588,25 @@ export function recordRecallEvent(
   insertAll(entryIds);
 }
 
+/**
+ * Entry ids `ob_recall` actually returned during one session.
+ *
+ * The authoritative answer to "what was recalled this session". `/end` used to
+ * take this from `.recalled-entries.json`, a file written by the startup
+ * subagent and trusted without checking whose session it described — on
+ * 2026-08-11 the copy on disk still belonged to session 2fb67133 from four days
+ * and two sessions earlier. Ordered by first appearance so the result is stable
+ * across calls.
+ */
+export function getSessionRecalledIds(db: Database.Database, sessionUuid: string): number[] {
+  if (!sessionUuid) return [];
+  const rows = db.prepare(`
+    SELECT knowledge_id FROM recall_log WHERE session_uuid = ?
+    GROUP BY knowledge_id ORDER BY MIN(id)
+  `).all(sessionUuid) as Array<{ knowledge_id: number }>;
+  return rows.map((r) => r.knowledge_id);
+}
+
 /** Record a rating as an event, alongside the aggregate counters. */
 export function recordFeedbackEvent(
   db: Database.Database,
