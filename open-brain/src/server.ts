@@ -202,6 +202,17 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       shadowLogPath: resolvePaths(projectRoot).shadowLog,
     });
 
+    // Name the source, always — including when it is the boring one. Reporting
+    // only the interesting case is what made v0.14.1's apoptosis block and a
+    // stale server produce identical output. Without this line, `Feedback: N
+    // entries rated` reads the same whether the ids came from recall_log or
+    // from a file belonging to someone else's session.
+    const originLine =
+      `  Recalled ids: ${recalledIds.length} from ${resolved.origin}` +
+      (resolved.rejected
+        ? `\n  Ignored ${resolved.rejected.path}: ${resolved.rejected.reason}`
+        : ``);
+
     const shadowLine = result.shadow.evaluated
       ? `  Shadow recall: ${result.shadow.strategies} strategies over ${result.shadow.queries} queries (best: ${result.shadow.leader})`
       : `  Shadow recall: skipped (${result.shadow.skipped})`;
@@ -211,7 +222,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     return {
       content: [{
         type: "text",
-        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n  Feedback: ${result.feedback.processed} entries rated\n  Reflection: ${result.reflection.flagged} clusters flagged\n  Invocations: ${result.invocations.logged} logged\n  Skill scan: ${result.skillScan.clusters} clusters (${result.skillScan.pendingProposals} pending proposals)\n${shadowLine}\n\n${shadowReport}`,
+        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Reflection: ${result.reflection.flagged} clusters flagged\n  Invocations: ${result.invocations.logged} logged\n  Skill scan: ${result.skillScan.clusters} clusters (${result.skillScan.pendingProposals} pending proposals)\n${shadowLine}\n\n${shadowReport}`,
       }],
     };
   } catch (err) {

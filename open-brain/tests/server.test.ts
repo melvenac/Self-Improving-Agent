@@ -80,6 +80,44 @@ describe("server handlers", () => {
       expect(text).toContain("Session End:");
       expect(text).toContain("Summary:");
       expect(text).toContain("Feedback: 0 entries rated");
+      // Always names the source, including the boring one — see originLine.
+      expect(text).toContain("Recalled ids: 0 from");
+    });
+
+    it("names the source of the recalled ids", async () => {
+      writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "1.0.0" }));
+
+      const res = await handleEnd({
+        project_root: tmp,
+        dry_run: true,
+        recalled_entry_ids: [1, 2],
+        session_summary: "explicit ids supplied",
+      });
+
+      expect(getText(res)).toContain("Recalled ids: 2 from explicit");
+    });
+
+    it("says which file it refused and why", async () => {
+      writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "1.0.0" }));
+      // A file left behind by an earlier session — the live 2026-08-11 case.
+      writeFileSync(
+        join(tmp, ".recalled-entries.json"),
+        JSON.stringify({ session_id: "2fb67133-stale", entries: [{ id: 138 }, { id: 184 }] })
+      );
+
+      const res = await handleEnd({
+        project_root: tmp,
+        dry_run: true,
+        session_id: "efcaeb75-current",
+        session_summary: "different session entirely",
+      });
+
+      const text = getText(res);
+      expect(text).toContain("Recalled ids: 0 from none");
+      expect(text).toContain("Ignored");
+      expect(text).toContain("2fb67133-stale");
+      // The stale entries must not have been rated.
+      expect(text).toContain("Feedback: 0 entries rated");
     });
 
     it("reports errors gracefully", async () => {

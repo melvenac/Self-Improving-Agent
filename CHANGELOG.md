@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.15.2] - 2026-08-11
+
+### Fixed
+- **`ob_end` did not say where its entry list came from**, so `Feedback: N entries rated` read identically whether the ids came from `recall_log`, from a file naming this session, or from a stale file that v0.15.1 had just refused. That is the v0.14.1 shape again — a report whose silence cannot be distinguished from the healthy case — and it meant the v0.15.1 fix could not be verified from the outside, including after an `/mcp reconnect`. `ob_end` now prints `Recalled ids: N from {explicit|recall-log|file|none}`, plus an `Ignored {path}: {reason}` line when a file was refused.
+- **The line is unconditional, including at zero and on the boring path.** Printing it only when something was refused would rebuild the exact ambiguity it exists to remove. The unattended hook path already logged refusals; the MCP path now matches it.
+- Tests: 3 cases in `server.test.ts` covering the explicit source, the always-present source line, and a refused stale file asserted to rate nothing. **631 tests / 48 files.**
+
 ## [v0.15.1] - 2026-08-11
 
 ### Fixed
