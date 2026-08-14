@@ -1,5 +1,21 @@
 # Changelog
 
+## [v0.16.0] - 2026-08-13
+
+### Fixed
+- **`ob_set_session` returned a 16-day-old session UUID in the same wording it uses for a live registration.** Found on a Cursor seat in this repo: the `::cursor` slot still held `7ad51ea2-…` from 2026-07-28 (Session 44), and `ob_set_session` handed it back as `[via hook file (session_id, ide cursor)]` — byte-identical to a healthy read. Every chunk, rating, and recall written from that seat was filed under a month-old identity. Nothing in `active-session.ts` compared `started_at` to now; `stale|TTL|maxAge|expire` returned zero hits across the file.
+- **This was never Cursor-specific.** The guard, once live, immediately flagged `a2a-hub::claude` at 6d18h — the same silent misattribution on the Claude path. Cursor is only where it got noticed, because that is where a dead SessionStart hook stopped refreshing the slot.
+- New `isStaleSession` / `sessionEntryAgeMs` / `STALE_SESSION_MS` (12h — longer than any working session, far shorter than the sixteen days that went unnoticed). An **unparseable timestamp counts as stale**: a slot that cannot prove it is current does not get trusted by default.
+- **Warns, does not fail.** `ob_set_session` still returns the id and appends the age, the `started_at`, and the fact that SessionStart has not run for that ide. Hard-erroring was considered and rejected — the seat that hits this is one whose hook host is already dead, and a loud id beats no id. Verified live against the real 6d18h slot, and against the real slot file where it flags exactly one of four entries with no false positives.
+
+### Added
+- **`dir_source` and `workspace_root_count` on every session slot.** `payload_keys` records key NAMES only, so an empty `workspace_roots: []` and a populated one are indistinguishable on disk — which is why "did the hook mis-key the workspace, or was a window genuinely open at `~`?" could not be settled from the evidence and was argued twice from the same file. `describeWorkspaceDir` now returns `{dir, dir_source, root_count}` and records which input won: `workspace_roots`, `fallback:empty_roots`, or `fallback:absent`. The next SessionStart answers the question by writing it down instead of leaving it to be re-derived. `resolveWorkspaceDir` is kept as a thin wrapper so existing callers and 36 existing assertions are untouched.
+- **`model` and `cli_version` on every session slot.** Cursor sends `model` and `cursor_version` on every SessionStart and we were recording that the keys existed while discarding both values. Without the model, the maturity lifecycle rates entries with no idea what produced them and shadow recall scores across an uncontrolled confound; without the host version, a harness regression cannot be dated. `user_email` rides in the same payload and is deliberately **not** read — the slot file is a diagnostic record, not an identity store, and a test pins the output keys to exactly `["cli_version","model"]`.
+
+### Notes
+- Both additions are the same lesson as v0.15.2 and entry #375 applied one level down: **a filter that drops its input has to report what it dropped.** `resolveWorkspaceDir` silently fell back and emitted nothing; the slot read silently aged and emitted nothing. In both cases the healthy and broken paths produced identical output, so neither could be diagnosed from the outside.
+- Tests: 13 new cases in `active-session.test.ts` covering all three `dir_source` states, the empty-vs-absent distinction, PII exclusion, the exact 16-day failure, and the staleness boundary. **643 tests / 48 files.** Verified end to end through the built `cli-bootstrap.js` and through the live `ob_set_session` tool, not only at unit level.
+
 ## [v0.15.2] - 2026-08-11
 
 ### Fixed

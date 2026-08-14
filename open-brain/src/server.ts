@@ -24,7 +24,7 @@ import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVaultDir } from "./shared/paths.js";
-import { readActiveSession, activeSessionKey, currentIde } from "./shared/active-session.js";
+import { readActiveSession, activeSessionKey, currentIde, isStaleSession, sessionEntryAgeMs } from "./shared/active-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { slugify, archiveVaultNote } from "./vault-writer.js";
 import { evaluateLifecycle, apoptosisFlaggedExpr, formatApoptosisQueue, recallRankExpr, type ApoptosisCandidate, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
@@ -360,6 +360,7 @@ server.tool(
     // and previously registered nothing at all — leaving recall_log and
     // feedback_log empty and shadow recall with no ground truth.
     let resolvedFrom = "argument";
+    let staleWarning = "";
     if (!session_id || session_id === "none") {
       const ide = currentIde();
       const active = readActiveSession(
@@ -380,6 +381,23 @@ server.tool(
       }
       session_id = active.uuid;
       resolvedFrom = `hook file (${active.source}, ide ${active.ide ?? "unset"})`;
+
+      // A slot the SessionStart hook never refreshed keeps answering forever. A
+      // Cursor seat was handed a sixteen-day-old UUID in this same confident
+      // wording and filed a session's worth of chunks and ratings under it. The
+      // read still succeeds — the id is better than nothing — but it stops
+      // sounding like a live registration.
+      if (isStaleSession(active)) {
+        const ageMs = sessionEntryAgeMs(active);
+        const age = ageMs === null
+          ? "an unreadable timestamp"
+          : `${Math.floor(ageMs / 86_400_000)}d ${Math.floor((ageMs % 86_400_000) / 3_600_000)}h old`;
+        staleWarning = `\n\nWARNING: this id came from a slot ${age} (started_at `
+          + `${active.started_at || "missing"}), not from a fresh session start. The `
+          + `SessionStart hook for ide "${ide}" has not run in this workspace, so work `
+          + `may be filed under a previous session. Check that the hook is registered `
+          + `and actually executing before trusting this id.`;
+      }
     }
 
     _activeSessionId = session_id;
@@ -400,7 +418,8 @@ server.tool(
         type: "text" as const,
         text: `Session registered: ${session_id}${project_dir ? ` (${project_dir})` : ""}`
           + ` [via ${resolvedFrom}]`
-          + (persisted ? "" : " — warning: not persisted to the sessions table"),
+          + (persisted ? "" : " — warning: not persisted to the sessions table")
+          + staleWarning,
       }],
     };
   }

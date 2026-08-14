@@ -49,6 +49,14 @@ export interface ActiveSessionEntry {
   payload_keys?: string[];
   /** process.cwd() at hook time. Cursor sets this to the config dir, not the workspace. */
   hook_cwd?: string;
+  /** Which input supplied project_dir. See {@link describeWorkspaceDir}. */
+  dir_source?: string;
+  /** How many workspace roots the payload offered. 0 with the key present is the bug. */
+  workspace_root_count?: number;
+  /** Model that drove the session, when the host reports one. */
+  model?: string;
+  /** Host CLI/app version, when reported. Lets a harness regression be dated. */
+  cli_version?: string;
 }
 
 /** Default IDE label — existing Claude Code installs pass nothing. */
@@ -95,10 +103,34 @@ export function detectIde(
  * shape is not documented, so accept a bare string, an array of strings, or an
  * array of objects with a path/uri field.
  */
-export function resolveWorkspaceDir(
+export interface WorkspaceResolution {
+  dir: string;
+  /**
+   * Which input supplied `dir`:
+   *   "workspace_roots"        — the payload named the workspace
+   *   "fallback:empty_roots"   — the key was there and offered nothing usable
+   *   "fallback:absent"        — the host never sent the key
+   */
+  dir_source: string;
+  /** Usable roots the payload offered. Zero alongside a present key is the fault. */
+  root_count: number;
+}
+
+/**
+ * Resolve the workspace AND say why.
+ *
+ * `resolveWorkspaceDir` returned a bare string, so a fallback was
+ * indistinguishable from a real answer once written to the slot file. A Cursor
+ * session keyed under the home directory for sixteen days and nothing recorded
+ * whether `workspace_roots` had been absent, empty, or simply ignored — the
+ * diagnostics stored key NAMES only, which cannot tell an empty array from a
+ * populated one. Any filter that drops its input has to report what it dropped,
+ * so the next occurrence is read off the file instead of re-derived.
+ */
+export function describeWorkspaceDir(
   payload: Record<string, unknown>,
   fallback: string,
-): string {
+): WorkspaceResolution {
   const pick = (value: unknown): string | null => {
     if (typeof value === "string" && value.trim()) return value.trim();
     if (value && typeof value === "object") {
@@ -111,18 +143,94 @@ export function resolveWorkspaceDir(
     return null;
   };
 
+  const present = "workspace_roots" in payload || "workspaceRoots" in payload;
   const roots = payload.workspace_roots ?? payload.workspaceRoots;
-  if (Array.isArray(roots)) {
-    for (const candidate of roots) {
-      const found = pick(candidate);
-      if (found) return found;
-    }
-  } else {
-    const found = pick(roots);
-    if (found) return found;
+  const candidates = Array.isArray(roots) ? roots : [roots];
+
+  let chosen: string | null = null;
+  let usable = 0;
+  for (const candidate of candidates) {
+    const found = pick(candidate);
+    if (!found) continue;
+    usable++;
+    if (!chosen) chosen = found;
   }
 
-  return fallback;
+  if (chosen) return { dir: chosen, dir_source: "workspace_roots", root_count: usable };
+  return {
+    dir: fallback,
+    dir_source: present ? "fallback:empty_roots" : "fallback:absent",
+    root_count: 0,
+  };
+}
+
+/** Back-compat wrapper: the directory alone, for callers that need nothing else. */
+export function resolveWorkspaceDir(
+  payload: Record<string, unknown>,
+  fallback: string,
+): string {
+  return describeWorkspaceDir(payload, fallback).dir;
+}
+
+/**
+ * Which agent did the work.
+ *
+ * Cursor already sends `model` and `cursor_version` on every SessionStart and we
+ * were recording that the keys existed while discarding both values. Without the
+ * model, the maturity lifecycle rates entries with no idea what produced them and
+ * shadow recall scores across an uncontrolled confound.
+ *
+ * `user_email` is in the same payload and is deliberately NOT read here. The
+ * slot file records diagnostics, not identity.
+ */
+export function resolveAgentIdentity(
+  payload: Record<string, unknown>,
+): { model?: string; cli_version?: string } {
+  const str = (value: unknown): string | undefined =>
+    typeof value === "string" && value.trim() ? value.trim() : undefined;
+
+  const out: { model?: string; cli_version?: string } = {};
+  const model = str(payload.model);
+  if (model) out.model = model;
+  const version = str(payload.cursor_version) ?? str(payload.cli_version) ?? str(payload.version);
+  if (version) out.cli_version = version;
+  return out;
+}
+
+/**
+ * How long a slot may sit before a read should stop trusting it.
+ *
+ * Twelve hours: longer than any single working session, far shorter than the
+ * sixteen days a stale Cursor slot went unnoticed.
+ */
+export const STALE_SESSION_MS = 12 * 60 * 60 * 1000;
+
+/** Age of an entry in ms, or null if it carries no usable timestamp. */
+export function sessionEntryAgeMs(
+  entry: ActiveSessionEntry,
+  now: number = Date.now(),
+): number | null {
+  const started = Date.parse(entry.started_at ?? "");
+  if (!Number.isFinite(started)) return null;
+  return now - started;
+}
+
+/**
+ * Is this slot too old to be the live session?
+ *
+ * `ob_set_session` handed back a sixteen-day-old UUID in the same confident
+ * wording it uses for a fresh one, so every chunk and rating written from that
+ * seat was filed under a month-old identity. An unreadable timestamp counts as
+ * stale: a slot that cannot prove it is current should not be trusted silently.
+ */
+export function isStaleSession(
+  entry: ActiveSessionEntry,
+  now: number = Date.now(),
+  maxAgeMs: number = STALE_SESSION_MS,
+): boolean {
+  const age = sessionEntryAgeMs(entry, now);
+  if (age === null) return true;
+  return age > maxAgeMs;
 }
 
 type ActiveSessionFile = Record<string, ActiveSessionEntry>;

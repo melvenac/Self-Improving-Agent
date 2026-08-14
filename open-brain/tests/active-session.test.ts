@@ -11,6 +11,12 @@ import {
   DEFAULT_IDE,
   detectIde,
   resolveWorkspaceDir,
+  describeWorkspaceDir,
+  resolveAgentIdentity,
+  sessionEntryAgeMs,
+  isStaleSession,
+  STALE_SESSION_MS,
+  type ActiveSessionEntry,
 } from "../src/shared/active-session.js";
 
 /**
@@ -80,6 +86,98 @@ describe("workspace resolution", () => {
 
   it("also accepts the camelCase spelling", () => {
     expect(resolveWorkspaceDir({ workspaceRoots: ["c:/w"] }, "c:/f")).toBe("c:/w");
+  });
+});
+
+describe("workspace resolution reports why", () => {
+  it("names workspace_roots when the payload supplied the workspace", () => {
+    const r = describeWorkspaceDir(CURSOR_PAYLOAD, "C:/Users/melve/.cursor");
+    expect(r.dir).toBe("C:/Users/melve/Projects/Self-Improving-Agent");
+    expect(r.dir_source).toBe("workspace_roots");
+    expect(r.root_count).toBe(1);
+  });
+
+  // The Bug A signature. `payload_keys` records that `workspace_roots` was sent
+  // but not that it was empty, so a home-dir slot was indistinguishable from a
+  // legitimate one. This is the case that has to be readable off the file.
+  it("distinguishes an EMPTY workspace_roots from an absent one", () => {
+    const empty = describeWorkspaceDir({ workspace_roots: [] }, "C:/Users/melve/.claude");
+    expect(empty.dir).toBe("C:/Users/melve/.claude");
+    expect(empty.dir_source).toBe("fallback:empty_roots");
+    expect(empty.root_count).toBe(0);
+
+    const absent = describeWorkspaceDir({}, "C:/Users/melve/.claude");
+    expect(absent.dir_source).toBe("fallback:absent");
+    expect(absent.root_count).toBe(0);
+  });
+
+  it("treats a roots array of only unusable entries as empty, not absent", () => {
+    const r = describeWorkspaceDir({ workspace_roots: ["", "   ", {}] }, "/fallback");
+    expect(r.dir_source).toBe("fallback:empty_roots");
+    expect(r.root_count).toBe(0);
+  });
+
+  it("counts every usable root, not just the one it picked", () => {
+    const r = describeWorkspaceDir({ workspace_roots: ["/a", "/b", "/c"] }, "/fallback");
+    expect(r.dir).toBe("/a");
+    expect(r.root_count).toBe(3);
+  });
+
+  it("keeps resolveWorkspaceDir answering exactly as before", () => {
+    expect(resolveWorkspaceDir(CURSOR_PAYLOAD, "/fb")).toBe(
+      "C:/Users/melve/Projects/Self-Improving-Agent",
+    );
+    expect(resolveWorkspaceDir({}, "/fb")).toBe("/fb");
+  });
+});
+
+describe("agent identity", () => {
+  it("captures the model and host version Cursor already sends", () => {
+    const id = resolveAgentIdentity(CURSOR_PAYLOAD);
+    expect(id.model).toBe("some-model");
+    expect(id.cli_version).toBe("1.2.3");
+  });
+
+  // The slot file is a diagnostic record, not an identity store. user_email
+  // rides along in the same payload and must never be persisted.
+  it("never reads user_email, which is in the same payload", () => {
+    const id = resolveAgentIdentity(CURSOR_PAYLOAD) as Record<string, unknown>;
+    expect(Object.keys(id).sort()).toEqual(["cli_version", "model"]);
+    expect(JSON.stringify(id)).not.toContain("example.com");
+  });
+
+  it("omits fields the host did not send rather than writing empty strings", () => {
+    expect(resolveAgentIdentity({})).toEqual({});
+    expect(resolveAgentIdentity({ model: "   " })).toEqual({});
+  });
+});
+
+describe("session staleness", () => {
+  const at = (iso: string): ActiveSessionEntry => ({
+    uuid: "u", project_dir: "/p", source: "session_id", started_at: iso,
+  });
+  const NOW = Date.parse("2026-08-13T20:00:00.000Z");
+
+  it("accepts a slot from this working session", () => {
+    expect(isStaleSession(at("2026-08-13T18:00:00.000Z"), NOW)).toBe(false);
+  });
+
+  // The observed failure: 2026-07-28 slot returned to a 2026-08-13 chat.
+  it("rejects the sixteen-day-old slot that went unnoticed", () => {
+    const entry = at("2026-07-28T23:35:38.908Z");
+    expect(isStaleSession(entry, NOW)).toBe(true);
+    expect(sessionEntryAgeMs(entry, NOW)! / 86_400_000).toBeGreaterThan(15);
+  });
+
+  it("treats a slot with no usable timestamp as stale, not as fresh", () => {
+    expect(isStaleSession(at(""), NOW)).toBe(true);
+    expect(isStaleSession(at("not-a-date"), NOW)).toBe(true);
+    expect(sessionEntryAgeMs(at("not-a-date"), NOW)).toBeNull();
+  });
+
+  it("puts the boundary at STALE_SESSION_MS exactly", () => {
+    expect(isStaleSession(at(new Date(NOW - STALE_SESSION_MS).toISOString()), NOW)).toBe(false);
+    expect(isStaleSession(at(new Date(NOW - STALE_SESSION_MS - 1).toISOString()), NOW)).toBe(true);
   });
 });
 

@@ -19,7 +19,8 @@ import {
   activeSessionKey,
   currentIde,
   detectIde,
-  resolveWorkspaceDir,
+  describeWorkspaceDir,
+  resolveAgentIdentity,
 } from "./shared/active-session.js";
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
 
@@ -45,7 +46,8 @@ if (hookInput.agent_id || (hookInput as Record<string, unknown>).is_background_a
 // looks up the real workspace — would never find it. `workspace_roots` is the
 // authoritative source when present.
 const payload = hookInput as Record<string, unknown>;
-const cwd = resolveWorkspaceDir(payload, hookInput.cwd || process.cwd());
+const workspace = describeWorkspaceDir(payload, hookInput.cwd || process.cwd());
+const cwd = workspace.dir;
 const home = process.env.HOME || process.env.USERPROFILE || "";
 const lines: string[] = [];
 
@@ -112,6 +114,13 @@ try {
     // Keys only, never values: payloads can carry paths and identifiers.
     payload_keys: Object.keys(hookInput as Record<string, unknown>).sort(),
     hook_cwd: process.cwd(),
+    // Keys alone could not settle whether a home-dir slot meant an empty
+    // `workspace_roots` or a Cursor window genuinely opened at ~. Record which
+    // input won and how many roots were on offer, so the answer is read rather
+    // than re-argued.
+    dir_source: workspace.dir_source,
+    workspace_root_count: workspace.root_count,
+    ...resolveAgentIdentity(payload),
   });
 } catch { /* provenance is best-effort — never fail session start */ }
 
