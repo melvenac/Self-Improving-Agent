@@ -2,7 +2,7 @@
 
 *A memory protocol that enables AI coding agents to learn across sessions.*
 
-**Latest: v0.15.2** · [Changelog](CHANGELOG.md)
+**Latest: v0.16.0** · [Changelog](CHANGELOG.md)
 
 ---
 
@@ -64,6 +64,8 @@ node scripts/setup.mjs
 ```
 
 This installs the open-brain MCP server, registers hooks, copies slash commands, and scaffolds the Obsidian vault. Restart Claude Code after running.
+
+On the first run it asks two questions — **your name** and **the agent's name** — because the `/start` and `/end` commands greet you and give the agent a persona. Press Enter to accept the defaults (your git `user.name`, and "Claude"). See [Identity](#identity--who-the-agent-talks-to) to change them later or to skip the prompt.
 
 For framework developers (symlinks source for live editing):
 ```bash
@@ -148,6 +150,27 @@ Start a Claude Code session and run `/start`. You should see:
 - Session log created
 
 </details>
+
+## Identity — who the agent talks to
+
+The slash commands are templates: wherever they address you or name the agent they carry `{{USER_NAME}}` and `{{AGENT_NAME}}`, and `setup.mjs` fills those in as it installs the commands into `~/.claude/commands/` and `~/.cursor/commands/`. The answers are stored in `~/.claude/open-brain/identity.json`:
+
+```json
+{ "user_name": "Jack", "agent_name": "Clark" }
+```
+
+| Run | Effect |
+|---|---|
+| `node scripts/setup.mjs` | First run prompts; later runs reuse the stored identity |
+| `node scripts/setup.mjs --reconfigure` | Prompt again and re-render every installed command |
+| `node scripts/setup.mjs --user Jack --agent Clark` | Set names with no prompt (either flag alone keeps the other) |
+| `node scripts/setup.mjs --yes` | Never prompt — use the stored identity, or the derived default on a fresh machine |
+
+Defaults when nothing is stored: the first word of `git config user.name`, then your OS account name, then "there"; the agent defaults to "Claude". Set `OPEN_BRAIN_IDENTITY` to move the file.
+
+`/sync`'s mirror-parity check knows about this: it renders the template with your stored identity before comparing it to the installed copy, so a personalised install is not drift — but an installed command that still contains a literal `{{USER_NAME}}` is, and the check names the file.
+
+If you edit the templates, keep the placeholders rather than writing a name. Anything you `cp` out of `project-template/` by hand will not be rendered; only `setup.mjs` renders.
 
 ## Commands
 

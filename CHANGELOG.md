@@ -1,5 +1,21 @@
 # Changelog
 
+## [v0.16.0] - 2026-08-25
+
+### Added
+- **Onboarding: the agent no longer calls everyone "Aaron".** The `/start`, `/end`, `/sync` and `/skill-scan` templates hard-coded the framework author's name and the agent persona "Clark" in 25 places, so every consumer who ran `setup.mjs` was greeted as Aaron by an agent called Clark — the templates were shipped as-is from a personal setup. They now carry `{{USER_NAME}}` / `{{AGENT_NAME}}` placeholders, and `setup.mjs` asks for both names on first run, stores them in `~/.claude/open-brain/identity.json`, and renders the placeholders as it installs the commands.
+  - **One renderer, two callers.** `open-brain/src/shared/identity.ts` is the single implementation; `setup.mjs` loads it from the build it just produced rather than carrying its own copy, because this repo has shipped bugs from two implementations of one rule before (two `evaluateLifecycle`s, two `success_rate` formulas).
+  - **Flags for unattended installs:** `--user NAME`, `--agent NAME`, `--reconfigure` (re-prompt and re-render), `--yes` (never prompt). Without a TTY the derived default is used and the log line says so, so a CI or scripted install cannot hang on a question.
+  - **Defaults are name-shaped, not empty.** First word of `git config user.name`, then the OS account name title-cased, then "there" — so the worst case renders "Hey there", never "Hey {{USER_NAME}}". The agent defaults to "Claude".
+  - **Setup refuses to install unrendered commands.** If the identity cannot be resolved (build missing, empty name) the command copy is skipped with a FAIL line rather than shipping literal placeholders into `~/.claude/commands/`.
+- `setup.mjs` now compares **rendered** content against the installed file rather than hashing the template, so `--reconfigure` rewrites files whose source did not change. The `sha256` helpers this replaces are removed.
+
+### Changed
+- **`checkMirrorParity` renders before it compares.** The live↔template pairs are compared against the template rendered with the stored identity, so a personalised install is not reported as drift. A live file that still contains a placeholder is named explicitly (`start.md has unrendered {{USER_NAME}} — run scripts/setup.mjs`) instead of a bare "differs", since the two failures have different fixes. The repo↔template pair stays raw: both sides are source.
+- `end.md` A14: "he can override" → "they can override".
+- Shadow-recall report: "Aaron's call whether to adopt" → "Your call whether to adopt".
+- Tests: `identity.test.ts` (14 cases) and 5 new `mirror-parity` cases covering rendered pass, mismatched identity, unrendered placeholder, no-identity, and the raw repo pair. `setup-env.ts` redirects `OPEN_BRAIN_IDENTITY` so a developer's real identity never leaks into the parity tests. **650 tests / 49 files.**
+
 ## [v0.15.2] - 2026-08-11
 
 ### Fixed

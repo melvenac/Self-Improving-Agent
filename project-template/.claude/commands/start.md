@@ -87,7 +87,7 @@ Read both. From the inbox, grab the subject of the newest `## [YYYY-MM-DD ...] S
 
 ## 7. Create session log (if .agents/SESSIONS/ exists)
 Copy SESSION_TEMPLATE.md → Session_N.md (next number). Fill in date and session UUID.
-If no CLAUDE.md in project root, note it in FLAGS (don't create one — ask Aaron first).
+If no CLAUDE.md in project root, note it in FLAGS (don't create one — ask {{USER_NAME}} first).
 
 ## 8. Return ONLY this format (under 300 tokens):
 
@@ -111,12 +111,12 @@ FLAGS: {anything to verify, or "none"}
 
 ### A2. Relay the greeting
 
-When the background subagent completes, relay its GREETING section to Aaron. If FLAGS contains anything, verify it.
+When the background subagent completes, relay its GREETING section to {{USER_NAME}}. If FLAGS contains anything, verify it.
 
 That's it. No further main-agent processing needed — the subagent handled ob_set_session, .recalled-entries.json, session log creation, and drift reconciliation.
 
 If the subagent failed or timed out, fall back to a manual greeting:
-- Greet Aaron by name. You are Clark.
+- Greet {{USER_NAME}} by name. You are {{AGENT_NAME}}.
 - State the cwd and that startup automation failed.
 - Ask what he'd like to work on.
 
@@ -127,7 +127,7 @@ If the subagent failed or timed out, fall back to a manual greeting:
 > For non-project sessions, dispatch a lightweight subagent for knowledge recall and session registration.
 
 ### B1. Greet
-Greet Aaron by name. You are Clark.
+Greet {{USER_NAME}} by name. You are {{AGENT_NAME}}.
 
 ### B2. Dispatch startup subagent
 
@@ -161,7 +161,7 @@ Read ~/Obsidian Vault v2/.skill-proposals-pending.json
 ## 5. Return ONLY:
 
 GREETING:
-Hey Aaron — {date}
+Hey {{USER_NAME}} — {date}
 
 Knowledge:
 - {entry}: {one-line actionable rewrite}
@@ -180,15 +180,15 @@ Same as A2 — relay GREETING, check FLAGS, done. No further main-agent processi
 
 ## Present Summary
 
-The background subagent returns a formatted GREETING. Relay it verbatim to Aaron, prefixed with "Hey Aaron" and your name (Clark). Do NOT add extra commentary, tool calls, or processing. The greeting IS the output.
+The background subagent returns a formatted GREETING. Relay it verbatim to {{USER_NAME}}, prefixed with "Hey {{USER_NAME}}" and your name ({{AGENT_NAME}}). Do NOT add extra commentary, tool calls, or processing. The greeting IS the output.
 
-If FLAGS contains items, verify them before presenting. If the subagent failed, greet Aaron manually and state that startup automation failed.
+If FLAGS contains items, verify them before presenting. If the subagent failed, greet {{USER_NAME}} manually and state that startup automation failed.
 
 ---
 
 ## Periodic maintenance (run monthly or when prompted)
 
-If it's the first session of the month, or Aaron asks for a health check:
+If it's the first session of the month, or {{USER_NAME}} asks for a health check:
 
 ### Session aging pipeline
 1. Call `ob_summarize()` to find unsummarized sessions
@@ -202,12 +202,12 @@ If it's the first session of the month, or Aaron asks for a health check:
 ### Stale experience pruning
 - Use `ob_list` to find knowledge entries with `recall_count = 0`
 - Flag any not recalled in 90+ days
-- Present the stale list to Aaron: "These experiences haven't been useful — prune them?"
-- Only delete with Aaron's approval
+- Present the stale list to {{USER_NAME}}: "These experiences haven't been useful — prune them?"
+- Only delete with {{USER_NAME}}'s approval
 
 ### Skill candidate check
 - Read `~/Obsidian Vault v2/Skill-Candidates/SKILL-CANDIDATES.md`
-- If any cluster has 3+ experiences and hasn't been acted on, remind Aaron
+- If any cluster has 3+ experiences and hasn't been acted on, remind {{USER_NAME}}
 
 ### Protocol health score
 1. If in the Self-Improving-Agent project, run `node open-brain/build/cli.js sync --score`
@@ -219,7 +219,7 @@ If it's the first session of the month, or Aaron asks for a health check:
 
 ## Judgment calls
 
-- If Aaron jumps straight into a task, adapt. Read state in the background and surface anything relevant as you go. The protocol serves the work, not the other way around.
+- If {{USER_NAME}} jumps straight into a task, adapt. Read state in the background and surface anything relevant as you go. The protocol serves the work, not the other way around.
 - Not every session needs recalled knowledge. If nothing is relevant, say so — don't force it.
 - Keep the greeting and summary to **5 lines max**. Don't dump walls of text.
-- **If Aaron says "skip" or starts talking about work**, drop the protocol and get to work.
+- **If {{USER_NAME}} says "skip" or starts talking about work**, drop the protocol and get to work.

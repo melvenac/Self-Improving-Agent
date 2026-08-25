@@ -36,3 +36,8 @@ process.env.KNOWLEDGE_V2_DB = join(stateDir, "knowledge-v2.db");
 // point OPEN_BRAIN_VAULT_DIR at their own fixture, but the default is isolated,
 // so forgetting to override leaks into tmp rather than into the user's notes.
 process.env.OPEN_BRAIN_VAULT_DIR = join(stateDir, "vault");
+
+// The identity file is read by the mirror-parity check to render templates
+// before comparing. Without this, a developer who has onboarded would see the
+// parity tests render with their real name and a fresh clone would not.
+process.env.OPEN_BRAIN_IDENTITY = join(stateDir, "identity.json");

@@ -5,14 +5,23 @@
  * Builds open-brain MCP server, registers hooks, copies slash commands, and scaffolds the Obsidian vault.
  *
  * Usage:
- *   node scripts/setup.mjs          # normal install
+ *   node scripts/setup.mjs                          # normal install (prompts for names on first run)
+ *   node scripts/setup.mjs --user Jack --agent Clark # set names without prompting
+ *   node scripts/setup.mjs --reconfigure             # re-prompt for names and re-render commands
+ *   node scripts/setup.mjs --yes                     # never prompt; use stored names or defaults
+ *
+ * Identity: the slash commands address you by name and give the agent a
+ * persona. Onboarding stores both in ~/.claude/open-brain/identity.json and
+ * renders the {{USER_NAME}} / {{AGENT_NAME}} placeholders as the commands are
+ * installed. Re-run setup at any time to change them.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import readline from 'node:readline/promises';
+import { pathToFileURL } from 'node:url';
 
 const HOME = os.homedir();
 const CLAUDE_DIR = path.join(HOME, '.claude');
@@ -28,6 +37,50 @@ const SKIP = '\u00b7';
 const FAIL = '\u2717';
 
 let hadFailure = false;
+
+// ---- CLI flags ----------------------------------------------------------
+function parseArgs(argv) {
+  const args = { user: null, agent: null, reconfigure: false, yes: false, dev: false };
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    const next = () => {
+      const v = argv[++i];
+      if (v === undefined || v.startsWith('--')) {
+        console.error(`${a} needs a value`);
+        process.exit(1);
+      }
+      return v;
+    };
+    if (a === '--user') args.user = next();
+    else if (a.startsWith('--user=')) args.user = a.slice('--user='.length);
+    else if (a === '--agent') args.agent = next();
+    else if (a.startsWith('--agent=')) args.agent = a.slice('--agent='.length);
+    else if (a === '--reconfigure') args.reconfigure = true;
+    else if (a === '--yes' || a === '-y') args.yes = true;
+    else if (a === '--dev') args.dev = true;
+    else if (a === '--help' || a === '-h') {
+      console.log('Usage: node scripts/setup.mjs [--user NAME] [--agent NAME] [--reconfigure] [--yes]');
+      process.exit(0);
+    } else {
+      console.error(`Unknown option: ${a}`);
+      process.exit(1);
+    }
+  }
+  return args;
+}
+const ARGS = parseArgs(process.argv.slice(2));
+
+// The identity helpers are compiled TypeScript in open-brain/build/. They are
+// loaded after buildOpenBrain() so there is exactly one implementation of the
+// placeholder rendering — the same one the /sync parity check uses.
+let identityLib = null;
+async function loadIdentityLib() {
+  if (identityLib) return identityLib;
+  const modPath = path.join(OPEN_BRAIN_DIR, 'build', 'shared', 'identity.js');
+  if (!fs.existsSync(modPath)) return null;
+  identityLib = await import(pathToFileURL(modPath).href);
+  return identityLib;
+}
 
 function log(icon, msg) {
   console.log(`${icon} ${msg}`);
@@ -55,27 +108,10 @@ function checkPrerequisites() {
   log(OK, `Prerequisites OK (Node ${process.version})`);
 }
 
-function fileHash(filePath) {
-  const content = fs.readFileSync(filePath);
-  return createHash('sha256').update(content).digest('hex');
-}
-
-function filesIdentical(a, b) {
-  if (!fs.existsSync(a) || !fs.existsSync(b)) return false;
-  return fileHash(a) === fileHash(b);
-}
-
 function ensureDir(dir) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-}
-
-function copyFileIfChanged(src, dest) {
-  if (filesIdentical(src, dest)) return false;
-  ensureDir(path.dirname(dest));
-  fs.copyFileSync(src, dest);
-  return true;
 }
 
 function buildOpenBrain() {
@@ -220,7 +256,117 @@ function registerHooks() {
   log(OK, 'SessionStart hook registered in settings.json');
 }
 
-function copySlashCommands() {
+// ---- Identity (onboarding) ---------------------------------------------
+
+function gitUserName() {
+  try {
+    return execSync('git config --get user.name', { stdio: 'pipe' }).toString().trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+async function promptIdentity(seed) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    console.log('');
+    console.log('  The slash commands greet you by name and give the agent a persona.');
+    console.log('  Press Enter to accept a default. Re-run with --reconfigure to change later.');
+    console.log('');
+    const ask = async (label, fallback) => {
+      const answer = (await rl.question(`  ${label} [${fallback}]: `)).trim();
+      return answer || fallback;
+    };
+    const user_name = await ask('Your name', seed.user_name);
+    const agent_name = await ask('Agent name', seed.agent_name);
+    console.log('');
+    return { user_name, agent_name };
+  } catch (e) {
+    // Ctrl+D / closed stdin mid-prompt. Fall back to the seed rather than
+    // dying with a stack trace: the answer to "who are you" can be corrected
+    // later with --reconfigure, but a half-finished install cannot.
+    if (e?.name === 'AbortError' || e?.code === 'ERR_USE_AFTER_CLOSE') {
+      console.log('');
+      log(SKIP, 'Prompt closed \u2014 keeping the defaults shown (re-run with --reconfigure to change)');
+      return { ...seed };
+    }
+    throw e;
+  } finally {
+    rl.close();
+  }
+}
+
+/**
+ * Resolve the identity for this install, in precedence order:
+ *   --user/--agent flags  >  stored identity (unless --reconfigure)
+ *   >  interactive prompt (TTY, not --yes)  >  derived default.
+ * Whatever is resolved is persisted, so the /sync parity check and a later
+ * re-run see the same names this install rendered with.
+ */
+async function configureIdentity() {
+  const lib = await loadIdentityLib();
+  if (!lib) {
+    log(FAIL, 'open-brain build missing \u2014 cannot configure identity');
+    hadFailure = true;
+    return null;
+  }
+
+  const stored = lib.loadIdentity(HOME);
+  const derived = lib.defaultIdentity({ gitUserName: gitUserName() });
+  const seed = stored || derived;
+  const flagged = ARGS.user !== null || ARGS.agent !== null;
+
+  let identity;
+  let how;
+  if (flagged) {
+    identity = { user_name: ARGS.user ?? seed.user_name, agent_name: ARGS.agent ?? seed.agent_name };
+    how = 'from flags';
+  } else if (stored && !ARGS.reconfigure) {
+    identity = stored;
+    how = 'stored';
+  } else if (process.stdin.isTTY && !ARGS.yes) {
+    identity = await promptIdentity(seed);
+    how = 'from prompt';
+  } else {
+    identity = seed;
+    how = stored ? 'stored' : 'derived \u2014 pass --user/--agent or re-run in a terminal to change';
+  }
+
+  if (!identity.user_name.trim() || !identity.agent_name.trim()) {
+    log(FAIL, 'Identity names cannot be empty');
+    hadFailure = true;
+    return null;
+  }
+
+  const changed = !stored || stored.user_name !== identity.user_name || stored.agent_name !== identity.agent_name;
+  const savedTo = lib.saveIdentity(identity, HOME);
+  log(changed ? OK : SKIP, `Identity: you are "${identity.user_name}", the agent is "${identity.agent_name}" (${how}) \u2192 ${savedTo}`);
+  return identity;
+}
+
+/**
+ * Copy every *.md in srcDir to destDir with the identity placeholders filled.
+ * Compares rendered content, not source hashes: the installed file is meant to
+ * differ from the template by exactly the substitutions, and a re-run after
+ * --reconfigure must rewrite files whose source did not change.
+ */
+async function renderCommands(srcDir, destDir, identity) {
+  const lib = await loadIdentityLib();
+  let written = 0;
+  for (const file of fs.readdirSync(srcDir)) {
+    if (!file.endsWith('.md')) continue;
+    const raw = fs.readFileSync(path.join(srcDir, file), 'utf-8');
+    const rendered = identity && lib ? lib.renderIdentity(raw, identity) : raw;
+    const dest = path.join(destDir, file);
+    if (fs.existsSync(dest) && fs.readFileSync(dest, 'utf-8') === rendered) continue;
+    ensureDir(destDir);
+    fs.writeFileSync(dest, rendered);
+    written++;
+  }
+  return written;
+}
+
+async function copySlashCommands(identity) {
   const destDir = path.join(CLAUDE_DIR, 'commands');
   ensureDir(destDir);
 
@@ -231,16 +377,10 @@ function copySlashCommands() {
     return;
   }
 
-  let copied = 0;
-  for (const file of fs.readdirSync(repoCommandsDir)) {
-    if (!file.endsWith('.md')) continue;
-    const src = path.join(repoCommandsDir, file);
-    const dest = path.join(destDir, file);
-    if (copyFileIfChanged(src, dest)) copied++;
-  }
+  const copied = await renderCommands(repoCommandsDir, destDir, identity);
 
   if (copied > 0) {
-    log(OK, `${copied} Claude slash command(s) copied \u2192 ${destDir}`);
+    log(OK, `${copied} Claude slash command(s) rendered \u2192 ${destDir}`);
   } else {
     log(SKIP, 'Claude slash commands already up to date \u2014 skipped');
   }
@@ -317,7 +457,7 @@ function registerCursorHooks() {
   log(OK, 'Cursor sessionStart hook registered in ~/.cursor/hooks.json');
 }
 
-function copyCursorSlashCommands() {
+async function copyCursorSlashCommands(identity) {
   const destDir = path.join(CURSOR_DIR, 'commands');
   const repoCommandsDir = path.join(REPO_ROOT, 'project-template', '.cursor', 'commands');
 
@@ -327,16 +467,10 @@ function copyCursorSlashCommands() {
   }
 
   ensureDir(destDir);
-  let copied = 0;
-  for (const file of fs.readdirSync(repoCommandsDir)) {
-    if (!file.endsWith('.md')) continue;
-    const src = path.join(repoCommandsDir, file);
-    const dest = path.join(destDir, file);
-    if (copyFileIfChanged(src, dest)) copied++;
-  }
+  const copied = await renderCommands(repoCommandsDir, destDir, identity);
 
   if (copied > 0) {
-    log(OK, `${copied} Cursor slash command(s) copied \u2192 ${destDir}`);
+    log(OK, `${copied} Cursor slash command(s) rendered \u2192 ${destDir}`);
   } else {
     log(SKIP, 'Cursor slash commands already up to date \u2014 skipped');
   }
@@ -389,17 +523,22 @@ function setupObsidianVault() {
   }
 }
 
-function main() {
+async function main() {
   console.log('\nSelf-Improving Agent Setup\n');
 
   checkPrerequisites();
   buildOpenBrain();
+  const identity = await configureIdentity();
   registerMcpServer();
   registerHooks();
-  copySlashCommands();
+  if (identity) {
+    await copySlashCommands(identity);
+  } else {
+    log(FAIL, 'Slash commands not installed \u2014 identity unresolved, refusing to ship unrendered placeholders');
+  }
   registerCursorMcp();
   registerCursorHooks();
-  copyCursorSlashCommands();
+  if (identity) await copyCursorSlashCommands(identity);
   setupObsidianVault();
 
   console.log('');
@@ -411,4 +550,7 @@ function main() {
   }
 }
 
-main();
+main().catch((e) => {
+  log(FAIL, e?.stack || String(e));
+  process.exit(1);
+});
