@@ -94,17 +94,11 @@ npm install
 npm run build
 ```
 
-Register it in your Claude Code MCP settings (`~/.claude/.mcp.json` or `~/.claude/settings.json`):
+Register it as a user-scope MCP server (this writes to `~/.claude.json`, which is the file Claude Code actually reads for user-scope servers — `~/.claude/.mcp.json` is *not* consulted):
 
-```json
-{
-  "mcpServers": {
-    "open-brain": {
-      "command": "node",
-      "args": ["<path-to-repo>/open-brain/build/server.js"]
-    }
-  }
-}
+```bash
+claude mcp add --scope user open-brain -- node "<path-to-repo>/open-brain/build/server.js"
+claude mcp list   # should show: open-brain … ✔ Connected
 ```
 
 ### 3. Set up automation hooks
@@ -179,7 +173,7 @@ node scripts/setup.mjs --uninstall --dry-run   # list what would change, touch n
 node scripts/setup.mjs --uninstall             # remove hooks, MCP entries, commands, identity
 ```
 
-Reverses exactly what setup wrote and nothing else: the `open-brain` hook entries in `~/.claude/settings.json` and `~/.cursor/hooks.json`, the `open-brain` server in `~/.claude/.mcp.json` and `~/.cursor/mcp.json`, the slash commands in `~/.claude/commands/` and `~/.cursor/commands/`, and `identity.json`. Files that existed before setup keep every other key; files setup created from scratch are deleted once empty.
+Reverses exactly what setup wrote and nothing else: the `open-brain` hook entries in `~/.claude/settings.json` and `~/.cursor/hooks.json`, the `open-brain` server in `~/.claude.json` (via `claude mcp remove`, only if it points at this checkout), `~/.claude/.mcp.json` and `~/.cursor/mcp.json`, the slash commands in `~/.claude/commands/` and `~/.cursor/commands/`, and `identity.json`. Files that existed before setup keep every other key; files setup created from scratch are deleted once empty.
 
 | Flag | Effect |
 |---|---|

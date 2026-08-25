@@ -200,6 +200,59 @@ function registerMcpServer() {
   log(OK, 'MCP server registered in .mcp.json');
 }
 
+// ---- Claude Code user-scope MCP registration ---------------------------
+//
+// ~/.claude/.mcp.json is NOT read by Claude Code. User-scope servers live in
+// ~/.claude.json and are managed by `claude mcp add --scope user`; the
+// `.mcp.json` convention is per-project. An install that only wrote
+// .mcp.json produced a session where /start ran but every ob_* call failed
+// with "tool not found" — found live on 2026-08-25. The CLI owns the format
+// of ~/.claude.json (it is a large file with unrelated state), so this shells
+// out to it rather than editing the JSON, and falls back to printing the
+// command when the CLI is not on PATH.
+
+function claudeCli(args) {
+  return execSync(`claude ${args}`, { stdio: 'pipe', timeout: 60000 }).toString();
+}
+
+function hasClaudeCli() {
+  try { claudeCli('--version'); return true; } catch { return false; }
+}
+
+function registeredClaudeMcpCommand() {
+  // `claude mcp get` exits non-zero when the server is unknown.
+  try {
+    return claudeCli(`mcp get ${MCP_SERVER_KEY}`);
+  } catch {
+    return null;
+  }
+}
+
+function registerClaudeUserMcp() {
+  const manual = `claude mcp add --scope user ${MCP_SERVER_KEY} -- node "${OPEN_BRAIN_SERVER}"`;
+  if (!hasClaudeCli()) {
+    log(SKIP, `claude CLI not on PATH \u2014 register the server yourself:\n    ${manual}`);
+    return;
+  }
+
+  const existing = registeredClaudeMcpCommand();
+  const norm = (t) => String(t || '').replace(/\\/g, '/').toLowerCase();
+  if (existing && norm(existing).includes(norm(OPEN_BRAIN_SERVER))) {
+    log(SKIP, 'Claude Code user-scope MCP already registered \u2014 skipped');
+    return;
+  }
+
+  try {
+    // A stale registration (different path) is replaced, not duplicated.
+    if (existing) claudeCli(`mcp remove --scope user ${MCP_SERVER_KEY}`);
+    claudeCli(`mcp add --scope user ${MCP_SERVER_KEY} -- node "${OPEN_BRAIN_SERVER}"`);
+    log(OK, `Claude Code user-scope MCP registered (claude mcp add) \u2192 ~/.claude.json`);
+  } catch (e) {
+    log(FAIL, `claude mcp add failed: ${e.message.split('\n')[0]}\n    run it yourself: ${manual}`);
+    hadFailure = true;
+  }
+}
+
 function registerHooks() {
   const settingsPath = CLAUDE_SETTINGS;
   let settings = {};
@@ -628,6 +681,24 @@ function uninstallMcpEntry(p, label, dryRun) {
   writeBackOrRemove(p, config, husk, dryRun);
 }
 
+function uninstallClaudeUserMcp(dryRun) {
+  if (!hasClaudeCli()) { log(SKIP, 'Claude Code user-scope MCP \u2014 claude CLI not on PATH; if registered, run: claude mcp remove --scope user open-brain'); return; }
+  const existing = registeredClaudeMcpCommand();
+  if (!existing) { log(SKIP, 'Claude Code user-scope MCP \u2014 not registered'); return; }
+  // Only remove a registration that points at THIS checkout. A user who
+  // registered open-brain from a different clone did not do it through us.
+  const norm = (t) => String(t || '').replace(/\\/g, '/').toLowerCase();
+  if (!norm(existing).includes(norm(OPEN_BRAIN_SERVER))) {
+    log(SKIP, `Claude Code user-scope MCP \u2014 registered from a different path, left alone:\n    ${existing.trim().split('\n').find((l) => l.includes('node')) || ''}`);
+    return;
+  }
+  if (!dryRun) {
+    try { claudeCli(`mcp remove --scope user ${MCP_SERVER_KEY}`); }
+    catch (e) { log(FAIL, `claude mcp remove failed: ${e.message.split('\n')[0]}`); hadFailure = true; return; }
+  }
+  log(OK, `${dryRun ? 'Would remove' : 'Removed'} Claude Code user-scope MCP registration (claude mcp remove)`);
+}
+
 function uninstallCursorHooks(dryRun) {
   const config = readJsonOrNull(CURSOR_HOOKS_JSON);
   if (!config) { log(SKIP, `Cursor hooks \u2014 ${CURSOR_HOOKS_JSON} absent`); return; }
@@ -779,6 +850,7 @@ async function uninstall() {
 
   uninstallClaudeHooks(dryRun);
   uninstallMcpEntry(CLAUDE_MCP_JSON, 'Claude Code', dryRun);
+  uninstallClaudeUserMcp(dryRun);
   await uninstallCommands(TEMPLATE_CLAUDE_COMMANDS, CLAUDE_COMMANDS_DIR, 'Claude Code', identity, dryRun);
   uninstallMcpEntry(CURSOR_MCP_JSON, 'Cursor', dryRun);
   uninstallCursorHooks(dryRun);
@@ -804,6 +876,7 @@ async function main() {
   buildOpenBrain();
   const identity = await configureIdentity();
   registerMcpServer();
+  registerClaudeUserMcp();
   registerHooks();
   if (identity) {
     await copySlashCommands(identity);

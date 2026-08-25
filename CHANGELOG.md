@@ -15,6 +15,9 @@
   - **Data is opt-in to delete.** `~/.claude/open-brain/` (the knowledge DB) and the vault survive by default and their paths are printed. `--purge` removes the state dir; the vault goes only while it is still the untouched scaffold — one note and it stays. `--dry-run` prints the full plan and changes nothing.
   - Verified by round-trip against a sandbox `$HOME` seeded with unrelated hooks and MCP servers: pre-install and post-uninstall configs are identical in content.
 
+### Fixed
+- **The MCP server was never visible to Claude Code.** `setup.mjs` registered it in `~/.claude/.mcp.json`, which Claude Code does not read — user-scope servers live in `~/.claude.json` and are managed by `claude mcp add --scope user`. Found live on 2026-08-25: after a clean install, `claude mcp list` showed every other server and not `open-brain`, so `/start` would have run and every `ob_*` call failed. Setup now shells out to `claude mcp add --scope user` (replacing a stale registration at another path rather than duplicating it), and prints the exact command when the CLI is not on PATH. The CLI owns `~/.claude.json`'s format — a large file with unrelated state — so it is never edited directly. `--uninstall` runs the matching `claude mcp remove`, but only when the registration points at this checkout. The README's manual step is corrected to match.
+
 ### Changed
 - **`checkMirrorParity` renders before it compares.** The live↔template pairs are compared against the template rendered with the stored identity, so a personalised install is not reported as drift. A live file that still contains a placeholder is named explicitly (`start.md has unrendered {{USER_NAME}} — run scripts/setup.mjs`) instead of a bare "differs", since the two failures have different fixes. The repo↔template pair stays raw: both sides are source.
 - `end.md` A14: "he can override" → "they can override".
