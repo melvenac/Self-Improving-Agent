@@ -172,6 +172,23 @@ Defaults when nothing is stored: the first word of `git config user.name`, then 
 
 If you edit the templates, keep the placeholders rather than writing a name. Anything you `cp` out of `project-template/` by hand will not be rendered; only `setup.mjs` renders.
 
+## Uninstall
+
+```bash
+node scripts/setup.mjs --uninstall --dry-run   # list what would change, touch nothing
+node scripts/setup.mjs --uninstall             # remove hooks, MCP entries, commands, identity
+```
+
+Reverses exactly what setup wrote and nothing else: the `open-brain` hook entries in `~/.claude/settings.json` and `~/.cursor/hooks.json`, the `open-brain` server in `~/.claude/.mcp.json` and `~/.cursor/mcp.json`, the slash commands in `~/.claude/commands/` and `~/.cursor/commands/`, and `identity.json`. Files that existed before setup keep every other key; files setup created from scratch are deleted once empty.
+
+| Flag | Effect |
+|---|---|
+| `--dry-run` | Print the plan without changing anything |
+| `--force` | Also remove slash commands you have edited since install (by default they are kept and named) |
+| `--purge` | Also delete `~/.claude/open-brain/` — the knowledge DB and logs. The Obsidian vault is deleted only if it is still the empty scaffold; a vault with any note in it is always kept |
+
+Your data is kept unless you say otherwise. The repo checkout itself is never touched — `rm -rf` it when you are done.
+
 ## Commands
 
 | Command | When | What it does |

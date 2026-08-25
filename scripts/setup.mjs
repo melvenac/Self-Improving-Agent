@@ -9,6 +9,9 @@
  *   node scripts/setup.mjs --user Jack --agent Clark # set names without prompting
  *   node scripts/setup.mjs --reconfigure             # re-prompt for names and re-render commands
  *   node scripts/setup.mjs --yes                     # never prompt; use stored names or defaults
+ *   node scripts/setup.mjs --uninstall               # remove hooks, MCP entries, commands, identity; keep data
+ *   node scripts/setup.mjs --uninstall --dry-run     # show what --uninstall would do
+ *   node scripts/setup.mjs --uninstall --purge       # also delete ~/.claude/open-brain/ (the knowledge DB)
  *
  * Identity: the slash commands address you by name and give the agent a
  * persona. Onboarding stores both in ~/.claude/open-brain/identity.json and
@@ -31,6 +34,24 @@ const OPEN_BRAIN_DIR = path.join(REPO_ROOT, 'open-brain');
 const OPEN_BRAIN_SERVER = path.join(OPEN_BRAIN_DIR, 'build', 'server.js');
 const OPEN_BRAIN_BOOTSTRAP = path.join(OPEN_BRAIN_DIR, 'build', 'cli-bootstrap.js');
 
+// Every path setup writes, so --uninstall reverses exactly this list and
+// nothing else. A location added to install without being added here is a
+// leak, which is why both halves read from the same constants.
+const CLAUDE_SETTINGS = path.join(CLAUDE_DIR, 'settings.json');
+const CLAUDE_MCP_JSON = path.join(CLAUDE_DIR, '.mcp.json');
+const CLAUDE_COMMANDS_DIR = path.join(CLAUDE_DIR, 'commands');
+const CLAUDE_STATE_DIR = path.join(CLAUDE_DIR, 'open-brain');
+const CURSOR_MCP_JSON = path.join(CURSOR_DIR, 'mcp.json');
+const CURSOR_HOOKS_JSON = path.join(CURSOR_DIR, 'hooks.json');
+const CURSOR_COMMANDS_DIR = path.join(CURSOR_DIR, 'commands');
+const TEMPLATE_CLAUDE_COMMANDS = path.join(REPO_ROOT, 'project-template', '.claude', 'commands');
+const TEMPLATE_CURSOR_COMMANDS = path.join(REPO_ROOT, 'project-template', '.cursor', 'commands');
+const MCP_SERVER_KEY = 'open-brain';
+// Hook commands are recognised by the script they run, not the exact string,
+// so an entry written by an older install (different path spelling, no --ide
+// flag) is still ours.
+const HOOK_SCRIPT_MARKERS = ['cli-bootstrap.js', 'cli-session-end.js'];
+
 // Status indicators
 const OK = '\u2713';
 const SKIP = '\u00b7';
@@ -40,7 +61,8 @@ let hadFailure = false;
 
 // ---- CLI flags ----------------------------------------------------------
 function parseArgs(argv) {
-  const args = { user: null, agent: null, reconfigure: false, yes: false, dev: false };
+  const args = { user: null, agent: null, reconfigure: false, yes: false, dev: false,
+                 uninstall: false, dryRun: false, force: false, purge: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const next = () => {
@@ -58,8 +80,13 @@ function parseArgs(argv) {
     else if (a === '--reconfigure') args.reconfigure = true;
     else if (a === '--yes' || a === '-y') args.yes = true;
     else if (a === '--dev') args.dev = true;
+    else if (a === '--uninstall') args.uninstall = true;
+    else if (a === '--dry-run') args.dryRun = true;
+    else if (a === '--force') args.force = true;
+    else if (a === '--purge') args.purge = true;
     else if (a === '--help' || a === '-h') {
       console.log('Usage: node scripts/setup.mjs [--user NAME] [--agent NAME] [--reconfigure] [--yes]');
+      console.log('       node scripts/setup.mjs --uninstall [--dry-run] [--force] [--purge]');
       process.exit(0);
     } else {
       console.error(`Unknown option: ${a}`);
@@ -138,7 +165,7 @@ function buildOpenBrain() {
 }
 
 function registerMcpServer() {
-  const mcpJsonPath = path.join(CLAUDE_DIR, '.mcp.json');
+  const mcpJsonPath = CLAUDE_MCP_JSON;
   let config = {};
 
   if (fs.existsSync(mcpJsonPath)) {
@@ -147,7 +174,7 @@ function registerMcpServer() {
 
   if (!config.mcpServers) config.mcpServers = {};
 
-  const serverPath = path.join(OPEN_BRAIN_DIR, 'build', 'server.js');
+  const serverPath = OPEN_BRAIN_SERVER;
 
   // Remove stale knowledge-mcp entry if present
   if (config.mcpServers['open-brain-knowledge']) {
@@ -174,7 +201,7 @@ function registerMcpServer() {
 }
 
 function registerHooks() {
-  const settingsPath = path.join(CLAUDE_DIR, 'settings.json');
+  const settingsPath = CLAUDE_SETTINGS;
   let settings = {};
 
   if (fs.existsSync(settingsPath)) {
@@ -367,10 +394,10 @@ async function renderCommands(srcDir, destDir, identity) {
 }
 
 async function copySlashCommands(identity) {
-  const destDir = path.join(CLAUDE_DIR, 'commands');
+  const destDir = CLAUDE_COMMANDS_DIR;
   ensureDir(destDir);
 
-  const repoCommandsDir = path.join(REPO_ROOT, 'project-template', '.claude', 'commands');
+  const repoCommandsDir = TEMPLATE_CLAUDE_COMMANDS;
 
   if (!fs.existsSync(repoCommandsDir)) {
     log(SKIP, 'No .claude/commands/ in repo \u2014 skipped');
@@ -387,7 +414,7 @@ async function copySlashCommands(identity) {
 }
 
 function registerCursorMcp() {
-  const mcpJsonPath = path.join(CURSOR_DIR, 'mcp.json');
+  const mcpJsonPath = CURSOR_MCP_JSON;
   let config = {};
 
   if (fs.existsSync(mcpJsonPath)) {
@@ -423,7 +450,7 @@ function registerCursorMcp() {
 }
 
 function registerCursorHooks() {
-  const hooksPath = path.join(CURSOR_DIR, 'hooks.json');
+  const hooksPath = CURSOR_HOOKS_JSON;
   // `--ide cursor` keys this session's slot separately from Claude Code's.
   const bootstrapCmd = `node "${OPEN_BRAIN_BOOTSTRAP.replace(/\\/g, '/')}" --ide cursor`;
 
@@ -458,8 +485,8 @@ function registerCursorHooks() {
 }
 
 async function copyCursorSlashCommands(identity) {
-  const destDir = path.join(CURSOR_DIR, 'commands');
-  const repoCommandsDir = path.join(REPO_ROOT, 'project-template', '.cursor', 'commands');
+  const destDir = CURSOR_COMMANDS_DIR;
+  const repoCommandsDir = TEMPLATE_CURSOR_COMMANDS;
 
   if (!fs.existsSync(repoCommandsDir)) {
     log(SKIP, 'No project-template/.cursor/commands/ in repo \u2014 skipped');
@@ -476,12 +503,9 @@ async function copyCursorSlashCommands(identity) {
   }
 }
 
-function setupObsidianVault() {
-  // Mirrors obsidianVaultDir() in open-brain/src/shared/paths.ts. This was
-  // hardcoded to the abandoned v1 vault, so a v2 install never got a seeded
-  // SKILL-INDEX.md — and skill-scan silently treats a missing index as
-  // "no skills exist yet", re-proposing every distilled skill forever.
-  const vaultRoot = process.env.OPEN_BRAIN_VAULT_DIR || path.join(HOME, 'Obsidian Vault v2');
+// The scaffold is defined once so that --uninstall --purge can recognise an
+// untouched vault by the same definition setup created it from.
+function vaultScaffold(vaultRoot) {
   const dirs = ['Archive', 'Checkpoints', 'Experiences', 'Skill-Candidates', 'Skills', 'Summaries'];
   const templateFiles = {
     // The Domain column is the contract: parseExistingSkills() reads it to
@@ -497,6 +521,16 @@ function setupObsidianVault() {
     [path.join(vaultRoot, 'Skill-Candidates', 'SKILL-CANDIDATES.md')]:
       '# Skill Candidates\n\n> Experience clusters that may be worth distilling into skills.\n\n(none yet)\n'
   };
+  return { dirs, templateFiles };
+}
+
+function setupObsidianVault() {
+  // Mirrors obsidianVaultDir() in open-brain/src/shared/paths.ts. This was
+  // hardcoded to the abandoned v1 vault, so a v2 install never got a seeded
+  // SKILL-INDEX.md — and skill-scan silently treats a missing index as
+  // "no skills exist yet", re-proposing every distilled skill forever.
+  const vaultRoot = process.env.OPEN_BRAIN_VAULT_DIR || path.join(HOME, 'Obsidian Vault v2');
+  const { dirs, templateFiles } = vaultScaffold(vaultRoot);
 
   let created = 0;
 
@@ -523,7 +557,247 @@ function setupObsidianVault() {
   }
 }
 
+// ---- Uninstall -----------------------------------------------------------
+
+function readJsonOrNull(p) {
+  if (!fs.existsSync(p)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(p, 'utf-8'));
+  } catch (e) {
+    log(FAIL, `${p} is not valid JSON \u2014 left untouched (${e.message})`);
+    hadFailure = true;
+    return undefined;
+  }
+}
+
+function isEmptyObject(o) {
+  return o && typeof o === 'object' && !Array.isArray(o) && Object.keys(o).length === 0;
+}
+
+/**
+ * Write `obj` back to `p`, or delete `p` when nothing but our own scaffolding
+ * remains. A file setup created from scratch (`{ mcpServers: {} }`,
+ * `{ version: 1, hooks: {} }`) has no reason to outlive the install; a file the
+ * user already had keeps every key we did not write.
+ */
+function writeBackOrRemove(p, obj, isHusk, dryRun) {
+  if (isHusk(obj)) {
+    if (!dryRun) fs.rmSync(p);
+    log(OK, `${dryRun ? 'Would remove' : 'Removed'} ${p} (nothing left but the scaffold setup created)`);
+  } else {
+    if (!dryRun) fs.writeFileSync(p, JSON.stringify(obj, null, 2) + '\n');
+    log(OK, `${dryRun ? 'Would update' : 'Updated'} ${p}`);
+  }
+}
+
+function hookIsOurs(cmd) {
+  const c = String(cmd || '').replace(/\\/g, '/').toLowerCase();
+  return HOOK_SCRIPT_MARKERS.some((m) => c.includes(m));
+}
+
+function uninstallClaudeHooks(dryRun) {
+  const settings = readJsonOrNull(CLAUDE_SETTINGS);
+  if (!settings) { log(SKIP, `${CLAUDE_SETTINGS} \u2014 nothing to remove`); return; }
+  if (!settings.hooks) { log(SKIP, 'Claude Code hooks \u2014 none registered'); return; }
+
+  let removed = 0;
+  for (const event of Object.keys(settings.hooks)) {
+    const entries = settings.hooks[event];
+    if (!Array.isArray(entries)) continue;
+    const kept = entries.filter((entry) => !(entry.hooks || []).some((h) => hookIsOurs(h.command)));
+    removed += entries.length - kept.length;
+    if (kept.length === 0) delete settings.hooks[event];
+    else settings.hooks[event] = kept;
+  }
+  if (isEmptyObject(settings.hooks)) delete settings.hooks;
+
+  if (removed === 0) { log(SKIP, 'Claude Code hooks \u2014 none of ours found'); return; }
+  if (!dryRun) fs.writeFileSync(CLAUDE_SETTINGS, JSON.stringify(settings, null, 2) + '\n');
+  log(OK, `${dryRun ? 'Would remove' : 'Removed'} ${removed} hook entr${removed === 1 ? 'y' : 'ies'} from ${CLAUDE_SETTINGS}`);
+}
+
+function uninstallMcpEntry(p, label, dryRun) {
+  const config = readJsonOrNull(p);
+  if (!config) { log(SKIP, `${label} MCP \u2014 ${p} absent`); return; }
+  if (!config.mcpServers?.[MCP_SERVER_KEY]) { log(SKIP, `${label} MCP \u2014 no ${MCP_SERVER_KEY} entry`); return; }
+
+  delete config.mcpServers[MCP_SERVER_KEY];
+  // Only a file that holds nothing but an empty mcpServers map is a husk;
+  // any other key means the user had this file before us.
+  const husk = (o) => Object.keys(o).length === 1 && isEmptyObject(o.mcpServers);
+  writeBackOrRemove(p, config, husk, dryRun);
+}
+
+function uninstallCursorHooks(dryRun) {
+  const config = readJsonOrNull(CURSOR_HOOKS_JSON);
+  if (!config) { log(SKIP, `Cursor hooks \u2014 ${CURSOR_HOOKS_JSON} absent`); return; }
+
+  let removed = 0;
+  for (const event of Object.keys(config.hooks || {})) {
+    const entries = config.hooks[event];
+    if (!Array.isArray(entries)) continue;
+    const kept = entries.filter((entry) => !hookIsOurs(entry.command));
+    removed += entries.length - kept.length;
+    if (kept.length === 0) delete config.hooks[event];
+    else config.hooks[event] = kept;
+  }
+  if (removed === 0) { log(SKIP, 'Cursor hooks \u2014 none of ours found'); return; }
+
+  // setup wrote exactly { version: 1, hooks: {} } when creating this file.
+  const husk = (o) => isEmptyObject(o.hooks) && Object.keys(o).every((k) => k === 'version' || k === 'hooks');
+  writeBackOrRemove(CURSOR_HOOKS_JSON, config, husk, dryRun);
+}
+
+/**
+ * Remove the slash commands setup installed. A file is removed when it is
+ * byte-identical to what setup would render today (template + stored
+ * identity); one the user has edited since is kept and named, unless --force.
+ * Without a build the rendered form cannot be reconstructed, so every file is
+ * treated as edited \u2014 build first, or pass --force.
+ */
+async function uninstallCommands(templateDir, destDir, label, identity, dryRun) {
+  if (!fs.existsSync(destDir)) { log(SKIP, `${label} commands \u2014 ${destDir} absent`); return; }
+  if (!fs.existsSync(templateDir)) { log(SKIP, `${label} commands \u2014 template dir missing, cannot tell which files are ours`); return; }
+
+  const lib = await loadIdentityLib();
+  if (!lib && !ARGS.force) {
+    log(FAIL, `${label} commands \u2014 open-brain not built, cannot verify files are unmodified; run \`npm --prefix open-brain run build\` or pass --force`);
+    hadFailure = true;
+    return;
+  }
+
+  let removed = 0;
+  const kept = [];
+  for (const file of fs.readdirSync(templateDir)) {
+    if (!file.endsWith('.md')) continue;
+    const dest = path.join(destDir, file);
+    if (!fs.existsSync(dest)) continue;
+
+    let ours = ARGS.force;
+    if (!ours && lib) {
+      const raw = fs.readFileSync(path.join(templateDir, file), 'utf-8');
+      const expected = identity ? lib.renderIdentity(raw, identity) : raw;
+      const actual = fs.readFileSync(dest, 'utf-8');
+      // Same tolerance as the /sync parity check: CRLF and trailing whitespace are not edits.
+      const norm = (t) => t.replace(/\r\n/g, '\n').replace(/\s+$/, '');
+      ours = norm(actual) === norm(expected) || norm(actual) === norm(raw);
+    }
+
+    if (ours) {
+      if (!dryRun) fs.rmSync(dest);
+      removed++;
+    } else {
+      kept.push(file);
+    }
+  }
+
+  if (removed > 0) log(OK, `${dryRun ? 'Would remove' : 'Removed'} ${removed} ${label} slash command(s) from ${destDir}`);
+  else log(SKIP, `${label} commands \u2014 none of ours found`);
+  if (kept.length > 0) log(SKIP, `Kept ${kept.length} edited ${label} command(s) (pass --force to remove): ${kept.join(', ')}`);
+
+  if (!dryRun && fs.existsSync(destDir) && fs.readdirSync(destDir).length === 0) {
+    fs.rmdirSync(destDir);
+    log(OK, `Removed empty ${destDir}`);
+  }
+}
+
+function uninstallIdentity(dryRun) {
+  const p = process.env.OPEN_BRAIN_IDENTITY || path.join(CLAUDE_STATE_DIR, 'identity.json');
+  if (!fs.existsSync(p)) { log(SKIP, 'Identity \u2014 not configured'); return; }
+  if (!dryRun) fs.rmSync(p);
+  log(OK, `${dryRun ? 'Would remove' : 'Removed'} ${p}`);
+  // The state dir is created for identity.json; if that was all it ever held,
+  // do not leave an empty folder behind. A dir with a DB in it is data, kept.
+  if (!dryRun && fs.existsSync(CLAUDE_STATE_DIR) && fs.readdirSync(CLAUDE_STATE_DIR).length === 0) {
+    fs.rmdirSync(CLAUDE_STATE_DIR);
+  }
+}
+
+/**
+ * Data is opt-in to delete. The knowledge DB and the vault are the whole point
+ * of the tool; an uninstall that silently took them with it would be the one
+ * irreversible step in an otherwise reversible script.
+ */
+function uninstallData(dryRun) {
+  const vaultRoot = process.env.OPEN_BRAIN_VAULT_DIR || path.join(HOME, 'Obsidian Vault v2');
+
+  if (!ARGS.purge) {
+    const left = [CLAUDE_STATE_DIR, vaultRoot].filter((p) => fs.existsSync(p));
+    if (left.length > 0) log(SKIP, `Kept your data (pass --purge to delete the state dir): ${left.join(', ')}`);
+    return;
+  }
+
+  if (fs.existsSync(CLAUDE_STATE_DIR)) {
+    if (!dryRun) fs.rmSync(CLAUDE_STATE_DIR, { recursive: true, force: true });
+    log(OK, `${dryRun ? 'Would remove' : 'Removed'} ${CLAUDE_STATE_DIR} (knowledge DB, logs, identity)`);
+  }
+
+  // The vault is removed only while it is still exactly the scaffold setup
+  // created: the six folders empty and the two seed files unchanged. One note
+  // written by the user or by a session, and it stays.
+  if (fs.existsSync(vaultRoot)) {
+    if (vaultIsPristineScaffold(vaultRoot)) {
+      if (!dryRun) fs.rmSync(vaultRoot, { recursive: true, force: true });
+      log(OK, `${dryRun ? 'Would remove' : 'Removed'} ${vaultRoot} (still the empty scaffold)`);
+    } else {
+      log(SKIP, `Kept ${vaultRoot} \u2014 it holds notes; delete it by hand if you want them gone`);
+    }
+  }
+}
+
+function vaultIsPristineScaffold(vaultRoot) {
+  const { dirs, templateFiles } = vaultScaffold(vaultRoot);
+  const expectedFiles = new Set(Object.keys(templateFiles));
+  const walk = (dir) => {
+    const out = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.name === '.DS_Store') continue;
+      if (entry.isDirectory()) out.push({ full, dir: true }, ...walk(full));
+      else out.push({ full, dir: false });
+    }
+    return out;
+  };
+  for (const { full, dir } of walk(vaultRoot)) {
+    if (dir) {
+      if (!dirs.includes(path.basename(full)) || path.dirname(full) !== vaultRoot) return false;
+    } else {
+      if (!expectedFiles.has(full)) return false;
+      if (fs.readFileSync(full, 'utf-8') !== templateFiles[full]) return false;
+    }
+  }
+  return true;
+}
+
+async function uninstall() {
+  const dryRun = ARGS.dryRun;
+  console.log(`\nSelf-Improving Agent Uninstall${dryRun ? ' (dry run \u2014 nothing will be changed)' : ''}\n`);
+
+  // Identity is read before it is removed: the command comparison needs it.
+  const lib = await loadIdentityLib();
+  const identity = lib ? lib.loadIdentity(HOME) : null;
+
+  uninstallClaudeHooks(dryRun);
+  uninstallMcpEntry(CLAUDE_MCP_JSON, 'Claude Code', dryRun);
+  await uninstallCommands(TEMPLATE_CLAUDE_COMMANDS, CLAUDE_COMMANDS_DIR, 'Claude Code', identity, dryRun);
+  uninstallMcpEntry(CURSOR_MCP_JSON, 'Cursor', dryRun);
+  uninstallCursorHooks(dryRun);
+  await uninstallCommands(TEMPLATE_CURSOR_COMMANDS, CURSOR_COMMANDS_DIR, 'Cursor', identity, dryRun);
+  uninstallIdentity(dryRun);
+  uninstallData(dryRun);
+
+  console.log('');
+  if (hadFailure) {
+    console.log('Uninstall completed with errors. Review the output above.');
+    process.exit(1);
+  }
+  console.log(dryRun
+    ? 'Dry run complete. Re-run without --dry-run to apply.'
+    : 'Uninstall complete. Restart Claude Code and Cursor. The repo itself was not touched.');
+}
+
 async function main() {
+  if (ARGS.uninstall) return uninstall();
   console.log('\nSelf-Improving Agent Setup\n');
 
   checkPrerequisites();
