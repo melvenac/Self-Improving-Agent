@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { checkMirrorParity, MIRROR_EXCEPTIONS, CURSOR_COMMAND_SET } from "../../../src/pipelines/sync/checks.js";
+import { saveIdentity } from "../../../src/shared/identity.js";
 
 describe("checkMirrorParity", () => {
   let root: string;
@@ -142,5 +143,65 @@ describe("checkMirrorParity", () => {
       expect(file.endsWith(".md")).toBe(true);
       expect(reason.length).toBeGreaterThan(10);
     }
+  });
+
+  describe("identity rendering", () => {
+    const liveCmds = () => join(home, ".claude", "commands");
+    const template = "Greet {{USER_NAME}} by name. You are {{AGENT_NAME}}.\n";
+    let savedEnv: string | undefined;
+
+    beforeEach(() => {
+      // Point the identity file into the fake home for these cases only.
+      savedEnv = process.env.OPEN_BRAIN_IDENTITY;
+      delete process.env.OPEN_BRAIN_IDENTITY;
+      write(repoCmds(), "start.md", template);
+      write(tmplCmds(), "start.md", template);
+    });
+
+    afterEach(() => {
+      if (savedEnv !== undefined) process.env.OPEN_BRAIN_IDENTITY = savedEnv;
+    });
+
+    it("passes when the live copy is the template rendered with the stored identity", () => {
+      saveIdentity({ user_name: "Jack", agent_name: "Clark" }, home);
+      write(liveCmds(), "start.md", "Greet Jack by name. You are Clark.\n");
+      const result = checkMirrorParity(root, home);
+      expect(result.severity).toBe("pass");
+      expect(result.message).toContain("2 file comparison");
+    });
+
+    it("flags a live copy rendered with a different identity than the one stored", () => {
+      saveIdentity({ user_name: "Jack", agent_name: "Clark" }, home);
+      write(liveCmds(), "start.md", "Greet Aaron by name. You are Clark.\n");
+      const result = checkMirrorParity(root, home);
+      expect(result.severity).toBe("issue");
+      expect(result.message).toContain("start.md differs");
+    });
+
+    it("names an unrendered placeholder in a live copy — installed without onboarding", () => {
+      saveIdentity({ user_name: "Jack", agent_name: "Clark" }, home);
+      write(liveCmds(), "start.md", template);
+      const result = checkMirrorParity(root, home);
+      expect(result.severity).toBe("issue");
+      expect(result.message).toContain("unrendered {{USER_NAME}}, {{AGENT_NAME}}");
+      expect(result.message).toContain("setup.mjs");
+    });
+
+    it("compares raw when no identity is stored, so a placeholder-for-placeholder copy passes only if flagged", () => {
+      // No identity file: the template cannot be rendered, and a live copy that
+      // still carries placeholders is the unrendered case above, not a pass.
+      write(liveCmds(), "start.md", template);
+      const result = checkMirrorParity(root, home);
+      expect(result.severity).toBe("issue");
+      expect(result.message).toContain("unrendered");
+    });
+
+    it("never renders the repo↔template pair — both sides are source", () => {
+      saveIdentity({ user_name: "Jack", agent_name: "Clark" }, home);
+      write(repoCmds(), "start.md", "Greet Jack by name. You are Clark.\n");
+      const result = checkMirrorParity(root, home);
+      expect(result.severity).toBe("issue");
+      expect(result.message).toContain("repo↔template (.claude): start.md differs");
+    });
   });
 });

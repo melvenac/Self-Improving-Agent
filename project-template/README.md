@@ -76,7 +76,7 @@ CLAUDE.md             # Claude Code entry point
 AGENTS.md             # Cursor / generic entry point
 ```
 
-**Not copied per project:** `~/.claude/commands/` and `~/.cursor/commands/` (`/start`, `/end`, `/sync`, …) — installed by SIA `setup.mjs`.
+**Not copied per project:** `~/.claude/commands/` and `~/.cursor/commands/` (`/start`, `/end`, `/sync`, …) — installed by SIA `setup.mjs`, which also fills in the `{{USER_NAME}}` / `{{AGENT_NAME}}` placeholders those templates carry. Copying them by hand leaves the placeholders literal.
 
 ---
 

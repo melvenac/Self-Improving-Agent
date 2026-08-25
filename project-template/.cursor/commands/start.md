@@ -96,7 +96,7 @@ Skills: {relevant + pending proposal count}
 FLAGS: {verify items, or "none"}
 ```
 
-Greet Aaron by name. Present GREETING verbatim. If FLAGS non-empty, verify before continuing.
+Greet {{USER_NAME}} by name. Present GREETING verbatim. If FLAGS non-empty, verify before continuing.
 
 ---
 
@@ -107,13 +107,13 @@ Greet Aaron by name. Present GREETING verbatim. If FLAGS non-empty, verify befor
 3. Checkpoint recall as Part A
 4. Write `.recalled-entries.json` in cwd
 5. Read Skill-Candidates index + pending proposals
-6. Greet Aaron; present knowledge + skills + checkpoints
+6. Greet {{USER_NAME}}; present knowledge + skills + checkpoints
 
 ---
 
 ## Judgment calls
 
-- If Aaron jumps straight into work, adapt — read state in background.
+- If {{USER_NAME}} jumps straight into work, adapt — read state in background.
 - Greeting **≤5 lines** of prose beyond the GREETING block.
-- If Aaron says "skip", drop protocol and work.
+- If {{USER_NAME}} says "skip", drop protocol and work.
 - First session of month: optional maintenance (summarize aging sessions, `ob_score`, stale experience review) — see full SIA docs.

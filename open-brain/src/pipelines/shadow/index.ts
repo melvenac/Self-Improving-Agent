@@ -114,7 +114,7 @@ export function formatShadowReport(entries: ShadowLogEntry[]): string {
     const [best] = rows;
     const live = rows.find((r) => r.strategy === "live");
     if (live && best.strategy !== "live" && best.meanNdcg > live.meanNdcg) {
-      lines.push(`  Candidate: ${best.strategy} beats live on nDCG. Aaron's call whether to adopt.`);
+      lines.push(`  Candidate: ${best.strategy} beats live on nDCG. Your call whether to adopt.`);
     } else {
       // Not the same as "live is best" — labels are drawn from what live
       // returned, so live is handicapped in its favour. See evaluate.ts.

@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { homedir } from "node:os";
 import Database from "better-sqlite3";
 import type { CheckResult } from "./types.js";
+import { loadIdentity, renderIdentity, unrenderedPlaceholders } from "../../shared/identity.js";
 
 /**
  * Slash-command files that are deliberately NOT mirrored, with the reason.
@@ -468,15 +469,24 @@ export function checkHookRegistration(settingsPath: string): CheckResult {
  *
  * Live user directories are only compared when present, so the check still
  * works in CI and for consumers who have not installed the commands.
+ *
+ * The template carries `{{USER_NAME}}` / `{{AGENT_NAME}}` placeholders and
+ * setup.mjs renders them on install, so a live copy legitimately differs from
+ * the template by exactly those substitutions. The live pairs are therefore
+ * compared against the template *rendered with the stored identity* — the same
+ * renderer setup.mjs used — and a live file that still contains a placeholder
+ * is called out by name, since that means it was copied without onboarding.
+ * The repo↔template pair stays raw: both sides are source.
  */
 export function checkMirrorParity(projectRoot: string, home = homedir()): CheckResult {
   const templateClaude = join(projectRoot, "project-template", ".claude", "commands");
   const templateCursor = join(projectRoot, "project-template", ".cursor", "commands");
+  const identity = loadIdentity(home);
 
-  const pairs: Array<{ label: string; a: string; b: string; required: boolean }> = [
-    { label: "repo↔template (.claude)", a: join(projectRoot, ".claude", "commands"), b: templateClaude, required: true },
-    { label: "live↔template (.claude)", a: join(home, ".claude", "commands"), b: templateClaude, required: false },
-    { label: "live↔template (.cursor)", a: join(home, ".cursor", "commands"), b: templateCursor, required: false },
+  const pairs: Array<{ label: string; a: string; b: string; required: boolean; live: boolean }> = [
+    { label: "repo↔template (.claude)", a: join(projectRoot, ".claude", "commands"), b: templateClaude, required: true, live: false },
+    { label: "live↔template (.claude)", a: join(home, ".claude", "commands"), b: templateClaude, required: false, live: true },
+    { label: "live↔template (.cursor)", a: join(home, ".cursor", "commands"), b: templateCursor, required: false, live: true },
   ];
 
   const problems: string[] = [];
@@ -497,7 +507,7 @@ export function checkMirrorParity(projectRoot: string, home = homedir()): CheckR
     }
   }
 
-  for (const { label, a, b, required } of pairs) {
+  for (const { label, a, b, required, live } of pairs) {
     const aExists = existsSync(a);
     const bExists = existsSync(b);
 
@@ -525,9 +535,20 @@ export function checkMirrorParity(projectRoot: string, home = homedir()): CheckR
       // while the repo copy stays LF, which a byte-for-byte check reports as
       // drift forever even though the two files say exactly the same thing.
       // Trailing-newline differences are noise for the same reason.
-      const norm = (p: string) =>
-        readFileSync(p, "utf-8").replace(/\r\n/g, "\n").replace(/\s+$/, "");
-      if (norm(join(a, file)) !== norm(join(b, file))) {
+      const norm = (text: string) => text.replace(/\r\n/g, "\n").replace(/\s+$/, "");
+      const liveText = readFileSync(join(a, file), "utf-8");
+      let templateText = readFileSync(join(b, file), "utf-8");
+
+      if (live) {
+        const leftover = unrenderedPlaceholders(liveText);
+        if (leftover.length > 0) {
+          problems.push(`${label}: ${file} has unrendered ${leftover.join(", ")} — run scripts/setup.mjs`);
+          continue;
+        }
+        if (identity) templateText = renderIdentity(templateText, identity);
+      }
+
+      if (norm(liveText) !== norm(templateText)) {
         problems.push(`${label}: ${file} differs`);
       }
     }

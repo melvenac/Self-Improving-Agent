@@ -24,7 +24,7 @@
 //   - a variant merely tying or losing is weak evidence, and does not establish
 //     that live is better
 // This is why formatShadowReport only ever names a "candidate" and leaves the
-// decision to Aaron.
+// decision to the maintainer.
 
 import type Database from "better-sqlite3";
 import { recallRankExpr } from "../../lifecycle.js";

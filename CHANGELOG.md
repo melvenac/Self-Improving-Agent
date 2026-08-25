@@ -1,5 +1,29 @@
 # Changelog
 
+## [v0.16.0] - 2026-08-25
+
+### Added
+- **Onboarding: the agent no longer calls everyone "Aaron".** The `/start`, `/end`, `/sync` and `/skill-scan` templates hard-coded the framework author's name and the agent persona "Clark" in 25 places, so every consumer who ran `setup.mjs` was greeted as Aaron by an agent called Clark — the templates were shipped as-is from a personal setup. They now carry `{{USER_NAME}}` / `{{AGENT_NAME}}` placeholders, and `setup.mjs` asks for both names on first run, stores them in `~/.claude/open-brain/identity.json`, and renders the placeholders as it installs the commands.
+  - **One renderer, two callers.** `open-brain/src/shared/identity.ts` is the single implementation; `setup.mjs` loads it from the build it just produced rather than carrying its own copy, because this repo has shipped bugs from two implementations of one rule before (two `evaluateLifecycle`s, two `success_rate` formulas).
+  - **Flags for unattended installs:** `--user NAME`, `--agent NAME`, `--reconfigure` (re-prompt and re-render), `--yes` (never prompt). Without a TTY the derived default is used and the log line says so, so a CI or scripted install cannot hang on a question.
+  - **Defaults are name-shaped, not empty.** First word of `git config user.name`, then the OS account name title-cased, then "there" — so the worst case renders "Hey there", never "Hey {{USER_NAME}}". The agent defaults to "Claude".
+  - **Setup refuses to install unrendered commands.** If the identity cannot be resolved (build missing, empty name) the command copy is skipped with a FAIL line rather than shipping literal placeholders into `~/.claude/commands/`.
+- `setup.mjs` now compares **rendered** content against the installed file rather than hashing the template, so `--reconfigure` rewrites files whose source did not change. The `sha256` helpers this replaces are removed.
+- **`setup.mjs --uninstall`** — there was no way back. Setup writes to eight global locations across two IDEs and the README's only reversal advice was implicit. Uninstall reverses exactly that list, driven by the same path constants install uses, so a location added to one side without the other is a visible omission rather than a leak.
+  - **Surgical, not wholesale.** Hook entries are matched by the script they run (`cli-bootstrap.js`, `cli-session-end.js`) so an older install's spelling still counts as ours; every other hook, MCP server and settings key is preserved byte-for-byte. A file setup created from scratch (`{ mcpServers: {} }`, `{ version: 1, hooks: {} }`) is deleted once it is a husk; a file the user already had is written back.
+  - **Edited commands are kept.** A slash command is removed only when it matches what setup would render today (template + stored identity, with the parity check's CRLF tolerance); anything the user changed is kept and named. `--force` overrides. Without a build the rendered form cannot be reconstructed, so the script refuses rather than guessing.
+  - **Data is opt-in to delete.** `~/.claude/open-brain/` (the knowledge DB) and the vault survive by default and their paths are printed. `--purge` removes the state dir; the vault goes only while it is still the untouched scaffold — one note and it stays. `--dry-run` prints the full plan and changes nothing.
+  - Verified by round-trip against a sandbox `$HOME` seeded with unrelated hooks and MCP servers: pre-install and post-uninstall configs are identical in content.
+
+### Fixed
+- **The MCP server was never visible to Claude Code.** `setup.mjs` registered it in `~/.claude/.mcp.json`, which Claude Code does not read — user-scope servers live in `~/.claude.json` and are managed by `claude mcp add --scope user`. Found live on 2026-08-25: after a clean install, `claude mcp list` showed every other server and not `open-brain`, so `/start` would have run and every `ob_*` call failed. Setup now shells out to `claude mcp add --scope user` (replacing a stale registration at another path rather than duplicating it), and prints the exact command when the CLI is not on PATH. The CLI owns `~/.claude.json`'s format — a large file with unrelated state — so it is never edited directly. `--uninstall` runs the matching `claude mcp remove`, but only when the registration points at this checkout. The README's manual step is corrected to match.
+
+### Changed
+- **`checkMirrorParity` renders before it compares.** The live↔template pairs are compared against the template rendered with the stored identity, so a personalised install is not reported as drift. A live file that still contains a placeholder is named explicitly (`start.md has unrendered {{USER_NAME}} — run scripts/setup.mjs`) instead of a bare "differs", since the two failures have different fixes. The repo↔template pair stays raw: both sides are source.
+- `end.md` A14: "he can override" → "they can override".
+- Shadow-recall report: "Aaron's call whether to adopt" → "Your call whether to adopt".
+- Tests: `identity.test.ts` (14 cases) and 5 new `mirror-parity` cases covering rendered pass, mismatched identity, unrendered placeholder, no-identity, and the raw repo pair. `setup-env.ts` redirects `OPEN_BRAIN_IDENTITY` so a developer's real identity never leaks into the parity tests. **650 tests / 49 files.**
+
 ## [v0.15.2] - 2026-08-11
 
 ### Fixed
