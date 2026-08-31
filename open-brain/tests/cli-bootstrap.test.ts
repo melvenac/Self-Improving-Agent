@@ -76,11 +76,14 @@ describe("cli-bootstrap SESSION_UUID contract", () => {
     );
   });
 
+  // The only test here that spawns TWICE. Each `npx tsx` spawn costs ~2-3s
+  // (npx resolution + TypeScript compile), so two of them straddle vitest's 5s
+  // default and fail under load while every single-spawn sibling passes.
   it("generates a DIFFERENT uuid each run, never a reused one", () => {
     const first = uuidLines(run({ cwd }))[0];
     const second = uuidLines(run({ cwd }))[0];
     expect(first).not.toBe(second);
-  });
+  }, 20000);
 
   it("stays silent in a subagent context (anti-loop)", () => {
     const out = run({ cwd, session_id: "should-not-appear", agent_id: "sub-1" });

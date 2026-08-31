@@ -54,10 +54,12 @@ Read these files (skip any that don't exist):
 10. .agents/AGENT.md — parse YAML frontmatter for name, role, partner, mailbox_channel (skip silently if absent)
 
 ## 3. Knowledge recall
-- ob_recall(queries: [Q1, Q2], project: "{cwd}", limit: 5)
+- ob_recall(queries: [Q1, Q2], project: "{cwd}", limit: 5, trigger: "start")
   Choose Q1/Q2 based on INBOX.md priorities (methodology-focused, not file-specific).
-- If results < 3, broaden: ob_recall(queries: [Q1, Q2], global: true, limit: 5)
-- Check for checkpoints: ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3)
+- If results < 3, broaden: ob_recall(queries: [Q1, Q2], global: true, limit: 5, trigger: "start")
+- Check for checkpoints: ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3, trigger: "checkpoint")
+
+Always pass `trigger` as shown — it records that these recalls are session-start injection, not a mid-task fetch. Mid-task recalls omit it (the default, "explicit", is correct there).
 
 ## 4. Write .recalled-entries.json
 Write to .recalled-entries.json in the project root (cwd), NOT ~/.claude/context-mode/.
@@ -143,10 +145,10 @@ Session UUID: {UUID from hook output, or "none"}
 If not "none": call ob_set_session(session_id: "{UUID}", project_dir: "{cwd}")
 
 ## 2. Knowledge recall
-- ob_recall(queries: [Q1, Q2], project: "{cwd}", limit: 5)
+- ob_recall(queries: [Q1, Q2], project: "{cwd}", limit: 5, trigger: "start")
   Choose queries based on the working directory context.
-- If results < 3: ob_recall(queries: [Q1, Q2], global: true, limit: 5)
-- Checkpoint: ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3)
+- If results < 3: ob_recall(queries: [Q1, Q2], global: true, limit: 5, trigger: "start")
+- Checkpoint: ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3, trigger: "checkpoint")
 
 ## 3. Write .recalled-entries.json
 Write to .recalled-entries.json in the working directory (cwd), NOT ~/.claude/context-mode/.

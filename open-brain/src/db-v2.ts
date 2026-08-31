@@ -85,13 +85,24 @@ export function initSchemaV2(db: Database.Database): void {
     -- so retrieval quality cannot be reconstructed from it after the fact.
     -- These two tables capture the (query -> ranked results -> rating) chain as
     -- it happens, which is the only way to score a ranking change honestly.
+    -- recall_trigger records HOW the recall reached the agent: 'start'
+    -- (injected by session startup), 'checkpoint' (checkpoint restoration),
+    -- 'explicit' (the agent asked mid-task). Session-start injection and a
+    -- deliberate mid-task fetch are different treatments with opposite
+    -- selection bias — an entry fetched on demand was fetched because it was
+    -- wanted — and without this column they are the same row, so no analysis
+    -- of injection value is possible. NULL = recorded before the column
+    -- existed; unknowable, never backfilled. Named recall_trigger, not
+    -- trigger: TRIGGER is a reserved SQLite keyword and a column by that name
+    -- would force quoting in every ad-hoc query.
     CREATE TABLE IF NOT EXISTS recall_log (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       session_uuid TEXT NOT NULL,
       query TEXT NOT NULL,
       knowledge_id INTEGER NOT NULL,
       rank INTEGER NOT NULL,
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
+      recall_trigger TEXT DEFAULT NULL
     );
 
     CREATE TABLE IF NOT EXISTS feedback_log (
@@ -164,6 +175,7 @@ interface AddedColumn {
 
 const ADDED_COLUMNS: AddedColumn[] = [
   { table: 'knowledge_index', column: 'fact_kind', ddl: 'TEXT DEFAULT NULL' },
+  { table: 'recall_log', column: 'recall_trigger', ddl: 'TEXT DEFAULT NULL' },
 ];
 
 /** Returns the columns it added, so a caller can report a first-run migration. */
@@ -171,6 +183,9 @@ export function migrateAddedColumns(db: Database.Database): string[] {
   const added: string[] = [];
   for (const target of ADDED_COLUMNS) {
     const existing = db.prepare(`PRAGMA table_info(${target.table})`).all() as { name: string }[];
+    // An absent table is the DDL's job, not this migration's — ALTERing it
+    // would throw, and initSchemaV2 creates it with the column already there.
+    if (existing.length === 0) continue;
     if (existing.some((c) => c.name === target.column)) continue;
     db.exec(`ALTER TABLE ${target.table} ADD COLUMN ${target.column} ${target.ddl}`);
     added.push(`${target.table}.${target.column}`);
@@ -564,26 +579,38 @@ export function getChunksForSession(db: Database.Database, uuid: string): Array<
 
 export type ShadowRating = 'helpful' | 'harmful' | 'neutral';
 
+/** How a recall reached the agent — see the recall_log DDL comment. */
+export type RecallTrigger = 'start' | 'checkpoint' | 'explicit';
+
+const RECALL_TRIGGERS: ReadonlySet<string> = new Set(['start', 'checkpoint', 'explicit']);
+
 /**
  * Record what a live recall actually returned, in rank order.
  *
  * `rank` is 1-based position as the agent saw it. Without it there is no way to
  * ask "did the variant put the useful entry higher than production did".
+ *
+ * `trigger` records the treatment. An unrecognized value is stored as
+ * 'explicit', not dropped and not passed through: dropping would make the row
+ * uninterpretable again (the exact defect this column closes), and passing
+ * through would let free text erode a three-value vocabulary.
  */
 export function recordRecallEvent(
   db: Database.Database,
   sessionUuid: string,
   query: string,
   entryIds: number[],
+  trigger: RecallTrigger = 'explicit',
 ): void {
   if (!sessionUuid || entryIds.length === 0) return;
   const now = new Date().toISOString();
+  const safeTrigger = RECALL_TRIGGERS.has(trigger) ? trigger : 'explicit';
   const stmt = db.prepare(`
-    INSERT INTO recall_log (session_uuid, query, knowledge_id, rank, created_at)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO recall_log (session_uuid, query, knowledge_id, rank, created_at, recall_trigger)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
   const insertAll = db.transaction((ids: number[]) => {
-    ids.forEach((id, i) => stmt.run(sessionUuid, query, id, i + 1, now));
+    ids.forEach((id, i) => stmt.run(sessionUuid, query, id, i + 1, now, safeTrigger));
   });
   insertAll(entryIds);
 }

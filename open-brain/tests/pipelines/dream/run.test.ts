@@ -72,6 +72,47 @@ describe("migrateAddedColumns", () => {
     expect(migrateAddedColumns(db)).toEqual([]);
     db.close();
   });
+
+  it("adds recall_trigger to a recall_log created before the column existed", () => {
+    const db = new Database(dbPath);
+    db.exec(`
+      CREATE TABLE recall_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        session_uuid TEXT NOT NULL,
+        query TEXT NOT NULL,
+        knowledge_id INTEGER NOT NULL,
+        rank INTEGER NOT NULL,
+        created_at TEXT NOT NULL
+      );
+    `);
+    db.prepare(`INSERT INTO recall_log (session_uuid, query, knowledge_id, rank, created_at) VALUES (?, ?, ?, ?, ?)`)
+      .run("s", "q", 1, 1, NOW.toISOString());
+
+    expect(migrateAddedColumns(db)).toEqual(["recall_log.recall_trigger"]);
+
+    const row = db.prepare(`SELECT recall_trigger FROM recall_log`).get() as { recall_trigger: unknown };
+    // Pre-column rows are unknowable, not silently declared explicit.
+    expect(row.recall_trigger).toBeNull();
+    db.close();
+  });
+
+  it("skips a table that does not exist rather than throwing on the ALTER", () => {
+    // A bare DB with only knowledge_index: recall_log is the DDL's job, and
+    // migrating a missing table used to die with "no such table".
+    const db = new Database(dbPath);
+    db.exec(`
+      CREATE TABLE knowledge_index (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        vault_path TEXT NOT NULL UNIQUE,
+        key TEXT NOT NULL UNIQUE,
+        content TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+    `);
+    expect(migrateAddedColumns(db)).toEqual(["knowledge_index.fact_kind"]);
+    db.close();
+  });
 });
 
 describe("runDream", () => {

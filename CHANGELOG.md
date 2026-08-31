@@ -1,5 +1,20 @@
 # Changelog
 
+## [v0.18.0] - 2026-08-31
+
+### Added
+- **`recall_log.recall_trigger` — the treatment is now recorded.** Session-start injection and a deliberate mid-task `ob_recall` produced identical rows, though they are different treatments with opposite selection bias (an entry fetched on demand was fetched because it was wanted). That made every analysis of injection value unanswerable in principle — Atlas's prereg (`Research/injection-ablation-prereg-2026-08-31.md`) lists it as the decisive of six structural defects — and it left `neutral` (63.8%, modal) meaning two incompatible things: *pushed + neutral* is the injection cost the WikiSkill question asks about; *pulled + neutral* is a retrieval-precision miss. One column disambiguates by join, with no change to the rating vocabulary and no migration of existing ratings.
+- `ob_recall` gains `trigger: 'start' | 'checkpoint' | 'explicit'` (default `explicit`); `/start` passes `start` for knowledge recalls and `checkpoint` for checkpoint restoration, `/checkpoint` passes `checkpoint` — all mirrors updated (repo, template `.claude` + `.cursor`, live `~/.claude` + `~/.cursor`). An unrecognized value is coerced to `explicit`, not dropped (the row must stay interpretable) and not passed through (free text would erode a three-value vocabulary). Pre-column rows stay NULL — unknowable, never backfilled, same rule as `fact_kind`.
+- Column named `recall_trigger`, not `trigger`: `TRIGGER` is a reserved SQLite keyword and a bare `trigger` column would force quoting in every ad-hoc analysis query.
+
+### Fixed
+- `migrateAddedColumns` now skips a table that does not exist instead of dying on the `ALTER` — an absent table is the DDL's job, and this was latent from the day the mechanism shipped (it only ever targeted `knowledge_index`, which every caller creates first).
+- The double-spawn cli-bootstrap test gets an explicit 20s timeout: each `npx tsx` spawn costs ~2-3s, so the one test that spawns twice straddled vitest's 5s default and failed under machine load while every single-spawn sibling passed.
+
+### Notes
+- Sequencing decision (Aaron, Session 52): (a) this column → (b) template de-personalization → (c) the four-part lifecycle bundle (denominator + threshold + compile-before-prune + archive write path, one change or none). Tests: 5 new. **669 tests / 49 files.**
+- The new `trigger` param is invisible to a running MCP server until reconnect (`/mcp reconnect open-brain`) — entry #352.
+
 ## [v0.17.0] - 2026-08-31
 
 ### Fixed

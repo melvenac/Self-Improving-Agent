@@ -45,9 +45,10 @@ Read these files (skip missing):
 
 ### A3. Knowledge recall
 
-- `ob_recall(queries: [Q1, Q2], project: "{cwd}", limit: 5)` — Q1/Q2 from top INBOX priorities (methodology, not file names)
-- If results < 3: `ob_recall(..., global: true, limit: 5)`
-- Checkpoints: `ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3)`
+- `ob_recall(queries: [Q1, Q2], project: "{cwd}", limit: 5, trigger: "start")` — Q1/Q2 from top INBOX priorities (methodology, not file names)
+- If results < 3: `ob_recall(..., global: true, limit: 5, trigger: "start")`
+- Checkpoints: `ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3, trigger: "checkpoint")`
+- `trigger` marks these as session-start injection; mid-task recalls omit it (default "explicit")
 
 ### A4. Write `.recalled-entries.json`
 

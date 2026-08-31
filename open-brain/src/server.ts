@@ -436,8 +436,10 @@ server.tool(
     tags: z.array(z.string()).optional().describe("Filter by tags"),
     verbose: z.boolean().optional().default(false).describe("If true, return full content instead of snippets"),
     limit: z.number().optional().default(5).describe("Results per query (default: 5)"),
+    trigger: z.enum(["start", "checkpoint", "explicit"]).optional().default("explicit")
+      .describe("How this recall reached the agent: 'start' = session-start injection, 'checkpoint' = checkpoint restoration, 'explicit' = deliberate mid-task fetch (default). Recorded for analysis — injection and on-demand fetch are different treatments."),
   },
-  async ({ queries, project, global: globalSearch, tags, verbose, limit }) => {
+  async ({ queries, project, global: globalSearch, tags, verbose, limit, trigger }) => {
     const v2db = getV2Db();
     const normalizedProject = canonicalizeProjectDir(project);
     const results: string[] = [];
@@ -525,7 +527,7 @@ server.tool(
         // never break a recall.
         if (_activeSessionId) {
           try {
-            recordRecallEvent(v2db, _activeSessionId, query, rows.map((r) => r.id));
+            recordRecallEvent(v2db, _activeSessionId, query, rows.map((r) => r.id), trigger);
           } catch { /* non-critical */ }
         }
 

@@ -4,7 +4,7 @@
 
 ## Step 0: Phase number
 
-1. `ob_recall(query: "[CHECKPOINT]", project: {cwd}, sessions: 1, limit: 10)`
+1. `ob_recall(query: "[CHECKPOINT]", project: {cwd}, sessions: 1, limit: 10, trigger: "checkpoint")`
 2. Count checkpoints from **this session**
 3. Phase number = count + 1
 

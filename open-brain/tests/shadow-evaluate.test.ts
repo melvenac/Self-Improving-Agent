@@ -47,6 +47,28 @@ describe('shadow ground truth', () => {
     expect(db.prepare('SELECT COUNT(*) n FROM recall_log').get()).toEqual({ n: 0 });
   });
 
+  /**
+   * The trigger records the treatment: session-start injection and a
+   * deliberate mid-task fetch are different treatments with opposite selection
+   * bias, and without the column they were the same row — which is why no
+   * analysis of injection value was ever answerable from this log.
+   */
+  it('records the recall trigger on every row of the call', () => {
+    recordRecallEvent(db, SESSION, 'q', [1, 2], 'start');
+    const rows = db.prepare('SELECT recall_trigger FROM recall_log').all() as Array<{ recall_trigger: string }>;
+    expect(rows).toEqual([{ recall_trigger: 'start' }, { recall_trigger: 'start' }]);
+  });
+
+  it('defaults the trigger to explicit when the caller does not pass one', () => {
+    recordRecallEvent(db, SESSION, 'q', [1]);
+    expect(db.prepare('SELECT recall_trigger FROM recall_log').get()).toEqual({ recall_trigger: 'explicit' });
+  });
+
+  it('coerces an unrecognized trigger to explicit rather than storing free text', () => {
+    recordRecallEvent(db, SESSION, 'q', [1], 'launch' as never);
+    expect(db.prepare('SELECT recall_trigger FROM recall_log').get()).toEqual({ recall_trigger: 'explicit' });
+  });
+
   it('returns distinct queries in first-use order', () => {
     recordRecallEvent(db, SESSION, 'second', [1]);
     recordRecallEvent(db, SESSION, 'first', [2]);

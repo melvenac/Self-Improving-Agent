@@ -8,7 +8,7 @@
 
 Check if previous checkpoints were stored this session:
 
-1. Run `ob_recall` with query: `"[CHECKPOINT]"` scoped to the current project, limited to the last 1 session (`sessions: 1`)
+1. Run `ob_recall` with query: `"[CHECKPOINT]"` scoped to the current project, limited to the last 1 session (`sessions: 1`), and `trigger: "checkpoint"` — this recall is checkpoint machinery, not a knowledge fetch, and the trigger keeps it out of injection-value analyses
 2. Count how many `[CHECKPOINT]` entries were returned from the current session
 3. **Phase number** = count + 1 (first checkpoint = phase 1)
 
