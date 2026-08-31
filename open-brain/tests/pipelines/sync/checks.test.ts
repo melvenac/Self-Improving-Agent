@@ -567,6 +567,11 @@ describe("validation checks", () => {
       expect(checkTemplatePersonalNames(tempDir).severity).toBe("pass");
     });
 
+    it("catches lowercase names — the guard is case-insensitive", () => {
+      writeTemplateFile(".claude/commands/start.md", "you are clark\n");
+      expect(checkTemplatePersonalNames(tempDir).severity).toBe("issue");
+    });
+
     it("warns when project-template/ is absent", () => {
       expect(checkTemplatePersonalNames(tempDir).severity).toBe("warn");
     });

@@ -430,8 +430,10 @@ export function checkSkillIndex(vaultPath: string): CheckResult {
  *
  * The name list is this repo's owner and agents. `melvenac` in GitHub URLs is
  * a repo reference, not a leak — \b keeps `melve` from matching inside it.
+ * Case-insensitive: "you are clark" in prose is exactly the shape that would
+ * recur, and a guard weaker than the state it protects is barely a guard.
  */
-const PERSONAL_NAMES = /\b(Aaron|Clark|melve)\b/;
+const PERSONAL_NAMES = /\b(Aaron|Clark|melve)\b/i;
 
 export function checkTemplatePersonalNames(projectRoot: string): CheckResult {
   const templateRoot = join(projectRoot, "project-template");

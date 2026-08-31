@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.19.1] - 2026-08-31
+
+### Fixed
+- **`template-personal-names` is now case-insensitive.** Atlas's verification nit on v0.19.0: `/\b(Aaron|Clark|melve)\b/` let lowercase `"you are clark"` slip the gate — exactly the prose shape that would recur, and a guard weaker than the state it protects is barely a guard. None of the three names collide with English words under `\b`, so `i` costs nothing. Test added. **674 tests / 49 files.**
+
 ## [v0.19.0] - 2026-08-31
 
 ### Fixed — `trigger` default is now `'unspecified'`, not `'explicit'` (Atlas audit finding on v0.18.0)
