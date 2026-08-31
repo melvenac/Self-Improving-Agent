@@ -78,4 +78,22 @@ describe("obsidianVaultDir", () => {
       else process.env.OPEN_BRAIN_VAULT_DIR = override;
     }
   });
+
+  // The leak this pins: setup-env.ts sets the override globally, but three
+  // suites tore it down with `delete`, which removes it rather than restoring
+  // the default. From that point on the resolver returned the developer's real
+  // vault and session summaries were written into their actual notes — 57
+  // before April, 13 more on 2026-08-31, each named for a `mkdtemp` project
+  // like `ob-server-Cz4UxZ`. Nothing failed, because an unset variable *means*
+  // "use production": absent and configured are the same value from inside the
+  // resolver. Refusing the real home under test is what makes it observable.
+  it("refuses to resolve to the real vault during a test run", () => {
+    const override = process.env.OPEN_BRAIN_VAULT_DIR;
+    delete process.env.OPEN_BRAIN_VAULT_DIR;
+    try {
+      expect(() => obsidianVaultDir()).toThrow(/real Obsidian vault during a test run/);
+    } finally {
+      if (override !== undefined) process.env.OPEN_BRAIN_VAULT_DIR = override;
+    }
+  });
 });

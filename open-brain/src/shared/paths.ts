@@ -53,7 +53,31 @@ export function projectDisplayName(rawProjectDir?: string | null, fallback = "Ge
  * rather than merely fixed.
  */
 export function obsidianVaultDir(home: string = homedir()): string {
-  return process.env.OPEN_BRAIN_VAULT_DIR || join(home, "Obsidian Vault v2");
+  const override = process.env.OPEN_BRAIN_VAULT_DIR;
+  if (override) return override;
+
+  const resolved = join(home, "Obsidian Vault v2");
+
+  // Resolving to the developer's REAL vault during a test run means the
+  // isolation in tests/setup-env.ts has been torn down — historically by an
+  // `afterEach` that `delete`d the override instead of restoring it. The
+  // failure is silent by construction: an unset variable *means* "use
+  // production", so absent and configured are the same value from in here, and
+  // the only symptom is session summaries appearing in the user's notes (57
+  // before April, 13 more on 2026-08-31). Fail loudly instead.
+  //
+  // Only the real home is refused. A test asserting path composition against a
+  // synthetic home is deliberate and still allowed.
+  const underTest = process.env.VITEST || process.env.VITEST_WORKER_ID;
+  if (underTest && resolved === join(homedir(), "Obsidian Vault v2")) {
+    throw new Error(
+      "obsidianVaultDir() resolved to the real Obsidian vault during a test run. " +
+        "OPEN_BRAIN_VAULT_DIR is unset — restore it in teardown rather than deleting it " +
+        "(tests/setup-env.ts sets it globally and re-asserts after each test)."
+    );
+  }
+
+  return resolved;
 }
 
 export interface ResolvedPaths {

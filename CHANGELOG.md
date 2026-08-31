@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.22.1] - 2026-08-31
+
+### Fixed
+- **Test-vault isolation re-asserts itself, and its absence is loud** (diagnosed and written by Atlas; committed by Forge). Three suites (`index-v2`, `skill-scan-runner`, `apoptosis-reachability`) set `OPEN_BRAIN_VAULT_DIR` in `beforeEach` and `delete`d it in `afterEach` — `delete` removes the variable rather than restoring `setup-env.ts`'s global default, so every later test in that worker resolved to the developer's **real** vault (57 leaked summaries before April, 13 more on 2026-08-31; ordering-dependent, hence the varying count). Fix: `setup-env.ts` re-asserts the temp vault in a global `afterEach`, and `obsidianVaultDir()` **throws under vitest when it resolves to the real home vault** — scoped deliberately to the real-home path, not to "override unset": a synthetic-home fallback test and two production call sites pass an explicit home legitimately. Do not simplify the guard's condition.
+- **The guard identified the leak's producer within minutes of existing:** `npx vitest` run from the **repo root** discovers the tests by default glob but loads no config, so `setup-env.ts` never runs — today's 13 leaked files came from exactly such runs. Pre-guard that was silent; post-guard it is 23 loud failures naming the mechanism. Run tests from `open-brain/`. Same invariant as the day's other fixes: an unset variable *meant* "use production," so absent and configured were one value from inside the resolver.
+
+### Notes
+- **688 tests / 49 files**, zero `ob-server-*` files after a full run; the 13 leaked files deleted. There is still no *detector* for vault pollution (the artifacts were found by accident at /end, not by a check) — only a preventer; a `/sync` count of `ob-server-*` files in the real vault remains open in INBOX.
+
 ## [v0.22.0] - 2026-08-31
 
 ### Added
