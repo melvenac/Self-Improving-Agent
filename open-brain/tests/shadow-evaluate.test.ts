@@ -79,6 +79,18 @@ describe('shadow ground truth', () => {
     expect(getSessionQueries(db, SESSION)).toEqual(['second', 'first']);
   });
 
+  it('records the rating origin, defaults a silent caller to unspecified, coerces junk', () => {
+    recordFeedbackEvent(db, SESSION, 1, 'helpful', 'recall-log');
+    recordFeedbackEvent(db, SESSION, 2, 'neutral');
+    recordFeedbackEvent(db, SESSION, 3, 'neutral', 'telepathy' as never);
+    const rows = db.prepare('SELECT knowledge_id, rating_origin FROM feedback_log ORDER BY knowledge_id').all();
+    expect(rows).toEqual([
+      { knowledge_id: 1, rating_origin: 'recall-log' },
+      { knowledge_id: 2, rating_origin: 'unspecified' },
+      { knowledge_id: 3, rating_origin: 'unspecified' },
+    ]);
+  });
+
   it('keeps the last rating when an entry is rated twice', () => {
     recordFeedbackEvent(db, SESSION, 7, 'neutral');
     recordFeedbackEvent(db, SESSION, 7, 'helpful');

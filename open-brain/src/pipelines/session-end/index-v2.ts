@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import { join } from "path";
 import { writeSummary } from "../../vault-writer.js";
-import { updateFeedbackV2, recordFeedbackEvent } from "../../db-v2.js";
+import { updateFeedbackV2, recordFeedbackEvent, type RatingOrigin } from "../../db-v2.js";
 import { flagReflectionClusters } from "./reflection.js";
 import { getSessionSummary } from "./session-summary.js";
 import { logInvocations } from "./invocation-logger.js";
@@ -30,6 +30,13 @@ export interface SessionEndV2Input {
    * behaves exactly as before.
    */
   entryRatings?: Record<number, FeedbackRating>;
+  /**
+   * Where `recalledEntryIds` came from, as resolveRecalledIds reported it.
+   * Recorded on every rating this run creates — the resolver computed this all
+   * along and it died in a log string, which is why 106 provenance-broken
+   * ratings had three indistinguishable explanations.
+   */
+  recalledOrigin?: RatingOrigin;
   dryRun: boolean;
   /** Where the shadow-recall history is appended. Injected rather than resolved
    *  here so tests cannot write into the real ~/.claude history. */
@@ -106,7 +113,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     // would score as having no ground truth at all.
     if (sessionId) {
       try {
-        recordFeedbackEvent(db, sessionId, id, rating);
+        recordFeedbackEvent(db, sessionId, id, rating, input.recalledOrigin);
       } catch { /* non-critical */ }
     }
     ratings.push({ id, rating });

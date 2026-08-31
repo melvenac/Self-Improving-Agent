@@ -192,6 +192,9 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       sessionSummary: args.session_summary || "",
       project: projectRoot.split(/[/\\]/).filter(Boolean).pop() || "General",
       recalledEntryIds: recalledIds,
+      // 'none' means no ids resolved, so no rating is created and no origin is
+      // needed; passing undefined lets the record default to 'unspecified'.
+      recalledOrigin: resolved.origin === "none" ? undefined : resolved.origin,
       // JSON object keys arrive as strings; the pipeline keys by entry id.
       entryRatings: args.entry_ratings
         ? Object.fromEntries(
@@ -686,7 +689,9 @@ server.tool(
     // that can tell the shadow harness which session judged what.
     if (_activeSessionId) {
       try {
-        recordFeedbackEvent(v2db, _activeSessionId, id, rating as Rating);
+        // A single ob_feedback call is its own provenance: the caller named the
+        // id directly rather than rating a resolved recall list.
+        recordFeedbackEvent(v2db, _activeSessionId, id, rating as Rating, "direct");
       } catch { /* non-critical */ }
     }
 
@@ -843,6 +848,12 @@ server.tool(
       "SELECT COALESCE(recall_trigger, '(pre-column)') as t, COUNT(*) as count FROM recall_log GROUP BY t ORDER BY count DESC"
     ).all() as Array<{ t: string; count: number }>;
 
+    // Same contract for ratings: where each rated id came from, with the
+    // pre-column era its own bucket rather than a healthy-looking zero.
+    const originCensus = v2db.prepare(
+      "SELECT COALESCE(rating_origin, '(pre-column)') as o, COUNT(*) as count FROM feedback_log GROUP BY o ORDER BY count DESC"
+    ).all() as Array<{ o: string; count: number }>;
+
     const lines = [
       `## Knowledge Stats`,
       `Total entries: ${knowledge.c}`,
@@ -854,6 +865,9 @@ server.tool(
       ``,
       `Recall trigger census:`,
       ...triggerCensus.map(r => `  ${r.t}: ${r.count}`),
+      ``,
+      `Rating origin census:`,
+      ...originCensus.map(r => `  ${r.o}: ${r.count}`),
     ];
 
     // Entries that crossed the apoptosis threshold and survived because they

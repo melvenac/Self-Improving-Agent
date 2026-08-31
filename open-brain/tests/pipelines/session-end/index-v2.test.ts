@@ -112,6 +112,38 @@ describe("sessionEndV2", () => {
     expect(updated.helpful).toBe(helpfulBefore + 1);
   });
 
+  it("stamps every rating with the resolver's origin, and unspecified when absent", () => {
+    const seed = (key: string) => {
+      indexKnowledge(db, {
+        vaultPath: `/vault/Experiences/test/${key}.md`,
+        key,
+        tags: "typescript",
+        content: "content",
+      });
+      return (db.prepare("SELECT id FROM knowledge_index WHERE key = ?").get(key) as { id: number }).id;
+    };
+
+    const withOrigin = seed("origin-stamped");
+    sessionEndV2(makeInput(db, vaultDir, agentsDir, {
+      recalledEntryIds: [withOrigin],
+      recalledOrigin: "recall-log",
+    }));
+
+    const withoutOrigin = seed("origin-absent");
+    sessionEndV2(makeInput(db, vaultDir, agentsDir, {
+      sessionId: "test-session-002",
+      recalledEntryIds: [withoutOrigin],
+    }));
+
+    const origins = db
+      .prepare("SELECT knowledge_id, rating_origin FROM feedback_log ORDER BY id")
+      .all() as Array<{ knowledge_id: number; rating_origin: string }>;
+    expect(origins).toEqual([
+      { knowledge_id: withOrigin, rating_origin: "recall-log" },
+      { knowledge_id: withoutOrigin, rating_origin: "unspecified" },
+    ]);
+  });
+
   it("flags reflection clusters when 3+ entries share a tag", () => {
     // Seed 3 entries with the same tag to trigger cluster detection
     for (let i = 1; i <= 3; i++) {

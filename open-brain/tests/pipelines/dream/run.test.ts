@@ -96,6 +96,28 @@ describe("migrateAddedColumns", () => {
     db.close();
   });
 
+  it("adds rating_origin to a feedback_log created before the column existed", () => {
+    const db = new Database(dbPath);
+    db.exec(`
+      CREATE TABLE feedback_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        session_uuid TEXT NOT NULL,
+        knowledge_id INTEGER NOT NULL,
+        rating TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      );
+    `);
+    db.prepare(`INSERT INTO feedback_log (session_uuid, knowledge_id, rating, created_at) VALUES (?, ?, ?, ?)`)
+      .run("s", 1, "helpful", NOW.toISOString());
+
+    expect(migrateAddedColumns(db)).toEqual(["feedback_log.rating_origin"]);
+
+    const row = db.prepare(`SELECT rating_origin FROM feedback_log`).get() as { rating_origin: unknown };
+    // Pre-column ratings are unknowable, not silently declared anything.
+    expect(row.rating_origin).toBeNull();
+    db.close();
+  });
+
   it("skips a table that does not exist rather than throwing on the ALTER", () => {
     // A bare DB with only knowledge_index: recall_log is the DDL's job, and
     // migrating a missing table used to die with "no such table".

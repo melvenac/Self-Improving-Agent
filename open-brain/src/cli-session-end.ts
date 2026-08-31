@@ -61,6 +61,7 @@ try {
       sessionSummary: "", // self-generates from session .db when empty
       project,
       recalledEntryIds: recalledIds,
+      recalledOrigin: resolved.origin === "none" ? undefined : resolved.origin,
       dryRun: false,
     });
 

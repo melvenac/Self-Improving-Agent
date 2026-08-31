@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.20.0] - 2026-08-31
+
+### Added
+- **`feedback_log.rating_origin` — where each rated id came from, recorded instead of discarded.** `resolveRecalledIds` computed `origin: 'explicit' | 'recall-log' | 'file' | 'none'` at the exact moment ratings were created and its only consumer was a log string — meanwhile 106 of 290 ratings were "provenance-broken" with at least three indistinguishable explanations (reconnect session-id loss, the explicit-ids path working as designed, stale file). The census split 24 pre-/82 post-v0.15.1, so "residue of the fixed bug" was wrong. Now every rating carries its origin: the resolver's value flows through `sessionEndV2` (`recalledOrigin`), a single `ob_feedback` call records `'direct'` (the caller named the id itself), and a silent caller gets `'unspecified'` — same rules as `recall_trigger`: countable, never fabricated, unknown values coerced, NULL reserved for pre-column rows.
+- `ob_stats` gains a rating origin census beside the trigger census. Atlas audit item (a) from prereg §12, approved by Aaron; sequenced before the lifecycle bundle so that work inherits an attributable ratings corpus.
+
+### Notes
+- Tests: 3 new (event-level origin rules, migration, pipeline pass-through with and without origin). New MCP behavior is invisible to a running server until that session's own `/mcp reconnect open-brain` — reconnects are per-session (see decisions.md 2026-08-31).
+
 ## [v0.19.1] - 2026-08-31
 
 ### Fixed

@@ -105,12 +105,21 @@ export function initSchemaV2(db: Database.Database): void {
       recall_trigger TEXT DEFAULT NULL
     );
 
+    -- rating_origin records WHERE the rated id came from, computed at the
+    -- moment the rating is created: 'explicit' (ids passed to ob_end),
+    -- 'recall-log' (resolved from recall_log), 'file' (.recalled-entries.json
+    -- naming this session), 'direct' (a single ob_feedback call), 'unspecified'
+    -- (a post-column caller that didn't say). resolveRecalledIds already
+    -- computed this and threw it away into a log string — meanwhile 106 of 290
+    -- ratings were "provenance-broken" with at least three indistinguishable
+    -- mechanisms. NULL = pre-column; unknowable, never backfilled.
     CREATE TABLE IF NOT EXISTS feedback_log (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       session_uuid TEXT NOT NULL,
       knowledge_id INTEGER NOT NULL,
       rating TEXT NOT NULL CHECK(rating IN ('helpful', 'harmful', 'neutral')),
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
+      rating_origin TEXT DEFAULT NULL
     );
 
     CREATE INDEX IF NOT EXISTS idx_recall_log_session ON recall_log(session_uuid);
@@ -176,6 +185,7 @@ interface AddedColumn {
 const ADDED_COLUMNS: AddedColumn[] = [
   { table: 'knowledge_index', column: 'fact_kind', ddl: 'TEXT DEFAULT NULL' },
   { table: 'recall_log', column: 'recall_trigger', ddl: 'TEXT DEFAULT NULL' },
+  { table: 'feedback_log', column: 'rating_origin', ddl: 'TEXT DEFAULT NULL' },
 ];
 
 /** Returns the columns it added, so a caller can report a first-run migration. */
@@ -639,18 +649,32 @@ export function getSessionRecalledIds(db: Database.Database, sessionUuid: string
   return rows.map((r) => r.knowledge_id);
 }
 
-/** Record a rating as an event, alongside the aggregate counters. */
+/** Where a rated id came from — see the feedback_log DDL comment. */
+export type RatingOrigin = 'explicit' | 'recall-log' | 'file' | 'direct' | 'unspecified';
+
+const RATING_ORIGINS: ReadonlySet<string> = new Set(['explicit', 'recall-log', 'file', 'direct', 'unspecified']);
+
+/**
+ * Record a rating as an event, alongside the aggregate counters.
+ *
+ * `origin` follows the recall_trigger rules exactly: a silent caller gets
+ * 'unspecified' (countable, never fabricated as a real origin), an
+ * unrecognized value is coerced to 'unspecified', and NULL stays reserved for
+ * pre-column rows.
+ */
 export function recordFeedbackEvent(
   db: Database.Database,
   sessionUuid: string,
   knowledgeId: number,
   rating: ShadowRating,
+  origin: RatingOrigin = 'unspecified',
 ): void {
   if (!sessionUuid) return;
+  const safeOrigin = RATING_ORIGINS.has(origin) ? origin : 'unspecified';
   db.prepare(`
-    INSERT INTO feedback_log (session_uuid, knowledge_id, rating, created_at)
-    VALUES (?, ?, ?, ?)
-  `).run(sessionUuid, knowledgeId, rating, new Date().toISOString());
+    INSERT INTO feedback_log (session_uuid, knowledge_id, rating, created_at, rating_origin)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(sessionUuid, knowledgeId, rating, new Date().toISOString(), safeOrigin);
 }
 
 /** Distinct queries this session issued, in first-use order. */
