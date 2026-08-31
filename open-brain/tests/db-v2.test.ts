@@ -12,6 +12,8 @@ import {
   recordRecall,
   updateFeedbackV2,
   getClusterCandidates,
+  SCHEMA_VERSION,
+  checkSchemaSkew,
 } from '../src/db-v2.js';
 
 describe('db-v2 schema', () => {
@@ -279,6 +281,27 @@ describe('openV2Database first-run', () => {
     } finally {
       db.close();
     }
+  });
+
+  it('stamps user_version with SCHEMA_VERSION, forward-only', () => {
+    const dbPath = join(tmp, 'stamp.db');
+    const db = openV2Database(dbPath);
+    expect(Number(db.pragma('user_version', { simple: true }))).toBe(SCHEMA_VERSION);
+    expect(checkSchemaSkew(db)).toEqual({
+      codeVersion: SCHEMA_VERSION, dbVersion: SCHEMA_VERSION, writerIsStale: false,
+    });
+    db.close();
+
+    // A DB stamped by a newer build must not be lowered by an older open —
+    // the stamp is how the older writer learns it is behind.
+    const future = new Database(dbPath);
+    future.pragma(`user_version = ${SCHEMA_VERSION + 1}`);
+    future.close();
+
+    const reopened = openV2Database(dbPath);
+    expect(Number(reopened.pragma('user_version', { simple: true }))).toBe(SCHEMA_VERSION + 1);
+    expect(checkSchemaSkew(reopened).writerIsStale).toBe(true);
+    reopened.close();
   });
 
   it('is a no-op when the directory already exists', () => {

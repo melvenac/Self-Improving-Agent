@@ -188,6 +188,47 @@ const ADDED_COLUMNS: AddedColumn[] = [
   { table: 'feedback_log', column: 'rating_origin', ddl: 'TEXT DEFAULT NULL' },
 ];
 
+/**
+ * The schema version this build writes.
+ *
+ * Derived from the migration list so an additive migration bumps it by
+ * construction — a stamp that has to be remembered is a stamp that gets
+ * forgotten. A migration that CHANGES a column's meaning (a table rebuild —
+ * see the constraint note above) must bump SCHEMA_REBUILDS explicitly, because
+ * nothing about it changes the list's length.
+ *
+ * Why this exists: MCP stdio servers are per-session subprocesses over one
+ * shared SQLite file, and each picks up new code only when its own session
+ * reconnects. Two writers on different builds ran against this DB for hours on
+ * 2026-08-31 — an old default contaminated 2 of 3 rows in a young column, and
+ * nothing detected it. Benign for an additive column; not benign once a
+ * migration changes what existing values mean.
+ */
+const SCHEMA_REBUILDS = 0;
+export const SCHEMA_VERSION = 1 + SCHEMA_REBUILDS + ADDED_COLUMNS.length;
+
+export interface SchemaSkew {
+  codeVersion: number;
+  dbVersion: number;
+  /** True when the DB was stamped by a NEWER build than this one. */
+  writerIsStale: boolean;
+}
+
+/**
+ * Compare this build against the version stamped in the database.
+ *
+ * `writerIsStale` means some newer build has already opened (and possibly
+ * migrated) this DB — this process is writing into a schema it does not fully
+ * know. Callers surface that loudly; refusing to run would brick every session
+ * that simply has not reconnected yet, which is the wrong trade for additive
+ * changes (the stale-slot precedent: warn and keep working, but stop sounding
+ * healthy).
+ */
+export function checkSchemaSkew(db: Database.Database): SchemaSkew {
+  const dbVersion = Number(db.pragma('user_version', { simple: true })) || 0;
+  return { codeVersion: SCHEMA_VERSION, dbVersion, writerIsStale: dbVersion > SCHEMA_VERSION };
+}
+
 /** Returns the columns it added, so a caller can report a first-run migration. */
 export function migrateAddedColumns(db: Database.Database): string[] {
   const added: string[] = [];
@@ -216,6 +257,10 @@ export function openV2Database(dbPath: string): Database.Database {
   initSchemaV2(db);
   migrateAddedColumns(db);
   migrateProjectDirToCanonical(db);
+  // Stamp forward only: a newer build raises the version, an older one must
+  // never lower it — the stamp is how an older writer learns it is behind.
+  const stamped = Number(db.pragma('user_version', { simple: true })) || 0;
+  if (stamped < SCHEMA_VERSION) db.pragma(`user_version = ${SCHEMA_VERSION}`);
   return db;
 }
 

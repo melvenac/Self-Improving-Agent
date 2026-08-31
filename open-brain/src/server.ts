@@ -18,7 +18,7 @@ import {
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { sessionStart } from "./pipelines/session-start/index.js";
-import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent } from "./db-v2.js";
+import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, checkSchemaSkew, type SchemaSkew } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
@@ -40,10 +40,26 @@ const V2_DB_PATH = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "op
 const v2VaultDir = () => obsidianVaultDir();
 
 let _v2db: Database.Database | null = null;
+let _schemaSkew: SchemaSkew | null = null;
 function getV2Db(): Database.Database {
   if (_v2db) return _v2db;
   _v2db = openV2Database(V2_DB_PATH);
+  _schemaSkew = checkSchemaSkew(_v2db);
   return _v2db;
+}
+
+/**
+ * One warning line when this build is older than the schema stamped in the DB
+ * — i.e. a newer build has already migrated it and this session simply has not
+ * reconnected. Empty when healthy. Version skew between concurrent per-session
+ * writers is permitted by the architecture and was detected by nothing until
+ * a stale default contaminated a young column (Session 52).
+ */
+function skewWarning(): string {
+  if (!_schemaSkew?.writerIsStale) return "";
+  return `\nWARNING: this server's build writes schema v${_schemaSkew.codeVersion} but the database is `
+    + `stamped v${_schemaSkew.dbVersion} by a newer build. This session is running old code against a `
+    + `newer schema — run /mcp reconnect open-brain here before trusting its writes.`;
 }
 
 let _activeSessionId: string | null = null;
@@ -591,7 +607,7 @@ server.tool(
       }
     }
 
-    return { content: [{ type: "text" as const, text: results.join("\n") }] };
+    return { content: [{ type: "text" as const, text: results.join("\n") + skewWarning() }] };
   }
 );
 
@@ -908,6 +924,7 @@ server.tool(
       // Unconditional, including at zero — a line that only appears when
       // something went wrong reads identically to a healthy silence.
       `Session self-registrations (this server instance): ${_sessionSelfRegistrations}`,
+      `Schema: code v${_schemaSkew?.codeVersion ?? "?"}, database v${_schemaSkew?.dbVersion ?? "?"}${_schemaSkew?.writerIsStale ? " — STALE WRITER" : ""}`,
     ];
 
     // Entries that crossed the apoptosis threshold and survived because they

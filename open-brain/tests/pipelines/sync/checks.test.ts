@@ -15,6 +15,7 @@ import {
   checkVaultPathRefs,
   checkSkillIndex,
   checkTemplatePersonalNames,
+  checkSchemaVersion,
   checkRules,
   checkReadmeRefs,
   checkHookConfigs,
@@ -570,6 +571,36 @@ describe("validation checks", () => {
     it("catches lowercase names — the guard is case-insensitive", () => {
       writeTemplateFile(".claude/commands/start.md", "you are clark\n");
       expect(checkTemplatePersonalNames(tempDir).severity).toBe("issue");
+    });
+  });
+
+  describe("checkSchemaVersion", () => {
+    const makeDb = (version: number): string => {
+      const dbPath = join(tempDir, "skew.db");
+      const db = new DatabaseCtor(dbPath);
+      db.pragma(`user_version = ${version}`);
+      db.close();
+      return dbPath;
+    };
+
+    it("passes when the DB is absent", () => {
+      expect(checkSchemaVersion(join(tempDir, "nope.db")).severity).toBe("pass");
+    });
+
+    it("passes when the stamp matches this build", async () => {
+      const { SCHEMA_VERSION } = await import("../../../src/db-v2.js");
+      expect(checkSchemaVersion(makeDb(SCHEMA_VERSION)).severity).toBe("pass");
+    });
+
+    it("fails when a newer build has stamped the DB — this build is the stale writer", async () => {
+      const { SCHEMA_VERSION } = await import("../../../src/db-v2.js");
+      const result = checkSchemaVersion(makeDb(SCHEMA_VERSION + 1));
+      expect(result.severity).toBe("issue");
+      expect(result.message).toContain("newer build");
+    });
+
+    it("warns, not fails, when the DB is merely behind — it heals on next open", () => {
+      expect(checkSchemaVersion(makeDb(0)).severity).toBe("warn");
     });
 
     it("warns when project-template/ is absent", () => {

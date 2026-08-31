@@ -4,6 +4,7 @@ import { homedir } from "node:os";
 import Database from "better-sqlite3";
 import type { CheckResult } from "./types.js";
 import { parseSkillIndexRows } from "../../shared/skill-index.js";
+import { SCHEMA_VERSION } from "../../db-v2.js";
 
 /**
  * Slash-command files that are deliberately NOT mirrored, with the reason.
@@ -470,6 +471,47 @@ export function checkTemplatePersonalNames(projectRoot: string): CheckResult {
     };
   }
   return { name: "template-personal-names", severity: "pass", message: "No personal names in project-template/" };
+}
+
+/**
+ * This build's schema version against the stamp in the live database.
+ *
+ * Per-session MCP servers pick up new code only when their own session
+ * reconnects, so two writers can run different builds against one DB
+ * indefinitely — proven live in Session 52, when a v0.18.0 server's default
+ * contaminated a column a v0.19.x server had already moved past. The stamp
+ * (SQLite user_version, written forward-only by openV2Database) is what lets
+ * an older writer learn it is behind; this check reads it at the commit gate.
+ */
+export function checkSchemaVersion(dbPath: string): CheckResult {
+  if (!existsSync(dbPath)) {
+    return { name: "schema-version", severity: "pass", message: "Knowledge DB absent — nothing to compare" };
+  }
+
+  let dbVersion: number;
+  try {
+    const db = new Database(dbPath, { readonly: true, fileMustExist: true });
+    dbVersion = Number(db.pragma("user_version", { simple: true })) || 0;
+    db.close();
+  } catch (err) {
+    return { name: "schema-version", severity: "warn", message: `Could not read knowledge DB: ${(err as Error).message}` };
+  }
+
+  if (dbVersion === SCHEMA_VERSION) {
+    return { name: "schema-version", severity: "pass", message: `Schema stamp matches this build (v${SCHEMA_VERSION})` };
+  }
+  if (dbVersion > SCHEMA_VERSION) {
+    return {
+      name: "schema-version",
+      severity: "issue",
+      message: `This build writes schema v${SCHEMA_VERSION} but the DB is stamped v${dbVersion} by a newer build — running stale code; rebuild or pull before writing`,
+    };
+  }
+  return {
+    name: "schema-version",
+    severity: "warn",
+    message: `DB stamped v${dbVersion}, this build writes v${SCHEMA_VERSION} — heals on the next openV2Database (no server has opened the DB since this build)`,
+  };
 }
 
 export function checkTemplate(projectRoot: string): CheckResult {

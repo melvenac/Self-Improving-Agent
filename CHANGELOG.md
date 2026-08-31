@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.22.0] - 2026-08-31
+
+### Added
+- **Schema version stamp — a stale writer can now know it is stale.** Per-session MCP servers pick up new code only when their own session reconnects, so two writers can run different builds against one shared SQLite file indefinitely; proven live in Session 52 when a v0.18.0 server's default contaminated a column a v0.19.x server had moved past, and nothing detected it. Benign for an additive column; not benign once a migration changes what existing values mean. Now: `SCHEMA_VERSION` derives from the migration list (an additive migration bumps it by construction; a meaning-changing rebuild bumps `SCHEMA_REBUILDS` explicitly), `openV2Database` stamps SQLite's `user_version` forward-only, and `checkSchemaSkew` compares.
+- **Surfaced in three places:** `ob_recall` output carries a WARNING when this build is older than the DB's stamp; `ob_stats` prints `Schema: code vX, database vY` unconditionally (STALE WRITER flagged); new `/sync` check `schema-version` fails at the commit gate when the sync build itself is the stale one, and warns (heals-on-open) when the DB is merely behind. Warn-and-keep-working, not refuse: bricking every not-yet-reconnected session is the wrong trade for additive changes — the stale-slot precedent.
+
+### Notes
+- Tests: forward-only stamping + skew detection, 4 sync-check states. **687 tests / 49 files.** Live DB stamped v4 at release. This closes Aaron's approved items (a)/(1), (3), (4) for Session 52; the lifecycle bundle is handed to the next session.
+
 ## [v0.21.0] - 2026-08-31
 
 ### Fixed
