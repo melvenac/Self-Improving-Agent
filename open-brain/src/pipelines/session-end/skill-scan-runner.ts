@@ -16,6 +16,8 @@ const vaultPath = () => obsidianVaultDir();
 const experiencesDir = () => join(vaultPath(), "Experiences");
 const candidatesFile = () => join(vaultPath(), "Skill-Candidates", "SKILL-CANDIDATES.md");
 const skillIndexFile = () => join(vaultPath(), "Skill-Candidates", "SKILL-INDEX.md");
+const pendingFile = () => join(vaultPath(), ".skill-proposals-pending.json");
+const ledgerFile = () => join(vaultPath(), ".skill-proposals-ledger.json");
 
 /** The vault is a user-managed directory; Skill-Candidates/ may not exist yet. */
 function writeVaultFile(path: string, contents: string): void {
@@ -59,6 +61,61 @@ function collectExperiences(dir: string): ExperienceFile[] {
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+// ─── Proposal ledger ────────────────────────────────────────────────────────
+//
+// A declined proposal used to leave no trace: the cluster still existed, so the
+// next scan proposed it again, forever. The ledger records the decision, and the
+// scan enforces it — the reviewing agent writes one JSON entry once, and no
+// amount of re-scanning can resurrect the proposal. Keyed by lowercased tag:
+//
+//   { "browser-automation": { "decision": "rejected", "date": "2026-08-31",
+//     "atCount": 4, "reason": "too tool-specific" } }
+
+interface LedgerEntry {
+  decision?: string;
+  date?: string;
+  atCount?: number;
+  reason?: string;
+}
+
+/** A proposal awaiting review in .skill-proposals-pending.json. */
+interface PendingProposal {
+  tag: string;
+  count: number;
+  files: string[];
+  date: string;
+}
+
+function readLedger(): Record<string, LedgerEntry> {
+  try {
+    const parsed = JSON.parse(readFileSync(ledgerFile(), "utf8"));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * A rejection is scoped to the evidence it judged: rejected at `atCount`
+ * experiences, the cluster stays suppressed until it outgrows that count —
+ * new experiences are new evidence and earn a fresh review. An entry without
+ * `atCount` is an unconditional rejection.
+ */
+function isRejected(tag: string, count: number, ledger: Record<string, LedgerEntry>): boolean {
+  const entry = ledger[tag.toLowerCase()];
+  if (!entry || entry.decision !== "rejected") return false;
+  return typeof entry.atCount === "number" ? count <= entry.atCount : true;
+}
+
+function readPending(): PendingProposal[] {
+  try {
+    const parsed = JSON.parse(readFileSync(pendingFile(), "utf8"));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
 function parsePreviousCounts(content: string): { counts: Map<string, number>; previousDate: string | null } {
@@ -113,20 +170,36 @@ export function runSkillScanPipeline(): SkillScanPipelineResult {
   // Run the scan
   const result = scanForSkills(experienceFiles, previousCounts);
 
-  // Write SKILL-CANDIDATES.md
-  writeCandidatesFile(result.clusters, previousCounts, previousDate, existingSkills);
+  const ledger = readLedger();
+  const rejected = new Set(
+    result.clusters.filter((c) => isRejected(c.tag, c.count, ledger)).map((c) => c.tag),
+  );
 
-  // Write pending proposals marker
-  const newClusters = result.clusters.filter((c) => c.status === "new" && !c.oversized);
-  if (newClusters.length > 0) {
-    const markerPath = join(vaultPath(), ".skill-proposals-pending.json");
-    const proposals = newClusters.map((c) => ({ tag: c.tag, count: c.count, files: c.files, date: today() }));
-    writeVaultFile(markerPath, JSON.stringify(proposals, null, 2));
+  // Write SKILL-CANDIDATES.md
+  writeCandidatesFile(result.clusters, previousCounts, previousDate, existingSkills, rejected);
+
+  // Rebuild the pending marker rather than append-or-skip. The old write fired
+  // only when a scan found something new, so a marker written once was never
+  // cleared: proposals stayed "pending" after being rejected or graduating, and
+  // startup re-reported them every session. Rebuilding from current clusters
+  // makes the marker self-healing — a proposal survives exactly as long as its
+  // cluster does and no decision has been recorded against it.
+  const prior = new Map(readPending().map((p) => [p.tag?.toLowerCase(), p]));
+  const pending: PendingProposal[] = [];
+  for (const c of result.clusters) {
+    if (c.oversized) continue;
+    const key = c.tag.toLowerCase();
+    if (existingSkills.has(key)) continue;
+    if (rejected.has(c.tag)) continue;
+    if (c.status === "new" || prior.has(key)) {
+      pending.push({ tag: c.tag, count: c.count, files: c.files, date: prior.get(key)?.date ?? today() });
+    }
   }
+  writeVaultFile(pendingFile(), JSON.stringify(pending, null, 2));
 
   return {
     clusters: result.clusters.length,
-    pendingProposals: result.pendingProposals,
+    pendingProposals: pending.length,
     approaching: result.approaching,
   };
 }
@@ -136,6 +209,7 @@ function writeCandidatesFile(
   previousCounts: Map<string, number>,
   previousDate: string | null,
   existingSkills: Set<string>,
+  rejected: Set<string> = new Set(),
 ): void {
   let md = `---\ndate: ${today()}\ntype: skill-scan\nprevious-scan: ${previousDate || "none"}\n---\n\n`;
   md += `# Skill Candidates\n\n`;
@@ -145,9 +219,11 @@ function writeCandidatesFile(
 
   for (const cluster of clusters) {
     const hasSkill = existingSkills.has(cluster.tag.toLowerCase());
+    const isRejected = rejected.has(cluster.tag);
     const status: string[] = [];
     if (hasSkill) status.push("has skill");
     if (cluster.oversized) status.push("TOO LARGE");
+    else if (isRejected) status.push("rejected");
     else if (cluster.status === "new") status.push("NEW");
     if (cluster.status === "growing") status.push("growing");
     if (cluster.consolidatedFrom?.length) status.push(`merged: ${cluster.consolidatedFrom.join(", ")}`);
@@ -157,6 +233,8 @@ function writeCandidatesFile(
       md += `**Status:** Too broad to distil into one skill — split into narrower tags before proposing\n\n`;
     } else if (hasSkill) {
       md += `**Status:** Skill exists — consider updating if new experiences add novel patterns\n\n`;
+    } else if (isRejected) {
+      md += `**Status:** Proposal rejected (see .skill-proposals-ledger.json) — re-proposes if the cluster outgrows the rejected count\n\n`;
     } else {
       md += `**Potential skill:** "${cluster.tag}" patterns and gotchas\n\n`;
     }

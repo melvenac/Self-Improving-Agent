@@ -54,6 +54,26 @@ New proposals: {list or "none"}
 Growth: {list or "none"}
 ```
 
+## Recording decisions (proposal ledger)
+
+When Aaron reviews a proposal, record the outcome so it is never re-proposed on unchanged evidence:
+
+- **Approved** → the skill gets created and registered in `SKILL-INDEX.md`; graduation detection handles the rest. No ledger entry needed.
+- **Rejected** → add an entry to `~/Obsidian Vault v2/.skill-proposals-ledger.json`, keyed by the **lowercased tag**:
+
+```json
+{
+  "browser-automation": {
+    "decision": "rejected",
+    "date": "2026-08-31",
+    "atCount": 4,
+    "reason": "too tool-specific to distil"
+  }
+}
+```
+
+Set `atCount` to the cluster's size at rejection time. The scan pipeline then suppresses the proposal deterministically until the cluster **outgrows** that count — new experiences are new evidence and earn a fresh review. Omit `atCount` only for an unconditional "never propose this" rejection.
+
 ## Rules
 
 - **Never auto-create skills.** Only propose — Aaron decides.

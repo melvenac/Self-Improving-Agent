@@ -160,3 +160,128 @@ describe("runSkillScanPipeline graduation detection", () => {
     expect(candidates()).not.toContain("has skill");
   });
 });
+
+/**
+ * The proposal ledger and the self-healing pending marker.
+ *
+ * A declined proposal used to leave no trace, so every scan re-proposed it;
+ * and the pending marker was only ever written when new clusters appeared, so
+ * a stale marker reported the same proposals forever. The ledger records the
+ * decision; the marker is rebuilt each scan from live clusters minus decided
+ * ones.
+ */
+describe("runSkillScanPipeline proposal ledger", () => {
+  let vaultDir: string;
+
+  function writeExperience(name: string, tags: string[]): void {
+    const dir = join(vaultDir, "Experiences", "General");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, `${name}.md`), `---\ntags: [${tags.join(", ")}]\n---\n\n# ${name}\n`);
+  }
+
+  function writeLedger(entries: Record<string, unknown>): void {
+    writeFileSync(join(vaultDir, ".skill-proposals-ledger.json"), JSON.stringify(entries));
+  }
+
+  const pending = (): Array<{ tag: string }> =>
+    JSON.parse(readFileSync(join(vaultDir, ".skill-proposals-pending.json"), "utf8"));
+
+  const candidates = (): string =>
+    readFileSync(join(vaultDir, "Skill-Candidates", "SKILL-CANDIDATES.md"), "utf8");
+
+  beforeEach(() => {
+    vaultDir = mkdtempSync(join(tmpdir(), "ob-ledger-"));
+    process.env.OPEN_BRAIN_VAULT_DIR = vaultDir;
+    for (const n of ["alpha", "beta", "gamma"]) writeExperience(n, ["convex"]);
+  });
+
+  afterEach(() => {
+    delete process.env.OPEN_BRAIN_VAULT_DIR;
+  });
+
+  it("proposes a new cluster into the pending marker", () => {
+    const result = runSkillScanPipeline();
+
+    expect(result.pendingProposals).toBe(1);
+    expect(pending().map((p) => p.tag)).toEqual(["convex"]);
+  });
+
+  it("suppresses a cluster rejected at its current count", () => {
+    writeLedger({ convex: { decision: "rejected", date: "2026-08-31", atCount: 3 } });
+
+    const result = runSkillScanPipeline();
+
+    expect(result.pendingProposals).toBe(0);
+    expect(pending()).toEqual([]);
+    expect(candidates()).toContain("### convex (3 experiences) — rejected");
+  });
+
+  it("re-proposes when the cluster outgrows the rejected count", () => {
+    writeLedger({ convex: { decision: "rejected", date: "2026-08-31", atCount: 2 } });
+
+    const result = runSkillScanPipeline();
+
+    expect(result.pendingProposals).toBe(1);
+    expect(pending().map((p) => p.tag)).toEqual(["convex"]);
+  });
+
+  it("suppresses unconditionally when the rejection has no atCount", () => {
+    writeLedger({ convex: { decision: "rejected", date: "2026-08-31" } });
+
+    expect(runSkillScanPipeline().pendingProposals).toBe(0);
+  });
+
+  it("clears a stale pending entry once its tag is rejected", () => {
+    // Simulate a marker left by an earlier scan, then a rejection recorded after.
+    writeFileSync(
+      join(vaultDir, ".skill-proposals-pending.json"),
+      JSON.stringify([{ tag: "convex", count: 3, files: ["alpha"], date: "2026-08-13" }]),
+    );
+    writeLedger({ convex: { decision: "rejected", date: "2026-08-31", atCount: 3 } });
+
+    runSkillScanPipeline();
+
+    expect(pending()).toEqual([]);
+  });
+
+  it("carries an undecided pending proposal across scans, keeping its date", () => {
+    // First scan proposes; write its marker date back in time to prove carry.
+    runSkillScanPipeline();
+    const first = pending();
+    writeFileSync(
+      join(vaultDir, ".skill-proposals-pending.json"),
+      JSON.stringify(first.map((p) => ({ ...p, date: "2026-08-13" }))),
+    );
+
+    // Second scan: cluster unchanged (status stable), no decision recorded.
+    runSkillScanPipeline();
+
+    expect(pending().map((p) => p.tag)).toEqual(["convex"]);
+    expect(pending()[0]).toMatchObject({ date: "2026-08-13" });
+  });
+
+  it("clears a pending proposal once the skill graduates into the index", () => {
+    runSkillScanPipeline();
+    expect(pending().map((p) => p.tag)).toEqual(["convex"]);
+
+    const dir = join(vaultDir, "Skill-Candidates");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(
+      join(dir, "SKILL-INDEX.md"),
+      "# Skill Index\n\n## Skills\n\n"
+      + "| Name | File | Domain | Problem Class | Source Project | Version |\n"
+      + "|---|---|---|---|---|---|\n"
+      + "| Convex Patterns | `convex.md` | convex | data-modeling | Open Brain | 1.0 |\n",
+    );
+
+    runSkillScanPipeline();
+
+    expect(pending()).toEqual([]);
+  });
+
+  it("tolerates a corrupt ledger file", () => {
+    writeFileSync(join(vaultDir, ".skill-proposals-ledger.json"), "not json{");
+
+    expect(runSkillScanPipeline().pendingProposals).toBe(1);
+  });
+});

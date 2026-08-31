@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.17.0] - 2026-08-31
+
+### Fixed
+- **`skillRows()` silently dropped malformed SKILL-INDEX.md rows.** A bare `continue` skipped any row it could not parse — a lost pipe or a blanked Domain cell made the registered skill invisible to graduation detection and the health score, so its cluster kept being re-proposed every scan, and a corrupted index read exactly like an empty one. The parser is now `parseSkillIndexRows()` returning `{rows, dropped}`: header and separator rows are structure and still skip silently, but a data row that yields no domain is *reported*, not absorbed. `parseSkillDomains`/`countSkills` keep their signatures, so all callers (sync score, skill-scan graduation) are untouched. Entry #375 again: a filter that drops rows must emit the dropped count.
+- **The pending-proposals marker was write-once, never cleared.** `.skill-proposals-pending.json` was only written when a scan found *new* clusters, so proposals stayed "pending" forever after being rejected or graduating — startup re-reported them every session. The marker is now rebuilt on every scan from live clusters: a proposal survives exactly as long as its cluster does and no decision has been recorded against it. Undecided proposals carry across scans with their original date.
+
+### Added
+- **New sync check `skill-index`** — parses the vault's SKILL-INDEX.md and fails `/sync` (severity `issue`) on any dropped row, naming the first offending line. Catches index corruption at commit time instead of after another dozen sessions of phantom re-proposals.
+- **Proposal ledger (`.skill-proposals-ledger.json`).** A rejected proposal used to leave no trace, so no amount of parser correctness could stop the re-propose loop — rejection simply wasn't representable. The ledger records `{decision, date, atCount, reason}` per tag; the scan suppresses rejected clusters deterministically until they *outgrow* `atCount` (new experiences are new evidence and earn a fresh review; omit `atCount` for an unconditional rejection). SKILL-CANDIDATES.md marks suppressed clusters `rejected`. The reviewing agent writes one JSON entry once; enforcement is code, not prompt. Design borrowed from WikiSkill (arXiv 2608.27454) — its `skill-impact.md` exists precisely "so that rejected interventions aren't re-proposed" (knowledge entry #455).
+- `/skill-scan` command now documents the decision-recording workflow (mirrored to template and live commands).
+
+### Notes
+- Tests: 10 new parser cases (`tests/shared/skill-index.test.ts`), 3 sync-check cases, 8 ledger/marker cases. **664 tests / 49 files.** Verified against the live vault index: 5 rows, 0 dropped — the guard arms clean.
+
 ## [v0.16.0] - 2026-08-13
 
 ### Fixed

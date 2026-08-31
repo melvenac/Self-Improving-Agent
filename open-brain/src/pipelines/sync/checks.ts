@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { homedir } from "node:os";
 import Database from "better-sqlite3";
 import type { CheckResult } from "./types.js";
+import { parseSkillIndexRows } from "../../shared/skill-index.js";
 
 /**
  * Slash-command files that are deliberately NOT mirrored, with the reason.
@@ -377,6 +378,42 @@ export function checkVaultIndexParity(vaultPath: string, dbPath: string): CheckR
     parts.push(`${dangling.length} index row(s) whose vault file is missing`);
   }
   return { name: "vault-index-parity", severity: "warn", message: parts.join("; ") };
+}
+
+/**
+ * Malformed rows in SKILL-INDEX.md's `## Skills` table.
+ *
+ * The parser used to `continue` past any row it could not read, so a mangled
+ * row (a lost pipe, a blanked Domain cell) made the registered skill invisible
+ * to graduation detection and the health score — the cluster it distilled kept
+ * being re-proposed every scan, and a corrupted index was indistinguishable
+ * from an empty one. The parser now reports what it dropped; this check turns
+ * any drop into a sync failure so corruption is caught at commit time, not
+ * after another twelve sessions of re-proposals.
+ */
+export function checkSkillIndex(vaultPath: string): CheckResult {
+  const indexPath = join(vaultPath, "Skill-Candidates", "SKILL-INDEX.md");
+  if (!existsSync(indexPath)) {
+    return { name: "skill-index", severity: "pass", message: "SKILL-INDEX.md absent — nothing to validate" };
+  }
+
+  let content: string;
+  try {
+    content = readFileSync(indexPath, "utf-8");
+  } catch (err) {
+    return { name: "skill-index", severity: "warn", message: `Could not read SKILL-INDEX.md: ${(err as Error).message}` };
+  }
+
+  const { rows, dropped } = parseSkillIndexRows(content);
+  if (dropped.length > 0) {
+    const shown = dropped[0].length > 60 ? dropped[0].slice(0, 60) + "…" : dropped[0];
+    return {
+      name: "skill-index",
+      severity: "issue",
+      message: `SKILL-INDEX.md has ${dropped.length} malformed skill row(s) invisible to graduation (clusters will re-propose): ${shown}`,
+    };
+  }
+  return { name: "skill-index", severity: "pass", message: `SKILL-INDEX.md parses cleanly (${rows.length} skill(s))` };
 }
 
 export function checkTemplate(projectRoot: string): CheckResult {

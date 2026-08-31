@@ -14,6 +14,7 @@ import {
   checkObsidianVault,
   checkVaultIndexParity,
   checkVaultPathRefs,
+  checkSkillIndex,
   checkTemplate,
   checkSpecProvenance,
   checkRules,
@@ -43,6 +44,7 @@ export function runSync(options: SyncOptions): SyncResult {
   checks.push(checkObsidianVault(paths.obsidianVault));
   checks.push(checkVaultIndexParity(paths.obsidianVault, paths.knowledgeV2Db));
   checks.push(checkVaultPathRefs(options.projectRoot));
+  checks.push(checkSkillIndex(paths.obsidianVault));
   checks.push(checkTemplate(options.projectRoot));
   checks.push(checkSpecProvenance(options.projectRoot));
   checks.push(checkRules(options.projectRoot));

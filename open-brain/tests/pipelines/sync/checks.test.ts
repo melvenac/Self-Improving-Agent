@@ -13,6 +13,7 @@ import {
   checkObsidianVault,
   checkVaultIndexParity,
   checkVaultPathRefs,
+  checkSkillIndex,
   checkRules,
   checkReadmeRefs,
   checkHookConfigs,
@@ -501,6 +502,43 @@ describe("validation checks", () => {
       writeFileSync(join(tempDir, "RULES.md"), "# Rules\n");
       const result = checkRules(tempDir);
       expect(result.severity).toBe("pass");
+    });
+  });
+
+  describe("checkSkillIndex", () => {
+    const writeIndex = (body: string): string => {
+      const vault = join(tempDir, "vault");
+      mkdirSync(join(vault, "Skill-Candidates"), { recursive: true });
+      writeFileSync(join(vault, "Skill-Candidates", "SKILL-INDEX.md"), body);
+      return vault;
+    };
+
+    it("passes when SKILL-INDEX.md is absent", () => {
+      expect(checkSkillIndex(join(tempDir, "vault")).severity).toBe("pass");
+    });
+
+    it("passes on a well-formed index and reports the skill count", () => {
+      const vault = writeIndex(
+        "# Skill Index\n\n## Skills\n\n"
+        + "| Name | File | Domain | Problem Class | Source Project | Version |\n"
+        + "|---|---|---|---|---|---|\n"
+        + "| Convex Patterns | `convex.md` | convex | data-modeling | Open Brain | 1.0 |\n",
+      );
+      const result = checkSkillIndex(vault);
+      expect(result.severity).toBe("pass");
+      expect(result.message).toContain("1 skill(s)");
+    });
+
+    it("fails sync when a row is malformed", () => {
+      const vault = writeIndex(
+        "# Skill Index\n\n## Skills\n\n"
+        + "| Name | File | Domain | Problem Class | Source Project | Version |\n"
+        + "|---|---|---|---|---|---|\n"
+        + "| Convex Patterns | `convex.md` |\n",
+      );
+      const result = checkSkillIndex(vault);
+      expect(result.severity).toBe("issue");
+      expect(result.message).toContain("1 malformed skill row(s)");
     });
   });
 });
