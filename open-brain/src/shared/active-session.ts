@@ -233,6 +233,37 @@ export function isStaleSession(
   return age > maxAgeMs;
 }
 
+/**
+ * Session id for a write-path operation, when the in-memory registration may
+ * be gone.
+ *
+ * `/mcp reconnect` restarts the MCP server, which loses `_activeSessionId`;
+ * every recall after that succeeded visibly while writing no `recall_log` row,
+ * so the /end sweep rated from a partial log (Session 52, confirmed by
+ * experiment). The slot file exists precisely to carry the uuid across
+ * processes, so a fresh slot is adopted — but a stale one is refused, not
+ * silently trusted (the 16-day-slot lesson, v0.16.0), and the caller is told
+ * which, so "not logged" is never invisible.
+ */
+export interface WriteSessionResolution {
+  id: string | null;
+  /** True when the id was adopted from the slot file, not already in memory. */
+  selfRegistered: boolean;
+  /** Why id is null: the slot was missing, or too old to trust. */
+  reason?: "no-slot" | "stale-slot";
+}
+
+export function resolveWriteSession(
+  currentId: string | null,
+  slot: ActiveSessionEntry | null,
+  now: number = Date.now(),
+): WriteSessionResolution {
+  if (currentId) return { id: currentId, selfRegistered: false };
+  if (!slot) return { id: null, selfRegistered: false, reason: "no-slot" };
+  if (isStaleSession(slot, now)) return { id: null, selfRegistered: false, reason: "stale-slot" };
+  return { id: slot.uuid, selfRegistered: true };
+}
+
 type ActiveSessionFile = Record<string, ActiveSessionEntry>;
 
 function readFile(path: string): ActiveSessionFile {

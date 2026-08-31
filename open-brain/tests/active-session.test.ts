@@ -16,6 +16,7 @@ import {
   sessionEntryAgeMs,
   isStaleSession,
   STALE_SESSION_MS,
+  resolveWriteSession,
   type ActiveSessionEntry,
 } from "../src/shared/active-session.js";
 
@@ -36,6 +37,48 @@ const CURSOR_PAYLOAD = {
   user_email: "someone@example.com",
   workspace_roots: ["C:/Users/melve/Projects/Self-Improving-Agent"],
 };
+
+/**
+ * Reconnect recovery (Session 52). `/mcp reconnect` restarts the server and
+ * loses the in-memory session id; every recall after that succeeded visibly
+ * while writing no recall_log row. The slot file already carries the uuid
+ * across processes, so a fresh slot is adopted — a stale one is refused, and
+ * the caller learns WHY there is no id instead of skipping silently.
+ */
+describe("resolveWriteSession", () => {
+  const NOW = Date.parse("2026-08-31T12:00:00Z");
+  const slot = (started_at: string): ActiveSessionEntry => ({
+    uuid: "slot-uuid-1",
+    project_dir: "C:/proj",
+    source: "session_id",
+    started_at,
+  });
+
+  it("returns the in-memory id untouched when one exists", () => {
+    const r = resolveWriteSession("mem-uuid", slot("2026-08-31T11:00:00Z"), NOW);
+    expect(r).toEqual({ id: "mem-uuid", selfRegistered: false });
+  });
+
+  it("adopts a fresh slot when the in-memory id is gone, and says so", () => {
+    const r = resolveWriteSession(null, slot("2026-08-31T11:00:00Z"), NOW);
+    expect(r).toEqual({ id: "slot-uuid-1", selfRegistered: true });
+  });
+
+  it("refuses a stale slot rather than filing work under an old identity", () => {
+    const r = resolveWriteSession(null, slot("2026-08-15T11:00:00Z"), NOW);
+    expect(r).toEqual({ id: null, selfRegistered: false, reason: "stale-slot" });
+  });
+
+  it("refuses an unparseable timestamp — a slot that cannot prove it is current", () => {
+    const r = resolveWriteSession(null, slot("not-a-date"), NOW);
+    expect(r).toEqual({ id: null, selfRegistered: false, reason: "stale-slot" });
+  });
+
+  it("reports a missing slot as its own reason", () => {
+    const r = resolveWriteSession(null, null, NOW);
+    expect(r).toEqual({ id: null, selfRegistered: false, reason: "no-slot" });
+  });
+});
 
 describe("host detection", () => {
   it("identifies Cursor by cursor_version, whatever the registration said", () => {

@@ -24,7 +24,7 @@ import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVaultDir } from "./shared/paths.js";
-import { readActiveSession, activeSessionKey, currentIde, isStaleSession, sessionEntryAgeMs } from "./shared/active-session.js";
+import { readActiveSession, activeSessionKey, currentIde, isStaleSession, sessionEntryAgeMs, resolveWriteSession } from "./shared/active-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { slugify, archiveVaultNote } from "./vault-writer.js";
 import { evaluateLifecycle, apoptosisFlaggedExpr, formatApoptosisQueue, recallRankExpr, type ApoptosisCandidate, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
@@ -47,6 +47,34 @@ function getV2Db(): Database.Database {
 }
 
 let _activeSessionId: string | null = null;
+
+/**
+ * Times a write path had to recover the session from the slot file because the
+ * in-memory registration was gone — i.e. operations that v0.19.x and earlier
+ * would have silently not logged. Surfaced unconditionally in ob_stats: a
+ * harness regression shows up as this number climbing, not as rows quietly
+ * not existing. Per-instance by nature — the loss it counts is per-instance.
+ */
+let _sessionSelfRegistrations = 0;
+
+/**
+ * Session id for recall/feedback writes, self-registering from the hook's slot
+ * file after a reconnect. Returns why there is no id when there is none, so
+ * every caller can say "not logged" out loud instead of skipping silently.
+ */
+function writeSessionId(): { id: string | null; selfRegistered: boolean; reason?: string } {
+  const cwd = process.cwd();
+  const slot = _activeSessionId ? null : readActiveSession(
+    resolvePaths(cwd).activeSession,
+    activeSessionKey(canonicalizeProjectDir(cwd) || cwd, currentIde()),
+  );
+  const resolved = resolveWriteSession(_activeSessionId, slot);
+  if (resolved.selfRegistered && resolved.id) {
+    _activeSessionId = resolved.id;
+    _sessionSelfRegistrations++;
+  }
+  return resolved;
+}
 const _recalledKnowledgeIds = new Set<number>();
 
 // Re-exported so existing importers (and tests) keep working; the shadow
@@ -527,11 +555,18 @@ server.tool(
 
         // Ground truth for the shadow-recall harness: what this query returned,
         // in the order the agent saw it. Best-effort — a logging failure must
-        // never break a recall.
-        if (_activeSessionId) {
+        // never break a recall — but never a SILENT skip: a recall that is not
+        // logged says so in its own output.
+        const session = writeSessionId();
+        if (session.id) {
           try {
-            recordRecallEvent(v2db, _activeSessionId, query, rows.map((r) => r.id), trigger);
+            recordRecallEvent(v2db, session.id, query, rows.map((r) => r.id), trigger);
           } catch { /* non-critical */ }
+          if (session.selfRegistered) {
+            results.push(`_(session ${session.id} self-registered from the hook slot after a server restart)_`);
+          }
+        } else {
+          results.push(`_(NOT LOGGED: no active session — ${session.reason === "stale-slot" ? "the hook slot is stale" : "no hook slot found"}; run ob_set_session to restore recall logging)_`);
         }
 
         // Track recall hits
@@ -687,11 +722,12 @@ server.tool(
     // Log the rating as an event before any apoptosis delete — the aggregate
     // counters carry no timestamps and no session, so this is the only record
     // that can tell the shadow harness which session judged what.
-    if (_activeSessionId) {
+    const feedbackSession = writeSessionId();
+    if (feedbackSession.id) {
       try {
         // A single ob_feedback call is its own provenance: the caller named the
         // id directly rather than rating a resolved recall list.
-        recordFeedbackEvent(v2db, _activeSessionId, id, rating as Rating, "direct");
+        recordFeedbackEvent(v2db, feedbackSession.id, id, rating as Rating, "direct");
       } catch { /* non-critical */ }
     }
 
@@ -868,6 +904,10 @@ server.tool(
       ``,
       `Rating origin census:`,
       ...originCensus.map(r => `  ${r.o}: ${r.count}`),
+      ``,
+      // Unconditional, including at zero — a line that only appears when
+      // something went wrong reads identically to a healthy silence.
+      `Session self-registrations (this server instance): ${_sessionSelfRegistrations}`,
     ];
 
     // Entries that crossed the apoptosis threshold and survived because they
@@ -970,7 +1010,7 @@ server.tool(
     // Session provenance: knowledge_index has no session column, so link the
     // artifact to its producing session here. Stores the vault path, not a
     // second copy of the text — the vault file stays the source of truth.
-    const sessionUuid = session_id ?? _activeSessionId;
+    const sessionUuid = session_id ?? writeSessionId().id;
     let linkedToSession = false;
     if (sessionUuid) {
       try {

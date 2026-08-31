@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.21.0] - 2026-08-31
+
+### Fixed
+- **`/mcp reconnect` no longer silently stops recall/feedback logging.** The restarted server loses its in-memory session id; every recall after that succeeded visibly while writing no `recall_log` row, so `/end` rated from a partial log (Session 52, confirmed by controlled experiment — the positive half row-verified, the negative half testimony by its nature). Write paths (`ob_recall`, `ob_feedback`, `ob_store_chunk`) now self-register from the SessionStart hook's slot file via `resolveWriteSession`: a fresh slot is adopted and the tool output says so; a stale slot (>12h, the v0.16.0 rule) or a missing one is refused and the output says **"NOT LOGGED"** with the reason — a skip is never silent.
+- **Both halves shipped together, per the v0.15.1 lesson** (structural prevention makes a failure impossible and simultaneously invisible): the fix is the self-registration; the instrumentation is `Session self-registrations (this server instance): N` in `ob_stats`, printed unconditionally including at zero — a harness regression shows up as a climbing count, not as rows quietly not existing. Same move as `'unspecified'`: an invisible attribution gap becomes a countable one.
+
+### Notes
+- Tests: 5 new `resolveWriteSession` cases (in-memory precedence, fresh-slot adoption, stale refusal, unparseable-timestamp refusal, missing-slot reason). **682 tests / 49 files.**
+
 ## [v0.20.0] - 2026-08-31
 
 ### Added
