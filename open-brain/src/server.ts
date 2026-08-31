@@ -436,8 +436,8 @@ server.tool(
     tags: z.array(z.string()).optional().describe("Filter by tags"),
     verbose: z.boolean().optional().default(false).describe("If true, return full content instead of snippets"),
     limit: z.number().optional().default(5).describe("Results per query (default: 5)"),
-    trigger: z.enum(["start", "checkpoint", "explicit"]).optional().default("explicit")
-      .describe("How this recall reached the agent: 'start' = session-start injection, 'checkpoint' = checkpoint restoration, 'explicit' = deliberate mid-task fetch (default). Recorded for analysis — injection and on-demand fetch are different treatments."),
+    trigger: z.enum(["start", "checkpoint", "explicit", "unspecified"]).optional().default("unspecified")
+      .describe("How this recall reached the agent: 'start' = session-start injection, 'checkpoint' = checkpoint restoration, 'explicit' = deliberate mid-task fetch. ALWAYS pass one of the first three; an omitted trigger is recorded as 'unspecified' (a countable labeling gap, never assumed to be a deliberate fetch). Recorded for analysis — injection and on-demand fetch are different treatments."),
   },
   async ({ queries, project, global: globalSearch, tags, verbose, limit, trigger }) => {
     const v2db = getV2Db();
@@ -836,6 +836,13 @@ server.tool(
     let dbSize = 0;
     try { dbSize = statSync(V2_DB_PATH).size; } catch { /* ignore */ }
 
+    // The recall corpus states its own labeling quality before anyone analyzes
+    // it: 'unspecified' counts callers that omitted the trigger (a labeling
+    // gap, not a treatment), '(pre-column)' counts rows older than v0.18.0.
+    const triggerCensus = v2db.prepare(
+      "SELECT COALESCE(recall_trigger, '(pre-column)') as t, COUNT(*) as count FROM recall_log GROUP BY t ORDER BY count DESC"
+    ).all() as Array<{ t: string; count: number }>;
+
     const lines = [
       `## Knowledge Stats`,
       `Total entries: ${knowledge.c}`,
@@ -844,6 +851,9 @@ server.tool(
       ``,
       `Maturity distribution:`,
       ...maturityDist.map(m => `  ${m.maturity}: ${m.count}`),
+      ``,
+      `Recall trigger census:`,
+      ...triggerCensus.map(r => `  ${r.t}: ${r.count}`),
     ];
 
     // Entries that crossed the apoptosis threshold and survived because they

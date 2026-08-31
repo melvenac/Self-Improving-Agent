@@ -416,6 +416,60 @@ export function checkSkillIndex(vaultPath: string): CheckResult {
   return { name: "skill-index", severity: "pass", message: `SKILL-INDEX.md parses cleanly (${rows.length} skill(s))` };
 }
 
+/**
+ * Personal identity leaking into the distributable template.
+ *
+ * project-template/ ships to strangers, and it shipped with "Aaron" in ~20
+ * places and "You are Clark" in the startup command — every consumer's agent
+ * introduced itself as Clark and addressed its user as Aaron. Identity belongs
+ * in the unshipped layers (the user's global CLAUDE.md, a project's
+ * .agents/AGENT.md); template prose stays generic ("the user"). Found by
+ * Atlas's self-containment scan (Session 52), same distribution-drift class as
+ * Session 36 — and like mirror parity, "remember not to write names into the
+ * template" is a prompt-level rule until a check enforces it.
+ *
+ * The name list is this repo's owner and agents. `melvenac` in GitHub URLs is
+ * a repo reference, not a leak — \b keeps `melve` from matching inside it.
+ */
+const PERSONAL_NAMES = /\b(Aaron|Clark|melve)\b/;
+
+export function checkTemplatePersonalNames(projectRoot: string): CheckResult {
+  const templateRoot = join(projectRoot, "project-template");
+  if (!existsSync(templateRoot)) {
+    return { name: "template-personal-names", severity: "warn", message: "project-template/ not found" };
+  }
+
+  const skipDirs = new Set(["node_modules", ".git"]);
+  const hits: string[] = [];
+  const walk = (dir: string): void => {
+    let entries;
+    try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const entry of entries) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (!skipDirs.has(entry.name)) walk(full);
+        continue;
+      }
+      try {
+        const match = readFileSync(full, "utf-8").match(PERSONAL_NAMES);
+        if (match) hits.push(`${full.replace(templateRoot, "project-template").replace(/\\/g, "/")} ("${match[1]}")`);
+      } catch { /* binary or unreadable — not prose, not a leak */ }
+    }
+  };
+  walk(templateRoot);
+
+  if (hits.length > 0) {
+    const shown = hits.slice(0, 5).join(", ");
+    const more = hits.length > 5 ? ` (+${hits.length - 5} more)` : "";
+    return {
+      name: "template-personal-names",
+      severity: "issue",
+      message: `Template ships personal names — consumers' agents will use them: ${shown}${more}`,
+    };
+  }
+  return { name: "template-personal-names", severity: "pass", message: "No personal names in project-template/" };
+}
+
 export function checkTemplate(projectRoot: string): CheckResult {
   const templatePath = join(projectRoot, "project-template");
   if (!existsSync(templatePath)) {

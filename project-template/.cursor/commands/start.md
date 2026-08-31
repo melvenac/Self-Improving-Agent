@@ -48,7 +48,7 @@ Read these files (skip missing):
 - `ob_recall(queries: [Q1, Q2], project: "{cwd}", limit: 5, trigger: "start")` — Q1/Q2 from top INBOX priorities (methodology, not file names)
 - If results < 3: `ob_recall(..., global: true, limit: 5, trigger: "start")`
 - Checkpoints: `ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3, trigger: "checkpoint")`
-- `trigger` marks these as session-start injection; mid-task recalls omit it (default "explicit")
+- `trigger` marks these as session-start injection; deliberate mid-task recalls pass `trigger: "explicit"` (omitted = recorded as "unspecified")
 
 ### A4. Write `.recalled-entries.json`
 
@@ -97,7 +97,7 @@ Skills: {relevant + pending proposal count}
 FLAGS: {verify items, or "none"}
 ```
 
-Greet Aaron by name. Present GREETING verbatim. If FLAGS non-empty, verify before continuing.
+Greet the user by name. Present GREETING verbatim. If FLAGS non-empty, verify before continuing.
 
 ---
 
@@ -108,13 +108,13 @@ Greet Aaron by name. Present GREETING verbatim. If FLAGS non-empty, verify befor
 3. Checkpoint recall as Part A
 4. Write `.recalled-entries.json` in cwd
 5. Read Skill-Candidates index + pending proposals
-6. Greet Aaron; present knowledge + skills + checkpoints
+6. Greet the user; present knowledge + skills + checkpoints
 
 ---
 
 ## Judgment calls
 
-- If Aaron jumps straight into work, adapt — read state in background.
+- If the user jumps straight into work, adapt — read state in background.
 - Greeting **≤5 lines** of prose beyond the GREETING block.
-- If Aaron says "skip", drop protocol and work.
+- If the user says "skip", drop protocol and work.
 - First session of month: optional maintenance (summarize aging sessions, `ob_score`, stale experience review) — see full SIA docs.

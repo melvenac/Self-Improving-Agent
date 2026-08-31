@@ -1,5 +1,22 @@
 # Changelog
 
+## [v0.19.0] - 2026-08-31
+
+### Fixed — `trigger` default is now `'unspecified'`, not `'explicit'` (Atlas audit finding on v0.18.0)
+- Defaulting to `'explicit'` fabricated a treatment: an omitted trigger became indistinguishable from a deliberate mid-task fetch — contamination in the exact direction the column exists to remove, and the dropped-count invariant at a fifth surface, sitting inside the fix meant to remove a confound. NULL was not reusable (it means "pre-column, unknowable"; a post-column silent caller is a different unknowable). New fourth value `'unspecified'`: the labeling gap becomes countable instead of masquerading as the pulled arm. Under-population with a known count beats contamination with an unknown count.
+- `ob_stats` gains a recall trigger census (`start` / `checkpoint` / `explicit` / `unspecified` / `(pre-column)`), so the corpus states its own labeling quality before anyone analyzes it. Command docs now instruct deliberate mid-task recalls to pass `trigger: "explicit"`.
+- The `[CHECKPOINT]` restoration stays labeled `'checkpoint'`, with the rationale corrected per the audit: the recording layer records what happened; whether checkpoint restoration pools with the pushed arm is an analysis decision made at query time, not baked into the label. Fixed while exactly one labeled row existed (itself correctly `'explicit'`).
+
+### Fixed — template de-personalization
+- **`project-template/` shipped its author's identity**: "Aaron" in ~20 places across the command files and "You are Clark" in the startup command — every consumer's agent would introduce itself as Clark and address its user as Aaron (found by Atlas's self-containment scan). All template prose now says "the user"; identity belongs to the unshipped layers (the user's global CLAUDE.md, a project's `.agents/AGENT.md`), which is where this repo's own Clark/Aaron greeting already lives, so nothing changes for this repo's sessions. Repo and live command mirrors updated identically to preserve parity. `melvenac` in GitHub clone URLs is a repo reference, not a leak, and stays.
+
+### Added
+- **New sync check `template-personal-names`** — walks `project-template/` and fails `/sync` on `\b(Aaron|Clark|melve)\b`. Same reasoning as mirror parity (Session 36's distribution-drift lesson): "remember not to write names into the template" is a prompt-level rule until a check enforces it.
+
+### Notes
+- Tests: 4 new check cases, 2 trigger cases updated. **673 tests / 49 files.**
+- The changed `trigger` default and enum are invisible to a running MCP server until reconnect (`/mcp reconnect open-brain`).
+
 ## [v0.18.0] - 2026-08-31
 
 ### Added

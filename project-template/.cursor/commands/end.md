@@ -122,5 +122,5 @@ Blockers:
 ## Judgment calls
 
 - Quick Q&A with nothing to capture is fine — still update project docs if `.agents/` exists.
-- If Aaron says "don't store that", respect immediately.
+- If the user says "don't store that", respect immediately.
 - Prefer fewer, high-quality experiences over noise.

@@ -580,9 +580,9 @@ export function getChunksForSession(db: Database.Database, uuid: string): Array<
 export type ShadowRating = 'helpful' | 'harmful' | 'neutral';
 
 /** How a recall reached the agent — see the recall_log DDL comment. */
-export type RecallTrigger = 'start' | 'checkpoint' | 'explicit';
+export type RecallTrigger = 'start' | 'checkpoint' | 'explicit' | 'unspecified';
 
-const RECALL_TRIGGERS: ReadonlySet<string> = new Set(['start', 'checkpoint', 'explicit']);
+const RECALL_TRIGGERS: ReadonlySet<string> = new Set(['start', 'checkpoint', 'explicit', 'unspecified']);
 
 /**
  * Record what a live recall actually returned, in rank order.
@@ -590,21 +590,26 @@ const RECALL_TRIGGERS: ReadonlySet<string> = new Set(['start', 'checkpoint', 'ex
  * `rank` is 1-based position as the agent saw it. Without it there is no way to
  * ask "did the variant put the useful entry higher than production did".
  *
- * `trigger` records the treatment. An unrecognized value is stored as
- * 'explicit', not dropped and not passed through: dropping would make the row
- * uninterpretable again (the exact defect this column closes), and passing
- * through would let free text erode a three-value vocabulary.
+ * `trigger` records the treatment. A caller that says nothing gets
+ * 'unspecified', never 'explicit': defaulting to a real treatment would file
+ * every forgotten label as a deliberate fetch — contamination in the exact
+ * direction the column exists to remove — while 'unspecified' keeps the
+ * labeling gap countable. NULL stays reserved for pre-column rows; reusing it
+ * here would merge two different unknowables. An unrecognized value is also
+ * stored as 'unspecified', not dropped and not passed through: dropping would
+ * make the row uninterpretable again, and passing through would let free text
+ * erode the vocabulary.
  */
 export function recordRecallEvent(
   db: Database.Database,
   sessionUuid: string,
   query: string,
   entryIds: number[],
-  trigger: RecallTrigger = 'explicit',
+  trigger: RecallTrigger = 'unspecified',
 ): void {
   if (!sessionUuid || entryIds.length === 0) return;
   const now = new Date().toISOString();
-  const safeTrigger = RECALL_TRIGGERS.has(trigger) ? trigger : 'explicit';
+  const safeTrigger = RECALL_TRIGGERS.has(trigger) ? trigger : 'unspecified';
   const stmt = db.prepare(`
     INSERT INTO recall_log (session_uuid, query, knowledge_id, rank, created_at, recall_trigger)
     VALUES (?, ?, ?, ?, ?, ?)

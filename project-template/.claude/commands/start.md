@@ -59,7 +59,7 @@ Read these files (skip any that don't exist):
 - If results < 3, broaden: ob_recall(queries: [Q1, Q2], global: true, limit: 5, trigger: "start")
 - Check for checkpoints: ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3, trigger: "checkpoint")
 
-Always pass `trigger` as shown — it records that these recalls are session-start injection, not a mid-task fetch. Mid-task recalls omit it (the default, "explicit", is correct there).
+Always pass `trigger` as shown — it records that these recalls are session-start injection. Deliberate mid-task recalls pass `trigger: "explicit"`; an omitted trigger is recorded as "unspecified" (a countable labeling gap, never assumed to be a deliberate fetch).
 
 ## 4. Write .recalled-entries.json
 Write to .recalled-entries.json in the project root (cwd), NOT ~/.claude/context-mode/.
@@ -89,7 +89,7 @@ Read both. From the inbox, grab the subject of the newest `## [YYYY-MM-DD ...] S
 
 ## 7. Create session log (if .agents/SESSIONS/ exists)
 Copy SESSION_TEMPLATE.md → Session_N.md (next number). Fill in date and session UUID.
-If no CLAUDE.md in project root, note it in FLAGS (don't create one — ask Aaron first).
+If no CLAUDE.md in project root, note it in FLAGS (don't create one — ask the user first).
 
 ## 8. Return ONLY this format (under 300 tokens):
 
@@ -113,14 +113,14 @@ FLAGS: {anything to verify, or "none"}
 
 ### A2. Relay the greeting
 
-When the background subagent completes, relay its GREETING section to Aaron. If FLAGS contains anything, verify it.
+When the background subagent completes, relay its GREETING section to the user. If FLAGS contains anything, verify it.
 
 That's it. No further main-agent processing needed — the subagent handled ob_set_session, .recalled-entries.json, session log creation, and drift reconciliation.
 
 If the subagent failed or timed out, fall back to a manual greeting:
-- Greet Aaron by name. You are Clark.
+- Greet the user by name. Use your configured agent name (from your global CLAUDE.md or .agents/AGENT.md) if one is set.
 - State the cwd and that startup automation failed.
-- Ask what he'd like to work on.
+- Ask what they'd like to work on.
 
 ---
 
@@ -129,7 +129,7 @@ If the subagent failed or timed out, fall back to a manual greeting:
 > For non-project sessions, dispatch a lightweight subagent for knowledge recall and session registration.
 
 ### B1. Greet
-Greet Aaron by name. You are Clark.
+Greet the user by name. Use your configured agent name (from your global CLAUDE.md or .agents/AGENT.md) if one is set.
 
 ### B2. Dispatch startup subagent
 
@@ -163,7 +163,7 @@ Read ~/Obsidian Vault v2/.skill-proposals-pending.json
 ## 5. Return ONLY:
 
 GREETING:
-Hey Aaron — {date}
+Hey {user} — {date}
 
 Knowledge:
 - {entry}: {one-line actionable rewrite}
@@ -182,15 +182,15 @@ Same as A2 — relay GREETING, check FLAGS, done. No further main-agent processi
 
 ## Present Summary
 
-The background subagent returns a formatted GREETING. Relay it verbatim to Aaron, prefixed with "Hey Aaron" and your name (Clark). Do NOT add extra commentary, tool calls, or processing. The greeting IS the output.
+The background subagent returns a formatted GREETING. Relay it verbatim to the user, prefixed with a personal greeting and your agent name if one is configured. Do NOT add extra commentary, tool calls, or processing. The greeting IS the output.
 
-If FLAGS contains items, verify them before presenting. If the subagent failed, greet Aaron manually and state that startup automation failed.
+If FLAGS contains items, verify them before presenting. If the subagent failed, greet the user manually and state that startup automation failed.
 
 ---
 
 ## Periodic maintenance (run monthly or when prompted)
 
-If it's the first session of the month, or Aaron asks for a health check:
+If it's the first session of the month, or the user asks for a health check:
 
 ### Session aging pipeline
 1. Call `ob_summarize()` to find unsummarized sessions
@@ -204,12 +204,12 @@ If it's the first session of the month, or Aaron asks for a health check:
 ### Stale experience pruning
 - Use `ob_list` to find knowledge entries with `recall_count = 0`
 - Flag any not recalled in 90+ days
-- Present the stale list to Aaron: "These experiences haven't been useful — prune them?"
-- Only delete with Aaron's approval
+- Present the stale list to the user: "These experiences haven't been useful — prune them?"
+- Only delete with the user's approval
 
 ### Skill candidate check
 - Read `~/Obsidian Vault v2/Skill-Candidates/SKILL-CANDIDATES.md`
-- If any cluster has 3+ experiences and hasn't been acted on, remind Aaron
+- If any cluster has 3+ experiences and hasn't been acted on, remind the user
 
 ### Protocol health score
 1. If in the Self-Improving-Agent project, run `node open-brain/build/cli.js sync --score`
@@ -221,7 +221,7 @@ If it's the first session of the month, or Aaron asks for a health check:
 
 ## Judgment calls
 
-- If Aaron jumps straight into a task, adapt. Read state in the background and surface anything relevant as you go. The protocol serves the work, not the other way around.
+- If the user jumps straight into a task, adapt. Read state in the background and surface anything relevant as you go. The protocol serves the work, not the other way around.
 - Not every session needs recalled knowledge. If nothing is relevant, say so — don't force it.
 - Keep the greeting and summary to **5 lines max**. Don't dump walls of text.
-- **If Aaron says "skip" or starts talking about work**, drop the protocol and get to work.
+- **If the user says "skip" or starts talking about work**, drop the protocol and get to work.

@@ -88,7 +88,7 @@ Write: .agents/SESSIONS/next-session.md
 A short scratchpad for the next `/start` to read. Include:
 - **Pick up here:** what was in progress or next in line
 - **Watch out for:** any gotchas or blockers the next session should know
-- **Open questions:** anything unresolved that needs Aaron's input
+- **Open questions:** anything unresolved that the user's input
 
 This file is overwritten each session — it's a relay baton, not a log.
 
@@ -220,7 +220,7 @@ No "Unresolved" or "What's next" section — that's SUMMARY.md's job. Use projec
 
 ### A14. Collect knowledge feedback (agent self-evaluation)
 
-If knowledge was recalled during `/start`, self-evaluate each entry — don't ask Aaron.
+If knowledge was recalled during `/start`, self-evaluate each entry — don't ask the user.
 
 1. Read `.recalled-entries.json` to get the recalled entry IDs and keys
 2. For each entry, self-assess:
@@ -232,7 +232,7 @@ If knowledge was recalled during `/start`, self-evaluate each entry — don't as
    - **harmful** — misled reasoning or caused wasted effort
    - **neutral** — recalled but not referenced or used
 4. Call `ob_feedback(entry_id, rating, referenced)` for each
-5. Report ratings to Aaron (he can override if needed)
+5. Report ratings to the user (they can override if needed)
 
 **`harmful` must be genuinely reachable, not just documented.** Across the first
 760 ratings not one was `harmful`, and that zero was read as health. It was not:
@@ -247,7 +247,7 @@ Alternatively, pass all judgments in one call via
 `success_rate` but does **not** run maturity promotion or apoptosis — use
 `ob_feedback` for any entry you expect to cross a lifecycle threshold.
 
-**Why self-evaluate:** Aaron can't see whether recalled knowledge helped the agent's internal reasoning. The agent that consumed it is the only one who knows.
+**Why self-evaluate:** The user can't see whether recalled knowledge helped the agent's internal reasoning. The agent that consumed it is the only one who knows.
 
 This feeds the maturity lifecycle (Progenitor → Proven → Mature) and apoptosis (auto-prune below 0.3 success rate after 5 ratings).
 
@@ -311,5 +311,5 @@ Session summary stored.
 
 - Not every session produces experiences beyond what hooks capture. A quick Q&A might have nothing extra — that's fine, just say "hooks will handle the session log."
 - Prefer fewer, high-quality supplemental experiences over many trivial ones.
-- If Aaron says "don't store that," respect it immediately.
+- If the user says "don't store that," respect it immediately.
 - **Never skip /end.** Even for short sessions. The next session's quality depends on it.

@@ -59,14 +59,17 @@ describe('shadow ground truth', () => {
     expect(rows).toEqual([{ recall_trigger: 'start' }, { recall_trigger: 'start' }]);
   });
 
-  it('defaults the trigger to explicit when the caller does not pass one', () => {
+  it('records a silent caller as unspecified, never as a deliberate fetch', () => {
+    // Defaulting to 'explicit' would file every forgotten label as a pulled
+    // recall — contamination in the exact direction the column exists to
+    // remove. 'unspecified' keeps the labeling gap countable instead.
     recordRecallEvent(db, SESSION, 'q', [1]);
-    expect(db.prepare('SELECT recall_trigger FROM recall_log').get()).toEqual({ recall_trigger: 'explicit' });
+    expect(db.prepare('SELECT recall_trigger FROM recall_log').get()).toEqual({ recall_trigger: 'unspecified' });
   });
 
-  it('coerces an unrecognized trigger to explicit rather than storing free text', () => {
+  it('coerces an unrecognized trigger to unspecified rather than storing free text', () => {
     recordRecallEvent(db, SESSION, 'q', [1], 'launch' as never);
-    expect(db.prepare('SELECT recall_trigger FROM recall_log').get()).toEqual({ recall_trigger: 'explicit' });
+    expect(db.prepare('SELECT recall_trigger FROM recall_log').get()).toEqual({ recall_trigger: 'unspecified' });
   });
 
   it('returns distinct queries in first-use order', () => {

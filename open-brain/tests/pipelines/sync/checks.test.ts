@@ -14,6 +14,7 @@ import {
   checkVaultIndexParity,
   checkVaultPathRefs,
   checkSkillIndex,
+  checkTemplatePersonalNames,
   checkRules,
   checkReadmeRefs,
   checkHookConfigs,
@@ -539,6 +540,35 @@ describe("validation checks", () => {
       const result = checkSkillIndex(vault);
       expect(result.severity).toBe("issue");
       expect(result.message).toContain("1 malformed skill row(s)");
+    });
+  });
+
+  describe("checkTemplatePersonalNames", () => {
+    const writeTemplateFile = (rel: string, content: string): void => {
+      const full = join(tempDir, "project-template", rel);
+      mkdirSync(dirname(full), { recursive: true });
+      writeFileSync(full, content);
+    };
+
+    it("passes on a template with no personal names", () => {
+      writeTemplateFile(".claude/commands/start.md", "Greet the user by name.\n");
+      expect(checkTemplatePersonalNames(tempDir).severity).toBe("pass");
+    });
+
+    it("fails when a template file ships a personal name", () => {
+      writeTemplateFile(".claude/commands/start.md", "Greet Aaron by name. You are Clark.\n");
+      const result = checkTemplatePersonalNames(tempDir);
+      expect(result.severity).toBe("issue");
+      expect(result.message).toContain("Aaron");
+    });
+
+    it("does not trip on the repo URL containing melvenac", () => {
+      writeTemplateFile("README.md", "git clone https://github.com/melvenac/Self-Improving-Agent.git\n");
+      expect(checkTemplatePersonalNames(tempDir).severity).toBe("pass");
+    });
+
+    it("warns when project-template/ is absent", () => {
+      expect(checkTemplatePersonalNames(tempDir).severity).toBe("warn");
     });
   });
 });
