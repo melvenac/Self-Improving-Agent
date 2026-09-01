@@ -16,6 +16,7 @@ import {
   checkSkillIndex,
   checkTemplatePersonalNames,
   checkSchemaVersion,
+  checkProjectDirsExist,
   checkRules,
   checkReadmeRefs,
   checkHookConfigs,
@@ -571,6 +572,49 @@ describe("validation checks", () => {
     it("catches lowercase names — the guard is case-insensitive", () => {
       writeTemplateFile(".claude/commands/start.md", "you are clark\n");
       expect(checkTemplatePersonalNames(tempDir).severity).toBe("issue");
+    });
+  });
+
+  describe("checkProjectDirsExist", () => {
+    const makeDb = (projectDirs: string[]): string => {
+      const dbPath = join(tempDir, `projdirs-${Math.random().toString(36).slice(2)}.db`);
+      const db = new DatabaseCtor(dbPath);
+      db.exec(`CREATE TABLE knowledge_index (id INTEGER PRIMARY KEY, project_dir TEXT)`);
+      const ins = db.prepare(`INSERT INTO knowledge_index (project_dir) VALUES (?)`);
+      for (const p of projectDirs) ins.run(p);
+      db.close();
+      return dbPath;
+    };
+
+    it("passes when the DB is absent", () => {
+      expect(checkProjectDirsExist(join(tempDir, "nope.db")).severity).toBe("pass");
+    });
+
+    it("passes when every project directory resolves", () => {
+      const real = tempDir.replace(/\\/g, "/");
+      expect(checkProjectDirsExist(makeDb([real])).severity).toBe("pass");
+    });
+
+    it("warns — never fails — on a directory that no longer exists", () => {
+      // Warn, not issue: an absent directory can be an archived project rather
+      // than a mistake, and blocking the commit gate over old history is the
+      // wrong trade.
+      const result = checkProjectDirsExist(makeDb(["c:/users/x/projects/renamed-away"]));
+      expect(result.severity).toBe("warn");
+      expect(result.message).toContain("renamed-away");
+      expect(result.message).toContain("relocate");
+    });
+
+    it("ignores global entries, which have no directory to check", () => {
+      const db = makeDb([]);
+      expect(checkProjectDirsExist(db).severity).toBe("pass");
+    });
+
+    it("reports the entry count so a large orphaned project is visible", () => {
+      const result = checkProjectDirsExist(
+        makeDb(["c:/users/x/projects/gone", "c:/users/x/projects/gone", "c:/users/x/projects/gone"]),
+      );
+      expect(result.message).toContain("(3)");
     });
   });
 

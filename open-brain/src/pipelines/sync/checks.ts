@@ -514,6 +514,61 @@ export function checkSchemaVersion(dbPath: string): CheckResult {
   };
 }
 
+/**
+ * Project directories recorded in the DB that no longer exist on disk.
+ *
+ * `project_dir` is an identity key derived from a path, so renaming a directory
+ * silently orphans everything keyed to the old name. Renaming
+ * `Tarrant County Makerspace` to `Tarrant-County-Makerspace` — spaces are awful
+ * to `cd` into — stranded 16 entries and 15 vault notes, and a project-scoped
+ * `ob_recall` from the real repo then returned about 60% of that project's
+ * memory while looking exactly like a complete result.
+ *
+ * Asks the filesystem rather than guessing a normalization rule: this catches
+ * any rename, move or deletion, where folding spaces to hyphens would corrupt
+ * every project whose directory legitimately contains a space.
+ *
+ * **Warn, never issue.** A directory can be legitimately absent — an archived
+ * project, a different machine, work that was never a repo — and only a person
+ * knows whether a missing path means "renamed to that one" or "gone". Failing
+ * the commit gate over history that is merely old would be the wrong trade.
+ */
+export function checkProjectDirsExist(dbPath: string): CheckResult {
+  if (!existsSync(dbPath)) {
+    return { name: "project-dirs", severity: "pass", message: "Knowledge DB absent — nothing to check" };
+  }
+
+  let rows: { p: string; c: number }[];
+  try {
+    const db = new Database(dbPath, { readonly: true, fileMustExist: true });
+    rows = db
+      .prepare(`
+        SELECT project_dir AS p, COUNT(*) AS c FROM knowledge_index
+        WHERE project_dir IS NOT NULL AND project_dir != '' AND project_dir LIKE '%/%'
+        GROUP BY project_dir
+      `)
+      .all() as { p: string; c: number }[];
+    db.close();
+  } catch (err) {
+    return { name: "project-dirs", severity: "warn", message: `Could not read knowledge DB: ${(err as Error).message}` };
+  }
+
+  const missing = rows.filter((r) => !existsSync(r.p)).sort((a, b) => b.c - a.c);
+  if (missing.length === 0) {
+    return { name: "project-dirs", severity: "pass", message: `All ${rows.length} project directories resolve on disk` };
+  }
+
+  const detail = missing.map((m) => `${m.p} (${m.c})`).join(", ");
+  return {
+    name: "project-dirs",
+    severity: "warn",
+    message:
+      `${missing.length} project director${missing.length === 1 ? "y" : "ies"} no longer exist${missing.length === 1 ? "s" : ""} — ` +
+      `entries are unreachable by project-scoped recall: ${detail}. ` +
+      `Fold a renamed one forward with: open-brain relocate --from "<old>" --to "<new>" --apply`,
+  };
+}
+
 export function checkTemplate(projectRoot: string): CheckResult {
   const templatePath = join(projectRoot, "project-template");
   if (!existsSync(templatePath)) {

@@ -280,6 +280,96 @@ if (command === "sync") {
     console.log(report.candidates.length === 0 ? "No candidates." : formatReport(report));
     console.log(`\nRead-only. Nothing was written.`);
   }
+} else if (command === "relocate") {
+  const { openV2Database } = await import("./db-v2.js");
+  const { planRelocate, applyRelocate, detectMissingProjects } = await import("./relocate.js");
+  const { obsidianVaultDir } = await import("./shared/paths.js");
+
+  const paths = resolvePaths(resolve("."));
+  const db = openV2Database(paths.knowledgeV2Db);
+  const vaultDir = obsidianVaultDir();
+
+  const flag = (name: string): string | undefined => {
+    const eq = args.find((a) => a.startsWith(`--${name}=`));
+    if (eq) return eq.slice(name.length + 3);
+    const idx = args.indexOf(`--${name}`);
+    return idx >= 0 ? args[idx + 1] : undefined;
+  };
+
+  const from = flag("from");
+  const to = flag("to");
+
+  if (!from || !to) {
+    // No arguments means "tell me what is wrong", not an error. The detector is
+    // the reason this command exists; the rename is the remedy.
+    const missing = detectMissingProjects(db);
+    console.log(`\nProject directories that no longer exist on disk: ${missing.length}\n`);
+    for (const m of missing) {
+      console.log(`  ${m.projectDir}`);
+      console.log(`    ${m.entries} knowledge entries, ${m.sessions} sessions — unreachable by project-scoped recall`);
+    }
+    if (missing.length > 0) {
+      console.log(`\nTo fold one onto its new location:`);
+      console.log(`  open-brain relocate --from "<old path>" --to "<new path>" [--apply]`);
+    }
+    console.log(`\nRead-only. Nothing was written.`);
+    process.exit(0);
+  }
+
+  const plan = planRelocate(db, vaultDir, from, to);
+  console.log(`\nRelocate  ${plan.fromCanonical}\n       →  ${plan.toCanonical}\n`);
+  if (!plan.targetExistsOnDisk) {
+    console.log(`  WARNING: the target directory does not exist on disk either.`);
+  }
+  console.log(`  knowledge entries : ${plan.knowledgeRows}`);
+  console.log(`  sessions          : ${plan.sessionRows}`);
+  console.log(`  vault notes to move: ${plan.noteMoves.length} → Experiences/${plan.toDisplay}/`);
+  if (plan.collisions.length > 0) {
+    console.log(`\n  ${plan.collisions.length} name collision(s) — these are NOT moved and NOT overwritten:`);
+    for (const c of plan.collisions) console.log(`    ${c.from}`);
+  }
+
+  if (!args.includes("--apply")) {
+    console.log(`\nDry run. Re-run with --apply to make these changes.`);
+    process.exit(0);
+  }
+
+  const result = applyRelocate(db, plan);
+  console.log(`\nApplied: ${result.knowledgeRows} entries, ${result.sessionRows} sessions, ${result.notesMoved} notes moved.`);
+  for (const f of result.noteFailures) console.log(`  FAILED to move ${f.path}: ${f.reason}`);
+  process.exit(result.noteFailures.length > 0 ? 1 : 0);
+} else if (command === "topics") {
+  const { openV2Database } = await import("./db-v2.js");
+  const { planTopics, writeTopics } = await import("./pipelines/topics/index.js");
+  const { obsidianVaultDir } = await import("./shared/paths.js");
+
+  const paths = resolvePaths(resolve("."));
+  const db = openV2Database(paths.knowledgeV2Db);
+  const vaultDir = obsidianVaultDir();
+
+  const minArg = args.find((a) => a.startsWith("--min="));
+  const min = minArg ? Number(minArg.slice("--min=".length)) : 5;
+  if (!Number.isFinite(min) || min < 1) {
+    console.error(`Invalid --min: expected a positive number, got "${minArg}".`);
+    process.exit(1);
+  }
+
+  const plans = planTopics(db, vaultDir, { min });
+  console.log(`\nTopics — ${plans.length} tags with >= ${min} entries\n`);
+  for (const p of plans.slice(0, 20)) console.log(`  ${String(p.links.length).padStart(4)}  ${p.tag}`);
+  if (plans.length > 20) console.log(`  ... +${plans.length - 20} more`);
+
+  if (!args.includes("--apply")) {
+    console.log(`\nDry run. Re-run with --apply to write Topics/ into the vault.`);
+    process.exit(0);
+  }
+
+  const result = writeTopics(vaultDir, plans);
+  console.log(`\nWrote ${result.written.length} topic note(s); removed ${result.removed.length} now below threshold.`);
+  if (result.skippedForeign.length > 0) {
+    console.log(`Left ${result.skippedForeign.length} hand-written note(s) in Topics/ untouched:`);
+    for (const f of result.skippedForeign.slice(0, 10)) console.log(`  ${f}`);
+  }
 } else {
   console.log("Usage: open-brain <command> [options]");
   console.log("");
@@ -288,5 +378,7 @@ if (command === "sync") {
   console.log("  start                                     Start a session");
   console.log("  end [--dry-run]                            End a session");
   console.log("  dream [--since=<days>] [--json]            Reconcile stored memory (read-only)");
+  console.log("  relocate [--from <dir> --to <dir>] [--apply]  Fold a renamed project's history forward");
+  console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   process.exit(1);
 }

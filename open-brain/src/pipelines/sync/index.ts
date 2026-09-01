@@ -17,6 +17,7 @@ import {
   checkSkillIndex,
   checkTemplatePersonalNames,
   checkSchemaVersion,
+  checkProjectDirsExist,
   checkTemplate,
   checkSpecProvenance,
   checkRules,
@@ -49,6 +50,7 @@ export function runSync(options: SyncOptions): SyncResult {
   checks.push(checkSkillIndex(paths.obsidianVault));
   checks.push(checkTemplatePersonalNames(options.projectRoot));
   checks.push(checkSchemaVersion(paths.knowledgeV2Db));
+  checks.push(checkProjectDirsExist(paths.knowledgeV2Db));
   checks.push(checkTemplate(options.projectRoot));
   checks.push(checkSpecProvenance(options.projectRoot));
   checks.push(checkRules(options.projectRoot));
