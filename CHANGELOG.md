@@ -1,5 +1,22 @@
 # Changelog
 
+## [v0.27.0] - 2026-09-01
+
+### Fixed
+- **Eight stored entries had tool-call scaffolding in their bodies; four had silently lost their tags to it.** Found by Ledger at close-out. The body ran past its own close and swallowed the next argument, so the `tags` array never arrived as a parameter — it ended up as text inside `content`. `ob_store` stored exactly what it was handed, so this was never a logic bug in the writer: **the call was malformed at emit and nothing validated it.** The scaffolding reached the DB `content` column as well as the vault file, which put it in FTS where it was searchable.
+- **Repaired in the only order that works: extract, write, verify, then strip.** The tags the author intended existed *only* inside the corrupted text — the row carried different ones. Stripping first would have destroyed them permanently. Restored: 457 → `methodology, measurement, open-brain, recall, observer-effect`; 458 → `…census, era-split`; 459 → `mcp, architecture, version-skew, concurrency, gotcha, tooling`; 462 → `testing, vitest, isolation, gotcha, tooling, configuration`. All 8 content columns and all 8 vault notes cleaned; FTS resynced through the existing `ki_au` trigger (phrase `"parameter name"` now matches 0).
+- **One failure mode, not two.** All eight carry the same marker; the only difference is whether the swallowed tail happened to include the tag array. The four with rich tags kept them by luck of where the body broke.
+- **The tag loss was directional, and it biased the rating signal upward.** In all four recoverable cases the tags that landed were *more generic* than intended, and three of four gained `self-improving-agent` — a token that appears in most session summaries for this repo. The auto-feedback fallback is `tags.some(tag => summaryLower.includes(tag))`, so generic tags match more often than `era-split` or `observer-effect` ever would. This defect did not merely lose metadata; it inflated those entries' helpful rate. **Mechanism only — n=4, far below the n=20 floor. Not a quantified claim and it must not enter the lifecycle rationale as a number.**
+
+### Added
+- **`shared/content-guard.ts` — `ob_store` and `ob_store_chunk` now refuse content carrying tool-call scaffolding.** Reject rather than strip: a body that ran past its close means the arguments after it went missing too, so silently repairing the text would store an entry that reads correctly and is quietly missing its tags — exactly the "operation that silently does not do what it says" shape this repo keeps hitting. The rejection names the marker, its offset, and says the tags did not arrive either, so the caller retries instead of working around it. Markers are narrow by design: a bare `</` matched 102 files on the first scan when the true count was 8.
+- **`ob_recalled` now routes through `resolveRecalledIds`** instead of reading its in-memory set. Two live failures: the set is empty after `/mcp reconnect` (so the tool reported "none recalled" in exactly the sessions that had reconnected — the same in-memory loss v0.21.0 fixed for the write paths), and `.recalled-entries.json` is per-**project**, not per-session. On 2026-09-01 two concurrent sessions in this repo shared one file and the second found the first's ids at close-out; rating from those would have attributed one session's recalls to another, for entries it never saw. `resolveRecalledIds` already compared the file's `session_id` and refused a mismatch — nothing was routed through it.
+- **`/end` step A14 no longer tells the agent to read `.recalled-entries.json`.** It calls `ob_recalled`. Structural prevention over instruction: the guard existed in code and the skill routed around it, so the fix is removing the raw-file read from the prompt, not adding a warning beside it.
+
+### Notes
+- Writing the guard reproduced the bug: the first attempt embedded the markers as literals and the closing tag terminated the write mid-file. They are assembled from parts in both the guard and its tests, with a comment saying why.
+- **749 tests / 54 files** (+11). Topics regenerated — four entries changed tags, which changes their topic membership.
+
 ## [v0.26.0] - 2026-09-01
 
 ### Added

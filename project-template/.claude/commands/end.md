@@ -222,7 +222,7 @@ No "Unresolved" or "What's next" section — that's SUMMARY.md's job. Use projec
 
 If knowledge was recalled during `/start`, self-evaluate each entry — don't ask the user.
 
-1. Read `.recalled-entries.json` to get the recalled entry IDs and keys
+1. Call `ob_recalled` to get the recalled entry IDs and keys. **Do not read `.recalled-entries.json` directly** — that file is per-*project*, not per-session, so with two sessions open in one repo it holds whichever session wrote last. A second session finding the first's ids there would rate entries it never saw, attributed to itself. `ob_recalled` compares the file's `session_id` to the running session and refuses a mismatch; reading the file raw does not.
 2. For each entry, self-assess:
    - Did I reference this in my reasoning or approach?
    - Did it change how I tackled a problem?

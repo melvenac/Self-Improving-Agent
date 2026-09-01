@@ -27,6 +27,7 @@ import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVault
 import { readActiveSession, activeSessionKey, currentIde, isStaleSession, sessionEntryAgeMs, resolveWriteSession } from "./shared/active-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { slugify, archiveVaultNote } from "./vault-writer.js";
+import { findToolCallScaffolding, scaffoldRejectionMessage } from "./shared/content-guard.js";
 import { evaluateLifecycle, apoptosisFlaggedExpr, formatApoptosisQueue, recallRankExpr, type ApoptosisCandidate, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
 import type { CategoryScore, ScoreResult } from "./pipelines/sync/types.js";
 
@@ -629,6 +630,14 @@ server.tool(
     ),
   },
   async ({ content, key, tags, source, scope, project_dir, kind }) => {
+    // Refuse a body that ran past its own close. Eight entries were stored this
+    // way on 2026-08-31; four of them lost their tags to the swallowed argument
+    // and nothing noticed for a month.
+    const scaffold = findToolCallScaffolding(content);
+    if (scaffold) {
+      return { content: [{ type: "text" as const, text: scaffoldRejectionMessage(scaffold) }], isError: true };
+    }
+
     const v2db = getV2Db();
     const effectiveProject = scope === "project" ? canonicalizeProjectDir(project_dir) : null;
     // From the raw dir, not `effectiveProject` — see projectDisplayName.
@@ -981,13 +990,38 @@ server.tool(
   "List knowledge entry IDs recalled this session. Used by session-end for auto-feedback.",
   {},
   async () => {
-    const ids = Array.from(_recalledKnowledgeIds);
+    const v2db = getV2Db();
+
+    // Routed through resolveRecalledIds rather than reading the in-memory set
+    // directly. Two reasons, both observed live:
+    //
+    // 1. The set is empty after `/mcp reconnect`, so this tool reported "none
+    //    recalled" in exactly the sessions that had reconnected — the same
+    //    in-memory-state loss v0.21.0 fixed for the write paths.
+    // 2. `.recalled-entries.json` is per-PROJECT, not per-session. On
+    //    2026-09-01 two concurrent sessions in this repo shared one file, and
+    //    the second read the first's ids at close-out. Rating from those would
+    //    have attributed one session's recalls to another for entries it never
+    //    saw. resolveRecalledIds compares the file's `session_id` and refuses a
+    //    mismatch; reading the file raw does not.
+    const session = writeSessionId();
+    const resolved = resolveRecalledIds({
+      db: v2db,
+      sessionId: session.id,
+      explicitIds: [],
+      filePaths: [resolve(process.cwd(), ".recalled-entries.json")],
+      readFile: (p) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
+    });
+
+    const ids = resolved.ids;
     if (ids.length === 0) {
-      return { content: [{ type: "text" as const, text: "No knowledge entries recalled this session." }] };
+      const why = resolved.rejected
+        ? `\nIgnored ${resolved.rejected.path}: ${resolved.rejected.reason}`
+        : session.id ? "" : `\nNo session id: ${session.reason ?? "unknown"}`;
+      return { content: [{ type: "text" as const, text: `No knowledge entries recalled this session.${why}` }] };
     }
 
-    const v2db = getV2Db();
-    const lines = [`Recalled ${ids.length} entries this session:`, ""];
+    const lines = [`Recalled ${ids.length} entries this session (source: ${resolved.origin}):`, ""];
     for (const id of ids) {
       const entry = v2db.prepare("SELECT id, key, maturity FROM knowledge_index WHERE id = ?").get(id) as { id: number; key: string | null; maturity: string } | undefined;
       if (entry) lines.push(`  [${entry.id}] ${entry.key || "(no key)"} — ${entry.maturity}`);
@@ -1012,6 +1046,12 @@ server.tool(
     phase: z.number().optional().describe("Phase number for multi-phase work"),
   },
   async ({ content, key, tags, category, project_dir, session_id, phase }) => {
+    // Same guard as ob_store: a chunk is stored the same way and leaks the same way.
+    const chunkScaffold = findToolCallScaffolding(content);
+    if (chunkScaffold) {
+      return { content: [{ type: "text" as const, text: scaffoldRejectionMessage(chunkScaffold) }], isError: true };
+    }
+
     const v2db = getV2Db();
     const now = new Date().toISOString();
     const date = now.slice(0, 10);
