@@ -6,6 +6,7 @@ import { flagReflectionClusters } from "./reflection.js";
 import { getSessionSummary } from "./session-summary.js";
 import { logInvocations } from "./invocation-logger.js";
 import { runSkillScanPipeline } from "./skill-scan-runner.js";
+import { planTopics, writeTopics, findOrphans } from "../topics/index.js";
 import { runShadowStage, type ShadowStageResult } from "../shadow/index.js";
 
 export type FeedbackRating = "helpful" | "harmful" | "neutral";
@@ -49,6 +50,7 @@ interface SessionEndV2Result {
   reflection: { flagged: number };
   invocations: { logged: number; skippedSessions: number };
   skillScan: { clusters: number; pendingProposals: number; approaching: number };
+  topics: { written: number; removed: number; orphans: number };
   shadow: ShadowStageResult;
 }
 
@@ -148,6 +150,24 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
         }
       : runShadowStage({ db, sessionUuid: sessionId, logPath: input.shadowLogPath });
 
+  // ── Stage 7: Topics ─────────────────────────────────────────────────────────
+  // Runs last, after this session's summary and any new entries exist, so the
+  // browsing layer is never a session behind. Regenerating every time is what
+  // keeps "no orphans" true going forward rather than true on the day someone
+  // last ran it by hand — v1's Maps of Content were correct in March and stale
+  // by April for exactly that reason.
+  let topics: { written: number; removed: number; orphans: number } = { written: 0, removed: 0, orphans: 0 };
+  if (!dryRun) {
+    try {
+      const result = writeTopics(vaultDir, planTopics(db, vaultDir));
+      topics = {
+        written: result.written.length,
+        removed: result.removed.length,
+        orphans: findOrphans(db, vaultDir).length,
+      };
+    } catch { /* a browsing affordance must never fail a session capture */ }
+  }
+
   return {
     summary: { written: summaryWritten, selfGenerated },
     feedback: { processed: ratings.length, ratings },
@@ -155,5 +175,6 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     invocations: invocationResult,
     skillScan: skillScanResult,
     shadow,
+    topics,
   };
 }

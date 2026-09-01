@@ -1,5 +1,21 @@
 # Changelog
 
+## [v0.25.0] - 2026-09-01
+
+### Added
+- **Summaries are reachable at last — and the no-orphan property is now structural, not incidental.** `writeSummary` gave each note only `sessionId`, `project` and `date`: no tags, no links, which is why all 158 summaries sat in the graph's outer ring. It now emits `tags: [<project-slug>, session-summary]`, and the topics generator reads `Summaries/` directly, grouping each under its project — a session belongs to the work it was part of far more than to any tag it happens to mention.
+- **Every note lands in a topic by construction.** Assignment falls back from qualifying subject tags → the note's project → `Topics/unsorted.md`, and **the fallbacks are deliberately not gated by `--min`**: a threshold that can strand a note would make "no orphans" a hope rather than a guarantee. `General` is treated as *not* a project, since it is `projectDisplayName`'s fallback for "no project at all" — `unsorted` is the same bucket, named honestly. New exported `findOrphans()` asserts the property rather than assuming it.
+- **Topics regenerate at session end (Stage 7).** Runs last, after this session's summary and any new entries exist, so the browsing layer is never a session behind, and reports `{ written, removed, orphans }`. This is what keeps the guarantee true going forward rather than true on the day someone last ran it by hand — v1's Maps of Content were correct in March and stale by April for exactly that reason. Wrapped in a catch: a browsing affordance must never fail a session capture.
+
+### Fixed
+- **Frontmatter parsing swallowed a line break.** `/^project:\s*(.+)$/m` — `\s` matches newlines, so a summary with an empty `project:` consumed the break and captured the *next* frontmatter line, filing that session under a topic literally named `date:-2026-09-01`. Now `[ \t]*` with `(.*)`, so an empty value is captured as empty rather than failing to match and falling through to the same wrong answer. Found by the test written for the guarantee, not by inspection.
+- **Four untagged entries tagged** — ids 457, 458, 459, 462, all from Atlas's 2026-08-31 session with `tags: []`. Written to **both** the `knowledge_index.tags` column and the vault note frontmatter, since they are two representations of one fact and this repo has been bitten by letting them drift. Tags reuse existing vocabulary rather than inventing new ones; a tag nothing else carries makes a Topic of one, which is not a cluster. `knowledge_index` now has **zero** untagged live entries.
+
+### Notes
+- **Applied to the live vault:** 152 topic notes (up from 128 — the extra are project fallbacks). Unlinked counts are now **Experiences 0 of 448, Summaries 0 of 158, Checkpoints 0 of 13**; `findOrphans` returns 0. Vault-wide, links went from 1,406 across 27 files to **3,319 across 179 files**. What remains visually unconnected is 3 `Research/` notes, `Archive/`, and the two `Skill-Candidates` reports — none of which are knowledge entries or summaries.
+- `SKILL-CANDIDATES.md` is still the single most-connected node, and that is inherent: it is a generated report listing every tag cluster of 3+, so it links 442 of 448 experiences. It no longer *dominates* the layout because it is no longer the only connected node. Filter it out of the graph view with `-path:Skill-Candidates` if it still reads as noise.
+- **730 tests / 52 files** (+8). Still no retrieval change: `ob_recall` reads FTS5 and skill-scan clusters by tag; nothing follows a wikilink.
+
 ## [v0.24.0] - 2026-09-01
 
 ### Fixed

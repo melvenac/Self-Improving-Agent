@@ -224,11 +224,21 @@ export function writeSummary(
 
   if (existsSync(filePath)) return null;
 
+  // `tags` carries the project slug and a type marker. Before this, a summary's
+  // only frontmatter was sessionId/project/date — no tags and no links — which
+  // is why all 158 of them sat outside the graph entirely. The topics generator
+  // groups summaries by `project` and reads `tags` when present; emitting both
+  // means a summary is reachable the moment it is written rather than whenever
+  // someone next thinks to build an index by hand.
+  const projectSlugTag = slugify(input.project);
+  const tags = [projectSlugTag, "session-summary"].filter(Boolean);
+
   const frontmatter = [
     "---",
     `sessionId: ${input.sessionId}`,
     `project: ${input.project}`,
     `date: ${input.date}`,
+    `tags: [${tags.join(", ")}]`,
     "---",
   ].join("\n");
 
