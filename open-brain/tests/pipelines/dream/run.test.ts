@@ -110,7 +110,10 @@ describe("migrateAddedColumns", () => {
     db.prepare(`INSERT INTO feedback_log (session_uuid, knowledge_id, rating, created_at) VALUES (?, ?, ?, ?)`)
       .run("s", 1, "helpful", NOW.toISOString());
 
-    expect(migrateAddedColumns(db)).toEqual(["feedback_log.rating_origin"]);
+    // `toContain`, not `toEqual`: this table gains columns over time (rating_method
+    // followed rating_origin), and an exact-list assertion turns every future
+    // additive migration into a failure in a test that is not about that column.
+    expect(migrateAddedColumns(db)).toContain("feedback_log.rating_origin");
 
     const row = db.prepare(`SELECT rating_origin FROM feedback_log`).get() as { rating_origin: unknown };
     // Pre-column ratings are unknowable, not silently declared anything.

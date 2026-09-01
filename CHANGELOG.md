@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.26.0] - 2026-09-01
+
+### Added
+- **`feedback_log.rating_method` — the measurement the remaining lifecycle parts are blocked on.** Records WHICH ARM produced each rating: `supplied` (an explicit per-entry judgment passed to `ob_end`), `heuristic` (`index-v2.ts`'s tag-substring fallback), `direct` (a deliberate `ob_feedback` call), `unspecified` (a caller that did not say). NULL stays pre-column and unknowable. This is distinct from `rating_origin`, which records where the rated *ids* came from — conflating them is why the corpus cannot answer the question that matters. A row reading `origin='explicit', rating='neutral'` is equally consistent with *"the agent judged this neutral"* and *"the fallback defaulted to neutral on ids from an explicit recall"*, and **33 of the 57 post-`rating_origin` rows are exactly that shape**. Those two readings demand opposite fixes: one is a rater problem, the other is plumbing. `ob_stats` now carries a `rating_method × verdict` cross-tab; crossed rather than summed because the load-bearing cell is `supplied × harmful`, the only combination that can ever make an apoptosis threshold satisfiable.
+
+### Notes
+- **The blocker is narrower and more structural than "the rater won't say harmful".** Two findings, both readable in the source rather than inferred:
+  - **`evaluateLifecycle` is called from exactly one place** — `server.ts:736`, inside `ob_feedback`. The session-end sweep bumps counters through `updateFeedbackV2` and **never evaluates the lifecycle at all**. So maturity promotion and apoptosis can only ever happen via a deliberate, per-entry `ob_feedback` call. That is a second and *independent* reason apoptosis has never fired, separate from `harmful` being unreachable on the heuristic path. Consistent with the data: the only 2 harmful ratings in the corpus are both pre-`rating_origin`, and one sits in a 2-rating session (`h=1, x=1`) — the signature of a deliberate `ob_feedback` pair, not a sweep.
+  - **`cli-session-end.ts` — the SessionEnd hook that runs automatically on every session — passes no `entryRatings`.** It is a Node script with no model in the loop, so it structurally *cannot* supply judgments. Only `ob_end` can, and only when the agent chooses to pass them.
+- **This is not a missing instruction.** `/end` already tells the agent that `harmful` must be genuinely reachable, gives the `ob_end(entry_ratings: {...})` call, and even documents that `ob_end` records counters but does not run promotion or apoptosis. The instruction is there and correctly worded; what was missing was any way to tell whether it was followed.
+- **Deliberately NOT shipped: wiring `evaluateLifecycle` into the sweep path.** That is the change that would make apoptosis start firing, and Ledger's calibration ruling still stands — no defensible threshold exists while `success_rate` is a citation rate. Connecting the pruner to a signal that cannot express harm would deterministically destroy knowledge on a metric that measures whether a tag got mentioned. The order is: measure (this release) → fix the signal → only then unify lifecycle evaluation.
+- Fixed a stale assertion in `dream/run.test.ts` that pinned `migrateAddedColumns` to an exact one-column list, turning every future additive migration into a failure in a test not about that column. Now `toContain`.
+- **738 tests / 53 files** (+8). Schema version 4 → 5, additive, bumped by construction from the migration list.
+
 ## [v0.25.0] - 2026-09-01
 
 ### Added

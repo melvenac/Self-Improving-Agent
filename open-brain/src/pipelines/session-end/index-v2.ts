@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import { join } from "path";
 import { writeSummary } from "../../vault-writer.js";
-import { updateFeedbackV2, recordFeedbackEvent, type RatingOrigin } from "../../db-v2.js";
+import { updateFeedbackV2, recordFeedbackEvent, type RatingOrigin, type RatingMethod } from "../../db-v2.js";
 import { flagReflectionClusters } from "./reflection.js";
 import { getSessionSummary } from "./session-summary.js";
 import { logInvocations } from "./invocation-logger.js";
@@ -109,13 +109,18 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     const matched = tags.some((tag) => summaryLower.includes(tag.toLowerCase()));
     const rating: FeedbackRating = supplied ?? (matched ? "helpful" : "neutral");
 
+    // Which arm produced this rating, recorded rather than inferred. Without it
+    // a `neutral` from a judging agent and a `neutral` from the fallback are one
+    // row shape, and those two demand opposite fixes.
+    const method: RatingMethod = supplied ? "supplied" : "heuristic";
+
     updateFeedbackV2(db, row.vault_path, rating);
     // This path bypasses ob_feedback, so log the event explicitly — otherwise
     // auto-feedback labels never reach the shadow harness and most sessions
     // would score as having no ground truth at all.
     if (sessionId) {
       try {
-        recordFeedbackEvent(db, sessionId, id, rating, input.recalledOrigin);
+        recordFeedbackEvent(db, sessionId, id, rating, input.recalledOrigin, method);
       } catch { /* non-critical */ }
     }
     ratings.push({ id, rating });

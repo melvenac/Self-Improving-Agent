@@ -743,7 +743,7 @@ server.tool(
       try {
         // A single ob_feedback call is its own provenance: the caller named the
         // id directly rather than rating a resolved recall list.
-        recordFeedbackEvent(v2db, feedbackSession.id, id, rating as Rating, "direct");
+        recordFeedbackEvent(v2db, feedbackSession.id, id, rating as Rating, "direct", "direct");
       } catch { /* non-critical */ }
     }
 
@@ -923,6 +923,17 @@ server.tool(
       "SELECT COALESCE(rating_origin, '(pre-column)') as o, COUNT(*) as count FROM feedback_log GROUP BY o ORDER BY count DESC"
     ).all() as Array<{ o: string; count: number }>;
 
+    // Which ARM produced each rating, crossed with the verdict. This is the
+    // census the lifecycle work is blocked on: `heuristic` rows come from a
+    // tag-substring topic-mention detector that cannot emit `harmful`, so a
+    // `helpful` there means "mentioned", not "worked". Crossed rather than
+    // summed because the interesting cell is `supplied` x `harmful` — the only
+    // combination that can ever make an apoptosis threshold satisfiable.
+    const methodCensus = v2db.prepare(
+      `SELECT COALESCE(rating_method, '(pre-column)') as m, rating as r, COUNT(*) as count
+       FROM feedback_log GROUP BY m, r ORDER BY m, r`
+    ).all() as Array<{ m: string; r: string; count: number }>;
+
     const lines = [
       `## Knowledge Stats`,
       `Total entries: ${knowledge.c}`,
@@ -937,6 +948,10 @@ server.tool(
       ``,
       `Rating origin census:`,
       ...originCensus.map(r => `  ${r.o}: ${r.count}`),
+      ``,
+      `Rating method x verdict:`,
+      ...methodCensus.map(r => `  ${r.m} / ${r.r}: ${r.count}`),
+      `  (heuristic cannot produce 'harmful' — a helpful there means "tag mentioned in summary")`,
       ``,
       // Unconditional, including at zero — a line that only appears when
       // something went wrong reads identically to a healthy silence.

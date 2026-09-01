@@ -120,7 +120,8 @@ export function initSchemaV2(db: Database.Database): void {
       knowledge_id INTEGER NOT NULL,
       rating TEXT NOT NULL CHECK(rating IN ('helpful', 'harmful', 'neutral')),
       created_at TEXT NOT NULL,
-      rating_origin TEXT DEFAULT NULL
+      rating_origin TEXT DEFAULT NULL,
+      rating_method TEXT DEFAULT NULL
     );
 
     CREATE INDEX IF NOT EXISTS idx_recall_log_session ON recall_log(session_uuid);
@@ -187,6 +188,7 @@ const ADDED_COLUMNS: AddedColumn[] = [
   { table: 'knowledge_index', column: 'fact_kind', ddl: 'TEXT DEFAULT NULL' },
   { table: 'recall_log', column: 'recall_trigger', ddl: 'TEXT DEFAULT NULL' },
   { table: 'feedback_log', column: 'rating_origin', ddl: 'TEXT DEFAULT NULL' },
+  { table: 'feedback_log', column: 'rating_method', ddl: 'TEXT DEFAULT NULL' },
 ];
 
 /**
@@ -740,6 +742,35 @@ export type RatingOrigin = 'explicit' | 'recall-log' | 'file' | 'direct' | 'unsp
 const RATING_ORIGINS: ReadonlySet<string> = new Set(['explicit', 'recall-log', 'file', 'direct', 'unspecified']);
 
 /**
+ * WHICH ARM produced a rating — as distinct from `rating_origin`, which records
+ * where the rated *ids* came from.
+ *
+ * Those are different questions and conflating them is why the corpus cannot
+ * currently answer the one that matters. A row reading
+ * `origin='explicit', rating='neutral'` is equally consistent with "the agent
+ * judged this entry neutral" and "the tag-substring fallback defaulted to
+ * neutral on ids that happened to come from an explicit recall" — and 33 of the
+ * 57 post-`rating_origin` rows are exactly that shape. Those two readings
+ * demand opposite fixes: the first is a rater problem, the second is plumbing.
+ *
+ * - `supplied`  — an explicit per-entry judgment the agent passed to `ob_end`.
+ *                 The only sweep-path input that can carry `harmful`.
+ * - `heuristic` — `index-v2.ts`'s fallback: does a tag substring appear in the
+ *                 session summary. A topic-mention detector, structurally
+ *                 unable to emit `harmful`, so a `helpful` from here means
+ *                 "mentioned", not "worked".
+ * - `direct`    — a deliberate `ob_feedback` call. The only path that also runs
+ *                 `evaluateLifecycle`, which is why apoptosis has never fired.
+ * - `unspecified` — a caller that did not say. Countable, never assumed to be a
+ *                 judgment; same rule as `recall_trigger`'s default.
+ *
+ * NULL means pre-column and is unknowable, not `unspecified`.
+ */
+export type RatingMethod = 'supplied' | 'heuristic' | 'direct' | 'unspecified';
+
+const RATING_METHODS: ReadonlySet<string> = new Set(['supplied', 'heuristic', 'direct', 'unspecified']);
+
+/**
  * Record a rating as an event, alongside the aggregate counters.
  *
  * `origin` follows the recall_trigger rules exactly: a silent caller gets
@@ -753,13 +784,15 @@ export function recordFeedbackEvent(
   knowledgeId: number,
   rating: ShadowRating,
   origin: RatingOrigin = 'unspecified',
+  method: RatingMethod = 'unspecified',
 ): void {
   if (!sessionUuid) return;
   const safeOrigin = RATING_ORIGINS.has(origin) ? origin : 'unspecified';
+  const safeMethod = RATING_METHODS.has(method) ? method : 'unspecified';
   db.prepare(`
-    INSERT INTO feedback_log (session_uuid, knowledge_id, rating, created_at, rating_origin)
-    VALUES (?, ?, ?, ?, ?)
-  `).run(sessionUuid, knowledgeId, rating, new Date().toISOString(), safeOrigin);
+    INSERT INTO feedback_log (session_uuid, knowledge_id, rating, created_at, rating_origin, rating_method)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(sessionUuid, knowledgeId, rating, new Date().toISOString(), safeOrigin, safeMethod);
 }
 
 /** Distinct queries this session issued, in first-use order. */
