@@ -24,6 +24,20 @@ export const LIFECYCLE_CONFIG = {
   failureBoost: 1.3,
 } as const;
 
+/**
+ * `archived_into` value for an entry retired with no successor.
+ *
+ * The column was designed for merges — "this entry was folded into entry N" —
+ * so every live-row filter reads `archived_into IS NULL` and the dream pipeline
+ * treats a non-NULL value as "already resolved". Apoptosis has no successor to
+ * point at, but it still needs a non-NULL value or the row stays live.
+ *
+ * Zero is not a valid `knowledge_index.id` (AUTOINCREMENT starts at 1), so it
+ * cannot collide with a real merge target, and it satisfies every existing
+ * `IS NULL` filter without touching one of them.
+ */
+export const ARCHIVED_NO_SUCCESSOR = 0;
+
 export type Maturity = "progenitor" | "proven" | "mature";
 export type Rating = "helpful" | "harmful" | "neutral";
 
@@ -154,12 +168,38 @@ export type RankConfig = Record<
  * matching `nonNeutral` there.
  */
 export function apoptosisFlaggedExpr(alias = "k"): string {
-  const c = LIFECYCLE_CONFIG;
+  return `${alias}.source = 'manual' AND ${lowSuccessExpr(alias)}`;
+}
+
+/**
+ * SQL predicate for "has been judged enough times to be judged at all".
+ *
+ * Counts `helpful + harmful` and excludes neutral, matching `nonNeutral` in
+ * `evaluateLifecycle`. Extracted because it was written out twice with two
+ * different arithmetics: `db-v2.ts` gated on `helpful + harmful + neutral`,
+ * so `ob_stats` reported on a population 2.4x the one the pruner would act on
+ * (56 entries vs 23 in the 2026-09-01 snapshot). Both surfaces returned zero,
+ * which is why the disagreement went unseen — and both zeros were the
+ * structurally-unreachable kind, not the healthy kind.
+ */
+export function apoptosisGateExpr(alias = "k"): string {
+  return `(${alias}.helpful + ${alias}.harmful) >= ${LIFECYCLE_CONFIG.apoptosisMinActivations}`;
+}
+
+/**
+ * SQL predicate for "rated badly enough to be an apoptosis candidate",
+ * independent of `source`.
+ *
+ * The review queue adds `source = 'manual'` on top of this; the health stats
+ * count every entry regardless of source. Those are legitimately different
+ * questions, but they must not disagree about the gate arithmetic or the
+ * threshold, which is why both are built from here.
+ */
+export function lowSuccessExpr(alias = "k"): string {
   return (
-    `${alias}.source = 'manual' ` +
-    `AND ${alias}.success_rate IS NOT NULL ` +
-    `AND ${alias}.success_rate < ${c.apoptosisThreshold} ` +
-    `AND (${alias}.helpful + ${alias}.harmful) >= ${c.apoptosisMinActivations}`
+    `${alias}.success_rate IS NOT NULL ` +
+    `AND ${alias}.success_rate < ${LIFECYCLE_CONFIG.apoptosisThreshold} ` +
+    `AND ${apoptosisGateExpr(alias)}`
   );
 }
 

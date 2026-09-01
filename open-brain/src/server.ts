@@ -18,7 +18,7 @@ import {
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { sessionStart } from "./pipelines/session-start/index.js";
-import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, checkSchemaSkew, type SchemaSkew } from "./db-v2.js";
+import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
@@ -753,9 +753,25 @@ server.tool(
       let archivedTo: string | null = null;
       try {
         archivedTo = archiveVaultNote(v2VaultDir(), entry.vault_path);
-      } catch { /* non-critical — still drop the row */ }
+      } catch { /* non-critical — still archive the row */ }
 
-      v2db.prepare("DELETE FROM knowledge_index WHERE id = ?").run(id);
+      // Soft-delete. The row used to be hard-DELETEd here, which was the more
+      // destructive half of the same decision the note-archiving above already
+      // rejected: `feedback_log` and `recall_log` carry no foreign key, so the
+      // rating history that justified the prune survived as rows pointing at an
+      // id that no longer existed — unreachable, and indistinguishable from
+      // never having been rated. Retiring the row keeps the verdict auditable
+      // and makes the prune reversible by clearing one column.
+      //
+      // The counters are written in the same statement, so the archived row
+      // records the rating that crossed the threshold rather than the state
+      // just before it.
+      archiveKnowledgeEntry(v2db, id, {
+        rating: rating as Rating,
+        successRate: result.newSuccessRate,
+        maturity: result.newMaturity,
+      });
+
       try {
         const logPath = join(v2VaultDir(), ".vault-writer.log");
         appendFileSync(logPath, `[${new Date().toISOString()}] APOPTOSIS: id=${id} key="${entry.key || ""}" ${result.transitionMessage}${archivedTo ? ` archived=${archivedTo}` : ""}\n`);
@@ -763,8 +779,9 @@ server.tool(
       return {
         content: [{
           type: "text" as const,
-          text: `${result.transitionMessage}\nEntry ${id} (${entry.key || "no key"}) has been removed.`
-            + (archivedTo ? `\nIts note was moved to Archive/ — nothing was destroyed.` : ""),
+          text: `${result.transitionMessage}\nEntry ${id} (${entry.key || "no key"}) has been archived — it no longer appears in recall, lists, or stats.`
+            + (archivedTo ? `\nIts note was moved to Archive/.` : "")
+            + `\nNothing was destroyed: the row and its rating history remain. To restore it, clear archived_into; to remove it for good, use ob_forget.`,
         }],
       };
     }

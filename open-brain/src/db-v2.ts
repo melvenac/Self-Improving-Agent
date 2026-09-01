@@ -2,6 +2,7 @@ import Database from 'better-sqlite3';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { canonicalizeProjectDir } from './shared/paths.js';
+import { lowSuccessExpr, ARCHIVED_NO_SUCCESSOR, type Maturity, type Rating } from './lifecycle.js';
 
 export function migrateProjectDirToCanonical(db: Database.Database): number {
   const rows = db.prepare(
@@ -418,6 +419,43 @@ export function updateFeedbackV2(db: Database.Database, vaultPath: string, ratin
   `).run(now, vaultPath);
 }
 
+/**
+ * Retire an entry by apoptosis without destroying it.
+ *
+ * Replaces the `DELETE FROM knowledge_index` this path used to run. The delete
+ * was unsafe for a reason the schema makes structural: neither `feedback_log`
+ * nor `recall_log` declares a foreign key, so removing the row left their rows
+ * pointing at an id that no longer resolved. The evidence that justified the
+ * prune became unreadable at the moment the prune acted on it, and an entry
+ * pruned for being bad became indistinguishable from one never rated at all.
+ *
+ * Writing `archived_into` instead drops the entry out of every live view — all
+ * of which already filter `archived_into IS NULL` — while keeping the row, its
+ * counters, and the joins into both logs intact. Reversible by clearing one
+ * column; `ob_forget` remains the way to remove an entry for good.
+ *
+ * The final rating is applied in the same statement, so the archived row shows
+ * the verdict that retired it rather than the state just before it. Same rule
+ * as `updateFeedbackV2`: a counter and everything derived from it move together
+ * or the derived value silently describes a state that never existed.
+ */
+export function archiveKnowledgeEntry(
+  db: Database.Database,
+  id: number,
+  final: { rating: Rating; successRate: number | null; maturity: Maturity },
+): number {
+  const col = final.rating === 'helpful' ? 'helpful' : final.rating === 'harmful' ? 'harmful' : 'neutral';
+  return db.prepare(`
+    UPDATE knowledge_index
+    SET ${col} = ${col} + 1,
+        success_rate = ?,
+        maturity = ?,
+        archived_into = ?,
+        updated_at = datetime('now')
+    WHERE id = ?
+  `).run(final.successRate, final.maturity, ARCHIVED_NO_SUCCESSOR, id).changes;
+}
+
 // --- Stats for scorer ---
 
 export interface KnowledgeQualityStats {
@@ -486,12 +524,14 @@ export function getStalenessStats(db: Database.Database): StalenessStats {
       AND recall_count = 0
       AND created_at < datetime('now', '-60 days')
   `).get() as { c: number };
+  // Gate and threshold come from lifecycle.ts, not from literals here. This
+  // query used `helpful + harmful + neutral >= 5` and a hardcoded 0.3 while the
+  // pruner used `helpful + harmful` and LIFECYCLE_CONFIG — so the health stat
+  // and the thing it claims to describe were counting different populations.
   const lowSuccess = db.prepare(`
     SELECT COUNT(*) AS c FROM knowledge_index
     WHERE archived_into IS NULL
-      AND success_rate IS NOT NULL
-      AND success_rate < 0.3
-      AND (helpful + harmful + neutral) >= 5
+      AND ${lowSuccessExpr('knowledge_index')}
   `).get() as { c: number };
 
   return {
