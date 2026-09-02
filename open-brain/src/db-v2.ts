@@ -339,6 +339,28 @@ export interface ClusterCandidate {
   count: number;
 }
 
+/**
+ * Inserts a knowledge row, or updates the one already holding this `key`.
+ *
+ * A same-key store is an UPDATE, not a replace. `INSERT OR REPLACE` deleted
+ * the conflicting row and inserted a fresh one, which reset maturity, all
+ * three counters, `success_rate`, `recall_count`, `last_recalled_at` and
+ * `created_at`, took a new AUTOINCREMENT id, and silently orphaned every
+ * `feedback_log` / `recall_log` row pointing at the old one (neither table
+ * has a foreign key). Entry 416 carried one of only two `harmful` ratings in
+ * the corpus and had no canonical note, so a single re-store would have
+ * destroyed half of all negative signal ever recorded.
+ *
+ * The caller owns content, tags, vault_path, source, project_dir, fact_kind
+ * and updated_at; the lifecycle owns everything else. The lifecycle inputs
+ * (`maturity`, `helpful`, ...) therefore seed a NEW row only and are ignored
+ * on conflict. `project_dir` and `fact_kind` overwrite only when supplied, so
+ * a re-store that omits them cannot unclassify an entry.
+ *
+ * A `vault_path` collision with a DIFFERENT key is left to raise. The old
+ * behaviour silently deleted the other row; a thrown UNIQUE error is the
+ * honest outcome for two keys claiming one file.
+ */
 export function indexKnowledge(db: Database.Database, input: KnowledgeIndexInput): void {
   const now = new Date().toISOString();
   const maturity = input.maturity ?? 'progenitor';
@@ -348,16 +370,25 @@ export function indexKnowledge(db: Database.Database, input: KnowledgeIndexInput
   const successRate = input.successRate ?? null;
 
   db.prepare(`
-    INSERT OR REPLACE INTO knowledge_index
+    INSERT INTO knowledge_index
       (vault_path, key, content, tags, source, project_dir, maturity, helpful, harmful, neutral, success_rate, recall_count, last_recalled_at, fact_kind, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NULL, ?, ?, ?)
+    ON CONFLICT(key) DO UPDATE SET
+      vault_path  = excluded.vault_path,
+      content     = excluded.content,
+      tags        = excluded.tags,
+      source      = excluded.source,
+      project_dir = COALESCE(excluded.project_dir, project_dir),
+      fact_kind   = COALESCE(excluded.fact_kind, fact_kind),
+      updated_at  = excluded.updated_at
   `).run(
     input.vaultPath, input.key, input.content, input.tags,
     input.source ?? 'manual', input.projectDir ?? null,
     maturity, helpful, harmful, neutral, successRate,
     input.factKind ?? null, now, now
   );
-  // FTS is populated automatically via INSERT trigger (content-backed)
+  // FTS follows via the content-backed triggers: ki_ai on insert, ki_au on
+  // the conflict-update path (delete the old rowid's text, insert the new).
 }
 
 export function searchFts(db: Database.Database, query: string): FtsResult[] {

@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.27.1] - 2026-09-01
+
+### Fixed
+- **A same-key store no longer wipes an entry's lifecycle state.** `indexKnowledge` used `INSERT OR REPLACE`, which deletes the conflicting row and inserts a fresh one: maturity, all three counters, `success_rate`, `recall_count`, `last_recalled_at` and `created_at` reset, the row took a new AUTOINCREMENT id, and every `feedback_log` / `recall_log` row pointing at the old id was orphaned (neither table has a foreign key). It is now a real upsert, `ON CONFLICT(key) DO UPDATE`, touching only the fields the caller owns: content, tags, `vault_path`, `source`, `updated_at`, and `project_dir` / `fact_kind` when supplied. Lifecycle inputs seed a new row only and are ignored on conflict.
+- **Why it was reachable.** The store pipeline's dedup branch fires only when the canonical `Experiences/{project}/{key}.md` file exists. A row whose note lives anywhere else (`Checkpoints/`, `Summaries/`, `Specs/`) skipped the guard and collided on the key. Found by Ledger; 14 rows carried ratings or recalls in that state. Lead case was entry 416, which holds one of only two `harmful` ratings in the corpus. Verified on a copy of the live DB: a simulated re-store of all 14 keeps every id and counter, `MAX(id)` stays at 476, and all 32 feedback and 77 recall joins survive.
+- **Two behaviours worth knowing.** A `vault_path` collision with a *different* key now raises a UNIQUE error instead of silently deleting the other row. And SQLite reserves the candidate rowid before a conflict resolves, so `sqlite_sequence` still advances on a same-key store even though no row is inserted; an id gap therefore means "re-store or delete" and cannot be read as a deletion on its own.
+
 ## [v0.27.0] - 2026-09-01
 
 ### Fixed
