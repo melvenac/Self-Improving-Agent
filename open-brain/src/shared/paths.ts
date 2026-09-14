@@ -1,4 +1,5 @@
 import { resolve, join } from "node:path";
+import { existsSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
 
 export function canonicalizeProjectDir(p?: string | null): string | null {
@@ -133,4 +134,52 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {
       || join(home, ".claude", "open-brain", "active-session.json"),
     projectTemplate: join(projectRoot, "project-template"),
   };
+}
+
+/**
+ * Does a project directory exist, given its CANONICAL form?
+ *
+ * `canonicalizeProjectDir` lowercases drive-letter paths so two spellings of
+ * one directory compare equal. That form is an identity key — for comparison,
+ * never for filesystem access (path-normalization §10). Handing it to
+ * `existsSync` works on NTFS by accident and fails on ext4/APFS, where a
+ * lowercased path is a different path; master's CI was red on exactly that
+ * for two weeks. So: try the path as given, then walk it component by
+ * component from its root, matching each segment against the parent's
+ * directory listing case-insensitively. Resolves on both kinds of filesystem.
+ */
+export function projectDirExists(canonicalPath: string): boolean {
+  if (!canonicalPath) return false;
+  if (existsSync(canonicalPath)) return true;
+  return existsCaseInsensitive(canonicalPath);
+}
+
+/** The component walk on its own, so tests can exercise it on any filesystem. */
+export function existsCaseInsensitive(path: string): boolean {
+  const normalized = path.replace(/\\/g, "/");
+  const parts = normalized.split("/").filter((p) => p.length > 0);
+  if (parts.length === 0) return false;
+
+  let current: string;
+  if (/^[a-zA-Z]:$/.test(parts[0])) {
+    current = parts.shift()! + "/";
+  } else if (normalized.startsWith("/")) {
+    current = "/";
+  } else {
+    current = ".";
+  }
+
+  for (const part of parts) {
+    let entries: string[];
+    try {
+      entries = readdirSync(current);
+    } catch {
+      return false;
+    }
+    const want = part.toLowerCase();
+    const match = entries.find((e) => e === part) ?? entries.find((e) => e.toLowerCase() === want);
+    if (match === undefined) return false;
+    current = current.endsWith("/") ? current + match : `${current}/${match}`;
+  }
+  return existsSync(current);
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.29.1] - 2026-09-14
+
+### Fixed
+- **The project-directory existence check no longer trusts the canonical (lowercased) path on a case-sensitive filesystem.** `project_dir` is an identity key: `canonicalizeProjectDir` lowercases drive-letter paths so two spellings of one directory compare equal. `detectMissingProjects` (behind the `project-dirs` sync check and `open-brain relocate`) and `applyRelocate`'s source check then handed that canonical form to `existsSync`. On NTFS that works by accident; on ext4/APFS a lowercased path is a different path, so a directory that exists is reported missing. The repo's own rule (path-normalization §10, v0.14.2) is that the canonical form is for comparison, never for filesystem access. New `projectDirExists` in `shared/paths.ts`: `existsSync` first, then a component-by-component walk from the root matching each segment against `readdirSync` of its parent case-insensitively — so the lowercased form resolves on NTFS and ext4 alike. `canonicalizeProjectDir` is unchanged. Fixed once at the existence check; both callers go through it.
+- **Why it was invisible for two weeks.** CI on master has been red on every run since 2026-09-01 — six of six (81b6af2, e9f7af1, 1e190c9, b2556d6, d2ba131, 62a3a00), all on the same test, `relocate > detectMissingProjects > does not report a directory that does exist`, which seeds a lowercased temp path and passes only on a case-insensitive filesystem. Local runs are on Windows, so the gate was red and nobody read it. That test is deliberately unchanged: the Linux runner is the proof it needed. A `/sync` check that prints master's last CI conclusion is filed for Loop 4.
+
 ## [v0.29.0] - 2026-09-14
 
 ### Fixed

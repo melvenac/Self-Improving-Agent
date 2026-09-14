@@ -1,7 +1,7 @@
 import type Database from 'better-sqlite3';
 import { existsSync, mkdirSync, renameSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
-import { canonicalizeProjectDir, projectDisplayName } from './shared/paths.js';
+import { canonicalizeProjectDir, projectDisplayName, projectDirExists } from './shared/paths.js';
 
 /**
  * Fold a project's stored history onto a renamed directory.
@@ -118,7 +118,7 @@ export function applyRelocate(
   const moved: NoteMove[] = [];
 
   for (const move of plan.noteMoves) {
-    if (!existsSync(move.from)) {
+    if (!projectDirExists(move.from)) {
       // The row points at a note that is already gone. Still relocate the row —
       // a dangling path under the new name is no worse than under the old, and
       // dropping it here would silently strip the entry from its project.
@@ -181,7 +181,8 @@ export function detectMissingProjects(db: Database.Database): MissingProject[] {
 
   const out: MissingProject[] = [];
   for (const row of rows) {
-    if (existsSync(row.p)) continue;
+    // Canonical (possibly lowercased) path: never hand it to existsSync alone.
+    if (projectDirExists(row.p)) continue;
     const s = (db
       .prepare(`SELECT COUNT(*) AS c FROM sessions WHERE project_dir = ?`)
       .get(row.p) as { c: number }).c;
