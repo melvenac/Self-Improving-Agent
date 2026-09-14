@@ -1,4 +1,9 @@
-export type CheckSeverity = "pass" | "warn" | "issue" | "fixed";
+/**
+ * "skip" is a check that could not run for a stated reason and says so. It is
+ * printed and counted, never folded into "pass": a skipped check that looks
+ * like a pass is the silent-zero shape this repo keeps finding.
+ */
+export type CheckSeverity = "pass" | "warn" | "issue" | "fixed" | "skip";
 
 export interface CheckResult {
   name: string;
@@ -22,6 +27,7 @@ export interface SyncResult {
   issues: CheckResult[];
   warnings: CheckResult[];
   passed: CheckResult[];
+  skipped: CheckResult[];
 }
 
 export interface CategoryScore {

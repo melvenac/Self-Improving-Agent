@@ -5,6 +5,7 @@ import Database from "better-sqlite3";
 import type { CheckResult } from "./types.js";
 import { parseSkillIndexRows } from "../../shared/skill-index.js";
 import { SCHEMA_VERSION } from "../../db-v2.js";
+import { parseState } from "../../shared/state-schema.js";
 
 /**
  * Slash-command files that are deliberately NOT mirrored, with the reason.
@@ -744,4 +745,39 @@ export function checkRules(projectRoot: string): CheckResult {
     return { name: "rules", severity: "warn", message: "RULES.md not found" };
   }
   return { name: "rules", severity: "pass", message: "RULES.md exists" };
+}
+
+/**
+ * `.agents/state.json` (Loop 2, read side). Absent is a SKIP with the reason
+ * printed, not a pass: nothing writes the file yet, so most projects will not
+ * have one, and a pass would claim a validation that never ran. Present must
+ * parse against the strict schema, and its `project.version` must equal
+ * package.json — the same single-source rule the README and PRD checks enforce.
+ */
+export function checkStateSchema(version: string, projectRoot: string): CheckResult {
+  const statePath = join(projectRoot, ".agents", "state.json");
+  if (!existsSync(statePath)) {
+    return {
+      name: "state-schema",
+      severity: "skip",
+      message: "skipped — no .agents/state.json (read side only in v0.29.0; no writer exists yet)",
+    };
+  }
+  const parsed = parseState(readFileSync(statePath, "utf-8"));
+  if (!parsed.ok) {
+    return { name: "state-schema", severity: "issue", message: `.agents/state.json invalid at ${parsed.error}` };
+  }
+  const fileVersion = parsed.data.project.version;
+  if (fileVersion !== version) {
+    return {
+      name: "state-schema",
+      severity: "issue",
+      message: `.agents/state.json project.version is ${fileVersion} but package.json is ${version}`,
+    };
+  }
+  return {
+    name: "state-schema",
+    severity: "pass",
+    message: `.agents/state.json valid (schema v${parsed.data.schema_version}, rev ${parsed.data.revision}, ${parsed.data.tasks.length} tasks)`,
+  };
 }

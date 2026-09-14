@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { readJson } from "../../shared/fs-utils.js";
-import type { ProjectState, SessionMode, StateFileKey, StateFileSize } from "./types.js";
+import { parseState } from "../../shared/state-schema.js";
+import type { ProjectState, SessionMode, StateFileKey, StateFileSize, StateJsonResult } from "./types.js";
 
 export interface ReadProjectStateOptions {
   /** Per-file line budget. Omitted = whole file, no truncation. */
@@ -20,14 +21,14 @@ export function readProjectState(projectRoot: string, options: ReadProjectStateO
   const version = pkg?.version ?? "0.0.0";
 
   const summaryDir = hasMeta ? ".agents/META" : ".agents/SYSTEM";
-  const files: Array<{ key: StateFileKey; rel: string }> = [
+  const files: Array<{ key: Exclude<StateFileKey, "stateJson">; rel: string }> = [
     { key: "summary", rel: `${summaryDir}/SUMMARY.md` },
     { key: "inbox", rel: ".agents/TASKS/INBOX.md" },
     { key: "taskFile", rel: ".agents/TASKS/task.md" },
     { key: "nextSession", rel: ".agents/SESSIONS/next-session.md" },
   ];
 
-  const content: Record<StateFileKey, string | null> = {
+  const content: Record<Exclude<StateFileKey, "stateJson">, string | null> = {
     summary: null, inbox: null, taskFile: null, nextSession: null,
   };
   const sizes: StateFileSize[] = [];
@@ -36,6 +37,15 @@ export function readProjectState(projectRoot: string, options: ReadProjectStateO
     const read = readOptional(join(projectRoot, rel), options.stateBudgetLines);
     content[key] = read.content;
     sizes.push({ file: key, path: rel, ...measure(read) });
+  }
+
+  // state.json is never truncated: it is a record, and a cut record is not a
+  // record. It joins the size block only when present, so the block stays
+  // byte-identical to v0.28.0 for every project that has no file yet.
+  const stateJson = readStateJson(projectRoot);
+  if (stateJson.present) {
+    const read = readOptional(join(projectRoot, STATE_JSON_REL));
+    sizes.push({ file: "stateJson", path: STATE_JSON_REL, ...measure(read) });
   }
 
   return {
@@ -48,7 +58,24 @@ export function readProjectState(projectRoot: string, options: ReadProjectStateO
     hasAgents,
     hasMeta,
     sizes,
+    stateJson,
   };
+}
+
+export const STATE_JSON_REL = ".agents/state.json";
+
+/**
+ * Reads `.agents/state.json` against the strict schema. Three outcomes, all
+ * distinguishable: absent (`present: false`), present but invalid (`valid:
+ * false` with the zod path in `error`), present and valid (`data`).
+ */
+export function readStateJson(projectRoot: string): StateJsonResult {
+  const path = join(projectRoot, STATE_JSON_REL);
+  if (!existsSync(path)) return { present: false, valid: false };
+  const parsed = parseState(readFileSync(path, "utf-8"));
+  return parsed.ok
+    ? { present: true, valid: true, data: parsed.data }
+    : { present: true, valid: false, error: parsed.error };
 }
 
 export interface OptionalRead {

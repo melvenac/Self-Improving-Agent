@@ -37,7 +37,11 @@ export interface PipelineHealthInput {
 // Category 1: Config & Structure (25 pts max)
 // Formula: round((passed + warnings*0.5) / total * 25)
 // "fixed" counts as "passed" (same credit)
-export function scoreConfigStructure(checks: CheckResult[]): CategoryScore {
+export function scoreConfigStructure(allChecks: CheckResult[]): CategoryScore {
+  // A skipped check did not run; it is neither a pass nor a failure and must
+  // not sit in the denominator (or the score would move because a file is
+  // absent, which is the normal state until a writer exists).
+  const checks = allChecks.filter((c) => c.severity !== "skip");
   if (checks.length === 0) {
     return { name: "Config & Structure", score: 0, max: 25, details: { passed: 0, warned: 0, failed: 0 } };
   }

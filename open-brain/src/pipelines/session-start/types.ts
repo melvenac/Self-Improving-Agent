@@ -1,3 +1,5 @@
+import type { State } from "../../shared/state-schema.js";
+
 export interface SessionStartOptions {
   projectRoot: string;
   homePath: string;
@@ -17,7 +19,8 @@ export interface SessionStartOptions {
 
 export type SessionMode = "project" | "lightweight" | "meta";
 
-export type StateFileKey = "summary" | "inbox" | "taskFile" | "nextSession";
+/** The four prose files plus, when present, `.agents/state.json`. */
+export type StateFileKey = "summary" | "inbox" | "taskFile" | "nextSession" | "stateJson";
 
 /**
  * Size instrumentation for one state file, measured on the content actually
@@ -37,6 +40,18 @@ export interface StateFileSize {
   truncated: boolean;
 }
 
+/**
+ * `.agents/state.json` as read. Absent and invalid are different results:
+ * `{present: false}` means no file; `{present: true, valid: false, error}`
+ * means a file that failed the strict schema, with the zod path in `error`.
+ */
+export interface StateJsonResult {
+  present: boolean;
+  valid: boolean;
+  error?: string;
+  data?: State;
+}
+
 export interface ProjectState {
   mode: SessionMode;
   version: string;
@@ -46,8 +61,13 @@ export interface ProjectState {
   nextSession: string | null;
   hasAgents: boolean;
   hasMeta: boolean;
-  /** One entry per state file, in the order summary, inbox, taskFile, nextSession. */
+  /**
+   * One entry per prose file, in the order summary, inbox, taskFile,
+   * nextSession; a fifth `stateJson` entry only when that file is present, so
+   * the block is byte-identical to v0.28.0 when it is not.
+   */
   sizes: StateFileSize[];
+  stateJson: StateJsonResult;
 }
 
 export interface DriftResult {
@@ -61,6 +81,10 @@ export interface SessionInfo {
   sessionId: string | null;
   sessionNumber: number;
   logPath: string;
+  /** True when an existing Session_N.md already carried this session id and was reused. */
+  reused: boolean;
+  /** Set when no log was created and the caller should say why (e.g. no SESSIONS/ dir). */
+  skippedReason: string | null;
 }
 
 export interface HealthCheckResult {

@@ -19,6 +19,7 @@ import {
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
+import { renderState } from "./pipelines/session-start/state-render.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
@@ -134,7 +135,12 @@ export async function handleSync(args: {
       for (const c of result.warnings) lines.push(`  ${c.name}: ${c.message}`);
     }
 
-    lines.push(`\nSummary: ${result.passed.length} passed, ${result.fixed.length} fixed, ${result.warnings.length} warnings, ${result.issues.length} issues`);
+    if (result.skipped.length > 0) {
+      lines.push(`\nSKIPPED:`);
+      for (const c of result.skipped) lines.push(`  ${c.name}: ${c.message}`);
+    }
+
+    lines.push(`\nSummary: ${result.passed.length} passed, ${result.fixed.length} fixed, ${result.warnings.length} warnings, ${result.issues.length} issues, ${result.skipped.length} skipped`);
 
     if (args.score) {
       const scoreResult = computeScore(projectRoot, result.checks);
@@ -170,6 +176,7 @@ const STATE_FILE_LABEL: Record<StateFileSize["file"], string> = {
   inbox: "INBOX.md",
   taskFile: "task.md",
   nextSession: "next-session.md",
+  stateJson: "state.json",
 };
 
 export async function handleStart(args: StartArgs): Promise<ToolResponse> {
@@ -198,8 +205,11 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     }
 
     if (result.session.logPath) {
-      lines.push(`\nSession #${result.session.sessionNumber}`);
+      lines.push(`\nSession #${result.session.sessionNumber}${result.session.reused ? " (existing log for this session id — reused, nothing created)" : ""}`);
       lines.push(`Log: ${result.session.logPath}`);
+      lines.push(`Session ID: ${result.session.sessionId ?? "discovery failed"}`);
+    } else if (result.session.skippedReason) {
+      lines.push(`\nSession log: ${result.session.skippedReason}`);
       lines.push(`Session ID: ${result.session.sessionId ?? "discovery failed"}`);
     }
 
@@ -226,18 +236,30 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
       lines.push(`  ${STATE_FILE_LABEL[s.file]} (${s.path}): ${s.lines} lines, ${s.words} words, ~${s.estTokens} tokens, truncated: ${cut}`);
     }
 
-    // The state itself. Each file under its own header; "absent" is spelled
-    // out so a missing file and an empty one never look alike.
-    const content: Record<StateFileSize["file"], string | null> = {
-      summary: result.state.summary,
-      inbox: result.state.inbox,
-      taskFile: result.state.taskFile,
-      nextSession: result.state.nextSession,
-    };
-    for (const s of result.sizes) {
-      lines.push(`\n## ${STATE_FILE_LABEL[s.file]}`);
-      const body = content[s.file];
-      lines.push(body === null ? "absent" : body.replace(/\s+$/, ""));
+    // The state itself. A valid state.json replaces the four prose files (they
+    // stay in the size block above so the shrink is visible). An invalid one
+    // says so and falls back. Absent leaves v0.28.0 output untouched. Each
+    // prose file sits under its own header; "absent" is spelled out so a
+    // missing file and an empty one never look alike.
+    const sj = result.state.stateJson;
+    if (sj.present && sj.valid && sj.data) {
+      lines.push(...renderState(sj.data));
+    } else {
+      if (sj.present && !sj.valid) {
+        lines.push(`\nstate.json invalid at ${sj.error} — falling back to files`);
+      }
+      const content: Record<string, string | null> = {
+        summary: result.state.summary,
+        inbox: result.state.inbox,
+        taskFile: result.state.taskFile,
+        nextSession: result.state.nextSession,
+      };
+      for (const s of result.sizes) {
+        if (s.file === "stateJson") continue;
+        lines.push(`\n## ${STATE_FILE_LABEL[s.file]}`);
+        const body = content[s.file];
+        lines.push(body === null ? "absent" : body.replace(/\s+$/, ""));
+      }
     }
 
     // Total is of everything above it — the measurement Part 1 of the
@@ -452,7 +474,23 @@ server.tool(
     ),
     project_dir: z.string().optional().describe("Current working directory"),
   },
-  async ({ session_id, project_dir }) => {
+  async (args) => handleSetSession(args)
+);
+
+export interface SetSessionArgs {
+  session_id?: string;
+  project_dir?: string;
+}
+
+/**
+ * Exported like the other handlers so the registered-id path can be exercised
+ * without the MCP transport (Loop 1's P7 was only inspectable until this).
+ * Body unchanged from the inline registration it replaces.
+ */
+export async function handleSetSession(args: SetSessionArgs): Promise<ToolResponse> {
+  let { session_id } = args;
+  const project_dir = args.project_dir;
+  {
     const cwd = project_dir || process.cwd();
 
     // Fall back to the hook's file handoff. Cursor does not reliably put the
@@ -523,7 +561,7 @@ server.tool(
       }],
     };
   }
-);
+}
 
 // --- ob_recall ---
 server.tool(

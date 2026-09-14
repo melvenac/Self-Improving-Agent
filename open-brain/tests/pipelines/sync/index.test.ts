@@ -55,7 +55,12 @@ describe("runSync", () => {
       if (check.severity === "issue") expect(result.issues).toContain(check);
       if (check.severity === "warn") expect(result.warnings).toContain(check);
       if (check.severity === "pass") expect(result.passed).toContain(check);
+      if (check.severity === "skip") expect(result.skipped).toContain(check);
     }
+    // Every check lands in exactly one bucket; a skip is counted, not hidden.
+    expect(
+      result.fixed.length + result.issues.length + result.warnings.length + result.passed.length + result.skipped.length
+    ).toBe(result.checks.length);
   });
 
   it("reads version from package.json", () => {

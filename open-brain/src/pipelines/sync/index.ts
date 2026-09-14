@@ -22,6 +22,7 @@ import {
   checkSpecProvenance,
   checkRules,
   checkMirrorParity,
+  checkStateSchema,
 } from "./checks.js";
 
 export function runSync(options: SyncOptions): SyncResult {
@@ -55,13 +56,15 @@ export function runSync(options: SyncOptions): SyncResult {
   checks.push(checkSpecProvenance(options.projectRoot));
   checks.push(checkRules(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
+  checks.push(checkStateSchema(version, options.projectRoot));
 
   const fixed = checks.filter((c) => c.severity === "fixed");
   const issues = checks.filter((c) => c.severity === "issue");
   const warnings = checks.filter((c) => c.severity === "warn");
   const passed = checks.filter((c) => c.severity === "pass");
+  const skipped = checks.filter((c) => c.severity === "skip");
 
-  return { version, checks, fixed, issues, warnings, passed };
+  return { version, checks, fixed, issues, warnings, passed, skipped };
 }
 
 export type { SyncOptions, SyncResult, CheckResult } from "./types.js";

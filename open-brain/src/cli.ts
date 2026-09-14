@@ -62,8 +62,14 @@ if (command === "sync") {
     console.log();
   }
 
+  if (result.skipped.length > 0) {
+    console.log("SKIPPED:");
+    for (const c of result.skipped) console.log(`  ${c.name}: ${c.message}`);
+    console.log();
+  }
+
   console.log(
-    `Summary: ${result.passed.length} passed, ${result.fixed.length} fixed, ${result.warnings.length} warnings, ${result.issues.length} issues`
+    `Summary: ${result.passed.length} passed, ${result.fixed.length} fixed, ${result.warnings.length} warnings, ${result.issues.length} issues, ${result.skipped.length} skipped`
   );
 
   if (score) {

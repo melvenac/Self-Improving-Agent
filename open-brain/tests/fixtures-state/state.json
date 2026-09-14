@@ -1,0 +1,488 @@
+{
+  "schema_version": 1,
+  "revision": 7,
+  "project": {
+    "name": "Self-Improving-Agent",
+    "version": "0.29.0"
+  },
+  "objective": {
+    "text": "Replace the four prose state files with a record: state.json read side, then /end writes it, then dogfood on this repo.",
+    "since_session": 54
+  },
+  "tasks": [
+    {
+      "id": "T-001",
+      "title": "ob_start returns state, drift and session instead of booleans",
+      "priority": "P0",
+      "status": "done",
+      "opened_session": 53,
+      "closed_session": 54,
+      "supersedes": null,
+      "note": "Loop 1, v0.28.0"
+    },
+    {
+      "id": "T-002",
+      "title": "readOptional truncation becomes a caller-set budget",
+      "priority": "P0",
+      "status": "done",
+      "opened_session": 53,
+      "closed_session": 54,
+      "supersedes": null,
+      "note": ""
+    },
+    {
+      "id": "T-003",
+      "title": "/start calls ob_start and stops hand-reading",
+      "priority": "P0",
+      "status": "done",
+      "opened_session": 53,
+      "closed_session": 54,
+      "supersedes": null,
+      "note": "three Claude Code copies moved together"
+    },
+    {
+      "id": "T-004",
+      "title": "ob_start size block (lines / words / est tokens / truncated)",
+      "priority": "P1",
+      "status": "done",
+      "opened_session": 53,
+      "closed_session": 54,
+      "supersedes": null,
+      "note": "ADR-023 instrumentation"
+    },
+    {
+      "id": "T-005",
+      "title": "state.json strict schema module with parseState / serializeState",
+      "priority": "P0",
+      "status": "in_progress",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Loop 2 capability half"
+    },
+    {
+      "id": "T-006",
+      "title": "readProjectState detects state.json; absent and invalid are distinct",
+      "priority": "P0",
+      "status": "in_progress",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": ""
+    },
+    {
+      "id": "T-007",
+      "title": "ob_start renders State section when state.json is valid",
+      "priority": "P0",
+      "status": "in_progress",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "prose files stay in the size block"
+    },
+    {
+      "id": "T-008",
+      "title": "/sync state-schema check with skip-with-reason",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": ""
+    },
+    {
+      "id": "T-009",
+      "title": "createSessionLog guard when SESSIONS/ is absent",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Loop 1 gap 2"
+    },
+    {
+      "id": "T-010",
+      "title": "ob_start idempotent per session id",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Loop 1 gap 3; makes P5 a code guarantee"
+    },
+    {
+      "id": "T-011",
+      "title": "Extract handleSetSession; end-to-end test that the registered id reaches the log",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Loop 1 gap 5"
+    },
+    {
+      "id": "T-012",
+      "title": "/end writes state.json through one structured tool",
+      "priority": "P0",
+      "status": "blocked",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Loop 3; blocked on Loop 2 acceptance"
+    },
+    {
+      "id": "T-013",
+      "title": "SUMMARY.md and INBOX.md become generated views",
+      "priority": "P1",
+      "status": "blocked",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Loop 3"
+    },
+    {
+      "id": "T-014",
+      "title": "Migrate this repo's .agents/ into state.json and run three sessions",
+      "priority": "P1",
+      "status": "blocked",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Loop 4 dogfood"
+    },
+    {
+      "id": "T-015",
+      "title": "Port the Cursor start.md variant to ob_start",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "inline Composer variant, deliberately untouched in Loops 1–2"
+    },
+    {
+      "id": "T-016",
+      "title": "Decide whether repo .claude/ is a tracked mirror or the template is sole source",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": ".gitignore:10"
+    },
+    {
+      "id": "T-017",
+      "title": "Reword SESSION_TEMPLATE Pre-Session Checklist",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": ""
+    },
+    {
+      "id": "T-018",
+      "title": "Same-key store no longer wipes lifecycle state (ON CONFLICT DO UPDATE)",
+      "priority": "P0",
+      "status": "done",
+      "opened_session": 53,
+      "closed_session": 53,
+      "supersedes": null,
+      "note": "v0.27.1"
+    },
+    {
+      "id": "T-019",
+      "title": "content-guard refuses tool-call scaffolding in ob_store",
+      "priority": "P0",
+      "status": "done",
+      "opened_session": 53,
+      "closed_session": 53,
+      "supersedes": null,
+      "note": "v0.27.0"
+    },
+    {
+      "id": "T-020",
+      "title": "feedback_log.rating_method records which arm rated",
+      "priority": "P1",
+      "status": "done",
+      "opened_session": 52,
+      "closed_session": 52,
+      "supersedes": null,
+      "note": "v0.26.0"
+    },
+    {
+      "id": "T-021",
+      "title": "Summaries reach the topics graph; no-orphan becomes a guarantee",
+      "priority": "P1",
+      "status": "done",
+      "opened_session": 52,
+      "closed_session": 52,
+      "supersedes": null,
+      "note": "v0.25.0"
+    },
+    {
+      "id": "T-022",
+      "title": "relocate: renamed project directory no longer strands memory",
+      "priority": "P1",
+      "status": "done",
+      "opened_session": 51,
+      "closed_session": 51,
+      "supersedes": null,
+      "note": "v0.24.0"
+    },
+    {
+      "id": "T-023",
+      "title": "Apoptosis archives instead of destroying",
+      "priority": "P0",
+      "status": "done",
+      "opened_session": 50,
+      "closed_session": 50,
+      "supersedes": null,
+      "note": "v0.23.0; threshold decision deferred"
+    },
+    {
+      "id": "T-024",
+      "title": "Choose an apoptosis threshold with a defensible gate",
+      "priority": "P2",
+      "status": "blocked",
+      "opened_session": 50,
+      "closed_session": null,
+      "supersedes": "T-023",
+      "note": "blocked on the default rating path being able to emit harmful"
+    },
+    {
+      "id": "T-025",
+      "title": "Wire evaluateLifecycle into the session-end sweep",
+      "priority": "P2",
+      "status": "blocked",
+      "opened_session": 52,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "deliberately not shipped: would start auto-deleting"
+    },
+    {
+      "id": "T-026",
+      "title": "Test-vault isolation self-re-asserts after every test",
+      "priority": "P0",
+      "status": "done",
+      "opened_session": 49,
+      "closed_session": 49,
+      "supersedes": null,
+      "note": "v0.22.1"
+    },
+    {
+      "id": "T-027",
+      "title": "Rating signal: cut or replace (Aaron's call)",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 54,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Loop 5+, gated on Q2/Q3"
+    }
+  ],
+  "verified": [
+    {
+      "id": "V-001",
+      "claim": "ob_start returns non-empty summary, inbox, taskFile and nextSession for this repo",
+      "evidence": [
+        {
+          "type": "tool-run",
+          "path": "open-brain/src/server.ts",
+          "observation": "all four ## headers present with content; isError false"
+        }
+      ],
+      "since_session": 54,
+      "status": "verified"
+    },
+    {
+      "id": "V-002",
+      "claim": "readOptional does not truncate by default; a budget cut is flagged per file",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/session-start/state-reader.test.ts",
+          "observation": "120-line file returned whole; budget 5 → truncated true, sourceLines 120"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/server.test.ts",
+          "observation": "state_budget_lines: 3 → 'truncated: yes (4 of 10 source lines)'"
+        }
+      ],
+      "since_session": 54,
+      "status": "verified"
+    },
+    {
+      "id": "V-003",
+      "claim": "No /start Claude Code copy instructs a Read of the four state files; each invokes ob_start once",
+      "evidence": [
+        {
+          "type": "grep",
+          "path": "project-template/.claude/commands/start.md",
+          "observation": "ob_start( count 1; old step text count 0; same for live and repo copies"
+        }
+      ],
+      "since_session": 54,
+      "status": "verified"
+    },
+    {
+      "id": "V-004",
+      "claim": "/sync passes mirror parity with the three start.md copies moved together",
+      "evidence": [
+        {
+          "type": "cli",
+          "path": "open-brain/build/cli.js",
+          "observation": "18 passed, 0 issues, 1 pre-existing warning"
+        }
+      ],
+      "since_session": 54,
+      "status": "verified"
+    },
+    {
+      "id": "V-005",
+      "claim": "Full suite green from open-brain/ and no test writes to the real vault",
+      "evidence": [
+        {
+          "type": "test-run",
+          "path": "open-brain/",
+          "observation": "55 files, 767 tests; 0 ob-server files newer than the run in ~/Obsidian Vault v2"
+        }
+      ],
+      "since_session": 54,
+      "status": "verified"
+    },
+    {
+      "id": "V-006",
+      "claim": "ob_start honours the registered session id over transcript discovery",
+      "evidence": [
+        {
+          "type": "inspection",
+          "path": "open-brain/src/server.ts",
+          "observation": "sessionId: _activeSessionId unchanged by Loop 1; not exercised end to end"
+        }
+      ],
+      "since_session": 54,
+      "status": "reopened"
+    },
+    {
+      "id": "V-007",
+      "claim": "SESSION_UUID emission and the active-session slot write are untouched by Loop 1",
+      "evidence": [
+        {
+          "type": "git",
+          "path": "open-brain/src/cli-bootstrap.ts",
+          "observation": "zero diff lines at d2ba131"
+        }
+      ],
+      "since_session": 54,
+      "status": "verified"
+    },
+    {
+      "id": "V-008",
+      "claim": "The untruncated ob_start return on this repo is 24,886 words (~42.7K tokens)",
+      "evidence": [
+        {
+          "type": "measurement",
+          "path": ".agents/",
+          "observation": "SUMMARY 9233 words, INBOX 13882, task 321, next-session 1372; overhead 78"
+        }
+      ],
+      "since_session": 54,
+      "status": "verified"
+    }
+  ],
+  "gaps": [
+    {
+      "id": "G-001",
+      "what": "Cursor start.md copies still hand-read SUMMARY.md and do not call ob_start",
+      "evidence": "project-template/.cursor/commands/start.md line 33",
+      "recommended_update": "port the inline-Composer variant in a later loop or declare it frozen",
+      "opened_session": 54
+    },
+    {
+      "id": "G-002",
+      "what": "repo .claude/ is gitignored so the repo start.md mirror exists on disk only",
+      "evidence": ".gitignore:10 /.claude/; git check-ignore -v",
+      "recommended_update": "untrack the ignore for commands/ or drop the repo↔template parity pair",
+      "opened_session": 54
+    },
+    {
+      "id": "G-003",
+      "what": "SESSION_TEMPLATE.md Pre-Session Checklist still says Read SUMMARY.md / Read INBOX.md",
+      "evidence": ".agents/SESSIONS/SESSION_TEMPLATE.md lines 10–11",
+      "recommended_update": "reword when the state schema lands",
+      "opened_session": 54
+    },
+    {
+      "id": "G-004",
+      "what": "GitNexus index goes stale at every commit and misattributes hunks to neighbouring symbols",
+      "evidence": "detect_changes at b2556d6 listed handleEnd for a handleStart-only diff",
+      "recommended_update": "re-index before every detect_changes; consider a post-commit hook",
+      "opened_session": 54
+    },
+    {
+      "id": "G-005",
+      "what": "vault-index-parity warns on one unindexed Checkpoints note",
+      "evidence": "/sync warning: Checkpoints/2026-09-11-worth-it-window-washing-…",
+      "recommended_update": "index the note or archive it; unrelated to the evaluation loops",
+      "opened_session": 54
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D-001",
+      "title": "Q4: state lives in files (JSON), not SQLite",
+      "date": "2026-09-14",
+      "note": "core must run on a fresh machine with Node + git; git is the history; files are truth, SQLite is a projection"
+    },
+    {
+      "id": "D-002",
+      "title": "Loop 2 is read side only",
+      "date": "2026-09-14",
+      "note": "no code path writes state.json until Loop 3, so nothing can corrupt it"
+    },
+    {
+      "id": "D-003",
+      "title": "Loop 1 accepted at v0.28.0 (d2ba131); pushed on Aaron's authorization",
+      "date": "2026-09-14",
+      "note": "independent QA confirmed V1–V8 and P1–P7"
+    },
+    {
+      "id": "D-004",
+      "title": "ob_start is the one startup implementation; /start is a caller",
+      "date": "2026-09-14",
+      "note": "ADR-013 pattern applied at the command layer"
+    },
+    {
+      "id": "D-005",
+      "title": "Same-key store is an upsert on caller-owned fields only",
+      "date": "2026-09-01",
+      "note": "v0.27.1; lifecycle inputs seed a new row only"
+    },
+    {
+      "id": "D-006",
+      "title": "Lifecycle evaluation stays out of the session-end sweep until a defensible threshold exists",
+      "date": "2026-08-31",
+      "note": "measure → fix the signal → unify lifecycle, in that order"
+    }
+  ],
+  "handoff": {
+    "pick_up": "Loop 2: run V1–V9 on the frozen tag, then dispatch Loop 3 (the writer) once accepted.",
+    "watch_out": [
+      "The live MCP server stays on the old build until /mcp reconnect open-brain.",
+      "Run vitest from open-brain/, never the repo root (entry 462).",
+      "Re-index GitNexus before detect_changes or hunks land on neighbouring symbols."
+    ],
+    "open_questions": [
+      "Q2: does the memory module become something the core does not import?",
+      "Q3: is the rating signal cut or replaced?"
+    ],
+    "session": 54
+  },
+  "last_session": {
+    "n": 54,
+    "date": "2026-09-14",
+    "uuid": "f7a1b3d9-ef6d-482f-aba1-ddaa296f722b"
+  }
+}

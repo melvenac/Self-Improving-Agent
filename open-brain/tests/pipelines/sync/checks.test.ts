@@ -22,10 +22,63 @@ import {
   checkHookConfigs,
   checkSummary,
   checkSpecProvenance,
+  checkStateSchema,
   resolveDocPath,
 } from "../../../src/pipelines/sync/checks.js";
+import { scoreConfigStructure } from "../../../src/pipelines/sync/scorer.js";
 
 const fixturesDir = join(import.meta.dirname, "../../fixtures");
+const stateFixture = join(import.meta.dirname, "../../fixtures-state/state.json");
+
+/** Loop 2 C4: state-schema is a skip-with-reason when absent, strict when present. */
+describe("checkStateSchema", () => {
+  let tempDir: string;
+
+  beforeEach(() => {
+    tempDir = mkdtempSync(join(tmpdir(), "ob-sync-state-"));
+    cpSync(fixturesDir, tempDir, { recursive: true });
+  });
+
+  afterEach(() => {
+    rmSync(tempDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+  });
+
+  it("skips with a printed reason when .agents/state.json is absent", () => {
+    const r = checkStateSchema("0.29.0", tempDir);
+    expect(r.severity).toBe("skip");
+    expect(r.name).toBe("state-schema");
+    expect(r.message).toMatch(/^skipped — no \.agents\/state\.json/);
+    expect(r.message).toContain("no writer exists yet");
+  });
+
+  it("passes on a valid file whose project.version matches package.json", () => {
+    cpSync(stateFixture, join(tempDir, ".agents", "state.json"));
+    const r = checkStateSchema("0.29.0", tempDir);
+    expect(r.severity).toBe("pass");
+    expect(r.message).toBe(".agents/state.json valid (schema v1, rev 7, 27 tasks)");
+  });
+
+  it("fails a version mismatch naming both values", () => {
+    cpSync(stateFixture, join(tempDir, ".agents", "state.json"));
+    const r = checkStateSchema("0.30.0", tempDir);
+    expect(r.severity).toBe("issue");
+    expect(r.message).toBe(".agents/state.json project.version is 0.29.0 but package.json is 0.30.0");
+  });
+
+  it("fails an invalid file with the zod path", () => {
+    writeFileSync(join(tempDir, ".agents", "state.json"), JSON.stringify({ schema_version: 1, revision: -1 }));
+    const r = checkStateSchema("0.29.0", tempDir);
+    expect(r.severity).toBe("issue");
+    expect(r.message).toMatch(/^\.agents\/state\.json invalid at revision: /);
+  });
+
+  it("a skipped check is outside the health-score denominator", () => {
+    const passes = [{ name: "a", severity: "pass" as const, message: "" }, { name: "b", severity: "pass" as const, message: "" }];
+    const withSkip = [...passes, { name: "state-schema", severity: "skip" as const, message: "skipped" }];
+    expect(scoreConfigStructure(withSkip).score).toBe(scoreConfigStructure(passes).score);
+    expect(scoreConfigStructure(withSkip).score).toBe(25);
+  });
+});
 
 describe("version sync checks", () => {
   let tempDir: string;

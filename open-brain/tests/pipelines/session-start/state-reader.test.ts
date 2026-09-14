@@ -2,7 +2,9 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, cpSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { readProjectState, readOptional } from "../../../src/pipelines/session-start/state-reader.js";
+import { readProjectState, readOptional, readStateJson } from "../../../src/pipelines/session-start/state-reader.js";
+
+const stateFixture = join(import.meta.dirname, "../../fixtures-state/state.json");
 
 describe("readProjectState", () => {
   let tempDir: string;
@@ -102,6 +104,37 @@ describe("readProjectState", () => {
         estTokens: 0,
         truncated: false,
       });
+    });
+
+    it("state.json: absent, invalid and valid are three distinguishable results (V2)", () => {
+      expect(readStateJson(tempDir)).toEqual({ present: false, valid: false });
+      expect(readProjectState(tempDir).stateJson).toEqual({ present: false, valid: false });
+      // Absent adds nothing to the size block — v0.28.0 shape preserved.
+      expect(readProjectState(tempDir).sizes.map((s) => s.file)).toEqual(["summary", "inbox", "taskFile", "nextSession"]);
+
+      writeFileSync(join(tempDir, ".agents", "state.json"), "{ definitely not json");
+      const invalid = readStateJson(tempDir);
+      expect(invalid.present).toBe(true);
+      expect(invalid.valid).toBe(false);
+      expect(invalid.error).toMatch(/^\$: not valid JSON/);
+      expect(invalid.data).toBeUndefined();
+
+      writeFileSync(join(tempDir, ".agents", "state.json"), JSON.stringify({ schema_version: 1 }));
+      const schemaFail = readProjectState(tempDir).stateJson;
+      expect(schemaFail).toMatchObject({ present: true, valid: false });
+      expect(schemaFail.error).toMatch(/^revision: /);
+
+      cpSync(stateFixture, join(tempDir, ".agents", "state.json"));
+      const state = readProjectState(tempDir);
+      expect(state.stateJson.present).toBe(true);
+      expect(state.stateJson.valid).toBe(true);
+      expect(state.stateJson.data!.revision).toBe(7);
+      // Present: it joins the size block as a fifth entry, never truncated.
+      const size = state.sizes.find((s) => s.file === "stateJson")!;
+      expect(size).toMatchObject({ path: ".agents/state.json", present: true, truncated: false });
+      expect(size.words).toBeGreaterThan(100);
+      // The prose files are still read alongside it (the size block shows the shrink).
+      expect(state.summary).toContain("Knowledge recall");
     });
 
     it("readOptional: absent, whole, and cut are three distinguishable results", () => {

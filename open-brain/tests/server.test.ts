@@ -1,8 +1,24 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { handleStart, handleEnd, handleSync, handleScore, computeScore } from "../src/server.js";
+import { handleStart, handleEnd, handleSync, handleScore, computeScore, handleSetSession } from "../src/server.js";
+import { readFileSync, cpSync } from "node:fs";
+
+const stateFixture = join(import.meta.dirname, "fixtures-state/state.json");
+
+/** A project with the four prose files, for the state.json rendering tests. */
+function proseProject(tmp: string): void {
+  writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "0.29.0" }));
+  mkdirSync(join(tmp, ".agents", "SYSTEM"), { recursive: true });
+  mkdirSync(join(tmp, ".agents", "TASKS"), { recursive: true });
+  mkdirSync(join(tmp, ".agents", "SESSIONS"), { recursive: true });
+  writeFileSync(join(tmp, ".agents", "SYSTEM", "SUMMARY.md"), "# Summary\nPROSE-SUMMARY-MARKER alpha beta");
+  writeFileSync(join(tmp, ".agents", "TASKS", "INBOX.md"), "# Inbox\n- [ ] PROSE-INBOX-MARKER");
+  writeFileSync(join(tmp, ".agents", "TASKS", "task.md"), "# Task\nPROSE-TASK-MARKER");
+  writeFileSync(join(tmp, ".agents", "SESSIONS", "next-session.md"), "# Handoff\nPROSE-NEXT-MARKER");
+  writeFileSync(join(tmp, ".agents", "SESSIONS", "SESSION_TEMPLATE.md"), "# Session N — [Date]\n> **Status:** In Progress\n");
+}
 import { createDb } from "../src/db.js";
 
 function getText(response: { content: { type: string; text: string }[] }): string {
@@ -137,6 +153,116 @@ describe("server handlers", () => {
       const res = await handleStart({ project_root: join(tmp, "nonexistent", "deep", "path") });
       // Should not crash — returns gracefully even for missing dirs
       expect(res.content[0].text).toBeTruthy();
+    });
+
+    /** Loop 2 V3(a): a valid state.json is rendered instead of the four prose files. */
+    it("renders the State section from a valid state.json and withholds the prose files", async () => {
+      proseProject(tmp);
+      cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+
+      const res = await handleStart({ project_root: tmp });
+      expect(res.isError).toBeUndefined();
+      const text = getText(res);
+
+      expect(text).toContain("## State (state.json rev 7)");
+      expect(text).toContain("Project: Self-Improving-Agent v0.29.0");
+      expect(text).toContain("Objective: Replace the four prose state files with a record");
+      // Active tasks only, grouped by priority; done is a count.
+      expect(text).toContain("Tasks (16 active; done: 11):");
+      expect(text).toContain("  P0:\n    [in_progress] T-005 state.json strict schema module");
+      expect(text).toContain("[blocked] T-012 /end writes state.json");
+      expect(text).toContain("[blocked] T-024 Choose an apoptosis threshold with a defensible gate (supersedes T-023)");
+      expect(text).not.toContain("T-001 ob_start returns state");   // done — count only
+      expect(text).not.toMatch(/\[done\]/);
+      // Verified: one line each with an evidence count; reopened is flagged.
+      expect(text).toContain("Verified (8):");
+      expect(text).toContain("  V-002 — readOptional does not truncate by default; a budget cut is flagged per file (2 evidence)");
+      expect(text).toContain("(1 evidence) [REOPENED]");
+      expect(text).toContain("Gaps (5):\n  G-001 — Cursor start.md copies");
+      expect(text).toContain("Decisions: 6 recorded; latest D-001 (2026-09-14)");
+      expect(text).toContain("Handoff (session 54):\n  pick up: Loop 2: run V1–V9");
+      expect(text).toContain("    - Run vitest from open-brain/, never the repo root (entry 462).");
+      expect(text).toContain("Last session: #54 2026-09-14 (f7a1b3d9-ef6d-482f-aba1-ddaa296f722b)");
+
+      // The four prose files are NOT returned…
+      for (const marker of ["PROSE-SUMMARY-MARKER", "PROSE-INBOX-MARKER", "PROSE-TASK-MARKER", "PROSE-NEXT-MARKER"]) {
+        expect(text).not.toContain(marker);
+      }
+      expect(text).not.toContain("## SUMMARY.md");
+      // …but they stay in the size block, and state.json joins it.
+      expect(text).toMatch(/SUMMARY\.md \(\.agents\/SYSTEM\/SUMMARY\.md\): 2 lines, \d+ words/);
+      expect(text).toMatch(/INBOX\.md \(\.agents\/TASKS\/INBOX\.md\): 2 lines/);
+      expect(text).toMatch(/task\.md \(\.agents\/TASKS\/task\.md\): 2 lines/);
+      expect(text).toMatch(/next-session\.md \(\.agents\/SESSIONS\/next-session\.md\): 2 lines/);
+      expect(text).toMatch(/state\.json \(\.agents\/state\.json\): \d+ lines, \d+ words, ~\d+ tokens, truncated: no/);
+      expect(text).toMatch(/\n\nTotal returned words: \d+ \(~\d+ tokens\)$/);
+    });
+
+    /** Loop 2 V3(b): an invalid state.json says so and falls back to v0.28.0 output. */
+    it("reports an invalid state.json with its path and falls back to the prose files", async () => {
+      proseProject(tmp);
+      const broken = JSON.parse(readFileSync(stateFixture, "utf-8"));
+      broken.tasks[2].priority = "P9";
+      writeFileSync(join(tmp, ".agents", "state.json"), JSON.stringify(broken));
+
+      const text = getText(await handleStart({ project_root: tmp }));
+      expect(text).toContain("state.json invalid at tasks.2.priority: ");
+      expect(text).toContain(" — falling back to files");
+      expect(text).not.toContain("## State (");
+      expect(text).toContain("## SUMMARY.md\n# Summary\nPROSE-SUMMARY-MARKER alpha beta");
+      expect(text).toContain("## INBOX.md\n# Inbox\n- [ ] PROSE-INBOX-MARKER");
+      expect(text).toContain("## task.md\n# Task\nPROSE-TASK-MARKER");
+      expect(text).toContain("## next-session.md\n# Handoff\nPROSE-NEXT-MARKER");
+      // Size block still present, with the (invalid) file in it.
+      expect(text).toMatch(/state\.json \(\.agents\/state\.json\): \d+ lines/);
+    });
+
+    /** Loop 2 V3(c) / P1: no state.json → no State section, no fallback line, no fifth size entry. */
+    it("leaves v0.28.0 output untouched when state.json is absent", async () => {
+      proseProject(tmp);
+      const text = getText(await handleStart({ project_root: tmp }));
+      expect(text).not.toContain("state.json");
+      expect(text).not.toContain("## State (");
+      expect(text).toContain("## SUMMARY.md\n# Summary\nPROSE-SUMMARY-MARKER alpha beta");
+      expect(text).toContain("## next-session.md\n# Handoff\nPROSE-NEXT-MARKER");
+    });
+
+    /** Loop 2 R1: .agents/ without SESSIONS/ no longer errors; the block says why there is no log. */
+    it("says why no session log was created when SESSIONS/ is missing", async () => {
+      writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "2.0.0" }));
+      mkdirSync(join(tmp, ".agents", "SYSTEM"), { recursive: true });
+      writeFileSync(join(tmp, ".agents", "SYSTEM", "SUMMARY.md"), "# Summary");
+      const res = await handleStart({ project_root: tmp });
+      expect(res.isError).toBeUndefined();
+      const text = getText(res);
+      expect(text).toContain("Session Start — project mode");
+      expect(text).toContain("Session log: no .agents/SESSIONS/ dir — log not created");
+      expect(text).not.toContain("Session #");
+    });
+
+    /**
+     * Loop 2 R3 / Loop 1 P7, now exercised: the id registered through the
+     * (extracted) ob_set_session handler is the id ob_start stamps into the
+     * log — and a second ob_start reuses that log instead of minting another.
+     */
+    it("stamps the registered session id into the log and reuses it on a second call", async () => {
+      proseProject(tmp);
+      const id = "11111111-2222-4333-8444-555555555555";
+      const reg = await handleSetSession({ session_id: id, project_dir: tmp });
+      expect(reg.isError).toBeUndefined();
+      expect(getText(reg)).toContain(`Session registered: ${id}`);
+      expect(getText(reg)).toContain("[via argument]");
+
+      const first = getText(await handleStart({ project_root: tmp }));
+      expect(first).toMatch(new RegExp(`Session #1\\nLog: .*Session_1\\.md\\nSession ID: ${id}`));
+      const log = readFileSync(join(tmp, ".agents", "SESSIONS", "Session_1.md"), "utf-8");
+      expect(log).toContain(`> **Session ID:** ${id}`);
+
+      const second = getText(await handleStart({ project_root: tmp }));
+      expect(second).toContain("Session #1 (existing log for this session id — reused, nothing created)");
+      expect(second).toContain(`Session ID: ${id}`);
+      const logs = readdirSync(join(tmp, ".agents", "SESSIONS")).filter((f) => /^Session_\d+\.md$/.test(f));
+      expect(logs).toEqual(["Session_1.md"]);
     });
   });
 

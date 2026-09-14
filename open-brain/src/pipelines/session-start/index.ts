@@ -1,9 +1,11 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { readProjectState } from "./state-reader.js";
 import { discoverSessionUuid } from "./session-discovery.js";
 import { detectDrift } from "./drift-detector.js";
-import { findNextSessionNumber, createSessionLog } from "./session-log.js";
+import { findNextSessionNumber, findExistingSessionLog, createSessionLog } from "./session-log.js";
 import { runHealthChecks } from "./health-checks.js";
-import type { SessionStartOptions, SessionStartResult } from "./types.js";
+import type { SessionInfo, SessionStartOptions, SessionStartResult } from "./types.js";
 
 export function sessionStart(options: SessionStartOptions): SessionStartResult {
   const state = readProjectState(options.projectRoot, { stateBudgetLines: options.stateBudgetLines });
@@ -15,16 +17,27 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
     options.sessionId ?? discoverSessionUuid(options.projectRoot, options.homePath);
   const health = runHealthChecks(options.homePath);
 
-  let session = { sessionId, sessionNumber: 0, logPath: "" };
+  let session: SessionInfo = { sessionId, sessionNumber: 0, logPath: "", reused: false, skippedReason: null };
 
   if (state.hasAgents) {
-    const sessionNumber = findNextSessionNumber(options.projectRoot);
-    const date = new Date().toISOString().split("T")[0];
-    const logPath = createSessionLog(options.projectRoot, sessionNumber, sessionId, date);
-    session = { sessionId, sessionNumber, logPath };
+    const sessionsDir = join(options.projectRoot, ".agents", "SESSIONS");
+    if (!existsSync(sessionsDir)) {
+      // Absent is not silent: the caller prints this instead of a blank block.
+      session.skippedReason = "no .agents/SESSIONS/ dir — log not created";
+    } else {
+      const existing = findExistingSessionLog(options.projectRoot, sessionId);
+      if (existing) {
+        session = { sessionId, ...existing, reused: true, skippedReason: null };
+      } else {
+        const sessionNumber = findNextSessionNumber(options.projectRoot);
+        const date = new Date().toISOString().split("T")[0];
+        const logPath = createSessionLog(options.projectRoot, sessionNumber, sessionId, date);
+        session = { sessionId, sessionNumber, logPath, reused: false, skippedReason: null };
+      }
+    }
   }
 
   return { state, drift, session, health, recalledEntryIds: [], sizes: state.sizes };
 }
 
-export type { SessionStartOptions, SessionStartResult, StateFileSize } from "./types.js";
+export type { SessionStartOptions, SessionStartResult, StateFileSize, StateJsonResult } from "./types.js";
