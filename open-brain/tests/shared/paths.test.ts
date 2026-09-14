@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { join } from "node:path";
-import { resolvePaths, obsidianVaultDir, canonicalizeProjectDir, projectDisplayName } from "../../src/shared/paths.js";
+import { resolvePaths, obsidianVaultDir, canonicalizeProjectDir, projectDisplayName, projectDirExists, existsCaseInsensitive } from "../../src/shared/paths.js";
+import { mkdtempSync, mkdirSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 
 describe("projectDisplayName", () => {
   // The regression: the display name used to be rebuilt from the canonical
@@ -94,6 +96,45 @@ describe("obsidianVaultDir", () => {
       expect(() => obsidianVaultDir()).toThrow(/real Obsidian vault during a test run/);
     } finally {
       if (override !== undefined) process.env.OPEN_BRAIN_VAULT_DIR = override;
+    }
+  });
+});
+
+/**
+ * v0.29.1 hotfix. The canonical project_dir is lowercased on Windows and was
+ * handed straight to existsSync; on ext4 a lowercased path is a different
+ * path, so an existing project read as missing and master's CI was red on
+ * this for six runs. The walk is tested directly so it is exercised on NTFS
+ * too, where the plain existsSync fast path would otherwise hide it.
+ */
+describe("projectDirExists / existsCaseInsensitive", () => {
+  it("finds a mixed-case directory through its lowercased canonical path", () => {
+    const base = mkdtempSync(join(tmpdir(), "ob-Case-"));
+    try {
+      const real = join(base, "Mixed-Case", "Deeper");
+      mkdirSync(real, { recursive: true });
+      const lowered = real.replace(/\\/g, "/").toLowerCase();
+      expect(existsCaseInsensitive(lowered)).toBe(true);
+      expect(projectDirExists(lowered)).toBe(true);
+      expect(projectDirExists(canonicalizeProjectDir(real)!)).toBe(true);
+      expect(projectDirExists(real)).toBe(true);
+    } finally {
+      rmSync(base, { recursive: true, force: true });
+    }
+  });
+
+  it("does not report a genuinely absent path as present", () => {
+    const base = mkdtempSync(join(tmpdir(), "ob-Case-"));
+    try {
+      const absent = join(base, "nope", "nothing").replace(/\\/g, "/").toLowerCase();
+      expect(existsCaseInsensitive(absent)).toBe(false);
+      expect(projectDirExists(absent)).toBe(false);
+      expect(projectDirExists("")).toBe(false);
+      // A near miss in one component is still absent.
+      mkdirSync(join(base, "Present"));
+      expect(projectDirExists(join(base, "presentx").toLowerCase())).toBe(false);
+    } finally {
+      rmSync(base, { recursive: true, force: true });
     }
   });
 });
