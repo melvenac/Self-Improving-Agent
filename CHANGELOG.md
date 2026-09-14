@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.28.0] - 2026-09-14
+
+### Fixed
+- **`ob_start` returns the state it computes instead of announcing that it computed it.** `handleStart` called `sessionStart()` — which reads SUMMARY / INBOX / task.md / next-session.md, detects drift and creates the session log — and then printed `SUMMARY loaded` / `INBOX loaded` and threw the content away. Nothing invoked the tool: `/start`'s subagent re-read the same files by hand, reconciled drift by hand and created `Session_N.md` by hand. Two startup implementations, the deterministic one dead by convention (the ADR-013 pattern recurring at the command layer). The tool now returns the full text of all four files, each under a `## <file>` header with `absent` spelled out when a file is missing, `drift[]` as `field: expected X, got Y (fixed|not fixed)` or `Drift: none`, and the session block. The mode / version / warnings / skill-proposal lines are unchanged.
+- **The hardcoded 50-line cut in `readOptional` is gone.** It silently dropped 150+ lines of this repo's SUMMARY.md and 170+ of INBOX.md, and a cut file was indistinguishable from a short one. Truncation is now a caller-set budget (`SessionStartOptions.stateBudgetLines`, `ob_start(state_budget_lines)`); the default is the whole file. When a budget does cut, the per-file size entry carries `truncated: true` and the source line count, so absent, short and cut are three distinguishable results.
+- **`/start` calls `ob_start` and stops hand-reading.** In the Part A subagent prompt, step 1 (`ob_set_session`) is now explicitly ordered before step 2 so the registered id lands in the session log; step 2 is "call `ob_start` once and use its state"; the old steps 6 (reconcile drift) and 7 (create session log) are removed because `sessionStart()` already does both — the greeting relays `ob_start`'s drift lines instead of re-deriving them. Recall, `.recalled-entries.json`, the mailbox read and the greeting format are unchanged. All three Claude Code copies (live `~/.claude/commands/`, repo `.claude/commands/`, `project-template/`) moved together; the two `.cursor/commands/` copies are a separate inline variant and were deliberately left alone (recorded as a gap in the Loop 1 report).
+
+### Added
+- **`ob_start` reports a size block (ADR-023 instrumentation).** Per state file: lines, words, estimated tokens (chars/4, rounded up — a tokenizer-free order-of-magnitude figure, not a billing number), and whether it was truncated; plus `Total returned words` for the whole tool text, computed last so it counts the real return. Carried as `StateFileSize[]` on `ProjectState.sizes` and `SessionStartResult.sizes` so tests can pin it. Not persisted to the DB in this loop. Measured on this repo at the time of the change, the untruncated return is the number Part 1 of the extraction evaluation asks for — see the Loop 1 report in `~/.agents/mailbox/channels/sia/forge-to-atlas.md`.
+
 ## [v0.27.1] - 2026-09-01
 
 ### Fixed

@@ -13,13 +13,14 @@ Check if `.agents/` directory exists in the current working directory.
 
 ## Part A: Project Startup (only if `.agents/` exists)
 
-> Dispatch a subagent to read all project state and return a concise summary.
+> Dispatch a subagent that loads project state through `ob_start` and returns a concise summary.
 > Raw file contents stay in the subagent's context — only the summary enters yours.
 
 ### Meta Mode Detection
 
 If `.agents/META/` exists, this is the **framework template repo itself**. In meta mode:
-- Read state from `META/` files, NOT the `SYSTEM/` templates
+- `ob_start` resolves `META/SUMMARY.md` instead of `SYSTEM/SUMMARY.md` automatically
+- For the residual reads below, use `META/` files, NOT the `SYSTEM/` templates
 - Only reference `SYSTEM/` files when working on template content
 
 ### A1. Dispatch startup subagent
@@ -30,7 +31,7 @@ If `.agents/META/` exists, this is the **framework template repo itself**. In me
 
 **UUID from hook:** Look for `SESSION_UUID:` in the hook output at the top of this conversation. Pass it to the subagent. If not found, pass "none". The hook discovers the UUID deterministically — no Bash calls needed.
 
-Use the Agent tool with `run_in_background: true` and the following prompt. Adapt file paths for meta mode (`.agents/META/` vs `.agents/SYSTEM/`):
+Use the Agent tool with `run_in_background: true` and the following prompt. Adapt the residual read paths for meta mode (`.agents/META/` vs `.agents/SYSTEM/`); `ob_start` needs no adapting:
 
 ```
 You are a startup subagent. Do NOT invoke any skills, do NOT dispatch agents, do NOT run /start.
@@ -39,19 +40,22 @@ You are a startup subagent. Do NOT invoke any skills, do NOT dispatch agents, do
 Session UUID: {UUID from hook output, or "none"}
 If UUID is not "none": call ob_set_session(session_id: "{UUID}", project_dir: "{cwd}")
 If "none": skip — provenance tracking disabled this session.
+This step MUST run before step 2: ob_start stamps the registered id into the session log instead of guessing one from transcripts.
 
-## 2. Read project state
-Read these files (skip any that don't exist):
-1. .agents/SYSTEM/SUMMARY.md (or .agents/META/SUMMARY.md if META/ exists)
-2. .agents/TASKS/INBOX.md (or .agents/META/INBOX.md)
-3. .agents/TASKS/task.md
-4. .agents/SESSIONS/next-session.md
-5. .agents/skills/INDEX.md
-6. package.json (version field only)
-7. ~/Obsidian Vault v2/Skill-Candidates/SKILL-INDEX.md
-8. ~/Obsidian Vault v2/.skill-proposals-pending.json
-9. .agents/SYSTEM/domains.json
-10. .agents/AGENT.md — parse YAML frontmatter for name, role, partner, mailbox_channel (skip silently if absent)
+## 2. Load project state via ob_start
+Call ob_start(project_root: "{cwd}") — exactly once. Its return is the project state:
+- the full text of SUMMARY.md, INBOX.md, task.md and next-session.md, each under its own `## <file>` header ("absent" when the file does not exist)
+- `Project: vX.Y.Z` (from package.json), `Drift detected (N): ...` or `Drift: none`
+- the session block: `Session #N`, `Log: <path>`, `Session ID: <uuid>` — ob_start has already created Session_N.md
+- a `## Sizes` block (per-file lines / words / ~tokens / truncated) and `Total returned words`
+Use that state for every later step. Do NOT Read SUMMARY.md, INBOX.md, task.md or next-session.md yourself, do NOT create a session log yourself, and do NOT reconcile drift yourself — relay what ob_start reported.
+
+Then read these residual files (skip any that don't exist):
+1. .agents/skills/INDEX.md
+2. ~/Obsidian Vault v2/Skill-Candidates/SKILL-INDEX.md
+3. ~/Obsidian Vault v2/.skill-proposals-pending.json
+4. .agents/SYSTEM/domains.json
+5. .agents/AGENT.md — parse YAML frontmatter for name, role, partner, mailbox_channel (skip silently if absent)
 
 ## 3. Knowledge recall
 - ob_recall(queries: [Q1, Q2], project: "{cwd}", limit: 5, trigger: "start")
@@ -83,20 +87,13 @@ Otherwise:
 
 Read both. From the inbox, grab the subject of the newest `## [YYYY-MM-DD ...] Sender — Subject` header (first one in the file after the intro). From decisions.md: parse all `## YYYY-MM-DD` headers, sort descending by date string (ISO format sorts correctly lexically), take the first result — do NOT assume last-in-file is most recent.
 
-## 6. Reconcile drift
-- Compare items marked "Done" in task.md against INBOX.md status. Fix any mismatches.
-- Compare SUMMARY.md version against package.json. Fix stale "What's next" or "What's broken".
-
-## 7. Create session log (if .agents/SESSIONS/ exists)
-Copy SESSION_TEMPLATE.md → Session_N.md (next number). Fill in date and session UUID.
-If no CLAUDE.md in project root, note it in FLAGS (don't create one — ask the user first).
-
-## 8. Return ONLY this format (under 300 tokens):
+## 6. Return ONLY this format (under 300 tokens):
 
 GREETING:
-Session N — {date}
+Session N — {date}   ← N from ob_start's session block
 Project: {name} {version}
 State: {2 sentences}
+Drift: {relay ob_start's drift lines verbatim, or "none"}
 Proposed: {top incomplete task from INBOX}
 
 Knowledge:
@@ -106,16 +103,16 @@ Mailbox: {latest subject} | Last decision: {date}   ← omit this line entirely 
 Handoff: {from next-session.md, or "none"}
 Skills: {relevant skills + pending proposal count}
 
-FLAGS: {anything to verify, or "none"}
+FLAGS: {anything to verify, or "none"}   ← include "no CLAUDE.md in project root" if that is the case (don't create one — ask the user first)
 ```
 
-**Important:** Choose Q1/Q2 queries based on the top INBOX priorities. The subagent sees the raw files and can make informed query choices.
+**Important:** Choose Q1/Q2 queries based on the top INBOX priorities. The subagent sees the raw state (from ob_start) and can make informed query choices.
 
 ### A2. Relay the greeting
 
 When the background subagent completes, relay its GREETING section to the user. If FLAGS contains anything, verify it.
 
-That's it. No further main-agent processing needed — the subagent handled ob_set_session, .recalled-entries.json, session log creation, and drift reconciliation.
+That's it. No further main-agent processing needed — the subagent handled ob_set_session, ob_start (state, session log, drift), .recalled-entries.json, and the mailbox read. Do NOT call ob_start again from the main agent: it creates a session log on every call.
 
 If the subagent failed or timed out, fall back to a manual greeting:
 - Greet the user by name. Use your configured agent name (from your global CLAUDE.md or .agents/AGENT.md) if one is set.

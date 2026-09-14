@@ -6,7 +6,7 @@ import { runHealthChecks } from "./health-checks.js";
 import type { SessionStartOptions, SessionStartResult } from "./types.js";
 
 export function sessionStart(options: SessionStartOptions): SessionStartResult {
-  const state = readProjectState(options.projectRoot);
+  const state = readProjectState(options.projectRoot, { stateBudgetLines: options.stateBudgetLines });
   const drift = detectDrift(state);
   // Prefer a UUID the caller already knows. Transcript discovery is a fallback
   // for mid-session callers only — it cannot identify a session that has not
@@ -24,7 +24,7 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
     session = { sessionId, sessionNumber, logPath };
   }
 
-  return { state, drift, session, health, recalledEntryIds: [] };
+  return { state, drift, session, health, recalledEntryIds: [], sizes: state.sizes };
 }
 
-export type { SessionStartOptions, SessionStartResult } from "./types.js";
+export type { SessionStartOptions, SessionStartResult, StateFileSize } from "./types.js";

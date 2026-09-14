@@ -17,7 +17,8 @@ import {
   scorePipelineHealth,
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
-import { sessionStart } from "./pipelines/session-start/index.js";
+import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
+import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
@@ -157,22 +158,43 @@ export async function handleSync(args: {
   }
 }
 
-export async function handleStart(args: {
+export interface StartArgs {
   project_root?: string;
-}): Promise<ToolResponse> {
+  /** Per-file line budget for the state files. Omitted = whole files. */
+  state_budget_lines?: number;
+}
+
+/** Display names for the four state files, keyed as in StateFileSize.file. */
+const STATE_FILE_LABEL: Record<StateFileSize["file"], string> = {
+  summary: "SUMMARY.md",
+  inbox: "INBOX.md",
+  taskFile: "task.md",
+  nextSession: "next-session.md",
+};
+
+export async function handleStart(args: StartArgs): Promise<ToolResponse> {
   try {
     const projectRoot = resolve(args.project_root ?? ".");
-    const result = sessionStart({ projectRoot, homePath: homedir(), sessionId: _activeSessionId });
+    const result = sessionStart({
+      projectRoot,
+      homePath: homedir(),
+      sessionId: _activeSessionId,
+      stateBudgetLines: args.state_budget_lines,
+    });
 
     const lines: string[] = [];
     lines.push(`Session Start — ${result.state.mode} mode`);
     lines.push(`Project: v${result.state.version}`);
 
+    // Drift is a result, not an instruction: the caller relays it, it does not
+    // re-derive it. An explicit "none" line keeps an empty drift[] observable.
     if (result.drift.length > 0) {
-      lines.push(`\nDrift detected:`);
+      lines.push(`\nDrift detected (${result.drift.length}):`);
       for (const d of result.drift) {
-        lines.push(`  ${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? " (fixed)" : ""}`);
+        lines.push(`  ${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? " (fixed)" : " (not fixed)"}`);
       }
+    } else {
+      lines.push(`\nDrift: none`);
     }
 
     if (result.session.logPath) {
@@ -180,9 +202,6 @@ export async function handleStart(args: {
       lines.push(`Log: ${result.session.logPath}`);
       lines.push(`Session ID: ${result.session.sessionId ?? "discovery failed"}`);
     }
-
-    lines.push(`\nState: ${result.state.summary ? "SUMMARY loaded" : "no SUMMARY"}`);
-    lines.push(`Inbox: ${result.state.inbox ? "INBOX loaded" : "no INBOX"}`);
 
     if (result.health.warnings.length > 0) {
       lines.push(`\nWarnings:`);
@@ -195,7 +214,39 @@ export async function handleStart(args: {
       lines.push(`\nSkill proposals pending: ${result.health.pendingSkillProposals} cluster(s) ready for review.`);
     }
 
-    return { content: [{ type: "text", text: lines.join("\n") }] };
+    // Size block precedes the content so a reader sees what is coming before
+    // it arrives. Estimator: chars/4 rounded up (see StateFileSize).
+    lines.push(`\n## Sizes (tokens estimated as chars/4)`);
+    for (const s of result.sizes) {
+      if (!s.present) {
+        lines.push(`  ${STATE_FILE_LABEL[s.file]} (${s.path}): absent`);
+        continue;
+      }
+      const cut = s.truncated ? `yes (${s.lines} of ${s.sourceLines} source lines)` : "no";
+      lines.push(`  ${STATE_FILE_LABEL[s.file]} (${s.path}): ${s.lines} lines, ${s.words} words, ~${s.estTokens} tokens, truncated: ${cut}`);
+    }
+
+    // The state itself. Each file under its own header; "absent" is spelled
+    // out so a missing file and an empty one never look alike.
+    const content: Record<StateFileSize["file"], string | null> = {
+      summary: result.state.summary,
+      inbox: result.state.inbox,
+      taskFile: result.state.taskFile,
+      nextSession: result.state.nextSession,
+    };
+    for (const s of result.sizes) {
+      lines.push(`\n## ${STATE_FILE_LABEL[s.file]}`);
+      const body = content[s.file];
+      lines.push(body === null ? "absent" : body.replace(/\s+$/, ""));
+    }
+
+    // Total is of everything above it — the measurement Part 1 of the
+    // evaluation asks for. Computed last so it counts the real return.
+    const text = lines.join("\n");
+    const totalWords = countWords(text);
+    return {
+      content: [{ type: "text", text: `${text}\n\nTotal returned words: ${totalWords} (~${estimateTokens(text)} tokens)` }],
+    };
   } catch (err) {
     return {
       content: [{ type: "text", text: `ob_start error: ${err instanceof Error ? err.message : String(err)}` }],
@@ -354,9 +405,10 @@ server.tool(
 
 server.tool(
   "ob_start",
-  "Start a new session — reads project state, detects drift, discovers session UUID, creates session log.",
+  "Start a new session — returns the full project state (SUMMARY, INBOX, task, next-session), detects drift, creates the session log, and reports per-file sizes. Call ob_set_session first so the registered session id is used.",
   {
     project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
+    state_budget_lines: z.number().int().min(0).optional().describe("Per-file line budget for the state files. Omit for the whole files (default). Truncation is reported per file."),
   },
   async (args) => handleStart(args)
 );

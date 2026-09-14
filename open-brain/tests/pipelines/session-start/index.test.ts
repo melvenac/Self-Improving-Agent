@@ -58,4 +58,16 @@ describe("sessionStart", () => {
     expect(result.state.mode).toBe("lightweight");
     expect(result.session.logPath).toBe("");
   });
+
+  it("surfaces per-file sizes at the top level and honours stateBudgetLines", () => {
+    const full = sessionStart({ projectRoot: tempDir, homePath: tempDir });
+    expect(full.sizes).toBe(full.state.sizes);
+    expect(full.sizes.map((s) => s.file)).toEqual(["summary", "inbox", "taskFile", "nextSession"]);
+    expect(full.sizes.every((s) => !s.truncated)).toBe(true);
+
+    const cut = sessionStart({ projectRoot: tempDir, homePath: tempDir, stateBudgetLines: 1 });
+    const summary = cut.sizes.find((s) => s.file === "summary")!;
+    expect(summary.truncated).toBe(true);
+    expect(summary.sourceLines).toBeGreaterThan(1);
+  });
 });

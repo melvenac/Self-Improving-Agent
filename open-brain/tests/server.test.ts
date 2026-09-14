@@ -29,7 +29,12 @@ describe("server handlers", () => {
       const text = getText(res);
       expect(text).toContain("Session Start — lightweight mode");
       expect(text).toContain("v1.0.0");
-      expect(text).toContain("no SUMMARY");
+      // Absent files are spelled out, in the size block and under their header.
+      expect(text).toContain("SUMMARY.md (.agents/SYSTEM/SUMMARY.md): absent");
+      expect(text).toContain("## SUMMARY.md\nabsent");
+      expect(text).toContain("## INBOX.md\nabsent");
+      expect(text).toContain("## task.md\nabsent");
+      expect(text).toContain("## next-session.md\nabsent");
     });
 
     it("returns project mode when .agents/ exists", async () => {
@@ -45,6 +50,86 @@ describe("server handlers", () => {
       const text = getText(res);
       expect(text).toContain("Session Start — project mode");
       expect(text).toContain("v2.0.0");
+    });
+
+    /**
+     * Loop 1 (ADR-023): ob_start used to compute the state and then report
+     * "SUMMARY loaded" — the content never left the pipeline. This pins the
+     * shape that replaced it: full file text under per-file headers, drift as
+     * a result, the session block, and the size instrumentation.
+     */
+    it("returns the full state, drift, session block and size block (untruncated default)", async () => {
+      writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "2.0.0" }));
+      mkdirSync(join(tmp, ".agents", "SYSTEM"), { recursive: true });
+      mkdirSync(join(tmp, ".agents", "TASKS"), { recursive: true });
+      mkdirSync(join(tmp, ".agents", "SESSIONS"), { recursive: true });
+      // 60 lines: past the old hardcoded 50-line cut, so the default is proven untruncated.
+      const summaryLines = ["# Summary", "**Version:** 1.9.0", ...Array.from({ length: 58 }, (_, i) => `line ${i + 3} alpha beta`)];
+      writeFileSync(join(tmp, ".agents", "SYSTEM", "SUMMARY.md"), summaryLines.join("\n"));
+      writeFileSync(join(tmp, ".agents", "TASKS", "INBOX.md"), "# Inbox\n- [ ] first task");
+      writeFileSync(join(tmp, ".agents", "TASKS", "task.md"), "# Task\ncurrent focus");
+      writeFileSync(join(tmp, ".agents", "SESSIONS", "SESSION_TEMPLATE.md"), "# Session N — [Date]\n> **Status:** In Progress\n");
+
+      const res = await handleStart({ project_root: tmp });
+      expect(res.isError).toBeUndefined();
+      const text = getText(res);
+
+      // Content, whole, under headers.
+      expect(text).toContain("## SUMMARY.md\n# Summary\n**Version:** 1.9.0");
+      expect(text).toContain("line 60 alpha beta");
+      expect(text).not.toContain("...(truncated)");
+      expect(text).toContain("## INBOX.md\n# Inbox\n- [ ] first task");
+      expect(text).toContain("## task.md\n# Task\ncurrent focus");
+      expect(text).toContain("## next-session.md\nabsent");
+
+      // Drift is relayed as a result (SUMMARY says 1.9.0, package.json says 2.0.0).
+      expect(text).toContain("Drift detected (1):");
+      expect(text).toContain("summary-version: expected 2.0.0, got 1.9.0 (not fixed)");
+
+      // Session block.
+      expect(text).toMatch(/Session #1\nLog: .*Session_1\.md\nSession ID: /);
+
+      // Size block: one line per file, absent spelled out, truncated: no.
+      expect(text).toContain("## Sizes (tokens estimated as chars/4)");
+      const summaryText = summaryLines.join("\n");
+      const summaryWords = summaryText.trim().split(/\s+/).length;
+      expect(text).toContain(
+        `SUMMARY.md (.agents/SYSTEM/SUMMARY.md): 60 lines, ${summaryWords} words, ~${Math.ceil(summaryText.length / 4)} tokens, truncated: no`
+      );
+      expect(text).toContain("INBOX.md (.agents/TASKS/INBOX.md): 2 lines, 7 words, ~6 tokens, truncated: no");
+      expect(text).toContain("task.md (.agents/TASKS/task.md): 2 lines, 4 words, ~5 tokens, truncated: no");
+      expect(text).toContain("next-session.md (.agents/SESSIONS/next-session.md): absent");
+
+      // Total is of the text above it and matches an independent count.
+      const m = text.match(/\n\nTotal returned words: (\d+) \(~(\d+) tokens\)$/);
+      expect(m).not.toBeNull();
+      const body = text.slice(0, m!.index);
+      expect(Number(m![1])).toBe(body.trim().split(/\s+/).length);
+      expect(Number(m![2])).toBe(Math.ceil(body.length / 4));
+    });
+
+    it("truncates only under an explicit budget, and says so per file", async () => {
+      writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "2.0.0" }));
+      mkdirSync(join(tmp, ".agents", "SYSTEM"), { recursive: true });
+      mkdirSync(join(tmp, ".agents", "TASKS"), { recursive: true });
+      // sessionStart() writes the log unconditionally once .agents/ exists, so
+      // SESSIONS/ must be there (see the Loop 1 gaps list — not fixed here).
+      mkdirSync(join(tmp, ".agents", "SESSIONS"), { recursive: true });
+      const summary = Array.from({ length: 10 }, (_, i) => `summary line ${i + 1}`).join("\n");
+      writeFileSync(join(tmp, ".agents", "SYSTEM", "SUMMARY.md"), summary);
+      writeFileSync(join(tmp, ".agents", "TASKS", "task.md"), "one line only");
+
+      const res = await handleStart({ project_root: tmp, state_budget_lines: 3 });
+      const text = getText(res);
+
+      // The long file is cut at the budget and flagged with the source size.
+      expect(text).toContain("## SUMMARY.md\nsummary line 1\nsummary line 2\nsummary line 3\n...(truncated)");
+      expect(text).not.toContain("summary line 4");
+      expect(text).toMatch(/SUMMARY\.md \(.*\): 4 lines, \d+ words, ~\d+ tokens, truncated: yes \(4 of 10 source lines\)/);
+      // The short file under budget is untouched; absent stays absent.
+      expect(text).toContain("task.md (.agents/TASKS/task.md): 1 lines, 3 words, ~4 tokens, truncated: no");
+      expect(text).toContain("## task.md\none line only");
+      expect(text).toContain("## INBOX.md\nabsent");
     });
 
     it("returns error response on failure", async () => {
