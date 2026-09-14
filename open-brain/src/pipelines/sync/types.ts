@@ -22,6 +22,8 @@ export interface SyncOptions {
 
 export interface SyncResult {
   version: string;
+  /** The root actually checked, after walking up from the given directory (R4). */
+  projectRoot: string;
   checks: CheckResult[];
   fixed: CheckResult[];
   issues: CheckResult[];

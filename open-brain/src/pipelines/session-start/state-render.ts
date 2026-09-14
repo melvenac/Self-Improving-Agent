@@ -63,7 +63,8 @@ function formatTask(t: Task): string {
   return `[${t.status}] ${t.id} ${t.title}${sup}${note}`;
 }
 
+/** Decisions are append-ordered (Loop 3 R2): the latest is the last element, not a date sort. */
 function latestDecision(state: State): string {
-  const sorted = [...state.decisions].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
-  return `${sorted[0].id} (${sorted[0].date}) ${sorted[0].title}`;
+  const d = state.decisions[state.decisions.length - 1];
+  return `${d.id} (${d.date}) ${d.title}`;
 }

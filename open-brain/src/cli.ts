@@ -11,6 +11,7 @@ import {
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { resolvePaths } from "./shared/paths.js";
+import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import type { ScoreResult, CategoryScore } from "./pipelines/sync/types.js";
 
 const args = process.argv.slice(2);
@@ -21,7 +22,14 @@ if (command === "sync") {
   const score = args.includes("--score");
   const scoreJson = args.includes("--json");
   const history = args.includes("--history");
-  const projectRoot = resolve(args.find((a) => !a.startsWith("--") && a !== "sync") ?? ".");
+  // R4 (Loop 3): resolve the real root before anything reads it. Run from
+  // open-brain/ this used to score the sub-package and print a wrong answer.
+  const startDir = resolve(args.find((a) => !a.startsWith("--") && a !== "sync") ?? ".");
+  const projectRoot = resolveRepoRoot(startDir);
+  if (!projectRoot) {
+    console.error(`sync refused: ${describeNoRoot(startDir)}`);
+    process.exit(1);
+  }
 
   if (history) {
     const paths = resolvePaths(projectRoot);

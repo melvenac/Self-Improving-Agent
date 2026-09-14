@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { handleStart, handleEnd, handleSync, handleScore, computeScore, handleSetSession } from "../src/server.js";
+import { handleStart, handleEnd, handleSync, handleScore, computeScore, handleSetSession, handleState } from "../src/server.js";
 import { readFileSync, cpSync } from "node:fs";
 
 const stateFixture = join(import.meta.dirname, "fixtures-state/state.json");
@@ -179,7 +179,8 @@ describe("server handlers", () => {
       expect(text).toContain("  V-002 — readOptional does not truncate by default; a budget cut is flagged per file (2 evidence)");
       expect(text).toContain("(1 evidence) [REOPENED]");
       expect(text).toContain("Gaps (5):\n  G-001 — Cursor start.md copies");
-      expect(text).toContain("Decisions: 6 recorded; latest D-001 (2026-09-14)");
+      // R2 (Loop 3): decisions are append-ordered; latest is the last element, not the newest date.
+      expect(text).toContain("Decisions: 6 recorded; latest D-006 (2026-08-31) Lifecycle evaluation stays out of the session-end sweep");
       expect(text).toContain("Handoff (session 54):\n  pick up: Loop 2: run V1–V9");
       expect(text).toContain("    - Run vitest from open-brain/, never the repo root (entry 462).");
       expect(text).toContain("Last session: #54 2026-09-14 (f7a1b3d9-ef6d-482f-aba1-ddaa296f722b)");
@@ -225,6 +226,58 @@ describe("server handlers", () => {
       expect(text).not.toContain("## State (");
       expect(text).toContain("## SUMMARY.md\n# Summary\nPROSE-SUMMARY-MARKER alpha beta");
       expect(text).toContain("## next-session.md\n# Handoff\nPROSE-NEXT-MARKER");
+    });
+
+    /** Loop 3 V7: ob_state round trip — write through the handler, views land on disk, ob_start renders the new revision. */
+    it("ob_state applies a batch, renders the views, and ob_start reads the result back", async () => {
+      proseProject(tmp);
+      cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+      // package.json here is 0.29.0 but the fixture says 0.29.0 too — bump the file so state-version drift is visible.
+      writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "0.30.0" }));
+
+      const refused = await handleState({ project_root: tmp, session: 55, expected_revision: 3, ops: [{ op: "set_objective", text: "x" }] });
+      expect(refused.isError).toBe(true);
+      expect(getText(refused)).toContain("ob_state refused: revision mismatch: expected_revision 3 but .agents/state.json is at revision 7");
+      expect(getText(refused)).toContain("Nothing written.");
+
+      const res = await handleState({
+        project_root: tmp, session: 55, expected_revision: 7,
+        ops: [
+          { op: "close_task", id: "T-005", note: "shipped in Loop 2" },
+          { op: "open_task", title: "Loop 3 writer", priority: "P0" },
+          { op: "add_verified", claim: "ob_state round-trips", evidence: [{ type: "test", path: "open-brain/tests/server.test.ts", observation: "this test" }] },
+          { op: "add_decision", title: "Views are generated", date: "2026-09-15", note: "" },
+          { op: "set_handoff", pick_up: "Loop 4 migration", watch_out: ["reconnect the server"], open_questions: [] },
+          { op: "end_session", n: 55, date: "2026-09-15", uuid: "round-trip-uuid" },
+        ],
+      });
+      expect(res.isError).toBeUndefined();
+      const out = getText(res);
+      expect(out).toContain("ob_state applied\nRevision: 7 → 8");
+      expect(out).toContain("  close_task T-005\n  open_task T-028\n  add_verified V-009\n  add_decision D-007\n  set_handoff\n  end_session");
+      expect(out).toContain("Dropped done tasks (retention 3 sessions): T-020, T-021, T-022, T-023, T-026");
+      expect(out).toContain("Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md");
+
+      // Views on disk, generated.
+      const header = "<!-- generated from .agents/state.json rev 8 by open-brain v0.30.0 — do not edit; change state via ob_state -->";
+      expect(readFileSync(join(tmp, ".agents", "TASKS", "INBOX.md"), "utf-8").startsWith(header)).toBe(true);
+      expect(readFileSync(join(tmp, ".agents", "TASKS", "task.md"), "utf-8")).toContain("**T-028** [P0] Loop 3 writer");
+      expect(readFileSync(join(tmp, ".agents", "SESSIONS", "next-session.md"), "utf-8")).toContain("Session 55 — 2026-09-15 — `round-trip-uuid`");
+      const summary = readFileSync(join(tmp, ".agents", "SYSTEM", "SUMMARY.md"), "utf-8");
+      expect(summary).toContain("PROSE-SUMMARY-MARKER alpha beta"); // outside the region, preserved
+      expect(summary).toContain("<!-- state:begin -->");
+      expect(summary).toContain("> **Status:** v0.30.0 — Replace the four prose state files");
+
+      // ob_start reads the new revision back.
+      const start = getText(await handleStart({ project_root: tmp }));
+      expect(start).toContain("## State (state.json rev 8)");
+      expect(start).toContain("[open] T-028 Loop 3 writer");
+      expect(start).not.toContain("[in_progress] T-005");
+      expect(start).toContain("Decisions: 7 recorded; latest D-007 (2026-09-15) Views are generated");
+      expect(start).toContain("Handoff (session 55):\n  pick up: Loop 4 migration");
+      expect(start).toContain("Last session: #55 2026-09-15 (round-trip-uuid)");
+      // R3: state.json still says 0.29.0 while package.json says 0.30.0 → reported, not fixed.
+      expect(start).toContain("state-version: expected 0.30.0, got 0.29.0 (not fixed)");
     });
 
     /** Loop 2 R1: .agents/ without SESSIONS/ no longer errors; the block says why there is no log. */

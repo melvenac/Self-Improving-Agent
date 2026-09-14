@@ -749,8 +749,9 @@ export function checkRules(projectRoot: string): CheckResult {
 
 /**
  * `.agents/state.json` (Loop 2, read side). Absent is a SKIP with the reason
- * printed, not a pass: nothing writes the file yet, so most projects will not
- * have one, and a pass would claim a validation that never ran. Present must
+ * printed, not a pass: the writer (ob_state, Loop 3) never creates the file,
+ * so an unmigrated project has none, and a pass would claim a validation
+ * that never ran. Present must
  * parse against the strict schema, and its `project.version` must equal
  * package.json — the same single-source rule the README and PRD checks enforce.
  */
@@ -760,7 +761,7 @@ export function checkStateSchema(version: string, projectRoot: string): CheckRes
     return {
       name: "state-schema",
       severity: "skip",
-      message: "skipped — no .agents/state.json (read side only in v0.29.0; no writer exists yet)",
+      message: "skipped — no .agents/state.json (this project has not been migrated; ob_state never creates the file)",
     };
   }
   const parsed = parseState(readFileSync(statePath, "utf-8"));

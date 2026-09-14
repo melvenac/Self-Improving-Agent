@@ -1,6 +1,7 @@
 import { homedir } from "node:os";
 import { resolvePaths } from "../../shared/paths.js";
 import { readJson } from "../../shared/fs-utils.js";
+import { resolveRepoRoot, describeNoRoot } from "../../shared/repo-root.js";
 import type { SyncOptions, SyncResult, CheckResult } from "./types.js";
 import {
   syncReadmeVersion,
@@ -25,7 +26,12 @@ import {
   checkStateSchema,
 } from "./checks.js";
 
-export function runSync(options: SyncOptions): SyncResult {
+export function runSync(input: SyncOptions): SyncResult {
+  // R4 (Loop 3): the given root may be a subdirectory (open-brain/ has its
+  // own package.json); walk up to the real project root or refuse.
+  const root = resolveRepoRoot(input.projectRoot);
+  if (!root) throw new Error(describeNoRoot(input.projectRoot));
+  const options: SyncOptions = { ...input, projectRoot: root };
   const paths = resolvePaths(options.projectRoot);
   const home = homedir();
 
@@ -64,7 +70,7 @@ export function runSync(options: SyncOptions): SyncResult {
   const passed = checks.filter((c) => c.severity === "pass");
   const skipped = checks.filter((c) => c.severity === "skip");
 
-  return { version, checks, fixed, issues, warnings, passed, skipped };
+  return { version, projectRoot: root, checks, fixed, issues, warnings, passed, skipped };
 }
 
 export type { SyncOptions, SyncResult, CheckResult } from "./types.js";
