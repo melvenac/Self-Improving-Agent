@@ -36,7 +36,10 @@ describe("summary-version with state.json present (Loop 4 R3)", () => {
     root = mkdtempSync(join(tmpdir(), "ob-r3-"));
     cpSync(fixturesDir, root, { recursive: true });
     cpSync(stateFixture, join(root, STATE));
-    // fixture state.json is project.version 0.29.0; the fixture package.json is 0.6.0
+    // The copied fixture tree brings its own package.json, so it is overwritten
+    // here to pin the version these tests assert on. Since Loop 8 R3 this is the
+    // only place a version comes from — state.json no longer carries one — so
+    // this line alone decides what the views should render.
     writeFileSync(join(root, "package.json"), JSON.stringify({ name: "fixture", version: "0.29.0" }));
   });
 

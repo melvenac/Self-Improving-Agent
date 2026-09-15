@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 12 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 12 by open-brain v0.32.0 — do not edit; change state via ob_state -->
 
 # Inbox
 

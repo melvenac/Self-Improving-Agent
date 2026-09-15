@@ -1,6 +1,58 @@
 # Changelog
 
-## [Unreleased] - Loop 7
+## [0.32.0] - 2026-09-15 — Loop 8
+
+Loop 8 of the extraction evaluation. Two capability questions about skills, four repairs, and the first tag in four loops. Both capability items ended in a **negative** answer that is the deliverable rather than a failure, and both were reached by reading the mechanism before proposing a measure.
+
+### Ruled — no auto-creation on this generator (C1)
+Full working: `~/Obsidian Vault v2/Research/loop-8-c1-skill-generator-2026-09-15.md`. Read in full: `skill-scan.ts`, `skill-scan-runner.ts`, and all 529 experience notes rather than a sample.
+- **The generator clusters on frontmatter tags alone.** `scanForSkills` receives every note's full `content` and passes it only to the frontmatter parser, so the note body never reaches clustering. Consolidation and dedupe run on file-set Jaccard, which can merge tags that share notes but can never see that three notes under one tag are unrelated.
+- **The noise is tag density, not tag choice.** 7.4 tags per note across 529 notes gives 3,910 memberships over 1,273 distinct tags, and **295 clear the threshold of 3**. The threshold is met whenever three notes happen to share one vocabulary item.
+- **Topic coherence is recoverable; action-pattern signal is not, from clustering.** A first coherence metric ranked noise *above* signal (`idempotency` 0.043 against `reference` 0.053) because template boilerplate dominated the shared terms and the denominator tracked cluster size. Corrected — topical means present in ≥50% of the cluster and <20% of the corpus, scored as lift over 300 size-matched random clusters — it gives `ranking` 16.8, `idempotency` 8.3, `qa` 3.2, `reference` 1.7, `handoff` 1.0 (exactly chance), with 25 of 39 clusters beating the random baseline at p95.
+- **An action field exists and nothing has ever read it.** `TRIGGER:`/`ACTION:`/`OUTCOME:`/`CONTEXT:` sit on 439/436/437/430 of 529 notes, co-occurring at 81–83%, so the A12 template is the dominant storage format rather than one among several. An earlier draft of this finding claimed no action record existed, from grepping the heading form `## Action` (3 of 529) when the template uses a bare field label. Corrected; the extraction question is carried forward as **open and unexamined**, not closed.
+- **Verdict:** the coherence gate ships as an advisory queue filter, not an auto-creation trigger. Passing it shows a cluster shares a subject, not that it records a repeated action worth compiling.
+
+### Designed — the evaluation signal, and why both candidates failed (C2)
+Full design: `~/Obsidian Vault v2/Research/loop-8-c2-evaluation-signal-2026-09-15.md`. Ships as design only, with no implementation, because there is no inflow to gate.
+- **Session outcome is not recorded.** Tests-green, sync-passing and merged are in no store, and `sessions.ended_at` is set on **1 of 57** rows — a `legacy-v` migration artifact. No real session has ever been closed: `ob_set_session` writes `started_at` and nothing updates it, while `chunk-indexer.ts:80-88` writes `ended_at` into the **v1** store rather than the v2 `sessions` table.
+- **"Did the skill's action sequence complete" is a category error here, not an instrumentation cost.** STEM can call `recordOutcome(skillId, success)` because a STEM skill has a toolChain, an ExecutionPlan and postconditions. Ours are markdown guidelines: there is no action sequence to complete, so nothing can be observed being abandoned.
+- **The population is the result.** 66 `type:skill` invocations in six months across 24 distinct skills; **15 invoked exactly once ever**; 5 reach STEM's `COMMITTED=3`; 2 reach `MATURE=10` and both are `end` and `start`, the session protocol. STEM's thresholds applied to this corpus promote two slash commands.
+- **We log invocations and never log offers.** Zero invocations is uninterpretable — useless, or never offered where it applied. Same defect shape as the injection question that `recall_trigger` fixed in Loop 7. Without the denominator every non-use retirement rule is unfalsifiable.
+- **The same skill is logged twice under two types.** `type:skill` is Skill-tool dispatch, `type:command` is the typed slash command: `start` 10/81, `end` 13/56, `transcript` **1/12**, `checkpoint` 1/8, `sync` 1/1. Keyed on `type:skill` alone the proposed rule would have retired `transcript`, whose combined count of 13 clears `MATURE`. The signal counts **both arms**, unioned on skill name, and the offer log must be keyed the same way or numerator and denominator will not line up.
+- **Proposed:** asymmetric — retirement only, promotion deferred; retirement means *unlisted, not deleted*; manual skills exempt from automatic action. The creation/use ladder (exists / listed / may short-circuit) is designed and **explicitly marked unexercised**, since nothing enters it.
+
+### Suspended — the maturity lifecycle, counters kept (R1)
+`matureBoost` and `provenBoost` to 1.0, apoptosis behind a new `apoptosisEnabled` flag, off. Counters, `success_rate` and promotion all keep running; restoring three constants restores the behaviour.
+- The flag is deliberately **not** `apoptosisThreshold: 0`. That constant is read in three places — the gate, `maturityBoost`, and the penalty term of `recallRankExpr` — so zeroing it would also have disabled `lowSuccessPenalty`, which R1 did not rule on.
+- `evaluateLifecycle` takes an optional config so the suspension is provable in **both** directions. A flag whose off state nothing can exercise is indistinguishable from a flag that does not work.
+- **The apoptosis decision had no test coverage before this loop** — only the review-queue SQL did, which is how the gate stayed inert in production for its whole life without anything noticing.
+- Noted, not fixed: `auto-feedback.ts` carries a second `evaluateLifecycle` with hardcoded thresholds that never reads `LIFECYCLE_CONFIG`. It is inert both ways — its apoptosis result is computed and never consumed, and its promotion compares against `"Progenitor"` while the DB stores `"progenitor"`.
+
+### Measured — the recency sweep, adopting nothing (R2)
+Full working: `~/Obsidian Vault v2/Research/loop-8-r2-recency-sweep-2026-09-15.md`. 39 sessions, all 39 anchored to their own recall time.
+- Aggregate nDCG rises from 0 through 0.005 and 0.01, **peaks at 0.02** (0.2324 against live 0.2190) and **turns over by 0.04** (0.2259). The aggregate is not the answer.
+- **No recency increase is distinguishable from chance**: 0.01 is 19–12 (p=0.281), 0.02 is 19–15 (p=0.608), 0.04 is 20–15 (p=0.500). The +0.0134 at the peak sits behind a coin flip.
+- The **single significant result** in the table is `bm25_only` *losing* to live, 10–23 at **p=0.035**: retrieval earns its complexity over pure lexical matching. With the lifecycle suspended, that is the evidence the remaining stack is worth keeping.
+- The metrics disagree at the top end — nDCG and precision peak at 0.02 while MRR climbs monotonically through 0.04 — so a constant chosen here would be chosen by choosing a metric. **`recencyDecayPerDay` stays at 0.005.** n=39 is underpowered and the fix is more sessions, not more strategies.
+- Two consistency checks, both passed: `recency_0_02` duplicates `recency_strong` and matches to four decimals, so the harness is deterministic; `no_maturity` is byte-identical to live after R1 and ties on every metric with **0/39 sessions reordered**, independently confirming the suspension is live in production config rather than merely present in source.
+- Instrument repair: the paired and reordering sections iterated a **hardcoded strategy list** and silently omitted every strategy added after it was written — including all three of R2's recency points. Both now derive from the strategies present, and a sign test was added.
+
+### Removed — `project.version` from `state.json` (R3, ADR-027, G-012)
+The field cached `package.json`'s version inside the record. Seven consumers, none authoritative: `state-writer.ts` already preferred `package.json`, and two sync checks plus a session-start drift branch existed only to police the copy against its own source.
+- Schema stays at **version 1**. `ProjectSchema` is a `z.strictObject` and there is no migration runner for this file, so a copy still carrying the field fails to parse outright — which is why **all three copies moved in one commit**: the live record, `tests/fixtures-state`, and `project-template/.agents/state.json`. The last is the skeleton that ships; leaving it behind would have broken the first read of every project scaffolded after this change, on someone else's machine.
+- **Revision does not advance.** The migration changes shape, not content, and every revision so far corresponds to an applied state op. `state-writer.ts:161` already defines a render-only pass as revision-preserving.
+- A new test pins the property the migration's safety rests on: a `state.json` still carrying `project.version` fails parse, so a missed copy is loud rather than silent.
+
+### Added — `command-parity` sync check (R4)
+Every slash command exists twice in this repo — user scope and project scope — because the repo *is* the framework source. The duplication is expected; the absence of any check that the copies agree was not. Loop 5's R4 had to be applied to each by hand and one copy drifted and stayed drifted.
+- Three tiers: repo against `project-template` at severity `issue`; user scope at `warn` and **skipped entirely when `~/.claude/commands` is absent**, so a check reading the author's home directory can never fail someone else's build; the cursor copies explicitly **not covered**, said so in the docstring, with G-001 left open.
+- Line endings are normalised, so CRLF-against-LF with identical content is not reported as drift.
+- `bootstrap.md` is a **standing allowed exception**: it is template-only, takes an empty folder to an AI-ready project, and `git log --all` shows it has never existed in repo scope. Without the exception the check would have shipped red against its own green-on-today acceptance criterion.
+
+### One lesson, twice
+Two Planner enumerations in this loop checked what was in both sets and never looked at the difference. R3's consumer list found everywhere `project.version` is *read* and missed the writer at `state-import/index.ts:437`; R4's rule checked the seven shared commands and missed the eighth file. The standing rule taken from it: any enumeration states what is in both sets, what is in each alone, and why each exception is allowed. Five of the loop's corrections were caught by the counterpart agent rather than by their author — three of the Developer's, two of the Planner's — and the correction log lives in the C1 note.
+
+## [0.31.0] - Loop 7
 
 Loop 7 of the extraction evaluation — a **decision** loop, not a build loop. It asks whether session-start injection earns its place, and the first thing it found is that one of the two arms that were supposed to be answering that question has never run.
 
