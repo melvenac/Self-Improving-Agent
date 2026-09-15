@@ -32,6 +32,16 @@ export interface RecalledIdsSource {
   origin: "explicit" | "recall-log" | "file" | "none";
   /** Set when a file existed but was not trusted. */
   rejected?: { path: string; fileSessionId: string | null; reason: string };
+  /**
+   * Why nothing resolved, when `origin` is "none" and no file was rejected —
+   * the case where there was simply nothing to read.
+   *
+   * Loop 5 R3: `rejected` only explains a file that existed and was refused. A
+   * session that never ran `ob_set_session`, or one with no recall_log rows and
+   * no file, produced `origin: "none"` with no explanation at all, rated
+   * nothing, and said nothing about why.
+   */
+  reason?: string;
 }
 
 export interface ResolveRecalledIdsInput {
@@ -106,5 +116,38 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS
     };
   }
 
-  return { ids: [], origin: "none" };
+  // Nothing anywhere: no explicit ids, no recall_log rows for a known session,
+  // and not one of the candidate files was readable. Say which, rather than
+  // returning a bare empty result the caller has to guess about.
+  return {
+    ids: [],
+    origin: "none",
+    reason: sessionId
+      ? `no recall_log rows for session ${sessionId} and no readable .recalled-entries.json (looked in ${filePaths.length} location(s))`
+      : `no session id (ob_set_session never ran) and no readable .recalled-entries.json (looked in ${filePaths.length} location(s))`,
+  };
+}
+
+/**
+ * Render the recalled-ids resolution as report lines — **including at zero**.
+ *
+ * The same shape as `formatApoptosisQueue`: absence must not be
+ * indistinguishable from success. Before this, a session that resolved nothing
+ * rated nothing and the only visible trace was `Feedback: 0 entries`, which
+ * reads identically whether there was nothing to rate, the session id was
+ * missing, or a file belonging to another session was refused.
+ *
+ * The count-and-origin line is unconditional; the explanation is added only
+ * when there is one to give.
+ */
+export function formatRecalledResolution(resolved: RecalledIdsSource, indent = "  "): string[] {
+  const lines = [`${indent}Recalled ids: ${resolved.ids.length} from ${resolved.origin}`];
+  if (resolved.rejected) {
+    lines.push(`${indent}Ignored ${resolved.rejected.path}: ${resolved.rejected.reason}`);
+  }
+  if (resolved.origin === "none") {
+    if (resolved.reason) lines.push(`${indent}Nothing rated: ${resolved.reason}`);
+    else if (resolved.rejected) lines.push(`${indent}Nothing rated: the only candidate file was refused (above)`);
+  }
+  return lines;
 }

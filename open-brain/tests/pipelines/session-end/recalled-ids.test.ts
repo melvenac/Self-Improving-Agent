@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import Database from "better-sqlite3";
 import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from "../../../src/db-v2.js";
-import { resolveRecalledIds } from "../../../src/pipelines/session-end/recalled-ids.js";
+import { resolveRecalledIds, formatRecalledResolution } from "../../../src/pipelines/session-end/recalled-ids.js";
 
 const THIS_SESSION = "efcaeb75-f5d5-421f-a1e5-645f155c59e4";
 const OTHER_SESSION = "2fb67133-f85a-4c1d-9e30-000000000000";
@@ -128,9 +128,12 @@ describe("resolveRecalledIds", () => {
     expect(result.rejected?.reason).toBe("unparseable");
   });
 
-  it("returns nothing when no file exists and nothing was recalled", () => {
+  it("returns nothing when no file exists and nothing was recalled — and says why (R3)", () => {
     const result = resolve(db, THIS_SESSION, {});
-    expect(result).toEqual({ ids: [], origin: "none" });
+    expect(result.ids).toEqual([]);
+    expect(result.origin).toBe("none");
+    // R3: this used to be a bare {ids, origin} that explained nothing.
+    expect(result.reason).toContain("no recall_log rows for session");
   });
 
   it("skips a missing candidate path and falls through to the next", () => {
@@ -143,5 +146,55 @@ describe("resolveRecalledIds", () => {
     });
     expect(result.origin).toBe("file");
     expect(result.ids).toEqual([42]);
+  });
+});
+
+describe("R3: a session that rates nothing says why", () => {
+  let db: Database.Database;
+  beforeEach(() => { db = makeDb(); });
+
+  /** The formatter's lines, joined, without embedding an escape in this file. */
+  const text = (lines: string[]) => lines.join(String.fromCharCode(10));
+
+  it("names the missing session id when ob_set_session never ran and no file exists", () => {
+    const r = resolve(db, null, {});
+    expect(r.origin).toBe("none");
+    expect(r.ids).toEqual([]);
+    expect(r.reason).toMatch(/no session id/);
+
+    const out = text(formatRecalledResolution(r));
+    expect(out).toContain("Recalled ids: 0 from none");
+    expect(out).toMatch(/Nothing rated: no session id/);
+  });
+
+  it("names the empty recall_log when the session IS known but nothing was recalled", () => {
+    const r = resolve(db, THIS_SESSION, {});
+    expect(r.origin).toBe("none");
+    expect(r.reason).toContain(THIS_SESSION);
+    expect(text(formatRecalledResolution(r))).toMatch(/Nothing rated: no recall_log rows for session/);
+  });
+
+  it("explains a refused foreign file, not just that it was ignored", () => {
+    const r = resolve(db, THIS_SESSION, { "/p/.recalled-entries.json": fileFor(OTHER_SESSION, [1, 2, 3]) });
+    expect(r.origin).toBe("none");
+    const out = text(formatRecalledResolution(r));
+    expect(out).toContain("Recalled ids: 0 from none");
+    expect(out).toContain("Ignored /p/.recalled-entries.json");
+    expect(out).toMatch(/Nothing rated: the only candidate file was refused/);
+  });
+
+  it("prints the count line even on the boring success path — absence must not look like success", () => {
+    recordRecallEvent(db, THIS_SESSION, "q", [7], "start");
+    const r = resolve(db, THIS_SESSION, {});
+    expect(r.origin).toBe("recall-log");
+    const lines = formatRecalledResolution(r);
+    expect(lines[0]).toBe("  Recalled ids: 1 from recall-log");
+    expect(text(lines)).not.toContain("Nothing rated");
+  });
+
+  it("honours the indent argument so the hook and the MCP tool share one formatter", () => {
+    const r = resolve(db, null, {});
+    expect(formatRecalledResolution(r, "")[0]).toBe("Recalled ids: 0 from none");
+    expect(formatRecalledResolution(r, "  ")[0]).toBe("  Recalled ids: 0 from none");
   });
 });
