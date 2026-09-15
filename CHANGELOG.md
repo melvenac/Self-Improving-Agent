@@ -1,5 +1,26 @@
 # Changelog
 
+## [Unreleased] - Loop 7
+
+Loop 7 of the extraction evaluation — a **decision** loop, not a build loop. It asks whether session-start injection earns its place, and the first thing it found is that one of the two arms that were supposed to be answering that question has never run.
+
+Still **0.31.0 and untagged**, third loop running, for the reason in ADR-027. G-012 remains queued.
+
+### Fixed — the unattended rating arm never knew its own session (R2)
+`cli-session-end.ts` read `process.env.CLAUDE_SESSION_ID`. **Claude Code does not set that variable**; the one that exists is `CLAUDE_CODE_SESSION_ID`, verified live in two concurrent sessions against their own uuids, and line 36 held the only occurrence of either name in the repository. So `sessionId` was the empty string on every session end this hook has ever run.
+
+The effect was not a missing label. `resolveRecalledIds` received a null session, could not match `recall_log`, and — since Loop 5 removed the `.recalled-entries.json` write — resolved nothing, so Stage 2's loop body never executed. **The `heuristic` arm has produced zero rows in the entire life of the `rating_method` column**, while all 18 rated sessions hold `recall_log` rows under their own uuid that the hook would have found had it known its id. A second, independent guard (`index-v2.ts`, `if (sessionId)` around the event write while `updateFeedbackV2` sits outside it) is the mechanism behind knowledge entry 473, "aggregate counter and event log cover different eras" — filed months ago as a curiosity about differing start dates.
+
+The hook now reads `session_id` from the hook payload on **stdin** — the same authoritative source `cli-bootstrap.ts` names in its own comment, and IDE-agnostic, since Cursor sets no `CLAUDE_*` variable but does send a payload — falling back to `CLAUDE_CODE_SESSION_ID`.
+
+This is **not** T-003. T-003 is the `active-session.json` slot collision; here the hook never had an id to collide over.
+
+### Added — the fallback rating arm is gated off (R2)
+`SessionEndV2Input.enableHeuristicRatings`, **default false**. Fixing the uuid would otherwise have switched a dormant arm on as a side effect, on the very next session end. That arm emits `helpful` when an entry's tag appears as a substring of the session summary — mentioned, not worked — into `success_rate`, which gates maturity and apoptosis, and whose per-entry corpus mean (0.311) sits one hundredth above the apoptosis threshold (0.3). Repair and switch-on are separated deliberately: the uuid is correct now, and the arm stays off until C2 rules. With no explicit judgment and the gate closed an entry is **skipped**, not rated neutral — a fallback neutral is indistinguishable from a rater's considered "retrieved and not used", which is the one signal the corpus still has.
+
+### Finding — T-003's write path is already guarded (R1)
+No fix written, and the reason is stated rather than assumed. `resolveWriteSession` consults the slot file only when the in-memory id is absent, and refuses any slot older than `STALE_SESSION_MS` (12h); explicit ids always win. `active-session.test.ts:48-79` already pins all five cases. The brief's justification for urgency does not hold: the live slot file keys the Planner under `c:/users/melve::claude` and the Developer under `c:/users/melve/projects/self-improving-agent::claude`, so the Harness-of-Harness pair does **not** share a slot. The residual window is two windows of the same IDE on the same project with a reconnect inside 12h. Separately observed and **not** the same defect: one uuid (`d7e514f8`) appears under two different project keys a day apart — one session attributed to two projects, which is the inverse collision and is not currently guarded.
+
 ## [Unreleased] - Loop 6
 
 Loop 6 of the extraction evaluation — **repair the instrument, then re-ask it the questions.** The usage-signal work is displaced to Loop 7 deliberately: Loop 5 proved the shadow harness scored every strategy against maturity values the labels being scored had just written, so building a new measurement on it would have repeated that error at larger scale.

@@ -38,6 +38,30 @@ export interface SessionEndV2Input {
    */
   entryRatings?: Record<number, FeedbackRating>;
   /**
+   * Whether the tag-substring fallback may rate entries it was given no
+   * judgment for. **Default false — the arm is off.**
+   *
+   * It was off by accident for the whole life of the `rating_method` column:
+   * the hook could not read its own session uuid, so Stage 2 never ran and this
+   * arm wrote nothing (see cli-session-end.ts and
+   * ~/Obsidian Vault v2/Research/loop-7-c1-reconciliation-2026-09-15.md §2).
+   * Fixing the uuid
+   * would have switched it on as a side effect, on the very next session end.
+   *
+   * That is not a safe thing to do silently. The arm emits `helpful` on a tag
+   * substring appearing in the session summary — mentioned, not worked — and
+   * those ratings feed `success_rate`, which gates maturity and apoptosis. The
+   * per-entry mean helpful rate is 0.311 against an apoptosis threshold of 0.3
+   * (injection-ablation prereg §10), so flooding a knife-edge scoring system
+   * with topic-mention signal is exactly the change that should not happen as a
+   * by-product of a bug fix.
+   *
+   * So the repair and the switch-on are separated: the uuid is correct now, and
+   * this stays false until Loop 7's C2 rules on whether session-start injection
+   * and its rating machinery are kept. Flip it in one place, deliberately.
+   */
+  enableHeuristicRatings?: boolean;
+  /**
    * Where `recalledEntryIds` came from, as resolveRecalledIds reported it.
    * Recorded on every rating this run creates — the resolver computed this all
    * along and it died in a log string, which is why 106 provenance-broken
@@ -122,6 +146,14 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     // An explicit judgment always wins over the substring heuristic — it is the
     // only input that can carry a negative signal.
     const supplied = input.entryRatings?.[id];
+
+    // Gate: with no explicit judgment and the fallback arm off, this entry is
+    // not rated at all — no counter bump, no event row. Skipping rather than
+    // recording a neutral matters: a neutral here would be indistinguishable
+    // from a rater's considered "retrieved and not used", which is the one
+    // signal the corpus still has.
+    if (supplied === undefined && !input.enableHeuristicRatings) continue;
+
     const matched = tags.some((tag) => summaryLower.includes(tag.toLowerCase()));
     const rating: FeedbackRating = supplied ?? (matched ? "helpful" : "neutral");
 
