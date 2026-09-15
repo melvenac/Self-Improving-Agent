@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "fs";
 import { join } from "path";
 import { execSync } from "child_process";
 import { obsidianVaultDir } from "../../shared/paths.js";
+import { SKILL_SCAN_ENABLED } from "../../shared/skill-scan-flag.js";
 
 export interface HealthWarning {
   category: string;
@@ -109,8 +110,13 @@ export function runHealthChecks(homePath: string): HealthCheckResult {
   }
 
   // 3. Pending skill proposals
+  //
+  // Loop 9 R1: silent while the generator is off. The file is NOT deleted, so
+  // without this gate a stale count would keep being announced after nothing
+  // was producing it — an absence reported as a healthy number, which is Rule 4
+  // and the specific failure this repair exists to avoid.
   const pendingPath = join(vaultPath, ".skill-proposals-pending.json");
-  if (existsSync(pendingPath)) {
+  if (SKILL_SCAN_ENABLED && existsSync(pendingPath)) {
     try {
       const pending = JSON.parse(readFileSync(pendingPath, "utf-8"));
       if (Array.isArray(pending) && pending.length > 0) {
