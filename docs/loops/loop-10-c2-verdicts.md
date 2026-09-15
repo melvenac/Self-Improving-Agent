@@ -53,7 +53,8 @@ written 2026-09-10. `.skill-proposals-pending.json` 39 entries.
 | P6 | `/checkpoint` | B | **KEEP** |
 | P9 | Guide SKILL.md | B | **KEEP** |
 | B8 | Smart Connections | D | **CUT** |
-| B10 | `.recalled-entries.json` | — | Already gone; no verdict required |
+| E29 | `db.ts` — the v1 database layer | D | **CUT** |
+| B10 | `.recalled-entries.json` | — | See correction below |
 
 **Tallied from the table rows programmatically, not by eye: 28 rows — A 2, B 11, C 2, D 11,
 n/a 2. Verdicts: 14 KEEP, 9 CUT, 4 SUSPENDED, 1 requiring none.**
@@ -117,6 +118,50 @@ shipped to the retrieval path optimises a variable that is not the binding one.
 sessions receiving injected recall take different actions from sessions that do not. Not a
 refinement of ranking, and not an uncontrolled before/after. Until such a result exists, the
 injection block is deleted; **its text is recoverable at `bfee8c0:.claude/commands/start.md`.**
+
+### E29 — `db.ts`, the v1 database layer. CUT. A component both enumerations were blind to.
+
+**Ruled after the SHA was first frozen, and dated: 2026-09-15.** The Planner found it during
+read-only QA of `1a0b708`.
+
+**Artifact.** 479 lines. **Zero production importers** — no static import anywhere in `src`,
+every dynamic import in `cli.ts` (`:98`, `:164`, `:222`) resolves to `db-v2.js`, and neither
+published bin (`build/cli.js`, `build/server.js`) reaches it. Its **only** importers are three
+test files: `tests/db.test.ts:2`, `tests/pipelines/sync/scorer-integration.test.ts:2-3`,
+`tests/server.test.ts:22`.
+
+**And it carries a live implementation of E4b, which was ruled CUT.** `db.ts:92` declares
+`success_rate`; `:179` and `:186` compute and write it; `:173`, `:282`, `:324`, `:371` read
+it; and **`:424` runs the low-success aggregation** —
+`SUM(CASE WHEN success_rate < 0.3 AND (helpful_count + harmful_count) >= 5 …)`. All of this
+was deleted from `db-v2.ts` in this loop and left untouched here. **C1 catches it twice over:
+dormant code is a KEEP wearing a CUT's label, and ADR-013 governs unreachable
+implementations.**
+
+**Category D.** No A artifact. Not B — production never reaches it, and execution by tests
+that exist to test it is not use. Not C — nothing in A or B depends on it. No reviving
+observation is nameable: `db-v2` superseded it, and reviving a second divergent copy of a
+cut mechanism is not something an observation could justify. **CUT.**
+
+**Why it survived to a frozen SHA, which is the part worth keeping.** I deleted it in stage 1,
+three test files broke, and I restored it as an over-deletion. **I read the failing tests as
+evidence the code was needed. They were evidence that three test files pin unreachable code.**
+Rule 2 says a passing test is not evidence until someone has seen it fail; the converse bit
+here — **a failing test was taken as proof that code must live.** C1 already answered it: CUT
+takes the code *with the tests that pinned it*.
+
+**Neither enumeration could have found it, and that is the fifth instance of the principle.**
+The source pass asked *what does production import*; a module reachable only from tests is
+invisible to that question. The prompt pass asked *what instructs an agent to call a memory
+tool*. **Both instruments share the premise that a component is something production reaches**,
+so a test-only module sits in the blind spot of both. Two measurements that share a premise
+are one measurement — in a form neither agent anticipated, and the only one that survived all
+the way to a frozen SHA.
+
+**A second finding fell out of executing it.** `scorer-integration.test.ts` is titled *"scorer
+with real DB inputs"* and fed the scorer statistics from `db.ts` — **a store production does
+not use**, since the scorer reads `db-v2` in production. It checked a stand-in for the thing,
+which is rule 6, and repointing it at `db-v2` makes it test what its own title claims.
 
 ## The other rulings that carry weight
 
