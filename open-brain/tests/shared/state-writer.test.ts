@@ -8,6 +8,7 @@ import {
   nextId,
   validateResultState,
   DONE_RETENTION_SESSIONS,
+  readState as readStateDoor,
   type WriteResult,
 } from "../../src/shared/state-writer.js";
 import { parseState, type State } from "../../src/shared/state-schema.js";
@@ -356,5 +357,63 @@ describe("applyStateOps (Loop 3 writer)", () => {
     expect(nextId("T", [])).toBe("T-001");
     expect(nextId("T", ["T-009", "T-010", "V-999", "T-x"])).toBe("T-011");
     expect(nextId("D", ["D-100"])).toBe("D-101");
+  });
+});
+
+describe("G-006: readState — the read door", () => {
+  let root: string;
+
+  beforeEach(() => {
+    root = mkdtempSync(join(tmpdir(), "ob-state-read-"));
+    cpSync(fixturesDir, root, { recursive: true });
+  });
+
+  afterEach(() => {
+    rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+  });
+
+  it("reads and validates without writing anything", () => {
+    cpSync(stateFixture, join(root, STATE));
+    const before = snapshot(root);
+
+    const r = readStateDoor(root);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.data.revision).toBe(7);
+    expect(r.data.last_session.n).toBe(54);
+    expect(r.path).toBe(join(root, STATE));
+
+    // The whole point of a read door: nothing on disk moves.
+    expect(snapshot(root)).toEqual(before);
+  });
+
+  it("refuses an absent state.json without creating it", () => {
+    const r = readStateDoor(root);
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.error).toMatch(/is absent — run the migration first/);
+    expect(existsSync(join(root, STATE))).toBe(false);
+  });
+
+  it("refuses an invalid state.json rather than returning a partial", () => {
+    mkdirSync(join(root, ".agents"), { recursive: true });
+    writeFileSync(join(root, STATE), JSON.stringify({ schema_version: 1, revision: "not a number" }));
+    const r = readStateDoor(root);
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.error).toMatch(/invalid at/);
+  });
+
+  it("describes a broken file the same way the write door does", () => {
+    const read = readStateDoor(root);
+    const write = applyStateOps(root, { session: SESSION, expected_revision: 0, ops: [{ op: "set_objective", text: "x" }] });
+    expect(read.ok).toBe(false);
+    expect(write.ok).toBe(false);
+    if (read.ok || write.ok) return;
+    // Both name the same file and the same condition.
+    expect(read.error).toContain(STATE);
+    expect(write.error).toContain(STATE);
+    expect(read.error).toMatch(/absent/);
+    expect(write.error).toMatch(/absent/);
   });
 });

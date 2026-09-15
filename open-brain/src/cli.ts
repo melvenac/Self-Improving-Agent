@@ -395,10 +395,63 @@ if (command === "sync") {
   // Loop 4 C1: the one-shot migration door. `state import --draft` (default)
   // writes a reviewable draft + report; `--commit` applies the reviewed draft.
   const sub = args[1];
-  if (sub !== "import") {
-    console.error("Usage: open-brain state import [--draft | --commit] [--force-snapshot] [dir]");
+  if (sub !== "import" && sub !== "show") {
+    console.error("Usage: open-brain state <show [--json] | import [--draft | --commit] [--force-snapshot]> [dir]");
     process.exit(1);
   }
+
+  // G-006: the read door. ob_state was the only way to see the record, so with
+  // the MCP server down the only remaining option was opening the JSON by hand.
+  // Read-only by construction — no write path is added here, so the
+  // single-writer rule (every mutation goes through applyStateOps) still holds.
+  if (sub === "show") {
+    const { readState } = await import("./shared/state-writer.js");
+    const startDir = resolve(args.slice(2).find((a) => !a.startsWith("--")) ?? ".");
+    const projectRoot = resolveRepoRoot(startDir);
+    if (!projectRoot) {
+      console.error(`state show refused: ${describeNoRoot(startDir)}`);
+      process.exit(1);
+    }
+    const r = readState(projectRoot);
+    if (!r.ok) {
+      console.error(`state show refused: ${r.error}`);
+      process.exit(1);
+    }
+    if (args.includes("--json")) {
+      console.log(JSON.stringify(r.data, null, 2));
+      process.exit(0);
+    }
+    const st = r.data;
+    const count = (pred: (t: (typeof st.tasks)[number]) => boolean) => st.tasks.filter(pred).length;
+    console.log(`
+state — ${st.project.name} v${st.project.version}
+`);
+    console.log(`Root: ${projectRoot}`);
+    console.log(`File: ${r.path}`);
+    console.log(`Revision: ${st.revision} · schema ${st.schema_version}`);
+    console.log(`Last session: ${st.last_session.n} (${st.last_session.date})${st.last_session.uuid ? ` · ${st.last_session.uuid}` : ""}`);
+    console.log(`Objective: ${st.objective ? `${st.objective.text} (since session ${st.objective.since_session})` : "none"}`);
+    console.log(
+      `Tasks: ${st.tasks.length} — open ${count((t) => t.status === "open")}, ` +
+      `in_progress ${count((t) => t.status === "in_progress")}, blocked ${count((t) => t.status === "blocked")}, ` +
+      `done ${count((t) => t.status === "done")} (retained)`
+    );
+    for (const p of ["P0", "P1", "P2", "P3"] as const) {
+      const active = st.tasks.filter((t) => t.priority === p && t.status !== "done");
+      if (active.length === 0) continue;
+      console.log(`  ${p}: ${active.length}`);
+      for (const t of active.slice(0, 5)) console.log(`    ${t.status === "in_progress" ? "~" : t.status === "blocked" ? "!" : " "} ${t.id} ${t.title}`);
+      if (active.length > 5) console.log(`    ... +${active.length - 5} more`);
+    }
+    console.log(`Verified: ${st.verified.length} · gaps: ${st.gaps.length} · decisions: ${st.decisions.length}`);
+    console.log(`Handoff (session ${st.handoff.session}): ${st.handoff.pick_up || "nothing recorded"}`);
+    if (st.handoff.watch_out.length) console.log(`  watch out: ${st.handoff.watch_out.length} item(s)`);
+    if (st.handoff.open_questions.length) console.log(`  open questions: ${st.handoff.open_questions.length}`);
+    console.log(`
+Read-only. Change state through ob_state — never by editing the file.`);
+    process.exit(0);
+  }
+
   const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL } = await import("./pipelines/state-import/index.js");
   const { relative } = await import("node:path");
   const commit = args.includes("--commit");
@@ -454,6 +507,7 @@ if (command === "sync") {
   console.log("  dream [--since=<days>] [--json]            Reconcile stored memory (read-only)");
   console.log("  relocate [--from <dir> --to <dir>] [--apply]  Fold a renamed project's history forward");
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
+  console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft|--commit] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
   process.exit(1);
 }

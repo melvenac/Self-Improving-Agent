@@ -86,13 +86,34 @@ export interface WriteResult {
   error?: string;
 }
 
-const STATE_REL = ".agents/state.json";
+export const STATE_REL = ".agents/state.json";
 const VIEW_REL = {
   inbox: ".agents/TASKS/INBOX.md",
   task: ".agents/TASKS/task.md",
   next: ".agents/SESSIONS/next-session.md",
   summary: ".agents/SYSTEM/SUMMARY.md",
 } as const;
+
+/**
+ * Read and validate `.agents/state.json` without writing anything.
+ *
+ * G-006: `ob_state` was the only door to the record, so with the MCP server
+ * down there was no way for a human or a script to read it except by opening
+ * the JSON by hand — which is exactly the habit the single-writer rule exists
+ * to prevent. Reading needs a door of its own; it does not need the writer.
+ *
+ * Same absent/invalid refusals as `applyStateOps`, so both doors describe a
+ * broken file the same way.
+ */
+export function readState(projectRoot: string): { ok: true; data: State; path: string } | { ok: false; error: string } {
+  const statePath = join(projectRoot, STATE_REL);
+  if (!existsSync(statePath)) {
+    return { ok: false, error: `${STATE_REL} is absent — run the migration first` };
+  }
+  const parsed = parseState(readFileSync(statePath, "utf-8"));
+  if (!parsed.ok) return { ok: false, error: `${STATE_REL} invalid at ${parsed.error}` };
+  return { ok: true, data: parsed.data, path: statePath };
+}
 
 export function applyStateOps(projectRoot: string, options: ApplyStateOptions): WriteResult {
   const dryRun = options.dry_run === true;
