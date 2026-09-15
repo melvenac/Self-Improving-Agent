@@ -248,6 +248,45 @@ describe("applyStateOps (Loop 3 writer)", () => {
     expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "close_gap", id: "G-001" }] }), /unknown gap G-001/);
   });
 
+  /**
+   * ADR-021: gaps are amendable. Before this op the only way to correct a gap's
+   * text was close + re-add, which silently minted a new id and reset
+   * opened_session — losing exactly the history the gap list exists to keep.
+   */
+  it("update_gap amends a gap in place, keeping its id and opened_session (Loop 6, R1)", () => {
+    const before = readState(root).gaps.find((g) => g.id === "G-002")!;
+    const r = applyStateOps(root, { session: SESSION + 5, expected_revision: 7, ops: [
+      { op: "update_gap", id: "G-002", what: "corrected text" },
+    ] });
+    expect(r.ok).toBe(true);
+    expect(r.applied).toEqual([{ op: "update_gap", id: "G-002" }]);
+
+    const after = readState(root).gaps.find((g) => g.id === "G-002")!;
+    expect(after.what).toBe("corrected text");
+    expect(after.opened_session).toBe(before.opened_session);
+    expect(after.evidence).toBe(before.evidence);
+    expect(after.recommended_update).toBe(before.recommended_update);
+  });
+
+  it("update_gap changes only the fields supplied, and refuses an empty amendment", () => {
+    const r = applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [
+      { op: "update_gap", id: "G-003", evidence: "new evidence", recommended_update: "new rec" },
+    ] });
+    expect(r.ok).toBe(true);
+    const g = readState(root).gaps.find((x) => x.id === "G-003")!;
+    expect(g.evidence).toBe("new evidence");
+    expect(g.recommended_update).toBe("new rec");
+
+    expectRefused(
+      applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "update_gap", id: "G-003" }] }),
+      /nothing to change/,
+    );
+    expectRefused(
+      applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "update_gap", id: "G-404", what: "x" }] }),
+      /unknown gap G-404/,
+    );
+  });
+
   it("add_decision appends in order with D-NNN (V2, R2)", () => {
     const r = applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [
       { op: "add_decision", title: "Older date, added later", date: "2026-01-01", note: "" },

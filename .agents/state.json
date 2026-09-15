@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 3,
+  "revision": 7,
   "project": {
     "name": "self-improving-agent",
     "version": "0.31.0"
@@ -708,6 +708,60 @@
       ],
       "since_session": 56,
       "status": "verified"
+    },
+    {
+      "id": "V-015",
+      "claim": "The shadow replay is evaluated as of the session it replays: lifecycle state is snapshotted pre-feedback, the candidate pool excludes entries created after the session, and the recency clock is anchored to the session's earliest recall. Production ranking is byte-identical.",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/shadow-replay-asof.test.ts",
+          "observation": "20 tests. 'never returns an entry created after the replayed session' is the acceptance pin; 'defaults to now, so production ranking is unchanged' pins that recallRankExpr with no asOf still emits julianday('now'); 'throws on a malformed timestamp rather than falling back to now' pins the no-silent-fallback rule."
+        },
+        {
+          "type": "test",
+          "path": "open-brain",
+          "observation": "npm test from the repo root: 898 tests pass across 63 files, no regressions against the 876 before this loop."
+        },
+        {
+          "type": "ci",
+          "path": "https://github.com/melvenac/Self-Improving-Agent/pull/7",
+          "observation": "CI test job pass, 30s, run 34932092992, on PR head 1f68315."
+        }
+      ],
+      "since_session": 57,
+      "status": "verified"
+    },
+    {
+      "id": "V-016",
+      "claim": "Stage 6 no longer ranks against maturity values Stage 2 wrote in the same session; the snapshot is captured over recalledEntryIds before the auto-feedback loop runs, and the stage order is preserved rather than reversed.",
+      "evidence": [
+        {
+          "type": "code",
+          "path": "open-brain/src/pipelines/session-end/index-v2.ts",
+          "observation": "captureLifecycleSnapshot(db, recalledEntryIds) sits above the Stage 2 rating loop; the result is passed to runShadowStage as `snapshot` at Stage 6."
+        },
+        {
+          "type": "code",
+          "path": "open-brain/src/pipelines/shadow/evaluate.ts",
+          "observation": "evaluate.ts:198 returns skipped 'no helpful ratings to score against' when labelCounts.helpful === 0 — confirming reordering would skip every session forever, which is why the fix is a snapshot rather than a stage swap."
+        }
+      ],
+      "since_session": 57,
+      "status": "verified"
+    },
+    {
+      "id": "V-017",
+      "claim": "update_gap amends a gap in place, preserving its id and opened_session, and refuses both an unknown id and an amendment that changes nothing.",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/shared/state-writer.test.ts",
+          "observation": "'update_gap amends a gap in place, keeping its id and opened_session' and 'update_gap changes only the fields supplied, and refuses an empty amendment' — 30 tests pass in that file."
+        }
+      ],
+      "since_session": 57,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -780,6 +834,27 @@
       "evidence": "runShadowStage is Stage 6 and the feedback stage is Stage 2 (pipelines/session-end/index-v2.ts), and feedback promotes maturity — so the live harness scores strategies against maturity its own labels just wrote. Entries ever rated helpful are 23.4% proven/mature vs a 7.1% corpus baseline. The recency rows escape that but are caught by anachronism: post-session-created results run 28.1% to 62.8% across strategies, Spearman rho ~0.71 against the nDCG ordering.",
       "recommended_update": "Loop 6 C1, as one job with two halves: snapshot lifecycle state as of the replayed session (feedback_log.created_at; carry BOTH success_rate and helpful count forward in order, since promotion is gated on both) AND restrict the candidate pool to entries that existed then (knowledge_index.created_at). The recency question sits behind that fix, not beside it.",
       "opened_session": 56
+    },
+    {
+      "id": "G-012",
+      "what": "project.version is a cached copy of package.json's version, and three checks plus a drift branch exist only to police the cache. ADR-027 decided removal; the work is not done.",
+      "evidence": "7 consumers found by grep: cli.ts:427 and session-start/state-render.ts:14 display it; state-import/index.ts:439,494 copy it; drift-detector.ts:9, checks-state.ts:73 and checks.ts:783 compare it to package.json and report; state-writer.ts:166 prefers package.json and falls back to it. None reads it as authoritative. Consequence observed in Loop 5: a version bump could not be made through the writer, and sync reported two issues clearable only by hand-editing state.json.",
+      "recommended_update": "Loop 7: drop project.version from the State schema, migrate existing state.json, delete the two sync checks and the drift branch that only police it, and read package.json directly at the five sites that display or copy it. Do NOT add set_version — that hardens a cache that should not exist.",
+      "opened_session": 57
+    },
+    {
+      "id": "G-013",
+      "what": "feedback_log holds only 31% of the non-neutral ratings the live counters know about (154 of 496), so any replay reconstructing maturity from it systematically under-promotes and cannot answer questions about maturity boosts.",
+      "evidence": "Measured in Loop 6 C2 on knowledge-v2.db: feedback_log earliest row 2026-07-28, earliest knowledge entry 2026-03-17 — the table postdates most of the history. Replayed corpora carry 5-11 non-progenitor entries out of 441-516, against 39 of 552 today. no_maturity consequently ties live (12-10-15) on an instrument biased toward exactly that result. Full working: open-brain/docs/shadow-recall-ranking-2026-09-15.md.",
+      "recommended_update": "Unrecoverable for past sessions — there is no record to reconstruct from, so do not attempt a backfill. Either accept that maturity questions are unanswerable on historical data and re-ask after enough post-2026-07-28 sessions accumulate, or record maturity and success_rate into recall_log at recall time (Loop 7 instrumentation) and answer them going forward only.",
+      "opened_session": 57
+    },
+    {
+      "id": "G-014",
+      "what": "success_rate excludes neutral ratings from its denominator and harmful is structurally near-unreachable, so success_rate is 1.00 for any entry ever rated helpful once. Maturity promotion therefore tracks recall volume rather than usefulness, and promotion grants a ranking boost that causes more recall.",
+      "evidence": "lifecycle.ts:70-73 computes nonNeutral = helpful + harmful and newSuccessRate = helpful / nonNeutral. Observed in session 57's own ratings: entry 192 reads 10 helpful / 51 neutral / success_rate 1.00 / mature (recalled 61 times, used 10); entry 138 reads 52/62 and entry 184 reads 43/59, both 1.00 and mature. All three mature entries injected at this session's /start went unused. Stored as knowledge entry 562.",
+      "recommended_update": "Loop 7, and treat it as the already-instrumented version of the usage-signal question: neutral IS the recall-without-application signal and it is already being recorded. Read the neutral counts before building new instrumentation. Do NOT rate unused entries harmful to 'fix' this — not being used is neutral, and collapsing that distinction destroys the only signal that already exists.",
+      "opened_session": 57
     }
   ],
   "decisions": [
@@ -956,27 +1031,41 @@
       "title": "Delete the text that generates a false claim, not just the claim",
       "date": "2026-09-15",
       "note": "Knowledge entry 556 asserted that ob_recalled compares the file's session_id. It was written from end.md A14, which described the fallback as if it were the mechanism. Rating 556 harmful and superseding it with 558 removes the entry but leaves the generator standing to mint it again. Loop 5 R4 corrects A14 itself. Deterministic and structural prevention before prompt-level correction."
+    },
+    {
+      "id": "ADR-027",
+      "title": "Amendment vocabulary: which state records can be corrected, and which are append-only",
+      "date": "2026-09-15",
+      "note": "Decided once rather than one op per incident. The op union grew by accident — update_task exists because someone needed it, update_gap did not because nobody had yet — and Loop 5 hit the consequence twice in one night.\n\nRULE: a record is amendable when its text DESCRIBES SOMETHING STILL BEING LEARNED. A record is append-only when its text IS THE HISTORICAL FACT, so that editing it destroys the thing the record exists to preserve.\n\nPer type:\n- TASKS — amendable (open/update/close/reopen). Title and priority are current intent, which legitimately changes. Already correct.\n- GAPS — amendable. A gap describes something we do not yet understand, so its text is provisional by construction. The record most needing correction was the one that could not be corrected. IMPLEMENTED this loop: update_gap. The prior workaround (close + re-add) silently minted a new id and reset opened_session, losing the history the gap list exists to keep.\n- VERIFIED — claim append-only; evidence appends; status reopens. The claim is what evidence was gathered against, so editing it invalidates that evidence silently while leaving it attached. Already correct; no update_verified.\n- DECISIONS — append-only. A decision log records what was decided and when; amending it is not a correction but a rewrite of the record. Supersede with a new decision instead. Already correct; no update_decision. Gap: decisions carry no supersedes field (tasks do), so superseding is convention only.\n- OBJECTIVE / HANDOFF / LAST_SESSION — singletons, set wholesale. Already correct.\n- PROJECT.VERSION — REMOVE; do not add set_version. No consumer treats it as authoritative: cli.ts:427 and session-start/state-render.ts:14 display it, state-import/index.ts:439,494 copy it, drift-detector.ts:9 + checks-state.ts:73 + checks.ts:783 compare it to package.json and complain, and state-writer.ts:166 prefers package.json with this only as fallback. It is a cached copy of a truth held elsewhere, with a drift branch and two checks existing solely to police the cache. DEFERRED to Loop 7: 7 call sites plus schema, a state.json migration and test updates is larger than the decision.\n\nID SCHEME, observed while filing this: the Planner's brief assumed the next ADR id was free, but ADR-021..ADR-026 already exist and nextId has since minted D-001..D-003 alongside them, so the list now carries both schemes. This decision took an explicit ADR-027 to avoid widening the split. The generation bug itself stays filed under G-005 — it is an id question, not an amendment one."
+    },
+    {
+      "id": "ADR-028",
+      "title": "No ranking constant changes on one measured alternative beating one incumbent",
+      "date": "2026-09-15",
+      "note": "Loop 6's repaired instrument made the recency question answerable and recency_strong (0.02/day) was the only strategy to beat live — 21-11-5, +0.0153 nDCG, winning against a presentation bias that favours the incumbent. The constant was still NOT changed.\n\nReasoning: recency_strong tests ONE alternative point against ONE incumbent. That 0.02 beats 0.005 is evidence the constant is too low. It is not evidence that 0.02 is right — nothing between or beyond was measured, and the optimum could be anywhere above 0.005. Adopting the one other number that happened to be guessed in the strategy list is the 'flipped because the new number is bigger' outcome the loop's own precondition rules out, and it rules it out whether or not the bigger number won.\n\nshadow/index.ts states the same contract independently: changing production constants stays a human decision; the harness only supplies the evidence. The evidence is now worth supplying, which it was not before this loop.\n\nRecommended next measurement: a sweep — 0.01 / 0.02 / 0.04 as separate strategies — to find where the gain turns over. Adoption is Aaron's call.\n\nWhat the same run did NOT license: no_maturity ties live, and that must not be read as 'maturity boosts are harmless'. See G-013 (feedback_log 31% complete) and G-014 (success_rate ignores neutral)."
     }
   ],
   "handoff": {
-    "pick_up": "Loop 6, in a FRESH session — one loop per developer session. Read ~/.agents/mailbox/channels/sia/loop-6-brief.md first. Base is master if Aaron merged PR #6, otherwise bf0a5a7 — check, do not assume. Loop 5 is closed and accepted; PR #6 is open as a draft with CI green at bf0a5a7 and the merge is Aaron's call. The Planner asked for a recommendation on C1's production half (Stage 6 scores what Stage 2 just wrote): reorder, snapshot at stage entry, or record pre-feedback maturity — answer with reasoning, since Forge has read that code and the Planner has not.",
+    "pick_up": "Loop 6 is COMPLETE and accepted. Draft PR #7 is open (https://github.com/melvenac/Self-Improving-Agent/pull/7) at 1f68315 with CI green; merging is Aaron's and the branch prunes itself on merge. Do NOT re-do Loop 6 work. Loop 7 is Aaron's to start with a fresh brief — read ~/.agents/mailbox/channels/sia/ for it before assuming scope. The displaced Loop 7 subject is the usage signal: whether recalled knowledge changes what an agent does.",
     "watch_out": [
-      "Reordering Stage 6 before Stage 2 does NOT work: the shadow stage needs this session's labels, and Stage 2 is what creates them. The fix has to preserve that order while removing the shared cause.",
-      "Promotion is gated on success_rate AND helpful count (lifecycle.ts:92-97), so any replay snapshot must carry both forward, in order.",
-      "Run vitest from open-brain/, never the repo root: the root loads no setup, OPEN_BRAIN_VAULT_DIR is unset, and 36 tests fail as guards refusing to touch the real vault.",
-      "state.json's project.version cannot be bumped through any op, so a version bump makes sync report two issues clearable only by hand-editing the record. Do not hand-edit it. Removal leads; set_version is a hardening fix and three times this session the right answer was delete rather than harden.",
-      "A stored knowledge claim is not verification. Read the consuming code before designing a fix for it — that rule is now in force for every brief."
+      "START WITH G-014, not with new instrumentation. The usage signal is already half-built: success_rate excludes neutral (lifecycle.ts:70-73) and harmful is near-unreachable, so `neutral` IS the recall-without-application signal and it is already recorded on every rating. Entry 192 reads 10 helpful / 51 neutral / success_rate 1.00 / mature. Read the neutral counts before building anything new.",
+      "The maturity questions stay unanswerable on historical data and no maturity constant should move on Loop 6's numbers. feedback_log holds 154 of 496 non-neutral ratings (G-013), so the replay under-promotes and no_maturity's tie with live is measured on an instrument biased toward exactly that result.",
+      "A replay harness must parameterise EVERY present-tense input — corpus membership, mutable signal values, and the clock. Loop 6 found three in one subsystem. The clock hid longest because nothing about the string 'now' looks like state. Check for a fourth before trusting any new replay number.",
+      "COALESCE is wrong for a nullable override: a snapshotted success_rate of NULL means 'unrated then' and ranks differently from every number, so substitution must test PRESENCE (CASE WHEN ov.id IS NOT NULL). This was the one instruction last loop that would have shipped a correctness defect rather than a doc error.",
+      "Bare `npx vitest` from the repo root loads no config — open-brain/vitest.config.ts:8 carries setupFiles — so OPEN_BRAIN_VAULT_DIR stays unset and 36 tests fail on a vault guard. Use `npm test` from the repo root (package.json:7 delegates), or vitest from open-brain/.",
+      "Fetch before reading any SHA off this working copy. Local master sat at 8aa2f2b (PR #5) while origin/master was 29e82b4 through most of session 57.",
+      "Two loops have now shipped untagged at 0.31.0. Deliberate both times, but it compounds — G-012 should settle it before a third."
     ],
     "open_questions": [
-      "Should project.version exist in state.json at all? Removal leads; no consumer treats it as authoritative.",
-      "Should the op vocabulary be decided once as an ADR (update_gap, update_decision, and the project.version question) rather than one op per incident?",
-      "T-003 remains the top P0 and is still unscoped — it needs a read of the reconnect path, which may already be addressed the same way the recall-file bug was."
+      "Loop 7's actual scope is Aaron's to set. The candidates in priority order are G-014 (the usage signal, already instrumented), G-012 (project.version removal, 7 call sites — decided in ADR-027, unblocks tagging), T-003 (session identity per project not per session, scheduled here by the Planner), and G-013 (accept historical maturity is unanswerable, or instrument recall_log going forward).",
+      "Should recencyDecayPerDay move, and to what? ADR-028 refused 0.02 on one-point evidence and recommends a sweep at 0.01 / 0.02 / 0.04. Aaron's call, and it needs the sweep run first.",
+      "Should maturity ever be demoted? evaluateLifecycle advances and never walks back, so an entry promoted while its rate was high stays promoted after it collapses. Pinned as production behaviour in tests this loop, not endorsed."
     ],
-    "session": 56
+    "session": 57
   },
   "last_session": {
-    "n": 56,
+    "n": 57,
     "date": "2026-09-15",
-    "uuid": "b10b59e8-90f1-4874-b92e-0f4738e8904e"
+    "uuid": "10613af5-f076-4e79-8c5e-75fb7789619c"
   }
 }

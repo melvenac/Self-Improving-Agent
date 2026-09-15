@@ -2,7 +2,15 @@ import Database from 'better-sqlite3';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { canonicalizeProjectDir } from './shared/paths.js';
-import { lowSuccessExpr, ARCHIVED_NO_SUCCESSOR, type Maturity, type Rating } from './lifecycle.js';
+import {
+  lowSuccessExpr,
+  evaluateLifecycle,
+  ARCHIVED_NO_SUCCESSOR,
+  type Maturity,
+  type Rating,
+  type LifecycleOverride,
+  type LifecycleSnapshot,
+} from './lifecycle.js';
 
 export function migrateProjectDirToCanonical(db: Database.Database): number {
   const rows = db.prepare(
@@ -865,4 +873,172 @@ export function getEvaluableSessions(db: Database.Database): string[] {
     ORDER BY r.session_uuid
   `).all() as Array<{ uuid: string }>;
   return rows.map((r) => r.uuid);
+}
+
+/**
+ * The moment a session's recall happened — earliest `recall_log` row for it.
+ *
+ * This is the single "as of" timestamp the replay needs: entries created after it
+ * did not exist to be recalled, and feedback recorded after it had not yet moved
+ * any entry's maturity. Returns null when the session logged no recalls, in which
+ * case there is nothing to replay and the caller should not attempt a cutoff —
+ * a null here must never be silently coerced to "now", which would reinstate the
+ * defect for exactly the sessions we cannot reconstruct.
+ */
+export function getSessionAsOf(db: Database.Database, sessionUuid: string): string | null {
+  const row = db.prepare(`
+    SELECT MIN(created_at) AS as_of FROM recall_log WHERE session_uuid = ?
+  `).get(sessionUuid) as { as_of: string | null } | undefined;
+  return row?.as_of ?? null;
+}
+
+/**
+ * Live lifecycle state for the given ids — the PRODUCTION half of the snapshot.
+ *
+ * Called at session end BEFORE the auto-feedback stage runs, over exactly the ids
+ * that stage is about to rate. Those are the only rows whose maturity or
+ * success_rate this session can move, so capturing them pre-feedback is enough to
+ * let the shadow stage rank against what it saw rather than what it just wrote.
+ *
+ * Exact, unlike `replayLifecycleAsOf` — it reads the real columns rather than
+ * reconstructing them. Its limit is elsewhere: pre-stage-entry is not recall time,
+ * so another session writing between this session's /start and its /end is not
+ * captured. That removes the circularity, which is the bug; it does not make the
+ * signal exact.
+ */
+export function captureLifecycleSnapshot(
+  db: Database.Database,
+  ids: number[],
+): LifecycleSnapshot {
+  const snapshot: LifecycleSnapshot = new Map();
+  if (ids.length === 0) return snapshot;
+
+  const stmt = db.prepare(`SELECT id, maturity, success_rate FROM knowledge_index WHERE id = ?`);
+  for (const id of ids) {
+    const row = stmt.get(id) as
+      | { id: number; maturity: Maturity; success_rate: number | null }
+      | undefined;
+    if (!row) continue;
+    snapshot.set(row.id, { maturity: row.maturity, success_rate: row.success_rate });
+  }
+  return snapshot;
+}
+
+export interface ReplayCoverage {
+  /** Ratings in `feedback_log` at or before the cutoff — what the replay could use. */
+  ratingsBefore: number;
+  /** Ratings in `feedback_log` over all time, for any entry. */
+  ratingsTotal: number;
+  /**
+   * Non-neutral ratings the live counters know about but `feedback_log` cannot
+   * account for. Non-zero means the log predates some ratings, so replayed
+   * maturity is a LOWER BOUND, not the true historical value. Reported rather
+   * than corrected: there is no record to correct it from.
+   */
+  unlogged: number;
+}
+
+/**
+ * Lifecycle state as of `asOf`, reconstructed by replaying `feedback_log` — the
+ * BACKFILL half of the snapshot, for sessions that ended before the production
+ * capture existed.
+ *
+ * Replays through `evaluateLifecycle` rather than reimplementing the thresholds,
+ * because promotion is gated on success_rate AND helpful count together and a
+ * second copy of that rule would drift from the first. Rows are applied in id
+ * order within the cutoff, which is insertion order, so the promotion sequence
+ * matches the one that actually ran.
+ *
+ * `source` is read per entry because apoptosis blocks promotion and its
+ * auto-delete arm is source-dependent; feeding a fixed value here would let the
+ * replay promote an entry the live pipeline had already frozen.
+ */
+export function replayLifecycleAsOf(
+  db: Database.Database,
+  asOf: string,
+): { snapshot: LifecycleSnapshot; coverage: ReplayCoverage } {
+  const sources = new Map<number, string>();
+  for (const row of db.prepare(`SELECT id, source FROM knowledge_index`).all() as Array<{
+    id: number;
+    source: string | null;
+  }>) {
+    sources.set(row.id, row.source ?? 'manual');
+  }
+
+  const state = new Map<
+    number,
+    { helpful: number; harmful: number; neutral: number; success_rate: number | null; maturity: Maturity }
+  >();
+
+  const rows = db.prepare(`
+    SELECT knowledge_id, rating FROM feedback_log
+    WHERE created_at <= ? ORDER BY id
+  `).all(asOf) as Array<{ knowledge_id: number; rating: Rating }>;
+
+  for (const row of rows) {
+    const cur = state.get(row.knowledge_id) ?? {
+      helpful: 0,
+      harmful: 0,
+      neutral: 0,
+      success_rate: null as number | null,
+      maturity: 'progenitor' as Maturity,
+    };
+
+    const result = evaluateLifecycle(
+      {
+        id: row.knowledge_id,
+        helpful: cur.helpful,
+        harmful: cur.harmful,
+        neutral: cur.neutral,
+        success_rate: cur.success_rate,
+        maturity: cur.maturity,
+        source: sources.get(row.knowledge_id) ?? 'manual',
+      },
+      row.rating,
+    );
+
+    state.set(row.knowledge_id, {
+      helpful: cur.helpful + (row.rating === 'helpful' ? 1 : 0),
+      harmful: cur.harmful + (row.rating === 'harmful' ? 1 : 0),
+      neutral: cur.neutral + (row.rating === 'neutral' ? 1 : 0),
+      success_rate: result.newSuccessRate,
+      maturity: result.newMaturity,
+    });
+  }
+
+  const snapshot: LifecycleSnapshot = new Map();
+  for (const [id, s] of state) {
+    snapshot.set(id, { maturity: s.maturity, success_rate: s.success_rate });
+  }
+
+  const totals = db.prepare(`SELECT COUNT(*) AS n FROM feedback_log`).get() as { n: number };
+  const live = db.prepare(`
+    SELECT COALESCE(SUM(helpful + harmful), 0) AS n FROM knowledge_index
+  `).get() as { n: number };
+  const logged = db.prepare(`
+    SELECT COUNT(*) AS n FROM feedback_log WHERE rating IN ('helpful', 'harmful')
+  `).get() as { n: number };
+
+  return {
+    snapshot,
+    coverage: {
+      ratingsBefore: rows.length,
+      ratingsTotal: totals.n,
+      unlogged: Math.max(0, live.n - logged.n),
+    },
+  };
+}
+
+/**
+ * Entries that did not exist as of `asOf`, and so could never have been recalled
+ * or labelled by the session being replayed.
+ *
+ * Exposed for tests and reporting; the ranking query applies the same cutoff
+ * inline rather than passing this set around.
+ */
+export function countEntriesAfter(db: Database.Database, asOf: string): number {
+  const row = db.prepare(`
+    SELECT COUNT(*) AS n FROM knowledge_index WHERE created_at > ?
+  `).get(asOf) as { n: number };
+  return row.n;
 }

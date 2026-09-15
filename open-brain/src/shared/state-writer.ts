@@ -56,6 +56,7 @@ export const OpSchema = z.discriminatedUnion("op", [
   z.strictObject({ op: z.literal("add_verified"), id: z.string().optional(), claim: z.string().min(1), evidence: z.array(EvidenceSchema).min(1) }),
   z.strictObject({ op: z.literal("reopen_verified"), id: z.string(), evidence: EvidenceSchema }),
   z.strictObject({ op: z.literal("add_gap"), id: z.string().optional(), what: z.string().min(1), evidence: z.string(), recommended_update: z.string() }),
+  z.strictObject({ op: z.literal("update_gap"), id: z.string(), what: z.string().min(1).optional(), evidence: z.string().optional(), recommended_update: z.string().optional() }),
   z.strictObject({ op: z.literal("close_gap"), id: z.string() }),
   z.strictObject({ op: z.literal("add_decision"), id: z.string().optional(), title: z.string().min(1), date: z.string().regex(ISO_DATE, "expected YYYY-MM-DD"), note: z.string() }),
   z.strictObject({ op: z.literal("set_objective"), text: z.string().min(1).nullable() }),
@@ -265,6 +266,22 @@ function applyOne(s: State, op: StateOp, session: number, removedGaps: string[])
       if (s.gaps.some((g) => g.id === id)) return { ok: false, error: `gap ${id} already exists` };
       s.gaps.push({ id, what: op.what, evidence: op.evidence, recommended_update: op.recommended_update, opened_session: session });
       return { ok: true, id };
+    }
+    case "update_gap": {
+      // Gaps are amendable by design (ADR-021). A gap describes something we are
+      // still learning about, so its own text is provisional — the record that
+      // most needs correcting was the one that could not be corrected, and the
+      // workaround was to close and re-add, which silently changed the id and
+      // the opened_session stamp.
+      const g = s.gaps.find((x) => x.id === op.id);
+      if (!g) return { ok: false, error: `unknown gap ${op.id}` };
+      if (op.what === undefined && op.evidence === undefined && op.recommended_update === undefined) {
+        return { ok: false, error: `update_gap ${op.id}: nothing to change` };
+      }
+      if (op.what !== undefined) g.what = op.what;
+      if (op.evidence !== undefined) g.evidence = op.evidence;
+      if (op.recommended_update !== undefined) g.recommended_update = op.recommended_update;
+      return { ok: true, id: g.id };
     }
     case "close_gap": {
       const idx = s.gaps.findIndex((g) => g.id === op.id);

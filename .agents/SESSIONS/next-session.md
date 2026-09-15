@@ -1,25 +1,27 @@
-<!-- generated from .agents/state.json rev 3 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 7 by open-brain v0.31.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## Pick up here _(written session 56)_
+## Pick up here _(written session 57)_
 
-Loop 6, in a FRESH session — one loop per developer session. Read ~/.agents/mailbox/channels/sia/loop-6-brief.md first. Base is master if Aaron merged PR #6, otherwise bf0a5a7 — check, do not assume. Loop 5 is closed and accepted; PR #6 is open as a draft with CI green at bf0a5a7 and the merge is Aaron's call. The Planner asked for a recommendation on C1's production half (Stage 6 scores what Stage 2 just wrote): reorder, snapshot at stage entry, or record pre-feedback maturity — answer with reasoning, since Forge has read that code and the Planner has not.
+Loop 6 is COMPLETE and accepted. Draft PR #7 is open (https://github.com/melvenac/Self-Improving-Agent/pull/7) at 1f68315 with CI green; merging is Aaron's and the branch prunes itself on merge. Do NOT re-do Loop 6 work. Loop 7 is Aaron's to start with a fresh brief — read ~/.agents/mailbox/channels/sia/ for it before assuming scope. The displaced Loop 7 subject is the usage signal: whether recalled knowledge changes what an agent does.
 
 ## Watch out
 
-- Reordering Stage 6 before Stage 2 does NOT work: the shadow stage needs this session's labels, and Stage 2 is what creates them. The fix has to preserve that order while removing the shared cause.
-- Promotion is gated on success_rate AND helpful count (lifecycle.ts:92-97), so any replay snapshot must carry both forward, in order.
-- Run vitest from open-brain/, never the repo root: the root loads no setup, OPEN_BRAIN_VAULT_DIR is unset, and 36 tests fail as guards refusing to touch the real vault.
-- state.json's project.version cannot be bumped through any op, so a version bump makes sync report two issues clearable only by hand-editing the record. Do not hand-edit it. Removal leads; set_version is a hardening fix and three times this session the right answer was delete rather than harden.
-- A stored knowledge claim is not verification. Read the consuming code before designing a fix for it — that rule is now in force for every brief.
+- START WITH G-014, not with new instrumentation. The usage signal is already half-built: success_rate excludes neutral (lifecycle.ts:70-73) and harmful is near-unreachable, so `neutral` IS the recall-without-application signal and it is already recorded on every rating. Entry 192 reads 10 helpful / 51 neutral / success_rate 1.00 / mature. Read the neutral counts before building anything new.
+- The maturity questions stay unanswerable on historical data and no maturity constant should move on Loop 6's numbers. feedback_log holds 154 of 496 non-neutral ratings (G-013), so the replay under-promotes and no_maturity's tie with live is measured on an instrument biased toward exactly that result.
+- A replay harness must parameterise EVERY present-tense input — corpus membership, mutable signal values, and the clock. Loop 6 found three in one subsystem. The clock hid longest because nothing about the string 'now' looks like state. Check for a fourth before trusting any new replay number.
+- COALESCE is wrong for a nullable override: a snapshotted success_rate of NULL means 'unrated then' and ranks differently from every number, so substitution must test PRESENCE (CASE WHEN ov.id IS NOT NULL). This was the one instruction last loop that would have shipped a correctness defect rather than a doc error.
+- Bare `npx vitest` from the repo root loads no config — open-brain/vitest.config.ts:8 carries setupFiles — so OPEN_BRAIN_VAULT_DIR stays unset and 36 tests fail on a vault guard. Use `npm test` from the repo root (package.json:7 delegates), or vitest from open-brain/.
+- Fetch before reading any SHA off this working copy. Local master sat at 8aa2f2b (PR #5) while origin/master was 29e82b4 through most of session 57.
+- Two loops have now shipped untagged at 0.31.0. Deliberate both times, but it compounds — G-012 should settle it before a third.
 
 ## Open questions
 
-- Should project.version exist in state.json at all? Removal leads; no consumer treats it as authoritative.
-- Should the op vocabulary be decided once as an ADR (update_gap, update_decision, and the project.version question) rather than one op per incident?
-- T-003 remains the top P0 and is still unscoped — it needs a read of the reconnect path, which may already be addressed the same way the recall-file bug was.
+- Loop 7's actual scope is Aaron's to set. The candidates in priority order are G-014 (the usage signal, already instrumented), G-012 (project.version removal, 7 call sites — decided in ADR-027, unblocks tagging), T-003 (session identity per project not per session, scheduled here by the Planner), and G-013 (accept historical maturity is unanswerable, or instrument recall_log going forward).
+- Should recencyDecayPerDay move, and to what? ADR-028 refused 0.02 on one-point evidence and recommends a sweep at 0.01 / 0.02 / 0.04. Aaron's call, and it needs the sweep run first.
+- Should maturity ever be demoted? evaluateLifecycle advances and never walks back, so an entry promoted while its rate was high stays promoted after it collapses. Pinned as production behaviour in tests this loop, not endorsed.
 
 ## Last session
 
-Session 56 — 2026-09-15 — `b10b59e8-90f1-4874-b92e-0f4738e8904e`
+Session 57 — 2026-09-15 — `10613af5-f076-4e79-8c5e-75fb7789619c`

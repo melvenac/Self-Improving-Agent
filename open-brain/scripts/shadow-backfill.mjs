@@ -9,11 +9,25 @@
 // Read-only by construction: the DB is opened readonly and evaluateSession
 // deliberately does not touch recall_count or last_recalled_at.
 //
-// READ THE CONFOUND BEFORE USING THE NUMBERS:
-// open-brain/docs/shadow-recall-ranking-2026-09-14.md — maturity and
-// recency are read as they are TODAY, but helpful ratings are what promote
-// maturity, so replaying a session scores it partly on promotions its own
-// labels caused. Strategies that touch matureBoost/provenBoost are confounded.
+// REPAIRED IN LOOP 6. Three present-tense inputs used to leak in, each standing
+// in for an as-of-then value, and every one of them favoured a different answer:
+//   1. maturity/success_rate were read as they are TODAY, but helpful ratings are
+//      what promote maturity — so a session was scored partly on promotions its
+//      own labels caused. Circular; hit matureBoost/provenBoost hardest.
+//   2. the candidate pool included entries created AFTER the session, which it
+//      could never have recalled and so could never have labelled. Penalised high
+//      recency decay, which is what surfaces new entries.
+//   3. the recency clock was `now`, not the replayed moment, ageing every entry by
+//      the same constant and collapsing the divisor ratio that actually ranks.
+//      Weakened decay's effect — pushing OPPOSITE to (2).
+// (2) and (3) pushed opposite ways on the same rows and may have partly cancelled,
+// which is worse than either alone: cancellation manufactures a plausible middle
+// that reads as a measurement. All three are fixed; evaluateSession now derives
+// the as-of moment from the session's earliest recall and reconstructs lifecycle
+// state from feedback_log up to it.
+//
+// Superseded: open-brain/docs/shadow-recall-ranking-2026-09-14.md — its numbers
+// were produced on the unrepaired instrument and must not be pooled with these.
 import Database from "better-sqlite3";
 import { homedir } from "os";
 import { evaluateSession } from "../build/pipelines/shadow/evaluate.js";
@@ -33,10 +47,19 @@ const eligible = db.prepare(`
 const acc = new Map();
 const perSession = [];
 let skipped = 0;
+let noAsOf = 0;
+let totalExcluded = 0;
+let coverage = null;
 
 for (const u of eligible) {
   const ev = evaluateSession(db, u, { limit: LIMIT });
   if (ev.skipped) { skipped++; continue; }
+  // A session with no logged recall has no moment to replay from, so it is NOT a
+  // faithful replay. Counted rather than hidden: before Loop 6 it was
+  // indistinguishable in the output from a correctly anchored one.
+  if (!ev.asOf) noAsOf++;
+  totalExcluded += ev.excludedAsNotYetCreated;
+  if (ev.coverage) coverage = ev.coverage;
   const row = { u, scores: {} };
   for (const s of ev.scores) {
     const a = acc.get(s.strategy) ?? { n: 0, ndcg: 0, mrr: 0, prec: 0, harmful: 0, labeled: 0, returned: 0 };
@@ -49,6 +72,18 @@ for (const u of eligible) {
 }
 
 console.log(`eligible=${eligible.length} evaluated=${perSession.length} skipped=${skipped} limit=${LIMIT}`);
+console.log(
+  `replay anchoring: ${perSession.length - noAsOf}/${perSession.length} sessions anchored to their own recall time` +
+  (noAsOf ? `, ${noAsOf} UNANCHORED (no logged recall — not a faithful replay)` : "")
+);
+console.log(`entries excluded as not-yet-created, summed over sessions: ${totalExcluded}`);
+if (coverage) {
+  console.log(
+    `feedback_log coverage: ${coverage.ratingsTotal} logged ratings; ` +
+    `${coverage.unlogged} non-neutral ratings known to the live counters but NOT in the log` +
+    (coverage.unlogged ? " — replayed maturity is a LOWER BOUND for those entries" : "")
+  );
+}
 console.log("\nDirections: nDCG higher better | MRR higher better | precision higher better | harmful LOWER better\n");
 console.log("strategy          sessions   nDCG     MRR    prec   harmful  labeled/returned");
 for (const r of [...acc.entries()].map(([k, a]) => ({ k, ...a })).sort((x, y) => y.ndcg / y.n - x.ndcg / x.n)) {
