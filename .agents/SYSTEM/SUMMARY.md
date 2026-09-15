@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 11 by open-brain v0.31.0 — do not edit; change state via ob_state -->
-> **Status:** v0.31.0 — Loop 7 is complete and delivered: draft PR #8 at c84be1d, CI green, merging is Aaron's. The open decision is T-145 - adopt or reject C2's recommendation to keep session-start retrieval and suspend the maturity lifecycle. Nothing from C2 is implemented; item 1 is a LIFECYCLE_CONFIG change deliberately left out of the loop. Loop 8's scope is Aaron's to set, and the strongest candidate the loop surfaced is not on the gap list: the store repeatedly holds a correct observation of a live defect filed as something inert (four instances in one night), recorded as knowledge 563.
+<!-- generated from .agents/state.json rev 12 by open-brain v0.32.0 — do not edit; change state via ob_state -->
+> **Status:** v0.32.0 — Loop 7 is complete and delivered: draft PR #8 at c84be1d, CI green, merging is Aaron's. The open decision is T-145 - adopt or reject C2's recommendation to keep session-start retrieval and suspend the maturity lifecycle. Nothing from C2 is implemented; item 1 is a LIFECYCLE_CONFIG change deliberately left out of the loop. Loop 8's scope is Aaron's to set, and the strongest candidate the loop surfaced is not on the gap list: the store repeatedly holds a correct observation of a live defect filed as something inert (four instances in one night), recorded as knowledge 563.
 
 ## What's working
 

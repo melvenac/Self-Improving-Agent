@@ -763,11 +763,14 @@ export function checkRules(projectRoot: string): CheckResult {
  * `.agents/state.json` (Loop 2, read side). Absent is a SKIP with the reason
  * printed, not a pass: the writer (ob_state, Loop 3) never creates the file,
  * so an unmigrated project has none, and a pass would claim a validation
- * that never ran. Present must
- * parse against the strict schema, and its `project.version` must equal
- * package.json — the same single-source rule the README and PRD checks enforce.
+ * that never ran. Present must parse against the strict schema.
+ *
+ * Loop 8 R3 / ADR-027: the `project.version` comparison is gone with the field.
+ * The schema is strict, so a file still carrying it now fails the parse above
+ * and is reported as invalid — which is the check that matters, since there is
+ * no migration runner for this file.
  */
-export function checkStateSchema(version: string, projectRoot: string): CheckResult {
+export function checkStateSchema(_version: string, projectRoot: string): CheckResult {
   const statePath = join(projectRoot, ".agents", "state.json");
   if (!existsSync(statePath)) {
     return {
@@ -780,17 +783,127 @@ export function checkStateSchema(version: string, projectRoot: string): CheckRes
   if (!parsed.ok) {
     return { name: "state-schema", severity: "issue", message: `.agents/state.json invalid at ${parsed.error}` };
   }
-  const fileVersion = parsed.data.project.version;
-  if (fileVersion !== version) {
-    return {
-      name: "state-schema",
-      severity: "issue",
-      message: `.agents/state.json project.version is ${fileVersion} but package.json is ${version}`,
-    };
-  }
   return {
     name: "state-schema",
     severity: "pass",
     message: `.agents/state.json valid (schema v${parsed.data.schema_version}, rev ${parsed.data.revision}, ${parsed.data.tasks.length} tasks)`,
+  };
+}
+
+/**
+ * Loop 8 R4 — slash-command parity between the repo and the template it ships.
+ *
+ * This repo IS the framework source, so it carries the commands it distributes
+ * while the author also has them installed globally. The duplication is
+ * expected; what was missing is any check that the copies agree. Loop 5's R4
+ * had to be applied to every copy by hand and one copy drifted and stayed
+ * drifted.
+ *
+ * Three tiers, deliberately scoped:
+ *
+ *   1. `.claude/commands/` vs `project-template/.claude/commands/` — `issue`.
+ *      Fully deterministic, no machine dependence.
+ *   2. `~/.claude/commands/` — `warn`, and SKIPPED ENTIRELY when absent. The
+ *      template ships to other people and other machines; a check that reads
+ *      the author's home directory must never be able to fail someone else's
+ *      build.
+ *   3. `project-template/.cursor/commands/` — NOT COVERED, on purpose. It holds
+ *      four commands against the `.claude` set's eight and they are ADAPTED,
+ *      not copied, so byte or content parity is the wrong assertion there and
+ *      would produce a permanently red check. G-001 stays open and this check
+ *      does not pretend to cover it.
+ *
+ * Line endings are normalised before comparing. The user-scope copy of
+ * `sync.md` is CRLF where the repo copy is LF with identical content, and
+ * reporting that as drift would fail on Windows for no reason.
+ *
+ * Asymmetric by design, and the asymmetry has an exception. A file only in the
+ * repo is allowed — `harness-audit.md` is a framework-development command that
+ * new projects have no use for. A file only in the template is normally an
+ * issue, because the template would be shipping a command the repo does not
+ * carry as source. `bootstrap.md` is the standing exception: it takes an empty
+ * folder to an AI-ready project, so the already-bootstrapped framework repo has
+ * no use for it, and it has never existed in repo scope.
+ */
+const TEMPLATE_ONLY_ALLOWED = new Set(["bootstrap.md"]);
+
+/** Content equality ignoring line-ending style and a trailing newline. */
+function sameCommandContent(a: string, b: string): boolean {
+  const norm = (s: string) => s.replace(/\r\n/g, "\n").replace(/\s+$/, "");
+  return norm(a) === norm(b);
+}
+
+function listCommands(dir: string): string[] {
+  try {
+    return readdirSync(dir).filter((f) => f.endsWith(".md")).sort();
+  } catch {
+    return [];
+  }
+}
+
+export function checkCommandParity(projectRoot: string, home = homedir()): CheckResult {
+  const name = "command-parity";
+  const repoDir = join(projectRoot, ".claude", "commands");
+  const templateDir = join(projectRoot, "project-template", ".claude", "commands");
+
+  if (!existsSync(repoDir) || !existsSync(templateDir)) {
+    return { name, severity: "skip", message: "skipped — .claude/commands or project-template/.claude/commands absent" };
+  }
+
+  const repo = listCommands(repoDir);
+  const template = listCommands(templateDir);
+  const problems: string[] = [];
+
+  // Tier 1: repo vs template.
+  for (const f of template) {
+    if (!repo.includes(f)) {
+      if (TEMPLATE_ONLY_ALLOWED.has(f)) continue;
+      problems.push(`${f} is in the template but not in .claude/commands`);
+      continue;
+    }
+    const a = readFileSync(join(repoDir, f), "utf8");
+    const b = readFileSync(join(templateDir, f), "utf8");
+    if (!sameCommandContent(a, b)) problems.push(`${f} differs between .claude/commands and the template`);
+  }
+
+  if (problems.length) {
+    return { name, severity: "issue", message: `command drift: ${problems.join("; ")}` };
+  }
+
+  const shared = template.filter((f) => repo.includes(f)).length;
+
+  // Tier 2: user scope. Absent is a skip for that tier, never a failure.
+  const userDir = join(home, ".claude", "commands");
+  if (!existsSync(userDir)) {
+    return {
+      name,
+      severity: "pass",
+      message: `${shared} shared commands identical to the template (user scope absent — not checked)`,
+      report: true,
+    };
+  }
+
+  const userDrift: string[] = [];
+  for (const f of listCommands(userDir)) {
+    if (!repo.includes(f)) continue; // user-only commands are their own business
+    const a = readFileSync(join(repoDir, f), "utf8");
+    const b = readFileSync(join(userDir, f), "utf8");
+    if (!sameCommandContent(a, b)) userDrift.push(f);
+  }
+
+  if (userDrift.length) {
+    return {
+      name,
+      severity: "warn",
+      message: `${shared} shared commands identical to the template; user-scope copies differ: ${userDrift.join(", ")}`,
+      report: true,
+    };
+  }
+
+  return {
+    name,
+    severity: "pass",
+    message: `${shared} shared commands identical across repo, template and user scope`,
+    report: true,
   };
 }

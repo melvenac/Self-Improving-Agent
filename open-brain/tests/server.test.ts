@@ -232,7 +232,8 @@ describe("server handlers", () => {
     it("ob_state applies a batch, renders the views, and ob_start reads the result back", async () => {
       proseProject(tmp);
       cpSync(stateFixture, join(tmp, ".agents", "state.json"));
-      // package.json here is 0.29.0 but the fixture says 0.29.0 too — bump the file so state-version drift is visible.
+      // Loop 8 R3: state-version drift is gone with the field. package.json is
+      // bumped here only so the views re-render, which is what this asserts.
       writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "0.30.0" }));
 
       const refused = await handleState({ project_root: tmp, session: 55, expected_revision: 3, ops: [{ op: "set_objective", text: "x" }] });
@@ -277,7 +278,7 @@ describe("server handlers", () => {
       expect(start).toContain("Handoff (session 55):\n  pick up: Loop 4 migration");
       expect(start).toContain("Last session: #55 2026-09-15 (round-trip-uuid)");
       // R3: state.json still says 0.29.0 while package.json says 0.30.0 → reported, not fixed.
-      expect(start).toContain("state-version: expected 0.30.0, got 0.29.0 (not fixed)");
+      expect(start).not.toContain("state-version:");
     });
 
     /** Loop 2 R1: .agents/ without SESSIONS/ no longer errors; the block says why there is no log. */

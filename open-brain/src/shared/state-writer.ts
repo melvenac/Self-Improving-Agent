@@ -71,7 +71,7 @@ export interface ApplyStateOptions {
   ops: unknown[];
   dry_run?: boolean;
   render?: boolean;
-  /** Version stamped into the generated views; defaults to the root package.json, then state.project.version. */
+  /** Version stamped into the generated views; defaults to the root package.json. */
   version?: string;
 }
 
@@ -164,7 +164,10 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   if (!check.ok) return refuse(before, check.error);
   const finalState = check.data;
 
-  const version = options.version ?? readJson<{ version: string }>(join(projectRoot, "package.json"))?.version ?? finalState.project.version;
+  // Loop 8 R3: the state.project.version fallback is gone with the field. This
+  // line already preferred package.json, which is what made the cached copy
+  // redundant and is the argument ADR-027 rests on.
+  const version = options.version ?? readJson<{ version: string }>(join(projectRoot, "package.json"))?.version ?? "0.0.0";
   const views: Array<{ rel: string; text: string }> = [];
   if (options.render !== false) {
     const viewOpts = { version, session: options.session };

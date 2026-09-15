@@ -35,24 +35,10 @@ describe("detectDrift", () => {
     expect(drift.some((d) => d.field === "summary-stale-broken")).toBe(true);
   });
 
-  /** Loop 3 R3: state.json's project.version vs package.json, reported never fixed. */
-  it("reports state-version drift only when state.json is present and valid", () => {
-    const data = { project: { name: "x", version: "0.5.0" } } as unknown as import("../../../src/shared/state-schema.js").State;
-    const present = { ...baseState, stateJson: { present: true, valid: true, data } };
-    const drift = detectDrift(present);
-    expect(drift).toContainEqual({ field: "state-version", expected: "0.6.0", actual: "0.5.0", fixed: false });
-
-    const matching = { ...baseState, stateJson: { present: true, valid: true, data: { project: { name: "x", version: "0.6.0" } } as unknown as typeof data } };
-    expect(detectDrift(matching).some((d) => d.field === "state-version")).toBe(false);
-
-    const invalid = { ...baseState, stateJson: { present: true, valid: false, error: "revision: bad" } };
-    expect(detectDrift(invalid).some((d) => d.field === "state-version")).toBe(false);
-
-    const absent = { ...baseState, stateJson: { present: false, valid: false } };
-    expect(detectDrift(absent).some((d) => d.field === "state-version")).toBe(false);
-    // Still reported when SUMMARY is null — it does not depend on the prose file.
-    expect(detectDrift({ ...present, summary: null }).some((d) => d.field === "state-version")).toBe(true);
-  });
+  // Loop 8 R3 / ADR-027: the `state-version` drift test is deleted with the
+  // branch it covered. It asserted that a cached copy of package.json's version
+  // disagreeing with package.json was drift — a cache-coherence check that no
+  // longer has a cache to police.
 
   it("skips drift detection when SUMMARY is null", () => {
     const state = { ...baseState, summary: null };

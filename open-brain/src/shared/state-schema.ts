@@ -40,9 +40,21 @@ export const TaskPriority = z.enum(["P0", "P1", "P2", "P3"]);
 export const TaskStatus = z.enum(["open", "in_progress", "blocked", "done"]);
 export const VerifiedStatus = z.enum(["verified", "reopened"]);
 
+/**
+ * Loop 8 R3 / ADR-027: `version` removed. It was a cache of package.json's
+ * version with seven consumers and no authority — `state-writer.ts` already
+ * preferred package.json, and two sync checks plus a drift branch existed only
+ * to police the copy against its source. The record does not store what the
+ * manifest already states.
+ *
+ * This is a strictObject, so a state.json still carrying `project.version`
+ * fails to parse outright rather than being tolerated. That is deliberate and
+ * pinned by test: there is no migration runner for this file, so every copy —
+ * the live record, the test fixture and the shipped template — had to move in
+ * the same commit, and a hard failure is what guarantees none was missed.
+ */
 export const ProjectSchema = z.strictObject({
   name: z.string(),
-  version: z.string(),
 });
 
 export const ObjectiveSchema = z.strictObject({
@@ -165,7 +177,7 @@ export function serializeState(data: State): string {
 
 const KEY_ORDER: Record<string, string[]> = {
   $: ["schema_version", "revision", "project", "objective", "tasks", "verified", "gaps", "decisions", "handoff", "last_session"],
-  project: ["name", "version"],
+  project: ["name"],
   objective: ["text", "since_session"],
   tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note"],
   verified: ["id", "claim", "evidence", "since_session", "status"],

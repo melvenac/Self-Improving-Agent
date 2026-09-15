@@ -3,17 +3,10 @@ import type { ProjectState, DriftResult } from "./types.js";
 export function detectDrift(state: ProjectState): DriftResult[] {
   const drift: DriftResult[] = [];
 
-  // Loop 3 R3: state.json's own version vs package.json. Reported, never
-  // auto-edited — the writer owns that file — so `fixed` is always false.
-  const sj = state.stateJson;
-  if (sj?.present && sj.valid && sj.data && sj.data.project.version !== state.version) {
-    drift.push({
-      field: "state-version",
-      expected: state.version,
-      actual: sj.data.project.version,
-      fixed: false,
-    });
-  }
+  // Loop 8 R3 / ADR-027: the `state-version` drift branch is gone with the
+  // field. It compared a cached copy of package.json's version against
+  // package.json — drift between a value and its own source, which is a
+  // cache-coherence problem the record should not have had.
 
   if (!state.summary) return drift;
 

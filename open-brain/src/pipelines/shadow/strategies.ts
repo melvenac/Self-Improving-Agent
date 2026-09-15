@@ -40,13 +40,47 @@ export const SHADOW_STRATEGIES: ShadowStrategy[] = [
   {
     name: "no_maturity",
     hypothesis:
-      "Maturity boosts entrench whatever was recalled early. Removing them tests whether they help or just compound.",
+      "Maturity boosts entrench whatever was recalled early. Removing them tests whether they help or just compound. " +
+      "DEGENERATE SINCE LOOP 8 R1: live now sets both boosts to 1.0, so this strategy is byte-identical to the control. " +
+      "Kept rather than deleted because the name is a JSONL key with history behind it, and because it is now a second " +
+      "free consistency check — it must tie with `live` exactly, and any gap between them means the harness is not deterministic.",
     overrides: { matureBoost: 1.0, provenBoost: 1.0 },
   },
   {
     name: "maturity_strong",
     hypothesis: "Proven/mature entries are under-weighted; feedback should count for more than 1.5x.",
     overrides: { matureBoost: 2.5, provenBoost: 1.6 },
+  },
+  // ── Loop 8 R2: the recency sweep ──────────────────────────────────────────
+  //
+  // Loop 7 found `no_recency` lost 11-22 against live on the repaired harness
+  // and landed level with the `bm25_only` floor, so the decay term is the one
+  // ranking input with evidence behind it. That says the constant matters; it
+  // does not say 0.005 is the right value. These three bracket it — one step
+  // below the current value is not offered because `no_recency` already covers
+  // the zero end and 0.005 is itself the low point of the useful range.
+  //
+  // ADOPT NOTHING AUTOMATICALLY. Report where the gain peaks or turns over and
+  // leave the constant to Aaron. A number being bigger is not a reason.
+  //
+  // Note `recency_strong` above is also 0.02 and is deliberately NOT renamed —
+  // its name is a JSONL key with history behind it. The duplication is useful:
+  // `recency_0_02` and `recency_strong` must produce identical results, so any
+  // divergence between them is a nondeterministic harness, not a finding.
+  {
+    name: "recency_0_01",
+    hypothesis: "2x the live decay. Tests whether the gain from decay is still climbing just above 0.005.",
+    overrides: { recencyDecayPerDay: 0.01 },
+  },
+  {
+    name: "recency_0_02",
+    hypothesis: "4x the live decay. Duplicates recency_strong on purpose as an internal consistency check.",
+    overrides: { recencyDecayPerDay: 0.02 },
+  },
+  {
+    name: "recency_0_04",
+    hypothesis: "8x the live decay. Tests for a turnover — the point where freshness starts outranking relevance.",
+    overrides: { recencyDecayPerDay: 0.04 },
   },
   {
     name: "bm25_only",

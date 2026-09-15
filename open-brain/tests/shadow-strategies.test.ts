@@ -71,11 +71,17 @@ describe('shadow strategies', () => {
     expect(flat).toHaveLength(2);
   });
 
-  it('maturity boost can be turned off by override', () => {
+  /**
+   * Inverted for Loop 8 R1. The boost is now off in the live config, so the old
+   * direction ("an override turns it off") tested nothing — the default and the
+   * override agreed. The property worth guarding is unchanged: an override moves
+   * the ranking. It is now demonstrated by turning the boost back ON.
+   */
+  it('maturity boost is suspended by default and can be turned back on by override', () => {
     add('plain.md', { maturity: 'progenitor' });
     add('mature.md', { maturity: 'mature' });
 
-    expect(rankedWith({})[0]).toBe('mature.md');
+    expect(rankedWith({ matureBoost: 1.5, recencyDecayPerDay: 0 })[0]).toBe('mature.md');
 
     // With both boosts neutralised the two entries score identically.
     // bm25() cannot be nested inside an aggregate, so compare in JS.

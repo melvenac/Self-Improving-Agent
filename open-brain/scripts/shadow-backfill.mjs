@@ -104,14 +104,46 @@ const h2h = (a, b) => {
   return { win, loss, tie, meanDiff: diff / (perSession.length || 1) };
 };
 
+/**
+ * Two-sided sign test on the win/loss split, ties discarded.
+ *
+ * Added in Loop 8 R2 because the aggregate means invite exactly the error the
+ * brief forbids: recency_0_02 leads live by +0.0134 mean nDCG, which reads as a
+ * result until you notice the paired split behind it is 19-15 — a coin flip.
+ * Reporting the mean without this makes noise look like a finding.
+ */
+function signTestP(win, loss) {
+  const n = win + loss;
+  if (n === 0) return 1;
+  const logC = (n, k) => {
+    let s = 0;
+    for (let i = 1; i <= k; i++) s += Math.log(n - k + i) - Math.log(i);
+    return s;
+  };
+  const k = Math.min(win, loss);
+  let tail = 0;
+  for (let i = 0; i <= k; i++) tail += Math.exp(logC(n, i) - n * Math.LN2);
+  return Math.min(1, 2 * tail);
+}
+
+// Derived from the strategies actually present, not a hardcoded list. The list
+// was hardcoded and silently omitted every strategy added after it was written —
+// this loop's three recency points included, which is the whole subject of R2.
+const VARIANTS = [...acc.keys()].filter((k) => k !== "live");
+
 console.log("\nPaired per-session head-to-head vs live, on nDCG (higher better):");
-for (const v of ["no_maturity", "bm25_only", "maturity_strong", "no_recency", "recency_strong"]) {
+console.log("  (p = two-sided sign test on win/loss, ties discarded; p>0.05 means the split is not distinguishable from chance)");
+for (const v of VARIANTS) {
   const r = h2h(v, "live");
-  console.log(`  ${v.padEnd(16)} win ${r.win}  loss ${r.loss}  tie ${r.tie}   mean nDCG diff ${r.meanDiff >= 0 ? "+" : ""}${r.meanDiff.toFixed(4)}`);
+  const p = signTestP(r.win, r.loss);
+  console.log(
+    `  ${v.padEnd(16)} win ${String(r.win).padStart(2)}  loss ${String(r.loss).padStart(2)}  tie ${String(r.tie).padStart(2)}` +
+    `   mean nDCG diff ${r.meanDiff >= 0 ? "+" : ""}${r.meanDiff.toFixed(4)}   p=${p.toFixed(3)}${p > 0.05 ? "  (not significant)" : ""}`
+  );
 }
 
 console.log("\nSessions where the strategy reordered results at all (nDCG differs from live):");
-for (const v of ["no_maturity", "bm25_only", "maturity_strong", "no_recency", "recency_strong"]) {
+for (const v of VARIANTS) {
   const n = perSession.filter((s) => Math.abs((s.scores[v]?.ndcg ?? 0) - (s.scores.live?.ndcg ?? 0)) > 1e-12).length;
   console.log(`  ${v.padEnd(16)} ${n}/${perSession.length}`);
 }

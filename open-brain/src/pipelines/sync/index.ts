@@ -24,6 +24,7 @@ import {
   checkRules,
   checkMirrorParity,
   checkStateSchema,
+  checkCommandParity,
 } from "./checks.js";
 import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-state.js";
 
@@ -62,6 +63,7 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkTemplate(options.projectRoot));
   checks.push(checkSpecProvenance(options.projectRoot));
   checks.push(checkRules(options.projectRoot));
+  checks.push(checkCommandParity(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
   checks.push(checkStateSchema(version, options.projectRoot));
   // Loop 4: R6 view headers vs state.json revision, R4 master CI conclusion,

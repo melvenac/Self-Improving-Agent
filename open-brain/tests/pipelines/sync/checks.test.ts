@@ -51,18 +51,32 @@ describe("checkStateSchema", () => {
     expect(r.message).toContain("ob_state never creates the file");
   });
 
-  it("passes on a valid file whose project.version matches package.json", () => {
+  it("passes on a valid file", () => {
     cpSync(stateFixture, join(tempDir, ".agents", "state.json"));
     const r = checkStateSchema("0.29.0", tempDir);
     expect(r.severity).toBe("pass");
     expect(r.message).toBe(".agents/state.json valid (schema v1, rev 7, 27 tasks)");
   });
 
-  it("fails a version mismatch naming both values", () => {
-    cpSync(stateFixture, join(tempDir, ".agents", "state.json"));
-    const r = checkStateSchema("0.30.0", tempDir);
+  /**
+   * Loop 8 R3 / ADR-027. The version comparison is gone, and what replaces it is
+   * stricter: ProjectSchema is a z.strictObject, so a file still carrying
+   * `project.version` does not parse at all.
+   *
+   * Pinned explicitly rather than inferred from reading the schema, because it
+   * is the property the migration's safety rests on — there is no migration
+   * runner for state.json, so all three copies (live record, this fixture, the
+   * shipped template) had to move in one commit, and this hard failure is what
+   * guarantees a missed copy is loud instead of silent.
+   */
+  it("rejects a file that still carries the removed project.version field", () => {
+    const stale = JSON.parse(readFileSync(stateFixture, "utf-8"));
+    stale.project.version = "0.29.0";
+    writeFileSync(join(tempDir, ".agents", "state.json"), JSON.stringify(stale));
+    const r = checkStateSchema("0.29.0", tempDir);
     expect(r.severity).toBe("issue");
-    expect(r.message).toBe(".agents/state.json project.version is 0.29.0 but package.json is 0.30.0");
+    expect(r.message).toContain("invalid at");
+    expect(r.message).toContain("project");
   });
 
   it("fails an invalid file with the zod path", () => {

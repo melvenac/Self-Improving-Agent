@@ -36,7 +36,10 @@ describe("summary-version with state.json present (Loop 4 R3)", () => {
     root = mkdtempSync(join(tmpdir(), "ob-r3-"));
     cpSync(fixturesDir, root, { recursive: true });
     cpSync(stateFixture, join(root, STATE));
-    // fixture state.json is project.version 0.29.0; the fixture package.json is 0.6.0
+    // The copied fixture tree brings its own package.json, so it is overwritten
+    // here to pin the version these tests assert on. Since Loop 8 R3 this is the
+    // only place a version comes from — state.json no longer carries one — so
+    // this line alone decides what the views should render.
     writeFileSync(join(root, "package.json"), JSON.stringify({ name: "fixture", version: "0.29.0" }));
   });
 
@@ -70,11 +73,9 @@ describe("summary-version with state.json present (Loop 4 R3)", () => {
 
   it("a version bump followed by sync re-renders with the new version and leaves the revision alone (V2)", () => {
     applyStateOps(root, { session: 55, expected_revision: 7, ops: [], render: true });
-    // bump package.json AND state.json's project.version (the state-schema rule); the views are now stale on version only
+    // Loop 8 R3: bumping package.json is now the whole bump — state.json no
+    // longer carries a copy to keep in step, which is the point of removing it.
     writeFileSync(join(root, "package.json"), JSON.stringify({ name: "fixture", version: "0.31.0" }));
-    const s = JSON.parse(readFileSync(join(root, STATE), "utf-8"));
-    s.project.version = "0.31.0";
-    writeFileSync(join(root, STATE), JSON.stringify(s, null, 2) + "\n");
     const proseBefore = proseLines(root);
 
     const r = checkSummary("0.31.0", root, false);
@@ -94,12 +95,9 @@ describe("summary-version with state.json present (Loop 4 R3)", () => {
     expect(existsSync(join(root, ".agents/TASKS/task.md"))).toBe(false);
   });
 
-  it("state.json version ≠ package.json is an issue pointed at state.json, not SUMMARY.md", () => {
-    const r = checkSummary("0.30.0", root, false);
-    expect(r.severity).toBe("issue");
-    expect(r.message).toBe(".agents/state.json project.version is 0.29.0 but package.json is 0.30.0 — fix state.json, not SUMMARY.md");
-    expect(existsSync(join(root, ".agents/TASKS/task.md"))).toBe(false);
-  });
+  // Loop 8 R3 / ADR-027: deleted with the check. It asserted that state.json
+  // disagreeing with package.json about the version was an issue; there is now
+  // only one place that value lives, so the two cannot disagree.
 
   it("invalid state.json skips with the reason and touches nothing", () => {
     writeFileSync(join(root, STATE), "{ \"schema_version\": 1 }");
