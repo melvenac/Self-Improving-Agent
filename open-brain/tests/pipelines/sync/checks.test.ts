@@ -55,7 +55,44 @@ describe("checkStateSchema", () => {
     cpSync(stateFixture, join(tempDir, ".agents", "state.json"));
     const r = checkStateSchema("0.29.0", tempDir);
     expect(r.severity).toBe("pass");
-    expect(r.message).toBe(".agents/state.json valid (schema v1, rev 7, 27 tasks)");
+    expect(r.message).toBe(
+      ".agents/state.json readable by this CLI process (schema v1, rev 7, 27 tasks)",
+    );
+  });
+
+  /**
+   * Loop 10 R1 — the runtime label is the whole check.
+   *
+   * The same code parsing the same file must say WHICH process's loaded schema
+   * did the parsing, because an MCP server holds its schema for the life of the
+   * process while `/sync` from the CLI is a different process entirely. Without
+   * the label the two are indistinguishable in the output, which is how a schema
+   * change stayed invisible for two loops.
+   */
+  it("names the process whose schema parsed the file", () => {
+    cpSync(stateFixture, join(tempDir, ".agents", "state.json"));
+
+    expect(checkStateSchema("0.29.0", tempDir, "cli").message).toContain("this CLI process");
+    expect(checkStateSchema("0.29.0", tempDir, "mcp-server").message).toContain(
+      "the running MCP server",
+    );
+  });
+
+  it("names the reconnect when the server's own schema cannot read the file", () => {
+    writeFileSync(join(tempDir, ".agents", "state.json"), JSON.stringify({ schema_version: 1 }));
+
+    const server = checkStateSchema("0.29.0", tempDir, "mcp-server");
+    expect(server.severity).toBe("issue");
+    expect(server.message).toContain("/mcp reconnect open-brain");
+    // A stale server reports success, so the remedy has to say how to confirm.
+    expect(server.message).toContain("a stale server reports success");
+
+    // From the CLI the same failure means something different, and says so
+    // rather than sending the reader to a reconnect that would not help.
+    const cli = checkStateSchema("0.29.0", tempDir, "cli");
+    expect(cli.severity).toBe("issue");
+    expect(cli.message).not.toContain("/mcp reconnect open-brain");
+    expect(cli.message).toContain("not the running server's");
   });
 
   /**

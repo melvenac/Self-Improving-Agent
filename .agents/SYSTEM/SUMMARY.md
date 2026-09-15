@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 13 by open-brain v0.33.0 — do not edit; change state via ob_state -->
-> **Status:** v0.33.0 — Loop 9 is delivered: PR #10 at 2c9a79d, tagged v0.33.0, CI green, Planner-QA'd, merging is Aaron's. Loop 8 merged as PR #9. The next loop is scoped by Clark's Loop 10 brief and must start in a FRESH SESSION — two loops ran in session 59, which is a lapsed discipline rather than a dropped one.
+<!-- generated from .agents/state.json rev 13 by open-brain v0.34.0 — do not edit; change state via ob_state -->
+> **Status:** v0.34.0 — Loop 9 is delivered: PR #10 at 2c9a79d, tagged v0.33.0, CI green, Planner-QA'd, merging is Aaron's. Loop 8 merged as PR #9. The next loop is scoped by Clark's Loop 10 brief and must start in a FRESH SESSION — two loops ran in session 59, which is a lapsed discipline rather than a dropped one.
 
 ## What's working
 

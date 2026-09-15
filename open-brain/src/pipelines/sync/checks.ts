@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import Database from "better-sqlite3";
-import type { CheckResult } from "./types.js";
+import type { CheckResult, SyncRuntime } from "./types.js";
 import { parseSkillIndexRows } from "../../shared/skill-index.js";
 import { SCHEMA_VERSION } from "../../db-v2.js";
 import { parseState } from "../../shared/state-schema.js";
@@ -770,23 +770,62 @@ export function checkRules(projectRoot: string): CheckResult {
  * and is reported as invalid — which is the check that matters, since there is
  * no migration runner for this file.
  */
-export function checkStateSchema(_version: string, projectRoot: string): CheckResult {
+/**
+ * Loop 10 R1 — the schema-staleness check.
+ *
+ * This parses the live `.agents/state.json` with **the calling process's own
+ * loaded schema**, and now names which process that was. It tests the capability
+ * rather than a proxy: can the process that will be asked to write this file even
+ * read it.
+ *
+ * **Why not the obvious version comparison.** Loop 9's R3 held `schema_version` at
+ * 1 while changing the shape of `ProjectSchema`, so a version check sees 1 against
+ * 1 and passes. It would have been green through the entire two-loop outage.
+ *
+ * **The class this closes.** An MCP server holds its schema for the life of the
+ * process, so a loop that changes a schema cannot close itself through the tool it
+ * changed without a reconnect — a human action neither agent can perform. It
+ * silently cost two loops of record-keeping. Running this from the CLI cannot
+ * detect it, because that is a different process; the runtime label is what makes
+ * the two distinguishable in the output.
+ *
+ * Reported whatever the severity, because a pass that is not shown is
+ * indistinguishable from a check that never ran.
+ */
+export function checkStateSchema(
+  _version: string,
+  projectRoot: string,
+  runtime: SyncRuntime = "cli",
+): CheckResult {
+  const name = "state-schema";
+  const where = runtime === "mcp-server" ? "the running MCP server" : "this CLI process";
   const statePath = join(projectRoot, ".agents", "state.json");
   if (!existsSync(statePath)) {
     return {
-      name: "state-schema",
+      name,
       severity: "skip",
       message: "skipped — no .agents/state.json (this project has not been migrated; ob_state never creates the file)",
+      report: true,
     };
   }
   const parsed = parseState(readFileSync(statePath, "utf-8"));
   if (!parsed.ok) {
-    return { name: "state-schema", severity: "issue", message: `.agents/state.json invalid at ${parsed.error}` };
+    const remedy =
+      runtime === "mcp-server"
+        ? " — the server's loaded schema cannot read the live file. If the schema changed this session, ask Aaron to run `/mcp reconnect open-brain`, then re-run this check: a stale server reports success."
+        : " — note this is the CLI's schema, not the running server's. The server may hold a different one; run ob_sync as an MCP tool to test that.";
+    return {
+      name,
+      severity: "issue",
+      message: `.agents/state.json invalid at ${parsed.error}, as parsed by ${where}${remedy}`,
+      report: true,
+    };
   }
   return {
-    name: "state-schema",
+    name,
     severity: "pass",
-    message: `.agents/state.json valid (schema v${parsed.data.schema_version}, rev ${parsed.data.revision}, ${parsed.data.tasks.length} tasks)`,
+    message: `.agents/state.json readable by ${where} (schema v${parsed.data.schema_version}, rev ${parsed.data.revision}, ${parsed.data.tasks.length} tasks)`,
+    report: true,
   };
 }
 

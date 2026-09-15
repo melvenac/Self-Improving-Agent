@@ -118,7 +118,11 @@ export async function handleSync(args: {
   score?: boolean;
 }): Promise<ToolResponse> {
   try {
-    const result = runSync({ projectRoot: resolve(args.project_root ?? "."), checkOnly: args.check_only ?? false, score: args.score ?? false, scoreJson: false, history: false });
+    // Loop 10 R1: `runtime: "mcp-server"` is the point of calling sync from here.
+    // The state-schema check parses the live state.json with THIS process's loaded
+    // schema, so a failure here — where the CLI passes — is the schema-staleness
+    // signal that cost two loops of record-keeping.
+    const result = runSync({ projectRoot: resolve(args.project_root ?? "."), checkOnly: args.check_only ?? false, score: args.score ?? false, scoreJson: false, history: false, runtime: "mcp-server" });
     const projectRoot = result.projectRoot;
 
     const lines: string[] = [];
@@ -309,6 +313,20 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
       lines.push(`ob_state refused: ${r.error}`);
       if (r.revision_before >= 0) lines.push(`Revision: ${r.revision_before} (unchanged)`);
       lines.push(`Nothing written.`);
+      // Loop 10 R2 — the refusal names its remedy.
+      //
+      // Fail-closed is correct and stays. What was missing is that this was
+      // diagnosed only because the session holding the error also held the
+      // context for the schema change that caused it. A fresh reader sees
+      // "expected string, received undefined" and suspects the FILE, when the
+      // cause may be that this server process holds a schema older than the file
+      // — an MCP server keeps its schema for the life of the process, and only a
+      // human can reconnect it.
+      if (/schema|expected .* received|invalid/i.test(r.error ?? "")) {
+        lines.push(
+          `If the state schema changed this session, this server may be holding the old one: ask Aaron to run \`/mcp reconnect open-brain\`, then re-run \`ob_sync\` — its state-schema check reports which process parsed the file. Confirm by a read ordered after the write, never by the reconnect message: a stale server reports success.`,
+        );
+      }
       return { content: [{ type: "text", text: lines.join("\n") }], isError: true };
     }
     lines.push(`ob_state ${r.dry_run ? "dry run — nothing written" : "applied"}`);
@@ -431,7 +449,7 @@ export async function handleScore(args: {
       }
     } else {
       // Run checks to feed config score
-      const result = runSync({ projectRoot, checkOnly: true, score: false, scoreJson: false, history: false });
+      const result = runSync({ projectRoot, checkOnly: true, score: false, scoreJson: false, history: false, runtime: "mcp-server" });
       const scoreResult = computeScore(projectRoot, result.checks);
 
       lines.push(`Health Score: ${scoreResult.total}/100`);
