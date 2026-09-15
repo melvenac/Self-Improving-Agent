@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { formatApoptosisQueue, apoptosisFlaggedExpr, type ApoptosisCandidate } from "../src/lifecycle.js";
+import {
+  formatApoptosisQueue,
+  apoptosisFlaggedExpr,
+  evaluateLifecycle,
+  LIFECYCLE_CONFIG,
+  type ApoptosisCandidate,
+  type FeedbackEntry,
+  type LifecycleGateConfig,
+} from "../src/lifecycle.js";
 
 function candidate(over: Partial<ApoptosisCandidate> = {}): ApoptosisCandidate {
   return { id: 1, key: "some-entry", helpful: 1, harmful: 5, success_rate: 0.17, ...over };
@@ -63,5 +71,79 @@ describe("apoptosisFlaggedExpr", () => {
     const sql = apoptosisFlaggedExpr("other");
 
     expect(sql).not.toMatch(/(?<![\w.])(source|success_rate|helpful|harmful)\b/);
+  });
+});
+
+/**
+ * Loop 8 R1 — the suspension itself.
+ *
+ * These pin behaviour that had no test before this loop: `evaluateLifecycle`'s
+ * apoptosis/autoDelete decision was covered nowhere, only the review-queue SQL
+ * was. That gap is why the gate could be inert in production for the whole of
+ * its life without a single test noticing.
+ */
+describe("R1 lifecycle suspension", () => {
+  /** An entry that would have tripped the pre-R1 gate: 5 rated, rate 0.2. */
+  const wouldPrune: FeedbackEntry = {
+    id: 1,
+    helpful: 1,
+    harmful: 3,
+    neutral: 40,
+    success_rate: 0.25,
+    maturity: "progenitor",
+    source: "agent",
+  };
+
+  const RESTORED: LifecycleGateConfig = { ...LIFECYCLE_CONFIG, apoptosisEnabled: true };
+
+  it("does not fire apoptosis while the gate is suspended", () => {
+    const r = evaluateLifecycle(wouldPrune, "harmful");
+    expect(r.apoptosis).toBe(false);
+    expect(r.autoDelete).toBe(false);
+    expect(r.transitionMessage).toBeNull();
+  });
+
+  it("still fires apoptosis when the gate is restored — so the flag is the thing stopping it", () => {
+    const r = evaluateLifecycle(wouldPrune, "harmful", RESTORED);
+    expect(r.apoptosis).toBe(true);
+    expect(r.autoDelete).toBe(true);
+    expect(r.transitionMessage).toContain("Apoptosis");
+  });
+
+  it("keeps recording counters and success_rate while suspended", () => {
+    // 1 helpful + 4 harmful once this rating lands: the rate must still move.
+    const r = evaluateLifecycle(wouldPrune, "harmful");
+    expect(r.newSuccessRate).toBeCloseTo(1 / 5, 10);
+  });
+
+  it("still promotes while suspended — the bookkeeping half stays live", () => {
+    const climbing: FeedbackEntry = {
+      id: 2,
+      helpful: 2,
+      harmful: 0,
+      neutral: 0,
+      success_rate: 1,
+      maturity: "progenitor",
+      source: "agent",
+    };
+    const r = evaluateLifecycle(climbing, "helpful");
+    expect(r.newMaturity).toBe("proven");
+    expect(r.transitionMessage).toContain("Promoted");
+  });
+
+  it("neutral ratings leave success_rate null and cannot reach the gate", () => {
+    const unrated: FeedbackEntry = {
+      id: 3,
+      helpful: 0,
+      harmful: 0,
+      neutral: 12,
+      success_rate: null,
+      maturity: "progenitor",
+      source: "agent",
+    };
+    // True even with the gate restored: the denominator excludes neutral, so a
+    // wholly-neutral entry is unreachable by apoptosis in either config.
+    expect(evaluateLifecycle(unrated, "neutral").newSuccessRate).toBeNull();
+    expect(evaluateLifecycle(unrated, "neutral", RESTORED).apoptosis).toBe(false);
   });
 });

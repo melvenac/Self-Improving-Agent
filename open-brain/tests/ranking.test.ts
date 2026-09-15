@@ -39,18 +39,22 @@ describe('recall ranking', () => {
   }
 
   /** Run the live ranking expression and return vault_paths in ranked order. */
-  function ranked(): string[] {
-    const rows = db
+  function ranked(overrides: Parameters<typeof recallRankExpr>[1] = {}): string[] {
+    return rankRows(overrides).map((r) => r.vault_path);
+  }
+
+  /** Same query, but keeping the computed rank so ties can be asserted as ties. */
+  function rankRows(overrides: Parameters<typeof recallRankExpr>[1] = {}) {
+    return db
       .prepare(
-        `SELECT k.vault_path, ${recallRankExpr('k')} AS weighted_rank
+        `SELECT k.vault_path, ${recallRankExpr('k', overrides)} AS weighted_rank
          FROM knowledge_fts
          JOIN knowledge_index k ON k.id = knowledge_fts.rowid
          WHERE knowledge_fts MATCH 'alpha'
          AND k.archived_into IS NULL
          ORDER BY weighted_rank`
       )
-      .all() as Array<{ vault_path: string }>;
-    return rows.map((r) => r.vault_path);
+      .all() as Array<{ vault_path: string; weighted_rank: number }>;
   }
 
   it('ranks a newer entry above an older one at equal relevance', () => {
@@ -67,18 +71,46 @@ describe('recall ranking', () => {
     expect(ranked()).toHaveLength(2);
   });
 
-  it('ranks a mature entry above a progenitor at equal relevance and age', () => {
+  /**
+   * Loop 8 R1: the maturity boost is suspended (both multipliers 1.0), so
+   * maturity no longer moves an entry in the ranking. Asserted as an exact tie
+   * rather than as an order, because with equal scores the returned order is
+   * whatever SQLite happens to emit and asserting on it would pin noise.
+   */
+  it('does not rank a mature entry above a progenitor while the boost is suspended', () => {
     add('progenitor.md', { ageDays: 30 });
     add('mature.md', { ageDays: 30, maturity: 'mature' });
 
-    expect(ranked()[0]).toBe('mature.md');
+    const rows = rankRows();
+    expect(rows).toHaveLength(2);
+    expect(rows[0].weighted_rank).toBeCloseTo(rows[1].weighted_rank, 10);
   });
 
-  it('ranks a proven entry above a progenitor at equal relevance and age', () => {
+  it('does not rank a proven entry above a progenitor while the boost is suspended', () => {
     add('progenitor.md', { ageDays: 30 });
     add('proven.md', { ageDays: 30, maturity: 'proven' });
 
-    expect(ranked()[0]).toBe('proven.md');
+    const rows = rankRows();
+    expect(rows).toHaveLength(2);
+    expect(rows[0].weighted_rank).toBeCloseTo(rows[1].weighted_rank, 10);
+  });
+
+  /**
+   * The suspension is a constant change, not a removal: the expression still
+   * applies the multipliers it is given. This pins that restoring the pre-R1
+   * values restores the pre-R1 behaviour, so the claim "fully reversible by
+   * restoring the constants" is proven here rather than asserted in a comment.
+   */
+  it('still applies the maturity boost when the pre-R1 constants are restored', () => {
+    add('progenitor.md', { ageDays: 30 });
+    add('mature.md', { ageDays: 30, maturity: 'mature' });
+    add('proven.md', { ageDays: 30, maturity: 'proven' });
+
+    expect(ranked({ matureBoost: 1.5, provenBoost: 1.2 })).toEqual([
+      'mature.md',
+      'proven.md',
+      'progenitor.md',
+    ]);
   });
 
   it('demotes an entry whose success rate is below the apoptosis threshold', () => {

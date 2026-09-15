@@ -1,7 +1,35 @@
 // Lifecycle engine — evaluates maturity transitions and apoptosis
 // Adapted from STEM Agent thresholds for session-based cadence
 
+/**
+ * Loop 8 R1 — the maturity lifecycle is SUSPENDED, not removed.
+ *
+ * Loop 7 established that `success_rate` excludes neutral from its denominator
+ * (`helpful / (helpful + harmful)`), and that `harmful` had fired twice in the
+ * history of the corpus. The rate is therefore near-two-valued: it reads 1.0 for
+ * almost everything ever rated, so it measures recall volume rather than
+ * usefulness. Both things it fed — the ranking boost and the apoptosis gate —
+ * were ranking and pruning on that.
+ *
+ * Suspension rather than deletion, and the counters keep recording: `helpful`,
+ * `harmful`, `neutral` and the promotion transitions all still accumulate, so if
+ * a better signal arrives the history is intact and this is reversible by
+ * restoring three constants. What is switched off is the *effect* on ranking and
+ * on deletion, not the bookkeeping.
+ *
+ * To restore: matureBoost 1.5, provenBoost 1.2, apoptosisEnabled true.
+ */
 export const LIFECYCLE_CONFIG = {
+  /**
+   * Master switch for the apoptosis gate (Loop 8 R1: off).
+   *
+   * Deliberately a separate flag rather than setting `apoptosisThreshold` to 0.
+   * That constant is read in three places — the gate here, `maturityBoost`, and
+   * the `penalty` term of `recallRankExpr` — so zeroing it would also silently
+   * disable `lowSuccessPenalty`, which R1 did not rule on. A flag turns off
+   * exactly what was ruled and nothing else.
+   */
+  apoptosisEnabled: false,
   /** Minimum non-neutral ratings before judging */
   apoptosisMinActivations: 5,
   /** Success rate below this = apoptosis candidate */
@@ -12,10 +40,10 @@ export const LIFECYCLE_CONFIG = {
   matureMinHelpful: 7,
   /** Minimum success rate to advance maturity */
   advanceMinSuccessRate: 0.5,
-  /** Recall ranking multiplier for mature entries */
-  matureBoost: 1.5,
-  /** Recall ranking multiplier for proven entries */
-  provenBoost: 1.2,
+  /** Recall ranking multiplier for mature entries (R1: suspended at 1.0; was 1.5) */
+  matureBoost: 1.0,
+  /** Recall ranking multiplier for proven entries (R1: suspended at 1.0; was 1.2) */
+  provenBoost: 1.0,
   /** Recall ranking penalty for entries below the apoptosis threshold */
   lowSuccessPenalty: 0.5,
   /** Per-day recency decay applied to recall ranking */
@@ -51,6 +79,23 @@ export interface FeedbackEntry {
   source: string;
 }
 
+/**
+ * The subset of LIFECYCLE_CONFIG that shapes `evaluateLifecycle`.
+ *
+ * Widened away from the literal types for the same reason as `RankConfig`:
+ * LIFECYCLE_CONFIG is `as const`, so a derived Pick<> would type
+ * `apoptosisEnabled` as literal `false` and reject the one override that
+ * makes the R1 suspension testable.
+ */
+export interface LifecycleGateConfig {
+  apoptosisEnabled: boolean;
+  apoptosisMinActivations: number;
+  apoptosisThreshold: number;
+  advanceMinSuccessRate: number;
+  provenMinHelpful: number;
+  matureMinHelpful: number;
+}
+
 export interface LifecycleResult {
   newSuccessRate: number | null;
   newMaturity: Maturity;
@@ -63,6 +108,13 @@ export interface LifecycleResult {
 export function evaluateLifecycle(
   entry: FeedbackEntry,
   rating: Rating,
+  /**
+   * Config override, defaulting to the live constants. Exists so the R1
+   * suspension can be proven in both directions by test: a flag whose "off"
+   * state nothing can exercise is indistinguishable from a flag that does not
+   * work. Both production call sites (db-v2.ts, server.ts) pass nothing.
+   */
+  config: LifecycleGateConfig = LIFECYCLE_CONFIG,
 ): LifecycleResult {
   // Increment counts
   const helpful = entry.helpful + (rating === "helpful" ? 1 : 0);
@@ -72,11 +124,13 @@ export function evaluateLifecycle(
   // Recalculate success rate (null if only neutral ratings)
   const newSuccessRate = nonNeutral > 0 ? helpful / nonNeutral : null;
 
-  // Check apoptosis
+  // Check apoptosis. R1: the gate is suspended, so this is false regardless of
+  // the counts — which still accumulate above, and still drive promotion below.
   const apoptosis =
-    nonNeutral >= LIFECYCLE_CONFIG.apoptosisMinActivations &&
+    config.apoptosisEnabled &&
+    nonNeutral >= config.apoptosisMinActivations &&
     newSuccessRate !== null &&
-    newSuccessRate < LIFECYCLE_CONFIG.apoptosisThreshold;
+    newSuccessRate < config.apoptosisThreshold;
 
   const autoDelete = apoptosis && entry.source !== "manual";
 
@@ -90,11 +144,11 @@ export function evaluateLifecycle(
     } else {
       transitionMessage = `Apoptosis candidate: flagged for review (${helpful} helpful, ${harmful} harmful, rate ${newSuccessRate!.toFixed(2)}, source: manual)`;
     }
-  } else if (newSuccessRate !== null && newSuccessRate >= LIFECYCLE_CONFIG.advanceMinSuccessRate) {
-    if (entry.maturity === "progenitor" && helpful >= LIFECYCLE_CONFIG.provenMinHelpful) {
+  } else if (newSuccessRate !== null && newSuccessRate >= config.advanceMinSuccessRate) {
+    if (entry.maturity === "progenitor" && helpful >= config.provenMinHelpful) {
       newMaturity = "proven";
       transitionMessage = `Promoted: progenitor → proven (${helpful} helpful, rate ${newSuccessRate.toFixed(2)})`;
-    } else if (entry.maturity === "proven" && helpful >= LIFECYCLE_CONFIG.matureMinHelpful) {
+    } else if (entry.maturity === "proven" && helpful >= config.matureMinHelpful) {
       newMaturity = "mature";
       transitionMessage = `Promoted: proven → mature (${helpful} helpful, rate ${newSuccessRate.toFixed(2)})`;
     }

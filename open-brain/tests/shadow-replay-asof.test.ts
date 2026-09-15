@@ -125,15 +125,25 @@ describe('lifecycle snapshot substitution', () => {
     });
     const plain = seed(db, 'plain', 'alpha', '2026-01-01T00:00:00.000Z');
 
+    // Loop 8 R1 suspended the maturity boost in the live config, so `live` can
+    // no longer separate these two rows and this test would pass on a tie. The
+    // mechanism under test is snapshot substitution, not the boost, so the boost
+    // is restored explicitly here — otherwise the assertion stops discriminating
+    // and silently guards nothing.
+    const BOOSTED_STRATEGY = { ...LIVE, overrides: { ...LIVE.overrides, matureBoost: 1.5 } };
+
     // Live columns say mature: the 1.5x boost overcomes the weaker match.
-    expect(runStrategyQuery(db, 'alpha', LIVE, 10, {})).toEqual([boosted, plain]);
+    expect(runStrategyQuery(db, 'alpha', BOOSTED_STRATEGY, 10, {})).toEqual([boosted, plain]);
 
     // As of the session it was still a progenitor, so no boost applies and the
     // better lexical match wins — the order the session actually saw.
     const snapshot: LifecycleSnapshot = new Map([
       [boosted, { maturity: 'progenitor' as const, success_rate: null }],
     ]);
-    expect(runStrategyQuery(db, 'alpha', LIVE, 10, { snapshot })).toEqual([plain, boosted]);
+    expect(runStrategyQuery(db, 'alpha', BOOSTED_STRATEGY, 10, { snapshot })).toEqual([
+      plain,
+      boosted,
+    ]);
   });
 
   /**
