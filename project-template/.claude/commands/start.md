@@ -52,24 +52,39 @@ Use that state for every later step. Do NOT Read SUMMARY.md, INBOX.md, task.md o
 
 Then read these residual files (skip any that don't exist):
 1. .agents/skills/INDEX.md
-2. ~/Obsidian Vault v2/Skill-Candidates/SKILL-INDEX.md
-3. ~/Obsidian Vault v2/.skill-proposals-pending.json
-4. .agents/SYSTEM/domains.json
-5. .agents/AGENT.md — parse YAML frontmatter for name, role, partner, mailbox_channel (skip silently if absent)
+2. .agents/SYSTEM/domains.json
+3. .agents/AGENT.md — parse YAML frontmatter for name, role, partner, mailbox_channel (skip silently if absent)
 
-## 3. Knowledge recall
-- ob_recall(queries: [Q1, Q2], project: "{cwd}", limit: 5, trigger: "start")
-  Choose Q1/Q2 based on INBOX.md priorities (methodology-focused, not file-specific).
-- If results < 3, broaden: ob_recall(queries: [Q1, Q2], global: true, limit: 5, trigger: "start")
-- Check for checkpoints: ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3, trigger: "checkpoint")
+> The two skill-proposal reads that sat here were removed with the skill scan
+> (Loop 10 C2, CUT). Nothing writes `.skill-proposals-pending.json` now, so reading it
+> would report a stale count from a file no longer produced — an absence reported as a
+> healthy number.
 
-Always pass `trigger` as shown — it records that these recalls are session-start injection. Deliberate mid-task recalls pass `trigger: "explicit"`; an omitted trigger is recorded as "unspecified" (a countable labeling gap, never assumed to be a deliberate fetch).
+## 3. Knowledge recall — REMOVED (Loop 10 C2, SUSPENDED)
 
-> **Do not write `.recalled-entries.json`.** The step that did was removed in the Loop 5 release.
-> `ob_recall` already records every hit in `recall_log` against the live session
-> uuid, which is what `/end` rates from — the file was a redundant second copy,
-> per-project rather than per-session, and merging into it each start made it
-> accumulate other sessions' ids without bound. Do not re-add the write.
+Session-start recall injection is suspended and this step is deleted rather than
+disabled: a flag can gate code deterministically, but an instruction an agent can
+still read can still fire.
+
+**Why.** The ranker earns its keep — on the repaired instrument `bm25_only` loses to
+`live` 10–23, p=0.035. That is evidence about *ranking*, not about *injection*. The one
+attempt to measure whether injected recall changes what an agent does collapsed to
+p=0.688 once the control was topic-matched. On 2026-09-15 the checkpoint slot returned a
+five-loop-stale entry that genuinely was the newest in scope; the entry describing the
+defect that would have repaired the system had been recalled zero times in 1,311 rows; and
+347 of 561 entries carry a NULL `project_dir`, so scoping cannot work for 62% of the
+corpus. In the same session a fact injected at 100% delivery, top of context, every
+session — `CLAUDE.md`'s own note that the summaries table does not exist — failed to
+connect to this file's instruction to call two tools that do not exist.
+
+**Reviving observation:** a topic-matched controlled comparison showing that sessions
+receiving injected recall take different actions from sessions that do not. Not a
+refinement of ranking, and not an uncontrolled before/after.
+
+**Recover the deleted text at `bfee8c0:.claude/commands/start.md`.**
+
+`ob_recall` remains available as a deliberate mid-task tool, called with
+`trigger: "explicit"`. What is suspended is the automatic injection at session start.
 
 ## 4. Read mailbox (if AGENT.md declared a mailbox_channel)
 Skip this step entirely if AGENT.md was absent or had no mailbox_channel.
@@ -90,12 +105,9 @@ Drift: {relay ob_start's drift lines verbatim, or "none"}
 Revision: {rev from ob_start's "## State (state.json rev N)" line, or "none"}
 Proposed: {top incomplete task from INBOX}
 
-Knowledge:
-- {entry}: {one-line actionable rewrite}
-
 Mailbox: {latest subject} | Last decision: {date}   ← omit this line entirely if no mailbox_channel
 Handoff: {from next-session.md, or "none"}
-Skills: {relevant skills + pending proposal count}
+Skills: {relevant skills from .agents/skills/INDEX.md, or "none"}
 
 FLAGS: {anything to verify, or "none"}   ← include "no CLAUDE.md in project root" if that is the case (don't create one — ask the user first)
 ```
@@ -135,26 +147,10 @@ You are a startup subagent for a non-project session. Do NOT invoke skills or di
 Session UUID: {UUID from hook output, or "none"}
 If not "none": call ob_set_session(session_id: "{UUID}", project_dir: "{cwd}")
 
-## 2. Knowledge recall
-- ob_recall(queries: [Q1, Q2], project: "{cwd}", limit: 5, trigger: "start")
-  Choose queries based on the working directory context.
-- If results < 3: ob_recall(queries: [Q1, Q2], global: true, limit: 5, trigger: "start")
-- Checkpoint: ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3, trigger: "checkpoint")
-
-## 3. Skills check
-Read ~/Obsidian Vault v2/Skill-Candidates/SKILL-INDEX.md
-Read ~/Obsidian Vault v2/.skill-proposals-pending.json
-
-## 4. Return ONLY:
+## 2. Return ONLY:
 
 GREETING:
 Hey {user} — {date}
-
-Knowledge:
-- {entry}: {one-line actionable rewrite}
-
-Skills: {relevant + pending count}
-Checkpoints: {count or "none"}
 
 FLAGS: {anything to verify, or "none"}
 ```
@@ -177,14 +173,16 @@ If FLAGS contains items, verify them before presenting. If the subagent failed, 
 
 If it's the first session of the month, or the user asks for a health check:
 
-### Session aging pipeline
-1. Call `ob_summarize()` to find unsummarized sessions
-2. For each (up to 5 per maintenance run):
-   - Read the session chunks
-   - Summarize into 3-5 sentences capturing: what was done, key decisions, gotchas
-   - Call `ob_store_summary(session_id, summary, model)` to persist
-3. Report: "Summarized N aging sessions"
-4. If any summarized sessions are older than 30 days, note that their raw chunks can be pruned on next run
+### Session aging pipeline — REMOVED (Loop 10 C2, CUT)
+
+**It instructed calls to `ob_summarize()` and `ob_store_summary()`, neither of which
+exists.** The server registers fourteen tools and neither name is among them; there is no
+match anywhere in `open-brain/src`. The step could never have executed.
+
+It survived because it was identical in all three mirrors, and `/sync`'s `command-parity`
+check compares the copies **to each other** rather than the tool names to the server's
+registry — so three identical copies of a false instruction agreed perfectly and the check
+reported `pass`. Recover the deleted text at `bfee8c0:.claude/commands/start.md`.
 
 ### Stale experience pruning
 - Use `ob_list` to find knowledge entries with `recall_count = 0`
@@ -192,9 +190,11 @@ If it's the first session of the month, or the user asks for a health check:
 - Present the stale list to the user: "These experiences haven't been useful — prune them?"
 - Only delete with the user's approval
 
-### Skill candidate check
-- Read `~/Obsidian Vault v2/Skill-Candidates/SKILL-CANDIDATES.md`
-- If any cluster has 3+ experiences and hasn't been acted on, remind the user
+### Skill candidate check — REMOVED (Loop 10 C2, CUT)
+
+The skill scan and its proposal machinery were cut: six months produced **0 skills** from
+39 proposals, none of which was ever acted on. Nothing now writes
+`.skill-proposals-pending.json` and nothing reads it. The vault notes are untouched.
 
 ### Protocol health score
 1. If in the Self-Improving-Agent project, run `node open-brain/build/cli.js sync --score`

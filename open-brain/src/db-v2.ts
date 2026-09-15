@@ -79,13 +79,10 @@ export function initSchemaV2(db: Database.Database): void {
       updated_at TEXT NOT NULL
     );
 
-    CREATE TABLE IF NOT EXISTS reflection_log (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      cluster_tag TEXT NOT NULL,
-      source_ids TEXT NOT NULL,
-      result TEXT NOT NULL CHECK(result IN ('approved', 'rejected', 'pending')),
-      created_at TEXT NOT NULL
-    );
+    -- Loop 10 C2: reflection_log is CUT. It held 0 rows after six months — it
+    -- never once recorded anything — so new databases no longer declare it.
+    -- Existing databases keep the empty table; nothing reads or writes it, and
+    -- dropping it would be a migration on live data this loop did not rule on.
 
     -- Ground truth for the shadow-recall harness.
     --
