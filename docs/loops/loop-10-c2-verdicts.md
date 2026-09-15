@@ -41,6 +41,7 @@ written 2026-09-10. `.skill-proposals-pending.json` 39 entries.
 | E16b | The warning's causal claim | — | **CUT** |
 | E17 | `ob_recall` + ranker | A | **KEEP** |
 | P1 | `/start` recall **injection** (=E28) | D | **SUSPENDED** — trigger below |
+| E18 | Apoptosis gate | D | **SUSPENDED** — same trigger as E3 |
 | E19 | Store path + content guard | B | **KEEP** |
 | E23 | Chunk store (+P6) | B | **KEEP** |
 | E24 | Dream pipeline | D | **CUT** |
@@ -53,8 +54,19 @@ written 2026-09-10. `.skill-proposals-pending.json` 39 entries.
 | B8 | Smart Connections | D | **CUT** |
 | B10 | `.recalled-entries.json` | — | Already gone; no verdict required |
 
-**D is non-empty (9 components) and A/B is non-empty (14).** Both of C1's falsification
-conditions are unmet, so the criterion stands.
+**Tallied from the table rows programmatically, not by eye: 27 rows — A 2, B 11, C 1, D 11,
+n/a 2. Verdicts: 14 KEEP, 9 CUT, 3 SUSPENDED, 1 requiring none.**
+
+**D is non-empty (11) and A/B is non-empty (13).** Both of C1's falsification conditions are
+unmet, so the criterion stands.
+
+> **Correction, recorded rather than silently fixed.** The first version of this document
+> (`d2b84ab`) stated "D is non-empty (9 components)", omitted **E18 from the table** while
+> ruling it in prose, and reported "nine CUTs" — a count asserted without running the count,
+> in the loop's own deliverable, the same defect as Planner 18/19/20 and Developer 16. The
+> Planner caught it by tallying the rows with `awk` instead of reading them. **Developer
+> error 17.** Every figure in the block above is now produced by `grep | awk | sort | uniq -c`
+> over the table, and the table is the auditable artifact.
 
 ## The central ruling: the ranker earns its keep, the injection does not
 
@@ -107,13 +119,23 @@ injection block is deleted; **its text is recoverable at `bfee8c0:.claude/comman
 
 ## The other rulings that carry weight
 
-**E18 apoptosis — CUT.** `archived_into` non-null is **0**: it has never retired a single
-entry in six months. `db-v2.ts:802` already says so — *"which is why apoptosis has never
-fired."* It gates on a success rate that is structurally 1.00 because neutral is excluded
-from the denominator, and neutral is **446 of 615 ratings**. **No observation can revive it
-without first changing a different component's semantics**, which is not a trigger on this
-one. Per C1, unrevivable means CUT, and per the brief a component that cannot be judged on six
-months of its own operation rules accordingly.
+**E18 apoptosis — SUSPENDED, on the same trigger as E3.** `archived_into` non-null is **0**:
+it has never retired a single entry in six months, and `db-v2.ts:802` already says so —
+*"which is why apoptosis has never fired."* It gates on a success rate that is structurally
+1.00 because neutral is excluded from the denominator, and neutral is **446 of 615 ratings**.
+
+**This verdict was CUT in `d2b84ab` and is corrected here.** The first version denied E18 a
+trigger on the grounds that its revival "requires changing a different component's semantics,
+which is not a trigger on this one" — while granting E3 a trigger that **waits on the same
+thing**. Apoptosis prunes below 0.3 after 5 ratings; it gates on precisely the rate E3's
+trigger names. **The identical observation revives both.** Applying C1's
+`D → CUT unless a reviving observation can be named` asymmetrically to two components sharing
+one dependency is the exception-invented-while-ruling that C1's falsification section exists
+to catch. The Planner caught it. **Developer error 18.**
+
+**Resolved by symmetry, in the direction that grants the trigger**, because the observation is
+genuinely nameable and specific: **a replacement for `success_rate` that discriminates.**
+Text recoverable at `bfee8c0:open-brain/src/lifecycle.ts`.
 
 **E4b `success_rate` — CUT, false-report clause.** It reports a rate that excludes 72.5% of
 its own inputs and is therefore structurally 1.00. Rule 5: a number is not health until the
@@ -125,6 +147,27 @@ file records restore values while naming **no reviving observation** — the ope
 suspension this loop exists to close. A trigger is nameable: **a ratings distribution in which
 `success_rate` discriminates**, which requires E4b's replacement to exist first. Text
 recoverable at `bfee8c0:open-brain/src/lifecycle.ts`.
+
+### SUSPENDED deletes the code too — vocabulary extension, and when it was made
+
+C1 said "CUT means the code goes" and did not say what SUSPENDED does to code. `bfee8c0`
+pinned the answer for **prompt** artifacts before any was ruled: the block is deleted, the
+trigger and a recovery SHA are recorded elsewhere, and suspension differs from CUT only in
+whether a reviving observation was nameable.
+
+**That rule is extended to code here, and this extension was made after seeing E3 and E18** —
+recorded with its date per C1's falsification section rather than presented as having been
+pinned in advance. The reasoning is not new: C1 already forbids dormant code, holding that
+"anything kept as dormant code is a KEEP wearing a CUT's label." **A SUSPENDED component left
+switched off in the tree is exactly the open-ended suspension this loop was convened to end**,
+and E3 and E18 are already in that state — off since Loop 8, with no stated condition for
+return. Leaving them there under a new label would re-create the thing being ruled against.
+
+**Consequence: E3 and E18 are deleted, like the CUTs.** The difference is that their reviving
+observation is written down and their text is recoverable at a named SHA. **On the operational
+question the Planner raised, the E3/E18 split therefore no longer changes what happens to the
+code** — both go — which is why resolving the asymmetry toward SUSPENDED costs nothing and
+preserves the honest distinction.
 
 **E6 reflection queue — CUT.** `reflection_log` has **0 rows**. Six months, never once
 recorded anything.
@@ -195,4 +238,4 @@ by measurements disagreeing. **This principle names the exact condition under wh
 catching mechanism silently stops working**, and it belongs in the record above the errors
 that produced it.
 
-Running error count: **23 Planner, 16 Developer.**
+Running error count: **23 Planner, 18 Developer.**
