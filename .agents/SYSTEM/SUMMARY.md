@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 7 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 8 by open-brain v0.31.0 — do not edit; change state via ob_state -->
 > **Status:** v0.31.0 — Loop 6 of the extraction evaluation — repair the shadow-recall instrument before re-asking the ranking questions. C1 has two halves that are one job: lifecycle-state snapshot as of the replayed session, and a candidate pool restricted to entries that existed then. Plus the op-vocabulary ADR (project.version removal leading), with the usage signal displaced to Loop 7. Brief at ~/.agents/mailbox/channels/sia/loop-6-brief.md.
 
 ## What's working
