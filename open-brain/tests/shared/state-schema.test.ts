@@ -50,6 +50,26 @@ describe("state-schema (Loop 2, read side)", () => {
     if (!r.ok) expect(r.error).toMatch(/^handoff: /);
   });
 
+  /** Loop 4 R2: closed_session is non-null exactly when status is done — both directions refuse. */
+  it("refuses a done task with closed_session null, and an open task with closed_session set (R2)", () => {
+    const doneNoClose = valid();
+    const done = doneNoClose.tasks.find((t) => t.status === "done")!;
+    done.closed_session = null;
+    const r1 = parseState(JSON.stringify(doneNoClose));
+    expect(r1.ok).toBe(false);
+    if (!r1.ok) expect(r1.error).toBe(`tasks.${doneNoClose.tasks.indexOf(done)}.closed_session: closed_session must be set when status is "done" and null otherwise`);
+
+    const openWithClose = valid();
+    const open = openWithClose.tasks.find((t) => t.status !== "done")!;
+    open.closed_session = 54;
+    const r2 = parseState(JSON.stringify(openWithClose));
+    expect(r2.ok).toBe(false);
+    if (!r2.ok) expect(r2.error).toMatch(/^tasks\.\d+\.closed_session: /);
+
+    // The committed fixture satisfies the rule in every row.
+    for (const t of valid().tasks) expect(t.status === "done").toBe(t.closed_session !== null);
+  });
+
   it("names the path of a bad enum inside a task", () => {
     const data = valid();
     (data.tasks[3] as unknown as { status: string }).status = "finished";

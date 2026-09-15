@@ -3,7 +3,7 @@ import { mkdtempSync, cpSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
-import { resolveRepoRoot, isProjectRoot, describeNoRoot } from "../../../src/shared/repo-root.js";
+import { resolveRepoRoot, isProjectRoot, describeNoRoot, resolveHookProjectDir } from "../../../src/shared/repo-root.js";
 import { runSync } from "../../../src/pipelines/sync/index.js";
 
 const fixturesDir = join(import.meta.dirname, "../../fixtures");
@@ -45,6 +45,22 @@ describe("resolveRepoRoot", () => {
     expect(fromSub.projectRoot).toBe(root);
     expect(fromSub.version).toBe(fromRoot.version);
     expect(fromSub.checks).toEqual(fromRoot.checks);
+  });
+
+  /** Loop 4 R5: the session-end hook resolves through the same walker, so a drifted cwd cannot create a stray .agents/. */
+  it("resolveHookProjectDir walks up from the stray-.agents subpackage to the root, and keeps a bare dir with nothing above it (V4)", () => {
+    const sub = join(root, "open-brain");
+    mkdirSync(join(sub, ".agents"), { recursive: true });
+    writeFileSync(join(sub, "package.json"), JSON.stringify({ name: "open-brain", version: "0.1.0" }));
+    expect(resolveHookProjectDir(sub)).toBe(root);
+    expect(resolveHookProjectDir(join(sub, "build"))).toBe(root);
+    expect(resolveHookProjectDir(root)).toBe(root);
+    const bare = mkdtempSync(join(tmpdir(), "ob-hook-bare-"));
+    try {
+      expect(resolveHookProjectDir(bare)).toBe(bare);
+    } finally {
+      rmSync(bare, { recursive: true, force: true });
+    }
   });
 
   it("a nested project with the protocol layout is its own root", () => {

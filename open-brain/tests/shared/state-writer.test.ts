@@ -178,6 +178,42 @@ describe("applyStateOps (Loop 3 writer)", () => {
     expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "close_task", id: "T-005" }] }), /already done \(closed session 55\)/);
   });
 
+  /** Loop 4 R1: a regression reopens the same task; the note is appended, not replaced. */
+  it("reopen_task moves done → open, clears closed_session, appends the note, and refuses a task that is not done (R1)", () => {
+    const r = applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "reopen_task", id: "T-001", note: "regressed in 0.30.1" }] });
+    expect(r.applied).toEqual([{ op: "reopen_task", id: "T-001" }]);
+    const t = readState(root).tasks.find((x) => x.id === "T-001")!;
+    expect(t).toMatchObject({ status: "open", closed_session: null, opened_session: 53, note: "Loop 1, v0.28.0 — regressed in 0.30.1" });
+    // It is an ordinary open task again: update and close both work.
+    const r2 = applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "update_task", id: "T-001", status: "in_progress" }, { op: "close_task", id: "T-001", note: "fixed again" }] });
+    expect(r2.ok).toBe(true);
+    expect(readState(root).tasks.find((x) => x.id === "T-001")).toMatchObject({ status: "done", closed_session: SESSION, note: "fixed again" });
+    // Refusals: not done, unknown, empty note.
+    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 9, ops: [{ op: "reopen_task", id: "T-005", note: "x" }] }), /task T-005 is not done \(status in_progress\)/);
+    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 9, ops: [{ op: "reopen_task", id: "T-999", note: "x" }] }), /unknown task T-999/);
+    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 9, ops: [{ op: "reopen_task", id: "T-001", note: "" }] }), /^ops\[0\] invalid at note: /);
+    // A task with no prior note gets the note verbatim.
+    applyStateOps(root, { session: SESSION, expected_revision: 9, ops: [{ op: "reopen_task", id: "T-002", note: "back" }] });
+    expect(readState(root).tasks.find((x) => x.id === "T-002")!.note).toBe("back");
+  });
+
+  /** Loop 4 R3: an empty batch re-renders the views and is a no-op on state.json. */
+  it("ops: [] with render: true re-renders the views, leaves revision and state.json bytes unchanged, and runs no retention (R3)", () => {
+    const r = applyStateOps(root, { session: 60, expected_revision: 7, ops: [], render: true, version: "9.9.9" });
+    expect(r.ok).toBe(true);
+    expect(r.revision_before).toBe(7);
+    expect(r.revision_after).toBe(7);
+    expect(r.applied).toEqual([]);
+    expect(r.dropped_task_ids).toEqual([]); // session 60 would have dropped every done task if retention ran
+    expect(r.rendered).toEqual([".agents/TASKS/INBOX.md", ".agents/TASKS/task.md", ".agents/SESSIONS/next-session.md", ".agents/SYSTEM/SUMMARY.md"]);
+    expect(readFileSync(join(root, STATE), "utf-8")).toBe(before);
+    const header = "<!-- generated from .agents/state.json rev 7 by open-brain v9.9.9 — do not edit; change state via ob_state -->";
+    expect(readFileSync(join(root, ".agents/TASKS/INBOX.md"), "utf-8").startsWith(header)).toBe(true);
+    expect(readFileSync(join(root, ".agents/SYSTEM/SUMMARY.md"), "utf-8")).toContain(header);
+    // The revision did not move, so the same expected_revision still writes.
+    expect(applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "set_objective", text: "x" }] }).revision_after).toBe(8);
+  });
+
   it("add_verified assigns V-NNN with since_session and requires evidence (V2)", () => {
     const ev = { type: "test", path: "open-brain/tests/x.test.ts", observation: "green" };
     const r = applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "add_verified", claim: "It holds", evidence: [ev] }] });

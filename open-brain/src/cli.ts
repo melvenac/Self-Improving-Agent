@@ -76,6 +76,13 @@ if (command === "sync") {
     console.log();
   }
 
+  const reported = result.checks.filter((c) => c.report);
+  if (reported.length > 0) {
+    console.log("REPORTED (printed whatever the severity):");
+    for (const c of reported) console.log(`  ${c.name} [${c.severity}]: ${c.message}`);
+    console.log();
+  }
+
   console.log(
     `Summary: ${result.passed.length} passed, ${result.fixed.length} fixed, ${result.warnings.length} warnings, ${result.issues.length} issues, ${result.skipped.length} skipped`
   );

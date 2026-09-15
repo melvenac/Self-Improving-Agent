@@ -25,6 +25,7 @@ import {
   checkMirrorParity,
   checkStateSchema,
 } from "./checks.js";
+import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-state.js";
 
 export function runSync(input: SyncOptions): SyncResult {
   // R4 (Loop 3): the given root may be a subdirectory (open-brain/ has its
@@ -49,7 +50,7 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkReadmeRefs(options.projectRoot));
   checks.push(checkHookConfigs(paths.settingsJson));
   checks.push(checkHookRegistration(paths.settingsJson));
-  checks.push(checkSummary(version, options.projectRoot));
+  checks.push(checkSummary(version, options.projectRoot, options.checkOnly));
   checks.push(checkClaudeMd(options.projectRoot));
   checks.push(checkObsidianVault(paths.obsidianVault));
   checks.push(checkVaultIndexParity(paths.obsidianVault, paths.knowledgeV2Db));
@@ -63,6 +64,11 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkRules(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
   checks.push(checkStateSchema(version, options.projectRoot));
+  // Loop 4: R6 view headers vs state.json revision, R4 master CI conclusion,
+  // R7 conflict markers in tracked files. Each prints its number unconditionally.
+  checks.push(checkStateViews(options.projectRoot));
+  checks.push(checkCiStatus(options.projectRoot));
+  checks.push(checkMergeMarkers(options.projectRoot));
 
   const fixed = checks.filter((c) => c.severity === "fixed");
   const issues = checks.filter((c) => c.severity === "issue");

@@ -50,6 +50,12 @@ export const ObjectiveSchema = z.strictObject({
   since_session: sessionNumber,
 });
 
+/**
+ * Loop 4 R2: `closed_session` is the session a task was closed in, so it is
+ * non-null exactly when `status` is "done". A done task with no closed
+ * session would be invisible to retention forever; an open task with one
+ * would claim a close that never happened. Both directions refuse.
+ */
 export const TaskSchema = z.strictObject({
   id: z.string(),
   title: z.string(),
@@ -59,6 +65,9 @@ export const TaskSchema = z.strictObject({
   closed_session: sessionNumber.nullable(),
   supersedes: z.string().nullable(),
   note: z.string(),
+}).refine((t) => (t.status === "done") === (t.closed_session !== null), {
+  message: 'closed_session must be set when status is "done" and null otherwise',
+  path: ["closed_session"],
 });
 
 export const EvidenceSchema = z.strictObject({

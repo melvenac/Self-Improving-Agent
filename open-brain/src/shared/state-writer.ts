@@ -48,6 +48,7 @@ export const OpSchema = z.discriminatedUnion("op", [
   z.strictObject({ op: z.literal("open_task"), id: z.string().optional(), title: z.string().min(1), priority: TaskPriority, note: z.string().optional(), supersedes: z.string().nullable().optional() }),
   z.strictObject({ op: z.literal("update_task"), id: z.string(), title: z.string().min(1).optional(), priority: TaskPriority.optional(), status: ActiveStatus.optional(), note: z.string().optional() }),
   z.strictObject({ op: z.literal("close_task"), id: z.string(), note: z.string().optional() }),
+  z.strictObject({ op: z.literal("reopen_task"), id: z.string(), note: z.string().min(1) }),
   z.strictObject({ op: z.literal("add_verified"), id: z.string().optional(), claim: z.string().min(1), evidence: z.array(EvidenceSchema).min(1) }),
   z.strictObject({ op: z.literal("reopen_verified"), id: z.string(), evidence: EvidenceSchema }),
   z.strictObject({ op: z.literal("add_gap"), id: z.string().optional(), what: z.string().min(1), evidence: z.string(), recommended_update: z.string() }),
@@ -124,8 +125,14 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
     applied.push({ op: v.data.op, id: r.id });
   }
 
-  const dropped = applyRetention(next, options.session);
-  next.revision = before + 1;
+  // Loop 4 R3: an empty batch is a re-render, not a write. The revision does
+  // not move, retention does not run and state.json is not touched — only
+  // the views are regenerated (with the current package.json version). This
+  // is what /sync uses to refresh stale view headers without inventing a
+  // state change.
+  const renderOnly = options.ops.length === 0;
+  const dropped = renderOnly ? [] : applyRetention(next, options.session);
+  next.revision = renderOnly ? before : before + 1;
 
   const check = validateResultState(next);
   if (!check.ok) return refuse(before, check.error);
@@ -143,7 +150,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   }
 
   if (!dryRun) {
-    atomicWrite(statePath, serializeState(finalState));
+    if (!renderOnly) atomicWrite(statePath, serializeState(finalState));
     for (const v of views) atomicWrite(join(projectRoot, v.rel), v.text);
   }
 
@@ -201,6 +208,17 @@ function applyOne(s: State, op: StateOp, session: number, removedGaps: string[])
       t.status = "done";
       t.closed_session = session;
       if (op.note !== undefined) t.note = op.note;
+      return { ok: true, id: t.id };
+    }
+    case "reopen_task": {
+      // Loop 4 R1: a regression reopens the same task rather than opening a
+      // superseding one; the note says why, appended so the close-out survives.
+      const t = findTask(s, op.id);
+      if (!t) return { ok: false, error: `unknown task ${op.id}` };
+      if (t.status !== "done") return { ok: false, error: `task ${op.id} is not done (status ${t.status}); nothing to reopen` };
+      t.status = "open";
+      t.closed_session = null;
+      t.note = t.note ? `${t.note} — ${op.note}` : op.note;
       return { ok: true, id: t.id };
     }
     case "add_verified": {

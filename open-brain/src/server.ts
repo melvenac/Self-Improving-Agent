@@ -142,6 +142,11 @@ export async function handleSync(args: {
       lines.push(`\nSKIPPED:`);
       for (const c of result.skipped) lines.push(`  ${c.name}: ${c.message}`);
     }
+    const reported = result.checks.filter((c) => c.report);
+    if (reported.length > 0) {
+      lines.push(`\nREPORTED (printed whatever the severity):`);
+      for (const c of reported) lines.push(`  ${c.name} [${c.severity}]: ${c.message}`);
+    }
 
     lines.push(`\nSummary: ${result.passed.length} passed, ${result.fixed.length} fixed, ${result.warnings.length} warnings, ${result.issues.length} issues, ${result.skipped.length} skipped`);
 
@@ -490,12 +495,12 @@ server.tool(
 
 server.tool(
   "ob_state",
-  "Write .agents/state.json through typed operations (open_task, update_task, close_task, add_verified, reopen_verified, add_gap, close_gap, add_decision, set_objective, set_handoff, end_session). Atomic: all ops apply or none. Requires the file to exist and expected_revision to match; bumps revision, applies done-task retention, and regenerates INBOX.md, task.md, next-session.md and the marked region of SUMMARY.md.",
+  "Write .agents/state.json through typed operations (open_task, update_task, close_task, reopen_task, add_verified, reopen_verified, add_gap, close_gap, add_decision, set_objective, set_handoff, end_session). Atomic: all ops apply or none. Requires the file to exist and expected_revision to match; bumps revision, applies done-task retention, and regenerates INBOX.md, task.md, next-session.md and the marked region of SUMMARY.md. An empty ops array with render: true re-renders the views without touching state.json or its revision.",
   {
     project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
     session: z.number().int().min(0).describe("Current session number — stamped on opened/closed/verified items"),
     expected_revision: z.number().int().min(0).describe("The revision you read from ob_start / the file; refused on mismatch"),
-    ops: z.array(z.record(z.string(), z.unknown())).min(1).describe("Ordered operations, each {op: <name>, ...args}"),
+    ops: z.array(z.record(z.string(), z.unknown())).describe("Ordered operations, each {op: <name>, ...args}; empty = re-render views only"),
     dry_run: z.boolean().optional().default(false).describe("Validate and report without writing anything"),
     render: z.boolean().optional().default(true).describe("Regenerate the view files after writing (default true)"),
   },

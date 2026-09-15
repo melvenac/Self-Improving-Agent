@@ -43,6 +43,18 @@ export function isProjectRoot(dir: string): boolean {
     || existsSync(join(dir, "open-brain"));
 }
 
+/**
+ * Loop 4 R5: the session-end hook's project directory. Claude Code hands the
+ * hook `CLAUDE_PROJECT_DIR`, but a drifted cwd (the hook fired from
+ * `open-brain/`) once produced a stray `open-brain/.agents/reflection-queue.json`.
+ * Walk up to the real root; when nothing above qualifies, keep the candidate
+ * so a project without the protocol layout still gets its `.agents/` where
+ * the hook was pointed.
+ */
+export function resolveHookProjectDir(candidate: string): string {
+  return resolveRepoRoot(candidate) ?? resolve(candidate);
+}
+
 export function describeNoRoot(start: string): string {
   return `no project root found walking up from ${resolve(start)} — need a directory with package.json beside .agents/SYSTEM/, .agents/META/ or open-brain/`;
 }
