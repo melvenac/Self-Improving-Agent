@@ -1,51 +1,39 @@
-// Lifecycle engine — evaluates maturity transitions and apoptosis
-// Adapted from STEM Agent thresholds for session-based cadence
+// Recall ranking — the expression ob_recall orders by.
 
 /**
- * Loop 8 R1 — the maturity lifecycle is SUSPENDED, not removed.
+ * Loop 10 C2 — the maturity lifecycle (E3), apoptosis (E18) and `success_rate`
+ * (E4b) are gone from this file, and the as-of replay they fed (E9b) with them.
  *
- * Loop 7 established that `success_rate` excludes neutral from its denominator
- * (`helpful / (helpful + harmful)`), and that `harmful` had fired twice in the
- * history of the corpus. The rate is therefore near-two-valued: it reads 1.0 for
- * almost everything ever rated, so it measures recall volume rather than
- * usefulness. Both things it fed — the ranking boost and the apoptosis gate —
- * were ranking and pruning on that.
+ * Loop 8 R1 had suspended the first two behind flags. This loop ruled on six
+ * months of their operation rather than on their design:
  *
- * Suspension rather than deletion, and the counters keep recording: `helpful`,
- * `harmful`, `neutral` and the promotion transitions all still accumulate, so if
- * a better signal arrives the history is intact and this is reversible by
- * restoring three constants. What is switched off is the *effect* on ranking and
- * on deletion, not the bookkeeping.
+ * - **Apoptosis never fired.** `archived_into` non-null: 0 rows. Not "rarely" —
+ *   never, in the entire history of the corpus.
+ * - **`success_rate` cannot discriminate.** It is `helpful / (helpful + harmful)`,
+ *   which excludes neutral — and neutral is 446 of 615 ratings, 72.5%. It reads
+ *   1.0 for almost everything ever rated, so it measured recall volume rather
+ *   than usefulness. A number that cannot be false is not evidence, and a
+ *   component emitting one cannot be kept on the strength of that path.
+ * - **The maturity boosts had been at 1.0 since Loop 8**, so removing them is
+ *   behaviour-preserving rather than a change to what recall returns.
  *
- * To restore: matureBoost 1.5, provenBoost 1.2, apoptosisEnabled true.
+ * SUSPENDED, not CUT — the deletion is how suspension is expressed, because a
+ * flag gates code deterministically but dormant code is a KEEP wearing a CUT's
+ * label. What makes it a suspension is that the reviving observation is written
+ * down and the text is recoverable.
+ *
+ * **REVIVING OBSERVATION: a replacement for `success_rate` that discriminates** —
+ * one whose denominator accounts for neutral, or a different signal entirely.
+ *
+ * **If that trigger fires, E9b must be restored in the same change.** Restoring
+ * maturity-weighted ranking restores the confound the as-of replay existed to
+ * remove; evaluating the new ranking without it measures that ranking with the
+ * evaluating session's own feedback inside it. A revival that omits E9b is not a
+ * partial revival, it is one that cannot be honestly measured.
+ *
+ * Recover the deleted code at `bfee8c0:open-brain/src/lifecycle.ts`.
  */
 export const LIFECYCLE_CONFIG = {
-  /**
-   * Master switch for the apoptosis gate (Loop 8 R1: off).
-   *
-   * Deliberately a separate flag rather than setting `apoptosisThreshold` to 0.
-   * That constant is read in three places — the gate here, `maturityBoost`, and
-   * the `penalty` term of `recallRankExpr` — so zeroing it would also silently
-   * disable `lowSuccessPenalty`, which R1 did not rule on. A flag turns off
-   * exactly what was ruled and nothing else.
-   */
-  apoptosisEnabled: false,
-  /** Minimum non-neutral ratings before judging */
-  apoptosisMinActivations: 5,
-  /** Success rate below this = apoptosis candidate */
-  apoptosisThreshold: 0.3,
-  /** Helpful ratings needed for progenitor → proven */
-  provenMinHelpful: 3,
-  /** Helpful ratings needed for proven → mature */
-  matureMinHelpful: 7,
-  /** Minimum success rate to advance maturity */
-  advanceMinSuccessRate: 0.5,
-  /** Recall ranking multiplier for mature entries (R1: suspended at 1.0; was 1.5) */
-  matureBoost: 1.0,
-  /** Recall ranking multiplier for proven entries (R1: suspended at 1.0; was 1.2) */
-  provenBoost: 1.0,
-  /** Recall ranking penalty for entries below the apoptosis threshold */
-  lowSuccessPenalty: 0.5,
   /** Per-day recency decay applied to recall ranking */
   recencyDecayPerDay: 0.005,
   /** Recall ranking multiplier for entries tagged 'failure' */
@@ -53,253 +41,27 @@ export const LIFECYCLE_CONFIG = {
 } as const;
 
 /**
- * `archived_into` value for an entry retired with no successor.
- *
- * The column was designed for merges — "this entry was folded into entry N" —
- * so every live-row filter reads `archived_into IS NULL` and the dream pipeline
- * treats a non-NULL value as "already resolved". Apoptosis has no successor to
- * point at, but it still needs a non-NULL value or the row stays live.
- *
- * Zero is not a valid `knowledge_index.id` (AUTOINCREMENT starts at 1), so it
- * cannot collide with a real merge target, and it satisfies every existing
- * `IS NULL` filter without touching one of them.
+ * Widened to `number` on purpose: LIFECYCLE_CONFIG is `as const`, so deriving
+ * this with Pick<> would give literal types and reject every override a shadow
+ * strategy exists to supply.
  */
-export const ARCHIVED_NO_SUCCESSOR = 0;
+export type RankConfig = Record<"recencyDecayPerDay" | "failureBoost", number>;
 
+/**
+ * The stored maturity label. Nothing computes it any more — E3's promotion
+ * engine is gone — but the column still holds what it held, and `ob_list` and
+ * the vault frontmatter still display it. Kept as a type so those readers stay
+ * honest about what they are reading: a value last written before Loop 10.
+ */
 export type Maturity = "progenitor" | "proven" | "mature";
+
+/**
+ * A feedback rating. The ratings path (E4) is KEEP — recording what an agent
+ * judged is sound and stays. What was cut is `success_rate`, the derived number
+ * built from these that excluded neutral from its own denominator.
+ */
 export type Rating = "helpful" | "harmful" | "neutral";
 
-export interface FeedbackEntry {
-  id: number;
-  helpful: number;
-  harmful: number;
-  neutral: number;
-  success_rate: number | null;
-  maturity: Maturity;
-  source: string;
-}
-
-/**
- * The subset of LIFECYCLE_CONFIG that shapes `evaluateLifecycle`.
- *
- * Widened away from the literal types for the same reason as `RankConfig`:
- * LIFECYCLE_CONFIG is `as const`, so a derived Pick<> would type
- * `apoptosisEnabled` as literal `false` and reject the one override that
- * makes the R1 suspension testable.
- */
-export interface LifecycleGateConfig {
-  apoptosisEnabled: boolean;
-  apoptosisMinActivations: number;
-  apoptosisThreshold: number;
-  advanceMinSuccessRate: number;
-  provenMinHelpful: number;
-  matureMinHelpful: number;
-}
-
-export interface LifecycleResult {
-  newSuccessRate: number | null;
-  newMaturity: Maturity;
-  apoptosis: boolean;
-  /** true = auto-delete, false = flag for approval */
-  autoDelete: boolean;
-  transitionMessage: string | null;
-}
-
-export function evaluateLifecycle(
-  entry: FeedbackEntry,
-  rating: Rating,
-  /**
-   * Config override, defaulting to the live constants. Exists so the R1
-   * suspension can be proven in both directions by test: a flag whose "off"
-   * state nothing can exercise is indistinguishable from a flag that does not
-   * work. Both production call sites (db-v2.ts, server.ts) pass nothing.
-   */
-  config: LifecycleGateConfig = LIFECYCLE_CONFIG,
-): LifecycleResult {
-  // Increment counts
-  const helpful = entry.helpful + (rating === "helpful" ? 1 : 0);
-  const harmful = entry.harmful + (rating === "harmful" ? 1 : 0);
-  const nonNeutral = helpful + harmful;
-
-  // Recalculate success rate (null if only neutral ratings)
-  const newSuccessRate = nonNeutral > 0 ? helpful / nonNeutral : null;
-
-  // Check apoptosis. R1: the gate is suspended, so this is false regardless of
-  // the counts — which still accumulate above, and still drive promotion below.
-  const apoptosis =
-    config.apoptosisEnabled &&
-    nonNeutral >= config.apoptosisMinActivations &&
-    newSuccessRate !== null &&
-    newSuccessRate < config.apoptosisThreshold;
-
-  const autoDelete = apoptosis && entry.source !== "manual";
-
-  // Evaluate maturity advancement (only if not being pruned)
-  let newMaturity = entry.maturity;
-  let transitionMessage: string | null = null;
-
-  if (apoptosis) {
-    if (autoDelete) {
-      transitionMessage = `Apoptosis: auto-pruned (${helpful} helpful, ${harmful} harmful, rate ${newSuccessRate!.toFixed(2)}, source: ${entry.source})`;
-    } else {
-      transitionMessage = `Apoptosis candidate: flagged for review (${helpful} helpful, ${harmful} harmful, rate ${newSuccessRate!.toFixed(2)}, source: manual)`;
-    }
-  } else if (newSuccessRate !== null && newSuccessRate >= config.advanceMinSuccessRate) {
-    if (entry.maturity === "progenitor" && helpful >= config.provenMinHelpful) {
-      newMaturity = "proven";
-      transitionMessage = `Promoted: progenitor → proven (${helpful} helpful, rate ${newSuccessRate.toFixed(2)})`;
-    } else if (entry.maturity === "proven" && helpful >= config.matureMinHelpful) {
-      newMaturity = "mature";
-      transitionMessage = `Promoted: proven → mature (${helpful} helpful, rate ${newSuccessRate.toFixed(2)})`;
-    }
-  }
-
-  return { newSuccessRate, newMaturity, apoptosis, autoDelete, transitionMessage };
-}
-
-/**
- * Maturity boost multiplier for ob_recall ranking.
- * Applied to BM25 weighted_rank (lower = better match, so we divide by boost).
- */
-export function maturityBoost(maturity: Maturity, successRate: number | null): number {
-  let boost = 1.0;
-  if (maturity === "mature") boost = LIFECYCLE_CONFIG.matureBoost;
-  else if (maturity === "proven") boost = LIFECYCLE_CONFIG.provenBoost;
-
-  // Penalty for low success rate (but not yet at apoptosis)
-  if (successRate !== null && successRate < LIFECYCLE_CONFIG.apoptosisThreshold) {
-    boost *= LIFECYCLE_CONFIG.lowSuccessPenalty;
-  }
-
-  return boost;
-}
-
-/**
- * The subset of LIFECYCLE_CONFIG that shapes recall ranking.
- *
- * Widened to `number` on purpose: LIFECYCLE_CONFIG is `as const`, so deriving
- * this with Pick<> would give literal types (`0.005`, `1.5`) and reject every
- * override a shadow strategy exists to supply.
- */
-export type RankConfig = Record<
-  | "matureBoost"
-  | "provenBoost"
-  | "lowSuccessPenalty"
-  | "apoptosisThreshold"
-  | "recencyDecayPerDay"
-  | "failureBoost",
-  number
->;
-
-/**
- * SQL ranking expression for ob_recall, built from LIFECYCLE_CONFIG so the
- * query and maturityBoost() cannot drift apart.
- *
- * bm25() is NEGATIVE and more-negative means a better match, and the query
- * sorts ASCENDING. So a factor that should IMPROVE rank must make the value
- * more negative (multiply), and a factor that should DEMOTE must make it less
- * negative (divide).
- *
- * `overrides` exists so the shadow-recall harness can evaluate alternative
- * weightings without a second ranking implementation — a strategy that does not
- * share this code path measures something users never see. Overrides are merged
- * into a fresh object; LIFECYCLE_CONFIG is never mutated.
- */
-/**
- * SQL predicate for entries flagged for apoptosis but still present.
- *
- * `evaluateLifecycle` reports "Apoptosis candidate: flagged for review" in the
- * single `ob_feedback` response that crosses the threshold, and nothing records
- * it: no column changes, `archived_into` stays NULL. So "flagged for approval"
- * described a review step whose queue could not be listed. Derived rather than
- * stored, because the inputs are already columns and a stored flag would be a
- * second source of truth that can fall out of step with them.
- *
- * Only `source = 'manual'` can appear: everything else is auto-pruned on the
- * rating that crosses the threshold, so a surviving candidate is manual by
- * construction. Built from LIFECYCLE_CONFIG so this and evaluateLifecycle
- * cannot drift — and note it counts `helpful + harmful`, excluding neutral,
- * matching `nonNeutral` there.
- */
-export function apoptosisFlaggedExpr(alias = "k"): string {
-  return `${alias}.source = 'manual' AND ${lowSuccessExpr(alias)}`;
-}
-
-/**
- * SQL predicate for "has been judged enough times to be judged at all".
- *
- * Counts `helpful + harmful` and excludes neutral, matching `nonNeutral` in
- * `evaluateLifecycle`. Extracted because it was written out twice with two
- * different arithmetics: `db-v2.ts` gated on `helpful + harmful + neutral`,
- * so `ob_stats` reported on a population 2.4x the one the pruner would act on
- * (56 entries vs 23 in the 2026-09-01 snapshot). Both surfaces returned zero,
- * which is why the disagreement went unseen — and both zeros were the
- * structurally-unreachable kind, not the healthy kind.
- */
-export function apoptosisGateExpr(alias = "k"): string {
-  return `(${alias}.helpful + ${alias}.harmful) >= ${LIFECYCLE_CONFIG.apoptosisMinActivations}`;
-}
-
-/**
- * SQL predicate for "rated badly enough to be an apoptosis candidate",
- * independent of `source`.
- *
- * The review queue adds `source = 'manual'` on top of this; the health stats
- * count every entry regardless of source. Those are legitimately different
- * questions, but they must not disagree about the gate arithmetic or the
- * threshold, which is why both are built from here.
- */
-export function lowSuccessExpr(alias = "k"): string {
-  return (
-    `${alias}.success_rate IS NOT NULL ` +
-    `AND ${alias}.success_rate < ${LIFECYCLE_CONFIG.apoptosisThreshold} ` +
-    `AND ${apoptosisGateExpr(alias)}`
-  );
-}
-
-export interface ApoptosisCandidate {
-  id: number;
-  key: string | null;
-  helpful: number;
-  harmful: number;
-  success_rate: number;
-}
-
-/**
- * Render the apoptosis review queue as report lines — **including at zero**.
- *
- * v0.14.0 printed this block only when the queue was non-empty, so an empty
- * queue and a server too old to have the block at all produced byte-identical
- * output. That is the same "absence is indistinguishable from success" shape
- * the block was added to fix, reintroduced by the fix itself. The count line is
- * therefore unconditional; only the per-entry detail and the removal hint are
- * gated, because those genuinely have nothing to say at zero.
- */
-export function formatApoptosisQueue(rows: ApoptosisCandidate[], limit = 10): string[] {
-  const lines = [``, `Apoptosis candidates awaiting review: ${rows.length}`];
-  for (const r of rows.slice(0, limit)) {
-    lines.push(`  [${r.id}] ${r.key ?? "no key"} — ${r.helpful} helpful, ${r.harmful} harmful, rate ${r.success_rate.toFixed(2)}`);
-  }
-  if (rows.length > limit) lines.push(`  ... +${rows.length - limit} more`);
-  if (rows.length > 0) {
-    lines.push(`  Manual entries are never auto-pruned. Use ob_forget to remove one (its note moves to Archive/).`);
-  }
-  return lines;
-}
-
-/**
- * SQL literal for the moment ranking is evaluated *from*.
- *
- * Production passes nothing and gets `'now'`, which is correct there: in live
- * recall "now" genuinely is recall time. A replay must pass the moment being
- * replayed, or every entry is aged by (today - that moment) and the recency
- * divisor ratio collapses toward 1.0 — flattening the very signal the recency
- * strategies exist to measure, and flattening it hardest for the strongest decay.
- *
- * Throws rather than falling back to `'now'` on a malformed value. A silent
- * fallback here would reinstate the defect invisibly for the one caller that
- * exists to avoid it, and nothing about the string `'now'` looks like state.
- */
 export function asOfLiteral(asOf?: string | null): string {
   if (asOf === undefined || asOf === null) return `'now'`;
   if (!/^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}:\d{2}(\.\d+)?Z?)?$/.test(asOf)) {
@@ -308,21 +70,16 @@ export function asOfLiteral(asOf?: string | null): string {
   return `'${asOf}'`;
 }
 
+/**
+ * SQL ranking expression for ob_recall, built from LIFECYCLE_CONFIG so the
+ * shadow harness can sweep the same constants production reads.
+ */
 export function recallRankExpr(
   alias = "k",
   overrides: Partial<RankConfig> = {},
   asOf?: string | null,
 ): string {
   const c: RankConfig = { ...LIFECYCLE_CONFIG, ...overrides };
-  const maturity =
-    `(CASE ${alias}.maturity ` +
-    `WHEN 'mature' THEN ${c.matureBoost} ` +
-    `WHEN 'proven' THEN ${c.provenBoost} ` +
-    `ELSE 1.0 END)`;
-  const penalty =
-    `(CASE WHEN ${alias}.success_rate IS NOT NULL ` +
-    `AND ${alias}.success_rate < ${c.apoptosisThreshold} ` +
-    `THEN ${c.lowSuccessPenalty} ELSE 1.0 END)`;
   // Exact tag-token match: normalize "a, b, failure" to ",a,b,failure," so we
   // match ",failure," and not substrings like "failures" or "no-failure".
   const failure =
@@ -334,30 +91,5 @@ export function recallRankExpr(
   // Divide by the recency term: older entries get a larger divisor, pulling the
   // (negative) score toward zero so they sort later. Multiplying here — as the
   // original expression did — inverted this and promoted stale knowledge.
-  return `(bm25(knowledge_fts) * ${maturity} * ${penalty} * ${failure} / ${recency})`;
+  return `(bm25(knowledge_fts) * ${failure} / ${recency})`;
 }
-
-/**
- * An entry's lifecycle state at a past moment — the two columns `recallRankExpr`
- * reads that this session's own feedback can move.
- *
- * `success_rate` is nullable and its NULL is meaningful: it means "no non-neutral
- * ratings yet", which is a different rank than any number. A consumer substituting
- * these values must therefore test for the override's PRESENCE, not for a non-NULL
- * value — COALESCE(override, live) silently falls back to today's number exactly
- * when the historical answer was "unrated", which is the confound this type exists
- * to remove.
- */
-export interface LifecycleOverride {
-  maturity: Maturity;
-  success_rate: number | null;
-}
-
-/**
- * `knowledge_index.id` → the state that entry held at the replayed moment.
- *
- * Absence means "unchanged since then" and the live row is correct. Only ids whose
- * state actually moved need an entry, which is why the production capture covers
- * `recalledEntryIds` and nothing wider: those are exactly the ids Stage 2 can touch.
- */
-export type LifecycleSnapshot = Map<number, LifecycleOverride>;

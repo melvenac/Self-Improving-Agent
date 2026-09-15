@@ -27,16 +27,14 @@
 // decision to Aaron.
 
 import type Database from "better-sqlite3";
-import { recallRankExpr, type LifecycleSnapshot } from "../../lifecycle.js";
+import { recallRankExpr } from "../../lifecycle.js";
 import { sanitizeFtsQuery, broadenFtsQuery } from "../../shared/fts.js";
 import {
   getSessionQueries,
   getSessionLabels,
   getSessionAsOf,
-  replayLifecycleAsOf,
   countEntriesAfter,
   type ShadowRating,
-  type ReplayCoverage,
 } from "../../db-v2.js";
 import { SHADOW_STRATEGIES, type ShadowStrategy } from "./strategies.js";
 
@@ -77,20 +75,11 @@ export interface SessionEvaluation {
    * this existed they were the same output.
    */
   asOf: string | null;
-  /** Entries whose lifecycle values were substituted for their live ones. */
-  snapshotted: number;
   /** Entries excluded because they did not exist yet at `asOf`. */
   excludedAsNotYetCreated: number;
-  /** Only set for a reconstructed replay; absent when production supplied the snapshot. */
-  coverage?: ReplayCoverage;
 }
 
 export interface ReplayContext {
-  /**
-   * Lifecycle values to substitute for the live columns. Absent ids keep the live
-   * row. An empty map means "nothing moved" and the join is skipped entirely.
-   */
-  snapshot?: LifecycleSnapshot;
   /**
    * The moment being replayed. Restricts the candidate pool to entries that
    * existed then, and anchors the recency clock to then rather than to now.
@@ -113,33 +102,27 @@ export function runStrategyQuery(
   replay: ReplayContext = {},
 ): number[] {
   const asOf = replay.asOf ?? null;
-  const overrides = [...(replay.snapshot ?? new Map()).entries()];
 
-  // Substitute the snapshot by JOINing it, so `recallRankExpr` — which reads
-  // maturity, success_rate, created_at and tags off its alias — is untouched and
-  // the ranking arithmetic under test stays byte-identical to production.
+  // Loop 10 C2 (E9b): the lifecycle-snapshot substitution is SUSPENDED and gone.
+  // It JOINed a per-entry override of `maturity` and `success_rate` so a replayed
+  // session ranked against the state as it stood rather than against state this
+  // session's own feedback had moved. `recallRankExpr` no longer reads either
+  // column — E3 and E4b were cut — so there is nothing left to substitute and the
+  // confound it removed cannot arise.
   //
-  // Presence, not COALESCE: a snapshotted `success_rate` of NULL means "unrated
-  // at that moment", which ranks differently from every number. COALESCE would
-  // fall back to today's value in exactly that case — reinstating the confound
-  // for the entries most likely to have been moved by this session's own labels.
-  const withClause = overrides.length
-    ? `WITH ov(id, maturity, success_rate) AS (VALUES ${overrides.map(() => "(?, ?, ?)").join(", ")})
-`
-    : "";
-  const source = overrides.length
-    ? `(
-      SELECT base.id, base.tags, base.created_at, base.archived_into,
-             CASE WHEN ov.id IS NOT NULL THEN ov.maturity ELSE base.maturity END AS maturity,
-             CASE WHEN ov.id IS NOT NULL THEN ov.success_rate ELSE base.success_rate END AS success_rate
-      FROM knowledge_index base LEFT JOIN ov ON ov.id = base.id
-    )`
-    : "knowledge_index";
-
+  // IF E3/E18's TRIGGER FIRES, THIS COMES BACK IN THE SAME CHANGE. Restoring
+  // maturity-weighted ranking restores the confound, and evaluating the restored
+  // ranking without this substitution measures it with the evaluating session's
+  // own labels inside it. Recover at `bfee8c0:open-brain/src/pipelines/shadow/evaluate.ts`.
+  //
+  // The `asOf` date filter below is NOT part of that suspension and stays: it
+  // restricts the candidate pool to entries that existed at the replayed moment,
+  // which is the other half of Loop 9's replay lesson and is independent of any
+  // lifecycle column.
   const sql = `
-    ${withClause}SELECT k.id, ${recallRankExpr("k", strategy.overrides, asOf)} AS weighted_rank
+    SELECT k.id, ${recallRankExpr("k", strategy.overrides, asOf)} AS weighted_rank
     FROM knowledge_fts
-    JOIN ${source} k ON k.id = knowledge_fts.rowid
+    JOIN knowledge_index k ON k.id = knowledge_fts.rowid
     WHERE knowledge_fts MATCH ?
     AND k.archived_into IS NULL
     ${asOf ? "AND k.created_at <= ?" : ""}
@@ -147,11 +130,10 @@ export function runStrategyQuery(
     LIMIT ?
   `;
 
-  const head = overrides.flatMap(([id, o]) => [id, o.maturity, o.success_rate]);
   const run = (matchExpr: string) =>
     db
       .prepare(sql)
-      .all(...head, matchExpr, ...(asOf ? [asOf] : []), limit) as Array<{ id: number }>;
+      .all(matchExpr, ...(asOf ? [asOf] : []), limit) as Array<{ id: number }>;
 
   let rows: Array<{ id: number }>;
   try {
@@ -238,12 +220,6 @@ export function scoreStrategy(
 export interface EvaluateOptions {
   limit?: number;
   strategies?: ShadowStrategy[];
-  /**
-   * Lifecycle values captured before this session's feedback ran — the production
-   * path. When omitted the values are reconstructed from `feedback_log`, which is
-   * what a backfill over historical sessions needs.
-   */
-  snapshot?: LifecycleSnapshot;
   /** Override the replayed moment. Defaults to the session's earliest recall. */
   asOf?: string | null;
 }
@@ -267,27 +243,13 @@ export function evaluateSession(
   // are. All three derive from this one timestamp.
   const asOf = options.asOf !== undefined ? options.asOf : getSessionAsOf(db, sessionUuid);
 
-  let snapshot: LifecycleSnapshot;
-  let coverage: ReplayCoverage | undefined;
-  if (options.snapshot) {
-    snapshot = options.snapshot;
-  } else if (asOf) {
-    const replayed = replayLifecycleAsOf(db, asOf);
-    snapshot = replayed.snapshot;
-    coverage = replayed.coverage;
-  } else {
-    snapshot = new Map();
-  }
-
   const base: SessionEvaluation = {
     sessionUuid,
     queries,
     labelCounts,
     scores: [],
     asOf,
-    snapshotted: snapshot.size,
     excludedAsNotYetCreated: asOf ? countEntriesAfter(db, asOf) : 0,
-    coverage,
   };
 
   if (queries.length === 0) return { ...base, skipped: "no logged queries" };
@@ -298,7 +260,7 @@ export function evaluateSession(
   const scores = strategies.map((strategy) => {
     const results = queries.map((query) => ({
       query,
-      ids: runStrategyQuery(db, query, strategy, limit, { snapshot, asOf }),
+      ids: runStrategyQuery(db, query, strategy, limit, { asOf }),
     }));
     return scoreStrategy(strategy.name, results, labels);
   });

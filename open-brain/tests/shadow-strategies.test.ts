@@ -77,28 +77,24 @@ describe('shadow strategies', () => {
    * override agreed. The property worth guarding is unchanged: an override moves
    * the ranking. It is now demonstrated by turning the boost back ON.
    */
-  it('maturity boost is suspended by default and can be turned back on by override', () => {
+  it('maturity is not a ranking input and cannot be reintroduced by an override', () => {
     add('plain.md', { maturity: 'progenitor' });
     add('mature.md', { maturity: 'mature' });
 
-    expect(rankedWith({ matureBoost: 1.5, recencyDecayPerDay: 0 })[0]).toBe('mature.md');
-
-    // With both boosts neutralised the two entries score identically.
-    // bm25() cannot be nested inside an aggregate, so compare in JS.
-    // Recency is neutralised too: the rows are created microseconds apart, so
-    // leaving the decay term in makes the scores differ whenever the two
-    // created_at values straddle a clock tick.
+    // Loop 10 C2 (E3): this used to assert that `matureBoost` was suspended at
+    // 1.0 and could be turned back on by an override. The constant no longer
+    // exists, so the guarantee is stronger and is asserted as such: two entries
+    // differing only in maturity score identically, and no override can change
+    // that. bm25() cannot be nested inside an aggregate, so compare in JS.
+    // Recency is neutralised because the rows are created microseconds apart.
     const scores = db
       .prepare(
-        `SELECT ${recallRankExpr('k', {
-          matureBoost: 1.0,
-          provenBoost: 1.0,
-          recencyDecayPerDay: 0,
-        })} AS r
+        `SELECT ${recallRankExpr('k', { recencyDecayPerDay: 0 })} AS r
          FROM knowledge_fts JOIN knowledge_index k ON k.id = knowledge_fts.rowid
          WHERE knowledge_fts MATCH 'alpha'`
       )
       .all() as Array<{ r: number }>;
+    expect(scores).toHaveLength(2);
     expect(new Set(scores.map((s) => s.r)).size).toBe(1);
   });
 

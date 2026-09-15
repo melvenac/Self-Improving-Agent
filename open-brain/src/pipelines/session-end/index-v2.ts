@@ -4,7 +4,6 @@ import { writeSummary } from "../../vault-writer.js";
 import {
   updateFeedbackV2,
   recordFeedbackEvent,
-  captureLifecycleSnapshot,
   type RatingOrigin,
   type RatingMethod,
 } from "../../db-v2.js";
@@ -114,15 +113,12 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   }
 
   // ── Stage 2: Auto-feedback ───────────────────────────────────────────────────
-  // Capture lifecycle state BEFORE any rating is written. Stage 6 scores this
-  // session's ranking against this session's labels, and Stage 2 is what creates
-  // those labels — so without this capture the shadow harness compares strategies
-  // against maturity values its own ground truth has just moved, and an entry
-  // rated helpful here is measured as though it had already been promoted.
-  //
-  // `recalledEntryIds` is the exact and complete set of ids Stage 2 can touch, so
-  // a wider snapshot would cost more and pin nothing extra.
-  const preFeedbackSnapshot = captureLifecycleSnapshot(db, recalledEntryIds);
+  // Loop 10 C2 (E9b): the pre-feedback lifecycle capture that stood here is
+  // suspended and gone. It existed because the shadow stage scored this session's
+  // ranking against this session's own labels, so ranking had to be pinned to the
+  // state before Stage 2 wrote to it. Ranking no longer reads maturity or
+  // success_rate, so there is nothing left for Stage 2 to move underneath it.
+  // IF E3/E18's TRIGGER FIRES, THE CAPTURE COMES BACK IN THE SAME CHANGE.
 
   const ratings: Array<{ id: number; rating: string }> = [];
   const summaryLower = sessionSummary.toLowerCase();
@@ -201,7 +197,6 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
           db,
           sessionUuid: sessionId,
           logPath: input.shadowLogPath,
-          snapshot: preFeedbackSnapshot,
         });
 
   // ── Stage 7: Topics ─────────────────────────────────────────────────────────
