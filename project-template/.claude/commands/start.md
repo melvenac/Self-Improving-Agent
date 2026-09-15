@@ -65,20 +65,13 @@ Then read these residual files (skip any that don't exist):
 
 Always pass `trigger` as shown — it records that these recalls are session-start injection. Deliberate mid-task recalls pass `trigger: "explicit"`; an omitted trigger is recorded as "unspecified" (a countable labeling gap, never assumed to be a deliberate fetch).
 
-## 4. Write .recalled-entries.json
-Write to .recalled-entries.json in the project root (cwd), NOT ~/.claude/context-mode/.
-Read .recalled-entries.json first (may exist from prior session).
-Merge new recalled entries (deduplicate by id), update session_start timestamp.
-Only include entries with result_type: "knowledge" (not summaries).
-Write the merged result:
-{
-  "session_id": "{UUID or null}",
-  "session_start": "{ISO timestamp}",
-  "queries": ["{all unique queries}"],
-  "entries": [{ "id": N, "key": "entry-key", "source": "knowledge" }]
-}
+> **Do not write `.recalled-entries.json`.** The step that did was removed in v0.32.0.
+> `ob_recall` already records every hit in `recall_log` against the live session
+> uuid, which is what `/end` rates from — the file was a redundant second copy,
+> per-project rather than per-session, and merging into it each start made it
+> accumulate other sessions' ids without bound. Do not re-add the write.
 
-## 5. Read mailbox (if AGENT.md declared a mailbox_channel)
+## 4. Read mailbox (if AGENT.md declared a mailbox_channel)
 Skip this step entirely if AGENT.md was absent or had no mailbox_channel.
 Otherwise:
 - Channel dir: `~/.agents/mailbox/channels/{mailbox_channel}/`
@@ -87,7 +80,7 @@ Otherwise:
 
 Read both. From the inbox, grab the subject of the newest `## [YYYY-MM-DD ...] Sender — Subject` header (first one in the file after the intro). From decisions.md: parse all `## YYYY-MM-DD` headers, sort descending by date string (ISO format sorts correctly lexically), take the first result — do NOT assume last-in-file is most recent.
 
-## 6. Return ONLY this format (under 300 tokens):
+## 5. Return ONLY this format (under 300 tokens):
 
 GREETING:
 Session N — {date}   ← N from ob_start's session block
@@ -113,7 +106,7 @@ FLAGS: {anything to verify, or "none"}   ← include "no CLAUDE.md in project ro
 
 When the background subagent completes, relay its GREETING section to the user. If FLAGS contains anything, verify it.
 
-That's it. No further main-agent processing needed — the subagent handled ob_set_session, ob_start (state, session log, drift), .recalled-entries.json, and the mailbox read. Do NOT call ob_start again from the main agent: it creates a session log on every call.
+That's it. No further main-agent processing needed — the subagent handled ob_set_session, ob_start (state, session log, drift) and the mailbox read. Do NOT call ob_start again from the main agent: it creates a session log on every call.
 
 If the subagent failed or timed out, fall back to a manual greeting:
 - Greet the user by name. Use your configured agent name (from your global CLAUDE.md or .agents/AGENT.md) if one is set.
@@ -148,17 +141,11 @@ If not "none": call ob_set_session(session_id: "{UUID}", project_dir: "{cwd}")
 - If results < 3: ob_recall(queries: [Q1, Q2], global: true, limit: 5, trigger: "start")
 - Checkpoint: ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3, trigger: "checkpoint")
 
-## 3. Write .recalled-entries.json
-Write to .recalled-entries.json in the working directory (cwd), NOT ~/.claude/context-mode/.
-Read .recalled-entries.json first (may have prior entries).
-Merge new recalled entries (deduplicate by id, only result_type: "knowledge").
-Write merged result with session_id, session_start, queries, entries.
-
-## 4. Skills check
+## 3. Skills check
 Read ~/Obsidian Vault v2/Skill-Candidates/SKILL-INDEX.md
 Read ~/Obsidian Vault v2/.skill-proposals-pending.json
 
-## 5. Return ONLY:
+## 4. Return ONLY:
 
 GREETING:
 Hey {user} — {date}
