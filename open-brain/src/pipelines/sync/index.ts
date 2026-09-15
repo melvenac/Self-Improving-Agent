@@ -1,6 +1,7 @@
 import { homedir } from "node:os";
 import { resolvePaths } from "../../shared/paths.js";
 import { readJson } from "../../shared/fs-utils.js";
+import { resolveRepoRoot, describeNoRoot } from "../../shared/repo-root.js";
 import type { SyncOptions, SyncResult, CheckResult } from "./types.js";
 import {
   syncReadmeVersion,
@@ -24,8 +25,14 @@ import {
   checkMirrorParity,
   checkStateSchema,
 } from "./checks.js";
+import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-state.js";
 
-export function runSync(options: SyncOptions): SyncResult {
+export function runSync(input: SyncOptions): SyncResult {
+  // R4 (Loop 3): the given root may be a subdirectory (open-brain/ has its
+  // own package.json); walk up to the real project root or refuse.
+  const root = resolveRepoRoot(input.projectRoot);
+  if (!root) throw new Error(describeNoRoot(input.projectRoot));
+  const options: SyncOptions = { ...input, projectRoot: root };
   const paths = resolvePaths(options.projectRoot);
   const home = homedir();
 
@@ -43,7 +50,7 @@ export function runSync(options: SyncOptions): SyncResult {
   checks.push(checkReadmeRefs(options.projectRoot));
   checks.push(checkHookConfigs(paths.settingsJson));
   checks.push(checkHookRegistration(paths.settingsJson));
-  checks.push(checkSummary(version, options.projectRoot));
+  checks.push(checkSummary(version, options.projectRoot, options.checkOnly));
   checks.push(checkClaudeMd(options.projectRoot));
   checks.push(checkObsidianVault(paths.obsidianVault));
   checks.push(checkVaultIndexParity(paths.obsidianVault, paths.knowledgeV2Db));
@@ -57,6 +64,11 @@ export function runSync(options: SyncOptions): SyncResult {
   checks.push(checkRules(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
   checks.push(checkStateSchema(version, options.projectRoot));
+  // Loop 4: R6 view headers vs state.json revision, R4 master CI conclusion,
+  // R7 conflict markers in tracked files. Each prints its number unconditionally.
+  checks.push(checkStateViews(options.projectRoot));
+  checks.push(checkCiStatus(options.projectRoot));
+  checks.push(checkMergeMarkers(options.projectRoot));
 
   const fixed = checks.filter((c) => c.severity === "fixed");
   const issues = checks.filter((c) => c.severity === "issue");
@@ -64,7 +76,7 @@ export function runSync(options: SyncOptions): SyncResult {
   const passed = checks.filter((c) => c.severity === "pass");
   const skipped = checks.filter((c) => c.severity === "skip");
 
-  return { version, checks, fixed, issues, warnings, passed, skipped };
+  return { version, projectRoot: root, checks, fixed, issues, warnings, passed, skipped };
 }
 
 export type { SyncOptions, SyncResult, CheckResult } from "./types.js";

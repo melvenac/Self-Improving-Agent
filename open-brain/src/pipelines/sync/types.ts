@@ -10,6 +10,12 @@ export interface CheckResult {
   severity: CheckSeverity;
   message: string;
   autoFixed?: boolean;
+  /**
+   * Printed whatever the severity (Loop 4 R4/R7): the number in the message
+   * — a CI conclusion, a marker count — is the point, and a pass that is not
+   * shown is indistinguishable from a check that never ran.
+   */
+  report?: boolean;
 }
 
 export interface SyncOptions {
@@ -22,6 +28,8 @@ export interface SyncOptions {
 
 export interface SyncResult {
   version: string;
+  /** The root actually checked, after walking up from the given directory (R4). */
+  projectRoot: string;
   checks: CheckResult[];
   fixed: CheckResult[];
   issues: CheckResult[];

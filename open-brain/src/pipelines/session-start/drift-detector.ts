@@ -3,6 +3,18 @@ import type { ProjectState, DriftResult } from "./types.js";
 export function detectDrift(state: ProjectState): DriftResult[] {
   const drift: DriftResult[] = [];
 
+  // Loop 3 R3: state.json's own version vs package.json. Reported, never
+  // auto-edited — the writer owns that file — so `fixed` is always false.
+  const sj = state.stateJson;
+  if (sj?.present && sj.valid && sj.data && sj.data.project.version !== state.version) {
+    drift.push({
+      field: "state-version",
+      expected: state.version,
+      actual: sj.data.project.version,
+      fixed: false,
+    });
+  }
+
   if (!state.summary) return drift;
 
   // Check version in SUMMARY matches package.json

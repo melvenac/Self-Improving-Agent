@@ -6,6 +6,7 @@ import type { CheckResult } from "./types.js";
 import { parseSkillIndexRows } from "../../shared/skill-index.js";
 import { SCHEMA_VERSION } from "../../db-v2.js";
 import { parseState } from "../../shared/state-schema.js";
+import { checkSummaryFromState } from "./checks-state.js";
 
 /**
  * Slash-command files that are deliberately NOT mirrored, with the reason.
@@ -176,16 +177,27 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
   return { name: "hook-configs", severity: "pass", message: "All hook command files exist" };
 }
 
-export function checkSummary(version: string, projectRoot: string): CheckResult {
+/**
+ * `summary-version`. Two regimes (Loop 4 R3):
+ * - `.agents/state.json` present → the views are generated; staleness is a
+ *   header mismatch and the fix is a re-render (checkSummaryFromState). No
+ *   prose is ever inserted into SUMMARY.md on this path.
+ * - absent → the prose regime: SUMMARY.md must mention the version, and the
+ *   remedy is a hand edit. This is the only path that can prompt a prose line.
+ */
+export function checkSummary(version: string, projectRoot: string, checkOnly = false): CheckResult {
+  if (existsSync(join(projectRoot, ".agents", "state.json"))) {
+    return checkSummaryFromState(version, projectRoot, checkOnly);
+  }
   const summaryPath = join(projectRoot, ".agents", "SYSTEM", "SUMMARY.md");
   if (!existsSync(summaryPath)) {
-    return { name: "summary", severity: "warn", message: ".agents/SYSTEM/SUMMARY.md not found" };
+    return { name: "summary-version", severity: "warn", message: ".agents/SYSTEM/SUMMARY.md not found" };
   }
   const content = readFileSync(summaryPath, "utf-8");
   if (content.includes(version)) {
-    return { name: "summary", severity: "pass", message: `SUMMARY.md contains version ${version}` };
+    return { name: "summary-version", severity: "pass", message: `SUMMARY.md contains version ${version}` };
   }
-  return { name: "summary", severity: "issue", message: `SUMMARY.md does not mention version ${version}` };
+  return { name: "summary-version", severity: "issue", message: `SUMMARY.md does not mention version ${version}` };
 }
 
 export function checkClaudeMd(projectRoot: string): CheckResult {
@@ -749,8 +761,9 @@ export function checkRules(projectRoot: string): CheckResult {
 
 /**
  * `.agents/state.json` (Loop 2, read side). Absent is a SKIP with the reason
- * printed, not a pass: nothing writes the file yet, so most projects will not
- * have one, and a pass would claim a validation that never ran. Present must
+ * printed, not a pass: the writer (ob_state, Loop 3) never creates the file,
+ * so an unmigrated project has none, and a pass would claim a validation
+ * that never ran. Present must
  * parse against the strict schema, and its `project.version` must equal
  * package.json — the same single-source rule the README and PRD checks enforce.
  */
@@ -760,7 +773,7 @@ export function checkStateSchema(version: string, projectRoot: string): CheckRes
     return {
       name: "state-schema",
       severity: "skip",
-      message: "skipped — no .agents/state.json (read side only in v0.29.0; no writer exists yet)",
+      message: "skipped — no .agents/state.json (this project has not been migrated; ob_state never creates the file)",
     };
   }
   const parsed = parseState(readFileSync(statePath, "utf-8"));

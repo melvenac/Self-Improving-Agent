@@ -2,7 +2,7 @@
 
 *A memory protocol that enables AI coding agents to learn across sessions.*
 
-**Latest: v0.29.1** · [Changelog](CHANGELOG.md)
+**Latest: v0.31.0** · [Changelog](CHANGELOG.md)
 
 ---
 
@@ -84,7 +84,7 @@ cd Self-Improving-Agent
 
 ### 2. Set up open-brain MCP server
 
-The open-brain MCP server provides persistent memory (9 tools: ob_recall, ob_store, ob_store_chunk, ob_feedback, ob_forget, ob_list, ob_stats, ob_set_session, ob_recalled).
+The open-brain MCP server provides persistent memory and project state (14 tools: ob_recall, ob_recalled, ob_store, ob_store_chunk, ob_feedback, ob_forget, ob_list, ob_stats, ob_set_session, ob_start, ob_state, ob_end, ob_sync, ob_score). Project state lives in `.agents/state.json`, created once by `open-brain state import` and written only through `ob_state`; INBOX.md, task.md, next-session.md and SUMMARY.md's marked region are rendered views of it. `ob_start` and `ob_sync` resolve the project root from any subdirectory.
 
 ```bash
 cd open-brain

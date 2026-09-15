@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "revision": 0,
+  "project": {
+    "name": "{{PROJECT}}",
+    "version": "0.0.0"
+  },
+  "objective": null,
+  "tasks": [],
+  "verified": [],
+  "gaps": [],
+  "decisions": [],
+  "handoff": {
+    "pick_up": "",
+    "watch_out": [],
+    "open_questions": [],
+    "session": 0
+  },
+  "last_session": {
+    "n": 0,
+    "date": "2026-09-14",
+    "uuid": null
+  }
+}

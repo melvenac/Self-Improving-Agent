@@ -15,6 +15,7 @@ import { openV2Database } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
 import { obsidianVaultDir } from "./shared/paths.js";
+import { resolveHookProjectDir } from "./shared/repo-root.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const V2_VAULT = obsidianVaultDir();
@@ -29,7 +30,9 @@ try {
     process.exit(0);
   }
 
-  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  // Loop 4 R5: resolve the real project root (shared/repo-root.ts) so a hook
+  // fired with a drifted cwd cannot write a stray `.agents/` into a subpackage.
+  const projectDir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
   const sessionId = process.env.CLAUDE_SESSION_ID || "";
   const agentsDir = join(projectDir, ".agents");
 

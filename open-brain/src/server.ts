@@ -20,6 +20,8 @@ import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/histo
 import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
+import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
+import { applyStateOps, DONE_RETENTION_SESSIONS } from "./shared/state-writer.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
@@ -116,11 +118,12 @@ export async function handleSync(args: {
   score?: boolean;
 }): Promise<ToolResponse> {
   try {
-    const projectRoot = resolve(args.project_root ?? ".");
-    const result = runSync({ projectRoot, checkOnly: args.check_only ?? false, score: args.score ?? false, scoreJson: false, history: false });
+    const result = runSync({ projectRoot: resolve(args.project_root ?? "."), checkOnly: args.check_only ?? false, score: args.score ?? false, scoreJson: false, history: false });
+    const projectRoot = result.projectRoot;
 
     const lines: string[] = [];
     lines.push(`Sync — v${result.version}`);
+    if (projectRoot !== resolve(args.project_root ?? ".")) lines.push(`Root: ${projectRoot} (resolved upward from ${resolve(args.project_root ?? ".")})`);
 
     if (result.fixed.length > 0) {
       lines.push(`\nFIXED:`);
@@ -138,6 +141,11 @@ export async function handleSync(args: {
     if (result.skipped.length > 0) {
       lines.push(`\nSKIPPED:`);
       for (const c of result.skipped) lines.push(`  ${c.name}: ${c.message}`);
+    }
+    const reported = result.checks.filter((c) => c.report);
+    if (reported.length > 0) {
+      lines.push(`\nREPORTED (printed whatever the severity):`);
+      for (const c of reported) lines.push(`  ${c.name} [${c.severity}]: ${c.message}`);
     }
 
     lines.push(`\nSummary: ${result.passed.length} passed, ${result.fixed.length} fixed, ${result.warnings.length} warnings, ${result.issues.length} issues, ${result.skipped.length} skipped`);
@@ -277,6 +285,52 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
   }
 }
 
+export interface StateArgs {
+  project_root?: string;
+  session: number;
+  expected_revision: number;
+  ops: unknown[];
+  dry_run?: boolean;
+  render?: boolean;
+}
+
+/**
+ * ob_state (Loop 3): the only door to writing .agents/state.json. Thin over
+ * applyStateOps; the WriteResult is rendered in the tool's usual text style.
+ */
+export async function handleState(args: StateArgs): Promise<ToolResponse> {
+  try {
+    const projectRoot = resolve(args.project_root ?? ".");
+    const r = applyStateOps(projectRoot, {
+      session: args.session,
+      expected_revision: args.expected_revision,
+      ops: args.ops,
+      dry_run: args.dry_run,
+      render: args.render,
+    });
+    const lines: string[] = [];
+    if (!r.ok) {
+      lines.push(`ob_state refused: ${r.error}`);
+      if (r.revision_before >= 0) lines.push(`Revision: ${r.revision_before} (unchanged)`);
+      lines.push(`Nothing written.`);
+      return { content: [{ type: "text", text: lines.join("\n") }], isError: true };
+    }
+    lines.push(`ob_state ${r.dry_run ? "dry run — nothing written" : "applied"}`);
+    lines.push(`Revision: ${r.revision_before} → ${r.revision_after}`);
+    lines.push(`Applied (${r.applied.length}):`);
+    for (const a of r.applied) lines.push(`  ${a.op}${a.id ? ` ${a.id}` : ""}`);
+    lines.push(`Dropped done tasks (retention ${DONE_RETENTION_SESSIONS} sessions): ${r.dropped_task_ids.length ? r.dropped_task_ids.join(", ") : "none"}`);
+    if (r.removed_gap_ids.length) lines.push(`Closed gaps removed: ${r.removed_gap_ids.join(", ")}`);
+    lines.push(`${r.dry_run ? "Would render" : "Rendered"} (${r.rendered.length}): ${r.rendered.length ? r.rendered.join(", ") : "none (render: false)"}`);
+    return { content: [{ type: "text", text: lines.join("\n") }] };
+  } catch (err) {
+    return {
+      content: [{ type: "text", text: `ob_state error: ${err instanceof Error ? err.message : String(err)}` }],
+      isError: true,
+    };
+  }
+}
+
 export interface EndArgs {
   project_root?: string;
   session_id?: string | null;
@@ -359,7 +413,11 @@ export async function handleScore(args: {
   history_only?: boolean;
 }): Promise<ToolResponse> {
   try {
-    const projectRoot = resolve(args.project_root ?? ".");
+    const startDir = resolve(args.project_root ?? ".");
+    const projectRoot = resolveRepoRoot(startDir);
+    if (!projectRoot) {
+      return { content: [{ type: "text", text: `ob_score refused: ${describeNoRoot(startDir)}` }], isError: true };
+    }
     const paths = resolvePaths(projectRoot);
     const lines: string[] = [];
 
@@ -433,6 +491,20 @@ server.tool(
     state_budget_lines: z.number().int().min(0).optional().describe("Per-file line budget for the state files. Omit for the whole files (default). Truncation is reported per file."),
   },
   async (args) => handleStart(args)
+);
+
+server.tool(
+  "ob_state",
+  "Write .agents/state.json through typed operations (open_task, update_task, close_task, reopen_task, add_verified, reopen_verified, add_gap, close_gap, add_decision, set_objective, set_handoff, end_session). Atomic: all ops apply or none. Requires the file to exist and expected_revision to match; bumps revision, applies done-task retention, and regenerates INBOX.md, task.md, next-session.md and the marked region of SUMMARY.md. An empty ops array with render: true re-renders the views without touching state.json or its revision.",
+  {
+    project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
+    session: z.number().int().min(0).describe("Current session number — stamped on opened/closed/verified items"),
+    expected_revision: z.number().int().min(0).describe("The revision you read from ob_start / the file; refused on mismatch"),
+    ops: z.array(z.record(z.string(), z.unknown())).describe("Ordered operations, each {op: <name>, ...args}; empty = re-render views only"),
+    dry_run: z.boolean().optional().default(false).describe("Validate and report without writing anything"),
+    render: z.boolean().optional().default(true).describe("Regenerate the view files after writing (default true)"),
+  },
+  async (args) => handleState(args)
 );
 
 server.tool(

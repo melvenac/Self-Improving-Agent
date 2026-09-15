@@ -11,6 +11,7 @@ import {
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { resolvePaths } from "./shared/paths.js";
+import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import type { ScoreResult, CategoryScore } from "./pipelines/sync/types.js";
 
 const args = process.argv.slice(2);
@@ -21,7 +22,14 @@ if (command === "sync") {
   const score = args.includes("--score");
   const scoreJson = args.includes("--json");
   const history = args.includes("--history");
-  const projectRoot = resolve(args.find((a) => !a.startsWith("--") && a !== "sync") ?? ".");
+  // R4 (Loop 3): resolve the real root before anything reads it. Run from
+  // open-brain/ this used to score the sub-package and print a wrong answer.
+  const startDir = resolve(args.find((a) => !a.startsWith("--") && a !== "sync") ?? ".");
+  const projectRoot = resolveRepoRoot(startDir);
+  if (!projectRoot) {
+    console.error(`sync refused: ${describeNoRoot(startDir)}`);
+    process.exit(1);
+  }
 
   if (history) {
     const paths = resolvePaths(projectRoot);
@@ -65,6 +73,13 @@ if (command === "sync") {
   if (result.skipped.length > 0) {
     console.log("SKIPPED:");
     for (const c of result.skipped) console.log(`  ${c.name}: ${c.message}`);
+    console.log();
+  }
+
+  const reported = result.checks.filter((c) => c.report);
+  if (reported.length > 0) {
+    console.log("REPORTED (printed whatever the severity):");
+    for (const c of reported) console.log(`  ${c.name} [${c.severity}]: ${c.message}`);
     console.log();
   }
 
@@ -376,6 +391,59 @@ if (command === "sync") {
     console.log(`Left ${result.skippedForeign.length} hand-written note(s) in Topics/ untouched:`);
     for (const f of result.skippedForeign.slice(0, 10)) console.log(`  ${f}`);
   }
+} else if (command === "state") {
+  // Loop 4 C1: the one-shot migration door. `state import --draft` (default)
+  // writes a reviewable draft + report; `--commit` applies the reviewed draft.
+  const sub = args[1];
+  if (sub !== "import") {
+    console.error("Usage: open-brain state import [--draft | --commit] [--force-snapshot] [dir]");
+    process.exit(1);
+  }
+  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL } = await import("./pipelines/state-import/index.js");
+  const { relative } = await import("node:path");
+  const commit = args.includes("--commit");
+  if (commit && args.includes("--draft")) {
+    console.error("state import: pass --draft or --commit, not both");
+    process.exit(1);
+  }
+  const startDir = resolve(args.slice(2).find((a) => !a.startsWith("--")) ?? ".");
+  const projectRoot = resolveRepoRoot(startDir);
+  if (!projectRoot) {
+    console.error(`state import refused: ${describeNoRoot(startDir)}`);
+    process.exit(1);
+  }
+  // Local calendar date, not UTC: an evening run must not stamp tomorrow.
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  try {
+    if (!commit) {
+      const r = runDraft(projectRoot, today);
+      const rep = r.draft.report;
+      console.log(`\nstate import — draft (nothing else changed)\n`);
+      console.log(`Root: ${projectRoot}`);
+      console.log(`Draft:  ${DRAFT_REL}`);
+      console.log(`Report: ${REPORT_REL}`);
+      console.log(`Validates: ${r.validation.ok ? "yes" : `NO — ${r.validation.error}`}`);
+      console.log(`Current session: ${rep.current_session} (${rep.last_session.file})`);
+      const s = rep.inbox.by_status;
+      console.log(`Tasks: ${rep.inbox.items} (open ${s.open}, in_progress ${s.in_progress}, blocked ${s.blocked}, done ${s.done}); superseded links ${rep.inbox.superseded_links.length}; unparsed lines ${rep.inbox.unparsed.length}`);
+      console.log(`Decisions: ${rep.decisions.imported} (${rep.decisions.skipped.length} skipped) · verified ${rep.verified_seeded} · gaps ${rep.gaps_seeded} · objective ${rep.objective.found ? "found" : "NOT found"}`);
+      console.log(`Handoff: pick_up ${rep.handoff.pick_up_lines} lines, watch_out ${rep.handoff.watch_out}, open_questions ${rep.handoff.open_questions}`);
+      if (rep.summary_removal) console.log(`SUMMARY.md: --commit will remove ${rep.summary_removal.total_lines_removed} lines (${rep.summary_removal.blockquote_lines} blockquote + ${rep.summary_removal.current_state_lines} Current State)`);
+      console.log(`\nReview the report, then run: open-brain state import --commit`);
+      process.exit(r.validation.ok ? 0 : 1);
+    }
+    const r = runCommit(projectRoot, today, { forceSnapshot: args.includes("--force-snapshot") });
+    console.log(`\nstate import — committed\n`);
+    console.log(`Snapshot: ${relative(projectRoot, r.snapshot.dir)} (${r.snapshot.files} files)`);
+    console.log(`Wrote:    ${STATE_REL} at revision 0`);
+    if (r.summary) console.log(`SUMMARY.md: removed ${r.summary.total_lines_removed} lines (${r.summary.blockquote_lines} blockquote + ${r.summary.current_state_lines} Current State); kept ${r.summary.kept_headings.join(", ")}`);
+    console.log(`Rendered: ${r.rendered.join(", ")}`);
+    console.log(`Moved into snapshot: ${r.moved.join(", ")}`);
+  } catch (err) {
+    console.error(`state import refused: ${err instanceof Error ? err.message : String(err)}`);
+    process.exit(1);
+  }
 } else {
   console.log("Usage: open-brain <command> [options]");
   console.log("");
@@ -386,5 +454,6 @@ if (command === "sync") {
   console.log("  dream [--since=<days>] [--json]            Reconcile stored memory (read-only)");
   console.log("  relocate [--from <dir> --to <dir>] [--apply]  Fold a renamed project's history forward");
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
+  console.log("  state import [--draft|--commit] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
   process.exit(1);
 }

@@ -48,7 +48,7 @@ describe("checkStateSchema", () => {
     expect(r.severity).toBe("skip");
     expect(r.name).toBe("state-schema");
     expect(r.message).toMatch(/^skipped — no \.agents\/state\.json/);
-    expect(r.message).toContain("no writer exists yet");
+    expect(r.message).toContain("ob_state never creates the file");
   });
 
   it("passes on a valid file whose project.version matches package.json", () => {

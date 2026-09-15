@@ -152,8 +152,7 @@ Source for lightweight command templates: the power-user curriculum repo (`comma
 
 - If not a git repo, ask: "Initialize git here?"
 - If yes, `git init` and create initial commit with CLAUDE.md + .agents/ + .claude/commands/
-- Add `.agents/SESSIONS/Session_*.md` to `.gitignore` (session logs are ephemeral)
-- Add `.agents/SESSIONS/next-session.md` to `.gitignore`
+- Copy the template's `gitignore` file to the project root as `.gitignore` (merge if one exists). It tracks exactly five state files under `.agents/` — `state.json` (the record) and its rendered views `TASKS/INBOX.md`, `TASKS/task.md`, `SESSIONS/next-session.md`, `SYSTEM/SUMMARY.md` — and ignores everything else there (session logs, archive/, PRD, docs). Verify with `git check-ignore -v .agents/SESSIONS/Session_1.md` (ignored) and `git check-ignore -v .agents/state.json` (not ignored).
 
 ## Step 6: Summary
 

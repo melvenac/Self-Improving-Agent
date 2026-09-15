@@ -6,7 +6,21 @@ node_modules/
 Thumbs.db
 
 # Local development framework (not distributed)
-/.agents/
+# .agents/ is ignored EXCEPT the five state files (Loop 4 C4, "option a"):
+# state.json is the record; INBOX.md, task.md, next-session.md and SUMMARY.md
+# are its rendered views. Session logs, archive/, PRD etc. stay local.
+/.agents/*
+!/.agents/state.json
+!/.agents/TASKS/
+/.agents/TASKS/*
+!/.agents/TASKS/INBOX.md
+!/.agents/TASKS/task.md
+!/.agents/SESSIONS/
+/.agents/SESSIONS/*
+!/.agents/SESSIONS/next-session.md
+!/.agents/SYSTEM/
+/.agents/SYSTEM/*
+!/.agents/SYSTEM/SUMMARY.md
 /.claude/
 /docs/
 CLAUDE.md

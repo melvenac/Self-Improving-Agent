@@ -11,8 +11,12 @@ import { tmpdir } from "node:os";
  * scan, emitted twice, not emitted at all) and was verified by hand each time.
  * cli-bootstrap.ts is a top-level script, so we exercise the real entry point
  * with a real stdin payload rather than unit-testing extracted internals.
+ *
+ * Each test spawns a node process. Under full-suite load that takes 5–7s on
+ * this machine and longer on CI, which the default 5s timeout reads as a
+ * failure. 30s means a timeout here is a real hang, not contention.
  */
-describe("cli-bootstrap SESSION_UUID contract", () => {
+describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
   const script = resolve(__dirname, "../src/cli-bootstrap.ts");
   let cwd: string;
   let home: string;
