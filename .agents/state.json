@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "revision": 0,
+  "revision": 2,
   "project": {
     "name": "self-improving-agent",
     "version": "0.31.0"
   },
   "objective": {
-    "text": "**Loop 4 of the extraction evaluation — dogfood: migrate this repo's `.agents/` prose into `.agents/state.json`, switch `/end` to `ob_state`, run on it.** Per `~/.agents/mailbox/channels/sia/loop-4-brief.md` (read it fully first). Branch `loop/4-dogfood` from `loop/3-state-writer` head **ee2cdb8**. First deliverable is `open-brain state import --draft` on this repo + the import report to the Planner; `--commit` only after the Planner's authorization. Report to the Planner session, not to Aaron. Session 54 shipped Loops 1–3 (v0.28.0, v0.29.0, v0.30.0 on PR #3) and hotfix v0.29.1 (merged; master 86ea010, CI green). Full handoff: `.agents/SESSIONS/next-session.md`.",
+    "text": "Loop 5 of the extraction evaluation — per the Planner's next brief. Candidates carried from Loop 4: render the INBOX Done section by the retention window (T-144), DECISIONS.md dual role (G-005), Cursor start/end copies onto ob_start/ob_state (G-001), a CLI door for ob_state (G-006). Loop 4 shipped as v0.31.0 on draft PR #5; merging PR #3/#5 is Aaron's release decision.",
     "since_session": 55
   },
   "tasks": [
@@ -14,11 +14,11 @@
       "id": "T-001",
       "title": "Loop 4",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 54,
-      "closed_session": null,
+      "closed_session": 55,
       "supersedes": null,
-      "note": "**dogfood: migrate this repo's `.agents/` to `state.json`, switch `/end` to `ob_state`, run on it** NEW (Session 54). Brief: `~/.agents/mailbox/channels/sia/loop-4-brief.md` (R1–R7 + C1–C6; the importer has a review gate before `--commit`). Branch `loop/4-dogfood` from `loop/3-state-writer` head ee2cdb8. First deliverable: `open-brain state import --draft` here + the import report to the Planner; `--commit` only on the Planner's authorization. Target v0.31.0, draft PR on acceptance. Prior loops: v0.28.0 (d2ba131, master), v0.29.0 (62a3a00, master), v0.29.1 hotfix (merged, master 86ea010, first green master CI since 2026-08-31), v0.30.0 (4e360fa on PR #3, green)."
+      "note": "Shipped as v0.31.0 (loop/4-dogfood 644465e, tag v0.31.0, draft PR #5, CI run 34921172116 success). Repairs R1–R7 in d49578a; importer, /end via ob_state, tracking policy, template seed in b492fd8; QA amendment (synthetic fixtures) in 644465e. This repo migrated: state.json rev 0 from 143 INBOX items, SUMMARY −181 lines, snapshot .agents/archive/pre-state-migration-2026-09-14/."
     },
     {
       "id": "T-002",
@@ -51,36 +51,6 @@
       "note": "**do not wire `evaluateLifecycle` into the session-end sweep** NEW (Session 53). Ledger's ruling: no defensible apoptosis threshold exists while `success_rate` is a citation rate (`index-v2.ts:110` falls back to a tag-substring topic-mention detector that cannot emit `harmful`). At t=0.3 the gate auto-deletes **22 entries with spotless records**, including one at 77 recalls and entry 351, which describes this exact failure mode. **Part 1 alone is also unsafe** — `success_rate` feeds the ranking penalty at `lifecycle.ts:102`. Second independent blocker: `evaluateLifecycle` is called from exactly one place (`server.ts:736`, `ob_feedback`), so the sweep never evaluates the lifecycle at all. Unblocking measurement is running — read `Research/rating-method-prereg-2026-09-01.md` §4 only after **10 sessions**, and honour §5 on what cannot be concluded. Part 3 unshippable (no objective gating signal exists). Part 4 shipped as v0.23.0. (Session 53)"
     },
     {
-      "id": "T-005",
-      "title": "`skillRows()` silent drop",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 52,
-      "supersedes": "T-006",
-      "note": "**FIXED (Session 52, v0.17.0), plus the half nobody had named: rejection wasn't representable.** `parseSkillIndexRows()` returns `{rows, dropped}` — header/separator skip silently as structure, but a data row yielding no Domain is reported, and the new `skill-index` sync check fails `/sync` on any drop (live vault verified: 5 rows, 0 dropped, so the guard armed clean). The re-propose-forever loop had a second cause the parser fix alone couldn't touch: a rejected proposal left no trace, so the next scan re-proposed it regardless of parsing. New `.skill-proposals-ledger.json` records `{decision, date, atCount, reason}` per tag; the scan suppresses rejected clusters until they outgrow `atCount`. The pending marker is now rebuilt each scan (was write-once-never-cleared — a third route to the same phantom-proposals symptom). Ledger design from WikiSkill (arXiv 2608.27454, entry #455). 664 tests / 49 files. Original finding follows. (Sessions 50, 51, 52)"
-    },
-    {
-      "id": "T-006",
-      "title": "[superseded] Original finding: `skillRows()` silent drop",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 51,
-      "supersedes": null,
-      "note": "**DEFERRED TWICE, now leads the queue unconditionally** (`open-brain/src/shared/skill-index.ts:49`). Named first job by Session 50, untouched by Session 51 (Aaron redirected to the Cursor commit failure at the first message). A bare `continue` drops any malformed `SKILL-INDEX.md` Domain cell, and that column feeds graduation detection — so a registered skill with a bad row reads as **\"no skill exists for this domain\"** and its cluster is re-proposed on every scan, forever. Same symptom as the v0.12.0 inflated proposals, different cause, already paid for once. Count the drops, surface the number, fail `/sync` on non-zero. (Sessions 50, 51)"
-    },
-    {
-      "id": "T-007",
-      "title": "`ob_set_session` returned a 16-day-old session UUID in the voice of a live registration",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 51,
-      "closed_session": 51,
-      "supersedes": null,
-      "note": "FIXED (Session 51, v0.16.0, ADR-019). A Cursor seat was handed `7ad51ea2-…` from 2026-07-28, formatted `[via hook file (session_id, ide cursor)]` — byte-identical to a healthy read — so a session's chunks, ratings and recalls were filed under Session 44's identity. Nothing compared `started_at` to now; `stale|TTL|maxAge|expire` had **zero hits** across `active-session.ts`. **Never Cursor-specific:** once live the guard immediately flagged `a2a-hub::claude` at 6d18h. `isStaleSession` / `sessionEntryAgeMs` / `STALE_SESSION_MS` (12h); warns and still returns the id, on Probe's argument that the seat hitting this already has a dead hook host. An unparseable timestamp counts as stale. Verified against the live tool on a real stale slot, and against the real slot file (flags 1 of 4, no false positives). (Session 51)"
-    },
-    {
       "id": "T-008",
       "title": "Add a `/sync` validator that stats every MCP command path in `~/.claude.json`",
       "priority": "P0",
@@ -101,46 +71,6 @@
       "note": "DONE (Session 53, `283498c`). Diagnosis corrected and folded in: the bash-bridge fails structurally because Cursor evals PreToolUse hooks in a Git Bash that is **not** the terminal `automationProfile`, so the detector never sees the payload — no better detector fixes it. Two of the six open decisions closed negative (bridge does not work; `setup.mjs` must not install it). Also folded in from Probe Session 51: `log-git-ops`' `if: Bash(git *)` did not filter (three hooks fired on a plain `echo`), and SessionStart never refreshed the `::cursor` slot. Surviving items reframed — the `/sync` detector can no longer key on \"no bridge present\", and fail-open is now the highest-value item, being the only lever on our side of the boundary. Original finding follows. (Sessions 51, 53)"
     },
     {
-      "id": "T-010",
-      "title": "[superseded] Original finding: correct and commit `open-brain/docs/cursor-windows-git-bash-hooks.md`",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 51,
-      "closed_session": 51,
-      "supersedes": null,
-      "note": "still **untracked**, and its diagnosis is now **partly wrong**: it blames the terminal profile, but Probe established Cursor resolves the hook host from `terminal.integrated.defaultProfile.windows` **by profile name**, ignoring both the `path` override and `automationProfile`. So `bash-bridge` was never in that pipe and cannot fix it. Committing as-is would preserve a bad explanation in git history. Also record the two reproduced bridge defects: `%*` in the `.cmd` re-parses through cmd.exe (`git commit -m \"fix: A && B (100%)\"` loses quotes and splits on `&&`), and the PowerShell detector substring-matches the whole command so a bash command *mentioning* `FromBase64String` runs in PowerShell. **If the approved `defaultProfile`/`automationProfile` experiment passes, delete the bridge rather than fix it** — the experiment must run from a Cursor seat. (Session 51)"
-    },
-    {
-      "id": "T-011",
-      "title": "Push `ddf8061` and tag `v0.16.0`",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 51,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "DONE (Session 52). Pushed `6b136d5..e2f66fd` with tags `v0.16.0` and `v0.17.0` together; the tag already existed locally. (Session 51, 52)"
-    },
-    {
-      "id": "T-012",
-      "title": "Apoptosis is mathematically unreachable",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 50,
-      "supersedes": "T-013",
-      "note": "**the prune signal has never been able to fire** FIXED (Session 50, v0.15.0). **Three independent defects, not one**, each sufficient alone. (1) `index-v2.ts:84` typed its rating `\"helpful\" | \"neutral\"`, so the path responsible for ~820 of the counter increments could not express harm — the vocabulary diagnosis was right. (2) `updateFeedbackV2` incremented the counter and **never recomputed `success_rate`**, leaving 304 rows NULL; `NULL < 0.3` never matches, so the threshold was disabled a second, independent way and fixing the vocabulary alone would have changed nothing. (3) `lifecycle.ts` divided by `helpful+harmful` while the **test mock** divided by `helpful+harmful+neutral` — two definitions of one column, which is why 604 green tests never caught it (this was already filed as the P1 below, and was rediscovered independently rather than read). Added `ob_end(entry_ratings)` so the agent's explicit judgment overrides the tag heuristic. Backfilled **26** rows — *not* 304, since for 286 NULL was already correct; three sat at 0.000 from neutral-only ratings and were tripping `maturityBoost`'s `lowSuccessPenalty`, i.e. demoted in ranking for going unmentioned. Nothing pruned: counters recorded while the signal was unreachable indict the instrument, not the entry. Lessons stored as **#372** and **#373**. Original finding follows. (Session 50)"
-    },
-    {
-      "id": "T-013",
-      "title": "[superseded] Original finding: apoptosis is mathematically unreachable",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 49,
-      "closed_session": 49,
-      "supersedes": null,
-      "note": "(Session 49). Live counts across 760 ratings: **315 helpful / 0 harmful / 445 neutral**. Not one harmful rating has ever been recorded. `apoptosisFlaggedExpr` requires `(helpful + harmful) >= 5 AND success_rate < 0.3`; with `harmful` permanently 0, reaching 5 requires 5 helpful, which drives `success_rate` **up**, so the two conditions cannot both hold. **\"0 apoptosis candidates awaiting review\" is structural, not a clean bill of health** — I reported it as health twice this session before checking. This invalidates more than pruning: `success_rate` feeds recall ranking through maturity, so every ranking decision rests on a one-sided signal. Session 46 already recorded \"nothing has ever been rated harmful\" (P1 below) — what was never drawn is the consequence. **Fix is a rating-vocabulary problem, not a threshold problem: do not lower 0.3.** The likely cause is that `harmful` means \"misled me,\" which a self-rater almost never concedes; the 445 neutrals are absorbing everything that merely failed to apply. Consider splitting neutral into *not-applicable* vs *did-not-help*, and make the `/end` self-evaluation state explicitly what a harmful rating is for. Verify by re-running the census, not by watching one session."
-    },
-    {
       "id": "T-014",
       "title": "Make point-of-use rating reachable",
       "priority": "P0",
@@ -149,76 +79,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "**`/end` is the wrong and only moment** (Aaron's question, Session 49). Ratings happen once, at `/end`, in a batch where the agent retro-rates a dozen entries long after the reasoning they informed. **Rating at *retrieval* is not the fix** — at recall time you know the match was plausible, not that it helped, so it measures the retriever rather than the knowledge, and retrieval is *already* recorded deterministically (`recall_count`, `last_recalled_at`, `recall_log`: 685 recalls across 175 of 357 entries). The right moment is point-of-use: when an entry demonstrably changes a decision, minutes after recall. **`ob_feedback` is already callable at any time — nothing enforces `/end`.** The actual blocker is that `/start` injects recalled entries as prose without their IDs, so mid-session rating is not *reachable*. Surfacing `[id]` alongside each injected entry is the small deterministic unblock; keep `/end` as the sweep for whatever went unrated in flight. Pairs with the apoptosis item above — earlier timing alone will not produce a \"harmful\" the rater was never going to give. Current coverage: **104 entries recalled but never rated**, 80 of 357 ever rated."
-    },
-    {
-      "id": "T-015",
-      "title": "`/start` and `/skill-scan` still name the retired v1 vault",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 49,
-      "closed_session": 49,
-      "supersedes": null,
-      "note": "FIXED (Session 49, v0.10.1–v0.11.1). The SKILL-INDEX connection was real and worse than a path typo: the v2 vault had **no `SKILL-INDEX.md` at all**, because `setup.mjs` seeded the retired v1 vault. Worse still, `parseExistingSkills` matched `### tag (N experiences) … has skill` — the shape of SKILL-CANDIDATES.md, not the index — so it could never match and **a populated index produced output identical to a missing one**. Graduation had been dead regardless of vault version. Fixed by parsing the `## Skills` table's Domain column, consolidated into `shared/skill-index.ts`. 31 v1 references cleared across four command mirrors. **Then guarded**: `checkVaultPathRefs` (v0.11.0) fails `sync` on v1 references across the repo, live `~/.claude`, `~/.cursor`, `~/docs`, and both `CLAUDE.md` files — records of what was true then (CHANGELOG, dream fixtures, dated plans) are exempt by design. The check immediately found three files nobody had connected to the rebuild, then one in `CLAUDE.md` that manual review had missed twice. Original finding follows. (Session 49)"
-    },
-    {
-      "id": "T-016",
-      "title": "Vault and index had silently diverged",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 49,
-      "closed_session": 49,
-      "supersedes": null,
-      "note": "**60 duplicates were inflating skill proposals** FOUND AND FIXED (Session 49, v0.12.0–v0.13.0). `checkVaultIndexParity` classifies divergence into duplicates / unindexed / dangling. It found **60 duplicate notes**, each filed under both `Experiences/General/` and `Experiences/<Project>/` with one copy indexed; `skill-scan` counted both, so three of five pending proposals rested on double-counted evidence (`template` 7→3, `esm` 5→4, `revenue` 5→dropped below threshold). Three unrelated producers: the v1→v2 migration, a test suite writing into the real vault, and deletion removing the row but not the file. **The detector was built before fixing any instance, deliberately** — it catches all three plus the next one, and found on first run what two rounds of hand-reading had missed. Repaired: 60 duplicates removed (bodies byte-identical, only `project:`/`source:` differed), 9 notes indexed and confirmed recallable, 1 test artifact deleted; vault committed `f8239e9`. Both seams then closed in v0.13.0 — `ob_forget`/apoptosis archive to `Archive/` instead of orphaning, and `ob_store` adopts an unindexed note instead of refusing it. `sync`: 15 passed / 0 warnings. (Session 49)"
-    },
-    {
-      "id": "T-017",
-      "title": "Audit all MCP tools against their designed behaviour",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 49,
-      "closed_session": 49,
-      "supersedes": "T-018",
-      "note": "DONE (Session 49, v0.12.0–v0.14.0). **13 tools registered, not 9.** Every core contract holds, verified against DB rows and vault files rather than the tools' own success messages, with the server pointed at a temp DB and vault and isolation proven before testing. Four findings, all now closed: vault/index divergence; `ob_recall` with neither `project` nor `global` returns other projects' scoped entries (**description corrected, not behaviour** — scoping the default would silently narrow recall, and retrieval returning too little is this system's documented failure mode); the apoptosis flag left no durable trace (`ob_stats` now lists candidates awaiting review, derived from the counts rather than stored); and nothing could index an existing vault note. Report: `.agents/SYSTEM/mcp-tool-audit-2026-08-08.md`. (Session 49)"
-    },
-    {
-      "id": "T-018",
-      "title": "[superseded] Original finding: `/start` and `/skill-scan` still name the retired v1 vault",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 48,
-      "closed_session": 48,
-      "supersedes": null,
-      "note": "the `/end` half is fixed (`8ae7def`); these are not. `start.md` has **5** hits in each of its 3 copies, `skill-scan.md` has **4** in each of 3, and user-global `notebooklm.md` has 1. **Check the SKILL-INDEX connection first:** `/start` reads `~/Obsidian Vault/Skill-Candidates/SKILL-INDEX.md` from the *v1* vault, and Session 48's startup flagged that table as empty since 2026-03-23 while `.skill-proposals-pending.json` held 4 — reading a dead index is a candidate explanation for exactly that symptom, so verify before assuming it is only a path typo. Note also that `.cursor/commands/` copies are **not** covered by `checkMirrorParity` — `/sync` passed clean through all of this. Resolve paths via `obsidianVaultDir()`, never a literal. (Session 48)"
-    },
-    {
-      "id": "T-019",
-      "title": "All copies of `/end` wrote to the RETIRED v1 vault",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 48,
-      "closed_session": 48,
-      "supersedes": "T-020",
-      "note": "FIXED (Session 48, `8ae7def`). **Five** copies, not the three first found: the two `.cursor/` ones are a separate shorter file for inline Composer execution and had drifted from each other. Two defects, both live: (1) A10/A12/A13 named `~/Obsidian Vault/` when the vault has been v2 since April — `~/Obsidian Vault/Summaries/` had received three files dated 2026-08-07 from other projects before this was caught; (2) the **dual-write instructions were worse than stale** — `ob_store` has been vault-first since v0.6.0 and writes the note itself, so \"also write the entry\" produced a duplicate, and for experiences at a *flat* `Experiences/{key}.md` where `ob_store` nests under the project, which `skill-scan` reads as a separate experience. Dual-writes removed; A13 kept and repointed, since `writeSummary` returns null on an existing file so the enriched `/end` version legitimately wins. Original finding follows. (Session 48)"
-    },
-    {
-      "id": "T-020",
-      "title": "[superseded] Original finding: all three `/end` command copies write to the RETIRED v1 vault",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 48,
-      "closed_session": 48,
-      "supersedes": null,
-      "note": "`~/.claude/commands/end.md`, `.claude/commands/end.md`, and `project-template/.claude/commands/end.md` all instruct agents to write summaries, experiences and research to `~/Obsidian Vault/{Summaries,Experiences,Research}/`. The live vault has been `~/Obsidian Vault v2/` since April. This is **not hypothetical**: `~/Obsidian Vault/Summaries/` received `2026-08-07-home-atlas.md`, `2026-08-07-a2a-hub.md` and `2026-08-07-melve.md` today, so other projects' knowledge is being split across a live vault and an archive nobody reads. Session 48 wrote its own summary to v2 manually. **Two fixes needed, not one:** (1) repoint the paths in all three copies — resolve via `obsidianVaultDir()`, never a literal; (2) **delete the manual dual-write steps entirely** — A10/A12 tell the agent to Write the vault note *after* `ob_store`, but `ob_store` has been vault-first since v0.6.0 and writes it already, so following the command produces a duplicate note at a second path. The instruction is not just stale, it is actively wrong. Same class as the `RUNBOOK.md` rot fixed this session, and it ships to template consumers. (Session 48)"
-    },
-    {
-      "id": "T-021",
-      "title": "Wire `dream` to `cli.ts`",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 48,
-      "closed_session": 48,
-      "supersedes": null,
-      "note": "DONE (Session 48, v0.10.0). `open-brain dream` ships with `--dry-run` as the default and `--apply` exiting non-zero (there is no write path yet; exiting 0 would imply changes landed). `misfiled` and `superseded` both returned exactly what the corpus audit predicted — 4 hits and #232←#234. `findStale` is not called. **The state/event distinction from `coleam00/skills` was folded in and turned out to define `superseded` rather than sit beside it**: a supersession is two live `state` entries about one subject. New `knowledge_index.fact_kind` (nullable; NULL = unclassified, *not* event), a column-migration mechanism that did not exist before, and a `kind` param on `ob_store`. Write path unchanged — storing still appends. Live run: 341 entries, 7 obsolete-reference (2 genuine, contradicting the design doc's \"zero\"), 7 duplicate. Follow-ups below."
     },
     {
       "id": "T-022",
@@ -261,56 +121,6 @@
       "note": "`.agents/SYSTEM/ENTITIES.md` documents `type: gotcha | pattern | decision | fix | optimization`; `vault-writer.ts` emits no `type` at all except `writeFailure`'s hardcoded `type: failure`; live vault notes carry one. Deliberately left out of the v0.10.0 work so the inconsistency stayed visible rather than being buried inside a feature. Worth noting while fixing it: **all five documented types are events** — there is no state type, which is why state facts get written as experiences and never replaced. No `/sync` check validates experience frontmatter today, so whatever is decided should come with one. (Session 48)"
     },
     {
-      "id": "T-026",
-      "title": "Original wire-`dream` brief",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 46,
-      "closed_session": 46,
-      "supersedes": null,
-      "note": "kept for its calibration numbers, which the shipped work confirmed. The deterministic layer was built and committed (`c430c97`, `2b1560b`): `pipelines/dream/{types,transcripts,rules,report}.ts`, 58 tests. `cli.ts` dispatches on `args[0]` (`sync`/`start`/`end`); add `dream` to the same chain. **`--dry-run` is the default; `--apply` must be required to mutate.** Design: `docs/dream-design.md`. Two rules earned by the corpus audit are specced but not written — `misfiled` (4 hits, checkable: `[CHECKPOINT]`/`[SUMMARY]` rows in `knowledge_index`) and `superseded` (1 hit: entry B names A as outdated, A has no forward pointer). **Do not ship `findStale`** — disuse does not discriminate; the one harmful entry the audit found had zero recalls, and so did ~130 sound ones. Keep the code and tests, don't run it. Window is **7 days**, not the reference implementation's 24h: real session counts are 24h→2, 72h→2, 7d→17. (Session 46)"
-    },
-    {
-      "id": "T-027",
-      "title": "`.recalled-entries.json` has no session guard",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 50,
-      "supersedes": "T-028",
-      "note": "**`/end` will rate stale entries** FIXED (Session 50, v0.15.1). Confirmed live again at session start: the file on disk described session `2fb67133` from **2026-08-07**, two sessions stale — it does not self-heal. **v0.15.0 is what made this urgent**: while ratings only moved a counter nobody read, mis-attribution was noise; the same day those ratings began governing apoptosis and ranking, a stale file would write wrong numbers into the deciding column. Fixed **structurally rather than by validating the file** — `recall_log` already records every `ob_recall` hit against the live session uuid, so when the session is known the file is not opened at all and a stale one cannot contribute. New `getSessionRecalledIds` + `resolveRecalledIds`; precedence is explicit ids → `recall_log` → the file *only* when it names this session → nothing. `server.ts` and `cli-session-end.ts` had separate inline copies of the read-and-trust logic and now share one. 12 tests including an assertion that the file is **not read at all** when `recall_log` answers. Original finding follows. (Session 50)"
-    },
-    {
-      "id": "T-028",
-      "title": "[superseded] Original finding: `.recalled-entries.json` has no session guard",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 46,
-      "closed_session": 46,
-      "supersedes": null,
-      "note": "the file is read by `/end` step A14 to self-rate recalled knowledge, but nothing checks that it belongs to the current session. Found holding session `592c95e6` dated **2026-04-16** during a 2026-08-04 session; following the step would have attributed today's judgments to entries recalled fifteen weeks ago, feeding invented ratings into the maturity lifecycle and apoptosis (which auto-prunes below 0.3 success rate). Fix: compare `session_id` against the live session and treat a mismatch as absent; clear the file at session start so absence is distinguishable from staleness. Compounding risk — only 62/332 entries have ever been rated, so a few fabricated ratings carry outsized weight. See knowledge entry #341. (Session 46)"
-    },
-    {
-      "id": "T-029",
-      "title": "Verify SESSION_UUID prints exactly once in Claude Code",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 50,
-      "supersedes": "T-030",
-      "note": "VERIFIED (Session 50). This session was fresh, not resumed, and the SessionStart banner carried `SESSION_UUID: efcaeb75-f5d5-421f-a1e5-645f155c59e4` **exactly once**. The v0.8.x-era duplicate-registration repair (two `cli-bootstrap.js` SessionStart entries, forward-slash and backslash spellings) holds, and `checkHookRegistration` has kept it clean through `/sync` since. Closes the last of the Session 40-41 checks. Original finding follows. (Session 50)"
-    },
-    {
-      "id": "T-030",
-      "title": "[superseded] Verify SESSION_UUID prints exactly once in Claude Code",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 40,
-      "closed_session": 41,
-      "supersedes": null,
-      "note": "the last open check, and Session 41 found a live cause rather than a hypothetical one: `~/.claude/settings.json` held **two** `cli-bootstrap.js` SessionStart registrations (forward-slash and backslash spellings), so the hook fired twice. Created by a `setup.mjs` re-run whose dedup compared strings literally. Live settings repaired (3 groups → 2, backup at `settings.json.bak-session42-dupehook`) and `setup.mjs` now normalises separators. `checkHookRegistration` catches recurrences via `/sync`. **Needs one fresh (non-resumed) Claude Code session to confirm visually.** (Sessions 40-41)"
-    },
-    {
       "id": "T-031",
       "title": "Add agent attribution to sessions",
       "priority": "P0",
@@ -331,16 +141,6 @@
       "note": "**`'start' | 'checkpoint' | 'explicit'`, set at the call sites** (Atlas build ask (a), Session 52, awaiting Aaron's priority call). The treatment is currently unrecorded: session-start injection and a deliberate mid-task `ob_recall` produce the same row shape, though they are different treatments with opposite selection bias (an entry fetched on demand was fetched because it was wanted). Without the column, no version of the injection-value question is ever answerable and every future analysis inherits the blindness. One column, deterministic, cheapest high-value schema change available. Full argument: `~/Obsidian Vault v2/Research/injection-ablation-prereg-2026-08-31.md`. (Session 52)"
     },
     {
-      "id": "T-033",
-      "title": "`project-template/` hardcoded \"Aaron\" (~20 places) and \"You are Clark\"",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "FIXED (Session 52, v0.19.0). All template prose now says \"the user\"; identity stays in the unshipped layers (global CLAUDE.md, `.agents/AGENT.md`) — which is where this repo's own Clark/Aaron greeting already lives, so nothing changed for local sessions. All five mirrors updated in parity. New `template-personal-names` sync check fails `/sync` on `\\b(Aaron|Clark|melve)\\b` in the template (GitHub `melvenac` URLs don't trip the word boundary). Same release carried the audit fix: `trigger` default is now `'unspecified'` — a silent caller is a countable labeling gap, never filed as a deliberate fetch; `ob_stats` reports the trigger census. (Atlas, Session 52; fixed Session 52)"
-    },
-    {
       "id": "T-034",
       "title": "Move the session-start recall into `cli-bootstrap`",
       "priority": "P0",
@@ -351,76 +151,6 @@
       "note": "**IF the census says prose is failing to comply** (Atlas + Forge, Session 52; gated, self-closing). No deterministic path labels the pushed arm today: the hook performs no recall, so 100% of `trigger: \"start\"` labeling rests on `/start` prose compliance. Do NOT fix before measuring — the same rule as \"no LIFECYCLE_CONFIG constant may be tuned before the sample is real.\" Gate: after ~10 sessions on the v0.19.0 default, read the `ob_stats` trigger census; if `'unspecified'` is non-trivial, prose is failing — move the session-start recall into `cli-bootstrap` so the hook labels it deterministically, composed with the surface-entry-IDs item (same call site). If `'unspecified'` stays near zero, prose is complying and the change buys nothing but risk — close the item. (Session 52)"
     },
     {
-      "id": "T-035",
-      "title": "Version skew between concurrent writers",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": "T-036",
-      "note": "**GUARDED (Session 52, v0.22.0).** `SCHEMA_VERSION` derives from the migration list (additive migrations bump by construction; meaning-changing rebuilds bump `SCHEMA_REBUILDS` explicitly); `openV2Database` stamps `user_version` forward-only; a stale writer warns in `ob_recall`, shows STALE WRITER in `ob_stats`, and fails the new `schema-version` /sync check. Warn-and-keep-working, per the stale-slot precedent. Original finding follows. (Session 52)"
-    },
-    {
-      "id": "T-036",
-      "title": "[superseded] Original finding: version skew between concurrent writers over one database",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "**permitted by the architecture, detected by nothing** (Atlas, Session 52, prereg §13). MCP stdio servers are per-session subprocesses sharing one SQLite file; after a rebuild, sessions reconnect at different times, so two writers can run different builds against the same tables indefinitely. Proven live: Forge's v0.18.0-build server wrote `'explicit'` defaults while Atlas's v0.19.x server rendered the new census — 2 of 3 rows in the young explicit arm are that skew's contamination. Benign for an additive column; NOT benign for a migration that changes a column's meaning. Candidate guard, deterministic-first: stamp the build/schema version on the DB (or on each written row batch), and have `openV2Database` or a /sync check flag a writer older than the schema it writes into. Bigger than the reconnect-scoping finding it emerged from. (Session 52)"
-    },
-    {
-      "id": "T-037",
-      "title": "Add `rating_origin` to `feedback_log`",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": "T-038",
-      "note": "**DONE (Session 52, v0.20.0).** Every rating now carries where its id came from (explicit / recall-log / file / direct / unspecified; NULL = pre-column, unknowable); the resolver's value threads through `sessionEndV2`, `ob_feedback` records 'direct', and `ob_stats` carries the origin census. Original ask follows. (Session 52)"
-    },
-    {
-      "id": "T-038",
-      "title": "[superseded] Original ask: add `rating_origin` to `feedback_log`",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "(Atlas audit, Session 52, awaiting Aaron). `resolveRecalledIds` already computes `origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\"` at the exact moment ratings are created; its only consumer is a log string (`server.ts:211`) and the value is discarded. Same reason `recall_log` needed `recall_trigger`, and cheaper — the value is already in hand. Motivating census: 106 of 290 ratings are provenance-broken and the split is 24 pre-/82 post-v0.15.1, so \"residue of the fixed bug\" is wrong — at least three live mechanisms produce the signature (reconnect session-id loss, the explicit-ids path working as designed, stale file) and they are currently indistinguishable. Full write-up: prereg §12. (Session 52)"
-    },
-    {
-      "id": "T-039",
-      "title": "`/mcp reconnect` silently stops recall logging",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": "T-040",
-      "note": "**FIXED (Session 52, v0.21.0), both halves per the recommendation below.** Write paths self-register from the hook slot file via `resolveWriteSession` (fresh slot adopted + announced in tool output; stale/missing refused + \"NOT LOGGED\" with reason), and `ob_stats` carries an unconditional self-registration counter. Original finding follows. (Session 52)"
-    },
-    {
-      "id": "T-040",
-      "title": "[superseded] Original finding: `/mcp reconnect` silently stops recall logging until `ob_set_session` re-runs",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "(found Session 52 while verifying v0.18.0; **mechanism confirmed by controlled two-row experiment later that session**). The restarted server loses in-memory `_activeSessionId`; `recordRecallEvent` is guarded by it, so every post-reconnect `ob_recall` succeeds visibly while writing no `recall_log` row — the /end rating sweep then rates from a partial log (under-attribution, the v0.15.1 shape at a new surface). Experiment: `ob_set_session` + unlabeled recall → row #660 with `'unspecified'` (v0.19.x default row-verified). The negative half — recall before re-registration wrote no row — is **testimony, not a stored row**: between rows #659 and #660 the table is empty, and absence of a row cannot be distinguished from absence of an attempt, which is the item's own failure shape standing in the way of proving itself (Atlas). Best obtainable evidence for a negative; recorded as such, not as \"proven.\" **Also established: MCP stdio servers are per-session** — a reconnect in one terminal does not touch another session's instance, so \"reconnect once\" never covers concurrent sessions; each needs its own. **Recommendation (Atlas, on this repo's own v0.15.1 precedent — structural prevention makes a failure impossible and simultaneously invisible): the two candidate fixes are not alternatives.** Self-register from the active-session slot file on boot (the fix — no recall is lost) AND count each time self-registration was needed, surfaced in `ob_stats` beside the trigger census (the instrumentation — a harness regression shows as a climbing count, not as rows quietly not existing). Same move as `'unspecified'`: an invisible gap becomes a countable one. Aaron decides. (Session 52)"
-    },
-    {
-      "id": "T-041",
-      "title": "Server tests writing into the real vault",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "**FIXED (Session 52, v0.22.1; diagnosed and written by Atlas, committed by Forge).** Two mechanisms, both closed loudly: (1) three suites `delete`d `OPEN_BRAIN_VAULT_DIR` in `afterEach` instead of restoring it — `setup-env.ts` now re-asserts the temp vault after every test, and `obsidianVaultDir()` throws under vitest when it resolves to the real home vault (guard deliberately scoped to the real-home path — do NOT simplify to \"override unset\"; synthetic-home tests and two production call sites pass explicit homes legitimately). (2) The guard then identified the producer of today's 13 files within minutes: `npx vitest` from the REPO ROOT loads no config → setup-env never runs → fully unisolated — Forge's own root-cwd full-suite runs. Silent before the guard; 23 loud failures after. **Run tests from `open-brain/`.** 13 files deleted, 688 tests green, zero leaks on re-run. **Remaining gap, still open below.** (Session 52)"
-    },
-    {
       "id": "T-042",
       "title": "Vault pollution has a preventer but no detector",
       "priority": "P0",
@@ -429,16 +159,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "(Atlas's framing, Session 52). Today's artifacts were found by accident (an /end step happened to list Summaries/), not by a check. Cheap detector: a /sync check counting `ob-server-*` (and any `mkdtemp`-shaped slug) files in the real vault — a filter-shaped leak deserves a counter (#375). Optionally a root-level vitest config (or a guard script) so a repo-root `npx vitest` either loads the real config or refuses to run, instead of silently running unisolated — the guard makes it loud today, but 23 scattered failures are a worse error message than one refusal. (Session 52)"
-    },
-    {
-      "id": "T-043",
-      "title": "Session 52's 11 /end ratings were misattributed",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "**REPAIRED (Aaron-approved UPDATE, 11 rows verified by content before and after).** The recorded cause was corrected by Atlas before it fossilized: NOT a slot collision with Atlas's session — `ce5ea1a9` was a **synthetic uuid minted by Forge's own bare cli-bootstrap timing probe** (`echo '{}' | node cli-bootstrap.js` at 07:48:32Z, run outside test isolation, no env override), which wrote the real slot file; v0.21.0's self-registration then adopted it. Same class as the ob-server-* vault leak: a tool run outside isolation writing real state. The bogus slot entry self-heals at the next real SessionStart (hook rewrites it); classifier declined a hand-edit and that's fine. (Session 52)"
     },
     {
       "id": "T-044",
@@ -471,16 +191,6 @@
       "note": "(filed 2026-08-13 from FluidNC Session 2, not an SIA session). Cursor `eval`s a PowerShell stdin feeder (`$OutputEncoding … \\| & { $input \\| node hook }`) inside Git Bash; parse dies on `&` before the hook starts; Cursor fail-closes Shell *and* hooked MCP. Three Claude-registered hooks each block independently (`log-git-ops`, `gitnexus-hook`, context-mode `pretooluse`) — confirms CHANGELOG: Cursor also runs `~/.claude/settings.json` hooks. Session UUID was `\"none\"`; `ob_set_session` refused. CHANGELOG v0.8.x said “use PowerShell” — that trades away Aaron’s bash agent. Workaround on disk, **unverified**: `~/.cursor/hooks/bash-bridge.{mjs,cmd}` plus Cursor User settings pointing the Git Bash / automation profiles at the `.cmd`. **Not in `setup.mjs`.** Next session: verify after reload, then decide whether setup installs it, whether `/sync` should warn, and rewrite the CHANGELOG note. Full write-up: `open-brain/docs/cursor-windows-git-bash-hooks.md`."
     },
     {
-      "id": "T-047",
-      "title": "`skillRows()` silently drops malformed rows",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "**FIXED (Session 52, v0.17.0); see the P0 entry for the full close-out including the rejection ledger.** The invariant audit suggested at the end of this item (other bare `continue`/filter drops in `open-brain/src`) remains open — carried below as its own item. Original finding follows. (Session 50, surfaced by Prime; fixed Session 52)"
-    },
-    {
       "id": "T-048",
       "title": "Audit remaining filters in `open-brain/src` for bare `continue`/`filter` drops",
       "priority": "P1",
@@ -489,16 +199,6 @@
       "closed_session": null,
       "supersedes": "T-049",
       "note": "(carried out of the skillRows item, Session 52). The invariant: any filter that drops rows must emit the dropped count — absent and zero must not collapse into one value. Four instances of the class are now on record (harmful-unrepresentable v0.15.0, skillRows v0.17.0, Prime's frontmatter-less SKILL.md, the v0.15.1 unreachable-and-uncountable resolver). One pass over the remaining loops is cheaper than discovering the fifth in production. (Session 52)"
-    },
-    {
-      "id": "T-049",
-      "title": "[superseded] Original finding: `skillRows()` silently drops malformed rows, so a registered skill reads as a missing one",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 50,
-      "supersedes": null,
-      "note": "(Session 50, surfaced by Prime). `open-brain/src/shared/skill-index.ts:49` skips any `SKILL-INDEX.md` row with an empty or malformed Domain cell via a bare `continue` — no count, no warning. That column feeds `parseSkillDomains()`, which graduation detection uses to decide whether a domain already has a skill, so a malformed row is not read as \"a skill with a bad row\" but as **\"no skill exists for this domain\"** — leaving the source cluster eligible and re-proposed as a candidate on every scan, permanently. Same symptom as the v0.12.0 inflated proposals (three of five from double-counted evidence), different cause, and still live. **Same shape as the v0.15.0 apoptosis bug**: the malformed case has no slot to live in, so *absent* and *zero* are indistinguishable from inside the loop that reads them. Fix: count skipped rows and surface the number; `/sync` should fail on a non-zero count rather than let a silent skip mean \"nothing there.\" **The invariant to generalize from it** (agreed with Prime, recorded in the mailbox `decisions.md`): the rule is not \"warn on bare `continue`\" but **\"any filter that drops rows must emit the dropped count\"** — a drop with no counter is precisely where *absent* and *zero* become the same value. Three instances of this class now sit across the two systems: `harmful` unrepresentable in the rating type (v0.15.0), `skillRows()` here, and a `SKILL.md` with no frontmatter being uncounted rather than invalid in Prime's loader. Same failure, three surfaces, two independently built systems — worth auditing the other filters in `open-brain/src` for bare `continue`/`filter` drops on the same pass."
     },
     {
       "id": "T-050",
@@ -581,36 +281,6 @@
       "note": "(Session 49). All five `/end` copies instruct `ob_feedback(entry_id, rating, referenced)` at step A14; the registered tool's schema is `{ id, rating }`. The third argument has been silently dropped from every call ever made — MCP ignores unknown properties, so nothing errored and nothing recorded it. Decide which way to close it: either **implement `referenced`** (it is the natural home for the *was it cited* signal the point-of-use item above needs, and distinguishing \"recalled and used\" from \"recalled and ignored\" is exactly what the 445 neutrals are hiding), or **strike it from the five command copies**. Do not leave a documented parameter that the tool cannot receive. Same class as the v0.14.0 stats bug: an interface whose failure mode is silence."
     },
     {
-      "id": "T-058",
-      "title": "`success_rate` holds values the current formula cannot produce",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 50,
-      "supersedes": "T-059",
-      "note": "FIXED (Session 50, v0.15.0). The diagnosis here was correct and I did not read this far down the backlog before starting — it was rediscovered from the live data instead. The source was **not** only v1-era migration: the `helpful/(helpful+harmful+neutral)` formula was live in the **test mock** at `auto-feedback.test.ts:31-33`, so the suite asserted semantics production did not use and structurally could not catch the drift. Mock corrected to match `evaluateLifecycle`; `updateFeedbackV2` now writes the rate in the same statement as the counter, so the two cannot drift again. 8 legacy rows restated by `scripts/backfill-success-rate.mjs` (e.g. #121 `4/(4+0+5)=0.444` → `1.000`), 18 never-computed rows filled. A `/sync` check that no row's `success_rate` disagrees with its own counters was **not** added — worth doing, see the new item below. Original finding follows. (Session 50)"
-    },
-    {
-      "id": "T-059",
-      "title": "[superseded] Original finding: `success_rate` holds values the current formula cannot produce",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 49,
-      "closed_session": 49,
-      "supersedes": null,
-      "note": "(Session 49). Live data has entries with `success_rate` of 0.333 and 0.444 while `harmful = 0` — impossible under `helpful / (helpful + harmful)`, which is what `apoptosisFlaggedExpr` and `evaluateLifecycle` assume. Almost certainly v1-era rows migrated with the old `helpful_count / total_ratings` metric, which counted neutral in the denominator (the metric ADR-015 deliberately refused to port). So the column carries **two incompatible formulas' output under one name**, and the lifecycle reads them identically. Audit: `SELECT success_rate, COUNT(*) FROM knowledge_index WHERE helpful > 0 GROUP BY success_rate` — 48 rows at exactly 1.0, five below it, 14 NULL. Recompute the legacy rows from their stored counters rather than trusting the value, and add a `/sync` check that no row's `success_rate` disagrees with its own `helpful`/`harmful` columns. Blocks any tuning of the apoptosis threshold, since the inputs are not one thing."
-    },
-    {
-      "id": "T-060",
-      "title": "Merge and release",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 41,
-      "closed_session": 41,
-      "supersedes": null,
-      "note": "DONE (Session 41). `9fce1d5` Cursor, `c23b8f4` v0.8.0, `debba5c` v0.8.1, merged to master and **pushed**, together with the 6-commit backlog and tags v0.7.1/v0.7.2/v0.8.0/v0.8.1 that had been local-only since Session 40. 453 tests, `/sync` 13 passed / 0 issues."
-    },
-    {
       "id": "T-061",
       "title": "Collect shadow-recall sessions",
       "priority": "P1",
@@ -619,36 +289,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "**1 of 10** the harness has exactly one real evaluated session (produced from Cursor). **No `LIFECYCLE_CONFIG` constant may be tuned before the sample is real**; the report deliberately refuses to name a winner below 10. Early signal worth watching, not acting on: `no_maturity` and `recency_strong` both beat `live` on MRR while losing on nDCG. Remember the metric favours the incumbent — `live` carried 6/10 labeled results against 4-6 for the variants, so *beating* live is strong evidence and tying is weak. (Session 41)"
-    },
-    {
-      "id": "T-062",
-      "title": "Re-measure knowledge quality after the recall fix",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 46,
-      "closed_session": 46,
-      "supersedes": null,
-      "note": "DONE (Session 46). All 332 live entries read individually; see `docs/corpus-audit-2026-08-04.md`. The suspicion was right in mechanism but wrong in conclusion: the corpus is **not** polluted. 17/332 (5.1%) carried a defect, and the rate does **not** concentrate in the early buggy period (Mar 7.3%, Apr 4.7%, May 2.1%, Jun 5.9%, Jul 3.9%) — July entries are the strongest material in the base. Exactly one entry was genuinely harmful (#85, reasoning-in-progress stored as fact, truncated mid-sentence); it is deleted. Corpus now 329 entries, zero stale v1 paths. **The real finding is that no quality signal exists in either direction**: nothing has ever been rated harmful and 81% has never been rated at all, so \"not measurably worse\" and \"never measured\" are indistinguishable from metadata. Do not infer worth from disuse. **Session 49 followed the consequence through**: with `harmful` still at 0 across 760 ratings, the apoptosis condition is unsatisfiable, not merely unmet — see the P0 item at the top."
-    },
-    {
-      "id": "T-063",
-      "title": "Re-run `gitnexus analyze`",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 50,
-      "supersedes": "T-064",
-      "note": "DONE (Session 50). Re-indexed three times as releases landed; final state **978 nodes / 2,294 edges / 115 clusters / 79 flows** at `6b136d5`. Two of the three runs hit the `file_fts` inconsistency and recovered on retry via the forced full rebuild — now filed as its own P1 above, since three sessions in a row is a pattern rather than bad luck. Confirms the RUNBOOK guidance again: **run it foreground and check `$?` separately** — this session also proved the piping trap on `npm run build`, where `tsc` failed but `... | tail && echo OK` printed OK because the pipeline's exit status came from `tail`. Prior history follows."
-    },
-    {
-      "id": "T-064",
-      "title": "[superseded] Re-run `gitnexus analyze`",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 41,
-      "closed_session": 48,
-      "supersedes": null,
-      "note": "STALE AGAIN at `8db618a`, four commits behind (`37d4e2e`). Session 49 re-indexed mid-session (917 symbols / 2149 relationships / 74 flows) and that run confirmed a useful diagnostic: **a HIGH risk reading from `detect_changes` on a stale index is usually line-shift attribution**, not real blast radius — neighbouring functions show as \"touched\" because an insertion moved their line numbers, and brand-new symbols are absent entirely. After re-indexing, the same change read LOW with one direct caller. Do not act on a HIGH from a stale index without re-running first. Prior: DONE (Session 48), 903/2111/73 at `f28247d`. Previously Session 41 (700/1628/56). **Procedure now lives in `RUNBOOK.md` → Troubleshooting; it has failed on two different causes and belongs somewhere durable.** Short version: run it foreground and check `$?` separately — backgrounding it while editing files fails on a session lock, and piping through `tail` masks the non-zero exit. Both write no database while reporting success. Session 48 hit a third cause: an interrupted incremental run left `file_fts` corrupt, exiting 1 with `document for node offset 198 is missing during delete`. Recovery is `analyze --repair-fts` then re-run — and the re-run detects the aborted run's `incrementalInProgress` flag and forces a **full** rebuild, so read the output rather than assuming the second attempt was incremental. (Sessions 41, 48)"
     },
     {
       "id": "T-065",
@@ -661,16 +301,6 @@
       "note": "scoring no longer uses it (both routes share `computeScore` against v2), but `createDb()` still expects the v1 schema, so the reference is dormant rather than removed. Once ported, `~/.claude/context-mode/knowledge.db` can go. (Session 41)"
     },
     {
-      "id": "T-066",
-      "title": "Revive shadow recall as a retrieval evaluation harness",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 42,
-      "closed_session": 42,
-      "supersedes": null,
-      "note": "BUILT (Session 42, v0.8.0). Strategies are config overrides of `recallRankExpr(alias, overrides)`, so they exercise the live ranking path rather than a parallel implementation. New `recall_log`/`feedback_log` tables capture the query → ranked results → rating chain; `knowledge_index` has only aggregate counters with no timestamps, so **historical replay proved impossible** and evaluation runs forward from here. Metric is nDCG/MRR against **session-local** labels — the v1 `helpful_count` metric was deliberately not ported (it rewards resurfacing already-rated entries, and would likely have scored the age-inverted ranking bug as better than the fix). Presentation bias is asymmetric in the incumbent`s favour (live 7/15 labeled vs variants 4-6/15 on the live DB), so beating live is strong evidence and tying is weak. No verdict below 10 sessions. See ADR-015. **Open for Aaron:** whether to keep all 6 strategies or trim."
-    },
-    {
       "id": "T-067",
       "title": "Close the remaining 153 open checkboxes across session logs",
       "priority": "P1",
@@ -679,36 +309,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "or adopt the RUNBOOK rule that logs are append-only and live state belongs in INBOX only. Right now an auditor sees 153 apparently-open items with no way to tell which are long done. (Session 41)"
-    },
-    {
-      "id": "T-068",
-      "title": "Build open-brain unified codebase",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 25,
-      "closed_session": 25,
-      "supersedes": null,
-      "note": "All 4 pipeline layers (sync, session-start, session-end, DB) + MCP server with 4 tools (ob_sync, ob_start, ob_end, ob_score). 233 tests, 18 files. Dependency injection throughout. (Session 25)"
-    },
-    {
-      "id": "T-069",
-      "title": "Wire open-brain MCP server into Claude Code settings",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 26,
-      "closed_session": 26,
-      "supersedes": null,
-      "note": "Done (Session 26). ob_* tools live in ~/.claude.json, permissions in settings.json."
-    },
-    {
-      "id": "T-070",
-      "title": "Hook migration",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 26,
-      "closed_session": 26,
-      "supersedes": null,
-      "note": "Done (Session 26). v2 SessionEnd hook active alongside v1 (30-day parallel). /start and /end updated with v2 paths and reflection queue."
     },
     {
       "id": "T-071",
@@ -721,26 +321,6 @@
       "note": "All 4 hooks.json copies patched (Session 30). Awaiting fresh-session verification: Read=0, Grep=0, Bash=1 tip."
     },
     {
-      "id": "T-072",
-      "title": "E2E test unified open-brain server",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 33,
-      "closed_session": 33,
-      "supersedes": null,
-      "note": "All 5 checkpoints pass. Recalled IDs == auto-feedback target IDs confirmed. (Session 33)"
-    },
-    {
-      "id": "T-073",
-      "title": "Rename kb_* → ob_",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 32,
-      "closed_session": 32,
-      "supersedes": null,
-      "note": "* — Done (Session 32). All tools use ob_* prefix."
-    },
-    {
       "id": "T-074",
       "title": "Rewrite /checkpoint as vault-first ob_store_chunk",
       "priority": "P1",
@@ -751,116 +331,6 @@
       "note": "Write markdown to `~/Obsidian Vault v2/Checkpoints/`, index in DB. Old `kb_store_chunk` was dropped. Update `~/.claude/commands/checkpoint.md`."
     },
     {
-      "id": "T-075",
-      "title": "Port invocation logger + skill-scan",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 33,
-      "closed_session": 33,
-      "supersedes": null,
-      "note": "Invocation logger ported to TypeScript (Stage 4), skill-scan wired as Stage 5. (Session 33)"
-    },
-    {
-      "id": "T-076",
-      "title": "Fix scorer stats inflation",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 33,
-      "closed_session": 33,
-      "supersedes": null,
-      "note": "getCoverageStats counted all tags, not domain matches. Fixed. (Session 33)"
-    },
-    {
-      "id": "T-077",
-      "title": "Resolve dead v2 DB tables",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 41,
-      "closed_session": 41,
-      "supersedes": null,
-      "note": "Closed the other way (Session 41, commit `a30f9d6`): rather than dropping them, `ob_set_session` now upserts into `sessions` and `ob_store_chunk` writes `chunks`. Both tables carry rows; the health check and staleness stats have real data to read."
-    },
-    {
-      "id": "T-078",
-      "title": "Investigate ob_recall project scoping",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 34,
-      "closed_session": 34,
-      "supersedes": null,
-      "note": "Done (Session 34). Two independent root causes found: (A) SESSION_UUID wiring gap → 62% NULL project_dir — patched in v0.6.1 working tree; (B) Path fragmentation across 5 variants — separate fix queued below."
-    },
-    {
-      "id": "T-079",
-      "title": "Verify SESSION_UUID round-trip (v0.6.1)",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 35,
-      "closed_session": 35,
-      "supersedes": null,
-      "note": "Done (Session 35). All 3 done-when checks passed live. Committed `9e37600`, tagged `v0.6.1`, pushed `origin master --tags`."
-    },
-    {
-      "id": "T-080",
-      "title": "Normalize `project_dir` paths (Bug B)",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 35,
-      "closed_session": 35,
-      "supersedes": null,
-      "note": "Done (Session 35, bundled into v0.7.0). `canonicalizeProjectDir()` in `shared/paths.ts`, applied at write + query boundaries, one-shot migration on DB open collapsed 74 rows from ~25 variants to 12 canonical values."
-    },
-    {
-      "id": "T-081",
-      "title": "Verify v0.7.0 session-start context pipeline",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 37,
-      "closed_session": 37,
-      "supersedes": null,
-      "note": "Done (Session 37). Item 5 fresh-session re-verify passed (`Last decision: 2026-04-17`). v0.7.0 committed `8e6d232`, tagged, pushed."
-    },
-    {
-      "id": "T-082",
-      "title": "Mirror slash commands: live → template + repo-root",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 36,
-      "closed_session": 36,
-      "supersedes": null,
-      "note": "Done (Session 36). 8 files → `project-template/.claude/commands/` (new: bootstrap, checkpoint; overwritten: end, skill-scan, start, sync, task, test; retracted: transcript). 7 files → repo-root `.claude/commands/` (new: checkpoint, end, skill-scan, start, task, test; overwritten: sync — was referencing deleted `scripts/sync.mjs`; preserved: harness-audit). Live `sync.md` also cleaned — stale `knowledge-mcp/package.json` reference removed."
-    },
-    {
-      "id": "T-083",
-      "title": "Cursor IDE integration",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 38,
-      "closed_session": 38,
-      "supersedes": null,
-      "note": "setup.mjs installs `~/.cursor/mcp.json`, `hooks.json`, and slash commands. Canonical copies in `project-template/.cursor/commands/`. FRAMEWORK + README updated. (Session 38)"
-    },
-    {
-      "id": "T-084",
-      "title": "Verify Cursor /start + /end E2E",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 38,
-      "closed_session": 44,
-      "supersedes": null,
-      "note": "DONE (Session 44, verified by Probe). Test E PASS: Cursor provenance recorded and the first shadow-recall session produced. Gotcha: Cursor hooks require PowerShell as the shell on Windows — with bash configured the wrapper dies on `&` before reaching node and SessionStart fails silently. (Sessions 38, 44)"
-    },
-    {
-      "id": "T-085",
-      "title": "Fix skill-scan cluster consolidation",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 40,
-      "closed_session": 40,
-      "supersedes": null,
-      "note": "Done (Session 40, commit `69673a6`). Jaccard replaces containment, merge size cap of 8, dominant-tag naming, `dedupeClusters`. Canonical file was `open-brain/src/pipelines/session-end/skill-scan.ts`, NOT the `.mjs` in `~/.claude/knowledge-mcp/scripts/` (dead, Apr 16, wired to no hook). Live-vault dry run exposed two defects the analysis missed: YAML tag quoting was never stripped (`\"deployment\"` vs `deployment` = two clusters), and the size cap only covered merges while single broad tags blew past it → new `oversized` flag."
-    },
-    {
       "id": "T-086",
       "title": "Re-tag the 28 oversized experience clusters",
       "priority": "P1",
@@ -869,36 +339,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "`deployment` (40), `convex` (36), `windows` (33), `mcp` (30), `claude-code` (23) and 23 more now flag TOO LARGE and are excluded from proposals. They need narrower tags on the underlying vault experiences before any skill can be distilled. Silent until someone acts. (Session 40)"
-    },
-    {
-      "id": "T-087",
-      "title": "Delete legacy `~/.claude/knowledge-mcp/`",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 47,
-      "closed_session": 47,
-      "supersedes": null,
-      "note": "DONE (Session 47). 573 MB removed after auditing every file for a live equivalent. The dashboard was the only thing worth keeping and now lives at `open-brain/scripts/dashboard.mjs` reading `knowledge-v2.db`. The three `.jsonl` files were verified by **exact record-set comparison, not by count** — that is what caught the one real gap (`shadow-recall.jsonl`: 6 unique April records in v1 vs 1 July record in v2, while counts showed v2 ahead on two of three files). 40 `checkpoint` chunks preserved into v2 with provenance and exported to `Obsidian Vault/Checkpoints/`. Session 41 found the directory still held **live** telemetry (`score-history.jsonl`, `skill-invocations.jsonl` — the latter written that same day) and moved both to `~/.claude/open-brain/` with 877 entries preserved. Deleting it before that would have destroyed the only longitudinal telemetry. What remains is the dead `skill-scan.mjs` (Apr 16, wired to no hook, still referenced by global `CLAUDE.md`), the frozen v1 `knowledge.db`, and `shadow-recall.jsonl` (no writer since the v1→v2 port)."
-    },
-    {
-      "id": "T-088",
-      "title": "v0.7.1 deterministic mirror enforcement",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 41,
-      "closed_session": 41,
-      "supersedes": null,
-      "note": "Done (Session 41, commit `a30f9d6`): `checkMirrorParity` added to the `/sync` check set, alongside a new `checkHookRegistration`. Deterministic-first per recall entry 205 — parity is now a check, not a prompt-level reminder."
-    },
-    {
-      "id": "T-089",
-      "title": "v0.7.1 session-UUID race fix",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 40,
-      "closed_session": 40,
-      "supersedes": null,
-      "note": "Done (Session 40, commit `f39568f`). `cli-bootstrap.ts` reads `session_id` from the hook's stdin payload; emits nothing if absent rather than a wrong UUID. `sessionStart()` takes an optional `sessionId`; `ob_start` passes the registered one. Transcript discovery kept only as a mid-session fallback."
     },
     {
       "id": "T-090",
@@ -921,16 +361,6 @@
       "note": "Three runtime artifacts to add: `.recalled-entries.json`, `/open-brain/.agents/`, `AGENTS.md` (gitnexus auto-generated). Patch already in working tree as of Session 37, uncommitted; lands with v0.7.1 release."
     },
     {
-      "id": "T-092",
-      "title": "Clean up stale paths in shared/paths.ts",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 41,
-      "closed_session": 41,
-      "supersedes": null,
-      "note": "Done (Session 41). Removed 3 dead keys (`prd`, `knowledgeMcpPackageJson`, `hooksDir` — zero consumers), repointed `scoreHistory` out of the retired `knowledge-mcp` directory, added `knowledgeV2Db` so CLI and server resolve the same DB. `knowledgeDb` deliberately left pointing at v1 with an explaining comment: `createDb()` expects the v1 schema, so repointing it needs that caller ported first. Also fixed `invocation-logger.ts`, which was still *writing* to the retired directory daily."
-    },
-    {
       "id": "T-093",
       "title": "Archive Atlas-Forge mailbox thread",
       "priority": "P1",
@@ -939,66 +369,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "5+ messages each side. Capture decisions in DECISIONS.md, truncate both files."
-    },
-    {
-      "id": "T-094",
-      "title": "Widen vault-writer extraction patterns",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 6,
-      "closed_session": 6,
-      "supersedes": null,
-      "note": "v0.3.1: Added hybrid conversation scanning (planning, architecture, workaround, root cause, explicit markers). Unified experience format across vault-writer and /end. SQLite-first data flow with Obsidian mirrors. Filter logging on all skips. (Session 6)"
-    },
-    {
-      "id": "T-095",
-      "title": "Investigate kb_recall returning zero results",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 7,
-      "closed_session": 7,
-      "supersedes": null,
-      "note": "Fixed in v0.3.2: stale build had wrong KB_DIR path (`knowledge-mcp` → `context-mode`), plus Windows path normalization for project_dir matching. (Session 7)"
-    },
-    {
-      "id": "T-096",
-      "title": "Sync KB MCP repo ↔ installed copies",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 19,
-      "closed_session": 19,
-      "supersedes": null,
-      "note": "Both copies now 13 tools. Added kb_feedback, kb_recalled to repo; kb_store_chunk was already in repo. Fixed missing await, added chunks_fts to schema init. (Session 19)"
-    },
-    {
-      "id": "T-097",
-      "title": "Test kb_store_chunk via /checkpoint",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 20,
-      "closed_session": 20,
-      "supersedes": null,
-      "note": "Verified: chunk 7156 stored via MCP. Also fixed session ID collision and UTC off-by-one bugs. (Session 20)"
-    },
-    {
-      "id": "T-098",
-      "title": "Re-test fresh clone on different machine",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "Removed per Aaron's direction (2026-04-05)."
-    },
-    {
-      "id": "T-099",
-      "title": "Verify provenance fixes + push",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 23,
-      "closed_session": 23,
-      "supersedes": null,
-      "note": "Verified all 3 provenance points, pushed d9a5a67. v0.6.0 released with recall diversification + curation. (Session 23)"
     },
     {
       "id": "T-100",
@@ -1041,16 +411,6 @@
       "note": "* (Aaron's ask, Session 53; spec at `docs/mailbox-transport-retirement-spec.md`). **The protocol is SIA's, the store is not** — reader `pipelines/session-start/agent-identity.ts` (`readMailboxState`), emitter `cli-bootstrap.ts:135–141`, and it **ships to every template consumer** via `project-template/.agents/AGENT.md:5,14–21` and `start.md:54`; the data lives in `~/.agents/`, a separate repo, and `/sync` validates none of it. Note the name collision — `<project>/.agents/` (gitignored, `.gitignore:9`) is not `~/.agents/`. **The archive half works** (26 commits, 25 touching message files, truncate-to-latest ran clean at `6454bbc`); the transport half is obsolete. Session 53 is its own evidence: Aaron hand-carried the inbox file, Forge then reached Atlas live four times, and the live channel **corrected the file twice** (v0.17.0 had already shipped; delta numbering moved from `#5 before #2` to names after 455/456 renumbered) — so the reply committed at `44dfd8b` was stale on both counts *within the session that wrote it*. **Root cause is one function.** In `readMailboxState`, `lastDecision` parses `^## (\\d{4}-\\d{2}-\\d{2})` and sorts — date-aware; `messageCount` counts `^## \\[` with no age, ever. The durable half already knows about time and the ephemeral half does not, which is why five dead channels (TCM 2026-04-24, worthit 06-04, nexcrm 06-09, a2a-hub and openlaser 07-22) announce themselves identically to the one live one. **Same dropped-count invariant as the four instances in P1** — a letter has no status field, cannot represent *answered* or *superseded*, so absence of resolution reads as currency. **Fix (deterministic-first rule #2, remove the trigger):** surface a message **only when it postdates its channel's last decision** — no timeout constant, nothing to tune, cannot drift; unparseable headers count as unresolved and are *reported*, not skipped. Then document live `SendMessage` as primary with the mailbox as the fallback for a peer that isn't running, state the durable contract (*if it must survive the session it is a decision or a task, written in that form*), and move the five dead channels under `archive/`. **Stageable today with no code change** — a blank `mailbox_channel` already skips the surface (`AGENT.md:21`); the code change only sets the default. Supersedes the item below, which asked for the same thing from the other end. Do **not** conflate the `AGENT.md` edits with the personalization-leak item in P0 — same file, separate changes. (Session 53)"
     },
     {
-      "id": "T-104",
-      "title": "[superseded by the item above] The mailbox protocol's truncate-to-latest rule defeats its own cross-session-persistence purpose",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 50,
-      "supersedes": null,
-      "note": "(Session 50, hit live when Aaron restarted Prime mid-exchange). `~/.agents/mailbox/README.md` contains two rules that were never checked against each other. The **Lifecycle** section says truncate conversation files to just the latest message once decisions are captured, history preserved in git. The **Cross-Session Persistence** section says the mailbox exists so a restarted agent boots with a last-known-state richer than automated recall, and advises writing a summary before ending a session with significant state. Truncation actively removes that summary: **the surviving message is the least self-contained one**, because it was written assuming the context of everything truncated above it. A restarted agent reading its inbox lands mid-argument with no way to know what it missed. Worked around this session by writing an explicit rehydration brief and pointing Prime at `decisions.md` — which is cumulative, never truncated, and *is* the designed answer, so the protocol holds as long as the reader knows to start there. Fix options: state in the README that a restarted agent reads `decisions.md` first and the inbox second; or add a convention that the truncated message carries a one-line \"context: see decisions.md 2026-08-11\" header; or exempt the newest message from truncation when it is a reply rather than a standing brief. **Same shape as the day's other findings** — two internally sensible rules, no check that they describe the same behaviour, and the seam belonged to neither section's author."
-    },
-    {
       "id": "T-105",
       "title": "Look into how checkpoints are tagged",
       "priority": "P2",
@@ -1059,86 +419,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "(Aaron, Session 50). `ob_store_chunk` appends the `category` as a tag *and* keeps whatever the caller passed, so Session 50's checkpoint stored `checkpoint, checkpoint, phase-1, ...` — the literal duplicate is visible in the tool's own response. Cosmetic on its face, but tag counts are what `skill-scan` clusters on, and double-counted evidence inflating cluster sizes is precisely the v0.12.0 defect (60 duplicate notes pushing three of five skill proposals over the threshold). **Check whether the duplicate reaches the clustering input before deciding severity** — if `skill-scan` reads distinct tags, this is a display nit; if it reads the raw list, every checkpoint has been counting double for its own category. Worth reviewing the wider question while there: whether `phase-{N}` tags are useful for recall at all, since they are unique per checkpoint and so can never cluster. Start at `ob_store_chunk` in `server.ts` and the tag-insert path in `db-v2.ts`; compare against how `ob_store` handles the same field. Note also that the checkpoint vault filename doubles the phase (`...-phase-1-phase-1.md`) because the key already contains it — same class of duplication, same call."
-    },
-    {
-      "id": "T-106",
-      "title": "Monitor extraction quality",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "Obsolete: auto-extraction removed entirely in v0.5.0 (zero retrieval value confirmed via audit, Session 11)."
-    },
-    {
-      "id": "T-107",
-      "title": "Setup scripts",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 8,
-      "closed_session": 8,
-      "supersedes": null,
-      "note": "v0.3.3: `scripts/setup.mjs` automates full install (Knowledge MCP, hooks, slash commands, Obsidian vault). `--dev` flag for framework developers (symlinks). (Session 8)"
-    },
-    {
-      "id": "T-108",
-      "title": "Automated doc-sync",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 7,
-      "closed_session": 7,
-      "supersedes": null,
-      "note": "v0.3.2: `scripts/sync-docs.mjs` + `/sync` slash command. Validates version across README, PRD, knowledge-mcp/package.json. (Session 7)"
-    },
-    {
-      "id": "T-109",
-      "title": "Automated repo→installed copy sync",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 8,
-      "closed_session": 8,
-      "supersedes": null,
-      "note": "v0.3.3: `setup.mjs --dev` creates symlinks from `~/.claude/knowledge-mcp/src/` → repo source. (Session 8)"
-    },
-    {
-      "id": "T-110",
-      "title": "Skill apoptosis",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 9,
-      "closed_session": 9,
-      "supersedes": null,
-      "note": "v0.4.0: kb_feedback with ternary ratings (helpful/harmful/neutral). Auto-prune non-manual entries below 0.3 success rate after 5 ratings. Manual entries flagged for approval. (Session 9)"
-    },
-    {
-      "id": "T-111",
-      "title": "Skill maturation stages",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 9,
-      "closed_session": 9,
-      "supersedes": null,
-      "note": "v0.4.0: Progenitor → Proven (3 helpful, ≥0.5 rate) → Mature (7 helpful). Maturity boost in kb_recall (1.5x/1.2x). (Session 9)"
-    },
-    {
-      "id": "T-112",
-      "title": "Experience abstraction/consolidation",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 23,
-      "closed_session": 23,
-      "supersedes": null,
-      "note": "v0.6.0: Recall-time diversity filter (cosine 0.85), kb_consolidate tool (distill N→1, archived_into soft delete, maturity inheritance), kb_recall_report (cluster detection + stale flagging), storage-time Jaccard dedup in kb_store. (Session 23)"
-    },
-    {
-      "id": "T-113",
-      "title": "Update /end to collect feedback",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 11,
-      "closed_session": 11,
-      "supersedes": null,
-      "note": "v0.5.0: Wired as /end B5. Lists recalled entries, prompts for ratings, calls kb_feedback. (Session 11)"
     },
     {
       "id": "T-114",
@@ -1151,86 +431,6 @@
       "note": "Show maturity distribution, flag manual entries below apoptosis threshold, flag high-neutral/low-helpful entries (retrieval quality issue)."
     },
     {
-      "id": "T-115",
-      "title": "Test new v0.6.0 MCP tools",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 24,
-      "closed_session": 24,
-      "supersedes": null,
-      "note": "All 3 tested and working: kb_recall_report (quality clusters), kb_forget_chunk (chunk deletion), kb_consolidate (merge with feedback inheritance). First consolidation pass done (STEM Agent 3→1). (Session 24)"
-    },
-    {
-      "id": "T-116",
-      "title": "Fix /start double-output loop",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 24,
-      "closed_session": 24,
-      "supersedes": null,
-      "note": "Root cause: line 9 of start.md routed project sessions through Part A + Part B, causing double kb_recall. Fixed to \"Part A only\" in both global and project-template copies. (Session 24)"
-    },
-    {
-      "id": "T-117",
-      "title": "Live-test kb_feedback via MCP",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 12,
-      "closed_session": 12,
-      "supersedes": null,
-      "note": "v0.5.1: Validated after MCP restart. Auto-feedback now handles this automatically via summary domain overlap. (Session 12)"
-    },
-    {
-      "id": "T-118",
-      "title": "Semantic search + summary vault writing",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 11,
-      "closed_session": 11,
-      "supersedes": null,
-      "note": "v0.5.0: sqlite-vec hybrid retrieval (FTS5 + vector via RRF) in kb_recall. Enriched summaries to Obsidian Summaries/ + SQLite. potion-base-32m local embeddings. 203 vectors backfilled. 35 summaries backfilled to Obsidian. Consolidated 5 scripts → session-end.mjs. Removed auto-extraction + mirroring. (Session 11)"
-    },
-    {
-      "id": "T-119",
-      "title": "Knowledge DB Dashboard",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 10,
-      "closed_session": 10,
-      "supersedes": null,
-      "note": "v0.4.1: `knowledge-mcp/scripts/dashboard.mjs` serves read-only web UI at localhost:3456. Tabs: Overview (stats + sessions-per-day chart), Sessions, Knowledge, Chunks, Summaries, Memory (CC memory files), Config (CLAUDE.md + settings.json). FTS5 search, sortable columns, tag filters, VS Code file links. (Session 10)"
-    },
-    {
-      "id": "T-120",
-      "title": "CC Memory audit + cleanup",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 10,
-      "closed_session": 10,
-      "supersedes": null,
-      "note": "36→21 files. Deleted 12 stale/redundant, moved 6 to project dirs, updated 3 with stale naming. Consolidated 4 user profiles→1. Created `/notebooklm` global command from memory workflow. Deleted stale Obsidian vault Projects/ folder. (Session 10)"
-    },
-    {
-      "id": "T-121",
-      "title": "Scope skill-scan to project domains",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 14,
-      "closed_session": 14,
-      "supersedes": null,
-      "note": "v0.5.2: `domains.json` config + forward-only TAG_EXPANSION filtering. 58 → 15 relevant clusters. (Session 14)"
-    },
-    {
-      "id": "T-122",
-      "title": "Audit existing Obsidian skills against experience corpus",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 14,
-      "closed_session": 14,
-      "supersedes": null,
-      "note": "v0.5.2: Rewrote convex (v2.0, 11 XP) and docker (v2.0, 11 XP) with enhanced methodology. Migrated all 5 skills to proper locations (`~/.claude/skills/` or `.agents/skills/`). Renamed Guidelines/ → Skill-Candidates/. (Session 14)"
-    },
-    {
       "id": "T-123",
       "title": "Improve TCM project skills with enhanced skill-creator",
       "priority": "P2",
@@ -1239,16 +439,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "14 skills in TCM `.agents/skills/`, none follow enhanced best practices. seo-optimizer test showed significant improvement. (Session 13)"
-    },
-    {
-      "id": "T-124",
-      "title": "Skill proposal de-duplication",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 23,
-      "closed_session": 23,
-      "supersedes": null,
-      "note": "v0.6.0: skill-scan.mjs now consolidates clusters with >60% file overlap (Jaccard on file sets). Reduces 51 → fewer distinct clusters. (Session 23)"
     },
     {
       "id": "T-125",
@@ -1291,154 +481,14 @@
       "note": "Current `/start` UUID discovery assumes Windows paths (`C:\\...` → `C--...`). Mac/Linux paths (`/home/user/...`, `/Users/user/...`) need different key derivation — no drive letter, no `:\\` to replace. Test on Mac/Linux and add platform-aware key derivation. (Session 21)"
     },
     {
-      "id": "T-129",
-      "title": "v0.3.0 knowledge retrieval redesign",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 5,
-      "closed_session": 5,
+      "id": "T-144",
+      "title": "Render the INBOX Done section by the retention window only",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 55,
+      "closed_session": null,
       "supersedes": null,
-      "note": "Recency-weighted BM25 in kb_recall, structured experience format (situation/action/outcome tuples), session quality gate, file-touch tagging, stop vault session writes (FTS5 primary store), remove Smart Connections from agent retrieval, recall count tracking, aging session helpers, monthly aging pipeline in /start. (Session 5)"
-    },
-    {
-      "id": "T-130",
-      "title": "Vault audit + cleanup",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 5,
-      "closed_session": 5,
-      "supersedes": null,
-      "note": "Deleted 17 junk sessions from Obsidian vault, audited Experiences/Topics/Guidelines quality, identified vault-writer quality problems. (Session 5)"
-    },
-    {
-      "id": "T-131",
-      "title": "Align PRD/README/package.json",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 5,
-      "closed_session": 5,
-      "supersedes": null,
-      "note": "Fixed PRD version (v4.0.0→v0.3.0), updated README with commands/hooks tables and setup links, bumped package.json. (Session 5)"
-    },
-    {
-      "id": "T-132",
-      "title": "LLM critique step for vault-writer",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "Superseded by structured experience format in v0.3.0; structured tuples reduce need for LLM critique pass."
-    },
-    {
-      "id": "T-133",
-      "title": "v0.2.2 vault-writer bug fixes + backfill + health check",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 4,
-      "closed_session": 4,
-      "supersedes": null,
-      "note": "Fixed phantom import crash, wrong DB paths, missing Stage 4, Windows path normalization. Added --backfill-sessions, noise filters, health check in bootstrap. Recovered 7 missing sessions. (Session 4)"
-    },
-    {
-      "id": "T-134",
-      "title": "v0.2.0 session lifecycle improvements",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 4,
-      "closed_session": 4,
-      "supersedes": null,
-      "note": "Unified /start with smart routing, merged /recall, added session-bootstrap.mjs hook, next-session handoff, context budget, stale pruning, per-project CLAUDE.md generation (Session 4)"
-    },
-    {
-      "id": "T-135",
-      "title": "Monthly kb_prune",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "Now built into /start as periodic maintenance (stale experience flagging)"
-    },
-    {
-      "id": "T-136",
-      "title": "v0.1.0 public pre-release",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 3,
-      "closed_session": 3,
-      "supersedes": null,
-      "note": "Bundled knowledge-mcp + a2a-wrapper, templated personal content, renamed Open Brain → Knowledge MCP, published with tag (Session 3)"
-    },
-    {
-      "id": "T-137",
-      "title": "INBOX reconciliation in /start",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 3,
-      "closed_session": 3,
-      "supersedes": null,
-      "note": "Option A: detect drift at session start by comparing task.md done items against INBOX (Session 3)"
-    },
-    {
-      "id": "T-138",
-      "title": "Unified /end command",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "Smart routing: detects `.agents/` → full project close-out + knowledge capture; no `.agents/` → lightweight capture only. One command to remember."
-    },
-    {
-      "id": "T-139",
-      "title": "Vault-writer Stage 5 safety net",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "Auto-fills `.agents/SESSIONS/Session_N.md` at session end when `/end` is skipped. Only fills empty sections, preserves `/end` content."
-    },
-    {
-      "id": "T-140",
-      "title": "Resolved global vs project command architecture",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "`/end` now handles both via smart routing. No separate project-level override needed."
-    },
-    {
-      "id": "T-141",
-      "title": "Database architecture redesign — ADR-005: keep 3 stores, fix wiring (write authority, federated search, Mirror A, CC…",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": "Evaluation through 2026-03-30."
-    },
-    {
-      "id": "T-142",
-      "title": "Extract A2A Hub to standalone project (v4.0.0)",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 52,
-      "supersedes": null,
-      "note": ""
-    },
-    {
-      "id": "T-143",
-      "title": "Obsidian vault orphan audit",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 2,
-      "closed_session": 2,
-      "supersedes": null,
-      "note": "216→175 files, ~100% connected (Session 2)"
+      "note": "At rev 0 INBOX.md was 14,308 words because renderInbox lists every done task with its verbatim note; retention only prunes on a write. Render done tasks closed within DONE_RETENTION_SESSIONS of last_session.n (or cap the list) so a freshly migrated project is not larger than its prose. Loop 5 candidate (Session 55)."
     }
   ],
   "verified": [
@@ -1531,6 +581,101 @@
       ],
       "since_session": 54,
       "status": "verified"
+    },
+    {
+      "id": "V-006",
+      "claim": "reopen_task moves done → open with closed_session null and the note appended; TaskSchema refuses closed_session that disagrees with status in both directions",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/shared/state-writer.test.ts",
+          "observation": "R1 test: reopen, update, close again; refusals for not-done, unknown, empty note"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/shared/state-schema.test.ts",
+          "observation": "R2 both directions, fixture compliant 27/27"
+        },
+        {
+          "type": "tag",
+          "path": "v0.31.0",
+          "observation": "accepted Loop 4 (644465e)"
+        }
+      ],
+      "since_session": 55,
+      "status": "verified"
+    },
+    {
+      "id": "V-007",
+      "claim": "summary-version with state.json present re-renders stale views through the shared renderers (applyStateOps with an empty batch: revision unchanged, no retention, state.json untouched) and never inserts prose; the prose regime runs only when state.json is absent",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/sync/checks-state.test.ts",
+          "observation": "version bump + sync re-renders header v0.31.0 at rev 7; --check issues; absent → old fixer; prose lines byte-identical"
+        },
+        {
+          "type": "sync",
+          "path": ".agents/SYSTEM/SUMMARY.md",
+          "observation": "after migration: summary-version pass 'views carry rev 0 / v0.31.0 — nothing to insert'; SUMMARY 9,580 → 610 words"
+        }
+      ],
+      "since_session": 55,
+      "status": "verified"
+    },
+    {
+      "id": "V-008",
+      "claim": "ci-status, state-views and merge-markers sync checks pass / warn / skip with the reason, and ci-status + merge-markers print their number whatever the severity (REPORTED block in sync CLI and ob_sync)",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/sync/checks-state.test.ts",
+          "observation": "each severity exercised with an injected runner; merge-markers in a temp git repo"
+        },
+        {
+          "type": "sync",
+          "path": "open-brain/src/cli.ts",
+          "observation": "live: 'ci-status [pass]: master 86ea010 conclusion: success', 'merge-markers [pass]: 0 conflict markers in 179 tracked text files'"
+        }
+      ],
+      "since_session": 55,
+      "status": "verified"
+    },
+    {
+      "id": "V-009",
+      "claim": "open-brain state import: --draft writes a schema-valid draft + report and nothing else; --commit snapshots .agents/ byte-complete before any change, writes state.json at revision 0, cuts SUMMARY's blockquote and Current State leaving the prose sections byte-identical, renders the four views, moves the draft into the snapshot, and refuses a second run",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/state-import.test.ts",
+          "observation": "fixture built from this repo's prose: boxes 55/3/0/85 → 42/3/0/98, 14 superseded links, snapshot == pre-commit tree, P8 sections identical, second --commit refuses"
+        },
+        {
+          "type": "migration",
+          "path": ".agents/archive/pre-state-migration-2026-09-14",
+          "observation": "real run by Aaron: 83-file snapshot, state.json rev 0, SUMMARY −181 lines, sync 22 passed / 0 issues"
+        }
+      ],
+      "since_session": 55,
+      "status": "verified"
+    },
+    {
+      "id": "V-010",
+      "claim": "/end writes state through ob_state when state.json exists (A7b), and the first real write on this repo went through the MCP tool at revision 0",
+      "evidence": [
+        {
+          "type": "write",
+          "path": ".agents/state.json",
+          "observation": "session 55: this batch — close_task T-001, open_task, 5 add_verified, 2 add_gap, add_decision ADR-026, set_objective, set_handoff, end_session; revision 0 → 1"
+        },
+        {
+          "type": "prose",
+          "path": ".claude/commands/end.md",
+          "observation": "A2/A5/A6/A7 gated, A7b present in all three copies + template (cmp-identical)"
+        }
+      ],
+      "since_session": 55,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -1575,6 +720,20 @@
       "evidence": "Loop 3 Developer report (gaps[]); planned as Loop 7",
       "recommended_update": "Add `open-brain state apply` once the tool contract has settled",
       "opened_session": 54
+    },
+    {
+      "id": "G-007",
+      "what": "`open-brain state import --commit` is denied by the auto-mode permission classifier inside an agent session (\"Irreversible Local Destruction\"); the one-shot migration must be run by the human",
+      "evidence": "Session 55: the classifier refused the command; Aaron ran `node build/cli.js state import --commit ..` from open-brain/ by hand",
+      "recommended_update": "State it in the importer's usage text and the Loop brief for consumers: draft by the agent, commit by the human. Consider a `--commit` that only ever adds files (snapshot + state.json) and a separate render step, so the classifier sees no rewrite.",
+      "opened_session": 55
+    },
+    {
+      "id": "G-008",
+      "what": "ob_start's prose baseline (24,888 words) vs the rev-0 render (7,360 words) was measured on a temp copy, not the live repo, because handleStart creates a session log per call",
+      "evidence": "Session 55 V12 measurement; identical inputs, but not the live path",
+      "recommended_update": "Give ob_start a read-only / no-log mode (or report sizes from the SessionStart hook) so a size measurement does not mint Session_N.md.",
+      "opened_session": 55
     }
   ],
   "decisions": [
@@ -1727,24 +886,29 @@
       "title": "Project state is a record; the prose files are generated views; loops ship on branches behind a bare-runner gate",
       "date": "2026-09-14",
       "note": "imported; original date unknown"
+    },
+    {
+      "id": "ADR-026",
+      "title": "Project state is a tracked record with one creator and one writer; the rest of .agents/ is local",
+      "date": "2026-09-14",
+      "note": "state.json created once by `state import --commit` (human-run after a reviewed draft), written only through ob_state; git tracks state.json + the four views; views never edited by hand; /sync re-renders instead of inserting prose"
     }
   ],
   "handoff": {
-    "pick_up": "Loop 4 per ~/.agents/mailbox/channels/sia/loop-4-brief.md; branch loop/4-dogfood from loop/3-state-writer head ee2cdb8; first deliverable is `open-brain state import --draft` on this repo + the import report to the Planner; --commit only after the Planner's authorization. Report to the Planner session (find it with ListAgents — name starts 'Prime installation check' now, may differ after the Planner rolls; the mailbox channel sia is the durable record either way). Do not report to Aaron.\n**Read the brief fully before starting** — the importer has a review gate before `--commit`, and R7 (a `merge-markers` /sync check) was appended after this session's slip. Aaron opens a fresh SIA session for Loop 4; this session ended at the Planner's roll instruction.",
+    "pick_up": "Loop 5 starts in a fresh session with a new Planner brief (~/.agents/mailbox/channels/sia/). Loop 4 is accepted: loop/4-dogfood = 644465e + the chore(state) first-write commit, tag v0.31.0 at 644465e, draft PR #5 (CI run 34921172116 green). This repo now runs on state.json: /start shows `Revision:`; /end writes through ob_state (A7b) — never edit INBOX.md, task.md, next-session.md or SUMMARY.md's marked region by hand. First real write (session 55, rev 0→1): ops close_task T-001, open_task T-144, add_verified V-006..V-010, add_gap G-007/G-008, add_decision ADR-026, set_objective, set_handoff, end_session; retention dropped 96 done tasks. state.json 136,390 → 73,776 bytes; tasks 143 (42 open / 3 in_progress / 0 blocked / 98 done) → 48 (42 / 3 / 0 / 3); verified 5 → 10, gaps 6 → 8, decisions 25 → 26. Views: SUMMARY 610 → 867 words, INBOX 14,308 → 6,935, task 176 → 150, next-session 583 → 392. A second write (rev 1→2) only refreshed this handoff with those numbers.",
     "watch_out": [
-      "**The live MCP server is on whichever build was running at the last `/mcp reconnect open-brain`** (v0.29.0 build as of Loop 2's reconnect; `open-brain/build/` on disk is whatever was last built). Ask via the Planner for a reconnect before relying on `ob_state` through the tool.",
-      "**Bash heredocs eat `\\\\` in regexes** (`/\\\\/g` became `/\\/g` twice this session). Write code with backslashes through the Write/Edit tools, never a heredoc.",
-      "**Gate every commit on the resolver that precedes it.** bb68600 was committed with CHANGELOG conflict markers because a Python step failed and the next command was not chained with `&&`. R7 makes this impossible to be green again; until it lands, check `grep -c '^<<<<<<<' CHANGELOG.md` before any merge commit.",
-      "**Python `print` of non-ASCII (`→`) crashes under cp1252** in this shell; keep prints ASCII.",
-      "**GitNexus:** the index goes stale every commit; `detect_changes` on a stale index attributes hunks to line-shift neighbours (handleEnd, EndArgs, buildSql showed up falsely). `analyze` sometimes fails with an FTS inconsistency and succeeds on retry. Re-index before trusting scope.",
-      "**Run vitest only from `open-brain/`** (entry 462). `cli-bootstrap.test.ts` now has a 30s describe timeout (9620b87) — a timeout there is a real hang.",
-      "**`/sync` from `open-brain/` now resolves the root** (R4, Loop 3). The `state-schema` check skips with a reason until state.json exists; `summary-version` still forces a prose line into SUMMARY on every bump — Loop 4 R3 stops that.",
-      "**CLAUDE.md and README.md are stale on the tool list** (say 13 tools; `ob_state` makes 14; ob_start/ob_state/sync root resolution undocumented in README). Not edited this session because the tree had to stay clean at /end — fold into Loop 4's doc audit.",
-      "Importer inputs surveyed: INBOX 54 open / 3 in_progress / 0 blocked / 85 done, 13 `[superseded]`, sections `## P0 — Critical` … `## P3 — Low`, `## Completed`; DECISIONS.md 24 ADRs, none with a Date line; SUMMARY blockquote = 73 `>` lines after the title, `## Current State` at line 77 → `## Architecture Overview` at 182; task.md `## Current Objective`; next-session `## Pick up here`, `### Watch out for`."
+      "Run vitest, tsc and the CLI from open-brain/ with an explicit `cd` — parallel Bash calls share one cwd and a `cd` in one call moved a sibling vitest run to the repo root (20 false failures in Session 55).",
+      "The auto-mode classifier denies `state import --commit` (and may deny other one-shot rewrites) in an agent session; hand the single command to Aaron with `! <cmd>` rather than routing around it.",
+      "GitNexus incremental analyze fails on the FTS 'file_fts' inconsistency; `node .gitnexus/run.cjs analyze --force` works. Re-index before detect_changes; new files are not in the index until re-analyzed.",
+      "Bash heredocs eat regex backslashes — write code through Write/Edit; use local calendar dates, not toISOString (an evening run stamped tomorrow).",
+      "The live MCP server picks up a build only after `/mcp reconnect open-brain` (ADR-024); verify with a dry-run ob_state before relying on new ops.",
+      "project-template/gitignore ships without the dot on purpose (a nested .gitignore would ignore the template's own .agents/ files in this repo); bootstrap Step 5 copies it.",
+      "The unnumbered `### ADR:` heading at DECISIONS.md:173 is skipped by the importer and must not be numbered by an agent (G-005)."
     ],
     "open_questions": [
-      "Q2 (memory as a module the core does not import) and Q3 (rating signal: replace with a usage signal, cut as interim) are decided per the Planner; Q4 = files (JSON), Q5 = dogfood here first. Tracking = option a (five state files tracked, rest of `.agents/` ignored) — implemented in Loop 4 C4.",
-      "When PR #3 and the Loop 4 PR merge (Aaron's cut after dogfood), tags land on master then."
+      "Loop 5 scope (Planner): Done-section-by-retention rendering (T-144) vs DECISIONS.md dual role vs Cursor copies vs CLI door — which first?",
+      "Should ob_start get a no-log read mode so sizes can be measured without minting a session log (G-008)?",
+      "PR #3 (v0.30.0) and PR #5 (v0.31.0): Aaron's merge order and whether tags move to master at merge."
     ],
     "session": 55
   },

@@ -1,28 +1,26 @@
-<!-- generated from .agents/state.json rev 0 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 2 by open-brain v0.31.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
 ## Pick up here _(written session 55)_
 
-Loop 4 per ~/.agents/mailbox/channels/sia/loop-4-brief.md; branch loop/4-dogfood from loop/3-state-writer head ee2cdb8; first deliverable is `open-brain state import --draft` on this repo + the import report to the Planner; --commit only after the Planner's authorization. Report to the Planner session (find it with ListAgents — name starts 'Prime installation check' now, may differ after the Planner rolls; the mailbox channel sia is the durable record either way). Do not report to Aaron.
-**Read the brief fully before starting** — the importer has a review gate before `--commit`, and R7 (a `merge-markers` /sync check) was appended after this session's slip. Aaron opens a fresh SIA session for Loop 4; this session ended at the Planner's roll instruction.
+Loop 5 starts in a fresh session with a new Planner brief (~/.agents/mailbox/channels/sia/). Loop 4 is accepted: loop/4-dogfood = 644465e + the chore(state) first-write commit, tag v0.31.0 at 644465e, draft PR #5 (CI run 34921172116 green). This repo now runs on state.json: /start shows `Revision:`; /end writes through ob_state (A7b) — never edit INBOX.md, task.md, next-session.md or SUMMARY.md's marked region by hand. First real write (session 55, rev 0→1): ops close_task T-001, open_task T-144, add_verified V-006..V-010, add_gap G-007/G-008, add_decision ADR-026, set_objective, set_handoff, end_session; retention dropped 96 done tasks. state.json 136,390 → 73,776 bytes; tasks 143 (42 open / 3 in_progress / 0 blocked / 98 done) → 48 (42 / 3 / 0 / 3); verified 5 → 10, gaps 6 → 8, decisions 25 → 26. Views: SUMMARY 610 → 867 words, INBOX 14,308 → 6,935, task 176 → 150, next-session 583 → 392. A second write (rev 1→2) only refreshed this handoff with those numbers.
 
 ## Watch out
 
-- **The live MCP server is on whichever build was running at the last `/mcp reconnect open-brain`** (v0.29.0 build as of Loop 2's reconnect; `open-brain/build/` on disk is whatever was last built). Ask via the Planner for a reconnect before relying on `ob_state` through the tool.
-- **Bash heredocs eat `\\` in regexes** (`/\\/g` became `/\/g` twice this session). Write code with backslashes through the Write/Edit tools, never a heredoc.
-- **Gate every commit on the resolver that precedes it.** bb68600 was committed with CHANGELOG conflict markers because a Python step failed and the next command was not chained with `&&`. R7 makes this impossible to be green again; until it lands, check `grep -c '^<<<<<<<' CHANGELOG.md` before any merge commit.
-- **Python `print` of non-ASCII (`→`) crashes under cp1252** in this shell; keep prints ASCII.
-- **GitNexus:** the index goes stale every commit; `detect_changes` on a stale index attributes hunks to line-shift neighbours (handleEnd, EndArgs, buildSql showed up falsely). `analyze` sometimes fails with an FTS inconsistency and succeeds on retry. Re-index before trusting scope.
-- **Run vitest only from `open-brain/`** (entry 462). `cli-bootstrap.test.ts` now has a 30s describe timeout (9620b87) — a timeout there is a real hang.
-- **`/sync` from `open-brain/` now resolves the root** (R4, Loop 3). The `state-schema` check skips with a reason until state.json exists; `summary-version` still forces a prose line into SUMMARY on every bump — Loop 4 R3 stops that.
-- **CLAUDE.md and README.md are stale on the tool list** (say 13 tools; `ob_state` makes 14; ob_start/ob_state/sync root resolution undocumented in README). Not edited this session because the tree had to stay clean at /end — fold into Loop 4's doc audit.
-- Importer inputs surveyed: INBOX 54 open / 3 in_progress / 0 blocked / 85 done, 13 `[superseded]`, sections `## P0 — Critical` … `## P3 — Low`, `## Completed`; DECISIONS.md 24 ADRs, none with a Date line; SUMMARY blockquote = 73 `>` lines after the title, `## Current State` at line 77 → `## Architecture Overview` at 182; task.md `## Current Objective`; next-session `## Pick up here`, `### Watch out for`.
+- Run vitest, tsc and the CLI from open-brain/ with an explicit `cd` — parallel Bash calls share one cwd and a `cd` in one call moved a sibling vitest run to the repo root (20 false failures in Session 55).
+- The auto-mode classifier denies `state import --commit` (and may deny other one-shot rewrites) in an agent session; hand the single command to Aaron with `! <cmd>` rather than routing around it.
+- GitNexus incremental analyze fails on the FTS 'file_fts' inconsistency; `node .gitnexus/run.cjs analyze --force` works. Re-index before detect_changes; new files are not in the index until re-analyzed.
+- Bash heredocs eat regex backslashes — write code through Write/Edit; use local calendar dates, not toISOString (an evening run stamped tomorrow).
+- The live MCP server picks up a build only after `/mcp reconnect open-brain` (ADR-024); verify with a dry-run ob_state before relying on new ops.
+- project-template/gitignore ships without the dot on purpose (a nested .gitignore would ignore the template's own .agents/ files in this repo); bootstrap Step 5 copies it.
+- The unnumbered `### ADR:` heading at DECISIONS.md:173 is skipped by the importer and must not be numbered by an agent (G-005).
 
 ## Open questions
 
-- Q2 (memory as a module the core does not import) and Q3 (rating signal: replace with a usage signal, cut as interim) are decided per the Planner; Q4 = files (JSON), Q5 = dogfood here first. Tracking = option a (five state files tracked, rest of `.agents/` ignored) — implemented in Loop 4 C4.
-- When PR #3 and the Loop 4 PR merge (Aaron's cut after dogfood), tags land on master then.
+- Loop 5 scope (Planner): Done-section-by-retention rendering (T-144) vs DECISIONS.md dual role vs Cursor copies vs CLI door — which first?
+- Should ob_start get a no-log read mode so sizes can be measured without minting a session log (G-008)?
+- PR #3 (v0.30.0) and PR #5 (v0.31.0): Aaron's merge order and whether tags move to master at merge.
 
 ## Last session
 

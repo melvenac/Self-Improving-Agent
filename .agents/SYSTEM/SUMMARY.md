@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 0 by open-brain v0.31.0 — do not edit; change state via ob_state -->
-> **Status:** v0.31.0 — **Loop 4 of the extraction evaluation — dogfood: migrate this repo's `.agents/` prose into `.agents/state.json`, switch `/end` to `ob_state`, run on it.** Per `~/.agents/mailbox/channels/sia/loop-4-brief.md` (read it fully first). Branch `loop/4-dogfood` from `loop/3-state-writer` head **ee2cdb8**. First deliverable is `open-brain state import --draft` on this repo + the import report to the Planner; `--commit` only after the Planner's authorization. Report to the Planner session, not to Aaron. Session 54 shipped Loops 1–3 (v0.28.0, v0.29.0, v0.30.0 on PR #3) and hotfix v0.29.1 (merged; master 86ea010, CI green). Full handoff: `.agents/SESSIONS/next-session.md`.
+<!-- generated from .agents/state.json rev 2 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+> **Status:** v0.31.0 — Loop 5 of the extraction evaluation — per the Planner's next brief. Candidates carried from Loop 4: render the INBOX Done section by the retention window (T-144), DECISIONS.md dual role (G-005), Cursor start/end copies onto ob_start/ob_state (G-001), a CLI door for ob_state (G-006). Loop 4 shipped as v0.31.0 on draft PR #5; merging PR #3/#5 is Aaron's release decision.
 
 ## What's working
 
@@ -11,6 +11,11 @@
 - state writer: revision check, atomic batch, retention, four views, ob_state _(V-003, 2 evidence)_
 - /sync resolves the project root or refuses; identical from root and open-brain/ _(V-004, 2 evidence)_
 - relocate existence check is case-insensitive; CI green on ubuntu _(V-005, 2 evidence)_
+- reopen_task moves done → open with closed_session null and the note appended; TaskSchema refuses closed_session that disagrees with status in both directions _(V-006, 3 evidence)_
+- summary-version with state.json present re-renders stale views through the shared renderers (applyStateOps with an empty batch: revision unchanged, no retention, state.json untouched) and never inserts prose; the prose regime runs only when state.json is absent _(V-007, 2 evidence)_
+- ci-status, state-views and merge-markers sync checks pass / warn / skip with the reason, and ci-status + merge-markers print their number whatever the severity (REPORTED block in sync CLI and ob_sync) _(V-008, 2 evidence)_
+- open-brain state import: --draft writes a schema-valid draft + report and nothing else; --commit snapshots .agents/ byte-complete before any change, writes state.json at revision 0, cuts SUMMARY's blockquote and Current State leaving the prose sections byte-identical, renders the four views, moves the draft into the snapshot, and refuses a second run _(V-009, 2 evidence)_
+- /end writes state through ob_state when state.json exists (A7b), and the first real write on this repo went through the MCP tool at revision 0 _(V-010, 2 evidence)_
 
 ## What's broken
 
@@ -20,22 +25,24 @@
 - Gap G-004: vault-index-parity warns on one unindexed Checkpoints note
 - Gap G-005: DECISIONS.md is both the prose ADR log and the decisions[] index
 - Gap G-006: No CLI door for ob_state (only the MCP tool)
+- Gap G-007: `open-brain state import --commit` is denied by the auto-mode permission classifier inside an agent session ("Irreversible Local Destruction"); the one-shot migration must be run by the human
+- Gap G-008: ob_start's prose baseline (24,888 words) vs the rev-0 render (7,360 words) was measured on a temp copy, not the live repo, because handleStart creates a session log per call
 
 ## What's next
 
-- [P0] T-001 Loop 4
 - [P0] T-003 Session identity is keyed per project, not per session
 - [P0] T-004 The lifecycle bundle's remaining three parts stay BLOCKED
 - [P0] T-008 Add a `/sync` validator that stats every MCP command path in `~/.claude.json`
 - [P0] T-014 Make point-of-use rating reachable
+- [P0] T-022 Replace-on-write for `state` facts
 
 ## Decisions
 
+- 2026-09-14 — Project state is a tracked record with one creator and one writer; the rest of .agents/ is local — state.json created once by `state import --commit` (human-run after a reviewed draft), written only through ob_state; git tracks state.json + the four views; views never edited by hand; /sync re-renders instead of inserting prose
 - 2026-09-14 — Project state is a record; the prose files are generated views; loops ship on branches behind a bare-runner gate — imported; original date unknown
 - 2026-09-14 — Per-session MCP servers require per-writer schema stamps — imported; original date unknown
 - 2026-09-14 — A structural fix ships with its own instrumentation, in the same release — imported; original date unknown
 - 2026-09-14 — Rejection must be representable — the ledger pattern — imported; original date unknown
-- 2026-09-14 — A treatment column's default is 'unspecified', never a real treatment value — imported; original date unknown
 <!-- state:end -->
 ## Architecture Overview
 
