@@ -109,6 +109,58 @@ Two further limitations, both pre-existing and documented in `evaluate.ts`:
   older now than they were then, which systematically penalises `recency_strong` and
   flatters `no_recency`. Their rows above should be read as suggestive at best.
 
+## The recency rows — a candidate, and why it is also confounded
+
+The Planner raised the recency rows as a possible clean signal, on the grounds that
+maturity leakage cannot explain them: `created_at` does not move when feedback is
+written, so `no_recency` and `recency_strong` are not subject to the
+Stage-2-writes-what-Stage-6-scores mechanism. They also line up monotonically against
+the current setting — `no_recency` 0.1389, `live` 0.1271, `recency_strong` 0.1026 —
+more decay, worse. That reasoning is correct about maturity leakage.
+
+**A second, independent confound explains the same pattern: anachronistic results.**
+
+The replay runs today's corpus against historical queries. `knowledge_index` now
+contains entries created *after* the sessions being replayed, and those entries cannot
+carry a label from a session that predates them — they are unscoreable by construction.
+Recency decay is precisely the term that promotes newer entries. So a strategy that
+decays harder fills its top-5 with entries that did not exist yet, and every slot spent
+that way is a slot that cannot score.
+
+Measured — share of returned entries created *after* the session being replayed:
+
+| strategy | anachronistic | nDCG |
+|---|---|---|
+| `no_recency` | **28.1%** (345/1227) | 0.1389 |
+| `bm25_only` | 33.4% (410/1227) | 0.1265 |
+| `maturity_strong` | 34.7% (426/1227) | 0.1510 |
+| `live` | 45.8% (562/1227) | 0.1271 |
+| `no_maturity` | 53.5% (656/1227) | 0.1205 |
+| `recency_strong` | **62.8%** (771/1227) | 0.1026 |
+
+Spearman rank correlation between "least anachronistic" and "best nDCG" is **ρ ≈ 0.71**
+across the six strategies. `recency_strong` is both the worst scorer and the most
+anachronistic; `no_recency` is the least anachronistic and the second-best scorer. The
+monotonic recency ordering is what this artifact predicts on its own, with or without
+any real effect from decay.
+
+It also explains the `bm25_only` oddity that prompted the question. `bm25_only` turns
+maturity off, like `no_maturity`, yet ties `live` while `no_maturity` loses — because
+`bm25_only` also turns recency decay off, dropping it to 33.4% anachronistic against
+`no_maturity`'s 53.5%. The two strategies differ in the recency term, and the
+anachronism column tracks that difference exactly.
+
+**Conclusion: not acted on, and not a clean signal.** Recency escapes the maturity
+leakage and is caught by corpus growth instead. Both confounds share one root — the
+replay reconstructs neither the corpus nor the lifecycle state as of the session being
+scored. Carried to Loop 6 as a candidate *behind* the instrument fix, not beside it: a
+per-session snapshot must also exclude entries created after the session, or the
+recency question will be asked of the same broken instrument.
+
+Note this weakens the maturity rows further rather than rescuing them: `no_maturity`
+is 53.5% anachronistic against `live`'s 45.8%, so part of its loss is this artifact too,
+independent of the leakage.
+
 ## What would make this answerable
 
 Score against maturity **as of the session being replayed**, not as of today. `feedback_log`
