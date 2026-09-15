@@ -37,9 +37,13 @@ import {
   renderNextSession,
   renderSummaryRegion,
   applySummaryRegion,
+  isDroppedByRetention,
+  DONE_RETENTION_SESSIONS,
 } from "../pipelines/state-views/index.js";
 
-export const DONE_RETENTION_SESSIONS = 3;
+// Defined in state-views (the INBOX view needs it to hide what this drops) and
+// re-exported here so existing import sites are unchanged. T-144.
+export { DONE_RETENTION_SESSIONS };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const ActiveStatus = z.enum(["open", "in_progress", "blocked"]);
@@ -141,12 +145,13 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   const version = options.version ?? readJson<{ version: string }>(join(projectRoot, "package.json"))?.version ?? finalState.project.version;
   const views: Array<{ rel: string; text: string }> = [];
   if (options.render !== false) {
-    views.push({ rel: VIEW_REL.inbox, text: renderInbox(finalState, { version }) });
-    views.push({ rel: VIEW_REL.task, text: renderTaskFile(finalState, { version }) });
-    views.push({ rel: VIEW_REL.next, text: renderNextSession(finalState, { version }) });
+    const viewOpts = { version, session: options.session };
+    views.push({ rel: VIEW_REL.inbox, text: renderInbox(finalState, viewOpts) });
+    views.push({ rel: VIEW_REL.task, text: renderTaskFile(finalState, viewOpts) });
+    views.push({ rel: VIEW_REL.next, text: renderNextSession(finalState, viewOpts) });
     const summaryPath = join(projectRoot, VIEW_REL.summary);
     const existing = existsSync(summaryPath) ? readFileSync(summaryPath, "utf-8") : "";
-    views.push({ rel: VIEW_REL.summary, text: applySummaryRegion(existing, renderSummaryRegion(finalState, { version })) });
+    views.push({ rel: VIEW_REL.summary, text: applySummaryRegion(existing, renderSummaryRegion(finalState, viewOpts)) });
   }
 
   if (!dryRun) {
@@ -289,10 +294,11 @@ export function nextId(prefix: "T" | "V" | "G" | "D", existing: string[]): strin
  * the first to go. Returns the dropped ids so the caller can say so.
  */
 export function applyRetention(s: State, session: number): string[] {
-  const cutoff = session - DONE_RETENTION_SESSIONS;
   const dropped: string[] = [];
   s.tasks = s.tasks.filter((t) => {
-    const old = t.status === "done" && t.closed_session !== null && t.closed_session <= cutoff;
+    // Same predicate the INBOX view filters on, so the record and the rendered
+    // Done list cannot disagree about what still exists (T-144).
+    const old = isDroppedByRetention(t, session);
     if (old) dropped.push(t.id);
     return !old;
   });
