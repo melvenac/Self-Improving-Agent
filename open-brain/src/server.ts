@@ -24,7 +24,7 @@ import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import { applyStateOps, DONE_RETENTION_SESSIONS } from "./shared/state-writer.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
-import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
+import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVaultDir } from "./shared/paths.js";

@@ -26,12 +26,40 @@ import { getSessionRecalledIds } from "../../db-v2.js";
  *   3. the file, but only when it names the session being ended (covers recalls
  *      made before `ob_set_session`, which never reached `recall_log`)
  *   4. nothing — and `reason` says which guard rejected it
+ *
+ * LOOP 5 R4 — nothing writes the file any more. `/start` step 4 was removed in
+ * the Loop 5 release: `recall_log` already holds every hit against the live session uuid,
+ * so the file was a redundant second copy, keyed per PROJECT rather than per
+ * session, and each start merged into it — so it accumulated other sessions'
+ * ids without bound. On 2026-09-14 a 33-entry file held 11 entries the session
+ * had actually recalled and 22 from eight earlier sessions, while wearing the
+ * running session's id. It never corrupted a rating, because precedence 2 wins
+ * whenever the session is known; its cost was diagnostic, and it was expensive
+ * — two agents spent an evening designing a fix for a bug the file only looked
+ * like it was causing.
+ *
+ * The read path stays for the one case it still covers: recalls made before
+ * `ob_set_session` ran never reach `recall_log` with a usable session uuid, and
+ * a file naming this session is the only remaining evidence of them. That case
+ * is now loud rather than silent (R3), so if it ever fires, someone will see it
+ * rather than inferring it from a zero. A leftover file from an older version
+ * fails precedence 3 and is refused by name.
  */
 export interface RecalledIdsSource {
   ids: number[];
   origin: "explicit" | "recall-log" | "file" | "none";
   /** Set when a file existed but was not trusted. */
   rejected?: { path: string; fileSessionId: string | null; reason: string };
+  /**
+   * Why nothing resolved, when `origin` is "none" and no file was rejected —
+   * the case where there was simply nothing to read.
+   *
+   * Loop 5 R3: `rejected` only explains a file that existed and was refused. A
+   * session that never ran `ob_set_session`, or one with no recall_log rows and
+   * no file, produced `origin: "none"` with no explanation at all, rated
+   * nothing, and said nothing about why.
+   */
+  reason?: string;
 }
 
 export interface ResolveRecalledIdsInput {
@@ -106,5 +134,38 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS
     };
   }
 
-  return { ids: [], origin: "none" };
+  // Nothing anywhere: no explicit ids, no recall_log rows for a known session,
+  // and not one of the candidate files was readable. Say which, rather than
+  // returning a bare empty result the caller has to guess about.
+  return {
+    ids: [],
+    origin: "none",
+    reason: sessionId
+      ? `no recall_log rows for session ${sessionId} and no readable .recalled-entries.json (looked in ${filePaths.length} location(s))`
+      : `no session id (ob_set_session never ran) and no readable .recalled-entries.json (looked in ${filePaths.length} location(s))`,
+  };
+}
+
+/**
+ * Render the recalled-ids resolution as report lines — **including at zero**.
+ *
+ * The same shape as `formatApoptosisQueue`: absence must not be
+ * indistinguishable from success. Before this, a session that resolved nothing
+ * rated nothing and the only visible trace was `Feedback: 0 entries`, which
+ * reads identically whether there was nothing to rate, the session id was
+ * missing, or a file belonging to another session was refused.
+ *
+ * The count-and-origin line is unconditional; the explanation is added only
+ * when there is one to give.
+ */
+export function formatRecalledResolution(resolved: RecalledIdsSource, indent = "  "): string[] {
+  const lines = [`${indent}Recalled ids: ${resolved.ids.length} from ${resolved.origin}`];
+  if (resolved.rejected) {
+    lines.push(`${indent}Ignored ${resolved.rejected.path}: ${resolved.rejected.reason}`);
+  }
+  if (resolved.origin === "none") {
+    if (resolved.reason) lines.push(`${indent}Nothing rated: ${resolved.reason}`);
+    else if (resolved.rejected) lines.push(`${indent}Nothing rated: the only candidate file was refused (above)`);
+  }
+  return lines;
 }

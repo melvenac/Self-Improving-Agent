@@ -12,6 +12,36 @@ import { TaskPriority } from "../../shared/state-schema.js";
 
 export interface ViewOptions {
   version: string;
+  /**
+   * The session the views are being rendered for — the same number the writer
+   * passes to `applyRetention`. Required so the rendered Done list and the
+   * record agree about which done tasks still exist (T-144).
+   */
+  session: number;
+}
+
+/**
+ * How many sessions of done tasks are kept. "Last 3 sessions" means the current
+ * one and the two before it, so a task closed at `session - 3` is the first to go.
+ *
+ * Defined here rather than in the writer because both need it and the writer
+ * already imports this module; re-exported from `state-writer.ts` so existing
+ * import sites keep working.
+ */
+export const DONE_RETENTION_SESSIONS = 3;
+
+/**
+ * The single retention predicate. The writer deletes these from the record; the
+ * INBOX view hides them.
+ *
+ * Before T-144 the view rendered every done task under a heading that claimed
+ * "last 3 sessions", while the writer dropped the older ones on the next write.
+ * The two disagreed for as long as no write happened — and `/sync`'s render-only
+ * path deliberately skips retention, so a repo could sit in that state
+ * indefinitely. One function now decides, and both call it.
+ */
+export function isDroppedByRetention(t: Task, session: number): boolean {
+  return t.status === "done" && t.closed_session !== null && t.closed_session <= session - DONE_RETENTION_SESSIONS;
 }
 
 export const SUMMARY_BEGIN = "<!-- state:begin -->";
@@ -45,8 +75,10 @@ export function renderInbox(state: State, o: ViewOptions): string {
     lines.push("");
   }
   if (active.length === 0) lines.push("_No open tasks._", "");
-  const done = state.tasks.filter((t) => t.status === "done").sort((a, b) => (b.closed_session ?? 0) - (a.closed_session ?? 0));
-  lines.push("## Done (last 3 sessions)", "");
+  const done = state.tasks
+    .filter((t) => t.status === "done" && !isDroppedByRetention(t, o.session))
+    .sort((a, b) => (b.closed_session ?? 0) - (a.closed_session ?? 0));
+  lines.push(`## Done (last ${DONE_RETENTION_SESSIONS} sessions)`, "");
   if (done.length === 0) lines.push("_None retained._");
   for (const t of done) lines.push(`- [x] **${t.id}** ${t.title} (session ${t.closed_session})${t.note ? ` — ${t.note}` : ""}`);
   lines.push("");

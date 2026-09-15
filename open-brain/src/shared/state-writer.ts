@@ -37,9 +37,13 @@ import {
   renderNextSession,
   renderSummaryRegion,
   applySummaryRegion,
+  isDroppedByRetention,
+  DONE_RETENTION_SESSIONS,
 } from "../pipelines/state-views/index.js";
 
-export const DONE_RETENTION_SESSIONS = 3;
+// Defined in state-views (the INBOX view needs it to hide what this drops) and
+// re-exported here so existing import sites are unchanged. T-144.
+export { DONE_RETENTION_SESSIONS };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const ActiveStatus = z.enum(["open", "in_progress", "blocked"]);
@@ -82,13 +86,34 @@ export interface WriteResult {
   error?: string;
 }
 
-const STATE_REL = ".agents/state.json";
+export const STATE_REL = ".agents/state.json";
 const VIEW_REL = {
   inbox: ".agents/TASKS/INBOX.md",
   task: ".agents/TASKS/task.md",
   next: ".agents/SESSIONS/next-session.md",
   summary: ".agents/SYSTEM/SUMMARY.md",
 } as const;
+
+/**
+ * Read and validate `.agents/state.json` without writing anything.
+ *
+ * G-006: `ob_state` was the only door to the record, so with the MCP server
+ * down there was no way for a human or a script to read it except by opening
+ * the JSON by hand — which is exactly the habit the single-writer rule exists
+ * to prevent. Reading needs a door of its own; it does not need the writer.
+ *
+ * Same absent/invalid refusals as `applyStateOps`, so both doors describe a
+ * broken file the same way.
+ */
+export function readState(projectRoot: string): { ok: true; data: State; path: string } | { ok: false; error: string } {
+  const statePath = join(projectRoot, STATE_REL);
+  if (!existsSync(statePath)) {
+    return { ok: false, error: `${STATE_REL} is absent — run the migration first` };
+  }
+  const parsed = parseState(readFileSync(statePath, "utf-8"));
+  if (!parsed.ok) return { ok: false, error: `${STATE_REL} invalid at ${parsed.error}` };
+  return { ok: true, data: parsed.data, path: statePath };
+}
 
 export function applyStateOps(projectRoot: string, options: ApplyStateOptions): WriteResult {
   const dryRun = options.dry_run === true;
@@ -141,12 +166,13 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   const version = options.version ?? readJson<{ version: string }>(join(projectRoot, "package.json"))?.version ?? finalState.project.version;
   const views: Array<{ rel: string; text: string }> = [];
   if (options.render !== false) {
-    views.push({ rel: VIEW_REL.inbox, text: renderInbox(finalState, { version }) });
-    views.push({ rel: VIEW_REL.task, text: renderTaskFile(finalState, { version }) });
-    views.push({ rel: VIEW_REL.next, text: renderNextSession(finalState, { version }) });
+    const viewOpts = { version, session: options.session };
+    views.push({ rel: VIEW_REL.inbox, text: renderInbox(finalState, viewOpts) });
+    views.push({ rel: VIEW_REL.task, text: renderTaskFile(finalState, viewOpts) });
+    views.push({ rel: VIEW_REL.next, text: renderNextSession(finalState, viewOpts) });
     const summaryPath = join(projectRoot, VIEW_REL.summary);
     const existing = existsSync(summaryPath) ? readFileSync(summaryPath, "utf-8") : "";
-    views.push({ rel: VIEW_REL.summary, text: applySummaryRegion(existing, renderSummaryRegion(finalState, { version })) });
+    views.push({ rel: VIEW_REL.summary, text: applySummaryRegion(existing, renderSummaryRegion(finalState, viewOpts)) });
   }
 
   if (!dryRun) {
@@ -289,10 +315,11 @@ export function nextId(prefix: "T" | "V" | "G" | "D", existing: string[]): strin
  * the first to go. Returns the dropped ids so the caller can say so.
  */
 export function applyRetention(s: State, session: number): string[] {
-  const cutoff = session - DONE_RETENTION_SESSIONS;
   const dropped: string[] = [];
   s.tasks = s.tasks.filter((t) => {
-    const old = t.status === "done" && t.closed_session !== null && t.closed_session <= cutoff;
+    // Same predicate the INBOX view filters on, so the record and the rendered
+    // Done list cannot disagree about what still exists (T-144).
+    const old = isDroppedByRetention(t, session);
     if (old) dropped.push(t.id);
     return !old;
   });

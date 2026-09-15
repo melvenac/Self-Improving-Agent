@@ -7,15 +7,18 @@ import {
   renderNextSession,
   renderSummaryRegion,
   applySummaryRegion,
+  isDroppedByRetention,
+  DONE_RETENTION_SESSIONS,
   SUMMARY_BEGIN,
   SUMMARY_END,
 } from "../../src/pipelines/state-views/index.js";
+import { applyRetention } from "../../src/shared/state-writer.js";
 import { parseState, type State } from "../../src/shared/state-schema.js";
 
 const fixtureText = readFileSync(join(import.meta.dirname, "../fixtures-state/state.json"), "utf-8");
 const fixtureSummary = readFileSync(join(import.meta.dirname, "../fixtures/.agents/SYSTEM/SUMMARY.md"), "utf-8");
 const state: State = (() => { const r = parseState(fixtureText); if (!r.ok) throw new Error(r.error); return r.data; })();
-const opts = { version: "0.30.0" };
+const opts = { version: "0.30.0", session: state.last_session.n };
 const HEADER = "<!-- generated from .agents/state.json rev 7 by open-brain v0.30.0 — do not edit; change state via ob_state -->";
 
 describe("state views (Loop 3 C3)", () => {
@@ -114,5 +117,47 @@ describe("state views (Loop 3 C3)", () => {
     const crlf = "# Title\r\n\r\nProse\r\n";
     const out = applySummaryRegion(crlf, SUMMARY_BEGIN + "\nline\n" + SUMMARY_END);
     expect(out).toBe("# Title\r\n\r\n" + SUMMARY_BEGIN + "\r\nline\r\n" + SUMMARY_END + "\r\n\r\nProse\r\n");
+  });
+});
+
+describe("T-144: rendered Done obeys the retention window", () => {
+  const session = state.last_session.n;
+  const doneIds = (text: string) =>
+    [...text.matchAll(/^- \[x\] \*\*(T-\d+)\*\*/gm)].map((m) => m[1]);
+
+  it("hides done tasks the writer would drop — fails against pre-T-144 code", () => {
+    const rendered = doneIds(renderInbox(state, opts));
+    const stale = state.tasks.filter((t) => isDroppedByRetention(t, session)).map((t) => t.id);
+
+    // The fixture must actually exercise this, or the test proves nothing.
+    expect(stale.length).toBeGreaterThan(0);
+    for (const id of stale) expect(rendered).not.toContain(id);
+  });
+
+  it("view and writer agree on exactly which done tasks exist", () => {
+    const rendered = doneIds(renderInbox(state, opts));
+
+    // What the record holds after the writer applies retention at the same session.
+    const copy: State = JSON.parse(JSON.stringify(state));
+    applyRetention(copy, session);
+    const kept = copy.tasks.filter((t) => t.status === "done").map((t) => t.id);
+
+    expect([...rendered].sort()).toEqual([...kept].sort());
+  });
+
+  it("renders the retention edge correctly: > cutoff kept, == cutoff dropped", () => {
+    const cutoff = session - DONE_RETENTION_SESSIONS;
+    const edge: State = JSON.parse(JSON.stringify(state));
+    edge.tasks = [
+      { id: "T-900", title: "at the cutoff", priority: "P2", status: "done", opened_session: 1, closed_session: cutoff, supersedes: null, note: null },
+      { id: "T-901", title: "one past the cutoff", priority: "P2", status: "done", opened_session: 1, closed_session: cutoff + 1, supersedes: null, note: null },
+    ];
+    const rendered = doneIds(renderInbox(edge, opts));
+    expect(rendered).not.toContain("T-900");
+    expect(rendered).toContain("T-901");
+  });
+
+  it("heading states the window from the constant, not a literal", () => {
+    expect(renderInbox(state, opts)).toContain(`## Done (last ${DONE_RETENTION_SESSIONS} sessions)`);
   });
 });

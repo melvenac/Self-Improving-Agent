@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 2 by open-brain v0.31.0 — do not edit; change state via ob_state -->
-> **Status:** v0.31.0 — Loop 5 of the extraction evaluation — per the Planner's next brief. Candidates carried from Loop 4: render the INBOX Done section by the retention window (T-144), DECISIONS.md dual role (G-005), Cursor start/end copies onto ob_start/ob_state (G-001), a CLI door for ob_state (G-006). Loop 4 shipped as v0.31.0 on draft PR #5; merging PR #3/#5 is Aaron's release decision.
+<!-- generated from .agents/state.json rev 3 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+> **Status:** v0.31.0 — Loop 6 of the extraction evaluation — repair the shadow-recall instrument before re-asking the ranking questions. C1 has two halves that are one job: lifecycle-state snapshot as of the replayed session, and a candidate pool restricted to entries that existed then. Plus the op-vocabulary ADR (project.version removal leading), with the usage signal displaced to Loop 7. Brief at ~/.agents/mailbox/channels/sia/loop-6-brief.md.
 
 ## What's working
 
@@ -16,6 +16,10 @@
 - ci-status, state-views and merge-markers sync checks pass / warn / skip with the reason, and ci-status + merge-markers print their number whatever the severity (REPORTED block in sync CLI and ob_sync) _(V-008, 2 evidence)_
 - open-brain state import: --draft writes a schema-valid draft + report and nothing else; --commit snapshots .agents/ byte-complete before any change, writes state.json at revision 0, cuts SUMMARY's blockquote and Current State leaving the prose sections byte-identical, renders the four views, moves the draft into the snapshot, and refuses a second run _(V-009, 2 evidence)_
 - /end writes state through ob_state when state.json exists (A7b), and the first real write on this repo went through the MCP tool at revision 0 _(V-010, 2 evidence)_
+- The rendered Done list and the state record agree on which done tasks exist, at the same session, including on /sync's render-only path _(V-011, 1 evidence)_
+- state.json can be read without the MCP server, through a door that writes nothing _(V-012, 1 evidence)_
+- A session that resolves no recalled ids reports why, instead of being indistinguishable from a session with nothing to rate _(V-013, 1 evidence)_
+- The interim ranking cut was tested rather than applied, and refused on evidence; LIFECYCLE_CONFIG is unchanged _(V-014, 1 evidence)_
 
 ## What's broken
 
@@ -24,9 +28,11 @@
 - Gap G-003: SESSION_TEMPLATE.md pre-session checklist still says to read SUMMARY/INBOX by hand
 - Gap G-004: vault-index-parity warns on one unindexed Checkpoints note
 - Gap G-005: DECISIONS.md is both the prose ADR log and the decisions[] index
-- Gap G-006: No CLI door for ob_state (only the MCP tool)
 - Gap G-007: `open-brain state import --commit` is denied by the auto-mode permission classifier inside an agent session ("Irreversible Local Destruction"); the one-shot migration must be run by the human
 - Gap G-008: ob_start's prose baseline (24,888 words) vs the rev-0 render (7,360 words) was measured on a temp copy, not the live repo, because handleStart creates a session log per call
+- Gap G-009: R4 is Claude-only: project-template/.cursor/commands/start.md still instructs writing .recalled-entries.json, so for a Cursor user the file still accumulates across sessions
+- Gap G-010: The state record can hold fields that nothing can subsequently change: project.version has no op at all, gaps have add and close but no update, decisions have add only
+- Gap G-011: The shadow-recall harness cannot currently answer any question about the maturity constants, in backfill OR in production
 
 ## What's next
 
@@ -38,11 +44,11 @@
 
 ## Decisions
 
+- 2026-09-15 — Delete the text that generates a false claim, not just the claim — Knowledge entry 556 asserted that ob_recalled compares the file's session_id. It was written from end.md A14, which described the fallback as if it were the mechanism. Rating 556 harmful and superseding it with 558 removes the entry but leaves the generator standing to mint it again. Loop 5 R4 corrects A14 itself. Deterministic and structural prevention before prompt-level correction.
+- 2026-09-15 — Retire .recalled-entries.json rather than harden it — recall_log already records every ob_recall hit against the live session uuid, and has won precedence whenever the session is known since 2026-08-11. The file was a redundant per-project copy that accumulated other sessions' ids without bound (33 entries here: 11 real, 22 from eight earlier sessions, all wearing the running session's id). It never corrupted a rating; its cost was diagnostic. /start no longer writes it; the read path stays for the pre-ob_set_session case, which R3 makes loud. Per-entry provenance explicitly NOT built.
+- 2026-09-15 — Refuse the interim ranking cut on evidence, and refuse the opposing result too — no_maturity loses to live, so the brief's precondition for setting matureBoost/provenBoost to 1.0 is not met. maturity_strong wins by +0.0239 and is ALSO refused: helpful ratings promote maturity, so a replay ranked by today's maturity is scored on promotions its own labels caused. A result that favours the hypothesis is not evidence when its mechanism is circular. A negative result is the deliverable; LIFECYCLE_CONFIG unchanged.
 - 2026-09-14 — Project state is a tracked record with one creator and one writer; the rest of .agents/ is local — state.json created once by `state import --commit` (human-run after a reviewed draft), written only through ob_state; git tracks state.json + the four views; views never edited by hand; /sync re-renders instead of inserting prose
 - 2026-09-14 — Project state is a record; the prose files are generated views; loops ship on branches behind a bare-runner gate — imported; original date unknown
-- 2026-09-14 — Per-session MCP servers require per-writer schema stamps — imported; original date unknown
-- 2026-09-14 — A structural fix ships with its own instrumentation, in the same release — imported; original date unknown
-- 2026-09-14 — Rejection must be representable — the ledger pattern — imported; original date unknown
 <!-- state:end -->
 ## Architecture Overview
 

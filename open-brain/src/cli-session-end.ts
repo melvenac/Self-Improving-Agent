@@ -13,7 +13,7 @@ import { join } from "path";
 import { homedir } from "os";
 import { openV2Database } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
-import { resolveRecalledIds } from "./pipelines/session-end/recalled-ids.js";
+import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/session-end/recalled-ids.js";
 import { obsidianVaultDir } from "./shared/paths.js";
 import { resolveHookProjectDir } from "./shared/repo-root.js";
 
@@ -53,9 +53,10 @@ try {
       readFile: (p) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
     });
     const recalledIds = resolved.ids;
-    if (resolved.rejected) {
-      console.log(`[session-end] Ignored ${resolved.rejected.path}: ${resolved.rejected.reason}`);
-    }
+    // Loop 5 R3: this hook runs unattended, so it was the worst place for a
+    // silent no-rating. It previously spoke only when a file was refused; a
+    // session with no id and no file said nothing at all and rated nothing.
+    for (const line of formatRecalledResolution(resolved, "")) console.log(`[session-end] ${line}`);
     const result = sessionEndV2({
       db,
       vaultDir: V2_VAULT,
