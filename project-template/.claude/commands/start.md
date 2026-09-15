@@ -94,6 +94,7 @@ Session N — {date}   ← N from ob_start's session block
 Project: {name} {version}
 State: {2 sentences}
 Drift: {relay ob_start's drift lines verbatim, or "none"}
+Revision: {rev from ob_start's "## State (state.json rev N)" line, or "none"}
 Proposed: {top incomplete task from INBOX}
 
 Knowledge:

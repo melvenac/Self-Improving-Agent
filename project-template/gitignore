@@ -1,0 +1,30 @@
+# Copy this file to your project root as `.gitignore` (bootstrap does it).
+# It ships without the leading dot so that it does not act as a nested
+# .gitignore inside the framework repo, where the template's own .agents/
+# files must stay tracked.
+
+node_modules/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+
+# .agents/ is ignored EXCEPT the five state files: state.json is the record;
+# INBOX.md, task.md, next-session.md and SUMMARY.md are its rendered views.
+# Session logs, archive/, PRD, docs etc. stay local (git is not their history).
+/.agents/*
+!/.agents/state.json
+!/.agents/TASKS/
+/.agents/TASKS/*
+!/.agents/TASKS/INBOX.md
+!/.agents/TASKS/task.md
+!/.agents/SESSIONS/
+/.agents/SESSIONS/*
+!/.agents/SESSIONS/next-session.md
+!/.agents/SYSTEM/
+/.agents/SYSTEM/*
+!/.agents/SYSTEM/SUMMARY.md
+
+# Runtime artifacts (session-local / regenerated)
+/.recalled-entries.json

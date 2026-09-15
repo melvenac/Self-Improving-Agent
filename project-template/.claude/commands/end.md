@@ -35,6 +35,7 @@ Fill in:
 - Check off the post-session checklist items as you complete them
 
 ### A2. Update SUMMARY.md
+> **Gate:** if `.agents/state.json` exists, SKIP this step — A7b writes the state through `ob_state`, which regenerates SUMMARY.md's marked region. Do not edit SUMMARY.md by hand in that case.
 ```
 If META/ exists:  Update: .agents/META/SUMMARY.md
 Otherwise:        Update: .agents/SYSTEM/SUMMARY.md
@@ -62,6 +63,7 @@ Update: .agents/SYSTEM/ENTITIES.md
 _(Not applicable in meta mode — framework has no data model.)_
 
 ### A5. Update INBOX.md
+> **Gate:** if `.agents/state.json` exists, SKIP this step — INBOX.md is generated from state; A7b writes the task ops. Do not edit INBOX.md by hand in that case.
 ```
 If META/ exists:  Update: .agents/META/INBOX.md
 Otherwise:        Update: .agents/TASKS/INBOX.md
@@ -71,6 +73,7 @@ Otherwise:        Update: .agents/TASKS/INBOX.md
 - Re-prioritize if needed
 
 ### A6. Update task.md
+> **Gate:** if `.agents/state.json` exists, SKIP this step — task.md is generated from state; A7b writes `set_objective` if the objective changed. Do not edit task.md by hand in that case.
 ```
 Update: .agents/TASKS/task.md
 ```
@@ -79,6 +82,7 @@ Update: .agents/TASKS/task.md
 - Clear stale tasks that no longer apply
 
 ### A7. Write next-session handoff
+> **Gate:** if `.agents/state.json` exists, SKIP this step — next-session.md is generated from state; A7b writes `set_handoff`. Do not edit next-session.md by hand in that case.
 ```
 Write: .agents/SESSIONS/next-session.md
 ```
@@ -91,6 +95,33 @@ A short scratchpad for the next `/start` to read. Include:
 - **Open questions:** anything unresolved that the user's input
 
 This file is overwritten each session — it's a relay baton, not a log.
+
+### A7b. Write the state through `ob_state` (ONLY when `.agents/state.json` exists)
+
+This one step replaces A2, A5, A6 and A7. The project's state is a record; the four prose files (SUMMARY.md's marked region, INBOX.md, task.md, next-session.md) are views rendered from it. **Never edit those four files by hand when state.json exists** — a hand edit is overwritten by the next render and is not state.
+
+Compose the session's ops from what happened (A1 and A3 are your notes), then call once:
+
+```
+ob_state(session: N, expected_revision: R, ops: [...], render: true)
+```
+
+- `N` = this session's number; `R` = the `Revision:` line from this session's `/start` greeting.
+- Ops, in this order, only the ones that apply:
+  - `close_task {id, note?}` — finished items
+  - `open_task {title, priority, note?, supersedes?}` — new work discovered
+  - `update_task {id, status?, priority?, title?, note?}` — status/priority changes on open items
+  - `reopen_task {id, note}` — a done item that regressed
+  - `add_verified {claim, evidence: [{type, path, observation}]}` — behaviours proven this session, with the test/tag/file that proves each
+  - `add_gap {what, evidence, recommended_update}` / `close_gap {id}`
+  - `add_decision {title, date, note}` — one per ADR appended in A3
+  - `set_objective {text}` — only if the objective changed (`null` clears it)
+  - `set_handoff {pick_up, watch_out[], open_questions[]}` — the relay baton (A7's content)
+  - `end_session {n, date, uuid}` — always last
+- On `revision mismatch`: call `ob_start` once to read the current revision, then retry the same batch once with that revision. Do not retry a third time; report the refusal in the session log.
+- The tool validates every op and refuses the whole batch on any error; nothing is written until all ops apply.
+
+When `.agents/state.json` is absent, this step does not run and A2/A5/A6/A7 run as written.
 
 ### A8. Run Validation (if configured)
 ```
