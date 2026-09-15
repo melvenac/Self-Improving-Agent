@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 5 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 7 by open-brain v0.31.0 — do not edit; change state via ob_state -->
 > **Status:** v0.31.0 — Loop 6 of the extraction evaluation — repair the shadow-recall instrument before re-asking the ranking questions. C1 has two halves that are one job: lifecycle-state snapshot as of the replayed session, and a candidate pool restricted to entries that existed then. Plus the op-vocabulary ADR (project.version removal leading), with the usage signal displaced to Loop 7. Brief at ~/.agents/mailbox/channels/sia/loop-6-brief.md.
 
 ## What's working
@@ -20,6 +20,9 @@
 - state.json can be read without the MCP server, through a door that writes nothing _(V-012, 1 evidence)_
 - A session that resolves no recalled ids reports why, instead of being indistinguishable from a session with nothing to rate _(V-013, 1 evidence)_
 - The interim ranking cut was tested rather than applied, and refused on evidence; LIFECYCLE_CONFIG is unchanged _(V-014, 1 evidence)_
+- The shadow replay is evaluated as of the session it replays: lifecycle state is snapshotted pre-feedback, the candidate pool excludes entries created after the session, and the recency clock is anchored to the session's earliest recall. Production ranking is byte-identical. _(V-015, 3 evidence)_
+- Stage 6 no longer ranks against maturity values Stage 2 wrote in the same session; the snapshot is captured over recalledEntryIds before the auto-feedback loop runs, and the stage order is preserved rather than reversed. _(V-016, 2 evidence)_
+- update_gap amends a gap in place, preserving its id and opened_session, and refuses both an unknown id and an amendment that changes nothing. _(V-017, 1 evidence)_
 
 ## What's broken
 
@@ -35,6 +38,7 @@
 - Gap G-011: The shadow-recall harness cannot currently answer any question about the maturity constants, in backfill OR in production
 - Gap G-012: project.version is a cached copy of package.json's version, and three checks plus a drift branch exist only to police the cache. ADR-027 decided removal; the work is not done.
 - Gap G-013: feedback_log holds only 31% of the non-neutral ratings the live counters know about (154 of 496), so any replay reconstructing maturity from it systematically under-promotes and cannot answer questions about maturity boosts.
+- Gap G-014: success_rate excludes neutral ratings from its denominator and harmful is structurally near-unreachable, so success_rate is 1.00 for any entry ever rated helpful once. Maturity promotion therefore tracks recall volume rather than usefulness, and promotion grants a ranking boost that causes more recall.
 
 ## What's next
 
@@ -46,6 +50,15 @@
 
 ## Decisions
 
+- 2026-09-15 — No ranking constant changes on one measured alternative beating one incumbent — Loop 6's repaired instrument made the recency question answerable and recency_strong (0.02/day) was the only strategy to beat live — 21-11-5, +0.0153 nDCG, winning against a presentation bias that favours the incumbent. The constant was still NOT changed.
+
+Reasoning: recency_strong tests ONE alternative point against ONE incumbent. That 0.02 beats 0.005 is evidence the constant is too low. It is not evidence that 0.02 is right — nothing between or beyond was measured, and the optimum could be anywhere above 0.005. Adopting the one other number that happened to be guessed in the strategy list is the 'flipped because the new number is bigger' outcome the loop's own precondition rules out, and it rules it out whether or not the bigger number won.
+
+shadow/index.ts states the same contract independently: changing production constants stays a human decision; the harness only supplies the evidence. The evidence is now worth supplying, which it was not before this loop.
+
+Recommended next measurement: a sweep — 0.01 / 0.02 / 0.04 as separate strategies — to find where the gain turns over. Adoption is Aaron's call.
+
+What the same run did NOT license: no_maturity ties live, and that must not be read as 'maturity boosts are harmless'. See G-013 (feedback_log 31% complete) and G-014 (success_rate ignores neutral).
 - 2026-09-15 — Amendment vocabulary: which state records can be corrected, and which are append-only — Decided once rather than one op per incident. The op union grew by accident — update_task exists because someone needed it, update_gap did not because nobody had yet — and Loop 5 hit the consequence twice in one night.
 
 RULE: a record is amendable when its text DESCRIBES SOMETHING STILL BEING LEARNED. A record is append-only when its text IS THE HISTORICAL FACT, so that editing it destroys the thing the record exists to preserve.
@@ -62,7 +75,6 @@ ID SCHEME, observed while filing this: the Planner's brief assumed the next ADR 
 - 2026-09-15 — Delete the text that generates a false claim, not just the claim — Knowledge entry 556 asserted that ob_recalled compares the file's session_id. It was written from end.md A14, which described the fallback as if it were the mechanism. Rating 556 harmful and superseding it with 558 removes the entry but leaves the generator standing to mint it again. Loop 5 R4 corrects A14 itself. Deterministic and structural prevention before prompt-level correction.
 - 2026-09-15 — Retire .recalled-entries.json rather than harden it — recall_log already records every ob_recall hit against the live session uuid, and has won precedence whenever the session is known since 2026-08-11. The file was a redundant per-project copy that accumulated other sessions' ids without bound (33 entries here: 11 real, 22 from eight earlier sessions, all wearing the running session's id). It never corrupted a rating; its cost was diagnostic. /start no longer writes it; the read path stays for the pre-ob_set_session case, which R3 makes loud. Per-entry provenance explicitly NOT built.
 - 2026-09-15 — Refuse the interim ranking cut on evidence, and refuse the opposing result too — no_maturity loses to live, so the brief's precondition for setting matureBoost/provenBoost to 1.0 is not met. maturity_strong wins by +0.0239 and is ALSO refused: helpful ratings promote maturity, so a replay ranked by today's maturity is scored on promotions its own labels caused. A result that favours the hypothesis is not evidence when its mechanism is circular. A negative result is the deliverable; LIFECYCLE_CONFIG unchanged.
-- 2026-09-14 — Project state is a tracked record with one creator and one writer; the rest of .agents/ is local — state.json created once by `state import --commit` (human-run after a reviewed draft), written only through ob_state; git tracks state.json + the four views; views never edited by hand; /sync re-renders instead of inserting prose
 <!-- state:end -->
 ## Architecture Overview
 

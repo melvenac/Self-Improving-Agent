@@ -1,26 +1,27 @@
-<!-- generated from .agents/state.json rev 5 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 7 by open-brain v0.31.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
 ## Pick up here _(written session 57)_
 
-Loop 6 is IN PROGRESS in session 57 on branch loop/6-instrument, based on master@29e82b4 (PR #6 merged, CI green — base question resolved, do not re-check it). Read ~/.agents/mailbox/channels/sia/loop-6-brief.md first. C1's production half is DECIDED and verified, implement it rather than re-deriving: capture (id -> maturity, success_rate) for the ids Stage 2 is about to rate, before the feedback loop runs, and have Stage 6 rank with those values substituted. Cheapest correct shape: leave recallRankExpr untouched (it takes an alias) and change only runStrategyQuery's FROM to join a subquery COALESCEing the overrides over knowledge_index.
+Loop 6 is COMPLETE and accepted. Draft PR #7 is open (https://github.com/melvenac/Self-Improving-Agent/pull/7) at 1f68315 with CI green; merging is Aaron's and the branch prunes itself on merge. Do NOT re-do Loop 6 work. Loop 7 is Aaron's to start with a fresh brief — read ~/.agents/mailbox/channels/sia/ for it before assuming scope. The displaced Loop 7 subject is the usage signal: whether recalled knowledge changes what an agent does.
 
 ## Watch out
 
-- Bare `npx vitest` from the repo root loads no config — open-brain/vitest.config.ts:8 carries setupFiles: ["tests/setup-env.ts"], so OPEN_BRAIN_VAULT_DIR stays unset and 36 tests fail as guards refusing to touch the real vault. Use `npm test` from the repo root (package.json:7 delegates via `npm --prefix open-brain test`), or vitest from open-brain/. The earlier 'never the repo root' wording was too broad and is corrected here.
-- Reordering Stage 6 before Stage 2 does NOT work and is ruled out, not merely disfavoured: evaluate.ts:198 returns skipped: "no helpful ratings to score against" when labelCounts.helpful === 0, so running the shadow stage first would skip every session forever. The order is the dependency, not an accident.
-- Promotion is gated on success_rate AND helpful count (lifecycle.ts:92-97), so any replay snapshot must carry both forward, in order. A maturity-only snapshot still lets the replay see a success_rate its own labels moved.
-- A local git ref can look authoritative and silently disagree with origin — local master sat at 8aa2f2b (PR #5) while origin/master was 29e82b4 until a fetch. Fetch before reading any SHA off this working copy.
-- state.json's project.version cannot be bumped through any op, so a version bump makes sync report two issues clearable only by hand-editing the record. Do not hand-edit it. Removal leads; set_version is the hardening fallback.
-- A stored knowledge claim is not verification. Read the consuming code before designing a fix for it — in force for every brief.
+- START WITH G-014, not with new instrumentation. The usage signal is already half-built: success_rate excludes neutral (lifecycle.ts:70-73) and harmful is near-unreachable, so `neutral` IS the recall-without-application signal and it is already recorded on every rating. Entry 192 reads 10 helpful / 51 neutral / success_rate 1.00 / mature. Read the neutral counts before building anything new.
+- The maturity questions stay unanswerable on historical data and no maturity constant should move on Loop 6's numbers. feedback_log holds 154 of 496 non-neutral ratings (G-013), so the replay under-promotes and no_maturity's tie with live is measured on an instrument biased toward exactly that result.
+- A replay harness must parameterise EVERY present-tense input — corpus membership, mutable signal values, and the clock. Loop 6 found three in one subsystem. The clock hid longest because nothing about the string 'now' looks like state. Check for a fourth before trusting any new replay number.
+- COALESCE is wrong for a nullable override: a snapshotted success_rate of NULL means 'unrated then' and ranks differently from every number, so substitution must test PRESENCE (CASE WHEN ov.id IS NOT NULL). This was the one instruction last loop that would have shipped a correctness defect rather than a doc error.
+- Bare `npx vitest` from the repo root loads no config — open-brain/vitest.config.ts:8 carries setupFiles — so OPEN_BRAIN_VAULT_DIR stays unset and 36 tests fail on a vault guard. Use `npm test` from the repo root (package.json:7 delegates), or vitest from open-brain/.
+- Fetch before reading any SHA off this working copy. Local master sat at 8aa2f2b (PR #5) while origin/master was 29e82b4 through most of session 57.
+- Two loops have now shipped untagged at 0.31.0. Deliberate both times, but it compounds — G-012 should settle it before a third.
 
 ## Open questions
 
-- Should project.version exist in state.json at all? Removal leads; no consumer treats it as authoritative (cli.ts:427, state-render.ts:14, drift-detector.ts:9, checks-state.ts:73, checks.ts:783, state-writer.ts:166 all display or police it, none read it as truth).
-- R1: which record types may be amended after creation and which are append-only by design? Decide once as an ADR rather than one op per incident (update_gap, update_decision, project.version).
-- T-003 is SCHEDULED to Loop 7 with the usage signal — the Planner ruled on it in session 57. Root cause is known: active-session.json is keyed <project_dir>::<ide>, so two sessions in one repo share a slot, which is the normal Harness-of-Harness configuration (Planner + Developer in one repo every loop). Do not start it before Loop 7's brief.
+- Loop 7's actual scope is Aaron's to set. The candidates in priority order are G-014 (the usage signal, already instrumented), G-012 (project.version removal, 7 call sites — decided in ADR-027, unblocks tagging), T-003 (session identity per project not per session, scheduled here by the Planner), and G-013 (accept historical maturity is unanswerable, or instrument recall_log going forward).
+- Should recencyDecayPerDay move, and to what? ADR-028 refused 0.02 on one-point evidence and recommends a sweep at 0.01 / 0.02 / 0.04. Aaron's call, and it needs the sweep run first.
+- Should maturity ever be demoted? evaluateLifecycle advances and never walks back, so an entry promoted while its rate was high stays promoted after it collapses. Pinned as production behaviour in tests this loop, not endorsed.
 
 ## Last session
 
-Session 56 — 2026-09-15 — `b10b59e8-90f1-4874-b92e-0f4738e8904e`
+Session 57 — 2026-09-15 — `10613af5-f076-4e79-8c5e-75fb7789619c`
