@@ -65,7 +65,7 @@ Then read these residual files (skip any that don't exist):
 
 Always pass `trigger` as shown — it records that these recalls are session-start injection. Deliberate mid-task recalls pass `trigger: "explicit"`; an omitted trigger is recorded as "unspecified" (a countable labeling gap, never assumed to be a deliberate fetch).
 
-> **Do not write `.recalled-entries.json`.** The step that did was removed in v0.32.0.
+> **Do not write `.recalled-entries.json`.** The step that did was removed in the Loop 5 release.
 > `ob_recall` already records every hit in `recall_log` against the live session
 > uuid, which is what `/end` rates from — the file was a redundant second copy,
 > per-project rather than per-session, and merging into it each start made it

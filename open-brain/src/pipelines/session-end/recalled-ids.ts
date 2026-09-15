@@ -28,7 +28,7 @@ import { getSessionRecalledIds } from "../../db-v2.js";
  *   4. nothing — and `reason` says which guard rejected it
  *
  * LOOP 5 R4 — nothing writes the file any more. `/start` step 4 was removed in
- * v0.32.0: `recall_log` already holds every hit against the live session uuid,
+ * the Loop 5 release: `recall_log` already holds every hit against the live session uuid,
  * so the file was a redundant second copy, keyed per PROJECT rather than per
  * session, and each start merged into it — so it accumulated other sessions'
  * ids without bound. On 2026-09-14 a 33-entry file held 11 entries the session
