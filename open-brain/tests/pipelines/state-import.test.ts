@@ -119,11 +119,15 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     expect(s.tasks[0].note).toContain("NEW (Session 54)");
 
     // Decisions, handoff, objective, seeds, last_session.
-    expect(s.decisions).toHaveLength(25);
-    expect(s.decisions[0]).toEqual({ id: "ADR-001", title: "Obsidian Vault as primary knowledge store", date: TODAY, note: "imported; original date partial: 2026-03" });
-    expect(s.decisions.find((d) => d.id === "ADR-004")).toEqual({ id: "ADR-004", title: "Extract A2A Hub to standalone project", date: "2026-03-22", note: "" });
-    expect(s.decisions.find((d) => d.id === "ADR-025")!.note).toBe("imported; original date unknown");
+    // Synthetic DECISIONS.md: partial date, full date, no date, one unnumbered heading, one trailing undated.
+    expect(s.decisions.map((d) => d.id)).toEqual(["ADR-001", "ADR-002", "ADR-003", "ADR-004"]);
+    expect(s.decisions[0]).toEqual({ id: "ADR-001", title: "A partial date is kept in the note, not the date field", date: TODAY, note: "imported; original date partial: 2026-03" });
+    expect(s.decisions[1]).toEqual({ id: "ADR-002", title: "A full date is kept as written", date: "2026-03-22", note: "" });
+    expect(s.decisions[2].note).toBe("imported; original date unknown");
+    expect(s.decisions[3].note).toBe("imported; original date unknown");
+    expect(r.draft.report.decisions).toMatchObject({ imported: 4, date_from_line: 1, date_unknown: 2, date_partial: [{ id: "ADR-001", original: "2026-03" }] });
     expect(r.draft.report.decisions.skipped).toHaveLength(1);
+    expect(r.draft.report.decisions.skipped[0].heading).toContain("### ADR: An unnumbered heading");
     expect(s.objective!.text.startsWith("**Loop 4 of the extraction evaluation")).toBe(true);
     expect(s.objective!.since_session).toBe(54);
     expect(s.handoff.session).toBe(54);
@@ -132,7 +136,7 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     expect(s.handoff.pick_up).toMatch(/^Loop 4 per /);
     expect(s.verified.map((v) => v.id)).toEqual(["V-001", "V-002", "V-003", "V-004", "V-005"]);
     expect(s.gaps.map((g) => g.id)).toEqual(["G-001", "G-002", "G-003", "G-004", "G-005", "G-006"]);
-    expect(s.last_session).toEqual({ n: 54, date: TODAY, uuid: "f7a1b3d9-ef6d-482f-aba1-ddaa296f722b" });
+    expect(s.last_session).toEqual({ n: 54, date: TODAY, uuid: "00000000-0000-4000-8000-000000000054" });
 
     const report = readFileSync(join(root, REPORT_REL), "utf-8");
     expect(report).toContain("| **all** | 42 | 3 | 0 | 98 | 143 |");
