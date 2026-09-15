@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 8 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 9 by open-brain v0.31.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -63,4 +63,3 @@ Legend: `[ ]` open · `[~]` in_progress · `[!]` blocked
 ## Done (last 3 sessions)
 
 - [x] **T-144** Render the INBOX Done section by the retention window only (session 56) — Loop 5 R1. isDroppedByRetention now serves both the INBOX view and applyRetention; ViewOptions gains the session the writer already uses. Three tests verified to fail against pre-fix code, including the cutoff edge.
-- [x] **T-001** Loop 4 (session 55) — Shipped as v0.31.0 (loop/4-dogfood 644465e, tag v0.31.0, draft PR #5, CI run 34921172116 success). Repairs R1–R7 in d49578a; importer, /end via ob_state, tracking policy, template seed in b492fd8; QA amendment (synthetic fixtures) in 644465e. This repo migrated: state.json rev 0 from 143 INBOX items, SUMMARY −181 lines, snapshot .agents/archive/pre-state-migration-2026-09-14/.

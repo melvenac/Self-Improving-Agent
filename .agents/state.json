@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 8,
+  "revision": 9,
   "project": {
     "name": "self-improving-agent",
     "version": "0.31.0"
@@ -10,16 +10,6 @@
     "since_session": 56
   },
   "tasks": [
-    {
-      "id": "T-001",
-      "title": "Loop 4",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 54,
-      "closed_session": 55,
-      "supersedes": null,
-      "note": "Shipped as v0.31.0 (loop/4-dogfood 644465e, tag v0.31.0, draft PR #5, CI run 34921172116 success). Repairs R1–R7 in d49578a; importer, /end via ob_state, tracking policy, template seed in b492fd8; QA amendment (synthetic fixtures) in 644465e. This repo migrated: state.json rev 0 from 143 INBOX items, SUMMARY −181 lines, snapshot .agents/archive/pre-state-migration-2026-09-14/."
-    },
     {
       "id": "T-003",
       "title": "Session identity is keyed per project, not per session",
@@ -855,6 +845,20 @@
       "evidence": "lifecycle.ts:70-73 computes nonNeutral = helpful + harmful and newSuccessRate = helpful / nonNeutral. Observed in session 57's own ratings: entry 192 reads 10 helpful / 51 neutral / success_rate 1.00 / mature (recalled 61 times, used 10); entry 138 reads 52/62 and entry 184 reads 43/59, both 1.00 and mature. All three mature entries injected at this session's /start went unused. Stored as knowledge entry 562.",
       "recommended_update": "Loop 7, and treat it as the already-instrumented version of the usage-signal question: neutral IS the recall-without-application signal and it is already being recorded. Read the neutral counts before building new instrumentation. Do NOT rate unused entries harmful to 'fix' this — not being used is neutral, and collapsing that distinction destroys the only signal that already exists.",
       "opened_session": 57
+    },
+    {
+      "id": "G-015",
+      "what": "One session uuid is written under two different project keys in active-session.json, corrupting project-scoped attribution.",
+      "evidence": "Live slot file: uuid d7e514f8-df2a-483c-a8c7-57f2e0a931b0 appears under BOTH 'c:/users/melve/appdata/roaming/cura/5.10/definition_changes::claude' (started_at 2026-09-08T01:39:45Z) and 'c:/users/melve/.claude/projects/c--users-melve/memory::claude' (started_at 2026-09-09T02:01:03Z). Mechanism established from source, not guessed: cli-bootstrap.ts writes the slot under activeSessionKey(canonicalizeProjectDir(cwd), ide) on every SessionStart invocation, and writeActiveSession (shared/active-session.ts) merges into the file by key - it never removes an existing key holding the same uuid. So a session that starts (or resumes) under a second directory gains a second key pointing at one uuid, and both keys then read back as live. Note the two source comments disagree about whether this can happen: cli-bootstrap.ts says 'this hook runs exactly once per session' while active-session.ts says 'every session start - including a resume - rewrites the slot'. Which trigger produced THIS pair is not recoverable: the SessionStart payload carries a 'source' field distinguishing startup/resume/clear, and the slot records payload key NAMES only, never values - the same drop-your-input defect describeWorkspaceDir was written to fix. This is the INVERSE of T-003: T-003 is two sessions sharing one identity, this is one session claiming two projects. T-003's guards (resolveWriteSession preferring the in-memory id, STALE_SESSION_MS refusing old slots) do not address it, because both keys are fresh and both are genuinely this session's uuid. It matters because every measurement in the Loop 7 C1 reconciliation is attributed by session uuid and scoped by project.",
+      "recommended_update": "Decide whether a uuid may hold more than one project key at all. If not, writeActiveSession should evict any other key carrying the same uuid before inserting. If yes (a session legitimately spanning directories), then project scoping cannot be derived from the slot file and needs its own record. Either way, store the SessionStart 'source' VALUE in the entry so the trigger is readable next time instead of re-derived.",
+      "opened_session": 58
+    },
+    {
+      "id": "G-016",
+      "what": "Intermittent cross-test failure in state-writer.test.ts under the full suite.",
+      "evidence": "Session 58, first full `npm test` run after the Loop 7 R2 gate landed: 'applyStateOps (Loop 3 writer) > update_task changes fields, refuses status done and refuses a done task (V2)' failed with 'expected [] to deeply equal [ { knowledge_id: 1, ...(2) } ]'. It passed in isolation (`npx vitest run tests/shared/state-writer.test.ts`, 30/30) and passed on the next two full runs (901/901 both times). It touches nothing changed in R2 - the failing assertion is about feedback_log rows, which suggests shared database or temp-directory state leaking between test files rather than a defect in the writer. Recorded because an unrecorded flake is rediscovered later by someone with less context, and because this one surfaced during a run whose result was being used to accept a change.",
+      "recommended_update": "Reproduce by running the full suite with a fixed seed / --no-file-parallelism to confirm it is cross-file state leakage, then isolate the shared resource. Low priority; it has not been observed to affect a result.",
+      "opened_session": 58
     }
   ],
   "decisions": [
