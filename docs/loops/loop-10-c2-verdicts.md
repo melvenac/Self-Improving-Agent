@@ -35,7 +35,8 @@ written 2026-09-10. `.skill-proposals-pending.json` 39 entries.
 | E6 | Reflection queue | D | **CUT** |
 | E7 | Invocation logger | B | **KEEP** |
 | E8 | Skill scan + proposals (+P7) | D | **CUT** |
-| E9 | Shadow-recall harness | A | **KEEP** |
+| E9a | Shadow-recall harness | A | **KEEP** |
+| E9b | As-of replay / lifecycle snapshot | C | **SUSPENDED** — same trigger as E3 |
 | E10 | Topics pipeline | B | **KEEP** |
 | E16a | Vault-freshness detection | B | **KEEP** |
 | E16b | The warning's causal claim | — | **CUT** |
@@ -54,8 +55,8 @@ written 2026-09-10. `.skill-proposals-pending.json` 39 entries.
 | B8 | Smart Connections | D | **CUT** |
 | B10 | `.recalled-entries.json` | — | Already gone; no verdict required |
 
-**Tallied from the table rows programmatically, not by eye: 27 rows — A 2, B 11, C 1, D 11,
-n/a 2. Verdicts: 14 KEEP, 9 CUT, 3 SUSPENDED, 1 requiring none.**
+**Tallied from the table rows programmatically, not by eye: 28 rows — A 2, B 11, C 2, D 11,
+n/a 2. Verdicts: 14 KEEP, 9 CUT, 4 SUSPENDED, 1 requiring none.**
 
 **D is non-empty (11) and A/B is non-empty (13).** Both of C1's falsification conditions are
 unmet, so the criterion stands.
@@ -137,6 +138,12 @@ to catch. The Planner caught it. **Developer error 18.**
 genuinely nameable and specific: **a replacement for `success_rate` that discriminates.**
 Text recoverable at `bfee8c0:open-brain/src/lifecycle.ts`.
 
+**Trigger, in full — this clause is load-bearing and must travel with the trigger:**
+restoring apoptosis means restoring maturity-weighted ranking, and **E9b, the as-of replay,
+must be restored in the same change.** Evaluating a restored ranking without it measures the
+new ranking with the evaluating session's own feedback inside it. A revival that omits E9b is
+not a partial revival; it is one that cannot be honestly measured.
+
 **E4b `success_rate` — CUT, false-report clause.** It reports a rate that excludes 72.5% of
 its own inputs and is therefore structurally 1.00. Rule 5: a number is not health until the
 other case is shown reachable. The recording path (E4) is sound and stays; the derived field
@@ -147,6 +154,42 @@ file records restore values while naming **no reviving observation** — the ope
 suspension this loop exists to close. A trigger is nameable: **a ratings distribution in which
 `success_rate` discriminates**, which requires E4b's replacement to exist first. Text
 recoverable at `bfee8c0:open-brain/src/lifecycle.ts`.
+
+**Trigger, in full — this clause is load-bearing and must travel with the trigger:**
+restoring the boosts means restoring maturity-weighted ranking, and **E9b, the as-of replay,
+must be restored in the same change**, or the restored ranking is measured with the
+evaluating session's own feedback inside it.
+
+### E9 re-ruled as a pair — a verdict made after seeing the consequence, dated
+
+**2026-09-15, after the E4b/E3/E18 deletion was attempted and its cascade became
+visible.** Recorded as made now, per C1's falsification clause, rather than presented as
+following from the original ruling.
+
+Executing E4b, E3 and E18 collapses machinery inside E9, which was ruled KEEP. The
+original verdict ruled on the harness's artifact (p=0.035); it said nothing about whether
+the harness's confound-control survives the removal of the confound. That is a ruling, so
+it is made explicitly rather than settled by an implementation choice.
+
+- **E9a — the harness itself. KEEP, category A**, unchanged. The p=0.035 artifact stands.
+- **E9b — the as-of replay: `LifecycleOverride`, `LifecycleSnapshot`,
+  `captureLifecycleSnapshot`, and `shadow/evaluate.ts`'s use of them. SUSPENDED, category
+  C**, on E3 and E18's trigger.
+
+**Why SUSPENDED and not CUT, which is where this nearly landed.** E9b holds exactly two
+columns — `maturity` and `success_rate` — so a replayed session is evaluated against the
+lifecycle state as it stood, rather than against state this session's own feedback moved.
+**E3 and E18 are suspended, not cut: their return is already provided for.** If their
+trigger fires, maturity-weighted ranking comes back — **and the confound comes back with
+it.** A CUT here would delete a revival instruction, and whoever fires that trigger would
+restore maturity ranking and then measure it with the exact contamination Loop 9 built
+this machinery to remove. **E9b's keep is wholly derivative of components whose return is
+anticipated**, so it is suspended on their trigger and nothing else.
+
+**Consequently the trigger text itself is amended, in all three places.** Reviving
+maturity ranking without restoring the as-of replay is not a partial revival; it is a
+revival that cannot be honestly measured. The next agent will read the trigger, not
+reconstruct this argument — which is the evening's own lesson applied forward.
 
 ### SUSPENDED deletes the code too — vocabulary extension, and when it was made
 
