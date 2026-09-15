@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 3 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 5 by open-brain v0.31.0 — do not edit; change state via ob_state -->
 > **Status:** v0.31.0 — Loop 6 of the extraction evaluation — repair the shadow-recall instrument before re-asking the ranking questions. C1 has two halves that are one job: lifecycle-state snapshot as of the replayed session, and a candidate pool restricted to entries that existed then. Plus the op-vocabulary ADR (project.version removal leading), with the usage signal displaced to Loop 7. Brief at ~/.agents/mailbox/channels/sia/loop-6-brief.md.
 
 ## What's working
@@ -33,6 +33,8 @@
 - Gap G-009: R4 is Claude-only: project-template/.cursor/commands/start.md still instructs writing .recalled-entries.json, so for a Cursor user the file still accumulates across sessions
 - Gap G-010: The state record can hold fields that nothing can subsequently change: project.version has no op at all, gaps have add and close but no update, decisions have add only
 - Gap G-011: The shadow-recall harness cannot currently answer any question about the maturity constants, in backfill OR in production
+- Gap G-012: project.version is a cached copy of package.json's version, and three checks plus a drift branch exist only to police the cache. ADR-027 decided removal; the work is not done.
+- Gap G-013: feedback_log holds only 31% of the non-neutral ratings the live counters know about (154 of 496), so any replay reconstructing maturity from it systematically under-promotes and cannot answer questions about maturity boosts.
 
 ## What's next
 
@@ -44,11 +46,23 @@
 
 ## Decisions
 
+- 2026-09-15 — Amendment vocabulary: which state records can be corrected, and which are append-only — Decided once rather than one op per incident. The op union grew by accident — update_task exists because someone needed it, update_gap did not because nobody had yet — and Loop 5 hit the consequence twice in one night.
+
+RULE: a record is amendable when its text DESCRIBES SOMETHING STILL BEING LEARNED. A record is append-only when its text IS THE HISTORICAL FACT, so that editing it destroys the thing the record exists to preserve.
+
+Per type:
+- TASKS — amendable (open/update/close/reopen). Title and priority are current intent, which legitimately changes. Already correct.
+- GAPS — amendable. A gap describes something we do not yet understand, so its text is provisional by construction. The record most needing correction was the one that could not be corrected. IMPLEMENTED this loop: update_gap. The prior workaround (close + re-add) silently minted a new id and reset opened_session, losing the history the gap list exists to keep.
+- VERIFIED — claim append-only; evidence appends; status reopens. The claim is what evidence was gathered against, so editing it invalidates that evidence silently while leaving it attached. Already correct; no update_verified.
+- DECISIONS — append-only. A decision log records what was decided and when; amending it is not a correction but a rewrite of the record. Supersede with a new decision instead. Already correct; no update_decision. Gap: decisions carry no supersedes field (tasks do), so superseding is convention only.
+- OBJECTIVE / HANDOFF / LAST_SESSION — singletons, set wholesale. Already correct.
+- PROJECT.VERSION — REMOVE; do not add set_version. No consumer treats it as authoritative: cli.ts:427 and session-start/state-render.ts:14 display it, state-import/index.ts:439,494 copy it, drift-detector.ts:9 + checks-state.ts:73 + checks.ts:783 compare it to package.json and complain, and state-writer.ts:166 prefers package.json with this only as fallback. It is a cached copy of a truth held elsewhere, with a drift branch and two checks existing solely to police the cache. DEFERRED to Loop 7: 7 call sites plus schema, a state.json migration and test updates is larger than the decision.
+
+ID SCHEME, observed while filing this: the Planner's brief assumed the next ADR id was free, but ADR-021..ADR-026 already exist and nextId has since minted D-001..D-003 alongside them, so the list now carries both schemes. This decision took an explicit ADR-027 to avoid widening the split. The generation bug itself stays filed under G-005 — it is an id question, not an amendment one.
 - 2026-09-15 — Delete the text that generates a false claim, not just the claim — Knowledge entry 556 asserted that ob_recalled compares the file's session_id. It was written from end.md A14, which described the fallback as if it were the mechanism. Rating 556 harmful and superseding it with 558 removes the entry but leaves the generator standing to mint it again. Loop 5 R4 corrects A14 itself. Deterministic and structural prevention before prompt-level correction.
 - 2026-09-15 — Retire .recalled-entries.json rather than harden it — recall_log already records every ob_recall hit against the live session uuid, and has won precedence whenever the session is known since 2026-08-11. The file was a redundant per-project copy that accumulated other sessions' ids without bound (33 entries here: 11 real, 22 from eight earlier sessions, all wearing the running session's id). It never corrupted a rating; its cost was diagnostic. /start no longer writes it; the read path stays for the pre-ob_set_session case, which R3 makes loud. Per-entry provenance explicitly NOT built.
 - 2026-09-15 — Refuse the interim ranking cut on evidence, and refuse the opposing result too — no_maturity loses to live, so the brief's precondition for setting matureBoost/provenBoost to 1.0 is not met. maturity_strong wins by +0.0239 and is ALSO refused: helpful ratings promote maturity, so a replay ranked by today's maturity is scored on promotions its own labels caused. A result that favours the hypothesis is not evidence when its mechanism is circular. A negative result is the deliverable; LIFECYCLE_CONFIG unchanged.
 - 2026-09-14 — Project state is a tracked record with one creator and one writer; the rest of .agents/ is local — state.json created once by `state import --commit` (human-run after a reviewed draft), written only through ob_state; git tracks state.json + the four views; views never edited by hand; /sync re-renders instead of inserting prose
-- 2026-09-14 — Project state is a record; the prose files are generated views; loops ship on branches behind a bare-runner gate — imported; original date unknown
 <!-- state:end -->
 ## Architecture Overview
 

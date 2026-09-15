@@ -12,6 +12,7 @@ import type Database from "better-sqlite3";
 import { appendFileSync, mkdirSync, readFileSync, existsSync } from "fs";
 import { dirname } from "path";
 import { evaluateSession, type SessionEvaluation, type StrategyScore } from "./evaluate.js";
+import type { LifecycleSnapshot } from "../../lifecycle.js";
 import { SHADOW_STRATEGIES } from "./strategies.js";
 
 export interface ShadowLogEntry {
@@ -20,6 +21,14 @@ export interface ShadowLogEntry {
   queries: string[];
   label_counts: Record<string, number>;
   scores: StrategyScore[];
+  /**
+   * Replay provenance. Lines written before Loop 6 carry none of these, and that
+   * absence is the marker for "scored on the circular instrument" — the aggregate
+   * must not silently pool those with repaired ones.
+   */
+  as_of?: string | null;
+  snapshotted?: number;
+  excluded_not_yet_created?: number;
 }
 
 export interface ShadowStageResult {
@@ -130,10 +139,16 @@ export interface ShadowStageInput {
   sessionUuid: string;
   logPath: string;
   limit?: number;
+  /**
+   * Lifecycle values as they stood BEFORE this session's auto-feedback ran.
+   * Without it Stage 6 ranks against maturity Stage 2 has just written, which is
+   * the production confound Loop 6 exists to remove.
+   */
+  snapshot?: LifecycleSnapshot;
 }
 
 export function runShadowStage(input: ShadowStageInput): ShadowStageResult {
-  const { db, sessionUuid, logPath, limit } = input;
+  const { db, sessionUuid, logPath, limit, snapshot } = input;
 
   if (!sessionUuid) {
     return { evaluated: false, skipped: "no session uuid", strategies: 0, queries: 0, leader: null };
@@ -141,7 +156,7 @@ export function runShadowStage(input: ShadowStageInput): ShadowStageResult {
 
   let evaluation: SessionEvaluation;
   try {
-    evaluation = evaluateSession(db, sessionUuid, { limit });
+    evaluation = evaluateSession(db, sessionUuid, { limit, snapshot });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return { evaluated: false, skipped: message, strategies: 0, queries: 0, leader: null };
@@ -164,6 +179,9 @@ export function runShadowStage(input: ShadowStageInput): ShadowStageResult {
       queries: evaluation.queries,
       label_counts: evaluation.labelCounts,
       scores: evaluation.scores,
+      as_of: evaluation.asOf,
+      snapshotted: evaluation.snapshotted,
+      excluded_not_yet_created: evaluation.excludedAsNotYetCreated,
     });
   } catch {
     // Losing one line of history is not worth failing session end over.

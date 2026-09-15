@@ -233,7 +233,32 @@ export function formatApoptosisQueue(rows: ApoptosisCandidate[], limit = 10): st
   return lines;
 }
 
-export function recallRankExpr(alias = "k", overrides: Partial<RankConfig> = {}): string {
+/**
+ * SQL literal for the moment ranking is evaluated *from*.
+ *
+ * Production passes nothing and gets `'now'`, which is correct there: in live
+ * recall "now" genuinely is recall time. A replay must pass the moment being
+ * replayed, or every entry is aged by (today - that moment) and the recency
+ * divisor ratio collapses toward 1.0 — flattening the very signal the recency
+ * strategies exist to measure, and flattening it hardest for the strongest decay.
+ *
+ * Throws rather than falling back to `'now'` on a malformed value. A silent
+ * fallback here would reinstate the defect invisibly for the one caller that
+ * exists to avoid it, and nothing about the string `'now'` looks like state.
+ */
+export function asOfLiteral(asOf?: string | null): string {
+  if (asOf === undefined || asOf === null) return `'now'`;
+  if (!/^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}:\d{2}(\.\d+)?Z?)?$/.test(asOf)) {
+    throw new Error(`asOfLiteral: expected an ISO-8601 timestamp, got ${JSON.stringify(asOf)}`);
+  }
+  return `'${asOf}'`;
+}
+
+export function recallRankExpr(
+  alias = "k",
+  overrides: Partial<RankConfig> = {},
+  asOf?: string | null,
+): string {
   const c: RankConfig = { ...LIFECYCLE_CONFIG, ...overrides };
   const maturity =
     `(CASE ${alias}.maturity ` +
@@ -249,7 +274,7 @@ export function recallRankExpr(alias = "k", overrides: Partial<RankConfig> = {})
   const failure =
     `(CASE WHEN ',' || REPLACE(COALESCE(${alias}.tags, ''), ' ', '') || ',' ` +
     `LIKE '%,failure,%' THEN ${c.failureBoost} ELSE 1.0 END)`;
-  const ageDays = `MAX(0, julianday('now') - julianday(${alias}.created_at))`;
+  const ageDays = `MAX(0, julianday(${asOfLiteral(asOf)}) - julianday(${alias}.created_at))`;
   const recency = `(1.0 + ${ageDays} * ${c.recencyDecayPerDay})`;
 
   // Divide by the recency term: older entries get a larger divisor, pulling the
@@ -257,3 +282,28 @@ export function recallRankExpr(alias = "k", overrides: Partial<RankConfig> = {})
   // original expression did — inverted this and promoted stale knowledge.
   return `(bm25(knowledge_fts) * ${maturity} * ${penalty} * ${failure} / ${recency})`;
 }
+
+/**
+ * An entry's lifecycle state at a past moment — the two columns `recallRankExpr`
+ * reads that this session's own feedback can move.
+ *
+ * `success_rate` is nullable and its NULL is meaningful: it means "no non-neutral
+ * ratings yet", which is a different rank than any number. A consumer substituting
+ * these values must therefore test for the override's PRESENCE, not for a non-NULL
+ * value — COALESCE(override, live) silently falls back to today's number exactly
+ * when the historical answer was "unrated", which is the confound this type exists
+ * to remove.
+ */
+export interface LifecycleOverride {
+  maturity: Maturity;
+  success_rate: number | null;
+}
+
+/**
+ * `knowledge_index.id` → the state that entry held at the replayed moment.
+ *
+ * Absence means "unchanged since then" and the live row is correct. Only ids whose
+ * state actually moved need an entry, which is why the production capture covers
+ * `recalledEntryIds` and nothing wider: those are exactly the ids Stage 2 can touch.
+ */
+export type LifecycleSnapshot = Map<number, LifecycleOverride>;

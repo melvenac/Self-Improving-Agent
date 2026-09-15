@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 3,
+  "revision": 5,
   "project": {
     "name": "self-improving-agent",
     "version": "0.31.0"
@@ -780,6 +780,20 @@
       "evidence": "runShadowStage is Stage 6 and the feedback stage is Stage 2 (pipelines/session-end/index-v2.ts), and feedback promotes maturity — so the live harness scores strategies against maturity its own labels just wrote. Entries ever rated helpful are 23.4% proven/mature vs a 7.1% corpus baseline. The recency rows escape that but are caught by anachronism: post-session-created results run 28.1% to 62.8% across strategies, Spearman rho ~0.71 against the nDCG ordering.",
       "recommended_update": "Loop 6 C1, as one job with two halves: snapshot lifecycle state as of the replayed session (feedback_log.created_at; carry BOTH success_rate and helpful count forward in order, since promotion is gated on both) AND restrict the candidate pool to entries that existed then (knowledge_index.created_at). The recency question sits behind that fix, not beside it.",
       "opened_session": 56
+    },
+    {
+      "id": "G-012",
+      "what": "project.version is a cached copy of package.json's version, and three checks plus a drift branch exist only to police the cache. ADR-027 decided removal; the work is not done.",
+      "evidence": "7 consumers found by grep: cli.ts:427 and session-start/state-render.ts:14 display it; state-import/index.ts:439,494 copy it; drift-detector.ts:9, checks-state.ts:73 and checks.ts:783 compare it to package.json and report; state-writer.ts:166 prefers package.json and falls back to it. None reads it as authoritative. Consequence observed in Loop 5: a version bump could not be made through the writer, and sync reported two issues clearable only by hand-editing state.json.",
+      "recommended_update": "Loop 7: drop project.version from the State schema, migrate existing state.json, delete the two sync checks and the drift branch that only police it, and read package.json directly at the five sites that display or copy it. Do NOT add set_version — that hardens a cache that should not exist.",
+      "opened_session": 57
+    },
+    {
+      "id": "G-013",
+      "what": "feedback_log holds only 31% of the non-neutral ratings the live counters know about (154 of 496), so any replay reconstructing maturity from it systematically under-promotes and cannot answer questions about maturity boosts.",
+      "evidence": "Measured in Loop 6 C2 on knowledge-v2.db: feedback_log earliest row 2026-07-28, earliest knowledge entry 2026-03-17 — the table postdates most of the history. Replayed corpora carry 5-11 non-progenitor entries out of 441-516, against 39 of 552 today. no_maturity consequently ties live (12-10-15) on an instrument biased toward exactly that result. Full working: open-brain/docs/shadow-recall-ranking-2026-09-15.md.",
+      "recommended_update": "Unrecoverable for past sessions — there is no record to reconstruct from, so do not attempt a backfill. Either accept that maturity questions are unanswerable on historical data and re-ask after enough post-2026-07-28 sessions accumulate, or record maturity and success_rate into recall_log at recall time (Loop 7 instrumentation) and answer them going forward only.",
+      "opened_session": 57
     }
   ],
   "decisions": [
@@ -956,23 +970,30 @@
       "title": "Delete the text that generates a false claim, not just the claim",
       "date": "2026-09-15",
       "note": "Knowledge entry 556 asserted that ob_recalled compares the file's session_id. It was written from end.md A14, which described the fallback as if it were the mechanism. Rating 556 harmful and superseding it with 558 removes the entry but leaves the generator standing to mint it again. Loop 5 R4 corrects A14 itself. Deterministic and structural prevention before prompt-level correction."
+    },
+    {
+      "id": "ADR-027",
+      "title": "Amendment vocabulary: which state records can be corrected, and which are append-only",
+      "date": "2026-09-15",
+      "note": "Decided once rather than one op per incident. The op union grew by accident — update_task exists because someone needed it, update_gap did not because nobody had yet — and Loop 5 hit the consequence twice in one night.\n\nRULE: a record is amendable when its text DESCRIBES SOMETHING STILL BEING LEARNED. A record is append-only when its text IS THE HISTORICAL FACT, so that editing it destroys the thing the record exists to preserve.\n\nPer type:\n- TASKS — amendable (open/update/close/reopen). Title and priority are current intent, which legitimately changes. Already correct.\n- GAPS — amendable. A gap describes something we do not yet understand, so its text is provisional by construction. The record most needing correction was the one that could not be corrected. IMPLEMENTED this loop: update_gap. The prior workaround (close + re-add) silently minted a new id and reset opened_session, losing the history the gap list exists to keep.\n- VERIFIED — claim append-only; evidence appends; status reopens. The claim is what evidence was gathered against, so editing it invalidates that evidence silently while leaving it attached. Already correct; no update_verified.\n- DECISIONS — append-only. A decision log records what was decided and when; amending it is not a correction but a rewrite of the record. Supersede with a new decision instead. Already correct; no update_decision. Gap: decisions carry no supersedes field (tasks do), so superseding is convention only.\n- OBJECTIVE / HANDOFF / LAST_SESSION — singletons, set wholesale. Already correct.\n- PROJECT.VERSION — REMOVE; do not add set_version. No consumer treats it as authoritative: cli.ts:427 and session-start/state-render.ts:14 display it, state-import/index.ts:439,494 copy it, drift-detector.ts:9 + checks-state.ts:73 + checks.ts:783 compare it to package.json and complain, and state-writer.ts:166 prefers package.json with this only as fallback. It is a cached copy of a truth held elsewhere, with a drift branch and two checks existing solely to police the cache. DEFERRED to Loop 7: 7 call sites plus schema, a state.json migration and test updates is larger than the decision.\n\nID SCHEME, observed while filing this: the Planner's brief assumed the next ADR id was free, but ADR-021..ADR-026 already exist and nextId has since minted D-001..D-003 alongside them, so the list now carries both schemes. This decision took an explicit ADR-027 to avoid widening the split. The generation bug itself stays filed under G-005 — it is an id question, not an amendment one."
     }
   ],
   "handoff": {
-    "pick_up": "Loop 6, in a FRESH session — one loop per developer session. Read ~/.agents/mailbox/channels/sia/loop-6-brief.md first. Base is master if Aaron merged PR #6, otherwise bf0a5a7 — check, do not assume. Loop 5 is closed and accepted; PR #6 is open as a draft with CI green at bf0a5a7 and the merge is Aaron's call. The Planner asked for a recommendation on C1's production half (Stage 6 scores what Stage 2 just wrote): reorder, snapshot at stage entry, or record pre-feedback maturity — answer with reasoning, since Forge has read that code and the Planner has not.",
+    "pick_up": "Loop 6 is IN PROGRESS in session 57 on branch loop/6-instrument, based on master@29e82b4 (PR #6 merged, CI green — base question resolved, do not re-check it). Read ~/.agents/mailbox/channels/sia/loop-6-brief.md first. C1's production half is DECIDED and verified, implement it rather than re-deriving: capture (id -> maturity, success_rate) for the ids Stage 2 is about to rate, before the feedback loop runs, and have Stage 6 rank with those values substituted. Cheapest correct shape: leave recallRankExpr untouched (it takes an alias) and change only runStrategyQuery's FROM to join a subquery COALESCEing the overrides over knowledge_index.",
     "watch_out": [
-      "Reordering Stage 6 before Stage 2 does NOT work: the shadow stage needs this session's labels, and Stage 2 is what creates them. The fix has to preserve that order while removing the shared cause.",
-      "Promotion is gated on success_rate AND helpful count (lifecycle.ts:92-97), so any replay snapshot must carry both forward, in order.",
-      "Run vitest from open-brain/, never the repo root: the root loads no setup, OPEN_BRAIN_VAULT_DIR is unset, and 36 tests fail as guards refusing to touch the real vault.",
-      "state.json's project.version cannot be bumped through any op, so a version bump makes sync report two issues clearable only by hand-editing the record. Do not hand-edit it. Removal leads; set_version is a hardening fix and three times this session the right answer was delete rather than harden.",
-      "A stored knowledge claim is not verification. Read the consuming code before designing a fix for it — that rule is now in force for every brief."
+      "Bare `npx vitest` from the repo root loads no config — open-brain/vitest.config.ts:8 carries setupFiles: [\"tests/setup-env.ts\"], so OPEN_BRAIN_VAULT_DIR stays unset and 36 tests fail as guards refusing to touch the real vault. Use `npm test` from the repo root (package.json:7 delegates via `npm --prefix open-brain test`), or vitest from open-brain/. The earlier 'never the repo root' wording was too broad and is corrected here.",
+      "Reordering Stage 6 before Stage 2 does NOT work and is ruled out, not merely disfavoured: evaluate.ts:198 returns skipped: \"no helpful ratings to score against\" when labelCounts.helpful === 0, so running the shadow stage first would skip every session forever. The order is the dependency, not an accident.",
+      "Promotion is gated on success_rate AND helpful count (lifecycle.ts:92-97), so any replay snapshot must carry both forward, in order. A maturity-only snapshot still lets the replay see a success_rate its own labels moved.",
+      "A local git ref can look authoritative and silently disagree with origin — local master sat at 8aa2f2b (PR #5) while origin/master was 29e82b4 until a fetch. Fetch before reading any SHA off this working copy.",
+      "state.json's project.version cannot be bumped through any op, so a version bump makes sync report two issues clearable only by hand-editing the record. Do not hand-edit it. Removal leads; set_version is the hardening fallback.",
+      "A stored knowledge claim is not verification. Read the consuming code before designing a fix for it — in force for every brief."
     ],
     "open_questions": [
-      "Should project.version exist in state.json at all? Removal leads; no consumer treats it as authoritative.",
-      "Should the op vocabulary be decided once as an ADR (update_gap, update_decision, and the project.version question) rather than one op per incident?",
-      "T-003 remains the top P0 and is still unscoped — it needs a read of the reconnect path, which may already be addressed the same way the recall-file bug was."
+      "Should project.version exist in state.json at all? Removal leads; no consumer treats it as authoritative (cli.ts:427, state-render.ts:14, drift-detector.ts:9, checks-state.ts:73, checks.ts:783, state-writer.ts:166 all display or police it, none read it as truth).",
+      "R1: which record types may be amended after creation and which are append-only by design? Decide once as an ADR rather than one op per incident (update_gap, update_decision, project.version).",
+      "T-003 is SCHEDULED to Loop 7 with the usage signal — the Planner ruled on it in session 57. Root cause is known: active-session.json is keyed <project_dir>::<ide>, so two sessions in one repo share a slot, which is the normal Harness-of-Harness configuration (Planner + Developer in one repo every loop). Do not start it before Loop 7's brief."
     ],
-    "session": 56
+    "session": 57
   },
   "last_session": {
     "n": 56,

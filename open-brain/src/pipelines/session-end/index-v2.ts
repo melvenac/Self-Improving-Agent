@@ -1,7 +1,13 @@
 import Database from "better-sqlite3";
 import { join } from "path";
 import { writeSummary } from "../../vault-writer.js";
-import { updateFeedbackV2, recordFeedbackEvent, type RatingOrigin, type RatingMethod } from "../../db-v2.js";
+import {
+  updateFeedbackV2,
+  recordFeedbackEvent,
+  captureLifecycleSnapshot,
+  type RatingOrigin,
+  type RatingMethod,
+} from "../../db-v2.js";
 import { flagReflectionClusters } from "./reflection.js";
 import { getSessionSummary } from "./session-summary.js";
 import { logInvocations } from "./invocation-logger.js";
@@ -88,6 +94,16 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   }
 
   // ── Stage 2: Auto-feedback ───────────────────────────────────────────────────
+  // Capture lifecycle state BEFORE any rating is written. Stage 6 scores this
+  // session's ranking against this session's labels, and Stage 2 is what creates
+  // those labels — so without this capture the shadow harness compares strategies
+  // against maturity values its own ground truth has just moved, and an entry
+  // rated helpful here is measured as though it had already been promoted.
+  //
+  // `recalledEntryIds` is the exact and complete set of ids Stage 2 can touch, so
+  // a wider snapshot would cost more and pin nothing extra.
+  const preFeedbackSnapshot = captureLifecycleSnapshot(db, recalledEntryIds);
+
   const ratings: Array<{ id: number; rating: string }> = [];
   const summaryLower = sessionSummary.toLowerCase();
 
@@ -143,7 +159,11 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     : runSkillScanPipeline();
 
   // ── Stage 6: Shadow recall ──────────────────────────────────────────────────
-  // Must run after Stage 2 so this session's own relevance labels already exist.
+  // Must run after Stage 2 so this session's own relevance labels already exist:
+  // evaluate.ts skips a session with no helpful ratings, so running this first
+  // would skip every session forever. The order is the dependency, not an
+  // accident — which is why the confound is removed with a snapshot taken before
+  // Stage 2 rather than by reordering these two stages.
   const shadow =
     dryRun || !input.shadowLogPath
       ? {
@@ -153,7 +173,12 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
           queries: 0,
           leader: null,
         }
-      : runShadowStage({ db, sessionUuid: sessionId, logPath: input.shadowLogPath });
+      : runShadowStage({
+          db,
+          sessionUuid: sessionId,
+          logPath: input.shadowLogPath,
+          snapshot: preFeedbackSnapshot,
+        });
 
   // ── Stage 7: Topics ─────────────────────────────────────────────────────────
   // Runs last, after this session's summary and any new entries exist, so the

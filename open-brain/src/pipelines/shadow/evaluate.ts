@@ -27,9 +27,17 @@
 // decision to Aaron.
 
 import type Database from "better-sqlite3";
-import { recallRankExpr } from "../../lifecycle.js";
+import { recallRankExpr, type LifecycleSnapshot } from "../../lifecycle.js";
 import { sanitizeFtsQuery, broadenFtsQuery } from "../../shared/fts.js";
-import { getSessionQueries, getSessionLabels, type ShadowRating } from "../../db-v2.js";
+import {
+  getSessionQueries,
+  getSessionLabels,
+  getSessionAsOf,
+  replayLifecycleAsOf,
+  countEntriesAfter,
+  type ShadowRating,
+  type ReplayCoverage,
+} from "../../db-v2.js";
 import { SHADOW_STRATEGIES, type ShadowStrategy } from "./strategies.js";
 
 export interface QueryResult {
@@ -62,6 +70,32 @@ export interface SessionEvaluation {
   scores: StrategyScore[];
   /** Set when the session cannot be scored; scores will be empty. */
   skipped?: string;
+  /**
+   * The moment replayed — the session's earliest logged recall. null means the
+   * session logged none, so no cutoff or clock anchor was applied and the run is
+   * NOT a faithful replay. Recorded so a reader can tell the two apart; before
+   * this existed they were the same output.
+   */
+  asOf: string | null;
+  /** Entries whose lifecycle values were substituted for their live ones. */
+  snapshotted: number;
+  /** Entries excluded because they did not exist yet at `asOf`. */
+  excludedAsNotYetCreated: number;
+  /** Only set for a reconstructed replay; absent when production supplied the snapshot. */
+  coverage?: ReplayCoverage;
+}
+
+export interface ReplayContext {
+  /**
+   * Lifecycle values to substitute for the live columns. Absent ids keep the live
+   * row. An empty map means "nothing moved" and the join is skipped entirely.
+   */
+  snapshot?: LifecycleSnapshot;
+  /**
+   * The moment being replayed. Restricts the candidate pool to entries that
+   * existed then, and anchors the recency clock to then rather than to now.
+   */
+  asOf?: string | null;
 }
 
 /**
@@ -76,18 +110,48 @@ export function runStrategyQuery(
   query: string,
   strategy: ShadowStrategy,
   limit: number,
+  replay: ReplayContext = {},
 ): number[] {
+  const asOf = replay.asOf ?? null;
+  const overrides = [...(replay.snapshot ?? new Map()).entries()];
+
+  // Substitute the snapshot by JOINing it, so `recallRankExpr` — which reads
+  // maturity, success_rate, created_at and tags off its alias — is untouched and
+  // the ranking arithmetic under test stays byte-identical to production.
+  //
+  // Presence, not COALESCE: a snapshotted `success_rate` of NULL means "unrated
+  // at that moment", which ranks differently from every number. COALESCE would
+  // fall back to today's value in exactly that case — reinstating the confound
+  // for the entries most likely to have been moved by this session's own labels.
+  const withClause = overrides.length
+    ? `WITH ov(id, maturity, success_rate) AS (VALUES ${overrides.map(() => "(?, ?, ?)").join(", ")})
+`
+    : "";
+  const source = overrides.length
+    ? `(
+      SELECT base.id, base.tags, base.created_at, base.archived_into,
+             CASE WHEN ov.id IS NOT NULL THEN ov.maturity ELSE base.maturity END AS maturity,
+             CASE WHEN ov.id IS NOT NULL THEN ov.success_rate ELSE base.success_rate END AS success_rate
+      FROM knowledge_index base LEFT JOIN ov ON ov.id = base.id
+    )`
+    : "knowledge_index";
+
   const sql = `
-    SELECT k.id, ${recallRankExpr("k", strategy.overrides)} AS weighted_rank
+    ${withClause}SELECT k.id, ${recallRankExpr("k", strategy.overrides, asOf)} AS weighted_rank
     FROM knowledge_fts
-    JOIN knowledge_index k ON k.id = knowledge_fts.rowid
+    JOIN ${source} k ON k.id = knowledge_fts.rowid
     WHERE knowledge_fts MATCH ?
     AND k.archived_into IS NULL
+    ${asOf ? "AND k.created_at <= ?" : ""}
     ORDER BY weighted_rank
     LIMIT ?
   `;
+
+  const head = overrides.flatMap(([id, o]) => [id, o.maturity, o.success_rate]);
   const run = (matchExpr: string) =>
-    db.prepare(sql).all(matchExpr, limit) as Array<{ id: number }>;
+    db
+      .prepare(sql)
+      .all(...head, matchExpr, ...(asOf ? [asOf] : []), limit) as Array<{ id: number }>;
 
   let rows: Array<{ id: number }>;
   try {
@@ -174,6 +238,14 @@ export function scoreStrategy(
 export interface EvaluateOptions {
   limit?: number;
   strategies?: ShadowStrategy[];
+  /**
+   * Lifecycle values captured before this session's feedback ran — the production
+   * path. When omitted the values are reconstructed from `feedback_log`, which is
+   * what a backfill over historical sessions needs.
+   */
+  snapshot?: LifecycleSnapshot;
+  /** Override the replayed moment. Defaults to the session's earliest recall. */
+  asOf?: string | null;
 }
 
 export function evaluateSession(
@@ -190,7 +262,33 @@ export function evaluateSession(
   const labelCounts: Record<ShadowRating, number> = { helpful: 0, harmful: 0, neutral: 0 };
   for (const rating of labels.values()) labelCounts[rating]++;
 
-  const base: SessionEvaluation = { sessionUuid, queries, labelCounts, scores: [] };
+  // Three present-tense inputs have to be pinned to the replayed moment, not to
+  // now: which entries exist, what lifecycle values they hold, and how old they
+  // are. All three derive from this one timestamp.
+  const asOf = options.asOf !== undefined ? options.asOf : getSessionAsOf(db, sessionUuid);
+
+  let snapshot: LifecycleSnapshot;
+  let coverage: ReplayCoverage | undefined;
+  if (options.snapshot) {
+    snapshot = options.snapshot;
+  } else if (asOf) {
+    const replayed = replayLifecycleAsOf(db, asOf);
+    snapshot = replayed.snapshot;
+    coverage = replayed.coverage;
+  } else {
+    snapshot = new Map();
+  }
+
+  const base: SessionEvaluation = {
+    sessionUuid,
+    queries,
+    labelCounts,
+    scores: [],
+    asOf,
+    snapshotted: snapshot.size,
+    excludedAsNotYetCreated: asOf ? countEntriesAfter(db, asOf) : 0,
+    coverage,
+  };
 
   if (queries.length === 0) return { ...base, skipped: "no logged queries" };
   // Without at least one helpful label every strategy scores identically zero,
@@ -200,7 +298,7 @@ export function evaluateSession(
   const scores = strategies.map((strategy) => {
     const results = queries.map((query) => ({
       query,
-      ids: runStrategyQuery(db, query, strategy, limit),
+      ids: runStrategyQuery(db, query, strategy, limit, { snapshot, asOf }),
     }));
     return scoreStrategy(strategy.name, results, labels);
   });

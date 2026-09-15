@@ -1,5 +1,32 @@
 # Changelog
 
+## [Unreleased] - Loop 6
+
+Loop 6 of the extraction evaluation — **repair the instrument, then re-ask it the questions.** The usage-signal work is displaced to Loop 7 deliberately: Loop 5 proved the shadow harness scored every strategy against maturity values the labels being scored had just written, so building a new measurement on it would have repeated that error at larger scale.
+
+Still **0.31.0 and untagged**, for the reason recorded in ADR-027: `state.json`'s `project.version` cannot be bumped through the writer, so a bump makes `/sync` report two issues clearable only by hand-editing the record. Removal is now decided; the work is deferred (G-012).
+
+### Fixed — the replay is evaluated as of the session it replays (C1)
+Three present-tense inputs had leaked into the shadow harness, each standing in for an as-of-then value. All three are fixed together, because two of them pushed **opposite ways** on the same rows and partial cancellation manufactures a plausible-looking middle that reads as a measurement rather than as noise.
+- **Lifecycle state is snapshotted, not read as it is today.** `runShadowStage` runs after the auto-feedback stage by design — `evaluate.ts:198` skips a session with no helpful ratings, so reordering would skip every session forever — so the fix captures `(id → maturity, success_rate)` for exactly `recalledEntryIds` *before* Stage 2 writes, and Stage 6 ranks with those values substituted. `recallRankExpr` is untouched: `runStrategyQuery` joins a subquery that substitutes by **presence**, not `COALESCE`, because a snapshotted `success_rate` of NULL means "unrated then" and `COALESCE` would fall back to today's number in exactly that case. Backfills over historical sessions reconstruct the same map from `feedback_log` through `evaluateLifecycle`, so the promotion rule is not reimplemented.
+- **The candidate pool is cut to entries that existed.** The replay could return entries created after the replayed session, which it could never have recalled and so could never have labelled. 4047 such results were being returned across the 37-session backfill.
+- **The recency clock is anchored to the replayed moment** (`lifecycle.ts`, `asOfLiteral`). `julianday('now')` aged every entry by (today − session), which preserves the age *gap* but collapses the divisor *ratio* that actually ranks — and collapses it hardest for the strongest decay, biasing the instrument toward "recency does nothing". Production passes no override and is byte-identical; `'now'` genuinely is recall time in live recall. A malformed timestamp throws rather than falling back to `'now'`, which would reinstate the defect invisibly.
+
+All three derive from one timestamp: the session's earliest `recall_log` row. A session with no logged recall reports `asOf: null` and is counted as **unanchored** rather than silently scored as if it were faithful.
+
+### Changed — the questions, re-asked (C2)
+`open-brain/docs/shadow-recall-ranking-2026-09-15.md` supersedes the 2026-09-14 report, whose numbers came from the unrepaired instrument and must not be pooled with these. 37 sessions, all anchored.
+- **Recency: answerable, and the answer is that decay is doing real work.** `no_recency`'s "the decay constant is noise" is **refuted** — it loses to `live` 11–22 (mean nDCG −0.0293) and lands level with the `bm25_only` floor. `recency_strong` is the only strategy to beat `live` (21–11–5, +0.0153), and it does so against a presentation bias that favours the incumbent, which is the strong-evidence case.
+- **Maturity: still unanswerable, for a new reason.** The circularity is gone; a sparsity limit the repair exposed replaces it. `feedback_log` holds 154 of the 496 non-neutral ratings the live counters know about, so the replay under-promotes badly — 5–11 non-progenitor entries per replayed corpus of 441–516, against 39 of 552 today. `no_maturity` ties `live` (12–10–**15 ties**) on an instrument now biased toward exactly that conclusion. Recorded as G-013.
+- **No constant changed.** `recency_strong` tests one alternative point against one incumbent: evidence that 0.005/day is too low, not evidence that 0.02 is right. Adopting the one other number that happened to be tried is the "flipped because the new number is bigger" outcome the loop's own precondition rules out. A sweep is the next measurement worth running, and the adoption decision stays Aaron's.
+
+### Added
+- **`update_gap {id, what?, evidence?, recommended_update?}`** (R1) — gaps are amendable by design. The previous workaround, close + re-add, silently minted a new id and reset `opened_session`, losing the history the gap list exists to keep. Refuses an unknown id and an amendment that changes nothing.
+- **Replay provenance in the shadow log and backfill output** — `as_of`, `snapshotted` and `excluded_not_yet_created` per line, and an anchoring / exclusion / `feedback_log`-coverage summary per backfill run. Lines written before Loop 6 carry none of these, which is the marker for "scored on the circular instrument"; the coverage line reports when replayed maturity is a lower bound rather than assuming the log is complete.
+
+### Decided
+- **ADR-027 — the amendment vocabulary, decided once** rather than one op per incident. A record is amendable when its text describes something still being learned; append-only when its text *is* the historical fact, so editing it destroys what the record exists to preserve. Tasks and gaps amendable; verified claims append-only with evidence appending; decisions append-only, superseded rather than edited; `project.version` removed rather than hardened with a `set_version` op — no consumer treats it as authoritative across the 7 call sites.
+
 ## [Unreleased] - Loop 5
 
 Loop 5 of the extraction evaluation — the interim ranking cut is **refused on evidence**, and four repairs land.

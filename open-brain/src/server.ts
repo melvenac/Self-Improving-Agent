@@ -495,7 +495,7 @@ server.tool(
 
 server.tool(
   "ob_state",
-  "Write .agents/state.json through typed operations (open_task, update_task, close_task, reopen_task, add_verified, reopen_verified, add_gap, close_gap, add_decision, set_objective, set_handoff, end_session). Atomic: all ops apply or none. Requires the file to exist and expected_revision to match; bumps revision, applies done-task retention, and regenerates INBOX.md, task.md, next-session.md and the marked region of SUMMARY.md. An empty ops array with render: true re-renders the views without touching state.json or its revision.",
+  "Write .agents/state.json through typed operations (open_task, update_task, close_task, reopen_task, add_verified, reopen_verified, add_gap, update_gap, close_gap, add_decision, set_objective, set_handoff, end_session). Atomic: all ops apply or none. Requires the file to exist and expected_revision to match; bumps revision, applies done-task retention, and regenerates INBOX.md, task.md, next-session.md and the marked region of SUMMARY.md. An empty ops array with render: true re-renders the views without touching state.json or its revision.",
   {
     project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
     session: z.number().int().min(0).describe("Current session number — stamped on opened/closed/verified items"),
