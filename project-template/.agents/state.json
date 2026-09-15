@@ -2,8 +2,7 @@
   "schema_version": 1,
   "revision": 0,
   "project": {
-    "name": "{{PROJECT}}",
-    "version": "0.0.0"
+    "name": "{{PROJECT}}"
   },
   "objective": null,
   "tasks": [],

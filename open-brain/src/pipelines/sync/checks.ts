@@ -763,11 +763,14 @@ export function checkRules(projectRoot: string): CheckResult {
  * `.agents/state.json` (Loop 2, read side). Absent is a SKIP with the reason
  * printed, not a pass: the writer (ob_state, Loop 3) never creates the file,
  * so an unmigrated project has none, and a pass would claim a validation
- * that never ran. Present must
- * parse against the strict schema, and its `project.version` must equal
- * package.json — the same single-source rule the README and PRD checks enforce.
+ * that never ran. Present must parse against the strict schema.
+ *
+ * Loop 8 R3 / ADR-027: the `project.version` comparison is gone with the field.
+ * The schema is strict, so a file still carrying it now fails the parse above
+ * and is reported as invalid — which is the check that matters, since there is
+ * no migration runner for this file.
  */
-export function checkStateSchema(version: string, projectRoot: string): CheckResult {
+export function checkStateSchema(_version: string, projectRoot: string): CheckResult {
   const statePath = join(projectRoot, ".agents", "state.json");
   if (!existsSync(statePath)) {
     return {
@@ -779,14 +782,6 @@ export function checkStateSchema(version: string, projectRoot: string): CheckRes
   const parsed = parseState(readFileSync(statePath, "utf-8"));
   if (!parsed.ok) {
     return { name: "state-schema", severity: "issue", message: `.agents/state.json invalid at ${parsed.error}` };
-  }
-  const fileVersion = parsed.data.project.version;
-  if (fileVersion !== version) {
-    return {
-      name: "state-schema",
-      severity: "issue",
-      message: `.agents/state.json project.version is ${fileVersion} but package.json is ${version}`,
-    };
   }
   return {
     name: "state-schema",

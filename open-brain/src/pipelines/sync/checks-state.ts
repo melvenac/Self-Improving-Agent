@@ -70,9 +70,10 @@ export function checkSummaryFromState(version: string, projectRoot: string, chec
     return { name, severity: "skip", message: `skipped — ${STATE_REL} invalid at ${read.error} (see state-schema); not touching SUMMARY.md` };
   }
   const state = read.state;
-  if (state.project.version !== version) {
-    return { name, severity: "issue", message: `${STATE_REL} project.version is ${state.project.version} but package.json is ${version} — fix state.json, not SUMMARY.md` };
-  }
+  // Loop 8 R3 / ADR-027: the project.version comparison is gone with the field.
+  // The views still carry a version header and it is still checked below — but
+  // it is checked against package.json, which is the only place that value now
+  // lives.
   const stale = readViewHeaders(projectRoot).filter((h) => !h.present || h.rev !== state.revision || h.version !== version);
   if (stale.length === 0) {
     return { name, severity: "pass", message: `views carry rev ${state.revision} / v${version} — nothing to insert` };

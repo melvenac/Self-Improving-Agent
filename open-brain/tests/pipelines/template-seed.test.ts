@@ -25,7 +25,7 @@ describe("project-template/.agents/state.json seed", () => {
     expect(r.data).toMatchObject({
       schema_version: 1,
       revision: 0,
-      project: { name: "{{PROJECT}}", version: "0.0.0" },
+      project: { name: "{{PROJECT}}" },
       objective: null,
       tasks: [],
       verified: [],
@@ -41,7 +41,8 @@ describe("project-template/.agents/state.json seed", () => {
     const tmp = mkdtempSync(join(tmpdir(), "ob-template-seed-"));
     tmps.push(tmp);
     cpSync(join(templateDir, ".agents"), join(tmp, ".agents"), { recursive: true });
-    // A scaffolded project fills in its own name and version; the seed's version must match package.json.
+    // Loop 8 R3: the seed no longer carries a version. package.json is the only
+    // authority for it, and /start renders it from there.
     writeFileSync(join(tmp, "package.json"), JSON.stringify({ name: "scaffolded", version: "0.0.0" }));
     const res = await handleStart({ project_root: tmp });
     const text = getText(res);

@@ -8,10 +8,13 @@ import { TaskPriority } from "../../shared/state-schema.js";
  * verified claims are one line each with an evidence count; the handoff is
  * the one prose-shaped thing kept whole. Loop 2 read side.
  */
-export function renderState(state: State): string[] {
+export function renderState(state: State, version?: string): string[] {
   const lines: string[] = [];
   lines.push(`\n## State (state.json rev ${state.revision})`);
-  lines.push(`Project: ${state.project.name} v${state.project.version}`);
+  // Loop 8 R3: the version comes from package.json, the only authority for it,
+  // rather than from a copy in the record. Omitted entirely when not supplied,
+  // because printing a stale or guessed version is worse than printing none.
+  lines.push(version ? `Project: ${state.project.name} v${version}` : `Project: ${state.project.name}`);
   lines.push(
     state.objective
       ? `Objective: ${state.objective.text} (since session ${state.objective.since_session})`

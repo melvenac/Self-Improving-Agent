@@ -251,7 +251,7 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     // missing file and an empty one never look alike.
     const sj = result.state.stateJson;
     if (sj.present && sj.valid && sj.data) {
-      lines.push(...renderState(sj.data));
+      lines.push(...renderState(sj.data, result.state.version));
     } else {
       if (sj.present && !sj.valid) {
         lines.push(`\nstate.json invalid at ${sj.error} — falling back to files`);

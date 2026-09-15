@@ -81,7 +81,7 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     if (!parsed.ok) return;
     const s = parsed.data;
     expect(s.revision).toBe(0);
-    expect(s.project).toEqual({ name: "self-improving-agent", version: "0.30.0" });
+    expect(s.project).toEqual({ name: "self-improving-agent" });
 
     // Hand count of the fixture INBOX: 55 `[ ]`, 3 `[~]`, 0 `[!]`, 85 `[x]` = 143 items.
     const rep = r.draft.report.inbox;

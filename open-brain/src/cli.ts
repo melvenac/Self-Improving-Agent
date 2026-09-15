@@ -424,7 +424,7 @@ if (command === "sync") {
     const st = r.data;
     const count = (pred: (t: (typeof st.tasks)[number]) => boolean) => st.tasks.filter(pred).length;
     console.log(`
-state — ${st.project.name} v${st.project.version}
+state — ${st.project.name}
 `);
     console.log(`Root: ${projectRoot}`);
     console.log(`File: ${r.path}`);

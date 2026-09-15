@@ -2,8 +2,7 @@
   "schema_version": 1,
   "revision": 12,
   "project": {
-    "name": "self-improving-agent",
-    "version": "0.31.0"
+    "name": "self-improving-agent"
   },
   "objective": {
     "text": "Loop 7 is complete and delivered: draft PR #8 at c84be1d, CI green, merging is Aaron's. The open decision is T-145 - adopt or reject C2's recommendation to keep session-start retrieval and suspend the maturity lifecycle. Nothing from C2 is implemented; item 1 is a LIFECYCLE_CONFIG change deliberately left out of the loop. Loop 8's scope is Aaron's to set, and the strongest candidate the loop surfaced is not on the gap list: the store repeatedly holds a correct observation of a live defect filed as something inert (four instances in one night), recorded as knowledge 563.",

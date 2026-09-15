@@ -436,7 +436,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
   const state: State = {
     schema_version: 1,
     revision: 0,
-    project: { name: report.project.name, version: report.project.version },
+    project: { name: report.project.name },
     objective,
     tasks,
     verified,
