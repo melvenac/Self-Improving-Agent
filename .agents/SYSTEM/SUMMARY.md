@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 12 by open-brain v0.33.0 — do not edit; change state via ob_state -->
-> **Status:** v0.33.0 — Loop 7 is complete and delivered: draft PR #8 at c84be1d, CI green, merging is Aaron's. The open decision is T-145 - adopt or reject C2's recommendation to keep session-start retrieval and suspend the maturity lifecycle. Nothing from C2 is implemented; item 1 is a LIFECYCLE_CONFIG change deliberately left out of the loop. Loop 8's scope is Aaron's to set, and the strongest candidate the loop surfaced is not on the gap list: the store repeatedly holds a correct observation of a live defect filed as something inert (four instances in one night), recorded as knowledge 563.
+<!-- generated from .agents/state.json rev 13 by open-brain v0.33.0 — do not edit; change state via ob_state -->
+> **Status:** v0.33.0 — Loop 9 is delivered: PR #10 at 2c9a79d, tagged v0.33.0, CI green, Planner-QA'd, merging is Aaron's. Loop 8 merged as PR #9. The next loop is scoped by Clark's Loop 10 brief and must start in a FRESH SESSION — two loops ran in session 59, which is a lapsed discipline rather than a dropped one.
 
 ## What's working
 
@@ -26,6 +26,10 @@
 - The unattended SessionEnd rating arm has never written a rating: the `heuristic` arm produced zero rows across the entire life of the `rating_method` column, because cli-session-end.ts read an environment variable the host does not set. _(V-018, 3 evidence)_
 - The heuristic rating arm is gated off by default and skips an unjudged entry entirely, writing neither an aggregate counter nor an event row. _(V-019, 2 evidence)_
 - T-003's write path already refuses the failure it describes: a slot is consulted only when the in-memory session id is absent, and is refused when older than 12h. _(V-020, 2 evidence)_
+- The skill-proposal generator is off at both ends behind one constant, and no stale count is announced from the pending file that is left on disk. _(V-021, 2 evidence)_
+- project.version is gone from every state.json in the tree and a file still carrying it fails parse, so a missed copy is loud rather than silent. _(V-022, 2 evidence)_
+- No recency-decay variant beats the live 0.005 constant at better than chance on the repaired harness. _(V-023, 1 evidence)_
+- Whether recalled knowledge changed what an agent did is not answerable on the existing record; the apparent signal is retrieval's own selection criterion. _(V-024, 1 evidence)_
 
 ## What's broken
 
@@ -39,47 +43,30 @@
 - Gap G-009: R4 is Claude-only: project-template/.cursor/commands/start.md still instructs writing .recalled-entries.json, so for a Cursor user the file still accumulates across sessions
 - Gap G-010: The state record can hold fields that nothing can subsequently change: project.version has no op at all, gaps have add and close but no update, decisions have add only
 - Gap G-011: The shadow-recall harness cannot currently answer any question about the maturity constants, in backfill OR in production
-- Gap G-012: project.version is a cached copy of package.json's version, and three checks plus a drift branch exist only to police the cache. ADR-027 decided removal; the work is not done.
 - Gap G-013: feedback_log holds only 31% of the non-neutral ratings the live counters know about (154 of 496), so any replay reconstructing maturity from it systematically under-promotes and cannot answer questions about maturity boosts.
 - Gap G-014: success_rate excludes neutral ratings from its denominator and harmful is structurally near-unreachable, so success_rate is 1.00 for any entry ever rated helpful once. Maturity promotion therefore tracks recall volume rather than usefulness, and promotion grants a ranking boost that causes more recall.
 - Gap G-015: One session uuid is written under two different project keys in active-session.json, corrupting project-scoped attribution.
 - Gap G-016: Intermittent cross-test failure in state-writer.test.ts under the full suite.
+- Gap G-017: 86% of ACTION: lines give prose advice rather than naming a file, which is why Loop 9's F1 fired at 14.2%. That is a fact about how the /end A12 template gets filled in, not about recall or retrieval.
+- Gap G-018: auto-feedback.ts carries a second evaluateLifecycle with hardcoded thresholds that never reads LIFECYCLE_CONFIG, so Loop 8 R1's suspension does not reach it.
+- Gap G-019: The correction record's Loops 5-7 row is carried forward from the running count rather than re-derived, so unlike every other row it cannot be audited from its own list.
+- Gap G-020: A session-log checklist ticked before the action it describes cannot fail, and misled the Planner into reporting that /end had never run.
 
 ## What's next
 
 - [P0] T-003 Session identity is keyed per project, not per session
-- [P0] T-004 The lifecycle bundle's remaining three parts stay BLOCKED
 - [P0] T-008 Add a `/sync` validator that stats every MCP command path in `~/.claude.json`
 - [P0] T-014 Make point-of-use rating reachable
 - [P0] T-022 Replace-on-write for `state` facts
+- [P0] T-023 Improve state-side classifier precision
 
 ## Decisions
 
+- 2026-09-15 — Pre-register the disposition trace, then do not build it — Loop 9 R2. F1 was pinned at an in-population share below 15% before the number existed; the event record turned out to have no shell-command type, only path predicates were matchable, and the measured share was 14.2%. Building something already pre-registered as unable to answer would be goalpost-moving in the direction that produces work. A threshold chosen after seeing 14.2% would have been chosen at 10%.
+- 2026-09-15 — Turn the skill-proposal generator off at both ends — Loop 9 R1, Aaron's ruling. The generator clusters on a single frontmatter tag and cannot carry action signal; he never reads the queue, which is why 39 proposals accumulated. Deterministic-first: remove the trigger rather than patch around it. Nothing deleted, vault notes accumulate as before, reversible by one constant.
+- 2026-09-15 — Suspend the maturity lifecycle rather than repair or delete it — Loop 8 R1. success_rate excludes neutral from its denominator and harmful had fired twice in the corpus' history, so the rate reads 1.00 for almost everything rated and measures recall volume rather than usefulness. Boosts to 1.0, apoptosis behind a flag, counters and promotion still recording. The flag is deliberately separate from apoptosisThreshold, which is read in three places and would have silently disabled lowSuccessPenalty too.
 - 2026-09-15 — ADR-030 - A bug fix that revives a dead code path ships gated off — Correcting the session-uuid bug in cli-session-end.ts would have switched the dormant heuristic rating arm on at the next session end, feeding topic-mention signal into a scoring system whose per-entry mean (0.311) sits one hundredth above its apoptosis threshold (0.3) - during the very loop deciding whether to keep that system. So the repair and the switch-on ship as two separable things: enableHeuristicRatings defaults false, and the doc comment carries the argument so whoever flips it later sees it rather than re-deriving it. Rows produced after the fix are out of sample for Loop 7, the population having been fixed before the change. Secondary rule, and the part that was nearly missed: with the gate closed an unjudged entry is SKIPPED, not recorded neutral - a fallback neutral is indistinguishable from a rater's considered 'retrieved and not used', so the cheaper diff would have destroyed the only signal the corpus still has while appearing to strengthen the data.
 - 2026-09-15 — ADR-029 - Keep session-start retrieval; suspend the maturity lifecycle; leave the causal question unasked — Loop 7's deliverable, RECOMMENDED not yet adopted - Aaron rules (T-129). 'Does injection earn its place' was three questions wearing one coat, and bundling them is what nearly retired the cheap half on evidence that only ever concerned the expensive half. STEM Agent's argument is that a maturation lifecycle belongs on an EXECUTABLE unit because only an execution yields an objective outcome; that indicts success_rate, maturity and apoptosis on knowledge entries and says nothing about whether fetching a note is worthwhile. A bookmark is not improved by a promotion ladder. Keep retrieval: the case against it was a claim retracted in the vault 26 minutes after it was written, and the first adequately powered contrast this project has produced runs in its favour (start 0.337 vs explicit 0.259 per-entry, n=109 and n=56, opposite to the pre-registration's own selection-bias prediction). Per prereg §5 that is not evidence injection helps - it refutes the claim that injection is the low-value mode. Suspend the lifecycle: success_rate is near-two-valued (98% of rated entries read exactly 1.0), apoptosis cannot fire on arithmetic (needs >=4 harmful on one entry, observed max 1), no_maturity tied live in Loop 6, and the ladder is a ratchet. Recency decay by contrast IS validated, so this is not 'ranking is worthless'. The causal question: control arm named concretely (randomised withhold flag in sessions at ob_start plus a non-self-reported outcome) and then argued against on the pre-registration's own costing - at ~2 sessions/week no effect smaller than enormous is resolvable.
-- 2026-09-15 — No ranking constant changes on one measured alternative beating one incumbent — Loop 6's repaired instrument made the recency question answerable and recency_strong (0.02/day) was the only strategy to beat live — 21-11-5, +0.0153 nDCG, winning against a presentation bias that favours the incumbent. The constant was still NOT changed.
-
-Reasoning: recency_strong tests ONE alternative point against ONE incumbent. That 0.02 beats 0.005 is evidence the constant is too low. It is not evidence that 0.02 is right — nothing between or beyond was measured, and the optimum could be anywhere above 0.005. Adopting the one other number that happened to be guessed in the strategy list is the 'flipped because the new number is bigger' outcome the loop's own precondition rules out, and it rules it out whether or not the bigger number won.
-
-shadow/index.ts states the same contract independently: changing production constants stays a human decision; the harness only supplies the evidence. The evidence is now worth supplying, which it was not before this loop.
-
-Recommended next measurement: a sweep — 0.01 / 0.02 / 0.04 as separate strategies — to find where the gain turns over. Adoption is Aaron's call.
-
-What the same run did NOT license: no_maturity ties live, and that must not be read as 'maturity boosts are harmless'. See G-013 (feedback_log 31% complete) and G-014 (success_rate ignores neutral).
-- 2026-09-15 — Amendment vocabulary: which state records can be corrected, and which are append-only — Decided once rather than one op per incident. The op union grew by accident — update_task exists because someone needed it, update_gap did not because nobody had yet — and Loop 5 hit the consequence twice in one night.
-
-RULE: a record is amendable when its text DESCRIBES SOMETHING STILL BEING LEARNED. A record is append-only when its text IS THE HISTORICAL FACT, so that editing it destroys the thing the record exists to preserve.
-
-Per type:
-- TASKS — amendable (open/update/close/reopen). Title and priority are current intent, which legitimately changes. Already correct.
-- GAPS — amendable. A gap describes something we do not yet understand, so its text is provisional by construction. The record most needing correction was the one that could not be corrected. IMPLEMENTED this loop: update_gap. The prior workaround (close + re-add) silently minted a new id and reset opened_session, losing the history the gap list exists to keep.
-- VERIFIED — claim append-only; evidence appends; status reopens. The claim is what evidence was gathered against, so editing it invalidates that evidence silently while leaving it attached. Already correct; no update_verified.
-- DECISIONS — append-only. A decision log records what was decided and when; amending it is not a correction but a rewrite of the record. Supersede with a new decision instead. Already correct; no update_decision. Gap: decisions carry no supersedes field (tasks do), so superseding is convention only.
-- OBJECTIVE / HANDOFF / LAST_SESSION — singletons, set wholesale. Already correct.
-- PROJECT.VERSION — REMOVE; do not add set_version. No consumer treats it as authoritative: cli.ts:427 and session-start/state-render.ts:14 display it, state-import/index.ts:439,494 copy it, drift-detector.ts:9 + checks-state.ts:73 + checks.ts:783 compare it to package.json and complain, and state-writer.ts:166 prefers package.json with this only as fallback. It is a cached copy of a truth held elsewhere, with a drift branch and two checks existing solely to police the cache. DEFERRED to Loop 7: 7 call sites plus schema, a state.json migration and test updates is larger than the decision.
-
-ID SCHEME, observed while filing this: the Planner's brief assumed the next ADR id was free, but ADR-021..ADR-026 already exist and nextId has since minted D-001..D-003 alongside them, so the list now carries both schemes. This decision took an explicit ADR-027 to avoid widening the split. The generation bug itself stays filed under G-005 — it is an id question, not an amendment one.
-- 2026-09-15 — Delete the text that generates a false claim, not just the claim — Knowledge entry 556 asserted that ob_recalled compares the file's session_id. It was written from end.md A14, which described the fallback as if it were the mechanism. Rating 556 harmful and superseding it with 558 removes the entry but leaves the generator standing to mint it again. Loop 5 R4 corrects A14 itself. Deterministic and structural prevention before prompt-level correction.
 <!-- state:end -->
 ## Architecture Overview
 
