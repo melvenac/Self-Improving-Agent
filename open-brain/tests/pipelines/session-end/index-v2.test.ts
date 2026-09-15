@@ -97,6 +97,9 @@ describe("sessionEndV2", () => {
     const input = makeInput(db, vaultDir, agentsDir, {
       sessionSummary: "Worked on typescript patterns and interfaces today",
       recalledEntryIds: [entryId],
+      // This test is about the fallback arm's behaviour, so it opts in. The arm
+      // is off by default — see the gate tests below.
+      enableHeuristicRatings: true,
     });
 
     const result = sessionEndV2(input);
@@ -127,12 +130,14 @@ describe("sessionEndV2", () => {
     sessionEndV2(makeInput(db, vaultDir, agentsDir, {
       recalledEntryIds: [withOrigin],
       recalledOrigin: "recall-log",
+      enableHeuristicRatings: true,
     }));
 
     const withoutOrigin = seed("origin-absent");
     sessionEndV2(makeInput(db, vaultDir, agentsDir, {
       sessionId: "test-session-002",
       recalledEntryIds: [withoutOrigin],
+      enableHeuristicRatings: true,
     }));
 
     const origins = db
@@ -142,6 +147,81 @@ describe("sessionEndV2", () => {
       { knowledge_id: withOrigin, rating_origin: "recall-log" },
       { knowledge_id: withoutOrigin, rating_origin: "unspecified" },
     ]);
+  });
+
+  // Loop 7 R2. Fixing the session-uuid bug in cli-session-end.ts switches this
+  // arm on for the first time in the rating_method column's life. It emits
+  // `helpful` on a tag substring appearing in the summary — mentioned, not
+  // worked — into a success_rate whose corpus mean (0.311) sits a hundredth
+  // above the apoptosis threshold (0.3). The repair and the switch-on are kept
+  // separate deliberately; these tests pin that separation.
+  describe("heuristic rating arm gate", () => {
+    const seedEntry = (key: string) => {
+      indexKnowledge(db, {
+        vaultPath: `/vault/Experiences/test/${key}.md`,
+        key,
+        tags: "typescript",
+        content: "content",
+      });
+      return (db.prepare("SELECT id FROM knowledge_index WHERE key = ?").get(key) as { id: number }).id;
+    };
+
+    it("rates nothing when the agent supplied no judgment (default: arm off)", () => {
+      const entryId = seedEntry("gated-off");
+      const before = (db.prepare("SELECT helpful, neutral FROM knowledge_index WHERE id = ?")
+        .get(entryId) as { helpful: number; neutral: number });
+
+      const result = sessionEndV2(makeInput(db, vaultDir, agentsDir, {
+        // A summary that WOULD match the tag, so the arm is only silent because
+        // it is gated — not because the substring test failed.
+        sessionSummary: "Worked on typescript all day",
+        recalledEntryIds: [entryId],
+      }));
+
+      expect(result.feedback.processed).toBe(0);
+      expect(result.feedback.ratings).toHaveLength(0);
+
+      // Skipped, not recorded as neutral: a fallback neutral is indistinguishable
+      // from a rater's considered "retrieved and not used".
+      const after = (db.prepare("SELECT helpful, neutral FROM knowledge_index WHERE id = ?")
+        .get(entryId) as { helpful: number; neutral: number });
+      expect(after).toEqual(before);
+
+      const events = db.prepare("SELECT COUNT(*) c FROM feedback_log").get() as { c: number };
+      expect(events.c).toBe(0);
+    });
+
+    it("still records an explicit judgment while the arm is off", () => {
+      const entryId = seedEntry("supplied-passes-gate");
+
+      const result = sessionEndV2(makeInput(db, vaultDir, agentsDir, {
+        sessionSummary: "nothing matching here",
+        recalledEntryIds: [entryId],
+        entryRatings: { [entryId]: "harmful" },
+      }));
+
+      expect(result.feedback.ratings).toEqual([{ id: entryId, rating: "harmful" }]);
+
+      const row = db.prepare("SELECT rating, rating_method FROM feedback_log").get() as
+        { rating: string; rating_method: string };
+      expect(row).toEqual({ rating: "harmful", rating_method: "supplied" });
+    });
+
+    it("rates via the fallback only when explicitly enabled", () => {
+      const entryId = seedEntry("gated-on");
+
+      const result = sessionEndV2(makeInput(db, vaultDir, agentsDir, {
+        sessionSummary: "Worked on typescript all day",
+        recalledEntryIds: [entryId],
+        enableHeuristicRatings: true,
+      }));
+
+      expect(result.feedback.ratings).toEqual([{ id: entryId, rating: "helpful" }]);
+
+      const row = db.prepare("SELECT rating_method FROM feedback_log").get() as
+        { rating_method: string };
+      expect(row.rating_method).toBe("heuristic");
+    });
   });
 
   it("flags reflection clusters when 3+ entries share a tag", () => {
@@ -188,6 +268,8 @@ describe("sessionEndV2", () => {
       sessionSummary: "typescript was used extensively",
       recalledEntryIds: [row.id],
       dryRun: true,
+      // Asserts feedback still runs under dryRun, which needs a rating to exist.
+      enableHeuristicRatings: true,
     });
 
     const result = sessionEndV2(input);

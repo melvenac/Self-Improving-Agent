@@ -150,6 +150,9 @@ describe("sessionEndV2 explicit ratings", () => {
       recalledEntryIds: [1],
       entryRatings,
       dryRun: true,
+      // These cases contrast a supplied judgment against the fallback, so the
+      // fallback has to be able to run. It is off by default — Loop 7 R2.
+      enableHeuristicRatings: true,
     });
   }
 

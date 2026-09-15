@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 7 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 11 by open-brain v0.31.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 6 of the extraction evaluation — repair the shadow-recall instrument before re-asking the ranking questions. C1 has two halves that are one job: lifecycle-state snapshot as of the replayed session, and a candidate pool restricted to entries that existed then. Plus the op-vocabulary ADR (project.version removal leading), with the usage signal displaced to Loop 7. Brief at ~/.agents/mailbox/channels/sia/loop-6-brief.md. _(since session 56)_
+Loop 7 is complete and delivered: draft PR #8 at c84be1d, CI green, merging is Aaron's. The open decision is T-145 - adopt or reject C2's recommendation to keep session-start retrieval and suspend the maturity lifecycle. Nothing from C2 is implemented; item 1 is a LIFECYCLE_CONFIG change deliberately left out of the loop. Loop 8's scope is Aaron's to set, and the strongest candidate the loop surfaced is not on the gap list: the store repeatedly holds a correct observation of a live defect filed as something inert (four instances in one night), recorded as knowledge 563. _(since session 58)_
 
 ## Top tasks
 

@@ -16,9 +16,35 @@ import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/session-end/recalled-ids.js";
 import { obsidianVaultDir } from "./shared/paths.js";
 import { resolveHookProjectDir } from "./shared/repo-root.js";
+import { resolveSessionId } from "./shared/active-session.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const V2_VAULT = obsidianVaultDir();
+
+// The session uuid, from the hook payload on stdin — the same authoritative
+// source cli-bootstrap.ts reads, and for the same reason.
+//
+// This previously read `process.env.CLAUDE_SESSION_ID`, which Claude Code does
+// not set. The variable that exists is CLAUDE_CODE_SESSION_ID. So sessionId was
+// the empty string on every session end this hook has ever run, and the effect
+// was not a missing label but a silent no-op: resolveRecalledIds got a null
+// session, could not match recall_log, and (since Loop 5 removed the
+// .recalled-entries.json write) resolved nothing, so Stage 2's loop body never
+// executed. The heuristic rating arm has therefore produced zero rows in the
+// entire life of the rating_method column — see
+// ~/Obsidian Vault v2/Research/loop-7-c1-reconciliation-2026-09-15.md §2.
+//
+// Reading stdin rather than the corrected env name is deliberate: it is the
+// documented contract, it matches the hook that works, and it is IDE-agnostic
+// (Cursor sets no CLAUDE_* variable at all but does send a payload).
+// CLAUDE_CODE_SESSION_ID stays as a fallback for a host that sends no stdin.
+let hookPayload: Record<string, unknown> = {};
+try {
+  const chunks: Buffer[] = [];
+  for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
+  const raw = Buffer.concat(chunks).toString().trim();
+  if (raw) hookPayload = JSON.parse(raw);
+} catch { /* stdin unavailable — fall back to the environment below */ }
 
 try {
   if (!existsSync(V2_DB)) {
@@ -33,7 +59,8 @@ try {
   // Loop 4 R5: resolve the real project root (shared/repo-root.ts) so a hook
   // fired with a drifted cwd cannot write a stray `.agents/` into a subpackage.
   const projectDir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
-  const sessionId = process.env.CLAUDE_SESSION_ID || "";
+  const sessionId =
+    resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
   const agentsDir = join(projectDir, ".agents");
 
   const project = projectDir.split(/[/\\]/).filter(Boolean).pop() || "General";

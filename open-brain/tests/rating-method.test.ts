@@ -80,6 +80,9 @@ describe("rating_method", () => {
       db, vaultDir: vault, agentsDir: agents, sessionId: "s1",
       sessionSummary: "this summary mentions alpha", project: "General",
       recalledEntryIds: [id], dryRun: false,
+      // The arm is gated off by default (Loop 7 R2); this test is about what it
+      // labels when it does run, so it opts in.
+      enableHeuristicRatings: true,
     });
 
     // 'helpful' here means "tag mentioned in summary", not "worked" — which is
@@ -98,6 +101,8 @@ describe("rating_method", () => {
       recalledEntryIds: [supplied, fellThrough],
       entryRatings: { [supplied]: "neutral" },
       dryRun: false,
+      // The contrast this test draws needs the fallback arm to produce its half.
+      enableHeuristicRatings: true,
     });
 
     const rows = methods();
