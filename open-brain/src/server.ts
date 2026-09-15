@@ -228,10 +228,6 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
       }
     }
 
-    if (result.health.pendingSkillProposals > 0) {
-      lines.push(`\nSkill proposals pending: ${result.health.pendingSkillProposals} cluster(s) ready for review.`);
-    }
-
     // Size block precedes the content so a reader sees what is coming before
     // it arrives. Estimator: chars/4 rounded up (see StateFileSize).
     lines.push(`\n## Sizes (tokens estimated as chars/4)`);
@@ -397,7 +393,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     return {
       content: [{
         type: "text",
-        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Reflection: ${result.reflection.flagged} clusters flagged\n  Invocations: ${result.invocations.logged} logged\n  Skill scan: ${result.skillScan.clusters} clusters (${result.skillScan.pendingProposals} pending proposals)\n${shadowLine}\n\n${shadowReport}`,
+        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Invocations: ${result.invocations.logged} logged\n${shadowLine}\n\n${shadowReport}`,
       }],
     };
   } catch (err) {

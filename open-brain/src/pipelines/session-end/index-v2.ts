@@ -8,11 +8,8 @@ import {
   type RatingOrigin,
   type RatingMethod,
 } from "../../db-v2.js";
-import { flagReflectionClusters } from "./reflection.js";
 import { getSessionSummary } from "./session-summary.js";
 import { logInvocations } from "./invocation-logger.js";
-import { runSkillScanPipeline } from "./skill-scan-runner.js";
-import { SKILL_SCAN_ENABLED } from "../../shared/skill-scan-flag.js";
 import { planTopics, writeTopics, findOrphans } from "../topics/index.js";
 import { runShadowStage, type ShadowStageResult } from "../shadow/index.js";
 
@@ -78,9 +75,7 @@ export interface SessionEndV2Input {
 interface SessionEndV2Result {
   summary: { written: boolean; selfGenerated: boolean };
   feedback: { processed: number; ratings: Array<{ id: number; rating: string }> };
-  reflection: { flagged: number };
   invocations: { logged: number; skippedSessions: number };
-  skillScan: { clusters: number; pendingProposals: number; approaching: number };
   topics: { written: number; removed: number; orphans: number };
   shadow: ShadowStageResult;
 }
@@ -175,27 +170,19 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     ratings.push({ id, rating });
   }
 
-  // ── Stage 3: Reflection flagging ─────────────────────────────────────────────
-  let flagged = 0;
-  if (!dryRun) {
-    const queuePath = join(agentsDir, "reflection-queue.json");
-    const result = flagReflectionClusters(db, queuePath);
-    flagged = result.flagged;
-  }
+  // Loop 10 C2: the reflection queue is CUT. `reflection_log` held 0 rows after
+  // six months — it never once recorded anything — so the stage that wrote it is
+  // gone rather than switched off.
+  //
+  // Loop 10 C2: the skill scan and its proposal machinery are CUT. Loop 9 R1 had
+  // already turned the generator off; six months of operation produced 0 skills
+  // from 39 proposals none of which was ever acted on. The vault notes it
+  // clustered over are untouched — the scan was derived, not a store.
 
-  // ── Stage 4: Invocation logging ──────────────────────────────────────────────
+  // ── Stage 3: Invocation logging ──────────────────────────────────────────────
   const invocationResult = dryRun ? { logged: 0, skippedSessions: 0 } : logInvocations();
 
-  // ── Stage 5: Skill scan ─────────────────────────────────────────────────────
-  // Loop 9 R1: off by ruling. The generator does not run, so nothing writes
-  // .skill-proposals-pending.json. Reversible by SKILL_SCAN_ENABLED alone; the
-  // vault notes it clusters over are untouched either way.
-  const skillScanResult =
-    dryRun || !SKILL_SCAN_ENABLED
-      ? { clusters: 0, pendingProposals: 0, approaching: 0 }
-      : runSkillScanPipeline();
-
-  // ── Stage 6: Shadow recall ──────────────────────────────────────────────────
+  // ── Stage 4: Shadow recall ──────────────────────────────────────────────────
   // Must run after Stage 2 so this session's own relevance labels already exist:
   // evaluate.ts skips a session with no helpful ratings, so running this first
   // would skip every session forever. The order is the dependency, not an
@@ -238,9 +225,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   return {
     summary: { written: summaryWritten, selfGenerated },
     feedback: { processed: ratings.length, ratings },
-    reflection: { flagged },
     invocations: invocationResult,
-    skillScan: skillScanResult,
     shadow,
     topics,
   };
