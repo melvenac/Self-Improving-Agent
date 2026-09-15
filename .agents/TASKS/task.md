@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 2 by open-brain v0.31.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 3 by open-brain v0.31.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 5 of the extraction evaluation — per the Planner's next brief. Candidates carried from Loop 4: render the INBOX Done section by the retention window (T-144), DECISIONS.md dual role (G-005), Cursor start/end copies onto ob_start/ob_state (G-001), a CLI door for ob_state (G-006). Loop 4 shipped as v0.31.0 on draft PR #5; merging PR #3/#5 is Aaron's release decision. _(since session 55)_
+Loop 6 of the extraction evaluation — repair the shadow-recall instrument before re-asking the ranking questions. C1 has two halves that are one job: lifecycle-state snapshot as of the replayed session, and a candidate pool restricted to entries that existed then. Plus the op-vocabulary ADR (project.version removal leading), with the usage signal displaced to Loop 7. Brief at ~/.agents/mailbox/channels/sia/loop-6-brief.md. _(since session 56)_
 
 ## Top tasks
 
