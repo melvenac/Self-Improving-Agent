@@ -164,7 +164,7 @@ Start a Claude Code session and run `/start`. You should see:
 | Hook | Trigger | What it does |
 |---|---|---|
 | `open-brain/build/cli-bootstrap.js` | SessionStart | Auto-detects project, emits `SESSION_UUID`, runs health checks, surfaces skill proposals |
-| `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: vault summary, auto-feedback, reflection clusters, invocation logging, skill-scan |
+| `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: vault summary, auto-feedback, reflection clusters, invocation logging, skill-scan. **Auto-feedback rates only entries the agent judged explicitly** — the tag-substring fallback is gated off (`enableHeuristicRatings`, default false) pending the Loop 7 C2 ruling |
 
 ## Memory reconciliation — `dream`
 
