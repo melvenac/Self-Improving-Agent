@@ -12,6 +12,7 @@ import { flagReflectionClusters } from "./reflection.js";
 import { getSessionSummary } from "./session-summary.js";
 import { logInvocations } from "./invocation-logger.js";
 import { runSkillScanPipeline } from "./skill-scan-runner.js";
+import { SKILL_SCAN_ENABLED } from "../../shared/skill-scan-flag.js";
 import { planTopics, writeTopics, findOrphans } from "../topics/index.js";
 import { runShadowStage, type ShadowStageResult } from "../shadow/index.js";
 
@@ -186,9 +187,13 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   const invocationResult = dryRun ? { logged: 0, skippedSessions: 0 } : logInvocations();
 
   // ── Stage 5: Skill scan ─────────────────────────────────────────────────────
-  const skillScanResult = dryRun
-    ? { clusters: 0, pendingProposals: 0, approaching: 0 }
-    : runSkillScanPipeline();
+  // Loop 9 R1: off by ruling. The generator does not run, so nothing writes
+  // .skill-proposals-pending.json. Reversible by SKILL_SCAN_ENABLED alone; the
+  // vault notes it clusters over are untouched either way.
+  const skillScanResult =
+    dryRun || !SKILL_SCAN_ENABLED
+      ? { clusters: 0, pendingProposals: 0, approaching: 0 }
+      : runSkillScanPipeline();
 
   // ── Stage 6: Shadow recall ──────────────────────────────────────────────────
   // Must run after Stage 2 so this session's own relevance labels already exist:

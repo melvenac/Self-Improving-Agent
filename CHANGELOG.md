@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.33.0] - 2026-09-15 — Loop 9
+
+Loop 9 of the extraction evaluation. The usage signal, on the smallest instrument that could answer it. One repair landed, one capability answered negatively, and **one instrument pre-registered and then not built** because its own viability threshold fired before a line of it was written.
+
+### Answered — the application question is not answerable on the existing record (C1, C2)
+Full working: `~/Obsidian Vault v2/Research/loop-9-c1-application-answerable-2026-09-15.md`.
+
+- **The defining pair was one real case and one fiction.** Entry **556**, cited since Loop 5 as "recalled and acted on while false", was **never recalled** — `recall_count` 0, `last_recalled_at` NULL, zero `recall_log` rows. It was *authored* during a session (extending entry 341, which was recalled 27 times) and rated harmful 24 minutes later. Searching the whole corpus, **exactly one** entry — 416 — was recalled in the session that then rated it harmful. Case (b) is **n=1**, and any design distinguishing it is calibrating on a single example.
+- **"Application" is itself two questions.** *Usage* — did the agent act in accordance with the entry — is observable in principle. *Difference* — would the agent have acted otherwise — contains a counterfactual and needs a control arm, which Loop 7's pre-registration costed and recommended against at ~2 sessions/week. **Difference is out of scope**; the loop answers usage.
+- **The measurement, and why its clean result was not a finding.** 436 of 558 entries carry an `ACTION:` line and 896 of 1,273 recalls point at one. Share of a recalled entry's ACTION vocabulary appearing in that session's commit diffs: treated 0.4865 against control 0.3853, **10 sessions of 10 in the same direction, sign test p=0.002**. Then the control was matched on topic — both arms restricted to Self-Improving-Agent notes — and the effect **collapsed to 4–2, p=0.688**. Recall is not random: BM25 selects on lexical match to a query reflecting the session's subject, so a recalled entry shares vocabulary with the work *by construction of the retrieval*. **The p=0.002 was retrieval measured back at itself.**
+- **It separates none of the defining cases.** Recalled-and-applied, recalled-and-ignored, and recalled-and-contradicted all score high, because on-topic is exactly what retrieval guarantees.
+- **Session close is not a prerequisite.** `ended_at` is set on 1 of 57 rows, but **53 of 57 sessions are end-boundable** from their own max recall/chunk timestamp. One of the three instruments Loop 8 listed in dependency order turns out to block nothing.
+
+### Not built — the disposition trace (R2)
+Pre-registration, amendments and pre-build verdict: `~/Obsidian Vault v2/Research/loop-9-r2-prereg-2026-09-15.md` (`status: pinned-before-data`).
+
+- The population was defined **from the entry alone, before any session runs**, so an unmatchable `ACTION:` (null-A, excluded) can never be confused with genuine non-application (null-B, the real negative). Minimum n pinned at **20** before the cadence was known; F1 pinned at an in-population share **below 15%**; F2 at a match rate below 5% or above 90%.
+- **The event record has no shell-command type.** Across 47 session DBs: `file_read` 488, `file_edit` 248, `file_write` 224, `git` 145 — and `git` holds bare verbs. Of the three predicate kinds, only `path` is matchable. The population narrowed to entries whose `ACTION:` names a file. *Logging commands would be a second instrument; it was not built.*
+- **F1 fired at 14.2%.** 94 of 436 ACTION-bearing entries yield a path predicate. Per the document's own rule the instrument was **reported as not working rather than reinterpreted**, and no code was written. Building something already pre-registered as unable to answer would be goalpost-moving in the direction that produces work — the same failure as moving them in the direction that avoids it.
+- 14.2% against a 15% line is close, which is the argument for the method rather than against it: **a threshold chosen after seeing 14.2% would have been chosen at 10%.**
+- This does **not** mean recall goes unapplied. It means **86% of `ACTION:` lines give prose advice rather than naming a file**, and the operation record holds no commands to match the rest against. The first half is a fact about how the `/end` template gets filled in — not about recall, and not a second instrument.
+
+### Turned off — the skill-proposal generator (R1)
+Aaron's ruling, implemented as ruled. One constant, `SKILL_SCAN_ENABLED`, read by **both** ends — the session-end stage that writes `.skill-proposals-pending.json` and the session-start check that reports "N pending" — so they cannot diverge. A count still announced from a stale file after the generator stops is an absence reported as a healthy number.
+- **Nothing is deleted.** The scan is derived, not a store; the pending file is left untouched and vault notes accumulate as before. Asserted by test, not merely stated.
+- Seven new tests, of which **five were verified to fail with the flag on**. Three initially did not: their temp vault had no `Experiences/` dir, so the pipeline returned early and they passed in both configurations.
+
+### The generalisation (C3)
+`~/Obsidian Vault v2/Research/loop-8-instrument-trust-2026-09-15.md`, Loop 9 addendum.
+
+**A passing test is not evidence until someone has seen it fail. A measurement is not a finding until someone has seen it produce the opposite.** This is **Rule 4 applied to the instrument rather than to the system under test** — which is why it keeps being rediscovered in new costumes. Nine instrument failures across five loops, every one a green signal that could not have been red, and **not one found by inspecting the tool**. Four were caught because two agents measured the same thing independently and the numbers disagreed; the rest because one agent measured twice by different routes. Loop 9 contributed three: three tests that could not fail, a probe that could only point one way, and a script reporting 54% where two reconciled variants gave 14.8% and 14.2%.
+
+The operational form is not vigilance: **build the second measurement, and prefer it to refining the first.** A refinement of a lying instrument is a better-looking lie.
+
+### Correction record
+
+The running total is replaced with a per-loop breakdown, because a total nobody can re-derive is a claim rather than a record — and this is the one figure in the project that exists specifically to stop either side keeping the flattering half of the score. Re-deriving it moved it **against the Developer**, which is the only direction that tests whether the method works.
+
+| | Planner | Developer |
+|---|---|---|
+| Loops 5–7 | 10 | 1 |
+| Loop 8 | 3 | 6 |
+| Loop 9 | 2 | 5 |
+| **total** | **15** | **12** |
+
+**Loop 8 — Planner (3):** the `domain:` premise carried into the brief; cross-project spread asserted as a noise discriminator when it is the opposite; `qa` called noise by eye against a metric that disagreed. **Developer (6):** the `domain:` hypothesis asserted before measuring; the `## Action` grep that missed 436 of 529 notes; the `e865f48` merge framing that described a defect that did not exist; collapsing the lying and stale instrument failures into one; "I checked the state" said of a read taken during a backgrounded write; the CRLF no-op edits trusted on an exit code.
+
+**Loop 9 — Planner (2):** entry **556** described as "recalled and acted on while false" when it was never recalled — a claim load-bearing since Loop 5; and *difference* smuggled into the phrasing of what is a *usage* question. **Developer (5):** the F3 control written corpus-wide **one document after diagnosing that same design as C1's artefact**; three non-discriminating R1 tests that passed with the flag both ways; the R1 test count stated as five when it was seven; a script reporting 54% where two reconciled variants gave 14.8% and 14.2%; and the instrument-failure count stated as four when it was three.
+
+**Two errors in the count itself, both understating the Developer side.** The Loop 9 brief recorded *3 Developer* after Loop 8 where the enumeration above gives 7; and this CHANGELOG asserted *Developer 8* where the enumeration gives 12. Neither was deliberate and both ran the same direction, which is precisely why the figure is now presented as a sum a reader can check rather than as a total either party asserts.
+
+
 ## [0.32.0] - 2026-09-15 — Loop 8
 
 Loop 8 of the extraction evaluation. Two capability questions about skills, four repairs, and the first tag in four loops. Both capability items ended in a **negative** answer that is the deliverable rather than a failure, and both were reached by reading the mechanism before proposing a measure.

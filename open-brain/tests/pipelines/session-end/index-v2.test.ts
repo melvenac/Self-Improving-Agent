@@ -289,3 +289,85 @@ describe("sessionEndV2", () => {
     expect(result.reflection.flagged).toBe(0);
   });
 });
+
+/**
+ * Loop 9 R1 — the generator end of the skill-scan disablement.
+ *
+ * Paired with tests/pipelines/session-start/skill-scan-off.test.ts, which covers
+ * the reporting end. The acceptance condition is both ends quiet together: a
+ * session end that still wrote the pending file, or a session start that still
+ * read it, would each on their own reinstate the queue this ruling removes.
+ */
+describe("sessionEndV2 with the skill scan disabled (Loop 9 R1)", () => {
+  let db: Database.Database;
+  let vaultDir: string;
+  let agentsDir: string;
+
+  beforeEach(() => {
+    db = makeDb();
+    vaultDir = makeTempDir();
+    agentsDir = makeTempDir();
+    process.env.OPEN_BRAIN_VAULT_DIR = vaultDir;
+  });
+
+  afterEach(() => {
+    delete process.env.OPEN_BRAIN_VAULT_DIR;
+  });
+
+  /**
+   * Seeds notes the old generator would cluster on: three sharing one tag is
+   * exactly the threshold it fired at. Without this the temp vault has no
+   * Experiences/ dir, the pipeline returns early, and these tests pass whether
+   * the flag is on or off - tests that cannot fail, which is the defect this
+   * loop exists to catch. Verified by flipping SKILL_SCAN_ENABLED to true:
+   * all three then go red.
+   */
+  function seedClusterableNotes() {
+    const expDir = path.join(vaultDir, "Experiences", "proj");
+    fs.mkdirSync(expDir, { recursive: true });
+    for (const n of ["one", "two", "three"]) {
+      fs.writeFileSync(
+        path.join(expDir, `${n}.md`),
+        `---\ntags: [idempotency, deployment]\n---\n\nACTION: do the thing\n`,
+      );
+    }
+  }
+
+  it("runs clean and reports a zero scan without invoking the generator", () => {
+    seedClusterableNotes();
+    const result = sessionEndV2(makeInput(db, vaultDir, agentsDir, {
+      sessionSummary: "a session that would previously have triggered a scan",
+      project: "my-project",
+    }));
+
+    expect(result.skillScan).toMatchObject({ clusters: 0, pendingProposals: 0, approaching: 0 });
+  });
+
+  it("writes neither the pending marker nor SKILL-CANDIDATES.md", () => {
+    seedClusterableNotes();
+
+    sessionEndV2(makeInput(db, vaultDir, agentsDir, {
+      sessionSummary: "session with clusterable notes present",
+      project: "my-project",
+    }));
+
+    expect(fs.existsSync(path.join(vaultDir, ".skill-proposals-pending.json"))).toBe(false);
+    expect(fs.existsSync(path.join(vaultDir, "Skill-Candidates", "SKILL-CANDIDATES.md"))).toBe(false);
+  });
+
+  it("does not overwrite or delete a pending file left over from before the ruling", () => {
+    seedClusterableNotes();
+    const p = path.join(vaultDir, ".skill-proposals-pending.json");
+    const before = JSON.stringify([{ tag: "reference", count: 3, files: ["a"], date: "2026-09-01" }]);
+    fs.writeFileSync(p, before);
+
+    sessionEndV2(makeInput(db, vaultDir, agentsDir, {
+      sessionSummary: "session after the ruling",
+      project: "my-project",
+    }));
+
+    // Nothing is deleted — the scan is derived, not a store — and nothing is
+    // rewritten either, because the generator never ran.
+    expect(fs.readFileSync(p, "utf-8")).toBe(before);
+  });
+});
