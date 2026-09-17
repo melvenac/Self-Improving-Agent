@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 27,
+  "revision": 28,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1434,6 +1434,12 @@
       "title": "gitattributes uses eol=lf, and the assertions stay line-ending sensitive",
       "date": "2026-09-17",
       "note": "`text=auto` alone still defers the working-tree ending to core.autocrlf, which is the setting that caused the failure, so `eol=lf` is explicit. The state-views assertions were NOT loosened the way sameCommandContent does at checks.ts:870: that would also hide a renderer which started emitting CRLF, a real regression worth failing on. With the checkout deterministic the assertion can afford to be strict."
+    },
+    {
+      "id": "D-013",
+      "title": "ADR-029 (D-004) adopted as written - the record catching up to code that has run under it for three loops",
+      "date": "2026-09-17",
+      "note": "Aaron adopted it on 2026-09-17, asked directly and answered directly. D-004 had stood as 'RECOMMENDED not yet adopted - Aaron rules (T-129)' since 2026-09-15. It was never a pending direction: Loops 8, 10 and 11 implemented all of it. matureBoost and provenBoost are 1.0, the apoptosis gate is off, the maturity lifecycle and success_rate are cut, session-start retrieval is kept. THE CODE HAD BEEN LIVING UNDER THIS DECISION FOR THREE LOOPS WHILE THE RECORD SAID NOBODY HAD MADE IT - which is Loop 11's defect class arriving in the decision log rather than in prose: a record describing a state the system had already left. Recorded as its own decision rather than by editing D-004, because ob_state has no update_decision op and because the sequence is worth keeping: recommended 2026-09-15, implemented across three loops, formally adopted 2026-09-17. NOT DECIDED BY THIS: whether the suspension should ever be reversed - D-004's own trigger language stands - and the $declined retirement of success_rate, Maturity and Rating, which Aaron deferred to Loop 13 on the same day. The behaviour is cut; the vocabulary and the column are not, and recording that as finished would make the retirements check green on an unfinished cut."
     }
   ],
   "handoff": {
