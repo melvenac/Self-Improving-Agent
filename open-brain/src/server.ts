@@ -523,7 +523,7 @@ server.tool(
 
 server.tool(
   "ob_end",
-  "End a session — self-generate summary from session .db, auto-rate recalled knowledge, write vault summary, flag reflection clusters.",
+  "End a session — self-generate summary from session .db, record any entry_ratings passed, write the vault summary, log invocations. (The reflection queue was cut in Loop 10; this no longer flags reflection clusters.)",
   {
     project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
     session_id: z.string().nullable().optional().default(null).describe("Session UUID (null if unknown)"),
@@ -891,7 +891,7 @@ function deriveKey(content: string): string {
 // --- ob_feedback ---
 server.tool(
   "ob_feedback",
-  "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Drives maturity promotion and apoptosis.",
+  "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Increments the entry's counter and writes a feedback_log row; nothing is derived from it further (maturity promotion was cut with E3 and apoptosis with E18 in Loop 10). Use ob_forget to retire an entry.",
   {
     id: z.coerce.number().describe("Knowledge entry ID"),
     rating: z.enum(["helpful", "harmful", "neutral"]).describe("Was this knowledge helpful, harmful, or neutral?"),

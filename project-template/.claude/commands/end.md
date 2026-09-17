@@ -32,10 +32,23 @@ Fill in:
 - **Gotchas & Lessons Learned** — Hard-won knowledge
 - **Decisions Made** — Any architectural decisions
 - Set status to **Completed**
-- Check off the post-session checklist items as you complete them
+- Check off a post-session checklist item **only after the action it names has finished and you have
+  seen its result** — never in the same edit that plans it. A box ticked ahead of the action cannot
+  fail, and reads afterwards as evidence that the action happened (G-020: this is how a Planner came
+  to report that `/end` had never run).
 
-### A2. Update SUMMARY.md
-> **Gate:** if `.agents/state.json` exists, SKIP this step — A7b writes the state through `ob_state`, which regenerates SUMMARY.md's marked region. Do not edit SUMMARY.md by hand in that case.
+### Which regime you are in — decide once, here
+
+**If `.agents/state.json` exists: A2, A5, A6 and A7 do not run. Skip all four and write the state in
+A7b instead.** Those four steps edit files that are rendered views of `state.json`; a hand edit to
+any of them is overwritten by the next render and is not state. This is the regime this repo is in.
+
+**If `.agents/state.json` is absent:** A2/A5/A6/A7 are the close-out, and A7b does not run.
+
+The four steps below are marked `[no-state fallback]` so this test is made once rather than four
+times.
+
+### A2. Update SUMMARY.md `[no-state fallback]`
 ```
 If META/ exists:  Update: .agents/META/SUMMARY.md
 Otherwise:        Update: .agents/SYSTEM/SUMMARY.md
@@ -62,8 +75,7 @@ Update: .agents/SYSTEM/ENTITIES.md
 ```
 _(Not applicable in meta mode — framework has no data model.)_
 
-### A5. Update INBOX.md
-> **Gate:** if `.agents/state.json` exists, SKIP this step — INBOX.md is generated from state; A7b writes the task ops. Do not edit INBOX.md by hand in that case.
+### A5. Update INBOX.md `[no-state fallback]`
 ```
 If META/ exists:  Update: .agents/META/INBOX.md
 Otherwise:        Update: .agents/TASKS/INBOX.md
@@ -72,8 +84,7 @@ Otherwise:        Update: .agents/TASKS/INBOX.md
 - Add any new tasks discovered during the session
 - Re-prioritize if needed
 
-### A6. Update task.md
-> **Gate:** if `.agents/state.json` exists, SKIP this step — task.md is generated from state; A7b writes `set_objective` if the objective changed. Do not edit task.md by hand in that case.
+### A6. Update task.md `[no-state fallback]`
 ```
 Update: .agents/TASKS/task.md
 ```
@@ -81,8 +92,7 @@ Update: .agents/TASKS/task.md
 - If the current objective is done, note that the next session should pick a new one
 - Clear stale tasks that no longer apply
 
-### A7. Write next-session handoff
-> **Gate:** if `.agents/state.json` exists, SKIP this step — next-session.md is generated from state; A7b writes `set_handoff`. Do not edit next-session.md by hand in that case.
+### A7. Write next-session handoff `[no-state fallback]`
 ```
 Write: .agents/SESSIONS/next-session.md
 ```
@@ -116,7 +126,11 @@ ob_state(session: N, expected_revision: R, ops: [...], render: true)
   - `add_gap {what, evidence, recommended_update}` / `close_gap {id}`
   - `add_decision {title, date, note}` — one per ADR appended in A3
   - `set_objective {text}` — only if the objective changed (`null` clears it)
-  - `set_handoff {pick_up, watch_out[], open_questions[]}` — the relay baton (A7's content)
+  - `set_handoff {pick_up, watch_out[], open_questions[]}` — the relay baton (A7's content).
+    **Do not assert commit or push status in it.** This op runs inside `/end`, before anything is
+    committed, so "THE COMMIT IS NOT MADE" is true when written and false when read — permanently,
+    every loop. State what the work *is*; the tree is authoritative about whether it landed, and the
+    next `/start` reads the tree.
   - `end_session {n, date, uuid}` — always last
 - On `revision mismatch`: call `ob_start` once to read the current revision, then retry the same batch once with that revision. Do not retry a third time; report the refusal in the session log.
 - The tool validates every op and refuses the whole batch on any error; nothing is written until all ops apply.
@@ -155,7 +169,10 @@ If this session changed features, commands, or architecture:
 
 ### A10. Capture external research
 
-> The SessionEnd hooks (`session-end.mjs` → `skill-scan.mjs`) auto-capture session logs and extract experiences. Steps A10-A14 catch what automation misses.
+> The single registered SessionEnd hook (`open-brain/build/cli-session-end.js`) runs the pipeline in
+> `pipelines/session-end/index-v2.ts`: summary, auto-feedback, invocation logging, shadow recall,
+> topics. Steps A10-A14 catch what it misses. (`session-end.mjs` and `skill-scan.mjs` were named here
+> until Loop 11; neither file exists.)
 If any external research was done this session (GitHub repos, YouTube videos, website docs, NotebookLM content), store a knowledge entry for each source using `ob_store`:
 
 ```
@@ -206,9 +223,11 @@ OUTCOME: {what happened, what to do differently}
 **Tag guidance:** Always include BOTH implementation tags (specific tools/libraries: `stripe`, `convex`, `clerk`) AND domain concept tags (what problem area: `payments`, `billing`, `authentication`, `deployment`, `styling`). Domain tags enable fuzzy recall — someone searching "how did we handle auth?" should find Clerk experiences even without knowing we use Clerk.
 
 **Do not write the vault note yourself.** `ob_store` writes
-`Experiences/{project}/{key}.md` — **nested under the project**, which is the
-layout `skill-scan` walks. Writing a flat `Experiences/{key}.md` alongside it
-produces a duplicate that the scan reads as a separate experience.
+`Experiences/{project}/{key}.md` — **nested under the project**
+(`vault-writer.ts:97`). Writing a flat `Experiences/{key}.md` alongside it
+produces a duplicate note with no row behind it, which `/sync`'s
+vault-index-parity check reads as an unindexed experience
+(`pipelines/sync/checks.ts:352`).
 
 Verify the store landed rather than trusting the success message: a rebuilt MCP
 server that has not restarted yet will strip any newly-added parameter and still
@@ -262,7 +281,9 @@ If knowledge was recalled during `/start`, self-evaluate each entry — don't as
    - **helpful** — actively informed a decision or prevented a mistake
    - **harmful** — misled reasoning or caused wasted effort
    - **neutral** — recalled but not referenced or used
-4. Call `ob_feedback(entry_id, rating, referenced)` for each
+4. Call `ob_feedback({id, rating})` for each — **those two arguments and no others.** The live schema
+   is `{ id: number, rating: "helpful" | "harmful" | "neutral" }` (`server.ts:895-897`). There is no
+   `referenced` parameter, and `entry_id` is not the name of the first one.
 5. Report ratings to the user (they can override if needed)
 
 **`harmful` must be genuinely reachable, not just documented.** Across the first
@@ -274,13 +295,17 @@ measures nothing. Equally, do **not** reach for `harmful` to mean "unused":
 that is `neutral`. Not being mentioned is not evidence of harm.
 
 Alternatively, pass all judgments in one call via
-`ob_end(entry_ratings: {"42": "harmful", ...})`. That records counters and
-`success_rate` but does **not** run maturity promotion or apoptosis — use
-`ob_feedback` for any entry you expect to cross a lifecycle threshold.
+`ob_end(entry_ratings: {"42": "harmful", ...})`. Both paths record the same thing: the aggregate
+counters, plus a row in `feedback_log`. Neither derives anything further from it — pick whichever
+suits the call you are already making.
 
 **Why self-evaluate:** The user can't see whether recalled knowledge helped the agent's internal reasoning. The agent that consumed it is the only one who knows.
 
-This feeds the maturity lifecycle (Progenitor → Proven → Mature) and apoptosis (auto-prune below 0.3 success rate after 5 ratings).
+**What the rating does, as of Loop 10:** it increments the entry's counter and writes a `feedback_log`
+row. That is all. `evaluateLifecycle` was cut with E3 and the apoptosis auto-delete with E18
+(`server.ts:908-910`, `:938-942`); ranking no longer reads `maturity` or `success_rate`. Rate
+honestly anyway — the log is the only record of what was judged, and the next question the corpus
+gets asked will be asked of it. Retiring an entry is `ob_forget`, with a human in the loop.
 
 If no knowledge was recalled, skip this step.
 

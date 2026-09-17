@@ -1,5 +1,68 @@
 # Changelog
 
+## [Unreleased] - Loop 11 — the instruction surface
+
+**Does each command do what it says?** Loop 10 ruled on the memory layer's code and never looked at
+the `.md` files that tell an agent what to do. Every finding below is tagged with which of the three
+audit questions found it: **Q1** references something that no longer exists, **Q2** contradicts
+itself or another governing file, **Q3** the tool behaves differently than the file says.
+
+### `end.md` — the file that runs every session (C2 item 1)
+
+- **Q1 — A10 named two files that do not exist.** `session-end.mjs` → `skill-scan.mjs`: neither is
+  on disk, in the repo or under `~/.claude`. The single registered `SessionEnd` hook is
+  `open-brain/build/cli-session-end.js`, and its pipeline's live stages are summary, auto-feedback,
+  invocation logging, shadow recall and topics.
+- **Q3 — A14 instructed a call the schema refuses.** `ob_feedback(entry_id, rating, referenced)`
+  against a live schema of `{id, rating}` (`server.ts:895-897`): two wrong argument names and one
+  parameter that has never existed. Recorded as T-057 and now fixed at the instruction site.
+- **Q1 — A14 promised a lifecycle that was cut.** Maturity promotion went with E3 and apoptosis with
+  E18 in Loop 10 (`server.ts:908-910`, `:938-942`); ranking reads neither `maturity` nor
+  `success_rate`. A rating now increments a counter and writes a `feedback_log` row, and that is all.
+- **Q1 — the `ob_end` / `ob_feedback` contrast was false on both sides.** "Use `ob_feedback` for any
+  entry you expect to cross a lifecycle threshold" named a threshold that no longer exists; both
+  paths now record the same thing.
+- **Q1 — A12 justified its vault path by a component Loop 10 cut.** The nested
+  `Experiences/{project}/{key}.md` layout is real (`vault-writer.ts:97`), but the reason given was
+  "the layout `skill-scan` walks". Re-cited to what actually reads it: `/sync`'s vault-index-parity
+  check (`pipelines/sync/checks.ts:352`).
+- **Q2 — four steps were dead by construction and the reader learned it four times.** A2, A5, A6 and
+  A7 each carried their own three-line gate saying to skip it when `state.json` exists. The regime
+  test is now made once, up front, and the four steps are marked `[no-state fallback]`.
+- **Q2 — the handoff asserted a commit status it cannot know.** `set_handoff` runs inside `/end`,
+  before anything is committed, so "THE COMMIT IS NOT MADE" is true when written and false when
+  read — permanently, every loop. A7b now forbids asserting commit or push status; the tree is
+  authoritative and `/start` reads it.
+- **Q2 — A1 told the agent to tick a checklist box as it worked.** A box ticked ahead of its action
+  cannot fail and afterwards reads as evidence the action happened. That is G-020, which misled a
+  Planner into reporting `/end` had never run.
+
+### Two MCP tool descriptions were false, and C3's proposed check would not catch either
+
+Tool descriptions are instruction text with no `.md` file. Two of fourteen were falsified by Loop
+10's own cuts and nothing noticed:
+
+- `ob_feedback` — "Drives maturity promotion and apoptosis." Both were removed in Loop 10.
+- `ob_end` — "flag reflection clusters." The reflection queue is CUT; `reflection_log` held 0 rows
+  after six months (`pipelines/session-end/index-v2.ts:169`).
+
+**Both tools exist under the names the commands call**, so a registry check of tool *names* — C3's
+design — passes on both. Name existence is machine-checkable; description truth is not. Recorded so
+C3 is not oversold as catching this class.
+
+### `command-parity` was right and the hand-rolled check was wrong
+
+A raw `md5` comparison across the three command mirrors reported 7 of 11 commands divergent. They
+were not: `core.autocrlf=true` with no `.gitattributes` means `project-template/` is checked out
+CRLF while the gitignored `.claude/` stays LF, so **byte comparison across the tracked/untracked
+boundary differs for every file, forever**. `sameCommandContent` (`checks.ts:870-873`) normalizes
+line endings and trailing whitespace, and was correct. CR-normalized, 0 of 11 differ at `38398e8`.
+Any future parity work must normalize or it will report drift that is not there.
+
+The check has now been seen to fail and to recover: editing the repo copy alone raised
+`command-parity: end.md differs`, and propagating to both mirrors returned it to
+`pass: 7 shared commands identical`.
+
 ## [0.35.0] - 2026-09-17 — the startup read
 
 **What a session start actually hands the agent.** Loop 10 ruled on what the memory layer is worth; this looks at what `/start` delivers. Two renderers carried the same defect, `start.md` documented a contract that did not hold, and the fix to the visible one changed nothing the agent sees.
