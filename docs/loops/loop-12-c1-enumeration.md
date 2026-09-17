@@ -64,6 +64,21 @@ snapshot whose job is to name an old tree (`knowledge-mcp/package.json`, `shared
 It is not historical by path and not prose. **Both must be excluded by rule, or C3 ships loud and
 gets ignored** — which is how a check dies.
 
+## C1.4 — A referrer class neither seat enumerated, found in R-010
+
+**A test that pins the behaviour of the retired thing.**
+
+`rating-method.test.ts` held two tests — *"labels the tag-substring fallback 'heuristic'"* and
+*"separates a supplied neutral from a heuristic neutral"* — whose **only purpose was to assert what
+the cut arm produced.** They are referrers, and they behave unlike every other referrer in this
+document: **a dangling reference sits there quietly; a test that pins a dead thing FAILS WHEN YOU DO
+THE RIGHT THING.** It resists the retirement rather than surviving it.
+
+That makes it the one referrer class you cannot miss — and also the one most likely to be "fixed" by
+restoring the behaviour instead of retiring the test. Classified **machine-checkable, by the test
+runner rather than by a check**, and it is the reason C1's three-bucket scheme needed a fourth
+question: not *does something still name it*, but *does something still assert it.*
+
 ## C1b — The event classes that end a name
 
 A ruling of `CUT` is the minority case. Of Loop 11's 25 Q1 defects the two largest clusters —

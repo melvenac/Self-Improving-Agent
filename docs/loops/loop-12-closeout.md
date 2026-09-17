@@ -167,7 +167,7 @@ every time someone checks their own work makes checking your own work look like 
 says how often the failure mode *fires*; the error count says how often it *escapes*. Both are worth
 having and they are not the same measurement.
 
-## The mechanism caught its author three times
+## The mechanism caught its author four times
 
 1. **C2** — `command-names` fired on its own repair. Writing `` `/recall` ``'s obituary in place is
    textually identical to the defect. **The obituary was dropped rather than reworded to dodge the
@@ -175,6 +175,14 @@ having and they are not the same measurement.
 2. **C3** — case-insensitive matching made `KB_PATH`, a live variable, match the retired `kb_*`
    **tool** prefix. Rule 8 inside the check written to enforce it. Now strict by default, pinned.
 3. **C3** — the backfill went red on `dream`, which no audit had looked for.
+4. **R-010** — the `retirements` check caught `README.md` still describing
+   `enableHeuristicRatings` as a live gate. **That line was written by me in C2, hours earlier, while
+   repairing the same file for the same class of defect.**
+
+**The fourth is the strongest argument the check is not ornamental, precisely because its author
+could not avoid the defect by knowing about it.** Twice in one day my own text was caught by my own
+mechanism. Knowing a failure mode intimately does not prevent it — it is the same finding this
+document opens with, arriving in the code rather than in the prose.
 
 ## The check that passed by spelling
 

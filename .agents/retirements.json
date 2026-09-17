@@ -398,7 +398,9 @@
         "~/.claude/commands/start.md",
         "~/.cursor/commands/start.md"
       ],
-      "out_of_repo_note": "Repaired by hand and listed here because the check cannot see outside projectRoot. THIS IS THE WHOLE OF C4’s MEASURED BLIND SPOT: one nameable boundary, closeable by pointing the check at the four command mirrors as command-names already is."
+      "out_of_repo_note": "Repaired by hand and listed here because the check cannot see outside projectRoot. THIS IS THE WHOLE OF C4’s MEASURED BLIND SPOT: one nameable boundary, closeable by pointing the check at the four command mirrors as command-names already is.",
+      "executed": "2026-09-17",
+      "execution_note": "FULLY EXECUTED. ~/.agents/mailbox/channels/sia/ (18 files) removed on Aaron's direct confirmation, after verifying all three records were present on origin/master with the decisions log at 67 entries — checked in the MASTER copy, not the working one. The eight other channels were counted before and after and are unchanged: a2a-hub 3, coop-mailer 4, foundry 3, gitnexus 0, nexcrm 5, openlaser 2, TCM 6, worthit 10."
     },
     {
       "id": "R-010",

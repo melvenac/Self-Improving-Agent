@@ -94,8 +94,22 @@ This is the Planner's design principle in its strongest available form: *prefer 
 fail over reporting that it exists.* **`project.version` is the precedent** — a file still carrying it
 does not parse, so the missed copy is loud in code with no check involved. Where the referent is
 code, delete it so the compiler complains; where the referent is a build artifact, make the build
-remove it. **The check is the fallback for prose, which is the only place a missed copy can stay
-quiet.**
+remove it.
+
+**AMENDED AFTER R-010 TESTED IT.** That ordering was asserted from intuition and the evidence does
+not support it. Cutting `enableHeuristicRatings` produced this:
+
+| instrument | caught | cannot see |
+|---|---|---|
+| **compiler** | **nothing** | `tsconfig.json` is `"include": ["src/**/*"]` — there is one tsconfig and **`tsc` never reads the test directory at all** |
+| **test suite** | **6 referrers**, two files, at runtime *after* `tsc` was green | prose |
+| **`retirements` check** | **1** — `README.md`, describing the flag as a live gate | code that compiles |
+
+**"Delete it so the compiler complains" is not merely bounded — it is blind to the half of the
+codebase most likely to name a thing nobody uses any more.** The corrected claim: **the compiler is
+strongest over what it compiles, the suite reaches past it into code the compiler ignores, and the
+check is the only one that reaches prose. All three were necessary, and none is a substitute for
+another.**
 
 ## Coverage, stated rather than implied
 

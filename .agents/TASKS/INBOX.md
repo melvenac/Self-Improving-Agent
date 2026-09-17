@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 25 by open-brain v0.37.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 26 by open-brain v0.37.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -39,6 +39,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-093** Archive Atlas-Forge mailbox thread
 - [ ] **T-146** Run the recency sweep at 0.01 / 0.02 / 0.04
 - [ ] **T-148** The note is required before you RETIRE a task, not only before you work one
+- [ ] **T-152** The test suite is not type-checked at all
 
 ## P2
 

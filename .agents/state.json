@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 25,
+  "revision": 26,
   "project": {
     "name": "self-improving-agent"
   },
@@ -488,6 +488,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "FIX COMPLETE AND VERIFIED, NOT YET MERGED — PR #21, branch fix/gitattributes at 0f41265. Verified against a control rather than asserted: two fresh worktrees from the same repo, one at 207eb6e (no fix) and one at 0f41265. Fixture `file -b`: 'ASCII text, with CRLF line terminators' before, 'ASCII text' after. state-views.test.ts: 1 failed before, 1 passed after. Full suite in the fresh FIXED clone: 44 files passed — the first time this repo has been green in a fresh Windows clone. `git add --renormalize` across the tree changes no blob (index was already LF), so only what lands on disk changes. Stays OPEN until Aaron merges; closing on a verified-but-unmerged fix would make the record say fixed while master is not."
+    },
+    {
+      "id": "T-152",
+      "title": "The test suite is not type-checked at all",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 63,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "open-brain/tsconfig.json is `\"include\": [\"src/**/*\"]` and there is exactly one tsconfig, so `tsc` NEVER READS open-brain/tests/. Not 'checked less strictly' — not checked. Found in Loop 12 R-010: cutting `enableHeuristicRatings` left the flag named in six places across four test files and `npx tsc --noEmit` exited 0. The referrers surfaced only at runtime, when assertions happened to trip on them. This reframes '603 tests passing': the suite proves behaviour, and nothing proves the tests' own types. A type error in a test is invisible unless a runtime assertion happens to catch it. Fix is a tsconfig that includes tests (or a second one for typecheck only); the risk is that it surfaces a backlog of existing test type errors, which is the point. Independent of the retirement work — filed, not fixed, in the loop that found it."
     }
   ],
   "verified": [
