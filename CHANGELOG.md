@@ -163,6 +163,64 @@ project-template/` returns nothing, so the framework does not ship it; and `git 
 returns the five state files that **PR #16 committed as the standard close-out**, with `/sync`
 passing. The rule says never, the protocol does it every loop, and nothing notices.
 
+### The skills and the `.agents/` instruction files (C2 item 5)
+
+**`self-improving-agent-guide/SKILL.md` — a registered skill teaching a lifecycle that was cut.** Its
+description advertised "the maturity lifecycle (Progenitor → Proven → Mature) and apoptosis", and the
+body carried the threshold table and boost multipliers as live behaviour. Both were cut in Loop 10.
+This is the skill an agent loads to learn *how the framework works*.
+
+**`self-improving-agent-gotchas/SKILL.md` — the stale-build gotcha had gone stale.** Its first entry
+told you to `cp knowledge-mcp/src/*.ts ~/.claude/knowledge-mcp/src/` and rebuild the "installed
+copy". **`~/.claude/knowledge-mcp/` does not exist**; there is one copy, in this repo, and
+`~/.claude/open-brain/` holds data only. The skill's trigger description also named `knowledge-mcp`,
+`scripts/*.mjs` and `kb_recall` throughout, so it advertised itself for an architecture two renames
+old. Replaced with the rebuild-then-reconnect sequence that actually works.
+
+**`TESTING.md` — every row was false and it is a file about how this project verifies things.** Four
+`.mjs` scripts that do not exist, `knowledge-mcp/`, the retired `kb_*` prefix, the v1 vault path, a
+test count 287 short, and "No CI/CD pipeline" while `.github/workflows/ci.yml` was green. Rewritten
+against the suite that exists.
+
+Also repaired: `LIFECYCLE.md` (invocation log path — the real one is
+`~/.claude/open-brain/skill-invocations.jsonl`, `invocation-logger.ts:49`), `SECURITY.md`,
+`RUNBOOK.md`. **`experiences-input.md` is a captured data dump, not a skill** — it now says so at the
+top, and its historical tool names are marked as preserved deliberately rather than left looking like
+current instructions.
+
+### The tracked-vs-untracked comparison does not support the hypothesis it was designed to test
+
+The claim was that instruction text no reviewer ever sees rots faster, with `project-template/`'s
+tracked files as the control. **On the mechanical Q1 test the gap is enormous — and it is an
+artefact.**
+
+| | files | checkable refs | dead refs | files with defects |
+|---|---|---|---|---|
+| Untracked-only (`.agents/`) | 13 | 138 | 40 (29%) | 77% |
+| Tracked-only (`project-template/.agents/`) | 16 | 140 | 0 (0%) | 0% |
+
+Reference *counts* are near-identical, which rules out surface area. Age does not explain it either:
+the template's `TESTING.md` and `RUNBOOK.md` date from 2026-03-21, **older** than the untracked
+`TESTING.md` at 2026-04-13, and clean.
+
+**But the references are not the same kind.** Counting only those pointing at live, moving
+infrastructure — `ob_*`/`kb_*` tools, `open-brain/` paths, hook scripts, vault paths, cut components:
+
+- Untracked-only: **108 of 197 (54%)**
+- Tracked-only: **7 of 240 (2%)**
+
+**The control group is barely exposed to the hazard at all — a 27× difference.** Its references are
+overwhelmingly its own static siblings (`ENTITIES.md`, `RULES.md`, `task.md`) and generic stack names
+(`next.config.js`, `playwright.config.ts`) that ship as a unit and cannot go stale. A group that
+points at nothing that moves will show no rot whether it is reviewed or not. **The comparison is
+invalid and the hypothesis is unproven.**
+
+**The one valid observation available points the other way.** `project-template/.claude/commands/end.md`
+is tracked, ships in PRs, and was byte-identical to the untracked copy — so it carried **all eight**
+of `end.md`'s defects, through every review it has ever been in. Where both halves face the same
+hazard, being tracked did not prevent the rot. Tracking makes a repair *reviewable and restorable*,
+which is reason enough to want it; **this loop produced no evidence that it makes text truer.**
+
 ### Two MCP tool descriptions were false, and C3's proposed check would not catch either
 
 Tool descriptions are instruction text with no `.md` file. Two of fourteen were falsified by Loop
