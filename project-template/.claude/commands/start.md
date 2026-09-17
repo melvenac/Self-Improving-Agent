@@ -84,37 +84,19 @@ Skip any that do not exist:
 
 1. `.agents/skills/INDEX.md`
 2. `.agents/SYSTEM/domains.json`
-3. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`, `mailbox_channel`
+3. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
 
-### 5. Mailbox
+### 5. Coordination
 
-**Skip entirely if `AGENT.md` was absent or declared no `mailbox_channel`.** Otherwise:
+**There is no mailbox step.** The `~/.agents/mailbox/` channel was retired in Loop 12: coordination
+between seats is A2A (direct cross-session messages), which arrives on its own and needs no read.
 
-Channel dir: `~/.agents/mailbox/channels/{mailbox_channel}/`. Read two things from it, in this order.
+**What a session start DOES need to read is the durable half, and it is in the repo:** the newest
+brief and boundary reports in `docs/loops/`, by the largest loop number. Decisions live in
+`.agents/state.json` `decisions[]` and already reached you through `ob_start`.
 
-**1. The newest brief — `loop-N-brief.md`, by the largest N.** This is where work actually arrives.
-`{partner}-to-{name}.md` is **archive, not inbox**: on 2026-09-17 its newest header was three days
-old and named a Loop 4 brief, while Loop 11's brief sat beside it in `loop-11-brief.md` and its
-corrections arrived as a cross-session message. Reporting the `-to-` file's subject as "latest"
-presents superseded work as current. Read it only if you need the history.
-
-**2. `decisions.md` — the LAST `## YYYY-MM-DD` header in the file.** Entries are appended, so **line
-position is the ordering, not the date.** Same-date headers are the norm: every header in this
-project's `decisions.md` shares its date with at least one other, so a date sort orders nothing and
-silently returns an arbitrary entry.
-
-**The ordering rule is the same for every file in this channel: appended, so the last header wins.**
-It was previously written as "the first one after the intro" for the inbox and "the last" for
-decisions — two opposite rules for two files with identical structure, which is why a 2026-08-31
-message was once reported as newer than a 2026-09-14 one.
-
-**Print the date beside whatever you report.** A stale subject beside a today decision reads as
-current work unless the dates are visible. If the newest brief predates the last decision, say so.
-
-> Note: `~/.agents/mailbox/README.md` documents neither of these. It defines the channel as the
-> three-file `{sender}-to-{receiver}` shape, gives no ordering rule, and does not mention
-> `loop-N-brief.md` or cross-session messages. The rules above are derived from the channel's actual
-> contents and traffic, not from the README.
+**A2A has no memory.** Anything a later session must be able to read goes in a tracked file before
+the exchange ends — session 61’s close-out travelled by A2A alone and exists in no file anywhere.
 
 ### 6. Present the briefing
 
@@ -145,7 +127,7 @@ BROKEN ({n} gaps open; newest {m})
 - {any task with status blocked}
 
 Working tree: {clean | N uncommitted: path, path, ...}
-Mailbox: {newest loop-N-brief.md} ({date}) | Last decision: {date} — {title}
+Latest brief: {newest docs/loops/loop-N-*.md} ({date})
 Skills: {relevant entries from .agents/skills/INDEX.md, or "none"}
 
 FLAGS: {anything to verify, or "none"}

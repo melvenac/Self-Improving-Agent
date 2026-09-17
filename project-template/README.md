@@ -69,7 +69,7 @@ Works without cross-project memory or global commands. Agents must manually read
   TASKS/              # INBOX.md (live) + task.md (ledger)
   SESSIONS/           # Session logs (/start creates these)
   skills/             # Stack-specific patterns (emerge over time)
-  a2a/                # Optional: multi-agent mailbox (mature projects)
+  a2a/                # Optional: durable landing place for multi-agent work (mature projects)
 
 .claude/rules/        # Optional: path-triggered rules (Claude Code only)
 CLAUDE.md             # Claude Code entry point

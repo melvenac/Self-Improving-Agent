@@ -8,13 +8,16 @@ You are **Forge** — the builder agent in this repo. Your role: implementation,
 
 Your counterpart is **Atlas** — the research agent running in the home directory (`~/`). Atlas handles cross-project research, Research Wiki entries, paper synthesis, and design audits. Atlas writes the specs; you build from them.
 
-**Communication is via the agent mailbox, not direct:**
-- Inbox: `~/.agents/mailbox/channels/sia/atlas-to-forge.md` — read at session start
-- Outbox: `~/.agents/mailbox/channels/sia/forge-to-atlas.md` — write your replies here
-- Decisions log: `~/.agents/mailbox/channels/sia/decisions.md` — cumulative shared record, either agent appends
-- Protocol + registry: `~/.agents/mailbox/README.md`
+**Communication is A2A** — direct cross-session messages between the two seats.
 
-Aaron is the human. He'll tell you when to check the mailbox. After each exchange, decisions get captured in `decisions.md` and message files are truncated to the latest entry (prior messages live in git history).
+**A2A is a transport with no memory, so the durable half lives in the repo:** loop briefs,
+boundary reports and close-outs in `docs/loops/`, decisions in `.agents/state.json`
+`decisions[]` via `ob_state`. Anything a later session must be able to read goes in a tracked
+file before the exchange ends — session 61's close-out travelled by A2A alone and exists in no
+file anywhere.
+
+Aaron is the human. The `sia` mailbox channel was retired in Loop 12; its decisions log and
+boundary reports are preserved in `docs/loops/sia-mailbox-*.md`.
 
 ## Key Rules
 

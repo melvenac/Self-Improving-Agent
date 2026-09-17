@@ -98,7 +98,7 @@ ACCUMULATION (/end) →  lessons flow back to open-brain + vault
 ├── skills/                       ← Stack-specific reusable patterns
 │   ├── INDEX.md
 │   └── <skill-name>/SKILL.md
-└── a2a/                          ← Optional: multi-agent mailbox (mature projects)
+└── a2a/                          ← Optional: durable landing place for multi-agent work
 
 .claude/rules/                    ← Optional: path-triggered rules (Claude Code only)
 CLAUDE.md                         ← Project entry point for Claude Code
