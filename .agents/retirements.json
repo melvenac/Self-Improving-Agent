@@ -138,7 +138,8 @@
           "class": "test",
           "why": "fixture proving an unexpected mirror copy is reported"
         }
-      ]
+      ],
+      "coverage_gap": "FOUND IN QA AT a3bcf2f, RECORDED RATHER THAN FIXED. The pattern `skill[-_]?scan` does not match \"the skill scan\" with a SPACE — verified: skill-scan, skill_scan and skillscan match; \"the skill scan\" does not. cli-session-end.ts:8 uses exactly that spelling, written by this loop's own C3 repair, so it PASSES BY SPELLING RATHER THAN BY RULE. The outcome is still correct — the file is an allowed referrer under the reflection-queue retirement — but a genuinely dangling \"the skill scan\" would pass too. THE FIX IS MEASURED AND CHEAP: widening the pattern to accept a space adds exactly two new referrers needing entries, open-brain/src/pipelines/session-end/index-v2.ts and open-brain/src/cli-session-end.ts, both obituaries; tests/fixtures-import is already historical and index-v2.test.ts is already listed. NOT APPLIED HERE because it changes shipped matching behaviour after sign-off, and a behaviour change after QA needs re-QA rather than a quiet amend."
     },
     {
       "id": "R-003",

@@ -90,7 +90,21 @@ refusing to retire a task on its title.
 than the record (`D-004` is *recommended, not adopted*; Loop 7 never closed it), and a `C3` spec that
 would have fired on four correct obituaries.
 
-**Running count: 33 Planner, 24 Developer.**
+### The broken-check shape bit both seats, all day
+
+**Planner 34 — a fallback `echo` that fired over a real hit.** `grep … ; echo "(blank = not listed)"`
+printed a false negative *next to* the true positive during QA. **The fourth instance of this shape
+today and the third inside a QA**, and only the true positive saved the reading. It is the same
+family as Loop 11's `grep -c … || echo 0`, `git show` mangled by MSYS, and Developer 23's truncated
+`head -25` above. **The loop should carry that its Planner kept committing this shape while ruling on it**
+— which is the honest version of the pattern, not an aside.
+
+**All four are one failure: an instrument that cannot distinguish "nothing there" from "I did not
+look."** A zero, a blank, a truncated list and a mangled ref all read as absence. **The only defence
+that worked, every time, was looking at what the instrument actually returned** rather than at the
+number it reduced to.
+
+**Running count: 34 Planner, 24 Developer.**
 
 ## The mechanism caught its author three times
 
@@ -100,6 +114,23 @@ would have fired on four correct obituaries.
 2. **C3** — case-insensitive matching made `KB_PATH`, a live variable, match the retired `kb_*`
    **tool** prefix. Rule 8 inside the check written to enforce it. Now strict by default, pinned.
 3. **C3** — the backfill went red on `dream`, which no audit had looked for.
+
+## The check that passed by spelling
+
+**Found in QA at `a3bcf2f` and recorded rather than fixed.** `skill-scan`'s pattern is
+`skill[-_]?scan`, which does **not** match **"the skill scan"** with a space. `cli-session-end.ts:8`
+uses exactly that spelling — **written by this loop's own C3 repair** — so that line **passes by
+spelling rather than by rule.** The outcome is still right: the file is an allowed referrer under the
+reflection-queue retirement. **The reason is accidental, and a genuinely dangling "the skill scan"
+would pass too.**
+
+**The fix is measured and cheap** — widening the pattern adds exactly two referrers needing entries,
+both obituaries. **It was not applied**, because changing shipped matching behaviour after sign-off
+needs re-QA rather than a quiet amend, and the SHA was signed off. Recorded as `coverage_gap` on
+R-002 in the record itself, where the next person to touch that retirement will see it.
+
+**This is the mechanism's own limitation showing in the mechanism's own file**, which is the right
+place for it.
 
 ## Measured, not executed
 
