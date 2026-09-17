@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 20,
+  "revision": 22,
   "project": {
     "name": "self-improving-agent"
   },
@@ -478,6 +478,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Session 62: `node open-brain/build/cli.js sync --check-only` was run intending a dry run. There is no such flag. cli.ts:21 is `args.includes(\"--check\")` — exact array membership, so \"--check-only\" does not match, checkOnly stayed false, the flag was SILENTLY DISCARDED and sync ran in FIX MODE, writing seven tracked files plus untracked PRD.md. No harm that time only because every write was version-sync the release bump required anyway, and the diff was read before committing — WHICH MEANS THE SAFETY CAME FROM THE OPERATOR, NOT THE TOOL. Loop 11's other 38 defects were prose that lied about behaviour; this is behaviour that lies about intent, and it is the more dangerous class: a mistyped safety flag selects the unsafe path and says nothing. Fix: parse argv against a known flag set and exit non-zero on anything unrecognised, naming the flag. Deterministic, and it cannot be overridden the way a documented convention can. Applies to every subcommand of cli.ts, not just sync. Evidence: cli.ts:21, and the seven-file write at 811dddc's parent."
+    },
+    {
+      "id": "T-151",
+      "title": "Add .gitattributes — the suite fails in a fresh Windows clone and three instruments call it green",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 62,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Session 62, found by the Planner during Loop 11 QA and reproduced independently by the Developer. tests/pipelines/state-views.test.ts fails 2 assertions in a FRESH worktree: applySummaryRegion expects '# Project Summary\\n\\n' and gets '# Project Summary\\r\\n\\r\\n'. CONTROL RESULT, recorded because the point is which instruments miss it: FAILS on master at 39fefb4 in a fresh worktree; PASSES in the long-lived main tree (588/588); PASSES in CI. Cause: core.autocrlf=true with NO .gitattributes, so a fresh checkout writes open-brain/tests/fixtures/.agents/SYSTEM/SUMMARY.md with CRLF while the assertion is written LF. Verified directly by comparing the same fixture across two checkouts of the same commit: `file -b` reports 'ASCII text' in the main tree and 'ASCII text, with CRLF line terminators' in the fresh worktree. The main tree passes only because its fixtures were written LF and never re-checked-out; CI passes because it runs on Linux. So the suite is green everywhere anyone looks and red in a fresh clone on Windows, which is the platform this project is developed on. This is the THIRD appearance of the missing .gitattributes in one day: the raw-md5 'seven of eleven commands diverged' finding that was retracted (they were CR-identical), the LF-will-be-replaced-by-CRLF warning on every commit, and now this. It matters more than a flaky assertion because Loop 11 made this repo clonable with its instructions for the first time, and the first thing a fresh clone now does is fail two tests. Fix: add .gitattributes normalising text files, and/or make the assertions line-ending agnostic the way sameCommandContent already does at checks.ts:870. NOT G-016 - checked rather than assumed: G-016 is tests/shared/state-writer.test.ts and its failing assertion is about feedback_log rows being empty, a shared-state leak; that file passes 30/30 in the same fresh worktree where state-views fails. Different file, different assertion, different mechanism; G-016 stays open on its own terms."
     }
   ],
   "verified": [
@@ -1307,6 +1317,12 @@
       "title": "R1's first production use was a true positive whose subject was R1 itself",
       "date": "2026-09-17",
       "note": "After the merge, ob_sync via MCP omitted the state-schema line entirely while the CLI printed it: the server held the module from before R1 existed. Reconnect confirmed the fix - 'readable by the running MCP server'. But both runs reported an identical '23 passed, 0 issues', so a stale server and a current one differ only in whether one row among twenty-three is printed. The signal is an absent check, not a failing one - the same family as apoptosis reading 0 forever. Expectation of a pass was correct about parsing and would have concealed it, which is why expectation is not the instrument."
+    },
+    {
+      "id": "D-009",
+      "title": "Orphan sweep after Loop 11: the three items held with Aaron are resolved, and the stale recall files are gone",
+      "date": "2026-09-17",
+      "note": "Cut on Aaron's word: .agents/TASKS/CONTRACT-SCHEMA.md (superseded by TaskSchema in state.json) and .agents/skills/skill-creator-enhanced.md (a loose 357-line skill file nothing registered; two skill-creators already global). Both survive in .agents/archive/pre-state-migration-2026-09-14/, so the cut did not destroy the only copy. Then a sweep of the wider repo: 14 orphaned build artifacts (.d.ts/.js.map with no .js beside them), settings.local.json.doctor-backup, doctor-undo-2026-07-27.md (its own premise went void when PR #17 tracked CLAUDE.md and .claude/ — it existed only because there was no git undo for them), fix-scorer-stats.md (subject held by T-053), and 14 branches fully contained in master. THE CONSEQUENTIAL ONE: all three live .recalled-entries.json copies, two of which sat on cli-session-end.ts's read path at cli-session-end.ts:77-78. Loop 5 removed the writer and left the files, so for four months the session-end rating path has read files nothing maintains, held off only by a session-id match that could never succeed again. The protection is now absence rather than a guard, which is deterministic-first per CLAUDE.md. HELD BACK DELIBERATELY: research-wiki-audit.md, v2-pipeline-e2e.md and the 2026-03-25 debug report carry intent recorded nowhere else, and cutting them would destroy the only copy — G-018's defect. loop/7-injection kept: git branch -d refused it, correctly, as it holds commits that never reached master. Verified after the cut: /sync 24 passed, 0 issues; 588 tests across 44 files green."
     }
   ],
   "handoff": {
