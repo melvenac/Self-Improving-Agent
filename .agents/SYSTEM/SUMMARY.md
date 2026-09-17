@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 17 by open-brain v0.35.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 18 by open-brain v0.35.0 — do not edit; change state via ob_state -->
 > **Status:** v0.35.0 — Loop 10 answered the question the project was started to ask: the ranker earns its keep, the injection does not, and after six months the memory half is still unproven. The next loop starts from that answer rather than from another measurement.
 
 ## What's working
@@ -30,6 +30,7 @@
 - project.version is gone from every state.json in the tree and a file still carrying it fails parse, so a missed copy is loud rather than silent. _(V-022, 2 evidence)_
 - No recency-decay variant beats the live 0.005 constant at better than chance on the repaired harness. _(V-023, 1 evidence)_
 - Whether recalled knowledge changed what an agent did is not answerable on the existing record; the apparent signal is retrieval's own selection criterion. _(V-024, 1 evidence)_
+- ob_start's State block replaces the four prose files rather than accompanying them, and renders task titles only: the payload fell from 7,971 to 2,142 words on the same rev-14 state, and the briefing was completable without opening task.md. _(V-025, 3 evidence)_
 
 ## What's broken
 
@@ -54,6 +55,7 @@
 - Gap G-022: The error-count table and the ordinal numbering disagree by 2 Planner and 1 Developer, at the Loops 5-7 boundary
 - Gap G-023: PR #2 has been open and review-ready for three weeks against a head that no longer exists on origin
 - Gap G-024: Done-task retention evicts entries from state.json permanently during a bulk close, while reporting it only in passing. Closing 13 tasks in session 61 dropped T-032 and T-052 out of the record entirely — nobody asked for those two to go, and it surfaced only because the tool output was read carefully. The count scales with the size of the close, so a large sweep evicts proportionally more, equally quietly.
+- Gap G-025: open-brain/build is not pruned on rebuild, so a deleted source leaves its declaration file and sourcemap behind with no .js beside them. auto-feedback.ts was cut in Loop 10, but build/pipelines/session-end/ still holds auto-feedback.d.ts and auto-feedback.js.map dated Sep 15. Inert — nothing executes without the .js — and build/ is gitignored, so this is per-seat debris rather than a repo defect.
 
 ## What's next
 

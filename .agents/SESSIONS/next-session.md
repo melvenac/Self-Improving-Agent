@@ -1,27 +1,28 @@
-<!-- generated from .agents/state.json rev 17 by open-brain v0.35.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 18 by open-brain v0.35.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## Pick up here _(written session 60)_
+## Pick up here _(written session 61)_
 
-Loop 10 is merged (PR #12, master 4f93676, tag v0.34.0). The close-out PR is the only Loop 10 work left. Loop 11's subject is Aaron's to rule; the recorded candidates are making R1's staleness signal a counted value rather than a printed row, and the finding that writing to the record must be a step rather than a resolution - six errors, the R4 rule and the Loop 9 footnote all lived only in messages until someone wrote them in.
+Session 61 was an inspection plus a backlog sweep, not a loop. The rewritten /start was judged against Aaron's four criteria and passed on the re-run: payload 7,971 -> 2,142 words, no disk spill, no file read that the briefing should have supplied. The backlog went 44 -> 31 active across revisions 14 -> 18. THE COMMIT IS NOT MADE: state.json, the four rendered views and Session_61.md are modified and uncommitted, and Clark (Planner, home seat) is taking it to Aaron. Nothing was branched or pushed. Loop 11's subject is still Aaron's to rule.
 
 ## Watch out
 
-- A reconnect message is not evidence: verify by a read ordered strictly after the write. R1's own first use proved a stale server reports success while looking identical in totals.
-- Every containment that worked this loop was a command; every containment that failed was an intention. Prefer a check that runs over a rule that must be remembered.
-- Two measurements that share a premise are one measurement - six instances this loop, ending with db.ts, which both enumeration passes missed because both assume a component is something production reaches.
-- git show <ref>:<path> is mangled by MSYS on Windows when the ref contains a slash; it reports a present file as missing. Use MSYS_NO_PATHCONV=1.
-- git ls-remote --tags double-counts annotated tags via the ^{} rows; filter them or the count doubles.
-- sed -i on tracked files is blocked by the auto-mode classifier as irreversible destruction; use the Edit tool instead.
-- A release tag and a session close-out must not share a branch (R4, now in the tracked template RULES.md): the reviewed commit and the PR's commit diverge by construction.
+- A substring check cannot distinguish an assertion from a citation of that assertion. Grepping G-010 for its retired clause returns true, because the amendment quotes the clause in order to retire it. Verify a rewrite by the field that changed, not by the absence of old words.
+- A read ordered before another seat's write is indistinguishable from a read of current state. Clark read rev 16 correctly while the file was already 17. Within one seat you can order a read after a write; across two seats neither party controls the ordering.
+- close_gap DELETES. state-writer.ts:292 is s.gaps.splice(idx, 1) — no closed_session, no tombstone, no retention, and no reopen_gap to undo it. Closing a gap destroys its evidence in the same motion; G-018's survives only at 6af5592.
+- A bulk close evicts unrelated done tasks through retention and announces it as one summary line. Closing 13 tasks dropped T-032 and T-052 out of the record entirely. Read the dry run before the real call, every time.
+- Reading a title is the documented way to read the new INBOX.md and is NOT enough to retire a task. That is T-148, and it is the cause of this session's one real error.
+- git show <ref>:<path> is mangled by MSYS on Windows when the ref contains a slash; use MSYS_NO_PATHCONV=1. Verified again this session against 6af5592.
+- A heredoc through the Bash tool failed to parse on this session's long markdown; the Write tool did the same job. Do not spend turns fighting the heredoc.
 
 ## Open questions
 
-- Does the protocol half earn its keep? It was never tested against Loop 10's criterion, so nothing may claim it did.
-- Should success_rate be dropped from live databases? It survives as an inert column; dropping it is a migration Loop 10 did not rule on.
+- Does the protocol half earn its keep? Still untested against Loop 10's criterion; nothing may claim it did.
+- Should success_rate be dropped from live databases? It survives as an inert column — T-053 closed because nothing computes it, which is not the same as it being gone.
 - Node v24: the v22 pin is released in this repo, but Smart Connections may break in Aaron's vault where no test here would catch it.
+- Should gaps and the Verified section be reconciled by something? G-010 asserted two claims that V-017 and V-022 already contradicted in the same file, and nothing reads across the two.
 
 ## Last session
 
-Session 60 — 2026-09-17 — `d6af4ac8-3836-4752-8c70-66facd766729`
+Session 61 — 2026-09-17 — `8ff4db2c-ab14-44fd-be58-864a09312fb8`
