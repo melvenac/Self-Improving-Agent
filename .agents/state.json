@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 30,
+  "revision": 31,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1099,6 +1099,29 @@
       ],
       "since_session": 63,
       "status": "verified"
+    },
+    {
+      "id": "V-034",
+      "claim": "PR #33's fix is correct and was QA'd independently rather than relayed: the retirements check passes in all three worktrees, including the main tree where it fired 115 findings, and the new regression test was seen red on the real defect",
+      "evidence": [
+        {
+          "type": "observation",
+          "path": "open-brain/tests/pipelines/sync/checks.test.ts",
+          "observation": "Rule 2 satisfied by hand at frozen SHA 714dbd7: reverting the call site to walkTracked in src made the new test fail 'expected issue to be pass'; restoring it made it pass. The test's `catch { return; }` guard did NOT fire, which is how we know it exercised the git path here rather than skipping vacuously."
+        },
+        {
+          "type": "observation",
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "observation": "Rule 13 satisfied: checkRetirements run against all three worktrees from ONE build. MAIN (dirty, .gitnexus/ present) PASS, 152 files scanned of 397 walked; PLANNER PASS 194/194; LOOP12 PASS 194/194. The tree that used to differ no longer does."
+        },
+        {
+          "type": "observation",
+          "path": "open-brain/package.json",
+          "observation": "QA'd in a FOURTH environment - a fresh npm install and tsc build in ~/Projects/sia-planner, neither the tree it was developed in nor the tree that found the bug. 44 files / 604 tests pass, matching the Developer's count by independent measurement rather than by report."
+        }
+      ],
+      "since_session": 63,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -1261,6 +1284,20 @@
       "what": "expected_revision serialises writes within one lineage, not across branches. Two seats can read the same base revision, derive the same successor, and both be accepted - the collision is invisible at the data layer and surfaces only as a git conflict at merge time, a different and much later layer. The revision counter does less work than its name implies.",
       "evidence": "2026-09-17, Loop 12. Forge filed T-152 at rev 25 -> 26 on docs/loop-12-closeout-amendments while the Planner wrote D-013 at rev 25 -> 26 on another branch, within moments. Both writes were legitimate and both were accepted; expected_revision refuse-on-mismatch protects a single writer against a STALE READ and cannot see a second writer who read the same base. Resolved by the Planner unwinding its branch - a social fix, not a mechanism. Master 34caf22 at rev 25; the surviving write is Forge's.",
       "recommended_update": "T-149 (a worktree per seat) DOES NOT ADDRESS THIS - separate checkouts do nothing about two seats deriving the same successor from the same base. Candidate fixes, none ruled: make the revision a content hash of the prior state rather than a counter, so two divergent successors cannot share an identity; or have ob_state refuse a write whose expected_revision is already the HEAD revision of another branch in the repo; or accept that state.json is a git-merged file and give it a merge driver that reconciles ops rather than lines. This is the two-seat version of the read-ordering problem, one level down in the data model rather than in the filesystem.",
+      "opened_session": 63
+    },
+    {
+      "id": "G-028",
+      "what": "The stated reason for PR #33 - that the 115 findings were 'almost all files under .gitnexus/' - is false, and it is the sentence that made the trade-off look free. Measured: .gitnexus/ accounts for 19 of the 115 findings (16.5%) across 5 files. The other 96 come from real untracked documents: docs/superpowers/plans and specs, docs/dream-design.md, docs/mailbox-transport-retirement-spec.md, .agents/SYSTEM/ENTITIES.md and .agents/TASKS/research-wiki-audit.md. The fix is still right - untracked files do not ship, and re-deriving .gitignore by hand is the defect the check exists to find - but it suppresses 43 files naming a retired thing, not 5.",
+      "evidence": "2026-09-17, QA of PR #33 at 714dbd7. Reproduced the old scanner verbatim (same SKIP set, same extension regex) against the main tree, subtracted `git ls-files`, then applied the record's own `historical` prefix list - which the first pass omitted, and which is why the first pass wrongly reported 156. 202 files removed by the git filter, 146 already excluded as historical, 56 genuinely newly invisible, 43 of those naming a retired thing; summing every matching retirement per file reproduces 115 exactly. Two of the suppressed files are not superseded design docs: .agents/TASKS/research-wiki-audit.md is one of the three files held with Aaron in Loop 11, and .agents/SYSTEM/ENTITIES.md is named by /end step A4 as a file agents are told to update, is untracked, and names the retired 'dream'. This is rule 10 applied to the fix for a defect rule 10 also describes.",
+      "recommended_update": "The check's own output must state the narrowing. It currently reads '0 unexpected across N live files'; 'live' should read 'tracked', and the message should say untracked files are not scanned, the way it already states 'green means every RECORDED retirement is finished, not that every retirement is recorded'. Loop 12's convention is that a check states its limit in its own output, not only in a code comment a maintainer reads.",
+      "opened_session": 63
+    },
+    {
+      "id": "G-029",
+      "what": "The regression test added by PR #33 can pass without testing anything. It runs `git init && git add && git commit` inside try/catch with stdio ignored, and on any failure does a bare `return` before reaching its assertion - so a machine without git, or with a git that fails for any reason, reports the test green. It is the rule 11 family - an instrument that cannot distinguish 'nothing there' from 'I did not look' - inside the regression test for the check about exactly that defect class.",
+      "evidence": "open-brain/tests/pipelines/sync/checks.test.ts, the case 'does not scan gitignored files, however loudly they name a retirement': `catch { return; }` with a comment deferring to 'the other tests', which do not cover the git path at all - they cover the fallback walk. NOT active in this environment: confirmed by regressing the source and watching this specific test fail, which proves it reached its assertion here, so the hazard is latent rather than masking anything today. This is the eighth instance of the instrument family in this file, and the Developer independently reported a ninth - vitest reporting 'no tests' for a file that would not parse - which occurred while writing this same test.",
+      "recommended_update": "Make the skip visible instead of silent: assert git availability once and fail loudly if absent, or use vitest's skip so the runner reports it as skipped rather than passed. A test that reports green when it did not run is worse than a missing test, because the missing one is countable.",
       "opened_session": 63
     }
   ],
