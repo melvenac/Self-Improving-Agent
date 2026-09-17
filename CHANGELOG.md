@@ -1,5 +1,46 @@
 # Changelog
 
+## [0.38.0] - 2026-09-17 — cut the heuristic rating arm
+
+### Removed
+
+- **`enableHeuristicRatings` and the tag-substring rating fallback (R-010).** Aaron ruled it
+  cut on 2026-09-17. It was a live flag, default-false, whose written justification was that it
+  protected the maturity and `success_rate` scoring — **scoring that Loop 10 deleted**, so the
+  stated reason had not existed for two loops.
+
+  Three independent reasons, none of them "we stopped liking it":
+
+  - **It never ran.** 636 `feedback_log` rows: 347 pre-column NULL, 267 `direct`, 22 `supplied`,
+    **zero `heuristic`** — verified against the live database rather than taken from V-018.
+  - **What it fed is gone.** It produced ratings that drove maturity and `success_rate`. Nothing
+    downstream consumes them.
+  - **The mechanism is the defect class Loop 11 spent itself removing.** It rated an entry
+    helpful by testing whether one of its tags appeared as a **substring of the session summary** —
+    a substring check answering a different question than the one being asked, in production.
+
+### Notes
+
+- **This is R-010, the second live test of Loop 12's retirement pipeline**, and deliberately
+  against a different substrate: the mailbox retirement tested prose, this tested code. The
+  contrast **corrected the design principle rather than confirming it.** `tsc` caught **nothing** —
+  `open-brain/tsconfig.json` is `"include": ["src/**/*"]`, so the test directory is never
+  type-checked at all. The suite caught six referrers across two files at runtime; the check caught
+  the one in `README.md` that neither could see. **The compiler is strongest over what it compiles,
+  the suite reaches past it into code the compiler ignores, and the check is the only one that
+  reaches prose. All three were necessary.**
+- **A referrer class neither enumeration had:** `rating-method.test.ts` held tests whose only
+  purpose was to pin what the cut arm produced. **A test asserting a retired component's behaviour
+  fails when you do the right thing** — the opposite of how every other referrer behaves.
+- **`recordFeedbackEvent` coerces an unknown method to `unspecified` rather than throwing.** Found
+  by reading the implementation after a test had already been written asserting the throw. The
+  coercion is the better property: a stray caller degrades instead of minting a value the type no
+  longer has.
+- **ADR-029 (D-004) adopted as written**, recorded as D-013. It had stood as *recommended, not yet
+  adopted* since 2026-09-15 while Loops 8, 10 and 11 implemented all of it — **a record describing
+  a state the system had already left**, which is Loop 11's defect class arriving in the decision
+  log.
+
 ## [0.37.0] - 2026-09-17 — make deletion a pipeline, not an intention
 
 **Loop 11 found 38 defects across 77 instruction files and 25 of them were references to things the
