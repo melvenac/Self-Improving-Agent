@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 17,
+  "revision": 18,
   "project": {
     "name": "self-improving-agent"
   },
@@ -458,6 +458,16 @@
       "closed_session": 61,
       "supersedes": null,
       "note": "Closed as moot (session 61, verified against 6af5592): the skill scan and proposal machinery were CUT (E8/P7). Nothing in open-brain/src writes .skill-proposals-pending.json; the sole surviving mention is a comment in session-start/health-checks.ts:119 noting the file is left on disk. There are no longer 39 pending clusters being generated to triage. Note the stale file itself may still sit on disk unannounced — that is V-021's recorded property, not this task."
+    },
+    {
+      "id": "T-148",
+      "title": "The note is required before you RETIRE a task, not only before you work one",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 61,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Clark's framing, session 61, and the deterministic fix for Planner Error 28. The titles-only INBOX.md legend says to read a task's note in state.json when you work the task, not when you pick one. Ruling on a task is neither picking nor working, and the rewrite drew no boundary for it — which is how T-050 came to be classified from its title as being about a writer, when its note says it is about an uncounted read. Not carelessness applying a rule; a rule that did not cover the case. Scope: the INBOX.md legend in state-render.ts and the corresponding line in .claude/commands/start.md plus the project-template mirror. Deliberately kept out of session 61's writes because it touches the renderer and a command file, and those writes were each one thing."
     }
   ],
   "verified": [
@@ -872,6 +882,29 @@
       ],
       "since_session": 59,
       "status": "verified"
+    },
+    {
+      "id": "V-025",
+      "claim": "ob_start's State block replaces the four prose files rather than accompanying them, and renders task titles only: the payload fell from 7,971 to 2,142 words on the same rev-14 state, and the briefing was completable without opening task.md.",
+      "evidence": [
+        {
+          "type": "observation",
+          "path": "open-brain/src/pipelines/session-start/state-render.ts",
+          "observation": "Two ob_start calls in session 61 against rev 14. Before: 'Total returned words: 7971 (~13534 tokens)', 53.2 KB, spilled to a tool-results file by the harness, of which the Tasks+gaps section alone was 7,475 words. After: 'Total returned words: 2142 (~3591 tokens)', returned inline, no spill."
+        },
+        {
+          "type": "observation",
+          "path": ".agents/SYSTEM/SUMMARY.md",
+          "observation": "Grepped the first ob_start result for SUMMARY.md's body text: zero hits. The four prose files are not in the return at all — only their sizes are reported, which is why the '## Sizes' block describes files that are absent."
+        },
+        {
+          "type": "observation",
+          "path": ".agents/TASKS/task.md",
+          "observation": "First run required opening task.md separately because the State block ordered tasks by priority bucket rather than the curated top-5 rank, contradicting the command's own instruction not to read those files. Second run did not: the ranking came from the State block."
+        }
+      ],
+      "since_session": 61,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -1020,6 +1053,13 @@
       "what": "Done-task retention evicts entries from state.json permanently during a bulk close, while reporting it only in passing. Closing 13 tasks in session 61 dropped T-032 and T-052 out of the record entirely — nobody asked for those two to go, and it surfaced only because the tool output was read carefully. The count scales with the size of the close, so a large sweep evicts proportionally more, equally quietly.",
       "evidence": "Session 61 ob_state dry run reported 'Dropped done tasks (retention 3 sessions): T-032, T-052'; both confirmed absent from state.json by read-back at rev 15. Recoverable at 6af5592. This is V-003's documented retention working as designed, not a defect in the close ops. Found by Forge while reading the dry-run output; attributed rather than folded in (Planner Error 24's fix).",
       "recommended_update": "A permanent removal should announce itself as a removal rather than as a line in a summary. Options not ruled on: name the evicted ids under their own heading, require an acknowledgement when a single call would evict, or make retention a separate explicit op rather than a side effect of closing tasks.",
+      "opened_session": 61
+    },
+    {
+      "id": "G-025",
+      "what": "open-brain/build is not pruned on rebuild, so a deleted source leaves its declaration file and sourcemap behind with no .js beside them. auto-feedback.ts was cut in Loop 10, but build/pipelines/session-end/ still holds auto-feedback.d.ts and auto-feedback.js.map dated Sep 15. Inert — nothing executes without the .js — and build/ is gitignored, so this is per-seat debris rather than a repo defect.",
+      "evidence": "Session 61, while verifying G-018 before closing it: find across the repo returned the two orphans and no auto-feedback.js. Matters because build/ is what the MCP server actually runs, so judging build freshness by file presence is unreliable here; mtime plus content held, presence alone would not have. Adjacent to G-021, which records that R1's staleness signal is under-specified.",
+      "recommended_update": "Decide whether the build step should clean its output directory, or whether a freshness check should assert on content rather than presence. Low stakes on its own; recorded because it is a second way for a stale artifact to look like live code.",
       "opened_session": 61
     }
   ],
@@ -1260,26 +1300,27 @@
     }
   ],
   "handoff": {
-    "pick_up": "Loop 10 is merged (PR #12, master 4f93676, tag v0.34.0). The close-out PR is the only Loop 10 work left. Loop 11's subject is Aaron's to rule; the recorded candidates are making R1's staleness signal a counted value rather than a printed row, and the finding that writing to the record must be a step rather than a resolution - six errors, the R4 rule and the Loop 9 footnote all lived only in messages until someone wrote them in.",
+    "pick_up": "Session 61 was an inspection plus a backlog sweep, not a loop. The rewritten /start was judged against Aaron's four criteria and passed on the re-run: payload 7,971 -> 2,142 words, no disk spill, no file read that the briefing should have supplied. The backlog went 44 -> 31 active across revisions 14 -> 18. THE COMMIT IS NOT MADE: state.json, the four rendered views and Session_61.md are modified and uncommitted, and Clark (Planner, home seat) is taking it to Aaron. Nothing was branched or pushed. Loop 11's subject is still Aaron's to rule.",
     "watch_out": [
-      "A reconnect message is not evidence: verify by a read ordered strictly after the write. R1's own first use proved a stale server reports success while looking identical in totals.",
-      "Every containment that worked this loop was a command; every containment that failed was an intention. Prefer a check that runs over a rule that must be remembered.",
-      "Two measurements that share a premise are one measurement - six instances this loop, ending with db.ts, which both enumeration passes missed because both assume a component is something production reaches.",
-      "git show <ref>:<path> is mangled by MSYS on Windows when the ref contains a slash; it reports a present file as missing. Use MSYS_NO_PATHCONV=1.",
-      "git ls-remote --tags double-counts annotated tags via the ^{} rows; filter them or the count doubles.",
-      "sed -i on tracked files is blocked by the auto-mode classifier as irreversible destruction; use the Edit tool instead.",
-      "A release tag and a session close-out must not share a branch (R4, now in the tracked template RULES.md): the reviewed commit and the PR's commit diverge by construction."
+      "A substring check cannot distinguish an assertion from a citation of that assertion. Grepping G-010 for its retired clause returns true, because the amendment quotes the clause in order to retire it. Verify a rewrite by the field that changed, not by the absence of old words.",
+      "A read ordered before another seat's write is indistinguishable from a read of current state. Clark read rev 16 correctly while the file was already 17. Within one seat you can order a read after a write; across two seats neither party controls the ordering.",
+      "close_gap DELETES. state-writer.ts:292 is s.gaps.splice(idx, 1) — no closed_session, no tombstone, no retention, and no reopen_gap to undo it. Closing a gap destroys its evidence in the same motion; G-018's survives only at 6af5592.",
+      "A bulk close evicts unrelated done tasks through retention and announces it as one summary line. Closing 13 tasks dropped T-032 and T-052 out of the record entirely. Read the dry run before the real call, every time.",
+      "Reading a title is the documented way to read the new INBOX.md and is NOT enough to retire a task. That is T-148, and it is the cause of this session's one real error.",
+      "git show <ref>:<path> is mangled by MSYS on Windows when the ref contains a slash; use MSYS_NO_PATHCONV=1. Verified again this session against 6af5592.",
+      "A heredoc through the Bash tool failed to parse on this session's long markdown; the Write tool did the same job. Do not spend turns fighting the heredoc."
     ],
     "open_questions": [
-      "Does the protocol half earn its keep? It was never tested against Loop 10's criterion, so nothing may claim it did.",
-      "Should success_rate be dropped from live databases? It survives as an inert column; dropping it is a migration Loop 10 did not rule on.",
-      "Node v24: the v22 pin is released in this repo, but Smart Connections may break in Aaron's vault where no test here would catch it."
+      "Does the protocol half earn its keep? Still untested against Loop 10's criterion; nothing may claim it did.",
+      "Should success_rate be dropped from live databases? It survives as an inert column — T-053 closed because nothing computes it, which is not the same as it being gone.",
+      "Node v24: the v22 pin is released in this repo, but Smart Connections may break in Aaron's vault where no test here would catch it.",
+      "Should gaps and the Verified section be reconciled by something? G-010 asserted two claims that V-017 and V-022 already contradicted in the same file, and nothing reads across the two."
     ],
-    "session": 60
+    "session": 61
   },
   "last_session": {
-    "n": 60,
+    "n": 61,
     "date": "2026-09-17",
-    "uuid": "d6af4ac8-3836-4752-8c70-66facd766729"
+    "uuid": "8ff4db2c-ab14-44fd-be58-864a09312fb8"
   }
 }
