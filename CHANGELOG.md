@@ -1,5 +1,310 @@
 # Changelog
 
+## [0.36.0] - 2026-09-17 — the instruction surface
+
+**Does each command do what it says?** Loop 10 ruled on the memory layer's code and never looked at
+the `.md` files that tell an agent what to do. Every finding below is tagged with which of the three
+audit questions found it: **Q1** references something that no longer exists, **Q2** contradicts
+itself or another governing file, **Q3** the tool behaves differently than the file says.
+
+### `end.md` — the file that runs every session (C2 item 1)
+
+- **Q1 — A10 named two files that do not exist.** `session-end.mjs` → `skill-scan.mjs`: neither is
+  on disk, in the repo or under `~/.claude`. The single registered `SessionEnd` hook is
+  `open-brain/build/cli-session-end.js`, and its pipeline's live stages are summary, auto-feedback,
+  invocation logging, shadow recall and topics.
+- **Q3 — A14 instructed a call the schema refuses.** `ob_feedback(entry_id, rating, referenced)`
+  against a live schema of `{id, rating}` (`server.ts:895-897`): two wrong argument names and one
+  parameter that has never existed. Recorded as T-057 and now fixed at the instruction site.
+- **Q1 — A14 promised a lifecycle that was cut.** Maturity promotion went with E3 and apoptosis with
+  E18 in Loop 10 (`server.ts:908-910`, `:938-942`); ranking reads neither `maturity` nor
+  `success_rate`. A rating now increments a counter and writes a `feedback_log` row, and that is all.
+- **Q1 — the `ob_end` / `ob_feedback` contrast was false on both sides.** "Use `ob_feedback` for any
+  entry you expect to cross a lifecycle threshold" named a threshold that no longer exists; both
+  paths now record the same thing.
+- **Q1 — A12 justified its vault path by a component Loop 10 cut.** The nested
+  `Experiences/{project}/{key}.md` layout is real (`vault-writer.ts:97`), but the reason given was
+  "the layout `skill-scan` walks". Re-cited to what actually reads it: `/sync`'s vault-index-parity
+  check (`pipelines/sync/checks.ts:352`).
+- **Q2 — four steps were dead by construction and the reader learned it four times.** A2, A5, A6 and
+  A7 each carried their own three-line gate saying to skip it when `state.json` exists. The regime
+  test is now made once, up front, and the four steps are marked `[no-state fallback]`.
+- **Q2 — the handoff asserted a commit status it cannot know.** `set_handoff` runs inside `/end`,
+  before anything is committed, so "THE COMMIT IS NOT MADE" is true when written and false when
+  read — permanently, every loop. A7b now forbids asserting commit or push status; the tree is
+  authoritative and `/start` reads it.
+- **Q2 — A1 told the agent to tick a checklist box as it worked.** A box ticked ahead of its action
+  cannot fail and afterwards reads as evidence the action happened. That is G-020, which misled a
+  Planner into reporting `/end` had never run.
+
+### `start.md` — the mailbox step read the wrong file with the wrong rule (C2 item 2)
+
+- **Q2 — two opposite ordering rules for two files with identical structure.** The inbox rule said
+  "the newest header is the first one after the intro"; the `decisions.md` rule four lines below said
+  "the LAST header in the file, entries are appended." Both files append. Session 62 hit it live: a
+  2026-08-31 message was ordered ahead of a 2026-09-14 one. One rule now governs the whole channel —
+  appended, so the last header wins.
+- **Q1 — the step read a file that had stopped being the channel.** With the ordering corrected by
+  hand, the mailbox line still reported "Loop 4 brief ready" as the latest subject on 2026-09-17,
+  because `{partner}-to-{name}.md` is archive: work arrives as `loop-N-brief.md` and as cross-session
+  messages. `/start` now reads the newest brief by loop number, and says so when the newest brief
+  predates the last decision.
+- **`~/.agents/mailbox/README.md` answers neither question.** It defines the channel as the
+  three-file `{sender}-to-{receiver}` shape, gives no ordering rule at all, and mentions neither
+  `loop-N-brief.md` nor cross-session messages. `start.md` now records that its rules are derived
+  from the channel's contents rather than from the README.
+
+**What actually persists, enumerated.** Briefs (`loop-4` … `loop-11-brief.md`) and `decisions.md`
+are on disk and greppable; `loop-11-brief.md` is actively amended in place. Cross-session messages
+are not: session 61's entire `/end` close-out report exists in no file in the repo or the mailbox.
+The README's write-then-notify rule (`README.md:58`) already requires each seat to mirror its
+messages into `{me}-to-{other}.md` — **the rule exists and nothing enforces it**, so persistence is
+per-seat convention. Recorded, not repaired; the fix is a ruling, not an edit.
+
+### `RULES.md` — a rule that forbade what `/sync` requires
+
+**Q2.** General rule 6 read "Don't modify `project-template/` — develop the template in its own repo
+and copy updates here." There is no separate template repo, and `command-parity` *fails* when a
+shared command differs between the repo, the template and user scope — so keeping the rule meant
+failing the check. Rewritten to say what the check enforces.
+
+**And a referrer for `LIFECYCLE.md`.** The Component Lifecycle Policy — the add/track/prune
+discipline and the source of the CUT/KEEP vocabulary the evaluation loops rule with — was reachable
+from nothing: no command, hook, skill or `CLAUDE.md` referenced it. **The policy this loop is
+applying could not be found by anyone applying it.** It is not a dead instruction and not a misfiled
+record, so it was neither cut nor demoted; it was given a referrer from `RULES.md`, which has four.
+
+### `/skill-scan` — Loop 10's CUT ruling executed on the prompt surface (C2 item 3)
+
+The ruling was made and never carried out: the command was still live and identical in all three
+mirrors. **No source remains** — `SKILL_SCAN`, `skillScan`, `runSkillScan` and
+`generateSkillProposals` return nothing across `open-brain/src`. Six orphaned build artifacts remain
+(three `.d.ts`, three `.js.map`, no `.js` beside any of them), which is G-025's class.
+
+**The brief scoped this as "delete the block from all three mirrors". It was referenced from
+eighteen files.** Deleting only the command would have manufactured fifteen dangling references —
+the exact Q1 defect this loop exists to remove. Repaired with the deletion, in the same commit:
+`harness-audit.md` (named the command file and a `knowledge-mcp/scripts/skill-scan.mjs` that does not
+exist), `FRAMEWORK.md`, `project-template/README.md`, `self-improving-agent-guide/SKILL.md` (three
+places, including a "machine-read contract" for a reader that no longer exists), `RUNBOOK.md`,
+`SECURITY.md` (two hook scripts that do not exist), both Cursor `end.md` copies, and `/sync`'s own
+`vault-index-parity` output strings. Historical records — `DECISIONS.md`, `PRD.md`, the MCP tool
+audit — keep their references; they describe what was, not what is.
+
+**`domains.json` was nearly a false finding.** Its description says it filters skill-scan proposals,
+so it read as dead config that `/start` still opens. It is not: the health scorer reads it at
+`pipelines/sync/score.ts:44`. The description was stale, not the file. Checking the consumer before
+filing the finding is the only reason it isn't in this list as a cut.
+
+### `RULES.md` — six more, in the file that governs
+
+Found while adding the `LIFECYCLE.md` referrer. **Q1:** "Scripts are ES modules (`.mjs`)" — the
+hooks and server are compiled TypeScript; "Hook execution order matters: `session-end.mjs` →
+`skill-scan.mjs`" — two files that do not exist, and the order is enforced inside
+`index-v2.ts`, not by hook registration; an error-log path under the retired v1 vault. **Q2:** agent
+rules 1-4 predate `state.json` and instructed hand-edits to the four rendered views — "Read
+SUMMARY.md before starting any work", "Update SUMMARY.md at session end" — which `/end` A7b forbids
+in bold.
+
+**Rule 5 is left exactly as it stands:** *"Never commit `.agents/` or `.claude/` to this repo
+(gitignored)."* That rule is the cause of the untracked-surface finding below, it is a deliberate
+policy, and changing it is not a repair an audit gets to make.
+
+### The Cursor mirror — and a fourth mirror nobody had enumerated (C2 item 6)
+
+`~/.cursor/commands/` is compared against the template by `checks.ts:682` and appeared in neither
+enumeration. **Four files, found by a check rather than by either auditor.**
+
+Both Cursor copies — template *and* live — still wrote `.recalled-entries.json` at `start.md:53,55`
+and read it back at `end.md:83`, the pre-Loop-5 feedback-poisoning path, **shipping in the
+distributable**; both carried the same false `ob_feedback(entry_id, rating, referenced)` signature;
+and both still sorted `decisions.md` by date string, the defect fixed in `.claude/start.md` and not
+here. All repaired in both copies. `grep -rn "entry_id, rating, referenced"` across every mirror now
+returns nothing.
+
+### The remaining commands (C2 item 4)
+
+**`/checkpoint` — the instruction and the implementation each added the same two components, and
+every checkpoint ever written carries the result.** The command said to pass
+`key: "{project-slug}-phase-{N}"`; the server composes the filename as
+`${date}-${projectSlug}-${slugify(key)}${phaseStr}` (`server.ts:1198`), adding both already. The
+vault holds the evidence:
+`2026-09-15-Self-Improving-Agent-self-improving-agent-loop-4-phase-1-phase-1.md` — project twice,
+phase twice — and the note in `/sync`'s standing `vault-index-parity` warning is one of them. `key`
+is now documented as the subject only; same for the tags the server supplies. **This one was found by
+reading the artifacts on disk rather than the text**, which no amount of cross-reading the two files
+would have surfaced as quickly.
+
+**`/test` could not be executed anywhere.** Its first instruction was "Follow the testing protocol
+defined in `.agents/workflows/test.md`" — a file that exists in **no mirror**. It also named a
+`playwright-tester` skill that exists only under `project-template/`, a `tests/e2e/` directory this
+repo does not have, and Playwright, which is not a dependency of any package here. Rewritten to
+declare its prerequisites and stop if they are missing, and to point at `npm test` as the suite this
+repo actually has.
+
+**`/harness-audit` was premised on a command that does not exist.** It opened by contrasting itself
+with `/harness-eval` and told the agent to read `.claude/commands/harness-eval.md`,
+`scripts/harness-eval.mjs`, `scripts/sync-docs.mjs` and `knowledge-mcp/scripts/session-end.mjs` —
+**four dead references, and `scripts/` contains exactly one file, `setup.mjs`.** Repointed at
+`/sync`, the two real hooks and `checks.ts`. It is not cut: `RULES.md`'s release checklist requires
+it for every minor and major bump, so a required release step was resting on a missing sibling.
+
+**`/sync` and `/task` came through clean on Q1** — `docs/PRD.md` is guarded by "(if present)", so it
+is conditional, not dead. **Every `ob_*` tool named across all six remaining commands exists in the
+registry**, which is C3's check run by hand: it passes today, so its value is regression prevention
+rather than finding what is already broken.
+
+### `RULES.md` rule 5 is not policy — it is an unfollowed rule (Q2)
+
+The rule forbidding `.agents/` and `.claude/` in the repo was recorded here as the deliberate cause
+of the untracked surface. **That was wrong, and three checks show it:** `RULES.md` is itself absent
+from HEAD with no commits at all, so the rule has no author and no date; `grep -rn "Never commit"
+project-template/` returns nothing, so the framework does not ship it; and `git ls-files .agents/`
+returns the five state files that **PR #16 committed as the standard close-out**, with `/sync`
+passing. The rule says never, the protocol does it every loop, and nothing notices.
+
+### The skills and the `.agents/` instruction files (C2 item 5)
+
+**`self-improving-agent-guide/SKILL.md` — a registered skill teaching a lifecycle that was cut.** Its
+description advertised "the maturity lifecycle (Progenitor → Proven → Mature) and apoptosis", and the
+body carried the threshold table and boost multipliers as live behaviour. Both were cut in Loop 10.
+This is the skill an agent loads to learn *how the framework works*.
+
+**`self-improving-agent-gotchas/SKILL.md` — the stale-build gotcha had gone stale.** Its first entry
+told you to `cp knowledge-mcp/src/*.ts ~/.claude/knowledge-mcp/src/` and rebuild the "installed
+copy". **`~/.claude/knowledge-mcp/` does not exist**; there is one copy, in this repo, and
+`~/.claude/open-brain/` holds data only. The skill's trigger description also named `knowledge-mcp`,
+`scripts/*.mjs` and `kb_recall` throughout, so it advertised itself for an architecture two renames
+old. Replaced with the rebuild-then-reconnect sequence that actually works.
+
+**`TESTING.md` — every row was false and it is a file about how this project verifies things.** Four
+`.mjs` scripts that do not exist, `knowledge-mcp/`, the retired `kb_*` prefix, the v1 vault path, a
+test count 287 short, and "No CI/CD pipeline" while `.github/workflows/ci.yml` was green. Rewritten
+against the suite that exists.
+
+Also repaired: `LIFECYCLE.md` (invocation log path — the real one is
+`~/.claude/open-brain/skill-invocations.jsonl`, `invocation-logger.ts:49`), `SECURITY.md`,
+`RUNBOOK.md`. **`experiences-input.md` is a captured data dump, not a skill** — it now says so at the
+top, and its historical tool names are marked as preserved deliberately rather than left looking like
+current instructions.
+
+### The tracked-vs-untracked comparison does not support the hypothesis it was designed to test
+
+The claim was that instruction text no reviewer ever sees rots faster, with `project-template/`'s
+tracked files as the control. **On the mechanical Q1 test the gap is enormous — and it is an
+artefact.**
+
+| | files | checkable refs | dead refs | files with defects |
+|---|---|---|---|---|
+| Untracked-only (`.agents/`) | 13 | 138 | 40 (29%) | 77% |
+| Tracked-only (`project-template/.agents/`) | 16 | 140 | 0 (0%) | 0% |
+
+Reference *counts* are near-identical, which rules out surface area. Age does not explain it either:
+the template's `TESTING.md` and `RUNBOOK.md` date from 2026-03-21, **older** than the untracked
+`TESTING.md` at 2026-04-13, and clean.
+
+**But the references are not the same kind.** Counting only those pointing at live, moving
+infrastructure — `ob_*`/`kb_*` tools, `open-brain/` paths, hook scripts, vault paths, cut components:
+
+- Untracked-only: **108 of 197 (54%)**
+- Tracked-only: **7 of 240 (2%)**
+
+**The control group is barely exposed to the hazard at all — a 27× difference.** Its references are
+overwhelmingly its own static siblings (`ENTITIES.md`, `RULES.md`, `task.md`) and generic stack names
+(`next.config.js`, `playwright.config.ts`) that ship as a unit and cannot go stale. A group that
+points at nothing that moves will show no rot whether it is reviewed or not. **The comparison is
+invalid and the hypothesis is unproven.**
+
+**The one valid observation available points the other way.** `project-template/.claude/commands/end.md`
+is tracked, ships in PRs, and was byte-identical to the untracked copy — so it carried **all eight**
+of `end.md`'s defects, through every review it has ever been in. Where both halves face the same
+hazard, being tracked did not prevent the rot. Tracking makes a repair *reviewable and restorable*,
+which is reason enough to want it; **this loop produced no evidence that it makes text truer.**
+
+### Two seats, one working tree — and a done task evicted to make room for the task about it
+
+**The Planner branched off `master` without checking which branch the shared tree was on**, committed
+19 newly-tracked instruction files and opened PR #17. Switching to that branch and back **deleted 19
+files from disk** — all of `.claude/commands/`, `CLAUDE.md`, `.agents/AGENT.md`, `LIFECYCLE.md`, the
+four `SYSTEM/` files, `domains.json`, the skills — because they are tracked there and absent from
+`loop/11-instructions`, so `git checkout` removed them. All 19 were backed up first and restored, and
+the Developer's uncommitted C3 work survived as pure additions (verified: 173 insertions, 0 deletions
+on top of `ddba9d0`).
+
+**Nobody did anything wrong on their own branch, and that is the finding.** `git worktree list`
+returns one entry. Either seat can delete the other's files by performing a correct operation;
+nothing warns either party; and for untracked files the loss is silent, because git does not report
+removing what it was never tracking. Filed as **T-149**, P0. The fix is one worktree per seat off the
+same repository.
+
+**Filing it cost a task, and this is recorded so the cost is not silent.** The `ob_state` dry run
+warned that adding one task would evict **T-004** under three-session retention (G-024). Its content,
+preserved here because the record will no longer hold it:
+
+> **T-004 — "The lifecycle bundle's remaining three parts stay BLOCKED"** (P0, opened 53, closed 59).
+> *Resolved by Loop 8 R1 rather than unblocked. The maturity multipliers go to 1.0 and the apoptosis
+> gate sits behind a new `apoptosisEnabled` flag, off, with counters and promotion still recording.
+> That makes parts 1 and 2 — the `success_rate` denominator fix and the threshold re-tune —
+> unnecessary rather than blocked: with no live threshold there is nothing to miscalibrate.
+> Reversible by restoring three constants, and `evaluateLifecycle` now takes an optional config so the
+> suspension is provable in both directions by test.*
+
+Loop 10 later cut `evaluateLifecycle` and apoptosis outright, so T-004 describes a suspension that has
+since become a removal. **Little was lost — but it was read before it went, which is the whole of
+G-024's ask.**
+
+### C3 — `command-tool-names`: a check that compares commands to the registry, not to each other
+
+`command-parity` compares the three mirrors **to each other**, so three identical copies of a false
+instruction agree perfectly and it reports `pass` — which is exactly what happened to `/skill-scan`,
+live and byte-identical in all three mirrors for a component Loop 10 had cut.
+
+The new check reads the `ob_*` registration sites in `server.ts` and asserts that every `ob_*` a
+command instructs an agent to call exists there, plus that no `kb_*` survivor of the retired v1
+prefix remains. The registry is read from the registration sites rather than a list maintained beside
+them: **a second list is the stand-in rule 5 warns about, and it would drift exactly as the mirrors
+did.**
+
+**Seen to fail before it was trusted.** Green on the real set (81 tool references across 33 command
+files, 14 registered tools); a scratch command naming `ob_nonexistent` and `kb_recall` turned it red
+on both arms; removing it returned it to green. Four tests cover the same cycle, including that an
+absent `server.ts` **skips rather than passes** — a check that cannot run must not look like one that
+ran and found nothing.
+
+**It is a regression guard, not a speculative one.** `ob_summarize` and `ob_store_summary` both
+shipped and were both caught by a human reading the files. This prevents the third recurrence.
+
+**And the limitation is written into the check's own pass message**, so it cannot be oversold: *"names
+only — this cannot tell whether a tool's description is true."* Both tools whose descriptions were
+false this loop **exist**, under exactly the names the commands call them by. This check passes on
+both.
+
+### Two MCP tool descriptions were false, and C3's proposed check would not catch either
+
+Tool descriptions are instruction text with no `.md` file. Two of fourteen were falsified by Loop
+10's own cuts and nothing noticed:
+
+- `ob_feedback` — "Drives maturity promotion and apoptosis." Both were removed in Loop 10.
+- `ob_end` — "flag reflection clusters." The reflection queue is CUT; `reflection_log` held 0 rows
+  after six months (`pipelines/session-end/index-v2.ts:169`).
+
+**Both tools exist under the names the commands call**, so a registry check of tool *names* — C3's
+design — passes on both. Name existence is machine-checkable; description truth is not. Recorded so
+C3 is not oversold as catching this class.
+
+### `command-parity` was right and the hand-rolled check was wrong
+
+A raw `md5` comparison across the three command mirrors reported 7 of 11 commands divergent. They
+were not: `core.autocrlf=true` with no `.gitattributes` means `project-template/` is checked out
+CRLF while the gitignored `.claude/` stays LF, so **byte comparison across the tracked/untracked
+boundary differs for every file, forever**. `sameCommandContent` (`checks.ts:870-873`) normalizes
+line endings and trailing whitespace, and was correct. CR-normalized, 0 of 11 differ at `38398e8`.
+Any future parity work must normalize or it will report drift that is not there.
+
+The check has now been seen to fail and to recover: editing the repo copy alone raised
+`command-parity: end.md differs`, and propagating to both mirrors returned it to
+`pass: 7 shared commands identical`.
+
 ## [0.35.0] - 2026-09-17 — the startup read
 
 **What a session start actually hands the agent.** Loop 10 ruled on what the memory layer is worth; this looks at what `/start` delivers. Two renderers carried the same defect, `start.md` documented a contract that did not hold, and the fix to the visible one changed nothing the agent sees.

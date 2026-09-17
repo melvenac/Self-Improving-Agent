@@ -28,9 +28,9 @@ Write one checkpoint via `ob_store_chunk`:
 ```
 ob_store_chunk({
   content: <above>,
-  key: "{project-slug}-phase-{N}",
+  key: "{what this phase was about}",   // subject only — server adds project + phase
   category: "checkpoint",
-  tags: ["checkpoint", "phase-{N}", "{project-slug}", ...],
+  tags: ["checkpoint", ...domain tags],
   project_dir: <cwd>,
   phase: {N}
 })

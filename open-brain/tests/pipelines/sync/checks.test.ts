@@ -23,6 +23,7 @@ import {
   checkSummary,
   checkSpecProvenance,
   checkStateSchema,
+  checkCommandToolNames,
   resolveDocPath,
 } from "../../../src/pipelines/sync/checks.js";
 import { scoreConfigStructure } from "../../../src/pipelines/sync/scorer.js";
@@ -366,7 +367,7 @@ describe("validation checks", () => {
       const r = checkVaultIndexParity(vault, db);
       expect(r.severity).toBe("warn");
       expect(r.message).toContain("1 duplicate note");
-      expect(r.message).toContain("counts it twice");
+      expect(r.message).toContain("two copies of one experience");
       expect(r.message).not.toContain("unindexed note");
     });
 
@@ -754,5 +755,61 @@ describe("validation checks", () => {
     it("warns when project-template/ is absent", () => {
       expect(checkTemplatePersonalNames(tempDir).severity).toBe("warn");
     });
+  });
+});
+
+// Loop 11 C3. Each case is written so the check has been SEEN TO FAIL before it
+// is trusted: the green assertions below mean nothing without the red ones.
+describe("checkCommandToolNames", () => {
+  const NL = String.fromCharCode(10);
+  let root: string;
+
+  function setup(commandFiles: Record<string, string>, serverTools: string[] = ["ob_recall", "ob_store", "ob_feedback"]) {
+    root = mkdtempSync(join(tmpdir(), "c3-"));
+    const srcDir = join(root, "open-brain", "src");
+    mkdirSync(srcDir, { recursive: true });
+    // Mirrors server.ts's registration shape: the tool name alone on its line.
+    writeFileSync(
+      join(srcDir, "server.ts"),
+      serverTools.map((t) => `server.tool(
+  "${t}",
+  "desc",
+);`).join(NL),
+    );
+    const cmdDir = join(root, ".claude", "commands");
+    mkdirSync(cmdDir, { recursive: true });
+    for (const [f, body] of Object.entries(commandFiles)) writeFileSync(join(cmdDir, f), body);
+    return root;
+  }
+
+  afterEach(() => { try { rmSync(root, { recursive: true, force: true }); } catch { /* best effort */ } });
+
+  it("fails on a command naming a tool that is not registered", () => {
+    const r = checkCommandToolNames(setup({ "a.md": "Call `ob_summarize({})` when done." }), join(root, "nohome"));
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("ob_summarize");
+    expect(r.message).toContain("a.md");
+  });
+
+  it("fails on the retired kb_* prefix even though the name looks plausible", () => {
+    const r = checkCommandToolNames(setup({ "a.md": "Call `kb_recall(...)`." }), join(root, "nohome"));
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("retired v1 prefix");
+  });
+
+  it("passes when every named tool is registered, and says it cannot judge descriptions", () => {
+    const r = checkCommandToolNames(setup({ "a.md": "Use `ob_recall` then `ob_feedback({id, rating})`." }), join(root, "nohome"));
+    expect(r.severity).toBe("pass");
+    expect(r.message).toContain("cannot tell whether a tool's description is true");
+  });
+
+  it("skips rather than passing when server.ts is absent", () => {
+    root = mkdtempSync(join(tmpdir(), "c3-"));
+    const cmdDir = join(root, ".claude", "commands");
+    mkdirSync(cmdDir, { recursive: true });
+    writeFileSync(join(cmdDir, "a.md"), "Call `ob_whatever`.");
+    const r = checkCommandToolNames(root, join(root, "nohome"));
+    expect(r.severity).toBe("skip");
+    expect(r.message).toContain("server.ts");
   });
 });

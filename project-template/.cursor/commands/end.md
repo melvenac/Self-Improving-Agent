@@ -76,13 +76,13 @@ npm run validate:session:post  # if script exists
 
 **A11** — Review for non-obvious lessons hooks would miss
 
-**A12 Experiences** — `ob_recall` dedup first, then `ob_store` with `[EXPERIENCE]` format. Again no manual vault write: `ob_store` nests under the project, and a flat `Experiences/{key}.md` beside it is read by `skill-scan` as a separate experience.
+**A12 Experiences** — `ob_recall` dedup first, then `ob_store` with `[EXPERIENCE]` format. Again no manual vault write: `ob_store` nests under the project, and a flat `Experiences/{key}.md` beside it is counted by /sync vault-index-parity as an unindexed experience.
 
 **A13 Summary** — Write `~/Obsidian Vault v2/Summaries/YYYY-MM-DD-{project-slug}.md` (What / Why / How / Lessons). The SessionEnd hook writes the same path but yields to an existing file, so this enriched version wins.
 
-**A14 Feedback** — Read `.recalled-entries.json`; `ob_feedback(entry_id, rating, referenced)` for each recalled entry (helpful / harmful / neutral)
+**A14 Feedback** — call `ob_recalled` to resolve the entry ids (**never read `.recalled-entries.json`**; nothing writes it, and the resolver refuses a copy naming another session), then `ob_feedback({id, rating})` for each — those two arguments and no others (helpful / harmful / neutral)
 
-Call **`ob_end`** if available to run session-end pipeline (vault summary, auto-feedback, skill-scan).
+Call **`ob_end`** if available to run the session-end pipeline (vault summary, auto-feedback, invocation logging).
 
 ---
 

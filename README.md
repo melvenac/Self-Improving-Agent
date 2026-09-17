@@ -2,7 +2,7 @@
 
 *A memory protocol that enables AI coding agents to learn across sessions.*
 
-**Latest: v0.35.0** · [Changelog](CHANGELOG.md)
+**Latest: v0.36.0** · [Changelog](CHANGELOG.md)
 
 ---
 

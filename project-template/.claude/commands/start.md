@@ -90,20 +90,31 @@ Skip any that do not exist:
 
 **Skip entirely if `AGENT.md` was absent or declared no `mailbox_channel`.** Otherwise:
 
-- Channel dir: `~/.agents/mailbox/channels/{mailbox_channel}/`
-- Inbox: `{partner.toLowerCase()}-to-{name.toLowerCase()}.md`
-- Decisions: `decisions.md`
+Channel dir: `~/.agents/mailbox/channels/{mailbox_channel}/`. Read two things from it, in this order.
 
-From the inbox, take the subject **and date** of the newest `## [YYYY-MM-DD ...] Sender — Subject`
-header — the first one after the intro.
+**1. The newest brief — `loop-N-brief.md`, by the largest N.** This is where work actually arrives.
+`{partner}-to-{name}.md` is **archive, not inbox**: on 2026-09-17 its newest header was three days
+old and named a Loop 4 brief, while Loop 11's brief sat beside it in `loop-11-brief.md` and its
+corrections arrived as a cross-session message. Reporting the `-to-` file's subject as "latest"
+presents superseded work as current. Read it only if you need the history.
 
-From `decisions.md`, take **the LAST `## YYYY-MM-DD` header in the file.** Entries are appended, so
-line position is the ordering. **Do not sort by date string.** Same-date headers are the norm: every
-header in this project's `decisions.md` shares its date with at least one other, so a date sort
-orders nothing and silently returns an arbitrary entry.
+**2. `decisions.md` — the LAST `## YYYY-MM-DD` header in the file.** Entries are appended, so **line
+position is the ordering, not the date.** Same-date headers are the norm: every header in this
+project's `decisions.md` shares its date with at least one other, so a date sort orders nothing and
+silently returns an arbitrary entry.
 
-**Print both dates.** A months-old inbox subject beside a today decision reads as current work unless
-the dates are visible.
+**The ordering rule is the same for every file in this channel: appended, so the last header wins.**
+It was previously written as "the first one after the intro" for the inbox and "the last" for
+decisions — two opposite rules for two files with identical structure, which is why a 2026-08-31
+message was once reported as newer than a 2026-09-14 one.
+
+**Print the date beside whatever you report.** A stale subject beside a today decision reads as
+current work unless the dates are visible. If the newest brief predates the last decision, say so.
+
+> Note: `~/.agents/mailbox/README.md` documents neither of these. It defines the channel as the
+> three-file `{sender}-to-{receiver}` shape, gives no ordering rule, and does not mention
+> `loop-N-brief.md` or cross-session messages. The rules above are derived from the channel's actual
+> contents and traffic, not from the README.
 
 ### 6. Present the briefing
 
@@ -134,7 +145,7 @@ BROKEN ({n} gaps open; newest {m})
 - {any task with status blocked}
 
 Working tree: {clean | N uncommitted: path, path, ...}
-Mailbox: {subject} ({date}) | Last decision: {date} — {title}
+Mailbox: {newest loop-N-brief.md} ({date}) | Last decision: {date} — {title}
 Skills: {relevant entries from .agents/skills/INDEX.md, or "none"}
 
 FLAGS: {anything to verify, or "none"}
