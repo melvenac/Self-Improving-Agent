@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 30 by open-brain v0.38.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 31 by open-brain v0.38.0 — do not edit; change state via ob_state -->
 > **Status:** v0.38.0 — Loop 13 - Idea B, the module boundary, alone. Make the core installable with Node and git, with memory as an opt-in module. It needs no measurement, which is exactly why it has lost four times to subjects that had one; the displacing sentence is 'it fits cleanly with what we are already touching'. The question it is the instrument for has been open since Loop 9 and is not 'does injection change behaviour' - Loop 10 answered that - but DOES THE MEMORY HALF GET USED AT ALL. Three consecutive loops have now ended with ob_recalled reporting nothing recalled.
 
 ## What's working
@@ -39,6 +39,7 @@
 - The build prunes: a stale artifact whose source was deleted cannot survive a rebuild _(V-031, 2 evidence)_
 - The heuristic rating arm never wrote a row in the entire life of the rating_method column _(V-032, 1 evidence)_
 - On the mailbox retirement the frozen pipeline found every in-repo referrer with no false positives, and its entire blind spot was one nameable structural boundary _(V-033, 2 evidence)_
+- PR #33's fix is correct and was QA'd independently rather than relayed: the retirements check passes in all three worktrees, including the main tree where it fired 115 findings, and the new regression test was seen red on the real defect _(V-034, 3 evidence)_
 
 ## What's broken
 
@@ -65,6 +66,8 @@
 - Gap G-024: Done-task retention evicts entries from state.json permanently during a bulk close, while reporting it only in passing. Closing 13 tasks in session 61 dropped T-032 and T-052 out of the record entirely — nobody asked for those two to go, and it surfaced only because the tool output was read carefully. The count scales with the size of the close, so a large sweep evicts proportionally more, equally quietly.
 - Gap G-026: Recall has no minimum relevance and almost no project scoping, so it fills its result limit with whatever is left once the relevant set runs out - and no metric the project has can see it happening. Deferred twice already, from Loop 11 and Loop 12, because it only ever lived in conversation.
 - Gap G-027: expected_revision serialises writes within one lineage, not across branches. Two seats can read the same base revision, derive the same successor, and both be accepted - the collision is invisible at the data layer and surfaces only as a git conflict at merge time, a different and much later layer. The revision counter does less work than its name implies.
+- Gap G-028: The stated reason for PR #33 - that the 115 findings were 'almost all files under .gitnexus/' - is false, and it is the sentence that made the trade-off look free. Measured: .gitnexus/ accounts for 19 of the 115 findings (16.5%) across 5 files. The other 96 come from real untracked documents: docs/superpowers/plans and specs, docs/dream-design.md, docs/mailbox-transport-retirement-spec.md, .agents/SYSTEM/ENTITIES.md and .agents/TASKS/research-wiki-audit.md. The fix is still right - untracked files do not ship, and re-deriving .gitignore by hand is the defect the check exists to find - but it suppresses 43 files naming a retired thing, not 5.
+- Gap G-029: The regression test added by PR #33 can pass without testing anything. It runs `git init && git add && git commit` inside try/catch with stdio ignored, and on any failure does a bare `return` before reaching its assertion - so a machine without git, or with a git that fails for any reason, reports the test green. It is the rule 11 family - an instrument that cannot distinguish 'nothing there' from 'I did not look' - inside the regression test for the check about exactly that defect class.
 
 ## What's next
 
