@@ -1,0 +1,40 @@
+# Line endings are LF in the index AND in the working tree, on every platform.
+#
+# WHY THIS EXISTS (T-151, session 62). This repo is developed on Windows with
+# `core.autocrlf=true` and had no `.gitattributes`. That combination commits LF
+# and checks out CRLF, so:
+#
+#   - a FRESH CLONE failed two assertions in `tests/pipelines/state-views.test.ts`
+#     — `applySummaryRegion` expects `'# Project Summary\n\n'` and a freshly
+#     checked-out fixture gave it `'\r\n\r\n'`;
+#   - the long-lived working tree PASSED, because its fixtures were written LF
+#     once and never checked out again;
+#   - CI PASSED, because it runs on Linux.
+#
+# The suite was green in every place anyone looked and red in a fresh clone on
+# the platform the project is developed on. It surfaced only when Loop 11 made
+# the repo clonable with its instructions for the first time and someone
+# actually cloned it.
+#
+# It cost twice more the same day: a raw `md5` comparison across the
+# tracked/untracked boundary reported 7 of 11 commands "diverged" when none had
+# (CR-only difference), and every commit printed "LF will be replaced by CRLF".
+#
+# `eol=lf` rather than plain `text=auto` is deliberate: `text=auto` alone still
+# defers the working-tree ending to `core.autocrlf`, which is the setting that
+# caused this. This makes the checkout deterministic regardless of local config.
+#
+# Every tracked file here is text (.ts, .md, .json, .mjs, .yml) and the index is
+# already LF, so this changes no blob — only what lands on disk.
+* text=auto eol=lf
+
+# Explicit for the types actually in the tree, so a future binary addition is a
+# deliberate decision rather than a silent match against `*`.
+*.ts   text eol=lf
+*.mjs  text eol=lf
+*.js   text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.yml  text eol=lf
+
+# Add binaries here as `-text` when any arrive; there are none today.
