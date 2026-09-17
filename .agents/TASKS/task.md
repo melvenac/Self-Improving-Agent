@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 13 by open-brain v0.34.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 14 by open-brain v0.34.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 9 is delivered: PR #10 at 2c9a79d, tagged v0.33.0, CI green, Planner-QA'd, merging is Aaron's. Loop 8 merged as PR #9. The next loop is scoped by Clark's Loop 10 brief and must start in a FRESH SESSION — two loops ran in session 59, which is a lapsed discipline rather than a dropped one. _(since session 59)_
+Loop 10 answered the question the project was started to ask: the ranker earns its keep, the injection does not, and after six months the memory half is still unproven. The next loop starts from that answer rather than from another measurement. _(since session 60)_
 
 ## Top tasks
 

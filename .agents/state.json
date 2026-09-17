@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "revision": 13,
+  "revision": 14,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 9 is delivered: PR #10 at 2c9a79d, tagged v0.33.0, CI green, Planner-QA'd, merging is Aaron's. Loop 8 merged as PR #9. The next loop is scoped by Clark's Loop 10 brief and must start in a FRESH SESSION — two loops ran in session 59, which is a lapsed discipline rather than a dropped one.",
-    "since_session": 59
+    "text": "Loop 10 answered the question the project was started to ask: the ranker earns its keep, the injection does not, and after six months the memory half is still unproven. The next loop starts from that answer rather than from another measurement.",
+    "since_session": 60
   },
   "tasks": [
     {
@@ -1020,6 +1020,27 @@
       "evidence": "Session_59.md carried '[x] State written through ob_state' written during A1, before the ob_state call; the call then refused on a stale-server schema parse and the tick was never corrected. The Planner read the log as a completed close-out and told Aaron no /end had happened.",
       "recommended_update": "Tick post-session checklist items after the call returns, not while writing the log. A checklist filled in from intent is the same green-that-cannot-be-red shape as the nine instrument failures.",
       "opened_session": 59
+    },
+    {
+      "id": "G-021",
+      "what": "R1's staleness signal is under-specified: a stale MCP server and a current one produce identical totals",
+      "evidence": "ob_sync via MCP before reconnect omitted state-schema entirely; both before and after reported 'Summary: 23 passed, 0 fixed, 1 warnings, 0 issues, 0 skipped'. Only the presence of one printed row distinguishes them.",
+      "recommended_update": "Make a stale server differ in a COUNTED value so the totals disagree rather than the rendering. Loop 11 candidate; deliberately not repaired in Loop 10, because this loop does not end at one more fix and that applies to its own repairs.",
+      "opened_session": 60
+    },
+    {
+      "id": "G-022",
+      "what": "The error-count table and the ordinal numbering disagree by 2 Planner and 1 Developer, at the Loops 5-7 boundary",
+      "evidence": "CHANGELOG table derives 23/18; the running count in use is 26/19. The table gives 13 Planner errors before Loop 9 while the ordinal numbering assumes 15. The gap sits at the Loops 5-7 row and nowhere else - the one row the carried-forward footnote already marks as unauditable from its own enumeration.",
+      "recommended_update": "Re-derive the Loops 5-7 era from its own record, or accept the carried figure explicitly. Recorded rather than resolved by picking the larger number, which would be the move the footnote condemns.",
+      "opened_session": 60
+    },
+    {
+      "id": "G-023",
+      "what": "PR #2 has been open and review-ready for three weeks against a head that no longer exists on origin",
+      "evidence": "gh pr list shows #2 'Configurable user/agent identity' created 2026-08-25, not a draft, head feat/configurable-identity; git ls-remote --heads origin returns only master. It survived the session that recorded 'origin now carries exactly one branch: master' - true of branches, false of what the repository advertised as open work.",
+      "recommended_update": "Aaron's call to close or restore. Out of Loop 10's scope and deliberately untouched.",
+      "opened_session": 60
     }
   ],
   "decisions": [
@@ -1238,27 +1259,47 @@
       "title": "Pre-register the disposition trace, then do not build it",
       "date": "2026-09-15",
       "note": "Loop 9 R2. F1 was pinned at an in-population share below 15% before the number existed; the event record turned out to have no shell-command type, only path predicates were matchable, and the measured share was 14.2%. Building something already pre-registered as unable to answer would be goalpost-moving in the direction that produces work. A threshold chosen after seeing 14.2% would have been chosen at 10%."
+    },
+    {
+      "id": "D-006",
+      "title": "Loop 10 ruled the memory half: the ranker earns its keep, the injection does not",
+      "date": "2026-09-17",
+      "note": "bm25_only loses to live 10-23 p=0.035 is evidence about RANKING, not about injection; the one attempt to measure injection collapsed to p=0.688 topic-matched. The upper bound is CLAUDE.md: injected at 100% delivery, top of context, every session, carrying the sentence that the summaries table does not exist, while /start instructed agents to call ob_summarize() and ob_store_summary() which do not exist and command-parity reported pass. Perfect delivery did not produce connection, so the problem is not delivery and no ranking/maturity/recency/scoping work can reach it. After six months the memory half is still unproven. 14 KEEP, 9 CUT, 4 SUSPENDED across 28 components. Released as v0.34.0 (4212f69), merged as PR #12 into master 4f93676."
+    },
+    {
+      "id": "D-007",
+      "title": "SUSPENDED deletes the code; it differs from CUT only by a named reviving observation and a recovery SHA",
+      "date": "2026-09-17",
+      "note": "C1 forbids dormant code, and a component left switched off in the tree IS the open-ended suspension this loop was convened to end. Pinned for prompt artifacts in bfee8c0 before any was ruled, then extended to code after seeing E3/E18 and dated as such per C1's falsification clause. E3, E18, E9b and P1 are therefore deleted with their triggers written down. Every trigger carries the clause that reviving maturity ranking without the as-of replay is not a partial revival but one that cannot be honestly measured."
+    },
+    {
+      "id": "D-008",
+      "title": "R1's first production use was a true positive whose subject was R1 itself",
+      "date": "2026-09-17",
+      "note": "After the merge, ob_sync via MCP omitted the state-schema line entirely while the CLI printed it: the server held the module from before R1 existed. Reconnect confirmed the fix - 'readable by the running MCP server'. But both runs reported an identical '23 passed, 0 issues', so a stale server and a current one differ only in whether one row among twenty-three is printed. The signal is an absent check, not a failing one - the same family as apoptosis reading 0 forever. Expectation of a pass was correct about parsing and would have concealed it, which is why expectation is not the instrument."
     }
   ],
   "handoff": {
-    "pick_up": "Check whether Aaron merged PR #10 (loop/9-usage, 2c9a79d, v0.33.0). If merged, Loop 10 branches from the new master and starts in a fresh session — do NOT continue it in a session that already holds Loop 9's context. Clark's Loop 10 brief is in ~/.agents/mailbox/channels/sia/ and should be read when the loop is picked up, not before.",
+    "pick_up": "Loop 10 is merged (PR #12, master 4f93676, tag v0.34.0). The close-out PR is the only Loop 10 work left. Loop 11's subject is Aaron's to rule; the recorded candidates are making R1's staleness signal a counted value rather than a printed row, and the finding that writing to the record must be a step rather than a resolution - six errors, the R4 rule and the Loop 9 footnote all lived only in messages until someone wrote them in.",
     "watch_out": [
-      "After any schema change to state.json, the MCP server must be reconnected before the next ob_state write. This session's /end refused on exactly that: the server held the pre-R3 strict schema and the file no longer had project.version. It fail-closed and wrote nothing, which is correct behaviour.",
-      "Loop 10's pre-registration must state on its face that it was written AFTER F1 fired at 14.2% against a 15% line. Both agents have seen that number and neither can write an innocent prereg now.",
-      "Scripted multi-line edits silently no-op against CRLF files while reporting success. Verify each by reading back what changed, and note that this guard is exactly what fails for a stale read.",
-      "A confirmation read taken while a backgrounded write is still in flight is worth nothing. Order the read after the write has genuinely terminated, not after the command you were watching returned.",
-      "ProjectSchema is a z.strictObject with no migration runner: any future field removal has to move the live record, tests/fixtures-state AND project-template/.agents/state.json in one commit.",
-      "The CHANGELOG footnote for the Loops 5-7 correction row still needs to land on the next touch of that file."
+      "A reconnect message is not evidence: verify by a read ordered strictly after the write. R1's own first use proved a stale server reports success while looking identical in totals.",
+      "Every containment that worked this loop was a command; every containment that failed was an intention. Prefer a check that runs over a rule that must be remembered.",
+      "Two measurements that share a premise are one measurement - six instances this loop, ending with db.ts, which both enumeration passes missed because both assume a component is something production reaches.",
+      "git show <ref>:<path> is mangled by MSYS on Windows when the ref contains a slash; it reports a present file as missing. Use MSYS_NO_PATHCONV=1.",
+      "git ls-remote --tags double-counts annotated tags via the ^{} rows; filter them or the count doubles.",
+      "sed -i on tracked files is blocked by the auto-mode classifier as irreversible destruction; use the Edit tool instead.",
+      "A release tag and a session close-out must not share a branch (R4, now in the tracked template RULES.md): the reviewed commit and the PR's commit diverge by construction."
     ],
     "open_questions": [
-      "Does the ACTION-template finding justify changing what /end A12 asks agents to write? It is a template change rather than an instrument, but it is Loop 10's to scope, not this session's.",
-      "G-010 was demonstrated live this session: ob_state has no typed op that can remove a schema field, so R3 needed a direct edit under Aaron's approval. Left open deliberately."
+      "Does the protocol half earn its keep? It was never tested against Loop 10's criterion, so nothing may claim it did.",
+      "Should success_rate be dropped from live databases? It survives as an inert column; dropping it is a migration Loop 10 did not rule on.",
+      "Node v24: the v22 pin is released in this repo, but Smart Connections may break in Aaron's vault where no test here would catch it."
     ],
-    "session": 59
+    "session": 60
   },
   "last_session": {
-    "n": 59,
-    "date": "2026-09-15",
-    "uuid": "590dafa8-d640-4086-95dc-c8c5d8934678"
+    "n": 60,
+    "date": "2026-09-17",
+    "uuid": "d6af4ac8-3836-4752-8c70-66facd766729"
   }
 }
