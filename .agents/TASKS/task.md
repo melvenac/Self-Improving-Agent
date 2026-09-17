@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 22 by open-brain v0.36.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 23 by open-brain v0.36.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 10 answered the question the project was started to ask: the ranker earns its keep, the injection does not, and after six months the memory half is still unproven. The next loop starts from that answer rather than from another measurement. _(since session 60)_
+Loop 11 answered the instruction-surface question and the answer is a ratio: Q1 25 / Q2 12 / Q3 1 across 77 files. The tools do what they say; the prose around them rots, and only in one direction — the protocol deletes something and the sentences that named it stay. Nothing checks that a deletion propagated to the text. The next loop's subject is Aaron's to rule, but that gap is what the evidence points at. _(since session 62)_
 
 ## Top tasks
 
