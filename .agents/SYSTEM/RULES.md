@@ -73,4 +73,8 @@ separate close-out PR off the new `master`. If the tree moves after a freeze, sa
 2. Priorities come from the same `ob_start` payload. A task's rationale is its `note` in `state.json`, read when you work it, not when you pick it.
 3. **Never hand-edit SUMMARY.md, INBOX.md, task.md or next-session.md when `state.json` exists** — they are rendered views, and a hand edit is overwritten by the next render. Write state through `ob_state`.
 4. Log decisions in DECISIONS.md with ADR format, and index each one with an `add_decision` op in the same `ob_state` call.
-5. Never commit `.agents/` or `.claude/` to this repo (gitignored)
+5. **The state record and the instruction surface are tracked; working material is not.** Tracked: `state.json` and its four rendered views, and every file that tells an agent what to do in a session — `CLAUDE.md`, `.claude/commands/`, `.agents/AGENT.md`, `LIFECYCLE.md`, `SYSTEM/RULES.md`, `RUNBOOK.md`, `SECURITY.md`, `TESTING.md`, `domains.json` and `.agents/skills/`. Local by intent: session logs, `archive/`, working task specs, `.claude/settings.local.json` and third-party plugin skills.
+
+   **Authority: Aaron's ruling of 2026-09-17, carried out in PR #17 (`chore(vcs): track the instruction surface`), which rewrites `.gitignore` and tracks the surface.** Not the audit's judgment — Loop 11 found this rule false and deliberately left it alone, because policy is not an auditor's to overturn.
+
+   This rule previously read *"Never commit `.agents/` or `.claude/` to this repo (gitignored)"*. It was false three ways: against PR #17; against the close-out, which commits `state.json` and the four views every loop with `/sync` passing (PR #16); and against Aaron's instruction. It was also in a file with no history of its own, so nobody could say who set it or when — which is what Loop 11 was spent removing everywhere else.
