@@ -60,10 +60,26 @@ export function renderState(state: State, version?: string): string[] {
   return lines;
 }
 
+/**
+ * One scannable line per task: status, id, title.
+ *
+ * `note` is deliberately NOT rendered. This is the second renderer to carry that
+ * defect and the one that actually mattered: when `state.json` is valid this
+ * render REPLACES the four prose files in `ob_start`'s return, so trimming
+ * `INBOX.md` alone changed nothing a starting session sees. Measured on state
+ * rev 14: 7,899 words returned, of which 5,795 were task notes — the notes
+ * removed from the inbox view reappearing one layer down in the same call.
+ *
+ * The size block above still reports the four files' sizes, so it advertised a
+ * shrink in content this function does not return. Counting one thing and
+ * returning another is how that went unnoticed.
+ *
+ * A task's rationale is its `note` in `.agents/state.json` under `tasks[]` —
+ * reference material for working a task, not for choosing one.
+ */
 function formatTask(t: Task): string {
   const sup = t.supersedes ? ` (supersedes ${t.supersedes})` : "";
-  const note = t.note ? ` — ${t.note}` : "";
-  return `[${t.status}] ${t.id} ${t.title}${sup}${note}`;
+  return `[${t.status}] ${t.id} ${t.title}${sup}`;
 }
 
 /** Decisions are append-ordered (Loop 3 R2): the latest is the last element, not a date sort. */

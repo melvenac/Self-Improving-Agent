@@ -58,14 +58,36 @@ function byPriority(a: Task, b: Task): number {
   return PRIORITY_ORDER.indexOf(a.priority) - PRIORITY_ORDER.indexOf(b.priority);
 }
 
+/**
+ * One scannable line per task: status, id, title.
+ *
+ * `note` is deliberately NOT rendered here. Titles are disciplined — across 44
+ * active tasks they total 330 words, median 8, none over 25 — while notes total
+ * 5,795 words, one of them 612 on its own. Appending them turned the backlog
+ * view into 6,653 words in which 44 titles could not be scanned, which is the
+ * opposite of what a "what is next" view is for. The note is reference material
+ * for working a task, not for choosing one; it lives in `.agents/state.json`
+ * under `tasks[].note` and the legend below says so.
+ *
+ * `task.md` and SUMMARY.md's region already rendered title-only top-5 lists.
+ * This makes the inbox consistent with them rather than the outlier.
+ */
 function taskLine(t: Task): string {
   const sup = t.supersedes ? ` (supersedes ${t.supersedes})` : "";
-  const note = t.note ? ` — ${t.note}` : "";
-  return `- ${STATUS_BOX[t.status]} **${t.id}** ${t.title}${sup}${note}`;
+  return `- ${STATUS_BOX[t.status]} **${t.id}** ${t.title}${sup}`;
 }
 
 export function renderInbox(state: State, o: ViewOptions): string {
-  const lines: string[] = [header(state, o), "", "# Inbox", "", "Legend: `[ ]` open · `[~]` in_progress · `[!]` blocked", ""];
+  const lines: string[] = [
+    header(state, o),
+    "",
+    "# Inbox",
+    "",
+    "Legend: `[ ]` open · `[~]` in_progress · `[!]` blocked",
+    "",
+    "Titles only. Full rationale for a task is its `note` in `.agents/state.json` under `tasks[]` — read it when you work the task, not when you pick one.",
+    "",
+  ];
   const active = state.tasks.filter((t) => t.status !== "done");
   for (const p of PRIORITY_ORDER) {
     const group = active.filter((t) => t.priority === p);

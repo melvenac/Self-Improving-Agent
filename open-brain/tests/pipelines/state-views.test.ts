@@ -26,10 +26,19 @@ describe("state views (Loop 3 C3)", () => {
     const text = renderInbox(state, opts);
     expect(text.split("\n")[0]).toBe(HEADER);
     expect(text).toContain("Legend: `[ ]` open · `[~]` in_progress · `[!]` blocked");
-    expect(text).toContain("## P0\n\n- [~] **T-005** state.json strict schema module with parseState / serializeState — Loop 2 capability half");
-    expect(text).toContain("- [!] **T-012** /end writes state.json through one structured tool — Loop 3; blocked on Loop 2 acceptance");
+    expect(text).toContain("## P0\n\n- [~] **T-005** state.json strict schema module with parseState / serializeState");
+    expect(text).toContain("- [!] **T-012** /end writes state.json through one structured tool");
     expect(text).toContain("- [ ] **T-008** /sync state-schema check with skip-with-reason");
     expect(text).toContain("(supersedes T-023)");
+
+    // Active task lines are titles only — the note is NOT rendered. Pinned as an
+    // absence so reinstating it argues with a failing test rather than sliding
+    // back in: notes totalled 5,795 words against 330 words of titles, which is
+    // what made the backlog unscannable. The note stays in state.json, and the
+    // legend points there.
+    expect(text).toContain("Titles only. Full rationale for a task is its `note` in `.agents/state.json`");
+    expect(text).not.toContain("— Loop 2 capability half");
+    expect(text).not.toContain("— Loop 3; blocked on Loop 2 acceptance");
     expect(text).toContain("## Done (last 3 sessions)\n\n- [x] **T-001** ob_start returns state, drift and session instead of booleans (session 54) — Loop 1, v0.28.0");
     // Order inside the sections follows priority, then file order.
     expect(text.indexOf("## P0")).toBeLessThan(text.indexOf("## P1"));
