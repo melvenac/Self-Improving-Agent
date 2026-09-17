@@ -38,9 +38,20 @@ Removing the maturity boosts moves nothing — they were already 1.0. **The low-
 ### R1–R4
 
 - **R1** — `ob_sync`'s `state-schema` check now names **which process's loaded schema** parsed the live `state.json`, and `ob_sync` called as an MCP tool reports as the server. A version comparison would have been green through the entire two-loop outage, because Loop 9's R3 deliberately held `schema_version` at 1 while changing `ProjectSchema`'s shape.
+
+  **R1's first production use was a true positive whose subject was R1 itself, and it exposed its own weakest property.** Called through the MCP tool immediately after the release merged, `ob_sync` **omitted the `state-schema` line entirely** while the CLI printed it in the same minute — the long-running server held the module from before `report: true` existed. A reconnect fixed it, and the line then read *"readable by the running MCP server"*. **But both runs reported `Summary: 23 passed, 0 fixed, 1 warnings, 0 issues, 0 skipped`, byte-identical.** The old check still ran and still passed, so it was counted in the 23.
+
+  **A stale server and a current one therefore differ only in whether one row among twenty-three is printed.** That is not a check that fires; it is a check whose *absence* someone has to notice — the same family as apoptosis reading 0 forever and `success_rate` reading 1.00, a healthy-looking number that cannot go unhealthy. **The instrument found a true positive and simultaneously demonstrated that its signal is under-specified.** Making a stale server differ in a *counted* value, so the totals disagree rather than the rendering, is recorded as **G-021** and left for a later loop: this loop does not end at one more fix, and that applies to its own repairs.
 - **R2** — `ob_state`'s schema refusal now names the reconnect, and says to confirm by a read ordered after the write, because **a stale server reports success**.
 - **R3** — the carried-forward footnote, below, plus an open discrepancy in the running count recorded rather than resolved.
 - **R4** — the branch-shape rule written where the loop protocol lives.
+
+### Environment traps found while verifying, both the `db.ts` class
+
+An instrument answering a narrower question than the claim it is used to support.
+
+- **`git show <ref>:<path>` is mangled by Git Bash on Windows when the ref contains a slash.** MSYS rewrites the colon to a semicolon and the slashes to backslashes, so `git show origin/master:.agents/state.json` fails as `ambiguous argument 'origin\master;.agents\state.json'`. **It returns empty and looks exactly like a missing file** — the Planner nearly reported the state record absent from master. `MSYS_NO_PATHCONV=1` fixes it. This is the more dangerous of the two, because **it fails silently in the direction of "the record is gone."**
+- **`git ls-remote --tags` lists both `refs/tags/X` and `refs/tags/X^{}` for annotated tags**, so a naive line count doubles it — 118 against a true 59. Filter `^{}` rows.
 
 ### Idea B
 
@@ -94,6 +105,8 @@ The running total is replaced with a per-loop breakdown, because a total nobody 
 | running count in use [^discrepancy] | **25** | **19** |
 
 [^discrepancy]: **The two rows disagree by 2 Planner and 1 Developer, and the difference is not reconciled.** Loop 10 opened from a brief stating **17 Planner, 13 Developer** and closed at **25 / 19**, counting 8 and 6 errors logged within the loop — all of them named in the Loop 10 entry and each auditable from its own description. This table's Loop 9 subtotal is **15 / 12**. The two starting points differ, so either two Planner and one Developer error were logged between Loop 9's CHANGELOG entry and Loop 10's brief without reaching this table, or the brief's opening figure was itself carried rather than derived. **Recorded as an open discrepancy rather than resolved by picking the larger number**, because picking one would be the same move the footnote below describes. The `25 / 19` line is what the agents used in-loop; the subtotal is what this table can actually support.
+
+    **Localized after the fact, and it lands where the footnote said to look.** The table derives **13** Planner errors before Loop 9; the ordinal numbering assumes **15**. The two agree everywhere in Loops 8, 9 and 10 and **disagree by exactly 2 at the Loops 5–7 boundary — the one row marked below as carried forward and unauditable from its own enumeration.** The discrepancy is not a bookkeeping slip in either agent's Loop 8–10 counting; it is **the carried row measuring itself.** Re-deriving the Loops 5–7 era is real work and out of Loop 10's scope, so both figures stand with the cause named. A footnote that predicts where the next error will be found, and is then right, has earned its place.
 
 [^carried]: **The Loops 5–7 row is carried forward from the running total as it stood, not re-derived from an enumeration.** Every other row in this table is backed by the named list beneath it and can be audited from its own entries; this one cannot. It is the single figure here that has to be taken on trust, and it is marked rather than quietly counted because a record that is re-read but never re-derived converges on its own errors — which Loop 10 then demonstrated twice, in a false "one tag per loop" summary line that survived a reconciliation whose stated purpose was to not answer from memory, and in `command-parity` reporting `pass` on three identical copies of an instruction that cannot execute. Agreed with the Planner in Loop 9; recorded here at the first touch of this file, because an intention is what the fresh-session rule and the skill queue both died of.
 
