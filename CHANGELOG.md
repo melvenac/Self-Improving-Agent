@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased] - Loop 11 — the instruction surface
+## [0.36.0] - 2026-09-17 — the instruction surface
 
 **Does each command do what it says?** Loop 10 ruled on the memory layer's code and never looked at
 the `.md` files that tell an agent what to do. Every finding below is tagged with which of the three
