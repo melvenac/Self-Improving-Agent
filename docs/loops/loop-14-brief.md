@@ -22,9 +22,29 @@ the same durable record the developer seat already has, and makes seat identity 
 checkout rather than of a file every checkout shares.
 
 **This is T-149** — *"Give each agent seat its own git worktree"* — **finished.** The worktree half was
-done on 2026-09-17: `~/Projects/sia-planner`, detached at `917fd68`. Detached on purpose, so it can
-never hold a branch another tree needs and can never accept a commit by default. **What the worktree
-did not fix is everything below.**
+done on 2026-09-17: `~/Projects/sia-planner`, created detached at `917fd68`. **What the worktree did
+not fix is everything below.**
+
+**The safety property was overstated when it was created, and the correction is the first evidence
+for C3.** The Planner wrote that the tree *"can never hold a branch another tree needs and can never
+accept a commit by default."* **Half of that was true.** Committing this very brief put the tree on
+`docs/loop-14-brief`, and the Developer caught it by running `git worktree list` rather than
+accepting the report. **The property survived under an hour, and it was falsified by its author's
+first use of the thing it described.**
+
+Separated honestly:
+
+- **"Never accepts a commit by default" held.** A detached HEAD forced an explicit `git checkout -b`.
+  That is a real containment and it did its job.
+- **"Can never hold a branch another tree needs" is false.** Detachment is a *resting state*, not an
+  invariant. A tree returns to it only if something returns it.
+
+**And "something returns it" is the whole point.** The procedure — branch, commit, push, then
+`git checkout --detach master` — is correct and is an **intention** until something runs it, which is
+rule 4 exactly. **It has no home, because the planner has no close-out. That is C3.** Recorded here
+rather than quietly repaired, because this is the same shape as `AGENT.md` asserting Atlas *"runs in
+the home directory"* — **a stated property falsified by its own author's next action, twice in one
+hour, in two files.**
 
 ## Why this, on evidence
 
@@ -81,8 +101,16 @@ Rule 1's running count is **provisional pending the QA of PR #33.** On current r
 retirements defect is **two escapes, not one**: the Developer shipped a check named `walkTracked`
 that checked nothing about trackedness, and the Planner signed it off. Both claims escaped — to
 master, and to `V-030`. **Two seats erring independently about the same artifact is two entries.**
-If the QA holds, the count opens Loop 14 at **36 Planner, 25 Developer**. **Do not carry the new
-numbers until the QA is written.**
+The Developer agreed unprompted and in writing, and asked that the Planner set the number rather than
+have it conceded in advance — **a number arrived at by negotiation is not a measurement.**
+
+**A second, independent Planner escape is confirmed and pending nothing:** the detachment claim in
+*The subject* above, which reached Aaron's report, PR #34's body and this brief before the Developer
+caught it. Under the admission rule the dividing line is **escape, not severity**.
+
+**Settled count stays 35 / 24.** With both pending entries the count opens Loop 14 at **37 Planner,
+25 Developer**. **Do not carry the new numbers until the #33 QA is written** — the rule's whole point
+is that the count moves when the reading is done, not when the conclusion is obvious.
 
 ---
 
@@ -145,6 +173,11 @@ subject survive — **because the Planner retypes them into every brief by hand.
 list beside the thing it describes is precisely the defect the Developer confessed to in
 `walkTracked` on the same day. **The planner's continuity is currently implemented as the failure
 mode this project exists to remove.**
+
+**Concrete first deliverable, which the loop earned before it started:** returning the planner tree
+to detached after a push belongs in the planner's close-out. It is the smallest possible instance of
+the whole subject — **a correct procedure that no seat runs, because the seat that should run it has
+nowhere to keep it.**
 
 ## C4 — The acceptance test, and it is binary
 
