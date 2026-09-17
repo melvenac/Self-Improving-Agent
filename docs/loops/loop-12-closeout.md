@@ -104,6 +104,20 @@ look."** A zero, a blank, a truncated list and a mangled ref all read as absence
 that worked, every time, was looking at what the instrument actually returned** rather than at the
 number it reduced to.
 
+**And the family arrived twice more while that paragraph was being written.** Both were caught
+before reaching the file, and both are recorded here rather than in a commit message because they
+are the clearest illustration the loop produced.
+
+1. **A dangling cross-reference, in the close-out of the loop about dangling references.** The first
+   draft cited "the substring row below". That row exists in **Loop 11's** close-out, not this one.
+   Written by an author who had spent the day building a check for exactly that defect, into the
+   document reporting it.
+2. **A CRLF mismatch that made an edit report success while silently dropping a line.** A multi-line
+   replace looked for two bare linefeeds in a file stored with carriage-return linefeeds, matched
+   nothing, **printed `fixed`**, and left the running-count line deleted. The tool said it had worked. Only re-reading the file showed it
+   had not — *the instrument that cannot distinguish "nothing there" from "I did not look", one
+   more time, inside the paragraph defining it.*
+
 **Running count: 34 Planner, 24 Developer.**
 
 ## The mechanism caught its author three times
