@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 28 by open-brain v0.38.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 30 by open-brain v0.38.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 11 answered the instruction-surface question and the answer is a ratio: Q1 25 / Q2 12 / Q3 1 across 77 files. The tools do what they say; the prose around them rots, and only in one direction — the protocol deletes something and the sentences that named it stay. Nothing checks that a deletion propagated to the text. The next loop's subject is Aaron's to rule, but that gap is what the evidence points at. _(since session 62)_
+Loop 13 - Idea B, the module boundary, alone. Make the core installable with Node and git, with memory as an opt-in module. It needs no measurement, which is exactly why it has lost four times to subjects that had one; the displacing sentence is 'it fits cleanly with what we are already touching'. The question it is the instrument for has been open since Loop 9 and is not 'does injection change behaviour' - Loop 10 answered that - but DOES THE MEMORY HALF GET USED AT ALL. Three consecutive loops have now ended with ob_recalled reporting nothing recalled. _(since session 63)_
 
 ## Top tasks
 

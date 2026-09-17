@@ -1,29 +1,31 @@
-<!-- generated from .agents/state.json rev 28 by open-brain v0.38.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 30 by open-brain v0.38.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## Pick up here _(written session 62)_
+## Pick up here _(written session 63)_
 
-Loop 11 is complete and merged: PRs #17, #18, #19 and #20 are in master, v0.36.0 is tagged at 39fefb4, and the instruction surface is tracked — a fresh clone now gets CLAUDE.md and the commands for the first time. One piece of work is outstanding and it is small: PR #21 (.gitattributes, T-151) is open and verified against a control worktree but not merged; Aaron merges. The next loop's subject is unruled. The evidence points at one gap: nothing checks that a deletion propagated to the prose, which is where 25 of 38 defects came from.
+Loop 13 is Idea B - the module boundary - ruled by Aaron. Its brief is docs/loops/LOOP-13-brief.md, landing in PR #31. READ THAT ONE BY NUMBER, NOT BY RECENCY: a Loop 14 brief already exists (PR #34, the two-seat record) and does not jump the queue, so 'the newest brief' is the WRONG file. Merge order is #33 (a real defect fix), then #32 (this close-out), then #31 which unblocks Loop 13, then #34. Base was master @ 917fd68 rev 28 at close; it will have moved - check it.
 
 ## Watch out
 
-- A substring check answers a DIFFERENT QUESTION than the one being asked, and the answers coincide most of the time — which is why it is dangerous rather than merely unreliable. Five instances in session 62: four where grep matched a citation of a retired assertion, one where it missed a correct document by being too literal (searching 'error 21' in a file that says 'Developer 21').
-- `git show <ref>:<path>` is mangled by MSYS on Windows when the ref contains a slash — use MSYS_NO_PATHCONV=1. It cost three re-runs in one session and TWICE produced confident wrong answers that were nearly filed as findings. A zero from a broken instrument looks exactly like a zero from a clean file.
-- For an instruction that produces artifacts, LOOK AT THE ARTIFACTS. The /checkpoint filename doubling was invisible in both files — each internally consistent — and obvious in one `ls`. Adopted as the audit's fourth question.
-- `ln -s` under MSYS creates a real directory, not a link. That is what makes `git worktree remove` fail with 'Filename too long' after you have linked node_modules into a throwaway worktree. Remove the copy first, or do not link at all.
-- An unrecognised CLI flag selects the MUTATING default: `sync --check-only` is silently discarded because cli.ts:21 is args.includes('--check'), and sync runs in fix mode. T-150 is open on it. Until it is fixed, type the flag exactly.
-- Two seats share one working tree. Either seat can delete the other's files by doing something entirely correct on its own branch, and for untracked files the loss is silent because git does not report removing what it never tracked. T-149 is open; the fix is one worktree per seat and it was demonstrated three times in session 62.
-- The checks in this repo had a better record in session 62 than either agent's hand-rolled reasoning. command-parity was right when a raw md5 said 7 of 11 commands had diverged (none had — CRLF across the tracked/untracked boundary); mirror-parity caught a repair applied to one Cursor copy and not the other, and surfaced a fourth command mirror (~/.cursor/commands/) that neither enumeration had.
-- Read the ob_state dry run before the real call, every time. Filing one task in session 62 would have evicted done-task T-004 under retention; the dry run said so first and its content was preserved in CHANGELOG.md before it went.
+- THE BRIEF TO READ IS THE ONE FOR THE LOOP YOU ARE RUNNING, BY NUMBER. An earlier version of this handoff said 'by the largest loop number', which now points at Loop 14's brief. Written before Loop 14 was briefed ahead of Loop 13 running - a sorting rule that was correct when written and false within the day.
+- THERE ARE NOW THREE WORKTREES and .agents/AGENT.md is ONE TRACKED FILE saying `name: Forge`, so /start greets whoever starts in ANY of them as Forge. The seat also carries three disagreeing names: Clark in the global CLAUDE.md, Atlas in AGENT.md's partner line, Planner in every brief since Loop 9. That is Loop 14's C1; do not fix it inside Loop 13.
+- RULE 13 - A CHECK IS ONLY AS TESTED AS THE TREES IT HAS RUN IN. The retirements check shipped through four boundary reports, a Planner QA and five merged PRs, then fired 115 findings the first time it ran in Aaron's MAIN tree - the only one of three with a .gitnexus/ generated index. RUN THE LOOP'S CHECKS IN THE MAIN TREE BEFORE ANY SIGN-OFF, and rebuild it first: the MCP server runs from that build and a stale server reports success.
+- AN INSTRUMENT THAT CANNOT DISTINGUISH 'NOTHING THERE' FROM 'I DID NOT LOOK' IS NOT A MEASUREMENT. Seven instances in session 63: a `|| echo 0` fallback, a blank `echo` over a real hit, MSYS mangling `git show <ref>:<path>`, a `find | head -25` truncation read as a complete inventory, a replace printing 'fixed' while deleting a line, escape sequences un-escaped in transit, and vitest reporting 'no tests' for a file that would not parse. THREE ARRIVED INSIDE THE WORK DESCRIBING THE PATTERN. Reading the artifact caught all seven; knowing the failure mode prevented none.
+- After #33 the retirements check scans ONLY WHAT GIT TRACKS. That is deliberate - an untracked file does not ship, and the alternative is re-deriving .gitignore by hand - but it is a real narrowing: .agents/TASKS/research-wiki-audit.md, one of the three files Loop 11 held with Aaron, names a retired thing and is no longer reported.
+- G-027: expected_revision serialises writes within one lineage, not across branches. Two seats read rev 25 and both wrote rev 26 in one day. Before writing state, check no other seat is about to, and hand over the NUMBER rather than the base.
+- A retired name in prose is textually identical whether it is a defect or an obituary. If a check fires on correct text, add the path to that retirement's allowed_referrers - NEVER reword to dodge a check.
+- The test suite is NOT type-checked (T-152): tsconfig is 'include: [src/**/*]' with one tsconfig, so `tsc --noEmit` exits 0 on a test file naming a deleted symbol.
+- Line endings are MIXED in this repo - .agents/AGENT.md is LF, docs/loops/*.md is CRLF, and checks.test.ts has both. Detect per file in any scripted edit and READ THE FILE BACK; a tool reporting success is not the edit having landed.
+- Read the ob_state dry run before the real call, every time. Gaps take what/evidence/recommended_update, NOT title/note - both seats made that identical mistake on the identical file hours apart.
 
 ## Open questions
 
-- Does the protocol half earn its keep? Still unanswered — and session 62 is evidence of a kind: a full loop ran start to finish with ZERO recalls. ob_recalled returned 'No knowledge entries recalled this session'. Session-start injection is suspended (Loop 10 C2) and no deliberate mid-task recall was ever wanted. A memory layer that is never consulted during a day of hard work is not obviously earning anything.
-- What checks that a deletion propagated to the prose? 25 of 38 defects were references to things the protocol itself deleted. command-tool-names now catches the tool-name case and NOTHING catches the rest — file names, script names, component names, renamed packages.
-- Should the point-of-use rating signal be built (T-014)? T-057 was closed by striking `referenced` from the instructions rather than implementing it, which stops the lie but leaves the was-it-cited question unanswered and the 445 neutrals still hiding it.
-- Node v24: the v22 pin is released in this repo, but Smart Connections may break in Aaron's vault where no test here would catch it. Unchanged from session 61.
+- Does the memory half get used at all? THREE consecutive loops ended with ob_recalled returning nothing recalled. This is Loop 13's subject and the reason Idea B was chosen over G-026.
+- Is the intermittent suite failure one flake or two? One identified instance is sync/index.test.ts > 'does not auto-fix in check-only mode'; G-016 names state-writer.test.ts. Attribution deliberately left open.
+- What forces a retirement to be RECORDED in the first place? The check verifies recorded referrers are still present; nothing compels a new retirement to get an entry. A CUT ruling should not be closeable without one.
+- The error count stands at 35 Planner / 24 Developer settled, opening Loop 14 at 37/25 once the #33 QA is written - two pending Planner entries (the retirements sign-off, the detachment claim) and one Developer (the retirements defect, self-reported).
 
 ## Last session
 
-Session 62 — 2026-09-17 — `b0518d9a-934d-45d6-b6e3-279816d3a66a`
+Session 63 — 2026-09-17 — `fb43e236-e52a-4698-a7c0-8e1126975f7c`
