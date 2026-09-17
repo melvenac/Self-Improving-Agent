@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
+import { execSync } from "node:child_process";
 import Database from "better-sqlite3";
 import type { CheckResult, SyncRuntime } from "./types.js";
 import { parseSkillIndexRows } from "../../shared/skill-index.js";
@@ -1214,7 +1215,7 @@ export function checkRetirements(projectRoot: string): CheckResult {
   const historical = record.historical ?? [];
   const isHistorical = (rel: string) => historical.some((h) => rel === h || rel.startsWith(h));
 
-  const surface = walkTracked(projectRoot).filter((rel) => !isHistorical(rel));
+  const surface = listScannableFiles(projectRoot).filter((rel) => !isHistorical(rel));
 
   const unexpected: string[] = [];
   const stale: string[] = [];
@@ -1291,7 +1292,37 @@ interface RetirementRecord {
   }>;
 }
 
-/** Repo files worth scanning. Deliberately not `git ls-files`: this must work in a temp dir under test. */
+/**
+ * Files worth scanning for a retired name: **the ones git tracks**.
+ *
+ * This used to be a filesystem walk with a hand-maintained skip list, and the
+ * name asserted a property it did not have. It shipped that way and fired **115
+ * findings** on a working tree that had a `.gitnexus/` index — a gitignored
+ * generated cache whose parse artifacts happen to contain the string
+ * `skill-scan`. The worktree it was developed in had no such directory, so it
+ * was green there and broken everywhere else.
+ *
+ * **A hand-maintained skip list is the same defect this check exists to find:**
+ * a second list, beside the thing it describes, that drifts. `.gitignore` is
+ * already the repo's statement about what is not its own content, and `git
+ * ls-files` reads it rather than duplicating it.
+ *
+ * The trade-off, stated rather than hidden: **an untracked file naming a retired
+ * thing is not reported.** That is deliberate — an untracked file does not ship,
+ * and the alternative is re-deriving `.gitignore` by hand. The filesystem walk
+ * survives only as a fallback for a temp directory under test, where there is
+ * no git repo to ask.
+ */
+function listScannableFiles(root: string): string[] {
+  try {
+    const out = execSync("git ls-files -z", { cwd: root, encoding: "buffer", stdio: ["ignore", "pipe", "ignore"] });
+    const files = out.toString("utf8").split("\0").filter(Boolean);
+    if (files.length > 0) return files.filter((f) => /\.(md|ts|mjs|cjs|js|json)$/.test(f));
+  } catch { /* not a git repo, or git unavailable — fall back to the walk */ }
+  return walkTracked(root);
+}
+
+/** Fallback only: a temp dir under test has no git repo to ask. */
 function walkTracked(root: string, rel = "", out: string[] = []): string[] {
   const SKIP = new Set(["node_modules", ".git", "build", "dist", "coverage", ".vitest"]);
   let entries: string[];
