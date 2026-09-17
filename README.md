@@ -118,7 +118,7 @@ The session bootstrap and session-end hooks are compiled TypeScript under `open-
 }
 ```
 
-Session-end automation (summary, auto-feedback, reflection, invocation logging, skill-scan) is handled by the open-brain MCP server's `ob_end` tool — called by the `/end` slash command. No separate hook scripts needed.
+Session-end automation (session summary, auto-feedback, invocation logging, shadow recall, topics) is handled by the open-brain MCP server's `ob_end` tool — called by the `/end` slash command. No separate hook scripts needed.
 
 ### 4. Set up slash commands
 
@@ -156,15 +156,14 @@ Start a Claude Code session and run `/start`. You should see:
 | `/start` | Session start | Reads project state, recalls relevant knowledge, registers session UUID, creates session log |
 | `/end` | Session end | Captures lessons, updates project state, writes handoff notes |
 | `/checkpoint` | Mid-session | Captures phase-level work context before `/compact`, enabling multi-phase sessions |
-| `/sync` | Before commits | Validates version consistency, structural integrity, and installed copy drift (38 checks) |
-| `/skill-scan` | On demand | Scans experience clusters and proposes reusable skills |
+| `/sync` | Before commits | Validates version consistency, structural integrity, and installed copy drift (26 checks) |
 
 ## Automation hooks
 
 | Hook | Trigger | What it does |
 |---|---|---|
 | `open-brain/build/cli-bootstrap.js` | SessionStart | Auto-detects project, emits `SESSION_UUID`, runs health checks, surfaces skill proposals |
-| `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: vault summary, auto-feedback, reflection clusters, invocation logging, skill-scan. **Auto-feedback rates only entries the agent judged explicitly** — the tag-substring fallback is gated off (`enableHeuristicRatings`, default false) pending the Loop 7 C2 ruling |
+| `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: session summary, auto-feedback, invocation logging, shadow recall, topics — numbered 1–4 and 7 in `index-v2.ts`, because stages 5 and 6 were cut in Loop 10. **Auto-feedback rates only entries the agent judged explicitly** — the tag-substring fallback is gated off (`enableHeuristicRatings`, default false). The reason originally given for that gate, protecting `success_rate` and the maturity lifecycle, no longer applies: Loop 10 cut that scoring. Whether the gate should stay is open and sits with D-004, recommended and not adopted |
 
 ## Memory reconciliation — `dream`
 
