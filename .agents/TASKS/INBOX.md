@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 20 by open-brain v0.36.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 22 by open-brain v0.36.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -21,6 +21,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-044** The slot needs an OWNER, not just a timestamp
 - [ ] **T-149** Give each agent seat its own git worktree
 - [ ] **T-150** An unrecognised CLI flag must refuse, not select the mutating default
+- [ ] **T-151** Add .gitattributes — the suite fails in a fresh Windows clone and three instruments call it green
 
 ## P1
 
