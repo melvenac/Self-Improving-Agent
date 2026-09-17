@@ -37,6 +37,43 @@ itself or another governing file, **Q3** the tool behaves differently than the f
   cannot fail and afterwards reads as evidence the action happened. That is G-020, which misled a
   Planner into reporting `/end` had never run.
 
+### `start.md` — the mailbox step read the wrong file with the wrong rule (C2 item 2)
+
+- **Q2 — two opposite ordering rules for two files with identical structure.** The inbox rule said
+  "the newest header is the first one after the intro"; the `decisions.md` rule four lines below said
+  "the LAST header in the file, entries are appended." Both files append. Session 62 hit it live: a
+  2026-08-31 message was ordered ahead of a 2026-09-14 one. One rule now governs the whole channel —
+  appended, so the last header wins.
+- **Q1 — the step read a file that had stopped being the channel.** With the ordering corrected by
+  hand, the mailbox line still reported "Loop 4 brief ready" as the latest subject on 2026-09-17,
+  because `{partner}-to-{name}.md` is archive: work arrives as `loop-N-brief.md` and as cross-session
+  messages. `/start` now reads the newest brief by loop number, and says so when the newest brief
+  predates the last decision.
+- **`~/.agents/mailbox/README.md` answers neither question.** It defines the channel as the
+  three-file `{sender}-to-{receiver}` shape, gives no ordering rule at all, and mentions neither
+  `loop-N-brief.md` nor cross-session messages. `start.md` now records that its rules are derived
+  from the channel's contents rather than from the README.
+
+**What actually persists, enumerated.** Briefs (`loop-4` … `loop-11-brief.md`) and `decisions.md`
+are on disk and greppable; `loop-11-brief.md` is actively amended in place. Cross-session messages
+are not: session 61's entire `/end` close-out report exists in no file in the repo or the mailbox.
+The README's write-then-notify rule (`README.md:58`) already requires each seat to mirror its
+messages into `{me}-to-{other}.md` — **the rule exists and nothing enforces it**, so persistence is
+per-seat convention. Recorded, not repaired; the fix is a ruling, not an edit.
+
+### `RULES.md` — a rule that forbade what `/sync` requires
+
+**Q2.** General rule 6 read "Don't modify `project-template/` — develop the template in its own repo
+and copy updates here." There is no separate template repo, and `command-parity` *fails* when a
+shared command differs between the repo, the template and user scope — so keeping the rule meant
+failing the check. Rewritten to say what the check enforces.
+
+**And a referrer for `LIFECYCLE.md`.** The Component Lifecycle Policy — the add/track/prune
+discipline and the source of the CUT/KEEP vocabulary the evaluation loops rule with — was reachable
+from nothing: no command, hook, skill or `CLAUDE.md` referenced it. **The policy this loop is
+applying could not be found by anyone applying it.** It is not a dead instruction and not a misfiled
+record, so it was neither cut nor demoted; it was given a referrer from `RULES.md`, which has four.
+
 ### Two MCP tool descriptions were false, and C3's proposed check would not catch either
 
 Tool descriptions are instruction text with no `.md` file. Two of fourteen were falsified by Loop
