@@ -499,7 +499,7 @@ server.tool(
 
 server.tool(
   "ob_start",
-  "Start a new session — returns the full project state (SUMMARY, INBOX, task, next-session), detects drift, creates the session log, and reports per-file sizes. Call ob_set_session first so the registered session id is used.",
+  "Start a new session. When .agents/state.json is valid this returns a `## State` render of it — objective, tasks by priority (titles only), verified, gaps, decisions, handoff, last session — which REPLACES the four prose files; their sizes are still reported but their text is not returned. When state.json is absent or invalid it falls back to the full text of SUMMARY, INBOX, task and next-session. Also detects drift, creates the session log, and reports per-file sizes. Call ob_set_session first so the registered session id is used.",
   {
     project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
     state_budget_lines: z.number().int().min(0).optional().describe("Per-file line budget for the state files. Omit for the whole files (default). Truncation is reported per file."),

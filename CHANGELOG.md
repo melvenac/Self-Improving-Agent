@@ -1,5 +1,49 @@
 # Changelog
 
+## [0.35.0] - 2026-09-17 — the startup read
+
+**What a session start actually hands the agent.** Loop 10 ruled on what the memory layer is worth; this looks at what `/start` delivers. Two renderers carried the same defect, `start.md` documented a contract that did not hold, and the fix to the visible one changed nothing the agent sees.
+
+### `ob_start`'s return: 13,534 → 3,591 tokens
+
+`state-render.ts` appended every task's `note` to its line. On state rev 14 that was **7,899 rendered words, of which 5,795 were notes** — one of them 612 words on its own. Titles are disciplined by comparison: 330 words across 44 active tasks, median 8, none over 25.
+
+**The trap was that a valid `state.json` makes this render REPLACE the four prose files**, so trimming `INBOX.md` — which was done first, 6,653 words → 841 — changed nothing a starting session reads. The notes removed from the inbox view reappeared one layer down in the same call. Meanwhile the `## Sizes` block kept reporting the four files' sizes, advertising a shrink in content the call does not return. **Counting one thing and returning another is how it went unnoticed.**
+
+Measured, both sides: `Total returned words` 7,971 (~13,534 tokens) → **2,142 (~3,591)**. The previous result was 53.2 KB and spilled to disk, needing three scripted passes to read back; the new one arrives inline.
+
+A task's rationale is still its `note` in `.agents/state.json` under `tasks[]` — reference material for working a task, not for choosing one.
+
+### Two false contract claims, both inherited and both repeated without deriving
+
+- **`ob_start` does not return the four prose files** when `state.json` is valid; it returns a `## State` render instead. `start.md` and the tool description both claimed otherwise. The source said so in a comment the whole time.
+- **`ob_start` does not create a session log on every call.** It reuses an existing log for the registered session id and says so: `Session #N (existing log for this session id — reused, nothing created)`. `start.md` warned the opposite.
+
+Both were carried forward from the previous `start.md` and restated as fact. Same defect as the "one tag per loop" line Loop 10 found: **a claim re-read from an artifact rather than re-derived from the thing it describes.**
+
+### `state-render.ts` had no test coverage at all
+
+The function composing what every session start reads was untested. Removing notes from it **passed 579 tests with nothing noticing**, while the equivalent change to the INBOX view was caught immediately by a test pinning the old format. **The renderer with no coverage was the one that mattered.** `tests/pipelines/session-start/state-render.test.ts` now pins the note's absence, so reinstating it argues with a failing test.
+
+### `/start` rewritten — 212 lines/1,713 words → 192/1,256
+
+- **No startup subagent.** It existed to keep a large payload out of the main context. The payload is now small, and a relay that summarises the state is a place where the state degrades. Removed with it: the anti-loop rule, the timeout fallback, and the summarisation step. The agent reads the record rather than an account of it.
+- **The briefing now carries what the views already rendered and the old greeting discarded**: OBJECTIVE with `since_session`, PICK UP HERE, **every WATCH OUT verbatim**, OPEN QUESTIONS, BROKEN (gaps + blocked), and a `git status` working-tree line.
+- **NEXT is labelled as ranked backlog, not a decision.** When no subject is ruled it says so. Previously it presented three months-old P0s beside a handoff saying the next subject was unruled — two sections disagreeing about whether there was work to start.
+- **The mailbox line prints dates.** It was showing a three-loop-stale subject beside a same-day decision, which reads as current work.
+- **`decisions.md` ordering corrected**: take the last `## YYYY-MM-DD` header, because entries are appended and every header in that file shares its date with another — a date sort orders nothing and returns an arbitrary entry.
+
+### Verified by re-running it
+
+Seven watch-outs printed verbatim; BROKEN populated, newest-first, with `opened session` on each; no file read that the briefing should have supplied; clean stop. **Not covered:** BROKEN's blocked-task branch has never run, because no task is currently blocked.
+
+### Known open, not fixed here
+
+- The `## Sizes` block still reports sizes for files the call does not return.
+- **G-021 needs an addendum**: R1 parses `state.json` against the server's loaded schema, so its scope is **schema-shape drift, not code freshness**. A server with a stale `state-render.ts` and an unchanged `state-schema.ts` passes R1 and returns the old output — which is what happened here. Freshness had to be established against the capability under test.
+- Only `project-template/.claude/commands/start.md` is tracked; the repo's own `.claude/` is gitignored and the user-scope copy sits outside the repo, so two of the three mirrors `command-parity` compares are unversioned.
+- One unexplained flaky test failure: 1 of 584 failed once, passed on two subsequent runs with no change. The failing test was not captured.
+
 ## [0.34.0] - 2026-09-15 — Loop 10
 
 **The decision loop.** Nine loops produced enough evidence to answer the question the project was started to ask, and this loop answers it rather than extending it. No new measurement was taken. **8,616 lines removed, 1,246 added, across 64 files; `open-brain/src` went from 61 TypeScript files to 44.**
