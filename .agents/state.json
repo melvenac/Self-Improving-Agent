@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 24,
+  "revision": 25,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1150,6 +1150,13 @@
       "evidence": "Session 61, while verifying G-018 before closing it: find across the repo returned the two orphans and no auto-feedback.js. Matters because build/ is what the MCP server actually runs, so judging build freshness by file presence is unreliable here; mtime plus content held, presence alone would not have. Adjacent to G-021, which records that R1's staleness signal is under-specified.",
       "recommended_update": "Decide whether the build step should clean its output directory, or whether a freshness check should assert on content rather than presence. Low stakes on its own; recorded because it is a second way for a stale artifact to look like live code.",
       "opened_session": 61
+    },
+    {
+      "id": "G-026",
+      "what": "Recall has no minimum relevance and almost no project scoping, so it fills its result limit with whatever is left once the relevant set runs out - and no metric the project has can see it happening. Deferred twice already, from Loop 11 and Loop 12, because it only ever lived in conversation.",
+      "evidence": "Derived 2026-09-17 by the Planner against src/db-v2.ts:417 and the live knowledge-v2.db, after Forge reported 4 of 12 results off-topic in session 61 (an OrcaSlicer config note, a JWT schema note, a provenance spec) on phrasings like 'verify a rewrite'. (1) searchFts is `WHERE knowledge_fts MATCH ? ORDER BY f.rank` with NO floor: FTS5 returns every entry containing any query token and the caller takes the top N. 'verify OR rewrite' matches 178 of 576 entries - 31% of the corpus; 'verify' alone matches 167. (2) 355 of 576 entries (62%) have a NULL project_dir, and ob_recall scopes to the project's entries PLUS global ones, so project scoping filters almost nothing - the top six for that query, reproduced, run from rank -6.156 to -4.098 and the sixth is a Makerspace session checkpoint. (3) The ranking expression is bm25 * failure / recency (lifecycle.ts:94) with no topical gate.",
+      "recommended_update": "LOOP 13, and Aaron has ruled it is not to be treated as a tuning task. Two things make the obvious fix - add a score floor - the wrong first move. FIRST: Loop 10's p=0.035 measured RELATIVE ORDERING against a lexical baseline, i.e. which entry should come first among those returned. Precision-at-N was never measured at all. So 'the ranker earns its keep' and 'a third of what it returns is noise' are both true and not in conflict; a floor would change the second without anyone knowing what it did to the first. SECOND, and larger: injection was CUT in Loop 10, so recall now serves only deliberate mid-task fetches - and session 62 ran a full eleven-hour loop with ZERO recalls (ob_recalled returned no entries). The real question is therefore not 'how do we tune the ranker' but 'what is retrieval for, now that injection is cut and a complete loop needed none of it'. Note also that the defect is invisible to every counter the project keeps: the rating vocabulary is helpful/harmful/neutral, an off-topic result is neutral, and neutral reads as harmless. Any Loop 13 instrument has to be able to see the thing before it is allowed to change it.",
+      "opened_session": 62
     }
   ],
   "decisions": [
