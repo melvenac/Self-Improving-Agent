@@ -2,13 +2,14 @@
   "name": "open-brain",
   "version": "0.1.0",
   "type": "module",
-  "description": "Unified knowledge pipeline — the v2 brain",
+  "description": "Unified knowledge pipeline \u2014 the v2 brain",
   "main": "./build/cli.js",
   "bin": {
     "open-brain": "./build/cli.js",
     "open-brain-server": "./build/server.js"
   },
   "scripts": {
+    "prebuild": "node -e \"require('node:fs').rmSync('build',{recursive:true,force:true})\"",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "dev": "npx tsx src/cli.ts",

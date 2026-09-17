@@ -363,7 +363,6 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  sync [--check] [--score [--json]] [--history]");
   console.log("  start                                     Start a session");
   console.log("  end [--dry-run]                            End a session");
-  console.log("  dream [--since=<days>] [--json]            Reconcile stored memory (read-only)");
   console.log("  relocate [--from <dir> --to <dir>] [--apply]  Fold a renamed project's history forward");
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");

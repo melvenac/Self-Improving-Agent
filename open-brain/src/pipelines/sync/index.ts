@@ -26,6 +26,8 @@ import {
   checkStateSchema,
   checkCommandParity,
   checkCommandToolNames,
+  checkCommandNames,
+  checkRetirements,
 } from "./checks.js";
 import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-state.js";
 
@@ -66,6 +68,8 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkRules(options.projectRoot));
   checks.push(checkCommandParity(options.projectRoot));
   checks.push(checkCommandToolNames(options.projectRoot));
+  checks.push(checkCommandNames(options.projectRoot));
+  checks.push(checkRetirements(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
   // Loop 10 R1: the runtime label travels with the check, because the same code
   // passing in one process and failing in the other IS the signal.

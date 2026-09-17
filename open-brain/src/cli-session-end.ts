@@ -2,8 +2,10 @@
 
 /**
  * SessionEnd hook entry point — thin CLI wrapper.
- * Runs the 5-stage session-end pipeline (summary, feedback, reflection,
- * invocation logging, skill-scan).
+ * Runs the 5-stage session-end pipeline: session summary, auto-feedback,
+ * invocation logging, shadow recall, topics. They are numbered 1-4 and 7 in
+ * index-v2.ts, because stages 5 and 6 were cut in Loop 10 along with the
+ * reflection queue and the skill scan.
  *
  * Replaces open-brain/scripts/session-end-v2.mjs with compiled TypeScript.
  */

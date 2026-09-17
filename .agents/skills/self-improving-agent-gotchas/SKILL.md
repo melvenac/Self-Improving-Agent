@@ -139,7 +139,7 @@ Define a write authority table (ADR-005) specifying which store is authoritative
 **Features worth adopting:**
 
 1. **Experience critique:** Use LLM-as-judge to validate experiences before storing. Score quality, reject low-value entries. (Planned — requires a `vault-writer.ts` change using `claude --print`.)
-2. **Task decomposition:** Split retrieval queries into 2-3 methodology-focused sub-queries for better recall. (Implemented as prompt changes to `/start`, `/recall`, CLAUDE.md.)
+2. **Task decomposition:** Split retrieval queries into 2-3 methodology-focused sub-queries for better recall. (Implemented as prompt changes to `/start` and CLAUDE.md.)
 3. **Experience rewriting:** Adapt retrieved experiences to the current task context before presenting them. (Implemented as prompt changes.)
 
 **Why this matters:** Not every insight needs to be invented from scratch. Studying analogous systems surfaces improvements that are easy to implement once identified.

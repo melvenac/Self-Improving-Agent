@@ -1,0 +1,358 @@
+{
+  "$schema_note": "Loop 12 C3. The Component Log in .agents/LIFECYCLE.md, made into data so a check can read it. A retirement is any event that ends a name: a component cut, a module renamed, an identifier prefix retired, a flag or subcommand removed, a dependency dropped, a schema field removed. Entries are GLOBAL — one per retired name, not one per referent class — because a class with no registry would otherwise have no entry at all and the record would under-cover silently. allowed_referrers is captured AT RETIREMENT TIME, which is the only moment anyone knows which mentions are deliberate; a correct obituary written then is in the set by construction, a dangling reference appearing later is not.",
+  "historical": [
+    "CHANGELOG.md",
+    "docs/loops/",
+    ".agents/archive/",
+    ".agents/SESSIONS/",
+    ".agents/LIFECYCLE.md",
+    ".agents/retirements.json",
+    ".agents/state.json",
+    ".agents/SYSTEM/SUMMARY.md",
+    ".agents/SYSTEM/DECISIONS.md",
+    ".agents/SYSTEM/PRD.md",
+    ".agents/SYSTEM/mcp-tool-audit-2026-08-08.md",
+    ".agents/TASKS/INBOX.md",
+    "open-brain/tests/fixtures/",
+    "open-brain/tests/fixtures-import/",
+    "open-brain/tests/fixtures-state/",
+    "open-brain/docs/"
+  ],
+  "$historical_note": "Records of what WAS. They keep their references by rule rather than by judgement each time. state.json carries decisions[] and SUMMARY.md/INBOX.md are its rendered views, so all three are the same class as DECISIONS.md. Test fixtures are frozen snapshots whose job is to name an old tree. open-brain/docs/ holds dated analysis notes.",
+  "retirements": [
+    {
+      "id": "R-001",
+      "name": "/recall",
+      "pattern": "`/recall`|commands/recall\\.md",
+      "event": "cut",
+      "classes": [
+        "command"
+      ],
+      "ruled": "2026-04-16",
+      "ruled_by": "Component Log, .agents/LIFECYCLE.md",
+      "replacement": "ob_recall with trigger: \"explicit\"",
+      "note": "THE CASE FOR THIS ENTIRE FILE. The Component Log recorded this retirement correctly on the day it happened. The reference in .agents/skills/self-improving-agent-gotchas/SKILL.md survived to v0.36.0 — five months, thirty-four minor versions, eleven loops and an audit of 77 instruction files looking for exactly this class — because nothing read the log. Found by command-names in one run, Loop 12 C2.",
+      "allowed_referrers": [
+        {
+          "path": "open-brain/tests/pipelines/sync/checks.test.ts",
+          "class": "test",
+          "why": "command-names regression test uses it as the known-dead name"
+        },
+        {
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "class": "prose",
+          "why": "obituary — the retirements check cites /recall as the case for the record existing at all"
+        }
+      ]
+    },
+    {
+      "id": "R-002",
+      "name": "skill-scan",
+      "pattern": "skill[-_]?scan|skillScan|SKILL_SCAN",
+      "ignore_case": true,
+      "event": "cut",
+      "classes": [
+        "command",
+        "symbol",
+        "path",
+        "prose"
+      ],
+      "ruled": "2026-09-15",
+      "ruled_by": "Loop 10 C2",
+      "executed": "2026-09-17",
+      "referrers_at_ruling": 19,
+      "note": "Ruled CUT in Loop 10, executed in Loop 11 (e0b2fc8) — and the count of referrers was recorded in four documents while the LIST was recorded in none. Loop 12 C1 could reconstruct 19 of the asserted 18; the three untracked mirrors were counted on disk and that state is unrecoverable from git. This entry is what should have existed at ruling time.",
+      "allowed_referrers": [
+        {
+          "path": ".agents/SYSTEM/RUNBOOK.md",
+          "class": "prose",
+          "why": "obituary — 'the skill-scan runner and its test were cut in Loop 10'"
+        },
+        {
+          "path": ".agents/SYSTEM/domains.json",
+          "class": "prose",
+          "why": "obituary — records that this consumer was cut, after the stale description nearly became a false finding"
+        },
+        {
+          "path": ".agents/skills/self-improving-agent-guide/SKILL.md",
+          "class": "prose",
+          "why": "obituary — 'Skill-scan clustering was cut in Loop 10'"
+        },
+        {
+          "path": "open-brain/src/pipelines/store/index.ts",
+          "class": "prose",
+          "why": "rationale comment explaining a historical vault-indexing constraint"
+        },
+        {
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "class": "prose",
+          "why": "command-names and this check both cite it as their worked example"
+        },
+        {
+          "path": "open-brain/src/pipelines/topics/index.ts",
+          "class": "prose",
+          "why": "rationale comment on what does and does not affect retrieval"
+        },
+        {
+          "path": "open-brain/src/server.ts",
+          "class": "prose",
+          "why": "rationale comment on vault duplicate counting"
+        },
+        {
+          "path": "open-brain/src/shared/paths.ts",
+          "class": "prose",
+          "why": "rationale comment on why path canonicalisation mattered"
+        },
+        {
+          "path": "open-brain/src/vault-writer.ts",
+          "class": "prose",
+          "why": "rationale comment citing the v0.12.0 audit"
+        },
+        {
+          "path": "scripts/setup.mjs",
+          "class": "prose",
+          "why": "rationale comment on a missing skill index"
+        },
+        {
+          "path": "open-brain/tests/setup-env.ts",
+          "class": "test",
+          "why": "names the cut suites the env shim used to serve"
+        },
+        {
+          "path": "open-brain/tests/vault-archive.test.ts",
+          "class": "test",
+          "why": "rationale comment on recursive vault reads"
+        },
+        {
+          "path": "open-brain/tests/pipelines/session-end/index-v2.test.ts",
+          "class": "test",
+          "why": "pins that the cut stage stays absent"
+        },
+        {
+          "path": "open-brain/tests/pipelines/sync/checks.test.ts",
+          "class": "test",
+          "why": "command-names regression test uses it as the known-dead name"
+        },
+        {
+          "path": "open-brain/tests/pipelines/sync/mirror-parity.test.ts",
+          "class": "test",
+          "why": "fixture proving an unexpected mirror copy is reported"
+        }
+      ],
+      "coverage_gap": "FOUND IN QA AT a3bcf2f, RECORDED RATHER THAN FIXED. The pattern `skill[-_]?scan` does not match \"the skill scan\" with a SPACE — verified: skill-scan, skill_scan and skillscan match; \"the skill scan\" does not. cli-session-end.ts:8 uses exactly that spelling, written by this loop's own C3 repair, so it PASSES BY SPELLING RATHER THAN BY RULE. The outcome is still correct — the file is an allowed referrer under the reflection-queue retirement — but a genuinely dangling \"the skill scan\" would pass too. THE FIX IS MEASURED AND CHEAP: widening the pattern to accept a space adds exactly two new referrers needing entries, open-brain/src/pipelines/session-end/index-v2.ts and open-brain/src/cli-session-end.ts, both obituaries; tests/fixtures-import is already historical and index-v2.test.ts is already listed. NOT APPLIED HERE because it changes shipped matching behaviour after sign-off, and a behaviour change after QA needs re-QA rather than a quiet amend."
+    },
+    {
+      "id": "R-003",
+      "name": "dream",
+      "pattern": "\\bdream\\b",
+      "event": "cut",
+      "classes": [
+        "cli-subcommand",
+        "symbol",
+        "prose"
+      ],
+      "ruled": "2026-09-15",
+      "ruled_by": "Loop 10 C2, executed in e05ad9a",
+      "note": "open-brain/src/pipelines/dream/ was deleted in Loop 10. README.md kept a documented section with three runnable command lines, and cli.ts's own usage block kept advertising the subcommand — so the CLI's help, which is the nearest thing CLI subcommands have to a registry, listed a subcommand that does not exist. Found by this check going red on the backfill, Loop 12 C3.",
+      "allowed_referrers": [
+        {
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "class": "prose",
+          "why": "rationale comment on why v1 paths appear in fixtures"
+        },
+        {
+          "path": ".agents/skills/self-improving-agent-guide/SKILL.md",
+          "class": "prose",
+          "why": "version-history line recording when dream was wired to the CLI"
+        }
+      ],
+      "ignore_case": true
+    },
+    {
+      "id": "R-004",
+      "name": "reflection queue",
+      "pattern": "reflection[_ ](log|clusters?|queue|stage)",
+      "ignore_case": true,
+      "event": "cut",
+      "classes": [
+        "symbol",
+        "prose"
+      ],
+      "ruled": "2026-09-15",
+      "ruled_by": "Loop 10 C2",
+      "note": "reflection_log held 0 rows after six months, so the stage that wrote it is gone rather than switched off. The pattern is deliberately narrow: a bare /reflection/ also matches the ordinary English word, which is the substring trap Loop 11 recorded five instances of.",
+      "allowed_referrers": [
+        {
+          "path": "open-brain/src/db-v2.ts",
+          "class": "prose",
+          "why": "obituary in the schema — 'Loop 10 C2: reflection_log is CUT'"
+        },
+        {
+          "path": "open-brain/src/pipelines/session-end/index-v2.ts",
+          "class": "prose",
+          "why": "obituary at the point in the pipeline where the stage used to run"
+        },
+        {
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "class": "prose",
+          "why": "command-tool-names cites the false ob_end description as its limitation"
+        },
+        {
+          "path": "open-brain/src/server.ts",
+          "class": "prose",
+          "why": "obituary inside ob_end's own description, repaired in Loop 11 after the description falsely claimed it still flags reflection clusters"
+        },
+        {
+          "path": "open-brain/tests/db-v2.test.ts",
+          "class": "test",
+          "why": "asserts a new database does NOT declare reflection_log — the cut, pinned"
+        },
+        {
+          "path": "open-brain/src/cli-session-end.ts",
+          "class": "prose",
+          "why": "obituary in the pipeline header explaining why the stage numbering skips 5 and 6"
+        }
+      ]
+    },
+    {
+      "id": "R-005",
+      "name": "kb_* tool prefix",
+      "pattern": "\\bkb_([a-z_]+|\\*)",
+      "event": "prefix-retired",
+      "classes": [
+        "tool"
+      ],
+      "ruled": "2026-09-15",
+      "replacement": "ob_*",
+      "note": "A prefix retirement is a deletion wearing a different name: the old names stop resolving and the sentences using them stay. This is one of the two largest clusters in Loop 11's 25 Q1 defects, and neither cluster was ever ruled CUT by anybody — which is why this record keys on the event rather than the verdict.",
+      "allowed_referrers": [
+        {
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "class": "prose",
+          "why": "command-tool-names treats any kb_* survivor as a dead call, and says so"
+        },
+        {
+          "path": "open-brain/tests/pipelines/sync/checks.test.ts",
+          "class": "test",
+          "why": "asserts the retired prefix fails even though the name looks plausible"
+        },
+        {
+          "path": ".agents/SYSTEM/TESTING.md",
+          "class": "prose",
+          "why": "obituary listing the retired prefix among things that no longer exist"
+        }
+      ]
+    },
+    {
+      "id": "R-006",
+      "name": "knowledge-mcp",
+      "pattern": "knowledge-mcp",
+      "event": "rename",
+      "classes": [
+        "path",
+        "package",
+        "prose"
+      ],
+      "ruled": "2026-08",
+      "replacement": "open-brain",
+      "note": "The other of the two largest clusters in Loop 11's Q1 set, and also never ruled CUT. A rename ends a name exactly as a cut does.",
+      "allowed_referrers": [
+        {
+          "path": ".agents/SYSTEM/TESTING.md",
+          "class": "prose",
+          "why": "obituary naming the rename explicitly"
+        },
+        {
+          "path": ".agents/skills/self-improving-agent-gotchas/SKILL.md",
+          "class": "prose",
+          "why": "obituary — a stale-build gotcha about the directory that no longer exists"
+        },
+        {
+          "path": "open-brain/src/shared/paths.ts",
+          "class": "prose",
+          "why": "comment marking the v1 path as deliberately NOT used"
+        },
+        {
+          "path": "scripts/setup.mjs",
+          "class": "code",
+          "why": "migration code that removes stale knowledge-mcp hook entries — it must name the old value to erase it"
+        }
+      ]
+    },
+    {
+      "id": "R-007",
+      "name": "project.version",
+      "pattern": "project\\.version",
+      "event": "schema-field-removed",
+      "classes": [
+        "schema-field",
+        "prose"
+      ],
+      "ruled": "2026-09-15",
+      "ruled_by": "ADR-027 / V-022",
+      "note": "THE WORKING PRECEDENT, and the design principle for everything else in this file: ProjectSchema is a z.strictObject, so a file still carrying the field DOES NOT PARSE. The missed copy is loud in code, with no check involved. Prefer making a missed copy fail over reporting that it exists; this check is the fallback for prose, which is the only place a missed copy can stay quiet.",
+      "allowed_referrers": [
+        {
+          "path": "open-brain/src/shared/state-schema.ts",
+          "class": "code",
+          "why": "the strictObject that makes a survivor fail to parse"
+        },
+        {
+          "path": "open-brain/src/shared/state-writer.ts",
+          "class": "prose",
+          "why": "records that the field is gone"
+        },
+        {
+          "path": "open-brain/src/pipelines/state-import/index.ts",
+          "class": "prose",
+          "why": "import path notes the removed field"
+        },
+        {
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "class": "prose",
+          "why": "version checks note the field no longer exists"
+        },
+        {
+          "path": "open-brain/src/pipelines/sync/checks-state.ts",
+          "class": "prose",
+          "why": "same, on the state side"
+        },
+        {
+          "path": "open-brain/tests/pipelines/sync/checks.test.ts",
+          "class": "test",
+          "why": "pins that a file still carrying the field is rejected — the guarantee the migration rests on"
+        }
+      ]
+    },
+    {
+      "id": "R-008",
+      "name": "db.ts",
+      "pattern": "\\bdb\\.ts\\b",
+      "event": "cut",
+      "classes": [
+        "path",
+        "symbol"
+      ],
+      "ruled": "2026-09-15",
+      "ruled_by": "Loop 10, commit 7aeec31",
+      "replacement": "db-v2.ts",
+      "note": "The v1 database layer both Loop 10 enumerations were blind to.",
+      "allowed_referrers": [
+        {
+          "path": "open-brain/tests/pipelines/sync/scorer-integration.test.ts",
+          "class": "prose",
+          "why": "obituary explaining what the test used to be fed from"
+        }
+      ]
+    }
+  ],
+  "$declined": {
+    "note": "NOT backfilled, and the reason is a finding rather than an omission. Loop 10 is recorded as cutting success_rate, the maturity lifecycle and apoptosis — but open-brain/src/lifecycle.ts is still present, still exports LIFECYCLE_CONFIG, Maturity and Rating, and is imported by db-v2.ts, server.ts, pipelines/shadow/evaluate.ts and pipelines/shadow/strategies.ts. Ranking no longer reads maturity or success_rate, so the BEHAVIOUR was cut; the type, the vocabulary and the column were not. Whether that is a finished retirement is a question for Aaron, not something this record gets to assert. Recording them here as finished would make the check green on an unfinished retirement, which is the exact failure the Planner named: green would read as 'it is done'.",
+    "names": [
+      "success_rate",
+      "maturity lifecycle",
+      "apoptosis"
+    ],
+    "evidence": "open-brain/src/lifecycle.ts:36 LIFECYCLE_CONFIG, :56 Maturity, :63 Rating; 4 importing modules"
+  }
+}

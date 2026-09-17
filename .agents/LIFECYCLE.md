@@ -57,7 +57,27 @@ Track lifecycle events here. Format: `YYYY-MM-DD | component | event | reason`
 2026-04-16 | skill-invocations.jsonl | CREATED | P1 from design audit — track usage for pruning
 2026-04-16 | task contract schema | CREATED | P1 from design audit — bound tasks with outputs/completion/scope
 2026-04-16 | /recall | PRUNED | Absorbed into /start — command file already removed, 3 historical invocations. Mid-session recalls use the `ob_recall` tool directly with `trigger: "explicit"`.
+2026-09-17 | this log | SUPERSEDED for retirements | PRUNED events now live in `.agents/retirements.json`, read by /sync's `retirements` check. This log keeps the CREATED and policy record.
 ```
+
+### Why the retirement half moved to data
+
+**This log was right and it changed nothing.** It recorded `/recall | PRUNED` on the day it
+happened, correctly, and the `/recall` reference in
+`.agents/skills/self-improving-agent-gotchas/SKILL.md` **survived to v0.36.0** — five months,
+thirty-four minor versions, eleven loops, and an audit of 77 instruction files looking for exactly
+that class of defect. It survived because **nothing read this file.**
+
+That is Loop 11's rule 4 in a single artifact: *every containment that worked was a command; every
+containment that failed was an intention.* A log a human must remember to grep is an intention.
+
+`.agents/retirements.json` is the same record as data, plus the one thing a prose log could never
+carry: **`allowed_referrers`, captured at retirement time** — the paths permitted to keep naming the
+retired thing. That set cannot be derived afterwards, because a retired name in prose is textually
+identical whether it is a defect or an obituary. The `retirements` check
+(`pipelines/sync/checks.ts`) reads the file on every `/sync`, over the whole history.
+
+**When you retire something, add an entry.** The check then tells you what still names it.
 
 ## Audit Query
 

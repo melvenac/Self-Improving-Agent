@@ -2,7 +2,7 @@
 
 *A memory protocol that enables AI coding agents to learn across sessions.*
 
-**Latest: v0.36.0** · [Changelog](CHANGELOG.md)
+**Latest: v0.37.0** · [Changelog](CHANGELOG.md)
 
 ---
 
@@ -118,7 +118,7 @@ The session bootstrap and session-end hooks are compiled TypeScript under `open-
 }
 ```
 
-Session-end automation (summary, auto-feedback, reflection, invocation logging, skill-scan) is handled by the open-brain MCP server's `ob_end` tool — called by the `/end` slash command. No separate hook scripts needed.
+Session-end automation (session summary, auto-feedback, invocation logging, shadow recall, topics) is handled by the open-brain MCP server's `ob_end` tool — called by the `/end` slash command. No separate hook scripts needed.
 
 ### 4. Set up slash commands
 
@@ -156,48 +156,23 @@ Start a Claude Code session and run `/start`. You should see:
 | `/start` | Session start | Reads project state, recalls relevant knowledge, registers session UUID, creates session log |
 | `/end` | Session end | Captures lessons, updates project state, writes handoff notes |
 | `/checkpoint` | Mid-session | Captures phase-level work context before `/compact`, enabling multi-phase sessions |
-| `/sync` | Before commits | Validates version consistency, structural integrity, and installed copy drift (38 checks) |
-| `/skill-scan` | On demand | Scans experience clusters and proposes reusable skills |
+| `/sync` | Before commits | Validates version consistency, structural integrity, and installed copy drift (26 checks) |
 
 ## Automation hooks
 
 | Hook | Trigger | What it does |
 |---|---|---|
 | `open-brain/build/cli-bootstrap.js` | SessionStart | Auto-detects project, emits `SESSION_UUID`, runs health checks, surfaces skill proposals |
-| `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: vault summary, auto-feedback, reflection clusters, invocation logging, skill-scan. **Auto-feedback rates only entries the agent judged explicitly** — the tag-substring fallback is gated off (`enableHeuristicRatings`, default false) pending the Loop 7 C2 ruling |
+| `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: session summary, auto-feedback, invocation logging, shadow recall, topics — numbered 1–4 and 7 in `index-v2.ts`, because stages 5 and 6 were cut in Loop 10. **Auto-feedback rates only entries the agent judged explicitly** — the tag-substring fallback is gated off (`enableHeuristicRatings`, default false). The reason originally given for that gate, protecting `success_rate` and the maturity lifecycle, no longer applies: Loop 10 cut that scoring. Whether the gate should stay is open and sits with D-004, recommended and not adopted |
 
-## Memory reconciliation — `dream`
-
-A read-only pass that compares stored knowledge against itself and proposes
-corrections. It catches what in-band memory writes structurally cannot: patterns
-*across* sessions. `/end` handles within-session capture; this is reconciliation.
-
-```bash
-node open-brain/build/cli.js dream                 # report, write nothing
-node open-brain/build/cli.js dream --since=30      # widen the window (default 7 days)
-node open-brain/build/cli.js dream --json          # machine-readable
-```
-
-**`--dry-run` is the default, not a flag** — an overnight run that forgets one
-reports instead of mutating. `--apply` exits non-zero: adjudication belongs to a
-model, which is not built, and exiting 0 would imply changes landed.
-
-Four rules run, each proposal carrying a verbatim quote so it can be checked
-without opening the entry:
-
-| Rule | Finds |
-|---|---|
-| `duplicate` | Two entries saying the same thing |
-| `superseded` | Two live answers to one question — a `state` fact restated elsewhere |
-| `obsolete-reference` | Entries citing infrastructure that no longer exists |
-| `misfiled` | Checkpoints and summaries sitting in the knowledge base |
+## Knowledge kinds — `state` and `event`
 
 Entries carry a **`state` or `event`** kind. A *state* is one current value that
 changes — a path, a version, a port — and wants replacing. An *event* is a
-timestamped thing that happened and wants appending. The rules are opposites,
-which is why the distinction matters: appending a state leaves two live answers
-with nothing marking which is current. Pass `kind` to `ob_store` to record it;
-storing still appends either way.
+timestamped thing that happened and wants appending. The distinction matters
+because appending a state leaves two live answers with nothing marking which is
+current. Pass `kind` to `ob_store` to record it (`server.ts:802`); storing still
+appends either way.
 
 ## Dashboard
 

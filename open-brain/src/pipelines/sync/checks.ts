@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import Database from "better-sqlite3";
@@ -1033,4 +1033,277 @@ export function checkCommandToolNames(projectRoot: string, home = homedir()): Ch
     message: `${namesChecked} tool references across ${scanned} command files all resolve to ${registered.size} registered tools (names only — this cannot tell whether a tool's description is true)`,
     report: true,
   };
+}
+
+/**
+ * Loop 12 C2 — `command-names`, the second referent class.
+ *
+ * `command-tool-names` resolves `ob_*` against the server's registration sites.
+ * This resolves `/name` against the command files that actually exist, across
+ * the same five mirrors. It is the same mechanism pointed at the referent that
+ * Loop 11's own worked example rotted on: **root `README.md` listed
+ * `/skill-scan` in the live Commands table for two loops after the command was
+ * deleted**, and `e0b2fc8` repaired the distributable copy while missing it.
+ *
+ * **Why command names and not file paths.** C2 tried file paths first and did
+ * not ship them, on purpose. A path check over the same surface produced six
+ * distinct findings of which **one** was a real defect; the other five were
+ * prose naming a non-existent path *correctly* — an obituary (`test.md` citing
+ * `.agents/workflows/test.md` inside the sentence explaining that it exists in
+ * no mirror), an example (`e.g. src/components/BookingDrawer.tsx`) and a
+ * conditional (`if .agents/META/ exists`). Separating those three from a
+ * dangling reference means parsing intent, which this loop is forbidden to
+ * attempt. **The difference is a registry.** Tool names have one in
+ * `server.ts`; command names have one in the command directories; file paths
+ * have none, and the filesystem is not a registry of what prose may mention.
+ * **Extend this mechanism to a referent only where a registry exists.** A check
+ * that cries wolf gets switched off, and then it occupies the slot a real check
+ * would have had.
+ *
+ * `BUILTINS` is deliberately tiny and grows only by an explicit act, for the
+ * same reason a retirement's allowed referrers are captured rather than
+ * inferred: it lists the host's own commands that this repo's prose actually
+ * names, not every command the host ships. Adding one is a decision someone
+ * makes and can be asked about, which is the right cost.
+ *
+ * Out of scope, and stated here because `command-tool-names` set the precedent:
+ * **this cannot tell whether a command's description is true.** It resolves the
+ * name and nothing else.
+ */
+export function checkCommandNames(projectRoot: string, home = homedir()): CheckResult {
+  const name = "command-names";
+
+  /** Host commands, not this project's. Grows by explicit act, never inferred. */
+  const BUILTINS = new Set(["compact", "init"]);
+
+  const commandDirs = [
+    join(projectRoot, ".claude", "commands"),
+    join(projectRoot, "project-template", ".claude", "commands"),
+    join(projectRoot, "project-template", ".cursor", "commands"),
+    join(home, ".claude", "commands"),
+    join(home, ".cursor", "commands"),
+  ].filter(existsSync);
+
+  if (commandDirs.length === 0) {
+    return { name, severity: "skip", message: "skipped — no command directories found" };
+  }
+
+  const registered = new Set<string>();
+  for (const dir of commandDirs) for (const f of listCommands(dir)) registered.add(f.slice(0, -3));
+
+  if (registered.size === 0) {
+    return { name, severity: "skip", message: "skipped — command directories hold no .md files" };
+  }
+
+  // The surface that gives instructions about THIS repo. Historical records —
+  // CHANGELOG, DECISIONS, PRD, the loop docs, session logs, the archive — keep
+  // their references by rule: they describe what was, not what is. They are
+  // excluded by not being listed, rather than by a filter someone must
+  // remember to apply.
+  const surface: Array<[string, string]> = [];
+  for (const dir of commandDirs) {
+    const label = dir.startsWith(home)
+      ? `~/${dir.slice(home.length + 1)}`
+      : dir.slice(projectRoot.length + 1);
+    for (const f of listCommands(dir)) surface.push([join(dir, f), `${label.replace(/\\/g, "/")}/${f}`]);
+  }
+  for (const f of ["README.md", "CLAUDE.md"]) {
+    if (existsSync(join(projectRoot, f))) surface.push([join(projectRoot, f), f]);
+  }
+  const skillsDir = join(projectRoot, ".agents", "skills");
+  if (existsSync(skillsDir)) {
+    for (const entry of readdirSync(skillsDir)) {
+      const skill = join(skillsDir, entry, "SKILL.md");
+      if (existsSync(skill)) surface.push([skill, `.agents/skills/${entry}/SKILL.md`]);
+    }
+  }
+
+  const problems: string[] = [];
+  let namesChecked = 0;
+
+  for (const [abs, rel] of surface) {
+    const seen = new Set<string>();
+    for (const m of readFileSync(abs, "utf8").matchAll(/`\/([a-z][a-z0-9-]*)`/g)) {
+      const cmd = m[1];
+      if (seen.has(cmd)) continue;
+      seen.add(cmd);
+      namesChecked++;
+      if (!registered.has(cmd) && !BUILTINS.has(cmd)) problems.push(`${rel}: /${cmd}`);
+    }
+  }
+
+  if (problems.length) {
+    const shown = problems.slice(0, 6).join("; ");
+    const more = problems.length > 6 ? `; +${problems.length - 6} more` : "";
+    return {
+      name,
+      severity: "issue",
+      message: `instructions name commands that do not exist: ${shown}${more} (if one is a host command, add it to BUILTINS in checks.ts — an explicit act, not an inference)`,
+    };
+  }
+
+  return {
+    name,
+    severity: "pass",
+    message: `${namesChecked} command references across ${surface.length} instruction files all resolve to ${registered.size} command files or ${BUILTINS.size} declared host commands (names only — this cannot tell whether a command's description is true)`,
+    report: true,
+  };
+}
+
+/**
+ * Loop 12 C3 — `retirements`, the check that makes a deletion finish itself.
+ *
+ * **The record this reads is not new. It is `.agents/LIFECYCLE.md`'s Component
+ * Log, made into data.** That log already existed, already tracked, and already
+ * held the right answer: `2026-04-16 | /recall | PRUNED | Absorbed into /start`.
+ * The `/recall` reference in the gotchas skill survived to **v0.36.0 anyway** —
+ * five months and thirty-four minor versions — because **nothing read it.**
+ * That is Loop 11's rule 4 in one artifact: every containment that worked was a
+ * command, every containment that failed was an intention. The log was an
+ * intention. This check is the command.
+ *
+ * **Why an allowlist and not a parser.** C2 established that a referent is
+ * checkable only where a registry exists, and that the filesystem is not one: a
+ * registry is a closed list of what exists *and may be named*, and the
+ * filesystem answers only the first half. **For a retired name there is no
+ * registry anywhere, because the thing is gone — so the record IS the missing
+ * registry**, built by hand at retirement time. `allowed_referrers` is captured
+ * when the retirement is made, which is the only moment anyone knows which
+ * mentions are deliberate. A correct obituary written then is in the set by
+ * construction; a dangling reference appearing later is not.
+ *
+ * This is forced rather than chosen. A retired name read in prose is textually
+ * identical whether it is a defect or an obituary — C2 proved it by firing on
+ * its own repair, where `` `/recall` `` inside the sentence explaining that
+ * `/recall` is gone was indistinguishable from the defect being described.
+ *
+ * **Entries are global, not per referent class.** A per-class record would have
+ * no entry at all for a class with no registry, so it would under-cover
+ * *silently*. Global keeps the record complete where checking cannot follow, and
+ * moves the incompleteness into this message where a reader can see it — which
+ * is why the pass text names the classes it cannot resolve. **Green here means
+ * "every recorded retirement is finished", never "everything is finished".**
+ *
+ * **An empty record passing would be the same defect as a check nobody has seen
+ * fail**, so the count of retirements and of verified referrers is in the
+ * message, and a stale allowlist entry — a path that no longer exists, or no
+ * longer names its retirement — is an issue rather than a silent pass.
+ */
+export function checkRetirements(projectRoot: string): CheckResult {
+  const name = "retirements";
+  const recordPath = join(projectRoot, ".agents", "retirements.json");
+
+  if (!existsSync(recordPath)) {
+    return { name, severity: "skip", message: "skipped — .agents/retirements.json not found" };
+  }
+
+  let record: RetirementRecord;
+  try {
+    record = JSON.parse(readFileSync(recordPath, "utf8")) as RetirementRecord;
+  } catch (e) {
+    return { name, severity: "issue", message: `.agents/retirements.json is not valid JSON: ${(e as Error).message}` };
+  }
+
+  const retirements = record.retirements ?? [];
+  if (retirements.length === 0) {
+    // Loud rather than green. A record with nothing in it proves nothing, and
+    // the shape of this failure is the reason the count travels in every message.
+    return { name, severity: "issue", message: ".agents/retirements.json records no retirements — an empty record passes for the same reason an unfallen check does" };
+  }
+
+  const historical = record.historical ?? [];
+  const isHistorical = (rel: string) => historical.some((h) => rel === h || rel.startsWith(h));
+
+  const surface = walkTracked(projectRoot).filter((rel) => !isHistorical(rel));
+
+  const unexpected: string[] = [];
+  const stale: string[] = [];
+  let verified = 0;
+  const classes = new Set<string>();
+  const events = new Set<string>();
+
+  for (const r of retirements) {
+    events.add(r.event);
+    for (const c of r.classes ?? []) classes.add(c);
+    // Case sensitivity is per retirement and defaults to STRICT. A prose name
+    // ("Skill-scan" at the start of a sentence) needs `ignore_case`; an
+    // identifier does not, and granting it globally made `KB_PATH` — a live
+    // variable in dashboard.mjs — look like the retired `kb_*` TOOL prefix.
+    // That is rule 8 arriving inside the check written to apply it.
+    const re = () => new RegExp(r.pattern, r.ignore_case ? "i" : "");
+    const allowed = new Set((r.allowed_referrers ?? []).map((a) => a.path));
+
+    for (const a of r.allowed_referrers ?? []) {
+      const abs = join(projectRoot, a.path);
+      if (!existsSync(abs)) {
+        stale.push(`${r.name}: allowed referrer ${a.path} no longer exists`);
+        continue;
+      }
+      if (!re().test(readFileSync(abs, "utf8"))) {
+        stale.push(`${r.name}: ${a.path} no longer names it — drop it from allowed_referrers`);
+        continue;
+      }
+      verified++;
+    }
+
+    for (const rel of surface) {
+      if (allowed.has(rel)) continue;
+      let txt: string;
+      try { txt = readFileSync(join(projectRoot, rel), "utf8"); } catch { continue; }
+      if (re().test(txt)) unexpected.push(`${rel} names ${r.name} (retired ${r.ruled}, ${r.event})`);
+    }
+  }
+
+  if (unexpected.length || stale.length) {
+    const all = [...unexpected, ...stale];
+    const shown = all.slice(0, 6).join("; ");
+    const more = all.length > 6 ? `; +${all.length - 6} more` : "";
+    return { name, severity: "issue", message: `retired names still referenced outside the record: ${shown}${more}` };
+  }
+
+  // The unverifiable half is stated, not omitted. `command` and `tool` names can
+  // additionally be resolved against a live registry by command-names and
+  // command-tool-names; every other class is guarded by this record alone.
+  const RESOLVABLE = ["command", "tool"];
+  const unresolvable = [...classes].filter((c) => !RESOLVABLE.includes(c)).sort();
+  return {
+    name,
+    severity: "pass",
+    message:
+      `${retirements.length} retirements across ${events.size} event classes, ${verified} allowed referrers all present and still naming their retirement, ` +
+      `0 unexpected across ${surface.length} live files — ` +
+      `resolvable against a registry: ${RESOLVABLE.join(", ")}; guarded by this record alone: ${unresolvable.join(", ")} ` +
+      `(green means every RECORDED retirement is finished, not that every retirement is recorded)`,
+    report: true,
+  };
+}
+
+interface RetirementRecord {
+  historical?: string[];
+  retirements?: Array<{
+    name: string;
+    pattern: string;
+    event: string;
+    ruled: string;
+    classes?: string[];
+    ignore_case?: boolean;
+    allowed_referrers?: Array<{ path: string; class: string; why: string }>;
+  }>;
+}
+
+/** Repo files worth scanning. Deliberately not `git ls-files`: this must work in a temp dir under test. */
+function walkTracked(root: string, rel = "", out: string[] = []): string[] {
+  const SKIP = new Set(["node_modules", ".git", "build", "dist", "coverage", ".vitest"]);
+  let entries: string[];
+  try { entries = readdirSync(join(root, rel)); } catch { return out; }
+  for (const e of entries) {
+    if (SKIP.has(e)) continue;
+    const childRel = rel ? `${rel}/${e}` : e;
+    const abs = join(root, childRel);
+    let isDir = false;
+    try { isDir = statSync(abs).isDirectory(); } catch { continue; }
+    if (isDir) walkTracked(root, childRel, out);
+    else if (/\.(md|ts|mjs|cjs|js|json)$/.test(e)) out.push(childRel);
+  }
+  return out;
 }
