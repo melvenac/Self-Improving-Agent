@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 14,
+  "revision": 17,
   "project": {
     "name": "self-improving-agent"
   },
@@ -100,16 +100,6 @@
       "note": "(Aaron's proposal, Session 41) — records currently carry objective, session id and status but not *which agent* produced them. **Must come from a per-session `--agent` flag, not `.agents/AGENT.md`**: Forge and Probe both read the same AGENT.md in this repo, so deriving it from the project file would label both \"Forge\" and be actively misleading — exactly the collision that required telling Probe to ignore AGENT.md. Proof of value: `Session_42.md`/`Session_43.md` were stamped with Forge's UUID while written by Probe; an `agent` field would have made that contradiction visible on line 4 instead of costing three mailbox rounds. Pays off in shadow recall too — a builder's queries differ in shape from a researcher's, and pooled scores could mask a ranking that suits one and not the other. Scope: `agent` on the active-session slot + `sessions` table, mirroring the `--ide` plumbing. **Counterpoint to weigh:** agent↔IDE is currently 1:1 per repo, so `ide` already proxies for it; value grows when two agents share an IDE (Atlas and Forge are both Claude Code)."
     },
     {
-      "id": "T-032",
-      "title": "Add `trigger TEXT` to `recall_log`",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 52,
-      "closed_session": 58,
-      "supersedes": null,
-      "note": "Shipped and populated. recall_log.recall_trigger exists in the db-v2 DDL and carries data: start 245, explicit 254, checkpoint 100, unspecified 11, NULL 637 (pre-column). Verified by direct query during session 58. This is load-bearing rather than cosmetic - it lifted one of the three primary blockers the injection-ablation pre-registration named, and made the start-vs-explicit contrast in the Loop 7 C1 reconciliation computable for the first time."
-    },
-    {
       "id": "T-034",
       "title": "Move the session-start recall into `cli-bootstrap`",
       "priority": "P0",
@@ -190,34 +180,24 @@
       "note": "(Session 50, reported by Prime). Prime's harness loads `<repo>/.agents/skills/*/SKILL.md` at boot and found three malformed: `gotchas/` and `seo-optimizer-test/` have a frontmatter `name` that differs from the directory, and `self-improving-agent-guide/SKILL.md` **had no frontmatter at all** so it never loaded — a 192-line architecture document invisible to the router for months (frontmatter added this session; unverified until Prime reboots). Each skill has up to **three** identities — directory name, frontmatter `name`, and the `.agents/skills/INDEX.md` row — and they currently disagree: INDEX.md registers two skills, Prime's loader finds three directories and loads two *different* ones. Neither reader was wrong about its own file; nothing ever checked they described the same set. Validator belongs in `/sync`, **not** the session-end hook — `/sync` is the mandatory pre-commit gate, the hook runs unattended after the fact. Confirmed hand-written, not generated: nothing in the repo writes that path, so there is no emitter to fix instead. **Directory work DONE 2026-08-11** — Aaron greenlit both. `gotchas/` renamed to `self-improving-agent-gotchas/` with INDEX.md's Directory cell updated; all three identity sources now verified in agreement for both remaining skills. `seo-optimizer-test/` moved out of the loader path to `.agents/archive/seo-optimizer-generalized.md` — **archived, not deleted, because the \"leftover fixture\" call was wrong.** It is the *generalized derivative* of TCM's applied `seo-optimizer` (placeholders instead of the hardcoded domain, `[COMMON]`/`[ARCHITECTURAL]`/`[SUBTLE]` tier annotations, plus a Priority Framework and two checklists existing in no other copy — 87 unique content lines). The `-test` suffix was recording a skill-generalization test *output*. Aaron to decide its permanent home. **Lesson worth keeping:** Forge and Prime independently agreed it was a fixture and the agreement read as corroboration — but both had reasoned from the same three indirect signals (`-test` suffix, absence from INDEX.md, wrong subject for the repo) and **neither had opened the file**. Two readers, one evidence set: the convergence carried no more information than either conclusion alone. Remaining scope of this item is the `/sync` validator itself. Original blocked items were: rename `gotchas/` → `self-improving-agent-gotchas/`, and decide `seo-optimizer-test/` — a Next.js SEO skill in a memory-protocol repo, unregistered in INDEX.md, which both agents read as a leftover test fixture (and which is currently the only skill Prime auto-triggers that no human ever declared). **The rename is cheaper than first assessed** (Prime, verified): INDEX.md's *Skill* column already reads `self-improving-agent-gotchas` and only its *Directory* cell says `gotchas/`, so the rename edits one table cell and lands all three identity sources in agreement — no name reconciliation across the registry. Whoever wrote INDEX.md had already judged `gotchas` too generic."
     },
     {
-      "id": "T-052",
-      "title": "Watch for the first real `harmful` rating",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 58,
-      "supersedes": null,
-      "note": "Fired. Session 6111e9ab rated entry 556 harmful on 2026-09-15 via ob_feedback (rating_method='direct'), and entry 558 supersedes 556 as the correction. That is the first harmful rating reachable through a live path; the store now holds 3 all-time (416, 434, 556), max 1 per entry. Verified by direct read of feedback_log during session 58. Note what made it reachable: an agent checked a stored claim against source and found it wrong - not a threshold or a prompt change."
-    },
-    {
       "id": "T-053",
       "title": "Add a `/sync` check that `success_rate` agrees with its own counters",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 50,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "(Session 50). The v0.15.0 backfill repaired 26 rows and `updateFeedbackV2` now writes counter and rate together, so they cannot drift *going forward* — but nothing asserts the invariant, and this column has already carried two incompatible formulas' output under one name. Check is cheap: `success_rate` must equal `helpful/(helpful+harmful)`, or be NULL exactly when `helpful+harmful = 0`. This is the piece the Session 49 P1 asked for that Session 50 did not deliver. **Atlas census constraint (Session 52): do NOT change the formula itself in passing.** The current formula makes the lifecycle a ratchet (harmful has fired 2/290; 104 entries at exactly 1.0, 342 NULL, apoptosis-eligible 0) — but the obvious repair, putting neutral in the denominator, is destructive if shipped alone: per-entry mean helpful is 0.311 against the 0.3 apoptosis threshold, so ~half the rated corpus becomes prune-eligible overnight on a rater whose modal verdict is neutral (63.8%). Denominator change, threshold re-tune, and compile-before-prune (WikiSkill deltas by name: *asymmetric rollback*, itself gated on *objective gating* — use names, not numbers, since entries 455 and 456 number the deltas differently) are one change or none. **Fourth component, same bundle (Atlas, Session 52; verified by grep): a working archive write path.** `archived_into` is read as the soft-delete filter in ~15 places (`db-v2.ts`, `server.ts`, `dream/`, `shadow/evaluate.ts`) and **written nowhere** — NULL on all 448 rows; the only removal op is `server.ts:699`/`:760` `DELETE FROM knowledge_index`, a hard delete with no cascade to `recall_log`/`feedback_log`. So any prune today orphans the rating history that justified the prune — compile-before-prune on top of a destructive primitive is an improved decision procedure feeding a shredder. Entry 455's forget escaped orphaning only because it had 0 recalls / 0 ratings (Atlas verified 0 dangling refs across 927 log rows). Full census: `~/Obsidian Vault v2/Research/injection-ablation-prereg-2026-08-31.md` (§11 carries the era split)."
+      "note": "Closed as moot (session 61, verified against 6af5592): success_rate was CUT in Loop 10 C2 (E4b). No computation remains in open-brain/src — db-v2.ts:457 records that the recomputation is gone, and new databases do not declare the column. A /sync check that success_rate agrees with its counters has nothing that could drift. Separate and still open: the handoff question of whether to drop the inert column from live databases."
     },
     {
       "id": "T-054",
       "title": "The automatic feedback path never evaluates the maturity lifecycle",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 50,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "(Session 50, surfaced by v0.15.0). `index-v2.ts` records ratings and now writes `success_rate`, but does not call `evaluateLifecycle`, so promotion and apoptosis happen **only** via `ob_feedback`. Pre-existing, not introduced. Low urgency because `/end` step A14 calls `ob_feedback` per entry, so the path Aaron actually uses does promote — verified this session, where #341 went proven→mature and #340 progenitor→proven. It is a consistency gap, not a broken lifecycle. **Do not close it by having the auto path auto-delete**: apoptosis fires with no human in the loop, and `ob_feedback` archives the vault note before dropping the row. If wired, promotion only."
+      "note": "Closed as moot (session 61, verified against 6af5592): the maturity lifecycle was SUSPENDED and deleted in Loop 10 C2 (E3), apoptosis with E18. No evaluateLifecycle function exists anywhere in open-brain/src — only comments recording the cut — and auto-feedback.ts is gone from the tree entirely. The automatic feedback path cannot fail to evaluate a lifecycle that no longer exists. This also retires the substance of G-018, which named auto-feedback.ts's divergent second copy."
     },
     {
       "id": "T-055",
@@ -283,11 +263,11 @@
       "id": "T-071",
       "title": "Verify context-mode hook fixes",
       "priority": "P1",
-      "status": "in_progress",
+      "status": "done",
       "opened_session": 30,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "All 4 hooks.json copies patched (Session 30). Awaiting fresh-session verification: Read=0, Grep=0, Bash=1 tip."
+      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 30, age 31 sessions, and left in_progress the whole time — started and abandoned. Recoverable from state.json history at 6af5592 if ever wanted back."
     },
     {
       "id": "T-074",
@@ -303,21 +283,21 @@
       "id": "T-086",
       "title": "Re-tag the 28 oversized experience clusters",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 40,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "`deployment` (40), `convex` (36), `windows` (33), `mcp` (30), `claude-code` (23) and 23 more now flag TOO LARGE and are excluded from proposals. They need narrower tags on the underlying vault experiences before any skill can be distilled. Silent until someone acts. (Session 40)"
+      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 40; lost 21 consecutive prioritisation contests without being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
     },
     {
       "id": "T-090",
       "title": "Verify SESSION_UUID against a LIVE session",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 40,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "RE-SCOPED by session 58, and now has a sharp n=1 test it never had. The Loop 7 R2 fix (c84be1d) corrected cli-session-end.ts from the non-existent CLAUDE_SESSION_ID to the stdin hook payload's session_id. Session 58's END is therefore the FIRST time the SessionEnd hook has ever run with a real session uuid. Verify retroactively against the store, uuid 4a395fd1-3504-4c5b-95df-515bd2ba90e0. THE SHARP TEST: `SELECT ended_at FROM sessions WHERE uuid='4a395fd1-...'`. ended_at is set on exactly 1 of 56 rows all-time and its only writer is chunk-indexer.ts:86 inside this very pipeline — so if the fix works this session is the second, and if it is still NULL the hook is still not completing. Secondary checks: feedback_log for this uuid should hold the 13 rows written via ob_feedback (rating_method='direct') and ZERO rows with rating_method='heuristic' — a heuristic row means the gate failed and is a defect, not data. Do not rate anything from this run; the Loop 7 population was fixed before the change."
+      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 40; lost 21 consecutive prioritisation contests without being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
     },
     {
       "id": "T-091",
@@ -343,11 +323,11 @@
       "id": "T-100",
       "title": "`open-brain end` (cli.ts:146) still runs the v1 session-end pipeline, which carries a divergent `evaluateLifecycle`",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 53,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "NEW (Session 53, post-close-out, found by Ledger, verified). `cli.ts` dynamically imports `pipelines/session-end/index.js`; that pulls `auto-feedback.ts`, whose own `evaluateLifecycle` hardcodes 0.3 / 5 / 3 / 7 / 0.5 independent of `LIFECYCLE_CONFIG` and writes capitalised maturity strings (`Progenitor`/`Proven`/`Mature`) that the `knowledge_index.maturity` CHECK constraint rejects. Hook (`cli-session-end.ts`) and MCP server use `index-v2.ts`, so nothing automated reaches it — but `open-brain` is a published bin and `end` is a live subcommand. Same class as `db.ts`: dead by convention, alive by invocation, holding a second copy of the destructive rule. Fix deterministically: route `end` to `sessionEndV2`, or remove the subcommand. Pair with the `db.ts` deletion."
+      "note": "Closed as moot (session 61, verified against 6af5592): the v1 session-end pipeline was CUT (E26) and the end subcommand is gone from cli.ts — no case \"end\" remains in its 372 lines. There is no longer a second code path carrying a divergent evaluateLifecycle, because there is no longer an evaluateLifecycle."
     },
     {
       "id": "T-101",
@@ -403,61 +383,61 @@
       "id": "T-123",
       "title": "Improve TCM project skills with enhanced skill-creator",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 13,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "14 skills in TCM `.agents/skills/`, none follow enhanced best practices. seo-optimizer test showed significant improvement. (Session 13)"
+      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 13; lost 48 consecutive prioritisation contests without being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
     },
     {
       "id": "T-125",
       "title": "Scope 3: Code maintainability eval",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 15,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "LLM agent that evaluates protocol scripts for redundancy, dead code, consolidation opportunities. Inspired by Meta-Harness propose→evaluate→log loop. Run quarterly or on-demand. (Session 15)"
+      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 15; lost 46 consecutive prioritisation contests without being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
     },
     {
       "id": "T-126",
       "title": "Context efficiency auto-optimization",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 17,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "Add token usage as a first-class metric in the self-improving loop. Instrumentation in session-end.mjs (Stage 4), detection rules, proposed optimizations. Design spec: `docs/superpowers/specs/2026-04-03-context-efficiency-auto-optimization-design.md`. Shares architecture with error-scan pipeline. Quick wins already built (Session 17): subagent /start, plugin audit, .recalled-entries.json merge. (Session 17)"
+      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 17; lost 44 consecutive prioritisation contests without being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
     },
     {
       "id": "T-127",
       "title": "Scope 4: True self-improving loop for the protocol itself",
       "priority": "P2",
-      "status": "in_progress",
+      "status": "done",
       "opened_session": 15,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "MVP built (Session 16): protocol health scoring (sync.mjs --score), shadow-recall (session-end.mjs Stage 3), experience-reference tracking (detectReferences + reference_count). Remaining: error-scan pipeline, context efficiency instrumentation, multi-model proposer, content-overlap scoring, lineage tracking. — The Meta-Harness paper (kb #178, `meta-harness-paper-research-2026`) describes an outer loop that proposes *variants* of a harness, evaluates them against metrics, logs results, and iterates. Scopes 1-3 (built in Session 15) are consistency/maintenance tooling — they check \"does the documentation match the code?\" but do NOT propose improvements to the protocol's effectiveness. Scope 4 is the real self-improving loop: propose changes to how kb_recall ranks results, how session-end.mjs generates summaries, how /start surfaces knowledge, how auto-feedback rates entries — then evaluate whether the change improved actual outcomes. **Prerequisites before starting:** (1) Define metrics — recall precision (% of recalled entries rated helpful), feedback distribution (helpful vs neutral vs harmful), session duration, /end completion rate, knowledge reuse frequency across sessions. (2) Instrument the pipeline — log these metrics automatically per session so the proposer has data to reason about. (3) Re-read the Meta-Harness source material — kb #178 has a high-level summary but may lack implementation detail for the propose→evaluate→log loop mechanics. The full paper (arxiv.org/abs/2603.28052) and the project page (yoonholee.com/meta-harness/) were indexed via context-mode during Session 15 but that index is session-scoped and won't persist. **Ask Aaron:** Before diving in, re-fetch the paper and video transcript (youtube.com/watch?v=61JUHDK-em8) for complete context — the stored kb entry captures findings but not the full algorithmic detail (Section 3: formal loop definition, Appendix A: qualitative proposer behavior, Appendix B: discovered harness examples). The video adds intuition about recursive self-improvement compounding. (4) Design the evaluation harness — what does a \"variant\" of our protocol look like? Probably a modified session-end.mjs or kb_recall query strategy, tested against historical session data. (5) Design the proposer — an agent with full filesystem access to prior variants' code, scores, and session traces (the Meta-Harness core insight: 10M tokens of diagnostic context vs 26K for compressed methods). **Key distinction from Scopes 1-3:** Scopes 1-3 ask \"is the harness internally consistent?\" Scope 4 asks \"is the harness *good*? Can it be *better*?\" This is the difference between linting and optimization. **Open questions:** Should the loop run automatically (expensive, needs guardrails) or be agent-assisted like Scope 3 (cheaper, needs human judgment)? How many sessions of metric data do we need before the proposer has enough signal? Should variants be tested on historical data (replay) or live (A/B)? (Session 15)"
+      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 15, age 46 sessions, and left in_progress the whole time — started and abandoned, which is stronger evidence of staleness than never being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
     },
     {
       "id": "T-128",
       "title": "Cross-platform UUID discovery",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 21,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "Current `/start` UUID discovery assumes Windows paths (`C:\\...` → `C--...`). Mac/Linux paths (`/home/user/...`, `/Users/user/...`) need different key derivation — no drive letter, no `:\\` to replace. Test on Mac/Linux and add platform-aware key derivation. (Session 21)"
+      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 21; lost 40 consecutive prioritisation contests as the only P3 in the backlog. Recoverable from state.json history at 6af5592 if ever wanted back."
     },
     {
       "id": "T-145",
       "title": "Rule on Loop 7 C2: keep retrieval, suspend the maturity lifecycle",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 58,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "Aaron's decision. Deliverable at ~/Obsidian Vault v2/Research/loop-7-c2-injection-decision-2026-09-15.md, draft PR #8. The recommendation splits three ways: KEEP session-start retrieval (the case against it was a retracted source; the only adequately powered contrast favours it, start 0.337 vs explicit 0.259 per-entry, both cells clearing the pre-registered n>=20 floor; the pre-registered retire-it criterion needs harmful >=5% and observes 0.0%). SUSPEND the maturity lifecycle (matureBoost/provenBoost -> 1.0, apoptosis gate off, counters keep recording) - reversible, and it removes the denominator hazard outright. Rule the causal question unanswerable and NOT worth answering. Implementation is a LIFECYCLE_CONFIG change, deliberately not made in Loop 7. Unblocks T-004."
+      "note": "Closed as DONE (session 61, verified against 6af5592): this asked Aaron to rule on Loop 7 C2 — keep retrieval, suspend the maturity lifecycle. Loop 10 ruled exactly that. docs/loops/loop-10-c2-verdicts.md records E3 (maturity lifecycle + counters) SUSPENDED, E18 (apoptosis gate) SUSPENDED on the same trigger, E9b SUSPENDED, and P1 (/start recall injection, =E28) SUSPENDED, against 14 KEEP / 9 CUT / 4 SUSPENDED overall. ob_recall stays. Closed as done rather than moot: the deliverable was a decision and the decision was made."
     },
     {
       "id": "T-146",
@@ -473,11 +453,11 @@
       "id": "T-147",
       "title": "Triage the 39 pending skill-proposal clusters",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 58,
-      "closed_session": null,
+      "closed_session": 61,
       "supersedes": null,
-      "note": "The cheapest available win and the only one blocked on attention rather than engineering. .skill-proposals-pending.json holds 39 clusters, never reviewed; the count drifts as skill-scan runs, so re-read rather than trusting a fixed number. WikiSkill's load-bearing result is +15.0 from handing the knowledge base to the Skill Proposer, so this is the compilation path the sources actually endorse. Note the known shortfall: skill-scan only proposes NEW skills, never patch-existing or no-action, which is why 39 accumulated."
+      "note": "Closed as moot (session 61, verified against 6af5592): the skill scan and proposal machinery were CUT (E8/P7). Nothing in open-brain/src writes .skill-proposals-pending.json; the sole surviving mention is a comment in session-start/health-checks.ts:119 noting the file is left on disk. There are no longer 39 pending clusters being generated to triage. Note the stale file itself may still sit on disk unannounced — that is V-021's recorded property, not this task."
     }
   ],
   "verified": [
@@ -953,9 +933,9 @@
     },
     {
       "id": "G-010",
-      "what": "The state record can hold fields that nothing can subsequently change: project.version has no op at all, gaps have add and close but no update, decisions have add only",
-      "evidence": "OpSchema in open-brain/src/shared/state-writer.ts lists twelve ops. Hit three times in one session: project.version could not be bumped, G-001 could not be amended to name the Cursor locations, and the same shape caused the earlier .recalled-entries.json reasoning. update_task exists because someone needed it; update_gap does not because nobody had yet.",
-      "recommended_update": "Loop 6: decide the op vocabulary once as an ADR rather than adding one op per incident. For project.version, removal leads — no consumer treats it as authoritative (cli.ts:427 and state-render.ts:14 display it; drift-detector.ts:9, checks-state.ts:73 and checks.ts:783 compare it to package.json; state-writer.ts:166 stamps views from package.json first). set_version is the fallback only if an authoritative consumer turns up.",
+      "what": "The op vocabulary cannot subsequently change some of what it records, and closing destroys rather than marks. Three parts, as of session 61. (1) SHARPEST: close_gap splices the entry out of the array — state-writer.ts:292, s.gaps.splice(idx, 1) — with no closed_session, no status and no tombstone, so closing a gap destroys its text, evidence and reasoning in the same motion. G-018's evidence, including the 'Progenitor' vs lowercase 'progenitor' case mismatch across 519/25/14 rows, left the record this way at rev 16 and survives only at 6af5592. (2) STILL TRUE: decisions are add-only, and verified has add_verified and reopen_verified but no amend. The 13-op vocabulary contains no update_decision and no update_verified. (3) RESOLVED, recorded rather than deleted: 'project.version has no op at all' is moot — Loop 8 R3 / ADR-027 removed the field (state-schema.ts:44-50; state.json's project now carries name only), as V-022 records. 'gaps have add and close but no update' is false — update_gap exists at state-writer.ts:59, :273, :282, as V-017 records. This amendment is itself made with update_gap, which is the clause it retires.",
+      "evidence": "Op vocabulary enumerated from state-writer.ts's z.literal set, session 61: add_decision, add_gap, add_verified, close_gap, close_task, end_session, open_task, reopen_task, reopen_verified, set_handoff, set_objective, update_gap, update_task — 13, with no update_decision or update_verified. close_gap deletion confirmed at state-writer.ts:289-294 and observed live: rev 16 removed G-018 with no tombstone, verified by read-back, and G-018 confirmed intact at 6af5592 via git show. Both retired clauses were ALREADY contradicted by the record's own Verified section — V-017 for update_gap, V-022 for project.version — while this gap continued to assert them, and nothing reconciled the two sections. close_gap finding found by Forge in a dry run, session 61.",
+      "recommended_update": "ADR the asymmetry rather than patching one op: tasks carry closed_session and a note and survive three sessions of retention; gaps carry nothing and survive zero. Closing should mark, not splice, so a closed gap keeps its evidence and can be audited or reopened — the record's own reopen_task precedent (V-006) has no gap equivalent. Pairs with G-024, which is the same eviction class with a retention window still attached; keep them separate. Secondary: decide whether decisions and verified need amend paths, or whether add-only is deliberate for those two. Standing hazard this gap now demonstrates: a gap can go stale while the Verified section already records its correction, so whatever fixes this should also ask what reconciles the two.",
       "opened_session": 56
     },
     {
@@ -1001,13 +981,6 @@
       "opened_session": 59
     },
     {
-      "id": "G-018",
-      "what": "auto-feedback.ts carries a second evaluateLifecycle with hardcoded thresholds that never reads LIFECYCLE_CONFIG, so Loop 8 R1's suspension does not reach it.",
-      "evidence": "Found by impact analysis during R1. It is inert in both directions: its apoptosis result is computed and never consumed by any caller, and its promotion compares against 'Progenitor' while the DB stores 'progenitor' (519 progenitor / 25 proven / 14 mature, all lowercase), so it can never match.",
-      "recommended_update": "Delete it or route it through LIFECYCLE_CONFIG. Inert today, but it is a second lifecycle engine that a future change could wake up without anyone noticing.",
-      "opened_session": 59
-    },
-    {
       "id": "G-019",
       "what": "The correction record's Loops 5-7 row is carried forward from the running count rather than re-derived, so unlike every other row it cannot be audited from its own list.",
       "evidence": "CHANGELOG 0.33.0 correction table. Loop 8 and Loop 9 rows enumerate their items and sum; the 10/1 first row is asserted.",
@@ -1041,6 +1014,13 @@
       "evidence": "gh pr list shows #2 'Configurable user/agent identity' created 2026-08-25, not a draft, head feat/configurable-identity; git ls-remote --heads origin returns only master. It survived the session that recorded 'origin now carries exactly one branch: master' - true of branches, false of what the repository advertised as open work.",
       "recommended_update": "Aaron's call to close or restore. Out of Loop 10's scope and deliberately untouched.",
       "opened_session": 60
+    },
+    {
+      "id": "G-024",
+      "what": "Done-task retention evicts entries from state.json permanently during a bulk close, while reporting it only in passing. Closing 13 tasks in session 61 dropped T-032 and T-052 out of the record entirely — nobody asked for those two to go, and it surfaced only because the tool output was read carefully. The count scales with the size of the close, so a large sweep evicts proportionally more, equally quietly.",
+      "evidence": "Session 61 ob_state dry run reported 'Dropped done tasks (retention 3 sessions): T-032, T-052'; both confirmed absent from state.json by read-back at rev 15. Recoverable at 6af5592. This is V-003's documented retention working as designed, not a defect in the close ops. Found by Forge while reading the dry-run output; attributed rather than folded in (Planner Error 24's fix).",
+      "recommended_update": "A permanent removal should announce itself as a removal rather than as a line in a summary. Options not ruled on: name the evicted ids under their own heading, require an acknowledgement when a single call would evict, or make retention a separate explicit op rather than a side effect of closing tasks.",
+      "opened_session": 61
     }
   ],
   "decisions": [

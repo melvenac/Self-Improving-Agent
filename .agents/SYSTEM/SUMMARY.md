@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 14 by open-brain v0.35.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 17 by open-brain v0.35.0 — do not edit; change state via ob_state -->
 > **Status:** v0.35.0 — Loop 10 answered the question the project was started to ask: the ranker earns its keep, the injection does not, and after six months the memory half is still unproven. The next loop starts from that answer rather than from another measurement.
 
 ## What's working
@@ -41,19 +41,19 @@
 - Gap G-007: `open-brain state import --commit` is denied by the auto-mode permission classifier inside an agent session ("Irreversible Local Destruction"); the one-shot migration must be run by the human
 - Gap G-008: ob_start's prose baseline (24,888 words) vs the rev-0 render (7,360 words) was measured on a temp copy, not the live repo, because handleStart creates a session log per call
 - Gap G-009: R4 is Claude-only: project-template/.cursor/commands/start.md still instructs writing .recalled-entries.json, so for a Cursor user the file still accumulates across sessions
-- Gap G-010: The state record can hold fields that nothing can subsequently change: project.version has no op at all, gaps have add and close but no update, decisions have add only
+- Gap G-010: The op vocabulary cannot subsequently change some of what it records, and closing destroys rather than marks. Three parts, as of session 61. (1) SHARPEST: close_gap splices the entry out of the array — state-writer.ts:292, s.gaps.splice(idx, 1) — with no closed_session, no status and no tombstone, so closing a gap destroys its text, evidence and reasoning in the same motion. G-018's evidence, including the 'Progenitor' vs lowercase 'progenitor' case mismatch across 519/25/14 rows, left the record this way at rev 16 and survives only at 6af5592. (2) STILL TRUE: decisions are add-only, and verified has add_verified and reopen_verified but no amend. The 13-op vocabulary contains no update_decision and no update_verified. (3) RESOLVED, recorded rather than deleted: 'project.version has no op at all' is moot — Loop 8 R3 / ADR-027 removed the field (state-schema.ts:44-50; state.json's project now carries name only), as V-022 records. 'gaps have add and close but no update' is false — update_gap exists at state-writer.ts:59, :273, :282, as V-017 records. This amendment is itself made with update_gap, which is the clause it retires.
 - Gap G-011: The shadow-recall harness cannot currently answer any question about the maturity constants, in backfill OR in production
 - Gap G-013: feedback_log holds only 31% of the non-neutral ratings the live counters know about (154 of 496), so any replay reconstructing maturity from it systematically under-promotes and cannot answer questions about maturity boosts.
 - Gap G-014: success_rate excludes neutral ratings from its denominator and harmful is structurally near-unreachable, so success_rate is 1.00 for any entry ever rated helpful once. Maturity promotion therefore tracks recall volume rather than usefulness, and promotion grants a ranking boost that causes more recall.
 - Gap G-015: One session uuid is written under two different project keys in active-session.json, corrupting project-scoped attribution.
 - Gap G-016: Intermittent cross-test failure in state-writer.test.ts under the full suite.
 - Gap G-017: 86% of ACTION: lines give prose advice rather than naming a file, which is why Loop 9's F1 fired at 14.2%. That is a fact about how the /end A12 template gets filled in, not about recall or retrieval.
-- Gap G-018: auto-feedback.ts carries a second evaluateLifecycle with hardcoded thresholds that never reads LIFECYCLE_CONFIG, so Loop 8 R1's suspension does not reach it.
 - Gap G-019: The correction record's Loops 5-7 row is carried forward from the running count rather than re-derived, so unlike every other row it cannot be audited from its own list.
 - Gap G-020: A session-log checklist ticked before the action it describes cannot fail, and misled the Planner into reporting that /end had never run.
 - Gap G-021: R1's staleness signal is under-specified: a stale MCP server and a current one produce identical totals
 - Gap G-022: The error-count table and the ordinal numbering disagree by 2 Planner and 1 Developer, at the Loops 5-7 boundary
 - Gap G-023: PR #2 has been open and review-ready for three weeks against a head that no longer exists on origin
+- Gap G-024: Done-task retention evicts entries from state.json permanently during a bulk close, while reporting it only in passing. Closing 13 tasks in session 61 dropped T-032 and T-052 out of the record entirely — nobody asked for those two to go, and it surfaced only because the tool output was read carefully. The count scales with the size of the close, so a large sweep evicts proportionally more, equally quietly.
 
 ## What's next
 
