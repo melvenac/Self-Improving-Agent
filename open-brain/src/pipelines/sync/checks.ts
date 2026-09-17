@@ -24,7 +24,7 @@ export const MIRROR_EXCEPTIONS: Record<string, string> = {
  * The slash commands Cursor is meant to receive.
  *
  * Cursor deliberately gets the session-lifecycle subset, not every command:
- * `bootstrap`, `skill-scan`, `task` and `test` are Claude Code workflows that
+ * `bootstrap`, `task` and `test` are Claude Code workflows that
  * have no Cursor equivalent. Declared here rather than left implicit, because a
  * deliberate omission and a forgotten one are indistinguishable by looking at
  * the directory — mirror parity only compares files present in both sides, so
@@ -319,9 +319,9 @@ export function checkVaultPathRefs(projectRoot: string, home = homedir()): Check
  * migration wrote notes without indexing them, a test suite wrote into the real
  * vault, and deleting an entry removes the row while leaving the file.
  *
- * The damage is not that a row is missing. `skill-scan` reads `Experiences/`
- * recursively, so an unindexed note still drives skill clustering while being
- * invisible to `ob_recall` — knowledge that shapes proposals but can never be
+ * The damage is not that a row is missing. The note sits in `Experiences/`
+ * looking like captured knowledge while being
+ * invisible to `ob_recall` — knowledge that is on disk but can never be
  * retrieved. One such note was driving a live skill proposal when this was
  * written.
  *
@@ -368,9 +368,9 @@ export function checkVaultIndexParity(vaultPath: string, dbPath: string): CheckR
 
   // An unmatched file whose *basename* is indexed under a different folder is a
   // second copy of an indexed note, not an unindexed one. The distinction is the
-  // whole point: a duplicate is counted twice by skill-scan and inflates the
-  // cluster sizes that gate skill proposals, while an unindexed note is simply
-  // unreachable. Reporting both as "not in the index" hides the first entirely.
+  // whole point: a duplicate means the vault holds two copies of one
+  // experience, while an unindexed note is simply unreachable. Reporting both
+  // as "not in the index" hides the first entirely.
   const indexedNames = new Set([...indexed].map((p) => p.slice(p.lastIndexOf("/") + 1)));
   const nameOf = (f: string) => norm(f).slice(norm(f).lastIndexOf("/") + 1);
   const duplicates = unmatched.filter((f) => indexedNames.has(nameOf(f)));
@@ -943,6 +943,94 @@ export function checkCommandParity(projectRoot: string, home = homedir()): Check
     name,
     severity: "pass",
     message: `${shared} shared commands identical across repo, template and user scope`,
+    report: true,
+  };
+}
+
+/**
+ * Loop 11 C3 — every `ob_*` a command instructs an agent to call must exist in
+ * the server's registered tool list.
+ *
+ * WHY THIS AND NOT PROSE PARITY. `command-parity` compares the three mirrors to
+ * each other. Three identical copies of a false instruction agree perfectly and
+ * it reports `pass` — which is exactly what happened to `/skill-scan`, live and
+ * byte-identical in all three mirrors for a component Loop 10 had cut.
+ *
+ * WHAT IT DOES NOT CATCH, stated here so the check is never oversold: **a tool
+ * that lies about itself.** Loop 11 found two of fourteen tool descriptions
+ * falsified by Loop 10's own cuts — `ob_feedback` claiming to drive maturity
+ * promotion and apoptosis, `ob_end` claiming to flag reflection clusters. Both
+ * tools EXIST, under exactly the names the commands call them by, so this check
+ * passes on both. Tool names are machine-checkable; whether a description is
+ * true is not.
+ *
+ * It is a regression guard rather than a speculative one: `ob_summarize` and
+ * `ob_store_summary` both shipped, and both were caught by a human reading the
+ * files. This prevents the third recurrence, not a hypothetical first.
+ *
+ * The registry is read from `server.ts`'s registration sites rather than from a
+ * list maintained beside them — a second list is the stand-in that rule 5 warns
+ * about, and it would drift from the thing it describes exactly as the mirrors
+ * did.
+ */
+export function checkCommandToolNames(projectRoot: string, home = homedir()): CheckResult {
+  const name = "command-tool-names";
+  const serverSrc = join(projectRoot, "open-brain", "src", "server.ts");
+
+  if (!existsSync(serverSrc)) {
+    return { name, severity: "skip", message: "skipped — open-brain/src/server.ts not found (running outside the source tree)" };
+  }
+
+  const registered = new Set(
+    [...readFileSync(serverSrc, "utf8").matchAll(/^\s*"(ob_[a-z_]+)",\s*$/gm)].map((m) => m[1])
+  );
+  if (registered.size === 0) {
+    return { name, severity: "skip", message: "skipped — no ob_* registrations found in server.ts (registration shape changed?)" };
+  }
+
+  const dirs = [
+    join(projectRoot, ".claude", "commands"),
+    join(projectRoot, "project-template", ".claude", "commands"),
+    join(projectRoot, "project-template", ".cursor", "commands"),
+    join(home, ".claude", "commands"),
+    join(home, ".cursor", "commands"),
+  ].filter(existsSync);
+
+  if (dirs.length === 0) {
+    return { name, severity: "skip", message: "skipped — no command directories found" };
+  }
+
+  const problems: string[] = [];
+  let scanned = 0;
+  let namesChecked = 0;
+
+  for (const dir of dirs) {
+    for (const f of listCommands(dir)) {
+      const text = readFileSync(join(dir, f), "utf8");
+      scanned++;
+      const named = new Set([...text.matchAll(/\b(ob_[a-z_]+|kb_[a-z_]+)\b/g)].map((m) => m[1]));
+      for (const tool of named) {
+        namesChecked++;
+        if (tool.startsWith("kb_")) {
+          // The v1 prefix. Retired wholesale, so any survivor is a dead call.
+          problems.push(`${f}: ${tool} (kb_* is the retired v1 prefix)`);
+        } else if (!registered.has(tool)) {
+          problems.push(`${f}: ${tool} is not a registered tool`);
+        }
+      }
+    }
+  }
+
+  if (problems.length) {
+    const shown = problems.slice(0, 6).join("; ");
+    const more = problems.length > 6 ? `; +${problems.length - 6} more` : "";
+    return { name, severity: "issue", message: `commands call tools that do not exist: ${shown}${more}` };
+  }
+
+  return {
+    name,
+    severity: "pass",
+    message: `${namesChecked} tool references across ${scanned} command files all resolve to ${registered.size} registered tools (names only — this cannot tell whether a tool's description is true)`,
     report: true,
   };
 }

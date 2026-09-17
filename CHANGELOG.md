@@ -221,6 +221,32 @@ of `end.md`'s defects, through every review it has ever been in. Where both halv
 hazard, being tracked did not prevent the rot. Tracking makes a repair *reviewable and restorable*,
 which is reason enough to want it; **this loop produced no evidence that it makes text truer.**
 
+### C3 — `command-tool-names`: a check that compares commands to the registry, not to each other
+
+`command-parity` compares the three mirrors **to each other**, so three identical copies of a false
+instruction agree perfectly and it reports `pass` — which is exactly what happened to `/skill-scan`,
+live and byte-identical in all three mirrors for a component Loop 10 had cut.
+
+The new check reads the `ob_*` registration sites in `server.ts` and asserts that every `ob_*` a
+command instructs an agent to call exists there, plus that no `kb_*` survivor of the retired v1
+prefix remains. The registry is read from the registration sites rather than a list maintained beside
+them: **a second list is the stand-in rule 5 warns about, and it would drift exactly as the mirrors
+did.**
+
+**Seen to fail before it was trusted.** Green on the real set (81 tool references across 33 command
+files, 14 registered tools); a scratch command naming `ob_nonexistent` and `kb_recall` turned it red
+on both arms; removing it returned it to green. Four tests cover the same cycle, including that an
+absent `server.ts` **skips rather than passes** — a check that cannot run must not look like one that
+ran and found nothing.
+
+**It is a regression guard, not a speculative one.** `ob_summarize` and `ob_store_summary` both
+shipped and were both caught by a human reading the files. This prevents the third recurrence.
+
+**And the limitation is written into the check's own pass message**, so it cannot be oversold: *"names
+only — this cannot tell whether a tool's description is true."* Both tools whose descriptions were
+false this loop **exist**, under exactly the names the commands call them by. This check passes on
+both.
+
 ### Two MCP tool descriptions were false, and C3's proposed check would not catch either
 
 Tool descriptions are instruction text with no `.md` file. Two of fourteen were falsified by Loop
