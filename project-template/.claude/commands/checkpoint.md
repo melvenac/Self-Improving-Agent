@@ -37,15 +37,23 @@ Write **one** checkpoint via `ob_store_chunk` that captures this phase of work. 
 ```
 ob_store_chunk({
   content: <formatted checkpoint above>,
-  key: "{project-slug}-phase-{N}",
+  key: "{what this phase was about}",
   category: "checkpoint",
-  tags: ["checkpoint", "phase-{N}", "{project-slug}", ...domain tags],
+  tags: ["checkpoint", ...domain tags],
   project_dir: <current working directory>,
   phase: {N}
 })
 ```
 
-The vault file is written to `~/Obsidian Vault v2/Checkpoints/YYYY-MM-DD-{project}-{key}-phase-{N}.md` with full frontmatter (type, project, date, session, phase, tags).
+**`key` is the subject only — do not put the project or the phase in it.** The server composes the
+filename as `${date}-${projectSlug}-${slugify(key)}${phaseStr}` (`server.ts:1198`), so it adds both
+already. Passing `"{project-slug}-phase-{N}"` produced names like
+`2026-09-15-Self-Improving-Agent-self-improving-agent-loop-4-phase-1-phase-1.md` — project twice,
+phase twice — on **every checkpoint written to date**, including the note in `/sync`'s standing
+`vault-index-parity` warning. Same for `tags`: `category` and the phase are added by the server.
+
+The vault file is written to `~/Obsidian Vault v2/Checkpoints/YYYY-MM-DD-{project}-{key}-phase-{N}.md`
+with full frontmatter (type, key, project, date, session, phase, tags).
 
 **What to include:**
 - Decisions and their reasoning (the "why" that compaction loses)

@@ -122,6 +122,47 @@ and both still sorted `decisions.md` by date string, the defect fixed in `.claud
 here. All repaired in both copies. `grep -rn "entry_id, rating, referenced"` across every mirror now
 returns nothing.
 
+### The remaining commands (C2 item 4)
+
+**`/checkpoint` — the instruction and the implementation each added the same two components, and
+every checkpoint ever written carries the result.** The command said to pass
+`key: "{project-slug}-phase-{N}"`; the server composes the filename as
+`${date}-${projectSlug}-${slugify(key)}${phaseStr}` (`server.ts:1198`), adding both already. The
+vault holds the evidence:
+`2026-09-15-Self-Improving-Agent-self-improving-agent-loop-4-phase-1-phase-1.md` — project twice,
+phase twice — and the note in `/sync`'s standing `vault-index-parity` warning is one of them. `key`
+is now documented as the subject only; same for the tags the server supplies. **This one was found by
+reading the artifacts on disk rather than the text**, which no amount of cross-reading the two files
+would have surfaced as quickly.
+
+**`/test` could not be executed anywhere.** Its first instruction was "Follow the testing protocol
+defined in `.agents/workflows/test.md`" — a file that exists in **no mirror**. It also named a
+`playwright-tester` skill that exists only under `project-template/`, a `tests/e2e/` directory this
+repo does not have, and Playwright, which is not a dependency of any package here. Rewritten to
+declare its prerequisites and stop if they are missing, and to point at `npm test` as the suite this
+repo actually has.
+
+**`/harness-audit` was premised on a command that does not exist.** It opened by contrasting itself
+with `/harness-eval` and told the agent to read `.claude/commands/harness-eval.md`,
+`scripts/harness-eval.mjs`, `scripts/sync-docs.mjs` and `knowledge-mcp/scripts/session-end.mjs` —
+**four dead references, and `scripts/` contains exactly one file, `setup.mjs`.** Repointed at
+`/sync`, the two real hooks and `checks.ts`. It is not cut: `RULES.md`'s release checklist requires
+it for every minor and major bump, so a required release step was resting on a missing sibling.
+
+**`/sync` and `/task` came through clean on Q1** — `docs/PRD.md` is guarded by "(if present)", so it
+is conditional, not dead. **Every `ob_*` tool named across all six remaining commands exists in the
+registry**, which is C3's check run by hand: it passes today, so its value is regression prevention
+rather than finding what is already broken.
+
+### `RULES.md` rule 5 is not policy — it is an unfollowed rule (Q2)
+
+The rule forbidding `.agents/` and `.claude/` in the repo was recorded here as the deliberate cause
+of the untracked surface. **That was wrong, and three checks show it:** `RULES.md` is itself absent
+from HEAD with no commits at all, so the rule has no author and no date; `grep -rn "Never commit"
+project-template/` returns nothing, so the framework does not ship it; and `git ls-files .agents/`
+returns the five state files that **PR #16 committed as the standard close-out**, with `/sync`
+passing. The rule says never, the protocol does it every loop, and nothing notices.
+
 ### Two MCP tool descriptions were false, and C3's proposed check would not catch either
 
 Tool descriptions are instruction text with no `.md` file. Two of fourteen were falsified by Loop
