@@ -1034,3 +1034,118 @@ export function checkCommandToolNames(projectRoot: string, home = homedir()): Ch
     report: true,
   };
 }
+
+/**
+ * Loop 12 C2 — `command-names`, the second referent class.
+ *
+ * `command-tool-names` resolves `ob_*` against the server's registration sites.
+ * This resolves `/name` against the command files that actually exist, across
+ * the same five mirrors. It is the same mechanism pointed at the referent that
+ * Loop 11's own worked example rotted on: **root `README.md` listed
+ * `/skill-scan` in the live Commands table for two loops after the command was
+ * deleted**, and `e0b2fc8` repaired the distributable copy while missing it.
+ *
+ * **Why command names and not file paths.** C2 tried file paths first and did
+ * not ship them, on purpose. A path check over the same surface produced six
+ * distinct findings of which **one** was a real defect; the other five were
+ * prose naming a non-existent path *correctly* — an obituary (`test.md` citing
+ * `.agents/workflows/test.md` inside the sentence explaining that it exists in
+ * no mirror), an example (`e.g. src/components/BookingDrawer.tsx`) and a
+ * conditional (`if .agents/META/ exists`). Separating those three from a
+ * dangling reference means parsing intent, which this loop is forbidden to
+ * attempt. **The difference is a registry.** Tool names have one in
+ * `server.ts`; command names have one in the command directories; file paths
+ * have none, and the filesystem is not a registry of what prose may mention.
+ * **Extend this mechanism to a referent only where a registry exists.** A check
+ * that cries wolf gets switched off, and then it occupies the slot a real check
+ * would have had.
+ *
+ * `BUILTINS` is deliberately tiny and grows only by an explicit act, for the
+ * same reason a retirement's allowed referrers are captured rather than
+ * inferred: it lists the host's own commands that this repo's prose actually
+ * names, not every command the host ships. Adding one is a decision someone
+ * makes and can be asked about, which is the right cost.
+ *
+ * Out of scope, and stated here because `command-tool-names` set the precedent:
+ * **this cannot tell whether a command's description is true.** It resolves the
+ * name and nothing else.
+ */
+export function checkCommandNames(projectRoot: string, home = homedir()): CheckResult {
+  const name = "command-names";
+
+  /** Host commands, not this project's. Grows by explicit act, never inferred. */
+  const BUILTINS = new Set(["compact", "init"]);
+
+  const commandDirs = [
+    join(projectRoot, ".claude", "commands"),
+    join(projectRoot, "project-template", ".claude", "commands"),
+    join(projectRoot, "project-template", ".cursor", "commands"),
+    join(home, ".claude", "commands"),
+    join(home, ".cursor", "commands"),
+  ].filter(existsSync);
+
+  if (commandDirs.length === 0) {
+    return { name, severity: "skip", message: "skipped — no command directories found" };
+  }
+
+  const registered = new Set<string>();
+  for (const dir of commandDirs) for (const f of listCommands(dir)) registered.add(f.slice(0, -3));
+
+  if (registered.size === 0) {
+    return { name, severity: "skip", message: "skipped — command directories hold no .md files" };
+  }
+
+  // The surface that gives instructions about THIS repo. Historical records —
+  // CHANGELOG, DECISIONS, PRD, the loop docs, session logs, the archive — keep
+  // their references by rule: they describe what was, not what is. They are
+  // excluded by not being listed, rather than by a filter someone must
+  // remember to apply.
+  const surface: Array<[string, string]> = [];
+  for (const dir of commandDirs) {
+    const label = dir.startsWith(home)
+      ? `~/${dir.slice(home.length + 1)}`
+      : dir.slice(projectRoot.length + 1);
+    for (const f of listCommands(dir)) surface.push([join(dir, f), `${label.replace(/\\/g, "/")}/${f}`]);
+  }
+  for (const f of ["README.md", "CLAUDE.md"]) {
+    if (existsSync(join(projectRoot, f))) surface.push([join(projectRoot, f), f]);
+  }
+  const skillsDir = join(projectRoot, ".agents", "skills");
+  if (existsSync(skillsDir)) {
+    for (const entry of readdirSync(skillsDir)) {
+      const skill = join(skillsDir, entry, "SKILL.md");
+      if (existsSync(skill)) surface.push([skill, `.agents/skills/${entry}/SKILL.md`]);
+    }
+  }
+
+  const problems: string[] = [];
+  let namesChecked = 0;
+
+  for (const [abs, rel] of surface) {
+    const seen = new Set<string>();
+    for (const m of readFileSync(abs, "utf8").matchAll(/`\/([a-z][a-z0-9-]*)`/g)) {
+      const cmd = m[1];
+      if (seen.has(cmd)) continue;
+      seen.add(cmd);
+      namesChecked++;
+      if (!registered.has(cmd) && !BUILTINS.has(cmd)) problems.push(`${rel}: /${cmd}`);
+    }
+  }
+
+  if (problems.length) {
+    const shown = problems.slice(0, 6).join("; ");
+    const more = problems.length > 6 ? `; +${problems.length - 6} more` : "";
+    return {
+      name,
+      severity: "issue",
+      message: `instructions name commands that do not exist: ${shown}${more} (if one is a host command, add it to BUILTINS in checks.ts — an explicit act, not an inference)`,
+    };
+  }
+
+  return {
+    name,
+    severity: "pass",
+    message: `${namesChecked} command references across ${surface.length} instruction files all resolve to ${registered.size} command files or ${BUILTINS.size} declared host commands (names only — this cannot tell whether a command's description is true)`,
+    report: true,
+  };
+}

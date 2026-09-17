@@ -24,6 +24,7 @@ import {
   checkSpecProvenance,
   checkStateSchema,
   checkCommandToolNames,
+  checkCommandNames,
   resolveDocPath,
 } from "../../../src/pipelines/sync/checks.js";
 import { scoreConfigStructure } from "../../../src/pipelines/sync/scorer.js";
@@ -811,5 +812,79 @@ describe("checkCommandToolNames", () => {
     const r = checkCommandToolNames(root, join(root, "nohome"));
     expect(r.severity).toBe("skip");
     expect(r.message).toContain("server.ts");
+  });
+});
+
+describe("checkCommandNames", () => {
+  let root: string;
+
+  /** commands: files that EXIST. surface: extra instruction files that REFER to them. */
+  function setup(commands: string[], surface: Record<string, string> = {}) {
+    root = mkdtempSync(join(tmpdir(), "c2-"));
+    const cmdDir = join(root, ".claude", "commands");
+    mkdirSync(cmdDir, { recursive: true });
+    for (const c of commands) writeFileSync(join(cmdDir, `${c}.md`), `# /${c}`);
+    for (const [f, body] of Object.entries(surface)) {
+      const abs = join(root, f);
+      mkdirSync(dirname(abs), { recursive: true });
+      writeFileSync(abs, body);
+    }
+    return root;
+  }
+
+  afterEach(() => { try { rmSync(root, { recursive: true, force: true }); } catch { /* best effort */ } });
+
+  // The defect this check was built for: README.md kept /skill-scan in its live
+  // Commands table for two loops after the command file was deleted.
+  it("fails on a README naming a command whose file does not exist", () => {
+    const r = checkCommandNames(
+      setup(["start", "end"], { "README.md": "| `/skill-scan` | On demand | proposes skills |" }),
+      join(root, "nohome"),
+    );
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("/skill-scan");
+    expect(r.message).toContain("README.md");
+  });
+
+  it("fails on a skill file naming a command that does not exist", () => {
+    const r = checkCommandNames(
+      setup(["start"], { ".agents/skills/gotchas/SKILL.md": "prompt changes to `/start`, `/recall`." }),
+      join(root, "nohome"),
+    );
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("/recall");
+  });
+
+  // Host commands are not this project's, so resolving them against the command
+  // directory would be the wrong question. Declared, never inferred.
+  it("passes on a declared host command and says the list is explicit", () => {
+    const r = checkCommandNames(
+      setup(["checkpoint"], { "README.md": "Run `/checkpoint` then `/compact`." }),
+      join(root, "nohome"),
+    );
+    expect(r.severity).toBe("pass");
+  });
+
+  it("names BUILTINS in the failure so the reader knows the explicit repair", () => {
+    const r = checkCommandNames(setup(["start"], { "README.md": "Run `/clear`." }), join(root, "nohome"));
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("BUILTINS");
+  });
+
+  it("passes when every named command resolves, and says it cannot judge descriptions", () => {
+    const r = checkCommandNames(
+      setup(["start", "end"], { "README.md": "`/start` then `/end`." }),
+      join(root, "nohome"),
+    );
+    expect(r.severity).toBe("pass");
+    expect(r.message).toContain("cannot tell whether a command's description is true");
+  });
+
+  // A check that cannot run must not look like one that ran and found nothing.
+  it("skips rather than passing when no command directory exists", () => {
+    root = mkdtempSync(join(tmpdir(), "c2-"));
+    writeFileSync(join(root, "README.md"), "Run `/skill-scan`.");
+    const r = checkCommandNames(root, join(root, "nohome"));
+    expect(r.severity).toBe("skip");
   });
 });
