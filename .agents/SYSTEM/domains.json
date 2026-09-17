@@ -1,0 +1,26 @@
+{
+  "description": "Project-relevant domain tags. Read by the health scorer (pipelines/sync/score.ts:44) to weight project-relevant knowledge. Formerly also filtered skill-scan proposals; that consumer was cut in Loop 10.",
+  "domains": [
+    "database",
+    "search",
+    "knowledge-management",
+    "ai-tooling",
+    "model-context-protocol",
+    "embeddings",
+    "typescript",
+    "automation",
+    "memory-systems",
+    "ai-agents",
+    "llm",
+    "research",
+    "version-control",
+    "storage",
+    "sqlite",
+    "fts5",
+    "mcp",
+    "agents",
+    "claude",
+    "obsidian"
+  ],
+  "include_untagged": false
+}

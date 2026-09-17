@@ -5,12 +5,23 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# Local development framework (not distributed)
-# .agents/ is ignored EXCEPT the five state files (Loop 4 C4, "option a"):
-# state.json is the record; INBOX.md, task.md, next-session.md and SUMMARY.md
-# are its rendered views. Session logs, archive/, PRD etc. stay local.
+# Local development framework.
+# Two things are tracked here: the STATE RECORD (state.json plus its four
+# rendered views, Loop 4 C4) and the INSTRUCTION SURFACE — every file that
+# tells an agent what to do in a session (Loop 11, session 62).
+#
+# Until 2026-09-17 the instruction surface was ignored entirely: 39 of 77
+# instruction files were absent from history, CLAUDE.md among them, so a
+# fresh clone got no instructions at all and a repair to a live command
+# appeared in no diff and could not be restored. Only project-template/ —
+# the copy shipped to other projects — was versioned.
+#
+# Still local by intent: session logs, archive/, working task specs,
+# .claude/settings.local.json, and third-party plugin skills.
 /.agents/*
 !/.agents/state.json
+!/.agents/AGENT.md
+!/.agents/LIFECYCLE.md
 !/.agents/TASKS/
 /.agents/TASKS/*
 !/.agents/TASKS/INBOX.md
@@ -21,9 +32,20 @@ Thumbs.db
 !/.agents/SYSTEM/
 /.agents/SYSTEM/*
 !/.agents/SYSTEM/SUMMARY.md
-/.claude/
+!/.agents/SYSTEM/RULES.md
+!/.agents/SYSTEM/RUNBOOK.md
+!/.agents/SYSTEM/SECURITY.md
+!/.agents/SYSTEM/TESTING.md
+!/.agents/SYSTEM/domains.json
+!/.agents/skills/
+/.agents/skills/*
+!/.agents/skills/INDEX.md
+!/.agents/skills/self-improving-agent-gotchas/
+!/.agents/skills/self-improving-agent-guide/
+# .claude/: the live commands are tracked; local settings and plugin skills are not.
+/.claude/*
+!/.claude/commands/
 /docs/
-CLAUDE.md
 
 # Runtime artifacts (session-local / regenerated)
 /.recalled-entries.json
