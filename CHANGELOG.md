@@ -221,6 +221,38 @@ of `end.md`'s defects, through every review it has ever been in. Where both halv
 hazard, being tracked did not prevent the rot. Tracking makes a repair *reviewable and restorable*,
 which is reason enough to want it; **this loop produced no evidence that it makes text truer.**
 
+### Two seats, one working tree — and a done task evicted to make room for the task about it
+
+**The Planner branched off `master` without checking which branch the shared tree was on**, committed
+19 newly-tracked instruction files and opened PR #17. Switching to that branch and back **deleted 19
+files from disk** — all of `.claude/commands/`, `CLAUDE.md`, `.agents/AGENT.md`, `LIFECYCLE.md`, the
+four `SYSTEM/` files, `domains.json`, the skills — because they are tracked there and absent from
+`loop/11-instructions`, so `git checkout` removed them. All 19 were backed up first and restored, and
+the Developer's uncommitted C3 work survived as pure additions (verified: 173 insertions, 0 deletions
+on top of `ddba9d0`).
+
+**Nobody did anything wrong on their own branch, and that is the finding.** `git worktree list`
+returns one entry. Either seat can delete the other's files by performing a correct operation;
+nothing warns either party; and for untracked files the loss is silent, because git does not report
+removing what it was never tracking. Filed as **T-149**, P0. The fix is one worktree per seat off the
+same repository.
+
+**Filing it cost a task, and this is recorded so the cost is not silent.** The `ob_state` dry run
+warned that adding one task would evict **T-004** under three-session retention (G-024). Its content,
+preserved here because the record will no longer hold it:
+
+> **T-004 — "The lifecycle bundle's remaining three parts stay BLOCKED"** (P0, opened 53, closed 59).
+> *Resolved by Loop 8 R1 rather than unblocked. The maturity multipliers go to 1.0 and the apoptosis
+> gate sits behind a new `apoptosisEnabled` flag, off, with counters and promotion still recording.
+> That makes parts 1 and 2 — the `success_rate` denominator fix and the threshold re-tune —
+> unnecessary rather than blocked: with no live threshold there is nothing to miscalibrate.
+> Reversible by restoring three constants, and `evaluateLifecycle` now takes an optional config so the
+> suspension is provable in both directions by test.*
+
+Loop 10 later cut `evaluateLifecycle` and apoptosis outright, so T-004 describes a suspension that has
+since become a removal. **Little was lost — but it was read before it went, which is the whole of
+G-024's ask.**
+
 ### C3 — `command-tool-names`: a check that compares commands to the registry, not to each other
 
 `command-parity` compares the three mirrors **to each other**, so three identical copies of a false

@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 18 by open-brain v0.35.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 19 by open-brain v0.35.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -19,6 +19,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-034** Move the session-start recall into `cli-bootstrap`
 - [ ] **T-042** Vault pollution has a preventer but no detector
 - [ ] **T-044** The slot needs an OWNER, not just a timestamp
+- [ ] **T-149** Give each agent seat its own git worktree
 
 ## P1
 
@@ -62,4 +63,3 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [x] **T-128** Cross-platform UUID discovery (session 61) — Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 21; lost 40 consecutive prioritisation contests as the only P3 in the backlog. Recoverable from state.json history at 6af5592 if ever wanted back.
 - [x] **T-145** Rule on Loop 7 C2: keep retrieval, suspend the maturity lifecycle (session 61) — Closed as DONE (session 61, verified against 6af5592): this asked Aaron to rule on Loop 7 C2 — keep retrieval, suspend the maturity lifecycle. Loop 10 ruled exactly that. docs/loops/loop-10-c2-verdicts.md records E3 (maturity lifecycle + counters) SUSPENDED, E18 (apoptosis gate) SUSPENDED on the same trigger, E9b SUSPENDED, and P1 (/start recall injection, =E28) SUSPENDED, against 14 KEEP / 9 CUT / 4 SUSPENDED overall. ob_recall stays. Closed as done rather than moot: the deliverable was a decision and the decision was made.
 - [x] **T-147** Triage the 39 pending skill-proposal clusters (session 61) — Closed as moot (session 61, verified against 6af5592): the skill scan and proposal machinery were CUT (E8/P7). Nothing in open-brain/src writes .skill-proposals-pending.json; the sole surviving mention is a comment in session-start/health-checks.ts:119 noting the file is left on disk. There are no longer 39 pending clusters being generated to triage. Note the stale file itself may still sit on disk unannounced — that is V-021's recorded property, not this task.
-- [x] **T-004** The lifecycle bundle's remaining three parts stay BLOCKED (session 59) — Resolved by Loop 8 R1 rather than unblocked. The maturity multipliers go to 1.0 and the apoptosis gate sits behind a new apoptosisEnabled flag, off, with counters and promotion still recording. That makes parts 1 and 2 — the success_rate denominator fix and the threshold re-tune — unnecessary rather than blocked: with no live threshold there is nothing to miscalibrate. Reversible by restoring three constants, and evaluateLifecycle now takes an optional config so the suspension is provable in both directions by test.
