@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 19 by open-brain v0.36.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 20 by open-brain v0.36.0 — do not edit; change state via ob_state -->
 > **Status:** v0.36.0 — Loop 10 answered the question the project was started to ask: the ranker earns its keep, the injection does not, and after six months the memory half is still unproven. The next loop starts from that answer rather than from another measurement.
 
 ## What's working
