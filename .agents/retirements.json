@@ -344,6 +344,61 @@
           "why": "obituary explaining what the test used to be fed from"
         }
       ]
+    },
+    {
+      "id": "R-009",
+      "name": "sia agent mailbox",
+      "pattern": "mailbox|atlas-to-forge|forge-to-atlas",
+      "ignore_case": true,
+      "event": "dependency-dropped",
+      "classes": [
+        "path",
+        "convention",
+        "config-key",
+        "prose"
+      ],
+      "ruled": "2026-09-17",
+      "ruled_by": "Aaron, Loop 12 C4: SIA only, records moved first — the other eight channels are not SIA's to delete",
+      "replacement": "A2A for coordination; docs/loops/ for briefs, boundary reports and the preserved records; state.json decisions[] for decisions",
+      "referrers_at_ruling": 13,
+      "note": "THE ONLY RETIREMENT IN THIS FILE WHOSE REFERRERS WERE COUNTED BY A MACHINE BEFORE IT WAS EXECUTED, which is the point of C4. The frozen pipeline reported 11 in-repo referrers, all real, no false positives; a manual sweep afterwards added 2 real (command mirrors under ~/, outside projectRoot) and 5 false (all matching INBOX, the TASK inbox). Scope: channels/sia only. ~/.agents/mailbox/ served nine channels, eight non-empty, and the other eight belong to other projects. The records were moved into docs/loops/ BEFORE anything was deleted: decisions.md (67 entries, 2026-04-16 to 2026-09-17) is NOT superseded by state.json decisions[] (43 entries, from 2026-03-22) — they are two different records that overlap without matching.",
+      "allowed_referrers": [
+        {
+          "path": "CLAUDE.md",
+          "class": "prose",
+          "why": "obituary naming where the retired channel’s records were preserved"
+        },
+        {
+          "path": ".agents/SYSTEM/RUNBOOK.md",
+          "class": "prose",
+          "why": "obituary — the hook no longer emits the mailbox line"
+        },
+        {
+          "path": ".claude/commands/start.md",
+          "class": "prose",
+          "why": "obituary — \"there is no mailbox step\", replacing the step that read it"
+        },
+        {
+          "path": "project-template/.claude/commands/start.md",
+          "class": "prose",
+          "why": "same obituary, shipped copy"
+        },
+        {
+          "path": "project-template/.cursor/commands/start.md",
+          "class": "prose",
+          "why": "same obituary, Cursor copy"
+        },
+        {
+          "path": "open-brain/src/cli-bootstrap.ts",
+          "class": "prose",
+          "why": "comment marking where the mailbox block stood and why it is gone"
+        }
+      ],
+      "out_of_repo_referrers": [
+        "~/.claude/commands/start.md",
+        "~/.cursor/commands/start.md"
+      ],
+      "out_of_repo_note": "Repaired by hand and listed here because the check cannot see outside projectRoot. THIS IS THE WHOLE OF C4’s MEASURED BLIND SPOT: one nameable boundary, closeable by pointing the check at the four command mirrors as command-names already is."
     }
   ],
   "$declined": {

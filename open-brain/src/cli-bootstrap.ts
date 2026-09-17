@@ -12,7 +12,7 @@ import { existsSync } from "fs";
 import { join } from "path";
 import { randomUUID } from "crypto";
 import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
-import { readAgentIdentity, readMailboxState } from "./pipelines/session-start/agent-identity.js";
+import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import {
   resolveSessionId,
   writeActiveSession,
@@ -124,23 +124,13 @@ try {
   });
 } catch { /* provenance is best-effort — never fail session start */ }
 
-// Agent identity — read .agents/AGENT.md if present and emit identity + mailbox state.
+// Agent identity — read .agents/AGENT.md if present. The mailbox block that stood
+// here is gone with the transport (Loop 12 C4): coordination moved to A2A and the
+// durable half to docs/loops/, so there is no channel left to count messages in.
 const identity = readAgentIdentity(cwd);
 if (identity) {
   const partner = identity.partner ? `partner: ${identity.partner}` : "no partner";
-  const channel = identity.mailbox_channel ? `channel: ${identity.mailbox_channel}` : "no channel";
-  lines.push(`Agent: ${identity.name} (${identity.role}) — ${partner}, ${channel}`);
-
-  if (identity.mailbox_channel && identity.partner) {
-    const mailbox = readMailboxState(home, identity.mailbox_channel, identity.name, identity.partner);
-    if (mailbox) {
-      const msg = mailbox.messageCount > 0
-        ? `${mailbox.messageCount} message${mailbox.messageCount === 1 ? "" : "s"} in ${mailbox.inboxFile}`
-        : `no new messages`;
-      const dec = mailbox.lastDecision ? `, last decision ${mailbox.lastDecision}` : "";
-      lines.push(`Mailbox: ${msg}${dec}`);
-    }
-  }
+  lines.push(`Agent: ${identity.name} (${identity.role}) — ${partner}`);
 }
 
 // Health checks

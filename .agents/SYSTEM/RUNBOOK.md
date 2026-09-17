@@ -31,7 +31,7 @@ registering them. Registered in `~/.claude/settings.json` (and
 
 | Event | Command | Does |
 |---|---|---|
-| SessionStart | `node <repo>/open-brain/build/cli-bootstrap.js` | Emits `SESSION_UUID`, agent identity, mailbox state. Exits silently inside a subagent (anti-loop). |
+| SessionStart | `node <repo>/open-brain/build/cli-bootstrap.js` | Emits `SESSION_UUID` and agent identity. (The mailbox line it used to emit went with the transport in Loop 12.) Exits silently inside a subagent (anti-loop). |
 | SessionEnd | `node <repo>/open-brain/build/cli-session-end.js` | Summary → auto-feedback → invocation logging → shadow recall → topics. |
 
 There is no ordering constraint: one hook per event, and each pipeline sequences

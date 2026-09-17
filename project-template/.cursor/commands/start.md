@@ -39,7 +39,7 @@ Read these files (skip missing):
 7. `~/Obsidian Vault v2/Skill-Candidates/SKILL-INDEX.md`
 8. `~/Obsidian Vault v2/.skill-proposals-pending.json`
 9. `.agents/SYSTEM/domains.json`
-10. `.agents/AGENT.md` — YAML frontmatter: name, role, partner, mailbox_channel
+10. `.agents/AGENT.md` — YAML frontmatter: name, role, partner
 
 **Focus:** Read only the **CURRENT STATE** block in SUMMARY unless schema/scope work requires more.
 
@@ -50,12 +50,17 @@ Read these files (skip missing):
 - Checkpoints: `ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3, trigger: "checkpoint")`
 - `trigger` marks these as session-start injection; deliberate mid-task recalls pass `trigger: "explicit"` (omitted = recorded as "unspecified")
 
-### A4. Mailbox (if AGENT.md has mailbox_channel)
+### 5. Coordination
 
-- `~/.agents/mailbox/channels/{mailbox_channel}/`
-- Inbox: `{partner}-to-{name}.md` · Decisions: `decisions.md`
-- Read the newest `loop-N-brief.md` by loop number; `{partner}-to-{name}.md` is archive.
-- `decisions.md`: entries are APPENDED, so take the LAST `## YYYY-MM-DD` header by line position. Do not sort by date string — same-date headers are the norm and a date sort orders nothing.
+**There is no mailbox step.** The `~/.agents/mailbox/` channel was retired in Loop 12: coordination
+between seats is A2A (direct cross-session messages), which arrives on its own and needs no read.
+
+**What a session start DOES need to read is the durable half, and it is in the repo:** the newest
+brief and boundary reports in `docs/loops/`, by the largest loop number. Decisions live in
+`.agents/state.json` `decisions[]` and already reached you through `ob_start`.
+
+**A2A has no memory.** Anything a later session must be able to read goes in a tracked file before
+the exchange ends — session 61’s close-out travelled by A2A alone and exists in no file anywhere.
 
 ### A5. Reconcile drift
 
@@ -78,7 +83,7 @@ Proposed: {top open INBOX item}
 Knowledge:
 - {entry}: {one-line actionable rewrite}
 
-Mailbox: {latest} | Last decision: {date}   ← omit if no mailbox
+Latest brief: {newest docs/loops/loop-N-*.md} ({date})
 Handoff: {from next-session.md, or "none"}
 Skills: {relevant + pending proposal count}
 
