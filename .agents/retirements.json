@@ -205,6 +205,11 @@
           "path": "open-brain/tests/db-v2.test.ts",
           "class": "test",
           "why": "asserts a new database does NOT declare reflection_log — the cut, pinned"
+        },
+        {
+          "path": "open-brain/src/cli-session-end.ts",
+          "class": "prose",
+          "why": "obituary in the pipeline header explaining why the stage numbering skips 5 and 6"
         }
       ]
     },

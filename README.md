@@ -165,38 +165,14 @@ Start a Claude Code session and run `/start`. You should see:
 | `open-brain/build/cli-bootstrap.js` | SessionStart | Auto-detects project, emits `SESSION_UUID`, runs health checks, surfaces skill proposals |
 | `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: session summary, auto-feedback, invocation logging, shadow recall, topics — numbered 1–4 and 7 in `index-v2.ts`, because stages 5 and 6 were cut in Loop 10. **Auto-feedback rates only entries the agent judged explicitly** — the tag-substring fallback is gated off (`enableHeuristicRatings`, default false). The reason originally given for that gate, protecting `success_rate` and the maturity lifecycle, no longer applies: Loop 10 cut that scoring. Whether the gate should stay is open and sits with D-004, recommended and not adopted |
 
-## Memory reconciliation — `dream`
-
-A read-only pass that compares stored knowledge against itself and proposes
-corrections. It catches what in-band memory writes structurally cannot: patterns
-*across* sessions. `/end` handles within-session capture; this is reconciliation.
-
-```bash
-node open-brain/build/cli.js dream                 # report, write nothing
-node open-brain/build/cli.js dream --since=30      # widen the window (default 7 days)
-node open-brain/build/cli.js dream --json          # machine-readable
-```
-
-**`--dry-run` is the default, not a flag** — an overnight run that forgets one
-reports instead of mutating. `--apply` exits non-zero: adjudication belongs to a
-model, which is not built, and exiting 0 would imply changes landed.
-
-Four rules run, each proposal carrying a verbatim quote so it can be checked
-without opening the entry:
-
-| Rule | Finds |
-|---|---|
-| `duplicate` | Two entries saying the same thing |
-| `superseded` | Two live answers to one question — a `state` fact restated elsewhere |
-| `obsolete-reference` | Entries citing infrastructure that no longer exists |
-| `misfiled` | Checkpoints and summaries sitting in the knowledge base |
+## Knowledge kinds — `state` and `event`
 
 Entries carry a **`state` or `event`** kind. A *state* is one current value that
 changes — a path, a version, a port — and wants replacing. An *event* is a
-timestamped thing that happened and wants appending. The rules are opposites,
-which is why the distinction matters: appending a state leaves two live answers
-with nothing marking which is current. Pass `kind` to `ob_store` to record it;
-storing still appends either way.
+timestamped thing that happened and wants appending. The distinction matters
+because appending a state leaves two live answers with nothing marking which is
+current. Pass `kind` to `ob_store` to record it (`server.ts:802`); storing still
+appends either way.
 
 ## Dashboard
 
