@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 22 by open-brain v0.36.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 23 by open-brain v0.36.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -32,11 +32,9 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-051** Add a `/sync` validator for the `.agents/skills/` frontmatter contract, asserting all three identity sources agree
 - [ ] **T-055** GitNexus's incremental analyze is unreliable on this repo
 - [ ] **T-056** `ob_store` derives the vault folder from a canonicalized path, so it lowercases the project name
-- [ ] **T-057** `ob_feedback`'s `referenced` argument does not exist
 - [ ] **T-061** Collect shadow-recall sessions
 - [ ] **T-065** Port `cli.ts` off the v1 database, then repoint `paths.knowledgeDb`
 - [ ] **T-067** Close the remaining 153 open checkboxes across session logs
-- [ ] **T-074** Rewrite /checkpoint as vault-first ob_store_chunk
 - [ ] **T-091** v0.7.1 .gitignore patch
 - [ ] **T-093** Archive Atlas-Forge mailbox thread
 - [ ] **T-146** Run the recency sweep at 0.01 / 0.02 / 0.04
@@ -47,11 +45,13 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-101** Commit the entry-455 archive move as one commit
 - [ ] **T-102** Distil and sanitise the v1 stores into v2, then retire the v1 vault
 - [ ] **T-103** Retire the mailbox as *transport*, keep it as *archive (supersedes T-104)
-- [ ] **T-105** Look into how checkpoints are tagged
 - [ ] **T-114** Update /start monthly maintenance
 
 ## Done (last 3 sessions)
 
+- [x] **T-057** `ob_feedback`'s `referenced` argument does not exist (session 62) — Closed by the STRIKE branch, which the note offered as one of two. `referenced` is gone from every copy: `/end` A14 now says `ob_feedback({id, rating})` — those two arguments and no others, citing server.ts:895-897 — and both Cursor mirrors were carrying the same false signature and were repaired too. `grep -rn "entry_id, rating, referenced"` across every mirror returns 0. The IMPLEMENT branch was not taken and its reasoning is not lost: the was-it-cited signal `referenced` would have carried is exactly what T-014 (point-of-use rating) still needs, and the 445 neutrals still hide it. Striking the argument does not answer that question, it just stops the instruction lying about being able to.
+- [x] **T-074** Rewrite /checkpoint as vault-first ob_store_chunk (session 62) — Verified already satisfied rather than done this session. The note asked for checkpoint.md to write markdown to ~/Obsidian Vault v2/Checkpoints/ and index in the DB via ob_store_chunk instead of the dropped kb_store_chunk. checkpoint.md:19 already does exactly that, and its parameter block matches the live schema (content, key, category, tags, project_dir, phase — all present, session_id optional and omitted). What was NOT right was the key convention, which is a separate defect found and fixed this session: the command told the caller to put the project and phase INTO key while server.ts:1198 adds both itself.
+- [x] **T-105** Look into how checkpoints are tagged (session 62) — Both halves answered. SEVERITY: the note said to check whether the duplicate tag reaches the clustering input before deciding — it cannot, because skill-scan was CUT in Loop 10 and executed off the prompt surface this session. There is no clustering input, so the v0.12.0 inflation risk is gone with it. CALLER: checkpoint.md instructed tags: ["checkpoint", "phase-{N}", "{project-slug}", ...] while server.ts:1209 already prepends `category`; the instruction now says tags: ["checkpoint" removed, ...domain tags]. The server still prepends category, so a caller that passes it will still double — that is the server's behaviour and it is unchanged, but nothing this repo instructs now triggers it. Found alongside the filename doubling, which was the sharper instance of the same shape.
 - [x] **T-053** Add a `/sync` check that `success_rate` agrees with its own counters (session 61) — Closed as moot (session 61, verified against 6af5592): success_rate was CUT in Loop 10 C2 (E4b). No computation remains in open-brain/src — db-v2.ts:457 records that the recomputation is gone, and new databases do not declare the column. A /sync check that success_rate agrees with its counters has nothing that could drift. Separate and still open: the handoff question of whether to drop the inert column from live databases.
 - [x] **T-054** The automatic feedback path never evaluates the maturity lifecycle (session 61) — Closed as moot (session 61, verified against 6af5592): the maturity lifecycle was SUSPENDED and deleted in Loop 10 C2 (E3), apoptosis with E18. No evaluateLifecycle function exists anywhere in open-brain/src — only comments recording the cut — and auto-feedback.ts is gone from the tree entirely. The automatic feedback path cannot fail to evaluate a lifecycle that no longer exists. This also retires the substance of G-018, which named auto-feedback.ts's divergent second copy.
 - [x] **T-071** Verify context-mode hook fixes (session 61) — Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 30, age 31 sessions, and left in_progress the whole time — started and abandoned. Recoverable from state.json history at 6af5592 if ever wanted back.

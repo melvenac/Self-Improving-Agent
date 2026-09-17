@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "revision": 22,
+  "revision": 23,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 10 answered the question the project was started to ask: the ranker earns its keep, the injection does not, and after six months the memory half is still unproven. The next loop starts from that answer rather than from another measurement.",
-    "since_session": 60
+    "text": "Loop 11 answered the instruction-surface question and the answer is a ratio: Q1 25 / Q2 12 / Q3 1 across 77 files. The tools do what they say; the prose around them rots, and only in one direction — the protocol deletes something and the sentences that named it stay. Nothing checks that a deletion propagated to the text. The next loop's subject is Aaron's to rule, but that gap is what the evidence points at.",
+    "since_session": 62
   },
   "tasks": [
     {
@@ -213,11 +213,11 @@
       "id": "T-057",
       "title": "`ob_feedback`'s `referenced` argument does not exist",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 49,
-      "closed_session": null,
+      "closed_session": 62,
       "supersedes": null,
-      "note": "(Session 49). All five `/end` copies instruct `ob_feedback(entry_id, rating, referenced)` at step A14; the registered tool's schema is `{ id, rating }`. The third argument has been silently dropped from every call ever made — MCP ignores unknown properties, so nothing errored and nothing recorded it. Decide which way to close it: either **implement `referenced`** (it is the natural home for the *was it cited* signal the point-of-use item above needs, and distinguishing \"recalled and used\" from \"recalled and ignored\" is exactly what the 445 neutrals are hiding), or **strike it from the five command copies**. Do not leave a documented parameter that the tool cannot receive. Same class as the v0.14.0 stats bug: an interface whose failure mode is silence."
+      "note": "Closed by the STRIKE branch, which the note offered as one of two. `referenced` is gone from every copy: `/end` A14 now says `ob_feedback({id, rating})` — those two arguments and no others, citing server.ts:895-897 — and both Cursor mirrors were carrying the same false signature and were repaired too. `grep -rn \"entry_id, rating, referenced\"` across every mirror returns 0. The IMPLEMENT branch was not taken and its reasoning is not lost: the was-it-cited signal `referenced` would have carried is exactly what T-014 (point-of-use rating) still needs, and the 445 neutrals still hide it. Striking the argument does not answer that question, it just stops the instruction lying about being able to."
     },
     {
       "id": "T-061",
@@ -263,11 +263,11 @@
       "id": "T-074",
       "title": "Rewrite /checkpoint as vault-first ob_store_chunk",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 55,
-      "closed_session": null,
+      "closed_session": 62,
       "supersedes": null,
-      "note": "Write markdown to `~/Obsidian Vault v2/Checkpoints/`, index in DB. Old `kb_store_chunk` was dropped. Update `~/.claude/commands/checkpoint.md`."
+      "note": "Verified already satisfied rather than done this session. The note asked for checkpoint.md to write markdown to ~/Obsidian Vault v2/Checkpoints/ and index in the DB via ob_store_chunk instead of the dropped kb_store_chunk. checkpoint.md:19 already does exactly that, and its parameter block matches the live schema (content, key, category, tags, project_dir, phase — all present, session_id optional and omitted). What was NOT right was the key convention, which is a separate defect found and fixed this session: the command told the caller to put the project and phase INTO key while server.ts:1198 adds both itself."
     },
     {
       "id": "T-086",
@@ -353,11 +353,11 @@
       "id": "T-105",
       "title": "Look into how checkpoints are tagged",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 55,
-      "closed_session": null,
+      "closed_session": 62,
       "supersedes": null,
-      "note": "(Aaron, Session 50). `ob_store_chunk` appends the `category` as a tag *and* keeps whatever the caller passed, so Session 50's checkpoint stored `checkpoint, checkpoint, phase-1, ...` — the literal duplicate is visible in the tool's own response. Cosmetic on its face, but tag counts are what `skill-scan` clusters on, and double-counted evidence inflating cluster sizes is precisely the v0.12.0 defect (60 duplicate notes pushing three of five skill proposals over the threshold). **Check whether the duplicate reaches the clustering input before deciding severity** — if `skill-scan` reads distinct tags, this is a display nit; if it reads the raw list, every checkpoint has been counting double for its own category. Worth reviewing the wider question while there: whether `phase-{N}` tags are useful for recall at all, since they are unique per checkpoint and so can never cluster. Start at `ob_store_chunk` in `server.ts` and the tag-insert path in `db-v2.ts`; compare against how `ob_store` handles the same field. Note also that the checkpoint vault filename doubles the phase (`...-phase-1-phase-1.md`) because the key already contains it — same class of duplication, same call."
+      "note": "Both halves answered. SEVERITY: the note said to check whether the duplicate tag reaches the clustering input before deciding — it cannot, because skill-scan was CUT in Loop 10 and executed off the prompt surface this session. There is no clustering input, so the v0.12.0 inflation risk is gone with it. CALLER: checkpoint.md instructed tags: [\"checkpoint\", \"phase-{N}\", \"{project-slug}\", ...] while server.ts:1209 already prepends `category`; the instruction now says tags: [\"checkpoint\" removed, ...domain tags]. The server still prepends category, so a caller that passes it will still double — that is the server's behaviour and it is unchanged, but nothing this repo instructs now triggers it. Found alongside the filename doubling, which was the sharper instance of the same shape."
     },
     {
       "id": "T-114",
@@ -487,7 +487,7 @@
       "opened_session": 62,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 62, found by the Planner during Loop 11 QA and reproduced independently by the Developer. tests/pipelines/state-views.test.ts fails 2 assertions in a FRESH worktree: applySummaryRegion expects '# Project Summary\\n\\n' and gets '# Project Summary\\r\\n\\r\\n'. CONTROL RESULT, recorded because the point is which instruments miss it: FAILS on master at 39fefb4 in a fresh worktree; PASSES in the long-lived main tree (588/588); PASSES in CI. Cause: core.autocrlf=true with NO .gitattributes, so a fresh checkout writes open-brain/tests/fixtures/.agents/SYSTEM/SUMMARY.md with CRLF while the assertion is written LF. Verified directly by comparing the same fixture across two checkouts of the same commit: `file -b` reports 'ASCII text' in the main tree and 'ASCII text, with CRLF line terminators' in the fresh worktree. The main tree passes only because its fixtures were written LF and never re-checked-out; CI passes because it runs on Linux. So the suite is green everywhere anyone looks and red in a fresh clone on Windows, which is the platform this project is developed on. This is the THIRD appearance of the missing .gitattributes in one day: the raw-md5 'seven of eleven commands diverged' finding that was retracted (they were CR-identical), the LF-will-be-replaced-by-CRLF warning on every commit, and now this. It matters more than a flaky assertion because Loop 11 made this repo clonable with its instructions for the first time, and the first thing a fresh clone now does is fail two tests. Fix: add .gitattributes normalising text files, and/or make the assertions line-ending agnostic the way sameCommandContent already does at checks.ts:870. NOT G-016 - checked rather than assumed: G-016 is tests/shared/state-writer.test.ts and its failing assertion is about feedback_log rows being empty, a shared-state leak; that file passes 30/30 in the same fresh worktree where state-views fails. Different file, different assertion, different mechanism; G-016 stays open on its own terms."
+      "note": "FIX COMPLETE AND VERIFIED, NOT YET MERGED — PR #21, branch fix/gitattributes at 0f41265. Verified against a control rather than asserted: two fresh worktrees from the same repo, one at 207eb6e (no fix) and one at 0f41265. Fixture `file -b`: 'ASCII text, with CRLF line terminators' before, 'ASCII text' after. state-views.test.ts: 1 failed before, 1 passed after. Full suite in the fresh FIXED clone: 44 files passed — the first time this repo has been green in a fresh Windows clone. `git add --renormalize` across the tree changes no blob (index was already LF), so only what lands on disk changes. Stays OPEN until Aaron merges; closing on a verified-but-unmerged fix would make the record say fixed while master is not."
     }
   ],
   "verified": [
@@ -925,6 +925,52 @@
       ],
       "since_session": 61,
       "status": "verified"
+    },
+    {
+      "id": "V-026",
+      "claim": "A fresh Windows clone of this repo passes the full suite; the CRLF checkout failure is fixed at the checkout layer rather than by loosening the assertion",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/state-views.test.ts",
+          "observation": "1 file failed in a fresh worktree at 207eb6e (no .gitattributes) and 1 passed in a fresh worktree at 0f41265, same repo, same commit content otherwise"
+        },
+        {
+          "type": "file",
+          "path": ".gitattributes",
+          "observation": "`* text=auto eol=lf`; the same fixture reports 'ASCII text, with CRLF line terminators' in the control checkout and 'ASCII text' in the fixed one"
+        },
+        {
+          "type": "test",
+          "path": "open-brain",
+          "observation": "full suite in the fresh fixed clone: 44 test files passed"
+        }
+      ],
+      "since_session": 62,
+      "status": "verified"
+    },
+    {
+      "id": "V-027",
+      "claim": "command-tool-names compares commands to the server's tool registry rather than to the other mirrors, fails on both an unregistered ob_* name and a retired kb_* name, and skips rather than passing when server.ts is absent",
+      "evidence": [
+        {
+          "type": "file",
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "observation": "registry read from the `server.tool(\"ob_*\")` registration sites, not from a list maintained beside them"
+        },
+        {
+          "type": "command",
+          "path": "node open-brain/build/cli.js sync",
+          "observation": "green on the real set (81 refs / 33 files / 14 tools), red on a scratch command naming ob_nonexistent AND kb_recall — both arms fired — then green again when removed"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/sync/checks.test.ts",
+          "observation": "4 tests covering the same cycle, including that an absent server.ts returns severity 'skip'"
+        }
+      ],
+      "since_session": 62,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -944,9 +990,9 @@
     },
     {
       "id": "G-003",
-      "what": "SESSION_TEMPLATE.md pre-session checklist still says to read SUMMARY/INBOX by hand",
-      "evidence": "Loop 1 Developer report (gaps[]); template wording predates ob_start",
-      "recommended_update": "Reword the checklist to name ob_start / the /start greeting",
+      "what": "SESSION_TEMPLATE.md's pre-session checklist is still pre-state.json: it tells the session to read SUMMARY.md, INBOX.md and ENTITIES.md by hand. As of session 62 that does not merely duplicate ob_start's work — it instructs the thing RULES.md agent-rule 1 now forbids, since with a valid state.json the ## State render REPLACES those four files. SESSION_TEMPLATE.md was inside Loop 11's audit set and was deliberately NOT repaired, to hold scope after the loop's subject was complete; recorded here rather than left as an intention. One-line fix.",
+      "evidence": "Session 62: the template was filled in for this session and the checklist was annotated as stale rather than ticked. `.agents/SESSIONS/Session_62.md` carries the annotation. RULES.md agent-rules 1-3 were rewritten this session to forbid hand-reading and hand-editing the rendered views.",
+      "recommended_update": "Replace the four read-by-hand lines with 'Run /start; ob_start returns the state render' and drop the ENTITIES.md line unless schema work is planned.",
       "opened_session": 54
     },
     {
@@ -1323,30 +1369,49 @@
       "title": "Orphan sweep after Loop 11: the three items held with Aaron are resolved, and the stale recall files are gone",
       "date": "2026-09-17",
       "note": "Cut on Aaron's word: .agents/TASKS/CONTRACT-SCHEMA.md (superseded by TaskSchema in state.json) and .agents/skills/skill-creator-enhanced.md (a loose 357-line skill file nothing registered; two skill-creators already global). Both survive in .agents/archive/pre-state-migration-2026-09-14/, so the cut did not destroy the only copy. Then a sweep of the wider repo: 14 orphaned build artifacts (.d.ts/.js.map with no .js beside them), settings.local.json.doctor-backup, doctor-undo-2026-07-27.md (its own premise went void when PR #17 tracked CLAUDE.md and .claude/ — it existed only because there was no git undo for them), fix-scorer-stats.md (subject held by T-053), and 14 branches fully contained in master. THE CONSEQUENTIAL ONE: all three live .recalled-entries.json copies, two of which sat on cli-session-end.ts's read path at cli-session-end.ts:77-78. Loop 5 removed the writer and left the files, so for four months the session-end rating path has read files nothing maintains, held off only by a session-id match that could never succeed again. The protection is now absence rather than a guard, which is deterministic-first per CLAUDE.md. HELD BACK DELIBERATELY: research-wiki-audit.md, v2-pipeline-e2e.md and the 2026-03-25 debug report carry intent recorded nowhere else, and cutting them would destroy the only copy — G-018's defect. loop/7-injection kept: git branch -d refused it, correctly, as it holds commits that never reached master. Verified after the cut: /sync 24 passed, 0 issues; 588 tests across 44 files green."
+    },
+    {
+      "id": "D-010",
+      "title": "Loop close-outs are tracked; the rest of docs/ stays local",
+      "date": "2026-09-17",
+      "note": "`.gitignore` gains `/docs/*` plus `!/docs/loops/`. A bare `!/docs/loops/` does not work — git cannot re-include a file whose parent DIRECTORY is excluded, so the parent had to become `/docs/*` first. Replaces the `git add -f` habit by which Loop 10's six docs were tracked: a step that must be remembered is not a rule (R4). Found because Loop 11's own close-out was silently dropped from the commit that claimed to contain it."
+    },
+    {
+      "id": "D-011",
+      "title": "RULES.md rule 5 rewritten on Aaron's authority, not the audit's",
+      "date": "2026-09-17",
+      "note": "The rule read 'Never commit .agents/ or .claude/ to this repo (gitignored)'. Loop 11 found it false three ways — against PR #17, against the close-out that commits state.json and the four views every loop with /sync passing, and against Aaron's instruction — and deliberately left it alone, because policy is not an auditor's to overturn. It was rewritten only after Aaron ruled directly, and the rule cites PR #17 as its authority rather than the audit."
+    },
+    {
+      "id": "D-012",
+      "title": "gitattributes uses eol=lf, and the assertions stay line-ending sensitive",
+      "date": "2026-09-17",
+      "note": "`text=auto` alone still defers the working-tree ending to core.autocrlf, which is the setting that caused the failure, so `eol=lf` is explicit. The state-views assertions were NOT loosened the way sameCommandContent does at checks.ts:870: that would also hide a renderer which started emitting CRLF, a real regression worth failing on. With the checkout deterministic the assertion can afford to be strict."
     }
   ],
   "handoff": {
-    "pick_up": "Session 61 was an inspection plus a backlog sweep, not a loop. The rewritten /start was judged against Aaron's four criteria and passed on the re-run: payload 7,971 -> 2,142 words, no disk spill, no file read that the briefing should have supplied. The backlog went 44 -> 31 active across revisions 14 -> 18. THE COMMIT IS NOT MADE: state.json, the four rendered views and Session_61.md are modified and uncommitted, and Clark (Planner, home seat) is taking it to Aaron. Nothing was branched or pushed. Loop 11's subject is still Aaron's to rule.",
+    "pick_up": "Loop 11 is complete and merged: PRs #17, #18, #19 and #20 are in master, v0.36.0 is tagged at 39fefb4, and the instruction surface is tracked — a fresh clone now gets CLAUDE.md and the commands for the first time. One piece of work is outstanding and it is small: PR #21 (.gitattributes, T-151) is open and verified against a control worktree but not merged; Aaron merges. The next loop's subject is unruled. The evidence points at one gap: nothing checks that a deletion propagated to the prose, which is where 25 of 38 defects came from.",
     "watch_out": [
-      "A substring check cannot distinguish an assertion from a citation of that assertion. Grepping G-010 for its retired clause returns true, because the amendment quotes the clause in order to retire it. Verify a rewrite by the field that changed, not by the absence of old words.",
-      "A read ordered before another seat's write is indistinguishable from a read of current state. Clark read rev 16 correctly while the file was already 17. Within one seat you can order a read after a write; across two seats neither party controls the ordering.",
-      "close_gap DELETES. state-writer.ts:292 is s.gaps.splice(idx, 1) — no closed_session, no tombstone, no retention, and no reopen_gap to undo it. Closing a gap destroys its evidence in the same motion; G-018's survives only at 6af5592.",
-      "A bulk close evicts unrelated done tasks through retention and announces it as one summary line. Closing 13 tasks dropped T-032 and T-052 out of the record entirely. Read the dry run before the real call, every time.",
-      "Reading a title is the documented way to read the new INBOX.md and is NOT enough to retire a task. That is T-148, and it is the cause of this session's one real error.",
-      "git show <ref>:<path> is mangled by MSYS on Windows when the ref contains a slash; use MSYS_NO_PATHCONV=1. Verified again this session against 6af5592.",
-      "A heredoc through the Bash tool failed to parse on this session's long markdown; the Write tool did the same job. Do not spend turns fighting the heredoc."
+      "A substring check answers a DIFFERENT QUESTION than the one being asked, and the answers coincide most of the time — which is why it is dangerous rather than merely unreliable. Five instances in session 62: four where grep matched a citation of a retired assertion, one where it missed a correct document by being too literal (searching 'error 21' in a file that says 'Developer 21').",
+      "`git show <ref>:<path>` is mangled by MSYS on Windows when the ref contains a slash — use MSYS_NO_PATHCONV=1. It cost three re-runs in one session and TWICE produced confident wrong answers that were nearly filed as findings. A zero from a broken instrument looks exactly like a zero from a clean file.",
+      "For an instruction that produces artifacts, LOOK AT THE ARTIFACTS. The /checkpoint filename doubling was invisible in both files — each internally consistent — and obvious in one `ls`. Adopted as the audit's fourth question.",
+      "`ln -s` under MSYS creates a real directory, not a link. That is what makes `git worktree remove` fail with 'Filename too long' after you have linked node_modules into a throwaway worktree. Remove the copy first, or do not link at all.",
+      "An unrecognised CLI flag selects the MUTATING default: `sync --check-only` is silently discarded because cli.ts:21 is args.includes('--check'), and sync runs in fix mode. T-150 is open on it. Until it is fixed, type the flag exactly.",
+      "Two seats share one working tree. Either seat can delete the other's files by doing something entirely correct on its own branch, and for untracked files the loss is silent because git does not report removing what it never tracked. T-149 is open; the fix is one worktree per seat and it was demonstrated three times in session 62.",
+      "The checks in this repo had a better record in session 62 than either agent's hand-rolled reasoning. command-parity was right when a raw md5 said 7 of 11 commands had diverged (none had — CRLF across the tracked/untracked boundary); mirror-parity caught a repair applied to one Cursor copy and not the other, and surfaced a fourth command mirror (~/.cursor/commands/) that neither enumeration had.",
+      "Read the ob_state dry run before the real call, every time. Filing one task in session 62 would have evicted done-task T-004 under retention; the dry run said so first and its content was preserved in CHANGELOG.md before it went."
     ],
     "open_questions": [
-      "Does the protocol half earn its keep? Still untested against Loop 10's criterion; nothing may claim it did.",
-      "Should success_rate be dropped from live databases? It survives as an inert column — T-053 closed because nothing computes it, which is not the same as it being gone.",
-      "Node v24: the v22 pin is released in this repo, but Smart Connections may break in Aaron's vault where no test here would catch it.",
-      "Should gaps and the Verified section be reconciled by something? G-010 asserted two claims that V-017 and V-022 already contradicted in the same file, and nothing reads across the two."
+      "Does the protocol half earn its keep? Still unanswered — and session 62 is evidence of a kind: a full loop ran start to finish with ZERO recalls. ob_recalled returned 'No knowledge entries recalled this session'. Session-start injection is suspended (Loop 10 C2) and no deliberate mid-task recall was ever wanted. A memory layer that is never consulted during a day of hard work is not obviously earning anything.",
+      "What checks that a deletion propagated to the prose? 25 of 38 defects were references to things the protocol itself deleted. command-tool-names now catches the tool-name case and NOTHING catches the rest — file names, script names, component names, renamed packages.",
+      "Should the point-of-use rating signal be built (T-014)? T-057 was closed by striking `referenced` from the instructions rather than implementing it, which stops the lie but leaves the was-it-cited question unanswered and the 445 neutrals still hiding it.",
+      "Node v24: the v22 pin is released in this repo, but Smart Connections may break in Aaron's vault where no test here would catch it. Unchanged from session 61."
     ],
-    "session": 61
+    "session": 62
   },
   "last_session": {
-    "n": 61,
+    "n": 62,
     "date": "2026-09-17",
-    "uuid": "8ff4db2c-ab14-44fd-be58-864a09312fb8"
+    "uuid": "b0518d9a-934d-45d6-b6e3-279816d3a66a"
   }
 }
