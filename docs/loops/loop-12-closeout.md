@@ -6,7 +6,33 @@
 
 ---
 
-## The headline
+## The finding that generalises
+
+**An instrument that cannot distinguish "nothing there" from "I did not look."**
+
+Four instruments failed that way today and they are one failure, not four:
+
+- `grep -c … || echo 0` — the fallback fires when grep *errors*, printing 0 for broken, not clean.
+- `grep … ; echo "(blank = not listed)"` — the echo fires **over** a real hit, printing a false
+  negative beside the true positive.
+- `find … | head -25` — a truncated list read as a complete enumeration. **It undercounted a
+  nine-channel mailbox as six, while enumerating what was about to be deleted.**
+- `git show <ref>:<path>` under MSYS with a slash in the ref — returns 0 for every string, including
+  the ones that are present.
+
+A zero, a blank, a truncation and a mangled ref **all render as absence**, and absence-of-evidence
+becomes indistinguishable from evidence-of-absence. **The only defence that worked, every time, was
+reading what the instrument returned rather than the number it reduced to.**
+
+**What makes this the loop's best evidence is where it kept happening: inside the work describing
+it.** Three near-misses today, each by an author who knew the failure mode intimately and shipped it
+into a draft anyway — a dangling cross-reference in the close-out about dangling references, a
+replace that printed `fixed` while deleting a line, and a bullet about mangled line endings that was
+itself mangled. **Each caught only by looking at the artifact instead of the tool's report of it.**
+
+**The delta below is about this repo. This is about how anyone verifies anything.**
+
+## The headline for this project
 
 **The record already existed, in prose, and it changed nothing.**
 
@@ -119,6 +145,27 @@ are the clearest illustration the loop produced.
    more time, inside the paragraph defining it.*
 
 **Running count: 34 Planner, 24 Developer.**
+
+### What the table admits, and what it does not
+
+**Written down so it is not decided case by case by whoever is holding the pen.** It came up because
+the Developer asked whether a near-miss caught before commit should be numbered; the answer is no,
+and the reasoning matters more than the verdict.
+
+- **Error table** — a wrong claim that reached an artifact, a commit, a counterpart, or Aaron.
+  Counted, numbered, attributed to a seat. **Every entry is something that would have misled someone
+  if nobody had caught it.**
+- **Near-miss register** — the same failure caught in-process by its own author. Recorded as
+  instances of a named family, counted separately, **never numbered into the error table.**
+
+**The dividing line is escape, not severity.** Admitting near-misses would change what the number
+measures — from *errors that escaped* to *mistakes made*, which is every draft revision anyone has
+ever done. **And it would tax the behaviour the table exists to encourage: a rule that adds a row
+every time someone checks their own work makes checking your own work look like failure.**
+
+**Near-miss count today: three, all one family** — the one this document now opens with. That number
+says how often the failure mode *fires*; the error count says how often it *escapes*. Both are worth
+having and they are not the same measurement.
 
 ## The mechanism caught its author three times
 
