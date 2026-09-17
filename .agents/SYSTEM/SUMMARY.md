@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 23 by open-brain v0.36.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 24 by open-brain v0.36.0 — do not edit; change state via ob_state -->
 > **Status:** v0.36.0 — Loop 11 answered the instruction-surface question and the answer is a ratio: Q1 25 / Q2 12 / Q3 1 across 77 files. The tools do what they say; the prose around them rots, and only in one direction — the protocol deletes something and the sentences that named it stay. Nothing checks that a deletion propagated to the text. The next loop's subject is Aaron's to rule, but that gap is what the evidence points at.
 
 ## What's working
@@ -33,6 +33,7 @@
 - ob_start's State block replaces the four prose files rather than accompanying them, and renders task titles only: the payload fell from 7,971 to 2,142 words on the same rev-14 state, and the briefing was completable without opening task.md. _(V-025, 3 evidence)_
 - A fresh Windows clone of this repo passes the full suite; the CRLF checkout failure is fixed at the checkout layer rather than by loosening the assertion _(V-026, 3 evidence)_
 - command-tool-names compares commands to the server's tool registry rather than to the other mirrors, fails on both an unregistered ob_* name and a retired kb_* name, and skips rather than passing when server.ts is absent _(V-027, 3 evidence)_
+- V-026's claim is now literal rather than a proxy: a real `git clone` of master, with its own node_modules, installs and passes 588/588 on Windows _(V-028, 3 evidence)_
 
 ## What's broken
 
