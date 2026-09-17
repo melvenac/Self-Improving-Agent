@@ -25,6 +25,7 @@ import {
   checkStateSchema,
   checkCommandToolNames,
   checkCommandNames,
+  checkRetirements,
   resolveDocPath,
 } from "../../../src/pipelines/sync/checks.js";
 import { scoreConfigStructure } from "../../../src/pipelines/sync/scorer.js";
@@ -885,6 +886,109 @@ describe("checkCommandNames", () => {
     root = mkdtempSync(join(tmpdir(), "c2-"));
     writeFileSync(join(root, "README.md"), "Run `/skill-scan`.");
     const r = checkCommandNames(root, join(root, "nohome"));
+    expect(r.severity).toBe("skip");
+  });
+});
+
+describe("checkRetirements", () => {
+  let root: string;
+
+  function setup(record: unknown, files: Record<string, string> = {}) {
+    root = mkdtempSync(join(tmpdir(), "c3-"));
+    mkdirSync(join(root, ".agents"), { recursive: true });
+    writeFileSync(join(root, ".agents", "retirements.json"), JSON.stringify(record));
+    for (const [f, body] of Object.entries(files)) {
+      const abs = join(root, f);
+      mkdirSync(dirname(abs), { recursive: true });
+      writeFileSync(abs, body);
+    }
+    return root;
+  }
+
+  const WIDGETIZER = {
+    historical: [".agents/retirements.json", "CHANGELOG.md"],
+    retirements: [
+      { id: "R-1", name: "widgetizer", pattern: "\\bwidgetizer\\b", event: "cut", ruled: "2026-09-15", classes: ["cli-subcommand"], allowed_referrers: [] },
+    ],
+  };
+
+  afterEach(() => { try { rmSync(root, { recursive: true, force: true }); } catch { /* best effort */ } });
+
+  it("fails on a file naming a retired thing outside the allowed set", () => {
+    const r = checkRetirements(setup(WIDGETIZER, { "README.md": "run `widgetizer` to reconcile" }));
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("README.md");
+    expect(r.message).toContain("widgetizer");
+  });
+
+  it("passes when the only referrer is a declared obituary", () => {
+    const record = structuredClone(WIDGETIZER);
+    record.retirements[0].allowed_referrers = [
+      { path: "README.md", class: "prose", why: "obituary" },
+    ];
+    const r = checkRetirements(setup(record, { "README.md": "`widgetizer` was cut in Loop 10" }));
+    expect(r.severity).toBe("pass");
+  });
+
+  // An empty record passing is the same defect as a check nobody has seen fail.
+  it("fails on an empty record rather than passing vacuously", () => {
+    const r = checkRetirements(setup({ historical: [], retirements: [] }));
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("empty record");
+  });
+
+  // Otherwise the allowlist silently grows into a list of paths nobody checks.
+  it("fails when an allowed referrer no longer names its retirement", () => {
+    const record = structuredClone(WIDGETIZER);
+    record.retirements[0].allowed_referrers = [
+      { path: "README.md", class: "prose", why: "obituary" },
+    ];
+    const r = checkRetirements(setup(record, { "README.md": "nothing about it here" }));
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("no longer names it");
+  });
+
+  it("fails when an allowed referrer has been deleted", () => {
+    const record = structuredClone(WIDGETIZER);
+    record.retirements[0].allowed_referrers = [
+      { path: "gone.md", class: "prose", why: "obituary" },
+    ];
+    const r = checkRetirements(setup(record));
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("no longer exists");
+  });
+
+  it("keeps historical records out of the scan by rule", () => {
+    const r = checkRetirements(setup(WIDGETIZER, { "CHANGELOG.md": "`widgetizer` shipped in v0.10.0" }));
+    expect(r.severity).toBe("pass");
+  });
+
+  /**
+   * Case sensitivity is per retirement and defaults to strict. Granting it
+   * globally made `KB_PATH`, a live variable, match the retired `kb_*` TOOL
+   * prefix — rule 8 arriving inside the check written to apply it.
+   */
+  it("does not match a live identifier that differs only in case", () => {
+    const record = {
+      historical: [".agents/retirements.json"],
+      retirements: [
+        { id: "R-1", name: "kb_*", pattern: "\\bkb_([a-z_]+|\\*)", event: "prefix-retired", ruled: "2026-09-15", classes: ["tool"], allowed_referrers: [] },
+      ],
+    };
+    const r = checkRetirements(setup(record, { "dash.mjs": "const KB_PATH = '/tmp/x';" }));
+    expect(r.severity).toBe("pass");
+  });
+
+  it("says green covers only what is recorded, and names the classes it cannot resolve", () => {
+    const r = checkRetirements(setup(WIDGETIZER));
+    expect(r.severity).toBe("pass");
+    expect(r.message).toContain("guarded by this record alone");
+    expect(r.message).toContain("not that every retirement is recorded");
+  });
+
+  it("skips rather than passing when the record is absent", () => {
+    root = mkdtempSync(join(tmpdir(), "c3-"));
+    const r = checkRetirements(root);
     expect(r.severity).toBe("skip");
   });
 });

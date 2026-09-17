@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import Database from "better-sqlite3";
@@ -1148,4 +1148,162 @@ export function checkCommandNames(projectRoot: string, home = homedir()): CheckR
     message: `${namesChecked} command references across ${surface.length} instruction files all resolve to ${registered.size} command files or ${BUILTINS.size} declared host commands (names only — this cannot tell whether a command's description is true)`,
     report: true,
   };
+}
+
+/**
+ * Loop 12 C3 — `retirements`, the check that makes a deletion finish itself.
+ *
+ * **The record this reads is not new. It is `.agents/LIFECYCLE.md`'s Component
+ * Log, made into data.** That log already existed, already tracked, and already
+ * held the right answer: `2026-04-16 | /recall | PRUNED | Absorbed into /start`.
+ * The `/recall` reference in the gotchas skill survived to **v0.36.0 anyway** —
+ * five months and thirty-four minor versions — because **nothing read it.**
+ * That is Loop 11's rule 4 in one artifact: every containment that worked was a
+ * command, every containment that failed was an intention. The log was an
+ * intention. This check is the command.
+ *
+ * **Why an allowlist and not a parser.** C2 established that a referent is
+ * checkable only where a registry exists, and that the filesystem is not one: a
+ * registry is a closed list of what exists *and may be named*, and the
+ * filesystem answers only the first half. **For a retired name there is no
+ * registry anywhere, because the thing is gone — so the record IS the missing
+ * registry**, built by hand at retirement time. `allowed_referrers` is captured
+ * when the retirement is made, which is the only moment anyone knows which
+ * mentions are deliberate. A correct obituary written then is in the set by
+ * construction; a dangling reference appearing later is not.
+ *
+ * This is forced rather than chosen. A retired name read in prose is textually
+ * identical whether it is a defect or an obituary — C2 proved it by firing on
+ * its own repair, where `` `/recall` `` inside the sentence explaining that
+ * `/recall` is gone was indistinguishable from the defect being described.
+ *
+ * **Entries are global, not per referent class.** A per-class record would have
+ * no entry at all for a class with no registry, so it would under-cover
+ * *silently*. Global keeps the record complete where checking cannot follow, and
+ * moves the incompleteness into this message where a reader can see it — which
+ * is why the pass text names the classes it cannot resolve. **Green here means
+ * "every recorded retirement is finished", never "everything is finished".**
+ *
+ * **An empty record passing would be the same defect as a check nobody has seen
+ * fail**, so the count of retirements and of verified referrers is in the
+ * message, and a stale allowlist entry — a path that no longer exists, or no
+ * longer names its retirement — is an issue rather than a silent pass.
+ */
+export function checkRetirements(projectRoot: string): CheckResult {
+  const name = "retirements";
+  const recordPath = join(projectRoot, ".agents", "retirements.json");
+
+  if (!existsSync(recordPath)) {
+    return { name, severity: "skip", message: "skipped — .agents/retirements.json not found" };
+  }
+
+  let record: RetirementRecord;
+  try {
+    record = JSON.parse(readFileSync(recordPath, "utf8")) as RetirementRecord;
+  } catch (e) {
+    return { name, severity: "issue", message: `.agents/retirements.json is not valid JSON: ${(e as Error).message}` };
+  }
+
+  const retirements = record.retirements ?? [];
+  if (retirements.length === 0) {
+    // Loud rather than green. A record with nothing in it proves nothing, and
+    // the shape of this failure is the reason the count travels in every message.
+    return { name, severity: "issue", message: ".agents/retirements.json records no retirements — an empty record passes for the same reason an unfallen check does" };
+  }
+
+  const historical = record.historical ?? [];
+  const isHistorical = (rel: string) => historical.some((h) => rel === h || rel.startsWith(h));
+
+  const surface = walkTracked(projectRoot).filter((rel) => !isHistorical(rel));
+
+  const unexpected: string[] = [];
+  const stale: string[] = [];
+  let verified = 0;
+  const classes = new Set<string>();
+  const events = new Set<string>();
+
+  for (const r of retirements) {
+    events.add(r.event);
+    for (const c of r.classes ?? []) classes.add(c);
+    // Case sensitivity is per retirement and defaults to STRICT. A prose name
+    // ("Skill-scan" at the start of a sentence) needs `ignore_case`; an
+    // identifier does not, and granting it globally made `KB_PATH` — a live
+    // variable in dashboard.mjs — look like the retired `kb_*` TOOL prefix.
+    // That is rule 8 arriving inside the check written to apply it.
+    const re = () => new RegExp(r.pattern, r.ignore_case ? "i" : "");
+    const allowed = new Set((r.allowed_referrers ?? []).map((a) => a.path));
+
+    for (const a of r.allowed_referrers ?? []) {
+      const abs = join(projectRoot, a.path);
+      if (!existsSync(abs)) {
+        stale.push(`${r.name}: allowed referrer ${a.path} no longer exists`);
+        continue;
+      }
+      if (!re().test(readFileSync(abs, "utf8"))) {
+        stale.push(`${r.name}: ${a.path} no longer names it — drop it from allowed_referrers`);
+        continue;
+      }
+      verified++;
+    }
+
+    for (const rel of surface) {
+      if (allowed.has(rel)) continue;
+      let txt: string;
+      try { txt = readFileSync(join(projectRoot, rel), "utf8"); } catch { continue; }
+      if (re().test(txt)) unexpected.push(`${rel} names ${r.name} (retired ${r.ruled}, ${r.event})`);
+    }
+  }
+
+  if (unexpected.length || stale.length) {
+    const all = [...unexpected, ...stale];
+    const shown = all.slice(0, 6).join("; ");
+    const more = all.length > 6 ? `; +${all.length - 6} more` : "";
+    return { name, severity: "issue", message: `retired names still referenced outside the record: ${shown}${more}` };
+  }
+
+  // The unverifiable half is stated, not omitted. `command` and `tool` names can
+  // additionally be resolved against a live registry by command-names and
+  // command-tool-names; every other class is guarded by this record alone.
+  const RESOLVABLE = ["command", "tool"];
+  const unresolvable = [...classes].filter((c) => !RESOLVABLE.includes(c)).sort();
+  return {
+    name,
+    severity: "pass",
+    message:
+      `${retirements.length} retirements across ${events.size} event classes, ${verified} allowed referrers all present and still naming their retirement, ` +
+      `0 unexpected across ${surface.length} live files — ` +
+      `resolvable against a registry: ${RESOLVABLE.join(", ")}; guarded by this record alone: ${unresolvable.join(", ")} ` +
+      `(green means every RECORDED retirement is finished, not that every retirement is recorded)`,
+    report: true,
+  };
+}
+
+interface RetirementRecord {
+  historical?: string[];
+  retirements?: Array<{
+    name: string;
+    pattern: string;
+    event: string;
+    ruled: string;
+    classes?: string[];
+    ignore_case?: boolean;
+    allowed_referrers?: Array<{ path: string; class: string; why: string }>;
+  }>;
+}
+
+/** Repo files worth scanning. Deliberately not `git ls-files`: this must work in a temp dir under test. */
+function walkTracked(root: string, rel = "", out: string[] = []): string[] {
+  const SKIP = new Set(["node_modules", ".git", "build", "dist", "coverage", ".vitest"]);
+  let entries: string[];
+  try { entries = readdirSync(join(root, rel)); } catch { return out; }
+  for (const e of entries) {
+    if (SKIP.has(e)) continue;
+    const childRel = rel ? `${rel}/${e}` : e;
+    const abs = join(root, childRel);
+    let isDir = false;
+    try { isDir = statSync(abs).isDirectory(); } catch { continue; }
+    if (isDir) walkTracked(root, childRel, out);
+    else if (/\.(md|ts|mjs|cjs|js|json)$/.test(e)) out.push(childRel);
+  }
+  return out;
 }
