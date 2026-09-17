@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 23,
+  "revision": 24,
   "project": {
     "name": "self-improving-agent"
   },
@@ -967,6 +967,29 @@
           "type": "test",
           "path": "open-brain/tests/pipelines/sync/checks.test.ts",
           "observation": "4 tests covering the same cycle, including that an absent server.ts returns severity 'skip'"
+        }
+      ],
+      "since_session": 62,
+      "status": "verified"
+    },
+    {
+      "id": "V-028",
+      "claim": "V-026's claim is now literal rather than a proxy: a real `git clone` of master, with its own node_modules, installs and passes 588/588 on Windows",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/state-views.test.ts",
+          "observation": "git clone of master at fed9e99 into a fresh directory; npm install exit 0 with no shared node_modules; npm test -> 44 files / 588 tests passed. The same suite failed 2 of 588 in a fresh checkout at 207eb6e, before .gitattributes."
+        },
+        {
+          "type": "file",
+          "path": ".gitattributes",
+          "observation": "file -b on open-brain/tests/fixtures/.agents/SYSTEM/SUMMARY.md inside the clone reports 'ASCII text', not 'with CRLF line terminators' - the fixture the two failing assertions read is LF at checkout, which is the layer the fix was made at."
+        },
+        {
+          "type": "file",
+          "path": ".agents/state.json",
+          "observation": "Why this exists as a separate claim: the Developer flagged V-026 at handoff as its own rule-5 violation - it claimed 'a fresh Windows clone' on the strength of two worktrees pointed at the main tree's node_modules. A proxy inside a claim marked VERIFIED is the defect this project exists to remove. ob_state has no update_verified op, so the correction is a new claim rather than an edit. V-026 stays as written, so the record shows that a proxy was used, that its author said so unprompted, and that someone then ran the thing."
         }
       ],
       "since_session": 62,
