@@ -795,10 +795,14 @@ const RATING_ORIGINS: ReadonlySet<string> = new Set(['explicit', 'recall-log', '
  *
  * - `supplied`  — an explicit per-entry judgment the agent passed to `ob_end`.
  *                 The only sweep-path input that can carry `harmful`.
- * - `heuristic` — `index-v2.ts`'s fallback: does a tag substring appear in the
- *                 session summary. A topic-mention detector, structurally
- *                 unable to emit `harmful`, so a `helpful` from here means
- *                 "mentioned", not "worked".
+ * - `heuristic` — CUT in Loop 12 (R-010). It rated an entry helpful when one of
+ *                 its tags appeared as a SUBSTRING of the session summary: a
+ *                 topic-mention detector, structurally unable to emit
+ *                 `harmful`, so a `helpful` from it meant "mentioned", not
+ *                 "worked". It never ran — zero rows across the entire life of
+ *                 this column, confirmed against the live database — and what
+ *                 it fed (success_rate, maturity) was cut in Loop 10. Retained
+ *                 in this list as an obituary, not in the type.
  * - `direct`    — a deliberate `ob_feedback` call. The only path that also runs
  *                 `evaluateLifecycle`, which is why apoptosis has never fired.
  * - `unspecified` — a caller that did not say. Countable, never assumed to be a
@@ -806,9 +810,9 @@ const RATING_ORIGINS: ReadonlySet<string> = new Set(['explicit', 'recall-log', '
  *
  * NULL means pre-column and is unknowable, not `unspecified`.
  */
-export type RatingMethod = 'supplied' | 'heuristic' | 'direct' | 'unspecified';
+export type RatingMethod = 'supplied' | 'direct' | 'unspecified';
 
-const RATING_METHODS: ReadonlySet<string> = new Set(['supplied', 'heuristic', 'direct', 'unspecified']);
+const RATING_METHODS: ReadonlySet<string> = new Set(['supplied', 'direct', 'unspecified']);
 
 /**
  * Record a rating as an event, alongside the aggregate counters.

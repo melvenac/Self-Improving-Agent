@@ -25,39 +25,18 @@ export interface SessionEndV2Input {
   /**
    * Per-entry ratings the agent judged explicitly at /end, keyed by entry id.
    *
-   * The tag-match fallback below can only answer "did the summary mention this
-   * entry's tags", which has no way to express that a recalled entry was acted
-   * on and turned out to be wrong. That left `harmful` unreachable on the only
-   * path that runs at scale, and an unreachable rating made the apoptosis
-   * threshold unsatisfiable rather than merely unmet. Entries absent from this
-   * map still fall back to the heuristic, so a session that supplies nothing
-   * behaves exactly as before.
+   * THE ONLY INPUT THAT PRODUCES A RATING. The tag-match fallback that used to
+   * stand beside this was CUT in Loop 12 (R-010): it could only answer "did the
+   * summary mention this entry's tags", which cannot express that a recalled
+   * entry was acted on and turned out to be wrong. That left `harmful`
+   * unreachable on the only path running at scale, and an unreachable rating
+   * made the apoptosis threshold unsatisfiable rather than merely unmet.
+   *
+   * An entry absent from this map is now SKIPPED rather than rated. A fallback
+   * neutral is indistinguishable from a rater's considered "retrieved and not
+   * used", which is the one signal the corpus still has.
    */
   entryRatings?: Record<number, FeedbackRating>;
-  /**
-   * Whether the tag-substring fallback may rate entries it was given no
-   * judgment for. **Default false — the arm is off.**
-   *
-   * It was off by accident for the whole life of the `rating_method` column:
-   * the hook could not read its own session uuid, so Stage 2 never ran and this
-   * arm wrote nothing (see cli-session-end.ts and
-   * ~/Obsidian Vault v2/Research/loop-7-c1-reconciliation-2026-09-15.md §2).
-   * Fixing the uuid
-   * would have switched it on as a side effect, on the very next session end.
-   *
-   * That is not a safe thing to do silently. The arm emits `helpful` on a tag
-   * substring appearing in the session summary — mentioned, not worked — and
-   * those ratings feed `success_rate`, which gates maturity and apoptosis. The
-   * per-entry mean helpful rate is 0.311 against an apoptosis threshold of 0.3
-   * (injection-ablation prereg §10), so flooding a knife-edge scoring system
-   * with topic-mention signal is exactly the change that should not happen as a
-   * by-product of a bug fix.
-   *
-   * So the repair and the switch-on are separated: the uuid is correct now, and
-   * this stays false until Loop 7's C2 rules on whether session-start injection
-   * and its rating machinery are kept. Flip it in one place, deliberately.
-   */
-  enableHeuristicRatings?: boolean;
   /**
    * Where `recalledEntryIds` came from, as resolveRecalledIds reported it.
    * Recorded on every rating this run creates — the resolver computed this all
@@ -135,8 +114,8 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
       .map((t: string) => t.trim())
       .filter(Boolean);
 
-    // An explicit judgment always wins over the substring heuristic — it is the
-    // only input that can carry a negative signal.
+    // The only input that can carry a negative signal, and since R-010 the only
+    // input at all.
     const supplied = input.entryRatings?.[id];
 
     // Gate: with no explicit judgment and the fallback arm off, this entry is
@@ -144,7 +123,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     // recording a neutral matters: a neutral here would be indistinguishable
     // from a rater's considered "retrieved and not used", which is the one
     // signal the corpus still has.
-    if (supplied === undefined && !input.enableHeuristicRatings) continue;
+    if (supplied === undefined) continue;
 
     const matched = tags.some((tag) => summaryLower.includes(tag.toLowerCase()));
     const rating: FeedbackRating = supplied ?? (matched ? "helpful" : "neutral");
@@ -152,7 +131,10 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     // Which arm produced this rating, recorded rather than inferred. Without it
     // a `neutral` from a judging agent and a `neutral` from the fallback are one
     // row shape, and those two demand opposite fixes.
-    const method: RatingMethod = supplied ? "supplied" : "heuristic";
+    // Only one arm can reach this line now, so the label is a constant rather
+    // than a branch. Kept because a `neutral` still has to say which arm made
+    // it: the 347 pre-column rows cannot, and that is why the column exists.
+    const method: RatingMethod = "supplied";
 
     updateFeedbackV2(db, row.vault_path, rating);
     // This path bypasses ob_feedback, so log the event explicitly — otherwise
