@@ -383,10 +383,10 @@ export function checkVaultIndexParity(vaultPath: string, dbPath: string): CheckR
   const rel = (f: string) => f.replace(vaultPath, "").replace(/\\/g, "/").replace(/^\//, "");
   const parts: string[] = [];
   if (duplicates.length > 0) {
-    parts.push(`${duplicates.length} duplicate note(s) — same note filed under two folders, so skill-scan counts it twice: ${rel(duplicates[0])}`);
+    parts.push(`${duplicates.length} duplicate note(s) — same note filed under two folders, so the vault holds two copies of one experience: ${rel(duplicates[0])}`);
   }
   if (unindexed.length > 0) {
-    parts.push(`${unindexed.length} unindexed note(s) — feed skill-scan but unreachable by ob_recall: ${rel(unindexed[0])}`);
+    parts.push(`${unindexed.length} unindexed note(s) — present in the vault but unreachable by ob_recall: ${rel(unindexed[0])}`);
   }
   if (dangling.length > 0) {
     parts.push(`${dangling.length} index row(s) whose vault file is missing`);

@@ -44,7 +44,7 @@ Without this scaffold, every AI session starts from zero on that project. With i
 
 | Layer | Location | Owns |
 |-------|----------|------|
-| **SIA (global)** | `~/.claude/`, open-brain, Obsidian | Session protocol, cross-project memory, skill-scan, health score |
+| **SIA (global)** | `~/.claude/`, open-brain, Obsidian | Session protocol, cross-project memory, health score |
 | **Framework (project)** | `.agents/` in each repo | Project truth, tasks, decisions, stack skills |
 
 **Slash commands do not live in the project.** Install them once:

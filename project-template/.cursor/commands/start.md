@@ -50,35 +50,23 @@ Read these files (skip missing):
 - Checkpoints: `ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3, trigger: "checkpoint")`
 - `trigger` marks these as session-start injection; deliberate mid-task recalls pass `trigger: "explicit"` (omitted = recorded as "unspecified")
 
-### A4. Write `.recalled-entries.json`
-
-Write to project root `{cwd}/.recalled-entries.json`. Merge with existing (dedupe by id). Only `result_type: "knowledge"`.
-
-```json
-{
-  "session_id": "{UUID or null}",
-  "session_start": "{ISO timestamp}",
-  "queries": ["..."],
-  "entries": [{ "id": N, "key": "...", "source": "knowledge" }]
-}
-```
-
-### A5. Mailbox (if AGENT.md has mailbox_channel)
+### A4. Mailbox (if AGENT.md has mailbox_channel)
 
 - `~/.agents/mailbox/channels/{mailbox_channel}/`
 - Inbox: `{partner}-to-{name}.md` · Decisions: `decisions.md`
-- Newest inbox subject + most recent decision date (sort `## YYYY-MM-DD` headers descending)
+- Read the newest `loop-N-brief.md` by loop number; `{partner}-to-{name}.md` is archive.
+- `decisions.md`: entries are APPENDED, so take the LAST `## YYYY-MM-DD` header by line position. Do not sort by date string — same-date headers are the norm and a date sort orders nothing.
 
-### A6. Reconcile drift
+### A5. Reconcile drift
 
 - `task.md` "Done" vs INBOX `[x]` — fix mismatches
 - SUMMARY version vs `package.json` — fix stale "What's next"
 
-### A7. Create session log
+### A6. Create session log
 
 If `.agents/SESSIONS/` exists: copy `SESSION_TEMPLATE.md` → next `Session_N.md` or `YYYY-MM-DD.md`. Fill date + UUID.
 
-### A8. Present greeting (≤300 tokens)
+### A7. Present greeting (≤300 tokens)
 
 ```
 GREETING:
@@ -106,9 +94,8 @@ Greet the user by name. Present GREETING verbatim. If FLAGS non-empty, verify be
 1. Register session (same UUID logic → `ob_set_session`)
 2. `ob_recall` with queries from cwd context; broaden if < 3 results
 3. Checkpoint recall as Part A
-4. Write `.recalled-entries.json` in cwd
-5. Read Skill-Candidates index + pending proposals
-6. Greet the user; present knowledge + skills + checkpoints
+4. Read Skill-Candidates index + pending proposals
+5. Greet the user; present knowledge + skills + checkpoints
 
 ---
 

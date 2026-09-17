@@ -96,7 +96,6 @@ See [`.agents/FRAMEWORK.md`](.agents/FRAMEWORK.md) for the full v1.1 guide (two-
 |--------------|----------------------------|
 | open-brain MCP recall/store | PRD, ENTITIES, RULES |
 | Obsidian vault experiences | SUMMARY, DECISIONS, gotchas |
-| `/skill-scan` proposals | Project skills in `.agents/skills/` |
 | Session hooks | Session logs in `.agents/SESSIONS/` |
 
 Sessions in any project feed experiences back into your vault — patterns learned on Project A help Project B.

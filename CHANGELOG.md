@@ -74,6 +74,54 @@ from nothing: no command, hook, skill or `CLAUDE.md` referenced it. **The policy
 applying could not be found by anyone applying it.** It is not a dead instruction and not a misfiled
 record, so it was neither cut nor demoted; it was given a referrer from `RULES.md`, which has four.
 
+### `/skill-scan` — Loop 10's CUT ruling executed on the prompt surface (C2 item 3)
+
+The ruling was made and never carried out: the command was still live and identical in all three
+mirrors. **No source remains** — `SKILL_SCAN`, `skillScan`, `runSkillScan` and
+`generateSkillProposals` return nothing across `open-brain/src`. Six orphaned build artifacts remain
+(three `.d.ts`, three `.js.map`, no `.js` beside any of them), which is G-025's class.
+
+**The brief scoped this as "delete the block from all three mirrors". It was referenced from
+eighteen files.** Deleting only the command would have manufactured fifteen dangling references —
+the exact Q1 defect this loop exists to remove. Repaired with the deletion, in the same commit:
+`harness-audit.md` (named the command file and a `knowledge-mcp/scripts/skill-scan.mjs` that does not
+exist), `FRAMEWORK.md`, `project-template/README.md`, `self-improving-agent-guide/SKILL.md` (three
+places, including a "machine-read contract" for a reader that no longer exists), `RUNBOOK.md`,
+`SECURITY.md` (two hook scripts that do not exist), both Cursor `end.md` copies, and `/sync`'s own
+`vault-index-parity` output strings. Historical records — `DECISIONS.md`, `PRD.md`, the MCP tool
+audit — keep their references; they describe what was, not what is.
+
+**`domains.json` was nearly a false finding.** Its description says it filters skill-scan proposals,
+so it read as dead config that `/start` still opens. It is not: the health scorer reads it at
+`pipelines/sync/score.ts:44`. The description was stale, not the file. Checking the consumer before
+filing the finding is the only reason it isn't in this list as a cut.
+
+### `RULES.md` — six more, in the file that governs
+
+Found while adding the `LIFECYCLE.md` referrer. **Q1:** "Scripts are ES modules (`.mjs`)" — the
+hooks and server are compiled TypeScript; "Hook execution order matters: `session-end.mjs` →
+`skill-scan.mjs`" — two files that do not exist, and the order is enforced inside
+`index-v2.ts`, not by hook registration; an error-log path under the retired v1 vault. **Q2:** agent
+rules 1-4 predate `state.json` and instructed hand-edits to the four rendered views — "Read
+SUMMARY.md before starting any work", "Update SUMMARY.md at session end" — which `/end` A7b forbids
+in bold.
+
+**Rule 5 is left exactly as it stands:** *"Never commit `.agents/` or `.claude/` to this repo
+(gitignored)."* That rule is the cause of the untracked-surface finding below, it is a deliberate
+policy, and changing it is not a repair an audit gets to make.
+
+### The Cursor mirror — and a fourth mirror nobody had enumerated (C2 item 6)
+
+`~/.cursor/commands/` is compared against the template by `checks.ts:682` and appeared in neither
+enumeration. **Four files, found by a check rather than by either auditor.**
+
+Both Cursor copies — template *and* live — still wrote `.recalled-entries.json` at `start.md:53,55`
+and read it back at `end.md:83`, the pre-Loop-5 feedback-poisoning path, **shipping in the
+distributable**; both carried the same false `ob_feedback(entry_id, rating, referenced)` signature;
+and both still sorted `decisions.md` by date string, the defect fixed in `.claude/start.md` and not
+here. All repaired in both copies. `grep -rn "entry_id, rating, referenced"` across every mirror now
+returns nothing.
+
 ### Two MCP tool descriptions were false, and C3's proposed check would not catch either
 
 Tool descriptions are instruction text with no `.md` file. Two of fourteen were falsified by Loop

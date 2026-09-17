@@ -171,8 +171,7 @@ If this session changed features, commands, or architecture:
 
 > The single registered SessionEnd hook (`open-brain/build/cli-session-end.js`) runs the pipeline in
 > `pipelines/session-end/index-v2.ts`: summary, auto-feedback, invocation logging, shadow recall,
-> topics. Steps A10-A14 catch what it misses. (`session-end.mjs` and `skill-scan.mjs` were named here
-> until Loop 11; neither file exists.)
+> topics. Steps A10-A14 catch what it misses.
 If any external research was done this session (GitHub repos, YouTube videos, website docs, NotebookLM content), store a knowledge entry for each source using `ob_store`:
 
 ```

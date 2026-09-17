@@ -366,7 +366,7 @@ describe("validation checks", () => {
       const r = checkVaultIndexParity(vault, db);
       expect(r.severity).toBe("warn");
       expect(r.message).toContain("1 duplicate note");
-      expect(r.message).toContain("counts it twice");
+      expect(r.message).toContain("two copies of one experience");
       expect(r.message).not.toContain("unindexed note");
     });
 
