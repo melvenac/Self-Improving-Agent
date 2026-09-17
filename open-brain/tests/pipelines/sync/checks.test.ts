@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, cpSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
+import { execSync } from "node:child_process";
 import DatabaseCtor from "better-sqlite3";
 import { rmSync } from "node:fs";
 import {
@@ -984,6 +985,33 @@ describe("checkRetirements", () => {
     expect(r.severity).toBe("pass");
     expect(r.message).toContain("guarded by this record alone");
     expect(r.message).toContain("not that every retirement is recorded");
+  });
+
+  /**
+   * SHIPPED BROKEN AND CAUGHT IN THE MAIN TREE, NOT THE WORKTREE IT WAS BUILT IN.
+   * The scanner was a filesystem walk with a hand-maintained skip list, so a
+   * gitignored generated cache (.gitnexus/, whose parse artifacts contain the
+   * string "skill-scan") produced 115 findings on a tree that had one. The
+   * development worktree had no such directory and was green throughout.
+   *
+   * A hand-maintained skip list is a second list beside the thing it describes —
+   * the same defect this check exists to find. .gitignore already says what is
+   * not the repo’s own content.
+   */
+  it("does not scan gitignored files, however loudly they name a retirement", () => {
+    const record = structuredClone(WIDGETIZER);
+    root = setup(record, {
+      ".gitignore": "cache/",
+      "cache/index.json": '{"symbol":"widgetizer"}',
+      "README.md": "nothing retired here",
+    });
+    try {
+      execSync("git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm x", { cwd: root, stdio: "ignore" });
+    } catch {
+      return; // no git available — the fallback walk is covered by the other tests
+    }
+    const r = checkRetirements(root);
+    expect(r.severity).toBe("pass");
   });
 
   it("skips rather than passing when the record is absent", () => {
