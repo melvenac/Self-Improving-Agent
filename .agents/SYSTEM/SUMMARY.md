@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 25 by open-brain v0.37.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 27 by open-brain v0.37.0 — do not edit; change state via ob_state -->
 > **Status:** v0.37.0 — Loop 11 answered the instruction-surface question and the answer is a ratio: Q1 25 / Q2 12 / Q3 1 across 77 files. The tools do what they say; the prose around them rots, and only in one direction — the protocol deletes something and the sentences that named it stay. Nothing checks that a deletion propagated to the text. The next loop's subject is Aaron's to rule, but that gap is what the evidence points at.
 
 ## What's working
@@ -60,6 +60,7 @@
 - Gap G-024: Done-task retention evicts entries from state.json permanently during a bulk close, while reporting it only in passing. Closing 13 tasks in session 61 dropped T-032 and T-052 out of the record entirely — nobody asked for those two to go, and it surfaced only because the tool output was read carefully. The count scales with the size of the close, so a large sweep evicts proportionally more, equally quietly.
 - Gap G-025: open-brain/build is not pruned on rebuild, so a deleted source leaves its declaration file and sourcemap behind with no .js beside them. auto-feedback.ts was cut in Loop 10, but build/pipelines/session-end/ still holds auto-feedback.d.ts and auto-feedback.js.map dated Sep 15. Inert — nothing executes without the .js — and build/ is gitignored, so this is per-seat debris rather than a repo defect.
 - Gap G-026: Recall has no minimum relevance and almost no project scoping, so it fills its result limit with whatever is left once the relevant set runs out - and no metric the project has can see it happening. Deferred twice already, from Loop 11 and Loop 12, because it only ever lived in conversation.
+- Gap G-027: expected_revision serialises writes within one lineage, not across branches. Two seats can read the same base revision, derive the same successor, and both be accepted - the collision is invisible at the data layer and surfaces only as a git conflict at merge time, a different and much later layer. The revision counter does less work than its name implies.
 
 ## What's next
 
