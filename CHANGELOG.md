@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.34.0] - 2026-09-15 — Loop 10
+
+**The decision loop.** Nine loops produced enough evidence to answer the question the project was started to ask, and this loop answers it rather than extending it. No new measurement was taken. **8,616 lines removed, 1,246 added, across 64 files; `open-brain/src` went from 61 TypeScript files to 44.**
+
+Full working: `docs/loops/loop-10-c1-criterion.md` (pinned before any data), the three enumeration passes, `loop-10-c2-verdicts.md`, and `loop-10-c3-accounting.md`.
+
+### The finding — the ranker earns its keep, the injection does not
+
+These are different claims and the project had been conflating them. The one significant result — `bm25_only` loses to `live` **10–23, p=0.035** — is about *ranking*: given a query, live ordering beats a lexical baseline. It is **not** evidence that injecting recalled knowledge at session start changes what an agent does. The one attempt to measure that collapsed to **p=0.688** once the control was topic-matched.
+
+**The upper bound, measured on the best possible case.** `CLAUDE.md` is injected unconditionally — 100% delivery, no retrieval, no ranking, top of context, every session. It already carried the sentence *"Summaries tab is empty — v2 has no summaries table."* That fact sat at maximum privilege for weeks **while `/start` instructed agents to call `ob_summarize()` and `ob_store_summary()`, which do not exist**, and `command-parity` reported `pass` on it. A fact delivered perfectly did not connect to the instruction it contradicts. **If perfect delivery does not produce connection, the problem is not delivery** — and no ranking, maturity, recency or scoping work can reach it.
+
+**After six months the memory half is still unproven.** The one part with evidence behind it is good at something other than what the layer was built to do. The protocol half was **not** tested against the criterion, so nothing here claims it earned its keep; what can be said is that tonight's true project state was reconstructed from hand-maintained `decisions.md` while the memory half handed both seats five-loop-stale state. That is observation, not finding.
+
+### Cut, each on its artifact
+
+- **Apoptosis never fired** — `archived_into` non-null: **0 rows** in six months. `db-v2.ts:802` already said so in a comment.
+- **`success_rate`** excluded neutral from its denominator, and neutral is **446 of 615 ratings**. It read 1.0 for almost everything ever rated: a number that could not be false.
+- **The skill scan produced 0 skills** from 39 proposals; the vault's `Skills/` folder is empty.
+- **The dream pipeline** — 1,229 lines, six files — on no hook, with no output artifact anywhere.
+- **The reflection queue** recorded 0 rows, ever.
+- **`db.ts`** — 479 lines unreachable from production, kept alive by three test files, **carrying a live implementation of `success_rate` that this loop had already cut elsewhere**.
+- The v1 session-end pipeline, the completed migration, `/start`'s session-aging block, and the vault-warning's untested causal claim (the detection stays).
+- **Smart Connections**, which has no code in this repository and could not be observed running during the loop that ruled on it — releasing the Node v22 pin. **It may still break in a vault that runs the plugin.**
+
+**Suspended, which here means deleted with a named reviving observation and a recovery SHA:** session-start injection, the maturity lifecycle, apoptosis's gate, and the shadow harness's as-of replay. Each trigger carries the clause that reviving maturity ranking without the as-of replay is not a partial revival but one that cannot be honestly measured.
+
+### The rule worth carrying — two measurements that share a premise are one measurement
+
+Five instances in one evening, across two agents and three subsystems: the dual enumeration missed every prompt-driven component because both passes assumed a component is code; `command-parity` passes three identical copies of a false instruction; a Planner error was briefly confirmed by a Developer error from the same source; a finding was relayed unattributed, making one source look like two; and **`db.ts` was invisible to both enumeration instruments because both assume a component is something production reaches** — that one survived to a frozen SHA. The project's instrument history is nine misreports caught only by measurements disagreeing. **This names the condition under which that catching mechanism silently stops working.**
+
+### Behaviour change, measured rather than asserted
+
+Removing the maturity boosts moves nothing — they were already 1.0. **The low-success penalty was not neutral: it fired on exactly 2 live entries of 561**, which now lose a 0.5 demotion. So the ranking change is behaviour-preserving for **559 of 561 entries, not for all of them**. The claim was checked before it shipped, which is the only reason it is stated correctly here.
+
+### R1–R4
+
+- **R1** — `ob_sync`'s `state-schema` check now names **which process's loaded schema** parsed the live `state.json`, and `ob_sync` called as an MCP tool reports as the server. A version comparison would have been green through the entire two-loop outage, because Loop 9's R3 deliberately held `schema_version` at 1 while changing `ProjectSchema`'s shape.
+- **R2** — `ob_state`'s schema refusal now names the reconnect, and says to confirm by a read ordered after the write, because **a stale server reports success**.
+- **R3** — the carried-forward footnote, below, plus an open discrepancy in the running count recorded rather than resolved.
+- **R4** — the branch-shape rule written where the loop protocol lives.
+
+### Idea B
+
+The only original idea never run. These rulings make it **cheaper and more clearly separable, not moot and not urgent** — the binding constraint is not architectural. Not done here.
+
 ## [0.33.0] - 2026-09-15 — Loop 9
 
 Loop 9 of the extraction evaluation. The usage signal, on the smallest instrument that could answer it. One repair landed, one capability answered negatively, and **one instrument pre-registered and then not built** because its own viability threshold fired before a line of it was written.
@@ -40,10 +86,16 @@ The running total is replaced with a per-loop breakdown, because a total nobody 
 
 | | Planner | Developer |
 |---|---|---|
-| Loops 5–7 | 10 | 1 |
+| Loops 5–7 [^carried] | 10 | 1 |
 | Loop 8 | 3 | 6 |
 | Loop 9 | 2 | 5 |
-| **total** | **15** | **12** |
+| Loop 10 | 8 | 6 |
+| **subtotal, this table** | **23** | **18** |
+| running count in use [^discrepancy] | **25** | **19** |
+
+[^discrepancy]: **The two rows disagree by 2 Planner and 1 Developer, and the difference is not reconciled.** Loop 10 opened from a brief stating **17 Planner, 13 Developer** and closed at **25 / 19**, counting 8 and 6 errors logged within the loop — all of them named in the Loop 10 entry and each auditable from its own description. This table's Loop 9 subtotal is **15 / 12**. The two starting points differ, so either two Planner and one Developer error were logged between Loop 9's CHANGELOG entry and Loop 10's brief without reaching this table, or the brief's opening figure was itself carried rather than derived. **Recorded as an open discrepancy rather than resolved by picking the larger number**, because picking one would be the same move the footnote below describes. The `25 / 19` line is what the agents used in-loop; the subtotal is what this table can actually support.
+
+[^carried]: **The Loops 5–7 row is carried forward from the running total as it stood, not re-derived from an enumeration.** Every other row in this table is backed by the named list beneath it and can be audited from its own entries; this one cannot. It is the single figure here that has to be taken on trust, and it is marked rather than quietly counted because a record that is re-read but never re-derived converges on its own errors — which Loop 10 then demonstrated twice, in a false "one tag per loop" summary line that survived a reconciliation whose stated purpose was to not answer from memory, and in `command-parity` reporting `pass` on three identical copies of an instruction that cannot execute. Agreed with the Planner in Loop 9; recorded here at the first touch of this file, because an intention is what the fresh-session rule and the skill queue both died of.
 
 **Loop 8 — Planner (3):** the `domain:` premise carried into the brief; cross-project spread asserted as a noise discriminator when it is the opposite; `qa` called noise by eye against a metric that disagreed. **Developer (6):** the `domain:` hypothesis asserted before measuring; the `## Action` grep that missed 436 of 529 notes; the `e865f48` merge framing that described a defect that did not exist; collapsing the lying and stale instrument failures into one; "I checked the state" said of a read taken during a backgrounded write; the CRLF no-op edits trusted on an exit code.
 

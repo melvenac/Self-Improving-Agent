@@ -151,11 +151,6 @@ for (const w of health.warnings) {
   lines.push(`WARNING: ${w.message}`);
 }
 
-if (health.pendingSkillProposals > 0) {
-  lines.push("");
-  lines.push(`Skill proposals pending: ${health.pendingSkillProposals} cluster(s) ready for review.`);
-}
-
 if (lines.length > 0) {
   console.log(lines.join("\n"));
 }

@@ -37,20 +37,11 @@ export const SHADOW_STRATEGIES: ShadowStrategy[] = [
       "0.005/day is too weak. At 0.02/day a 50-day-old entry is doubly penalised rather than 1.25x.",
     overrides: { recencyDecayPerDay: 0.02 },
   },
-  {
-    name: "no_maturity",
-    hypothesis:
-      "Maturity boosts entrench whatever was recalled early. Removing them tests whether they help or just compound. " +
-      "DEGENERATE SINCE LOOP 8 R1: live now sets both boosts to 1.0, so this strategy is byte-identical to the control. " +
-      "Kept rather than deleted because the name is a JSONL key with history behind it, and because it is now a second " +
-      "free consistency check — it must tie with `live` exactly, and any gap between them means the harness is not deterministic.",
-    overrides: { matureBoost: 1.0, provenBoost: 1.0 },
-  },
-  {
-    name: "maturity_strong",
-    hypothesis: "Proven/mature entries are under-weighted; feedback should count for more than 1.5x.",
-    overrides: { matureBoost: 2.5, provenBoost: 1.6 },
-  },
+  // Loop 10 C2: `no_maturity` and `maturity_strong` are gone with E3. Both swept
+  // constants that no longer exist — `no_maturity` had been byte-identical to the
+  // control since Loop 8 R1 set the boosts to 1.0, and `maturity_strong` tested
+  // raising a weight the ranking no longer reads. Their JSONL keys stay in the
+  // historical log; nothing new is written under them.
   // ── Loop 8 R2: the recency sweep ──────────────────────────────────────────
   //
   // Loop 7 found `no_recency` lost 11-22 against live on the repaired harness
@@ -87,9 +78,6 @@ export const SHADOW_STRATEGIES: ShadowStrategy[] = [
     hypothesis:
       "Floor. All boosts off — pure lexical relevance. Any strategy that cannot beat this is not earning its complexity.",
     overrides: {
-      matureBoost: 1.0,
-      provenBoost: 1.0,
-      lowSuccessPenalty: 1.0,
       recencyDecayPerDay: 0,
       failureBoost: 1.0,
     },

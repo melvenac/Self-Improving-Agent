@@ -89,7 +89,6 @@ export interface SessionInfo {
 
 export interface HealthCheckResult {
   warnings: Array<{ category: string; message: string }>;
-  pendingSkillProposals: number;
 }
 
 export interface SessionStartResult {

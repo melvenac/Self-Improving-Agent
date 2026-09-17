@@ -2,7 +2,6 @@ import { existsSync, readdirSync, readFileSync, statSync } from "fs";
 import { join } from "path";
 import { execSync } from "child_process";
 import { obsidianVaultDir } from "../../shared/paths.js";
-import { SKILL_SCAN_ENABLED } from "../../shared/skill-scan-flag.js";
 
 export interface HealthWarning {
   category: string;
@@ -11,7 +10,6 @@ export interface HealthWarning {
 
 export interface HealthCheckResult {
   warnings: HealthWarning[];
-  pendingSkillProposals: number;
 }
 
 /**
@@ -99,9 +97,16 @@ export function runHealthChecks(homePath: string): HealthCheckResult {
             } catch { /* skip unreadable */ }
           }
           if (!found) {
+            // Loop 10 C2 (E16b): the message used to open "session-end may be
+            // failing". That named a cause the check never tested, and on
+            // 2026-09-15 it was wrong: the flagged session had no `sessions`
+            // row at all, so `ob_set_session` never ran and capture had nothing
+            // to key on — the opposite end of the pipeline. The detection is
+            // sound and stays; the diagnosis was an untested claim and is gone.
+            // State what was observed, not why.
             warnings.push({
               category: "pipeline",
-              message: `session-end may be failing — session ${newestSession} (${Math.round(hoursStale)}h old) has no Obsidian capture.`,
+              message: `session ${newestSession} (${Math.round(hoursStale)}h old) has no Obsidian capture.`,
             });
           }
         }
@@ -109,21 +114,10 @@ export function runHealthChecks(homePath: string): HealthCheckResult {
     } catch { /* don't block startup */ }
   }
 
-  // 3. Pending skill proposals
-  //
-  // Loop 9 R1: silent while the generator is off. The file is NOT deleted, so
-  // without this gate a stale count would keep being announced after nothing
-  // was producing it — an absence reported as a healthy number, which is Rule 4
-  // and the specific failure this repair exists to avoid.
-  const pendingPath = join(vaultPath, ".skill-proposals-pending.json");
-  if (SKILL_SCAN_ENABLED && existsSync(pendingPath)) {
-    try {
-      const pending = JSON.parse(readFileSync(pendingPath, "utf-8"));
-      if (Array.isArray(pending) && pending.length > 0) {
-        pendingSkillProposals = pending.length;
-      }
-    } catch { /* ignore parse errors */ }
-  }
+  // Loop 10 C2 (E8): the pending-skill-proposals report is CUT along with the
+  // generator that fed it. Six months produced 0 skills from 39 proposals none
+  // of which was ever acted on. `.skill-proposals-pending.json` is left on disk
+  // untouched — nothing reads it now and nothing writes it.
 
-  return { warnings, pendingSkillProposals };
+  return { warnings };
 }

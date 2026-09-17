@@ -12,7 +12,6 @@ import type Database from "better-sqlite3";
 import { appendFileSync, mkdirSync, readFileSync, existsSync } from "fs";
 import { dirname } from "path";
 import { evaluateSession, type SessionEvaluation, type StrategyScore } from "./evaluate.js";
-import type { LifecycleSnapshot } from "../../lifecycle.js";
 import { SHADOW_STRATEGIES } from "./strategies.js";
 
 export interface ShadowLogEntry {
@@ -27,6 +26,10 @@ export interface ShadowLogEntry {
    * must not silently pool those with repaired ones.
    */
   as_of?: string | null;
+  /**
+   * Written by runs before Loop 10 C2 cut E9b. Optional and no longer emitted;
+   * historical JSONL rows still carry it and readers must tolerate both.
+   */
   snapshotted?: number;
   excluded_not_yet_created?: number;
 }
@@ -139,16 +142,15 @@ export interface ShadowStageInput {
   sessionUuid: string;
   logPath: string;
   limit?: number;
-  /**
-   * Lifecycle values as they stood BEFORE this session's auto-feedback ran.
-   * Without it Stage 6 ranks against maturity Stage 2 has just written, which is
-   * the production confound Loop 6 exists to remove.
-   */
-  snapshot?: LifecycleSnapshot;
+  // Loop 10 C2 (E9b): `snapshot` is SUSPENDED and gone. It carried lifecycle
+  // values as they stood before this session's auto-feedback ran, so the shadow
+  // stage did not rank against maturity the same session had just written. The
+  // ranking no longer reads maturity or success_rate — E3 and E4b were cut — so
+  // the confound cannot arise. IF E3/E18's TRIGGER FIRES, RESTORE THIS TOO.
 }
 
 export function runShadowStage(input: ShadowStageInput): ShadowStageResult {
-  const { db, sessionUuid, logPath, limit, snapshot } = input;
+  const { db, sessionUuid, logPath, limit } = input;
 
   if (!sessionUuid) {
     return { evaluated: false, skipped: "no session uuid", strategies: 0, queries: 0, leader: null };
@@ -156,7 +158,7 @@ export function runShadowStage(input: ShadowStageInput): ShadowStageResult {
 
   let evaluation: SessionEvaluation;
   try {
-    evaluation = evaluateSession(db, sessionUuid, { limit, snapshot });
+    evaluation = evaluateSession(db, sessionUuid, { limit });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return { evaluated: false, skipped: message, strategies: 0, queries: 0, leader: null };
@@ -180,7 +182,6 @@ export function runShadowStage(input: ShadowStageInput): ShadowStageResult {
       label_counts: evaluation.labelCounts,
       scores: evaluation.scores,
       as_of: evaluation.asOf,
-      snapshotted: evaluation.snapshotted,
       excluded_not_yet_created: evaluation.excludedAsNotYetCreated,
     });
   } catch {

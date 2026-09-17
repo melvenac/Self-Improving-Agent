@@ -96,21 +96,27 @@ describe('recall ranking', () => {
   });
 
   /**
-   * The suspension is a constant change, not a removal: the expression still
-   * applies the multipliers it is given. This pins that restoring the pre-R1
-   * values restores the pre-R1 behaviour, so the claim "fully reversible by
-   * restoring the constants" is proven here rather than asserted in a comment.
+   * Loop 10 C2 (E3): the maturity boost is gone from the ranking expression, so
+   * the test that pinned "restoring the constants restores the behaviour" went
+   * with it. This replaces it with the guarantee that now matters: maturity does
+   * not influence rank at all, which is what makes the deletion behaviour-
+   * preserving against the pre-deletion state where both boosts were 1.0.
    */
-  it('still applies the maturity boost when the pre-R1 constants are restored', () => {
+  it('ignores maturity entirely — it is no longer a ranking input', () => {
     add('progenitor.md', { ageDays: 30 });
     add('mature.md', { ageDays: 30, maturity: 'mature' });
     add('proven.md', { ageDays: 30, maturity: 'proven' });
 
-    expect(ranked({ matureBoost: 1.5, provenBoost: 1.2 })).toEqual([
-      'mature.md',
-      'proven.md',
-      'progenitor.md',
-    ]);
+    const rows = db.prepare(`
+      SELECT k.vault_path, ${recallRankExpr('k')} AS weighted_rank
+      FROM knowledge_fts JOIN knowledge_index k ON k.id = knowledge_fts.rowid
+      WHERE knowledge_fts MATCH 'alpha'
+    `).all() as Array<{ vault_path: string; weighted_rank: number }>;
+
+    expect(rows).toHaveLength(3);
+    // Same age, same tags, same text — so identical scores regardless of maturity.
+    expect(rows[0].weighted_rank).toBeCloseTo(rows[1].weighted_rank, 10);
+    expect(rows[1].weighted_rank).toBeCloseTo(rows[2].weighted_rank, 10);
   });
 
   it('demotes an entry whose success rate is below the apoptosis threshold', () => {
@@ -157,19 +163,17 @@ describe('recall ranking', () => {
     expect(ranked()).toContain('tagged.md');
   });
 
-  it('SQL maturity factors agree with maturityBoost()', () => {
-    // The SQL expression is generated from LIFECYCLE_CONFIG; assert the same
-    // constants drive the TypeScript helper so the two cannot drift.
+  it('builds the SQL from LIFECYCLE_CONFIG, and names neither maturity nor success_rate', () => {
     const sql = recallRankExpr('k');
-    expect(sql).toContain(String(LIFECYCLE_CONFIG.matureBoost));
-    expect(sql).toContain(String(LIFECYCLE_CONFIG.provenBoost));
-    expect(sql).toContain(String(LIFECYCLE_CONFIG.lowSuccessPenalty));
 
-    expect(maturityBoost('mature', null)).toBe(LIFECYCLE_CONFIG.matureBoost);
-    expect(maturityBoost('proven', null)).toBe(LIFECYCLE_CONFIG.provenBoost);
-    expect(maturityBoost('progenitor', null)).toBe(1.0);
-    expect(maturityBoost('mature', 0.1)).toBe(
-      LIFECYCLE_CONFIG.matureBoost * LIFECYCLE_CONFIG.lowSuccessPenalty
-    );
+    // The surviving constants still come from config rather than literals.
+    expect(sql).toContain(String(LIFECYCLE_CONFIG.failureBoost));
+    expect(sql).toContain(String(LIFECYCLE_CONFIG.recencyDecayPerDay));
+
+    // Loop 10 C2: asserted as an absence. A database created after this loop has
+    // no success_rate column, so an expression naming it would not merely rank
+    // wrongly — it would throw.
+    expect(sql).not.toContain('success_rate');
+    expect(sql).not.toContain('maturity');
   });
 });

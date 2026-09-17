@@ -65,7 +65,9 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkRules(options.projectRoot));
   checks.push(checkCommandParity(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
-  checks.push(checkStateSchema(version, options.projectRoot));
+  // Loop 10 R1: the runtime label travels with the check, because the same code
+  // passing in one process and failing in the other IS the signal.
+  checks.push(checkStateSchema(version, options.projectRoot, options.runtime ?? "cli"));
   // Loop 4: R6 view headers vs state.json revision, R4 master CI conclusion,
   // R7 conflict markers in tracked files. Each prints its number unconditionally.
   checks.push(checkStateViews(options.projectRoot));

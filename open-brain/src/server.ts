@@ -32,7 +32,7 @@ import { readActiveSession, activeSessionKey, currentIde, isStaleSession, sessio
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { slugify, archiveVaultNote } from "./vault-writer.js";
 import { findToolCallScaffolding, scaffoldRejectionMessage } from "./shared/content-guard.js";
-import { evaluateLifecycle, apoptosisFlaggedExpr, formatApoptosisQueue, recallRankExpr, type ApoptosisCandidate, type FeedbackEntry, type Rating, type Maturity } from "./lifecycle.js";
+import { recallRankExpr, type Rating, type Maturity } from "./lifecycle.js";
 import type { CategoryScore, ScoreResult } from "./pipelines/sync/types.js";
 
 // --- V2 Database singleton ---
@@ -118,7 +118,11 @@ export async function handleSync(args: {
   score?: boolean;
 }): Promise<ToolResponse> {
   try {
-    const result = runSync({ projectRoot: resolve(args.project_root ?? "."), checkOnly: args.check_only ?? false, score: args.score ?? false, scoreJson: false, history: false });
+    // Loop 10 R1: `runtime: "mcp-server"` is the point of calling sync from here.
+    // The state-schema check parses the live state.json with THIS process's loaded
+    // schema, so a failure here — where the CLI passes — is the schema-staleness
+    // signal that cost two loops of record-keeping.
+    const result = runSync({ projectRoot: resolve(args.project_root ?? "."), checkOnly: args.check_only ?? false, score: args.score ?? false, scoreJson: false, history: false, runtime: "mcp-server" });
     const projectRoot = result.projectRoot;
 
     const lines: string[] = [];
@@ -228,10 +232,6 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
       }
     }
 
-    if (result.health.pendingSkillProposals > 0) {
-      lines.push(`\nSkill proposals pending: ${result.health.pendingSkillProposals} cluster(s) ready for review.`);
-    }
-
     // Size block precedes the content so a reader sees what is coming before
     // it arrives. Estimator: chars/4 rounded up (see StateFileSize).
     lines.push(`\n## Sizes (tokens estimated as chars/4)`);
@@ -313,6 +313,20 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
       lines.push(`ob_state refused: ${r.error}`);
       if (r.revision_before >= 0) lines.push(`Revision: ${r.revision_before} (unchanged)`);
       lines.push(`Nothing written.`);
+      // Loop 10 R2 — the refusal names its remedy.
+      //
+      // Fail-closed is correct and stays. What was missing is that this was
+      // diagnosed only because the session holding the error also held the
+      // context for the schema change that caused it. A fresh reader sees
+      // "expected string, received undefined" and suspects the FILE, when the
+      // cause may be that this server process holds a schema older than the file
+      // — an MCP server keeps its schema for the life of the process, and only a
+      // human can reconnect it.
+      if (/schema|expected .* received|invalid/i.test(r.error ?? "")) {
+        lines.push(
+          `If the state schema changed this session, this server may be holding the old one: ask Aaron to run \`/mcp reconnect open-brain\`, then re-run \`ob_sync\` — its state-schema check reports which process parsed the file. Confirm by a read ordered after the write, never by the reconnect message: a stale server reports success.`,
+        );
+      }
       return { content: [{ type: "text", text: lines.join("\n") }], isError: true };
     }
     lines.push(`ob_state ${r.dry_run ? "dry run — nothing written" : "applied"}`);
@@ -397,7 +411,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     return {
       content: [{
         type: "text",
-        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Reflection: ${result.reflection.flagged} clusters flagged\n  Invocations: ${result.invocations.logged} logged\n  Skill scan: ${result.skillScan.clusters} clusters (${result.skillScan.pendingProposals} pending proposals)\n${shadowLine}\n\n${shadowReport}`,
+        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Invocations: ${result.invocations.logged} logged\n${shadowLine}\n\n${shadowReport}`,
       }],
     };
   } catch (err) {
@@ -435,7 +449,7 @@ export async function handleScore(args: {
       }
     } else {
       // Run checks to feed config score
-      const result = runSync({ projectRoot, checkOnly: true, score: false, scoreJson: false, history: false });
+      const result = runSync({ projectRoot, checkOnly: true, score: false, scoreJson: false, history: false, runtime: "mcp-server" });
       const scoreResult = computeScore(projectRoot, result.checks);
 
       lines.push(`Health Score: ${scoreResult.total}/100`);
@@ -661,7 +675,7 @@ server.tool(
         let sql = `
         SELECT
           k.id, k.key, k.content, k.tags, k.source, k.project_dir,
-          k.maturity, k.success_rate,
+          k.maturity,
           snippet(knowledge_fts, 1, '>>', '<<', '...', 128) as snippet,
           k.created_at,
           ${recallRankExpr("k")} as weighted_rank
@@ -692,7 +706,7 @@ server.tool(
       type RecallRow = {
         id: number; key: string | null; content: string; tags: string | null;
         source: string; project_dir: string | null; maturity: string;
-        success_rate: number | null; snippet: string; created_at: string;
+        snippet: string; created_at: string;
         weighted_rank: number;
       };
 
@@ -888,10 +902,10 @@ server.tool(
       // vault_path is selected for the apoptosis branch: the note has to be
       // archived before the row goes, and after the DELETE there is nothing
       // left to look it up from.
-      "SELECT id, key, content, tags, source, helpful, harmful, neutral, success_rate, maturity, vault_path FROM knowledge_index WHERE id = ?"
+      "SELECT id, key, content, tags, source, helpful, harmful, neutral, maturity, vault_path FROM knowledge_index WHERE id = ?"
     ).get(id) as {
       id: number; key: string | null; content: string; tags: string | null; source: string;
-      helpful: number; harmful: number; neutral: number; success_rate: number | null; maturity: string;
+      helpful: number; harmful: number; neutral: number; maturity: string;
       vault_path: string | null;
     } | undefined;
 
@@ -899,14 +913,11 @@ server.tool(
       return { content: [{ type: "text" as const, text: `Error: no knowledge entry with id ${id}.` }], isError: true };
     }
 
-    const feedbackEntry: FeedbackEntry = {
-      id: entry.id, helpful: entry.helpful, harmful: entry.harmful, neutral: entry.neutral,
-      success_rate: entry.success_rate, maturity: entry.maturity as Maturity, source: entry.source,
-    };
+    // Loop 10 C2: `evaluateLifecycle` is gone with E3, and apoptosis with E18.
+    // The rating is still recorded — the ratings path (E4) is KEEP — but nothing
+    // derives a maturity transition or a prune verdict from it any more.
 
-    const result = evaluateLifecycle(feedbackEntry, rating as Rating);
-
-    // Log the rating as an event before any apoptosis delete — the aggregate
+    // Log the rating as an event — the aggregate
     // counters carry no timestamps and no session, so this is the only record
     // that can tell the shadow harness which session judged what.
     const feedbackSession = writeSessionId();
@@ -918,57 +929,21 @@ server.tool(
       } catch { /* non-critical */ }
     }
 
-    if (result.autoDelete) {
-      // Archive rather than unlink: apoptosis fires with no human in the loop,
-      // so destroying a readable note automatically is the wrong default.
-      let archivedTo: string | null = null;
-      try {
-        archivedTo = archiveVaultNote(v2VaultDir(), entry.vault_path);
-      } catch { /* non-critical — still archive the row */ }
-
-      // Soft-delete. The row used to be hard-DELETEd here, which was the more
-      // destructive half of the same decision the note-archiving above already
-      // rejected: `feedback_log` and `recall_log` carry no foreign key, so the
-      // rating history that justified the prune survived as rows pointing at an
-      // id that no longer existed — unreachable, and indistinguishable from
-      // never having been rated. Retiring the row keeps the verdict auditable
-      // and makes the prune reversible by clearing one column.
-      //
-      // The counters are written in the same statement, so the archived row
-      // records the rating that crossed the threshold rather than the state
-      // just before it.
-      archiveKnowledgeEntry(v2db, id, {
-        rating: rating as Rating,
-        successRate: result.newSuccessRate,
-        maturity: result.newMaturity,
-      });
-
-      try {
-        const logPath = join(v2VaultDir(), ".vault-writer.log");
-        appendFileSync(logPath, `[${new Date().toISOString()}] APOPTOSIS: id=${id} key="${entry.key || ""}" ${result.transitionMessage}${archivedTo ? ` archived=${archivedTo}` : ""}\n`);
-      } catch { /* non-critical */ }
-      return {
-        content: [{
-          type: "text" as const,
-          text: `${result.transitionMessage}\nEntry ${id} (${entry.key || "no key"}) has been archived — it no longer appears in recall, lists, or stats.`
-            + (archivedTo ? `\nIts note was moved to Archive/.` : "")
-            + `\nNothing was destroyed: the row and its rating history remain. To restore it, clear archived_into; to remove it for good, use ob_forget.`,
-        }],
-      };
-    }
+    // Loop 10 C2 (E18): the apoptosis auto-delete arm that stood here is gone. It
+    // never fired — `archived_into` non-null was 0 rows across the whole corpus —
+    // because it gated on a success rate that excluded neutral and therefore read
+    // 1.0 for almost everything ever rated. `ob_forget` remains the way to retire
+    // an entry, with a human in the loop, which is what actually happened.
 
     const col = rating; // v2 columns: helpful, harmful, neutral
     v2db.prepare(`
-      UPDATE knowledge_index SET ${col} = ${col} + 1, success_rate = ?, maturity = ?, updated_at = datetime('now') WHERE id = ?
-    `).run(result.newSuccessRate, result.newMaturity, id);
+      UPDATE knowledge_index SET ${col} = ${col} + 1, updated_at = datetime('now') WHERE id = ?
+    `).run(id);
 
     const lines = [
       `Feedback recorded for entry ${id} (${entry.key || "no key"}): ${rating}`,
       `Counts: ${entry.helpful + (rating === "helpful" ? 1 : 0)} helpful, ${entry.harmful + (rating === "harmful" ? 1 : 0)} harmful, ${entry.neutral + (rating === "neutral" ? 1 : 0)} neutral`,
-      `Success rate: ${result.newSuccessRate !== null ? result.newSuccessRate.toFixed(2) : "N/A"}`,
-      `Maturity: ${result.newMaturity}`,
     ];
-    if (result.transitionMessage) lines.push(`Lifecycle: ${result.transitionMessage}`);
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };
   }
@@ -1030,7 +1005,7 @@ server.tool(
     const v2db = getV2Db();
     const normalizedProject = canonicalizeProjectDir(project);
 
-    let sql = "SELECT id, key, content, tags, source, project_dir, created_at, maturity, success_rate FROM knowledge_index WHERE archived_into IS NULL";
+    let sql = "SELECT id, key, content, tags, source, project_dir, created_at, maturity FROM knowledge_index WHERE archived_into IS NULL";
     const params: unknown[] = [];
     if (normalizedProject) {
       sql += " AND (project_dir IS NULL OR project_dir LIKE ?)";
@@ -1042,7 +1017,7 @@ server.tool(
     const entries = v2db.prepare(sql).all(...params) as Array<{
       id: number; key: string | null; content: string; tags: string | null;
       source: string; project_dir: string | null; created_at: string;
-      maturity: string; success_rate: number | null;
+      maturity: string;
     }>;
 
     if (entries.length === 0) {
@@ -1130,17 +1105,10 @@ server.tool(
       `Schema: code v${_schemaSkew?.codeVersion ?? "?"}, database v${_schemaSkew?.dbVersion ?? "?"}${_schemaSkew?.writerIsStale ? " — STALE WRITER" : ""}`,
     ];
 
-    // Entries that crossed the apoptosis threshold and survived because they
-    // were stored manually. Until now "flagged for review" appeared only in the
-    // one ob_feedback response that crossed the line, so the review queue could
-    // not be listed at all.
-    const flagged = v2db.prepare(
-      `SELECT id, key, helpful, harmful, success_rate FROM knowledge_index k
-       WHERE archived_into IS NULL AND ${apoptosisFlaggedExpr("k")}
-       ORDER BY success_rate ASC, (helpful + harmful) DESC`
-    ).all() as ApoptosisCandidate[];
-
-    lines.push(...formatApoptosisQueue(flagged));
+    // Loop 10 C2 (E18): the apoptosis review queue is gone with the gate that fed
+    // it. It listed entries that had crossed a threshold on `success_rate` — a
+    // rate that excluded neutral, and so read 1.0 for almost everything. Loop 9
+    // measured the resulting penalty firing on 2 entries out of 554.
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };
   }
@@ -1252,8 +1220,8 @@ server.tool(
     const result = v2db.prepare(`
       INSERT INTO knowledge_index
         (vault_path, key, content, tags, source, project_dir, maturity,
-         helpful, harmful, neutral, success_rate, recall_count, last_recalled_at, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, 'progenitor', 0, 0, 0, NULL, 0, NULL, ?, ?)
+         helpful, harmful, neutral, recall_count, last_recalled_at, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, 'progenitor', 0, 0, 0, 0, NULL, ?, ?)
     `).run(vaultPath, key, content, [category, ...tags || []].join(", "), category, normalizedProject, now, now);
 
     const id = Number(result.lastInsertRowid);

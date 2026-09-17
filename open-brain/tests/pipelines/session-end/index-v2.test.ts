@@ -224,33 +224,6 @@ describe("sessionEndV2", () => {
     });
   });
 
-  it("flags reflection clusters when 3+ entries share a tag", () => {
-    // Seed 3 entries with the same tag to trigger cluster detection
-    for (let i = 1; i <= 3; i++) {
-      indexKnowledge(db, {
-        vaultPath: `/vault/Experiences/test/entry-${i}.md`,
-        key: `entry-${i}`,
-        tags: "shared-tag,other",
-        content: `Entry ${i} content`,
-      });
-    }
-
-    const input = makeInput(db, vaultDir, agentsDir);
-    const result = sessionEndV2(input);
-
-    expect(result.reflection.flagged).toBeGreaterThan(0);
-
-    const queuePath = path.join(agentsDir, "reflection-queue.json");
-    expect(fs.existsSync(queuePath)).toBe(true);
-
-    const queue = JSON.parse(fs.readFileSync(queuePath, "utf-8"));
-    expect(queue.clusters).toBeDefined();
-    const sharedTagCluster = queue.clusters.find(
-      (c: { tag: string }) => c.tag === "shared-tag"
-    );
-    expect(sharedTagCluster).toBeDefined();
-  });
-
   it("skips vault writes in dry-run mode", () => {
     // Seed an entry so feedback can still run
     indexKnowledge(db, {
@@ -283,22 +256,24 @@ describe("sessionEndV2", () => {
     expect(result.feedback.processed).toBe(1);
     expect(result.feedback.ratings[0].rating).toBe("helpful");
 
-    // Reflection queue should NOT be written
-    const queuePath = path.join(agentsDir, "reflection-queue.json");
-    expect(fs.existsSync(queuePath)).toBe(false);
-    expect(result.reflection.flagged).toBe(0);
   });
 });
 
 /**
- * Loop 9 R1 — the generator end of the skill-scan disablement.
+ * Loop 10 C2 — the skill scan and its proposal machinery are CUT.
  *
- * Paired with tests/pipelines/session-start/skill-scan-off.test.ts, which covers
- * the reporting end. The acceptance condition is both ends quiet together: a
- * session end that still wrote the pending file, or a session start that still
- * read it, would each on their own reinstate the queue this ruling removes.
+ * Loop 9 R1 had already switched the generator off behind a flag; this loop
+ * removed the code, because six months of operation produced 0 skills from 39
+ * proposals none of which was ever acted on. These tests survive the deletion
+ * because what they assert is still the guarantee that matters and is now
+ * structural rather than flag-gated: a session end writes no pending file, and
+ * it does not touch one left over from before. The third test in this block
+ * pinned `result.skillScan`, a field that no longer exists, and went with it.
+ *
+ * `.skill-proposals-pending.json` is deliberately never deleted — the scan was
+ * derived, not a store.
  */
-describe("sessionEndV2 with the skill scan disabled (Loop 9 R1)", () => {
+describe("sessionEndV2 after the skill scan was cut (Loop 10 C2)", () => {
   let db: Database.Database;
   let vaultDir: string;
   let agentsDir: string;
@@ -332,16 +307,6 @@ describe("sessionEndV2 with the skill scan disabled (Loop 9 R1)", () => {
       );
     }
   }
-
-  it("runs clean and reports a zero scan without invoking the generator", () => {
-    seedClusterableNotes();
-    const result = sessionEndV2(makeInput(db, vaultDir, agentsDir, {
-      sessionSummary: "a session that would previously have triggered a scan",
-      project: "my-project",
-    }));
-
-    expect(result.skillScan).toMatchObject({ clusters: 0, pendingProposals: 0, approaching: 0 });
-  });
 
   it("writes neither the pending marker nor SKILL-CANDIDATES.md", () => {
     seedClusterableNotes();

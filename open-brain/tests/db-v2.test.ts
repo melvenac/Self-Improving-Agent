@@ -38,7 +38,8 @@ describe('db-v2 schema', () => {
     expect(tables).toContain('sessions');
     expect(tables).toContain('chunks');
     expect(tables).toContain('knowledge_index');
-    expect(tables).toContain('reflection_log');
+    // Loop 10 C2: reflection_log is CUT and new databases no longer declare it.
+    expect(tables).not.toContain('reflection_log');
   });
 
   it('creates knowledge_index with vault_path column', () => {
@@ -106,15 +107,15 @@ describe('db-v2 schema', () => {
     expect(chunk.category).toBe('prompt');
   });
 
-  it('creates reflection_log table', () => {
+  it('does not create reflection_log — CUT in Loop 10 C2', () => {
     initSchemaV2(db);
 
-    const columns = db.pragma('table_info(reflection_log)').map((c: any) => c.name);
+    // It held 0 rows after six months: it never once recorded anything. Asserted
+    // as an absence rather than deleted outright, so a future reinstatement has
+    // to argue with a failing test rather than slip in unnoticed.
+    const columns = db.pragma('table_info(reflection_log)') as unknown[];
 
-    expect(columns).toContain('cluster_tag');
-    expect(columns).toContain('source_ids');
-    expect(columns).toContain('result');
-    expect(columns).toContain('created_at');
+    expect(columns).toHaveLength(0);
   });
 });
 

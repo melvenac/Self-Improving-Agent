@@ -133,6 +133,19 @@ Pick what applies, delete the rest, and customize.
 - **Commit messages:** Use conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
 - **PR size:** Keep PRs small and focused (< 400 lines when possible)
 
+### A release tag and a session close-out must not share a branch
+
+The close-out goes in **its own PR off the default branch**, after the release PR merges.
+
+**Why, and it is by construction rather than by accident.** A release branch is reviewed and
+signed off at a frozen commit. Committing the session close-out onto that same branch moves
+it, so the commit the reviewer verified and the commit the PR points at **diverge every
+time** — not when someone is careless, but always. A sign-off does not transfer across an
+amend, and here the amend is guaranteed rather than possible.
+
+**The sequence:** freeze → review read-only → tag → PR → merge → *then* a separate close-out
+PR off the updated default branch. If the tree moves after a freeze, say so.
+
 ---
 
 ## Agent-Specific Rules

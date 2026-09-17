@@ -99,9 +99,7 @@ try {
     const genLabel = result.summary.selfGenerated ? " (self-generated)" : "";
     console.log(`[session-end] Summary: ${result.summary.written ? "written" : "skipped"}${genLabel}`);
     console.log(`[session-end] Feedback: ${result.feedback.processed} entries`);
-    console.log(`[session-end] Reflection: ${result.reflection.flagged} clusters flagged`);
     console.log(`[session-end] Invocations: ${result.invocations.logged} logged`);
-    console.log(`[session-end] Skill scan: ${result.skillScan.clusters} clusters`);
   } finally {
     db.close();
   }

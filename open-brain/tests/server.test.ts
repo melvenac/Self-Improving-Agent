@@ -19,7 +19,8 @@ function proseProject(tmp: string): void {
   writeFileSync(join(tmp, ".agents", "SESSIONS", "next-session.md"), "# Handoff\nPROSE-NEXT-MARKER");
   writeFileSync(join(tmp, ".agents", "SESSIONS", "SESSION_TEMPLATE.md"), "# Session N — [Date]\n> **Status:** In Progress\n");
 }
-import { createDb } from "../src/db.js";
+import Database from "better-sqlite3";
+import { initSchemaV2, indexKnowledge } from "../src/db-v2.js";
 
 function getText(response: { content: { type: string; text: string }[] }): string {
   return response.content[0].text;
@@ -325,10 +326,18 @@ describe("server handlers", () => {
       // Create a minimal project structure
       writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "1.0.0" }));
 
-      // Create an in-memory DB at a temp path
+      // Create a scratch DB at a temp path. Loop 10 C2 (E29): this used the v1
+      // `createDb`, which production does not use; repointed at `db-v2`.
       const dbPath = join(tmp, "knowledge.db");
-      const db = createDb(dbPath);
-      db.insertKnowledge("test entry about auth", { key: "auth-test", tags: ["auth"] });
+      const db = new Database(dbPath);
+      initSchemaV2(db);
+      indexKnowledge(db, {
+        vaultPath: join(tmp, "auth-test.md"),
+        key: "auth-test",
+        content: "test entry about auth",
+        tags: "auth",
+        source: "manual",
+      });
       db.close();
 
       // handleEnd opens its own DB at $KNOWLEDGE_V2_DB, which setup-env.ts points

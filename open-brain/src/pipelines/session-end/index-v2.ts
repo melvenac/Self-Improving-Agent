@@ -4,15 +4,11 @@ import { writeSummary } from "../../vault-writer.js";
 import {
   updateFeedbackV2,
   recordFeedbackEvent,
-  captureLifecycleSnapshot,
   type RatingOrigin,
   type RatingMethod,
 } from "../../db-v2.js";
-import { flagReflectionClusters } from "./reflection.js";
 import { getSessionSummary } from "./session-summary.js";
 import { logInvocations } from "./invocation-logger.js";
-import { runSkillScanPipeline } from "./skill-scan-runner.js";
-import { SKILL_SCAN_ENABLED } from "../../shared/skill-scan-flag.js";
 import { planTopics, writeTopics, findOrphans } from "../topics/index.js";
 import { runShadowStage, type ShadowStageResult } from "../shadow/index.js";
 
@@ -78,9 +74,7 @@ export interface SessionEndV2Input {
 interface SessionEndV2Result {
   summary: { written: boolean; selfGenerated: boolean };
   feedback: { processed: number; ratings: Array<{ id: number; rating: string }> };
-  reflection: { flagged: number };
   invocations: { logged: number; skippedSessions: number };
-  skillScan: { clusters: number; pendingProposals: number; approaching: number };
   topics: { written: number; removed: number; orphans: number };
   shadow: ShadowStageResult;
 }
@@ -119,15 +113,12 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   }
 
   // ── Stage 2: Auto-feedback ───────────────────────────────────────────────────
-  // Capture lifecycle state BEFORE any rating is written. Stage 6 scores this
-  // session's ranking against this session's labels, and Stage 2 is what creates
-  // those labels — so without this capture the shadow harness compares strategies
-  // against maturity values its own ground truth has just moved, and an entry
-  // rated helpful here is measured as though it had already been promoted.
-  //
-  // `recalledEntryIds` is the exact and complete set of ids Stage 2 can touch, so
-  // a wider snapshot would cost more and pin nothing extra.
-  const preFeedbackSnapshot = captureLifecycleSnapshot(db, recalledEntryIds);
+  // Loop 10 C2 (E9b): the pre-feedback lifecycle capture that stood here is
+  // suspended and gone. It existed because the shadow stage scored this session's
+  // ranking against this session's own labels, so ranking had to be pinned to the
+  // state before Stage 2 wrote to it. Ranking no longer reads maturity or
+  // success_rate, so there is nothing left for Stage 2 to move underneath it.
+  // IF E3/E18's TRIGGER FIRES, THE CAPTURE COMES BACK IN THE SAME CHANGE.
 
   const ratings: Array<{ id: number; rating: string }> = [];
   const summaryLower = sessionSummary.toLowerCase();
@@ -175,27 +166,19 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     ratings.push({ id, rating });
   }
 
-  // ── Stage 3: Reflection flagging ─────────────────────────────────────────────
-  let flagged = 0;
-  if (!dryRun) {
-    const queuePath = join(agentsDir, "reflection-queue.json");
-    const result = flagReflectionClusters(db, queuePath);
-    flagged = result.flagged;
-  }
+  // Loop 10 C2: the reflection queue is CUT. `reflection_log` held 0 rows after
+  // six months — it never once recorded anything — so the stage that wrote it is
+  // gone rather than switched off.
+  //
+  // Loop 10 C2: the skill scan and its proposal machinery are CUT. Loop 9 R1 had
+  // already turned the generator off; six months of operation produced 0 skills
+  // from 39 proposals none of which was ever acted on. The vault notes it
+  // clustered over are untouched — the scan was derived, not a store.
 
-  // ── Stage 4: Invocation logging ──────────────────────────────────────────────
+  // ── Stage 3: Invocation logging ──────────────────────────────────────────────
   const invocationResult = dryRun ? { logged: 0, skippedSessions: 0 } : logInvocations();
 
-  // ── Stage 5: Skill scan ─────────────────────────────────────────────────────
-  // Loop 9 R1: off by ruling. The generator does not run, so nothing writes
-  // .skill-proposals-pending.json. Reversible by SKILL_SCAN_ENABLED alone; the
-  // vault notes it clusters over are untouched either way.
-  const skillScanResult =
-    dryRun || !SKILL_SCAN_ENABLED
-      ? { clusters: 0, pendingProposals: 0, approaching: 0 }
-      : runSkillScanPipeline();
-
-  // ── Stage 6: Shadow recall ──────────────────────────────────────────────────
+  // ── Stage 4: Shadow recall ──────────────────────────────────────────────────
   // Must run after Stage 2 so this session's own relevance labels already exist:
   // evaluate.ts skips a session with no helpful ratings, so running this first
   // would skip every session forever. The order is the dependency, not an
@@ -214,7 +197,6 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
           db,
           sessionUuid: sessionId,
           logPath: input.shadowLogPath,
-          snapshot: preFeedbackSnapshot,
         });
 
   // ── Stage 7: Topics ─────────────────────────────────────────────────────────
@@ -238,9 +220,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   return {
     summary: { written: summaryWritten, selfGenerated },
     feedback: { processed: ratings.length, ratings },
-    reflection: { flagged },
     invocations: invocationResult,
-    skillScan: skillScanResult,
     shadow,
     topics,
   };
