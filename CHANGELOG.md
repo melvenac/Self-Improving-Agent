@@ -1,5 +1,97 @@
 # Changelog
 
+## [0.37.0] - 2026-09-17 — make deletion a pipeline, not an intention
+
+**Loop 11 found 38 defects across 77 instruction files and 25 of them were references to things the
+protocol deleted itself.** Deletion is a discrete event, so this loop put a procedure around it.
+
+### The record already existed, in prose, and it changed nothing
+
+`.agents/LIFECYCLE.md` has a **Component Log**. It is tracked. It has been correct since April:
+`2026-04-16 | /recall | PRUNED | Absorbed into /start`. **The `/recall` reference in the gotchas
+skill survived to v0.36.0 anyway** — five months, thirty-four minor versions, eleven loops, and an
+audit of 77 instruction files looking for exactly that class — **because nothing read it.** That is
+Loop 11's rule 4 in one artifact: every containment that worked was a command, every containment
+that failed was an intention. The log was an intention.
+
+`.agents/retirements.json` is that log as data, plus the one thing prose could never carry:
+**`allowed_referrers`, captured at retirement time.** It cannot be derived afterwards, because a
+retired name in prose is textually identical whether it is a defect or an obituary.
+
+### `command-names` (C2) — resolve `/name` against the commands that exist
+
+Shipped **red on real defects, never a scratch input**, and the repair isolated in its own commit so
+the failure is reproducible from history rather than asserted in prose.
+
+- **`/skill-scan`** — root `README.md` listed it in the live Commands table for two loops after the
+  cut. `e0b2fc8` repaired `project-template/README.md` and missed the front door. **The repair
+  reached what ships and missed what runs**, exactly inverting Loop 11's finding.
+- **`/recall`** — cut in **v0.2.0**, referenced at **v0.36.0**.
+- `README.md` also named `reflection` and `skill-scan` as live pipeline stages, and claimed 38 sync
+  checks against 26. **"5-stage pipeline" was accidentally right by COUNT** — the file labels stages
+  1, 2, 3, 4 and 7 — while two of its five names were cut components and two real stages were
+  missing. A number correct for the wrong reason is the hardest kind to catch.
+
+### `retirements` (C3) — the check that reads the record on every `/sync`
+
+- **`dream` is worse than `/skill-scan` was.** Loop 10 deleted `src/pipelines/dream/`; `README.md`
+  kept a 32-line section with three runnable command lines, and **`cli.ts`'s own usage block kept
+  advertising the subcommand.** A CLI's help is the nearest thing a subcommand has to a registry, and
+  it was a hand-maintained list beside the dispatch rather than derived from it.
+- Entries are **global**, not per referent class: a class with no registry would otherwise have no
+  entry and the record would under-cover silently.
+- **An empty record is an issue, not a pass** — an empty record passing is the same defect as a check
+  nobody has seen fail.
+- **Case sensitivity is per retirement and strict by default**, after `KB_PATH` — a live variable —
+  matched the retired `kb_*` **tool** prefix. Rule 8 inside the check written to enforce it.
+
+### The build prunes
+
+`tsc` never deletes stale output, so G-025's class was guaranteed to recur after every cut.
+`prebuild` now removes `build/` first. **Demonstrated, not asserted:** planted the two files G-025
+names, orphan count 2 → 0.
+
+### What did NOT ship, and why that is the result
+
+**File paths were built first and declined.** Over the same surface a path check produced six
+findings and **one** was real; the other five were prose naming a missing path *correctly* — an
+obituary, an example, a conditional. **The difference is a registry:** tool names have one, command
+names have one, file paths do not, and the filesystem is not one because a registry is a closed list
+of what exists *and may be named*.
+
+**The first gate hid the defects.** "Only flag a path whose parent exists" dropped the noise to zero
+and suppressed the two paths Loop 11 explicitly names as what a path check would have caught. Found
+by listing what the gate removed instead of trusting the smaller number.
+
+### C4 — the mailbox retirement, measured but not executed
+
+| | found | real | false |
+|---|---|---|---|
+| pipeline, unaided | 11 | **11** | **0** |
+| manual sweep, beyond it | 7 | 2 | **5** |
+
+**100% precision against 29%.** All five phantoms were `INBOX` — the *task* inbox. **The pipeline's
+entire blind spot is one nameable boundary, the repo root**, and both real misses are command mirrors
+under `~/` that the same check would reach if pointed there. A closeable gap, not a capability limit.
+**Swept together this reports "18 referrers" and hides both the precision and the gap. The order was
+the experiment.**
+
+**Execution stopped on scope.** `~/.agents/mailbox/` serves **nine channels, eight non-empty** —
+`a2a-hub`, `coop-mailer`, `foundry`, `nexcrm`, `openlaser`, `sia`, `TCM`, `worthit` and an empty
+`gitnexus` — 51 files under `channels/`, 33 of them outside `sia`. Aaron ruled on the channel in
+front of him; executing it as written deletes seven other projects' coordination state. Held for his
+ruling.
+
+### Declined and reported rather than closed
+
+- **`success_rate`, the maturity lifecycle and `apoptosis` are not in the record.** `lifecycle.ts` is
+  still live and imported by four modules: the behaviour was cut, the type and vocabulary were not.
+  Recording them as finished would make the check green on an unfinished retirement.
+- **`enableHeuristicRatings` is gated off for a reason Loop 10 cut.** Stated as the record has it,
+  with no new justification invented; the question is logged for Aaron.
+- **`sync.md`'s `docs/PRD.md`** stays open. A wrong path is not a retirement, and stretching the
+  mechanism to cover it would close a number and break the definition.
+
 ## [0.36.0] - 2026-09-17 — the instruction surface
 
 **Does each command do what it says?** Loop 10 ruled on the memory layer's code and never looked at
