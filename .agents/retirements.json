@@ -399,6 +399,33 @@
         "~/.cursor/commands/start.md"
       ],
       "out_of_repo_note": "Repaired by hand and listed here because the check cannot see outside projectRoot. THIS IS THE WHOLE OF C4’s MEASURED BLIND SPOT: one nameable boundary, closeable by pointing the check at the four command mirrors as command-names already is."
+    },
+    {
+      "id": "R-010",
+      "name": "enableHeuristicRatings / the heuristic rating arm",
+      "pattern": "enableHeuristicRatings|heuristic rating arm",
+      "event": "flag-removed",
+      "classes": [
+        "flag",
+        "symbol",
+        "enum-value",
+        "prose"
+      ],
+      "ruled": "2026-09-17",
+      "ruled_by": "Aaron, Loop 12",
+      "note": "IT NEVER RAN. Zero rows across the entire life of the rating_method column — confirmed against the live database, not taken from V-018: 636 rows, 347 pre-column NULL, 267 direct, 22 supplied, 0 heuristic. What it fed was already gone: it produced ratings driving success_rate and maturity, both cut in Loop 10. And the mechanism was this loop's own defect class in production code — it rated an entry helpful when one of its tags appeared as a SUBSTRING of the session summary, which is rule 8 shipped. Leaving it gated off with an honest note would have preserved a live flag with a dead justification forever, in the codebase of the loop that removes exactly that. The `heuristic` value is out of the RatingMethod type and out of RATING_METHODS, so recordFeedbackEvent now coerces a stray caller to `unspecified` rather than minting a value the type no longer has.",
+      "allowed_referrers": [
+        {
+          "path": "open-brain/src/cli-session-end.ts",
+          "class": "prose",
+          "why": "obituary — records that the arm produced zero rows, which is why the uuid bug was invisible"
+        },
+        {
+          "path": "open-brain/tests/pipelines/session-end/index-v2.test.ts",
+          "class": "test",
+          "why": "the describe block that pinned the gate now pins the cut"
+        }
+      ]
     }
   ],
   "$declined": {

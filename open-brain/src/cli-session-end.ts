@@ -32,7 +32,7 @@ const V2_VAULT = obsidianVaultDir();
 // was not a missing label but a silent no-op: resolveRecalledIds got a null
 // session, could not match recall_log, and (since Loop 5 removed the
 // .recalled-entries.json write) resolved nothing, so Stage 2's loop body never
-// executed. The heuristic rating arm has therefore produced zero rows in the
+// executed. The heuristic rating arm therefore produced zero rows in the
 // entire life of the rating_method column — see
 // ~/Obsidian Vault v2/Research/loop-7-c1-reconciliation-2026-09-15.md §2.
 //

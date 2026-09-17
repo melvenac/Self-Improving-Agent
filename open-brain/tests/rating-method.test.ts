@@ -72,44 +72,42 @@ describe("rating_method", () => {
     expect(methods()).toEqual([{ knowledge_id: id, rating: "harmful", rating_method: "supplied" }]);
   });
 
-  it("labels the tag-substring fallback 'heuristic'", () => {
-    const id = seed("heuristic-entry", "alpha");
+  // R-010: the tag-substring fallback is CUT. These two tests used to pin what
+  // it LABELLED; they now pin that it cannot produce a row at all. A summary
+  // that would once have matched is the point — the silence is the cut, not a
+  // failed substring test.
+  it("writes nothing for an entry the agent did not judge", () => {
+    const id = seed("unjudged-entry", "alpha");
     recordSession(db, "s1", null);
 
     sessionEndV2({
       db, vaultDir: vault, agentsDir: agents, sessionId: "s1",
       sessionSummary: "this summary mentions alpha", project: "General",
       recalledEntryIds: [id], dryRun: false,
-      // The arm is gated off by default (Loop 7 R2); this test is about what it
-      // labels when it does run, so it opts in.
-      enableHeuristicRatings: true,
     });
 
-    // 'helpful' here means "tag mentioned in summary", not "worked" — which is
-    // exactly why the arm has to be recorded alongside the verdict.
-    expect(methods()).toEqual([{ knowledge_id: id, rating: "helpful", rating_method: "heuristic" }]);
+    expect(methods()).toEqual([]);
   });
 
-  it("separates a supplied neutral from a heuristic neutral — the ambiguity this exists to remove", () => {
+  it("the supplied/heuristic neutral ambiguity is gone by construction, not by labelling", () => {
     const supplied = seed("judged-neutral", "alpha");
-    const fellThrough = seed("defaulted-neutral", "beta");
+    const unjudged = seed("defaulted-neutral", "beta");
     recordSession(db, "s1", null);
 
     sessionEndV2({
       db, vaultDir: vault, agentsDir: agents, sessionId: "s1",
-      sessionSummary: "mentions nothing", project: "General",
-      recalledEntryIds: [supplied, fellThrough],
+      sessionSummary: "mentions alpha and beta", project: "General",
+      recalledEntryIds: [supplied, unjudged],
       entryRatings: { [supplied]: "neutral" },
       dryRun: false,
-      // The contrast this test draws needs the fallback arm to produce its half.
-      enableHeuristicRatings: true,
     });
 
-    const rows = methods();
-    // Identical verdicts, different arms. Before this column these were one row.
-    expect(rows.every((r) => r.rating === "neutral")).toBe(true);
-    expect(rows.find((r) => r.knowledge_id === supplied)?.rating_method).toBe("supplied");
-    expect(rows.find((r) => r.knowledge_id === fellThrough)?.rating_method).toBe("heuristic");
+    // The column was added to tell two neutrals apart. Only one arm can write
+    // now, so the ambiguity is removed at the source rather than annotated:
+    // every neutral in the log is a rater's considered neutral.
+    expect(methods()).toEqual([
+      { knowledge_id: supplied, rating: "neutral", rating_method: "supplied" },
+    ]);
   });
 
   it("defaults an unlabelled caller to 'unspecified', never to a judgment", () => {

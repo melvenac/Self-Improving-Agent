@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import { sessionEndV2, type SessionEndV2Input } from "../../../src/pipelines/session-end/index-v2.js";
-import { initSchemaV2, indexKnowledge } from "../../../src/db-v2.js";
+import { initSchemaV2, indexKnowledge, recordFeedbackEvent } from "../../../src/db-v2.js";
 
 function makeTempDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), "session-end-v2-"));
@@ -97,9 +97,9 @@ describe("sessionEndV2", () => {
     const input = makeInput(db, vaultDir, agentsDir, {
       sessionSummary: "Worked on typescript patterns and interfaces today",
       recalledEntryIds: [entryId],
-      // This test is about the fallback arm's behaviour, so it opts in. The arm
-      // is off by default — see the gate tests below.
-      enableHeuristicRatings: true,
+      // The fallback arm is CUT (R-010), so an explicit judgment is the only
+      // input that produces a rating at all.
+      entryRatings: { [entryId]: "helpful" as const },
     });
 
     const result = sessionEndV2(input);
@@ -130,14 +130,14 @@ describe("sessionEndV2", () => {
     sessionEndV2(makeInput(db, vaultDir, agentsDir, {
       recalledEntryIds: [withOrigin],
       recalledOrigin: "recall-log",
-      enableHeuristicRatings: true,
+      entryRatings: { [withOrigin]: "helpful" as const },
     }));
 
     const withoutOrigin = seed("origin-absent");
     sessionEndV2(makeInput(db, vaultDir, agentsDir, {
       sessionId: "test-session-002",
       recalledEntryIds: [withoutOrigin],
-      enableHeuristicRatings: true,
+      entryRatings: { [withoutOrigin]: "helpful" as const },
     }));
 
     const origins = db
@@ -155,7 +155,7 @@ describe("sessionEndV2", () => {
   // worked — into a success_rate whose corpus mean (0.311) sits a hundredth
   // above the apoptosis threshold (0.3). The repair and the switch-on are kept
   // separate deliberately; these tests pin that separation.
-  describe("heuristic rating arm gate", () => {
+  describe("heuristic rating arm — CUT in Loop 12 (R-010)", () => {
     const seedEntry = (key: string) => {
       indexKnowledge(db, {
         vaultPath: `/vault/Experiences/test/${key}.md`,
@@ -207,20 +207,31 @@ describe("sessionEndV2", () => {
       expect(row).toEqual({ rating: "harmful", rating_method: "supplied" });
     });
 
-    it("rates via the fallback only when explicitly enabled", () => {
-      const entryId = seedEntry("gated-on");
+    // R-010: the arm is CUT, not gated. There is no longer an input that turns
+    // it on, so a summary that would once have matched now rates nothing — and
+    // `heuristic` is gone from the vocabulary rather than merely unused.
+    it("cannot be switched back on, and heuristic is out of the vocabulary", () => {
+      const entryId = seedEntry("arm-cut");
 
       const result = sessionEndV2(makeInput(db, vaultDir, agentsDir, {
+        // Would have matched the tag under the old fallback.
         sessionSummary: "Worked on typescript all day",
         recalledEntryIds: [entryId],
-        enableHeuristicRatings: true,
       }));
 
-      expect(result.feedback.ratings).toEqual([{ id: entryId, rating: "helpful" }]);
+      expect(result.feedback.ratings).toHaveLength(0);
 
-      const row = db.prepare("SELECT rating_method FROM feedback_log").get() as
+      const rows = db.prepare("SELECT COUNT(*) c FROM feedback_log").get() as { c: number };
+      expect(rows.c).toBe(0);
+
+      // `heuristic` is out of the vocabulary, so the writer no longer accepts
+      // it. It COERCES rather than throws — read from the implementation, not
+      // assumed — so a stray caller degrades to `unspecified` instead of
+      // quietly minting a value the type no longer has.
+      recordFeedbackEvent(db, "s", entryId, "helpful", "unspecified", "heuristic" as never);
+      const written = db.prepare("SELECT rating_method FROM feedback_log").get() as
         { rating_method: string };
-      expect(row.rating_method).toBe("heuristic");
+      expect(written.rating_method).toBe("unspecified");
     });
   });
 
@@ -242,7 +253,7 @@ describe("sessionEndV2", () => {
       recalledEntryIds: [row.id],
       dryRun: true,
       // Asserts feedback still runs under dryRun, which needs a rating to exist.
-      enableHeuristicRatings: true,
+      entryRatings: { [row.id]: "helpful" as const },
     });
 
     const result = sessionEndV2(input);

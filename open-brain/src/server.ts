@@ -1070,9 +1070,9 @@ server.tool(
     ).all() as Array<{ o: string; count: number }>;
 
     // Which ARM produced each rating, crossed with the verdict. This is the
-    // census the lifecycle work is blocked on: `heuristic` rows come from a
-    // tag-substring topic-mention detector that cannot emit `harmful`, so a
-    // `helpful` there means "mentioned", not "worked". Crossed rather than
+    // census the lifecycle work is blocked on. The `heuristic` arm that would
+    // have skewed it was CUT in Loop 12 (R-010) having never written a row, so
+    // every row here came from a judgment rather than a topic-mention detector. Crossed rather than
     // summed because the interesting cell is `supplied` x `harmful` — the only
     // combination that can ever make an apoptosis threshold satisfiable.
     const methodCensus = v2db.prepare(
@@ -1097,7 +1097,7 @@ server.tool(
       ``,
       `Rating method x verdict:`,
       ...methodCensus.map(r => `  ${r.m} / ${r.r}: ${r.count}`),
-      `  (heuristic cannot produce 'harmful' — a helpful there means "tag mentioned in summary")`,
+      `  (the heuristic arm was cut in Loop 12 and never wrote a row; NULL means pre-column)`,
       ``,
       // Unconditional, including at zero — a line that only appears when
       // something went wrong reads identically to a healthy silence.

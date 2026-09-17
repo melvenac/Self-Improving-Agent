@@ -163,7 +163,7 @@ Start a Claude Code session and run `/start`. You should see:
 | Hook | Trigger | What it does |
 |---|---|---|
 | `open-brain/build/cli-bootstrap.js` | SessionStart | Auto-detects project, emits `SESSION_UUID`, runs health checks, surfaces skill proposals |
-| `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: session summary, auto-feedback, invocation logging, shadow recall, topics — numbered 1–4 and 7 in `index-v2.ts`, because stages 5 and 6 were cut in Loop 10. **Auto-feedback rates only entries the agent judged explicitly** — the tag-substring fallback is gated off (`enableHeuristicRatings`, default false). The reason originally given for that gate, protecting `success_rate` and the maturity lifecycle, no longer applies: Loop 10 cut that scoring. Whether the gate should stay is open and sits with D-004, recommended and not adopted |
+| `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: session summary, auto-feedback, invocation logging, shadow recall, topics — numbered 1–4 and 7 in `index-v2.ts`, because stages 5 and 6 were cut in Loop 10. **Auto-feedback rates only entries the agent judged explicitly.** The tag-substring fallback beside it was cut in Loop 12 (R-010): it had never written a row, and what it fed — `success_rate` and the maturity lifecycle — was cut in Loop 10. An entry the agent did not judge is now skipped rather than rated, because a fallback neutral is indistinguishable from a considered “retrieved and not used” |
 
 ## Knowledge kinds — `state` and `event`
 
