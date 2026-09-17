@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "revision": 28,
+  "revision": 29,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 11 answered the instruction-surface question and the answer is a ratio: Q1 25 / Q2 12 / Q3 1 across 77 files. The tools do what they say; the prose around them rots, and only in one direction — the protocol deletes something and the sentences that named it stay. Nothing checks that a deletion propagated to the text. The next loop's subject is Aaron's to rule, but that gap is what the evidence points at.",
-    "since_session": 62
+    "text": "Loop 13 - Idea B, the module boundary, alone. Make the core installable with Node and git, with memory as an opt-in module. It needs no measurement, which is exactly why it has lost four times to subjects that had one; the displacing sentence is 'it fits cleanly with what we are already touching'. The question it is the instrument for has been open since Loop 9 and is not 'does injection change behaviour' - Loop 10 answered that - but DOES THE MEMORY HALF GET USED AT ALL. Three consecutive loops have now ended with ob_recalled reporting nothing recalled.",
+    "since_session": 63
   },
   "tasks": [
     {
@@ -1004,6 +1004,101 @@
       ],
       "since_session": 62,
       "status": "verified"
+    },
+    {
+      "id": "V-029",
+      "claim": "command-names resolves a /name reference against the command files that exist, and was seen red on two real defects before it was trusted",
+      "evidence": [
+        {
+          "type": "commit",
+          "path": "9be93f5",
+          "observation": "repo red at this SHA: 'instructions name commands that do not exist: README.md: /skill-scan; .agents/skills/self-improving-agent-gotchas/SKILL.md: /recall'"
+        },
+        {
+          "type": "commit",
+          "path": "ccb5807",
+          "observation": "green after the isolated repair: 62 command references across 35 instruction files, 0 issues"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/sync/checks.test.ts",
+          "observation": "6 tests: red on README, red on a skill file, pass on a declared host command, BUILTINS named in the failure, the description disclaimer, skip-not-pass with no command directory"
+        }
+      ],
+      "since_session": 63,
+      "status": "verified"
+    },
+    {
+      "id": "V-030",
+      "claim": "The retirements check reads .agents/retirements.json on every /sync and fails on an empty record rather than passing vacuously",
+      "evidence": [
+        {
+          "type": "commit",
+          "path": "5eb6125",
+          "observation": "repo red at this SHA on three files the backfill exposed: cli-session-end.ts (skill-scan), cli.ts (dream), README.md (dream)"
+        },
+        {
+          "type": "commit",
+          "path": "cbf61ac",
+          "observation": "green after repair; pass message names the classes it cannot resolve and states that green covers only RECORDED retirements"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/sync/checks.test.ts",
+          "observation": "9 tests including 'fails on an empty record rather than passing vacuously' and 'does not match a live identifier that differs only in case' (KB_PATH vs the retired kb_* tool prefix)"
+        }
+      ],
+      "since_session": 63,
+      "status": "verified"
+    },
+    {
+      "id": "V-031",
+      "claim": "The build prunes: a stale artifact whose source was deleted cannot survive a rebuild",
+      "evidence": [
+        {
+          "type": "file",
+          "path": "open-brain/package.json",
+          "observation": "prebuild removes build/ before tsc; previously bare 'tsc', which never deletes stale output"
+        },
+        {
+          "type": "observation",
+          "path": "open-brain/build/pipelines/session-end/",
+          "observation": "planted auto-feedback.d.ts and auto-feedback.js.map - the exact two files G-025 named - orphan count 2, then npm run build, orphan count 0"
+        }
+      ],
+      "since_session": 63,
+      "status": "verified"
+    },
+    {
+      "id": "V-032",
+      "claim": "The heuristic rating arm never wrote a row in the entire life of the rating_method column",
+      "evidence": [
+        {
+          "type": "database",
+          "path": "~/.claude/open-brain/knowledge-v2.db",
+          "observation": "SELECT rating_method, COUNT(*) FROM feedback_log GROUP BY 1: 347 pre-column NULL, 267 direct, 22 supplied, ZERO heuristic across 636 rows. Checked against the live DB rather than taken from V-018."
+        }
+      ],
+      "since_session": 63,
+      "status": "verified"
+    },
+    {
+      "id": "V-033",
+      "claim": "On the mailbox retirement the frozen pipeline found every in-repo referrer with no false positives, and its entire blind spot was one nameable structural boundary",
+      "evidence": [
+        {
+          "type": "document",
+          "path": "docs/loops/loop-12-c4-mailbox-retirement.md",
+          "observation": "pipeline unaided: 11 found / 11 real / 0 false. Manual sweep afterwards: 7 found / 2 real / 5 false - all five phantoms matched INBOX, the task inbox. The two real misses were command mirrors under ~/, outside projectRoot."
+        },
+        {
+          "type": "observation",
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "observation": "the gap is closeable, not a capability limit: pointing the check at the four command mirrors as command-names already is would reach both"
+        }
+      ],
+      "since_session": 63,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -1101,8 +1196,8 @@
     {
       "id": "G-016",
       "what": "Intermittent cross-test failure in state-writer.test.ts under the full suite.",
-      "evidence": "Session 58, first full `npm test` run after the Loop 7 R2 gate landed: 'applyStateOps (Loop 3 writer) > update_task changes fields, refuses status done and refuses a done task (V2)' failed with 'expected [] to deeply equal [ { knowledge_id: 1, ...(2) } ]'. It passed in isolation (`npx vitest run tests/shared/state-writer.test.ts`, 30/30) and passed on the next two full runs (901/901 both times). It touches nothing changed in R2 - the failing assertion is about feedback_log rows, which suggests shared database or temp-directory state leaking between test files rather than a defect in the writer. Recorded because an unrecorded flake is rediscovered later by someone with less context, and because this one surfaced during a run whose result was being used to accept a change.",
-      "recommended_update": "Reproduce by running the full suite with a fixed seed / --no-file-parallelism to confirm it is cross-file state leakage, then isolate the shared resource. Low priority; it has not been observed to affect a result.",
+      "evidence": "AMENDED session 63. The flake now has ONE identified instance and it is NOT the file this gap names: tests/pipelines/sync/index.test.ts > runSync > 'does not auto-fix in check-only mode' failed under the full suite and passed in isolation, confirmed by running that file alone. This gap names state-writer.test.ts. So either there are two distinct flakes or this gap's attribution is wrong. Recorded as an observation and NOT resolved: one identified instance does not establish that earlier occurrences were the same test, and attributing a flake to an open gap on a shape match is the same move as retiring a task on its title. Frequency observed: roughly 2 failures in 7 full-suite runs, then 6 consecutive clean runs.",
+      "recommended_update": "Next session to hit it should capture the failing test name BEFORE re-running - the failure summary did not survive to the agent's output on either of the first two occurrences, which is why it went unattributed for a whole loop. Then decide whether to split this gap in two or correct its file.",
       "opened_session": 58
     },
     {
@@ -1152,13 +1247,6 @@
       "what": "Done-task retention evicts entries from state.json permanently during a bulk close, while reporting it only in passing. Closing 13 tasks in session 61 dropped T-032 and T-052 out of the record entirely — nobody asked for those two to go, and it surfaced only because the tool output was read carefully. The count scales with the size of the close, so a large sweep evicts proportionally more, equally quietly.",
       "evidence": "Session 61 ob_state dry run reported 'Dropped done tasks (retention 3 sessions): T-032, T-052'; both confirmed absent from state.json by read-back at rev 15. Recoverable at 6af5592. This is V-003's documented retention working as designed, not a defect in the close ops. Found by Forge while reading the dry-run output; attributed rather than folded in (Planner Error 24's fix).",
       "recommended_update": "A permanent removal should announce itself as a removal rather than as a line in a summary. Options not ruled on: name the evicted ids under their own heading, require an acknowledgement when a single call would evict, or make retention a separate explicit op rather than a side effect of closing tasks.",
-      "opened_session": 61
-    },
-    {
-      "id": "G-025",
-      "what": "open-brain/build is not pruned on rebuild, so a deleted source leaves its declaration file and sourcemap behind with no .js beside them. auto-feedback.ts was cut in Loop 10, but build/pipelines/session-end/ still holds auto-feedback.d.ts and auto-feedback.js.map dated Sep 15. Inert — nothing executes without the .js — and build/ is gitignored, so this is per-seat debris rather than a repo defect.",
-      "evidence": "Session 61, while verifying G-018 before closing it: find across the repo returned the two orphans and no auto-feedback.js. Matters because build/ is what the MCP server actually runs, so judging build freshness by file presence is unreliable here; mtime plus content held, presence alone would not have. Adjacent to G-021, which records that R1's staleness signal is under-specified.",
-      "recommended_update": "Decide whether the build step should clean its output directory, or whether a freshness check should assert on content rather than presence. Low stakes on its own; recorded because it is a second way for a stale artifact to look like live code.",
       "opened_session": 61
     },
     {
@@ -1440,31 +1528,55 @@
       "title": "ADR-029 (D-004) adopted as written - the record catching up to code that has run under it for three loops",
       "date": "2026-09-17",
       "note": "Aaron adopted it on 2026-09-17, asked directly and answered directly. D-004 had stood as 'RECOMMENDED not yet adopted - Aaron rules (T-129)' since 2026-09-15. It was never a pending direction: Loops 8, 10 and 11 implemented all of it. matureBoost and provenBoost are 1.0, the apoptosis gate is off, the maturity lifecycle and success_rate are cut, session-start retrieval is kept. THE CODE HAD BEEN LIVING UNDER THIS DECISION FOR THREE LOOPS WHILE THE RECORD SAID NOBODY HAD MADE IT - which is Loop 11's defect class arriving in the decision log rather than in prose: a record describing a state the system had already left. Recorded as its own decision rather than by editing D-004, because ob_state has no update_decision op and because the sequence is worth keeping: recommended 2026-09-15, implemented across three loops, formally adopted 2026-09-17. NOT DECIDED BY THIS: whether the suspension should ever be reversed - D-004's own trigger language stands - and the $declined retirement of success_rate, Maturity and Rating, which Aaron deferred to Loop 13 on the same day. The behaviour is cut; the vocabulary and the column are not, and recording that as finished would make the retirements check green on an unfinished cut."
+    },
+    {
+      "id": "D-014",
+      "title": "Retire the agent mailbox - SIA channel only",
+      "date": "2026-09-17",
+      "note": "Aaron: 'the mailbox was pre-A2A and should be retired. HoH with A2A solves the agent-to-agent communication issue', scoped on ruling to the sia channel alone. ~/.agents/mailbox/ served NINE channels, eight non-empty, and seven belong to other projects (nexcrm has three named seats; worthit and TCM were missed in the first enumeration because it was read off a truncated `head -25`). Executed: all three records preserved in docs/loops/sia-mailbox-*.md with the decisions log verified at 67 entries IN THE MASTER COPY before deletion; 18 files removed; the other eight channels counted before and after and unchanged. The brief's framing 'decisions -> state.json decisions[]' was WRONG - the mailbox log holds 67 entries from 2026-04-16 and state.json holds 43 from 2026-03-22, two different records that overlap without matching."
+    },
+    {
+      "id": "D-015",
+      "title": "Forge may publish its own loop branches",
+      "date": "2026-09-17",
+      "note": "Aaron, resolving an inconsistency the Planner surfaced rather than used: Loop 11's Developer pushed loop/11-instructions and opened PR #18 under what it believed were the same instructions, while Forge held a standing 'tag, never push'. One instruction, two readings, a whole loop apart. Forge pushes and opens the PR; the Planner tags the merge commit on master. Loop 12 cost a few hours of an unopened PR because Forge declined to publish on a peer's say-so and then declined again on a relay of Aaron's answer, confirming with Aaron directly instead. Recorded as the right price rather than an over-caution: a peer cannot extend reserved authority, and a relay of an answer is still the same channel."
+    },
+    {
+      "id": "D-016",
+      "title": "ADR-031 - a sign-off transfers across an amend only when the amend is provably disjoint",
+      "date": "2026-09-17",
+      "note": "Refines 'a sign-off does not transfer across an amend', which made every post-QA prose fix cost a re-QA and therefore made the cheap path be not fixing prose, or amending quietly. New rule: it transfers when the amend is provably disjoint from what was signed, and PROVABLY MEANS A DIFF THE QA SEAT CAN RUN - in practice `git diff --stat <signed-sha> HEAD -- <executable paths>` handed over showing empty. Paired with the error-table admission rule: the table records a wrong claim that reached an artifact, a commit, a counterpart or Aaron; a near-miss caught in-process by its own author goes in a separate register as an instance of a named family, never numbered. THE DIVIDING LINE IS ESCAPE, NOT SEVERITY. Both rules exist to stop a correctness rule taxing the behaviour it wants - a rule that adds a row every time someone checks their own work makes checking your own work look like failure. Requested by the seat that stood to benefit from the looser rule, after noticing it had already drafted the entry before asking."
+    },
+    {
+      "id": "D-017",
+      "title": "Loop 13 is Idea B - the module boundary",
+      "date": "2026-09-17",
+      "note": "Aaron ruled, against the alternative of G-026 (recall precision), which he had earlier pencilled in. The Planner argued for Idea B and not on the grounds that it was owed a turn: G-026's urgency is contingent on recall being USED, and three consecutive loops have now run with zero recalls, so tuning precision on a system nobody queries optimises a thing whose value is unestablished. Idea B - core installable with Node and git, memory an opt-in module - is the instrument for the question open since Loop 9: not 'does injection change behaviour', which Loop 10 answered, but 'does the memory half get used at all'. Idea B had been scheduled as Loop 7 and displaced four times, every time into a loop that had its own subject, by the sentence 'it fits cleanly with what we are already touching' - a sentence the Planner itself wrote about the lifecycle cut four hours before quoting the pattern back."
     }
   ],
   "handoff": {
-    "pick_up": "Loop 11 is complete and merged: PRs #17, #18, #19 and #20 are in master, v0.36.0 is tagged at 39fefb4, and the instruction surface is tracked — a fresh clone now gets CLAUDE.md and the commands for the first time. One piece of work is outstanding and it is small: PR #21 (.gitattributes, T-151) is open and verified against a control worktree but not merged; Aaron merges. The next loop's subject is unruled. The evidence points at one gap: nothing checks that a deletion propagated to the prose, which is where 25 of 38 defects came from.",
+    "pick_up": "Loop 12 is complete and merged: PRs #26-#30, v0.38.0 tagged, state rev 28. Loop 13 is Idea B - the module boundary - ruled by Aaron; the Planner is writing the brief. Read it from docs/loops/ by the largest loop number rather than from the mailbox, which no longer exists. Base is master @ 917fd68 at the time of writing - check it rather than assume it, and expect it to have moved.",
     "watch_out": [
-      "A substring check answers a DIFFERENT QUESTION than the one being asked, and the answers coincide most of the time — which is why it is dangerous rather than merely unreliable. Five instances in session 62: four where grep matched a citation of a retired assertion, one where it missed a correct document by being too literal (searching 'error 21' in a file that says 'Developer 21').",
-      "`git show <ref>:<path>` is mangled by MSYS on Windows when the ref contains a slash — use MSYS_NO_PATHCONV=1. It cost three re-runs in one session and TWICE produced confident wrong answers that were nearly filed as findings. A zero from a broken instrument looks exactly like a zero from a clean file.",
-      "For an instruction that produces artifacts, LOOK AT THE ARTIFACTS. The /checkpoint filename doubling was invisible in both files — each internally consistent — and obvious in one `ls`. Adopted as the audit's fourth question.",
-      "`ln -s` under MSYS creates a real directory, not a link. That is what makes `git worktree remove` fail with 'Filename too long' after you have linked node_modules into a throwaway worktree. Remove the copy first, or do not link at all.",
-      "An unrecognised CLI flag selects the MUTATING default: `sync --check-only` is silently discarded because cli.ts:21 is args.includes('--check'), and sync runs in fix mode. T-150 is open on it. Until it is fixed, type the flag exactly.",
-      "Two seats share one working tree. Either seat can delete the other's files by doing something entirely correct on its own branch, and for untracked files the loss is silent because git does not report removing what it never tracked. T-149 is open; the fix is one worktree per seat and it was demonstrated three times in session 62.",
-      "The checks in this repo had a better record in session 62 than either agent's hand-rolled reasoning. command-parity was right when a raw md5 said 7 of 11 commands had diverged (none had — CRLF across the tracked/untracked boundary); mirror-parity caught a repair applied to one Cursor copy and not the other, and surfaced a fourth command mirror (~/.cursor/commands/) that neither enumeration had.",
-      "Read the ob_state dry run before the real call, every time. Filing one task in session 62 would have evicted done-task T-004 under retention; the dry run said so first and its content was preserved in CHANGELOG.md before it went."
+      "AN INSTRUMENT THAT CANNOT DISTINGUISH 'NOTHING THERE' FROM 'I DID NOT LOOK' IS NOT A MEASUREMENT. Six instances in session 63: a `|| echo 0` fallback, a blank `echo` firing over a real hit, MSYS mangling `git show <ref>:<path>`, a `find | head -25` truncation read as a complete inventory, a multi-line replace matching bare linefeeds against a CRLF file and printing 'fixed' while deleting a line, and escape sequences un-escaped in transit. THREE OF THEM ARRIVED INSIDE THE DOCUMENT DESCRIBING THE PATTERN. Reading the artifact caught all six; knowing the failure mode prevented none.",
+      "Never count from a truncated list, and never act destructively on one. `find ... | head -25` produced 'six channels' for a directory that held nine - while enumerating what was about to be deleted.",
+      "Line endings are NOT uniform in this repo: .agents/AGENT.md is LF, docs/loops/*.md is CRLF. Detect per file in any scripted edit, and READ THE FILE BACK afterwards - a tool reporting success is not the edit having landed.",
+      "G-027: expected_revision serialises writes within one lineage, not across branches. Two seats read rev 25 and both wrote rev 26 on the same day; the collision was invisible until a git conflict at merge. Before writing state, check no other seat is about to, and hand over the NUMBER rather than the base.",
+      "A retired name in prose is textually identical whether it is a defect or an obituary. If a check fires on correct text, add the path to that retirement's allowed_referrers - NEVER reword to dodge a check, which is how a check becomes decorative.",
+      "The test suite is NOT type-checked (T-152). tsconfig is 'include: [src/**/*]' with one tsconfig, so `tsc --noEmit` exits 0 on a test file naming a deleted symbol. '603 tests passing' means behaviour is proven and the tests' own types are not.",
+      "A test that pins a retired thing's behaviour FAILS WHEN YOU DO THE RIGHT THING, and is therefore the referrer most likely to be 'fixed' by restoring the behaviour instead of retiring the test.",
+      "Read the ob_state dry run before the real call, every time - and note that gaps take what/evidence/recommended_update, NOT title/note. Both seats made that identical mistake on the identical file hours apart."
     ],
     "open_questions": [
-      "Does the protocol half earn its keep? Still unanswered — and session 62 is evidence of a kind: a full loop ran start to finish with ZERO recalls. ob_recalled returned 'No knowledge entries recalled this session'. Session-start injection is suspended (Loop 10 C2) and no deliberate mid-task recall was ever wanted. A memory layer that is never consulted during a day of hard work is not obviously earning anything.",
-      "What checks that a deletion propagated to the prose? 25 of 38 defects were references to things the protocol itself deleted. command-tool-names now catches the tool-name case and NOTHING catches the rest — file names, script names, component names, renamed packages.",
-      "Should the point-of-use rating signal be built (T-014)? T-057 was closed by striking `referenced` from the instructions rather than implementing it, which stops the lie but leaves the was-it-cited question unanswered and the 445 neutrals still hiding it.",
-      "Node v24: the v22 pin is released in this repo, but Smart Connections may break in Aaron's vault where no test here would catch it. Unchanged from session 61."
+      "Does the memory half get used at all? THREE consecutive loops have ended with ob_recalled returning 'No knowledge entries recalled this session'. Session-start injection is suspended (Loop 10 C2) and no deliberate mid-task recall was wanted in any of them. This is Loop 13's subject and the reason it was chosen over G-026.",
+      "Is the intermittent suite failure one flake or two? One identified instance is sync/index.test.ts > 'does not auto-fix in check-only mode'; G-016 names state-writer.test.ts. Attribution deliberately left open.",
+      "What forces a retirement to be RECORDED in the first place? The check verifies that recorded referrers are still present; nothing compels a new retirement to get an entry. The successor gap: a CUT ruling should not be closeable without one.",
+      "docs/loops/ carried this loop's conclusions as a HABIT, not a mechanism. Nothing compels the next loop to put its boundary reports there - the same asymmetry as the retirement record, one layer up."
     ],
-    "session": 62
+    "session": 63
   },
   "last_session": {
-    "n": 62,
+    "n": 63,
     "date": "2026-09-17",
-    "uuid": "b0518d9a-934d-45d6-b6e3-279816d3a66a"
+    "uuid": "fb43e236-e52a-4698-a7c0-8e1126975f7c"
   }
 }
