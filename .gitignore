@@ -45,7 +45,14 @@ Thumbs.db
 # .claude/: the live commands are tracked; local settings and plugin skills are not.
 /.claude/*
 !/.claude/commands/
-/docs/
+# docs/: working material stays local, but LOOP CLOSE-OUTS ARE THE RECORD and are tracked.
+# Loop 10's six docs were tracked only because someone remembered `git add -f`; Loop 11's
+# close-out was silently dropped from its own commit because nobody did. A rule that must be
+# remembered is not a rule (Loop 10 R4), so the negation replaces the habit.
+# The parent must be `/docs/*` rather than `/docs/` — git cannot re-include a file whose
+# parent DIRECTORY is excluded.
+/docs/*
+!/docs/loops/
 
 # Runtime artifacts (session-local / regenerated)
 /.recalled-entries.json

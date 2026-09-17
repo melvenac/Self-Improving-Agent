@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 19,
+  "revision": 20,
   "project": {
     "name": "self-improving-agent"
   },
@@ -468,6 +468,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Session 62: two seats share one working tree at C:/Users/melve/Projects/Self-Improving-Agent (git worktree list returns exactly one entry). The Planner branched off master without checking which branch the tree was on, committed 19 newly-tracked instruction files, and opened PR #17. Switching to that branch and back DELETED 19 files from disk - all of .claude/commands/, CLAUDE.md, .agents/AGENT.md, LIFECYCLE.md, the four SYSTEM/ files, domains.json and the skills - because they are tracked on the new branch and absent from loop/11-instructions, so git checkout removed them. They were backed up first and all 19 restored; the Developer's uncommitted C3 work survived as pure additions (verified: 173 insertions, 0 deletions, on top of ddba9d0). NOBODY DID ANYTHING WRONG ON THEIR OWN BRANCH - that is the point. Either seat can delete the other's files by performing a correct operation, nothing warns either party, and the loss is silent for untracked files because git does not report removing what it never tracked. Same shape as the read-ordering watch-out: within one seat you can order your actions; across two seats neither party controls the tree. Fix: one worktree per seat off the same repository (git worktree add ../sia-planner <branch>), so branches cannot collide in a shared checkout. Evidence: this incident, Planner error 30, session 62. Filing this task evicted done-task T-004 under retention (G-024); its content is preserved in CHANGELOG.md under Loop 11."
+    },
+    {
+      "id": "T-150",
+      "title": "An unrecognised CLI flag must refuse, not select the mutating default",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 62,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Session 62: `node open-brain/build/cli.js sync --check-only` was run intending a dry run. There is no such flag. cli.ts:21 is `args.includes(\"--check\")` — exact array membership, so \"--check-only\" does not match, checkOnly stayed false, the flag was SILENTLY DISCARDED and sync ran in FIX MODE, writing seven tracked files plus untracked PRD.md. No harm that time only because every write was version-sync the release bump required anyway, and the diff was read before committing — WHICH MEANS THE SAFETY CAME FROM THE OPERATOR, NOT THE TOOL. Loop 11's other 38 defects were prose that lied about behaviour; this is behaviour that lies about intent, and it is the more dangerous class: a mistyped safety flag selects the unsafe path and says nothing. Fix: parse argv against a known flag set and exit non-zero on anything unrecognised, naming the flag. Deterministic, and it cannot be overridden the way a documented convention can. Applies to every subcommand of cli.ts, not just sync. Evidence: cli.ts:21, and the seven-file write at 811dddc's parent."
     }
   ],
   "verified": [
