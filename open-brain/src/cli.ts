@@ -12,7 +12,34 @@ import {
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { resolvePaths } from "./shared/paths.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
-import type { ScoreResult, CategoryScore } from "./pipelines/sync/types.js";
+import type { ScoreResult, CategoryScore, MemoryChecks } from "./pipelines/sync/types.js";
+
+/**
+ * Load the memory module's sync checks, or return undefined if it is not
+ * installed.
+ *
+ * Loop 13 (the module boundary). This dynamic import is the composition root:
+ * it is the ONE place that knows both halves exist. `checks-memory.js` pulls in
+ * `better-sqlite3`, a native build, so a static import here would make the
+ * protocol CLI — version strings, hook wiring, state views — unusable on any
+ * machine that cannot compile it. Q1 of the original evaluation: installable by
+ * a stranger with Node and git.
+ *
+ * A failure is swallowed deliberately, and `runSync` renders the absence as
+ * three SKIPPED checks naming the reason. The caller never sees "passed".
+ */
+async function loadMemoryChecks(): Promise<MemoryChecks | undefined> {
+  try {
+    const mod = await import("./pipelines/sync/checks-memory.js");
+    return {
+      checkVaultIndexParity: mod.checkVaultIndexParity,
+      checkSchemaVersion: mod.checkSchemaVersion,
+      checkProjectDirsExist: mod.checkProjectDirsExist,
+    };
+  } catch {
+    return undefined;
+  }
+}
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -47,7 +74,7 @@ if (command === "sync") {
     process.exit(0);
   }
 
-  const result = runSync({ projectRoot, checkOnly, score, scoreJson, history });
+  const result = runSync({ projectRoot, checkOnly, score, scoreJson, history, memoryChecks: await loadMemoryChecks() });
 
   // Print results
   console.log(`\nSync — v${result.version}\n`);

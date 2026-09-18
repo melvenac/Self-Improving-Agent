@@ -9,6 +9,10 @@ import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, append
 import type Database from "better-sqlite3";
 
 import { runSync } from "./pipelines/sync/index.js";
+// The MCP server IS the memory half — it already requires the native build to
+// load — so it supplies the memory checks statically. Loop 13: memory may
+// import core, and this is that direction.
+import * as memoryChecks from "./pipelines/sync/checks-memory.js";
 import {
   scoreConfigStructure,
   scoreKnowledgeQuality,
@@ -122,7 +126,7 @@ export async function handleSync(args: {
     // The state-schema check parses the live state.json with THIS process's loaded
     // schema, so a failure here — where the CLI passes — is the schema-staleness
     // signal that cost two loops of record-keeping.
-    const result = runSync({ projectRoot: resolve(args.project_root ?? "."), checkOnly: args.check_only ?? false, score: args.score ?? false, scoreJson: false, history: false, runtime: "mcp-server" });
+    const result = runSync({ projectRoot: resolve(args.project_root ?? "."), checkOnly: args.check_only ?? false, score: args.score ?? false, scoreJson: false, history: false, runtime: "mcp-server", memoryChecks });
     const projectRoot = result.projectRoot;
 
     const lines: string[] = [];
@@ -449,7 +453,7 @@ export async function handleScore(args: {
       }
     } else {
       // Run checks to feed config score
-      const result = runSync({ projectRoot, checkOnly: true, score: false, scoreJson: false, history: false, runtime: "mcp-server" });
+      const result = runSync({ projectRoot, checkOnly: true, score: false, scoreJson: false, history: false, runtime: "mcp-server", memoryChecks });
       const scoreResult = computeScore(projectRoot, result.checks);
 
       lines.push(`Health Score: ${scoreResult.total}/100`);

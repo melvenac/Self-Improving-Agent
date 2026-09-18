@@ -32,6 +32,26 @@ export interface CheckResult {
  */
 export type SyncRuntime = "cli" | "mcp-server";
 
+/**
+ * The memory module's contribution to `/sync`, supplied rather than imported.
+ *
+ * Loop 13 (the module boundary): these three checks read the knowledge
+ * database, and importing them is what dragged `better-sqlite3` — a native
+ * build — into `cli.ts`, which otherwise needs nothing but Node and the
+ * filesystem. Core declares this shape; `pipelines/sync/checks-memory.ts`
+ * implements it; a composition root that has established the memory module is
+ * installed passes it in.
+ *
+ * **Core must never import the implementation.** That direction is the whole
+ * design, and it is asserted mechanically by the `module-boundary` check rather
+ * than remembered.
+ */
+export interface MemoryChecks {
+  checkVaultIndexParity(vaultPath: string, dbPath: string): CheckResult;
+  checkSchemaVersion(dbPath: string): CheckResult;
+  checkProjectDirsExist(dbPath: string): CheckResult;
+}
+
 export interface SyncOptions {
   projectRoot: string;
   checkOnly: boolean;
@@ -40,6 +60,12 @@ export interface SyncOptions {
   history: boolean;
   /** Defaults to "cli". `ob_sync` passes "mcp-server". */
   runtime?: SyncRuntime;
+  /**
+   * Absent means the memory module is not installed. `runSync` then reports the
+   * three memory checks as `skipped` with that reason — NOT as passing. An
+   * absent module and a clean database must not render identically (rule 11).
+   */
+  memoryChecks?: MemoryChecks;
 }
 
 export interface SyncResult {
