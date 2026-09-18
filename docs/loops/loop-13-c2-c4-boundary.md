@@ -219,25 +219,42 @@ call whether that is an entry.**
 respected by sequencing rather than by luck. State is now at rev 32 (PR #39), written by the planner
 seat.
 
-### CORRECTION — the CRLF watch-out is NOT fully stale, and I said it was
+### CORRECTION — two right measurements, two wrong claims (G-031, rev 33)
 
 **`.gitattributes` exists and T-151 is correctly closed.** That part holds.
 
-**But "`docs/loops/*.md` is LF" was wrong, and it was my claim before it was anyone else's.** I
-measured **three** files and generalised to the directory. Measured properly — counting CR bytes
-across all 21 — **`docs/loops/sia-mailbox-decisions.md` has 3,670 CRLF pairs in the working tree.**
+**Both seats made the same error in opposite directions, and neither measurement was wrong.**
 
-**Why it hides, and this is the part worth carrying:** git stores that file as LF, because
-`.gitattributes` normalises on commit. With `text eol=lf`, git compares *normalised* content, so the
-CRLF-on-disk copy shows as **clean in `git status`** and survives indefinitely until something
-forces a re-checkout. **The repo is correct and the working tree is stale, and nothing in the normal
-workflow reports the difference.**
+| Tree | `docs/loops/sia-mailbox-decisions.md` | CR bytes |
+|---|---|---|
+| planner | 281,558 | 0 |
+| main | 281,558 | 0 |
+| **forge** | **285,228** | **3,670** |
 
-**Two instruments disagreed and one was answering a different question.** `file` said CRLF;
-`grep -c $'\r'` said 0. `file` was right. The byte count is what settled it — the same
-parse-the-structure-rather-than-match-the-text move as C1's `import type` correction, arriving
-again at the very end.
+**281,558 + 3,670 = 285,228 exactly. The byte delta IS the carriage returns.** Verified in this
+tree: the working copy is 285,228 bytes, `git show HEAD:<path>` is 281,558.
 
-**So the session-63 watch-out's advice stands as written:** *detect line endings per file in any
-scripted edit and read the file back.* What is stale is the claim that the mix is widespread —
-it is 1 file in 21, not a general condition.
+**The disagreement was never about line endings. It was about scope, and neither of us stated
+ours.** I generalised **three files to a directory**. Atlas generalised **one worktree to a
+repository**. Both readings were accurate reports of what each seat actually looked at. **What
+resolved it was comparing the trees rather than arbitrating between the two readings.**
+
+**Why it hides, and this is the half worth carrying.** `.gitattributes` says `text eol=lf`, so git
+normalises on commit and compares *normalised* content. The stale CRLF copy therefore reads **clean
+in `git status`, clean in every diff**, and `git show HEAD:<path>` returns LF. **The repo is right,
+the tree is stale, nothing reports it,** and it survives until something forces a re-checkout of
+that path. A scripted multi-line edit there hits the mismatch **on a file git swears is fine.**
+
+**Two instruments disagreed and one answered a different question.** `file` said CRLF;
+`grep -c $'\r'` said 0. `file` was right; counting bytes settled it. Parse the structure rather than
+match the text — C1's `import type` correction arriving one more time, at the very end of the loop.
+The detector was self-tested against a known-CRLF probe before any negative was trusted, because a
+detector that never reports CRLF produces exactly the clean sweep both seats first reported.
+
+**What this means for the session-63 watch-out:** *"line endings are MIXED in this repo"* **goes** —
+it is one file of 21, in one tree of three. *"Detect per file in any scripted edit and read the file
+back"* **stays, and must not be dropped as stale.**
+
+**Recorded as G-031 at rev 33 by the planner seat, and it needed a pointer rather than an
+amendment:** `ob_state` refuses `update_task` because **a close note is write-once**, so T-151's
+note cannot be corrected in place. Whether close notes should be amendable is **unruled**.
