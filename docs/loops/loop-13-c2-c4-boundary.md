@@ -86,7 +86,22 @@ G-029's shape is the thing it is built to avoid. 10 cases.
 
 ---
 
-## C4 — the acceptance test. **It does not pass, and there is no partial credit.**
+## C4 — **the machinery is installable; the instruction is not**
+
+**C4 closes as a RECORDED FAILURE.** The command surface and hook installation are a later loop's
+subject and out of scope for Loop 13. `start.md` and the hook contract were not touched.
+
+> **Provenance of that ruling, stated because rule 1 requires it.** It reached this session as a
+> **relay** from the outgoing planner seat, reporting Aaron's words. **Forge has not had it from
+> Aaron in-session.** The scope narrowing was acted on anyway — acting on it only *reduces* what
+> this loop touches and is reversible while the branch is local — but the attribution is recorded
+> as relayed rather than as confirmed. **If it is confirmed, this note is replaced before push. If
+> it is wrong, this paragraph is the thing that makes it correctable** rather than a decision
+> silently attributed to someone who did not make it.
+
+**This section is the deliverable.** The brief was written to make this outcome reportable —
+*that either passes or it does not, and there is no partial credit to hide in* — and a loop that
+ends in an honest no is not a failed loop.
 
 **Done as a real install.** `git clone` of the branch into a fresh directory,
 `npm install --omit=optional`, `npm run build`. **`node_modules/better-sqlite3` confirmed absent
@@ -106,22 +121,31 @@ not exist, so "no vault, no database" is real rather than incidental.
 | `state-schema` check | **pass** — `state.json` read, rev 31, 49 tasks |
 | `server.js` (the MCP server) | **exit 1**, `Cannot find package 'better-sqlite3'` — **correct**: it *is* the memory half, and C4 specifies no MCP server |
 
-**Why it still fails.** C4 is *"`/start` works"*, and `/start` is a slash command, not a function.
-`.claude/commands/start.md` names **`ob_start` six times** and `ob_set_session` once, with **no CLI
-path**. A stranger following the documented `/start` reaches `server.ts`, which resolves
-`better-sqlite3` at module load and exits 1.
+**Why it fails — and it is ONE finding with two halves, not two findings.**
 
-**The machinery is installable. The instruction is not.** Every piece `/start` needs runs without
-memory — `cli-bootstrap`, `sessionStart`, the state render, the four residual reads. Nothing routes a
-memory-free session to them.
+Every piece `/start` needs runs without memory: `cli-bootstrap`, `sessionStart`, the state render,
+the four residual reads. **Nothing routes a memory-free session to them, and nothing puts the route
+on a stranger's machine.**
 
-**And the floor is lower than that**, per Atlas's audit tonight: both hooks in `~/.claude/settings.json`
-hardcode absolute paths into `C:/Users/melve/Projects/Self-Improving-Agent`. **A fresh profile has
-neither hook.** So C4 must also answer how a stranger *acquires* the SessionStart hook, and if the
-answer is "hand-edit `settings.json` with an absolute path into your own home directory", core is
-installable by Aaron on this machine — the proxy the brief forbids. It is also a live fragility
-independent of this loop: **moving or renaming the main tree breaks SessionStart and SessionEnd for
-every project on this machine**, and nothing records that.
+1. **The documented route goes through memory.** C4 is *"`/start` works"*, and `/start` is a slash
+   command, not a function. `.claude/commands/start.md` names **`ob_start` six times** and
+   `ob_set_session` once, with **no CLI path**. A stranger following it reaches `server.ts`, which
+   resolves `better-sqlite3` at module load and exits 1.
+2. **A fresh profile has no SessionStart hook at all.** Both hooks in `~/.claude/settings.json`
+   hardcode absolute paths into `C:/Users/melve/Projects/Self-Improving-Agent`. If acquiring one
+   means hand-editing `settings.json` with an absolute path into one person's home directory, then
+   **core is installable by Aaron, on this machine** — the proxy the brief forbids.
+
+**Found twice, from two directions, by two seats:** Atlas by parsing `settings.json` (having first
+mangled it with `sed` and caught that in-process), Forge by running a real install and watching the
+documented path fail. **Two independent routes to the same floor is a measurement, not an
+agreement.**
+
+**A live fragility independent of this loop, recorded because nothing else records it:** moving or
+renaming the main tree **breaks SessionStart and SessionEnd for every project on this machine** —
+and two directories were moved today.
+
+**The next loop's subject falls out of this without anyone having to argue for it.**
 
 **Reported rather than hidden**, per the brief: *if it turns out core cannot install without a
 hand-edited absolute path, that is a finding worth reporting, not a failure to hide.*
@@ -135,10 +159,10 @@ The crossing that actually blocks C4 is an **instruction** — a command file na
 no import graph contains that edge. Closing it means giving `/start` a documented memory-free route
 and a way for a stranger to install the hook. **That is real work and it is not done.**
 
-I did not start it because it changes the command surface and the hook contract, and the brief's
-reporting rule is one question at a time. **This is the question:** does Loop 13 extend to the
-command surface and hook installation, or does C4 close as a recorded failure with that work
-becoming Loop 15's subject?
+I did not start it because it changes the command surface and the hook contract, which is a ruling
+rather than a build decision. **The ruling relayed to this session is: close C4 as a recorded
+failure, that work becomes a later loop's subject** — see the provenance note in the C4 section.
+Recorded here rather than carried as an intention.
 
 ---
 
