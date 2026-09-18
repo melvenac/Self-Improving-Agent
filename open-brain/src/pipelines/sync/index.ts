@@ -13,12 +13,9 @@ import {
   checkSummary,
   checkClaudeMd,
   checkObsidianVault,
-  checkVaultIndexParity,
   checkVaultPathRefs,
   checkSkillIndex,
   checkTemplatePersonalNames,
-  checkSchemaVersion,
-  checkProjectDirsExist,
   checkTemplate,
   checkSpecProvenance,
   checkRules,
@@ -28,6 +25,7 @@ import {
   checkCommandToolNames,
   checkCommandNames,
   checkRetirements,
+  checkModuleBoundary,
 } from "./checks.js";
 import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-state.js";
 
@@ -57,12 +55,28 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkSummary(version, options.projectRoot, options.checkOnly));
   checks.push(checkClaudeMd(options.projectRoot));
   checks.push(checkObsidianVault(paths.obsidianVault));
-  checks.push(checkVaultIndexParity(paths.obsidianVault, paths.knowledgeV2Db));
   checks.push(checkVaultPathRefs(options.projectRoot));
   checks.push(checkSkillIndex(paths.obsidianVault));
   checks.push(checkTemplatePersonalNames(options.projectRoot));
-  checks.push(checkSchemaVersion(paths.knowledgeV2Db));
-  checks.push(checkProjectDirsExist(paths.knowledgeV2Db));
+
+  // The memory module's three checks, supplied rather than imported (Loop 13).
+  // When it is absent they are reported as SKIPPED with the reason — never as
+  // passing. "No memory module installed" and "database is healthy" are
+  // different facts and must not render identically.
+  const mem = options.memoryChecks;
+  if (mem) {
+    checks.push(mem.checkVaultIndexParity(paths.obsidianVault, paths.knowledgeV2Db));
+    checks.push(mem.checkSchemaVersion(paths.knowledgeV2Db));
+    checks.push(mem.checkProjectDirsExist(paths.knowledgeV2Db));
+  } else {
+    for (const name of ["vault-index-parity", "schema-version", "project-dirs"]) {
+      checks.push({
+        name,
+        severity: "skip",
+        message: "memory module not installed — this check reads the knowledge database and was not run",
+      });
+    }
+  }
   checks.push(checkTemplate(options.projectRoot));
   checks.push(checkSpecProvenance(options.projectRoot));
   checks.push(checkRules(options.projectRoot));
@@ -70,6 +84,8 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkCommandToolNames(options.projectRoot));
   checks.push(checkCommandNames(options.projectRoot));
   checks.push(checkRetirements(options.projectRoot));
+  // Loop 13 C3: the module boundary asserted mechanically rather than remembered.
+  checks.push(checkModuleBoundary(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
   // Loop 10 R1: the runtime label travels with the check, because the same code
   // passing in one process and failing in the other IS the signal.

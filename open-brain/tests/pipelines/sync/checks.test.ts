@@ -12,12 +12,9 @@ import {
   checkClaudeMd,
   checkTemplate,
   checkObsidianVault,
-  checkVaultIndexParity,
   checkVaultPathRefs,
   checkSkillIndex,
   checkTemplatePersonalNames,
-  checkSchemaVersion,
-  checkProjectDirsExist,
   checkRules,
   checkReadmeRefs,
   checkHookConfigs,
@@ -29,6 +26,14 @@ import {
   checkRetirements,
   resolveDocPath,
 } from "../../../src/pipelines/sync/checks.js";
+// Loop 13 (the module boundary): these three read the knowledge database and
+// now live in the memory-side module. Core's checks.js no longer imports
+// better-sqlite3 at all.
+import {
+  checkVaultIndexParity,
+  checkSchemaVersion,
+  checkProjectDirsExist,
+} from "../../../src/pipelines/sync/checks-memory.js";
 import { scoreConfigStructure } from "../../../src/pipelines/sync/scorer.js";
 
 const fixturesDir = join(import.meta.dirname, "../../fixtures");

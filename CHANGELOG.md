@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.39.0] - 2026-09-17 — the module boundary: core installs with Node and git
+
+### Added
+
+- **`module-boundary` sync check (Loop 13 C3).** Asserts the dependency direction mechanically:
+  **core must never import memory; memory may import core.** Seen red on the real pre-cut defect at
+  `669902c` — naming all four crossings — green on the fixed tree, and `skip` with a reason when
+  `open-brain/src` is absent. It refuses outright on an unresolved import rather than reporting a
+  clean graph, because a dropped edge is a crossing it cannot see.
+
+  It states its own limits in its output: it sees **value imports only** — not instructions that
+  reach a tool at run time, and not load-time native resolution in `server.ts`. C4's acceptance
+  test is what covers the latter; this check is not a substitute for it.
+
+- **`pipelines/sync/checks-memory.ts`.** The three checks that read the knowledge database —
+  `vault-index-parity`, `schema-version`, `project-dirs` — moved out of `checks.ts` unchanged.
+
+### Changed
+
+- **`better-sqlite3` moved to `optionalDependencies`.** Q1 of the original evaluation: installable
+  by a stranger with Node and git. A failed native build no longer fails the install, and the
+  protocol half runs without it.
+
+- **`runSync` receives the memory checks instead of importing them** (`SyncOptions.memoryChecks`).
+  Core declares the shape, `checks-memory.ts` implements it, and the composition roots supply it:
+  `cli.ts` by dynamic import that may fail, `server.ts` statically because it is the memory half.
+  When the module is absent the three checks report **`skip` with the reason, never `pass`** — an
+  uninstalled module and a healthy database must not render identically.
+
+### Fixed
+
+- **The entire code-level crossing from protocol into memory.** `cli.ts -> pipelines/sync/index.ts
+  -> pipelines/sync/checks.ts -> better-sqlite3` meant reading a version string off disk required a
+  native build. `cli.ts`, `sync/checks.ts` and `sync/index.ts` are now all memory-free.
+
 ## [0.38.0] - 2026-09-17 — cut the heuristic rating arm
 
 ### Removed
