@@ -46,10 +46,35 @@ boundary reports are preserved in `docs/loops/sia-mailbox-*.md`.
 - Session protocol: `/start` and `/end` handle lifecycle
 - Knowledge DB: `~/.claude/open-brain/knowledge-v2.db` (SQLite + FTS5). Override path via `KNOWLEDGE_V2_DB` env var.
 
+## Before you trust the GitNexus block below
+
+**Everything between the `gitnexus:start` / `gitnexus:end` markers is written by the analyzer, not
+by hand.** `gitnexus analyze` regenerates that whole section on every run. Edits inside it are
+discarded silently — verified by running the analyzer against a scratch clone and diffing, which is
+the only way to find this. **Anything you need to survive a reindex goes here, above the marker.**
+
+**The symbol and relationship counts are suppressed by `.gitnexusrc` (`noStats: true`), and that is
+load-bearing.** The analyzer used to write `(1326 symbols, 3182 relationships, 109 execution flows)`
+into that line and leave the tracked file **modified after every reindex** — so each refresh forced
+a choice between committing a counts-only diff and reverting the tool's own output. The tool's
+source names this: a committed block "would otherwise churn the volatile counts on every analyze."
+**Do not remove `.gitnexusrc`.**
+
+**A stale index does not refuse — it answers.** The MUST rules below, followed against a stale index,
+return a confident wrong blast radius. At v0.39.0 the index was **137 commits behind and pinned to
+`loop/4-dogfood`, a deleted branch**; an agent obeying the instruction would have been worse off
+than one ignoring it. `/sync`'s `gitnexus-index` check now reports staleness by comparing the
+indexed SHA to HEAD. **The recorded `branch` is not evidence** — in a detached checkout the analyzer
+keeps the previous name, so a current index can carry a dead branch pin. All three worktrees here
+are detached or will be.
+
+The index lives in **one** checkout, so `gitnexus-index` **skips with a reason** in every other
+worktree. A skip there is not a pass.
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **Self-Improving-Agent** (1326 symbols, 3182 relationships, 109 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **Self-Improving-Agent**. Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
