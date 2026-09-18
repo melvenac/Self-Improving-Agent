@@ -91,13 +91,22 @@ G-029's shape is the thing it is built to avoid. 10 cases.
 **C4 closes as a RECORDED FAILURE.** The command surface and hook installation are a later loop's
 subject and out of scope for Loop 13. `start.md` and the hook contract were not touched.
 
-> **Provenance of that ruling, stated because rule 1 requires it.** It reached this session as a
-> **relay** from the outgoing planner seat, reporting Aaron's words. **Forge has not had it from
-> Aaron in-session.** The scope narrowing was acted on anyway — acting on it only *reduces* what
-> this loop touches and is reversible while the branch is local — but the attribution is recorded
-> as relayed rather than as confirmed. **If it is confirmed, this note is replaced before push. If
-> it is wrong, this paragraph is the thing that makes it correctable** rather than a decision
-> silently attributed to someone who did not make it.
+> **Provenance of that ruling, stated because rule 1 requires it.**
+>
+> **Confirmed first-hand to the planner seat.** Aaron ruled it in-session to Atlas, in his words:
+> *"yes, Loop 13's C4 closes as a recorded failure."* Atlas holds that directly and has written it
+> to state as **D-018 at rev 32**.
+>
+> **It reaches Forge as a relay, and is recorded that way.** This seat has not had it from Aaron
+> in-session. That is a weaker link than Atlas's and the record should not flatten the two into one
+> claim — an earlier draft of this section said simply `Ruled by Aaron, 2026-09-17`, which
+> attributed a decision to a person on the strength of a relay. Caught by Atlas in QA, not by me at
+> the time.
+>
+> **What the ruling covers, and what it does not.** Aaron ruled the command surface is **not Loop
+> 13's**. He did **not** rule it the next loop's subject — that is `T-154`, a task, not a decision.
+> He said **nothing about push, tag or PR**; that instruction travelled in the same relay and has
+> reached neither seat from him. **The branch is held.**
 
 **This section is the deliverable.** The brief was written to make this outcome reportable —
 *that either passes or it does not, and there is no partial credit to hide in* — and a loop that
@@ -206,6 +215,29 @@ miscount was caught and corrected inside C1 before any conclusion rested on it, 
 figure is what shipped; the C3 check excludes type-only imports and a test asserts it. **Atlas's
 call whether that is an entry.**
 
-**Rev 31 untouched.** No state written. `.gitattributes` exists and `docs/loops/*.md` is LF, so
-**T-151 appears already satisfied** and the session-63 CRLF watch-out is stale — recorded, not
-closed, because closing a task is a state write.
+**Rev 31 untouched by Forge.** No state written from this seat all session, which is how G-027 was
+respected by sequencing rather than by luck. State is now at rev 32 (PR #39), written by the planner
+seat.
+
+### CORRECTION — the CRLF watch-out is NOT fully stale, and I said it was
+
+**`.gitattributes` exists and T-151 is correctly closed.** That part holds.
+
+**But "`docs/loops/*.md` is LF" was wrong, and it was my claim before it was anyone else's.** I
+measured **three** files and generalised to the directory. Measured properly — counting CR bytes
+across all 21 — **`docs/loops/sia-mailbox-decisions.md` has 3,670 CRLF pairs in the working tree.**
+
+**Why it hides, and this is the part worth carrying:** git stores that file as LF, because
+`.gitattributes` normalises on commit. With `text eol=lf`, git compares *normalised* content, so the
+CRLF-on-disk copy shows as **clean in `git status`** and survives indefinitely until something
+forces a re-checkout. **The repo is correct and the working tree is stale, and nothing in the normal
+workflow reports the difference.**
+
+**Two instruments disagreed and one was answering a different question.** `file` said CRLF;
+`grep -c $'\r'` said 0. `file` was right. The byte count is what settled it — the same
+parse-the-structure-rather-than-match-the-text move as C1's `import type` correction, arriving
+again at the very end.
+
+**So the session-63 watch-out's advice stands as written:** *detect line endings per file in any
+scripted edit and read the file back.* What is stale is the claim that the mix is widespread —
+it is 1 file in 21, not a general condition.
