@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 33 by open-brain v0.38.0 — do not edit; change state via ob_state -->
-> **Status:** v0.38.0 — Loop 13 - Idea B, the module boundary, alone. Make the core installable with Node and git, with memory as an opt-in module. It needs no measurement, which is exactly why it has lost four times to subjects that had one; the displacing sentence is 'it fits cleanly with what we are already touching'. The question it is the instrument for has been open since Loop 9 and is not 'does injection change behaviour' - Loop 10 answered that - but DOES THE MEMORY HALF GET USED AT ALL. Three consecutive loops have now ended with ob_recalled reporting nothing recalled.
+<!-- generated from .agents/state.json rev 33 by open-brain v0.39.0 — do not edit; change state via ob_state -->
+> **Status:** v0.39.0 — Loop 13 - Idea B, the module boundary, alone. Make the core installable with Node and git, with memory as an opt-in module. It needs no measurement, which is exactly why it has lost four times to subjects that had one; the displacing sentence is 'it fits cleanly with what we are already touching'. The question it is the instrument for has been open since Loop 9 and is not 'does injection change behaviour' - Loop 10 answered that - but DOES THE MEMORY HALF GET USED AT ALL. Three consecutive loops have now ended with ob_recalled reporting nothing recalled.
 
 ## What's working
 
