@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 31,
+  "revision": 33,
   "project": {
     "name": "self-improving-agent"
   },
@@ -170,26 +170,6 @@
       "note": "(Session 50, reported by Prime). Prime's harness loads `<repo>/.agents/skills/*/SKILL.md` at boot and found three malformed: `gotchas/` and `seo-optimizer-test/` have a frontmatter `name` that differs from the directory, and `self-improving-agent-guide/SKILL.md` **had no frontmatter at all** so it never loaded — a 192-line architecture document invisible to the router for months (frontmatter added this session; unverified until Prime reboots). Each skill has up to **three** identities — directory name, frontmatter `name`, and the `.agents/skills/INDEX.md` row — and they currently disagree: INDEX.md registers two skills, Prime's loader finds three directories and loads two *different* ones. Neither reader was wrong about its own file; nothing ever checked they described the same set. Validator belongs in `/sync`, **not** the session-end hook — `/sync` is the mandatory pre-commit gate, the hook runs unattended after the fact. Confirmed hand-written, not generated: nothing in the repo writes that path, so there is no emitter to fix instead. **Directory work DONE 2026-08-11** — Aaron greenlit both. `gotchas/` renamed to `self-improving-agent-gotchas/` with INDEX.md's Directory cell updated; all three identity sources now verified in agreement for both remaining skills. `seo-optimizer-test/` moved out of the loader path to `.agents/archive/seo-optimizer-generalized.md` — **archived, not deleted, because the \"leftover fixture\" call was wrong.** It is the *generalized derivative* of TCM's applied `seo-optimizer` (placeholders instead of the hardcoded domain, `[COMMON]`/`[ARCHITECTURAL]`/`[SUBTLE]` tier annotations, plus a Priority Framework and two checklists existing in no other copy — 87 unique content lines). The `-test` suffix was recording a skill-generalization test *output*. Aaron to decide its permanent home. **Lesson worth keeping:** Forge and Prime independently agreed it was a fixture and the agreement read as corroboration — but both had reasoned from the same three indirect signals (`-test` suffix, absence from INDEX.md, wrong subject for the repo) and **neither had opened the file**. Two readers, one evidence set: the convergence carried no more information than either conclusion alone. Remaining scope of this item is the `/sync` validator itself. Original blocked items were: rename `gotchas/` → `self-improving-agent-gotchas/`, and decide `seo-optimizer-test/` — a Next.js SEO skill in a memory-protocol repo, unregistered in INDEX.md, which both agents read as a leftover test fixture (and which is currently the only skill Prime auto-triggers that no human ever declared). **The rename is cheaper than first assessed** (Prime, verified): INDEX.md's *Skill* column already reads `self-improving-agent-gotchas` and only its *Directory* cell says `gotchas/`, so the rename edits one table cell and lands all three identity sources in agreement — no name reconciliation across the registry. Whoever wrote INDEX.md had already judged `gotchas` too generic."
     },
     {
-      "id": "T-053",
-      "title": "Add a `/sync` check that `success_rate` agrees with its own counters",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as moot (session 61, verified against 6af5592): success_rate was CUT in Loop 10 C2 (E4b). No computation remains in open-brain/src — db-v2.ts:457 records that the recomputation is gone, and new databases do not declare the column. A /sync check that success_rate agrees with its counters has nothing that could drift. Separate and still open: the handoff question of whether to drop the inert column from live databases."
-    },
-    {
-      "id": "T-054",
-      "title": "The automatic feedback path never evaluates the maturity lifecycle",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 50,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as moot (session 61, verified against 6af5592): the maturity lifecycle was SUSPENDED and deleted in Loop 10 C2 (E3), apoptosis with E18. No evaluateLifecycle function exists anywhere in open-brain/src — only comments recording the cut — and auto-feedback.ts is gone from the tree entirely. The automatic feedback path cannot fail to evaluate a lifecycle that no longer exists. This also retires the substance of G-018, which named auto-feedback.ts's divergent second copy."
-    },
-    {
       "id": "T-055",
       "title": "GitNexus's incremental analyze is unreliable on this repo",
       "priority": "P1",
@@ -250,16 +230,6 @@
       "note": "or adopt the RUNBOOK rule that logs are append-only and live state belongs in INBOX only. Right now an auditor sees 153 apparently-open items with no way to tell which are long done. (Session 41)"
     },
     {
-      "id": "T-071",
-      "title": "Verify context-mode hook fixes",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 30,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 30, age 31 sessions, and left in_progress the whole time — started and abandoned. Recoverable from state.json history at 6af5592 if ever wanted back."
-    },
-    {
       "id": "T-074",
       "title": "Rewrite /checkpoint as vault-first ob_store_chunk",
       "priority": "P1",
@@ -268,26 +238,6 @@
       "closed_session": 62,
       "supersedes": null,
       "note": "Verified already satisfied rather than done this session. The note asked for checkpoint.md to write markdown to ~/Obsidian Vault v2/Checkpoints/ and index in the DB via ob_store_chunk instead of the dropped kb_store_chunk. checkpoint.md:19 already does exactly that, and its parameter block matches the live schema (content, key, category, tags, project_dir, phase — all present, session_id optional and omitted). What was NOT right was the key convention, which is a separate defect found and fixed this session: the command told the caller to put the project and phase INTO key while server.ts:1198 adds both itself."
-    },
-    {
-      "id": "T-086",
-      "title": "Re-tag the 28 oversized experience clusters",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 40,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 40; lost 21 consecutive prioritisation contests without being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
-    },
-    {
-      "id": "T-090",
-      "title": "Verify SESSION_UUID against a LIVE session",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 40,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 40; lost 21 consecutive prioritisation contests without being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
     },
     {
       "id": "T-091",
@@ -308,16 +258,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "5+ messages each side. Capture decisions in DECISIONS.md, truncate both files."
-    },
-    {
-      "id": "T-100",
-      "title": "`open-brain end` (cli.ts:146) still runs the v1 session-end pipeline, which carries a divergent `evaluateLifecycle`",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 53,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as moot (session 61, verified against 6af5592): the v1 session-end pipeline was CUT (E26) and the end subcommand is gone from cli.ts — no case \"end\" remains in its 372 lines. There is no longer a second code path carrying a divergent evaluateLifecycle, because there is no longer an evaluateLifecycle."
     },
     {
       "id": "T-101",
@@ -370,66 +310,6 @@
       "note": "Show maturity distribution, flag manual entries below apoptosis threshold, flag high-neutral/low-helpful entries (retrieval quality issue)."
     },
     {
-      "id": "T-123",
-      "title": "Improve TCM project skills with enhanced skill-creator",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 13,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 13; lost 48 consecutive prioritisation contests without being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
-    },
-    {
-      "id": "T-125",
-      "title": "Scope 3: Code maintainability eval",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 15,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 15; lost 46 consecutive prioritisation contests without being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
-    },
-    {
-      "id": "T-126",
-      "title": "Context efficiency auto-optimization",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 17,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 17; lost 44 consecutive prioritisation contests without being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
-    },
-    {
-      "id": "T-127",
-      "title": "Scope 4: True self-improving loop for the protocol itself",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 15,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 15, age 46 sessions, and left in_progress the whole time — started and abandoned, which is stronger evidence of staleness than never being picked. Recoverable from state.json history at 6af5592 if ever wanted back."
-    },
-    {
-      "id": "T-128",
-      "title": "Cross-platform UUID discovery",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 21,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as stale, not wrong (session 61, Aaron's call relayed via Clark). Opened session 21; lost 40 consecutive prioritisation contests as the only P3 in the backlog. Recoverable from state.json history at 6af5592 if ever wanted back."
-    },
-    {
-      "id": "T-145",
-      "title": "Rule on Loop 7 C2: keep retrieval, suspend the maturity lifecycle",
-      "priority": "P0",
-      "status": "done",
-      "opened_session": 58,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as DONE (session 61, verified against 6af5592): this asked Aaron to rule on Loop 7 C2 — keep retrieval, suspend the maturity lifecycle. Loop 10 ruled exactly that. docs/loops/loop-10-c2-verdicts.md records E3 (maturity lifecycle + counters) SUSPENDED, E18 (apoptosis gate) SUSPENDED on the same trigger, E9b SUSPENDED, and P1 (/start recall injection, =E28) SUSPENDED, against 14 KEEP / 9 CUT / 4 SUSPENDED overall. ob_recall stays. Closed as done rather than moot: the deliverable was a decision and the decision was made."
-    },
-    {
       "id": "T-146",
       "title": "Run the recency sweep at 0.01 / 0.02 / 0.04",
       "priority": "P1",
@@ -438,16 +318,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Unblocked by Loop 7 C2: the sweep optimises session-start retrieval, and C2 keeps that path. ADR-028 refused 0.02 on one measured alternative beating one incumbent and recommended this sweep instead. Loop 6 established recency decay does real work (no_recency refuted, 11-22), so this is the one ranking input with evidence behind it. Run before any further ranking change."
-    },
-    {
-      "id": "T-147",
-      "title": "Triage the 39 pending skill-proposal clusters",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 58,
-      "closed_session": 61,
-      "supersedes": null,
-      "note": "Closed as moot (session 61, verified against 6af5592): the skill scan and proposal machinery were CUT (E8/P7). Nothing in open-brain/src writes .skill-proposals-pending.json; the sole surviving mention is a comment in session-start/health-checks.ts:119 noting the file is left on disk. There are no longer 39 pending clusters being generated to triage. Note the stale file itself may still sit on disk unannounced — that is V-021's recorded property, not this task."
     },
     {
       "id": "T-148",
@@ -483,11 +353,11 @@
       "id": "T-151",
       "title": "Add .gitattributes — the suite fails in a fresh Windows clone and three instruments call it green",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 62,
-      "closed_session": null,
+      "closed_session": 64,
       "supersedes": null,
-      "note": "FIX COMPLETE AND VERIFIED, NOT YET MERGED — PR #21, branch fix/gitattributes at 0f41265. Verified against a control rather than asserted: two fresh worktrees from the same repo, one at 207eb6e (no fix) and one at 0f41265. Fixture `file -b`: 'ASCII text, with CRLF line terminators' before, 'ASCII text' after. state-views.test.ts: 1 failed before, 1 passed after. Full suite in the fresh FIXED clone: 44 files passed — the first time this repo has been green in a fresh Windows clone. `git add --renormalize` across the tree changes no blob (index was already LF), so only what lands on disk changes. Stays OPEN until Aaron merges; closing on a verified-but-unmerged fix would make the record say fixed while master is not."
+      "note": "Already satisfied at 669902c and verified independently by both seats before either mentioned it to the other. .gitattributes exists and carries its own derivation (T-151, session 62: core.autocrlf=true with no .gitattributes commits LF and checks out CRLF, so a FRESH CLONE failed two assertions in state-views.test.ts while the long-lived tree and Linux CI both passed). All 19 files in docs/loops/ are LF in the working tree, measured file by file. CONSEQUENCE FOR THE VIEWS: the session-63 watch-out 'Line endings are MIXED in this repo - .agents/AGENT.md is LF, docs/loops/*.md is CRLF' is STALE and should not be carried forward by the next /end. It was true when written and was falsified by the fix landing."
     },
     {
       "id": "T-152",
@@ -498,6 +368,26 @@
       "closed_session": null,
       "supersedes": null,
       "note": "open-brain/tsconfig.json is `\"include\": [\"src/**/*\"]` and there is exactly one tsconfig, so `tsc` NEVER READS open-brain/tests/. Not 'checked less strictly' — not checked. Found in Loop 12 R-010: cutting `enableHeuristicRatings` left the flag named in six places across four test files and `npx tsc --noEmit` exited 0. The referrers surfaced only at runtime, when assertions happened to trip on them. This reframes '603 tests passing': the suite proves behaviour, and nothing proves the tests' own types. A type error in a test is invisible unless a runtime assertion happens to catch it. Fix is a tsconfig that includes tests (or a second one for typecheck only); the risk is that it surfaces a backlog of existing test type errors, which is the point. Independent of the retirement work — filed, not fixed, in the loop that found it."
+    },
+    {
+      "id": "T-153",
+      "title": "Move the Developer worktree from ~/Projects/sia-forge to ~/Worktrees/sia-forge",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 64,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "WHY: ~/Projects means repos Aaron owns and commits to; seats are not projects, and ~/Worktrees/ is a top-level sibling of ~/Third-Party, ~/mcp-servers and ~/tools-src. The planner seat already lives there. BLOCKED ON: no live session in the folder - moving a directory under a running session destroys its cwd, which is Planner error 30 in a different costume. It happens BETWEEN sessions and belongs to whoever is between them. EXPLICITLY NOT INSIDE THE REPO: a worktree under the main tree is a gitignored second copy of every .md, .ts and .json for anything walking the filesystem to scan - the .gitnexus/ shape that cost 115 findings, four boundary reports, a Planner QA and five merged PRs. Keep this reasoning attached or someone re-proposes it. GOTCHAS: expect Permission denied on the first attempt and retry from outside the folder; git worktree move renames the folder but NOT the admin directory - verified, sia-forge's .git pointer still reads .git/worktrees/sia-loop12. Harmless. Do not fix it. RECORDED BECAUSE IT EXISTED NOWHERE: this plan lived in a conversation with Aaron and in one relayed line that named the deadline without naming the change."
+    },
+    {
+      "id": "T-154",
+      "title": "Give /start a memory-free documented route, and make the SessionStart hook installable by a stranger",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 64,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "DERIVED FROM C4's FAILURE, NOT RULED AS THE NEXT LOOP'S SUBJECT. Aaron ruled on 2026-09-17 only that this work is not Loop 13's. Recording it as a decision would manufacture a sequencing ruling he did not make. See the gap recorded this revision for the two halves and their provenance. The shape of the fix is known and the ruling is not: start.md names ob_start six times with no CLI path, and every piece /start needs already runs without memory - cli-bootstrap.js exits 0 on a memory-free install with the project detected and agent identity read. Changing the hook contract is a ruling, not a build decision."
     }
   ],
   "verified": [
@@ -1299,6 +1189,20 @@
       "evidence": "open-brain/tests/pipelines/sync/checks.test.ts, the case 'does not scan gitignored files, however loudly they name a retirement': `catch { return; }` with a comment deferring to 'the other tests', which do not cover the git path at all - they cover the fallback walk. NOT active in this environment: confirmed by regressing the source and watching this specific test fail, which proves it reached its assertion here, so the hazard is latent rather than masking anything today. This is the eighth instance of the instrument family in this file, and the Developer independently reported a ninth - vitest reporting 'no tests' for a file that would not parse - which occurred while writing this same test.",
       "recommended_update": "Make the skip visible instead of silent: assert git availability once and fail loudly if absent, or use vitest's skip so the runner reports it as skipped rather than passed. A test that reports green when it did not run is worse than a missing test, because the missing one is countable.",
       "opened_session": 63
+    },
+    {
+      "id": "G-030",
+      "what": "Core cannot be installed and started by a stranger, and the reason is one finding with two halves - neither of them in the code. (a) THE DOCUMENTED ROUTE GOES THROUGH MEMORY: .claude/commands/start.md names ob_start six times and ob_set_session once and gives no CLI path, so anyone following the documented /start reaches server.ts and dies at module load on better-sqlite3 - even though every piece /start actually needs runs without memory. (b) A FRESH PROFILE HAS NO SessionStart HOOK AT ALL, and both hooks in ~/.claude/settings.json hardcode absolute paths into C:/Users/melve/Projects/Self-Improving-Agent. If acquiring one means hand-editing settings.json with an absolute path into one person's home directory, core is installable BY AARON ON THIS MACHINE, which is the proxy the brief forbids.",
+      "evidence": "Two independent routes to the same floor, recorded as a measurement rather than an agreement. Forge reached it by running a real install (fresh clone, --omit=optional, better-sqlite3 absent before the run) and watching the documented path fail; Atlas reached it by PARSING ~/.claude/settings.json structurally after a grep-plus-sed pass returned a false empty - two hook entries, SessionEnd -> Projects/Self-Improving-Agent/open-brain/build/cli-session-end.js and SessionStart -> the same tree's cli-bootstrap.js, with settings.local.json defining no hooks. Reports: docs/loops/loop-13-c2-c4-boundary.md at 2084aee. Related and unrecorded anywhere else: moving or renaming the main tree breaks SessionStart and SessionEnd for EVERY project on this machine, and two directories were moved on 2026-09-17.",
+      "recommended_update": "Give /start a documented memory-free route and give a stranger a way to install the hook without hand-editing an absolute path. NOT ruled as the next loop's subject - Aaron ruled only that it is not Loop 13's.",
+      "opened_session": 64
+    },
+    {
+      "id": "G-031",
+      "what": "THIS GAP CORRECTS T-151's CLOSE NOTE AT REV 32 AND CANNOT BE WRITTEN INTO IT - a close note is write-once, so a wrong one is uncorrectable in place and only a pointer like this one can reach a reader of it. TWO FINDINGS. (1) THE CORRECTION: T-151's close note said 'all 19 files in docs/loops/ are LF in the working tree' and concluded the session-63 line-endings watch-out was stale. The measurement was correct; THE SCOPE WAS NOT STATED, and it was one worktree. 'Line endings are MIXED in this repo' is indeed wrong as a general condition - 1 file of 21, in 1 worktree of 3 - but the operative advice, DETECT PER FILE IN ANY SCRIPTED EDIT AND READ THE FILE BACK, stands and must NOT be dropped as stale by the next /end. (2) THE REAL DEFECT: a working-tree copy can disagree with the repository on line endings while git reports clean, and no check sees it. .gitattributes normalises on commit, so git STORES docs/loops/sia-mailbox-decisions.md as LF and `git show HEAD:<path>` returns LF; because `text eol=lf` makes git compare NORMALISED content, a stale CRLF working copy also reads clean in `git status` and in every diff. The repository is correct, one working tree is stale, nothing in the normal workflow reports the difference, and it survives until something forces a re-checkout of that path. A scripted multi-line edit against that file would hit exactly the mismatch the watch-out warns about, ON A FILE GIT SWEARS IS FINE.",
+      "evidence": "Measured 2026-09-17 across three worktrees sharing one .git, same tracked path docs/loops/sia-mailbox-decisions.md: planner 281,558 bytes / 0 CR; main 281,558 / 0 CR; forge 285,228 / 3,670 CR. 281,558 + 3,670 = 285,228 exactly, so the byte delta IS the carriage returns. Found by Forge flagging that its OWN earlier claim was wrong, having generalised from three measured files to a directory of 21; two instruments disagreed in its tree - `file` said CRLF, a grep for a carriage return said 0 - and `file` was right, settled by a byte count, with its detector validated against a known-CRLF file before any negative was trusted. The planner seat re-measured with an independently self-tested detector (probe written with known CR bytes, asserted before use) and found 0 CR across all 19 files in ITS tree. BOTH MEASUREMENTS WERE CORRECT AND BOTH CLAIMS WERE WRONG: the disagreement was never about the file, it was about which checkout, and neither claim carried its scope. Resolved by comparing the trees directly rather than declaring one measurement the winner.",
+      "recommended_update": "Decide whether anything should detect this. A check comparing working-tree bytes against `git show HEAD:<path>` for text-normalised paths would catch it; whether that earns its own instrument is UNRULED and is not being recorded as ruled. Until then the containment is the session-63 advice, which stands as written. Also open for ruling: a close note is write-once, so a task closed with a wrong note cannot be corrected in place - whether that is acceptable, or whether close notes should be amendable, is unruled.",
+      "opened_session": 64
     }
   ],
   "decisions": [
@@ -1589,6 +1493,12 @@
       "title": "Loop 13 is Idea B - the module boundary",
       "date": "2026-09-17",
       "note": "Aaron ruled, against the alternative of G-026 (recall precision), which he had earlier pencilled in. The Planner argued for Idea B and not on the grounds that it was owed a turn: G-026's urgency is contingent on recall being USED, and three consecutive loops have now run with zero recalls, so tuning precision on a system nobody queries optimises a thing whose value is unestablished. Idea B - core installable with Node and git, memory an opt-in module - is the instrument for the question open since Loop 9: not 'does injection change behaviour', which Loop 10 answered, but 'does the memory half get used at all'. Idea B had been scheduled as Loop 7 and displaced four times, every time into a loop that had its own subject, by the sentence 'it fits cleanly with what we are already touching' - a sentence the Planner itself wrote about the lifecycle cut four hours before quoting the pattern back."
+    },
+    {
+      "id": "D-018",
+      "title": "Loop 13's C4 closes as a recorded failure",
+      "date": "2026-09-17",
+      "note": "Ruled by Aaron in-session to the planner seat (Atlas), 2026-09-17, in the words 'yes, Loop 13's C4 closes as a recorded failure'. C4 asked whether core installs and runs with Node and git alone, memory absent. It does NOT, and the reason is the finding: THE MACHINERY IS INSTALLABLE; THE INSTRUCTION IS NOT. Forge ran a real install - fresh clone, npm install --omit=optional, better-sqlite3 confirmed ABSENT before anything ran, env vars pointed at nonexistent paths - and everything mechanical passed: install, build, sync --check (21 passed, 4 skipped, the three memory checks SKIPPING WITH THE REASON rather than passing), open-brain start exit 0, cli-bootstrap.js exit 0 with project detected and agent identity read. server.js died correctly, because it IS the memory half. The loop fails at the instruction layer only. Aaron ruled ONLY that the command surface and hook installation are not Loop 13's work. He did NOT rule them as the next loop's subject; that is recorded as an open task with its derivation, not as a decision. A loop that ends in an honest no is not a failed loop, and the brief was written to make this outcome reportable: it either passes or it does not, and there is no partial credit to hide in."
     }
   ],
   "handoff": {
