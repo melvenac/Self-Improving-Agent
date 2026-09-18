@@ -13,6 +13,7 @@ import { join } from "path";
 import { randomUUID } from "crypto";
 import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
+import { describeDerivedArtifacts } from "./pipelines/session-start/derived-artifacts.js";
 import {
   resolveSessionId,
   writeActiveSession,
@@ -131,6 +132,20 @@ const identity = readAgentIdentity(cwd);
 if (identity) {
   const partner = identity.partner ? `partner: ${identity.partner}` : "no partner";
   lines.push(`Agent: ${identity.name} (${identity.role}) — ${partner}`);
+}
+
+// Derived artifacts — the index and the build. Reported HERE as well as in
+// /sync because /sync guards the commit moment, while a stale index misleads
+// `impact` mid-edit and a stale build makes the MCP server answer from another
+// commit, both potentially hours from any commit. Prints NOTHING when the
+// artifacts are current or absent: the only output is a problem. See
+// pipelines/session-start/derived-artifacts.ts for why it calls the same
+// functions /sync does rather than repeating the comparison.
+if (hasAgents) {
+  for (const line of describeDerivedArtifacts(cwd)) {
+    lines.push("");
+    lines.push(line);
+  }
 }
 
 // Health checks
