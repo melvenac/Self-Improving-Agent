@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import { execSync } from "node:child_process";
+import { execSync, execFileSync } from "node:child_process";
 import type { CheckResult, SyncRuntime } from "./types.js";
 import { parseSkillIndexRows } from "../../shared/skill-index.js";
 import { parseState } from "../../shared/state-schema.js";
@@ -1331,6 +1331,267 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
     message:
       `core does not import memory (${scale}). ` +
       `LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.`,
+    report: true,
+  };
+}
+
+/**
+ * Run a git command, returning null rather than throwing.
+ *
+ * Returns null for BOTH "git failed" and "git is not here", and every caller
+ * below distinguishes those from a real answer before reporting anything. A
+ * helper that folded a failure into an empty string would let a broken git
+ * render as a clean result — the family this repo keeps finding.
+ */
+function gitOut(cwd: string, args: string[]): string | null {
+  try {
+    // execFileSync, NOT execSync: no shell, so arguments reach git verbatim.
+    // Built as a shell string first, `<sha>^{commit}` came back as `<sha>{commit}`
+    // because cmd.exe treats `^` as its escape character — the check then reported
+    // "indexed commit is not present in this repository" for a commit that was.
+    // It failed CLOSED, which is why a test caught it instead of a green run.
+    return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Is the GitNexus index current, and is it even anchored to something real?
+ *
+ * The index lives in ONE tree — the main checkout — and is read through the
+ * GitNexus MCP tools, which `CLAUDE.md` tells agents they MUST consult before
+ * editing a symbol. When it is stale those tools do not refuse: they ANSWER,
+ * about code as it was at the indexed commit. An agent that obeys the
+ * instruction gets a confident wrong blast radius; one that ignores it gets
+ * nothing and notices. **The compliant path is the worse one**, and that is why
+ * this check exists rather than a note telling people to reindex.
+ *
+ * Found at v0.39.0: the index was 137 commits behind AND pinned to
+ * `loop/4-dogfood`, a branch deleted from both the local repo and origin.
+ *
+ * ## The anchor is the indexed SHA, NOT the recorded branch
+ *
+ * A first version judged staleness by whether the pinned branch still existed.
+ * That was wrong, and it was caught by reindexing rather than by reasoning: a
+ * successful reindex at `08e6486` left `branch: "loop/4-dogfood"` — a deleted
+ * branch — because the tree was in a DETACHED head and the analyzer had no name
+ * to record, so it kept the old one. The check would have reported ISSUE on a
+ * perfectly current index. All three worktrees here are detached or will be.
+ *
+ * **`lastCommit` versus HEAD is a comparison of two SHAs and cannot be fooled.**
+ * It was available the whole time. The branch field is reported as context and
+ * never as the finding.
+ *
+ * ## Why the ref and timestamp are printed
+ *
+ * Two seats measured this an hour apart and got 137 and 138, because master
+ * moved underneath them. A derived number must carry what it was derived from,
+ * or two correct measurements look like a disagreement.
+ *
+ * LIMIT, stated in the output: this can see that the index is old. It cannot
+ * see whether anything it indexed actually changed — a hundred commits touching
+ * only Markdown leave the graph perfectly valid.
+ */
+export function checkGitNexusIndex(projectRoot: string): CheckResult {
+  const name = "gitnexus-index";
+  const metaPath = join(projectRoot, ".gitnexus", "meta.json");
+  if (!existsSync(metaPath)) {
+    return {
+      name,
+      severity: "skip",
+      message: "no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)",
+      report: true,
+    };
+  }
+
+  let meta: { lastCommit?: string; branch?: string; indexedAt?: string };
+  try {
+    meta = JSON.parse(readFileSync(metaPath, "utf8"));
+  } catch (err) {
+    return { name, severity: "issue", message: `.gitnexus/meta.json unreadable: ${(err as Error).message}`, report: true };
+  }
+
+  const head = gitOut(projectRoot, ["rev-parse", "--short", "HEAD"]);
+  if (head === null) {
+    return { name, severity: "skip", message: "git unavailable here — index freshness not checked (not a pass)", report: true };
+  }
+  const at = `measured against HEAD ${head} at ${new Date().toISOString()}`;
+
+  // The `branch` field is NOT evidence and must never drive the verdict.
+  // The analyzer only records a branch name when one exists: in a DETACHED head
+  // it keeps whatever was there before. Measured at v0.39.0 — a reindex at
+  // 08e6486 left `branch: "loop/4-dogfood"`, a deleted branch, on a perfectly
+  // current index. Judging staleness by it reports ISSUE on a fresh index, which
+  // is a false positive on the exact case this check exists to catch, and it
+  // would teach whoever sees it to ignore the check.
+  //
+  // All three worktrees here are detached or will be, so that is the NORMAL case
+  // rather than an edge case. A dead pin is reported as context, never as the
+  // finding.
+  const branch = meta.branch;
+  let branchNote = "";
+  if (branch) {
+    const exists =
+      gitOut(projectRoot, ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`]) !== null ||
+      gitOut(projectRoot, ["rev-parse", "--verify", "--quiet", `refs/remotes/origin/${branch}`]) !== null;
+    if (!exists) {
+      branchNote =
+        ` NOTE: the recorded branch '${branch}' no longer exists, which is expected in a detached checkout —` +
+        ` the analyzer keeps the previous name. It is not evidence of staleness either way.`;
+    }
+  }
+
+  const indexed = meta.lastCommit;
+  if (!indexed) {
+    return { name, severity: "issue", message: `.gitnexus/meta.json records no lastCommit — staleness is undefined; reindex. ${at}`, report: true };
+  }
+  if (gitOut(projectRoot, ["cat-file", "-e", `${indexed}^{commit}`]) === null) {
+    return {
+      name,
+      severity: "issue",
+      message:
+        `indexed commit ${indexed.slice(0, 7)} is not present in this repository — staleness is UNDEFINED, not zero. Reindex. ${at} ` +
+        `LIMIT: sees that the index is old, not whether anything it indexed changed.`,
+      report: true,
+    };
+  }
+
+  const behindRaw = gitOut(projectRoot, ["rev-list", "--count", `${indexed}..HEAD`]);
+  if (behindRaw === null || !/^\d+$/.test(behindRaw)) {
+    return { name, severity: "issue", message: `could not count commits since ${indexed.slice(0, 7)} — staleness undefined, not zero. ${at}`, report: true };
+  }
+  const behind = Number(behindRaw);
+
+  const tail = `(indexed ${indexed.slice(0, 7)}, ${meta.indexedAt ?? "time unrecorded"}; ${at}) ` +
+    `LIMIT: sees that the index is old, not whether anything it indexed changed.${branchNote}`;
+
+  if (behind === 0) return { name, severity: "pass", message: `index is at HEAD ${tail}`, report: true };
+  return { name, severity: "warn", message: `index is ${behind} commit(s) behind HEAD — run analyze ${tail}`, report: true };
+}
+
+/**
+ * Does `build/` correspond to the commit that is checked out?
+ *
+ * **This is the more dangerous of the two derived artifacts and it had no check
+ * at all.** The MCP server and both SessionStart/SessionEnd hooks execute the
+ * main tree's `build/` — for every project on this machine, not just this one.
+ * A build from a different commit serves old code and reports success.
+ *
+ * mtimes cannot answer this: checking out an older commit and rebuilding gives
+ * a NEWER mtime over OLDER content. The build therefore stamps the SHA it was
+ * built from (`scripts/write-build-info.mjs`, wired as `postbuild`) and this
+ * check compares it to HEAD. **A comparison, not a heuristic.**
+ *
+ * An unstamped build is reported as UNKNOWN rather than fresh — a build that
+ * predates the stamp cannot be vouched for, and saying so is the point.
+ */
+/**
+ * Is this the main checkout, or a linked worktree?
+ *
+ * `--absolute-git-dir` and `--git-common-dir` are the SAME path in the main
+ * checkout and differ in a linked worktree, where the git dir is
+ * `<common>/worktrees/<name>`. Measured across all three trees here.
+ *
+ * Returns null when git cannot answer, and the caller then says nothing about
+ * consequences rather than guessing one.
+ */
+function isMainCheckout(projectRoot: string): boolean | null {
+  const gitDir = gitOut(projectRoot, ["rev-parse", "--path-format=absolute", "--absolute-git-dir"]);
+  const commonDir = gitOut(projectRoot, ["rev-parse", "--path-format=absolute", "--git-common-dir"]);
+  if (gitDir === null || commonDir === null) return null;
+  const norm = (p: string) => p.replace(/\\/g, "/").replace(/\/+$/, "").toLowerCase();
+  return norm(gitDir) === norm(commonDir);
+}
+
+/**
+ * What a stale build actually costs, WHERE THE CHECK IS RUNNING.
+ *
+ * This sentence used to assert unconditionally that "the MCP server and both
+ * hooks are running code from a different commit". **That is true only in the
+ * main checkout.** Both hooks in `~/.claude/settings.json` hardcode absolute
+ * paths into the main tree's `open-brain/build/`, so in a linked worktree a
+ * stale local build means the local CLI is stale and the hooks and server are
+ * untouched. Two of the three trees here are linked.
+ *
+ * It matters because this check fires OFTEN — every amend, rebase and branch
+ * switch re-stales the build, correctly, since the stamp is a commit
+ * comparison. **Frequent plus a false justification is how a check teaches
+ * people to ignore it**, and this one has to survive being seen often.
+ *
+ * Rule 14: a statement true where it was written, used as an invariant,
+ * falsified by an ordinary fact elsewhere. The verdict and the comparison are
+ * unchanged — only the consequence is made true where it is read.
+ */
+function staleBuildConsequence(projectRoot: string): string {
+  const main = isMainCheckout(projectRoot);
+  if (main === null) {
+    return "this build does not match the checked-out commit.";
+  }
+  return main
+    ? "the MCP server and both hooks run from THIS tree's build, so they are running code from a different commit, and a stale server reports success."
+    : "the local CLI in this checkout is stale. The hooks and MCP server run from the MAIN checkout's build and are unaffected by this one.";
+}
+
+export function checkBuildFreshness(projectRoot: string): CheckResult {
+  const name = "build-freshness";
+  const buildDir = join(projectRoot, "open-brain", "build");
+  if (!existsSync(buildDir)) {
+    return { name, severity: "skip", message: "open-brain/build absent — nothing built here to compare (not a pass)", report: true };
+  }
+
+  const infoPath = join(buildDir, "build-info.json");
+  if (!existsSync(infoPath)) {
+    return {
+      name,
+      severity: "issue",
+      message:
+        "build/ exists but carries no build-info.json — it predates the stamp, so which commit it was built from is UNKNOWN. " +
+        `Rebuild. An unstamped build cannot be distinguished from a stale one, and ${staleBuildConsequence(projectRoot)}`,
+      report: true,
+    };
+  }
+
+  let info: { commit?: string | null; builtAt?: string; reason?: string | null };
+  try {
+    info = JSON.parse(readFileSync(infoPath, "utf8"));
+  } catch (err) {
+    return { name, severity: "issue", message: `build/build-info.json unreadable: ${(err as Error).message} — rebuild`, report: true };
+  }
+
+  if (!info.commit) {
+    return {
+      name,
+      severity: "issue",
+      message: `build was not stamped with a commit (${info.reason ?? "no reason recorded"}) — freshness is UNKNOWN, not fresh. Rebuild.`,
+      report: true,
+    };
+  }
+
+  const head = gitOut(projectRoot, ["rev-parse", "HEAD"]);
+  if (head === null) {
+    return { name, severity: "skip", message: "git unavailable here — build freshness not checked (not a pass)", report: true };
+  }
+
+  const short = (s: string) => s.slice(0, 7);
+  if (head === info.commit) {
+    return {
+      name,
+      severity: "pass",
+      message:
+        `build matches HEAD ${short(head)} (built ${info.builtAt ?? "at an unrecorded time"}). ` +
+        `LIMIT: compares commits, not working-tree edits — uncommitted source changes are not in this build either.`,
+      report: true,
+    };
+  }
+
+  return {
+    name,
+    severity: "issue",
+    message:
+      `build was made from ${short(info.commit)} but HEAD is ${short(head)} — ${staleBuildConsequence(projectRoot)} Rebuild. ` +
+      `(built ${info.builtAt ?? "at an unrecorded time"}) ` +
+      `LIMIT: compares commits, not working-tree edits.`,
     report: true,
   };
 }

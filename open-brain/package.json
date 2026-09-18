@@ -2,7 +2,7 @@
   "name": "open-brain",
   "version": "0.1.0",
   "type": "module",
-  "description": "Unified knowledge pipeline \u2014 the v2 brain",
+  "description": "Unified knowledge pipeline — the v2 brain",
   "main": "./build/cli.js",
   "bin": {
     "open-brain": "./build/cli.js",
@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "dev": "npx tsx src/cli.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "postbuild": "node scripts/write-build-info.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

@@ -26,6 +26,8 @@ import {
   checkCommandNames,
   checkRetirements,
   checkModuleBoundary,
+  checkGitNexusIndex,
+  checkBuildFreshness,
 } from "./checks.js";
 import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-state.js";
 
@@ -86,6 +88,11 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkRetirements(options.projectRoot));
   // Loop 13 C3: the module boundary asserted mechanically rather than remembered.
   checks.push(checkModuleBoundary(options.projectRoot));
+  // Derived artifacts: the index is advice, the build is EXECUTED by the MCP
+  // server and both hooks. Separate checks — one severity for two artifacts
+  // would report a single outcome for two independent claims.
+  checks.push(checkGitNexusIndex(options.projectRoot));
+  checks.push(checkBuildFreshness(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
   // Loop 10 R1: the runtime label travels with the check, because the same code
   // passing in one process and failing in the other IS the signal.
