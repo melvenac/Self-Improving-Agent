@@ -1486,6 +1486,53 @@ export function checkGitNexusIndex(projectRoot: string): CheckResult {
  * An unstamped build is reported as UNKNOWN rather than fresh — a build that
  * predates the stamp cannot be vouched for, and saying so is the point.
  */
+/**
+ * Is this the main checkout, or a linked worktree?
+ *
+ * `--absolute-git-dir` and `--git-common-dir` are the SAME path in the main
+ * checkout and differ in a linked worktree, where the git dir is
+ * `<common>/worktrees/<name>`. Measured across all three trees here.
+ *
+ * Returns null when git cannot answer, and the caller then says nothing about
+ * consequences rather than guessing one.
+ */
+function isMainCheckout(projectRoot: string): boolean | null {
+  const gitDir = gitOut(projectRoot, ["rev-parse", "--path-format=absolute", "--absolute-git-dir"]);
+  const commonDir = gitOut(projectRoot, ["rev-parse", "--path-format=absolute", "--git-common-dir"]);
+  if (gitDir === null || commonDir === null) return null;
+  const norm = (p: string) => p.replace(/\\/g, "/").replace(/\/+$/, "").toLowerCase();
+  return norm(gitDir) === norm(commonDir);
+}
+
+/**
+ * What a stale build actually costs, WHERE THE CHECK IS RUNNING.
+ *
+ * This sentence used to assert unconditionally that "the MCP server and both
+ * hooks are running code from a different commit". **That is true only in the
+ * main checkout.** Both hooks in `~/.claude/settings.json` hardcode absolute
+ * paths into the main tree's `open-brain/build/`, so in a linked worktree a
+ * stale local build means the local CLI is stale and the hooks and server are
+ * untouched. Two of the three trees here are linked.
+ *
+ * It matters because this check fires OFTEN — every amend, rebase and branch
+ * switch re-stales the build, correctly, since the stamp is a commit
+ * comparison. **Frequent plus a false justification is how a check teaches
+ * people to ignore it**, and this one has to survive being seen often.
+ *
+ * Rule 14: a statement true where it was written, used as an invariant,
+ * falsified by an ordinary fact elsewhere. The verdict and the comparison are
+ * unchanged — only the consequence is made true where it is read.
+ */
+function staleBuildConsequence(projectRoot: string): string {
+  const main = isMainCheckout(projectRoot);
+  if (main === null) {
+    return "this build does not match the checked-out commit.";
+  }
+  return main
+    ? "the MCP server and both hooks run from THIS tree's build, so they are running code from a different commit, and a stale server reports success."
+    : "the local CLI in this checkout is stale. The hooks and MCP server run from the MAIN checkout's build and are unaffected by this one.";
+}
+
 export function checkBuildFreshness(projectRoot: string): CheckResult {
   const name = "build-freshness";
   const buildDir = join(projectRoot, "open-brain", "build");
@@ -1500,7 +1547,7 @@ export function checkBuildFreshness(projectRoot: string): CheckResult {
       severity: "issue",
       message:
         "build/ exists but carries no build-info.json — it predates the stamp, so which commit it was built from is UNKNOWN. " +
-        "Rebuild. An unstamped build cannot be distinguished from a stale one, and the MCP server and both hooks run from it.",
+        `Rebuild. An unstamped build cannot be distinguished from a stale one, and ${staleBuildConsequence(projectRoot)}`,
       report: true,
     };
   }
@@ -1542,8 +1589,7 @@ export function checkBuildFreshness(projectRoot: string): CheckResult {
     name,
     severity: "issue",
     message:
-      `build was made from ${short(info.commit)} but HEAD is ${short(head)} — the MCP server and both hooks are running ` +
-      `code from a different commit, and a stale server reports success. Rebuild. ` +
+      `build was made from ${short(info.commit)} but HEAD is ${short(head)} — ${staleBuildConsequence(projectRoot)} Rebuild. ` +
       `(built ${info.builtAt ?? "at an unrecorded time"}) ` +
       `LIMIT: compares commits, not working-tree edits.`,
     report: true,

@@ -53,6 +53,18 @@ instruction, not in the agent.
 
 ### Fixed
 
+- **The stale-build consequence is now true WHERE THE CHECK RUNS.** It asserted unconditionally that
+  "the MCP server and both hooks are running code from a different commit" — true only in the main
+  checkout. Both hooks hardcode absolute paths into the main tree, so in a linked worktree a stale
+  build means the local CLI is stale and the hooks and server are untouched; two of the three trees
+  here are linked. Main vs linked is detected by comparing `--absolute-git-dir` with
+  `--git-common-dir`, which are identical only in the main checkout. **The verdict and the
+  comparison are unchanged — only the consequence.** The same false invariant was in a second
+  message that had not been reported (the unstamped branch); fixing only the reported one would
+  have left the defect a branch away. Both are pinned by tests, because nothing pinned the sentence
+  before and the next edit could have re-universalised it silently.
+
+
 - **`gitnexus-index` no longer judges staleness by the recorded branch.** The first version failed
   a fresh index: a successful reindex at `08e6486` left `branch: "loop/4-dogfood"` — deleted —
   because the tree was **detached** and the analyzer keeps the previous name. That is a false

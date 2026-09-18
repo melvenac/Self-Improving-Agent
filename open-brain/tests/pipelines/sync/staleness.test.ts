@@ -145,7 +145,70 @@ describe("checkBuildFreshness", () => {
     execSync("git add -A && git commit -q -m c", { cwd: dir, stdio: "ignore" });
     const r = checkBuildFreshness(dir);
     expect(r.severity).toBe("issue");
+    expect(r.message).toContain("was made from");
+  });
+
+  it("in a MAIN checkout, names the hooks and server as affected", () => {
+    writeInfo({ commit: head, builtAt: "2026-09-17T00:00:00.000Z", reason: null });
+    execSync("git commit -q --allow-empty -m moved", { cwd: dir, stdio: "ignore" });
+    const r = checkBuildFreshness(dir);
+    expect(r.severity).toBe("issue");
     expect(r.message).toContain("a stale server reports success");
+  });
+
+  it("in a LINKED WORKTREE, says the hooks and server are UNAFFECTED", () => {
+    // The consequence was asserted unconditionally and is true only in the main
+    // checkout: both hooks hardcode absolute paths into the MAIN tree's build,
+    // so here a stale build means a stale local CLI and nothing more. Two of the
+    // three trees on this machine are linked. Rule 14 — a statement true where
+    // it was written, used as an invariant.
+    //
+    // This is pinned by a test precisely because nothing pinned it before: the
+    // wording could be re-universalised by the next edit with nothing to catch
+    // it, which is the shape of the defect itself.
+    const wt = join(dir, "..", `wt-${Date.now()}`);
+    try {
+      execSync(`git worktree add -q --detach "${wt}"`, { cwd: dir, stdio: "ignore" });
+      mkdirSync(join(wt, "open-brain", "build"), { recursive: true });
+      writeFileSync(
+        join(wt, "open-brain", "build", "build-info.json"),
+        JSON.stringify({ commit: "0".repeat(40), builtAt: "2026-09-17T00:00:00.000Z", reason: null }),
+      );
+      const r = checkBuildFreshness(wt);
+      expect(r.severity).toBe("issue");
+      expect(r.message).toContain("local CLI in this checkout is stale");
+      expect(r.message).toContain("unaffected");
+      // The main-checkout claim must NOT appear here.
+      expect(r.message).not.toContain("a stale server reports success");
+    } finally {
+      try {
+        execSync(`git worktree remove --force "${wt}"`, { cwd: dir, stdio: "ignore" });
+      } catch {
+        rmSync(wt, { recursive: true, force: true });
+      }
+    }
+  });
+
+  it("the UNSTAMPED message carries the same tree-aware consequence, not a universal one", () => {
+    // The same false invariant lived in a second message that was not flagged:
+    // the unstamped branch also asserted the hooks run from this tree. Fixing
+    // only the reported instance would have left the defect one branch away.
+    const wt = join(dir, "..", `wt2-${Date.now()}`);
+    try {
+      execSync(`git worktree add -q --detach "${wt}"`, { cwd: dir, stdio: "ignore" });
+      mkdirSync(join(wt, "open-brain", "build"), { recursive: true });
+      const r = checkBuildFreshness(wt);
+      expect(r.severity).toBe("issue");
+      expect(r.message).toContain("UNKNOWN");
+      expect(r.message).toContain("unaffected");
+      expect(r.message).not.toContain("a stale server reports success");
+    } finally {
+      try {
+        execSync(`git worktree remove --force "${wt}"`, { cwd: dir, stdio: "ignore" });
+      } catch {
+        rmSync(wt, { recursive: true, force: true });
+      }
+    }
   });
 
   it("reports an UNSTAMPED build as unknown, never as fresh", () => {
