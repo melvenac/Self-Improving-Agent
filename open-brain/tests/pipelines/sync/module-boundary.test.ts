@@ -111,6 +111,27 @@ describe("checkModuleBoundary", () => {
     expect(MEMORY_SIDE).not.toContain("pipelines/session-start/new-thing.ts");
   });
 
+  it("a pass must prove it WALKED — the count in the message is the proof", () => {
+    // The unresolved-specifier refusal covers a DROPPED edge. This covers the
+    // never-walked case: a walker that silently stopped early still returns
+    // "pass", and a pass that did not look is the same non-measurement in a
+    // different costume. The file count is the only thing in the output that
+    // can distinguish them, so it is asserted rather than merely printed.
+    write("pipelines/session-start/index.ts", "export const s = 1;\n");
+    write("pipelines/state-views/index.ts", "export const v = 1;\n");
+    const r = checkModuleBoundary(dir);
+    expect(r.severity).toBe("pass");
+    // 3 from beforeEach + 2 here. A walker that stopped at the root would say 3.
+    expect(r.message).toContain("5 file(s)");
+  });
+
+  it("fires on a memory import added to a NEW nested file, not just an existing one", () => {
+    write("pipelines/state-views/renderer.ts", 'import D from "better-sqlite3";\nexport const r = 1;\n');
+    const r = checkModuleBoundary(dir);
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("pipelines/state-views/renderer.ts -> better-sqlite3");
+  });
+
   it("passes on this repository's own source", () => {
     const repoRoot = join(import.meta.dirname, "..", "..", "..", "..");
     const r = checkModuleBoundary(repoRoot);
