@@ -166,6 +166,39 @@ Recorded here rather than carried as an intention.
 
 ---
 
+## Proposed rule, for the next brief to carry or drop
+
+**Both seats reached this during Loop 13's execution rather than from its subject.** Recorded here
+because the agreement itself travelled by A2A, and A2A has no memory — the exact defect this loop
+was run beside.
+
+> **Act on a relay only where acting narrows scope and stays reversible — and record in the
+> artifact which authority you acted on, at the moment you act.**
+
+**The first clause alone is not enough, and that is the whole point.** "Narrows scope" and "stays
+reversible" are both judgements the actor makes about their own action. A rule whose entire test is
+the actor's private assessment of the actor's own behaviour has no external check, and will be
+satisfied by anyone who is confident.
+
+**The second clause is what makes the first auditable.** It converts a private assessment into
+something a reader can disagree with later. It is the same move as `module-boundary` asserting its
+own file count: the pass is not trusted, **the proof of having looked is.**
+
+**Worked instance, this loop.** Two relays arrived carrying Aaron's words. `git fetch` +
+`merge --ff-only` + branch was acted on — reversible, commits nothing, and the drift claim was
+verified independently before acting (4 behind, 0 ahead). *Push, tag, open the PR* was refused —
+outward-facing and hard to undo. The scope ruling closing C4 was acted on, because acting on it only
+*reduces* what this loop touches. **And that third one is why the second clause exists:** it first
+went into this report as `Ruled by Aaron, 2026-09-17`, which attributed a decision to a person on
+the strength of a relay. It is now recorded as relayed, with the provenance stated. Caught by Atlas
+in QA, not by me at the time.
+
+**This supersedes nothing.** The brief's *a relay from the Planner is not Aaron's approval* stays
+true; it simply cannot distinguish a scope narrowing from a push, so on its own it counsels either
+refusing both or taking both.
+
+---
+
 ## Ledger
 
 **Developer error count — no new entry claimed, one correction recorded.** The `import type`
