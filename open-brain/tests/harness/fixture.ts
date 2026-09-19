@@ -14,7 +14,7 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -70,11 +70,28 @@ export function makeRepo(prefix = "harness-repo-"): RepoFixture {
   const root = realpathSync(mkdtempSync(join(tmpdir(), prefix)));
 
   rawGit(root, ["init", "--initial-branch=main"]);
-  // Local config only — a test must never depend on, or touch, the machine's git identity.
-  rawGit(root, ["config", "user.email", "harness-test@example.invalid"]);
-  rawGit(root, ["config", "user.name", "Harness Test"]);
-  rawGit(root, ["config", "commit.gpgsign", "false"]);
-  rawGit(root, ["config", "core.autocrlf", "false"]);
+
+  // Local config only — a test must never depend on, or touch, the machine's
+  // git identity. Written as one file append rather than four `git config`
+  // spawns: with ~50 repositories per run that was 200 extra synchronous child
+  // processes, and every one of them blocks the vitest worker's event loop.
+  // That is not a micro-optimisation — it was enough to make the worker miss
+  // its reporter heartbeat and raise `Timeout calling "onTaskUpdate"`, which
+  // vitest warns "might cause false positive tests".
+  appendFileSync(
+    join(root, ".git", "config"),
+    [
+      "[user]",
+      "\temail = harness-test@example.invalid",
+      "\tname = Harness Test",
+      "[commit]",
+      "\tgpgsign = false",
+      "[core]",
+      "\tautocrlf = false",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
 
   const write = (repoPath: string, content: string): void => {
     const abs = join(root, repoPath);
