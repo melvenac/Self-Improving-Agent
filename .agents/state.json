@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 39,
+  "revision": 41,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1056,6 +1056,124 @@
       ],
       "since_session": 64,
       "status": "verified"
+    },
+    {
+      "id": "V-038",
+      "claim": "The write allowlist refuses a stage write made outside it even when the role bypasses the runtime's write helper and calls node:fs directly — the write is reverted, no candidate commit is made, and the breach is not retried",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/runtime.test.ts",
+          "observation": "'A4 — the write allowlist refuses': a SneakyDeveloper stub writes src/backdoor.ts with node:fs; loop fails allowlist-violation, file is gone, candidateSha null, loop-001-developer absent"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/src/harness/workspace.ts",
+          "observation": "mutating enforceAllowlist's ok to a constant true fails 4 A4 tests; restored, 157/157 pass"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/workspace.test.ts",
+          "observation": "a file written deep inside an unlisted new directory is reported as the file, not the directory, so a prefix rule cannot permit it"
+        }
+      ],
+      "since_session": 65,
+      "status": "verified"
+    },
+    {
+      "id": "V-039",
+      "claim": "The QA stage refuses to run when the tree has moved from the candidate SHA or is dirty against it, and reports those two conditions separately rather than as one 'not frozen'",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/runtime.test.ts",
+          "observation": "'A3 — the frozen candidate': a deterministic check that makes a real commit produces candidate-moved and no E_t.json; a check that leaves an untracked file produces the dirty-tree branch of the same refusal"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/src/harness/workspace.ts",
+          "observation": "mutating verifyFrozen's two conditions to if(false) fails 2 A3 tests; restored, green"
+        }
+      ],
+      "since_session": 65,
+      "status": "verified"
+    },
+    {
+      "id": "V-040",
+      "claim": "An exhausted schema-retry cap is a recorded failure — FAILED.md on disk naming the stage, code and attempt count, a non-zero exit, and no E_t — never a silent pass, and the retried role is handed the problems and the schema that rejected it",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/runtime.test.ts",
+          "observation": "'A2 — schema retry and the cap': cap exhausted gives schema-cap-exhausted with attempts recorded, FAILED.md asserted for content not existence, and E_t.json absent"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/src/harness/artifacts.ts",
+          "observation": "renderFailure writes the stage, machine-readable code, attempts and problems into the iteration directory"
+        }
+      ],
+      "since_session": 65,
+      "status": "verified"
+    },
+    {
+      "id": "V-041",
+      "claim": "Deterministic check verdicts come from process exit codes and nothing else: a command printing 'All 648 tests passed!' while exiting 1 is recorded as failed, a command that cannot be spawned is a failure with a null exit code rather than a pass, and a QA report whose runtime_checks contradict the measurement is refused rather than silently corrected",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/checks.test.ts",
+          "observation": "20 tests including the stdout/exit-code disagreement in both directions, an unspawnable binary, and a timeout"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/runtime.test.ts",
+          "observation": "a QA stub reporting green runtime_checks against a measured red build fails the loop with evidence-disagrees-with-runtime"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/checks.test.ts",
+          "observation": "a source scan finds no shell:true, no shell:process.platform and no template-string command in any harness source file; seen red on a planted shell:true"
+        }
+      ],
+      "since_session": 65,
+      "status": "verified"
+    },
+    {
+      "id": "V-042",
+      "claim": "The harness sits inside the module boundary as core and reaches no memory code, and it cannot invoke a network git subcommand",
+      "evidence": [
+        {
+          "type": "command",
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "observation": "sync --check at 1c8e6ca: module-boundary pass, 'core does not import memory (56 file(s), 41 core)' — up from 44 files before the harness landed"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/git.test.ts",
+          "observation": "ten denied subcommands refused at the call site including behind leading -c/-C global options; a source scan for a network git subcommand seen red on a planted git(root, [\"push\"])"
+        }
+      ],
+      "since_session": 65,
+      "status": "verified"
+    },
+    {
+      "id": "V-043",
+      "claim": "A loop's pre-loop state is restorable with git alone, and the runtime's rollback markers cannot be moved",
+      "evidence": [
+        {
+          "type": "command",
+          "path": "open-brain/src/harness/cli.ts",
+          "observation": "by-hand run against a scratch repo outside vitest: git reset --hard loop-001-base && git clean -fdx returned HEAD to the pre-loop commit, removed artifacts/ entirely, left git status --porcelain empty"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/git.test.ts",
+          "observation": "tagAt refuses to move an existing tag and the marker still points where it did"
+        }
+      ],
+      "since_session": 65,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -1281,6 +1399,27 @@
       "what": "The mutual-exclusion rule over the record - 'no seat takes a revision while another seat holds an unclosed session' - deadlocks a three-seat loop, and its proposed mechanism inherits the deadlock. Found while fixing the stale objective on 2026-09-19: both Forge and Probe had open sessions, so the rule as stated forbade the planner from writing set_objective - a write the loop needed before it could start. The developer's specced mechanism, 'ob_state refuses a write when another seat's session is open and unclosed', would have refused it too. The rule was written for two seats that alternate; with three seats whose sessions are long-lived and overlapping, a planner that cannot write mid-loop cannot rule mid-loop.",
       "evidence": "The rule's own history: first stated by the developer as 'the developer's /end is the last write', falsified by the planner within the hour because QA's E_t and the close-out both come after the developer's /end by design; restated by the planner as mutual exclusion over the record; now falsified by the first mid-loop write the planner needed to make. Two formulations, both encoding an assumption about how many seats are live at once. The actual failure G-027 describes is two seats deriving one revision from ONE BASE - a lineage problem, not a concurrency problem.",
       "recommended_update": "State the invariant over lineage, not sessions: ob_state refuses a write when the local state.json revision does not match the revision on origin/master, and says which is ahead. That is a fetch and a comparison, needs no session bookkeeping, permits any seat to write at any time provided it is writing on the current base, and turns the G-027 collision into a refusal at the moment of the write instead of a merge conflict later. A seat that gets the refusal fetches, re-reads, and retries once - which is what the /end protocol already says to do on 'revision mismatch'. Supersedes the mechanism proposed under the D-019 discussion; the developer should not build the session-flag version. NOT ruled as any loop's subject.",
+      "opened_session": 65
+    },
+    {
+      "id": "G-037",
+      "what": "The harness test suite made the FULL vitest run exit 1 while printing '805 passed'. Several hundred synchronous child processes plus rmSync over .git directories blocked the vitest worker's event loop past its reporter heartbeat, raising `[vitest-worker]: Timeout calling \"onTaskUpdate\"` as an UNHANDLED ERROR — which vitest exits non-zero on. Fixed at 1c8e6ca by making fixture cleanup an awaited async rm. But the condition is LOAD-DEPENDENT and was only ever measured on one machine, and the first fix (cutting ~200 git config spawns) looked sufficient and changed nothing.",
+      "evidence": "Observed in 7 of 7 full-suite runs before the fix and 0 of 4 after, all on this Windows machine. A planted failing assertion WAS still reported while the warning was present, which bounds the blast radius but does not clear it. Nothing in CI is known to distinguish this failure mode from a real test failure, and I could not test another machine.",
+      "recommended_update": "Decide whether CI should treat a vitest unhandled error distinctly from a test failure, and whether the harness suite needs its own pool or parallelism setting. Re-measure on CI and on a second machine before assuming the fix generalises.",
+      "opened_session": 65
+    },
+    {
+      "id": "G-038",
+      "what": "The QA write allowlist is never exercised by a passing loop, so the only thing standing between a QA seat and the candidate is one test. In a normal run the QA stage writes NOTHING during its own stage — the runtime writes E_t after validating it — so the by-hand run reported 'examined 0 changed path(s)' for QA. The allowlist is only reached when a QA role misbehaves.",
+      "evidence": "By-hand harness run at 1c8e6ca printed 'qa attempt 1: all writes inside the allowlist (examined 0 changed path(s) against 2 rule(s))'. The misbehaving path is covered by exactly one test, 'refuses a QA write outside its allowlist' in runtime.test.ts. A passing loop therefore provides no evidence that the QA boundary works.",
+      "recommended_update": "When slice two makes QA a real session that writes its own report, revisit whether the runtime should still write E_t on QA's behalf. If it should, add more than one test on the misbehaving path, since a green loop proves nothing about it.",
+      "opened_session": 65
+    },
+    {
+      "id": "G-039",
+      "what": "THE STORE ALREADY CONTAINED THE ENTRY THAT WOULD HAVE PREVENTED THIS SESSION'S ERROR, AND NOTHING SURFACED IT. Entry 299, `pipe-to-tail-masks-exit-code`, stored 2026-07-26, is titled 'Piping to tail/head masks the real exit code — and I reported a false success because of it'. On 2026-09-19 I ran `npx vitest run 2>&1 | tail -8; echo $?`, read tail's 0, and reported a false success — the same act, described in advance, by the same agent identity. ob_recalled returned 'No knowledge entries recalled this session' for the fifth consecutive loop. This is the first time the standing open question 'DOES THE MEMORY HALF GET USED AT ALL' has a concrete cost attached rather than an absence of evidence.",
+      "evidence": "ob_recall at session end with trigger 'explicit' returned entry 299 as the SECOND result for the query 'test runner exit code differs from reported test results' and the FIRST for 'pipeline exit code is not the process exit code'. So the entry is present, indexed, and highly ranked for the exact question — retrieval works. It was never queried during the work, because nothing queries it: session-start injection was suspended in Loop 10 C2, and ob_recall is a deliberate mid-task tool that a working agent has no trigger to reach for. The failure is not in ranking or storage; it is that the only path to the corpus is an agent remembering to ask.",
+      "recommended_update": "This is the datapoint Loop 13 was built as the instrument for and four loops have failed to produce. Atlas should rule on whether the next loop deliberately exercises recall, and specifically whether a cheap always-on trigger exists that is not the Loop 10 C2 injection — for example querying the corpus at the moment a verification claim is about to be made, which is where this one would have fired. Do not re-enable start-time injection on the strength of this alone: C2 was cut on evidence and one instance does not overturn it.",
       "opened_session": 65
     }
   ],
@@ -1584,32 +1723,43 @@
       "title": "The HoH loop is autonomous inside a branch; Aaron holds master until the shadow-gate count says otherwise",
       "date": "2026-09-19",
       "note": "Ruled by Aaron in-session to the planner seat, by returning the planner's recommendation verbatim: 'autonomous inside a branch, you at master, with the runtime recording what it would have done at each merge so your disagreements become a count. The day that count is zero across loops with real defects in them, remove the gate on evidence.' THIS RESOLVES THE CONFLICT RECORDED IN docs/HOH-JEV.md §6.2 AND docs/loops/loop-15-brief.md §5.1: hoh_jev.md specified a loop that never blocks on a human, which was incompatible with 'Aaron merges, on his word', a rule that has held for every loop in this record. WHAT IS AUTONOMOUS: the plan gate, the developer done-gate, QA scoring, retry, and rollback — closed questions with criteria written in advance, run by the runtime without a human. WHAT IS NOT: the merge to master. The runtime stops at a candidate commit and never merges, pushes to master, or tags. WHY THE MERGE STAYS HUMAN, ON EVIDENCE RATHER THAN NERVES: every serious defect found recently passed the automated checks and was caught by a human question or a human-ordered real run — the retirements check green through five merged PRs then 115 findings in the main tree; build-freshness shipped with its author's tests green and wrong in two checkouts of three; the main tree fifteen commits stale and reporting pass. A gate is a calibrated judge of the evidence it is shown, and every one of those failures was in the evidence, not the judgement. TypeSafe's own words: typed output guarantees the interface, not truth. THE EXIT CRITERION IS MEASURABLE: the runtime records, at every merge decision, what it WOULD have done. Aaron still merges. Each time his decision differs from the runtime's is counted. When that count is zero across several loops that contained real defects, the human gate is redundant and is removed — on evidence. If it is not zero, the count is exactly what would have been lost. This is 'see it red before you trust it green' applied to the human gate itself. WHAT NO GATE REPLACES, stated so it is not quietly automated later: asking the question nobody wrote down. Jev answers questions it is asked; the observation that Loop 14 was briefed against a world that no longer existed came from a person noticing, not from a gate."
+    },
+    {
+      "id": "D-020",
+      "title": "D-020 — the HoH runtime lives at open-brain/src/harness/, not the repo root",
+      "date": "2026-09-19",
+      "note": "The brief writes `harness/`. The same reasoning that ruled TypeScript over Python — one build, one test command, one CI lane — applies to a second root-level project. The deciding factor was that module-boundary reads only open-brain/src: at the repo root the runtime whose entire job is enforcing a boundary would have sat outside the only check that asserts the dependency direction. Inside, it is checked as core, passes, and a future import of memory would fail /sync."
+    },
+    {
+      "id": "D-021",
+      "title": "D-021 — zod is the deliverable-schema source; the .schema.json files are derived and drift-checked",
+      "date": "2026-09-19",
+      "note": "A hand-maintained JSON Schema beside a runtime validator is two statements of one shape, which is the defect family most of this record is made of. schema.test.ts regenerates from zod and compares byte for byte; seen red on a hand-edited minLength. The two rules JSON Schema cannot express — new_capability non-empty unless stop_ship is requested and justified, repair_targets non-empty — are written into the generated files' own description, so a reader validating against the file alone is told what it cannot see. Regenerate with `npx tsx src/harness/cli.ts schemas --write`; it refuses to write into a build directory."
     }
   ],
   "handoff": {
-    "pick_up": "Loop 15 runs before Loop 14, ruled 2026-09-19. Loop 14 is re-briefed rather than deferred: it was written when there were two seats and no runtime, and Loop 15 adds the component that would own the artifacts Loop 14 planned to design by hand. There are three seats now — Forge (developer), Atlas (planner), Probe (qa, read-only, evaluates a frozen SHA it did not build). Loop 13 shipped v0.39.0 and v0.40.0 and closed C4 as a recorded failure: the machinery is installable, the instruction is not.",
+    "pick_up": "Loop 15 slice one is built and handed to Probe for evaluation — the first time acceptance in this project is determined by a seat that neither set the objective nor built the candidate. Frozen candidate 1c8e6ca9cc5d407da4649120426ca5defa3cd9f7 on branch loop/15-hoh-runtime, with docs/loops/loop-15-developer-handoff.md at d4e2180 as the durable handoff. The runtime runs planner -> developer -> QA with stubbed roles, enforcing a write allowlist and a frozen candidate. Two rulings are owed from Atlas and are named in the handoff: whether D_t may refuse an empty repair_targets, a rule the brief does not spell out, and whether the runtime may create loop-NNN-* tags given that HOH-JEV.md 6.2 says it never tags while brief A5 requires them.",
     "watch_out": [
-      "LOOP 15 FIXES BOUNDARY FAILURES, NOT MEASUREMENT FAILURES. Eleven near-misses in two days were agents misreading their own instruments. A runtime cannot stop a seat running a grep that hides the line it needed. Do not let the runtime's existence become a reason to trust an unread output.",
-      "AN AUTHOR'S GREEN IS WHERE EVALUATION STARTS, NOT A SUBSTITUTE FOR IT. build-freshness shipped asserting a consequence true in one checkout of three with its author's tests passing. Hand Probe a frozen SHA and the deterministic results, then stop.",
-      "FAIL CLOSED. Every instrument that failed this project failed open. The one bug that surfaced loudly — cmd.exe eating ^ in <sha>^{commit} — did so only because an undefined distance is an ISSUE rather than a zero. Use execFileSync with an args array; no shell.",
-      "A FINDING REPORTED AGAINST A LINE IS USUALLY A FINDING ABOUT A CLASS. The stale-build consequence was reported against one line and an identical instance sat one branch away, in the message firing on the main tree. Look for the sibling before fixing the instance.",
-      "EVERYTHING BETWEEN gitnexus:start AND gitnexus:end IN CLAUDE.md IS REGENERATED BY THE ANALYZER. Edits inside it are discarded silently. Anything that must survive a reindex goes above the marker. Do not remove .gitnexusrc — without noStats the analyzer rewrites the tracked file on every run.",
-      "A PUSH NEEDS AUTHORITY FOR THAT PUSH, NOT AUTHORITY FOR THE ACTIVITY. This seat pushed a branch nobody had authorised because it had a good reason. A good reason is not authorisation. Whether unauthorised ACTS belong in an error table that counts wrong CLAIMS is unruled.",
-      "ACT ON A RELAY ONLY WHERE ACTING NARROWS SCOPE AND STAYS REVERSIBLE, AND RECORD IN THE ARTIFACT WHICH AUTHORITY YOU ACTED ON, AT THE MOMENT YOU ACT. Both halves of the first clause are judgements the actor makes about its own action; the second clause is what makes it auditable.",
-      "TWO MEASUREMENTS THAT DISAGREE MAY BOTH BE RIGHT — the resolution is a third measurement, not an argument. A tracked file measured 0 CR in two worktrees and 3,670 in a third, and the byte delta was exactly the carriage returns (G-031). A derived number must carry the ref and time it was derived from.",
-      "T-153 MOVES THIS WORKTREE to ~/Worktrees/sia-forge. It cannot be done from inside a live session — moving a directory under one destroys its cwd. Expect Permission denied on the first attempt and retry from outside the folder. Do not 'fix' the .git/worktrees/sia-loop12 admin path; git resolves it."
+      "A PIPELINE'S EXIT CODE IS NOT THE PROCESS'S. `npx vitest run | tail -8; echo $?` returns tail's 0 for a suite exiting 1. This was committed THIS session while building the component whose acceptance criterion is 'check results come from exit codes'. Redirect to a file and echo $? on the next line; never read a status through a pipe.",
+      "THE SUITE CAN EXIT 1 WHILE PRINTING '805 passed'. A vitest unhandled error fails the run without failing a test. Read the exit code AND the Errors line, not the passed count.",
+      "THE FIRST FIX THAT LOOKS SUFFICIENT MAY CHANGE NOTHING. Cutting ~200 child processes did not clear the worker timeout; an awaited async rm over .git did. Measure after each fix separately rather than bundling them and crediting the wrong one.",
+      "REGENERATE RENDERED VIEWS ON A REBASE CONFLICT, NEVER HAND-MERGE THEM. The four state views conflict whenever a version bump meets a state write. Take the base side, then run /sync.",
+      "MSYS MANGLES A GIT PATHSPEC IN GIT BASH. `git show origin/master:.agents/state.json` reached git as `origin\\master;.agents\\state.json`. Same family as cmd.exe eating ^ — use execFileSync with an args array, or read the working-tree file.",
+      "A SOURCE SCAN CAN MATCH THE RIGHT TEXT AND ANSWER THE WRONG QUESTION. The 'no git push in harness' scan fired on the deny-list constant, where the word appears because it is forbidden. Validate a detector against a planted positive AND check what its hits actually are.",
+      "NOTHING IS PUSHED AND NOTHING IS TAGGED. Every commit on loop/15-hoh-runtime is local. A push needs Aaron's word for that push; a peer relay is not his approval."
     ],
     "open_questions": [
-      "DOES THE MEMORY HALF GET USED AT ALL? ob_recalled returned nothing again this session — the FOURTH consecutive loop. Loop 13 was chosen as the instrument for this question and the instrument now exists: the protocol half demonstrably runs without memory. Nobody has yet run a loop that deliberately uses it.",
-      "Is C4's failure the ONLY barrier to a stranger installing this? Two were verified — the documented /start route and the absent SessionStart hook. Nobody enumerated the rest.",
-      "Should a close note be amendable? ob_state makes it write-once, so T-151 was closed with a note now known to be partly wrong and only a pointer from G-031 reaches a reader of it.",
-      "Do unauthorised ACTS belong in an error table that counts wrong CLAIMS? Named rather than decided, because the seat that would benefit from the answer is the one that raised it."
+      "DOES THE MEMORY HALF GET USED AT ALL? ob_recalled has now returned nothing for five consecutive loops. Loop 13 built the instrument and Loop 15 did not use it either. Nobody has yet run a loop that deliberately exercises recall.",
+      "May D_t refuse an empty repair_targets? Enforced on my reading of HOH-JEV.md's symmetric rule; the brief names only the new_capability rejection. This runtime would refuse a plan the brief would accept.",
+      "May the runtime create loop-NNN-* tags? HOH-JEV.md 6.2 says it never tags; brief A5 requires loop-001-developer and loop-001-qa. Resolved by judgement as being about master, and constrained to local tags with all network git subcommands refused.",
+      "Is the vitest worker-timeout condition present on CI or on another machine? Load-dependent, measured on one Windows machine only, and nothing in CI is known to distinguish it from a real test failure.",
+      "Should a close note be amendable? Still open from session 64; ob_state makes it write-once."
     ],
-    "session": 64
+    "session": 65
   },
   "last_session": {
-    "n": 64,
+    "n": 65,
     "date": "2026-09-19",
-    "uuid": "c82ecd47-5458-4a67-a16f-0c28df764b12"
+    "uuid": "dbdce9b2-cd52-4ddd-81db-7105c4be4cd9"
   }
 }
