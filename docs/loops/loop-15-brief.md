@@ -1,0 +1,134 @@
+# Loop 15 brief — the HoH runtime, slice one
+
+**Written by:** Atlas (planner seat) · **Date:** 2026-09-19 · **Base:** `master` @ `e65f251`
+**Source:** `hoh_jev.md` (Aaron, untracked in the planner worktree) and
+*Harness-of-Harness*, arXiv:2609.01481.
+
+> **Sequencing is not settled.** Loop 14 — the two-seat record — was briefed ahead of its turn and
+> `D-017`-era rulings say it does not jump the queue. Aaron's instruction was *"let's build this into
+> our loops."* **This brief is written as Loop 15 and whether it runs before Loop 14 is his ruling,
+> recorded as open rather than assumed.**
+
+---
+
+## 1. What this loop is for
+
+**Build the outer runtime that spawns three isolated role sessions, validates their deliverables
+against schemas, and versions each loop in git. No Jev, no API key, no model calls at the gates.**
+
+The brief's own build order puts the runtime first and the decision layer fourth, and it is right
+for a reason worth stating: **the runtime is the thing that enforces separation, and separation is
+what this project has been failing at without one.** Three seats now exist as worktrees with role
+files, and nothing makes a seat stay inside its role — it is an intention, which is the failure mode
+named in `.agents/roles/shared.md`. **A runtime that freezes inputs and enforces write permissions is
+a check; role files are a rule someone must remember.**
+
+**Jev is deliberately out of scope for this loop** and that is not timidity. The endpoint, model alias
+and response shape in `hoh_jev.md` are **unverified by this project** — nobody here has called that
+API. Building the gates before the runtime would mean an unverified dependency sitting under the part
+that enforces everything else. Slice one produces a runtime that is useful with the gates stubbed,
+and slice two replaces the stubs.
+
+## 2. The increment, bounded and locally complete
+
+**Repair** — the standing defect this loop fixes: **nothing enforces the seat boundaries the role
+files describe.** The planner has held scope, verdict and write authority in the same session, and
+the only thing preventing a recurrence today is that a role file asks it not to.
+
+**New capability** — one, small, observable: **`harness` runs a loop end-to-end with three stubbed
+role sessions and produces a versioned, schema-valid `artifacts/iterations/t001/`.**
+
+### Deliverables
+
+- **`harness/` in TypeScript**, not Python. *Ruled, not asked:* this repo is TypeScript, `open-brain`
+  already carries the build, test and lint toolchain, `/sync` and the checks are wired to it, and a
+  second language would need its own CI lane. The brief offers `runtime.py # or ts`.
+- **`harness/schemas/plan.schema.json`** and **`evidence.schema.json`**, from the shapes in
+  `hoh_jev.md` §"Artifact schemas". `D_t` rejects an empty `new_capability` unless `stop_ship` is
+  explicitly requested and justified.
+- **Schema validation with retry**, capped, and **the cap is a recorded failure rather than a silent
+  pass.**
+- **`harness/prompts/{planner,developer,qa}.md`** — the skeletons from the brief, each pointing at
+  its tracked `.agents/roles/*.md` rather than restating it. **Do not duplicate role knowledge into
+  the prompts**; that is the defect PR #44 exists to fix.
+- **Git versioning per loop:** commit after the developer stage and after evidence is stored, tag
+  `loop-<t>-<role>` so rollback is a git operation.
+- **Deterministic checks before QA** — build and unit tests — whose **exit codes are read, never
+  inferred and never asked of a model.**
+- **`artifacts/index.md`**, a short categorised index. **Details loaded on demand, not pasted into
+  every prompt.**
+- **A dry-run mode** that prints what would be sent to a gate without sending it. Required now, while
+  the gates are stubs, so it exists before there is anything to get wrong.
+
+### Explicitly out of scope
+
+Jev client, plan gate, developer done-gate, QA scoring, selective retrieval, skill routing,
+compaction, and any change to `.claude/commands/`. **`start.md` and the hook contract stay untouched**
+— that is `T-154` and it is not this loop.
+
+## 3. What must be preserved
+
+- **`/start` and `/end` keep working unchanged.** The HoH runtime sits beside the existing session
+  protocol; it does not replace it in this loop. A seat must still be able to work by hand.
+- **648 tests, `sync --check` clean, `module-boundary` green.** The runtime is new surface; it must
+  not reach into `open-brain/src` core in a way the boundary check refuses.
+- **`ob_state` remains the only writer of `.agents/state.json`.**
+
+## 4. Acceptance — observable, and derived per item
+
+| id | type | observable |
+| --- | --- | --- |
+| **A1** | black-box | `harness` runs loop `t001` with three stubbed role sessions and exits 0, producing `artifacts/iterations/t001/` containing `D_t.md`, `A_t.gitref`, `E_t.json`. |
+| **A2** | black-box | An invalid `D_t` causes that role to be **retried**, and exhausting the cap **fails the loop with a recorded reason** — not a pass, not a silent continue. |
+| **A3** | white-box | The QA stage receives a **frozen git ref**, and the runtime refuses to proceed if the working tree has moved from the candidate SHA. |
+| **A4** | white-box | The developer stage's write path is restricted; a stub role writing outside its allowlist is **refused by the runtime**, not merely warned. |
+| **A5** | black-box | `loop-001-developer` and `loop-001-qa` tags exist and `git` alone can restore the pre-loop state. |
+| **A6** | black-box | Dry-run mode prints the gate payload and sends nothing. Asserted by a test that would fail if a network call were attempted. |
+| **A7** | white-box | Deterministic check results come from **exit codes**; no stage infers pass/fail from text. |
+
+**Every check above must fail first on the real condition before it is trusted** — see
+`.agents/roles/developer.md`.
+
+## 5. Two conflicts this loop surfaces, neither of them Forge's to settle
+
+**1. Autonomy versus "Aaron merges, on his word."** `hoh_jev.md` specifies a loop that does not block
+on a human — *"escalate to 'stop this loop and record a blocker' instead."* That is incompatible with
+the standing ruling that Aaron merges every change, which has held for every loop in this repo's
+record. **Assumption for slice one, stated so it can be overruled: the runtime stops at a candidate
+commit and never merges or pushes. Aaron remains the merge gate.** This must be ruled before the
+gates land, because a gate that can roll back and re-run is most of the way to a loop that ships
+without him.
+
+**2. What the product is.** `hoh_jev.md` says *"the runtime is the actual product you are building."*
+This repo's product is the memory protocol and its template. **Slice one treats `harness/` as a
+component of this repo, not as a replacement for it**, and nothing in `project-template/` changes.
+Whether HoH eventually becomes what SIA ships is a larger question than one loop.
+
+## 6. Secrets
+
+**`TYPESAFE_API_KEY` is read from the environment and never written to a file in this repo.** No key
+appears in a prompt, a payload log, an artifact, a commit, or a conversation. **The Jev client, when
+it lands, redacts before logging** — brief §"What Claude Code should do", item 3.
+
+**Nobody should paste the key into an agent session.** Set it in the environment; the runtime reads
+it there or fails closed with a message naming the variable.
+
+## 7. Roles for this loop
+
+- **Planner (Atlas)** — this brief, the ruling on sequencing once Aaron gives it, and the close-out.
+  **No product edits.**
+- **Developer (Forge)** — `harness/`, schemas, tests. Pushes and opens the PR. **Each push needs
+  authority for that push.**
+- **QA (Probe)** — **first real use of the seat.** Evaluates a frozen candidate SHA, read-only, and
+  writes the evidence report. Criteria derived from §4, not from a checklist. **Missing evidence is
+  a gap, not a pass.**
+
+**This loop is the first one where acceptance is not written by the seat that set the objective.**
+That is the point of it as much as the runtime is.
+
+## 8. Open, for Aaron
+
+- **Does Loop 15 run before Loop 14?** Loop 14 is briefed and queued.
+- **The autonomy boundary in §5.1**, before the gates land rather than after.
+- **The TypeSafe plugin** (`claude plugin marketplace add typesafe-ai/skills`) is a config change to
+  his environment and is **his to run, not an agent's** — and it is not needed for slice one.
