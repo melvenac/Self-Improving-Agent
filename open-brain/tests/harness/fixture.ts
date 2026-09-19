@@ -14,7 +14,8 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { appendFileSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, mkdtempSync, realpathSync, writeFileSync } from "node:fs";
+import { rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -55,7 +56,17 @@ export interface RepoFixture {
   /** Stage everything and commit. Returns the new sha. */
   commitAll(message: string): string;
   sha(): string;
-  cleanup(): void;
+  /**
+   * Asynchronous on purpose.
+   *
+   * `rmSync` over a `.git` directory is a long synchronous block on Windows —
+   * hundreds of small files, with a virus scanner in the path — and a vitest
+   * worker that never yields cannot answer the reporter's heartbeat. That
+   * surfaced as `Timeout calling "onTaskUpdate"`, an UNHANDLED ERROR, which
+   * makes vitest exit non-zero while reporting every test as passed. Awaiting
+   * an async `rm` lets the event loop breathe between tests.
+   */
+  cleanup(): Promise<void>;
 }
 
 /**
@@ -113,7 +124,7 @@ export function makeRepo(prefix = "harness-repo-"): RepoFixture {
     write,
     commitAll,
     sha: () => rawGit(root, ["rev-parse", "HEAD"]),
-    cleanup: () => rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }),
+    cleanup: () => rm(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }),
   };
 }
 

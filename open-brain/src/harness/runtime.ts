@@ -48,6 +48,7 @@ import {
   enforceAllowlist,
   requireCleanTree,
   verifyFrozen,
+  type AllowlistVerdict,
   type FrozenCandidate,
 } from "./workspace.js";
 import { makeWriter, WriteRefused, type RoleContext, type RoleName, type RoleSession } from "./roles.js";
@@ -270,7 +271,7 @@ export function runLoop(config: LoopConfig): LoopResult {
     previousProblems: readonly string[],
     extras: Pick<RoleContext, "plan" | "candidate" | "checks">,
   ):
-    | { ok: true; deliverable: unknown }
+    | { ok: true; deliverable: unknown; verdict: AllowlistVerdict }
     | { ok: false; code: FailureCode; reason: string } => {
     const roleName: RoleName = role.role;
     const ctx: RoleContext = {
@@ -312,7 +313,7 @@ export function runLoop(config: LoopConfig): LoopResult {
       };
     }
 
-    return { ok: true, deliverable };
+    return { ok: true, deliverable, verdict };
   };
 
   // --- Stage 1: planner ---------------------------------------------------
@@ -377,7 +378,10 @@ export function runLoop(config: LoopConfig): LoopResult {
   const devStage = runStage(config.roles.developer, devAllow, 1, [], { plan, candidate: null, checks: null });
   if (!devStage.ok) return fail("developer", devStage.code, devStage.reason);
 
-  const devVerdict = enforceAllowlist(repoRoot, devAllow);
+  // Reuse the verdict runStage already computed: a second scan is another
+  // blocking git call per loop, and two scans of a tree that cannot have
+  // changed between them is also two chances to disagree.
+  const devVerdict = devStage.verdict;
   if (devVerdict.permitted.length === 0) {
     return fail(
       "developer",
