@@ -6,7 +6,7 @@ this is the tracked version and the one that binds.** Where they disagree, this 
 divergence below says why.
 
 **Last verified against sources:** 2026-09-19 — `docs.typesafe.ai/api.md`, the `typesafe-ai/skills`
-repository, and this repo at `e3d33c7`.
+repository, this repo at `e3d33c7`, **and one live call to the API** (see §3).
 
 **Read with:** [`.agents/roles/shared.md`](../.agents/roles/shared.md) and the seat file for your
 role. **This document describes the loop; those describe the seats.** Neither restates the other.
@@ -109,6 +109,30 @@ whose keys you choose; **the keys are not sent to the model** and answers return
 | `noul` | Does this hold? | `noul`: 0–1, the probability of yes |
 | `choice` | Which one of these? | `choice`, `probabilities`, `confidence` |
 | `score` | Where on this ordered scale? | `score`, `legend`, `probabilities`, `confidence` |
+
+### Live call, 2026-09-19 — what the docs did not say
+
+One request from a process holding `TYPESAFE_API_KEY`, three questions, trivial state. `HTTP 200`
+in **505 ms**; `usage` reported 388 input / 73 output tokens. Two facts came only from running it:
+
+- **`score` criteria is a LIST in the request and an OBJECT in the response.** Sending
+  `criteria: {"0": "Calm", "1": "Frustrated", "2": "Very angry"}` returned `422` with
+  `loc: ["body","questions","frustration","score","criteria"], msg: "Input should be a valid list"`.
+  The correct request is `criteria: ["Calm", "Frustrated", "Very angry"]` — **the order is the
+  scale.** The response then carries `legend: {"0": "Calm", "1": "Frustrated", "2": "Very angry"}`.
+  The indexed API page truncated before the score request example, so this was never verified
+  against the docs — only against the wire.
+- **`model: "jev-latest"` resolves to a concrete version in the response** — `"model": "jev-1.13.0"`.
+  **The client must log the resolved model with every gate decision**, or two runs of the same gate
+  are not comparable after an upstream model change.
+
+Live-confirmed in the same call: `noul` returned `{"noul": 0.95}` with **no `confidence` field**;
+`choice` and `score` both carried `confidence`. The asymmetry below is measured, not read.
+
+**The 422 was worth more than the 200.** The body named the exact field. The first version of the
+smoke script parsed for `answers` before printing the body and reported `model: undefined` — a
+useless failure from a precise one. **A Jev client must surface the `detail` array of a 422
+verbatim before anything else.**
 
 > ### The asymmetry that breaks naive gate policies
 >
@@ -260,7 +284,8 @@ variable** when it is absent.
 
 ## 9. Not verified
 
-- **Pricing and latency figures** from the original brief. Not load-bearing for any policy here.
+- **Pricing figures** from the original brief. Not load-bearing for any policy here. Latency was
+  observed once at 505 ms for a three-question call — **one sample, not a characterisation.**
 - **Whether the gate policies in §4 produce good decisions.** The shapes are verified; the thresholds
   are guesses until a loop has run against them. **Treat the first numbers as a starting position,
   not a calibration.**
