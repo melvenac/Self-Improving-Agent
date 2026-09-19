@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 33,
+  "revision": 35,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1012,6 +1012,70 @@
       ],
       "since_session": 63,
       "status": "verified"
+    },
+    {
+      "id": "V-035",
+      "claim": "The protocol half installs and runs with Node and git alone — no native build, no vault, no database, no MCP server — while the memory half correctly refuses to load without better-sqlite3",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "docs/loops/loop-13-c2-c4-boundary.md",
+          "observation": "Real install: fresh clone, npm install --omit=optional, node_modules/better-sqlite3 confirmed ABSENT before anything ran, KNOWLEDGE_V2_DB and OPEN_BRAIN_VAULT_DIR pointed at nonexistent paths. sync --check 0 issues with the three memory checks skipped WITH their reason; open-brain start exit 0; cli-bootstrap.js exit 0 with project detected and identity read; server.js exit 1 'Cannot find package better-sqlite3', correct because it IS the memory half."
+        },
+        {
+          "type": "file",
+          "path": "open-brain/package.json",
+          "observation": "better-sqlite3 moved to optionalDependencies; npm ci --omit=optional leaves it absent and plain npm ci leaves it present, both verified against the regenerated lockfile."
+        }
+      ],
+      "since_session": 64,
+      "status": "verified"
+    },
+    {
+      "id": "V-036",
+      "claim": "The core-must-not-import-memory direction is asserted mechanically by the module-boundary check, which was seen red on the real pre-cut defect and fails closed on inputs it cannot resolve",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/sync/module-boundary.test.ts",
+          "observation": "12 cases. Run against the pre-cut tree extracted from 669902c with git archive, the check named all four crossings C1 had enumerated by hand and nothing else; green on the fixed tree; skip with a reason when open-brain/src is absent."
+        },
+        {
+          "type": "code",
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "observation": "Refuses on an unresolved specifier rather than reporting a clean graph; unlisted files default to CORE; the walked file count is asserted by a test that was seen red on a wrong count, so a walker that stopped early cannot report clean."
+        },
+        {
+          "type": "observation",
+          "path": "docs/loops/loop-13-c1-boundary.md",
+          "observation": "Limit stated in the check's own output: value imports only, not instructions that reach a tool at run time and not load-time native resolution in server.ts. It PASSES on ob_start, ob_state and ob_sync, which are unreachable without the native module."
+        }
+      ],
+      "since_session": 64,
+      "status": "verified"
+    },
+    {
+      "id": "V-037",
+      "claim": "Derived artifacts now report their own staleness, and the GitNexus analyzer no longer dirties a tracked instruction file on every run",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/sync/staleness.test.ts",
+          "observation": "gitnexus-index compares the indexed SHA to HEAD and treats the recorded branch as context only — a reindex at 08e6486 left branch loop/4-dogfood, deleted, on a current index, so judging by branch failed a fresh index. build-freshness compares a postbuild commit stamp to HEAD and reports an unstamped build as UNKNOWN, never fresh."
+        },
+        {
+          "type": "observation",
+          "path": ".gitnexusrc",
+          "observation": "noStats: true. Verified by running gitnexus analyze in a scratch clone and diffing: the counts stay cut and, with the prose moved ABOVE the gitnexus:start marker, CLAUDE.md is byte-identical after a full reindex. Everything between the markers is regenerated wholesale."
+        },
+        {
+          "type": "observation",
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "observation": "The stale-build consequence is derived per checkout: --absolute-git-dir equals --git-common-dir only in the main checkout. It asserted a machine-wide effect that was false in two of three trees, and an identical unreported instance sat one branch away in the unstamped-build message."
+        }
+      ],
+      "since_session": 64,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -1202,6 +1266,20 @@
       "what": "THIS GAP CORRECTS T-151's CLOSE NOTE AT REV 32 AND CANNOT BE WRITTEN INTO IT - a close note is write-once, so a wrong one is uncorrectable in place and only a pointer like this one can reach a reader of it. TWO FINDINGS. (1) THE CORRECTION: T-151's close note said 'all 19 files in docs/loops/ are LF in the working tree' and concluded the session-63 line-endings watch-out was stale. The measurement was correct; THE SCOPE WAS NOT STATED, and it was one worktree. 'Line endings are MIXED in this repo' is indeed wrong as a general condition - 1 file of 21, in 1 worktree of 3 - but the operative advice, DETECT PER FILE IN ANY SCRIPTED EDIT AND READ THE FILE BACK, stands and must NOT be dropped as stale by the next /end. (2) THE REAL DEFECT: a working-tree copy can disagree with the repository on line endings while git reports clean, and no check sees it. .gitattributes normalises on commit, so git STORES docs/loops/sia-mailbox-decisions.md as LF and `git show HEAD:<path>` returns LF; because `text eol=lf` makes git compare NORMALISED content, a stale CRLF working copy also reads clean in `git status` and in every diff. The repository is correct, one working tree is stale, nothing in the normal workflow reports the difference, and it survives until something forces a re-checkout of that path. A scripted multi-line edit against that file would hit exactly the mismatch the watch-out warns about, ON A FILE GIT SWEARS IS FINE.",
       "evidence": "Measured 2026-09-17 across three worktrees sharing one .git, same tracked path docs/loops/sia-mailbox-decisions.md: planner 281,558 bytes / 0 CR; main 281,558 / 0 CR; forge 285,228 / 3,670 CR. 281,558 + 3,670 = 285,228 exactly, so the byte delta IS the carriage returns. Found by Forge flagging that its OWN earlier claim was wrong, having generalised from three measured files to a directory of 21; two instruments disagreed in its tree - `file` said CRLF, a grep for a carriage return said 0 - and `file` was right, settled by a byte count, with its detector validated against a known-CRLF file before any negative was trusted. The planner seat re-measured with an independently self-tested detector (probe written with known CR bytes, asserted before use) and found 0 CR across all 19 files in ITS tree. BOTH MEASUREMENTS WERE CORRECT AND BOTH CLAIMS WERE WRONG: the disagreement was never about the file, it was about which checkout, and neither claim carried its scope. Resolved by comparing the trees directly rather than declaring one measurement the winner.",
       "recommended_update": "Decide whether anything should detect this. A check comparing working-tree bytes against `git show HEAD:<path>` for text-normalised paths would catch it; whether that earns its own instrument is UNRULED and is not being recorded as ruled. Until then the containment is the session-63 advice, which stands as written. Also open for ruling: a close note is write-once, so a task closed with a wrong note cannot be corrected in place - whether that is acceptable, or whether close notes should be amendable, is unruled.",
+      "opened_session": 64
+    },
+    {
+      "id": "G-032",
+      "what": "Seat role knowledge is now tracked but nothing reads it. .agents/roles/*.md carries how each seat works, and no hook, command or pipeline loads it: agent-identity.ts parses only the frontmatter of AGENT.local.md then AGENT.md for name/role/partner, and a grep across open-brain/src and .claude/commands for 'roles/' returns nothing. Tracking fixed durability; reachability is a separate problem and is still open.",
+      "evidence": "agent-identity.ts:34-35 reads AGENT.local.md then AGENT.md and parses frontmatter only. grep -rn 'roles/' over open-brain/src and .claude/commands returns no hits. The knowledge was read this session only because the planner seat said in an A2A message that it existed.",
+      "recommended_update": "Make the role file reachable deterministically rather than by instruction: have cli-bootstrap resolve the role from the frontmatter and print the path of the matching .agents/roles/<role>.md in the startup greeting, or add it to /start's residual reads. Rule 4 — every containment that worked was a command; every containment that failed was an intention.",
+      "opened_session": 64
+    },
+    {
+      "id": "G-033",
+      "what": "A freshness check served through the MCP server cannot report that server's own staleness, because the check it needs is the code the stale server lacks. ob_sync run before /mcp reconnect returned 23 passed with no sign of module-boundary, gitnexus-index or build-freshness — not because they failed but because that server process predated v0.40.0. The same gate run from the CLI showed 26 passed with all three. A green ob_sync is therefore only as current as the server build serving it, and nothing in its output says which build that was.",
+      "evidence": "Session 64: ob_sync via MCP returned 'Summary: 23 passed, 0 fixed, 4 warnings, 0 issues, 0 skipped' with no module-boundary, gitnexus-index or build-freshness lines. After `/mcp reconnect open-brain`, the identical call returned 26 passed with all three present, and build-freshness immediately caught a real mismatch (build e3d33c7 vs HEAD ae1113a). The CLI path had been reporting all three throughout.",
+      "recommended_update": "Make the runtime identify itself in the output rather than leaving it inferable: have ob_sync print the build commit it is serving from (build-info.json is already written by postbuild) alongside the existing `runtime: mcp-server` label, so a reader can tell a green from a stale green. Note the ordering constraint — build-freshness compares the PROJECT tree's build to HEAD, which is a different question from which build the SERVER process loaded, and only the latter explains a missing check.",
       "opened_session": 64
     }
   ],
@@ -1502,30 +1580,29 @@
     }
   ],
   "handoff": {
-    "pick_up": "Loop 13 is Idea B - the module boundary - ruled by Aaron. Its brief is docs/loops/LOOP-13-brief.md, landing in PR #31. READ THAT ONE BY NUMBER, NOT BY RECENCY: a Loop 14 brief already exists (PR #34, the two-seat record) and does not jump the queue, so 'the newest brief' is the WRONG file. Merge order is #33 (a real defect fix), then #32 (this close-out), then #31 which unblocks Loop 13, then #34. Base was master @ 917fd68 rev 28 at close; it will have moved - check it.",
+    "pick_up": "Loop 15 runs before Loop 14, ruled 2026-09-19. Loop 14 is re-briefed rather than deferred: it was written when there were two seats and no runtime, and Loop 15 adds the component that would own the artifacts Loop 14 planned to design by hand. There are three seats now — Forge (developer), Atlas (planner), Probe (qa, read-only, evaluates a frozen SHA it did not build). Loop 13 shipped v0.39.0 and v0.40.0 and closed C4 as a recorded failure: the machinery is installable, the instruction is not.",
     "watch_out": [
-      "THE BRIEF TO READ IS THE ONE FOR THE LOOP YOU ARE RUNNING, BY NUMBER. An earlier version of this handoff said 'by the largest loop number', which now points at Loop 14's brief. Written before Loop 14 was briefed ahead of Loop 13 running - a sorting rule that was correct when written and false within the day.",
-      "THERE ARE NOW THREE WORKTREES and .agents/AGENT.md is ONE TRACKED FILE saying `name: Forge`, so /start greets whoever starts in ANY of them as Forge. The seat also carries three disagreeing names: Clark in the global CLAUDE.md, Atlas in AGENT.md's partner line, Planner in every brief since Loop 9. That is Loop 14's C1; do not fix it inside Loop 13.",
-      "RULE 13 - A CHECK IS ONLY AS TESTED AS THE TREES IT HAS RUN IN. The retirements check shipped through four boundary reports, a Planner QA and five merged PRs, then fired 115 findings the first time it ran in Aaron's MAIN tree - the only one of three with a .gitnexus/ generated index. RUN THE LOOP'S CHECKS IN THE MAIN TREE BEFORE ANY SIGN-OFF, and rebuild it first: the MCP server runs from that build and a stale server reports success.",
-      "AN INSTRUMENT THAT CANNOT DISTINGUISH 'NOTHING THERE' FROM 'I DID NOT LOOK' IS NOT A MEASUREMENT. Seven instances in session 63: a `|| echo 0` fallback, a blank `echo` over a real hit, MSYS mangling `git show <ref>:<path>`, a `find | head -25` truncation read as a complete inventory, a replace printing 'fixed' while deleting a line, escape sequences un-escaped in transit, and vitest reporting 'no tests' for a file that would not parse. THREE ARRIVED INSIDE THE WORK DESCRIBING THE PATTERN. Reading the artifact caught all seven; knowing the failure mode prevented none.",
-      "After #33 the retirements check scans ONLY WHAT GIT TRACKS. That is deliberate - an untracked file does not ship, and the alternative is re-deriving .gitignore by hand - but it is a real narrowing: .agents/TASKS/research-wiki-audit.md, one of the three files Loop 11 held with Aaron, names a retired thing and is no longer reported.",
-      "G-027: expected_revision serialises writes within one lineage, not across branches. Two seats read rev 25 and both wrote rev 26 in one day. Before writing state, check no other seat is about to, and hand over the NUMBER rather than the base.",
-      "A retired name in prose is textually identical whether it is a defect or an obituary. If a check fires on correct text, add the path to that retirement's allowed_referrers - NEVER reword to dodge a check.",
-      "The test suite is NOT type-checked (T-152): tsconfig is 'include: [src/**/*]' with one tsconfig, so `tsc --noEmit` exits 0 on a test file naming a deleted symbol.",
-      "Line endings are MIXED in this repo - .agents/AGENT.md is LF, docs/loops/*.md is CRLF, and checks.test.ts has both. Detect per file in any scripted edit and READ THE FILE BACK; a tool reporting success is not the edit having landed.",
-      "Read the ob_state dry run before the real call, every time. Gaps take what/evidence/recommended_update, NOT title/note - both seats made that identical mistake on the identical file hours apart."
+      "LOOP 15 FIXES BOUNDARY FAILURES, NOT MEASUREMENT FAILURES. Eleven near-misses in two days were agents misreading their own instruments. A runtime cannot stop a seat running a grep that hides the line it needed. Do not let the runtime's existence become a reason to trust an unread output.",
+      "AN AUTHOR'S GREEN IS WHERE EVALUATION STARTS, NOT A SUBSTITUTE FOR IT. build-freshness shipped asserting a consequence true in one checkout of three with its author's tests passing. Hand Probe a frozen SHA and the deterministic results, then stop.",
+      "FAIL CLOSED. Every instrument that failed this project failed open. The one bug that surfaced loudly — cmd.exe eating ^ in <sha>^{commit} — did so only because an undefined distance is an ISSUE rather than a zero. Use execFileSync with an args array; no shell.",
+      "A FINDING REPORTED AGAINST A LINE IS USUALLY A FINDING ABOUT A CLASS. The stale-build consequence was reported against one line and an identical instance sat one branch away, in the message firing on the main tree. Look for the sibling before fixing the instance.",
+      "EVERYTHING BETWEEN gitnexus:start AND gitnexus:end IN CLAUDE.md IS REGENERATED BY THE ANALYZER. Edits inside it are discarded silently. Anything that must survive a reindex goes above the marker. Do not remove .gitnexusrc — without noStats the analyzer rewrites the tracked file on every run.",
+      "A PUSH NEEDS AUTHORITY FOR THAT PUSH, NOT AUTHORITY FOR THE ACTIVITY. This seat pushed a branch nobody had authorised because it had a good reason. A good reason is not authorisation. Whether unauthorised ACTS belong in an error table that counts wrong CLAIMS is unruled.",
+      "ACT ON A RELAY ONLY WHERE ACTING NARROWS SCOPE AND STAYS REVERSIBLE, AND RECORD IN THE ARTIFACT WHICH AUTHORITY YOU ACTED ON, AT THE MOMENT YOU ACT. Both halves of the first clause are judgements the actor makes about its own action; the second clause is what makes it auditable.",
+      "TWO MEASUREMENTS THAT DISAGREE MAY BOTH BE RIGHT — the resolution is a third measurement, not an argument. A tracked file measured 0 CR in two worktrees and 3,670 in a third, and the byte delta was exactly the carriage returns (G-031). A derived number must carry the ref and time it was derived from.",
+      "T-153 MOVES THIS WORKTREE to ~/Worktrees/sia-forge. It cannot be done from inside a live session — moving a directory under one destroys its cwd. Expect Permission denied on the first attempt and retry from outside the folder. Do not 'fix' the .git/worktrees/sia-loop12 admin path; git resolves it."
     ],
     "open_questions": [
-      "Does the memory half get used at all? THREE consecutive loops ended with ob_recalled returning nothing recalled. This is Loop 13's subject and the reason Idea B was chosen over G-026.",
-      "Is the intermittent suite failure one flake or two? One identified instance is sync/index.test.ts > 'does not auto-fix in check-only mode'; G-016 names state-writer.test.ts. Attribution deliberately left open.",
-      "What forces a retirement to be RECORDED in the first place? The check verifies recorded referrers are still present; nothing compels a new retirement to get an entry. A CUT ruling should not be closeable without one.",
-      "The error count stands at 35 Planner / 24 Developer settled, opening Loop 14 at 37/25 once the #33 QA is written - two pending Planner entries (the retirements sign-off, the detachment claim) and one Developer (the retirements defect, self-reported)."
+      "DOES THE MEMORY HALF GET USED AT ALL? ob_recalled returned nothing again this session — the FOURTH consecutive loop. Loop 13 was chosen as the instrument for this question and the instrument now exists: the protocol half demonstrably runs without memory. Nobody has yet run a loop that deliberately uses it.",
+      "Is C4's failure the ONLY barrier to a stranger installing this? Two were verified — the documented /start route and the absent SessionStart hook. Nobody enumerated the rest.",
+      "Should a close note be amendable? ob_state makes it write-once, so T-151 was closed with a note now known to be partly wrong and only a pointer from G-031 reaches a reader of it.",
+      "Do unauthorised ACTS belong in an error table that counts wrong CLAIMS? Named rather than decided, because the seat that would benefit from the answer is the one that raised it."
     ],
-    "session": 63
+    "session": 64
   },
   "last_session": {
-    "n": 63,
-    "date": "2026-09-17",
-    "uuid": "fb43e236-e52a-4698-a7c0-8e1126975f7c"
+    "n": 64,
+    "date": "2026-09-19",
+    "uuid": "c82ecd47-5458-4a67-a16f-0c28df764b12"
   }
 }
