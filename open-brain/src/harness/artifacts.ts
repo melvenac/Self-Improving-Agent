@@ -1,0 +1,138 @@
+/**
+ * The loop's artifacts on disk: `D_t.md`, `A_t.gitref`, `E_t.json`, and — when
+ * the loop fails — `FAILED.md`.
+ *
+ * **A failure is an artifact.** *An exhausted cap is a recorded failure, never a
+ * silent pass*, and a failure that exists only as a non-zero exit code and some
+ * scrollback is not recorded. `FAILED.md` is written into the same iteration
+ * directory as everything else, so a later reader finds the failure where they
+ * would have found the evidence.
+ *
+ * Every artifact carries **what it was derived from** — the sha, the branch,
+ * the time. A bare value in a file is correct on the day it was written and
+ * unverifiable afterwards.
+ */
+
+import type { Plan, Evidence } from "./schema.js";
+import type { FrozenCandidate } from "./workspace.js";
+
+/** Repo-relative directory for one iteration's artifacts. */
+export const iterationDir = (loop: string): string => `artifacts/iterations/${loop}`;
+
+export const planMarkdownPath = (loop: string): string => `${iterationDir(loop)}/D_t.md`;
+export const planJsonPath = (loop: string): string => `${iterationDir(loop)}/D_t.json`;
+export const gitrefPath = (loop: string): string => `${iterationDir(loop)}/A_t.gitref`;
+export const evidencePath = (loop: string): string => `${iterationDir(loop)}/E_t.json`;
+export const failurePath = (loop: string): string => `${iterationDir(loop)}/FAILED.md`;
+
+const bullets = (items: readonly string[]): string =>
+  items.length === 0 ? "_none_\n" : `${items.map((i) => `- ${i}`).join("\n")}\n`;
+
+/**
+ * `D_t` as markdown, for a human.
+ *
+ * `D_t.json` beside it is the machine copy and is written from the same
+ * validated object in the same call, so the two cannot describe different
+ * plans.
+ */
+export function renderPlanMarkdown(plan: Plan, writtenAt: string): string {
+  const lines: string[] = [
+    `# D_t — plan for loop ${plan.loop}`,
+    "",
+    `**Written:** ${writtenAt} · **Machine copy:** \`D_t.json\` in this directory`,
+    "",
+    "## Objective",
+    "",
+    plan.objective,
+    "",
+    "## New capability",
+    "",
+    plan.new_capability.trim() === ""
+      ? `_none — stop-ship requested: ${plan.stop_ship?.justification ?? "(no justification)"}_`
+      : plan.new_capability,
+    "",
+    "## Repair targets",
+    "",
+    bullets(plan.repair_targets),
+    "## Tasks",
+    "",
+    bullets(plan.tasks),
+    "## Acceptance",
+    "",
+    "| id | type | observable |",
+    "| --- | --- | --- |",
+    ...plan.acceptance.map((a) => `| ${a.id} | ${a.type} | ${a.observable} |`),
+    "",
+    "## Out of scope",
+    "",
+    bullets(plan.out_of_scope),
+    "## Must be preserved",
+    "",
+    bullets(plan.preserve),
+  ];
+  return `${lines.join("\n")}\n`;
+}
+
+/**
+ * `A_t.gitref` — the candidate, and the three facts that make it checkable.
+ *
+ * Plain text rather than JSON so `git show` and `cat` are enough. The sha is on
+ * its own line after the key, which is what a later script should parse; the
+ * rest is for a reader.
+ */
+export function renderGitref(candidate: FrozenCandidate, loop: string): string {
+  return [
+    `loop: ${loop}`,
+    `sha: ${candidate.sha}`,
+    `branch: ${candidate.branch}`,
+    `frozen_at: ${candidate.frozenAt}`,
+    "",
+    "# This is the candidate QA was given. The runtime refuses to run QA if HEAD",
+    "# has moved from this sha or the working tree is dirty against it.",
+    "",
+  ].join("\n");
+}
+
+export const renderEvidence = (evidence: Evidence): string => `${JSON.stringify(evidence, null, 2)}\n`;
+
+export interface FailureRecord {
+  loop: string;
+  stage: string;
+  reason: string;
+  /** Machine-readable cause, so a caller can branch without parsing prose. */
+  code: string;
+  attempts?: number;
+  problems?: readonly string[];
+  at: string;
+}
+
+/**
+ * `FAILED.md` — why the loop stopped, in the iteration directory.
+ *
+ * States the stage, the code and the attempts. An exhausted retry cap reads as
+ * an exhausted retry cap, not as "the loop did not finish".
+ */
+export function renderFailure(f: FailureRecord): string {
+  const lines: string[] = [
+    `# Loop ${f.loop} FAILED`,
+    "",
+    `**Stage:** ${f.stage} · **Code:** \`${f.code}\` · **At:** ${f.at}`,
+    f.attempts !== undefined ? `**Attempts:** ${f.attempts}` : "",
+    "",
+    "## Reason",
+    "",
+    f.reason,
+    "",
+  ];
+  if (f.problems && f.problems.length > 0) {
+    lines.push("## Problems", "", bullets(f.problems));
+  }
+  lines.push(
+    "---",
+    "",
+    "This file is the record of a refusal, not of an incomplete run. The loop stopped",
+    "deliberately; nothing downstream should read its absence of evidence as a pass.",
+    "",
+  );
+  return `${lines.filter((l) => l !== "").join("\n")}\n`;
+}

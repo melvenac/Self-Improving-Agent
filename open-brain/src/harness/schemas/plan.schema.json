@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "loop": {
+      "type": "string",
+      "pattern": "^t\\d{3,}$"
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tasks": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "out_of_scope": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "preserve": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "acceptance": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "observable": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "blackbox",
+              "whitebox"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "observable",
+          "type"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "repair_targets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "new_capability": {
+      "type": "string"
+    },
+    "stop_ship": {
+      "type": "object",
+      "properties": {
+        "requested": {
+          "type": "boolean",
+          "const": true
+        },
+        "justification": {
+          "type": "string",
+          "minLength": 20
+        }
+      },
+      "required": [
+        "requested",
+        "justification"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "loop",
+    "objective",
+    "tasks",
+    "out_of_scope",
+    "preserve",
+    "acceptance",
+    "repair_targets",
+    "new_capability"
+  ],
+  "additionalProperties": false,
+  "title": "D_t — HoH loop plan",
+  "description": "The plan for one HoH loop. LIMIT: two rules this schema cannot express are enforced by the runtime and not by JSON Schema — new_capability must be non-empty unless stop_ship is requested and justified, and repair_targets must be non-empty. Derived from open-brain/src/harness/schema.ts; do not edit by hand."
+}

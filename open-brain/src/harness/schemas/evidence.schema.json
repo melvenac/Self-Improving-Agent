@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "loop": {
+      "type": "string",
+      "pattern": "^t\\d{3,}$"
+    },
+    "candidate_git": {
+      "type": "object",
+      "properties": {
+        "sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frozen_at": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "sha",
+        "branch",
+        "frozen_at"
+      ],
+      "additionalProperties": false
+    },
+    "runtime_checks": {
+      "type": "object",
+      "properties": {
+        "build": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string",
+              "minLength": 1
+            },
+            "exit_code": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "passed": {
+              "type": "boolean"
+            },
+            "duration_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "detail": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "command",
+            "exit_code",
+            "passed",
+            "duration_ms",
+            "detail"
+          ],
+          "additionalProperties": false
+        },
+        "unit": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string",
+              "minLength": 1
+            },
+            "exit_code": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "passed": {
+              "type": "boolean"
+            },
+            "duration_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "detail": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "command",
+            "exit_code",
+            "passed",
+            "duration_ms",
+            "detail"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "build",
+        "unit"
+      ],
+      "additionalProperties": false
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "met",
+              "unmet",
+              "partial",
+              "not_evaluated"
+            ]
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "blocker",
+              "major",
+              "minor",
+              "info"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "evidence",
+          "severity"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "acceptance": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "met",
+              "unmet",
+              "partial",
+              "not_evaluated"
+            ]
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "evidence"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "regressions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "loop",
+    "candidate_git",
+    "runtime_checks",
+    "requirements",
+    "acceptance",
+    "regressions",
+    "gaps",
+    "notes"
+  ],
+  "additionalProperties": false,
+  "title": "E_t — HoH loop evidence",
+  "description": "The QA evidence report for one HoH loop. LIMIT: runtime_checks are supplied by the runtime from process exit codes, not by the QA role; a role-supplied value that disagrees with the measurement is refused. Derived from open-brain/src/harness/schema.ts; do not edit by hand."
+}
