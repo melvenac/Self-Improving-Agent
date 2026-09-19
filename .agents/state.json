@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 35,
+  "revision": 36,
   "project": {
     "name": "self-improving-agent"
   },
@@ -190,16 +190,6 @@
       "note": "(Session 49). `server.ts:537` computes `projectName = effectiveProject.split(\"/\").pop()` from the *canonical* `project_dir`, and `canonicalizeProjectDir` lowercases the **entire string** when it starts with a drive letter — not just the drive. Result: `ob_store` writes `Experiences/self-improving-agent/` while the `store()` pipeline given an explicit project name writes `Experiences/Self-Improving-Agent/`. **Two live rows already differ** — #235 (older) and #365 (stored during this close-out). **Invisible on Windows** because the filesystem is case-insensitive, so both resolve into the one real folder, `checkVaultIndexParity` passes, and nothing dangles. On macOS or Linux this silently creates a **second project folder**, which `skill-scan` reads as a separate project and which reproduces the exact 60-duplicate divergence repaired earlier this same session. The general rule it violates: **a canonical form is for comparison, not for display** — deriving a human-facing name from a lossy identity key reuses a transformation for a purpose it was not built for. Fix: carry the display name separately (the caller already knows it) rather than reconstructing it from the key; then repoint the two existing rows. Related to the P3 cross-platform item — this is a second Windows-only blind spot. Now documented as §10 of the `path-normalization` skill."
     },
     {
-      "id": "T-057",
-      "title": "`ob_feedback`'s `referenced` argument does not exist",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 49,
-      "closed_session": 62,
-      "supersedes": null,
-      "note": "Closed by the STRIKE branch, which the note offered as one of two. `referenced` is gone from every copy: `/end` A14 now says `ob_feedback({id, rating})` — those two arguments and no others, citing server.ts:895-897 — and both Cursor mirrors were carrying the same false signature and were repaired too. `grep -rn \"entry_id, rating, referenced\"` across every mirror returns 0. The IMPLEMENT branch was not taken and its reasoning is not lost: the was-it-cited signal `referenced` would have carried is exactly what T-014 (point-of-use rating) still needs, and the 445 neutrals still hide it. Striking the argument does not answer that question, it just stops the instruction lying about being able to."
-    },
-    {
       "id": "T-061",
       "title": "Collect shadow-recall sessions",
       "priority": "P1",
@@ -228,16 +218,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "or adopt the RUNBOOK rule that logs are append-only and live state belongs in INBOX only. Right now an auditor sees 153 apparently-open items with no way to tell which are long done. (Session 41)"
-    },
-    {
-      "id": "T-074",
-      "title": "Rewrite /checkpoint as vault-first ob_store_chunk",
-      "priority": "P1",
-      "status": "done",
-      "opened_session": 55,
-      "closed_session": 62,
-      "supersedes": null,
-      "note": "Verified already satisfied rather than done this session. The note asked for checkpoint.md to write markdown to ~/Obsidian Vault v2/Checkpoints/ and index in the DB via ob_store_chunk instead of the dropped kb_store_chunk. checkpoint.md:19 already does exactly that, and its parameter block matches the live schema (content, key, category, tags, project_dir, phase — all present, session_id optional and omitted). What was NOT right was the key convention, which is a separate defect found and fixed this session: the command told the caller to put the project and phase INTO key while server.ts:1198 adds both itself."
     },
     {
       "id": "T-091",
@@ -288,16 +268,6 @@
       "closed_session": null,
       "supersedes": "T-104",
       "note": "* (Aaron's ask, Session 53; spec at `docs/mailbox-transport-retirement-spec.md`). **The protocol is SIA's, the store is not** — reader `pipelines/session-start/agent-identity.ts` (`readMailboxState`), emitter `cli-bootstrap.ts:135–141`, and it **ships to every template consumer** via `project-template/.agents/AGENT.md:5,14–21` and `start.md:54`; the data lives in `~/.agents/`, a separate repo, and `/sync` validates none of it. Note the name collision — `<project>/.agents/` (gitignored, `.gitignore:9`) is not `~/.agents/`. **The archive half works** (26 commits, 25 touching message files, truncate-to-latest ran clean at `6454bbc`); the transport half is obsolete. Session 53 is its own evidence: Aaron hand-carried the inbox file, Forge then reached Atlas live four times, and the live channel **corrected the file twice** (v0.17.0 had already shipped; delta numbering moved from `#5 before #2` to names after 455/456 renumbered) — so the reply committed at `44dfd8b` was stale on both counts *within the session that wrote it*. **Root cause is one function.** In `readMailboxState`, `lastDecision` parses `^## (\\d{4}-\\d{2}-\\d{2})` and sorts — date-aware; `messageCount` counts `^## \\[` with no age, ever. The durable half already knows about time and the ephemeral half does not, which is why five dead channels (TCM 2026-04-24, worthit 06-04, nexcrm 06-09, a2a-hub and openlaser 07-22) announce themselves identically to the one live one. **Same dropped-count invariant as the four instances in P1** — a letter has no status field, cannot represent *answered* or *superseded*, so absence of resolution reads as currency. **Fix (deterministic-first rule #2, remove the trigger):** surface a message **only when it postdates its channel's last decision** — no timeout constant, nothing to tune, cannot drift; unparseable headers count as unresolved and are *reported*, not skipped. Then document live `SendMessage` as primary with the mailbox as the fallback for a peer that isn't running, state the durable contract (*if it must survive the session it is a decision or a task, written in that form*), and move the five dead channels under `archive/`. **Stageable today with no code change** — a blank `mailbox_channel` already skips the surface (`AGENT.md:21`); the code change only sets the default. Supersedes the item below, which asked for the same thing from the other end. Do **not** conflate the `AGENT.md` edits with the personalization-leak item in P0 — same file, separate changes. (Session 53)"
-    },
-    {
-      "id": "T-105",
-      "title": "Look into how checkpoints are tagged",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 55,
-      "closed_session": 62,
-      "supersedes": null,
-      "note": "Both halves answered. SEVERITY: the note said to check whether the duplicate tag reaches the clustering input before deciding — it cannot, because skill-scan was CUT in Loop 10 and executed off the prompt surface this session. There is no clustering input, so the v0.12.0 inflation risk is gone with it. CALLER: checkpoint.md instructed tags: [\"checkpoint\", \"phase-{N}\", \"{project-slug}\", ...] while server.ts:1209 already prepends `category`; the instruction now says tags: [\"checkpoint\" removed, ...domain tags]. The server still prepends category, so a caller that passes it will still double — that is the server's behaviour and it is unchanged, but nothing this repo instructs now triggers it. Found alongside the filename doubling, which was the sharper instance of the same shape."
     },
     {
       "id": "T-114",
@@ -1281,6 +1251,13 @@
       "evidence": "Session 64: ob_sync via MCP returned 'Summary: 23 passed, 0 fixed, 4 warnings, 0 issues, 0 skipped' with no module-boundary, gitnexus-index or build-freshness lines. After `/mcp reconnect open-brain`, the identical call returned 26 passed with all three present, and build-freshness immediately caught a real mismatch (build e3d33c7 vs HEAD ae1113a). The CLI path had been reporting all three throughout.",
       "recommended_update": "Make the runtime identify itself in the output rather than leaving it inferable: have ob_sync print the build commit it is serving from (build-info.json is already written by postbuild) alongside the existing `runtime: mcp-server` label, so a reader can tell a green from a stale green. Note the ordering constraint — build-freshness compares the PROJECT tree's build to HEAD, which is a different question from which build the SERVER process loaded, and only the latter explains a missing check.",
       "opened_session": 64
+    },
+    {
+      "id": "G-034",
+      "what": "build-freshness PASS means 'this build matches this checkout', NOT 'this build is current' — so a checkout parked on an old commit with a matching build is GREEN while serving stale code to every session on the machine. Measured 2026-09-19: the main tree at HEAD e65f251, build stamped e65f251, master a1ed790, ELEVEN COMMITS BEHIND, and build-freshness returns '[pass]: build matches HEAD e65f251'. That tree is what both SessionStart and SessionEnd hooks and the open-brain MCP server run from, in every project on this machine. TWO FURTHER FAULTS COMPOUND WITH IT, and they are distinct rather than restatements. (a) EXTENDS G-033: a check served through the MCP server cannot report that server's own staleness, because the code it needs is the code the stale server lacks. (b) THE TREE-AWARE MESSAGE MAKES IT WORSE: run through MCP against a linked worktree, build-freshness prints 'the hooks and MCP server run from the MAIN checkout's build and are unaffected by this one' — a reassurance ABOUT THE VERY PROCESS THAT PRODUCED IT, asserted rather than measured, and false at the time it was printed because the main build was eleven commits behind. The wording added on 2026-09-19 to make the message true per-checkout is what makes this instance misleading.",
+      "evidence": "Reproduced independently by both seats. Planner measurement: `git rev-parse --short HEAD` = e65f251 in the main tree; `build-info.json` commit = e65f251; `git rev-list --count HEAD..origin/master` = 11; `sync --check` run against that tree with a current CLI returns build-freshness [pass]. The misleading reassurance was observed in an ob_sync call through the reconnected MCP server against the planner worktree at the same time. Developer measurement (session 64, G-033 as originally written): pre-reconnect ob_sync returned 23 passed with module-boundary, gitnexus-index and build-freshness ABSENT rather than failing; post-reconnect, 26 passed with all three, and build-freshness caught a real mismatch on its first run. OPENED AS ITS OWN GAP RATHER THAN AMENDING G-033 so the developer's original narrower claim stays auditable and the two extensions are attributable to where they were found.",
+      "recommended_update": "Derive the claim instead of asserting it, which is bounded and needs no host config: from a linked worktree `git rev-parse --git-common-dir` gives the main .git, so the main checkout is its parent. Read THAT tree's build-info.json and HEAD, compare both to the upstream ref, and report three distinct states rather than two — current, consistently-old, and mismatched. Then the sentence about the hooks and the MCP server is measured rather than claimed, and a consistently-old main tree stops reading as green. NOT BUILT DELIBERATELY: the developer declined to ship it as the last act of a rolling session, on the grounds that author-accepting new code with no QA is the defect build-freshness itself is the case study for. It is Loop 15-shaped or later, and it must be seen RED on a consistently-old tree before it is trusted.",
+      "opened_session": 65
     }
   ],
   "decisions": [
