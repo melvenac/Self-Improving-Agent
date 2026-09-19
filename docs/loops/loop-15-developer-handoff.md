@@ -23,17 +23,19 @@ as the trees it has run in. `build-freshness` shipped green in one tree and was 
 
 | | |
 | --- | --- |
-| **Frozen SHA** | `1c8e6ca9cc5d407da4649120426ca5defa3cd9f7` |
+| **Frozen SHA** | `1086e5528f87491f2e3a5533c4494c38a400531a` (supersedes `1c8e6ca`, see Finding 2) |
 | **Branch** | `loop/15-hoh-runtime` |
 | **Reachable** | from the shared `.git` by SHA — no push needed, all four checkouts share one object store |
 
-**Exactly one commit lands after the candidate: this document**, which touches `docs/loops/` only.
-So `git diff 1c8e6ca..loop/15-hoh-runtime --stat` should name this file and nothing else.
+**Commits after the candidate are this document and the session-close state write**, which touch
+`docs/loops/` and `.agents/` only. No source file changes after `1086e55`.
 
 **Check the SHA off `git log` yourself rather than taking it from this line.** If it disagrees with
-`1c8e6ca`, the disagreement is the finding, not a typo to smooth over — a derived number carries the
-ref and time it came from, and this one was derived by the seat that wants it to be right. Every
-number in the next section was measured **at `1c8e6ca`**, after the fix in *Finding 1*, not before.
+`1086e55`, the disagreement is the finding, not a typo to smooth over — a derived number carries the
+ref and time it came from, and this one was derived by the seat that wants it to be right.
+
+**Every number in the next section was re-measured at `1086e55`** after the Finding 2 correction —
+not carried forward from the superseded candidate.
 
 ---
 
@@ -45,25 +47,26 @@ pedantry: an earlier reading in this session took the exit code of `tail` throug
 
 | Check | Command | Exit | Observed |
 | --- | --- | --- | --- |
-| Build | `npm run build` (in `open-brain/`) | **0** | build stamped `1c8e6ca` |
+| Build | `npm run build` (in `open-brain/`) | **0** | build stamped `1086e55` |
 | Typecheck | `npx tsc --noEmit` | **0** | no output |
-| Suite | `npx vitest run` | **0** | 55 files, 805 tests, **0 errors** |
+| Suite | `npx vitest run` | **0** | 55 files, **807 tests**, **0 errors** |
 | `/sync` | `node open-brain/build/cli.js sync --check` | **0** | 25 passed, 0 issues, 4 warnings, 1 skip |
 
 Three `/sync` lines worth reading rather than summarising:
 
-- `build-freshness [pass]: build matches HEAD 1c8e6ca` — so the build these results came from is the
+- `build-freshness [pass]: build matches HEAD 1086e55` — so the build these results came from is the
   candidate's, not an older one. See *Finding 4* for why that is weaker evidence than it looks.
 - `module-boundary [pass]: core does not import memory (56 file(s), 41 core)` — the harness is inside
   the 41 core files and reaches no memory code.
-- `state-schema [pass]: … rev 39` — the rebase landed; this is not a stale record.
+- `state-schema [pass]: … rev 41` — the rebase onto `d45c965` landed (it arrived as rev 39) and
+  this session's own close-out has since been written. Not a stale record.
 
 **Typecheck covers `src/` only.** `T-152` records that the suite itself is not type-checked. I
 type-checked `tests/harness/` separately with a throwaway config extending `tsconfig.json`: **exit 0**.
 That config was deleted rather than committed, so **nothing in CI re-checks it** — a fact about the
 repo, not a claim about my tests.
 
-**Suite arithmetic, so you can check it rather than accept it:** 805 total − 157 new = **648**, which
+**Suite arithmetic, so you can check it rather than accept it:** 807 total − 159 new = **648**, which
 is the number the brief's §3 names as the figure to preserve. Measured directly too:
 `npx vitest run --exclude 'tests/harness/**'` gives **648 passed in 48 files**. **No pre-existing
 file was modified** — `git diff --stat d45c965..HEAD` touches only new paths plus `package.json`,
@@ -199,13 +202,34 @@ intermittent cross-test failure in `state-writer.test.ts` under the full suite. 
 same plant failed exactly one. **I am reporting that as unresolved rather than attributing it to
 `G-016`, because I did not capture the name.**
 
-### Finding 2 — a rule I enforce that the brief does not spell out
+### Finding 2 — ~~a rule I enforce that the brief does not spell out~~ — RAISED, OVERTURNED, FIXED
 
-`D_t` refuses an empty `repair_targets`. The brief only names the `new_capability` rejection. I read
-`HOH-JEV.md` §"Rules the runtime enforces" as symmetric — *"a loop that is only repair collapses
-into local patching; one that is only capability abandons what the last loop found"* — and enforced
-both halves, with `stop_ship` excusing neither. **This is my reading, not a ruling**, it is a plan
-this runtime would refuse that the brief would accept, and Atlas should overrule it if it is wrong.
+**Resolved before this document reached you. Kept rather than deleted, because the correction is
+more useful than the original finding.**
+
+I enforced a second schema rejection the brief does not name: `D_t` refused an empty
+`repair_targets`, reading `HOH-JEV.md` §"Rules the runtime enforces" as symmetric. I flagged it to
+Atlas as my reading rather than a ruling. **Atlas overturned it, and the reason is a defect I had
+not seen, not a difference of taste.**
+
+`new_capability` is checkable from `D_t` alone. *"Repairs outstanding problems"* is only checkable
+against `E_{t-1}`, **which the schema never sees** — it cannot know whether there was anything to
+repair. So the symmetric rule refuses the two cases where there legitimately is nothing: **the first
+loop of any project, which has no `E_{t-1}` at all, and any loop following a clean `E_t`.** My rule
+would have deadlocked the runtime **on start and again on success.** The paper's own plan gate lists
+`capability_increment` as a valid category, and for a gate to judge it the schema has to let it
+through. The rule belongs to slice two's `addresses_top_failures` gate question, which can see the
+prior evidence.
+
+**Fixed at the new candidate.** `repair_targets` is still required as an array and may now be empty;
+the refusal, its description note and the test asserting it are gone. The replacement tests assert
+the two cases the old rule deadlocked, plus that an *omitted* `repair_targets` is still refused —
+"allowed to be empty" is not "optional", and "nobody considered it" must not render the same as
+"nothing to repair".
+
+**What this cost and what it is worth:** a schema rule that looked like a faithful reading of a
+written rule would have made the runtime unusable on its own first iteration, and **I did not find
+it — the seat that did not write it did.** That is the loop's own thesis landing on the loop.
 
 ### Finding 3 — the tag instruction contradicts itself across the two source documents
 
