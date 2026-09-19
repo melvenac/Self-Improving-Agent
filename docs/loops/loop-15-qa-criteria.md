@@ -69,6 +69,10 @@ untested**, and **blind spot** (what the procedure cannot see).
   emit a `D_t` that violates `plan.schema.json` on every attempt. Three shapes will be tried:
   missing `new_capability`; `new_capability: ""` without `stop_ship`; and `acceptance: []`.
   Capture `$?` and read the artifact directory and any log the candidate names.
+  **Amendment 2, ruled 2026-09-19:** a `D_t` with empty `repair_targets` is VALID — the schema
+  cannot know whether there was anything to repair, since that needs `E_{t-1}`, which it never
+  sees. The three invalid shapes above stand; `repair_targets: []` is added as a fourth shape that
+  must be **accepted**, so a candidate still refusing it is a fail on this row.
 - **Pass:** exit non-zero **and** a recorded reason exists on disk (in `artifacts/` or a file the
   candidate names) that states the cap was hit and which role — **and** the number of attempts
   observed equals the cap. **Fail:** exit 0, or a continue past the invalid plan, or a reason that
@@ -200,11 +204,11 @@ candidate, and the report says so.
 
 | id | fence | procedure | verdict |
 | --- | --- | --- | --- |
-| **F1** | No Jev client, no gate, no network | `git diff --stat <base>..<SHA>`; grep the harness for `typesafe.ai`, `fetch(`, `https.request`, `axios` — validated against a known positive in `open-brain/src` first | **fail** on any real network call site outside a dry-run print. |
+| **F1** | No Jev client, no gate, no network | `git diff --stat <base>..<SHA>`; grep the harness for `typesafe.ai`, `fetch(`, `https.request`, `axios` — validated against a **planted** known positive in the scratchpad first (there is no such call anywhere in `open-brain/src` to validate against, which the first attempt found out by returning nothing). Ruled 2026-09-19 (amendment 2): the runtime refuses ten network git subcommands at the call site, so this fence also has a mechanical thing to see red: the deny list in `git.ts`, exercised by its own test. | **fail** on any real network call site outside a dry-run print. |
 | **F2** | `harness/prompts/` and `artifacts/index.md` cut | `ls harness/prompts artifacts/index.md` | present = finding (scope widened), reported; not a fail on the runtime. |
 | **F3** | Nothing in `project-template/` changes; `.claude/commands/` untouched | covered by P1's diff | as P1. |
 | **F4** | No secret in any file | `git grep -n TYPESAFE_API_KEY <SHA>` — every hit must be a *read* of the variable, not a value | **fail** on a value. |
-| **F5** | TypeScript, not Python | `find harness -name '*.py'` after confirming `find` finds a known `.ts` there | **fail** on any. |
+| **F5** | TypeScript, not Python | `find open-brain/src/harness open-brain/tests/harness -name '*.py'` after confirming `find` finds a known `.ts` there. Path corrected 2026-09-19: the planner confirmed the harness lives at `open-brain/src/harness/`, not the repo root the brief wrote. | **fail** on any. |
 
 ## 5. What I will report as a finding even though no row fails
 
@@ -250,6 +254,21 @@ Filled in below from a run in `~/Worktrees/sia-qa` at `e47ae20`, this seat's own
 The four warnings (`prd-version`, `vault-index-parity`, `project-dirs`, `spec-provenance`) are
 pre-existing at the base and will not be attributed to the candidate unless their text changes.
 The author's "648" and this tree's 648 agree; that is one reproduction, in one tree, at one SHA.
+
+## 7a. Voided candidate, recorded so it is not mistaken for the evaluated one
+
+`1c8e6ca9cc5d407da4649120426ca5defa3cd9f7` was handed over by Forge at 23:51Z on 2026-09-19 and
+**superseded at 23:58Z by a planner ruling (amendment 2)** before the evaluation finished. Under
+§1 every observation made against it is void. Two are kept here as notes, labelled void, because
+they were made and a reader should not think they were not: in this tree at that SHA, `npm ci`,
+`npm run build` and `npx tsc --noEmit` each exited 0, and `npx vitest run` exited 0 with
+805 passed of 805 in 55 files and no `[vitest-worker]` timeout line (grep validated on a plant).
+**None of that is evidence about the candidate the report evaluates.**
+
+One machine fact learned while reading it is not candidate-specific and carries forward: on this
+machine (Node v22.23.2, win32) `spawnSync("npm.cmd", …, { shell: false })` fails with `EINVAL`
+and `spawnSync("npm", …)` with `ENOENT`. Any candidate whose default checks spawn `npm.cmd`
+without a shell cannot run them here; whether that is so is an A1 observation against the new SHA.
 
 ## 8. Procedure order on hand-over
 
