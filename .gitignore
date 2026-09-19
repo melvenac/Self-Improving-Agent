@@ -61,6 +61,11 @@ Thumbs.db
 # parent DIRECTORY is excluded.
 /docs/*
 !/docs/loops/
+# HOH-JEV.md is the LOOP GUIDE — the standing contract for how a loop runs, which seat may
+# write what, and how the Jev gates are called. It began as an untracked file in one
+# worktree and was being used as the guide from there, which is the same defect as the
+# close-outs above: a source of truth on one disk, invisible to a fresh clone.
+!/docs/HOH-JEV.md
 
 # Runtime artifacts (session-local / regenerated)
 /.recalled-entries.json
