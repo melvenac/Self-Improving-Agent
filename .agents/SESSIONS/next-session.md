@@ -1,31 +1,30 @@
-<!-- generated from .agents/state.json rev 33 by open-brain v0.40.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 35 by open-brain v0.40.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## Pick up here _(written session 63)_
+## Pick up here _(written session 64)_
 
-Loop 13 is Idea B - the module boundary - ruled by Aaron. Its brief is docs/loops/LOOP-13-brief.md, landing in PR #31. READ THAT ONE BY NUMBER, NOT BY RECENCY: a Loop 14 brief already exists (PR #34, the two-seat record) and does not jump the queue, so 'the newest brief' is the WRONG file. Merge order is #33 (a real defect fix), then #32 (this close-out), then #31 which unblocks Loop 13, then #34. Base was master @ 917fd68 rev 28 at close; it will have moved - check it.
+Loop 15 runs before Loop 14, ruled 2026-09-19. Loop 14 is re-briefed rather than deferred: it was written when there were two seats and no runtime, and Loop 15 adds the component that would own the artifacts Loop 14 planned to design by hand. There are three seats now — Forge (developer), Atlas (planner), Probe (qa, read-only, evaluates a frozen SHA it did not build). Loop 13 shipped v0.39.0 and v0.40.0 and closed C4 as a recorded failure: the machinery is installable, the instruction is not.
 
 ## Watch out
 
-- THE BRIEF TO READ IS THE ONE FOR THE LOOP YOU ARE RUNNING, BY NUMBER. An earlier version of this handoff said 'by the largest loop number', which now points at Loop 14's brief. Written before Loop 14 was briefed ahead of Loop 13 running - a sorting rule that was correct when written and false within the day.
-- THERE ARE NOW THREE WORKTREES and .agents/AGENT.md is ONE TRACKED FILE saying `name: Forge`, so /start greets whoever starts in ANY of them as Forge. The seat also carries three disagreeing names: Clark in the global CLAUDE.md, Atlas in AGENT.md's partner line, Planner in every brief since Loop 9. That is Loop 14's C1; do not fix it inside Loop 13.
-- RULE 13 - A CHECK IS ONLY AS TESTED AS THE TREES IT HAS RUN IN. The retirements check shipped through four boundary reports, a Planner QA and five merged PRs, then fired 115 findings the first time it ran in Aaron's MAIN tree - the only one of three with a .gitnexus/ generated index. RUN THE LOOP'S CHECKS IN THE MAIN TREE BEFORE ANY SIGN-OFF, and rebuild it first: the MCP server runs from that build and a stale server reports success.
-- AN INSTRUMENT THAT CANNOT DISTINGUISH 'NOTHING THERE' FROM 'I DID NOT LOOK' IS NOT A MEASUREMENT. Seven instances in session 63: a `|| echo 0` fallback, a blank `echo` over a real hit, MSYS mangling `git show <ref>:<path>`, a `find | head -25` truncation read as a complete inventory, a replace printing 'fixed' while deleting a line, escape sequences un-escaped in transit, and vitest reporting 'no tests' for a file that would not parse. THREE ARRIVED INSIDE THE WORK DESCRIBING THE PATTERN. Reading the artifact caught all seven; knowing the failure mode prevented none.
-- After #33 the retirements check scans ONLY WHAT GIT TRACKS. That is deliberate - an untracked file does not ship, and the alternative is re-deriving .gitignore by hand - but it is a real narrowing: .agents/TASKS/research-wiki-audit.md, one of the three files Loop 11 held with Aaron, names a retired thing and is no longer reported.
-- G-027: expected_revision serialises writes within one lineage, not across branches. Two seats read rev 25 and both wrote rev 26 in one day. Before writing state, check no other seat is about to, and hand over the NUMBER rather than the base.
-- A retired name in prose is textually identical whether it is a defect or an obituary. If a check fires on correct text, add the path to that retirement's allowed_referrers - NEVER reword to dodge a check.
-- The test suite is NOT type-checked (T-152): tsconfig is 'include: [src/**/*]' with one tsconfig, so `tsc --noEmit` exits 0 on a test file naming a deleted symbol.
-- Line endings are MIXED in this repo - .agents/AGENT.md is LF, docs/loops/*.md is CRLF, and checks.test.ts has both. Detect per file in any scripted edit and READ THE FILE BACK; a tool reporting success is not the edit having landed.
-- Read the ob_state dry run before the real call, every time. Gaps take what/evidence/recommended_update, NOT title/note - both seats made that identical mistake on the identical file hours apart.
+- LOOP 15 FIXES BOUNDARY FAILURES, NOT MEASUREMENT FAILURES. Eleven near-misses in two days were agents misreading their own instruments. A runtime cannot stop a seat running a grep that hides the line it needed. Do not let the runtime's existence become a reason to trust an unread output.
+- AN AUTHOR'S GREEN IS WHERE EVALUATION STARTS, NOT A SUBSTITUTE FOR IT. build-freshness shipped asserting a consequence true in one checkout of three with its author's tests passing. Hand Probe a frozen SHA and the deterministic results, then stop.
+- FAIL CLOSED. Every instrument that failed this project failed open. The one bug that surfaced loudly — cmd.exe eating ^ in <sha>^{commit} — did so only because an undefined distance is an ISSUE rather than a zero. Use execFileSync with an args array; no shell.
+- A FINDING REPORTED AGAINST A LINE IS USUALLY A FINDING ABOUT A CLASS. The stale-build consequence was reported against one line and an identical instance sat one branch away, in the message firing on the main tree. Look for the sibling before fixing the instance.
+- EVERYTHING BETWEEN gitnexus:start AND gitnexus:end IN CLAUDE.md IS REGENERATED BY THE ANALYZER. Edits inside it are discarded silently. Anything that must survive a reindex goes above the marker. Do not remove .gitnexusrc — without noStats the analyzer rewrites the tracked file on every run.
+- A PUSH NEEDS AUTHORITY FOR THAT PUSH, NOT AUTHORITY FOR THE ACTIVITY. This seat pushed a branch nobody had authorised because it had a good reason. A good reason is not authorisation. Whether unauthorised ACTS belong in an error table that counts wrong CLAIMS is unruled.
+- ACT ON A RELAY ONLY WHERE ACTING NARROWS SCOPE AND STAYS REVERSIBLE, AND RECORD IN THE ARTIFACT WHICH AUTHORITY YOU ACTED ON, AT THE MOMENT YOU ACT. Both halves of the first clause are judgements the actor makes about its own action; the second clause is what makes it auditable.
+- TWO MEASUREMENTS THAT DISAGREE MAY BOTH BE RIGHT — the resolution is a third measurement, not an argument. A tracked file measured 0 CR in two worktrees and 3,670 in a third, and the byte delta was exactly the carriage returns (G-031). A derived number must carry the ref and time it was derived from.
+- T-153 MOVES THIS WORKTREE to ~/Worktrees/sia-forge. It cannot be done from inside a live session — moving a directory under one destroys its cwd. Expect Permission denied on the first attempt and retry from outside the folder. Do not 'fix' the .git/worktrees/sia-loop12 admin path; git resolves it.
 
 ## Open questions
 
-- Does the memory half get used at all? THREE consecutive loops ended with ob_recalled returning nothing recalled. This is Loop 13's subject and the reason Idea B was chosen over G-026.
-- Is the intermittent suite failure one flake or two? One identified instance is sync/index.test.ts > 'does not auto-fix in check-only mode'; G-016 names state-writer.test.ts. Attribution deliberately left open.
-- What forces a retirement to be RECORDED in the first place? The check verifies recorded referrers are still present; nothing compels a new retirement to get an entry. A CUT ruling should not be closeable without one.
-- The error count stands at 35 Planner / 24 Developer settled, opening Loop 14 at 37/25 once the #33 QA is written - two pending Planner entries (the retirements sign-off, the detachment claim) and one Developer (the retirements defect, self-reported).
+- DOES THE MEMORY HALF GET USED AT ALL? ob_recalled returned nothing again this session — the FOURTH consecutive loop. Loop 13 was chosen as the instrument for this question and the instrument now exists: the protocol half demonstrably runs without memory. Nobody has yet run a loop that deliberately uses it.
+- Is C4's failure the ONLY barrier to a stranger installing this? Two were verified — the documented /start route and the absent SessionStart hook. Nobody enumerated the rest.
+- Should a close note be amendable? ob_state makes it write-once, so T-151 was closed with a note now known to be partly wrong and only a pointer from G-031 reaches a reader of it.
+- Do unauthorised ACTS belong in an error table that counts wrong CLAIMS? Named rather than decided, because the seat that would benefit from the answer is the one that raised it.
 
 ## Last session
 
-Session 63 — 2026-09-17 — `fb43e236-e52a-4698-a7c0-8e1126975f7c`
+Session 64 — 2026-09-19 — `c82ecd47-5458-4a67-a16f-0c28df764b12`
