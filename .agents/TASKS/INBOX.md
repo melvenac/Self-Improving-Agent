@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 37 by open-brain v0.40.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 38 by open-brain v0.40.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -40,6 +40,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-148** The note is required before you RETIRE a task, not only before you work one
 - [ ] **T-152** The test suite is not type-checked at all
 - [ ] **T-154** Give /start a memory-free documented route, and make the SessionStart hook installable by a stranger
+- [ ] **T-155** Shadow merge gate: the runtime records what it would have done at each merge, and disagreements with Aaron are counted
 
 ## P2
 

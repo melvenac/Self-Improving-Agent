@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 37,
+  "revision": 38,
   "project": {
     "name": "self-improving-agent"
   },
@@ -358,6 +358,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "DERIVED FROM C4's FAILURE, NOT RULED AS THE NEXT LOOP'S SUBJECT. Aaron ruled on 2026-09-17 only that this work is not Loop 13's. Recording it as a decision would manufacture a sequencing ruling he did not make. See the gap recorded this revision for the two halves and their provenance. The shape of the fix is known and the ruling is not: start.md names ob_start six times with no CLI path, and every piece /start needs already runs without memory - cli-bootstrap.js exits 0 on a memory-free install with the project detected and agent identity read. Changing the hook contract is a ruling, not a build decision."
+    },
+    {
+      "id": "T-155",
+      "title": "Shadow merge gate: the runtime records what it would have done at each merge, and disagreements with Aaron are counted",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 65,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "DERIVED FROM THE AUTONOMY RULING (see the decision recorded this revision). At every point where a merge to master could occur, the runtime writes a would-merge / would-not-merge verdict with its reasons — deterministic check results, QA E_t status, and once the gates exist, their typed answers — into artifacts/iterations/tNNN/. Aaron still merges. The runtime then records his actual decision beside its own, and the count of disagreements is the instrument that decides when the human gate is removed. BELONGS TO SLICE TWO OR LATER, not Loop 15: it needs the gates to have an opinion, and it needs the merge point to exist in the runtime first. NOT RULED AS THE NEXT LOOP'S SUBJECT. Design constraints that come from the record: the verdict must be written BEFORE Aaron decides, so it cannot be fitted to his answer; both verdicts carry the candidate SHA and a timestamp; a run where the runtime could not form a verdict (gate unreachable, evidence missing) is recorded as UNDEFINED and never as agreement. Zero disagreements across loops with NO real defects in the stream is not evidence of anything — the count only means something when the loops contained failures a gate could have caught."
     }
   ],
   "verified": [
@@ -1554,6 +1564,12 @@
       "title": "Loop 13's C4 closes as a recorded failure",
       "date": "2026-09-17",
       "note": "Ruled by Aaron in-session to the planner seat (Atlas), 2026-09-17, in the words 'yes, Loop 13's C4 closes as a recorded failure'. C4 asked whether core installs and runs with Node and git alone, memory absent. It does NOT, and the reason is the finding: THE MACHINERY IS INSTALLABLE; THE INSTRUCTION IS NOT. Forge ran a real install - fresh clone, npm install --omit=optional, better-sqlite3 confirmed ABSENT before anything ran, env vars pointed at nonexistent paths - and everything mechanical passed: install, build, sync --check (21 passed, 4 skipped, the three memory checks SKIPPING WITH THE REASON rather than passing), open-brain start exit 0, cli-bootstrap.js exit 0 with project detected and agent identity read. server.js died correctly, because it IS the memory half. The loop fails at the instruction layer only. Aaron ruled ONLY that the command surface and hook installation are not Loop 13's work. He did NOT rule them as the next loop's subject; that is recorded as an open task with its derivation, not as a decision. A loop that ends in an honest no is not a failed loop, and the brief was written to make this outcome reportable: it either passes or it does not, and there is no partial credit to hide in."
+    },
+    {
+      "id": "D-019",
+      "title": "The HoH loop is autonomous inside a branch; Aaron holds master until the shadow-gate count says otherwise",
+      "date": "2026-09-19",
+      "note": "Ruled by Aaron in-session to the planner seat, by returning the planner's recommendation verbatim: 'autonomous inside a branch, you at master, with the runtime recording what it would have done at each merge so your disagreements become a count. The day that count is zero across loops with real defects in them, remove the gate on evidence.' THIS RESOLVES THE CONFLICT RECORDED IN docs/HOH-JEV.md §6.2 AND docs/loops/loop-15-brief.md §5.1: hoh_jev.md specified a loop that never blocks on a human, which was incompatible with 'Aaron merges, on his word', a rule that has held for every loop in this record. WHAT IS AUTONOMOUS: the plan gate, the developer done-gate, QA scoring, retry, and rollback — closed questions with criteria written in advance, run by the runtime without a human. WHAT IS NOT: the merge to master. The runtime stops at a candidate commit and never merges, pushes to master, or tags. WHY THE MERGE STAYS HUMAN, ON EVIDENCE RATHER THAN NERVES: every serious defect found recently passed the automated checks and was caught by a human question or a human-ordered real run — the retirements check green through five merged PRs then 115 findings in the main tree; build-freshness shipped with its author's tests green and wrong in two checkouts of three; the main tree fifteen commits stale and reporting pass. A gate is a calibrated judge of the evidence it is shown, and every one of those failures was in the evidence, not the judgement. TypeSafe's own words: typed output guarantees the interface, not truth. THE EXIT CRITERION IS MEASURABLE: the runtime records, at every merge decision, what it WOULD have done. Aaron still merges. Each time his decision differs from the runtime's is counted. When that count is zero across several loops that contained real defects, the human gate is redundant and is removed — on evidence. If it is not zero, the count is exactly what would have been lost. This is 'see it red before you trust it green' applied to the human gate itself. WHAT NO GATE REPLACES, stated so it is not quietly automated later: asking the question nobody wrote down. Jev answers questions it is asked; the observation that Loop 14 was briefed against a world that no longer existed came from a person noticing, not from a gate."
     }
   ],
   "handoff": {
