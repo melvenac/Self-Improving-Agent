@@ -41,8 +41,16 @@ suite could have found this. It took an install.
 
 **An instruction that punishes compliance is a defect in the instruction.**
 
-`CLAUDE.md` carried MUST rules pointing at a code index that was **138 commits behind and pinned to
-`loop/4-dogfood`, a deleted branch**. The index did not refuse — it answered. So an agent obeying the
+`CLAUDE.md` carried MUST rules pointing at a code index that was **138 commits behind as of
+`08e6486`, and pinned to `loop/4-dogfood`, a deleted branch**. The index did not refuse — it
+answered.
+
+> **That number carries its ref because §5 says it must, and the first draft of this sentence did
+> not.** From the indexed commit `ee2cdb8` the true figure is **124** against `669902c`, **138**
+> against `08e6486`, and **144** against `e65f251`, which is this document's own base. **A bare
+> "138" is correct on Monday and wrong by Wednesday**, and a reader who checks it gets a different
+> answer and concludes the document is wrong — or reopens the argument §5 closed. Caught in review
+> by the Developer. So an agent obeying the
 rule would have received a confident wrong blast radius about code nine minor versions old, and an
 agent ignoring it got nothing and noticed. **The compliant path was the worse one.**
 
@@ -92,8 +100,8 @@ release tag says so in its own body rather than hiding it in a document nobody o
 
 ## 5. The record
 
-**Error counts: 43 Planner / 25 Developer.** Eight entries moved this loop, seven of them the
-planner seat's.
+**Error counts: 45 Planner / 25 Developer.** Ten entries moved this loop, **all ten the planner
+seat's** — two of them found in review of this document, after it was pushed.
 
 | # | Seat | Entry |
 | --- | --- | --- |
@@ -103,6 +111,13 @@ planner seat's.
 | 41 | Planner | *"`loop/7-injection` is the only copy of Loop 7's injection work."* The branch holds no code — one commit, five `.agents/` files, a superseded rev 12. |
 | 42 | Planner | *"Four of five corrections came from reading the document."* Three from the document, two from A2A. **Set by the seat against itself, unprompted**, on the grounds that declining to count it would be applying the escape rule in its own favour. |
 | 43 | Planner | **Reported a defect against a line when it was a defect about a class.** The stale-build message asserted a consequence true in one checkout of three; an identical instance sat one branch away, in the message firing on the main tree. The Developer found the sibling. |
+| 44 | Planner | **This document stated "138 commits behind" with no ref**, in §2, while §5 required derived numbers to carry what they were derived from. The true figure is 124, 138 or 144 depending on the base, and 144 against this document's own. **The rule was broken three paragraphs after being written.** |
+| 45 | Planner | **This document said "Ten instances" and listed eleven**, in the register that counts miscounts — then the count was re-verified with a script that split on semicolons and reproduced the undercount, because two instances shared a clause. |
+
+**Entries 44 and 45 were found by the Developer, reviewing a document that argues it should not write
+it.** Both were in the pushed PR and both had been repeated to Aaron in conversation, which is what
+makes them entries rather than near-misses. **A close-out that broke two of its own stated rules
+inside its own §5 is better evidence for §5 than anything it asserts.**
 
 **Entry 41's inversion outranks the entry.** *"This is the only copy" is a sentence that stops the
 search.* If Loop 7's code exists nowhere, that sentence would have prevented anyone discovering it
@@ -118,23 +133,32 @@ one — the MUST rules above — was ruled a defect in the instruction rather th
 **That number says how often the failure mode fires, not how often it escapes**, which is why it is
 worth more than the error count.
 
-**Ten instances, and the register itself nearly proved the case against itself.** The previous
+**Eleven instances, and the register itself nearly proved the case against itself — twice.** The previous
 planner wrote into a tracked document that three of them were *"gone — lost to compaction."* **They
 were on disk the whole time**, in the session transcript. *"Not in my context"* was read as *"does
 not exist"* — **rule 11, committed by the author of rule 11, inside the document defining the
 register.** The method matters more than the instances: **compaction removes things from context,
 not from disk.** Grep the transcript before writing that anything is unrecoverable.
 
-The instances, in the order they were found: a `git diff | head -60` window read as an unmade
-amendment; a probe returning 0 for every string; an edit reporting success while mangling its own
-text; a 156-vs-43 miscount from not applying the record's own prefix list; **a `grep | sed` over
-`settings.json` that mangled every path into `"node /"`**, and — **within the hour, on the same
-audit, by the other seat having just been told about it** — a regex over a stringified JSON blob
-returning nothing at all; a transcript size read as fixed while the file was still being written; a
-Git-Bash path handed to Node reading as a real defect; **`head`'s exit code captured instead of
-`node`'s, giving a green 0 from a server that had crashed, inside the test for whether the thing
-installs**; a `find -maxdepth 2` producing a clean false absence; and a filtered `grep` that placed
-a warning under an `ISSUES:` header and nearly had this seat report a defect in freshly merged code.
+The instances, in the order they were found: **(1)** a `git diff | head -60` window read as an
+unmade amendment; **(2)** a probe returning 0 for every string; **(3)** an edit reporting success
+while mangling its own text; **(4)** a 156-vs-43 miscount from not applying the record's own prefix
+list; **(5)** a `grep | sed` over `settings.json` that mangled every path into `"node /"`; **(6)** —
+**within the hour, on the same audit, by the other seat having just been told about (5)** — a regex
+over a stringified JSON blob returning nothing at all; **(7)** a transcript size read as fixed while
+the file was still being written; **(8)** a Git-Bash path handed to Node reading as a real defect;
+**(9) `head`'s exit code captured instead of `node`'s, giving a green 0 from a server that had
+crashed, inside the test for whether the thing installs**; **(10)** a `find -maxdepth 2` producing a
+clean false absence; and **(11)** a filtered `grep` that placed a warning under an `ISSUES:` header
+and nearly had this seat report a defect in freshly merged code.
+
+**The numbering is explicit because the prose without it was miscounted, by its own author, twice.**
+The first draft said *ten* and listed eleven — (5) and (6) were joined in one clause, being the same
+mistake made by two seats an hour apart. **Then the count was verified with a script that split on
+semicolons, which reproduced the undercount exactly, because the category boundary was in the
+punctuation.** A verification instrument that shares the defect of the thing it verifies is the
+register's own family, arriving inside the register. Caught in review by the Developer, who counted
+by hand.
 
 **Three findings from the register that survive the loop:**
 
