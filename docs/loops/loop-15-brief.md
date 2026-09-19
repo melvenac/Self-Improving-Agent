@@ -23,11 +23,11 @@ files, and nothing makes a seat stay inside its role — it is an intention, whi
 named in `.agents/roles/shared.md`. **A runtime that freezes inputs and enforces write permissions is
 a check; role files are a rule someone must remember.**
 
-**Jev is deliberately out of scope for this loop** and that is not timidity. The endpoint, model alias
-and response shape in `hoh_jev.md` are **unverified by this project** — nobody here has called that
-API. Building the gates before the runtime would mean an unverified dependency sitting under the part
-that enforces everything else. Slice one produces a runtime that is useful with the gates stubbed,
-and slice two replaces the stubs.
+**Jev is deliberately out of scope for this loop**, and the reason has changed since this brief was
+first written. The original reason was that the API was unverified. **It has since been verified —
+see §9 — so the remaining reason is sequencing, not risk:** the runtime is what enforces separation,
+and a gate belongs on top of an enforced boundary rather than under one. Slice one produces a runtime
+that is useful with the gates stubbed, and slice two replaces the stubs.
 
 ## 2. The increment, bounded and locally complete
 
@@ -132,3 +132,47 @@ That is the point of it as much as the runtime is.
 - **The autonomy boundary in §5.1**, before the gates land rather than after.
 - **The TypeSafe plugin** (`claude plugin marketplace add typesafe-ai/skills`) is a config change to
   his environment and is **his to run, not an agent's** — and it is not needed for slice one.
+
+## 9. The Jev dependency, verified 2026-09-19
+
+**Checked against the source rather than taken from `hoh_jev.md`.** The marketplace was not
+configured — `claude plugin marketplace list` shows five, none of them TypeSafe.
+
+**The plugin is real.** `typesafe-ai/skills` on GitHub, 512 stars, last pushed 2026-09-12, and its
+`.claude-plugin/marketplace.json` declares one plugin, `typesafe`. **Aaron installs it; an agent does
+not** — it changes his environment. It is a skill for *writing* Jev integrations, not a runtime
+dependency, and **slice one does not need it.**
+
+**`hoh_jev.md`'s API details are accurate**, confirmed against `docs.typesafe.ai/api.md`:
+
+| Claim | Status |
+| --- | --- |
+| `POST https://api.typesafe.ai/v1/systemone` | **Confirmed** |
+| `Authorization: Bearer <API_KEY>` | **Confirmed** |
+| `model: "jev-latest"`, required field | **Confirmed** |
+| Three question types — `noul`, `choice`, `score` | **Confirmed** |
+| `choice` returns `choice` + `probabilities` + `confidence` | **Confirmed** |
+| `score` returns `score` + `legend` + `probabilities` + `confidence` | **Confirmed** |
+| Pricing and latency figures | **Not verified** — not load-bearing for any gate policy |
+
+**One asymmetry the gate policies must respect: `noul` has no `confidence` field.** Only `choice` and
+`score` carry one, derived from the answer's probability distribution. A policy written as *"reject
+if X is low with high confidence"* is expressible for a score and **not** for a noul, where the
+returned number is the probability itself.
+
+**Two lines from TypeSafe's own skill that belong in the gate design**, and both are this project's
+existing lessons arriving from outside it:
+
+> **"Typed output guarantees the interface, not truth."**
+
+A schema-valid gate answer is not a correct one. **A gate is an instrument and the rules in
+`.agents/roles/shared.md` apply to it** — it must fail closed, state its limits, and never be
+believed because its shape was valid.
+
+> **"Separate missing evidence, model errors, code errors, and service failures."**
+
+The documented failures are `401` (bad key), `422` (malformed question), `429` (rate limited) and
+`529` (overloaded). **These are four different conditions and must not collapse into one "gate
+failed" branch.** `429` and `529` are retryable; `401` and `422` are defects. **Fail closed on
+anything that would authorise a destructive action, fail open only on optional ranking** — the
+brief's own rule, and it needs the error classes separated to be implementable.
