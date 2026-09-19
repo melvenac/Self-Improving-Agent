@@ -48,9 +48,13 @@ untested**, and **blind spot** (what the procedure cannot see).
   form I found and do not fail A1 on a filename.**
 - **Pass:** exit 0 **and** an iteration directory for `t001` containing a plan artifact, a git-ref
   artifact and an evidence artifact, each non-empty; the evidence artifact parses as JSON and
-  validates against `evidence.schema.json`; the plan artifact validates against `plan.schema.json`
-  (validation run with the candidate's own validator if it exposes one, else with a JSON Schema
-  validator from the scratchpad against the extracted document). **Fail:** any of those false.
+  validates against `evidence.schema.json`; the plan artifact validates against `plan.schema.json`.
+  **The primary validator is an independent JSON Schema validator run from the scratchpad against
+  the candidate's schema files and the extracted documents** — the candidate's own validator, if it
+  exposes one, is a cross-check only. Checking the candidate's output with the candidate's validator
+  is circular: a validator that accepts everything passes its own output. Before either is
+  believed, the schema is seen red (A2's seen-red observation, moved ahead of this row in §8).
+  **Fail:** any of those false.
   **Untested:** no documented entry point, or the run needs an input I do not have.
 - **Blind spot:** says nothing about the *content* of the artifacts beyond schema validity; a stub
   that writes the minimum valid document passes this row. Retry behaviour is A2's job.
@@ -253,7 +257,9 @@ The author's "648" and this tree's 648 agree; that is one reproduction, in one t
 2. `git cat-file -t <SHA>` prints `commit` (object store, no fetch needed); `git checkout --detach <SHA>`;
    verify identity (§1). Start the clock.
 3. `npm ci`, `npm run build`, capture exit codes.
-4. P2, then A1, A5 (they share the run), then A2, A3, A4, A6, A7, then P1, P3, F1–F5.
+4. P2; then A2's schema seen-red observation (both schemas reject the blanked `hoh_jev.md` sample
+   and accept it unblanked, under the independent validator) **before any A1 pass is recorded**;
+   then A1 and A5 (they share the run); then the rest of A2, A3, A4, A6, A7; then P1, P3, F1–F5.
 5. Verify identity again (§1). If moved, void and restart.
 6. Write `docs/loops/loop-15-qa-report.md`: for each row required / observed / tree / SHA / time /
    verdict; then **what could not be verified**; then what the checks cannot see; then defects with
