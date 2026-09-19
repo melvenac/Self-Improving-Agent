@@ -41,11 +41,19 @@ untested**, and **blind spot** (what the procedure cannot see).
   entry point the candidate documents (its README or `--help`; if neither names one, that is a
   finding under §5 and the row is `untested`). Capture `$?`. Then `ls -la artifacts/iterations/t001/`
   unfiltered, and `git status --porcelain` to see what the run left behind.
-- **Pass:** exit 0 **and** all three named files present, each non-empty, **and** `E_t.json` parses
-  with `node -e 'JSON.parse(require("fs").readFileSync(...))'`. **Fail:** any of those false.
+- **Filenames — RULED by the planner, 2026-09-19** (`docs/loops/loop-15-brief-amendment-1.md`):
+  the three names in the brief are illustrative; the schema is binding. The plan artifact must
+  validate against `plan.schema.json`; the evidence artifact must parse as JSON and validate against
+  `evidence.schema.json`. The form (`.md`, `.json`) is Forge's local decision. **I report which
+  form I found and do not fail A1 on a filename.**
+- **Pass:** exit 0 **and** an iteration directory for `t001` containing a plan artifact, a git-ref
+  artifact and an evidence artifact, each non-empty; the evidence artifact parses as JSON and
+  validates against `evidence.schema.json`; the plan artifact validates against `plan.schema.json`
+  (validation run with the candidate's own validator if it exposes one, else with a JSON Schema
+  validator from the scratchpad against the extracted document). **Fail:** any of those false.
   **Untested:** no documented entry point, or the run needs an input I do not have.
-- **Blind spot:** says nothing about the *content* of the three files beyond parseability; a stub
-  that writes `{}` passes this row. Content is A2's job.
+- **Blind spot:** says nothing about the *content* of the artifacts beyond schema validity; a stub
+  that writes the minimum valid document passes this row. Retry behaviour is A2's job.
 
 ### A2 — an invalid `D_t` is retried, and exhausting the cap is a recorded failure
 
@@ -118,11 +126,12 @@ untested**, and **blind spot** (what the procedure cannot see).
   `loop-001-qa` is at or after `loop-001-developer`, and checking out the pre-loop SHA gives a
   clean tree. **Fail:** either tag missing, or pointing at the pre-loop SHA itself, or tagged on an
   uncommitted state. **Untested:** the run in A1 did not complete.
-- **Blind spot:** the tag *name* format. The brief writes `loop-<t>-<role>` and `loop-001-*` in
-  the same paragraph; if the candidate emits `loop-1-developer` I report it and pass the row with
-  the deviation named — the requirement is rollback, not the padding. Note `^{commit}` is written
-  here for bash; under `cmd.exe` the caret is an escape and the command silently asks a different
-  question (`.agents/roles/developer.md`).
+- **Tag name format — RULED by the planner, 2026-09-19** (`docs/loops/loop-15-brief-amendment-1.md`):
+  tags are zero-padded, `loop-001-developer` / `loop-001-qa`, so they sort with
+  `artifacts/iterations/t001/`. **`loop-1-developer` is a fail on this row.** My draft had written
+  "pass with the deviation named"; that is overridden. Note `^{commit}` is written here for bash;
+  under `cmd.exe` the caret is an escape and the command silently asks a different question
+  (`.agents/roles/developer.md`).
 
 ### A6 — dry-run prints the gate payload and sends nothing
 
@@ -171,6 +180,12 @@ untested**, and **blind spot** (what the procedure cannot see).
 | **P2** | 648 tests, `sync --check` clean, `module-boundary` green | `npm test` in `open-brain/` of the evaluation tree at the SHA, count read from vitest's summary line; `node open-brain/build/cli.js sync --check` from the tree root, exit code and every check line read unfiltered; the `module-boundary` line specifically | **pass:** test total ≥ baseline (§7) with 0 failed, `sync --check` exit 0, `module-boundary` reports a pass with its walked-file count stated. **fail:** any failed test; any check at `issue`; `module-boundary` at `skip`. **untested:** the suite does not run in this tree — reported as such, not as green. Note `build-freshness` **skips** in a tree with no build and skip is not pass; it is run after `npm run build` so it can report. |
 | **P3** | `ob_state` remains the only writer of `.agents/state.json` | grep the harness source and its tests for `state.json` and `.agents/` (validate the grep against `open-brain/src/pipelines/state-writer.ts`, a known positive, first); read every hit | **pass:** no write path to `.agents/state.json` outside `ob_state`. **fail:** any. **untested:** grep instrument fails its own known-positive check. |
 
+What `sync --check` cannot see, to carry into the report: `ci-status` queries GitHub's Actions API
+and reports the **remote's** master, not this tree's. During the baseline run it said
+`master d45c965` while this tree's `origin/master` was `e47ae20`; both were right about what they
+measured, and one had not looked recently. A `git fetch` reconciles them. Its line is evidence
+about the remote, never about the candidate in this tree.
+
 Rule 13 applies to P2: `sync --check` will also be run in the main checkout, against the main
 checkout's own build (`node ~/Projects/Self-Improving-Agent/open-brain/build/cli.js sync --check`
 from that root). That tree is at `54289fe` today and will not be moved by me; if its HEAD is not the
@@ -193,8 +208,9 @@ candidate, and the report says so.
 - Any spawn with `shell: true` or a template-string command (A7 blind spot).
 - Enforcement of A4 by post-hoc diff rather than prevention.
 - A retry cap that is a magic number with no name.
-- A `D_t` written as Markdown while `plan.schema.json` is JSON Schema — how the candidate validates
-  Markdown against a JSON schema is a design question I will describe, not rule on.
+- Which form the plan artifact takes (`.md` with an embedded document, or `.json`) and how the
+  candidate validates it against `plan.schema.json`. Ruled illustrative-versus-binding by the planner
+  (amendment 1); the form is reported, not judged.
 
 ## 6. What cannot be verified now, stated so nobody inherits it as settled
 
