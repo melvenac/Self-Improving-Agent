@@ -43,6 +43,13 @@ Thumbs.db
 !/.agents/skills/INDEX.md
 !/.agents/skills/self-improving-agent-gotchas/
 !/.agents/skills/self-improving-agent-guide/
+# roles/: SEAT KNOWLEDGE IS TRACKED; only the seat's NAME is local. AGENT.local.md is
+# gitignored by design (a per-checkout override must not be versioned), and role guidance
+# written into it would exist on one disk, in one ignored file, invisible to a fresh clone
+# and destroyed by moving the worktree. Same lesson as the block above, relearned 2026-09-19.
+!/.agents/roles/
+/.agents/roles/*
+!/.agents/roles/*.md
 # .claude/: the live commands are tracked; local settings and plugin skills are not.
 /.claude/*
 !/.claude/commands/
