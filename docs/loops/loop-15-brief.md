@@ -4,10 +4,33 @@
 **Source:** `hoh_jev.md` (Aaron, untracked in the planner worktree) and
 *Harness-of-Harness*, arXiv:2609.01481.
 
-> **Sequencing is not settled.** Loop 14 — the two-seat record — was briefed ahead of its turn and
-> `D-017`-era rulings say it does not jump the queue. Aaron's instruction was *"let's build this into
-> our loops."* **This brief is written as Loop 15 and whether it runs before Loop 14 is his ruling,
-> recorded as open rather than assumed.**
+> ### Sequencing: RULED. Loop 15 runs before Loop 14.
+>
+> **Ruled by Aaron, 2026-09-19.** His reason: it solves problems that keep recurring. The planner
+> seat put two stronger ones to him and he took the ruling on all three.
+>
+> **1. Loop 14 is briefed against a world that no longer exists.** It was written when there were two
+> seats and no runtime. There are now three seats, and Loop 15 adds the component that would own
+> exactly the artifacts Loop 14 planned to design by hand — who writes which record, when, and where
+> it persists. **Run Loop 14 first and its output is obsolete on arrival.** That is rule 14 applied to
+> a plan instead of a document.
+>
+> **2. Loop 15 generates Loop 14's evidence rather than spending it.** It is the first loop whose
+> verdict is written by a seat that neither set the objective nor built the candidate. That is Loop
+> 14's subject.
+>
+> **Loop 14 is therefore RE-BRIEFED, not merely deferred.** Its C1 has already shipped (PR #37); its
+> C2 and C3 look different once a runtime owns the artifacts.
+>
+> **What this loop does NOT fix, stated so nobody expects it to.** It addresses **boundary** failures
+> — one seat holding scope, verdict and write authority at once. **It does nothing about measurement
+> failures**, which were far more frequent: eleven near-misses in two days, every one an agent
+> misreading its own instrument. **A runtime cannot stop a seat from running a grep that hides the
+> line it needed.**
+>
+> **Slice one was narrowed after briefing**, by the seat that wrote it: the role prompts and the
+> artifact index are cut below. The first draft carried eight deliverables and seven acceptance
+> checks, which fails this seat's own rule that bounded scope exists so a failure points somewhere.
 
 ---
 
@@ -48,15 +71,16 @@ role sessions and produces a versioned, schema-valid `artifacts/iterations/t001/
   explicitly requested and justified.
 - **Schema validation with retry**, capped, and **the cap is a recorded failure rather than a silent
   pass.**
-- **`harness/prompts/{planner,developer,qa}.md`** — the skeletons from the brief, each pointing at
-  its tracked `.agents/roles/*.md` rather than restating it. **Do not duplicate role knowledge into
-  the prompts**; that is the defect PR #44 exists to fix.
+- ~~`harness/prompts/{planner,developer,qa}.md`~~ — **cut from slice one.** Prompts do nothing while
+  the roles are stubs; they belong to the slice that spawns real sessions. When they land they must
+  point at the tracked `.agents/roles/*.md` rather than restate it — duplicating role knowledge into
+  a prompt is the defect PR #44 exists to fix.
 - **Git versioning per loop:** commit after the developer stage and after evidence is stored, tag
   `loop-<t>-<role>` so rollback is a git operation.
 - **Deterministic checks before QA** — build and unit tests — whose **exit codes are read, never
   inferred and never asked of a model.**
-- **`artifacts/index.md`**, a short categorised index. **Details loaded on demand, not pasted into
-  every prompt.**
+- ~~`artifacts/index.md`~~ — **cut from slice one.** An index solves selective retrieval, which is
+  not a problem at one iteration. It lands with the slice that has something to select from.
 - **A dry-run mode** that prints what would be sent to a gate without sending it. Required now, while
   the gates are stubs, so it exists before there is anything to get wrong.
 
@@ -128,7 +152,7 @@ That is the point of it as much as the runtime is.
 
 ## 8. Open, for Aaron
 
-- **Does Loop 15 run before Loop 14?** Loop 14 is briefed and queued.
+- ~~Does Loop 15 run before Loop 14?~~ **Ruled 2026-09-19: yes.** See the header. Loop 14 is re-briefed, not deferred.
 - **The autonomy boundary in §5.1**, before the gates land rather than after.
 - **The TypeSafe plugin** (`claude plugin marketplace add typesafe-ai/skills`) is a config change to
   his environment and is **his to run, not an agent's** — and it is not needed for slice one.
