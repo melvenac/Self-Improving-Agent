@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 36,
+  "revision": 37,
   "project": {
     "name": "self-improving-agent"
   },
@@ -343,11 +343,11 @@
       "id": "T-153",
       "title": "Move the Developer worktree from ~/Projects/sia-forge to ~/Worktrees/sia-forge",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 64,
-      "closed_session": null,
+      "closed_session": 65,
       "supersedes": null,
-      "note": "WHY: ~/Projects means repos Aaron owns and commits to; seats are not projects, and ~/Worktrees/ is a top-level sibling of ~/Third-Party, ~/mcp-servers and ~/tools-src. The planner seat already lives there. BLOCKED ON: no live session in the folder - moving a directory under a running session destroys its cwd, which is Planner error 30 in a different costume. It happens BETWEEN sessions and belongs to whoever is between them. EXPLICITLY NOT INSIDE THE REPO: a worktree under the main tree is a gitignored second copy of every .md, .ts and .json for anything walking the filesystem to scan - the .gitnexus/ shape that cost 115 findings, four boundary reports, a Planner QA and five merged PRs. Keep this reasoning attached or someone re-proposes it. GOTCHAS: expect Permission denied on the first attempt and retry from outside the folder; git worktree move renames the folder but NOT the admin directory - verified, sia-forge's .git pointer still reads .git/worktrees/sia-loop12. Harmless. Do not fix it. RECORDED BECAUSE IT EXISTED NOWHERE: this plan lived in a conversation with Aaron and in one relayed line that named the deadline without naming the change."
+      "note": "Done 2026-09-19. `git worktree move ~/Projects/sia-forge ~/Worktrees/sia-forge`, run from outside the folder after the developer session had exited and said so plainly. All four checkouts now sit where they belong: the main tree as infrastructure, and Atlas, Forge and Probe side by side under ~/Worktrees/. VERIFIED BY READING THE FILESYSTEM, NOT THE COMMAND'S OUTPUT: the new path exists, the old one does not, `git worktree list` shows four entries, the tree is clean at d50ef67, and `cli-bootstrap.js` run in the new location still greets 'Forge (developer) - partner: Atlas' - which matters because .agents/AGENT.local.md is untracked and a delete-and-recreate would have destroyed the seat identity silently. Both deliberately preserved local branches survived: loop/7-injection (unmerged, which is the only thing protecting it) and docs/loop-13-developer-testimony (kept locally so its commit stays reachable). The .git pointer still reads .git/worktrees/sia-loop12, a name two renames old - LEFT ALONE, as recorded: git resolves it and repairing it is how it breaks. THE PREDICTED FAILURE DID NOT OCCUR. The record warned to expect `Permission denied` on the first attempt and retry from outside the folder, because that happened on both moves the previous day. It moved first time. Either running from outside was the difference, or the earlier failures were the live session holding the directory - unresolved, and worth knowing rather than carrying forward as certain. ORDERING, WHICH THE DEVELOPER GOT RIGHT AND THE PLANNER HAD BACKWARDS: push and merge the session record FIRST, then exit, then move. The developer's close-out existed only in that directory as an unpushed commit; moving first would have made the entire session's record depend on a directory operation succeeding, for no gain."
     },
     {
       "id": "T-154",
