@@ -103,5 +103,5 @@
   ],
   "additionalProperties": false,
   "title": "D_t — HoH loop plan",
-  "description": "The plan for one HoH loop. LIMIT: two rules this schema cannot express are enforced by the runtime and not by JSON Schema — new_capability must be non-empty unless stop_ship is requested and justified, and repair_targets must be non-empty. Derived from open-brain/src/harness/schema.ts; do not edit by hand."
+  "description": "The plan for one HoH loop. LIMIT: one rule this schema cannot express is enforced by the runtime and not by JSON Schema — new_capability must be non-empty unless stop_ship is requested and justified. repair_targets is required but MAY be empty: whether a plan repairs enough is only answerable against the previous loop's evidence, which this schema never sees, so it belongs to the plan gate and not here. Derived from open-brain/src/harness/schema.ts; do not edit by hand."
 }

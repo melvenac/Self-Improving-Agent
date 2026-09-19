@@ -39,11 +39,18 @@ something that did not produce it**, and until now nothing made that possible.
   different fixes, and one verdict for both hides which happened.
 
 - **`D_t` and `E_t` schemas, derived rather than duplicated.** `zod` is the source;
-  `src/harness/schemas/*.schema.json` are generated from it and a test fails if they drift. Two rules
-  JSON Schema cannot express — `new_capability` non-empty unless `stop_ship` is requested *and*
-  justified, and `repair_targets` non-empty — are enforced by the runtime and **stated in the
-  generated file's own description**, so a reader validating against the file alone is told what it
-  cannot see.
+  `src/harness/schemas/*.schema.json` are generated from it and a test fails if they drift. The one
+  rule JSON Schema cannot express — `new_capability` non-empty unless `stop_ship` is requested *and*
+  justified — is enforced by the runtime and **stated in the generated file's own description**, so a
+  reader validating against the file alone is told what it cannot see.
+
+  **`repair_targets` is required but may be empty, and that is a correction.** The first version
+  refused an empty one, reading *"each plan repairs outstanding problems AND adds one small
+  observable capability"* as symmetric. **The reading was faithful and the layer was wrong.**
+  Whether a plan repairs enough is only answerable against the previous loop's evidence, which the
+  schema never sees — so a symmetric rule refuses the two cases where there is legitimately nothing
+  to repair: **the first loop of a project, and any loop after a clean `E_t`.** It would have
+  deadlocked the runtime on start and again on success. That rule belongs to the plan gate.
 
 - **A capped schema retry whose exhaustion is an artifact.** A rejected deliverable is handed back
   its own problems and its own schema, not re-rolled blind. An exhausted cap writes `FAILED.md` into

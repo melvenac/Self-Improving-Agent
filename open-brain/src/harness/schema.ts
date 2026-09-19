@@ -53,18 +53,31 @@ export const StopShipSchema = z.strictObject({
 /**
  * `D_t` — the plan for one loop.
  *
- * Both halves of the rule in `docs/HOH-JEV.md` §"Rules the runtime enforces"
- * are enforced, not just the one the brief spells out:
+ * **One rejection, not two, and the asymmetry is deliberate.**
+ * **`new_capability` must be non-empty** unless `stop_ship` is requested and
+ * justified.
  *
- * - **`new_capability` must be non-empty** unless `stop_ship` is requested and
- *   justified. This is the rejection the brief names.
- * - **`repair_targets` must be non-empty.** The brief does not name this one
- *   and this is a deliberate reading rather than an omission: the source rule
- *   is symmetric — *"a loop that is only repair collapses into local patching;
- *   one that is only capability abandons what the last loop found"* — and the
- *   runtime's job in this slice is enforcement. Flagged in the handoff so the
- *   planner seat can overrule it; `stop_ship` does not excuse it, because a
- *   stop-ship loop is by definition repair.
+ * ## Why `repair_targets` may be empty — overturned on review, recorded here
+ *
+ * The first version of this schema also refused an empty `repair_targets`,
+ * reading the source rule as symmetric: *"a loop that is only repair collapses
+ * into local patching; one that is only capability abandons what the last loop
+ * found"*. **The reading was faithful to the sentence and the rule was in the
+ * wrong layer.**
+ *
+ * `new_capability` is checkable from `D_t` alone. *"Repairs outstanding
+ * problems"* is only checkable against `E_{t-1}` — **which this schema never
+ * sees.** It cannot know whether there was anything to repair. So a symmetric
+ * schema rule refuses the two cases where there legitimately is nothing:
+ * **the first loop of a project, which has no `E_{t-1}` at all, and any loop
+ * following a clean `E_t`.** The runtime would have deadlocked on start and
+ * again on success.
+ *
+ * The paper's own plan gate names `capability_increment` — *"adds a small new
+ * observable capability with little repair"* — as a valid category. For a gate
+ * to judge that against prior evidence, the schema has to let it through.
+ * **The rule belongs in slice two's `addresses_top_failures` gate question,
+ * which can see `E_{t-1}`, not here.**
  */
 export const PlanSchema = z
   .strictObject({
@@ -85,14 +98,6 @@ export const PlanSchema = z
         path: ["new_capability"],
         message:
           "empty new_capability is refused unless stop_ship is explicitly requested and justified",
-      });
-    }
-    if (plan.repair_targets.length === 0) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["repair_targets"],
-        message:
-          "a plan must repair something as well as add something — repair_targets cannot be empty, and stop_ship does not excuse it",
       });
     }
     const seen = new Set<string>();
@@ -240,9 +245,11 @@ export function jsonSchemas(): Record<DeliverableKind, Record<string, unknown>> 
       ...(z.toJSONSchema(PlanSchema, { io: "input" }) as Record<string, unknown>),
       title: "D_t — HoH loop plan",
       description:
-        "The plan for one HoH loop. LIMIT: two rules this schema cannot express are " +
-        "enforced by the runtime and not by JSON Schema — new_capability must be non-empty " +
-        "unless stop_ship is requested and justified, and repair_targets must be non-empty. " +
+        "The plan for one HoH loop. LIMIT: one rule this schema cannot express is enforced by " +
+        "the runtime and not by JSON Schema — new_capability must be non-empty unless stop_ship " +
+        "is requested and justified. repair_targets is required but MAY be empty: whether a plan " +
+        "repairs enough is only answerable against the previous loop's evidence, which this " +
+        "schema never sees, so it belongs to the plan gate and not here. " +
         "Derived from open-brain/src/harness/schema.ts; do not edit by hand.",
     },
     evidence: {

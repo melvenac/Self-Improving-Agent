@@ -82,18 +82,32 @@ describe("D_t schema", () => {
     expect(r.ok).toBe(false);
   });
 
-  it("refuses an empty repair_targets, and stop_ship does not excuse it", () => {
-    // This rule is a reading of HOH-JEV.md's symmetric rule, not a line the
-    // brief spells out. It is flagged in the handoff so it can be overruled.
+  it("ACCEPTS an empty repair_targets — the first loop of a project has nothing to repair", () => {
+    // Overturned on review. An earlier version of this schema refused this,
+    // reading the source rule as symmetric. The reading was faithful to the
+    // sentence and the rule was in the wrong layer: "repairs outstanding
+    // problems" is only answerable against E_{t-1}, which the schema never
+    // sees. These two tests are the cases that rule deadlocked.
+    const r = validatePlan({ ...validPlan(), repair_targets: [] });
+    expect(r.ok).toBe(true);
+  });
+
+  it("ACCEPTS an empty repair_targets after a clean previous loop", () => {
     const r = validatePlan({
       ...validPlan(),
       repair_targets: [],
-      new_capability: "",
-      stop_ship: { requested: true, justification: "The suite is red on master and nothing may ship." },
+      new_capability: "adds one small observable capability with little repair",
     });
-    expect(r.ok).toBe(false);
-    if (r.ok) throw new Error("unreachable");
-    expect(r.problems.join("\n")).toContain("repair_targets");
+    expect(r.ok).toBe(true);
+  });
+
+  it("still requires repair_targets to be present as an array", () => {
+    // Allowed to be empty is not the same as optional: an omitted field would
+    // mean "nobody considered it", which is not the same fact as "nothing to
+    // repair" and must not render identically.
+    const plan = validPlan() as Partial<Plan>;
+    delete plan.repair_targets;
+    expect(validatePlan(plan).ok).toBe(false);
   });
 
   it("refuses an unknown key instead of ignoring it", () => {
@@ -192,8 +206,10 @@ describe("derived JSON Schema files", () => {
     // that the runtime refuses. The limit is written where they will be.
     const plan = JSON.parse(readFileSync(join(dir, "plan.schema.json"), "utf-8")) as { description: string };
     expect(plan.description).toContain("new_capability");
-    expect(plan.description).toContain("repair_targets");
     expect(plan.description).toContain("LIMIT");
+    // And states the rule that was DELIBERATELY not made a schema rule, so a
+    // reader does not reintroduce it.
+    expect(plan.description).toContain("repair_targets is required but MAY be empty");
   });
 
   it("marks additionalProperties false, so an unknown key is refused by the file too", () => {
