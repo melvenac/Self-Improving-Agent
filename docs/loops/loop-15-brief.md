@@ -119,9 +119,10 @@ compaction, and any change to `.claude/commands/`. **`start.md` and the hook con
 on a human — *"escalate to 'stop this loop and record a blocker' instead."* That is incompatible with
 the standing ruling that Aaron merges every change, which has held for every loop in this repo's
 record. **Assumption for slice one, stated so it can be overruled: the runtime stops at a candidate
-commit and never merges or pushes. Aaron remains the merge gate.** This must be ruled before the
-gates land, because a gate that can roll back and re-run is most of the way to a loop that ships
-without him.
+commit and never merges or pushes. Aaron remains the merge gate.** **RULED 2026-09-19 (`D-019`): autonomous inside a branch, Aaron at master.** The runtime
+records what it would have done at each merge and disagreements are counted (`T-155`); the
+human gate is removed only when that count is zero across loops that contained real defects.
+The assumption above is now the rule, and the gates may land against it.
 
 **2. What the product is.** `hoh_jev.md` says *"the runtime is the actual product you are building."*
 This repo's product is the memory protocol and its template. **Slice one treats `harness/` as a
@@ -153,7 +154,7 @@ That is the point of it as much as the runtime is.
 ## 8. Open, for Aaron
 
 - ~~Does Loop 15 run before Loop 14?~~ **Ruled 2026-09-19: yes.** See the header. Loop 14 is re-briefed, not deferred.
-- **The autonomy boundary in §5.1**, before the gates land rather than after.
+- ~~The autonomy boundary in §5.1~~ **Ruled 2026-09-19: `D-019`.** See §5.1.
 - **The TypeSafe plugin** (`claude plugin marketplace add typesafe-ai/skills`) is a config change to
   his environment and is **his to run, not an agent's** — and it is not needed for slice one.
 

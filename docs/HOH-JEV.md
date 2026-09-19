@@ -241,12 +241,28 @@ silent pass.**
 TypeScript, `open-brain` carries the build, test and lint toolchain, and `/sync` is wired to it. A
 second language needs its own CI lane.
 
-**2. The loop does not run without Aaron.** The original specifies a fully autonomous loop that
-escalates to a recorded blocker rather than asking a human. **That is incompatible with "Aaron
-merges, on his word", which has held for every loop in this record.** Current binding rule: **the
-runtime stops at a candidate commit and never merges, pushes or tags.** This must be ruled again
-before the gates land — **a gate that can roll back and re-run is most of the way to a loop that
-ships without him.**
+**2. The loop is autonomous inside a branch; Aaron holds master.** RULED 2026-09-19 (`D-019`).
+The original specifies a fully autonomous loop that escalates to a recorded blocker rather than
+asking a human. That is incompatible with "Aaron merges, on his word", which has held for every
+loop in this record, so the line is drawn where authority lives:
+
+- **Autonomous:** the plan gate, the developer done-gate, QA scoring, retry, rollback. Closed
+  questions with criteria written in advance, run by the runtime with no human.
+- **Not autonomous:** the merge to master. **The runtime stops at a candidate commit and never
+  merges, pushes to master, or tags.**
+
+**Why the merge stays human, on evidence rather than nerves.** Every serious defect found recently
+passed the automated checks and was caught by a human question or a human-ordered real run. A gate
+is a calibrated judge of the evidence it is shown, and every one of those failures was in the
+evidence, not the judgement — *typed output guarantees the interface, not truth.*
+
+**The exit criterion is measurable (`T-155`).** The runtime records, at every merge decision, what
+it *would* have done. Aaron still merges. Each disagreement is counted. **When that count is zero
+across several loops that contained real defects, the human gate is redundant and is removed — on
+evidence.** If it is not zero, the count is exactly what would have been lost. This is *see it red
+before you trust it green*, applied to the human gate itself.
+
+**What no gate replaces:** asking the question nobody wrote down. Jev answers what it is asked.
 
 **3. `harness/` is a component, not the product.** The original says the runtime *is* the product.
 This repo's product is the memory protocol and its template; `project-template/` is untouched.
