@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 57 by open-brain v0.43.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 58 by open-brain v0.43.0 — do not edit; change state via ob_state -->
 > **Status:** v0.43.0 — Loop 14 — the three-seat record, re-briefed at docs/loops/loop-14-rebrief.md (supersedes loop-14-brief.md in part). Sequenced by Aaron 2026-09-20 (D-023) after Loop 15 slice two closed ACCEPTED at v0.42.0 (D-024). Loop 14 runs no role through the harness runtime; G-045 (D4) does not block it and is slice three's mandatory first repair. Fresh developer and QA sessions per the roll rule; criteria before candidate; frozen SHA; the record moves one seat at a time.
 
 ## What's working
@@ -64,6 +64,7 @@
 - A refusal names the condition it is actually about: the schema advice fires only on a schema_version mismatch, and it says rebuild rather than reconnect _(V-056, 2 evidence)_
 - ob_start refuses a record whose schema version this build cannot read, rather than falling back to an older account of the project _(V-057, 2 evidence)_
 - The SessionStart hook cannot stamp a session identity nobody asked for over a checkout _(V-058, 2 evidence)_
+- Acceptance for Loop 14 was determined by the QA seat from three frozen SHAs, read-only in its own tree, against criteria written before any candidate existed (424c618) and narrowed only before a candidate, never after a verdict: the first candidate 7e1c041 was rejected on one row (C2d, the near-miss register sorted nowhere) with four findings recorded from withheld probes; the second c7fbdd9 passed every row with the C2 negative fixture shown present at base and absent at the candidate, every SHA the greeting names matched by hand across the migration boundary, and twelve type-clean mutants red; the version-bump commit 3135da4 carried the verdict forward on a diff confirmed to touch no source or test. _(V-059, 3 evidence)_
 
 ## What's broken
 
