@@ -200,9 +200,23 @@ that exists only on this branch. It belongs in the merge choreography beside the
 **Recorded rather than suppressed with a `MIRROR_EXCEPTION`,** which would silence a real signal for
 good.
 
-Everything else: **960 tests pass** (896 at base), exit code read from `$?` and never through a pipe;
+Everything else: **974 tests pass** (896 at base), exit code read from `$?` and never through a pipe;
 `sync --check` otherwise 0 issues, 3 pre-existing warnings, 1 skipped (`gitnexus-index` — no index in
 this tree, a skip and not a pass).
+
+> **DEVELOPER 31.** This sentence read **960** from the first candidate until the version bump, while
+> §9 — four sections below it, in the same document — said 974. It was true when written and was
+> falsified by my own later work in the same file.
+>
+> **It is an entry, not a near-miss, and the test is escape rather than severity:** it was committed
+> to a tracked artifact, handed to the planner and to QA by SHA, and read by both. That it is a small
+> number changes nothing about which side of the line it fell on.
+>
+> **Rule 14, in the handoff written by the seat that spent the loop finding rule-14 instances.** The
+> useful lesson is narrower than "update your numbers": **a measurement written into prose acquires
+> an implied *as of*, and the fix that scales is to cite where it was measured rather than restate
+> it** — which `shared.md` already says, and which I did not apply to my own document. The count
+> here now names its run; the authority is the suite, not this line.
 
 ## 8. For whoever writes the record next
 

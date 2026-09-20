@@ -1,5 +1,100 @@
 # Changelog
 
+## [0.43.0] - 2026-09-20 — the three-seat record, and a seat that is told where it stands
+
+Loop 14. The developer seat had a record and the QA seat got one the moment the runtime wrote `E_t`;
+the planner had a narrative. This gives every seat the same durable record, and gives every session
+three things it had to work out for itself before: **which tree it is in, which seat it is, and
+whose handoff it is reading.**
+
+### The condition this loop exists for, measured rather than imagined
+
+On the morning of 2026-09-20 a developer seat ran `/start` on a branch two merges behind
+`origin/master` and reported four false claims about the project. **Nothing was broken.** The tree
+was clean, the record parsed, `Drift: none`, a valid rev-50 `## State` block. Every instrument
+answered its own question correctly, and the question none of them asked was whether this tree is the
+current one.
+
+### Added
+
+- **`tree-currency.ts`** — HEAD and the record's revision compared to `origin/master`, printed
+  FIRST, before the mode, the version, the drift line or the record. One implementation on two
+  surfaces. It **never fetches** — a greeting must not do network I/O — so every result carries the
+  age of the reference it used and `current` cannot be read as *current as of now*. It prints a line
+  when the tree IS current: silence would make "level with master" and "this check did not run"
+  render identically. It names `origin/master` and disclaims drift in its own words, because **a
+  stale tree is perfectly self-consistent** and `Drift: none` sat above a rev-50 record all session.
+- **`role-files.ts`** — the seat's role file and `shared.md` are **loaded**, and named with their
+  commit. `.agents/roles/` had been tracked since PR #44 and read by nothing (`G-032`); C1's own
+  criterion, set 2026-09-17, was *"if `/start` does not consult it, it does not exist."* Four
+  conditions kept apart because they mislead differently: absent, untracked, **stale** (working tree
+  vs HEAD's blob), and behind-upstream — **recorded only, never called stale**, because an unmerged
+  branch is not a checkout that lies about itself.
+- **`handoff-provenance.ts`** — another seat's close-out commit, **derived**. It cannot be stored:
+  the commit containing a handoff write does not exist at the moment of that write. Bounded and
+  failing closed — *"unchanged through all 50 commits examined"* is a different answer from *"no
+  commit"*, and neither is ever blank.
+- **`open-brain state migrate`** — schema v1 → v2, with a dry run. `applyStateOps` cannot do this:
+  it refuses a file that does not validate against the current schema, so **the moment the schema
+  moves, the door locks from the inside.** The seat owning the migrated handoff is required and never
+  inferred.
+- **`open-brain detach`** — the return-to-detached step, which had been run by hand more than twenty
+  times. Refuses a dirty tree; refuses commits `origin/master` does not have, naming them, because a
+  detached HEAD leaves them reachable only through the reflog; reads the end state back rather than
+  trusting the checkout's exit code. `origin/master`, never `master`.
+
+### Changed
+
+- **`state.json` is schema 2: `handoff` → `handoffs[]`, keyed by seat.** One project-wide slot was a
+  structural defect under the roll rule (`G-046`): two seats close out in sequence and the second
+  erased the first, every loop. It had already sent a session to a file that no longer held what it
+  was said to hold. `set_handoff` and `end_session` take a seat and refuse one outside
+  planner / developer / qa. **A v1 file now fails to parse outright**, which is what forced the live
+  record, the shipped template and the test fixture to move in one commit.
+- **The planner's handoff carries `loop_state`** — open PRs and their QA status, the SHA frozen for a
+  QA in progress, questions pending for Aaron, rulings made mid-loop. **Required, and every field may
+  be empty.** `[]` and `null` are answers; absence is not. A required field is run; an optional one is
+  remembered, which is the failure `C3` names.
+- **`role: none`** declares a checkout that is not a seat. Read-side only, so a write from one is
+  refused by the schema rather than by a parallel rule that could drift from it.
+- **The greeting renders the reader's own handoff** and names the others by their derived commit.
+
+### Fixed
+
+- **`G-047` — the session number counted close-out writes, not sessions.** One seat-session took
+  three numbers in slice two, so every per-session rate divided by a denominator that inflated most
+  for the loops that went worst. A returning uuid now keeps its number, **and the whole batch is
+  stamped with it** — the first version normalised only `last_session`, leaving the record saying a
+  handoff was written in a session that does not exist.
+- **`T-157` / `G-024` — retention evicted tasks the tree still cites**, twice in two consecutive
+  writes. A done task whose id appears in the tracked tree is kept and the note names the citing
+  files. The scan excludes the record and its own generated views; without that every task would cite
+  itself and the guard could never fire.
+- **A handoff's close-out is derived from its words, not its bytes.** The v1 → v2 migration rewrote
+  every entry, which made the migration commit every seat's close-out by construction.
+- **The greeting no longer names a commit for words that commit does not contain.** The SHA came from
+  HEAD and the line from disk; **the window was every `/end`**, which writes the record before
+  committing it.
+- **The schema-staleness advice fired on almost every refusal** — the condition matched an ordinary
+  bad argument — **and it was wrong**: a reconnect restarts the server from the same build, so when
+  the schema change is in a build it does not have, nothing changes. It now says rebuild.
+- **`ob_start` fell back to prose on a record it could not read**, while `ob_state` refused. A
+  session on a stale build against a migrated record got a greeting that looked like the
+  pre-`state.json` regime. It now refuses a **present** record whose version is unknown; an absent
+  one still keeps the prose regime.
+- **The SessionStart hook swallowed a malformed payload**, then read the shell's directory as the
+  project, greeted it plausibly, and stamped a generated uuid over that checkout's identity.
+  Malformed now refuses and writes nothing; **a well-formed payload with no session id also writes
+  no slot**, because stamping an identity nobody asked for is the defect whatever the payload's shape.
+
+### A note on how this loop was checked
+
+Twelve mutants across the new guards. **Three survived a fully green suite before the assertions were
+repaired** — a hardcoded flag, and twice a guard written to honour this repo's *read the state back,
+never the exit code* rule that was itself never tested. Three separate defects were found by
+**running** the thing rather than by any test: each was correct by the rule that produced it and
+wrong for the question being asked, and each was green.
+
 ## [0.42.0] - 2026-09-20 — the ref channel closes, and the first two gates go live
 
 Loop 15, slice two. Slice one enforced the seat boundaries for every channel anyone had thought of
