@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 54 by open-brain v0.42.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 56 by open-brain v0.42.0 — do not edit; change state via ob_state -->
 > **Status:** v0.42.0 — Loop 14 — the three-seat record, re-briefed at docs/loops/loop-14-rebrief.md (supersedes loop-14-brief.md in part). Sequenced by Aaron 2026-09-20 (D-023) after Loop 15 slice two closed ACCEPTED at v0.42.0 (D-024). Loop 14 runs no role through the harness runtime; G-045 (D4) does not block it and is slice three's mandatory first repair. Fresh developer and QA sessions per the roll rule; criteria before candidate; frozen SHA; the record moves one seat at a time.
 
 ## What's working
@@ -60,6 +60,10 @@
 - The record's session number counts sessions rather than close-out writes, and says when it declined a number _(V-052, 2 evidence)_
 - A state.json schema migration is performed by a tested program with a dry run, not by editing the record _(V-053, 2 evidence)_
 - Returning a seat worktree to detached is a command that refuses the three ways it can lose work _(V-054, 2 evidence)_
+- A greeting never names a commit for words that commit does not contain, and the two uncommitted cases read alike _(V-055, 2 evidence)_
+- A refusal names the condition it is actually about: the schema advice fires only on a schema_version mismatch, and it says rebuild rather than reconnect _(V-056, 2 evidence)_
+- ob_start refuses a record whose schema version this build cannot read, rather than falling back to an older account of the project _(V-057, 2 evidence)_
+- The SessionStart hook cannot stamp a session identity nobody asked for over a checkout _(V-058, 2 evidence)_
 
 ## What's broken
 

@@ -159,6 +159,25 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
 
   // Deep copy so a refused batch leaves the parsed state untouched.
   const next: State = JSON.parse(JSON.stringify(parsed.data));
+
+  // THE EFFECTIVE SESSION NUMBER, resolved BEFORE any op is applied.
+  //
+  // G-047's fix made `end_session` keep the existing number when the uuid
+  // returns — but `end_session` runs LAST, so every earlier op in the same batch
+  // had already been stamped with the number the caller asked for. The record
+  // then said a handoff was written in session 72 while `last_session` said 71,
+  // and 72 did not exist. Found by reading the record back after the write that
+  // introduced it.
+  //
+  // A fix that leaves the record internally inconsistent is not a fix, so the
+  // whole batch is stamped with the number this session actually has.
+  const endOp = options.ops.find(
+    (o): o is { op: "end_session"; uuid: string | null; n: number } =>
+      typeof o === "object" && o !== null && (o as { op?: unknown }).op === "end_session",
+  );
+  const sessionIsAlreadyRecorded =
+    endOp !== undefined && endOp.uuid !== null && next.last_session.uuid === endOp.uuid;
+  const effectiveSession = sessionIsAlreadyRecorded ? next.last_session.n : options.session;
   const applied: WriteResult["applied"] = [];
   const removedGaps: string[] = [];
   const notes: string[] = [];
@@ -170,7 +189,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
       const path = issue.path.length ? issue.path.map(String).join(".") : "$";
       return refuse(before, `ops[${i}] invalid at ${path}: ${issue.message}`);
     }
-    const r = applyOne(next, v.data, options.session, removedGaps, notes);
+    const r = applyOne(next, v.data, effectiveSession, removedGaps, notes);
     if (!r.ok) return refuse(before, `ops[${i}] (${v.data.op}): ${r.error}`);
     applied.push({ op: v.data.op, id: r.id });
   }
@@ -188,7 +207,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   const cited = renderOnly ? new Map<string, string[]>() : citedTaskIds(projectRoot);
   const retention = renderOnly
     ? { dropped: [] as string[], kept: [] as string[] }
-    : applyRetention(next, options.session, cited);
+    : applyRetention(next, effectiveSession, cited);
   const dropped = retention.dropped;
   for (const id of retention.kept) {
     const where = cited.get(id) ?? [];
@@ -211,7 +230,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   const version = options.version ?? readJson<{ version: string }>(join(projectRoot, "package.json"))?.version ?? "0.0.0";
   const views: Array<{ rel: string; text: string }> = [];
   if (options.render !== false) {
-    const viewOpts = { version, session: options.session };
+    const viewOpts = { version, session: effectiveSession };
     views.push({ rel: VIEW_REL.inbox, text: renderInbox(finalState, viewOpts) });
     views.push({ rel: VIEW_REL.task, text: renderTaskFile(finalState, viewOpts) });
     views.push({ rel: VIEW_REL.next, text: renderNextSession(finalState, viewOpts) });
@@ -388,7 +407,7 @@ function applyOne(s: State, op: StateOp, session: number, removedGaps: string[],
       const prev = s.last_session;
       if (op.uuid !== null && prev.uuid === op.uuid) {
         if (op.n !== prev.n) {
-          notes.push(`end_session: uuid ${op.uuid} is already recorded as session ${prev.n}; kept ${prev.n} rather than taking ${op.n} (G-047 - the number counts sessions, not close-out writes)`);
+          notes.push(`end_session: uuid ${op.uuid} is already recorded as session ${prev.n}; kept ${prev.n} rather than taking ${op.n}, and EVERY op in this batch was stamped ${prev.n} for the same reason (G-047 - the number counts sessions, not close-out writes)`);
         }
         s.last_session = { n: prev.n, date: op.date, uuid: op.uuid, seat: op.seat };
         return { ok: true, id: null };

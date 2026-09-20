@@ -390,6 +390,36 @@ describe("applyStateOps (Loop 3 writer)", () => {
     expect(second.notes.join(" ")).toMatch(/already recorded as session 55/);
   });
 
+  it("G-047: a reused uuid stamps the WHOLE BATCH with the kept number, not just last_session", () => {
+    // The first version of this fix normalised only last_session. end_session
+    // runs LAST, so every earlier op in the same batch had already been stamped
+    // with the number the caller asked for: the record then said a handoff was
+    // written in session 72 while last_session said 71, and 72 did not exist.
+    //
+    // Found by reading the live record back after the write that introduced it,
+    // not by a test. A fix that leaves the record internally inconsistent is not
+    // a fix.
+    applyStateOps(root, { session: 55, expected_revision: 7, ops: [{ op: "end_session", n: 55, date: "2026-09-15", uuid: "same", seat: "developer" }] });
+
+    const second = applyStateOps(root, {
+      session: 56,
+      expected_revision: 8,
+      ops: [
+        { op: "set_handoff", seat: "developer", pick_up: "second close-out", watch_out: [], open_questions: [] },
+        { op: "open_task", title: "opened in the same batch", priority: "P2" },
+        { op: "end_session", n: 56, date: "2026-09-16", uuid: "same", seat: "developer" },
+      ],
+    });
+    expect(second.ok).toBe(true);
+
+    const s = readState(root);
+    expect(s.last_session.n).toBe(55);
+    // The handoff and the task must agree with it. Before the fix these were 56.
+    expect(s.handoffs.find((h) => h.seat === "developer")?.session).toBe(55);
+    expect(s.tasks.find((t) => t.title === "opened in the same batch")?.opened_session).toBe(55);
+    expect(second.notes.join(" ")).toMatch(/EVERY op in this batch was stamped 55/);
+  });
+
   it("a DIFFERENT uuid still takes a new number", () => {
     // The other half: idempotency must not become a ban on new sessions.
     applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "end_session", n: 55, date: "2026-09-15", uuid: "one", seat: "developer" }] });
