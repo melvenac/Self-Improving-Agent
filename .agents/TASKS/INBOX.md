@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 53 by open-brain v0.42.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 54 by open-brain v0.42.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -49,8 +49,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-103** Retire the mailbox as *transport*, keep it as *archive (supersedes T-104)
 - [ ] **T-114** Update /start monthly maintenance
 - [ ] **T-156** A scan that matches the sentence forbidding a thing, as though it were the thing (G-040): every source-text scan in the harness tests must be validated against a known positive and a known negative in the same test, or replaced by a parser
-- [ ] **T-157** Retention evicts done tasks whose ids the tracked tree cites (G-024, twice in two writes): refuse to evict a cited id, or tombstone
 
 ## Done (last 3 sessions)
 
-_None retained._
+- [x] **T-157** Retention evicts done tasks whose ids the tracked tree cites (G-024, twice in two writes): refuse to evict a cited id, or tombstone (session 71) — Done 2026-09-20, Loop 14. Retention now KEEPS a done task whose id is cited anywhere in the tracked tree, and the write's note names the citing files. Verified against the real repository rather than a fixture: T-151 and T-153 — the two tasks actually evicted at revs 48 and 49 — are both detected as cited, and 16 of 36 task ids are NOT cited, which is the half that matters, because a guard that keeps everything cannot fail and is not a guard. The scan excludes state.json and its four generated views; without that exclusion every task would cite itself. It matches the id PATTERN, so a mention in a test fixture counts (T-999 is 'cited' by state-writer.test.ts) — that errs toward keeping, which is visible in the record, rather than destroying, which is not, and the limit is stated in the function's own note. Mutation-checked: disabling the citation branch fails the suite.
