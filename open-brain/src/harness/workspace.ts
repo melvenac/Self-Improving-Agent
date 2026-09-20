@@ -24,7 +24,7 @@
 
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { changedPaths, committedPaths, headSha, isClean } from "./git.js";
+import { changedPaths, committedPaths, headSha, isClean, symbolicHeadRef } from "./git.js";
 
 /** A path that cannot be compared safely, with the reason it was refused. */
 export interface UnsafePath {
@@ -180,8 +180,14 @@ export function enforceAllowlist(repoRoot: string, allow: Allowlist, stageBase: 
 
   let message: string;
   if (headMoved) {
+    // Name the REF as well as both shas. Moving HEAD is a ref write — the
+    // ref-watch defers this one ref to this check, so this is the only record
+    // of it, and a record that says a ref moved without saying which ref and
+    // between what cannot be checked by its reader (G-041, A2).
+    const headRef = symbolicHeadRef(repoRoot);
     message =
-      `the stage moved HEAD from ${stageBase.slice(0, 12)} to ${observedHead.slice(0, 12)} — a role may not commit; ` +
+      `the stage moved HEAD (${headRef ?? "detached — HEAD names a commit directly"}) ` +
+      `from ${stageBase.slice(0, 12)} to ${observedHead.slice(0, 12)} — a role may not commit; ` +
       `the runtime owns the commit boundary, because which commit is the candidate and what each tag points at ` +
       `depend on it. ${violations.length} of the paths it touched were also outside the allowlist` +
       `${violations.length > 0 ? `: ${violations.slice(0, 4).join("; ")}` : ""}. ${scale}.`;

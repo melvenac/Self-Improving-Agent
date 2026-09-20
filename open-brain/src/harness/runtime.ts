@@ -53,7 +53,14 @@ import {
   type AllowlistVerdict,
   type FrozenCandidate,
 } from "./workspace.js";
-import { makeWriter, WriteRefused, type RoleContext, type RoleName, type RoleSession } from "./roles.js";
+import {
+  isRuntimeConstructed,
+  makeWriter,
+  WriteRefused,
+  type RoleContext,
+  type RoleName,
+  type RoleSession,
+} from "./roles.js";
 import {
   jsonSchemas,
   validateEvidence,
@@ -72,23 +79,44 @@ import {
 import {
   evidencePath,
   failurePath,
+  gateRecordPath,
   gitrefPath,
   iterationDir,
   planJsonPath,
   planMarkdownPath,
   renderEvidence,
   renderFailure,
+  renderGateRecord,
   renderGitref,
   renderPlanMarkdown,
   type FailureRecord,
+  type GateRecord,
+  type GateRecordKind,
 } from "./artifacts.js";
+import { RefWatch, type RefVerdict } from "./refwatch.js";
 import {
+  buildJevRequest,
   DryRunTransport,
+  DONE_GATE_QUESTIONS,
+  GateCallFailed,
+  JEV_KEY_VAR,
+  JevTransport,
+  PLAN_GATE_QUESTIONS,
+  redact,
   UnconfiguredTransport,
   type GateAnswer,
   type GatePayload,
   type GateTransport,
 } from "./gate.js";
+import {
+  decideDoneGate,
+  decidePlanGate,
+  loadPolicies,
+  policiesDir,
+  PolicyUnreadable,
+  type GateDecision,
+  type Policies,
+} from "./policies.js";
 
 /** How the decision gates behave. Slice one defaults to `skip`; the client lands in slice two. */
 export type GateMode = "skip" | "dry-run" | "live";
@@ -103,8 +131,20 @@ export interface LoopConfig {
   checks?: DeterministicChecks;
   /** Attempts per schema-validated role, including the first. */
   maxAttempts?: number;
+  /**
+   * Watch every ref under `refs/` around each stage (`G-041`). **Defaults to
+   * on**, and turning it off is the only way to run without it — a role the
+   * runtime did not construct is then refused outright.
+   */
+  refWatch?: boolean;
   gateMode?: GateMode;
   transport?: GateTransport;
+  /**
+   * Where the gate thresholds are read from. Defaults to the module's own
+   * `policies/` directory. A test points it at a temp directory to show that
+   * changing a threshold changes the decision with no source change (A6).
+   */
+  policiesDir?: string;
   log?: (line: string) => void;
   now?: () => Date;
   env?: NodeJS.ProcessEnv;
@@ -123,7 +163,33 @@ export type FailureCode =
   | "tag-target-moved"
   | "candidate-not-parent-of-evidence"
   | "evidence-disagrees-with-runtime"
-  | "gate-unavailable";
+  | "gate-unavailable"
+  | "foreign-role-unwatched"
+  | "stage-changed-ref"
+  | "gate-rejected"
+  | "gate-halted"
+  | "policy-unreadable";
+
+/**
+ * A refusal to START, thrown rather than returned.
+ *
+ * Every other failure in this file is a `LoopResult` with a `FailureCode`: the
+ * loop ran and something in it failed. This one is different in kind — the
+ * runtime declines to begin — and it is thrown so that difference cannot be
+ * read as a graded outcome. A caller that ignores the distinction gets an
+ * exception rather than an exit code it might not check.
+ */
+export class LoopRefused extends Error {
+  readonly code: FailureCode;
+  /** The seats that caused the refusal, in stage order. */
+  readonly roles: readonly RoleName[];
+  constructor(code: FailureCode, roles: readonly RoleName[], message: string) {
+    super(message);
+    this.name = "LoopRefused";
+    this.code = code;
+    this.roles = roles;
+  }
+}
 
 export interface LoopResult {
   status: "completed" | "failed";
@@ -141,6 +207,8 @@ export interface LoopResult {
   evidence: Evidence | null;
   gatePayloads: GatePayload[];
   gateAnswers: GateAnswer[];
+  /** One per gate consulted or dry-run, in order. Also written to disk. */
+  gateRecords: GateRecord[];
   failure: FailureRecord | null;
   /** 0 only when the loop completed AND the deterministic checks were green. */
   exitCode: number;
@@ -151,21 +219,82 @@ const isoOf = (now: () => Date): string => now().toISOString();
 /** `t001` → `001`, for tag names. */
 const loopNumber = (loop: string): string => loop.replace(/^t/, "");
 
-export function runLoop(config: LoopConfig): LoopResult {
+/**
+ * Run one loop.
+ *
+ * **Synchronous on the way in, asynchronous on the way through.** The foreign-
+ * role refusal below is thrown by this function itself, not by the promise it
+ * returns: a refusal to start must not be deferred to a microtask, because
+ * "refuses before any stage runs" is a claim about ordering. Everything after
+ * it is async, because a live gate is an HTTP call and the alternatives to
+ * awaiting one are a spawned process or a wedged runtime.
+ */
+export function runLoop(config: LoopConfig): Promise<LoopResult> {
+  // --- The one flag, before anything else ---------------------------------
+  //
+  // `G-041` and slice two's A1. Nothing above this line: not a git call, not a
+  // tag, not an artifact, not a log line. "Refuses before any stage runs" is
+  // only checkable if there is nothing to undo when it refuses.
+  //
+  // Slice one was safe because `cli.ts` passes `stubRoles()` and nothing else
+  // called `runLoop`. That is a property of one call site, and a property of
+  // one call site is an intention. This is the rule.
+  const refWatchEnabled = config.refWatch ?? true;
+  if (!refWatchEnabled) {
+    const stageOrder: readonly RoleName[] = ["planner", "developer", "qa"];
+    const foreignRoles = stageOrder.filter((r) => !isRuntimeConstructed(config.roles[r]));
+    if (foreignRoles.length > 0) {
+      throw new LoopRefused(
+        "foreign-role-unwatched",
+        foreignRoles,
+        `refusing to start loop ${config.loop}: ${foreignRoles.join(", ")} ` +
+          `${foreignRoles.length === 1 ? "is a role" : "are roles"} this runtime did not construct, and the ` +
+          `ref-watch is off. A role the runtime did not build can reach the repository through channels the ` +
+          `stage checks do not watch — refs were the last one found (G-041), and the list of channels is not ` +
+          `known to be complete. Run with the ref-watch on, or pass roles this runtime constructed.`,
+      );
+    }
+  }
+
+  return runLoopInner(config, refWatchEnabled);
+}
+
+async function runLoopInner(config: LoopConfig, refWatchEnabled: boolean): Promise<LoopResult> {
   const log = config.log ?? (() => {});
   const now = config.now ?? (() => new Date());
   const env = config.env ?? process.env;
   const maxAttempts = config.maxAttempts ?? 3;
   const gateMode: GateMode = config.gateMode ?? "skip";
   const transport: GateTransport =
-    gateMode === "dry-run"
+    config.transport ??
+    (gateMode === "dry-run"
       ? new DryRunTransport(log, env)
-      : (config.transport ?? new UnconfiguredTransport());
+      : gateMode === "live"
+        ? new JevTransport({ env, log })
+        : new UnconfiguredTransport());
+
+  // Thresholds are data, loaded once, before any gate is asked. A policy file
+  // that will not parse must stop the loop at the start rather than halfway
+  // through, and there is deliberately no built-in default to fall back to.
+  const policiesRoot = config.policiesDir ?? policiesDir();
+  let policies: Policies | null = null;
+  let policyError: string | null = null;
+  if (gateMode !== "skip") {
+    try {
+      policies = loadPolicies(policiesRoot);
+    } catch (err) {
+      policyError = err instanceof PolicyUnreadable ? err.message : (err as Error).message;
+    }
+  }
 
   const { repoRoot, loop } = config;
+  const refWatch = refWatchEnabled ? new RefWatch(repoRoot) : null;
   const schemas = jsonSchemas();
   const gatePayloads: GatePayload[] = [];
   const gateAnswers: GateAnswer[] = [];
+  const gateRecords: GateRecord[] = [];
+  /** Gate records written to disk already, so `fail()` does not write one twice. */
+  const gateRecordsWritten = new Set<GateRecordKind>();
   const artifacts: string[] = [];
   const tags: string[] = [];
 
@@ -184,8 +313,25 @@ export function runLoop(config: LoopConfig): LoopResult {
     evidence: null,
     gatePayloads,
     gateAnswers,
+    gateRecords,
     failure: null,
     exitCode: 1,
+  };
+
+  /**
+   * Write one gate record into the iteration directory.
+   *
+   * Returns the repo-relative path so the caller can include it in the commit
+   * it is already making. Nothing here commits: a write between the candidate
+   * commit and QA's freeze check would dirty the tree the freeze is about.
+   */
+  const writeGateRecord = (kind: GateRecordKind, record: GateRecord): string => {
+    const path = gateRecordPath(loop, kind);
+    const write = makeWriter(repoRoot, new Allowlist([`${iterationDir(loop)}/`]), "planner");
+    write(path, renderGateRecord(record));
+    gateRecordsWritten.add(kind);
+    artifacts.push(path);
+    return path;
   };
 
   /**
@@ -204,6 +350,19 @@ export function runLoop(config: LoopConfig): LoopResult {
     } catch (err) {
       record.reason = `${record.reason} (FAILED.md could not be written: ${(err as Error).message})`;
     }
+    // A gate that was asked before the loop failed still has a record, and a
+    // record that only survives a successful loop is no use for reading why an
+    // unsuccessful one went the way it did. Separate try: a gate record that
+    // cannot be written must not be reported as FAILED.md failing to write.
+    try {
+      for (const pending of gateRecords) {
+        if (pending.gate !== "plan" && pending.gate !== "developer-done") continue;
+        const kind: GateRecordKind = pending.gate === "plan" ? "plan" : "done";
+        if (!gateRecordsWritten.has(kind)) writeGateRecord(kind, pending);
+      }
+    } catch (err) {
+      record.reason = `${record.reason} (a gate record could not be written: ${(err as Error).message})`;
+    }
     log(`LOOP ${loop} FAILED at ${stage} [${code}]: ${record.reason}`);
     result.failure = record;
     result.status = "failed";
@@ -211,26 +370,117 @@ export function runLoop(config: LoopConfig): LoopResult {
     return result;
   };
 
-  /** Ask a gate, in whichever mode this run is in. Never silently approves. */
-  const consultGate = (payload: GatePayload): { ok: true; answer: GateAnswer } | { ok: false; reason: string } => {
+  /**
+   * Ask a gate, apply the policy, and record all of it. Never silently approves.
+   *
+   * Three modes, three shapes, and the record distinguishes them by field
+   * rather than by absence:
+   *
+   * - `skip` — nothing is asked. `sent: false`, `answer: null`, `decision:
+   *   null`, and a note that says it is not an approval.
+   * - `dry-run` — the payload is built and printed and no request is made.
+   *   `sent: false`, and the `request` field is the body that WOULD have gone,
+   *   which is the only thing a dry run is for.
+   * - `live` — the request goes, the answer comes back typed, and the policy
+   *   from `policies/` decides. `sent: true`.
+   *
+   * A gate that could not be reached is a failure, never a pass: *a gate that
+   * cannot reach Jev must not become a gate that passes.*
+   */
+  const consultGate = async (
+    kind: GateRecordKind,
+    payload: GatePayload,
+    decide: (answers: Record<string, unknown> | null) => GateDecision,
+  ): Promise<
+    | { ok: true; answer: GateAnswer; decision: GateDecision | null; record: GateRecord }
+    | { ok: false; code: FailureCode; reason: string }
+  > => {
     gatePayloads.push(payload);
+    const requestedAt = isoOf(now);
+    const record: GateRecord = {
+      gate: payload.gate,
+      loop,
+      mode: gateMode,
+      sent: false,
+      requested_at: requestedAt,
+      answered_at: null,
+      model_requested: payload.model,
+      model_resolved: null,
+      // The body exactly as it would go on the wire. Redacted as a second
+      // layer; the credential is a header and never reaches this object.
+      request: redact(buildJevRequest(payload), env),
+      answer: null,
+      usage: null,
+      decision: null,
+      runtime_action: "",
+      note: "",
+    };
+
     if (gateMode === "skip") {
       const answer: GateAnswer = {
         gate: payload.gate,
         answers: null,
         consulted: false,
-        note: "gates are stubbed in slice one; no decision was taken. Not an approval.",
+        note: "gate mode is skip; nothing was asked and no decision was taken. Not an approval.",
       };
       gateAnswers.push(answer);
-      return { ok: true, answer };
+      record.runtime_action = "proceeded without consulting the gate (mode: skip)";
+      record.note = answer.note;
+      gateRecords.push(record);
+      return { ok: true, answer, decision: null, record };
     }
+
+    let answer: GateAnswer;
     try {
-      const answer = transport.dispatch(payload);
-      gateAnswers.push(answer);
-      return { ok: true, answer };
+      answer = await transport.dispatch(payload);
     } catch (err) {
-      return { ok: false, reason: (err as Error).message };
+      record.runtime_action = "failed the loop — the gate could not be reached";
+      record.note =
+        err instanceof GateCallFailed
+          ? `${err.classification} (HTTP ${err.status ?? "none"}, retryable: ${err.retryable}): ${err.message}` +
+            (err.fields.length > 0 ? ` fields: ${err.fields.join(", ")}` : "") +
+            (err.detail === "" ? "" : ` body: ${err.detail}`)
+          : (err as Error).message;
+      gateRecords.push(record);
+      return { ok: false, code: "gate-unavailable", reason: record.note };
     }
+
+    gateAnswers.push(answer);
+    record.sent = answer.consulted;
+    record.answered_at = isoOf(now);
+    record.answer = answer.answers;
+    record.model_resolved = answer.resolvedModel ?? null;
+    record.usage = (answer.usage ?? null) as Record<string, unknown> | null;
+    record.note = answer.note;
+
+    // A dry run produces no answers, so there is nothing to apply a policy to.
+    // Applying one anyway would manufacture a rejection out of a mode whose
+    // whole purpose is not to decide.
+    if (!answer.consulted || answer.answers === null) {
+      record.runtime_action = "proceeded without a decision — the transport did not consult a gate";
+      gateRecords.push(record);
+      return { ok: true, answer, decision: null, record };
+    }
+
+    const decision = decide(answer.answers);
+    record.decision = { ...decision } as unknown as Record<string, unknown>;
+    if (decision.verdict === "proceed") {
+      record.runtime_action = "proceeded — the policy found no rule against it";
+      gateRecords.push(record);
+      return { ok: true, answer, decision, record };
+    }
+    record.runtime_action =
+      decision.verdict === "halt" ? "halted the loop on the gate's verdict" : "failed the loop on the gate's verdict";
+    gateRecords.push(record);
+    return {
+      ok: false,
+      code: decision.verdict === "halt" ? "gate-halted" : "gate-rejected",
+      reason:
+        `the ${payload.gate} gate's answer was ${decision.verdict}ed by the policy in ${policiesRoot}: ` +
+        `${decision.reasons.join("; ")}. Thresholds applied: ${JSON.stringify(decision.applied)}. ` +
+        `Answered by ${answer.resolvedModel ?? "an unreported model version"}. ` +
+        `LIMIT: typed output guarantees the interface, not truth — this is the gate's judgement, not a measurement.`,
+    };
   };
 
   // --- Preconditions ------------------------------------------------------
@@ -241,6 +491,36 @@ export function runLoop(config: LoopConfig): LoopResult {
 
   const clean = requireCleanTree(repoRoot, "preflight");
   if (!clean.ok) return fail("preflight", "dirty-tree", clean.reason);
+
+  if (policyError !== null) {
+    return fail(
+      "preflight",
+      "policy-unreadable",
+      `the gate thresholds could not be read, and gate mode is "${gateMode}": ${policyError}`,
+    );
+  }
+
+  // QA's F3. A missing credential is the same KIND of fact as an unreadable
+  // policy file — a precondition of running live that is knowable before any
+  // work starts — and it was being discovered at the planner gate, after
+  // loop-001-base had been created in the target repository. Checked here, in
+  // the same place, for the same reason.
+  //
+  // Only when the runtime builds its own transport: an injected one is a test's
+  // or a caller's, and it has no key to look for.
+  if (gateMode === "live" && config.transport === undefined) {
+    const key = env[JEV_KEY_VAR];
+    if (typeof key !== "string" || key.trim() === "") {
+      return fail(
+        "preflight",
+        "gate-unavailable",
+        `gate mode is "live" and ${JEV_KEY_VAR} is not set in this process's environment. It is read ` +
+          `from the environment only — never from a file in this repo, a config key, a CLI flag or a ` +
+          `prompt. Set it in the shell that runs the harness, or use --gate dry-run. Refused before ` +
+          `the loop tagged or wrote anything.`,
+      );
+    }
+  }
 
   const n = loopNumber(loop);
   const baseTag = `loop-${n}-base`;
@@ -259,6 +539,7 @@ export function runLoop(config: LoopConfig): LoopResult {
   const baseSha = headSha(repoRoot);
   const branch = currentBranch(repoRoot);
   result.baseSha = baseSha;
+  refWatch?.authorise(`refs/tags/${baseTag}`);
   tagAt(repoRoot, baseTag, baseSha, `HoH loop ${loop}: tree before the loop ran`);
   tags.push(baseTag);
   log(`loop ${loop}: base ${baseSha} on ${branch}, tagged ${baseTag}`);
@@ -296,6 +577,39 @@ export function runLoop(config: LoopConfig): LoopResult {
     // The base this stage is judged against. Every path difference between
     // here and the stage's end is the stage's doing, committed or not.
     const stageBase = headSha(repoRoot);
+    // …and every REF difference likewise. The runtime writes its own refs
+    // between stages, never inside a window, so a delta here is a role's.
+    refWatch?.begin(roleName);
+
+    /**
+     * Close the ref window and put back anything the role wrote.
+     *
+     * Runs BEFORE the allowlist comparison, deliberately: moving
+     * `refs/heads/<branch>` changes what `git rev-parse HEAD` answers, so a
+     * path verdict computed first would be measured against a HEAD the role
+     * chose.
+     */
+    let refVerdict: RefVerdict | null = null;
+
+    /**
+     * Close the ref window — READ ONLY — and put HEAD back before anything
+     * else looks at it.
+     *
+     * The ordering is QA's D1. A role that runs `git checkout -b evil` leaves
+     * HEAD naming a branch the watch is about to delete; deleting it first
+     * makes `git rev-parse HEAD` fail, and `enforceAllowlist` reads HEAD as
+     * its first act. Restoring HEAD moves nothing but HEAD, so the allowlist
+     * still sees every path the stage touched.
+     *
+     * Nothing else is restored here: the verdict has to be computed against
+     * the repository the ROLE left, and a backwards move of the checked-out
+     * branch is a fact `enforceAllowlist` must still see.
+     */
+    const closeRefWindow = (): { verdict: RefVerdict | null; headNote: string } => {
+      if (!refWatch) return { verdict: null, headNote: "" };
+      const verdict = refWatch.compare();
+      return { verdict, headNote: refWatch.restoreHead() };
+    };
 
     /**
      * Undo whatever the stage left behind.
@@ -305,17 +619,24 @@ export function runLoop(config: LoopConfig): LoopResult {
      * ROGUE content rather than the original.
      */
     const rollBack = (verdict: ReturnType<typeof enforceAllowlist>): string => {
-      if (verdict.headMoved) {
+      // Refs first, HEAD included. After this the checked-out branch is back
+      // where the stage found it, so `resetHardTo` below is resetting to a
+      // commit that IS an ancestor of HEAD — which is why QA's D2 ended in
+      // "recover by hand" without it.
+      const refNote = refWatch && refVerdict ? refWatch.restore(refVerdict) : "";
+      const refMoved = refVerdict !== null && (refVerdict.unauthored.length > 0 || refVerdict.deferredDelta !== null);
+
+      if (verdict.headMoved || refMoved) {
         try {
           resetHardTo(repoRoot, stageBase);
-          return ` The rogue commit was discarded and the tree reset to ${stageBase.slice(0, 12)}.`;
+          return `${refNote} The stage's work was discarded and the tree reset to ${stageBase.slice(0, 12)}.`;
         } catch (err) {
-          return ` THE TREE COULD NOT BE ROLLED BACK: ${(err as Error).message} Recover by hand before rerunning.`;
+          return `${refNote} THE TREE COULD NOT BE ROLLED BACK: ${(err as Error).message} Recover by hand before rerunning.`;
         }
       }
       const bad = [...verdict.violations, ...verdict.unsafe.map((u) => u.path)];
       if (bad.length > 0) revertPaths(repoRoot, bad);
-      return " The offending paths were reverted.";
+      return `${refNote} The offending paths were reverted.`;
     };
 
     let deliverable: unknown;
@@ -325,12 +646,38 @@ export function runLoop(config: LoopConfig): LoopResult {
       // The in-process helper refusing is still a boundary violation: the role
       // tried. It is reported as one so the two mechanisms agree.
       const thrownCode: FailureCode = err instanceof WriteRefused ? "allowlist-violation" : "role-threw";
+      // A role that threw may still have written a ref on its way out, and a
+      // thrown error is not a reason to stop looking at the other channels.
+      const closed = closeRefWindow();
+      refVerdict = closed.verdict;
+      const headNote = closed.headNote;
       const verdictAfterThrow = enforceAllowlist(repoRoot, allow, stageBase);
-      const undone = verdictAfterThrow.ok ? "" : rollBack(verdictAfterThrow);
-      return { ok: false, code: thrownCode, reason: `${roleName} stage: ${(err as Error).message}${undone}` };
+      const refBad = refVerdict !== null && !refVerdict.ok;
+      const undone = verdictAfterThrow.ok && !refBad ? "" : rollBack(verdictAfterThrow);
+      if (refBad) {
+        return {
+          ok: false,
+          code: "stage-changed-ref",
+          reason: `${roleName} stage: ${refVerdict!.message}${headNote}${undone} The stage also threw: ${(err as Error).message}`,
+        };
+      }
+      return { ok: false, code: thrownCode, reason: `${roleName} stage: ${(err as Error).message}${headNote}${undone}` };
     }
 
+    const closed = closeRefWindow();
+    refVerdict = closed.verdict;
+    const headNote = closed.headNote;
     const verdict = enforceAllowlist(repoRoot, allow, stageBase);
+
+    if (refVerdict !== null && !refVerdict.ok) {
+      const undone = rollBack(verdict);
+      return {
+        ok: false,
+        code: "stage-changed-ref",
+        reason: `${roleName} was refused, not warned. ${refVerdict.message}${headNote}${undone}`,
+      };
+    }
+    if (refVerdict) log(`  ${roleName} refs: ${refVerdict.message}`);
     log(`  ${roleName} attempt ${attempt}: ${verdict.message}`);
     if (!verdict.ok) {
       const undone = rollBack(verdict);
@@ -368,6 +715,11 @@ export function runLoop(config: LoopConfig): LoopResult {
           `The tree moved between making that commit and tagging it, so the tag would not mean what it says.`,
       };
     }
+    // Declare the exact ref before writing it. The runtime tags between stages,
+    // never inside a window, so this is currently consumed by nothing — and
+    // that is the point: if tagging ever moves inside a stage, the ledger is
+    // already correct rather than something a later reader has to notice.
+    refWatch?.authorise(`refs/tags/${tag}`);
     tagAt(repoRoot, tag, sha, message);
     tags.push(tag);
     return { ok: true };
@@ -407,23 +759,54 @@ export function runLoop(config: LoopConfig): LoopResult {
   }
   result.plan = plan;
 
-  const planGate = consultGate({
-    gate: "plan",
-    loop,
-    model: "jev-latest",
-    questions: [
-      { id: "bounded", kind: "score", prompt: "Is this increment bounded and locally complete?", legend: ["not bounded", "bounded and complete"] },
-      { id: "repairs", kind: "choice", prompt: "Does the plan both repair and add a capability?", options: ["both", "repair only", "capability only"] },
-    ],
-    context: { plan },
-  });
-  if (!planGate.ok) return fail("planner", "gate-unavailable", planGate.reason);
+  // Slice four's artifact index is what will fill this. Until then it is
+  // empty, stated once here rather than spelled `[]` at three call sites where
+  // a reader would have to work out whether the emptiness meant anything.
+  const priorFailures: readonly string[] = [];
+
+  const planGate = await consultGate(
+    "plan",
+    {
+      gate: "plan",
+      loop,
+      model: "jev-latest",
+      questions: PLAN_GATE_QUESTIONS,
+      // §4's state for this gate. `prior_failures` and the validated set are
+      // what the record already knows; the gate is not asked to recall them.
+      context: {
+        plan,
+        prior_failures: priorFailures,
+        validated_behaviours: plan.preserve,
+        changed_areas: [],
+      },
+    },
+    (answers) =>
+      decidePlanGate(answers, policies!.plan, {
+        // Neither is inferred from the gate. A stop-ship needs support from the
+        // deterministic checks and QA history, and at the PLAN gate neither has
+        // run for this loop — so both are false and a stop-ship is refused
+        // rather than honoured. Slice four's index is what makes them real.
+        deterministicFailure: false,
+        qaHistorySupportsStopShip: false,
+        // Read from the state the runtime assembled, not from the gate. Until
+        // the index lands this is always empty, which is exactly why the
+        // threshold on `addresses_top_failures` had nothing to be about (F5).
+        hasPriorFailures: priorFailures.length > 0,
+      }),
+  );
+  if (!planGate.ok) return fail("planner", planGate.code, planGate.reason);
+  const planGatePath = writeGateRecord("plan", planGate.record);
+  log(`  plan gate: ${planGate.record.runtime_action}`);
 
   const writePlan = makeWriter(repoRoot, plannerAllow, "planner");
   writePlan(planMarkdownPath(loop), renderPlanMarkdown(plan, isoOf(now)));
   writePlan(planJsonPath(loop), `${JSON.stringify(plan, null, 2)}\n`);
   artifacts.push(planMarkdownPath(loop), planJsonPath(loop));
-  commitPaths(repoRoot, [planMarkdownPath(loop), planJsonPath(loop)], `harness(${loop}): plan D_t`);
+  commitPaths(
+    repoRoot,
+    [planMarkdownPath(loop), planJsonPath(loop), planGatePath],
+    `harness(${loop}): plan D_t`,
+  );
   log(`  planner: D_t committed`);
 
   // --- Stage 2: developer -------------------------------------------------
@@ -461,16 +844,32 @@ export function runLoop(config: LoopConfig): LoopResult {
   result.checksPassed = checks.allPassed;
   log(`  checks: build ${checks.build.detail}; unit ${checks.unit.detail}`);
 
-  const doneGate = consultGate({
-    gate: "developer-done",
-    loop,
-    model: "jev-latest",
-    questions: [
-      { id: "complete", kind: "choice", prompt: "Is the increment complete against D_t?", options: ["yes", "no"] },
-    ],
-    context: { plan, candidate: candidateSha, checks },
-  });
-  if (!doneGate.ok) return fail("developer", "gate-unavailable", doneGate.reason);
+  // §4: the done-gate's state carries the TEST EXIT CODES as data, and no
+  // question in it asks whether the tests passed. The runtime read that from
+  // the process; asking a model to re-derive it would be requesting an opinion
+  // about a measurement.
+  const doneGate = await consultGate(
+    "done",
+    {
+      gate: "developer-done",
+      loop,
+      model: "jev-latest",
+      questions: DONE_GATE_QUESTIONS,
+      context: {
+        plan,
+        candidate: candidateSha,
+        diffstat: devVerdict.permitted,
+        checks: {
+          build: { command: checks.build.command, exit_code: checks.build.exit_code },
+          unit: { command: checks.unit.command, exit_code: checks.unit.exit_code },
+        },
+        prior_failures: priorFailures,
+      },
+    },
+    (answers) => decideDoneGate(answers, policies!.done, { checksPassed: checks.allPassed }),
+  );
+  if (!doneGate.ok) return fail("developer", doneGate.code, doneGate.reason);
+  log(`  done gate: ${doneGate.record.runtime_action}`);
 
   // --- Freeze -------------------------------------------------------------
 
@@ -530,25 +929,36 @@ export function runLoop(config: LoopConfig): LoopResult {
   }
   result.evidence = evidence;
 
-  const scoreGate = consultGate({
-    gate: "qa-score",
-    loop,
-    model: "jev-latest",
-    questions: [
-      { id: "accept", kind: "score", prompt: "How well does the candidate meet D_t's acceptance?", legend: ["not met", "fully met"] },
-    ],
-    context: { plan, evidence, candidate: candidateSha },
-  });
-  if (!scoreGate.ok) return fail("qa", "gate-unavailable", scoreGate.reason);
+  // --- The QA scoring gate is NOT built in this slice ---------------------
+  //
+  // `docs/HOH-JEV.md` §7 puts QA scoring in slice three, and the slice-two
+  // brief lists it out of scope. Slice one had a placeholder question here;
+  // sending it live would spend a real call on a question nobody designed and
+  // return an answer that reads like a verdict.
+  //
+  // So it is not asked, and the absence is RECORDED rather than left as a
+  // missing file. A gate nobody consulted is not a gate that approved.
+  log(
+    `  qa-score gate: NOT CONSULTED — QA scoring through Jev is slice three ` +
+      `(docs/HOH-JEV.md §7). Nothing about this candidate was judged by a gate at the QA stage.`,
+  );
 
   const writeQa = makeWriter(repoRoot, qaAllow, "qa");
   writeQa(evidencePath(loop), renderEvidence(evidence));
   writeQa(gitrefPath(loop), renderGitref(candidate, loop));
   artifacts.push(evidencePath(loop), gitrefPath(loop));
 
+  // G_done is written HERE, into the evidence commit, and not when the gate
+  // answered. Between the candidate commit and QA's freeze check the tree must
+  // stay exactly the candidate — a gate record written there would dirty the
+  // very thing the freeze is asserting. LIMIT: on a loop that fails after the
+  // done-gate, G_done.json is written by the failure path instead, beside
+  // FAILED.md, and is not in any commit.
+  const doneGatePath = writeGateRecord("done", doneGate.record);
+
   const evidenceSha = commitPaths(
     repoRoot,
-    [evidencePath(loop), gitrefPath(loop)],
+    [evidencePath(loop), gitrefPath(loop), doneGatePath],
     `harness(${loop}): evidence E_t for ${candidateSha.slice(0, 12)}`,
   );
   result.evidenceSha = evidenceSha;

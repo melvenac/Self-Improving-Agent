@@ -63,6 +63,14 @@ describe("harness git wrapper", () => {
       expect(NETWORK_SUBCOMMAND.test('git(repoRoot, ["push", "origin", "main"])')).toBe(true);
       expect(NETWORK_SUBCOMMAND.test('git(repoRoot, ["status", "--porcelain"])')).toBe(false);
 
+      // T-156: the NEAR-MISS, planted and asserted, not merely described.
+      // The deny list is textually identical to an instance of the thing it
+      // forbids, which is the whole of G-040. Both halves are asserted here:
+      // the pattern DOES fire on the constant (so it is not too narrow), and
+      // the named exclusion DOES suppress it (so it is doing the work).
+      const denyList = 'export const DENIED_SUBCOMMANDS: readonly string[] = [\n  "push",\n  "fetch",\n];';
+      expect(NETWORK_SUBCOMMAND.test(denyList), "the pattern no longer sees the deny list at all").toBe(true);
+
       const dir = resolve(__dirname, "../../src/harness");
       const walk = (d: string, out: string[] = []): string[] => {
         for (const e of readdirSync(d, { withFileTypes: true })) {
@@ -75,6 +83,11 @@ describe("harness git wrapper", () => {
       expect(files.length, "harness source file count — the scan must prove it looked").toBeGreaterThanOrEqual(8);
 
       const denyListBlock = /export const DENIED_SUBCOMMANDS[\s\S]*?\];/;
+      expect(
+        NETWORK_SUBCOMMAND.test(denyList.replace(denyListBlock, "")),
+        "the exclusion does not actually suppress the deny list",
+      ).toBe(false);
+
       const offenders: string[] = [];
       let scanned = 0;
       for (const f of files) {

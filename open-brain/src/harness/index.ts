@@ -43,6 +43,10 @@ export {
   isRepo,
   refExists,
   resolveRef,
+  allRefs,
+  symbolicHeadRef,
+  setRefTo,
+  deleteRef,
   commitPaths,
   tagAt,
   revertPaths,
@@ -80,6 +84,7 @@ export {
   StubDeveloper,
   StubQa,
   WriteRefused,
+  isRuntimeConstructed,
   type RoleName,
   type RoleContext,
   type RoleSession,
@@ -88,15 +93,49 @@ export {
 export {
   redact,
   renderPayload,
+  buildJevRequest,
+  toWireQuestion,
   DryRunTransport,
   UnconfiguredTransport,
+  JevTransport,
   GateUnavailable,
+  GateCallFailed,
   SECRET_ENV_VARS,
+  JEV_KEY_VAR,
+  JEV_ENDPOINT,
+  PLAN_GATE_QUESTIONS,
+  DONE_GATE_QUESTIONS,
   type GatePayload,
   type GateAnswer,
   type GateTransport,
   type GateQuestion,
+  type GateFailureClass,
+  type JevTransportOptions,
 } from "./gate.js";
+
+export {
+  loadPolicies,
+  policiesDir,
+  policyJsonSchemas,
+  decidePlanGate,
+  decideDoneGate,
+  PolicyUnreadable,
+  POLICY_FILES,
+  PlanGatePolicySchema,
+  DoneGatePolicySchema,
+  type Policies,
+  type PlanGatePolicy,
+  type DoneGatePolicy,
+  type GateDecision,
+  type GateVerdict,
+} from "./policies.js";
+
+export {
+  RefWatch,
+  type RefDelta,
+  type RefVerdict,
+  type RefChange,
+} from "./refwatch.js";
 
 export {
   iterationDir,
@@ -109,7 +148,18 @@ export {
   renderGitref,
   renderEvidence,
   renderFailure,
+  gateRecordPath,
+  renderGateRecord,
   type FailureRecord,
+  type GateRecord,
+  type GateRecordKind,
 } from "./artifacts.js";
 
-export { runLoop, type LoopConfig, type LoopResult, type FailureCode, type GateMode } from "./runtime.js";
+export {
+  runLoop,
+  LoopRefused,
+  type LoopConfig,
+  type LoopResult,
+  type FailureCode,
+  type GateMode,
+} from "./runtime.js";

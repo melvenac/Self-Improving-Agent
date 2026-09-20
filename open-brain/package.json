@@ -15,7 +15,7 @@
     "dev": "npx tsx src/cli.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "postbuild": "node scripts/write-build-info.mjs"
+    "postbuild": "node scripts/copy-build-assets.mjs && node scripts/write-build-info.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

@@ -1,5 +1,139 @@
 # Changelog
 
+## [0.42.0] - 2026-09-20 — the ref channel closes, and the first two gates go live
+
+Loop 15, slice two. Slice one enforced the seat boundaries for every channel anyone had thought of
+and one nobody had — commits — and was blind to the one QA found last: **refs**. A role that ran
+`git tag -f loop-001-developer loop-001-base` during its stage completed the loop at exit 0 with no
+commit, no file write and HEAD untouched. `loop-001-developer` then named the pre-loop commit while
+`E_t.json` named the real candidate, and **a reader who trusts the tag, which is what a tag is for,
+restores the wrong commit** (`G-041`).
+
+Nothing real runs through this runtime until that is a refusal, so the hole closes first and the
+gates sit on top of it.
+
+### The pattern, stated once because it is now three deep
+
+**Every enforcement channel in this runtime was found only after something used it.** The working
+tree, then commits, then refs. Each was closed by the seat that found it and none was predicted.
+The list is not known to be complete: hooks, submodules, the index, config and the reflog have not
+been probed. Each check here states in its own output what it does not see.
+
+### Added
+
+- **`refwatch.ts`** — a snapshot of every ref under `refs/` around each stage, compared after,
+  restoring anything the runtime did not author and failing the loop with the ref and both SHAs in
+  the record. **Refs, not tags**: a watch that listed tags would leave `git branch -f` and
+  `git update-ref` open, and naming the observed channel narrowly is how the next channel gets
+  missed. **Authorship is a ledger, not a name** — the runtime declares the exact ref it is about to
+  write and that declaration is consumed by the one delta it describes, because accepting
+  `loop-NNN-*` by name would accept `loop-001-anything` and the name is what an adversarial role
+  controls.
+- **The foreign-role refusal at `runLoop` entry** — a role object the runtime did not construct is
+  refused, thrown, above every git call, tag, artifact and log line, when the ref-watch is off.
+  Provenance is a `WeakSet` inside `roles.ts` that the module does not export: nothing outside can
+  add to it. Slice one was safe only because `cli.ts` happened to pass `stubRoles()`, and a property
+  of one call site is an intention.
+- **`JevTransport`** — one HTTPS POST to `api.typesafe.ai/v1/systemone`, batched questions, typed
+  answers, `TYPESAFE_API_KEY` read from the environment at call time and nowhere else. Absent key is
+  a refusal naming the variable **before the request is built**. No spawned process: a `curl` would
+  put the key on a command line, in the process table and the shell history.
+- **Four failure classes that do not collapse** — `401`, `422`, `429`, `529` become four distinct
+  outcomes, `429`/`529` retryable and `401`/`422` not, with the `422` carrying the field paths the
+  API named. An undocumented status is its own outcome rather than filed under one of the four, and
+  a `200` with no answers map is refused rather than read as approval.
+- **The plan gate and the developer done-gate**, with `docs/HOH-JEV.md` §4's exact question ids and
+  kinds. The done-gate's payload carries the deterministic checks' **exit codes as data** and asks
+  no question about whether the tests passed.
+- **`harness/policies/*.json`** — thresholds as data, zod-validated, with the JSON Schema derived and
+  drift-checked (`D-021`'s shape). Changing a number changes the runtime's decision with no source
+  change. **There is no built-in default**: an unreadable policy directory stops the loop, because a
+  run with thresholds nobody chose is worse than a run that refuses.
+- **`G_plan.json` and `G_done.json`** in `artifacts/iterations/tNNN/` — the request as it would go on
+  the wire, the typed answer, the thresholds applied, and what the runtime then did. Written in every
+  mode; `sent` is what distinguishes a dry run, not the file's absence.
+- **`--gate skip|dry-run|live`** on `harness run`. An unrecognised mode refuses (`T-150`).
+
+### Changed
+
+- **`GateTransport.dispatch` and `runLoop` are asynchronous.** A live gate is an HTTP call, and the
+  synchronous alternatives are a spawned process or a wedged runtime. `runLoop` itself stays
+  synchronous up to the foreign-role refusal, which is thrown rather than rejected — *refuses before
+  any stage runs* is a claim about ordering, and a refusal deferred to a microtask is not that claim.
+- **A stage that moves HEAD now names the ref as well as both SHAs.** The ref-watch defers the
+  checked-out branch to the commit boundary, which already owns that channel and carries QA's D1–D3
+  wording, so `stage-committed`'s message is the only record of that ref write.
+- **The QA scoring gate is not consulted.** It is slice three. Slice one's placeholder question would
+  have spent a real call on a question nobody designed; the runtime now records that it did not ask,
+  because a gate nobody consulted is not a gate that approved.
+- **`docs/HOH-JEV.md` §3 gains the request shape**, read from `docs.typesafe.ai/api.md` and marked as
+  read rather than wire-verified. `criteria` is an ordered **list** for `score` and a **map** for
+  `choice` — the note that recorded the score `422` did not say the choice case differs.
+
+### Fixed
+
+- **`G-041`** — closed, seen red on the real condition first: all four A2 cases reported
+  `expected 'completed' to be 'failed'` before the watch existed.
+- **`T-156`, in part** — the two harness source-text scans now assert a planted **near-miss** as well
+  as a planted positive, and the two scans added here do the same. A sentence forbidding a thing is
+  textually identical to an instance of it (`G-040`). Where the distinction is not reliably
+  expressible — "no question asks whether the tests passed" — the structural assertion over the
+  parsed payload is the one that counts, and the text scan states that limit in the test.
+
+### Repaired after QA rejected the first candidate
+
+`b4194a9` was **not accepted** (report at `8f2c547`): seven rows passed, A6 failed on its second
+half, A7 was untested by rule, and three defects of the ref-and-provenance class were recorded. Each
+repair below was seen red on the real condition first, in one commit, before any mechanism existed.
+
+- **`HEAD` is part of the ref snapshot** (`D1`, `D2`). It is not under `refs/`, so a role running
+  `git checkout -b evil` changed a channel nothing watched — and the watch then deleted the branch
+  **while HEAD still named it**, so `git rev-parse HEAD` failed and `GitFailed` escaped `runLoop`
+  entirely: no result, no `FAILED.md`, and a repository needing hand recovery. HEAD is now snapshotted
+  and put back **before anything else reads it**, a `symbolic-ref` switch is itself a reported
+  breach, and the restore moves nothing but HEAD.
+- **The deferred ref is restored by the watch** (`D2`). The commit boundary keeps the verdict and its
+  wording, but its rollback is `reset --hard`, which refuses when the stage base is not an ancestor
+  of HEAD — exactly a backwards move. So `update-ref refs/heads/main <pre-loop>` was recorded and
+  then left for a human, with the runtime's own plan commit unreachable. The watch holds a `before`
+  value and a compare-and-swap; it now uses them, and the reset that follows is to a commit that is
+  an ancestor again. **The shipped test accepted that outcome** — its pattern was
+  `/moved HEAD|could not be rolled back/i` — and has been tightened.
+- **Provenance is the exact class** (`D3`). `class Evil extends StubPlanner` called `super()`, which
+  registered it, so a role whose `run()` was entirely foreign was runtime-constructed as far as the
+  mechanism could tell. The doc comment was literally true and the property it defended was defeated
+  by inheritance. `new.target` closes it.
+- **The threshold scan's SCOPE was A6's defect, not its detector.** It read one region of one file.
+  A `0.7` typed into a gate prompt in `gate.ts` — where §4 says a threshold must never live — left the
+  whole harness suite green. The scan now covers the prompts and the gate-context assembly as well,
+  its targets are asserted as data so narrowing them is deliberate, and QA's own plant is its
+  positive fixture.
+- **A missing `TYPESAFE_API_KEY` is a preflight refusal** (`F3`), in the same place as an unreadable
+  policy file and for the same reason. It was being found at the planner gate, after `loop-001-base`
+  existed in the target repository.
+- **`addresses_top_failures` is not judged when there are no prior failures** (`F5`). A threshold on a
+  question with no referent is not a measurement, and it made the done gate unreachable on the CLI
+  path — A7 would have observed one gate instead of two. The applicability is data in
+  `plan-gate.json`, like every other value there.
+- **`gate-live.test.ts` now installs the global-`fetch` guard its header claimed** (`F2`).
+
+**`F1` is deliberately not repaired** and this says so rather than leaving it to be re-found:
+`git.test.ts`'s network scan fires on a comment naming the call. QA called that *"safe direction;
+inconsistent"*. Making it consistent with `checks.test.ts` means stripping comments, which is the
+**less** strict side, so it is left alone.
+
+### Not in this slice, stated so nobody reads the absence as an oversight
+
+Real role prompts and real role sessions, QA scoring through Jev (slice three). Selective retrieval
+and the artifact index (slice four). `T-155`'s shadow merge gate, which needs a merge point that does
+not exist yet. **No live Jev call was made from the developer seat** — every test here runs against
+an injected fake, and the one real call is QA's, once, as A7.
+
+**What this cannot make true:** that a gate's typed answer is correct. *Typed output guarantees the
+interface, not truth.* The thresholds shipped here are a starting position; only
+`has_observable_acceptance_min` and the "scope_size near 2" rule come from the guide at all, and
+nothing has been calibrated against a loop.
+
 ## [0.41.0] - 2026-09-19 — the seat boundaries become a check instead of a request
 
 Loop 15, slice one. **This repo has had three roles as documents for months and could not keep to

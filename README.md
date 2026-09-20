@@ -2,7 +2,7 @@
 
 *A memory protocol that enables AI coding agents to learn across sessions.*
 
-**Latest: v0.41.0** · [Changelog](CHANGELOG.md)
+**Latest: v0.42.0** · [Changelog](CHANGELOG.md)
 
 ---
 
@@ -198,17 +198,21 @@ An outer harness around the three seats — **planner, developer, QA** — from
 repo already had the three roles as documents and could not keep to them, because a role file is a
 rule someone has to remember.
 
-**The roles are stubs.** Slice one calls no model, reads no API key, and takes no gate decision.
-What exists is the machinery the gates will sit on, and the two refusals that make the boundaries
-real.
+**The roles are still stubs.** Slice two adds the Jev client and the first two gates; real role
+prompts are slice three. A stubbed role's `D_t` and diff are what the gates see, which is enough to
+observe whether a gate is asked the right question and whether policy comes from a file.
 
 ```bash
-# Prints the derived D_t / E_t schemas. Changes nothing.
+# Prints the derived D_t / E_t and gate-policy schemas. Changes nothing.
 npx tsx open-brain/src/harness/cli.ts schemas
 
 # Runs a loop. Pass --repo: a loop COMMITS and TAGS in the repository it runs
 # against, so point it at a scratch clone rather than your working checkout.
-npx tsx open-brain/src/harness/cli.ts run --loop t001 --dry-run --repo /path/to/scratch/repo
+npx tsx open-brain/src/harness/cli.ts run --loop t001 --gate dry-run --repo /path/to/scratch/repo
+
+# The same loop with the gates live. Needs TYPESAFE_API_KEY in the environment —
+# it is read from there and nowhere else, and its absence is a refusal naming it.
+npx tsx open-brain/src/harness/cli.ts run --loop t001 --gate live --repo /path/to/scratch/repo
 ```
 
 The target repository needs a clean tree and, for the default checks, an `open-brain/` directory with
@@ -222,6 +226,10 @@ The target repository needs a clean tree and, for the default checks, an `open-b
 | **Exit codes only** | Build and unit results come from process status; no stage reads stdout to decide. A report contradicting the measurement is refused, not corrected |
 | **Per-loop git tags** | `loop-<NNN>-base`, `-developer`, `-qa`. Rollback is one git command. Tags refuse to move |
 | **Dry run** | Prints every gate payload and sends nothing; secrets redacted by live value *and* field name |
+| **Ref watch** | Snapshots every ref under `refs/` around each stage. A role that runs `git tag -f`, `git branch -f` or `git update-ref` fails the loop, the ref is put back, and the record names the ref and both SHAs. Authorship is a ledger of the exact refs the runtime declared, not a name pattern a role could imitate (`G-041`) |
+| **Foreign-role refusal** | `runLoop` throws before any stage runs if it is handed a role it did not construct while the ref-watch is off. Provenance is a set inside `roles.ts` that the module does not export, so it cannot be forged from outside |
+| **Gate policy as data** | Thresholds live in `open-brain/src/harness/policies/*.json`, zod-validated, with the JSON Schema derived and drift-checked. Changing a number changes the decision with no source change; there is no built-in default to fall back to |
+| **Four failure classes** | `401`, `422`, `429`, `529` map to four distinct outcomes the runtime can act on — `422` carries the field the API named — and an undocumented status is its own outcome rather than filed under one of the four |
 
 **The runtime never merges, pushes, or touches a remote** — ten network subcommands are refused at
 the call site (`D-019`: autonomous inside a branch, Aaron at master).
@@ -236,7 +244,8 @@ See [`docs/HOH-JEV.md`](docs/HOH-JEV.md) for the loop contract.
 
 | Feature | Since | What it does |
 |---|---|---|
-| **HoH loop runtime** | v0.41.0 | Enforces the planner/developer/QA boundary: frozen candidate for QA, write allowlist that refuses, capped schema retry, per-loop git tags. Roles are stubbed in slice one |
+| **HoH loop runtime** | v0.41.0 | Enforces the planner/developer/QA boundary: frozen candidate for QA, write allowlist that refuses, capped schema retry, per-loop git tags. Roles are stubbed |
+| **Ref watch + gates** | v0.42.0 | Closes the ref channel (`G-041`) and puts the plan gate and developer done-gate behind the runtime, with thresholds as data and gate verdicts written into the iteration artifact |
 | **Dashboard** | v0.9.0 | Read-only web viewer at `localhost:3456`; surfaces the maturity lifecycle (progenitor/proven/mature), which the v1 schema could not represent |
 | **Tiered Memory** | v0.6.0 | 4-tier access (Core/Hot/Warm/Cold); Obsidian Vault as SOT; Smart Connections semantic search replaces sqlite-vec; vault-first store pipeline; reflection cycle for experience distillation |
 | **Session manifest** | v0.5.5 | Threads Claude's session UUID across all memory layers for full provenance tracking |

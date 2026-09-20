@@ -25,6 +25,49 @@ export const gitrefPath = (loop: string): string => `${iterationDir(loop)}/A_t.g
 export const evidencePath = (loop: string): string => `${iterationDir(loop)}/E_t.json`;
 export const failurePath = (loop: string): string => `${iterationDir(loop)}/FAILED.md`;
 
+/** Which gate a record belongs to. The file name follows the gate, not the stage. */
+export type GateRecordKind = "plan" | "done";
+
+export const gateRecordPath = (loop: string, kind: GateRecordKind): string =>
+  `${iterationDir(loop)}/${kind === "plan" ? "G_plan" : "G_done"}.json`;
+
+/**
+ * One gate's whole story: what was asked, what came back, which thresholds were
+ * applied, and what the runtime then did.
+ *
+ * **Written in every mode.** `sent` is the difference between a dry run and a
+ * live one — not the presence of the file. A record that exists only when a
+ * gate was consulted cannot be used to check what a dry run WOULD have asked,
+ * which is the only thing a dry run is for.
+ *
+ * `request` is the body as it goes on the wire, **redacted**. The credential is
+ * an HTTP header and is never part of this object in the first place; the
+ * redaction is the second layer, for anything that reached the state by another
+ * route.
+ */
+export interface GateRecord {
+  gate: string;
+  loop: string;
+  mode: string;
+  /** False in `skip` and `dry-run`. True only when a request actually left. */
+  sent: boolean;
+  requested_at: string;
+  answered_at: string | null;
+  model_requested: string;
+  /** The concrete version the alias resolved to, e.g. `jev-1.13.0`. Null when not sent. */
+  model_resolved: string | null;
+  request: Record<string, unknown>;
+  answer: Record<string, unknown> | null;
+  usage: Record<string, unknown> | null;
+  /** The policy verdict, its reasons, and the threshold values used. Null when not consulted. */
+  decision: Record<string, unknown> | null;
+  /** What the runtime did as a result, in its own words. Never inferred by a reader. */
+  runtime_action: string;
+  note: string;
+}
+
+export const renderGateRecord = (record: GateRecord): string => `${JSON.stringify(record, null, 2)}\n`;
+
 const bullets = (items: readonly string[]): string =>
   items.length === 0 ? "_none_\n" : `${items.map((i) => `- ${i}`).join("\n")}\n`;
 

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "gate": {
+      "type": "string",
+      "const": "plan"
+    },
+    "has_observable_acceptance_min": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "scope_size_reject_at_or_above": {
+      "type": "number"
+    },
+    "scope_size_reject_confidence_min": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "preserves_validated_min": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "addresses_top_failures_min": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "addresses_top_failures_requires_prior_failures": {
+      "type": "boolean"
+    },
+    "treat_system_as_feature_complete": {
+      "type": "boolean"
+    },
+    "stop_ship_requires_deterministic_failure": {
+      "type": "boolean"
+    },
+    "stop_ship_requires_qa_history": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "gate",
+    "has_observable_acceptance_min",
+    "scope_size_reject_at_or_above",
+    "scope_size_reject_confidence_min",
+    "preserves_validated_min",
+    "addresses_top_failures_min",
+    "addresses_top_failures_requires_prior_failures",
+    "treat_system_as_feature_complete",
+    "stop_ship_requires_deterministic_failure",
+    "stop_ship_requires_qa_history"
+  ],
+  "additionalProperties": false,
+  "title": "Plan gate policy",
+  "description": "Thresholds for the plan gate. Values are data and may be edited; the SHAPE is derived from open-brain/src/harness/policies.ts and this file must not be edited by hand. LIMIT: noul answers carry no confidence field, so every noul rule is a threshold on the value itself and no noul rule can be conditioned on confidence. PROVENANCE: only has_observable_acceptance_min (0.7) and the 'scope_size near 2 at high confidence rejects' rule come from docs/HOH-JEV.md §4. Every other number in the shipped plan-gate.json is the developer's starting position, chosen without data. LIMIT: these numbers are a starting position, not a calibration (docs/HOH-JEV.md §9)."
+}
