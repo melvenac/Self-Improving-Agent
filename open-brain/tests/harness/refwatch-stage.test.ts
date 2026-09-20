@@ -197,6 +197,10 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
 
     expect(r.status).toBe("failed");
     expect(r.failure?.code).toBe("stage-committed");
+    // A2 as ruled: EVERY ref-channel breach names the ref and both shas, and
+    // the deferred ref has no other record than this one.
+    expect(r.failure?.reason).toContain("refs/heads/main");
+    expect(r.failure?.reason).toMatch(/from [0-9a-f]{12} to [0-9a-f]{12}/);
   });
 
   it("refuses a role that moves the checked-out branch with update-ref", () => {
@@ -215,6 +219,8 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
 
     expect(r.status).toBe("failed");
     expect(r.failure?.reason).toMatch(/moved HEAD|could not be rolled back/i);
+    expect(r.failure?.reason).toContain("refs/heads/main");
+    expect(r.failure?.reason).toMatch(/from [0-9a-f]{12} to [0-9a-f]{12}/);
   });
 
   it("reports the ref verdict on every stage, with its own limits stated", () => {
