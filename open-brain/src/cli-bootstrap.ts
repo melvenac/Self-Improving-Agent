@@ -13,6 +13,7 @@ import { join } from "path";
 import { randomUUID } from "crypto";
 import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
+import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
 import { describeDerivedArtifacts } from "./pipelines/session-start/derived-artifacts.js";
 import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
 import {
@@ -144,6 +145,21 @@ const identity = readAgentIdentity(cwd);
 if (identity) {
   const partner = identity.partner ? `partner: ${identity.partner}` : "no partner";
   lines.push(`Agent: ${identity.name} (${identity.role}) — ${partner}`);
+}
+
+// The role files, NAMED here and LOADED by ob_start. C1's remainder is G-032 —
+// `.agents/roles/` tracked and read by nothing — and the split is deliberate:
+// this hook fires for every session including ones that never run /start, so the
+// PROBLEMS (a missing, untracked or stale role file) must be announced here,
+// while the content belongs where the seat is actually briefed. Printing both in
+// both places would double ~245 lines into every session's context.
+if (hasAgents) {
+  const roles = describeRoleFiles(cwd, identity);
+  for (const line of roles.lines) lines.push(line);
+  for (const p of roles.problems) {
+    lines.push("");
+    lines.push(p);
+  }
 }
 
 // Derived artifacts — the index and the build. Reported HERE as well as in

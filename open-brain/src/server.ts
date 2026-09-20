@@ -23,6 +23,8 @@ import {
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
 import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
+import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
+import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
@@ -248,6 +250,31 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
       }
     }
 
+    // Seat identity and the role knowledge that goes with it (C1 / G-032).
+    //
+    // `readAgentIdentity` is a READ-ONLY door: it parses AGENT.local.md then
+    // AGENT.md and writes nothing. That matters on its own — the only other way
+    // to ask which seat a checkout greets as was to run the SessionStart hook,
+    // which calls writeActiveSession and, given no session id, GENERATES one and
+    // stamps it over the checkout's slot. Checking identity reassigned identity.
+    //
+    // The CONTENT is returned, not just the filenames. A greeting that named the
+    // files without loading them would satisfy "the greeting says it did" and
+    // leave G-032 exactly where it was: tracked, and read by nothing.
+    const roles = describeRoleFiles(projectRoot, readAgentIdentity(projectRoot));
+    lines.push("");
+    lines.push(
+      roles.seat
+        ? `Seat: ${roles.seat.name} (${roles.seat.role})${roles.seat.partner ? ` — partner: ${roles.seat.partner}` : ""}`
+        : `Seat: UNRESOLVED`
+    );
+    lines.push(...roles.lines);
+    if (roles.problems.length > 0) {
+      lines.push(`
+ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
+      for (const p of roles.problems) lines.push(`  ${p}`);
+    }
+
     // Size block precedes the content so a reader sees what is coming before
     // it arrives. Estimator: chars/4 rounded up (see StateFileSize).
     lines.push(`\n## Sizes (tokens estimated as chars/4)`);
@@ -284,6 +311,15 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
         const body = content[s.file];
         lines.push(body === null ? "absent" : body.replace(/\s+$/, ""));
       }
+    }
+
+    // The role knowledge itself, last: it is reference material the seat reads
+    // once and refers back to, not a briefing it reads top to bottom.
+    for (const f of roles.files) {
+      if (f.content === null) continue;
+      lines.push(`
+## ${f.rel}${f.commit ? ` @ ${f.commit.slice(0, 7)}` : ""}`);
+      lines.push(f.content.replace(/\s+$/, ""));
     }
 
     // Total is of everything above it — the measurement Part 1 of the
