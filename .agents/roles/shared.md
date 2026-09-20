@@ -14,6 +14,14 @@ mistake, it says so — provenance is what makes a rule falsifiable by the seat 
 having landed. `gh pr merge` has printed `could not determine current branch: failed to run git` while
 the merge succeeded. A read confirms only if it is ordered after the write actually terminated.
 
+**A chained shell command reports one outcome for several claims.** `check && commit` commits when the
+check passes; `check; commit` commits regardless and prints the check's output either way; and
+`grep -c` exits 1 on a zero count, so a fail-closed gate written as `[ "$(grep -c …)" = 0 ] && commit`
+refuses on the *good* result. **The shape that works, seen in the QA seat's commits:** run the check to
+a file, read its exit status into a variable, and put the commit inside `if [ "$rc" -eq 0 ]`. Assert
+the end state after the chain, not the exit line of its last stage — `cmd | tail; echo $?` reports
+`tail`'s success, and a runner can print *"805 passed"* and exit 1.
+
 **An instrument that cannot distinguish "nothing there" from "I did not look" is not a measurement.**
 Eleven instances of this one family are recorded in `docs/loops/loop-13-closeout.md`, and **knowing
 the failure mode prevented none of them.** What worked every time was re-running with a different
@@ -138,5 +146,15 @@ be holding behind.
 paths into it and the MCP server runs from its build. Moving or renaming it breaks every session on
 the machine, in every project. Rebuild it after changing server code — **a stale server reports
 success.**
+
+**The main tree is not a QA fixture.** Checking a candidate out there and rebuilding — the only way
+`build-freshness` reports — means every session on the machine runs the candidate's server until the
+tree is restored, and nothing checks the restore; a session started in that window inherits whichever
+state it finds. **QA runs in the QA tree, made to resemble the main tree:** `gitnexus analyze` in the
+QA checkout gives it the generated `.gitnexus/` files rule 13 exists for, where the candidate actually
+is. The one main-tree-only condition that remains — Aaron's untracked `.agents/SYSTEM/PRD.md` — is not
+a property of any candidate, and a QA report names it as unrun rather than lets a green imply it.
+*(Ruled 2026-09-20 after the planner announced a main-tree checkout to three seats and QA stopped it.
+The planner had done exactly that two days earlier with Aaron present, and it happened not to bite.)*
 
 **Run `/sync` before any commit.** `package.json` is the version source of truth.
