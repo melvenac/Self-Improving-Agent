@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 58 by open-brain v0.43.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 59 by open-brain v0.43.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 14 — the three-seat record, re-briefed at docs/loops/loop-14-rebrief.md (supersedes loop-14-brief.md in part). Sequenced by Aaron 2026-09-20 (D-023) after Loop 15 slice two closed ACCEPTED at v0.42.0 (D-024). Loop 14 runs no role through the harness runtime; G-045 (D4) does not block it and is slice three's mandatory first repair. Fresh developer and QA sessions per the roll rule; criteria before candidate; frozen SHA; the record moves one seat at a time. _(since session 64)_
+NEXT LOOP: the G-039 recall trigger — not yet briefed. Ruled by Aaron 2026-09-20 (D-026) after Loop 14 closed ACCEPTED at v0.43.0 (D-025). Constraint from docs/loops/g-039-ruling.md: the trigger is deterministic, fails closed on nothing, and the loop is handed both fixes (a trigger on a queried store; an unconditional read of a curated set). Problem statement from Loop 14: shared.md is loaded into every session and the seat that quoted its rule broke it the same day — loading a rule and applying it are two different things. Then Loop 15 slice three with G-045 first. Fresh developer and QA sessions on Opus 5; the planner on Fable 5.1; criteria before candidate; frozen SHA; the record moves one seat at a time. _(since session 73)_
 
 ## Top tasks
 

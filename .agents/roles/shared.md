@@ -71,6 +71,24 @@ a boundary cannot widen by omission. **State the check's limits in its own outpu
 **The instrument for structured data is a parser, never a pattern match.** Two seats made this
 mistake an hour apart on the same file, the second having just been told about the first.
 
+**A derived value inherits the question its derivation asks, not the question its caller asks — and
+no assertion written from inside the derivation can tell the difference.** Three instances in Loop
+14, every one green: a fetch-time line that said "unknown" while looking like caution; a greeting
+that named the migration commit as every seat's close-out because the migration rewrote every
+entry's bytes; a session number stamped on a batch before the record held it. Each was found by
+reading the artifact afterwards. *(Developer's sentence, Loop 14; `loop-14-closeout.md` §3.)*
+
+**Green on the first run is the signal to mutate. Assert both directions. `tsc` clean is part of
+calling a mutant valid.** Three mutants survived green suites at first pass in Loop 14, each the exact
+defect being fixed; a vacuous negative shipped inside the repair for a vacuous positive and was caught
+only because the positive failed against the same wrong path; two mutants broke syntax rather than
+behaviour and were replaced before being counted. *(Developer, Loop 14.)*
+
+**This file is loaded into every session now (`G-032` closed, Loop 14), so it has a budget it did
+not have before.** A rule goes here short, with provenance; the reasoning stays in the close-out it
+came from. And loading a rule is not applying it: the seat that quoted this file's line on restated
+numbers at a boundary restated a number in its own handoff the same day (Developer 31).
+
 ## The record
 
 **Nothing that must outlive a session may live only in one.** A2A is a transport with no memory.

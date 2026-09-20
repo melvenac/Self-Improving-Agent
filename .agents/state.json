@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
-  "revision": 58,
+  "revision": 59,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 14 — the three-seat record, re-briefed at docs/loops/loop-14-rebrief.md (supersedes loop-14-brief.md in part). Sequenced by Aaron 2026-09-20 (D-023) after Loop 15 slice two closed ACCEPTED at v0.42.0 (D-024). Loop 14 runs no role through the harness runtime; G-045 (D4) does not block it and is slice three's mandatory first repair. Fresh developer and QA sessions per the roll rule; criteria before candidate; frozen SHA; the record moves one seat at a time.",
-    "since_session": 64
+    "text": "NEXT LOOP: the G-039 recall trigger — not yet briefed. Ruled by Aaron 2026-09-20 (D-026) after Loop 14 closed ACCEPTED at v0.43.0 (D-025). Constraint from docs/loops/g-039-ruling.md: the trigger is deterministic, fails closed on nothing, and the loop is handed both fixes (a trigger on a queried store; an unconditional read of a curated set). Problem statement from Loop 14: shared.md is loaded into every session and the seat that quoted its rule broke it the same day — loading a rule and applying it are two different things. Then Loop 15 slice three with G-045 first. Fresh developer and QA sessions on Opus 5; the planner on Fable 5.1; criteria before candidate; frozen SHA; the record moves one seat at a time.",
+    "since_session": 73
   },
   "tasks": [
     {
@@ -1492,6 +1492,42 @@
       ],
       "since_session": 72,
       "status": "verified"
+    },
+    {
+      "id": "V-060",
+      "claim": "The session-start hook writes nothing to the active-session slot unless its payload carries a session id: a malformed payload refuses, writes nothing and exits non-zero; a well-formed payload with no session_id prints identity read-only and says the slot was not written; only a payload with an id writes the slot (the identity-reassignment finding, reserved as G-048 in loop-14-closeout.md section 4, closed in the Loop 14 candidate).",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/cli-bootstrap.test.ts",
+          "observation": "R4 rows seen red at 7e1c041 and green at c7fbdd9 (QA report 2, 667cd9d): backslash payload -> exit 1, stderr names the bad escape, slot byte-identical; empty stdin and {} -> exit 0, 'Session slot NOT written', slot byte-identical; a payload with an id still writes the slot. Mutant red with tsc clean."
+        }
+      ],
+      "since_session": 73,
+      "status": "verified"
+    },
+    {
+      "id": "V-061",
+      "claim": "A fresh session's greeting is true about its tree and its seat: the tree-currency line prints first and says behind/current/ahead/could-not-compare against the local origin/master ref without fetching; the seat's role file and shared.md are loaded by content and named by commit with absent/untracked/stale kept apart; the greeting renders the reader's own seat's last handoff and names the other seats' close-out commits derived from git by the seat's words, failing closed.",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/session-start/tree-currency.test.ts",
+          "observation": "Seen red on this morning's actual stale tree (a worktree at 5b5bd30: '7 commits behind origin/master, record here rev 50, at origin/master rev 52'); ahead not called behind; GIT_TRACE to a file shows zero fetch/ls-remote (QA report 1, 867790b, row S)."
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/pipelines/session-start/handoff-provenance.test.ts",
+          "observation": "QA report 2 (667cd9d) row C2b: each seat rendered its own entry or 'no handoff recorded for this seat'; others named c0d69d5 (qa) and the developer's close-out, matched by hand against git log across the migration boundary; no seat named the migration commit de4674d; twelve mutants red."
+        },
+        {
+          "type": "file",
+          "path": ".agents/AGENT.local.md",
+          "observation": "The main tree, given role: none after the merge, greets 'Clark (none) — not a seat' with the tree-currency line first (planner, 2026-09-20 22:16Z, from the rebuilt main-tree build)."
+        }
+      ],
+      "since_session": 73,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -1685,13 +1721,6 @@
       "opened_session": 64
     },
     {
-      "id": "G-032",
-      "what": "Seat role knowledge is now tracked but nothing reads it. .agents/roles/*.md carries how each seat works, and no hook, command or pipeline loads it: agent-identity.ts parses only the frontmatter of AGENT.local.md then AGENT.md for name/role/partner, and a grep across open-brain/src and .claude/commands for 'roles/' returns nothing. Tracking fixed durability; reachability is a separate problem and is still open.",
-      "evidence": "agent-identity.ts:34-35 reads AGENT.local.md then AGENT.md and parses frontmatter only. grep -rn 'roles/' over open-brain/src and .claude/commands returns no hits. The knowledge was read this session only because the planner seat said in an A2A message that it existed.",
-      "recommended_update": "Make the role file reachable deterministically rather than by instruction: have cli-bootstrap resolve the role from the frontmatter and print the path of the matching .agents/roles/<role>.md in the startup greeting, or add it to /start's residual reads. Rule 4 — every containment that worked was a command; every containment that failed was an intention.",
-      "opened_session": 64
-    },
-    {
       "id": "G-033",
       "what": "A freshness check served through the MCP server cannot report that server's own staleness, because the check it needs is the code the stale server lacks. ob_sync run before /mcp reconnect returned 23 passed with no sign of module-boundary, gitnexus-index or build-freshness — not because they failed but because that server process predated v0.40.0. The same gate run from the CLI showed 26 passed with all three. A green ob_sync is therefore only as current as the server build serving it, and nothing in its output says which build that was.",
       "evidence": "Session 64: ob_sync via MCP returned 'Summary: 23 passed, 0 fixed, 4 warnings, 0 issues, 0 skipped' with no module-boundary, gitnexus-index or build-freshness lines. After `/mcp reconnect open-brain`, the identical call returned 26 passed with all three present, and build-freshness immediately caught a real mismatch (build e3d33c7 vs HEAD ae1113a). The CLI path had been reporting all three throughout.",
@@ -1773,20 +1802,6 @@
       "what": "DELETING THE CHECKED-OUT BRANCH DURING A STAGE CRASHES THE RUNTIME WITH NO RECORD (D4, slice two). `git update-ref -d refs/heads/main` while main is checked out (legal; `git branch -D` would refuse): the watch records the deferred ref as deleted, restoreHead sees HEAD's NAME unchanged and does nothing, then `git rev-parse HEAD` fails on the dangling name inside enforceAllowlist and GitFailed escapes runLoop before rollBack, where the deferred-ref restore lives. No LoopResult, no FAILED.md, HEAD unresolvable, main gone, tree staged. D1's sibling: the D1 repair keys on HEAD's name changing; here the name is constant and its referent was removed. Lower likelihood than D1 and the fix is D2's shape moved earlier.",
       "evidence": "Found by Probe (QA seat), report 2 at 1ee8346 section 5, withheld probe N(c), run against the built candidate 830af70 in the QA tree. A2's four cases and the control pass byte-for-byte; this is not a criteria row and neither seat widened the criteria after the verdict. Ruled by Atlas in loop-15-slice-2-closeout.md section 3 onto slice three, on the same grounds as D6 in slice one: the roles are stubs and no real role runs through this runtime before slice three.",
       "recommended_update": "Slice three's MANDATORY mechanical first repair, seen red first with the update-ref -d probe as its A1: the restore reads nothing from the repository until the snapshot is fully restored, and after HEAD's name is put back HEAD must resolve or the ref is restored from the snapshot before any read. Restore the deferred delta (the watch already holds before) before anything reads HEAD, not only inside the rollback. The open denominator stays open: index, hooks, config, submodules and reflog are unprobed channels.",
-      "opened_session": 64
-    },
-    {
-      "id": "G-046",
-      "what": "THE HANDOFF IS ONE SLOT PER PROJECT AND THE ROLL RULE OVERWRITES IT. set_handoff writes a single project-wide field; when the developer and QA seats roll in sequence after a loop (D-023), the second close-out replaces the first in the rendered view, so a fresh session's greeting reads only the last seat's pick_up. The first seat's handoff is not lost (it is in the close-out commit) but nothing renders it. Planner 49: the kickoff message to the fresh developer asserted the view carried the developer's file pointers after the QA seat's write had replaced them — a claim about the record the record did not hold, caught by the developer.",
-      "evidence": "Rev 45 (#61, developer close-out) filled the slot; rev 46 (#63, QA close-out) replaced it; the developer found cli.ts:167 itself and flagged the claim. Recorded in docs/loops/loop-15-slice-2-brief-amendment-1.md section 2. Repeated at the slice-two roll (revs 50 and 51) with the seats citing each other's close-out SHAs by hand as the workaround.",
-      "recommended_update": "A handoff keyed by seat, or the greeting rendering the last handoff from each seat that has one. Until fixed: a rolled seat's handoff is cited by the SHA of its close-out commit and the kickoff message carries that SHA.",
-      "opened_session": 64
-    },
-    {
-      "id": "G-047",
-      "what": "THE RECORD'S SESSION NUMBER COUNTS CLOSE-OUT WRITES, NOT SESSIONS, AND ONLY THE UUID SHOWS IT. One developer seat-session (uuid 284d6280, one /start, one context) wrote end_session three times in slice two: n=67 at rev 48, n=68 at rev 49, n=69 at rev 50 — once per candidate and once at the roll, structurally per-write. state.json keeps only last_session, so nothing in the record reveals that three numbered sessions were one. Every per-session rate (error entries per session, the correction record's rows) is computed against a denominator that inflates whenever a loop needs more than one candidate, and inflates most for the loops that went worst.",
-      "evidence": "Observed by Forge (developer seat) at its /end after the slice-two merge; deliberately NOT written as a gap in that write because the dry run assigned it G-045, an id already broadcast for D4 — taking it would have made four documents point at the wrong gap. The text is in docs/loops/loop-15-slice-2-developer-handoff.md section 10 (merged #71); numbered here by the planner at close. A second disagreement: the session log for all three writes is one file, Session_3.md, the worktree's third local log.",
-      "recommended_update": "Decide what the number counts and make the other derivable: end_session idempotent per uuid (a second write for the same uuid updates its entry), or a sessions[] list with uuids so a reader can collapse them, or rename the field to what it measures and derive a real session count from distinct uuids. Until then treat any per-session rate in a close-out as an upper bound on the denominator and say so where it is quoted.",
       "opened_session": 64
     }
   ],
@@ -2120,6 +2135,18 @@
       "title": "D-024 — Loop 15 slice two ACCEPTED at 830af70 on the second candidate; D4 (the checked-out branch deleted during a stage) ruled onto slice three as G-045, its mechanical first repair",
       "date": "2026-09-20",
       "note": "Accepted by the QA seat in report 2 (1ee8346) on criteria written before the first candidate existed (c73f147 lineage), after rejecting the first candidate b4194a9 in report 1 (8f2c547) on A6 and three withheld probes of the class beneath G-041: what the restore does with HEAD. Six repairs ruled as classes, seen red in a9ffe26 and green in c1f99d0. A7 ruled as the gate's observability, not the loop's completion: both gates answered live from the QA seat and the done gate correctly rejected the stub diff; the brief's request-ids clause is struck (the wire carries none). Merged on Aaron's word 2026-09-20 in order #68 (developer, rev 47 -> 49), #69, #70 (QA), #65, #66, #67 (planner docs); v0.42.0 on 4bed570. Both seats rolled on the record: #71 (rev 50), #72 (rev 51). Close-out: docs/loops/loop-15-slice-2-closeout.md. G-041 CLOSED at this revision: the ref channel is a refusal (ref snapshot with HEAD in it, restored before any read; foreign-role refusal at runLoop entry with new.target provenance; authorship by ledger), seen red at 9cdcc84 and a9ffe26, accepted on the observation that found it; close_gap splices without tombstone (G-010) so its text lives here. The finding that generalises: a restore that reads the repository before the snapshot is fully restored is itself a channel. Counts at close: 50 Planner / 30 Developer / 2 QA, every entry set by its own seat before being asked."
+    },
+    {
+      "id": "D-025",
+      "title": "D-025 — Loop 14 ACCEPTED at c7fbdd9 on the second candidate; the three-seat record is built and the greeting is true",
+      "date": "2026-09-20",
+      "note": "Accepted by the QA seat in report 2 (667cd9d) on criteria written before the first candidate existed (424c618 -> a68c358), after rejecting the first candidate 7e1c041 in report 1 (867790b) on one row (the near-miss register sorted nowhere; ruled to belong to the close-out document by family). Version bump to 0.43.0 at 3135da4 re-verified in scope (97bdbe6). Merged on Aaron's word 2026-09-20: #77 (rev 52 -> 56, schema 1 -> 2), #78, #79, #75, #76; v0.43.0 on e1948a0. Seats rolled: #80 (developer, rev 57; T-157 closed there), #81 (QA, rev 58); the planner rolls with this write for the first time (C3's acceptance). Close-out: docs/loops/loop-14-closeout.md. CLOSED AT THIS REVISION, text here because close_gap splices without tombstone: G-032 (role files loaded at session start by content and named by commit); G-046 (handoffs[] keyed by seat, the greeting renders the reader's own seat's entry and names the others' close-out commits derived from git by the seat's words, failing closed); G-047 (end_session idempotent per uuid, whole batch stamped with the effective number). The identity-reassignment finding (the hook wrote a generated uuid into the active-session slot when its payload carried none; reserved as G-048 in the close-out) is closed in the candidate and recorded as a verified behaviour rather than opened-and-spliced. The finding that generalises, the developer's sentence: a derived value inherits the question its derivation asks, not the question its caller asks, and no assertion written from inside the derivation can tell the difference; three instances, all green. shared.md gains three rules with provenance (green on the first run is the signal to mutate; assert both directions; tsc clean is part of a valid mutant) and a budget note. Counts at close: 50 Planner / 31 Developer / 2 QA."
+    },
+    {
+      "id": "D-026",
+      "title": "D-026 — After Loop 14: the G-039 recall-trigger loop, then Loop 15 slice three",
+      "date": "2026-09-20",
+      "note": "Ruled by Aaron 2026-09-20 ('I agree' to the planner's recommendation), recorded first in loop-14-rebrief-amendment-2.md section 5 while the record was frozen. Grounds: eight loops have stored knowledge and none has read any of it during work (ob_recalled empty every session); Loop 14's last result sharpened it — shared.md is now loaded into every session and the seat that quoted its rule at a boundary restated a number in its own handoff the same day (Developer 31): loading a rule and applying it are two different things. The G-039 loop builds a deterministic trigger that fails closed on nothing, handed both fixes from g-039-ruling.md (a trigger on a queried store; an unconditional read of a curated set). Slice three follows with G-045 as its mechanical first repair. Also ruled 2026-09-20: the developer and QA seats move to Opus 5 at their next fresh sessions, the planner stays on Fable 5.1 (Aaron's weekly usage; the planner recommended it and noted the QA seat then shares the developer's model, with the process, not the model, carrying the seat's independence)."
     }
   ],
   "handoffs": [
@@ -2168,12 +2195,50 @@
       ],
       "session": 71,
       "loop_state": null
+    },
+    {
+      "seat": "planner",
+      "pick_up": "THE PLANNER SEAT'S FIRST HANDOFF THROUGH THE PER-SEAT SLOT (C3's acceptance, Loop 14). Loop 14 is closed: ACCEPTED at c7fbdd9, merged as #77 with the bump 3135da4, v0.43.0 on e1948a0, both seats rolled (#80, #81), the close-out at docs/loops/loop-14-closeout.md. The next loop is the G-039 recall trigger (D-026), UNBRIEFED: write its brief in docs/loops/ from g-039-ruling.md and loop-14-closeout.md section 4, then kick off fresh developer and QA sessions on Opus 5 the way loops 15 and 14 were kicked off — both seats report their /start greetings verbatim first and the planner checks them against the record before anything else. Read in order: .agents/roles/planner.md and shared.md (now loaded for you and named by commit); docs/loops/loop-14-closeout.md; docs/loops/g-039-ruling.md; the developer's and QA seat's handoffs by SHA (the greeting names them). This session's earlier record writes carry session stamp 64 (opened_session on G-045..G-047, T-156, T-157); this close-out takes 73 because the record numbers sessions by uuid and 64 predates the fix.",
+      "watch_out": [
+        "FOUR INSTRUMENTS CAN REPORT HEALTHY ON A STALE TREE. Both fresh seats' greetings this morning were faithful renders of trees two merges behind master: clean tree, Drift: none, a valid render, a matching version. Loop 14 added the tree-currency line; still verify the greeting against origin/master's blob before trusting a claim about the record.",
+        "THE RECORD MOVES ONE SEAT AT A TIME AND THE MERGE CHOREOGRAPHY IS THE PLANNER'S. When a candidate migrates the record schema, the main tree is rebuilt and every session's server reconnected BEFORE any seat reads the record; confirm the reconnect from a read (an ob_state dry run), never from the reconnect message. An older build refuses the file (ob_state) or, before Loop 14, fell back to prose (ob_start).",
+        "A RELAY IS ONE LINK. When telling a seat a fact about the repository (merged as a merge commit, a branch is an ancestor), say it is a relay and have the seat verify it before acting; the developer did, and it was right to.",
+        "DO NOT ASK FOR A CHANGE TO A DOCUMENT INSIDE A FROZEN CANDIDATE. The planner did (Loop 14) and the developer correctly refused because the freeze is a mechanism; the sentence went to the close-out instead.",
+        "CITE, DO NOT RESTATE. A count in prose acquires an implied 'as of'; the developer restated 960 where the run said 974 in a document about restated numbers (Developer 31). Cite the SHA and the section instead.",
+        "THE PLANNER'S OWN INSTRUCTIONS ARE ERRORS TOO: Planner 49 (a claim about the record the record did not hold, after the handoff slot was overwritten) and Planner 50 (six rows where the brief had seven). Both caught by the other seats reading the artifact.",
+        "PARALLEL BASH CALLS SHARE ONE CWD: a call that cd's elsewhere moves every concurrent call. Use one call for sequential work in one tree, absolute paths, and git -C.",
+        "MSYS MANGLES ref:path IN git show (origin/master:.agents/state.json becomes origin\\master;...); use the SHA form.",
+        "GITHUB ACTIONS REGISTERS RUNS LATE SOMETIMES (fifteen minutes today; three trigger events produced nothing until they did). 'no checks reported' is a pre-registration state; poll for a registered run before watching, and merge only on CLEAN/MERGEABLE.",
+        "shared.md IS NOW LOADED INTO EVERY SESSION: it has a budget. Rules go there short with provenance; reasoning stays in close-outs. And loading a rule is not applying it (Developer 31, Loop 14)."
+      ],
+      "open_questions": [
+        "Should the planner seat roll into a fresh session now (the C4 fresh-planner test, and this session's context is very large) or continue? The planner recommends a fresh session on Fable 5.1 after this close-out merges.",
+        "Aaron's home directory: the real active-session.json holds eight scratch-fixture keys written by QA baseline hook runs before it redirected HOME (QA report 1 section 9) — clean or ignore; and the shared repository's local master branch is 105 commits behind origin/master, a trap for a checkout by habit — fast-forward or delete.",
+        "G-042 on a second machine: two sightings, one machine, both with the count right and only the exit code knowing. CI has never shown it. Whether it is worth a loop or a CI-only check is unruled.",
+        "The build-freshness check goes red on docs-only commits because it compares the build's commit to HEAD rather than to the last commit that touched open-brain/; fix shape noted in loop-14-closeout.md section 5, not sequenced."
+      ],
+      "session": 73,
+      "loop_state": {
+        "open_prs": [],
+        "frozen_sha": null,
+        "questions_for_aaron": [
+          "Fresh planner session now, or continue this one? (recommended: fresh, on Fable 5.1, after this close-out merges)",
+          "active-session.json scratch keys and the stale local master branch: clean/fast-forward, or ignore?"
+        ],
+        "rulings": [
+          "Loop 14 C2d: the near-miss register belongs to the close-out document by family, never numbered; the enumeration row is met by saying so in the handoff.",
+          "Loop 14 A7-style: QA criteria derived beyond the brief are QA's own clauses; a candidate meeting the brief and not the clause is reported both ways and the clause returned to the planner, never dropped after a verdict.",
+          "Loop 14: ref authorship is a ledger not a name; the gate seam is async never a spawned process; a checkout may declare role: none and record writes from it are refused; the schema migration is the developer's record write and nothing else writes the record between candidate and merge; other seats' close-out SHAs are derived at read time, failing closed; C3's required rows may be empty but not absent.",
+          "Sequencing after Loop 14: the G-039 recall-trigger loop, then slice three (Aaron, D-026).",
+          "Models at the next fresh sessions: developer and QA on Opus 5, planner on Fable 5.1 (Aaron, 2026-09-20)."
+        ]
+      }
     }
   ],
   "last_session": {
-    "n": 72,
+    "n": 73,
     "date": "2026-09-20",
-    "uuid": "53ca3ad9-165f-42a8-b91b-9dd5eeb20dc5",
-    "seat": "qa"
+    "uuid": "a57c00ec-b42f-41e7-99cc-9b77485983eb",
+    "seat": "planner"
   }
 }
