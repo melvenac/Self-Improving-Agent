@@ -49,6 +49,8 @@ export interface StateJsonResult {
   present: boolean;
   valid: boolean;
   error?: string;
+  /** Zod path of the first issue when `valid` is false. Branch on this, not on `error`. */
+  errorPath?: string;
   data?: State;
 }
 

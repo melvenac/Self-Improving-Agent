@@ -180,7 +180,10 @@ function renderOneHandoff(h: Handoff): string[] {
  */
 function describeProvenance(h: Handoff, options: RenderStateOptions): string {
   if (!options.projectRoot) return "commit not derived (no project root given)";
-  const p = findHandoffCommit(options.projectRoot, h.seat);
+  // `h` is the entry being rendered — read from disk. Passing it lets the walk
+  // refuse to name a commit when the working copy has moved on from HEAD, rather
+  // than printing HEAD's SHA above words HEAD does not contain (F1).
+  const p = findHandoffCommit(options.projectRoot, h.seat, undefined, h);
   if (p.commit) return `close-out ${p.commit.slice(0, 7)}${p.date ? ` ${p.date.slice(0, 10)}` : ""}`;
   return `no commit: ${p.note ?? "undetermined"}`;
 }

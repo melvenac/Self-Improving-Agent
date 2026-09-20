@@ -504,3 +504,106 @@ describe("server handlers", () => {
     });
   });
 });
+
+describe("F2 / F3 — a refusal must name the condition it is actually about", () => {
+  let tmp: string;
+
+  beforeEach(() => {
+    tmp = mkdtempSync(join(tmpdir(), "ob-refuse-"));
+    mkdirSync(join(tmp, ".agents"), { recursive: true });
+  });
+
+  afterEach(() => {
+    try { rmSync(tmp, { recursive: true }); } catch { /* Windows race */ }
+  });
+
+  const writeState = (o: Record<string, unknown>) =>
+    writeFileSync(join(tmp, ".agents", "state.json"), JSON.stringify(o, null, 2) + "\n");
+
+  const writeProse = (marker: string) => {
+    mkdirSync(join(tmp, ".agents", "SYSTEM"), { recursive: true });
+    writeFileSync(join(tmp, ".agents", "SYSTEM", "SUMMARY.md"), "# " + marker + "\n\nthe account\n");
+  };
+
+  it("F2: the reconnect/rebuild advice appears ONLY on a schema_version mismatch", async () => {
+    // The old condition was /schema|expected .* received|invalid/i, which matches
+    // almost every refusal ob_state can produce. QA saw it on seven refusals in a
+    // row, all against a schema-VALID record — including a plain bad argument.
+    cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+    const badOp = await handleState({
+      project_root: tmp,
+      session: 55,
+      expected_revision: 7,
+      ops: [{ op: "open_task", title: "x", priority: "P9" }],
+    });
+    const text = getText(badOp);
+    expect(text).toMatch(/invalid at priority/);
+    expect(text).not.toMatch(/reconnect/i);
+    expect(text).not.toMatch(/Rebuild the checkout/i);
+  });
+
+  it("F2: and it DOES appear on a schema_version mismatch, saying rebuild rather than reconnect", async () => {
+    // The other half, and the wording matters: a reconnect restarts the server
+    // from the SAME BUILD, so when the schema change is in a build this one does
+    // not have, reconnecting changes nothing. That is what actually happened.
+    writeState({ schema_version: 99, revision: 0 });
+    const r = await handleState({
+      project_root: tmp,
+      session: 1,
+      expected_revision: 0,
+      ops: [{ op: "set_objective", text: "x" }],
+    });
+    const text = getText(r);
+    expect(text).toMatch(/schema_version/);
+    expect(text).toMatch(/RECONNECT ALONE MAY NOT FIX IT/);
+    expect(text).toMatch(/Rebuild the checkout this server runs from/);
+  });
+
+  it("F3: ob_start REFUSES an unknown schema_version and does NOT fall back to prose", async () => {
+    // ob_state refused a record it could not parse; ob_start did not. It printed
+    // one notice line and then returned 59k characters of prose, so a session
+    // started from a stale build against a migrated record got a greeting that
+    // looked like the pre-state.json regime. The merge choreography counts on
+    // that failure being loud, and it was loud on the WRITE side only.
+    writeState({ schema_version: 99, revision: 0 });
+    writeProse("PROSE-SENTINEL");
+
+    const res = await handleStart({ project_root: tmp });
+    const text = getText(res);
+    expect(res.isError).toBe(true);
+    expect(text).toMatch(/STATE RECORD REFUSED/);
+    expect(text).toMatch(/NOT falling back to the prose files/);
+    // The prose must not be in the return at all. The point is that it is a
+    // different and older account, not that it carries a warning.
+    expect(text).not.toMatch(/PROSE-SENTINEL/);
+  });
+
+  it("F3: an ABSENT state.json still keeps the prose regime", async () => {
+    // Narrow on purpose, and ruled: absence is the pre-state.json case, which is
+    // supported. Only a PRESENT file whose version this build does not know
+    // refuses. Turning a fix into an outage for every project without a record
+    // would be the larger bug.
+    writeProse("PROSE-SENTINEL");
+
+    const res = await handleStart({ project_root: tmp });
+    const text = getText(res);
+    expect(res.isError).toBeUndefined();
+    expect(text).toMatch(/PROSE-SENTINEL/);
+    expect(text).not.toMatch(/STATE RECORD REFUSED/);
+  });
+
+  it("F3: a MALFORMED but known-version record still falls back, rather than refusing", async () => {
+    // The distinction the errorPath branch exists for: "this build cannot read
+    // this VERSION" is not "this file is broken". For the second, the prose is
+    // the best available answer.
+    writeState({ schema_version: 2, revision: -1 });
+    writeProse("PROSE-SENTINEL");
+
+    const res = await handleStart({ project_root: tmp });
+    const text = getText(res);
+    expect(res.isError).toBeUndefined();
+    expect(text).toMatch(/invalid at revision/);
+    expect(text).toMatch(/falling back to files/);
+    expect(text).toMatch(/PROSE-SENTINEL/);
+  });
+});

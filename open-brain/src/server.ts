@@ -303,6 +303,30 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         projectRoot,
       }));
     } else {
+      // F3: an unknown schema_version REFUSES, with no prose fallback.
+      //
+      // `ob_state` already refused a record it could not parse; `ob_start` did
+      // not — it printed one notice line and then fell back to 59k characters of
+      // prose, so a session started from a stale build against a migrated record
+      // got a greeting that looked like the pre-state.json regime. The merge
+      // choreography counts on that failure being loud, and it was loud on the
+      // write side only.
+      //
+      // Narrow on purpose: this is the VERSION being unknown to this build, not
+      // any invalid file. A record that is merely malformed still falls back,
+      // because the prose is then the best available answer.
+      if (sj.present && !sj.valid && sj.errorPath === "schema_version") {
+        lines.push(
+          `\nSTATE RECORD REFUSED: ${sj.error}.`,
+          `This build cannot read this record's schema version. NOT falling back to the prose files: they are a DIFFERENT and older account of the project, and a greeting built from them would look ordinary while describing a state the record has moved past.`,
+          `Rebuild the checkout this process runs from against a commit carrying the record's schema, then start again.`,
+        );
+        const text = lines.join("\n");
+        return {
+          content: [{ type: "text", text: `${text}\n\nTotal returned words: ${countWords(text)} (~${estimateTokens(text)} tokens)` }],
+          isError: true,
+        };
+      }
       if (sj.present && !sj.valid) {
         lines.push(`\nstate.json invalid at ${sj.error} — falling back to files`);
       }
@@ -381,9 +405,19 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
       // cause may be that this server process holds a schema older than the file
       // — an MCP server keeps its schema for the life of the process, and only a
       // human can reconnect it.
-      if (/schema|expected .* received|invalid/i.test(r.error ?? "")) {
+      // F2: ONLY on a schema_version mismatch, and branching on the parse
+      // PATH rather than on the wording. The old condition was
+      // /schema|expected .* received|invalid/i, which matches nearly every
+      // refusal this tool can produce — `ops[0] invalid at priority` is an
+      // ordinary bad argument and was told to reconnect the server.
+      //
+      // And the advice itself was wrong. A reconnect restarts the server from
+      // the SAME BUILD; when the schema change lives on a branch that build does
+      // not have — which is the case that actually occurred — reconnecting
+      // changes nothing. What is needed is a build carrying the schema.
+      if (r.error_path === "schema_version") {
         lines.push(
-          `If the state schema changed this session, this server may be holding the old one: ask Aaron to run \`/mcp reconnect open-brain\`, then re-run \`ob_sync\` — its state-schema check reports which process parsed the file. Confirm by a read ordered after the write, never by the reconnect message: a stale server reports success.`,
+          `This process's schema does not match the file's. A RECONNECT ALONE MAY NOT FIX IT: it restarts this server from the same build, so if the schema change is in a build this one does not have — a branch, or a checkout that has not been rebuilt — nothing changes. Rebuild the checkout this server runs from, then reconnect it, then confirm with \`ob_sync\`'s state-schema check, which reports which process parsed the file. Confirm by a read ordered after the write, never by the reconnect message: a stale server reports success.`,
         );
       }
       return { content: [{ type: "text", text: lines.join("\n") }], isError: true };

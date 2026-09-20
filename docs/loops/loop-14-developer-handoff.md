@@ -9,6 +9,11 @@
 
 ---
 
+> **SECOND CANDIDATE.** The first was `7e1c041`; QA's report is at `867790b` on `qa/loop-14-report`.
+> Eight of nine rows passed, six mutants all red, and the honest no was **C2d** — the near-miss
+> register, sorted below in §3. Four of QA's findings ride with this candidate because the SHA had to
+> move for that sentence anyway; each was seen red first. §9 lists them.
+
 ## 1. Commits, in order
 
 | SHA | What |
@@ -18,6 +23,8 @@
 | `de4674d` | C2 + C3's rows + G-047 + T-157 + `role: none`; schema v1 → v2, all three `state.json` copies |
 | `ff0c482` | Derive a handoff's close-out from its words, not its bytes |
 | `1e40e23` | C3: `open-brain detach` as a command; `end.md` and `shared.md` updated |
+| `7e1c041` | Record write, session 71 — first candidate |
+| *(this one)* | C2d sorted; F1–F4 repaired; §6's designed-door sentence |
 
 ## 2. What to check first, because it is the thing most likely to be wrong
 
@@ -67,6 +74,26 @@ field is run, an optional one is remembered, and remembering is the failure C3 n
 **Verified against the real tree, not a fixture:** `T-151` and `T-153` — the two actually evicted —
 are both detected, and **16 of 36 task ids are NOT cited, so the guard can still fire.** I checked
 that specifically: a protection that keeps everything cannot fail and is not a protection.
+
+**C2d — the enumeration, as the test of the shape.** Every item the re-brief's C2 list and C3 table
+name, sorted into *carried by the record* or *carried by something else*:
+
+| Item | Where it lives | Carried by |
+| --- | --- | --- |
+| open PRs and which were QA'd | `loop_state.open_prs[{ref, qa_status, note}]` | the record |
+| the SHA frozen for a QA in progress | `loop_state.frozen_sha` | the record |
+| questions pending for Aaron | `loop_state.questions_for_aaron` | the record |
+| rulings made mid-loop | `loop_state.rulings` | the record |
+| Aaron's standing rulings | `.agents/roles/shared.md`, loaded and printed by C1 | tracked role knowledge |
+| the detach procedure | `open-brain detach` | a command |
+| **the near-miss register** | **`docs/loops/*-closeout.md`, by family and never numbered** | **the close-out document** |
+
+**The near-miss register is not a record field and is not meant to become one.** Ruled by the
+planner, 2026-09-20: the loop close-outs are the record's document layer, and the register has lived
+there since Loop 13. Its entries are *families of near-miss*, deliberately uncounted — a numbered
+list of them would invite exactly the negotiation over the number that `shared.md` forbids for error
+entries. It is sorted here, into the close-out, rather than left unmentioned; **QA was right that the
+criterion was not met by the candidate it evaluated, because nothing said so anywhere.**
 
 **C3 — detach.** `open-brain detach`. Dirty tree refused with paths; commits not on `origin/master`
 refused with their subjects (`--force` overrides deliberately); fetches first; reads the end state
@@ -148,7 +175,12 @@ same question.
 
 **Repaired without a direct write:** the auto-mode classifier denied editing
 `~/.claude/open-brain/active-session.json` as Self-Modification, correctly. Re-running the hook with
-a well-formed payload restored the right uuid through the program's own door. **The earlier `{}`
+a well-formed payload restored the right uuid through the program's own door.
+
+**THE DENIAL WAS CORRECT AND WAS NOT WORKED AROUND:** the repair went through the hook's own write
+path with the real session id in the payload, which is the designed door. Nothing wrote that file by
+hand. *(Said outright because a reader who sees "denied, then repaired" needs the sentence between,
+and inference is what fails at 3am six weeks from now.)* **The earlier `{}`
 payload was my shell eating backslashes**, not a hook defect; the hook's `try/catch` swallows a
 malformed payload and falls through to generating a uuid, which is worth knowing.
 
@@ -177,3 +209,76 @@ this tree, a skip and not a pass).
 The record is at **rev 53** on this branch. `expected_revision` must be 53, **from a build carrying
 schema v2** — an older build cannot read the file at all, which is the loud failure the `z.literal`
 is for.
+
+---
+
+## 9. Second candidate — QA's findings, repaired
+
+Four of QA's findings, each seen red first. They rode with the C2d sentence because that sentence
+moved the SHA anyway; none is a new feature.
+
+**F1 — the SHA and the words came from different places, and nothing said so.** The greeting derived
+another seat's close-out from HEAD while rendering its first line from disk, so after a `set_handoff`
+with no commit yet it printed `close-out 7e1c041` above words that commit does not contain. **The
+window is every `/end`:** the record is written before it is committed, so every seat's greeting
+passes through this state. A *new* uncommitted entry was already honest — it has no HEAD entry — so
+the two uncommitted cases read differently, which is what made it hard to see. Now the working copy
+is compared with HEAD's and **no SHA is offered at all** when they differ. A wrong SHA is worse than
+none, because a reader follows it. Comparison is on the seat's **words**, so filling `loop_state` in
+memory does not make the greeting disown its commit — the same rule as §5.2.
+
+**F2 — the reconnect advice fired on almost every refusal.** The condition was
+`/schema|expected .* received|invalid/i`, which matches `ops[0] invalid at priority` — an ordinary
+bad argument told to reconnect the server. QA saw seven in a row against a schema-valid record.
+`parseState` now returns the zod **path** as data and callers branch on that, never on the wording.
+**And the advice itself was wrong:** a reconnect restarts the server from the *same build*, so when
+the schema change is on a branch that build does not have — which is what actually happened here —
+reconnecting changes nothing. It now says rebuild the checkout the server runs from.
+
+**F3 — `ob_state` refused a v2 record; `ob_start` did not.** It printed one notice line and fell back
+to 59k characters of prose, so a session on a stale build against a migrated record got a greeting
+that looked like the pre-`state.json` regime. **The merge choreography counts on that failure being
+loud, and it was loud on the write side only.** `ob_start` now refuses a *present* record whose
+`schema_version` this build does not know, in words, with no prose fallback. Deliberately narrow, and
+ruled: an **absent** `state.json` keeps the prose regime, and a record that is merely malformed still
+falls back — "this build cannot read this version" is not "this file is broken", and for the second
+the prose is the best available answer.
+
+**F4 — a malformed payload was swallowed, and the hook then invented an answer.** It read
+`process.cwd()` — the shell's directory, not the session's — greeted the wrong project plausibly,
+generated a session uuid and stamped it into that project's slot. Both seats hit it through the same
+mechanism: a Windows path in the payload whose backslashes are invalid JSON escapes. **Absent and
+malformed are not the same input.** Absent means nothing was offered and is supported; malformed
+means the caller tried to say something and this process could not hear it. Now: refuse, write
+nothing, exit non-zero.
+
+**Ruled with it:** a *well-formed* payload carrying no `session_id` also writes nothing to the slot.
+Printing a generated uuid is fine — `/start` registers it — but the slot is the checkout's session
+identity, read as a fallback by every later write, and stamping a value nobody asked for over it is
+the defect whatever the payload's shape. The hook says it did not write, because a slot not written
+and a slot written correctly look identical afterwards. **This is the identity-reassignment
+observation from §6, closed in the code before it has a gap number.**
+
+### The test that asserted the defect
+
+`cli-bootstrap.test.ts` carried *"does not crash on malformed stdin"*, whose stated reasoning was
+*"malformed stdin means no usable payload, so a UUID is generated rather than the session losing
+provenance entirely."* The second half is true; the first half is the mistake, and it pinned the bug
+in place for however long it stood. Replaced, with that reasoning quoted in the replacement.
+
+### And a third vacuous assertion, in this repair
+
+The first version of the slot tests checked `join(home, ".claude", "open-brain",
+"active-session.json")` — **a path the hook never writes under test**, because `tests/setup-env.ts`
+sets `OPEN_BRAIN_ACTIVE_SESSION` globally and the spawned process inherits it. So *"writes nothing to
+the slot"* passed whatever the code did. Caught only because the **positive** case failed against the
+same wrong path. The slot path is now pinned per test. **Third of that family this loop**, and the
+one that best shows the shape: a negative assertion against a path nothing writes is indistinguishable
+from a passing guard.
+
+### Mutants, this candidate
+
+Four, each the defect being repaired, all caught: the slot-write guard removed; the malformed-payload
+refusal swallowed; F1's uncommitted comparison removed. A fifth was written and **discarded as
+invalid** — it broke syntax rather than behaviour, so its red said nothing, and `tsc` clean is now
+part of calling a mutant valid.

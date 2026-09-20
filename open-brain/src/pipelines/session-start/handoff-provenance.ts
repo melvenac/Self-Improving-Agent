@@ -51,13 +51,36 @@ export const DEFAULT_BOUND = 50;
 export function findHandoffCommit(
   projectRoot: string,
   seat: Seat,
-  bound: number = DEFAULT_BOUND
+  bound: number = DEFAULT_BOUND,
+  current?: Handoff
 ): HandoffProvenance {
   const base: HandoffProvenance = { seat, commit: null, date: null, searched: 0, bound, note: null };
 
   const head = handoffAt(projectRoot, "HEAD", seat);
   if (head === null) {
     return { ...base, note: `no committed handoff for "${seat}" at HEAD — nothing to trace` };
+  }
+
+  // F1 — THE SHA IS DERIVED FROM HEAD AND THE WORDS ARE RENDERED FROM DISK, so
+  // when they disagree the greeting prints a commit that does not contain the
+  // line beneath it. Observed by QA: after `set_handoff` with new words and no
+  // commit yet, the greeting showed `close-out 7e1c041` above the NEW first
+  // line, and nothing said they were from different places.
+  //
+  // THE WINDOW IS EVERY `/end`: the record is written before it is committed, so
+  // between those two moments every seat's greeting is in this state.
+  //
+  // A NEW uncommitted entry was already honest — it has no HEAD entry, so it
+  // took the branch above. A MODIFIED one was not. The two uncommitted cases now
+  // read alike, and this one fails closed: no SHA is offered at all, because a
+  // wrong SHA is worse than none. A reader follows a SHA.
+  if (current && stable(current) !== stable(head)) {
+    return {
+      ...base,
+      note:
+        `uncommitted — the working copy of this seat's handoff differs from HEAD, so no commit contains these words. ` +
+        `Commit the record, or read HEAD's version for the committed one.`,
+    };
   }
 
   const log = gitOut(projectRoot, ["log", `--max-count=${bound}`, "--format=%H%x00%cI", "--", STATE_REL]);

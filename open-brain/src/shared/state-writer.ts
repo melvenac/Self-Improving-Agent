@@ -103,6 +103,11 @@ export interface WriteResult {
   notes: string[];
   dry_run: boolean;
   error?: string;
+  /**
+   * When the refusal came from parsing `state.json`, the zod path of the first
+   * issue. Callers branch on THIS, never on the wording of `error`.
+   */
+  error_path?: string;
 }
 
 export const STATE_REL = ".agents/state.json";
@@ -136,8 +141,8 @@ export function readState(projectRoot: string): { ok: true; data: State; path: s
 
 export function applyStateOps(projectRoot: string, options: ApplyStateOptions): WriteResult {
   const dryRun = options.dry_run === true;
-  const refuse = (before: number, error: string): WriteResult => ({
-    ok: false, revision_before: before, revision_after: before, applied: [], dropped_task_ids: [], kept_cited_task_ids: [], removed_gap_ids: [], rendered: [], notes: [], dry_run: dryRun, error,
+  const refuse = (before: number, error: string, errorPath?: string): WriteResult => ({
+    ok: false, revision_before: before, revision_after: before, applied: [], dropped_task_ids: [], kept_cited_task_ids: [], removed_gap_ids: [], rendered: [], notes: [], dry_run: dryRun, error, error_path: errorPath,
   });
 
   const statePath = join(projectRoot, STATE_REL);
@@ -145,7 +150,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
     return refuse(-1, `${STATE_REL} is absent — this writer never creates it; run the migration first`);
   }
   const parsed = parseState(readFileSync(statePath, "utf-8"));
-  if (!parsed.ok) return refuse(-1, `${STATE_REL} invalid at ${parsed.error} — refusing to write over a file that does not validate`);
+  if (!parsed.ok) return refuse(-1, `${STATE_REL} invalid at ${parsed.error} — refusing to write over a file that does not validate`, parsed.path);
 
   const before = parsed.data.revision;
   if (options.expected_revision !== before) {

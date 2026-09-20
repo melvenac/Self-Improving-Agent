@@ -146,6 +146,54 @@ describe("findHandoffCommit", () => {
     expect(p.note).toMatch(/no SHA is claimed/);
   });
 
+  it("F1: REFUSES a SHA when the working copy differs from HEAD — the /end window", () => {
+    // QA's observation on candidate 7e1c041: after `set_handoff` with new words
+    // and no commit, the greeting printed `developer (session 80): close-out
+    // 7e1c041` above the NEW first line. The SHA came from HEAD's committed
+    // entry, the line from disk, and nothing said they disagreed.
+    //
+    // The window is EVERY /end: the record is written before it is committed.
+    writeV2(dir, 1, [handoff("developer", "committed words", 5)]);
+    const committed = commit(dir, "developer close-out");
+
+    // Same shape the greeting is in mid-/end: HEAD still has the old entry, the
+    // caller is rendering the new one.
+    const rewritten = handoff("developer", "REWRITTEN in the working tree, not committed", 5);
+    const p = findHandoffCommit(dir, "developer", undefined, rewritten);
+
+    expect(p.commit).toBeNull();
+    expect(p.note).toMatch(/uncommitted/);
+    expect(p.note).toMatch(/differs from HEAD/);
+    // Fails closed: a wrong SHA is worse than none, because a reader follows it.
+    expect(p.note).not.toMatch(new RegExp(committed.slice(0, 7)));
+  });
+
+  it("F1: still names the commit when the working copy MATCHES HEAD", () => {
+    // The other half. Refusing whenever `current` is supplied would make the
+    // guard a ban, and the ordinary case — a committed record — must still
+    // resolve.
+    writeV2(dir, 1, [handoff("developer", "committed words", 5)]);
+    const committed = commit(dir, "developer close-out");
+
+    const same = handoff("developer", "committed words", 5);
+    const p = findHandoffCommit(dir, "developer", undefined, same);
+    expect(p.commit).toBe(committed);
+    expect(p.note).toBeNull();
+  });
+
+  it("F1: a change only to loop_state is NOT 'uncommitted' — the words are the identity", () => {
+    // Consistent with §5.2's fix: the container is not the words. Filling
+    // loop_state in memory must not make the greeting disown the commit.
+    writeV2(dir, 1, [handoff("qa", "same words", 5)]);
+    const committed = commit(dir, "qa close-out");
+
+    const withRows = {
+      ...handoff("qa", "same words", 5),
+      loop_state: { open_prs: [], frozen_sha: "abc", questions_for_aaron: [], rulings: [] },
+    };
+    expect(findHandoffCommit(dir, "qa", undefined, withRows).commit).toBe(committed);
+  });
+
   it("says there is nothing to trace when that seat has no handoff", () => {
     writeV2(dir, 1, [handoff("qa", "only qa here")]);
     commit(dir, "one");

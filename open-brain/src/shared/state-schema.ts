@@ -220,7 +220,19 @@ export type OpenPr = z.infer<typeof OpenPrSchema>;
 
 export const SCHEMA_VERSION = 2 as const;
 
-export type ParseResult = { ok: true; data: State } | { ok: false; error: string };
+/**
+ * `path` is the zod path of the FIRST issue, dot-joined, or `$` for the root —
+ * the same value the `error` string leads with, exposed as data.
+ *
+ * It exists because callers were pattern-matching the message. `ob_state`
+ * appended "the server may be holding an old schema, ask Aaron to reconnect" on
+ * `/schema|expected .* received|invalid/i`, which matches almost every refusal
+ * it can produce — including `ops[0] invalid at priority`, an ordinary bad
+ * argument with nothing to do with the schema. A scan that broad is the
+ * prohibition-vs-instance family (G-040) pointed at error text: it fired on the
+ * word, not on the condition.
+ */
+export type ParseResult = { ok: true; data: State } | { ok: false; error: string; path: string };
 
 /**
  * Parses JSON text into a validated State. The error string names the zod
@@ -232,13 +244,13 @@ export function parseState(text: string): ParseResult {
   try {
     raw = JSON.parse(text);
   } catch (err) {
-    return { ok: false, error: `$: not valid JSON — ${err instanceof Error ? err.message : String(err)}` };
+    return { ok: false, error: `$: not valid JSON — ${err instanceof Error ? err.message : String(err)}`, path: "$" };
   }
   const result = StateSchema.safeParse(raw);
   if (result.success) return { ok: true, data: result.data };
   const issue = result.error.issues[0];
   const path = issue.path.length === 0 ? "$" : issue.path.map(String).join(".");
-  return { ok: false, error: `${path}: ${issue.message}` };
+  return { ok: false, error: `${path}: ${issue.message}`, path };
 }
 
 /**
