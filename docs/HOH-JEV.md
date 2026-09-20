@@ -339,6 +339,15 @@ prompt, a payload log, an artifact, a commit, or a conversation. **Nobody pastes
 session.** The client **redacts before logging** and **fails closed with a message naming the
 variable** when it is absent.
 
+**What redaction does NOT cover, added by the developer seat on QA's F4, 2026-09-20.** The redactor
+runs over the recorded `G_*.json` and over log lines. It does **not** run over the request body, and
+that is by design: the `state` is the thing the model judges, and redacting it would change the
+question. So **a secret that reaches a role's deliverable travels twice** — to the API in the request,
+and into the `D_t` commit in the repository — while the gate record beside it reads `[REDACTED]` and
+looks clean. Observed by QA with a planted key in a plan's `objective`. The mechanism that keeps a
+credential out of a payload is that nothing puts one in a deliverable; there is no second line of
+defence there, and this sentence exists so nobody reads the redactor as one.
+
 ## 9. Not verified
 
 - **Pricing figures** from the original brief. Not load-bearing for any policy here. Latency was
