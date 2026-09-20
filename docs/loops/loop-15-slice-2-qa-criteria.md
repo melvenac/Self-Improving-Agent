@@ -4,7 +4,10 @@
 `docs/loops/loop-15-slice-2-brief.md` §2–§5 at `origin/master` @ `293cddb`, its amendment 1
 (`docs/loops/loop-15-slice-2-brief-amendment-1.md` at `7fc2f3e` on
 `origin/docs/loop-15-slice-2-amendment-1`, not yet merged — ruling 8 becomes a ledger and A2 gains a
-fourth case), and `docs/HOH-JEV.md` §3, §4, §8 at the same base.
+fourth case), and `docs/HOH-JEV.md` §3, §4, §8 at the same base. **Amendment 2** (ruled by the
+planner by A2A on 2026-09-20 after this file's first commit `71f9760`; the planner is writing it as
+tracked text) resolves the four questions in §9 — the rulings are recorded inline where they change
+a row, marked **RULED**.
 **Handoffs cited by close-out SHA, not by the rendered view** (amendment 1 §2): the developer's at
 `git show b92c1ae:.agents/SESSIONS/next-session.md`; the previous QA seat's at
 `git show 293cddb:.agents/SESSIONS/next-session.md`.
@@ -220,11 +223,11 @@ untested**, and **blind spot** (what the procedure cannot see).
   against the accepted candidate: the response is `jev-1.13.0` or a later version the docs name,
   each answer is well-typed, the `score` legend is an object, and the two `G_*.json` files record it
   with `sent: true`. QA records request ids, never the key. Run once; not in CI.
-- **When:** last, and only after A1–A6, A8 and A9 have been observed on the frozen SHA with no
-  fail — the one call is spent on a candidate that has passed everything observable without it.
-  If any row failed, A7 is **untested** with that reason. If a later candidate supersedes the one
-  the call was made against, A7 on the new SHA is **untested** unless the planner authorises a
-  second call (§9 Q3).
+- **When — RULED (amendment 2, §9 Q3):** last, after A1–A6, A8 and A9 have been observed on the
+  frozen SHA with no fail. The live pair — one call per gate — runs on **every** candidate that
+  passes every other row, not once per loop; a superseded candidate that reached A7 does not carry
+  its observation forward to the next SHA. If any row failed, A7 is **untested** on that candidate
+  with that reason. The discipline is that it is last, not that it is rare.
 - **Procedure:** `[ -n "$TYPESAFE_API_KEY" ]` prints `set` (never the value). Run the candidate's
   documented live command against a scratch repo with `--loop t001`; capture exit and the log to a
   file. Parse `G_plan.json` and `G_done.json`: `sent: true`; the resolved `model` recorded with the
@@ -249,19 +252,21 @@ untested**, and **blind spot** (what the procedure cannot see).
 
 ### A8 — slice one's rows hold on the final candidate
 
-- **Required:** slice one's A1–A6 hold on the final candidate, re-run by QA.
+- **Required:** slice one's acceptance rows hold on the final candidate, re-run by QA. **RULED
+  (amendment 2, §9 Q1): all seven** — the brief's "A1–A6" was a miscount of a seven-row table
+  (Planner 50); slice one's A7 is inside this row's verdict, not preservation.
 - **Procedure:** re-run the procedures of `docs/loops/loop-15-qa-criteria.md` §2 (at `293cddb`)
-  rows A1–A6 at the new SHA, in a fresh scratch repo, with the same shapes: the three artifacts and
+  rows A1–A7 at the new SHA, in a fresh scratch repo, with the same shapes: the three artifacts and
   their schema validation by an independent validator (A1); the three invalid `D_t` shapes retried
   and the cap recorded, `repair_targets: []` accepted (A2); the frozen ref and the moved-tree
   refusal, HEAD moved and tree dirty reported separately (A3); the out-of-allowlist write refused
   and reverted, uncommitted and **committed** both (A4); zero-padded tags and `git reset --hard
   loop-001-base && git clean -fdx` restoring the pre-loop state (A5); dry-run sends nothing and the
-  no-network test is seen red (A6). Slice one's **A7** (deterministic verdicts from exit codes, no
-  text inference; every spawn an args array with no shell) is re-run the same way and reported
-  under §3 as **P5**, not as part of this row's verdict — §9 Q1.
-- **Pass:** every one of the six passes on the new SHA by its own row's definition. **Fail:** any
-  one fails. **Untested:** any one's procedure cannot complete, named individually.
+  no-network test is seen red (A6); deterministic verdicts from exit codes with no text inference,
+  every spawn an args array with no shell, and a forced-failure check recording `fail` in
+  `E_t.json` (A7).
+- **Pass:** every one of the seven passes on the new SHA by its own row's definition. **Fail:**
+  any one fails. **Untested:** any one's procedure cannot complete, named individually.
 - **Blind spot:** the same as each row's own, at `loop-15-qa-criteria.md`.
 
 ### A9 — every source-text scan has a must-match and a must-not-match fixture
@@ -303,7 +308,7 @@ untested**, and **blind spot** (what the procedure cannot see).
 | **P2** | `sync --check` clean in the QA tree, zero skipped, `module-boundary` green | after build and analyze (§1): `node open-brain/build/cli.js sync --check > file 2>&1; rc=$?`, every line read unfiltered | **pass:** `rc` 0, `0 issues`, `0 skipped`, `module-boundary [pass]` with its walked-file count, `gitnexus-index [pass]` at the candidate SHA, `build-freshness [pass]` at the candidate SHA. **fail:** any issue; any skip; `module-boundary` naming a memory import. |
 | **P3** | `ob_state` remains the only writer of `.agents/state.json` | grep the harness source and tests for `state.json` and `.agents/`, validated against `open-brain/src/pipelines/state-writer.ts` first; read every hit | **pass:** no write path outside `ob_state`. **fail:** any. |
 | **P4** | No network in the test suite; the runtime never merges, pushes or creates a release tag | the deny-list test still green; the no-network test seen red (A8/A6); the fake server in A4 loopback-only; `git for-each-ref` in every scratch repo after every run shows only `refs/heads/*` the fixture made and `refs/tags/loop-001-*`; the suite run with `env -u TYPESAFE_API_KEY` and again with a planted value gives the same totals | **pass:** all of those. **fail:** any test resolving a non-loopback host; any `v*` tag or remote ref written by a run. *Limit:* I cannot observe the network from outside on this machine; this is code-path plus test evidence, and the report says so. |
-| **P5** | Slice one's A7: verdicts from exit codes; no `shell: true`; no template-string commands | as `loop-15-qa-criteria.md` §2 A7, re-run on the new SHA — including a forced-failure check recording `fail` in `E_t.json` | as that row. Reported here pending §9 Q1. |
+| **P5** | *(folded into A8 — RULED, amendment 2, §9 Q1)* Slice one's A7 is part of A8's verdict; the id is kept so the numbering below does not shift | — | see A8. |
 | **P6** | `/start`, `/end`, the hook contract, `project-template/` untouched | `git diff --stat 293cddb..<SHA> -- .claude/commands/ project-template/ scripts/ .agents/roles/` | **pass:** empty (a roles change is reported, not failed). **fail:** any hunk in commands, template or scripts. A diff, not a behaviour test. |
 | **P7** | Version bumped once in `package.json` with a CHANGELOG entry; `/sync` clean on it | `git diff 293cddb..<SHA> -- package.json CHANGELOG.md`; P2 covers consistency | **pass:** one bump, one entry. **finding** otherwise, not a fail — the bump is the developer's and the tag is Aaron's (brief §8). |
 
@@ -402,19 +407,24 @@ pre-existing at the base and are not attributed to the candidate unless their te
    confirmed absent. Commit on `qa/loop-15-slice-2-report`, gated on `sync --check`'s exit read
    into a variable, and tell the planner by SHA. **Do not push.**
 
-## 9. Returned to the planner — readings I will apply unless ruled otherwise
+## 9. Returned to the planner at `71f9760` — all four RULED (amendment 2, 2026-09-20)
 
-1. **A8 says "A1–A6"; slice one's §4 had seven rows.** Slice one's A7 (exit codes, no shell) is the
-   row `V-041` rests on and the one the checks-scan in A9 protects. Reading applied: re-run it and
-   report it as **P5** under preservation; it does not enter A8's verdict. If the planner rules it
-   into A8, the row's definition is already written and nothing widens.
+1. **A8 says "A1–A6"; slice one's §4 had seven rows.** Reading applied at `71f9760`: re-run slice
+   one's A7 as P5 outside A8's verdict. **RULED otherwise:** A8 covers all seven; the "A1–A6" was
+   the planner miscounting the brief it wrote (Planner 50). A8 and P5 above are updated.
 2. **A6's "caught by the policy schema's drift check".** A `D-021` drift check compares a zod source
-   to its derived JSON; it cannot by itself see a `0.7` typed into a prompt string. Reading applied:
-   the behaviour is binding — a threshold literal outside `policies/` is caught by **some** check
-   with its own fixtures (A9) — and the mechanism's name is not; I report the form found.
-3. **A7's spend.** One live call, spent only on a candidate that passed every other row. If that
-   candidate is then superseded, the new SHA has no live observation. Reading applied: A7 is
-   `untested` on a superseding SHA unless the planner authorises a second call for it.
-4. **"Both SHAs" for a created ref (A2 case iv).** A ref that did not exist has no pre-stage SHA.
-   Reading applied: the record must say the ref was absent before the stage and name the SHA it was
-   created at; a record naming only one SHA with no statement of prior absence is a fail.
+   to its derived JSON; it cannot by itself see a `0.7` typed into a prompt string. **RULED as
+   read:** the behaviour binds — a threshold literal outside `policies/` is caught by a check with
+   its own positive and negative fixtures (A9's shape) — and the words "drift check" do not bind
+   the form. I report the form found.
+3. **A7's spend.** Reading applied at `71f9760`: one call, `untested` on a superseding SHA unless a
+   second is authorised. **RULED otherwise:** the live pair runs on every candidate that passes
+   every other row; a superseded candidate's observation does not carry forward. A7 is updated.
+4. **"Both SHAs" for a created ref (A2 case iv).** **RULED as read:** the record states the ref was
+   absent before the stage and names the SHA it was created at; a record naming one SHA with no
+   statement of prior absence is a fail.
+
+Two findings from the base, sent to the developer by the planner at the same time: A5 asserts §4's
+exact ids and kinds, so the placeholder questions at `293cddb` fail it; and the transport seam is
+**ruled async** rather than a spawned process — a spawned process in the live transport is now a
+fail on that ruling, not only a finding under §5.
