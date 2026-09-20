@@ -67,3 +67,13 @@ any seat reads the record**; the planner and QA trees rebuild before their first
 close-out write comes after all of that, on the new build. The fresh-session test (C4 as the
 re-brief wrote it) is run by Aaron and the planner after the merge and is the loop's acceptance of
 last resort, not QA's frozen-SHA verdict.
+
+## 5. Sequencing after Loop 14 — ruled by Aaron, 2026-09-20
+
+**After Loop 14 closes: the recall-trigger loop for `G-039`, then Loop 15 slice three.** The planner
+recommended it on the grounds that seven loops have stored knowledge and none has read any of it
+during work, so the system is a good process and not yet a self-improving one; Aaron agreed in one
+word. The constraint from `g-039-ruling.md` stands: the trigger is deterministic, fails closed on
+nothing, and the loop is handed both fixes — a trigger on a queried store and an unconditional read
+of a curated set. Slice three keeps `G-045` as its mechanical first repair. **Recorded here because
+the record is frozen while the developer holds Loop 14; it becomes a decision at the close-out write.**
