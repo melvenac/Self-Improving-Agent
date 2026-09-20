@@ -249,7 +249,11 @@ loop in this record, so the line is drawn where authority lives:
 - **Autonomous:** the plan gate, the developer done-gate, QA scoring, retry, rollback. Closed
   questions with criteria written in advance, run by the runtime with no human.
 - **Not autonomous:** the merge to master. **The runtime stops at a candidate commit and never
-  merges, pushes to master, or tags.**
+  merges, never pushes anything to a remote, and never creates a release tag.** Local tags in the
+  `loop-NNN-*` namespace are rollback bookkeeping and are permitted — the runtime refuses the network
+  git subcommands at the call site, so nothing it creates can leave the machine. *(Corrected
+  2026-09-19, amendment 2: this line originally said "or tags", which contradicted the brief's A5 and
+  had to be resolved by the developer's judgement. Planner 47.)*
 
 **Why the merge stays human, on evidence rather than nerves.** Every serious defect found recently
 passed the automated checks and was caught by a human question or a human-ordered real run. A gate
