@@ -4,10 +4,13 @@
 `docs/loops/loop-15-slice-2-brief.md` §2–§5 at `origin/master` @ `293cddb`, its amendment 1
 (`docs/loops/loop-15-slice-2-brief-amendment-1.md` at `7fc2f3e` on
 `origin/docs/loop-15-slice-2-amendment-1`, not yet merged — ruling 8 becomes a ledger and A2 gains a
-fourth case), and `docs/HOH-JEV.md` §3, §4, §8 at the same base. **Amendment 2** (ruled by the
-planner by A2A on 2026-09-20 after this file's first commit `71f9760`; the planner is writing it as
-tracked text) resolves the four questions in §9 — the rulings are recorded inline where they change
-a row, marked **RULED**.
+fourth case), and `docs/HOH-JEV.md` §3, §4, §8 at the same base. **Amendment 2**
+(`docs/loops/loop-15-slice-2-brief-amendment-2.md` at `16f2a5f`, PR #66) resolves the four
+questions in §9 — ruled by A2A on 2026-09-20 after this file's first commit `71f9760`, then written
+as tracked text; the rulings are recorded inline where they change a row, marked **RULED**. Both
+amendments (`7fc2f3e` PR #65, `16f2a5f` PR #66) are on `origin` as branches and **unmerged at time
+of writing**; they are cited by SHA, and the report will say whether they had merged by the time
+of the verdict.
 **Handoffs cited by close-out SHA, not by the rendered view** (amendment 1 §2): the developer's at
 `git show b92c1ae:.agents/SESSIONS/next-session.md`; the previous QA seat's at
 `git show 293cddb:.agents/SESSIONS/next-session.md`.
@@ -105,6 +108,21 @@ untested**, and **blind spot** (what the procedure cannot see).
   the accept-list is by name pattern rather than ledger; the control is refused. **Untested:** a
   stub cannot run a shell command during its stage without editing the candidate (it could in slice
   one; see `probe3.mjs`).
+- **RULED (planner, 2026-09-20, relaying a developer claim as a claim):** the developer reports
+  that a naive ref-watch renames slice one's D1–D3 breaches (a commit moves
+  `refs/heads/<branch>`), so the current branch's head is **deferred** to the older
+  commit-boundary check — a move of the current branch head (any commit, or `update-ref
+  refs/heads/<current> <sha>`) is refused as `stage-committed`, while the brief's three cases and
+  case (iv) report the new code. **The ruling so nobody negotiates a pass:** A2's observable is
+  the behaviour as written — the loop fails and the recorded reason **names the ref and both
+  SHAs** — for every ref-channel breach **including the current branch**. Which `FailureCode`
+  carries it is the developer's; whether the record for a current-branch move names the ref and
+  both SHAs is what I observe. A `stage-committed` record that names only HEAD's two SHAs and not
+  the ref is a **miss on A2 as written**, not a wording dispute. The claim itself (that the
+  deferral exists and behaves so) is verified at the candidate, not taken from the handoff: the
+  scratch fixture has a checked-out branch (`main`, as the runtime tests' fixture does), so
+  `refs/heads/main` is a real current branch there; a detached fixture would make this case
+  vacuous, and I say which the fixture was.
 - **Blind spot:** a snapshot-compare cannot see a ref moved and moved back within one stage, nor
   anything that reaches the repository outside `refs/` — the index, hooks, config, submodules,
   the reflog, packed-refs storage. Those are the open denominator (§6); the check must **state its
