@@ -35,6 +35,12 @@ import { runLoop, type LoopConfig } from "../../src/harness/runtime.js";
 import { StubDeveloper, StubPlanner, StubQa } from "../../src/harness/roles.js";
 import type { GateAnswer, GatePayload, GateTransport } from "../../src/harness/gate.js";
 import { exitingChecks, makeRepo, requireGit, type RepoFixture } from "./fixture.js";
+import {
+  scanThresholds,
+  thresholdLiterals,
+  thresholdScanRegions,
+  THRESHOLD_SCAN_TARGETS,
+} from "./threshold-scan.js";
 
 const PLAN_ANSWERS = {
   plan_mode: { type: "choice", choice: "mixed", confidence: 0.9 },
@@ -56,11 +62,12 @@ const DONE_ANSWERS = {
 class TableTransport implements GateTransport {
   readonly name = "table";
   readonly seen: GatePayload[] = [];
+  constructor(private readonly planAnswers: Record<string, unknown> = PLAN_ANSWERS) {}
   async dispatch(payload: GatePayload): Promise<GateAnswer> {
     this.seen.push(payload);
     return {
       gate: payload.gate,
-      answers: payload.gate === "plan" ? PLAN_ANSWERS : DONE_ANSWERS,
+      answers: payload.gate === "plan" ? this.planAnswers : DONE_ANSWERS,
       consulted: true,
       note: "fake",
       resolvedModel: "jev-1.13.0",
@@ -273,6 +280,122 @@ describe("gate policies", { timeout: 60_000 }, () => {
   /* --------------------------------------------------------------------- *
    * A6, half two + T-156 — the scan, with both fixtures
    * --------------------------------------------------------------------- */
+
+  /* --------------------------------------------------------------------- *
+   * A6 half two, second candidate — the scan's SCOPE was the defect
+   *
+   * QA planted `"… Answer at least 0.7 if so."` into the
+   * `has_observable_acceptance` prompt in `gate.ts` and the whole harness suite
+   * stayed green: 17/17 here, 234/234 overall. The detector was fine; it was
+   * pointed at one region of one file. §4 says thresholds must never live in a
+   * prompt, and the prompts were outside every scan.
+   * --------------------------------------------------------------------- */
+
+  describe("A6 half two — the scan covers the prompts and the gate context", () => {
+    it("names gate.ts and runtime.ts in its scope, not just policies.ts", () => {
+      const files = THRESHOLD_SCAN_TARGETS.map((t) => t.file).sort();
+      expect(files).toEqual(["gate.ts", "policies.ts", "runtime.ts"]);
+      // policies.ts is scanned from the marker down; the other two whole.
+      const policies = THRESHOLD_SCAN_TARGETS.find((t) => t.file === "policies.ts");
+      expect(policies?.from).toBe("Applying a policy");
+      expect(THRESHOLD_SCAN_TARGETS.find((t) => t.file === "gate.ts")?.from).toBeNull();
+    });
+
+    it("fires on a threshold planted in a PROMPT, and not on a comment about one", () => {
+      // The positive is QA's own plant, verbatim in shape.
+      const plantedPrompt = `{ id: "has_observable_acceptance", kind: "noul", prompt: "Does every criterion name a concrete observable? Answer at least 0.7 if so." }`;
+      expect(thresholdLiterals(plantedPrompt)).toEqual(["0.7"]);
+
+      // The near-miss: a sentence forbidding the thing is textually identical
+      // to an instance of it, so the scan must read code and not prose.
+      expect(thresholdLiterals("// no prompt may carry a threshold such as 0.7")).toEqual([]);
+      expect(thresholdLiterals("/* §4: thresholds like 0.7 live in policies/ */")).toEqual([]);
+
+      // And it must not fire on a version string, which is not a threshold.
+      expect(thresholdLiterals('const m = "jev-1.13.0";')).toEqual([]);
+    });
+
+    it("finds no threshold literal in any scanned region of the shipped source", () => {
+      const offenders = scanThresholds();
+      expect(
+        offenders,
+        `a threshold outside policies/*.json is a threshold nobody can change without a source ` +
+          `edit: ${offenders.map((o) => `${o.file}: ${o.literal}`).join(", ")}`,
+      ).toEqual([]);
+    });
+
+    it("proves it looked: every target exists and every region is non-empty", () => {
+      // A scan over a path that does not resolve, or a marker that is gone,
+      // would report a clean result having read nothing.
+      for (const region of thresholdScanRegions()) {
+        expect(region.text.length, `${region.file} scanned an empty region`).toBeGreaterThan(200);
+      }
+      expect(thresholdScanRegions()).toHaveLength(THRESHOLD_SCAN_TARGETS.length);
+    });
+  });
+
+  /* --------------------------------------------------------------------- *
+   * F5 — a threshold on a question with no referent
+   * --------------------------------------------------------------------- */
+
+  describe("F5 — addresses_top_failures has no referent when there are no prior failures", () => {
+    const ctx = (over: Record<string, boolean> = {}) => ({
+      deterministicFailure: false,
+      qaHistorySupportsStopShip: false,
+      hasPriorFailures: false,
+      ...over,
+    });
+
+    it("does not threshold the answer when prior_failures is empty", () => {
+      // The developer's accidental live call rejected the stub plan on
+      // `addresses_top_failures 0.32 < 0.5` with `prior_failures: []`. Asking a
+      // model whether a plan addresses the top failures when there are none,
+      // and then thresholding the answer, is scoring a question with no
+      // referent — and on the CLI path it makes the done gate unreachable, so
+      // A7 would observe one gate rather than two.
+      const answers = { ...PLAN_ANSWERS, addresses_top_failures: { type: "noul", noul: 0.32 } };
+      const d = decidePlanGate(answers, loadPolicies().plan, ctx());
+      expect(d.verdict).toBe("proceed");
+      expect(d.reasons.join(" ")).not.toContain("addresses_top_failures");
+    });
+
+    it("still thresholds it when there ARE prior failures", () => {
+      const answers = { ...PLAN_ANSWERS, addresses_top_failures: { type: "noul", noul: 0.32 } };
+      const d = decidePlanGate(answers, loadPolicies().plan, ctx({ hasPriorFailures: true }));
+      expect(d.verdict).toBe("reject");
+      expect(d.reasons.join(" ")).toContain("addresses_top_failures");
+    });
+
+    it("records the applicability in the decision, so a reader is not left to infer it", () => {
+      const answers = { ...PLAN_ANSWERS, addresses_top_failures: { type: "noul", noul: 0.32 } };
+      const d = decidePlanGate(answers, loadPolicies().plan, ctx());
+      expect(d.notApplicable).toContain("addresses_top_failures");
+    });
+
+    it("the done gate is REACHABLE live with stub roles and the shipped policy", async () => {
+      // F5's consequence, at the runtime rather than in the decision function.
+      const repo2 = makeRepo("harness-f5-");
+      try {
+        const transport = new TableTransport({
+          ...PLAN_ANSWERS,
+          addresses_top_failures: { type: "noul", noul: 0.32 },
+        });
+        const r = await runLoop({
+          repoRoot: repo2.root,
+          loop: "t001",
+          roles: { planner: new StubPlanner(), developer: new StubDeveloper(), qa: new StubQa() },
+          checks: exitingChecks(0, 0),
+          gateMode: "live",
+          transport,
+          log: () => {},
+        });
+        expect(r.failure, r.failure?.reason).toBeNull();
+        expect(transport.seen.map((p) => p.gate)).toEqual(["plan", "developer-done"]);
+      } finally {
+        await repo2.cleanup();
+      }
+    });
+  });
 
   describe("T-156 — no threshold hides in the decision code", () => {
     const MARKER = "Applying a policy";

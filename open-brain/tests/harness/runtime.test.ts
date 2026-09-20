@@ -637,6 +637,14 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       const r = await runLoop(config({ gateMode: "live", env: stripped }));
       expect(r.failure?.code).toBe("gate-unavailable");
       expect(r.failure?.reason).toContain("TYPESAFE_API_KEY");
+
+      // QA's F3: the refusal came AFTER the planner stage, leaving
+      // loop-001-base and a FAILED.md in the target repository. Policy
+      // readability is checked at preflight; a missing credential is the same
+      // kind of fact and is now checked in the same place.
+      expect(r.failure?.stage, "the key check ran after a stage").toBe("preflight");
+      expect(resolveRef(repo.root, "loop-001-base"), "the base tag was created anyway").toBeNull();
+      expect(r.tags).toEqual([]);
     });
   });
 });

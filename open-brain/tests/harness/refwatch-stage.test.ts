@@ -20,6 +20,8 @@
  */
 
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { RefWatch } from "../../src/harness/refwatch.js";
 import { runLoop, type LoopConfig } from "../../src/harness/runtime.js";
 import { StubDeveloper, StubPlanner, StubQa, type RoleContext, type RoleSession } from "../../src/harness/roles.js";
@@ -218,9 +220,106 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
     );
 
     expect(r.status).toBe("failed");
-    expect(r.failure?.reason).toMatch(/moved HEAD|could not be rolled back/i);
+    expect(r.failure?.reason).toContain("moved HEAD");
     expect(r.failure?.reason).toContain("refs/heads/main");
     expect(r.failure?.reason).toMatch(/from [0-9a-f]{12} to [0-9a-f]{12}/);
+    // QA's D2: the old assertion was /moved HEAD|could not be rolled back/i and
+    // the SECOND alternative accepted a repository left needing hand recovery.
+    // A test whose pattern accepts the defect it is meant to exclude is the
+    // prohibition-vs-instance family with the halves swapped.
+    expect(r.failure?.reason).not.toMatch(/could not be rolled back|recover by hand/i);
+  });
+
+  /* --------------------------------------------------------------------- *
+   * Second candidate — HEAD is part of the snapshot
+   *
+   * QA's D1 and D2 are one design question: what the restore does about HEAD.
+   * The watch owns `refs/`; HEAD is a symbolic ref OUTSIDE `refs/`, and both
+   * defects turn on it. `checkout -b` and `reset` are the ordinary vocabulary
+   * of a developer session, so this is closed before a real role runs.
+   * --------------------------------------------------------------------- */
+
+  describe("D1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human", () => {
+    it("D1 — `checkout -b evil` + commit is refused WITH a record, and HEAD still resolves", async () => {
+      const r = await runLoop(
+        config({
+          roles: {
+            planner: new StubPlanner(),
+            developer: {
+              role: "developer",
+              run: (ctx: RoleContext) => {
+                const d = new StubDeveloper().run(ctx);
+                rawGit(ctx.repoRoot, ["checkout", "-b", "evil"]);
+                rawGit(ctx.repoRoot, ["add", "-A"]);
+                rawGit(ctx.repoRoot, ["commit", "--no-verify", "--no-gpg-sign", "-m", "evil"]);
+                return d;
+              },
+            },
+            qa: new StubQa(),
+          },
+        }),
+      );
+
+      // Observed at b4194a9: GitFailed escaped runLoop entirely — no
+      // LoopResult, no FAILED.md, HEAD unborn on a branch that had just been
+      // deleted underneath it, and the whole tree staged.
+      expect(r.status).toBe("failed");
+      expect(r.failure, "no failure record was produced").not.toBeNull();
+      expect(existsSync(join(repo.root, "artifacts/iterations/t001/FAILED.md"))).toBe(true);
+
+      // The repository is usable without a human: HEAD resolves, it points at
+      // the branch the window opened on, and the role's branch is gone.
+      expect(rawGit(repo.root, ["rev-parse", "HEAD"])).toMatch(/^[0-9a-f]{40}$/);
+      expect(rawGit(repo.root, ["symbolic-ref", "HEAD"])).toBe("refs/heads/main");
+      expect(resolveRef(repo.root, "refs/heads/evil")).toBeNull();
+    });
+
+    it("D1b — `symbolic-ref HEAD refs/heads/side` is refused and HEAD is put back", async () => {
+      rawGit(repo.root, ["branch", "side", repo.sha()]);
+      const r = await runLoop(
+        config({
+          roles: {
+            planner: new StubPlanner(),
+            developer: sabotage(new StubDeveloper(), () => ["symbolic-ref", "HEAD", "refs/heads/side"]),
+            qa: new StubQa(),
+          },
+        }),
+      );
+
+      expect(r.status).toBe("failed");
+      expect(rawGit(repo.root, ["symbolic-ref", "HEAD"]), "HEAD was left on the role's branch").toBe(
+        "refs/heads/main",
+      );
+    });
+
+    it("D2 — a backwards move of the checked-out branch is RESTORED, not left for a human", async () => {
+      const preLoop = repo.sha();
+      const r = await runLoop(
+        config({
+          roles: {
+            planner: new StubPlanner(),
+            developer: sabotage(new StubDeveloper(), () => ["update-ref", "refs/heads/main", preLoop]),
+            qa: new StubQa(),
+          },
+        }),
+      );
+
+      expect(r.status).toBe("failed");
+      expect(r.failure?.code).toBe("stage-committed");
+      expect(r.failure?.reason).toContain("refs/heads/main");
+      expect(r.failure?.reason).toMatch(/from [0-9a-f]{12} to [0-9a-f]{12}/);
+      // The watch HAD before/after and a compare-and-swap for this ref; the
+      // deferral handed it to a check that can only roll FORWARD.
+      expect(r.failure?.reason).not.toMatch(/could not be rolled back|recover by hand/i);
+
+      // The runtime's own plan commit is reachable again, and the index is not
+      // holding the role's work.
+      expect(resolveRef(repo.root, "refs/heads/main"), "main is still at the pre-loop commit").not.toBe(preLoop);
+      const dirty = rawGit(repo.root, ["status", "--porcelain"])
+        .split("\n")
+        .filter((l) => l !== "" && !l.includes("FAILED.md"));
+      expect(dirty, `the tree was left dirty: ${dirty.join(" | ")}`).toEqual([]);
+    });
   });
 
   it("reports the ref verdict on every stage, with its own limits stated", async () => {

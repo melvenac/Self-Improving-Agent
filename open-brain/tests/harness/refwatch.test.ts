@@ -118,6 +118,44 @@ describe("G-041 A1 — runLoop refuses a role it did not construct", { timeout: 
     expect(r.status).toBe("completed");
   });
 
+  /**
+   * QA's D3. `class Evil extends StubPlanner` calls `super()`, which registered
+   * the instance — so a role whose `run()` is entirely foreign was
+   * runtime-constructed as far as the mechanism could tell.
+   *
+   * The doc comment was literally true (*"a role is runtime-constructed iff its
+   * constructor ran in this file"*) and the property it was defending was
+   * defeated by inheritance. **Provenance is the exact class, not the
+   * constructor chain.**
+   */
+  it("D3 — a SUBCLASS of a stub is foreign, because its run() is", async () => {
+    class Evil extends StubPlanner {
+      run(ctx: RoleContext): unknown {
+        return new StubPlanner().run(ctx);
+      }
+    }
+
+    let thrown: unknown;
+    try {
+      await runLoop(
+        config({ roles: { planner: new Evil(), developer: new StubDeveloper(), qa: new StubQa() }, refWatch: false }),
+      );
+    } catch (err) {
+      thrown = err;
+    }
+
+    expect(thrown, "a subclass of a stub was accepted as runtime-constructed").toBeInstanceOf(LoopRefused);
+    expect((thrown as LoopRefused).roles).toEqual(["planner"]);
+  });
+
+  it("still accepts the stubs themselves after the subclass rule", async () => {
+    // The negative control for D3's fix: tightening provenance to the exact
+    // class must not stop the runtime from recognising its own stubs.
+    const r = await runLoop(config({ refWatch: false }));
+    expect(r.failure, r.failure?.reason).toBeNull();
+    expect(r.status).toBe("completed");
+  });
+
   it("still runs runtime-constructed roles with the watch explicitly off", async () => {
     // The flag refuses FOREIGN roles without a watch. It does not make the
     // watch mandatory for the roles the runtime built itself — that would be a

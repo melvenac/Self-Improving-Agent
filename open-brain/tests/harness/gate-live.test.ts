@@ -50,8 +50,15 @@ const okAnswers = {
 
 describe("JevTransport", () => {
   const realFetch = globalThis.fetch;
+
   afterEach(() => {
     globalThis.fetch = realFetch;
+  });
+
+  it("F2 — the global fetch really is replaced, so a negative from this file means something", () => {
+    expect(() => (globalThis.fetch as unknown as () => void)()).toThrow(
+      /must not reach the network/,
+    );
   });
 
   /* --------------------------------------------------------------------- *
