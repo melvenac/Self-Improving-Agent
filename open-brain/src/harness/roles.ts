@@ -60,6 +60,43 @@ export interface RoleSession {
   run(ctx: RoleContext): unknown;
 }
 
+/* ------------------------------------------------------------------------- *
+ * Provenance
+ *
+ * `G-041`: a role acted on the repository through a channel nobody watched.
+ * The repair has two halves, and the runtime's half needs to know whether it
+ * built the role in front of it. That question cannot be answered by looking at
+ * the object — a foreign role can declare any `role`, implement `run`, and
+ * behave exactly like a stub, because **behaviour is what an adversarial role
+ * controls.**
+ *
+ * So the record is kept here, in a set this module does not export and no
+ * caller can reach. A role is runtime-constructed if and only if its
+ * constructor ran in this file. Nothing outside can add to the set — not by
+ * importing a marker, not by copying a symbol, not by setting a property.
+ *
+ * **Every future real-role constructor registers itself the same way**, in this
+ * module. A role built anywhere else is foreign, which is the intended answer.
+ * ------------------------------------------------------------------------- */
+
+const runtimeConstructed = new WeakSet<object>();
+
+/** Record a role as one this module built. Deliberately NOT exported. */
+function registerRuntimeRole(session: RoleSession): void {
+  runtimeConstructed.add(session);
+}
+
+/**
+ * Whether the runtime constructed this role itself.
+ *
+ * LIMIT: this answers who built the object, not what it does. A
+ * runtime-constructed role is still held to the allowlist, the commit boundary
+ * and the ref-watch — provenance narrows who may run, never what they may do.
+ */
+export function isRuntimeConstructed(session: RoleSession): boolean {
+  return runtimeConstructed.has(session as unknown as object);
+}
+
 /** Build the write helper for one stage. */
 export function makeWriter(repoRoot: string, allow: Allowlist, role: RoleName) {
   return (repoPath: string, content: string): void => {
@@ -91,7 +128,9 @@ export function makeWriter(repoRoot: string, allow: Allowlist, role: RoleName) {
 /** A planner stub that returns a valid plan. */
 export class StubPlanner implements RoleSession {
   readonly role = "planner" as const;
-  constructor(private readonly overrides: Partial<Plan> = {}) {}
+  constructor(private readonly overrides: Partial<Plan> = {}) {
+    registerRuntimeRole(this);
+  }
 
   run(ctx: RoleContext): unknown {
     const base: Plan = {
@@ -113,7 +152,9 @@ export class StubPlanner implements RoleSession {
 /** A developer stub that writes one file inside its allowlist. */
 export class StubDeveloper implements RoleSession {
   readonly role = "developer" as const;
-  constructor(private readonly writes: ReadonlyArray<{ path: string; content: string }> = []) {}
+  constructor(private readonly writes: ReadonlyArray<{ path: string; content: string }> = []) {
+    registerRuntimeRole(this);
+  }
 
   run(ctx: RoleContext): unknown {
     const writes =
@@ -140,7 +181,9 @@ export class StubDeveloper implements RoleSession {
  */
 export class StubQa implements RoleSession {
   readonly role = "qa" as const;
-  constructor(private readonly overrides: Record<string, unknown> = {}) {}
+  constructor(private readonly overrides: Record<string, unknown> = {}) {
+    registerRuntimeRole(this);
+  }
 
   run(ctx: RoleContext): unknown {
     const candidate = ctx.candidate;

@@ -53,7 +53,14 @@ import {
   type AllowlistVerdict,
   type FrozenCandidate,
 } from "./workspace.js";
-import { makeWriter, WriteRefused, type RoleContext, type RoleName, type RoleSession } from "./roles.js";
+import {
+  isRuntimeConstructed,
+  makeWriter,
+  WriteRefused,
+  type RoleContext,
+  type RoleName,
+  type RoleSession,
+} from "./roles.js";
 import {
   jsonSchemas,
   validateEvidence,
@@ -103,6 +110,12 @@ export interface LoopConfig {
   checks?: DeterministicChecks;
   /** Attempts per schema-validated role, including the first. */
   maxAttempts?: number;
+  /**
+   * Watch every ref under `refs/` around each stage (`G-041`). **Defaults to
+   * on**, and turning it off is the only way to run without it — a role the
+   * runtime did not construct is then refused outright.
+   */
+  refWatch?: boolean;
   gateMode?: GateMode;
   transport?: GateTransport;
   log?: (line: string) => void;
@@ -123,7 +136,30 @@ export type FailureCode =
   | "tag-target-moved"
   | "candidate-not-parent-of-evidence"
   | "evidence-disagrees-with-runtime"
-  | "gate-unavailable";
+  | "gate-unavailable"
+  | "foreign-role-unwatched"
+  | "stage-changed-ref";
+
+/**
+ * A refusal to START, thrown rather than returned.
+ *
+ * Every other failure in this file is a `LoopResult` with a `FailureCode`: the
+ * loop ran and something in it failed. This one is different in kind — the
+ * runtime declines to begin — and it is thrown so that difference cannot be
+ * read as a graded outcome. A caller that ignores the distinction gets an
+ * exception rather than an exit code it might not check.
+ */
+export class LoopRefused extends Error {
+  readonly code: FailureCode;
+  /** The seats that caused the refusal, in stage order. */
+  readonly roles: readonly RoleName[];
+  constructor(code: FailureCode, roles: readonly RoleName[], message: string) {
+    super(message);
+    this.name = "LoopRefused";
+    this.code = code;
+    this.roles = roles;
+  }
+}
 
 export interface LoopResult {
   status: "completed" | "failed";
@@ -152,6 +188,32 @@ const isoOf = (now: () => Date): string => now().toISOString();
 const loopNumber = (loop: string): string => loop.replace(/^t/, "");
 
 export function runLoop(config: LoopConfig): LoopResult {
+  // --- The one flag, before anything else ---------------------------------
+  //
+  // `G-041` and slice two's A1. Nothing above this line: not a git call, not a
+  // tag, not an artifact, not a log line. "Refuses before any stage runs" is
+  // only checkable if there is nothing to undo when it refuses.
+  //
+  // Slice one was safe because `cli.ts` passes `stubRoles()` and nothing else
+  // called `runLoop`. That is a property of one call site, and a property of
+  // one call site is an intention. This is the rule.
+  const refWatchEnabled = config.refWatch ?? true;
+  if (!refWatchEnabled) {
+    const stageOrder: readonly RoleName[] = ["planner", "developer", "qa"];
+    const foreignRoles = stageOrder.filter((r) => !isRuntimeConstructed(config.roles[r]));
+    if (foreignRoles.length > 0) {
+      throw new LoopRefused(
+        "foreign-role-unwatched",
+        foreignRoles,
+        `refusing to start loop ${config.loop}: ${foreignRoles.join(", ")} ` +
+          `${foreignRoles.length === 1 ? "is a role" : "are roles"} this runtime did not construct, and the ` +
+          `ref-watch is off. A role the runtime did not build can reach the repository through channels the ` +
+          `stage checks do not watch — refs were the last one found (G-041), and the list of channels is not ` +
+          `known to be complete. Run with the ref-watch on, or pass roles this runtime constructed.`,
+      );
+    }
+  }
+
   const log = config.log ?? (() => {});
   const now = config.now ?? (() => new Date());
   const env = config.env ?? process.env;
