@@ -23,7 +23,7 @@ as the trees it has run in. `build-freshness` shipped green in one tree and was 
 
 | | |
 | --- | --- |
-| **Frozen SHA** | `1086e5528f87491f2e3a5533c4494c38a400531a` (supersedes `1c8e6ca`, see Finding 2) |
+| **Frozen SHA** | `4414bcc6f2d46fa62296d0ed65cb16a9b3c31752` (third candidate; supersedes `1086e55`, which QA did not accept) |
 | **Branch** | `loop/15-hoh-runtime` |
 | **Reachable** | from the shared `.git` by SHA — no push needed, all four checkouts share one object store |
 
@@ -31,11 +31,11 @@ as the trees it has run in. `build-freshness` shipped green in one tree and was 
 `docs/loops/` and `.agents/` only. No source file changes after `1086e55`.
 
 **Check the SHA off `git log` yourself rather than taking it from this line.** If it disagrees with
-`1086e55`, the disagreement is the finding, not a typo to smooth over — a derived number carries the
+`4414bcc`, the disagreement is the finding, not a typo to smooth over — a derived number carries the
 ref and time it came from, and this one was derived by the seat that wants it to be right.
 
-**Every number in the next section was re-measured at `1086e55`** after the Finding 2 correction —
-not carried forward from the superseded candidate.
+**Every number in the next section was re-measured at `4414bcc`** after the QA fixes — not carried
+forward from either superseded candidate.
 
 ---
 
@@ -47,14 +47,14 @@ pedantry: an earlier reading in this session took the exit code of `tail` throug
 
 | Check | Command | Exit | Observed |
 | --- | --- | --- | --- |
-| Build | `npm run build` (in `open-brain/`) | **0** | build stamped `1086e55` |
+| Build | `npm run build` (in `open-brain/`) | **0** | build stamped `4414bcc` |
 | Typecheck | `npx tsc --noEmit` | **0** | no output |
-| Suite | `npx vitest run` | **0** | 55 files, **807 tests**, **0 errors** |
+| Suite | `npx vitest run` | **0** | 55 files, **823 tests**, **0 errors** |
 | `/sync` | `node open-brain/build/cli.js sync --check` | **0** | 25 passed, 0 issues, 4 warnings, 1 skip |
 
 Three `/sync` lines worth reading rather than summarising:
 
-- `build-freshness [pass]: build matches HEAD 1086e55` — so the build these results came from is the
+- `build-freshness [pass]: build matches HEAD 4414bcc` — so the build these results came from is the
   candidate's, not an older one. See *Finding 4* for why that is weaker evidence than it looks.
 - `module-boundary [pass]: core does not import memory (56 file(s), 41 core)` — the harness is inside
   the 41 core files and reaches no memory code.
@@ -66,7 +66,7 @@ type-checked `tests/harness/` separately with a throwaway config extending `tsco
 That config was deleted rather than committed, so **nothing in CI re-checks it** — a fact about the
 repo, not a claim about my tests.
 
-**Suite arithmetic, so you can check it rather than accept it:** 807 total − 159 new = **648**, which
+**Suite arithmetic, so you can check it rather than accept it:** 823 total − 175 new = **648**, which
 is the number the brief's §3 names as the figure to preserve. Measured directly too:
 `npx vitest run --exclude 'tests/harness/**'` gives **648 passed in 48 files**. **No pre-existing
 file was modified** — `git diff --stat d45c965..HEAD` touches only new paths plus `package.json`,
@@ -78,6 +78,46 @@ file was modified** — `git diff --stat d45c965..HEAD` touches only new paths p
 
 **`module-boundary` passes at 56 files, 41 core**, and the harness is inside the 41. That is
 deliberate: see *Decision 1*.
+
+---
+
+## What changed since the candidate you rejected
+
+**All four defects fixed, plus D5. Your acceptance bar for A3/A4 is what I built to, not a
+reinterpretation of it.**
+
+**The class (D1, D2, D3).** `enforceAllowlist` now takes the stage's base commit and compares
+against the **union of `git diff base..HEAD` and the working tree**, so a role that commits is seen.
+Any stage that moves HEAD at all is refused as `stage-committed` and rolled back to its base —
+including one whose committed paths were all permitted, because the runtime owns the commit
+boundary and which commit is the candidate depends on it. Identity is verified **before every tag**
+via a helper that refuses when HEAD is not the sha being tagged. And the invariant your D1 broke is
+asserted directly rather than inferred: **the candidate must be the evidence commit's first
+parent**, checked after the evidence commit.
+
+**D3's reason is now the right one.** A committing developer fails `stage-committed` with *"the
+stage moved HEAD…"*, never `developer-no-change`. There is a test asserting it is not the old code.
+
+**D4.** `resolveNpm()` locates npm's JavaScript entry point and runs it through `node` — **no
+shell**, so A7's property is unchanged. There is no `npm.cmd` fallback on win32; if npm cannot be
+located the check is a recorded failure naming the problem, never a silent pass. **Verified by hand:
+the documented command with no overrides now exits 0** against a scratch repo with `open-brain/`
+scripts. The README is corrected too — it now passes `--repo` and warns that a loop commits and tags
+in the repository it runs against, which the old first example did not say.
+
+**D5.** `A_t.gitref` now states what is guaranteed (tree matched at QA start, QA neither committed
+nor wrote outside its allowlist, candidate is the evidence commit's parent) and what is not.
+
+**Seen red against the shipped behaviour, not merely written:** reverting enforcement to
+working-tree-only fails **6 of the 7** new commit-path tests; restoring `npm.cmd` fails **3 of 4**
+D4 tests with the exact `EINVAL` you reported. The seventh is an invariant assertion that holds on a
+clean run either way, which is why it does not move.
+
+**One of my own scans was wrong and you did not catch it because it was green.** The "no shell spawn
+in harness source" scan reported `checks.ts` as an offender the moment I added a doc comment saying
+*"the fix is not `shell: true`"* — the sentence explaining the prohibition, matched as an instance of
+it. Same shape as the `git push` scan hitting its own deny list. It now strips comments, with both
+halves asserted: a planted mention in a comment must not fire and the same text in code must.
 
 ---
 
