@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "revision": 0,
   "project": {
     "name": "{{PROJECT}}"
@@ -9,15 +9,20 @@
   "verified": [],
   "gaps": [],
   "decisions": [],
-  "handoff": {
-    "pick_up": "",
-    "watch_out": [],
-    "open_questions": [],
-    "session": 0
-  },
+  "handoffs": [
+    {
+      "seat": "developer",
+      "pick_up": "",
+      "watch_out": [],
+      "open_questions": [],
+      "session": 0,
+      "loop_state": null
+    }
+  ],
   "last_session": {
     "n": 0,
     "date": "2026-09-14",
-    "uuid": null
+    "uuid": null,
+    "seat": null
   }
 }

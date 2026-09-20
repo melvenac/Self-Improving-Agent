@@ -277,13 +277,87 @@ if (command === "sync") {
     console.log(`Left ${result.skippedForeign.length} hand-written note(s) in Topics/ untouched:`);
     for (const f of result.skippedForeign.slice(0, 10)) console.log(`  ${f}`);
   }
+} else if (command === "detach") {
+  // C3's concrete first piece: "return the tree to detached after a push." It had
+  // been run by hand more than twenty times, which is exactly the shape C3
+  // describes — a step that works because a seat remembers it.
+  const { detachToUpstream } = await import("./pipelines/detach/index.js");
+  const startDir = resolve(args.slice(1).find((a) => !a.startsWith("--")) ?? ".");
+  const repoRoot = resolveRepoRoot(startDir);
+  if (!repoRoot) {
+    console.error(`detach refused: ${describeNoRoot(startDir)}`);
+    process.exit(1);
+  }
+  const r = detachToUpstream(repoRoot, {
+    dryRun: args.includes("--dry-run"),
+    noFetch: args.includes("--no-fetch"),
+    force: args.includes("--force"),
+  });
+  console.log(`detach — ${repoRoot}`);
+  for (const step of r.steps) console.log(`  ${step}`);
+  if (!r.ok) {
+    console.error(`
+detach REFUSED: ${r.error}`);
+    process.exit(1);
+  }
+  console.log(`
+HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " (detached)"} -> ${r.headAfter?.slice(0, 7)} (detached)`);
+  process.exit(0);
 } else if (command === "state") {
   // Loop 4 C1: the one-shot migration door. `state import --draft` (default)
   // writes a reviewable draft + report; `--commit` applies the reviewed draft.
   const sub = args[1];
-  if (sub !== "import" && sub !== "show") {
-    console.error("Usage: open-brain state <show [--json] | import [--draft | --commit] [--force-snapshot]> [dir]");
+  if (sub !== "import" && sub !== "show" && sub !== "migrate") {
+    console.error("Usage: open-brain state <show [--json] | import [--draft | --commit] [--force-snapshot] | migrate --seat <planner|developer|qa> [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>> [dir]");
     process.exit(1);
+  }
+
+  // Loop 14 C2: schema v1 -> v2. `applyStateOps` cannot do this — it refuses a
+  // file that does not validate against the CURRENT schema, so once the schema
+  // moves the writer can no longer read the record it must migrate. The only
+  // alternative is a hand-edit of the record, which is what the single-writer
+  // rule exists to prevent. So the migration is a program, with a dry run, and
+  // it runs identically on the live record, the shipped template and the fixture.
+  if (sub === "migrate") {
+    const { migrateStateFile } = await import("./pipelines/state-migrate/index.js");
+    const flag = (name: string): string | null => {
+      const i = args.indexOf(name);
+      return i >= 0 && args[i + 1] && !args[i + 1].startsWith("--") ? args[i + 1] : null;
+    };
+    const seat = flag("--seat");
+    if (!seat) {
+      console.error("state migrate refused: --seat <planner|developer|qa> is REQUIRED.");
+      console.error("A v1 handoff does not say whose it is, and guessing would attribute one seat's words to another.");
+      process.exit(1);
+    }
+    const files = args.slice(2).filter((a) => !a.startsWith("--") && a !== seat && a !== flag("--last-session-seat"));
+    if (files.length === 0) {
+      console.error("state migrate refused: name at least one state.json to migrate.");
+      process.exit(1);
+    }
+    const dryRun = args.includes("--dry-run");
+    let failed = 0;
+    for (const f of files) {
+      const r = migrateStateFile(resolve(f), {
+        seat: seat as "planner" | "developer" | "qa",
+        lastSessionSeat: (flag("--last-session-seat") as "planner" | "developer" | "qa" | null) ?? null,
+        dryRun,
+        keepRevision: args.includes("--keep-revision"),
+      });
+      console.log(`${dryRun ? "[dry run] " : ""}${r.path}`);
+      if (!r.ok) {
+        console.log(`  REFUSED: ${r.error}`);
+        failed++;
+        continue;
+      }
+      for (const c of r.changes) console.log(`  ${c}`);
+    }
+    if (failed > 0) {
+      console.error(`
+${failed} file(s) refused — nothing was written for those.`);
+      process.exit(1);
+    }
+    process.exit(0);
   }
 
   // G-006: the read door. ob_state was the only way to see the record, so with
@@ -330,9 +404,16 @@ state — ${st.project.name}
       if (active.length > 5) console.log(`    ... +${active.length - 5} more`);
     }
     console.log(`Verified: ${st.verified.length} · gaps: ${st.gaps.length} · decisions: ${st.decisions.length}`);
-    console.log(`Handoff (session ${st.handoff.session}): ${st.handoff.pick_up || "nothing recorded"}`);
-    if (st.handoff.watch_out.length) console.log(`  watch out: ${st.handoff.watch_out.length} item(s)`);
-    if (st.handoff.open_questions.length) console.log(`  open questions: ${st.handoff.open_questions.length}`);
+    if (st.handoffs.length === 0) console.log(`Handoffs: none recorded`);
+    for (const h of st.handoffs) {
+      console.log(`Handoff [${h.seat}] (session ${h.session}): ${h.pick_up || "nothing recorded"}`);
+      if (h.watch_out.length) console.log(`  watch out: ${h.watch_out.length} item(s)`);
+      if (h.open_questions.length) console.log(`  open questions: ${h.open_questions.length}`);
+      if (h.loop_state) {
+        const l = h.loop_state;
+        console.log(`  loop state: ${l.open_prs.length} open PR(s), frozen ${l.frozen_sha ?? "none"}, ${l.questions_for_aaron.length} question(s) for Aaron, ${l.rulings.length} ruling(s)`);
+      }
+    }
     console.log(`
 Read-only. Change state through ob_state — never by editing the file.`);
     process.exit(0);
@@ -394,5 +475,8 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft|--commit] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
+  console.log("  state migrate --seat <planner|developer|qa> [--keep-revision] [--dry-run] <file...>");
+  console.log("                                             Migrate state.json schema v1 -> v2");
+  console.log("  detach [--dry-run] [--no-fetch] [--force] [dir]      Return a seat worktree to detached at origin/master");
   process.exit(1);
 }

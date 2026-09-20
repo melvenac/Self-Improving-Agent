@@ -13,7 +13,7 @@ import type { State } from "../../../src/shared/state-schema.js";
  */
 
 const state: State = {
-  schema_version: 1,
+  schema_version: 2,
   revision: 14,
   project: { name: "test-project" },
   objective: { text: "prove the renderer is a view, not a dump", since_session: 60 },
@@ -52,8 +52,8 @@ const state: State = {
   verified: [],
   gaps: [],
   decisions: [],
-  handoff: { session: 60, pick_up: "here", watch_out: ["a hazard"], open_questions: [] },
-  last_session: { n: 60, date: "2026-09-17", uuid: null },
+  handoffs: [{ seat: "developer", session: 60, pick_up: "here", watch_out: ["a hazard"], open_questions: [] , loop_state: null }],
+  last_session: { n: 60, date: "2026-09-17", uuid: null , seat: null },
 } as unknown as State;
 
 describe("renderState — the startup read", () => {
@@ -77,9 +77,30 @@ describe("renderState — the startup read", () => {
     expect(text).not.toContain("T-102");
   });
 
-  it("keeps the handoff whole — it is the one prose-shaped thing that stays", () => {
-    expect(text).toContain("pick up: here");
-    expect(text).toContain("- a hazard");
+  it("keeps the READER'S OWN handoff whole — it is the one prose-shaped thing that stays", () => {
+    const own = renderState(state, "0.34.0", { seat: "developer" }).join("\n");
+    expect(own).toContain("Your handoff — developer");
+    expect(own).toContain("pick up: here");
+    expect(own).toContain("- a hazard");
+  });
+
+  it("does NOT render another seat's handoff as though it were yours", () => {
+    // G-046, and the reason C2 exists: with one project-wide slot the second
+    // seat to close out overwrote the first, and a fresh session read the last
+    // writer's pick-up as its own. A greeting that shows the developer's handoff
+    // to the planner is C4 failing on the row C2 exists for.
+    const asPlanner = renderState(state, "0.34.0", { seat: "planner" }).join("\n");
+    expect(asPlanner).not.toContain("Your handoff");
+    expect(asPlanner).toContain("no handoff recorded for this seat (planner)");
+    // The developer's is still NAMED — withholding it entirely would be its own
+    // kind of silence — but as another seat's, not as this reader's.
+    expect(asPlanner).toContain("Other seats' handoffs");
+    expect(asPlanner).toContain("developer (session");
+  });
+
+  it("says the reader's seat is unresolved rather than picking one", () => {
+    expect(text).toContain("READER'S SEAT UNRESOLVED");
+    expect(text).not.toContain("Your handoff");
   });
 
   it("prints the version only when supplied, never a guess", () => {

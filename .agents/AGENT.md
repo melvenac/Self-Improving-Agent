@@ -1,6 +1,6 @@
 ---
 name: Forge
-role: builder
+role: developer
 partner: Atlas
 ---
 

@@ -130,13 +130,18 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     expect(r.draft.report.decisions.skipped[0].heading).toContain("### ADR: An unnumbered heading");
     expect(s.objective!.text.startsWith("**Loop 4 of the extraction evaluation")).toBe(true);
     expect(s.objective!.since_session).toBe(54);
-    expect(s.handoff.session).toBe(54);
-    expect(s.handoff.watch_out).toHaveLength(9);
-    expect(s.handoff.open_questions).toHaveLength(2);
-    expect(s.handoff.pick_up).toMatch(/^Loop 4 per /);
+    expect(s.handoffs).toHaveLength(1);
+    // The prose slot does not say whose it is. It is attributed to the
+    // developer because the single slot was written by /end and /end was the
+    // developer's command — a documented assumption, not a discovered fact.
+    expect(s.handoffs[0].seat).toBe("developer");
+    expect(s.handoffs[0].session).toBe(54);
+    expect(s.handoffs[0].watch_out).toHaveLength(9);
+    expect(s.handoffs[0].open_questions).toHaveLength(2);
+    expect(s.handoffs[0].pick_up).toMatch(/^Loop 4 per /);
     expect(s.verified.map((v) => v.id)).toEqual(["V-001", "V-002", "V-003", "V-004", "V-005"]);
     expect(s.gaps.map((g) => g.id)).toEqual(["G-001", "G-002", "G-003", "G-004", "G-005", "G-006"]);
-    expect(s.last_session).toEqual({ n: 54, date: TODAY, uuid: "00000000-0000-4000-8000-000000000054" });
+    expect(s.last_session).toEqual({ n: 54, date: TODAY, uuid: "00000000-0000-4000-8000-000000000054", seat: null });
 
     const report = readFileSync(join(root, REPORT_REL), "utf-8");
     expect(report).toContain("| **all** | 42 | 3 | 0 | 98 | 143 |");
@@ -199,7 +204,7 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     expect(() => runDraft(root, TODAY)).toThrow(/already exists/);
 
     // P3: the writer accepts the migrated file — first real write bumps to revision 1.
-    const w = applyStateOps(root, { session: 55, expected_revision: 0, ops: [{ op: "end_session", n: 55, date: "2026-09-14", uuid: null }], version: "0.30.0" });
+    const w = applyStateOps(root, { session: 55, expected_revision: 0, ops: [{ op: "end_session", n: 55, date: "2026-09-14", uuid: null, seat: "developer" }], version: "0.30.0" });
     expect(w.ok).toBe(true);
     expect(w.revision_after).toBe(1);
     // Retention on the first write drops the done items closed ≤ 52 (session 55 − 3).
@@ -309,9 +314,12 @@ describe("state import parsing rules (unit)", () => {
   it("next-session rules: pick_up text, watch_out bullets, open_questions bullets (empty when absent), other sections reported", () => {
     const rep: ImportReport["handoff"] = { pick_up_lines: 0, watch_out: 0, open_questions: 0, sections_not_imported: [] };
     const h = importHandoff("# H\n\n## Pick up here (x)\n\nDo this.\nThen that.\n\n### Refs\n\n- a\n\n### Watch out for\n\n- one\n- two\n", 55, rep);
-    expect(h).toEqual({ pick_up: "Do this.\nThen that.", watch_out: ["one", "two"], open_questions: [], session: 55 });
+    // seat "developer" is a DOCUMENTED ASSUMPTION, not a discovered fact: the
+    // prose slot does not say whose it is, and the single slot was written by
+    // /end, which was the developer's command.
+    expect(h).toEqual({ seat: "developer", pick_up: "Do this.\nThen that.", watch_out: ["one", "two"], open_questions: [], session: 55, loop_state: null });
     expect(rep).toEqual({ pick_up_lines: 2, watch_out: 2, open_questions: 0, sections_not_imported: ["Refs"] });
-    expect(importHandoff(null, 55, rep)).toEqual({ pick_up: "", watch_out: [], open_questions: [], session: 55 });
+    expect(importHandoff(null, 55, rep)).toEqual({ seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: 55, loop_state: null });
   });
 
   it("SUMMARY surgery removes exactly the title blockquote and the Current State section and leaves everything else byte for byte", () => {

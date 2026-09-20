@@ -13,7 +13,9 @@ import { join } from "path";
 import { randomUUID } from "crypto";
 import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
+import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
 import { describeDerivedArtifacts } from "./pipelines/session-start/derived-artifacts.js";
+import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
 import {
   resolveSessionId,
   writeActiveSession,
@@ -29,12 +31,46 @@ import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
 // Claude Code includes `agent_id` when the hook fires inside a subagent.
 // The same payload carries `session_id` — the authoritative session UUID.
 let hookInput: { agent_id?: string; cwd?: string; session_id?: string } = {};
-try {
-  const chunks: Buffer[] = [];
-  for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
-  const raw = Buffer.concat(chunks).toString().trim();
-  if (raw) hookInput = JSON.parse(raw);
-} catch { /* stdin unavailable — continue as main session */ }
+{
+  let raw = "";
+  try {
+    const chunks: Buffer[] = [];
+    for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
+    raw = Buffer.concat(chunks).toString().trim();
+  } catch {
+    // stdin genuinely unavailable — no payload was offered. Continue: an IDE
+    // that supplies nothing is a supported case, and is why a uuid is generated
+    // below rather than demanded.
+  }
+  if (raw) {
+    try {
+      hookInput = JSON.parse(raw);
+    } catch (err) {
+      // F4: a payload that was OFFERED and could not be parsed is refused, and
+      // NOTHING is written.
+      //
+      // This used to be swallowed. The hook then fell through with an empty
+      // payload, read `process.cwd()` — the shell's directory, not the session's
+      // — printed a plausible greeting for the wrong project, GENERATED a session
+      // uuid and stamped it into that project's slot. Every part of that looks
+      // right and none of it is: it is G-044's family, an instrument that changes
+      // what it measures while answering about somewhere else.
+      //
+      // Observed twice from two seats, both times through the same mechanism: a
+      // Windows path in the payload whose backslashes are invalid JSON escapes.
+      //
+      // Absent and malformed are different and must not be treated alike. Absent
+      // is supported; malformed means the caller tried to say something and this
+      // process could not hear it, and proceeding invents the answer.
+      process.stderr.write(
+        `SessionStart hook REFUSED: the payload on stdin is not valid JSON — ${err instanceof Error ? err.message : String(err)}\n` +
+          `Nothing was written: no session was registered and no identity was resolved. ` +
+          `A malformed payload is not an absent one; proceeding would have greeted this shell's working directory with a generated session id.\n`,
+      );
+      process.exit(1);
+    }
+  }
+}
 
 // Anti-loop. Claude Code marks subagents with `agent_id`; Cursor marks them
 // with `is_background_agent`. Neither should register a session.
@@ -60,6 +96,17 @@ if (hasAgents) {
   lines.push(`Project detected: ${cwd} (.agents/ found${hasMeta ? ", META mode" : ""})`);
 } else {
   lines.push("No .agents/ detected — general session.");
+}
+
+// Tree currency, printed as early as the project line and BEFORE the seat
+// identity or anything read from the record. A stale checkout answers every
+// other question correctly about a version of the project that is no longer the
+// current one, so a seat must learn it first rather than last. Same function
+// ob_start calls — one implementation, three surfaces, for the reason
+// derived-artifacts.ts states about itself: two copies of a freshness rule
+// drift, and the drift is silent.
+if (hasAgents) {
+  for (const line of describeTreeCurrency(cwd).lines) lines.push(line);
 }
 
 // Session UUID — emit so /start can pick it up and call ob_set_session.
@@ -98,9 +145,30 @@ const registeredAs =
 // Cursor session "claude" and let it overwrite a real Claude Code slot.
 const ide = detectIde(payload, registeredAs);
 
+// THE SLOT IS WRITTEN ONLY WHEN THE PAYLOAD SUPPLIED AN ID.
+//
+// A generated uuid is fine to PRINT — /start picks it up and registers it, and a
+// stable per-session key is what the system needs. Writing it into the
+// checkout's slot is a different act: the slot is that checkout's session
+// identity, read as a fallback by every later write, and stamping a value
+// nobody asked for over it is the defect regardless of the payload's shape.
+//
+// It cost this loop a real session: running the hook to check which seat a
+// checkout is overwrote that checkout's live session id with a generated one.
+// Checking identity reassigned identity.
+//
+// Absence is reported rather than silent, because a slot that was not written
+// and a slot that was written with the right value look identical afterwards.
+if (!resolved) {
+  lines.push(
+    `Session slot NOT written: the payload carried no session id, so nothing was stamped over this checkout's identity. ` +
+      `The id above is generated for this greeting; register it with ob_set_session.`,
+  );
+}
+
 try {
   const projectKey = canonicalizeProjectDir(cwd) || cwd;
-  writeActiveSession(resolvePaths(cwd).activeSession, activeSessionKey(projectKey, ide), {
+  if (resolved) writeActiveSession(resolvePaths(cwd).activeSession, activeSessionKey(projectKey, ide), {
     uuid: sessionUuid,
     project_dir: cwd,
     source: uuidSource,
@@ -132,6 +200,21 @@ const identity = readAgentIdentity(cwd);
 if (identity) {
   const partner = identity.partner ? `partner: ${identity.partner}` : "no partner";
   lines.push(`Agent: ${identity.name} (${identity.role}) — ${partner}`);
+}
+
+// The role files, NAMED here and LOADED by ob_start. C1's remainder is G-032 —
+// `.agents/roles/` tracked and read by nothing — and the split is deliberate:
+// this hook fires for every session including ones that never run /start, so the
+// PROBLEMS (a missing, untracked or stale role file) must be announced here,
+// while the content belongs where the seat is actually briefed. Printing both in
+// both places would double ~245 lines into every session's context.
+if (hasAgents) {
+  const roles = describeRoleFiles(cwd, identity);
+  for (const line of roles.lines) lines.push(line);
+  for (const p of roles.problems) {
+    lines.push("");
+    lines.push(p);
+  }
 }
 
 // Derived artifacts — the index and the build. Reported HERE as well as in

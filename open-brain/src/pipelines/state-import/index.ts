@@ -298,8 +298,18 @@ function bullets(body: string[]): string[] {
   return body.filter((l) => /^\s*[-*] /.test(l)).map((l) => l.replace(/^\s*[-*] /, "").trim());
 }
 
-export function importHandoff(text: string | null, current: number, report: ImportReport["handoff"]): State["handoff"] {
-  const handoff: State["handoff"] = { pick_up: "", watch_out: [], open_questions: [], session: current };
+/**
+ * The prose `next-session.md` carries ONE handoff and does not say whose.
+ *
+ * It is attributed to the DEVELOPER seat, and that is a documented assumption
+ * rather than a discovered fact: the single slot was written by `/end`, and
+ * `/end` was the developer's command — the re-brief states it as `handoff` is
+ * "one slot, written only by the developer". An import that guessed silently
+ * would put an unattributed handoff under a seat and leave no trace of the
+ * guess, so the assumption is recorded in the report instead.
+ */
+export function importHandoff(text: string | null, current: number, report: ImportReport["handoff"]): State["handoffs"][number] {
+  const handoff: State["handoffs"][number] = { seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: current, loop_state: null };
   if (!text) return handoff;
   const lines = text.split(/\r?\n/);
   const headings = lines.map((l, i) => ({ l, i })).filter(({ l }) => /^#{2,6} /.test(l));
@@ -434,7 +444,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
   if (texts.summary) report.summary_removal = planSummaryRemoval(texts.summary).report;
 
   const state: State = {
-    schema_version: 1,
+    schema_version: 2,
     revision: 0,
     project: { name: report.project.name },
     objective,
@@ -442,8 +452,8 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
     verified,
     gaps,
     decisions,
-    handoff,
-    last_session: { n: last.n, date: last.date, uuid: last.uuid },
+    handoffs: [handoff],
+    last_session: { n: last.n, date: last.date, uuid: last.uuid, seat: null },
   };
   return { state, report };
 }

@@ -75,7 +75,7 @@ export function readStateJson(projectRoot: string): StateJsonResult {
   const parsed = parseState(readFileSync(path, "utf-8"));
   return parsed.ok
     ? { present: true, valid: true, data: parsed.data }
-    : { present: true, valid: false, error: parsed.error };
+    : { present: true, valid: false, error: parsed.error, errorPath: parsed.path };
 }
 
 export interface OptionalRead {

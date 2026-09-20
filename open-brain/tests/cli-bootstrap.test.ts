@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -20,11 +20,15 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
   const script = resolve(__dirname, "../src/cli-bootstrap.ts");
   let cwd: string;
   let home: string;
+  let slotPath: string;
 
   beforeEach(() => {
     cwd = mkdtempSync(join(tmpdir(), "ob-boot-cwd-"));
     home = mkdtempSync(join(tmpdir(), "ob-boot-home-"));
     mkdirSync(join(cwd, ".agents"), { recursive: true });
+    // A fresh slot path per test, inside this test's HOME so afterEach removes
+    // it. Absent until something writes it, which is the whole assertion.
+    slotPath = join(home, "slot", "active-session.json");
   });
 
   afterEach(() => {
@@ -40,6 +44,30 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
       env: { ...process.env, HOME: home, USERPROFILE: home },
       shell: process.platform === "win32",
     });
+  }
+
+  /**
+   * Raw stdin, and the exit status and stderr rather than only stdout.
+   * `run` above stringifies its argument, so it cannot express a payload that is
+   * not valid JSON — which is the whole subject of the F4 tests below.
+   */
+  function runRaw(raw: string): { status: number | null; stdout: string; stderr: string } {
+    const r = spawnSync("npx", ["tsx", script], {
+      input: raw,
+      encoding: "utf-8",
+      // OPEN_BRAIN_ACTIVE_SESSION is pinned PER TEST, not left to $HOME.
+      //
+      // tests/setup-env.ts sets it globally to one shared temp file so the suite
+      // cannot write the real ~/.claude slot, and a spawned process inherits it
+      // through `...process.env`. The first version of the slot assertions below
+      // checked `join(home, ".claude", "open-brain", "active-session.json")` —
+      // a path the hook never writes under these tests — so "writes nothing"
+      // passed whatever the code did. A vacuous negative, and the third of that
+      // family in this loop.
+      env: { ...process.env, HOME: home, USERPROFILE: home, OPEN_BRAIN_ACTIVE_SESSION: slotPath },
+      shell: process.platform === "win32",
+    });
+    return { status: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "" };
   }
 
   const uuidLines = (out: string) =>
@@ -96,16 +124,46 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
     expect(uuidLines(out)).toHaveLength(0);
   });
 
-  it("does not crash on malformed stdin", () => {
-    const out = execFileSync("npx", ["tsx", script], {
-      input: "{not json",
-      encoding: "utf-8",
-      env: { ...process.env, HOME: home, USERPROFILE: home },
-      shell: process.platform === "win32",
-    });
-    // Malformed stdin means no usable payload, so a UUID is generated rather
-    // than the session losing provenance entirely.
-    expect(uuidLines(out)).toHaveLength(1);
+  it("REFUSES malformed stdin rather than continuing without the payload", () => {
+    // THIS TEST ASSERTED THE DEFECT UNTIL 2026-09-20, and its reasoning was the
+    // trap: "malformed stdin means no usable payload, so a UUID is generated
+    // rather than the session losing provenance entirely." The second half is
+    // true and the first half is the mistake — ABSENT and MALFORMED are not the
+    // same input. Absent means nothing was offered. Malformed means the caller
+    // tried to say something and this process could not hear it, and continuing
+    // then INVENTS the answer: it reads the shell's cwd as the project, greets
+    // the wrong directory plausibly, and stamps a generated uuid over that
+    // checkout's identity.
+    //
+    // Both seats hit it through the same mechanism, a Windows path in the
+    // payload whose backslashes are invalid JSON escapes.
+    const r = runRaw("{not json");
+    expect(r.status).not.toBe(0);
+    expect(r.stderr).toMatch(/REFUSED/);
+    expect(r.stdout).not.toMatch(/SESSION_UUID/);
+  });
+
+  it("a well-formed payload with NO session id writes nothing to the slot", () => {
+    // Ruled after QA's criteria pass: generating a uuid and stamping it over the
+    // checkout's identity is the defect WHATEVER the payload's shape. Printing
+    // one is fine — /start registers it — but the slot is the checkout's session
+    // identity, read as a fallback by every later write.
+    const r = runRaw(JSON.stringify({ cwd }));
+    expect(r.status).toBe(0);
+    // The greeting still resolves an id, read-only.
+    expect(r.stdout).toMatch(/SESSION_UUID/);
+    // And says what it did NOT do, because a slot not written and a slot written
+    // with the right value look identical afterwards.
+    expect(r.stdout).toMatch(/Session slot NOT written/);
+    expect(existsSync(slotPath)).toBe(false);
+  });
+
+  it("a payload WITH a session id still writes the slot — the guard is not a ban", () => {
+    const r = runRaw(JSON.stringify({ cwd, session_id: "supplied-9876" }));
+    expect(r.status).toBe(0);
+    expect(r.stdout).toMatch(/SESSION_UUID: supplied-9876/);
+    expect(r.stdout).not.toMatch(/Session slot NOT written/);
+    expect(existsSync(slotPath)).toBe(true);
   });
 
   it("still refuses to guess an id from the filesystem", () => {
@@ -116,5 +174,50 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
     writeFileSync(join(home, ".claude", "projects", "x", `${stale}.jsonl`), "{}\n");
 
     expect(uuidLines(run({ cwd }))[0]).not.toContain(stale);
+  });
+
+  // F4 — QA reproduced this from a second seat with the same mechanism: a payload
+  // whose `cwd` carried Windows backslashes (invalid JSON escapes). The hook
+  // swallowed the parse error, fell through with an EMPTY payload, read
+  // process.cwd() — the SHELL's directory, not the session's — printed a
+  // plausible greeting for the wrong project, GENERATED a session uuid and wrote
+  // it into that project's slot.
+  //
+  // Every part of that looks right and none of it is. G-044's family: an
+  // instrument that changes what it measures while answering about somewhere else.
+  it("F4: a MALFORMED payload refuses, writes nothing, and exits non-zero", () => {
+    // The real shape that caused it, twice, from two seats: a Windows path whose
+    // single backslashes are invalid JSON escape sequences.
+    //
+    // The escaping here is load-bearing and was wrong once already. Written as
+    // "C:\Users\melve" in TS source, `\U` and `\m` collapse to `U` and `m`, the
+    // payload becomes VALID JSON, and the test measures nothing. The assertion
+    // below pins the payload itself so it cannot silently become well-formed.
+    const malformed = '{"session_id":"abc","cwd":"C:\\Users\\melve"}';
+    expect(() => JSON.parse(malformed)).toThrow();
+
+    const r = runRaw(malformed);
+
+    expect(r.status).not.toBe(0);
+    expect(r.stderr).toMatch(/REFUSED/);
+    expect(r.stderr).toMatch(/not valid JSON/);
+    expect(r.stderr).toMatch(/malformed payload is not an absent one/);
+    // No greeting a reader could mistake for a good one, and no generated uuid.
+    expect(r.stdout).not.toMatch(/SESSION_UUID/);
+    expect(existsSync(slotPath)).toBe(false);
+  });
+
+  it("F4: an ABSENT payload is still supported — absent and malformed are different", () => {
+    // An IDE that supplies nothing is a supported case and is why a uuid is
+    // generated at all. Refusing it too would turn a fix into an outage.
+    const r = runRaw("");
+    expect(r.status).toBe(0);
+    expect(r.stdout).toMatch(/SESSION_UUID/);
+  });
+
+  it("F4: a WELL-FORMED payload still registers the id it was given", () => {
+    const r = runRaw(JSON.stringify({ cwd, session_id: "real-1234" }));
+    expect(r.status).toBe(0);
+    expect(r.stdout).toMatch(/SESSION_UUID: real-1234/);
   });
 });

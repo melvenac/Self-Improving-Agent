@@ -22,6 +22,10 @@ import {
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
+import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
+import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
+import { SeatName, type Seat } from "./shared/state-schema.js";
+import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
@@ -206,6 +210,17 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     });
 
     const lines: string[] = [];
+
+    // FIRST, before the mode, the version, the drift line or the record itself.
+    // A seat reading a stale tree's record needs to know that before it reads
+    // any of it — on 2026-09-20 one read a rev-50 record as current and reported
+    // four false claims about the project, with every other instrument green.
+    // The line names `origin/master` and disclaims drift in its own words, so a
+    // reader seeing it above `Drift: none` cannot take either as the other's
+    // confirmation. See pipelines/session-start/tree-currency.ts.
+    lines.push(...describeTreeCurrency(projectRoot).lines);
+    lines.push("");
+
     lines.push(`Session Start — ${result.state.mode} mode`);
     lines.push(`Project: v${result.state.version}`);
 
@@ -236,6 +251,31 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
       }
     }
 
+    // Seat identity and the role knowledge that goes with it (C1 / G-032).
+    //
+    // `readAgentIdentity` is a READ-ONLY door: it parses AGENT.local.md then
+    // AGENT.md and writes nothing. That matters on its own — the only other way
+    // to ask which seat a checkout greets as was to run the SessionStart hook,
+    // which calls writeActiveSession and, given no session id, GENERATES one and
+    // stamps it over the checkout's slot. Checking identity reassigned identity.
+    //
+    // The CONTENT is returned, not just the filenames. A greeting that named the
+    // files without loading them would satisfy "the greeting says it did" and
+    // leave G-032 exactly where it was: tracked, and read by nothing.
+    const roles = describeRoleFiles(projectRoot, readAgentIdentity(projectRoot));
+    lines.push("");
+    lines.push(
+      roles.seat
+        ? `Seat: ${roles.seat.name} (${roles.seat.role})${roles.seat.partner ? ` — partner: ${roles.seat.partner}` : ""}`
+        : `Seat: UNRESOLVED`
+    );
+    lines.push(...roles.lines);
+    if (roles.problems.length > 0) {
+      lines.push(`
+ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
+      for (const p of roles.problems) lines.push(`  ${p}`);
+    }
+
     // Size block precedes the content so a reader sees what is coming before
     // it arrives. Estimator: chars/4 rounded up (see StateFileSize).
     lines.push(`\n## Sizes (tokens estimated as chars/4)`);
@@ -255,8 +295,38 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     // missing file and an empty one never look alike.
     const sj = result.state.stateJson;
     if (sj.present && sj.valid && sj.data) {
-      lines.push(...renderState(sj.data, result.state.version));
+      // The reader's OWN seat, so the greeting renders this seat's handoff and
+      // names the others by their close-out commit. A greeting that shows the
+      // developer's handoff to the planner is C4 failing on the row C2 exists for.
+      lines.push(...renderState(sj.data, result.state.version, {
+        seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
+        projectRoot,
+      }));
     } else {
+      // F3: an unknown schema_version REFUSES, with no prose fallback.
+      //
+      // `ob_state` already refused a record it could not parse; `ob_start` did
+      // not — it printed one notice line and then fell back to 59k characters of
+      // prose, so a session started from a stale build against a migrated record
+      // got a greeting that looked like the pre-state.json regime. The merge
+      // choreography counts on that failure being loud, and it was loud on the
+      // write side only.
+      //
+      // Narrow on purpose: this is the VERSION being unknown to this build, not
+      // any invalid file. A record that is merely malformed still falls back,
+      // because the prose is then the best available answer.
+      if (sj.present && !sj.valid && sj.errorPath === "schema_version") {
+        lines.push(
+          `\nSTATE RECORD REFUSED: ${sj.error}.`,
+          `This build cannot read this record's schema version. NOT falling back to the prose files: they are a DIFFERENT and older account of the project, and a greeting built from them would look ordinary while describing a state the record has moved past.`,
+          `Rebuild the checkout this process runs from against a commit carrying the record's schema, then start again.`,
+        );
+        const text = lines.join("\n");
+        return {
+          content: [{ type: "text", text: `${text}\n\nTotal returned words: ${countWords(text)} (~${estimateTokens(text)} tokens)` }],
+          isError: true,
+        };
+      }
       if (sj.present && !sj.valid) {
         lines.push(`\nstate.json invalid at ${sj.error} — falling back to files`);
       }
@@ -272,6 +342,15 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
         const body = content[s.file];
         lines.push(body === null ? "absent" : body.replace(/\s+$/, ""));
       }
+    }
+
+    // The role knowledge itself, last: it is reference material the seat reads
+    // once and refers back to, not a briefing it reads top to bottom.
+    for (const f of roles.files) {
+      if (f.content === null) continue;
+      lines.push(`
+## ${f.rel}${f.commit ? ` @ ${f.commit.slice(0, 7)}` : ""}`);
+      lines.push(f.content.replace(/\s+$/, ""));
     }
 
     // Total is of everything above it — the measurement Part 1 of the
@@ -326,9 +405,19 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
       // cause may be that this server process holds a schema older than the file
       // — an MCP server keeps its schema for the life of the process, and only a
       // human can reconnect it.
-      if (/schema|expected .* received|invalid/i.test(r.error ?? "")) {
+      // F2: ONLY on a schema_version mismatch, and branching on the parse
+      // PATH rather than on the wording. The old condition was
+      // /schema|expected .* received|invalid/i, which matches nearly every
+      // refusal this tool can produce — `ops[0] invalid at priority` is an
+      // ordinary bad argument and was told to reconnect the server.
+      //
+      // And the advice itself was wrong. A reconnect restarts the server from
+      // the SAME BUILD; when the schema change lives on a branch that build does
+      // not have — which is the case that actually occurred — reconnecting
+      // changes nothing. What is needed is a build carrying the schema.
+      if (r.error_path === "schema_version") {
         lines.push(
-          `If the state schema changed this session, this server may be holding the old one: ask Aaron to run \`/mcp reconnect open-brain\`, then re-run \`ob_sync\` — its state-schema check reports which process parsed the file. Confirm by a read ordered after the write, never by the reconnect message: a stale server reports success.`,
+          `This process's schema does not match the file's. A RECONNECT ALONE MAY NOT FIX IT: it restarts this server from the same build, so if the schema change is in a build this one does not have — a branch, or a checkout that has not been rebuilt — nothing changes. Rebuild the checkout this server runs from, then reconnect it, then confirm with \`ob_sync\`'s state-schema check, which reports which process parsed the file. Confirm by a read ordered after the write, never by the reconnect message: a stale server reports success.`,
         );
       }
       return { content: [{ type: "text", text: lines.join("\n") }], isError: true };
@@ -338,7 +427,13 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
     lines.push(`Applied (${r.applied.length}):`);
     for (const a of r.applied) lines.push(`  ${a.op}${a.id ? ` ${a.id}` : ""}`);
     lines.push(`Dropped done tasks (retention ${DONE_RETENTION_SESSIONS} sessions): ${r.dropped_task_ids.length ? r.dropped_task_ids.join(", ") : "none"}`);
+    // T-157: printed unconditionally, not folded into the line above. The
+    // evictions that cost this project two tasks were reported as one clause
+    // among several and read as routine.
+    if (r.kept_cited_task_ids.length) lines.push(`KEPT despite retention (id cited in the tracked tree): ${r.kept_cited_task_ids.join(", ")}`);
     if (r.removed_gap_ids.length) lines.push(`Closed gaps removed: ${r.removed_gap_ids.join(", ")}`);
+    // Anything the writer did differently from what was asked.
+    for (const n of r.notes) lines.push(`NOTE: ${n}`);
     lines.push(`${r.dry_run ? "Would render" : "Rendered"} (${r.rendered.length}): ${r.rendered.length ? r.rendered.join(", ") : "none (render: false)"}`);
     return { content: [{ type: "text", text: lines.join("\n") }] };
   } catch (err) {
@@ -1273,4 +1368,9 @@ if (isDirectRun) {
     console.error("open-brain server failed:", err);
     process.exit(1);
   });
+}
+
+/** Narrows a declared seat role to the closed set the record accepts. */
+function isSeat(role: string): role is Seat {
+  return SeatName.safeParse(role).success;
 }

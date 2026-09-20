@@ -182,8 +182,17 @@ describe("server handlers", () => {
       expect(text).toContain("Gaps (5):\n  G-001 — Cursor start.md copies");
       // R2 (Loop 3): decisions are append-ordered; latest is the last element, not the newest date.
       expect(text).toContain("Decisions: 6 recorded; latest D-006 (2026-08-31) Lifecycle evaluation stays out of the session-end sweep");
-      expect(text).toContain("Handoff (session 54):\n  pick up: Loop 2: run V1–V9");
-      expect(text).toContain("    - Run vitest from open-brain/, never the repo root (entry 462).");
+      // The fixture's single v1 handoff migrated to seat "developer". handleStart
+      // resolves the reader's seat from the checkout rather than assuming one, and
+      // this temp project declares none — so the render says the seat is
+      // unresolved and names the handoff instead of showing it as "yours".
+      expect(text).toContain("READER'S SEAT UNRESOLVED");
+      expect(text).toContain("developer (session 54)");
+      // Another seat's watch-out items are NOT rendered — only its pick-up line
+      // and its close-out commit. Pinned as an absence: printing every seat's
+      // full handoff to every reader is the noise that made one shared slot look
+      // tolerable for as long as it did.
+      expect(text).not.toContain("    - Run vitest from open-brain/, never the repo root (entry 462).");
       expect(text).toContain("Last session: #54 2026-09-14 (f7a1b3d9-ef6d-482f-aba1-ddaa296f722b)");
 
       // The four prose files are NOT returned…
@@ -249,14 +258,16 @@ describe("server handlers", () => {
           { op: "open_task", title: "Loop 3 writer", priority: "P0" },
           { op: "add_verified", claim: "ob_state round-trips", evidence: [{ type: "test", path: "open-brain/tests/server.test.ts", observation: "this test" }] },
           { op: "add_decision", title: "Views are generated", date: "2026-09-15", note: "" },
-          { op: "set_handoff", pick_up: "Loop 4 migration", watch_out: ["reconnect the server"], open_questions: [] },
-          { op: "end_session", n: 55, date: "2026-09-15", uuid: "round-trip-uuid" },
+          { op: "set_handoff", seat: "developer", pick_up: "Loop 4 migration", watch_out: ["reconnect the server"], open_questions: [] },
+          { op: "end_session", n: 55, date: "2026-09-15", uuid: "round-trip-uuid", seat: "developer" },
         ],
       });
       expect(res.isError).toBeUndefined();
       const out = getText(res);
       expect(out).toContain("ob_state applied\nRevision: 7 → 8");
-      expect(out).toContain("  close_task T-005\n  open_task T-028\n  add_verified V-009\n  add_decision D-007\n  set_handoff\n  end_session");
+      // set_handoff reports the SEAT as its id, so which seat wrote a handoff is
+      // visible in the applied list rather than only inside the file.
+      expect(out).toContain("  close_task T-005\n  open_task T-028\n  add_verified V-009\n  add_decision D-007\n  set_handoff developer\n  end_session");
       expect(out).toContain("Dropped done tasks (retention 3 sessions): T-020, T-021, T-022, T-023, T-026");
       expect(out).toContain("Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md");
 
@@ -264,7 +275,10 @@ describe("server handlers", () => {
       const header = "<!-- generated from .agents/state.json rev 8 by open-brain v0.30.0 — do not edit; change state via ob_state -->";
       expect(readFileSync(join(tmp, ".agents", "TASKS", "INBOX.md"), "utf-8").startsWith(header)).toBe(true);
       expect(readFileSync(join(tmp, ".agents", "TASKS", "task.md"), "utf-8")).toContain("**T-028** [P0] Loop 3 writer");
-      expect(readFileSync(join(tmp, ".agents", "SESSIONS", "next-session.md"), "utf-8")).toContain("Session 55 — 2026-09-15 — `round-trip-uuid`");
+      // The last-session line now carries the seat that closed it, between the
+      // date and the uuid: which seat ended a session was previously knowable
+      // only by reading the handoff it happened to write.
+      expect(readFileSync(join(tmp, ".agents", "SESSIONS", "next-session.md"), "utf-8")).toContain("Session 55 — 2026-09-15 — developer — `round-trip-uuid`");
       const summary = readFileSync(join(tmp, ".agents", "SYSTEM", "SUMMARY.md"), "utf-8");
       expect(summary).toContain("PROSE-SUMMARY-MARKER alpha beta"); // outside the region, preserved
       expect(summary).toContain("<!-- state:begin -->");
@@ -276,7 +290,10 @@ describe("server handlers", () => {
       expect(start).toContain("[open] T-028 Loop 3 writer");
       expect(start).not.toContain("[in_progress] T-005");
       expect(start).toContain("Decisions: 7 recorded; latest D-007 (2026-09-15) Views are generated");
-      expect(start).toContain("Handoff (session 55):\n  pick up: Loop 4 migration");
+      // This temp project declares no seat, so the read-back names the handoff
+      // rather than presenting it as the reader's own.
+      expect(start).toContain("developer (session 55)");
+      expect(start).toContain("Loop 4 migration");
       expect(start).toContain("Last session: #55 2026-09-15 (round-trip-uuid)");
       // R3: state.json still says 0.29.0 while package.json says 0.30.0 → reported, not fixed.
       expect(start).not.toContain("state-version:");
@@ -485,5 +502,108 @@ describe("server handlers", () => {
       // Should not crash — falls back to zeros if no DB
       expect(result.categories.find((c) => c.name === "Knowledge Quality")!.score).toBeGreaterThanOrEqual(0);
     });
+  });
+});
+
+describe("F2 / F3 — a refusal must name the condition it is actually about", () => {
+  let tmp: string;
+
+  beforeEach(() => {
+    tmp = mkdtempSync(join(tmpdir(), "ob-refuse-"));
+    mkdirSync(join(tmp, ".agents"), { recursive: true });
+  });
+
+  afterEach(() => {
+    try { rmSync(tmp, { recursive: true }); } catch { /* Windows race */ }
+  });
+
+  const writeState = (o: Record<string, unknown>) =>
+    writeFileSync(join(tmp, ".agents", "state.json"), JSON.stringify(o, null, 2) + "\n");
+
+  const writeProse = (marker: string) => {
+    mkdirSync(join(tmp, ".agents", "SYSTEM"), { recursive: true });
+    writeFileSync(join(tmp, ".agents", "SYSTEM", "SUMMARY.md"), "# " + marker + "\n\nthe account\n");
+  };
+
+  it("F2: the reconnect/rebuild advice appears ONLY on a schema_version mismatch", async () => {
+    // The old condition was /schema|expected .* received|invalid/i, which matches
+    // almost every refusal ob_state can produce. QA saw it on seven refusals in a
+    // row, all against a schema-VALID record — including a plain bad argument.
+    cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+    const badOp = await handleState({
+      project_root: tmp,
+      session: 55,
+      expected_revision: 7,
+      ops: [{ op: "open_task", title: "x", priority: "P9" }],
+    });
+    const text = getText(badOp);
+    expect(text).toMatch(/invalid at priority/);
+    expect(text).not.toMatch(/reconnect/i);
+    expect(text).not.toMatch(/Rebuild the checkout/i);
+  });
+
+  it("F2: and it DOES appear on a schema_version mismatch, saying rebuild rather than reconnect", async () => {
+    // The other half, and the wording matters: a reconnect restarts the server
+    // from the SAME BUILD, so when the schema change is in a build this one does
+    // not have, reconnecting changes nothing. That is what actually happened.
+    writeState({ schema_version: 99, revision: 0 });
+    const r = await handleState({
+      project_root: tmp,
+      session: 1,
+      expected_revision: 0,
+      ops: [{ op: "set_objective", text: "x" }],
+    });
+    const text = getText(r);
+    expect(text).toMatch(/schema_version/);
+    expect(text).toMatch(/RECONNECT ALONE MAY NOT FIX IT/);
+    expect(text).toMatch(/Rebuild the checkout this server runs from/);
+  });
+
+  it("F3: ob_start REFUSES an unknown schema_version and does NOT fall back to prose", async () => {
+    // ob_state refused a record it could not parse; ob_start did not. It printed
+    // one notice line and then returned 59k characters of prose, so a session
+    // started from a stale build against a migrated record got a greeting that
+    // looked like the pre-state.json regime. The merge choreography counts on
+    // that failure being loud, and it was loud on the WRITE side only.
+    writeState({ schema_version: 99, revision: 0 });
+    writeProse("PROSE-SENTINEL");
+
+    const res = await handleStart({ project_root: tmp });
+    const text = getText(res);
+    expect(res.isError).toBe(true);
+    expect(text).toMatch(/STATE RECORD REFUSED/);
+    expect(text).toMatch(/NOT falling back to the prose files/);
+    // The prose must not be in the return at all. The point is that it is a
+    // different and older account, not that it carries a warning.
+    expect(text).not.toMatch(/PROSE-SENTINEL/);
+  });
+
+  it("F3: an ABSENT state.json still keeps the prose regime", async () => {
+    // Narrow on purpose, and ruled: absence is the pre-state.json case, which is
+    // supported. Only a PRESENT file whose version this build does not know
+    // refuses. Turning a fix into an outage for every project without a record
+    // would be the larger bug.
+    writeProse("PROSE-SENTINEL");
+
+    const res = await handleStart({ project_root: tmp });
+    const text = getText(res);
+    expect(res.isError).toBeUndefined();
+    expect(text).toMatch(/PROSE-SENTINEL/);
+    expect(text).not.toMatch(/STATE RECORD REFUSED/);
+  });
+
+  it("F3: a MALFORMED but known-version record still falls back, rather than refusing", async () => {
+    // The distinction the errorPath branch exists for: "this build cannot read
+    // this VERSION" is not "this file is broken". For the second, the prose is
+    // the best available answer.
+    writeState({ schema_version: 2, revision: -1 });
+    writeProse("PROSE-SENTINEL");
+
+    const res = await handleStart({ project_root: tmp });
+    const text = getText(res);
+    expect(res.isError).toBeUndefined();
+    expect(text).toMatch(/invalid at revision/);
+    expect(text).toMatch(/falling back to files/);
+    expect(text).toMatch(/PROSE-SENTINEL/);
   });
 });
