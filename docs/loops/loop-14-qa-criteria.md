@@ -456,3 +456,97 @@ marked **RULED**. The planner said the same rulings go to the developer in the s
    time through it, and I read it with the candidate's build in my tree.
 6. **C3's refusal shape**: **RULED: confirmed** — schema refusal or absence rendered in words both
    pass; only silence fails.
+
+## 10. Second candidate — rows added by the planner's ruling on the first report (`867790b`), 2026-09-20
+
+The first candidate `7e1c041` was evaluated in `docs/loops/loop-14-qa-report.md` at `867790b`: eight
+rows passed, C2d failed on the near-miss register. The planner ruled on that report before any
+second candidate existed, and the rulings below are recorded here **before** the second SHA arrives
+so the criteria cannot be fitted to it. **The second candidate is on the same branch and is
+evaluated against every row above again in full** — the table, the six mutants, the by-hand SHA
+check across the migration boundary — plus the four rows below, all marked **[ruled]**.
+
+**C2d — RULED.** The near-miss register belongs to the **close-out document, by family, never
+numbered** — not to the record. The row is met by **a sentence in the developer handoff's
+enumeration saying so**; it failed correctly on the first candidate because nothing said it
+anywhere. Pass on the second candidate: that sentence exists in a tracked file at the SHA, and the
+other six items still sort as in the report's §3.5 table.
+
+### R1 — an uncommitted MODIFIED other-seat entry fails closed with no SHA **[ruled]**
+
+- **Required (ruling on F1):** when another seat's handoff in the working copy of `state.json`
+  differs from the entry at HEAD, the greeting **names no SHA** for it and says why; it must not
+  print a close-out commit beside words that commit does not hold. The already-honest case — a NEW
+  entry with no committed ancestor — keeps its `no commit … nothing to trace` line.
+- **Procedure:** on a scratch worktree at the candidate, `set_handoff seat: developer` with new
+  words through `handleState`, no commit; greet as Probe. **Seen red at `7e1c041`:** the same
+  fixture printed `developer (session 80): close-out 7e1c041 2026-09-20` above `PROBE: developer
+  words rewritten in the working tree, not committed` (report §6 F1). At the second candidate the
+  developer line must carry **no 7-character SHA** and must say the entry is modified / uncommitted
+  relative to HEAD; the qa and planner lines are unchanged. Then commit the write in the scratch
+  worktree and greet again: the SHA of that commit appears. Also the NEW-entry case: planner
+  `set_handoff` uncommitted → `no commit` line as before. A shipped test asserts the modified case
+  and goes red under a mutant that skips the working-tree comparison.
+- **Pass / fail:** pass on all three shapes and the mutant red; fail if any SHA is printed for a
+  modified entry, or if the fix silently drops the other seats' lines instead.
+
+### R2 — the reconnect advice appears only on a schema mismatch, and it says rebuild **[ruled]**
+
+- **Required (ruling on F2):** an `ob_state` refusal for an **invalid op against a record that
+  validates** carries no *"ask Aaron to run /mcp reconnect"* text. A refusal because the record does
+  not validate against the server's schema **at `schema_version`** carries advice that names
+  **rebuilding the main checkout** (the process runs from its build) as well as reconnecting.
+- **Procedure:** the seven refusals of report §3.2 repeated against a rev-54-or-later valid record —
+  each must end without the reconnect sentence; then the candidate's `handleState` against a
+  **v1** copy (`git show 7c7e04b:.agents/state.json`) — refused naming `schema_version`, with advice
+  that contains the word *rebuild* and names the main checkout or its build.
+- **Pass / fail:** both; fail if the advice is on the plain refusals, absent on the mismatch, or
+  says reconnect without rebuild.
+
+### R3 — `ob_start` refuses an unknown `schema_version` in words, with no prose fallback **[ruled]**
+
+- **Required (ruling on F3):** when `state.json` is **present** and its `schema_version` is not the
+  one the build knows, `handleStart` says so, names the version it found and the one it expected,
+  and prints **no** `## SUMMARY.md` / `## INBOX.md` / `## task.md` / `## next-session.md` sections.
+  The tree-currency line and the seat / role lines still print first. **Reading I apply, returned
+  below:** an **absent** `state.json` keeps the prose regime (V-002's three-way reader; projects
+  that never migrated); a present file at the **current** version that fails validation on some
+  other field is the developer's choice, recorded.
+- **Procedure:** the candidate's build on `F-behind` (record rev 50, `schema_version: 1`) — the
+  `## State` block absent, the refusal line present naming `1` and `2`, no prose sections; on a
+  fixture with `schema_version: 3` planted — the same shape naming `3`; on a fixture with
+  `state.json` deleted — the prose sections as before. **Seen red at `7e1c041`:** `F-behind` printed
+  `state.json invalid at schema_version: Invalid input: expected 2 — falling back to files` and the
+  four files (report §3.3). A shipped test asserts the no-fallback shape.
+- **Pass / fail:** pass on all three; fail if the unknown-version case still prints any prose
+  section, or if the absent-file case stops printing them without a ruling.
+- **Limit, stated:** this changes the **new** build. The **old** build in the main checkout will
+  still fall back to prose against the merged v2 record until it is rebuilt; R3 protects the next
+  schema bump, not this one. The report says so.
+
+### R4 — a malformed hook payload refuses, writes nothing, exits non-zero **[ruled]**
+
+- **Required (ruling on F4):** `cli-bootstrap.js` given stdin that does not parse as JSON **refuses**
+  — a line on stderr naming the parse failure, **no** `SESSION_UUID:` / `Agent:` greeting for the
+  shell's cwd, **no** write to `active-session.json`, and a **non-zero** exit. A well-formed payload
+  behaves as today.
+- **Procedure:** with `HOME`/`USERPROFILE` at a scratch home, run the hook from `/tmp` with (a) the
+  backslash payload that reproduced F4 — a JSON string containing a Windows path with unescaped
+  backslashes; (b) an empty stdin; (c) a well-formed payload built by `JSON.stringify`. Before and
+  after (a) and (b): the scratch `active-session.json` key count and bytes. **Seen red at
+  `7e1c041`:** (a) printed `Project detected: C:\Users\melve\Worktrees\sia-qa`, a generated
+  `SESSION_UUID`, exit 0, and wrote `source: "generated"` into the scratch slot for this checkout
+  (report §6 F4). A shipped test asserts the refusal.
+- **Pass / fail:** (a) and (b) exit non-zero with the file byte-identical and no greeting; (c) exit
+  0 with the greeting. Fail if (a) or (b) exits 0, prints a greeting, or changes the file. **What a
+  well-formed payload with no `session_id` (the `{}` case) does is the developer's choice** —
+  recorded, not scored — and returned below.
+- **Limit:** a SessionStart hook that exits non-zero is reported by the host as a hook error and
+  does not stop the session; I observe the exit code and the file, not the host's rendering.
+
+### Returned to the planner with this amendment
+
+7. **R3's absent-file case:** I keep the prose regime for an absent `state.json` and refuse only a
+   present file with an unknown version. Confirm, or rule that absent also refuses.
+8. **R4's `{}` case:** a well-formed payload with no `session_id` — refuse, or generate as today?
+   Recorded either way unless ruled.
