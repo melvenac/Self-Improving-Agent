@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 46,
+  "revision": 47,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "NO LOOP IS OPEN. Loop 15 slice one closed ACCEPTED on 2026-09-20 at v0.41.0 (D-022). The next loop is not briefed: Aaron rules on sequencing; the planner recommends Loop 15 slice two — real role sessions through open-brain/src/harness/ — with G-041 (the ref channel: a role's `git tag -f` during its stage is undetected) as its mandatory first repair, mechanical and seen red before it is believed. Loop 14 (re-briefed in docs/loops/loop-14-rebrief.md) follows. This field is reset on every loop close (G-035); a greeting that names a closed loop is a defect in the record, not the greeting.",
+    "text": "Loop 15 slice two — the ref channel closes and the gates go live. Brief: docs/loops/loop-15-slice-2-brief.md, binding with docs/HOH-JEV.md. First: G-041 — a ref snapshot around every stage refusing any delta the runtime did not author (refs, not tags), and a refusal flag at runLoop entry for any role the runtime did not construct, seen red before the watch exists (A1). Then: Jev transport reading TYPESAFE_API_KEY from the environment only, plan gate and developer done-gate as batched typed questions, thresholds as data in harness/policies/, gate verdicts written into the iteration artifact; roles stay stubbed. QA writes criteria before the first candidate; one live Jev call, by QA, once (A7). Loop 14 follows (docs/loops/loop-14-rebrief.md). Ruled D-023, 2026-09-20.",
     "since_session": 64
   },
   "tasks": [
@@ -177,7 +177,7 @@
       "opened_session": 50,
       "closed_session": null,
       "supersedes": null,
-      "note": "(Session 50). Failed twice in one session with `FTS index 'file_fts' is inconsistent: document for node offset N is missing during delete`, both times self-healing on retry because the aborted run leaves `incrementalInProgress` set and the next run forces a full rebuild. Session 48 hit the same class and RUNBOOK already documents `analyze --repair-fts`. Now three occurrences across three sessions — if it recurs, stop retrying by hand and either pin the runner version or default this repo to full rebuild. Cheap mitigation: the retry works, so this costs a minute, not a session."
+      "note": "FOLDED IN FROM G-043 (Probe, session 66, 2026-09-20): `gitnexus clean` exits 0 and deletes nothing without --force, so a chained clean-then-analyze reports success having cleaned nothing. Any script or instruction that cleans the index must pass --force and assert the directory is gone before re-analysing; recovery from the FTS 'document for node offset N is missing during delete' failure is `analyze --repair-fts` (store entry 349), not clean. The failure recurred on dec2406 in the QA tree and self-healed on a second plain analyze; it did not recur in the main tree on the same commit."
     },
     {
       "id": "T-056",
@@ -1856,6 +1856,12 @@
       "title": "D-022 — Loop 15 slice one is ACCEPTED at 4414bcc; D6 (a role rewriting an existing tag) is ruled onto slice two as G-041, not widened away",
       "date": "2026-09-20",
       "note": "Accepted by the QA seat in report 2 (a2cb718) on criteria written before the first candidate existed (24e33e5 lineage), after the second candidate was rejected because enforcement read `git status` and a commit leaves it clean. Merged on Aaron's word 2026-09-20 in order #57 (developer, rev 39 -> 43), #58 and #59 (QA criteria, QA reports), #53-#56 (planner docs); v0.41.0 tagged on the final merge dec2406. Close-out: docs/loops/loop-15-closeout.md. Slice two's A1 is mechanical: the runtime refuses any role it did not construct itself unless a ref-watch is present, one flag, failing closed, seen red first — the developer's rule-4 objection to the intention-shaped version is upheld. Sequencing after this loop is held for Aaron; the planner's recommendation is slice two with G-041 first, because that is where real roles arrive. Error counts at close: 48 Planner / 28 Developer / 0 QA, window since Loop 13's close at 45/25."
+    },
+    {
+      "id": "D-023",
+      "title": "D-023 — Loop 15 slice two next, G-041 its mechanical first repair, then Loop 14; developer and QA seats roll after every complete loop",
+      "date": "2026-09-20",
+      "note": "Ruled by Aaron 2026-09-20, in his words: 'Loop 15 slice two next, with G-041 as its mechanical first repair, then Loop 14' and 'forge and probe need to roll after each complete loop'. Brief: docs/loops/loop-15-slice-2-brief.md (merged #62). Slice two follows the guide's build order (docs/HOH-JEV.md §7): the ref-watch and the foreign-role refusal flag first (A1, seen red before the watch exists), then the Jev transport, the plan gate and the developer done-gate with thresholds as data; roles stay stubbed, real prompts are slice three. The close-out's phrase 'slice two is where real roles arrive' is superseded by the brief's §1. THE ROLL RULE: at every loop close the developer and QA seats end their sessions on the record, one seat at a time (G-036), and fresh sessions take the next loop — done for slice one as #61 (rev 45) and #63 (rev 46). The planner seat does not roll on this rule."
     }
   ],
   "handoff": {

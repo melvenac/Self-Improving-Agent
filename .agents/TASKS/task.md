@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 46 by open-brain v0.41.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 47 by open-brain v0.41.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-NO LOOP IS OPEN. Loop 15 slice one closed ACCEPTED on 2026-09-20 at v0.41.0 (D-022). The next loop is not briefed: Aaron rules on sequencing; the planner recommends Loop 15 slice two — real role sessions through open-brain/src/harness/ — with G-041 (the ref channel: a role's `git tag -f` during its stage is undetected) as its mandatory first repair, mechanical and seen red before it is believed. Loop 14 (re-briefed in docs/loops/loop-14-rebrief.md) follows. This field is reset on every loop close (G-035); a greeting that names a closed loop is a defect in the record, not the greeting. _(since session 64)_
+Loop 15 slice two — the ref channel closes and the gates go live. Brief: docs/loops/loop-15-slice-2-brief.md, binding with docs/HOH-JEV.md. First: G-041 — a ref snapshot around every stage refusing any delta the runtime did not author (refs, not tags), and a refusal flag at runLoop entry for any role the runtime did not construct, seen red before the watch exists (A1). Then: Jev transport reading TYPESAFE_API_KEY from the environment only, plan gate and developer done-gate as batched typed questions, thresholds as data in harness/policies/, gate verdicts written into the iteration artifact; roles stay stubbed. QA writes criteria before the first candidate; one live Jev call, by QA, once (A7). Loop 14 follows (docs/loops/loop-14-rebrief.md). Ruled D-023, 2026-09-20. _(since session 64)_
 
 ## Top tasks
 
