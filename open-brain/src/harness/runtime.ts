@@ -89,6 +89,7 @@ import {
   renderPlanMarkdown,
   type FailureRecord,
 } from "./artifacts.js";
+import { RefWatch, type RefVerdict } from "./refwatch.js";
 import {
   DryRunTransport,
   UnconfiguredTransport,
@@ -225,6 +226,7 @@ export function runLoop(config: LoopConfig): LoopResult {
       : (config.transport ?? new UnconfiguredTransport());
 
   const { repoRoot, loop } = config;
+  const refWatch = refWatchEnabled ? new RefWatch(repoRoot) : null;
   const schemas = jsonSchemas();
   const gatePayloads: GatePayload[] = [];
   const gateAnswers: GateAnswer[] = [];
@@ -321,6 +323,7 @@ export function runLoop(config: LoopConfig): LoopResult {
   const baseSha = headSha(repoRoot);
   const branch = currentBranch(repoRoot);
   result.baseSha = baseSha;
+  refWatch?.authorise(`refs/tags/${baseTag}`);
   tagAt(repoRoot, baseTag, baseSha, `HoH loop ${loop}: tree before the loop ran`);
   tags.push(baseTag);
   log(`loop ${loop}: base ${baseSha} on ${branch}, tagged ${baseTag}`);
@@ -358,6 +361,24 @@ export function runLoop(config: LoopConfig): LoopResult {
     // The base this stage is judged against. Every path difference between
     // here and the stage's end is the stage's doing, committed or not.
     const stageBase = headSha(repoRoot);
+    // …and every REF difference likewise. The runtime writes its own refs
+    // between stages, never inside a window, so a delta here is a role's.
+    refWatch?.begin(roleName);
+
+    /**
+     * Close the ref window and put back anything the role wrote.
+     *
+     * Runs BEFORE the allowlist comparison, deliberately: moving
+     * `refs/heads/<branch>` changes what `git rev-parse HEAD` answers, so a
+     * path verdict computed first would be measured against a HEAD the role
+     * chose.
+     */
+    const closeRefWindow = (): { ok: true; verdict: RefVerdict | null } | { ok: false; reason: string } => {
+      if (!refWatch) return { ok: true, verdict: null };
+      const verdict = refWatch.compare();
+      if (verdict.ok) return { ok: true, verdict };
+      return { ok: false, reason: `${verdict.message}${refWatch.restore(verdict)}` };
+    };
 
     /**
      * Undo whatever the stage left behind.
@@ -387,10 +408,28 @@ export function runLoop(config: LoopConfig): LoopResult {
       // The in-process helper refusing is still a boundary violation: the role
       // tried. It is reported as one so the two mechanisms agree.
       const thrownCode: FailureCode = err instanceof WriteRefused ? "allowlist-violation" : "role-threw";
+      // A role that threw may still have written a ref on its way out, and a
+      // thrown error is not a reason to stop looking at the other channels.
+      const refAfterThrow = closeRefWindow();
       const verdictAfterThrow = enforceAllowlist(repoRoot, allow, stageBase);
       const undone = verdictAfterThrow.ok ? "" : rollBack(verdictAfterThrow);
+      if (!refAfterThrow.ok) {
+        return {
+          ok: false,
+          code: "stage-changed-ref",
+          reason: `${roleName} stage: ${refAfterThrow.reason}${undone} The stage also threw: ${(err as Error).message}`,
+        };
+      }
       return { ok: false, code: thrownCode, reason: `${roleName} stage: ${(err as Error).message}${undone}` };
     }
+
+    const refClose = closeRefWindow();
+    if (!refClose.ok) {
+      const verdictAfterRef = enforceAllowlist(repoRoot, allow, stageBase);
+      const undone = verdictAfterRef.ok ? "" : rollBack(verdictAfterRef);
+      return { ok: false, code: "stage-changed-ref", reason: `${roleName} was refused, not warned. ${refClose.reason}${undone}` };
+    }
+    if (refClose.verdict) log(`  ${roleName} refs: ${refClose.verdict.message}`);
 
     const verdict = enforceAllowlist(repoRoot, allow, stageBase);
     log(`  ${roleName} attempt ${attempt}: ${verdict.message}`);
@@ -430,6 +469,11 @@ export function runLoop(config: LoopConfig): LoopResult {
           `The tree moved between making that commit and tagging it, so the tag would not mean what it says.`,
       };
     }
+    // Declare the exact ref before writing it. The runtime tags between stages,
+    // never inside a window, so this is currently consumed by nothing — and
+    // that is the point: if tagging ever moves inside a stage, the ledger is
+    // already correct rather than something a later reader has to notice.
+    refWatch?.authorise(`refs/tags/${tag}`);
     tagAt(repoRoot, tag, sha, message);
     tags.push(tag);
     return { ok: true };

@@ -249,6 +249,65 @@ export function resolveRef(cwd: string, ref: string): string | null {
 }
 
 /**
+ * Every ref under `refs/`, as ref name → the object it points at.
+ *
+ * `%(objectname)` is the ref's own target, **not the peeled commit**, and that
+ * is deliberate: `git tag -f` on an annotated tag writes a new tag object, so a
+ * watch that peeled to the commit would see the same sha before and after a
+ * forced retag that changed the message. Identity of the target object is the
+ * thing being watched.
+ *
+ * The sha is printed first because it is fixed-width: the parse is a slice at
+ * 40, never a split on a separator a ref name might contain. (Ref names cannot
+ * contain spaces, but a parser that does not need that fact cannot be wrong
+ * about it.)
+ *
+ * LIMIT: `refs/` only. `HEAD` itself, `ORIG_HEAD`, the index, reflogs, hooks
+ * and config are not refs and are not seen here.
+ */
+export function allRefs(cwd: string): Map<string, string> {
+  const raw = git(cwd, ["for-each-ref", "--format=%(objectname) %(refname)"]);
+  const out = new Map<string, string>();
+  if (raw === "") return out;
+  for (const line of raw.split("\n")) {
+    const trimmed = line.trimEnd();
+    if (trimmed === "") continue;
+    const sha = trimmed.slice(0, 40);
+    const name = trimmed.slice(41);
+    if (!/^[0-9a-f]{40}$/.test(sha) || name === "") {
+      throw new GitFailed(`for-each-ref produced a line this parser cannot read: "${line}"`, null, "");
+    }
+    out.set(name, sha);
+  }
+  return out;
+}
+
+/**
+ * The ref `HEAD` symbolically points at — `refs/heads/main` — or null when the
+ * checkout is detached and HEAD names a commit directly.
+ */
+export function symbolicHeadRef(cwd: string): string | null {
+  const r = gitTry(cwd, ["symbolic-ref", "--quiet", "HEAD"]);
+  return r.ok && r.stdout !== "" ? r.stdout : null;
+}
+
+/**
+ * Point a ref at `sha`, refusing unless it currently points at `expectedOld`.
+ *
+ * The old-value argument is git's own compare-and-swap. Without it a restore
+ * races whatever moved the ref in the first place, and a restore that can lose
+ * that race is not a restore.
+ */
+export function setRefTo(cwd: string, ref: string, sha: string, expectedOld: string | null): void {
+  git(cwd, expectedOld === null ? ["update-ref", ref, sha] : ["update-ref", ref, sha, expectedOld]);
+}
+
+/** Delete a ref, refusing unless it currently points at `expectedOld`. */
+export function deleteRef(cwd: string, ref: string, expectedOld: string): void {
+  git(cwd, ["update-ref", "-d", ref, expectedOld]);
+}
+
+/**
  * Stage the given paths and commit. Returns the new sha.
  *
  * Paths are passed after `--` so a path that looks like a flag cannot become
