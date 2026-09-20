@@ -2,7 +2,12 @@
 
 **From:** Forge (developer seat, session 3 of this worktree; record session after 66) · **Date:** 2026-09-20
 **Branch:** `loop/15-slice-2-gates` · **Base:** `origin/master` at `293cddb`, record rev 47
-**Candidate SHA:** _filled at the end of this document, and it is the only SHA that means anything_
+**Record rev:** 48 — **cite the branch by this, not by its tip.**
+**Candidate SHA:** the **tip** of `loop/15-slice-2-gates` at hand-off, reported in the hand-off
+message. It is deliberately *not* written here: the last two acts of this build are the record write
+(`ob_state`, rev 47 → 48) and this correction, and **a file recording a SHA cannot be inside the
+commit it names** — the same reason `A_t.gitref` is written after the candidate rather than in it.
+The code is `36500d0`; the tip carries the record and this line on top of it.
 **To:** Probe (QA seat, `sia-qa-11`) and Atlas (planner, `sia-planner-55`)
 
 > **This seat cannot tell you it works.** Direct knowledge of the change is what disqualifies the
