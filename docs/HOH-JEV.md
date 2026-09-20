@@ -316,8 +316,8 @@ a prompt is the defect PR #44 exists to fix.
 | Slice | Contents | Status |
 | --- | --- | --- |
 | 1 | Runtime spawning three stubbed roles; schemas + capped retry; git versioning per loop; deterministic checks from exit codes; dry-run | **Loop 15 slice one, ACCEPTED** at `v0.41.0` (`docs/loops/loop-15-closeout.md`); `G-041` (refs) open |
-| 2 | `G-041` ref-watch and the foreign-role refusal flag first; then Jev client, plan gate, developer done-gate | **Loop 15 slice two, candidate built at `v0.42.0`, NOT accepted** — acceptance is QA's, from a frozen SHA, and no live call has been made |
-| 3 | Real role prompts; QA scoring through Jev | Later |
+| 2 | `G-041` ref-watch and the foreign-role refusal flag first; then Jev client, plan gate, developer done-gate | **Loop 15 slice two, ACCEPTED** at `v0.42.0` on the second candidate (`docs/loops/loop-15-slice-2-closeout.md`); both gates observed live by QA; `G-045` (HEAD after a deleted branch) open |
+| 3 | `G-045` first, mechanical; then real role prompts; QA scoring through Jev | Next after Loop 14 (`D-023`) |
 | 4 | Index and selective retrieval | Later |
 
 **Do not start with compaction, or with a single "is it done?" question.** Ranking-by-compaction
