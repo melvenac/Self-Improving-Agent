@@ -277,6 +277,32 @@ if (command === "sync") {
     console.log(`Left ${result.skippedForeign.length} hand-written note(s) in Topics/ untouched:`);
     for (const f of result.skippedForeign.slice(0, 10)) console.log(`  ${f}`);
   }
+} else if (command === "detach") {
+  // C3's concrete first piece: "return the tree to detached after a push." It had
+  // been run by hand more than twenty times, which is exactly the shape C3
+  // describes — a step that works because a seat remembers it.
+  const { detachToUpstream } = await import("./pipelines/detach/index.js");
+  const startDir = resolve(args.slice(1).find((a) => !a.startsWith("--")) ?? ".");
+  const repoRoot = resolveRepoRoot(startDir);
+  if (!repoRoot) {
+    console.error(`detach refused: ${describeNoRoot(startDir)}`);
+    process.exit(1);
+  }
+  const r = detachToUpstream(repoRoot, {
+    dryRun: args.includes("--dry-run"),
+    noFetch: args.includes("--no-fetch"),
+    force: args.includes("--force"),
+  });
+  console.log(`detach — ${repoRoot}`);
+  for (const step of r.steps) console.log(`  ${step}`);
+  if (!r.ok) {
+    console.error(`
+detach REFUSED: ${r.error}`);
+    process.exit(1);
+  }
+  console.log(`
+HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " (detached)"} -> ${r.headAfter?.slice(0, 7)} (detached)`);
+  process.exit(0);
 } else if (command === "state") {
   // Loop 4 C1: the one-shot migration door. `state import --draft` (default)
   // writes a reviewable draft + report; `--commit` applies the reviewed draft.
@@ -449,5 +475,8 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft|--commit] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
+  console.log("  state migrate --seat <planner|developer|qa> [--keep-revision] [--dry-run] <file...>");
+  console.log("                                             Migrate state.json schema v1 -> v2");
+  console.log("  detach [--dry-run] [--no-fetch] [--force] [dir]      Return a seat worktree to detached at origin/master");
   process.exit(1);
 }

@@ -139,8 +139,24 @@ reported` means CI has not registered — not that it passed. A merge against an
 failed and left the PR closed.
 
 **Seat worktrees are detached at rest.** Branch deliberately to commit; return with
-`git checkout --detach origin/master` — **`origin/master`, not `master`**, which another worktree may
-be holding behind.
+**`node open-brain/build/cli.js detach`**, which is the two git commands plus the three refusals that
+make them safe:
+
+- a **dirty tree** is refused, naming the paths — detaching leaves uncommitted work against a base
+  you did not choose;
+- **commits this HEAD has that `origin/master` does not** are refused, naming them. This is the one
+  that matters: a detached HEAD leaves them reachable only through the reflog, so a seat running
+  this after a push it *believed* succeeded loses the session. `--force` exists to override it
+  deliberately;
+- it **fetches first**, then **reads the end state back** rather than trusting the checkout's exit
+  code, and says `verified: detached at <sha>, no branch` only after checking.
+
+It targets **`origin/master`, not `master`** — a local ref another worktree may be holding behind.
+That was a correction, not a preference: the original brief said `--detach master`.
+
+**This step had been run by hand more than twenty times** before it became a command. That is `C3`'s
+shape exactly — a step that works because a seat remembers it — and the by-hand version has no
+refusals at all.
 
 **The main checkout is infrastructure, not a spare worktree.** Both session hooks hardcode absolute
 paths into it and the MCP server runs from its build. Moving or renaming it breaks every session on

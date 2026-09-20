@@ -126,14 +126,52 @@ ob_state(session: N, expected_revision: R, ops: [...], render: true)
   - `add_gap {what, evidence, recommended_update}` / `close_gap {id}`
   - `add_decision {title, date, note}` — one per ADR appended in A3
   - `set_objective {text}` — only if the objective changed (`null` clears it)
-  - `set_handoff {pick_up, watch_out[], open_questions[]}` — the relay baton (A7's content).
+  - `set_handoff {seat, pick_up, watch_out[], open_questions[], loop_state?}` — the relay baton
+    (A7's content), **for your seat**.
+
+    **`seat` is required and is one of `planner` / `developer` / `qa`.** It replaces YOUR entry and
+    leaves the other seats' alone. Before Loop 14 this was one project-wide slot, so under the roll
+    rule the second seat to close out erased the first — which cost a session when a later message
+    sent a fresh seat to a file that no longer held what it was said to hold (`G-046`).
+
     **Do not assert commit or push status in it.** This op runs inside `/end`, before anything is
     committed, so "THE COMMIT IS NOT MADE" is true when written and false when read — permanently,
     every loop. State what the work *is*; the tree is authoritative about whether it landed, and the
     next `/start` reads the tree.
-  - `end_session {n, date, uuid}` — always last
+
+    **THE PLANNER SEAT MUST PASS `loop_state`, AND THE WRITE IS REFUSED WITHOUT IT.** This is not a
+    reminder — the schema and the op both refuse, so the rows cannot be skipped by forgetting:
+
+    ```
+    loop_state: {
+      open_prs: [{ref, qa_status, note}],   // qa_status: not_started | in_progress | accepted | rejected | not_required
+      frozen_sha: "<sha>" | null,           // the SHA frozen for a QA in progress
+      questions_for_aaron: ["..."],         // pending, not answered
+      rulings: ["..."]                      // made mid-loop, which nothing else records
+    }
+    ```
+
+    **Every field may be EMPTY and none may be ABSENT.** `[]` and `null` are real answers — "no open
+    PRs" is a state of the world. Absence is not an answer, and an optional field is one a seat
+    remembers to fill, which is the failure `C3` names. These four rows are what the planner loses at
+    every roll: the runtime's `D_t`, `E_t` and `G_*` say what a loop decided, built, judged and
+    gated, and carry none of them. In slice two all four travelled by A2A and by the planner
+    remembering.
+
+    A developer or QA seat may pass `loop_state` when it knows one of these, and may omit it.
+  - `end_session {n, date, uuid, seat}` — always last.
+
+    **`seat` is required.** If `uuid` matches the session already recorded, the number is KEPT and
+    the result says so: the number counts sessions, not close-out writes (`G-047`). One developer
+    seat-session took three numbers in slice two, so read the `NOTE:` lines in the result rather than
+    assuming `n` was accepted.
 - On `revision mismatch`: call `ob_start` once to read the current revision, then retry the same batch once with that revision. Do not retry a third time; report the refusal in the session log.
 - The tool validates every op and refuses the whole batch on any error; nothing is written until all ops apply.
+- **Read the result's `NOTE:` lines and the `KEPT despite retention` line.** The writer reports what
+  it did differently from what you asked. Retention now keeps a done task whose id the tracked tree
+  cites (`T-157`), rather than evicting it and mentioning it in passing — that happened twice in two
+  consecutive writes, and both times the task was preserved only because a seat read one line of dry
+  run output and then grepped the repository by hand.
 
 When `.agents/state.json` is absent, this step does not run and A2/A5/A6/A7 run as written.
 
