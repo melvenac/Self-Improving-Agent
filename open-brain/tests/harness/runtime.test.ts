@@ -29,8 +29,8 @@ describe("harness runtime", { timeout: 60_000 }, () => {
    * --------------------------------------------------------------------- */
 
   describe("A1 — end to end", () => {
-    it("completes, exits 0, and writes D_t.md, A_t.gitref and E_t.json", () => {
-      const r = runLoop(config());
+    it("completes, exits 0, and writes D_t.md, A_t.gitref and E_t.json", async () => {
+      const r = await runLoop(config());
 
       expect(r.failure, r.failure?.reason).toBeNull();
       expect(r.status).toBe("completed");
@@ -41,18 +41,18 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       }
     });
 
-    it("records in A_t.gitref the sha QA was actually frozen at", () => {
-      const r = runLoop(config());
+    it("records in A_t.gitref the sha QA was actually frozen at", async () => {
+      const r = await runLoop(config());
       const gitref = read("artifacts/iterations/t001/A_t.gitref");
       expect(gitref).toContain(`sha: ${r.candidateSha}`);
       expect(gitref).toContain("branch: main");
       expect(gitref).toMatch(/frozen_at: \d{4}-\d{2}-\d{2}T/);
     });
 
-    it("writes an E_t whose candidate_git matches the developer commit, not HEAD", () => {
+    it("writes an E_t whose candidate_git matches the developer commit, not HEAD", async () => {
       // The evidence commit is one past the candidate. E_t must name the
       // candidate, or the report describes a tree nobody evaluated.
-      const r = runLoop(config());
+      const r = await runLoop(config());
       const evidence = JSON.parse(read("artifacts/iterations/t001/E_t.json")) as {
         candidate_git: { sha: string };
       };
@@ -60,8 +60,8 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(r.evidenceSha).not.toBe(r.candidateSha);
     });
 
-    it("fills runtime_checks from exit codes rather than from the role", () => {
-      const r = runLoop(config({ checks: exitingChecks(0, 0) }));
+    it("fills runtime_checks from exit codes rather than from the role", async () => {
+      const r = await runLoop(config({ checks: exitingChecks(0, 0) }));
       const evidence = JSON.parse(read("artifacts/iterations/t001/E_t.json")) as {
         runtime_checks: { build: { exit_code: number; passed: boolean } };
       };
@@ -70,8 +70,8 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(r.checksPassed).toBe(true);
     });
 
-    it("leaves the tree clean when it is done", () => {
-      runLoop(config());
+    it("leaves the tree clean when it is done", async () => {
+      await runLoop(config());
       expect(rawGit(repo.root, ["status", "--porcelain"])).toBe("");
     });
   });
@@ -95,23 +95,23 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       }
     }
 
-    it("retries an invalid D_t and completes when a later attempt validates", () => {
+    it("retries an invalid D_t and completes when a later attempt validates", async () => {
       const planner = new FlakyPlanner(2);
-      const r = runLoop(config({ roles: { planner, developer: new StubDeveloper(), qa: new StubQa() } }));
+      const r = await runLoop(config({ roles: { planner, developer: new StubDeveloper(), qa: new StubQa() } }));
 
       expect(r.status).toBe("completed");
       expect(planner.attemptsSeen).toEqual([1, 2]);
     });
 
-    it("hands the failing role the problems that rejected it, not a bare re-roll", () => {
+    it("hands the failing role the problems that rejected it, not a bare re-roll", async () => {
       const planner = new FlakyPlanner(2);
-      runLoop(config({ roles: { planner, developer: new StubDeveloper(), qa: new StubQa() } }));
+      await runLoop(config({ roles: { planner, developer: new StubDeveloper(), qa: new StubQa() } }));
 
       expect(planner.problemsSeen[0]).toEqual([]);
       expect(planner.problemsSeen[1]!.join(" ")).toContain("new_capability");
     });
 
-    it("gives the role its own JSON Schema on the retry", () => {
+    it("gives the role its own JSON Schema on the retry", async () => {
       let schemaOnRetry: unknown = null;
       const planner: RoleSession = {
         role: "planner",
@@ -121,13 +121,13 @@ describe("harness runtime", { timeout: 60_000 }, () => {
           return ctx.attempt >= 2 ? good : { ...good, new_capability: "" };
         },
       };
-      runLoop(config({ roles: { planner, developer: new StubDeveloper(), qa: new StubQa() } }));
+      await runLoop(config({ roles: { planner, developer: new StubDeveloper(), qa: new StubQa() } }));
       expect(schemaOnRetry).toMatchObject({ title: "D_t — HoH loop plan" });
     });
 
-    it("fails the loop with a recorded reason when the cap is exhausted", () => {
+    it("fails the loop with a recorded reason when the cap is exhausted", async () => {
       const planner = new FlakyPlanner(99);
-      const r = runLoop(config({
+      const r = await runLoop(config({
         maxAttempts: 3,
         roles: { planner, developer: new StubDeveloper(), qa: new StubQa() },
       }));
@@ -139,8 +139,8 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(planner.attemptsSeen).toEqual([1, 2, 3]);
     });
 
-    it("writes FAILED.md, so the failure is an artifact and not just an exit code", () => {
-      runLoop(config({
+    it("writes FAILED.md, so the failure is an artifact and not just an exit code", async () => {
+      await runLoop(config({
         maxAttempts: 2,
         roles: { planner: new FlakyPlanner(99), developer: new StubDeveloper(), qa: new StubQa() },
       }));
@@ -152,20 +152,20 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(failed).toContain("record of a refusal");
     });
 
-    it("produces no E_t when the cap is exhausted — a failed loop leaves no evidence", () => {
-      runLoop(config({
+    it("produces no E_t when the cap is exhausted — a failed loop leaves no evidence", async () => {
+      await runLoop(config({
         maxAttempts: 2,
         roles: { planner: new FlakyPlanner(99), developer: new StubDeveloper(), qa: new StubQa() },
       }));
       expect(existsSync(join(repo.root, "artifacts/iterations/t001/E_t.json"))).toBe(false);
     });
 
-    it("retries the QA role on an invalid E_t and caps there too", () => {
+    it("retries the QA role on an invalid E_t and caps there too", async () => {
       const qa: RoleSession = {
         role: "qa",
         run: () => ({ loop: "t001", nonsense: true }),
       };
-      const r = runLoop(config({ maxAttempts: 2, roles: { planner: new StubPlanner(), developer: new StubDeveloper(), qa } }));
+      const r = await runLoop(config({ maxAttempts: 2, roles: { planner: new StubPlanner(), developer: new StubDeveloper(), qa } }));
       expect(r.failure?.code).toBe("schema-cap-exhausted");
       expect(r.failure?.stage).toBe("qa");
     });
@@ -196,8 +196,8 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       }
     }
 
-    it("refuses a developer write outside the allowlist, bypassing the helper", () => {
-      const r = runLoop(config({
+    it("refuses a developer write outside the allowlist, bypassing the helper", async () => {
+      const r = await runLoop(config({
         roles: { planner: new StubPlanner(), developer: new SneakyDeveloper("src/backdoor.ts"), qa: new StubQa() },
       }));
 
@@ -207,23 +207,23 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(r.failure?.reason).toContain("refused, not warned");
     });
 
-    it("reverts the offending write rather than leaving it on disk", () => {
-      runLoop(config({
+    it("reverts the offending write rather than leaving it on disk", async () => {
+      await runLoop(config({
         roles: { planner: new StubPlanner(), developer: new SneakyDeveloper("src/backdoor.ts"), qa: new StubQa() },
       }));
       expect(existsSync(join(repo.root, "src/backdoor.ts"))).toBe(false);
     });
 
-    it("never creates a candidate commit or a developer tag from a refused stage", () => {
-      const r = runLoop(config({
+    it("never creates a candidate commit or a developer tag from a refused stage", async () => {
+      const r = await runLoop(config({
         roles: { planner: new StubPlanner(), developer: new SneakyDeveloper("src/backdoor.ts"), qa: new StubQa() },
       }));
       expect(r.candidateSha).toBeNull();
       expect(resolveRef(repo.root, "loop-001-developer")).toBeNull();
     });
 
-    it("refuses a write that escapes the repository through ..", () => {
-      const r = runLoop(config({
+    it("refuses a write that escapes the repository through ..", async () => {
+      const r = await runLoop(config({
         roles: {
           planner: new StubPlanner(),
           developer: {
@@ -236,8 +236,8 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(r.failure?.code).toBe("allowlist-violation");
     });
 
-    it("honours a widened developer allowlist when one is given deliberately", () => {
-      const r = runLoop(config({
+    it("honours a widened developer allowlist when one is given deliberately", async () => {
+      const r = await runLoop(config({
         developerAllowlist: ["artifacts/", "src/"],
         roles: { planner: new StubPlanner(), developer: new SneakyDeveloper("src/allowed-now.ts"), qa: new StubQa() },
       }));
@@ -245,7 +245,7 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(read("src/allowed-now.ts")).toContain("bypassing ctx.write");
     });
 
-    it("refuses a QA write outside its allowlist — QA may never touch the candidate", () => {
+    it("refuses a QA write outside its allowlist — QA may never touch the candidate", async () => {
       const qa: RoleSession = {
         role: "qa",
         run(ctx) {
@@ -254,13 +254,13 @@ describe("harness runtime", { timeout: 60_000 }, () => {
           return new StubQa().run(ctx);
         },
       };
-      const r = runLoop(config({ roles: { planner: new StubPlanner(), developer: new StubDeveloper(), qa } }));
+      const r = await runLoop(config({ roles: { planner: new StubPlanner(), developer: new StubDeveloper(), qa } }));
       expect(r.failure?.code).toBe("allowlist-violation");
       expect(r.failure?.stage).toBe("qa");
       expect(read("README.md")).toBe("# fixture\n");
     });
 
-    it("does not retry a boundary breach", () => {
+    it("does not retry a boundary breach", async () => {
       let calls = 0;
       const developer: RoleSession = {
         role: "developer",
@@ -270,7 +270,7 @@ describe("harness runtime", { timeout: 60_000 }, () => {
           return {};
         },
       };
-      runLoop(config({ maxAttempts: 3, roles: { planner: new StubPlanner(), developer, qa: new StubQa() } }));
+      await runLoop(config({ maxAttempts: 3, roles: { planner: new StubPlanner(), developer, qa: new StubQa() } }));
       expect(calls).toBe(1);
     });
   });
@@ -301,10 +301,10 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       },
     });
 
-    it("QA that overwrites and commits the candidate is refused — the loop does not complete", () => {
+    it("QA that overwrites and commits the candidate is refused — the loop does not complete", async () => {
       // QA D1: this completed at exit 0, with loop-001-qa pointing at an
       // evidence commit whose parent was the rogue commit.
-      const r = runLoop(config({
+      const r = await runLoop(config({
         roles: {
           planner: new StubPlanner(),
           developer: new StubDeveloper(),
@@ -320,8 +320,8 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(resolveRef(repo.root, "loop-001-qa")).toBeNull();
     });
 
-    it("QA that commits is rolled back to the candidate, so the tree still matches the frozen sha", () => {
-      const r = runLoop(config({
+    it("QA that commits is rolled back to the candidate, so the tree still matches the frozen sha", async () => {
+      const r = await runLoop(config({
         roles: {
           planner: new StubPlanner(),
           developer: new StubDeveloper(),
@@ -329,16 +329,21 @@ describe("harness runtime", { timeout: 60_000 }, () => {
         },
       }));
       expect(repo.sha()).toBe(r.candidateSha);
-      // FAILED.md is written AFTER the rollback and is the only thing left
-      // dirty — deliberately, since a refusal that leaves no record on disk is
-      // the silent-pass failure this runtime exists to avoid.
-      expect(rawGit(repo.root, ["status", "--porcelain"])).toBe("?? artifacts/iterations/t001/FAILED.md");
+      // FAILED.md is written AFTER the rollback and is left dirty —
+      // deliberately, since a refusal that leaves no record on disk is the
+      // silent-pass failure this runtime exists to avoid. G_done.json joins it
+      // on a failure after the done-gate: the gate record belongs in the
+      // evidence commit, and this loop never reaches one.
+      expect(rawGit(repo.root, ["status", "--porcelain"]).split("\n").sort()).toEqual([
+        "?? artifacts/iterations/t001/FAILED.md",
+        "?? artifacts/iterations/t001/G_done.json",
+      ]);
     });
 
-    it("a planner that commits outside its allowlist is refused", () => {
+    it("a planner that commits outside its allowlist is refused", async () => {
       // QA D2: this completed at exit 0 with src/backdoor.ts in history one
       // commit below D_t, and all three tags created.
-      const r = runLoop(config({
+      const r = await runLoop(config({
         roles: {
           planner: committingRole("planner", "src/backdoor.ts", "export const leaked = true;\n"),
           developer: new StubDeveloper(),
@@ -353,12 +358,12 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(resolveRef(repo.root, "loop-001-developer")).toBeNull();
     });
 
-    it("a developer that commits fails for the RIGHT reason, not 'changed nothing'", () => {
+    it("a developer that commits fails for the RIGHT reason, not 'changed nothing'", async () => {
       // QA D3: this failed with developer-no-change — "the developer stage
       // changed nothing" — while HEAD had moved and the file was on disk. The
       // loop failed closed by accident, and the recorded reason was the
       // opposite of what happened.
-      const r = runLoop(config({
+      const r = await runLoop(config({
         roles: {
           planner: new StubPlanner(),
           developer: committingRole("developer", "src/backdoor.ts", "export const leaked = true;\n"),
@@ -373,10 +378,10 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(existsSync(join(repo.root, "src/backdoor.ts"))).toBe(false);
     });
 
-    it("refuses a commit even when every path it touched was inside the allowlist", () => {
+    it("refuses a commit even when every path it touched was inside the allowlist", async () => {
       // The runtime owns the commit boundary: which commit is the candidate
       // and what each tag points at depend on it.
-      const r = runLoop(config({
+      const r = await runLoop(config({
         roles: {
           planner: new StubPlanner(),
           developer: committingRole("developer", "artifacts/iterations/t001/note.md", "allowed path\n"),
@@ -387,9 +392,9 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(r.failure?.reason).toContain("a role may not commit");
     });
 
-    it("leaves the tree exactly where the loop started when the first stage commits", () => {
+    it("leaves the tree exactly where the loop started when the first stage commits", async () => {
       const before = repo.sha();
-      runLoop(config({
+      await runLoop(config({
         roles: {
           planner: committingRole("planner", "src/backdoor.ts", "x\n"),
           developer: new StubDeveloper(),
@@ -402,9 +407,9 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(existsSync(join(repo.root, "artifacts/iterations/t001/FAILED.md"))).toBe(true);
     });
 
-    it("asserts the candidate is the evidence commit's parent on a clean run", () => {
+    it("asserts the candidate is the evidence commit's parent on a clean run", async () => {
       // The invariant D1 broke, checked directly rather than inferred.
-      const r = runLoop(config());
+      const r = await runLoop(config());
       expect(rawGit(repo.root, ["rev-parse", `${r.evidenceSha}^1`])).toBe(r.candidateSha);
     });
   });
@@ -414,15 +419,15 @@ describe("harness runtime", { timeout: 60_000 }, () => {
    * --------------------------------------------------------------------- */
 
   describe("A5 — versioning and rollback", () => {
-    it("creates loop-001-developer and loop-001-qa", () => {
-      const r = runLoop(config());
+    it("creates loop-001-developer and loop-001-qa", async () => {
+      const r = await runLoop(config());
       expect(resolveRef(repo.root, "loop-001-developer")).toBe(r.candidateSha);
       expect(resolveRef(repo.root, "loop-001-qa")).toBe(r.evidenceSha);
     });
 
-    it("restores the pre-loop state with git alone", () => {
+    it("restores the pre-loop state with git alone", async () => {
       const before = repo.sha();
-      const r = runLoop(config());
+      const r = await runLoop(config());
       expect(r.status).toBe("completed");
       expect(repo.sha()).not.toBe(before);
       expect(existsSync(join(repo.root, "artifacts/iterations/t001/E_t.json"))).toBe(true);
@@ -435,15 +440,15 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(existsSync(join(repo.root, "artifacts/iterations/t001"))).toBe(false);
     });
 
-    it("refuses to run a loop id whose tags already exist, rather than moving them", () => {
-      runLoop(config());
-      const again = runLoop(config());
+    it("refuses to run a loop id whose tags already exist, rather than moving them", async () => {
+      await runLoop(config());
+      const again = await runLoop(config());
       expect(again.status).toBe("failed");
       expect(again.failure?.code).toBe("tag-exists");
     });
 
-    it("commits the candidate separately from the evidence", () => {
-      const r = runLoop(config());
+    it("commits the candidate separately from the evidence", async () => {
+      const r = await runLoop(config());
       const parent = rawGit(repo.root, ["rev-parse", `${r.evidenceSha}^`]);
       expect(parent).toBe(r.candidateSha);
     });
@@ -454,7 +459,7 @@ describe("harness runtime", { timeout: 60_000 }, () => {
    * --------------------------------------------------------------------- */
 
   describe("A3 — the frozen candidate", () => {
-    it("hands QA the candidate sha and the time it was frozen", () => {
+    it("hands QA the candidate sha and the time it was frozen", async () => {
       let seen: { sha: string; frozenAt: string } | null = null;
       const qa: RoleSession = {
         role: "qa",
@@ -463,13 +468,13 @@ describe("harness runtime", { timeout: 60_000 }, () => {
           return new StubQa().run(ctx);
         },
       };
-      const r = runLoop(config({ roles: { planner: new StubPlanner(), developer: new StubDeveloper(), qa } }));
+      const r = await runLoop(config({ roles: { planner: new StubPlanner(), developer: new StubDeveloper(), qa } }));
       expect(seen).not.toBeNull();
       expect(seen!.sha).toBe(r.candidateSha);
       expect(seen!.frozenAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     });
 
-    it("refuses to run QA when a deterministic check moved HEAD off the candidate", () => {
+    it("refuses to run QA when a deterministic check moved HEAD off the candidate", async () => {
       // Not simulated: the unit check is a real process that makes a real
       // commit, which is the actual way a tree moves out from under QA.
       const mover = {
@@ -484,7 +489,7 @@ describe("harness runtime", { timeout: 60_000 }, () => {
         timeoutMs: 30_000,
       };
 
-      const r = runLoop(config({ checks: { build: exitingCheck(0), unit: mover } }));
+      const r = await runLoop(config({ checks: { build: exitingCheck(0), unit: mover } }));
 
       expect(r.status).toBe("failed");
       expect(r.failure?.code).toBe("candidate-moved");
@@ -492,13 +497,13 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(existsSync(join(repo.root, "artifacts/iterations/t001/E_t.json"))).toBe(false);
     });
 
-    it("refuses to run QA when a check left the working tree dirty", () => {
+    it("refuses to run QA when a check left the working tree dirty", async () => {
       const dirtier = {
         command: process.execPath,
         args: ["-e", "require('node:fs').writeFileSync('leftover.txt','a check left this behind');"],
         timeoutMs: 30_000,
       };
-      const r = runLoop(config({ checks: { build: exitingCheck(0), unit: dirtier } }));
+      const r = await runLoop(config({ checks: { build: exitingCheck(0), unit: dirtier } }));
       expect(r.failure?.code).toBe("candidate-moved");
       expect(r.failure?.reason).toContain("the working tree is dirty");
     });
@@ -509,8 +514,8 @@ describe("harness runtime", { timeout: 60_000 }, () => {
    * --------------------------------------------------------------------- */
 
   describe("deterministic checks in the loop", () => {
-    it("completes the loop with a red build and reports it rather than hiding it", () => {
-      const r = runLoop(config({ checks: exitingChecks(1, 0) }));
+    it("completes the loop with a red build and reports it rather than hiding it", async () => {
+      const r = await runLoop(config({ checks: exitingChecks(1, 0) }));
       expect(r.status).toBe("completed");
       expect(r.checksPassed).toBe(false);
       expect(r.exitCode).toBe(1);
@@ -522,7 +527,7 @@ describe("harness runtime", { timeout: 60_000 }, () => {
       expect(evidence.runtime_checks.build.passed).toBe(false);
     });
 
-    it("refuses a QA report whose runtime_checks contradict the measurement", () => {
+    it("refuses a QA report whose runtime_checks contradict the measurement", async () => {
       const lyingQa: RoleSession = {
         role: "qa",
         run(ctx) {
@@ -531,7 +536,7 @@ describe("harness runtime", { timeout: 60_000 }, () => {
           return { ...base, runtime_checks: { build: green, unit: green } };
         },
       };
-      const r = runLoop(config({
+      const r = await runLoop(config({
         checks: exitingChecks(1, 1),
         roles: { planner: new StubPlanner(), developer: new StubDeveloper(), qa: lyingQa },
       }));
@@ -546,31 +551,31 @@ describe("harness runtime", { timeout: 60_000 }, () => {
    * --------------------------------------------------------------------- */
 
   describe("preconditions", () => {
-    it("refuses to start on a dirty tree", () => {
+    it("refuses to start on a dirty tree", async () => {
       repo.write("uncommitted.md", "left over from something else\n");
-      const r = runLoop(config());
+      const r = await runLoop(config());
       expect(r.failure?.code).toBe("dirty-tree");
       expect(r.failure?.reason).toContain("uncommitted.md");
     });
 
-    it("refuses a directory that is not a git repository", () => {
-      const r = runLoop(config({ repoRoot: join(repo.root, "does-not-exist") }));
+    it("refuses a directory that is not a git repository", async () => {
+      const r = await runLoop(config({ repoRoot: join(repo.root, "does-not-exist") }));
       expect(r.failure?.code).toBe("not-a-repo");
     });
 
-    it("fails the loop when the developer stage changes nothing", () => {
+    it("fails the loop when the developer stage changes nothing", async () => {
       const idle: RoleSession = { role: "developer", run: () => ({ summary: "did nothing" }) };
-      const r = runLoop(config({ roles: { planner: new StubPlanner(), developer: idle, qa: new StubQa() } }));
+      const r = await runLoop(config({ roles: { planner: new StubPlanner(), developer: idle, qa: new StubQa() } }));
       expect(r.failure?.code).toBe("developer-no-change");
       expect(r.failure?.reason).toContain("no candidate for QA to evaluate");
     });
 
-    it("records a role that throws without pretending the stage passed", () => {
+    it("records a role that throws without pretending the stage passed", async () => {
       const angry: RoleSession = {
         role: "developer",
         run: () => { throw new Error("the role blew up"); },
       };
-      const r = runLoop(config({ roles: { planner: new StubPlanner(), developer: angry, qa: new StubQa() } }));
+      const r = await runLoop(config({ roles: { planner: new StubPlanner(), developer: angry, qa: new StubQa() } }));
       expect(r.failure?.code).toBe("role-threw");
       expect(r.failure?.reason).toContain("the role blew up");
     });
@@ -581,34 +586,57 @@ describe("harness runtime", { timeout: 60_000 }, () => {
    * --------------------------------------------------------------------- */
 
   describe("gates", () => {
-    it("skips the gates by default and records that no decision was taken", () => {
-      const r = runLoop(config());
-      expect(r.gateAnswers).toHaveLength(3);
+    it("skips the gates by default and records that no decision was taken", async () => {
+      const r = await runLoop(config());
+      // TWO, not three. QA scoring through Jev is slice three, so slice two
+      // does not ask it — and not asking is recorded rather than left as an
+      // absence. A gate nobody consulted is not a gate that approved.
+      expect(r.gateAnswers).toHaveLength(2);
       for (const a of r.gateAnswers) {
         expect(a.consulted).toBe(false);
         expect(a.note).toContain("Not an approval");
       }
     });
 
-    it("builds a payload for all three gates", () => {
-      const r = runLoop(config());
-      expect(r.gatePayloads.map((p) => p.gate)).toEqual(["plan", "developer-done", "qa-score"]);
+    it("builds a payload for the two gates this slice owns", async () => {
+      const r = await runLoop(config());
+      expect(r.gatePayloads.map((p) => p.gate)).toEqual(["plan", "developer-done"]);
     });
 
-    it("prints every gate payload in dry-run mode and still sends nothing", () => {
+    it("says in the log that the QA scoring gate was NOT consulted", async () => {
       const lines: string[] = [];
-      const r = runLoop(config({ gateMode: "dry-run", log: (l) => lines.push(l) }));
+      await runLoop(config({ log: (l) => lines.push(l) }));
+      expect(lines.join(" | ")).toContain("qa-score gate: NOT CONSULTED");
+    });
+
+    it("prints every gate payload in dry-run mode and still sends nothing", async () => {
+      const lines: string[] = [];
+      const r = await runLoop(config({ gateMode: "dry-run", log: (l) => lines.push(l) }));
       expect(r.status).toBe("completed");
-      const out = lines.join("\n");
+      const out = lines.join(" | ");
       expect(out).toContain("gate payload (dry run, NOT sent): plan");
       expect(out).toContain("gate payload (dry run, NOT sent): developer-done");
-      expect(out).toContain("gate payload (dry run, NOT sent): qa-score");
+      // No payload for the QA scoring gate, because it is not built. The log
+      // still SAYS so — not consulted is recorded, not omitted.
+      expect(out).not.toContain("gate payload (dry run, NOT sent): qa-score");
+      expect(out).toContain("qa-score gate: NOT CONSULTED");
     });
 
-    it("fails closed when gates are live and no client is configured", () => {
-      const r = runLoop(config({ gateMode: "live" }));
+    it("fails closed when gates are live and the key is not in the environment", async () => {
+      // The live transport now exists, so "no client configured" is no longer
+      // the reason — the missing credential is, and the refusal names the
+      // variable rather than the gate's absence.
+      // The env is constructed with the variable EXPLICITLY REMOVED, never the
+      // inherited one assumed empty — a test that assumes makes a real call on
+      // a machine where the assumption is false, which is how this seat made
+      // one. The strip is asserted before it is relied on.
+      const stripped = { ...process.env };
+      delete stripped.TYPESAFE_API_KEY;
+      expect("TYPESAFE_API_KEY" in stripped).toBe(false);
+
+      const r = await runLoop(config({ gateMode: "live", env: stripped }));
       expect(r.failure?.code).toBe("gate-unavailable");
-      expect(r.failure?.reason).toContain("no gate client is configured");
+      expect(r.failure?.reason).toContain("TYPESAFE_API_KEY");
     });
   });
 });

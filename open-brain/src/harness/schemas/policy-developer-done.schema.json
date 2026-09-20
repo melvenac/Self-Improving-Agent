@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "gate": {
+      "type": "string",
+      "const": "developer-done"
+    },
+    "diff_matches_plan_min": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "touches_out_of_scope_max": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "local_tests_support_claim_min": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "stuck_repeating_prior_failure_max": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "risk_of_regression_rollback_at_or_above": {
+      "type": "number"
+    },
+    "hand_to_qa_requires_green_checks": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "gate",
+    "diff_matches_plan_min",
+    "touches_out_of_scope_max",
+    "local_tests_support_claim_min",
+    "stuck_repeating_prior_failure_max",
+    "risk_of_regression_rollback_at_or_above",
+    "hand_to_qa_requires_green_checks"
+  ],
+  "additionalProperties": false,
+  "title": "Developer done-gate policy",
+  "description": "Thresholds for the developer done-gate. Values are data and may be edited; the SHAPE is derived from open-brain/src/harness/policies.ts and this file must not be edited by hand. LIMIT: whether tests passed is read from process exit codes and is never asked of the gate; no threshold here can make a red build green. PROVENANCE: docs/HOH-JEV.md §4 gives the RULES (hand to QA when diff_matches_plan is high, touches_out_of_scope low and tests green; roll back when stuck_repeating_prior_failure is high, or risk_of_regression is high AND tests failed) and no numbers at all. Every number in the shipped developer-done.json is the developer's starting position."
+}

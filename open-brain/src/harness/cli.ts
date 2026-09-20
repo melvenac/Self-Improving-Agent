@@ -22,6 +22,7 @@ import { runLoop, type GateMode } from "./runtime.js";
 import { stubRoles } from "./roles.js";
 import { jsonSchemas, serialiseSchema, type DeliverableKind } from "./schema.js";
 import { defaultChecks, type CheckSpec } from "./checks.js";
+import { policyJsonSchemas } from "./policies.js";
 
 const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
 
@@ -36,7 +37,11 @@ run options
                        write. A rule ending in / is a directory prefix.
                        Default: artifacts/iterations/<loop>/
   --max-attempts <n>   schema retries per role, including the first (default 3)
-  --dry-run            build every gate payload, print it, and send nothing
+  --gate <mode>        skip | dry-run | live (default: skip)
+                       dry-run builds every gate payload, prints it, and sends
+                       nothing. live sends to Jev and needs TYPESAFE_API_KEY in
+                       the environment; thresholds come from harness/policies/.
+  --dry-run            alias for --gate dry-run
   --build-cmd <cmd>    override the build check (split on spaces, no shell)
   --unit-cmd <cmd>     override the unit check (split on spaces, no shell)
   --json               print the loop result as JSON on stdout
@@ -58,7 +63,16 @@ interface ParsedRun {
 
 class UsageError extends Error {}
 
-const RUN_FLAGS_WITH_VALUE = new Set(["--loop", "--repo", "--allow", "--max-attempts", "--build-cmd", "--unit-cmd"]);
+const RUN_FLAGS_WITH_VALUE = new Set([
+  "--loop",
+  "--repo",
+  "--allow",
+  "--max-attempts",
+  "--build-cmd",
+  "--unit-cmd",
+  "--gate",
+]);
+const GATE_MODES: readonly GateMode[] = ["skip", "dry-run", "live"];
 const RUN_FLAGS_BOOLEAN = new Set(["--dry-run", "--json"]);
 
 function parseRun(argv: readonly string[]): ParsedRun {
@@ -91,6 +105,13 @@ function parseRun(argv: readonly string[]): ParsedRun {
       else if (arg === "--allow") out.allow.push(value);
       else if (arg === "--build-cmd") out.buildCmd = value;
       else if (arg === "--unit-cmd") out.unitCmd = value;
+      else if (arg === "--gate") {
+        // An unrecognised mode refuses rather than picking one. T-150 again.
+        if (!GATE_MODES.includes(value as GateMode)) {
+          throw new UsageError(`--gate must be one of ${GATE_MODES.join(", ")}, got "${value}"`);
+        }
+        out.gateMode = value as GateMode;
+      }
       else if (arg === "--max-attempts") {
         const n = Number.parseInt(value, 10);
         if (!Number.isInteger(n) || n < 1) throw new UsageError(`--max-attempts must be a positive integer, got "${value}"`);
@@ -122,6 +143,18 @@ export function schemaDir(): string {
 export const schemaFileName = (kind: DeliverableKind): string =>
   kind === "plan" ? "plan.schema.json" : "evidence.schema.json";
 
+/**
+ * The derived JSON Schema for each POLICY file.
+ *
+ * These live beside the deliverable schemas rather than in `policies/`, which
+ * stays purely data: the build copies `policies/` into `build/` because the
+ * runtime opens it there, and a derived file in that directory would be copied
+ * too — becoming exactly the stale authoritative-looking artifact this file
+ * already refuses to create.
+ */
+export const policySchemaFileName = (kind: "plan" | "done"): string =>
+  kind === "plan" ? "policy-plan.schema.json" : "policy-developer-done.schema.json";
+
 function cmdSchemas(argv: readonly string[]): number {
   let write = false;
   for (const arg of argv) {
@@ -139,6 +172,17 @@ function cmdSchemas(argv: readonly string[]): number {
     );
   }
   const schemas = jsonSchemas();
+  const policySchemas = policyJsonSchemas();
+  for (const kind of ["plan", "done"] as const) {
+    const text = serialiseSchema(policySchemas[kind]);
+    if (write) {
+      const target = join(schemaDir(), policySchemaFileName(kind));
+      writeFileSync(target, text, "utf-8");
+      process.stdout.write(`wrote ${target}\n`);
+    } else {
+      process.stdout.write(text);
+    }
+  }
   for (const kind of ["plan", "evidence"] as const) {
     const text = serialiseSchema(schemas[kind]);
     if (write) {
@@ -152,7 +196,7 @@ function cmdSchemas(argv: readonly string[]): number {
   return 0;
 }
 
-function cmdRun(argv: readonly string[]): number {
+async function cmdRun(argv: readonly string[]): Promise<number> {
   const opts = parseRun(argv);
   const lines: string[] = [];
   const log = (line: string): void => {
@@ -161,7 +205,7 @@ function cmdRun(argv: readonly string[]): number {
   };
 
   const base = defaultChecks();
-  const result = runLoop({
+  const result = await runLoop({
     repoRoot: opts.repo,
     loop: opts.loop,
     roles: stubRoles(),
@@ -181,7 +225,7 @@ function cmdRun(argv: readonly string[]): number {
   return result.exitCode;
 }
 
-export function main(argv: readonly string[]): number {
+export async function main(argv: readonly string[]): Promise<number> {
   const [sub, ...rest] = argv;
   try {
     if (sub === undefined || sub === "help" || sub === "--help" || sub === "-h") {
@@ -189,7 +233,7 @@ export function main(argv: readonly string[]): number {
       // No subcommand is not success: a bare `harness` did nothing that was asked for.
       return sub === undefined ? 2 : 0;
     }
-    if (sub === "run") return cmdRun(rest);
+    if (sub === "run") return await cmdRun(rest);
     if (sub === "schemas") return cmdSchemas(rest);
     throw new UsageError(`unknown subcommand "${sub}"`);
   } catch (err) {
@@ -215,5 +259,17 @@ const invokedDirectly = (() => {
 })();
 
 if (invokedDirectly) {
-  process.exitCode = main(process.argv.slice(2));
+  // `main` catches its own errors and returns an exit code, so the only way to
+  // reach the `catch` here is a defect in that catch. It is written anyway:
+  // an unhandled rejection in Node prints a warning and can exit 0, which is
+  // the "reads the number instead of the output" failure with the numbers
+  // swapped.
+  main(process.argv.slice(2)).then(
+    (code) => { process.exitCode = code; },
+    (err: unknown) => {
+      process.stderr.write(`harness: ${(err as Error).message}
+`);
+      process.exitCode = 1;
+    },
+  );
 }

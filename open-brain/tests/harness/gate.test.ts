@@ -39,14 +39,14 @@ describe("dry run — A6", () => {
     }
   }
 
-  it("records and prints the payload without dispatching", () => {
+  it("records and prints the payload without dispatching", async () => {
     globalThis.fetch = (() => {
       throw new Error("fetch was called during a dry run");
     }) as typeof fetch;
 
     const lines: string[] = [];
     const dry = new DryRunTransport((l) => lines.push(l), {});
-    const answer = dry.dispatch(payload());
+    const answer = await dry.dispatch(payload());
 
     expect(dry.sent).toHaveLength(1);
     expect(lines.join("\n")).toContain("NOT sent");
@@ -55,35 +55,39 @@ describe("dry run — A6", () => {
     expect(answer.answers).toBeNull();
   });
 
-  it("returns an answer that cannot be mistaken for an approval", () => {
+  it("returns an answer that cannot be mistaken for an approval", async () => {
     const dry = new DryRunTransport(() => {}, {});
-    const answer = dry.dispatch(payload());
+    const answer = await dry.dispatch(payload());
     // `consulted: false` and `answers: null` force a caller to handle the case
     // rather than read a truthy default as a yes.
     expect(answer.consulted).toBe(false);
     expect(answer.note).toContain("Not an approval");
   });
 
-  it("would fail if the dry run reached a live transport", () => {
+  it("would fail if the dry run reached a live transport", async () => {
     // Validating the instrument against a known positive: the exploding
     // transport must actually explode, or the assertion above proves nothing.
     expect(() => new ExplodingTransport().dispatch()).toThrow(/network call was attempted/);
+    // …and it is still a rejection, not a return, through the async seam.
+    await expect(Promise.resolve().then(() => new ExplodingTransport().dispatch())).rejects.toThrow(
+      /network call was attempted/,
+    );
   });
 });
 
 describe("UnconfiguredTransport", () => {
-  it("throws rather than returning a permissive answer", () => {
+  it("rejects rather than returning a permissive answer", async () => {
     // A gate that is not built yet must not read as a gate that said yes.
-    expect(() => new UnconfiguredTransport().dispatch(payload())).toThrow(GateUnavailable);
+    await expect(new UnconfiguredTransport().dispatch(payload())).rejects.toBeInstanceOf(GateUnavailable);
   });
 
-  it("names the reason and the way out", () => {
+  it("names the reason and the way out", async () => {
     try {
-      new UnconfiguredTransport().dispatch(payload());
+      await new UnconfiguredTransport().dispatch(payload());
       throw new Error("unreachable");
     } catch (err) {
       expect((err as Error).message).toContain("no gate client is configured");
-      expect((err as Error).message).toContain("--dry-run");
+      expect((err as Error).message).toContain("--gate dry-run");
       expect((err as Error).message).toContain("Refusing rather than proceeding unjudged");
     }
   });

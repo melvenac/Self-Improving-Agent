@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 47 by open-brain v0.41.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 47 by open-brain v0.42.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 

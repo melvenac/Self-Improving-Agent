@@ -56,8 +56,8 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
    * (i) The exact probe QA used — `git tag -f` in the QA stage
    * --------------------------------------------------------------------- */
 
-  it("(i) refuses `git tag -f loop-001-developer loop-001-base` and restores the tag", () => {
-    const r = runLoop(
+  it("(i) refuses `git tag -f loop-001-developer loop-001-base` and restores the tag", async () => {
+    const r = await runLoop(
       config({
         roles: {
           planner: new StubPlanner(),
@@ -83,11 +83,11 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
    * (ii) `git branch -f` — the channel a tag-only watch would miss
    * --------------------------------------------------------------------- */
 
-  it("(ii) refuses `git branch -f` and puts the branch back", () => {
+  it("(ii) refuses `git branch -f` and puts the branch back", async () => {
     const base = repo.sha();
     rawGit(repo.root, ["branch", "side", base]);
 
-    const r = runLoop(
+    const r = await runLoop(
       config({
         roles: {
           planner: new StubPlanner(),
@@ -107,8 +107,8 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
    * (iii) `git update-ref` on a ref that is neither a branch nor a tag
    * --------------------------------------------------------------------- */
 
-  it("(iii) refuses a bare `git update-ref` and deletes the ref it created", () => {
-    const r = runLoop(
+  it("(iii) refuses a bare `git update-ref` and deletes the ref it created", async () => {
+    const r = await runLoop(
       config({
         roles: {
           planner: new StubPlanner(),
@@ -129,8 +129,8 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
    * (iv) The ledger, not the name
    * --------------------------------------------------------------------- */
 
-  it("(iv) refuses a role-created `loop-001-anything`, which a name rule would have allowed", () => {
-    const r = runLoop(
+  it("(iv) refuses a role-created `loop-001-anything`, which a name rule would have allowed", async () => {
+    const r = await runLoop(
       config({
         roles: {
           planner: new StubPlanner(),
@@ -150,8 +150,8 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
    * The watch must not fire on the runtime's own refs
    * --------------------------------------------------------------------- */
 
-  it("lets a clean loop through and still writes its own three tags", () => {
-    const r = runLoop(config());
+  it("lets a clean loop through and still writes its own three tags", async () => {
+    const r = await runLoop(config());
 
     expect(r.failure, r.failure?.reason).toBeNull();
     expect(r.status).toBe("completed");
@@ -164,20 +164,20 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
    * The deferral — one channel, one owner
    * --------------------------------------------------------------------- */
 
-  it("leaves the checked-out branch to the commit boundary, and says so", () => {
+  it("leaves the checked-out branch to the commit boundary, and says so", async () => {
     const lines: string[] = [];
-    runLoop(config({ log: (l) => lines.push(l) }));
+    await runLoop(config({ log: (l) => lines.push(l) }));
     const refLines = lines.filter((l) => l.includes("ref(s)"));
     for (const l of refLines) {
       expect(l).toContain("refs/heads/main is left to the commit boundary");
     }
   });
 
-  it("still reports a COMMITTING role as stage-committed, not as a ref write", () => {
+  it("still reports a COMMITTING role as stage-committed, not as a ref write", async () => {
     // The deferral must not rename an existing breach. QA's D1–D3 lesson lives
     // in the commit boundary's wording; a ref-watch that claimed this channel
     // would replace it with something vaguer.
-    const r = runLoop(
+    const r = await runLoop(
       config({
         roles: {
           planner: new StubPlanner(),
@@ -203,11 +203,11 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
     expect(r.failure?.reason).toMatch(/from [0-9a-f]{12} to [0-9a-f]{12}/);
   });
 
-  it("refuses a role that moves the checked-out branch with update-ref", () => {
+  it("refuses a role that moves the checked-out branch with update-ref", async () => {
     // Deferred is not unwatched: the commit boundary sees HEAD's sha change
     // whether a commit or an update-ref moved it.
     const base = repo.sha();
-    const r = runLoop(
+    const r = await runLoop(
       config({
         roles: {
           planner: new StubPlanner(),
@@ -223,9 +223,9 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
     expect(r.failure?.reason).toMatch(/from [0-9a-f]{12} to [0-9a-f]{12}/);
   });
 
-  it("reports the ref verdict on every stage, with its own limits stated", () => {
+  it("reports the ref verdict on every stage, with its own limits stated", async () => {
     const lines: string[] = [];
-    const r = runLoop(config({ log: (l) => lines.push(l) }));
+    const r = await runLoop(config({ log: (l) => lines.push(l) }));
 
     expect(r.status).toBe("completed");
     const refLines = lines.filter((l) => l.includes("ref(s)"));
@@ -241,13 +241,13 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
    * --------------------------------------------------------------------- */
 
   describe("RefWatch", () => {
-    it("refuses to produce a verdict with no open window", () => {
+    it("refuses to produce a verdict with no open window", async () => {
       // "Nothing changed" and "I did not look" must not be the same output.
       const w = new RefWatch(repo.root);
       expect(() => w.compare()).toThrow(/no open window/);
     });
 
-    it("consumes an authorisation once — a second delta on the same ref is unauthored", () => {
+    it("consumes an authorisation once — a second delta on the same ref is unauthored", async () => {
       const w = new RefWatch(repo.root);
       w.begin("test");
       w.authorise("refs/tags/only-once");
@@ -260,7 +260,7 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
       expect(v.ok).toBe(false);
     });
 
-    it("clears authorisations when a new window opens", () => {
+    it("clears authorisations when a new window opens", async () => {
       // A declaration that outlived its window would excuse a later role's
       // write on the same ref name.
       const w = new RefWatch(repo.root);
@@ -275,7 +275,7 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
       expect(second.unauthored.map((d) => d.ref)).toEqual(["refs/tags/stale"]);
     });
 
-    it("restores with a compare-and-swap, and reports a ref it could not put back", () => {
+    it("restores with a compare-and-swap, and reports a ref it could not put back", async () => {
       const w = new RefWatch(repo.root);
       w.begin("test");
       rawGit(repo.root, ["tag", "moved", "HEAD"]);

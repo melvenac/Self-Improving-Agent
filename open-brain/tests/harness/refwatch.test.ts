@@ -60,10 +60,10 @@ describe("G-041 A1 — runLoop refuses a role it did not construct", { timeout: 
     qa: foreign(new StubQa()),
   });
 
-  it("throws a distinct refusal when a foreign role is passed with no ref-watch", () => {
+  it("throws a distinct refusal when a foreign role is passed with no ref-watch", async () => {
     let thrown: unknown;
     try {
-      runLoop(config({ roles: foreignRoles(), refWatch: false }));
+      await runLoop(config({ roles: foreignRoles(), refWatch: false }));
     } catch (err) {
       thrown = err;
     }
@@ -76,7 +76,7 @@ describe("G-041 A1 — runLoop refuses a role it did not construct", { timeout: 
     expect(refusal.message).toMatch(/ref-watch/i);
   });
 
-  it("refuses BEFORE any stage runs — no base tag, no artifacts, nothing committed", () => {
+  it("refuses BEFORE any stage runs — no base tag, no artifacts, nothing committed", async () => {
     const headBefore = repo.sha();
 
     expect(() => runLoop(config({ roles: foreignRoles(), refWatch: false }))).toThrow(LoopRefused);
@@ -88,10 +88,10 @@ describe("G-041 A1 — runLoop refuses a role it did not construct", { timeout: 
     expect(repo.sha()).toBe(headBefore);
   });
 
-  it("names only the foreign seat when the others are runtime-constructed", () => {
+  it("names only the foreign seat when the others are runtime-constructed", async () => {
     let thrown: unknown;
     try {
-      runLoop(
+      await runLoop(
         config({
           roles: { planner: new StubPlanner(), developer: foreign(new StubDeveloper()), qa: new StubQa() },
           refWatch: false,
@@ -103,26 +103,26 @@ describe("G-041 A1 — runLoop refuses a role it did not construct", { timeout: 
     expect((thrown as LoopRefused).roles).toEqual(["developer"]);
   });
 
-  it("runs the same foreign roles when the ref-watch is active", () => {
-    const r = runLoop(config({ roles: foreignRoles(), refWatch: true }));
+  it("runs the same foreign roles when the ref-watch is active", async () => {
+    const r = await runLoop(config({ roles: foreignRoles(), refWatch: true }));
 
     expect(r.failure, r.failure?.reason).toBeNull();
     expect(r.status).toBe("completed");
     expect(r.exitCode).toBe(0);
   });
 
-  it("has the ref-watch on by default, so omitting the flag permits foreign roles", () => {
+  it("has the ref-watch on by default, so omitting the flag permits foreign roles", async () => {
     // Fail-closed: the only way to run without the watch is to say so, and
     // saying so is what forbids a foreign role.
-    const r = runLoop(config({ roles: foreignRoles() }));
+    const r = await runLoop(config({ roles: foreignRoles() }));
     expect(r.status).toBe("completed");
   });
 
-  it("still runs runtime-constructed roles with the watch explicitly off", () => {
+  it("still runs runtime-constructed roles with the watch explicitly off", async () => {
     // The flag refuses FOREIGN roles without a watch. It does not make the
     // watch mandatory for the roles the runtime built itself — that would be a
     // different rule, and slice one's CLI path would fail it.
-    const r = runLoop(config({ refWatch: false }));
+    const r = await runLoop(config({ refWatch: false }));
     expect(r.failure, r.failure?.reason).toBeNull();
     expect(r.status).toBe("completed");
   });

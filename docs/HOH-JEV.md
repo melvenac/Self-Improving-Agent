@@ -143,6 +143,43 @@ verbatim before anything else.**
 > **not** for a **noul**, where the returned number **is** the probability. Several of the suggested
 > policies in the original brief are noul-based. **Write noul policies as thresholds on the value.**
 
+### The request shape, read from the docs — added by the developer seat, 2026-09-20
+
+**Confirmed against `docs.typesafe.ai/api.md` on 2026-09-20 while building the client. Read from the
+documentation, NOT re-verified on the wire** — the one live call is A7 and it belongs to QA. Recorded
+here because the alternative was guessing, and every field below is one a wrong guess turns into a
+`422`.
+
+A question is `{type, instructions, criteria}` — **not** a wrapper keyed by the type. The `422`
+recorded above shows `loc: ["body","questions","frustration","score","criteria"]` because the
+validator names the variant it tried; the body sent is flat:
+
+```json
+{
+  "state": { "plan": "…" },
+  "model": "jev-latest",
+  "questions": {
+    "has_observable_acceptance": { "type": "noul", "instructions": "Does every criterion name a concrete observable?" }
+  }
+}
+```
+
+- **`instructions` is the question.** It may be a string, an object or an array; an object holds the
+  question in one field and the data it refers to in the others, referenced by backticked name.
+- **`criteria` means two different things.** For **`score`** it is an **ordered array** of level
+  descriptions, at least 2 and at most 10, *and the order is the scale* — this is the field the
+  recorded `422` was about. For **`choice`** it is a **map of option → rubric description**, `null`
+  where an option needs no detail, up to 255 options. **A choice is not a list**, which the note
+  above did not say and which a reader would otherwise infer from the score case.
+- **`noul` takes no `criteria` at all.**
+- Every **answer** carries a `type` matching its question. `choice` and `score` carry `confidence`;
+  `noul` does not. A `score` answer carries `legend` as an **object** keyed by index.
+- The response envelope is `{model, answers, usage}` and `model` is the resolved concrete version.
+
+**A score answer that arrives with no `confidence` is a malformed answer, not a low-confidence one.**
+Treating the absence as zero would make every "reject at high confidence" rule unable to fire — fail
+open, in the one direction that matters — so the runtime records it as a missing answer.
+
 ### Failure classes — four, not one
 
 `401` bad or missing key · `422` malformed request, body names the field · `429` rate limited ·
@@ -279,7 +316,7 @@ a prompt is the defect PR #44 exists to fix.
 | Slice | Contents | Status |
 | --- | --- | --- |
 | 1 | Runtime spawning three stubbed roles; schemas + capped retry; git versioning per loop; deterministic checks from exit codes; dry-run | **Loop 15 slice one, ACCEPTED** at `v0.41.0` (`docs/loops/loop-15-closeout.md`); `G-041` (refs) open |
-| 2 | `G-041` ref-watch and the foreign-role refusal flag first; then Jev client, plan gate, developer done-gate | **Loop 15 slice two, briefed** (`docs/loops/loop-15-slice-2-brief.md`) |
+| 2 | `G-041` ref-watch and the foreign-role refusal flag first; then Jev client, plan gate, developer done-gate | **Loop 15 slice two, candidate built at `v0.42.0`, NOT accepted** — acceptance is QA's, from a frozen SHA, and no live call has been made |
 | 3 | Real role prompts; QA scoring through Jev | Later |
 | 4 | Index and selective retrieval | Later |
 

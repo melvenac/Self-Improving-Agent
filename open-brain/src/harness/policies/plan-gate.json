@@ -1,0 +1,11 @@
+{
+  "gate": "plan",
+  "has_observable_acceptance_min": 0.7,
+  "scope_size_reject_at_or_above": 1.5,
+  "scope_size_reject_confidence_min": 0.7,
+  "preserves_validated_min": 0.6,
+  "addresses_top_failures_min": 0.5,
+  "treat_system_as_feature_complete": false,
+  "stop_ship_requires_deterministic_failure": true,
+  "stop_ship_requires_qa_history": true
+}
