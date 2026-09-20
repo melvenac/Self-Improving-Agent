@@ -129,18 +129,56 @@ Each row: **required** (the brief's or amendment's words), **procedure** (what I
 - **Procedure, `F-cur`, per seat:** the greeting's handoff block (a) names the seat whose handoff it
   is, (b) for Probe renders the handoff whose `pick_up` begins *"THIS IS THE QA SEAT'S HANDOFF"*
   (session 70, byte-equal to `handoff` at `git show c0d69d5:.agents/state.json`), for Forge the one
-  whose `pick_up` begins *"LOOP 15 SLICE TWO IS ACCEPTED AND MERGED"* (session 69, byte-equal to
-  `git show 5b5bd30:.agents/state.json`), and for Atlas either none — said in words — or whatever
-  the planner has written by then, cited by rev; (c) names the other two seats' handoffs by a SHA
+  whose `pick_up` begins *"LOOP 15 SLICE TWO IS ACCEPTED AND MERGED"* (session 69, at
+  `git show 5b5bd30:.agents/state.json`) **rendered from git or named by that SHA with the record
+  said to hold none — see the correction under Migration below**, and for Atlas either none — said
+  in words — or whatever the planner has written by then, cited by rev; (c) names the other two
+  seats' handoffs by a SHA
   that `git show <sha>:.agents/state.json` resolves to a state carrying that seat's handoff as
   rendered. **Migration — RULED (§9.5):** the candidate carries the migrated `state.json` as the
   developer's record write: `schema_version` bumped and `revision` 52 → 53 **in one write on the
   developer's branch**, and no other record write between the candidate and the merge. So at the
-  candidate SHA `state.json` reads `revision: 53` with the new `schema_version`, the two preserved
-  entries above are byte-equal to their sources, and `git log --format=%h -- .agents/state.json`
-  between `7c7e04b` and the candidate shows the migration and at most the developer's close-out. A
-  migrated record that drops or edits either handoff, a revision other than 53, or a second
-  writer in that range is a fail. **`F-behind`, per seat:** the old single-slot record
+  candidate SHA `state.json` reads `revision: 53` with the new `schema_version`, and
+  `git log --format=%h -- .agents/state.json` between `7c7e04b` and the candidate shows the
+  migration and at most the developer's close-out. A revision other than 53 or a second writer in
+  that range is a fail.
+  **Corrected before any candidate, 2026-09-20, after the planner described the developer's C2
+  boundary (`ff0c482`; migration at `de4674d`):** an earlier draft of this clause required the
+  migrated record to carry **both** the QA seat's (rev 51) and the developer's (rev 50) handoffs
+  byte-equal to their sources. That went beyond the amendment, which asks that the greeting render
+  the reader's own seat's last handoff and **name the others' by SHA** — it does not ask the
+  migration to recover a slot the single-slot record had already overwritten. The rev-52 slot
+  holds one entry (the QA seat's, session 70); the developer's rev-50 handoff exists only at
+  `5b5bd30`. So: **the QA entry** in the migrated record is byte-equal in `pick_up`, `watch_out`
+  and `open_questions` to the slot at `git show c0d69d5:.agents/state.json` (a fail if edited or
+  dropped); **the developer's** is not required in the record, and Forge's `F-cur` greeting
+  passes by either rendering its rev-50 handoff derived from git and cited at `5b5bd30`, or
+  saying in words that the record holds no entry for the developer seat and naming `5b5bd30` as
+  its last close-out — and fails by rendering the QA entry as Forge's own, or by silence. The
+  planner's has no entry until its first roll, and Atlas's greeting must say so in words. The
+  correction is recorded here rather than made silently because it narrows a clause I added; it
+  is not a widening after a verdict, since no candidate exists yet.
+  **Two developer claims, relayed by the planner from `ff0c482`, to verify and not to take:**
+  (i) the other seats' close-out SHAs are derived by walking `git log -- .agents/state.json` and
+  comparing the seat's **words**, not bytes, because the migration rewrote every entry's bytes and
+  a byte comparison made the migration commit every seat's answer while 946 tests stayed green. I
+  check every SHA the greeting names against `git log --format='%h %s' -- .agents/state.json`
+  read by hand, for each seat, and add the **negative case across the migration boundary**: on a
+  fixture whose HEAD is at or after `de4674d`, no seat's named SHA may be the migration commit,
+  and Probe's must be `c0d69d5` (or the later commit that last changed the QA entry's words),
+  Forge's `5b5bd30`. A derivation that names the migration commit for any seat is a fail.
+  (ii) the migration is a program, `open-brain state migrate`, with a dry run that refuses an
+  unknown seat and a file that is neither valid v1 nor v2, and it is idempotent. On a **copy** of
+  the rev-52 record: dry run then real run, `sha256sum` before and after; run it **twice** and the
+  second run's output bytes equal the first's and it says it changed nothing; the dry run on a
+  planted `seat: auditor` entry and on a file that is neither shape (a v1 file with one key
+  removed; a v2 file with `schema_version: 3`) is **refused** with the reason. A second run that
+  changes bytes, or a dry run that accepts either planted file, is a fail.
+  (iii) **the old build fails loudly on the migrated record.** The `7c7e04b` build's `handleStart`
+  on a fixture at the candidate must **refuse** to parse `schema_version: 2` with a message naming
+  the version, not fall back to the prose files silently (V-002's strict reader). I run it once and
+  quote the line. The §7 baseline transcripts are from that build on the v1 record; they say
+  nothing about v2 and the report says so. **`F-behind`, per seat:** the old single-slot record
   is read by the candidate's build — the greeting must either say which seat's handoff the slot is
   (session 69 → the developer) or refuse the old shape in words; it must **not** present it as the
   reader's own. **Old shape read by the old build** is the baseline (§7), not a candidate result.
