@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 43 by open-brain v0.41.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 44 by open-brain v0.41.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 15 - the HoH runtime, slice one. Build the outer runtime that spawns three isolated role sessions (planner, developer, QA), validates their deliverables against schemas with a capped retry whose exhaustion is a recorded failure, freezes the candidate ref before QA and refuses if the tree moves, refuses developer writes outside the plan's allowlist, and versions each loop in git with loop-<t>-<role> tags. No Jev, no model calls at the gates - the gates are stubbed, and the runtime is what enforces the seat separation that role files could only request. Brief: docs/loops/loop-15-brief.md. Sequenced ahead of Loop 14 by D-019-era ruling; Loop 14 is re-briefed, not deferred. Autonomy boundary ruled (D-019): autonomous inside a branch, Aaron at master. First loop where acceptance is written by a seat (Probe) that neither set the objective nor built the candidate. _(since session 65)_
+NO LOOP IS OPEN. Loop 15 slice one closed ACCEPTED on 2026-09-20 at v0.41.0 (D-022). The next loop is not briefed: Aaron rules on sequencing; the planner recommends Loop 15 slice two — real role sessions through open-brain/src/harness/ — with G-041 (the ref channel: a role's `git tag -f` during its stage is undetected) as its mandatory first repair, mechanical and seen red before it is believed. Loop 14 (re-briefed in docs/loops/loop-14-rebrief.md) follows. This field is reset on every loop close (G-035); a greeting that names a closed loop is a defect in the record, not the greeting. _(since session 64)_
 
 ## Top tasks
 
