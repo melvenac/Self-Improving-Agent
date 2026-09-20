@@ -1,0 +1,219 @@
+#!/usr/bin/env node
+/**
+ * `harness` — the command line for the HoH loop runtime.
+ *
+ * ## Two refusals this CLI makes on purpose
+ *
+ * 1. **There is no default subcommand.** `harness` with no arguments prints
+ *    usage and exits non-zero. It does not run a loop.
+ * 2. **An unrecognised flag refuses.** `T-150` in this project's backlog is
+ *    exactly this defect found elsewhere: an unknown flag that fell through to
+ *    the mutating default. A typo must stop the program, not pick an action for
+ *    the user.
+ *
+ * Both are the same rule — *default unlisted things to the strict side so a
+ * boundary cannot widen by omission* — applied to argument parsing.
+ */
+
+import { writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { runLoop, type GateMode } from "./runtime.js";
+import { stubRoles } from "./roles.js";
+import { jsonSchemas, serialiseSchema, type DeliverableKind } from "./schema.js";
+import { defaultChecks, type CheckSpec } from "./checks.js";
+
+const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
+
+  harness run --loop <tNNN> [options]
+  harness schemas [--write]
+  harness help
+
+run options
+  --loop <tNNN>        required; the iteration id, e.g. t001
+  --repo <dir>         repository to run in (default: cwd)
+  --allow <rule>       repeatable; a repo-relative path the DEVELOPER stage may
+                       write. A rule ending in / is a directory prefix.
+                       Default: artifacts/iterations/<loop>/
+  --max-attempts <n>   schema retries per role, including the first (default 3)
+  --dry-run            build every gate payload, print it, and send nothing
+  --build-cmd <cmd>    override the build check (split on spaces, no shell)
+  --unit-cmd <cmd>     override the unit check (split on spaces, no shell)
+  --json               print the loop result as JSON on stdout
+
+The runtime never merges, pushes, or touches a remote. It stops at a candidate
+commit and local tags (D-019: autonomous inside a branch, Aaron at master).
+`;
+
+interface ParsedRun {
+  loop: string;
+  repo: string;
+  allow: string[];
+  maxAttempts: number;
+  gateMode: GateMode;
+  buildCmd: string | null;
+  unitCmd: string | null;
+  json: boolean;
+}
+
+class UsageError extends Error {}
+
+const RUN_FLAGS_WITH_VALUE = new Set(["--loop", "--repo", "--allow", "--max-attempts", "--build-cmd", "--unit-cmd"]);
+const RUN_FLAGS_BOOLEAN = new Set(["--dry-run", "--json"]);
+
+function parseRun(argv: readonly string[]): ParsedRun {
+  const out: ParsedRun = {
+    loop: "",
+    repo: process.cwd(),
+    allow: [],
+    maxAttempts: 3,
+    gateMode: "skip",
+    buildCmd: null,
+    unitCmd: null,
+    json: false,
+  };
+
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i]!;
+    if (RUN_FLAGS_BOOLEAN.has(arg)) {
+      if (arg === "--dry-run") out.gateMode = "dry-run";
+      if (arg === "--json") out.json = true;
+      continue;
+    }
+    if (RUN_FLAGS_WITH_VALUE.has(arg)) {
+      const value = argv[i + 1];
+      if (value === undefined || value.startsWith("--")) {
+        throw new UsageError(`${arg} needs a value`);
+      }
+      i += 1;
+      if (arg === "--loop") out.loop = value;
+      else if (arg === "--repo") out.repo = resolve(value);
+      else if (arg === "--allow") out.allow.push(value);
+      else if (arg === "--build-cmd") out.buildCmd = value;
+      else if (arg === "--unit-cmd") out.unitCmd = value;
+      else if (arg === "--max-attempts") {
+        const n = Number.parseInt(value, 10);
+        if (!Number.isInteger(n) || n < 1) throw new UsageError(`--max-attempts must be a positive integer, got "${value}"`);
+        out.maxAttempts = n;
+      }
+      continue;
+    }
+    // Rule T-150: refuse, never fall through to the default action.
+    throw new UsageError(`unrecognised argument "${arg}"`);
+  }
+
+  if (out.loop === "") throw new UsageError("--loop is required, e.g. --loop t001");
+  if (!/^t\d{3,}$/.test(out.loop)) throw new UsageError(`--loop must look like t001, got "${out.loop}"`);
+  return out;
+}
+
+/** Split an override command on whitespace. No shell, so no quoting rules to get wrong. */
+function toSpec(cmd: string): CheckSpec {
+  const parts = cmd.trim().split(/\s+/).filter((p) => p !== "");
+  if (parts.length === 0) throw new UsageError("command override is empty");
+  return { command: parts[0]!, args: parts.slice(1) };
+}
+
+/** Where the derived schema files live, resolved from this module rather than from cwd. */
+export function schemaDir(): string {
+  return join(dirname(fileURLToPath(import.meta.url)), "schemas");
+}
+
+export const schemaFileName = (kind: DeliverableKind): string =>
+  kind === "plan" ? "plan.schema.json" : "evidence.schema.json";
+
+function cmdSchemas(argv: readonly string[]): number {
+  let write = false;
+  for (const arg of argv) {
+    if (arg === "--write") write = true;
+    else throw new UsageError(`unrecognised argument "${arg}"`);
+  }
+  const dir = schemaDir();
+  if (write && /[\\/]build[\\/]/.test(`${dir}/`)) {
+    // The derived files belong beside their source. Writing them into build/
+    // would produce a copy that looks authoritative, is never read, and
+    // disappears on the next `prebuild` rm — a stale artifact by construction.
+    throw new UsageError(
+      `refusing to write schemas into a build directory (${dir}). ` +
+        `Regenerate from source: npx tsx src/harness/cli.ts schemas --write`,
+    );
+  }
+  const schemas = jsonSchemas();
+  for (const kind of ["plan", "evidence"] as const) {
+    const text = serialiseSchema(schemas[kind]);
+    if (write) {
+      const target = join(schemaDir(), schemaFileName(kind));
+      writeFileSync(target, text, "utf-8");
+      process.stdout.write(`wrote ${target}\n`);
+    } else {
+      process.stdout.write(text);
+    }
+  }
+  return 0;
+}
+
+function cmdRun(argv: readonly string[]): number {
+  const opts = parseRun(argv);
+  const lines: string[] = [];
+  const log = (line: string): void => {
+    lines.push(line);
+    if (!opts.json) process.stdout.write(`${line}\n`);
+  };
+
+  const base = defaultChecks();
+  const result = runLoop({
+    repoRoot: opts.repo,
+    loop: opts.loop,
+    roles: stubRoles(),
+    developerAllowlist: opts.allow.length > 0 ? opts.allow : undefined,
+    maxAttempts: opts.maxAttempts,
+    gateMode: opts.gateMode,
+    checks: {
+      build: opts.buildCmd ? toSpec(opts.buildCmd) : base.build,
+      unit: opts.unitCmd ? toSpec(opts.unitCmd) : base.unit,
+    },
+    log,
+  });
+
+  if (opts.json) {
+    process.stdout.write(`${JSON.stringify({ ...result, log: lines }, null, 2)}\n`);
+  }
+  return result.exitCode;
+}
+
+export function main(argv: readonly string[]): number {
+  const [sub, ...rest] = argv;
+  try {
+    if (sub === undefined || sub === "help" || sub === "--help" || sub === "-h") {
+      process.stdout.write(USAGE);
+      // No subcommand is not success: a bare `harness` did nothing that was asked for.
+      return sub === undefined ? 2 : 0;
+    }
+    if (sub === "run") return cmdRun(rest);
+    if (sub === "schemas") return cmdSchemas(rest);
+    throw new UsageError(`unknown subcommand "${sub}"`);
+  } catch (err) {
+    if (err instanceof UsageError) {
+      process.stderr.write(`harness: ${err.message}\n\n${USAGE}`);
+      return 2;
+    }
+    process.stderr.write(`harness: ${(err as Error).message}\n`);
+    return 1;
+  }
+}
+
+// `process.argv[1]` is this file when run directly, and something else when
+// imported by a test. Comparing resolved paths keeps the test import side-effect free.
+const invokedDirectly = (() => {
+  const entry = process.argv[1];
+  if (!entry) return false;
+  try {
+    return resolve(entry) === resolve(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+})();
+
+if (invokedDirectly) {
+  process.exitCode = main(process.argv.slice(2));
+}

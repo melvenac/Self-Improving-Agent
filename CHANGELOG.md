@@ -1,5 +1,133 @@
 # Changelog
 
+## [0.41.0] - 2026-09-19 — the seat boundaries become a check instead of a request
+
+Loop 15, slice one. **This repo has had three roles as documents for months and could not keep to
+them.** The planner seat has held scope, verdict and write authority in one session — setting the
+objective, merging, tagging, writing the record. Nothing prevented it except a file asking it not
+to, and **an intention is not a mechanism** (Loop 10 R4).
+
+`harness/` is the outer runtime from *Harness-of-Harness* (arXiv:2609.01481), reduced to the part
+that enforces: it freezes what QA is allowed to look at, and it refuses writes outside a stage's
+allowlist. **The roles are stubs.** No model is called, no API key is read, and no gate takes a
+decision — the Jev client, the three gates and real role prompts are slice two and after.
+
+### The finding that drove this
+
+**The `build-freshness` check shipped in v0.40.0 asserting a consequence that was true in one
+checkout of three.** Its author ran it. Its tests were green. It was wrong in two trees. That is not
+a lapse to be more careful about next time — it is what direct knowledge of a change does to the
+author's ability to evaluate it. **Acceptance has to be determined from a fixed candidate by
+something that did not produce it**, and until now nothing made that possible.
+
+### Added
+
+- **`open-brain/src/harness/`** — the loop runtime. `planner -> developer -> QA`, each stage
+  starting from a clean tree and ending in a commit, producing a versioned
+  `artifacts/iterations/<loop>/`. Run it with `npx tsx open-brain/src/harness/cli.ts run --loop t001`.
+
+- **A write allowlist that refuses, in two layers.** The context helper refuses a path before the
+  write (**prevention**); a `git status` diff after the stage refuses anything that reached disk
+  another way and reverts it (**detection**). The second layer is the one that matters: in slice two
+  the roles are separate processes writing straight to disk, and a helper they can decline to call
+  protects nothing. A boundary breach is **not retried** — re-rolling a role that wrote out of
+  bounds treats a breach as noise.
+
+- **A frozen candidate.** QA is handed a SHA and the runtime refuses to proceed if HEAD has moved or
+  the working tree is dirty against it. The two conditions are **reported separately**, because
+  "someone committed past it" and "someone edited a file in place" are different accidents with
+  different fixes, and one verdict for both hides which happened.
+
+- **`D_t` and `E_t` schemas, derived rather than duplicated.** `zod` is the source;
+  `src/harness/schemas/*.schema.json` are generated from it and a test fails if they drift. The one
+  rule JSON Schema cannot express — `new_capability` non-empty unless `stop_ship` is requested *and*
+  justified — is enforced by the runtime and **stated in the generated file's own description**, so a
+  reader validating against the file alone is told what it cannot see.
+
+  **`repair_targets` is required but may be empty, and that is a correction.** The first version
+  refused an empty one, reading *"each plan repairs outstanding problems AND adds one small
+  observable capability"* as symmetric. **The reading was faithful and the layer was wrong.**
+  Whether a plan repairs enough is only answerable against the previous loop's evidence, which the
+  schema never sees — so a symmetric rule refuses the two cases where there is legitimately nothing
+  to repair: **the first loop of a project, and any loop after a clean `E_t`.** It would have
+  deadlocked the runtime on start and again on success. That rule belongs to the plan gate.
+
+- **A capped schema retry whose exhaustion is an artifact.** A rejected deliverable is handed back
+  its own problems and its own schema, not re-rolled blind. An exhausted cap writes `FAILED.md` into
+  the iteration directory and exits non-zero — **a recorded failure, never a silent pass.**
+
+- **Deterministic checks read from exit codes only.** No stage is given stdout to judge. A QA report
+  whose `runtime_checks` contradict the measurement is **refused rather than corrected**: silently
+  overwriting it would hide a role fabricating results, which is the thing a separate QA seat exists
+  to make visible.
+
+- **A dry run that predates the client it stubs.** `--dry-run` prints every gate payload and sends
+  nothing, and there is no network code in that path to send with. Secrets are redacted by **live
+  value and by field name**, because value-matching alone reports a clean payload when the
+  environment variable is unset — an instrument that cannot tell "nothing there" from "I did not
+  look".
+
+- **Per-loop git versioning.** Tags `loop-<NNN>-base`, `loop-<NNN>-developer` and `loop-<NNN>-qa`,
+  zero-padded so they sort with `artifacts/iterations/t001/`. Rollback is one git command against
+  the base tag, with no harness involved. Tags **refuse to move**; a rollback marker that can be
+  repointed is not a marker.
+
+### Found by QA before release, and fixed
+
+**The first candidate was NOT ACCEPTED, and the class it failed on is the one this runtime exists
+for: enforcement observed the working tree, and a commit is invisible to a working-tree observer.**
+A role that wrote a file and then committed it left `git status` clean, so the allowlist reported
+"examined 0 changed paths" and the loop continued. Three ways in:
+
+- **A QA role that overwrote and committed the candidate completed the loop at exit 0**, with
+  `loop-001-qa` pointing at an evidence commit whose parent was the rogue commit while `E_t` named
+  the candidate. The freeze was verified once, before the QA stage, and nothing looked again after
+  the stage that could move it.
+- **A planner that committed outside its allowlist completed the loop**, leaving the file in history
+  below the candidate.
+- **A developer that committed failed for the opposite reason** — *"the developer stage changed
+  nothing"* — while HEAD had moved and the file was on disk. It failed closed by accident.
+
+**Committing is not an exotic attack. It is how a real session leaves its work**, which is exactly
+what slice two's roles will be. Fixed by comparing against the diff from each stage's base commit
+unioned with the working tree, refusing any stage that moves HEAD at all, rolling back to the stage
+base, verifying identity before every tag, and asserting directly that the candidate is the evidence
+commit's first parent.
+
+**The default checks could not run on the platform this repo is developed on.** `defaultChecks()`
+picked `npm.cmd` on win32 and spawned it with `shell: false`; Node 18.20/20.12/22 refuse that, so
+every default check died with `EINVAL` and **the README's own documented command exited 1 for anyone
+following it on Windows.** The suite asserted the command's *name* and never ran it. npm is now
+resolved to its JavaScript entry point and spawned through `node` — still no shell — and the tests
+spawn rather than pattern-match.
+
+**None of this was caught by the author.** Acceptance was determined from a frozen candidate by a
+seat that did not produce it, which is what the loop was built to make possible.
+
+### Deliberately not done
+
+- **The runtime never merges, pushes, or touches a remote.** `git.ts` refuses ten network
+  subcommands at the call site, checked on the subcommand git actually receives so quoting cannot
+  slip past it, and a test scans the source for a planted `push`. `D-019`: autonomous inside a
+  branch, Aaron at master.
+
+- **A red build does not stop the loop.** It is the evidence. Suppressing a QA report about a broken
+  candidate would be widening the criteria until something passes. The loop completes and the CLI
+  exits non-zero.
+
+- **An unrecognised CLI flag refuses** and there is no default subcommand, so a typo stops the
+  program instead of selecting a mutating action (`T-150`, found elsewhere in this backlog).
+
+### Limits, stated because a check whose limit is unwritten gets trusted past it
+
+- **Slice one fixes boundary failures and does nothing about measurement failures**, which were far
+  more frequent — eleven near-misses in two days, every one an agent misreading its own instrument.
+  **A runtime cannot stop a seat running a grep that hides the line it needed.**
+- The allowlist sees **paths git reports**: not a write made and reverted inside the stage, and not
+  a gitignored path.
+- `module-boundary` covers the harness because it lives under `open-brain/src`. At the repo root it
+  would have been outside the only check that asserts the dependency direction.
+
 ## [0.40.0] - 2026-09-17 — derived artifacts have to prove they are current
 
 The GitNexus index was **137 commits behind and pinned to a deleted branch**, and `CLAUDE.md`

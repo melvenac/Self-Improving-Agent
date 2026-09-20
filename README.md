@@ -2,7 +2,7 @@
 
 *A memory protocol that enables AI coding agents to learn across sessions.*
 
-**Latest: v0.40.0** · [Changelog](CHANGELOG.md)
+**Latest: v0.41.0** · [Changelog](CHANGELOG.md)
 
 ---
 
@@ -191,10 +191,52 @@ Browse sessions, chunks, knowledge entries with their maturity lifecycle, CC mem
 
 > The viewer predates the v2 schema and still queries v1 table names (`knowledge`, `summaries`, `tags`, `chunks_fts`). A shim maps these to `knowledge_index` and empty stand-ins using **TEMP views scoped to the connection**, so `knowledge-v2.db` is never modified. The `summaries` tab is empty by design — v2 has no summaries table.
 
+## HoH loop runtime (`open-brain/src/harness/`)
+
+An outer harness around the three seats — **planner, developer, QA** — from
+*Harness-of-Harness* (arXiv:2609.01481). Its value here is **enforcement, not automation**: this
+repo already had the three roles as documents and could not keep to them, because a role file is a
+rule someone has to remember.
+
+**The roles are stubs.** Slice one calls no model, reads no API key, and takes no gate decision.
+What exists is the machinery the gates will sit on, and the two refusals that make the boundaries
+real.
+
+```bash
+# Prints the derived D_t / E_t schemas. Changes nothing.
+npx tsx open-brain/src/harness/cli.ts schemas
+
+# Runs a loop. Pass --repo: a loop COMMITS and TAGS in the repository it runs
+# against, so point it at a scratch clone rather than your working checkout.
+npx tsx open-brain/src/harness/cli.ts run --loop t001 --dry-run --repo /path/to/scratch/repo
+```
+
+The target repository needs a clean tree and, for the default checks, an `open-brain/` directory with
+`build` and `test` scripts. Roll a loop back with `git reset --hard loop-001-base`.
+
+| Mechanism | What it does |
+|---|---|
+| **Write allowlist** | Refuses before the write *and* detects afterwards against the diff from the stage's base commit — **committed and uncommitted both**, because a role that commits leaves a clean `git status`. A breach is refused, not warned, reverted, and never retried |
+| **Frozen candidate** | QA is handed a SHA; the runtime refuses if HEAD moved or the tree is dirty, checks identity again **after** every stage and before every tag, and asserts the candidate is the evidence commit's parent |
+| **Schema retry, capped** | A rejected `D_t`/`E_t` is handed back its own problems and schema. An exhausted cap writes `FAILED.md` and exits non-zero |
+| **Exit codes only** | Build and unit results come from process status; no stage reads stdout to decide. A report contradicting the measurement is refused, not corrected |
+| **Per-loop git tags** | `loop-<NNN>-base`, `-developer`, `-qa`. Rollback is one git command. Tags refuse to move |
+| **Dry run** | Prints every gate payload and sends nothing; secrets redacted by live value *and* field name |
+
+**The runtime never merges, pushes, or touches a remote** — ten network subcommands are refused at
+the call site (`D-019`: autonomous inside a branch, Aaron at master).
+
+**What it does not fix, stated so nobody expects it to:** boundary failures only. It does nothing
+about measurement failures, which are far more frequent. A runtime cannot stop a seat running a
+grep that hides the line it needed.
+
+See [`docs/HOH-JEV.md`](docs/HOH-JEV.md) for the loop contract.
+
 ## Key Features
 
 | Feature | Since | What it does |
 |---|---|---|
+| **HoH loop runtime** | v0.41.0 | Enforces the planner/developer/QA boundary: frozen candidate for QA, write allowlist that refuses, capped schema retry, per-loop git tags. Roles are stubbed in slice one |
 | **Dashboard** | v0.9.0 | Read-only web viewer at `localhost:3456`; surfaces the maturity lifecycle (progenitor/proven/mature), which the v1 schema could not represent |
 | **Tiered Memory** | v0.6.0 | 4-tier access (Core/Hot/Warm/Cold); Obsidian Vault as SOT; Smart Connections semantic search replaces sqlite-vec; vault-first store pipeline; reflection cycle for experience distillation |
 | **Session manifest** | v0.5.5 | Threads Claude's session UUID across all memory layers for full provenance tracking |
