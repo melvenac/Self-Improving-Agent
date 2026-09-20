@@ -83,7 +83,11 @@ main tree is not a QA fixture.**
 
 ## 4. The record
 
-**Error counts at close: 48 Planner / 28 Developer / 0 QA.** Movement this loop:
+**Error counts at close: 48 Planner / 28 Developer / 0 QA.** Movement **since Loop 13's close at
+45 / 25 — which is this loop's window, because no other loop was open between**: three each. The
+developer counted two from the QA reports alone and asked for the derivation rather than accept the
+sentence; the third, 26, is from the write-ordering exchange that preceded the first candidate, and
+the planner's 46 is from the same exchange. Stated so the window is derivable, not argued over.
 
 | # | Seat | Entry |
 | --- | --- | --- |
