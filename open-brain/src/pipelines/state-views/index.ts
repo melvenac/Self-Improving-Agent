@@ -7,7 +7,7 @@
  * `<!-- state:begin -->` and `<!-- state:end -->` is generated; everything
  * outside it is the project's own prose and is preserved byte for byte.
  */
-import type { State, Task } from "../../shared/state-schema.js";
+import type { State, Task, Handoff } from "../../shared/state-schema.js";
 import { TaskPriority } from "../../shared/state-schema.js";
 
 export interface ViewOptions {
@@ -118,17 +118,57 @@ export function renderTaskFile(state: State, o: ViewOptions): string {
   return lines.join("\n");
 }
 
+/**
+ * Every seat's handoff, each under its own heading.
+ *
+ * This file used to render ONE handoff because the record held one. Under the
+ * roll rule two seats close out in sequence, so that single slot meant the
+ * second erased the first (G-046) — and the view was where the erasure became
+ * visible to a human, usually after it mattered. Rendering all of them is the
+ * point: a reader of this file can see that three seats have handoffs and whose
+ * is whose, without opening state.json.
+ *
+ * Seats are rendered in a FIXED order rather than in array order, so a write by
+ * one seat cannot reorder the file and produce a diff that looks like a change
+ * to another seat's entry.
+ */
 export function renderNextSession(state: State, o: ViewOptions): string {
-  const h = state.handoff;
-  const lines: string[] = [header(state, o), "", "# Next Session Handoff", "", `## Pick up here _(written session ${h.session})_`, "", h.pick_up || "_Nothing recorded._", ""];
-  lines.push("## Watch out", "");
-  if (h.watch_out.length === 0) lines.push("_Nothing flagged._");
-  for (const w of h.watch_out) lines.push(`- ${w}`);
-  lines.push("", "## Open questions", "");
-  if (h.open_questions.length === 0) lines.push("_None._");
-  for (const q of h.open_questions) lines.push(`- ${q}`);
+  const lines: string[] = [header(state, o), "", "# Next Session Handoff", ""];
+
+  if (state.handoffs.length === 0) {
+    lines.push("_No handoffs recorded._", "");
+  } else {
+    const order: Array<Handoff["seat"]> = ["planner", "developer", "qa"];
+    const sorted = [...state.handoffs].sort((a, b) => order.indexOf(a.seat) - order.indexOf(b.seat));
+    for (const h of sorted) {
+      lines.push(`## ${h.seat} _(written session ${h.session})_`, "");
+      lines.push("### Pick up here", "", h.pick_up || "_Nothing recorded._", "");
+      lines.push("### Watch out", "");
+      if (h.watch_out.length === 0) lines.push("_Nothing flagged._");
+      for (const w of h.watch_out) lines.push(`- ${w}`);
+      lines.push("", "### Open questions", "");
+      if (h.open_questions.length === 0) lines.push("_None._");
+      for (const q of h.open_questions) lines.push(`- ${q}`);
+      lines.push("");
+      if (h.loop_state) {
+        const l = h.loop_state;
+        lines.push("### Loop state", "");
+        // "_None._" in words, never an omitted row: an empty list and an absent
+        // one are different facts and must not render the same (C3).
+        lines.push("**Open PRs:** " + (l.open_prs.length === 0 ? "_None._" : ""));
+        for (const pr of l.open_prs) lines.push(`- ${pr.ref} — QA: ${pr.qa_status}${pr.note ? ` — ${pr.note}` : ""}`);
+        lines.push("", `**SHA frozen for QA:** ${l.frozen_sha ? `\`${l.frozen_sha}\`` : "_None._"}`, "");
+        lines.push("**Questions pending for Aaron:** " + (l.questions_for_aaron.length === 0 ? "_None._" : ""));
+        for (const q of l.questions_for_aaron) lines.push(`- ${q}`);
+        lines.push("", "**Rulings made mid-loop:** " + (l.rulings.length === 0 ? "_None._" : ""));
+        for (const r of l.rulings) lines.push(`- ${r}`);
+        lines.push("");
+      }
+    }
+  }
+
   const ls = state.last_session;
-  lines.push("", "## Last session", "", `Session ${ls.n} — ${ls.date}${ls.uuid ? ` — \`${ls.uuid}\`` : ""}`, "");
+  lines.push("## Last session", "", `Session ${ls.n} — ${ls.date}${ls.seat ? ` — ${ls.seat}` : ""}${ls.uuid ? ` — \`${ls.uuid}\`` : ""}`, "");
   return lines.join("\n");
 }
 

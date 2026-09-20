@@ -64,9 +64,14 @@ describe("state views (Loop 3 C3)", () => {
   it("next-session.md: handoff fields and last session (V4)", () => {
     const text = renderNextSession(state, opts);
     expect(text.split("\n")[0]).toBe(HEADER);
-    expect(text).toContain("## Pick up here _(written session 54)_\n\nLoop 2: run V1–V9 on the frozen tag");
-    expect(text).toContain("## Watch out\n\n- The live MCP server stays on the old build until /mcp reconnect open-brain.");
-    expect(text).toContain("## Open questions\n\n- Q2:");
+    // Each seat now gets its own `## <seat>` section, so the handoff headings
+    // moved one level down. The seat heading is asserted too: a view that
+    // rendered the fields without saying whose they are is the shape G-046
+    // describes, and it read perfectly well right up until two seats had one.
+    expect(text).toContain("## developer _(written session 54)_");
+    expect(text).toContain("### Pick up here\n\nLoop 2: run V1–V9 on the frozen tag");
+    expect(text).toContain("### Watch out\n\n- The live MCP server stays on the old build until /mcp reconnect open-brain.");
+    expect(text).toContain("### Open questions\n\n- Q2:");
     expect(text).toContain("## Last session\n\nSession 54 — 2026-09-14 — `f7a1b3d9-ef6d-482f-aba1-ddaa296f722b`");
   });
 

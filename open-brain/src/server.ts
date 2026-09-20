@@ -24,6 +24,7 @@ import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/histo
 import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
 import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
 import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
+import { SeatName, type Seat } from "./shared/state-schema.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
@@ -294,7 +295,13 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
     // missing file and an empty one never look alike.
     const sj = result.state.stateJson;
     if (sj.present && sj.valid && sj.data) {
-      lines.push(...renderState(sj.data, result.state.version));
+      // The reader's OWN seat, so the greeting renders this seat's handoff and
+      // names the others by their close-out commit. A greeting that shows the
+      // developer's handoff to the planner is C4 failing on the row C2 exists for.
+      lines.push(...renderState(sj.data, result.state.version, {
+        seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
+        projectRoot,
+      }));
     } else {
       if (sj.present && !sj.valid) {
         lines.push(`\nstate.json invalid at ${sj.error} — falling back to files`);
@@ -386,7 +393,13 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
     lines.push(`Applied (${r.applied.length}):`);
     for (const a of r.applied) lines.push(`  ${a.op}${a.id ? ` ${a.id}` : ""}`);
     lines.push(`Dropped done tasks (retention ${DONE_RETENTION_SESSIONS} sessions): ${r.dropped_task_ids.length ? r.dropped_task_ids.join(", ") : "none"}`);
+    // T-157: printed unconditionally, not folded into the line above. The
+    // evictions that cost this project two tasks were reported as one clause
+    // among several and read as routine.
+    if (r.kept_cited_task_ids.length) lines.push(`KEPT despite retention (id cited in the tracked tree): ${r.kept_cited_task_ids.join(", ")}`);
     if (r.removed_gap_ids.length) lines.push(`Closed gaps removed: ${r.removed_gap_ids.join(", ")}`);
+    // Anything the writer did differently from what was asked.
+    for (const n of r.notes) lines.push(`NOTE: ${n}`);
     lines.push(`${r.dry_run ? "Would render" : "Rendered"} (${r.rendered.length}): ${r.rendered.length ? r.rendered.join(", ") : "none (render: false)"}`);
     return { content: [{ type: "text", text: lines.join("\n") }] };
   } catch (err) {
@@ -1321,4 +1334,9 @@ if (isDirectRun) {
     console.error("open-brain server failed:", err);
     process.exit(1);
   });
+}
+
+/** Narrows a declared seat role to the closed set the record accepts. */
+function isSeat(role: string): role is Seat {
+  return SeatName.safeParse(role).success;
 }

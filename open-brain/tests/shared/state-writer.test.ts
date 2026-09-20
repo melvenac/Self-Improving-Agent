@@ -127,7 +127,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
     // Canonical: parse + serialize reproduces the bytes on disk.
     const text = readFileSync(join(root, STATE), "utf-8");
     expect(text.endsWith("\n")).toBe(true);
-    expect(text.startsWith('{\n  "schema_version": 1,\n  "revision": 9,')).toBe(true);
+    expect(text.startsWith('{\n  "schema_version": 2,\n  "revision": 9,')).toBe(true);
   });
 
   it("dry_run returns the full result and changes nothing on disk (V1)", () => {
@@ -304,14 +304,103 @@ describe("applyStateOps (Loop 3 writer)", () => {
     expect(readState(root).objective).toBeNull();
   });
 
-  it("set_handoff replaces the handoff with the current session (V2)", () => {
-    applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "set_handoff", pick_up: "Here", watch_out: ["a"], open_questions: [] }] });
-    expect(readState(root).handoff).toEqual({ pick_up: "Here", watch_out: ["a"], open_questions: [], session: SESSION });
+  it("set_handoff replaces THAT SEAT's handoff and leaves the others alone (V2)", () => {
+    applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "set_handoff", seat: "developer", pick_up: "Here", watch_out: ["a"], open_questions: [] }] });
+    expect(readState(root).handoffs).toEqual([
+      { seat: "developer", pick_up: "Here", watch_out: ["a"], open_questions: [], session: SESSION, loop_state: null },
+    ]);
   });
 
-  it("end_session sets last_session (V2)", () => {
-    applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "end_session", n: SESSION, date: "2026-09-15", uuid: "u-1" }] });
-    expect(readState(root).last_session).toEqual({ n: SESSION, date: "2026-09-15", uuid: "u-1" });
+  it("set_handoff for a second seat ADDS rather than overwrites — G-046", () => {
+    // The defect this replaces: one project-wide slot, so under the roll rule
+    // the second seat to close out erased the first, every loop. A later
+    // message then sent a fresh seat to a file that no longer held what it was
+    // said to hold.
+    const r = applyStateOps(root, {
+      session: SESSION,
+      expected_revision: 7,
+      ops: [
+        { op: "set_handoff", seat: "developer", pick_up: "dev", watch_out: [], open_questions: [] },
+        { op: "set_handoff", seat: "qa", pick_up: "qa", watch_out: [], open_questions: [] },
+      ],
+    });
+    expect(r.ok).toBe(true);
+    const seats = readState(root).handoffs;
+    expect(seats).toHaveLength(2);
+    expect(seats.find((h) => h.seat === "developer")?.pick_up).toBe("dev");
+    expect(seats.find((h) => h.seat === "qa")?.pick_up).toBe("qa");
+  });
+
+  it("set_handoff REFUSES a seat outside the closed set, and a planner handoff with no loop_state", () => {
+    const unknownSeat = applyStateOps(root, {
+      session: SESSION,
+      expected_revision: 7,
+      ops: [{ op: "set_handoff", seat: "builder", pick_up: "x", watch_out: [], open_questions: [] }],
+    });
+    expectRefused(unknownSeat, /ops\[0\] invalid at seat/);
+
+    // C3: the rows may be EMPTY but not ABSENT. A planner handoff without them
+    // is the remembered version of the thing that has to be run.
+    const noRows = applyStateOps(root, {
+      session: SESSION,
+      expected_revision: 7,
+      ops: [{ op: "set_handoff", seat: "planner", pick_up: "x", watch_out: [], open_questions: [] }],
+    });
+    expectRefused(noRows, /must carry loop_state/);
+
+    // ...and the EMPTY form is accepted, or the distinction would be a ban.
+    const empty = applyStateOps(root, {
+      session: SESSION,
+      expected_revision: 7,
+      ops: [
+        {
+          op: "set_handoff",
+          seat: "planner",
+          pick_up: "x",
+          watch_out: [],
+          open_questions: [],
+          loop_state: { open_prs: [], frozen_sha: null, questions_for_aaron: [], rulings: [] },
+        },
+      ],
+    });
+    expect(empty.ok).toBe(true);
+  });
+
+  it("end_session sets last_session with the seat that closed it (V2)", () => {
+    applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "end_session", n: SESSION, date: "2026-09-15", uuid: "u-1", seat: "developer" }] });
+    expect(readState(root).last_session).toEqual({ n: SESSION, date: "2026-09-15", uuid: "u-1", seat: "developer" });
+  });
+
+  it("end_session is IDEMPOTENT per uuid: a second write keeps the number and says so (G-047)", () => {
+    // The number counted CLOSE-OUT WRITES, not sessions. One developer
+    // seat-session wrote end_session three times in slice two — 67, 68, 69
+    // under one uuid — so every per-session rate was divided by a denominator
+    // that inflates most for the loops that went worst.
+    applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "end_session", n: 55, date: "2026-09-15", uuid: "same", seat: "developer" }] });
+    const second = applyStateOps(root, {
+      session: SESSION,
+      expected_revision: 8,
+      ops: [{ op: "end_session", n: 56, date: "2026-09-16", uuid: "same", seat: "developer" }],
+    });
+
+    expect(second.ok).toBe(true);
+    const ls = readState(root).last_session;
+    expect(ls.n).toBe(55);
+    expect(ls.date).toBe("2026-09-16");
+    expect(second.notes.join(" ")).toMatch(/already recorded as session 55/);
+  });
+
+  it("a DIFFERENT uuid still takes a new number", () => {
+    // The other half: idempotency must not become a ban on new sessions.
+    applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "end_session", n: 55, date: "2026-09-15", uuid: "one", seat: "developer" }] });
+    const next = applyStateOps(root, {
+      session: SESSION,
+      expected_revision: 8,
+      ops: [{ op: "end_session", n: 56, date: "2026-09-16", uuid: "two", seat: "qa" }],
+    });
+    expect(next.ok).toBe(true);
+    expect(readState(root).last_session.n).toBe(56);
+    expect(next.notes).toEqual([]);
   });
 
   // ---- V3: retention ----
@@ -326,8 +415,34 @@ describe("applyStateOps (Loop 3 writer)", () => {
     expect(ids).toHaveLength(27 - 7);
 
     const s = readState(root);
-    const dropped = applyRetention(s, 57);
+    const { dropped, kept } = applyRetention(s, 57);
     expect(dropped).toEqual(["T-001", "T-002", "T-003", "T-004"]); // closed 54 = 57-3 → dropped
+    expect(kept).toEqual([]);
+  });
+
+  it("T-157: retention KEEPS a done task whose id the tracked tree cites", () => {
+    // Twice in two consecutive writes, retention destroyed a task other tracked
+    // documents referred to by id — T-151, which G-031 exists to correct, and
+    // T-153, cited by three files. Both survived only because a seat happened to
+    // read one line of dry-run output and then grep the tree by hand.
+    const s = readState(root);
+    const before = s.tasks.filter((t) => t.status === "done").map((t) => t.id);
+    expect(before).toContain("T-001");
+
+    const uncited = applyRetention(readState(root), 57, new Map()).dropped;
+    expect(uncited).toContain("T-001");
+
+    const { dropped, kept } = applyRetention(s, 57, new Map([["T-001", ["docs/loops/some-closeout.md"]]]));
+    expect(kept).toEqual(["T-001"]);
+    expect(dropped).not.toContain("T-001");
+    expect(s.tasks.some((t) => t.id === "T-001")).toBe(true);
+    // The others still go. The guard must protect the cited one, not disable
+    // retention: a check that keeps everything cannot fail and is not a check.
+    // Asserted as "one fewer than without the citation" rather than a hardcoded
+    // list, so it tests the difference the citation made and nothing else.
+    expect(dropped).toEqual(uncited.filter((id) => id !== "T-001"));
+    expect(dropped.length).toBe(uncited.length - 1);
+    expect(dropped.length).toBeGreaterThan(0);
     expect(DONE_RETENTION_SESSIONS).toBe(3);
   });
 
@@ -388,7 +503,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
 
     writeFileSync(join(root, STATE), "{ \"schema_version\": 1 }");
     const r2 = applyStateOps(root, { session: SESSION, expected_revision: 0, ops: [{ op: "set_objective", text: "x" }] });
-    expectRefused(r2, /state\.json invalid at revision: /);
+    expectRefused(r2, /state\.json invalid at schema_version: /);
     expect(readFileSync(join(root, STATE), "utf-8")).toBe("{ \"schema_version\": 1 }");
   });
 

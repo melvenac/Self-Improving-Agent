@@ -182,8 +182,17 @@ describe("server handlers", () => {
       expect(text).toContain("Gaps (5):\n  G-001 — Cursor start.md copies");
       // R2 (Loop 3): decisions are append-ordered; latest is the last element, not the newest date.
       expect(text).toContain("Decisions: 6 recorded; latest D-006 (2026-08-31) Lifecycle evaluation stays out of the session-end sweep");
-      expect(text).toContain("Handoff (session 54):\n  pick up: Loop 2: run V1–V9");
-      expect(text).toContain("    - Run vitest from open-brain/, never the repo root (entry 462).");
+      // The fixture's single v1 handoff migrated to seat "developer". handleStart
+      // resolves the reader's seat from the checkout rather than assuming one, and
+      // this temp project declares none — so the render says the seat is
+      // unresolved and names the handoff instead of showing it as "yours".
+      expect(text).toContain("READER'S SEAT UNRESOLVED");
+      expect(text).toContain("developer (session 54)");
+      // Another seat's watch-out items are NOT rendered — only its pick-up line
+      // and its close-out commit. Pinned as an absence: printing every seat's
+      // full handoff to every reader is the noise that made one shared slot look
+      // tolerable for as long as it did.
+      expect(text).not.toContain("    - Run vitest from open-brain/, never the repo root (entry 462).");
       expect(text).toContain("Last session: #54 2026-09-14 (f7a1b3d9-ef6d-482f-aba1-ddaa296f722b)");
 
       // The four prose files are NOT returned…
@@ -249,14 +258,16 @@ describe("server handlers", () => {
           { op: "open_task", title: "Loop 3 writer", priority: "P0" },
           { op: "add_verified", claim: "ob_state round-trips", evidence: [{ type: "test", path: "open-brain/tests/server.test.ts", observation: "this test" }] },
           { op: "add_decision", title: "Views are generated", date: "2026-09-15", note: "" },
-          { op: "set_handoff", pick_up: "Loop 4 migration", watch_out: ["reconnect the server"], open_questions: [] },
-          { op: "end_session", n: 55, date: "2026-09-15", uuid: "round-trip-uuid" },
+          { op: "set_handoff", seat: "developer", pick_up: "Loop 4 migration", watch_out: ["reconnect the server"], open_questions: [] },
+          { op: "end_session", n: 55, date: "2026-09-15", uuid: "round-trip-uuid", seat: "developer" },
         ],
       });
       expect(res.isError).toBeUndefined();
       const out = getText(res);
       expect(out).toContain("ob_state applied\nRevision: 7 → 8");
-      expect(out).toContain("  close_task T-005\n  open_task T-028\n  add_verified V-009\n  add_decision D-007\n  set_handoff\n  end_session");
+      // set_handoff reports the SEAT as its id, so which seat wrote a handoff is
+      // visible in the applied list rather than only inside the file.
+      expect(out).toContain("  close_task T-005\n  open_task T-028\n  add_verified V-009\n  add_decision D-007\n  set_handoff developer\n  end_session");
       expect(out).toContain("Dropped done tasks (retention 3 sessions): T-020, T-021, T-022, T-023, T-026");
       expect(out).toContain("Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md");
 
@@ -264,7 +275,10 @@ describe("server handlers", () => {
       const header = "<!-- generated from .agents/state.json rev 8 by open-brain v0.30.0 — do not edit; change state via ob_state -->";
       expect(readFileSync(join(tmp, ".agents", "TASKS", "INBOX.md"), "utf-8").startsWith(header)).toBe(true);
       expect(readFileSync(join(tmp, ".agents", "TASKS", "task.md"), "utf-8")).toContain("**T-028** [P0] Loop 3 writer");
-      expect(readFileSync(join(tmp, ".agents", "SESSIONS", "next-session.md"), "utf-8")).toContain("Session 55 — 2026-09-15 — `round-trip-uuid`");
+      // The last-session line now carries the seat that closed it, between the
+      // date and the uuid: which seat ended a session was previously knowable
+      // only by reading the handoff it happened to write.
+      expect(readFileSync(join(tmp, ".agents", "SESSIONS", "next-session.md"), "utf-8")).toContain("Session 55 — 2026-09-15 — developer — `round-trip-uuid`");
       const summary = readFileSync(join(tmp, ".agents", "SYSTEM", "SUMMARY.md"), "utf-8");
       expect(summary).toContain("PROSE-SUMMARY-MARKER alpha beta"); // outside the region, preserved
       expect(summary).toContain("<!-- state:begin -->");
@@ -276,7 +290,10 @@ describe("server handlers", () => {
       expect(start).toContain("[open] T-028 Loop 3 writer");
       expect(start).not.toContain("[in_progress] T-005");
       expect(start).toContain("Decisions: 7 recorded; latest D-007 (2026-09-15) Views are generated");
-      expect(start).toContain("Handoff (session 55):\n  pick up: Loop 4 migration");
+      // This temp project declares no seat, so the read-back names the handoff
+      // rather than presenting it as the reader's own.
+      expect(start).toContain("developer (session 55)");
+      expect(start).toContain("Loop 4 migration");
       expect(start).toContain("Last session: #55 2026-09-15 (round-trip-uuid)");
       // R3: state.json still says 0.29.0 while package.json says 0.30.0 → reported, not fixed.
       expect(start).not.toContain("state-version:");

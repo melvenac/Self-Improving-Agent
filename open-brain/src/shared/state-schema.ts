@@ -111,21 +111,86 @@ export const DecisionSchema = z.strictObject({
   note: z.string(),
 });
 
+/**
+ * The closed set of seats. Matches the harness's `RoleName`
+ * (`harness/roles.ts`) — a handoff belongs to a seat that can actually run a
+ * stage, and a typo must refuse rather than create a fourth seat nobody reads.
+ */
+export const SeatName = z.enum(["planner", "developer", "qa"]);
+export type Seat = z.infer<typeof SeatName>;
+
+export const QaStatus = z.enum(["not_started", "in_progress", "accepted", "rejected", "not_required"]);
+
+export const OpenPrSchema = z.strictObject({
+  ref: z.string().min(1),
+  qa_status: QaStatus,
+  note: z.string(),
+});
+
+/**
+ * The rows C3 names: what the planner loses at every roll and the runtime does
+ * not carry. `D_t`, `E_t` and `G_*` say what a loop decided, built, judged and
+ * gated; none of them is an iteration's output, so all four travelled by A2A and
+ * by the planner remembering.
+ *
+ * **Required, and may be empty.** `[]` and `null` are legitimate answers —
+ * "no open PRs" is a real state of the world. ABSENCE is not: a field the seat
+ * must answer is run rather than remembered, while an optional one is
+ * remembered, which is the failure C3 describes. Empty and absent must not look
+ * alike.
+ */
+export const LoopStateSchema = z.strictObject({
+  open_prs: z.array(OpenPrSchema),
+  frozen_sha: z.string().nullable(),
+  questions_for_aaron: z.array(z.string()),
+  rulings: z.array(z.string()),
+});
+
+/**
+ * One seat's handoff.
+ *
+ * `seat` exists because a single project-wide slot is a structural defect under
+ * the roll rule (`G-046`): when two seats close out in sequence, the second
+ * overwrites the first, and a fresh session's greeting reads only the last
+ * seat's pick-up. That has already sent a seat to a file that no longer held
+ * what it was said to hold.
+ *
+ * `loop_state` is required for the planner and optional for everyone else — the
+ * rows are the planner's to answer, and a developer or QA seat that happens to
+ * know the frozen SHA may still record it.
+ */
 export const HandoffSchema = z.strictObject({
+  seat: SeatName,
   pick_up: z.string(),
   watch_out: z.array(z.string()),
   open_questions: z.array(z.string()),
   session: sessionNumber,
+  loop_state: LoopStateSchema.nullable(),
+}).refine((h) => h.seat !== "planner" || h.loop_state !== null, {
+  message: "a planner handoff must carry loop_state (its fields may be empty, but not absent)",
+  path: ["loop_state"],
 });
 
 export const LastSessionSchema = z.strictObject({
   n: sessionNumber,
   date: z.string().regex(ISO_DATE, "expected YYYY-MM-DD"),
   uuid: z.string().nullable(),
+  /** Which seat closed it. Null only for records written before seats existed. */
+  seat: SeatName.nullable(),
 });
 
 export const StateSchema = z.strictObject({
-  schema_version: z.literal(1),
+  /**
+   * 2 as of Loop 14: `handoff` became `handoffs`, an array keyed by seat.
+   *
+   * A `z.literal`, so a v1 file fails to parse OUTRIGHT rather than being
+   * tolerated and read back as absence. There is no migration runner for this
+   * file, which is exactly why a hard failure is the right behaviour: every copy
+   * — the live record, the shipped template and the test fixture — must move in
+   * the same commit, and a loud refusal is what guarantees none was missed. The
+   * same argument ADR-027 used when `project.version` was removed.
+   */
+  schema_version: z.literal(2),
   revision: nonNegInt,
   project: ProjectSchema,
   objective: ObjectiveSchema.nullable(),
@@ -133,17 +198,27 @@ export const StateSchema = z.strictObject({
   verified: z.array(VerifiedSchema),
   gaps: z.array(GapSchema),
   decisions: z.array(DecisionSchema),
-  handoff: HandoffSchema,
+  /** At most one per seat; see SeatName. Order is not significant. */
+  handoffs: z.array(HandoffSchema),
   last_session: LastSessionSchema,
-});
+}).refine(
+  (s) => {
+    const seats = s.handoffs.map((h) => h.seat);
+    return new Set(seats).size === seats.length;
+  },
+  { message: "handoffs must hold at most one entry per seat", path: ["handoffs"] }
+);
 
 export type State = z.infer<typeof StateSchema>;
 export type Task = z.infer<typeof TaskSchema>;
 export type Verified = z.infer<typeof VerifiedSchema>;
 export type Gap = z.infer<typeof GapSchema>;
 export type Decision = z.infer<typeof DecisionSchema>;
+export type Handoff = z.infer<typeof HandoffSchema>;
+export type LoopState = z.infer<typeof LoopStateSchema>;
+export type OpenPr = z.infer<typeof OpenPrSchema>;
 
-export const SCHEMA_VERSION = 1 as const;
+export const SCHEMA_VERSION = 2 as const;
 
 export type ParseResult = { ok: true; data: State } | { ok: false; error: string };
 
@@ -176,7 +251,7 @@ export function serializeState(data: State): string {
 }
 
 const KEY_ORDER: Record<string, string[]> = {
-  $: ["schema_version", "revision", "project", "objective", "tasks", "verified", "gaps", "decisions", "handoff", "last_session"],
+  $: ["schema_version", "revision", "project", "objective", "tasks", "verified", "gaps", "decisions", "handoffs", "last_session"],
   project: ["name"],
   objective: ["text", "since_session"],
   tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note"],
@@ -184,8 +259,10 @@ const KEY_ORDER: Record<string, string[]> = {
   evidence: ["type", "path", "observation"],
   gaps: ["id", "what", "evidence", "recommended_update", "opened_session"],
   decisions: ["id", "title", "date", "note"],
-  handoff: ["pick_up", "watch_out", "open_questions", "session"],
-  last_session: ["n", "date", "uuid"],
+  handoffs: ["seat", "pick_up", "watch_out", "open_questions", "session", "loop_state"],
+  loop_state: ["open_prs", "frozen_sha", "questions_for_aaron", "rulings"],
+  open_prs: ["ref", "qa_status", "note"],
+  last_session: ["n", "date", "uuid", "seat"],
 };
 
 function canonicalize(value: unknown, slot = "$"): unknown {

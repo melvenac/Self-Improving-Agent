@@ -122,7 +122,7 @@ describe("readProjectState", () => {
       writeFileSync(join(tempDir, ".agents", "state.json"), JSON.stringify({ schema_version: 1 }));
       const schemaFail = readProjectState(tempDir).stateJson;
       expect(schemaFail).toMatchObject({ present: true, valid: false });
-      expect(schemaFail.error).toMatch(/^revision: /);
+      expect(schemaFail.error).toMatch(/^schema_version: /);
 
       cpSync(stateFixture, join(tempDir, ".agents", "state.json"));
       const state = readProjectState(tempDir);

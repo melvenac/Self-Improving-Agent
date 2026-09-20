@@ -186,6 +186,34 @@ describe("describeRoleFiles", () => {
     expect(own?.behindUpstream).toBe(false);
   });
 
+  it('a checkout declaring role: none is NOT A SEAT — said in words, and not a problem', () => {
+    // The main checkout is infrastructure: both session hooks hardcode paths into
+    // it and the MCP server runs from its build. It should be able to say it is
+    // not a seat instead of claiming one because a tracked AGENT.md must name
+    // something. Reporting this as a missing role file would train readers to
+    // ignore the line that matters.
+    seedRepo(dir);
+    const r = describeRoleFiles(dir, { name: "main", role: "none", partner: null });
+
+    expect(r.problems).toEqual([]);
+    const text = r.lines.join("\n");
+    expect(text).toMatch(/NOT A SEAT/);
+    expect(text).toMatch(/refused/);
+    // No seat-specific role file is looked for, but shared.md still loads: rules
+    // everyone holds are not conditional on holding a seat.
+    expect(r.files.some((f) => f.rel.endsWith("none.md"))).toBe(false);
+    expect(r.files.find((f) => f.rel.endsWith("shared.md"))?.content).toContain("rules for shared");
+  });
+
+  it("still flags a role that is neither a seat nor the explicit none", () => {
+    // The negative half: "none" must not become a way to silence any unknown
+    // role. Only the declared value is accepted.
+    seedRepo(dir, { role: "builder", roleFiles: ["developer", "shared"] });
+    const r = describeRoleFiles(dir, { name: "Seat", role: "builder", partner: null });
+    expect(r.problems.length).toBeGreaterThan(0);
+    expect(r.problems.join("\n")).toMatch(/role: none/);
+  });
+
   it("reports behindUpstream false when there is no upstream to compare against", () => {
     // Unanswerable must not read as positive. A repo with no origin/master can
     // say nothing about being behind it, and "false" here means "no observation",

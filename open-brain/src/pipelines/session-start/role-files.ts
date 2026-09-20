@@ -54,6 +54,22 @@ import type { AgentIdentity } from "./agent-identity.js";
 export const ROLE_NAMES = ["planner", "developer", "qa"] as const;
 export type RoleName = (typeof ROLE_NAMES)[number];
 
+/**
+ * A checkout that is deliberately NOT a seat.
+ *
+ * The main checkout is infrastructure: both session hooks hardcode paths into it
+ * and the MCP server runs from its build. It is not a seat and should be able to
+ * say so, rather than being forced to claim one because a tracked `AGENT.md` has
+ * to name something. Before this it declared `role: builder`, which was outside
+ * the closed set and had no role file — an accident that read as a seat.
+ *
+ * `none` is a READ-side value only. It never enters the record: `set_handoff`
+ * and `end_session` take `SeatName`, which is the three real seats, so a write
+ * attempted from such a checkout is refused by the schema rather than by a
+ * separate rule that could drift from it.
+ */
+export const NOT_A_SEAT = "none";
+
 export interface RoleFileReport {
   /** Repo-relative, always in POSIX form so it reads the same on every platform. */
   rel: string;
@@ -88,15 +104,26 @@ const SHARED_REL = `${ROLES_DIR}/shared.md`;
 
 export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | null): RoleFilesResult {
   const problems: string[] = [];
+  const lines0: string[] = [];
   const inGit = git(projectRoot, ["rev-parse", "--is-inside-work-tree"]) === "true";
 
   const wanted: Array<{ rel: string; owner: string }> = [];
-  if (seat) {
+  const notASeat = seat?.role === NOT_A_SEAT;
+
+  if (notASeat) {
+    // Declared, not guessed. No role file is looked for and NO PROBLEM is
+    // raised: an infrastructure checkout that says it is not a seat is correct,
+    // and reporting it as a missing role file would train readers to ignore the
+    // line that matters.
+    lines0.push(`This checkout is NOT A SEAT (${seat!.name}, role: ${NOT_A_SEAT}) — no seat-specific role file is expected here.`);
+    lines0.push(`  Seat-taking writes (set_handoff, end_session) are refused from a checkout with no seat.`);
+  } else if (seat) {
     wanted.push({ rel: `${ROLES_DIR}/${seat.role}.md`, owner: seat.role });
     if (!(ROLE_NAMES as readonly string[]).includes(seat.role)) {
       problems.push(
         `SEAT ROLE "${seat.role}" IS OUTSIDE THE CLOSED SET (${ROLE_NAMES.join(" / ")}) — ` +
-          `this seat's role knowledge cannot be located by name, and the harness would not accept it as a stage role either.`
+          `this seat's role knowledge cannot be located by name, and the harness would not accept it as a stage role either. ` +
+          `A checkout that is deliberately not a seat declares role: ${NOT_A_SEAT}.`
       );
     }
   } else {
@@ -133,7 +160,7 @@ export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | nul
     }
   }
 
-  return { seat, files, lines: render(files, inGit), problems };
+  return { seat, files, lines: [...lines0, ...render(files, inGit)], problems };
 }
 
 function render(files: RoleFileReport[], inGit: boolean): string[] {

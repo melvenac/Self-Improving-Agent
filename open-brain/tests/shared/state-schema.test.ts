@@ -25,7 +25,7 @@ function reorderKeys(value: unknown): unknown {
 describe("state-schema (Loop 2, read side)", () => {
   it("parses the realistic fixture", () => {
     const data = valid();
-    expect(data.schema_version).toBe(1);
+    expect(data.schema_version).toBe(2);
     expect(data.revision).toBe(7);
     expect(data.tasks.length).toBeGreaterThanOrEqual(25);
     expect(data.tasks.filter((t) => t.status === "done").length).toBeGreaterThanOrEqual(10);
@@ -33,7 +33,9 @@ describe("state-schema (Loop 2, read side)", () => {
     expect(data.verified.every((v) => v.evidence.length >= 1)).toBe(true);
     expect(data.gaps).toHaveLength(5);
     expect(data.decisions).toHaveLength(6);
-    expect(data.handoff.pick_up.length).toBeGreaterThan(0);
+    expect(data.handoffs).toHaveLength(1);
+    expect(data.handoffs[0].seat).toBe("developer");
+    expect(data.handoffs[0].pick_up.length).toBeGreaterThan(0);
   });
 
   it("rejects text that is not JSON, naming the root", () => {
@@ -44,10 +46,10 @@ describe("state-schema (Loop 2, read side)", () => {
 
   it("names the path of a missing required field", () => {
     const data = valid() as unknown as Record<string, unknown>;
-    delete data.handoff;
+    delete data.handoffs;
     const r = parseState(JSON.stringify(data));
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.error).toMatch(/^handoff: /);
+    if (!r.ok) expect(r.error).toMatch(/^handoffs: /);
   });
 
   /** Loop 4 R2: closed_session is non-null exactly when status is done — both directions refuse. */
@@ -102,7 +104,10 @@ describe("state-schema (Loop 2, read side)", () => {
 
   it("rejects a wrong schema_version and a malformed date", () => {
     const v = valid() as unknown as Record<string, unknown>;
-    v.schema_version = 2;
+    // 1, not 2: v2 is now the accepted version, so the old value is what must
+    // be refused. A v1 record failing to parse is the whole reason the literal
+    // is a literal — every copy moves in one commit or a missed one is loud.
+    v.schema_version = 1;
     const r1 = parseState(JSON.stringify(v));
     expect(r1.ok).toBe(false);
     if (!r1.ok) expect(r1.error).toMatch(/^schema_version: /);
@@ -125,7 +130,7 @@ describe("state-schema (Loop 2, read side)", () => {
     if (r.ok) expect(serializeState(r.data)).toBe(once);
 
     expect(once.endsWith("\n")).toBe(true);
-    expect(once.startsWith('{\n  "schema_version": 1,\n  "revision": 7,\n  "project": {')).toBe(true);
+    expect(once.startsWith('{\n  "schema_version": 2,\n  "revision": 7,\n  "project": {')).toBe(true);
   });
 
   it("the committed fixture is already in canonical form", () => {

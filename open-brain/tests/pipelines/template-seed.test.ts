@@ -23,7 +23,7 @@ describe("project-template/.agents/state.json seed", () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.data).toMatchObject({
-      schema_version: 1,
+      schema_version: 2,
       revision: 0,
       project: { name: "{{PROJECT}}" },
       objective: null,
@@ -31,8 +31,8 @@ describe("project-template/.agents/state.json seed", () => {
       verified: [],
       gaps: [],
       decisions: [],
-      handoff: { pick_up: "", watch_out: [], open_questions: [], session: 0 },
-      last_session: { n: 0, uuid: null },
+      handoffs: [{ seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: 0, loop_state: null }],
+      last_session: { n: 0, uuid: null, seat: null },
     });
     expect(r.data.last_session.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });

@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "revision": 7,
   "project": {
     "name": "Self-Improving-Agent"
@@ -466,22 +466,27 @@
       "note": "measure → fix the signal → unify lifecycle, in that order"
     }
   ],
-  "handoff": {
-    "pick_up": "Loop 2: run V1–V9 on the frozen tag, then dispatch Loop 3 (the writer) once accepted.",
-    "watch_out": [
-      "The live MCP server stays on the old build until /mcp reconnect open-brain.",
-      "Run vitest from open-brain/, never the repo root (entry 462).",
-      "Re-index GitNexus before detect_changes or hunks land on neighbouring symbols."
-    ],
-    "open_questions": [
-      "Q2: does the memory module become something the core does not import?",
-      "Q3: is the rating signal cut or replaced?"
-    ],
-    "session": 54
-  },
+  "handoffs": [
+    {
+      "seat": "developer",
+      "pick_up": "Loop 2: run V1–V9 on the frozen tag, then dispatch Loop 3 (the writer) once accepted.",
+      "watch_out": [
+        "The live MCP server stays on the old build until /mcp reconnect open-brain.",
+        "Run vitest from open-brain/, never the repo root (entry 462).",
+        "Re-index GitNexus before detect_changes or hunks land on neighbouring symbols."
+      ],
+      "open_questions": [
+        "Q2: does the memory module become something the core does not import?",
+        "Q3: is the rating signal cut or replaced?"
+      ],
+      "session": 54,
+      "loop_state": null
+    }
+  ],
   "last_session": {
     "n": 54,
     "date": "2026-09-14",
-    "uuid": "f7a1b3d9-ef6d-482f-aba1-ddaa296f722b"
+    "uuid": "f7a1b3d9-ef6d-482f-aba1-ddaa296f722b",
+    "seat": null
   }
 }
