@@ -15,6 +15,8 @@
  */
 
 import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { dirname, join } from "node:path";
 import type { CheckOutcome } from "./schema.js";
 
 export interface CheckSpec {
@@ -30,12 +32,78 @@ export interface DeterministicChecks {
   unit: CheckSpec;
 }
 
+/**
+ * How to invoke npm **without a shell**, which on Windows is not "npm.cmd".
+ *
+ * ## The defect this exists to fix
+ *
+ * The first version picked `npm.cmd` on win32 and spawned it with
+ * `shell: false`. **Node 18.20/20.12/22 refuse to spawn a batch file that
+ * way** — the fix for CVE-2024-27980 — so every default check died with
+ * `EINVAL` on the platform this repo is developed on. The runtime recorded that
+ * honestly as a failure, which is why acceptance A7 still held, and the loop
+ * exited 1: **a stranger following the README got a red loop from the first
+ * command.** QA found it by running the documented command verbatim. The suite
+ * did not, because it asserted the command's NAME and never ran it.
+ *
+ * The fix is not `shell: true`. A shell is how `^` got eaten and how an exit
+ * code stops belonging to the process under test. Instead we spawn **node with
+ * npm's own JavaScript entry point**, which is a real executable running a real
+ * script, with arguments passed verbatim.
+ *
+ * Returns `null` when npm cannot be located, and the caller turns that into a
+ * recorded failure naming the problem. **It never falls back to a bare `"npm"`
+ * that would `ENOENT` on win32 and look like a different fault.**
+ */
+export function resolveNpm(): { command: string; args: string[] } | null {
+  const fromEnv = process.env.npm_execpath;
+  if (fromEnv && fromEnv.endsWith(".js") && existsSync(fromEnv)) {
+    return { command: process.execPath, args: [fromEnv] };
+  }
+  const nodeDir = dirname(process.execPath);
+  const candidates = [
+    join(nodeDir, "node_modules", "npm", "bin", "npm-cli.js"),
+    join(nodeDir, "..", "lib", "node_modules", "npm", "bin", "npm-cli.js"),
+    join(nodeDir, "..", "node_modules", "npm", "bin", "npm-cli.js"),
+  ];
+  for (const c of candidates) {
+    if (existsSync(c)) return { command: process.execPath, args: [c] };
+  }
+  // On a POSIX box `npm` is an ordinary executable and spawns fine without a
+  // shell. On win32 it is not, so there is deliberately no fallback there.
+  if (process.platform !== "win32") return { command: "npm", args: [] };
+  return null;
+}
+
+/** A check that cannot run, expressed as a spec so the failure is recorded rather than thrown. */
+const unresolvableNpm = (what: string): CheckSpec => ({
+  command: process.execPath,
+  args: [
+    "-e",
+    `console.error(${JSON.stringify(
+      `npm could not be located for the ${what} check. Set npm_execpath, or pass --build-cmd/--unit-cmd.`,
+    )}); process.exit(127);`,
+  ],
+  timeoutMs: 30_000,
+});
+
 /** The checks a loop runs when the caller names none. */
 export function defaultChecks(): DeterministicChecks {
-  const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+  const npm = resolveNpm();
+  if (!npm) {
+    return { build: unresolvableNpm("build"), unit: unresolvableNpm("unit") };
+  }
   return {
-    build: { command: npm, args: ["--prefix", "open-brain", "run", "build"], timeoutMs: 300_000 },
-    unit: { command: npm, args: ["--prefix", "open-brain", "test"], timeoutMs: 900_000 },
+    build: {
+      command: npm.command,
+      args: [...npm.args, "--prefix", "open-brain", "run", "build"],
+      timeoutMs: 300_000,
+    },
+    unit: {
+      command: npm.command,
+      args: [...npm.args, "--prefix", "open-brain", "test"],
+      timeoutMs: 900_000,
+    },
   };
 }
 

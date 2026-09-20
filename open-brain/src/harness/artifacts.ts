@@ -87,8 +87,16 @@ export function renderGitref(candidate: FrozenCandidate, loop: string): string {
     `branch: ${candidate.branch}`,
     `frozen_at: ${candidate.frozenAt}`,
     "",
-    "# This is the candidate QA was given. The runtime refuses to run QA if HEAD",
-    "# has moved from this sha or the working tree is dirty against it.",
+    "# This is the candidate QA was given.",
+    "#",
+    "# WHAT THE RUNTIME GUARANTEES ABOUT IT: the tree matched this sha when the QA",
+    "# stage began; the QA stage neither committed nor wrote outside its allowlist;",
+    "# and this sha is the first parent of the commit holding E_t.",
+    "#",
+    "# WHAT IT DOES NOT: nothing here describes the tree after the loop ended, and",
+    "# an earlier version of this comment claimed only that HEAD had not moved BEFORE",
+    "# QA ran - which was true, silent about the stage that could move it, and read",
+    "# by a reader as a property of the record.",
     "",
   ].join("\n");
 }

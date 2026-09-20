@@ -24,7 +24,7 @@
 
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { changedPaths, headSha, isClean } from "./git.js";
+import { changedPaths, committedPaths, headSha, isClean } from "./git.js";
 
 /** A path that cannot be compared safely, with the reason it was refused. */
 export interface UnsafePath {
@@ -114,41 +114,101 @@ export interface AllowlistVerdict {
   unsafe: UnsafePath[];
   /** How many paths were examined. A check must prove it looked. */
   examined: number;
+  /** Of those, how many came from commits rather than the working tree. */
+  examinedCommitted: number;
+  /** HEAD when the comparison ran, and the base it was compared against. */
+  observedHead: string;
+  stageBase: string;
+  /** True when the stage moved HEAD. A structural breach in its own right. */
+  headMoved: boolean;
   message: string;
 }
 
 /**
- * Compare everything git says changed against the allowlist.
+ * Compare everything the stage changed against the allowlist — **committed and
+ * uncommitted both**.
+ *
+ * ## Why `git status` alone was not enough, stated where the fix lives
+ *
+ * The first version of this function read only `git status`. A role that wrote
+ * a file and then **committed** it left a clean working tree, so the check
+ * reported "examined 0 changed paths" and the loop continued. QA demonstrated
+ * it three ways: a QA role committing over the candidate, a planner committing
+ * outside its allowlist, and a developer committing one that failed for the
+ * *opposite* reason — "the developer stage changed nothing" while HEAD had
+ * moved and the file was on disk.
+ *
+ * **Committing is not an exotic attack; it is how a real session leaves its
+ * work**, which is what slice two's roles are. So the comparison is now against
+ * the diff from the stage's base commit, unioned with the working tree.
+ *
+ * `headMoved` is reported separately from the path verdict because the two are
+ * different breaches: a stage that commits has taken over the runtime's own
+ * boundary — which commit is the candidate, and what a tag points at — even if
+ * every path it touched was permitted.
  *
  * Reports `examined` unconditionally. A verdict of "no violations" over zero
- * examined paths and a verdict over forty are different facts, and a caller
- * that cannot tell them apart has an instrument that cannot fail.
+ * examined paths and a verdict over forty are different facts.
  */
-export function enforceAllowlist(repoRoot: string, allow: Allowlist): AllowlistVerdict {
-  const raw = changedPaths(repoRoot);
+export function enforceAllowlist(repoRoot: string, allow: Allowlist, stageBase: string): AllowlistVerdict {
+  const observedHead = headSha(repoRoot);
+  const headMoved = observedHead !== stageBase;
+  const working = changedPaths(repoRoot);
+  const committed = committedPaths(repoRoot, stageBase, observedHead);
+
   const permitted: string[] = [];
   const violations: string[] = [];
   const unsafe: UnsafePath[] = [];
+  const seen = new Set<string>();
 
-  for (const r of raw) {
+  for (const r of [...committed, ...working]) {
     const n = normaliseRepoPath(r);
     if (!n.ok) {
       unsafe.push({ path: r, reason: n.reason });
       continue;
     }
+    if (seen.has(n.value)) continue;
+    seen.add(n.value);
     (allow.permits(n.value) ? permitted : violations).push(n.value);
   }
 
-  const ok = violations.length === 0 && unsafe.length === 0;
-  const scale = `examined ${raw.length} changed path(s) against ${allow.rules.length} rule(s)`;
-  const message = ok
-    ? `all writes inside the allowlist (${scale}). LIMIT: sees paths git reports — not a write that was made and reverted within the stage.`
-    : `${violations.length} write(s) outside the allowlist and ${unsafe.length} unusable path(s) — ` +
+  const examined = seen.size + unsafe.length;
+  const ok = violations.length === 0 && unsafe.length === 0 && !headMoved;
+  const scale =
+    `examined ${examined} changed path(s) against ${allow.rules.length} rule(s) — ` +
+    `${committed.length} from commits since ${stageBase.slice(0, 12)}, ${working.length} in the working tree`;
+
+  let message: string;
+  if (headMoved) {
+    message =
+      `the stage moved HEAD from ${stageBase.slice(0, 12)} to ${observedHead.slice(0, 12)} — a role may not commit; ` +
+      `the runtime owns the commit boundary, because which commit is the candidate and what each tag points at ` +
+      `depend on it. ${violations.length} of the paths it touched were also outside the allowlist` +
+      `${violations.length > 0 ? `: ${violations.slice(0, 4).join("; ")}` : ""}. ${scale}.`;
+  } else if (!ok) {
+    message =
+      `${violations.length} write(s) outside the allowlist and ${unsafe.length} unusable path(s) — ` +
       `${[...violations, ...unsafe.map((u) => `${u.path} (${u.reason})`)].slice(0, 6).join("; ")}` +
       `${violations.length + unsafe.length > 6 ? ` +${violations.length + unsafe.length - 6} more` : ""}. ` +
       `Allowed: ${allow.describe()}. ${scale}.`;
+  } else {
+    message =
+      `all writes inside the allowlist and HEAD unchanged (${scale}). ` +
+      `LIMIT: sees paths git reports — not a write made and reverted within the stage, and not a gitignored path.`;
+  }
 
-  return { ok, permitted, violations, unsafe, examined: raw.length, message };
+  return {
+    ok,
+    permitted,
+    violations,
+    unsafe,
+    examined,
+    examinedCommitted: committed.length,
+    observedHead,
+    stageBase,
+    headMoved,
+    message,
+  };
 }
 
 /**

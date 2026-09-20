@@ -172,6 +172,65 @@ export function changedPaths(cwd: string): string[] {
 /** True when git reports nothing changed, tracked or untracked. */
 export const isClean = (cwd: string): boolean => changedPaths(cwd).length === 0;
 
+/**
+ * Paths changed by the commits between `base` and `head`.
+ *
+ * **This is the half `git status` cannot see, and not seeing it was the defect
+ * that failed QA.** A role that writes a file and then commits it leaves a
+ * CLEAN working tree, so an enforcement mechanism built on `git status` alone
+ * reports "nothing changed" while the file sits in history. Slice two makes
+ * this the normal case, not an exotic one: committing is how a real session
+ * leaves its work.
+ *
+ * `--no-renames` is deliberate. Rename detection would report only the new
+ * path for a move, and a role that moved a protected file OUT of the allowlist
+ * would be judged on its destination alone. Without it both sides appear as a
+ * delete and an add, which is what the allowlist must see.
+ */
+export function committedPaths(cwd: string, base: string, head: string): string[] {
+  if (base === head) return [];
+  const raw = execFileSync(
+    "git",
+    ["diff", "--name-only", "--no-renames", "-z", base, head],
+    { cwd, encoding: "utf-8", shell: false, stdio: ["ignore", "pipe", "pipe"] },
+  );
+  return raw.split("\0").filter((p) => p !== "");
+}
+
+/** Whether `maybeAncestor` is an ancestor of `descendant` (a commit is its own ancestor). */
+export function isAncestor(cwd: string, maybeAncestor: string, descendant: string): boolean {
+  if (maybeAncestor === descendant) return true;
+  return gitTry(cwd, ["merge-base", "--is-ancestor", maybeAncestor, descendant]).ok;
+}
+
+/** The first parent of a commit, or null when it has none. */
+export function firstParent(cwd: string, sha: string): string | null {
+  const r = gitTry(cwd, ["rev-parse", "--verify", "--quiet", `${sha}^1`]);
+  return r.ok && /^[0-9a-f]{40}$/.test(r.stdout) ? r.stdout : null;
+}
+
+/**
+ * Discard everything back to `base`: commits, tracked edits and untracked files.
+ *
+ * **Refuses unless `base` is an ancestor of HEAD.** `reset --hard` destroys
+ * work, and the one case where it must not run is the one where the runtime has
+ * lost track of where it is. If the tree is somewhere unexpected this throws and
+ * says so, leaving the mess for a human rather than deleting an unknown history
+ * to tidy up.
+ */
+export function resetHardTo(cwd: string, base: string): void {
+  const head = headSha(cwd);
+  if (!isAncestor(cwd, base, head)) {
+    throw new GitRefused(
+      `refusing to reset ${cwd} to ${base}: it is not an ancestor of HEAD (${head}). ` +
+        `Something moved the tree somewhere this runtime did not expect, and discarding ` +
+        `unknown history to recover from that would be worse than stopping. Recover by hand.`,
+    );
+  }
+  git(cwd, ["reset", "--hard", base]);
+  git(cwd, ["clean", "-fd"]);
+}
+
 /** Whether `cwd` is inside a git work tree at all. */
 export function isRepo(cwd: string): boolean {
   const r = gitTry(cwd, ["rev-parse", "--is-inside-work-tree"]);

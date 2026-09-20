@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import {
   defaultChecks,
+  resolveNpm,
   reconcileReportedChecks,
   runCheck,
   runDeterministicChecks,
@@ -104,11 +108,34 @@ describe("no process in the harness is spawned through a shell", () => {
   const SHELL_PLATFORM = /shell:\s*process\.platform/;
   const TEMPLATE_COMMAND = /(?:execSync|exec)\s*\(\s*`/;
 
+  /**
+   * Strip comments before scanning. **This scan is about code.**
+   *
+   * Its first version reported `checks.ts` as an offender because a doc comment
+   * there says *"The fix is not `shell: true`"* — the sentence explaining why
+   * the thing is forbidden, matched as though it were the thing. Exactly the
+   * false positive the `git push` scan hit on its own deny-list constant. A
+   * detector that cannot tell a prohibition from an instance of it is measuring
+   * the wrong thing, even when its answer happens to be alarming.
+   */
+  const stripComments = (src: string): string =>
+    src.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
   it("validates its patterns against known positives before trusting a negative", () => {
     expect(SHELL_TRUE.test("spawnSync(cmd, args, { shell: true })")).toBe(true);
     expect(SHELL_PLATFORM.test('{ shell: process.platform === "win32" }')).toBe(true);
     expect(TEMPLATE_COMMAND.test("execSync(`npm run ${task}`)")).toBe(true);
     expect(SHELL_TRUE.test("spawnSync(cmd, args, { shell: false })")).toBe(false);
+  });
+
+  it("strips comments but keeps code, so a prohibition is not read as an instance", () => {
+    // Both halves asserted: a planted mention in a comment must NOT fire, and
+    // the identical text in code MUST. A stripper that ate everything would
+    // make this scan permanently green.
+    expect(SHELL_TRUE.test(stripComments("/** never pass shell: true here */"))).toBe(false);
+    expect(SHELL_TRUE.test(stripComments("// avoid shell: true\n"))).toBe(false);
+    expect(SHELL_TRUE.test(stripComments("spawnSync(c, a, { shell: true });"))).toBe(true);
+    expect(stripComments('const url = "https://example.com";')).toContain("https://example.com");
   });
 
   it("finds no shell spawn in any harness source file", async () => {
@@ -127,20 +154,67 @@ describe("no process in the harness is spawned through a shell", () => {
 
     const offenders: string[] = [];
     for (const f of files) {
-      const src = readFileSync(f, "utf-8");
+      const src = stripComments(readFileSync(f, "utf-8"));
       if (SHELL_TRUE.test(src) || SHELL_PLATFORM.test(src) || TEMPLATE_COMMAND.test(src)) offenders.push(f);
     }
     expect(offenders, `harness source spawns through a shell: ${offenders.join(", ")}`).toEqual([]);
   });
 });
 
-describe("defaultChecks", () => {
-  it("names npm without a shell, and points at open-brain", () => {
+/**
+ * D4 — the defaults have to actually RUN.
+ *
+ * The version of this block that shipped asserted `d.build.command` matched
+ * `/^npm(\.cmd)?$/` and never executed anything. On win32 that name was
+ * `npm.cmd`, and Node 18.20/20.12/22 refuse to spawn a batch file with
+ * `shell: false` (the CVE-2024-27980 fix), so **every default check died with
+ * `EINVAL` on the platform this repo is developed on** and the documented
+ * README command exited 1. The name assertion passed throughout.
+ *
+ * So these tests spawn. A name is not evidence that a command runs.
+ */
+describe("defaultChecks — D4", () => {
+  it("points at open-brain and the right scripts", () => {
     const d = defaultChecks();
-    expect(d.build.command).toMatch(/^npm(\.cmd)?$/);
     expect(d.build.args).toContain("open-brain");
     expect(d.unit.args).toContain("test");
   });
+
+  it("never spawns a batch file, which cannot be spawned without a shell", () => {
+    const d = defaultChecks();
+    for (const spec of [d.build, d.unit]) {
+      expect(spec.command.toLowerCase().endsWith(".cmd")).toBe(false);
+      expect(spec.command.toLowerCase().endsWith(".bat")).toBe(false);
+    }
+  });
+
+  it("RESOLVES npm to something that runs — spawned, not asserted by name", () => {
+    const npm = resolveNpm();
+    expect(npm, "npm could not be resolved on this machine").not.toBeNull();
+    const r = runCheck({ command: npm!.command, args: [...npm!.args, "--version"], timeoutMs: 60_000 }, process.cwd());
+    expect(r.exit_code, `resolveNpm produced a command that will not run: ${r.detail}`).toBe(0);
+    expect(r.passed).toBe(true);
+  });
+
+  it("the default BUILD check spawns successfully against a repo that has the scripts", () => {
+    // Runs npm for real. The script is a no-op so this measures whether the
+    // spawn works, which is the defect, without rebuilding the project.
+    const scratch = mkdtempSync(join(tmpdir(), "harness-npm-"));
+    try {
+      mkdirSync(join(scratch, "open-brain"), { recursive: true });
+      writeFileSync(
+        join(scratch, "open-brain", "package.json"),
+        `${JSON.stringify({ name: "scratch", version: "0.0.0", scripts: { build: "node -e \"process.exit(0)\"", test: "node -e \"process.exit(0)\"" } }, null, 2)}\n`,
+        "utf-8",
+      );
+      const d = defaultChecks();
+      const build = runCheck(d.build, scratch);
+      expect(build.exit_code, `default build check did not run: ${build.detail}`).toBe(0);
+      expect(build.passed).toBe(true);
+    } finally {
+      rmSync(scratch, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+    }
+  }, 120_000);
 });
 
 describe("reconcileReportedChecks", () => {

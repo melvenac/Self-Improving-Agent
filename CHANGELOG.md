@@ -72,6 +72,38 @@ something that did not produce it**, and until now nothing made that possible.
   the base tag, with no harness involved. Tags **refuse to move**; a rollback marker that can be
   repointed is not a marker.
 
+### Found by QA before release, and fixed
+
+**The first candidate was NOT ACCEPTED, and the class it failed on is the one this runtime exists
+for: enforcement observed the working tree, and a commit is invisible to a working-tree observer.**
+A role that wrote a file and then committed it left `git status` clean, so the allowlist reported
+"examined 0 changed paths" and the loop continued. Three ways in:
+
+- **A QA role that overwrote and committed the candidate completed the loop at exit 0**, with
+  `loop-001-qa` pointing at an evidence commit whose parent was the rogue commit while `E_t` named
+  the candidate. The freeze was verified once, before the QA stage, and nothing looked again after
+  the stage that could move it.
+- **A planner that committed outside its allowlist completed the loop**, leaving the file in history
+  below the candidate.
+- **A developer that committed failed for the opposite reason** — *"the developer stage changed
+  nothing"* — while HEAD had moved and the file was on disk. It failed closed by accident.
+
+**Committing is not an exotic attack. It is how a real session leaves its work**, which is exactly
+what slice two's roles will be. Fixed by comparing against the diff from each stage's base commit
+unioned with the working tree, refusing any stage that moves HEAD at all, rolling back to the stage
+base, verifying identity before every tag, and asserting directly that the candidate is the evidence
+commit's first parent.
+
+**The default checks could not run on the platform this repo is developed on.** `defaultChecks()`
+picked `npm.cmd` on win32 and spawned it with `shell: false`; Node 18.20/20.12/22 refuse that, so
+every default check died with `EINVAL` and **the README's own documented command exited 1 for anyone
+following it on Windows.** The suite asserted the command's *name* and never ran it. npm is now
+resolved to its JavaScript entry point and spawned through `node` — still no shell — and the tests
+spawn rather than pattern-match.
+
+**None of this was caught by the author.** Acceptance was determined from a frozen candidate by a
+seat that did not produce it, which is what the loop was built to make possible.
+
 ### Deliberately not done
 
 - **The runtime never merges, pushes, or touches a remote.** `git.ts` refuses ten network

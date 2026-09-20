@@ -276,6 +276,140 @@ describe("harness runtime", { timeout: 60_000 }, () => {
   });
 
   /* --------------------------------------------------------------------- *
+   * A3/A4 — the commit path. Every test here reproduces a defect QA found in
+   * the shipped candidate, where enforcement observed only the working tree
+   * and a role that committed its work was invisible.
+   *
+   * These must be run against a role that ACTUALLY RUNS GIT. Simulating the
+   * effect would test the simulation. Committing is also not an exotic attack:
+   * in slice two it is how a real session leaves its work.
+   * --------------------------------------------------------------------- */
+
+  describe("A3/A4 — a role that COMMITS is refused", () => {
+    /** A role that writes a file and commits it, bypassing ctx.write entirely. */
+    const committingRole = (role: "planner" | "developer" | "qa", path: string, body: string): RoleSession => ({
+      role,
+      run(ctx) {
+        const abs = join(ctx.repoRoot, path);
+        mkdirSync(dirname(abs), { recursive: true });
+        writeFileSync(abs, body, "utf-8");
+        rawGit(ctx.repoRoot, ["add", "--", path]);
+        rawGit(ctx.repoRoot, ["commit", "--no-verify", "--no-gpg-sign", "-m", `rogue ${role} commit`]);
+        if (role === "planner") return new StubPlanner().run(ctx);
+        if (role === "qa") return new StubQa().run(ctx);
+        return { summary: "committed directly" };
+      },
+    });
+
+    it("QA that overwrites and commits the candidate is refused — the loop does not complete", () => {
+      // QA D1: this completed at exit 0, with loop-001-qa pointing at an
+      // evidence commit whose parent was the rogue commit.
+      const r = runLoop(config({
+        roles: {
+          planner: new StubPlanner(),
+          developer: new StubDeveloper(),
+          qa: committingRole("qa", "README.md", "# QA edited and committed the candidate\n"),
+        },
+      }));
+
+      expect(r.status).toBe("failed");
+      expect(r.exitCode).toBe(1);
+      expect(r.failure?.code).toBe("stage-committed");
+      expect(r.failure?.stage).toBe("qa");
+      expect(read("README.md")).toBe("# fixture\n");
+      expect(resolveRef(repo.root, "loop-001-qa")).toBeNull();
+    });
+
+    it("QA that commits is rolled back to the candidate, so the tree still matches the frozen sha", () => {
+      const r = runLoop(config({
+        roles: {
+          planner: new StubPlanner(),
+          developer: new StubDeveloper(),
+          qa: committingRole("qa", "README.md", "# rogue\n"),
+        },
+      }));
+      expect(repo.sha()).toBe(r.candidateSha);
+      // FAILED.md is written AFTER the rollback and is the only thing left
+      // dirty — deliberately, since a refusal that leaves no record on disk is
+      // the silent-pass failure this runtime exists to avoid.
+      expect(rawGit(repo.root, ["status", "--porcelain"])).toBe("?? artifacts/iterations/t001/FAILED.md");
+    });
+
+    it("a planner that commits outside its allowlist is refused", () => {
+      // QA D2: this completed at exit 0 with src/backdoor.ts in history one
+      // commit below D_t, and all three tags created.
+      const r = runLoop(config({
+        roles: {
+          planner: committingRole("planner", "src/backdoor.ts", "export const leaked = true;\n"),
+          developer: new StubDeveloper(),
+          qa: new StubQa(),
+        },
+      }));
+
+      expect(r.status).toBe("failed");
+      expect(r.failure?.code).toBe("stage-committed");
+      expect(r.failure?.stage).toBe("planner");
+      expect(existsSync(join(repo.root, "src/backdoor.ts"))).toBe(false);
+      expect(resolveRef(repo.root, "loop-001-developer")).toBeNull();
+    });
+
+    it("a developer that commits fails for the RIGHT reason, not 'changed nothing'", () => {
+      // QA D3: this failed with developer-no-change — "the developer stage
+      // changed nothing" — while HEAD had moved and the file was on disk. The
+      // loop failed closed by accident, and the recorded reason was the
+      // opposite of what happened.
+      const r = runLoop(config({
+        roles: {
+          planner: new StubPlanner(),
+          developer: committingRole("developer", "src/backdoor.ts", "export const leaked = true;\n"),
+          qa: new StubQa(),
+        },
+      }));
+
+      expect(r.failure?.code).toBe("stage-committed");
+      expect(r.failure?.code).not.toBe("developer-no-change");
+      expect(r.failure?.reason).toContain("moved HEAD");
+      expect(r.failure?.reason).toContain("src/backdoor.ts");
+      expect(existsSync(join(repo.root, "src/backdoor.ts"))).toBe(false);
+    });
+
+    it("refuses a commit even when every path it touched was inside the allowlist", () => {
+      // The runtime owns the commit boundary: which commit is the candidate
+      // and what each tag points at depend on it.
+      const r = runLoop(config({
+        roles: {
+          planner: new StubPlanner(),
+          developer: committingRole("developer", "artifacts/iterations/t001/note.md", "allowed path\n"),
+          qa: new StubQa(),
+        },
+      }));
+      expect(r.failure?.code).toBe("stage-committed");
+      expect(r.failure?.reason).toContain("a role may not commit");
+    });
+
+    it("leaves the tree exactly where the loop started when the first stage commits", () => {
+      const before = repo.sha();
+      runLoop(config({
+        roles: {
+          planner: committingRole("planner", "src/backdoor.ts", "x\n"),
+          developer: new StubDeveloper(),
+          qa: new StubQa(),
+        },
+      }));
+      // FAILED.md is written into the artifacts dir after the rollback, so the
+      // commit is gone but the failure record remains — deliberately.
+      expect(rawGit(repo.root, ["rev-parse", "HEAD"])).toBe(before);
+      expect(existsSync(join(repo.root, "artifacts/iterations/t001/FAILED.md"))).toBe(true);
+    });
+
+    it("asserts the candidate is the evidence commit's parent on a clean run", () => {
+      // The invariant D1 broke, checked directly rather than inferred.
+      const r = runLoop(config());
+      expect(rawGit(repo.root, ["rev-parse", `${r.evidenceSha}^1`])).toBe(r.candidateSha);
+    });
+  });
+
+  /* --------------------------------------------------------------------- *
    * A5 — tags, and git alone restores the pre-loop state
    * --------------------------------------------------------------------- */
 

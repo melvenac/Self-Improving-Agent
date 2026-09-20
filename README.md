@@ -203,14 +203,21 @@ What exists is the machinery the gates will sit on, and the two refusals that ma
 real.
 
 ```bash
-npx tsx open-brain/src/harness/cli.ts run --loop t001 --dry-run
-npx tsx open-brain/src/harness/cli.ts schemas          # print the derived D_t / E_t schemas
+# Prints the derived D_t / E_t schemas. Changes nothing.
+npx tsx open-brain/src/harness/cli.ts schemas
+
+# Runs a loop. Pass --repo: a loop COMMITS and TAGS in the repository it runs
+# against, so point it at a scratch clone rather than your working checkout.
+npx tsx open-brain/src/harness/cli.ts run --loop t001 --dry-run --repo /path/to/scratch/repo
 ```
+
+The target repository needs a clean tree and, for the default checks, an `open-brain/` directory with
+`build` and `test` scripts. Roll a loop back with `git reset --hard loop-001-base`.
 
 | Mechanism | What it does |
 |---|---|
-| **Write allowlist** | Refuses before the write *and* detects afterwards with a `git status` diff, reverting anything that reached disk another way. A breach is refused, not warned, and never retried |
-| **Frozen candidate** | QA is handed a SHA; the runtime refuses to proceed if HEAD moved or the tree is dirty. The two are reported separately |
+| **Write allowlist** | Refuses before the write *and* detects afterwards against the diff from the stage's base commit — **committed and uncommitted both**, because a role that commits leaves a clean `git status`. A breach is refused, not warned, reverted, and never retried |
+| **Frozen candidate** | QA is handed a SHA; the runtime refuses if HEAD moved or the tree is dirty, checks identity again **after** every stage and before every tag, and asserts the candidate is the evidence commit's parent |
 | **Schema retry, capped** | A rejected `D_t`/`E_t` is handed back its own problems and schema. An exhausted cap writes `FAILED.md` and exits non-zero |
 | **Exit codes only** | Build and unit results come from process status; no stage reads stdout to decide. A report contradicting the measurement is refused, not corrected |
 | **Per-loop git tags** | `loop-<NNN>-base`, `-developer`, `-qa`. Rollback is one git command. Tags refuse to move |

@@ -6,7 +6,7 @@ import {
   requireCleanTree,
   verifyFrozen,
 } from "../../src/harness/workspace.js";
-import { makeRepo, requireGit, type RepoFixture } from "./fixture.js";
+import { makeRepo, rawGit, requireGit, type RepoFixture } from "./fixture.js";
 
 describe("normaliseRepoPath", () => {
   it("accepts an ordinary repo-relative path", () => {
@@ -84,7 +84,7 @@ describe("enforceAllowlist against a real tree", () => {
 
   it("passes when every change is inside the allowlist, and reports what it examined", () => {
     repo.write("artifacts/iterations/t001/D_t.md", "# plan\n");
-    const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]));
+    const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]), repo.sha());
     expect(v.ok).toBe(true);
     expect(v.permitted).toEqual(["artifacts/iterations/t001/D_t.md"]);
     expect(v.examined).toBe(1);
@@ -95,14 +95,14 @@ describe("enforceAllowlist against a real tree", () => {
   it("refuses a write outside the allowlist and names it", () => {
     repo.write("artifacts/iterations/t001/D_t.md", "# plan\n");
     repo.write("src/secret.ts", "export const leaked = true;\n");
-    const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]));
+    const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]), repo.sha());
     expect(v.ok).toBe(false);
     expect(v.violations).toEqual(["src/secret.ts"]);
     expect(v.message).toContain("src/secret.ts");
   });
 
   it("reports zero examined on a clean tree, which is not the same as passing over work", () => {
-    const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]));
+    const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]), repo.sha());
     expect(v.ok).toBe(true);
     expect(v.examined).toBe(0);
     expect(v.message).toContain("examined 0 changed path");
@@ -112,8 +112,77 @@ describe("enforceAllowlist against a real tree", () => {
     // The failure this guards: git reporting `unlisted/` and a prefix rule
     // happening to permit the directory while the file inside is the payload.
     repo.write("unlisted/deep/deeper/payload.ts", "x\n");
-    const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]));
+    const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]), repo.sha());
     expect(v.violations).toEqual(["unlisted/deep/deeper/payload.ts"]);
+  });
+
+  /**
+   * The half `git status` cannot see — QA's D1/D2/D3, at the unit level.
+   *
+   * The first version of this function read only the working tree, so a stage
+   * that committed its work left it reporting "examined 0 changed paths".
+   */
+  describe("committed changes", () => {
+    it("sees a path that was written AND COMMITTED during the stage", () => {
+      const base = repo.sha();
+      repo.write("src/backdoor.ts", "export const leaked = true;\n");
+      repo.commitAll("rogue commit");
+
+      // The working tree is clean here. That is the whole problem.
+      expect(rawGit(repo.root, ["status", "--porcelain"])).toBe("");
+
+      const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]), base);
+      expect(v.violations).toEqual(["src/backdoor.ts"]);
+      expect(v.examinedCommitted).toBe(1);
+      expect(v.ok).toBe(false);
+    });
+
+    it("reports headMoved even when every committed path was permitted", () => {
+      // A stage that commits has taken the runtime's commit boundary, which is
+      // a breach whether or not the paths were allowed.
+      const base = repo.sha();
+      repo.write("artifacts/iterations/t001/note.md", "allowed content\n");
+      repo.commitAll("commit inside the allowlist");
+
+      const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]), base);
+      expect(v.violations).toEqual([]);
+      expect(v.headMoved).toBe(true);
+      expect(v.ok).toBe(false);
+      expect(v.message).toContain("a role may not commit");
+    });
+
+    it("unions committed and uncommitted paths without double-counting", () => {
+      const base = repo.sha();
+      repo.write("src/one.ts", "a\n");
+      repo.commitAll("committed one");
+      repo.write("src/one.ts", "a modified again\n");
+      repo.write("src/two.ts", "b\n");
+
+      const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]), base);
+      expect(v.violations.sort()).toEqual(["src/one.ts", "src/two.ts"]);
+      expect(v.examined).toBe(2);
+    });
+
+    it("reports both sides of a committed rename, so a move out of a protected path is seen", () => {
+      repo.write("protected/keep.md", "original\n");
+      repo.commitAll("add protected file");
+      const base = repo.sha();
+      // `git mv` will not create the destination directory, so the move is to
+      // the repo root — which still exercises both sides of the rename.
+      rawGit(repo.root, ["mv", "protected/keep.md", "moved-out.md"]);
+      repo.commitAll("move it out");
+
+      const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]), base);
+      expect(v.violations.sort()).toEqual(["moved-out.md", "protected/keep.md"]);
+    });
+
+    it("passes and says HEAD is unchanged when the stage behaved", () => {
+      repo.write("artifacts/iterations/t001/D_t.md", "# plan\n");
+      const v = enforceAllowlist(repo.root, new Allowlist(["artifacts/"]), repo.sha());
+      expect(v.ok).toBe(true);
+      expect(v.headMoved).toBe(false);
+      expect(v.message).toContain("HEAD unchanged");
+    });
   });
 });
 

@@ -37,9 +37,11 @@
 import {
   commitPaths,
   currentBranch,
+  firstParent,
   headSha,
   isRepo,
   refExists,
+  resetHardTo,
   revertPaths,
   tagAt,
 } from "./git.js";
@@ -115,8 +117,11 @@ export type FailureCode =
   | "schema-cap-exhausted"
   | "allowlist-violation"
   | "role-threw"
+  | "stage-committed"
   | "developer-no-change"
   | "candidate-moved"
+  | "tag-target-moved"
+  | "candidate-not-parent-of-evidence"
   | "evidence-disagrees-with-runtime"
   | "gate-unavailable";
 
@@ -288,32 +293,84 @@ export function runLoop(config: LoopConfig): LoopResult {
       write: makeWriter(repoRoot, allow, roleName),
     };
 
+    // The base this stage is judged against. Every path difference between
+    // here and the stage's end is the stage's doing, committed or not.
+    const stageBase = headSha(repoRoot);
+
+    /**
+     * Undo whatever the stage left behind.
+     *
+     * Order matters: a rogue commit has to be unwound before reverting paths,
+     * because once HEAD has moved `git checkout HEAD -- <path>` restores the
+     * ROGUE content rather than the original.
+     */
+    const rollBack = (verdict: ReturnType<typeof enforceAllowlist>): string => {
+      if (verdict.headMoved) {
+        try {
+          resetHardTo(repoRoot, stageBase);
+          return ` The rogue commit was discarded and the tree reset to ${stageBase.slice(0, 12)}.`;
+        } catch (err) {
+          return ` THE TREE COULD NOT BE ROLLED BACK: ${(err as Error).message} Recover by hand before rerunning.`;
+        }
+      }
+      const bad = [...verdict.violations, ...verdict.unsafe.map((u) => u.path)];
+      if (bad.length > 0) revertPaths(repoRoot, bad);
+      return " The offending paths were reverted.";
+    };
+
     let deliverable: unknown;
     try {
       deliverable = role.run(ctx);
     } catch (err) {
       // The in-process helper refusing is still a boundary violation: the role
       // tried. It is reported as one so the two mechanisms agree.
-      const code: FailureCode = err instanceof WriteRefused ? "allowlist-violation" : "role-threw";
-      const verdictAfterThrow = enforceAllowlist(repoRoot, allow);
-      if (verdictAfterThrow.violations.length > 0) revertPaths(repoRoot, verdictAfterThrow.violations);
-      return { ok: false, code, reason: `${roleName} stage: ${(err as Error).message}` };
+      const thrownCode: FailureCode = err instanceof WriteRefused ? "allowlist-violation" : "role-threw";
+      const verdictAfterThrow = enforceAllowlist(repoRoot, allow, stageBase);
+      const undone = verdictAfterThrow.ok ? "" : rollBack(verdictAfterThrow);
+      return { ok: false, code: thrownCode, reason: `${roleName} stage: ${(err as Error).message}${undone}` };
     }
 
-    const verdict = enforceAllowlist(repoRoot, allow);
+    const verdict = enforceAllowlist(repoRoot, allow, stageBase);
     log(`  ${roleName} attempt ${attempt}: ${verdict.message}`);
     if (!verdict.ok) {
-      revertPaths(repoRoot, [...verdict.violations, ...verdict.unsafe.map((u) => u.path)]);
+      const undone = rollBack(verdict);
+      // A stage that COMMITTED is reported as that, not as "wrote outside its
+      // allowlist" and never as "changed nothing". QA found this exact
+      // misreport: a developer that committed a backdoor failed with
+      // "the developer stage changed nothing", which is the opposite of true.
+      const code: FailureCode = verdict.headMoved ? "stage-committed" : "allowlist-violation";
       return {
         ok: false,
-        code: "allowlist-violation",
+        code,
         reason:
-          `${roleName} wrote outside its allowlist and was refused, not warned. ${verdict.message} ` +
-          `The offending paths were reverted. A boundary breach is not retried.`,
+          `${roleName} was refused, not warned. ${verdict.message}${undone} ` +
+          `A boundary breach is not retried.`,
       };
     }
 
     return { ok: true, deliverable, verdict };
+  };
+
+  /**
+   * Refuse to tag anything other than the commit we believe we are tagging.
+   *
+   * A tag is the rollback contract, and QA showed a tag landing on an evidence
+   * commit whose parent was a rogue commit rather than the candidate. Checking
+   * identity at the moment of tagging costs one `rev-parse`.
+   */
+  const tagVerified = (tag: string, sha: string, message: string): { ok: true } | { ok: false; reason: string } => {
+    const observed = headSha(repoRoot);
+    if (observed !== sha) {
+      return {
+        ok: false,
+        reason:
+          `refusing to create ${tag} at ${sha.slice(0, 12)}: HEAD is ${observed.slice(0, 12)}. ` +
+          `The tree moved between making that commit and tagging it, so the tag would not mean what it says.`,
+      };
+    }
+    tagAt(repoRoot, tag, sha, message);
+    tags.push(tag);
+    return { ok: true };
   };
 
   // --- Stage 1: planner ---------------------------------------------------
@@ -393,8 +450,8 @@ export function runLoop(config: LoopConfig): LoopResult {
 
   const candidateSha = commitPaths(repoRoot, devVerdict.permitted, `harness(${loop}): candidate A_t`);
   result.candidateSha = candidateSha;
-  tagAt(repoRoot, developerTag, candidateSha, `HoH loop ${loop}: developer candidate`);
-  tags.push(developerTag);
+  const devTagged = tagVerified(developerTag, candidateSha, `HoH loop ${loop}: developer candidate`);
+  if (!devTagged.ok) return fail("developer", "tag-target-moved", devTagged.reason);
   log(`  developer: candidate ${candidateSha}, tagged ${developerTag}`);
 
   // --- Deterministic checks ----------------------------------------------
@@ -495,8 +552,24 @@ export function runLoop(config: LoopConfig): LoopResult {
     `harness(${loop}): evidence E_t for ${candidateSha.slice(0, 12)}`,
   );
   result.evidenceSha = evidenceSha;
-  tagAt(repoRoot, qaTag, evidenceSha, `HoH loop ${loop}: QA evidence`);
-  tags.push(qaTag);
+  // The invariant QA's D1 broke, asserted directly rather than inferred from
+  // the stage checks that are supposed to make it true. A tag landed on an
+  // evidence commit whose parent was a rogue commit instead of the candidate,
+  // while E_t named the candidate — the record and the tree disagreeing with
+  // nothing to notice. One rev-parse closes it.
+  const evidenceParent = firstParent(repoRoot, evidenceSha);
+  if (evidenceParent !== candidateSha) {
+    return fail(
+      "qa",
+      "candidate-not-parent-of-evidence",
+      `the evidence commit ${evidenceSha.slice(0, 12)} has parent ${evidenceParent?.slice(0, 12) ?? "(none)"} ` +
+        `but the candidate is ${candidateSha.slice(0, 12)}. Something was committed between the candidate and ` +
+        `the evidence, so E_t describes a tree that is not the candidate's.`,
+    );
+  }
+
+  const qaTagged = tagVerified(qaTag, evidenceSha, `HoH loop ${loop}: QA evidence`);
+  if (!qaTagged.ok) return fail("qa", "tag-target-moved", qaTagged.reason);
   log(`  qa: evidence ${evidenceSha}, tagged ${qaTag}`);
 
   result.status = "completed";
