@@ -78,3 +78,8 @@ AGENTS.md
 
 # Build artifacts
 open-brain/build/
+
+# hoh_jev.md is the ORIGINAL BRIEF Aaron wrote for the HoH + Jev loop, tracked 2026-09-20 on his
+# word. docs/HOH-JEV.md is the binding guide and names where it diverges from this file (its
+# section 6); this file is kept so the divergences can be checked against their source.
+!/docs/hoh_jev.md
