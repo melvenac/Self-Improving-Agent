@@ -278,8 +278,8 @@ a prompt is the defect PR #44 exists to fix.
 
 | Slice | Contents | Status |
 | --- | --- | --- |
-| 1 | Runtime spawning three stubbed roles; schemas + capped retry; git versioning per loop; deterministic checks from exit codes; dry-run | **Loop 15, briefed** (`docs/loops/loop-15-brief.md`) |
-| 2 | Jev client, plan gate, developer done-gate | Next |
+| 1 | Runtime spawning three stubbed roles; schemas + capped retry; git versioning per loop; deterministic checks from exit codes; dry-run | **Loop 15 slice one, ACCEPTED** at `v0.41.0` (`docs/loops/loop-15-closeout.md`); `G-041` (refs) open |
+| 2 | `G-041` ref-watch and the foreign-role refusal flag first; then Jev client, plan gate, developer done-gate | **Loop 15 slice two, briefed** (`docs/loops/loop-15-slice-2-brief.md`) |
 | 3 | Real role prompts; QA scoring through Jev | Later |
 | 4 | Index and selective retrieval | Later |
 
