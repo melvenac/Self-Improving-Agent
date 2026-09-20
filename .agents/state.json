@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 51,
+  "revision": 52,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 15 slice two — the ref channel closes and the gates go live. Brief: docs/loops/loop-15-slice-2-brief.md, binding with docs/HOH-JEV.md. First: G-041 — a ref snapshot around every stage refusing any delta the runtime did not author (refs, not tags), and a refusal flag at runLoop entry for any role the runtime did not construct, seen red before the watch exists (A1). Then: Jev transport reading TYPESAFE_API_KEY from the environment only, plan gate and developer done-gate as batched typed questions, thresholds as data in harness/policies/, gate verdicts written into the iteration artifact; roles stay stubbed. QA writes criteria before the first candidate; one live Jev call, by QA, once (A7). Loop 14 follows (docs/loops/loop-14-rebrief.md). Ruled D-023, 2026-09-20.",
+    "text": "Loop 14 — the three-seat record, re-briefed at docs/loops/loop-14-rebrief.md (supersedes loop-14-brief.md in part). Sequenced by Aaron 2026-09-20 (D-023) after Loop 15 slice two closed ACCEPTED at v0.42.0 (D-024). Loop 14 runs no role through the harness runtime; G-045 (D4) does not block it and is slice three's mandatory first repair. Fresh developer and QA sessions per the roll rule; criteria before candidate; frozen SHA; the record moves one seat at a time.",
     "since_session": 64
   },
   "tasks": [
@@ -177,7 +177,7 @@
       "opened_session": 50,
       "closed_session": null,
       "supersedes": null,
-      "note": "FOLDED IN FROM G-043 (Probe, session 66, 2026-09-20): `gitnexus clean` exits 0 and deletes nothing without --force, so a chained clean-then-analyze reports success having cleaned nothing. Any script or instruction that cleans the index must pass --force and assert the directory is gone before re-analysing; recovery from the FTS 'document for node offset N is missing during delete' failure is `analyze --repair-fts` (store entry 349), not clean. The failure recurred on dec2406 in the QA tree and self-healed on a second plain analyze; it did not recur in the main tree on the same commit."
+      "note": "SLICE TWO COUNT (2026-09-20): six of six incremental analyzes in the QA tree failed with the FTS inconsistency and were recovered by `analyze --repair-fts`; the main tree hit it once on a merge and once not. The trigger on this repository is EVERY incremental run, not merges. `gitnexus clean` without --force exits 0 and deletes nothing (G-043, folded earlier)."
     },
     {
       "id": "T-056",
@@ -358,6 +358,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "From G-040 (opened session 65). The 'no git push in harness source' scan fired on the DENIED_SUBCOMMANDS constant; the 'no shell spawn' scan fired on a doc comment. Both were caught because the scan went red while someone was looking; the same flaw in the other direction — a pattern too narrow to match the real thing — is a green that means nothing. Same family as the command-names / command-tool-names checks in /sync. Acceptance: each such scan has a fixture that MUST match and one that MUST NOT, both asserted; or the scan is a parse over the module graph. Sits in slice two's plan unless Aaron sequences otherwise."
+    },
+    {
+      "id": "T-157",
+      "title": "Retention evicts done tasks whose ids the tracked tree cites (G-024, twice in two writes): refuse to evict a cited id, or tombstone",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 64,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "T-151 at rev 48 and T-153 at rev 49 were dropped by the 3-session retention rule while cited by id in tracked documents (T-153 in docs/HOH-JEV.md, loop-13-closeout.md, loop-14-rebrief.md). The developer read 'Dropped' in the dry-run output, grepped the tree, and preserved each verbatim into the gap that cites it. Hand preservation is not a mechanism. Acceptance: the retention pass refuses (or tombstones, keeping id, title and close note) any done task whose id appears in a tracked file, and the refusal names the citing files; seen red on a fixture that cites a task about to be evicted."
     }
   ],
   "verified": [
@@ -1520,13 +1530,6 @@
       "opened_session": 65
     },
     {
-      "id": "G-041",
-      "what": "A ROLE CAN REWRITE AN EXISTING TAG DURING ITS STAGE AND THE LOOP COMPLETES AT EXIT 0. A QA stub that ran `git tag -f loop-001-developer loop-001-base` — no commit, no file write, HEAD untouched — completed the loop with status completed and no failure. `loop-001-developer` then named the pre-loop commit while `E_t.json` and `A_t.gitref` still named the real candidate, so the record and the tags disagreed and nothing noticed. A reader who trusts the tag, which is what a tag is for, restores or inspects the wrong commit. THE SAME CLASS AS D1-D3: a role acting on the repository through a channel the observer does not watch. Report 1's channel was commits; this one is refs. `enforceAllowlist` compares `git diff base..HEAD` and `git status`; `tagVerified` checks HEAD against the sha BEING CREATED and never re-reads the target of a tag that already exists; `tagAt` refuses to move a tag through the runtime, and a role does not go through the runtime. NOT A CRITERIA ROW: A5 passed on its observable — the two tags exist and git alone restores — on the clean run and on this one. Neither seat widened the criteria after the verdict, which is why this is a gap and not a rejection.",
-      "evidence": "FOUND BY PROBE (QA seat), report 2 at `a2cb718` section 5, probe P5, 2026-09-20T00:30Z, run against the built candidate 4414bcc rather than against the handoff. Observed tags: loop-001-base -> c2d8576 (initial), loop-001-developer -> c2d8576 (was 27e744f, the candidate), loop-001-qa -> b9bf4e4 (evidence); evidence parent == candidate true; porcelain empty; E_t present. RULED BY ATLAS (planner seat) onto slice two in loop-15-closeout.md section 6, on two grounds: A5 passed on its written observable, and slice one cannot reach it by construction — cli.ts:167 hardcodes stubRoles(), there is no flag to supply a role, and nothing outside runtime.ts calls runLoop except that one site (checked by Forge).",
-      "recommended_update": "Slice two's MANDATORY repair target, and it may not run a real role until this is closed. Fix: a REF snapshot before each stage compared after, refusing any change the runtime did not make — REFS, NOT TAGS. Watching tags alone leaves branches and update-ref, and the lesson from D1 is that naming the observed channel narrowly is how the next channel gets missed. The constraint itself must be mechanical rather than remembered (rule 4): slice two's first acceptance check is that the runtime REFUSES any role it did not construct itself unless a ref-watch is present — one flag at runLoop entry, failing closed, seen red before the first real role is wired.",
-      "opened_session": 65
-    },
-    {
       "id": "G-042",
       "what": "THE TEST SUITE EXITED 1 WHILE EVERY LINE OF ITS OUTPUT REPORTED 805 PASSED. A `[vitest-worker]: Timeout calling \"onTaskUpdate\"` heartbeat timeout, raised as an UNHANDLED ERROR, which vitest exits non-zero on without failing any test. Caused by the harness suite blocking the worker's event loop — `rmSync` over `.git` directories, not the process spawns first suspected. Fixed at 1c8e6ca by making fixture cleanup an awaited async `rm`. THE CONDITION IS LOAD-DEPENDENT AND WAS MEASURED ON ONE MACHINE ONLY. Nothing in CI is known to distinguish a vitest unhandled error from a real test failure, so the same condition there would read as a red suite with no failing test and no obvious cause.",
       "evidence": "Observed in 7 of 7 full-suite runs before the fix and 0 of 4 after, all on one Windows machine (Node v22.23.2). A planted failing assertion WAS still reported while the warning was present, which bounds the blast radius without clearing it. TWO THINGS NOT ESTABLISHED, recorded rather than smoothed over: whether the condition appears on CI or on another machine, and an unresolved second failing test file on one planted-failure run where exactly one failure was planted — a later run of the same plant failed exactly one. DELIBERATELY NOT ATTRIBUTED TO G-016 (known intermittent cross-test failure in state-writer.test.ts) because the file name was not captured. Full measurement in docs/loops/loop-15-developer-handoff.md at 9b3078f, Finding 1.",
@@ -1546,6 +1549,27 @@
       "evidence": "docs/loops/loop-15-slice-2-developer-handoff.md section 5, error entries E1 and E2, set by the developer seat before being asked. The repaired tests are open-brain/tests/harness/gate-live.test.ts (withoutKey) and the live-gate case in open-brain/tests/harness/runtime.test.ts, both at 36500d0. The live call's own record, artifacts/iterations/t001/G_plan.json in the session scratchpad, carries the resolved model and the typed answers and no credential — grepped with the instrument checked first.",
       "recommended_update": "Sweep the repo for the class: any test or script whose expected behaviour is 'the variable is absent'. Each must construct the environment it passes, delete the variable from that copy, and assert the deletion changed something — never read process.env and assume. Then decide whether a /sync check can find the shape mechanically: a test that names an env var whose absence it relies on, without deleting it from a constructed env.",
       "opened_session": 67
+    },
+    {
+      "id": "G-045",
+      "what": "DELETING THE CHECKED-OUT BRANCH DURING A STAGE CRASHES THE RUNTIME WITH NO RECORD (D4, slice two). `git update-ref -d refs/heads/main` while main is checked out (legal; `git branch -D` would refuse): the watch records the deferred ref as deleted, restoreHead sees HEAD's NAME unchanged and does nothing, then `git rev-parse HEAD` fails on the dangling name inside enforceAllowlist and GitFailed escapes runLoop before rollBack, where the deferred-ref restore lives. No LoopResult, no FAILED.md, HEAD unresolvable, main gone, tree staged. D1's sibling: the D1 repair keys on HEAD's name changing; here the name is constant and its referent was removed. Lower likelihood than D1 and the fix is D2's shape moved earlier.",
+      "evidence": "Found by Probe (QA seat), report 2 at 1ee8346 section 5, withheld probe N(c), run against the built candidate 830af70 in the QA tree. A2's four cases and the control pass byte-for-byte; this is not a criteria row and neither seat widened the criteria after the verdict. Ruled by Atlas in loop-15-slice-2-closeout.md section 3 onto slice three, on the same grounds as D6 in slice one: the roles are stubs and no real role runs through this runtime before slice three.",
+      "recommended_update": "Slice three's MANDATORY mechanical first repair, seen red first with the update-ref -d probe as its A1: the restore reads nothing from the repository until the snapshot is fully restored, and after HEAD's name is put back HEAD must resolve or the ref is restored from the snapshot before any read. Restore the deferred delta (the watch already holds before) before anything reads HEAD, not only inside the rollback. The open denominator stays open: index, hooks, config, submodules and reflog are unprobed channels.",
+      "opened_session": 64
+    },
+    {
+      "id": "G-046",
+      "what": "THE HANDOFF IS ONE SLOT PER PROJECT AND THE ROLL RULE OVERWRITES IT. set_handoff writes a single project-wide field; when the developer and QA seats roll in sequence after a loop (D-023), the second close-out replaces the first in the rendered view, so a fresh session's greeting reads only the last seat's pick_up. The first seat's handoff is not lost (it is in the close-out commit) but nothing renders it. Planner 49: the kickoff message to the fresh developer asserted the view carried the developer's file pointers after the QA seat's write had replaced them — a claim about the record the record did not hold, caught by the developer.",
+      "evidence": "Rev 45 (#61, developer close-out) filled the slot; rev 46 (#63, QA close-out) replaced it; the developer found cli.ts:167 itself and flagged the claim. Recorded in docs/loops/loop-15-slice-2-brief-amendment-1.md section 2. Repeated at the slice-two roll (revs 50 and 51) with the seats citing each other's close-out SHAs by hand as the workaround.",
+      "recommended_update": "A handoff keyed by seat, or the greeting rendering the last handoff from each seat that has one. Until fixed: a rolled seat's handoff is cited by the SHA of its close-out commit and the kickoff message carries that SHA.",
+      "opened_session": 64
+    },
+    {
+      "id": "G-047",
+      "what": "THE RECORD'S SESSION NUMBER COUNTS CLOSE-OUT WRITES, NOT SESSIONS, AND ONLY THE UUID SHOWS IT. One developer seat-session (uuid 284d6280, one /start, one context) wrote end_session three times in slice two: n=67 at rev 48, n=68 at rev 49, n=69 at rev 50 — once per candidate and once at the roll, structurally per-write. state.json keeps only last_session, so nothing in the record reveals that three numbered sessions were one. Every per-session rate (error entries per session, the correction record's rows) is computed against a denominator that inflates whenever a loop needs more than one candidate, and inflates most for the loops that went worst.",
+      "evidence": "Observed by Forge (developer seat) at its /end after the slice-two merge; deliberately NOT written as a gap in that write because the dry run assigned it G-045, an id already broadcast for D4 — taking it would have made four documents point at the wrong gap. The text is in docs/loops/loop-15-slice-2-developer-handoff.md section 10 (merged #71); numbered here by the planner at close. A second disagreement: the session log for all three writes is one file, Session_3.md, the worktree's third local log.",
+      "recommended_update": "Decide what the number counts and make the other derivable: end_session idempotent per uuid (a second write for the same uuid updates its entry), or a sessions[] list with uuids so a reader can collapse them, or rename the field to what it measures and derive a real session count from distinct uuids. Until then treat any per-session rate in a close-out as an upper bound on the denominator and say so where it is quoted.",
+      "opened_session": 64
     }
   ],
   "decisions": [
@@ -1872,6 +1896,12 @@
       "title": "D-023 — Loop 15 slice two next, G-041 its mechanical first repair, then Loop 14; developer and QA seats roll after every complete loop",
       "date": "2026-09-20",
       "note": "Ruled by Aaron 2026-09-20, in his words: 'Loop 15 slice two next, with G-041 as its mechanical first repair, then Loop 14' and 'forge and probe need to roll after each complete loop'. Brief: docs/loops/loop-15-slice-2-brief.md (merged #62). Slice two follows the guide's build order (docs/HOH-JEV.md §7): the ref-watch and the foreign-role refusal flag first (A1, seen red before the watch exists), then the Jev transport, the plan gate and the developer done-gate with thresholds as data; roles stay stubbed, real prompts are slice three. The close-out's phrase 'slice two is where real roles arrive' is superseded by the brief's §1. THE ROLL RULE: at every loop close the developer and QA seats end their sessions on the record, one seat at a time (G-036), and fresh sessions take the next loop — done for slice one as #61 (rev 45) and #63 (rev 46). The planner seat does not roll on this rule."
+    },
+    {
+      "id": "D-024",
+      "title": "D-024 — Loop 15 slice two ACCEPTED at 830af70 on the second candidate; D4 (the checked-out branch deleted during a stage) ruled onto slice three as G-045, its mechanical first repair",
+      "date": "2026-09-20",
+      "note": "Accepted by the QA seat in report 2 (1ee8346) on criteria written before the first candidate existed (c73f147 lineage), after rejecting the first candidate b4194a9 in report 1 (8f2c547) on A6 and three withheld probes of the class beneath G-041: what the restore does with HEAD. Six repairs ruled as classes, seen red in a9ffe26 and green in c1f99d0. A7 ruled as the gate's observability, not the loop's completion: both gates answered live from the QA seat and the done gate correctly rejected the stub diff; the brief's request-ids clause is struck (the wire carries none). Merged on Aaron's word 2026-09-20 in order #68 (developer, rev 47 -> 49), #69, #70 (QA), #65, #66, #67 (planner docs); v0.42.0 on 4bed570. Both seats rolled on the record: #71 (rev 50), #72 (rev 51). Close-out: docs/loops/loop-15-slice-2-closeout.md. G-041 CLOSED at this revision: the ref channel is a refusal (ref snapshot with HEAD in it, restored before any read; foreign-role refusal at runLoop entry with new.target provenance; authorship by ledger), seen red at 9cdcc84 and a9ffe26, accepted on the observation that found it; close_gap splices without tombstone (G-010) so its text lives here. The finding that generalises: a restore that reads the repository before the snapshot is fully restored is itself a channel. Counts at close: 50 Planner / 30 Developer / 2 QA, every entry set by its own seat before being asked."
     }
   ],
   "handoff": {

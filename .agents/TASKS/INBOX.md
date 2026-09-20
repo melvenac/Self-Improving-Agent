@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 51 by open-brain v0.42.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 52 by open-brain v0.42.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -49,6 +49,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-103** Retire the mailbox as *transport*, keep it as *archive (supersedes T-104)
 - [ ] **T-114** Update /start monthly maintenance
 - [ ] **T-156** A scan that matches the sentence forbidding a thing, as though it were the thing (G-040): every source-text scan in the harness tests must be validated against a known positive and a known negative in the same test, or replaced by a parser
+- [ ] **T-157** Retention evicts done tasks whose ids the tracked tree cites (G-024, twice in two writes): refuse to evict a cited id, or tombstone
 
 ## Done (last 3 sessions)
 

@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 51 by open-brain v0.42.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 52 by open-brain v0.42.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 15 slice two — the ref channel closes and the gates go live. Brief: docs/loops/loop-15-slice-2-brief.md, binding with docs/HOH-JEV.md. First: G-041 — a ref snapshot around every stage refusing any delta the runtime did not author (refs, not tags), and a refusal flag at runLoop entry for any role the runtime did not construct, seen red before the watch exists (A1). Then: Jev transport reading TYPESAFE_API_KEY from the environment only, plan gate and developer done-gate as batched typed questions, thresholds as data in harness/policies/, gate verdicts written into the iteration artifact; roles stay stubbed. QA writes criteria before the first candidate; one live Jev call, by QA, once (A7). Loop 14 follows (docs/loops/loop-14-rebrief.md). Ruled D-023, 2026-09-20. _(since session 64)_
+Loop 14 — the three-seat record, re-briefed at docs/loops/loop-14-rebrief.md (supersedes loop-14-brief.md in part). Sequenced by Aaron 2026-09-20 (D-023) after Loop 15 slice two closed ACCEPTED at v0.42.0 (D-024). Loop 14 runs no role through the harness runtime; G-045 (D4) does not block it and is slice three's mandatory first repair. Fresh developer and QA sessions per the roll rule; criteria before candidate; frozen SHA; the record moves one seat at a time. _(since session 64)_
 
 ## Top tasks
 
