@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 43 by open-brain v0.41.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 44 by open-brain v0.41.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -48,6 +48,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-102** Distil and sanitise the v1 stores into v2, then retire the v1 vault
 - [ ] **T-103** Retire the mailbox as *transport*, keep it as *archive (supersedes T-104)
 - [ ] **T-114** Update /start monthly maintenance
+- [ ] **T-156** A scan that matches the sentence forbidding a thing, as though it were the thing (G-040): every source-text scan in the harness tests must be validated against a known positive and a known negative in the same test, or replaced by a parser
 
 ## Done (last 3 sessions)
 

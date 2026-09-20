@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "revision": 43,
+  "revision": 44,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 15 - the HoH runtime, slice one. Build the outer runtime that spawns three isolated role sessions (planner, developer, QA), validates their deliverables against schemas with a capped retry whose exhaustion is a recorded failure, freezes the candidate ref before QA and refuses if the tree moves, refuses developer writes outside the plan's allowlist, and versions each loop in git with loop-<t>-<role> tags. No Jev, no model calls at the gates - the gates are stubbed, and the runtime is what enforces the seat separation that role files could only request. Brief: docs/loops/loop-15-brief.md. Sequenced ahead of Loop 14 by D-019-era ruling; Loop 14 is re-briefed, not deferred. Autonomy boundary ruled (D-019): autonomous inside a branch, Aaron at master. First loop where acceptance is written by a seat (Probe) that neither set the objective nor built the candidate.",
-    "since_session": 65
+    "text": "NO LOOP IS OPEN. Loop 15 slice one closed ACCEPTED on 2026-09-20 at v0.41.0 (D-022). The next loop is not briefed: Aaron rules on sequencing; the planner recommends Loop 15 slice two — real role sessions through open-brain/src/harness/ — with G-041 (the ref channel: a role's `git tag -f` during its stage is undetected) as its mandatory first repair, mechanical and seen red before it is believed. Loop 14 (re-briefed in docs/loops/loop-14-rebrief.md) follows. This field is reset on every loop close (G-035); a greeting that names a closed loop is a defect in the record, not the greeting.",
+    "since_session": 64
   },
   "tasks": [
     {
@@ -368,6 +368,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "DERIVED FROM THE AUTONOMY RULING (see the decision recorded this revision). At every point where a merge to master could occur, the runtime writes a would-merge / would-not-merge verdict with its reasons — deterministic check results, QA E_t status, and once the gates exist, their typed answers — into artifacts/iterations/tNNN/. Aaron still merges. The runtime then records his actual decision beside its own, and the count of disagreements is the instrument that decides when the human gate is removed. BELONGS TO SLICE TWO OR LATER, not Loop 15: it needs the gates to have an opinion, and it needs the merge point to exist in the runtime first. NOT RULED AS THE NEXT LOOP'S SUBJECT. Design constraints that come from the record: the verdict must be written BEFORE Aaron decides, so it cannot be fitted to his answer; both verdicts carry the candidate SHA and a timestamp; a run where the runtime could not form a verdict (gate unreachable, evidence missing) is recorded as UNDEFINED and never as agreement. Zero disagreements across loops with NO real defects in the stream is not evidence of anything — the count only means something when the loops contained failures a gate could have caught."
+    },
+    {
+      "id": "T-156",
+      "title": "A scan that matches the sentence forbidding a thing, as though it were the thing (G-040): every source-text scan in the harness tests must be validated against a known positive and a known negative in the same test, or replaced by a parser",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 64,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "From G-040 (opened session 65). The 'no git push in harness source' scan fired on the DENIED_SUBCOMMANDS constant; the 'no shell spawn' scan fired on a doc comment. Both were caught because the scan went red while someone was looking; the same flaw in the other direction — a pattern too narrow to match the real thing — is a green that means nothing. Same family as the command-names / command-tool-names checks in /sync. Acceptance: each such scan has a fixture that MUST match and one that MUST NOT, both asserted; or the scan is a parse over the module graph. Sits in slice two's plan unless Aaron sequences otherwise."
     }
   ],
   "verified": [
@@ -1797,6 +1807,12 @@
       "title": "D-021 — zod is the deliverable-schema source; the .schema.json files are derived and drift-checked",
       "date": "2026-09-19",
       "note": "A hand-maintained JSON Schema beside a runtime validator is two statements of one shape, which is the defect family most of this record is made of. schema.test.ts regenerates from zod and compares byte for byte; seen red on a hand-edited minLength. The two rules JSON Schema cannot express — new_capability non-empty unless stop_ship is requested and justified, repair_targets non-empty — are written into the generated files' own description, so a reader validating against the file alone is told what it cannot see. Regenerate with `npx tsx src/harness/cli.ts schemas --write`; it refuses to write into a build directory."
+    },
+    {
+      "id": "D-022",
+      "title": "D-022 — Loop 15 slice one is ACCEPTED at 4414bcc; D6 (a role rewriting an existing tag) is ruled onto slice two as G-041, not widened away",
+      "date": "2026-09-20",
+      "note": "Accepted by the QA seat in report 2 (a2cb718) on criteria written before the first candidate existed (24e33e5 lineage), after the second candidate was rejected because enforcement read `git status` and a commit leaves it clean. Merged on Aaron's word 2026-09-20 in order #57 (developer, rev 39 -> 43), #58 and #59 (QA criteria, QA reports), #53-#56 (planner docs); v0.41.0 tagged on the final merge dec2406. Close-out: docs/loops/loop-15-closeout.md. Slice two's A1 is mechanical: the runtime refuses any role it did not construct itself unless a ref-watch is present, one flag, failing closed, seen red first — the developer's rule-4 objection to the intention-shaped version is upheld. Sequencing after this loop is held for Aaron; the planner's recommendation is slice two with G-041 first, because that is where real roles arrive. Error counts at close: 48 Planner / 28 Developer / 0 QA, window since Loop 13's close at 45/25."
     }
   ],
   "handoff": {
