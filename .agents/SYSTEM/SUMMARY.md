@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 50 by open-brain v0.42.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 51 by open-brain v0.42.0 — do not edit; change state via ob_state -->
 > **Status:** v0.42.0 — Loop 15 slice two — the ref channel closes and the gates go live. Brief: docs/loops/loop-15-slice-2-brief.md, binding with docs/HOH-JEV.md. First: G-041 — a ref snapshot around every stage refusing any delta the runtime did not author (refs, not tags), and a refusal flag at runLoop entry for any role the runtime did not construct, seen red before the watch exists (A1). Then: Jev transport reading TYPESAFE_API_KEY from the environment only, plan gate and developer done-gate as batched typed questions, thresholds as data in harness/policies/, gate verdicts written into the iteration artifact; roles stay stubbed. QA writes criteria before the first candidate; one live Jev call, by QA, once (A7). Loop 14 follows (docs/loops/loop-14-rebrief.md). Ruled D-023, 2026-09-20.
 
 ## What's working
@@ -53,6 +53,7 @@
 - The harness's default deterministic checks actually run on win32: npm is resolved to its JavaScript entry point and spawned through node with no shell, and the README's documented command exits 0 with no overrides _(V-045, 2 evidence)_
 - Acceptance for Loop 15 slice one was determined by a seat that neither set the objective nor built the candidate, from a frozen SHA, read-only, against criteria written before any candidate existed — and every observation in it is reproducible from tracked files by SHA, tree and time. _(V-046, 3 evidence)_
 - Rule 13 can be met in the QA tree without touching the main checkout: a per-checkout GitNexus index makes every /sync check run there, 0 skipped, so the checks run where the candidate actually is. _(V-047, 1 evidence)_
+- Acceptance for Loop 15 slice two was determined by the QA seat from two frozen SHAs, read-only, against criteria written before any candidate existed (c73f147): the first candidate b4194a9 was rejected on a planted prompt literal no scan caught, with three ref/provenance defects recorded from withheld probes; the second 830af70 was accepted on the brief's table with every ruled repair seen red first at a9ffe26 and observed closed, and the one live Jev pair observed both gates answering typed, recorded with sent: true, and the key reaching nothing. _(V-048, 3 evidence)_
 
 ## What's broken
 
