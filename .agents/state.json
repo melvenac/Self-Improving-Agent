@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 41,
+  "revision": 42,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1174,6 +1174,47 @@
       ],
       "since_session": 65,
       "status": "verified"
+    },
+    {
+      "id": "V-044",
+      "claim": "Stage enforcement sees COMMITTED changes, not only the working tree: a role that writes a file and commits it is refused, rolled back to the stage's base, and reported as having moved HEAD rather than as having changed nothing",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/runtime.test.ts",
+          "observation": "'A3/A4 — a role that COMMITS is refused': roles that run real git and commit are refused at all three stages with code stage-committed; reverting enforceAllowlist to working-tree-only fails 6 of the 7 new tests"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/workspace.test.ts",
+          "observation": "enforceAllowlist unions git diff base..HEAD with git status, reports examinedCommitted, and flags headMoved even when every committed path was permitted"
+        },
+        {
+          "type": "test",
+          "path": "open-brain/src/harness/runtime.ts",
+          "observation": "identity is verified before every tag via tagVerified, and the candidate is asserted to be the evidence commit's first parent after the evidence commit"
+        }
+      ],
+      "since_session": 65,
+      "status": "verified"
+    },
+    {
+      "id": "V-045",
+      "claim": "The harness's default deterministic checks actually run on win32: npm is resolved to its JavaScript entry point and spawned through node with no shell, and the README's documented command exits 0 with no overrides",
+      "evidence": [
+        {
+          "type": "test",
+          "path": "open-brain/tests/harness/checks.test.ts",
+          "observation": "'defaultChecks — D4' spawns rather than pattern-matching: resolveNpm's output is executed, and the default build check runs against a scratch repo. Restoring npm.cmd fails 3 of 4 with spawnSync npm.cmd EINVAL"
+        },
+        {
+          "type": "command",
+          "path": "README.md",
+          "observation": "npx tsx open-brain/src/harness/cli.ts run --loop t001 --dry-run --repo <scratch> exited 0 with build and unit both exit 0, run by hand at 4414bcc on Node v22.23.2 win32"
+        }
+      ],
+      "since_session": 65,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -1420,6 +1461,13 @@
       "what": "THE STORE ALREADY CONTAINED THE ENTRY THAT WOULD HAVE PREVENTED THIS SESSION'S ERROR, AND NOTHING SURFACED IT. Entry 299, `pipe-to-tail-masks-exit-code`, stored 2026-07-26, is titled 'Piping to tail/head masks the real exit code — and I reported a false success because of it'. On 2026-09-19 I ran `npx vitest run 2>&1 | tail -8; echo $?`, read tail's 0, and reported a false success — the same act, described in advance, by the same agent identity. ob_recalled returned 'No knowledge entries recalled this session' for the fifth consecutive loop. This is the first time the standing open question 'DOES THE MEMORY HALF GET USED AT ALL' has a concrete cost attached rather than an absence of evidence.",
       "evidence": "ob_recall at session end with trigger 'explicit' returned entry 299 as the SECOND result for the query 'test runner exit code differs from reported test results' and the FIRST for 'pipeline exit code is not the process exit code'. So the entry is present, indexed, and highly ranked for the exact question — retrieval works. It was never queried during the work, because nothing queries it: session-start injection was suspended in Loop 10 C2, and ob_recall is a deliberate mid-task tool that a working agent has no trigger to reach for. The failure is not in ranking or storage; it is that the only path to the corpus is an agent remembering to ask.",
       "recommended_update": "This is the datapoint Loop 13 was built as the instrument for and four loops have failed to produce. Atlas should rule on whether the next loop deliberately exercises recall, and specifically whether a cheap always-on trigger exists that is not the Loop 10 C2 injection — for example querying the corpus at the moment a verification claim is about to be made, which is where this one would have fired. Do not re-enable start-time injection on the strength of this alone: C2 was cut on evidence and one instance does not overturn it.",
+      "opened_session": 65
+    },
+    {
+      "id": "G-040",
+      "what": "A SCAN THAT MATCHES THE SENTENCE FORBIDDING A THING, AS THOUGH IT WERE THE THING. This has now happened twice in one session in the same codebase, both times in tests I wrote to be strict: the 'no git push in harness source' scan fired on the DENIED_SUBCOMMANDS constant, and the 'no shell spawn' scan fired on a doc comment reading 'the fix is not shell: true'. Both were caught only because the scan went red at a moment I happened to be looking; a green scan with the same flaw in the other direction — matching nothing because the pattern was too narrow — would not have announced itself.",
+      "evidence": "Two instances, 2026-09-19 and 2026-09-20, in open-brain/tests/harness/git.test.ts and checks.test.ts. The first was fixed with a narrow named exclusion, the second by stripping comments before scanning. Neither fix generalises to the other, and no check in the repo asserts that a source scan distinguishes a prohibition from an instance. Probe did not catch the second because it was green when Probe read it.",
+      "recommended_update": "When a source scan is used as an assertion, it needs the same treatment as any other instrument: validate against a planted positive AND a planted near-miss that must NOT fire, and read what its hits actually are rather than only whether the count is zero. Consider whether the repo's own /sync source scans have the same flaw — nobody has looked.",
       "opened_session": 65
     }
   ],
@@ -1738,21 +1786,21 @@
     }
   ],
   "handoff": {
-    "pick_up": "Loop 15 slice one is built and handed to Probe for evaluation — the first time acceptance in this project is determined by a seat that neither set the objective nor built the candidate. Frozen candidate 1c8e6ca9cc5d407da4649120426ca5defa3cd9f7 on branch loop/15-hoh-runtime, with docs/loops/loop-15-developer-handoff.md at d4e2180 as the durable handoff. The runtime runs planner -> developer -> QA with stubbed roles, enforcing a write allowlist and a frozen candidate. Two rulings are owed from Atlas and are named in the handoff: whether D_t may refuse an empty repair_targets, a rule the brief does not spell out, and whether the runtime may create loop-NNN-* tags given that HOH-JEV.md 6.2 says it never tags while brief A5 requires them.",
+    "pick_up": "Loop 15 slice one is on its THIRD candidate: 4414bcc6f2d46fa62296d0ed65cb16a9b3c31752, branch loop/15-hoh-runtime, unpushed, awaiting Probe's re-evaluation. The first candidate was NOT ACCEPTED — Probe found four defects, three of them one class: enforcement observed the working tree, and a commit is invisible to a working-tree observer, so a role that committed its work bypassed both the allowlist and the freeze. Fixed by comparing against the diff from each stage's base commit, refusing any stage that moves HEAD, verifying identity before every tag, and asserting the candidate is the evidence commit's first parent. The fourth defect: default checks picked npm.cmd on win32 with shell:false, which Node refuses, so the README's own documented command exited 1 for anyone following it. Probe re-evaluates from its section 1; Atlas will run the checks in the main checkout so rule 13 is met on the re-evaluation.",
     "watch_out": [
-      "A PIPELINE'S EXIT CODE IS NOT THE PROCESS'S. `npx vitest run | tail -8; echo $?` returns tail's 0 for a suite exiting 1. This was committed THIS session while building the component whose acceptance criterion is 'check results come from exit codes'. Redirect to a file and echo $? on the next line; never read a status through a pipe.",
-      "THE SUITE CAN EXIT 1 WHILE PRINTING '805 passed'. A vitest unhandled error fails the run without failing a test. Read the exit code AND the Errors line, not the passed count.",
-      "THE FIRST FIX THAT LOOKS SUFFICIENT MAY CHANGE NOTHING. Cutting ~200 child processes did not clear the worker timeout; an awaited async rm over .git did. Measure after each fix separately rather than bundling them and crediting the wrong one.",
-      "REGENERATE RENDERED VIEWS ON A REBASE CONFLICT, NEVER HAND-MERGE THEM. The four state views conflict whenever a version bump meets a state write. Take the base side, then run /sync.",
-      "MSYS MANGLES A GIT PATHSPEC IN GIT BASH. `git show origin/master:.agents/state.json` reached git as `origin\\master;.agents\\state.json`. Same family as cmd.exe eating ^ — use execFileSync with an args array, or read the working-tree file.",
-      "A SOURCE SCAN CAN MATCH THE RIGHT TEXT AND ANSWER THE WRONG QUESTION. The 'no git push in harness' scan fired on the deny-list constant, where the word appears because it is forbidden. Validate a detector against a planted positive AND check what its hits actually are.",
-      "NOTHING IS PUSHED AND NOTHING IS TAGGED. Every commit on loop/15-hoh-runtime is local. A push needs Aaron's word for that push; a peer relay is not his approval."
+      "ENFORCEMENT THAT READS `git status` IS BLIND TO A COMMIT. This is the defect that failed QA and it is not exotic — committing is how a real session leaves its work, which is exactly what slice two's roles will be. Any future check about what a stage did must compare against a base commit, not against the working tree.",
+      "A PIPELINE'S EXIT CODE IS NOT THE PROCESS'S. `npx vitest run | tail -8; echo $?` returns tail's 0 for a suite exiting 1. Redirect to a file and echo $? on the next line; never read a status through a pipe.",
+      "THE SUITE CAN EXIT 1 WHILE PRINTING '823 passed'. A vitest unhandled error fails the run without failing a test. Read the exit code AND the Errors line, not the passed count.",
+      "A SOURCE SCAN CAN MATCH THE SENTENCE FORBIDDING A THING AS THOUGH IT WERE THE THING. Twice in one session: the git-push scan fired on its own deny list, the shell scan on a comment saying 'the fix is not shell: true'. Validate a scan against a planted positive AND a planted near-miss that must not fire (recorded as G-040).",
+      "A NAME IS NOT EVIDENCE THAT A COMMAND RUNS. defaultChecks was asserted by matching /^npm(\\.cmd)?$/ and never spawned, so a check that could not start on this platform passed its test for the life of the candidate. If a test is about whether something runs, run it.",
+      "NODE REFUSES TO SPAWN A .cmd WITHOUT A SHELL (18.20/20.12/22, CVE-2024-27980). On win32, resolve npm to its JS entry and run it through node. Do not reach for shell: true — that is how `^` got eaten and how an exit code stops belonging to the process under test.",
+      "REGENERATE RENDERED VIEWS ON A REBASE CONFLICT, NEVER HAND-MERGE THEM. Take the base side, then run /sync.",
+      "NOTHING IS PUSHED AND NOTHING IS TAGGED ON MASTER. Every commit on loop/15-hoh-runtime is local. A push needs Aaron's word for that push; a peer relay is not his approval."
     ],
     "open_questions": [
-      "DOES THE MEMORY HALF GET USED AT ALL? ob_recalled has now returned nothing for five consecutive loops. Loop 13 built the instrument and Loop 15 did not use it either. Nobody has yet run a loop that deliberately exercises recall.",
-      "May D_t refuse an empty repair_targets? Enforced on my reading of HOH-JEV.md's symmetric rule; the brief names only the new_capability rejection. This runtime would refuse a plan the brief would accept.",
-      "May the runtime create loop-NNN-* tags? HOH-JEV.md 6.2 says it never tags; brief A5 requires loop-001-developer and loop-001-qa. Resolved by judgement as being about master, and constrained to local tags with all network git subcommands refused.",
+      "DOES THE MEMORY HALF GET USED AT ALL? Answered with a cost this session and recorded as G-039: entry 299 described the exact defect I then committed, ranked first for the question, and nothing asked. Atlas ruled the fix must be a DETERMINISTIC trigger on an observable condition, not an instruction to remember, and that the unconditional-read shape used by CC memory is the other candidate. Not yet sequenced as a loop.",
       "Is the vitest worker-timeout condition present on CI or on another machine? Load-dependent, measured on one Windows machine only, and nothing in CI is known to distinguish it from a real test failure.",
+      "Do the repo's own /sync source scans share the prohibition-vs-instance flaw found twice in the harness tests? Nobody has looked.",
       "Should a close note be amendable? Still open from session 64; ob_state makes it write-once."
     ],
     "session": 65

@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 41 by open-brain v0.41.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 42 by open-brain v0.41.0 — do not edit; change state via ob_state -->
 > **Status:** v0.41.0 — Loop 15 - the HoH runtime, slice one. Build the outer runtime that spawns three isolated role sessions (planner, developer, QA), validates their deliverables against schemas with a capped retry whose exhaustion is a recorded failure, freezes the candidate ref before QA and refuses if the tree moves, refuses developer writes outside the plan's allowlist, and versions each loop in git with loop-<t>-<role> tags. No Jev, no model calls at the gates - the gates are stubbed, and the runtime is what enforces the seat separation that role files could only request. Brief: docs/loops/loop-15-brief.md. Sequenced ahead of Loop 14 by D-019-era ruling; Loop 14 is re-briefed, not deferred. Autonomy boundary ruled (D-019): autonomous inside a branch, Aaron at master. First loop where acceptance is written by a seat (Probe) that neither set the objective nor built the candidate.
 
 ## What's working
@@ -49,6 +49,8 @@
 - Deterministic check verdicts come from process exit codes and nothing else: a command printing 'All 648 tests passed!' while exiting 1 is recorded as failed, a command that cannot be spawned is a failure with a null exit code rather than a pass, and a QA report whose runtime_checks contradict the measurement is refused rather than silently corrected _(V-041, 3 evidence)_
 - The harness sits inside the module boundary as core and reaches no memory code, and it cannot invoke a network git subcommand _(V-042, 2 evidence)_
 - A loop's pre-loop state is restorable with git alone, and the runtime's rollback markers cannot be moved _(V-043, 2 evidence)_
+- Stage enforcement sees COMMITTED changes, not only the working tree: a role that writes a file and commits it is refused, rolled back to the stage's base, and reported as having moved HEAD rather than as having changed nothing _(V-044, 3 evidence)_
+- The harness's default deterministic checks actually run on win32: npm is resolved to its JavaScript entry point and spawned through node with no shell, and the README's documented command exits 0 with no overrides _(V-045, 2 evidence)_
 
 ## What's broken
 
@@ -87,6 +89,7 @@
 - Gap G-037: The harness test suite made the FULL vitest run exit 1 while printing '805 passed'. Several hundred synchronous child processes plus rmSync over .git directories blocked the vitest worker's event loop past its reporter heartbeat, raising `[vitest-worker]: Timeout calling "onTaskUpdate"` as an UNHANDLED ERROR — which vitest exits non-zero on. Fixed at 1c8e6ca by making fixture cleanup an awaited async rm. But the condition is LOAD-DEPENDENT and was only ever measured on one machine, and the first fix (cutting ~200 git config spawns) looked sufficient and changed nothing.
 - Gap G-038: The QA write allowlist is never exercised by a passing loop, so the only thing standing between a QA seat and the candidate is one test. In a normal run the QA stage writes NOTHING during its own stage — the runtime writes E_t after validating it — so the by-hand run reported 'examined 0 changed path(s)' for QA. The allowlist is only reached when a QA role misbehaves.
 - Gap G-039: THE STORE ALREADY CONTAINED THE ENTRY THAT WOULD HAVE PREVENTED THIS SESSION'S ERROR, AND NOTHING SURFACED IT. Entry 299, `pipe-to-tail-masks-exit-code`, stored 2026-07-26, is titled 'Piping to tail/head masks the real exit code — and I reported a false success because of it'. On 2026-09-19 I ran `npx vitest run 2>&1 | tail -8; echo $?`, read tail's 0, and reported a false success — the same act, described in advance, by the same agent identity. ob_recalled returned 'No knowledge entries recalled this session' for the fifth consecutive loop. This is the first time the standing open question 'DOES THE MEMORY HALF GET USED AT ALL' has a concrete cost attached rather than an absence of evidence.
+- Gap G-040: A SCAN THAT MATCHES THE SENTENCE FORBIDDING A THING, AS THOUGH IT WERE THE THING. This has now happened twice in one session in the same codebase, both times in tests I wrote to be strict: the 'no git push in harness source' scan fired on the DENIED_SUBCOMMANDS constant, and the 'no shell spawn' scan fired on a doc comment reading 'the fix is not shell: true'. Both were caught only because the scan went red at a moment I happened to be looking; a green scan with the same flaw in the other direction — matching nothing because the pattern was too narrow — would not have announced itself.
 
 ## What's next
 
