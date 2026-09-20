@@ -369,3 +369,34 @@ count in a commit message that should have been `7/7`; and this section itself.
 
 **I am claiming zero entries and five near-misses. Probe sets the number, not me** — and if any of the
 above reached something I did not check, it is an entry and I have miscounted in my own favour.
+
+---
+
+### ARBITRATED AFTER THIS WAS WRITTEN: three, not zero. I miscounted in my own favour twice.
+
+**Left standing above rather than edited, because the claim is the evidence.** What follows is what
+the seats that hold the table actually set.
+
+**Probe found two of the five near-misses had escaped into commits**, and Atlas numbered them
+**27 and 28**: the `5/5` in a commit message where this document says `7/7`, and `1c8e6ca`'s *"I
+reported that suite as green"*, which this document itself calls an overstatement. My reasoning for
+calling them near-misses was that the false green reached no artifact — but I had gone on to write
+*about* it in two commit messages, inaccurately, and **a wrong claim you chose to leave in a commit
+is still a wrong claim in a commit.** Choosing to record rather than rewrite was right; it does not
+make the record correct.
+
+**Entry 26 predates this document** — *"the developer's `/end` is the last write to the record"*,
+from the write-ordering exchange before the first candidate, which I withdrew within the hour and
+asked to be counted at the time.
+
+**So: three entries, five near-misses, running total 48 Planner / 28 Developer / 0 QA.**
+
+**And I got the arithmetic wrong a second time, arguing the count down.** When Atlas said three I
+made it two and asked them to re-derive it before it reached a PR. They were right and I was not:
+I had silently measured from the first candidate, they from the loop's start, **and neither of us
+had stated the window.** Their sentence was unambiguous and my correction was not — I flagged an
+unstated boundary while standing on one. The close-out now names the window explicitly, which is the
+actual defect and the only thing that came out of my objection worth keeping.
+
+**Asking was still right.** A number about the accuracy record, in the document that records
+accuracy, is worth thirty seconds even when checking it costs you two entries.
