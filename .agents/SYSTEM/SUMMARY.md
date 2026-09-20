@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 44 by open-brain v0.41.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 45 by open-brain v0.41.0 — do not edit; change state via ob_state -->
 > **Status:** v0.41.0 — NO LOOP IS OPEN. Loop 15 slice one closed ACCEPTED on 2026-09-20 at v0.41.0 (D-022). The next loop is not briefed: Aaron rules on sequencing; the planner recommends Loop 15 slice two — real role sessions through open-brain/src/harness/ — with G-041 (the ref channel: a role's `git tag -f` during its stage is undetected) as its mandatory first repair, mechanical and seen red before it is believed. Loop 14 (re-briefed in docs/loops/loop-14-rebrief.md) follows. This field is reset on every loop close (G-035); a greeting that names a closed loop is a defect in the record, not the greeting.
 
 ## What's working
