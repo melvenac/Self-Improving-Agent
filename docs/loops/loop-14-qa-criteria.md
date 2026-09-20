@@ -6,9 +6,10 @@
 differ; `.agents/roles/qa.md` (`876029d`) and `.agents/roles/shared.md` (`e177ea2`) at the same base;
 and the planner's kickoff message of 2026-09-20, which restated the rows and added one — **staleness**
 — as "the developer's own note". Where a clause below comes from that message and not from the two
-tracked briefs it is marked **[kickoff]**; where it is my own addition it is marked **[mine]** and is
+tracked briefs it is marked **[kickoff]**; where it was my own addition it was marked **[mine]** and
 returned to the planner in §9 rather than silently applied (my predecessor's QA 2 came from two
-clauses that were not).
+clauses that were not). **All six §9 items were RULED by the planner on 2026-09-20 after the first
+commit `424c618`; every former [mine] clause now carries its ruling inline.**
 **Handoffs cited by close-out SHA, not by the rendered view:** the developer's for slice two is at
 `git show 5b5bd30:.agents/state.json` (rev 50, session 69); the previous QA seat's at
 `git show c0d69d5:.agents/state.json` (rev 51, session 70); the planner's slice-two close-out write is
@@ -69,8 +70,8 @@ Each row: **required** (the brief's or amendment's words), **procedure** (what I
   path it looked for. **Stale, reading (a):** `qa.md` edited in the working tree and not committed —
   the greeting says the file differs from HEAD. **Stale, reading (b):** `F-behind` where the
   candidate has touched a role file, or a scratch branch that has, with `origin/master` ahead — the
-  greeting says the file at HEAD is behind `origin/master`. Which readings of "stale" the candidate
-  implements is recorded; §9 returns the question.
+  greeting says the file at HEAD is behind `origin/master`. **RULED (§9.1):** (a) is required; (b)
+  is recorded, not required — the tree-level line (S) owns it.
 - **Pass:** all three seats' greetings name both files with commits equal to git's answer at the
   candidate SHA; the missing case and at least reading (a) of stale are reported in the greeting
   text; the greeting also names the seat's own last handoff and its commit (measured under C2b).
@@ -97,8 +98,8 @@ Each row: **required** (the brief's or amendment's words), **procedure** (what I
   (`qa`) is the developer's choice and is recorded; either way the value the greeting later renders
   for is the one `agent-identity.ts` resolves, from the same file. **Fail:** any of (1)–(3) applies;
   a refusal that leaves the file changed; a seat accepted that no identity file can produce.
-  **[mine]** (3) — the amendment says "a write without one is refused"; refusing an *unknown* seat is
-  my reading of "takes a seat", returned in §9.
+  **RULED (§9.2):** (3) is required, not mine — the seat set is closed (planner, developer, qa, the
+  harness's `RoleName`); `auditor` is a write without a valid seat and must be refused.
 - **Blind spot:** `handleState` is the MCP door; `/end` is a command file that composes the batch.
   A command file that omits the seat would be refused every time — which is a pass here and a
   finding under C3 and §3.
@@ -120,9 +121,14 @@ Each row: **required** (the brief's or amendment's words), **procedure** (what I
   `git show 5b5bd30:.agents/state.json`), and for Atlas either none — said in words — or whatever
   the planner has written by then, cited by rev; (c) names the other two seats' handoffs by a SHA
   that `git show <sha>:.agents/state.json` resolves to a state carrying that seat's handoff as
-  rendered. **Migration:** if the candidate carries a migrated `state.json` (the single slot split
-  into per-seat entries), the two entries above must be byte-equal to their sources; a migrated
-  record that drops or edits either is a fail. **`F-behind`, per seat:** the old single-slot record
+  rendered. **Migration — RULED (§9.5):** the candidate carries the migrated `state.json` as the
+  developer's record write: `schema_version` bumped and `revision` 52 → 53 **in one write on the
+  developer's branch**, and no other record write between the candidate and the merge. So at the
+  candidate SHA `state.json` reads `revision: 53` with the new `schema_version`, the two preserved
+  entries above are byte-equal to their sources, and `git log --format=%h -- .agents/state.json`
+  between `7c7e04b` and the candidate shows the migration and at most the developer's close-out. A
+  migrated record that drops or edits either handoff, a revision other than 53, or a second
+  writer in that range is a fail. **`F-behind`, per seat:** the old single-slot record
   is read by the candidate's build — the greeting must either say which seat's handoff the slot is
   (session 69 → the developer) or refuse the old shape in words; it must **not** present it as the
   reader's own. **Old shape read by the old build** is the baseline (§7), not a candidate result.
@@ -133,7 +139,8 @@ Each row: **required** (the brief's or amendment's words), **procedure** (what I
 - **Blind spot:** "names by SHA" needs the SHA **derived at read time from git**, because
   `set_handoff` runs inside `/end` before the commit exists (`end.md` says so in its own warning).
   A fixture without history for that path — a shallow clone — cannot name it; the greeting must say
-  so rather than print nothing. **[mine]** that last clause, returned in §9.
+  so rather than print nothing. **RULED (§9.3):** required — the "cannot name" line prints the
+  bound it searched, and a stored SHA is rule 14 and a fail.
 
 ### C2c — a second `end_session` for the same uuid updates rather than increments (G-047)
 
@@ -190,7 +197,7 @@ Each row: **required** (the brief's or amendment's words), **procedure** (what I
   a planner-seat close batch missing an enumerated row is **refused** by `handleState` if the schema
   makes the rows required, or **accepted with the absence rendered in words** if it does not; which
   of the two the candidate chose is recorded, and *silently accepted with nothing rendered* is a
-  fail. (3) The detach step: if the candidate scripts it, the script is run on a scratch clone with
+  fail. **RULED (§9.6):** that is the bar — either shape passes, only silence fails. (3) The detach step: if the candidate scripts it, the script is run on a scratch clone with
   a local branch checked out and must leave `git symbolic-ref -q HEAD` empty and HEAD at the SHA
   `origin/master` names; if not scripted, "still by hand" is recorded as the brief allows.
 - **What I cannot verify and will not report as verified:** the planner's live roll on this loop's
@@ -222,8 +229,8 @@ Each row: **required** (the brief's or amendment's words), **procedure** (what I
   fresh as the last fetch, and a line that says "current" without saying against what is rule 14).
   **Fail:** silence on `F-behind`; silence or "current" on `F-noremote`; the line after the State
   block; a network fetch performed by the start pipeline to answer (`GIT_TRACE=1` on the run shows
-  no `fetch`/`ls-remote`). **[mine]** the `F-noremote` and ahead-is-not-behind shapes and the
-  no-network clause; returned in §9.
+  no `fetch`/`ls-remote`). **RULED (§9.4):** all four shapes required — the *could not compare*
+  line carries the reason, and the pipeline compares to the local `origin/master` ref only.
 - **Blind spot:** the line is true of the ref, not of the remote. Nothing in a greeting can say
   whether `origin/master` on GitHub has moved since the last fetch, and the report says so.
 
@@ -340,25 +347,29 @@ came from — **not copied from any report**:
 9. Report to `docs/loops/loop-14-qa-report.md` on a `qa/loop-14-report` branch cut from the same
    base, committed, not pushed; SHA reported to the planner by A2A. Probes withheld until then.
 
-## 9. Returned to the planner — readings applied, not resolved
+## 9. Returned to the planner at `424c618` — all six RULED by A2A, 2026-09-20
 
-Each is applied as stated so the evaluation can run; a ruling that differs is applied on receipt
-and recorded inline as **RULED**, as slice two's file did.
+Each was applied as stated so the evaluation could run; the planner ruled on all six in one message
+after verifying `424c618`, and the rulings are recorded here and inline where they change a row,
+marked **RULED**. The planner said the same rulings go to the developer in the same breath.
 
 1. **"Stale role file"** (C1): I test two readings — (a) working-tree bytes differ from HEAD's blob;
-   (b) the file at HEAD is behind the same path at `origin/master`. Pass requires (a); (b) is
-   recorded. Is (b) required?
-2. **Unknown seat** (C2a): the amendment refuses a write *without* a seat. I also refuse a seat no
-   identity file can produce. Is that in scope, or the developer's choice?
+   (b) the file at HEAD is behind the same path at `origin/master`. **RULED:** (a) is **required**;
+   (b) is **recorded, not required**, because the tree-level staleness line (S) owns that question.
+2. **Unknown seat** (C2a): the amendment refuses a write *without* a seat; I also refuse a seat no
+   identity file can produce. **RULED: refused, in scope.** The seat set is **closed** — planner,
+   developer, qa, the harness's `RoleName` — and a seat outside it is a write without a valid seat.
 3. **"Names the others' by SHA"** (C2b): a handoff cannot carry its own commit SHA because
-   `set_handoff` runs before the commit (`end.md`'s own warning). I require the SHA derived from git
-   at read time and a "cannot name" line where history is absent. Confirm, or rule the SHA is a
-   different thing than a close-out commit.
-4. **Staleness shapes** (S): the kickoff row names *behind*. I also require an explicit *current*
-   line, a *could not compare* line with no `origin/master`, *ahead* not reported as behind, and no
-   network from the start pipeline. Confirm or strike.
-5. **The migrated record** (C2b): if the candidate carries a migrated `state.json`, that is a record
-   write by the developer mid-loop, at a revision. Whose revision is it, and does the record move
-   one seat at a time through it? Not mine to rule; asked so the report can cite it.
-6. **C3's refusal shape**: required rows refused by schema, or absence rendered in words? I accept
-   either and fail only silence. Confirm that is the bar.
+   `set_handoff` runs before the commit (`end.md`'s own warning). **RULED: confirmed** — derived
+   from git at read time, failing closed with a "cannot name" line that **prints the bound it
+   searched**; a stored SHA would be rule 14.
+4. **Staleness shapes** (S): **RULED: confirmed, all four** — an explicit *current* line; *could not
+   compare* **with the reason** when `origin/master` is absent; *ahead* is not *behind*; no network
+   from the start pipeline — it compares to the local `origin/master` ref and never fetches.
+5. **The migrated record** (C2b): **RULED:** the migrated record is **the developer's record write
+   at the revision it bumps** — `schema_version` and `revision` 52 → 53 **in one write on the
+   developer's branch**, either with its end-of-build close-out or as its own op — and **nothing
+   else writes the record between the candidate and the merge**. The record moves one seat at a
+   time through it, and I read it with the candidate's build in my tree.
+6. **C3's refusal shape**: **RULED: confirmed** — schema refusal or absence rendered in words both
+   pass; only silence fails.
