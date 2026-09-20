@@ -246,3 +246,38 @@ quietly changed.
 says `LIMIT: refs/ and HEAD — …` instead of `refs/ only`. A check that names the channels it does not
 watch has to be re-read when it starts watching one more, and the shipped assertion was updated with
 it.
+
+---
+
+## 10. One observation that wants a gap id, recorded here so it is not lost waiting for one
+
+**Written at the seat roll, after the merge.** It is not given a `G-0xx` number here because the
+planner reserved `G-045` for the `update-ref -d` defect and broadcast that id to both seats; taking
+the next free number would have made every existing reference to `G-045` point at the wrong gap.
+That is the dangling-reference family this loop hit twice already, so the number is the planner's to
+assign at close-out and the text is here in the meantime.
+
+### The record's session number counts close-out writes, not sessions, and only the uuid shows it
+
+One Claude session at this seat — uuid `284d6280-e781-457c-b5fc-9819f0936602`, one `/start`, one
+context — wrote `end_session` **three times**: `n=67` at rev 48, `n=68` at rev 49, `n=69` at rev 50.
+
+**Not a slip.** A multi-candidate loop asks the developer to write the record at the end of each
+build, and `/end` writes one more at the seat roll, so the count is structurally per-write.
+`state.json` keeps only `last_session`, so 67 and 68 are already gone and nothing in the record
+reveals that three of its numbered sessions were one.
+
+**The consequence is arithmetic.** Any rate expressed *per session* — error entries per session,
+loops per session, the correction record's rows — is computed against a denominator that inflates
+whenever a loop needs more than one candidate, and inflates **most for the loops that went worst**.
+The uuid is the only field that could distinguish them and it is aggregated nowhere.
+
+A second place the counters disagree: the session log for all three writes is one file,
+`.agents/SESSIONS/Session_3.md` — this worktree's third local log, not the record's 69th session.
+
+**Recommended:** decide which thing the number counts and make the other derivable. Either
+`end_session` becomes idempotent per uuid (a second write for the same uuid updates its entry rather
+than taking a new number), or the record keeps a `sessions[]` list with uuids so a reader can
+collapse them, or the field is renamed to what it measures and a real session count is derived from
+distinct uuids. Until then, treat any per-session rate in a close-out as an upper bound on the
+denominator, and say so where it is quoted.
