@@ -179,7 +179,7 @@ store's problem is not what it holds. See `g-039-ruling.md`.
 
 ## 7. Held for Aaron
 
-- **Merge order:** `loop/15-hoh-runtime` (state rev 42), then `qa/loop-15-criteria` and
+- **Merge order:** `loop/15-hoh-runtime` (state rev 43; cite the rev, not the tip — the tip moves with every developer commit), then `qa/loop-15-criteria` and
   `qa/loop-15-report`, then the three open docs PRs, then this close-out. Then the `v0.41.0` tag on
   the merge commit — his to give.
 - **Whether the planner seat may push its own doc branches** — implicit since 2026-09-17, ratified
