@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 45,
+  "revision": 46,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1225,6 +1225,42 @@
       ],
       "since_session": 65,
       "status": "verified"
+    },
+    {
+      "id": "V-046",
+      "claim": "Acceptance for Loop 15 slice one was determined by a seat that neither set the objective nor built the candidate, from a frozen SHA, read-only, against criteria written before any candidate existed — and every observation in it is reproducible from tracked files by SHA, tree and time.",
+      "evidence": [
+        {
+          "type": "file",
+          "path": "docs/loops/loop-15-qa-criteria.md",
+          "observation": "committed at 24e33e5 before the first candidate (1c8e6ca) was handed over; amended only by planner rulings, each with its reason in the file"
+        },
+        {
+          "type": "file",
+          "path": "docs/loops/loop-15-qa-report.md",
+          "observation": "1086e55 not accepted: five defects each with the scratch-repo observation, line numbers and time; §1 is what could not be verified"
+        },
+        {
+          "type": "file",
+          "path": "docs/loops/loop-15-qa-report-2.md",
+          "observation": "4414bcc accepted on the criteria; all five defects re-observed fixed by probe against the built candidate; D6 found by the same probe family and returned to the planner rather than widened or omitted"
+        }
+      ],
+      "since_session": 66,
+      "status": "verified"
+    },
+    {
+      "id": "V-047",
+      "claim": "Rule 13 can be met in the QA tree without touching the main checkout: a per-checkout GitNexus index makes every /sync check run there, 0 skipped, so the checks run where the candidate actually is.",
+      "evidence": [
+        {
+          "type": "command",
+          "path": "open-brain/build/cli.js",
+          "observation": "sync --check in ~/Worktrees/sia-qa at 4414bcc after `gitnexus analyze` there: 26 passed, 4 warnings, 0 issues, 0 skipped; gitnexus-index [pass] indexed 4414bcc 2026-09-20T00:28:19Z; build-freshness [pass] against a build made in that tree. .gitnexus/ is gitignored and no tracked file changed."
+        }
+      ],
+      "since_session": 66,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -1493,6 +1529,13 @@
       "evidence": "Observed in 7 of 7 full-suite runs before the fix and 0 of 4 after, all on one Windows machine (Node v22.23.2). A planted failing assertion WAS still reported while the warning was present, which bounds the blast radius without clearing it. TWO THINGS NOT ESTABLISHED, recorded rather than smoothed over: whether the condition appears on CI or on another machine, and an unresolved second failing test file on one planted-failure run where exactly one failure was planted — a later run of the same plant failed exactly one. DELIBERATELY NOT ATTRIBUTED TO G-016 (known intermittent cross-test failure in state-writer.test.ts) because the file name was not captured. Full measurement in docs/loops/loop-15-developer-handoff.md at 9b3078f, Finding 1.",
       "recommended_update": "Decide whether CI should treat a vitest unhandled error distinctly from a test failure, and whether the harness suite needs its own pool or parallelism setting. Re-measure on CI and on a second machine before assuming the fix generalises. Note the diagnostic lesson attached to it: the first fix — cutting ~200 child processes — looked sufficient, cut 13s of wall time, and changed nothing; measure after each fix separately or you credit the wrong change and keep a false mechanism.",
       "opened_session": 65
+    },
+    {
+      "id": "G-043",
+      "what": "`gitnexus clean` exits 0 and deletes nothing unless `--force` is passed, printing only 'Run with --force to confirm deletion' to stdout. A chained `clean; analyze` reads as a clean rebuild while the old index was never removed. T-055's incremental-analyze failure (FTS index 'file_fts' is inconsistent … missing during delete) hit this seat on the merged master at dec2406 on the first analyze after the merge; the second analyze succeeded with nothing cleaned in between, so the 'clean' step contributed nothing and reported success.",
+      "evidence": "~/Worktrees/sia-qa, 2026-09-20T04:12–04:13Z: first `gitnexus analyze` exit 1 with the FTS error; `gitnexus clean` exit 0 with 'Run with --force to confirm deletion'; second `gitnexus analyze` exit 0, 18.6s, indexed dec2406; sync gitnexus-index [pass]. Knowledge entry 349 already records the FTS failure and `analyze --repair-fts` as the recovery, and did not surface (G-039 shape).",
+      "recommended_update": "Fold into T-055: any script or instruction that cleans the index must pass --force and assert the directory is gone before re-analysing; recovery is `analyze --repair-fts` per entry 349, not `clean`.",
+      "opened_session": 66
     }
   ],
   "decisions": [
@@ -1816,28 +1859,33 @@
     }
   ],
   "handoff": {
-    "pick_up": "SLICE TWO IS NEXT, with G-041 as its mechanical first repair, then Loop 14 (Aaron, 2026-09-20). Slice one shipped at v0.41.0 (master fdb7a8c, record rev 44) and the seat rolls after every complete loop, so this is a fresh developer session. START BY READING THE CODE, NOT THE RECORD: open-brain/src/harness/ is the whole runtime — runLoop and the stage loop in runtime.ts, the RoleSession interface and stubRoles in roles.ts, enforcement in workspace.ts, git helpers in git.ts, deterministic checks in checks.ts, the gate seam in gate.ts. The CLI entry is cli.ts, and cli.ts:167 is the line that hardcodes stubRoles() — that line is why slice one is safe with G-041 open, and slice two's first act changes it. docs/HOH-JEV.md is the loop contract and names slice two as the Jev client plus the plan and developer-done gates. The QA reports at docs/loops/loop-15-qa-report.md and -2.md are worth reading in full before touching enforcement; they found what the author and the code did not.",
+    "pick_up": "THIS IS THE QA SEAT'S HANDOFF; the developer's for slice two is preserved in the watch-outs below. Seats roll after every complete loop, so slice two gets a FRESH QA session, and its first act is to write criteria BEFORE a candidate exists — the file for slice one is docs/loops/loop-15-qa-criteria.md and its shape (one row per brief acceptance item: required, procedure with tree and command, what pass/fail/untested mean, blind spot; then preservation, scope fences, what cannot be verified, baseline reproduced, procedure order) is the shape to keep. The slice-two brief is docs/loops/loop-15-slice-2-brief.md (branch loop/15-slice-2-brief until merged); its §4 has nine rows and A7 is the one live Jev call, which is QA's to observe. Read both reports in full first: docs/loops/loop-15-qa-report.md (1086e55, not accepted) and docs/loops/loop-15-qa-report-2.md (4414bcc, accepted; D6 → G-041). The probe shapes that found D1–D6, described in the reports' §4/§5 and rerunnable from their descriptions: stub roles that act on the repository through a channel the observer does not watch — an uncommitted write (refused), a COMMIT during a stage (D1–D3), a HEAD move backwards to an ancestor (fails closed, tree left at base), a commit of only-permitted paths (refused), and a REF rewrite with HEAD untouched, `git tag -f loop-001-developer loop-001-base` (D6, open). Slice two's A1 is the mechanical refusal of that last one; see it red before believing it. Evaluate in ~/Worktrees/sia-qa, never the main checkout; the tree carries its own .gitnexus/ index so /sync runs 0 skipped — re-run `gitnexus analyze` at the candidate and record the analyzer's exit and indexed commit beside the build's.",
     "watch_out": [
       "G-041 IS SLICE TWO'S MANDATORY FIRST REPAIR AND IT GATES EVERYTHING ELSE. A role can force-move an existing tag: no commit, no file write, HEAD untouched, loop completes at exit 0. Design sketched and agreed: snapshot refs before each stage, compare after, refuse any change the runtime did not make — REFS, NOT TAGS, because watching tags alone leaves branches and update-ref. Then make the constraint mechanical rather than remembered: the runtime REFUSES any role it did not construct itself unless a ref-watch is present, one flag at runLoop entry, failing closed, SEEN RED BEFORE the first real role is wired. That refusal is slice two's A1.",
       "EVERY ENFORCEMENT CHANNEL SO FAR WAS FOUND ONLY AFTER SOMETHING USED IT — working tree, then commits, then refs. The list is not known to be complete. Before adding a check, ask what ELSE reaches the repository, and state the limit in the check's own output.",
       "COMMITTING IS HOW A REAL SESSION LEAVES ITS WORK. Slice one's tests all used stubs that wrote without committing, so the mainline path was the untested one. When the roles become real sessions, the 'adversarial' case and the normal case are the same case.",
       "THE SUITE CAN EXIT 1 WHILE PRINTING ALL TESTS PASSED (G-042). A vitest unhandled error fails the run without failing a test, it is load-dependent, and it is uncharacterised on CI. Read the exit code AND the Errors line. Never read a status through a pipe — `cmd | tail; echo $?` reports tail's.",
       "T-156 NEEDS FIXTURES, NOT A PATTERN TWEAK. The scans it covers must be validated against a planted POSITIVE and a planted NEAR-MISS that must not fire — a sentence forbidding a thing is textually identical to an instance of it. The two harness scans that hit this are in tests/harness/git.test.ts and checks.test.ts; the unexamined repo ones are command-names and command-tool-names.",
-      "TYPESAFE_API_KEY IS READ FROM THE ENVIRONMENT AND NEVER WRITTEN TO A FILE, A PROMPT, A PAYLOAD LOG, AN ARTIFACT OR A COMMIT. gate.ts already redacts by live value AND by field name; keep both, because value-matching alone reports a clean payload when the variable is unset.",
+      "TYPESAFE_API_KEY IS READ FROM THE ENVIRONMENT AND NEVER WRITTEN TO A FILE, A PROMPT, A PAYLOAD LOG, AN ARTIFACT OR A COMMIT. gate.ts already redacts by live value AND by field name; keep both, because value-matching alone reports a clean payload when the variable is unset. For QA: a key-absence count is vacuous when nothing put the value in a payload — in slice one the REDACTED count was 0 too, so value redaction was never exercised by a run.",
       "THE MAIN CHECKOUT IS NOT A QA FIXTURE. Both session hooks and the MCP server run from its build. QA runs in the QA tree; seat worktrees are detached at rest, returned with `git checkout --detach origin/master`.",
-      "NOTHING IS PUSHED FROM THIS SEAT. A push needs Aaron's word for that push; a peer relay is not his approval."
+      "NOTHING IS PUSHED FROM THIS SEAT. A push needs Aaron's word for that push; a peer relay is not his approval. The planner pushes QA branches from the shared object store by the SHA the QA seat reports, and records that authority in the PR body.",
+      "A COMMAND ASSERTED BY NAME HAS NOT BEEN RUN. D4 lived for two candidates behind a test that matched the default command's name against /^npm(\\.cmd)?$/; the README's own command run verbatim found it. Run the documented first command as a stranger would, on the platform the repo is developed on.",
+      "THE CANDIDATE IS FROZEN AND IT WILL MOVE. 1c8e6ca was superseded 7 minutes after hand-over by a planner ruling, mid-evaluation. Under criteria §1 that voids everything; record the void observations as void rather than deleting them, and restart on the new SHA. Verify identity before the first observation and after the last, every time.",
+      "GATE THE COMMIT ON THE CHECK'S EXIT, READ INTO A VARIABLE. `check; commit` commits regardless; this seat did it once pre-candidate. Run the check to a file, `rc=$?`, commit inside `if [ \"$rc\" -eq 0 ]`. build-freshness fires correctly after every docs commit on a branch, so rebuild before the gate rather than reading the issue as noise.",
+      "`gitnexus clean` DOES NOTHING WITHOUT --force AND EXITS 0. Recovery from the T-055 FTS corruption is `analyze --repair-fts` (knowledge entry 349), then analyze again."
     ],
     "open_questions": [
       "ONE ISSUE IS OPEN IN AARON'S MAIN CHECKOUT AND NOWHERE ELSE: .agents/SYSTEM/PRD.md still names a version older than 0.41.0, so sync reports 1 issue there and 0 in every other tree, because the file is untracked and exists only in his. The fix is the auto-fix path, `node open-brain/build/cli.js sync` run in that tree. I asked Aaron whether to run it and did not get an answer before the seat rolled; it is unresolved, not forgotten, and it will block the next /sync-before-commit in the main tree.",
-      "DOES THE MEMORY HALF GET USED AT ALL? G-039, measured three times in session 65: entry 299, developer.md and shared.md each described a defect that was then committed, all three in context, none fired. Ruled that the fix must be a DETERMINISTIC trigger on an observable condition, with the unconditional-read shape as the other candidate. Not yet sequenced.",
+      "DOES THE MEMORY HALF GET USED AT ALL? G-039, measured three times in session 65 and once more in session 66: knowledge entry 349 recorded the exact FTS failure this seat hit on 2026-09-20 and its recovery command, and nothing surfaced it; ob_recalled reported nothing recalled for the whole session. Ruled that the fix must be a DETERMINISTIC trigger on an observable condition, with the unconditional-read shape as the other candidate. Not yet sequenced.",
       "Do command-names and command-tool-names share the prohibition-vs-instance flaw? T-156 covers it; nobody has looked.",
-      "Is the vitest worker-timeout condition present on CI or another machine? One machine, load-dependent."
+      "Is the vitest worker-timeout condition present on CI or another machine? One machine, load-dependent; three full-suite runs in the QA tree (805, 807, 823) showed none.",
+      "What ELSE reaches the repository besides the working tree, commits and refs? Hooks, submodules, the index (`git add` without commit is seen as working-tree change; `git update-index --assume-unchanged` is not), config, and reflog have not been probed. G-041's ref-watch closes one more channel; the list is still not known to be complete."
     ],
-    "session": 65
+    "session": 66
   },
   "last_session": {
-    "n": 65,
+    "n": 66,
     "date": "2026-09-20",
-    "uuid": "dbdce9b2-cd52-4ddd-81db-7105c4be4cd9"
+    "uuid": "9730e33b-481e-4800-8263-670d3410135c"
   }
 }
