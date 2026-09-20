@@ -22,6 +22,7 @@ import {
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
+import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
@@ -206,6 +207,17 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     });
 
     const lines: string[] = [];
+
+    // FIRST, before the mode, the version, the drift line or the record itself.
+    // A seat reading a stale tree's record needs to know that before it reads
+    // any of it — on 2026-09-20 one read a rev-50 record as current and reported
+    // four false claims about the project, with every other instrument green.
+    // The line names `origin/master` and disclaims drift in its own words, so a
+    // reader seeing it above `Drift: none` cannot take either as the other's
+    // confirmation. See pipelines/session-start/tree-currency.ts.
+    lines.push(...describeTreeCurrency(projectRoot).lines);
+    lines.push("");
+
     lines.push(`Session Start — ${result.state.mode} mode`);
     lines.push(`Project: v${result.state.version}`);
 

@@ -14,6 +14,7 @@ import { randomUUID } from "crypto";
 import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeDerivedArtifacts } from "./pipelines/session-start/derived-artifacts.js";
+import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
 import {
   resolveSessionId,
   writeActiveSession,
@@ -60,6 +61,17 @@ if (hasAgents) {
   lines.push(`Project detected: ${cwd} (.agents/ found${hasMeta ? ", META mode" : ""})`);
 } else {
   lines.push("No .agents/ detected — general session.");
+}
+
+// Tree currency, printed as early as the project line and BEFORE the seat
+// identity or anything read from the record. A stale checkout answers every
+// other question correctly about a version of the project that is no longer the
+// current one, so a seat must learn it first rather than last. Same function
+// ob_start calls — one implementation, three surfaces, for the reason
+// derived-artifacts.ts states about itself: two copies of a freshness rule
+// drift, and the drift is silent.
+if (hasAgents) {
+  for (const line of describeTreeCurrency(cwd).lines) lines.push(line);
 }
 
 // Session UUID — emit so /start can pick it up and call ob_set_session.
