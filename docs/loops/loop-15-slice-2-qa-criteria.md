@@ -147,8 +147,23 @@ untested**, and **blind spot** (what the procedure cannot see).
   `git log -p --all`, and over every log the run wrote, after confirming the same grep counts a
   known-present string in the same set. Also `git grep -n TYPESAFE_API_KEY <SHA>` — every hit is a
   read of the variable's *name*, never a value.
+- **The inherited environment has the key (planner, 2026-09-20, from Developer 30):** it was set
+  with `setx`, so it is in **every** session's environment on this machine — mine, the
+  developer's, the planner's, and every child process that inherits. Consequences, recorded so
+  nobody inherits the trap: (a) my "unset" run strips it **explicitly** (`env -u`) and the report
+  first shows it was present in the parent (`[ -n ]` → `set`, never the value); (b) the **shipped
+  no-key test** must construct its environment without the variable explicitly — an env object
+  built without it, or a copy with it deleted — not assume the inherited environment lacks it. A
+  test that assumes so passes vacuously on CI and fails on this machine; I run it here, where the
+  key is present, and read what it does. If the transport reads `process.env` at call time
+  (ruling 3), I note how the test isolates that without leaving `process.env` mutated for the
+  rest of the suite. (c) The developer made one live call from its seat while demonstrating the
+  no-key path, for exactly this reason (Developer 29); it is not evidence for A7 and is not
+  offered as such. The developer's report that the key is absent from repo, artifacts, commits
+  and run log after that call is a claim I re-observe under A3 and A7, not one I take.
 - **Pass:** unset → exit non-zero, stderr names `TYPESAFE_API_KEY`, no `G_*.json` with `sent:
-  true`, no request built (white-box ordering); set → the placeholder count is **0** everywhere
+  true`, no request built (white-box ordering); the no-key test strips the variable explicitly
+  and passes on this machine with the key present; set → the placeholder count is **0** everywhere
   walked, and the shipped test asserts on the iteration directory and the log and is seen red.
   **Fail:** a failure that does not name the variable; a `GateUnavailable` raised after a request
   object exists; the key read from a file, config or flag; a non-zero count anywhere; a test that
@@ -264,6 +279,11 @@ untested**, and **blind spot** (what the procedure cannot see).
   count non-zero anywhere; more than two requests; a model older than `jev-1.13.0`. **Untested:**
   the key is absent from my environment, the API returns a non-`200` (recorded with its class — that
   is A4's evidence, not A7's), or a prior row failed.
+- **The developer's wire observation is not this row's evidence** (planner, 2026-09-20): the
+  developer saw, on its own accidental live call, `score` criteria as a list, `choice` criteria
+  as a map, `legend` as an object, `confidence` on `choice` and `score` and none on `noul`. I
+  record what the wire shows me on the candidate; where the two disagree, the developer's is the
+  one to distrust, and the disagreement is reported rather than arbitrated.
 - **Blind spot:** one call is one sample of latency, cost and answer distribution — a
   characterisation of nothing (guide §9). Whether the answers are *right* is not observable
   (T-155, later).
