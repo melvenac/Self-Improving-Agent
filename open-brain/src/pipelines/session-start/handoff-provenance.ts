@@ -104,28 +104,78 @@ export function findHandoffCommit(
   return { ...base, commit: commits[lastEqual].sha, date: commits[lastEqual].date ?? null, searched, note: null };
 }
 
-/** That seat's handoff as committed at `ref`, or null when absent/unparseable there. */
+/** That seat's handoff as committed at `ref`, or null when absent/unreadable there. */
 function handoffAt(projectRoot: string, ref: string, seat: Seat): Handoff | null {
   const text = gitOut(projectRoot, ["show", `${ref}:${STATE_REL}`]);
   if (text === null) return null;
   const parsed = parseState(text);
-  if (!parsed.ok) {
-    // An OLDER revision may predate schema v2 entirely — it carried a single
-    // `handoff` with no seat. That is not an error to report; it is the boundary
-    // of what can be compared, and the walk simply stops there.
-    return null;
-  }
-  return parsed.data.handoffs.find((h) => h.seat === seat) ?? null;
+  if (parsed.ok) return parsed.data.handoffs.find((h) => h.seat === seat) ?? null;
+  return v1HandoffAt(text);
 }
 
 /**
- * A stable string for comparison. Key order comes from the file, which
- * `serializeState` writes canonically — but a hand-edited or differently-ordered
- * copy must not read as a different handoff, so the keys are sorted here rather
- * than trusted.
+ * A pre-v2 revision carried ONE `handoff` and did not say whose it was.
+ *
+ * Reading it matters because the history this walk searches crosses the
+ * migration. Stopping at that boundary would make the migration commit the
+ * answer for every seat — which is exactly the wrong answer, since the real
+ * close-out is older than it.
+ *
+ * The single v1 handoff is returned WITHOUT a seat claim, and `stable()`
+ * compares content only, so it matches when it is literally the same handoff and
+ * not otherwise. A v1 record cannot tell us whose it was; what it can tell us is
+ * whether these are the same words, which is the question being asked.
+ *
+ * Deliberately hand-parsed rather than validated: this is archaeology on a
+ * retired shape, and demanding that an old revision satisfy any current schema
+ * would defeat the point.
+ */
+function v1HandoffAt(text: string): Handoff | null {
+  try {
+    const raw = JSON.parse(text) as { handoff?: unknown };
+    const h = raw.handoff as Record<string, unknown> | undefined;
+    if (!h || typeof h.pick_up !== "string" || !Array.isArray(h.watch_out) || !Array.isArray(h.open_questions)) {
+      return null;
+    }
+    return {
+      seat: "developer",
+      pick_up: h.pick_up,
+      watch_out: h.watch_out as string[],
+      open_questions: h.open_questions as string[],
+      session: typeof h.session === "number" ? h.session : 0,
+      loop_state: null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * A stable string for comparison, over the handoff's CONTENT only.
+ *
+ * `seat` is excluded because it is the search key and constant by construction.
+ * `loop_state` is excluded because it is metadata about the loop rather than the
+ * handoff a reader is being pointed at.
+ *
+ * ## Why content and not the whole entry, found by running it
+ *
+ * The v1 → v2 migration added `seat` and `loop_state` to every entry. Comparing
+ * whole entries therefore made the MIGRATION COMMIT the "close-out" for every
+ * seat — the greeting named `de4674d`, a developer commit, as the QA seat's
+ * close-out. That is accurate to "where this entry last changed" and wrong for
+ * the question actually being asked, which is "where did this seat write this".
+ *
+ * Any future schema change would do the same. Comparing the fields that carry
+ * the seat's words means a migration that reshapes the container does not
+ * reattribute the contents.
  */
 function stable(h: Handoff): string {
-  return JSON.stringify(h, Object.keys(h).sort());
+  return JSON.stringify({
+    pick_up: h.pick_up,
+    watch_out: h.watch_out,
+    open_questions: h.open_questions,
+    session: h.session,
+  });
 }
 
 /** execFileSync with an args array: no shell, so `ref:path` reaches git verbatim. */
