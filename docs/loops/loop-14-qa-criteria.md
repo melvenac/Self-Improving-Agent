@@ -547,6 +547,13 @@ other six items still sort as in the report's §3.5 table.
 ### Returned to the planner with this amendment
 
 7. **R3's absent-file case:** I keep the prose regime for an absent `state.json` and refuse only a
-   present file with an unknown version. Confirm, or rule that absent also refuses.
-8. **R4's `{}` case:** a well-formed payload with no `session_id` — refuse, or generate as today?
-   Recorded either way unless ruled.
+   present file with an unknown version. **RULED: confirmed** — an absent `state.json` keeps the
+   general-mode prose regime; only a present file with an unknown `schema_version` refuses.
+8. **R4's `{}` case:** a well-formed payload with no `session_id`. **RULED, and it is scored:** the
+   hook **writes NOTHING to the slot** — generating an id and stamping it over the checkout's
+   identity is the defect being numbered, whatever the payload's shape. The greeting may still print
+   identity read-only. **Refuse-and-write-nothing and greet-and-write-nothing both pass; a generated
+   uuid in the slot fails.** Procedure added to R4: (d) `{}` on stdin with the scratch
+   `active-session.json` hashed before and after — byte-identical is the pass condition, whatever
+   the exit code and whatever is printed; a slot with `source: "generated"` (the shape observed at
+   `7e1c041`, report §6 F4) is the fail.
