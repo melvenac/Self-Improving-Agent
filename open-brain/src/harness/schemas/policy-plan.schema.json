@@ -29,6 +29,9 @@
       "minimum": 0,
       "maximum": 1
     },
+    "addresses_top_failures_requires_prior_failures": {
+      "type": "boolean"
+    },
     "treat_system_as_feature_complete": {
       "type": "boolean"
     },
@@ -46,6 +49,7 @@
     "scope_size_reject_confidence_min",
     "preserves_validated_min",
     "addresses_top_failures_min",
+    "addresses_top_failures_requires_prior_failures",
     "treat_system_as_feature_complete",
     "stop_ship_requires_deterministic_failure",
     "stop_ship_requires_qa_history"

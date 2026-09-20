@@ -2,6 +2,20 @@
 
 **From:** Forge (developer seat, session 3 of this worktree; record session after 66) · **Date:** 2026-09-20
 **Branch:** `loop/15-slice-2-gates` · **Base:** `origin/master` at `293cddb`, record rev 47
+> ## SECOND CANDIDATE — read this section first
+>
+> `b4194a9` was **not accepted**. QA's report is at `8f2c547` on
+> `qa/loop-15-slice-2-report`: seven rows pass, **A6 fails on its second half**, A7 is untested by
+> rule, and three defects (`D1`, `D2`, `D3`) of the ref-and-provenance class are recorded.
+>
+> The six ruled repairs are in this branch. **All six were seen red first**, in one commit
+> (`a9ffe26`): *6 failed | 217 passed (223), exit 1*, plus `policies.test.ts` failing to load because
+> the module the widened scan needs did not exist yet. §9 below has the row-by-row account.
+>
+> Everything in §1–§8 describes the first candidate and still holds except where §9 supersedes it.
+> **§5's two error entries stand unchanged** — the live call and the key in the transcript are facts
+> about this seat, not about a candidate.
+
 **Record rev:** 48 — **cite the branch by this, not by its tip.**
 **Candidate SHA:** the **tip** of `loop/15-slice-2-gates` at hand-off, reported in the hand-off
 message. It is deliberately *not* written here: the last two acts of this build are the record write
@@ -183,3 +197,52 @@ that is a different fact and this one does not cover it.
 Nothing was pushed from this seat and no PR was opened. A push needs Aaron's word for that push; a
 peer relay is not his approval. The branch exists in this worktree's object store, which the other
 worktrees share, so the planner can reach the SHA without a push.
+
+
+---
+
+## 9. The second candidate — what changed, and what it was red on
+
+**Red first, in `a9ffe26`, before any mechanism existed:** `6 failed | 217 passed (223)`, exit 1 read
+from the process, with `policies.test.ts` failing to LOAD (`Cannot find module './threshold-scan.js'`)
+because the A6 and F5 rows live in that suite and the scan module was not written yet.
+
+| QA's finding | What it was red on | The repair |
+| --- | --- | --- |
+| **D1** | `GitFailed` escaped `runLoop`: no result, no `FAILED.md`, HEAD naming a branch the watch had just deleted | `HEAD` is part of the snapshot and is put back **before anything else reads it**; a `symbolic-ref` switch is itself a reported breach |
+| **D2** | rollback refused — *"not an ancestor of HEAD … Recover by hand"* — leaving `main` at the pre-loop commit and the plan commit unreachable | the watch restores the deferred ref with its own compare-and-swap; the `reset --hard` that follows is to a commit that is an ancestor again |
+| **D2b** | the SHIPPED test accepted that outcome: `/moved HEAD|could not be rolled back/i` | tightened; the second alternative is now explicitly excluded |
+| **D3** | `class Evil extends StubPlanner` accepted as runtime-constructed | provenance is `new.target`, the exact class, not the constructor chain |
+| **A6** | scope, not detector: a `0.7` in a `gate.ts` prompt left 234/234 green | the scan covers `gate.ts` and `runtime.ts` too; its targets are asserted as data; QA's own plant is the positive fixture |
+| **F3** | the no-key refusal came after the planner stage, leaving `loop-001-base` behind | checked at preflight, beside policy readability |
+| **F5** | `addresses_top_failures` thresholded with `prior_failures: []` | applicability is data in `plan-gate.json`; the done gate is now reachable live with stub roles |
+| **F2** | the header claimed a `fetch` guard the file did not contain | the guard is installed, and its own test was red without it |
+
+**`F1` is not repaired, deliberately.** `git.test.ts`'s scan fires on a comment naming the call. QA
+called that *"safe direction; inconsistent"*. Making it consistent with `checks.test.ts` means
+stripping comments — the **less** strict side — so it is left as it is and named here rather than
+quietly changed.
+
+### What I did NOT do, and why
+
+- **No version bump.** `0.42.0` was never merged or tagged, so the second candidate is still
+  `0.42.0`; the CHANGELOG entry gained a *"Repaired after QA rejected the first candidate"* section
+  rather than a new version.
+- **No live call.** Still none from this seat, and A7 is still QA's. The done gate is now reachable
+  live with stub roles, which is what F5 was about.
+- **`G-041` not closed in the record.** Closing a gap splices it out with no tombstone (`G-010`);
+  that is the planner's write, at close-out.
+
+### Measurements at the second candidate — this tree, exit codes read from the process
+
+| What | Result |
+| --- | --- |
+| `npx tsc --noEmit` | exit 0 |
+| `npx vitest run tests/harness` | **248 passed, 12 files, exit 0** (was 234) |
+| `npx vitest run` | **896 passed, 60 files, exit 0**, 117s, **0 lines matching `Unhandled`/`vitest-worker`/`timed out`**, nothing else running |
+| `node open-brain/build/cli.js sync --check` | filled at the commit gate below |
+
+**One consequence QA should expect rather than read as drift:** the ref verdict's own LIMIT line now
+says `LIMIT: refs/ and HEAD — …` instead of `refs/ only`. A check that names the channels it does not
+watch has to be re-read when it starts watching one more, and the shipped assertion was updated with
+it.

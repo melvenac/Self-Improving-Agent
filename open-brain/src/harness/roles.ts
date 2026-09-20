@@ -76,13 +76,28 @@ export interface RoleSession {
  * importing a marker, not by copying a symbol, not by setting a property.
  *
  * **Every future real-role constructor registers itself the same way**, in this
- * module. A role built anywhere else is foreign, which is the intended answer.
+ * module, passing its OWN class as the expected `new.target`. A role built
+ * anywhere else — or a subclass of one built here — is foreign, which is the
+ * intended answer.
  * ------------------------------------------------------------------------- */
 
 const runtimeConstructed = new WeakSet<object>();
 
-/** Record a role as one this module built. Deliberately NOT exported. */
-function registerRuntimeRole(session: RoleSession): void {
+/**
+ * Record a role as one this module built — **only when the class being
+ * constructed is the one calling.**
+ *
+ * `newTarget` is `new.target` from the constructor. QA's D3: without this
+ * check, `class Evil extends StubPlanner { run() { … } }` calls `super()`, the
+ * registration runs, and a role whose `run()` is entirely foreign is
+ * runtime-constructed as far as the mechanism can tell. The doc comment was
+ * literally true — the constructor DID run in this file — and the property it
+ * was defending was defeated by inheritance.
+ *
+ * Provenance is the exact class, not the constructor chain.
+ */
+function registerRuntimeRole(session: RoleSession, newTarget: unknown, expected: unknown): void {
+  if (newTarget !== expected) return;
   runtimeConstructed.add(session);
 }
 
@@ -129,7 +144,7 @@ export function makeWriter(repoRoot: string, allow: Allowlist, role: RoleName) {
 export class StubPlanner implements RoleSession {
   readonly role = "planner" as const;
   constructor(private readonly overrides: Partial<Plan> = {}) {
-    registerRuntimeRole(this);
+    registerRuntimeRole(this, new.target, StubPlanner);
   }
 
   run(ctx: RoleContext): unknown {
@@ -153,7 +168,7 @@ export class StubPlanner implements RoleSession {
 export class StubDeveloper implements RoleSession {
   readonly role = "developer" as const;
   constructor(private readonly writes: ReadonlyArray<{ path: string; content: string }> = []) {
-    registerRuntimeRole(this);
+    registerRuntimeRole(this, new.target, StubDeveloper);
   }
 
   run(ctx: RoleContext): unknown {
@@ -182,7 +197,7 @@ export class StubDeveloper implements RoleSession {
 export class StubQa implements RoleSession {
   readonly role = "qa" as const;
   constructor(private readonly overrides: Record<string, unknown> = {}) {
-    registerRuntimeRole(this);
+    registerRuntimeRole(this, new.target, StubQa);
   }
 
   run(ctx: RoleContext): unknown {

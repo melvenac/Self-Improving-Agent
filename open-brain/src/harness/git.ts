@@ -292,6 +292,28 @@ export function symbolicHeadRef(cwd: string): string | null {
 }
 
 /**
+ * Point `HEAD` at a branch ref, without touching the index or the worktree.
+ *
+ * `git symbolic-ref` and not `git checkout`: the runtime is undoing a role's
+ * change to what HEAD names, not moving the tree. `checkout` would do both and
+ * the second half is not ours to do here.
+ */
+export function setSymbolicHead(cwd: string, ref: string): void {
+  git(cwd, ["symbolic-ref", "HEAD", ref]);
+}
+
+/**
+ * Point `HEAD` directly at a commit, detaching it, without touching the index
+ * or the worktree.
+ *
+ * `--no-deref` is the whole point: without it this would move whatever branch
+ * HEAD currently names, which is the opposite of detaching.
+ */
+export function detachHeadTo(cwd: string, sha: string): void {
+  git(cwd, ["update-ref", "--no-deref", "HEAD", sha]);
+}
+
+/**
  * Point a ref at `sha`, refusing unless it currently points at `expectedOld`.
  *
  * The old-value argument is git's own compare-and-swap. Without it a restore

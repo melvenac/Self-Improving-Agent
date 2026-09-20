@@ -87,6 +87,18 @@ export const PlanGatePolicySchema = z
     preserves_validated_min: probability,
     addresses_top_failures_min: probability,
     /**
+     * Whether `addresses_top_failures` is judged at all when there are no
+     * prior failures to address.
+     *
+     * A threshold on a question with no referent is not a measurement. QA's F5:
+     * the developer's accidental live call rejected the stub plan on
+     * `addresses_top_failures 0.32` with `prior_failures: []` — which on the
+     * CLI path makes the done gate unreachable and would leave A7 observing one
+     * gate instead of two. A switch rather than a number, and it is data like
+     * every other value here.
+     */
+    addresses_top_failures_requires_prior_failures: z.boolean(),
+    /**
      * §4 rejects `repair_only` "unless S is already feature-complete", which is
      * a fact about the system and not about the plan. It is a switch rather
      * than a threshold, and it defaults to the rejecting side.
@@ -219,6 +231,14 @@ export interface GateDecision {
   applied: Record<string, number | boolean>;
   /** Questions the answer set did not contain. Any one of these forces a reject. */
   missing: string[];
+  /**
+   * Questions whose rule did not apply, with no bearing on the verdict.
+   *
+   * Reported rather than silently skipped: a rule that did not fire and a rule
+   * that passed are different facts, and a reader of the artifact must not have
+   * to infer which happened.
+   */
+  notApplicable: string[];
 }
 
 /** Pull one typed answer out of the map, or null when it is absent or malformed. */
@@ -239,6 +259,13 @@ export interface PlanGateContext {
   deterministicFailure: boolean;
   /** True when QA history supports a stop-ship. Never inferred from the gate. */
   qaHistorySupportsStopShip: boolean;
+  /**
+   * Whether the state sent to the gate carried any prior failures.
+   *
+   * Read from the state the runtime assembled, never from the gate's answer —
+   * *do not ask a model anything code can compute.*
+   */
+  hasPriorFailures: boolean;
 }
 
 /**
@@ -255,12 +282,14 @@ export function decidePlanGate(
 ): GateDecision {
   const reasons: string[] = [];
   const missing: string[] = [];
+  const notApplicable: string[] = [];
   const applied: Record<string, number | boolean> = {
     has_observable_acceptance_min: policy.has_observable_acceptance_min,
     scope_size_reject_at_or_above: policy.scope_size_reject_at_or_above,
     scope_size_reject_confidence_min: policy.scope_size_reject_confidence_min,
     preserves_validated_min: policy.preserves_validated_min,
     addresses_top_failures_min: policy.addresses_top_failures_min,
+    addresses_top_failures_requires_prior_failures: policy.addresses_top_failures_requires_prior_failures,
     treat_system_as_feature_complete: policy.treat_system_as_feature_complete,
     stop_ship_requires_deterministic_failure: policy.stop_ship_requires_deterministic_failure,
     stop_ship_requires_qa_history: policy.stop_ship_requires_qa_history,
@@ -277,7 +306,13 @@ export function decidePlanGate(
 
   noul("has_observable_acceptance", policy.has_observable_acceptance_min);
   noul("preserves_validated", policy.preserves_validated_min);
-  noul("addresses_top_failures", policy.addresses_top_failures_min);
+  if (policy.addresses_top_failures_requires_prior_failures && !ctx.hasPriorFailures) {
+    // Asked, so the answer is on the record; not judged, because there is
+    // nothing for it to be about.
+    notApplicable.push("addresses_top_failures");
+  } else {
+    noul("addresses_top_failures", policy.addresses_top_failures_min);
+  }
 
   const scope = typed(answers, "scope_size", ScoreAnswerSchema);
   // A score with no confidence is MISSING, not a score with low confidence.
@@ -322,7 +357,7 @@ export function decidePlanGate(
   }
 
   const verdict: GateVerdict = halt ? "halt" : reasons.length > 0 ? "reject" : "proceed";
-  return { gate: "plan", verdict, reasons, applied, missing };
+  return { gate: "plan", verdict, reasons, applied, missing, notApplicable };
 }
 
 export interface DoneGateContext {
@@ -403,5 +438,6 @@ export function decideDoneGate(
     reasons,
     applied,
     missing,
+    notApplicable: [],
   };
 }

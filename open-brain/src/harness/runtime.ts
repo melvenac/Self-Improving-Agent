@@ -99,6 +99,7 @@ import {
   DryRunTransport,
   DONE_GATE_QUESTIONS,
   GateCallFailed,
+  JEV_KEY_VAR,
   JevTransport,
   PLAN_GATE_QUESTIONS,
   redact,
@@ -499,6 +500,28 @@ async function runLoopInner(config: LoopConfig, refWatchEnabled: boolean): Promi
     );
   }
 
+  // QA's F3. A missing credential is the same KIND of fact as an unreadable
+  // policy file — a precondition of running live that is knowable before any
+  // work starts — and it was being discovered at the planner gate, after
+  // loop-001-base had been created in the target repository. Checked here, in
+  // the same place, for the same reason.
+  //
+  // Only when the runtime builds its own transport: an injected one is a test's
+  // or a caller's, and it has no key to look for.
+  if (gateMode === "live" && config.transport === undefined) {
+    const key = env[JEV_KEY_VAR];
+    if (typeof key !== "string" || key.trim() === "") {
+      return fail(
+        "preflight",
+        "gate-unavailable",
+        `gate mode is "live" and ${JEV_KEY_VAR} is not set in this process's environment. It is read ` +
+          `from the environment only — never from a file in this repo, a config key, a CLI flag or a ` +
+          `prompt. Set it in the shell that runs the harness, or use --gate dry-run. Refused before ` +
+          `the loop tagged or wrote anything.`,
+      );
+    }
+  }
+
   const n = loopNumber(loop);
   const baseTag = `loop-${n}-base`;
   const developerTag = `loop-${n}-developer`;
@@ -566,11 +589,26 @@ async function runLoopInner(config: LoopConfig, refWatchEnabled: boolean): Promi
      * path verdict computed first would be measured against a HEAD the role
      * chose.
      */
-    const closeRefWindow = (): { ok: true; verdict: RefVerdict | null } | { ok: false; reason: string } => {
-      if (!refWatch) return { ok: true, verdict: null };
+    let refVerdict: RefVerdict | null = null;
+
+    /**
+     * Close the ref window — READ ONLY — and put HEAD back before anything
+     * else looks at it.
+     *
+     * The ordering is QA's D1. A role that runs `git checkout -b evil` leaves
+     * HEAD naming a branch the watch is about to delete; deleting it first
+     * makes `git rev-parse HEAD` fail, and `enforceAllowlist` reads HEAD as
+     * its first act. Restoring HEAD moves nothing but HEAD, so the allowlist
+     * still sees every path the stage touched.
+     *
+     * Nothing else is restored here: the verdict has to be computed against
+     * the repository the ROLE left, and a backwards move of the checked-out
+     * branch is a fact `enforceAllowlist` must still see.
+     */
+    const closeRefWindow = (): { verdict: RefVerdict | null; headNote: string } => {
+      if (!refWatch) return { verdict: null, headNote: "" };
       const verdict = refWatch.compare();
-      if (verdict.ok) return { ok: true, verdict };
-      return { ok: false, reason: `${verdict.message}${refWatch.restore(verdict)}` };
+      return { verdict, headNote: refWatch.restoreHead() };
     };
 
     /**
@@ -581,17 +619,24 @@ async function runLoopInner(config: LoopConfig, refWatchEnabled: boolean): Promi
      * ROGUE content rather than the original.
      */
     const rollBack = (verdict: ReturnType<typeof enforceAllowlist>): string => {
-      if (verdict.headMoved) {
+      // Refs first, HEAD included. After this the checked-out branch is back
+      // where the stage found it, so `resetHardTo` below is resetting to a
+      // commit that IS an ancestor of HEAD — which is why QA's D2 ended in
+      // "recover by hand" without it.
+      const refNote = refWatch && refVerdict ? refWatch.restore(refVerdict) : "";
+      const refMoved = refVerdict !== null && (refVerdict.unauthored.length > 0 || refVerdict.deferredDelta !== null);
+
+      if (verdict.headMoved || refMoved) {
         try {
           resetHardTo(repoRoot, stageBase);
-          return ` The rogue commit was discarded and the tree reset to ${stageBase.slice(0, 12)}.`;
+          return `${refNote} The stage's work was discarded and the tree reset to ${stageBase.slice(0, 12)}.`;
         } catch (err) {
-          return ` THE TREE COULD NOT BE ROLLED BACK: ${(err as Error).message} Recover by hand before rerunning.`;
+          return `${refNote} THE TREE COULD NOT BE ROLLED BACK: ${(err as Error).message} Recover by hand before rerunning.`;
         }
       }
       const bad = [...verdict.violations, ...verdict.unsafe.map((u) => u.path)];
       if (bad.length > 0) revertPaths(repoRoot, bad);
-      return " The offending paths were reverted.";
+      return `${refNote} The offending paths were reverted.`;
     };
 
     let deliverable: unknown;
@@ -603,28 +648,36 @@ async function runLoopInner(config: LoopConfig, refWatchEnabled: boolean): Promi
       const thrownCode: FailureCode = err instanceof WriteRefused ? "allowlist-violation" : "role-threw";
       // A role that threw may still have written a ref on its way out, and a
       // thrown error is not a reason to stop looking at the other channels.
-      const refAfterThrow = closeRefWindow();
+      const closed = closeRefWindow();
+      refVerdict = closed.verdict;
+      const headNote = closed.headNote;
       const verdictAfterThrow = enforceAllowlist(repoRoot, allow, stageBase);
-      const undone = verdictAfterThrow.ok ? "" : rollBack(verdictAfterThrow);
-      if (!refAfterThrow.ok) {
+      const refBad = refVerdict !== null && !refVerdict.ok;
+      const undone = verdictAfterThrow.ok && !refBad ? "" : rollBack(verdictAfterThrow);
+      if (refBad) {
         return {
           ok: false,
           code: "stage-changed-ref",
-          reason: `${roleName} stage: ${refAfterThrow.reason}${undone} The stage also threw: ${(err as Error).message}`,
+          reason: `${roleName} stage: ${refVerdict!.message}${headNote}${undone} The stage also threw: ${(err as Error).message}`,
         };
       }
-      return { ok: false, code: thrownCode, reason: `${roleName} stage: ${(err as Error).message}${undone}` };
+      return { ok: false, code: thrownCode, reason: `${roleName} stage: ${(err as Error).message}${headNote}${undone}` };
     }
 
-    const refClose = closeRefWindow();
-    if (!refClose.ok) {
-      const verdictAfterRef = enforceAllowlist(repoRoot, allow, stageBase);
-      const undone = verdictAfterRef.ok ? "" : rollBack(verdictAfterRef);
-      return { ok: false, code: "stage-changed-ref", reason: `${roleName} was refused, not warned. ${refClose.reason}${undone}` };
-    }
-    if (refClose.verdict) log(`  ${roleName} refs: ${refClose.verdict.message}`);
-
+    const closed = closeRefWindow();
+    refVerdict = closed.verdict;
+    const headNote = closed.headNote;
     const verdict = enforceAllowlist(repoRoot, allow, stageBase);
+
+    if (refVerdict !== null && !refVerdict.ok) {
+      const undone = rollBack(verdict);
+      return {
+        ok: false,
+        code: "stage-changed-ref",
+        reason: `${roleName} was refused, not warned. ${refVerdict.message}${headNote}${undone}`,
+      };
+    }
+    if (refVerdict) log(`  ${roleName} refs: ${refVerdict.message}`);
     log(`  ${roleName} attempt ${attempt}: ${verdict.message}`);
     if (!verdict.ok) {
       const undone = rollBack(verdict);
@@ -706,6 +759,11 @@ async function runLoopInner(config: LoopConfig, refWatchEnabled: boolean): Promi
   }
   result.plan = plan;
 
+  // Slice four's artifact index is what will fill this. Until then it is
+  // empty, stated once here rather than spelled `[]` at three call sites where
+  // a reader would have to work out whether the emptiness meant anything.
+  const priorFailures: readonly string[] = [];
+
   const planGate = await consultGate(
     "plan",
     {
@@ -717,7 +775,7 @@ async function runLoopInner(config: LoopConfig, refWatchEnabled: boolean): Promi
       // what the record already knows; the gate is not asked to recall them.
       context: {
         plan,
-        prior_failures: [],
+        prior_failures: priorFailures,
         validated_behaviours: plan.preserve,
         changed_areas: [],
       },
@@ -730,6 +788,10 @@ async function runLoopInner(config: LoopConfig, refWatchEnabled: boolean): Promi
         // rather than honoured. Slice four's index is what makes them real.
         deterministicFailure: false,
         qaHistorySupportsStopShip: false,
+        // Read from the state the runtime assembled, not from the gate. Until
+        // the index lands this is always empty, which is exactly why the
+        // threshold on `addresses_top_failures` had nothing to be about (F5).
+        hasPriorFailures: priorFailures.length > 0,
       }),
   );
   if (!planGate.ok) return fail("planner", planGate.code, planGate.reason);
@@ -801,7 +863,7 @@ async function runLoopInner(config: LoopConfig, refWatchEnabled: boolean): Promi
           build: { command: checks.build.command, exit_code: checks.build.exit_code },
           unit: { command: checks.unit.command, exit_code: checks.unit.exit_code },
         },
-        prior_failures: [],
+        prior_failures: priorFailures,
       },
     },
     (answers) => decideDoneGate(answers, policies!.done, { checksPassed: checks.allPassed }),

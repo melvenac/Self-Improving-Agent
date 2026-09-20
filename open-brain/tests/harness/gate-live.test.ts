@@ -10,7 +10,7 @@
  * The one real call belongs to QA, once, by hand, as A7.
  */
 
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, beforeEach } from "vitest";
 import {
   buildJevRequest,
   GateCallFailed,
@@ -50,6 +50,20 @@ const okAnswers = {
 
 describe("JevTransport", () => {
   const realFetch = globalThis.fetch;
+
+  /**
+   * QA's F2: this file's header CLAIMED the global `fetch` was replaced with
+   * one that fails the test if touched, and no line in the file did so. A
+   * comment asserting a property the code does not have is rule 14 living
+   * inside the test the property rests on.
+   *
+   * It is installed here, for real, for every test in this file.
+   */
+  beforeEach(() => {
+    globalThis.fetch = (() => {
+      throw new Error("a test in this file must not reach the network");
+    }) as unknown as typeof fetch;
+  });
 
   afterEach(() => {
     globalThis.fetch = realFetch;

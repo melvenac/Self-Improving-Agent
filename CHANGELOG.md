@@ -80,6 +80,48 @@ been probed. Each check here states in its own output what it does not see.
   expressible — "no question asks whether the tests passed" — the structural assertion over the
   parsed payload is the one that counts, and the text scan states that limit in the test.
 
+### Repaired after QA rejected the first candidate
+
+`b4194a9` was **not accepted** (report at `8f2c547`): seven rows passed, A6 failed on its second
+half, A7 was untested by rule, and three defects of the ref-and-provenance class were recorded. Each
+repair below was seen red on the real condition first, in one commit, before any mechanism existed.
+
+- **`HEAD` is part of the ref snapshot** (`D1`, `D2`). It is not under `refs/`, so a role running
+  `git checkout -b evil` changed a channel nothing watched — and the watch then deleted the branch
+  **while HEAD still named it**, so `git rev-parse HEAD` failed and `GitFailed` escaped `runLoop`
+  entirely: no result, no `FAILED.md`, and a repository needing hand recovery. HEAD is now snapshotted
+  and put back **before anything else reads it**, a `symbolic-ref` switch is itself a reported
+  breach, and the restore moves nothing but HEAD.
+- **The deferred ref is restored by the watch** (`D2`). The commit boundary keeps the verdict and its
+  wording, but its rollback is `reset --hard`, which refuses when the stage base is not an ancestor
+  of HEAD — exactly a backwards move. So `update-ref refs/heads/main <pre-loop>` was recorded and
+  then left for a human, with the runtime's own plan commit unreachable. The watch holds a `before`
+  value and a compare-and-swap; it now uses them, and the reset that follows is to a commit that is
+  an ancestor again. **The shipped test accepted that outcome** — its pattern was
+  `/moved HEAD|could not be rolled back/i` — and has been tightened.
+- **Provenance is the exact class** (`D3`). `class Evil extends StubPlanner` called `super()`, which
+  registered it, so a role whose `run()` was entirely foreign was runtime-constructed as far as the
+  mechanism could tell. The doc comment was literally true and the property it defended was defeated
+  by inheritance. `new.target` closes it.
+- **The threshold scan's SCOPE was A6's defect, not its detector.** It read one region of one file.
+  A `0.7` typed into a gate prompt in `gate.ts` — where §4 says a threshold must never live — left the
+  whole harness suite green. The scan now covers the prompts and the gate-context assembly as well,
+  its targets are asserted as data so narrowing them is deliberate, and QA's own plant is its
+  positive fixture.
+- **A missing `TYPESAFE_API_KEY` is a preflight refusal** (`F3`), in the same place as an unreadable
+  policy file and for the same reason. It was being found at the planner gate, after `loop-001-base`
+  existed in the target repository.
+- **`addresses_top_failures` is not judged when there are no prior failures** (`F5`). A threshold on a
+  question with no referent is not a measurement, and it made the done gate unreachable on the CLI
+  path — A7 would have observed one gate instead of two. The applicability is data in
+  `plan-gate.json`, like every other value there.
+- **`gate-live.test.ts` now installs the global-`fetch` guard its header claimed** (`F2`).
+
+**`F1` is deliberately not repaired** and this says so rather than leaving it to be re-found:
+`git.test.ts`'s network scan fires on a comment naming the call. QA called that *"safe direction;
+inconsistent"*. Making it consistent with `checks.test.ts` means stripping comments, which is the
+**less** strict side, so it is left alone.
+
 ### Not in this slice, stated so nobody reads the absence as an oversight
 
 Real role prompts and real role sessions, QA scoring through Jev (slice three). Selective retrieval

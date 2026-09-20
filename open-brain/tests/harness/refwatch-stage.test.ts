@@ -331,7 +331,10 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
     expect(refLines.length, `expected one ref verdict per stage, got: ${lines.join(" | ")}`).toBe(3);
     // A check that does not say what it cannot see invites its reader to assume
     // it saw everything.
-    for (const l of refLines) expect(l).toContain("LIMIT: refs/ only");
+    // HEAD joined the snapshot with QA's D1/D2, and the limit line says so:
+    // a check that names the channels it does not watch must be re-read when
+    // it starts watching one more.
+    for (const l of refLines) expect(l).toContain("LIMIT: refs/ and HEAD");
     for (const l of refLines) expect(l).toMatch(/examined \d+ ref\(s\)/);
   });
 

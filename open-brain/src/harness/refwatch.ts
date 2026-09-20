@@ -62,7 +62,17 @@
  * deliberate.
  */
 
-import { allRefs, deleteRef, setRefTo, symbolicHeadRef, GitFailed, GitRefused } from "./git.js";
+import {
+  allRefs,
+  deleteRef,
+  detachHeadTo,
+  headSha,
+  setRefTo,
+  setSymbolicHead,
+  symbolicHeadRef,
+  GitFailed,
+  GitRefused,
+} from "./git.js";
 
 export type RefChange = "created" | "deleted" | "moved";
 
@@ -73,6 +83,12 @@ export interface RefDelta {
   /** The object it points at after, or null if it was deleted. */
   after: string | null;
   kind: RefChange;
+  /**
+   * True only for the synthetic `HEAD` entry, where `before` and `after` are
+   * ref NAMES rather than object ids. A reader that formats a sha would
+   * otherwise print the first twelve characters of `refs/heads/main`.
+   */
+  symbolic?: boolean;
 }
 
 export interface RefVerdict {
@@ -89,13 +105,26 @@ export interface RefVerdict {
   unusedAuthorisations: string[];
   /** The branch HEAD was on, left to the commit boundary. Null when detached. */
   deferredRef: string | null;
+  /**
+   * The delta on that deferred ref, when it moved.
+   *
+   * It is NOT in {@link unauthored} — the commit boundary judges it and keeps
+   * its own wording — but the watch still restores it, because it is the only
+   * mechanism here that holds a `before` value. QA's D2: the commit boundary's
+   * rollback can only roll FORWARD, so a backwards move was recorded and left
+   * for a human while the watch had a compare-and-swap that would have undone
+   * it.
+   */
+  deferredDelta: RefDelta | null;
   message: string;
 }
 
 const short = (sha: string | null): string => (sha === null ? "(absent)" : sha.slice(0, 12));
 
 const describe = (d: RefDelta): string =>
-  d.kind === "created"
+  d.symbolic === true
+    ? `${d.ref} moved from ${d.before ?? "(detached)"} to ${d.after ?? "(detached)"}`
+    : d.kind === "created"
     ? `${d.ref} created at ${short(d.after)}`
     : d.kind === "deleted"
       ? `${d.ref} deleted (was ${short(d.before)})`
@@ -113,15 +142,30 @@ export class RefWatch {
   private baseline: Map<string, string> | null = null;
   private stage = "";
   private deferredRef: string | null = null;
+  /** What HEAD named when the window opened: a ref, or null when detached. */
+  private headSymbolic: string | null = null;
+  /** Where HEAD pointed when the window opened. Needed to re-detach it. */
+  private headCommit = "";
   private authorisations = new Set<string>();
 
   constructor(private readonly repoRoot: string) {}
 
-  /** Snapshot every ref and open a window. Clears any unused authorisation. */
+  /**
+   * Snapshot every ref AND what HEAD names, and open a window.
+   *
+   * **HEAD is part of the snapshot, and QA's D1/D2 are why.** HEAD is not under
+   * `refs/`, so a watch that reads `for-each-ref` alone does not see a role
+   * run `git checkout -b`. Worse, it then deletes the branch it created while
+   * HEAD still points at it — leaving HEAD naming a ref that does not exist,
+   * which makes `git rev-parse HEAD` fail and takes the rest of the runtime
+   * down with it. The restore has to know what pointed at what.
+   */
   begin(stage: string): void {
     this.stage = stage;
     this.authorisations = new Set();
-    this.deferredRef = symbolicHeadRef(this.repoRoot);
+    this.headSymbolic = symbolicHeadRef(this.repoRoot);
+    this.headCommit = headSha(this.repoRoot);
+    this.deferredRef = this.headSymbolic;
     this.baseline = allRefs(this.repoRoot);
   }
 
@@ -156,21 +200,36 @@ export class RefWatch {
     const unauthored: RefDelta[] = [];
 
     const deferred = this.deferredRef;
-    let deferredMoved = false;
+    let deferredDelta: RefDelta | null = null;
 
     for (const ref of [...names].sort()) {
       const b = before.get(ref) ?? null;
       const a = after.get(ref) ?? null;
       if (b === a) continue;
       if (ref === deferred) {
-        // Owned by the commit boundary. Counted, named, not judged here.
-        deferredMoved = true;
+        // Owned by the commit boundary, which keeps its own wording for it.
+        // Carried out of here so the restore can still put it back: the watch
+        // is the only mechanism holding a `before` value for this ref.
+        deferredDelta = { ref, before: b, after: a, kind: b === null ? "created" : a === null ? "deleted" : "moved" };
         continue;
       }
       const kind: RefChange = b === null ? "created" : a === null ? "deleted" : "moved";
       const delta: RefDelta = { ref, before: b, after: a, kind };
       if (this.authorisations.delete(ref)) authored.push(delta);
       else unauthored.push(delta);
+    }
+
+    // HEAD, which is not a ref under refs/ and is its own channel. A role that
+    // runs `git symbolic-ref HEAD refs/heads/side` changes no ref at all.
+    const headAfter = symbolicHeadRef(this.repoRoot);
+    if (headAfter !== this.headSymbolic) {
+      unauthored.push({
+        ref: "HEAD",
+        before: this.headSymbolic,
+        after: headAfter,
+        kind: "moved",
+        symbolic: true,
+      });
     }
 
     const unusedAuthorisations = [...this.authorisations].sort();
@@ -183,9 +242,10 @@ export class RefWatch {
       deferred === null
         ? `HEAD is detached, so no branch ref was deferred.`
         : `${deferred} is left to the commit boundary, which owns that channel and ` +
-          `${deferredMoved ? "will report that this stage moved it" : "reports it unmoved"}.`;
+          `${deferredDelta === null ? "reports it unmoved" : "will report that this stage moved it"}` +
+          `${deferredDelta === null ? "" : `, and this watch restores it to ${short(deferredDelta.before)}`}.`;
     const limit =
-      `LIMIT: refs/ only — not the index, reflogs, hooks, config or submodules; ${deferral} ` +
+      `LIMIT: refs/ and HEAD — not the index, reflogs, hooks, config or submodules; ${deferral} ` +
       `Refs are shared across every worktree of this repository, so a concurrent writer inside ` +
       `the window is refused too.`;
 
@@ -205,8 +265,38 @@ export class RefWatch {
       unauthored,
       unusedAuthorisations,
       deferredRef: deferred,
+      deferredDelta,
       message,
     };
+  }
+
+  /**
+   * Put HEAD back to what it named when the window opened.
+   *
+   * **Called before anything else reads HEAD, and before any ref is deleted.**
+   * That ordering is the whole of QA's D1: deleting `refs/heads/evil` while
+   * HEAD names it leaves `git rev-parse HEAD` failing, and every later
+   * mechanism in the stage reads HEAD.
+   *
+   * Moves nothing but HEAD — not the index, not the working tree. Undoing what
+   * a role made HEAD name is this watch's business; the tree is the caller's.
+   */
+  restoreHead(): string {
+    const current = symbolicHeadRef(this.repoRoot);
+    if (current === this.headSymbolic) return "";
+    try {
+      if (this.headSymbolic === null) {
+        detachHeadTo(this.repoRoot, this.headCommit);
+        return ` HEAD was detached again at ${short(this.headCommit)}.`;
+      }
+      setSymbolicHead(this.repoRoot, this.headSymbolic);
+      return ` HEAD was pointed back at ${this.headSymbolic}.`;
+    } catch (err) {
+      return (
+        ` HEAD COULD NOT BE PUT BACK (it names ${current ?? "a commit directly"} and should name ` +
+        `${this.headSymbolic ?? "a commit directly"}): ${(err as Error).message} Recover by hand.`
+      );
+    }
   }
 
   /**
@@ -218,11 +308,24 @@ export class RefWatch {
    * would leave the repository in a third state nobody has seen.
    */
   restore(verdict: RefVerdict): string {
-    if (verdict.unauthored.length === 0) return "";
+    // HEAD first, always. A ref cannot be deleted safely while HEAD names it,
+    // and `restoreHead` is idempotent, so calling it here as well as before the
+    // allowlist comparison costs one `symbolic-ref` read.
+    const headNote = this.restoreHead();
+
+    // The deferred ref is restored HERE even though the commit boundary judges
+    // it. QA's D2: that check's rollback is `reset --hard`, which refuses when
+    // the stage base is not an ancestor of HEAD — exactly the backwards move —
+    // and left the repository with the runtime's own plan commit unreachable.
+    // This watch holds the `before` value and a compare-and-swap.
+    const toRestore = [...verdict.unauthored.filter((d) => d.symbolic !== true)];
+    if (verdict.deferredDelta !== null) toRestore.push(verdict.deferredDelta);
+    if (toRestore.length === 0) return headNote;
+
     const restored: string[] = [];
     const failed: string[] = [];
 
-    for (const d of verdict.unauthored) {
+    for (const d of toRestore) {
       try {
         if (d.before === null) deleteRef(this.repoRoot, d.ref, d.after!);
         else setRefTo(this.repoRoot, d.ref, d.before, d.after);
@@ -233,7 +336,7 @@ export class RefWatch {
       }
     }
 
-    const parts: string[] = [];
+    const parts: string[] = [headNote];
     if (restored.length > 0) parts.push(` Restored ${restored.length} ref(s): ${restored.join("; ")}.`);
     if (failed.length > 0) {
       parts.push(
