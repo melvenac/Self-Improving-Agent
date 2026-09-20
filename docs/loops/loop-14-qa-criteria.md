@@ -320,17 +320,45 @@ Each row: **required** (the brief's or amendment's words), **procedure** (what I
 
 ## 7. Baseline, reproduced in this tree before any candidate
 
-Recorded in a follow-up commit on this branch once run, each number with the SHA, tree and time it
-came from — **not copied from any report**:
+Every number below carries the SHA, tree and time it came from — **not copied from any report**.
+Tree: `~/Worktrees/sia-qa`, 2026-09-20, source at `7c7e04b` (the two docs-only commits on this
+branch change nothing under `open-brain/`: `git diff 7c7e04b 424c618 -- open-brain/` is 0 lines).
 
-- `npx vitest run` in `open-brain/` at `7c7e04b`: exit code, passed/failed/skipped, any
-  `Unhandled`/`vitest-worker` line count.
-- `node open-brain/build/cli.js sync --check` at `7c7e04b`: passed / warned / failed / skipped.
-- The **old build's** greeting for each of the three seats on `F-cur`-shaped fixtures at `7c7e04b`
-  and on `F-behind`: six transcripts. These are what C2b's negative fixture looks like **before**
-  the candidate, so the report can show the defect present at base and absent at the candidate
-  rather than assert it.
-- `git log -1 --format=%h -- .agents/roles/<file>` for all four role files at `7c7e04b`.
+- **Full suite at `7c7e04b`:** `npx vitest run > file 2>&1; echo VITEST_RC=$?` in `open-brain/`,
+  run alone, 2026-09-20 ~18:27–18:30Z: **`VITEST_RC=0`**, 60 files / 896 tests passed, duration
+  154s, **0** lines matching `unhandled|vitest-worker|timed out`. The background wrapper reported
+  "exit 1" — that was the trailing `grep -c` exiting 1 on its zero count, the instrument defect
+  `shared.md` names, not the suite.
+- **`sync --check` at `7c7e04b`** (build stamped `7c7e04b`, 18:19Z): exit 0, 26 passed, 4
+  warnings, 0 issues, **0 skipped**; one warning is `gitnexus-index` 6 commits behind (indexed
+  `d1b096b`). At `424c618` with the `7c7e04b` build the same gate returned exit 1 on
+  `build-freshness` — the check compares commits, says so in its LIMIT, and goes red on a
+  docs-only commit; rebuilt at `424c618` (18:31Z) it passed 26 / 0 skipped.
+- **Role files at `7c7e04b`:** `planner.md`, `developer.md`, `qa.md` last changed at `876029d`
+  (2026-09-19); `shared.md` at `e177ea2` (2026-09-19). C1's expected commits are re-derived at the
+  candidate, not read from here.
+- **The old build's greeting, six transcripts** (`handleStart` from `build/server.js` at source
+  `7c7e04b`, `KNOWLEDGE_V2_DB` scratch, 18:32Z; fixtures cloned with `origin/master` pinned by
+  `update-ref`; `F-cur` = HEAD `7c7e04b` rev 52, 0 behind; `F-behind` = HEAD `d1b096b` rev 50,
+  **6 behind**, 0 ahead, porcelain 0):
+  - **The greeting is seat-blind.** With `Log:` lines removed, the three `F-cur` greetings hash
+    identically (`a493ce3b…`) and the three `F-behind` greetings hash identically (`cc31f070…`);
+    only the hook line differs (`Agent: Atlas (planner)` / `Forge (developer)` / `Probe (qa)`).
+  - **The handoff block names no seat.** `F-cur` prints `Handoff (session 70):` and the QA seat's
+    pick-up to all three seats; `F-behind` prints `Handoff (session 69):` and the **developer's**
+    pick-up (*"LOOP 15 SLICE TWO IS ACCEPTED AND MERGED…"*) to all three seats, including Probe
+    and Atlas — C2b's negative fixture, present at base.
+  - **No role file is named by the pipeline.** The only `roles/` mention in any transcript is
+    the record's own G-032 text inside the State block (one line, at line 161/163); the frame
+    before `## State` has none. Detector validated on a planted `.agents/roles/qa.md` line first.
+  - **No staleness line.** The frame before `## State` on `F-behind` reads `Drift: none`,
+    `Session #1`, `Session ID: discovery failed`, `## Sizes`, then `## State (state.json rev 50)`
+    — nothing says the tree is 6 commits and 2 revisions behind. Read directly from the frame, not
+    only counted: a word count over the frame reported one hit, and it was the fixture's own
+    directory name `behind-probe` inside the `Log:` path — the detector answering a different
+    question, resolved by reading the line.
+  - `Session ID: discovery failed` on every fixture: no session is registered for a scratch root.
+    Not scored; noted so the candidate's transcripts are read with the same expectation.
 
 ## 8. Procedure order on hand-over
 
