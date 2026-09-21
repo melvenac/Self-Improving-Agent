@@ -31,9 +31,17 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 > not merely free of a stack trace) and `loop-16-brief-amendment-4.md` at **`5ab0ac4`**
 > (**`R16`–`R18`**, and the design fact that makes them necessary). **These arrive at the
 > developer's boundary 2 (`ee74fd1`, rev 2); no candidate has been frozen and nothing here is
-> written in response to a verdict.** **Every former `[mine]`
-> clause now carries its ruling inline.** Nothing here is narrowed in response to a candidate,
-> because no candidate exists.
+> written in response to a verdict.**
+>
+> **AMENDED A THIRD TIME, still before the freeze** — fourth commit; `154d1b3`, `46feb51` and
+> `09e9664` are cited and **not** amended. It applies `loop-16-brief-amendment-5.md` at
+> **`6da5fa9`** (the floor is **corpus-relative**, so a toy fixture cannot test it at all; the
+> shipped floor **8.0** and `max_injected` **1**; **`R19`** — an absolute floor rots as the store
+> grows and is accepted as a *stated limit with provenance*, not repaired), names `R12`'s targeted
+> set now that the developer has named it, and corrects §7.7's `G-042` picture. It arrives at the
+> developer's boundary 3 (`12b5aeb`, rev 3). **Every former `[mine]` clause carries its ruling
+> inline; one new `[mine]` clause is added at §1 and returned in §9.** Nothing here is narrowed in
+> response to a candidate, because no candidate has been frozen.
 
 > **Rule of this file.** Every criterion names what will be observed, in which tree, with which
 > command, and what result means **pass**, **fail** or **untested**. A criterion I cannot state that
@@ -65,6 +73,7 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 | **The hook registration for A7 and A10** | `~/.claude/settings.json` is Aaron's file. Registering the trigger against the QA tree's build is an act that needs **his word for that act** (brief §6, §8). I ask the planner by SHA at the moment, the planner asks Aaron, and the report records: the exact JSON added, when it was added, when it was removed, and the file's content read back after removal and compared to a copy taken before. **If the word does not come, A7 and A10 are reported `untested` and no row is inferred from the others.** |
 | **The store under test** | Trigger queries are measured against a **fixture store** built in the scratchpad (`KNOWLEDGE_V2_DB` pointed at it), never the live `~/.claude/open-brain/knowledge-v2.db`, for every row except A7 and A8 — those two are live by construction because they need a real session. What A7/A8 write to the live store is disclosed in the report. |
 | **Fixture store shape (A1–A4)** | One SQLite store built by the candidate's own schema code (not hand-written DDL, which would measure my DDL), holding entry 299's text **as it exists at base** — captured to a file in §7 so the fixture cannot drift — plus **at least ten decoys sharing the common tokens `exit`, `code`, `tail`, `run`** (brief A1). Decoys are drawn from the live store's real entries where they qualify and are otherwise synthesised; the report lists every decoy id and its provenance. The store's maturity column matters (`recallRankExpr` boosts Mature 1.5× / Proven 1.2×), so the fixture records each row's maturity and the report says what entry 299's was. |
+| **THE FIXTURE MUST BE AT CORPUS SCALE WHEREVER THE FLOOR IS IN THE PATH (`6da5fa9` §1)** | **bm25's IDF is a function of the corpus, so a toy fixture cannot test a floor at all.** Measured by the developer: the precision-only query `"tail" "exit" "code"` scores 14.01 / 12.29 / 10.62 / 6.83 / 6.03 against the live 599-entry store and **about 5e-6 for every row against a three-document fixture**. At any shipped floor a small fixture is silent for **every** input, and *"the floor silenced the weak match"* then passes with the floor doing no work. **A4's fixture is 599 documents** (strong 20.98 above, weak 4.28 below; shipped floor **8.0**, `max_injected` **1**). **My reading, and a clause of mine — `[mine]`, returned in §9:** the same argument applies to **A1 and A2**, whose fixture the brief sizes at *"at least ten decoys"*. If the floor sits in the path those rows exercise, a ten-document fixture makes **entry 299 itself** score below 8.0 and A1 cannot pass except with the floor bypassed — which is mutant **M7**'s condition (*floor set to 0*), the thing this loop treats as wrong. **So I run A1 and A2 against a corpus at scale as well as against the brief's ten-decoy fixture and report both.** A pass on the ten-decoy fixture alone is not evidence the trigger injects entry 299 in production; if the candidate's A1 test runs at ten documents, I report *what it can and cannot show* rather than scoring it green or red on my own reading. |
 | **Read-only** | No edit to any tracked file at the candidate. Nothing is repaired. Where a check must be *seen red* on a mutation, the mutation is made on a scratch copy, never in the candidate tree. |
 | **Instrument discipline** | **"Exit 0" everywhere below** means the status captured from the process under test — `cmd > file 2>&1; rc=$?` with `rc` written to a file and read back, or `execFileSync` — never a pipeline's last stage and never a line of output (`G-042`, and the entry this whole loop is about). **Every instrument that returns a zero or an empty result is validated against a planted positive through the same channel first** (`G-044`: `GIT_TRACE=1` to stderr saw nothing because the callee ignored stderr; the zero was "I did not look"). Hook payloads are built with `JSON.stringify`, never by hand — a Windows backslash makes them invalid JSON and the hook then reads the shell's own cwd while looking right. The suite runs **alone**; no fixture construction beside it. |
 | **The hook event** | **`PostToolUse` only (`R1`).** The brief's *"the developer chooses"* is now chosen, on the developer's own reason: on `PostToolUse` the host **cannot** honour a block, so *the trigger never blocks* is structural rather than behavioural. Every row below is measured on that event; a candidate that also registers `PreToolUse` is out of scope (§4), not a bonus. |
@@ -208,9 +217,14 @@ untested**, and **blind spot** (what the procedure cannot see).
   check (`D-021`'s pattern, as slice two's policies).
 - **Procedure:** locate the floor's source of truth, its derived file and its drift check, from the
   developer's handoff and from the tree. Build A4's **own** fixture command — tokens that match
-  exactly one decoy, weakly, scoring below the shipped floor; I verify "weakly matches" by querying
-  the fixture store directly and recording the decoy's rank and score with the floor removed, so
-  "below the floor" is a measured distance and not an assumption. Then, with **no edit to any
+  exactly one decoy, weakly, scoring below the shipped floor. **The measured-distance clause is met
+  by construction at rev 3** (`6da5fa9` §1: fixture at scale, strong 20.98, weak 4.28, floor 8.0),
+  so what I check is not the distance but **the row that protects it**: a **scale assertion** must
+  exist, asserting the fixture is still 599 documents with the strong match above and the weak
+  below, and **it must go red when the corpus shrinks** — I shrink the fixture on a scratch copy and
+  require that row red. Without it A4 goes quietly vacuous the first time someone trims the fixture,
+  which is the class amendment 1 §1 already records twice. I still record the two scores myself
+  rather than citing the developer's. Then, with **no edit to any
   `.ts`**, lower the floor in the data file, re-run, observe that decoy injected; restore, re-run,
   observe silence. Both directions in the same session, with the file's bytes hashed before,
   between and after, and with the `.ts` files' hashes unchanged across all three. Separately:
@@ -227,6 +241,18 @@ untested**, and **blind spot** (what the procedure cannot see).
   M5 myself on a scratch copy, `tsc --noEmit` clean, and require it red. A candidate whose A4 tests
   still run at `floor: 0` passes its own suite and fails this row. *Declaring a live mutant beats a
   green suite that does not cover the code, and checking the declaration is mine.*
+  **`R19` — the floor is calibrated to a corpus and rots with it, accepted as a stated limit rather
+  than repaired** (`6da5fa9` §2). IDF falls for a term as more entries carry it, so 8.0 measured
+  against 599 entries on 2026-09-20 is not the same cut on a store of 2,000. The ruling requires the
+  limit to be **stated with provenance in two places**, and that is an observable of this row:
+  **the handoff names the store size and the date the floor was calibrated against, next to the
+  number, and the policy file carries the same provenance.** I read both and check the number and
+  the provenance agree with each other and with what I measure. A floor of 8.0 with no store size
+  and no date beside it — in either place — is a fail of this row, on the same footing as A10's
+  `R10` sentence: the ruling's whole content is that the limit is written down.
+  **`max_injected` is 1** (`6da5fa9` §1) — recorded here because it bounds A1 and A8: at most one
+  entry is ever injected, so "entry 299 first" and "entry 299 and nothing else" are the same
+  assertion at the hook's output even where the query returns five.
   and assert the drift check goes **red**; then assert it is **green** on the unmodified candidate
   — the presence half that `T-156` requires.
 - **Pass:** both directions observed from a data change alone, on A4's own fixture command; A2's
@@ -433,7 +459,14 @@ untested**, and **blind spot** (what the procedure cannot see).
     exits `0` from the process; plus `sync --check` **zero skipped** in this tree;
     `module-boundary` green; and the network test covering the trigger's module.
     **The developer names the targeted set in its handoff; I may add the recall tests if it omits
-    them** (the §7.4 enumeration is what I add from).
+    them** (the §7.4 enumeration is what I add from). **The set is now named** (`6da5fa9` §3):
+    `tests/trigger/**`, `recall-broadening`, `ranking`, `db-v2`, `rating-method`,
+    `pipelines/session-end/recalled-ids`, `server` — reported there as 9 files, 107 tests, exit 0.
+    **Two files from my §7.4 enumeration are not in it — `index-upsert.test.ts` and
+    `active-session.test.ts`** — both of which carry recall assertions at base. `R12` gives me the
+    addition explicitly, so **I add them and score the enlarged set**, and the report names which
+    files were the developer's and which were mine. I re-derive the file and test counts myself;
+    9/107 is the developer's number, not an observation of mine.
   - **REPORTED, both ways, not scored:** the full suite run **once, alone** at the candidate —
     files and tests passed and failed, the exit code, the unhandled-errors line, and **every victim
     by file and test name**.
@@ -500,9 +533,14 @@ the trigger's path; `G-045` or slice three's list.
 
 1. **Entry 299's rank against the live store, not the fixture.** A1 is a fixture measurement. The
    live-store rank at base is in §7.1 (rank 1, *with broadening having fired*); I take the same
-   measurement at the candidate through the trigger's precision-only path, and if entry 299 does not
-   come back at all — because the precise query underfills below the floor — that is the most
-   important number in the report and it is not a row.
+   measurement at the candidate through the trigger's precision-only path.
+   **The developer has now taken it and the answer is no longer "unknown"** (`6da5fa9` §1,
+   superseding amendment 1 §3): the precision-only query `"tail" "exit" "code"` returns **five**
+   matches at base and ranks entry 299 **first at 14.01**, then 12.29, 10.62, 6.83, 6.03 — so
+   **the broadening was not carrying the rank; it was adding the two rows below the gap.** That is
+   the developer's number, relayed, and amendment 5 says explicitly that I still measure it
+   independently. **I do, and I report mine beside theirs** — agreement is the expected result and
+   is worth one line; disagreement is a finding about one of the two instruments.
 2. **What the floor was calibrated against.** A4 tests that it is data. If the developer's stated
    calibration is one query, the report says so.
 3. **Where the reminder lands relative to the act.** The event is ruled (`PostToolUse`, `R1`), and
@@ -522,10 +560,14 @@ the trigger's path; `G-045` or slice three's list.
    commands in A10's fifty derived anything at all — the *not asked* rate on ordinary work — as a
    number, not a row. A channel that is closed for 49 of 50 real commands is working as ruled and
    is still worth knowing before the loop after this one decides what a third element costs.
-7. **Whether any mutant the developer declared live is still live at the candidate.** M5 is
-   declared at rev 2 (`5ab0ac4` §3) and M4 was declared dead only once `R18`'s assertion existed.
-   I run both myself rather than reading the handoff's account of them, and the report says which
-   mutants I ran, not which I was told about.
+7. **Whether any mutant the developer declared live is still live at the candidate.** M5 was
+   declared live at rev 2 (`5ab0ac4` §3) and is **reported dead at rev 3**, with **M6** (derived
+   schema hand-edited) and **M7** (floor set to 0) red and the one source-text scan carrying a
+   known positive and a known negative in the same test (`T-156`) — all of that from `6da5fa9` §3.
+   **I run M4, M5, M6 and M7 myself**, `tsc --noEmit` clean on each, rather than reading the
+   handoff's account of them; the report says which mutants I ran, not which I was told about. A
+   mutant reported dead that survives here is the sharpest finding available in this loop, because
+   it means the suite and the handoff disagree about what is covered.
 
 ## 6. What cannot be verified now, stated so nobody inherits it as settled
 
@@ -534,6 +576,12 @@ the trigger's path; `G-045` or slice three's list.
 - **That the trigger fires for the developer's or planner's seat**, in another project, or under a
   different host version. A7 is one session in one tree.
 - **That `G-026` (recall precision at large) is unaffected.** The floor is the trigger's only.
+- **That the floor is still the right cut on any store but this one, on any day but today.**
+  `R19` accepts that an absolute floor calibrated against 599 entries on 2026-09-20 rots as the
+  store grows, and the loop states the limit rather than repairing it. Everything A4 shows is that
+  8.0 separates a strong match from a weak one **in a 599-document fixture built today**. Whether
+  the trigger goes quiet at 2,000 entries is not observable from here and is a later loop's
+  question, asked with the measurement in view.
 - **That the census's meaning survives concurrency.** A8's delta is a lower bound.
 - **The main-tree-only condition** (Aaron's untracked `PRD.md`) — unrun, as always.
 
@@ -593,16 +641,29 @@ All at `4550ee5`, 2026-09-20, in `~/Worktrees/sia-qa`, after detach + build + an
    - `sync --check` at base: **27 passed, 0 fixed, 3 warnings, 0 issues, 0 skipped** (warnings:
      `prd-version`, `vault-index-parity`, `spec-provenance` — all pre-existing seat-tree
      conditions).
-7. **THE SAME BASE IS GREEN IN THE DEVELOPER'S TREE** (`5ab0ac4` §3, relayed by the planner, **not
-   measured by me**): the full suite there ran **986 passed, exit 0, alone**. Mine exited 1 twice,
-   alone, at the same base on the same machine — different trees, different times, and a different
-   test count (986 vs 974), which is itself unexplained and which I record rather than reconcile.
-   **This is the datapoint that moves `G-042` from "is it this machine" to "it is not even this
-   machine uniformly"**, and it is one more row for the planner's `G-042` amendment at close-out.
-   It does not change `R12`: A11 is still scored on the targeted run, because the condition is
-   demonstrably tree- and time-dependent and a candidate cannot be held to it. **Relay discipline:**
-   I did not run the developer's tree and will not; the number is cited to `5ab0ac4` in the report,
-   never restated as an observation of mine.
+7. **THREE `G-042` SIGHTINGS ACROSS TWO TREES, AND THE "SAME BASE" IN AMENDMENT 4 §3 DOES NOT
+   HOLD.** Every developer number below is relayed from `5ab0ac4` §3 and `6da5fa9` §3 and is **not
+   measured by me**; I did not run the developer's tree and will not.
+
+   | run | tree | code state | tests | exit |
+   | --- | --- | --- | --- | --- |
+   | mine, ×2 | QA | **base `4550ee5`** | 974 — 973 passed, 1 failed, a different victim each | **1** |
+   | developer | developer | **rev 2 `ee74fd1`** | 986 passed | **0** |
+   | developer | developer | **rev 3 `12b5aeb`** | 997 passed, 0 failed | **1** |
+
+   Amendment 4 §3 called the developer's 986 run *"same base"* as my two. Amendment 5 §3 then says
+   *"the same tree at rev 2 exited 0 with 986"* — so that run was at **rev 2 of
+   `loop/16-recall-trigger`**, not at base. The arithmetic agrees: 974 at base, +12 at rev 2, +11
+   more at rev 3, and `6da5fa9` §3 records that *"the branch only adds test files."* **The likeliest
+   explanation of 986-vs-974, which I flagged as unexplained in the third commit, is that the
+   developer's runs include the candidate's own new tests.** I cannot see that tree, so this is an
+   inference from three counts and one sentence, not an observation — **but "same base" must not
+   travel into `G-042`'s close-out amendment unchecked**, because the force of that row is that
+   identical code behaved differently in two trees, and on these numbers the code was not identical.
+   **What survives, and is stronger for being narrower: the developer's own tree went green at rev 2
+   and red at rev 3, zero failing tests both times.** One seat, one machine, one tree, clean then
+   not — a sighting that needs no cross-tree comparison at all. `R12` is unchanged either way: the
+   condition is tree-, time- and revision-dependent and no candidate can be held to it.
 
 ## 8. Procedure order on hand-over
 
@@ -670,7 +731,20 @@ developer declined to open this file when the planner's GO named it, on brief §
 does not see the probes*); nothing here changes, and it is noted because it means the probes in
 this file are still unseen by the seat being evaluated.
 
-**Still open and not mine to close:** nothing from §4's rows. The two standing acts are Aaron's —
+**ONE NEW `[mine]` CLAUSE, opened by amendment 5 and returned here rather than applied silently.**
+`6da5fa9` §1 sizes **A4's** fixture at 599 documents because bm25's IDF makes a toy fixture score
+every row at ~5e-6, so no floor can be tested on one. **The brief sizes A1's and A2's fixture at
+"at least ten decoys", and that argument applies to them too:** if the floor sits in the path those
+rows exercise, entry 299 itself scores below 8.0 on a ten-document fixture and A1 can only pass
+with the floor bypassed — which is **M7**'s condition, the thing this loop treats as a defect.
+**My clause:** I run A1 and A2 against a corpus at scale **as well as** the brief's ten-decoy
+fixture and report both; a pass on the ten-decoy fixture alone is not evidence the trigger injects
+entry 299 in production. **I am not scoring the candidate on my reading** — if its A1 test runs at
+ten documents I report what that can and cannot show and return the question. **Ruling wanted:**
+does A1's fixture need to be at scale, or is A1 deliberately a test of ranking *before* the floor?
+The two readings differ in what a green A1 is evidence of, and only the planner can choose.
+
+**Still open and not mine to close:** nothing else from §4's rows. The two standing acts are Aaron's —
 the `settings.json` registration for A7/A10 (§1), and his ruling held at brief §8.1 on building the
 deterministic trigger only.
 
