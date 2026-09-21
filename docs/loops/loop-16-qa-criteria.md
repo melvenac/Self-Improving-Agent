@@ -16,6 +16,16 @@ session 71); the planner's Loop 14 close-out is `8b200f7` (rev 59, session 73).
 **Candidate:** none yet. This file is committed before the developer's first commit exists so the
 criteria cannot be fitted to what arrives. **They are not widened after a verdict.**
 
+> **AMENDED ONCE, BEFORE ANY CANDIDATE EXISTS — the only window in which this file may change.**
+> The base commit `154d1b3` is **not** amended; this is the second commit on the same branch.
+> It applies `docs/loops/loop-16-brief-amendment-1.md` at **`1453e5f`** (rulings `R1`–`R11`,
+> answering the developer's six questions and my seven §9 items, and recording **Planner 51** —
+> A4 was unbuildable as written — and **Planner 52** — A6 could not fail); `loop-16-brief-amendment-2.md`
+> at **`c43a31f`** (`R12` on A11, `R13`, `R14`), read from the tracked file and not only from the
+> hub room; and §7.6's base suite measurement, which was outstanding when `154d1b3` was written. **Every former `[mine]`
+> clause now carries its ruling inline.** Nothing here is narrowed in response to a candidate,
+> because no candidate exists.
+
 > **Rule of this file.** Every criterion names what will be observed, in which tree, with which
 > command, and what result means **pass**, **fail** or **untested**. A criterion I cannot state that
 > way is in §6 as unverifiable now, not silently dropped. **Missing evidence is a gap, not a pass.**
@@ -48,6 +58,7 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 | **Fixture store shape (A1–A4)** | One SQLite store built by the candidate's own schema code (not hand-written DDL, which would measure my DDL), holding entry 299's text **as it exists at base** — captured to a file in §7 so the fixture cannot drift — plus **at least ten decoys sharing the common tokens `exit`, `code`, `tail`, `run`** (brief A1). Decoys are drawn from the live store's real entries where they qualify and are otherwise synthesised; the report lists every decoy id and its provenance. The store's maturity column matters (`recallRankExpr` boosts Mature 1.5× / Proven 1.2×), so the fixture records each row's maturity and the report says what entry 299's was. |
 | **Read-only** | No edit to any tracked file at the candidate. Nothing is repaired. Where a check must be *seen red* on a mutation, the mutation is made on a scratch copy, never in the candidate tree. |
 | **Instrument discipline** | **"Exit 0" everywhere below** means the status captured from the process under test — `cmd > file 2>&1; rc=$?` with `rc` written to a file and read back, or `execFileSync` — never a pipeline's last stage and never a line of output (`G-042`, and the entry this whole loop is about). **Every instrument that returns a zero or an empty result is validated against a planted positive through the same channel first** (`G-044`: `GIT_TRACE=1` to stderr saw nothing because the callee ignored stderr; the zero was "I did not look"). Hook payloads are built with `JSON.stringify`, never by hand — a Windows backslash makes them invalid JSON and the hook then reads the shell's own cwd while looking right. The suite runs **alone**; no fixture construction beside it. |
+| **The hook event** | **`PostToolUse` only (`R1`).** The brief's *"the developer chooses"* is now chosen, on the developer's own reason: on `PostToolUse` the host **cannot** honour a block, so *the trigger never blocks* is structural rather than behavioural. Every row below is measured on that event; a candidate that also registers `PreToolUse` is out of scope (§4), not a bonus. |
 | **Not shown** | Probe shapes beyond the brief's own cases are not listed here and are not shown to the developer before the report; they go into the report after the verdict. |
 
 ## 2. Acceptance criteria, one per row in the brief's §4
@@ -65,11 +76,23 @@ untested**, and **blind spot** (what the procedure cannot see).
   exit code from the process. Then, independently of the developer's test, call the trigger's query
   function directly with that literal command string and assert entry 299 is rank 1 — the
   developer's test and my call must agree; if only the developer's passes, the test is measuring
-  itself. **Seen-red check:** `git log --reverse --format='%h %s' <base>..<candidate>` — the first
+  itself. **[mine]** — the only clause in this file still so marked: `R11` kept it explicitly, on
+  the grounds that it *"can fail only on a genuine disagreement, which is a finding either way."*
+  **Seen-red check:** `git log --reverse --format='%h %s' <base>..<candidate>` — the first
   commit on the branch must contain the A1 test and must not contain the implementation. I verify
   the red by checking that first commit out into a scratch worktree of the shared object store,
   running the test there, and recording a **non-zero** exit and the failure text. A first commit
   whose test passes, or that contains implementation, is a fail.
+  **RULED (`R9`, was my §9.6):** *"The first commit survives to hand-over. The developer's first
+  commit is A1's test failing, and the branch is **not squashed, rebased or reordered** before
+  hand-over. The hand-off cites the branch by rev **and** names that first commit's SHA. QA checks
+  it out in a scratch worktree and runs it red."* So a hand-over that does not name the first
+  commit's SHA, or a branch whose history has been rewritten, is a **fail** of this row rather than
+  an untested one. No longer mine.
+  **The first commit is already named:** `90e314f` on `loop/16-recall-trigger`, rev 1, A1 red
+  (`loop-16-brief-amendment-2.md` at `c43a31f`, header). **That is a relay from the planner's file,
+  not an observation** — I check it out and run it red myself, and if the hand-over names a
+  different first commit, the hand-over wins and the discrepancy is a finding.
 - **Pass:** entry 299 is rank 1 from both callers; the first commit exists, contains the test alone,
   and is red when run. **Fail:** any other rank; disagreement between the two callers; the first
   commit green, absent, or carrying implementation. **Untested:** cannot arise — every input is
@@ -97,7 +120,17 @@ untested**, and **blind spot** (what the procedure cannot see).
   trigger value is not the new one — in particular `unspecified`, which is what
   `recordRecallEvent` writes for a value absent from `RECALL_TRIGGERS` (`db-v2.ts:749`, measured at
   base in §7.3): a census that silently absorbs the trigger into `unspecified` is a fail, not a
-  naming quibble. **Untested:** cannot arise.
+  naming quibble. **RULED (`R6`, was my §9.3):** confirmed as the brief's plain meaning — *"a fire
+  that lands in the census as `unspecified` is a fail … that is precisely the failure A8 exists to
+  see."* No longer mine. `R6` also settles where the value goes: into `RECALL_TRIGGERS`, the DB
+  set, and **not** into `ob_recall`'s zod enum — an agent cannot label an explicit recall as
+  hook-injected, so a candidate that widens the enum is a fail of this row.
+  **Where the fire rows live (`R5`):** injected entries are written to `recall_log` with the new
+  trigger value **and** to a sibling fires table; looked-at entries to the fires table **only**, so
+  a silent fire never enters the rated set **by construction, not by a filter**. This row's SQL
+  therefore reads the fires table for the three negatives and asserts `recall_log` has **no** row
+  for them — the absence and its matching presence (the planted positive's `recall_log` row) in one
+  test. **Untested:** cannot arise.
 - **Blind spot:** "returns nothing" is measured at the query, not at the hook's stdout. A5 covers
   the emitted JSON; a query that returns nothing while the hook emits an empty `additionalContext`
   field would pass here and fail there, which is the correct division.
@@ -127,18 +160,35 @@ untested**, and **blind spot** (what the procedure cannot see).
 
 ### A4 — the relevance floor is data, and changing it changes behaviour with no source change
 
-- **Required (§4 A4):** *"The relevance floor is read from data, not a literal; changing it changes
-  A2's third case from silent to injected with **no source change**, and a floor hand-edited into
-  the query code is caught by a drift check (`D-021`'s pattern, as slice two's policies)."*
+- **Required (§4 A4, as corrected by `R4`):** the brief's row said *"changing it changes A2's third
+  case from silent to injected"*. **That was unbuildable and is recorded as Planner 51:** A2's
+  third case is a command whose tokens match **no** entry, and no floor can promote a row FTS never
+  returns. `R4` replaces the case: *"A command whose tokens **weakly match one decoy below the
+  floor**: at the shipped floor the trigger is silent; with the floor lowered in the policy file and
+  **no source change** it injects that decoy; restored, silent again. A2 keeps its three true
+  negatives unchanged. A4's drift-check clause stands."* The rest of the row is unchanged: the floor
+  is read from data, not a literal, and a floor hand-edited into the query code is caught by a drift
+  check (`D-021`'s pattern, as slice two's policies).
 - **Procedure:** locate the floor's source of truth, its derived file and its drift check, from the
-  developer's handoff and from the tree. Then, with **no edit to any `.ts`**, change the floor in
-  the data file so A2's third command crosses it, re-run, and observe injection; restore, re-run,
+  developer's handoff and from the tree. Build A4's **own** fixture command — tokens that match
+  exactly one decoy, weakly, scoring below the shipped floor; I verify "weakly matches" by querying
+  the fixture store directly and recording the decoy's rank and score with the floor removed, so
+  "below the floor" is a measured distance and not an assumption. Then, with **no edit to any
+  `.ts`**, lower the floor in the data file, re-run, observe that decoy injected; restore, re-run,
   observe silence. Both directions in the same session, with the file's bytes hashed before,
-  between and after. Separately: hand-edit a floor literal into the query source on a scratch copy
+  between and after, and with the `.ts` files' hashes unchanged across all three. Separately:
+  hand-edit a floor literal into the query source on a scratch copy
+  — and note **`R14`**: the policy pattern (zod contract, JSON values read at run time, derived
+  schema, byte-for-byte drift test) is **rebuilt in a directory the trigger owns**, with **no edge
+  to `src/harness/`**; ruling 5 named `harness/policies/` as the *shape* and §3 forbids the import,
+  so I check both — the pattern present, and the import graph clean of a harness edge. Reusing the
+  literal harness module is a fail of this row and of §3.2.
   and assert the drift check goes **red**; then assert it is **green** on the unmodified candidate
   — the presence half that `T-156` requires.
-- **Pass:** both directions observed from a data change alone; drift check red on the planted
-  literal and green on the candidate. **Fail:** behaviour that only changes when source changes;
+- **Pass:** both directions observed from a data change alone, on A4's own fixture command; A2's
+  three true negatives unchanged and still silent at both floor settings; drift check red on the
+  planted literal and green on the candidate. **Fail:** behaviour that only changes when source
+  changes;
   a drift check that is green on the planted literal (an instrument that cannot tell "no drift"
   from "I did not look"); a floor with no derived-file/drift-check trio when the brief's §5.5 says
   *"that it is not a literal is not"* the developer's choice.
@@ -160,42 +210,58 @@ untested**, and **blind spot** (what the procedure cannot see).
   payload: `hookSpecificOutput.additionalContext` present, containing the string `299` as the
   entry's id in whatever field the candidate uses **and** the `ACTION:` text from entry 299.
   Assert on each A2 payload: the `additionalContext` key is **absent** (not present-and-empty, not
-  `null` — I record which, and present-and-empty is a fail against the brief's *"not an empty
-  reminder"* in §2), stdout is empty or a JSON object with no such key, exit 0. Across all four:
-  `permissionDecision`, `permissionDecisionReason`, `updatedInput`, `decision` and `continue: false`
-  are absent, and exit is 0.
+  `null` — I record which, and present-and-empty is a fail. **RULED (`R2`, was my §9.2):** *"the
+  key absent — present-and-empty is a fail (QA's reading is the brief's plain meaning: not an empty
+  reminder)."* No longer mine), stdout is empty or a JSON object with no such key, exit 0. Across
+  all four: `permissionDecision`, `permissionDecisionReason`, `updatedInput`, `decision` and
+  `continue: false` are absent, and exit is 0.
+  **The non-blocking property is CITED, not tested (`R2`).** That those fields would be ignored on
+  `PostToolUse` is a fact about the host; it is cited here from the hooks reference and **no mutant
+  is built to prove it** — a *deny on `PostToolUse`* variant run in a live session would put a
+  throwaway hook in front of a real seat for no evidence the documentation does not already give.
+  A5 asserts the hook's own emitted output and nothing about how the host treats it.
 - **Pass:** all of the above, with the A1 positive and the A2 negatives in the same test run.
   **Fail:** any blocking field on any payload; a non-zero exit; an empty-but-present
   `additionalContext`; an id or `ACTION` text that does not match entry 299 at the candidate.
-  **Untested:** if the developer chooses `PreToolUse` and `PostToolUse` both, each event is measured
-  separately and a row is untested only if one event cannot be invoked.
+  **Untested:** cannot arise — the event is `PostToolUse` only (`R1`) and I invoke it myself.
 - **Blind spot:** I invoke the hook the way the documentation says Claude Code does. **That is a
   relay** (the brief says so of its own reading, §7.7). A7 is the only row that observes the real
   host, and it is the reason A5 is not sufficient.
 
-### A6 — three failure shapes leave the tool call byte-identical, and each is logged
+### A6 — three failure shapes fail silent to the model and loud to the log
 
-- **Required (§4 A6):** *"With the store path pointed at a file that does not exist, a store that is
-  locked, and a hook killed at its timeout: the tool call's own result is byte-identical to a run
-  with no hook registered, and each failure appears in the named log file. Three cases."*
+- **Required (§4 A6, as re-scoped by `R3`):** the brief's row asked for *"the tool call's own result
+  … byte-identical to a run with no hook registered"*. **That could not fail and is recorded as
+  Planner 52:** on `PostToolUse` the tool has already run, so byte-identity is structurally
+  guaranteed — a green A6 would have been a derived value answering its own question, the exact
+  class `loop-14-closeout.md` §3 names, inside a brief that cites it. My §9.5 planted-unequal
+  payload was aimed at the same row and is **moot**, not adopted. `R3` keeps the same three
+  failures and replaces the observables: *store path absent, store locked, hook killed at its
+  timeout*, each asserting **(a)** exit code `0`, **(b)** empty stdout — no `additionalContext`, no
+  partial, no error string dressed as an entry — and **(c)** one line naming the failure in the log
+  file the handoff names. *Fails silent to the model, loud to the log.* "Byte-identical tool result"
+  is dropped as an observable.
 - **Procedure:** the three shapes — `KNOWLEDGE_V2_DB` at a non-existent path; the store held under
   an exclusive SQLite lock by a second process for longer than the hook's timeout; the hook process
-  killed at its configured timeout. "The tool call's own result is byte-identical" is measured as:
-  the hook's stdout carries nothing the host would merge (no `additionalContext`, no blocking
-  field), exit is 0, and the emitted bytes equal those of a control run with the hook's logic
-  disabled. **Baseline first:** the control bytes are captured before the three shapes, and their
-  equality is asserted against a planted *inequality* (a deliberately different payload) so that
-  "byte-identical" is not an instrument that always says yes.
-  Then read the named log file: one entry per shape, naming the shape. **Presence half (`T-156`):**
-  the log file must be **empty or absent** on a clean successful fire in the same test, so a log
-  that is written unconditionally cannot pass the three absence checks by accident.
-- **Pass:** three shapes, three byte-identical results, three log entries, clean run silent in the
-  log, inequality control fails as designed. **Fail:** any shape that changes the tool result, exits
-  non-zero, or leaves no log entry; a log file the handoff does not name. **Untested:** if the
-  locked-store shape cannot be produced on Windows with the candidate's driver, recorded as
-  untested with the attempt, never inferred from the other two.
-- **Blind spot:** a crash inside the host's own merge of `additionalContext` is not reachable from
-  here. Named in §10.
+  killed at its configured timeout. For each: exit code captured from the process; stdout captured
+  and asserted **empty**, and where non-empty, parsed and asserted to carry no `additionalContext`
+  and no error text; **stderr captured too and asserted to carry no stack trace** — `R3`'s reason
+  that (a) matters on `PostToolUse` is that a hook exiting `2` has its **stderr shown to the
+  model**, so a crash dump would be an injection through another channel, and a zero exit with a
+  loud stderr is the near-miss that observable exists to catch. Then read the named log file: one
+  line per shape, naming the shape. **Presence half (`T-156`):** in the same test, a clean
+  successful fire must leave the log **empty or absent** and must produce a non-empty stdout — so a
+  log written unconditionally cannot pass the three checks by accident, and an always-empty stdout
+  cannot pass (b) by accident.
+- **Pass:** three shapes; three exits of `0`; three empty stdouts with clean stderr; three log
+  lines naming their shape; clean fire silent in the log and non-empty on stdout. **Fail:** any
+  non-zero exit; any stdout content on a failure shape; a stack trace on stderr; a missing log
+  line; a log file the handoff does not name. **Untested:** if the locked-store shape cannot be
+  produced on Windows with the candidate's driver, recorded as untested with the attempt, never
+  inferred from the other two.
+- **Blind spot:** I observe the hook's output, not the host's handling of it. A crash inside the
+  host's own merge of `additionalContext` is not reachable from here, and with byte-identity
+  dropped as an observable nothing in this row watches the tool result itself. Named in §10.
 
 ### A7 — the real session, read from the transcript
 
@@ -236,13 +302,24 @@ untested**, and **blind spot** (what the procedure cannot see).
   `open-brain/src/pipelines/session-end/recalled-ids.ts`, and I call that resolution directly
   against the live session uuid and record its output. A seat's own `/end` reporting on the
   correctness of its own `/end` is the derived-value defect the developer named in Loop 14, and I
-  will not use it as the measurement. **[mine — §9.1]**
+  will not use it as the measurement. **Was `[mine — §9.1]`; RULED `R8`, see below.**
 - **Pass:** census delta ≥ 2 on the new value; `ob_recalled` distinguishes hook-injected from
   explicit; the resolved rated set contains 299 and no looked-at-only entry. **Fail:** the census
   showing the fires under `unspecified` or under `explicit` (the brief: *"a hook-fired recall is
   never counted as an `explicit` one"*); any looked-at-only id in the rated set — that writes
   `success_rate` for entries nobody read, the column that gates apoptosis and boosts ranking.
   **Untested:** whatever A7 leaves untested, propagated, not inferred.
+- **RULED (`R8`, was my §9.1):** *"A8 is observed by calling the resolution directly, not by running
+  QA's `/end` — `getSessionRecalledIds` against the live uuid, in the probe session. QA does not run
+  `/end` mid-loop in any case; its `/end` is the roll. **Not both.**"* So the direct call is the
+  measurement and the `/end` run is not made. No longer mine.
+- **Two more rulings this row observes.** **`R5`:** a silent fire never enters the rated set **by
+  construction, not by a filter** — `getSessionRecalledIds` and `recalled-ids.ts` precedence are
+  unchanged, so a candidate that reaches the same outcome by filtering looked-at ids out of
+  `recall_log` is a fail of this row even though the set looks right. I read the code for which it
+  is, not only the result. **`R7`:** injected entries bump `recall_count` and `last_recalled_at`;
+  looked-at entries do **not**. Measured on entry 299 and on one looked-at decoy, before and after,
+  read from `knowledge_index` directly — both directions, one test.
 - **Blind spot:** the live store is shared with every other session on this machine. A concurrent
   session's recalls land in the same census, so the delta is a lower bound, and I say so rather
   than treating the number as exact.
@@ -277,32 +354,60 @@ untested**, and **blind spot** (what the procedure cannot see).
   JSON. Both arms in the same session where possible, and if not, the arms' conditions are stated.
   **Nothing else runs during the measurement** — the suite-runs-alone rule applies to timing at
   least as much as to vitest.
-- **Pass:** the numbers exist, with the method. **There is no threshold** — the brief says a number,
-  not a verdict, and I do not invent one. **Fail:** the measurement not taken, or taken with the
-  method unstated. **Untested:** no registration word from Aaron.
+- **RULED (`R10`, was my §9.7):** *"A10 measures the floor, and says so. Fifty or more repetitions
+  of one fixed trivial command, with and without the hook, p95 wall time reported with the method
+  and the configured `timeout`. That is the hook's cost, and node startup is its floor; if the
+  number is mostly interpreter startup the handoff names that and names 'resident process' as the
+  out-of-scope way down."* So the fixed trivial command is the ruled shape, not my convenience, and
+  the report says in words that it is a floor rather than a realistic mix. I additionally check
+  that the **handoff** names the startup share and the resident-process option when the number is
+  mostly startup — that is `R10`'s clause on the developer, and a row I would otherwise pass while
+  the required sentence is missing.
+- **Pass:** the numbers exist, with the method, and the handoff carries `R10`'s sentence where it
+  applies. **There is no threshold** — the brief says a number, not a verdict, and I do not invent
+  one. **Fail:** the measurement not taken, or taken with the method unstated. **Untested:** no
+  registration word from Aaron.
 - **Blind spot:** one machine, one store size (599 entries at base, §7.2). Cost is a function of the
   store, and a p95 here says nothing about a store ten times larger.
 
-### A11 — the suite, the gate, the boundary, and no network
+### A11 — the targeted run is scored; the full suite is reported both ways
 
-- **Required (§4 A11):** *"Suite exit code read from the process (`G-042`); `sync --check` clean with
-  zero skipped in the QA tree; `module-boundary` green; a test that fails on any network attempt
-  covers the trigger's module."*
-- **Procedure:** `npx vitest run` **alone**, stdout+stderr to a file, `rc=$?` written to a file and
-  read back; the printed pass count recorded beside the exit code, because the two disagreeing *is*
-  `G-042` and is itself a finding. `node open-brain/build/cli.js sync --check` from the root, full
-  output, **0 skipped** asserted explicitly (a skip is not a pass), with `gitnexus-index` reporting
-  the candidate's SHA. `module-boundary` green in that run. For the network clause: locate the test
-  the developer added, then **validate it against a planted positive** — introduce a network call
-  into a scratch copy of the trigger's module and assert the test goes red — before believing its
-  green.
-- **Pass:** suite exit 0 with the count and the code agreeing; `sync --check` clean, 0 skipped;
-  `module-boundary` green; the network test red on the planted call and green on the candidate.
-  **Fail:** any of these; in particular a suite that prints a green count and exits non-zero, which
-  is recorded with the full worker output. **Untested:** cannot arise.
-- **Blind spot:** a green suite is not evidence the trigger works; it is evidence nothing else
-  broke. And `G-042` is load-dependent and has only ever been seen on this machine — a clean run
-  here does not close it.
+- **Required (§4 A11, as re-scoped by `R12`):** the brief's row asked for the suite's *"exit code
+  read from the process"*. **The full suite is red at base** — twice, alone, a different single
+  victim each time, both victims green in isolation (§7.6). Scoring the row as written would have
+  failed a candidate for a condition it inherited. `R12`:
+  - **SCORED:** the **targeted run** — the trigger's own tests plus the existing recall tests —
+    exits `0` from the process; plus `sync --check` **zero skipped** in this tree;
+    `module-boundary` green; and the network test covering the trigger's module.
+    **The developer names the targeted set in its handoff; I may add the recall tests if it omits
+    them** (the §7.4 enumeration is what I add from).
+  - **REPORTED, both ways, not scored:** the full suite run **once, alone** at the candidate —
+    files and tests passed and failed, the exit code, the unhandled-errors line, and **every victim
+    by file and test name**.
+  - **A full-suite failure counts against the candidate only if** the failing test **(i)** fails
+    again **alone**, or **(ii)** lives in a file the candidate touched, or **(iii)** is in the
+    targeted set. Otherwise it is environment, recorded with the SHA.
+  - **`G-042` and `G-016` are not repaired this loop.** The planner amends `G-042` at the close-out
+    with my two base runs.
+- **Procedure:** targeted run first — `npx vitest run <the named set>`, stdout+stderr to a file,
+  `rc=$?` written to a file and read back, exit `0` required. Then `node open-brain/build/cli.js
+  sync --check` from the root, full output, **0 skipped** asserted explicitly (a skip is not a
+  pass), with `gitnexus-index` reporting the candidate's SHA and `module-boundary` green in that
+  run. Then the full suite **once, alone**, nothing else running from this seat, same exit-code
+  discipline; every victim named; each victim then re-run **alone** to apply (i), and checked
+  against `git diff <base>..<candidate> --name-only` to apply (ii). For the network clause: locate
+  the test the developer added, then **validate it against a planted positive** — introduce a
+  network call into a scratch copy of the trigger's module and assert the test goes red — before
+  believing its green.
+- **Pass:** targeted run exit 0; `sync --check` clean, 0 skipped; `module-boundary` green; network
+  test red on the planted call and green on the candidate; and no full-suite victim meeting (i),
+  (ii) or (iii). **Fail:** any of those; in particular a **targeted** run that prints a green count
+  and exits non-zero, recorded with the full worker output. **Untested:** cannot arise.
+- **Blind spot:** a green targeted run is evidence about the trigger's own tests, not that nothing
+  else broke — and the full suite, which would be that evidence, is exactly the instrument `G-042`
+  has made unreliable here. The (i)/(ii)/(iii) filter is a judgement I apply; a real regression in
+  a file the candidate did not touch, that happens to pass alone, walks through it. I name that in
+  §10 rather than pretend the filter is tight.
 
 ## 3. Preservation — what must still be true (brief §3)
 
@@ -311,9 +416,10 @@ Checked at the candidate, each with its own observation, none inferred from a gr
 1. **`ob_recall` for an explicit caller behaves exactly as at base** — same SQL, same broadening,
    same output. Measured as: the base output captured in §7.1 reproduced byte-for-byte at the
    candidate for the same query and limit against the same store snapshot, plus A9's diff.
-2. **Suite green with the exit code from the process; `sync --check` clean, zero skipped;
-   `module-boundary` green.** A11. **The trigger imports nothing from the harness and the harness
-   imports nothing from it** — read from the import graph, not asserted.
+2. **The targeted run green with the exit code from the process; `sync --check` clean, zero
+   skipped; `module-boundary` green; the full suite reported both ways** — A11 as re-scoped by
+   `R12`. **The trigger imports nothing from the harness and the harness imports nothing from it**
+   — read from the import graph, not asserted.
 3. **`ob_state` remains the only writer of `.agents/state.json`.** Measured: hash `state.json`
    before and after every A5/A6/A7 fire; unchanged. The trigger writes to the store's tables, never
    the record.
@@ -330,10 +436,12 @@ Checked at the candidate, each with its own observation, none inferred from a gr
 
 A candidate that does any of these is reported as out of scope regardless of its rows:
 reinstating session-start injection (Loop 10 C2 stands); changing `ob_recall`'s behaviour for
-explicit callers, including applying the new floor to it (`G-026`, not this loop); adding a second
-always-loaded curated set; `T-014` beyond the one constraint in A8; `T-154`/`G-030`; any change to
-`.claude/commands/`, to `open-brain/src/harness/`, or to the record schema; Jev, a network call or
-an API key anywhere in the trigger's path; `G-045` or slice three's list.
+explicit callers, including applying the new floor to it (`G-026`, not this loop) **or widening its
+zod enum with the new trigger value (`R6`)**; adding a second always-loaded curated set; `T-014`
+beyond the one constraint in A8; `T-154`/`G-030`; **registering `PreToolUse` (`R1` chose
+`PostToolUse` only)**; **repairing `G-042` or `G-016` (`R12`)**; any change to `.claude/commands/`,
+to `open-brain/src/harness/`, or to the record schema; Jev, a network call or an API key anywhere in
+the trigger's path; `G-045` or slice three's list.
 
 ## 5. What I will report as a finding even though no row fails
 
@@ -344,8 +452,11 @@ an API key anywhere in the trigger's path; `G-045` or slice three's list.
    important number in the report and it is not a row.
 2. **What the floor was calibrated against.** A4 tests that it is data. If the developer's stated
    calibration is one query, the report says so.
-3. **Which hook event was chosen and why** (`PreToolUse`, `PostToolUse`, or both), and whether the
-   choice makes the reminder arrive before or after the seat has already acted.
+3. **Where the reminder lands relative to the act.** The event is ruled (`PostToolUse`, `R1`), and
+   the ruling's own reason is that *"the damage is done when the seat reads the trimmed output and
+   the `0`, and the reminder lands beside that result."* So the reminder arrives **after** the act
+   by design. I report what that looked like in A7's transcript — whether the reminder sat beside a
+   result the seat had already drawn a conclusion from — as an observation, not a row.
 4. **The inherited defects, named:** the trigger runs the main tree's build, so a stale main tree
    serves a stale trigger (`G-034`), and the registration route is `G-030`'s. The brief requires the
    handoff to say so; I check that it does.
@@ -389,9 +500,35 @@ All at `4550ee5`, 2026-09-20, in `~/Worktrees/sia-qa`, after detach + build + an
 5. **Tree conditions:** `detach` verified at `4550ee5`; `npm run build` exit 0, `build stamped
    4550ee5`; `analyze --repair-fts` exit 0 then `analyze` exit 0 — `changed=0, added=6, deleted=0`,
    2,751 nodes / 5,581 edges / 191 clusters / 161 flows.
-6. **Still to take before the candidate arrives, and reported as taken or not:** a full `npx vitest
-   run` alone with the exit code read from the process, and `sync --check` with the skipped count —
-   the base numbers A11 is compared against.
+6. **The base full suite is RED, twice, alone — taken after `154d1b3` and the reason A11 was
+   re-scoped.** Both runs `npx vitest run` in `open-brain/`, nothing else running from this seat,
+   exit code written to a file and read back from the file.
+   - **Run 1:** exit **1**. Test Files 1 failed | 64 passed (65). Tests 1 failed | 973 passed
+     (974). Errors 1. Duration 131.40s. Victim:
+     `tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > "ops: [] with render:
+     true re-renders the views, leaves revision and state.json bytes unchanged, and runs no
+     retention (R3)"` — `EPERM: operation not permitted, rename '…\ob-state-writer-88czyU\.agents\
+     SYSTEM\SUMMARY.md.tmp-13832' -> '…SUMMARY.md'` at `atomicWrite src/shared/state-writer.ts:561`.
+     **This is `G-016`'s family exactly** (intermittent cross-test failure in that file under the
+     full suite, opened session 58).
+   - **Run 2:** exit **1**. Test Files 1 failed | 64 passed (65). Tests 1 failed | 973 passed
+     (974). Errors 1. Duration 123.61s. Victim:
+     `tests/pipelines/session-start/role-files.test.ts > describeRoleFiles > "records
+     HEAD-behind-upstream for a role file without calling it stale"` — `Test timed out in 5000ms`
+     at `role-files.test.ts:154`. A different file, a different failure mode, Loop 14's own C1 file.
+   - **Both victims together, in isolation:** exit **0**, 2 files, 49 tests passed, 9.75s. Neither
+     is a defect in the code; both are full-suite-only and load-dependent.
+   - **`G-042` fired in BOTH runs:** `[vitest-worker]: Timeout calling "onTaskUpdate"`, raised as an
+     Unhandled Error, **alone both times.** The previous QA seat's handoff at `94d3e4e` records
+     four clean runs alone and one red under load, and leaves open whether the condition is real
+     when nothing else runs. Two for two here at this base.
+   - **The honest limit on "alone":** alone means nothing was running from **my** seat. I cannot
+     see another session's load on this machine and did not ask anyone to be idle. The previous
+     seat's four clean runs were at a different SHA during Loop 14, so *"the base changed"* and
+     *"the machine was busier"* are both live and I have not separated them.
+   - `sync --check` at base: **27 passed, 0 fixed, 3 warnings, 0 issues, 0 skipped** (warnings:
+     `prd-version`, `vault-index-parity`, `spec-provenance` — all pre-existing seat-tree
+     conditions).
 
 ## 8. Procedure order on hand-over
 
@@ -401,7 +538,9 @@ All at `4550ee5`, 2026-09-20, in `~/Worktrees/sia-qa`, after detach + build + an
 4. **A1's seen-red check first** — the branch's first commit, in a scratch worktree.
 5. A9's diff, before running anything, so I know what moved.
 6. A1–A4 against the fixture store; A5, A6 against the hook as a process.
-7. A11's suite, **alone**.
+7. A11's **targeted** run (scored), then `sync --check`, then the full suite **once, alone**
+   (reported both ways); every full-suite victim re-run alone and checked against the candidate's
+   changed files, per `R12`'s (i)/(ii)/(iii).
 8. Ask for the registration word (§1); on it, A7, then A8 immediately, then A10; then restore the
    registration and read `settings.json` back.
 9. Re-check `git rev-parse HEAD` and `git status --porcelain`. If either moved, the evaluation is
@@ -409,48 +548,57 @@ All at `4550ee5`, 2026-09-20, in `~/Worktrees/sia-qa`, after detach + build + an
 10. Write the report. Verdict, then every row with its observation, then §6's list, then the probe
     shapes, then what the checks cannot see.
 
-## 9. Returned to the planner — clauses that are mine, not the brief's
+## 9. Returned to the planner at `154d1b3` — all seven RULED before any candidate existed
 
-Per Loop 14's A7-style ruling, these are marked here before any candidate exists, and a candidate
-that meets the brief and not one of these is reported **both ways**, with the clause returned rather
-than dropped. I do not narrow them after a verdict; I may narrow one **before** a candidate exists,
-saying why, in this file.
+Per Loop 14's A7-style ruling, these were marked as mine in the first commit and returned rather
+than silently applied. **All seven were ruled by the planner in `loop-16-brief-amendment-1.md`
+(`1453e5f`) before the developer's first commit**, and every clause now carries its ruling inline
+in §2. This section is kept so the provenance of each clause is auditable, not as an open list.
 
-1. **[mine] A8's third clause measured without running my own `/end`.** The brief says *"the rated
-   set at `/end` contains 299"*. Running `/end` would make my own session-end the instrument that
-   reports on session-end's correctness — the derived-value defect from Loop 14. I intend to call
-   `recalled-ids.ts`'s resolution directly instead. **If you want the literal `/end` run, say so and
-   I will do both.**
-2. **[mine] A5's reading that a present-but-empty `additionalContext` is a fail.** The brief's row
-   says *"emits **no** `additionalContext` field"*; its §2 says *"not a *no relevant entries* line,
-   not an empty reminder"*. I read those together as: the key must be absent. If present-and-empty
-   is acceptable to you, the row changes.
-3. **[mine] A6's control-inequality check.** The brief asks for byte-identical results. I add a
-   planted *unequal* payload so that "identical" is not an instrument that always says yes. This
-   adds no requirement on the candidate.
-4. **[mine] A1's independent second caller.** The brief scores the developer's test. I additionally
-   call the query directly and require the two to agree, because a test that measures itself is the
-   thing this repo keeps finding. This can only fail if the two genuinely disagree.
-5. **[mine] A2's "not `unspecified`" clause.** The brief says the census *"gains a value for the
-   trigger, distinct from all four"*. `db-v2.ts:749`'s fallback means an unregistered value lands in
-   `unspecified` silently, so I score that specific outcome as a fail rather than as a naming
-   detail. I believe this is the brief's plain meaning; flagged because it is an inference.
-6. **A question, not a clause: what makes A1 "seen red first" checkable?** The brief says the
-   developer's first commit is the failing test. I intend to verify by checking that commit out and
-   running it. If the developer squashes or reorders the branch before hand-over, that evidence is
-   destroyed and the row becomes untested. **Ruling wanted:** does the branch's first commit have to
-   survive to hand-over intact?
-7. **A question: is A10's "≥50 consecutive `Bash` calls" mine to generate, or must they be real work?**
-   I plan a fixed trivial command repeated, which measures the hook's floor, not a realistic mix.
+| # at `154d1b3` | ruling | outcome |
+| --- | --- | --- |
+| 1 — A8 without running my own `/end` | **`R8`** | **Adopted, and narrowed to one method:** the direct `getSessionRecalledIds` call **only** — *"not both"*. The `/end` run is not made. |
+| 2 — A5: present-but-empty is a fail | **`R2`** | **Adopted as the brief's plain meaning.** No longer mine. |
+| 3 — A6's planted-unequal payload | **`R3` + Planner 52** | **Moot, not adopted.** The row it defended could not fail on `PostToolUse`; A6 is re-scoped to exit code, empty stdout and a log line. My instinct is recorded as *"the right instinct against the same row"*, and the row it aimed at is gone. |
+| 4 — A1's independent second caller | **`R11`** | **Stays as mine**, explicitly: *"it can fail only on a genuine disagreement, which is a finding either way."* The one clause in this file still marked `[mine]`. |
+| 5 — A2: a fire under `unspecified` is a fail | **`R6`** | **Confirmed as the brief's plain meaning.** No longer mine. `R6` also rules the value goes into `RECALL_TRIGGERS` and **not** into `ob_recall`'s zod enum. |
+| 6 — must the first commit survive to hand-over? | **`R9`** | **Yes.** No squash, rebase or reorder; the hand-off names that commit's SHA. A rewritten branch is now a **fail** of A1, not an untested row. |
+| 7 — A10: generated calls or real work? | **`R10`** | **Generated, fixed, trivial — and the report says it is a floor.** The developer's handoff must name the startup share and the out-of-scope way down when the number is mostly startup. |
+
+**Two planner errors were set in the same file and are recorded here because they changed my rows:**
+**Planner 51** (A4 was unbuildable — no floor can promote a row FTS never returns) and **Planner
+52** (A6 could not fail on `PostToolUse`). Both were caught by the developer reading the artifact,
+independently of my §9.3 aiming at the same row from the other side.
+
+**Three later rulings, in `loop-16-brief-amendment-2.md` (`c43a31f`), read from the tracked file
+rather than only from the room.** **`R12`** re-scoped A11 after I measured the base suite red twice
+(§7.6) — applied in A11. **`R14`** rules the floor's policy pattern is rebuilt trigger-owned with
+no edge to `src/harness/` — applied in A4 and checked against §3.2. **`R13`** records that the
+developer declined to open this file when the planner's GO named it, on brief §6 (*the developer
+does not see the probes*); nothing here changes, and it is noted because it means the probes in
+this file are still unseen by the seat being evaluated.
+
+**Still open and not mine to close:** nothing from §4's rows. The two standing acts are Aaron's —
+the `settings.json` registration for A7/A10 (§1), and his ruling held at brief §8.1 on building the
+deterministic trigger only.
 
 ## 10. What these criteria, as a set, cannot see
 
 A green sweep of §2 means: the query ranks one entry first against a small fixture; it is silent on
-three commands; it does not broaden; its floor is data; the hook's JSON is shaped right and never
-blocks; three failure shapes are inert and logged; one real session shows one injection and one
+three commands; it does not broaden; its floor is data; the hook's JSON is shaped right; three
+failure shapes exit 0, say nothing and are logged; one real session shows one injection and one
 silence; the census and the rated set agree with that session; nothing existing changed; and there
 is a latency number. **It does not mean the store gets used.** It does not mean the entry surfaced
 was the useful one, that the floor is set anywhere near right, that the trigger fires for commands
 nobody thought to test, or that a seat reads what appears next to its tool result. The loop's own
 brief says the last of these outright. The rest are named here so that a pass is read for what it
 is.
+
+**Three holes the amendments opened, named rather than left implicit.** (1) `R12`'s (i)/(ii)/(iii)
+filter is a judgement I apply: a real regression in a file the candidate did not touch, which
+happens to pass when re-run alone, walks through it — and the full suite, the instrument that would
+catch it, is the one `G-042` has made unreliable here. (2) With byte-identity dropped from A6
+(`R3`, Planner 52), **nothing in §2 watches the tool result itself**; the row now watches the hook
+only, which is the correct scope on `PostToolUse` and is still less than the brief originally
+asked. (3) `R2` cites the host's handling of `permissionDecision` on `PostToolUse` from the
+documentation rather than testing it — a deliberate trade, and a relay.
