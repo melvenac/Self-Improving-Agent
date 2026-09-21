@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 76,
+  "revision": 77,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2573,6 +2573,12 @@
       "title": "Seats on one machine use native cross-session messaging; A2A-Hub is for cross-machine",
       "date": "2026-09-21",
       "note": "AMENDS D-028, whose premise was that Claude Code cross-session discovery is broken on this machine. That premise is FALSE and was tested end to end on 2026-09-21 with three live seats (planner sia-planner-1c, developer sia-forge-42, QA sia-qa-24). All six directions were attested BY THE RECEIVING SIDE, never by a send receipt: both seats independently refused to treat success:true as delivery. An idle seat wakes on inbound with no human in the path — measured at 1.486s from receipt to first tool call. The queue-hold hypothesis is excluded by MAGNITUDE (|delta| = 227ms between the sender's success return and the receiver's context receipt, against the seconds-to-minutes a human-gated hold predicts), which does not require trusting two processes' log clocks at sub-second resolution; the ordering (delivery BEFORE the sender's own acknowledgment) is suggestive but not load-bearing. D-028's hub deployment keeps its role for CROSS-MACHINE traffic and for the Grok bot; it is no longer the default for seats on one box. Known limit, from the QA seat: ListAgents has a registration lag — the developer's listing showed only the planner while the QA seat was already running, and an early or short listing is INDISTINGUISHABLE from a seat that is not running. Nothing may gate on a single ListAgents poll."
+    },
+    {
+      "id": "D-030",
+      "title": "SIA reaches a working point on Claude Code first; Cursor is bridged afterwards through A2A-Hub, at close-to-parity rather than 1:1",
+      "date": "2026-09-21",
+      "note": "AARON'S SEQUENCING, stated at the close of session 77 and recorded because it was about to exist only in a chat. PHASE 1: get SIA to a good working point on Claude Code. PHASE 2: bring Cursor in through A2A-Hub. PARITY IS EXPLICITLY NOT THE TARGET - 'maybe not 1 to 1 parity but close'. A Cursor seat needs enough to BE A SEAT, not every SIA feature, and that scope call belongs to phase 2 rather than being assumed now. THIS AMENDS D-029's SCOPE. D-029 ruled native cross-session messaging for seats on one machine and the hub for CROSS-MACHINE traffic. A Cursor seat is neither: it sits on the same box and cannot speak Claude Code's native cross-session protocol at all, since ListAgents/SendMessage are host features rather than anything this repo controls. So the hub's role is CROSS-MACHINE AND CROSS-HARNESS, and a same-box Cursor seat is the second case. Native stays the default only between Claude Code seats. WHAT THIS MEANS FOR PRIORITY, because the planner raised T-046 to P0 one revision earlier on the idle-meter argument: T-046, G-001 and G-009 gate PHASE 2, not slice three. They stay P0 as the gate on a whole phase and on capacity already paid for (Cursor Pro+ $60/month, Cursor Models 7% used, Other Models 0%, resets Oct 3), but they are NOT work that interrupts the current loop. The planner's idle-meter framing was an argument about value, not about sequence; Aaron supplied the sequence. STILL TO ESTABLISH BEFORE PHASE 2 IS PLANNED, and not assumed here: which Cursor pool a given model draws from - Other Models spills to on-demand spend, which is disabled, so '0% used' is not 'any model runs free'. And whether a hub-bridged Cursor seat can meet the loop's evidence rules at all: frozen SHA, exit-code-only verdicts, and a write allowlist the runtime enforces are Claude-Code-side today."
     }
   ],
   "handoffs": [
