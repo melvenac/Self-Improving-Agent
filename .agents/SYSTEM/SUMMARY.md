@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 60 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 61 by open-brain v0.44.0 — do not edit; change state via ob_state -->
 > **Status:** v0.44.0 — NEXT LOOP: the G-039 recall trigger — not yet briefed. Ruled by Aaron 2026-09-20 (D-026) after Loop 14 closed ACCEPTED at v0.43.0 (D-025). Constraint from docs/loops/g-039-ruling.md: the trigger is deterministic, fails closed on nothing, and the loop is handed both fixes (a trigger on a queried store; an unconditional read of a curated set). Problem statement from Loop 14: shared.md is loaded into every session and the seat that quoted its rule broke it the same day — loading a rule and applying it are two different things. Then Loop 15 slice three with G-045 first. Fresh developer and QA sessions on Opus 5; the planner on Fable 5.1; criteria before candidate; frozen SHA; the record moves one seat at a time.
 
 ## What's working
@@ -72,6 +72,11 @@
 - The trigger's query path never broadens. ob_recall's OR fallback is right for a caller who asked and wrong for a channel nobody asked for, and the trigger is forbidden it — below the relevance floor it emits nothing at all rather than the best of a bad set, and the key is absent rather than empty. _(V-064, 2 evidence)_
 - The trigger fails silent to the model and loud to the log. On a missing store, a locked store and a result past its own deadline it exits 0, writes nothing to stdout, nothing to stderr, and one line to recall-trigger.log. Exit 0 is load-bearing: a PostToolUse hook that exits non-zero has its stderr shown to the model. _(V-065, 2 evidence)_
 - Only entries the trigger INJECTED are rateable and counted. A looked-at entry never enters recall_log and never bumps recall_count or last_recalled_at — structurally, because the query path holds a read-only handle and nothing else in the module writes knowledge_index. _(V-066, 2 evidence)_
+- The recall trigger fires at the tool-call boundary in a real Claude Code session and injects entry 299's ACTION beside the tool result, unasked — the first time in this project's record that the memory half reached an agent at the moment of the act. _(V-067, 1 evidence)_
+- R7 holds through the real built hook binary: an injected entry bumps recall_count and last_recalled_at and accumulates across repeats, while a not-asked fire and a genuinely silent fire (query ran, nothing cleared the floor) bump nothing. _(V-068, 1 evidence)_
+- The network tripwire catches a call inside the trigger's own source, not only one placed beside it. _(V-069, 1 evidence)_
+- A looked-at entry cannot enter the rated set by construction rather than by a filter: every non-injected fire carries injected_ids []. _(V-070, 1 evidence)_
+- CLOSED GAP IDS ARE REUSED BY THE NEXT add_gap, AND THE TRACKED TREE STILL CITES THEM. Verified at rev 60 by a dry run that assigned G-046 and G-047 to two new gaps, when gaps of those ids were closed at rev 59 and are cited with their OLD meanings in ten tracked files including .claude/commands/end.md. Reported rather than written: this seat dropped both add_gap ops to avoid creating the wrong references. _(V-071, 2 evidence)_
 
 ## What's broken
 

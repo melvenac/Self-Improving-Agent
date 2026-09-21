@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 60,
+  "revision": 61,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1623,6 +1623,76 @@
       ],
       "since_session": 74,
       "status": "verified"
+    },
+    {
+      "id": "V-067",
+      "claim": "The recall trigger fires at the tool-call boundary in a real Claude Code session and injects entry 299's ACTION beside the tool result, unasked — the first time in this project's record that the memory half reached an agent at the moment of the act.",
+      "evidence": [
+        {
+          "type": "file",
+          "path": "docs/loops/loop-16-qa-report-2.md",
+          "observation": "§4: trigger_fires row #2 at 04:08:29.325Z, session 6eab2c5c, command `echo ... 2>&1 | tail -8; echo $?`, query \"tail\" \"exit\" \"code\", state injected, ids [299]; row #3 for `git status --porcelain` state not-asked, no query derived. Scored on the fire rows, not on the seat's account."
+        }
+      ],
+      "since_session": 75,
+      "status": "verified"
+    },
+    {
+      "id": "V-068",
+      "claim": "R7 holds through the real built hook binary: an injected entry bumps recall_count and last_recalled_at and accumulates across repeats, while a not-asked fire and a genuinely silent fire (query ran, nothing cleared the floor) bump nothing.",
+      "evidence": [
+        {
+          "type": "file",
+          "path": "docs/loops/loop-16-qa-report-3.md",
+          "observation": "§3: build/cli-recall-trigger.js spawned with JSON.stringify payloads against scratch stores. Injected 0->1 with timestamp 2026-09-21 04:22:08; three injections accumulate to 3; a three-document store produces state silent, empty stdout, and no entry bumped."
+        }
+      ],
+      "since_session": 75,
+      "status": "verified"
+    },
+    {
+      "id": "V-069",
+      "claim": "The network tripwire catches a call inside the trigger's own source, not only one placed beside it.",
+      "evidence": [
+        {
+          "type": "file",
+          "path": "docs/loops/loop-16-qa-report-2.md",
+          "observation": "§3: a real fetch() planted inside deriveQuery, tsc --noEmit clean, turns the CLAIM row red — `expected [ …(7) ] to deeply equal []`. The candidate's own third test simulates the mutant beside the trigger; this one is inside it."
+        }
+      ],
+      "since_session": 75,
+      "status": "verified"
+    },
+    {
+      "id": "V-070",
+      "claim": "A looked-at entry cannot enter the rated set by construction rather than by a filter: every non-injected fire carries injected_ids [].",
+      "evidence": [
+        {
+          "type": "file",
+          "path": "docs/loops/loop-16-qa-report-2.md",
+          "observation": "§7: all ten of this session's non-injected fires carry \"[]\"; getSessionRecalledIds resolved directly (R8, not by running /end) returns [299,349,423,589,593] — 299 plus this session's explicit recalls only. trigger_fires' CHECK constraint refuses 'asked', '', 'INJECTED' and 'not_asked' at the database."
+        }
+      ],
+      "since_session": 75,
+      "status": "verified"
+    },
+    {
+      "id": "V-071",
+      "claim": "CLOSED GAP IDS ARE REUSED BY THE NEXT add_gap, AND THE TRACKED TREE STILL CITES THEM. Verified at rev 60 by a dry run that assigned G-046 and G-047 to two new gaps, when gaps of those ids were closed at rev 59 and are cited with their OLD meanings in ten tracked files including .claude/commands/end.md. Reported rather than written: this seat dropped both add_gap ops to avoid creating the wrong references.",
+      "evidence": [
+        {
+          "type": "file",
+          "path": ".agents/state.json",
+          "observation": "gaps array holds 39 entries, max id G-045; G-046 and G-047 absent (close_gap splices, per G-010). ob_state dry run at rev 60 assigned exactly those two ids to new gaps."
+        },
+        {
+          "type": "file",
+          "path": ".claude/commands/end.md",
+          "observation": "cites G-046 for the per-seat handoff slot and G-047 for session numbering; `git grep -lE 'G-04[67]'` returns 10 tracked files including CHANGELOG.md, docs/loops/loop-14-closeout.md and three Loop 14 QA documents."
+        }
+      ],
+      "since_session": 75,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -2247,26 +2317,25 @@
   "handoffs": [
     {
       "seat": "qa",
-      "pick_up": "THIS IS THE QA SEAT'S HANDOFF for Loop 14, the first entry written through the per-seat machinery this seat evaluated; read the planner's close-out for the loop's disposition. Loop 14 is ACCEPTED at c7fbdd9 and carried to the version-bump 3135da4; v0.43.0 is tagged at e1948a0. Seats roll after every complete loop, so the next QA session is a FRESH one for whatever the planner briefs next (Loop 15 slice three per D-023, whose mandatory first repair is G-045). Its first act is the same as this seat's was: write docs/loops/loop-<N>-qa-criteria.md from the brief's rows BEFORE any candidate exists, in the shape of docs/loops/loop-14-qa-criteria.md at a68c358 - every pass clause derived from the brief's or the planner's words, anything added marked [mine] and returned to the planner in a numbered section, then recorded inline as RULED at the commit the ruling arrives. Narrow a clause you added only BEFORE a candidate exists and say why in the file; never after a verdict. Read the three reports for this loop first: docs/loops/loop-14-qa-report.md (867790b, 7e1c041 rejected on C2d with four findings), loop-14-qa-report-2.md (667cd9d, c7fbdd9 accepted, R1-R4 closed) and loop-14-qa-report-3.md (97bdbe6, the bridge to 3135da4). The probe shapes are in report 1 section 10 and report 2 section 10 and rerunnable from the descriptions; the scripts were scratchpad-only and are not tracked - rebuild them: a linked-worktree fixture maker (clone --no-checkout once, `git worktree add --detach` per fixture, origin/master pinned by update-ref), a greeting runner that imports build/server.js and calls handleStart with HOME, USERPROFILE and KNOWLEDGE_V2_DB pointed at the scratchpad, and a handleState runner that hashes state.json before and after. Evaluate in ~/Worktrees/sia-qa, never the main checkout; the tree carries its own .gitnexus/ index so /sync runs 0 skipped; budget the T-055 FTS repair into every analyze (it fired on 1 of 3 today here).",
+      "pick_up": "THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at 5351270 and released as v0.44.0. Read the planner's close-out at docs/loops/loop-16-closeout.md for the loop's disposition; the four QA reports are in #85 (75e307d) — report 1 at a13f3c5 with its correction at ef79340, report 2 at c1b977a, report 3 at 87b4cef, report 4 at 31fec1a. Seats roll after every complete loop, so the next QA session is a FRESH one for whatever the planner briefs — Loop 15 slice three per D-023, whose mandatory first repair is G-045. Its first act is the same as this seat's was: write docs/loops/loop-<N>-qa-criteria.md from the brief's rows BEFORE any candidate exists, in the shape of loop-16-qa-criteria.md at 75f05eb, every pass clause derived from the brief's words, anything added marked [mine] and returned to the planner in a numbered section rather than applied. Nine criteria commits this loop and not one of them moved while a candidate was under evaluation; that is the property worth keeping. The probe shapes are in report 1 §10, report 2 §14 and report 3 §10 and are rerunnable from the descriptions — the scripts were scratchpad-only and are not tracked. Evaluate in ~/Worktrees/sia-qa; the tree carries its own .gitnexus/ index so /sync runs 0 skipped. TWO GAPS THIS SEAT FOUND ARE UNWRITTEN AND ARE IN V-071 AND THE OPEN QUESTIONS BELOW, because writing them would have reused two closed gap ids.",
       "watch_out": [
-        "THE SUITE MUST RUN ALONE. A full vitest run that overlapped thirteen `git worktree add` calls printed 974 passed and exited 1 with G-042's `[vitest-worker]: Timeout calling \"onTaskUpdate\"`; the same run alone exited 0, four of four today. Build fixtures before or after the run, never during, and read the exit code from a variable written to a file, never from a pipe.",
-        "A HOOK PAYLOAD BUILT BY HAND WITH WINDOWS BACKSLASHES IS INVALID JSON, and before c7fbdd9 the hook then greeted the SHELL'S cwd with a generated uuid while looking right. Two of my negative checks were reading my own checkout. Build every payload with JSON.stringify, and assert the `Project detected:` line names the fixture before reading anything else. The candidate now refuses malformed payloads (R4), but the lesson is about the instrument.",
-        "THE SHARED CWD DRIFTS UNDER PARALLEL BASH CALLS EVEN WITH AN EXPLICIT `cd` AT THE HEAD OF EACH COMMAND. Three reads returned 'no such file' because a sibling call's `cd open-brain` landed between my cd and my sed. Absolute paths and `git -C <root>` for everything that runs beside another call; this is the third session to record it.",
-        "GIT_TRACE=1 TO STDERR SEES NOTHING FROM THE SESSION-START MODULES because they spawn git with stderr ignored; the zero is 'did not look'. GIT_TRACE=<absolute file path> sees every call (25-29 per greeting). Validate a zero on a planted positive through the same channel, not a different one.",
-        "`if (false && ...)` IS NOT A VALID MUTANT where the condition narrows a TypeScript union: tsc refuses it (TS2339) while vitest, through esbuild, still goes red. Run `tsc --noEmit` on every mutant before counting it; two of twelve had to be redone type-clean. The developer's own rule, and it applied to me first.",
-        "DOCS-ONLY COMMITS MAKE build-freshness RED because it compares the build's commit to HEAD; every criteria and report commit needed `npm run build` first. Carried to the close-out as an instrument finding; until it changes, rebuild before every /sync in a seat tree.",
-        "THE OLD BUILD IN THE MAIN CHECKOUT FALLS BACK TO PROSE AGAINST THE MERGED v2 RECORD with one notice line (report 1 F3); R3 fixed the NEW build only. A session served by a main tree that has not been rebuilt after the merge gets a greeting that looks ordinary and is old. Confirm the server from a read (a dry-run ob_state answer that accepts `seat`), never from the reconnect message.",
-        "A CHECKOUT WITH NO AGENT.local.md NOW GREETS AS Forge (developer) AND RENDERS THE DEVELOPER'S HANDOFF AS ITS OWN, because the tracked AGENT.md says developer. The main tree is that checkout until its `role: none` file exists (report 1 F6). Not code; choreography.",
-        "THE REAL ~/.claude/open-brain/active-session.json CARRIES 8 SCRATCH KEYS from this session's six baseline hook runs (before HOME was redirected) and the developer's two C4 runs. Harmless, refused after 12h, disclosed to Aaron in report 1 section 9, not edited by any seat. Redirect HOME and USERPROFILE before the first hook run of any fixture work.",
-        "NOTHING IS PUSHED FROM THIS SEAT. The planner pushed both QA branches from the shared object store by the SHA this seat reported, on Aaron's word; the close-out commit goes on a branch cut from origin/master and is reported by SHA the same way."
+        "CLOSED GAP IDS ARE HANDED BACK BY THE NEXT add_gap. At rev 60 a dry run assigned G-046 and G-047 — ids closed at rev 59 whose OLD meanings are cited in ten tracked files, including .claude/commands/end.md, which explains the per-seat handoff by citing G-046. Done-task retention now protects ids the tree cites (it KEPT T-157 in this very write, with a NOTE); gaps have no such guard, and the gap failure is worse: an evicted task id goes DANGLING and announces itself, while a reused gap id points at something WRONG and does not. DRY RUN EVERY add_gap AND CHECK THE ASSIGNED ID AGAINST `git grep` BEFORE THE REAL CALL.",
+        "ob_stats SHOWING `hook: 1` IS NOT EVIDENCE THE SERVER KNOWS ABOUT THE TRIGGER. That census is a GROUP BY over recall_log values, so a stale build prints it from data alone. The three fire counts from trigger_fires are the discriminator, and the planner's check was worded to require them — one word looser and a pre-0.44.0 server would have been declared current.",
+        "A QUOTING LAYER BETWEEN YOU AND THE ARTIFACT EDITS THE CONTENT AND REPORTS SUCCESS. Four instances this session: a heredoc'd backslash became a real newline inside a TypeScript string literal (syntax-broken mutant, all twelve tests red, looks exactly like the result you wanted); a heredoc'd regex never compiled so a fixture was never modified and the test passed against it — which read as A FALSE ACCUSATION against a working guard; a backticked word in a hub message was executed as a command substitution and the clause arrived missing its subject; and json.dumps without ensure_ascii=False escaped every em-dash in Aaron's settings.json. WRITE EVERY SCRIPT AND EVERY MESSAGE TO A FILE, including one-liners, and have mutation scripts ASSERT THE EDIT LANDED before running anything.",
+        "tsc --noEmit ON EVERY MUTANT, BEFORE COUNTING IT. Three mutants this session were type-invalid and proved nothing while looking red or green as convenient — TS2349 from calling an object instead of its method, and an invented field that fell back to the real one at run time. A mutant that breaks syntax or types is not a mutant.",
+        "A FIXTURE CAN FAIL IN THE FLATTERING DIRECTION, and that is harder to see than a vacuous one because it looks like rigour. My first A1 decoy carried all three query terms in one short sentence and beat entry 299; the developer's rank-9 fixture gave every decoy a length advantage. Both exaggerated the defect. Measure your fixture's shape — decoy lengths against the target's — and report the range.",
+        "THE DERIVATION READS ELEMENTS, NOT WORDS. `zzqqxxyy 2>&1 | tail -3; echo $?` derives all three terms and injects, because the recogniser sees a trimmer pipeline and a $? read. You cannot produce a SILENT fire with nonsense command text; use a three-document store, where bm25's IDF collapses and nothing clears the floor.",
+        "EVERY ROW YOU RUN, RUNS ON THIS MACHINE. CI is the second machine and it found two faults in one file the first time it looked, both of which passed every local run including three full suites. Cite a CI run id as evidence, and treat an empty statusCheckRollup as PRE-REGISTRATION and not a pass — mine was genuinely empty for ~3.5 minutes after the push before the run appeared.",
+        "NOTHING IS PUSHED FROM THIS SEAT. The planner pushes QA branches by the SHA this seat reports, on Aaron's word for that push. Every push names a BRANCH TIP, never an interior commit — a report correction is auditable only if the thing it corrects travels with it.",
+        "REGISTERING THE HOOK IN ~/.claude/settings.json IS MACHINE-WIDE, not QA-tree-wide: two of the ten fire rows from the A7 probe carry other seats' session uuids. Aaron's word is for THAT ACT AT THAT SHA and does not carry forward. Back up first, hash before and after, and verify the restore BY BYTES — 'PostToolUse is [] again' is a semantic restore, not a restore."
       ],
       "open_questions": [
-        "IS THE VITEST WORKER-TIMEOUT CONDITION (G-042) REAL ON ANY MACHINE WHEN NOTHING ELSE IS RUNNING? Four clean runs alone today and one red under load, all on this machine; CI has never been measured for it. The amendment to G-042 carries the counts.",
-        "DOES THE MEMORY HALF GET USED AT ALL? ob_recalled returned 'No knowledge entries recalled this session' again; the shared-cwd rule and the GIT_TRACE-to-file trick both lived in prior handoffs and in the store and neither surfaced when they bit. Eight loops now.",
-        "WHAT ELSE REACHES THE REPOSITORY? Unchanged from slice two: the index, hooks, config, submodules, packed-refs and the reflog are unprobed by any seat, and Loop 15 slice three (G-045) is next.",
-        "WHY DOES handleStart REPORT 'Session ID: discovery failed' ON A FIXTURE WHOSE SLOT THE HOOK JUST WROTE with the same session id into the same (scratch) home? The slot was there with the right uuid and the read side did not find it. Not scored, not chased; T-003's family, and the reuse-the-log path was untested because of it."
+        "WHERE DOES A CLAUDE CODE SESSION'S TRANSCRIPT ACTUALLY LIVE? Not at ~/.claude/projects/<slug>/<uuid>.jsonl for this session — three .jsonl files there, none this uuid, none holding the probe string; a recursive search found it only in open-brain/knowledge-v2.db-wal, the trigger's own fire row. Until that is answered, no criteria row can evidence that the host DELIVERED a hook's additionalContext to the model, only that the hook emitted it. A7 was scored on the fire rows for exactly this reason. UNWRITTEN AS A GAP because the id would have collided.",
+        "DOES A SEAT APPLY WHAT THE TRIGGER SURFACES? Unchanged and unmeasured, and the loop's own premise was demonstrated against it while the candidate was being built — the developer piped to tail and read tail's exit code while measuring A10, against a store containing entry 299, with the hook built and not registered. A trigger built and not registered is exactly as useful as no trigger.",
+        "IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.",
+        "IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided."
       ],
-      "session": 72,
+      "session": 75,
       "loop_state": null
     },
     {
@@ -2331,9 +2400,9 @@
     }
   ],
   "last_session": {
-    "n": 74,
+    "n": 75,
     "date": "2026-09-21",
-    "uuid": "46758737-4461-4480-be96-fcf65ba9fa95",
-    "seat": "developer"
+    "uuid": "6eab2c5c-8a09-4a22-9bdf-4af60df64f4e",
+    "seat": "qa"
   }
 }
