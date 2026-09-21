@@ -60,6 +60,17 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 > always-printed zeros, `R19`'s zod-required provenance), the enlarged targeted set, the mutant
 > set out to **M16**, and the fourth `G-042` sighting. It arrives at the developer's boundary 4
 > (`405a5e3`, rev 4).
+>
+> **AMENDED A SIXTH TIME, AND THIS IS THE LAST — the freeze is next** (`R24`). Seventh commit; all
+> six earlier commits are cited and none amended. It applies `loop-16-brief-amendment-8.md` at
+> **`29766dc`**: **`R22`** (A10 measured — the common case pays ~0.28 s on every `Bash` call and
+> the census is kept this loop, with the price put to Aaron), **`R23`** (a malformed payload is
+> logged and dropped, not refused — A6's fourth case), **`R24`** (the freeze, the hand-off's
+> required contents, and no version bump before acceptance), **`M22` declared alive with a reason**
+> so its *row* is what I check, **`M18`'s class** — the candidate's own A6 harness asserted a
+> channel it never captured, on my `R15` clause — and the **fifth `G-042` sighting, which is clean
+> and falsifies the correlation I drew at the sixth commit.** It arrives at the developer's
+> boundary 5 (`1afb04c`, rev 5). **Nothing in this file changes after the candidate SHA is named.**
 
 > **Rule of this file.** Every criterion names what will be observed, in which tree, with which
 > command, and what result means **pass**, **fail** or **untested**. A criterion I cannot state that
@@ -332,6 +343,12 @@ untested**, and **blind spot** (what the procedure cannot see).
   **A5's negatives are fixture-independent by construction** (`R16`: the A2 commands are *not
   asked*, so no query is made at any scale). I **assert** that rather than assume it, by running
   one negative at both scales and requiring the same *not asked* state from each.
+  **As built at rev 5** (`29766dc` header, `1afb04c`): the positive runs at 599 documents with the
+  shipped floor read from the policy file, the hook **spawned as a child process**, and the payload
+  built with `JSON.stringify`. I check each of those three from the test's own code rather than
+  from its name — a positive that imports the hook's function instead of spawning it is not the
+  same test, because the child-process boundary is where stdout, stderr and the exit code become
+  observable at all, which `M18` just demonstrated the hard way.
 - **Pass:** all of the above, with the A1 positive and the A2 negatives in the same test run.
   **Fail:** any blocking field on any payload; a non-zero exit; an empty-but-present
   `additionalContext`; an id or `ACTION` text that does not match entry 299 at the candidate;
@@ -369,10 +386,31 @@ untested**, and **blind spot** (what the procedure cannot see).
   successful fire must leave the log **empty or absent** and must produce a non-empty stdout — so a
   log written unconditionally cannot pass the three checks by accident, and an always-empty stdout
   cannot pass (b) by accident.
-- **Pass:** three shapes; three exits of `0`; three empty stdouts; **three empty stderrs**; three
-  log lines naming their shape; clean fire silent in the log and non-empty on stdout. **Fail:** any
-  non-zero exit; any stdout content on a failure shape; **any stderr content at all** (`R15`); a
-  missing log line; a log file the handoff does not name. **Untested:** if the locked-store shape cannot be
+- **`R23` — A FOURTH FAILURE CASE: a malformed payload is LOGGED AND DROPPED, not refused**
+  (`29766dc` §3). Unlike `SessionStart`'s F4, which refuses and exits non-zero, and for `R15`'s own
+  reason: this hook runs after every tool call on an event where **stderr reaches the model**, so
+  refusing loudly would be an injection through the other channel. Observables are the same three
+  plus the log line: exit `0`, empty stdout, empty stderr, one line naming it. **Both ways in one
+  test:** the malformed payload produces a log line and no output; **a well-formed payload in the
+  same run produces output and no such log line** — otherwise "it dropped the bad one" passes on a
+  hook that drops everything. Payloads are built with `JSON.stringify`; a hand-built one with
+  Windows backslashes is itself malformed and would test `R23` by accident while looking like the
+  positive.
+- **THE HARNESS MUST BE SHOWN TO CAPTURE WHAT THE ROW ASSERTS — `M18`'s class, and it landed on my
+  own clause.** `29766dc` §4: the candidate's A6 harness hardcoded `stderr: ''` on the success path
+  because `execFileSync` returns stdout only, **so every `expect(stderr).toBe('')` in A6 passed
+  without looking** — on the exact observable `R15` exists for, which I added. It is rewritten on
+  `spawnSync` with `M18b` red on four rows. **I do not take that on the handoff's word:** I plant
+  output on **stderr** in a scratch copy of the hook and require the stderr assertion to go **red**.
+  If it stays green the harness still is not looking, and every `R15` result in the report is void
+  rather than passing. **I apply the same test to every value these rows assert** — stdout, exit
+  code, the log file's contents — by planting a violation of each and requiring red, because an
+  assertion on a value the harness never captured is this loop's own subject wearing test clothes.
+- **Pass:** four shapes; four exits of `0`; four empty stdouts; **four empty stderrs**; four
+  log lines naming their shape; clean fire silent in the log and non-empty on stdout; **and every
+  asserted channel shown red on a planted violation.** **Fail:** any non-zero exit; any stdout
+  content on a failure shape; **any stderr content at all** (`R15`); a missing log line; a log file
+  the handoff does not name; **any assertion that stays green when its channel is violated.** **Untested:** if the locked-store shape cannot be
   produced on Windows with the candidate's driver, recorded as untested with the attempt, never
   inferred from the other two.
 - **Blind spot:** I observe the hook's output, not the host's handling of it. A crash inside the
@@ -495,10 +533,26 @@ untested**, and **blind spot** (what the procedure cannot see).
   that the **handoff** names the startup share and the resident-process option when the number is
   mostly startup — that is `R10`'s clause on the developer, and a row I would otherwise pass while
   the required sentence is missing.
-- **Pass:** the numbers exist, with the method, and the handoff carries `R10`'s sentence where it
-  applies. **There is no threshold** — the brief says a number, not a verdict, and I do not invent
-  one. **Fail:** the measurement not taken, or taken with the method unstated. **Untested:** no
-  registration word from Aaron.
+- **MEASURED AT REV 5, AND THE PREDICTION WAS WRONG** (`29766dc` §2; 60 samples per arm, warm-up
+  discarded, 599-document store, nothing else running): interpreter floor p50 58.8 / **p95 65.5
+  ms**; *not asked* (`git status`) p50 229.7 / **p95 277.2 ms**; *injected* p50 235.6 / **p95 306.6
+  ms**. `R10` anticipated the number would be mostly interpreter startup; **it is 21%.** The rest
+  is the hook's own work — loading the native sqlite binding and opening the store — so
+  **the common case pays about 0.28 s on every `Bash` call while asking the store nothing**,
+  because `R16` requires a fire row for every invocation and that row is a write.
+  **`R22` rules it kept as built for this loop** — the denominator is what makes *does the memory
+  half get used* answerable, and a census that skips the common case cannot say how often the
+  trigger was silent — **and puts the price to Aaron in the close-out as a decision.** The named
+  first follow-up, not built now: record *not asked* without opening the store.
+  **What I verify, since the number itself is ruled and not scored:** I reproduce all three arms
+  with my own method and report mine beside the developer's; and I check the handoff **names where
+  the 220 ms goes** (`R24`), because `R22`'s whole disposition rests on that attribution being
+  written down rather than asserted.
+- **Pass:** the numbers exist, with the method, and the handoff carries `R10`'s sentence and
+  `R24`'s attribution. **There is no threshold** — the brief says a number, not a verdict, and I
+  do not invent one; `R22` has already ruled the disposition, so **a slow number is not a fail
+  here.** **Fail:** the measurement not taken, or taken with the method unstated; the attribution
+  missing from the handoff. **Untested:** no registration word from Aaron.
 - **Blind spot:** one machine, one store size (599 entries at base, §7.2). Cost is a function of the
   store, and a p95 here says nothing about a store ten times larger.
 
@@ -581,7 +635,21 @@ Checked at the candidate, each with its own observation, none inferred from a gr
 6. **The store is opened read-only by the query and written only for the fire record.** Read the
    open mode in the code, and observe it: with the store file marked read-only at the OS level, a
    query-only fire must still succeed (or fail into A6's logged path) and must not error as a write.
+   **`M22` IS DECLARED ALIVE, WITH A REASON** (`29766dc` §4): the query only reads, so restricting
+   its handle has no behavioural evidence until code exists that would violate it, and a **row**
+   asserts the handle is read-only in both directions instead. **I check that row, not the mutant**
+   — the planner's instruction, and right: a mutant with no behavioural difference cannot be
+   killed, and a runner that reports otherwise is lying. What I require of the row: read-only
+   asserted **positively** (the handle's mode, read from the handle) **and negatively** (a write
+   attempted through that handle fails), since the negative alone passes against a handle nothing
+   ever writes through. **A declared-alive mutant is a stated gap and I report it as one**, rather
+   than letting *all mutants red except one, with a reason* read as full coverage.
 7. **Nothing pushes, merges, or tags.** From my seat, structurally: I report SHAs.
+8. **`R24` — NO VERSION BUMP, CHANGELOG OR README ENTRY BEFORE ACCEPTANCE** (`29766dc` §3). As
+   Loop 14 did, the bump is **one commit above the accepted SHA and is re-verified by me in
+   scope**. So a candidate carrying a `package.json` version change, a `CHANGELOG.md` entry or a
+   README edit is **out of scope** (§4) at the freeze, and I check `git diff <base>..<candidate>`
+   for all three by path rather than trusting the handoff's summary.
 
 ## 4. Scope fences — things the candidate must NOT do (brief §2, out of scope)
 
@@ -646,6 +714,16 @@ the trigger's path; `G-045` or slice three's list.
 
 - **That a seat *applies* what the trigger surfaces.** The brief says this outright and so does the
   ruling. Nothing in §2 measures it and nothing in the report will imply it.
+  **`G-039` HAPPENED AGAIN, LIVE, INSIDE THE LOOP BUILT TO FIX IT** (`29766dc` §1): while measuring
+  A10 the developer ran `node .a10.tmp.mjs 2>&1 | tail -12; echo $?`, the script crashed on a
+  module-resolution error, the shell reported `A10_EXIT=0`, and the developer read tail's status.
+  **The store being benchmarked contains entry 299, which describes that exact act, and the hook
+  that had just been built would have injected it — except it is not registered, so nothing
+  fired.** Caught by its author only because a stack trace under a green exit is visible; a
+  quieter failure would have been reported as a measurement. That is the loop's premise
+  demonstrated by its own construction, and it is also the sharpest statement of this row's limit:
+  **a trigger that is built and not registered is exactly as useful as no trigger.** A7 and A10 are
+  the only rows that run it registered, and both depend on an act of Aaron's that may not come.
 - **That the trigger fires for the developer's or planner's seat**, in another project, or under a
   different host version. A7 is one session in one tree.
 - **That `G-026` (recall precision at large) is unaffected.** The floor is the trigger's only.
@@ -724,6 +802,7 @@ All at `4550ee5`, 2026-09-20, in `~/Worktrees/sia-qa`, after detach + build + an
    | developer | developer | **rev 2 `ee74fd1`** | 986 passed | **0** |
    | developer | developer | **rev 3 `12b5aeb`** | 997 passed, 0 failed | **1** |
    | developer | developer | **rev 4 `405a5e3`**, after a real fix | 1008 passed, 0 failed, 69 files | **1** |
+   | developer | developer | **rev 5 `1afb04c`** | 1021 passed, 70 files | **0** |
 
    Amendment 4 §3 called the developer's 986 run *"same base"* as my two. Amendment 5 §3 then says
    *"the same tree at rev 2 exited 0 with 986"* — so that run was at **rev 2 of
@@ -745,6 +824,16 @@ All at `4550ee5`, 2026-09-20, in `~/Worktrees/sia-qa`, after detach + build + an
    tracked file and both seats. Amendments 4 and 5 are **cited and not retro-edited**, which is why
    this table names the code state per row: the corrected reading lives here and in `f28ed11`, and
    a reader of `5ab0ac4` alone still gets the wrong sentence. **The wording the planner will carry
+   **THE FIFTH POINT FALSIFIES THE CORRELATION I DREW FROM THE FIRST FOUR.** At the sixth commit
+   I wrote that the rising test count across rev 2 (986, clean), rev 3 (997, timeout) and rev 4
+   (1008, timeout) was *the first evidence separating “more tests” from “this machine”* — stated
+   as a correlation, not a cause, which is the only reason it costs nothing to retract. **Rev 5
+   is 1021 tests and exit 0** (`29766dc` §4). Within one tree the sequence is now clean, timeout,
+   timeout, clean, with the count rising monotonically throughout. **Test count does not predict
+   the timeout.** What survives is only what survived before the fourth sighting: the condition
+   appears and disappears in a single tree with no failing test, and nothing yet distinguishes
+   the runs that fire from the runs that do not. I record the retraction here rather than
+   quietly dropping the sentence, because a reader of the sixth commit has the wrong inference.
    **FOURTH SIGHTING, rev 4** (`3db1365` §2): 69 files, 1008 tests, zero failed, exit 1 on the
    heartbeat. So the same tree now reads clean at rev 2 (986) and timed out at rev 3 (997) and
    rev 4 (1008) — **three points in one tree with the test count rising monotonically**, which is
@@ -761,6 +850,13 @@ All at `4550ee5`, 2026-09-20, in `~/Worktrees/sia-qa`, after detach + build + an
 
 ## 8. Procedure order on hand-over
 
+0. **Check the hand-off document against `R24`'s contract before anything else**
+   (`29766dc` §3). `docs/loops/loop-16-developer-handoff.md` is written on the branch as **rev 6**
+   and that SHA is the frozen candidate. The hand-off must name: **the first commit (`90e314f`,
+   `R9`)**, **the targeted set (`R12`)**, **the floor's provenance (`R19`)**, **where A10's 220 ms
+   goes (`R22`)**, and **`M22` as declared**. A missing item is a finding reported before the rows
+   are run, because four of my rows score the hand-off's contents and I would otherwise be
+   discovering that halfway through.
 1. Record the SHA as given, in writing, with the time. `git cat-file -t`.
 2. `git checkout --detach <SHA>`; `git status --porcelain` empty; `git rev-parse HEAD` equal.
 3. Build, analyze, `sync --check` (§1). Exit codes into variables, read back from files.
