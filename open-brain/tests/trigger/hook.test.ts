@@ -84,12 +84,30 @@ const postToolUse = (command: string, session = SESSION) => ({
 const logLines = (): string[] =>
   existsSync(logPath) ? readFileSync(logPath, 'utf-8').split('\n').filter((l) => l.trim() !== '') : [];
 
+/**
+ * ONE TRANSACTION, and it is not a tidiness preference — it is the fix for a
+ * CI failure this file caused.
+ *
+ * Unlike the other fixtures here, this store is FILE-BACKED: a child process
+ * has to open it, so `:memory:` is not available. `indexKnowledge` runs its
+ * own statement, so 599 calls were 599 implicit transactions and 599 fsyncs.
+ * Measured on the developer machine: **2999ms that way, 148ms wrapped**. That
+ * was survivable locally and it blew vitest's 10s HOOK timeout on the slower
+ * CI runner — where the whole file then reported 12 tests skipped, which
+ * reads like a missing suite rather than a slow one.
+ *
+ * The explicit timeout below is defence in depth rather than the fix. A
+ * timeout is not a correctness property: raising it alone would have left a
+ * three-second setup that grows with the fixture, and the next person to add
+ * documents would rediscover this on CI instead of here.
+ */
 beforeAll(() => {
   dir = mkdtempSync(join(tmpdir(), 'trigger-hook-'));
   dbPath = join(dir, 'knowledge-v2.db');
   logPath = join(dir, 'recall-trigger.log');
 
   const db = new Database(dbPath);
+  db.pragma('journal_mode = WAL');
   initSchemaV2(db);
   const add = (key: string, content: string) =>
     indexKnowledge(db, { vaultPath: `${key}.md`, key, content, tags: '', source: 'test' });
@@ -101,10 +119,12 @@ beforeAll(() => {
     'Session provenance is keyed to the uuid the hook payload carried.',
     'Maturity promotion tracks recall volume rather than usefulness.',
   ];
-  for (let i = 0; i < 598; i++) add(`filler-${i}`, `${filler[i % filler.length]} Document ${i}.`);
-  add('pipe-to-tail-masks-exit-code', ENTRY_299);
+  db.transaction(() => {
+    for (let i = 0; i < 598; i++) add(`filler-${i}`, `${filler[i % filler.length]} Document ${i}.`);
+    add('pipe-to-tail-masks-exit-code', ENTRY_299);
+  })();
   db.close();
-});
+}, 60_000);
 
 afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
@@ -120,6 +140,14 @@ beforeEach(() => {
  * measures the hook's real cost from the BUILT entry point, not from this.
  */
 const SPAWN_TIMEOUT = 60_000;
+
+// EVERY row in this file needs it, INCLUDING the `it.each` block. The three
+// `it.each` rows were missed when the timeout was first added — a bulk edit
+// matched `it(` and not `it.each([...])(`  — and they inherited the 5s
+// default. They passed alone and timed out under a full-suite run, which is
+// the same failure shape as the CI hook timeout this commit fixes, one layer
+// out: a setting believed to be applied everywhere and applied not quite
+// everywhere, with the gap only visible under load.
 
 describe('A5 — what the hook emits', () => {
   it('POSITIVE, at scale, through the shipped floor: additionalContext carries 299 and its ACTION', () => {
@@ -179,7 +207,7 @@ describe('A5 — what the hook emits', () => {
     // as a "no relevant entries" line would.
     expect(result.stdout.trim()).toBe('');
     expect(result.stderr).toBe('');
-  });
+  }, SPAWN_TIMEOUT);
 
   it('ignores a tool that is not Bash, and says nothing about it', () => {
     const result = runHook({
