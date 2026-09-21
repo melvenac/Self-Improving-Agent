@@ -219,3 +219,30 @@ at the moment of the act without anyone remembering to. On the third candidate i
 once, observed — and the same loop produced the act it exists to catch, twice: once by hand in the
 developer's shell, and once as a ruling that was agreed with and never built. That is the next
 loop's material, and it was earned here.
+
+## 10. Addendum — CI, after this close-out was written
+
+Written after §§1–9 and the pushes; appended, not retro-edited. **CI on #83 failed at `ca1693f`**
+(run `35561810837`): `tests/trigger/hook.test.ts`'s `beforeAll` hit vitest's 10 s hook timeout on
+the runner, taking 12 tests with it as *skipped* — a shape that reads like a missing suite rather
+than a slow one. Never seen locally. The developer diagnosed it rather than raising the timeout:
+the fixture is the loop's only file-backed store (a child process must open it), and
+`indexKnowledge` ran 599 implicit transactions — 599 fsyncs — 2999 ms here, over 10 s there. Fixed
+at the cause (one transaction plus WAL, 119 ms), with a 60 s hook argument beside it written in as
+defence in depth and kept local to the file rather than a global `hookTimeout`. **With the setup
+fixed, the full suite found a second fault of the same shape:** three `it.each` rows had never
+received `SPAWN_TIMEOUT` (the bulk edit matched `it(` and not `it.each(`), passing alone every time
+— in every verification run of every seat — and failing under load. `c02b47b`, rev 15, test-only,
+one file; **run `35562643258` green**; #83 `MERGEABLE / CLEAN`. QA verified the fix in scope and
+reconciled *three rows, one edit* by reading the block. The developer's line for the record:
+*"the hook tests are green" was true per-file and false under load, and no per-file run could have
+told me.*
+
+**QA's sentence, which supersedes anything the reports say about `G-042`'s reach:** *every piece
+of evidence in all four reports was taken on one machine, and the first time a second machine
+looked, it found two faults in one file.* CI is the second machine. It goes to the record with the
+`G-042` amendment and it changes what "the full suite alone" is evidence of.
+
+The pushes of `31fec1a` (report 4, same branch as the report tip already pushed) and `c02b47b`
+(the fix, same branch as #83) were made on Aaron's single word *push*, as the same act on the same
+branches; recorded here so the scope of that word is auditable.
