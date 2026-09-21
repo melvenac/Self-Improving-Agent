@@ -53,6 +53,22 @@ export const TriggerPolicySchema = z.strictObject({
    */
   max_injected: z.number().int().min(1),
   /**
+   * The hook's own deadline, in milliseconds.
+   *
+   * WHAT IT DOES AND DOES NOT BOUND, because the difference decides how A6's
+   * third case is read. better-sqlite3 is synchronous, so nothing here can
+   * INTERRUPT a query in progress; the deadline is checked after the work
+   * returns and decides whether the result may still be EMITTED. It bounds
+   * what reaches the model, not how long the process runs. The real bound on
+   * duration is the host's own `timeout` on the hook registration, which the
+   * handoff names beside this number.
+   *
+   * A hook that comes back late and injects anyway is the worst case: the
+   * seat has already read the tool result and moved on, so the reminder
+   * arrives attached to the wrong moment.
+   */
+  deadline_ms: z.number().int().min(1),
+  /**
    * WHERE `relevance_floor` WAS MEASURED, AND AGAINST WHAT — required, not
    * decorative (R19).
    *

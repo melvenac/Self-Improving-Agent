@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import Database from 'better-sqlite3';
 import { initSchemaV2, indexKnowledge } from '../../src/db-v2.js';
 import { deriveQuery, queryStore } from '../../src/trigger/query.js';
@@ -92,6 +95,35 @@ describe('A2 — commands the trigger says nothing about', () => {
     expect(deriveQuery(command)).not.toBe('');
     expect(queryStore({ db: empty, command, floor: 0 })).toEqual([]);
     empty.close();
+  });
+});
+
+describe('brief §3 — the query path is handed a genuinely read-only handle', () => {
+  /**
+   * DECLARED SURVIVING MUTANT, M22: handing `runTrigger` the WRITABLE
+   * connection instead of the read-only one changes nothing observable,
+   * because the query only reads. The restriction is a capability, and a
+   * capability's only behavioural evidence is the failure of code that does
+   * not exist yet — it would kill the mutant the moment the query path tried
+   * to write.
+   *
+   * What CAN be asserted is that the handle the hook opens is really
+   * read-only, rather than named so in a comment. Both directions: the query
+   * works through it, and a write through it is refused.
+   */
+  it('the query works through a read-only connection, and a write through it is refused', () => {
+    const file = join(mkdtempSync(join(tmpdir(), 'trigger-ro-')), 'store.db');
+    const seed = new Database(file);
+    initSchemaV2(seed);
+    add(seed, 'pipe-to-tail-masks-exit-code', STRONG);
+    seed.close();
+
+    const ro = new Database(file, { readonly: true, fileMustExist: true });
+    expect(queryStore({ db: ro, command: 'npx vitest run 2>&1 | tail -8; echo $?', floor: -Infinity }).length)
+      .toBeGreaterThan(0);
+    expect(() => ro.prepare('DELETE FROM knowledge_index').run())
+      .toThrow(/readonly|read-only/i);
+    ro.close();
   });
 });
 

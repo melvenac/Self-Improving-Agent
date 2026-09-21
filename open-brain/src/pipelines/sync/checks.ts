@@ -1173,6 +1173,7 @@ export const MEMORY_SIDE: string[] = [
   "vault-writer.ts",
   "server.ts",
   "cli-session-end.ts",
+  "cli-recall-trigger.ts",
   "pipelines/session-end/",
   "pipelines/store/",
   "pipelines/topics/",

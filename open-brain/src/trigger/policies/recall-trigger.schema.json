@@ -10,6 +10,11 @@
       "minimum": 1,
       "maximum": 9007199254740991
     },
+    "deadline_ms": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
     "provenance": {
       "type": "string",
       "minLength": 1
@@ -18,6 +23,7 @@
   "required": [
     "relevance_floor",
     "max_injected",
+    "deadline_ms",
     "provenance"
   ],
   "additionalProperties": false

@@ -14,7 +14,14 @@ import { recordFire, type FireState } from "./fires.js";
 import type { TriggerPolicy } from "./policy.js";
 
 export interface TriggerRunInput {
+  /** Writable: the fire record, and nothing else. */
   db: Database.Database;
+  /**
+   * Read-only handle for the query (brief §3). Defaults to `db` so tests and
+   * in-process callers need only one connection; the hook passes a genuinely
+   * read-only one so the query path CANNOT write even by mistake.
+   */
+  readDb?: Database.Database;
   sessionUuid: string;
   command: string;
   policy: TriggerPolicy;
@@ -84,7 +91,7 @@ export function runTrigger(input: TriggerRunInput): TriggerOutcome {
   }
 
   const hits = queryStore({
-    db: input.db,
+    db: input.readDb ?? input.db,
     command: input.command,
     floor: input.policy.relevance_floor,
     limit: input.policy.max_injected,

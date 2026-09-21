@@ -161,7 +161,7 @@ describe('A4 — the floor is read from data', () => {
       writeFileSync(
         join(dir, POLICY_FILE),
         `${JSON.stringify(
-          { relevance_floor: floor, max_injected: maxInjected, provenance: 'test fixture, 599 entries, 2026-09-20' },
+          { relevance_floor: floor, max_injected: maxInjected, deadline_ms: 2000, provenance: 'test fixture, 599 entries, 2026-09-20' },
           null,
           2,
         )}\n`,
@@ -186,7 +186,7 @@ describe('A4 — the floor is read from data', () => {
     it('refuses a policy file with an unknown key rather than ignoring it', () => {
       writeFileSync(
         join(dir, POLICY_FILE),
-        JSON.stringify({ relevance_floor: 8, max_injected: 1, provenance: 'x', relevence_floor: 0 }),
+        JSON.stringify({ relevance_floor: 8, max_injected: 1, deadline_ms: 2000, provenance: 'x', relevence_floor: 0 }),
         'utf-8',
       );
       expect(() => loadPolicy(dir)).toThrow(/does not match the policy schema/);
