@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 74 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 77 by open-brain v0.44.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -19,6 +19,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-034** Move the session-start recall into `cli-bootstrap`
 - [ ] **T-042** Vault pollution has a preventer but no detector
 - [ ] **T-044** The slot needs an OWNER, not just a timestamp
+- [ ] **T-046** Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
 - [ ] **T-149** Give each agent seat its own git worktree
 - [ ] **T-150** An unrecognised CLI flag must refuse, not select the mutating default
 - [ ] **T-158** close_gap must tombstone (or refuse an id the tracked tree cites) — a reused gap id points at something wrong and announces nothing
@@ -29,7 +30,6 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 ## P1
 
 - [ ] **T-045** Verify the vault-isolation leak stays closed
-- [ ] **T-046** Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
 - [ ] **T-048** Audit remaining filters in `open-brain/src` for bare `continue`/`filter` drops (supersedes T-049)
 - [ ] **T-050** v0.15.1 made a foreign `.recalled-entries.json` writer unreachable *and* uncountable
 - [ ] **T-051** Add a `/sync` validator for the `.agents/skills/` frontmatter contract, asserting all three identity sources agree
@@ -59,7 +59,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-156** A scan that matches the sentence forbidding a thing, as though it were the thing (G-040): every source-text scan in the harness tests must be validated against a known positive and a known negative in the same test, or replaced by a parser
 - [ ] **T-160** Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [ ] **T-162** The element table's growth rule: the store cannot be consulted for act shapes the table does not name
-- [ ] **T-165** Evaluate an alternate harness/model as the DEVELOPER seat via T-155's shadow merge gate — Aaron's named candidate is DeepSeek v4.1 Flash
+- [ ] **T-165** Evaluate an alternate harness/model as the DEVELOPER seat via T-155's shadow merge gate — the driver is a SECOND METER, not cost; Aaron's named candidate is DeepSeek v4.1 Flash
 
 ## Done (last 3 sessions)
 
