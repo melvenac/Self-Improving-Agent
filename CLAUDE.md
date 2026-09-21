@@ -23,7 +23,23 @@ boundary reports are preserved in `docs/loops/sia-mailbox-*.md`.
 
 - **Run `/sync` before any commit.** This validates version consistency + structural integrity (scripts exist, hooks valid, references correct).
 - **`package.json` is the version source of truth.** Bump it once, run `/sync`, everything else updates.
-- **`.agents/` is gitignored except the five state files.** `state.json` (the record) and its rendered views `TASKS/INBOX.md`, `TASKS/task.md`, `SESSIONS/next-session.md`, `SYSTEM/SUMMARY.md` are tracked; `SESSIONS/Session_*.md`, the .agents archive directory, PRD and the rest stay local. State changes go through `ob_state`, never by editing the views.
+- **`.agents/` is gitignored by an ALLOWLIST, and the allowlist is the real rule** — the old
+  summary here said "except the five state files" and had been wrong for some time. Tracked:
+  `state.json` (the record) and its rendered views `TASKS/INBOX.md`, `TASKS/task.md`,
+  `SESSIONS/next-session.md`, `SYSTEM/SUMMARY.md`; the operating layer `SYSTEM/RULES.md`,
+  `RUNBOOK.md`, `SECURITY.md`, `TESTING.md`, `domains.json`; `.agents/roles/`; `AGENT.md`;
+  `LIFECYCLE.md`; `retirements.json`; the skills index and the two skill directories. **And as
+  of session 77 the SCOPE layer: `SYSTEM/PRD.md`, `DECISIONS.md`, `ENTITIES.md`.** Local:
+  the per-session session logs, the .agents archive directory, `AGENT.local.md`, and the
+  specs directory. State changes go through `ob_state`, never by editing the views.
+- **An untracked file reaches ONE checkout, and the seats do not work in it.** Until session 77
+  everything tracked in `.agents/SYSTEM/` was HOW TO OPERATE and the three files carrying WHAT
+  THIS IS AND WHY — PRD, DECISIONS, ENTITIES — were the only ones left out. They existed in the
+  main tree and in none of the three seat worktrees. A planner seat then ran a whole session,
+  wrote a loop brief and ruled seven acceptance criteria without ever encountering the problem
+  statement, which is four sentences in a 4.4 KB file. `/sync` had been reporting `PRD.md not
+  found` as a WARNING on every run in those trees, and it was read past every time — a detector
+  that fires correctly into a block of warnings nobody acts on is not a detector.
 - **Node v22 LTS.** No longer pinned by this project. The pin existed for the Smart
   Connections Obsidian plugin, which Loop 10 CUT: it has no code in this repository, and it
   could not be observed running during the loop that ruled on it. **A dependency that

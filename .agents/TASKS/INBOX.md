@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 71 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 72 by open-brain v0.44.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -24,7 +24,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-158** close_gap must tombstone (or refuse an id the tracked tree cites) — a reused gap id points at something wrong and announces nothing
 - [ ] **T-163** Close-outs must APPEND a per-seat record, not overwrite a shared slot — plus a /sync check that no close-out reduces the recorded seat-uuid count for an open loop
 - [ ] **T-164** The session counter is per-worktree, so a seat can close out on a number that collides with the record's sequence
-- [ ] **T-167** The record carries no INTENT, so every seat reasons about purpose from a backlog — add project.intent, render it above the objective, and assert it with a /sync check
+- [ ] **T-167** The scope layer did not travel: PRD/DECISIONS/ENTITIES were untracked, so no seat worktree had them — tracked at session 77; make prd-version an ISSUE, and render the problem statement at /start
 
 ## P1
 
