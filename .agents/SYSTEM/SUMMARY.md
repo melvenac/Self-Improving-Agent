@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 68 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 69 by open-brain v0.44.0 — do not edit; change state via ob_state -->
 > **Status:** v0.44.0 — Loop 15 slice three — G-045 first (D-026), on v0.44.0. Loop 16 closed ACCEPTED at 5351270 (D-027): the recall trigger exists, fired live once, and is NOT registered for production — Aaron's decision, close-out §8. Slice three inherits from loop-14-closeout.md §8 (real roles; QA scoring through Jev; thresholds against real diffs; F11; the open channel denominator; T-155 buildable) and from Loop 16: no add_gap by any seat until T-158 lands; a clean session launch is a precondition of any transcript-dependent row (T-161); the first not-asked/silent/injected counts are the denominator for whether the trigger's floor is conservative or mute (T-159). Fresh developer and QA sessions on Opus 5; planner on Fable 5.1; criteria before candidate; frozen SHA; the record moves one seat at a time; hub rooms are transport, tracked files are the record.
 
 ## What's working
