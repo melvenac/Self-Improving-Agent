@@ -372,3 +372,79 @@ The targeted set is unchanged from §8 plus the new `tests/trigger/no-network.te
 **Nothing in `src/` changed in candidate 2.** Every commit is a test or this document, so candidate
 1's A5, A6, A10 measurements and the full-suite result stand unaltered — and A7, A8 and A10-live
 run against this candidate with the hook registered, on Aaron's word.
+
+---
+
+# Candidate 3
+
+**Appended 2026-09-20**, after QA's second report and the planner's ruling **R27 in amendment 12
+(`87cbb9d`)**. Candidate 2 was NOT ACCEPTED on one omission. **One commit on top of `f7930d0`**,
+unsquashed; `45ee2ab` and `f7930d0` both remain in the history.
+
+## 17. The trigger fired in a real session, and that is the loop's result
+
+Under Aaron's word, with the hook registered, in a live Claude Code session: the trigger **injected
+entry 299 beside a `| tail -8; echo $?` tool result**, stayed **silent on `git status`**, and
+recorded **`not-asked`** for a single-stage `tail -20 <file>` issued from another session — R18
+firing on a real command that nobody wrote as a test. All three are in the fire rows, keyed to the
+live session uuid, and QA's A10 reproduction agrees in shape with §7's numbers.
+
+That is the capability this loop exists for, observed rather than argued.
+
+## 18. F3 — a ruling that fired nowhere
+
+**R7 (amendment 1) was never built.** *Injected entries bump `recall_count` and `last_recalled_at`;
+looked-at entries do not.* I asked the question, the planner answered it, I recorded the answer in
+the boundary report — and never wrote the code. The evidence is unambiguous: after the live
+injection at 04:08, entry 299's row still read `recall_count 11` and `last_recalled_at 23:52`, and
+**neither column name appeared anywhere in the candidate's diff.**
+
+Worth naming precisely, because "I forgot" is the least useful version of it: **a ruling I had
+argued for, agreed with, and reported as settled produced no code and no test, and nothing between
+the ruling and the verdict could tell.** Every check the candidate ran was green. The criteria
+carried R7 as an A8 observable, which is why QA caught it and the suite did not — and the planner
+has recorded its own share, that a ruling arrived with no §4 row able to make its absence red.
+
+**It is the same family as the finding this loop is about.** `shared.md` is loaded into every
+session and the seat that quoted its rule broke it the same day (Loop 14). Here a ruling reached
+the seat, was acknowledged in writing, and still reached no code. Loading a rule, agreeing with a
+rule, and applying a rule are three different things.
+
+## 19. The repair
+
+`recordFire`'s injection branch now bumps both columns for injected ids only, inside the transaction
+that already writes the fire row and the `recall_log` rows — so an injection is one atomic act: the
+fire, the rateable recall, and the counters.
+
+**`datetime('now')`, matching what `ob_recall` writes into the same column.** Two writers of one
+column disagreeing on format is a defect this repo has paid for elsewhere.
+
+**"Looked-at does not bump" is structural, not remembered.** Nothing else in `fires.ts` writes to
+`knowledge_index`, and the query path holds a read-only handle — so there is no code path that
+could bump a looked-at entry, rather than a rule the code has to keep.
+
+Four rows, both directions (T-156): injected bumps count and timestamp; a looked-at entry (floor
+raised) bumps neither; a not-asked fire touches neither; repeated injections accumulate, so the
+counter counts REACHES rather than entries. Two mutants:
+
+| id | mutant | result |
+| --- | --- | --- |
+| M23 | the bump removed | RED (2 rows) |
+| M24 | silent fires bump too | RED (the looked-at row) |
+
+## 20. The diff is confined, as R27 requires
+
+```
+open-brain/src/trigger/fires.ts | 23 insertions, 0 deletions   (the only src change)
+```
+
+Two column writes in the injection path and the comment explaining them. Nothing else under `src/`
+changed in candidate 3, so **the live evidence gathered at `f7930d0` stands and the registration
+does not need to be asked for again.**
+
+## 21. Verification at candidate 3
+
+```
+targeted run (R12)   13 files, 153 tests, exit 0
+tsc --noEmit         0
+```

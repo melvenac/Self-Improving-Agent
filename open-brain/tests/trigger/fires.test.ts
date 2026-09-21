@@ -138,6 +138,53 @@ describe('the fire record — three states, one row each', () => {
     expect(fireCounts(db, SESSION)).toEqual({ 'not-asked': 0, silent: 1, injected: 1 });
   });
 
+  it('R7: an INJECTED entry bumps recall_count and last_recalled_at', () => {
+    const before = db.prepare('SELECT recall_count, last_recalled_at FROM knowledge_index WHERE id = ?')
+      .get(id299) as { recall_count: number; last_recalled_at: string | null };
+    expect(before.recall_count).toBe(0);
+    expect(before.last_recalled_at).toBeNull();
+
+    runTrigger({ db, sessionUuid: SESSION, command: G039, policy: POLICY });
+
+    const after = db.prepare('SELECT recall_count, last_recalled_at FROM knowledge_index WHERE id = ?')
+      .get(id299) as { recall_count: number; last_recalled_at: string | null };
+    expect(after.recall_count).toBe(1);
+    expect(after.last_recalled_at).not.toBeNull();
+  });
+
+  it('R7, the other direction: a LOOKED-AT entry does not bump either column', () => {
+    // The half that matters, and the half an implementation can pass by
+    // accident. The query considers this entry and the floor excludes it, so
+    // it was never in front of anyone — counting it would inflate the number
+    // /start's pruning maintenance reads when it asks what has never been
+    // recalled. Both columns asserted, because bumping one without the other
+    // is a state nothing else in the store would explain.
+    const highFloor: TriggerPolicy = { relevance_floor: 1e9, max_injected: 1 };
+    const outcome = runTrigger({ db, sessionUuid: SESSION, command: G039, policy: highFloor });
+    expect(outcome.state).toBe('silent');
+
+    const row = db.prepare('SELECT recall_count, last_recalled_at FROM knowledge_index WHERE id = ?')
+      .get(id299) as { recall_count: number; last_recalled_at: string | null };
+    expect(row.recall_count).toBe(0);
+    expect(row.last_recalled_at).toBeNull();
+  });
+
+  it('R7: a NOT-ASKED fire touches no counter at all', () => {
+    runTrigger({ db, sessionUuid: SESSION, command: 'git status --porcelain', policy: POLICY });
+
+    const row = db.prepare('SELECT recall_count, last_recalled_at FROM knowledge_index WHERE id = ?')
+      .get(id299) as { recall_count: number; last_recalled_at: string | null };
+    expect(row.recall_count).toBe(0);
+    expect(row.last_recalled_at).toBeNull();
+  });
+
+  it('R7: repeated injections accumulate, so the counter counts reaches and not entries', () => {
+    for (let i = 0; i < 3; i++) runTrigger({ db, sessionUuid: SESSION, command: G039, policy: POLICY });
+    const row = db.prepare('SELECT recall_count FROM knowledge_index WHERE id = ?')
+      .get(id299) as { recall_count: number };
+    expect(row.recall_count).toBe(3);
+  });
+
   it('refuses a fire whose state and ids disagree, in both directions', () => {
     const base = { sessionUuid: SESSION, command: G039, query: '"tail"' };
     expect(() => recordFire(db, { ...base, state: 'injected', injectedIds: [] }))

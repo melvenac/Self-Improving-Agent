@@ -85,6 +85,29 @@ export function recordFire(db: Database.Database, fire: FireRecord): void {
       // `hook`, never `explicit`: nobody asked. R6, and the reason is in
       // db-v2's RECALL_TRIGGERS comment.
       recordRecallEvent(db, fire.sessionUuid, fire.query, fire.injectedIds, "hook");
+
+      // R7 (amendment 1): an INJECTED entry bumps the recall counters; a
+      // looked-at one does not. The counter means "this reached an agent",
+      // and an injected entry did — it was put in front of a seat beside a
+      // tool result. An entry the query considered and the floor excluded was
+      // never in front of anyone, and counting it would inflate exactly the
+      // number `/start`'s pruning maintenance reads when it asks which
+      // entries have never been recalled.
+      //
+      // Nothing else in this file writes to `knowledge_index`, and the query
+      // path holds a read-only handle, so "looked-at does not bump" is
+      // structural rather than a rule this code remembers to follow.
+      //
+      // `datetime('now')` rather than the ISO string above, to match what
+      // `ob_recall` writes into the same column — two writers of one column
+      // disagreeing on format is a defect this repo has paid for elsewhere.
+      const bump = db.prepare(
+        `UPDATE knowledge_index
+            SET recall_count = COALESCE(recall_count, 0) + 1,
+                last_recalled_at = datetime('now')
+          WHERE id = ?`,
+      );
+      for (const id of fire.injectedIds) bump.run(id);
     }
   })();
 }
