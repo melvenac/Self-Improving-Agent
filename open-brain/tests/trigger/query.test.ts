@@ -4,23 +4,34 @@ import { initSchemaV2, indexKnowledge } from '../../src/db-v2.js';
 import { queryStore } from '../../src/trigger/query.js';
 
 /**
- * A1 — the row this loop starts red on.
+ * A1, restated by R26 (amendment 10) into the two questions the original row
+ * was asking at once.
  *
- * Loop 16 brief §4: against a fixture store holding entry 299's text and at
- * least ten decoys sharing common tokens (`exit`, `code`, `tail`, `run`), the
- * trigger's query for the literal command that produced G-039 returns entry
- * 299 FIRST.
+ * The original: *against a fixture holding entry 299 and at least ten decoys
+ * sharing common tokens (`exit`, `code`, `tail`, `run`), the query returns 299
+ * FIRST.* That sentence was written before the derivation existed, and the
+ * derivation does not AND that token set — it ANDs `tail`, `exit`, `code`. So
+ * the row tested two different things depending on which fixture you built,
+ * and QA's second caller (R11) found that only ONE of the ten original decoys
+ * was live under the real query. 299 was winning a field of two.
  *
- * The decoys are the point. A query that returns 299 out of a store where
- * nothing else mentions `tail` or `exit` has demonstrated nothing about
- * ranking — it has demonstrated that FTS can find the only matching row. Every
- * decoy below shares at least two of the four tokens with the command, and
- * three of them are about exit codes in a way that is genuinely adjacent.
+ * Both fixtures are kept, and neither is weakened:
  *
- * Amendment 1 §3: at base the live store returns 299 at rank 1 only inside a
- * BROADENED set. The trigger is forbidden that path (§5.4), so this fixture
- * asserts the precision path's ranking directly rather than inheriting a
- * number measured through a different query.
+ *   **A1(a) — precision.** The original decoys, most of which carry only some
+ *   of the derived terms. 299 ranks FIRST, and that is ASSERTED. What it
+ *   demonstrates is that the conjunction excludes partial matches: nine of
+ *   these ten never enter the match set at all.
+ *
+ *   **A1(b) — the field.** Ten decoys each genuinely carrying all three
+ *   derived terms, at comparable length. 299's presence in the match set is
+ *   ASSERTED; its RANK is REPORTED and never asserted. Against real
+ *   competitors the trigger does not put 299 first; that is a known gap owned
+ *   by a later loop, and a row asserting first place here would be a claim
+ *   this loop cannot defend.
+ *
+ * The rank is printed rather than swallowed because the number is the evidence
+ * the close-out gap is built from. A test that knows a number and does not say
+ * it is the same silence this loop exists to end.
  */
 
 /** The command from G-039, verbatim. */
@@ -36,10 +47,35 @@ export const ENTRY_299 = [
 ].join('\n');
 
 /**
- * Ten decoys sharing the command's tokens. Not filler: each one is a plausible
- * near-miss a real store would hold, and four of them are about exit codes.
+ * A1(a)'s decoys — the brief's original token list (`exit`, `code`, `tail`,
+ * `run`), each sharing SOME of it. Exactly one carries all three derived
+ * terms, and that is the point of this fixture rather than a defect in it:
+ * the conjunction is what keeps the other nine out.
  */
-export const DECOYS: Array<[string, string]> = [
+export const PRECISION_DECOYS: Array<[string, string]> = [
+  ['vitest-run-alone', 'The suite must run alone: a vitest run that overlaps worktree creation exits 1 while every line reports passed.'],
+  ['exit-code-from-variable', 'Read the exit code from the process into a variable, never from the tail of a log.'],
+  ['npx-runner-selection', 'npx picks a runner from node_modules; run the local binary directly when the version matters.'],
+  ['echo-debugging', 'Using echo to print a value mid-script is fine; using echo to report a run exit code after a pipe is not.'],
+  ['tail-follow-logs', 'Use tail -f to follow a log file while a long run proceeds in another shell.'],
+  ['gitnexus-analyze-exit', 'gitnexus analyze can print a healthy banner and exit non-zero; capture the code as its own statement.'],
+  ['head-truncation', 'head -n trims output to the first N lines and is safe when the command exit status does not matter.'],
+  ['shell-pipeline-basics', 'A shell pipeline runs every stage concurrently; the last stage decides the exit code the shell reports.'],
+  ['run-command-allowlist', 'The runtime allowlist decides which command a stage may run and refuses everything else.'],
+  ['code-review-exit', 'A review that exits early on the first finding hides the rest of the code from the reader.'],
+];
+
+/**
+ * A1(b)'s decoys — ten genuine competitors, each carrying `tail`, `exit` AND
+ * `code`, at lengths comparable to entry 299's 566 characters.
+ *
+ * Comparable length is not decoration. An earlier version of this fixture ran
+ * 235–343 characters against 299's 566, which handed every decoy a bm25
+ * length-normalisation advantage unrelated to relevance and reported 299 at
+ * rank 9 rather than 4. A stacked fixture proves as little as a vacuous one;
+ * it just fails in the flattering direction.
+ */
+export const FIELD_DECOYS: Array<[string, string]> = [
   ['vitest-run-alone',
    'The suite must run alone. A full vitest run that overlapped thirteen worktree additions printed 974 passed and still returned a non-zero exit code, and reading the tail of that output showed no failing test at all. Build fixtures before the run or after it, never during, and read the exit code from a variable written by the process rather than from the tail of a log. The worker heartbeat raises an unhandled error that vitest exits non-zero on without failing any test, so the summary and the exit code disagree and only one of them is right.'],
   ['exit-code-from-variable',
@@ -60,47 +96,61 @@ export const DECOYS: Array<[string, string]> = [
    'A container build that fails part way still prints layer output, so the tail of the build log looks entirely ordinary and the failure is several screens up. The exit code is the only reliable signal, and a build run through a shell wrapper reports the wrapper exit code unless the script is written to propagate it. Compare the image identifier before and after: an unchanged digest with a zero exit code means the build never ran.'],
   ['migration-exit-code',
    'A half-applied migration exits non-zero and the tail of its output names the last statement it managed to run rather than the one that failed, so the log reads as progress and the exit code reads as failure. Read the exit code first and the log second, because the code tells you whether to trust what the tail of the file appears to say. A migration runner that wraps the database client can lose the code the same way a deploy wrapper does.'],
-];describe('A1 — the trigger ranks entry 299 first for the G-039 command', () => {
+];
+
+const seed = (decoys: Array<[string, string]>): { db: Database.Database; id299: number } => {
+  const db = new Database(':memory:');
+  initSchemaV2(db);
+  const add = (key: string, content: string): number => {
+    indexKnowledge(db, { vaultPath: `${key}.md`, key, content, tags: '', source: 'test' });
+    return (db.prepare('SELECT id FROM knowledge_index WHERE key = ?').get(key) as { id: number }).id;
+  };
+  // Decoys first, so 299 is not the lowest rowid: an implementation that
+  // returns insertion order must not pass by accident.
+  for (const [key, content] of decoys) add(key, content);
+  return { db, id299: add('pipe-to-tail-masks-exit-code', ENTRY_299) };
+};
+
+/** Keys in the match set, in the trigger's own ranked order. */
+const ranked = (db: Database.Database): string[] =>
+  queryStore({ db, command: G039_COMMAND, floor: -Infinity, limit: 50 }).map((h) => h.key ?? '(no key)');
+
+describe('A1(a) — precision: the conjunction excludes partial matches, and 299 ranks first', () => {
   let db: Database.Database;
-  let entry299Id: number;
+  let id299: number;
 
-  beforeEach(() => {
-    db = new Database(':memory:');
-    initSchemaV2(db);
-
-    const add = (key: string, content: string): number => {
-      indexKnowledge(db, { vaultPath: `${key}.md`, key, content, tags: '', source: 'test' });
-      const row = db.prepare('SELECT id FROM knowledge_index WHERE key = ?').get(key) as { id: number };
-      return row.id;
-    };
-
-    // Decoys first, so 299 is not the lowest rowid: an implementation that
-    // happens to return insertion order must not pass this row by accident.
-    for (const [key, content] of DECOYS) add(key, content);
-    entry299Id = add('pipe-to-tail-masks-exit-code', ENTRY_299);
-  });
-
+  beforeEach(() => { ({ db, id299 } = seed(PRECISION_DECOYS)); });
   afterEach(() => db.close());
 
   it('returns entry 299 as the first hit', () => {
     const hits = queryStore({ db, command: G039_COMMAND, floor: 0 });
-
     expect(hits.length).toBeGreaterThan(0);
-    expect(hits[0].id).toBe(entry299Id);
+    expect(hits[0].id).toBe(id299);
   });
 
-  it('every decoy is LIVE under the conjunctive query — all ten, not just the ones that happened to match', () => {
-    // REBUILT FOR CANDIDATE 2, on QA's F2. The first version asserted that ten
-    // rows matched `tail OR exit OR run OR code`, which is the brief's token
-    // list and NOT the derivation's. Under the conjunctive query the trigger
-    // actually runs — "tail" AND "exit" AND "code" — only one decoy was live,
-    // so A1 was choosing 299 out of two documents while the fixture's name
-    // claimed eleven. A guard written to the wrong query is a guard that
-    // reports on something other than the thing under test.
-    //
-    // Asserted against FTS directly rather than through the trigger, so a
-    // broken trigger cannot make this look healthy, and asserted per decoy so
-    // a failure names which one went dead.
+  it('and it wins a SMALL field, which is what this fixture demonstrates', () => {
+    // Stated rather than implied, because the original row read as though it
+    // demonstrated ranking among competitors and it does not. Most of these
+    // ten decoys never enter the match set: they carry some of the brief's
+    // token list and not all three derived terms. That is the conjunction
+    // doing its job — and it is why A1(b) exists.
+    const keys = ranked(db);
+    expect(keys).toContain('pipe-to-tail-masks-exit-code');
+    expect(keys.length).toBeLessThan(PRECISION_DECOYS.length);
+    console.log(`A1(a) match set (${keys.length} of ${PRECISION_DECOYS.length + 1} documents): ${keys.join(', ')}`);
+  });
+});
+
+describe('A1(b) — the field: ten real competitors, rank reported and not asserted', () => {
+  let db: Database.Database;
+
+  beforeEach(() => { ({ db } = seed(FIELD_DECOYS)); });
+  afterEach(() => db.close());
+
+  it('every decoy is LIVE under the conjunctive query — all ten, by name', () => {
+    // The guard R25 asked for. The first version of this counted matches of
+    // the brief's four-token list, which is not the query the trigger runs, so
+    // it reported on something other than the thing under test.
     const live = db
       .prepare(
         `SELECT k.key FROM knowledge_fts f
@@ -110,8 +160,39 @@ export const DECOYS: Array<[string, string]> = [
       .all('"tail" "exit" "code"') as Array<{ key: string }>;
 
     const liveKeys = live.map((r) => r.key).sort();
-    const expected = [...DECOYS.map(([key]) => key), 'pipe-to-tail-masks-exit-code'].sort();
-    expect(liveKeys).toEqual(expected);
+    expect(liveKeys).toEqual([...FIELD_DECOYS.map(([key]) => key), 'pipe-to-tail-masks-exit-code'].sort());
     expect(liveKeys).toHaveLength(11);
+  });
+
+  it('299 is IN the match set — and its rank is reported, never asserted (R26)', () => {
+    const keys = ranked(db);
+    const rank = keys.indexOf('pipe-to-tail-masks-exit-code') + 1;
+
+    // The whole assertion. A1(b) fails only if 299 is absent.
+    expect(keys).toContain('pipe-to-tail-masks-exit-code');
+
+    // The number this row exists to surface. It is the evidence behind the
+    // close-out's ranking gap, and a test that knows a number and does not say
+    // it is the same silence this loop exists to end.
+    console.log(
+      `A1(b) entry 299 ranks ${rank} of ${keys.length} against ten same-topic competitors ` +
+        `(top: ${keys[0]}). RANK REPORTED, NOT ASSERTED — R26 / amendment 10. bm25 length ` +
+        `normalisation is the cause; the live 599-entry store ranks 299 first only because five ` +
+        `entries there match all three terms, which is a thin field rather than discrimination.`,
+    );
+  });
+
+  it('every competitor gives the same advice as 299, which is how the gap should be weighed', () => {
+    // Recorded as a test rather than a comment because it is the fact that
+    // decides how much the ranking gap costs in practice. With max_injected
+    // at 1 the seat receives ONE of these, and every one of them says: read
+    // the status from the process, not from the trimmed output. The ruling's
+    // prohibition is on injecting an IRRELEVANT entry; these are competitors,
+    // not noise.
+    for (const [key, content] of FIELD_DECOYS) {
+      const advice = content.toLowerCase();
+      expect(advice, `${key} should carry the same advice`).toMatch(/exit code|status/);
+      expect(advice, `${key} should be about the trimmed-output trap`).toContain('tail');
+    }
   });
 });
