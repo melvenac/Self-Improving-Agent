@@ -50,6 +50,16 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 > reading**, and it is applied as ruled. **No `[mine]` clause remains open; one stays marked (A1's
 > independent second caller, kept by `R11`).** Nothing here is narrowed in response to a
 > candidate, because no candidate has been frozen.
+>
+> **AMENDED A FIFTH TIME, still before the freeze** — sixth commit; all five earlier commits are
+> cited and none amended. It applies `loop-16-brief-amendment-7.md` at **`3db1365`**: **`R21`** —
+> the trigger is **memory-side** and says so, by the reviewed one-line declaration of `trigger/`
+> in `MEMORY_SIDE`, which is the door `module-boundary` exists to force rather than a suppression;
+> the harness boundary is unchanged. It also carries rev 4's reported facts into the rows that
+> must verify them (`trigger_fires`' CHECK constraint, `hook` asserted by name, `ob_stats`'
+> always-printed zeros, `R19`'s zod-required provenance), the enlarged targeted set, the mutant
+> set out to **M16**, and the fourth `G-042` sighting. It arrives at the developer's boundary 4
+> (`405a5e3`, rev 4).
 
 > **Rule of this file.** Every criterion names what will be observed, in which tree, with which
 > command, and what result means **pass**, **fail** or **untested**. A criterion I cannot state that
@@ -78,7 +88,7 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 | **Evaluation tree** | `~/Worktrees/sia-qa`, moved with `git checkout --detach <SHA>`; then `git status --porcelain` empty and `git rev-parse HEAD` equal to the SHA, **checked before the first observation and again after the last.** If either changes between them, every observation is void, recorded as void, and the evaluation restarts on the new SHA. |
 | **Made to resemble the main tree** | In order: `npm ci` (only if `package-lock.json` changed at the candidate) and `npm run build` in `open-brain/`, exit codes captured into variables and read back from a file, `build/build-info.json` carrying the candidate SHA; `node .gitnexus/run.cjs analyze` from the root — on the FTS `file_fts` inconsistency (`T-055`) run `analyze --repair-fts` then `analyze` again, and **never `clean` without `--force`** (`G-043`); then `node open-brain/build/cli.js sync --check` from the root, which must report **0 skipped**. The analyzer's exit code and indexed commit are recorded beside the build's. |
 | **The main checkout** | `~/Projects/Self-Improving-Agent` is not moved, not built and not checked out by me. **The main tree is not a QA fixture** (`shared.md`, ruled 2026-09-20). Its one unique condition — Aaron's untracked `.agents/SYSTEM/PRD.md` — is reported as **unrun**, never implied green. |
-| **The hook registration for A7 and A10** | `~/.claude/settings.json` is Aaron's file. Registering the trigger against the QA tree's build is an act that needs **his word for that act** (brief §6, §8). I ask the planner by SHA at the moment, the planner asks Aaron, and the report records: the exact JSON added, when it was added, when it was removed, and the file's content read back after removal and compared to a copy taken before. **If the word does not come, A7 and A10 are reported `untested` and no row is inferred from the others.** |
+| **The hook registration for A7 and A10** | `~/.claude/settings.json` is Aaron's file. Registering the trigger against the QA tree's build is an act that needs **his word for that act** (brief §6, §8). I ask the planner by SHA at the moment, the planner asks Aaron, and the report records: the exact JSON added, when it was added, when it was removed, and the file's content read back after removal and compared to a copy taken before. **If the word does not come, A7 and A10 are reported `untested` and no row is inferred from the others.** **Two facts about that file, from `3db1365` §2 and to be re-read by me at the moment rather than trusted from here:** the `PostToolUse` array is **empty today**, so my registration is the only entry in it and a restore means *empty again*, which I assert by reading the array back rather than by diffing prose; and **a `PreToolUse` hook from the context-mode plugin already intercepts `Bash`**, which is one more reason the trigger is on `PostToolUse` — it cannot take part in that event's deny-wins precedence at all. If the `PostToolUse` array is **not** empty when I read it, I stop and ask rather than appending, because "restore" then means something I have not measured. |
 | **The store under test** | Trigger queries are measured against a **fixture store** built in the scratchpad (`KNOWLEDGE_V2_DB` pointed at it), never the live `~/.claude/open-brain/knowledge-v2.db`, for every row except A7 and A8 — those two are live by construction because they need a real session. What A7/A8 write to the live store is disclosed in the report. |
 | **Fixture store shape (A1–A4)** | One SQLite store built by the candidate's own schema code (not hand-written DDL, which would measure my DDL), holding entry 299's text **as it exists at base** — captured to a file in §7 so the fixture cannot drift — plus **at least ten decoys sharing the common tokens `exit`, `code`, `tail`, `run`** (brief A1). Decoys are drawn from the live store's real entries where they qualify and are otherwise synthesised; the report lists every decoy id and its provenance. The store's maturity column matters (`recallRankExpr` boosts Mature 1.5× / Proven 1.2×), so the fixture records each row's maturity and the report says what entry 299's was. |
 | **THE FIXTURE MUST BE AT CORPUS SCALE WHEREVER THE FLOOR IS IN THE PATH (`6da5fa9` §1)** | **bm25's IDF is a function of the corpus, so a toy fixture cannot test a floor at all.** Measured by the developer: the precision-only query `"tail" "exit" "code"` scores 14.01 / 12.29 / 10.62 / 6.83 / 6.03 against the live 599-entry store and **about 5e-6 for every row against a three-document fixture**. At any shipped floor a small fixture is silent for **every** input, and *"the floor silenced the weak match"* then passes with the floor doing no work. **A4's fixture is 599 documents** (strong 20.98 above, weak 4.28 below; shipped floor **8.0**, `max_injected` **1**). |
@@ -408,7 +418,17 @@ untested**, and **blind spot** (what the procedure cannot see).
   per state and **the `asked, silent` count must not move** from those two commands. A census that
   reports a single fires total, or that folds *not asked* into *asked, silent*, is a fail of this
   row — the three counts are the denominator the whole repair exists to create (brief §2: *fires,
-  hits and injections are three different counts and the record can show all three*). `ob_recalled` must name entry 299 as hook-injected and must not name any entry
+  hits and injections are three different counts and the record can show all three*).
+  **Reported landed at rev 4** (`3db1365` §2), each verified rather than accepted: `ob_stats`
+  prints the three counts **always, zeros included** — I check the **zero** case specifically,
+  because a count that appears only when non-zero cannot distinguish zero from absent, which is
+  this loop's own subject one layer up; **`hook` is in `RECALL_TRIGGERS` and not in `ob_recall`'s
+  enum**, asserted **by name** because *not explicit* would pass on `unspecified`, and I require
+  the by-name form in the test rather than the weaker one; and `trigger_fires` carries a **CHECK
+  constraint refusing a fourth state**, because the TypeScript union is erased at run time — **I
+  attempt a fourth state directly in SQL against a scratch copy and require the insert to fail**,
+  since a constraint nothing has ever violated is indistinguishable from a comment.
+  `ob_recalled` must name entry 299 as hook-injected and must not name any entry
   from the silent fire. For the third clause — *the rated set at `/end`* — I read what `/end` would
   rate **without running my own `/end` as the instrument**: the rated set is resolved by
   `open-brain/src/pipelines/session-end/recalled-ids.ts`, and I call that resolution directly
@@ -494,7 +514,9 @@ untested**, and **blind spot** (what the procedure cannot see).
     **The developer names the targeted set in its handoff; I may add the recall tests if it omits
     them** (the §7.4 enumeration is what I add from). **The set is now named** (`6da5fa9` §3):
     `tests/trigger/**`, `recall-broadening`, `ranking`, `db-v2`, `rating-method`,
-    `pipelines/session-end/recalled-ids`, `server` — reported there as 9 files, 107 tests, exit 0.
+    `pipelines/session-end/recalled-ids`, `server` — reported there as 9 files, 107 tests, exit 0;
+    **`tests/pipelines/sync/module-boundary.test.ts` was added at rev 4** because the candidate now
+    touches `MEMORY_SIDE` (`3db1365` §2, reported there as 11 files, 130 tests).
     **Two files from my §7.4 enumeration are not in it — `index-upsert.test.ts` and
     `active-session.test.ts`** — both of which carry recall assertions at base. `R12` gives me the
     addition explicitly, so **I add them and score the enlarged set**, and the report names which
@@ -538,7 +560,17 @@ Checked at the candidate, each with its own observation, none inferred from a gr
 2. **The targeted run green with the exit code from the process; `sync --check` clean, zero
    skipped; `module-boundary` green; the full suite reported both ways** — A11 as re-scoped by
    `R12`. **The trigger imports nothing from the harness and the harness imports nothing from it**
-   — read from the import graph, not asserted.
+   — read from the import graph, not asserted. **`R21` (`3db1365` §1): the trigger is MEMORY-SIDE
+   and says so.** `module-boundary` went red when `src/trigger/` arrived — correctly, because the
+   check defaults an unlisted new file to core and the trigger imports `db-v2`. The ruled repair is
+   **the one-line declaration of `trigger/` in `MEMORY_SIDE`**, not a suppression and not an
+   exemption. **Three things I check, and the second is the one that matters:** (a) `trigger/` is
+   declared in `MEMORY_SIDE`; (b) **that declaration is the ONLY change to the check** — I read
+   `git diff <base>..<candidate>` over the check and its test and require no loosened predicate, no
+   new ignore, no widened glob, because a real declaration and a quiet exemption both turn the
+   check green and only one of them is `R21`; (c) **mutant M16** (the declaration removed) is red,
+   run by me, `tsc`-clean. The harness boundary in §3 is **unchanged** and I assert both directions
+   of it separately — this ruling moves the trigger across the memory/core line, not the harness one.
 3. **`ob_state` remains the only writer of `.agents/state.json`.** Measured: hash `state.json`
    before and after every A5/A6/A7 fire; unchanged. The trigger writes to the store's tables, never
    the record.
@@ -597,10 +629,18 @@ the trigger's path; `G-045` or slice three's list.
    declared live at rev 2 (`5ab0ac4` §3) and is **reported dead at rev 3**, with **M6** (derived
    schema hand-edited) and **M7** (floor set to 0) red and the one source-text scan carrying a
    known positive and a known negative in the same test (`T-156`) — all of that from `6da5fa9` §3.
-   **I run M4, M5, M6 and M7 myself**, `tsc --noEmit` clean on each, rather than reading the
-   handoff's account of them; the report says which mutants I ran, not which I was told about. A
-   mutant reported dead that survives here is the sharpest finding available in this loop, because
-   it means the suite and the handoff disagree about what is covered.
+   **By rev 4 the set is M4 through M16**, with nine (M8–M16) reported red at rev 4 alone —
+   including **M13–M15** on the policy file's `R19` provenance, which its zod contract requires,
+   and **M16** on the `MEMORY_SIDE` declaration (`3db1365`).
+   **I run every mutant myself**, `tsc --noEmit` clean on each, rather than reading the handoff's
+   account of them; the report says which mutants I ran, not which I was told about. A mutant
+   reported dead that survives here is the sharpest finding available in this loop, because it
+   means the suite and the handoff disagree about what is covered.
+   **And I read each mutation for what it actually changed.** The developer reports a mutation
+   attempt that refused with *pattern not unique* rather than mutating the first match (`3db1365`
+   §2). That refusal is correct, and its converse is what I check for: **a runner that silently
+   mutates the first match reports *killed* about a line it never touched** — a green mutation
+   score that measures nothing, which is this repo's recurring defect wearing a different hat.
 
 ## 6. What cannot be verified now, stated so nobody inherits it as settled
 
@@ -683,6 +723,7 @@ All at `4550ee5`, 2026-09-20, in `~/Worktrees/sia-qa`, after detach + build + an
    | mine, ×2 | QA | **base `4550ee5`** | 974 — 973 passed, 1 failed, a different victim each | **1** |
    | developer | developer | **rev 2 `ee74fd1`** | 986 passed | **0** |
    | developer | developer | **rev 3 `12b5aeb`** | 997 passed, 0 failed | **1** |
+   | developer | developer | **rev 4 `405a5e3`**, after a real fix | 1008 passed, 0 failed, 69 files | **1** |
 
    Amendment 4 §3 called the developer's 986 run *"same base"* as my two. Amendment 5 §3 then says
    *"the same tree at rev 2 exited 0 with 986"* — so that run was at **rev 2 of
@@ -704,7 +745,18 @@ All at `4550ee5`, 2026-09-20, in `~/Worktrees/sia-qa`, after detach + build + an
    tracked file and both seats. Amendments 4 and 5 are **cited and not retro-edited**, which is why
    this table names the code state per row: the corrected reading lives here and in `f28ed11`, and
    a reader of `5ab0ac4` alone still gets the wrong sentence. **The wording the planner will carry
-   to `G-042`'s close-out amendment is the narrow one** — one tree, green at rev 2, red at rev 3,
+   **FOURTH SIGHTING, rev 4** (`3db1365` §2): 69 files, 1008 tests, zero failed, exit 1 on the
+   heartbeat. So the same tree now reads clean at rev 2 (986) and timed out at rev 3 (997) and
+   rev 4 (1008) — **three points in one tree with the test count rising monotonically**, which is
+   the first evidence that separates *more tests* from *this machine* or *this tree*. It is still
+   one machine and the counts are confounded with the code, so it is a correlation with three
+   points, not a cause; I report it that way.
+   **`R12`(ii) fired correctly for the first time at rev 4:** the first run there had a REAL
+   failure in a file the candidate touched (`module-boundary`), and the developer fixed it as a
+   candidate failure rather than filing it as environment. That is the filter working in the
+   direction I said in §10 it might not — worth recording, and it does not close the hole,
+   because the case it catches is the one where clause (ii) is obvious.
+   **The wording the planner will carry to `G-042`'s close-out amendment is the narrow one** — one tree, green at rev 2, red at rev 3,
    zero failing tests both times; my two base runs stand as they are.
 
 ## 8. Procedure order on hand-over
