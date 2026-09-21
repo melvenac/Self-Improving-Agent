@@ -1,49 +1,49 @@
-<!-- generated from .agents/state.json rev 61 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 62 by open-brain v0.44.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner _(written session 73)_
+## planner _(written session 76)_
 
 ### Pick up here
 
-THE PLANNER SEAT'S FIRST HANDOFF THROUGH THE PER-SEAT SLOT (C3's acceptance, Loop 14). Loop 14 is closed: ACCEPTED at c7fbdd9, merged as #77 with the bump 3135da4, v0.43.0 on e1948a0, both seats rolled (#80, #81), the close-out at docs/loops/loop-14-closeout.md. The next loop is the G-039 recall trigger (D-026), UNBRIEFED: write its brief in docs/loops/ from g-039-ruling.md and loop-14-closeout.md section 4, then kick off fresh developer and QA sessions on Opus 5 the way loops 15 and 14 were kicked off — both seats report their /start greetings verbatim first and the planner checks them against the record before anything else. Read in order: .agents/roles/planner.md and shared.md (now loaded for you and named by commit); docs/loops/loop-14-closeout.md; docs/loops/g-039-ruling.md; the developer's and QA seat's handoffs by SHA (the greeting names them). This session's earlier record writes carry session stamp 64 (opened_session on G-045..G-047, T-156, T-157); this close-out takes 73 because the record numbers sessions by uuid and 64 predates the fix.
+LOOP 16 IS CLOSED — ACCEPTED at 5351270, v0.44.0 at 579d894 (D-027), close-out at docs/loops/loop-16-closeout.md with a CI addendum §10; the developer (#87 af90fce, rev 60) and QA (#88, rev 61) rolled before this write. The next loop is Loop 15 slice three, G-045 first (D-026) — write its brief from loop-14-closeout.md §8, loop-16-closeout.md §§5 and 8, and the five tasks opened at this write (T-158..T-162); kick off fresh developer and QA sessions on Opus 5 as Loop 16 was kicked off: both seats report their /start greetings VERBATIM first and the planner checks them against origin/master's record before either reads the brief. Read in order: .agents/roles/planner.md and shared.md (loaded); docs/loops/loop-16-closeout.md; docs/loops/g-039-ruling.md §'What this does not settle'; the developer's and QA seat's handoffs by SHA (named in the greeting). TRANSPORT: Claude Code cross-session discovery is broken on this machine; the seats talk through A2A-Hub on tcm (D-028; memory reference_a2a_hub_tcm) — rooms atlas↔forge k571c0nz7tq2e5g0qt8td094n18ers8v and atlas↔probe k579yfv49ydbzrt3txbg6vrrhs8erycy exist, or open new ones per seat with hub-talk --peer; keep your own read-only-cursor reader; one background listener per room; every message from a file. Held for Aaron at this write: register the trigger for production (close-out §8.1); the census price (§8.2); the tcm redeploy with fd23eac after this close-out merges, AUTH_MODE staying warn.
 
 ### Watch out
 
-- FOUR INSTRUMENTS CAN REPORT HEALTHY ON A STALE TREE. Both fresh seats' greetings this morning were faithful renders of trees two merges behind master: clean tree, Drift: none, a valid render, a matching version. Loop 14 added the tree-currency line; still verify the greeting against origin/master's blob before trusting a claim about the record.
-- THE RECORD MOVES ONE SEAT AT A TIME AND THE MERGE CHOREOGRAPHY IS THE PLANNER'S. When a candidate migrates the record schema, the main tree is rebuilt and every session's server reconnected BEFORE any seat reads the record; confirm the reconnect from a read (an ob_state dry run), never from the reconnect message. An older build refuses the file (ob_state) or, before Loop 14, fell back to prose (ob_start).
-- A RELAY IS ONE LINK. When telling a seat a fact about the repository (merged as a merge commit, a branch is an ancestor), say it is a relay and have the seat verify it before acting; the developer did, and it was right to.
-- DO NOT ASK FOR A CHANGE TO A DOCUMENT INSIDE A FROZEN CANDIDATE. The planner did (Loop 14) and the developer correctly refused because the freeze is a mechanism; the sentence went to the close-out instead.
-- CITE, DO NOT RESTATE. A count in prose acquires an implied 'as of'; the developer restated 960 where the run said 974 in a document about restated numbers (Developer 31). Cite the SHA and the section instead.
-- THE PLANNER'S OWN INSTRUCTIONS ARE ERRORS TOO: Planner 49 (a claim about the record the record did not hold, after the handoff slot was overwritten) and Planner 50 (six rows where the brief had seven). Both caught by the other seats reading the artifact.
-- PARALLEL BASH CALLS SHARE ONE CWD: a call that cd's elsewhere moves every concurrent call. Use one call for sequential work in one tree, absolute paths, and git -C.
-- MSYS MANGLES ref:path IN git show (origin/master:.agents/state.json becomes origin\master;...); use the SHA form.
-- GITHUB ACTIONS REGISTERS RUNS LATE SOMETIMES (fifteen minutes today; three trigger events produced nothing until they did). 'no checks reported' is a pre-registration state; poll for a registered run before watching, and merge only on CLEAN/MERGEABLE.
-- shared.md IS NOW LOADED INTO EVERY SESSION: it has a budget. Rules go there short with provenance; reasoning stays in close-outs. And loading a rule is not applying it (Developer 31, Loop 14).
+- NO add_gap BY ANY SEAT UNTIL T-158 LANDS: close_gap splices without a tombstone and the next add_gap is handed a CLOSED id whose old meaning tracked files cite (QA's dry run got G-046 and G-047). New gaps travel as verified entries, handoff rows and tasks — this write did exactly that.
+- A RULING WITH NO ACCEPTANCE ROW FIRES NOWHERE. R7 was ruled at amendment 1, agreed by the developer, written into a boundary report, and never built; 153 tests, tsc, sync and five reports were all green. Every ruling that changes behaviour gets a §4 row in the same amendment, or it is an intention.
+- THE CENSUS LINE `hook: N` IN ob_stats IS VISIBLE FROM THE OLD BUILD — the data is there and the old query renders it. Only the three fire counts (not-asked / silent / injected) prove the new server. Both seats nearly ran /end against a stale server on that line.
+- EVERY SEAT SESSION TONIGHT HAD NO TRANSCRIPT: CLAUDE_CODE_CHILD_SESSION=1 inherited from the VS Code window. Launch cleanly or with CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1 before any row that reads a transcript; check the variable at /start (T-161).
+- ALL QA EVIDENCE IN LOOP 16 CAME FROM ONE MACHINE; CI found two faults in one file the first time it looked (599 fsyncs on a file-backed fixture; it.each rows without the spawn timeout). 'Green per-file' was true and false under load. Run the full suite alone at every candidate, and read the CI run id, not the empty rollup — registration lagged ~3.5 minutes.
+- A STACKED FIXTURE FAILS IN THE FLATTERING DIRECTION: both seats built one within hours (short decoys; a short sentence) and both caught their own. Guard fixtures in both directions — not weakened, not stacked — and report decoy lengths.
+- AN ASSERTION ON A VALUE THE HARNESS NEVER CAPTURED (M18): execFileSync returns stdout only; a hardcoded stderr: '' passed every stderr assertion without looking. tsc --noEmit on every mutant before it counts — three type-invalid mutants went red for the wrong reason in one session.
+- THE REGISTRATION IS MACHINE-WIDE: one settings.json entry arms the hook for every session in every project; it fired in the planner's and developer's sessions during QA's probe. Say the blast radius, not only the build.
+- PARALLEL BASH CALLS SHARE ONE CWD; MSYS MANGLES ref:path IN git show; GITHUB ACTIONS REGISTERS RUNS LATE; the sync gate goes red on docs-only commits until you rebuild — all still true, all bit again.
+- hub-talk: --say used to advance the read cursor (two dropped turns); fixed in c85c0d3, but a --wait started while a previous one runs under the same name double-delivers, and an inline --say executes backticks. One listener; files.
 
 ### Open questions
 
-- Should the planner seat roll into a fresh session now (the C4 fresh-planner test, and this session's context is very large) or continue? The planner recommends a fresh session on Fable 5.1 after this close-out merges.
-- Aaron's home directory: the real active-session.json holds eight scratch-fixture keys written by QA baseline hook runs before it redirected HOME (QA report 1 section 9) — clean or ignore; and the shared repository's local master branch is 105 commits behind origin/master, a trap for a checkout by habit — fast-forward or delete.
-- G-042 on a second machine: two sightings, one machine, both with the count right and only the exit code knowing. CI has never shown it. Whether it is worth a loop or a CI-only check is unruled.
-- The build-freshness check goes red on docs-only commits because it compares the build's commit to HEAD rather than to the last commit that touched open-brain/; fix shape noted in loop-14-closeout.md section 5, not sequenced.
+- Register the trigger for production, pointing at the main tree's build? Recommended yes for one loop, measured by the fires table and point-of-use rating (close-out §8.1). Aaron's file, Aaron's call.
+- Is the floor conservative or mute? First production counts: 10 recognised commands asked the store and got nothing, against 1 injection. T-159 keeps the denominator; the next trigger increment reads it.
+- The first injection was rated neutral by the seat that received it — the rule was already loaded three ways. When does an injection change behaviour, and what counts it? The fires table plus /end ratings are the instrument; nothing yet reads them across sessions.
+- Where does the ranking gap get built — a column weight, a gap criterion between rank 1 and 2, or a relevance signal beyond bm25 (G-026 amendment)? Not slice three's; named so it is not rediscovered.
+- A2A-Hub: redeploy tcm with fd23eac (after this close-out merges, before the roll — Aaron's sequencing); per-agent keys then strict; long-poll/push (T-160). Aaron declined the tailnet for the Grok bot's host; revocation must be exercised against the ~39 live agent rows before the hub is public.
 
 ### Loop state
 
 **Open PRs:** _None._
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `none — Loop 16 accepted at 5351270, tip ca1693f + c02b47b, tagged v0.44.0 at 579d894`
 
 **Questions pending for Aaron:** 
-- Fresh planner session now, or continue this one? (recommended: fresh, on Fable 5.1, after this close-out merges)
-- active-session.json scratch keys and the stale local master branch: clean/fast-forward, or ignore?
+- Register the trigger for production (main tree build)?
+- Keep the census price one loop, or make T-159 slice three's first task?
+- tcm redeploy with fd23eac after this close-out merges (AUTH_MODE stays warn).
 
 **Rulings made mid-loop:** 
-- Loop 14 C2d: the near-miss register belongs to the close-out document by family, never numbered; the enumeration row is met by saying so in the handoff.
-- Loop 14 A7-style: QA criteria derived beyond the brief are QA's own clauses; a candidate meeting the brief and not the clause is reported both ways and the clause returned to the planner, never dropped after a verdict.
-- Loop 14: ref authorship is a ledger not a name; the gate seam is async never a spawned process; a checkout may declare role: none and record writes from it are refused; the schema migration is the developer's record write and nothing else writes the record between candidate and merge; other seats' close-out SHAs are derived at read time, failing closed; C3's required rows may be empty but not absent.
-- Sequencing after Loop 14: the G-039 recall-trigger loop, then slice three (Aaron, D-026).
-- Models at the next fresh sessions: developer and QA on Opus 5, planner on Fable 5.1 (Aaron, 2026-09-20).
+- R1–R27 in loop-16-brief-amendment-1..12 (1453e5f c43a31f 1051cae 5ab0ac4 6da5fa9 f28ed11 3db1365 29766dc 0c70b52 084cf18 e0c1dd2 87cbb9d); R28 at this write: no add_gap by any seat until T-158; G-039 stays open as the loop's evidence rather than being spliced away.
+- Planner errors 51–54 set in the close-out §7 (54 / 31 / 2).
+- No PRs open at this write: #83–#88 merged; the planner close-out PR follows this commit.
 
 ## developer _(written session 74)_
 
@@ -96,4 +96,4 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 
 ## Last session
 
-Session 75 — 2026-09-21 — qa — `6eab2c5c-8a09-4a22-9bdf-4af60df64f4e`
+Session 76 — 2026-09-21 — planner — `22631f4e-433a-4f29-8669-47ee2f543bec`
