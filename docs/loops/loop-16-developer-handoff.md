@@ -253,3 +253,122 @@ quoted and broken in the same session, and §5 of this file is the same thing ha
 surfaced entry one command away. What is now true is narrower and measurable: **the store is asked,
 at the act, by something that does not have to remember to ask — and when it is silent, the record
 can say whether it looked.**
+
+---
+
+# Candidate 2
+
+**Appended 2026-09-20**, after QA's report on `45ee2ab` and the planner's rulings in amendments
+**9 (`0c70b52`)**, **10 (`084cf18`)** and **11 (`e0c1dd2`)**. Candidate 1 was NOT ACCEPTED on one
+row. New commits on top, unsquashed and unrebased; `45ee2ab` is still in the history and still
+reachable.
+
+## 12. What candidate 1 got wrong, and what it did not
+
+**F1 — the guard the brief named did not exist.** A11's fourth clause and brief §3 require a test
+that fails if a network call is attempted over the trigger's module. There was none. The property
+itself held — nothing under `src/trigger/` imports `fetch`, `node:http(s)`, `node:net`, `node:dns`
+or `undici` — so this was not a live defect. **It was the missing guard against one, and the
+distinction between *the property holds today* and *something notices when it stops* is this
+loop's entire subject.** Shipping without it was the wrong shape twice over.
+
+Everything else at `45ee2ab` passed, verified by QA rather than relayed — including the full suite
+alone in the QA tree at the candidate: 1021 passed, exit 0.
+
+## 13. The repair, and the finding underneath it
+
+**The network tripwire** (`tests/trigger/no-network.test.ts`). Ten outbound surfaces patched —
+`fetch`, `http.request`/`get`, `https.request`/`get`, `net.connect`, `net.Socket#connect`,
+`tls.connect`, `dns.lookup`, `dns.promises.lookup` — recording attempts rather than only throwing,
+so a failure names what was reached. `net.Socket#connect` is the one that matters: `http`, `https`
+and `tls` all reach the network through it, so a route avoiding the named module functions still
+trips.
+
+Not a source scan, deliberately. A grep for `fetch(` over `src/trigger/` is what `G-040` does — the
+scan that fired on a constant listing forbidden subcommands, and the one that fired on a comment
+reading *the fix is not shell: true* — and it would miss a transitive import, a dynamic `require`,
+or a native binding opening a socket.
+
+**All ten surfaces are fired deliberately first, in the same test** (T-156). A tripwire installed on
+the wrong object records nothing and looks exactly like a clean run, which is candidate 1's M18 in
+another costume.
+
+**A1's fixture, and the finding it produced.** Rebuilding it so every decoy carries all three
+derived terms made A1 fail: entry 299 did not rank first. I left it red and reported it rather than
+weakening the fixture, and the planner ruled the restatement below.
+
+**I reported that finding wrong first, and the correction is the more useful half.** My initial
+rebuilt decoys ran 235–343 characters against entry 299's 566 and put 299 at **rank 9 of 11**.
+Amendment 9 §2 specifies decoys *of comparable length*; mine were not, which handed every decoy a
+bm25 length-normalisation advantage unrelated to relevance. Rebuilt at 426–545 characters, **299
+ranks 4 of 11** — beside QA's independent 3. **A stacked fixture proves as little as a vacuous one;
+it just fails in the flattering direction**, and "the ranking is badly broken" was the flattering
+direction for me, because it makes the row somebody else's problem.
+
+## 14. A1 as restated (R26), and what each half is worth
+
+**A1(a) — precision, ASSERTED.** The original decoys, most carrying only part of the brief's token
+list. 299 ranks first. The row now prints its own match set:
+
+```
+A1(a) match set (2 of 11 documents): pipe-to-tail-masks-exit-code, exit-code-from-variable
+```
+
+So QA's F2 — *299 was winning a field of two* — is stated by the test rather than left for a reader
+to discover. What A1(a) demonstrates is the conjunction excluding partial matches, which is a real
+property and a smaller one than the original row implied.
+
+**A1(b) — the field, REPORTED.** Ten decoys each genuinely carrying all three derived terms at
+comparable length. The only assertion is that 299 is IN the match set; A1(b) fails only if it is
+absent. The rank is printed:
+
+```
+A1(b) entry 299 ranks 4 of 11 against ten same-topic competitors (top: migration-exit-code).
+RANK REPORTED, NOT ASSERTED.
+```
+
+**No N is asserted** (R26): a top-4 would be today's measurement writing its own row and a top-3
+would be QA's. First place is a gap at the close-out, in the planner's words.
+
+**What the ranking gap actually is.** bm25 length normalisation. Entry 299 is 566 characters; the
+competitors are 426–545 and carry the same three terms. It is not a small-corpus artifact — I
+checked, because that was the comfortable explanation: adding non-matching filler restores the
+absolute scores (`4.138e-6` at 11 documents to `9.99` at 600) and **leaves the rank where it was**.
+**The live store ranks 299 first because only five entries there match all three terms, not because
+the ranking discriminates it from a field.** Boundary 3's rank-1 was a thin field.
+
+Measured and NOT applied, as evidence for whoever owns the gap — weighting the `key` column (the
+entry's identity, which carries all three terms), at 600 documents: `x2` → 5th, `x3` → 3rd, `x5` →
+2nd, `x10` → 1st at 18.39 against 17.83. **`x10` clears by 0.56, and a weight chosen because it
+makes A1 pass is tuning to the test**, which is why no weight is in this candidate.
+
+**How the gap should be weighed.** Every one of the ten competitors gives the SAME ADVICE as 299 —
+read the status from the process, not from the trimmed output. With `max_injected` at 1 the seat
+receives one of them and is warned correctly either way. The ruling's prohibition is on injecting an
+IRRELEVANT entry; these are competitors, not noise. A row asserts this so it is not left as a
+comment. **And the durable answer to *was that the right entry* is what the fires table and
+point-of-use rating measure in production** — which is the thing this loop built.
+
+## 15. A6's accepted substitution, written here as R25 requires
+
+The criteria said *hook killed at its timeout*; the candidate tests **past its own deadline**
+instead. `better-sqlite3` is synchronous, so nothing inside the hook can interrupt a query in
+progress: **the host's `timeout` bounds how long the process may run, and `deadline_ms` bounds
+whether a result that came back late may still be emitted.** "Killed at its timeout" is not
+producible from inside the hook — the host does the killing — so the observable that IS reachable
+is the emission rule, and that is what the row tests. QA accepted the substitution and amendment 9
+§3 rules it accepted.
+
+## 16. Verification at candidate 2
+
+```
+targeted run (R12)   13 files, 149 tests, exit 0
+tsc --noEmit         0
+```
+
+The targeted set is unchanged from §8 plus the new `tests/trigger/no-network.test.ts`, which the
+`tests/trigger/**` glob already covers.
+
+**Nothing in `src/` changed in candidate 2.** Every commit is a test or this document, so candidate
+1's A5, A6, A10 measurements and the full-suite result stand unaltered — and A7, A8 and A10-live
+run against this candidate with the hook registered, on Aaron's word.
