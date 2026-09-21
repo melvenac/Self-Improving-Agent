@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 73,
+  "revision": 74,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1909,6 +1909,29 @@
           "type": "measurement",
           "path": "planner tree at master 7920892, 2026-09-21T09:16:20-09:18:02Z, idle",
           "observation": "SUITE_EXIT=0, 71 files, 99.75s - a second clean idle run at a different SHA"
+        }
+      ],
+      "since_session": 77,
+      "status": "verified"
+    },
+    {
+      "id": "V-077",
+      "claim": "A correct detector was dismissed by BOTH seats that saw it, and severity alone would not have fixed it: 'pre-existing' was used as a reason to classify a finding as unrelated, when it is only a statement about WHEN it started",
+      "evidence": [
+        {
+          "type": "report",
+          "path": "developer seat's /sync report to Aaron, 2026-09-21",
+          "observation": "reported `prd-version: PRD.md not found` inside the line '26 passed, 0 issues, 3 warnings - all pre-existing and unrelated', classifying it without opening the question of WHY the file was missing. The seat's own words: 'I had already decided it was noise', and severity would not have reached that decision"
+        },
+        {
+          "type": "session",
+          "path": "planner seat cfb0ca78, same day",
+          "observation": "read the same warning three times in one session and read past it each time, because it sat beside a missing specs/ directory and an unindexed vault note - two findings that ARE inert, which is what made the third one look inert too"
+        },
+        {
+          "type": "measurement",
+          "path": ".agents/SYSTEM/PRD.md at 3fe553f",
+          "observation": "with the file present the same check escalates to an ISSUE and immediately caught a real staleness (v0.43.0 against 0.44.0). The check was correct throughout; what failed was its severity AND, independently, how two readers classified it"
         }
       ],
       "since_session": 77,
