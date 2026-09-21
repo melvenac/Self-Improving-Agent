@@ -1173,12 +1173,22 @@ export const MEMORY_SIDE: string[] = [
   "vault-writer.ts",
   "server.ts",
   "cli-session-end.ts",
+  "cli-recall-trigger.ts",
   "pipelines/session-end/",
   "pipelines/store/",
   "pipelines/topics/",
   "pipelines/shadow/",
   "pipelines/sync/checks-memory.ts",
   "pipelines/sync/score.ts",
+  // Loop 16. The recall trigger queries the knowledge store, so it is memory
+  // by definition — but it arrived as new files, which this list's default
+  // correctly classified as CORE, and the check went red on the first full
+  // run after they existed. That is the design working: the boundary widened
+  // by a reviewed line here rather than by a database import slipping into a
+  // file nobody had classified. The OTHER boundary the trigger holds — no
+  // edge either way with `src/harness/` (brief §3) — is a different rule and
+  // is unaffected by this entry.
+  "trigger/",
 ];
 
 const isMemorySide = (rel: string): boolean =>

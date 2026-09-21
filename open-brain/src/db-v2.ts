@@ -41,7 +41,61 @@ export function migrateProjectDirToCanonical(db: Database.Database): number {
   return updated;
 }
 
+/**
+ * The trigger's fire table, as its own statement.
+ *
+ * Separated from initSchemaV2's one big exec for a reason the recall trigger
+ * forced: that function is followed by the column migrations and the
+ * project_dir canonicalisation, which walk the whole store. The trigger runs
+ * after EVERY Bash call, and a hook that pays for a full migration pass per
+ * tool call is a latency cost with no caller. It needs exactly this table to
+ * exist and nothing else.
+ *
+ * DEFINED ONCE AND CALLED FROM BOTH PLACES. Two copies of a CREATE TABLE is
+ * the defect this repo keeps finding in other clothes — a shape stated twice
+ * and falsified by an ordinary edit to one of them.
+ */
+export function initTriggerFires(db: Database.Database): void {
+  db.exec(`
+    -- Every INVOCATION of the recall trigger, whether or not it surfaced
+    -- anything. Loop 16 R5 and R16.
+    --
+    -- A SIBLING TABLE RATHER THAN MORE ROWS IN recall_log, for a reason that
+    -- is structural and not stylistic. recall_log means "this entry reached
+    -- the agent": getSessionRecalledIds treats it as the authoritative rated
+    -- set at /end, and those ratings move success_rate, which gates
+    -- apoptosis and boosts ranking. An entry the trigger LOOKED AT and did not
+    -- surface was never in front of anyone, so a looked-at row in recall_log
+    -- would write ratings for entries nobody read. Keeping fires here means
+    -- that cannot happen BY CONSTRUCTION rather than by a filter someone must
+    -- remember to keep. (knowledge_id is also NOT NULL there, and
+    -- recordRecallEvent returns early on an empty id list, so a silent fire
+    -- has no shape to take in that table at all.)
+    --
+    -- state is the whole point of the table: 'not-asked' (no element of the
+    -- command was recognised, the store was never consulted), 'silent' (the
+    -- store was consulted and nothing cleared the floor), 'injected' (ids went
+    -- to the model). Before this, ob_recalled reporting "no knowledge
+    -- entries recalled this session" could not tell "nothing asked" from
+    -- "asked, and nothing relevant" — and for five loops the silence was read
+    -- as inconclusive when it was the answer (G-039). Three states, three
+    -- counts, and "did the memory half get used" finally has a denominator.
+    CREATE TABLE IF NOT EXISTS trigger_fires (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_uuid TEXT NOT NULL,
+      command TEXT NOT NULL,
+      query TEXT NOT NULL,
+      state TEXT NOT NULL CHECK(state IN ('not-asked', 'silent', 'injected')),
+      injected_ids TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_trigger_fires_session ON trigger_fires(session_uuid);
+  `);
+}
+
 export function initSchemaV2(db: Database.Database): void {
+  initTriggerFires(db);
   db.exec(`
     CREATE TABLE IF NOT EXISTS sessions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -717,9 +771,18 @@ export function getChunksForSession(db: Database.Database, uuid: string): Array<
 export type ShadowRating = 'helpful' | 'harmful' | 'neutral';
 
 /** How a recall reached the agent — see the recall_log DDL comment. */
-export type RecallTrigger = 'start' | 'checkpoint' | 'explicit' | 'unspecified';
+export type RecallTrigger = 'start' | 'checkpoint' | 'explicit' | 'unspecified' | 'hook';
 
-const RECALL_TRIGGERS: ReadonlySet<string> = new Set(['start', 'checkpoint', 'explicit', 'unspecified']);
+/**
+ * `hook` is Loop 16's value and it is deliberately NOT in `ob_recall`'s zod
+ * enum (R6). The enum is what an agent may pass; this set is what the store
+ * may record. Keeping them different is the only thing that makes the census
+ * answerable: if an agent could pass `hook`, a deliberate mid-task fetch
+ * could be filed as an injection nobody asked for, and the one question the
+ * column exists to answer — does the memory half get used WITHOUT being
+ * asked — would be unanswerable by construction.
+ */
+const RECALL_TRIGGERS: ReadonlySet<string> = new Set(['start', 'checkpoint', 'explicit', 'unspecified', 'hook']);
 
 /**
  * Record what a live recall actually returned, in rank order.

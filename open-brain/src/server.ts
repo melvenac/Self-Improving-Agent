@@ -1162,6 +1162,22 @@ server.tool(
       "SELECT COALESCE(recall_trigger, '(pre-column)') as t, COUNT(*) as count FROM recall_log GROUP BY t ORDER BY count DESC"
     ).all() as Array<{ t: string; count: number }>;
 
+    // The trigger's three states, across every session (Loop 16 R16, A8).
+    //
+    // This is the denominator the memory half never had. 'not-asked' says how
+    // narrow the derivation is, 'silent' says whether the floor is set
+    // sensibly, 'injected' says how often anything actually reached a seat —
+    // and the difference between the first two is the distinction `ob_recalled`
+    // could not make for five loops (G-039). Zero rows is itself an answer
+    // here and is printed as three zeros rather than an omitted section: an
+    // absent census reads as "not measured", which is the failure this table
+    // exists to end.
+    const fireCensus = v2db.prepare(
+      "SELECT state, COUNT(*) as count FROM trigger_fires GROUP BY state ORDER BY count DESC"
+    ).all() as Array<{ state: string; count: number }>;
+    const fireCounts: Record<string, number> = { "not-asked": 0, silent: 0, injected: 0 };
+    for (const row of fireCensus) fireCounts[row.state] = row.count;
+
     // Same contract for ratings: where each rated id came from, with the
     // pre-column era its own bucket rather than a healthy-looking zero.
     const originCensus = v2db.prepare(
@@ -1190,6 +1206,11 @@ server.tool(
       ``,
       `Recall trigger census:`,
       ...triggerCensus.map(r => `  ${r.t}: ${r.count}`),
+      ``,
+      `Trigger fires (every invocation, whether or not it surfaced anything):`,
+      `  not asked (no recognised element): ${fireCounts["not-asked"]}`,
+      `  asked, silent (nothing cleared the floor): ${fireCounts.silent}`,
+      `  asked, injected: ${fireCounts.injected}`,
       ``,
       `Rating origin census:`,
       ...originCensus.map(r => `  ${r.o}: ${r.count}`),
@@ -1250,11 +1271,23 @@ server.tool(
       return { content: [{ type: "text" as const, text: `No knowledge entries recalled this session.${why}` }] };
     }
 
+    // Which of these the HOOK put in front of the agent, as opposed to the
+    // agent fetching them (Loop 16, A8). They are rated the same way and they
+    // are not the same evidence: an entry fetched on demand was wanted, an
+    // injected one was not asked for, and the whole question this loop exists
+    // to answer is whether the second kind is worth anything.
+    const hookInjected = new Set(
+      (v2db.prepare(
+        "SELECT DISTINCT knowledge_id FROM recall_log WHERE session_uuid = ? AND recall_trigger = 'hook'"
+      ).all(session.id ?? "") as Array<{ knowledge_id: number }>).map((r) => r.knowledge_id),
+    );
+
     const lines = [`Recalled ${ids.length} entries this session (source: ${resolved.origin}):`, ""];
     for (const id of ids) {
       const entry = v2db.prepare("SELECT id, key, maturity FROM knowledge_index WHERE id = ?").get(id) as { id: number; key: string | null; maturity: string } | undefined;
-      if (entry) lines.push(`  [${entry.id}] ${entry.key || "(no key)"} — ${entry.maturity}`);
-      else lines.push(`  [${id}] (deleted)`);
+      const how = hookInjected.has(id) ? " [hook-injected]" : "";
+      if (entry) lines.push(`  [${entry.id}] ${entry.key || "(no key)"} — ${entry.maturity}${how}`);
+      else lines.push(`  [${id}] (deleted)${how}`);
     }
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };

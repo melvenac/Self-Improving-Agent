@@ -26,7 +26,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 
 /** Each entry is a directory that the BUILT code opens at run time. */
-const RUNTIME_ASSET_DIRS = ["harness/policies"];
+const RUNTIME_ASSET_DIRS = ["harness/policies", "trigger/policies"];
 
 let copied = 0;
 for (const rel of RUNTIME_ASSET_DIRS) {
