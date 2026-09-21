@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 59 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 60 by open-brain v0.44.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -45,29 +45,29 @@ THE PLANNER SEAT'S FIRST HANDOFF THROUGH THE PER-SEAT SLOT (C3's acceptance, Loo
 - Sequencing after Loop 14: the G-039 recall-trigger loop, then slice three (Aaron, D-026).
 - Models at the next fresh sessions: developer and QA on Opus 5, planner on Fable 5.1 (Aaron, 2026-09-20).
 
-## developer _(written session 71)_
+## developer _(written session 74)_
 
 ### Pick up here
 
-LOOP 14 IS MERGED AND TAGGED: PR #77 at 542871e, origin/master e1948a0, v0.43.0, record schema 2. The developer seat's work is done and this is the first handoff written into the per-seat slot by the command it built. THE DURABLE ACCOUNT IS docs/loops/loop-14-developer-handoff.md — section 3 has C2d's enumeration, section 5 what went wrong, section 9 QA's four findings repaired. The next developer session is a FRESH seat for whatever the planner briefs; sequencing after this loop is the planner's. THE MAIN TREE NOW GREETS AS Clark (none) — it declares role: none, so it says in words that it is not a seat and the seat-taking ops refuse from it. THE GLOBAL end.md WAS CARRIED ACROSS BY THE PLANNER AFTER THE MERGE, which is the one thing in this loop a check could see and not fix.
+LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.44.0. The recall trigger is live — it fired in a real session and the production store carries its fire rows. THE DURABLE ACCOUNT IS docs/loops/loop-16-developer-handoff.md: sections 1-16 for candidates 1 and 2, 17-21 for candidate 3, with section 5 and section 18 carrying what went wrong. The planner's close-out is docs/loops/loop-16-closeout.md at 579d894. THE RECORD'S OBJECTIVE IS STILL THE PRE-LOOP ONE ('NEXT LOOP: the G-039 recall trigger — not yet briefed') and G-039 is still open: both are the planner's to rule at its own close-out write, and this seat deliberately did not touch either. The next developer session is a FRESH seat for whatever is briefed next.
 
 ### Watch out
 
-- A DERIVED VALUE INHERITS THE QUESTION ITS DERIVATION ASKS, NOT THE QUESTION ITS CALLER ASKS, and no assertion written from inside the derivation can tell the difference. Three instances this loop, every one green when found and every one found by RUNNING the thing rather than by a test: a path instrument that reported 'unknown' in every seat checkout while looking like caution; a migration that made itself every seat's close-out by construction; and my own G-047 fix leaving the record claiming a handoff was written in a session that does not exist.
-- GREEN ON THE FIRST RUN IS NOT INFORMATION — MUTATE EVERY NEW GUARD. Three mutants survived a fully green suite before the assertions were repaired, twice in guards written to honour this repo's own 'read the state back, never the exit code' rule, which were themselves being trusted rather than tested. And a mutant that breaks SYNTAX proves nothing: tsc clean is part of calling one valid.
-- ASSERT BOTH DIRECTIONS. Three vacuous assertions this loop, the third inside the repair for the second. A negative assertion against a path nothing writes is indistinguishable from a passing guard; it was caught only because the POSITIVE case failed the same way.
-- A LINKED-WORKTREE FIXTURE IS NOT OPTIONAL IN THIS REPO. `git rev-parse --git-path` returns a relative path in a clone and an ABSOLUTE WINDOWS path in a linked worktree, and a per-worktree FETCH_HEAD exists only if the fetch ran from that worktree. A plain clone passes both bugs. Every seat checkout here is a linked worktree.
-- THE SHELL EATS THINGS, AND IT DID SO FOUR TIMES. Backslashes in heredoc'd Python produced real newlines inside TypeScript string literals, and once turned a 'malformed JSON' fixture into a VALID one, so the test would have measured nothing. Write the script to a file instead of a heredoc.
-- ob_start NOW REFUSES A PRESENT RECORD WHOSE schema_version THIS BUILD CANNOT READ, with no prose fallback — deliberately narrow. An ABSENT state.json still keeps the prose regime and a malformed-but-known-version record still falls back. If a project without a record ever stops greeting, that distinction is the first thing to check.
-- THE HOOK NOW REFUSES A MALFORMED PAYLOAD AND EXITS NON-ZERO, and a well-formed payload with no session_id writes no slot. If a host sends a malformed payload routinely, sessions will fail to start rather than start wrongly — the intended direction, but a behaviour change at the outermost edge that nothing in this repo can observe.
-- A MEASUREMENT WRITTEN INTO PROSE ACQUIRES AN IMPLIED 'as of' (Developer 31). shared.md already forbids copying a number out of the record into a second place; I read that file at session start, quoted it at a boundary report, and then did the thing it forbids four sections into my own document. Cite where a number was measured rather than restating it.
+- A DERIVED VALUE IS ONLY AS GOOD AS THE CHANNEL THE ASSERTION READS FROM. execFileSync returns ONLY STDOUT, so a harness that hardcoded stderr:'' made every expect(stderr).toBe('') pass without ever looking — on the exact observable a ruling had just been written to require. A mutant found it; no amount of reading would have. When a test asserts on a value, check the instrument actually carries that value to the assertion.
+- A THRESHOLD COMPARED AGAINST bm25 IS CORPUS-RELATIVE, AND A FIXTURE THAT DOES NOT RESEMBLE THE CORPUS CANNOT TEST IT. The same query scores about 5e-6 against three documents and 14.01 against 599. At the shipped floor a small store is silent for EVERY input, so 'the floor silenced the weak match' passes with the floor doing no work at all. floor.test.ts carries a row asserting its own corpus is still at production scale; if that row ever goes red, every floor assertion under it has gone vacuous rather than wrong.
+- A STACKED FIXTURE PROVES AS LITTLE AS A VACUOUS ONE — IT JUST FAILS IN THE FLATTERING DIRECTION. Decoys at 235-343 characters against a 566-character target reported rank 9; rebuilt at comparable length, rank 4. The wrong number was the one that made the problem someone else's, and I reported it before catching it.
+- A RULING CAN BE ASKED FOR, AGREED, REPORTED AS SETTLED, AND NEVER BUILT. R7 was the answer to my own question and produced no code and no test. Nothing between the ruling and QA's verdict could tell: 153 tests, tsc clean, sync clean, five boundary reports and a handoff checklist were all green. Loading a rule, agreeing with a rule, and applying a rule are three different things.
+- PER-INSERT TRANSACTIONS ON A FILE-BACKED SQLite FIXTURE ARE 20x SLOWER: 599 inserts is 599 fsyncs, 2999ms against 148ms wrapped. Survivable locally and over vitest's 10s HOOK timeout on CI, where the whole file then reports its tests SKIPPED — which reads like a missing suite rather than a slow one. :memory: fixtures are unaffected, which is why only one file went red.
+- A BULK EDIT THAT MATCHES `it(` DOES NOT MATCH `it.each([...])(`. Three rows kept vitest's default timeout and passed alone every single time, including in CI where an earlier failure hid them. PER-FILE GREEN IS NOT SUITE GREEN: run the full suite alone before calling a change done, including when the change is 'only tests'.
+- `git show <ref>:<path>` IS MANGLED BY MSYS IN THE BASH TOOL — it becomes a backslash path and git refuses it. Use PowerShell for ref:path reads. Every amendment and every cross-branch file in this loop was read that way.
+- THE HOOK RUNS THE BUILD ITS REGISTRATION POINTS AT, and ob_stats is the only honest test of which build is serving a session — the RECONNECT MESSAGE REPORTS SUCCESS EITHER WAY. Note the trap: the recall-trigger census value `hook` is visible from the OLD build too, because that query predates the loop; only the three FIRE COUNTS prove the new one.
 
 ### Open questions
 
-- DOES THE MEMORY HALF GET USED AT ALL? ob_recall was not called once in this entire session, across two candidates and nine commits. Eight loops. This loop supplies the sharpest evidence yet for why that matters: shared.md is now LOADED into every session by C1, and the seat that read it still broke one of its rules — so loading a rule and applying it are two different things, and recall would have been a third.
-- Is the vitest worker-timeout (G-042) anything but this machine? QA saw the signature under concurrent load from a different seat in a different tree — which kills 'only Forge's process' and leaves 'only this machine' untouched. Two sightings, both here, both with the count right and the exit code the only instrument that knew.
-- Does refusing a malformed hook payload break any real host? Nothing in this repo can observe how hosts invoke the hook; both observations of the malformed case were seats' own shell-quoting errors.
-- Is the no-SHA path in the greeting read as 'unknown' or as 'broken'? It fails closed by design and is correct, but after F1 it appears during every /end, which is the most common moment a seat reads its own greeting.
+- IS THE FLOOR SET TOO HIGH? The first production numbers are 5 not-asked, 10 asked-silent, 1 injected — so ten recognised commands asked the store and got nothing. That is either a correctly conservative floor or a floor that will train seats to ignore a channel that never speaks. The fire table now makes it answerable; nobody has answered it.
+- DOES A SEAT ACT ON WHAT IS SURFACED? Unmeasured by design. This loop makes the store ask; whether the answer changes an error rate is the next loops' count, against the error table, by family.
+- IS THE 0.28s PER Bash CALL ACCEPTABLE? R22 kept the census's denominator for the evaluation period and put the cost to Aaron. The named follow-up is a cheap not-asked path that appends to the log the hook already writes and lets the session-end hook reconcile it into trigger_fires.
+- SHOULD THE RANKING BE REPAIRED, AND HOW? Entry 299 ranks 4 of 11 against ten same-topic competitors; the live store ranks it first only because five entries match all three terms. Key-column weighting moves it (x10 to first, by 0.56) but a weight chosen to make a test pass is tuning to the test.
 
 ## qa _(written session 72)_
 
@@ -97,4 +97,4 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 14, the first entry written through the p
 
 ## Last session
 
-Session 73 — 2026-09-20 — planner — `a57c00ec-b42f-41e7-99cc-9b77485983eb`
+Session 74 — 2026-09-21 — developer — `46758737-4461-4480-be96-fcf65ba9fa95`
