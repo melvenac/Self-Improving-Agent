@@ -24,10 +24,10 @@ import { queryStore } from '../../src/trigger/query.js';
  */
 
 /** The command from G-039, verbatim. */
-const G039_COMMAND = 'npx vitest run 2>&1 | tail -8; echo $?';
+export const G039_COMMAND = 'npx vitest run 2>&1 | tail -8; echo $?';
 
 /** Entry 299's shape as the live store holds it — TRIGGER/ACTION/CONTEXT. */
-const ENTRY_299 = [
+export const ENTRY_299 = [
   '[EXPERIENCE] Piping to tail/head masks the real exit code — and I reported a false success because of it',
   'DOMAIN: shell, tooling, verification',
   'TRIGGER: Any time a command output is trimmed with `| tail -N`, `| head -N`, or `| grep`, AND the success/failure of that command matters.',
@@ -39,19 +39,28 @@ const ENTRY_299 = [
  * Ten decoys sharing the command's tokens. Not filler: each one is a plausible
  * near-miss a real store would hold, and four of them are about exit codes.
  */
-const DECOYS: Array<[string, string]> = [
-  ['vitest-run-alone', 'The suite must run alone: a vitest run that overlaps worktree creation exits 1 while every line reports passed.'],
-  ['exit-code-from-variable', 'Read the exit code from the process into a variable, never from the tail of a log.'],
-  ['npx-runner-selection', 'npx picks a runner from node_modules; run the local binary directly when the version matters.'],
-  ['echo-debugging', 'Using echo to print a value mid-script is fine; using echo to report a run exit code after a pipe is not.'],
-  ['tail-follow-logs', 'Use tail -f to follow a log file while a long run proceeds in another shell.'],
-  ['gitnexus-analyze-exit', 'gitnexus analyze can print a healthy banner and exit non-zero; capture the code as its own statement.'],
-  ['head-truncation', 'head -n trims output to the first N lines and is safe when the command exit status does not matter.'],
-  ['shell-pipeline-basics', 'A shell pipeline runs every stage concurrently; the last stage decides the exit code the shell reports.'],
-  ['run-command-allowlist', 'The runtime allowlist decides which command a stage may run and refuses everything else.'],
-  ['code-review-exit', 'A review that exits early on the first finding hides the rest of the code from the reader.'],
+export const DECOYS: Array<[string, string]> = [
+  ['vitest-run-alone',
+   'The suite must run alone. A full vitest run that overlapped thirteen worktree additions printed 974 passed and still returned a non-zero exit code, and reading the tail of that output showed no failing test at all. Build fixtures before or after the run, never during, and read the exit code from a variable rather than from the tail of a log.'],
+  ['exit-code-from-variable',
+   'Read the exit code from the process into a variable rather than from the tail of a log file. A compound command reports one exit code for several steps, so the code you read belongs to whichever step ran last. Capture it immediately, on its own line, before any further command runs and overwrites it.'],
+  ['deploy-exit-status',
+   'A deploy script that ends by printing its log tail will report a successful exit code even when the build step failed. Check the container image timestamp rather than the exit code the wrapper reports, because the wrapper exits with the code of the last command in its own body and that is usually the echo.'],
+  ['gitnexus-analyze-exit',
+   'gitnexus analyze can print a healthy banner and still exit non-zero, and the tail of its output shows the banner rather than the failure. Capture the exit code as its own statement. An interrupted incremental run leaves the FTS index inconsistent, which is a different failure with the same exit code.'],
+  ['ci-runner-exit-codes',
+   'The CI runner treats any non-zero exit code as a failed job, so a script that swallows an error and exits zero turns a broken build green. Print the tail of the failing step to the job summary, but decide the outcome from the exit code the process itself returned.'],
+  ['shell-pipeline-status',
+   'A shell pipeline runs every stage concurrently and the last stage decides the exit code the shell reports. Trimming output with tail is therefore safe only when the status of the upstream command does not matter, and the code you read afterwards is the trimmer exit code.'],
+  ['test-runner-summary',
+   'A test runner prints its summary at the tail of the output and returns an exit code that a wrapper can lose. Read both: the summary says which test failed, the exit code says whether the run failed, and in a worker timeout they disagree because no test failed at all.'],
+  ['log-rotation-exit',
+   'The log rotation job writes its tail into a status file and exits. A non-zero exit code there means the rotation did not complete and the code that reads the status file will see a stale tail from the previous run rather than an error.'],
+  ['docker-build-exit',
+   'A docker build that fails part way still prints layer output, so the tail of the build log looks ordinary. The exit code is the only signal, and a build run through a shell wrapper reports the wrapper exit code unless the script is written to propagate it.'],
+  ['migration-exit-code',
+   'A half-applied migration exits non-zero and the tail of its output names the last statement it ran, not the one that failed. Read the exit code first, then the log, because the code tells you whether to trust what the tail of the file says.'],
 ];
-
 describe('A1 — the trigger ranks entry 299 first for the G-039 command', () => {
   let db: Database.Database;
   let entry299Id: number;
@@ -81,19 +90,29 @@ describe('A1 — the trigger ranks entry 299 first for the G-039 command', () =>
     expect(hits[0].id).toBe(entry299Id);
   });
 
-  it('has a fixture whose decoys really do share the command tokens', () => {
-    // Guards the guard: if the decoys stopped matching, the row above would go
-    // green for the wrong reason — the "only matching row" case the fixture
-    // exists to rule out. Asserted against FTS directly, not through the
-    // trigger, so a broken trigger cannot make this look healthy.
-    const matching = db
+  it('every decoy is LIVE under the conjunctive query — all ten, not just the ones that happened to match', () => {
+    // REBUILT FOR CANDIDATE 2, on QA's F2. The first version asserted that ten
+    // rows matched `tail OR exit OR run OR code`, which is the brief's token
+    // list and NOT the derivation's. Under the conjunctive query the trigger
+    // actually runs — "tail" AND "exit" AND "code" — only one decoy was live,
+    // so A1 was choosing 299 out of two documents while the fixture's name
+    // claimed eleven. A guard written to the wrong query is a guard that
+    // reports on something other than the thing under test.
+    //
+    // Asserted against FTS directly rather than through the trigger, so a
+    // broken trigger cannot make this look healthy, and asserted per decoy so
+    // a failure names which one went dead.
+    const live = db
       .prepare(
-        `SELECT COUNT(*) AS n FROM knowledge_fts f
+        `SELECT k.key FROM knowledge_fts f
          JOIN knowledge_index k ON k.id = f.rowid
          WHERE knowledge_fts MATCH ?`,
       )
-      .get('"tail" OR "exit" OR "run" OR "code"') as { n: number };
+      .all('"tail" "exit" "code"') as Array<{ key: string }>;
 
-    expect(matching.n).toBeGreaterThanOrEqual(10);
+    const liveKeys = live.map((r) => r.key).sort();
+    const expected = [...DECOYS.map(([key]) => key), 'pipe-to-tail-masks-exit-code'].sort();
+    expect(liveKeys).toEqual(expected);
+    expect(liveKeys).toHaveLength(11);
   });
 });
