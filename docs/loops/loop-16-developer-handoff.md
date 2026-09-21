@@ -1,10 +1,12 @@
 # Loop 16 — developer handoff
 
 **From:** Forge (developer) · **Date:** 2026-09-20 · **Branch:** `loop/16-recall-trigger`, cut from
-`origin/master` at `4550ee5` · **Candidate:** rev 6, `4a9b056`
-**Brief:** `loop-16-brief.md` (`8457600`), as amended by `1453e5f`, `c43a31f`, `1051cae`, `5ab0ac4`,
-`6da5fa9`, `f28ed11`. Where an amendment and the brief disagree, the amendment governs; this file
-cites the ruling by number rather than restating it.
+`origin/master` at `4550ee5` · **Candidate:** rev 9 — the tip of this branch at hand-over, posted to the planner by SHA (a file
+cannot carry its own commit hash, so the SHA lives in the hand-over message and in `git log`)
+**Brief:** `loop-16-brief.md` (`8457600`), as amended by all eight amendments, in order:
+`1453e5f` (R1–R11), `c43a31f` (R12–R14), `1051cae` (R15), `5ab0ac4` (R16–R18), `6da5fa9` (R19),
+`f28ed11` (R20, Planner 53), `3db1365` (R21), `29766dc` (R22–R24). Where an amendment and the brief
+disagree, the amendment governs; this file cites the ruling by number rather than restating it.
 **Not squashed, not rebased, not reordered** (R9). The first commit is A1 failing and it is still
 there: `90e314f`.
 
@@ -23,7 +25,10 @@ there: `90e314f`.
 | 3 | `12b5aeb` | A4 — the floor as data, measured against the live store. M5 dead. |
 | 4 | `405a5e3` | The fire record: R5's sibling table, R16's three states, A2 complete, R6's census value, R19's provenance. |
 | 5 | `1afb04c` | The `PostToolUse` hook. A5, A6, A10's number. |
-| 6 | `4a9b056` | CHANGELOG and README, including the registration line and what is not obvious about it. |
+| 6 | `4a9b056` | CHANGELOG and README — **reverted at rev 8**, see below. |
+| 7 | `fcdac0a` | This handoff. |
+| 8 | `8851afb` | Revert of `4a9b056`. R24 forbids a version bump, CHANGELOG or README before acceptance; they had already been committed when the ruling arrived, so they come out by revert rather than by rewrite — R9 keeps this branch unsquashed, and a revert is additive where a rebase would erase that it happened. The CHANGELOG text survives in `4a9b056` for a cherry-pick at close-out. |
+| 9 | *(this commit)* | This section and the amendment citations. **The frozen candidate**, reported to the planner by SHA. |
 
 ## 2. What to check first, because it is the thing most likely to be wrong
 
@@ -104,6 +109,12 @@ because `execFileSync` **returns only stdout** and the harness hardcoded `stderr
 path. Every `expect(result.stderr).toBe('')` in the A6 block passed *without ever looking*, days
 after R15 was added to require exactly that assertion. Rewritten on `spawnSync`.
 
+**Recorded as a class by the planner (R24): an assertion on a value the harness never captured.**
+It is not the same as a vacuous assertion — the value existed, the code produced it, and the
+assertion was well formed. The instrument simply never carried it to the place the assertion read.
+A negative assertion is only as good as the channel it reads from, and `execFileSync`'s return value
+is one channel of the three.
+
 **A redundant guard made the real one untestable.** An `existsSync` check answered before
 `fileMustExist` could, so a mutant turning that flag off survived. One guard now, and it is tested.
 
@@ -157,6 +168,12 @@ census requires a fire row for every invocation, and that row is a write, so a `
 still open the store. **Completeness of the denominator costs about 0.28s on every `Bash` call.**
 That is a trade for the planner, not for this seat: make the common case cheap and the census loses
 the number that makes *did the memory half get used* answerable.
+
+**Ruled (R22): the census keeps its denominator this loop.** The 0.28s is the evaluation period's
+price, stated and put to Aaron rather than optimised away under a verdict. **The named follow-up,
+not built here:** a cheap `not-asked` path that appends to the log file the hook already writes and
+lets the session-end hook reconcile those lines into `trigger_fires` — which keeps the three counts
+whole while taking the store open off the common path.
 
 A number, not a verdict (§4 A10). The configured host `timeout` in the registration is **10s**;
 `deadline_ms` in the policy is **2000**. They do different jobs — see §9.
@@ -221,8 +238,12 @@ not scored (R12).
   tree". Not a pass. §3's zero-skipped requirement is on the QA tree and is not claimed here.
 - **Three pre-existing `sync` warnings** unrelated to this loop: `prd-version`, `vault-index-parity`,
   `spec-provenance`.
-- **The CHANGELOG entry is under `[Unreleased]`.** The version bump belongs to the close-out
-  choreography after a verdict, not to the candidate.
+- **There is no CHANGELOG or README change in this candidate, deliberately** (R24). Both were
+  written and then reverted at rev 8; the bump and the docs are one commit above the accepted SHA,
+  which is Loop 14's pattern. Noting the conflict rather than resolving it silently: the repo's
+  general convention is to commit a CHANGELOG entry alongside the code, and the loop's choreography
+  overrides it here and satisfies it a commit later. **QA does not need the README for A7** — the
+  registration line and its two non-obvious parts are in §9 of this file.
 - **A7 and A10-live are QA's**, in the QA tree, with the hook registered for the probe.
 
 ## 11. What this loop cannot make true
