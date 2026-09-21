@@ -5,9 +5,13 @@
 planner · **Base:** `origin/master` `4550ee5` (record rev 59, v0.43.0) ·
 **Criteria:** `docs/loops/loop-16-qa-criteria.md` at **`a957270`** (seven commits, none amending an
 earlier one, all written before the candidate SHA was named) ·
-**Brief:** `loop-16-brief.md` `8457600` with amendments `1453e5f` `c43a31f` `1051cae` `5ab0ac4`
-`6da5fa9` `f28ed11` `3db1365` `29766dc` (verified complete against the branch: those eight and the
-brief are the whole of `4550ee5..docs/loop-16-brief`) ·
+**Brief:** `loop-16-brief.md` `8457600` with **nine** amendments — `1453e5f` `c43a31f` `1051cae`
+`5ab0ac4` `6da5fa9` `f28ed11` `3db1365` `29766dc` `0c70b52` — re-derived from the branch at the time
+of this correction: those nine plus the brief are the whole of `4550ee5..docs/loop-16-brief`
+(10 commits). **Amendment 9 (`0c70b52`) is the disposition this report is written under**, so it is
+cited here as well as in §4 and §2's A6 row. *(Corrected in the second commit on this branch — see
+§11.4: the first commit listed eight and claimed the list was complete, which was true when I
+verified it and false when I wrote it.)* ·
 **Developer's hand-off:** `docs/loops/loop-16-developer-handoff.md` at the candidate.
 
 ---
@@ -386,6 +390,19 @@ file had a backticked word executed as a command substitution and arrived with t
 clause missing — in a message correcting an overconfident claim. The send reported success. All
 three are one class: **a layer between me and the artifact that edits the content while reporting
 success.**
+
+4. **A count in this report's own header that had acquired an implied "as of" — and it is the
+   defect I filed against someone else's document earlier the same day.** The first commit of this
+   report listed **eight** brief amendments and asserted *"verified complete against the branch."*
+   The verification was real, and I ran it before amendment 9 existed. **Amendment 9 (`0c70b52`)
+   was committed before I wrote the report, and I had already fetched and seen it** — I cited it
+   twice in the body while carrying the stale list forward in the header without re-deriving it.
+   At turn 35 I had raised exactly this shape against the developer's hand-off (§8's targeted-set
+   counts labelled at one SHA and read as current) and quoted `shared.md`'s rule that *every
+   derived number carries what it was derived from*. Re-derived at the correction: ten commits in
+   `4550ee5..docs/loop-16-brief` — the brief and nine amendments. **Caught by the planner naming
+   the ninth SHA, not by me.** That is the difference between this one and the three above, and it
+   is the reason it is worth recording: the other three I caught; this one reached the artifact.
 
 ---
 
