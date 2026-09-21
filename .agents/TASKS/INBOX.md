@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 62 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 63 by open-brain v0.44.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -22,6 +22,8 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-149** Give each agent seat its own git worktree
 - [ ] **T-150** An unrecognised CLI flag must refuse, not select the mutating default
 - [ ] **T-158** close_gap must tombstone (or refuse an id the tracked tree cites) — a reused gap id points at something wrong and announces nothing
+- [ ] **T-163** Close-outs must APPEND a per-seat record, not overwrite a shared slot — plus a /sync check that no close-out reduces the recorded seat-uuid count for an open loop
+- [ ] **T-164** The session counter is per-worktree, so a seat can close out on a number that collides with the record's sequence
 
 ## P1
 
@@ -43,7 +45,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-154** Give /start a memory-free documented route, and make the SessionStart hook installable by a stranger
 - [ ] **T-155** Shadow merge gate: the runtime records what it would have done at each merge, and disagreements with Aaron are counted
 - [ ] **T-159** The trigger's cheap not-asked path — record a not-asked fire without opening the store
-- [ ] **T-161** Seat sessions launched with CLAUDE_CODE_CHILD_SESSION inherited persist no transcript — make the launch rule a check
+- [ ] **T-161** /start must assert a transcript exists for the session's own uuid — the CLAUDE_CODE_CHILD_SESSION check would be a permanent false positive
 
 ## P2
 

@@ -246,3 +246,122 @@ looked, it found two faults in one file.* CI is the second machine. It goes to t
 The pushes of `31fec1a` (report 4, same branch as the report tip already pushed) and `c02b47b`
 (the fix, same branch as #83) were made on Aaron's single word *push*, as the same act on the same
 branches; recorded here so the scope of that word is auditable.
+
+## 11. Correction — 2026-09-21, session 77 (planner), after acceptance
+
+**This section corrects §5 and the handoff watch-out. The original text above is left standing so
+the reasoning error stays legible; nothing earlier in this file has been rewritten.**
+
+**What was wrong: the cause, not the scope.** The record at rev 62 (`state.json` line 410, T-161's
+note) says all three Loop 16 seats — planner `22631f4e`, developer `46758737`,
+QA `6eab2c5c` — "carried `CLAUDE_CODE_CHILD_SESSION=1` in their inherited environment and Claude
+Code wrote no `.jsonl` for any of them; the marker is process-level … inherited from the VS Code
+window they were launched in." The three-seat scope is correct and is confirmed here. **The causal
+claim is false.** Five sessions live on 2026-09-21 — planner `cfb0ca78`, forge `bf8cb461`, QA
+`a5612fd2` and two others — all carry `CLAUDE_CODE_CHILD_SESSION=1` and all wrote growing
+transcripts. The variable is not sufficient for the failure and is not the cause.
+
+**Two things built on the false cause, which therefore do not stand:**
+
+- The prescribed fix — "relaunch VS Code cleanly or set `CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1`"
+  — is unvalidated. None of the five healthy sessions set that variable.
+- The prescribed fix *shape* — a `SessionStart` or `/sync` warning when the marker is present —
+  **would fire on all five healthy sessions**, a permanent false positive. `T-161` is rewritten
+  against the discriminating symptom instead: does a `.jsonl` exist for the session's own uuid.
+
+**What replaces it.** The failure is **per launch**, not per session and not a property of the host
+or the window. One launch at `2026-09-20T22:52–22:53Z` lost transcripts on all three seats, and it
+is bracketed by healthy launches in the same three worktrees — `18:07Z` the same day, and
+`07:33–07:42Z` the next morning. A whole-tree scan of `~/.claude/projects` for uuid directories with
+no sibling `.jsonl` returns exactly those three and nothing else. Time of day is excluded: forge
+`dbdce9b2` launched `09-19T22:52:39Z`, the same clock minute 24 h earlier, and wrote a clean
+transcript.
+
+**The consequence, stated at full size.** There is **zero transcript coverage machine-wide from
+`09-20T23:38Z` to `09-21T07:33Z`**, and Loop 16's entire commit sequence — QA report 2, the v0.44.0
+release, this close-out, the addendum, and the `#83`–`#87` merges and the three seat close-outs, `04:19Z` → `06:00Z` — falls
+inside that hole. Loop 16 was executed, accepted, released and merged with no transcript existing
+anywhere on the machine. §5's "A7's transcript clause could not be met" is right and understates it:
+for this loop A7 is not unmet, it is **permanently unmeetable**. Aaron accepted Loop 16 with the
+three-seat loss recorded, so this reopens nothing; it names the size of what was accepted.
+
+**Limits carried with this, not dropped.**
+
+- **Mechanism unknown.** This is correlation inside a tight bracket around one launch. Aaron's own
+  account — that he rolled the agent terminals and relaunched in the same VS Code instance — is
+  consistent with a per-launch failure and is *not* promoted to a cause here.
+- **Three is a floor, not a census.** The scan finds only sessions that spilled tool-results to
+  disk. A session that opened no transcript and never spilled leaves no trace, and an mtime cannot
+  distinguish "never opened" from "opened then deleted."
+- **A spill span is not a lifespan.** The orphans' tool-result mtimes span ~1 h; tracked evidence
+  puts the QA seat executing at `04:08Z`, 4.15 h after its last spill. Real span ≈ 6.8 h. An
+  earlier reading of the planner orphan as "died early" was this error and is withdrawn.
+- **Clocks.** Tool-result mtimes are local (UTC−5); transcript timestamps are UTC. An earlier
+  "17:53" in this investigation was that confusion.
+
+**Provenance of this correction.** Found while testing whether native cross-session messaging works
+on this machine (it does — see the `D-028` amendment). Evidence from three seats: planner `cfb0ca78`
+verified its own orphan and the record citation, QA `a5612fd2` verified `6eab2c5c` from inside its
+own tree and demanded the citation for the other two uuids, developer `bf8cb461` verified `46758737`
+from inside its tree and ran the whole-tree scan and the coverage-hole scan. The uuid mapping was
+relayed planner → QA → developer unlabelled and was briefly attributed to a file no one had read;
+QA caught it by grep and it was re-sourced to `state.json` before it reached this file.
+
+**Two findings from verifying the above, which outlive it.**
+
+- **A close-out overwrites a shared slot with its own seat's value, so the record can only hold the
+  uuid of whichever seat closed last.** Counts of each uuid in `state.json`, by revision, measured
+  independently by two seats and re-measured here:
+
+  | rev | commit | `46758737` dev | `22631f4e` planner | `6eab2c5c` QA |
+  |---|---|---|---|---|
+  | 60 | `d456544` developer close-out | 1 | 0 | 0 |
+  | 61 | `0ad9c29` QA close-out | **0** | 0 | 2 |
+  | 62 | `024dfa4` planner close-out | 1 | 2 | 2 |
+
+  Rev 61 removed the developer's uuid **and** added its own in one commit — not a field dropped by
+  accident but a shared slot overwritten. Rev 62 did the same in the other direction. **Every
+  close-out silently erases its predecessor's evidence**, and the Loop 16 trio is fully recorded at
+  rev 62 only by luck of ordering: the planner happened to close last and happened to write all
+  three. No intent is claimed anywhere in this. **Nothing in `/sync` would catch it.** The fix is
+  deterministic and small: a close-out APPENDS a seat record to a list keyed by seat rather than
+  replacing a shared field, and a `/sync` check asserts that a close-out never reduces the count of
+  recorded seat uuids for an open loop — which turns a silent overwrite into a failed check. **This
+  is not about Loop 16**: any loop whose seats close in sequence loses all but the last, and nothing
+  today would notice. The record moves one seat at a
+  time precisely so this cannot happen silently; it happened anyway, and it is why the evidence was
+  missing from the QA seat's tree a day later. Found by the QA seat, in its own close-out's diff.
+- **Every absence check carries a known-present control.** Checking the citation, the QA seat ran
+  `git show origin/master:.agents/state.json 2>/dev/null | grep`; Git Bash mangled the ref, git
+  exited 128, stderr was discarded, `grep` read an empty stream, and all three uuids came back zero
+  — *including* `6eab2c5c`, which that seat had just proven present in six tracked files. Without
+  that control the output reads as "the planner's quoted text is not at `origin/master` either,"
+  which is false, dramatic, and arrives exactly when its reader most wants to believe it. A silenced
+  stderr and a mangled ref are indistinguishable from a true zero. The control is what separates
+  them.
+- **And the control must discriminate the transition, not merely be present.** Verifying that the
+  seats had moved from rev 60 to rev 62, the planner told the developer to confirm with
+  `grep -c 46758737` returning 1 — a value that reads 1 at rev 60 *and* 1 at rev 62. The check
+  passes without moving. The developer ran it on its unmoved tree and caught it. For that transition
+  the discriminating control is `22631f4e`: 0 before, 2 after. "Known-present" is not the rule;
+  **differs across the specific transition being verified** is. The weaker version was written with
+  the discriminating table already on screen.
+
+**Errors in this correction's own making, recorded rather than smoothed.** The planner sourced
+`46758737` as having entered at `024dfa4` "and no earlier," reading the first line of a `git log -S`
+listing that had three commits on it — the same substitution of a headline for the instrument that
+this section criticises elsewhere. The developer then read that pickaxe listing as proof the string
+*entered and persisted* at `d456544` and accused the QA seat's `grep` of silently skipping a large
+file; three blobs read directly show the string was genuinely absent at rev 61, so that zero was
+correct and the accusation was not. An unfounded accusation against an instrument costs what
+trusting a broken one costs: it makes a correct negative unusable.
+
+**A watch-out that is written but not reachable at the moment it would help.** The developer seat's
+own greeting carries the line "`git show <ref>:<path>` is mangled by MSYS in the Bash tool." Within
+hours of that being written down, **both** seats hit it independently — the QA seat's silent-zero
+near-miss above *is* that trap — and neither had read the line at the time. Observed by the
+developer seat, in its own watch-out list, after the fact. This is `G-039`'s subject exactly: the
+record already contained the thing that would have prevented the error, and nothing surfaced it at
+the moment of use. It is evidence for the recall trigger's premise and against treating a tracked
+warning as a control. **A tracked file that something must remember to read is an intention; a check
+is a rule.**

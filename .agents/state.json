@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 62,
+  "revision": 63,
   "project": {
     "name": "self-improving-agent"
   },
@@ -401,13 +401,13 @@
     },
     {
       "id": "T-161",
-      "title": "Seat sessions launched with CLAUDE_CODE_CHILD_SESSION inherited persist no transcript — make the launch rule a check",
+      "title": "/start must assert a transcript exists for the session's own uuid — the CLAUDE_CODE_CHILD_SESSION check would be a permanent false positive",
       "priority": "P1",
       "status": "open",
       "opened_session": 76,
       "closed_session": null,
       "supersedes": null,
-      "note": "All three Loop 16 seats (planner uuid 22631f4e, developer 46758737, QA 6eab2c5c) carried CLAUDE_CODE_CHILD_SESSION=1 in their inherited environment and Claude Code wrote no .jsonl for any of them; the marker is process-level (not User/Machine env, not settings, not shell profiles) — inherited from the VS Code window they were launched in. Consequences: no /resume, no transcript-grep recovery after compaction (shared.md's rule assumes one), and A7's transcript evidence unmeetable. The session-end capture is unaffected (it never reads the transcript). Fix for the human: relaunch VS Code cleanly or set CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1. Fix shape here: the SessionStart hook or /sync warns when the marker is present in an interactive session, and slice three's brief makes a clean launch a PRECONDITION of any transcript-dependent row."
+      "note": "REWRITTEN session 77 after the recorded cause was falsified. The rev-62 note said all three Loop 16 seats (planner 22631f4e, developer 46758737, QA 6eab2c5c) wrote no .jsonl because they carried CLAUDE_CODE_CHILD_SESSION=1 inherited from the VS Code window. The THREE-SEAT SCOPE IS CONFIRMED; THE CAUSE IS FALSE. Five sessions live on 2026-09-21 (planner cfb0ca78, developer bf8cb461, QA a5612fd2 and two others) all carry CHILD=1 and all wrote growing transcripts. So the fix shape the old note prescribed — SessionStart or /sync warns when the marker is present — WOULD FIRE ON ALL FIVE HEALTHY SESSIONS: shipping it encodes a falsified hypothesis into tooling as a permanent false positive. Build the check against the discriminating symptom instead: at /start, does a .jsonl exist for THIS session's own uuid under its project slug (the slug is the WORKTREE path, not the repo root). The prescribed human fix (relaunch cleanly / CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1) is likewise unvalidated — none of the five healthy sessions set it. The failure is PER LAUNCH: one launch at 2026-09-20T22:52-22:53Z lost all three seats, bracketed by healthy launches at 18:07Z the same day and 07:33-07:42Z the next morning, and a whole-tree scan of ~/.claude/projects for uuid directories with no sibling .jsonl returns exactly those three and nothing else. Mechanism unknown; Aaron's rolled-terminals account is consistent with per-launch and is NOT promoted to a cause. Evidence and limits in docs/loops/loop-16-closeout.md section 11."
     },
     {
       "id": "T-162",
@@ -418,6 +418,26 @@
       "closed_session": null,
       "supersedes": null,
       "note": "QA's entry 615 (session 75): its two costliest errors in Loop 16 — a mutation script whose regex never compiled, and type-invalid mutants — were both already in the store (entries 292 and 604, stored months earlier), and the trigger could not surface either: its table recognises a trimmer pipeline and a $? read, and `python mutate.py M4` is neither. G-039 one category out: not 'the store was not consulted' but 'the store cannot be consulted for this shape of act'. Amendment 4 ruled the table grows on evidence, not speculation; this is the first evidence. Candidates: a scripted edit whose exit code is read without asserting the edit landed; a test run on a mutant without tsc. Whoever briefs the next trigger increment starts here, with the fires table's not-asked count as the denominator."
+    },
+    {
+      "id": "T-163",
+      "title": "Close-outs must APPEND a per-seat record, not overwrite a shared slot — plus a /sync check that no close-out reduces the recorded seat-uuid count for an open loop",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 77,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened session 77 from the Loop 16 correction. Measured: rev 61's QA close-out removed the developer's uuid (1 -> 0) and added its own (0 -> 2) in the same commit; rev 62 did the same in the other direction. The slot therefore only ever holds the last seat to close, and every loop whose seats close in sequence loses all but one seat's evidence with nothing noticing. This is why the developer's uuid was missing from the QA seat's tree a day later and why a correctly-run grep there returned a true zero that read as absence. DETERMINISTIC FIX (Aaron's stated preference over prompt-level guidance): make the slot a list keyed by seat so a close-out can only append its own entry. CHECK SHAPE, proposed by the developer seat and attributed to it: 'no close-out removes a uuid another seat's close-out added', cheap to implement against the rendered views. A /sync assertion turns a silent overwrite into a failed check. Not add_gap: R28 holds until T-158 lands."
+    },
+    {
+      "id": "T-164",
+      "title": "The session counter is per-worktree, so a seat can close out on a number that collides with the record's sequence",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 77,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened session 77, flagged by the developer seat in its own /start greeting. ob_start greeted the developer as Session #6 and opened .agents/SESSIONS/Session_6.md while the record's last session is #76; .agents/SESSIONS/Session_*.md is gitignored, so the counter reflects logs in THAT checkout only. A seat that closes out on its local number writes a colliding session id into a shared record. This is T-003's shape (session identity keyed per project, not per session) observed concretely in the worktree regime, and it is live for every seat session from here on: three seats now run in three checkouts, each with its own counter. Until it is fixed, a seat must be told its record session number rather than using the one its greeting shows. Related: T-149 (per-seat worktrees), T-003."
     }
   ],
   "verified": [
@@ -1743,6 +1763,70 @@
       ],
       "since_session": 75,
       "status": "verified"
+    },
+    {
+      "id": "V-072",
+      "claim": "Native cross-session A2A carries a three-seat loop on this machine: all six directions attested by the receiving side rather than by send receipts, and an idle seat wakes on inbound in ~1.5s with no human in the path",
+      "evidence": [
+        {
+          "type": "session",
+          "path": "planner cfb0ca78 / developer bf8cb461 / QA a5612fd2, 2026-09-21",
+          "observation": "ListAgents from each seat lists the other two; every leg confirmed by the receiver quoting it back, not by success:true"
+        },
+        {
+          "type": "transcript",
+          "path": "developer bf8cb461 .jsonl, 2026-09-21T07:42:17.728Z-07:43:22.092Z",
+          "observation": "idle with no user input and no tool calls; inbound at 07:43:20.606Z; first tool call 07:43:22.092Z = 1.486s; the planner's competing question did not arrive until 07:43:38.559Z, after the reply had already been sent"
+        },
+        {
+          "type": "transcript",
+          "path": "QA a5612fd2 .jsonl lines 63-64, 2026-09-21",
+          "observation": "tool_use 07:43:19.667Z, success returned 07:43:20.833Z - 227ms AFTER the receiver already had it; a human-gated hold predicts seconds to minutes, so it is excluded by magnitude regardless of clock trust"
+        }
+      ],
+      "since_session": 77,
+      "status": "verified"
+    },
+    {
+      "id": "V-073",
+      "claim": "CLAUDE_CODE_CHILD_SESSION=1 does not cause the missing-transcript failure, and the failure is per-launch rather than per-session or a property of the host",
+      "evidence": [
+        {
+          "type": "filesystem",
+          "path": "~/.claude/projects/*/",
+          "observation": "five sessions live 2026-09-21 all carry CHILD=1 and all wrote growing .jsonl files; a whole-tree scan for uuid directories with no sibling .jsonl returns exactly the three Loop 16 seats and nothing else"
+        },
+        {
+          "type": "filesystem",
+          "path": "~/.claude/projects/C--Users-melve-Worktrees-{sia-forge,sia-planner,sia-qa}/",
+          "observation": "the orphan trio launched 2026-09-20T22:52-22:53Z, bracketed by healthy launches at 18:07Z the same day and 07:33-07:42Z the next; forge dbdce9b2 launched the same clock minute 24h earlier and wrote a clean transcript, excluding time-of-day"
+        },
+        {
+          "type": "filesystem",
+          "path": "transcript coverage 2026-09-20T23:38Z to 2026-09-21T07:33Z",
+          "observation": "zero transcript coverage machine-wide across the window containing Loop 16's entire commit sequence (04:19Z-06:00Z); A7 is not merely unmet for that loop but permanently unmeetable"
+        }
+      ],
+      "since_session": 77,
+      "status": "verified"
+    },
+    {
+      "id": "V-074",
+      "claim": "A seat's close-out overwrites a shared slot with its own seat's value, so the record holds only the uuid of whichever seat closed last — every loop silently loses all but one seat's evidence and no check notices",
+      "evidence": [
+        {
+          "type": "git",
+          "path": "d456544 / 0ad9c29 / 024dfa4, .agents/state.json",
+          "observation": "uuid counts by revision: rev 60 dev=1 planner=0 qa=0; rev 61 dev=0 planner=0 qa=2; rev 62 dev=1 planner=2 qa=2. Rev 61 removed the developer's uuid AND added its own in one commit"
+        },
+        {
+          "type": "analysis",
+          "path": "docs/loops/loop-16-closeout.md section 11",
+          "observation": "the Loop 16 trio is complete at rev 62 only by luck of ordering — the planner happened to close last and happened to write all three; /sync has no check for a close-out reducing the recorded seat count"
+        }
+      ],
+      "since_session": 77,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -2374,6 +2458,12 @@
       "title": "D-028 — A2A-Hub on tcm is the seats' chatter transport; the record stays in tracked files",
       "date": "2026-09-21",
       "note": "Claude Code cross-session discovery returned nobody on this machine (three sessions, bound inbox pipes, valid keys, v2.1.278; feedback drafted). Deployed A2A-Hub to tcm (100.124.212.87:4000, Tailscale) on Aaron's word and ran Loop 16 on it. Rules learned, all from failures: the read cursor moves only on a read (two turns were dropped on a send before Clark's fix c85c0d3); one background listener per seat, re-armed only after the previous exits; every hub message from a file (an inline backtick is a command substitution); the wake is the harness re-invoking a session when its background `hub-talk --wait` exits — measured on both paths. Silence on this transport is still ambiguous ('no messages' vs 'no listener') — T-160. AUTH_MODE stays warn until per-agent keys exist."
+    },
+    {
+      "id": "D-029",
+      "title": "Seats on one machine use native cross-session messaging; A2A-Hub is for cross-machine",
+      "date": "2026-09-21",
+      "note": "AMENDS D-028, whose premise was that Claude Code cross-session discovery is broken on this machine. That premise is FALSE and was tested end to end on 2026-09-21 with three live seats (planner sia-planner-1c, developer sia-forge-42, QA sia-qa-24). All six directions were attested BY THE RECEIVING SIDE, never by a send receipt: both seats independently refused to treat success:true as delivery. An idle seat wakes on inbound with no human in the path — measured at 1.486s from receipt to first tool call. The queue-hold hypothesis is excluded by MAGNITUDE (|delta| = 227ms between the sender's success return and the receiver's context receipt, against the seconds-to-minutes a human-gated hold predicts), which does not require trusting two processes' log clocks at sub-second resolution; the ordering (delivery BEFORE the sender's own acknowledgment) is suggestive but not load-bearing. D-028's hub deployment keeps its role for CROSS-MACHINE traffic and for the Grok bot; it is no longer the default for seats on one box. Known limit, from the QA seat: ListAgents has a registration lag — the developer's listing showed only the planner while the QA seat was already running, and an early or short listing is INDISTINGUISHABLE from a seat that is not running. Nothing may gate on a single ListAgents poll."
     }
   ],
   "handoffs": [
