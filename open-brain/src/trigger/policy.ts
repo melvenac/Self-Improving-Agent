@@ -52,6 +52,20 @@ export const TriggerPolicySchema = z.strictObject({
    * channel nobody asked for earns attention by being short.
    */
   max_injected: z.number().int().min(1),
+  /**
+   * WHERE `relevance_floor` WAS MEASURED, AND AGAINST WHAT — required, not
+   * decorative (R19).
+   *
+   * An absolute bm25 floor is a cut on a scale that moves: IDF falls for a
+   * term as more entries carry it, so a floor calibrated against 599 entries
+   * is not the same cut on a store of 2,000. The loop accepted that as a
+   * stated limit rather than repairing it, and a limit nobody can see is not
+   * stated. Required by the contract so it cannot be dropped in an edit that
+   * changes the number, and `floor.test.ts` asserts it still names a corpus
+   * size and a date — otherwise this is one more field that rots quietly,
+   * which is the defect this repo keeps finding.
+   */
+  provenance: z.string().min(1),
 });
 
 export type TriggerPolicy = z.infer<typeof TriggerPolicySchema>;

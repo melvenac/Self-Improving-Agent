@@ -97,6 +97,19 @@ describe('A4 — the floor is read from data', () => {
     expect(policy.max_injected).toBeGreaterThanOrEqual(1);
   });
 
+  it('R19: the shipped floor carries the corpus and date it was measured against', () => {
+    // The floor is a cut on a scale that moves with the store's size, which
+    // the loop accepted as a limit rather than repairing. A limit nobody can
+    // see is not stated — so the provenance is required by the contract AND
+    // checked for the two things that make it re-measurable: how big the
+    // corpus was, and when. A free-text field nobody asserts on is the same
+    // rot one step later.
+    const { provenance } = loadPolicy();
+    expect(provenance).toMatch(/\b599\b/);
+    expect(provenance).toMatch(/\b\d{4}-\d{2}-\d{2}\b/);
+    expect(provenance).toContain(String(loadPolicy().relevance_floor));
+  });
+
   it('the corpus is at production scale, so the shipped number means here what it means live', () => {
     // Guards the guard. If this fixture ever shrinks, bm25's IDF term
     // collapses and every score with it — at which point the shipped floor
@@ -147,7 +160,11 @@ describe('A4 — the floor is read from data', () => {
     const writePolicy = (floor: number, maxInjected = 1) =>
       writeFileSync(
         join(dir, POLICY_FILE),
-        `${JSON.stringify({ relevance_floor: floor, max_injected: maxInjected }, null, 2)}\n`,
+        `${JSON.stringify(
+          { relevance_floor: floor, max_injected: maxInjected, provenance: 'test fixture, 599 entries, 2026-09-20' },
+          null,
+          2,
+        )}\n`,
         'utf-8',
       );
 
@@ -169,7 +186,7 @@ describe('A4 — the floor is read from data', () => {
     it('refuses a policy file with an unknown key rather than ignoring it', () => {
       writeFileSync(
         join(dir, POLICY_FILE),
-        JSON.stringify({ relevance_floor: 8, max_injected: 1, relevence_floor: 0 }),
+        JSON.stringify({ relevance_floor: 8, max_injected: 1, provenance: 'x', relevence_floor: 0 }),
         'utf-8',
       );
       expect(() => loadPolicy(dir)).toThrow(/does not match the policy schema/);

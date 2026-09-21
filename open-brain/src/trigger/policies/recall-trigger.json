@@ -1,4 +1,5 @@
 {
   "relevance_floor": 8.0,
-  "max_injected": 1
+  "max_injected": 1,
+  "provenance": "relevance_floor measured 2026-09-20 against the live store at 599 entries: the query \"tail\" \"exit\" \"code\" scored 14.01 / 12.29 / 10.62 for the three genuinely relevant entries and 6.83 / 6.03 for the two irrelevant ones; 8.0 sits in that gap. bm25 is corpus-relative (Loop 16 R19, amendment 5 at 6da5fa9), so this cut moves as the store grows and must be re-measured, not assumed."
 }
