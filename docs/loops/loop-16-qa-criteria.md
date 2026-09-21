@@ -71,6 +71,17 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 > channel it never captured, on my `R15` clause — and the **fifth `G-042` sighting, which is clean
 > and falsifies the correlation I drew at the sixth commit.** It arrives at the developer's
 > boundary 5 (`1afb04c`, rev 5). **Nothing in this file changes after the candidate SHA is named.**
+>
+> **AMENDED A SEVENTH TIME — and the sixth block above says "this is the last", which it was not.**
+> Eighth commit; all seven earlier commits cited, none amended. **The claim was not wrong so much
+> as scoped without saying so:** it was true of candidate 1's freeze, and candidate 1 was **NOT
+> ACCEPTED** (report 1 at `a13f3c5`/`ef79340`; disposition `0c70b52`). **A rejected candidate
+> reopens the window, and the rule that matters — nothing changes between a candidate being named
+> and its verdict — was kept: not one character of this file moved while `45ee2ab` was under
+> evaluation.** This commit lands before candidate 2 exists, which is the same position every
+> earlier commit was in. It applies `loop-16-brief-amendment-10.md` at **`084cf18`**: **`R26`**
+> restates A1 as **A1(a)** and **A1(b)**, records that no column weight is chosen, and makes the
+> rank among full-term competitors a **reported number, never an assertion**.
 
 > **Rule of this file.** Every criterion names what will be observed, in which tree, with which
 > command, and what result means **pass**, **fail** or **untested**. A criterion I cannot state that
@@ -116,7 +127,47 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 Each row: **required** (the brief's words), **procedure** (what I run, where), **pass / fail /
 untested**, and **blind spot** (what the procedure cannot see).
 
-### A1 — the trigger's query returns entry 299 first, and the test was seen red first
+### A1 — RESTATED BY `R26` into A1(a) and A1(b); the seen-red clause is unchanged
+
+> **`R26` (`084cf18` §2) replaces the single A1 row below for candidate 2 onwards.** The row as
+> originally written is kept underneath because it is what candidate 1 was scored against and
+> `a13f3c5` cites it. **What changed and why:** against a fixture of ten decoys each carrying all
+> three derived terms, the developer measured entry 299 at **rank 9 of 11**, and showed the cause
+> is **length, not corpus size** — the rank holds from 11 documents to 600 while the absolute
+> scores recover, because 299 is 566 characters and the decoys are 235–343 carrying the same three
+> terms. My F2 found rank 3 with a different decoy set; **the two fixtures agree on the class and
+> differ only in degree.** So the live store's rank-1 at 14.01 was **a thin field — only five
+> entries there carry all three terms — not a demonstration.**
+>
+> **A1(a) — precision. ASSERTED.** Against the original fixture (decoys sharing *some* of the
+> derived terms), the G-039 command returns entry 299 **first**, because the conjunctive query
+> excludes every partial match. Evidence that the AND works. Fails if 299 is not first.
+>
+> **A1(b) — the field. REPORTED, NEVER ASSERTED.** Against the rebuilt fixture (ten decoys each
+> carrying all three terms, comparable length, a guard asserting all ten **by name**), the command
+> returns entry 299 **in the match set**, and the test **reports its rank** as a number in the test
+> output and in the hand-off. **A1(b) fails only if 299 is ABSENT from the match set.** A rank of
+> 9 is a pass and a finding at once, and I report the number without treating it as a defect.
+>
+> **What I check, since the row no longer asserts the interesting thing:** that the rebuilt fixture
+> is not weakened (all ten decoys carry all three terms — asserted by name, and I verify the guard
+> names ten and would go red at nine); that **no column weight has been introduced** (the
+> key-weight table — ×2→rank 5, ×3→3, ×5→2, ×10→1 by 0.56 — is close-out evidence, and **a weight
+> chosen because it makes A1 pass is tuning to the test**, so its presence in candidate 2 is a
+> scope fence breach); and that the rank actually appears in the test output and the hand-off
+> rather than only in a comment.
+>
+> **The limit `R26` states and I carry into the report:** all ten of the developer's decoys give
+> **the same advice as entry 299** — read the status from the process, not the trimmer — so for the
+> act this loop exists for, any of them would have warned the seat correctly. **Mine were plausible
+> prose carrying the terms and *not* that advice.** bm25 over three terms cannot tell those two
+> fixtures apart. That is the honest statement of what the ranking gap costs, and it is smaller
+> than my F2 alone implied. What measures it in production is already built: the fires table
+> records every injected id and `/end` rates hook-injected entries at point of use.
+
+---
+
+#### A1 as written for candidate 1 — kept because `a13f3c5` scored against it
 
 - **Required (§4 A1):** *"Against a fixture store holding entry 299's text and at least ten decoys
   sharing common tokens (`exit`, `code`, `tail`, `run`), the trigger's query for the literal command
@@ -654,9 +705,11 @@ Checked at the candidate, each with its own observation, none inferred from a gr
 ## 4. Scope fences — things the candidate must NOT do (brief §2, out of scope)
 
 A candidate that does any of these is reported as out of scope regardless of its rows:
-reinstating session-start injection (Loop 10 C2 stands); changing `ob_recall`'s behaviour for
-explicit callers, including applying the new floor to it (`G-026`, not this loop) **or widening its
-zod enum with the new trigger value (`R6`)**; adding a second always-loaded curated set; `T-014`
+reinstating session-start injection (Loop 10 C2 stands); **introducing an FTS column weight, or any
+other ranking change, to make A1 pass (`R26`) — the key-weight table is close-out evidence and
+tuning to the test is what the ruling forbids**; changing `ob_recall`'s behaviour for explicit
+callers, including applying the new floor to it (`G-026`, not this loop) **or widening its zod enum
+with the new trigger value (`R6`)**; adding a second always-loaded curated set; `T-014`
 beyond the one constraint in A8; `T-154`/`G-030`; **registering `PreToolUse` (`R1` chose
 `PostToolUse` only)**; **repairing `G-042` or `G-016` (`R12`)**; any change to `.claude/commands/`,
 to `open-brain/src/harness/`, or to the record schema; Jev, a network call or an API key anywhere in
@@ -972,3 +1025,29 @@ from *the table is too small*, and a green sweep is fully compatible with a trig
 fires on real work — which is the failure mode `G-039` itself is an instance of, arriving from the
 other side. §5.6 reports the *not asked* rate on A10's fifty calls as the only number that speaks
 to it, and it is a number, not a verdict.
+
+---
+
+## 11. Candidate 2 — what it must carry, and what carries over
+
+Added at the eighth commit, before candidate 2 exists. From `R25` (`0c70b52`) as restated by `R26`
+(`084cf18`): **on top of `45ee2ab`, unsquashed, and nothing else.**
+
+1. **The network tripwire** — the row candidate 1 failed on. Reported as built with **ten surfaces,
+   each fired deliberately before its negative is believed.** That shape is right and it is what I
+   check: for each surface, the planted call must turn the test **red**, and I run the plants
+   myself rather than reading the count. A tripwire whose surfaces were never fired is the same
+   instrument failure the trigger exists to fix.
+2. **The rebuilt A1 fixture**, in `A1(b)`'s **report-not-assert** form, with the guard asserting all
+   ten decoys **by name**.
+3. **A hand-off section** citing amendments 9 and 10 and A6's substitution.
+
+**What carries over from candidate 1, and is NOT re-derived from scratch:** every row that passed
+at `45ee2ab` is re-run, not re-reasoned — candidate 2 is `45ee2ab` plus two additions, so a row that
+passed and whose code did not change is expected to pass again, and **a change in any of them is
+the finding.** I diff `45ee2ab..candidate2` first and let the diff say which rows can possibly have
+moved, rather than treating the whole evaluation as new. The seen-red clause (`R9`) is unchanged:
+the first commit is still `90e314f` and the branch is still unsquashed.
+
+**What I will not do:** accept "all ten surfaces fired" or "the guard names ten" from the hand-off.
+Both are one command each to check, and both are exactly the kind of claim that reads as true.
