@@ -22,7 +22,16 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 > answering the developer's six questions and my seven §9 items, and recording **Planner 51** —
 > A4 was unbuildable as written — and **Planner 52** — A6 could not fail); `loop-16-brief-amendment-2.md`
 > at **`c43a31f`** (`R12` on A11, `R13`, `R14`), read from the tracked file and not only from the
-> hub room; and §7.6's base suite measurement, which was outstanding when `154d1b3` was written. **Every former `[mine]`
+> hub room; and §7.6's base suite measurement, which was outstanding when `154d1b3` was written.
+>
+> **AMENDED A SECOND TIME, still before any candidate is evaluated** — third commit on the same
+> branch; `154d1b3` and `46feb51` are cited and **not** amended. It applies
+> `loop-16-brief-amendment-3.md` at **`1051cae`** (**`R15`** — the stderr observable I added in the
+> second commit is now the brief's clause, not mine, and is **stricter**: stderr asserted *empty*,
+> not merely free of a stack trace) and `loop-16-brief-amendment-4.md` at **`5ab0ac4`**
+> (**`R16`–`R18`**, and the design fact that makes them necessary). **These arrive at the
+> developer's boundary 2 (`ee74fd1`, rev 2); no candidate has been frozen and nothing here is
+> written in response to a verdict.** **Every former `[mine]`
 > clause now carries its ruling inline.** Nothing here is narrowed in response to a candidate,
 > because no candidate exists.
 
@@ -59,6 +68,8 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 | **Read-only** | No edit to any tracked file at the candidate. Nothing is repaired. Where a check must be *seen red* on a mutation, the mutation is made on a scratch copy, never in the candidate tree. |
 | **Instrument discipline** | **"Exit 0" everywhere below** means the status captured from the process under test — `cmd > file 2>&1; rc=$?` with `rc` written to a file and read back, or `execFileSync` — never a pipeline's last stage and never a line of output (`G-042`, and the entry this whole loop is about). **Every instrument that returns a zero or an empty result is validated against a planted positive through the same channel first** (`G-044`: `GIT_TRACE=1` to stderr saw nothing because the callee ignored stderr; the zero was "I did not look"). Hook payloads are built with `JSON.stringify`, never by hand — a Windows backslash makes them invalid JSON and the hook then reads the shell's own cwd while looking right. The suite runs **alone**; no fixture construction beside it. |
 | **The hook event** | **`PostToolUse` only (`R1`).** The brief's *"the developer chooses"* is now chosen, on the developer's own reason: on `PostToolUse` the host **cannot** honour a block, so *the trigger never blocks* is structural rather than behavioural. Every row below is measured on that event; a candidate that also registers `PreToolUse` is out of scope (§4), not a bonus. |
+| **The derivation under test (`5ab0ac4` §1)** | **The query is narrow by construction, not filtered down from a broad one.** The derivation recognises risky *elements* of a command and ANDs the terms each contributes — a pipeline whose last stage trims (`tail`/`head`/`grep`) → `tail`; a read of `$?` or `${PIPESTATUS` → `exit`, `code` — from a fixed table in code, no model, no network. **A command with no recognised element derives nothing and the store is never asked.** This is ruled, not a candidate's choice, and it is why A2 now has three states rather than two: ANDing a command's *words* matches nothing in FTS5 (the G-039 command would ask for `npx` AND `vitest` AND `tail` AND `echo`, which matches no entry including 299), and the only repair for that is the `OR` fallback `R1`/§5.4 forbid. |
+| **Three invocation states (`R16`)** | Every hook invocation records exactly one of **not asked** (no element recognised, store not consulted), **asked, silent** (consulted, nothing at or above the floor), **asked, injected** (ids), in the fires table, keyed to the live session uuid. **The distinction is load-bearing:** *not asked* and *asked, silent* both emit nothing, and conflating them is `G-039`'s own defect one layer down — an instrument that cannot tell "nothing there" from "I did not look", rebuilt inside the fix for it. Every row below that asserts silence asserts **which** silence. |
 | **Not shown** | Probe shapes beyond the brief's own cases are not listed here and are not shown to the developer before the report; they go into the report after the verdict. |
 
 ## 2. Acceptance criteria, one per row in the brief's §4
@@ -115,8 +126,34 @@ untested**, and **blind spot** (what the procedure cannot see).
   the "three positives-of-the-record" half, and it is what makes the zeros mean something.
   For the third command I build tokens from a random string not present in any fixture row, and I
   assert that absence by querying the fixture store for each token first.
-- **Pass:** three empty results; three fire rows with zero ids; the planted positive non-empty in
-  the same test run. **Fail:** any injection on a negative; a missing fire row; a fire row whose
+- **`R16` — the three commands are `not asked`, and that is asserted apart from `asked, silent`.**
+  None of `git status --porcelain`, `ls -la` or the no-token command contains a recognised element,
+  so the derivation yields nothing and **the store is never consulted**. Each fire row must carry
+  the **`not asked`** state, not `asked, silent`. I assert the two states are distinguishable in the
+  record, not merely that both are quiet — a candidate whose fires table has one "nothing happened"
+  value passes the old A2 and fails this one, and it should, because that is `G-039`'s defect
+  rebuilt one layer down. Where the store being consulted is observable (a query counter, a log
+  line, or an instrumented store handle), I assert **zero consultations** for these three and a
+  **non-zero** consultation for the planted positive in the same run — the absence validated by the
+  presence, per `T-156`.
+- **`R17` — a recognised command against a store with no answer is `asked, silent`. A required
+  test, and the one that shows the channel fails closed.** Against a fixture store holding **one
+  unrelated entry**: the G-039 command derives its terms, the store **is** asked, nothing clears the
+  floor, **nothing is emitted**, and the state recorded is `asked, silent`. Without this case a
+  channel that is quiet only because it did not understand the question has not been shown to fail
+  closed — silence from *not asked* proves nothing about the floor.
+- **`R18` — `tail -f file` is not the act, asserted in both directions.** Single-stage
+  `tail -f build.log` derives **nothing** (state `not asked`); the G-039 pipeline derives **all
+  three terms** (`tail`, `exit`, `code`), asserted by reading the derived terms, not by reading the
+  result. The developer's mutant **M4** — the pipeline requirement dropped — survived eleven green
+  rows until this assertion existed, so I also run M4 myself on a scratch copy, `tsc --noEmit`
+  clean, and require it red here.
+- **Pass:** three empty results, each recorded as **`not asked`**; `R17`'s recognised-but-unanswered
+  case recorded as **`asked, silent`** with nothing emitted; `R18` both directions; M4 red; three
+  fire rows with zero ids; the planted positive non-empty and recorded as `asked, injected` in the
+  same test run. **Fail:** any injection on a negative; the two silent states indistinguishable in
+  the record; `R17`'s case recorded as `not asked` (the store was asked) or emitting anything;
+  `tail -f build.log` deriving terms; M4 surviving; a missing fire row; a fire row whose
   trigger value is not the new one — in particular `unspecified`, which is what
   `recordRecallEvent` writes for a value absent from `RECALL_TRIGGERS` (`db-v2.ts:749`, measured at
   base in §7.3): a census that silently absorbs the trigger into `unspecified` is a fail, not a
@@ -183,6 +220,13 @@ untested**, and **blind spot** (what the procedure cannot see).
   to `src/harness/`**; ruling 5 named `harness/policies/` as the *shape* and §3 forbids the import,
   so I check both — the pattern present, and the import graph clean of a harness edge. Reusing the
   literal harness module is a fail of this row and of §3.2.
+  **`M5` IS DECLARED LIVE AT REV 2 AND THIS ROW IS WHAT KILLS IT** (`5ab0ac4` §3): the developer
+  reports that every assertion at boundary 2 runs at `floor: 0`, so the floor filter is
+  **unreachable as tested** and a mutant removing it survives a green suite. A4's weak-match fixture
+  is the row that covers it. **I do not take "M5 is dead at rev 3" on the handoff's word** — I run
+  M5 myself on a scratch copy, `tsc --noEmit` clean, and require it red. A candidate whose A4 tests
+  still run at `floor: 0` passes its own suite and fails this row. *Declaring a live mutant beats a
+  green suite that does not cover the code, and checking the declaration is mine.*
   and assert the drift check goes **red**; then assert it is **green** on the unmodified candidate
   — the presence half that `T-156` requires.
 - **Pass:** both directions observed from a data change alone, on A4's own fixture command; A2's
@@ -245,18 +289,21 @@ untested**, and **blind spot** (what the procedure cannot see).
   an exclusive SQLite lock by a second process for longer than the hook's timeout; the hook process
   killed at its configured timeout. For each: exit code captured from the process; stdout captured
   and asserted **empty**, and where non-empty, parsed and asserted to carry no `additionalContext`
-  and no error text; **stderr captured too and asserted to carry no stack trace** — `R3`'s reason
-  that (a) matters on `PostToolUse` is that a hook exiting `2` has its **stderr shown to the
-  model**, so a crash dump would be an injection through another channel, and a zero exit with a
-  loud stderr is the near-miss that observable exists to catch. Then read the named log file: one
+  and no error text; **stderr captured and asserted EMPTY**. That observable was mine in the second
+  commit and is now **`R15`** (`loop-16-brief-amendment-3.md` at `1051cae`), ruled in as the
+  brief's clause and **stricter than I wrote it** — *empty*, not merely free of a stack trace. The
+  reason is `R3`'s own: a `PostToolUse` hook that exits `2` has its **stderr shown to the model**,
+  so a hook that exits `0` with anything on stderr passes `R3`'s three observables as written and
+  still puts text in front of the seat — an injection through the other channel. **Everything the
+  hook has to say about a failure goes to the log file and nowhere else.** No longer mine. Then read the named log file: one
   line per shape, naming the shape. **Presence half (`T-156`):** in the same test, a clean
   successful fire must leave the log **empty or absent** and must produce a non-empty stdout — so a
   log written unconditionally cannot pass the three checks by accident, and an always-empty stdout
   cannot pass (b) by accident.
-- **Pass:** three shapes; three exits of `0`; three empty stdouts with clean stderr; three log
-  lines naming their shape; clean fire silent in the log and non-empty on stdout. **Fail:** any
-  non-zero exit; any stdout content on a failure shape; a stack trace on stderr; a missing log
-  line; a log file the handoff does not name. **Untested:** if the locked-store shape cannot be
+- **Pass:** three shapes; three exits of `0`; three empty stdouts; **three empty stderrs**; three
+  log lines naming their shape; clean fire silent in the log and non-empty on stdout. **Fail:** any
+  non-zero exit; any stdout content on a failure shape; **any stderr content at all** (`R15`); a
+  missing log line; a log file the handoff does not name. **Untested:** if the locked-store shape cannot be
   produced on Windows with the candidate's driver, recorded as untested with the attempt, never
   inferred from the other two.
 - **Blind spot:** I observe the hook's output, not the host's handling of it. A crash inside the
@@ -296,7 +343,13 @@ untested**, and **blind spot** (what the procedure cannot see).
   recorded verbatim, compared against the same two calls taken **before** A7 in the same session
   (§7.2 holds the pre-loop live baseline; the immediate before/after pair is what the delta is
   computed from, because the live store moves). The census must show the new value with a delta of
-  **at least two**. `ob_recalled` must name entry 299 as hook-injected and must not name any entry
+  **at least two**. **`R16`: the census reads THREE counts, not two** — *not asked*, *asked,
+  silent*, *asked, injected*. A7's two commands produce one `asked, injected` (the G-039 pipeline)
+  and one `not asked` (`git status --porcelain` recognises no element), so the deltas are checked
+  per state and **the `asked, silent` count must not move** from those two commands. A census that
+  reports a single fires total, or that folds *not asked* into *asked, silent*, is a fail of this
+  row — the three counts are the denominator the whole repair exists to create (brief §2: *fires,
+  hits and injections are three different counts and the record can show all three*). `ob_recalled` must name entry 299 as hook-injected and must not name any entry
   from the silent fire. For the third clause — *the rated set at `/end`* — I read what `/end` would
   rate **without running my own `/end` as the instrument**: the rated set is resolved by
   `open-brain/src/pipelines/session-end/recalled-ids.ts`, and I call that resolution directly
@@ -462,6 +515,17 @@ the trigger's path; `G-045` or slice three's list.
    handoff to say so; I check that it does.
 5. **Anything in the `G-040` family** — a scan or assertion that matches the sentence forbidding a
    thing as though it were the thing, in either direction.
+6. **The size and content of the element table, and what it cannot see.** The derivation recognises
+   two elements (`5ab0ac4` §1), each from a real error in this repo, and a command with no
+   recognised element never asks the store. That is the right direction for *fails closed on
+   nothing* and it also means **the trigger's reach is exactly the table**. I report how many
+   commands in A10's fifty derived anything at all — the *not asked* rate on ordinary work — as a
+   number, not a row. A channel that is closed for 49 of 50 real commands is working as ruled and
+   is still worth knowing before the loop after this one decides what a third element costs.
+7. **Whether any mutant the developer declared live is still live at the candidate.** M5 is
+   declared at rev 2 (`5ab0ac4` §3) and M4 was declared dead only once `R18`'s assertion existed.
+   I run both myself rather than reading the handoff's account of them, and the report says which
+   mutants I ran, not which I was told about.
 
 ## 6. What cannot be verified now, stated so nobody inherits it as settled
 
@@ -529,6 +593,16 @@ All at `4550ee5`, 2026-09-20, in `~/Worktrees/sia-qa`, after detach + build + an
    - `sync --check` at base: **27 passed, 0 fixed, 3 warnings, 0 issues, 0 skipped** (warnings:
      `prd-version`, `vault-index-parity`, `spec-provenance` — all pre-existing seat-tree
      conditions).
+7. **THE SAME BASE IS GREEN IN THE DEVELOPER'S TREE** (`5ab0ac4` §3, relayed by the planner, **not
+   measured by me**): the full suite there ran **986 passed, exit 0, alone**. Mine exited 1 twice,
+   alone, at the same base on the same machine — different trees, different times, and a different
+   test count (986 vs 974), which is itself unexplained and which I record rather than reconcile.
+   **This is the datapoint that moves `G-042` from "is it this machine" to "it is not even this
+   machine uniformly"**, and it is one more row for the planner's `G-042` amendment at close-out.
+   It does not change `R12`: A11 is still scored on the targeted run, because the condition is
+   demonstrably tree- and time-dependent and a candidate cannot be held to it. **Relay discipline:**
+   I did not run the developer's tree and will not; the number is cited to `5ab0ac4` in the report,
+   never restated as an observation of mine.
 
 ## 8. Procedure order on hand-over
 
@@ -570,6 +644,24 @@ in §2. This section is kept so the provenance of each clause is auditable, not 
 52** (A6 could not fail on `PostToolUse`). Both were caught by the developer reading the artifact,
 independently of my §9.3 aiming at the same row from the other side.
 
+**One clause of mine was ruled in after the second commit.** The stderr observable I added to A6
+and returned as my own is now **`R15`** (`loop-16-brief-amendment-3.md`, `1051cae`) — *"it is ruled
+here so it is the brief's clause and not QA's"* — and the ruling is **stricter than my version**:
+stderr asserted **empty**, not merely free of a stack trace. Unmarked in A6. That is the §9
+mechanism running in the direction it is supposed to: a clause I could have applied silently
+instead reached the developer as a requirement.
+
+**Four rulings arrived at the developer's boundary 2 (`ee74fd1`, rev 2), in
+`loop-16-brief-amendment-4.md` (`5ab0ac4`), and they changed two rows before any freeze.**
+**`R16`** — three invocation states, with *not asked* distinguished from *asked, silent*; applied
+in §1 and A2 and read as three counts in A8. **`R17`** — a recognised command against a store with
+no answer is a **required** test, and it is the only case that shows the channel fails closed
+rather than merely fails to understand; applied in A2. **`R18`** — `tail -f file` derives nothing
+and the G-039 pipeline derives all three terms, both directions, with the developer's mutant M4 run
+by me; applied in A2. **The design fact behind all three** — the query is narrow *by construction*
+because ANDing a command's words matches nothing in FTS5 — is in §1 as a fixed condition, because
+every row that asserts silence now has to say **which** silence.
+
 **Three later rulings, in `loop-16-brief-amendment-2.md` (`c43a31f`), read from the tracked file
 rather than only from the room.** **`R12`** re-scoped A11 after I measured the base suite red twice
 (§7.6) — applied in A11. **`R14`** rules the floor's policy pattern is rebuilt trigger-owned with
@@ -584,8 +676,9 @@ deterministic trigger only.
 
 ## 10. What these criteria, as a set, cannot see
 
-A green sweep of §2 means: the query ranks one entry first against a small fixture; it is silent on
-three commands; it does not broaden; its floor is data; the hook's JSON is shaped right; three
+A green sweep of §2 means: the query ranks one entry first against a small fixture; three commands
+never reach the store and one recognised command reaches it and comes back empty, each recorded as
+the state it was; the query does not broaden; its floor is data; the hook's JSON is shaped right; three
 failure shapes exit 0, say nothing and are logged; one real session shows one injection and one
 silence; the census and the rated set agree with that session; nothing existing changed; and there
 is a latency number. **It does not mean the store gets used.** It does not mean the entry surfaced
@@ -602,3 +695,11 @@ catch it, is the one `G-042` has made unreliable here. (2) With byte-identity dr
 only, which is the correct scope on `PostToolUse` and is still less than the brief originally
 asked. (3) `R2` cites the host's handling of `permissionDecision` on `PostToolUse` from the
 documentation rather than testing it — a deliberate trade, and a relay.
+
+**A fourth, opened by amendment 4 and not a hole in the rulings but in what any of this can show.**
+The trigger's reach is exactly its two-element table (`5ab0ac4` §1), so every row in §2 measures a
+channel that is **closed by default**. Nothing here can distinguish *the table is the right size*
+from *the table is too small*, and a green sweep is fully compatible with a trigger that never
+fires on real work — which is the failure mode `G-039` itself is an instance of, arriving from the
+other side. §5.6 reports the *not asked* rate on A10's fifty calls as the only number that speaks
+to it, and it is a number, not a verdict.
