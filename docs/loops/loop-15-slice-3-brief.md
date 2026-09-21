@@ -2,12 +2,12 @@
 
 **From:** Atlas (planner) · **Date:** 2026-09-21 · **Sequenced by Aaron (`D-026`):** the `G-039`
 recall-trigger loop (Loop 16, ACCEPTED at `5351270`, released `v0.44.0`), then this.
-**Base:** `origin/master` at the commit carrying **state rev 63** — the developer reads the number
+**Base:** `origin/master` at the commit carrying **state rev 64** — the developer reads the number
 from `state.json`, not from this file. **Version at base:** `0.44.0`.
 **Branch:** `loop/15-slice-3` · **Fresh sessions** for developer and QA, both on Opus 5; planner on
 Fable 5.1.
 **Built from:** `loop-14-closeout.md` §8 (what slice three inherits), `loop-15-slice-2-closeout.md`
-§3 (the `G-045` ruling), `loop-16-closeout.md` §§5, 8 and **§11**, and tasks `T-158`–`T-164`.
+§3 (the `G-045` ruling), `loop-16-closeout.md` §§5, 8 and **§11**, and tasks `T-158`–`T-165`.
 **Roles:** `.agents/roles/*.md`, loaded at session start and named by commit.
 
 > **What slice two left, in one sentence.** The runtime refuses the things it was built to refuse —
@@ -114,6 +114,9 @@ behind it.
   replacement is *per launch*, mechanism unknown. Do not chase it inside this loop; do not let a
   seat build the `CHILD=1` warning, which would fire on every healthy session.
 - **`G-042` on a second machine**, and the `build-freshness` fix shape.
+- **`T-165` — evaluating an alternate harness as the developer seat.** It is *gated on* this
+  loop's `T-155`, not part of it: the shadow merge gate is the instrument, so the evaluation cannot
+  start until the gate exists. Build `T-155` so a shadow developer can be pointed at it.
 
 ---
 

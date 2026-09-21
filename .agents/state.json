@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 63,
+  "revision": 64,
   "project": {
     "name": "self-improving-agent"
   },
@@ -438,6 +438,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Opened session 77, flagged by the developer seat in its own /start greeting. ob_start greeted the developer as Session #6 and opened .agents/SESSIONS/Session_6.md while the record's last session is #76; .agents/SESSIONS/Session_*.md is gitignored, so the counter reflects logs in THAT checkout only. A seat that closes out on its local number writes a colliding session id into a shared record. This is T-003's shape (session identity keyed per project, not per session) observed concretely in the worktree regime, and it is live for every seat session from here on: three seats now run in three checkouts, each with its own counter. Until it is fixed, a seat must be told its record session number rather than using the one its greeting shows. Related: T-149 (per-seat worktrees), T-003."
+    },
+    {
+      "id": "T-165",
+      "title": "Evaluate an alternate harness/model as the DEVELOPER seat via T-155's shadow merge gate — Aaron's named candidate is DeepSeek v4.1 Flash",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 77,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened session 77 at Aaron's request; the driver is usage cost, not capability doubt. DECIDE IT BY MEASUREMENT, NOT ARGUMENT: run the alternate harness as a SHADOW developer on the same brief and the same base SHA as the real developer seat, record what it would have done at each merge, and count disagreements — the instrument is T-155's shadow merge gate, so this task is BLOCKED until T-155 lands in Loop 15 slice three. Report disagreement count and kind, not a verdict on the model. WHY THE DEVELOPER SEAT AND NOT THE OTHERS: the developer is the only seat whose output is checked by something that is not the developer — V-038 (write allowlist reverts an out-of-band write), V-039 (refuses a moved or dirty tree against the candidate SHA), V-040 (exhausted retry cap is a recorded failure), V-041 (verdicts from exit codes alone), V-044 (sees committed changes, not only the working tree). A weaker developer yields worse code, not a false record. QA is the opposite — QA IS the check and nothing sits behind it: session 77's evidence is the QA seat refusing success:true as proof of delivery, demanding a citation for a uuid mapping three agents had relayed unlabelled, and catching a mangled-ref false zero only because it carried a known-present control. None of that is mechanically enforceable. The planner is worse still: it writes criteria before any candidate exists and nothing downstream checks the criteria. So the swap candidate is the developer seat only. KNOWN BLOCKERS FOR A CURSOR-HOSTED SEAT, already recorded: G-001 (Cursor start.md/end.md copies are not on ob_start/ob_state), G-009 (the template's Cursor start.md still writes .recalled-entries.json, so R4 is Claude-only), T-046 (Cursor + Git Bash: the PowerShell hook wrapper fail-closes EVERY tool — broken, not degraded). COST THAT PARTLY CANCELS THE SAVING: D-029 makes native cross-session messaging the transport for seats on one machine; a non-Claude-Code seat cannot use it and returns to the A2A hub for that edge, so hub operating cost is traded for model cost. CHEAPER LEVER, MEASURE IT FIRST: session 77 spent a long three-seat exchange on a transport investigation that a two-seat exchange would have mostly produced. How often three seats are convened is a larger lever than which model sits in them, and it costs nothing to try."
     }
   ],
   "verified": [
