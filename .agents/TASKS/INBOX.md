@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 65 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 69 by open-brain v0.44.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -24,6 +24,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-158** close_gap must tombstone (or refuse an id the tracked tree cites) — a reused gap id points at something wrong and announces nothing
 - [ ] **T-163** Close-outs must APPEND a per-seat record, not overwrite a shared slot — plus a /sync check that no close-out reduces the recorded seat-uuid count for an open loop
 - [ ] **T-164** The session counter is per-worktree, so a seat can close out on a number that collides with the record's sequence
+- [ ] **T-167** The record carries no INTENT, so every seat reasons about purpose from a backlog — add project.intent, render it above the objective, and assert it with a /sync check
 
 ## P1
 
@@ -46,6 +47,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-155** Shadow merge gate: the runtime records what it would have done at each merge, and disagreements with Aaron are counted
 - [ ] **T-159** The trigger's cheap not-asked path — record a not-asked fire without opening the store
 - [ ] **T-161** /start must assert a transcript exists for the session's own uuid — the CLAUDE_CODE_CHILD_SESSION check would be a permanent false positive
+- [ ] **T-166** GitNexus impact() missed a call site on the exact path under repair while reporting epistemic 'exact' - the MUST-run-impact rule is only as good as the resolver
 
 ## P2
 
