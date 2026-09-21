@@ -38,6 +38,17 @@ Thumbs.db
 !/.agents/SYSTEM/SECURITY.md
 !/.agents/SYSTEM/TESTING.md
 !/.agents/SYSTEM/domains.json
+# PRD/DECISIONS/ENTITIES: THE SCOPE LAYER TRAVELS. Tracked 2026-09-21 (session 77) after a
+# planner seat spent a whole session without knowing what the project is for. Everything
+# tracked above is HOW TO OPERATE; these three are WHAT THIS IS AND WHY, and they were the
+# only ones left out. An untracked file reaches ONE checkout: PRD.md existed in the main tree
+# and in none of the three seat worktrees, where every seat actually works. /sync had been
+# reporting `PRD.md not found` as a WARNING on every run in those trees and it was read past
+# every time. This is the roles/ lesson below, which says it was relearned 2026-09-19 --
+# two lines away from the rule that was still hiding the PRD.
+!/.agents/SYSTEM/PRD.md
+!/.agents/SYSTEM/DECISIONS.md
+!/.agents/SYSTEM/ENTITIES.md
 !/.agents/skills/
 /.agents/skills/*
 !/.agents/skills/INDEX.md
