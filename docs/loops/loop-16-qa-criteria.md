@@ -82,6 +82,15 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 > earlier commit was in. It applies `loop-16-brief-amendment-10.md` at **`084cf18`**: **`R26`**
 > restates A1 as **A1(a)** and **A1(b)**, records that no column weight is chosen, and makes the
 > rank among full-term competitors a **reported number, never an assertion**.
+>
+> **AMENDED AN EIGHTH TIME — ninth commit, still before candidate 2.** All eight earlier commits
+> cited, none amended. It applies `loop-16-brief-amendment-11.md` at **`e0c1dd2`**, which
+> **corrects amendment 10's rank-9 figure forward** to **4 (developer, comparable-length decoys)
+> and 3 (mine)**, and records that `R26` is the developer's option **(b) without an N** — a top-4
+> today would be chosen by today's measurement and a top-3 by mine, so either number would be the
+> fixture writing the row. Re-derived at this commit rather than taken from the list handed to me:
+> `4550ee5..docs/loop-16-brief` is **12 commits** — the brief plus **eleven** amendments,
+> `1453e5f c43a31f 1051cae 5ab0ac4 6da5fa9 f28ed11 3db1365 29766dc 0c70b52 084cf18 e0c1dd2`.
 
 > **Rule of this file.** Every criterion names what will be observed, in which tree, with which
 > command, and what result means **pass**, **fail** or **untested**. A criterion I cannot state that
@@ -132,12 +141,30 @@ untested**, and **blind spot** (what the procedure cannot see).
 > **`R26` (`084cf18` §2) replaces the single A1 row below for candidate 2 onwards.** The row as
 > originally written is kept underneath because it is what candidate 1 was scored against and
 > `a13f3c5` cites it. **What changed and why:** against a fixture of ten decoys each carrying all
-> three derived terms, the developer measured entry 299 at **rank 9 of 11**, and showed the cause
-> is **length, not corpus size** — the rank holds from 11 documents to 600 while the absolute
-> scores recover, because 299 is 566 characters and the decoys are 235–343 carrying the same three
-> terms. My F2 found rank 3 with a different decoy set; **the two fixtures agree on the class and
-> differ only in degree.** So the live store's rank-1 at 14.01 was **a thin field — only five
-> entries there carry all three terms — not a demonstration.**
+> three derived terms, the trigger does **not** rank entry 299 first, and the live store's
+> rank-1 at 14.01 is **a thin field — only five entries there carry all three terms — not a
+> demonstration.**
+>
+> **THE NUMBER, CORRECTED FORWARD BY `e0c1dd2` §1 AND NOT RETRO-EDITED HERE.** The eighth commit
+> of this file recorded **rank 9 of 11** from amendment 10, attributed to the developer, with
+> *length* named as the cause. **That figure came from a stacked fixture** — decoys of 235–343
+> characters against entry 299's 566, so every decoy held a length-normalisation advantage
+> unrelated to relevance. Rebuilt at comparable length (426–545 characters, all three terms,
+> plausible prose): **entry 299 ranks 4 of 11 at 600 documents**, 10.14 against the top decoy's
+> 11.42. **My own independent fixture put it 3rd.** So the honest figures are **4 (developer) and
+> 3 (mine) — not 9** — and **length is one factor in bm25's ordering, not the cause of a rank-9
+> that was the fixture's own doing.**
+>
+> **The developer caught this in its own fixture, by re-reading amendment 9 §2 after acting on
+> it.** The phrase that matters is `e0c1dd2`'s: *a stacked fixture proves as little as a vacuous
+> one; it fails in the flattering direction* — and *"the ranking is badly broken"* was the
+> flattering direction for the seat whose row it made someone else's problem. **That is the same
+> class as my own first A1 probe**, where my "weak" decoy carried all three terms in one short
+> sentence and beat entry 299; mine flattered the finding too. Two seats, two fixtures, one
+> direction of error, both self-caught.
+>
+> **What survives all of it unchanged:** the finding — against ten genuine same-topic competitors
+> the trigger does not rank 299 first — and `R26` itself.
 >
 > **A1(a) — precision. ASSERTED.** Against the original fixture (decoys sharing *some* of the
 > derived terms), the G-039 command returns entry 299 **first**, because the conjunctive query
@@ -151,7 +178,10 @@ untested**, and **blind spot** (what the procedure cannot see).
 >
 > **What I check, since the row no longer asserts the interesting thing:** that the rebuilt fixture
 > is not weakened (all ten decoys carry all three terms — asserted by name, and I verify the guard
-> names ten and would go red at nine); that **no column weight has been introduced** (the
+> names ten and would go red at nine) **and is not STACKED either — I measure every decoy's length
+> against entry 299's 566 characters and report the range, because `e0c1dd2` shows the failure can
+> run in the flattering direction as easily as the vacuous one, and a fixture that makes the gap
+> look worse is as wrong as one that hides it**; that **no column weight has been introduced** (the
 > key-weight table — ×2→rank 5, ×3→3, ×5→2, ×10→1 by 0.56 — is close-out evidence, and **a weight
 > chosen because it makes A1 pass is tuning to the test**, so its presence in candidate 2 is a
 > scope fence breach); and that the rank actually appears in the test output and the hand-off
