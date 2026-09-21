@@ -89,6 +89,31 @@ not have before.** A rule goes here short, with provenance; the reasoning stays 
 came from. And loading a rule is not applying it: the seat that quoted this file's line on restated
 numbers at a boundary restated a number in its own handoff the same day (Developer 31).
 
+**A ruling with no acceptance row fires nowhere.** R7 of Loop 16 was ruled, agreed by the seat that
+asked for it, written into a boundary report as settled — and never built; 153 tests, `tsc`, `sync`
+and five reports were green throughout. A ruling that changes behaviour gets a row in the same
+amendment, or it is an intention with a number. *(Loop 16, F3; `loop-16-closeout.md` §4.1.)*
+
+**An assertion on a value the harness never captured passes without looking.** `execFileSync`
+returns stdout only; a harness that hardcodes `stderr: ''` makes every stderr assertion vacuous on
+exactly the channel it exists for. Distinct from a vacuous assertion — the value existed and the
+instrument never carried it. Found by a mutant, not by review. *(Developer, Loop 16 M18.)*
+
+**A stacked fixture proves as little as a vacuous one; it fails in the flattering direction.** Short
+decoys handed every competitor a length advantage and made a rank-4 read as rank-9 — flattering to
+the seat whose row it made someone else's problem. Both seats built one within hours; both caught
+their own. Guard fixtures in both directions and report the lengths. *(Loop 16, amendment 11.)*
+
+**`tsc --noEmit` on every mutant before it counts, and assert the edit landed before running.**
+Three type-invalid mutants went red for the wrong reason in one session; a mutation script whose
+regex never compiled left the fixture untouched and read as *"the guard does not detect nine
+decoys"* — a false accusation against a working guard. *(QA, Loop 16 reports 1–3 §11/§8.)*
+
+**A variable's presence is misread as easily as its absence.** Every Loop 16 seat inherited
+`CLAUDE_CODE_CHILD_SESSION=1` from its launch environment and wrote no transcript; all three read
+the missing file as a host property. Three seats agreeing was one environment observed three times —
+nobody disagreed, so nobody looked. *(QA, Loop 16 close; `G-044`'s mirror.)*
+
 ## The record
 
 **Nothing that must outlive a session may live only in one.** A2A is a transport with no memory.

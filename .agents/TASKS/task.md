@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 61 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 62 by open-brain v0.44.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-NEXT LOOP: the G-039 recall trigger — not yet briefed. Ruled by Aaron 2026-09-20 (D-026) after Loop 14 closed ACCEPTED at v0.43.0 (D-025). Constraint from docs/loops/g-039-ruling.md: the trigger is deterministic, fails closed on nothing, and the loop is handed both fixes (a trigger on a queried store; an unconditional read of a curated set). Problem statement from Loop 14: shared.md is loaded into every session and the seat that quoted its rule broke it the same day — loading a rule and applying it are two different things. Then Loop 15 slice three with G-045 first. Fresh developer and QA sessions on Opus 5; the planner on Fable 5.1; criteria before candidate; frozen SHA; the record moves one seat at a time. _(since session 73)_
+Loop 15 slice three — G-045 first (D-026), on v0.44.0. Loop 16 closed ACCEPTED at 5351270 (D-027): the recall trigger exists, fired live once, and is NOT registered for production — Aaron's decision, close-out §8. Slice three inherits from loop-14-closeout.md §8 (real roles; QA scoring through Jev; thresholds against real diffs; F11; the open channel denominator; T-155 buildable) and from Loop 16: no add_gap by any seat until T-158 lands; a clean session launch is a precondition of any transcript-dependent row (T-161); the first not-asked/silent/injected counts are the denominator for whether the trigger's floor is conservative or mute (T-159). Fresh developer and QA sessions on Opus 5; planner on Fable 5.1; criteria before candidate; frozen SHA; the record moves one seat at a time; hub rooms are transport, tracked files are the record. _(since session 76)_
 
 ## Top tasks
 
