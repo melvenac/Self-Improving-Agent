@@ -39,9 +39,17 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 > shipped floor **8.0** and `max_injected` **1**; **`R19`** — an absolute floor rots as the store
 > grows and is accepted as a *stated limit with provenance*, not repaired), names `R12`'s targeted
 > set now that the developer has named it, and corrects §7.7's `G-042` picture. It arrives at the
-> developer's boundary 3 (`12b5aeb`, rev 3). **Every former `[mine]` clause carries its ruling
-> inline; one new `[mine]` clause is added at §1 and returned in §9.** Nothing here is narrowed in
-> response to a candidate, because no candidate has been frozen.
+> developer's boundary 3 (`12b5aeb`, rev 3).
+>
+> **AMENDED A FOURTH TIME, still before the freeze** — fifth commit; all four earlier commits are
+> cited and none amended. It applies `loop-16-brief-amendment-6.md` at **`f28ed11`**:
+> **`Planner 53`** (the *"same base"* claim I corrected is set as a planner entry; amendments 4
+> and 5 are cited, not retro-edited) and **`R20`** — **A1 tests ranking *before* the floor and its
+> ten-document fixture is correct; the end-to-end path runs at scale exactly once, as A5's
+> positive case.** `R20` decided the `[mine]` clause I opened at the fourth commit **against my
+> reading**, and it is applied as ruled. **No `[mine]` clause remains open; one stays marked (A1's
+> independent second caller, kept by `R11`).** Nothing here is narrowed in response to a
+> candidate, because no candidate has been frozen.
 
 > **Rule of this file.** Every criterion names what will be observed, in which tree, with which
 > command, and what result means **pass**, **fail** or **untested**. A criterion I cannot state that
@@ -73,7 +81,8 @@ criteria cannot be fitted to what arrives. **They are not widened after a verdic
 | **The hook registration for A7 and A10** | `~/.claude/settings.json` is Aaron's file. Registering the trigger against the QA tree's build is an act that needs **his word for that act** (brief §6, §8). I ask the planner by SHA at the moment, the planner asks Aaron, and the report records: the exact JSON added, when it was added, when it was removed, and the file's content read back after removal and compared to a copy taken before. **If the word does not come, A7 and A10 are reported `untested` and no row is inferred from the others.** |
 | **The store under test** | Trigger queries are measured against a **fixture store** built in the scratchpad (`KNOWLEDGE_V2_DB` pointed at it), never the live `~/.claude/open-brain/knowledge-v2.db`, for every row except A7 and A8 — those two are live by construction because they need a real session. What A7/A8 write to the live store is disclosed in the report. |
 | **Fixture store shape (A1–A4)** | One SQLite store built by the candidate's own schema code (not hand-written DDL, which would measure my DDL), holding entry 299's text **as it exists at base** — captured to a file in §7 so the fixture cannot drift — plus **at least ten decoys sharing the common tokens `exit`, `code`, `tail`, `run`** (brief A1). Decoys are drawn from the live store's real entries where they qualify and are otherwise synthesised; the report lists every decoy id and its provenance. The store's maturity column matters (`recallRankExpr` boosts Mature 1.5× / Proven 1.2×), so the fixture records each row's maturity and the report says what entry 299's was. |
-| **THE FIXTURE MUST BE AT CORPUS SCALE WHEREVER THE FLOOR IS IN THE PATH (`6da5fa9` §1)** | **bm25's IDF is a function of the corpus, so a toy fixture cannot test a floor at all.** Measured by the developer: the precision-only query `"tail" "exit" "code"` scores 14.01 / 12.29 / 10.62 / 6.83 / 6.03 against the live 599-entry store and **about 5e-6 for every row against a three-document fixture**. At any shipped floor a small fixture is silent for **every** input, and *"the floor silenced the weak match"* then passes with the floor doing no work. **A4's fixture is 599 documents** (strong 20.98 above, weak 4.28 below; shipped floor **8.0**, `max_injected` **1**). **My reading, and a clause of mine — `[mine]`, returned in §9:** the same argument applies to **A1 and A2**, whose fixture the brief sizes at *"at least ten decoys"*. If the floor sits in the path those rows exercise, a ten-document fixture makes **entry 299 itself** score below 8.0 and A1 cannot pass except with the floor bypassed — which is mutant **M7**'s condition (*floor set to 0*), the thing this loop treats as wrong. **So I run A1 and A2 against a corpus at scale as well as against the brief's ten-decoy fixture and report both.** A pass on the ten-decoy fixture alone is not evidence the trigger injects entry 299 in production; if the candidate's A1 test runs at ten documents, I report *what it can and cannot show* rather than scoring it green or red on my own reading. |
+| **THE FIXTURE MUST BE AT CORPUS SCALE WHEREVER THE FLOOR IS IN THE PATH (`6da5fa9` §1)** | **bm25's IDF is a function of the corpus, so a toy fixture cannot test a floor at all.** Measured by the developer: the precision-only query `"tail" "exit" "code"` scores 14.01 / 12.29 / 10.62 / 6.83 / 6.03 against the live 599-entry store and **about 5e-6 for every row against a three-document fixture**. At any shipped floor a small fixture is silent for **every** input, and *"the floor silenced the weak match"* then passes with the floor doing no work. **A4's fixture is 599 documents** (strong 20.98 above, weak 4.28 below; shipped floor **8.0**, `max_injected` **1**). |
+| **WHICH ROW RUNS AT WHICH SCALE — `R20`, and it decides what each row is evidence of** | I raised the corpus argument against the brief's own ten-decoy sizing for A1/A2 and returned it rather than applying it; **`R20` (`f28ed11` §2) rules the split, and I score on the ruling, not on my reading.** **A1 and A2 test ranking and derivation BEFORE the floor**: their ten-document fixture is correct and their assertions run **with the floor out of the path**. A green A1 is evidence that the derivation and query rank entry 299 first among decoys sharing its tokens — **nothing more**, and the report says so in those words rather than letting a green A1 imply production behaviour. **The end-to-end path is exercised at scale exactly once, as A5's POSITIVE case.** I still run A1 and A2 at **both** scales and report both, as I proposed and as `R20` confirms — the at-scale run is reported, not scored. |
 | **Read-only** | No edit to any tracked file at the candidate. Nothing is repaired. Where a check must be *seen red* on a mutation, the mutation is made on a scratch copy, never in the candidate tree. |
 | **Instrument discipline** | **"Exit 0" everywhere below** means the status captured from the process under test — `cmd > file 2>&1; rc=$?` with `rc` written to a file and read back, or `execFileSync` — never a pipeline's last stage and never a line of output (`G-042`, and the entry this whole loop is about). **Every instrument that returns a zero or an empty result is validated against a planted positive through the same channel first** (`G-044`: `GIT_TRACE=1` to stderr saw nothing because the callee ignored stderr; the zero was "I did not look"). Hook payloads are built with `JSON.stringify`, never by hand — a Windows backslash makes them invalid JSON and the hook then reads the shell's own cwd while looking right. The suite runs **alone**; no fixture construction beside it. |
 | **The hook event** | **`PostToolUse` only (`R1`).** The brief's *"the developer chooses"* is now chosen, on the developer's own reason: on `PostToolUse` the host **cannot** honour a block, so *the trigger never blocks* is structural rather than behavioural. Every row below is measured on that event; a candidate that also registers `PreToolUse` is out of scope (§4), not a bonus. |
@@ -117,6 +126,15 @@ untested**, and **blind spot** (what the procedure cannot see).
   and is red when run. **Fail:** any other rank; disagreement between the two callers; the first
   commit green, absent, or carrying implementation. **Untested:** cannot arise — every input is
   under my control.
+- **`R20` — what a green A1 is and is not evidence of.** A1's ten-document fixture is correct
+  **and its assertions run with the floor out of the path** (`f28ed11` §2; the developer's rev-2
+  tests at `floor: 0` are what that means). So a green A1 shows that **the derivation and the query
+  rank entry 299 first among decoys that share its tokens — nothing more.** It is not evidence that
+  the trigger injects anything, because at ten documents every row scores ~5e-6 and the shipped
+  floor would silence all of them. **`floor: 0` is correct here and is mutant M7's condition
+  elsewhere**, which is exactly why the split is ruled rather than left to either seat: I check
+  that the candidate's A1 runs with the floor out of the path *deliberately and locally*, not that
+  the floor is globally disabled in the test suite — the latter is M7 and A4 kills it.
 - **Blind spot:** rank 1 against *these* decoys is not rank 1 against the live store's 599 entries.
   A1 measures the query's shape, not its field performance; §5.1 is where I report the live-store
   rank separately, and it is not a pass/fail clause.
@@ -290,9 +308,24 @@ untested**, and **blind spot** (what the procedure cannot see).
   is built to prove it** — a *deny on `PostToolUse`* variant run in a live session would put a
   throwaway hook in front of a real seat for no evidence the documentation does not already give.
   A5 asserts the hook's own emitted output and nothing about how the host treats it.
+- **`R20` — A5's POSITIVE CASE IS THE ONLY END-TO-END TEST AT SCALE, AND THAT IS NOW THIS ROW'S
+  MOST IMPORTANT CLAUSE** (`f28ed11` §2). The positive runs the A1 command through the hook's
+  **real path** — derivation, query, **the shipped floor read from the policy file**, emission —
+  against the **599-document fixture**, and emits `additionalContext` carrying entry 299.
+  **A positive case run at a ten-document fixture, or with the floor bypassed, does not meet the
+  row**, and I check which fixture and which floor the candidate's own test used rather than
+  reading its name. **I assert the failure directions too:** the same positive at ten documents
+  must emit nothing (every row is below the floor), and at 599 with the floor bypassed is M7's
+  condition, not the shipped configuration. That pair is `T-156` for this row; without it *"the
+  floor let the strong match through"* passes with the floor doing no work — the class amendment 1
+  §1 records twice.
+  **A5's negatives are fixture-independent by construction** (`R16`: the A2 commands are *not
+  asked*, so no query is made at any scale). I **assert** that rather than assume it, by running
+  one negative at both scales and requiring the same *not asked* state from each.
 - **Pass:** all of the above, with the A1 positive and the A2 negatives in the same test run.
   **Fail:** any blocking field on any payload; a non-zero exit; an empty-but-present
-  `additionalContext`; an id or `ACTION` text that does not match entry 299 at the candidate.
+  `additionalContext`; an id or `ACTION` text that does not match entry 299 at the candidate;
+  **a positive case that only passes at ten documents or with the floor bypassed** (`R20`).
   **Untested:** cannot arise — the event is `PostToolUse` only (`R1`) and I invoke it myself.
 - **Blind spot:** I invoke the hook the way the documentation says Claude Code does. **That is a
   relay** (the brief says so of its own reading, §7.7). A7 is the only row that observes the real
@@ -664,6 +697,15 @@ All at `4550ee5`, 2026-09-20, in `~/Worktrees/sia-qa`, after detach + build + an
    and red at rev 3, zero failing tests both times.** One seat, one machine, one tree, clean then
    not — a sighting that needs no cross-tree comparison at all. `R12` is unchanged either way: the
    condition is tree-, time- and revision-dependent and no candidate can be held to it.
+   **RULED AND SET AS `Planner 53`** (`f28ed11` §1): *"same base" was false … the developer's runs
+   included the candidate's own new tests. The code was not identical, so "green there, red here"
+   was not a cross-tree comparison of identical code, and the sentence overstated its evidence in
+   the file that exists to record evidence carefully.* An entry, not a near-miss — it reached a
+   tracked file and both seats. Amendments 4 and 5 are **cited and not retro-edited**, which is why
+   this table names the code state per row: the corrected reading lives here and in `f28ed11`, and
+   a reader of `5ab0ac4` alone still gets the wrong sentence. **The wording the planner will carry
+   to `G-042`'s close-out amendment is the narrow one** — one tree, green at rev 2, red at rev 3,
+   zero failing tests both times; my two base runs stand as they are.
 
 ## 8. Procedure order on hand-over
 
@@ -731,18 +773,16 @@ developer declined to open this file when the planner's GO named it, on brief §
 does not see the probes*); nothing here changes, and it is noted because it means the probes in
 this file are still unseen by the seat being evaluated.
 
-**ONE NEW `[mine]` CLAUSE, opened by amendment 5 and returned here rather than applied silently.**
-`6da5fa9` §1 sizes **A4's** fixture at 599 documents because bm25's IDF makes a toy fixture score
-every row at ~5e-6, so no floor can be tested on one. **The brief sizes A1's and A2's fixture at
-"at least ten decoys", and that argument applies to them too:** if the floor sits in the path those
-rows exercise, entry 299 itself scores below 8.0 on a ten-document fixture and A1 can only pass
-with the floor bypassed — which is **M7**'s condition, the thing this loop treats as a defect.
-**My clause:** I run A1 and A2 against a corpus at scale **as well as** the brief's ten-decoy
-fixture and report both; a pass on the ten-decoy fixture alone is not evidence the trigger injects
-entry 299 in production. **I am not scoring the candidate on my reading** — if its A1 test runs at
-ten documents I report what that can and cannot show and return the question. **Ruling wanted:**
-does A1's fixture need to be at scale, or is A1 deliberately a test of ranking *before* the floor?
-The two readings differ in what a green A1 is evidence of, and only the planner can choose.
+**THE CLAUSE OPENED AT THE FOURTH COMMIT IS RULED — `R20`, and it went the other way from my
+instinct, which is the point of returning it.** I had argued that the corpus argument sizing A4's
+fixture at 599 applies to A1 and A2 as well, since at ten documents entry 299 itself scores ~5e-6
+and A1 could only pass with the floor bypassed — **M7**'s condition. I ran both scales and returned
+the question rather than scoring on my reading. **`R20` (`f28ed11` §2) rules that A1 tests ranking
+BEFORE the floor**: the ten-document fixture is correct, `floor: 0` is correct *there*, and a green
+A1 is evidence about ranking among token-sharing decoys **and nothing more**. The end-to-end path
+runs at scale exactly once, as **A5's positive case**, which is where the argument I was making
+actually belonged. **Applied in §1, A1 and A5; scored on the ruling.** Had I applied my reading
+silently, I would have failed a correct A1 and left the at-scale gap in A5 unwatched.
 
 **Still open and not mine to close:** nothing else from §4's rows. The two standing acts are Aaron's —
 the `settings.json` registration for A7/A10 (§1), and his ruling held at brief §8.1 on building the
@@ -769,6 +809,13 @@ catch it, is the one `G-042` has made unreliable here. (2) With byte-identity dr
 only, which is the correct scope on `PostToolUse` and is still less than the brief originally
 asked. (3) `R2` cites the host's handling of `permissionDecision` on `PostToolUse` from the
 documentation rather than testing it — a deliberate trade, and a relay.
+
+**`R20` narrows what a green sweep means, and the narrowing is worth stating plainly.** A1, A2, A3
+and A4 all run on fixtures; **exactly one row — A5's positive case — runs the whole path at corpus
+scale with the shipped floor.** So the evidence that this trigger injects entry 299 for the G-039
+command in anything resembling production rests on **one case in one row**, plus A7's single live
+session. That is the brief's design and it is correct — the alternative was a green A1 that meant
+less than it looked like — but a reader of the report should know the load-bearing case is one.
 
 **A fourth, opened by amendment 4 and not a hole in the rulings but in what any of this can show.**
 The trigger's reach is exactly its two-element table (`5ab0ac4` §1), so every row in §2 measures a
