@@ -1,5 +1,58 @@
 # Changelog
 
+## [Unreleased] — the store answers at the moment of the act
+
+Loop 16. For eight loops `ob_recalled` reported *no knowledge entries recalled this session*, and on
+2026-09-19 the store was found to contain the exact description of an error a seat had just made —
+entry 299, *piping to tail masks the real exit code* — ranked first when finally asked, and never
+asked. **Retrieval worked, ranking worked, and nothing called it.** This adds the thing that calls
+it.
+
+### Added
+
+- **`cli-recall-trigger.js`** — a `PostToolUse` hook on `Bash`. It derives a query from the command
+  BY CODE, queries the knowledge store, and injects the matching entry's `ACTION` next to the tool
+  result. `PostToolUse` rather than `PreToolUse` because the trigger must never block and on this
+  event the host cannot honour a block even if the hook emitted one — structural rather than a
+  promise the code keeps.
+- **Narrow by construction, not broad and then filtered.** ANDing a command's words is dead on
+  arrival: FTS5 is conjunctive, so `npx vitest run 2>&1 | tail -8; echo $?` would ask for an entry
+  containing *npx* AND *vitest* AND *tail* AND *echo*, which matches nothing — including entry 299.
+  The repair for that in `ob_recall` is the `OR` fallback, and this path may not use it. So the
+  derivation recognises risky ELEMENTS of a command and ANDs the terms each contributes. **A command
+  with no recognised element derives no query and the store is never asked.**
+- **`trigger_fires`** — every invocation recorded in one of three states: `not-asked`, `silent`,
+  `injected`. This is the loop's mandatory repair. *No knowledge entries recalled this session* was
+  the same sentence whether nothing was asked or everything was asked and nothing was relevant, and
+  for five loops that silence was read as inconclusive when it was the answer. Fires, hits and
+  injections are three different counts and `ob_stats` now shows all three.
+- **A relevance floor as data**, with a zod contract, values read at run time, a derived JSON schema
+  and a byte-for-byte drift test. Below the floor the trigger says **nothing** — not an empty
+  reminder, not a *no relevant entries* line. A channel that speaks when it has nothing trains the
+  reader to skip it.
+- **`hook` as a recall trigger value** — in the database's vocabulary and deliberately NOT in
+  `ob_recall`'s tool schema, so an agent cannot label its own deliberate fetch as an injection
+  nobody asked for. Only injected entries are rateable at `/end`; an entry the trigger looked at and
+  did not surface was never in front of anyone.
+
+### Known limits, stated rather than discovered later
+
+- **The floor is corpus-relative.** It is compared against bm25, whose IDF term falls as more entries
+  carry a term, so `8.0` measured against 599 entries on 2026-09-20 is not the same cut on a store of
+  2,000. The policy file carries that provenance and the contract requires it. Whether the floor
+  should be relative — a ratio to the top score, or a gap criterion — is not settled here.
+- **The trigger costs about 0.28s per `Bash` call** (p95 306.6ms injected, 277.2ms for the common
+  unrecognised case, against a 65.5ms interpreter floor). Most of it is loading the native SQLite
+  binding and opening the store, and the common case pays nearly all of it while asking the store
+  nothing — because recording a fire is a write, and the census's completeness is what makes *did the
+  memory half get used* answerable at all.
+- **It inherits the existing hook registration defects by name** (`G-030`, `G-034`, owned by
+  `T-154`): registered by absolute path, so a stale checkout serves a stale trigger.
+- **Whether a seat ACTS on what is surfaced is not measured here.** A loaded rule can be quoted and
+  broken in the same session; a surfaced entry can be too. What this makes true is narrower: the
+  store is asked, at the act, by something that does not have to remember to ask — and when it is
+  silent, the record can say whether it looked.
+
 ## [0.43.0] - 2026-09-20 — the three-seat record, and a seat that is told where it stands
 
 Loop 14. The developer seat had a record and the QA seat got one the moment the runtime wrote `E_t`;

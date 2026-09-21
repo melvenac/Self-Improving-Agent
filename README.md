@@ -113,10 +113,34 @@ The session bootstrap and session-end hooks are compiled TypeScript under `open-
 {
   "hooks": {
     "SessionStart": [{ "matcher": "", "hooks": [{ "type": "command", "command": "node \"/abs/path/to/open-brain/build/cli-bootstrap.js\"" }] }],
-    "SessionEnd":   [{ "matcher": "", "hooks": [{ "type": "command", "command": "node \"/abs/path/to/open-brain/build/cli-session-end.js\"" }] }]
+    "SessionEnd":   [{ "matcher": "", "hooks": [{ "type": "command", "command": "node \"/abs/path/to/open-brain/build/cli-session-end.js\"" }] }],
+    "PostToolUse":  [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "node \"/abs/path/to/open-brain/build/cli-recall-trigger.js\"", "timeout": 10 }] }]
   }
 }
 ```
+
+**On the recall trigger's registration, three things that are not obvious.**
+
+- **`PostToolUse`, not `PreToolUse`, and the choice is load-bearing.** Both
+  events accept `hookSpecificOutput.additionalContext` and both insert it next
+  to the tool result. They differ in whether blocking is possible: on
+  `PreToolUse` exit 2 blocks the tool call, and `permissionDecision` and
+  `updatedInput` are honoured; on `PostToolUse` none of them are. The trigger
+  must never block, and on this event that is structural rather than a promise
+  the code keeps.
+- **`timeout` is the host's bound; `deadline_ms` in the policy is the
+  trigger's own.** They do different jobs. The host's `timeout` bounds how long
+  the process may RUN. `deadline_ms` decides whether a result that came back
+  late may still be EMITTED — a reminder that arrives after the seat has read
+  the tool result is attached to the wrong moment. Set `timeout` comfortably
+  above `deadline_ms`.
+- **It runs the build it is registered against.** Like the other two hooks, the
+  path is absolute, so a stale checkout serves a stale trigger (`G-030`,
+  `G-034`). `T-154` owns fixing that for all three.
+
+Every failure is silent to the model and loud to the log: the hook exits 0,
+writes nothing to stdout or stderr, and appends one line to
+`recall-trigger.log` beside the knowledge database.
 
 Session-end automation (session summary, auto-feedback, invocation logging, shadow recall, topics) is handled by the open-brain MCP server's `ob_end` tool — called by the `/end` slash command. No separate hook scripts needed.
 
@@ -163,6 +187,7 @@ Start a Claude Code session and run `/start`. You should see:
 | Hook | Trigger | What it does |
 |---|---|---|
 | `open-brain/build/cli-bootstrap.js` | SessionStart | Auto-detects project, emits `SESSION_UUID`, runs health checks, surfaces skill proposals |
+| `open-brain/build/cli-recall-trigger.js` | PostToolUse (`Bash`) | Queries the knowledge store at the moment of the act and injects a matching entry's `ACTION` next to the tool result. Deterministic and local — the query is derived from the command by code, never by asking the model. **Precision only: it never broadens, and below the relevance floor it says nothing at all** rather than surfacing the best of a bad set. Every invocation is recorded in `trigger_fires` as `not-asked`, `silent` or `injected`, so "nothing recalled" can finally be told apart from "nothing asked" |
 | `open-brain/build/cli-session-end.js` | SessionEnd | 5-stage pipeline: session summary, auto-feedback, invocation logging, shadow recall, topics — numbered 1–4 and 7 in `index-v2.ts`, because stages 5 and 6 were cut in Loop 10. **Auto-feedback rates only entries the agent judged explicitly.** The tag-substring fallback beside it was cut in Loop 12 (R-010): it had never written a row, and what it fed — `success_rate` and the maturity lifecycle — was cut in Loop 10. An entry the agent did not judge is now skipped rather than rated, because a fallback neutral is indistinguishable from a considered “retrieved and not used” |
 
 ## Knowledge kinds — `state` and `event`
