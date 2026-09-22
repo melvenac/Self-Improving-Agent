@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 80 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 81 by open-brain v0.44.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -62,6 +62,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-160** Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [ ] **T-162** The element table's growth rule: the store cannot be consulted for act shapes the table does not name
 - [ ] **T-165** Evaluate an alternate harness/model as the DEVELOPER seat via T-155's shadow merge gate — the driver is a SECOND METER, not cost; Aaron's named candidate is DeepSeek v4.1 Flash
+- [ ] **T-171** update_task REPLACES a task's note, and neither the dry run nor the write says so: an op written to append a correction silently erases the whole note
 
 ## Done (last 3 sessions)
 

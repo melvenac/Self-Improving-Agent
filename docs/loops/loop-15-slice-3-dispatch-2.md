@@ -15,10 +15,15 @@ of these:**
    list is stale (items 2, 4 and 5 were cut in Loop 10); PR #97 adds a note saying so, and T-169
    rewrites the list at this loop's close.
 2. **`README.md`**. Same caveat: it still describes the maturity lifecycle and skill proposals.
-3. **The SIA Step-Back**, https://claude.ai/artifact/3Kv8BuKYrj5vaKQgD8NKC7 (vault copy:
-   `~/Obsidian Vault v2/Research/sia-extraction-evaluation-2026-09-14.md`). It says what the
+3. **The SIA Step-Back**, https://claude.ai/artifact/3Kv8BuKYrj5vaKQgD8NKC7. It says what the
    project set out to solve, what worked, and why the three-seat loop exists (ideas E and F; the
-   HoH runtime is F made mechanical). It stops at Loop 11.
+   HoH runtime is F made mechanical). It stops at Loop 11. **Read the artifact, not the vault
+   copy.** *Corrected 2026-09-22, same session:* this line first offered
+   `~/Obsidian Vault v2/Research/sia-extraction-evaluation-2026-09-14.md` as an equivalent. It is
+   not: the vault copy is 234 lines and stops at Part 3 plus a Loop 4 addendum. Parts 4 and 5
+   (Loop 10's ruling, Loop 11's audit) and every "NOW" block exist only in the artifact. The QA
+   seat found it by reading both, and the developer had read only the vault copy. The planner
+   asserted the equivalence without checking it.
 
 **In your first report, write one sentence saying what this slice is for in terms of the problem
 statement.** If you cannot, say so, and stop before acting.
@@ -65,3 +70,12 @@ Durable work goes in tracked files.
 Brief §4 applies whole: no `add_gap` (R28), a ruling needs an acceptance row, controls must
 discriminate the transition, PowerShell for `ref:path`, native A2A on this machine (D-029), and
 nothing gates on a single `ListAgents` poll.
+
+**Added the same session: "use PowerShell for `ref:path`" trades one mangling for another.** The QA
+seat's finding, by blob hash: in PowerShell 5.1, `git show origin/master:<path> | Out-File` decodes
+git's UTF-8 as ANSI, and every em-dash comes back as `â€”` (36 differing lines on PRD.md against
+identical bytes). MSYS mangles the path; PowerShell mangles the content. Routes that survive both:
+compare blob hashes (`git rev-parse <ref>:<path>` against `git hash-object <file>`); in Bash,
+`MSYS_NO_PATHCONV=1 git show <ref>:<path>`; in PowerShell, set
+`[Console]::OutputEncoding = [Text.Encoding]::UTF8` first. **A content comparison has to be
+validated against a known-identical pair before its differences are trusted.**
