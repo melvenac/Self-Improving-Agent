@@ -22,6 +22,12 @@ AI coding sessions start cold. Skills learned in one project die there. Lessons 
 
 ## Core Features
 
+> **Stale as of v0.44.0 (2026-09-22), kept as written on purpose.** Loop 10 cut the maturity
+> lifecycle, the reflection cycle and skill distillation, so items 2, 4 and 5 below describe
+> things that no longer ship. The problem statement above still holds. What changed and why:
+> the SIA Step-Back artifact, Part 5 (https://claude.ai/artifact/3Kv8BuKYrj5vaKQgD8NKC7), and
+> `docs/loops/`. This list will be rewritten when Loop 15 closes.
+
 1. **3-Tier Knowledge Architecture** — Global vault + domain-tagged experiences + project-level `.agents/`
 2. **Tiered Memory Architecture** — 4 access tiers: Core (CLAUDE.md, always loaded), Hot (Obsidian Vault v2 Experiences/Skills/ via Smart Connections semantic search), Warm (vault Summaries/Archive/), Cold (SQLite chunks only). Obsidian Vault is the source of truth for content; SQLite `knowledge-v2.db` holds the retrieval index (vault_path, feedback counters, maturity) plus a `content` copy. The copy is not optional: `knowledge_fts` is an external-content FTS5 table over `knowledge_index`, so dropping the column would break keyword search and `ob_recall`. The vault remains authoritative — the DB copy exists to be indexed, not to be edited. Smart Connections is available as a separate MCP tool for vault semantic search, but is not fused into `ob_recall` ranking (see "Not currently implemented"). Reflection cycle: session-end flags tag clusters with 3+ entries; /start synthesizes principles with approval. Failures stored as structured .md with 1.3x recall boost.
 3. **Automatic Accumulation** — SessionEnd hook captures session logs and summaries without manual steps (`cli-session-end.js` → skill-scan). The v1/v2 parallel period is complete; only the v2 TypeScript hook is registered.
