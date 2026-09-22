@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 81,
+  "revision": 82,
   "project": {
     "name": "self-improving-agent"
   },
@@ -508,6 +508,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Found session 78 by the planner, by reading state-writer.ts:293 (`if (op.note !== undefined) t.note = op.note;`) BEFORE the real write, after a dry run of update_task on T-169 with a one-sentence correction reported only 'Applied (1): update_task T-169'. Had it been written, T-169's 1,869-character note would have been replaced by that sentence. The dry run gave no sign that it was a replacement or of how much text would go. SAME CLASS AS G-024 (retention evicts quietly) and G-010 (close_gap destroys rather than marks): a record operation whose destructive half is not reported. Close notes are write-once, and this makes open notes write-over with no warning. FIX SHAPE, for the developer to design: (a) the dry run and the write both report 'note REPLACED: N chars -> M chars' whenever a note changes; or (b) separate append_note and replace_note, so the destructive one is named at the call site. (b) is structural and (a) is a report; prefer (b) under deterministic-first. Workaround until then: read the current note and pass it back whole with the edit inside it, as was done for T-169 at rev 81."
+    },
+    {
+      "id": "T-172",
+      "title": "The main tree serves every session and nothing says when it is behind master: the greeting must print the SERVING build's distance from origin/master, and one refusing command must update, rebuild and verify it",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 78,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Session 78, raised by Aaron's question ('so we need to rebuild after every loop and make sure the mcp server is on latest?'). The answer today is yes, by hand: after any merge touching open-brain/src, update the main checkout to master, rebuild, and have every open session run /mcp reconnect open-brain. That is a step that works only while someone remembers it, and it was missed. MEASURED 2026-09-22: the main tree was at 0bf0597, 24 commits behind origin/master 9788064, while every check read green, because build-freshness compares the main tree's build to the main tree's own HEAD and never to master (G-034). The SessionStart hook prints a tree-currency line for the seat's own checkout but none for the checkout actually serving the hooks and the MCP server. FIX SHAPE, deterministic first: (1) cli-bootstrap prints, first, 'serving build: <sha>, N behind origin/master (last fetch <time>)' for the MAIN tree, however the session was launched; it reads refs locally and never fetches; (2) one command, e.g. `open-brain main-tree update`, which refuses on a dirty tree or on commits not on origin/master (the detach command's three refusals), fast-forwards, rebuilds, and reads build-freshness back against origin/master rather than trusting exit codes. It then says which sessions must reconnect, because only the human can. The reconnect cannot be automated from inside a session. Relates to G-033, G-034, T-154."
     }
   ],
   "verified": [
