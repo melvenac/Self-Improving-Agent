@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 94,
+  "revision": 95,
   "project": {
     "name": "self-improving-agent"
   },
@@ -558,6 +558,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Found by the QA seat (Probe, record session 82) running sync --check twice in its tree, 2026-09-23; recorded in docs/loops/loop-15-slice-3-rulings-7.md. With the index built at 3b19287, /sync said 'index is at HEAD' when HEAD was c9947c5 (an ancestor of the indexed commit), and '2 commit(s) behind HEAD' at 980a2b9. The check counts commits HEAD has that the index lacks and never the commits the index has that HEAD lacks, so an index built from another branch, or ahead of HEAD, passes as current. Rule 11's family: a distance that cannot tell 'same commit' from 'I only looked one way'. Fix shape to rule on later: compare both directions (merge-base, or rev-list --left-right --count) and report 'diverged' as an issue. Not investigated beyond QA's two observations. A task, not a gap, because the brief's R28 forbids add_gap until T-158."
+    },
+    {
+      "id": "T-177",
+      "title": "Candidate A2 is blocked: the developer seat's responses were stopped twice by a host safety classifier, and slice three cannot close until A2 is built or re-planned",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 81,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Recorded by the planner (record session 81), 2026-09-23, from the developer seat's two reports (Forge, record session 83; relayed to the planner by A2A, not seen first-hand). Dispatched A2 = rulings-6 R24 as amended by rulings-7 R30/R31 (D-A1 closed for a link at the watched path, an ancestor link and a hard link) plus D-A3. While reading harness source to design the repair, one developer response was stopped by a safety classifier; Aaron paused the build in that window. Aaron then restarted it ('A2 build started again', typed in the developer window before D-038 reached that seat), and the next response was stopped the same way; none of its tool calls ran. The seat did not retry and did not work around it. Which content trips it is unknown to both seats. STATE: local branch loop/15-slice-3-candidate-a2 at 4f752ca in ~/Worktrees/sia-forge (918a1c9 + the final criteria 6672e83 merged); no upstream, clean, no source or test change; nothing pushed; read back by the planner. BOUND: under shared.md's permission-laundering rule and D-038's limit, no other seat takes over the same work to get past the stop, and no seat rephrases around it. Only Aaron decides how A2 proceeds. CONSEQUENCE: D-033/D-036 close slice three at A, B and C in that order, and B's Step 0 runs at A2's accepted SHA, so the slice is blocked on this."
     }
   ],
   "verified": [

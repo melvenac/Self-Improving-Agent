@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 94 by open-brain v0.44.1 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 95 by open-brain v0.44.1 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -26,6 +26,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-163** Close-outs must APPEND a per-seat record, not overwrite a shared slot — plus a /sync check that no close-out reduces the recorded seat-uuid count for an open loop
 - [ ] **T-164** The session counter is per-worktree, so a seat can close out on a number that collides with the record's sequence
 - [ ] **T-167** The scope layer did not travel: PRD/DECISIONS/ENTITIES were untracked, so no seat worktree had them — tracked at session 77; make prd-version an ISSUE, and render the problem statement at /start
+- [ ] **T-177** Candidate A2 is blocked: the developer seat's responses were stopped twice by a host safety classifier, and slice three cannot close until A2 is built or re-planned
 
 ## P1
 
