@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "revision": 89,
+  "revision": 90,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 15 slice three, on v0.44.1, scope ruled by Aaron at session 78 (D-033): the slice CLOSES when candidates A and B are ACCEPTED; Jev threshold calibration (brief section 3.3) moves to the next slice. DONE: G-045, merged in PR #101 at f673d5e and released as v0.44.1 (the release commit is separate, per D-031). NOW: candidate A, a real model-backed developer role through the HoH runtime. Its criteria are final at c9947c5 on origin/qa/loop-15-slice-3-criteria-a, with seven criteria commits that must all be ancestors of the candidate, and the rulings are docs/loops/loop-15-slice-3-rulings-1..4.md (R1-R22: the R14 catch-all record, constructed env for role and checks, a single git spawn site, layers 0/1/2 plus R19-R21, R18 GIT_DIR pinning, and R22's tree-kill, with its win32 normal-exit limit as T-174). The developer is freezing it; the push waits for Aaron's word. Its full suite ran red once with G-042's signature and clean once; both hypotheses are LOAD and neither is separated (T-168, D-034). NEXT: QA scores A; then candidate B (T-155's shadow merge gate plus E_t's schema change, rulings-2 R10), built on A's accepted SHA; then the close-out with T-169. All three seats run Opus 5.5, and every tracked report records model AND effort, read from the session transcript's per-entry field (dispatch-2). Merges: record/docs-only PRs go through D-032's path check; candidates are Aaron's. Standing: no add_gap until T-158 (R28); no /end until T-163.",
+    "text": "Loop 15 slice three, on v0.44.1. SCOPE (D-033 as amended by D-036): the slice CLOSES when candidates A, B and C are ACCEPTED; Jev threshold calibration is the next slice. DONE: G-045 (PR #101, f673d5e, v0.44.1). NOW: candidate A, a real model-backed developer role through the HoH runtime (R1-R22), frozen at 3b19287 (origin/loop/15-slice-3-candidate-a 918a1c9, PR #112 open for CI, NOT yet QA'd), criteria final at c9947c5; QA is scoring it (its full suite was green at 02:30Z with all peers idle). NEXT: B = the G-042 repair (developer design at e1173b1: Step 0 reproduces the red 3 of 3 under a generated load at A's accepted SHA BEFORE B's criteria, and QA reproduces it independently) + E_t's schema change (rulings-2 R10). Then C = T-155's shadow merge gate. Then the close-out with T-169. SESSIONS (D-035): developer and QA start FRESH sessions at each candidate boundary, handing off through tracked files. All seats run Opus 5.5 and record model AND effort from the transcript's per-entry field. Merges: record/docs-only PRs through D-032's path check; candidates are Aaron's. Other projects' seats are recorded beside suite results and pause on request (D-034). Standing: no add_gap until T-158 (R28); no /end until T-163.",
     "since_session": 78
   },
   "tasks": [
@@ -2673,6 +2673,18 @@
       "title": "Other projects' seats on this machine work normally and are RECORDED beside SIA suite results; they pause only when a SIA seat requests a controlled rerun",
       "date": "2026-09-23",
       "note": "AARON'S RULING, session 78 ('record by default, pause on request'). It arose when the A2A-Hub planner seat (worktrees-82) was BUSY during the developer's full suite on candidate A, run 1 went red with G-042's signature, and run 2 was clean after that seat held its tool calls on request. Blocking another project across the board for SIA's load-sensitive suite would trade that project's work against SIA's flakiness; recording costs nothing and builds the evidence G-042 needs. The deterministic successor is in T-168's amended note: a machine-wide, stale-safe 'suite running' marker that heavy commands check, recording by default under this decision."
+    },
+    {
+      "id": "D-035",
+      "title": "Seats start FRESH SESSIONS at each candidate boundary; the handoff between them is tracked files, never a long-running context",
+      "date": "2026-09-23",
+      "note": "AARON'S RULING, session 78 ('yes'), raised by his observation that the developer seat was at about 28% context and the QA seat nearly as low partway through candidate A. Context belongs to a SESSION, not a loop; a loop runs out of it only when one session carries several candidates. RULE: after QA's verdict on a candidate, the developer and QA seats write their tracked handoff (the developer report, the QA report, design files) and stop; fresh sessions take the next candidate from tracked files (brief, rulings, criteria, reports), re-read at full context. They do not /end until T-163 lands. Anything that exists only in a seat's context at the boundary must be moved into a tracked file first. COROLLARY, from candidate A's cost: the max-effort criteria re-read and the rulings it produces come BEFORE the build starts, not during it. Candidate A grew from 5 rulings to 22 mid-build, and every late ruling cost context in two seats."
+    },
+    {
+      "id": "D-036",
+      "title": "AMENDS D-033: slice three closes at candidates A, B and C. B = the G-042 repair plus E_t's schema change; C = T-155's shadow merge gate",
+      "date": "2026-09-23",
+      "note": "AARON'S RULING, session 78 ('yes'). Decisions are add-only (G-010), so this amends D-033 rather than editing it. B was ruled as G-042's repair (rulings-5 R23) plus all of T-155. The developer's B-repair design alone (load generator, eld instrument, stage-boundary yields, async execFile in cli.test.ts, AST sweep, optional vitest projects split) is substantial, and T-155 (verdict function, merge.json policy, shadow-verdict CLI, derived decision, append-only ledger, /sync check, retrospective backfill) is at least as large, so one candidate would have been roughly candidate A's size again. SPLIT: B = the G-042 repair (design at loop/15-slice-3-forge-design-b e1173b1, Step 0 first per the planner's ruling) + E_t's schema change (rulings-2 R10); C = T-155, built on B's accepted SHA. Each gets its own criteria before its candidate. Jev calibration stays the next slice (D-033)."
     }
   ],
   "handoffs": [
