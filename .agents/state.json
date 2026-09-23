@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 82,
+  "revision": 83,
   "project": {
     "name": "self-improving-agent"
   },
@@ -317,7 +317,7 @@
       "opened_session": 62,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 62: `node open-brain/build/cli.js sync --check-only` was run intending a dry run. There is no such flag. cli.ts:21 is `args.includes(\"--check\")` — exact array membership, so \"--check-only\" does not match, checkOnly stayed false, the flag was SILENTLY DISCARDED and sync ran in FIX MODE, writing seven tracked files plus untracked PRD.md. No harm that time only because every write was version-sync the release bump required anyway, and the diff was read before committing — WHICH MEANS THE SAFETY CAME FROM THE OPERATOR, NOT THE TOOL. Loop 11's other 38 defects were prose that lied about behaviour; this is behaviour that lies about intent, and it is the more dangerous class: a mistyped safety flag selects the unsafe path and says nothing. Fix: parse argv against a known flag set and exit non-zero on anything unrecognised, naming the flag. Deterministic, and it cannot be overridden the way a documented convention can. Applies to every subcommand of cli.ts, not just sync. Evidence: cli.ts:21, and the seven-file write at 811dddc's parent."
+      "note": "Session 62: `node open-brain/build/cli.js sync --check-only` was run intending a dry run. There is no such flag. cli.ts:21 is `args.includes(\"--check\")` — exact array membership, so \"--check-only\" does not match, checkOnly stayed false, the flag was SILENTLY DISCARDED and sync ran in FIX MODE, writing seven tracked files plus untracked PRD.md. No harm that time only because every write was version-sync the release bump required anyway, and the diff was read before committing — WHICH MEANS THE SAFETY CAME FROM THE OPERATOR, NOT THE TOOL. Loop 11's other 38 defects were prose that lied about behaviour; this is behaviour that lies about intent, and it is the more dangerous class: a mistyped safety flag selects the unsafe path and says nothing. Fix: parse argv against a known flag set and exit non-zero on anything unrecognised, naming the flag. Deterministic, and it cannot be overridden the way a documented convention can. Applies to every subcommand of cli.ts, not just sync. Evidence: cli.ts:21, and the seven-file write at 811dddc's parent. --- SIGHTING, session 80 (Forge, developer), relayed by the planner at session 78 and labelled as the developer's observation: `node open-brain/build/cli.js sync --help` at 5759008 did NOT print help; it ran the full sync in FIX mode, the mutating default. `git status` afterwards showed nothing changed, which was luck rather than a refusal. This is the exact failure this task names, observed live on the command every seat runs before every commit. Reproduce: that command at 5759008. SECOND EXPOSURE, same session, planner's own: a Bash one-liner quoting this sighting in double quotes let the shell execute the backticked command itself before node parsed anything. The tree was clean afterwards. A command that mutates by default is one quoting slip away from running unasked."
     },
     {
       "id": "T-152",
