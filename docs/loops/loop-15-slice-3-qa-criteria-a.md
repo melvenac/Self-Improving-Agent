@@ -173,6 +173,26 @@ delayed write attributed to a later stage.
    **Controls:** the real `claude.cmd` resolves at preflight to the native `…\bin\claude.exe`,
    read from the record without running `claude`. A planted JS-entry shim resolves to `node.exe`
    plus its entry.
+   **D-A2, the control must discriminate on CI too** (`loop-15-slice-3-rulings-6.md` R27, master
+   `a11916a`; amendment 4). At `3b19287` the "2.5 CONTROL" test (`process-role.test.ts:245–251`)
+   asserts `launcher === null` and `return`s where `claude` is absent. Its comment says "Stated, not
+   passed", but vitest reports it **passed**, and on CI it did pass by count: 22 tests, 3 skipped,
+   and the three are the `skipIf` rows (report A §9). A control that passes because its subject is
+   absent is rule 11. For A2:
+   - **A planted control that runs on every platform, CI's Linux included.** A launcher planted by the
+     test on a scratch path, which the resolver must accept, is **resolved**: `ok`, with the form and
+     the executable asserted. On POSIX that is an executable script; on win32 it is the planted
+     JS-entry shim above. **In the same test**, its refusal twin is **refused**, naming the path. On
+     POSIX, that twin is whatever unresolvable form the candidate's resolver refuses there, such as a
+     path that does not exist or a directory (`resolveLauncher`, `process.ts:78–119` at `3b19287`).
+     So the row can fail on CI in both directions.
+   - **The real-`claude` control keeps its own test**, and where `claude` is absent it is **skipped
+     with a reason** (`it.skipIf`, as its CA-9 neighbour at `:261` already does), never passed.
+     Locally, where `claude` is installed, it is reported **passed**, read from the per-test output.
+   - **Read from the CI run's per-test output:** the planted control and its refusal twin are
+     **passed, not skipped**, on Linux, and the real-`claude` control is **skipped**. **Fail:** any
+     test in this row whose body returns before an assertion that could fail on the platform where it
+     ran, and is reported passed there.
 6. **R15 (rulings-3 item 4): every process that runs role-authored code gets a constructed
    environment, the checks included.** `runCheck` (`checks.ts:122–128`) at `9ed674c` passes no
    `env`, so `npm --prefix open-brain run build` and `… test` inherit `process.env`, including
@@ -355,6 +375,21 @@ it is listed in the iteration record. Identity is still passed with `-c user.nam
 - **Discriminating, in the same test (R7):** a planted global `filter.<x>.clean` plus a work-tree
   `.gitattributes` **executes without layer 0 and does not execute with it.** The global file is
   simulated through the test's own environment and is never the real one.
+  **D-A4, simulated through `HOME`, not `GIT_CONFIG_GLOBAL`** (`loop-15-slice-3-rulings-6.md` R27,
+  master `a11916a`; amendment 4). At `3b19287` this row set `GIT_CONFIG_GLOBAL` to a scratch file
+  (`config-channel.test.ts:206–211`). `runtimeGitEnv` strips that variable as a redirect **with or
+  without** layer 0 (`git.ts:93`, `:182`), so the row could not fail when layer 0 was removed, and it
+  stayed green under M-L0 (report A §2 CA-4c, §4, §9). For A2:
+  - The global file is `HOME/.gitconfig`, under a scratch `HOME`. `XDG_CONFIG_HOME` points at an
+    empty scratch dir, and `GIT_CONFIG_GLOBAL` is **unset** in the test's environment. Report A's
+    **probe H** measured exactly this shape on this machine: the candidate did **not** run the
+    filter, and **M-L0 did** (`global-home:` in the marker).
+  - **The in-test control is the same git call without the runtime, under the same `HOME`**, which
+    writes the marker. That shows git reads `HOME/.gitconfig` on the platform where the test runs.
+  - **M-L0 must turn this row's own test red**, not only CA-4e's. It is run by this seat on this
+    machine's git. CI runs the unmutated row only, so on git `2.55.0` the row is evidenced as passing
+    and not as discriminating. The report names the tests M-L0 killed.
+  - CA-4g's global cell is measured through the same simulation.
 - **Identity:** the runtime's own commits still carry the configured name and email, read back from
   `git log -1 --format=%an%n%ae`. A layer 0 that silences global config and then cannot commit is
   not a pass.
@@ -1120,3 +1155,17 @@ R25–R27 as worded.
    `role-timeout` text must not claim the tree was killed while the DFORK grandchild survives.
    Closing the double-fork is **not** required (R24: "A2 does not try to close the double-fork. It
    names it."). **Ruling asked:** confirm this reading, or give D-A3 its own row.
+6. **D-A4's class, looked for and found clean in the code, with one weak positive.** D-A4 is a
+   simulation route that the runtime ignores, which makes a negative vacuous. This seat looked for
+   the same thing in CA-4c's R19 row (the "generated file carries only allowlisted keys" test at
+   `config-channel.test.ts:231–261`), which also simulates machine config with `GIT_CONFIG_GLOBAL`.
+   - **That route is read.** At `3b19287`, `readMachineSafeConfig` reads with `machineRead`, and
+     `runtimeGitEnv` then **keeps** `GIT_CONFIG_GLOBAL` (`git.ts:178–181`, `:286–298`). This is
+     static reading, not run.
+   - **But the row's only positive, `expect(keys).toContain("core.autocrlf")`, cannot show that the
+     planted file was read.** This machine's system config also carries `core.autocrlf`, so the
+     negatives (`sshCommand`, `fsmonitor`, `filter.x.clean` absent) would pass even if the planted
+     file were ignored.
+   - **[mine], proposed for A2:** the row asserts the planted **value** (`autocrlf = input`, where the
+     system value is `true`), so its positive transition comes from the planted file. **Ruling
+     asked:** add it to CA-4c's R19 bullet, or leave it as a named weakness?
