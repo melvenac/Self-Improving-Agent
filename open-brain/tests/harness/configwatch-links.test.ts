@@ -70,7 +70,9 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     ...over,
   });
 
-  it("R41: non-recursive rmdir removes a win32 junction and leaves the victim", () => {
+  it.skipIf(!isWin)(
+    "R41: non-recursive rmdir removes a win32 junction and leaves the victim (win32 only: symlinkSync type junction is a junction here; on POSIX it is a symlink and rmdir throws ENOTDIR)",
+    () => {
     const victim = join(tmp.dir, "victim");
     const canary = join(victim, "canary.txt");
     const link = join(tmp.dir, "link");
@@ -81,7 +83,8 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(() => lstatSync(link)).toThrow();
     expect(readFileSync(canary, "utf-8")).toBe("CANARY-BYTES");
     expect(lstatSync(victim).isDirectory()).toBe(true);
-  });
+  },
+  );
 
   it("(a) a junction at .git/info does not write or delete the victim", () => {
     const dirs = resolveGitDirs(repo.root);
@@ -135,6 +138,29 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
       expect(lstatSync(config).isSymbolicLink()).toBe(false);
       expect(v.message).toContain("put back");
     });
+
+    it.skipIf(isWin)(
+      "CA-15 (b)2: a directory symlink at .git/hooks is removed via the ENOTDIR fallback and the victim is untouched",
+      () => {
+        const dirs = resolveGitDirs(repo.root);
+        const watch = new ConfigWatch(dirs);
+        watch.begin("developer");
+        const hooks = join(dirs.commonDir, "hooks");
+        const aside = join(dirs.commonDir, "hooks-aside-posix");
+        const victim = join(tmp.dir, "victim-hooks-sym");
+        const canary = join(victim, "canary.txt");
+        mkdirSync(victim);
+        writeFileSync(canary, "HOOKS-SYM-CANARY");
+        renameSync(hooks, aside);
+        symlinkSync(victim, hooks);
+        expect(lstatSync(hooks).isSymbolicLink()).toBe(true);
+        const v = watch.closeAndRestore();
+        expect(readFileSync(canary, "utf-8")).toBe("HOOKS-SYM-CANARY");
+        expect(lstatSync(hooks).isSymbolicLink()).toBe(false);
+        expect(lstatSync(hooks).isDirectory()).toBe(true);
+        expect(v.unrestored).toEqual([]);
+      },
+    );
 
     it.skipIf(isWin)("a symlink at .git does not write the victim and claims no restore", () => {
       const dirs = resolveGitDirs(repo.root);
