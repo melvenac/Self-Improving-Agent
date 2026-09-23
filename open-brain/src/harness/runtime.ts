@@ -620,6 +620,9 @@ async function runLoopInner(
   const configWatch = gitDirs === null ? null : new ConfigWatch(gitDirs, repoRoot);
   const machineWatch =
     gitDirs === null ? null : new MachineConfigWatch(machineConfigPaths(env, gitExecPath(repoRoot)));
+  // R44: the link baseline is the loop's base, taken once here. Stage begin()
+  // opens a content window and must not re-define that baseline.
+  machineWatch?.captureBase();
   for (const note of machineWatch?.baseNotes() ?? []) result.findings.push(note);
 
   /**

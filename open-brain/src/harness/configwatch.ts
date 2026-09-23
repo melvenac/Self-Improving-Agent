@@ -601,10 +601,10 @@ export function gitExecPath(repoRoot: string): string | null {
  * nothing: a role that wrote `~/.gitconfig` has changed git for every session
  * on the machine, and the runtime must not "restore" a person's own file (R8).
  *
- * A link is part of the finding (R39). After the role runs, a path whose type
- * or link target — or any ancestor's — differs from base is reported as a type
- * change and is not read through. A link that was already there at base is
- * read the same way it was read then.
+ * A link is part of the finding (R39). The baseline is captured once at
+ * preflight (R44): a later stage does not re-snapshot, and a link that was not
+ * there at base is never read through. A link that was already there at base
+ * is read the same way it was read then.
  */
 interface MachineSnap {
   /** Top-down components from the filesystem root through the path, each lstat'd without continuing past a new link. */
@@ -613,12 +613,30 @@ interface MachineSnap {
 }
 
 export class MachineConfigWatch {
-  private snapshot: Map<string, MachineSnap> | null = null;
+  /** Link types and targets at preflight. Never replaced (R44). */
+  private loopBase: Map<string, MachineSnap> | null = null;
+  /** Content window for the current stage. Closed by compare. */
+  private stageStart: Map<string, MachineSnap> | null = null;
   private stage = "";
   readonly paths: readonly MachineConfigPath[];
 
   constructor(paths: readonly MachineConfigPath[]) {
     this.paths = paths;
+  }
+
+  /**
+   * A component is a link now and was not that link at base, or the reverse.
+   * Absent → file is not this: a new regular file is still hashed (R8).
+   */
+  private linkChange(base: MachineSnap, now: MachineSnap["chain"]): MachineSnap["chain"][number] | undefined {
+    return now.find((c, i) => {
+      const prev = base.chain[i];
+      const prevLink = prev?.kind === "symlink";
+      const nowLink = c.kind === "symlink";
+      if (!prevLink && !nowLink) return false;
+      if (prev === undefined) return nowLink;
+      return prev.kind !== c.kind || prev.target !== c.target;
+    });
   }
 
   /** Links present at base, so the record can name them without refusing the loop (R35). */
@@ -675,36 +693,63 @@ export class MachineConfigWatch {
     return { chain, hash: "unread" };
   }
 
+  /**
+   * The loop's base, once. A later call does not re-read. `begin` opens a stage
+   * window against this base and must not be the thing that defines it (R44).
+   */
+  captureBase(): void {
+    if (this.loopBase !== null) return;
+    this.loopBase = new Map(this.paths.map((p) => [p.path, this.snap(p.path, true)]));
+  }
+
   begin(stage: string): void {
     this.stage = stage;
-    this.snapshot = new Map(this.paths.map((p) => [p.path, this.snap(p.path, true)]));
+    this.captureBase();
+    const start = new Map<string, MachineSnap>();
+    for (const p of this.paths) {
+      const base = this.loopBase!.get(p.path) ?? { chain: [], hash: "absent" };
+      // A link that was not at base is not a stage baseline and is not read.
+      if (this.linkChange(base, this.chainOf(p.path, true))) {
+        start.set(p.path, { chain: this.chainOf(p.path, true), hash: "unread" });
+      } else {
+        start.set(p.path, this.snap(p.path, true));
+      }
+    }
+    this.stageStart = start;
   }
 
   compare(): MachineConfigFinding[] {
-    const before = this.snapshot;
-    if (before === null) throw new Error("MachineConfigWatch.compare() was called with no open window.");
-    this.snapshot = null;
+    const start = this.stageStart;
+    if (start === null || this.loopBase === null) {
+      throw new Error("MachineConfigWatch.compare() was called with no open window.");
+    }
+    this.stageStart = null;
     const out: MachineConfigFinding[] = [];
     for (const p of this.paths) {
-      const b = before.get(p.path) ?? { chain: [], hash: "absent" };
+      const base = this.loopBase.get(p.path) ?? { chain: [], hash: "absent" };
       const now = this.chainOf(p.path, true);
-      const typeDiff = now.find((c, i) => {
-        const prev = b.chain[i];
-        return prev === undefined || prev.kind !== c.kind || prev.target !== c.target;
-      });
+      const typeDiff = this.linkChange(base, now);
       if (typeDiff) {
+        const baseKind = base.chain[base.chain.length - 1]?.kind ?? "absent";
+        const target = typeDiff.target ? ` target ${typeDiff.target}` : "";
+        const after =
+          baseKind === "absent"
+            ? `absent → ${typeDiff.kind}${target}; not read through`
+            : `type change: ${typeDiff.path} is a ${typeDiff.kind}${target}; not read through`;
         out.push({
           stage: this.stage,
           scope: p.scope,
           path: p.path,
-          before: `type:${b.chain[b.chain.length - 1]?.kind ?? "absent"}`,
-          after: `type change: ${typeDiff.path} is a ${typeDiff.kind}${typeDiff.target ? ` target ${typeDiff.target}` : ""}; not read through`,
+          before: baseKind === "absent" ? "absent" : `type:${baseKind}`,
+          after,
         });
         continue;
       }
+      const opened = start.get(p.path);
       const a = this.snap(p.path, true);
-      if (a.hash !== b.hash) {
-        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: b.hash, after: a.hash });
+      const beforeHash = opened?.hash ?? base.hash;
+      if (a.hash !== beforeHash) {
+        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: beforeHash, after: a.hash });
       }
     }
     return out;

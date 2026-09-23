@@ -20,7 +20,7 @@ import {
 import { join } from "node:path";
 import { runLoop, LoopRefused, type LoopConfig } from "../../src/harness/runtime.js";
 import { StubDeveloper, StubPlanner, StubQa } from "../../src/harness/roles.js";
-import { ConfigWatch, resolveGitDirs } from "../../src/harness/configwatch.js";
+import { ConfigWatch, MachineConfigWatch, resolveGitDirs } from "../../src/harness/configwatch.js";
 import { exitingChecks, makeRepo, rawGit, requireGit, type RepoFixture } from "./fixture.js";
 import { scratch } from "./candidate-a-fixture.js";
 
@@ -376,5 +376,32 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(namesOf(victim)).toEqual(["canary.txt"]);
     const blob = JSON.stringify(planted.findings) + (planted.failure?.reason ?? "");
     expect(blob).not.toContain("XDG-CANARY-TOKEN");
+  });
+
+  it("R44: a machine-config link planted after base is not read through on the next stage", () => {
+    const xdg = join(tmp.dir, "xdg-r44");
+    const gitDir = join(xdg, "git");
+    mkdirSync(gitDir, { recursive: true });
+    const cfg = join(gitDir, "config");
+    writeFileSync(cfg, "[user]\n\tname = base\n");
+    const watch = new MachineConfigWatch([{ scope: "xdg", path: cfg, source: "test" }]);
+    watch.begin("developer");
+
+    const victim = join(tmp.dir, "r44-victim");
+    mkdirSync(victim);
+    writeFileSync(join(victim, "config"), "[user]\n\tname = VICTIM-R44\n");
+    renameSync(gitDir, join(xdg, "git-aside"));
+    symlinkSync(victim, gitDir, "junction");
+
+    const dev = watch.compare();
+    expect(dev.some((f) => f.after.includes("not read"))).toBe(true);
+
+    watch.begin("qa");
+    writeFileSync(join(victim, "config"), "[user]\n\tname = VICTIM-R44-EDITED\n");
+    const qa = watch.compare();
+    const reread = qa.find((f) => /^[0-9a-f]{16}$/.test(f.before) && /^[0-9a-f]{16}$/.test(f.after));
+    expect(reread, JSON.stringify(qa)).toBeUndefined();
+    expect(qa.some((f) => f.after.includes("not read"))).toBe(true);
+    expect(readFileSync(join(victim, "config"), "utf-8")).toContain("VICTIM-R44-EDITED");
   });
 });
