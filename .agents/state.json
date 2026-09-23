@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 83,
+  "revision": 84,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2625,6 +2625,12 @@
       "title": "A loop candidate carries no version bump; the bump and CHANGELOG entry go in a separate release commit after QA acceptance",
       "date": "2026-09-22",
       "note": "AARON'S RULING, session 78 ('release commit after acceptance'), answering the question open since session 77. The candidate QA scores is exactly the candidate that merges: no commit is added to it between acceptance and merge except the release commit, and that one touches only package.json, CHANGELOG.md and the version surfaces /sync keeps consistent. The QA seat confirms its diff touches no source or test, as V-059 did for 3135da4 in Loop 14. FOR LOOP CANDIDATES THIS OVERRIDES the global CLAUDE.md rule 'bump at commit time'; outside a loop (chore, docs, hotfix) the global rule stands. Forge had already followed this for the G-045 candidate 9ed674c without a ruling behind it; that is now the ruling."
+    },
+    {
+      "id": "D-032",
+      "title": "Standing merge authority for record/docs-only PRs; Aaron keeps the merge for loop candidates and anything touching code, instructions or checks",
+      "date": "2026-09-22",
+      "note": "AARON'S RULING, session 78 ('I've approved every merge, do we really need that check from me?', then 'yes' to the planner's proposal). AMENDS the shared.md line 'Aaron merges, on his word' FOR ONE CLASS OF PR ONLY. COVERED: a PR whose EVERY changed path is in this allowlist: docs/** ; README.md ; .agents/state.json ; its four rendered views (.agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md) ; the scope layer (.agents/SYSTEM/PRD.md, DECISIONS.md, ENTITIES.md). Any seat may merge such a PR when ALL of these hold: CI conclusion success; mergeStateStatus CLEAN (UNKNOWN and UNSTABLE mean not yet); the merge pinned with --match-head-commit to the SHA the conditions were read at; and the merge verified against origin/master afterwards, not taken from the command's exit code. NOT COVERED, still Aaron's word: loop candidates; anything under open-brain/ (source, tests, build config); hooks; package.json and CHANGELOG.md (the release commit, D-031); .claude/ (commands); .agents/roles/, .agents/SYSTEM/RULES.md and the rest of the operating layer; .agents/retirements.json and any other data a check reads. Those change how seats behave or what a check enforces. WHY THE LINE IS THERE: (1) Aaron's merge decision on a candidate is the ground truth T-155's shadow gate counts against, and an agent merging would make it count disagreements with another agent; (2) a code merge is release to consumers (D-019: autonomous inside a branch, Aaron at master). THE CHECK IS PATH-BASED AND MECHANICAL, NOT A JUDGEMENT: until it is a script, the merging seat runs `gh pr diff <n> --name-only`, tests every path against the allowlist, and puts the list and the result in a PR comment BEFORE merging. A single unlisted path sends the PR to Aaron. SIZE IS NOT A CRITERION. A large record PR is covered, and a one-line change to a role file is not. A seat in doubt sends it to Aaron. The first PR under this authority is the one that records it. Aaron's 'yes' is to this text, and the PR says so."
     }
   ],
   "handoffs": [
