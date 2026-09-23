@@ -13,7 +13,7 @@
 | 1 R49 | done | `configwatch-links` `-t R49`: 4 failed, exit 1. Absent machine hard link, both shapes beyond a base link, and a new repository file each put a content hash in the record. | same file, no filter: 22 passed, 3 skipped (POSIX), exit 0. Commit `9788d32`. |
 | 2 R50 | done | `-t R50`: 1 failed, exit 1. Record was `modified (identity:… not read → <hash>)` and `Cannot read properties of null (reading 'equals')`. | same file, no filter: 23 passed, 3 skipped, exit 0. |
 | 3 R51 | done | The 2.5 win32 control planted `planted-launcher.js`. The row names the `.cmd` JS-entry shim (the 2.4 plant). No product assertion was red: `resolveLauncher` already maps that shim to `node-entry`. | `-t "2.5 CONTROL: a planted"`: 1 passed, 23 skipped, exit 0. |
-| 4 R52 | not started | | |
+| 4 R52 | tests written, not executed here | This seat is win32. All five are `skipIf(isWin)`. | `configwatch-links` with no filter: 23 passed, 8 skipped, exit 0. The five R52 tests are among the skips. Not run on POSIX. |
 
 Full suite not run. Atlas is asked before that.
 
@@ -40,3 +40,19 @@ Files: `open-brain/src/harness/configwatch.ts`, `open-brain/tests/harness/config
 CA-2.5's win32 accepted control now plants `planted-launcher.cmd`, the same npm JS-entry shim 2.4 plants, aimed at `planted-launcher.js`. `resolveLauncher` returns `node-entry`, this process's node, and `preArgs` of the `.js` entry. The refusal twin is still a `.cmd` with no shim target. The POSIX branch is unchanged.
 
 Files: `open-brain/tests/harness/process-role.test.ts`.
+
+## Item 4 — R52
+
+Candidate tests, each `it.skipIf(isWin)`. Not executed in this seat.
+
+- **(b)3.** A chmod through a symlink changes the victim (the instrument), then `ConfigWatch.closeAndRestore` on `.git/config` replaced by that symlink leaves the victim at mode `644`.
+- **(b)4.** `HOME/.gitconfig` replaced by a symlink to a victim file is reported and the victim hash is not in the finding.
+- **R29 mode 000.** Its own `.gitconfig`, not shared with a write probe. A direct read must throw `EACCES` or the test throws (it does not skip). The watch's compare record does not contain the bytes or their hash.
+- **Controls.** A write through the symlink changes the victim. Planting the symlink, with no `runLoop`, leaves the victim's listing and bytes as they were.
+- **R35 on Linux.** A symlink at `$XDG_CONFIG_HOME/git` at base, placed next to the win32 test. The loop's failure is null.
+
+Files: `open-brain/tests/harness/configwatch-links.test.ts`.
+
+## Not verified
+
+The full suite was not run. Atlas is asked before that. R52 was not run on POSIX; this seat is win32, and those tests skip. `/sync` on this tree still reports the pre-existing `prd-version`, stale rendered views, `retirements`, and `build-freshness` issues. None of them come from A4's commits. GitNexus impact was not run: the MCP tools are not in this session, and the index is behind HEAD.

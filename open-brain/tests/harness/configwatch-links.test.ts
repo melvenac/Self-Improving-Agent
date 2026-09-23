@@ -8,6 +8,7 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
 import { createHash } from "node:crypto";
 import {
+  chmodSync,
   lstatSync,
   mkdirSync,
   readdirSync,
@@ -380,6 +381,27 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(blob).not.toContain("XDG-CANARY-TOKEN");
   });
 
+  it.skipIf(isWin)("R35: a symlink at $XDG_CONFIG_HOME/git at base proceeds past preflight", async () => {
+    const xdg = join(tmp.dir, "xdg-r35-posix");
+    const dot = join(tmp.dir, "r35-posix-dot");
+    mkdirSync(dot);
+    writeFileSync(join(dot, "config"), "[user]\n\tname = base\n");
+    mkdirSync(xdg);
+    symlinkSync(dot, join(xdg, "git"));
+    const env = {
+      ...process.env,
+      HOME: tmp.dir,
+      USERPROFILE: tmp.dir,
+      XDG_CONFIG_HOME: xdg,
+      GIT_CONFIG_GLOBAL: join(tmp.dir, ".gitconfig"),
+      GIT_CONFIG_SYSTEM: join(tmp.dir, "system.gitconfig"),
+    };
+    writeFileSync(env.GIT_CONFIG_GLOBAL, "");
+    writeFileSync(env.GIT_CONFIG_SYSTEM, "");
+    const proceeded = await runLoop(loopConfig({ env }));
+    expect(proceeded.failure, proceeded.failure?.reason).toBeNull();
+  });
+
   it("R44: a machine-config link planted after base is not read through on the next stage", () => {
     const xdg = join(tmp.dir, "xdg-r44");
     const gitDir = join(xdg, "git");
@@ -659,5 +681,91 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(v.unrestored, blob).toEqual([]);
     expect(readFileSync(victim)).toEqual(bytes);
     expect(lstatSync(config).nlink).toBe(2);
+  });
+
+  it.skipIf(isWin)("R52 (b)3: chmod through a link leaves the victim's mode unchanged", () => {
+    const victim = join(tmp.dir, "r52-chmod-victim");
+    writeFileSync(victim, "chmod-victim");
+    chmodSync(victim, 0o644);
+    const probe = join(tmp.dir, "r52-chmod-probe");
+    symlinkSync(victim, probe);
+    chmodSync(probe, 0o600);
+    expect(lstatSync(victim).mode & 0o777, "the instrument can see a chmod through the link").toBe(0o600);
+    chmodSync(victim, 0o644);
+
+    const dirs = resolveGitDirs(repo.root);
+    const watch = new ConfigWatch(dirs);
+    watch.begin("developer");
+    const config = join(dirs.commonDir, "config");
+    renameSync(config, join(dirs.commonDir, "config-aside-r52"));
+    symlinkSync(victim, config);
+    watch.closeAndRestore();
+    expect(lstatSync(victim).mode & 0o777).toBe(0o644);
+    expect(readFileSync(victim, "utf-8")).toBe("chmod-victim");
+  });
+
+  it.skipIf(isWin)("R52 (b)4: HOME/.gitconfig as a symlink to a file is reported and not read", () => {
+    const home = join(tmp.dir, "r52-b4-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const victim = join(tmp.dir, "r52-b4-victim");
+    const bytes = Buffer.from("[user]\n\tname = VICTIM-R52-B4\n");
+    writeFileSync(victim, bytes);
+    const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    unlinkSync(cfg);
+    symlinkSync(victim, cfg);
+    const found = watch.compare();
+    const blob = JSON.stringify(found);
+    expect(blob, blob).not.toContain(victimHash);
+    expect(blob).toContain("not read");
+    expect(readFileSync(victim)).toEqual(bytes);
+  });
+
+  it.skipIf(isWin)("R52 R29: mode 000 shows EACCES on a direct read, and the bytes are not recorded", () => {
+    const home = join(tmp.dir, "r52-mode0-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    const bytes = Buffer.from("[user]\n\tname = MODE0-SECRET\n");
+    writeFileSync(cfg, bytes);
+    chmodSync(cfg, 0o000);
+    try {
+      let code = "";
+      try {
+        readFileSync(cfg);
+      } catch (err) {
+        code = (err as NodeJS.ErrnoException).code ?? "";
+      }
+      if (code !== "EACCES") {
+        throw new Error(`mode 000 direct read did not throw EACCES (code ${code || "none"}); not skipping`);
+      }
+      const hash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+      const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+      watch.begin("developer");
+      const blob = JSON.stringify(watch.compare());
+      expect(blob).not.toContain(hash);
+      expect(blob).not.toContain("MODE0-SECRET");
+    } finally {
+      chmodSync(cfg, 0o644);
+    }
+  });
+
+  it.skipIf(isWin)("R52 control: a write through the link changes the victim, and a plant without the runtime does not", () => {
+    const victim = join(tmp.dir, "r52-write-victim");
+    writeFileSync(victim, "before");
+    const link = join(tmp.dir, "r52-write-link");
+    symlinkSync(victim, link);
+    writeFileSync(link, "after");
+    expect(readFileSync(victim, "utf-8")).toBe("after");
+
+    const plantedVictim = join(tmp.dir, "r52-plant-victim");
+    mkdirSync(plantedVictim);
+    writeFileSync(join(plantedVictim, "canary.txt"), "PLANT");
+    const planted = join(tmp.dir, "r52-planted");
+    symlinkSync(plantedVictim, planted);
+    expect(readFileSync(join(plantedVictim, "canary.txt"), "utf-8")).toBe("PLANT");
+    expect(namesOf(plantedVictim)).toEqual(["canary.txt"]);
   });
 });
