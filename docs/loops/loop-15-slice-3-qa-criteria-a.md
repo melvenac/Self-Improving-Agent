@@ -49,6 +49,23 @@ CA-4f, CA-4g and CA-3(c) below carry them.
 
 That is one git version, and the row re-measures it at the candidate on both versions (CA-5's pair).
 
+**Rulings-3 folded in before any candidate:** `loop-15-slice-3-rulings-3.md` (`origin/docs/slice-3-rulings-3`
+at `78474cf`, blob `9841b5bc`, read in full) rules all 17 items of §7. They are folded into the rows
+at this commit: R14 → CA-14 (new); R15 → CA-2.6 (new); R16 and R17 → CA-4b; R18 → CA-4h; R19 → CA-4c
+and CA-5; items 1, 2, 3, 5, 6, 7, 12, 13, 14, 15 and 17 → their rows. §7 stays as the record of what
+was proposed and why. Two readings of this seat's are marked **[mine]** where they stand:
+CA-4c's R19 refusal control, and the note on R17's reach inside the checks.
+**R20 → CA-4i and R21 → CA-3d, together with the shim rework in CA-2.4/2.5 and U6, come from the
+planner's A2A message sent after rulings-3.** At this commit they are in no tracked rulings file. They
+are recorded here as **relayed rulings**, and the shim target was **re-derived by this seat** (CA-2.4).
+The planner owns putting R20 and R21 into a tracked rulings file. Three questions the fold raised are
+returned in §5.4–§5.6.
+
+**Effort, per commit (the host transcript's per-entry `effort` field is the instrument; the settings
+file is not, per dispatch-2's correction):** `770bcb9`, `ce8e6a1` and `96738a8` were written at
+**medium** (the transcript's `medium` run, 2026-09-22T23:50:58Z → 2026-09-23T01:02:20Z). `b14c0ad`
+(§7) and this fold were written at **max** (the run from 01:02:27Z).
+
 ---
 
 ## 1. Fixed conditions, carried from `loop-15-slice-3-qa-criteria.md` §1 and not restated
@@ -82,7 +99,11 @@ verdict are computed after the role's process has exited.
 stage must fail on both.
 **Control:** the same role writing nothing reaches a clean stage verdict. If a window closed at spawn
 return instead of at exit, the delayed writes are invisible, and this pair discriminates.
-**Fail:** any window computed while the process runs; or a delayed write that goes unreported.
+**Attribution (rulings-3 item 1):** the failure is recorded against **the stage whose process
+wrote**, with both deltas in that one stage's record. A runtime that did not await, and caught the
+delayed writes in the *next* stage's window, fails this row.
+**Fail:** any window computed while the process runs; a delayed write that goes unreported; or a
+delayed write attributed to a later stage.
 
 ### CA-2 — `ProcessRole`: a constructed environment and no shell (P3)
 
@@ -96,20 +117,44 @@ return instead of at exit, the delayed writes are invisible, and this pair discr
    `CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1` is present. This is the design's stated behaviour. Brief
    §5's ban on a `CHILD=1` *warning* is not engaged: this removes the variable, it does not warn
    on it.
-4. **No shell:** an argv element containing `^`, `$HOME`, a backslash and a space reaches the child
-   byte-for-byte, as shown by the child echoing its argv into the deliverable.
-   **Amendment to `ce8e6a1`, before any candidate (planner's note from Forge's plan).** On this
-   machine `claude` is an npm shim (`.cmd`/`.ps1`), and Node refuses to spawn a `.cmd` without a
-   shell (CVE-2024-27980). The adapter therefore resolves the shim to its JS entry and spawns
-   `node <entry> <args>`. The byte-for-byte row runs through **that resolved spawn**, and it
-   records the spawned executable and argv[0..1], so the path exercised is the real one. It is not a
-   test-only direct spawn.
-5. **Fail closed when the shim cannot be resolved.** An adapter pointed at a shim whose JS entry
-   cannot be found (a planted `.cmd` with no resolvable entry) refuses **before any tag**, and the
-   refusal **names the path**. It never falls back to a shell: the probe plants a marker-writing
-   `.cmd` and asserts the marker is absent. **Control:** a resolvable shim in the same position
-   spawns and writes its deliverable. A native executable (`claude.exe`) is spawned directly, and
-   if none is available on this machine that case is reported **unprobed**, not asserted.
+4. **No shell, and argv arrives byte-for-byte (rulings-3 item 2).** The probe element carries `^`,
+   `$HOME`, a backslash, a space, **a double quote, a newline and a trailing backslash**. It reaches
+   the child byte-for-byte, shown by the child echoing its argv into the deliverable. **A prompt
+   over the platform's command-line limit fails closed; it is never truncated.** Passing the prompt
+   by file, with argv carrying only the path, is the developer's call.
+   **The two shim forms, re-derived before this fold (the planner's relay of Forge's measurement,
+   verified by this seat).** On this machine both npm shims execute a **native** binary:
+   `claude.cmd` line 9 and the sh shim line 12 run
+   `node_modules\@anthropic-ai\claude-code\bin\claude.exe`, a 237 MB PE32+ executable, and the
+   package's `bin.claude` is `bin/claude.exe`. **The native form is the real path here.** The
+   classic npm **JS-entry** form (`node.exe <entry.js> %*`) exists on this machine only as a planted
+   shim. So:
+   - **Native form, observed from the runtime's own record:** the adapter resolves the real
+     `claude.cmd` to `…\bin\claude.exe` and spawns it **directly** with `shell: false`. The iteration
+     record carries the resolved executable path and argv, and no `cmd.exe` appears in it.
+   - **Byte-for-byte, observed through the adapter's same resolution-and-spawn path** with a planted
+     JS-entry shim whose target is `node.exe` plus an argv-echo script. That is the only target whose
+     received argv this seat can read. **Argv parsing inside the native `claude.exe` is the
+     binary's own and is not observable here (U6).**
+   (Superseded at this fold: the `ce8e6a1`→`96738a8` premise that the adapter spawns
+   `node <entry>` for the real `claude`.)
+5. **Fail closed when the shim cannot be resolved (rulings-3 item 3: keep "before any tag").** A
+   planted `.cmd` whose target cannot be resolved (a missing executable, or no recognisable target
+   line) is refused **before any tag**, and the refusal **names the path**. It never falls back to a
+   shell: the planted `.cmd` writes a marker if run, and the marker is absent.
+   **Controls:** the real `claude.cmd` resolves at preflight to the native `…\bin\claude.exe`,
+   read from the record without running `claude`. A planted JS-entry shim resolves to `node.exe`
+   plus its entry.
+6. **R15 (rulings-3 item 4): every process that runs role-authored code gets a constructed
+   environment, the checks included.** `runCheck` (`checks.ts:122–128`) at `9ed674c` passes no
+   `env`, so `npm --prefix open-brain run build` and `… test` inherit `process.env`, including
+   `TYPESAFE_API_KEY` in live mode. Those commands run the package scripts and test files a
+   model-backed developer just wrote.
+   - **Probe:** a role-authored test file (and, separately, a role-edited `build` script) writes its
+     own environment to a file outside the repository. With the sentinel set in the parent, the key
+     and the sentinel are absent.
+   - **Control:** an allowlisted variable is present, which is the transition.
+   - The check's git descendants carry layer 0 and layer 1 in that environment (R17, CA-4b).
 
 **Fail:** the key or sentinel reaches the child; any assertion here reads inherited
 `process.env` without constructing and then checking it (G-044); a shell anywhere in the spawn.
@@ -124,21 +169,56 @@ return instead of at exit, the delayed writes are invisible, and this pair discr
   `includeIf.gitdir:…path`, and an include in `config.worktree` in a linked worktree (CA-4h). The
   control is the same repository with the key removed, which proceeds past preflight.
 
-Both refusals come **before any tag, commit or artefact**: after the refusal, `loop-*` tags are
-absent, HEAD is unmoved and there is no `artifacts/` directory, each read by the same expression as
-the control.
+- (d) **R21: local config at base is default-deny.** Preflight refuses **any** key in the target's
+  local config at base that is outside a safe allowlist of what a fresh `git init` / `git clone`
+  write, measured on **both** CA-5 git versions. The refusal names the key.
+  - **Probes:** `filter.x.clean` planted at base; `core.sshCommand` planted at base. Each is refused
+    with the key named.
+  - **Measured on git `2.54.0.windows.1` before this fold** (read with `git config --file … --list
+    --name-only`, a parser):
+    - `init` writes `core.{bare, filemode, ignorecase, logallrefupdates, repositoryformatversion,
+      symlinks}`;
+    - `clone` adds `remote.origin.{url, fetch}` and `branch.main.{remote, merge}`;
+    - `git remote remove origin` takes all four back out.
+
+    CI's `2.55.0` on Linux is measured at the candidate.
+  - **Controls, reconciled with (b):** a fresh clone **with stub roles** passes R21 (while (b)
+    refuses its remote whenever a `ProcessRole` is present). The same clone after `git remote remove
+    origin` passes both, with a `ProcessRole`.
+  - **Two conflicts, measured and returned in §5.4 [mine], not scored until ruled:**
+    - `makeRepo` (`fixture.ts:92–104`) appends `user.email`, `user.name`, `commit.gpgsign` and
+      `core.autocrlf`, none of which `init` or `clone` writes. As worded, R21 refuses every harness
+      fixture repository.
+    - CA-4h's probe target sets `extensions.worktreeConfig`, which R21 would refuse at preflight,
+      making CA-4h unrunnable.
+
+**All three refusals (a)–(c), and (d), come before any tag, commit or artefact** (rulings-3 item 5).
+After the refusal, `loop-*` tags are absent, HEAD is unmoved and there is no `artifacts/` directory,
+each read by the same expression as the control.
 **Controls:** the same loop with stub roles and the watch off proceeds past preflight, and so does
 the same repository with its remote removed.
 **Fail:** a refusal after any write; a refusal without a named reason; or a limit that goes
 unstated ("a role can still push to an explicit URL").
 
-### CA-4 — the config/hooks channel is closed (P1), in two layers, each shown load-bearing
+### CA-4 — the config/hooks channel is closed (P1), in three layers (0, 1, 2), each shown load-bearing or its redundancy stated
 
 **CA-4a, detection and restore (layer 2).** A role that plants each of `post-commit`,
 `reference-transaction` and `core.fsmonitor`, **one per run**:
 - is failed with `stage-changed-config`, refused and never retried;
-- **the planted program did not run**: its marker, outside the repository, is absent;
-- the snapshot files are restored **by bytes**, with each file's hash equal to its pre-stage hash.
+- **the planted program did not run**: its marker, outside the repository, is absent. The marker
+  records a value **only a runtime git call carries**, such as the layer-0 `GIT_CONFIG_GLOBAL` path,
+  and the probe role makes no git call after planting. So a line in the marker is attributed to a
+  runtime call, never to the role's own (rulings-3 item 7);
+- the restore is judged on the **file set as well as the bytes** (rulings-3 item 6): the snapshot
+  scope's set of files equals the pre-stage set (created files removed, deleted files restored), and
+  each file's hash equals its pre-stage hash.
+
+**Two more probes, which end in `stage-changed-config` with a record and no exception** (rulings-3
+item 6): **garbage `.git/config`**, and **`core.repositoryformatversion=99`**. Measured before this
+fold, at v0.44.1: both make every git call exit 128. Garbage config crashes today's runtime with
+**no `LoopResult` and no `FAILED.md`** (§7.1). This is the **behavioural** test of layer 2's "restore
+before any git call": **M-L2-order must turn it red.** A deleted `.git/config` is survivable by git
+(measured, exit 0) and is detected and restored like any change.
 
 **Control:** the same planted program, invoked through the same git call **without** the runtime,
 writes its marker. That is the design's discriminating control, and it is required.
@@ -148,10 +228,31 @@ files with **no git call at all**, and the restore runs before `closeRefWindow` 
 reads HEAD. G-045's R2 whitelist applies: no repository read between the fault and the completed
 restore except the restore's own file I/O.
 
-**CA-4b, the overrides (layer 1) on EVERY runtime git call.** Every git invocation the runtime makes
-goes through one function that carries the overrides. This is evidenced by a scan that is itself
-validated both ways (G-040, T-156): it finds a planted bare `execFileSync("git"` and passes the real
-source.
+**CA-4b, the overrides (layer 1) on EVERY runtime git call: one spawn site (R16), carried in the
+environment (R17).**
+- **R16 (rulings-3 item 8):** every runtime git spawn routes through **one** function that applies
+  layers 0 and 1 and R18's pinning. At `9ed674c` there are four: `git()` at `git.ts:86`, `gitTry` at
+  `:115` (`spawnSync`), and `changedPaths` at `:146` and `committedPaths` at `:192` (raw
+  `execFileSync` with `"git"` on its own line).
+  **The check is a parser:** a TypeScript AST walk over every `child_process` call in
+  `open-brain/src/harness/`. It asserts **exactly one git spawn site**, and it classifies every other
+  process spawn by name (the `ProcessRole` spawn, `runCheck`). **An unclassified call site fails
+  the check**, so the boundary cannot widen by omission.
+  **Validated both ways:** it fails on a planted second git spawn in **each** API form
+  (`execFileSync`, `execFile`, `spawnSync`, `spawn`), **including a multi-line call with `"git"` on
+  its own line**, and it passes the candidate's real source. The single-line pattern this row named
+  at `96738a8` missed two of the four sites; that is §7 item 8's finding against this seat's own
+  criteria.
+- **R17 (rulings-3 item 9):** layer 1 is carried in the environment (`GIT_CONFIG_COUNT`/`KEY_n`/
+  `VALUE_n`), so it reaches descendant git processes, including the build check's postbuild
+  stamping (`write-build-info.mjs:31` runs `git rev-parse HEAD`).
+  **Observable:** the environment a descendant git process receives inside a check carries layer 0's
+  `GIT_CONFIG_GLOBAL` and layer 1's `GIT_CONFIG_COUNT` pairs. A role-edited build script prints its
+  environment, which is enough, because the claim is about reach.
+  **[mine], a note on what this row can claim:** inside the checks, role-authored code runs by
+  design (package scripts, tests), and that code can run git directly with any config it likes. So
+  **R17 there is consistency, not a boundary. The boundary inside the checks is R15's constructed
+  environment** (CA-2.6). The verdict states reach and does not claim protection.
 
 **Each layer must be shown load-bearing, or its redundancy stated.** There are two mutants:
 - M-L1 removes the overrides;
@@ -170,9 +271,35 @@ Both runs are in the same row, with the marker read by the same expression. **If
 be constructed** against the candidate's code, the verdict records layer 1 as **redundant by
 construction**. It does not claim layer 1 protects anything.
 
-**CA-4c — layer 0 (R7): runtime git calls do not read the machine's git config.** Every runtime git
-call runs with `GIT_CONFIG_GLOBAL=<runtime-owned empty file>` and `GIT_CONFIG_NOSYSTEM=1`, and
-passes identity with `-c user.name=… -c user.email=…`.
+**CA-4c — layer 0 (R7, as amended by R19): runtime git calls do not read the machine's git config;
+they read a runtime-generated file that carries only non-program keys.** Every runtime git call runs
+with `GIT_CONFIG_NOSYSTEM=1` and with `GIT_CONFIG_GLOBAL` pointing at a **runtime-generated** file.
+The file holds only **non-program** keys read from the machine's effective config at preflight
+(`core.autocrlf`, `core.eol`, `core.symlinks`, `core.ignorecase`, `core.longpaths` and the like), and
+it is listed in the iteration record. Identity is still passed with `-c user.name=… -c user.email=…`
+(R7).
+- **R19, what the file may carry:** a parser over the generated file asserts that **every key in it
+  is on a named non-program allowlist**. An unlisted key fails the check (strict default). **Probe:**
+  a program-valued key planted in the (simulated) machine global config at preflight (for example,
+  `filter.x.clean`, or `core.sshCommand`) is **not carried**.
+- **R19, what layer 0 must no longer break (§7 item 10, measured):** on a target cloned under the
+  machine's own config (this machine's system config carries `core.autocrlf=true`) with **no
+  `.gitattributes`**:
+  - an untouched file is **not** reported changed;
+  - a role's CRLF save is committed with the **same** `git ls-files --eol` index state the
+    machine's own git would produce. The comparison is the same content committed by the machine's
+    git in a copy.
+
+  At v0.44.1 plus R7 alone, both failed: the untouched file read ` M`, and the save was committed
+  `i/crlf` against the machine's `i/lf`.
+- **R19, the refusal:** a target that **needs** a program-valued key is refused at preflight, and
+  the refusal names it (`filter.lfs` with `required=true`). **[mine], a control on how "needs" is
+  read, returned in §5.5:** this machine's **system** config carries `filter.lfs.required=true` for
+  **every** repository. So refusing on the key's presence would refuse every target here. The row
+  reads "needs" as **the target's attributes** (`.gitattributes` or `.git/info/attributes`) **name a
+  filter, diff or merge driver whose program key the generated file does not carry**.
+  - **Probe:** a target whose attributes say `*.bin filter=lfs` is refused, naming `filter.lfs`.
+  - **Control:** a target with no such attribute, on this same machine, is **not** refused.
 - **Discriminating, in the same test (R7):** a planted global `filter.<x>.clean` plus a work-tree
   `.gitattributes` **executes without layer 0 and does not execute with it.** The global file is
   simulated through the test's own environment and is never the real one.
@@ -198,8 +325,10 @@ contribute in either direction.
   alike**, and never by writing the real files (U4). Each write is reported with that path. After
   the loop the file still holds the role's bytes, which shows nothing was restored.
 - **Control:** a role that writes nothing produces no such finding.
-- **The system path:** if the runtime cannot redirect it without writing a real system file, that
-  path is reported as unprobed rather than asserted.
+- **The system path:** simulated with `GIT_CONFIG_SYSTEM` pointing at a scratch file, for the role
+  process and the runtime alike, so the real `C:/Program Files/Git/etc/gitconfig` is never written.
+  The R8 hash covers the path git reports for system config in that environment. If the candidate's
+  hashing cannot follow `GIT_CONFIG_SYSTEM`, the system path is reported **unprobed**, not asserted.
 - **Fail:** a watched path missing from the list; a change restored; a change that fails the stage;
   the hashing done with a git call that layer 0 does not cover.
 
@@ -220,10 +349,32 @@ The report states the observed outcome for each of the six cells. Design §2.3's
 - **Probe, run in a linked worktree** (where `.git` is a file) with `extensions.worktreeConfig`
   set: plant, one per run, a hook in the common dir, a program-valued key in `config.worktree`, and
   one in the common `config`. Each is detected, restored by bytes, and does not execute.
-- **Redirection probe:** a role that rewrites the worktree's `.git` file to point at a different
-  git dir does not move the snapshot, which is resolved at preflight. The change is reported, not
-  silently followed.
-- **Fail:** any path resolved after a role has run.
+- **Redirection probe (R18, rulings-3 item 11):** every runtime git call **pins `GIT_DIR` and
+  `GIT_WORK_TREE`, resolved at preflight**. Measured before this fold: rewriting a linked
+  worktree's `.git` pointer file sends the **next** unpinned git call into another repository
+  (`rev-parse --absolute-git-dir` moved from `md-repo/.git/worktrees/md-wt` to `md-other/.git`).
+  - A role that rewrites the pointer to another repository's git dir does not redirect the runtime:
+    the runtime's post-stage refs and tags land in the **original** repository. The other
+    repository's `show-ref` is **byte-identical** before and after the loop, read by the same
+    expression for both.
+  - The pointer change is **reported**, not silently followed.
+  - **Mutant M-R18** (pinning dropped) turns this row red.
+- **Fail:** any path resolved after a role has run; any runtime git call without the pinned dirs.
+
+**CA-4i — R20: the generated global-config file cannot be edited under the runtime.** The runtime
+holds the generated file's bytes in memory and **compares them before every git call**. A mismatch
+raises `GitRefused`, and the R14 backstop (CA-14) records it.
+- **Probe:** a role, told the file's path by the test, appends `filter.x.clean` (with a work-tree
+  attribute that uses it) → the loop ends in a **record**, `FAILED.md` names the file, and the
+  planted program's attributed marker is absent.
+- **Second probe:** a **same-length** edit (one character changed), so a size-only comparison
+  cannot pass the row.
+- **Control:** the unedited file → the loop proceeds.
+- **Stated limit, which the report must carry, per the ruling:** compare-then-call leaves a window
+  between the comparison and the call. CA-6's tree-kill closes it **on the timeout path**. For a role
+  that **exits normally** while a descendant survives (U3), no row establishes that the tree is dead
+  before the runtime's next git call. **§5.6 returns that question.** Until it is ruled, the report
+  states the dependency and does not claim the window closed.
 
 **CA-4d — snapshot scope stated.** The candidate states which files layer 2 snapshots, and whether
 `.git/config.worktree`, `.git/info/attributes`, and a planted `include.path` pointing outside the
@@ -246,15 +397,22 @@ commits, branch creation, upstream tracking).
 - If none does, the report says so, and the per-stage choice is recorded as **untested by this
   loop's runtime**, not as verified.
 
+**R19's target (rulings-3 R19):** the known-negative **also** runs on a target cloned under this
+machine's own config, with **no `.gitattributes`**, and not on a `makeRepo` fixture. `makeRepo` sets
+`core.autocrlf=false` locally, which is why every existing harness test is blind to §7 item 10. On
+that target the known-negative shows no spurious changed path.
 **Fail:** a known-negative run on one git version only; a detector validated only against planted
-positives.
+positives; the R19 known-negative run only on a fixture with local line-ending overrides.
 
 ### CA-6 — `role-timeout` (P4)
 
 **Pass:** a role that sleeps past its bound is killed **with its process tree**. This is shown by a
-grandchild the role spawned no longer being alive after the stage (PID checked by the probe, not by
-the runtime's own claim). The stage fails with `role-timeout`, and **the windows still close and
-restore**: a hook planted before the sleep is restored by bytes and recorded.
+grandchild the role spawned no longer being alive after the stage, by **two instruments** (rulings-3
+item 12): the grandchild's PID is absent, **and** a heartbeat file it appends to every 200ms stops
+growing, read at least 1s after the stage. A PID can be reused, and a new process cannot fake a
+heartbeat. Both are checked by the probe, not taken from the runtime's own claim.
+The stage fails with `role-timeout`, and **the windows still close and restore**: a hook planted
+before the sleep is restored by bytes and recorded.
 **Control:** the same role under a bound it does not exceed completes, and its grandchild runs to
 completion.
 **Fail:** a surviving grandchild reported as killed; a timeout that skips the windows; a timeout
@@ -301,7 +459,9 @@ transcript kept.
   is not scored.
 - **The adapter's flags are pinned by a test that reads the installed `claude --help`.** On CI,
   where `claude` is not installed, that test **skips with a reason**; it never passes. A skip read
-  as a pass is rule 11.
+  as a pass is rule 11. **Locally, where `claude` is installed, the same test is reported *passed*,
+  not skipped** (rulings-3 item 13), read from the local suite's per-test output. Skip detection can
+  be wrong in both directions.
 
 **Fail:** the role runs beside the runtime; the only evidence is narrative; a missing transcript
 reported as present.
@@ -336,7 +496,11 @@ count:
 | config in linked-worktree locations (common dir, `config.worktree`) | probed by this candidate, CA-4h |
 | config outside the repository (global, XDG, system) | runtime reads closed by layer 0 (CA-4c, CA-4e); role writes **hashed and reported, not restored** (CA-4f) |
 | includes present at base | refused at preflight (CA-3c) |
-| index | unprobed |
+| any other local config key at base | refused unless on the init/clone allowlist (CA-3d, R21) |
+| the generated global-config file | compared before every git call (CA-4i, R20) |
+| config content (garbage, `repositoryformatversion=99`) | layer 2 restores it before any git call (CA-4a) |
+| HEAD file (content) | **probed at v0.44.1: crash without record** (§7.1). A's backstop records it (CA-14). **The channel itself is open** (rulings-3 item 17) |
+| index | **probed at v0.44.1: crash without record** (§7.1). A's backstop records it (CA-14). **The channel itself is open** (rulings-3 item 17) |
 | submodules | unprobed |
 | reflog | unprobed |
 | outside `.git/` (writes, network, surviving processes) | invisible to the runtime; see §3 |
@@ -351,10 +515,41 @@ probed.
 At the candidate: a full suite with the exit code captured unpiped, `ListAgents` peers recorded
 before and after, and the peers told before and after. A CI run id for the **candidate head**, read
 from the run itself. The same CI run supplies CA-5's second git version.
+**`/sync` at the candidate, in the QA tree, after `gitnexus analyze`** (rule 13, V-047; rulings-3
+item 14), with **0 skipped** and the exit code recorded. QA report 1 ran it with the index 10 commits
+behind.
+**The exit code is read from `sync --check`, not from plain `sync`.** Measured at this fold, same
+tree, same single issue (`build-freshness`): plain `sync` (fix mode) **exits 0** while printing
+`1 issues`, and `sync --check` **exits 1**. Forge reported the fix-mode half on the v0.44.1 release
+commit. A verdict taken from plain `sync`'s exit code reads green over an issue. The report records
+both exit codes and the summary line.
 
 ### CA-13 — no version bump (D-031)
 
 `git diff <base>..<candidate> -- package.json open-brain/package.json CHANGELOG.md` is empty.
+
+### CA-14 — R14, the backstop: any git failure after a role has run ends in a record (item 16)
+
+**Pass:** any git failure after a role has run ends in a `LoopResult` plus `FAILED.md` that **names
+the failing call**. **It is a record, not a repair:** A's promise ("cannot leave without a record")
+is kept by catching the **class**, not by enumerating channels.
+- **Rows, the three §7.1 probes, each run at the candidate after its v0.44.1 baseline:**
+  - **garbage `.git/HEAD`** → a record naming the failing call. The same probe at v0.44.1:
+    `GitFailed` from `for-each-ref`, no `LoopResult`, no `FAILED.md`;
+  - **garbage `.git/index`** → a record naming `git status`. At v0.44.1: a plain `Error: Command
+    failed` from `changedPaths`, no record. The backstop must catch this form too, **whatever error
+    class the failing spawn raises**;
+  - **garbage `.git/config`** → layer 2 restores it first (CA-4a). **Under M-L2** (window removed)
+    the backstop records it instead of crashing.
+
+  **The transition is the control:** each probe's v0.44.1 outcome (no record) and its candidate
+  outcome (a record) are read by the same expressions.
+- **The record does not claim what did not happen:** where the repository is left damaged
+  (garbage HEAD), `FAILED.md` does **not** say the tree or refs were restored or rolled back. It says
+  the repository was left as the failure found it, and it names the path if known.
+- **Mutant M-backstop** (the backstop removed) turns the HEAD and index rows red.
+- **Fail:** any exception out of `runLoop` after a role has run; a record that omits the failing
+  call; a record that claims a repair it did not perform.
 
 ---
 
@@ -368,9 +563,18 @@ not acceptance rows.
 U1: network egress by a role process — the runtime has no network view and this seat does not capture traffic
 U2: writes by a role outside the repository other than its runtime-chosen deliverable path — not observable by the runtime
 U3: child processes that outlive the role outside the role-timeout path (CA-6 covers the timeout path only)
-U4: writes to the REAL ~/.gitconfig or system gitconfig — machine-wide, Aaron's files; CA-4c is probed via GIT_CONFIG_GLOBAL simulation only
+U4: writes to the REAL ~/.gitconfig, $XDG_CONFIG_HOME/git/config or system gitconfig — machine-wide, Aaron's files; CA-4c/4e/4f/4g are probed via HOME, XDG_CONFIG_HOME, GIT_CONFIG_GLOBAL and GIT_CONFIG_SYSTEM simulation only
 U5: the quality or correctness of the model-backed role's output in the first real run (CA-9) — an observation, not acceptance
+U6: argv parsing INSIDE the native claude.exe — the binary's own command-line parser, not instrumentable by this seat; CA-2.4 verifies the runtime's resolution and spawn with an observable target
 ```
+
+**Recorded, not a row (rulings-3 item 15):** `%ProgramData%\Git\config` is **not read** by git
+`2.54.0.windows.1`, and this is **for that version only**. `git.exe` holds 0 references to it; the
+ASCII and UTF-16LE detectors were each validated on a known positive (`GIT_CONFIG_NOSYSTEM`,
+`USERPROFILE`). With it redirected to a scratch dir, a planted filter executed 0 times and `git config
+--show-origin` did not list it. It is therefore not a watched path for CA-4f **on that version**.
+**Superseded at this fold:** `b14c0ad`'s U6 ("native `claude.exe`, none on this machine") rested on
+`which` finding only the npm shim. The shim's **target** is a native exe (CA-2.4).
 
 ---
 
@@ -380,15 +584,17 @@ U5: the quality or correctness of the model-backed role's output in the first re
    Record **tree moved** and **tree dirty** separately.
 2. Rebuild before measuring anything from the built CLI.
 3. Run every row's control **before** its negative, in the same run and by the same expression.
-4. Mutants: M-L0, M-L1, M-L2, the CA-4h resolve-late mutant (paths resolved after the stage), the
-   CA-5 snapshot-timing mutant (if applicable), and the CA-10 mutants. All type-clean, and the type
+4. Mutants: M-L0, M-L1, M-L2, M-L2-order, the CA-4h resolve-late mutant (paths resolved after the
+   stage), M-R18 (pinning dropped), M-backstop (R14 removed), a second git spawn site (R16's AST
+   check must turn red), a checks spawn that inherits the environment (R15), the CA-5
+   snapshot-timing mutant (if applicable), and the CA-10 mutants. All type-clean, and the type
    checker shown able to fail.
 5. Full suite with peers recorded; CI run id for the candidate head.
 6. Report, in prose (R10). Nothing is pushed without Aaron's direct word.
 
 ---
 
-## 5. Returned to the planner, numbered — all three now RULED
+## 5. Returned to the planner, numbered — items 1–3 RULED; items 4–6 NEW at the rulings-3 fold, UNRULED and not scored until ruled
 
 1. ~~CA-4c: is global/system config in candidate A?~~ **RULED by rulings-2 R7–R9 and R11–R13:** it is
    in A as layer 0, with a report-only window, and the P5 claim is withdrawn. It is folded into
@@ -404,6 +610,29 @@ U5: the quality or correctness of the model-backed role's output in the first re
    child's environment recorded.** The original question: **CA-9's transcript clause** depends on T-161's unknown per-launch loss. **Ruling asked:** is an
    absent transcript a CA-9 fail, or a reported absence with the row scored on the runtime artefacts
    (as written)?
+4. **R21 (CA-3d) as worded conflicts with two things, both measured.**
+   - `makeRepo` (`fixture.ts:92–104`) appends `user.email`, `user.name`, `commit.gpgsign` and
+     `core.autocrlf` to every harness test repository. None of these is written by a fresh `init` or
+     `clone` (measured on 2.54). So R21 refuses every fixture, and every harness test that runs a
+     loop fails at preflight.
+   - CA-4h's probe target sets `extensions.worktreeConfig`, which R21 refuses, so CA-4h can never
+     run past preflight.
+
+   **Ruling asked:** either the allowlist names these non-program keys explicitly (`user.name`,
+   `user.email`, `commit.gpgsign`, `core.autocrlf`, `extensions.worktreeConfig`), or the fixture
+   stops writing them. The fixture wrote `core.autocrlf=false` precisely to be deterministic across
+   machines, so that choice interacts with R19.
+5. **R19's refusal: how "needs" is read (CA-4c).** This machine's **system** config carries
+   `filter.lfs.required=true` for every repository. Read as "the key is present", R19 refuses every
+   target on this machine. The row reads "needs" as "the target's attributes name a filter, diff or
+   merge driver whose program key the generated file does not carry", with a control target that
+   has no such attribute. **Ruling asked:** confirm that reading, or state the intended one.
+6. **R20's compare-then-call window (CA-4i) on a NORMAL exit.** The ruling says CA-6's tree-kill
+   closes the window. CA-6 establishes tree-kill on the **timeout** path only. A role that exits
+   normally while a descendant survives (U3) can edit the generated file between the runtime's
+   comparison and its call. **Ruling asked:** does the runtime kill the role's surviving
+   descendants after **every** stage (a new CA-6 clause, with the same two-instrument probe), or
+   does the report state the window as open on the normal-exit path?
 
 ## 6. `E_t` fit — the table that produced R10 (the obligation now binds at candidate B)
 
@@ -425,14 +654,22 @@ U5: the quality or correctness of the model-backed role's output in the first re
 - (d) out-of-scope ids are declared in the same parseable block as the unrunnable ids, as a
   separate list.
 
-This file lists only in-scope rows, so for A it declares no out-of-scope ids.
+This file lists only in-scope rows, so for A it declares no out-of-scope ids. The HEAD-file and index
+**repairs**, which rulings-3 R14 names as not A's work, are recorded as open in CA-11. They are not
+rows.
 
 ---
 
-## 7. PROPOSED amendment 3: the max-effort re-read, before any candidate. UNRULED.
+## 7. Amendment 3: the max-effort re-read, before any candidate. RULED (rulings-3, `78474cf`).
 
-**Nothing in this section binds until the planner rules on it, item by item.** The rows in §2 as
-committed at `96738a8` are the binding text until then. This section exists because §2 through §6
+**Every item below was ruled by `loop-15-slice-3-rulings-3.md` and is folded into §2–§4 at the
+commit that follows `b14c0ad`.** This section stays unchanged below this paragraph, as the record of
+what was proposed and why. Where the fold and this section differ, **§2–§4 bind**: item 15's U6 was
+superseded (CA-2.4's shim target), and item 16 became R14/CA-14. The fold also carries R20 (CA-4i)
+and R21 (CA-3d), which the planner ruled after rulings-3, and §5.4–§5.6, returned at the fold.
+*(Original heading at `b14c0ad`: "PROPOSED amendment 3 … UNRULED. Nothing in this section binds until
+the planner rules on it, item by item. The rows in §2 as committed at `96738a8` are the binding text
+until then.")* This section exists because §2 through §6
 were written at effort **medium**: the host transcript records `"effort":"medium"` on every entry
 from 2026-09-22T23:50:58Z to 2026-09-23T01:02:20Z, and all four of this seat's tracked commits fall
 inside that run. The re-read was done at **max** (from 01:02:27Z). Every claim below was **measured**
