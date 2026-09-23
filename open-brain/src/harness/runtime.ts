@@ -604,11 +604,23 @@ async function runLoopInner(config: LoopConfig, refWatchEnabled: boolean): Promi
      * Nothing else is restored here: the verdict has to be computed against
      * the repository the ROLE left, and a backwards move of the checked-out
      * branch is a fact `enforceAllowlist` must still see.
+     *
+     * **With one exception, and it is the narrowest one that works: a deferred
+     * ref the stage DELETED** (`G-045`). `restoreHead` compares HEAD's symbolic
+     * NAME, which `update-ref -d` does not change — only the referent goes —
+     * so HEAD is left naming a ref that is not there and `enforceAllowlist`'s
+     * first `rev-parse HEAD` fails, taking `GitFailed` out of `runLoop` ahead
+     * of the rollback. The deletion is put back here because it is the only
+     * delta that makes the READ ITSELF impossible; a MOVE is still left alone,
+     * so D2's backwards move is seen and reported rather than quietly undone.
+     * The comparison above has already recorded the deletion, so the loop still
+     * fails with `stage-changed-ref`.
      */
     const closeRefWindow = (): { verdict: RefVerdict | null; headNote: string } => {
       if (!refWatch) return { verdict: null, headNote: "" };
       const verdict = refWatch.compare();
-      return { verdict, headNote: refWatch.restoreHead() };
+      const headNote = refWatch.restoreHead();
+      return { verdict, headNote: headNote + refWatch.restoreDeletedDeferred(verdict) };
     };
 
     /**

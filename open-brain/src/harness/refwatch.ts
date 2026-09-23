@@ -242,20 +242,49 @@ export class RefWatch {
       deferred === null
         ? `HEAD is detached, so no branch ref was deferred.`
         : `${deferred} is left to the commit boundary, which owns that channel and ` +
-          `${deferredDelta === null ? "reports it unmoved" : "will report that this stage moved it"}` +
+          `${
+            deferredDelta === null
+              ? "reports it unmoved"
+              : deferredDelta.kind === "deleted"
+                ? "cannot report it at all, because this stage DELETED it — so this watch refuses it instead (G-045)"
+                : "will report that this stage moved it"
+          }` +
           `${deferredDelta === null ? "" : `, and this watch restores it to ${short(deferredDelta.before)}`}.`;
     const limit =
       `LIMIT: refs/ and HEAD — not the index, reflogs, hooks, config or submodules; ${deferral} ` +
       `Refs are shared across every worktree of this repository, so a concurrent writer inside ` +
       `the window is refused too.`;
 
-    const ok = unauthored.length === 0;
+    /**
+     * A DELETED deferred ref is this watch's to refuse, not the commit
+     * boundary's (`G-045`).
+     *
+     * The boundary judges the checked-out branch by what HEAD resolves to.
+     * That can express a MOVE — it becomes `stage-committed` — but it has no
+     * way to say "the branch is gone", and before this loop it never got the
+     * chance: `rev-parse HEAD` failed on the dangling name and the whole run
+     * died with no record. Now that {@link restoreDeletedDeferred} puts the ref
+     * back so HEAD can be read at all, the boundary would see a branch that
+     * never moved and the stage would be reported as CLEAN. Counting the
+     * deletion here is what keeps it a failure rather than a silent repair —
+     * the deferral to the commit boundary was only ever sound for a move.
+     */
+    const deferredDeleted = deferredDelta !== null && deferredDelta.kind === "deleted";
+
+    const ok = unauthored.length === 0 && !deferredDeleted;
+    const deletion = deferredDeleted
+      ? `${deferred} was DELETED during this stage (it pointed at ${short(deferredDelta!.before)}). ` +
+        `The checked-out branch is not the stage's to remove: HEAD went on naming it, so nothing ` +
+        `could read HEAD until this watch put it back (G-045). `
+      : "";
     const message = ok
       ? `no ref changed that the runtime did not author (${scale}). ${limit}`
-      : `${unauthored.length} ref write(s) the runtime did not author: ` +
-        `${unauthored.map(describe).join("; ")}. A role may not write a ref: a tag is the rollback ` +
-        `contract, and one that a stage can repoint means "wherever the last role left it" (G-041). ` +
-        `${scale}. ${limit}`;
+      : unauthored.length === 0
+        ? `${deletion}${scale}. ${limit}`
+        : `${deletion}${unauthored.length} ref write(s) the runtime did not author: ` +
+          `${unauthored.map(describe).join("; ")}. A role may not write a ref: a tag is the rollback ` +
+          `contract, and one that a stage can repoint means "wherever the last role left it" (G-041). ` +
+          `${scale}. ${limit}`;
 
     return {
       ok,
@@ -295,6 +324,50 @@ export class RefWatch {
       return (
         ` HEAD COULD NOT BE PUT BACK (it names ${current ?? "a commit directly"} and should name ` +
         `${this.headSymbolic ?? "a commit directly"}): ${(err as Error).message} Recover by hand.`
+      );
+    }
+  }
+
+  /**
+   * Put back a deferred ref the stage **deleted**, before anything reads HEAD.
+   *
+   * `G-045`. `git update-ref -d refs/heads/main` is legal while `main` is
+   * checked out — `git branch -D` refuses, `update-ref -d` does not. HEAD's
+   * *name* does not change, so {@link restoreHead} compares the symbolic name,
+   * finds it unchanged and does nothing, while the referent is gone. The next
+   * `git rev-parse HEAD` — `enforceAllowlist`'s first act — then fails on the
+   * dangling name and `GitFailed` escapes `runLoop` before the rollback, where
+   * the deferred restore otherwise lives: no `LoopResult`, no `FAILED.md`.
+   *
+   * **The gate is this watch's own record, not a caught exception.** A delta
+   * whose `kind` is `deleted` is a positive fact the comparison already holds;
+   * keying on "`rev-parse` threw" would only ever fire for the one channel
+   * whose damage lands on HEAD, and index, hooks, config, submodules and
+   * reflog are unprobed.
+   *
+   * **Only a deletion, and that is load-bearing.** A deferred ref that MOVED is
+   * left exactly where the role put it, because {@link RefWatch.compare} runs
+   * before this and `enforceAllowlist` must still see the move — that is how a
+   * backwards move is reported as `stage-committed` rather than as nothing at
+   * all (QA's D2). Restoring every deferred delta here would put `main` back
+   * before the allowlist looked, and D2 would go quiet. The deletion is the
+   * only kind that makes the read itself impossible.
+   *
+   * Returns "" when there is nothing to do, and writes nothing in that case.
+   */
+  restoreDeletedDeferred(verdict: RefVerdict): string {
+    const d = verdict.deferredDelta;
+    if (d === null || d.kind !== "deleted" || d.before === null) return "";
+    try {
+      // No compare-and-swap: the ref does not exist, so there is no old value
+      // to swap against. `before` is what the window opened on.
+      setRefTo(this.repoRoot, d.ref, d.before, null);
+      return ` ${d.ref} was deleted during the stage and was put back at ${short(d.before)} before HEAD was read.`;
+    } catch (err) {
+      const why = err instanceof GitFailed ? err.stderr || err.message : (err as Error).message;
+      return (
+        ` ${d.ref} WAS DELETED DURING THE STAGE AND COULD NOT BE PUT BACK (${why}). ` +
+        `Recover by hand before rerunning — HEAD does not resolve.`
       );
     }
   }

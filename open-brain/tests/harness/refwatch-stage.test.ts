@@ -320,6 +320,60 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
         .filter((l) => l !== "" && !l.includes("FAILED.md"));
       expect(dirty, `the tree was left dirty: ${dirty.join(" | ")}`).toEqual([]);
     });
+
+    /**
+     * `D4` / `G-045`, slice two's withheld probe N(c), reported in
+     * `loop-15-slice-2-qa-report-2.md` §5 and ruled as slice three's A1.
+     *
+     * `git update-ref -d refs/heads/main` is legal while `main` is checked out —
+     * `git branch -D` would refuse. The name HEAD carries does not change, only
+     * its referent is removed, so `restoreHead()` compares the symbolic name,
+     * finds it unchanged, and returns "". `enforceAllowlist` then reads
+     * `git rev-parse HEAD`, which fails on the dangling name, and `GitFailed`
+     * escapes `runLoop` **before** `rollBack` — where the deferred-ref restore
+     * lives. D1's repair does not reach it: that one keys on HEAD's NAME
+     * changing.
+     *
+     * This asserts the end state the repair must produce, not the crash. Seen
+     * red first: `runLoop` rejects with
+     * `GitFailed: git rev-parse HEAD failed … unknown revision`, so no
+     * `LoopResult` is returned at all and every expectation below is unreached.
+     */
+    it("D4 — deleting the checked-out branch is refused WITH a record, and the ref comes back", async () => {
+      const preLoop = repo.sha();
+      const r = await runLoop(
+        config({
+          roles: {
+            planner: new StubPlanner(),
+            developer: sabotage(new StubDeveloper(), () => ["update-ref", "-d", "refs/heads/main"]),
+            qa: new StubQa(),
+          },
+        }),
+      );
+
+      // A record exists at all — the failure this probe is about is the absence
+      // of one, so this is the row that matters most.
+      expect(r.status).toBe("failed");
+      expect(r.failure, "no failure record was produced").not.toBeNull();
+      expect(existsSync(join(repo.root, "artifacts/iterations/t001/FAILED.md"))).toBe(true);
+
+      // The repository is usable without a human: HEAD resolves, still names the
+      // branch the window opened on, and that branch exists again.
+      expect(rawGit(repo.root, ["rev-parse", "HEAD"])).toMatch(/^[0-9a-f]{40}$/);
+      expect(rawGit(repo.root, ["symbolic-ref", "HEAD"])).toBe("refs/heads/main");
+      expect(resolveRef(repo.root, "refs/heads/main"), "main was not restored").not.toBeNull();
+
+      // The watch held `before` for this ref, so the restore is not a thing a
+      // human is asked to do.
+      expect(r.failure?.reason).not.toMatch(/could not be rolled back|recover by hand/i);
+
+      // The role's staged work is not left in the index.
+      const dirty = rawGit(repo.root, ["status", "--porcelain"])
+        .split("\n")
+        .filter((l) => l !== "" && !l.includes("FAILED.md"));
+      expect(dirty, `the tree was left dirty: ${dirty.join(" | ")}`).toEqual([]);
+      expect(preLoop).toMatch(/^[0-9a-f]{40}$/);
+    });
   });
 
   it("reports the ref verdict on every stage, with its own limits stated", async () => {
@@ -394,6 +448,47 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
       const report = w.restore(v);
       expect(report).toContain("COULD NOT BE RESTORED");
       expect(report).toContain("refs/tags/moved");
+    });
+
+    /**
+     * `G-045`, the healthy path. `restoreDeletedDeferred` runs on EVERY stage
+     * now, so "it does nothing unless a deferred ref was deleted" is a claim
+     * about every clean loop in the suite — and an unmeasured claim about the
+     * healthy path is how a green row comes to mean less than it did.
+     */
+    it("restoreDeletedDeferred is a no-op when the watch holds no deferred delta", async () => {
+      const w = new RefWatch(repo.root);
+      w.begin("test");
+      const v = w.compare();
+      const refsBefore = rawGit(repo.root, ["show-ref"]);
+
+      expect(v.deferredDelta, "the stage changed nothing, so there is no delta").toBeNull();
+      expect(w.restoreDeletedDeferred(v), "it spoke when it had nothing to do").toBe("");
+      expect(rawGit(repo.root, ["show-ref"]), "it wrote a ref with no delta to act on").toBe(refsBefore);
+    });
+
+    /**
+     * The narrowing that keeps D2 meaningful, asserted directly rather than
+     * inferred from D2 staying green: a deferred ref that MOVED is left where
+     * the role put it, because `enforceAllowlist` has not read HEAD yet and the
+     * move is what it must see.
+     */
+    it("restoreDeletedDeferred leaves a MOVED deferred ref alone — only a deletion is put back", async () => {
+      const preLoop = repo.sha();
+      repo.write("later.txt", "later\n");
+      repo.commitAll("a commit to move main off the pre-loop sha");
+
+      const w = new RefWatch(repo.root);
+      w.begin("test");
+      rawGit(repo.root, ["update-ref", "refs/heads/main", preLoop]);
+      const v = w.compare();
+
+      expect(v.deferredDelta?.kind, "this probe is meant to produce a move").toBe("moved");
+      expect(w.restoreDeletedDeferred(v), "a move was treated as a deletion").toBe("");
+      expect(
+        resolveRef(repo.root, "refs/heads/main"),
+        "the move was undone before the allowlist could see it",
+      ).toBe(preLoop);
     });
   });
 });
