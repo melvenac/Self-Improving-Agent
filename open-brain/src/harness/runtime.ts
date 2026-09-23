@@ -77,11 +77,13 @@ import {
 } from "./schema.js";
 import {
   ConfigWatch,
+  dotGitLink,
   gitExecPath,
   includesAtBase,
   unsafeLocalKeys,
   machineConfigPaths,
   MachineConfigWatch,
+  repositoryLinksAtBase,
   resolveGitDirs,
   type ConfigVerdict,
   type GitDirs,
@@ -211,6 +213,7 @@ export type FailureCode =
   | "role-unresolvable"
   | "git-dirs-unresolvable"
   | "unsafe-config-at-base"
+  | "link-at-base"
   | "required-filter"
   | "runtime-git-failed"
   | "runtime-git-refused"
@@ -360,6 +363,15 @@ export function runLoop(config: LoopConfig): Promise<LoopResult> {
   let carried: CarriedConfig | null = null;
   let workTree = resolvePath(config.repoRoot);
   if (repoOk.ok && repoOk.stdout === "true") {
+    const linked = dotGitLink(config.repoRoot);
+    if (linked !== null) {
+      throw new LoopRefused(
+        "link-at-base",
+        [],
+        `refusing to start loop ${config.loop}: ${linked} is a link at base. A restore or a git call through it ` +
+          `would write outside the repository. Refused before any tag, commit or artefact.`,
+      );
+    }
     // R12: resolved ONCE, here, before any role has run — the only moment the
     // answer is the repository's rather than a role's.
     try {
@@ -400,6 +412,17 @@ export function runLoop(config: LoopConfig): Promise<LoopResult> {
  * layer 0 carries, after re-pinning with the generated global config.
  */
 function preflightConfig(config: LoopConfig, gitDirs: GitDirs, workTree: string): CarriedConfig {
+  const links = repositoryLinksAtBase(config.repoRoot, gitDirs);
+  if (links.length > 0) {
+    throw new LoopRefused(
+      "link-at-base",
+      [],
+      `refusing to start loop ${config.loop}: a link is already at a repository watched path at base — ` +
+        `${links.join("; ")}. Refused before any tag, commit or artefact. A machine-config path that is a ` +
+        `link at base is not this check.`,
+    );
+  }
+
   // R13: an include present at base puts its target outside every window.
   const inc = includesAtBase(config.repoRoot, gitDirs);
   if (inc.error !== null) {
@@ -594,9 +617,10 @@ async function runLoopInner(
 
   // Layer 2 and R8. Null only when the target is not a repository, which the
   // preconditions below turn into a recorded failure before any stage runs.
-  const configWatch = gitDirs === null ? null : new ConfigWatch(gitDirs);
+  const configWatch = gitDirs === null ? null : new ConfigWatch(gitDirs, repoRoot);
   const machineWatch =
     gitDirs === null ? null : new MachineConfigWatch(machineConfigPaths(env, gitExecPath(repoRoot)));
+  for (const note of machineWatch?.baseNotes() ?? []) result.findings.push(note);
 
   /**
    * The iteration record for everything that is not a failure. Written beside
@@ -1032,13 +1056,37 @@ async function runLoopInner(
       if (machineWatch) {
         for (const f of machineWatch.compare()) {
           result.machineConfigFindings.push(f);
+          const typeChange = f.after.startsWith("type change:");
           const line =
             `machine-wide git config changed during the ${f.stage} stage: ${f.scope} ${f.path} ${f.before} → ${f.after}. ` +
+            (typeChange ? `Reported as a type change. ` : "") +
             `REPORTED, NOT RESTORED — this file is read by git for every session on the machine, and the runtime ` +
             `does not rewrite a person's own config (rulings-2 R8).`;
           result.findings.push(line);
           log(`  FINDING: ${line}`);
         }
+      }
+
+      // R38: an ancestor link means the next git call, including rollback, would
+      // write outside the repository. Stop before any of those calls.
+      const timedOut = processRun?.outcome.timedOut === true;
+      if (configVerdict?.ancestorLink) {
+        const ancestor = configVerdict.ancestorLink;
+        const kill =
+          timedOut
+            ? `${roleName} exceeded its bound after ${processRun!.outcome.durationMs}ms. The kill that ran: ${processRun!.outcome.killNote}. ` +
+              `That is the kill's own result, not a census of descendants. A double-forked process can survive it ` +
+              `(named limit; the double-fork is not closed). `
+            : "";
+        return {
+          ok: false,
+          code: timedOut ? "role-timeout" : "stage-changed-config",
+          processRun,
+          reason:
+            `${kill}${roleName} was refused, not warned. ${configVerdict.message} ` +
+            `Rollback was not performed: ${ancestor} is a link, and a git reset or checkout through it would write ` +
+            `outside the repository. The tree is left for a human. A boundary breach is not retried.`,
+        };
       }
 
       const closed = closeRefWindow();
@@ -1048,7 +1096,6 @@ async function runLoopInner(
 
       const refBad = refVerdict !== null && !refVerdict.ok;
       const configBad = configVerdict !== null && !configVerdict.ok;
-      const timedOut = processRun?.outcome.timedOut === true;
       const configPart = configBad ? ` ${configVerdict!.message}` : "";
 
       if (timedOut) {
@@ -1058,8 +1105,10 @@ async function runLoopInner(
           code: "role-timeout",
           processRun,
           reason:
-            `${roleName} exceeded its bound after ${processRun!.outcome.durationMs}ms and was killed with its ` +
-            `process tree (${processRun!.outcome.killNote}). Every window was still closed and restored.` +
+            `${roleName} exceeded its bound after ${processRun!.outcome.durationMs}ms. ` +
+            `The kill that ran: ${processRun!.outcome.killNote}. ` +
+            `That is the kill's own result, not a census of descendants. ` +
+            `A double-forked process can survive it (named limit; the double-fork is not closed).` +
             `${configPart}${refBad ? ` ${refVerdict!.message}` : ""}${headNote}${undone}`,
         };
       }

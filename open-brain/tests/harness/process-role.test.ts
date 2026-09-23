@@ -392,10 +392,23 @@ describe("candidate A — a role that is a real process", { timeout: 180_000 }, 
         ),
       );
       expect(r.failure?.code).toBe("role-timeout");
+      expect(r.failure?.reason).toContain("The kill that ran:");
+      expect(r.failure?.reason).toContain("double-fork");
+      expect(r.failure?.reason).not.toContain("killed with its process tree");
+      expect(r.failure?.reason).not.toContain("Every window was still closed");
       expect(r.failure?.reason).toContain("post-commit");
       expect(readdirSync(join(repo.root, ".git/hooks")).sort()).toEqual(hooksBefore);
       await expectDead(pidFile, heartbeat);
       expect(markerLines(marker)).toEqual([]);
+    });
+
+    it("a single child past its bound records only the kill that ran", async () => {
+      const r = await runLoop(loopWith(roleFor({ writes: [WRITE], hangMs: 120_000 }, { timeoutMs: 3000 })));
+      expect(r.failure?.code).toBe("role-timeout");
+      expect(r.failure?.reason).toContain("The kill that ran:");
+      expect(r.failure?.reason).toContain("double-fork");
+      expect(r.failure?.reason).not.toContain("killed with its process tree");
+      expect(r.failure?.reason).not.toContain("Every window was still closed");
     });
 
     it("CONTROL: under a bound it does not exceed, the role completes and its grandchild runs to completion", async () => {

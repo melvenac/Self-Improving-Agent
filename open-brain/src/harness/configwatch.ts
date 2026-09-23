@@ -33,21 +33,19 @@
  * index, submodules and the reflog are unprobed.
  */
 
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import {
   chmodSync,
-  closeSync,
   existsSync,
-  ftruncateSync,
   lstatSync,
   mkdirSync,
-  openSync,
   readdirSync,
   readFileSync,
-  rmSync,
-  statSync,
+  readlinkSync,
+  renameSync,
+  rmdirSync,
+  unlinkSync,
   writeFileSync,
-  writeSync,
 } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { git, gitTry } from "./git.js";
@@ -89,20 +87,112 @@ export function watchedLocations(dirs: GitDirs): { files: string[]; trees: strin
   return { files: [...files].sort(), trees: [...new Set(trees)].sort() };
 }
 
-/** Every regular file under `dir`, recursively. A missing dir has none. */
+/**
+ * What `lstat` says about one path. `lstat` does not follow the final component.
+ * An intermediate component that is a link is NOT visible here — walk those
+ * with {@link linkAboveWatched}. Inodes are bigint: a win32 `ino` does not fit
+ * in a Number (measured above 2^53).
+ */
+export interface PathIdentity {
+  kind: "absent" | "file" | "dir" | "symlink" | "other";
+  mode: number;
+  nlink: number;
+  ino: bigint | null;
+  target: string | null;
+}
+
+export function identify(p: string): PathIdentity {
+  try {
+    const st = lstatSync(p, { bigint: true });
+    const base = { mode: Number(st.mode & 0o777n), nlink: Number(st.nlink), ino: st.ino, target: null as string | null };
+    if (st.isSymbolicLink()) return { ...base, kind: "symlink", target: readlinkSync(p) };
+    if (st.isFile()) return { ...base, kind: "file" };
+    if (st.isDirectory()) return { ...base, kind: "dir" };
+    return { ...base, kind: "other" };
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code === "ENOENT" || code === "ENOTDIR") {
+      return { kind: "absent", mode: 0, nlink: 0, ino: null, target: null };
+    }
+    throw err;
+  }
+}
+
+/**
+ * The first symlink strictly between `floor` and `target`, not including either
+ * endpoint. `lstat(target)` alone cannot see this: it only checks the final component.
+ */
+export function linkAncestor(floor: string, target: string): string | null {
+  const rel = relative(floor, target);
+  if (rel === "" || rel.startsWith("..") || isAbsolute(rel)) return null;
+  const parts = rel.split(/[\\/]/).filter((p) => p !== "");
+  let cur = floor;
+  for (let i = 0; i < parts.length - 1; i += 1) {
+    cur = join(cur, parts[i]!);
+    if (identify(cur).kind === "symlink") return cur;
+  }
+  return null;
+}
+
+/** A link at an ancestor of `target`, from the repo root or from either git dir. */
+export function linkAboveWatched(repoRoot: string, dirs: GitDirs, target: string): string | null {
+  const floors = [repoRoot, dirname(dirs.gitDir), dirname(dirs.commonDir)];
+  for (const floor of floors) {
+    const hit = linkAncestor(floor, target);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+/** `.git` itself replaced by a link. Checked before any git call at preflight. */
+export function dotGitLink(repoRoot: string): string | null {
+  const p = join(repoRoot, ".git");
+  return identify(p).kind === "symlink" ? p : null;
+}
+
+/**
+ * Directory entries under `dir`. A symlink is listed and not entered.
+ * A missing dir, or a dir that is itself a link, contributes nothing: the
+ * caller decides what a link at the root means, and this function does not follow it.
+ */
 function listTree(dir: string): string[] {
-  if (!existsSync(dir)) return [];
+  if (identify(dir).kind !== "dir") return [];
   const out: string[] = [];
   const walk = (d: string): void => {
     for (const entry of readdirSync(d, { withFileTypes: true })) {
       const p = join(d, entry.name);
+      if (entry.isSymbolicLink()) {
+        out.push(p);
+        continue;
+      }
       if (entry.isDirectory()) walk(p);
       else out.push(p);
     }
   };
-  if (statSync(dir).isDirectory()) walk(dir);
-  else out.push(dir);
+  walk(dir);
   return out;
+}
+
+/**
+ * Links already present at repository watched paths. Machine-config paths are
+ * not this function's: a dotfiles link at base is recorded, not refused (R35).
+ */
+export function repositoryLinksAtBase(repoRoot: string, dirs: GitDirs): string[] {
+  const found: string[] = [];
+  const note = (p: string): void => {
+    const anc = linkAboveWatched(repoRoot, dirs, p);
+    if (anc) found.push(anc);
+    if (identify(p).kind === "symlink") found.push(p);
+  };
+  const { files, trees } = watchedLocations(dirs);
+  for (const f of files) note(f);
+  for (const t of trees) {
+    note(t);
+    if (identify(t).kind === "dir") {
+      for (const entry of listTree(t)) if (identify(entry).kind === "symlink") found.push(entry);
+    }
+  }
+  return [...new Set(found)];
 }
 
 const hashOf = (bytes: Buffer | null): string =>
@@ -123,6 +213,11 @@ export interface ConfigVerdict {
   changes: ConfigChange[];
   /** Files the restore could not put back, with why. */
   unrestored: string[];
+  /**
+   * Set when a link replaced an ancestor of a watched path. Nothing beneath it
+   * was restored, and the runtime must not spawn git — including rollback.
+   */
+  ancestorLink: string | null;
   message: string;
 }
 
@@ -138,40 +233,146 @@ export const CONFIG_WATCH_LIMIT =
  * safe moment to have looked is also the moment to put things back: between
  * the two, nothing may run git.
  */
-/** A watched file's content AND mode — a hook is enabled by its executable bit as much as by its bytes. */
+/**
+ * A watched file's content AND mode — a hook is enabled by its executable bit
+ * as much as by its bytes. `nlink` and `ino` are for the record and for seeing
+ * a hard link. They never select an in-place write (R36): a restore always
+ * creates a new file and renames it over the entry.
+ */
 interface FileState {
-  bytes: Buffer;
+  kind: "file" | "symlink";
+  bytes: Buffer | null;
   mode: number;
+  nlink: number;
+  ino: bigint | null;
+  target: string | null;
 }
 
-const readState = (p: string): FileState | null =>
-  existsSync(p) && !statSync(p).isDirectory() ? { bytes: readFileSync(p), mode: statSync(p).mode & 0o777 } : null;
+/** Read a path only when `lstat` says it is a regular file. A symlink is recorded, not followed. */
+const readState = (p: string): FileState | null => {
+  const id = identify(p);
+  if (id.kind === "symlink") {
+    return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, target: id.target };
+  }
+  if (id.kind !== "file") return null;
+  return { kind: "file", bytes: readFileSync(p), mode: id.mode, nlink: id.nlink, ino: id.ino, target: null };
+};
 
-const sameState = (a: FileState | null, b: FileState | null): boolean =>
-  a === null || b === null ? a === b : a.mode === b.mode && a.bytes.equals(b.bytes);
-
-const stateHash = (s: FileState | null): string =>
-  s === null ? "absent" : `${hashOf(s.bytes)}/${s.mode.toString(8)}`;
+/** A change, including a hard link whose bytes still match (nlink or inode moved). */
+const changed = (a: FileState | null, b: FileState | null): boolean => {
+  if (a === null || b === null) return a !== b;
+  if (a.kind !== b.kind) return true;
+  if (a.kind === "symlink" || b.kind === "symlink") return a.target !== b.target;
+  return a.mode !== b.mode || a.nlink !== b.nlink || a.ino !== b.ino || !a.bytes!.equals(b.bytes!);
+};
 
 /**
- * Put `bytes` back into `path`. An EXISTING file is rewritten in place — open
- * `r+`, truncate, write — not recreated: on Windows a hidden file cannot be
- * opened for create-and-truncate (`EPERM`), and Git for Windows marks a linked
- * worktree's `.git` pointer hidden. `writeFileSync` there fails on exactly the
- * file the redirection probe targets (found by running it, not by reading).
+ * What "put back" is allowed to claim. The new file's inode will not match the
+ * snapshot — that is the point of writing a new file — so inode is not required.
+ * Type, bytes, mode and nlink are.
  */
-function writeBack(path: string, bytes: Buffer): void {
-  if (!existsSync(path)) {
-    mkdirSync(dirname(path), { recursive: true });
-    writeFileSync(path, bytes);
-    return;
+const agrees = (snapshot: FileState, now: FileState | null): boolean => {
+  if (now === null || snapshot.kind !== now.kind) return false;
+  if (snapshot.kind === "symlink") return snapshot.target === now.target;
+  return now.mode === snapshot.mode && now.nlink === snapshot.nlink && now.bytes!.equals(snapshot.bytes!);
+};
+
+const stateHash = (s: FileState | null): string => {
+  if (s === null) return "absent";
+  if (s.kind === "symlink") return `symlink:${s.target}`;
+  return `${hashOf(s.bytes)}/${s.mode.toString(8)}/nlink:${s.nlink}`;
+};
+
+class AncestorLinkError extends Error {
+  constructor(readonly ancestor: string) {
+    super(ancestor);
+    this.name = "AncestorLinkError";
   }
-  const fd = openSync(path, "r+");
+}
+
+/**
+ * Remove a symlink or directory junction without following it and without a
+ * recursive remove. A non-recursive `rmdir` on a win32 junction removes the
+ * junction and leaves the target (measured in scratch before this was used).
+ * A file symlink is not a directory; `rmdir` fails and `unlink` removes the link.
+ */
+function removeLink(path: string): void {
   try {
-    ftruncateSync(fd, 0);
-    writeSync(fd, bytes, 0, bytes.length, 0);
-  } finally {
-    closeSync(fd);
+    rmdirSync(path);
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code === "ENOTDIR" || code === "ENOENT" || code === "EINVAL" || code === "EPERM") {
+      unlinkSync(path);
+      return;
+    }
+    throw err;
+  }
+}
+
+function assertNoAncestor(repoRoot: string, dirs: GitDirs, target: string): void {
+  const hit = linkAboveWatched(repoRoot, dirs, target);
+  if (hit) throw new AncestorLinkError(hit);
+}
+
+/** Create `dir` one level at a time. `mkdir` recursive is not used: each new level is checked first. */
+function ensureRealDir(repoRoot: string, dirs: GitDirs, dir: string): void {
+  assertNoAncestor(repoRoot, dirs, dir);
+  const id = identify(dir);
+  if (id.kind === "dir") return;
+  if (id.kind === "symlink") {
+    assertNoAncestor(repoRoot, dirs, dir);
+    removeLink(dir);
+  } else if (id.kind === "file" || id.kind === "other") {
+    throw new Error(`${dir} is a ${id.kind}; refusing to replace it with a directory`);
+  }
+  const parent = dirname(dir);
+  if (parent !== dir) ensureRealDir(repoRoot, dirs, parent);
+  assertNoAncestor(repoRoot, dirs, dir);
+  if (identify(dir).kind === "absent") mkdirSync(dir);
+}
+
+/**
+ * Write `bytes` as a NEW file in the same directory, then rename it over `path`.
+ * No restore path opens an existing watched file for writing (R36). A hard link
+ * therefore cannot carry the write: rename replaces the directory entry.
+ */
+function restoreNewFile(repoRoot: string, dirs: GitDirs, path: string, bytes: Buffer, mode: number): void {
+  assertNoAncestor(repoRoot, dirs, path);
+  ensureRealDir(repoRoot, dirs, dirname(path));
+  const tmp = join(dirname(path), `.a2-restore-${process.pid}-${randomBytes(4).toString("hex")}`);
+  assertNoAncestor(repoRoot, dirs, tmp);
+  writeFileSync(tmp, bytes, { flag: "wx" });
+  try {
+    assertNoAncestor(repoRoot, dirs, path);
+    const cur = identify(path);
+    if (cur.kind === "symlink") {
+      assertNoAncestor(repoRoot, dirs, path);
+      removeLink(path);
+    }
+    assertNoAncestor(repoRoot, dirs, path);
+    assertNoAncestor(repoRoot, dirs, tmp);
+    try {
+      renameSync(tmp, path);
+    } catch {
+      assertNoAncestor(repoRoot, dirs, path);
+      const again = identify(path);
+      if (again.kind === "symlink") removeLink(path);
+      else if (again.kind === "file") unlinkSync(path);
+      assertNoAncestor(repoRoot, dirs, tmp);
+      renameSync(tmp, path);
+    }
+    assertNoAncestor(repoRoot, dirs, path);
+    const placed = identify(path);
+    if (placed.kind !== "file") throw new Error(`restore of ${path} left a ${placed.kind}`);
+    chmodSync(path, mode);
+    if (identify(path).kind !== "file") throw new Error(`chmod saw ${path} change type`);
+  } catch (err) {
+    try {
+      if (identify(tmp).kind === "file") unlinkSync(tmp);
+    } catch {
+      // the temp file was already renamed
+    }
+    throw err;
   }
 }
 
@@ -179,15 +380,25 @@ export class ConfigWatch {
   private snapshot: Map<string, FileState | null> | null = null;
   private stage = "";
   readonly dirs: GitDirs;
+  /** The work tree. Ancestor walks start here, not at `gitDir`'s parent: a linked worktree's git dir lives elsewhere. */
+  readonly repoRoot: string;
 
-  constructor(dirs: GitDirs) {
+  constructor(dirs: GitDirs, repoRoot?: string) {
     this.dirs = dirs;
+    this.repoRoot = repoRoot ?? resolve(dirs.gitDir, "..");
   }
 
   private currentFiles(): string[] {
     const { files, trees } = watchedLocations(this.dirs);
     const all = new Set<string>(files);
-    for (const t of trees) for (const f of listTree(t)) all.add(f);
+    for (const t of trees) {
+      // A link at the tree root is the change. Do not list what it points at.
+      if (identify(t).kind === "symlink") {
+        all.add(t);
+        continue;
+      }
+      for (const f of listTree(t)) all.add(f);
+    }
     return [...all].sort();
   }
 
@@ -218,30 +429,76 @@ export class ConfigWatch {
     }
     this.snapshot = null;
 
-    const names = new Set<string>([...before.keys(), ...this.currentFiles()]);
     const changes: ConfigChange[] = [];
     const unrestored: string[] = [];
+    let ancestorLink: string | null = null;
+
+    const blocked = (ancestor: string): void => {
+      ancestorLink = ancestor;
+    };
+
+    // A junction at a watched tree root is route (a): remove the link, then
+    // recreate the directory, and only then restore the files that were inside.
+    // Doing the file writes first would see the junction as an ancestor of those
+    // files and refuse the recreate. An ancestor ABOVE the tree root (`.git`
+    // itself) is route (b): do not touch anything beneath it.
+    for (const tree of watchedLocations(this.dirs).trees) {
+      if (ancestorLink) break;
+      try {
+        assertNoAncestor(this.repoRoot, this.dirs, tree);
+        if (identify(tree).kind !== "symlink") continue;
+        assertNoAncestor(this.repoRoot, this.dirs, tree);
+        removeLink(tree);
+        assertNoAncestor(this.repoRoot, this.dirs, tree);
+        if (identify(tree).kind === "absent") mkdirSync(tree);
+      } catch (err) {
+        if (err instanceof AncestorLinkError) blocked(err.ancestor);
+        else unrestored.push(`${tree} (${(err as Error).message})`);
+      }
+    }
+
+    // After a tree-root junction is gone. Not called when an ancestor link was
+    // found: listing would lstat through that link.
+    const names = new Set<string>(ancestorLink ? [...before.keys()] : [...before.keys(), ...this.currentFiles()]);
 
     for (const path of [...names].sort()) {
-      const b = before.has(path) ? before.get(path)! : null;
-      const a = readState(path);
-      if (sameState(b, a)) continue;
-      changes.push({
-        path,
-        kind: b === null ? "created" : a === null ? "deleted" : "modified",
-        before: stateHash(b),
-        after: stateHash(a),
-      });
+      if (ancestorLink) break;
+      let b: FileState | null = null;
+      let a: FileState | null = null;
       try {
-        if (b === null) rmSync(path, { force: true });
-        else {
-          writeBack(path, b.bytes);
-          chmodSync(path, b.mode);
+        assertNoAncestor(this.repoRoot, this.dirs, path);
+        b = before.has(path) ? before.get(path)! : null;
+        a = readState(path);
+        if (!changed(b, a)) continue;
+        changes.push({
+          path,
+          kind: b === null ? "created" : a === null ? "deleted" : "modified",
+          before: stateHash(b),
+          after: stateHash(a),
+        });
+        if (b === null) {
+          assertNoAncestor(this.repoRoot, this.dirs, path);
+          const cur = identify(path);
+          if (cur.kind === "symlink") removeLink(path);
+          else if (cur.kind === "file") unlinkSync(path);
+          else if (cur.kind !== "absent") {
+            unrestored.push(`${path} (a ${cur.kind} was created; not removed recursively)`);
+          }
+        } else if (b.kind === "file" && b.bytes !== null) {
+          restoreNewFile(this.repoRoot, this.dirs, path, b.bytes, b.mode);
+        } else {
+          unrestored.push(`${path} (snapshot was ${b.kind}; not followed)`);
         }
         const now = readState(path);
-        if (!sameState(now, b)) unrestored.push(`${path} (read back ${stateHash(now)}, expected ${stateHash(b)})`);
+        if (b !== null && !agrees(b, now)) {
+          unrestored.push(`${path} (read back ${stateHash(now)}, expected ${stateHash(b)})`);
+        }
+        if (b === null && readState(path) !== null && identify(path).kind === "symlink") {
+          unrestored.push(`${path} (the link is still there)`);
+        }
       } catch (err) {
-        unrestored.push(`${path} (${(err as Error).message})`);
+        if (err instanceof AncestorLinkError) blocked(err.ancestor);
+        else unrestored.push(`${path} (${(err as Error).message})`);
       }
     }
 
@@ -250,19 +507,28 @@ export class ConfigWatch {
       return r.startsWith("..") ? p : `<common>/${r.replace(/\\/g, "/")}`;
     };
     const scale = `examined ${names.size} file(s) around the ${this.stage} stage`;
-    const ok = changes.length === 0;
-    const message = ok
-      ? `no repository config or hook changed (${scale}). ${CONFIG_WATCH_LIMIT}`
-      : `${changes.length} repository config/hook file(s) changed during the ${this.stage} stage: ` +
-        `${changes.map((c) => `${rel(c.path)} ${c.kind} (${c.before} → ${c.after})`).join("; ")}. ` +
-        `A role may not change what git executes: a hook or a program-valued config key runs inside the ` +
-        `runtime's own git calls. ` +
-        (unrestored.length === 0
+    const ok = changes.length === 0 && ancestorLink === null;
+    const restored =
+      ancestorLink !== null
+        ? `No restore was claimed beneath the ancestor link ${ancestorLink}. `
+        : unrestored.length === 0 && changes.length > 0
           ? `Every file was put back by bytes before any git call read the repository. `
-          : `${unrestored.length} FILE(S) COULD NOT BE PUT BACK: ${unrestored.join("; ")}. Recover by hand before rerunning. `) +
-        `${scale}. ${CONFIG_WATCH_LIMIT}`;
+          : unrestored.length > 0
+            ? `${unrestored.length} FILE(S) COULD NOT BE PUT BACK: ${unrestored.join("; ")}. Recover by hand before rerunning. `
+            : "";
+    const message =
+      ancestorLink !== null
+        ? `ancestor link at ${ancestorLink} during the ${this.stage} stage. ${restored}${scale}. ${CONFIG_WATCH_LIMIT}`
+        : ok
+          ? `no repository config or hook changed (${scale}). ${CONFIG_WATCH_LIMIT}`
+          : `${changes.length} repository config/hook file(s) changed during the ${this.stage} stage: ` +
+            `${changes.map((c) => `${rel(c.path)} ${c.kind} (${c.before} → ${c.after})`).join("; ")}. ` +
+            `A role may not change what git executes: a hook or a program-valued config key runs inside the ` +
+            `runtime's own git calls. ` +
+            restored +
+            `${scale}. ${CONFIG_WATCH_LIMIT}`;
 
-    return { ok, stage: this.stage, examined: names.size, changes, unrestored, message };
+    return { ok, stage: this.stage, examined: names.size, changes, unrestored, ancestorLink, message };
   }
 }
 
@@ -334,9 +600,20 @@ export function gitExecPath(repoRoot: string): string | null {
  * a FINDING, with the path and both hashes. It fails nothing and restores
  * nothing: a role that wrote `~/.gitconfig` has changed git for every session
  * on the machine, and the runtime must not "restore" a person's own file (R8).
+ *
+ * A link is part of the finding (R39). After the role runs, a path whose type
+ * or link target — or any ancestor's — differs from base is reported as a type
+ * change and is not read through. A link that was already there at base is
+ * read the same way it was read then.
  */
+interface MachineSnap {
+  /** Top-down components from the filesystem root through the path, each lstat'd without continuing past a new link. */
+  chain: Array<{ path: string; kind: PathIdentity["kind"]; target: string | null }>;
+  hash: string;
+}
+
 export class MachineConfigWatch {
-  private snapshot: Map<string, string> | null = null;
+  private snapshot: Map<string, MachineSnap> | null = null;
   private stage = "";
   readonly paths: readonly MachineConfigPath[];
 
@@ -344,13 +621,63 @@ export class MachineConfigWatch {
     this.paths = paths;
   }
 
-  private hashNow(p: string): string {
-    return existsSync(p) && statSync(p).isFile() ? hashOf(readFileSync(p)) : "absent";
+  /** Links present at base, so the record can name them without refusing the loop (R35). */
+  baseNotes(): string[] {
+    const notes: string[] = [];
+    for (const p of this.paths) {
+      const id = identify(p.path);
+      if (id.kind === "symlink") {
+        notes.push(
+          `machine config ${p.scope} ${p.path} is a link at base, target ${id.target}; read through that target, not refused.`,
+        );
+      }
+    }
+    return notes;
+  }
+
+  private chainOf(p: string, stopOnLink: boolean): MachineSnap["chain"] {
+    const abs = resolve(p);
+    const parts = abs.split(/[\\/]/).filter((s) => s !== "");
+    const chain: MachineSnap["chain"] = [];
+    let cur = abs.startsWith("/") && parts[0] !== "" ? "" : parts.length > 0 && /^[A-Za-z]:$/.test(parts[0]!) ? "" : dirname(abs);
+    // Walk from the root prefix down, so a junction in the middle stops the walk
+    // before the final component is lstat'd through it.
+    const prefix = /^[A-Za-z]:/.test(abs) ? abs.slice(0, 2) : abs.startsWith("/") ? "/" : "";
+    cur = prefix === "/" ? "/" : prefix;
+    const rest = prefix === "/" ? parts : parts.slice(1);
+    if (prefix !== "/" && prefix !== "") {
+      const rootId = identify(prefix + "\\");
+      chain.push({ path: prefix + "\\", kind: rootId.kind === "absent" ? "dir" : rootId.kind, target: rootId.target });
+    }
+    for (const part of rest) {
+      cur = cur === "/" ? `/${part}` : cur === "" ? part : join(cur, part);
+      const id = identify(cur);
+      chain.push({ path: cur, kind: id.kind, target: id.target });
+      if (stopOnLink && id.kind === "symlink") break;
+    }
+    return chain;
+  }
+
+  private snap(p: string, allowReadThrough: boolean): MachineSnap {
+    const chain = this.chainOf(p, !allowReadThrough);
+    const last = chain[chain.length - 1];
+    const reached = last !== undefined && resolve(last.path) === resolve(p);
+    if (!reached || last === undefined) return { chain, hash: "unread" };
+    if (last.kind === "file") return { chain, hash: hashOf(readFileSync(p)) };
+    if (last.kind === "symlink" && allowReadThrough) {
+      try {
+        return { chain, hash: hashOf(readFileSync(p)) };
+      } catch {
+        return { chain, hash: "unreadable" };
+      }
+    }
+    if (last.kind === "absent") return { chain, hash: "absent" };
+    return { chain, hash: "unread" };
   }
 
   begin(stage: string): void {
     this.stage = stage;
-    this.snapshot = new Map(this.paths.map((p) => [p.path, this.hashNow(p.path)]));
+    this.snapshot = new Map(this.paths.map((p) => [p.path, this.snap(p.path, true)]));
   }
 
   compare(): MachineConfigFinding[] {
@@ -359,9 +686,26 @@ export class MachineConfigWatch {
     this.snapshot = null;
     const out: MachineConfigFinding[] = [];
     for (const p of this.paths) {
-      const b = before.get(p.path) ?? "absent";
-      const a = this.hashNow(p.path);
-      if (a !== b) out.push({ stage: this.stage, scope: p.scope, path: p.path, before: b, after: a });
+      const b = before.get(p.path) ?? { chain: [], hash: "absent" };
+      const now = this.chainOf(p.path, true);
+      const typeDiff = now.find((c, i) => {
+        const prev = b.chain[i];
+        return prev === undefined || prev.kind !== c.kind || prev.target !== c.target;
+      });
+      if (typeDiff) {
+        out.push({
+          stage: this.stage,
+          scope: p.scope,
+          path: p.path,
+          before: `type:${b.chain[b.chain.length - 1]?.kind ?? "absent"}`,
+          after: `type change: ${typeDiff.path} is a ${typeDiff.kind}${typeDiff.target ? ` target ${typeDiff.target}` : ""}; not read through`,
+        });
+        continue;
+      }
+      const a = this.snap(p.path, true);
+      if (a.hash !== b.hash) {
+        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: b.hash, after: a.hash });
+      }
     }
     return out;
   }
