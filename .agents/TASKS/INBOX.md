@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 92 by open-brain v0.44.1 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 93 by open-brain v0.44.1 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -54,6 +54,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-172** The main tree serves every session and nothing says when it is behind master: the greeting must print the SERVING build's distance from origin/master, and one refusing command must update, rebuild and verify it
 - [ ] **T-173** Per-stage effort chosen by a deterministic policy, with Jev in shadow. Sequenced AFTER candidate A (it needs ProcessRole)
 - [ ] **T-175** `state import` seeds SIA's own history (V-001..V-005, G-001..G-006) into EVERY project's record. Delete the seeds from the importer
+- [ ] **T-176** gitnexus-index measures distance in one direction only: an index on a different line of history reads as current
 
 ## P2
 
