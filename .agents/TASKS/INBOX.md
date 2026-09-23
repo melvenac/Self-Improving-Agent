@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 79 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 83 by open-brain v0.44.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -51,6 +51,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-168** 'Run the full suite alone' must become a check: assert peer idleness before the run and refuse or flag when a peer is busy
 - [ ] **T-169** At Loop 15 close, rewrite PRD.md and README.md against what ships, take PRD.md off retirements.json's historical list, and retire the maturity lifecycle
 - [ ] **T-170** Memory is LOOKUP by default and INJECTION only on a deterministic match against the act; fix the WRITE side first, so every stored lesson carries the key (command pattern, path or error string) that would have caught the mistake
+- [ ] **T-172** The main tree serves every session and nothing says when it is behind master: the greeting must print the SERVING build's distance from origin/master, and one refusing command must update, rebuild and verify it
 
 ## P2
 
@@ -62,6 +63,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-160** Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [ ] **T-162** The element table's growth rule: the store cannot be consulted for act shapes the table does not name
 - [ ] **T-165** Evaluate an alternate harness/model as the DEVELOPER seat via T-155's shadow merge gate — the driver is a SECOND METER, not cost; Aaron's named candidate is DeepSeek v4.1 Flash
+- [ ] **T-171** update_task REPLACES a task's note, and neither the dry run nor the write says so: an op written to append a correction silently erases the whole note
 
 ## Done (last 3 sessions)
 
