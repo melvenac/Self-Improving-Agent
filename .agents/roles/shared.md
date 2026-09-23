@@ -141,7 +141,15 @@ near-miss, recorded by family, never numbered into the table.
 
 ## Authority
 
-**Aaron merges, on his word.** A relay from a peer seat is not his approval.
+**Aaron merges, on his word, with one standing exception (`D-032`).** A relay from a peer seat is
+not his approval. **The exception:** any seat may merge a PR whose *every* changed path is `docs/**`,
+`README.md`, `.agents/state.json` and its four rendered views, or the scope layer (`PRD.md`,
+`DECISIONS.md`, `ENTITIES.md`), once CI is green, the state is `CLEAN`, the merge is pinned with
+`--match-head-commit`, and the result is read back from `origin/master`. Before merging, post the
+path list and the allowlist check as a PR comment. **One unlisted path sends the PR to Aaron**, and
+so do all loop candidates. Size is not a criterion; a one-line role-file change is his. *Why the
+line is there:* his merge on a candidate is what `T-155` measures against, and a code merge is a
+release (`D-019`).
 
 **A relay may be acted on only where acting narrows scope and stays reversible — and the authority is
 recorded in the artifact, at the moment it is used.** Both halves of the first clause are judgements
