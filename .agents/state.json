@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 86,
+  "revision": 87,
   "project": {
     "name": "self-improving-agent"
   },
@@ -538,6 +538,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Session 78, from rulings-4 (R22 narrowed to option (b) on the developer's costing). Node has no job-object API. taskkill /T walks from a LIVE root, so after a role exits normally its orphans are unreachable, and descendant PID lists (WMI/CIM) are racy against PID reuse and were ruled out. Candidate A therefore kills the process group on POSIX on every exit path, and on win32 states in every iteration record that normal-exit tree-kill is unavailable. THE FIX, the developer's estimate: a small C# launcher compiled at runtime with PowerShell Add-Type. It calls CreateJobObject with KILL_ON_JOB_CLOSE, creates the role process SUSPENDED, assigns it to the job, resumes it, relays the exit code and stdio (the prompt on stdin, the tails of stdout and stderr), and calls TerminateJobObject on the runtime's command. About 150-250 lines, plus 0.5-1.5s of PowerShell startup per stage. MUST FAIL CLOSED: Add-Type unavailable (constrained language mode) or AV interference refuses the loop and never falls back to an unkilled tree. PowerShell is a shell binary, so it may interpret only the runtime's fixed script and must pass the role's argv as data, never through a command line. CI is Linux, so only a Windows machine tests it; the row needs a Windows runner or states that limit. Residual it closes: R20's compare-then-call race on the generated config file, on the normal-exit path on Windows."
+    },
+    {
+      "id": "T-175",
+      "title": "`state import` seeds SIA's own history (V-001..V-005, G-001..G-006) into EVERY project's record. Delete the seeds from the importer",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 78,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Session 78. Found by the A2A-Hub planner seat during a `state import --draft` dry run on ~/Projects/A2A-Hub (write-up: A2A-Hub docs/loops/sia-migration-assessment.md), and VERIFIED by the SIA planner reading open-brain/src/pipelines/state-import/index.ts:353-378 at f673d5e: mk('V-001'..'V-005') with since_session 54, and G-001..G-006, which are SIA's Loop 1-4 history, are hardcoded into every import. They are false for any project but SIA, and verified[] has no delete op, so an imported project carries them permanently. SIA's own record already exists and the importer refuses a second run (V-009), so the seeds have no remaining use. FIX: DELETE them, and do not gate them behind a flag. Update the report's '## Seeds' line (index.ts:537) and any test that pins the seeded counts. This bears directly on the PRD's stranger-install goal (G-030, T-154): every stranger's first import would be seeded with SIA's history. WORKAROUND, given to the A2A-Hub seat so it need not wait: remove the eleven entries from the DRAFT with a parser (not a text edit), re-validate with parseState, and confirm first that --commit consumes the edited draft file. Sequenced after Loop 15 candidate A; it is not to interrupt the developer mid-candidate. ALSO NOTED, not a defect: the importer maps only ## P0-P3 sections (SECTION_RE, index.ts:96). Priority is a judgement the importer should not guess, so a project grouped by roadmap version restructures before importing."
     }
   ],
   "verified": [
