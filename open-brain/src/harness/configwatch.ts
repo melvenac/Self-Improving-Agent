@@ -199,6 +199,75 @@ export function repositoryLinksAtBase(repoRoot: string, dirs: GitDirs): string[]
 const hashOf = (bytes: Buffer | null): string =>
   bytes === null ? "absent" : createHash("sha256").update(bytes).digest("hex").slice(0, 16);
 
+/** One component of a path's resolution. `nlink` is compared on the final file only (R49). */
+interface ResolutionComp {
+  path: string;
+  kind: PathIdentity["kind"];
+  target: string | null;
+  dev: bigint | null;
+  ino: bigint | null;
+  nlink: number;
+}
+
+function resolutionComp(p: string): ResolutionComp {
+  const id = identify(p);
+  return { path: p, kind: id.kind, target: id.target, dev: id.dev, ino: id.ino, nlink: id.nlink };
+}
+
+/** The deepest floor that contains `file`, so a linked worktree's git dir still has a chain. */
+function repoFloor(repoRoot: string, dirs: GitDirs, file: string): string {
+  const floors = [repoRoot, dirname(dirs.gitDir), dirname(dirs.commonDir)];
+  const inside = floors.filter((f) => {
+    const rel = relative(f, file);
+    return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
+  });
+  inside.sort((a, b) => b.length - a.length);
+  return inside[0] ?? dirname(file);
+}
+
+/** From the floor exclusive, down to `file`, stopping at the first absence (R30, R49). */
+function recordRepoChain(floor: string, file: string): ResolutionComp[] {
+  const rel = relative(floor, file);
+  const segs = rel === "" || rel.startsWith("..") || isAbsolute(rel) ? [] : rel.split(/[\\/]/).filter((s) => s !== "");
+  const chain: ResolutionComp[] = [];
+  let cur = floor;
+  for (const seg of segs) {
+    cur = join(cur, seg);
+    const c = resolutionComp(cur);
+    chain.push(c);
+    if (c.kind === "absent") break;
+  }
+  return chain;
+}
+
+/**
+ * R49, repository side, separate from the machine-side check so each can be
+ * reverted on its own. Returns the first component whose type, dev, ino,
+ * readlink target, or (on the final file) nlink differs from the chain recorded
+ * when the window opened. No recorded chain means the path was absent then.
+ *
+ * LIMIT: the compare and the open are not atomic, the same class of race as
+ * R37. This does not close it.
+ */
+function repositoryResolutionDiff(floor: string, file: string, base: ResolutionComp[] | undefined): ResolutionComp | null {
+  const rel = relative(floor, file);
+  const segs = rel === "" || rel.startsWith("..") || isAbsolute(rel) ? [] : rel.split(/[\\/]/).filter((s) => s !== "");
+  let cur = floor;
+  for (let i = 0; i < segs.length; i++) {
+    cur = join(cur, segs[i]!);
+    const now = resolutionComp(cur);
+    const prev = base?.[i];
+    if (!prev) return now;
+    const final = i === segs.length - 1;
+    const nlinkOk = !final || prev.kind !== "file" || now.kind !== "file" || prev.nlink === now.nlink;
+    if (prev.kind !== now.kind || prev.target !== now.target || prev.dev !== now.dev || prev.ino !== now.ino || !nlinkOk) {
+      return now;
+    }
+    if (now.kind === "absent") return null;
+  }
+  return null;
+}
+
 export interface ConfigChange {
   path: string;
   kind: "created" | "deleted" | "modified";
@@ -404,6 +473,8 @@ function restoreNewFile(repoRoot: string, dirs: GitDirs, path: string, bytes: Bu
 
 export class ConfigWatch {
   private snapshot: Map<string, FileState | null> | null = null;
+  /** R49: resolution from the repo root, exclusive, recorded when the window opened. */
+  private resolutionBase: Map<string, ResolutionComp[]> | null = null;
   /** Kind of each watched tree root when the window opened. An absence stays an absence (R45). */
   private treeAtBase = new Map<string, PathIdentity["kind"]>();
   private stage = "";
@@ -435,8 +506,31 @@ export class ConfigWatch {
     this.stage = stage;
     this.treeAtBase = new Map(watchedLocations(this.dirs).trees.map((t) => [t, identify(t).kind]));
     const snap = new Map<string, FileState | null>();
-    for (const f of this.currentFiles()) snap.set(f, readState(f));
+    const chains = new Map<string, ResolutionComp[]>();
+    for (const f of this.currentFiles()) {
+      chains.set(f, recordRepoChain(repoFloor(this.repoRoot, this.dirs, f), f));
+      snap.set(f, readState(f));
+    }
+    this.resolutionBase = chains;
     this.snapshot = snap;
+  }
+
+  /**
+   * The after-preflight read (R49). A path whose resolution differs from the
+   * chain recorded in {@link begin}, including a path that was absent then, is
+   * reported from lstat and not opened.
+   */
+  private readForCompare(path: string, baseline: FileState | null, chains: Map<string, ResolutionComp[]> | null): FileState | null {
+    const diff = repositoryResolutionDiff(repoFloor(this.repoRoot, this.dirs, path), path, chains?.get(path));
+    if (diff) {
+      const id = identify(path);
+      if (id.kind === "symlink") {
+        return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, target: id.target, unreadIdentity: false };
+      }
+      if (id.kind !== "file") return null;
+      return fileState(id, null, true);
+    }
+    return readState(path, baseline);
   }
 
   get open(): boolean {
@@ -457,6 +551,8 @@ export class ConfigWatch {
       );
     }
     this.snapshot = null;
+    const chains = this.resolutionBase;
+    this.resolutionBase = null;
 
     const changes: ConfigChange[] = [];
     const unrestored: string[] = [];
@@ -508,7 +604,7 @@ export class ConfigWatch {
       try {
         assertNoAncestor(this.repoRoot, this.dirs, path);
         b = before.has(path) ? before.get(path)! : null;
-        a = readState(path, b);
+        a = this.readForCompare(path, b, chains);
         if (!changed(b, a)) continue;
         changes.push({
           path,
@@ -647,8 +743,13 @@ export function gitExecPath(repoRoot: string): string | null {
  * is read the same way it was read then.
  */
 interface MachineSnap {
-  /** Top-down components from the filesystem root through the path, each lstat'd without continuing past a new link. */
-  chain: Array<{ path: string; kind: PathIdentity["kind"]; target: string | null; dev: bigint | null; ino: bigint | null; nlink: number }>;
+  /**
+   * Components from the path's anchor (included) down to the file, through any
+   * link that was there when the chain was recorded. The anchor is HOME for
+   * `.gitconfig`, the XDG base for `git/config`, and the system config's
+   * directory for system config (R49).
+   */
+  chain: ResolutionComp[];
   hash: string;
 }
 
@@ -665,36 +766,99 @@ export class MachineConfigWatch {
   }
 
   /**
-   * A component is a link now and was not that link at base, or the reverse.
-   * Absent → file is not this: a new regular file is still hashed (R8).
+   * HOME (or USERPROFILE) for `.gitconfig`, the XDG base for `git/config`,
+   * and the system config's own directory. The anchor itself is part of the
+   * chain (R49), so replacing `~/.config` with a junction is visible.
    */
-  private linkChange(base: MachineSnap, now: MachineSnap["chain"]): MachineSnap["chain"][number] | undefined {
-    return now.find((c, i) => {
-      const prev = base.chain[i];
-      const prevLink = prev?.kind === "symlink";
-      const nowLink = c.kind === "symlink";
-      if (!prevLink && !nowLink) return false;
-      if (prev === undefined) return nowLink;
-      return prev.kind !== c.kind || prev.target !== c.target;
-    });
+  private anchorOf(file: string): string {
+    const spec = this.paths.find((p) => p.path === file);
+    if (spec?.scope === "xdg") return dirname(dirname(file));
+    return dirname(file);
   }
 
-  /** A regular file whose dev, ino or nlink moved. The bytes are not read (R43). */
-  private identityChange(base: MachineSnap, now: MachineSnap["chain"]): MachineSnap["chain"][number] | undefined {
-    return now.find((c, i) => {
+  /** Anchor included, then each component down to `file`. */
+  private componentPaths(file: string): string[] {
+    const anchor = this.anchorOf(file);
+    const rel = relative(anchor, file);
+    const segs = rel === "" || rel.startsWith("..") || isAbsolute(rel) ? [] : rel.split(/[\\/]/).filter((s) => s !== "");
+    const paths = [anchor];
+    let cur = anchor;
+    for (const seg of segs) {
+      cur = join(cur, seg);
+      paths.push(cur);
+    }
+    return paths;
+  }
+
+  /** The whole resolution, continuing through links, stopping at the first absence. */
+  private recordChain(file: string): ResolutionComp[] {
+    const chain: ResolutionComp[] = [];
+    for (const p of this.componentPaths(file)) {
+      const c = resolutionComp(p);
+      chain.push(c);
+      if (c.kind === "absent") break;
+    }
+    return chain;
+  }
+
+  /**
+   * R49, machine side, separate from {@link repositoryResolutionDiff}. The first
+   * component whose type, dev, ino, readlink target, or (on the final file)
+   * nlink differs from the preflight chain. The walk stops there, so a changed
+   * link is not followed. A path absent at preflight differs when it appears,
+   * and is not read.
+   *
+   * LIMIT: this compare and the later open are not atomic, the same class of
+   * race as R37. This does not close it.
+   */
+  private resolutionMismatch(base: MachineSnap, file: string): ResolutionComp | undefined {
+    const paths = this.componentPaths(file);
+    for (let i = 0; i < paths.length; i++) {
+      const now = resolutionComp(paths[i]!);
       const prev = base.chain[i];
-      if (!prev || prev.kind !== "file" || c.kind !== "file") return false;
-      return prev.dev !== c.dev || prev.ino !== c.ino || prev.nlink !== c.nlink;
-    });
+      if (!prev) return now;
+      const final = i === paths.length - 1;
+      const nlinkOk = !final || prev.kind !== "file" || now.kind !== "file" || prev.nlink === now.nlink;
+      if (prev.kind !== now.kind || prev.target !== now.target || prev.dev !== now.dev || prev.ino !== now.ino || !nlinkOk) {
+        return now;
+      }
+      if (now.kind === "absent") return undefined;
+    }
+    return undefined;
+  }
+
+  private mismatchFinding(base: MachineSnap, diff: ResolutionComp, p: MachineConfigPath): MachineConfigFinding {
+    const prev = base.chain.find((c) => c.path === diff.path);
+    const baseKind = prev?.kind ?? "absent";
+    if (diff.kind === "symlink" || prev?.kind === "symlink") {
+      const target = diff.target ? ` target ${diff.target}` : "";
+      const after =
+        baseKind === "absent"
+          ? `absent → ${diff.kind}${target}; not read through`
+          : `type change: ${diff.path} is a ${diff.kind}${target}; not read through`;
+      return {
+        stage: this.stage,
+        scope: p.scope,
+        path: p.path,
+        before: baseKind === "absent" ? "absent" : `type:${baseKind}`,
+        after,
+      };
+    }
+    return {
+      stage: this.stage,
+      scope: p.scope,
+      path: p.path,
+      before: baseKind === "absent" || base.hash === "absent" ? "absent" : base.hash,
+      after: `identity change: dev ${diff.dev} ino ${diff.ino} nlink ${diff.nlink}; not read`,
+    };
   }
 
   /** Links present at base, so the record can name them without refusing the loop (R35). */
   baseNotes(): string[] {
     const notes: string[] = [];
     for (const p of this.paths) {
-      // Each component, not only the final one (R46). lstat does not follow, so a
-      // junction at a parent is visible here; lstat of the final path is not.
-      for (const c of this.chainOf(p.path, true)) {
+      // Each component from the anchor, not only the final one (R46).
+      for (const c of this.recordChain(p.path)) {
         if (c.kind !== "symlink") continue;
         notes.push(
           `machine config ${p.scope} ${c.path} is a link at base, type ${c.kind}, readlink ${c.target}; read through that target, not refused.`,
@@ -704,43 +868,23 @@ export class MachineConfigWatch {
     return notes;
   }
 
-  private chainOf(p: string, stopOnLink: boolean): MachineSnap["chain"] {
-    const abs = resolve(p);
-    const parts = abs.split(/[\\/]/).filter((s) => s !== "");
-    const chain: MachineSnap["chain"] = [];
-    let cur = abs.startsWith("/") && parts[0] !== "" ? "" : parts.length > 0 && /^[A-Za-z]:$/.test(parts[0]!) ? "" : dirname(abs);
-    // Walk from the root prefix down, so a junction in the middle stops the walk
-    // before the final component is lstat'd through it.
-    const prefix = /^[A-Za-z]:/.test(abs) ? abs.slice(0, 2) : abs.startsWith("/") ? "/" : "";
-    cur = prefix === "/" ? "/" : prefix;
-    const rest = prefix === "/" ? parts : parts.slice(1);
-    if (prefix !== "/" && prefix !== "") {
-      const rootId = identify(prefix + "\\");
-      chain.push({ path: prefix + "\\", kind: rootId.kind === "absent" ? "dir" : rootId.kind, target: rootId.target, dev: rootId.dev, ino: rootId.ino, nlink: rootId.nlink });
-    }
-    for (const part of rest) {
-      cur = cur === "/" ? `/${part}` : cur === "" ? part : join(cur, part);
-      const id = identify(cur);
-      chain.push({ path: cur, kind: id.kind, target: id.target, dev: id.dev, ino: id.ino, nlink: id.nlink });
-      if (stopOnLink && id.kind === "symlink") break;
-    }
-    return chain;
-  }
-
   private snap(p: string, allowReadThrough: boolean): MachineSnap {
-    const chain = this.chainOf(p, !allowReadThrough);
+    const chain = this.recordChain(p);
     const last = chain[chain.length - 1];
     const reached = last !== undefined && resolve(last.path) === resolve(p);
     if (!reached || last === undefined) return { chain, hash: "unread" };
-    if (last.kind === "file") return { chain, hash: hashOf(readFileSync(p)) };
-    if (last.kind === "symlink" && allowReadThrough) {
+    if (last.kind === "absent") return { chain, hash: "absent" };
+    if (!allowReadThrough) return { chain, hash: "unread" };
+    // Bytes, only when the caller has already accepted the resolution (or this
+    // is the preflight capture). The gap between that accept and this open is
+    // the R37-class limit named on resolutionMismatch.
+    if (last.kind === "file" || last.kind === "symlink") {
       try {
         return { chain, hash: hashOf(readFileSync(p)) };
       } catch {
         return { chain, hash: "unreadable" };
       }
     }
-    if (last.kind === "absent") return { chain, hash: "absent" };
     return { chain, hash: "unread" };
   }
 
@@ -759,10 +903,9 @@ export class MachineConfigWatch {
     const start = new Map<string, MachineSnap>();
     for (const p of this.paths) {
       const base = this.loopBase!.get(p.path) ?? { chain: [], hash: "absent" };
-      const now = this.chainOf(p.path, true);
-      // A new link, or a hard link that was not at base, is not a stage baseline and is not read.
-      if (this.linkChange(base, now) || this.identityChange(base, now)) {
-        start.set(p.path, { chain: now, hash: "unread" });
+      // A resolution that differs from preflight is not a stage baseline and is not read.
+      if (this.resolutionMismatch(base, p.path)) {
+        start.set(p.path, { chain: [], hash: "unread" });
       } else {
         start.set(p.path, this.snap(p.path, true));
       }
@@ -779,33 +922,9 @@ export class MachineConfigWatch {
     const out: MachineConfigFinding[] = [];
     for (const p of this.paths) {
       const base = this.loopBase.get(p.path) ?? { chain: [], hash: "absent" };
-      const now = this.chainOf(p.path, true);
-      const typeDiff = this.linkChange(base, now);
-      const idDiff = typeDiff ? undefined : this.identityChange(base, now);
-      if (idDiff) {
-        out.push({
-          stage: this.stage,
-          scope: p.scope,
-          path: p.path,
-          before: base.hash,
-          after: `identity change: dev ${idDiff.dev} ino ${idDiff.ino} nlink ${idDiff.nlink}; not read`,
-        });
-        continue;
-      }
-      if (typeDiff) {
-        const baseKind = base.chain[base.chain.length - 1]?.kind ?? "absent";
-        const target = typeDiff.target ? ` target ${typeDiff.target}` : "";
-        const after =
-          baseKind === "absent"
-            ? `absent → ${typeDiff.kind}${target}; not read through`
-            : `type change: ${typeDiff.path} is a ${typeDiff.kind}${target}; not read through`;
-        out.push({
-          stage: this.stage,
-          scope: p.scope,
-          path: p.path,
-          before: baseKind === "absent" ? "absent" : `type:${baseKind}`,
-          after,
-        });
+      const diff = this.resolutionMismatch(base, p.path);
+      if (diff) {
+        out.push(this.mismatchFinding(base, diff, p));
         continue;
       }
       const opened = start.get(p.path);

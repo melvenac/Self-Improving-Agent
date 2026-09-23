@@ -552,4 +552,89 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(readFileSync(victim)).toEqual(bytes);
     expect(lstatSync(cfg).isSymbolicLink()).toBe(false);
   });
+
+  it("R49: a machine-config file absent at base, later a hard link, is reported from lstat and not read", () => {
+    const xdg = join(tmp.dir, "xdg-r49-absent");
+    const gitDir = join(xdg, "git");
+    mkdirSync(gitDir, { recursive: true });
+    const cfg = join(gitDir, "config");
+    const watch = new MachineConfigWatch([{ scope: "xdg", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const victim = join(tmp.dir, "r49-absent-victim");
+    const bytes = Buffer.from("[user]\n\tname = VICTIM-R49-ABSENT\n");
+    writeFileSync(victim, bytes);
+    const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    linkSync(victim, cfg);
+    expect(lstatSync(cfg).nlink).toBe(2);
+    const found = watch.compare();
+    const blob = JSON.stringify(found);
+    expect(blob, blob).not.toContain(victimHash);
+    expect(found[0]?.path).toBe(cfg);
+    expect(found[0]?.after).toContain("not read");
+    expect(found[0]?.after).toContain("nlink 2");
+    expect(readFileSync(victim)).toEqual(bytes);
+  });
+
+  it("R49: a directory replaced beyond a machine-config link at base is not read", () => {
+    const xdg = join(tmp.dir, "xdg-r49-j");
+    const dot = join(tmp.dir, "r49-dot-j");
+    mkdirSync(dot);
+    writeFileSync(join(dot, "config"), "[user]\n\tname = base-j\n");
+    mkdirSync(xdg);
+    const gitDir = join(xdg, "git");
+    symlinkSync(dot, gitDir, "junction");
+    const watch = new MachineConfigWatch([{ scope: "xdg", path: join(gitDir, "config"), source: "test" }]);
+    watch.begin("developer");
+    const victim = join(tmp.dir, "r49-j-victim");
+    mkdirSync(victim);
+    const bytes = Buffer.from("[user]\n\tname = VICTIM-R49-J\n");
+    writeFileSync(join(victim, "config"), bytes);
+    const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    renameSync(dot, join(tmp.dir, "r49-dot-j-aside"));
+    symlinkSync(victim, dot, "junction");
+    const found = watch.compare();
+    const blob = JSON.stringify(found);
+    expect(blob, blob).not.toContain(victimHash);
+    expect(blob).toContain("not read");
+    expect(readFileSync(join(victim, "config"))).toEqual(bytes);
+  });
+
+  it("R49: a hard link beyond a machine-config link at base is not read", () => {
+    const xdg = join(tmp.dir, "xdg-r49-h");
+    const dot = join(tmp.dir, "r49-dot-h");
+    mkdirSync(dot);
+    const baseCfg = join(dot, "config");
+    writeFileSync(baseCfg, "[user]\n\tname = base-h\n");
+    mkdirSync(xdg);
+    const gitDir = join(xdg, "git");
+    symlinkSync(dot, gitDir, "junction");
+    const watch = new MachineConfigWatch([{ scope: "xdg", path: join(gitDir, "config"), source: "test" }]);
+    watch.begin("developer");
+    const victim = join(tmp.dir, "r49-h-victim");
+    const bytes = Buffer.from("[user]\n\tname = VICTIM-R49-H\n");
+    writeFileSync(victim, bytes);
+    const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    unlinkSync(baseCfg);
+    linkSync(victim, baseCfg);
+    expect(lstatSync(baseCfg).nlink).toBe(2);
+    const found = watch.compare();
+    const blob = JSON.stringify(found);
+    expect(blob, blob).not.toContain(victimHash);
+    expect(blob).toContain("not read");
+    expect(readFileSync(victim)).toEqual(bytes);
+  });
+
+  it("R49: a repository file absent at base is not read when it appears", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const watch = new ConfigWatch(dirs);
+    watch.begin("developer");
+    const hook = join(dirs.commonDir, "hooks", "post-commit");
+    const bytes = Buffer.from("#!/bin/sh\necho R49-REPO\n");
+    writeFileSync(hook, bytes);
+    const hash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    const v = watch.closeAndRestore();
+    const blob = JSON.stringify(v.changes) + v.message;
+    expect(blob, blob).not.toContain(hash);
+    expect(blob).toContain("not read");
+  });
 });
