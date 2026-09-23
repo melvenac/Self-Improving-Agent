@@ -410,7 +410,21 @@ The report states the observed outcome for each of the six cells. Design §2.3's
     repository's `show-ref` is **byte-identical** before and after the loop, read by the same
     expression for both.
   - The pointer change is **reported**, not silently followed.
-  - **Mutant M-R18** (pinning dropped) turns this row red.
+  - **R18's job is shown by the PAIR M-L2 ± M-R18, and the clause is met by the pair**
+    (`loop-15-slice-3-rulings-6.md` R26, master `a11916a`; amendment 4). This is the same shape as
+    layer 1's CA-4b-L1. M-R18 **alone** survives: layer 2 restores the pointer before any git call,
+    so R18 is defence in depth behind layer 2 (report A §2 CA-4h, §4). The row runs both:
+    - **M-L2** (window removed, pinning kept): the pointer rewrite is not restored, the runtime
+      stays in the **original** repository, and the other repository's `show-ref` is byte-identical
+      before and after. Report A measured this: the loop **completed**, with pinning keeping it home;
+    - **M-L2 + M-R18** (window and pinning both removed): the runtime **follows** the redirect, and
+      the row turns red. Report A measured this: `runtime-git-failed`.
+
+    The two runs are in one row, with the other repository and the record read by the same
+    expressions. **A2's report cites the clause as met by the pair**, not by M-R18 alone. If A2's
+    change to layer 2 makes the pair impossible to construct, the report records R18 as **redundant
+    by construction** and does not claim it protects anything. *(Superseded at this amendment: "Mutant
+    M-R18 (pinning dropped) turns this row red", which report A found not met as written.)*
 - **Fail:** any path resolved after a role has run; any runtime git call without the pinned dirs.
 
 **CA-4i — R20: the generated global-config file cannot be edited under the runtime.** The runtime
@@ -835,7 +849,7 @@ ASCII and UTF-16LE detectors were each validated on a known positive (`GIT_CONFI
 2. Rebuild before measuring anything from the built CLI.
 3. Run every row's control **before** its negative, in the same run and by the same expression.
 4. Mutants: M-L0, M-L1, M-L2, M-L2-order, the CA-4h resolve-late mutant (paths resolved after the
-   stage), M-R18 (pinning dropped), M-backstop (R14 removed), M-R22 (a PID-list or direct-child
+   stage), M-R18 (pinning dropped; scored as the pair M-L2 ± M-R18, R26), M-backstop (R14 removed), M-R22 (a PID-list or direct-child
    kill, on POSIX), a second git spawn site (R16's AST
    check must turn red), a checks spawn that inherits the environment (R15), the CA-5
    snapshot-timing mutant (if applicable), and the CA-10 mutants. All type-clean, and the type
