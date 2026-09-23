@@ -41,5 +41,24 @@ or process group, not a PID list. CA-6's tree-kill covered the timeout path only
 compare-then-call window open on exactly the path where no timeout fires. CA-6's heartbeat row runs
 on the normal-exit path as well.
 
+**R22 NARROWED ON WIN32, the same session: option (b), on the developer's costing.** Node has no
+job-object API. On Windows, `taskkill /T` walks the tree from a **live** root, so after a normal
+exit the role's orphans are unreachable, and a descendant PID list is both racy and ruled out. A true
+job object needs a separate launcher, roughly 150–250 lines of C# via PowerShell `Add-Type`, adding
+0.5–1.5s per stage, with its own failure modes. **Ruled:**
+- **POSIX:** the tree-kill holds on every exit path, as a process group with SIGKILL to the group
+  before any runtime git call.
+- **Win32 normal exit:** a **named limit, stated in every iteration record**: "normal-exit
+  tree-kill: unavailable on win32 (no job object); timeout path killed via `taskkill /T` while the
+  root is alive". The runtime must not claim the kill there.
+- **Rows, both directions:** on POSIX, the group is dead after a normal exit (CA-6's heartbeat row,
+  run on CI's Linux); on win32, the unavailability line is present and no kill is claimed.
+- **Why the residual is acceptable although real roles run on Windows:** a surviving descendant
+  still meets layer 1 in the environment (R17), R20's byte-compare before every call, and R18's
+  pinning. What remains is the compare-then-call race on the generated file, plus everything outside
+  the repository, which F11 already names as invisible.
+- **The job-object launcher is its own task (T-174),** and it must fail closed: `Add-Type`
+  unavailable or AV interference refuses the loop and never falls back to an unkilled tree.
+
 **Process:** the QA seat folds all three into one criteria push, the successor of `847fc35`, on
 Aaron's word. The developer merges that tip before freezing, so every criteria commit is an ancestor.

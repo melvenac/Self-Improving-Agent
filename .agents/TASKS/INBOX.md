@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 85 by open-brain v0.44.1 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 86 by open-brain v0.44.1 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -65,6 +65,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-162** The element table's growth rule: the store cannot be consulted for act shapes the table does not name
 - [ ] **T-165** Evaluate an alternate harness/model as the DEVELOPER seat via T-155's shadow merge gate — the driver is a SECOND METER, not cost; Aaron's named candidate is DeepSeek v4.1 Flash
 - [ ] **T-171** update_task REPLACES a task's note, and neither the dry run nor the write says so: an op written to append a correction silently erases the whole note
+- [ ] **T-174** Win32 job-object launcher so the role's whole process tree is killed on a NORMAL exit too (R22's named limit on Windows)
 
 ## Done (last 3 sessions)
 
