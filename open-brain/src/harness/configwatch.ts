@@ -279,7 +279,7 @@ const agrees = (snapshot: FileState, now: FileState | null): boolean => {
 
 const stateHash = (s: FileState | null): string => {
   if (s === null) return "absent";
-  if (s.kind === "symlink") return `symlink:${s.target}`;
+  if (s.kind === "symlink") return `type:symlink readlink:${s.target}`;
   return `${hashOf(s.bytes)}/${s.mode.toString(8)}/nlink:${s.nlink}`;
 };
 
@@ -452,17 +452,15 @@ export class ConfigWatch {
         const now = identify(tree);
         if (now.kind !== "symlink") continue;
         const baseKind = this.treeAtBase.get(tree) ?? "absent";
-        // Absent → link is a change, named here. The files under a link are not
-        // the record of the link (R45). A directory that existed is recreated
-        // below; an absence is not.
-        if (baseKind === "absent") {
-          changes.push({
-            path: tree,
-            kind: "created",
-            before: "absent",
-            after: `symlink:${now.target}`,
-          });
-        }
+        // The root itself is the change, with its type and readlink target (R46).
+        // Listing only the files under it as deleted is not that record.
+        // A directory that existed is recreated below; an absence is not (R45).
+        changes.push({
+          path: tree,
+          kind: baseKind === "absent" ? "created" : "modified",
+          before: baseKind === "absent" ? "absent" : baseKind,
+          after: `type:symlink readlink:${now.target}`,
+        });
         assertNoAncestor(this.repoRoot, this.dirs, tree);
         removeLink(tree);
         assertNoAncestor(this.repoRoot, this.dirs, tree);
@@ -659,10 +657,12 @@ export class MachineConfigWatch {
   baseNotes(): string[] {
     const notes: string[] = [];
     for (const p of this.paths) {
-      const id = identify(p.path);
-      if (id.kind === "symlink") {
+      // Each component, not only the final one (R46). lstat does not follow, so a
+      // junction at a parent is visible here; lstat of the final path is not.
+      for (const c of this.chainOf(p.path, true)) {
+        if (c.kind !== "symlink") continue;
         notes.push(
-          `machine config ${p.scope} ${p.path} is a link at base, target ${id.target}; read through that target, not refused.`,
+          `machine config ${p.scope} ${c.path} is a link at base, type ${c.kind}, readlink ${c.target}; read through that target, not refused.`,
         );
       }
     }

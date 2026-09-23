@@ -10,8 +10,8 @@
 |---|---|---|---|
 | 1 R44 | done | QA-stage finding was content hashes `24fab94adf280a9c` → `c18ec7f70cfd397e` | `R44` test passed. With it: `R35`, both `CA-4f`. Exit 0. Test Files 2 passed. Tests 4 passed, 42 skipped. |
 | 2 R45 | done | `v.ok` was true (the absent `<git-dir>/info` junction was not a change) | 3 passed: the repo root, the machine-config absent → link, and the existing `.git/info` junction. Exit 0. |
-| 3 R46 | next | | |
-| 4 R43 | pending | | |
+| 3 R46 | done | tree root named only the files under it as deleted; an entry's after was `symlink:<target>` without `type:`; baseNotes on a parent junction was empty | 7 passed (R45, R46, existing hooks junction and entry). Exit 0. |
+| 4 R43 | next | | |
 | 5 R47 CA-2.5 | pending | | |
 | 6 R47 CA-4c / R34 | pending | | |
 | 7 R48 | pending | | |
@@ -26,5 +26,9 @@ Files: `open-brain/src/harness/configwatch.ts`, `open-brain/src/harness/runtime.
 ## Item 2 — R45
 
 A watched tree root that was absent when the window opened, and is a link at close, is a `created` change (`absent → symlink:<target>`). The restore removes the link and does not `mkdir`. A tree that was a real directory is still recreated. Machine-config paths stay detect-only: absent → link is reported with the target, not read, not restored (Atlas ruling on R44/R45).
+
+## Item 3 — R46
+
+Every symlink tree root is recorded as `type:symlink readlink:<target>`, including one that was a real directory (the files under it are no longer the only record). A symlink entry uses the same after-string. `baseNotes` walks each path component with `lstat` and names a link at a parent, with its type and readlink target.
 
 Not verified: full suite (not run; ask Atlas first). POSIX not run here (win32).

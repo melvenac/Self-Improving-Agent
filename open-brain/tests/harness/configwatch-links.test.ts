@@ -426,8 +426,8 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const root = v.changes.find((c) => c.path === info);
     expect(root, v.message).toBeTruthy();
     expect(root?.before).toBe("absent");
-    expect(root?.after).toContain("symlink:");
-    expect(root?.after).toContain(victim);
+    expect(root?.after).toContain("type:symlink");
+    expect(root?.after).toContain(`readlink:${victim}`);
     expect(() => lstatSync(info)).toThrow();
     expect(readFileSync(canary, "utf-8")).toBe("R45-CANARY");
     expect(namesOf(victim)).toEqual(["canary.txt"]);
@@ -456,5 +456,56 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(found.some((f) => /^[0-9a-f]{16}$/.test(f.after))).toBe(false);
     expect(readFileSync(join(victim, "config"), "utf-8")).toContain("VICTIM-R45");
     expect(lstatSync(gitDir).isSymbolicLink()).toBe(true);
+  });
+
+  it("R46: a tree-root link is named with its type and readlink target", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const watch = new ConfigWatch(dirs);
+    watch.begin("developer");
+    const hooks = join(dirs.commonDir, "hooks");
+    const aside = join(dirs.commonDir, "hooks-aside-r46");
+    const victim = join(tmp.dir, "r46-hooks");
+    mkdirSync(victim);
+    writeFileSync(join(victim, "canary.txt"), "R46-HOOKS");
+    renameSync(hooks, aside);
+    symlinkSync(victim, hooks, "junction");
+    const v = watch.closeAndRestore();
+    const root = v.changes.find((c) => c.path === hooks);
+    expect(root, v.message).toBeTruthy();
+    expect(root?.after).toContain("type:symlink");
+    expect(root?.after).toContain(`readlink:${victim}`);
+    expect(lstatSync(hooks).isDirectory()).toBe(true);
+    expect(readFileSync(join(victim, "canary.txt"), "utf-8")).toBe("R46-HOOKS");
+  });
+
+  it("R46: a link entry is named with its type and readlink target", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const watch = new ConfigWatch(dirs);
+    watch.begin("developer");
+    const victim = join(tmp.dir, "r46-entry");
+    mkdirSync(victim);
+    writeFileSync(join(victim, "canary.txt"), "R46-ENTRY");
+    const entry = join(dirs.commonDir, "hooks", "sub");
+    symlinkSync(victim, entry, "junction");
+    const v = watch.closeAndRestore();
+    const row = v.changes.find((c) => c.path === entry);
+    expect(row, v.message).toBeTruthy();
+    expect(row?.after).toContain("type:symlink");
+    expect(row?.after).toContain(`readlink:${victim}`);
+    expect(() => lstatSync(entry)).toThrow();
+    expect(readFileSync(join(victim, "canary.txt"), "utf-8")).toBe("R46-ENTRY");
+  });
+
+  it("R46: baseNotes names a link at a parent component of a machine-config path", () => {
+    const xdg = join(tmp.dir, "xdg-r46");
+    const victim = join(tmp.dir, "r46-base-victim");
+    mkdirSync(xdg);
+    mkdirSync(victim);
+    writeFileSync(join(victim, "config"), "[user]\n\tname = base\n");
+    const gitDir = join(xdg, "git");
+    symlinkSync(victim, gitDir, "junction");
+    const watch = new MachineConfigWatch([{ scope: "xdg", path: join(gitDir, "config"), source: "test" }]);
+    const notes = watch.baseNotes();
+    expect(notes.some((n) => n.includes(gitDir) && n.includes("type symlink") && n.includes(victim))).toBe(true);
   });
 });
