@@ -7,7 +7,7 @@
 | **Project** | Self-Improving Agent |
 | **Description** | A memory protocol and automation layer that enables AI coding agents to learn across sessions. Provides retrieval/accumulation hooks, slash commands, and a project template for persistent AI learning. |
 | **Repo** | https://github.com/melvenac/Self-Improving-Agent |
-| **Version** | v0.44.0 |
+| **Version** | v0.44.1 |
 | **License** | MIT |
 
 ## Target Users
