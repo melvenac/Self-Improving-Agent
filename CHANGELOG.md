@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.44.1] - 2026-09-22 — a deleted checked-out branch no longer crashes the runtime without a record
+
+Loop 15 slice three, §2 (`G-045`). Candidate `9ed674c`, accepted by the QA seat on §2 scope in
+`docs/loops/loop-15-slice-3-qa-report.md` against criteria `17c9056`. Per `D-031` the candidate
+carried no bump; this is the release commit on top of it.
+
+### Fixed
+
+- **`G-045` — `git update-ref -d refs/heads/<branch>` during a stage, while that branch is checked
+  out.** Before: the ref-watch recorded the deletion, `restoreHead` saw HEAD's *name* unchanged and
+  did nothing, and the next `git rev-parse HEAD` inside `enforceAllowlist` threw `GitFailed` out of
+  `runLoop` ahead of the rollback — no `LoopResult`, no `FAILED.md`, HEAD unresolvable, the branch
+  gone. Now a deleted deferred ref is put back **before HEAD is read**, and the stage still fails with
+  `stage-changed-ref`. A MOVE of the checked-out branch is still left for `enforceAllowlist` to see,
+  so slice two's `D2` is reported rather than quietly undone.
+
+### Not fixed, stated so a green `G-045` is not read as more than it is
+
+- **One channel closed: HEAD after a deleted checked-out ref.** The index, hooks, config, submodules
+  and reflog are unprobed by this release. A measurement on 2026-09-22 showed role-planted hooks and
+  `core.fsmonitor` execute inside the runtime's own git calls; that is candidate A's, not this one's
+  (`docs/loops/loop-15-slice-3-developer-design.md` §2.3).
+- **Carried into candidate A's repair half**, both found by the QA seat: the early restore is an
+  unconditional write — its comment says no compare-and-swap is possible, which is false, since
+  `update-ref <ref> <sha> <zero-oid>` is one — and test `D4`'s `toMatch(sha)` is vacuous and must
+  assert the branch's value.
+
 ## [0.44.0] - 2026-09-20 — the store answers at the moment of the act
 
 Loop 16. For eight loops `ob_recalled` reported *no knowledge entries recalled this session*, and on
