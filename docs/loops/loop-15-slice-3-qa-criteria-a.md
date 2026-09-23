@@ -426,3 +426,138 @@ U5: the quality or correctness of the model-backed role's output in the first re
   separate list.
 
 This file lists only in-scope rows, so for A it declares no out-of-scope ids.
+
+---
+
+## 7. PROPOSED amendment 3: the max-effort re-read, before any candidate. UNRULED.
+
+**Nothing in this section binds until the planner rules on it, item by item.** The rows in §2 as
+committed at `96738a8` are the binding text until then. This section exists because §2 through §6
+were written at effort **medium**: the host transcript records `"effort":"medium"` on every entry
+from 2026-09-22T23:50:58Z to 2026-09-23T01:02:20Z, and all four of this seat's tracked commits fall
+inside that run. The re-read was done at **max** (from 01:02:27Z). Every claim below was **measured**
+on git `2.54.0.windows.1` in scratch repositories, and none was argued. Where a first instrument
+lied, that is said.
+
+### 7.1 Measured today, against the runtime as it stands (the `9ed674c` harness source, now v0.44.1)
+
+The probe is the same `probe.mts` as QA report 1: a stub role that, after its stub work, writes one
+file. The positive control in the same run (a role creating `refs/anything`) fails cleanly with
+`stage-changed-ref` and writes `FAILED.md`.
+
+| A role writes garbage to | Where the runtime dies | `LoopResult` | `FAILED.md` |
+|---|---|---|---|
+| `.git/config` | `GitFailed` from `for-each-ref` in `RefWatch.compare` | **none** | **absent** |
+| `.git/HEAD` | `GitFailed` from `for-each-ref` ("not a git repository") | **none** | **absent** |
+| `.git/index` | plain `Error: Command failed: git status --porcelain=v1 -z …` from `changedPaths` | **none** | **absent** |
+
+**These are G-045's failure class through three more channels:** a role's one-line act, and no
+record. Git's own behaviour was measured first: garbage `.git/config`, garbage `.git/HEAD` and
+`core.repositoryformatversion=99` each make `symbolic-ref` and `rev-parse` exit 128. A **deleted**
+`.git/config` does **not** (both exit 0). A garbage `.git/index` leaves `rev-parse` working and makes
+`status` exit 128.
+
+### 7.2 Proposed items
+
+1. **CA-1: attribution.** The failure is recorded against **the stage whose process wrote**, with
+   both deltas in that one stage's record. As written, a runtime that did not await and caught the
+   delayed writes in the *next* stage's window would satisfy "the stage must fail on both."
+2. **CA-2.4: the probe element also carries a double quote, a newline and a trailing backslash.**
+   Those are the characters a real prompt contains and the ones Windows argv quoting gets wrong.
+   **[mine]:** if the prompt travels as argv, a prompt over the platform's command-line limit fails
+   closed; it is never truncated.
+3. **CA-2.5: "before any tag" is an observable I added without marking it [mine].** It is returned
+   now: keep preflight resolution, or relax the row to "refused with a record that names the path,
+   and no shell fallback."
+4. **CA-2.6 [mine], NEW: the checks run role-authored code with the runtime's full environment.**
+   `runCheck` (`checks.ts:122–128`) calls `spawnSync` with **no `env` option**, so `npm --prefix
+   open-brain run build` and `… test` inherit `process.env`. In live mode that includes
+   `TYPESAFE_API_KEY`. Those commands execute the target's package scripts and test files, which a
+   model-backed developer has just written. CA-2 keeps the key out of the **role** process; this
+   path reaches it one step later. The class rule: **every process the runtime spawns that runs
+   role-authored code gets a constructed environment.**
+   - **Probe:** a role-authored test file writes its own environment to a file outside the
+     repository. With the sentinel set in the parent, the key is absent; an allowlisted variable is
+     present (the control).
+5. **CA-3: "Both refusals" becomes "All three refusals"** (a, b and c).
+6. **CA-4a: the restore is judged on the file SET as well as the bytes.**
+   - The snapshot scope's file set equals the pre-stage set: created files are removed, deleted
+     files are restored, and each file's bytes are equal.
+   - **Add probes:** garbage `.git/config`, and `core.repositoryformatversion=99`. Each must end in
+     a `LoopResult` with `stage-changed-config` and `FAILED.md`, with no exception. **Today both
+     crash with no record** (§7.1).
+   - This is the **behavioural** test of layer 2's "restore before any git call": M-L2-order must
+     turn it red. That is stronger than reading the code path, and it is what CA-4b-L1 lacked.
+7. **CA-4a: attribute the marker.** The planted program records a value that only a runtime git call
+   carries (for example, the layer-0 `GIT_CONFIG_GLOBAL` path). The probe role makes no git call
+   after planting. Otherwise a role's own git call writes the marker and fails a correct runtime.
+8. **CA-4b: the scan is a parser, and it covers every spawn site.** `git.ts` has **four** git spawn
+   sites:
+   - `git()` at :86, via `execFileSync`;
+   - `gitTry` at :115, via `spawnSync`;
+   - `changedPaths` at :146 and `committedPaths` at :192, both raw `execFileSync` with `"git"` on its
+     own line.
+
+   `checks.ts:122` is a fifth process spawn. **The single-line pattern `execFileSync("git"` that
+   CA-4b names misses :146 and :192.** That is G-040's too-narrow scan, in this seat's own criteria.
+   The scan walks the TypeScript AST for every `child_process` call. It is validated against a
+   planted call of each API form, **including a multi-line one**, and against the real source.
+9. **CA-4b/4c [mine]: the layers' reach into descendant processes.** Layer 0 is environment-based,
+   so it reaches every descendant git process, including a check's (the build's postbuild stamping
+   runs git). Layer 1 as `-c` arguments reaches only the runtime's direct calls. **Require:** git
+   processes under the checks run under layer 0. The candidate also states layer 1's reach, or
+   applies it through `GIT_CONFIG_COUNT`/`KEY`/`VALUE`, which descendants inherit.
+10. **CA-4c [mine]: layer 0 also drops non-program settings, and that changes what the runtime sees
+    and commits.** This machine's system config carries `core.autocrlf=true`, `core.symlinks`,
+    `core.fscache`, `filter.lfs.{clean,smudge,process,required=true}`, `init.defaultbranch`,
+    `credential.helper`, `diff.astextplain.textconv` and `http.*`. **Measured** on a target cloned
+    under the machine's config with **no `.gitattributes`**:
+    - an **untouched** file reads ` M` under layer 0, and clean under the machine's config;
+    - a role's CRLF save is **committed as CRLF** under layer 0 (`ls-files --eol`: `i/crlf`), where
+      the machine's git commits LF (`i/lf`).
+
+    **A clone of THIS repo is not affected:** its `.gitattributes` sets `text` and `eol=lf`
+    (`git check-attr`). **Every harness test is blind to this,** because `fixture.ts`'s `makeRepo`
+    sets `core.autocrlf=false` locally. **Require:** the candidate enumerates the keys layer 0
+    removes that change an observation or a commit. For each, it either carries the value explicitly
+    (a non-program key such as `core.autocrlf` or `core.symlinks`, read at preflight and passed by
+    `-c`), or refuses the target (for example, one using `filter=lfs`), or states a limit. CA-5 then
+    adds a known-negative on a target cloned under the machine's own config, without
+    `.gitattributes`.
+    *First instrument, disclosed:* `grep -c $'\r'` counted lines, not carriage returns. It read 3
+    for an LF blob, and `od -c` plus `git ls-files --eol` replaced it before anything was concluded.
+11. **CA-4h: the `.git` pointer file.** **Measured:** rewriting a linked worktree's `.git` file sends
+    the next `git` call into **another repository**. `rev-parse --absolute-git-dir` moved from
+    `md-repo/.git/worktrees/md-wt` to `md-other/.git`. Resolving at preflight does not stop the
+    runtime's later calls from following the pointer. **Require:** every runtime git call after
+    preflight pins the resolved dirs (`GIT_DIR`/`GIT_WORK_TREE` or `--git-dir`/`--work-tree`), or
+    the pointer file is in layer 2's snapshot and restored before any call. The probe shows the
+    runtime's post-stage tags and refs land in the **original** repository.
+12. **CA-6: a heartbeat as well as a PID.** The grandchild appends to a file every 200ms, and the
+    file stops growing (read ≥1s after the stage). A PID alone can be reused, and a heartbeat cannot
+    be faked by a new process.
+13. **CA-9: the `claude --help` pin must RUN locally.** Where `claude` is installed, the test is
+    reported **passed, not skipped**. Skip detection can be wrong in both directions.
+14. **CA-12:** `/sync` at the candidate, in the QA tree, **after `gitnexus analyze`** (rule 13,
+    V-047), with 0 skipped and the exit code recorded. QA report 1 ran `/sync` with the index 10
+    commits behind.
+15. **§3 block:**
+    - **U6:** native `claude.exe`. This machine has only the npm shim (`which -a claude claude.exe`).
+    - **U4** is widened to XDG and system config via `HOME`/`XDG_CONFIG_HOME`/`GIT_CONFIG_SYSTEM`
+      simulation.
+    - `%ProgramData%\Git\config` is **not read** by git `2.54.0.windows.1`: 0 references in `git.exe`
+      (ASCII and UTF-16LE detectors each validated on a known positive, `GIT_CONFIG_NOSYSTEM` and
+      `USERPROFILE`), and 0 executions with it redirected. It is therefore not a watched path for
+      this version.
+16. **SCOPE: returned, not chosen.** Candidate A's sentence says a role "cannot … leave without a
+    record." §7.1 shows it can, today, through `.git/HEAD` and `.git/index`, and neither is in A's
+    scope. (`.git/config` is, via item 6.) There are two honest options, and the choice is the
+    planner's:
+    - **(a)** A adds a **backstop**: every git failure after a role has run ends in a `LoopResult`
+      and `FAILED.md` (a record, not a repair), with the three §7.1 probes as its rows;
+    - **(b)** A's sentence is qualified, and CA-11 records HEAD-file and index as **"probed: crash
+      without record"**.
+
+    This seat does not narrow it by itself.
+17. **CA-11 table:** add **HEAD file (content)** and **index**, both "probed §7.1: crash without
+    record at v0.44.1". Index was "unprobed".
