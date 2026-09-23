@@ -137,4 +137,4 @@ the repository only.**
 index at `3b19287` it said "index is at HEAD" when HEAD was `c9947c5`, an ancestor of the indexed
 commit. It counts the commits HEAD has that the index lacks, never the reverse, so an index built on a
 different line of history reads as current. This is rule 11's family: a distance that cannot tell "same
-commit" from "I only looked one way". Filed as a task, not a gap (brief R28).
+commit" from "I only looked one way". Filed as **T-176** (P1, state rev 93), not a gap (brief R28).
