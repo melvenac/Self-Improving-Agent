@@ -53,13 +53,23 @@ That is one git version, and the row re-measures it at the candidate on both ver
 at `78474cf`, blob `9841b5bc`, read in full) rules all 17 items of §7. They are folded into the rows
 at this commit: R14 → CA-14 (new); R15 → CA-2.6 (new); R16 and R17 → CA-4b; R18 → CA-4h; R19 → CA-4c
 and CA-5; items 1, 2, 3, 5, 6, 7, 12, 13, 14, 15 and 17 → their rows. §7 stays as the record of what
-was proposed and why. Two readings of this seat's are marked **[mine]** where they stand:
-CA-4c's R19 refusal control, and the note on R17's reach inside the checks.
-**R20 → CA-4i and R21 → CA-3d, together with the shim rework in CA-2.4/2.5 and U6, come from the
-planner's A2A message sent after rulings-3.** At this commit they are in no tracked rulings file. They
-are recorded here as **relayed rulings**, and the shim target was **re-derived by this seat** (CA-2.4).
-The planner owns putting R20 and R21 into a tracked rulings file. Three questions the fold raised are
-returned in §5.4–§5.6.
+was proposed and why. One reading of this seat's is still marked **[mine]**: the note on R17's reach
+inside the checks. The other, CA-4c's reading of R19's "needs", was **ruled after `847fc35`**, in the
+planner's A2A message, and is folded in the commit that follows it.
+**R20 → CA-4i and R21 → CA-3d, together with the shim rework in CA-2.4/2.5 and U6, are TRACKED in
+rulings-3 as merged to master** (`c5c0b2e`, PR #107, blob `dde14219`). They are in a section, "Two
+more, from the developer while building", added after the `78474cf` copy this seat first folded.
+Diffed here: the addition is 21 lines and nothing else changed. At `847fc35` this file called them
+"relayed", which was true of the copy it had read. The shim target was **re-derived by this seat**
+(CA-2.4).
+**Rulings-4** (`origin/docs/slice-3-rulings-4`: first read at `5c1ad5b`, blob `3c21b538`, then at
+`d18a196`, blob `76c868ff`, both read in full; not yet on master at this commit) rules this file's
+three returned questions:
+- **R19's "needs"** → CA-4c (§5.5);
+- **R21 against the fixture** → CA-3d (§5.4);
+- **R22, the tree-kill on every exit path, narrowed on win32 by ruling (b)** → CA-6 and CA-4i (§5.6).
+Between the two reads, the only change is the added "R22 NARROWED ON WIN32" section (diffed). All §5
+items are now ruled.
 
 **Effort, per commit (the host transcript's per-entry `effort` field is the instrument; the settings
 file is not, per dispatch-2's correction):** `770bcb9`, `ce8e6a1` and `96738a8` were written at
@@ -185,14 +195,29 @@ delayed write attributed to a later stage.
   - **Controls, reconciled with (b):** a fresh clone **with stub roles** passes R21 (while (b)
     refuses its remote whenever a `ProcessRole` is present). The same clone after `git remote remove
     origin` passes both, with a `ProcessRole`.
-  - **Two conflicts, measured and returned in §5.4 [mine], not scored until ruled:**
-    - `makeRepo` (`fixture.ts:92–104`) appends `user.email`, `user.name`, `commit.gpgsign` and
-      `core.autocrlf`, none of which `init` or `clone` writes. As worded, R21 refuses every harness
-      fixture repository.
-    - CA-4h's probe target sets `extensions.worktreeConfig`, which R21 would refuse at preflight,
-      making CA-4h unrunnable.
+  - **The allowlist is extended by a short NAMED list of reviewed non-program keys (rulings-4, §5.4
+    RULED), and the fixture is not bent:** `user.name`, `user.email`, `commit.gpgsign`,
+    `core.autocrlf`, `core.eol` and `extensions.worktreeConfig`. **Each carries a one-line reason in
+    the code.** The report reads those reasons from the source.
+    - **Any key that names or selects a program stays refused:** `gpg.program`, `tag.gpgSign`,
+      `filter.*`, `core.sshCommand`, `core.fsmonitor`, and every other key not on the allowlist.
+      Default-deny means an unlisted key needs no mention.
+    - **Row:** a `makeRepo` fixture target (whose local config carries `user.email`, `user.name`,
+      `commit.gpgsign=false` and `core.autocrlf=false`) is **accepted**. The same target with
+      `core.sshCommand` planted beside those keys is **refused**, and the refusal **names
+      `core.sshCommand`**. CA-4h's `extensions.worktreeConfig` target passes preflight.
+    - **`commit.gpgsign` is allowed because every runtime commit passes `--no-gpg-sign`, and the row
+      verifies that premise rather than inheriting it.**
+      - With `commit.gpgsign=true` in the target's local config, **every runtime-authored commit
+        object has no `gpgsig` header** (`git cat-file -p <sha>`, one read per runtime commit), and
+        the loop completes.
+      - **Control:** in a copy of that target, `git -c gpg.program=<marker script> commit`
+        **without** `--no-gpg-sign` writes the marker, which shows the key is live.
+      - Code-path evidence: the single commit path (R16) carries `--no-gpg-sign`.
+    - (At `847fc35` this sub-item was two conflicts returned in §5.4, unruled.)
 
-**All three refusals (a)–(c), and (d), come before any tag, commit or artefact** (rulings-3 item 5).
+**All four refusals (a)–(d) come before any tag, commit or artefact** (rulings-3 item 5, extended to
+(d) by R21).
 After the refusal, `loop-*` tags are absent, HEAD is unmoved and there is no `artifacts/` directory,
 each read by the same expression as the control.
 **Controls:** the same loop with stub roles and the watch off proceeds past preflight, and so does
@@ -292,14 +317,23 @@ it is listed in the iteration record. Identity is still passed with `-c user.nam
 
   At v0.44.1 plus R7 alone, both failed: the untouched file read ` M`, and the save was committed
   `i/crlf` against the machine's `i/lf`.
-- **R19, the refusal:** a target that **needs** a program-valued key is refused at preflight, and
-  the refusal names it (`filter.lfs` with `required=true`). **[mine], a control on how "needs" is
-  read, returned in §5.5:** this machine's **system** config carries `filter.lfs.required=true` for
-  **every** repository. So refusing on the key's presence would refuse every target here. The row
-  reads "needs" as **the target's attributes** (`.gitattributes` or `.git/info/attributes`) **name a
-  filter, diff or merge driver whose program key the generated file does not carry**.
-  - **Probe:** a target whose attributes say `*.bin filter=lfs` is refused, naming `filter.lfs`.
-  - **Control:** a target with no such attribute, on this same machine, is **not** refused.
+- **R19, the refusal (§5.5 RULED in rulings-4, `5c1ad5b`):** a target **needs** a required filter
+  when **a TRACKED path's attribute names it**: `git ls-files`, then `git check-attr filter` on those
+  paths. That is git's own attribute parser, and it **runs no filter**. Machine config having the key
+  is **not** "needs". The query goes **through the one spawn site** (R16).
+  - Git for Windows ships `filter.lfs.required=true` in **system** config, and the literal
+    machine-config reading refused **144 of the suite's loops, including the plain stub**. That is
+    Forge's measurement, relayed. It agrees with this seat's §5.5 derivation from this machine's
+    system config.
+  - **Probe:** a target with `*.bin filter=lfs` and a **tracked** `.bin` file is refused at
+    preflight, naming `filter.lfs`.
+  - **Control:** the plain stub target, on this same machine, is **accepted**.
+  - **Preflight order (ruled):** R13 includes (CA-3c) → R21 local-config default-deny (CA-3d) →
+    R19 attribute query. The query is itself a git call, so it comes after R21 and runs under layers
+    0 and 1 with R18's pinning (CA-4b, CA-4h). The report evidences the order from the code path.
+  - **Stated limit, recorded as a limit and not a pass:** a path the role **adds** with
+    `filter=lfs` meets a runtime git that has no lfs driver, so the attribute is **inert**. That is
+    fail-safe, and it is not a refusal.
 - **Discriminating, in the same test (R7):** a planted global `filter.<x>.clean` plus a work-tree
   `.gitattributes` **executes without layer 0 and does not execute with it.** The global file is
   simulated through the test's own environment and is never the real one.
@@ -371,10 +405,19 @@ raises `GitRefused`, and the R14 backstop (CA-14) records it.
   cannot pass the row.
 - **Control:** the unedited file → the loop proceeds.
 - **Stated limit, which the report must carry, per the ruling:** compare-then-call leaves a window
-  between the comparison and the call. CA-6's tree-kill closes it **on the timeout path**. For a role
-  that **exits normally** while a descendant survives (U3), no row establishes that the tree is dead
-  before the runtime's next git call. **§5.6 returns that question.** Until it is ruled, the report
-  states the dependency and does not claim the window closed.
+  between the comparison and the call. R22 (rulings-4, §5.6) was **narrowed by ruling (b)**
+  (rulings-4 at `d18a196`): Node has no job-object API, and `taskkill /T` cannot reach the orphans
+  of a role that exited normally.
+  - **On POSIX** the window is closed on every exit path. The role's process group is killed
+    (SIGKILL to the group) before any runtime git call. The report claims this only if CA-6's POSIX
+    normal-exit and error-path rows pass on CI's Linux.
+  - **On win32 the normal-exit path is a NAMED LIMIT.** The window stays open there, **narrowed but
+    not closed** by three things:
+    - layer 1 in the environment (R17);
+    - R20's byte-compare, which catches an edit made before any comparison;
+    - R18's pinning, which stops a redirect through the `.git` pointer.
+
+    The report states it as open on that path.
 
 **CA-4d — snapshot scope stated.** The candidate states which files layer 2 snapshots, and whether
 `.git/config.worktree`, `.git/info/attributes`, and a planted `include.path` pointing outside the
@@ -404,7 +447,38 @@ that target the known-negative shows no spurious changed path.
 **Fail:** a known-negative run on one git version only; a detector validated only against planted
 positives; the R19 known-negative run only on a fixture with local line-ending overrides.
 
-### CA-6 — `role-timeout` (P4)
+### CA-6 — `role-timeout` (P4), and the tree-kill on every exit path (R22 as narrowed by ruling (b))
+
+**R22 (rulings-4), narrowed by ruling (b)** (rulings-4 at `d18a196`, blob `76c868ff`, section "R22
+NARROWED ON WIN32", on the developer's costing: Node has no job-object API, and `taskkill /T` walks
+the tree from a **live** root, so a normally-exited role's orphans are unreachable):
+- **POSIX, every exit path (normal, timeout, error):** the role's **process group** is killed
+  (SIGKILL to the group) **before any runtime git call**. It is a group, not a PID list.
+  - **Rows, run on CI's Linux:** a role that exits **normally** while a grandchild it started keeps
+    running, and a role that exits **with an error** in the same state. In each, after the stage the
+    grandchild is dead by **both** instruments below, and it is dead before the runtime's next git
+    call. The ordering probe: the grandchild tries to edit the generated global-config file 300ms
+    after the role exits, and the file's bytes are unchanged.
+  - These rows are read from **the CI run's per-test output as passed, not skipped**. A POSIX-only
+    test skips on this win32 machine, and a skip read as a pass is rule 11.
+  - **Mutant M-R22** (a PID-list or direct-child-only kill) turns the normal-exit row red.
+- **win32, normal exit: a NAMED LIMIT, not a kill.** **Every** iteration record carries the line
+  `normal-exit tree-kill: unavailable on win32 (no job object); timeout path killed via taskkill /T
+  while the root is alive`, and the runtime **claims no group-kill there**.
+  - **Row, on this machine:** the line is present in the record of a normal-exit stage, and no text
+    in that record claims the tree was killed.
+  - **Limits the row states:** the residual is narrowed by layer 1 in the environment (R17), R20's
+    byte-compare and R18's pinning, and it is not closed.
+  - **A job-object launcher is a separate follow-up task, T-174, not A's.** Per the ruling, T-174
+    must fail closed: if `Add-Type` is unavailable or AV interferes, the loop is refused and never
+    falls back to an unkilled tree.
+- **win32, timeout path:** `taskkill /T` while the root is alive, which is the row below.
+  - **[mine], a measurement of the stated limit, reported and not scored:** `taskkill /T` walks
+    parent links from the live root. So a **double-forked** grandchild, whose intermediate parent
+    has already exited, may be unreachable even here. The report runs that case and states the
+    outcome beside the limit line, so the line is not read as covering it unmeasured.
+
+**The timeout row (P4, all platforms):**
 
 **Pass:** a role that sleeps past its bound is killed **with its process tree**. This is shown by a
 grandchild the role spawned no longer being alive after the stage, by **two instruments** (rulings-3
@@ -503,7 +577,8 @@ count:
 | index | **probed at v0.44.1: crash without record** (§7.1). A's backstop records it (CA-14). **The channel itself is open** (rulings-3 item 17) |
 | submodules | unprobed |
 | reflog | unprobed |
-| outside `.git/` (writes, network, surviving processes) | invisible to the runtime; see §3 |
+| surviving role processes | POSIX: the process group is killed on every exit path (CA-6). win32: killed on the timeout path via `taskkill /T`; **normal exit is a named limit** in every iteration record (R22 (b)); escapees are U3 |
+| outside `.git/` (writes, network) | invisible to the runtime; see §3 |
 
 F11's R6 sentence ("clean **on the probed channels only** …") appears in the loop's own output. It
 carries R8's amendment ("…everything outside `.git/`, **except the global/system git config files,
@@ -562,7 +637,7 @@ not acceptance rows.
 ```qa-unrunnable
 U1: network egress by a role process — the runtime has no network view and this seat does not capture traffic
 U2: writes by a role outside the repository other than its runtime-chosen deliverable path — not observable by the runtime
-U3: child processes that outlive the role outside the role-timeout path (CA-6 covers the timeout path only)
+U3: on win32, processes that outlive a NORMALLY-exiting role (R22 narrowed by ruling (b): no job object; a named limit in every iteration record); on every platform, processes that escape the role's process group or parent chain (setsid on POSIX, double-fork orphaning on win32) and processes started through a service or scheduler
 U4: writes to the REAL ~/.gitconfig, $XDG_CONFIG_HOME/git/config or system gitconfig — machine-wide, Aaron's files; CA-4c/4e/4f/4g are probed via HOME, XDG_CONFIG_HOME, GIT_CONFIG_GLOBAL and GIT_CONFIG_SYSTEM simulation only
 U5: the quality or correctness of the model-backed role's output in the first real run (CA-9) — an observation, not acceptance
 U6: argv parsing INSIDE the native claude.exe — the binary's own command-line parser, not instrumentable by this seat; CA-2.4 verifies the runtime's resolution and spawn with an observable target
@@ -585,7 +660,8 @@ ASCII and UTF-16LE detectors were each validated on a known positive (`GIT_CONFI
 2. Rebuild before measuring anything from the built CLI.
 3. Run every row's control **before** its negative, in the same run and by the same expression.
 4. Mutants: M-L0, M-L1, M-L2, M-L2-order, the CA-4h resolve-late mutant (paths resolved after the
-   stage), M-R18 (pinning dropped), M-backstop (R14 removed), a second git spawn site (R16's AST
+   stage), M-R18 (pinning dropped), M-backstop (R14 removed), M-R22 (a PID-list or direct-child
+   kill, on POSIX), a second git spawn site (R16's AST
    check must turn red), a checks spawn that inherits the environment (R15), the CA-5
    snapshot-timing mutant (if applicable), and the CA-10 mutants. All type-clean, and the type
    checker shown able to fail.
@@ -594,7 +670,7 @@ ASCII and UTF-16LE detectors were each validated on a known positive (`GIT_CONFI
 
 ---
 
-## 5. Returned to the planner, numbered — items 1–3 RULED; items 4–6 NEW at the rulings-3 fold, UNRULED and not scored until ruled
+## 5. Returned to the planner, numbered — all six RULED (4, 5 and 6 by rulings-4)
 
 1. ~~CA-4c: is global/system config in candidate A?~~ **RULED by rulings-2 R7–R9 and R11–R13:** it is
    in A as layer 0, with a report-only window, and the P5 claim is withdrawn. It is folded into
@@ -610,7 +686,9 @@ ASCII and UTF-16LE detectors were each validated on a known positive (`GIT_CONFI
    child's environment recorded.** The original question: **CA-9's transcript clause** depends on T-161's unknown per-launch loss. **Ruling asked:** is an
    absent transcript a CA-9 fail, or a reported absence with the row scored on the runtime artefacts
    (as written)?
-4. **R21 (CA-3d) as worded conflicts with two things, both measured.**
+4. **RULED (rulings-4): the allowlist is extended by a named list of reviewed non-program keys, each
+   with a reason in the code, and the fixture is not bent. Folded into CA-3d.** The original question:
+   **R21 (CA-3d) as worded conflicts with two things, both measured.**
    - `makeRepo` (`fixture.ts:92–104`) appends `user.email`, `user.name`, `commit.gpgsign` and
      `core.autocrlf` to every harness test repository. None of these is written by a fresh `init` or
      `clone` (measured on 2.54). So R21 refuses every fixture, and every harness test that runs a
@@ -622,12 +700,17 @@ ASCII and UTF-16LE detectors were each validated on a known positive (`GIT_CONFI
    `user.email`, `commit.gpgsign`, `core.autocrlf`, `extensions.worktreeConfig`), or the fixture
    stops writing them. The fixture wrote `core.autocrlf=false` precisely to be deterministic across
    machines, so that choice interacts with R19.
-5. **R19's refusal: how "needs" is read (CA-4c).** This machine's **system** config carries
+5. **RULED (rulings-4 R19): "needs" = a TRACKED path's attribute names the filter (`ls-files` then
+   `check-attr`), and the preflight order is R13 → R21 → R19, folded into CA-4c.**
+   The original question: **R19's refusal: how "needs" is read (CA-4c).** This machine's **system** config carries
    `filter.lfs.required=true` for every repository. Read as "the key is present", R19 refuses every
    target on this machine. The row reads "needs" as "the target's attributes name a filter, diff or
    merge driver whose program key the generated file does not carry", with a control target that
    has no such attribute. **Ruling asked:** confirm that reading, or state the intended one.
-6. **R20's compare-then-call window (CA-4i) on a NORMAL exit.** The ruling says CA-6's tree-kill
+6. **RULED (rulings-4 R22, narrowed by ruling (b)): on POSIX the process group is killed on every exit
+   path; on win32 the normal-exit path is a named limit in every iteration record, and T-174 is the
+   job-object follow-up. Folded into CA-6 and CA-4i.** The original question:
+   **R20's compare-then-call window (CA-4i) on a NORMAL exit.** The ruling says CA-6's tree-kill
    closes the window. CA-6 establishes tree-kill on the **timeout** path only. A role that exits
    normally while a descendant survives (U3) can edit the generated file between the runtime's
    comparison and its call. **Ruling asked:** does the runtime kill the role's surviving
