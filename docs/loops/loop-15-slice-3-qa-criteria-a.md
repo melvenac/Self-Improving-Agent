@@ -145,9 +145,18 @@ source.
 - M-L1 removes the overrides;
 - M-L2 removes the window.
 
-Each must turn at least one row red. **If M-L1 turns nothing red, layer 1 is untested**: the
-candidate then states which call layer 1 protects that layer 2 does not, and a row covering that
-call is added before scoring. It must not be carried as defence nobody has seen work.
+Each must turn at least one row red.
+
+**Layer 1's visible job (§5.2, RULED; amendment to `770bcb9`).** Layer 1 is kept as defence in
+depth against a **layer-2 ordering defect**. The row, CA-4b-L1, uses one mutant (M-L2-order) that
+moves a runtime git read **ahead of** layer 2's restore, run with the hook or `core.fsmonitor`
+planted:
+- with layer 1 on, the planted program does **not** execute;
+- with layer 1 also removed (M-L2-order + M-L1), it **does**.
+
+Both runs are in the same row, with the marker read by the same expression. **If no such mutant can
+be constructed** against the candidate's code, the verdict records layer 1 as **redundant by
+construction**. It does not claim layer 1 protects anything.
 
 **CA-4c — layer 0 (R7): runtime git calls do not read the machine's git config.** Every runtime git
 call runs with `GIT_CONFIG_GLOBAL=<runtime-owned empty file>` and `GIT_CONFIG_NOSYSTEM=1`, and
@@ -267,9 +276,15 @@ transcript kept.
 - A4b is met here if a model-backed role completed a stage **inside** the runtime, evidenced by the
   **runtime's own artefacts**: the `LoopResult`, the iteration directory, `R_t`, and the transcript
   path the runtime recorded.
-- **The transcript must exist at the recorded path.** If it does not (T-161: loss is per-launch,
-  mechanism unknown), that is reported as absent, and the row is scored on the runtime artefacts
-  alone. It is never reconstructed.
+- **The transcript (§5.3, RULED; amendment to `770bcb9`).** A missing transcript is a **reported
+  absence, not a CA-9 fail.** The row is scored on the runtime's own artefacts: the iteration
+  directory, the `LoopResult`, `R_t`, and the windows. The transcript is evidence of the role's
+  reasoning, not of the runtime's behaviour. It is never reconstructed.
+- **The child's actual environment is recorded either way:** whether
+  `CLAUDE_CODE_FORCE_SESSION_PERSISTENCE=1` was set, and whether `CLAUDE_CODE_CHILD_SESSION` was
+  absent. It is read from the child's own printed environment (CA-2), not from the runtime's
+  configuration. **A missing transcript with both set correctly is a T-161 data point, and the
+  report names it as one.**
 - **This run is an observation, not acceptance** (V-046, V-048). The quality of the role's output
   is not scored.
 - **The adapter's flags are pinned by a test that reads the installed `claude --help`.** On CI,
@@ -361,16 +376,20 @@ U5: the quality or correctness of the model-backed role's output in the first re
 
 ---
 
-## 5. Returned to the planner, numbered, UNRULED and not scored until ruled
+## 5. Returned to the planner, numbered — all three now RULED
 
 1. ~~CA-4c: is global/system config in candidate A?~~ **RULED by rulings-2 R7–R9 and R11–R13:** it is
    in A as layer 0, with a report-only window, and the P5 claim is withdrawn. It is folded into
    CA-4c/e/f/g/h and CA-3c above.
-2. **CA-4b's "each layer load-bearing" clause.** If layer 2 restores before any git call, layer 1
+2. **RULED (planner, 2026-09-23): layer 1 stays as defence in depth against a layer-2 ordering
+   defect, and it gets the CA-4b-L1 row. If that row cannot be built, layer 1 is recorded as redundant
+   by construction.** The original question:
+   **CA-4b's "each layer load-bearing" clause.** If layer 2 restores before any git call, layer 1
    may protect nothing a test can see. That would make it the defence-in-depth the design already
    calls the host permission profile: honest if stated, rot if carried as coverage. **Ruling asked:**
    require a red row for M-L1, or accept a stated redundancy?
-3. **CA-9's transcript clause** depends on T-161's unknown per-launch loss. **Ruling asked:** is an
+3. **RULED (planner, 2026-09-23): a reported absence, scored on the runtime's artefacts, with the
+   child's environment recorded.** The original question: **CA-9's transcript clause** depends on T-161's unknown per-launch loss. **Ruling asked:** is an
    absent transcript a CA-9 fail, or a reported absence with the row scored on the runtime artefacts
    (as written)?
 
