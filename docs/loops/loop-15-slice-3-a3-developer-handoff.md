@@ -14,8 +14,8 @@
 | 4 R43 | done | repo after was `f6c637173221f649/666/nlink:2` (the victim hash); machine after was `712138997b4c155f` | full `configwatch-links` file: 18 passed, 3 skipped (POSIX). Exit 0. |
 | 5 R47 CA-2.5 | done | with `resolveLauncher`'s node-entry branch forced to refuse: `mutant: refusing node entry …planted-launcher.js`, expected false to be true. Exit 1. | after the mutant was removed: 2 passed (planted launcher and real `claude`), 22 skipped. Exit 0. |
 | 6 R47 CA-4c / R34 | done | M-L0 (layer 0 not applied): `the global filter ran inside a runtime git call: expected [ 'global:', 'global:', … ] to deeply equal []`. Exit 1. | layer 0 restored: 4 passed, 28 skipped. Exit 0. System `core.autocrlf` on this machine is `true`, not `input`. |
-| 7 R48 | next | | |
-| 8 D-A2-6 | pending | | |
+| 7 R48 | done | | CI test step is `npm test -- --reporter=verbose`. Nothing else in the workflow changed. Not run here. |
+| 8 D-A2-6 | next | | |
 
 ## Item 1 — R44
 

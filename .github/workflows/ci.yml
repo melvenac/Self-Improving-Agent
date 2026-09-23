@@ -31,4 +31,4 @@ jobs:
 
       - name: Test
         working-directory: open-brain
-        run: npm test
+        run: npm test -- --reporter=verbose
