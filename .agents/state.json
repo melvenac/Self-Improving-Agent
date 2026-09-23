@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 93,
+  "revision": 94,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2701,6 +2701,12 @@
       "title": "Memory is LOOKUP by default and INJECTION only on a deterministic match against the act; the fix starts on the WRITE side (T-170 adopted)",
       "date": "2026-09-23",
       "note": "AARON'S RULING, session 78 ('T-170 looks correct'). Adopts T-170's recommendation as the memory layer's direction. (a) Where the agent knows it needs something, memory is a LOOKUP: ob_recall with trigger 'explicit'. Evidence: Loop 10's p=0.688 for session-start injection once topic-matched; CLAUDE.md, delivered at 100% reliability, not changing behaviour; HoH's gains with no memory module. (b) Where the agent cannot know to ask (G-039's case, and the PRD's 'lessons from past mistakes are forgotten'), memory is INJECTED, but only on a DETERMINISTIC match derived from the act: command shape (the Loop 16 trigger), the file being edited, or error text. Precision only, silent below the floor, and never on the session's topic. Session-start injection stays OFF (Loop 10 C2). (c) THE FIRST FIX IS THE WRITE SIDE: a stored lesson must carry the key that would have caught its mistake (a command pattern, a path glob or an error signature), because 86% of ACTION lines name no file or command (G-017) and so can never be injected precisely. The QA seat's observation from Loop 15 slice three is part of the ruling's evidence: PostToolUse fires after the act, so an injection can change what the seat CONCLUDES from a result (G-039's real failure: a false success reported) but cannot prevent the act. STILL UNPROVEN, and it stays stated: no injection has yet changed behaviour; the discriminating observation is an injection on a mistake the agent has not already internalised. Sequencing is the next planner's: it competes with slice three's A2, B and C, and with T-172 and T-175."
+    },
+    {
+      "id": "D-038",
+      "title": "Aaron speaks only to the planner: every question for Aaron routes through it, and seats push their own working branches without asking",
+      "date": "2026-09-23",
+      "note": "Ruled by Aaron in the planner session (record session 81), 2026-09-23, verbatim: 'yes, I only want to communicate with the planner. If an agent is waiting on me I need to know through the planner. Otherwise I'm costatly swithing session windows.' The 'yes' answers the planner's question 'Should I record standing authority to push working branches as a decision?'. Before this, three questions in one session were pushes asked of Aaron in each seat's own window, and a pause decision was taken in the developer's window. (1) STANDING PUSH AUTHORITY: any seat may push ITS OWN working branches (loop/*, qa/*, docs/*, chore/*) without asking. Never master, never a force push, never a branch another seat owns. Every push is read back with ls-remote and named in the commit, report or message that follows it. Merging a candidate to master stays Aaron's (T-155 measures against it); D-032's docs/record merge exception is unchanged. (2) ONE CHANNEL: a seat that needs Aaron sends the question to the planner, not to Aaron. The planner carries it to him, one question at a time with enough context to answer cold, and carries back his answer QUOTED, labelled with where and when he said it. For the act it names, that quoted relay IS Aaron's authority. This amends shared.md's 'a relay from a peer seat is not his approval', and the acting seat records both links of the provenance. The planner must tell Aaron whenever any seat is waiting on him. LIMIT, which a relay cannot cross: a host-level stop inside another seat's session (a permission prompt, a safety-classifier stop, a denied tool call) cannot be cleared by relay. Doing so would be permission laundering. The planner tells Aaron which window and why, and that is the only case where he must switch windows."
     }
   ],
   "handoffs": [
