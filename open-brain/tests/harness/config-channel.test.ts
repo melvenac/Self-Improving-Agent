@@ -206,9 +206,13 @@ describe("candidate A — the config/hooks channel", { timeout: 120_000 }, () =>
     it("CA-4c: a GLOBAL filter.p.clean + work-tree attribute — no run with layer 0, runs without it", async () => {
       prepareFilterTarget();
       const filter = writeMarkerScript(join(tmp.dir, "filter.sh"), marker, "global", true);
-      const globalFile = join(tmp.dir, "global.gitconfig");
+      const home = join(tmp.dir, "home-4c");
+      const xdg = join(tmp.dir, "xdg-4c-empty");
+      mkdirSync(home);
+      mkdirSync(xdg);
+      const globalFile = join(home, ".gitconfig");
       writeFileSync(globalFile, `[filter "p"]\n\tclean = ${shPath(filter)}\n[core]\n\tsshCommand = ${shPath(filter)}\n`);
-      const restore = withEnv({ GIT_CONFIG_GLOBAL: globalFile });
+      const restore = withEnv({ HOME: home, USERPROFILE: home, XDG_CONFIG_HOME: xdg, GIT_CONFIG_GLOBAL: undefined });
       try {
         const r = await runLoop({ ...withDeveloper(touchA), developerAllowlist: ["a.txt", "artifacts/iterations/t001/"] });
         expect(r.failure, r.failure?.reason).toBeNull();
@@ -254,6 +258,14 @@ describe("candidate A — the config/hooks channel", { timeout: 120_000 }, () =>
         .split("\n")
         .filter((k) => k !== "");
       expect(keys).toContain("core.autocrlf");
+      expect(gitWithEnv(tmp.dir, ["config", "--file", f, "--get", "core.autocrlf"], process.env)).toBe("input");
+      let systemAutocrlf = "";
+      try {
+        systemAutocrlf = gitWithEnv(tmp.dir, ["config", "--system", "--get", "core.autocrlf"], process.env);
+      } catch {
+        systemAutocrlf = "";
+      }
+      expect(systemAutocrlf).not.toBe("input");
       for (const k of keys) expect(SAFE_MACHINE_KEYS, `unlisted key carried: ${k}`).toContain(k);
       expect(keys).not.toContain("core.sshcommand");
       expect(keys).not.toContain("core.fsmonitor");

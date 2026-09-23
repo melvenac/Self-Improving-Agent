@@ -13,8 +13,8 @@
 | 3 R46 | done | tree root named only the files under it as deleted; an entry's after was `symlink:<target>` without `type:`; baseNotes on a parent junction was empty | 7 passed (R45, R46, existing hooks junction and entry). Exit 0. |
 | 4 R43 | done | repo after was `f6c637173221f649/666/nlink:2` (the victim hash); machine after was `712138997b4c155f` | full `configwatch-links` file: 18 passed, 3 skipped (POSIX). Exit 0. |
 | 5 R47 CA-2.5 | done | with `resolveLauncher`'s node-entry branch forced to refuse: `mutant: refusing node entry …planted-launcher.js`, expected false to be true. Exit 1. | after the mutant was removed: 2 passed (planted launcher and real `claude`), 22 skipped. Exit 0. |
-| 6 R47 CA-4c / R34 | next | | |
-| 7 R48 | pending | | |
+| 6 R47 CA-4c / R34 | done | M-L0 (layer 0 not applied): `the global filter ran inside a runtime git call: expected [ 'global:', 'global:', … ] to deeply equal []`. Exit 1. | layer 0 restored: 4 passed, 28 skipped. Exit 0. System `core.autocrlf` on this machine is `true`, not `input`. |
+| 7 R48 | next | | |
 | 8 D-A2-6 | pending | | |
 
 ## Item 1 — R44
@@ -38,5 +38,9 @@ Every symlink tree root is recorded as `type:symlink readlink:<target>`, includi
 ## Item 5 — R47, CA-2.5
 
 The control that returned early when `claude` was absent is now two tests. A planted launcher is accepted and resolved on every platform (win32: a `.js` shim as `node-entry`; POSIX: an executable script as `native`), and a refusal twin runs beside it (win32: a `.cmd` with no npm-shim target; POSIX: a directory). The real `claude` launcher is its own test, `it.skipIf` when `claude` is not on `PATH`, with that reason in the title.
+
+## Item 6 — R47, CA-4c and R34
+
+The global-filter row plants `HOME/.gitconfig` and an empty scratch `XDG_CONFIG_HOME`, with `GIT_CONFIG_GLOBAL` unset, so git's own discovery is what layer 0 has to hide. The R19 row asserts the planted value `core.autocrlf = input`, and that the system value is not `input`.
 
 Not verified: full suite (not run; ask Atlas first). POSIX not run here (win32).
