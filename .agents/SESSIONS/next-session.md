@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 91 by open-brain v0.44.1 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 92 by open-brain v0.44.1 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -23,7 +23,7 @@ LOOP 15 SLICE THREE: candidate A (3b19287) was REJECTED on one blocker, D-A1: la
 
 - Does the effort level change the error rate? The first data (this session's errors at medium and at high) is recorded but not analysed; T-173 is the instrument.
 - Is G-042 external load or the suite's own? Candidate A's run was red with another project busy, green once and green again; both hypotheses are load, and B's Step 0 is designed to separate them.
-- When does a recall-trigger injection change behaviour? Entry 299 was injected about eight more times this session across all seats, always apt and never changing the act, because the practice was already loaded and PostToolUse fires after the act. T-170 records the lookup-versus-injection recommendation; Aaron has not ruled on it.
+- When does a recall-trigger injection change behaviour? Entry 299 was injected about eight more times this session across all seats, always apt and never changing the act, because the practice was already loaded and PostToolUse fires after the act. Aaron adopted T-170 as the memory direction (D-037); when to schedule its write-side fix against slice three's remaining candidates is the next planner's call.
 - A2A-Hub's `state import --commit` is Aaron's to run (G-007); its draft is prepared, with SIA's seed entries removed by parser (T-175).
 
 ### Loop state
@@ -33,7 +33,6 @@ LOOP 15 SLICE THREE: candidate A (3b19287) was REJECTED on one blocker, D-A1: la
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- T-170: memory as lookup by default with injection only on a deterministic match against the act. Recorded as a recommendation, not ruled.
 - Run A2A-Hub's `state import --commit` (G-007).
 
 **Rulings made mid-loop:** 
@@ -42,6 +41,7 @@ LOOP 15 SLICE THREE: candidate A (3b19287) was REJECTED on one blocker, D-A1: la
 - D-033 and D-036: slice three closes at A, B and C; Jev calibration is the next slice
 - D-034 other projects' seats are recorded, pause on request
 - D-035 fresh seat sessions at each candidate boundary
+- D-037 memory is lookup by default, injection only on a deterministic match against the act (T-170 adopted)
 - Rulings R1-R27 in docs/loops/loop-15-slice-3-rulings-1..6.md
 - Candidate A rejected; A2 carries D-A1 and D-A3 only (R24)
 
