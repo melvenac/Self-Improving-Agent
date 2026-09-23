@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 102 by open-brain v0.44.1 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 104 by open-brain v0.44.1 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,35 +6,37 @@
 
 ### Pick up here
 
-PLANNER SESSION 81 (Atlas) handing off to a FRESH planner (record session 90) at about 39% context left, 2026-09-23. CANDIDATE A4 is in flight: Grok 4.7 in Cursor, developer record session 88, branch loop/15-slice-3-candidate-a4, draft PR #130. It is 544cf15 (R49-R52 on A3 5010199) PLUS one R54 fix commit pending. Its first full suite failed CA-4f (config-channel.test.ts:348) because R44 merged the read gate with stage attribution; rulings-11 R54 (master 2c0ead2) separates them. The hub room is k57frxw0ptb8tadmqdwy0khhks8ey006 ('sia-a4', A2A-Hub v1.8.0, read receipts live; check GET /a2a/session/<id>/reads). NEXT ACTIONS: (1) When Grok pushes the R54 commit: verify on origin (scope, ancestors, master untouched); confirm Relay's hold is still on and A2A-Hub's local stack is still STOPPED (stopped on Aaron's word, 11 processes, ports free); then give Grok ONE full suite with you idle (start your hub listener only after a sleep). (2) Freeze, then dispatch a FRESH QA seat as record session 89 against the criteria at 6672e83 read with rulings-9/10/11. Every CA-15 probe runs against A4, A3 5010199, A2 2add792 and 3b19287, including QA report A3's four new shapes (A3 is their known positive), R52's five POSIX tests read from CI's per-test lines, and one mutant per protection with R49 and R54 each revertible alone. Tell QA to report to the live planner found by ListAgents, not by name. (3) After the QA suite, lift Relay's hold; whether A2A-Hub's stack restarts is Relay's and Aaron's call. (4) If A4 is accepted: the merge is Aaron's; then B (G-042 repair plus E_t; G-042 now has two idle-vs-contended pairs) and C (T-155) go to the CLAUDE developer. If rejected: rule on the class, not the instance; a fresh Grok session builds A5.
+PLANNER SESSION 81 (Atlas) handing off to a FRESH planner (record session 90). Aaron is restarting VS Code, so EVERY seat rolls at once, 2026-09-23. STATE: CANDIDATE A4 is FROZEN at f9a1aa8 on origin/loop/15-slice-3-candidate-a4 (draft PR #130): R49-R52 plus R54 on A3 5010199, built by Grok 4.7 in Cursor, developer record session 88, which has finished. QA 89 HAS NOT STARTED. FIRST ACTIONS: (1) run /start. Then ask Aaron to start a FRESH Claude session in ~/Worktrees/sia-qa and, once it is up (ListAgents), send it a pointer: 'you are QA record session 89; run /start; read and follow docs/loops/loop-15-slice-3-dispatch-qa-a4.md on master'. That file is the complete dispatch, including the detach the QA tree needs first. (2) When QA asks for its full suite: A2A-Hub's local stack must still be STOPPED (it was stopped on Aaron's word; check that ports 3210/4000/5173 are free, or ask), no A2A-Hub seat should be running (after the restart none should be; if a fresh Relay appears, ask it to hold), and YOU stay idle. (3) On the verdict: if accepted, the merge is Aaron's; then B (G-042 repair plus E_t; G-042 now points at the worktree as well as load) and C (T-155) on the CLAUDE developer. If rejected: rule on the CLASS; a fresh Grok session builds A5 through A2A-Hub (room k57frxw0ptb8tadmqdwy0khhks8ey006 or a new one). The hub is v1.8.0 on tcm, with read receipts: GET /a2a/session/<id>/reads. (4) The A2A-Hub hold lives in A2A-Hub's record (rev 25) and binds its next Relay until the SIA planner lifts it. Tell a fresh Relay when SIA's suite runs are done.
 
 ### Watch out
 
-- FOUR PLANNER ERRORS TONIGHT IN ONE FAMILY, ALL ON CA-15: a ruling written from the case in front of it without reading back every criteria row it touches (the Grok dispatch omitted D-A2/D-A4; R36 silent on the read; R39's unqualified base; R43/R44 as instances, not a class; R44 merging read gate and stage attribution, which broke CA-4f). CONTAINMENT: before sending any ruling, list every criteria row it changes behaviour for, and say for each whether it still passes. R49 (a principle) and R54 (two baselines) were written that way.
-- A CURSOR SEAT IS NEVER WOKEN BY A HUB MESSAGE (T-160). Read receipts now make it VISIBLE: GET /a2a/session/<room>/reads shows 'unread by grok since T'. Grok still needs Aaron to nudge it when it goes idle (T-050's wake is open, and Relay will ask for a live trial). Always --session and never --peer; run hub-talk only from ~/Projects/A2A-Hub (v1.8.0), and never --inbox or --wait without reading the output: that marks turns read.
-- FULL-SUITE RUNS NEED A QUIET MACHINE (G-042). Tonight's evidence: the suite was red with the planner running light commands, or with A2A-Hub's local stack up (its daemons poll every 2 s), and green with everything idle. Hold Relay's seats, keep the stack stopped, and do NOT run your own listener or CI polling during a run: delay the listener with a sleep.
+- AFTER A VS CODE RESTART, CHECK YOUR OWN TRANSCRIPT EXISTS. On 2026-09-20 one relaunch of rolled seats wrote NO transcript for all three (G-044, T-161, cause unknown). Look for ~/.claude/projects/<slug>/<your-uuid>.jsonl growing. If it is absent, tell Aaron before doing work that depends on it (effort and model are read from it).
+- FOUR PLANNER ERRORS IN ONE FAMILY ON CA-15 (rulings-9, -10, -11): a ruling written from the case in front of it without reading back EVERY criteria row it touches. Before sending any ruling, list the rows it changes behaviour for, and say whether each still passes. R49 (a principle) and R54 (two baselines: the read gate at the loop base, attribution at the stage start) are the model.
+- A CURSOR SEAT IS NEVER WOKEN BY A HUB MESSAGE (T-160; A2A-Hub T-050 still open). Read receipts make its silence VISIBLE: /reads shows 'unread by grok since T'. Aaron nudges it in Cursor. Always --session, never --peer; run hub-talk only from ~/Projects/A2A-Hub (v1.8.0); never --inbox/--wait without reading the output.
+- FULL SUITES NEED A QUIET MACHINE (G-042), and possibly a particular tree: Grok's tree went red three times tonight, QA's tree was always green when idle. Delay your own listener with a sleep during any suite, and stop CI polling.
 - stop_reason "refusal" is the API safety layer. Candidate A's link-handling work goes to Grok (T-177); nobody rephrases around it. B and C go to Claude.
-- GROK: 256k context; brief it by SECTION with verified line pointers, one commit per item, red before green, stop at about 70%. approvalMode is unrestricted, so verify master after every push it reports.
-- D-038/D-039: Aaron speaks only to the planner. Quote his words verbatim when relaying, with where and when. A permission stop in another seat's window (Relay's SSH, for example) cannot be cleared by relay: tell Aaron which window. A2A-Hub's seats have standing push authority (their D-005).
-- update_task, update_gap and set_objective REPLACE their field. Compose old+new in a SCRIPT FILE (never an inline node -e with apostrophes), DRY-RUN FIRST (skipped once tonight), then verify byte for byte.
-- build-freshness fails after every docs commit in this tree. Check `git diff --name-only <build> HEAD -- open-brain` before calling it stamp-only.
+- D-038/D-039: Aaron speaks only to the planner; quote him verbatim with where and when; a permission stop in another seat's window cannot be cleared by relay. A2A-Hub's seats push their own branches (their D-005).
+- update_task, update_gap, set_objective and set_handoff REPLACE their field. Compose in a SCRIPT FILE, DRY-RUN FIRST, and verify byte for byte.
+- build-freshness fails after every docs commit in this tree; check `git diff --name-only <build> HEAD -- open-brain` before calling it stamp-only.
 
 ### Open questions
 
-- Does A4, with R54, pass? The clause-3 principle (R49) is the first ruling stated as a class; if QA still finds a sibling, the principle needs sharpening, not another instance.
-- T-050: can Cursor's stop hook wake an idle seat? Relay will ask for a live trial through the planner.
-- Were Forge's two refusals false positives? Aaron was advised to /feedback; not recorded as done.
-- T-165: Grok has built A2, A3 and A4; each delivered its scope; every rejection traced to planner rulings. Worth a deliberate comparison once slice three closes.
+- Does A4 pass? R49 is the first ruling on CA-15 stated as a class. If QA still finds a sibling, sharpen the principle; do not add an instance.
+- Is G-042 the machine's load, the worktree, or Cursor running in it? Tonight's pattern points at more than load.
+- T-050: can Cursor's stop hook wake an idle seat? A live trial is to be asked for through the SIA planner (A2A-Hub's D-003).
+- Were Forge's two refusals false positives? /feedback was advised; not recorded as done.
+- T-165: Grok built A2, A3 and A4, and each delivered its scope; every rejection traced to planner rulings. Compare deliberately once slice three closes.
 
 ### Loop state
 
 **Open PRs:** _None._
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `f9a1aa84209f9d17cac404faeb19e00caf2d3491`
 
 **Questions pending for Aaron:** 
+- Start a fresh QA session in ~/Worktrees/sia-qa after the restart (QA 89).
 - If QA accepts A4: the merge to master is his.
-- Whether A2A-Hub's local stack restarts after SIA's QA run (Relay's and his call).
+- Whether A2A-Hub's local stack restarts after SIA's QA run (his and Relay's call).
 
 **Rulings made mid-loop:** 
 - D-031 release commit after acceptance
@@ -46,7 +48,7 @@ PLANNER SESSION 81 (Atlas) handing off to a FRESH planner (record session 90) at
 - D-038 Aaron speaks only to the planner; seats push their own working branches
 - D-039 A2A-Hub's planner routes through the SIA planner for shared work
 - Rulings R1-R54 in docs/loops/loop-15-slice-3-rulings-1..11.md (R28 is the brief's)
-- A rejected (D-A1); A2 rejected (A2-1..5); A3 rejected (A3-1..3); A4 = R49-R52 + R54 in flight
+- A rejected (D-A1); A2 rejected (A2-1..5); A3 rejected (A3-1..3); A4 frozen at f9a1aa8, QA 89 pending
 
 ## developer _(written session 74)_
 
