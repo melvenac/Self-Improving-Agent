@@ -66,6 +66,19 @@ The R44 qa assertion now expects no finding. The developer stage still reports t
 
 Files: `open-brain/src/harness/configwatch.ts`, `open-brain/tests/harness/configwatch-links.test.ts`.
 
+## Full suite
+
+Both runs from `open-brain/`, output redirected to a file, exit code taken before any pipe. Neither was re-run.
+
+| Run | Tree | Condition | Exit | Files | Tests | Error |
+|---|---|---|---|---|---|---|
+| 1 | `544cf15` (before R54) | A2A-Hub local stack up (Convex, hub, two daemons polling every 2s, vite). Planner idle. Wall 228s, vitest 225.27s. | 1 | 1 failed, 74 passed (75) | 1 failed, 1120 passed, 10 skipped (1131) | CA-4f stage was `qa` (`config-channel.test.ts:348`), plus `Error: [vitest-worker]: Timeout calling "onTaskUpdate"` |
+| 2 | `2db806a` | A2A-Hub stack stopped, ports free, planner idle, no polling. Wall 180s, vitest 176.40s. | 1 | 75 passed (75) | 1121 passed, 10 skipped (1131). No FAIL line. | `Error: [vitest-worker]: Timeout calling "onTaskUpdate"` only. Atlas ruled this is G-042's heartbeat, not an A4 change. |
+
 ## Not verified
 
-The full suite was not run. Atlas is asked before that. R52 was not run on POSIX; this seat is win32, and those tests skip. `/sync` on this tree still reports the pre-existing `prd-version`, stale rendered views, `retirements`, and `build-freshness` issues. None of them come from A4's commits. GitNexus impact was not run: the MCP tools are not in this session, and the index is behind HEAD.
+R52 was not run on POSIX. This seat is win32, and those five tests `skipIf(isWin)`. `/sync` on this tree still reports the pre-existing `prd-version`, stale rendered views, `retirements`, and `build-freshness` issues. None of them come from A4's commits. GitNexus impact was not run: the MCP tools are not in this session, and the index is behind HEAD.
+
+## Freeze
+
+Implementation is `2db806a`. This commit is the handoff only. A fresh session can continue from this file.
