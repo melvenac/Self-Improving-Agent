@@ -15,7 +15,7 @@
 | 5 R47 CA-2.5 | done | with `resolveLauncher`'s node-entry branch forced to refuse: `mutant: refusing node entry …planted-launcher.js`, expected false to be true. Exit 1. | after the mutant was removed: 2 passed (planted launcher and real `claude`), 22 skipped. Exit 0. |
 | 6 R47 CA-4c / R34 | done | M-L0 (layer 0 not applied): `the global filter ran inside a runtime git call: expected [ 'global:', 'global:', … ] to deeply equal []`. Exit 1. | layer 0 restored: 4 passed, 28 skipped. Exit 0. System `core.autocrlf` on this machine is `true`, not `input`. |
 | 7 R48 | done | | CI test step is `npm test -- --reporter=verbose`. Nothing else in the workflow changed. Not run here. |
-| 8 D-A2-6 | next | | |
+| 8 D-A2-6 | done | | Handoff correction only. No code change. |
 
 ## Item 1 — R44
 
@@ -43,4 +43,12 @@ The control that returned early when `claude` was absent is now two tests. A pla
 
 The global-filter row plants `HOME/.gitconfig` and an empty scratch `XDG_CONFIG_HOME`, with `GIT_CONFIG_GLOBAL` unset, so git's own discovery is what layer 0 has to hide. The R19 row asserts the planted value `core.autocrlf = input`, and that the system value is not `input`.
 
-Not verified: full suite (not run; ask Atlas first). POSIX not run here (win32).
+## Item 7 — R48
+
+The CI test step prints every test (`npm test -- --reporter=verbose`). No other line in `.github/workflows/ci.yml` changed.
+
+## Item 8 — D-A2-6
+
+A2's handoff said a junctioned `.git` never reaches a git call. That claim is wrong. `runtime.ts:361` runs `git rev-parse --is-inside-work-tree` before `dotGitLink` at `:366`. That one git call happens, then the link refuses the loop. The refusal still lands. The "never" does not.
+
+Not verified: full suite (not run; ask Atlas first). POSIX not run here (win32). The verbose CI log was not executed. D-A2-7 and D-A5 are carried, not in this candidate.
