@@ -18,6 +18,8 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { CheckOutcome } from "./schema.js";
+import { constructEnv } from "./process.js";
+import { LAYER1_ENV, NULL_DEVICE } from "./git.js";
 
 export interface CheckSpec {
   /** Executable, run with no shell. */
@@ -117,10 +119,37 @@ const render = (spec: CheckSpec): string => [spec.command, ...spec.args].join(" 
  * status can belong to the shell, or to the last element of a pipeline, rather
  * than to the thing under test.
  */
-export function runCheck(spec: CheckSpec, cwd: string): CheckOutcome {
+/**
+ * Names a check process may inherit beyond the base allowlist. What npm and a
+ * test runner need to start, and nothing that authorises anything.
+ */
+export const CHECK_ENV_ALLOW: readonly string[] = ["CI", "NODE_ENV", "FORCE_COLOR", "NO_COLOR", "TERM"];
+
+/**
+ * The environment a deterministic check runs in (R15).
+ *
+ * **Every process that runs role-authored code gets a constructed
+ * environment**: the build and the tests execute what the developer role just
+ * wrote, so they must not inherit `TYPESAFE_API_KEY`. Git layers 0 and 1 are
+ * carried as environment so a git the build runs (`write-build-info.mjs`) is
+ * held to them too. `GIT_DIR` is deliberately NOT pinned here: the test suite
+ * creates its own repositories, and a pinned `GIT_DIR` would point every one of
+ * them at the target.
+ */
+export function checkEnv(parent: NodeJS.ProcessEnv, globalConfigPath: string): NodeJS.ProcessEnv {
+  return constructEnv(
+    parent,
+    CHECK_ENV_ALLOW,
+    { ...LAYER1_ENV, GIT_CONFIG_GLOBAL: globalConfigPath, GIT_CONFIG_NOSYSTEM: "1" },
+    { forced: false },
+  );
+}
+
+export function runCheck(spec: CheckSpec, cwd: string, env: NodeJS.ProcessEnv = checkEnv(process.env, NULL_DEVICE)): CheckOutcome {
   const started = Date.now();
   const r = spawnSync(spec.command, [...spec.args], {
     cwd,
+    env,
     encoding: "utf-8",
     shell: false,
     timeout: spec.timeoutMs ?? 300_000,
@@ -190,9 +219,13 @@ export interface CheckRunResults {
 }
 
 /** Run both checks in order. The build runs first; the unit run happens regardless. */
-export function runDeterministicChecks(checks: DeterministicChecks, cwd: string): CheckRunResults {
-  const build = runCheck(checks.build, cwd);
-  const unit = runCheck(checks.unit, cwd);
+export function runDeterministicChecks(
+  checks: DeterministicChecks,
+  cwd: string,
+  env: NodeJS.ProcessEnv = checkEnv(process.env, NULL_DEVICE),
+): CheckRunResults {
+  const build = runCheck(checks.build, cwd, env);
+  const unit = runCheck(checks.unit, cwd, env);
   return { build, unit, allPassed: build.passed && unit.passed };
 }
 

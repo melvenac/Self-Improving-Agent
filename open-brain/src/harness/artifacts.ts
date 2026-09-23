@@ -155,6 +155,8 @@ export interface FailureRecord {
   attempts?: number;
   problems?: readonly string[];
   at: string;
+  /** Rendered after the reason: the loop's findings and developer record, so they survive a failure. */
+  appendix?: string;
 }
 
 /**
@@ -178,6 +180,7 @@ export function renderFailure(f: FailureRecord): string {
   if (f.problems && f.problems.length > 0) {
     lines.push("## Problems", "", bullets(f.problems));
   }
+  if (f.appendix !== undefined && f.appendix !== "") lines.push(f.appendix);
   lines.push(
     "---",
     "",
