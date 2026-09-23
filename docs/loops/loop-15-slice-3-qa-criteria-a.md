@@ -93,6 +93,22 @@ handoff §1 (`docs/loops/loop-15-slice-3-forge-session-80-final-handoff.md` at `
 parsed as JSON): every assistant entry carries top-level `"model":"claude-opus-5-5"` and
 `"effort":"high"`, 40 of 40 entries at 03:44:00Z. Additions of this seat's own are marked **[mine]**
 and returned in §8; they are not scored until ruled.
+**Amendment 5, the ruling fold (the same seat and session), which makes these criteria FINAL for A2.**
+`loop-15-slice-3-rulings-7.md` (master `a9018af`, blob `649ff472`, read in full) accepts amendment 4 as A2's criteria
+and rules §8's six items plus one finding of its own, R29–R35. They are folded in one commit:
+- R29 → CA-15's read half;
+- R30 (ancestor links) and R31 (hard links) → CA-15, **scored**;
+- R32 → CA-15 (c) and §4;
+- R33 → CA-6;
+- R34 → CA-4c's R19 bullet;
+- R35 → CA-15 clauses 3 and 5.
+
+Every **[mine]** marker that amendment 4 added to §2 is removed, because each item was ruled in. CA-6's
+DFORK marker, which dates from before candidate A, now says it is scored for A2 under R33. CA-4b's R17
+note keeps its marker; it is not a row. §8 is kept as the record of what was
+asked, with each item's ruling beside it. **Rulings-7 also amends R24:** A2 must close the ancestor and
+hard-link shapes as part of D-A1, which the planner measured on win32 before ruling (rulings-7, "Measured
+by this seat before ruling").
 
 ---
 
@@ -345,6 +361,12 @@ it is listed in the iteration record. Identity is still passed with `-c user.nam
   is on a named non-program allowlist**. An unlisted key fails the check (strict default). **Probe:**
   a program-valued key planted in the (simulated) machine global config at preflight (for example,
   `filter.x.clean`, or `core.sshCommand`) is **not carried**.
+  **The positive comes from the planted file (rulings-7 R34).** The row asserts the planted **value**,
+  `core.autocrlf = input`, in the generated file, not only the key's presence. At `3b19287` the only
+  positive was `toContain("core.autocrlf")`, and this machine's system config carries that key too.
+  - **Control, in the same test:** the platform's **system** value is read by the same git call without
+    the planted file, and it is shown **not** to be `input`. So the positive comes from the planted
+    file on CI's Linux as well as here.
 - **R19, what layer 0 must no longer break (§7 item 10, measured):** on a target cloned under the
   machine's own config (this machine's system config carries `core.autocrlf=true`) with **no
   `.gitattributes`**:
@@ -544,10 +566,20 @@ the tree from a **live** root, so a normally-exited role's orphans are unreachab
     must fail closed: if `Add-Type` is unavailable or AV interferes, the loop is refused and never
     falls back to an unkilled tree.
 - **win32, timeout path:** `taskkill /T` while the root is alive, which is the row below.
-  - **[mine], a measurement of the stated limit, reported and not scored:** `taskkill /T` walks
+  - **A measurement of the stated limit (DFORK). It was [mine] and unscored for candidate A; for A2 it
+    is scored for the record-text clause only (R33, next bullet):** `taskkill /T` walks
     parent links from the live root. So a **double-forked** grandchild, whose intermediate parent
     has already exited, may be unreachable even here. The report runs that case and states the
     outcome beside the limit line, so the line is not read as covering it unmeasured.
+  - **For A2, D-A3 is scored on this measurement** (rulings-6 R24; rulings-7 R33). This row's fail
+    clause "a surviving grandchild reported as killed" applies to the DFORK run.
+    - **The report quotes the `role-timeout` text VERBATIM** from the DFORK run **and** from a plain
+      single-child timeout.
+    - **Neither text may claim more than that run's kill measurably did.** At `3b19287` the text said
+      "was killed with its process tree" unconditionally (`runtime.ts:1061–1062`) while a
+      double-forked descendant survived.
+    - Closing the double-fork is **not** required (R24: "A2 does not try to close the double-fork. It
+      names it.").
 
 **The timeout row (P4, all platforms):**
 
@@ -645,7 +677,8 @@ count:
 | the generated global-config file | compared before every git call (CA-4i, R20) |
 | config content (garbage, `repositoryformatversion=99`) | layer 2 restores it before any git call (CA-4a) |
 | link-typed watched paths (symlink or junction at a watched path, root or entry; a link at base) | probed by this candidate, CA-15 (amendment 4). **At `3b19287`, a junction at `.git/hooks` made the restore act outside the repository (D-A1)** |
-| hard links at a watched file | unprobed; returned in §8, item 3 |
+| link at an ancestor of a watched path (for example `.git` itself) | probed by this candidate, CA-15 (a)5 and (b)6 (R30). A link at the repository root or above is **unprobed**, and is R30's stated limit |
+| hard links at a watched file | probed by this candidate, CA-15 (a)6 and (b)5 (R31) |
 | HEAD file (content) | **probed at v0.44.1: crash without record** (§7.1). A's backstop records it (CA-14). **The channel itself is open** (rulings-3 item 17) |
 | index | **probed at v0.44.1: crash without record** (§7.1). A's backstop records it (CA-14). **The channel itself is open** (rulings-3 item 17) |
 | submodules | unprobed |
@@ -724,6 +757,17 @@ inside a watched tree. The watched set is the one the candidate states under CA-
 This is report A §13's list. The row runs against the set A2 states. **A set smaller than this one is
 reported as a narrowing**, never scored silently.
 
+**Two more shapes, scored (rulings-7 R30, R31, amending R24):**
+- **Ancestor links (R30).** A link at **any path component from the repository root (exclusive) down to
+  each watched path** is a change, and so is a link on the chain down from each git directory R18 pins
+  in a linked worktree. `lstat` checks only the final component. The planner measured it on win32:
+  with a junction at `.git`, `lstat` of `.git/config` reports `isFile`, and an `r+` write through it
+  overwrote the victim.
+- **Hard links (R31).** A hard link at a watched file is not a "type", but R25's binding sentence covers
+  it. The planner measured it on win32: an unprivileged `linkSync` gave `nlink: 2`, and an `r+` write
+  overwrote the outside file. **The mechanism that prevents it is the developer's.** This row says what
+  must not happen.
+
 **Pass, all of the following, for every probe below:**
 1. The stage fails `stage-changed-config`, is refused and never retried, and ends in a `LoopResult`
    and `FAILED.md`, with no exception out of `runLoop`.
@@ -731,20 +775,42 @@ reported as a narrowing**, never scored silently.
    `lstat` on the watched path reports the snapshot's type: a regular file, or a real directory, not
    a link. Its file set and bytes equal the pre-stage snapshot. This is CA-4a's set-and-bytes rule,
    read with `lstat`, not through the path.
-3. **Nothing outside the repository is read, written or deleted by the runtime.** It is shown by the
-   canaries below, in both directions.
+   - **For an ancestor link (R30), this clause is REPLACED.** The snapshot does not hold the whole git
+     directory, so nothing beneath the ancestor can be recreated. The record **names the replaced
+     ancestor and claims no restore of anything beneath it.**
+3. **Nothing outside the repository is written or deleted, by the runtime or by any process it
+   spawns** (R35, replacing "read, written or deleted").
+   - **Reads outside the repository are confined to the named machine-config paths as they stood at
+     base**, including a link target recorded at base: `readMachineSafeConfig` at loop start
+     (`runtime.ts:443` at `3b19287`) and `MachineConfigWatch` (`configwatch.ts:304`, `:348`).
+   - **After a role has run, no watched path, repository or machine, is read THROUGH a link, an
+     ancestor link or a hard link that was not there at base.**
+   - **For an ancestor link (R30), this clause also covers the runtime's record.** `FAILED.md` and
+     every iteration artefact must not be written through the link. If the record cannot be written
+     without doing so, the `LoopResult` says where it could not be written.
+   - **Spawned processes count** (R30). A rollback `git reset` or `git checkout` through a junctioned
+     `.git` would be expected to write an index into the victim. That is inferred and not measured,
+     and if it happens it fails this clause like a direct write.
+   - It is shown by the canaries below, in both directions.
 4. **The record says what happened.** It names the link-typed path as a type change. It does not say
    "put back" for any path whose post-restore `lstat` re-read disagrees with the snapshot. R24:
    "put back" is written only after an `lstat` re-read.
-5. **A link already at a watched path at BASE is refused at preflight** (R24: "links at base refused
-   at preflight"), before any tag, commit or artefact, naming the path, and with its target's
-   canaries unchanged.
+5. **A link already at a REPOSITORY watched path at BASE is refused at preflight** (R24: "links at base
+   refused at preflight"; R35 limits the refusal to repository paths), before any tag, commit or
+   artefact, naming the path, and with its target's canaries unchanged.
    - **Control:** the same repository with the link replaced by a real directory proceeds past
      preflight.
+   - **A machine-config path that is a link at base is NOT refused** (R35). That is how an ordinary
+     dotfiles setup looks, and refusing it would make the harness uninstallable for a stranger. It is
+     recorded with its type and target.
+   - **Control (R35):** a link planted at `$XDG_CONFIG_HOME/git` at base (a junction on win32, a
+     symlink on CI's Linux) **proceeds past preflight**, and the record carries its type and target.
+     This machine's `~/.gitconfig` is a regular file (`nlink` 1), so the control is planted, not
+     found.
 
 **Canaries, in both directions.** Every probe points its link at a **scratch victim** outside the
 repository, created by the probe for that run. No real directory is ever a target. "Both directions"
-is read two ways here, and the row requires both. That reading is returned in §8, item 1.
+is read two ways, and the row requires both (rulings-7 R29 confirms both).
 - **Write and delete.** The victim holds canary files with known names, bytes and (on POSIX) modes.
   After the loop:
   - every canary exists with its bytes and mode unchanged;
@@ -756,10 +822,15 @@ is read two ways here, and the row requires both. That reading is returned in §
     including `.git/`, the iteration directory, `FAILED.md`, and the loop's returned output.
   - The search is validated on a known positive in the same run: the victim itself, where it must
     hit.
-  - **[mine], POSIX only, on CI:** the victim is made unreadable (mode `000`). The test first shows
-    that a direct read of it fails with `EACCES`, and **fails rather than skips** if it does not (a
-    runner with root privileges would read it anyway). A runtime read through the link would then
-    surface as an error, and the record carries none.
+  - **POSIX only, on CI (R29):** a victim made unreadable (mode `000`), **in its own run and never
+    the victim of a write/delete probe.** A victim the runtime cannot open makes a write through the
+    link fail with `EACCES`, so the write canary would survive because the write was refused, not
+    because none was attempted: a stacked fixture failing in the flattering direction. The write and
+    delete probes therefore use a victim the runner **can** write.
+    - In the mode-`000` run, the test first shows that a direct read of the victim fails with
+      `EACCES`, and **fails rather than skips** if it does not (a runner with root privileges would
+      read it anyway).
+    - A runtime read through the link would then surface as an error, and the record carries none.
   - **Limit, stated:** a read that leaves no trace, such as a hash computed and then discarded, is
     not observable by any canary. For that case the report adds code-path evidence that A2's walk
     never opens, `readdir`s or hashes **through** a link, labelled as static reading.
@@ -785,10 +856,17 @@ is read two ways here, and the row requires both. That reading is returned in §
   3. **R24's sibling:** a junction as an **entry inside** a watched tree (`.git/hooks/sub` → the
      victim);
   4. **R24's sibling:** in a linked worktree, a junction at `<git-dir>/info`;
-  5. **[mine]:** a junction at an **ancestor** of every watched path. The role renames `.git` aside
-     in a non-linked repository and junctions `.git` → the victim. R18's pinning is by path, so the
-     pins and every watched path would all resolve through the link. **Expected:** a record, and the
-     victim's canaries intact. Returned in §8, item 2.
+  5. **R30, scored:** a junction at an **ancestor** of every watched path. The role renames `.git`
+     aside in a non-linked repository and junctions `.git` → the victim. R18's pinning is by path, so
+     the pins and every watched path resolve through the link. **Pass:** clauses 1, 3 and 4, with
+     clause 2 replaced as R30 states, and the canaries in both directions.
+  6. **R31, scored:** a **hard link**. `linkSync` a victim file to `.git/config`, and in a second run to
+     a hook entry inside `.git/hooks`. The victim is on the same volume as the repository.
+     - **The plant is asserted with `nlink === 2`.**
+     - **Pass:** the victim's bytes are unchanged, and the stage fails `stage-changed-config` with a
+       record that names the path.
+     - The known positive at `3b19287` is predicted from `writeBack`'s in-place `r+`, and the
+       transition control measures it.
   - **The plant is asserted to have landed.** Before the stage ends, the stub role `lstat`s its link
     and writes the result to its deliverable, and the probe reads it back. A plant that failed
     silently makes every negative vacuous: report A §3's file-symlink case failed with `EPERM` on
@@ -812,7 +890,12 @@ is read two ways here, and the row requires both. That reading is returned in §
      (CA-4f's simulation) is replaced by a symlink to a victim file.
      - The change is **reported** as a type change naming the path.
      - Nothing is restored (R8), and the victim's bytes are unchanged.
-     - On win32, the same sibling is probed with a junction at `$XDG_CONFIG_HOME/git`.
+     - On win32, the same sibling is probed with a junction at `$XDG_CONFIG_HOME/git`, planted
+       **after base** by the role. R35's base-link control is the opposite case: a link that is
+       already there at base proceeds.
+  5. **R31, the hard link on POSIX:** the same two runs as (a)6, with the plant asserted by
+     `nlink === 2` and the victim's bytes unchanged.
+  6. **R30, the ancestor on POSIX:** the same as (a)5, with a symlink at `.git`.
   - **In-test controls, since this seat has no POSIX machine to run a mutant on:**
     - the plant is asserted with `lstat(…).isSymbolicLink()`;
     - a write **through** the link by the test itself changes the victim, so the instrument can see
@@ -824,17 +907,27 @@ is read two ways here, and the row requires both. That reading is returned in §
 - **(c) The attribution mutant, M-L2-norestore:** A2 with its restore removed and detection kept,
   `tsc --noEmit` clean, run against probe (a). The victim is untouched, which shows the probe
   separates the runtime's restore from the role's act (report A §3 ran the same mutant at `3b19287`).
-  - **[mine]:** a second mutant, **M-L2-follow**, replaces A2's `lstat` guard before a write, delete
-    or `chmod` with the link-following form (`stat`, or the guard removed). It must turn at least one
-    (a) probe red. If A2's guard is not a single edit, the report names the edit made. Returned in
-    §8, item 4.
+  - **M-L2-follow, REQUIRED, one mutant per protection (R32).** The transition control shows that
+    `3b19287` and A2 differ. It does not show that A2's guard is what keeps the victim intact.
+    - A2 may protect the three shapes separately: a link at the watched path, an ancestor link, and a
+      hard link. If it does, **each protection gets its own mutant**, which reverts only that
+      protection and must turn its own probe red: (a)1–(a)4, (a)5, and (a)6 respectively.
+    - **If one mechanism covers all three shapes, one mutant must turn all three probes red.**
+    - Every edit is asserted to land, and `tsc --noEmit` is clean, before a mutant counts. The report
+      names each edit made.
 
 **Fail, any one of:**
 - a canary changed or deleted, or an entry added to a victim;
 - the token found where the runtime writes;
 - a watched path that is still a link after the loop;
 - a "put back" claim for a path whose `lstat` re-read disagrees;
-- a link at base that passes preflight;
+- a link at a repository watched path at base that passes preflight, or a machine-config link at base
+  that is refused (R35);
+- for an ancestor link: any restore claimed beneath it, or a record or iteration artefact written
+  through it (R30);
+- a hard-link plant not asserted by `nlink === 2`, or a victim changed through one (R31);
+- a write/delete probe run against a mode-`000` victim (R29);
+- a required M-L2-follow mutant that is missing, or that leaves its own probe green (R32);
 - a probe with no known positive reported as a discriminating pass;
 - a POSIX row read as passed when CI skipped it;
 - a recursive `rm` anywhere in the restore path (R24: "rm never recursive"), read from the code.
@@ -842,9 +935,10 @@ is read two ways here, and the row requires both. That reading is returned in §
 **What this row cannot see, stated now:**
 - the traceless reads above;
 - a link planted **between** the window's compare and its restore: a race, not probed (report A §8);
-- **hard links.** A hard link at a watched file is a regular file to `lstat`, and a write through it
-  changes the outside file. Returned in §8, item 3, as a question and not a row;
+- **a link at the repository root itself, or above it**: R30's stated limit, not probed;
 - win32 **file** symlinks, which need Developer Mode here. (b) covers them on POSIX instead.
+
+(Hard links were listed here at `80f450d` as a question. R31 made them scored probes, (a)6 and (b)5.)
 
 ---
 
@@ -898,8 +992,8 @@ ASCII and UTF-16LE detectors were each validated on a known positive (`GIT_CONFI
 8. **Every CA-15 probe that can run on win32 runs against `3b19287` as well**, as the transition
    control, in the same session and by the same expressions. It runs in a `git archive` copy, never in
    a checkout of the main tree.
-9. **Mutants added:** M-L2-norestore (CA-15 (c)), and M-L2-follow **[mine]** (§8, item 4). The same
-   rules apply: type-clean, and each edit asserted to land.
+9. **Mutants added:** M-L2-norestore (CA-15 (c)), and M-L2-follow, **required, one per protection**
+   (R32). The same rules apply: type-clean, and each edit asserted to land.
 10. **Ask the planner for a PR on A2's branch at once.** CI is pull_request-only, and CA-15 (b) exists
     only in a CI run.
 11. **D-A2, D-A3, D-A4 and D-A5 are carried and reported**, whatever the outcome. D-A2 and D-A4 are
@@ -1122,11 +1216,28 @@ record. Git's own behaviour was measured first: garbage `.git/config`, garbage `
 
 ---
 
-## 8. Amendment 4 (record session 82): returned to the planner, numbered. UNRULED.
+## 8. Amendment 4 (record session 82): returned to the planner, numbered. RULED (rulings-7, master `a9018af`, blob `649ff472`).
 
-These are this seat's own readings and additions to rulings-6, marked **[mine]** where they appear
-above. **Nothing here is scored until the planner rules on it.** The rest of amendment 4 applies
-R25–R27 as worded.
+**Every item below was ruled in `loop-15-slice-3-rulings-7.md`, and the rulings are folded into
+§2–§4 at amendment 5.** This section is kept unchanged below as the record of what was asked; **where
+it and §2–§4 differ, §2–§4 bind.** The rulings:
+- item 1 → **R29**: both readings confirmed, with the mode-`000` victim moved to a separate run;
+- item 2 → **R30**: scored, larger than framed (every ancestor component, measured);
+- item 3 → **R31**: scored, measured;
+- item 4 → **R32**: required, one mutant per protection;
+- item 5 → **R33**: confirmed, plus verbatim quotes;
+- item 6 → **R34**: added, plus a system-value control.
+
+**R35 is the planner's own finding against this amendment:** clause 3's "read" said too much, since the
+runtime reads machine config by design, and clause 5 refused ordinary dotfiles links. This seat's
+wording made every candidate fail clause 3, or would have forced a QA seat to narrow it after a verdict.
+It is corrected in §2 CA-15. **This seat's error entry:** the words reached the committed criteria and
+the planner, so it escaped. Its family: a clause written from the ruling's sentence without checking it
+against what the runtime does by design.
+
+*(Original heading and preamble at `80f450d`: "UNRULED. These are this seat's own readings and
+additions to rulings-6, marked [mine] where they appear above. Nothing here is scored until the planner
+rules on it.")*
 
 1. **CA-15, "canaries in both directions": two readings, and the row requires both.**
    - (i) Read against **write and read**: nothing written or deleted outside the repository, and
