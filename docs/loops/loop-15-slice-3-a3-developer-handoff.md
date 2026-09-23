@@ -12,8 +12,8 @@
 | 2 R45 | done | `v.ok` was true (the absent `<git-dir>/info` junction was not a change) | 3 passed: the repo root, the machine-config absent → link, and the existing `.git/info` junction. Exit 0. |
 | 3 R46 | done | tree root named only the files under it as deleted; an entry's after was `symlink:<target>` without `type:`; baseNotes on a parent junction was empty | 7 passed (R45, R46, existing hooks junction and entry). Exit 0. |
 | 4 R43 | done | repo after was `f6c637173221f649/666/nlink:2` (the victim hash); machine after was `712138997b4c155f` | full `configwatch-links` file: 18 passed, 3 skipped (POSIX). Exit 0. |
-| 5 R47 CA-2.5 | next | | |
-| 6 R47 CA-4c / R34 | pending | | |
+| 5 R47 CA-2.5 | done | with `resolveLauncher`'s node-entry branch forced to refuse: `mutant: refusing node entry …planted-launcher.js`, expected false to be true. Exit 1. | after the mutant was removed: 2 passed (planted launcher and real `claude`), 22 skipped. Exit 0. |
+| 6 R47 CA-4c / R34 | next | | |
 | 7 R48 | pending | | |
 | 8 D-A2-6 | pending | | |
 
@@ -34,5 +34,9 @@ Every symlink tree root is recorded as `type:symlink readlink:<target>`, includi
 ## Item 4 — R43
 
 `readState` compares `dev`, `ino` (`{ bigint: true }`) and `nlink` with the baseline before `readFileSync`. A mismatch is recorded as `identity:…; not read` and the bytes are not read. A new hard link (`nlink` other than 1, no baseline file) is not read either. `MachineConfigWatch` applies the same comparison and does not hash through it.
+
+## Item 5 — R47, CA-2.5
+
+The control that returned early when `claude` was absent is now two tests. A planted launcher is accepted and resolved on every platform (win32: a `.js` shim as `node-entry`; POSIX: an executable script as `native`), and a refusal twin runs beside it (win32: a `.cmd` with no npm-shim target; POSIX: a directory). The real `claude` launcher is its own test, `it.skipIf` when `claude` is not on `PATH`, with that reason in the title.
 
 Not verified: full suite (not run; ask Atlas first). POSIX not run here (win32).

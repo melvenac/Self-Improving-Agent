@@ -11,7 +11,7 @@
 
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
 import { spawnSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runLoop, LoopRefused, type LoopConfig } from "../../src/harness/runtime.js";
 import {
@@ -242,21 +242,54 @@ describe("candidate A — a role that is a real process", { timeout: 180_000 }, 
       }
     });
 
-    it("2.5 CONTROL: the real `claude` launcher resolves without running it — native on this machine", () => {
-      const launcher = findOnPath("claude", process.env);
-      if (launcher === null) {
-        // Not installed here (CI). Stated, not passed.
-        expect(launcher).toBeNull();
-        return;
-      }
-      const r = resolveLauncher(launcher);
-      expect(r.ok, r.ok ? "" : r.reason).toBe(true);
-      if (r.ok && isWin) {
-        expect(r.form).toBe("native");
-        expect(r.executable.toLowerCase()).toMatch(/claude\.exe$/);
-        expect(r.executable.toLowerCase()).not.toContain("cmd.exe");
+    it("2.5 CONTROL: a planted launcher is accepted and resolved, and its refusal twin is not", () => {
+      if (isWin) {
+        const shim = join(tmp.dir, "planted-launcher.js");
+        writeFileSync(shim, "process.stdout.write('ok\\n');\n");
+        const accepted = resolveLauncher(shim);
+        expect(accepted.ok, accepted.ok ? "" : accepted.reason).toBe(true);
+        if (accepted.ok) {
+          expect(accepted.form).toBe("node-entry");
+          expect(accepted.executable).toBe(process.execPath);
+          expect(accepted.preArgs).toEqual([realpathSync(shim)]);
+        }
+        const bad = join(tmp.dir, "planted-refusal.cmd");
+        writeFileSync(bad, "@echo off\r\necho refused\r\n");
+        const refused = resolveLauncher(bad);
+        expect(refused.ok).toBe(false);
+        if (!refused.ok) expect(refused.reason).toContain(bad);
+      } else {
+        const script = join(tmp.dir, "planted-launcher");
+        writeFileSync(script, "#!/bin/sh\necho ok\n");
+        chmodSync(script, 0o755);
+        const accepted = resolveLauncher(script);
+        expect(accepted.ok, accepted.ok ? "" : accepted.reason).toBe(true);
+        if (accepted.ok) {
+          expect(accepted.form).toBe("native");
+          expect(accepted.executable).toBe(realpathSync(script));
+        }
+        const bad = join(tmp.dir, "planted-refusal");
+        mkdirSync(bad);
+        const refused = resolveLauncher(bad);
+        expect(refused.ok).toBe(false);
+        if (!refused.ok) expect(refused.reason).toContain(bad);
       }
     });
+
+    it.skipIf(!findOnPath("claude", process.env))(
+      "2.5 CONTROL: the real claude launcher resolves without running it — skipped when claude is absent",
+      () => {
+        const launcher = findOnPath("claude", process.env);
+        expect(launcher).not.toBeNull();
+        const r = resolveLauncher(launcher!);
+        expect(r.ok, r.ok ? "" : r.reason).toBe(true);
+        if (r.ok && isWin) {
+          expect(r.form).toBe("native");
+          expect(r.executable.toLowerCase()).toMatch(/claude\.exe$/);
+          expect(r.executable.toLowerCase()).not.toContain("cmd.exe");
+        }
+      },
+    );
 
     it.skipIf(findOnPath("claude", process.env) === null)(
       "CA-9: every flag the claude adapter passes exists in the installed `claude --help` (skipped where claude is absent)",
