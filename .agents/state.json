@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 85,
+  "revision": 86,
   "project": {
     "name": "self-improving-agent"
   },
@@ -528,6 +528,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Session 78, on Aaron's word ('record this as a task ... sequenced after candidate A'), from his question whether effort can change on the fly per task and whether Jev could help. THE LEVER EXISTS: `claude --effort <low|medium|high|xhigh|max>` is a per-invocation flag, verified from `claude --help` on this machine on 2026-09-22 and not assumed, and candidate A's ProcessRole launches each real role as its own `claude -p` process, so the runtime can set effort PER STAGE, PER LAUNCH. That is structural, not a prompt. Subagent definitions (.claude/agents/*.md frontmatter) carry effort too, the second route inside a seat. DESIGN SHAPE, the developer's to design and the planner's to rule: (1) DETERMINISTIC FIRST, a policy file (data, zod-validated, JSON Schema derived and drift-checked, like the gate policies) mapping what the runtime already knows to an effort level: the stage (QA -> max); the plan's paths (security-relevant harness files such as refwatch/git/runtime -> xhigh; docs and version surfaces -> medium); a retry after a failed attempt -> one level up. (2) JEV ONLY FOR WHAT PATHS CANNOT SEE, as a typed judgement ('does this plan need novel reasoning or is it mechanical?'): a one-line diff to a git primitive is small and subtle, which is the shape of this session's two false claims ('no compare-and-swap possible', 'the overrides close config'). (3) JEV RUNS IN SHADOW FIRST: it records the level it WOULD have chosen beside the policy's, and changes nothing until its disagreements are counted against outcomes, T-155's discipline applied to effort. HOH-JEV section 3: typed output guarantees the interface, not the truth. THE OUTCOME DATA ALREADY STARTED: from dispatch-2 (PRs #104/#105) every tracked report records model AND effort, and the instrument is the session transcript's PER-ENTRY `effort` field, reported as timestamped runs. settings.json gives only the configured default, as the QA seat found with three instruments giving three answers. FIRST DATA POINT, for calibration and not a conclusion: all planner rulings and all QA artefacts before 2026-09-23 ~01:00Z were written at MEDIUM, and this session's errors were mostly failures to CHECK rather than to reason, which effort may not fix; enforced gates did. Relates to T-155, T-165, T-170."
+    },
+    {
+      "id": "T-174",
+      "title": "Win32 job-object launcher so the role's whole process tree is killed on a NORMAL exit too (R22's named limit on Windows)",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 78,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Session 78, from rulings-4 (R22 narrowed to option (b) on the developer's costing). Node has no job-object API. taskkill /T walks from a LIVE root, so after a role exits normally its orphans are unreachable, and descendant PID lists (WMI/CIM) are racy against PID reuse and were ruled out. Candidate A therefore kills the process group on POSIX on every exit path, and on win32 states in every iteration record that normal-exit tree-kill is unavailable. THE FIX, the developer's estimate: a small C# launcher compiled at runtime with PowerShell Add-Type. It calls CreateJobObject with KILL_ON_JOB_CLOSE, creates the role process SUSPENDED, assigns it to the job, resumes it, relays the exit code and stdio (the prompt on stdin, the tails of stdout and stderr), and calls TerminateJobObject on the runtime's command. About 150-250 lines, plus 0.5-1.5s of PowerShell startup per stage. MUST FAIL CLOSED: Add-Type unavailable (constrained language mode) or AV interference refuses the loop and never falls back to an unkilled tree. PowerShell is a shell binary, so it may interpret only the runtime's fixed script and must pass the role's argv as data, never through a command line. CI is Linux, so only a Windows machine tests it; the row needs a Windows runner or states that limit. Residual it closes: R20's compare-then-call race on the generated config file, on the normal-exit path on Windows."
     }
   ],
   "verified": [
