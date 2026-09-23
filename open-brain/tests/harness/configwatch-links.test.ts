@@ -425,7 +425,9 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const qa = watch.compare();
     const reread = qa.find((f) => /^[0-9a-f]{16}$/.test(f.before) && /^[0-9a-f]{16}$/.test(f.after));
     expect(reread, JSON.stringify(qa)).toBeUndefined();
-    expect(qa.some((f) => f.after.includes("not read"))).toBe(true);
+    // R54: the link was already reported in developer. The qa edit is bytes
+    // behind a path the read gate forbids, so it is not re-reported.
+    expect(qa, JSON.stringify(qa)).toEqual([]);
     expect(readFileSync(join(victim, "config"), "utf-8")).toContain("VICTIM-R44-EDITED");
   });
 

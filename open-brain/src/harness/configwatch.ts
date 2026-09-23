@@ -831,6 +831,49 @@ export class MachineConfigWatch {
     return undefined;
   }
 
+  /** The chain as far as the read gate. Stops on the first component that differs from `gate`, so a changed link is not followed. */
+  private chainUntil(gate: MachineSnap, file: string): ResolutionComp[] {
+    const paths = this.componentPaths(file);
+    const chain: ResolutionComp[] = [];
+    for (let i = 0; i < paths.length; i++) {
+      const now = resolutionComp(paths[i]!);
+      chain.push(now);
+      const prev = gate.chain[i];
+      if (!prev) return chain;
+      const final = i === paths.length - 1;
+      const nlinkOk = !final || prev.kind !== "file" || now.kind !== "file" || prev.nlink === now.nlink;
+      if (prev.kind !== now.kind || prev.target !== now.target || prev.dev !== now.dev || prev.ino !== now.ino || !nlinkOk) {
+        return chain;
+      }
+      if (now.kind === "absent") return chain;
+    }
+    return chain;
+  }
+
+  /**
+   * R54, stage attribution, separate from {@link resolutionMismatch}. A change
+   * is reported once, against the snapshot taken at the start of this stage.
+   * `"bytes"` is a content change the read gate allowed. A component means the
+   * lstat identity changed during the stage. A change that is already in the
+   * stage-start snapshot is not reported again.
+   *
+   * LIMIT: a byte change to a path the read gate forbids is invisible here,
+   * because those bytes are never read.
+   */
+  private attributionChange(start: MachineSnap, end: MachineSnap): ResolutionComp | "bytes" | undefined {
+    const n = Math.max(start.chain.length, end.chain.length);
+    for (let i = 0; i < n; i++) {
+      const a = start.chain[i];
+      const b = end.chain[i];
+      if (!a || !b) return b ?? a;
+      const final = i === n - 1;
+      const nlinkOk = !final || a.kind !== "file" || b.kind !== "file" || a.nlink === b.nlink;
+      if (a.kind !== b.kind || a.target !== b.target || a.dev !== b.dev || a.ino !== b.ino || !nlinkOk) return b;
+    }
+    if (start.hash !== end.hash && start.hash !== "unread" && end.hash !== "unread") return "bytes";
+    return undefined;
+  }
+
   private mismatchFinding(base: MachineSnap, diff: ResolutionComp, p: MachineConfigPath): MachineConfigFinding {
     const prev = base.chain.find((c) => c.path === diff.path);
     const baseKind = prev?.kind ?? "absent";
@@ -907,9 +950,9 @@ export class MachineConfigWatch {
     const start = new Map<string, MachineSnap>();
     for (const p of this.paths) {
       const base = this.loopBase!.get(p.path) ?? { chain: [], hash: "absent" };
-      // A resolution that differs from preflight is not a stage baseline and is not read.
+      // Stage attribution baseline: lstat always, bytes only when the read gate allows.
       if (this.resolutionMismatch(base, p.path)) {
-        start.set(p.path, { chain: [], hash: "unread" });
+        start.set(p.path, { chain: this.chainUntil(base, p.path), hash: "unread" });
       } else {
         start.set(p.path, this.snap(p.path, true));
       }
@@ -926,16 +969,15 @@ export class MachineConfigWatch {
     const out: MachineConfigFinding[] = [];
     for (const p of this.paths) {
       const base = this.loopBase.get(p.path) ?? { chain: [], hash: "absent" };
-      const diff = this.resolutionMismatch(base, p.path);
-      if (diff) {
-        out.push(this.mismatchFinding(base, diff, p));
-        continue;
-      }
-      const opened = start.get(p.path);
-      const a = this.snap(p.path, true);
-      const beforeHash = opened?.hash ?? base.hash;
-      if (a.hash !== beforeHash) {
-        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: beforeHash, after: a.hash });
+      const opened = start.get(p.path) ?? { chain: [], hash: "absent" };
+      const end = this.resolutionMismatch(base, p.path)
+        ? { chain: this.chainUntil(base, p.path), hash: "unread" }
+        : this.snap(p.path, true);
+      const why = this.attributionChange(opened, end);
+      if (why === "bytes") {
+        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: opened.hash, after: end.hash });
+      } else if (why) {
+        out.push(this.mismatchFinding(opened, why, p));
       }
     }
     return out;
