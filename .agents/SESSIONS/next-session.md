@@ -1,58 +1,49 @@
-<!-- generated from .agents/state.json rev 90 by open-brain v0.44.1 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 91 by open-brain v0.44.1 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner _(written session 77)_
+## planner _(written session 78)_
 
 ### Pick up here
 
-LOOP 15 SLICE THREE IS OPEN AND PARKED AT ITS FIRST ITEM, on Aaron's budget call (72% of the week used, Fable 100%, both reset Wednesday 00:00). G-045 IS DONE AND UNEVALUATED: candidate 9ed674c on origin/loop/15-slice-3-forge-candidate (tip 5759008, adding only the developer handoff), sitting on QA's criteria 17c9056 on origin/loop/15-slice-3. BOTH PUSHED, NEITHER MERGED - QA parked before running the criteria it wrote, so nothing has scored the candidate. The branch loop/15-slice-3 is checked out in the QA worktree; fast-forwarding it to 5759008 is a one-line move once that tree is free. Slice three's section 3 is untouched: no real roles through the runtime, no Jev thresholds, no F11, no T-155 - and T-155 is the instrument T-165 needs, so build it so something other than the real seat can be pointed at the gate. THE SEATS WERE STOOD DOWN WITHOUT /end, DELIBERATELY: V-074/T-163 means every close-out overwrites a shared slot with its own seat's value, so three more close-outs would have erased each other's uuids. Their durable work is in tracked files instead - QA's criteria at 17c9056 (all seven [mine] items ruled before any candidate existed, section 9), the developer's 222-line handoff at 5759008. WHAT THIS SESSION ACTUALLY SETTLED, none of it planned: native cross-session A2A works here (D-029 amends D-028, six directions receiver-attested, idle wake 1.486s); Loop 16's recorded cause for its missing transcripts is FALSE and the failure is per-launch (loop-16-closeout.md section 11); G-042 has a controlled measurement against it (V-076); and THE SCOPE LAYER NOW TRAVELS - PRD.md, DECISIONS.md and ENTITIES.md were untracked, reached one checkout, and are now on the allowlist. READ .agents/SYSTEM/PRD.md BEFORE RULING ANYTHING; its problem statement is four sentences and a planner seat ran a whole session without it.
+LOOP 15 SLICE THREE: candidate A (3b19287) was REJECTED on one blocker, D-A1: layer 2's restore follows a planted directory junction out of the repository, deletes and writes files there, and records success. Everything else passed. READ THESE FIRST, IN ORDER: the PRD, README and the SIA Step-Back ARTIFACT (not the vault copy, which stops at Part 3) per dispatch-2 section 0; then docs/loops/loop-15-slice-3-rulings-1..6.md (R1-R27; rulings-6 is the current state); then QA report A (10eb4d0, sections 13 and 15) and the developer's final handoff (216cec6). NEXT ACTIONS: (1) start a FRESH QA session: it finalises CA-15 plus D-A2 and D-A4 as criteria commits on qa/loop-15-slice-3-criteria-a, pushed on Aaron's word, BEFORE any A2 code; rule on its text. (2) Start a FRESH developer session: it builds A2 (D-A1 + D-A3 only, R24), merges the final criteria tip so every criteria commit is an ancestor, freezes and hands over. (3) QA scores A2. Then B, then C (D-036). Assign record session numbers explicitly at dispatch (T-164): this planner was 78, QA 79, developer 80, so the next seats take 81 and up. Nothing of this session is uncommitted: every ruling is in a docs/loops file on master and every decision in state.json.
 
 ### Watch out
 
-- READ THE PRD BEFORE YOU RULE. .agents/SYSTEM/PRD.md is four sentences of problem statement and it now travels to every checkout (session 77). Before it did, a planner wrote a loop brief, ruled seven acceptance criteria and put a project-direction question to Aaron built on a dichotomy README.md lines 262-264 already resolve. THE RECORD IS MECHANISM; THE PRD IS PURPOSE. Reading the record exhaustively does not tell you what the project is for.
-- THE ORDERING FIX ALONE CONVERTED A LOUD CRASH INTO A SILENT PASS (V-075). After G-045's repair the stage that deleted the checked-out branch reported status: completed. IF D4 HAD ASSERTED THE GitFailed MESSAGE INSTEAD OF THE END STATE IT WOULD HAVE GONE GREEN THE MOMENT THE CRASH STOPPED, AND THIS WOULD HAVE SHIPPED. Assert the end state the repair must produce, never the symptom it removes.
-- A DETECTOR THAT FIRES INTO A BLOCK NOBODY ACTS ON IS NOT A DETECTOR. /sync reported `prd-version: PRD.md not found` as a WARNING on every run in every seat tree for as long as the worktrees have existed; this planner read past it three times in one session because it sat beside a missing specs/ and an unindexed vault note. With the file present the same check escalates to an ISSUE and immediately caught a real staleness. The check was right all along - its SEVERITY was load-bearing and wrong.
-- THE BASELINE AT eb14d09 IS RED UNDER CONTENTION AND GREEN IDLE (V-076). Same SHA, same 1031 tests: idle 1031/1031 exit 0; contended 1030 passed / 1 failed exit 1 with two unhandled onTaskUpdate. OBSERVATION, not conclusion - n=1 each side with the WORKTREE still uncontrolled. Do not score a candidate against an assumed-green base, and do not treat G-042 as explained until the repeat comparison exists in one tree.
-- 'RUN THE FULL SUITE ALONE' NAMED A CONDITION NO SEAT COULD VERIFY (T-168). Every seat believed it was following it. ListAgents makes the check possible - call it immediately before the run and RECORD the peer states beside the result, which is the field all eleven historical sightings lack. Limits: ListAgents has a registration lag, so an empty listing is not evidence of idleness; and it cannot see non-Claude load, so it is necessary and not sufficient.
-- impact() RETURNED risk LOW, epistemic 'exact', AND MISSED THE CALL SITE ON THE PATH UNDER REPAIR (T-166). Not staleness - subtree hash 281bbae5 matched at both commits. A LOW computed from half the call graph is indistinguishable from a LOW computed from all of it. The main index is 58 commits behind and pinned to the DELETED branch loop/4-dogfood; repo: 'Self-Improving-Agent' is ambiguous across three registered repos. CLAUDE.md's MUST-run-impact rule is only as good as the resolver.
-- EVERY CLOSE-OUT OVERWRITES A SHARED SLOT WITH ITS OWN SEAT'S VALUE (V-074, T-163). rev 61 removed the developer's uuid AND added its own in one commit. The record holds only the last seat to close. Nothing in /sync catches it. THIS IS WHY THE SEATS WERE STOOD DOWN WITHOUT /end at session 77 - fix T-163 before running three close-outs again.
-- THE SESSION COUNTER IS PER-WORKTREE (T-164). The developer greeted as #6 and QA as #5 against a record whose last session is #77. Tell every seat its RECORD number explicitly at dispatch.
-- A CONTROL MUST DISCRIMINATE THE TRANSITION, NOT MERELY BE PRESENT. I gave the developer a control reading 1 at BOTH revisions of the move it was meant to verify; it ran it on its unmoved tree and refused it. And a check against ABSENCE alone cannot separate 'the move failed' from 'the instrument is broken' - QA's addition, earned twice in five minutes.
-- WHEN A TASK IS CORRECTED, GREP FOR EVERY GAP AND FILE THAT CITES IT IN THE SAME WRITE. T-161 was corrected at rev 64 and G-044 - the gap it cites, and the gap ABOUT instruments that cannot tell 'nothing there' from 'I did not look' - was left asserting the falsified cause. The QA seat found it at /start. The gap is what a future seat reads first.
-- LABEL THE SOURCE WHEN YOU RELAY A FACT. A uuid mapping travelled planner -> QA -> developer unlabelled and was attributed to a file nobody had read. Caught by one grep, and only because the QA seat demanded a citation rather than accepting it.
-- BOTH SEATS REFUSED success:true AS EVIDENCE OF DELIVERY, refused to run /start on a peer's say-so when Aaron had named that gate, and the developer refused a planner ruling that would have silenced the row the planner had just named as the one that would notice. That behaviour is what made this session's findings trustworthy. Do not treat a refusal as friction.
-- NO add_gap BY ANY SEAT UNTIL T-158 LANDS (R28). update_gap is fine and was used three times this session (G-044, G-042 twice). New findings travel as verified entries, handoff rows and tasks.
-- PARALLEL BASH CALLS SHARE ONE CWD; MSYS MANGLES ref:path IN git show - USE POWERSHELL; the sync gate goes red on docs-only commits until you rebuild; GitHub Actions registers runs late. All four bit again, and the MSYS one was already in the developer's own watch-out list when both seats hit it independently within hours.
+- A PROTECTION CAN ACT OUTSIDE ITS BOUNDARY AND RECORD SUCCESS (D-A1). Layer 2 was built to keep a role inside the repository, and through a junction it became the runtime deleting and writing files outside it, followed by 'every file was put back by bytes'. The criteria checked the file SET and BYTES at the watched paths, never the watched paths' TYPE. A finding reported against a line is a finding about a class: the developer had already fixed the hidden-.git-file instance of the same class in the same restore.
+- LATE RULINGS COST CONTEXT TWICE. Candidate A grew from 5 rulings to 22 mid-build, and the developer and QA seats ran down to about 28% context. D-035: fresh seat sessions at every candidate boundary, and the max-effort criteria re-read with its rulings happens BEFORE the build, not during it.
+- EFFORT IS READ FROM THE TRANSCRIPT, NOT FROM SETTINGS. The session transcript's per-entry 'effort' field is the only instrument that records what was used. settings.json gives the configured default, and CLAUDE_EFFORT gives the current value, not the value at launch; three instruments gave three answers in the QA seat. Everything this session's seats wrote before about 01:00Z on 2026-09-23 was produced at MEDIUM, including rulings-1 and rulings-2, the G-045 acceptance and criteria A's first four commits.
+- update_task REPLACES THE NOTE (T-171), and the dry run says only 'Applied'. To append, read the current note, pass the whole text back with the addition, and verify byte for byte afterwards. It was done four times this session: T-169, T-150, T-175, T-168.
+- A BASH DOUBLE-QUOTED STRING EXECUTES BACKTICKS. A node -e one-liner quoting a sighting ran the mutating `sync --help` in the planner's tree (T-150's second exposure). Put scripts that contain backticks in FILES.
+- THE MAIN TREE SERVES EVERY SESSION ON THE MACHINE, A2A-HUB'S TOO, AND NOTHING SAYS WHICH BUILD IS SERVING (T-172). /mcp reconnect prints success either way. Before rebuilding the main tree, tell every seat, including other projects'.
+- RELAY IS NOT AUTHORITY FOR A PUSH. Both seats declined to push on the planner's relay of Aaron's 'yes' and asked him directly, which is correct under shared.md: a push widens scope. Plan for one push question per branch in each seat's session.
+- D-032 COVERS ONLY record and docs paths. RUN the path check before commenting it: this planner posted one from memory once and had to re-run it.
 
 ### Open questions
 
-- What should /start RENDER from the scope layer, now that it travels? The PRD's four-sentence problem statement is the candidate - short enough to sit above the objective, and unlike a hand-written intent field nobody has to maintain it. DECISIONS.md at 43KB is reference a seat fetches, not something to inject. T-167 carries this and it is the last open half of it.
-- Is G-042 concurrent-seat load rather than 'this machine'? V-076 supports it; the repeat comparison in ONE tree, three runs each way, is what would settle it.
-- Why did the two full-suite runs disagree before the controlled test - QA's red at eb14d09 against the developer's 1034/1034 at the candidate? Timing on a shared box is the obvious answer and nobody has established it.
-- Does the candidate carry a version bump and CHANGELOG entry? The developer followed the LOOP protocol (bump in a separate chore(release) commit after acceptance) over the global CLAUDE.md rule. The planner agrees; Aaron's to overrule. One commit on top either way.
-- When does a trigger injection change behaviour, and what counts it? Three injections now, all of entry 299, all apt to the command's shape and all changing nothing because the practice was already loaded. The trigger IS registered and live - the objective claimed otherwise until rev 70.
-- Should the seats run at all before Wednesday's reset, and at what count? T-165 (DeepSeek v4.1 Flash as a shadow DEVELOPER via T-155's gate) is the recorded answer and is gated on T-155, which this loop has not built.
-- What is the mechanism behind the per-launch transcript loss? Unknown and deliberately not chased. Aaron's rolled-terminals account is consistent and is NOT promoted to a cause.
+- Does the effort level change the error rate? The first data (this session's errors at medium and at high) is recorded but not analysed; T-173 is the instrument.
+- Is G-042 external load or the suite's own? Candidate A's run was red with another project busy, green once and green again; both hypotheses are load, and B's Step 0 is designed to separate them.
+- When does a recall-trigger injection change behaviour? Entry 299 was injected about eight more times this session across all seats, always apt and never changing the act, because the practice was already loaded and PostToolUse fires after the act. T-170 records the lookup-versus-injection recommendation; Aaron has not ruled on it.
+- A2A-Hub's `state import --commit` is Aaron's to run (G-007); its draft is prepared, with SIA's seed entries removed by parser (T-175).
 
 ### Loop state
 
 **Open PRs:** _None._
 
-**SHA frozen for QA:** `9ed674c - G-045 candidate, pushed on origin/loop/15-slice-3-forge-candidate (tip 5759008), UNEVALUATED; QA criteria at 17c9056 on origin/loop/15-slice-3, unmoved`
+**SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- Keep the candidate free of the version bump (loop protocol) or bump at commit time (global CLAUDE.md rule)?
-- Run the G-042 repeat comparison in one tree - three idle, three contended?
-- What should /start render from the PRD, now that the scope layer travels?
+- T-170: memory as lookup by default with injection only on a deterministic match against the act. Recorded as a recommendation, not ruled.
+- Run A2A-Hub's `state import --commit` (G-007).
 
 **Rulings made mid-loop:** 
-- R1-R7 on the QA seat's seven [mine] criteria items, all ruled BEFORE any candidate existed, folded into 17c9056 at one SHA. R2 and R4 went against the QA seat: R2 inverted 'any read' from a HEAD-resolving blacklist to a whitelist of the restore's own plumbing (G-040's shape); R4 split A4 so a correct refusal cannot be scored as a real role completing a stage.
-- The G-045 restore gates on the WATCH'S OWN recorded delta, not on every stage and not on a caught exception. NARROWED BY THE DEVELOPER AND ACCEPTED: only a DELETED delta, because restoring a MOVED one before the read puts main back, headMoved goes false, and D2 reports nothing - the planner's ruling would have silenced the row it had named as the one that would notice.
-- D-029 amends D-028: native cross-session messaging for seats on one machine, hub for cross-machine.
-- The Loop 16 close-out is amended in place at section 11, dated, with nothing above it rewritten - Aaron's ruling. Acceptance does not reopen.
-- THE SCOPE LAYER TRAVELS - Aaron's ruling, against the planner's original T-167 framing of a one-or-two-sentence intent field. His objection: a sentence cannot carry the scope, and earlier SIA versions had the agent reconstruct it by reading multiple files, which captured enough. PRD.md, DECISIONS.md and ENTITIES.md are now tracked.
-- The seats stand down WITHOUT /end this session, because T-163's shared-slot overwrite would have had three close-outs erase each other.
+- D-031 release commit after acceptance
+- D-032 standing merge authority for record/docs-only PRs
+- D-033 and D-036: slice three closes at A, B and C; Jev calibration is the next slice
+- D-034 other projects' seats are recorded, pause on request
+- D-035 fresh seat sessions at each candidate boundary
+- Rulings R1-R27 in docs/loops/loop-15-slice-3-rulings-1..6.md
+- Candidate A rejected; A2 carries D-A1 and D-A3 only (R24)
 
 ## developer _(written session 74)_
 
