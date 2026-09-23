@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 96 by open-brain v0.44.1 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 97 by open-brain v0.44.1 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -47,6 +47,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-154** Give /start a memory-free documented route, and make the SessionStart hook installable by a stranger
 - [ ] **T-155** Shadow merge gate: the runtime records what it would have done at each merge, and disagreements with Aaron are counted
 - [ ] **T-159** The trigger's cheap not-asked path — record a not-asked fire without opening the store
+- [ ] **T-160** Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [ ] **T-161** /start must assert a transcript exists for the session's own uuid — the CLAUDE_CODE_CHILD_SESSION check would be a permanent false positive
 - [ ] **T-166** GitNexus impact() missed a call site on the exact path under repair while reporting epistemic 'exact' - the MUST-run-impact rule is only as good as the resolver
 - [ ] **T-168** 'Run the full suite alone' must become a check: assert peer idleness before the run and refuse or flag when a peer is busy
@@ -64,7 +65,6 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-103** Retire the mailbox as *transport*, keep it as *archive (supersedes T-104)
 - [ ] **T-114** Update /start monthly maintenance
 - [ ] **T-156** A scan that matches the sentence forbidding a thing, as though it were the thing (G-040): every source-text scan in the harness tests must be validated against a known positive and a known negative in the same test, or replaced by a parser
-- [ ] **T-160** Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [ ] **T-162** The element table's growth rule: the store cannot be consulted for act shapes the table does not name
 - [ ] **T-165** Evaluate an alternate harness/model as the DEVELOPER seat via T-155's shadow merge gate — the driver is a SECOND METER, not cost; Aaron's named candidate is DeepSeek v4.1 Flash
 - [ ] **T-171** update_task REPLACES a task's note, and neither the dry run nor the write says so: an op written to append a correction silently erases the whole note

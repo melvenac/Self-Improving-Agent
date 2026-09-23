@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 96,
+  "revision": 97,
   "project": {
     "name": "self-improving-agent"
   },
@@ -392,12 +392,12 @@
     {
       "id": "T-160",
       "title": "Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys",
-      "priority": "P2",
+      "priority": "P1",
       "status": "open",
       "opened_session": 76,
       "closed_session": null,
       "supersedes": null,
-      "note": "Deferred from Loop 16 as load; re-weighed as correctness after an outside agent (Aaron's Grok bot, third vendor) asked for push 'so that nobody was listening cannot silently look like a healthy empty room' — the read-cursor drop's class one layer up, silence that cannot distinguish 'no messages' from 'no listener'. Pieces: long-poll on GET /a2a/session/:id/messages (Clark's item 2, blocked earlier on the auth refactor, now landed at 95ca5c6); a Stop hook that refuses to let a seat go idle while its room holds an unread turn (the deterministic version of the background-wait habit); per-agent keys then AUTH_MODE=strict (every seat still uses the literal dev-key; strict today 403s every seat). Owner: Clark plans, Cursor implements, in A2A-Hub; redeploy tcm with each."
+      "note": "Deferred from Loop 16 as load; re-weighed as correctness after an outside agent (Aaron's Grok bot, third vendor) asked for push 'so that nobody was listening cannot silently look like a healthy empty room' — the read-cursor drop's class one layer up, silence that cannot distinguish 'no messages' from 'no listener'. Pieces: long-poll on GET /a2a/session/:id/messages (Clark's item 2, blocked earlier on the auth refactor, now landed at 95ca5c6); a Stop hook that refuses to let a seat go idle while its room holds an unread turn (the deterministic version of the background-wait habit); per-agent keys then AUTH_MODE=strict (every seat still uses the literal dev-key; strict today 403s every seat). Owner: Clark plans, Cursor implements, in A2A-Hub; redeploy tcm with each. --- EVIDENCE, planner (record session 81), 2026-09-23, and it is now a cost, not a risk: Grok 4.7 in Cursor held the SIA developer seat for candidate A2 (T-177) over A2A-Hub. The planner sent turn 6 (full-suite go-ahead) and turn 7 (CI red at 65752b4 with the fix) into room k579hndqdr1mxnahy0px1dy8ks8eyef3. Grok was IDLE and never read them; Aaron found it by looking at the Cursor window (Aaron, in the planner session: \"Grok was idle, had not read the messages. That's something we need to fix with a2a hub.\"). The hub returned sent-turn receipts for both, which are true and say nothing about reading. Nothing on either side could tell the sender. A Cursor agent is not woken by a hub message: it sees one only when it runs hub-talk itself. This breaks D-038 (Aaron speaks only to the planner) for every non-Claude seat, because each message then needs Aaron in that window to deliver it. Raised to P1. The two pieces that matter, in order: (1) READ RECEIPTS on the hub: record each participant read cursor server-side, so a sender can see unread-by-X-since-T, which makes silence unambiguous with no client change; (2) a WAKE for the idle seat: a Stop-type hook in the seat IDE that will not let the agent go idle while its room holds an unread turn (or blocks on a long-poll and feeds the turn back). Whether Cursor hooks can do (2) is not yet checked."
     },
     {
       "id": "T-161",
