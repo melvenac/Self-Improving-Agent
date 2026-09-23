@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 84 by open-brain v0.44.1 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 85 by open-brain v0.44.1 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -52,6 +52,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-169** At Loop 15 close, rewrite PRD.md and README.md against what ships, take PRD.md off retirements.json's historical list, and retire the maturity lifecycle
 - [ ] **T-170** Memory is LOOKUP by default and INJECTION only on a deterministic match against the act; fix the WRITE side first, so every stored lesson carries the key (command pattern, path or error string) that would have caught the mistake
 - [ ] **T-172** The main tree serves every session and nothing says when it is behind master: the greeting must print the SERVING build's distance from origin/master, and one refusing command must update, rebuild and verify it
+- [ ] **T-173** Per-stage effort chosen by a deterministic policy, with Jev in shadow. Sequenced AFTER candidate A (it needs ProcessRole)
 
 ## P2
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 84,
+  "revision": 85,
   "project": {
     "name": "self-improving-agent"
   },
@@ -518,6 +518,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Session 78, raised by Aaron's question ('so we need to rebuild after every loop and make sure the mcp server is on latest?'). The answer today is yes, by hand: after any merge touching open-brain/src, update the main checkout to master, rebuild, and have every open session run /mcp reconnect open-brain. That is a step that works only while someone remembers it, and it was missed. MEASURED 2026-09-22: the main tree was at 0bf0597, 24 commits behind origin/master 9788064, while every check read green, because build-freshness compares the main tree's build to the main tree's own HEAD and never to master (G-034). The SessionStart hook prints a tree-currency line for the seat's own checkout but none for the checkout actually serving the hooks and the MCP server. FIX SHAPE, deterministic first: (1) cli-bootstrap prints, first, 'serving build: <sha>, N behind origin/master (last fetch <time>)' for the MAIN tree, however the session was launched; it reads refs locally and never fetches; (2) one command, e.g. `open-brain main-tree update`, which refuses on a dirty tree or on commits not on origin/master (the detach command's three refusals), fast-forwards, rebuilds, and reads build-freshness back against origin/master rather than trusting exit codes. It then says which sessions must reconnect, because only the human can. The reconnect cannot be automated from inside a session. Relates to G-033, G-034, T-154."
+    },
+    {
+      "id": "T-173",
+      "title": "Per-stage effort chosen by a deterministic policy, with Jev in shadow. Sequenced AFTER candidate A (it needs ProcessRole)",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 78,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Session 78, on Aaron's word ('record this as a task ... sequenced after candidate A'), from his question whether effort can change on the fly per task and whether Jev could help. THE LEVER EXISTS: `claude --effort <low|medium|high|xhigh|max>` is a per-invocation flag, verified from `claude --help` on this machine on 2026-09-22 and not assumed, and candidate A's ProcessRole launches each real role as its own `claude -p` process, so the runtime can set effort PER STAGE, PER LAUNCH. That is structural, not a prompt. Subagent definitions (.claude/agents/*.md frontmatter) carry effort too, the second route inside a seat. DESIGN SHAPE, the developer's to design and the planner's to rule: (1) DETERMINISTIC FIRST, a policy file (data, zod-validated, JSON Schema derived and drift-checked, like the gate policies) mapping what the runtime already knows to an effort level: the stage (QA -> max); the plan's paths (security-relevant harness files such as refwatch/git/runtime -> xhigh; docs and version surfaces -> medium); a retry after a failed attempt -> one level up. (2) JEV ONLY FOR WHAT PATHS CANNOT SEE, as a typed judgement ('does this plan need novel reasoning or is it mechanical?'): a one-line diff to a git primitive is small and subtle, which is the shape of this session's two false claims ('no compare-and-swap possible', 'the overrides close config'). (3) JEV RUNS IN SHADOW FIRST: it records the level it WOULD have chosen beside the policy's, and changes nothing until its disagreements are counted against outcomes, T-155's discipline applied to effort. HOH-JEV section 3: typed output guarantees the interface, not the truth. THE OUTCOME DATA ALREADY STARTED: from dispatch-2 (PRs #104/#105) every tracked report records model AND effort, and the instrument is the session transcript's PER-ENTRY `effort` field, reported as timestamped runs. settings.json gives only the configured default, as the QA seat found with three instruments giving three answers. FIRST DATA POINT, for calibration and not a conclusion: all planner rulings and all QA artefacts before 2026-09-23 ~01:00Z were written at MEDIUM, and this session's errors were mostly failures to CHECK rather than to reason, which effort may not fix; enforced gates did. Relates to T-155, T-165, T-170."
     }
   ],
   "verified": [
