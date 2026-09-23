@@ -98,6 +98,18 @@ return instead of at exit, the delayed writes are invisible, and this pair discr
    on it.
 4. **No shell:** an argv element containing `^`, `$HOME`, a backslash and a space reaches the child
    byte-for-byte, as shown by the child echoing its argv into the deliverable.
+   **Amendment to `ce8e6a1`, before any candidate (planner's note from Forge's plan).** On this
+   machine `claude` is an npm shim (`.cmd`/`.ps1`), and Node refuses to spawn a `.cmd` without a
+   shell (CVE-2024-27980). The adapter therefore resolves the shim to its JS entry and spawns
+   `node <entry> <args>`. The byte-for-byte row runs through **that resolved spawn**, and it
+   records the spawned executable and argv[0..1], so the path exercised is the real one. It is not a
+   test-only direct spawn.
+5. **Fail closed when the shim cannot be resolved.** An adapter pointed at a shim whose JS entry
+   cannot be found (a planted `.cmd` with no resolvable entry) refuses **before any tag**, and the
+   refusal **names the path**. It never falls back to a shell: the probe plants a marker-writing
+   `.cmd` and asserts the marker is absent. **Control:** a resolvable shim in the same position
+   spawns and writes its deliverable. A native executable (`claude.exe`) is spawned directly, and
+   if none is available on this machine that case is reported **unprobed**, not asserted.
 
 **Fail:** the key or sentinel reaches the child; any assertion here reads inherited
 `process.env` without constructing and then checking it (G-044); a shell anywhere in the spawn.
