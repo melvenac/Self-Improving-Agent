@@ -60,6 +60,27 @@ difference is one observation, not a measurement (T-173).
 | 15 | **Accepted.** U6, the widened U4, and `%ProgramData%\Git\config` recorded as unread by 2.54 **for that version only**. |
 | 17 | **Accepted, reworded under R14:** the HEAD file and the index are "probed at v0.44.1: crash without record; A's backstop records it; the channel itself is open". |
 
+## Two more, from the developer while building (same session)
+
+The developer measured that this machine's `claude.cmd` shim points at a **native executable**
+(`node_modules\@anthropic-ai\claude-code\bin\claude.exe`), not a JavaScript entry. The native form is
+therefore the real path here, the JS-entry form is exercised only by a planted shim, and the QA seat's
+U6 premise is reworked before the amendment is pushed.
+
+- **R20. The generated global-config file is verified by bytes before every git call.** Any file
+  outside the repository is writable by a role, so R19's file would otherwise be a layer the role can
+  edit. The runtime holds the file's exact bytes in memory and compares them before each git call. A
+  mismatch throws `GitRefused`, and R14's backstop records it. **Stated limit:** this is
+  compare-then-call, so a process that outlives the role could write in between. CA-6's process-tree
+  kill and heartbeat close that gap, and the report states the dependency.
+- **R21. Local config at base is default-deny.** A program-valued key **already present** in the
+  target's `.git/config` at base runs inside the runtime's calls under every layer, because layer 2
+  only catches keys added during a stage. Preflight refuses any local key outside a **safe allowlist
+  of what a fresh `git init` or `git clone` writes**, measured on both git versions and not recalled,
+  and names the key. This is default-deny rather than a list of dangerous keys: the same argument
+  that justified layer 2, and the same shape as R19. Row: `filter.x.clean` and `core.sshCommand`
+  planted at base are refused with the key named; a fresh clone as the control is accepted.
+
 ## Process
 
 - **The amendment goes to origin before any candidate exists,** on Aaron's word in the QA seat's
