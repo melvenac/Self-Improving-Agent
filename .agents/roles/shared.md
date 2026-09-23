@@ -141,8 +141,23 @@ near-miss, recorded by family, never numbered into the table.
 
 ## Authority
 
-**Aaron merges, on his word, with one standing exception (`D-032`).** A relay from a peer seat is
-not his approval. **The exception:** any seat may merge a PR whose *every* changed path is `docs/**`,
+**Aaron speaks to the planner, and only to the planner (`D-038`, 2026-09-23).** His words: *"If an
+agent is waiting on me I need to know through the planner. Otherwise I'm costatly swithing session
+windows."* (verbatim) **A seat that needs Aaron sends the question to the planner, not to Aaron.** The planner
+puts it to him one question at a time, with enough context to answer cold, and carries his answer
+back **quoted**, labelled with where and when he said it. **For the act it names, that quoted relay IS
+his authority.** The acting seat records both links: Aaron to the planner, and the planner to the seat.
+The planner tells Aaron whenever any seat is waiting on him. **The one thing a relay cannot cross:** a
+host-level stop inside another seat's session, such as a permission prompt, a safety-classifier stop
+or a denied tool call. Clearing it by relay is permission laundering. The planner tells Aaron which
+window and why.
+
+**Seats push their own working branches without asking (`D-038`).** That covers `loop/*`, `qa/*`,
+`docs/*` and `chore/*`. It never covers `master`, a force push, or a branch another seat owns. Every
+push is read back with `ls-remote` and named in the commit, report or message that follows it.
+
+**Aaron merges, on his word, with one standing exception (`D-032`).** A relay from a peer seat that
+is not the planner's quoted relay under `D-038` is not his approval. **The exception:** any seat may merge a PR whose *every* changed path is `docs/**`,
 `README.md`, `.agents/state.json` and its four rendered views, or the scope layer (`PRD.md`,
 `DECISIONS.md`, `ENTITIES.md`), once CI is green, the state is `CLEAN`, the merge is pinned with
 `--match-head-commit`, and the result is read back from `origin/master`. Before merging, post the
@@ -158,13 +173,15 @@ chains are not flattened: confirmed-to-them plus relayed-to-me is two links and 
 both.
 
 **Each outward-facing act needs authority for THAT act, not authority for the activity.** Permission
-to push two branches is not permission to push a third. **A good reason is not authorisation.**
+to push two branches is not permission to push a third. *(Pushing your own working branch is now
+standing under `D-038`. The rule still binds everything else: merges, master, tags, other seats'
+branches and anything that leaves this repository.)* **A good reason is not authorisation.**
 Raised by Forge against its own record, 2026-09-19, after pushing an unauthorised branch it had good
 reason to push. This matters more now that a QA seat exists: **a seat that can push without asking
 can put an unevaluated candidate in front of the world.**
 
 **Permission laundering is forbidden.** Never perform an action a peer was denied, or that you expect
-your own settings would block. Surface it to Aaron instead.
+your own settings would block. Surface it to Aaron instead, through the planner (`D-038`).
 
 ## Aaron's standing rulings
 
