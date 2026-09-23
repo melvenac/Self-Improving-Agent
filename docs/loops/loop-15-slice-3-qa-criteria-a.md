@@ -76,6 +76,24 @@ file is not, per dispatch-2's correction):** `770bcb9`, `ce8e6a1` and `96738a8` 
 **medium** (the transcript's `medium` run, 2026-09-22T23:50:58Z → 2026-09-23T01:02:20Z). `b14c0ad`
 (§7) and this fold were written at **max** (the run from 01:02:27Z).
 
+**Amendment 4, by Probe (QA seat, record session 82, assigned by the planner under T-164; the
+greeting's per-worktree counter said 7 and is not used), 2026-09-23 (UTC), before candidate A2
+exists.** Candidate A `3b19287` was **REJECTED** on blocker D-A1 (QA report A at `10eb4d0` on
+`origin/qa/loop-15-slice-3-report-a`). `loop-15-slice-3-rulings-6.md` (master `a11916a`, read in full)
+rules that **A2 is scored against these criteria plus the rows below** (R24), and gives this seat
+three rulings to fold before A2 is built: **R25 → CA-15** (new), **R26 → CA-4h**, **R27 → CA-2.5 and
+CA-4c**. There is one commit per ruling, each citing it. No A2 branch exists on `origin` at this
+amendment: `git for-each-ref refs/remotes/origin` after a fetch at 2026-09-23T03:44:26Z lists
+`loop/15-slice-3-candidate-a` (`918a1c9`, the rejected A) and no other candidate branch for slice
+three. Inputs also read in full: report A (§3, §13, §15 in particular) and the developer's final
+handoff §1 (`docs/loops/loop-15-slice-3-forge-session-80-final-handoff.md` at `216cec6`,
+`origin/loop/15-slice-3-forge-design-b`), which is D-A1's repair direction.
+**Model and effort, from this session's host transcript**
+(`~/.claude/projects/C--Users-melve-Worktrees-sia-qa/34125541-b33d-4ef7-a80f-aaf583f9047d.jsonl`,
+parsed as JSON): every assistant entry carries top-level `"model":"claude-opus-5-5"` and
+`"effort":"high"`, 40 of 40 entries at 03:44:00Z. Additions of this seat's own are marked **[mine]**
+and returned in §8; they are not scored until ruled.
+
 ---
 
 ## 1. Fixed conditions, carried from `loop-15-slice-3-qa-criteria.md` §1 and not restated
@@ -422,6 +440,10 @@ raises `GitRefused`, and the R14 backstop (CA-14) records it.
 **CA-4d — snapshot scope stated.** The candidate states which files layer 2 snapshots, and whether
 `.git/config.worktree`, `.git/info/attributes`, and a planted `include.path` pointing outside the
 repository are covered. Each claimed file is shown by one planted change being detected.
+**Read with CA-15 (amendment 4):** the stated scope is the set of paths **as `lstat` sees them**. At
+`3b19287` every stated path was resolved through links, so a link at a watched root silently made
+the scope that link's target (report A §2, CA-4d). A scope that resolves through a link fails this
+row as well as CA-15.
 
 ### CA-5 — R4's known-negative: a clean stub loop leaves every stage's window unchanged
 
@@ -573,6 +595,8 @@ count:
 | any other local config key at base | refused unless on the init/clone allowlist (CA-3d, R21) |
 | the generated global-config file | compared before every git call (CA-4i, R20) |
 | config content (garbage, `repositoryformatversion=99`) | layer 2 restores it before any git call (CA-4a) |
+| link-typed watched paths (symlink or junction at a watched path, root or entry; a link at base) | probed by this candidate, CA-15 (amendment 4). **At `3b19287`, a junction at `.git/hooks` made the restore act outside the repository (D-A1)** |
+| hard links at a watched file | unprobed; returned in §8, item 3 |
 | HEAD file (content) | **probed at v0.44.1: crash without record** (§7.1). A's backstop records it (CA-14). **The channel itself is open** (rulings-3 item 17) |
 | index | **probed at v0.44.1: crash without record** (§7.1). A's backstop records it (CA-14). **The channel itself is open** (rulings-3 item 17) |
 | submodules | unprobed |
@@ -626,6 +650,153 @@ is kept by catching the **class**, not by enumerating channels.
 - **Fail:** any exception out of `runLoop` after a role has run; a record that omits the failing
   call; a record that claims a repair it did not perform.
 
+### CA-15 — R25: the watched paths' TYPE. A restore never reads, writes or deletes outside the repository
+
+**Source:** `loop-15-slice-3-rulings-6.md` R25 (master `a11916a`) accepts this row "in the shape QA
+§13 proposes, with three probes": QA report A §13 at `10eb4d0`. The repair it tests is R24's D-A1
+item, in the direction of the developer's final handoff §1 at `216cec6`. R25's binding sentence:
+**"Nothing outside the repository may be read or written by a restore, and a row proves it with
+canaries in both directions."**
+
+**Why the row exists.** CA-4a judged the watched **file set** and the **bytes**, not the watched
+paths' **type**. Through a junction, both "matched" by the letter. Meanwhile candidate A's restore
+deleted two files outside the repository, wrote 14 there, left the role's link in place, and recorded
+"Every file was put back by bytes" (report A §3). The criteria gap was this seat's, and it is owned
+in report A §3.
+
+**The claim.** A link (a symlink or a directory junction) is itself a **change**, whatever the bytes
+read through it, when it is at any path layer 2 watches, at any watched tree root, or as an entry
+inside a watched tree. The watched set is the one the candidate states under CA-4d. At `3b19287`,
+`watchedLocations` (`configwatch.ts:80–90`) was:
+- the files `<common>/config`, `<git-dir>/config.worktree`, `<common>/config.worktree`, and the
+  `.git` pointer when `.git` is a file;
+- the trees `<common>/hooks` and `<common>/info`, plus `<git-dir>/info` in a linked worktree.
+
+This is report A §13's list. The row runs against the set A2 states. **A set smaller than this one is
+reported as a narrowing**, never scored silently.
+
+**Pass, all of the following, for every probe below:**
+1. The stage fails `stage-changed-config`, is refused and never retried, and ends in a `LoopResult`
+   and `FAILED.md`, with no exception out of `runLoop`.
+2. **The link is removed and the original entry recreated from the snapshot.** After the loop,
+   `lstat` on the watched path reports the snapshot's type: a regular file, or a real directory, not
+   a link. Its file set and bytes equal the pre-stage snapshot. This is CA-4a's set-and-bytes rule,
+   read with `lstat`, not through the path.
+3. **Nothing outside the repository is read, written or deleted by the runtime.** It is shown by the
+   canaries below, in both directions.
+4. **The record says what happened.** It names the link-typed path as a type change. It does not say
+   "put back" for any path whose post-restore `lstat` re-read disagrees with the snapshot. R24:
+   "put back" is written only after an `lstat` re-read.
+5. **A link already at a watched path at BASE is refused at preflight** (R24: "links at base refused
+   at preflight"), before any tag, commit or artefact, naming the path, and with its target's
+   canaries unchanged.
+   - **Control:** the same repository with the link replaced by a real directory proceeds past
+     preflight.
+
+**Canaries, in both directions.** Every probe points its link at a **scratch victim** outside the
+repository, created by the probe for that run. No real directory is ever a target. "Both directions"
+is read two ways here, and the row requires both. That reading is returned in §8, item 1.
+- **Write and delete.** The victim holds canary files with known names, bytes and (on POSIX) modes.
+  After the loop:
+  - every canary exists with its bytes and mode unchanged;
+  - the victim holds **no** entry the probe did not create;
+  - the victim is listed by `lstat`/`readdir` of the victim itself, by the same expression before
+    and after.
+- **Read.** Each canary carries a unique token.
+  - After the loop the token appears **nowhere the runtime writes**: the repository directory
+    including `.git/`, the iteration directory, `FAILED.md`, and the loop's returned output.
+  - The search is validated on a known positive in the same run: the victim itself, where it must
+    hit.
+  - **[mine], POSIX only, on CI:** the victim is made unreadable (mode `000`). The test first shows
+    that a direct read of it fails with `EACCES`, and **fails rather than skips** if it does not (a
+    runner with root privileges would read it anyway). A runtime read through the link would then
+    surface as an error, and the record carries none.
+  - **Limit, stated:** a read that leaves no trace, such as a hash computed and then discarded, is
+    not observable by any canary. For that case the report adds code-path evidence that A2's walk
+    never opens, `readdir`s or hashes **through** a link, labelled as static reading.
+- **Each instrument is shown able to see a change**, which is what makes its silence evidence.
+  - **The transition control:** every probe that can run on win32 is also run against candidate A
+    `3b19287` in the same session, by the same expressions. Report A §3 measured probe (a)1 there:
+    both canaries deleted, and 14 `*.sample` files written. **For each probe, the report states which
+    clause turned red at `3b19287`.**
+    - Reading `listTree` at `3b19287` (`configwatch.ts:93–106`) predicts that an entry-level link
+      is not followed at all: `Dirent.isDirectory()` is false for a link, and `readState`'s
+      `statSync` then sees a directory and reads it as absent. The predicted red for (a)3 is
+      therefore clause 2 (the link is still there), not the canaries.
+    - **A probe with no red clause at `3b19287` is reported as "no known positive"**, and its A2
+      result is labelled that way. It is not counted as a discriminating pass.
+  - **The attribution control:** probe (c) below.
+
+**Probes.**
+- **(a) win32, directory junctions**, created with `symlinkSync(target, path, "junction")` (no
+  privilege needed on win32; report A §3). One per run:
+  1. a junction at `<common>/hooks`, after the role renames the real directory aside. This is
+     report A §3's measured case.
+  2. a junction at `<common>/info`, the same way;
+  3. **R24's sibling:** a junction as an **entry inside** a watched tree (`.git/hooks/sub` → the
+     victim);
+  4. **R24's sibling:** in a linked worktree, a junction at `<git-dir>/info`;
+  5. **[mine]:** a junction at an **ancestor** of every watched path. The role renames `.git` aside
+     in a non-linked repository and junctions `.git` → the victim. R18's pinning is by path, so the
+     pins and every watched path would all resolve through the link. **Expected:** a record, and the
+     victim's canaries intact. Returned in §8, item 2.
+  - **The plant is asserted to have landed.** Before the stage ends, the stub role `lstat`s its link
+    and writes the result to its deliverable, and the probe reads it back. A plant that failed
+    silently makes every negative vacuous: report A §3's file-symlink case failed with `EPERM` on
+    this machine.
+  - **R24's addition, verified and not assumed:** a non-recursive `rmdir` on a win32 junction removes
+    the junction and never touches its target. This seat measures it directly before scoring: a
+    junction → a victim with canaries; `rmdirSync` without `recursive`; the junction is gone by
+    `lstat`, and the canaries remain by bytes. It is measured again as a consequence of every (a)
+    probe.
+- **(b) POSIX symlinks, run on CI's Linux**, where no privilege is needed (R25). This is a test in
+  the candidate's own suite, `skipIf(win32)`. It is read from the CI run's per-test output as
+  **passed, not skipped**: a skip read as a pass is rule 11. One case per run:
+  1. a symlink at `.git/config` → a victim **file**. At `3b19287`, `writeBack` opens `r+` through
+     the link, which predicts the victim is overwritten with the config's bytes (report A §3, §7
+     item 1, unmeasured). The victim's bytes are unchanged.
+  2. a symlink at `.git/hooks` → a victim directory. Its canaries are unchanged.
+  3. **R24's sibling, `chmod` through links:** a symlink as an entry inside `.git/hooks`, where the
+     snapshot recorded a hook, pointing at a victim file with mode `0644`. The victim's mode is still
+     `0644` afterwards.
+  4. **R24's sibling, `MachineConfigWatch` hashing through links:** the simulated `HOME/.gitconfig`
+     (CA-4f's simulation) is replaced by a symlink to a victim file.
+     - The change is **reported** as a type change naming the path.
+     - Nothing is restored (R8), and the victim's bytes are unchanged.
+     - On win32, the same sibling is probed with a junction at `$XDG_CONFIG_HOME/git`.
+  - **In-test controls, since this seat has no POSIX machine to run a mutant on:**
+    - the plant is asserted with `lstat(…).isSymbolicLink()`;
+    - a write **through** the link by the test itself changes the victim, so the instrument can see
+      a change through that link;
+    - the role's planting act, performed without the runtime, leaves the victim unchanged. This is
+      the attribution control's POSIX form.
+  - **This seat reads the test's source at the candidate**, and reports whether it asserts all of the
+    above by the same expressions before and after.
+- **(c) The attribution mutant, M-L2-norestore:** A2 with its restore removed and detection kept,
+  `tsc --noEmit` clean, run against probe (a). The victim is untouched, which shows the probe
+  separates the runtime's restore from the role's act (report A §3 ran the same mutant at `3b19287`).
+  - **[mine]:** a second mutant, **M-L2-follow**, replaces A2's `lstat` guard before a write, delete
+    or `chmod` with the link-following form (`stat`, or the guard removed). It must turn at least one
+    (a) probe red. If A2's guard is not a single edit, the report names the edit made. Returned in
+    §8, item 4.
+
+**Fail, any one of:**
+- a canary changed or deleted, or an entry added to a victim;
+- the token found where the runtime writes;
+- a watched path that is still a link after the loop;
+- a "put back" claim for a path whose `lstat` re-read disagrees;
+- a link at base that passes preflight;
+- a probe with no known positive reported as a discriminating pass;
+- a POSIX row read as passed when CI skipped it;
+- a recursive `rm` anywhere in the restore path (R24: "rm never recursive"), read from the code.
+
+**What this row cannot see, stated now:**
+- the traceless reads above;
+- a link planted **between** the window's compare and its restore: a race, not probed (report A §8);
+- **hard links.** A hard link at a watched file is a regular file to `lstat`, and a write through it
+  changes the outside file. Returned in §8, item 3, as a question and not a row;
+- win32 **file** symlinks, which need Developer Mode here. (b) covers them on POSIX instead.
+
 ---
 
 ## 3. Declared unrunnable, BEFORE any candidate (R3 and its refinement)
@@ -642,6 +813,10 @@ U4: writes to the REAL ~/.gitconfig, $XDG_CONFIG_HOME/git/config or system gitco
 U5: the quality or correctness of the model-backed role's output in the first real run (CA-9) — an observation, not acceptance
 U6: argv parsing INSIDE the native claude.exe — the binary's own command-line parser, not instrumentable by this seat; CA-2.4 verifies the runtime's resolution and spawn with an observable target
 ```
+
+**U2 covers writes made by the ROLE, not by the runtime (amendment 4).** The runtime's own reads,
+writes and deletes outside the repository are **not** unrunnable. They are CA-15's subject, and they
+are scored there.
 
 **Recorded, not a row (rulings-3 item 15):** `%ProgramData%\Git\config` is **not read** by git
 `2.54.0.windows.1`, and this is **for that version only**. `git.exe` holds 0 references to it; the
@@ -667,6 +842,20 @@ ASCII and UTF-16LE detectors were each validated on a known positive (`GIT_CONFI
    checker shown able to fail.
 5. Full suite with peers recorded; CI run id for the candidate head.
 6. Report, in prose (R10). Nothing is pushed without Aaron's direct word.
+
+**Added at amendment 4, for candidate A2 (rulings-6 R24, R25; report A §15):**
+7. **A2 re-runs every row**, not only CA-4a and CA-15. The restore change touches layer 2, which
+   CA-4a/b/d/h/i, CA-5, CA-8 and CA-11 all depend on.
+8. **Every CA-15 probe that can run on win32 runs against `3b19287` as well**, as the transition
+   control, in the same session and by the same expressions. It runs in a `git archive` copy, never in
+   a checkout of the main tree.
+9. **Mutants added:** M-L2-norestore (CA-15 (c)), and M-L2-follow **[mine]** (§8, item 4). The same
+   rules apply: type-clean, and each edit asserted to land.
+10. **Ask the planner for a PR on A2's branch at once.** CI is pull_request-only, and CA-15 (b) exists
+    only in a CI run.
+11. **D-A2, D-A3, D-A4 and D-A5 are carried and reported**, whatever the outcome. D-A2 and D-A4 are
+    rows after amendment 4 (CA-2.5, CA-4c). D-A3 is R24's record-text item. D-A5 is the developer's
+    only if it touches nothing A2 already changes (R27).
 
 ---
 
@@ -881,3 +1070,39 @@ record. Git's own behaviour was measured first: garbage `.git/config`, garbage `
     This seat does not narrow it by itself.
 17. **CA-11 table:** add **HEAD file (content)** and **index**, both "probed §7.1: crash without
     record at v0.44.1". Index was "unprobed".
+
+---
+
+## 8. Amendment 4 (record session 82): returned to the planner, numbered. UNRULED.
+
+These are this seat's own readings and additions to rulings-6, marked **[mine]** where they appear
+above. **Nothing here is scored until the planner rules on it.** The rest of amendment 4 applies
+R25–R27 as worded.
+
+1. **CA-15, "canaries in both directions": two readings, and the row requires both.**
+   - (i) Read against **write and read**: nothing written or deleted outside the repository, and
+     nothing read there, which is the pair R25 names.
+   - (ii) Read against the **instrument's two directions**: silence under A2, and a red known
+     positive at `3b19287` (the transition control).
+
+   The read half's instruments are mine: a unique token that must not propagate, and, on POSIX, a
+   mode-`000` victim with its `EACCES` shown first. **Ruling asked:** confirm both readings, or name
+   the intended one.
+2. **CA-15 (a)5, a junction at `.git` itself (an ancestor of every watched path).** It is not in §13's
+   list or R24's sibling list. It is the same class, and R18's pinning is by path, so pinning does not
+   stop it. **Ruling asked:** a scored probe, or a stated limit?
+3. **Hard links (not a row).** On NTFS a hard link needs no privilege on the same volume. Suppose a
+   role replaces `.git/config` with a hard link to an outside file. A restore that writes the
+   snapshot's bytes through `r+` then overwrites that outside file. `lstat` reports a regular file, so
+   a type check cannot see it; the observables would be `nlink > 1`, or an inode different from the
+   snapshot's. **This is predicted from reading the code and not measured**, and it is not R25's
+   "type". **Ruling asked:** a CA-15 probe for A2, a named limit, or a separate item?
+4. **M-L2-follow**, a mutant that reverts A2's `lstat` guard to a link-following form. It shows the
+   guard is what keeps the victim intact, where the transition control shows only that `3b19287`
+   differs from A2. **Ruling asked:** is it required?
+5. **R24's D-A3 has no row of its own.** This seat reads it as covered by CA-6's existing fail clause,
+   "a surviving grandchild reported as killed". That clause is applied for A2 to the double-fork
+   measurement (DFORK, report A §2 CA-6), which becomes **scored** for this one clause: the
+   `role-timeout` text must not claim the tree was killed while the DFORK grandchild survives.
+   Closing the double-fork is **not** required (R24: "A2 does not try to close the double-fork. It
+   names it."). **Ruling asked:** confirm this reading, or give D-A3 its own row.
