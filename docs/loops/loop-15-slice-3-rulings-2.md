@@ -71,5 +71,30 @@ on the four, for B's design:
   criteria SHA, before any candidate, and they are excluded from the verdict. The two lists are kept
   separate, because "could not run" and "not this candidate's" are different claims.
 
-**Acceptance rows:** R7, R8 and R9 are candidate A criteria rows; R10 is candidate B's. The QA seat
+## Siblings, raised by the developer the same session (unprobed by either seat)
+
+Forge conceded the design's "closes hooks and config" as a developer error: it closed **repo-local**
+config only, which is the class rule broken by the design that cited it. Forge then looked for
+siblings unprompted and found three. **All three are rows for candidate A; none is measured yet.**
+
+**R11. XDG global config.** Git also reads `$XDG_CONFIG_HOME/git/config` (default
+`~/.config/git/config`) as global config. R7's claim that `GIT_CONFIG_GLOBAL` replaces it is a
+reading of git's documentation, **so the row measures it**: a program planted in the XDG path must
+not execute with layer 0 on. R8's report-only hashing covers **both** `~/.gitconfig` and the XDG
+path, or a role writes to the one that is not watched.
+
+**R12. Linked worktrees.** In a linked worktree `.git` is a file, config and hooks live in the
+**common** dir, and `config.worktree` lives under `.git/worktrees/<name>/` when
+`extensions.worktreeConfig` is set. Layer 2 resolves `--git-common-dir` and `--git-dir` **once, at
+preflight, before any role runs**, and snapshots `common/config`, `common/hooks/*`,
+`common/info/*` and `<git-dir>/config.worktree`. Resolving them after a stage would let the role
+redirect them first.
+
+**R13. Includes present at base are REFUSED at preflight.** An `include.path` or `includeIf` in the
+local config that points outside `.git` is caught by layer 2 when it is added, but one that already
+exists at base puts its target outside every window. Preflight refuses a target repository with any
+include in its local config and names the key. It refuses rather than reports, because the target
+is a scratch clone that has no reason to carry one, and failing closed costs nothing there.
+
+**Acceptance rows:** R7, R8, R9, R11, R12 and R13 are candidate A criteria rows; R10 is candidate B's. The QA seat
 writes them.
