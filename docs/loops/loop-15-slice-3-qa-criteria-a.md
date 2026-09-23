@@ -53,8 +53,9 @@ That is one git version, and the row re-measures it at the candidate on both ver
 at `78474cf`, blob `9841b5bc`, read in full) rules all 17 items of §7. They are folded into the rows
 at this commit: R14 → CA-14 (new); R15 → CA-2.6 (new); R16 and R17 → CA-4b; R18 → CA-4h; R19 → CA-4c
 and CA-5; items 1, 2, 3, 5, 6, 7, 12, 13, 14, 15 and 17 → their rows. §7 stays as the record of what
-was proposed and why. Two readings of this seat's are marked **[mine]** where they stand:
-CA-4c's R19 refusal control, and the note on R17's reach inside the checks.
+was proposed and why. One reading of this seat's is still marked **[mine]**: the note on R17's reach
+inside the checks. The other, CA-4c's reading of R19's "needs", was **ruled after `847fc35`**, in the
+planner's A2A message, and is folded in the commit that follows it.
 **R20 → CA-4i and R21 → CA-3d, together with the shim rework in CA-2.4/2.5 and U6, come from the
 planner's A2A message sent after rulings-3.** At this commit they are in no tracked rulings file. They
 are recorded here as **relayed rulings**, and the shim target was **re-derived by this seat** (CA-2.4).
@@ -292,14 +293,22 @@ it is listed in the iteration record. Identity is still passed with `-c user.nam
 
   At v0.44.1 plus R7 alone, both failed: the untouched file read ` M`, and the save was committed
   `i/crlf` against the machine's `i/lf`.
-- **R19, the refusal:** a target that **needs** a program-valued key is refused at preflight, and
-  the refusal names it (`filter.lfs` with `required=true`). **[mine], a control on how "needs" is
-  read, returned in §5.5:** this machine's **system** config carries `filter.lfs.required=true` for
-  **every** repository. So refusing on the key's presence would refuse every target here. The row
-  reads "needs" as **the target's attributes** (`.gitattributes` or `.git/info/attributes`) **name a
-  filter, diff or merge driver whose program key the generated file does not carry**.
-  - **Probe:** a target whose attributes say `*.bin filter=lfs` is refused, naming `filter.lfs`.
-  - **Control:** a target with no such attribute, on this same machine, is **not** refused.
+- **R19, the refusal (§5.5 RULED by the planner after `847fc35`, relayed by A2A):** a target
+  **needs** a required filter when **a TRACKED path's attribute names it**: `git ls-files`, then
+  `git check-attr filter` on those paths. Machine config having the key is **not** "needs".
+  - Git for Windows ships `filter.lfs.required=true` in **system** config, and the literal
+    machine-config reading refused **144 of the suite's loops, including the plain stub**. That is
+    Forge's measurement, relayed. It agrees with this seat's §5.5 derivation from this machine's
+    system config.
+  - **Probe:** a target with `*.bin filter=lfs` and a **tracked** `.bin` file is refused at
+    preflight, naming `filter.lfs`.
+  - **Control:** the plain stub target, on this same machine, is **accepted**.
+  - **Preflight order (ruled):** R13 includes (CA-3c) → R21 local-config default-deny (CA-3d) →
+    R19 attribute query. The query is itself a git call, so it comes after R21 and runs under layers
+    0 and 1 with R18's pinning (CA-4b, CA-4h). The report evidences the order from the code path.
+  - **Stated limit, recorded as a limit and not a pass:** a path the role **adds** with
+    `filter=lfs` meets a runtime git that has no lfs driver, so the attribute is **inert**. That is
+    fail-safe, and it is not a refusal.
 - **Discriminating, in the same test (R7):** a planted global `filter.<x>.clean` plus a work-tree
   `.gitattributes` **executes without layer 0 and does not execute with it.** The global file is
   simulated through the test's own environment and is never the real one.
@@ -594,7 +603,7 @@ ASCII and UTF-16LE detectors were each validated on a known positive (`GIT_CONFI
 
 ---
 
-## 5. Returned to the planner, numbered — items 1–3 RULED; items 4–6 NEW at the rulings-3 fold, UNRULED and not scored until ruled
+## 5. Returned to the planner, numbered — items 1–3 and 5 RULED; items 4 and 6 UNRULED and not scored until ruled
 
 1. ~~CA-4c: is global/system config in candidate A?~~ **RULED by rulings-2 R7–R9 and R11–R13:** it is
    in A as layer 0, with a report-only window, and the P5 claim is withdrawn. It is folded into
@@ -622,7 +631,9 @@ ASCII and UTF-16LE detectors were each validated on a known positive (`GIT_CONFI
    `user.email`, `commit.gpgsign`, `core.autocrlf`, `extensions.worktreeConfig`), or the fixture
    stops writing them. The fixture wrote `core.autocrlf=false` precisely to be deterministic across
    machines, so that choice interacts with R19.
-5. **R19's refusal: how "needs" is read (CA-4c).** This machine's **system** config carries
+5. **RULED (planner, after `847fc35`, relayed): "needs" = a TRACKED path's attribute names the filter
+   (`ls-files` then `check-attr`), and the preflight order is R13 → R21 → R19, folded into CA-4c.**
+   The original question: **R19's refusal: how "needs" is read (CA-4c).** This machine's **system** config carries
    `filter.lfs.required=true` for every repository. Read as "the key is present", R19 refuses every
    target on this machine. The row reads "needs" as "the target's attributes name a filter, diff or
    merge driver whose program key the generated file does not carry", with a control target that
