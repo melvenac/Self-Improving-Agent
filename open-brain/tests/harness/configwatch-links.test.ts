@@ -637,4 +637,27 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(blob, blob).not.toContain(hash);
     expect(blob).toContain("not read");
   });
+
+  it("R50: a hard link already at a repository file at base is no change and carries no exception text", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const config = join(dirs.commonDir, "config");
+    const bytes = readFileSync(config);
+    const victim = join(tmp.dir, "r50-victim");
+    writeFileSync(victim, bytes);
+    unlinkSync(config);
+    linkSync(victim, config);
+    expect(lstatSync(config).nlink).toBe(2);
+    const watch = new ConfigWatch(dirs);
+    watch.begin("planner");
+    const v = watch.closeAndRestore();
+    const blob = JSON.stringify(v) ;
+    expect(blob, blob).not.toContain("equals");
+    expect(blob).not.toContain("TypeError");
+    expect(blob).not.toContain("Cannot read properties");
+    expect(v.ok, blob).toBe(true);
+    expect(v.changes, blob).toEqual([]);
+    expect(v.unrestored, blob).toEqual([]);
+    expect(readFileSync(victim)).toEqual(bytes);
+    expect(lstatSync(config).nlink).toBe(2);
+  });
 });

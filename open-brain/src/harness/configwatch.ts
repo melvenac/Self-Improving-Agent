@@ -335,10 +335,12 @@ const fileState = (id: PathIdentity, bytes: Buffer | null, unreadIdentity: boole
 /**
  * Read a path only when `lstat` says it is a regular file whose dev, ino and
  * nlink match the baseline. A mismatch is an identity change and is not read
- * (R43). A symlink is recorded, not followed. With no baseline, a hard link
- * (nlink other than 1) is not read either: it was not there at base.
+ * (R43). A symlink is recorded, not followed. A hard link that appears with no
+ * baseline was not there at the window's open, and is not read (R49).
+ * `preflight` is that open: a hard link already there is the base, so its
+ * bytes are recorded and an unchanged link is not a change (R50).
  */
-const readState = (p: string, baseline?: FileState | null): FileState | null => {
+const readState = (p: string, baseline?: FileState | null, preflight = false): FileState | null => {
   const id = identify(p);
   if (id.kind === "symlink") {
     return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, target: id.target, unreadIdentity: false };
@@ -346,7 +348,8 @@ const readState = (p: string, baseline?: FileState | null): FileState | null => 
   if (id.kind !== "file") return null;
   const hadFile = baseline?.kind === "file";
   const same = hadFile && baseline.dev === id.dev && baseline.ino === id.ino && baseline.nlink === id.nlink;
-  if ((hadFile && !same) || (!hadFile && id.nlink !== 1)) return fileState(id, null, true);
+  if (hadFile && !same) return fileState(id, null, true);
+  if (!hadFile && id.nlink !== 1 && !preflight) return fileState(id, null, true);
   return fileState(id, readFileSync(p), false);
 };
 
@@ -368,7 +371,8 @@ const changed = (a: FileState | null, b: FileState | null): boolean => {
 const agrees = (snapshot: FileState, now: FileState | null): boolean => {
   if (now === null || snapshot.kind !== now.kind) return false;
   if (snapshot.kind === "symlink") return snapshot.target === now.target;
-  return now.mode === snapshot.mode && now.nlink === snapshot.nlink && now.bytes!.equals(snapshot.bytes!);
+  if (snapshot.bytes === null || now.bytes === null) return false;
+  return now.mode === snapshot.mode && now.nlink === snapshot.nlink && now.bytes.equals(snapshot.bytes);
 };
 
 const stateHash = (s: FileState | null): string => {
@@ -509,7 +513,7 @@ export class ConfigWatch {
     const chains = new Map<string, ResolutionComp[]>();
     for (const f of this.currentFiles()) {
       chains.set(f, recordRepoChain(repoFloor(this.repoRoot, this.dirs, f), f));
-      snap.set(f, readState(f));
+      snap.set(f, readState(f, undefined, true));
     }
     this.resolutionBase = chains;
     this.snapshot = snap;

@@ -10,8 +10,8 @@
 
 | Item | Status | Red | Green |
 |---|---|---|---|
-| 1 R49 | done | `configwatch-links` `-t R49`: 4 failed, exit 1. Absent machine hard link, both shapes beyond a base link, and a new repository file each put a content hash in the record. | same file, no filter: 22 passed, 3 skipped (POSIX), exit 0. |
-| 2 R50 | not started | | |
+| 1 R49 | done | `configwatch-links` `-t R49`: 4 failed, exit 1. Absent machine hard link, both shapes beyond a base link, and a new repository file each put a content hash in the record. | same file, no filter: 22 passed, 3 skipped (POSIX), exit 0. Commit `9788d32`. |
+| 2 R50 | done | `-t R50`: 1 failed, exit 1. Record was `modified (identity:… not read → <hash>)` and `Cannot read properties of null (reading 'equals')`. | same file, no filter: 23 passed, 3 skipped, exit 0. |
 | 3 R51 | not started | | |
 | 4 R52 | not started | | |
 
@@ -26,5 +26,11 @@ After preflight, a watched path is opened only when its whole resolution still m
 **Separate protections.** `repositoryResolutionDiff` is the repository side (`readForCompare` is its only after-preflight caller). `MachineConfigWatch.resolutionMismatch` is the machine side. Reverting one does not revert the other.
 
 **What A3 still did.** `identityChange` fired only when both sides were files, so an absent machine path that became a hard link was hashed with no `nlink` check. `chainOf(path, true)` stopped at the first link, so a base dotfiles link was not compared past the link and `snap` read through it.
+
+Files: `open-brain/src/harness/configwatch.ts`, `open-brain/tests/harness/configwatch-links.test.ts`.
+
+## Item 2 — R50
+
+A hard link already on a repository watched file when the window opens is the base. `readState` records its bytes at that open (`preflight`). An unchanged link compares equal: no change, and the link is left in place. A hard link that appears only after the open is still not read (R43, R49). `agrees` does not call `.equals` on null bytes, so a missing snapshot cannot put `Cannot read properties of null (reading 'equals')` into the record.
 
 Files: `open-brain/src/harness/configwatch.ts`, `open-brain/tests/harness/configwatch-links.test.ts`.
