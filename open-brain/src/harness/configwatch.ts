@@ -378,6 +378,8 @@ function restoreNewFile(repoRoot: string, dirs: GitDirs, path: string, bytes: Bu
 
 export class ConfigWatch {
   private snapshot: Map<string, FileState | null> | null = null;
+  /** Kind of each watched tree root when the window opened. An absence stays an absence (R45). */
+  private treeAtBase = new Map<string, PathIdentity["kind"]>();
   private stage = "";
   readonly dirs: GitDirs;
   /** The work tree. Ancestor walks start here, not at `gitDir`'s parent: a linked worktree's git dir lives elsewhere. */
@@ -405,6 +407,7 @@ export class ConfigWatch {
   /** Open a window: read every watched file's bytes. File I/O only. */
   begin(stage: string): void {
     this.stage = stage;
+    this.treeAtBase = new Map(watchedLocations(this.dirs).trees.map((t) => [t, identify(t).kind]));
     const snap = new Map<string, FileState | null>();
     for (const f of this.currentFiles()) snap.set(f, readState(f));
     this.snapshot = snap;
@@ -446,11 +449,24 @@ export class ConfigWatch {
       if (ancestorLink) break;
       try {
         assertNoAncestor(this.repoRoot, this.dirs, tree);
-        if (identify(tree).kind !== "symlink") continue;
+        const now = identify(tree);
+        if (now.kind !== "symlink") continue;
+        const baseKind = this.treeAtBase.get(tree) ?? "absent";
+        // Absent → link is a change, named here. The files under a link are not
+        // the record of the link (R45). A directory that existed is recreated
+        // below; an absence is not.
+        if (baseKind === "absent") {
+          changes.push({
+            path: tree,
+            kind: "created",
+            before: "absent",
+            after: `symlink:${now.target}`,
+          });
+        }
         assertNoAncestor(this.repoRoot, this.dirs, tree);
         removeLink(tree);
         assertNoAncestor(this.repoRoot, this.dirs, tree);
-        if (identify(tree).kind === "absent") mkdirSync(tree);
+        if (baseKind === "dir" && identify(tree).kind === "absent") mkdirSync(tree);
       } catch (err) {
         if (err instanceof AncestorLinkError) blocked(err.ancestor);
         else unrestored.push(`${tree} (${(err as Error).message})`);

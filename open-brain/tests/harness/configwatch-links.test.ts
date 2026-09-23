@@ -404,4 +404,57 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(qa.some((f) => f.after.includes("not read"))).toBe(true);
     expect(readFileSync(join(victim, "config"), "utf-8")).toContain("VICTIM-R44-EDITED");
   });
+
+  it("R45: a junction at a tree root that was absent is removed and the absence restored", () => {
+    const wt = join(tmp.dir, "wt-r45");
+    rawGit(repo.root, ["worktree", "add", "-b", "wt-r45", wt]);
+    const dirs = resolveGitDirs(wt);
+    const info = join(dirs.gitDir, "info");
+    expect(dirs.gitDir).not.toBe(dirs.commonDir);
+    expect(() => lstatSync(info)).toThrow();
+
+    const watch = new ConfigWatch(dirs, wt);
+    watch.begin("developer");
+    const victim = join(tmp.dir, "r45-victim");
+    const canary = join(victim, "canary.txt");
+    mkdirSync(victim);
+    writeFileSync(canary, "R45-CANARY");
+    symlinkSync(victim, info, "junction");
+
+    const v = watch.closeAndRestore();
+    expect(v.ok).toBe(false);
+    const root = v.changes.find((c) => c.path === info);
+    expect(root, v.message).toBeTruthy();
+    expect(root?.before).toBe("absent");
+    expect(root?.after).toContain("symlink:");
+    expect(root?.after).toContain(victim);
+    expect(() => lstatSync(info)).toThrow();
+    expect(readFileSync(canary, "utf-8")).toBe("R45-CANARY");
+    expect(namesOf(victim)).toEqual(["canary.txt"]);
+  });
+
+  it("R45: a machine-config path absent at base, later a link, is reported and not read", () => {
+    const xdg = join(tmp.dir, "xdg-r45");
+    mkdirSync(xdg);
+    const gitDir = join(xdg, "git");
+    const cfg = join(gitDir, "config");
+    const watch = new MachineConfigWatch([{ scope: "xdg", path: cfg, source: "test" }]);
+    watch.begin("developer");
+
+    const victim = join(tmp.dir, "r45-xdg-victim");
+    mkdirSync(victim);
+    writeFileSync(join(victim, "config"), "[user]\n\tname = VICTIM-R45\n");
+    symlinkSync(victim, gitDir, "junction");
+
+    const found = watch.compare();
+    expect(found).toHaveLength(1);
+    expect(found[0]?.before).toBe("absent");
+    expect(found[0]?.after).toContain("absent → symlink");
+    expect(found[0]?.after).toContain(victim);
+    expect(found[0]?.after).toContain("not read through");
+    expect(found[0]?.after).not.toContain("VICTIM-R45");
+    expect(found.some((f) => /^[0-9a-f]{16}$/.test(f.after))).toBe(false);
+    expect(readFileSync(join(victim, "config"), "utf-8")).toContain("VICTIM-R45");
+    expect(lstatSync(gitDir).isSymbolicLink()).toBe(true);
+  });
 });

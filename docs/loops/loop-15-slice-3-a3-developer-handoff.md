@@ -9,8 +9,8 @@
 | Item | Status | Red | Green |
 |---|---|---|---|
 | 1 R44 | done | QA-stage finding was content hashes `24fab94adf280a9c` → `c18ec7f70cfd397e` | `R44` test passed. With it: `R35`, both `CA-4f`. Exit 0. Test Files 2 passed. Tests 4 passed, 42 skipped. |
-| 2 R45 | next | | |
-| 3 R46 | pending | | |
+| 2 R45 | done | `v.ok` was true (the absent `<git-dir>/info` junction was not a change) | 3 passed: the repo root, the machine-config absent → link, and the existing `.git/info` junction. Exit 0. |
+| 3 R46 | next | | |
 | 4 R43 | pending | | |
 | 5 R47 CA-2.5 | pending | | |
 | 6 R47 CA-4c / R34 | pending | | |
@@ -22,5 +22,9 @@
 `MachineConfigWatch` captures its link baseline once (`captureBase`), called from `runtime.ts` at preflight. `begin` opens a per-stage content window and does not replace that baseline. A symlink that was not at base is reported as a type change (or `absent → symlink` when the base component was absent) and is not read through. A normal absent → file write is still hashed.
 
 Files: `open-brain/src/harness/configwatch.ts`, `open-brain/src/harness/runtime.ts`, `open-brain/tests/harness/configwatch-links.test.ts`.
+
+## Item 2 — R45
+
+A watched tree root that was absent when the window opened, and is a link at close, is a `created` change (`absent → symlink:<target>`). The restore removes the link and does not `mkdir`. A tree that was a real directory is still recreated. Machine-config paths stay detect-only: absent → link is reported with the target, not read, not restored (Atlas ruling on R44/R45).
 
 Not verified: full suite (not run; ask Atlas first). POSIX not run here (win32).
