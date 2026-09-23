@@ -98,13 +98,14 @@ export interface PathIdentity {
   mode: number;
   nlink: number;
   ino: bigint | null;
+  dev: bigint | null;
   target: string | null;
 }
 
 export function identify(p: string): PathIdentity {
   try {
     const st = lstatSync(p, { bigint: true });
-    const base = { mode: Number(st.mode & 0o777n), nlink: Number(st.nlink), ino: st.ino, target: null as string | null };
+    const base = { mode: Number(st.mode & 0o777n), nlink: Number(st.nlink), ino: st.ino, dev: st.dev, target: null as string | null };
     if (st.isSymbolicLink()) return { ...base, kind: "symlink", target: readlinkSync(p) };
     if (st.isFile()) return { ...base, kind: "file" };
     if (st.isDirectory()) return { ...base, kind: "dir" };
@@ -112,7 +113,7 @@ export function identify(p: string): PathIdentity {
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code;
     if (code === "ENOENT" || code === "ENOTDIR") {
-      return { kind: "absent", mode: 0, nlink: 0, ino: null, target: null };
+      return { kind: "absent", mode: 0, nlink: 0, ino: null, dev: null, target: null };
     }
     throw err;
   }
@@ -245,17 +246,39 @@ interface FileState {
   mode: number;
   nlink: number;
   ino: bigint | null;
+  dev: bigint | null;
   target: string | null;
+  /** Set when dev, ino or nlink disagreed with the baseline, so the bytes were not read (R43). */
+  unreadIdentity: boolean;
 }
 
-/** Read a path only when `lstat` says it is a regular file. A symlink is recorded, not followed. */
-const readState = (p: string): FileState | null => {
+const fileState = (id: PathIdentity, bytes: Buffer | null, unreadIdentity: boolean): FileState => ({
+  kind: "file",
+  bytes,
+  mode: id.mode,
+  nlink: id.nlink,
+  ino: id.ino,
+  dev: id.dev,
+  target: null,
+  unreadIdentity,
+});
+
+/**
+ * Read a path only when `lstat` says it is a regular file whose dev, ino and
+ * nlink match the baseline. A mismatch is an identity change and is not read
+ * (R43). A symlink is recorded, not followed. With no baseline, a hard link
+ * (nlink other than 1) is not read either: it was not there at base.
+ */
+const readState = (p: string, baseline?: FileState | null): FileState | null => {
   const id = identify(p);
   if (id.kind === "symlink") {
-    return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, target: id.target };
+    return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, target: id.target, unreadIdentity: false };
   }
   if (id.kind !== "file") return null;
-  return { kind: "file", bytes: readFileSync(p), mode: id.mode, nlink: id.nlink, ino: id.ino, target: null };
+  const hadFile = baseline?.kind === "file";
+  const same = hadFile && baseline.dev === id.dev && baseline.ino === id.ino && baseline.nlink === id.nlink;
+  if ((hadFile && !same) || (!hadFile && id.nlink !== 1)) return fileState(id, null, true);
+  return fileState(id, readFileSync(p), false);
 };
 
 /** A change, including a hard link whose bytes still match (nlink or inode moved). */
@@ -263,7 +286,9 @@ const changed = (a: FileState | null, b: FileState | null): boolean => {
   if (a === null || b === null) return a !== b;
   if (a.kind !== b.kind) return true;
   if (a.kind === "symlink" || b.kind === "symlink") return a.target !== b.target;
-  return a.mode !== b.mode || a.nlink !== b.nlink || a.ino !== b.ino || !a.bytes!.equals(b.bytes!);
+  if (a.unreadIdentity || b.unreadIdentity) return true;
+  if (a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink) return true;
+  return a.mode !== b.mode || !a.bytes!.equals(b.bytes!);
 };
 
 /**
@@ -280,6 +305,7 @@ const agrees = (snapshot: FileState, now: FileState | null): boolean => {
 const stateHash = (s: FileState | null): string => {
   if (s === null) return "absent";
   if (s.kind === "symlink") return `type:symlink readlink:${s.target}`;
+  if (s.unreadIdentity) return `identity:dev ${s.dev} ino ${s.ino} nlink ${s.nlink}; not read`;
   return `${hashOf(s.bytes)}/${s.mode.toString(8)}/nlink:${s.nlink}`;
 };
 
@@ -482,7 +508,7 @@ export class ConfigWatch {
       try {
         assertNoAncestor(this.repoRoot, this.dirs, path);
         b = before.has(path) ? before.get(path)! : null;
-        a = readState(path);
+        a = readState(path, b);
         if (!changed(b, a)) continue;
         changes.push({
           path,
@@ -622,7 +648,7 @@ export function gitExecPath(repoRoot: string): string | null {
  */
 interface MachineSnap {
   /** Top-down components from the filesystem root through the path, each lstat'd without continuing past a new link. */
-  chain: Array<{ path: string; kind: PathIdentity["kind"]; target: string | null }>;
+  chain: Array<{ path: string; kind: PathIdentity["kind"]; target: string | null; dev: bigint | null; ino: bigint | null; nlink: number }>;
   hash: string;
 }
 
@@ -650,6 +676,15 @@ export class MachineConfigWatch {
       if (!prevLink && !nowLink) return false;
       if (prev === undefined) return nowLink;
       return prev.kind !== c.kind || prev.target !== c.target;
+    });
+  }
+
+  /** A regular file whose dev, ino or nlink moved. The bytes are not read (R43). */
+  private identityChange(base: MachineSnap, now: MachineSnap["chain"]): MachineSnap["chain"][number] | undefined {
+    return now.find((c, i) => {
+      const prev = base.chain[i];
+      if (!prev || prev.kind !== "file" || c.kind !== "file") return false;
+      return prev.dev !== c.dev || prev.ino !== c.ino || prev.nlink !== c.nlink;
     });
   }
 
@@ -681,12 +716,12 @@ export class MachineConfigWatch {
     const rest = prefix === "/" ? parts : parts.slice(1);
     if (prefix !== "/" && prefix !== "") {
       const rootId = identify(prefix + "\\");
-      chain.push({ path: prefix + "\\", kind: rootId.kind === "absent" ? "dir" : rootId.kind, target: rootId.target });
+      chain.push({ path: prefix + "\\", kind: rootId.kind === "absent" ? "dir" : rootId.kind, target: rootId.target, dev: rootId.dev, ino: rootId.ino, nlink: rootId.nlink });
     }
     for (const part of rest) {
       cur = cur === "/" ? `/${part}` : cur === "" ? part : join(cur, part);
       const id = identify(cur);
-      chain.push({ path: cur, kind: id.kind, target: id.target });
+      chain.push({ path: cur, kind: id.kind, target: id.target, dev: id.dev, ino: id.ino, nlink: id.nlink });
       if (stopOnLink && id.kind === "symlink") break;
     }
     return chain;
@@ -724,9 +759,10 @@ export class MachineConfigWatch {
     const start = new Map<string, MachineSnap>();
     for (const p of this.paths) {
       const base = this.loopBase!.get(p.path) ?? { chain: [], hash: "absent" };
-      // A link that was not at base is not a stage baseline and is not read.
-      if (this.linkChange(base, this.chainOf(p.path, true))) {
-        start.set(p.path, { chain: this.chainOf(p.path, true), hash: "unread" });
+      const now = this.chainOf(p.path, true);
+      // A new link, or a hard link that was not at base, is not a stage baseline and is not read.
+      if (this.linkChange(base, now) || this.identityChange(base, now)) {
+        start.set(p.path, { chain: now, hash: "unread" });
       } else {
         start.set(p.path, this.snap(p.path, true));
       }
@@ -745,6 +781,17 @@ export class MachineConfigWatch {
       const base = this.loopBase.get(p.path) ?? { chain: [], hash: "absent" };
       const now = this.chainOf(p.path, true);
       const typeDiff = this.linkChange(base, now);
+      const idDiff = typeDiff ? undefined : this.identityChange(base, now);
+      if (idDiff) {
+        out.push({
+          stage: this.stage,
+          scope: p.scope,
+          path: p.path,
+          before: base.hash,
+          after: `identity change: dev ${idDiff.dev} ino ${idDiff.ino} nlink ${idDiff.nlink}; not read`,
+        });
+        continue;
+      }
       if (typeDiff) {
         const baseKind = base.chain[base.chain.length - 1]?.kind ?? "absent";
         const target = typeDiff.target ? ` target ${typeDiff.target}` : "";

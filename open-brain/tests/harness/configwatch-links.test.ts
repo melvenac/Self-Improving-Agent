@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
+import { createHash } from "node:crypto";
 import {
   lstatSync,
   mkdirSync,
@@ -16,6 +17,7 @@ import {
   writeFileSync,
   linkSync,
   rmdirSync,
+  unlinkSync,
 } from "node:fs";
 import { join } from "node:path";
 import { runLoop, LoopRefused, type LoopConfig } from "../../src/harness/runtime.js";
@@ -507,5 +509,47 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const watch = new MachineConfigWatch([{ scope: "xdg", path: join(gitDir, "config"), source: "test" }]);
     const notes = watch.baseNotes();
     expect(notes.some((n) => n.includes(gitDir) && n.includes("type symlink") && n.includes(victim))).toBe(true);
+  });
+
+  it("R43: a hard link that replaces a watched file is not read", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const config = join(dirs.commonDir, "config");
+    const watch = new ConfigWatch(dirs);
+    watch.begin("developer");
+    const victim = join(tmp.dir, "r43-victim");
+    const bytes = Buffer.from("R43-VICTIM-BYTES\n");
+    writeFileSync(victim, bytes);
+    const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    unlinkSync(config);
+    linkSync(victim, config);
+    const v = watch.closeAndRestore();
+    const row = v.changes.find((c) => c.path === config);
+    expect(row, v.message).toBeTruthy();
+    expect(row?.after).not.toContain(victimHash);
+    expect(row?.after).toContain("not read");
+    expect(readFileSync(victim)).toEqual(bytes);
+    expect(lstatSync(config).nlink).toBe(1);
+    expect(lstatSync(victim).nlink).toBe(1);
+  });
+
+  it("R43: a machine-config hard link is not read", () => {
+    const home = join(tmp.dir, "r43-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const victim = join(tmp.dir, "r43-machine-victim");
+    const bytes = Buffer.from("[user]\n\tname = VICTIM-R43\n");
+    writeFileSync(victim, bytes);
+    const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    unlinkSync(cfg);
+    linkSync(victim, cfg);
+    const found = watch.compare();
+    expect(found).toHaveLength(1);
+    expect(found[0]?.after).not.toContain(victimHash);
+    expect(found[0]?.after).toContain("not read");
+    expect(readFileSync(victim)).toEqual(bytes);
+    expect(lstatSync(cfg).isSymbolicLink()).toBe(false);
   });
 });
