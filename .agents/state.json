@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 99,
+  "revision": 100,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2773,39 +2773,43 @@
     },
     {
       "seat": "planner",
-      "pick_up": "LOOP 15 SLICE THREE: candidate A (3b19287) was REJECTED on one blocker, D-A1: layer 2's restore follows a planted directory junction out of the repository, deletes and writes files there, and records success. Everything else passed. READ THESE FIRST, IN ORDER: the PRD, README and the SIA Step-Back ARTIFACT (not the vault copy, which stops at Part 3) per dispatch-2 section 0; then docs/loops/loop-15-slice-3-rulings-1..6.md (R1-R27; rulings-6 is the current state); then QA report A (10eb4d0, sections 13 and 15) and the developer's final handoff (216cec6). NEXT ACTIONS: (1) start a FRESH QA session: it finalises CA-15 plus D-A2 and D-A4 as criteria commits on qa/loop-15-slice-3-criteria-a, pushed on Aaron's word, BEFORE any A2 code; rule on its text. (2) Start a FRESH developer session: it builds A2 (D-A1 + D-A3 only, R24), merges the final criteria tip so every criteria commit is an ancestor, freezes and hands over. (3) QA scores A2. Then B, then C (D-036). Assign record session numbers explicitly at dispatch (T-164): this planner was 78, QA 79, developer 80, so the next seats take 81 and up. Nothing of this session is uncommitted: every ruling is in a docs/loops file on master and every decision in state.json.",
+      "pick_up": "PLANNER SESSION 81 (Atlas), 2026-09-23, written while candidate A3 is being built overnight and Aaron is asleep. STATE: candidate A2 2add792 (Grok 4.7 in Cursor, session 84) was REJECTED by QA (Probe, session 85; report at 8cddfc7, merged). A2 CLOSED D-A1's write/delete route in 13 probe shapes. CA-15 failed on the read half, the record and one silent pass. Rulings-9 (R42-R48, on master aef8195) scopes CANDIDATE A3 as a new commit on 2add792. A3 is being built by a FRESH Grok session (developer, record session 86) on branch loop/15-slice-3-candidate-a3, from docs/loops/loop-15-slice-3-a3-grok-brief.md; its plan was accepted in hub turn 12 with two rulings (a new a3 branch; machine-config absent-to-link is reported, never restored or read through). NEXT ACTIONS: (1) Grok reports in hub room k579hndqdr1mxnahy0px1dy8ks8eyef3 (A2A-Hub, reached via ~/Projects/A2A-Hub/scripts/hub-talk.mjs with --session). It asks before a full suite; before saying go, pause Relay (a2a-planner-26) and its Rivet/Gauge. (2) When A3 is frozen and pushed, verify on origin (scope, ancestors, master untouched), open a DRAFT PR so CI runs the POSIX rows, and dispatch a FRESH QA seat (Probe; the session in ~/Worktrees/sia-qa has not run /start, so tell it to) as record session 87, against the criteria at 6672e83 read with rulings-9, including D-A2/D-A4 (R47) and every CA-15 probe against 3b19287 AND 2add792. (3) If A3 is accepted: the merge is Aaron's; then B (the G-042 repair plus E_t) and C (T-155) go to the CLAUDE developer seat (Aaron's question, answered as a recommendation). Session numbers used: 81 planner, 82 QA, 83 developer (Claude, stopped by refusals), 84 developer (Grok, A2), 85 QA, 86 developer (Grok, A3); the next is 87.",
       "watch_out": [
-        "A PROTECTION CAN ACT OUTSIDE ITS BOUNDARY AND RECORD SUCCESS (D-A1). Layer 2 was built to keep a role inside the repository, and through a junction it became the runtime deleting and writing files outside it, followed by 'every file was put back by bytes'. The criteria checked the file SET and BYTES at the watched paths, never the watched paths' TYPE. A finding reported against a line is a finding about a class: the developer had already fixed the hidden-.git-file instance of the same class in the same restore.",
-        "LATE RULINGS COST CONTEXT TWICE. Candidate A grew from 5 rulings to 22 mid-build, and the developer and QA seats ran down to about 28% context. D-035: fresh seat sessions at every candidate boundary, and the max-effort criteria re-read with its rulings happens BEFORE the build, not during it.",
-        "EFFORT IS READ FROM THE TRANSCRIPT, NOT FROM SETTINGS. The session transcript's per-entry 'effort' field is the only instrument that records what was used. settings.json gives the configured default, and CLAUDE_EFFORT gives the current value, not the value at launch; three instruments gave three answers in the QA seat. Everything this session's seats wrote before about 01:00Z on 2026-09-23 was produced at MEDIUM, including rulings-1 and rulings-2, the G-045 acceptance and criteria A's first four commits.",
-        "update_task REPLACES THE NOTE (T-171), and the dry run says only 'Applied'. To append, read the current note, pass the whole text back with the addition, and verify byte for byte afterwards. It was done four times this session: T-169, T-150, T-175, T-168.",
-        "A BASH DOUBLE-QUOTED STRING EXECUTES BACKTICKS. A node -e one-liner quoting a sighting ran the mutating `sync --help` in the planner's tree (T-150's second exposure). Put scripts that contain backticks in FILES.",
-        "THE MAIN TREE SERVES EVERY SESSION ON THE MACHINE, A2A-HUB'S TOO, AND NOTHING SAYS WHICH BUILD IS SERVING (T-172). /mcp reconnect prints success either way. Before rebuilding the main tree, tell every seat, including other projects'.",
-        "RELAY IS NOT AUTHORITY FOR A PUSH. Both seats declined to push on the planner's relay of Aaron's 'yes' and asked him directly, which is correct under shared.md: a push widens scope. Plan for one push question per branch in each seat's session.",
-        "D-032 COVERS ONLY record and docs paths. RUN the path check before commenting it: this planner posted one from memory once and had to re-run it."
+        "A CURSOR SEAT IS NEVER WOKEN BY A HUB MESSAGE (T-160, now P1). Grok sees a turn only when it runs hub-talk itself; it sat idle through two turns tonight while the send receipts looked like success. Every dispatch tells it to end each turn with `hub-talk --wait --wait-timeout 1800 --session <room>`; if it goes quiet, Aaron must nudge it in its window. ALWAYS pass --session: without it hub-talk joins the newest lobby (Grok landed in grok-room once). NEVER pass --peer: it re-registers the peer's name (A2A-Hub T-051).",
+        "RE-ARM THE HUB LISTENER AFTER EVERY DELIVERY. A `hub-talk --wait` background job exits on the first peer turn; once, none was running and Aaron saw a Grok message before the planner did. And never 'drain' with --wait into a file you do not read: under A2A-Hub's coming read receipts, that marks the turn read though the model never saw it (disclosed to Relay).",
+        "EVERY RULING NAMES THE CRITERIA CLAUSE IT SERVES. Three planner errors tonight, one family, each written from the case in front of it without being read back against the row it serves: the Grok dispatch omitted D-A2/D-A4, which amendment 4 had made candidate rows; R36 was silent on the read; R39's 'base' was unqualified. All escaped to the developer and QA (rulings-9).",
+        "stop_reason: \"refusal\" IS THE API SAFETY LAYER, NOT SIA AND NOT THE HARNESS (read from Forge's transcript, 05:30:35Z and 05:34:24Z). No seat rephrases around it, and no other seat takes the same work to get past it; only Aaron decides. Candidate A's link-handling work went to Grok on his word (T-177). B and C return to the Claude developer.",
+        "GROK IN CURSOR HAS A 256k CONTEXT. The first A2 session reached 50.7% on reading and design alone. Brief it by SECTION with line pointers (checked against the SHA), with test output to files and a stop at about 70%. Cursor compacts automatically near 90% and the summary loses detail. Its config says approvalMode unrestricted, so D-038's push limits rest on its compliance: verify master after every push it reports.",
+        "D-038 SUPERSEDES the session-78 watch-out 'RELAY IS NOT AUTHORITY FOR A PUSH ... one push question per branch'. Seats push their own working branches without asking; questions for Aaron route through the planner, and his quoted answer is the authority for that act; a host-level stop in another seat's window is the one thing a relay cannot clear. D-039: A2A-Hub's planner (Relay) routes through the SIA planner for shared work, and the SIA planner relays and does NOT plan A2A-Hub. Aaron gave A2A-Hub's seats the same standing push authority tonight (relayed quoted to Relay; its record carries it).",
+        "FULL-SUITE RUNS NEED A QUIET MACHINE (G-042). Before any SIA full suite, ask Relay to hold Rivet and Gauge, wait for its confirmation, and lift the hold as soon as the run ends. Tonight QA's suite ran green at 1107 passed / 5 skipped with the peers idle.",
+        "`build-freshness` FAILS AFTER EVERY DOCS COMMIT IN THIS TREE because it compares commits. Before calling it stamp-only, run `git diff --name-only <build-commit> HEAD -- open-brain` and state the result; otherwise rebuild.",
+        "update_task REPLACES THE NOTE (T-171). Compose old+new in a SCRIPT FILE (an apostrophe inside a bash single-quoted node -e ends the quoting), pass the full text, and verify byte for byte. Done tonight for T-177 twice and T-160 once."
       ],
       "open_questions": [
-        "Does the effort level change the error rate? The first data (this session's errors at medium and at high) is recorded but not analysed; T-173 is the instrument.",
-        "Is G-042 external load or the suite's own? Candidate A's run was red with another project busy, green once and green again; both hypotheses are load, and B's Step 0 is designed to separate them.",
-        "When does a recall-trigger injection change behaviour? Entry 299 was injected about eight more times this session across all seats, always apt and never changing the act, because the practice was already loaded and PostToolUse fires after the act. Aaron adopted T-170 as the memory direction (D-037); when to schedule its write-side fix against slice three's remaining candidates is the next planner's call.",
-        "A2A-Hub's `state import --commit` is Aaron's to run (G-007); its draft is prepared, with SIA's seed entries removed by parser (T-175)."
+        "Does A2A-Hub Loop 1 (Relay; Rivet building T-049 read receipts plus T-051 --peer) make a Cursor seat's silence visible? It helps SIA only after two steps that are Aaron's word: updating ~/Projects/A2A-Hub (the hub-talk every SIA seat runs) and a tcm redeploy (image plus convex deploy, verified with a real send) while no SIA hub traffic is live.",
+        "Were the two refusals false positives? Aaron was advised to run /feedback in Forge's window; whether he did is not recorded.",
+        "T-165's first data point exists (Grok built A2: sound design, clean reports, rejected on the read and record halves, like Claude's candidate A on its blocker). Not yet compared deliberately.",
+        "Does the effort level change the error rate? (carried) Is G-042 external load or the suite's own? (carried; tonight's suites were all green with the peers idle)."
       ],
-      "session": 78,
+      "session": 81,
       "loop_state": {
         "open_prs": [],
         "frozen_sha": null,
         "questions_for_aaron": [
-          "Run A2A-Hub's `state import --commit` (G-007)."
+          "Morning: merge A3 to master if QA accepts it (the merge is his).",
+          "When A2A-Hub's receipts pass its QA: his word to update ~/Projects/A2A-Hub and to redeploy tcm (Relay will ask through the SIA planner)."
         ],
         "rulings": [
           "D-031 release commit after acceptance",
           "D-032 standing merge authority for record/docs-only PRs",
-          "D-033 and D-036: slice three closes at A, B and C; Jev calibration is the next slice",
+          "D-033 and D-036: slice three closes at A, B and C",
           "D-034 other projects' seats are recorded, pause on request",
           "D-035 fresh seat sessions at each candidate boundary",
-          "D-037 memory is lookup by default, injection only on a deterministic match against the act (T-170 adopted)",
-          "Rulings R1-R27 in docs/loops/loop-15-slice-3-rulings-1..6.md",
-          "Candidate A rejected; A2 carries D-A1 and D-A3 only (R24)"
+          "D-037 memory is lookup by default (T-170)",
+          "D-038 Aaron speaks only to the planner; seats push their own working branches",
+          "D-039 A2A-Hub's planner routes through the SIA planner for shared work",
+          "Rulings R1-R48 in docs/loops/loop-15-slice-3-rulings-1..9.md (R28 is the brief's)",
+          "Candidate A rejected (D-A1); A2 rejected (A2-1..A2-5, with D-A2/D-A4 unmet by the dispatch); A3 = R43-R48 on 2add792"
         ]
       }
     }
