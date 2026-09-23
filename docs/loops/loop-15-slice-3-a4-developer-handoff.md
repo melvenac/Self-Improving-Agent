@@ -12,7 +12,7 @@
 |---|---|---|---|
 | 1 R49 | done | `configwatch-links` `-t R49`: 4 failed, exit 1. Absent machine hard link, both shapes beyond a base link, and a new repository file each put a content hash in the record. | same file, no filter: 22 passed, 3 skipped (POSIX), exit 0. Commit `9788d32`. |
 | 2 R50 | done | `-t R50`: 1 failed, exit 1. Record was `modified (identity:… not read → <hash>)` and `Cannot read properties of null (reading 'equals')`. | same file, no filter: 23 passed, 3 skipped, exit 0. |
-| 3 R51 | not started | | |
+| 3 R51 | done | The 2.5 win32 control planted `planted-launcher.js`. The row names the `.cmd` JS-entry shim (the 2.4 plant). No product assertion was red: `resolveLauncher` already maps that shim to `node-entry`. | `-t "2.5 CONTROL: a planted"`: 1 passed, 23 skipped, exit 0. |
 | 4 R52 | not started | | |
 
 Full suite not run. Atlas is asked before that.
@@ -34,3 +34,9 @@ Files: `open-brain/src/harness/configwatch.ts`, `open-brain/tests/harness/config
 A hard link already on a repository watched file when the window opens is the base. `readState` records its bytes at that open (`preflight`). An unchanged link compares equal: no change, and the link is left in place. A hard link that appears only after the open is still not read (R43, R49). `agrees` does not call `.equals` on null bytes, so a missing snapshot cannot put `Cannot read properties of null (reading 'equals')` into the record.
 
 Files: `open-brain/src/harness/configwatch.ts`, `open-brain/tests/harness/configwatch-links.test.ts`.
+
+## Item 3 — R51
+
+CA-2.5's win32 accepted control now plants `planted-launcher.cmd`, the same npm JS-entry shim 2.4 plants, aimed at `planted-launcher.js`. `resolveLauncher` returns `node-entry`, this process's node, and `preArgs` of the `.js` entry. The refusal twin is still a `.cmd` with no shim target. The POSIX branch is unchanged.
+
+Files: `open-brain/tests/harness/process-role.test.ts`.

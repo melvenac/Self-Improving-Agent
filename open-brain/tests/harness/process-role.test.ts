@@ -244,14 +244,32 @@ describe("candidate A — a role that is a real process", { timeout: 180_000 }, 
 
     it("2.5 CONTROL: a planted launcher is accepted and resolved, and its refusal twin is not", () => {
       if (isWin) {
-        const shim = join(tmp.dir, "planted-launcher.js");
-        writeFileSync(shim, "process.stdout.write('ok\\n');\n");
+        // The row names the planted JS-entry shim (a .cmd, as in 2.4), not a bare .js (R51).
+        const entry = join(tmp.dir, "planted-launcher.js");
+        writeFileSync(entry, "process.stdout.write('ok\\n');\n");
+        const shim = join(tmp.dir, "planted-launcher.cmd");
+        writeFileSync(
+          shim,
+          [
+            "@ECHO off",
+            "GOTO start",
+            ":find_dp0",
+            "SET dp0=%~dp0",
+            "EXIT /b",
+            ":start",
+            "SETLOCAL",
+            "CALL :find_dp0",
+            `"%dp0%\\node.exe"  "%dp0%\\planted-launcher.js" %*`,
+            "",
+          ].join("\r\n"),
+        );
         const accepted = resolveLauncher(shim);
         expect(accepted.ok, accepted.ok ? "" : accepted.reason).toBe(true);
         if (accepted.ok) {
           expect(accepted.form).toBe("node-entry");
           expect(accepted.executable).toBe(process.execPath);
-          expect(accepted.preArgs).toEqual([realpathSync(shim)]);
+          expect(accepted.preArgs).toEqual([realpathSync(entry)]);
+          expect(accepted.resolvedFrom).toBe(realpathSync(shim));
         }
         const bad = join(tmp.dir, "planted-refusal.cmd");
         writeFileSync(bad, "@echo off\r\necho refused\r\n");
