@@ -199,6 +199,31 @@ describe("QA 94 probe (not for merge): D-041's trade and R61 on POSIX", { timeou
     expect(found[0]?.before, "the path existed at base; 'absent' is a claim the runtime did not observe").not.toBe("absent");
   });
 
+  /** v2: the one case M-typechange6 changes. Rulings-13 R60: a link planted AT the watched path is still a type change. */
+  it.skipIf(isWin)("AT-PATH-SAME: a symlink planted AT the watched path, leading to the SAME base file, is reported as a type change and not read", () => {
+    const home = join(tmp.dir, "aps-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = aps-base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "qa94" }]);
+    watch.captureBase();
+    const baseIno = statSync(cfg).ino;
+    watch.begin("developer");
+    const real = join(home, "real-gitconfig");
+    renameSync(cfg, real);
+    symlinkSync(real, cfg);
+    const edited = "[user]\n\tname = aps-edited-through-the-new-link\n";
+    writeFileSync(cfg, edited);
+    expect(lstatSync(cfg).isSymbolicLink(), "plant: a link AT the watched path").toBe(true);
+    expect(statSync(cfg).ino, "plant: it leads to the base object").toBe(baseIno);
+    const found = watch.compare();
+    const blob = JSON.stringify(found);
+    say("QA94-AT-PATH-SAME", { editHashInRecord: blob.includes(h16(edited)), found });
+    expect(found.length, "clause 4: reported").toBeGreaterThan(0);
+    expect(blob, "clause 4: as a type change").toContain("type change");
+    expect(blob, "not read through the new link").not.toContain(h16(edited));
+  });
+
   it.skipIf(isWin)("R61-UNIT: four base states, one stage with no act: every path is in a reported state", () => {
     const home = join(tmp.dir, "r61u");
     mkdirSync(home);
