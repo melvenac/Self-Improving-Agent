@@ -57,3 +57,11 @@ Fix `63a7932` CI: run `35948192903`, success. https://github.com/melvenac/Self-I
 Tip `5b3a0d1` CI: run `35948435287`, success, 1133 passed, 6 skipped, 0 failed. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35948435287
 
 Redcheck `35948167777` on `79af55f`: 5 failed | 1128 passed | 6 skipped. Failed: R55 hard link, R55 directory symlink, R55 new file, R57, R59. R55 CONTROL passed on A4 (the in-place edit was already read). R58 and R35 were not in the failure list.
+
+R59's read half: `R59: qa reads a machine file restored to its base resolution and does not say not read`. Red on `loop/15-slice-3-a5-redcheck` `8bd34aa`, run `35949006640`: 6 failed | 1128 passed | 6 skipped. The new failure is that test (the other five are the earlier reds). Mutant: leave `mismatchFinding`'s "not read" text in place when `compare` did read (`end.hash` is a content hash). Green on `845dfaa`, run `35949008244`: 1134 passed | 6 skipped | 0 failed.
+
+R58 code mutants, each a branch off `845dfaa`:
+
+- `(b)3`: `loop/15-slice-3-a5-mut-b3` `23269d3` chmods through the symlink on restore. Run `35949009974`: 1 failed | 1133 passed | 6 skipped. The failure is `R58 (b)3`.
+- R29: `loop/15-slice-3-a5-mut-r29` `c9232ad` reads through the link and records `unreadable`. Run `35949011700`: 12 failed | 1122 passed | 6 skipped. `R58 R29` is one of them.
+- R35: `loop/15-slice-3-a5-mut-r35` `4e3a850` drops type and readlink from the base note. Run `35949013391`: 2 failed | 1132 passed | 6 skipped. Failures: the R35 symlink test, and `R46: baseNotes names a link at a parent component`.
