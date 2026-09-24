@@ -363,12 +363,16 @@ describe("candidate A — the config/hooks channel", { timeout: 120_000 }, () =>
         expect(reported, `no finding for ${t}`).toContain(t);
         expect(readFileSync(t, "utf-8"), `${t} was restored — R8 forbids it`).toContain("role wrote this");
       }
-      for (const f of r.machineConfigFindings) {
+      const writes = r.machineConfigFindings.filter((f) => f.before !== f.after);
+      expect(writes).toHaveLength(3);
+      for (const f of writes) {
         expect(f.before).not.toBe(f.after);
         expect(f.stage).toBe("developer");
+        expect(targets).toContain(f.path);
       }
       const recorded = JSON.parse(rawGit(repo.root, ["show", `${r.evidenceSha}:artifacts/iterations/t001/findings.json`]));
-      expect(recorded.machine_config_findings.length).toBe(3);
+      const recordedWrites = recorded.machine_config_findings.filter((f: { before: string; after: string }) => f.before !== f.after);
+      expect(recordedWrites).toHaveLength(3);
     });
 
     it("CONTROL: a role that writes nothing produces no machine-config finding", async () => {
@@ -376,7 +380,8 @@ describe("candidate A — the config/hooks channel", { timeout: 120_000 }, () =>
       mkdirSync(home, { recursive: true });
       const r = await runLoop({ ...config(), env: { ...process.env, HOME: home, USERPROFILE: home } });
       expect(r.failure, r.failure?.reason).toBeNull();
-      expect(r.machineConfigFindings).toEqual([]);
+      expect(r.machineConfigFindings.length, "R65: every watched path is in the record").toBeGreaterThan(0);
+      expect(r.machineConfigFindings.every((f) => f.before === f.after)).toBe(true);
     });
   });
 

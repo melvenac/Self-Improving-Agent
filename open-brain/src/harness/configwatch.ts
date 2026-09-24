@@ -1055,9 +1055,7 @@ export class MachineConfigWatch {
       const opened = start.get(p.path)!;
       const end = this.observe(p.path, base);
       if (end.state === "read" && opened.state === "read") {
-        if (opened.hash !== end.hash) {
-          out.push({ stage: this.stage, scope: p.scope, path: p.path, before: opened.hash, after: end.hash });
-        }
+        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: opened.hash, after: end.hash });
         continue;
       }
       if (end.state === "read") {
@@ -1068,7 +1066,16 @@ export class MachineConfigWatch {
         continue;
       }
       const linkPlanted = end.viaLink !== null && end.viaLink !== opened.viaLink;
-      if (sameId(opened, end) && opened.state !== "read" && !linkPlanted) continue;
+      if (sameId(opened, end) && opened.state !== "read" && !linkPlanted) {
+        const stable =
+          end.reason === "unreadable" || end.hash === "unreadable"
+            ? "unreadable"
+            : end.state === "unwatched"
+              ? `unwatched: ${end.reason}; not read`
+              : `not read: ${end.reason}`;
+        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: stable, after: stable });
+        continue;
+      }
       if (linkPlanted) {
         const after =
           base.resolvedPath === null
@@ -1081,9 +1088,13 @@ export class MachineConfigWatch {
       const typeChange = end.lexicalKind === "symlink" && base.lexicalKind !== "symlink";
       const after = typeChange
         ? `type change: ${p.path} is a ${end.lexicalKind}${end.lexicalTarget ? ` target ${end.lexicalTarget}` : ""}; not read through`
-        : end.resolvedPath === null
-          ? `unwatched: ${end.reason}; not read`
-          : `not read: base ${base.resolvedPath ?? "unresolved"} dev ${base.dev} ino ${base.ino} nlink ${base.nlink}; current ${end.resolvedPath} dev ${end.dev} ino ${end.ino} nlink ${end.nlink}`;
+        : end.reason === "handle is a different file"
+          ? "handle is a different file; not read"
+          : end.reason === "unreadable" || end.hash === "unreadable"
+            ? "unreadable"
+            : end.resolvedPath === null
+              ? `unwatched: ${end.reason}; not read`
+              : `not read: base ${base.resolvedPath ?? "unresolved"} dev ${base.dev} ino ${base.ino} nlink ${base.nlink}; current ${end.resolvedPath} dev ${end.dev} ino ${end.ino} nlink ${end.nlink}`;
       const before = base.state === "read" ? base.hash : base.resolvedPath === null ? "absent" : `type:${base.lexicalKind}`;
       out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
     }

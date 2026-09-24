@@ -444,11 +444,13 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     watch.begin("qa");
     writeFileSync(join(victim, "config"), "[user]\n\tname = VICTIM-R44-EDITED\n");
     const qa = watch.compare();
-    const reread = qa.find((f) => /^[0-9a-f]{16}$/.test(f.before) && /^[0-9a-f]{16}$/.test(f.after));
+    const reread = qa.find((f) => /^[0-9a-f]{16}$/.test(f.before) && /^[0-9a-f]{16}$/.test(f.after) && f.before !== f.after);
     expect(reread, JSON.stringify(qa)).toBeUndefined();
     // R54: the link was already reported in developer. The qa edit is bytes
-    // behind a path the read gate forbids, so it is not re-reported.
-    expect(qa, JSON.stringify(qa)).toEqual([]);
+    // behind a path the read gate forbids, so it is not re-reported as a change.
+    // R65: the path is still in the qa record.
+    expect(qa.some((f) => f.path === cfg), JSON.stringify(qa)).toBe(true);
+    expect(JSON.stringify(qa)).not.toContain("VICTIM-R44-EDITED");
     expect(readFileSync(join(victim, "config"), "utf-8")).toContain("VICTIM-R44-EDITED");
   });
 
