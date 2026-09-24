@@ -1027,10 +1027,13 @@ export class MachineConfigWatch {
     const out: MachineConfigFinding[] = [];
     for (const p of this.paths) {
       const base = this.loopBase.get(p.path) ?? { chain: [], hash: "absent" };
+      void base;
       const opened = start.get(p.path) ?? { chain: [], hash: "absent" };
-      const end = this.resolutionMismatch(base, p.path)
-        ? { chain: this.chainUntil(base, p.path), hash: "unread" }
-        : this.snap(p.path, true);
+      const end = this.snap(p.path, true);
+      if (end.hash === "unreadable") {
+        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: opened.hash, after: "unreadable" });
+        continue;
+      }
       const why = this.attributionChange(opened, end);
       if (why === "bytes") {
         out.push({ stage: this.stage, scope: p.scope, path: p.path, before: opened.hash, after: end.hash });
