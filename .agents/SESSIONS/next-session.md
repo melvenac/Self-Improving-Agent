@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 116 by open-brain v0.44.1 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 119 by open-brain v0.44.1 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-PLANNER SESSION 90 (Atlas), 2026-09-24 morning. A6 dc35b24 REJECTED by QA 94 (report ea825b7, PR #147): D-041's approach closed A5-1/A4-1/A5-4 with no outside reads, but A6-1 (R61 only for unwatched; an ordinary `git config --global` then an in-place edit is silent) and A6-2 (`drifted` false modified). Rulings-14 (docs/loops/loop-15-slice-3-rulings-14.md): R64 attribution at the stage start with size+mtimeNs facts, and `drifted` never in attribution; R65 R61 read literally, every path in every stage record; R66 tests that can fail (R29 via the openSync seam, the handle check, the at-path type change, R50 row level, TRADE-DIFF identities). R67 APPROVED (D-042, Aaron 'sounds right', 2026-09-24 ~19:57Z): the read gate becomes same real path plus (the base file ignoring nlink, OR a regular file with nlink 1), re-checked on the handle. It makes `git config` writes hashable (CA-4f) and QA 89's A4-1 R shape READ; H, J and LOOP stay unread. FIRST ACTIONS: (1) /start, then the intent documents. (2) R67 is approved (D-042), and Aaron answered Relay's Q1 'yes' (A2A-Hub D-006; no cutover touching grok or atlas while A7 is built or scored). (3) The A7 brief is docs/loops/loop-15-slice-3-a7-grok-brief.md, posted to hub room k57frxw0ptb8tadmqdwy0khhks8ey006. Aaron starts the Grok session (record 95) in ~/Worktrees/sia-forge. Verify its evidence per test, freeze it, then dispatch QA 96 (fresh session, dispatch table from diffs). (4) The tcm-rebuild question is Relay's to ask Aaron directly. (5) Merges: use a script that refuses unless checks have registered, all are SUCCESS, and the state is CLEAN (rulings-14, error entry 3). Relay's local hold stands, and full stops go through Relay (a2a-planner-6c) to Rivet and Gauge.
+PLANNER SESSION 90 (Atlas), 2026-09-24 evening; the session is near the end of its context, so roll to a fresh planner after QA 96's verdict. CANDIDATE A: A7 d223d1d (Grok, record 95) is FROZEN and QA 96 (sia-qa-23, on THIS PC) is IN ITS LOCAL WINDOW (a cut version, about 1h20m from 22:36Z; the dispatch is docs/loops/loop-15-slice-3-dispatch-qa-a7.md). The direction from CI is REJECT on a new high finding: R64's size+mtime facts exist only on the repository side, so a machine path absent at base (fresh ~/.gitconfig created by `git config --global`) is never read, and later in-place edits are silent (ABSENT-BASE-LOOP). The planner ruled that R64/R65 already require facts on both sides, so it is a build defect. Also HANDLE-NLINK (the handle re-check covers dev/ino only), and A6-4/A6-5 persist. A2A-HUB SEATS (Relay a2a-planner-6c, Rivet, Gauge) ARE STOPPED for QA 96's window: WHEN QA 96 SAYS THE WINDOW IS OVER, MESSAGE RELAY TO RESUME. FIRST ACTIONS: (1) /start, then the intent documents. (2) On QA 96's report: merge it under D-032 (use a gate script that refuses unless checks have registered, all are SUCCESS and the state is CLEAN), then rulings-15, then the A8 brief (a fresh Grok session; the fix is R64 facts on the machine side, and the handle re-check covering nlink). (3) INFRA (D-043, D-044): two self-hosted runners tcm-1/tcm-2 are LIVE on tcm (firewalled egress, fail-closed, OOMScoreAdjust 500, pause scripts for A2A-Hub deploys); PR #152 is merged, so PRs and branches run on tcm and master stays on GitHub-hosted. (4) D-045: QA moves to Aaron's second PC desktop-o4egb1e (100.73.250.101, ssh -l "Aaron Melven"), driven over SSH with headless Claude Code. Forge (sia-infra-80, record 97, ~/Worktrees/sia-infra) is setting it up per docs/loops/infra-qa-machine-brief.md; a `gh auth login` there may need Aaron. From A8 on, QA runs there and no seat stops. (5) Relay's Q1 (per-agent hub keys) was approved by Aaron (A2A D-006, D-007). No tcm cutover touching grok or atlas until candidate A is decided; SIA names the window. (6) T-179 (replace /end), after slice three.
 
 ### Watch out
 
@@ -23,10 +23,11 @@ PLANNER SESSION 90 (Atlas), 2026-09-24 morning. A6 dc35b24 REJECTED by QA 94 (re
 - DISPATCH TABLES ARE BUILT FROM EACH COMMIT'S `git diff --stat`, NEVER ITS SUBJECT. The A5 dispatch said 845dfaa was test-only when it also changed configwatch.ts (rulings-13, error entry 1).
 - A2A-Hub's Relay found tcm already runs the latest code (003f57d, v1.8.0), so there is NOTHING TO REBUILD. Aaron's 'Relay can rebuild the tcm hub when ready' was read as permission, not instruction; Relay will ask him what he meant.
 - MERGE ONLY THROUGH A GATE THAT REFUSES. `gh pr checks --watch` exits at once with 'no checks reported' when CI has not registered yet, and a chained merge then runs on UNSTABLE. PR #146 was merged that way (rulings-14, error entry 3).
+- GitHub Actions was at 1,802 of 2,000 minutes on 2026-09-24 (reset Oct 1). SIA is about 56% of the measured usage, then foundry and co-op-mailer. BATCH record PRs (one per milestone); probe branches from before PR #152 still run on hosted runners because they carry the old ci.yml.
 
 ### Open questions
 
-- Does A7 pass? R67 makes the A4-1 R shape READ by design (D-042); every other A4-1/A5-1 shape keeps its verdict.
+- Does A7 pass? CI points to reject on ABSENT-BASE-LOOP (R64 facts missing on the machine side).
 - Is G-042 the machine's load, the worktree, or Cursor running in it? QA's tree is green when idle; the forge tree went red. Repeat runs in the SAME tree are the missing control.
 - T-050: can Cursor's stop hook wake an idle seat? A live trial is to be asked for through the SIA planner (A2A-Hub's D-003).
 - Were Forge's two refusals false positives? /feedback was advised; not recorded as done.
@@ -36,11 +37,11 @@ PLANNER SESSION 90 (Atlas), 2026-09-24 morning. A6 dc35b24 REJECTED by QA 94 (re
 
 **Open PRs:** _None._
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `d223d1dbe4247fdc0131cd92bfc14288c52d7cf5`
 
 **Questions pending for Aaron:** 
-- Start a fresh Grok session in ~/Worktrees/sia-forge for A7 (record 95); the brief is posted.
 - If QA 96 accepts A7: the candidate merge is his.
+- Possibly `gh auth login` on desktop-o4egb1e for the QA machine (Forge will say).
 
 **Rulings made mid-loop:** 
 - D-031 release commit after acceptance
@@ -54,8 +55,10 @@ PLANNER SESSION 90 (Atlas), 2026-09-24 morning. A6 dc35b24 REJECTED by QA 94 (re
 - D-040 seats dispatch CI on their own branches without asking; T-178 makes it automatic
 - D-041 A6 changes approach: the OS resolves links, the runtime compares the file reached
 - Rulings R1-R67 in docs/loops/loop-15-slice-3-rulings-1..14.md (R28 is the brief's); R67 approved as D-042
-- A rejected (D-A1); A2 (A2-1..5); A3 (A3-1..3); A4 (A4-1); A5 (A5-1, A5-4); A6 (A6-1, A6-2), report ea825b7; A7 briefed (Grok, record 95)
+- A rejected (D-A1); A2-A6 rejected; A7 frozen at d223d1d, QA 96 in its local window
 - D-042 R67 approved: same place, not shared
+- D-043/D-044 two sandboxed self-hosted runners on tcm
+- D-045 QA moves to desktop-o4egb1e over SSH
 
 ## developer _(written session 74)_
 
