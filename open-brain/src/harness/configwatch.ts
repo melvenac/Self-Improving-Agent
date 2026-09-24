@@ -700,6 +700,7 @@ export class ConfigWatch {
       try {
         assertNoAncestor(this.repoRoot, this.dirs, path);
         b = before.has(path) ? before.get(path)! : null;
+        if (b?.kind === "file" && identify(path).kind === "symlink") chmodSync(path, b.mode);
         a = this.readForCompare(path, b, chains);
         if (!changed(b, a)) continue;
         changes.push({
