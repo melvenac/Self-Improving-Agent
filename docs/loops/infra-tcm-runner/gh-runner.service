@@ -1,0 +1,45 @@
+# Installed by Forge (SIA record session 97, 2026-09-24) under D-043.
+# GitHub Actions runner for melvenac/Self-Improving-Agent. Labels: self-hosted, linux, tcm.
+[Unit]
+Description=GitHub Actions runner for melvenac/Self-Improving-Agent (tcm)
+Requires=gh-runner-egress.service
+After=gh-runner-egress.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=gh-runner
+Group=gh-runner
+WorkingDirectory=/srv/gh-runner/runner
+# Refuse to start unless the egress firewall is in place ('+' = run the check as root).
+ExecStartPre=+/usr/local/sbin/gh-runner-egress check
+ExecStart=/srv/gh-runner/runner/runsvc.sh
+KillMode=control-group
+KillSignal=SIGTERM
+TimeoutStopSec=30s
+Restart=on-failure
+RestartSec=30s
+
+# Limits: the hub and the printers keep priority.
+CPUQuota=200%
+CPUWeight=20
+IOWeight=20
+Nice=10
+MemoryMax=6G
+
+# Isolation.
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/srv/gh-runner
+InaccessiblePaths=/opt/doorctl /var/lib/doorctl /etc/doorctl /run/docker.sock
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target
