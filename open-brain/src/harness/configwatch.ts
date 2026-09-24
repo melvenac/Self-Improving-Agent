@@ -37,12 +37,16 @@ import { createHash, randomBytes } from "node:crypto";
 import {
   chmodSync,
   existsSync,
+  closeSync,
+  fstatSync,
   lstatSync,
   mkdirSync,
+  openSync,
   readdirSync,
   readFileSync,
   readlinkSync,
   realpathSync,
+  statSync,
   renameSync,
   rmdirSync,
   unlinkSync,
@@ -273,9 +277,10 @@ function routeChain(
       const key = `${c.dev}:${c.ino}`;
       if (c.dev !== null && visited.has(key)) break;
       if (c.dev !== null) visited.add(key);
-      const rest = paths.slice(i + 1).map((p) => relative(paths[i]!, p));
+      const restSegs: string[] = [];
+      for (let j = i + 1; j < paths.length; j++) restSegs.push(relative(paths[j - 1]!, paths[j]!));
       const { anchor: nextAnchor, dest } = linkTargetAnchor(paths[i]!, c.target);
-      const followed = rest.length === 0 ? dest : join(dest, ...rest);
+      const followed = restSegs.length === 0 ? dest : join(dest, ...restSegs);
       chain.push(...routeChain(nextAnchor, followed, true, depth + 1, visited));
       break;
     }
@@ -421,7 +426,9 @@ const changed = (a: FileState | null, b: FileState | null): boolean => {
   if (a === null || b === null) return a !== b;
   if (a.kind !== b.kind) return true;
   if (a.kind === "symlink" || b.kind === "symlink") return a.target !== b.target;
-  if (a.unreadIdentity || b.unreadIdentity) return true;
+  if (a.unreadIdentity || b.unreadIdentity) {
+    return a.kind !== b.kind || a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink;
+  }
   if (a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink) return true;
   return a.mode !== b.mode || !a.bytes!.equals(b.bytes!);
 };
@@ -701,7 +708,13 @@ export class ConfigWatch {
         assertNoAncestor(this.repoRoot, this.dirs, path);
         b = before.has(path) ? before.get(path)! : null;
         a = this.readForCompare(path, b, chains);
-        if (!changed(b, a)) continue;
+        const baseChain = chains?.get(path);
+        const baseLast = baseChain?.[baseChain.length - 1];
+        const drifted =
+          a?.unreadIdentity === true &&
+          baseLast?.kind === "file" &&
+          (baseLast.dev !== a.dev || baseLast.ino !== a.ino || baseLast.nlink !== a.nlink);
+        if (!changed(b, a) && !drifted) continue;
         changes.push({
           path,
           kind: b === null ? "created" : a === null ? "deleted" : "modified",
@@ -839,14 +852,21 @@ export function gitExecPath(repoRoot: string): string | null {
  * is read the same way it was read then.
  */
 interface MachineSnap {
-  /**
-   * Components from the path's anchor (included) down to the file, through any
-   * link that was there when the chain was recorded. The anchor is HOME for
-   * `.gitconfig`, the XDG base for `git/config`, and the system config's
-   * directory for system config (R49).
-   */
-  chain: ResolutionComp[];
+  /** `lstat` of the path as written. A link planted at this path is a type change. */
+  lexicalKind: PathIdentity["kind"];
+  lexicalTarget: string | null;
+  /** First symlink on the path as written, if any. Not a followed route. */
+  viaLink: string | null;
+  viaTarget: string | null;
+  /** What the OS reaches. Null when the path does not resolve. */
+  resolvedPath: string | null;
+  kind: PathIdentity["kind"];
+  dev: bigint | null;
+  ino: bigint | null;
+  nlink: number;
   hash: string;
+  state: "read" | "not-read" | "unwatched";
+  reason: string;
 }
 
 export class MachineConfigWatch {
@@ -872,38 +892,91 @@ export class MachineConfigWatch {
     return dirname(file);
   }
 
-  /** The whole resolution, through every link, including a final link's target (R55). */
-  private recordChain(file: string): ResolutionComp[] {
-    return routeChain(this.anchorOf(file), file, true);
-  }
-
   /**
-   * R49, machine side, separate from {@link repositoryResolutionDiff}. The first
-   * component whose type, dev, ino, readlink target, or (on the final file)
-   * nlink differs from the preflight chain. The walk stops there, so a changed
-   * link is not followed. A path absent at preflight differs when it appears,
-   * and is not read.
+   * R60. The OS resolves `p`. A link planted at `p` itself is a type change and
+   * is not opened. The same file is opened, `fstat`'d on that handle, and only
+   * then read. A different file is not opened.
    *
-   * LIMIT: this compare and the later open are not atomic, the same class of
-   * race as R37. This does not close it.
+   * LIMIT: a racing role can still make this open a different file (R37). The
+   * handle check stops the read.
    */
-  private resolutionMismatch(base: MachineSnap, file: string): ResolutionComp | undefined {
-    return firstDiff(base.chain, this.recordChain(file)) ?? undefined;
-  }
-
-  /** The chain as far as the read gate. Stops on the first component that differs from `gate`. */
-  private chainUntil(gate: MachineSnap, file: string): ResolutionComp[] {
-    const now = this.recordChain(file);
-    const chain: ResolutionComp[] = [];
-    const n = Math.max(gate.chain.length, now.length);
-    for (let i = 0; i < now.length; i++) {
-      const cur = now[i]!;
-      chain.push(cur);
-      const prev = gate.chain[i];
-      if (!prev || compsDiffer(prev, cur, i === n - 1)) return chain;
-      if (cur.kind === "absent") return chain;
+  private observe(p: string, gate: MachineSnap | null): MachineSnap {
+    const lexical = identify(p);
+    let viaLink: string | null = null;
+    let viaTarget: string | null = null;
+    for (const c of lexicalPaths(this.anchorOf(p), p, true)) {
+      const id = identify(c);
+      if (id.kind === "symlink" && id.target) {
+        viaLink = c;
+        viaTarget = id.target;
+        break;
+      }
+      if (id.kind === "absent") break;
     }
-    return chain;
+    const unresolved = (): MachineSnap => ({
+      lexicalKind: lexical.kind,
+      lexicalTarget: lexical.target,
+      viaLink,
+      viaTarget,
+      resolvedPath: null,
+      kind: "absent",
+      dev: null,
+      ino: null,
+      nlink: 0,
+      hash: "unread",
+      state: "unwatched",
+      reason: "did not resolve",
+    });
+    let resolvedPath: string | null = null;
+    let kind: PathIdentity["kind"] = "absent";
+    let dev: bigint | null = null;
+    let ino: bigint | null = null;
+    let nlink = 0;
+    try {
+      resolvedPath = realpathSync.native(p);
+      const st = statSync(resolvedPath, { bigint: true });
+      kind = st.isFile() ? "file" : st.isDirectory() ? "dir" : "other";
+      dev = st.dev;
+      ino = st.ino;
+      nlink = Number(st.nlink);
+    } catch {
+      return unresolved();
+    }
+    const note: MachineSnap = {
+      lexicalKind: lexical.kind,
+      lexicalTarget: lexical.target,
+      viaLink,
+      viaTarget,
+      resolvedPath,
+      kind,
+      dev,
+      ino,
+      nlink,
+      hash: "unread",
+      state: "not-read",
+      reason: "not read",
+    };
+    if (gate && lexical.kind === "symlink" && gate.lexicalKind !== "symlink") {
+      return { ...note, reason: "type change" };
+    }
+    const same =
+      gate === null ||
+      (gate.resolvedPath !== null && gate.kind === kind && gate.dev === dev && gate.ino === ino && gate.nlink === nlink);
+    if (!same) return { ...note, reason: "different file" };
+    if (kind !== "file") return { ...note, reason: "not a file" };
+    let fd: number | null = null;
+    try {
+      fd = openSync(p, "r");
+      const st = fstatSync(fd, { bigint: true });
+      if (!st.isFile() || st.dev !== dev || st.ino !== ino || Number(st.nlink) !== nlink) {
+        return { ...note, reason: "handle is a different file" };
+      }
+      return { ...note, hash: hashOf(readFileSync(fd)), state: "read", reason: "read" };
+    } catch {
+      return { ...note, hash: "unreadable", reason: "unreadable" };
+    } finally {
+      if (fd !== null) closeSync(fd);
+    }
   }
 
   /**
@@ -916,81 +989,27 @@ export class MachineConfigWatch {
    * LIMIT: a byte change to a path the read gate forbids is invisible here,
    * because those bytes are never read.
    */
-  private attributionChange(start: MachineSnap, end: MachineSnap): ResolutionComp | "bytes" | undefined {
-    const n = Math.max(start.chain.length, end.chain.length);
-    for (let i = 0; i < n; i++) {
-      const a = start.chain[i];
-      const b = end.chain[i];
-      if (!a || !b) return b ?? a;
-      const final = i === n - 1;
-      const nlinkOk = !final || a.kind !== "file" || b.kind !== "file" || a.nlink === b.nlink;
-      if (a.kind !== b.kind || a.target !== b.target || a.dev !== b.dev || a.ino !== b.ino || !nlinkOk) return b;
-    }
-    if (start.hash !== end.hash && start.hash !== "unread" && end.hash !== "unread") return "bytes";
-    return undefined;
-  }
-
-  private mismatchFinding(base: MachineSnap, diff: ResolutionComp, p: MachineConfigPath): MachineConfigFinding {
-    const prev = base.chain.find((c) => c.path === diff.path);
-    const baseKind = prev?.kind ?? "absent";
-    if (diff.kind === "symlink" || prev?.kind === "symlink") {
-      const target = diff.target ? ` target ${diff.target}` : "";
-      const after =
-        baseKind === "absent"
-          ? `absent → ${diff.kind}${target}; not read through`
-          : `type change: ${diff.path} is a ${diff.kind}${target}; not read through`;
-      return {
-        stage: this.stage,
-        scope: p.scope,
-        path: p.path,
-        before: baseKind === "absent" ? "absent" : `type:${baseKind}`,
-        after,
-      };
-    }
-    return {
-      stage: this.stage,
-      scope: p.scope,
-      path: p.path,
-      before: baseKind === "absent" || base.hash === "absent" ? "absent" : base.hash,
-      after: `identity change: dev ${diff.dev} ino ${diff.ino} nlink ${diff.nlink}; not read`,
-    };
-  }
-
-  /** Links present at base, so the record can name them without refusing the loop (R35). */
+  /** Links present at base, named from the path as written, not a route walk (R35, R46). */
   baseNotes(): string[] {
+    this.captureBase();
     const notes: string[] = [];
     for (const p of this.paths) {
-      // Each component from the anchor, not only the final one (R46).
-      for (const c of this.recordChain(p.path)) {
-        if (c.kind !== "symlink") continue;
+      const snap = this.loopBase!.get(p.path);
+      const willRead = snap?.state === "read";
+      for (const c of lexicalPaths(this.anchorOf(p.path), p.path, true)) {
+        const id = identify(c);
+        if (id.kind !== "symlink" || !id.target) continue;
         notes.push(
-          `machine config ${p.scope} ${c.path} is a link at base, type ${c.kind}, readlink ${c.target}; read through that target, not refused.`,
+          willRead
+            ? `machine config ${p.scope} ${c} is a link at base, type ${id.kind}, readlink ${id.target}; read through that target, not refused.`
+            : `machine config ${p.scope} ${c} is a link at base, type ${id.kind}, readlink ${id.target}; unwatched: ${snap?.reason ?? "did not resolve"}.`,
         );
+      }
+      if (snap && snap.state === "unwatched" && snap.lexicalKind !== "symlink") {
+        notes.push(`machine config ${p.scope} ${p.path} unwatched: ${snap.reason}.`);
       }
     }
     return notes;
-  }
-
-  private snap(p: string, allowReadThrough: boolean): MachineSnap {
-    const chain = this.recordChain(p);
-    const last = chain[chain.length - 1];
-    // path.resolve does not follow links, so the target file and ~/.gitconfig
-    // compare unequal. realpath is the object opening `p` reaches (R55 control).
-    const reached = last !== undefined && opensSame(last.path, p);
-    if (!reached || last === undefined) return { chain, hash: "unread" };
-    if (last.kind === "absent") return { chain, hash: "absent" };
-    if (!allowReadThrough) return { chain, hash: "unread" };
-    // Bytes, only when the caller has already accepted the resolution (or this
-    // is the preflight capture). The gap between that accept and this open is
-    // the R37-class limit named on resolutionMismatch.
-    if (last.kind === "file" || last.kind === "symlink") {
-      try {
-        return { chain, hash: hashOf(readFileSync(p)) };
-      } catch {
-        return { chain, hash: "unreadable" };
-      }
-    }
-    return { chain, hash: "unread" };
   }
 
   /**
@@ -999,7 +1018,7 @@ export class MachineConfigWatch {
    */
   captureBase(): void {
     if (this.loopBase !== null) return;
-    this.loopBase = new Map(this.paths.map((p) => [p.path, this.snap(p.path, true)]));
+    this.loopBase = new Map(this.paths.map((p) => [p.path, this.observe(p.path, null)]));
   }
 
   begin(stage: string): void {
@@ -1007,13 +1026,8 @@ export class MachineConfigWatch {
     this.captureBase();
     const start = new Map<string, MachineSnap>();
     for (const p of this.paths) {
-      const base = this.loopBase!.get(p.path) ?? { chain: [], hash: "absent" };
-      // Stage attribution baseline: lstat always, bytes only when the read gate allows.
-      if (this.resolutionMismatch(base, p.path)) {
-        start.set(p.path, { chain: this.chainUntil(base, p.path), hash: "unread" });
-      } else {
-        start.set(p.path, this.snap(p.path, true));
-      }
+      const base = this.loopBase!.get(p.path)!;
+      start.set(p.path, this.observe(p.path, base));
     }
     this.stageStart = start;
   }
@@ -1025,23 +1039,44 @@ export class MachineConfigWatch {
     }
     this.stageStart = null;
     const out: MachineConfigFinding[] = [];
+    const sameId = (a: MachineSnap, b: MachineSnap): boolean =>
+      a.lexicalKind === b.lexicalKind && a.resolvedPath === b.resolvedPath && a.kind === b.kind && a.dev === b.dev && a.ino === b.ino && a.nlink === b.nlink;
     for (const p of this.paths) {
-      const base = this.loopBase.get(p.path) ?? { chain: [], hash: "absent" };
-      const opened = start.get(p.path) ?? { chain: [], hash: "absent" };
-      const end = this.resolutionMismatch(base, p.path)
-        ? { chain: this.chainUntil(base, p.path), hash: "unread" }
-        : this.snap(p.path, true);
-      const why = this.attributionChange(opened, end);
-      if (why === "bytes") {
-        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: opened.hash, after: end.hash });
-      } else if (why) {
-        const finding = this.mismatchFinding(opened, why, p);
-        // "Not read" is only true on the gate path, which left the hash unread (R59).
-        if (end.hash !== "unread") {
-          finding.after = end.hash;
+      const base = this.loopBase.get(p.path)!;
+      const opened = start.get(p.path)!;
+      const end = this.observe(p.path, base);
+      if (end.state === "read" && opened.state === "read") {
+        if (opened.hash !== end.hash) {
+          out.push({ stage: this.stage, scope: p.scope, path: p.path, before: opened.hash, after: end.hash });
         }
-        out.push(finding);
+        continue;
       }
+      if (end.state === "read") {
+        const before = base.state === "read" ? base.hash : "absent";
+        if (before !== end.hash || opened.state !== "read") {
+          out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after: end.hash });
+        }
+        continue;
+      }
+      const linkPlanted = end.viaLink !== null && end.viaLink !== opened.viaLink;
+      if (sameId(opened, end) && opened.state !== "read" && !linkPlanted) continue;
+      if (linkPlanted) {
+        const after =
+          base.resolvedPath === null
+            ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through`
+            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through`;
+        const before = base.state === "read" ? base.hash : base.resolvedPath === null ? "absent" : `type:${base.lexicalKind}`;
+        out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
+        continue;
+      }
+      const typeChange = end.lexicalKind === "symlink" && base.lexicalKind !== "symlink";
+      const after = typeChange
+        ? `type change: ${p.path} is a ${end.lexicalKind}${end.lexicalTarget ? ` target ${end.lexicalTarget}` : ""}; not read through`
+        : end.resolvedPath === null
+          ? `unwatched: ${end.reason}; not read`
+          : `not read: base ${base.resolvedPath ?? "unresolved"} dev ${base.dev} ino ${base.ino} nlink ${base.nlink}; current ${end.resolvedPath} dev ${end.dev} ino ${end.ino} nlink ${end.nlink}`;
+      const before = base.state === "read" ? base.hash : base.resolvedPath === null ? "absent" : `type:${base.lexicalKind}`;
+      out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
     }
     return out;
   }

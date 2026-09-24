@@ -135,7 +135,12 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
       writeFileSync(victim, "SYM-CANARY");
       renameSync(config, join(dirs.commonDir, "config-aside"));
       symlinkSync(victim, config);
-      expect(lstatSync(config).isSymbolicLink()).toBe(true);
+      expect(lstatSync(config).isSymbolicLink(), "plant: config is a symlink").toBe(true);
+      const probe = join(tmp.dir, "b1-probe");
+      symlinkSync(victim, probe);
+      writeFileSync(probe, "through-link");
+      expect(readFileSync(victim, "utf-8"), "control: a write through the link changes the victim").toBe("through-link");
+      writeFileSync(victim, "SYM-CANARY");
       const v = watch.closeAndRestore();
       expect(readFileSync(victim, "utf-8")).toBe("SYM-CANARY");
       expect(lstatSync(config).isSymbolicLink()).toBe(false);
@@ -156,7 +161,13 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
         writeFileSync(canary, "HOOKS-SYM-CANARY");
         renameSync(hooks, aside);
         symlinkSync(victim, hooks);
-        expect(lstatSync(hooks).isSymbolicLink()).toBe(true);
+        expect(lstatSync(hooks).isSymbolicLink(), "plant: hooks is a symlink").toBe(true);
+        const probe = join(tmp.dir, "b2-probe");
+        symlinkSync(victim, probe);
+        writeFileSync(join(probe, "through.txt"), "through");
+        expect(readFileSync(canary, "utf-8"), "control: a write through the link changes the victim").toBe("HOOKS-SYM-CANARY");
+        expect(readFileSync(join(victim, "through.txt"), "utf-8")).toBe("through");
+        unlinkSync(join(victim, "through.txt"));
         const v = watch.closeAndRestore();
         expect(readFileSync(canary, "utf-8")).toBe("HOOKS-SYM-CANARY");
         expect(lstatSync(hooks).isSymbolicLink()).toBe(false);
@@ -176,6 +187,12 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
       const dot = join(repo.root, ".git");
       renameSync(dot, join(repo.root, ".git-aside"));
       symlinkSync(victim, dot);
+      expect(lstatSync(dot).isSymbolicLink(), "plant: .git is a symlink").toBe(true);
+      const probe = join(tmp.dir, "b6-probe");
+      symlinkSync(victim, probe);
+      writeFileSync(join(probe, "through.txt"), "through");
+      expect(namesOf(victim), "control: a write through the link changes the victim").toContain("through.txt");
+      unlinkSync(join(victim, "through.txt"));
       const v = watch.closeAndRestore();
       expect(readFileSync(join(victim, "canary.txt"), "utf-8")).toBe("GIT-SYM-CANARY");
       expect(namesOf(victim)).toEqual(beforeNames);
@@ -723,6 +740,12 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
     unlinkSync(cfg);
     symlinkSync(victim, cfg);
+    expect(lstatSync(cfg).isSymbolicLink(), "plant: .gitconfig is a symlink").toBe(true);
+    const probe = join(tmp.dir, "b4-probe");
+    symlinkSync(victim, probe);
+    writeFileSync(probe, "[user]\n\tname = THROUGH\n");
+    expect(readFileSync(victim, "utf-8"), "control: a write through the link changes the victim").toContain("THROUGH");
+    writeFileSync(victim, bytes);
     const found = watch.compare();
     const blob = JSON.stringify(found);
     expect(blob, blob).not.toContain(victimHash);
@@ -984,5 +1007,140 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     } finally {
       chmodSync(victim, 0o644);
     }
+  });
+
+  /**
+   * R60. The OS resolves the link. An in-place edit of the base file is hashed.
+   * Red at 4c1287f: the route walk stops short (relative `..`, and a link with
+   * two components after it) and the path is silently unread.
+   */
+  it.skipIf(isWin)("R60: an in-place edit through a stow relative link is read and hashed", () => {
+    const home = join(tmp.dir, "r60-stow-home");
+    const dotfiles = join(tmp.dir, "r60-dotfiles");
+    mkdirSync(home);
+    mkdirSync(dotfiles);
+    const target = join(dotfiles, "gitconfig");
+    writeFileSync(target, "[user]\n\tname = base\n");
+    const cfg = join(home, ".gitconfig");
+    symlinkSync(join("..", "dotfiles", "gitconfig"), cfg);
+    expect(lstatSync(cfg).isSymbolicLink(), "plant: stow link climbs out with ..").toBe(true);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    const notes = watch.baseNotes().join("\n");
+    watch.begin("developer");
+    const edited = "[user]\n\tname = stow-edited-in-place\n";
+    writeFileSync(target, edited);
+    const hash = createHash("sha256").update(edited).digest("hex").slice(0, 16);
+    const blob = JSON.stringify(watch.compare());
+    if (notes.includes("read through")) expect(blob, notes).toContain(hash);
+    expect(blob, blob).toContain(hash);
+  });
+
+  it.skipIf(isWin)("R60: an in-place edit below a linked config directory is read and hashed", () => {
+    const real = join(tmp.dir, "r60-real-xdg");
+    mkdirSync(join(real, "git"), { recursive: true });
+    const target = join(real, "git", "config");
+    writeFileSync(target, "[user]\n\tname = base\n");
+    const xdg = join(tmp.dir, "r60-xdg-link");
+    symlinkSync(real, xdg);
+    const cfg = join(xdg, "git", "config");
+    expect(lstatSync(xdg).isSymbolicLink(), "plant: the config home is a link with two components after it").toBe(true);
+    const watch = new MachineConfigWatch([{ scope: "xdg", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const edited = "[user]\n\tname = anchor-edited-in-place\n";
+    writeFileSync(target, edited);
+    const hash = createHash("sha256").update(edited).digest("hex").slice(0, 16);
+    const blob = JSON.stringify(watch.compare());
+    expect(blob, blob).toContain(hash);
+  });
+
+  it.skipIf(isWin)("R60: a different file reached through a stow link is not read, and both resolutions are named", () => {
+    const home = join(tmp.dir, "r60-swap-home");
+    const dotfiles = join(tmp.dir, "r60-swap-dotfiles");
+    mkdirSync(home);
+    mkdirSync(dotfiles);
+    const target = join(dotfiles, "gitconfig");
+    writeFileSync(target, "[user]\n\tname = base\n");
+    const cfg = join(home, ".gitconfig");
+    symlinkSync(join("..", "dotfiles", "gitconfig"), cfg);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const victim = join(tmp.dir, "r60-swap-victim");
+    const bytes = Buffer.from("[user]\n\tname = VICTIM-R60\n");
+    writeFileSync(victim, bytes);
+    const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    unlinkSync(target);
+    linkSync(victim, target);
+    expect(lstatSync(target).nlink, "plant: target nlink 2").toBe(2);
+    const blob = JSON.stringify(watch.compare());
+    expect(blob, blob).not.toContain(victimHash);
+    expect(blob).toContain("not read");
+    expect(blob).toContain(target);
+    expect(blob).toContain(victim);
+  });
+
+  it.skipIf(isWin)("R61: a link that does not resolve is reported unwatched and is not claimed as read", () => {
+    const home = join(tmp.dir, "r61-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    symlinkSync("missing-r61-target", cfg);
+    expect(lstatSync(cfg).isSymbolicLink(), "plant: dangling link").toBe(true);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    const notes = watch.baseNotes().join("\n");
+    expect(notes, notes).not.toContain("read through that target");
+    expect(notes).toMatch(/unwatched|did not resolve/);
+    watch.begin("developer");
+    const blob = JSON.stringify(watch.compare());
+    expect(blob + notes).toContain(cfg);
+    expect(blob).not.toMatch(/[0-9a-f]{16}/);
+  });
+
+  it("R62: a repository file new since the loop base and untouched by the stage is no change", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const watch = new ConfigWatch(dirs, repo.root);
+    watch.captureBase();
+    const created = join(dirs.commonDir, "hooks", "r62-new");
+    writeFileSync(created, "new-since-base\n");
+    watch.begin("developer");
+    const v = watch.closeAndRestore();
+    const blob = JSON.stringify(v);
+    expect(v.ok, blob).toBe(true);
+    expect(v.changes, blob).toEqual([]);
+    expect(blob).not.toContain("COULD NOT BE PUT BACK");
+
+    const control = new ConfigWatch(dirs, repo.root);
+    control.captureBase();
+    control.begin("developer");
+    const during = join(dirs.commonDir, "hooks", "r62-during");
+    writeFileSync(during, "during-stage\n");
+    const cv = control.closeAndRestore();
+    expect(cv.ok, JSON.stringify(cv)).toBe(false);
+    expect(cv.changes.some((c) => c.path === during), JSON.stringify(cv)).toBe(true);
+  });
+
+  /**
+   * R60 routeChain rest. A link with two components after it must not double
+   * the path (`hooks/hooks`). Red at 4c1287f: the chain ends at that absent
+   * doubled path, so a type change of the real file is not what the record names.
+   */
+  it.skipIf(isWin)("R60: a repository link with two components after it names the real file, not a doubled path", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const git = join(repo.root, ".git");
+    const real = join(repo.root, ".git-real");
+    renameSync(git, real);
+    symlinkSync(real, git);
+    expect(lstatSync(git).isSymbolicLink(), "plant: .git is a link and hooks/post-commit is two components after it").toBe(true);
+    const hook = join(real, "hooks", "post-commit");
+    writeFileSync(hook, "#!/bin/sh\nexit 0\n");
+    const watch = new ConfigWatch(dirs, repo.root);
+    watch.captureBase();
+    watch.begin("developer");
+    unlinkSync(hook);
+    symlinkSync(join(tmp.dir, "r60-rest-victim"), hook);
+    writeFileSync(join(tmp.dir, "r60-rest-victim"), "victim\n");
+    const v = watch.closeAndRestore();
+    const blob = JSON.stringify(v);
+    expect(blob, blob).not.toContain("hooks/hooks");
+    expect(blob).toContain("not read");
+    expect(v.changes.some((c) => c.path === join(git, "hooks", "post-commit") || c.path === hook), blob).toBe(true);
   });
 });
