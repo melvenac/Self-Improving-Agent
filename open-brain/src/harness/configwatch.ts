@@ -1080,7 +1080,7 @@ export class MachineConfigWatch {
         const after =
           base.resolvedPath === null
             ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through`
-            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: base ${base.resolvedPath ?? "unresolved"} dev ${base.dev} ino ${base.ino} nlink ${base.nlink}; current ${end.resolvedPath ?? "unresolved"} dev ${end.dev} ino ${end.ino} nlink ${end.nlink}`;
+            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through`;
         const before = base.state === "read" ? base.hash : base.resolvedPath === null ? "absent" : `type:${base.lexicalKind}`;
         out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
         continue;
