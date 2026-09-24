@@ -877,7 +877,6 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
   it("R57: a later stage does not read a repository file whose route differs from the loop base", () => {
     const dirs = resolveGitDirs(repo.root);
     const watch = new ConfigWatch(dirs);
-    watch.captureBase();
     watch.begin("developer");
     watch.closeAndRestore();
     const config = join(dirs.commonDir, "config");

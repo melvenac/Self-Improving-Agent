@@ -42,6 +42,7 @@ import {
   readdirSync,
   readFileSync,
   readlinkSync,
+  realpathSync,
   renameSync,
   rmdirSync,
   unlinkSync,
@@ -207,6 +208,14 @@ interface ResolutionComp {
   dev: bigint | null;
   ino: bigint | null;
   nlink: number;
+}
+
+function opensSame(a: string, b: string): boolean {
+  try {
+    return realpathSync(a) === realpathSync(b);
+  } catch {
+    return resolve(a) === resolve(b);
+  }
 }
 
 function resolutionComp(p: string): ResolutionComp {
@@ -965,7 +974,9 @@ export class MachineConfigWatch {
   private snap(p: string, allowReadThrough: boolean): MachineSnap {
     const chain = this.recordChain(p);
     const last = chain[chain.length - 1];
-    const reached = last !== undefined && resolve(last.path) === resolve(p);
+    // path.resolve does not follow links, so the target file and ~/.gitconfig
+    // compare unequal. realpath is the object opening `p` reaches (R55 control).
+    const reached = last !== undefined && opensSame(last.path, p);
     if (!reached || last === undefined) return { chain, hash: "unread" };
     if (last.kind === "absent") return { chain, hash: "absent" };
     if (!allowReadThrough) return { chain, hash: "unread" };

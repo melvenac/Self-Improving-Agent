@@ -10,13 +10,13 @@ Not in A5: D-A2-7, D-A5, and the R37 race. The compare-then-open window is the s
 
 **Red:** the new R55 tests are `skipIf(isWin)`. This machine cannot plant a file symlink (`EPERM`). They are red at `f9a1aa8` on Linux (QA probe `qa89-a4-probe.test.ts` A4-1, CI run `35928008495`). Mutant that turns them red: stop following a final link in `routeChain` (A4 `componentPaths`).
 
-**Green here:** `configwatch-links.test.ts` — the R55 cases skipped, the rest passed. Linux result is CI run `35947532386` on `70ec18c` (dispatched, not yet finished at handoff).
+**Linux run `35947532386` on `70ec18c` failed.** 1 failed | 1132 passed | 6 skipped. The failure is `R55 CONTROL` at `configwatch-links.test.ts:798`: an in-place edit of the base target produced no finding. `path.resolve` does not follow links, so `snap` treated the target file and `~/.gitconfig` as different paths and did not read. H, J, and R passed on that run (swapped targets stayed unread). The fix compares `realpath`. Mutant that turns the control red: compare with `path.resolve` instead of `realpath`. Mutant that turns H/J/R red: stop following a final link in `routeChain`.
 
 ## R57 — repository `begin` against the loop base
 
 `ConfigWatch.captureBase` records the route once. `begin` reads a repository file only when that route still matches. Attribution stays the stage snapshot.
 
-**Red at `f9a1aa8`:** `begin` called `readState` with no gate, so the second stage's verdict contained the victim hash. Mutant: read inside `begin` even when `repositoryResolutionDiff` is set.
+**Red:** branch `loop/15-slice-3-a5-redcheck` at `79af55f` is `f9a1aa8` plus these tests and no implementation. Its CI run is named below. Mutant: read inside `begin` even when `repositoryResolutionDiff` is set.
 
 **Green:** `R57: a later stage does not read...` passed on win32 (exit 0, targeted file).
 
