@@ -723,7 +723,13 @@ export class ConfigWatch {
         assertNoAncestor(this.repoRoot, this.dirs, path);
         b = before.has(path) ? before.get(path)! : null;
         a = this.readForCompare(path, b, chains);
-        if (!changed(b, a)) continue;
+        const baseChain = chains?.get(path);
+        const baseLast = baseChain?.[baseChain.length - 1];
+        const drifted =
+          a?.unreadIdentity === true &&
+          baseLast?.kind === "file" &&
+          (baseLast.dev !== a.dev || baseLast.ino !== a.ino || baseLast.nlink !== a.nlink);
+        if (!changed(b, a) && !drifted) continue;
         changes.push({
           path,
           kind: b === null ? "created" : a === null ? "deleted" : "modified",
