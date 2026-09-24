@@ -269,7 +269,7 @@ function routeChain(
     const c = resolutionComp(paths[i]!);
     chain.push(c);
     if (c.kind === "absent") break;
-    if (c.kind === "symlink" && c.target) {
+    if (c.kind === "symlink" && c.target && i < paths.length - 1) {
       const key = `${c.dev}:${c.ino}`;
       if (c.dev !== null && visited.has(key)) break;
       if (c.dev !== null) visited.add(key);
