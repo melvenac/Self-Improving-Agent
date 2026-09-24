@@ -1055,7 +1055,9 @@ export class MachineConfigWatch {
       const opened = start.get(p.path)!;
       const end = this.observe(p.path, base);
       if (end.state === "read" && opened.state === "read") {
-        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: opened.hash, after: end.hash });
+        if (opened.hash !== end.hash) {
+          out.push({ stage: this.stage, scope: p.scope, path: p.path, before: opened.hash, after: end.hash });
+        }
         continue;
       }
       if (end.state === "read") {
