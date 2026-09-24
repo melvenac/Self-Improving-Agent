@@ -98,6 +98,7 @@ describe("R66 — openSync seam", { timeout: 60_000 }, () => {
     watch.begin("developer");
     unlinkSync(cfg);
     symlinkSync(victim, cfg);
+    seam.opened = [];
     try {
       let code = "";
       try {
