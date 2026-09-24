@@ -1,0 +1,63 @@
+#!/bin/bash
+# gh-runners-pause - stop both tcm runners WITHOUT killing a running CI job (for A2A-Hub tcm deploys).
+#
+# Installed by Forge (SIA developer seat, record session 97, 2026-09-24) under D-044, at Relay's request.
+# Usage: sudo gh-runners-pause [timeout-seconds, default 3600]
+#
+# Each runner is stopped as soon as IT is idle, so an idle runner takes no new job while the other
+# finishes. A runner is busy while its unit's cgroup holds a Runner.Worker process (the runner starts
+# one per job); a cgroup that cannot be read counts as busy, so doubt never kills a job. On timeout it
+# exits 1 saying NOT paused and kills nothing. It says "paused" only after reading is-active back.
+#
+# Limit: between the idle check and the stop there are milliseconds in which GitHub could assign a
+# job; stopping would then cancel that job. Resume with gh-runners-resume. A reboot also resumes.
+set -uo pipefail
+
+UNITS=(gh-runner@1.service gh-runner@2.service)
+TIMEOUT=${1:-3600}
+[[ "$TIMEOUT" =~ ^[0-9]+$ ]] || { echo "usage: $0 [timeout-seconds]" >&2; exit 2; }
+[ "$(id -u)" -eq 0 ] || { echo "run with sudo" >&2; exit 2; }
+
+ts() { date -u +%H:%M:%SZ; }
+
+busy() {
+  local cg procs p
+  cg=$(systemctl show -p ControlGroup --value "$1")
+  procs="/sys/fs/cgroup$cg/cgroup.procs"
+  [ -n "$cg" ] && [ -r "$procs" ] || return 0
+  while read -r p; do
+    grep -qa "bin/Runner.Worker" "/proc/$p/cmdline" 2>/dev/null && return 0
+  done < "$procs"
+  return 1
+}
+
+deadline=$((SECONDS + TIMEOUT))
+last=""
+while :; do
+  waiting=()
+  for u in "${UNITS[@]}"; do
+    systemctl is-active --quiet "$u" || continue
+    if busy "$u"; then
+      waiting+=("$u")
+    else
+      echo "[$(ts)] $u: idle, stopping"
+      systemctl stop "$u"
+    fi
+  done
+  [ ${#waiting[@]} -eq 0 ] && break
+  if [ "${waiting[*]}" != "$last" ]; then echo "[$(ts)] waiting for a running job: ${waiting[*]}"; last="${waiting[*]}"; fi
+  if [ "$SECONDS" -ge "$deadline" ]; then
+    echo "[$(ts)] NOT paused: still running a job after ${TIMEOUT}s: ${waiting[*]}. Nothing was killed."
+    exit 1
+  fi
+  sleep 5
+done
+
+rc=0
+for u in "${UNITS[@]}"; do
+  s=$(systemctl is-active "$u")
+  echo "  $u: $s"
+  [ "$s" = inactive ] || [ "$s" = failed ] || rc=1
+done
+if [ "$rc" -eq 0 ]; then echo "[$(ts)] paused"; else echo "[$(ts)] NOT paused (see states above)"; fi
+exit "$rc"
