@@ -1,4 +1,4 @@
-# Installed by Forge (SIA record session 97, 2026-09-24) under D-043.
+# Installed by Forge (SIA record session 97, 2026-09-24) under D-043 and D-044.
 [Unit]
 Description=Stop gh-runner if its egress firewall is missing (fail closed)
 

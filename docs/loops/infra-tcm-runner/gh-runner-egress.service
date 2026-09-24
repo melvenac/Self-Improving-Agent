@@ -1,8 +1,7 @@
-# Installed by Forge (SIA record session 97, 2026-09-24) under D-043.
+# Installed by Forge (SIA record session 97, 2026-09-24) under D-043 and D-044.
 [Unit]
 Description=Owner-matched egress firewall for the gh-runner user (D-043)
 After=network-pre.target ufw.service docker.service
-Before=gh-runner.service
 
 [Service]
 Type=oneshot

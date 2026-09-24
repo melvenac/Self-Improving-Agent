@@ -1,0 +1,24 @@
+#!/bin/bash
+# gh-runners-resume - start both tcm runners after gh-runners-pause (for A2A-Hub tcm deploys).
+#
+# Installed by Forge (SIA developer seat, record session 97, 2026-09-24) under D-044, at Relay's request.
+# Usage: sudo gh-runners-resume
+# Says "resumed" only after reading is-active back as active for both. A runner refuses to start if
+# its egress firewall is missing (ExecStartPre), and this script then reports NOT resumed.
+set -uo pipefail
+
+UNITS=(gh-runner@1.service gh-runner@2.service)
+[ "$(id -u)" -eq 0 ] || { echo "run with sudo" >&2; exit 2; }
+
+ts() { date -u +%H:%M:%SZ; }
+
+systemctl start "${UNITS[@]}"
+sleep 3
+rc=0
+for u in "${UNITS[@]}"; do
+  s=$(systemctl is-active "$u")
+  echo "  $u: $s"
+  [ "$s" = active ] || rc=1
+done
+if [ "$rc" -eq 0 ]; then echo "[$(ts)] resumed"; else echo "[$(ts)] NOT resumed (see states above; journalctl -u 'gh-runner@*')"; fi
+exit "$rc"

@@ -1,7 +1,8 @@
-# Installed by Forge (SIA record session 97, 2026-09-24) under D-043.
-# GitHub Actions runner for melvenac/Self-Improving-Agent. Labels: self-hosted, linux, tcm.
+# Installed by Forge (SIA record session 97, 2026-09-24) under D-043 and D-044.
+# GitHub Actions runner tcm-%i for melvenac/Self-Improving-Agent. Labels: self-hosted, linux, tcm.
+# Instances 1 and 2 share the gh-runner user, so the one owner-matched firewall covers both.
 [Unit]
-Description=GitHub Actions runner for melvenac/Self-Improving-Agent (tcm)
+Description=GitHub Actions runner tcm-%i for melvenac/Self-Improving-Agent
 Requires=gh-runner-egress.service
 After=gh-runner-egress.service network-online.target
 Wants=network-online.target
@@ -10,22 +11,24 @@ Wants=network-online.target
 Type=simple
 User=gh-runner
 Group=gh-runner
-WorkingDirectory=/srv/gh-runner/runner
+WorkingDirectory=/srv/gh-runner/runner-%i
 # Refuse to start unless the egress firewall is in place ('+' = run the check as root).
 ExecStartPre=+/usr/local/sbin/gh-runner-egress check
-ExecStart=/srv/gh-runner/runner/runsvc.sh
+ExecStart=/srv/gh-runner/runner-%i/runsvc.sh
 KillMode=control-group
 KillSignal=SIGTERM
 TimeoutStopSec=30s
 Restart=on-failure
 RestartSec=30s
 
-# Limits: the hub and the printers keep priority.
-CPUQuota=200%
+# D-044, "max out": no CPU quota, so idle cores are used, but at low weight and priority, so the
+# hub, Convex and the printers win whenever they want CPU.
 CPUWeight=20
 IOWeight=20
 Nice=10
-MemoryMax=6G
+# 5G each, 10G for both, of tcm's 15.4 GiB. Under memory pressure the kernel kills a CI job first.
+MemoryMax=5G
+OOMScoreAdjust=500
 
 # Isolation.
 NoNewPrivileges=yes

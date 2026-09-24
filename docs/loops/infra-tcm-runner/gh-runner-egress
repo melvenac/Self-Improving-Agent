@@ -1,13 +1,13 @@
 #!/bin/bash
 # gh-runner-egress - owner-matched egress firewall for the GitHub Actions runner user on tcm.
 #
-# Installed by Forge (SIA developer seat, record session 97, 2026-09-24) under D-043.
+# Installed by Forge (SIA developer seat, record session 97, 2026-09-24) under D-043 and D-044.
 # It owns ONLY the GH_RUNNER chain (IPv4 and IPv6) and one jump per family at OUTPUT position 1.
 # It never touches ufw's chains or files, Docker's chains, or any other rule.
 #
 #   apply   build the chains, put the jump first, snapshot both into /run (root only)
 #   check   exit 0 only if the jump is still OUTPUT rule 1 and the chain matches its snapshot
-#   watch   check; on failure log why and STOP gh-runner.service (fail closed)
+#   watch   check; on failure log why and STOP every gh-runner@ instance (fail closed)
 #   remove  delete the jumps and the chains
 #
 # IPv4: the runner may reach systemd-resolved's DNS stubs and the public internet, nothing else.
@@ -17,7 +17,7 @@ set -euo pipefail
 
 RUNNER_USER=gh-runner
 CHAIN=GH_RUNNER
-RUNNER_UNIT=gh-runner.service
+RUNNER_UNITS='gh-runner@*.service'   # every runner instance (D-044: tcm-1, tcm-2)
 STATE_DIR=/run/gh-runner-egress
 RUID=$(id -u "$RUNNER_USER")
 
@@ -96,9 +96,9 @@ case "${1:-}" in
     ;;
   watch)
     if ! out=$("$0" check 2>&1); then
-      logger -t gh-runner-egress -p auth.crit "egress firewall check FAILED, stopping $RUNNER_UNIT: $out"
+      logger -t gh-runner-egress -p auth.crit "egress firewall check FAILED, stopping $RUNNER_UNITS: $out"
       echo "$out"
-      systemctl stop "$RUNNER_UNIT"
+      systemctl stop "$RUNNER_UNITS"
       exit 1
     fi
     ;;
