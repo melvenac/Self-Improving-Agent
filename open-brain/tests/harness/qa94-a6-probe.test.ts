@@ -25,6 +25,7 @@
  * Every test prints a QA94-... line with what it saw. Each asserts its own plant.
  */
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
   appendFileSync, chmodSync, linkSync, lstatSync, mkdirSync, readFileSync, renameSync, statSync, symlinkSync,
@@ -199,6 +200,31 @@ describe("QA 94 probe (not for merge): D-041's trade and R61 on POSIX", { timeou
     expect(found[0]?.before, "the path existed at base; 'absent' is a claim the runtime did not observe").not.toBe("absent");
   });
 
+  /** v2: the one case M-typechange6 changes. Rulings-13 R60: a link planted AT the watched path is still a type change. */
+  it.skipIf(isWin)("AT-PATH-SAME: a symlink planted AT the watched path, leading to the SAME base file, is reported as a type change and not read", () => {
+    const home = join(tmp.dir, "aps-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = aps-base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "qa94" }]);
+    watch.captureBase();
+    const baseIno = statSync(cfg).ino;
+    watch.begin("developer");
+    const real = join(home, "real-gitconfig");
+    renameSync(cfg, real);
+    symlinkSync(real, cfg);
+    const edited = "[user]\n\tname = aps-edited-through-the-new-link\n";
+    writeFileSync(cfg, edited);
+    expect(lstatSync(cfg).isSymbolicLink(), "plant: a link AT the watched path").toBe(true);
+    expect(statSync(cfg).ino, "plant: it leads to the base object").toBe(baseIno);
+    const found = watch.compare();
+    const blob = JSON.stringify(found);
+    say("QA94-AT-PATH-SAME", { editHashInRecord: blob.includes(h16(edited)), found });
+    expect(found.length, "clause 4: reported").toBeGreaterThan(0);
+    expect(blob, "clause 4: as a type change").toContain("type change");
+    expect(blob, "not read through the new link").not.toContain(h16(edited));
+  });
+
   it.skipIf(isWin)("R61-UNIT: four base states, one stage with no act: every path is in a reported state", () => {
     const home = join(tmp.dir, "r61u");
     mkdirSync(home);
@@ -221,6 +247,46 @@ describe("QA 94 probe (not for merge): D-041's trade and R61 on POSIX", { timeou
     const present = Object.fromEntries(paths.map((p) => [p.split("/").pop(), record.includes(p)]));
     say("QA94-R61-UNIT", { present, notes, found, readHash: h16(readFileSync(readP)), readHashInRecord: record.includes(h16(readFileSync(readP))) });
     for (const p of paths) expect(record, `R61: ${p} is in the record with its state`).toContain(p);
+  });
+
+  /** v3: the ordinary form of R61-LOOP. `git config --global` rewrites ~/.gitconfig by lock-and-rename (new inode). */
+  it("GITCONFIG-LOOP: the developer runs `git config --global`; the qa role then appends in place: both writes are reported", async () => {
+    const home = join(tmp.dir, "gcl-home");
+    mkdirSync(home);
+    const globalCfg = join(home, ".gitconfig");
+    writeFileSync(globalCfg, "[user]\n\tname = gcl-base\n");
+    const xdg = join(tmp.dir, "gcl-xdg");
+    mkdirSync(xdg);
+    const system = join(tmp.dir, "gcl-system.gitconfig");
+    writeFileSync(system, "");
+    const env: NodeJS.ProcessEnv = { ...process.env, HOME: home, USERPROFILE: home, XDG_CONFIG_HOME: xdg, GIT_CONFIG_SYSTEM: system };
+    delete env.GIT_CONFIG_GLOBAL;
+    const baseIno = statSync(globalCfg).ino;
+    let devIno = 0;
+    let qaHash = "";
+    const cfgLoop: LoopConfig = {
+      repoRoot: repo.root, loop: "t001", env,
+      roles: {
+        planner: new StubPlanner(),
+        developer: { role: "developer", run: async (ctx) => {
+          const d = await new StubDeveloper().run(ctx);
+          execFileSync("git", ["config", "--global", "user.email", "qa94@example.invalid"], { env, cwd: home });
+          devIno = statSync(globalCfg).ino;
+          return d;
+        } },
+        qa: { role: "qa", run: async (ctx) => { appendFileSync(globalCfg, "[core]\n\tqa94 = appended-in-place\n"); qaHash = h16(readFileSync(globalCfg)); return new StubQa().run(ctx); } },
+      },
+      checks: exitingChecks(0, 0),
+      log: () => {},
+    };
+    const r = await runLoop(cfgLoop);
+    const byStage: Record<string, string[]> = {};
+    for (const f of r.machineConfigFindings.filter((x) => x.path === globalCfg)) (byStage[f.stage] ??= []).push(`${f.before} -> ${f.after}`);
+    say("QA94-GITCONFIG-LOOP", { status: r.status, failure: r.failure?.code ?? null, baseIno: String(baseIno), devIno: String(devIno), inodeChangedByGitConfig: devIno !== baseIno, byStage, qaHash, qaHashInRecord: JSON.stringify(r).includes(qaHash) });
+    expect(readFileSync(globalCfg, "utf-8"), "plant: git config wrote").toContain("qa94@example.invalid");
+    expect(readFileSync(globalCfg, "utf-8"), "plant: the qa append").toContain("appended-in-place");
+    expect(byStage.developer?.length ?? 0, "CA-4f: the developer's write is reported").toBeGreaterThan(0);
+    expect(byStage.qa?.length ?? 0, "CA-4f / R61: the qa stage's in-place write is reported").toBeGreaterThan(0);
   });
 
   it.skipIf(isWin)("R61-LOOP: runLoop; every machine path in every stage's record; a hard link elsewhere, then an in-place edit", async () => {
