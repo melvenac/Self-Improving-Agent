@@ -432,9 +432,7 @@ const changed = (a: FileState | null, b: FileState | null): boolean => {
   if (a === null || b === null) return a !== b;
   if (a.kind !== b.kind) return true;
   if (a.kind === "symlink" || b.kind === "symlink") return a.target !== b.target;
-  if (a.unreadIdentity || b.unreadIdentity) {
-    return a.kind !== b.kind || a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink;
-  }
+  if (a.unreadIdentity || b.unreadIdentity) return true;
   if (a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink) return true;
   return a.mode !== b.mode || !a.bytes!.equals(b.bytes!);
 };
