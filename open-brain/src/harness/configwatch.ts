@@ -323,6 +323,12 @@ function recordRepoChain(floor: string, file: string): ResolutionComp[] {
   return routeChain(floor, file, false);
 }
 
+/** Last path the repository route records. A doubled `rest` ends at the wrong file. */
+export function routeEnd(anchor: string, file: string): string | null {
+  const chain = routeChain(anchor, file, false);
+  return chain.length === 0 ? null : chain[chain.length - 1]!.path;
+}
+
 /**
  * R49, repository side, separate from the machine-side check so each can be
  * reverted on its own. Returns the first component whose type, dev, ino,

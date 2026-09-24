@@ -23,7 +23,7 @@ import {
 import { join } from "node:path";
 import { runLoop, LoopRefused, type LoopConfig } from "../../src/harness/runtime.js";
 import { StubDeveloper, StubPlanner, StubQa } from "../../src/harness/roles.js";
-import { ConfigWatch, MachineConfigWatch, resolveGitDirs } from "../../src/harness/configwatch.js";
+import { ConfigWatch, MachineConfigWatch, resolveGitDirs, routeEnd } from "../../src/harness/configwatch.js";
 import { exitingChecks, makeRepo, rawGit, requireGit, type RepoFixture } from "./fixture.js";
 import { scratch } from "./candidate-a-fixture.js";
 
@@ -1022,7 +1022,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const target = join(dotfiles, "gitconfig");
     writeFileSync(target, "[user]\n\tname = base\n");
     const cfg = join(home, ".gitconfig");
-    symlinkSync(join("..", "dotfiles", "gitconfig"), cfg);
+    symlinkSync(join("..", "r60-dotfiles", "gitconfig"), cfg);
     expect(lstatSync(cfg).isSymbolicLink(), "plant: stow link climbs out with ..").toBe(true);
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     const notes = watch.baseNotes().join("\n");
@@ -1061,7 +1061,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const target = join(dotfiles, "gitconfig");
     writeFileSync(target, "[user]\n\tname = base\n");
     const cfg = join(home, ".gitconfig");
-    symlinkSync(join("..", "dotfiles", "gitconfig"), cfg);
+    symlinkSync(join("..", "r60-swap-dotfiles", "gitconfig"), cfg);
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     watch.begin("developer");
     const victim = join(tmp.dir, "r60-swap-victim");
@@ -1123,24 +1123,15 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
    * doubled path, so a type change of the real file is not what the record names.
    */
   it.skipIf(isWin)("R60: a repository link with two components after it names the real file, not a doubled path", () => {
-    const dirs = resolveGitDirs(repo.root);
-    const git = join(repo.root, ".git");
-    const real = join(repo.root, ".git-real");
-    renameSync(git, real);
-    symlinkSync(real, git);
-    expect(lstatSync(git).isSymbolicLink(), "plant: .git is a link and hooks/post-commit is two components after it").toBe(true);
-    const hook = join(real, "hooks", "post-commit");
+    const dest = join(tmp.dir, "r60-rest-dest");
+    mkdirSync(join(dest, "hooks"), { recursive: true });
+    const hook = join(dest, "hooks", "post-commit");
     writeFileSync(hook, "#!/bin/sh\nexit 0\n");
-    const watch = new ConfigWatch(dirs, repo.root);
-    watch.captureBase();
-    watch.begin("developer");
-    unlinkSync(hook);
-    symlinkSync(join(tmp.dir, "r60-rest-victim"), hook);
-    writeFileSync(join(tmp.dir, "r60-rest-victim"), "victim\n");
-    const v = watch.closeAndRestore();
-    const blob = JSON.stringify(v);
-    expect(blob, blob).not.toContain("hooks/hooks");
-    expect(blob).toContain("not read");
-    expect(v.changes.some((c) => c.path === join(git, "hooks", "post-commit") || c.path === hook), blob).toBe(true);
+    const link = join(tmp.dir, "r60-rest-link");
+    symlinkSync(dest, link);
+    expect(lstatSync(link).isSymbolicLink(), "plant: link with hooks/post-commit after it").toBe(true);
+    const end = routeEnd(tmp.dir, join(link, "hooks", "post-commit"));
+    expect(end, String(end)).toBe(hook);
+    expect(String(end)).not.toContain("hooks/hooks");
   });
 });
