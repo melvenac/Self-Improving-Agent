@@ -622,6 +622,7 @@ async function runLoopInner(
     gitDirs === null ? null : new MachineConfigWatch(machineConfigPaths(env, gitExecPath(repoRoot)));
   // R44: the link baseline is the loop's base, taken once here. Stage begin()
   // opens a content window and must not re-define that baseline.
+  configWatch?.captureBase();
   machineWatch?.captureBase();
   for (const note of machineWatch?.baseNotes() ?? []) result.findings.push(note);
 
@@ -1017,7 +1018,8 @@ async function runLoopInner(
           }
         }
         const bad = [...verdict.violations, ...verdict.unsafe.map((u) => u.path)];
-        if (bad.length > 0) revertPaths(repoRoot, bad);
+        if (bad.length === 0) return refNote;
+        revertPaths(repoRoot, bad);
         return `${refNote} The offending paths were reverted.`;
       };
 

@@ -47,7 +47,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, isAbsolute, join, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, parse, relative, resolve } from "node:path";
 import { git, gitTry } from "./git.js";
 
 /** Where git keeps the files this layer watches, resolved once. */
@@ -214,6 +214,85 @@ function resolutionComp(p: string): ResolutionComp {
   return { path: p, kind: id.kind, target: id.target, dev: id.dev, ino: id.ino, nlink: id.nlink };
 }
 
+const ROUTE_LIMIT = 40;
+
+/** A link target's own anchor: the path root when absolute, the link's directory when relative. */
+function linkTargetAnchor(linkPath: string, target: string): { anchor: string; dest: string } {
+  if (isAbsolute(target)) {
+    const dest = resolve(target);
+    return { anchor: parse(dest).root, dest };
+  }
+  const anchor = dirname(linkPath);
+  return { anchor, dest: resolve(anchor, target) };
+}
+
+function lexicalPaths(anchor: string, file: string, includeAnchor: boolean): string[] {
+  const rel = relative(anchor, file);
+  const segs = rel === "" || rel.startsWith("..") || isAbsolute(rel) ? [] : rel.split(/[\\/]/).filter((s) => s !== "");
+  const paths: string[] = [];
+  if (includeAnchor && anchor !== "") paths.push(anchor);
+  let cur = anchor;
+  for (const seg of segs) {
+    cur = join(cur, seg);
+    paths.push(cur);
+  }
+  return paths;
+}
+
+/**
+ * R55. The route is every component as written, and when a component is a link,
+ * that link plus every component of its target from the target's own anchor,
+ * recursively — including a link in the last position and the object it leads
+ * to. `lstat` and `readlink` only; this does not open the file.
+ */
+function routeChain(
+  anchor: string,
+  file: string,
+  includeAnchor: boolean,
+  depth = 0,
+  seen?: Set<string>,
+): ResolutionComp[] {
+  if (depth > ROUTE_LIMIT) return [];
+  const chain: ResolutionComp[] = [];
+  const visited = seen ?? new Set<string>();
+  const paths = lexicalPaths(anchor, file, includeAnchor);
+  for (let i = 0; i < paths.length; i++) {
+    const c = resolutionComp(paths[i]!);
+    chain.push(c);
+    if (c.kind === "absent") break;
+    if (c.kind === "symlink" && c.target) {
+      const key = `${c.dev}:${c.ino}`;
+      if (c.dev !== null && visited.has(key)) break;
+      if (c.dev !== null) visited.add(key);
+      const rest = paths.slice(i + 1).map((p) => relative(paths[i]!, p));
+      const { anchor: nextAnchor, dest } = linkTargetAnchor(paths[i]!, c.target);
+      const followed = rest.length === 0 ? dest : join(dest, ...rest);
+      chain.push(...routeChain(nextAnchor, followed, true, depth + 1, visited));
+      break;
+    }
+  }
+  return chain;
+}
+
+function compsDiffer(prev: ResolutionComp, now: ResolutionComp, final: boolean): boolean {
+  const nlinkOk = !final || prev.kind !== "file" || now.kind !== "file" || prev.nlink === now.nlink;
+  return prev.kind !== now.kind || prev.target !== now.target || prev.dev !== now.dev || prev.ino !== now.ino || !nlinkOk;
+}
+
+/** First route entry that differs. `null` when the object and the route still match. */
+function firstDiff(base: ResolutionComp[] | undefined, now: ResolutionComp[]): ResolutionComp | null {
+  const n = Math.max(base?.length ?? 0, now.length);
+  for (let i = 0; i < n; i++) {
+    const prev = base?.[i];
+    const cur = now[i];
+    if (!prev) return cur ?? null;
+    if (!cur) return prev;
+    if (compsDiffer(prev, cur, i === n - 1)) return cur;
+    if (cur.kind === "absent") return null;
+  }
+  return null;
+}
+
 /** The deepest floor that contains `file`, so a linked worktree's git dir still has a chain. */
 function repoFloor(repoRoot: string, dirs: GitDirs, file: string): string {
   const floors = [repoRoot, dirname(dirs.gitDir), dirname(dirs.commonDir)];
@@ -225,19 +304,9 @@ function repoFloor(repoRoot: string, dirs: GitDirs, file: string): string {
   return inside[0] ?? dirname(file);
 }
 
-/** From the floor exclusive, down to `file`, stopping at the first absence (R30, R49). */
+/** From the floor exclusive, down to `file`, through links, stopping at the first absence (R30, R49, R55). */
 function recordRepoChain(floor: string, file: string): ResolutionComp[] {
-  const rel = relative(floor, file);
-  const segs = rel === "" || rel.startsWith("..") || isAbsolute(rel) ? [] : rel.split(/[\\/]/).filter((s) => s !== "");
-  const chain: ResolutionComp[] = [];
-  let cur = floor;
-  for (const seg of segs) {
-    cur = join(cur, seg);
-    const c = resolutionComp(cur);
-    chain.push(c);
-    if (c.kind === "absent") break;
-  }
-  return chain;
+  return routeChain(floor, file, false);
 }
 
 /**
@@ -250,22 +319,7 @@ function recordRepoChain(floor: string, file: string): ResolutionComp[] {
  * R37. This does not close it.
  */
 function repositoryResolutionDiff(floor: string, file: string, base: ResolutionComp[] | undefined): ResolutionComp | null {
-  const rel = relative(floor, file);
-  const segs = rel === "" || rel.startsWith("..") || isAbsolute(rel) ? [] : rel.split(/[\\/]/).filter((s) => s !== "");
-  let cur = floor;
-  for (let i = 0; i < segs.length; i++) {
-    cur = join(cur, segs[i]!);
-    const now = resolutionComp(cur);
-    const prev = base?.[i];
-    if (!prev) return now;
-    const final = i === segs.length - 1;
-    const nlinkOk = !final || prev.kind !== "file" || now.kind !== "file" || prev.nlink === now.nlink;
-    if (prev.kind !== now.kind || prev.target !== now.target || prev.dev !== now.dev || prev.ino !== now.ino || !nlinkOk) {
-      return now;
-    }
-    if (now.kind === "absent") return null;
-  }
-  return null;
+  return firstDiff(base, recordRepoChain(floor, file));
 }
 
 export interface ConfigChange {
@@ -477,8 +531,8 @@ function restoreNewFile(repoRoot: string, dirs: GitDirs, path: string, bytes: Bu
 
 export class ConfigWatch {
   private snapshot: Map<string, FileState | null> | null = null;
-  /** R49: resolution from the repo root, exclusive, recorded when the window opened. */
-  private resolutionBase: Map<string, ResolutionComp[]> | null = null;
+  /** R49/R57: resolution from the repo root, exclusive, recorded once at the loop's base. */
+  private loopChains: Map<string, ResolutionComp[]> | null = null;
   /** Kind of each watched tree root when the window opened. An absence stays an absence (R45). */
   private treeAtBase = new Map<string, PathIdentity["kind"]>();
   private stage = "";
@@ -505,17 +559,47 @@ export class ConfigWatch {
     return [...all].sort();
   }
 
-  /** Open a window: read every watched file's bytes. File I/O only. */
-  begin(stage: string): void {
-    this.stage = stage;
-    this.treeAtBase = new Map(watchedLocations(this.dirs).trees.map((t) => [t, identify(t).kind]));
-    const snap = new Map<string, FileState | null>();
+  /**
+   * The loop's base, once (R57). A later call does not re-read. `begin` gates
+   * its reads against this and must not be the thing that defines it.
+   */
+  captureBase(): void {
+    if (this.loopChains !== null) return;
     const chains = new Map<string, ResolutionComp[]>();
     for (const f of this.currentFiles()) {
       chains.set(f, recordRepoChain(repoFloor(this.repoRoot, this.dirs, f), f));
-      snap.set(f, readState(f, undefined, true));
     }
-    this.resolutionBase = chains;
+    this.loopChains = chains;
+  }
+
+  /** Open a window. Bytes are read only when the route still matches the loop's base (R57). */
+  begin(stage: string): void {
+    this.stage = stage;
+    this.treeAtBase = new Map(watchedLocations(this.dirs).trees.map((t) => [t, identify(t).kind]));
+    this.captureBase();
+    const snap = new Map<string, FileState | null>();
+    for (const f of this.currentFiles()) {
+      const floor = repoFloor(this.repoRoot, this.dirs, f);
+      const diff = repositoryResolutionDiff(floor, f, this.loopChains!.get(f));
+      if (diff) {
+        const id = identify(f);
+        if (id.kind === "symlink") {
+          snap.set(f, {
+            kind: "symlink",
+            bytes: null,
+            mode: id.mode,
+            nlink: id.nlink,
+            ino: id.ino,
+            dev: id.dev,
+            target: id.target,
+            unreadIdentity: false,
+          });
+        } else if (id.kind === "file") snap.set(f, fileState(id, null, true));
+        else snap.set(f, null);
+      } else {
+        snap.set(f, readState(f, undefined, true));
+      }
+    }
     this.snapshot = snap;
   }
 
@@ -555,8 +639,7 @@ export class ConfigWatch {
       );
     }
     this.snapshot = null;
-    const chains = this.resolutionBase;
-    this.resolutionBase = null;
+    const chains = this.loopChains;
 
     const changes: ConfigChange[] = [];
     const unrestored: string[] = [];
@@ -780,29 +863,9 @@ export class MachineConfigWatch {
     return dirname(file);
   }
 
-  /** Anchor included, then each component down to `file`. */
-  private componentPaths(file: string): string[] {
-    const anchor = this.anchorOf(file);
-    const rel = relative(anchor, file);
-    const segs = rel === "" || rel.startsWith("..") || isAbsolute(rel) ? [] : rel.split(/[\\/]/).filter((s) => s !== "");
-    const paths = [anchor];
-    let cur = anchor;
-    for (const seg of segs) {
-      cur = join(cur, seg);
-      paths.push(cur);
-    }
-    return paths;
-  }
-
-  /** The whole resolution, continuing through links, stopping at the first absence. */
+  /** The whole resolution, through every link, including a final link's target (R55). */
   private recordChain(file: string): ResolutionComp[] {
-    const chain: ResolutionComp[] = [];
-    for (const p of this.componentPaths(file)) {
-      const c = resolutionComp(p);
-      chain.push(c);
-      if (c.kind === "absent") break;
-    }
-    return chain;
+    return routeChain(this.anchorOf(file), file, true);
   }
 
   /**
@@ -816,36 +879,20 @@ export class MachineConfigWatch {
    * race as R37. This does not close it.
    */
   private resolutionMismatch(base: MachineSnap, file: string): ResolutionComp | undefined {
-    const paths = this.componentPaths(file);
-    for (let i = 0; i < paths.length; i++) {
-      const now = resolutionComp(paths[i]!);
-      const prev = base.chain[i];
-      if (!prev) return now;
-      const final = i === paths.length - 1;
-      const nlinkOk = !final || prev.kind !== "file" || now.kind !== "file" || prev.nlink === now.nlink;
-      if (prev.kind !== now.kind || prev.target !== now.target || prev.dev !== now.dev || prev.ino !== now.ino || !nlinkOk) {
-        return now;
-      }
-      if (now.kind === "absent") return undefined;
-    }
-    return undefined;
+    return firstDiff(base.chain, this.recordChain(file)) ?? undefined;
   }
 
-  /** The chain as far as the read gate. Stops on the first component that differs from `gate`, so a changed link is not followed. */
+  /** The chain as far as the read gate. Stops on the first component that differs from `gate`. */
   private chainUntil(gate: MachineSnap, file: string): ResolutionComp[] {
-    const paths = this.componentPaths(file);
+    const now = this.recordChain(file);
     const chain: ResolutionComp[] = [];
-    for (let i = 0; i < paths.length; i++) {
-      const now = resolutionComp(paths[i]!);
-      chain.push(now);
+    const n = Math.max(gate.chain.length, now.length);
+    for (let i = 0; i < now.length; i++) {
+      const cur = now[i]!;
+      chain.push(cur);
       const prev = gate.chain[i];
-      if (!prev) return chain;
-      const final = i === paths.length - 1;
-      const nlinkOk = !final || prev.kind !== "file" || now.kind !== "file" || prev.nlink === now.nlink;
-      if (prev.kind !== now.kind || prev.target !== now.target || prev.dev !== now.dev || prev.ino !== now.ino || !nlinkOk) {
-        return chain;
-      }
-      if (now.kind === "absent") return chain;
+      if (!prev || compsDiffer(prev, cur, i === n - 1)) return chain;
+      if (cur.kind === "absent") return chain;
     }
     return chain;
   }
@@ -977,7 +1024,12 @@ export class MachineConfigWatch {
       if (why === "bytes") {
         out.push({ stage: this.stage, scope: p.scope, path: p.path, before: opened.hash, after: end.hash });
       } else if (why) {
-        out.push(this.mismatchFinding(opened, why, p));
+        const finding = this.mismatchFinding(opened, why, p);
+        // "Not read" is only true on the gate path, which left the hash unread (R59).
+        if (end.hash !== "unread") {
+          finding.after = finding.after.replace(/; not read through$/, "").replace(/; not read$/, "");
+        }
+        out.push(finding);
       }
     }
     return out;

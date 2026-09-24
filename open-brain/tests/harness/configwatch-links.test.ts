@@ -400,6 +400,10 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     writeFileSync(env.GIT_CONFIG_SYSTEM, "");
     const proceeded = await runLoop(loopConfig({ env }));
     expect(proceeded.failure, proceeded.failure?.reason).toBeNull();
+    const note = proceeded.findings.find((f) => f.includes(join(xdg, "git")) && f.includes("link at base"));
+    expect(note, JSON.stringify(proceeded.findings)).toBeDefined();
+    expect(note).toContain("type symlink");
+    expect(note).toContain(`readlink ${dot}`);
   });
 
   it("R44: a machine-config link planted after base is not read through on the next stage", () => {
@@ -769,5 +773,187 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     symlinkSync(plantedVictim, planted);
     expect(readFileSync(join(plantedVictim, "canary.txt"), "utf-8")).toBe("PLANT");
     expect(namesOf(plantedVictim)).toEqual(["canary.txt"]);
+  });
+
+  /**
+   * R55. The final component is a link at base (`~/.gitconfig` → `dot/gitconfig`).
+   * Red at f9a1aa8 on Linux: the chain held the link and snap read the swapped target.
+   * Turns red by reverting `routeChain` so a final link is not followed (A4's `componentPaths`).
+   */
+  it.skipIf(isWin)("R55 CONTROL: the base link's target edited in place is read", () => {
+    const home = join(tmp.dir, "r55-ctl-home");
+    const dot = join(home, "dot");
+    mkdirSync(dot, { recursive: true });
+    const target = join(dot, "gitconfig");
+    writeFileSync(target, "[user]\n\tname = base\n");
+    const cfg = join(home, ".gitconfig");
+    symlinkSync(join("dot", "gitconfig"), cfg);
+    expect(lstatSync(cfg).isSymbolicLink(), "plant: .gitconfig is a symlink").toBe(true);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const edited = "[user]\n\tname = dotfiles-edited-in-place\n";
+    writeFileSync(target, edited);
+    const hash = createHash("sha256").update(edited).digest("hex").slice(0, 16);
+    const found = watch.compare();
+    expect(JSON.stringify(found), JSON.stringify(found)).toContain(hash);
+    expect(readFileSync(target, "utf-8")).toBe(edited);
+  });
+
+  it.skipIf(isWin)("R55: the base link's target replaced by a hard link is not read", () => {
+    const home = join(tmp.dir, "r55-h-home");
+    const dot = join(home, "dot");
+    mkdirSync(dot, { recursive: true });
+    const target = join(dot, "gitconfig");
+    writeFileSync(target, "[user]\n\tname = base\n");
+    const cfg = join(home, ".gitconfig");
+    symlinkSync(join("dot", "gitconfig"), cfg);
+    expect(lstatSync(cfg).isSymbolicLink(), "plant: .gitconfig is a symlink").toBe(true);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const victim = join(tmp.dir, "r55-h-victim");
+    const bytes = Buffer.from("[user]\n\tname = VICTIM-R55-H\n");
+    writeFileSync(victim, bytes);
+    const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    unlinkSync(target);
+    linkSync(victim, target);
+    expect(lstatSync(target).nlink, "plant: target nlink 2").toBe(2);
+    const dev = watch.compare();
+    watch.begin("qa");
+    writeFileSync(victim, "[user]\n\tname = VICTIM-R55-H-QA\n");
+    const qaHash = createHash("sha256").update(readFileSync(victim)).digest("hex").slice(0, 16);
+    const qa = watch.compare();
+    const blob = JSON.stringify([...dev, ...qa]);
+    expect(blob, blob).not.toContain(victimHash);
+    expect(blob, blob).not.toContain(qaHash);
+    expect(blob).toContain("not read");
+  });
+
+  it.skipIf(isWin)("R55: the base link's target directory replaced by a symlink is not read", () => {
+    const home = join(tmp.dir, "r55-j-home");
+    const dot = join(home, "dot");
+    mkdirSync(dot, { recursive: true });
+    writeFileSync(join(dot, "gitconfig"), "[user]\n\tname = base\n");
+    const cfg = join(home, ".gitconfig");
+    symlinkSync(join("dot", "gitconfig"), cfg);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const victim = join(tmp.dir, "r55-j-victim");
+    mkdirSync(victim);
+    const bytes = Buffer.from("[user]\n\tname = VICTIM-R55-J\n");
+    writeFileSync(join(victim, "gitconfig"), bytes);
+    const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    renameSync(dot, `${dot}-aside`);
+    symlinkSync(victim, dot);
+    expect(lstatSync(dot).isSymbolicLink(), "plant: dot is a symlink").toBe(true);
+    const blob = JSON.stringify(watch.compare());
+    expect(blob, blob).not.toContain(victimHash);
+    expect(blob).toContain("not read");
+  });
+
+  it.skipIf(isWin)("R55: the base link's target replaced by a new file is not read", () => {
+    const home = join(tmp.dir, "r55-r-home");
+    const dot = join(home, "dot");
+    mkdirSync(dot, { recursive: true });
+    const target = join(dot, "gitconfig");
+    writeFileSync(target, "[user]\n\tname = base\n");
+    const cfg = join(home, ".gitconfig");
+    symlinkSync(join("dot", "gitconfig"), cfg);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const nb = "[user]\n\tname = NEW-FILE-R55\n";
+    writeFileSync(`${target}-new`, nb);
+    renameSync(`${target}-new`, target);
+    const hash = createHash("sha256").update(nb).digest("hex").slice(0, 16);
+    const blob = JSON.stringify(watch.compare());
+    expect(blob, blob).not.toContain(hash);
+    expect(blob).toContain("not read");
+  });
+
+  /**
+   * R57. The second stage's begin must not hash a repository file whose route
+   * differs from the loop's base. Red at f9a1aa8: `begin` called `readState`
+   * with no gate. Turns red by reading inside `begin` whenever the route differs.
+   */
+  it("R57: a later stage does not read a repository file whose route differs from the loop base", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const watch = new ConfigWatch(dirs);
+    watch.captureBase();
+    watch.begin("developer");
+    watch.closeAndRestore();
+    const config = join(dirs.commonDir, "config");
+    const victim = join(tmp.dir, "r57-victim");
+    const bytes = Buffer.from("# VICTIM-R57\n");
+    writeFileSync(victim, bytes);
+    const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    unlinkSync(config);
+    linkSync(victim, config);
+    expect(lstatSync(config).nlink, "plant: config nlink 2").toBe(2);
+    watch.begin("qa");
+    writeFileSync(victim, "# VICTIM-R57-QA\n");
+    const qaHash = createHash("sha256").update(readFileSync(victim)).digest("hex").slice(0, 16);
+    const v = watch.closeAndRestore();
+    const blob = JSON.stringify(v);
+    expect(blob, blob).not.toContain(victimHash);
+    expect(blob, blob).not.toContain(qaHash);
+    expect(blob).toContain("not read");
+    expect(readFileSync(victim, "utf-8")).toContain("VICTIM-R57-QA");
+  });
+
+  it.skipIf(isWin)("R58 (b)3: a symlink planted on a hook entry does not change the victim, and the modes differ", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const hook = join(dirs.commonDir, "hooks", "post-commit");
+    writeFileSync(hook, "#!/bin/sh\nexit 0\n");
+    chmodSync(hook, 0o755);
+    const snapMode = lstatSync(hook).mode & 0o777;
+    const victim = join(tmp.dir, "r58-b3-victim");
+    writeFileSync(victim, "victim");
+    chmodSync(victim, 0o644);
+    const victimMode = lstatSync(victim).mode & 0o777;
+    expect(snapMode, `snapshot ${snapMode.toString(8)} victim ${victimMode.toString(8)}`).not.toBe(victimMode);
+
+    const probe = join(tmp.dir, "r58-b3-probe");
+    symlinkSync(victim, probe);
+    writeFileSync(probe, "through-link");
+    expect(readFileSync(victim, "utf-8"), "control: a write through the link changes the victim").toBe("through-link");
+    writeFileSync(victim, "victim");
+
+    const watch = new ConfigWatch(dirs);
+    watch.begin("developer");
+    unlinkSync(hook);
+    symlinkSync(victim, hook);
+    expect(lstatSync(hook).isSymbolicLink(), "plant: hook entry is a symlink").toBe(true);
+    expect(readFileSync(victim, "utf-8"), "control: the plant itself leaves the victim").toBe("victim");
+    watch.closeAndRestore();
+    expect(lstatSync(victim).mode & 0o777).toBe(victimMode);
+    expect(readFileSync(victim, "utf-8")).toBe("victim");
+  });
+
+  it.skipIf(isWin)("R58 R29: a link to a mode-000 victim is not read", () => {
+    const home = join(tmp.dir, "r58-r29-home");
+    mkdirSync(home);
+    const victim = join(tmp.dir, "r58-r29-victim");
+    const bytes = Buffer.from("[user]\n\tname = MODE0-LINK-SECRET\n");
+    writeFileSync(victim, bytes);
+    chmodSync(victim, 0o000);
+    const cfg = join(home, ".gitconfig");
+    symlinkSync(victim, cfg);
+    expect(lstatSync(cfg).isSymbolicLink(), "plant: .gitconfig is a link to the mode-000 victim").toBe(true);
+    try {
+      let code = "";
+      try {
+        readFileSync(cfg);
+      } catch (err) {
+        code = (err as NodeJS.ErrnoException).code ?? "";
+      }
+      if (code !== "EACCES") throw new Error(`read through the link did not throw EACCES (code ${code || "none"})`);
+      const hash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+      const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+      watch.begin("developer");
+      const blob = JSON.stringify(watch.compare());
+      expect(blob).not.toContain(hash);
+      expect(blob).not.toContain("MODE0-LINK-SECRET");
+    } finally {
+      chmodSync(victim, 0o644);
+    }
   });
 });

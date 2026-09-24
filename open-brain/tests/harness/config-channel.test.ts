@@ -312,6 +312,16 @@ describe("candidate A — the config/hooks channel", { timeout: 120_000 }, () =>
       rawGit(repo.root, ["add", "a.txt"]);
       expect(markerLines(marker).some((l) => l.startsWith("local:"))).toBe(true);
     });
+
+    it("R59: a config-only refusal does not say paths were reverted when none were", async () => {
+      const r = await runLoop({
+        ...withDeveloper((ctx) => {
+          appendFileSync(join(ctx.repoRoot, ".git/config"), "\n# r59-config-only\n");
+        }),
+      });
+      expect(r.failure?.code).toBe("stage-changed-config");
+      expect(r.failure?.reason ?? "", r.failure?.reason).not.toContain("The offending paths were reverted.");
+    });
   });
 
   /* --------------------------------------------------------------------- *
