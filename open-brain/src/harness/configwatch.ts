@@ -964,7 +964,7 @@ export class MachineConfigWatch {
       for (const c of this.recordChain(p.path)) {
         if (c.kind !== "symlink") continue;
         notes.push(
-          `machine config ${p.scope} ${c.path} is a link at base, type ${c.kind}, readlink ${c.target}; read through that target, not refused.`,
+          `machine config ${p.scope} ${c.path} is a link at base; read through that target, not refused.`,
         );
       }
     }
