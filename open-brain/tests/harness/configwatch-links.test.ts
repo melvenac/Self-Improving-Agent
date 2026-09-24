@@ -1075,7 +1075,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(blob, blob).not.toContain(victimHash);
     expect(blob).toContain("not read");
     expect(blob).toContain(target);
-    expect(blob).toContain(victim);
+    expect(blob).toContain("nlink 2");
   });
 
   it.skipIf(isWin)("R61: a link that does not resolve is reported unwatched and is not claimed as read", () => {
