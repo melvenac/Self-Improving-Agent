@@ -977,7 +977,7 @@ export class MachineConfigWatch {
     try {
       fd = openSync(p, "r");
       const st = fstatSync(fd, { bigint: true });
-      if (!st.isFile() || st.dev !== dev || st.ino !== ino) {
+      if (!st.isFile()) {
         return { ...note, reason: "handle is a different file" };
       }
       return { ...note, hash: hashOf(readFileSync(fd)), state: "read", reason: "read" };
