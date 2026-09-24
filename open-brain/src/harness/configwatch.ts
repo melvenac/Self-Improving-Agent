@@ -104,13 +104,16 @@ export interface PathIdentity {
   nlink: number;
   ino: bigint | null;
   dev: bigint | null;
+  /** Byte length and mtime. Attribution of an unread file uses these (R64). */
+  size: bigint;
+  mtimeNs: bigint;
   target: string | null;
 }
 
 export function identify(p: string): PathIdentity {
   try {
     const st = lstatSync(p, { bigint: true });
-    const base = { mode: Number(st.mode & 0o777n), nlink: Number(st.nlink), ino: st.ino, dev: st.dev, target: null as string | null };
+    const base = { mode: Number(st.mode & 0o777n), nlink: Number(st.nlink), ino: st.ino, dev: st.dev, size: st.size, mtimeNs: st.mtimeNs, target: null as string | null };
     if (st.isSymbolicLink()) return { ...base, kind: "symlink", target: readlinkSync(p) };
     if (st.isFile()) return { ...base, kind: "file" };
     if (st.isDirectory()) return { ...base, kind: "dir" };
@@ -118,7 +121,7 @@ export function identify(p: string): PathIdentity {
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code;
     if (code === "ENOENT" || code === "ENOTDIR") {
-      return { kind: "absent", mode: 0, nlink: 0, ino: null, dev: null, target: null };
+      return { kind: "absent", mode: 0, nlink: 0, ino: null, dev: null, size: 0n, mtimeNs: 0n, target: null };
     }
     throw err;
   }
@@ -390,6 +393,8 @@ interface FileState {
   nlink: number;
   ino: bigint | null;
   dev: bigint | null;
+  size: bigint;
+  mtimeNs: bigint;
   target: string | null;
   /** Set when dev, ino or nlink disagreed with the baseline, so the bytes were not read (R43). */
   unreadIdentity: boolean;
@@ -402,6 +407,8 @@ const fileState = (id: PathIdentity, bytes: Buffer | null, unreadIdentity: boole
   nlink: id.nlink,
   ino: id.ino,
   dev: id.dev,
+  size: id.size,
+  mtimeNs: id.mtimeNs,
   target: null,
   unreadIdentity,
 });
@@ -417,7 +424,7 @@ const fileState = (id: PathIdentity, bytes: Buffer | null, unreadIdentity: boole
 const readState = (p: string, baseline?: FileState | null, preflight = false): FileState | null => {
   const id = identify(p);
   if (id.kind === "symlink") {
-    return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, target: id.target, unreadIdentity: false };
+    return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false };
   }
   if (id.kind !== "file") return null;
   const hadFile = baseline?.kind === "file";
@@ -433,7 +440,7 @@ const changed = (a: FileState | null, b: FileState | null): boolean => {
   if (a.kind !== b.kind) return true;
   if (a.kind === "symlink" || b.kind === "symlink") return a.target !== b.target;
   if (a.unreadIdentity || b.unreadIdentity) {
-    return a.kind !== b.kind || a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink;
+    return a.kind !== b.kind || a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink || a.size !== b.size || a.mtimeNs !== b.mtimeNs;
   }
   if (a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink) return true;
   return a.mode !== b.mode || !a.bytes!.equals(b.bytes!);
@@ -613,6 +620,8 @@ export class ConfigWatch {
             nlink: id.nlink,
             ino: id.ino,
             dev: id.dev,
+            size: id.size,
+            mtimeNs: id.mtimeNs,
             target: id.target,
             unreadIdentity: false,
           });
@@ -635,7 +644,7 @@ export class ConfigWatch {
     if (diff) {
       const id = identify(path);
       if (id.kind === "symlink") {
-        return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, target: id.target, unreadIdentity: false };
+        return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false };
       }
       if (id.kind !== "file") return null;
       return fileState(id, null, true);
@@ -714,13 +723,7 @@ export class ConfigWatch {
         assertNoAncestor(this.repoRoot, this.dirs, path);
         b = before.has(path) ? before.get(path)! : null;
         a = this.readForCompare(path, b, chains);
-        const baseChain = chains?.get(path);
-        const baseLast = baseChain?.[baseChain.length - 1];
-        const drifted =
-          a?.unreadIdentity === true &&
-          baseLast?.kind === "file" &&
-          (baseLast.dev !== a.dev || baseLast.ino !== a.ino || baseLast.nlink !== a.nlink);
-        if (!changed(b, a) && !drifted) continue;
+        if (!changed(b, a)) continue;
         changes.push({
           path,
           kind: b === null ? "created" : a === null ? "deleted" : "modified",
