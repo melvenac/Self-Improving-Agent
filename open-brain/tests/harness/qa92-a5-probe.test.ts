@@ -214,6 +214,54 @@ describe("QA 92 probe (not for merge): R55 route siblings on POSIX", { timeout: 
     expect(qa.length).toBeGreaterThan(0);
   });
 
+  /**
+   * v2 (added after the first A5 run, win32 finding r35anchorEdit): routeChain builds `rest` cumulatively
+   * (relative(paths[i], p) for every later p) and joins them all, so a link with TWO OR MORE components after it
+   * yields a doubled path (<dest>/git/git/config). Two Linux shapes of that mechanism, absolute targets only.
+   */
+  it.skipIf(isWin)("ANCHOR-EDIT: $XDG_CONFIG_HOME itself a symlink at base (absolute); git/config edited in place is hashed", () => {
+    const realXdg = join(tmp.dir, "anc-real-xdg");
+    mkdirSync(join(realXdg, "git"), { recursive: true });
+    const target = join(realXdg, "git", "config");
+    writeFileSync(target, "[user]\n\tname = anchor-base\n");
+    const xdg = join(tmp.dir, "anc-xdg");
+    symlinkSync(realXdg, xdg);
+    const cfg = join(xdg, "git", "config");
+    expect(lstatSync(xdg).isSymbolicLink(), "plant: $XDG_CONFIG_HOME is a symlink").toBe(true);
+    expect(readFileSync(cfg, "utf-8")).toBe("[user]\n\tname = anchor-base\n");
+    const watch = new MachineConfigWatch([{ scope: "xdg", path: cfg, source: "qa92" }]);
+    watch.begin("developer");
+    const edited = "[user]\n\tname = anchor-edited\n";
+    writeFileSync(target, edited);
+    const found = watch.compare();
+    const route = ((watch as any).recordChain(cfg) as Array<{ kind: string; path: string }>).slice(-3).map((c) => `${c.kind} ${c.path}`);
+    say("QA92-ANCHOR-EDIT", { expectHash: h16(edited), inRecord: JSON.stringify(found).includes(h16(edited)), found, routeTail: route });
+    expect(JSON.stringify(found)).toContain(h16(edited));
+  });
+
+  it.skipIf(isWin)("VIADIR-EDIT: ~/.gitconfig -> an absolute target through a symlinked directory with two components after it; an in-place edit is hashed", () => {
+    const real = join(tmp.dir, "via-real");
+    mkdirSync(join(real, "sub"), { recursive: true });
+    const target = join(real, "sub", "gitconfig");
+    writeFileSync(target, "[user]\n\tname = via-base\n");
+    const lnk = join(tmp.dir, "via-lnk");
+    symlinkSync(real, lnk);
+    const home = join(tmp.dir, "via-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    symlinkSync(join(lnk, "sub", "gitconfig"), cfg);
+    expect(lstatSync(cfg).isSymbolicLink() && lstatSync(lnk).isSymbolicLink(), "plant: two links").toBe(true);
+    expect(readFileSync(cfg, "utf-8")).toBe("[user]\n\tname = via-base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "qa92" }]);
+    watch.begin("developer");
+    const edited = "[user]\n\tname = via-edited\n";
+    writeFileSync(target, edited);
+    const found = watch.compare();
+    const route = ((watch as any).recordChain(cfg) as Array<{ kind: string; path: string }>).slice(-3).map((c) => `${c.kind} ${c.path}`);
+    say("QA92-VIADIR-EDIT", { expectHash: h16(edited), inRecord: JSON.stringify(found).includes(h16(edited)), found, routeTail: route });
+    expect(JSON.stringify(found)).toContain(h16(edited));
+  });
+
   /** CA-4f's own probe shape through runLoop: a role appends to ~/.gitconfig, which is a stow link at base. */
   it.skipIf(isWin)("STOW-LOOP: CA-4f through runLoop: the developer appends through a stow link at base; the write is reported with both hashes", async () => {
     const { home, target, cfg } = stowGlobal("sloop");
