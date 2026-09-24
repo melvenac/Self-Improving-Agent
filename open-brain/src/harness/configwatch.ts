@@ -277,10 +277,9 @@ function routeChain(
       const key = `${c.dev}:${c.ino}`;
       if (c.dev !== null && visited.has(key)) break;
       if (c.dev !== null) visited.add(key);
-      const restSegs: string[] = [];
-      for (let j = i + 1; j < paths.length; j++) restSegs.push(relative(paths[j - 1]!, paths[j]!));
+      const rest = paths.slice(i + 1).map((p) => relative(paths[i]!, p));
       const { anchor: nextAnchor, dest } = linkTargetAnchor(paths[i]!, c.target);
-      const followed = restSegs.length === 0 ? dest : join(dest, ...restSegs);
+      const followed = rest.length === 0 ? dest : join(dest, ...rest);
       chain.push(...routeChain(nextAnchor, followed, true, depth + 1, visited));
       break;
     }
