@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 114,
+  "revision": 115,
   "project": {
     "name": "self-improving-agent"
   },
@@ -578,6 +578,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Opened record session 90 (planner), 2026-09-23, from D-040 on Aaron's word 'ci should run autonoumously'. Today ci.yml triggers on push to master, pull_request and workflow_dispatch only, so a working branch without a PR runs no CI unless someone dispatches it. D-040 part 1 makes dispatching standing in the meantime; this task removes the need for it. For the developer seat to decide HOW, with the planner ruling only on the result. Two things to settle there: (a) a branch with an open PR would run twice (push plus pull_request), so choose a de-duplication (e.g. a concurrency group, or push on qa/** only with PRs covering loop/**) rather than paying double; (b) docs/* and chore/* pushes touch no source, so paths-ignore may be right for them. ACCEPTANCE: a push to a fresh qa/* branch with no PR starts a CI run with no manual act, observed by run id; a push to master still runs; a PR still runs; and no branch runs twice for one push. ci.yml is outside D-032's allowlist, so the PR is Aaron's to merge. Sequencing: not slice-three scope. It can ride with B on the Claude developer seat if the planner scopes it in, otherwise it waits for the slice to close."
+    },
+    {
+      "id": "T-179",
+      "title": "Replace /end with a small 'store lessons' step: each session's lessons stored with the key that would have caught them (T-170); the record is written as work happens, and the rest of /end is cut",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 90,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened record session 90 (planner), 2026-09-24, on Aaron's word in the planner session. He asked: 'We have not been using end command to close out session work. I'm wondering if we need it or if we can reduce the scope of what end does.' He then answered 'yes' to recording this as a task after slice three, adding, verbatim: 'the plan is to migrate all other projects to the new sia convention so I'm not too concerned about the other projects as you stated.' So compatibility with other projects' /end is NOT a constraint; they will migrate to SIA's convention. THE PLANNER'S READING of /end (.claude/commands/end.md, 3076 words, A1-A14): (1) the RECORD half (A7b: set_handoff, add_decision, set_objective through ob_state) is already done by seats as work happens, which is better than once at the end because a dead session loses nothing; (2) A2-A7 hand-edit the prose views, only for projects without state.json; (3) the session summary, auto-feedback and logging run in the SessionEnd hook without /end; (4) A14's self-rating fed the maturity lifecycle cut in Loop 10; (5) A9's drift audit and A13's Obsidian summary duplicate /sync and the hook; (6) A11-A12, storing lessons in the knowledge store, is the ONE step nothing else does, and without it the recall trigger (G-039, V-062) has nothing new to fire on. /end is also blocked today by T-163 (its end_session overwrites the shared last_session slot). SCOPE: a replacement command that stores each lesson with the deterministic key T-170 requires (a command pattern, path or error string); the record write is dropped from it (seats write the record as they go); the other steps are cut or left to the hook. It must not write last_session until T-163 lands. SEQUENCING: after slice three closes (D-033/D-036), so candidate A is not interrupted. Relates to T-170, T-163 and T-044."
     }
   ],
   "verified": [

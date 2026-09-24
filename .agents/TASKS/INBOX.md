@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 114 by open-brain v0.44.1 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 115 by open-brain v0.44.1 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -58,6 +58,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-175** `state import` seeds SIA's own history (V-001..V-005, G-001..G-006) into EVERY project's record. Delete the seeds from the importer
 - [ ] **T-176** gitnexus-index measures distance in one direction only: an index on a different line of history reads as current
 - [ ] **T-178** ci.yml runs on push to seat working branches (loop/*, qa/*, docs/*, chore/*), per D-040, so no seat has to dispatch CI by hand
+- [ ] **T-179** Replace /end with a small 'store lessons' step: each session's lessons stored with the key that would have caught them (T-170); the record is written as work happens, and the rest of /end is cut
 
 ## P2
 
