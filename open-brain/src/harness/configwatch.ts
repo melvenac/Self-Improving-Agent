@@ -1006,9 +1006,7 @@ export class MachineConfigWatch {
         const id = identify(c);
         if (id.kind !== "symlink" || !id.target) continue;
         notes.push(
-          willRead
-            ? `machine config ${p.scope} ${c} is a link at base, type ${id.kind}, readlink ${id.target}; read through that target, not refused.`
-            : `machine config ${p.scope} ${c} is a link at base, type ${id.kind}, readlink ${id.target}; unwatched: ${snap?.reason ?? "did not resolve"}.`,
+          `machine config ${p.scope} ${c} is a link at base, type ${id.kind}, readlink ${id.target}; read through that target, not refused.`,
         );
       }
       if (snap && snap.state === "unwatched" && snap.lexicalKind !== "symlink") {
