@@ -10,7 +10,7 @@ Not in A5: D-A2-7, D-A5, and the R37 race. The compare-then-open window is the s
 
 **Red:** the new R55 tests are `skipIf(isWin)`. This machine cannot plant a file symlink (`EPERM`). They are red at `f9a1aa8` on Linux (QA probe `qa89-a4-probe.test.ts` A4-1, CI run `35928008495`). Mutant that turns them red: stop following a final link in `routeChain` (A4 `componentPaths`).
 
-**Green here:** `configwatch-links.test.ts` — the R55 cases skipped, the rest passed. Linux green is the CI run named below.
+**Green here:** `configwatch-links.test.ts` — the R55 cases skipped, the rest passed. Linux result is CI run `35947532386` on `70ec18c` (dispatched, not yet finished at handoff).
 
 ## R57 — repository `begin` against the loop base
 
@@ -47,3 +47,5 @@ Mutant for (b)3: drop the mode assertion (or plant the symlink where the snapsho
 ## Targeted run
 
 `open-brain/`, `npx vitest run tests/harness/configwatch-links.test.ts tests/harness/config-channel.test.ts`. Exit 0. Test Files 2 passed. Tests 57 passed, 14 skipped.
+
+Linux CI: workflow_dispatch run `35947532386` on `70ec18c`. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35947532386
