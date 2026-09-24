@@ -1038,7 +1038,7 @@ export class MachineConfigWatch {
         const finding = this.mismatchFinding(opened, why, p);
         // "Not read" is only true on the gate path, which left the hash unread (R59).
         if (end.hash !== "unread") {
-          finding.after = finding.after.replace(/; not read through$/, "").replace(/; not read$/, "");
+          finding.after = end.hash;
         }
         out.push(finding);
       }
