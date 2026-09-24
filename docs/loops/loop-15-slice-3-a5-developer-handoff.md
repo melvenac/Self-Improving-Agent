@@ -48,4 +48,8 @@ Mutant for (b)3: drop the mode assertion (or plant the symlink where the snapsho
 
 `open-brain/`, `npx vitest run tests/harness/configwatch-links.test.ts tests/harness/config-channel.test.ts`. Exit 0. Test Files 2 passed. Tests 57 passed, 14 skipped.
 
-Linux CI: workflow_dispatch run `35947532386` on `70ec18c`. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35947532386
+Linux CI on the implementation: run `35947532386` on `70ec18c` failed as above. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35947532386
+
+Red check: `loop/15-slice-3-a5-redcheck` `79af55f`, run `35948167777`. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35948167777
+
+Fix `63a7932` CI: run `35948192903`. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35948192903
