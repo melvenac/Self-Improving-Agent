@@ -968,16 +968,16 @@ export class MachineConfigWatch {
     if (gate && lexical.kind === "symlink" && gate.lexicalKind !== "symlink") {
       return { ...note, reason: "type change" };
     }
-    const same =
-      gate === null ||
-      (gate.resolvedPath !== null && gate.kind === kind && gate.dev === dev && gate.ino === ino && gate.nlink === nlink);
+    const sameObject = gate !== null && gate.kind === kind && gate.dev === dev && gate.ino === ino;
+    const singleName = kind === "file" && nlink === 1 && gate !== null && gate.resolvedPath === resolvedPath;
+    const same = gate === null || (gate.resolvedPath === resolvedPath && (sameObject || singleName));
     if (!same) return { ...note, reason: "different file" };
     if (kind !== "file") return { ...note, reason: "not a file" };
     let fd: number | null = null;
     try {
       fd = openSync(p, "r");
       const st = fstatSync(fd, { bigint: true });
-      if (!st.isFile() || st.dev !== dev || st.ino !== ino || Number(st.nlink) !== nlink) {
+      if (!st.isFile() || st.dev !== dev || st.ino !== ino) {
         return { ...note, reason: "handle is a different file" };
       }
       return { ...note, hash: hashOf(readFileSync(fd)), state: "read", reason: "read" };

@@ -875,7 +875,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(blob).toContain("not read");
   });
 
-  it.skipIf(isWin)("R55: the base link's target replaced by a new file is not read", () => {
+  it.skipIf(isWin)("R55: the base link's target replaced by a new file is read (D-042)", () => {
     const home = join(tmp.dir, "r55-r-home");
     const dot = join(home, "dot");
     mkdirSync(dot, { recursive: true });
@@ -890,8 +890,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     renameSync(`${target}-new`, target);
     const hash = createHash("sha256").update(nb).digest("hex").slice(0, 16);
     const blob = JSON.stringify(watch.compare());
-    expect(blob, blob).not.toContain(hash);
-    expect(blob).toContain("not read");
+    expect(blob, blob).toContain(hash);
   });
 
   /**
