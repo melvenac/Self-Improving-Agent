@@ -52,4 +52,8 @@ Linux CI on the implementation: run `35947532386` on `70ec18c` failed as above. 
 
 Red check: `loop/15-slice-3-a5-redcheck` `79af55f`, run `35948167777`. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35948167777
 
-Fix `63a7932` CI: run `35948192903`. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35948192903
+Fix `63a7932` CI: run `35948192903`, success. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35948192903
+
+Tip `5b3a0d1` CI: run `35948435287`, success, 1133 passed, 6 skipped, 0 failed. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35948435287
+
+Redcheck `35948167777` on `79af55f`: 5 failed | 1128 passed | 6 skipped. Failed: R55 hard link, R55 directory symlink, R55 new file, R57, R59. R55 CONTROL passed on A4 (the in-place edit was already read). R58 and R35 were not in the failure list.
