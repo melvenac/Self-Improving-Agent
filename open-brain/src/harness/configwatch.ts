@@ -1082,7 +1082,7 @@ export class MachineConfigWatch {
         out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
         continue;
       }
-      const typeChange = end.lexicalKind === "symlink" && base.lexicalKind !== "symlink";
+      const typeChange = false && end.lexicalKind === "symlink" && base.lexicalKind !== "symlink";
       const after = typeChange
         ? `type change: ${p.path} is a ${end.lexicalKind}${end.lexicalTarget ? ` target ${end.lexicalTarget}` : ""}; not read through`
         : end.reason === "handle is a different file"
