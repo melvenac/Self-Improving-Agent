@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 107,
+  "revision": 108,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2789,32 +2789,34 @@
     },
     {
       "seat": "planner",
-      "pick_up": "PLANNER SESSION 81 (Atlas) handing off to a FRESH planner (record session 90). Aaron is restarting VS Code, so EVERY seat rolls at once, 2026-09-23. STATE: CANDIDATE A4 is FROZEN at f9a1aa8 on origin/loop/15-slice-3-candidate-a4 (draft PR #130): R49-R52 plus R54 on A3 5010199, built by Grok 4.7 in Cursor, developer record session 88, which has finished. QA 89 HAS NOT STARTED. FIRST ACTIONS: (1) run /start. Then ask Aaron to start a FRESH Claude session in ~/Worktrees/sia-qa and, once it is up (ListAgents), send it a pointer: 'you are QA record session 89; run /start; read and follow docs/loops/loop-15-slice-3-dispatch-qa-a4.md on master'. That file is the complete dispatch, including the detach the QA tree needs first. (2) When QA asks for its full suite: A2A-Hub's local stack must still be STOPPED (it was stopped on Aaron's word; check that ports 3210/4000/5173 are free, or ask), no A2A-Hub seat should be running (after the restart none should be; if a fresh Relay appears, ask it to hold), and YOU stay idle. (3) On the verdict: if accepted, the merge is Aaron's; then B (G-042 repair plus E_t; G-042 now points at the worktree as well as load) and C (T-155) on the CLAUDE developer. If rejected: rule on the CLASS; a fresh Grok session builds A5 through A2A-Hub (room k57frxw0ptb8tadmqdwy0khhks8ey006 or a new one). The hub is v1.8.0 on tcm, with read receipts: GET /a2a/session/<id>/reads. (4) The A2A-Hub hold lives in A2A-Hub's record (rev 25) and binds its next Relay until the SIA planner lifts it. Tell a fresh Relay when SIA's suite runs are done.",
+      "pick_up": "PLANNER SESSION 90 (Atlas), 2026-09-23. A4 f9a1aa8 was REJECTED by QA 89 on A4-1: a link at the LAST position of a machine-config path whose target a role swaps is read, measured on Linux CI run 35928008495. The report is merged (PR #137, 3ecfa70). Rulings-12 (PR #138, 139f9fa) owns the cause: R49 defined the resolution by the link's text, not its object. R55 restates it as the object test (read only if opening the path reaches the base object by the base route), and R56-R59 answer the report's section 11. The A5 brief is docs/loops/loop-15-slice-3-a5-grok-brief.md. The objective is at rev 107. D-040 (rev 106, PR #136): seats dispatch CI on their own branches without asking; T-178 makes it automatic. WAITING ON AARON: the A5 dispatch is turn 14 in hub room k57frxw0ptb8tadmqdwy0khhks8ey006, posted 23:47:58Z, and it was still UNREAD by grok at 01:48Z. Aaron has not yet started the fresh Grok session (record 91). The paste text for him: 'You are the developer seat for Self-Improving-Agent, record session 91. The planner (atlas) has dispatched you through A2A-Hub. Read your instructions by running, from ~/Projects/A2A-Hub: HUB_URL=http://100.124.212.87:4000 node scripts/hub-talk.mjs --as grok --session k57frxw0ptb8tadmqdwy0khhks8ey006 --inbox. Read the output, then follow the brief it points to: docs/loops/loop-15-slice-3-a5-grok-brief.md on origin/master.' FIRST ACTIONS: (1) /start, then read the Step-Back artifact, PRD.md and README.md BEFORE any ruling; this seat skipped them at session 90 until Aaron asked. (2) Check /a2a/session/k57frxw0ptb8tadmqdwy0khhks8ey006/reads. If turn 14 is still unread by grok, ask Aaron to start Grok with the paste text above. (3) When Grok freezes A5: a fresh QA session (record 92) in ~/Worktrees/sia-qa, with a dispatch file like loop-15-slice-3-dispatch-qa-a4.md. QA should run its qa89-a4-probe.test.ts (branch qa/loop-15-slice-3-a4-probe, 9f58fbc) against A5 on Linux CI; A4 is the known positive. (4) The A2A-Hub hold (A2A-Hub record rev 25) still binds its next Relay: SIA's suite runs are NOT done, and A5 and QA 92 will each need a quiet machine.",
       "watch_out": [
-        "AFTER A VS CODE RESTART, CHECK YOUR OWN TRANSCRIPT EXISTS. On 2026-09-20 one relaunch of rolled seats wrote NO transcript for all three (G-044, T-161, cause unknown). Look for ~/.claude/projects/<slug>/<your-uuid>.jsonl growing. If it is absent, tell Aaron before doing work that depends on it (effort and model are read from it).",
-        "FOUR PLANNER ERRORS IN ONE FAMILY ON CA-15 (rulings-9, -10, -11): a ruling written from the case in front of it without reading back EVERY criteria row it touches. Before sending any ruling, list the rows it changes behaviour for, and say whether each still passes. R49 (a principle) and R54 (two baselines: the read gate at the loop base, attribution at the stage start) are the model.",
-        "A CURSOR SEAT IS NEVER WOKEN BY A HUB MESSAGE (T-160; A2A-Hub T-050 still open). Read receipts make its silence VISIBLE: /reads shows 'unread by grok since T'. Aaron nudges it in Cursor. Always --session, never --peer; run hub-talk only from ~/Projects/A2A-Hub (v1.8.0); never --inbox/--wait without reading the output.",
-        "FULL SUITES NEED A QUIET MACHINE (G-042), and possibly a particular tree: Grok's tree went red three times tonight, QA's tree was always green when idle. Delay your own listener with a sleep during any suite, and stop CI polling.",
+        "RECORD SESSION NUMBERS ARE NOT THE GREETING'S (T-164). Session 90's greeting said Session #6; QA 89's said 10. The sequence: planner 90, Grok 91, QA 92, then the next planner. Put the record number in every dispatch.",
+        "READ THE INTENT DOCUMENTS AT /start (the Step-Back artifact on claude.ai, not the vault copy; PRD.md; README.md). The memory entry saying so was loaded at session 90 and not acted on. /start does not name the reads, and T-167 is the structural fix.",
+        "FIVE PLANNER ERRORS IN ONE FAMILY ON CA-15 (rulings-9, -10, -11, and R49's lexical definition, owned in rulings-12). A principle defined by a list of what to record leaks at the list's edge. Define a rule by what it protects, and read back every row it touches before sending (rulings-12 has the table).",
+        "A CURSOR SEAT IS NEVER WOKEN BY A HUB MESSAGE (T-160; A2A-Hub T-050 still open). Read receipts make its silence VISIBLE: /reads shows 'unread by grok since T'. Aaron nudges it in Cursor. Always --session, never --peer; run hub-talk only from ~/Projects/A2A-Hub (v1.8.0); never --inbox/--wait without reading the output. A --wait-timeout 3600 in the background runs the full hour and exits 2 with the unread line.",
+        "FULL SUITES NEED A QUIET MACHINE (G-042). QA 89's idle run in the QA tree was clean (exit 0, 1121 passed); the developer tree's last run was heartbeat-only red, so the worktree is still a suspect (n=1 each). Other projects' sessions count too: at session 90 a '3d-printers' session was live, and Aaron kept it idle.",
         "stop_reason \"refusal\" is the API safety layer. Candidate A's link-handling work goes to Grok (T-177); nobody rephrases around it. B and C go to Claude.",
-        "D-038/D-039: Aaron speaks only to the planner; quote him verbatim with where and when; a permission stop in another seat's window cannot be cleared by relay. A2A-Hub's seats push their own branches (their D-005).",
-        "update_task, update_gap, set_objective and set_handoff REPLACE their field. Compose in a SCRIPT FILE, DRY-RUN FIRST, and verify byte for byte.",
-        "build-freshness fails after every docs commit in this tree; check `git diff --name-only <build> HEAD -- open-brain` before calling it stamp-only."
+        "D-038/D-039/D-040: Aaron speaks only to the planner; quote him verbatim with where and when; a permission stop in another seat's window cannot be cleared by relay. CI on a seat's own branch no longer needs asking (D-040), but master, merges, tags and workflow edits still do.",
+        "update_task, update_gap, set_objective and set_handoff REPLACE their field. Compose in a SCRIPT FILE, DRY-RUN FIRST, and verify byte for byte. Git Bash's /tmp and node's /tmp are different directories on this machine (AppData\\Local\\Temp vs C:\\tmp).",
+        "build-freshness fails after every docs commit in this tree; check `git diff --name-only <build> HEAD -- open-brain` before calling it stamp-only. /sync also carries a retirements ISSUE on ENTITIES.md (dream, reflection queue), recorded in T-169 part 3.",
+        "The recall trigger injects entry 299 (pipe-to-tail) on any Bash command with a pipe to tail/head. At session 90 it fired three times, and once it was right: `detach | tail -2` hid detach's exit code. Check the end state (HEAD, branch, porcelain) rather than the piped exit line."
       ],
       "open_questions": [
-        "Does A4 pass? R49 is the first ruling on CA-15 stated as a class. If QA still finds a sibling, sharpen the principle; do not add an instance.",
-        "Is G-042 the machine's load, the worktree, or Cursor running in it? Tonight's pattern points at more than load.",
+        "Does A5 pass? R55 is defined by the object and route rather than a record list. If QA finds another sibling, ask first whether R55's words already cover it (a build defect) before writing a new rule.",
+        "Is G-042 the machine's load, the worktree, or Cursor running in it? QA's tree is green when idle; the forge tree went red. Repeat runs in the SAME tree are the missing control.",
         "T-050: can Cursor's stop hook wake an idle seat? A live trial is to be asked for through the SIA planner (A2A-Hub's D-003).",
         "Were Forge's two refusals false positives? /feedback was advised; not recorded as done.",
-        "T-165: Grok built A2, A3 and A4, and each delivered its scope; every rejection traced to planner rulings. Compare deliberately once slice three closes."
+        "T-165: every rejection of a Grok-built candidate (A2, A3, A4) traces at least partly to a planner ruling. Compare deliberately once slice three closes, reading it that way, not as a score for the developer seat."
       ],
-      "session": 81,
+      "session": 90,
       "loop_state": {
         "open_prs": [],
-        "frozen_sha": "f9a1aa84209f9d17cac404faeb19e00caf2d3491",
+        "frozen_sha": null,
         "questions_for_aaron": [
-          "Start a fresh QA session in ~/Worktrees/sia-qa after the restart (QA 89).",
-          "If QA accepts A4: the merge to master is his.",
-          "Whether A2A-Hub's local stack restarts after SIA's QA run (his and Relay's call)."
+          "Start a fresh Grok 4.7 session in Cursor on ~/Worktrees/sia-forge (record 91) with the paste text in pick_up; turn 14 is waiting unread.",
+          "Later: a fresh QA session in ~/Worktrees/sia-qa (record 92) when A5 is frozen.",
+          "T-178's ci.yml PR is his to merge when it exists."
         ],
         "rulings": [
           "D-031 release commit after acceptance",
@@ -2825,8 +2827,9 @@
           "D-037 memory is lookup by default (T-170)",
           "D-038 Aaron speaks only to the planner; seats push their own working branches",
           "D-039 A2A-Hub's planner routes through the SIA planner for shared work",
-          "Rulings R1-R54 in docs/loops/loop-15-slice-3-rulings-1..11.md (R28 is the brief's)",
-          "A rejected (D-A1); A2 rejected (A2-1..5); A3 rejected (A3-1..3); A4 frozen at f9a1aa8, QA 89 pending"
+          "D-040 seats dispatch CI on their own branches without asking; T-178 makes it automatic",
+          "Rulings R1-R59 in docs/loops/loop-15-slice-3-rulings-1..12.md (R28 is the brief's)",
+          "A rejected (D-A1); A2 rejected (A2-1..5); A3 rejected (A3-1..3); A4 rejected (A4-1, report at 3ecfa70); A5 dispatched to Grok (record 91), not yet started"
         ]
       }
     }
