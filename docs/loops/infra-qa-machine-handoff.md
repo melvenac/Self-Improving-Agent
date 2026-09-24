@@ -6,8 +6,10 @@
 only), plus the planner's Remote-SSH addition and rulings.
 **Model and effort:** Claude Opus 5.5 (1M context), effort **low**.
 
-**Status:** steps 1, 2, 3 and 5 are **done**. Step 4 is **skipped** by the planner's ruling. Step 6 (the
-baseline) is **held**, because the PC is not quiet (section 6). Nothing heavy ran on Aaron's main PC.
+**Status:** steps 1, 2, 3 and 5 are **done**, and the detached launch is **demonstrated**. Step 4 is
+**skipped** by the planner's ruling. **Step 6 ran after Aaron restarted the PC: exit 1, 14 failed and
+1020 passed (1034), with no `onTaskUpdate` and no Unhandled lines** (section 6). Nothing heavy ran on
+Aaron's main PC.
 
 ## Authority, as it was used
 
@@ -118,21 +120,31 @@ ssh -l "Aaron Melven" 100.73.250.101 'cd /d "%USERPROFILE%\Worktrees\sia-qa" && 
   - **The result line:** `success`, `is_error: false`, 2 turns, $0.118, `permission_denials: []`.
 - **`dontAsk` plus `--allowedTools` is the permission shape a QA dispatch should use:** anything not
   listed is denied rather than prompted, and a denial shows up in `permission_denials`.
-- **How a long run is detached and polled: designed, NOT DEMONSTRATED.** Windows' OpenSSH server puts
-  a session's processes in a job object that is killed when the session ends, so `start /b` does not
-  survive. The design, staged on that PC as `%TEMP%\sia-setup\launch.ps1` and `baseline.ps1`:
+- **How a long run is detached and polled: DEMONSTRATED with the baseline itself.** Windows' OpenSSH
+  server puts a session's processes in a job object that is killed when the session ends, so
+  `start /b` does not survive. The method (`launch.ps1` and `baseline.ps1`):
   - launch with `Invoke-CimMethod Win32_Process Create`, which creates the process outside the ssh
     session's job object;
-  - the child writes its log, a meta file (start, end, exit code, wall time) and a `done` marker to files;
+  - the child writes its log, a meta file (start, head, end, exit code, wall time) and a `done` marker
+    to `%TEMP%\sia-setup`;
   - a later ssh session polls for the marker and reads the files.
 
-  It was meant to be demonstrated with the baseline itself, and the baseline is held. **Until it has run
-  once, and has been seen surviving the launching session's end, it is a design.**
+  The observation: the launching ssh session returned `ReturnValue=0 ProcessId=8404` and **exited at
+  23:39:33Z**. A fresh ssh session about 20 s later saw 6 node processes running and a meta file with
+  `start` and `head` but no `done` marker. Polling every 15 s saw `done` at 23:42:37Z. So the run
+  survived its launching session's end.
+- **Reading the log back:** `scp` with the user name as the SOURCE failed (`Aaron Melven: invalid user
+  name`, and `-o User=…` fails the same way). As a DESTINATION the `"Aaron Melven@host:path"` form works.
+  To fetch a file, use `ssh … "type <path>" > local-file`.
+- **One quoting hazard:** a Git Bash heredoc turned the `/\\/g` in a JavaScript file into `/\/g`. Write
+  files with a tool that takes them verbatim.
 
-## 6. Baseline (step 6): HELD
+## 6. Baseline (step 6): RAN, exit 1
 
-**It was not run, because the PC was not quiet** and the brief says "with nothing else running on that
-PC". At the check (the `quiet.ps1` and `procs.ps1` scripts):
+### 6.1 How the PC was made quiet
+
+**The first check found the PC not quiet**, and the brief says "with nothing else running on that PC".
+At that check (the `quiet.ps1` and `procs.ps1` scripts):
 - CPU 5%, but **free RAM 2.2 GB of 7.9**;
 - **a second Windows account, `Members`, has four `claude.exe` processes in its disconnected session 1**:
   an interactive `claude` since 16:55, a `daemon run --origin transient` since 15:15, and a
@@ -140,11 +152,84 @@ PC". At the check (the `quiet.ps1` and `procs.ps1` scripts):
 - **Aaron's own account** has a `claude.exe` (pid 15024, session 0) running since 18:23. It is probably
   the terminal he used for `/login`.
 
-I touched none of them. The planner has asked Aaron what the `Members` sessions are and whether they can
-be closed during QA windows. When the baseline runs, the plan is `baseline.ps1`, launched detached:
-`npm test` on `origin/master`, output to a file, the exit code captured through a redirect rather than a
-pipe, wall time in the meta file, and then the test counts and any `onTaskUpdate` or `Unhandled` lines
-read from the log. That is G-042's second-machine measurement, to be reported as observation, not cause.
+I touched none of them. **Aaron, in my window, verbatim: "I can restart that computer so it's quite. Do
+it?"** Before answering I checked, read-only, that nothing would relaunch them: `AutoAdminLogon` is not
+set, no scheduled task mentions claude or node, no HKLM Run entry mentions claude, and the `Members`
+Startup folder is empty. I told him the restart would end the `Members` Claude sessions, which was his
+call. He restarted the PC; it booted at 18:34:28 local time (-05:00).
+
+**After the restart the PC was OFF the tailnet** (`tailscale status`: offline; `tailscale ping`: no
+reply) until Aaron logged in. **Likely cause, not verified:** Tailscale's "Run unattended" is off, so on
+Windows it connects only for a logged-in user. My read of the setting (`tailscale debug prefs | findstr
+unattended`) printed nothing, which is not evidence either way. I gave Aaron the fix
+(`tailscale set --unattended`, or the tray setting); whether he applied it is unknown.
+
+**The quiet check before launch:** CPU 1%, 5.04 GB free, **0 node/claude processes**, and the `Members`
+sessions gone. **Condition of the measurement:** Aaron's own console session was logged in and active
+(since 18:34). Clone at 6075f6b, which `ls-remote` confirmed was still `origin/master` just before
+launch; tree clean.
+
+### 6.2 The result (G-042's second-machine measurement)
+
+**What the log and the meta file show** (`baseline.log`, 1074 lines, read back with `ssh "type …"`).
+The log is NOT in the repo, because `.gitignore:4` ignores `*.log`. It stays on the QA PC at
+`%TEMP%\sia-setup\baseline.log`, next to `baseline.meta`.
+
+| | |
+|---|---|
+| SHA | 6075f6b (`origin/master`) |
+| Launched | 23:39:33Z, detached through WMI |
+| **Exit code** | **1**, from `cmd /c "npm test > log 2>&1"`: a redirect, not a pipe |
+| Wall time | **177.22 s** by the meta file; vitest's own `Duration 170.45s` (tests 436.74 s summed across workers) |
+| Test files | **2 failed, 69 passed (71)** |
+| Tests | **14 failed, 1020 passed (1034)** |
+| `onTaskUpdate` lines | **0** |
+| `Unhandled` lines | **0** |
+
+The instrument was checked: the same log has 296 `✓` lines, so a zero count is a count. The first two
+reads of this log produced zeros from a file that did not exist (the scp failure); those zeros were
+discarded.
+
+**Failure 1: 13 tests in `tests/cli-bootstrap.test.ts`** (the whole `cli-bootstrap SESSION_UUID contract`
+block), each 2.7–3.2 s. Each fails with:
+```
+Error: Command failed: npx tsx C:\Users\Aaron Melven\Worktrees\sia-qa\open-brain\src\cli-bootstrap.ts
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\Aaron' imported from C:\Users\Aaron Melven\Worktrees\sia-qa\open-brain\
+```
+- **Observed:** the path reached `tsx` cut at the space in `Aaron Melven`.
+- **Read from the code:** `tests/cli-bootstrap.test.ts:41` runs (its `shell` option is at :45, and a
+  second spawn has the same option at :68)
+  `execFileSync("npx", ["tsx", script], { …, shell: process.platform === "win32" })`. With `shell: true`,
+  Node joins the arguments into one command string without quoting them.
+- **Inference (consistent with both, not separately tested):** cmd splits the unquoted path at the space.
+  This is a test-harness defect that needs a Windows user whose profile path contains a space.
+- That is why it has never shown. On Aaron's main PC the profile is `C:\Users\melve`, with no space.
+  On Linux CI there is no shell, so the argument array is passed verbatim.
+- **Siblings:** a grep for `shell: process.platform === "win32"` in `open-brain` finds only those two call
+  sites. The third hit, in `tests/harness/checks.test.ts:126`, is a string fixture, not a spawn.
+
+**Failure 2: 1 test in `tests/shared/paths.test.ts:117`,** `projectDirExists / existsCaseInsensitive >
+finds a mixed-case directory through its lowercased canonical path`: `expected false to be true` on
+`existsCaseInsensitive(lowered)`.
+- **Observed, as a separate check:** the same walk, replicated in `walk.cjs` and run alone over ssh, which
+  creates the same kind of temp dir under `C:\Users\Aaron Melven\AppData\Local\Temp`, **succeeds at every
+  level** and ends with `existsSync: true`. `%TEMP%` and `os.tmpdir()` are the long form, not an 8.3
+  short name; that hypothesis was checked and is FALSE.
+- **So the cause is NOT established.** The failure depends on something that differs between the suite's
+  run and an isolated run: the WMI launch context, concurrency within the suite, or something else.
+- **My attempt to run the diagnostic under the same WMI launch produced no output file.** That was my
+  instrument failing (most likely the nested quoting in the WMI command line), not a result.
+- **The discriminating next step:** run `npx vitest run tests/shared/paths.test.ts` alone through the WMI
+  launcher, and again in a plain ssh session, and compare.
+
+**What this does and does not say about G-042:**
+- **Observed:** a quiet, second machine ran the full suite once at 6075f6b with **no `onTaskUpdate` and
+  no Unhandled errors**, and failed for two reasons that are not timing.
+- **Not inferred:** that G-042 is absent on this machine. It is n=1, and G-042 is load-dependent.
+- **A caution for anyone reading exit codes from this machine:** it is red at `origin/master` for
+  environment reasons (the space in the profile path). A QA verdict taken here must compare
+  against this baseline's 14 known failures rather than expect green. Or the two defects get fixed first:
+  the planner's call.
 
 ## 7. VS Code Remote-SSH (the planner's addition)
 
@@ -186,8 +271,9 @@ stays until the baseline has run.
 
 ## 9. What was not verified
 
-- **The detached launch and polling** (section 5).
-- **The baseline** (section 6).
+- **The cause of the `paths.test.ts` failure** (section 6.2): unexplained. The next step is named there.
+- **The `cli-bootstrap` cause is inferred** from the error text and the spawn options. No fix was tested.
+- **Tailscale "Run unattended"** on that PC (section 6.1).
 - **Everything in step 4** (section 4).
 - **Remote-SSH from Aaron's side** (section 7).
 - **The `Members` sessions:** what they are and why they run are unknown, and they are Aaron's to
