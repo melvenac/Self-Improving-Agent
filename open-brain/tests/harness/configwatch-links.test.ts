@@ -1068,14 +1068,19 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const bytes = Buffer.from("[user]\n\tname = VICTIM-R60\n");
     writeFileSync(victim, bytes);
     const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
+    const baseIno = lstatSync(target).ino;
     unlinkSync(target);
     linkSync(victim, target);
     expect(lstatSync(target).nlink, "plant: target nlink 2").toBe(2);
+    const nowIno = lstatSync(target).ino;
+    expect(nowIno, "plant: the base inode and the current inode differ").not.toBe(baseIno);
     const blob = JSON.stringify(watch.compare());
     expect(blob, blob).not.toContain(victimHash);
     expect(blob).toContain("not read");
     expect(blob).toContain(target);
     expect(blob).toContain("nlink 2");
+    expect(blob, "the base identity is in the record").toContain(String(baseIno));
+    expect(blob, "the current identity is in the record and differs").toContain(String(nowIno));
   });
 
   it.skipIf(isWin)("R61: a link that does not resolve is reported unwatched and is not claimed as read", () => {
@@ -1133,5 +1138,179 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const end = routeEnd(tmp.dir, join(link, "hooks", "post-commit"));
     expect(end, String(end)).toBe(hook);
     expect(String(end)).not.toContain("hooks/hooks");
+  });
+
+  const h16 = (b: Buffer | string) => createHash("sha256").update(b).digest("hex").slice(0, 16);
+
+  it("R64: a repository file rewritten between base and the stage, then untouched, is no change", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const refs = join(dirs.commonDir, "info", "refs");
+    const line = "0000000000000000000000000000000000000000\trefs/heads/main\n";
+    writeFileSync(refs, line);
+    const watch = new ConfigWatch(dirs, repo.root);
+    watch.captureBase();
+    const lock = `${refs}.lock`;
+    writeFileSync(lock, line);
+    renameSync(lock, refs);
+    watch.begin("developer");
+    const v = watch.closeAndRestore();
+    const blob = JSON.stringify(v);
+    expect(v.ok, blob).toBe(true);
+    expect(v.changes, blob).toEqual([]);
+    expect(blob).not.toContain("COULD NOT BE PUT BACK");
+  });
+
+  it("R65: an unchanged machine path appears in the stage record as read", () => {
+    const home = join(tmp.dir, "r65-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    const body = "[user]\n\tname = r65-base\n";
+    writeFileSync(cfg, body);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const found = watch.compare();
+    const blob = JSON.stringify(found);
+    expect(found.some((f) => f.path === cfg), blob).toBe(true);
+    expect(blob, blob).toContain(h16(body));
+  });
+
+  it.skipIf(isWin)("R65: a path unreadable at base is recorded unreadable, never absent", () => {
+    const home = join(tmp.dir, "r65-000-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = r65-000\n");
+    chmodSync(cfg, 0o000);
+    try {
+      let code = "";
+      try {
+        readFileSync(cfg);
+      } catch (err) {
+        code = (err as NodeJS.ErrnoException).code ?? "";
+      }
+      if (code !== "EACCES") throw new Error(`direct read did not throw EACCES (code ${code || "none"})`);
+      const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+      const notes = watch.baseNotes().join("\n");
+      watch.begin("developer");
+      const blob = notes + JSON.stringify(watch.compare());
+      expect(blob, blob).toContain(cfg);
+      expect(blob).toContain("unreadable");
+      expect(blob).not.toContain('"before":"absent"');
+    } finally {
+      chmodSync(cfg, 0o644);
+    }
+  });
+
+  it("R67: a lock-and-rename in one stage and an in-place append in the next are both hashed", () => {
+    const home = join(tmp.dir, "r67-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = r67-base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const replaced = "[user]\n\tname = r67-replaced\n\temail = a7@example.invalid\n";
+    writeFileSync(`${cfg}.lock`, replaced);
+    renameSync(`${cfg}.lock`, cfg);
+    const dev = watch.compare();
+    const devBlob = JSON.stringify(dev);
+    expect(devBlob, devBlob).toContain(h16(replaced));
+    watch.begin("qa");
+    const appended = `${replaced}[core]\n\tqa = appended-in-place\n`;
+    writeFileSync(cfg, appended);
+    const qaBlob = JSON.stringify(watch.compare());
+    expect(qaBlob, qaBlob).toContain(h16(replaced));
+    expect(qaBlob, qaBlob).toContain(h16(appended));
+  });
+
+  it("R67: a hard link made elsewhere does not stop an in-place read", () => {
+    const home = join(tmp.dir, "r67-hl-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = r67-hl-base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    linkSync(cfg, join(tmp.dir, "r67-elsewhere"));
+    expect(lstatSync(cfg).nlink, "plant: a second name elsewhere").toBe(2);
+    const edited = "[user]\n\tname = r67-hl-edited\n";
+    writeFileSync(cfg, edited);
+    const blob = JSON.stringify(watch.compare());
+    expect(blob, blob).toContain(h16(edited));
+  });
+
+  it.skipIf(isWin)("R67: the base link's target replaced by a new single-name file is read", () => {
+    const home = join(tmp.dir, "r67-r-home");
+    const dot = join(home, "dot");
+    mkdirSync(dot, { recursive: true });
+    const target = join(dot, "gitconfig");
+    writeFileSync(target, "[user]\n\tname = base\n");
+    const cfg = join(home, ".gitconfig");
+    symlinkSync(join("dot", "gitconfig"), cfg);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const nb = "[user]\n\tname = NEW-FILE-R67\n";
+    writeFileSync(`${target}-new`, nb);
+    renameSync(`${target}-new`, target);
+    expect(lstatSync(target).nlink, "plant: the replacement has one name").toBe(1);
+    const blob = JSON.stringify(watch.compare());
+    expect(blob, blob).toContain(h16(nb));
+  });
+
+  it("R66 R50: an in-place edit of a hook hard-linked at base is a change", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const hook = join(dirs.commonDir, "hooks", "post-commit");
+    const bytes = Buffer.from("#!/bin/sh\nexit 0\n");
+    writeFileSync(hook, bytes);
+    const other = join(tmp.dir, "r50-other-name");
+    linkSync(hook, other);
+    expect(lstatSync(hook).nlink, "plant: hard-linked at base").toBe(2);
+    const watch = new ConfigWatch(dirs, repo.root);
+    watch.captureBase();
+    watch.begin("developer");
+    writeFileSync(hook, "#!/bin/sh\necho edited\n");
+    const v = watch.closeAndRestore();
+    const blob = JSON.stringify(v);
+    expect(v.ok, blob).toBe(false);
+    expect(v.changes.some((c) => c.path === hook), blob).toBe(true);
+  });
+
+  it.skipIf(isWin)("R66: a symlink planted at the watched path is a type change and is not read", () => {
+    const home = join(tmp.dir, "r66-aps-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = aps-base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const real = join(home, "real-gitconfig");
+    renameSync(cfg, real);
+    symlinkSync(real, cfg);
+    const edited = "[user]\n\tname = aps-edited-through-the-new-link\n";
+    writeFileSync(cfg, edited);
+    expect(lstatSync(cfg).isSymbolicLink(), "plant: a link at the watched path").toBe(true);
+    const blob = JSON.stringify(watch.compare());
+    expect(blob, blob).toContain("type change");
+    expect(blob).not.toContain(h16(edited));
+  });
+
+  it.skipIf(isWin)("R66 TRADE-DIFF: a mid-path link to a different file names both resolutions and both identities", () => {
+    const xdg = join(tmp.dir, "r66-td-xdg");
+    mkdirSync(join(xdg, "git"), { recursive: true });
+    const cfg = join(xdg, "git", "config");
+    writeFileSync(cfg, "[user]\n\tname = td-base\n");
+    const baseIno = lstatSync(cfg).ino;
+    const watch = new MachineConfigWatch([{ scope: "xdg", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const outside = join(tmp.dir, "r66-td-outside");
+    mkdirSync(outside);
+    const secret = "[user]\n\tname = VICTIM-TDIFF\n";
+    const outsideFile = join(outside, "config");
+    writeFileSync(outsideFile, secret);
+    renameSync(join(xdg, "git"), join(xdg, "git-aside"));
+    symlinkSync(outside, join(xdg, "git"));
+    const nowIno = lstatSync(outsideFile).ino;
+    const blob = JSON.stringify(watch.compare());
+    expect(blob, blob).not.toContain(h16(secret));
+    expect(blob).toContain(outsideFile);
+    expect(blob).toContain(cfg);
+    expect(blob, "base identity").toContain(String(baseIno));
+    expect(blob, "current identity").toContain(String(nowIno));
   });
 });
