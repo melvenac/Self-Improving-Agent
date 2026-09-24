@@ -888,6 +888,7 @@ export class MachineConfigWatch {
    * race as R37. This does not close it.
    */
   private resolutionMismatch(base: MachineSnap, file: string): ResolutionComp | undefined {
+    if (file !== "") return undefined;
     return firstDiff(base.chain, this.recordChain(file)) ?? undefined;
   }
 
