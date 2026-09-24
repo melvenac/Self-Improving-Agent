@@ -322,6 +322,16 @@ describe("candidate A — the config/hooks channel", { timeout: 120_000 }, () =>
       expect(r.failure?.code).toBe("stage-changed-config");
       expect(r.failure?.reason ?? "", r.failure?.reason).not.toContain("The offending paths were reverted.");
     });
+
+    it("R63: a revert that ran says the offending paths were reverted", async () => {
+      const r = await runLoop({
+        ...withDeveloper((ctx) => {
+          writeFileSync(join(ctx.repoRoot, "sneaky.txt"), "nope\n");
+        }),
+      });
+      expect(r.failure?.reason ?? "", r.failure?.reason).toContain("The offending paths were reverted.");
+      expect(existsSync(join(repo.root, "sneaky.txt")), "the revert removed the plant").toBe(false);
+    });
   });
 
   /* --------------------------------------------------------------------- *
