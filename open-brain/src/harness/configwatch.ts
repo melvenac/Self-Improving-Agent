@@ -442,6 +442,7 @@ const changed = (a: FileState | null, b: FileState | null): boolean => {
   if (a.unreadIdentity || b.unreadIdentity) {
     return a.kind !== b.kind || a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink || a.size !== b.size || a.mtimeNs !== b.mtimeNs;
   }
+  if (a.kind === "file" && a.nlink > 1 && b.nlink > 1 && a.ino === b.ino) return false;
   if (a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink) return true;
   return a.mode !== b.mode || !a.bytes!.equals(b.bytes!);
 };
