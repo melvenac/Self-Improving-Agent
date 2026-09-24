@@ -962,9 +962,6 @@ export class MachineConfigWatch {
       state: "not-read",
       reason: "not read",
     };
-    if (gate && lexical.kind === "symlink" && gate.lexicalKind !== "symlink") {
-      return { ...note, reason: "type change" };
-    }
     const same =
       gate === null ||
       (gate.resolvedPath !== null && gate.kind === kind && gate.dev === dev && gate.ino === ino && gate.nlink === nlink);
