@@ -968,7 +968,6 @@ export class MachineConfigWatch {
     const same =
       gate === null ||
       (gate.resolvedPath !== null && gate.kind === kind && gate.dev === dev && gate.ino === ino && gate.nlink === nlink);
-    if (!same) return { ...note, reason: "different file" };
     if (kind !== "file") return { ...note, reason: "not a file" };
     let fd: number | null = null;
     try {
