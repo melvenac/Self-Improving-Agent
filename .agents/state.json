@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 115,
+  "revision": 116,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2761,6 +2761,12 @@
       "title": "R67 approved: the machine-config read gate is 'same place, not shared' (same real path, and either the base file ignoring nlink or a regular file with exactly one name), re-checked on the opened handle; this amends D-041's 'same file as at base'",
       "date": "2026-09-24",
       "note": "Ruled by Aaron in the SIA planner session (record session 90), 2026-09-24 ~19:57Z, verbatim: 'sounds right'. He was answering the planner's question: 'Should the rule become \"same place, not shared\"? The runtime would read the file if it is at the same real path and is either the original file or a new file with no other names. That keeps the protection: a redirected link, or a file shared with something outside, is still never read. I recommend yes. The trade: a file replaced at the same spot gets read, and its contents are ones the agent could have written into the original file anyway.' WHY: QA report A6 (ea825b7) §11.1 and §11.5, and A6-1. Under D-041's 'same file', `git config --global` (lock+rename, a new inode) and editors that save by replacing the file made CA-4f's ordinary write unhashable, and nlink in the identity flipped a path to not-read whenever a hard link was made anywhere. THE RULE (rulings-14 R67): after preflight, read a machine-config path only if (1) realpath equals the base realpath, and (2) the file there is the base file (dev, ino and type; nlink excluded) OR a regular file with nlink 1. Both are re-checked on the opened handle before any byte is read. Anything else is not read and is reported with both resolutions and identities. THE TRADE, recorded: QA 89's A4-1 R shape (the base target replaced by a new file) becomes READ. A4-1's H, J and LOOP stay unread. Nothing is read through a redirection or from a file with another name. Criteria discipline: amended before any A7 candidate exists, on Aaron's word."
+    },
+    {
+      "id": "D-043",
+      "title": "A self-hosted GitHub Actions runner goes on tcm for SIA's CI (PRs and branches on tcm; master pushes stay on GitHub-hosted); this overrides, for that purpose only, the 2026-09-02 'tcm is not a scratch host for agents' ruling",
+      "date": "2026-09-24",
+      "note": "Ruled by Aaron in the SIA planner session (record session 90), 2026-09-24, verbatim, in order: 'go ahead, is there a local alternative to github? Something we could put on tcm server that would do the same job? Only use github for major updates?'; then 'yes, set it up now. Do I need to start a sia developer agent using claude, not cursor?'; then, after the planner surfaced his 2026-09-02 ruling that tcm is 'not a scratch host for agents' and that tcm also runs OctoPrint and doorctl: 'TCM server is not used much at all. For now it's only being used for the hub dev. Ready for sia infra?'. WHY: GitHub warned at 1,802 of 2,000 included Actions minutes, 7 days to the reset, account-wide. SIA's own share since 2026-09-21 was about 454 minutes over 200 runs, about 70% on PR and master CI for docs/record-only changes (planner, from gh run list). Self-hosted runner minutes are free, and tcm gives Linux for the POSIX-only link tests. SHAPE (docs/loops/infra-tcm-runner-brief.md): ONE runner as a dedicated unprivileged user, not in the docker group, CPU-capped (about 2 of 4 cores) at low priority, with no access to the hub's data, OctoPrint, doorctl or Samba. It is proven on a branch with a separate workflow before master's CI changes. The switch to it (PRs and non-master pushes on tcm, master on ubuntu-latest) is a ci.yml PR that AARON merges. Built by a fresh Claude developer session in a new worktree ~/Worktrees/sia-infra (record session 97), because sia-forge is Grok's for A7. Relay (A2A-Hub) is told before tcm changes. RELATED: the planner batches record PRs from now on to cut minutes; T-178 is to be narrowed, since CI on every branch push would add minutes."
     }
   ],
   "handoffs": [
