@@ -967,7 +967,7 @@ export class MachineConfigWatch {
     };
     const sameObject = gate !== null && gate.kind === kind && gate.dev === dev && gate.ino === ino;
     const singleName = kind === "file" && nlink === 1 && gate !== null && gate.resolvedPath === resolvedPath;
-    const same = gate === null || (gate.resolvedPath === resolvedPath && (sameObject || singleName));
+    const same = gate === null || sameObject || (gate.resolvedPath === resolvedPath && singleName);
     if (!same) return { ...note, reason: "different file" };
     if (kind !== "file") return { ...note, reason: "not a file" };
     let fd: number | null = null;
