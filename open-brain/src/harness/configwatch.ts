@@ -976,7 +976,8 @@ export class MachineConfigWatch {
     const last = chain[chain.length - 1];
     // path.resolve does not follow links, so the target file and ~/.gitconfig
     // compare unequal. realpath is the object opening `p` reaches (R55 control).
-    const reached = last !== undefined && opensSame(last.path, p);
+    const reached = last !== undefined && resolve(last.path) === resolve(p);
+    void opensSame;
     if (!reached || last === undefined) return { chain, hash: "unread" };
     if (last.kind === "absent") return { chain, hash: "absent" };
     if (!allowReadThrough) return { chain, hash: "unread" };
