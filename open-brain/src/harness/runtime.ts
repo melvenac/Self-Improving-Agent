@@ -1020,7 +1020,7 @@ async function runLoopInner(
         const bad = [...verdict.violations, ...verdict.unsafe.map((u) => u.path)];
         if (bad.length === 0) return refNote;
         revertPaths(repoRoot, bad);
-        return `${refNote} The offending paths were reverted.`;
+        return refNote;
       };
 
       let deliverable: unknown;
