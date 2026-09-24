@@ -4,8 +4,8 @@
 **On:** `docs/loops/loop-15-slice-3-qa-report-a6.md`, by the QA seat (Probe), record session 94, merged to master
 in PR #147 (head `ea825b7`). I read the verdict message, §11 and §12 on master. **Candidate A6 `dc35b24` is
 REJECTED.**
-**Status of this file:** R64 to R66 are ruled. **R67 is PROPOSED, and waits for Aaron,** because it changes his
-D-041. **A7 is not briefed until he answers.**
+**Status of this file:** R64 to R66 are ruled. **R67 is APPROVED by Aaron: D-042, 2026-09-24 ~19:57Z, verbatim
+"sounds right".** It was proposed here first, because it changes his D-041. A7 carries R64 to R67.
 
 ---
 
@@ -83,7 +83,7 @@ mutant shown red on CI:
 - **TRADE-DIFF's record carries both resolved paths and both identities** (R60's "report it").
 - **`8ad8728`'s assertion keeps its honest form** (identity for a hard link), and adds that the base side differs.
 
-**R67: PROPOSED, AWAITING AARON (amends D-041's "same file as at base").**
+**R67: APPROVED (D-042; amends D-041's "same file as at base").**
 - **The read gate becomes: same place, not shared.** After preflight, the runtime reads a machine-config path only if
   both hold:
   1. **the OS resolves it to the same real path as at base** (`realpath`);
@@ -128,6 +128,6 @@ case where it reads a byte through a redirection. **QA is asked to look for one.
 ## A7
 
 - **Base:** a new commit series on A6 `dc35b24`. Keep A6's object test, handle check and R61 base notes.
-- **Carries:** R64 to R66, plus R67 **only if Aaron approves it**.
-- **Who builds it:** a fresh Grok session, record session **95**. **QA is record session 96.**
-- **The brief is written after Aaron's answer on R67.**
+- **Carries:** R64 to R67 (R67 approved, D-042).
+- **Who builds it:** a fresh Grok session, record session **95**, with
+  `docs/loops/loop-15-slice-3-a7-grok-brief.md`. **QA is record session 96.**

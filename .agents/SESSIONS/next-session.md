@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 112 by open-brain v0.44.1 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 114 by open-brain v0.44.1 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-PLANNER SESSION 90 (Atlas), 2026-09-24 morning. A6 dc35b24 REJECTED by QA 94 (report ea825b7, PR #147): D-041's approach closed A5-1/A4-1/A5-4 with no outside reads, but A6-1 (R61 only for unwatched; an ordinary `git config --global` then an in-place edit is silent) and A6-2 (`drifted` false modified). Rulings-14 (docs/loops/loop-15-slice-3-rulings-14.md): R64 attribution at the stage start with size+mtimeNs facts, and `drifted` never in attribution; R65 R61 read literally, every path in every stage record; R66 tests that can fail (R29 via the openSync seam, the handle check, the at-path type change, R50 row level, TRADE-DIFF identities). R67 PROPOSED, AARON'S DECISION: the read gate becomes same real path plus (the base file ignoring nlink, OR a regular file with nlink 1), re-checked on the handle. It makes `git config` writes hashable (CA-4f) and QA 89's A4-1 R shape READ; H, J and LOOP stay unread. FIRST ACTIONS: (1) /start, then the intent documents. (2) Put R67 to Aaron, one question with the trade, and record his answer as a decision. (3) Write the A7 brief (on dc35b24; Grok record 95; QA 96; a commit table from diffs) and post it to hub room k57frxw0ptb8tadmqdwy0khhks8ey006; Aaron starts the Grok session in ~/Worktrees/sia-forge. (4) Also for Aaron: A2A-Hub Relay's Q1 (T-003 per-agent keys and the hub-talk contract change; SIA's names atlas, grok, forge, probe on http://100.124.212.87:4000), relayed verbatim under D-039. (5) Merges: use a script that refuses unless checks have registered, all are SUCCESS, and the state is CLEAN (rulings-14, error entry 3). Relay's local hold stands, and full stops go through Relay (a2a-planner-6c) to Rivet and Gauge.
+PLANNER SESSION 90 (Atlas), 2026-09-24 morning. A6 dc35b24 REJECTED by QA 94 (report ea825b7, PR #147): D-041's approach closed A5-1/A4-1/A5-4 with no outside reads, but A6-1 (R61 only for unwatched; an ordinary `git config --global` then an in-place edit is silent) and A6-2 (`drifted` false modified). Rulings-14 (docs/loops/loop-15-slice-3-rulings-14.md): R64 attribution at the stage start with size+mtimeNs facts, and `drifted` never in attribution; R65 R61 read literally, every path in every stage record; R66 tests that can fail (R29 via the openSync seam, the handle check, the at-path type change, R50 row level, TRADE-DIFF identities). R67 APPROVED (D-042, Aaron 'sounds right', 2026-09-24 ~19:57Z): the read gate becomes same real path plus (the base file ignoring nlink, OR a regular file with nlink 1), re-checked on the handle. It makes `git config` writes hashable (CA-4f) and QA 89's A4-1 R shape READ; H, J and LOOP stay unread. FIRST ACTIONS: (1) /start, then the intent documents. (2) R67 is approved (D-042), and Aaron answered Relay's Q1 'yes' (A2A-Hub D-006; no cutover touching grok or atlas while A7 is built or scored). (3) The A7 brief is docs/loops/loop-15-slice-3-a7-grok-brief.md, posted to hub room k57frxw0ptb8tadmqdwy0khhks8ey006. Aaron starts the Grok session (record 95) in ~/Worktrees/sia-forge. Verify its evidence per test, freeze it, then dispatch QA 96 (fresh session, dispatch table from diffs). (4) The tcm-rebuild question is Relay's to ask Aaron directly. (5) Merges: use a script that refuses unless checks have registered, all are SUCCESS, and the state is CLEAN (rulings-14, error entry 3). Relay's local hold stands, and full stops go through Relay (a2a-planner-6c) to Rivet and Gauge.
 
 ### Watch out
 
@@ -26,7 +26,7 @@ PLANNER SESSION 90 (Atlas), 2026-09-24 morning. A6 dc35b24 REJECTED by QA 94 (re
 
 ### Open questions
 
-- Does Aaron approve R67 (same real path, plus the base file or a single-name file)? Without it, CA-4f's both-hashes is unmeetable for `git config`'s own write.
+- Does A7 pass? R67 makes the A4-1 R shape READ by design (D-042); every other A4-1/A5-1 shape keeps its verdict.
 - Is G-042 the machine's load, the worktree, or Cursor running in it? QA's tree is green when idle; the forge tree went red. Repeat runs in the SAME tree are the missing control.
 - T-050: can Cursor's stop hook wake an idle seat? A live trial is to be asked for through the SIA planner (A2A-Hub's D-003).
 - Were Forge's two refusals false positives? /feedback was advised; not recorded as done.
@@ -39,10 +39,8 @@ PLANNER SESSION 90 (Atlas), 2026-09-24 morning. A6 dc35b24 REJECTED by QA 94 (re
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- R67 (rulings-14): amend D-041's read gate to same real path plus (base file, or single-name file)?
-- Relay's Q1 (A2A-Hub T-003 per-agent keys and the hub-talk contract change), relayed verbatim under D-039.
-- What he meant by 'Relay can rebuild the tcm hub when ready' (Relay found nothing to ship).
-- Start a fresh Grok session in ~/Worktrees/sia-forge for A7 (record 95) once the brief is posted.
+- Start a fresh Grok session in ~/Worktrees/sia-forge for A7 (record 95); the brief is posted.
+- If QA 96 accepts A7: the candidate merge is his.
 
 **Rulings made mid-loop:** 
 - D-031 release commit after acceptance
@@ -55,8 +53,9 @@ PLANNER SESSION 90 (Atlas), 2026-09-24 morning. A6 dc35b24 REJECTED by QA 94 (re
 - D-039 A2A-Hub's planner routes through the SIA planner for shared work
 - D-040 seats dispatch CI on their own branches without asking; T-178 makes it automatic
 - D-041 A6 changes approach: the OS resolves links, the runtime compares the file reached
-- Rulings R1-R66 in docs/loops/loop-15-slice-3-rulings-1..14.md (R28 is the brief's); R67 proposed, awaiting Aaron
-- A rejected (D-A1); A2 (A2-1..5); A3 (A3-1..3); A4 (A4-1); A5 (A5-1, A5-4); A6 (A6-1, A6-2), report ea825b7; A7 not yet briefed
+- Rulings R1-R67 in docs/loops/loop-15-slice-3-rulings-1..14.md (R28 is the brief's); R67 approved as D-042
+- A rejected (D-A1); A2 (A2-1..5); A3 (A3-1..3); A4 (A4-1); A5 (A5-1, A5-4); A6 (A6-1, A6-2), report ea825b7; A7 briefed (Grok, record 95)
+- D-042 R67 approved: same place, not shared
 
 ## developer _(written session 74)_
 
