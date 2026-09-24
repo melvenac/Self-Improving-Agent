@@ -898,6 +898,32 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(readFileSync(victim, "utf-8")).toContain("VICTIM-R57-QA");
   });
 
+  it("R59: qa reads a machine file restored to its base resolution and does not say not read", () => {
+    const home = join(tmp.dir, "r59-revert-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    const original = "[user]\n\tname = base-r59\n";
+    writeFileSync(cfg, original);
+    const restored = createHash("sha256").update(original).digest("hex").slice(0, 16);
+    const aside = join(tmp.dir, "r59-aside");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    renameSync(cfg, aside);
+    const victim = join(tmp.dir, "r59-victim");
+    writeFileSync(victim, "[user]\n\tname = V1-R59\n");
+    linkSync(victim, cfg);
+    expect(lstatSync(cfg).nlink, "plant: developer left a hard link").toBe(2);
+    const dev = watch.compare();
+    expect(JSON.stringify(dev)).toContain("not read");
+    watch.begin("qa");
+    unlinkSync(cfg);
+    renameSync(aside, cfg);
+    const qa = watch.compare();
+    const blob = JSON.stringify(qa);
+    expect(blob, blob).not.toContain("not read");
+    expect(blob, blob).toContain(restored);
+  });
+
   it.skipIf(isWin)("R58 (b)3: a symlink planted on a hook entry does not change the victim, and the modes differ", () => {
     const dirs = resolveGitDirs(repo.root);
     const hook = join(dirs.commonDir, "hooks", "post-commit");
@@ -935,6 +961,10 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     writeFileSync(victim, bytes);
     chmodSync(victim, 0o000);
     const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    unlinkSync(cfg);
     symlinkSync(victim, cfg);
     expect(lstatSync(cfg).isSymbolicLink(), "plant: .gitconfig is a link to the mode-000 victim").toBe(true);
     try {
@@ -946,11 +976,11 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
       }
       if (code !== "EACCES") throw new Error(`read through the link did not throw EACCES (code ${code || "none"})`);
       const hash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
-      const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
-      watch.begin("developer");
       const blob = JSON.stringify(watch.compare());
       expect(blob).not.toContain(hash);
       expect(blob).not.toContain("MODE0-LINK-SECRET");
+      expect(blob).not.toContain("unreadable");
+      expect(blob).toContain("not read");
     } finally {
       chmodSync(victim, 0o644);
     }
