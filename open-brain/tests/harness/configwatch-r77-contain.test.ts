@@ -5,14 +5,10 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
 import { chmodSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import {
-  ConfigWatch,
-  MachineConfigWatch,
-  identify,
-  repositoryLinksAtBase,
-  resolveGitDirs,
-} from "../../src/harness/configwatch.js";
-import { makeRepo, requireGit, type RepoFixture } from "./fixture.js";
+import { ConfigWatch, MachineConfigWatch, identify, repositoryLinksAtBase, resolveGitDirs } from "../../src/harness/configwatch.js";
+import { runLoop, type LoopConfig } from "../../src/harness/runtime.js";
+import { StubDeveloper, StubPlanner, StubQa } from "../../src/harness/roles.js";
+import { exitingChecks, makeRepo, requireGit, type RepoFixture } from "./fixture.js";
 import { scratch } from "./candidate-a-fixture.js";
 
 const isWin = process.platform === "win32";
@@ -169,5 +165,41 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
       thrown = (e as NodeJS.ErrnoException).code ?? (e as Error).message;
     }
     expect(thrown, "any read code, including EISDIR, stays inside the window").toBe("");
+  });
+
+  it.skipIf(isWin)("R77-GIT-AFTER-BREAK: replacing .git/config with a directory ends stage-changed-config and restores it", async () => {
+    const cfg = join(repo.root, ".git/config");
+    const before = readFileSync(cfg);
+    const loop: LoopConfig = {
+      repoRoot: repo.root,
+      loop: "t001",
+      roles: {
+        planner: new StubPlanner(),
+        developer: {
+          role: "developer",
+          run: async (ctx) => {
+            const d = await new StubDeveloper().run(ctx);
+            unlinkSync(cfg);
+            mkdirSync(cfg);
+            return d;
+          },
+        },
+        qa: new StubQa(),
+      },
+      checks: exitingChecks(0, 0),
+      log: () => {},
+    };
+    let thrown = "";
+    let r: Awaited<ReturnType<typeof runLoop>> | null = null;
+    try {
+      r = await runLoop(loop);
+    } catch (e) {
+      thrown = (e as Error).message;
+    }
+    let restored = false;
+    try { restored = readFileSync(cfg).equals(before); } catch { restored = false; }
+    expect(thrown, "the loop does not throw").toBe("");
+    expect(r!.failure?.code, "stage-changed-config, never runtime-error").toBe("stage-changed-config");
+    expect(restored, ".git/config is put back by bytes").toBe(true);
   });
 });
