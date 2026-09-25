@@ -102,7 +102,9 @@ describe("T-180: a stale input is named at the top of the report and gates --com
 
       const typo = cli(["state", "import", "--commit", "--accept-stal", root], root);
       expect(typo.status).toBe(1);
-      expect(typo.stderr).toContain("--accept-stal");
+      // The flag check's own words: "--accept-stal" alone is also inside the
+      // stale refusal's "--accept-stale" (QA 102, D1).
+      expect(typo.stderr).toContain("unrecognised flag(s) --accept-stal.");
       expect(existsSync(join(root, STATE_REL))).toBe(false);
 
       const acked = cli(["state", "import", "--commit", "--accept-stale", root], root);

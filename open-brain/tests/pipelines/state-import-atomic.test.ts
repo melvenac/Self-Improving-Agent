@@ -15,7 +15,7 @@ import { join, relative } from "node:path";
 import { tmpdir } from "node:os";
 
 /** A path fragment: the next write or rename whose path contains it throws. */
-const inject = { writeOn: null as string | null, renameOn: null as string | null };
+const inject = { writeOn: null as string | null, renameOn: null as string | null, copyTo: null as string | null };
 vi.mock("node:fs", async (importOriginal) => {
   const a = await importOriginal<typeof import("node:fs")>();
   const norm = (p: unknown) => String(p).replace(/\\/g, "/");
@@ -27,7 +27,11 @@ vi.mock("node:fs", async (importOriginal) => {
     if (inject.renameOn && norm(from).includes(inject.renameOn)) throw new Error(`induced failure renaming ${norm(from)}`);
     return a.renameSync(from, to);
   }) as typeof a.renameSync;
-  return { ...a, default: { ...a, writeFileSync, renameSync }, writeFileSync, renameSync };
+  const cpSync = ((from: string, to: string, opts?: realFs.CopySyncOptions) => {
+    if (inject.copyTo && norm(to).includes(inject.copyTo)) throw new Error(`induced failure copying to ${norm(to)}`);
+    return a.cpSync(from, to, opts);
+  }) as typeof a.cpSync;
+  return { ...a, default: { ...a, writeFileSync, renameSync, cpSync }, writeFileSync, renameSync, cpSync };
 });
 
 const { runDraft, runCommit, STATE_REL, DRAFT_REL } = await import("../../src/pipelines/state-import/index.js");
@@ -67,7 +71,7 @@ describe("R2-3 (IF-11): a failure at any write after the snapshot leaves the pro
     writeProject(root);
     runDraft(root, TODAY);
   });
-  afterEach(() => { inject.writeOn = null; inject.renameOn = null; realFs.rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }); });
+  afterEach(() => { inject.writeOn = null; inject.renameOn = null; inject.copyTo = null; realFs.rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }); });
 
   const points: Array<[string, () => void]> = [
     ["writing state.json", () => { inject.writeOn = STATE_REL; }],
@@ -103,6 +107,16 @@ describe("R2-3 (IF-11): a failure at any write after the snapshot leaves the pro
     runCommit(root, TODAY, { forceSnapshot: true });
     expect(realFs.existsSync(join(earlier, "from-an-earlier-run.md"))).toBe(false);
     expect(realFs.readdirSync(join(root, ".agents/archive"))).toEqual([`pre-state-migration-${TODAY}`]);
+  });
+
+  it("a snapshot that fails part-way is removed, with archive/ if the snapshot created it, and a second run completes", () => {
+    const before = tree(root);
+    inject.copyTo = `pre-state-migration-${TODAY}/TASKS`; // one entry of several: whatever readdir copied first is partial
+    expect(() => runCommit(root, TODAY)).toThrow(/induced failure copying/);
+    inject.copyTo = null;
+    expect(tree(root)).toEqual(before);
+    expect(realFs.existsSync(join(root, ".agents/archive"))).toBe(false);
+    expect(realFs.existsSync(runCommit(root, TODAY).statePath)).toBe(true);
   });
 
   it("the rollback says what it did in the error", () => {
