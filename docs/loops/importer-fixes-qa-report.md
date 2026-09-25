@@ -244,6 +244,10 @@ qa/importer-fixes-ci -f hosted=false`, since `ci.yml` runs only on `workflow_dis
 - **Scope slip, no harm:** for IF-6 on `e082983` I ran `npx vitest run tests/pipelines/` (33 files, 405 tests) rather
   than the red-check file alone. It is not a full suite, and the only failing file was the red-check file. It also ran
   on master code, so the dispatch's single full-suite run at `f6b6d44` is still the only one.
+- **The first `git commit` of this report failed:** `Author identity unknown`, because this PC has no git `user.name`
+  or `user.email`. I set no config. I committed with `git -c user.name="Aaron Melven" -c user.email=melvenac@gmail.com`,
+  for that command only. That is the identity on every seat's commits, including the candidate's and earlier `qa/`
+  branches. Whether the QA PC should have a configured identity is Aaron's call, and it is noted in Open 7.
 - **Left behind on purpose:** the scratch worktrees `C:\Users\Aaron Melven\qa102\cand` (clean) and `…\qa102\master`
   (detached at `9bc06e3`, with the candidate's two test files and the fixture staged for the IF-6 check) remain for
   reproduction. They are outside the repo's working tree and on no branch. `git worktree remove` clears them.
@@ -286,5 +290,12 @@ None of these blocks the report. Each has my recommendation.
    rule on.
 6. **The `ci-status` check misreads "gh auth login" as unauthenticated** in a clone whose origin is not GitHub. This is
    minor and predates the candidate. It could go into a sync-hygiene task.
+7. **The QA PC has no git identity** (see Error entries). Every headless QA commit has to pass it per command.
+   *Recommendation:* set it once in the QA worktree's local config, or have the driver pass it, so that a later seat
+   does not stall there.
+
+**Branch:** this report and `docs/loops/qa-scripts-importer/` are committed on `qa/importer-fixes-report`, based on
+`3258372`, and pushed with `push-qa.mjs`. The driver records the read-back. `qa/importer-fixes-ci` (at `f6b6d44`) is
+this seat's only other push.
 
 QA-102: REPORT COMPLETE
