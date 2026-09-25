@@ -1177,8 +1177,9 @@ export class MachineConfigWatch {
       const base = this.loopBase.get(p.path)!;
       const opened = start.get(p.path)!;
       const end = this.observe(p.path, base);
-      if (opened.state === "read" && end.state !== "read") {
-        const code = /\b(E[A-Z0-9]+)\b/.exec(end.reason)?.[1] ?? "UNKNOWN";
+      const unresolved = "did not resolve: ";
+      if (opened.state === "read" && end.reason.startsWith(unresolved) && end.reason.slice(unresolved.length).startsWith("E")) {
+        const code = end.reason.slice(unresolved.length);
         out.push({
           stage: this.stage, scope: p.scope, path: p.path,
           before: opened.hash, after: `unobservable (${code})`, changed: true, unobservableCode: code,
