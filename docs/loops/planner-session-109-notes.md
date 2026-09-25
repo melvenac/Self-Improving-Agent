@@ -236,3 +236,18 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   found the row unmeetable (unchanged parts ≈ 37,700). Ruled: keep 40k, score an honest no, verified becomes a
   count plus the newest 10, role files stay whole, new row T183-6 (inline return in a live session). The follow-up
   is per-seat greeting profiles. Brief amendment 1.
+- **T-191 opened** (rev 132), per-seat greeting profiles, after T-183, on Aaron's "yes".
+- **Aaron asked: "is there a way to score every line and judge if the agent needs that context?"** The planner's
+  answer, recorded here because T-191's note points at it:
+  - **"Needs" is not directly observable.** V-024: whether recalled knowledge changed what an agent did is not
+    answerable on the record, and Loop 10 found that guaranteed delivery (CLAUDE.md) still failed to change behaviour.
+    A scorer that predicts need therefore has no ground truth to be graded against, unless one is built.
+  - **The measurable proxy is lookup.** If a line is omitted and the seat then asks for it (`state show`, a grep of
+    `state.json`, reading the file), the omission cost something. Log every such lookup against the id. That is the
+    miss rate.
+  - **Order, deterministic first:** (1) seat profiles (T-191); (2) exact-match inclusion: any id the seat's brief,
+    handoff or objective names is always shown in full (T-170's "injection only on a deterministic match"); (3) only
+    then a scorer (Jev, a typed judgement per line) in SHADOW, logging what it would have dropped and compared against
+    the lookup log, the same meter-before-gate shape as T-155 and T-173. It is promoted only on a measured miss rate.
+  - **Never scored away:** watch-outs and open questions. They are the curated part, and G-039 is the cost of a
+    lesson that existed and did not reach the act.

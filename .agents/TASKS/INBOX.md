@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 131 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 132 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -65,6 +65,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-183** ob_start's greeting has grown about 7x since V-025 (2,142 words at rev 14; about 14,900 words, 92,131 characters, at rev 121) and no longer fits one tool result: render gaps and verified by TITLE, as tasks already are
 - [ ] **T-185** Other open-brain subcommands take the first non-'--' token as their directory: `detach -dry-run` and `state migrate -dry-run` would do the REAL thing; sync and start share the shape. Refuse unknown '-' tokens everywhere
 - [ ] **T-187** /sync rebuilds the GitNexus index when it is behind (D-049): plain /sync runs analyze where a .gitnexus exists and the indexed SHA is not HEAD, then verifies the new SHA; sync --check stays read-only; a tree with no index stays SKIP (never PASS)
+- [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 
 ## P2
 

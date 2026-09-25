@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 131,
+  "revision": 132,
   "project": {
     "name": "self-improving-agent"
   },
@@ -698,6 +698,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Session 100. MISSED, not deliberate: QA 99's report (section 5.1) recorded Windows Defender at 2h16m of CPU on desktop-o4egb1e, scanning the files the tests create, and said it had not measured the cost to the suite. The planner read that line when ruling and turned it into nothing, until Aaron asked through the home-directory session why exclusions had not been done. Design (sent to Aaron): the suite's about 60 mkdtemp prefixes all sit under os.tmpdir(), and excluding all of %TEMP% would be the broadest hole, so the tests' temp is moved to a dedicated folder instead. Node's os.tmpdir() follows TEMP/TMP. Aaron adds `Add-MpPreference -ExclusionPath 'C:\\qa-tmp','C:\\qa-scratch'` himself: a security setting, his machine. NOT process exclusions for node.exe or git.exe: they would cover npm install scripts from the internet. Risk kept visible: Defender scanning is a classic cause of EBUSY/EPERM on rename and delete, which SIA's product code does (state-writer's temp-then-rename; the importer's round-2 rollback), and users run Defender, hence the one full-suite control run with the default TEMP per candidate. The driver change goes into docs/loops/qa-99/drive.ps1's template via qa-driver-copy.mjs, for the next QA seat after 104 and 106."
+    },
+    {
+      "id": "T-191",
+      "title": "Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 109,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Session 109, on Aaron's word ('Could the greeting be dynamic per seat depending on what context that agent needs' and then 'yes' to recording it, 2026-09-25, planner session). SEQUENCED AFTER T-183, which clips lines for everyone and is scored an honest no against 40,000 characters (T-183 brief amendment 1): per-seat profiles are the change that gets a non-planner greeting under. SHAPE (planner's, the developer designs): a zod-validated profile file, like the gate policies, mapping the seat (already known from AGENT.local.md at start) to its sections. Planner: everything. Developer: objective, own handoff, watch-outs, verified (count plus newest), gap ids and titles, role files. QA: verified and gaps in full, watch-outs, role files. RULE: every omitted section is PRINTED as omitted, with its count and the read-only command that shows it (G-032: a section a seat never sees is the failure). Per-seat WATCH-OUTS need a seats tag on each watch-out, a schema change, so that part waits for a migration window. NOT this task: task-aware selection (reading the brief to pick lines) or model-scored relevance. Aaron asked the same session whether each line could be scored; the planner's answer is recorded in docs/loops/planner-session-109-notes.md (exact-match rules first, a scorer only in shadow with a measured miss rate). Candidate seat: sia-builder, which touches only the render and sync code."
     }
   ],
   "verified": [
