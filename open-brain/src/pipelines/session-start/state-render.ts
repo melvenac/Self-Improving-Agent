@@ -123,7 +123,7 @@ export function clip(text: string, limit: number, where: string): string {
   const head = text.slice(0, limit);
   const end = /[.!?](?=\s)|[\r\n]/.exec(head);
   const cut = (end ? head.slice(0, end.index + (end[0] === "\n" || end[0] === "\r" ? 0 : 1)) : head).trimEnd();
-  return `${cut}… (${text.length} chars; full text: state.json ${where})`;
+  return cut;
 }
 
 /** Decisions are append-ordered (Loop 3 R2): the latest is the last element, not a date sort. */
