@@ -288,3 +288,11 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   off; Forge 113's hold is lifted. Offered to Aaron: a self-hosted Windows runner on the QA PC (his machine, his
   call), and candidate B, which is the G-042 repair itself.
 - **Grok's hub hold (turn 120)** was superseded by the freeze (turn 123), which ended its session.
+- **Importer r3 FROZEN at `063662b`** (handoff `00244d3`, 0 non-doc paths; verified). Forge 110 is done. Its
+  sampler-script near-miss (a PowerShell one-element pipe to a scalar, so the window never held 3) failed closed.
+- **QA dispatches written:** QA 111 (`importer-fixes-r3-dispatch-qa.md`, driver `qa-111/`) and QA 114
+  (`t183-dispatch-qa.md`, driver `qa-114/`). **QA seats run ONE AT A TIME on the QA PC**, because they share its one
+  tree. Order: QA 108 (running), then 111, then 114. IF-20's utf16le-nobom is ruled in advance as the rule changing
+  by ruling, not a defect.
+- **Aaron asked whether the QA PC has two CI runners. It does not.** GitHub lists exactly `tcm-1` and `tcm-2`, both
+  Linux, on tcm (D-043/D-044). The QA PC (D-045) has none. A Windows runner there would be new (his call).
