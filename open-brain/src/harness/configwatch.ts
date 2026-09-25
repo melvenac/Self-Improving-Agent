@@ -1224,7 +1224,7 @@ export class MachineConfigWatch {
         const code = s.reason.startsWith("absent (") ? s.reason.slice("absent (".length, -1) : (s.errno ?? "UNKNOWN");
         return `${link}; does not resolve (${code})`;
       }
-      return `${link}; resolves to: ${factText(s)}`;
+      return link;
     };
     // R79. A loop base that was not there is that phrase, never zeroed facts.
     const baseText = (s: MachineSnap): string =>
