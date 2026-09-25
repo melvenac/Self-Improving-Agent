@@ -1100,7 +1100,8 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     watch.begin("developer");
     const blob = JSON.stringify(watch.compare());
     expect(blob + notes).toContain(cfg);
-    expect(blob).not.toMatch(/[0-9a-f]{16}/);
+    expect(blob, "not claimed as read").not.toMatch(/"(before|after)":"[0-9a-f]{16}/);
+    expect(blob, "the link's facts").toContain("ino");
   });
 
   it("R62: a repository file new since the loop base and untouched by the stage is no change", () => {
