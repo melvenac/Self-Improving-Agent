@@ -270,3 +270,7 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   36198349278 (11 red), mutants (i) 36198525222, (ii) 36198530073, (iii) 36198534363 and (iv) 36198539151, each one
   source file and killed. Footprint within the brief. T183-1 is an honest no (87,587 → 46,578). T183-6 was not run: it
   needs the main checkout's build.
+- **Near-miss (the planner's; caught by Forge 110 before the run):** the planner declared the box quiet after
+  checking only for vitest/tsc/build process NAMES. Forge 110 sampled CPU: Grok's `cursor-agent` (pid 2604) was the
+  busiest process, and ListAgents cannot see a Cursor seat. "No test process" is not "quiet" (G-042, V-076). The
+  full suite waits for a CPU-sampled idle minute, bounded at 20 minutes.
