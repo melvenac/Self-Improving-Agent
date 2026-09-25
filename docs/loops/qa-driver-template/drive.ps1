@@ -1,6 +1,6 @@
-# Drive QA 106 headless (copied from qa-99 by qa-driver-copy.mjs) on the QA PC: launch, check the report is complete, resume at most 3 times.
+# Drive QA 99 headless on the QA PC: launch, check the report is complete, resume at most 3 times.
 # Launched detached through Win32_Process.Create (infra handoff section 5), so it survives the ssh session.
-# Everything it observes goes to %USERPROFILE%\sia-qa106\ (the long path; WMI's TEMP is the 8.3 short name):
+# Everything it observes goes to %USERPROFILE%\sia-qa99\ (the long path; WMI's TEMP is the 8.3 short name):
 #   drive.meta  key=value lines: start, head, attempts, session_id, exit codes, result lines, refusal, completion,
 #               ref audit, end
 #   run-N.jsonl each attempt's stream-json; run-N.err its stderr; refs-before/after.txt; done (written last)
@@ -10,12 +10,12 @@ param([int] $MaxContinuations = 3)
 
 $ErrorActionPreference = 'Continue'
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
-$out    = Join-Path $env:USERPROFILE 'sia-qa106'
+$out    = Join-Path $env:USERPROFILE 'sia-qa99'
 $tree   = Join-Path $env:USERPROFILE 'Worktrees\sia-qa'
 $claude = Join-Path $env:USERPROFILE '.local\bin\claude.exe'
-$report = Join-Path $tree 'docs\loops\importer-fixes-r2-qa-report.md'
-$stops  = Join-Path $tree 'docs\loops\qa-106\stops.txt'
-$marker = 'QA-106: REPORT COMPLETE'
+$report = Join-Path $tree 'docs\loops\loop-15-slice-3-qa-report-a8.md'
+$stops  = Join-Path $tree 'docs\loops\qa-99\stops.txt'
+$marker = 'QA-99: REPORT COMPLETE'
 $meta   = Join-Path $out 'drive.meta'
 
 New-Item -ItemType Directory -Force $out | Out-Null
@@ -47,7 +47,7 @@ $common = @(
   '--append-system-prompt-file', $stops,
   '--output-format', 'stream-json', '--verbose'
 )
-$first = 'You are the QA seat, record session 106, for the SIA importer fixes round 2. Read docs/loops/importer-fixes-r2-dispatch-qa.md in the current directory and follow it. Nobody is watching this run live.'
+$first = 'You are the QA seat, record session 99, for SIA Loop 15 slice three. Read docs/loops/loop-15-slice-3-dispatch-qa-a8.md in the current directory and follow it. Nobody is watching this run live.'
 
 # Parse one attempt's stream-json with a parser, never a pattern match.
 function Read-Run([string] $path) {
@@ -67,7 +67,7 @@ function Read-Run([string] $path) {
 }
 
 function Test-Complete {
-  if (-not (Test-Path $report)) { return 'the report file docs/loops/importer-fixes-r2-qa-report.md does not exist' }
+  if (-not (Test-Path $report)) { return 'the report file docs/loops/loop-15-slice-3-qa-report-a8.md does not exist' }
   $last = (Get-Content $report -Encoding utf8 | Where-Object { $_.Trim() -ne '' } | Select-Object -Last 1)
   if ($last -ne $marker) { return "its last non-blank line is not exactly '$marker'" }
   return ''

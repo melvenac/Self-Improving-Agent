@@ -4,6 +4,14 @@
 headless by `docs/loops/qa-106/drive.ps1`. **Nobody is watching live, and you cannot reach the planner.** Questions go in
 "Open for the planner"; carry on with whatever does not depend on the answer.
 **Not available here:** `/start`, open-brain MCP, the SessionStart hook, `gitnexus`.
+**Temp and scratch (T-190):**
+- The driver sets `TEMP`=`TMP`=`C:\qa-tmp`, which Defender excludes, so probes, mutants and ad-hoc runs are not slowed
+  by scanning. Put ALL your scratch work (worktrees, archives, clones) under **`C:\qa-scratch`**, which Defender also
+  excludes.
+- The one full-suite run is the **Defender-on control**. Run it with the default temp:
+  `TEMP="$QA_DEFAULT_TEMP" TMP="$QA_DEFAULT_TEMP" npx vitest run > file 2>&1; SUITE_EXIT=$?`. That temp is the 8.3 path
+  `C:\Users\AARONM~1\…`, so the path fixed by PR #156 stays in play.
+- A failure that appears only in the control run is a finding, not noise. Record both temps in the report.
 **No git identity on this PC:** pass it per command (`git -c user.name="Aaron Melven" -c user.email=melvenac@gmail.com
 commit …`). Do not write any git config.
 

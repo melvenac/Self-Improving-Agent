@@ -13,7 +13,7 @@ if (!n || !reportRel || !dispatchRel || !prefix || !first) { console.error("usag
 if (!/^\d+$/.test(n) || !/^[a-z0-9-]+$/.test(prefix)) { console.error("bad n or prefix"); process.exit(2); }
 if (first.includes("'")) { console.error("the first prompt may not contain ' (it sits in a PowerShell single-quoted string)"); process.exit(2); }
 
-const src = "docs/loops/qa-99";
+const src = "docs/loops/qa-driver-template"; // qa-99 plus T-190 (qa-99 itself is kept exactly as it ran)
 const dst = `docs/loops/qa-${n}`;
 fs.mkdirSync(dst, { recursive: true });
 const win = (p) => p.replace(/\//g, "\\");
