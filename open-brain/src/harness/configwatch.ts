@@ -803,6 +803,7 @@ export class ConfigWatch {
             unrestored.push(`${path} (a ${cur.kind} was created; not removed recursively)`);
           }
         } else if (b.kind === "file" && b.bytes !== null) {
+          try { chmodSync(path, b.mode || 0o644); } catch { /* the write records unrestored */ }
           restoreNewFile(this.repoRoot, this.dirs, path, b.bytes, b.mode);
         } else if (b.kind === "file") {
           // R80. Was :755 at 6bd97f2. An unread file was described as "not followed", which is the symlink wording.
