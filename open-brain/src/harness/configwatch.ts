@@ -117,7 +117,6 @@ export interface PathIdentity {
  * runtime could not see the path, and that code fails the stage.
  */
 export function resolutionUnobservable(code: string): string | null {
-  if (code === "ENOENT" || code === "ENOTDIR") return null;
   return code;
 }
 
