@@ -43,9 +43,9 @@ describe("R77 hard link restore", { timeout: 60_000 }, () => {
           const d = await new StubDeveloper().run(ctx);
           unlinkSync(hook);
           linkSync(victim, hook);
+          afterRoleBytes = readFileSync(victim, "utf-8");
           chmodSync(hook, 0o000);
           afterRoleMode = lstatSync(victim).mode & 0o777;
-          afterRoleBytes = readFileSync(victim, "utf-8");
           return d;
         } },
         qa: new StubQa(),
@@ -60,6 +60,7 @@ describe("R77 hard link restore", { timeout: 60_000 }, () => {
     try {
       r = await runLoop(loop);
       modeNow = lstatSync(victim).mode & 0o777;
+      chmodSync(victim, 0o644);
       bytesNow = readFileSync(victim, "utf-8");
     } catch (e) {
       thrown = (e as Error).message;
