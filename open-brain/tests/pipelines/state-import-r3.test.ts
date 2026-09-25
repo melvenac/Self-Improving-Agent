@@ -190,41 +190,54 @@ describe("R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence 
 });
 
 describe("R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse", () => {
-  it("QA 106's sequence: the rollback fails part-way, then --draft, --commit and --commit --force-snapshot each refuse; Session_7.md exists at every step", () => {
-    writeProject(root, 7);
-    runDraft(root, TODAY);
-    const original = tree(root);
-    const log7 = () => expect(copiesOf(root, LOG7).length).toBeGreaterThan(0);
+  // QA 106 held a handle on SUMMARY.md, so the rollback failed REMOVING SYSTEM/. Which entries go
+  // before it is the platform's readdir order: on NTFS (case-insensitive) state.json goes first, as
+  // QA saw; on Linux it may survive, and then state.json's own refusal hides D7. Failing the copy
+  // BACK of SYSTEM/ instead removes every live entry first on every platform: QA's dangerous state.
+  const rollbackFailures: Array<[string, () => void]> = [
+    ["removing SYSTEM/ (QA 106's handle)", () => { inject.rmOn = ".agents/SYSTEM"; }],
+    ["copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform)", () => { inject.copyTo = ".agents/SYSTEM"; }],
+  ];
+  for (const [where, arm] of rollbackFailures) {
+    it(`QA 106's sequence, the rollback failing while ${where}: --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step`, () => {
+      writeProject(root, 7);
+      runDraft(root, TODAY);
+      const original = tree(root);
+      // Every original file's bytes exist somewhere under the project (live or in the snapshot).
+      const noneLost = () => {
+        const now = new Set(Object.values(tree(root)));
+        expect(Object.entries(original).filter(([, h]) => !now.has(h)).map(([p]) => p)).toEqual([]);
+        expect(copiesOf(root, LOG7).length).toBeGreaterThan(0);
+      };
 
-    // 1. The commit fails at SUMMARY.md, and the rollback fails removing SYSTEM/ (QA held a handle on SUMMARY.md).
-    inject.writeOn = ".agents/SYSTEM/SUMMARY.md";
-    inject.rmOn = ".agents/SYSTEM";
-    expect(() => runCommit(root, TODAY)).toThrow(/ROLLBACK FAILED/);
-    inject.writeOn = null; inject.rmOn = null;
-    log7();
-    const snapshot = Object.fromEntries(Object.entries(tree(root)).filter(([p]) => p.startsWith(SNAP + "/")));
-    expect(Object.keys(snapshot).length).toBeGreaterThan(0);
-    const damaged = tree(root);
+      // 1. The commit fails at SUMMARY.md, and then the rollback fails too.
+      inject.writeOn = ".agents/SYSTEM/SUMMARY.md";
+      arm();
+      expect(() => runCommit(root, TODAY)).toThrow(/ROLLBACK FAILED/);
+      inject.writeOn = null; inject.rmOn = null; inject.copyTo = null;
+      noneLost();
+      const damaged = tree(root);
 
-    // 2–4. Every re-run refuses, names the snapshot, and changes nothing.
-    for (const run of [() => runDraft(root, TODAY), () => runCommit(root, TODAY), () => runCommit(root, TODAY, { forceSnapshot: true })]) {
-      expect(run).toThrow(/half-restored/);
-      expect(run).toThrow(new RegExp(`pre-state-migration-${TODAY}/`));
-      expect(tree(root)).toEqual(damaged);
-      log7();
-    }
+      // 2–4. Every re-run refuses, names the snapshot, and changes nothing.
+      for (const run of [() => runDraft(root, TODAY), () => runCommit(root, TODAY), () => runCommit(root, TODAY, { forceSnapshot: true })]) {
+        expect(run).toThrow(/half-restored/);
+        expect(run).toThrow(new RegExp(`pre-state-migration-${TODAY}/`));
+        expect(tree(root)).toEqual(damaged);
+        noneLost();
+      }
 
-    // The way out the refusal states: restore from the snapshot, delete the marker.
-    const agents = join(root, ".agents");
-    for (const n of realFs.readdirSync(agents)) if (n !== "archive") realFs.rmSync(join(agents, n), { recursive: true, force: true });
-    for (const n of realFs.readdirSync(join(root, SNAP))) realFs.cpSync(join(root, SNAP, n), join(agents, n), { recursive: true });
-    const markers = realFs.readdirSync(join(agents, "archive")).filter((n) => n.endsWith(".import-incomplete"));
-    expect(markers).toEqual([`pre-state-migration-${TODAY}.import-incomplete`]);
-    realFs.rmSync(join(agents, "archive", markers[0]));
-    const restored = Object.fromEntries(Object.entries(tree(root)).filter(([p]) => !p.startsWith(".agents/archive/")));
-    expect(restored).toEqual(original);
-    expect(realFs.existsSync(runCommit(root, TODAY, { forceSnapshot: true }).statePath)).toBe(true);
-  });
+      // The way out the refusal states: restore from the snapshot, delete the marker.
+      const agents = join(root, ".agents");
+      for (const n of realFs.readdirSync(agents)) if (n !== "archive") realFs.rmSync(join(agents, n), { recursive: true, force: true });
+      for (const n of realFs.readdirSync(join(root, SNAP))) realFs.cpSync(join(root, SNAP, n), join(agents, n), { recursive: true });
+      const markers = realFs.readdirSync(join(agents, "archive")).filter((n) => n.endsWith(".import-incomplete"));
+      expect(markers).toEqual([`pre-state-migration-${TODAY}.import-incomplete`]);
+      realFs.rmSync(join(agents, "archive", markers[0]));
+      const restored = Object.fromEntries(Object.entries(tree(root)).filter(([p]) => !p.startsWith(".agents/archive/")));
+      expect(restored).toEqual(original);
+      expect(realFs.existsSync(runCommit(root, TODAY, { forceSnapshot: true }).statePath)).toBe(true);
+    });
+  }
 
   it("the marker exists before --commit's first write to the live tree, so a process that dies there leaves a project that refuses", () => {
     writeProject(root, 7);
