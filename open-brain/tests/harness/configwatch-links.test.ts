@@ -1314,4 +1314,90 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(blob, "base identity").toContain(String(baseIno));
     expect(blob, "current identity").toContain(String(nowIno));
   });
+
+  it("R68: an in-place write to an unread machine path reports both fact sets", () => {
+    const home = join(tmp.dir, "r68-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = r68-base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const other = join(tmp.dir, "r68-other");
+    const first = "[user]\n\tname = r68-two-name\n";
+    writeFileSync(other, first);
+    unlinkSync(cfg);
+    linkSync(other, cfg);
+    expect(lstatSync(cfg).nlink, "plant: two names").toBe(2);
+    watch.compare();
+    watch.begin("qa");
+    const edited = `${first}[core]\n\tqa = in-place\n`;
+    writeFileSync(cfg, edited);
+    const qa = watch.compare();
+    const row = qa.find((f) => f.path === cfg);
+    const blob = JSON.stringify(qa);
+    expect(row, blob).toBeTruthy();
+    expect(row!.before, blob).not.toBe(row!.after);
+    expect(row!.before).toContain("size");
+    expect(row!.before).toContain("mtimeNs");
+    expect(row!.after).toContain("size");
+    expect(row!.after).toContain("mtimeNs");
+    expect(blob).not.toContain(h16(edited));
+    expect(blob).toContain("not read");
+  });
+
+  it("R69: a machine path absent at base is read once it appears as a single-name file", () => {
+    const home = join(tmp.dir, "r69-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const body = "[user]\n\tname = r69-created\n";
+    writeFileSync(cfg, body);
+    expect(lstatSync(cfg).nlink).toBe(1);
+    const blob = JSON.stringify(watch.compare());
+    expect(blob, blob).toContain(h16(body));
+    expect(blob).toContain("absent");
+  });
+
+  it("R69: a two-name file appearing where the path was absent is not read", () => {
+    const home = join(tmp.dir, "r69-two-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const other = join(tmp.dir, "r69-two-other");
+    const body = "[user]\n\tname = r69-two-secret\n";
+    writeFileSync(other, body);
+    linkSync(other, cfg);
+    expect(lstatSync(cfg).nlink).toBe(2);
+    const blob = JSON.stringify(watch.compare());
+    expect(blob, blob).not.toContain(h16(body));
+    expect(blob).toContain("not read");
+  });
+
+  it("R71: an unread repository record prints both fact sets", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const watch = new ConfigWatch(dirs, repo.root);
+    watch.begin("developer");
+    watch.closeAndRestore();
+    const config = join(dirs.commonDir, "config");
+    const victim = join(tmp.dir, "r71-victim");
+    writeFileSync(victim, "# R71-A\n");
+    unlinkSync(config);
+    linkSync(victim, config);
+    expect(lstatSync(config).nlink).toBe(2);
+    watch.begin("qa");
+    writeFileSync(victim, "# R71-BB\n");
+    const v = watch.closeAndRestore();
+    const row = v.changes.find((c) => c.path === config);
+    const blob = JSON.stringify(v);
+    expect(row, blob).toBeTruthy();
+    expect(row!.before, blob).not.toBe(row!.after);
+    expect(row!.before).toContain("size");
+    expect(row!.before).toContain("mtimeNs");
+    expect(row!.after).toContain("size");
+    expect(row!.after).toContain("mtimeNs");
+    expect(blob).not.toContain(h16("# R71-A\n"));
+    expect(blob).not.toContain(h16("# R71-BB\n"));
+  });
 });

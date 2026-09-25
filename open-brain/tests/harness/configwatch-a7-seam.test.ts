@@ -28,7 +28,7 @@ vi.mock("node:fs", async (importOriginal) => {
   return { ...m, default: { ...m, openSync }, openSync };
 });
 
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, linkSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { MachineConfigWatch } from "../../src/harness/configwatch.js";
@@ -114,5 +114,25 @@ describe("R66 — openSync seam", { timeout: 60_000 }, () => {
     } finally {
       chmodSync(victim, 0o644);
     }
+  });
+
+  it("R70: a second name gained inside open is not read", () => {
+    const cfg = join(dir, ".gitconfig");
+    const body = "[user]\n\tname = r70-base\n";
+    writeFileSync(cfg, body);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.captureBase();
+    watch.begin("developer");
+    const second = join(dir, "r70-second");
+    seam.target = cfg;
+    seam.act = () => linkSync(cfg, second);
+    const found = watch.compare();
+    const row = found.find((f) => f.path === cfg);
+    const blob = JSON.stringify(found);
+    expect(seam.fired, "plant: the seam ran inside open").toBe(1);
+    expect(statSync(cfg).nlink, "plant: nlink 2 on the handle").toBe(2);
+    expect(row, blob).toBeTruthy();
+    expect(row!.after, blob).not.toContain(h16(body));
+    expect(row!.after).toContain("handle is a different file");
   });
 });
