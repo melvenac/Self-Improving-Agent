@@ -19,7 +19,7 @@ vi.mock("node:fs", async (importOriginal) => {
     },
   };
 });
-import { chmodSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { ConfigWatch, MachineConfigWatch, identify, repositoryLinksAtBase, resolveGitDirs } from "../../src/harness/configwatch.js";
 import { runLoop, type LoopConfig } from "../../src/harness/runtime.js";
@@ -120,6 +120,7 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
 
   it.skipIf(isWin)("R77-CLOSE-VERDICT-NOT-OK: closeAndRestore is not ok when a directory cannot be listed", () => {
     const hooks = join(repo.root, ".git/hooks");
+    for (const name of readdirSync(hooks)) unlinkSync(join(hooks, name));
     const watch = new ConfigWatch(resolveGitDirs(repo.root), repo.root);
     watch.captureBase();
     watch.begin("developer");
