@@ -29,6 +29,8 @@ Each is one source change on `763611a`, tsc clean, tcm. Every run also failed CA
 | (e) close `ok` ignores unlisted | `895d8a5` | 36128242271 | none at loop level |
 | (f) begin does not refuse | `18db97b` | 36128283292 | R77-BEGIN-UNLISTED |
 
-(e) survives at loop level because the stop before git still fails the stage. The verdict's `ok` is the record. `R77-CLOSE-VERDICT-NOT-OK` calls `closeAndRestore` directly. Re-run of (e) with that row: `c87969b`, CI 36128793192. Candidate with the row: `9fe71a2`, CI 36128789771.
+(e) survives at loop level on `895d8a5` because the stop before git still fails the stage. The isolated row empties hooks before begin and asserts `changes.length === 0` and `ok === false`. On `b8cef69`, run 36129234932, that row is the extra failure: (e) is killed. The candidate `a00d2fe`, run 36129231903, failed only CA-9 and `R72-BEFORE-ABSENT-DANGLING`.
+
+Rulings for this section are R77 readings 1–8 and R82 in `docs/loops/loop-15-slice-3-rulings-18.md` at `68518ef` on `origin/docs/session-100-qa99-dispatch`.
 
 Model: Grok 4.7. No effort setting is shown.
