@@ -223,7 +223,7 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
 - **T-183 dispatched as a separate seat** on Aaron's question ("Can we dispatch another agent to work on only t 183?
   Is that work isolated enough…"). Its isolation is checked by footprint: A10 is `harness/*`; importer round 3 is
   `state-import/*` and `cli.ts`; T-183 is render-only (`session-start/state-render.ts` plus a `sync` check), with
-  **no schema change** as the binding condition. Worktree `~/Worktrees/sia-t183` created by the planner, detached at
+  **no schema change** as the binding condition. Worktree created by the planner as `~/Worktrees/sia-t183`, then renamed on Aaron's word to `~/Worktrees/sia-builder` ("change the agent name, t183 is too spacific.  We can use that agent as a builder for other isolated builds"), detached at
   `48acaa8`, with an untracked seat file. Brief: `docs/loops/t183-greeting-brief.md`. Record **113** (developer),
   **114** (QA).
 - **R80 at `e8fce2a`** (36196931266: CA-9 only; redcheck `e10971c` 36196648961 reddens the six rows). The texts, the

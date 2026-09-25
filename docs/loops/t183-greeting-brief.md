@@ -1,7 +1,7 @@
 # T-183: the greeting fits one tool result. Brief for a FRESH developer session (record session 113)
 
 **By:** Atlas (planner), record session 109 · 2026-09-25. **To:** the Claude developer seat (Forge), **record 113**,
-in **`~/Worktrees/sia-t183`**, a new checkout made for this task alone (detached at master `48acaa8`).
+in **`~/Worktrees/sia-builder`**, the standing checkout for isolated builds (detached at master `48acaa8`). T-183 is its first job.
 **Authority:** Aaron, in the planner session: *"Can we dispatch another agent to work on only t 183? Is that work
 isolated enough to not interfere with the other two forge agents?"*, answered yes on the condition below.
 **Runs beside two other seats:** Grok on candidate A10 (`harness/*`, in `sia-forge`) and Forge 110 on importer
