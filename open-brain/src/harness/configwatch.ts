@@ -108,6 +108,8 @@ export interface PathIdentity {
   size: bigint;
   mtimeNs: bigint;
   target: string | null;
+  /** Set when lstat or readlink failed with a code other than ENOENT or ENOTDIR. Not absence. */
+  code?: string | null;
 }
 
 export function identify(p: string): PathIdentity {
@@ -121,9 +123,9 @@ export function identify(p: string): PathIdentity {
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code;
     if (code === "ENOENT" || code === "ENOTDIR") {
-      return { kind: "absent", mode: 0, nlink: 0, ino: null, dev: null, size: 0n, mtimeNs: 0n, target: null };
+      return { kind: "absent", mode: 0, nlink: 0, ino: null, dev: null, size: 0n, mtimeNs: 0n, target: null, code: null };
     }
-    throw err;
+    return { kind: "other", mode: 0, nlink: 0, ino: null, dev: null, size: 0n, mtimeNs: 0n, target: null, code: code ?? "UNKNOWN" };
   }
 }
 
@@ -164,11 +166,20 @@ export function dotGitLink(repoRoot: string): string | null {
  * A missing dir, or a dir that is itself a link, contributes nothing: the
  * caller decides what a link at the root means, and this function does not follow it.
  */
-function listTree(dir: string): string[] {
-  if (identify(dir).kind !== "dir") return [];
+function listTree(dir: string): { paths: string[]; unlisted: string[] } {
+  if (identify(dir).kind !== "dir") return { paths: [], unlisted: [] };
   const out: string[] = [];
+  const unlisted: string[] = [];
   const walk = (d: string): void => {
-    for (const entry of readdirSync(d, { withFileTypes: true })) {
+    let entries;
+    try {
+      entries = readdirSync(d, { withFileTypes: true });
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
+      unlisted.push(`unlisted: ${d} (${code})`);
+      return;
+    }
+    for (const entry of entries) {
       const p = join(d, entry.name);
       if (entry.isSymbolicLink()) {
         out.push(p);
@@ -179,7 +190,7 @@ function listTree(dir: string): string[] {
     }
   };
   walk(dir);
-  return out;
+  return { paths: out, unlisted };
 }
 
 /**
@@ -198,7 +209,9 @@ export function repositoryLinksAtBase(repoRoot: string, dirs: GitDirs): string[]
   for (const t of trees) {
     note(t);
     if (identify(t).kind === "dir") {
-      for (const entry of listTree(t)) if (identify(entry).kind === "symlink") found.push(entry);
+      const listed = listTree(t);
+      for (const note of listed.unlisted) found.push(note);
+      for (const entry of listed.paths) if (identify(entry).kind === "symlink") found.push(entry);
     }
   }
   return [...new Set(found)];
@@ -437,9 +450,9 @@ const readState = (p: string, baseline?: FileState | null, preflight = false): F
   try {
     return fileState(id, readFileSync(p), false);
   } catch (err) {
-    const code = (err as NodeJS.ErrnoException).code;
-    if (code !== "EACCES" && code !== "EPERM") throw err;
-    return { ...fileState(id, null, true), readError: "unreadable" };
+    const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
+    const readError = code === "EACCES" || code === "EPERM" ? "unreadable" : `unreadable (${code})`;
+    return { ...fileState(id, null, true), readError };
   }
 };
 
@@ -470,7 +483,7 @@ const agrees = (snapshot: FileState, now: FileState | null): boolean => {
 const stateHash = (s: FileState | null): string => {
   if (s === null) return "absent";
   if (s.kind === "symlink") return `type:symlink readlink:${s.target}`;
-  if (s.readError) return `unreadable; type file dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
+  if (s.readError) return `${s.readError}; type file dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
   if (s.unreadIdentity) return `identity:dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}; not read`;
   return `${hashOf(s.bytes)}/${s.mode.toString(8)}/nlink:${s.nlink}`;
 };
@@ -593,7 +606,7 @@ export class ConfigWatch {
         all.add(t);
         continue;
       }
-      for (const f of listTree(t)) all.add(f);
+      for (const f of listTree(t).paths) all.add(f);
     }
     return [...all].sort();
   }
@@ -792,8 +805,12 @@ export class ConfigWatch {
             `runtime's own git calls. ` +
             restored +
             `${scale}. ${CONFIG_WATCH_LIMIT}`;
+    const readNotes = [...before.values()].flatMap((s) =>
+      s?.readError && s.readError !== "unreadable" ? [s.readError] : [],
+    );
+    const withReads = readNotes.length === 0 ? message : `${message} Read failures: ${readNotes.join("; ")}.`;
 
-    return { ok, stage: this.stage, examined: names.size, changes, unrestored, ancestorLink, message };
+    return { ok, stage: this.stage, examined: names.size, changes, unrestored, ancestorLink, message: withReads };
   }
 }
 
