@@ -135,6 +135,7 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
       chmodSync(hooks, 0o755);
     }
     expect(thrown, "close does not throw").toBe("");
+    expect(verdict!.changes, "an empty tree that cannot be listed is not a file change").toEqual([]);
     expect(verdict!.ok, "an unlisted directory is not an ok close").toBe(false);
     expect(verdict!.message, "the message names the directory").toContain(hooks);
     expect(verdict!.message, "the message names the code").toContain("EACCES");
