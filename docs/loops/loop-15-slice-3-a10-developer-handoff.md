@@ -1,4 +1,36 @@
-# A10 developer handoff — R77
+# A10 developer handoff
+
+Continuing record 107, with tonight's context. Not a new session. Model: Grok 4.7. No effort setting is shown. GitNexus impact is not available on this seat.
+
+## R78 and the R82 ENOENT precision
+
+Accepted at `f45c4c922e0665ed6d5e44f17982c2091f32ace1`.
+
+R78: a read side prints `<hash> type <kind> dev <dev> ino <ino> nlink <nlink> size <size> mtimeNs <mtimeNs>`. Candidate CI 36131825963, then the ENOENT commit's CI 36192597210, standing pair only. Redcheck `c065652` on `e7fbe78`, CI 36192722723, reddens `R73-READ-STABLE-FACTS` and `R73-READ-CHANGE-FACTS`. Hash-alone mutant `ec24c67`, CI 36192708146, reddens the same two rows.
+
+ENOENT and ENOTDIR are absence. `resolutionUnobservable` returns null for those two codes and the record is `absent (CODE)`. There is no separate red-at-base run. Mutant `14655c3` (CI 36192647557) drops the exclusion, so every code is unobservable again, and that restores the pre-fix behaviour. The mutant stands as the red: `R82-ENOENT-IS-ABSENT` fails as `machine-config-unobservable` with ENOENT.
+
+The win32 R35 junction is local-only. tcm cannot run it. Command, from `open-brain`:
+
+```
+npx vitest run tests/harness/configwatch-r77-contain.test.ts tests/harness/configwatch-links.test.ts -t "R82-ENOENT-IS-ABSENT|R35: a machine-config junction" --reporter=verbose
+```
+
+```
+ ✓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R82-ENOENT-IS-ABSENT: a machine path removed during the stage is absent (ENOENT) and the stage continues 3024ms
+ ✓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R35: a machine-config junction at base is not refused, and one planted later is a type change 5662ms
+
+ Test Files  2 passed (2)
+      Tests  2 passed | 82 skipped (84)
+   Start at  16:37:34
+   Duration  8.02s (transform 546ms, setup 106ms, collect 2.08s, tests 8.76s, environment 1ms, prepare 1.47s)
+```
+
+## R79
+
+A side prints what the runtime has. An unreadable stage start is `unreadable; stage start <facts>` on every combination. A missing path is `absent (ENOENT)`, and a loop base that did not exist is `absent at loop base` with no zeroed facts. A dangling link keeps its lstat facts. `R71 A6-5` now asserts that form. QA 99's `R71-UNREADABLE-START` and `R71-UNREADABLE-AT-BASE` are not in this tree.
+
+## R77
 
 Candidate `loop/15-slice-3-candidate-a10`. R77 tree before the verdict-unit row: `763611a4ff927fc59806ac85156a774b5dd6cf0c`. The unit row is `9fe71a2d64ca25f6aef1e41aefde6721812e481f`.
 
