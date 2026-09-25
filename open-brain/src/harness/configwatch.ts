@@ -52,7 +52,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { basename, dirname, isAbsolute, join, parse, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, parse, relative, resolve } from "node:path";
 import { git, gitTry } from "./git.js";
 
 /** Where git keeps the files this layer watches, resolved once. */
@@ -762,16 +762,6 @@ export class ConfigWatch {
 
     for (const path of [...names].sort()) {
       if (ancestorLink) break;
-      const covered = this.unlistedNotes.find(
-        (u) => path === u.dir || path.startsWith(u.dir + sep) || path.startsWith(u.dir + "/"),
-      );
-      if (covered && before.has(path)) {
-        const b = before.get(path)!;
-        unrestored.push(
-          `${path} (unrestorable: under unlisted ${covered.dir} (${covered.code}); begin ${stateHash(b)})`,
-        );
-        continue;
-      }
       let b: FileState | null = null;
       let a: FileState | null = null;
       try {
