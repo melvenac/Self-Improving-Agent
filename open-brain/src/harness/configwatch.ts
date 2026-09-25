@@ -212,7 +212,6 @@ export function repositoryLinksAtBase(repoRoot: string, dirs: GitDirs): string[]
     note(t);
     if (identify(t).kind === "dir") {
       const listed = listTree(t);
-      for (const note of listed.unlisted) found.push(note);
       for (const entry of listed.paths) if (identify(entry).kind === "symlink") found.push(entry);
     }
   }

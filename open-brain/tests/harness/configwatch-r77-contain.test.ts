@@ -68,14 +68,20 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
     chmodSync(hooks, 0o000);
     let thrown = "";
     let reported = "";
+    let links = "";
     try {
-      reported = repositoryLinksAtBase(repo.root, resolveGitDirs(repo.root)).join("\n");
+      const dirs = resolveGitDirs(repo.root);
+      const watch = new ConfigWatch(dirs, repo.root);
+      watch.begin("developer");
+      reported = watch.unlistedAtOpen().join("\n");
+      links = repositoryLinksAtBase(repo.root, dirs).join("\n");
     } catch (e) {
       thrown = (e as NodeJS.ErrnoException).code ?? (e as Error).message;
     }
     expect(thrown, "listTree contains readdir").toBe("");
     expect(reported, "an unlistable directory is reported unlisted, not silently absent").toContain("unlisted:");
     expect(reported, "the unlist record carries the code").toContain("EACCES");
+    expect(links, "an unlist note is not a link").not.toContain("unlisted:");
   });
 
   it.skipIf(isWin)("R77-BEGIN-TREE: begin contains listTree (currentFiles :592, begin :620)", () => {
