@@ -125,3 +125,22 @@ Room `k57frxw0ptb8tadmqdwy0khhks8ey006`. Turn numbers are the hub's.
   accepted the first. Nothing was reported to Relay. Grok's rule: never resend a message whose result it did not
   see. A hub-side idempotency key would make that structural rather than a promise, so it is a candidate A2A-Hub
   task, for Relay to consider, not a defect.
+
+## Preserved from the record: T-189 (G-024)
+
+The rev-131 dry run said retention would DROP T-189 while the handoff still cites it, so it was copied here verbatim
+from `state.json` rev 130. That copy is itself a tracked citation, so the real write KEPT T-189. Its retention note
+read "dangling reference (T-157)", which names the wrong id: a copy slip in the message, recorded as an observation.
+
+```json
+{
+ "id": "T-189",
+ "title": "The D-050 maintenance window: after importer round 2 hands back, upgrade GitNexus to 1.6.12, update and rebuild the SIA main checkout (T-172), reindex it fully, and reconnect /mcp in every open session",
+ "priority": "P1",
+ "status": "done",
+ "opened_session": 100,
+ "closed_session": 100,
+ "supersedes": null,
+ "note": "Done 2026-09-25 by the planner (session 100) on D-050, with Aaron's added word 'stop the five idle GitNexus server processes and then run the upgrade'. Each step was read back before the next. (1) Relay confirmed no A2A-Hub seat was mid-call; the planner found 4 running gitnexus MCP processes (the fifth had exited) and stopped them; 0 remained. (2) npm 11.19.0 on node v22.23.2: `npm i -g gitnexus@1.6.12`, rc 0; read back `gitnexus --version` = 1.6.12. npm 11 SKIPPED the install scripts of the native packages (@ladybugdb/core, tree-sitter and its grammars, onnxruntime-node, protobufjs, and gitnexus's own build-tree-sitter-grammars postinstall). Each native module still `require`s cleanly (they ship prebuilds); non-TS grammars are untested. (3) Main checkout ~/Projects/Self-Improving-Agent: clean, f673d5e -> origin/master 9bc06e3 (v0.44.2; 111 commits). Only root package.json changed among the dependency files (the version line), so no npm ci, avoiding the Windows lock on better-sqlite3 held by every session's open-brain server. `npm run build` rc 0, stamped 9bc06e3; `sync --check` there: build-freshness PASS against 9bc06e3; 27 passed, 1 issue (the known ENTITIES.md retirements). (4) `gitnexus analyze --force --skip-agents-md --skip-skills`: 1.6.12 detected the schema change and recreated the database; indexed in 47.1s; meta.json lastCommit 9bc06e3 = HEAD; 7,123 nodes, 15,635 edges, 297 clusters, 173 flows; the tracked tree stayed clean. (5) OUTSTANDING, Aaron's: /mcp reconnect of open-brain and gitnexus in every open session. Until then those sessions run the OLD open-brain server code (v0.44.1) and have no gitnexus. A2A-Hub's own index is Relay's to rebuild. This closes the window, not T-172: that task's lasting fix (the greeting prints the serving build's distance; one refusing command updates it) is still open."
+}
+```

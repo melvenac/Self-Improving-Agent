@@ -1,15 +1,20 @@
-<!-- generated from .agents/state.json rev 130 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 131 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner _(written session 100)_
+## planner _(written session 109)_
 
 ### Pick up here
 
-PLANNER SESSION 100 (Atlas), 2026-09-25 ~10:40Z. READ docs/loops/adoption-plan-2026-09-25.md FIRST (section 8). CANDIDATE A: A9 6bd97f2 REJECTED by QA 104 (report on origin/qa/loop-15-slice-3-a9-report e80acd4). Rulings-17 (R77-R80) and the A10 brief are written and pushed on docs/session-100-qa99-dispatch; the A10 dispatch is POSTED as turn 46 in hub room k57frxw0ptb8tadmqdwy0khhks8ey006. WAITING ON AARON: start a fresh Grok session in ~/Worktrees/sia-forge (record 107) and paste: 'You are the developer seat, record session 107. Your dispatch is waiting on the A2A hub. From ~/Projects/A2A-Hub run: HUB_URL=http://100.124.212.87:4000 node scripts/hub-talk.mjs --as grok --session k57frxw0ptb8tadmqdwy0khhks8ey006 --inbox. Read turn 46 from atlas and follow it.' Its QA is 108, headless, via docs/loops/qa-driver-copy.mjs (template qa-driver-template, T-190). IMPORTER: round 2 aba35de (developer 105, handoff 665b3a2) is in headless QA 106 since 10:20Z (dispatch docs/loops/importer-fixes-r2-dispatch-qa.md; watch with watch.mjs --dir sia-qa106). On acceptance: merge and release are Aaron's (D-019); then the main checkout needs updating and rebuilding again, because the D-050 window already moved it to v0.44.2 (T-189 done). THEN one record PR for docs/session-100-qa99-dispatch under D-032. SESSION 100 ROLLED at Aaron's request (~10:45Z, context 24%). ITS BACKGROUND WATCHES DIED WITH IT, SO RE-ARM THEM: (1) a hub `--wait --wait-timeout 3600` as atlas in room k57frxw0ptb8tadmqdwy0khhks8ey006 for Grok's 'A10 started' (run hub-talk from ~/Projects/A2A-Hub, which now needs atlas's key file, present); (2) a poll of C:/Users/AARONM~1/sia-qa106/drive.meta and its `done` marker over `ssh -l "Aaron Melven" 100.73.250.101`. Then read QA 106's report on origin/qa/importer-fixes-r2-report. The QA drivers set TEMP=C:/qa-tmp (T-190; Aaron applied the Defender exclusions for C:/qa-tmp and C:/qa-scratch).
+PLANNER SESSION 109 (Atlas), 2026-09-25, ran overnight while Aaron slept. READ docs/loops/planner-session-109-notes.md FIRST: every ruling of the night, with its hub turn and a run id the planner read itself. A10: R77+R82 complete; R78 built. Grok owes (turn 107) the R78 tcm redcheck and mutant, and the ENOENT-is-absence fix (R82-ENOENT-IS-ABSENT) with win32 R35 evidence, then R79, R80, the handoff, and the freeze. Grok went quiet after 11:53Z: ask Aaron to nudge the Cursor window (hub room k57frxw0ptb8tadmqdwy0khhks8ey006). When A10 freezes, write the QA 108 dispatch from rulings-17 plus rulings-18, and copy the driver with docs/loops/qa-driver-copy.mjs. IMPORTER: round 2 rejected; round 3 is briefed, and Aaron starts developer 110 in sia-infra. B Step 0 (record 112) follows round 3 in sia-infra.
 
 ### Watch out
 
+- RULINGS-18 BINDS QA 108 (docs/loops/loop-15-slice-3-rulings-18.md): R77's eight readings, R81 and R82. The hub keeps no record; the rulings file and the session notes are the record.
+- A RESTORE MUST NEVER TOUCH THE OLD PATH (R36): d14a874 added chmodSync(path) before the rename-restore, which followed a planted hook symlink to a victim outside the repository (R58 (b)3). A kind==='file' guard does not help, because a hard link is kind file. The planner's own turn-90 wording invited it.
+- ENOENT/ENOTDIR ARE ABSENCE, NOT FAILURE (R82 made precise, turn 107): a win32 junction shape (R35) failed machine-config-unobservable with ENOENT. tcm cannot run it; QA 108 on win32 must.
+- A DIRECTORY LISTING'S SIZE LIES FOR AN OPEN FILE: the planner read run-0.jsonl as 0 bytes via Get-ChildItem at 17 minutes, called it Out-File buffering, and a control run disproved that (Out-File wrote at 2.5 s). Count lines, or read from a handle.
+- THE PLANNER CANNOT READ THE QA PC OVER SSH (host classifier, 'Production Reads'). Aaron runs the reads; a QA report arrives as its origin/qa/*-report branch, which the planner can read.
 - THE GREETING NO LONGER FITS ONE TOOL RESULT (T-183): ob_start's output was 92,131 characters at rev 121 and is saved to a file. READ THE WHOLE FILE IN CHUNKS before acting; the watch-outs and the handoff are inside it.
 - THE MAIN CHECKOUT WAS UPDATED IN THE D-050 WINDOW (T-189): ~/Projects/Self-Improving-Agent is at 9bc06e3 (v0.44.2), built and indexed on GitNexus 1.6.12, and Aaron reconnected /mcp in all five sessions (every server process started after the build). A later merge (the importer fixes) needs the same update and rebuild again, and T-172's lasting fix is still open.
 - A2A-HUB T-003 IS DONE (window 2026-09-25 ~03:55Z-04:27Z, opened on Aaron's "dispatch relay A2A-Hub switchover"; K7 passed: 6 owned rows, the shared dev-key held by no name; tcm on v1.10.0, AUTH_MODE warn; ~/Projects/A2A-Hub at c4d2d1c). hub-talk now REQUIRES a key file: atlas's and grok's are in C:/Users/melve/.a2a-hub/keys/100.124.212.87-4000/ (created by the planner from ~/Worktrees/a2a-client-v1.10.0 on Aaron's word to Relay). A NEW SIA hub name needs `hub-talk --as <name> --init-key` against tcm AND Aaron's word first. Never copy a .key file anywhere. Relay's evidence: A2A-Hub docs/loops/t-003-cutover-log.md.
@@ -32,6 +37,8 @@ PLANNER SESSION 100 (Atlas), 2026-09-25 ~10:40Z. READ docs/loops/adoption-plan-2
 
 ### Open questions
 
+- A10's R79 and R80 are not started. Does Grok's context last them, or does D-035 want a fresh Grok session at the R78 boundary? Grok's own read of its context decides.
+- The spawn-site scan matches by name (RegExp.exec read as child_process exec): T-156's, not A10's. Does it get a row in T-156's note?
 - Is G-042 the machine's load, the worktree, or Cursor running in it? Repeat runs in the SAME tree are the missing control.
 - T-050: can Cursor's stop hook wake an idle seat? Deferred by Relay (2026-09-25) until it writes a brief for Aaron after the tcm cutover; not a trial on Grok's seat.
 - Were Forge's two refusals false positives? /feedback was advised; not recorded as done.
@@ -43,11 +50,13 @@ PLANNER SESSION 100 (Atlas), 2026-09-25 ~10:40Z. READ docs/loops/adoption-plan-2
 ### Loop state
 
 **Open PRs:** 
-- docs/session-100-qa99-dispatch — QA: not_required — Branch, not yet a PR: every session-100 doc (QA 99/102/104/106 dispatches and drivers, the driver template and copier, the live view, the adoption plan, both importer briefs, rulings-16 and -17, the A9 and A10 briefs) and the state writes. One record PR under D-032 when a verdict lands, or now if the next planner prefers: every path is docs/** or .agents state.
+- docs/session-100-qa99-dispatch — QA: not_required — The record PR under D-032: sessions 100 and 109's docs and state. Every path is docs/** or .agents state (checked at session 109: 37 of 37). Opened by planner 109.
 
 **SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** _None._
+**Questions pending for Aaron:** 
+- Nudge Grok's Cursor window: quiet since 11:53Z, owes turn 107's items.
+- Start developer 110 (importer round 3) in ~/Worktrees/sia-infra with the round-3 brief.
 
 **Rulings made mid-loop:** 
 - D-031 release commit after acceptance
@@ -70,6 +79,7 @@ PLANNER SESSION 100 (Atlas), 2026-09-25 ~10:40Z. READ docs/loops/adoption-plan-2
 - D-048 Makerspace record-only onto SIA before its cutover, after the pilots and T-175/T-180 (T-181; docs/loops/adoption-plan-2026-09-25.md)
 - D-049 /sync rebuilds the GitNexus index when behind (T-187)
 - D-050 one maintenance window: GitNexus 1.6.12, main checkout v0.44.2, full reindex (T-189 done)
+- Session 109: rulings-18 (R77 as applied, R81 B Step 0 does not wait for A, R82 fail closed on what cannot be seen); QA 106 verdict (aba35de does not merge) and the round-3 brief
 
 ## developer _(written session 74)_
 
