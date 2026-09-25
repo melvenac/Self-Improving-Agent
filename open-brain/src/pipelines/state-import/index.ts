@@ -116,7 +116,9 @@ export function decodeText(buf: Buffer): DecodedText {
 function withCheck(buf: Buffer, encoding: "utf8" | "utf8-bom"): DecodedText {
   let text: string;
   try {
-    text = new TextDecoder("utf-8", { fatal: true }).decode(buf);
+    // ignoreBOM: TextDecoder drops a UTF-8 BOM by default, which made the strip
+    // in decodeText a second, unobservable protection. One, and it is that one.
+    text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(buf);
   } catch {
     return { text: buf.toString("utf-8"), encoding, undecodable: "not valid UTF-8, and no UTF-16 byte-order mark: its encoding is unknown, so its words cannot be read" };
   }
