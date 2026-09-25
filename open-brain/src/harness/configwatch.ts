@@ -166,19 +166,24 @@ export function dotGitLink(repoRoot: string): string | null {
  * A missing dir, or a dir that is itself a link, contributes nothing: the
  * caller decides what a link at the root means, and this function does not follow it.
  */
-function listTree(dir: string): { paths: string[]; unlisted: string[] } {
+interface UnlistedDir {
+  dir: string;
+  code: string;
+}
+
+function listTree(dir: string): { paths: string[]; unlisted: UnlistedDir[] } {
   const id = identify(dir);
-  if (id.kind === "other" && id.code) return { paths: [], unlisted: [`unlisted: ${dir} (${id.code})`] };
+  if (id.kind === "other" && id.code) return { paths: [], unlisted: [{ dir, code: id.code }] };
   if (id.kind !== "dir") return { paths: [], unlisted: [] };
   const out: string[] = [];
-  const unlisted: string[] = [];
+  const unlisted: UnlistedDir[] = [];
   const walk = (d: string): void => {
     let entries;
     try {
       entries = readdirSync(d, { withFileTypes: true });
     } catch (err) {
       const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
-      unlisted.push(`unlisted: ${d} (${code})`);
+      unlisted.push({ dir: d, code });
       return;
     }
     for (const entry of entries) {
@@ -602,12 +607,12 @@ export class ConfigWatch {
   }
 
   /** Directories listTree could not list on the latest currentFiles call. */
-  private unlistedNotes: string[] = [];
+  private unlistedNotes: UnlistedDir[] = [];
 
   private currentFiles(): string[] {
     const { files, trees } = watchedLocations(this.dirs);
     const all = new Set<string>(files);
-    const unlisted: string[] = [];
+    const unlisted: UnlistedDir[] = [];
     for (const t of trees) {
       // A link at the tree root is the change. Do not list what it points at.
       if (identify(t).kind === "symlink") {
@@ -624,7 +629,7 @@ export class ConfigWatch {
 
   /** Directories the latest listing could not read, as `unlisted: <dir> (<code>)`. */
   unlistedAtOpen(): readonly string[] {
-    return this.unlistedNotes;
+    return this.unlistedNotes.map((u) => `unlisted: ${u.dir} (${u.code})`);
   }
 
   /**
@@ -757,12 +762,9 @@ export class ConfigWatch {
 
     for (const path of [...names].sort()) {
       if (ancestorLink) break;
-      const covered = this.unlistedNotes
-        .map((note) => {
-          const m = /^unlisted: (.+) \(([^)]+)\)$/.exec(note);
-          return m ? { dir: m[1]!, code: m[2]! } : null;
-        })
-        .find((u) => u !== null && (path === u.dir || path.startsWith(u.dir + sep) || path.startsWith(u.dir + "/")));
+      const covered = this.unlistedNotes.find(
+        (u) => path === u.dir || path.startsWith(u.dir + sep) || path.startsWith(u.dir + "/"),
+      );
       if (covered && before.has(path)) {
         const b = before.get(path)!;
         unrestored.push(
@@ -815,7 +817,7 @@ export class ConfigWatch {
       const r = relative(this.dirs.commonDir, p);
       return r.startsWith("..") ? p : `<common>/${r.replace(/\\/g, "/")}`;
     };
-    const unlisted = [...this.unlistedNotes];
+    const unlisted = this.unlistedNotes.map((u) => `unlisted: ${u.dir} (${u.code})`);
     const scale = `examined ${names.size + unlisted.length} file(s) around the ${this.stage} stage`;
     const ok = (changes.length === 0 && ancestorLink === null && unlisted.length === 0);
     const restored =
@@ -946,6 +948,8 @@ interface MachineSnap {
   hash: string;
   state: "read" | "not-read" | "unwatched";
   reason: string;
+  /** Set only by the catch that saw lstat, open, fstat, or read throw. Absent means the path was observed. */
+  errno: string | null;
 }
 
 export class MachineConfigWatch {
@@ -1014,6 +1018,7 @@ export class MachineConfigWatch {
       hash: "unread",
       state: "unwatched",
       reason: "did not resolve",
+      errno: null,
     });
     let resolvedPath: string | null = null;
     let kind: PathIdentity["kind"] = "absent";
@@ -1033,7 +1038,7 @@ export class MachineConfigWatch {
       mtimeNs = st.mtimeNs;
     } catch (err) {
       const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
-      return { ...unresolved(), reason: `did not resolve: ${code}` };
+      return { ...unresolved(), reason: `did not resolve: ${code}`, errno: code };
     }
     const note: MachineSnap = {
       lexicalKind: lexical.kind,
@@ -1051,6 +1056,7 @@ export class MachineConfigWatch {
       hash: "unread",
       state: "not-read",
       reason: "not read",
+      errno: null,
     };
     if (gate && lexical.kind === "symlink" && gate.lexicalKind !== "symlink") {
       return { ...note, reason: "type change" };
@@ -1086,8 +1092,9 @@ export class MachineConfigWatch {
         };
       }
       return { ...note, hash: hashOf(readFileSync(fd)), state: "read", reason: "read" };
-    } catch {
-      return { ...note, hash: "unreadable", reason: "unreadable" };
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
+      return { ...note, hash: "unreadable", reason: "unreadable", errno: code };
     } finally {
       if (fd !== null) closeSync(fd);
     }
@@ -1177,12 +1184,10 @@ export class MachineConfigWatch {
       const base = this.loopBase.get(p.path)!;
       const opened = start.get(p.path)!;
       const end = this.observe(p.path, base);
-      const unresolved = "did not resolve: ";
-      if (opened.state === "read" && end.reason.startsWith(unresolved) && end.reason.slice(unresolved.length).startsWith("E")) {
-        const code = end.reason.slice(unresolved.length);
+      if (opened.state === "read" && end.errno !== null) {
         out.push({
           stage: this.stage, scope: p.scope, path: p.path,
-          before: opened.hash, after: `unobservable (${code})`, changed: true, unobservableCode: code,
+          before: opened.hash, after: `unobservable (${end.errno})`, changed: true, unobservableCode: end.errno,
         });
         continue;
       }
