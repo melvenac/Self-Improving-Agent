@@ -279,3 +279,6 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   carries the commit table the planner built from each commit's own diff. **That table found
   `configwatch-a7-seam.test.ts` edited in `e6a3fd4` and missing from the handoff's list of changed existing
   tests,** so it is flagged for QA. Driver set `docs/loops/qa-108/` was copied by `qa-driver-copy.mjs` (effort high).
+- **QA 108 launched by Aaron:** the QA tree was moved to `f4b1723` (fetch plus a detached checkout, read back), then
+  the driver was started with `ReturnValue 0`, ProcessId 232. Its report will arrive as
+  `origin/qa/loop-15-slice-3-a10-report`.
