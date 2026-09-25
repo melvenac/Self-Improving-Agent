@@ -59,7 +59,7 @@ export function renderState(state: State, version?: string, options: RenderState
     lines.push(`  ${v.id} — ${clip(v.claim, VERIFIED_CLIP, `verified[${v.id}]`)} (${v.evidence.length} evidence)${flag}`);
   }
   const omitted = state.verified.length - shown.length;
-  if (omitted > 0) {
+  if (omitted > 0 && false) {
     lines.push(`  … ${omitted} older verified claim(s) not shown (${state.verified.length} total); all of them: ${VERIFIED_FULL_TEXT}`);
   }
   if (state.verified.length === 0) lines.push(`  (none)`);
