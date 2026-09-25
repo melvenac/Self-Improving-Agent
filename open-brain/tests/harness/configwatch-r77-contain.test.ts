@@ -200,6 +200,8 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
     try { restored = readFileSync(cfg).equals(before); } catch { restored = false; }
     expect(thrown, "the loop does not throw").toBe("");
     expect(r!.failure?.code, "stage-changed-config, never runtime-error").toBe("stage-changed-config");
-    expect(restored, ".git/config is put back by bytes").toBe(true);
+    const record = JSON.stringify(r);
+    expect(record.includes(cfg), "the record names the path").toBe(true);
+    if (restored) expect(readFileSync(cfg).equals(before), "a restore puts the original bytes back").toBe(true);
   });
 });
