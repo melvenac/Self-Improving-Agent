@@ -177,9 +177,14 @@ export function existsCaseInsensitive(path: string): boolean {
       return false;
     }
     const want = part.toLowerCase();
-    const match = entries.find((e) => e === part) ?? entries.find((e) => e.toLowerCase() === want);
-    if (match === undefined) return false;
-    current = current.endsWith("/") ? current + match : `${current}/${match}`;
+    const listed = entries.find((e) => e === part) ?? entries.find((e) => e.toLowerCase() === want);
+    // A name the filesystem resolves but readdir never lists: a Windows 8.3 short
+    // alias such as AARONM~1, which is what os.tmpdir() returns in some launch
+    // contexts. Accept the segment as given when it resolves. On a case-sensitive
+    // filesystem this changes nothing: no case-insensitive entry means no exact one.
+    const next = current.endsWith("/") ? current + (listed ?? part) : `${current}/${listed ?? part}`;
+    if (listed === undefined && !existsSync(next)) return false;
+    current = next;
   }
   return existsSync(current);
 }
