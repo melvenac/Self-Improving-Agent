@@ -999,8 +999,7 @@ export class MachineConfigWatch {
       nlink === 1 &&
       lexical.kind === "file" &&
       basename(resolvedPath) === basename(p) &&
-      parentReal !== null &&
-      parentReal === gate.parentReal;
+      parentReal !== null;
     const same = gate === null || appeared || (gate.resolvedPath === resolvedPath && (sameObject || singleName));
     if (!same) return { ...note, reason: "different file" };
     if (kind !== "file") return { ...note, reason: "not a file" };
