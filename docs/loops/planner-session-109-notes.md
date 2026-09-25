@@ -282,3 +282,9 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
 - **QA 108 launched by Aaron:** the QA tree was moved to `f4b1723` (fetch plus a detached checkout, read back), then
   the driver was started with `ReturnValue 0`, ProcessId 232. Its report will arrive as
   `origin/qa/loop-15-slice-3-a10-report`.
+- **Aaron: "This machine never really goes quiet during the day, what are my other options."** Ruled: developer
+  seats do **not** run the full local suite on this box. Full-suite evidence comes from tcm CI (Linux, quiet) and the
+  QA seat's one run on the QA PC (Windows, quiet, the Defender-on control, T-190). Forge 110 skips its run and hands
+  off; Forge 113's hold is lifted. Offered to Aaron: a self-hosted Windows runner on the QA PC (his machine, his
+  call), and candidate B, which is the G-042 repair itself.
+- **Grok's hub hold (turn 120)** was superseded by the freeze (turn 123), which ended its session.
