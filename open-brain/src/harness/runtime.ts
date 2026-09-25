@@ -1076,7 +1076,7 @@ async function runLoopInner(
       if (machineWatch) {
         for (const f of machineWatch.compare()) {
           result.machineConfigFindings.push(f);
-          if (!f.changed) continue;
+          if (!machineChangeReported(f)) continue;
           const typeChange = f.after.startsWith("type change:");
           const line =
             `machine-wide git config changed during the ${f.stage} stage: ${f.scope} ${f.path} ${f.before} → ${f.after}. ` +
@@ -1626,4 +1626,9 @@ async function runLoopInner(
   } finally {
     releasePin(repoRoot, carried);
   }
+}
+
+/** R72. A machine finding is reported when the comparison says changed, even if the two texts are equal. */
+export function machineChangeReported(f: { before: string; after: string; changed: boolean }): boolean {
+  return f.changed;
 }

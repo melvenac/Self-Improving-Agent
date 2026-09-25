@@ -804,6 +804,9 @@ export class ConfigWatch {
           }
         } else if (b.kind === "file" && b.bytes !== null) {
           restoreNewFile(this.repoRoot, this.dirs, path, b.bytes, b.mode);
+        } else if (b.kind === "file") {
+          // R80. Was :755 at 6bd97f2. An unread file was described as "not followed", which is the symlink wording.
+          unrestored.push(`${path} (snapshot was file; unread, not restored)`);
         } else {
           unrestored.push(`${path} (snapshot was ${b.kind}; not followed)`);
         }
@@ -1102,14 +1105,14 @@ export class MachineConfigWatch {
       const st = fstatSync(fd, { bigint: true });
       // R70. The single-name condition is re-checked on the handle, with dev, ino and type, before any byte.
       if (!st.isFile() || st.dev !== dev || st.ino !== ino || Number(st.nlink) !== nlink) {
-        const gained = st.isFile() && st.dev === dev && st.ino === ino && Number(st.nlink) > nlink;
-        return {
-          ...note,
-          nlink: Number(st.nlink),
-          reason: gained
-            ? "handle is a different file; the object gained a name inside open"
-            : "handle is a different file",
-        };
+        const n = Number(st.nlink);
+        const sameObject = st.isFile() && st.dev === dev && st.ino === ino;
+        const reason = sameObject && n > nlink
+          ? "the object gained a name inside open"
+          : sameObject && n < nlink
+            ? "the object lost a name inside open"
+            : "handle is a different file";
+        return { ...note, nlink: n, reason };
       }
       return { ...note, hash: hashOf(readFileSync(fd)), state: "read", reason: "read" };
     } catch (err) {
@@ -1226,11 +1229,8 @@ export class MachineConfigWatch {
         continue;
       }
       if (end.state === "read") {
-        const before = stageBefore(opened);
-        const after = readText(end);
-        if (before !== after || opened.state !== "read") {
-          out.push(row(before, after, true, p.path, p.scope));
-        }
+        // R80. Was :1134 at 6bd97f2. Both-read already continued, so `opened.state !== "read"` was always true.
+        out.push(row(stageBefore(opened), readText(end), true, p.path, p.scope));
         continue;
       }
       const linkPlanted = end.viaLink !== null && end.viaLink !== opened.viaLink;
@@ -1253,14 +1253,14 @@ export class MachineConfigWatch {
         const after =
           base.resolvedPath === null
             ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${factText(end)}`
-            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: base ${baseText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
+            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
         out.push(row(stageBefore(opened), after, true, p.path, p.scope));
         continue;
       }
       const typeChange = end.lexicalKind === "symlink" && base.lexicalKind !== "symlink";
       const after = typeChange
         ? `type change: ${p.path} is a ${end.lexicalKind}${end.lexicalTarget ? ` target ${end.lexicalTarget}` : ""}; not read through; ${factText(end)}`
-        : end.reason.startsWith("handle is a different file")
+        : end.reason === "the object gained a name inside open" || end.reason === "the object lost a name inside open" || end.reason.startsWith("handle is a different file")
           ? `${end.reason}; not read; ${factText(end)}`
           : end.reason === "unreadable" || end.hash === "unreadable"
             ? `unreadable; current ${factText(end)}`
@@ -1268,7 +1268,7 @@ export class MachineConfigWatch {
               ? end.reason.startsWith("absent (")
                 ? end.reason
                 : `unwatched: ${end.reason}; not read`
-              : `not read: base ${baseText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
+              : `not read: loop base ${baseText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
       const before = stageBefore(opened);
       out.push(row(before, after, true, p.path, p.scope));
     }

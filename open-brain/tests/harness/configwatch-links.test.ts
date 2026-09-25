@@ -1541,7 +1541,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     watch.begin("qa");
     appendFileSync(cfg, "[core]\n\tr74 = later\n");
     const row = watch.compare().find((x) => x.path === cfg)!;
-    const baseSeg = /not read: base (.*?); current/.exec(row.after)?.[1] ?? "";
+    const baseSeg = /not read: loop base (.*?); current/.exec(row.after)?.[1] ?? "";
     expect(base.ino).not.toBe(start.ino);
     expect(baseSeg, row.after).toContain(`ino ${base.ino}`);
     expect(baseSeg).not.toContain(`ino ${start.ino}`);
