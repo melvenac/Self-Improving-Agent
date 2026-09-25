@@ -460,6 +460,7 @@ const readState = (p: string, baseline?: FileState | null, preflight = false): F
   if (id.kind === "symlink") {
     return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null };
   }
+  if (id.kind === "other" && id.code) return { ...fileState(id, null, true), readError: `unreadable (${id.code})` };
   if (id.kind !== "file") return null;
   const hadFile = baseline?.kind === "file";
   const same = hadFile && baseline.dev === id.dev && baseline.ino === id.ino && baseline.nlink === id.nlink;
@@ -700,6 +701,7 @@ export class ConfigWatch {
       if (id.kind === "symlink") {
         return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null };
       }
+      if (id.kind === "other" && id.code) return { ...fileState(id, null, true), readError: `unreadable (${id.code})` };
       if (id.kind !== "file") return null;
       return fileState(id, null, true);
     }
@@ -1233,7 +1235,7 @@ export class MachineConfigWatch {
       if (opened.state === "read") return readText(opened);
       if (opened.reason === "unreadable" || opened.hash === "unreadable") return `unreadable; stage start ${factText(opened)}`;
       if (opened.lexicalKind === "symlink" && opened.resolvedPath === null) return `${opened.reason}; ${factText(opened)}`;
-      if (opened.resolvedPath === null) return opened.reason.startsWith("absent (") ? opened.reason : "absent";
+      if (opened.resolvedPath === null) return opened.reason.startsWith("absent (") ? opened.reason : opened.errno !== null ? `unobservable at stage start: ${opened.reason}` : "absent";
       return `stage start ${factText(opened)}`;
     };
     const row = (before: string, after: string, changed: boolean, path: string, scope: string): MachineConfigFinding => ({
@@ -1243,10 +1245,10 @@ export class MachineConfigWatch {
       const base = this.loopBase.get(p.path)!;
       const opened = start.get(p.path)!;
       const end = this.observe(p.path, base);
-      if (opened.state === "read" && end.errno !== null) {
+      if (opened.errno === null && opened.reason !== "unreadable" && opened.hash !== "unreadable" && end.errno !== null) {
         out.push({
           stage: this.stage, scope: p.scope, path: p.path,
-          before: readText(opened), after: `unobservable (${end.errno})`, changed: true, unobservableCode: end.errno,
+          before: readText(opened), after: `unobservable (${end.errno}); ${end.lexicalKind === "symlink" ? linkSide(end) : factText(end)}`, changed: true, unobservableCode: end.errno,
         });
         continue;
       }
