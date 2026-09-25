@@ -49,9 +49,14 @@ Room `k57frxw0ptb8tadmqdwy0khhks8ey006`. Turn numbers are the hub's.
 - `drive.meta` at ~10:36Z: start 10:20:49Z, head `56d7bdd`, TEMP `C:\qa-tmp`, Defender exclusions present, and an
   empty `procs_at_start` (no claude/node at launch, which is the idle condition). **No `done`.** A `claude` process
   was alive. `run-0.jsonl` was 0 bytes.
-- **Driver defect:** `drive.ps1:82` pipes claude's stream-json to `Out-File`, which buffers. The jsonl stays empty
-  until late, so `watch.mjs` cannot tell a running seat from a hung one. The fix is a per-line flushed write, in the
-  driver template (T-190's driver, developer-owned).
+- **~~Driver defect~~ WITHDRAWN.** The planner first recorded that `drive.ps1:82` (`| Out-File $jsonl`) buffers,
+  so the jsonl stays empty and `watch.mjs` is blind. **Tested and false.** In Windows PowerShell 5.1 on this machine,
+  a node emitter writing one JSON line a second, piped exactly as the driver does, had **101 bytes on disk at 2.5 s
+  with `Out-File`**, the same as the `Add-Content`-per-line alternative (rc and UTF-8 preserved in both). The control
+  was run to validate the detector, and it disproved the diagnosis. QA 106's own report counted its jsonl mid-run
+  (141 records). **Likely cause of the 0 bytes, not tested:** `Get-ChildItem`'s Length comes from the NTFS directory
+  entry, which can lag for a file still open for writing. Read the size from an open handle, or count lines, instead.
+  The template is unchanged.
 - The QA tree carried three untracked paths at start: last runs' A8/A9 reports and scripts. They are not candidate
   content.
 - The planner cannot read the QA PC over SSH (host classifier, "Production Reads"). Aaron ran the reads. The report
@@ -87,6 +92,10 @@ Room `k57frxw0ptb8tadmqdwy0khhks8ey006`. Turn numbers are the hub's.
 - **Error (reached a counterpart):** turn 71 ruled that an unlisted directory at "begin or close" ends
   `stage-changed-config`. At begin that label is false (R74). Corrected by the planner at turn 72, before Grok
   built it. This is the planner's own family: a ruling's wording is its scope.
+- **Error (reached Aaron and this file):** told Aaron that `Out-File` buffers and that the driver cannot show
+  progress, and planned to change the template. A control run disproved it (see QA 106 above). The diagnosis came
+  from reading code, without running the instrument's known positive. This is shared.md's "validate a detector
+  against a known positive before you trust a negative", broken by the seat that quoted it.
 - **Near-miss:** the B amendment first asserted A's footprint. It was derived with `git diff --name-only` before
   commit.
 - **Record defect found:** session 100's handoff gives "~10:40Z" and "~10:45Z" for events that happened before
