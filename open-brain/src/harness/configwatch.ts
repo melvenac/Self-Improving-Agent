@@ -173,14 +173,7 @@ function listTree(dir: string): { paths: string[]; unlisted: string[] } {
   const out: string[] = [];
   const unlisted: string[] = [];
   const walk = (d: string): void => {
-    let entries;
-    try {
-      entries = readdirSync(d, { withFileTypes: true });
-    } catch (err) {
-      const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
-      unlisted.push(`unlisted: ${d} (${code})`);
-      return;
-    }
+    const entries = readdirSync(d, { withFileTypes: true });
     for (const entry of entries) {
       const p = join(d, entry.name);
       if (entry.isSymbolicLink()) {
