@@ -125,7 +125,7 @@ export function identify(p: string): PathIdentity {
     if (code === "ENOENT" || code === "ENOTDIR") {
       return { kind: "absent", mode: 0, nlink: 0, ino: null, dev: null, size: 0n, mtimeNs: 0n, target: null, code: null };
     }
-    return { kind: "other", mode: 0, nlink: 0, ino: null, dev: null, size: 0n, mtimeNs: 0n, target: null, code: code ?? "UNKNOWN" };
+    throw err;
   }
 }
 
