@@ -18,8 +18,11 @@ seat. The candidate is the SHA plus the rows below. "It works" is not this seat'
   with no marker. Anything longer is cut at the first sentence end or at 140, whichever comes first,
   and always carries `… (N chars; full text: state.json gaps[<id>])`. A line break counts as a clip.
   Verified renders as its count plus the **newest 10** in append order, clipped at 100 and keeping the
-  evidence count. Any **reopened** claim is shown whatever its age (this seat's choice, not ruled:
-  a reopened claim is a warning, not history). One omission line names the omitted count, the total
+  evidence count. **Design decision: any reopened claim is shown whatever its age.** A reopened
+  claim is a warning, not history, and it is the one kind of verified line that must not be clipped
+  away by age: a reader who needs to know that a verified claim no longer holds must not have to go
+  to `state show --json` to find out. This seat made the choice without a ruling; Atlas accepted it
+  at the verdict (A2A, record 109, 2026-09-25). One omission line names the omitted count, the total
   and `node open-brain/build/cli.js state show --json`, the read-only command that prints every claim.
   Plain `state show` prints only the count, measured in this tree.
 - `checks.ts`: `composeGreeting` and `checkGreetingSize`. It composes the greeting from the functions
