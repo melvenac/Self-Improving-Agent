@@ -1202,7 +1202,7 @@ export class MachineConfigWatch {
       s.resolvedPath === null && s.lexicalKind !== "symlink" ? "absent at loop base" : `${s.resolvedPath ?? "unresolved"} ${factText(s)}`;
     const stageBefore = (opened: MachineSnap): string => {
       if (opened.state === "read") return readText(opened);
-      if (opened.reason === "unreadable" || opened.hash === "unreadable") return `unreadable; stage start ${factText(opened)}`;
+      if (opened.reason === "unreadable" || opened.hash === "unreadable") return "unreadable";
       if (opened.lexicalKind === "symlink" && opened.resolvedPath === null) return `${opened.reason}; ${factText(opened)}`;
       if (opened.resolvedPath === null) return opened.reason.startsWith("absent (") ? opened.reason : "absent";
       return `stage start ${factText(opened)}`;
