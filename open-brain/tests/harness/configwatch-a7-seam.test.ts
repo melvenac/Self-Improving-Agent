@@ -134,5 +134,7 @@ describe("R66 — openSync seam", { timeout: 60_000 }, () => {
     expect(row, blob).toBeTruthy();
     expect(row!.after, blob).not.toContain(h16(body));
     expect(row!.after).toContain("handle is a different file");
+    expect(row!.after).toContain("gained a name inside open");
+    expect(row!.after).toContain(String(statSync(cfg, { bigint: true }).ino));
   });
 });

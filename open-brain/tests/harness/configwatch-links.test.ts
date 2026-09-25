@@ -8,9 +8,12 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
 import { createHash } from "node:crypto";
 import {
+  appendFileSync,
   chmodSync,
   lstatSync,
   mkdirSync,
+  statSync,
+  utimesSync,
   readdirSync,
   readFileSync,
   renameSync,
@@ -1399,5 +1402,202 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(row!.after).toContain("mtimeNs");
     expect(blob).not.toContain(h16("# R71-A\n"));
     expect(blob).not.toContain(h16("# R71-BB\n"));
+  });
+
+  const facts = (p: string) => {
+    const st = lstatSync(p, { bigint: true });
+    return { ino: String(st.ino), size: String(st.size), mtimeNs: String(st.mtimeNs), nlink: String(st.nlink) };
+  };
+
+  it("R73: a stable unread machine record carries the lstat facts", () => {
+    const home = join(tmp.dir, "r73-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = r73-base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const other = join(tmp.dir, "r73-other");
+    writeFileSync(other, "[user]\n\tname = r73-two\n");
+    unlinkSync(cfg);
+    linkSync(other, cfg);
+    watch.compare();
+    watch.begin("qa");
+    const f = facts(cfg);
+    const row = watch.compare().find((x) => x.path === cfg);
+    expect(f.nlink).toBe("2");
+    expect(row?.changed).toBe(false);
+    expect(row?.after, JSON.stringify(row)).toContain("not read");
+    expect(row?.after).toContain(f.ino);
+    expect(row?.after).toContain(`size ${f.size}`);
+    expect(row?.after).toContain(f.mtimeNs);
+    expect(row?.after).toMatch(/type file/);
+  });
+
+  it("R73: a directory at the path carries its facts", () => {
+    const home = join(tmp.dir, "r73-dir-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    mkdirSync(cfg);
+    const f = facts(cfg);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const row = watch.compare().find((x) => x.path === cfg);
+    expect(row?.after, JSON.stringify(row)).toContain("not read");
+    expect(row?.after).toContain(f.ino);
+    expect(row?.changed).toBe(false);
+  });
+
+  it.skipIf(isWin)("R73: a stable unreadable file says unreadable and carries its facts", () => {
+    const home = join(tmp.dir, "r73-un-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = r73-un\n");
+    chmodSync(cfg, 0o000);
+    const f = facts(cfg);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const row = watch.compare().find((x) => x.path === cfg);
+    chmodSync(cfg, 0o644);
+    expect(row?.after, JSON.stringify(row)).toContain("unreadable");
+    expect(row?.after).toContain(f.ino);
+  });
+
+  it.skipIf(isWin)("R72: an in-place write to an unreadable file is a change", () => {
+    const home = join(tmp.dir, "r72-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = r72-base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    chmodSync(cfg, 0o200);
+    watch.compare();
+    watch.begin("qa");
+    const start = facts(cfg);
+    appendFileSync(cfg, "[core]\n\tr72 = later\n");
+    const end = facts(cfg);
+    const row = watch.compare().find((x) => x.path === cfg);
+    chmodSync(cfg, 0o644);
+    expect(end.size).not.toBe(start.size);
+    expect(row?.changed, JSON.stringify(row)).toBe(true);
+    expect(row?.before).not.toBe(row?.after);
+    expect(row?.before).toContain("unreadable");
+    expect(row?.after).toContain("unreadable");
+    expect(row?.before).toContain(`size ${start.size}`);
+    expect(row?.after).toContain(`size ${end.size}`);
+  });
+
+  it.skipIf(isWin)("R72: an unreadable repository file is reported from its facts, not dropped", () => {
+    const dirs = resolveGitDirs(repo.root);
+    const config = join(dirs.commonDir, "config");
+    const watch = new ConfigWatch(dirs, repo.root);
+    watch.begin("developer");
+    chmodSync(config, 0o200);
+    const start = facts(config);
+    appendFileSync(config, "\n# r72-repo\n");
+    const end = facts(config);
+    const v = watch.closeAndRestore();
+    chmodSync(config, 0o644);
+    const row = v.changes.find((c) => c.path === config);
+    expect(end.size).not.toBe(start.size);
+    expect(row, JSON.stringify(v)).toBeTruthy();
+    expect(row!.before).not.toBe(row!.after);
+    expect(row!.after).toContain("unreadable");
+    expect(row!.after).toContain(`size ${end.size}`);
+  });
+
+  it.skipIf(isWin)("R71 A6-5: a failed read at stage start is the word unreadable, not absent", () => {
+    const home = join(tmp.dir, "r71-un-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = r71-un-base\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    chmodSync(cfg, 0o000);
+    watch.compare();
+    watch.begin("qa");
+    chmodSync(cfg, 0o644);
+    writeFileSync(cfg, "[user]\n\tname = r71-un-qa\n");
+    const row = watch.compare().find((x) => x.path === cfg);
+    expect(row?.before).toBe("unreadable");
+    expect(row?.changed).toBe(true);
+  });
+
+  it("R74: the word base names the loop base, and both sides print type", () => {
+    const home = join(tmp.dir, "r74-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = r74-base\n");
+    const base = facts(cfg);
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const other = join(tmp.dir, "r74-other");
+    writeFileSync(other, "[user]\n\tname = r74-two\n");
+    unlinkSync(cfg);
+    linkSync(other, cfg);
+    watch.compare();
+    const start = facts(cfg);
+    watch.begin("qa");
+    appendFileSync(cfg, "[core]\n\tr74 = later\n");
+    const row = watch.compare().find((x) => x.path === cfg)!;
+    const baseSeg = /not read: base (.*?); current/.exec(row.after)?.[1] ?? "";
+    expect(base.ino).not.toBe(start.ino);
+    expect(baseSeg, row.after).toContain(`ino ${base.ino}`);
+    expect(baseSeg).not.toContain(`ino ${start.ino}`);
+    expect(row.before).toMatch(/type file/);
+    expect(row.after).toMatch(/type file/);
+    expect(row.before).toContain("stage start");
+    expect(row.before).toContain(`size ${start.size}`);
+  });
+
+  it("R75: size alone, with mtime pinned, is a change", () => {
+    const home = join(tmp.dir, "r75-size-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = r75-size\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const other = join(tmp.dir, "r75-size-other");
+    writeFileSync(other, "[user]\n\tname = r75-size-two\n");
+    unlinkSync(cfg);
+    linkSync(other, cfg);
+    utimesSync(cfg, 1_700_000_000, 1_700_000_000);
+    watch.compare();
+    watch.begin("qa");
+    const start = facts(cfg);
+    appendFileSync(cfg, "[core]\n\tr75 = size\n");
+    utimesSync(cfg, 1_700_000_000, 1_700_000_000);
+    const end = facts(cfg);
+    const row = watch.compare().find((x) => x.path === cfg);
+    expect(end.mtimeNs).toBe(start.mtimeNs);
+    expect(end.size).not.toBe(start.size);
+    expect(row?.changed).toBe(true);
+    expect(row?.before).toContain(`size ${start.size}`);
+    expect(row?.after).toContain(`size ${end.size}`);
+  });
+
+  it("R75: mtimeNs alone, same size, is a change", () => {
+    const home = join(tmp.dir, "r75-mtime-home");
+    mkdirSync(home);
+    const cfg = join(home, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = r75-mtime\n");
+    const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
+    watch.begin("developer");
+    const other = join(tmp.dir, "r75-mtime-other");
+    const body = "[user]\n\tname = r75-mtime-two\n";
+    writeFileSync(other, body);
+    unlinkSync(cfg);
+    linkSync(other, cfg);
+    utimesSync(cfg, 1_700_000_000, 1_700_000_000);
+    watch.compare();
+    watch.begin("qa");
+    const start = facts(cfg);
+    writeFileSync(cfg, "X".repeat(statSync(cfg).size));
+    utimesSync(cfg, 1_700_000_010, 1_700_000_010);
+    const end = facts(cfg);
+    const row = watch.compare().find((x) => x.path === cfg);
+    expect(end.size).toBe(start.size);
+    expect(end.mtimeNs).not.toBe(start.mtimeNs);
+    expect(row?.changed).toBe(true);
+    expect(row?.before).not.toBe(row?.after);
   });
 });
