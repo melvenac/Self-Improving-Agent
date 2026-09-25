@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Live, read-only view of a headless QA run on the QA PC: follows the driver's stream-json log over ssh and prints
 // each step as a readable line. It never writes to the QA PC and never touches the run.
-// Usage: node docs/loops/qa-99/watch.mjs [--attempt N] [--once]
+// Usage: node docs/loops/qa-99/watch.mjs [--dir sia-qaNN] [--attempt N] [--once]
+//   --dir NAME   the driver's output folder under the profile (default sia-qa99; QA 102 is sia-qa102)
 //   --attempt N  start from attempt N (default 0); the view moves on to the next attempt by itself
 //   --once       print what has been logged so far and exit, instead of following
 import { spawn, execFileSync } from "node:child_process";
@@ -9,8 +10,11 @@ import readline from "node:readline";
 
 const HOST = "100.73.250.101";
 const USER = "Aaron Melven";
-const DIR = "C:\\Users\\AARONM~1\\sia-qa99"; // the 8.3 name: no space, so no quoting through the remote cmd
 const args = process.argv.slice(2);
+const di = args.indexOf("--dir");
+const dirName = di >= 0 ? args[di + 1] : "sia-qa99";
+if (!/^sia-qa\d+$/.test(dirName ?? "")) { console.error(`watch: --dir must look like sia-qaNN, got '${dirName}'`); process.exit(2); }
+const DIR = `C:\\Users\\AARONM~1\\${dirName}`; // the 8.3 name: no space, so no quoting through the remote cmd
 const once = args.includes("--once");
 const ai = args.indexOf("--attempt");
 let attempt = ai >= 0 ? Number(args[ai + 1]) : 0;
@@ -84,7 +88,7 @@ async function follow() {
   await new Promise((r) => child.on("close", r));
 }
 
-console.log(`${c.dim}watching QA 99 on ${HOST} (read-only). Ctrl+C stops the view, not the run.${c.off}`);
+console.log(`${c.dim}watching ${dirName} on ${HOST} (read-only). Ctrl+C stops the view, not the run.${c.off}`);
 for (;;) {
   await follow();
   if (once) break;
