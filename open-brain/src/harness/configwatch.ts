@@ -800,8 +800,8 @@ export class ConfigWatch {
       const r = relative(this.dirs.commonDir, p);
       return r.startsWith("..") ? p : `<common>/${r.replace(/\\/g, "/")}`;
     };
-    const scale = `examined ${names.size + unlisted.length} file(s) around the ${this.stage} stage`;
     const unlisted = [...this.unlistedNotes];
+    const scale = `examined ${names.size + unlisted.length} file(s) around the ${this.stage} stage`;
     const ok = (changes.length === 0 && ancestorLink === null && unlisted.length === 0);
     const restored =
       ancestorLink !== null
