@@ -725,10 +725,36 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
 // Doors
 // ---------------------------------------------------------------------------
 
+/**
+ * Written beside the snapshot before --commit changes anything, and removed
+ * when the import completes or rolls back. Left behind, it means a rollback
+ * did not finish (or the process died part-way), and .agents/ cannot be
+ * trusted: drafting from it, then committing over it, is how QA 106's D7 lost
+ * Session_7.md. The check that reads it is the refusal, first in both doors.
+ */
+const INCOMPLETE_SUFFIX = ".import-incomplete";
+
+function incompleteNote(snapshotRel: string): string {
+  return "A state import --commit started here and did not finish, and its rollback did not complete.\n\n" +
+    `.agents/ may be part-migrated. ${snapshotRel}/ holds every original: restore .agents/ from it by hand, then delete this file.\n` +
+    "Until then, `open-brain state import --draft` and `--commit` refuse.\n";
+}
+
+function refuseHalfRestored(root: string): void {
+  const archive = join(root, ".agents", "archive");
+  if (!existsSync(archive)) return;
+  const left = readdirSync(archive).filter((n) => n.startsWith(SNAPSHOT_PREFIX) && n.endsWith(INCOMPLETE_SUFFIX));
+  if (left.length === 0) return;
+  const snapshots = left.map((n) => `.agents/archive/${n.slice(0, -INCOMPLETE_SUFFIX.length)}/`).join(" and ");
+  const markers = left.map((n) => `.agents/archive/${n}`).join(" and ");
+  throw new Error(`.agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from ${snapshots}, which holds every original, then delete ${markers}. Nothing written`);
+}
+
 export interface DraftResult { draftPath: string; reportPath: string; draft: ImportDraft; validation: { ok: true } | { ok: false; error: string } }
 
 export function runDraft(projectRoot: string, today: string): DraftResult {
   const root = resolve(projectRoot);
+  refuseHalfRestored(root);
   if (existsSync(join(root, STATE_REL))) throw new Error(`${STATE_REL} already exists — the importer runs once; nothing written`);
   const draft = buildImportDraft(root, today);
   const validation = StateSchema.safeParse(draft.state);
@@ -784,6 +810,7 @@ export interface CommitResult {
 
 export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean } = {}): CommitResult {
   const root = resolve(projectRoot);
+  refuseHalfRestored(root);
   const statePath = join(root, STATE_REL);
   if (existsSync(statePath)) throw new Error(`${STATE_REL} already exists — the importer runs once; nothing written`);
   const draftPath = join(root, DRAFT_REL);
@@ -819,8 +846,10 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   if (aside) renameSync(snapshotDir, aside);
   let snapshot: SnapshotResult;
   const made: { created: string | null } = { created: null };
+  const marker = `${snapshotDir}${INCOMPLETE_SUFFIX}`;
   try {
     snapshot = takeSnapshot(root, today, opts.forceSnapshot === true, made);
+    writeFileSync(marker, incompleteNote(relative(root, snapshotDir).replace(/\\/g, "/")), "utf-8");
   } catch (err) {
     // .agents/ outside archive/ is untouched. Only what this run created goes:
     // the snapshot's "already exists" refusal is thrown in here, and that
@@ -865,8 +894,9 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
     done = migrate();
   } catch (err) {
     const why = err instanceof Error ? err.message : String(err);
-    throw new Error(`${why}. ${rollBack(agents, snapshot.dir, made.created, aside)}`);
+    throw new Error(`${why}. ${rollBack(agents, snapshot.dir, made.created, aside, marker)}`);
   }
+  rmSync(marker, { force: true });
   if (aside) rmSync(aside, { recursive: true, force: true });
   return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input) };
 }
@@ -876,14 +906,16 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
  * The snapshot is deleted only after the restore finished, so a restore that
  * fails part-way leaves the one copy that can repair it, and says where.
  */
-function rollBack(agents: string, snapshotDir: string, created: string | null, aside: string | null): string {
+function rollBack(agents: string, snapshotDir: string, created: string | null, aside: string | null, marker: string): string {
   try {
     for (const name of readdirSync(agents)) if (name !== "archive") rmSync(join(agents, name), { recursive: true, force: true });
     for (const name of readdirSync(snapshotDir)) cpSync(join(snapshotDir, name), join(agents, name), { recursive: true });
   } catch (err) {
-    return `ROLLBACK FAILED (${err instanceof Error ? err.message : String(err)}): .agents/ is part-migrated. Restore it by hand from ${snapshotDir}, which was kept`;
+    // The marker stays, so every later --draft and --commit refuses until it goes (D7).
+    return `ROLLBACK FAILED (${err instanceof Error ? err.message : String(err)}): .agents/ is part-migrated. Restore it by hand from ${snapshotDir}, which was kept. --draft and --commit refuse until ${marker} is deleted`;
   }
   if (created) rmSync(created, { recursive: true, force: true });
+  rmSync(marker, { force: true });
   if (aside) renameSync(aside, snapshotDir);
   return "Rolled back: .agents/ was restored from the snapshot, and the snapshot removed, so nothing changed";
 }
