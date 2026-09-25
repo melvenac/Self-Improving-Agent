@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { renderState, GAP_CLIP, VERIFIED_CLIP, VERIFIED_SHOWN, VERIFIED_FULL_TEXT } from "../../../src/pipelines/session-start/state-render.js";
+import { renderState, VERIFIED_FULL_TEXT } from "../../../src/pipelines/session-start/state-render.js";
 import { parseState } from "../../../src/shared/state-schema.js";
 import type { State } from "../../../src/shared/state-schema.js";
 
@@ -121,7 +121,7 @@ describe("renderState — the startup read", () => {
  */
 describe("renderState — T-183 clipped gaps and verified claims", () => {
   const LONG_GAP = `First sentence of a long gap. ${"Detail that must not reach the greeting. ".repeat(10)}`;
-  const LONG_GAP_NO_STOP = "x".repeat(GAP_CLIP + 60);
+  const LONG_GAP_NO_STOP = "x".repeat(200);
   const SHORT_GAP = "A short gap. Two sentences, still under the limit.";
   const LONG_CLAIM = `${"A verified claim that runs well past its limit ".repeat(4)}and keeps going.`;
   const clipped: State = {
@@ -151,7 +151,7 @@ describe("renderState — T-183 clipped gaps and verified claims", () => {
 
   it("T183-2: with no sentence end inside the limit, the cut is at the limit — and still marked", () => {
     expect(line("G-003")[0]).toBe(
-      `  G-003 — ${"x".repeat(GAP_CLIP)}… (${LONG_GAP_NO_STOP.length} chars; full text: state.json gaps[G-003]) (opened session 56)`
+      `  G-003 — ${"x".repeat(140)}… (${LONG_GAP_NO_STOP.length} chars; full text: state.json gaps[G-003]) (opened session 56)`
     );
   });
 
@@ -170,12 +170,12 @@ describe("renderState — T-183 clipped gaps and verified claims", () => {
     expect(v).toHaveLength(1);
     expect(v[0]).toMatch(new RegExp(`… \\(${LONG_CLAIM.length} chars; full text: state\\.json verified\\[V-001\\]\\) \\(2 evidence\\)$`));
     const body = v[0].slice("  V-001 — ".length, v[0].indexOf("…"));
-    expect(body.length).toBeLessThanOrEqual(VERIFIED_CLIP);
+    expect(body.length).toBeLessThanOrEqual(100);
     expect(line("V-002")).toEqual(["  V-002 — short claim (1 evidence)"]);
   });
 
-  it("verified is its count plus the newest VERIFIED_SHOWN, and the omission is counted and named", () => {
-    const many = Array.from({ length: VERIFIED_SHOWN + 5 }, (_, i) => ({
+  it("verified is its count plus the newest 10, and the omission is counted and named", () => {
+    const many = Array.from({ length: 15 }, (_, i) => ({
       id: `V-${String(i + 1).padStart(3, "0")}`,
       claim: `claim ${i + 1}`,
       evidence: [],
@@ -189,7 +189,8 @@ describe("renderState — T-183 clipped gaps and verified claims", () => {
     for (let n = 6; n <= 15; n++) expect(out).toContain(`  V-${String(n).padStart(3, "0")} — claim ${n} (0 evidence)`);
     expect(out).toContain("  V-002 — claim 2 (0 evidence) [REOPENED]");
     for (const n of [1, 3, 4, 5]) expect(text).not.toContain(`V-00${n} —`);
-    expect(out).toContain(`  … 4 older verified claim(s) not shown (${many.length} total); all of them: ${VERIFIED_FULL_TEXT}`);
+    expect(out).toContain(`  … 4 older verified claim(s) not shown (${many.length} total); all of them: node open-brain/build/cli.js state show --json`);
+    expect(VERIFIED_FULL_TEXT).toBe("node open-brain/build/cli.js state show --json");
   });
 
   it("prints no omission line when nothing was omitted", () => {
@@ -198,7 +199,7 @@ describe("renderState — T-183 clipped gaps and verified claims", () => {
 
   it("the marker is present exactly when text was cut, for every gap and claim", () => {
     for (const g of clipped.gaps) {
-      const cut = g.what.length > GAP_CLIP || /[\r\n]/.test(g.what);
+      const cut = g.what.length > 140 || /[\r\n]/.test(g.what);
       expect(line(g.id)[0].includes("full text: state.json"), g.id).toBe(cut);
     }
   });
