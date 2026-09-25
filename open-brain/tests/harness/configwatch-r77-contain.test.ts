@@ -118,6 +118,27 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
     expect(readFileSync(cfg).includes("fsmonitor"), "the planted line is restored").toBe(false);
   });
 
+  it.skipIf(isWin)("R77-CLOSE-VERDICT-NOT-OK: closeAndRestore is not ok when a directory cannot be listed", () => {
+    const hooks = join(repo.root, ".git/hooks");
+    const watch = new ConfigWatch(resolveGitDirs(repo.root), repo.root);
+    watch.captureBase();
+    watch.begin("developer");
+    chmodSync(hooks, 0o000);
+    let thrown = "";
+    let verdict: ReturnType<ConfigWatch["closeAndRestore"]> | null = null;
+    try {
+      verdict = watch.closeAndRestore();
+    } catch (e) {
+      thrown = (e as Error).message;
+    } finally {
+      chmodSync(hooks, 0o755);
+    }
+    expect(thrown, "close does not throw").toBe("");
+    expect(verdict!.ok, "an unlisted directory is not an ok close").toBe(false);
+    expect(verdict!.message, "the message names the directory").toContain(hooks);
+    expect(verdict!.message, "the message names the code").toContain("EACCES");
+  });
+
   it.skipIf(isWin)("R77-OBSERVE-BEGIN: begin's observe contains lstat (observe identify :931, begin :1092)", () => {
     const h = join(tmp.dir, "home");
     mkdirSync(h);
