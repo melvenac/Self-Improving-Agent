@@ -261,3 +261,12 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   source file, killed: 36197666218, 36197704680, 36197730757, 36197760017, 36197900577, 36197931021. **R77–R82 are
   all built at `ecf1f62`.** No master merge is needed (0 non-doc paths since `9bc06e3`). The handoff and freeze are
   ordered, with a seven-item handoff contract.
+- **Importer r3 handed back:** candidate `063662b` (CI 36198263294, tcm-2, 1085 passed), handoff `1c15943`
+  (docs only). The 14 mutants were re-run and are committed in `docs/loops/dev-scripts-importer-r3/`. QA 106's probes
+  byte-exact: 24/1. The one fail is utf16le-nobom, which the planner scores. The full local suite was **approved**
+  once the box was checked quiet: Forge 113 holding, Grok asked to hold (turn 120), no vitest/tsc process; a non-SIA
+  `@deepseek-ai/dsh web` process was live and noted.
+- **T-183 handed back:** code `0f0e7ad`, handoff `777c7ba`. Verified: fix 36198351955 (1052 passed), redcheck
+  36198349278 (11 red), mutants (i) 36198525222, (ii) 36198530073, (iii) 36198534363 and (iv) 36198539151, each one
+  source file and killed. Footprint within the brief. T183-1 is an honest no (87,587 → 46,578). T183-6 was not run: it
+  needs the main checkout's build.
