@@ -1124,7 +1124,7 @@ export class MachineConfigWatch {
         const n = Number(st.nlink);
         const sameObject = st.isFile() && st.dev === dev && st.ino === ino;
         const reason = sameObject && n > nlink
-          ? "the object gained a name inside open"
+          ? "handle is a different file; the object gained a name inside open"
           : sameObject && n < nlink
             ? "the object lost a name inside open"
             : "handle is a different file";
