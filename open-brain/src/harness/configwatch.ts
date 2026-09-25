@@ -1169,8 +1169,10 @@ export class MachineConfigWatch {
       a.mtimeNs === b.mtimeNs;
     const factText = (s: MachineSnap): string =>
       `type ${s.kind} dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
+    // R78. A side that was read prints the hash and the facts. "Read or not" includes a read.
+    const readText = (s: MachineSnap): string => `${s.hash} ${factText(s)}`;
     const stageBefore = (opened: MachineSnap): string => {
-      if (opened.state === "read") return opened.hash;
+      if (opened.state === "read") return readText(opened);
       if (opened.reason === "unreadable" || opened.hash === "unreadable") return "unreadable";
       if (opened.resolvedPath === null) return "absent";
       return `stage start ${factText(opened)}`;
@@ -1185,18 +1187,19 @@ export class MachineConfigWatch {
       if (opened.state === "read" && end.errno !== null) {
         out.push({
           stage: this.stage, scope: p.scope, path: p.path,
-          before: opened.hash, after: `unobservable (${end.errno})`, changed: true, unobservableCode: end.errno,
+          before: readText(opened), after: `unobservable (${end.errno})`, changed: true, unobservableCode: end.errno,
         });
         continue;
       }
       if (end.state === "read" && opened.state === "read") {
-        out.push(row(opened.hash, end.hash, opened.hash !== end.hash, p.path, p.scope));
+        out.push(row(readText(opened), readText(end), opened.hash !== end.hash, p.path, p.scope));
         continue;
       }
       if (end.state === "read") {
         const before = stageBefore(opened);
-        if (before !== end.hash || opened.state !== "read") {
-          out.push(row(before, end.hash, true, p.path, p.scope));
+        const after = readText(end);
+        if (before !== after || opened.state !== "read") {
+          out.push(row(before, after, true, p.path, p.scope));
         }
         continue;
       }
