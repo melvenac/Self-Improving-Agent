@@ -1204,7 +1204,7 @@ export class MachineConfigWatch {
       if (opened.state === "read") return readText(opened);
       if (opened.reason === "unreadable" || opened.hash === "unreadable") return `unreadable; stage start ${factText(opened)}`;
       if (opened.lexicalKind === "symlink" && opened.resolvedPath === null) return `${opened.reason}; ${factText(opened)}`;
-      if (opened.resolvedPath === null) return opened.reason.startsWith("absent (") ? opened.reason : "absent";
+      if (opened.resolvedPath === null) return "absent";
       return `stage start ${factText(opened)}`;
     };
     const row = (before: string, after: string, changed: boolean, path: string, scope: string): MachineConfigFinding => ({
