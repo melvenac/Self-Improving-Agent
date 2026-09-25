@@ -181,3 +181,15 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
 - **Grok, 21:44Z:** "Continuing record 107, not a new 113. Same seat, context held." **Record 113 is not used.**
   Its first post-restart turn (109) crossed the planner's resume note (108) in the hub, so turn 108's "still at
   fb2fbe9" was already stale when Grok read it.
+- **Turn 113:** R79 at `afee764`. Redcheck `b44cb1d` (36195158562) reddens its six rows. The fix run 36195386155
+  fails CA-9 only, and **R72-BEFORE-ABSENT-DANGLING is green**, so the standing pair is now CA-9 alone. Existing-test
+  edits accepted as reasoned: R45 (R79's words), R71 A6-5 (listed in rulings-17), and R61, whose `/[0-9a-f]{16}/`
+  matched R79's new mtime digits and was narrowed to "no side opens with a hash". Owed before R80: a mutant proving the
+  narrowed R61 still catches a read, and R79 mutants (a)–(d).
+- **Hosted Actions minutes exhausted** (Aaron's screenshot, 2,000/2,000; resets 2026-10-01). GitHub's annotation on
+  master-push run 36138505219: "The job was not started because recent account payments have failed or your spending
+  limit needs to be increased", so it was blocked, not billed. Only master pushes run hosted (`ci.yml:19`, D-043), so
+  seat and PR CI on tcm is unaffected, but master's latest run reads as failure until a tcm run exists. Asked
+  Aaron whether to dispatch one (D-040 does not cover master).
+- **Relay's D-003 question** (hub enrollment, Loop 6, T-067) is queued for Aaron after the CI question. SIA agrees
+  with `--init-key --invite <code>`, and Relay has recorded that on A2A-Hub master (PR #27).
