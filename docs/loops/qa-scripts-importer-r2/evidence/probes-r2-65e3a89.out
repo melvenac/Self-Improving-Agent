@@ -1,0 +1,220 @@
+probes-r2 against C:\qa-scratch\r1 @ 65e3a89; TEMP=C:\qa-tmp
+
+==================== R2-1 / IF-9: every encoding shape, stale (Session 6 vs log 7) and current (Session 7)
+---- utf8 | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 utf8: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf8-bom | INBOX bytes ef bb bf 23 20 49 6e 62
+     stale  : draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, wrote 16 beyond draft+report, state.json true
+              INBOX: - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     current: draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+FAIL IF-9 utf8-bom: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- crlf | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 crlf: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf8-bom+crlf | INBOX bytes ef bb bf 23 20 49 6e 62
+     stale  : draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, wrote 16 beyond draft+report, state.json true
+              INBOX: - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     current: draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+FAIL IF-9 utf8-bom+crlf: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf16le-bom | INBOX bytes ff fe 23 00 20 00 49 00
+     stale  : draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, wrote 16 beyond draft+report, state.json true
+              INBOX: - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     current: draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+FAIL IF-9 utf16le-bom: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf16le-bom+crlf | INBOX bytes ff fe 23 00 20 00 49 00
+     stale  : draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, wrote 16 beyond draft+report, state.json true
+              INBOX: - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     current: draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+FAIL IF-9 utf16le-bom+crlf: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf16be-bom | INBOX bytes fe ff 00 23 00 20 00 49
+     stale  : draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, wrote 16 beyond draft+report, state.json true
+              INBOX: - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     current: draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+FAIL IF-9 utf16be-bom: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf16le-nobom | INBOX bytes 23 00 20 00 49 00 6e 00
+     stale  : draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, wrote 16 beyond draft+report, state.json true
+              INBOX: - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     current: draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+FAIL IF-9 utf16le-nobom: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- cp1252 (em dashes) | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 cp1252 (em dashes): stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- cp1252 (ASCII only) | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 cp1252 (ASCII only): stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- lone CR | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 1 declares Session 6 (`# Inbox — priorities> **Last Updated:** Session 6## P0 — Critical- [ ] **A task** — do it`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.m
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 lone CR: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 `>` | INBOX bytes ff fe 23 00 20 00 49 00
+     stale  : draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, wrote 16 beyond draft+report, state.json true
+              INBOX: - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     current: draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+FAIL IF-9 ps51 `>`: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 Out-File | INBOX bytes ff fe 23 00 20 00 49 00
+     stale  : draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, wrote 16 beyond draft+report, state.json true
+              INBOX: - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     current: draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+FAIL IF-9 ps51 Out-File: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 Set-Content | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 ps51 Set-Content: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 Add-Content | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 ps51 Add-Content: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 Out-File -Encoding utf8 | INBOX bytes ef bb bf 23 20 49 6e 62
+     stale  : draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, wrote 16 beyond draft+report, state.json true
+              INBOX: - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     current: draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+FAIL IF-9 ps51 Out-File -Encoding utf8: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 Get-Content|Set-Content (round trip of a UTF-8 file) | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 ps51 Get-Content|Set-Content (round trip of a UTF-8 file): stale inputs are all STALE, and bare --commit refuses and writes nothing
+NOTE IF-9 evidence: utf8: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: utf8-bom: INBOX evidence DIFFERS
+NOTE IF-9 evidence: crlf: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: utf8-bom+crlf: INBOX evidence DIFFERS
+NOTE IF-9 evidence: utf16le-bom: INBOX evidence DIFFERS
+NOTE IF-9 evidence: utf16le-bom+crlf: INBOX evidence DIFFERS
+NOTE IF-9 evidence: utf16be-bom: INBOX evidence DIFFERS
+NOTE IF-9 evidence: utf16le-nobom: INBOX evidence DIFFERS
+NOTE IF-9 evidence: cp1252 (em dashes): INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: cp1252 (ASCII only): INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: lone CR: INBOX evidence DIFFERS
+NOTE IF-9 evidence: ps51 `>`: INBOX evidence DIFFERS
+NOTE IF-9 evidence: ps51 Out-File: INBOX evidence DIFFERS
+NOTE IF-9 evidence: ps51 Set-Content: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: ps51 Add-Content: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: ps51 Out-File -Encoding utf8: INBOX evidence DIFFERS
+NOTE IF-9 evidence: ps51 Get-Content|Set-Content (round trip of a UTF-8 file): INBOX evidence IDENTICAL to plain UTF-8
+
+==================== R2-1: SUMMARY.md in each shape, current project, --commit
+NOTE R2-1 SUMMARY utf8: --commit exit 0 (state import — committed); after: first bytes 23 20 50 72; title at line 1, region begins at line 3; original status blockquote still present: false; tree (migrated)
+NOTE R2-1 SUMMARY utf8-bom: --commit exit 0 (state import — committed); after: first bytes 3c 21 2d 2d; title at line 0, region begins at line 1; original status blockquote still present: true; tree (migrated)
+NOTE R2-1 SUMMARY utf16le-bom+crlf: --commit exit 0 (state import — committed); after: first bytes 3c 21 2d 2d; title at line 0, region begins at line 1; original status blockquote still present: false; tree (migrated)
+NOTE R2-1 SUMMARY cp1252 (em dashes): --commit exit 0 (state import — committed); after: first bytes 23 20 50 72; title at line 1, region begins at line 3; original status blockquote still present: false; tree (migrated)
+NOTE R2-1 SUMMARY lone CR: --commit exit 0 (state import — committed); after: first bytes 23 20 50 72; title at line 1, region begins at line 3; original status blockquote still present: true; tree (migrated)
+
+==================== R2-2 / IF-10: declared session against log 7
+NOTE IF-10 ahead by 13: - current `.agents/SESSIONS/next-session.md`: line 3 declares Session 20 (`> Updated at end of Session 20.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) || bare --commit exit 0
+NOTE IF-10 ahead by 1: - current `.agents/SESSIONS/next-session.md`: line 3 declares Session 8 (`> Updated at end of Session 8.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) || bare --commit exit 0
+NOTE IF-10 equal: - current `.agents/SESSIONS/next-session.md`: line 3 declares Session 7 (`> Updated at end of Session 7.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) || bare --commit exit 0
+NOTE IF-10 behind by 1: - **STALE** `.agents/SESSIONS/next-session.md`: line 3 declares Session 6 (`> Updated at end of Session 6.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) || bare --commit exit 1
+NOTE IF-10 title 'Handoff for Session 8', log 7: - current `.agents/SESSIONS/next-session.md`: line 1 declares Session 8 (`# Handoff for Session 8`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+
+==================== R2-3 / IF-11: complete, or change nothing
+FAIL IF-11 PROBE-2 (no SESSIONS/): --commit exit 1; state.json true; views: INBOX.md true, task.md true, next-session.md false, SUMMARY.md false
+NOTE IF-11 PROBE-2 (no SESSIONS/): a second --commit: exit 1: state import refused: .agents/state.json already exists — the importer runs once; nothing written
+---- IF-11 read-only INBOX.md (render step fails): exit 1
+     | state import refused: EPERM: operation not permitted, rename 'C:\qa-scratch\pr2-r1\r23-ro-inbox\.agents\TASKS\INBOX.md.tmp-8812' -> 'C:\qa-scratch\pr2-r1\r23-ro-inbox\.agents\TASKS\INBOX.md'
+FAIL IF-11 read-only INBOX.md (render step fails): the tree is byte-identical to before, including the read-only bit (+13 [.agents/archive/, .agents/archive/pre-state-migration-2026-09-25/, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/next-session.md, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md, .agents/archive/pre-state-migration-2026-09-25/state.draft.json] -0 [] ~1 [.agents/SYSTEM/SUMMARY.md])
+NOTE IF-11 read-only INBOX.md (render step fails): with mtimes compared too: +13 [.agents/archive/, .agents/archive/pre-state-migration-2026-09-25/, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/next-session.md, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md, .agents/archive/pre-state-migration-2026-09-25/state.draft.json] -0 [] ~1 [.agents/SYSTEM/SUMMARY.md]
+FAIL IF-11 read-only INBOX.md (render step fails): made writable, the second --commit completes (exit 1)
+FAIL IF-11 --force-snapshot + render failure: exit 1; tree +11 [.agents/archive/pre-state-migration-2026-09-25/SESSIONS/, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/next-session.md, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md, .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md, .agents/archive/pre-state-migration-2026-09-25/SYSTEM/] -0 [] ~1 [.agents/SYSTEM/SUMMARY.md]
+NOTE IF-11 junction inside .agents/ + render failure: mklink /J exit 0: Junction created for C:\qa-scratch\pr2-r1\r23-junction\.agents\linked <<===>> C:\qa-scratch\pr2-r1\r23-junction-TARGET
+---- IF-11 junction inside .agents/ + render failure: exit 1
+     | state import refused: EPERM: operation not permitted, rename 'C:\qa-scratch\pr2-r1\r23-junction\.agents\TASKS\INBOX.md.tmp-8304' -> 'C:\qa-scratch\pr2-r1\r23-junction\.agents\TASKS\INBOX.md'
+PASS IF-11 junction inside .agents/ + render failure: the junction's target outside the project is untouched (identical)
+NOTE IF-11 junction inside .agents/ + render failure: .agents/linked after: still a link; archive/ exists true
+---- IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): exit 1
+     | state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\pr2-r1\r23-rollback-fails\.agents\SYSTEM\SUMMARY.md'
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): the live tree (outside archive/) right after the failure: REMOVED 0 []; added 1 [.agents/state.json]; changed 0 []
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): archive/: pre-state-migration-2026-09-25
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): the kept snapshot holds 10 entries; original .agents entries missing or differing in it: 0
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): re-run 1, --draft: exit 1; ; staleness line: ; the kept snapshot still holds Session_7.md
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): re-run 2, --commit: exit 1: state import refused: .agents/state.json already exists — the importer runs once; nothing written; the kept snapshot still holds Session_7.md; snapshot directory exists: true
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): re-run 3, --commit --force-snapshot, as re-run 2's refusal advises: exit 1: state import refused: .agents/state.json already exists — the importer runs once; nothing written
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): after re-run 3: the snapshot now holds 10 entries; the session files from before the import that exist NOWHERE in the project any more: none
+
+==================== R2-4 / IF-12: tokens, before and after the flag, standing in ANOTHER drafted project
+BAD  --draft -x                                   [F T B] exit 0; A CHANGED B = C = | state import — draft (nothing else changed)
+BAD  --draft -x                                   [F B T] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+BAD  --draft -x                                   [T F B] exit 0; A CHANGED B = C = | state import — draft (nothing else changed)
+BAD  --draft -x                                   [T B F] exit 0; A CHANGED B = C = | state import — draft (nothing else changed)
+BAD  --draft -x                                   [B F T] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+BAD  --draft -x                                   [B T F] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+BAD  --draft -x                                   [T F] exit 0; A CHANGED B = C = | state import — draft (nothing else changed)
+BAD  --draft -x                                   [F T] exit 0; A CHANGED B = C = | state import — draft (nothing else changed)
+BAD  --draft x                                    [F T B] exit 0; A CHANGED B = C = | state import — draft (nothing else changed)
+BAD  --draft x                                    [F B T] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+BAD  --draft x                                    [T F B] exit 0; A CHANGED B = C = | state import — draft (nothing else changed)
+BAD  --draft x                                    [T B F] exit 0; A CHANGED B = C = | state import — draft (nothing else changed)
+BAD  --draft x                                    [B F T] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+BAD  --draft x                                    [B T F] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+BAD  --draft x                                    [T F] exit 0; A CHANGED B = C = | state import — draft (nothing else changed)
+BAD  --draft x                                    [F T] exit 0; A CHANGED B = C = | state import — draft (nothing else changed)
+BAD  --draft second positional (another project)  [F T B] exit 0; A = B = C CHANGED | state import — draft (nothing else changed)
+BAD  --draft second positional (another project)  [F B T] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+BAD  --draft second positional (another project)  [T F B] exit 0; A = B = C CHANGED | state import — draft (nothing else changed)
+BAD  --draft second positional (another project)  [T B F] exit 0; A = B = C CHANGED | state import — draft (nothing else changed)
+BAD  --draft second positional (another project)  [B F T] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+BAD  --draft second positional (another project)  [B T F] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+ok   --draft non-existent directory               [F T B] exit 1; A = B = C = | state import refused: no project root found walking up from <scratch>\no-such-dir — need a directory with package.json beside .agents/SYSTEM/, .agents
+BAD  --draft non-existent directory               [F B T] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+ok   --draft non-existent directory               [T F B] exit 1; A = B = C = | state import refused: no project root found walking up from <scratch>\no-such-dir — need a directory with package.json beside .agents/SYSTEM/, .agents
+ok   --draft non-existent directory               [T B F] exit 1; A = B = C = | state import refused: no project root found walking up from <scratch>\no-such-dir — need a directory with package.json beside .agents/SYSTEM/, .agents
+BAD  --draft non-existent directory               [B F T] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+BAD  --draft non-existent directory               [B T F] exit 0; A = B CHANGED C = | state import — draft (nothing else changed)
+ok   --draft non-existent directory               [T F] exit 1; A = B = C = | state import refused: no project root found walking up from <scratch>\no-such-dir — need a directory with package.json beside .agents/SYSTEM/, .agents
+ok   --draft non-existent directory               [F T] exit 1; A = B = C = | state import refused: no project root found walking up from <scratch>\no-such-dir — need a directory with package.json beside .agents/SYSTEM/, .agents
+BAD  --commit -x                                   [F T B] exit 0; A CHANGED B = C = | state import — committed
+BAD  --commit -x                                   [F B T] exit 0; A = B CHANGED C = | state import — committed
+ok   --commit -x                                   [T F B] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit -x                                   [T B F] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit -x                                   [B F T] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit -x                                   [B T F] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit -x                                   [T F] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit -x                                   [F T] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit x                                    [F T B] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit x                                    [F B T] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit x                                    [T F B] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit x                                    [T B F] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit x                                    [B F T] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit x                                    [B T F] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit x                                    [T F] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit x                                    [F T] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+BAD  --commit second positional (another project)  [F T B] exit 0; A = B = C CHANGED | state import — committed
+ok   --commit second positional (another project)  [F B T] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit second positional (another project)  [T F B] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit second positional (another project)  [T B F] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit second positional (another project)  [B F T] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit second positional (another project)  [B T F] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit non-existent directory               [F T B] exit 1; A = B = C = | state import refused: no project root found walking up from <scratch>\no-such-dir — need a directory with package.json beside .agents/SYSTEM/, .agents
+ok   --commit non-existent directory               [F B T] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit non-existent directory               [T F B] exit 1; A = B = C = | state import refused: no project root found walking up from <scratch>\no-such-dir — need a directory with package.json beside .agents/SYSTEM/, .agents
+ok   --commit non-existent directory               [T B F] exit 1; A = B = C = | state import refused: no project root found walking up from <scratch>\no-such-dir — need a directory with package.json beside .agents/SYSTEM/, .agents
+ok   --commit non-existent directory               [B F T] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit non-existent directory               [B T F] exit 1; A = B = C = | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+ok   --commit non-existent directory               [T F] exit 1; A = B = C = | state import refused: no project root found walking up from <scratch>\no-such-dir — need a directory with package.json beside .agents/SYSTEM/, .agents
+ok   --commit non-existent directory               [F T] exit 1; A = B = C = | state import refused: no project root found walking up from <scratch>\no-such-dir — need a directory with package.json beside .agents/SYSTEM/, .agents
+FAIL IF-12 matrix: 60 runs: every one exits 1 and leaves A, B and C unchanged (hash, size, mtime, read-only bit); 28 did not
+NOTE IF-12 '' (an empty argument, as an unset "$DIR" gives): ["--commit",""] exit 0; changed: A | state import — committed [expected: refuse, or at least not A]
+NOTE IF-12 '' before a real directory: ["--commit","","<B>"] exit 0; changed: A | state import — committed [expected: refuse]
+NOTE IF-12 '-' alone: ["--commit","-","<B>"] exit 0; changed: A | state import — committed [expected: refuse]
+NOTE IF-12 '--' (end of options): ["--commit","--","<B>"] exit 1; changed: none | state import refused: unrecognised flag(s) --. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written. [expected: refuse]
+NOTE IF-12 an existing FILE as the directory: ["--commit","<B>/package.json"] exit 0; changed: B | state import — committed [expected: refuse]
+NOTE IF-12 B's own subdirectory .agents/TASKS (walk-up kept by design): ["--draft","<B>/.agents/TASKS"] exit 0; changed: B | state import — draft (nothing else changed) [expected: B only (a draft rewrite)]
+NOTE IF-12 the same directory twice: ["--commit","<B>","<B>"] exit 0; changed: B | state import — committed [expected: refuse (conservative) or B]
+NOTE IF-12 control: --commit <B> from A: ["--commit","<B>"] exit 0; changed: B | state import — committed [expected: B only]
+FAIL IF-12 control: the named project, and only it, is committed, and the output names its root
+NOTE IF-12 control: <C> alone, flag after (the matrix's excluded orders): ["<B>","--commit"] exit 0; changed: B | state import — committed [expected: B only]
+PASS IF-12 control, directory before the flag: a single named project before the flag is committed, and nothing else
+
+SUMMARY: 10 passed, 15 failed
+EXIT=1

@@ -1,0 +1,48 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index f938efe..d46a3b2 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -415,6 +415,32 @@ export function findLastSession(sessionsDir: string, today: string): ImportRepor
+ // imported as though it were current.
+ // ---------------------------------------------------------------------------
+ 
++export function seedVerified(): Verified[] {
++  const mk = (id: string, claim: string, testPath: string, testObs: string, tag: string, tagObs: string): Verified => ({
++    id, claim, since_session: 54, status: "verified",
++    evidence: [{ type: "test", path: testPath, observation: testObs }, { type: "tag", path: tag, observation: tagObs }],
++  });
++  return [
++    mk("V-001", "ob_start is the single startup implementation and returns state, drift, session and sizes", "open-brain/tests/server.test.ts", "handleStart shape pinned", "v0.28.0", "accepted Loop 1"),
++    mk("V-002", "state.json read side: strict schema, three-way reader, ob_start render, state-schema sync check", "open-brain/tests/shared/state-schema.test.ts", "strict schema + fixture round trip", "v0.29.0", "accepted Loop 2"),
++    mk("V-003", "state writer: revision check, atomic batch, retention, four views, ob_state", "open-brain/tests/shared/state-writer.test.ts", "refusals, atomicity, retention, views", "v0.30.0", "accepted Loop 3"),
++    mk("V-004", "/sync resolves the project root or refuses; identical from root and open-brain/", "open-brain/tests/pipelines/sync/repo-root.test.ts", "root from subdirectory; refusal names the cwd", "v0.30.0", "accepted Loop 3 (R4)"),
++    mk("V-005", "relocate existence check is case-insensitive; CI green on ubuntu", "open-brain/src/relocate.ts", "projectDirExists resolves the canonical path case-insensitively; CI run 34890412313 green on master 86ea010", "v0.29.1", "hotfix merged via PR #4"),
++  ];
++}
++
++export function seedGaps(): Gap[] {
++  const mk = (id: string, what: string, evidence: string, recommended_update: string): Gap => ({ id, what, evidence, recommended_update, opened_session: 54 });
++  return [
++    mk("G-001", "Cursor start.md/end.md copies are not on ob_start/ob_state", "Loop 1 and Loop 3 Developer reports (gaps[]); Loop 4 C2 freezes the Cursor copies", "Move the Cursor copies in a dedicated loop once ob_state is exercised from a Cursor seat"),
++    mk("G-002", "The repo's .claude/ is gitignored; mirror policy for slash commands is undecided", "Loop 1 Developer report (gaps[]); next-session.md carried items at Session 54", "Aaron decides: track .claude/commands/ or keep the template as the only tracked copy"),
++    mk("G-003", "SESSION_TEMPLATE.md pre-session checklist still says to read SUMMARY/INBOX by hand", "Loop 1 Developer report (gaps[]); template wording predates ob_start", "Reword the checklist to name ob_start / the /start greeting"),
++    mk("G-004", "vault-index-parity warns on one unindexed Checkpoints note", "/sync output at Sessions 53–55 (Loop 2 report, carried)", "Index the note through ob_store or remove it; then the check passes"),
++    mk("G-005", "DECISIONS.md is both the prose ADR log and the decisions[] index", "Loop 3 Developer report (gaps[]); importer reads ADR headings, add_decision writes state only", "Decide which is canonical after the first ob_state add_decision; render DECISIONS.md from state or stop importing"),
++    mk("G-006", "No CLI door for ob_state (only the MCP tool)", "Loop 3 Developer report (gaps[]); planned as Loop 7", "Add `open-brain state apply` once the tool contract has settled"),
++  ];
++}
++
+ export type StalenessVerdict = "current" | "stale" | "could_not_tell";
+ export interface InputStaleness { input: string; verdict: StalenessVerdict; declared_session: number | null; evidence: string }
+ export interface StalenessReport {
+@@ -564,8 +590,8 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
+   report.objective = { found: objective !== null, preview };
+   const decisions = texts.decisions ? importDecisions(texts.decisions, today, report.decisions) : [];
+   const handoff = importHandoff(texts.next, current, report.handoff);
+-  const verified: Verified[] = [];
+-  const gaps: Gap[] = [];
++  const verified: Verified[] = seedVerified();
++  const gaps: Gap[] = seedGaps();
+   report.verified_imported = verified.length;
+   report.gaps_imported = gaps.length;
+   if (texts.summary) report.summary_removal = planSummaryRemoval(texts.summary).report;

@@ -1,0 +1,11 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index f938efe..e64ea7d 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -853,6 +853,5 @@ function rollBack(agents: string, snapshotDir: string, archiveExisted: boolean,
+   }
+   rmSync(snapshotDir, { recursive: true, force: true });
+   if (!archiveExisted) rmSync(join(agents, "archive"), { recursive: true, force: true });
+-  if (aside) renameSync(aside, snapshotDir);
+   return "Rolled back: .agents/ was restored from the snapshot, and the snapshot removed, so nothing changed";
+ }

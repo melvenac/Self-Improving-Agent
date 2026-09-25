@@ -1,0 +1,26 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index f938efe..b5440c2 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -768,10 +768,6 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+   const onDisk = readInputs(root);
+   const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable);
+   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
+-  if (stale.length > 0 && opts.acceptStale !== true) {
+-    const list = stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ");
+-    throw new Error(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${list}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
+-  }
+   // SUMMARY.md is the one input --commit rewrites in place rather than regenerates.
+   const summaryPath = join(root, ".agents/SYSTEM/SUMMARY.md");
+   const summaryRead = readText(summaryPath);
+@@ -798,6 +794,10 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+     throw err;
+   }
+ 
++  if (stale.length > 0 && opts.acceptStale !== true) {
++    const list = stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ");
++    throw new Error(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${list}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
++  }
+   const migrate = () => {
+     // 2. state.json at revision 0, canonical bytes.
+     writeFileSync(statePath, serializeState(parsed.data), "utf-8");

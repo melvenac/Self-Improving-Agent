@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index f938efe..d82f339 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -775,7 +775,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+   // SUMMARY.md is the one input --commit rewrites in place rather than regenerates.
+   const summaryPath = join(root, ".agents/SYSTEM/SUMMARY.md");
+   const summaryRead = readText(summaryPath);
+-  if (summaryRead?.undecodable) throw new Error(`.agents/SYSTEM/SUMMARY.md is ${summaryRead.undecodable}, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
++  if (summaryRead?.undecodable === "never") throw new Error(`.agents/SYSTEM/SUMMARY.md is ${summaryRead.undecodable}, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
+ 
+   // 1. Snapshot before anything under .agents/ changes. From here on the
+   // import completes or changes nothing (R2-3): every later step runs inside

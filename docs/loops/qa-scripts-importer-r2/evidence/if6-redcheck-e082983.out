@@ -1,0 +1,273 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/qa-scratch/r1/open-brain[39m
+
+ [31m❯[39m tests/pipelines/state-import-fixes.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m9 failed[39m[2m)[22m[33m 2302[2mms[22m[39m
+[31m   [31m×[31m T-175: an import carries none of SIA's own history (IF-1)[2m > [22mverified[] and gaps[] are empty, the draft parses, and the report says 0 for both[39m[32m 60[2mms[22m[39m
+[31m     → expected [ { id: 'V-001', …(4) }, …(4) ] to deeply equal [][39m
+[31m   [31m×[31m T-175: an import carries none of SIA's own history (IF-1)[2m > [22mthe CLI's draft line says verified 0 · gaps 0[39m[33m 777[2mms[22m[39m
+[31m     → expected '\nstate import — draft (nothing else …' to contain 'verified 0 · gaps 0'[39m
+[31m   [31m×[31m T-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-2: A2A-Hub at e0bc3f8, the known positive[2m > [22m--draft names next-session.md as stale, with evidence, in the report's first section[39m[32m 19[2mms[22m[39m
+[31m     → expected undefined to be defined[39m
+[31m   [31m×[31m T-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-2: A2A-Hub at e0bc3f8, the known positive[2m > [22m--commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it[39m[32m 52[2mms[22m[39m
+[31m     → expected [Function] to throw an error[39m
+[31m   [31m×[31m T-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-2: A2A-Hub at e0bc3f8, the known positive[2m > [22mthe CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale[39m[33m 1346[2mms[22m[39m
+[31m     → expected +0 to be 1 // Object.is equality[39m
+[31m   [31m×[31m T-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-3: a project whose inputs are current, the known negative[2m > [22mno input is stale, every judged input is current, and --commit proceeds without the acknowledgement[39m[32m 11[2mms[22m[39m
+[31m     → expected undefined to be defined[39m
+[31m   [31m×[31m T-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-4: an input the detector cannot judge is reported, never counted as current[2m > [22man input with no session marker is 'could not tell', named in the report's first section[39m[32m 11[2mms[22m[39m
+[31m     → expected undefined to be defined[39m
+[31m   [31m×[31m T-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-4: an input the detector cannot judge is reported, never counted as current[2m > [22mwith no Session_N.md to compare against, every present input is 'could not tell'[39m[32m 11[2mms[22m[39m
+[31m     → expected undefined to be defined[39m
+[31m   [31m×[31m T-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-4: an input the detector cannot judge is reported, never counted as current[2m > [22minputs that are not imported as current state are listed as not judged, with a reason[39m[32m 12[2mms[22m[39m
+[31m     → expected undefined to be defined[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 9 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-fixes.test.ts[2m > [22mT-175: an import carries none of SIA's own history (IF-1)[2m > [22mverified[] and gaps[] are empty, the draft parses, and the report says 0 for both
+[31m[1mAssertionError[22m: expected [ { id: 'V-001', …(4) }, …(4) ] to deeply equal [][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- [][39m
+[31m+ [[39m
+[31m+   {[39m
+[31m+     "claim": "ob_start is the single startup implementation and returns state, drift, session and sizes",[39m
+[31m+     "evidence": [[39m
+[31m+       {[39m
+[31m+         "observation": "handleStart shape pinned",[39m
+[31m+         "path": "open-brain/tests/server.test.ts",[39m
+[31m+         "type": "test",[39m
+[31m+       },[39m
+[31m+       {[39m
+[31m+         "observation": "accepted Loop 1",[39m
+[31m+         "path": "v0.28.0",[39m
+[31m+         "type": "tag",[39m
+[31m+       },[39m
+[31m+     ],[39m
+[31m+     "id": "V-001",[39m
+[31m+     "since_session": 54,[39m
+[31m+     "status": "verified",[39m
+[31m+   },[39m
+[31m+   {[39m
+[31m+     "claim": "state.json read side: strict schema, three-way reader, ob_start render, state-schema sync check",[39m
+[31m+     "evidence": [[39m
+[31m+       {[39m
+[31m+         "observation": "strict schema + fixture round trip",[39m
+[31m+         "path": "open-brain/tests/shared/state-schema.test.ts",[39m
+[31m+         "type": "test",[39m
+[31m+       },[39m
+[31m+       {[39m
+[31m+         "observation": "accepted Loop 2",[39m
+[31m+         "path": "v0.29.0",[39m
+[31m+         "type": "tag",[39m
+[31m+       },[39m
+[31m+     ],[39m
+[31m+     "id": "V-002",[39m
+[31m+     "since_session": 54,[39m
+[31m+     "status": "verified",[39m
+[31m+   },[39m
+[31m+   {[39m
+[31m+     "claim": "state writer: revision check, atomic batch, retention, four views, ob_state",[39m
+[31m+     "evidence": [[39m
+[31m+       {[39m
+[31m+         "observation": "refusals, atomicity, retention, views",[39m
+[31m+         "path": "open-brain/tests/shared/state-writer.test.ts",[39m
+[31m+         "type": "test",[39m
+[31m+       },[39m
+[31m+       {[39m
+[31m+         "observation": "accepted Loop 3",[39m
+[31m+         "path": "v0.30.0",[39m
+[31m+         "type": "tag",[39m
+[31m+       },[39m
+[31m+     ],[39m
+[31m+     "id": "V-003",[39m
+[31m+     "since_session": 54,[39m
+[31m+     "status": "verified",[39m
+[31m+   },[39m
+[31m+   {[39m
+[31m+     "claim": "/sync resolves the project root or refuses; identical from root and open-brain/",[39m
+[31m+     "evidence": [[39m
+[31m+       {[39m
+[31m+         "observation": "root from subdirectory; refusal names the cwd",[39m
+[31m+         "path": "open-brain/tests/pipelines/sync/repo-root.test.ts",[39m
+[31m+         "type": "test",[39m
+[31m+       },[39m
+[31m+       {[39m
+[31m+         "observation": "accepted Loop 3 (R4)",[39m
+[31m+         "path": "v0.30.0",[39m
+[31m+         "type": "tag",[39m
+[31m+       },[39m
+[31m+     ],[39m
+[31m+     "id": "V-004",[39m
+[31m+     "since_session": 54,[39m
+[31m+     "status": "verified",[39m
+[31m+   },[39m
+[31m+   {[39m
+[31m+     "claim": "relocate existence check is case-insensitive; CI green on ubuntu",[39m
+[31m+     "evidence": [[39m
+[31m+       {[39m
+[31m+         "observation": "projectDirExists resolves the canonical path case-insensitively; CI run 34890412313 green on master 86ea010",[39m
+[31m+         "path": "open-brain/src/relocate.ts",[39m
+[31m+         "type": "test",[39m
+[31m+       },[39m
+[31m+       {[39m
+[31m+         "observation": "hotfix merged via PR #4",[39m
+[31m+         "path": "v0.29.1",[39m
+[31m+         "type": "tag",[39m
+[31m+       },[39m
+[31m+     ],[39m
+[31m+     "id": "V-005",[39m
+[31m+     "since_session": 54,[39m
+[31m+     "status": "verified",[39m
+[31m+   },[39m
+[31m+ ][39m
+
+[36m [2m❯[22m tests/pipelines/state-import-fixes.test.ts:[2m81:34[22m[39m
+    [90m 79| [39m    [34mexpect[39m(parsed[33m.[39mok)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m 80| [39m    [35mif[39m ([33m![39mparsed[33m.[39mok) [35mreturn[39m[33m;[39m
+    [90m 81| [39m    [34mexpect[39m(parsed[33m.[39mdata[33m.[39mverified)[33m.[39m[34mtoEqual[39m([])[33m;[39m
+    [90m   | [39m                                 [31m^[39m
+    [90m 82| [39m    [34mexpect[39m(parsed[33m.[39mdata[33m.[39mgaps)[33m.[39m[34mtoEqual[39m([])[33m;[39m
+    [90m 83| [39m    [35mconst[39m report [33m=[39m [34mreadFileSync[39m([34mjoin[39m(root[33m,[39m [33mREPORT_REL[39m)[33m,[39m [32m"utf-8"[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-fixes.test.ts[2m > [22mT-175: an import carries none of SIA's own history (IF-1)[2m > [22mthe CLI's draft line says verified 0 · gaps 0
+[31m[1mAssertionError[22m: expected '\nstate import — draft (nothing else …' to contain 'verified 0 · gaps 0'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- verified 0 · gaps 0[39m
+[31m+[39m
+[31m+ state import — draft (nothing else changed)[39m
+[31m+[39m
+[31m+ Root: C:\qa-tmp\ob-import-fix-o0zlAk[39m
+[31m+ Draft:  .agents/state.draft.json[39m
+[31m+ Report: .agents/state.import-report.md[39m
+[31m+ Validates: yes[39m
+[31m+ Current session: 54 (.agents/SESSIONS/Session_54.md)[39m
+[31m+ Tasks: 143 (open 42, in_progress 3, blocked 0, done 98); superseded links 14; unparsed lines 2[39m
+[31m+ Decisions: 4 (1 skipped) · verified 5 · gaps 6 · objective found[39m
+[31m+ Handoff: pick_up 2 lines, watch_out 9, open_questions 2[39m
+[31m+ SUMMARY.md: --commit will remove 181 lines (74 blockquote + 105 Current State)[39m
+[31m+[39m
+[31m+ Review the report, then run: open-brain state import --commit[39m
+[31m+[39m
+
+[36m [2m❯[22m tests/pipelines/state-import-fixes.test.ts:[2m92:22[22m[39m
+    [90m 90| [39m    [35mconst[39m r [33m=[39m [34mcli[39m([[32m"state"[39m[33m,[39m [32m"import"[39m[33m,[39m [32m"--draft"[39m[33m,[39m root][33m,[39m root)[33m;[39m
+    [90m 91| [39m    [34mexpect[39m(r[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m0[39m)[33m;[39m
+    [90m 92| [39m    [34mexpect[39m(r[33m.[39mstdout)[33m.[39m[34mtoContain[39m([32m"verified 0 · gaps 0"[39m)[33m;[39m
+    [90m   | [39m                     [31m^[39m
+    [90m 93| [39m  }[33m,[39m [34m30_000[39m)[33m;[39m
+    [90m 94| [39m})[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-fixes.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-2: A2A-Hub at e0bc3f8, the known positive[2m > [22m--draft names next-session.md as stale, with evidence, in the report's first section
+[31m[1mAssertionError[22m: expected undefined to be defined[39m
+[36m [2m❯[22m tests/pipelines/state-import-fixes.test.ts:[2m106:18[22m[39m
+    [90m104| [39m      [35mconst[39m r [33m=[39m [34mrunDraft[39m(root[33m,[39m [33mTODAY[39m)[33m;[39m
+    [90m105| [39m      [35mconst[39m st [33m=[39m [34mstaleness[39m(r[33m.[39mdraft[33m.[39mreport)[33m;[39m
+    [90m106| [39m      [34mexpect[39m(st)[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+    [90m   | [39m                 [31m^[39m
+    [90m107| [39m      const next = st!.inputs.find((i) => i.input === ".agents/SESSION…
+    [90m108| [39m      expect(next).toMatchObject({ verdict: "stale", declared_session:…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-fixes.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-2: A2A-Hub at e0bc3f8, the known positive[2m > [22m--commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it
+[31m[1mAssertionError[22m: expected [Function] to throw an error[39m
+
+[32m- Expected:[39m 
+null
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2m❯[22m tests/pipelines/state-import-fixes.test.ts:[2m120:44[22m[39m
+    [90m118| [39m    it("--commit refuses without the acknowledgement, writing nothing …
+    [90m119| [39m      [34mrunDraft[39m(root[33m,[39m [33mTODAY[39m)[33m;[39m
+    [90m120| [39m      [34mexpect[39m(() [33m=>[39m [34mrunCommit[39m(root[33m,[39m [33mTODAY[39m))[33m.[39m[34mtoThrow[39m([36m/next-session\.md/[39m)[33m;[39m
+    [90m   | [39m                                           [31m^[39m
+    [90m121| [39m      [34mexpect[39m([34mexistsSync[39m([34mjoin[39m(root[33m,[39m [33mSTATE_REL[39m)))[33m.[39m[34mtoBe[39m([35mfalse[39m)[33m;[39m
+    [90m122| [39m      [34mexpect[39m([34mexistsSync[39m([34mjoin[39m(root[33m,[39m [32m".agents/archive"[39m)))[33m.[39m[34mtoBe[39m([35mfalse[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-fixes.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-2: A2A-Hub at e0bc3f8, the known positive[2m > [22mthe CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale
+[31m[1mAssertionError[22m: expected +0 to be 1 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 0[39m
+
+[36m [2m❯[22m tests/pipelines/state-import-fixes.test.ts:[2m131:27[22m[39m
+    [90m129| [39m
+    [90m130| [39m      [35mconst[39m bare [33m=[39m [34mcli[39m([[32m"state"[39m[33m,[39m [32m"import"[39m[33m,[39m [32m"--commit"[39m[33m,[39m root][33m,[39m root)[33m;[39m
+    [90m131| [39m      [34mexpect[39m(bare[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m1[39m)[33m;[39m
+    [90m   | [39m                          [31m^[39m
+    [90m132| [39m      [34mexpect[39m(bare[33m.[39mstderr)[33m.[39m[34mtoContain[39m([32m"next-session.md"[39m)[33m;[39m
+    [90m133| [39m      [34mexpect[39m(bare[33m.[39mstderr)[33m.[39m[34mtoContain[39m([32m"--accept-stale"[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-fixes.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-3: a project whose inputs are current, the known negative[2m > [22mno input is stale, every judged input is current, and --commit proceeds without the acknowledgement
+[31m[1mAssertionError[22m: expected undefined to be defined[39m
+[36m [2m❯[22m tests/pipelines/state-import-fixes.test.ts:[2m156:18[22m[39m
+    [90m154| [39m      [35mconst[39m r [33m=[39m [34mrunDraft[39m(root[33m,[39m [33mTODAY[39m)[33m;[39m
+    [90m155| [39m      [35mconst[39m st [33m=[39m [34mstaleness[39m(r[33m.[39mdraft[33m.[39mreport)[33m;[39m
+    [90m156| [39m      [34mexpect[39m(st)[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+    [90m   | [39m                 [31m^[39m
+    [90m157| [39m      expect(st!.inputs.map((i) => [i.input, i.verdict]).sort()).toEqu…
+    [90m158| [39m        [[32m".agents/SESSIONS/next-session.md"[39m[33m,[39m [32m"current"[39m][33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-fixes.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-4: an input the detector cannot judge is reported, never counted as current[2m > [22man input with no session marker is 'could not tell', named in the report's first section
+[31m[1mAssertionError[22m: expected undefined to be defined[39m
+[36m [2m❯[22m tests/pipelines/state-import-fixes.test.ts:[2m175:18[22m[39m
+    [90m173| [39m      [35mconst[39m r [33m=[39m [34mrunDraft[39m(root[33m,[39m [33mTODAY[39m)[33m;[39m
+    [90m174| [39m      [35mconst[39m st [33m=[39m [34mstaleness[39m(r[33m.[39mdraft[33m.[39mreport)[33m;[39m
+    [90m175| [39m      [34mexpect[39m(st)[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+    [90m   | [39m                 [31m^[39m
+    [90m176| [39m      const inbox = st!.inputs.find((i) => i.input === ".agents/TASKS/…
+    [90m177| [39m      expect(inbox).toMatchObject({ verdict: "could_not_tell", declare…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-fixes.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-4: an input the detector cannot judge is reported, never counted as current[2m > [22mwith no Session_N.md to compare against, every present input is 'could not tell'
+[31m[1mAssertionError[22m: expected undefined to be defined[39m
+[36m [2m❯[22m tests/pipelines/state-import-fixes.test.ts:[2m189:18[22m[39m
+    [90m187| [39m      [35mconst[39m r [33m=[39m [34mrunDraft[39m(root[33m,[39m [33mTODAY[39m)[33m;[39m
+    [90m188| [39m      [35mconst[39m st [33m=[39m [34mstaleness[39m(r[33m.[39mdraft[33m.[39mreport)[33m;[39m
+    [90m189| [39m      [34mexpect[39m(st)[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+    [90m   | [39m                 [31m^[39m
+    [90m190| [39m      [34mexpect[39m(st[33m![39m[33m.[39minputs)[33m.[39m[34mtoHaveLength[39m([34m3[39m)[33m;[39m
+    [90m191| [39m      for (const i of st!.inputs) expect(i.verdict).toBe("could_not_te…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-fixes.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-4: an input the detector cannot judge is reported, never counted as current[2m > [22minputs that are not imported as current state are listed as not judged, with a reason
+[31m[1mAssertionError[22m: expected undefined to be defined[39m
+[36m [2m❯[22m tests/pipelines/state-import-fixes.test.ts:[2m198:18[22m[39m
+    [90m196| [39m      writeFileSync(join(root, ".agents/SYSTEM/DECISIONS.md"), "# Deci…
+    [90m197| [39m      [35mconst[39m st [33m=[39m [34mstaleness[39m([34mrunDraft[39m(root[33m,[39m [33mTODAY[39m)[33m.[39mdraft[33m.[39mreport)[33m;[39m
+    [90m198| [39m      [34mexpect[39m(st)[33m.[39m[34mtoBeDefined[39m()[33m;[39m
+    [90m   | [39m                 [31m^[39m
+    [90m199| [39m      expect(st!.not_judged.map((n) => n.input)).toContain(".agents/SY…
+    [90m200| [39m      [35mfor[39m ([35mconst[39m n [35mof[39m st[33m![39m[33m.[39mnot_judged) [34mexpect[39m(n[33m.[39mreason)[33m.[39mnot[33m.[39m[34mtoBe[39m([32m""[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m9 failed[39m[22m[90m (9)[39m
+[2m   Start at [22m 05:40:06
+[2m   Duration [22m 3.14s[2m (transform 203ms, setup 45ms, collect 314ms, tests 2.30s, environment 0ms, prepare 170ms)[22m
+
+EXIT=1

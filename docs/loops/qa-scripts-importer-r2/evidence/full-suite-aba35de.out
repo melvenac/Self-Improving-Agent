@@ -1,0 +1,310 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/qa-scratch/cand/open-brain[39m
+
+ [32m✓[39m tests/shared/state-writer.test.ts [2m([22m[2m36 tests[22m[2m)[22m[33m 2267[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/checks.test.ts [2m([22m[2m102 tests[22m[2m)[22m[33m 2439[2mms[22m[39m
+   [33m[2m✓[22m[39m checkRetirements[2m > [22mdoes not scan gitignored files, however loudly they name a retirement [33m 311[2mms[22m[39m
+ [32m✓[39m tests/server.test.ts [2m([22m[2m25 tests[22m[2m)[22m[33m 1833[2mms[22m[39m
+ [32m✓[39m tests/harness/policies.test.ts [2m([22m[2m25 tests[22m[2m)[22m[33m 7753[2mms[22m[39m
+   [33m[2m✓[22m[39m gate policies[2m > [22mA6 — a threshold change in the file changes the decision[2m > [22mproceeds with the shipped threshold and is rejected by a stricter one [33m 2986[2mms[22m[39m
+   [33m[2m✓[22m[39m gate policies[2m > [22mA6 — a threshold change in the file changes the decision[2m > [22mrecords the thresholds it applied in the gate artifact [33m 2272[2mms[22m[39m
+   [33m[2m✓[22m[39m gate policies[2m > [22mF5 — addresses_top_failures has no referent when there are no prior failures[2m > [22mthe done gate is REACHABLE live with stub roles and the shipped policy [33m 2105[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 15101[2mms[22m[39m
+   [33m[2m✓[22m[39m R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell'[2m > [22mthe CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing [33m 1759[2mms[22m[39m
+   [33m[2m✓[22m[39m R2-3 (IF-11): an import completes, or it changes nothing[2m > [22mPROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist [33m 1675[2mms[22m[39m
+   [33m[2m✓[22m[39m R2-4 (IF-12): `state import` acts on exactly the project the operator named[2m > [22ma single-dash token that is not a known flag refuses, before or after the directory [33m 3208[2mms[22m[39m
+   [33m[2m✓[22m[39m R2-4 (IF-12): `state import` acts on exactly the project the operator named[2m > [22mPROBE-12: a bare word before the directory is a second positional and refuses; the cwd's project is not committed [33m 2482[2mms[22m[39m
+   [33m[2m✓[22m[39m R2-4 (IF-12): `state import` acts on exactly the project the operator named[2m > [22mPROBE-5b: a positional that names no existing directory refuses instead of walking up from the cwd [33m 1653[2mms[22m[39m
+   [33m[2m✓[22m[39m R2-5 (IF-13): every protection has a test that fails without it[2m > [22mM6: a misspelled acknowledgement on a CURRENT project is refused by the flag check itself [33m 1582[2mms[22m[39m
+   [33m[2m✓[22m[39m R2-5 (IF-13): every protection has a test that fails without it[2m > [22mM13: --accept-stale with --draft refuses and writes no draft [33m 786[2mms[22m[39m
+   [33m[2m✓[22m[39m R2-5 (IF-13): every protection has a test that fails without it[2m > [22mM14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output [33m 1644[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 454[2mms[22m[39m
+ [32m✓[39m tests/active-session.test.ts [2m([22m[2m48 tests[22m[2m)[22m[32m 71[2mms[22m[39m
+ [32m✓[39m tests/harness/refwatch-stage.test.ts [2m([22m[2m19 tests[22m[2m)[22m[33m 25467[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22m(i) refuses `git tag -f loop-001-developer loop-001-base` and restores the tag [33m 2180[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22m(ii) refuses `git branch -f` and puts the branch back [33m 1624[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22m(iii) refuses a bare `git update-ref` and deletes the ref it created [33m 1626[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22m(iv) refuses a role-created `loop-001-anything`, which a name rule would have allowed [33m 1325[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mlets a clean loop through and still writes its own three tags [33m 2140[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mleaves the checked-out branch to the commit boundary, and says so [33m 2251[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mstill reports a COMMITTING role as stage-committed, not as a ref write [33m 1597[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mrefuses a role that moves the checked-out branch with update-ref [33m 1450[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mD1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human[2m > [22mD1 — `checkout -b evil` + commit is refused WITH a record, and HEAD still resolves [33m 1614[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mD1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human[2m > [22mD1b — `symbolic-ref HEAD refs/heads/side` is refused and HEAD is put back [33m 1447[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mD1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human[2m > [22mD2 — a backwards move of the checked-out branch is RESTORED, not left for a human [33m 1575[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mD1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human[2m > [22mD4 — deleting the checked-out branch is refused WITH a record, and the ref comes back [33m 1483[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mreports the ref verdict on every stage, with its own limits stated [33m 2167[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mRefWatch[2m > [22mconsumes an authorisation once — a second delta on the same ref is unauthored [33m 399[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mRefWatch[2m > [22mclears authorisations when a new window opens [33m 493[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mRefWatch[2m > [22mrestores with a compare-and-swap, and reports a ref it could not put back [33m 710[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mRefWatch[2m > [22mrestoreDeletedDeferred is a no-op when the watch holds no deferred delta [33m 470[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A2 — a role that writes a ref fails the loop[2m > [22mRefWatch[2m > [22mrestoreDeletedDeferred leaves a MOVED deferred ref alone — only a deletion is put back [33m 629[2mms[22m[39m
+[90mstdout[2m | tests/trigger/query.test.ts[2m > [22m[2mA1(a) — precision: the conjunction excludes partial matches, and 299 ranks first[2m > [22m[2mand it wins a SMALL field, which is what this fixture demonstrates
+[22m[39mA1(a) match set (2 of 11 documents): pipe-to-tail-masks-exit-code, exit-code-from-variable
+
+[90mstdout[2m | tests/trigger/query.test.ts[2m > [22m[2mA1(b) — the field: ten real competitors, rank reported and not asserted[2m > [22m[2m299 is IN the match set — and its rank is reported, never asserted (R26)
+[22m[39mA1(b) entry 299 ranks 4 of 11 against ten same-topic competitors (top: migration-exit-code). RANK REPORTED, NOT ASSERTED — R26 / amendment 10. bm25 length normalisation is the cause; the live 599-entry store ranks 299 first only because five entries there match all three terms, which is a thin field rather than discrimination.
+
+ [32m✓[39m tests/trigger/query.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+ [32m✓[39m tests/harness/gate-live.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-end/index-v2.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 135[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/checks-state.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 779[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-start/tree-currency.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 15406[2mms[22m[39m
+   [33m[2m✓[22m[39m describeTreeCurrency[2m > [22mreports current when the clone is level with origin/master [33m 1020[2mms[22m[39m
+   [33m[2m✓[22m[39m describeTreeCurrency[2m > [22mSAYS SO when current — a silent pass would look like a check that did not run [33m 1022[2mms[22m[39m
+   [33m[2m✓[22m[39m describeTreeCurrency[2m > [22mreports BEHIND with the commit count and both record revisions [33m 2123[2mms[22m[39m
+   [33m[2m✓[22m[39m describeTreeCurrency[2m > [22mnames the comparison so it cannot be read as the drift line [33m 1898[2mms[22m[39m
+   [33m[2m✓[22m[39m describeTreeCurrency[2m > [22mstates that the comparison is only as fresh as the last fetch [33m 1045[2mms[22m[39m
+   [33m[2m✓[22m[39m describeTreeCurrency[2m > [22mRESOLVES a real last-fetch timestamp, rather than reporting it unknown [33m 1713[2mms[22m[39m
+   [33m[2m✓[22m[39m describeTreeCurrency[2m > [22mfinds FETCH_HEAD in a LINKED WORKTREE, where it is not under .git/ [33m 1221[2mms[22m[39m
+   [33m[2m✓[22m[39m describeTreeCurrency[2m > [22mreports ahead without calling it behind, and stays quiet about staleness [33m 1204[2mms[22m[39m
+   [33m[2m✓[22m[39m describeTreeCurrency[2m > [22mreports DIVERGED when both sides moved [33m 1778[2mms[22m[39m
+   [33m[2m✓[22m[39m describeTreeCurrency[2m > [22mreports the record revision as unknown rather than 0 when state.json is absent upstream [33m 1070[2mms[22m[39m
+   [33m[2m✓[22m[39m describeTreeCurrency[2m > [22mreports a record revision behind even when HEAD is level, and says both numbers [33m 1011[2mms[22m[39m
+ [32m✓[39m tests/trigger/floor.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 160[2mms[22m[39m
+ [32m✓[39m tests/shadow-evaluate.test.ts [2m([22m[2m27 tests[22m[2m)[22m[32m 78[2mms[22m[39m
+ [32m✓[39m tests/cli-bootstrap.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 12226[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22memits SESSION_UUID exactly once when the payload carries session_id [33m 896[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22memits the id from the payload verbatim, not a filesystem guess [33m 773[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22maccepts payload fields other than Claude Code's session_id [33m 897[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22mgenerates a UUID when the IDE supplies none [33m 906[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22mgenerates a DIFFERENT uuid each run, never a reused one [33m 1755[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22mstays silent in a subagent context (anti-loop) [33m 831[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22mREFUSES malformed stdin rather than continuing without the payload [33m 745[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22ma well-formed payload with NO session id writes nothing to the slot [33m 818[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22ma payload WITH a session id still writes the slot — the guard is not a ban [33m 856[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22mstill refuses to guess an id from the filesystem [33m 989[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22mF4: a MALFORMED payload refuses, writes nothing, and exits non-zero [33m 813[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22mF4: an ABSENT payload is still supported — absent and malformed are different [33m 785[2mms[22m[39m
+   [33m[2m✓[22m[39m cli-bootstrap SESSION_UUID contract[2m > [22mF4: a WELL-FORMED payload still registers the id it was given [33m 1160[2mms[22m[39m
+ [32m✓[39m tests/db-v2.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 130[2mms[22m[39m
+ [32m✓[39m tests/trigger/fires.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 60[2mms[22m[39m
+ [32m✓[39m tests/trigger/hook.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 35131[2mms[22m[39m
+   [33m[2m✓[22m[39m A5 — what the hook emits[2m > [22mPOSITIVE, at scale, through the shipped floor: additionalContext carries 299 and its ACTION [33m 2669[2mms[22m[39m
+   [33m[2m✓[22m[39m A5 — what the hook emits[2m > [22mthe POLICY FILE is what let 299 through — raise the floor and the same call goes silent [33m 5975[2mms[22m[39m
+   [33m[2m✓[22m[39m A5 — what the hook emits[2m > [22mNEGATIVE: git status --porcelain emits nothing at all — no key, no stdout, no stderr [33m 2862[2mms[22m[39m
+   [33m[2m✓[22m[39m A5 — what the hook emits[2m > [22mNEGATIVE: ls -la emits nothing at all — no key, no stdout, no stderr [33m 2735[2mms[22m[39m
+   [33m[2m✓[22m[39m A5 — what the hook emits[2m > [22mNEGATIVE: zzqx --flurb wibble emits nothing at all — no key, no stdout, no stderr [33m 2789[2mms[22m[39m
+   [33m[2m✓[22m[39m A5 — what the hook emits[2m > [22mignores a tool that is not Bash, and says nothing about it [33m 2749[2mms[22m[39m
+   [33m[2m✓[22m[39m A6 — three failures, and the model hears none of them[2m > [22mstore path absent [33m 2784[2mms[22m[39m
+   [33m[2m✓[22m[39m A6 — three failures, and the model hears none of them[2m > [22mstore locked by another writer [33m 3364[2mms[22m[39m
+   [33m[2m✓[22m[39m A6 — three failures, and the model hears none of them[2m > [22mpast its own deadline: the work finished, and the result is still not emitted [33m 3077[2mms[22m[39m
+   [33m[2m✓[22m[39m A6 — three failures, and the model hears none of them[2m > [22ma malformed payload is logged and dropped, NOT refused with a non-zero exit [33m 3221[2mms[22m[39m
+   [33m[2m✓[22m[39m A6 — three failures, and the model hears none of them[2m > [22mPOSITIVE CONTROL: the same harness on a healthy store DOES emit [33m 2771[2mms[22m[39m
+ [32m✓[39m tests/harness/checks.test.ts [2m([22m[2m24 tests[22m[2m)[22m[33m 2574[2mms[22m[39m
+   [33m[2m✓[22m[39m runCheck[2m > [22mrecords a timeout as a failure rather than letting it hang the loop [33m 427[2mms[22m[39m
+   [33m[2m✓[22m[39m defaultChecks — D4[2m > [22mRESOLVES npm to something that runs — spawned, not asserted by name [33m 319[2mms[22m[39m
+   [33m[2m✓[22m[39m defaultChecks — D4[2m > [22mthe default BUILD check spawns successfully against a repo that has the scripts [33m 563[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-views.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-start/role-files.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 7396[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22mLOADS the content, not just the names — G-032 is about reading them [33m 577[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22mnames each file AND its commit [33m 550[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22mTELLS the seat when its role file is missing, rather than leaving it to notice [33m 477[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22mnames a role outside the closed seat set as its own problem [33m 411[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22mTELLS the seat when the working copy differs from HEAD's blob — the stale case [33m 580[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22mdoes not call an unmodified file stale [33m 518[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22mreports an UNTRACKED role file as a problem — tracked is the whole point [33m 479[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22msays so when there is no seat identity at all, rather than loading nothing quietly [33m 392[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22mrecords HEAD-behind-upstream for a role file without calling it stale [33m 1871[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22ma checkout declaring role: none is NOT A SEAT — said in words, and not a problem [33m 441[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22mstill flags a role that is neither a seat nor the explicit none [33m 457[2mms[22m[39m
+   [33m[2m✓[22m[39m describeRoleFiles[2m > [22mreports behindUpstream false when there is no upstream to compare against [33m 612[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/staleness.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 8619[2mms[22m[39m
+   [33m[2m✓[22m[39m checkGitNexusIndex[2m > [22mskips with a reason where there is no .gitnexus/, and says it is not a pass [33m 402[2mms[22m[39m
+   [33m[2m✓[22m[39m checkGitNexusIndex[2m > [22mpasses when the index is at HEAD, and carries the ref it measured against [33m 462[2mms[22m[39m
+   [33m[2m✓[22m[39m checkGitNexusIndex[2m > [22mwarns with a count when merely behind [33m 635[2mms[22m[39m
+   [33m[2m✓[22m[39m checkGitNexusIndex[2m > [22ma dead branch pin on a CURRENT index is not staleness — the SHA is the anchor [33m 466[2mms[22m[39m
+   [33m[2m✓[22m[39m checkGitNexusIndex[2m > [22ma dead branch pin on a BEHIND index still reports the count, and stays a warn [33m 727[2mms[22m[39m
+   [33m[2m✓[22m[39m checkGitNexusIndex[2m > [22mtreats an indexed commit absent from the repo as UNDEFINED, not zero [33m 434[2mms[22m[39m
+   [33m[2m✓[22m[39m checkGitNexusIndex[2m > [22mfails on meta.json with no lastCommit rather than assuming current [33m 363[2mms[22m[39m
+   [33m[2m✓[22m[39m checkGitNexusIndex[2m > [22mfails on unreadable meta.json rather than skipping past it [33m 330[2mms[22m[39m
+   [33m[2m✓[22m[39m checkBuildFreshness[2m > [22mskips when there is no build, and says it is not a pass [33m 422[2mms[22m[39m
+   [33m[2m✓[22m[39m checkBuildFreshness[2m > [22mpasses when the stamp matches HEAD, and states what it cannot see [33m 422[2mms[22m[39m
+   [33m[2m✓[22m[39m checkBuildFreshness[2m > [22mfails when the build was made from a different commit [33m 656[2mms[22m[39m
+   [33m[2m✓[22m[39m checkBuildFreshness[2m > [22min a MAIN checkout, names the hooks and server as affected [33m 595[2mms[22m[39m
+   [33m[2m✓[22m[39m checkBuildFreshness[2m > [22min a LINKED WORKTREE, says the hooks and server are UNAFFECTED [33m 717[2mms[22m[39m
+   [33m[2m✓[22m[39m checkBuildFreshness[2m > [22mthe UNSTAMPED message carries the same tree-aware consequence, not a universal one [33m 724[2mms[22m[39m
+   [33m[2m✓[22m[39m checkBuildFreshness[2m > [22mreports an UNSTAMPED build as unknown, never as fresh [33m 439[2mms[22m[39m
+   [33m[2m✓[22m[39m checkBuildFreshness[2m > [22mreports a build stamped with a null commit as unknown, and gives the recorded reason [33m 446[2mms[22m[39m
+   [33m[2m✓[22m[39m checkBuildFreshness[2m > [22mfails on unreadable build-info.json rather than passing [33m 377[2mms[22m[39m
+ [32m✓[39m tests/harness/workspace.test.ts [2m([22m[2m31 tests[22m[2m)[22m[33m 6277[2mms[22m[39m
+   [33m[2m✓[22m[39m enforceAllowlist against a real tree[2m > [22mpasses when every change is inside the allowlist, and reports what it examined [33m 318[2mms[22m[39m
+   [33m[2m✓[22m[39m enforceAllowlist against a real tree[2m > [22mrefuses a write outside the allowlist and names it [33m 352[2mms[22m[39m
+   [33m[2m✓[22m[39m enforceAllowlist against a real tree[2m > [22mcounts a file written deep inside an unlisted new directory [33m 339[2mms[22m[39m
+   [33m[2m✓[22m[39m enforceAllowlist against a real tree[2m > [22mcommitted changes[2m > [22msees a path that was written AND COMMITTED during the stage [33m 626[2mms[22m[39m
+   [33m[2m✓[22m[39m enforceAllowlist against a real tree[2m > [22mcommitted changes[2m > [22mreports headMoved even when every committed path was permitted [33m 634[2mms[22m[39m
+   [33m[2m✓[22m[39m enforceAllowlist against a real tree[2m > [22mcommitted changes[2m > [22munions committed and uncommitted paths without double-counting [33m 504[2mms[22m[39m
+   [33m[2m✓[22m[39m enforceAllowlist against a real tree[2m > [22mcommitted changes[2m > [22mreports both sides of a committed rename, so a move out of a protected path is seen [33m 728[2mms[22m[39m
+   [33m[2m✓[22m[39m requireCleanTree[2m > [22mrefuses a dirty tree and says why a dirty start cannot be held to an allowlist [33m 393[2mms[22m[39m
+   [33m[2m✓[22m[39m verifyFrozen — acceptance A3[2m > [22mverifies a candidate whose tree has not moved [33m 337[2mms[22m[39m
+   [33m[2m✓[22m[39m verifyFrozen — acceptance A3[2m > [22mrefuses when HEAD has moved past the candidate [33m 506[2mms[22m[39m
+   [33m[2m✓[22m[39m verifyFrozen — acceptance A3[2m > [22mrefuses when HEAD is right but the working tree is dirty [33m 327[2mms[22m[39m
+ [32m✓[39m tests/vault-writer.test.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 68[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-staleness.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 6069[2mms[22m[39m
+   [33m[2m✓[22m[39m T-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-2: A2A-Hub at e0bc3f8, the known positive[2m > [22mthe CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale [33m 3955[2mms[22m[39m
+   [33m[2m✓[22m[39m T-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-4: an input the detector cannot judge is reported, never counted as current[2m > [22m--commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report [33m 1830[2mms[22m[39m
+ [32m✓[39m tests/harness/runtime.test.ts [2m([22m[2m44 tests[22m[2m)[22m[33m 79844[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA1 — end to end[2m > [22mcompletes, exits 0, and writes D_t.md, A_t.gitref and E_t.json [33m 2194[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA1 — end to end[2m > [22mrecords in A_t.gitref the sha QA was actually frozen at [33m 2534[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA1 — end to end[2m > [22mwrites an E_t whose candidate_git matches the developer commit, not HEAD [33m 2225[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA1 — end to end[2m > [22mfills runtime_checks from exit codes rather than from the role [33m 2161[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA1 — end to end[2m > [22mleaves the tree clean when it is done [33m 2271[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA2 — schema retry and the cap[2m > [22mretries an invalid D_t and completes when a later attempt validates [33m 2460[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA2 — schema retry and the cap[2m > [22mhands the failing role the problems that rejected it, not a bare re-roll [33m 2459[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA2 — schema retry and the cap[2m > [22mgives the role its own JSON Schema on the retry [33m 2444[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA2 — schema retry and the cap[2m > [22mfails the loop with a recorded reason when the cap is exhausted [33m 1199[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA2 — schema retry and the cap[2m > [22mwrites FAILED.md, so the failure is an artifact and not just an exit code [33m 998[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA2 — schema retry and the cap[2m > [22mproduces no E_t when the cap is exhausted — a failed loop leaves no evidence [33m 948[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA2 — schema retry and the cap[2m > [22mretries the QA role on an invalid E_t and caps there too [33m 2182[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA4 — the write allowlist refuses[2m > [22mrefuses a developer write outside the allowlist, bypassing the helper [33m 1430[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA4 — the write allowlist refuses[2m > [22mreverts the offending write rather than leaving it on disk [33m 1238[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA4 — the write allowlist refuses[2m > [22mnever creates a candidate commit or a developer tag from a refused stage [33m 1279[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA4 — the write allowlist refuses[2m > [22mrefuses a write that escapes the repository through .. [33m 1154[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA4 — the write allowlist refuses[2m > [22mhonours a widened developer allowlist when one is given deliberately [33m 2148[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA4 — the write allowlist refuses[2m > [22mrefuses a QA write outside its allowlist — QA may never touch the candidate [33m 2004[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA4 — the write allowlist refuses[2m > [22mdoes not retry a boundary breach [33m 1406[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA3/A4 — a role that COMMITS is refused[2m > [22mQA that overwrites and commits the candidate is refused — the loop does not complete [33m 2173[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA3/A4 — a role that COMMITS is refused[2m > [22mQA that commits is rolled back to the candidate, so the tree still matches the frozen sha [33m 2425[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA3/A4 — a role that COMMITS is refused[2m > [22ma planner that commits outside its allowlist is refused [33m 1165[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA3/A4 — a role that COMMITS is refused[2m > [22ma developer that commits fails for the RIGHT reason, not 'changed nothing' [33m 1498[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA3/A4 — a role that COMMITS is refused[2m > [22mrefuses a commit even when every path it touched was inside the allowlist [33m 1666[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA3/A4 — a role that COMMITS is refused[2m > [22mleaves the tree exactly where the loop started when the first stage commits [33m 1061[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA3/A4 — a role that COMMITS is refused[2m > [22masserts the candidate is the evidence commit's parent on a clean run [33m 2224[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA5 — versioning and rollback[2m > [22mcreates loop-001-developer and loop-001-qa [33m 2401[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA5 — versioning and rollback[2m > [22mrestores the pre-loop state with git alone [33m 2713[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA5 — versioning and rollback[2m > [22mrefuses to run a loop id whose tags already exist, rather than moving them [33m 2263[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA5 — versioning and rollback[2m > [22mcommits the candidate separately from the evidence [33m 2456[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA3 — the frozen candidate[2m > [22mhands QA the candidate sha and the time it was frozen [33m 2478[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA3 — the frozen candidate[2m > [22mrefuses to run QA when a deterministic check moved HEAD off the candidate [33m 1649[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mA3 — the frozen candidate[2m > [22mrefuses to run QA when a check left the working tree dirty [33m 1556[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mdeterministic checks in the loop[2m > [22mcompletes the loop with a red build and reports it rather than hiding it [33m 2217[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mdeterministic checks in the loop[2m > [22mrefuses a QA report whose runtime_checks contradict the measurement [33m 1889[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mpreconditions[2m > [22mfails the loop when the developer stage changes nothing [33m 1150[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mpreconditions[2m > [22mrecords a role that throws without pretending the stage passed [33m 1275[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mgates[2m > [22mskips the gates by default and records that no decision was taken [33m 2324[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mgates[2m > [22mbuilds a payload for the two gates this slice owns [33m 2327[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mgates[2m > [22msays in the log that the QA scoring gate was NOT consulted [33m 2763[2mms[22m[39m
+   [33m[2m✓[22m[39m harness runtime[2m > [22mgates[2m > [22mprints every gate payload in dry-run mode and still sends nothing [33m 2622[2mms[22m[39m
+ [32m✓[39m tests/topics.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 256[2mms[22m[39m
+ [32m✓[39m tests/harness/git.test.ts [2m([22m[2m29 tests[22m[2m)[22m[33m 8362[2mms[22m[39m
+   [33m[2m✓[22m[39m harness git wrapper[2m > [22mshell-free argument handling[2m > [22mpasses ^{commit} to git verbatim [33m 305[2mms[22m[39m
+   [33m[2m✓[22m[39m harness git wrapper[2m > [22mshell-free argument handling[2m > [22mhandles a path containing a space and a caret [33m 484[2mms[22m[39m
+   [33m[2m✓[22m[39m harness git wrapper[2m > [22mchangedPaths[2m > [22mreports both sides of a rename [33m 406[2mms[22m[39m
+   [33m[2m✓[22m[39m harness git wrapper[2m > [22mchangedPaths[2m > [22mdoes not report gitignored files [33m 479[2mms[22m[39m
+   [33m[2m✓[22m[39m harness git wrapper[2m > [22mtags[2m > [22mcreates an annotated tag at a given sha [33m 341[2mms[22m[39m
+   [33m[2m✓[22m[39m harness git wrapper[2m > [22mtags[2m > [22mrefuses to move a tag that already exists [33m 623[2mms[22m[39m
+   [33m[2m✓[22m[39m harness git wrapper[2m > [22mrevertPaths[2m > [22mrestores a tracked file that was modified [33m 536[2mms[22m[39m
+   [33m[2m✓[22m[39m harness git wrapper[2m > [22mrevertPaths[2m > [22mremoves an untracked file, which `git checkout --` cannot [33m 304[2mms[22m[39m
+   [33m[2m✓[22m[39m harness git wrapper[2m > [22mfailure reporting[2m > [22mgitTry reports ok from the exit status, not from stdout looking plausible [33m 301[2mms[22m[39m
+ [32m✓[39m tests/pipelines/detach.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 10759[2mms[22m[39m
+   [33m[2m✓[22m[39m detachToUpstream[2m > [22mdetaches a branch checkout onto origin/master and VERIFIES the end state [33m 1313[2mms[22m[39m
+   [33m[2m✓[22m[39m detachToUpstream[2m > [22mREFUSES when HEAD carries commits origin/master does not — the work-loss case [33m 1245[2mms[22m[39m
+   [33m[2m✓[22m[39m detachToUpstream[2m > [22m--force proceeds past that refusal, and only then [33m 1579[2mms[22m[39m
+   [33m[2m✓[22m[39m detachToUpstream[2m > [22mREFUSES a dirty tree and names the paths [33m 1139[2mms[22m[39m
+   [33m[2m✓[22m[39m detachToUpstream[2m > [22mreports 'nothing to do' when already detached at the target [33m 1388[2mms[22m[39m
+   [33m[2m✓[22m[39m detachToUpstream[2m > [22mdry run changes nothing and says what it would do [33m 1244[2mms[22m[39m
+   [33m[2m✓[22m[39m detachToUpstream[2m > [22msays when it skipped the fetch, so a reader knows which comparison they got [33m 1110[2mms[22m[39m
+   [33m[2m✓[22m[39m detachToUpstream[2m > [22mdetaches onto origin/master even when the local master has moved ahead [33m 1296[2mms[22m[39m
+   [33m[2m✓[22m[39m detachToUpstream[2m > [22mrefuses when the upstream ref does not exist [33m 413[2mms[22m[39m
+ [32m✓[39m tests/harness/schema.test.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m tests/trigger/no-network.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-start/handoff-provenance.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 4731[2mms[22m[39m
+   [33m[2m✓[22m[39m findHandoffCommit[2m > [22mnames the commit where that seat's handoff last changed [33m 775[2mms[22m[39m
+   [33m[2m✓[22m[39m findHandoffCommit[2m > [22mCROSSES A SCHEMA MIGRATION rather than stopping at it [33m 749[2mms[22m[39m
+   [33m[2m✓[22m[39m findHandoffCommit[2m > [22mignores a change that only reshapes the container [33m 493[2mms[22m[39m
+   [33m[2m✓[22m[39m findHandoffCommit[2m > [22mFAILS CLOSED when the entry is older than the bound, naming the bound [33m 1154[2mms[22m[39m
+   [33m[2m✓[22m[39m findHandoffCommit[2m > [22mF1: REFUSES a SHA when the working copy differs from HEAD — the /end window [33m 311[2mms[22m[39m
+   [33m[2m✓[22m[39m findHandoffCommit[2m > [22mF1: still names the commit when the working copy MATCHES HEAD [33m 395[2mms[22m[39m
+   [33m[2m✓[22m[39m findHandoffCommit[2m > [22mF1: a change only to loop_state is NOT 'uncommitted' — the words are the identity [33m 365[2mms[22m[39m
+   [33m[2m✓[22m[39m findHandoffCommit[2m > [22msays there is nothing to trace when that seat has no handoff [33m 302[2mms[22m[39m
+ [32m✓[39m tests/trigger/negatives.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 148[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-end/recalled-ids.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 54[2mms[22m[39m
+ [32m✓[39m tests/harness/gate-artifacts.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 17238[2mms[22m[39m
+   [33m[2m✓[22m[39m gate artifacts[2m > [22mA5 — dry run[2m > [22mwrites G_plan.json and G_done.json with sent: false [33m 2590[2mms[22m[39m
+   [33m[2m✓[22m[39m gate artifacts[2m > [22mA5 — dry run[2m > [22mrecords the exact payload that WOULD have gone on the wire [33m 2434[2mms[22m[39m
+   [33m[2m✓[22m[39m gate artifacts[2m > [22mA5 — dry run[2m > [22mcarries the deterministic checks' EXIT CODES as data in the done-gate payload [33m 2335[2mms[22m[39m
+   [33m[2m✓[22m[39m gate artifacts[2m > [22mA5 — dry run[2m > [22mcontains no question about whether the tests passed — structurally, then by scan [33m 2620[2mms[22m[39m
+   [33m[2m✓[22m[39m gate artifacts[2m > [22mA5 — dry run[2m > [22mprints the payload in a dry run and sends nothing [33m 2423[2mms[22m[39m
+   [33m[2m✓[22m[39m gate artifacts[2m > [22mA3 — the key reaches no artifact and no log line[2m > [22mgreps the whole iteration directory and the captured log after a live run [33m 2308[2mms[22m[39m
+   [33m[2m✓[22m[39m gate artifacts[2m > [22mrecords a skipped gate as not consulted rather than omitting the file [33m 2493[2mms[22m[39m
+ [32m✓[39m tests/shared/paths.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 587[2mms[22m[39m
+   [33m[2m✓[22m[39m projectDirExists / existsCaseInsensitive[2m > [22mresolves a real 8.3 short-name segment (win32 only: short names exist only on Windows) [33m 552[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-migrate.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 89[2mms[22m[39m
+ [32m✓[39m tests/ranking.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-start/state-reader.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 370[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-atomic.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1138[2mms[22m[39m
+ [32m✓[39m tests/rating-method.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 113[2mms[22m[39m
+ [32m✓[39m tests/index-upsert.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 50[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/module-boundary.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 141[2mms[22m[39m
+ [32m✓[39m tests/shadow-stage.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 78[2mms[22m[39m
+ [32m✓[39m tests/relocate.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 72[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/mirror-parity.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 128[2mms[22m[39m
+ [32m✓[39m tests/shared/state-schema.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 41[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-start/session-log.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 166[2mms[22m[39m
+ [32m✓[39m tests/harness/refwatch.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 9100[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A1 — runLoop refuses a role it did not construct[2m > [22mthrows a distinct refusal when a foreign role is passed with no ref-watch [33m 312[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A1 — runLoop refuses a role it did not construct[2m > [22mruns the same foreign roles when the ref-watch is active [33m 2490[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A1 — runLoop refuses a role it did not construct[2m > [22mhas the ref-watch on by default, so omitting the flag permits foreign roles [33m 2040[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A1 — runLoop refuses a role it did not construct[2m > [22mstill accepts the stubs themselves after the subclass rule [33m 1730[2mms[22m[39m
+   [33m[2m✓[22m[39m G-041 A1 — runLoop refuses a role it did not construct[2m > [22mstill runs runtime-constructed roles with the watch explicitly off [33m 1774[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/repo-root.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 1388[2mms[22m[39m
+   [33m[2m✓[22m[39m resolveRepoRoot[2m > [22mthis repo's shape: a subpackage with its own package.json AND a stray bare .agents/ resolves to the root (V6) [33m 422[2mms[22m[39m
+   [33m[2m✓[22m[39m resolveRepoRoot[2m > [22mthe sync CLI refuses non-zero with one line naming the cwd (V6) [33m 871[2mms[22m[39m
+ [32m✓[39m tests/harness/gate.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m tests/shadow-strategies.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/pipeline-health.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-start/state-render.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/scorer.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/pipelines/store/index.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m tests/content-guard.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/shared/skill-index.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/command-parity.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 120[2mms[22m[39m
+ [32m✓[39m tests/session-provenance.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-start/derived-artifacts.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 5410[2mms[22m[39m
+   [33m[2m✓[22m[39m describeDerivedArtifacts[2m > [22msays NOTHING when neither artifact exists — most projects on this machine [33m 416[2mms[22m[39m
+   [33m[2m✓[22m[39m describeDerivedArtifacts[2m > [22msays NOTHING when both artifacts are current [33m 567[2mms[22m[39m
+   [33m[2m✓[22m[39m describeDerivedArtifacts[2m > [22mNEVER prints an all-clear — silence is the only success output [33m 532[2mms[22m[39m
+   [33m[2m✓[22m[39m describeDerivedArtifacts[2m > [22mreports a stale build as STALE, naming the check [33m 592[2mms[22m[39m
+   [33m[2m✓[22m[39m describeDerivedArtifacts[2m > [22mreports an ageing index as AGEING, not STALE [33m 884[2mms[22m[39m
+   [33m[2m✓[22m[39m describeDerivedArtifacts[2m > [22mmentions no tool by name when that tool's artifact is absent [33m 624[2mms[22m[39m
+   [33m[2m✓[22m[39m describeDerivedArtifacts[2m > [22mreports both when both are bad [33m 759[2mms[22m[39m
+   [33m[2m✓[22m[39m describeDerivedArtifacts[2m > [22mkeeps the greeting short — the full provenance stays in /sync [33m 572[2mms[22m[39m
+   [33m[2m✓[22m[39m describeDerivedArtifacts[2m > [22mdoes not throw where there is no git repository at all [33m 461[2mms[22m[39m
+ [32m✓[39m tests/recall-broadening.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 29[2mms[22m[39m
+ [32m✓[39m tests/vault-archive.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m tests/pipelines/template-seed.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 139[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-start/agent-identity.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 29[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/history.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/scorer-integration.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/hook-registration.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-start/index.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 176[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-start/session-discovery.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-seeds.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 932[2mms[22m[39m
+   [33m[2m✓[22m[39m T-175: an import carries none of SIA's own history (IF-1)[2m > [22mthe CLI's draft line says verified 0 · gaps 0 [33m 876[2mms[22m[39m
+ [32m✓[39m tests/pipelines/session-start/drift-detector.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m tests/pipelines/sync/index.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 822[2mms[22m[39m
+ [32m✓[39m tests/harness/cli.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 30001[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22margument handling refuses rather than defaulting — T-150[2m > [22mprints usage and exits non-zero with no subcommand [33m 1179[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22margument handling refuses rather than defaulting — T-150[2m > [22mexits 0 for an explicit help request [33m 1005[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22margument handling refuses rather than defaulting — T-150[2m > [22mrefuses an unknown subcommand [33m 1090[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22margument handling refuses rather than defaulting — T-150[2m > [22mrefuses an unrecognised flag instead of selecting the default action [33m 3848[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22margument handling refuses rather than defaulting — T-150[2m > [22mrefuses a flag whose value is missing [33m 933[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22margument handling refuses rather than defaulting — T-150[2m > [22mrequires --loop [33m 968[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22margument handling refuses rather than defaulting — T-150[2m > [22mrefuses a malformed loop id [33m 938[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22margument handling refuses rather than defaulting — T-150[2m > [22mrefuses a non-numeric --max-attempts [33m 938[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22mA1 — a full loop from the command line[2m > [22mexits 0 and writes the three artifacts [33m 3146[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22mA1 — a full loop from the command line[2m > [22mwrites a plan artifact that validates against the plan schema [33m 3089[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22mA1 — a full loop from the command line[2m > [22mtags the loop with zero-padded three-digit numbers [33m 3218[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22mA1 — a full loop from the command line[2m > [22mexits non-zero when a deterministic check is red, and says so [33m 2519[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22mA1 — a full loop from the command line[2m > [22memits a machine-readable result with --json [33m 2356[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22mA1 — a full loop from the command line[2m > [22mfails with a recorded reason on a dirty tree [33m 848[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22mA6 — dry run from the command line[2m > [22mprints the gate payloads and completes [33m 2376[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22mschemas[2m > [22mprints both derived schemas [33m 766[2mms[22m[39m
+   [33m[2m✓[22m[39m harness CLI[2m > [22mschemas[2m > [22mrefuses an unknown flag [33m 750[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m75 passed[39m[22m[90m (75)[39m
+[2m      Tests [22m [1m[32m1070 passed[39m[22m[90m (1070)[39m
+[2m   Start at [22m 05:48:35
+[2m   Duration [22m 129.43s[2m (transform 2.21s, setup 1.48s, collect 11.41s, tests 323.57s, environment 25ms, prepare 13.66s)[22m
+
+SUITE_EXIT=0

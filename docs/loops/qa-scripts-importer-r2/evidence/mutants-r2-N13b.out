@@ -1,0 +1,5 @@
+original hashes: index.ts 82b4a14efc0d, cli.ts 21d04763222f; HEAD aba35de
+N13b [R2-3: a partial snapshot is removed (both removals)] diff 0	2	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/44
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before a snapshot that fails part-way is removed, with archive/ if the snapshot created it, and a second run completes
+restored: index.ts 82b4a14efc0d cli.ts 21d04763222f (original 82b4a14efc0d / 21d04763222f); git status --porcelain: clean
+EXIT=0

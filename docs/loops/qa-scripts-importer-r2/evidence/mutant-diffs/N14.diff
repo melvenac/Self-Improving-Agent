@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index f938efe..dac9c23 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -852,7 +852,6 @@ function rollBack(agents: string, snapshotDir: string, archiveExisted: boolean,
+     return `ROLLBACK FAILED (${err instanceof Error ? err.message : String(err)}): .agents/ is part-migrated. Restore it by hand from ${snapshotDir}, which was kept`;
+   }
+   rmSync(snapshotDir, { recursive: true, force: true });
+-  if (!archiveExisted) rmSync(join(agents, "archive"), { recursive: true, force: true });
+   if (aside) renameSync(aside, snapshotDir);
+   return "Rolled back: .agents/ was restored from the snapshot, and the snapshot removed, so nothing changed";
+ }

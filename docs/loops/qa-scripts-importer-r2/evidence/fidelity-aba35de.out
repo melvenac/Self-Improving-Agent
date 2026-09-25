@@ -1,0 +1,10 @@
+fixture file list matches the expected 9: true
+IDENTICAL .agents/SESSIONS/next-session.md  hub 11ba24ebc2a1 15977B CR=0 | fixture 11ba24ebc2a1 15977B CR=0
+IDENTICAL .agents/SESSIONS/Session_13.md  hub 6311bcb3aba5 6350B CR=0 | fixture 6311bcb3aba5 6350B CR=0
+IDENTICAL .agents/SESSIONS/Session_14.md  hub d75badf77ea2 7586B CR=0 | fixture d75badf77ea2 7586B CR=0
+IDENTICAL .agents/SYSTEM/DECISIONS.md  hub b0ef508ed27b 30077B CR=0 | fixture b0ef508ed27b 30077B CR=0
+IDENTICAL .agents/SYSTEM/SUMMARY.md  hub c6c445eb8db8 13368B CR=0 | fixture c6c445eb8db8 13368B CR=0
+IDENTICAL .agents/TASKS/INBOX.md  hub 2d1751251c21 19993B CR=0 | fixture 2d1751251c21 19993B CR=0
+IDENTICAL .agents/TASKS/task.md  hub 3ab837d9c752 9364B CR=0 | fixture 3ab837d9c752 9364B CR=0
+summary: identical 7, eol-only 0, different 0 (of 7)
+package.json fixture keys: name,version; name matches, version matches (hub a2a-intelligent-hub@1.7.0)

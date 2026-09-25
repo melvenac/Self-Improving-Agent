@@ -1,0 +1,11 @@
+setcontent.md:  23 20 49 6e 62 6f 78 20 97 20 70 72 69 6f 72 69
+ 74 69 65 73
+addcontent.md:  23 20 49 6e 62 6f 78 20 97 20 70 72 69 6f 72 69
+ 74 69 65 73
+outfile.md:  ff fe 23 00 20 00 49 00 6e 00 62 00 6f 00 78 00
+ 20 00 14 20
+redirect.md:  ff fe 23 00 20 00 49 00 6e 00 62 00 6f 00 78 00
+ 20 00 14 20
+outfile-utf8.md:  ef bb bf 23 20 49 6e 62 6f 78 20 e2 80 94 20 70
+ 72 69 6f 72
+setcontent.md bytes 7-9: 20 97 20

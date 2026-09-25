@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index f938efe..48a07f6 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -792,7 +792,6 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+     snapshot = takeSnapshot(root, today, opts.forceSnapshot === true);
+   } catch (err) {
+     // .agents/ outside archive/ is untouched; only the partial snapshot goes.
+-    rmSync(snapshotDir, { recursive: true, force: true });
+     if (!archiveExisted) rmSync(archive, { recursive: true, force: true });
+     if (aside) renameSync(aside, snapshotDir);
+     throw err;

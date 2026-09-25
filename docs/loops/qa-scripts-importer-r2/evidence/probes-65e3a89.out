@@ -1,0 +1,342 @@
+---- IF-1 (SIA fixture) --draft: exit 0
+     | state import — draft (nothing else changed)
+     | Root: C:\qa-scratch\probes-r1\if1-sia
+     | Draft:  .agents/state.draft.json
+     | Report: .agents/state.import-report.md
+     | Validates: yes
+     | Current session: 54 (.agents/SESSIONS/Session_54.md)
+     | Staleness: 0 stale · 2 could not tell (.agents/TASKS/INBOX.md, .agents/TASKS/task.md) · 1 current. Details are in the report's first section.
+     | Tasks: 143 (open 42, in_progress 3, blocked 0, done 98); superseded links 14; unparsed lines 2
+     | Decisions: 4 (1 skipped) · verified 0 · gaps 0 · objective found
+     | Handoff: pick_up 2 lines, watch_out 9, open_questions 2
+     | SUMMARY.md: --commit will remove 181 lines (74 blockquote + 105 Current State)
+     | Review the report, then run: open-brain state import --commit
+PASS IF-1 (SIA fixture): --draft exits 0
+PASS IF-1 (SIA fixture): the draft passes parseState
+PASS IF-1 (SIA fixture): verified[] 0 and gaps[] 0 are empty
+PASS IF-1 (SIA fixture): the report says verified[]: 0 · gaps[]: 0
+PASS IF-1 (SIA fixture): the CLI line says verified 0 · gaps 0
+PASS IF-1 (SIA fixture): no V-00x or G-00x id anywhere in the report or the draft
+---- IF-1 (SIA fixture) --commit: exit 0
+     | state import — committed
+     | Could not tell whether current: .agents/TASKS/INBOX.md, .agents/TASKS/task.md
+     | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (8 files)
+     | Wrote:    .agents/state.json at revision 0
+     | SUMMARY.md: removed 181 lines (74 blockquote + 105 Current State); kept Architecture Overview, Search Architecture (v0.6.0), Key Distinction, Research Context (Session 8)
+     | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+     | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md
+PASS IF-1 (SIA fixture): after --commit, state.json parses with empty verified[] and gaps[]
+PASS IF-1 (A2A-Hub archive): another project's draft: parses, verified[] and gaps[] empty, CLI line says 0
+---- IF-2 (A2A-Hub e0bc3f8, fresh git archive) --draft: exit 0
+     | state import — draft (nothing else changed)
+     | Root: C:\qa-scratch\probes-r1\if2-hub
+     | Draft:  .agents/state.draft.json
+     | Report: .agents/state.import-report.md
+     | Validates: yes
+     | Current session: 14 (.agents/SESSIONS/Session_14.md)
+     | Staleness: 2 stale (.agents/TASKS/INBOX.md, .agents/SESSIONS/next-session.md) · 0 could not tell · 1 current. Details are in the report's first section.
+     | --commit will REFUSE until those inputs are updated and the draft is re-run, or until --accept-stale is passed.
+     | Tasks: 6 (open 0, in_progress 0, blocked 0, done 6); superseded links 0; unparsed lines 106
+     | Decisions: 13 (1 skipped) · verified 0 · gaps 0 · objective NOT found
+     | Handoff: pick_up 9 lines, watch_out 22, open_questions 5
+     | SUMMARY.md: --commit will remove 70 lines (4 blockquote + 64 Current State)
+     | Review the report, then run: open-brain state import --commit
+     report first section (index 2; before it: # state.json import report — draft (2026-09-25)):
+     > ## Staleness — read this first
+     > 
+     > Signal: the highest `Session N` an input names in its status blockquote (the `>` lines directly under its title) or in a heading, compared with the highest `SESSIONS/Session_N.md`.
+     > Latest session: Session 14 (`.agents/SESSIONS/Session_14.md`).
+     > 
+     > - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 11 (`> **Last Updated:** Session 11 (2026-07-29) — repo-resident peers shipped as v1.6.0 (ADR-010): a peer can answer from a codebase it's resident in, verified l…`); the latest session log is Session 14 (.agents/SESSIONS/Session_14.md)
+     > - **STALE** `.agents/SESSIONS/next-session.md`: line 3 declares Session 13 (`> Updated at end of Session 13 (2026-08-07). Relay baton, not a log.`); the latest session log is Session 14 (.agents/SESSIONS/Session_14.md)
+     > - current `.agents/TASKS/task.md`: line 3 declares Session 14 (`> **Focus:** v2 — cross-repo agent-to-agent, proven locally. **All three trust-domain prerequisites (PRD §8) closed in Session 14** and shipped as v1.7.0. Wh…`); the latest session log is Session 14 (.agents/SESSIONS/Session_14.md)
+     > - not judged `.agents/SYSTEM/SUMMARY.md`: not imported as state: --commit only cuts its status blockquote and `## Current State`
+     > - not judged `.agents/SYSTEM/DECISIONS.md`: imported as a dated log of past decisions, not as current state
+     > 
+     > **`--commit` refuses while an input above is STALE.** Update it and re-run `--draft`, or pass `--accept-stale` to import it as it stands.
+     > 
+     > Project: a2a-intelligent-hub v1.7.0 · current session 14 (from .agents/SESSIONS/Session_14.md) · retention edge: done items closed ≤ session 11 are dropped on the first ob_state write
+     > 
+PASS IF-2 (A2A-Hub e0bc3f8, fresh git archive): --draft exits 0
+PASS IF-2 (A2A-Hub e0bc3f8, fresh git archive): the report's first section is the staleness section
+PASS IF-2 (A2A-Hub e0bc3f8, fresh git archive): next-session.md is STALE, with the declaring line and the latest log as evidence
+NOTE IF-2 (A2A-Hub e0bc3f8, fresh git archive): INBOX line: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 11 (`> **Last Updated:** Session 11 (2026-07-29) — repo-resident peers shipped as v1.6.0 (ADR-010): a peer can answer from a codebase it's resident in, verified l…`); the latest session log is Session 14 (.agents/SESSIONS/Session_14.md)
+PASS IF-2 (A2A-Hub e0bc3f8, fresh git archive): --draft wrote only the draft and the report (added .agents/state.draft.json,.agents/state.import-report.md; changed 0; removed 0)
+---- IF-2 (A2A-Hub e0bc3f8, fresh git archive) --commit (no acknowledgement): exit 1
+     | state import refused: 2 input(s) predate the latest session (Session 14): .agents/TASKS/INBOX.md declares Session 11; .agents/SESSIONS/next-session.md declares Session 13. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS IF-2 (A2A-Hub e0bc3f8, fresh git archive): --commit refuses: exit 1, no state.json, no archive/, nothing else changed
+PASS IF-2 (A2A-Hub e0bc3f8, fresh git archive): the refusal names next-session.md and the acknowledgement flag
+---- IF-2 (A2A-Hub e0bc3f8, fresh git archive) --commit --accept-stal: exit 1
+     | state import refused: unrecognised flag(s) --accept-stal. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+PASS IF-2 (A2A-Hub e0bc3f8, fresh git archive): a misspelled acknowledgement refuses as an unrecognised flag
+---- IF-2 (A2A-Hub e0bc3f8, fresh git archive) --commit --accept-stale: exit 0
+     | state import — committed
+     | Imported STALE under --accept-stale: .agents/TASKS/INBOX.md, .agents/SESSIONS/next-session.md
+     | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (37 files)
+     | Wrote:    .agents/state.json at revision 0
+     | SUMMARY.md: removed 70 lines (4 blockquote + 64 Current State); kept Architecture Overview, Roadmap, Key Metrics
+     | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+     | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md
+PASS IF-2 (A2A-Hub e0bc3f8, fresh git archive): --commit --accept-stale proceeds: state.json written, snapshot taken
+PASS IF-2 (A2A-Hub e0bc3f8, fresh git archive): the commit output names what was imported stale
+NOTE IF-2 (A2A-Hub e0bc3f8, fresh git archive): snapshot .agents\archive\pre-state-migration-2026-09-25: 37 files; original .agents files missing or differing in it: 0
+---- IF-3 (title-line + range markers) --draft: exit 0
+     | state import — draft (nothing else changed)
+     | Root: C:\qa-scratch\probes-r1\if3-a
+     | Draft:  .agents/state.draft.json
+     | Report: .agents/state.import-report.md
+     | Validates: yes
+     | Current session: 9 (.agents/SESSIONS/Session_9.md)
+     | Staleness: 0 stale · 0 could not tell · 3 current. Details are in the report's first section.
+     | Tasks: 1 (open 1, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 1
+     | Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+     | Handoff: pick_up 1 lines, watch_out 0, open_questions 0
+     | Review the report, then run: open-brain state import --commit
+     > - current `.agents/TASKS/INBOX.md`: line 3 declares Session 9 (`> Last touched in Sessions 8–9`); the latest session log is Session 9 (.agents/SESSIONS/Session_9.md)
+     > - current `.agents/TASKS/task.md`: line 1 declares Session 9 (`# Current Focus — Session 9`); the latest session log is Session 9 (.agents/SESSIONS/Session_9.md)
+     > - current `.agents/SESSIONS/next-session.md`: line 3 declares Session 9 (`## Pick up here (end of Session 9)`); the latest session log is Session 9 (.agents/SESSIONS/Session_9.md)
+     > - not judged `.agents/SYSTEM/SUMMARY.md`: absent: nothing is imported from it
+     > - not judged `.agents/SYSTEM/DECISIONS.md`: absent: nothing is imported from it
+PASS IF-3 (title-line + range markers): no finding: 0 stale, 0 could not tell, 3 current
+---- IF-3 (title-line + range markers) --commit: exit 0
+     | state import — committed
+     | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (7 files)
+     | Wrote:    .agents/state.json at revision 0
+     | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+     | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md
+PASS IF-3 (title-line + range markers): --commit proceeds without the acknowledgement, and prints no staleness line
+---- IF-3 (acknowledgement passed when nothing is stale) --commit --accept-stale: exit 0
+     | state import — committed
+     | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (6 files)
+     | Wrote:    .agents/state.json at revision 0
+     | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+     | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md
+PASS IF-3 (acknowledgement passed when nothing is stale): an unneeded acknowledgement is harmless and claims nothing
+---- IF-4 (marker only in body text) --draft: exit 0
+     | state import — draft (nothing else changed)
+     | Root: C:\qa-scratch\probes-r1\if4-body
+     | Draft:  .agents/state.draft.json
+     | Report: .agents/state.import-report.md
+     | Validates: yes
+     | Current session: 7 (.agents/SESSIONS/Session_7.md)
+     | Staleness: 0 stale · 1 could not tell (.agents/TASKS/INBOX.md) · 2 current. Details are in the report's first section.
+     | Tasks: 1 (open 1, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 1
+     | Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+     | Handoff: pick_up 1 lines, watch_out 1, open_questions 0
+     | Review the report, then run: open-brain state import --commit
+     > - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+PASS IF-4 (marker only in body text): INBOX is 'could not tell' in the first section, with a reason
+PASS IF-4 (marker only in body text): INBOX is not counted as current
+PASS IF-4 (marker only in body text): the CLI staleness line counts it as could-not-tell, not current
+---- IF-4 (marker only in body text) --commit: exit 0
+     | state import — committed
+     | Could not tell whether current: .agents/TASKS/INBOX.md
+     | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (6 files)
+     | Wrote:    .agents/state.json at revision 0
+     | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+     | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md
+PASS IF-4 (marker only in body text): --commit proceeds and prints exactly one line naming the input (ruling 1b)
+---- IF-4 (SESSIONS/ exists, no Session_N.md) --draft: exit 0
+     | state import — draft (nothing else changed)
+     | Root: C:\qa-scratch\probes-r1\if4-nolog
+     | Draft:  .agents/state.draft.json
+     | Report: .agents/state.import-report.md
+     | Validates: yes
+     | Current session: 0 ((no Session_N.md))
+     | Staleness: 0 stale · 3 could not tell (.agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md) · 0 current. Details are in the report's first section.
+     | Tasks: 1 (open 1, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 1
+     | Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+     | Handoff: pick_up 1 lines, watch_out 1, open_questions 0
+     | Review the report, then run: open-brain state import --commit
+     > - could not tell `.agents/TASKS/INBOX.md`: no SESSIONS/Session_N.md to compare against ((no Session_N.md))
+     > - could not tell `.agents/TASKS/task.md`: no SESSIONS/Session_N.md to compare against ((no Session_N.md))
+     > - could not tell `.agents/SESSIONS/next-session.md`: no SESSIONS/Session_N.md to compare against ((no Session_N.md))
+     > - not judged `.agents/SYSTEM/SUMMARY.md`: absent: nothing is imported from it
+     > - not judged `.agents/SYSTEM/DECISIONS.md`: absent: nothing is imported from it
+PASS IF-4 (SESSIONS/ exists, no Session_N.md): all three present inputs are 'could not tell', none current
+---- IF-4 (SESSIONS/ exists, no Session_N.md) --commit: exit 0
+     | state import — committed
+     | Could not tell whether current: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md
+     | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (5 files)
+     | Wrote:    .agents/state.json at revision 0
+     | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+     | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md
+PASS IF-4 (SESSIONS/ exists, no Session_N.md): --commit proceeds with the could-not-tell line
+---- PROBE-1 input newer than the latest session --draft: exit 0
+     | state import — draft (nothing else changed)
+     | Root: C:\qa-scratch\probes-r1\p1-newer
+     | Draft:  .agents/state.draft.json
+     | Report: .agents/state.import-report.md
+     | Validates: yes
+     | Current session: 7 (.agents/SESSIONS/Session_7.md)
+     | Staleness: 0 stale · 0 could not tell · 3 current. Details are in the report's first section.
+     | Tasks: 1 (open 1, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 1
+     | Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+     | Handoff: pick_up 1 lines, watch_out 1, open_questions 0
+     | Review the report, then run: open-brain state import --commit
+     > - current `.agents/TASKS/INBOX.md`: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     > - current `.agents/TASKS/task.md`: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     > - current `.agents/SESSIONS/next-session.md`: line 3 declares Session 20 (`> Updated at end of Session 20.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     > - not judged `.agents/SYSTEM/SUMMARY.md`: absent: nothing is imported from it
+     > - not judged `.agents/SYSTEM/DECISIONS.md`: absent: nothing is imported from it
+---- PROBE-1 input newer than the latest session --commit: exit 0
+     | state import — committed
+     | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (6 files)
+     | Wrote:    .agents/state.json at revision 0
+     | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+     | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md
+NOTE PROBE-1 input newer than the latest session: draft exit 0; next-session verdict line: - current `.agents/SESSIONS/next-session.md`: line 3 declares Session 20 (`> Updated at end of Session 20.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md); --commit exit 0, state.json true
+---- PROBE-2 no SESSIONS/ directory --draft: exit 0
+     | state import — draft (nothing else changed)
+     | Root: C:\qa-scratch\probes-r1\p2-nosessions
+     | Draft:  .agents/state.draft.json
+     | Report: .agents/state.import-report.md
+     | Validates: yes
+     | Current session: 0 ((no SESSIONS/ directory))
+     | Staleness: 0 stale · 2 could not tell (.agents/TASKS/INBOX.md, .agents/TASKS/task.md) · 0 current. Details are in the report's first section.
+     | Tasks: 1 (open 1, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 1
+     | Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+     | Handoff: pick_up 0 lines, watch_out 0, open_questions 0
+     | Review the report, then run: open-brain state import --commit
+     > - could not tell `.agents/TASKS/INBOX.md`: no SESSIONS/Session_N.md to compare against ((no SESSIONS/ directory))
+     > - could not tell `.agents/TASKS/task.md`: no SESSIONS/Session_N.md to compare against ((no SESSIONS/ directory))
+     > - not judged `.agents/SESSIONS/next-session.md`: absent: nothing is imported from it
+     > - not judged `.agents/SYSTEM/SUMMARY.md`: absent: nothing is imported from it
+     > - not judged `.agents/SYSTEM/DECISIONS.md`: absent: nothing is imported from it
+---- PROBE-2 no SESSIONS/ directory --commit: exit 1
+     | state import refused: ENOENT: no such file or directory, open 'C:\qa-scratch\probes-r1\p2-nosessions\.agents\SESSIONS\next-session.md.tmp-9556'
+NOTE PROBE-2 no SESSIONS/ directory: draft exit 0; --commit exit 1, state.json true; after the failed commit: added 5 (.agents/state.json + 4 under archive/), changed .agents/TASKS/INBOX.md, .agents/TASKS/task.md, removed none
+---- PROBE-2 no SESSIONS/ directory --commit, second attempt: exit 1
+     | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+---- PROBE-2 no SESSIONS/ directory --draft, after the failure: exit 1
+     | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+---- PROBE-3 next-session.md names no session --draft: exit 0
+     | state import — draft (nothing else changed)
+     | Root: C:\qa-scratch\probes-r1\p3-nextnomarker
+     | Draft:  .agents/state.draft.json
+     | Report: .agents/state.import-report.md
+     | Validates: yes
+     | Current session: 7 (.agents/SESSIONS/Session_7.md)
+     | Staleness: 0 stale · 1 could not tell (.agents/SESSIONS/next-session.md) · 2 current. Details are in the report's first section.
+     | Tasks: 1 (open 1, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 1
+     | Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+     | Handoff: pick_up 1 lines, watch_out 1, open_questions 0
+     | Review the report, then run: open-brain state import --commit
+     > - could not tell `.agents/SESSIONS/next-session.md`: names no `Session N` in its status blockquote or its headings
+     > - current `.agents/TASKS/INBOX.md`: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     > - current `.agents/TASKS/task.md`: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     > - not judged `.agents/SYSTEM/SUMMARY.md`: absent: nothing is imported from it
+     > - not judged `.agents/SYSTEM/DECISIONS.md`: absent: nothing is imported from it
+---- PROBE-3 next-session.md names no session --commit: exit 0
+     | state import — committed
+     | Could not tell whether current: .agents/SESSIONS/next-session.md
+     | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (6 files)
+     | Wrote:    .agents/state.json at revision 0
+     | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+     | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md
+NOTE PROBE-3 next-session.md names no session: draft exit 0; --commit exit 0, state.json true
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+NOTE PROBE-4 untracked .agents/ (git repo, .agents/ gitignored), stale inputs: git ls-files: .gitignore,package.json; git status --porcelain --ignored: !! .agents/
+---- PROBE-4 untracked .agents/ (git repo, .agents/ gitignored), stale inputs --draft: exit 0
+     | state import — draft (nothing else changed)
+     | Root: C:\qa-scratch\probes-r1\p4-untracked
+     | Draft:  .agents/state.draft.json
+     | Report: .agents/state.import-report.md
+     | Validates: yes
+     | Current session: 7 (.agents/SESSIONS/Session_7.md)
+     | Staleness: 2 stale (.agents/TASKS/INBOX.md, .agents/SESSIONS/next-session.md) · 0 could not tell · 1 current. Details are in the report's first section.
+     | --commit will REFUSE until those inputs are updated and the draft is re-run, or until --accept-stale is passed.
+     | Tasks: 1 (open 1, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 1
+     | Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+     | Handoff: pick_up 1 lines, watch_out 1, open_questions 0
+     | Review the report, then run: open-brain state import --commit
+     > - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 5 (`> Session 5`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     > - **STALE** `.agents/SESSIONS/next-session.md`: line 3 declares Session 6 (`> Updated at end of Session 6.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     > - current `.agents/TASKS/task.md`: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     > - not judged `.agents/SYSTEM/SUMMARY.md`: absent: nothing is imported from it
+     > - not judged `.agents/SYSTEM/DECISIONS.md`: absent: nothing is imported from it
+---- PROBE-4 untracked .agents/ (git repo, .agents/ gitignored), stale inputs --commit: exit 1
+     | state import refused: 2 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 5; .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+---- PROBE-4 untracked .agents/ (git repo, .agents/ gitignored), stale inputs --commit --accept-stale: exit 0
+     | state import — committed
+     | Imported STALE under --accept-stale: .agents/TASKS/INBOX.md, .agents/SESSIONS/next-session.md
+     | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (7 files)
+     | Wrote:    .agents/state.json at revision 0
+     | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+     | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md
+NOTE PROBE-4 untracked .agents/ (git repo, .agents/ gitignored), stale inputs: draft exit 0; bare --commit exit 1; acknowledged exit 0; state.json true
+---- PROBE-4b untracked .agents/, no git at all, stale inputs --commit: exit 1
+     | state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+NOTE PROBE-4b untracked .agents/, no git at all, stale inputs: draft exit 0: Staleness: 1 stale (.agents/SESSIONS/next-session.md) · 0 could not tell · 2 current. Details are in the report's first section.; bare --commit exit 1
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","--accept-stal","<dir>"]: exit 1, state.json false | state import refused: unrecognised flag(s) --accept-stal. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","<dir>","--accept-stal"]: exit 1, state.json false | state import refused: unrecognised flag(s) --accept-stal. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","--accept_stale","<dir>"]: exit 1, state.json false | state import refused: unrecognised flag(s) --accept_stale. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","<dir>","--accept_stale"]: exit 1, state.json false | state import refused: unrecognised flag(s) --accept_stale. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","--Accept-Stale","<dir>"]: exit 1, state.json false | state import refused: unrecognised flag(s) --Accept-Stale. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","<dir>","--Accept-Stale"]: exit 1, state.json false | state import refused: unrecognised flag(s) --Accept-Stale. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","--accept-stale=yes","<dir>"]: exit 1, state.json false | state import refused: unrecognised flag(s) --accept-stale=yes. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","<dir>","--accept-stale=yes"]: exit 1, state.json false | state import refused: unrecognised flag(s) --accept-stale=yes. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","--acceptStale","<dir>"]: exit 1, state.json false | state import refused: unrecognised flag(s) --acceptStale. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","<dir>","--acceptStale"]: exit 1, state.json false | state import refused: unrecognised flag(s) --acceptStale. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","--accept-stales","<dir>"]: exit 1, state.json false | state import refused: unrecognised flag(s) --accept-stales. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","<dir>","--accept-stales"]: exit 1, state.json false | state import refused: unrecognised flag(s) --accept-stales. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","---accept-stale","<dir>"]: exit 1, state.json false | state import refused: unrecognised flag(s) ---accept-stale. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","<dir>","---accept-stale"]: exit 1, state.json false | state import refused: unrecognised flag(s) ---accept-stale. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","-accept-stale","<dir>"]: exit 1, state.json false | state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","<dir>","-accept-stale"]: exit 1, state.json false | state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","accept-stale","<dir>"]: exit 1, state.json false | state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","<dir>","accept-stale"]: exit 1, state.json false | state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","--commit=yes","<dir>"]: exit 1, state.json false | state import refused: unrecognised flag(s) --commit=yes. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5 misspelled acknowledgement flags (stale project) ["--commit","<dir>","--commit=yes"]: exit 1, state.json false | state import refused: unrecognised flag(s) --commit=yes. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5b misspelled acknowledgement on a CURRENT project (does junk pass silently?) ["--commit","-accept-stale","<dir>"]: exit 0, state.json true | state import — committed
+---- PROBE-5b misspelled acknowledgement on a CURRENT project (does junk pass silently?) ["--commit","<dir>","-accept-stale"]: exit 0, state.json true | state import — committed
+---- PROBE-5b misspelled acknowledgement on a CURRENT project (does junk pass silently?) ["--commit","accept-stale","<dir>"]: exit 0, state.json true | state import — committed
+---- PROBE-5b misspelled acknowledgement on a CURRENT project (does junk pass silently?) ["--commit","<dir>","accept-stale"]: exit 0, state.json true | state import — committed
+---- PROBE-5b misspelled acknowledgement on a CURRENT project (does junk pass silently?) ["--commit","--accept-stal","<dir>"]: exit 1, state.json false | state import refused: unrecognised flag(s) --accept-stal. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-5b misspelled acknowledgement on a CURRENT project (does junk pass silently?) ["--commit","<dir>","--accept-stal"]: exit 1, state.json false | state import refused: unrecognised flag(s) --accept-stal. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+---- PROBE-6 --accept-stale with --draft --draft --accept-stale: exit 1
+     | state import refused: --accept-stale applies only to --commit. Nothing written.
+NOTE PROBE-6 --accept-stale with --draft: exit 1; draft written false
+---- PROBE-7 input fixed between --draft and --commit (handoff limit 5) --commit: exit 0
+     | state import — committed
+     | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (6 files)
+     | Wrote:    .agents/state.json at revision 0
+     | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+     | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md
+NOTE PROBE-7 input fixed between --draft and --commit (handoff limit 5): --commit exit 0; committed handoff pick_up is "Carry on." (the draft's, not the fixed file's)
+---- PROBE-8 UTF-8 BOM on every judged input, markers in the status blockquote --draft: exit 0
+     | state import — draft (nothing else changed)
+     | Root: C:\qa-scratch\probes-r1\p8-bom
+     | Draft:  .agents/state.draft.json
+     | Report: .agents/state.import-report.md
+     | Validates: yes
+     | Current session: 7 (.agents/SESSIONS/Session_7.md)
+     | Staleness: 0 stale · 3 could not tell (.agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md) · 0 current. Details are in the report's first section.
+     | Tasks: 1 (open 1, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 2
+     | Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+     | Handoff: pick_up 1 lines, watch_out 1, open_questions 0
+     | Review the report, then run: open-brain state import --commit
+     > - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     > - could not tell `.agents/TASKS/task.md`: names no `Session N` in its status blockquote or its headings
+     > - could not tell `.agents/SESSIONS/next-session.md`: names no `Session N` in its status blockquote or its headings
+     > - not judged `.agents/SYSTEM/SUMMARY.md`: absent: nothing is imported from it
+     > - not judged `.agents/SYSTEM/DECISIONS.md`: absent: nothing is imported from it
+NOTE PROBE-8 UTF-8 BOM on every judged input, markers in the status blockquote: draft exit 0; bare --commit exit 0, state.json true
+     > - **STALE** `.agents/SESSIONS/next-session.md`: line 3 declares Session 6 (`> Updated at end of Session 6.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     > - current `.agents/TASKS/INBOX.md`: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     > - current `.agents/TASKS/task.md`: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     > - not judged `.agents/SYSTEM/SUMMARY.md`: absent: nothing is imported from it
+     > - not judged `.agents/SYSTEM/DECISIONS.md`: absent: nothing is imported from it
+NOTE PROBE-9 CRLF inputs, stale marker: draft exit 0: Staleness: 1 stale (.agents/SESSIONS/next-session.md) · 0 could not tell · 2 current. Details are in the report's first section.; bare --commit exit 1
+NOTE PROBE-10 a future-session heading in a stale input (handoff limit 1, false negative): draft: Staleness: 0 stale · 0 could not tell · 3 current. Details are in the report's first section.; bare --commit exit 0
+NOTE PROBE-11 session log with a leading zero or different name: draft: Current session: 7 (.agents/SESSIONS/Session_007.md) / Staleness: 1 stale (.agents/SESSIONS/next-session.md) · 0 could not tell · 2 current. Details are in the report's first section.
+---- PROBE-12 single-dash typo before the directory, run from inside ANOTHER drafted project cwd=A: --commit -accept-stale <B>: exit 0
+     | state import — committed
+     | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (6 files)
+     | Wrote:    .agents/state.json at revision 0
+     | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+     | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md
+NOTE PROBE-12 single-dash typo before the directory, run from inside ANOTHER drafted project: exit 0; A state.json true; B state.json false
+
+SUMMARY: 26 passed, 0 failed
+EXIT=0

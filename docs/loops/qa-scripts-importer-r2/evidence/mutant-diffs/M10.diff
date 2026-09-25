@@ -1,0 +1,15 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index f938efe..45ccf29 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -648,9 +648,9 @@ export function renderStaleness(s: StalenessReport): string[] {
+ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): string {
+   const L: string[] = [];
+   L.push(`# state.json import report — ${mode} (${r.migration_date})`, "");
+-  L.push(...renderStaleness(r.staleness), "");
+   L.push(`Project: ${r.project.name} v${r.project.version} · current session ${r.current_session} (from ${r.last_session.file}) · retention edge: done items closed ≤ session ${r.current_session - DONE_RETENTION_SESSIONS} are dropped on the first ob_state write`, "");
+   L.push("## Sources", "");
++  L.push(...renderStaleness(r.staleness), "");
+   for (const [k, s] of Object.entries(r.sources)) L.push(`- ${k}: \`${s.path}\` — ${s.present ? `${s.lines} lines` : "ABSENT"}`);
+   L.push("", "## Tasks (INBOX.md)", "");
+   L.push(`Items parsed: ${r.inbox.items} (of which ${r.inbox.completed_section_items} under \`## Completed\`, imported as P3).`, "");
