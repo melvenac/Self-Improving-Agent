@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 120,
+  "revision": 121,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2779,6 +2779,12 @@
       "title": "SIA QA's local measurement moves to a dedicated second PC, desktop-o4egb1e, driven over SSH from the planner's machine, so no seat stops for QA windows; it starts with the candidate after A7",
       "date": "2026-09-24",
       "note": "Ruled by Aaron in the SIA planner session (record session 90), 2026-09-24, verbatim, in order: 'I have another computer on the network 100.73.250.101, can we offload qa measurement to that computer? I don't like stopping for and hour 20 minutes. Is there a way to offload parts to that computer? Either dev a2a hub on that computer or move qa over there?'; then 'driven from here, cc is already on that machine and can be driven from this machine. I've tested it already'; then 'done, the user is Aaron Melven' (after enabling OpenSSH per the planner's steps, tailnet-only, key auth); then 'yes' to having the infra developer seat do the setup now. THE PLANNER'S CHOICE, recorded as its own: move QA, not A2A-Hub. QA is the only seat that needs a quiet machine; the PC is Windows, which QA needs for its win32 half, while Linux is CI; and a second machine gives G-042 its missing control. MACHINE (surveyed over SSH): desktop-o4egb1e, Tailscale 100.73.250.101, Windows 10 19045, i5-3570 4 cores, 7.9 GB, 394 GB free; Claude Code present; git, node and gh missing. SETUP: docs/loops/infra-qa-machine-brief.md, by Forge (record 97, ~/Worktrees/sia-infra). DRIVING: Claude Code non-interactive over SSH, output read on the planner's machine. It also works as T-154's real stranger-machine install test. QA 96's current window stays on this PC."
+    },
+    {
+      "id": "D-046",
+      "title": "A8 goes ahead with rulings-15 including R69 (a machine-config path absent at base is readable once it appears as a single-name file at the base parent's realpath); v0.44.2 released (PR #156, tag on ac4d19b); Tailscale 'Run unattended' on the QA PC",
+      "date": "2026-09-25",
+      "note": "Aaron, SIA planner session (record session 90), 2026-09-25, verbatim: 'merge PR #156  create and push the tag  go ahead on grok a8 but it needs a new session first  run unatteended is on the qa pc'. He was answering the planner's list: R69 (okay or veto), starting A8's Grok session, merging Forge's Windows-path PR, and Tailscale's Run unattended. HE DID NOT ANSWER R69 BY NAME. The planner reads 'go ahead on grok a8', given after R69 was offered for veto as part of A8's scope, as NO VETO. That reading is recorded as the planner's; if Aaron meant otherwise, R69 comes out of A8 before its QA. DONE: PR #156 merged through the gate (head 4e6c1fe, merge ac4d19b); annotated tag v0.44.2 on ac4d19b, pushed and read back (tag object 9b55505). A8 is dispatched to hub room k57frxw0ptb8tadmqdwy0khhks8ey006; Aaron starts the fresh Grok session (record 98). The QA PC (desktop-o4egb1e) has Tailscale Run unattended on, per Aaron."
     }
   ],
   "handoffs": [
