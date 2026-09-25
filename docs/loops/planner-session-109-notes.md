@@ -213,3 +213,10 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
 - **Forge 110 skipped `/start`** (Aaron noticed it). The role files still load through the SessionStart hook, but
   the session registration, the session log, the state render and the watch-outs were missing. Told to run it now,
   read the whole greeting, and confirm the role-file line.
+- **Forge 110 ran `/start`:** read the whole 88,074-character greeting; role files `developer.md @ 876029d` and
+  `shared.md @ ed7f762` loaded through the hook; the greeting's local number is Session #4 (record 110). Design calls
+  **accepted with conditions:** R3-1 removes only mkdirSync's first-created directory, and a partial-copy test with
+  `archive/` present kills N13; the `--force-snapshot` aside must be shown not to overlap. R3-3 uses a marker file
+  `<snapshot>.import-incomplete` whose check is the refusal; the refusal must name the exit (restore, then remove
+  the marker), and a dies-mid-migrate test is required. Rejected on good grounds: my same-day-snapshot rule (it
+  fires on a legitimate `--force-snapshot`) and copy-over (`cpSync` on links, and writing through junctions).
