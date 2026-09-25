@@ -1199,7 +1199,7 @@ export class MachineConfigWatch {
     const readText = (s: MachineSnap): string => `${s.hash} ${factText(s)}`;
     // R79. A loop base that was not there is that phrase, never zeroed facts.
     const baseText = (s: MachineSnap): string =>
-      s.resolvedPath === null && s.lexicalKind !== "symlink" ? "absent at loop base" : `${s.resolvedPath ?? "unresolved"} ${factText(s)}`;
+      s.resolvedPath === null && s.lexicalKind !== "symlink" ? factText(s) : `${s.resolvedPath ?? "unresolved"} ${factText(s)}`;
     const stageBefore = (opened: MachineSnap): string => {
       if (opened.state === "read") return readText(opened);
       if (opened.reason === "unreadable" || opened.hash === "unreadable") return `unreadable; stage start ${factText(opened)}`;
