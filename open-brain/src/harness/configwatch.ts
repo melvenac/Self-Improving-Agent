@@ -211,6 +211,7 @@ export function repositoryLinksAtBase(repoRoot: string, dirs: GitDirs): string[]
   for (const t of trees) {
     note(t);
     if (identify(t).kind === "dir") {
+      // Unlisted is not reported here; begin's currentFiles refuses the same trees, R77.
       const listed = listTree(t);
       for (const entry of listed.paths) if (identify(entry).kind === "symlink") found.push(entry);
     }
