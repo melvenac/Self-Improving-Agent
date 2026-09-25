@@ -98,12 +98,25 @@ export interface ImportDraft { state: State; report: ImportReport }
  * (QA 102, D2). UTF-16 is what Windows PowerShell 5.1's `>` and `Out-File`
  * write, BOM first. Line endings need nothing here: every split is `\r?\n`.
  */
-export type TextEncoding = "utf8" | "utf8-bom" | "utf16le-bom" | "utf16be-bom";
+export type TextEncoding = "utf8" | "utf8-bom" | "utf16le-bom" | "utf16be-bom" | "windows-1252";
 export interface DecodedText {
   text: string;
   encoding: TextEncoding;
   /** Why the text cannot be trusted as read, or null. Such an input is never judged. */
   undecodable: string | null;
+}
+
+/** Said in the evidence of an input read as Windows-1252, so the guess is visible. */
+export const READ_AS_1252 = "read as Windows-1252: not valid UTF-8, and no byte-order mark";
+
+// Windows-1252's 0x80–0x9F; every other byte is its own code point. Written
+// out rather than asked of TextDecoder, whose "windows-1252" has decoded this
+// range as Latin-1 on some Node builds.
+const CP1252_HIGH = "€\u0081‚ƒ„…†‡ˆ‰Š‹Œ\u008dŽ\u008f\u0090‘’“”•–—˜™š›œ\u009džŸ";
+function decode1252(buf: Buffer): string {
+  let s = "";
+  for (const b of buf) s += b >= 0x80 && b <= 0x9f ? CP1252_HIGH[b - 0x80] : String.fromCharCode(b);
+  return s;
 }
 
 export function decodeText(buf: Buffer): DecodedText {
@@ -120,7 +133,12 @@ function withCheck(buf: Buffer, encoding: "utf8" | "utf8-bom"): DecodedText {
     // in decodeText a second, unobservable protection. One, and it is that one.
     text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(buf);
   } catch {
-    return { text: buf.toString("utf-8"), encoding, undecodable: "not valid UTF-8, and no UTF-16 byte-order mark: its encoding is unknown, so its words cannot be read" };
+    // Not UTF-8 and no BOM: Windows PowerShell 5.1's Set-Content/Add-Content
+    // write the ANSI code page. Every ASCII byte means the same in it, and the
+    // session marker is ASCII, so the verdict holds (QA 106, D5). Only NUL
+    // bytes — UTF-16 without its BOM — leave the words unreadable.
+    if (!buf.includes(0)) return { text: decode1252(buf), encoding: "windows-1252", undecodable: null };
+    text = buf.toString("utf-8");
   }
   if (text.includes("\u0000")) return { text, encoding, undecodable: "contains NUL bytes, as UTF-16 without a byte-order mark would: its encoding is unknown, so its words cannot be read" };
   return { text, encoding, undecodable: null };
@@ -470,7 +488,7 @@ const NOT_JUDGED_REASON: Partial<Record<InputKey, string>> = {
   decisions: "imported as a dated log of past decisions, not as current state",
 };
 
-export function detectStaleness(texts: Record<InputKey, string | null>, last: ImportReport["last_session"], undecodable: Partial<Record<InputKey, string>> = {}): StalenessReport {
+export function detectStaleness(texts: Record<InputKey, string | null>, last: ImportReport["last_session"], undecodable: Partial<Record<InputKey, string>> = {}, readAs: Partial<Record<InputKey, string>> = {}): StalenessReport {
   const latest = last.n > 0 ? { n: last.n, file: last.file } : null;
   const inputs: InputStaleness[] = [];
   const not_judged: StalenessReport["not_judged"] = [];
@@ -501,19 +519,25 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
     }
     inputs.push({ input, verdict: d.n < latest.n ? "stale" : "current", declared_session: d.n, evidence: where });
   }
+  for (const i of inputs) {
+    const key = (Object.keys(INPUT_REL) as InputKey[]).find((k) => INPUT_REL[k] === i.input)!;
+    if (readAs[key]) i.evidence += ` (${readAs[key]})`;
+  }
   return { signal: STALENESS_SIGNAL, latest, inputs, not_judged };
 }
 
-function readInputs(root: string): { paths: Record<InputKey, string>; texts: Record<InputKey, string | null>; undecodable: Partial<Record<InputKey, string>> } {
+function readInputs(root: string): { paths: Record<InputKey, string>; texts: Record<InputKey, string | null>; undecodable: Partial<Record<InputKey, string>>; readAs: Partial<Record<InputKey, string>> } {
   const paths = Object.fromEntries((Object.keys(INPUT_REL) as InputKey[]).map((k) => [k, join(root, INPUT_REL[k])])) as Record<InputKey, string>;
   const texts = {} as Record<InputKey, string | null>;
   const undecodable: Partial<Record<InputKey, string>> = {};
+  const readAs: Partial<Record<InputKey, string>> = {};
   for (const k of Object.keys(paths) as InputKey[]) {
     const d = readText(paths[k]);
     texts[k] = d?.text ?? null;
     if (d?.undecodable) undecodable[k] = d.undecodable;
+    if (d?.encoding === "windows-1252") readAs[k] = READ_AS_1252;
   }
-  return { paths, texts, undecodable };
+  return { paths, texts, undecodable, readAs };
 }
 
 // ---------------------------------------------------------------------------
@@ -527,7 +551,7 @@ function lineCount(text: string | null): number {
 export function buildImportDraft(projectRoot: string, today: string): ImportDraft {
   const root = resolve(projectRoot);
   const pkg = readJson<{ name?: string; version?: string }>(join(root, "package.json"));
-  const { paths, texts, undecodable } = readInputs(root);
+  const { paths, texts, undecodable, readAs } = readInputs(root);
 
   const last = findLastSession(join(root, ".agents/SESSIONS"), today);
   const current = last.n;
@@ -536,7 +560,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
     project: { name: pkg?.name ?? "unknown", version: pkg?.version ?? "0.0.0" },
     current_session: current,
     migration_date: today,
-    staleness: detectStaleness(texts, last, undecodable),
+    staleness: detectStaleness(texts, last, undecodable, readAs),
     sources: Object.fromEntries(Object.entries(paths).map(([k, p]) => [k, { path: relative(root, p).replace(/\\/g, "/"), present: existsSync(p), lines: lineCount(texts[k as keyof typeof texts]) }])),
     inbox: {
       items: 0,
@@ -766,7 +790,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
 
   // 0. T-180: a stale input refuses before anything is written, including the snapshot.
   const onDisk = readInputs(root);
-  const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable);
+  const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable, onDisk.readAs);
   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
   if (stale.length > 0 && opts.acceptStale !== true) {
     const list = stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ");
@@ -776,6 +800,9 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   const summaryPath = join(root, ".agents/SYSTEM/SUMMARY.md");
   const summaryRead = readText(summaryPath);
   if (summaryRead?.undecodable) throw new Error(`.agents/SYSTEM/SUMMARY.md is ${summaryRead.undecodable}, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
+  // Windows-1252 is a guess. It is safe for a verdict, which reads only ASCII,
+  // but not for a file written back: a wrong guess would rewrite its other text.
+  if (summaryRead?.encoding === "windows-1252") throw new Error(`.agents/SYSTEM/SUMMARY.md is not valid UTF-8 and has no byte-order mark, so its encoding can only be guessed, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
 
   // 1. Snapshot before anything under .agents/ changes. From here on the
   // import completes or changes nothing (R2-3): every later step runs inside
