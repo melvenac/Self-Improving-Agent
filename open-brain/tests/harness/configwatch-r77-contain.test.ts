@@ -431,4 +431,35 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
     expect(record, "the record names the path").toContain(cfg);
     expect(record, "the record names the code").toContain("EACCES");
   });
+
+  it("R82-ENOENT-IS-ABSENT: a machine path removed during the stage is absent (ENOENT) and the stage continues", async () => {
+    const h = join(tmp.dir, "r82-enoent-home");
+    mkdirSync(h);
+    const cfg = join(h, ".gitconfig");
+    writeFileSync(cfg, "[user]\n\tname = gone\n");
+    const xdg = join(tmp.dir, "r82-enoent-xdg");
+    mkdirSync(xdg);
+    const system = join(tmp.dir, "r82-enoent-system.gitconfig");
+    writeFileSync(system, "");
+    const env: NodeJS.ProcessEnv = { ...process.env, HOME: h, USERPROFILE: h, XDG_CONFIG_HOME: xdg, GIT_CONFIG_SYSTEM: system };
+    delete env.GIT_CONFIG_GLOBAL;
+    const r = await runLoop({
+      repoRoot: repo.root, loop: "t001", env,
+      roles: {
+        planner: new StubPlanner(),
+        developer: { role: "developer", run: async (ctx) => {
+          const d = await new StubDeveloper().run(ctx);
+          unlinkSync(cfg);
+          return d;
+        } },
+        qa: new StubQa(),
+      },
+      checks: exitingChecks(0, 0),
+      log: () => {},
+    });
+    const record = JSON.stringify(r);
+    expect(r.failure, r.failure?.reason).toBeNull();
+    expect(record, "absent (ENOENT)").toContain("absent (ENOENT)");
+    expect(record, "not an unobservable stop").not.toContain("machine-config-unobservable");
+  });
 });

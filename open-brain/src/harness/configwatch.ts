@@ -112,6 +112,15 @@ export interface PathIdentity {
   code?: string | null;
 }
 
+/**
+ * R82. ENOENT and ENOTDIR mean nothing is there. Every other code means the
+ * runtime could not see the path, and that code fails the stage.
+ */
+export function resolutionUnobservable(code: string): string | null {
+  if (code === "ENOENT" || code === "ENOTDIR") return null;
+  return code;
+}
+
 export function identify(p: string): PathIdentity {
   try {
     const st = lstatSync(p, { bigint: true });
@@ -1036,7 +1045,8 @@ export class MachineConfigWatch {
       mtimeNs = st.mtimeNs;
     } catch (err) {
       const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
-      return { ...unresolved(), reason: `did not resolve: ${code}`, errno: code };
+      const errno = resolutionUnobservable(code);
+      return { ...unresolved(), reason: errno === null ? `absent (${code})` : `did not resolve: ${code}`, errno };
     }
     const note: MachineSnap = {
       lexicalKind: lexical.kind,
@@ -1092,7 +1102,11 @@ export class MachineConfigWatch {
       return { ...note, hash: hashOf(readFileSync(fd)), state: "read", reason: "read" };
     } catch (err) {
       const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
-      return { ...note, hash: "unreadable", reason: "unreadable", errno: code };
+      const errno = resolutionUnobservable(code);
+      if (errno === null) {
+        return { ...note, resolvedPath: null, kind: "absent", hash: "unread", state: "unwatched", reason: `absent (${code})`, errno: null };
+      }
+      return { ...note, hash: "unreadable", reason: "unreadable", errno };
     } finally {
       if (fd !== null) closeSync(fd);
     }
@@ -1232,7 +1246,9 @@ export class MachineConfigWatch {
           : end.reason === "unreadable" || end.hash === "unreadable"
             ? `unreadable; current ${factText(end)}`
             : end.resolvedPath === null
-              ? `unwatched: ${end.reason}; not read`
+              ? end.reason.startsWith("absent (")
+                ? end.reason
+                : `unwatched: ${end.reason}; not read`
               : `not read: base ${base.resolvedPath ?? "unresolved"} ${factText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
       const before = unreadBoth ? `unreadable; stage start ${factText(opened)}` : stageBefore(opened);
       out.push(row(before, after, true, p.path, p.scope));
