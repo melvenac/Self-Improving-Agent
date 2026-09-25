@@ -1108,8 +1108,7 @@ export class MachineConfigWatch {
       a.dev === b.dev &&
       a.ino === b.ino &&
       a.nlink === b.nlink &&
-      a.size === b.size &&
-      a.mtimeNs === b.mtimeNs;
+      a.size === b.size;
     const factText = (s: MachineSnap): string =>
       `type ${s.kind} dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
     const stageBefore = (opened: MachineSnap): string => {
