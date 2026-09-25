@@ -52,7 +52,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, isAbsolute, join, parse, relative, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, parse, relative, resolve } from "node:path";
 import { git, gitTry } from "./git.js";
 
 /** Where git keeps the files this layer watches, resolved once. */
@@ -991,7 +991,17 @@ export class MachineConfigWatch {
     }
     const sameObject = gate !== null && gate.kind === kind && gate.dev === dev && gate.ino === ino;
     const singleName = kind === "file" && nlink === 1 && gate !== null && gate.resolvedPath === resolvedPath;
-    const same = gate === null || (gate.resolvedPath === resolvedPath && (sameObject || singleName));
+    // R69. Absent at base may be read once it appears at the same parent and name, as one regular file.
+    const appeared =
+      gate !== null &&
+      gate.resolvedPath === null &&
+      kind === "file" &&
+      nlink === 1 &&
+      lexical.kind === "file" &&
+      basename(resolvedPath) === basename(p) &&
+      parentReal !== null &&
+      parentReal === gate.parentReal;
+    const same = gate === null || appeared || (gate.resolvedPath === resolvedPath && (sameObject || singleName));
     if (!same) return { ...note, reason: "different file" };
     if (kind !== "file") return { ...note, reason: "not a file" };
     let fd: number | null = null;
