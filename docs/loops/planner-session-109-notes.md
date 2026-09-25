@@ -251,3 +251,9 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
     the lookup log, the same meter-before-gate shape as T-155 and T-173. It is promoted only on a measured miss rate.
   - **Never scored away:** watch-outs and open questions. They are the curated part, and G-039 is the cost of a
     lesson that existed and did not reach the act.
+- **Forge 110, importer round 3:** verified r3 `dfa1a2a` (36197519049, tcm-1, success, 1084 passed) and redcheck
+  `27e4a1d` (36197521563, tcm-2, 11 failed). **Its finding:** D7's damage depends on readdir order (NTFS removes
+  state.json before SYSTEM/, Linux does not), so a data-loss test can pass on one filesystem for the wrong reason.
+  A copy-back variant reproduces D7 on both. 14 local mutants, as the developer reports them (N13 dead); QA 111
+  re-runs them, from committed scripts. An intermittent Windows rename EPERM was seen on unrelated tests: noise,
+  named.
