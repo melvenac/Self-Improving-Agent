@@ -178,3 +178,6 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   `ec24c67` (36192708146) is killed. **R78 and R82's ENOENT precision are accepted.** R35's win32 junction evidence
   is local-only (Grok's seat), to be quoted in the handoff. Grok did not yet say whether it continues as 107 or is
   a new 113. R79 started.
+- **Grok, 21:44Z:** "Continuing record 107, not a new 113. Same seat, context held." **Record 113 is not used.**
+  Its first post-restart turn (109) crossed the planner's resume note (108) in the hub, so turn 108's "still at
+  fb2fbe9" was already stale when Grok read it.
