@@ -2,7 +2,23 @@
  * R77 red tests on A9 6bd97f2. Each names the unguarded call it covers.
  * EACCES on a directory is Linux; these rows skip on win32. tcm is the read.
  */
-import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from "vitest";
+
+const eio = vi.hoisted(() => ({ path: "" }));
+vi.mock("node:fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs")>();
+  return {
+    ...actual,
+    readFileSync: (...args: Parameters<typeof actual.readFileSync>) => {
+      if (eio.path !== "" && args[0] === eio.path) {
+        const err = new Error("simulated EIO") as NodeJS.ErrnoException;
+        err.code = "EIO";
+        throw err;
+      }
+      return actual.readFileSync(...args);
+    },
+  };
+});
 import { chmodSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { ConfigWatch, MachineConfigWatch, identify, repositoryLinksAtBase, resolveGitDirs } from "../../src/harness/configwatch.js";
@@ -152,19 +168,26 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
     expect(thrown, "readFileSync EACCES is already contained").toBe("");
   });
 
-  it.skipIf(isWin)("R77-READ-OTHER-CODE: .git/config replaced by a directory is recorded, not thrown (readState :438 rethrows EISDIR)", () => {
+  it("R77-READ-EIO: a readFileSync EIO is recorded as unreadable, not absent and not thrown", () => {
     const cfg = join(repo.root, ".git/config");
     const dirs = resolveGitDirs(repo.root);
-    unlinkSync(cfg);
-    mkdirSync(cfg);
-    const watch = new ConfigWatch(dirs, repo.root);
+    eio.path = cfg;
     let thrown = "";
+    let record = "";
     try {
-      watch.begin("developer");
-    } catch (e) {
-      thrown = (e as NodeJS.ErrnoException).code ?? (e as Error).message;
+      const watch = new ConfigWatch(dirs, repo.root);
+      try {
+        watch.begin("developer");
+      } catch (e) {
+        thrown = (e as NodeJS.ErrnoException).code ?? (e as Error).message;
+      }
+      if (thrown === "") record = JSON.stringify(watch.closeAndRestore());
+    } finally {
+      eio.path = "";
     }
-    expect(thrown, "any read code, including EISDIR, stays inside the window").toBe("");
+    expect(thrown, "EIO stays inside the window").toBe("");
+    expect(record, "the record says unreadable with the code").toContain("EIO");
+    expect(record, "EIO is not printed as absent").not.toContain(`"before":"absent"`);
   });
 
   it.skipIf(isWin)("R77-GIT-AFTER-BREAK: replacing .git/config with a directory ends stage-changed-config and restores it", async () => {
