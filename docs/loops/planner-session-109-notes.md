@@ -274,3 +274,8 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   checking only for vitest/tsc/build process NAMES. Forge 110 sampled CPU: Grok's `cursor-agent` (pid 2604) was the
   busiest process, and ListAgents cannot see a Cursor seat. "No test process" is not "quiet" (G-042, V-076). The
   full suite waits for a CPU-sampled idle minute, bounded at 20 minutes.
+- **A10 FROZEN at `4b7a5ae`** (verified by the planner: ls-remote; parent `ecf1f62`; 0 non-doc paths; CI 36198950992
+  fails CA-9 only). Grok's session is done (turn 123). QA 108's dispatch (`loop-15-slice-3-dispatch-qa-a10.md`)
+  carries the commit table the planner built from each commit's own diff. **That table found
+  `configwatch-a7-seam.test.ts` edited in `e6a3fd4` and missing from the handoff's list of changed existing
+  tests,** so it is flagged for QA. Driver set `docs/loops/qa-108/` was copied by `qa-driver-copy.mjs` (effort high).
