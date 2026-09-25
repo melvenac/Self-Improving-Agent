@@ -873,6 +873,11 @@ interface MachineSnap {
   dev: bigint | null;
   ino: bigint | null;
   nlink: number;
+  /** R68. An unread machine path is attributed by these, the same facts as R64. */
+  size: bigint;
+  mtimeNs: bigint;
+  /** R69. The parent directory's realpath at this observation. Compared when a path was absent at base. */
+  parentReal: string | null;
   hash: string;
   state: "read" | "not-read" | "unwatched";
   reason: string;
@@ -911,6 +916,12 @@ export class MachineConfigWatch {
    */
   private observe(p: string, gate: MachineSnap | null): MachineSnap {
     const lexical = identify(p);
+    let parentReal: string | null = null;
+    try {
+      parentReal = realpathSync.native(dirname(p));
+    } catch {
+      parentReal = null;
+    }
     let viaLink: string | null = null;
     let viaTarget: string | null = null;
     for (const c of lexicalPaths(this.anchorOf(p), p, true)) {
@@ -932,6 +943,9 @@ export class MachineConfigWatch {
       dev: null,
       ino: null,
       nlink: 0,
+      size: 0n,
+      mtimeNs: 0n,
+      parentReal,
       hash: "unread",
       state: "unwatched",
       reason: "did not resolve",
@@ -941,6 +955,8 @@ export class MachineConfigWatch {
     let dev: bigint | null = null;
     let ino: bigint | null = null;
     let nlink = 0;
+    let size = 0n;
+    let mtimeNs = 0n;
     try {
       resolvedPath = realpathSync.native(p);
       const st = statSync(resolvedPath, { bigint: true });
@@ -948,6 +964,8 @@ export class MachineConfigWatch {
       dev = st.dev;
       ino = st.ino;
       nlink = Number(st.nlink);
+      size = st.size;
+      mtimeNs = st.mtimeNs;
     } catch {
       return unresolved();
     }
@@ -961,6 +979,9 @@ export class MachineConfigWatch {
       dev,
       ino,
       nlink,
+      size,
+      mtimeNs,
+      parentReal,
       hash: "unread",
       state: "not-read",
       reason: "not read",
@@ -977,6 +998,7 @@ export class MachineConfigWatch {
     try {
       fd = openSync(p, "r");
       const st = fstatSync(fd, { bigint: true });
+      // R70. The single-name condition is re-checked on the handle, with dev, ino and type, before any byte.
       if (!st.isFile() || st.dev !== dev || st.ino !== ino) {
         return { ...note, reason: "handle is a different file" };
       }
@@ -1049,7 +1071,14 @@ export class MachineConfigWatch {
     this.stageStart = null;
     const out: MachineConfigFinding[] = [];
     const sameId = (a: MachineSnap, b: MachineSnap): boolean =>
-      a.lexicalKind === b.lexicalKind && a.resolvedPath === b.resolvedPath && a.kind === b.kind && a.dev === b.dev && a.ino === b.ino && a.nlink === b.nlink;
+      a.lexicalKind === b.lexicalKind &&
+      a.resolvedPath === b.resolvedPath &&
+      a.kind === b.kind &&
+      a.dev === b.dev &&
+      a.ino === b.ino &&
+      a.nlink === b.nlink &&
+      a.size === b.size &&
+      a.mtimeNs === b.mtimeNs;
     for (const p of this.paths) {
       const base = this.loopBase.get(p.path)!;
       const opened = start.get(p.path)!;
@@ -1059,7 +1088,7 @@ export class MachineConfigWatch {
         continue;
       }
       if (end.state === "read") {
-        const before = base.state === "read" ? base.hash : "absent";
+        const before = base.state === "read" ? base.hash : base.resolvedPath === null ? "absent" : `type:${base.lexicalKind}`;
         if (before !== end.hash || opened.state !== "read") {
           out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after: end.hash });
         }
@@ -1094,8 +1123,15 @@ export class MachineConfigWatch {
             ? "unreadable"
             : end.resolvedPath === null
               ? `unwatched: ${end.reason}; not read`
-              : `not read: base ${base.resolvedPath ?? "unresolved"} dev ${base.dev} ino ${base.ino} nlink ${base.nlink}; current ${end.resolvedPath} dev ${end.dev} ino ${end.ino} nlink ${end.nlink}`;
-      const before = base.state === "read" ? base.hash : base.resolvedPath === null ? "absent" : `type:${base.lexicalKind}`;
+              : `not read: base ${opened.resolvedPath ?? "unresolved"} dev ${opened.dev} ino ${opened.ino} nlink ${opened.nlink} size ${opened.size} mtimeNs ${opened.mtimeNs}; current ${end.resolvedPath} dev ${end.dev} ino ${end.ino} nlink ${end.nlink} size ${end.size} mtimeNs ${end.mtimeNs}`;
+      const before =
+        opened.state !== "read" && opened.resolvedPath !== null
+          ? `type ${opened.kind} dev ${opened.dev} ino ${opened.ino} nlink ${opened.nlink} size ${opened.size} mtimeNs ${opened.mtimeNs}`
+          : base.state === "read"
+            ? base.hash
+            : base.resolvedPath === null
+              ? "absent"
+              : `type:${base.lexicalKind}`;
       out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
     }
     return out;
