@@ -53,10 +53,10 @@ clean, and was run against the two T-183 files locally on win32 and on tcm.
 
 | Mutant | Edit | Local (win32) | tcm |
 |---|---|---|---|
-| (i) clip marker | `clip()` returns the cut with no marker | killed: 5 failed (T183-2 x2, line break, verified clip, marker-exactly-when-cut) | MUT_I |
-| (ii) verbatim watch-outs | watch-outs rendered through `clip(w, 140)` | killed: 3 failed (the planner, developer and qa verbatim rows) | MUT_II |
-| (iii) size threshold | `n > limit` becomes `n > limit * 2` | killed: 1 failed (red on the known positive) | MUT_III |
-| (iv) omission line | the omission line suppressed | killed: 1 failed (newest 10 plus a counted, named omission) | MUT_IV |
+| (i) clip marker | `clip()` returns the cut with no marker | killed: 5 failed (T183-2 x2, line break, verified clip, marker-exactly-when-cut) | killed, run 36198525222: 5 failed / 1047 passed, the same 5 |
+| (ii) verbatim watch-outs | watch-outs rendered through `clip(w, 140)` | killed: 3 failed (the planner, developer and qa verbatim rows) | killed, run 36198530073: 3 failed / 1049 passed, the same 3 |
+| (iii) size threshold | `n > limit` becomes `n > limit * 2` | killed: 1 failed (red on the known positive) | killed, run 36198534363: 1 failed / 1051 passed, the same 1 |
+| (iv) omission line | the omission line suppressed | killed: 1 failed (newest 10 plus a counted, named omission) | killed, run 36198539151: 1 failed / 1051 passed, the same 1 |
 
 ## 4. What was not verified
 
