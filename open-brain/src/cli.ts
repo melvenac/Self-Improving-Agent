@@ -421,13 +421,28 @@ Read-only. Change state through ob_state — never by editing the file.`);
 
   const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG } = await import("./pipelines/state-import/index.js");
   const { relative } = await import("node:path");
+  const { existsSync, statSync } = await import("node:fs");
   // T-150's rule: an unrecognised flag refuses. Before this, a misspelled flag
   // was ignored, so `--comit` quietly ran a draft, and a misspelled
   // acknowledgement would have been indistinguishable from none.
+  // Any token starting with "-", not only "--": `-accept-stale` used to fall
+  // through to the directory slot (QA 102, D4).
   const importFlags = ["--draft", "--commit", "--force-snapshot", ACCEPT_STALE_FLAG];
-  const unknownFlags = args.slice(2).filter((a) => a.startsWith("--") && !importFlags.includes(a));
+  const unknownFlags = args.slice(2).filter((a) => a.startsWith("-") && !importFlags.includes(a));
   if (unknownFlags.length > 0) {
     console.error(`state import refused: unrecognised flag(s) ${unknownFlags.join(", ")}. Known: ${importFlags.join(", ")}. Nothing written.`);
+    process.exit(1);
+  }
+  // At most one positional, and it must name a directory that exists. A second
+  // one, or one that names nothing, used to resolve against the cwd and walk up,
+  // committing the cwd's project instead of the one named (QA 102, PROBE-12).
+  const positionals = args.slice(2).filter((a) => !a.startsWith("-"));
+  if (positionals.length > 1) {
+    console.error(`state import refused: more than one directory given (${positionals.join(", ")}). Pass one project directory. Nothing written.`);
+    process.exit(1);
+  }
+  if (positionals.length === 1 && !(existsSync(resolve(positionals[0])) && statSync(resolve(positionals[0])).isDirectory())) {
+    console.error(`state import refused: ${positionals[0]} does not exist or is not a directory (resolved to ${resolve(positionals[0])}). Nothing written.`);
     process.exit(1);
   }
   const commit = args.includes("--commit");
@@ -439,7 +454,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     console.error(`state import refused: ${ACCEPT_STALE_FLAG} applies only to --commit. Nothing written.`);
     process.exit(1);
   }
-  const startDir = resolve(args.slice(2).find((a) => !a.startsWith("--")) ?? ".");
+  const startDir = resolve(positionals[0] ?? ".");
   const projectRoot = resolveRepoRoot(startDir);
   if (!projectRoot) {
     console.error(`state import refused: ${describeNoRoot(startDir)}`);
@@ -473,6 +488,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     }
     const r = runCommit(projectRoot, today, { forceSnapshot: args.includes("--force-snapshot"), acceptStale: args.includes(ACCEPT_STALE_FLAG) });
     console.log(`\nstate import — committed\n`);
+    console.log(`Root: ${projectRoot}`);
     if (r.accepted_stale.length) console.log(`Imported STALE under ${ACCEPT_STALE_FLAG}: ${r.accepted_stale.join(", ")}`);
     const unknown = r.staleness.inputs.filter((i) => i.verdict === "could_not_tell");
     if (unknown.length) console.log(`Could not tell whether current: ${unknown.map((i) => i.input).join(", ")}`);

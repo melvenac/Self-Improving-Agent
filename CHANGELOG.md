@@ -59,6 +59,13 @@ further adoption (T-181). There is no version bump in these commits: the release
   `state.json already exists`. It now creates any missing view directory, and a failure at any step
   after the snapshot restores `.agents/` from the snapshot, removes it, and says so in the error.
   With `--force-snapshot`, the snapshot being replaced is kept aside until the import completes.
+- **`state import` acts only on the project named (QA's D4).** Round 1's "any flag it does not
+  recognise now refuses" was true only for `--` tokens: `-accept-stale` or `accept-stale` was taken
+  as the directory, and placed before the real one it resolved against the cwd, so **the cwd's
+  project was committed instead**. Now any unknown `-`-prefixed token refuses, more than one
+  positional refuses, and a positional that is not an existing directory refuses. Nothing is written
+  in any of these cases. `--commit` now prints the `Root:` it committed. Other subcommands share
+  the old shape. They are listed in the round-2 handoff and are not changed here.
 
 ## [0.44.2] - 2026-09-24 — a Windows profile with a space in its name
 
