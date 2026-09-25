@@ -308,7 +308,7 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   // writes a reviewable draft + report; `--commit` applies the reviewed draft.
   const sub = args[1];
   if (sub !== "import" && sub !== "show" && sub !== "migrate") {
-    console.error("Usage: open-brain state <show [--json] | import [--draft | --commit] [--force-snapshot] | migrate --seat <planner|developer|qa> [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>> [dir]");
+    console.error("Usage: open-brain state <show [--json] | import [--draft | --commit [--accept-stale]] [--force-snapshot] | migrate --seat <planner|developer|qa> [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>> [dir]");
     process.exit(1);
   }
 
@@ -419,11 +419,24 @@ Read-only. Change state through ob_state — never by editing the file.`);
     process.exit(0);
   }
 
-  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL } = await import("./pipelines/state-import/index.js");
+  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG } = await import("./pipelines/state-import/index.js");
   const { relative } = await import("node:path");
+  // T-150's rule: an unrecognised flag refuses. Before this, a misspelled flag
+  // was ignored, so `--comit` quietly ran a draft, and a misspelled
+  // acknowledgement would have been indistinguishable from none.
+  const importFlags = ["--draft", "--commit", "--force-snapshot", ACCEPT_STALE_FLAG];
+  const unknownFlags = args.slice(2).filter((a) => a.startsWith("--") && !importFlags.includes(a));
+  if (unknownFlags.length > 0) {
+    console.error(`state import refused: unrecognised flag(s) ${unknownFlags.join(", ")}. Known: ${importFlags.join(", ")}. Nothing written.`);
+    process.exit(1);
+  }
   const commit = args.includes("--commit");
   if (commit && args.includes("--draft")) {
     console.error("state import: pass --draft or --commit, not both");
+    process.exit(1);
+  }
+  if (!commit && args.includes(ACCEPT_STALE_FLAG)) {
+    console.error(`state import refused: ${ACCEPT_STALE_FLAG} applies only to --commit. Nothing written.`);
     process.exit(1);
   }
   const startDir = resolve(args.slice(2).find((a) => !a.startsWith("--")) ?? ".");
@@ -445,6 +458,11 @@ Read-only. Change state through ob_state — never by editing the file.`);
       console.log(`Report: ${REPORT_REL}`);
       console.log(`Validates: ${r.validation.ok ? "yes" : `NO — ${r.validation.error}`}`);
       console.log(`Current session: ${rep.current_session} (${rep.last_session.file})`);
+      const judged = rep.staleness.inputs;
+      const stale = judged.filter((i) => i.verdict === "stale");
+      const unknown = judged.filter((i) => i.verdict === "could_not_tell");
+      console.log(`Staleness: ${stale.length} stale${stale.length ? ` (${stale.map((i) => i.input).join(", ")})` : ""} · ${unknown.length} could not tell${unknown.length ? ` (${unknown.map((i) => i.input).join(", ")})` : ""} · ${judged.length - stale.length - unknown.length} current. Details are in the report's first section.`);
+      if (stale.length) console.log(`--commit will REFUSE until those inputs are updated and the draft is re-run, or until ${ACCEPT_STALE_FLAG} is passed.`);
       const s = rep.inbox.by_status;
       console.log(`Tasks: ${rep.inbox.items} (open ${s.open}, in_progress ${s.in_progress}, blocked ${s.blocked}, done ${s.done}); superseded links ${rep.inbox.superseded_links.length}; unparsed lines ${rep.inbox.unparsed.length}`);
       console.log(`Decisions: ${rep.decisions.imported} (${rep.decisions.skipped.length} skipped) · verified ${rep.verified_imported} · gaps ${rep.gaps_imported} · objective ${rep.objective.found ? "found" : "NOT found"}`);
@@ -453,8 +471,11 @@ Read-only. Change state through ob_state — never by editing the file.`);
       console.log(`\nReview the report, then run: open-brain state import --commit`);
       process.exit(r.validation.ok ? 0 : 1);
     }
-    const r = runCommit(projectRoot, today, { forceSnapshot: args.includes("--force-snapshot") });
+    const r = runCommit(projectRoot, today, { forceSnapshot: args.includes("--force-snapshot"), acceptStale: args.includes(ACCEPT_STALE_FLAG) });
     console.log(`\nstate import — committed\n`);
+    if (r.accepted_stale.length) console.log(`Imported STALE under ${ACCEPT_STALE_FLAG}: ${r.accepted_stale.join(", ")}`);
+    const unknown = r.staleness.inputs.filter((i) => i.verdict === "could_not_tell");
+    if (unknown.length) console.log(`Could not tell whether current: ${unknown.map((i) => i.input).join(", ")}`);
     console.log(`Snapshot: ${relative(projectRoot, r.snapshot.dir)} (${r.snapshot.files} files)`);
     console.log(`Wrote:    ${STATE_REL} at revision 0`);
     if (r.summary) console.log(`SUMMARY.md: removed ${r.summary.total_lines_removed} lines (${r.summary.blockquote_lines} blockquote + ${r.summary.current_state_lines} Current State); kept ${r.summary.kept_headings.join(", ")}`);
@@ -474,7 +495,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  relocate [--from <dir> --to <dir>] [--apply]  Fold a renamed project's history forward");
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
-  console.log("  state import [--draft|--commit] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
+  console.log("  state import [--draft|--commit [--accept-stale]] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
   console.log("  state migrate --seat <planner|developer|qa> [--keep-revision] [--dry-run] <file...>");
   console.log("                                             Migrate state.json schema v1 -> v2");
   console.log("  detach [--dry-run] [--no-fetch] [--force] [dir]      Return a seat worktree to detached at origin/master");

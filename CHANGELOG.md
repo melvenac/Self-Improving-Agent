@@ -15,6 +15,28 @@ further adoption (T-181). There is no version bump in these commits: the release
   from `verified_seeded`/`gaps_seeded` to `verified_imported`/`gaps_imported`. SIA's own record is
   unaffected: it was imported once, and `--commit` refuses a second run (V-009).
 
+### Added
+
+- **`state import` names an input that predates the project's latest session, and `--commit`
+  refuses on it (T-180).** The importer used to present an old handoff or INBOX as current state
+  without comment. A2A-Hub at `e0bc3f8` is the known positive: its `next-session.md` is Session 13's
+  and its INBOX is Session 11's, while `Session_14.md` exists. The signal is the file's own words.
+  An input's declared session is the highest `Session N` in its status blockquote or its headings,
+  and it is compared with the highest `SESSIONS/Session_N.md`. Git and mtime are not used, because
+  `.agents/` is untracked in some projects and a copy resets mtimes.
+  - The draft report's **first section** lists each judged input (handoff, INBOX, task) as
+    **STALE**, *could not tell* or *current*, with the line that declares its session. SUMMARY and
+    DECISIONS are listed as *not judged*, with the reason. The CLI draft output prints the counts.
+  - `--commit` refuses while any input is STALE, before the snapshot or any write, unless you pass
+    **`--accept-stale`**. It judges the inputs on disk again at commit time.
+  - *Could not tell* (no marker, or no `Session_N.md`) is reported and never counted as current. It
+    does not block `--commit`: SIA's own session-54 prose has two inputs without a marker.
+  - Any flag `state import` does not recognise now refuses (T-150's rule). Before this, a
+    misspelled flag was ignored. `--accept-stale` without `--commit` also refuses.
+  - New known-positive fixture: `open-brain/tests/fixtures-import-a2a-hub/`, the importer's
+    inputs at A2A-Hub `e0bc3f8`. It is on `.agents/retirements.json`'s `historical` list, like the
+    other three fixture directories, because its text names SIA's retired mailbox.
+
 ## [0.44.2] - 2026-09-24 — a Windows profile with a space in its name
 
 Found by the first full-suite run on the dedicated QA machine (`desktop-o4egb1e`, D-045), whose

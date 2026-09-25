@@ -15,6 +15,7 @@
     ".agents/TASKS/INBOX.md",
     "open-brain/tests/fixtures/",
     "open-brain/tests/fixtures-import/",
+    "open-brain/tests/fixtures-import-a2a-hub/",
     "open-brain/tests/fixtures-state/",
     "open-brain/docs/"
   ],

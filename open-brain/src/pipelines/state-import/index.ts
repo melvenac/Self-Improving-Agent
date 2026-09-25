@@ -50,6 +50,7 @@ export interface ImportReport {
   project: { name: string; version: string };
   current_session: number;
   migration_date: string;
+  staleness: StalenessReport;
   sources: Record<string, { path: string; present: boolean; lines: number }>;
   inbox: {
     items: number;
@@ -356,6 +357,96 @@ export function findLastSession(sessionsDir: string, today: string): ImportRepor
 }
 
 // ---------------------------------------------------------------------------
+// Staleness (T-180): an input that predates the latest session is named, not
+// imported as though it were current.
+// ---------------------------------------------------------------------------
+
+export type StalenessVerdict = "current" | "stale" | "could_not_tell";
+export interface InputStaleness { input: string; verdict: StalenessVerdict; declared_session: number | null; evidence: string }
+export interface StalenessReport {
+  signal: string;
+  latest: { n: number; file: string } | null;
+  inputs: InputStaleness[];
+  not_judged: Array<{ input: string; reason: string }>;
+}
+
+/**
+ * One signal, the file's own words. Not git: `.agents/` is untracked in some
+ * projects, and a tree snapshotted in one commit gives every file the same
+ * date. Not mtime: a checkout or a copy resets it.
+ */
+export const STALENESS_SIGNAL =
+  "the highest `Session N` an input names in its status blockquote (the `>` lines directly under its title) or in a heading, compared with the highest `SESSIONS/Session_N.md`";
+
+const DECLARED_RE = /\bSessions?\s+(\d+)(?:\s*[–-]\s*(\d+))?/g;
+
+/** The highest session an input declares, and the line that declares it. */
+export function declaredSession(text: string): { n: number; line: number; text: string } | null {
+  const lines = text.split(/\r?\n/);
+  const candidates: number[] = [];
+  const titleIdx = lines.findIndex((l) => l.startsWith("# "));
+  if (titleIdx !== -1) {
+    for (let i = titleIdx + 1; i < lines.length && (lines[i].trim() === "" || lines[i].startsWith(">")); i++) {
+      if (lines[i].startsWith(">")) candidates.push(i);
+    }
+  }
+  lines.forEach((l, i) => { if (/^#{1,6} /.test(l)) candidates.push(i); });
+  let best: { n: number; line: number; text: string } | null = null;
+  for (const i of candidates) {
+    for (const m of lines[i].matchAll(DECLARED_RE)) {
+      const n = Math.max(parseInt(m[1], 10), m[2] ? parseInt(m[2], 10) : 0);
+      if (!best || n > best.n) best = { n, line: i + 1, text: lines[i].trim() };
+    }
+  }
+  return best;
+}
+
+type InputKey = "inbox" | "task" | "next" | "summary" | "decisions";
+const INPUT_REL: Record<InputKey, string> = {
+  inbox: ".agents/TASKS/INBOX.md",
+  task: ".agents/TASKS/task.md",
+  next: ".agents/SESSIONS/next-session.md",
+  summary: ".agents/SYSTEM/SUMMARY.md",
+  decisions: ".agents/SYSTEM/DECISIONS.md",
+};
+/** The inputs imported AS CURRENT STATE: tasks, objective, handoff. */
+const JUDGED: InputKey[] = ["next", "inbox", "task"];
+const NOT_JUDGED_REASON: Partial<Record<InputKey, string>> = {
+  summary: "not imported as state: --commit only cuts its status blockquote and `## Current State`",
+  decisions: "imported as a dated log of past decisions, not as current state",
+};
+
+export function detectStaleness(texts: Record<InputKey, string | null>, last: ImportReport["last_session"]): StalenessReport {
+  const latest = last.n > 0 ? { n: last.n, file: last.file } : null;
+  const inputs: InputStaleness[] = [];
+  const not_judged: StalenessReport["not_judged"] = [];
+  for (const key of Object.keys(INPUT_REL) as InputKey[]) {
+    const input = INPUT_REL[key];
+    const text = texts[key];
+    if (text === null) { not_judged.push({ input, reason: "absent: nothing is imported from it" }); continue; }
+    if (!JUDGED.includes(key)) { not_judged.push({ input, reason: NOT_JUDGED_REASON[key]! }); continue; }
+    if (!latest) {
+      inputs.push({ input, verdict: "could_not_tell", declared_session: declaredSession(text)?.n ?? null, evidence: `no SESSIONS/Session_N.md to compare against (${last.file})` });
+      continue;
+    }
+    const d = declaredSession(text);
+    if (!d) {
+      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: "names no `Session N` in its status blockquote or its headings" });
+      continue;
+    }
+    const where = `line ${d.line} declares Session ${d.n} (\`${d.text.length > 160 ? d.text.slice(0, 157) + "…" : d.text}\`); the latest session log is Session ${latest.n} (${latest.file})`;
+    inputs.push({ input, verdict: d.n < latest.n ? "stale" : "current", declared_session: d.n, evidence: where });
+  }
+  return { signal: STALENESS_SIGNAL, latest, inputs, not_judged };
+}
+
+function readInputs(root: string): { paths: Record<InputKey, string>; texts: Record<InputKey, string | null> } {
+  const paths = Object.fromEntries((Object.keys(INPUT_REL) as InputKey[]).map((k) => [k, join(root, INPUT_REL[k])])) as Record<InputKey, string>;
+  const texts = Object.fromEntries((Object.keys(paths) as InputKey[]).map((k) => [k, readOptional(paths[k])])) as Record<InputKey, string | null>;
+  return { paths, texts };
+}
+
+// ---------------------------------------------------------------------------
 // The draft
 // ---------------------------------------------------------------------------
 
@@ -370,14 +461,7 @@ function lineCount(text: string | null): number {
 export function buildImportDraft(projectRoot: string, today: string): ImportDraft {
   const root = resolve(projectRoot);
   const pkg = readJson<{ name?: string; version?: string }>(join(root, "package.json"));
-  const paths = {
-    inbox: join(root, ".agents/TASKS/INBOX.md"),
-    task: join(root, ".agents/TASKS/task.md"),
-    next: join(root, ".agents/SESSIONS/next-session.md"),
-    summary: join(root, ".agents/SYSTEM/SUMMARY.md"),
-    decisions: join(root, ".agents/SYSTEM/DECISIONS.md"),
-  };
-  const texts = { inbox: readOptional(paths.inbox), task: readOptional(paths.task), next: readOptional(paths.next), summary: readOptional(paths.summary), decisions: readOptional(paths.decisions) };
+  const { paths, texts } = readInputs(root);
 
   const last = findLastSession(join(root, ".agents/SESSIONS"), today);
   const current = last.n;
@@ -386,6 +470,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
     project: { name: pkg?.name ?? "unknown", version: pkg?.version ?? "0.0.0" },
     current_session: current,
     migration_date: today,
+    staleness: detectStaleness(texts, last),
     sources: Object.fromEntries(Object.entries(paths).map(([k, p]) => [k, { path: relative(root, p).replace(/\\/g, "/"), present: existsSync(p), lines: lineCount(texts[k as keyof typeof texts]) }])),
     inbox: {
       items: 0,
@@ -474,9 +559,30 @@ export function planSummaryRemoval(text: string): { text: string; report: NonNul
 // The report (markdown)
 // ---------------------------------------------------------------------------
 
+export const ACCEPT_STALE_FLAG = "--accept-stale";
+
+/** The report's first section: staleness goes where a reviewer reads first. */
+export function renderStaleness(s: StalenessReport): string[] {
+  const L: string[] = ["## Staleness — read this first", ""];
+  L.push(`Signal: ${s.signal}.`);
+  L.push(s.latest ? `Latest session: Session ${s.latest.n} (\`${s.latest.file}\`).` : "Latest session: none found, so no input can be judged.", "");
+  const order: StalenessVerdict[] = ["stale", "could_not_tell", "current"];
+  const label: Record<StalenessVerdict, string> = { stale: "**STALE**", could_not_tell: "could not tell", current: "current" };
+  for (const v of order) for (const i of s.inputs.filter((x) => x.verdict === v)) L.push(`- ${label[v]} \`${i.input}\`: ${i.evidence}`);
+  for (const n of s.not_judged) L.push(`- not judged \`${n.input}\`: ${n.reason}`);
+  L.push("");
+  const stale = s.inputs.filter((i) => i.verdict === "stale").length;
+  const unknown = s.inputs.filter((i) => i.verdict === "could_not_tell").length;
+  if (stale > 0) L.push(`**\`--commit\` refuses while an input above is STALE.** Update it and re-run \`--draft\`, or pass \`${ACCEPT_STALE_FLAG}\` to import it as it stands.`);
+  else L.push("No input is stale.");
+  if (unknown > 0) L.push(`${unknown} input(s) could not be judged. That does not block \`--commit\`, and it is not a finding that they are up to date.`);
+  return L;
+}
+
 export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): string {
   const L: string[] = [];
   L.push(`# state.json import report — ${mode} (${r.migration_date})`, "");
+  L.push(...renderStaleness(r.staleness), "");
   L.push(`Project: ${r.project.name} v${r.project.version} · current session ${r.current_session} (from ${r.last_session.file}) · retention edge: done items closed ≤ session ${r.current_session - DONE_RETENTION_SESSIONS} are dropped on the first ob_state write`, "");
   L.push("## Sources", "");
   for (const [k, s] of Object.entries(r.sources)) L.push(`- ${k}: \`${s.path}\` — ${s.present ? `${s.lines} lines` : "ABSENT"}`);
@@ -576,9 +682,13 @@ export interface CommitResult {
   summary: NonNullable<ImportReport["summary_removal"]> | null;
   rendered: string[];
   moved: string[];
+  /** Judged again at commit, from the inputs on disk. */
+  staleness: StalenessReport;
+  /** The stale inputs imported anyway under --accept-stale; empty otherwise. */
+  accepted_stale: string[];
 }
 
-export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string } = {}): CommitResult {
+export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean } = {}): CommitResult {
   const root = resolve(projectRoot);
   const statePath = join(root, STATE_REL);
   if (existsSync(statePath)) throw new Error(`${STATE_REL} already exists — the importer runs once; nothing written`);
@@ -587,6 +697,14 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   const parsed = parseState(readFileSync(draftPath, "utf-8"));
   if (!parsed.ok) throw new Error(`${DRAFT_REL} does not validate at ${parsed.error} — nothing written`);
   if (parsed.data.revision !== 0) throw new Error(`${DRAFT_REL} revision must be 0 (is ${parsed.data.revision}) — nothing written`);
+
+  // 0. T-180: a stale input refuses before anything is written, including the snapshot.
+  const staleness = detectStaleness(readInputs(root).texts, findLastSession(join(root, ".agents/SESSIONS"), today));
+  const stale = staleness.inputs.filter((i) => i.verdict === "stale");
+  if (stale.length > 0 && opts.acceptStale !== true) {
+    const list = stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ");
+    throw new Error(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${list}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
+  }
 
   // 1. Snapshot before anything under .agents/ changes.
   const snapshot = takeSnapshot(root, today, opts.forceSnapshot === true);
@@ -616,5 +734,5 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
     renameSync(from, to);
     moved.push(relative(root, to).replace(/\\/g, "/"));
   }
-  return { statePath, snapshot, summary, rendered: r.rendered, moved };
+  return { statePath, snapshot, summary, rendered: r.rendered, moved, staleness, accepted_stale: stale.map((i) => i.input) };
 }
