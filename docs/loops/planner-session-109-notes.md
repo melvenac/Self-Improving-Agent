@@ -257,3 +257,7 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   A copy-back variant reproduces D7 on both. 14 local mutants, as the developer reports them (N13 dead); QA 111
   re-runs them, from committed scripts. An intermittent Windows rename EPERM was seen on unrelated tests: noise,
   named.
+- **R80 accepted at `ecf1f62`.** Red `016d3d8` (36197418005); fix 36197403513 (CA-9 only); six mutants, each one
+  source file, killed: 36197666218, 36197704680, 36197730757, 36197760017, 36197900577, 36197931021. **R77–R82 are
+  all built at `ecf1f62`.** No master merge is needed (0 non-doc paths since `9bc06e3`). The handoff and freeze are
+  ordered, with a seven-item handoff contract.
