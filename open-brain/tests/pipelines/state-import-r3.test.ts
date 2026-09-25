@@ -87,6 +87,56 @@ afterEach(() => {
   realFs.rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
 });
 
+describe("R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created", () => {
+  function earlierSnapshot(): void {
+    realFs.mkdirSync(join(root, SNAP, "SESSIONS"), { recursive: true });
+    realFs.writeFileSync(join(root, SNAP, "SESSIONS/Session_7.md"), LOG7);
+    realFs.writeFileSync(join(root, SNAP, "from-an-earlier-run.md"), "keep me\n");
+  }
+
+  it("a same-day snapshot plus a plain --commit: refused, and the snapshot is byte-identical afterwards", () => {
+    writeProject(root, 7);
+    runDraft(root, TODAY);
+    earlierSnapshot();
+    const before = tree(root);
+    expect(() => runCommit(root, TODAY)).toThrow(/already exists/);
+    expect(tree(root)).toEqual(before);
+  });
+
+  it("the same with --accept-stale on a stale project: refused, and the snapshot is byte-identical afterwards", () => {
+    writeProject(root, 6);
+    runDraft(root, TODAY);
+    earlierSnapshot();
+    const before = tree(root);
+    expect(() => runCommit(root, TODAY, { acceptStale: true })).toThrow(/already exists/);
+    expect(tree(root)).toEqual(before);
+  });
+
+  it("a snapshot that fails part-way when archive/ already existed: only the partial snapshot goes, and archive/'s other contents stay (N13)", () => {
+    writeProject(root, 7);
+    runDraft(root, TODAY);
+    realFs.mkdirSync(join(root, ".agents/archive/pre-state-migration-2026-09-01"), { recursive: true });
+    realFs.writeFileSync(join(root, ".agents/archive/pre-state-migration-2026-09-01/old.md"), "older\n");
+    const before = tree(root);
+    inject.copyTo = `pre-state-migration-${TODAY}/TASKS`;
+    expect(() => runCommit(root, TODAY)).toThrow(/induced failure copying/);
+    inject.copyTo = null;
+    expect(tree(root)).toEqual(before);
+    expect(realFs.existsSync(join(root, SNAP))).toBe(false);
+  });
+
+  it("--force-snapshot with a snapshot that fails part-way: the aside comes back byte for byte, and only the new partial snapshot goes", () => {
+    writeProject(root, 7);
+    runDraft(root, TODAY);
+    earlierSnapshot();
+    const before = tree(root);
+    inject.copyTo = `pre-state-migration-${TODAY}/TASKS`;
+    expect(() => runCommit(root, TODAY, { forceSnapshot: true })).toThrow(/induced failure copying/);
+    inject.copyTo = null;
+    expect(tree(root)).toEqual(before);
+  });
+});
+
 describe("R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding", () => {
   // QA 106's three shapes (evidence/ps51-bytes.out): an em dash is byte 0x97.
   // Set-Content writes CRLF line ends; Add-Content appends them line by line.

@@ -743,14 +743,18 @@ export function runDraft(projectRoot: string, today: string): DraftResult {
 
 export interface SnapshotResult { dir: string; files: number }
 
-/** Copies `.agents/` (minus `archive/`) into `.agents/archive/pre-state-migration-<date>/`. Refuses if it exists unless `force`. */
-export function takeSnapshot(projectRoot: string, today: string, force: boolean): SnapshotResult {
+/**
+ * Copies `.agents/` (minus `archive/`) into `.agents/archive/pre-state-migration-<date>/`. Refuses if it exists unless `force`.
+ * `made.created` is set to the first directory this call created (the snapshot, or `archive/` above it), so a
+ * caller cleaning up after a failure removes exactly that, and never a snapshot it found there (QA 106, D6).
+ */
+export function takeSnapshot(projectRoot: string, today: string, force: boolean, made: { created: string | null } = { created: null }): SnapshotResult {
   const root = resolve(projectRoot);
   const agents = join(root, ".agents");
   if (!existsSync(agents)) throw new Error(".agents/ does not exist — nothing to migrate");
   const dir = join(agents, "archive", `${SNAPSHOT_PREFIX}${today}`);
   if (existsSync(dir) && !force) throw new Error(`snapshot ${relative(root, dir).replace(/\\/g, "/")} already exists — pass --force-snapshot to overwrite it`);
-  mkdirSync(dir, { recursive: true });
+  made.created = mkdirSync(dir, { recursive: true }) ?? null;
   // Entry by entry: cpSync refuses to copy a directory into its own
   // subtree, and the snapshot lives under .agents/archive/.
   let files = 0;
@@ -809,18 +813,19 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   // `migrate`, and a failure in any of them puts .agents/ back from the snapshot.
   const agents = join(root, ".agents");
   const archive = join(agents, "archive");
-  const archiveExisted = existsSync(archive);
   const snapshotDir = join(archive, `${SNAPSHOT_PREFIX}${today}`);
   // --force-snapshot replaces an earlier snapshot; keep it aside until the import completes.
   const aside = opts.forceSnapshot === true && existsSync(snapshotDir) ? `${snapshotDir}.replaced-${process.pid}` : null;
   if (aside) renameSync(snapshotDir, aside);
   let snapshot: SnapshotResult;
+  const made: { created: string | null } = { created: null };
   try {
-    snapshot = takeSnapshot(root, today, opts.forceSnapshot === true);
+    snapshot = takeSnapshot(root, today, opts.forceSnapshot === true, made);
   } catch (err) {
-    // .agents/ outside archive/ is untouched; only the partial snapshot goes.
-    rmSync(snapshotDir, { recursive: true, force: true });
-    if (!archiveExisted) rmSync(archive, { recursive: true, force: true });
+    // .agents/ outside archive/ is untouched. Only what this run created goes:
+    // the snapshot's "already exists" refusal is thrown in here, and that
+    // snapshot is the operator's, not this run's (QA 106, D6).
+    if (made.created) rmSync(made.created, { recursive: true, force: true });
     if (aside) renameSync(aside, snapshotDir);
     throw err;
   }
@@ -860,7 +865,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
     done = migrate();
   } catch (err) {
     const why = err instanceof Error ? err.message : String(err);
-    throw new Error(`${why}. ${rollBack(agents, snapshot.dir, archiveExisted, aside)}`);
+    throw new Error(`${why}. ${rollBack(agents, snapshot.dir, made.created, aside)}`);
   }
   if (aside) rmSync(aside, { recursive: true, force: true });
   return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input) };
@@ -871,15 +876,14 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
  * The snapshot is deleted only after the restore finished, so a restore that
  * fails part-way leaves the one copy that can repair it, and says where.
  */
-function rollBack(agents: string, snapshotDir: string, archiveExisted: boolean, aside: string | null): string {
+function rollBack(agents: string, snapshotDir: string, created: string | null, aside: string | null): string {
   try {
     for (const name of readdirSync(agents)) if (name !== "archive") rmSync(join(agents, name), { recursive: true, force: true });
     for (const name of readdirSync(snapshotDir)) cpSync(join(snapshotDir, name), join(agents, name), { recursive: true });
   } catch (err) {
     return `ROLLBACK FAILED (${err instanceof Error ? err.message : String(err)}): .agents/ is part-migrated. Restore it by hand from ${snapshotDir}, which was kept`;
   }
-  rmSync(snapshotDir, { recursive: true, force: true });
-  if (!archiveExisted) rmSync(join(agents, "archive"), { recursive: true, force: true });
+  if (created) rmSync(created, { recursive: true, force: true });
   if (aside) renameSync(aside, snapshotDir);
   return "Rolled back: .agents/ was restored from the snapshot, and the snapshot removed, so nothing changed";
 }
