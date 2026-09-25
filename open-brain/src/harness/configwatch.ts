@@ -1092,7 +1092,6 @@ export class MachineConfigWatch {
       a.mtimeNs === b.mtimeNs;
     const stageBefore = (opened: MachineSnap): string => {
       if (opened.state === "read") return opened.hash;
-      if (opened.reason === "unreadable" || opened.hash === "unreadable") return "unreadable";
       if (opened.resolvedPath === null) return "absent";
       return `type ${opened.kind} dev ${opened.dev} ino ${opened.ino} nlink ${opened.nlink} size ${opened.size} mtimeNs ${opened.mtimeNs}`;
     };
