@@ -5,6 +5,26 @@
 Aaron went to bed around 10:40Z and said "do as much as you can without me", and "if there are any issues with
 the hub, report it to relay".
 
+## Morning summary (for Aaron, written 13:05Z)
+
+**Waiting on you, in this order:**
+1. **Nudge Grok's Cursor window** (`~/Worktrees/sia-forge`). It has been quiet since 11:53Z and owes hub turn 107:
+   R78's tcm redcheck and mutant, and the ENOENT-is-absence fix. Paste: *"Read turn 107 in hub room
+   k57frxw0ptb8tadmqdwy0khhks8ey006 and continue."*
+2. **Start developer 110** (importer round 3): a fresh Claude Code session in `~/Worktrees/sia-infra`, told to read
+   `docs/loops/importer-fixes-round-3-brief.md`. QA 106 rejected round 2 (D6 data loss, D5, D7).
+
+**Done overnight:**
+- A10 R77 and R82 are complete: every protection red first on tcm, with a killed mutant. R78 is built.
+- Two defects caught before any QA seat saw them:
+  - **the restore chmodded a file outside the repository through a planted link.** My own ruling invited it, and
+    an existing test caught it;
+  - a win32 regression.
+- Rulings-18; the B Step 0 amendment (R81); the importer round-3 brief; state rev 131.
+- The record PR **#158 merged** (`48acaa8`) under D-032.
+
+**Planner errors tonight:** five, listed below. The worst was the turn-90 wording that invited the chmod.
+
 ## Intent documents
 
 Read at this session, **after** the /start briefing and before the first ruling: the Step-Back artifact (all 899
