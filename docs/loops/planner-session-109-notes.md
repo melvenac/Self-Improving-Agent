@@ -44,6 +44,7 @@ Room `k57frxw0ptb8tadmqdwy0khhks8ey006`. Turn numbers are the hub's.
 | 98 | Grok's `3771d53` guarded the chmod with `kind === 'file'` (predating turn 97). **A hard link is kind file**, so it still leaks. Ruled: delete, per R36. New row R77-MODE000-HARDLINK. |
 | 100 | `c923550` deletes the chmod (36130325448, verified: the standing pair only; the one chmod left is on the new file at `:581`). Hard-link row: red on `3771d53` for the right reason (36130492138: the victim reset to 0644). On the candidate `258dfbf` (36130489186) it is red for the **wrong** reason: the test reads the mode-000 victim itself (inside the role and after the loop). Test fix ordered. |
 | 104 | Hard-link row accepted: green on candidate `e7fbe78` (36130766787), red on `3771d53` for the mode (36130769900). Grok misreported the older run 36130492138 as an EACCES failure; its log shows the mode assertion (corrected in the hub). Mutants (i) and (ii) ordered against `e7fbe78`. |
+| 105 | Verified: (i) 36131048854 (`9e0dfb1`) +1 R77-UNLISTED-CONTENTS, (ii) 36131090156 (`ad8bc1c`) +1 R82-MACHINE-UNOBSERVABLE. Both **killed**, each a one-file source change. **R77 and R82 are complete at `e7fbe78`:** every protection has a row shown red first and a killed mutant ((a)–(f), (i)–(iii)). Standing failures: CA-9 (T-182) and R72-BEFORE-ABSENT-DANGLING (R79's). R78 started. |
 
 ## Candidate B
 
