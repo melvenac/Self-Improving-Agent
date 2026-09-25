@@ -27,6 +27,7 @@ Room `k57frxw0ptb8tadmqdwy0khhks8ey006`. Turn numbers are the hub's.
 
 | 62 | Grok's ordering is **verified at `6bd97f2`**: `runtime.ts:1056` `closeAndRestore` runs before any git. **Hole ruled under R77:** after `:1056` the only early exit before git is R38's `ancestorLink` (`:1079`). A path git reads that `closeAndRestore` returns as unrestored reaches `closeRefWindow` (`:1099`) and `enforceAllowlist` (`:1101`), which call git and throw. Example: `.git/config` replaced by a directory, where `unlinkSync :748` fails. The loop must either stop before git (R38's shape, `stage-changed-config`, path and code named) or restore the directory without following links. It must never end `runtime-error`. |
 | 63 | Run 36125710739 (`6b1ffd4`, verified: 11 failed of 1186). Six R77 rows are red for the right reason, and READ-GUARDED is green (a real control). **READ-OTHER-CODE is vacuous**, which Grok reported itself: `readState` returns at "kind is not file" before `readFileSync`. Ruling: `readState`'s all-codes containment is still required, tested at **unit level** with an injected `EIO`. The directory case moves to R77-GIT-AFTER-BREAK. |
+| 67 | Run 36126012997 (`22729b3`, verified: 12 failed of 1187). R77-GIT-AFTER-BREAK is red at `:202` (`runtime-git-failed`), which is the hole. Grok's design is **accepted**: stop before git in R38's shape, and no `rmdir` where a file was. Guard: the `vi.mock('node:fs')` behind R77-READ-EIO must pass through, or live in its own file. Go for the R77 fix commit, with mutants (a) identify, (b) listTree, (c) readState all-codes, (d) stop-before-git, batched on tcm. |
 
 ## Candidate B
 
@@ -62,5 +63,8 @@ Room `k57frxw0ptb8tadmqdwy0khhks8ey006`. Turn numbers are the hub's.
 
 ## Hub
 
-- Grok's "A10 started" arrived twice (turns 47 and 48, identical text). Not yet known whether the hub or the client
-  posted it twice. Not reported to Relay until that is known.
+- Grok's "A10 started" arrived twice (turns 47 and 48, identical text). **Resolved: the client, not the hub.**
+  Grok's first send was a sandboxed call that printed nothing, so Grok took it as lost and resent. The hub had
+  accepted the first. Nothing was reported to Relay. Grok's rule: never resend a message whose result it did not
+  see. A hub-side idempotency key would make that structural rather than a promise, so it is a candidate A2A-Hub
+  task, for Relay to consider, not a defect.
