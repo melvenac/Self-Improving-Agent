@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..2375033 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -810,7 +810,6 @@ export interface CommitResult {
+ 
+ export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean } = {}): CommitResult {
+   const root = resolve(projectRoot);
+-  refuseHalfRestored(root);
+   const statePath = join(root, STATE_REL);
+   if (existsSync(statePath)) throw new Error(`${STATE_REL} already exists — the importer runs once; nothing written`);
+   const draftPath = join(root, DRAFT_REL);

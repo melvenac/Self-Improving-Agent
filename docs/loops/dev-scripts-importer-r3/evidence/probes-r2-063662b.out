@@ -1,0 +1,219 @@
+probes-r2 against C:\Users\melve\Worktrees\sia-infra @ 063662b; TEMP=C:\Users\melve\AppData\Local\Temp
+
+==================== R2-1 / IF-9: every encoding shape, stale (Session 6 vs log 7) and current (Session 7)
+---- utf8 | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 utf8: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf8-bom | INBOX bytes ef bb bf 23 20 49 6e 62
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 utf8-bom: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- crlf | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 crlf: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf8-bom+crlf | INBOX bytes ef bb bf 23 20 49 6e 62
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 utf8-bom+crlf: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf16le-bom | INBOX bytes ff fe 23 00 20 00 49 00
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 utf16le-bom: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf16le-bom+crlf | INBOX bytes ff fe 23 00 20 00 49 00
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 utf16le-bom+crlf: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf16be-bom | INBOX bytes fe ff 00 23 00 20 00 49
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 utf16be-bom: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- utf16le-nobom | INBOX bytes 23 00 20 00 49 00 6e 00
+     stale  : draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, wrote 16 beyond draft+report, state.json true
+              INBOX: - could not tell `.agents/TASKS/INBOX.md`: contains NUL bytes, as UTF-16 without a byte-order mark would: its encoding is unknown, so its words cannot be read
+     current: draft 0; 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+FAIL IF-9 utf16le-nobom: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- cp1252 (em dashes) | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) (read as Windows-1252: not valid UTF-8, and no byte-order mark)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 cp1252 (em dashes): stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- cp1252 (ASCII only) | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 cp1252 (ASCII only): stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- lone CR | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 1 declares Session 6 (`# Inbox — priorities> **Last Updated:** Session 6## P0 — Critical- [ ] **A task** — do it`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.m
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 lone CR: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 `>` | INBOX bytes ff fe 23 00 20 00 49 00
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 ps51 `>`: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 Out-File | INBOX bytes ff fe 23 00 20 00 49 00
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 ps51 Out-File: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 Set-Content | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) (read as Windows-1252: not valid UTF-8, and no byte-order mark)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 ps51 Set-Content: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 Add-Content | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) (read as Windows-1252: not valid UTF-8, and no byte-order mark)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 ps51 Add-Content: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 Out-File -Encoding utf8 | INBOX bytes ef bb bf 23 20 49 6e 62
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 ps51 Out-File -Encoding utf8: stale inputs are all STALE, and bare --commit refuses and writes nothing
+---- ps51 Get-Content|Set-Content (round trip of a UTF-8 file) | INBOX bytes 23 20 49 6e 62 6f 78 20
+     stale  : draft 0; 3 stale / 0 ctt / 0 current; bare --commit exit 1, wrote 0 beyond draft+report, state.json false; --accept-stale exit 0
+              INBOX: - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: draft 0; 0 stale / 0 ctt / 3 current; bare --commit exit 0, state.json true
+PASS IF-9 ps51 Get-Content|Set-Content (round trip of a UTF-8 file): stale inputs are all STALE, and bare --commit refuses and writes nothing
+NOTE IF-9 evidence: utf8: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: utf8-bom: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: crlf: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: utf8-bom+crlf: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: utf16le-bom: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: utf16le-bom+crlf: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: utf16be-bom: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: utf16le-nobom: INBOX evidence DIFFERS
+NOTE IF-9 evidence: cp1252 (em dashes): INBOX evidence DIFFERS
+NOTE IF-9 evidence: cp1252 (ASCII only): INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: lone CR: INBOX evidence DIFFERS
+NOTE IF-9 evidence: ps51 `>`: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: ps51 Out-File: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: ps51 Set-Content: INBOX evidence DIFFERS
+NOTE IF-9 evidence: ps51 Add-Content: INBOX evidence DIFFERS
+NOTE IF-9 evidence: ps51 Out-File -Encoding utf8: INBOX evidence IDENTICAL to plain UTF-8
+NOTE IF-9 evidence: ps51 Get-Content|Set-Content (round trip of a UTF-8 file): INBOX evidence IDENTICAL to plain UTF-8
+
+==================== R2-1: SUMMARY.md in each shape, current project, --commit
+NOTE R2-1 SUMMARY utf8: --commit exit 0 (state import — committed); after: first bytes 23 20 50 72; title at line 1, region begins at line 3; original status blockquote still present: false; tree (migrated)
+NOTE R2-1 SUMMARY utf8-bom: --commit exit 0 (state import — committed); after: first bytes 23 20 50 72; title at line 1, region begins at line 3; original status blockquote still present: false; tree (migrated)
+NOTE R2-1 SUMMARY utf16le-bom+crlf: --commit exit 0 (state import — committed); after: first bytes 23 20 50 72; title at line 1, region begins at line 3; original status blockquote still present: false; tree (migrated)
+NOTE R2-1 SUMMARY cp1252 (em dashes): --commit exit 1 (state import refused: .agents/SYSTEM/SUMMARY.md is not valid UTF-8 and has no byte-order mark, so its encoding can only be guessed, and --commit rewri); after: first bytes 23 20 50 72; title at line 1, region begins at line 0; original status blockquote still present: true; tree identical
+NOTE R2-1 SUMMARY lone CR: --commit exit 0 (state import — committed); after: first bytes 23 20 50 72; title at line 1, region begins at line 3; original status blockquote still present: true; tree (migrated)
+
+==================== R2-2 / IF-10: declared session against log 7
+NOTE IF-10 ahead by 13: - could not tell `.agents/SESSIONS/next-session.md`: line 3 declares Session 20 (`> Updated at end of Session 20.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md). It declares a session AHEAD of the latest log, so the numbers disagree and cannot say whether it is current || bare --commit exit 0, prints the could-not-tell line
+NOTE IF-10 ahead by 1: - could not tell `.agents/SESSIONS/next-session.md`: line 3 declares Session 8 (`> Updated at end of Session 8.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md). It declares a session AHEAD of the latest log, so the numbers disagree and cannot say whether it is current || bare --commit exit 0, prints the could-not-tell line
+NOTE IF-10 equal: - current `.agents/SESSIONS/next-session.md`: line 3 declares Session 7 (`> Updated at end of Session 7.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) || bare --commit exit 0
+NOTE IF-10 behind by 1: - **STALE** `.agents/SESSIONS/next-session.md`: line 3 declares Session 6 (`> Updated at end of Session 6.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) || bare --commit exit 1
+NOTE IF-10 title 'Handoff for Session 8', log 7: - could not tell `.agents/SESSIONS/next-session.md`: line 1 declares Session 8 (`# Handoff for Session 8`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md). It declares a session A
+
+==================== R2-3 / IF-11: complete, or change nothing
+PASS IF-11 PROBE-2 (no SESSIONS/): --commit exit 0; state.json true; views: INBOX.md true, task.md true, next-session.md true, SUMMARY.md true
+NOTE IF-11 PROBE-2 (no SESSIONS/): a second --commit: exit 1: state import refused: .agents/state.json already exists — the importer runs once; nothing written
+---- IF-11 read-only INBOX.md (render step fails): exit 1
+     | state import refused: EPERM: operation not permitted, rename 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-infra\dd2af804-42bc-4061-8190-2459da415a73\scratchpad\pr2\r23-ro-inbox\.agents\TASKS\INBOX.md.tmp-20244' -> 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-infra\dd2af804-42bc-4061-8190-2459da415a73\scratchpad\pr2\r23-ro-inbox\.agents\TASKS\INBOX.md'. Rolled back: .agents/ was restored from the snapshot, and the snapshot removed, so nothing changed
+PASS IF-11 read-only INBOX.md (render step fails): the tree is byte-identical to before, including the read-only bit (identical)
+NOTE IF-11 read-only INBOX.md (render step fails): with mtimes compared too: identical
+PASS IF-11 read-only INBOX.md (render step fails): made writable, the second --commit completes (exit 0)
+PASS IF-11 --force-snapshot + render failure: exit 1; tree identical
+NOTE IF-11 junction inside .agents/ + render failure: mklink /J exit 0: Junction created for C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-infra\dd2af804-42bc-4061-8190-2459da415a73\scratchpad\pr2\r23-junction\.agents\linked <<===>> C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-infra\dd2af804-42bc-4061-8190-2459da415a73\scratchpad\pr2\r23-junction-TARGET
+---- IF-11 junction inside .agents/ + render failure: exit 1
+     | state import refused: EPERM: operation not permitted, symlink 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-infra\dd2af804-42bc-4061-8190-2459da415a73\scratchpad\pr2\r23-junction-TARGET' -> 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-infra\dd2af804-42bc-4061-8190-2459da415a73\scratchpad\pr2\r23-junction\.agents\archive\pre-state-migration-2026-09-25\linked'
+PASS IF-11 junction inside .agents/ + render failure: the junction's target outside the project is untouched (identical)
+NOTE IF-11 junction inside .agents/ + render failure: .agents/linked after: still a link; archive/ exists false
+---- IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): exit 1
+     | state import refused: EBUSY: resource busy or locked, open 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-infra\dd2af804-42bc-4061-8190-2459da415a73\scratchpad\pr2\r23-rollback-fails\.agents\SYSTEM\SUMMARY.md'. ROLLBACK FAILED (EBUSY: resource busy or locked, unlink 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-infra\dd2af804-42bc-4061-8190-2459da415a73\scratchpad\pr2\r23-rollback-fails\.agents\SYSTEM\SUMMARY.md'): .agents/ is part-migrated. Restore it by hand from C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-infra\dd2af804-42bc-4061-8190-2459da415a73\scratchpad\pr2\r23-rollback-fails\.agents\archive\pre-state-migration-2026-09-25, which was kept. --draft and --commit refuse until C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-infra\dd2af804-42bc-4061-8190-2459da415a73\scratchpad\pr2\r23-rollback-fails\.agents\archive\pre-state-migration-2026-09-25.import-incomplete is deleted
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): the live tree (outside archive/) right after the failure: REMOVED 5 [.agents/SESSIONS/, .agents/SESSIONS/next-session.md, .agents/SESSIONS/Session_7.md, .agents/state.draft.json, .agents/state.import-report.md]; added 0 []; changed 0 []
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): archive/: pre-state-migration-2026-09-25, pre-state-migration-2026-09-25.import-incomplete
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): the kept snapshot holds 10 entries; original .agents entries missing or differing in it: 0
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): re-run 1, --draft: exit 1; ; staleness line: ; the kept snapshot still holds Session_7.md
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): re-run 2, --commit: exit 1: state import refused: .agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from .agents/archive/pre-state-migration-2026-09-25/, which holds every original, then delete .agents/arch; the kept snapshot still holds Session_7.md; snapshot directory exists: true
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): re-run 3, --commit --force-snapshot, as re-run 2's refusal advises: exit 1: state import refused: .agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from .agents/archive/pre-state-migration-2026-09-25/, which holds 
+NOTE IF-11 the rollback itself fails (SUMMARY.md held open, share=Read): after re-run 3: the snapshot now holds 10 entries; the session files from before the import that exist NOWHERE in the project any more: none
+
+==================== R2-4 / IF-12: tokens, before and after the flag, standing in ANOTHER drafted project
+ok   --draft -x                                   [F T B] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --draft -x                                   [F B T] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --draft -x                                   [T F B] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --draft -x                                   [T B F] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --draft -x                                   [B F T] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --draft -x                                   [B T F] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --draft -x                                   [T F] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --draft -x                                   [F T] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --draft x                                    [F T B] exit 1; A = B = C = | state import refused: more than one directory given (x, <scratch>\r24-B-named). Pass one project directory. Nothing writte
+ok   --draft x                                    [F B T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, x). Pass one project directory. Nothing writte
+ok   --draft x                                    [T F B] exit 1; A = B = C = | state import refused: more than one directory given (x, <scratch>\r24-B-named). Pass one project directory. Nothing writte
+ok   --draft x                                    [T B F] exit 1; A = B = C = | state import refused: more than one directory given (x, <scratch>\r24-B-named). Pass one project directory. Nothing writte
+ok   --draft x                                    [B F T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, x). Pass one project directory. Nothing writte
+ok   --draft x                                    [B T F] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, x). Pass one project directory. Nothing writte
+ok   --draft x                                    [T F] exit 1; A = B = C = | state import refused: x does not exist or is not a directory (resolved to <scratch>\r24-A-cwd\x). Nothing written.
+ok   --draft x                                    [F T] exit 1; A = B = C = | state import refused: x does not exist or is not a directory (resolved to <scratch>\r24-A-cwd\x). Nothing written.
+ok   --draft second positional (another project)  [F T B] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-C-other, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft second positional (another project)  [F B T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft second positional (another project)  [T F B] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-C-other, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft second positional (another project)  [T B F] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-C-other, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft second positional (another project)  [B F T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft second positional (another project)  [B T F] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft non-existent directory               [F T B] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\no-such-dir, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft non-existent directory               [F B T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft non-existent directory               [T F B] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\no-such-dir, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft non-existent directory               [T B F] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\no-such-dir, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft non-existent directory               [B F T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft non-existent directory               [B T F] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --draft non-existent directory               [T F] exit 1; A = B = C = | state import refused: <scratch>\no-such-dir does not exist or is not a directory (resolved to C:\Users\melve\AppData\Local
+ok   --draft non-existent directory               [F T] exit 1; A = B = C = | state import refused: <scratch>\no-such-dir does not exist or is not a directory (resolved to C:\Users\melve\AppData\Local
+ok   --commit -x                                   [F T B] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --commit -x                                   [F B T] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --commit -x                                   [T F B] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --commit -x                                   [T B F] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --commit -x                                   [B F T] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --commit -x                                   [B T F] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --commit -x                                   [T F] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --commit -x                                   [F T] exit 1; A = B = C = | state import refused: unrecognised flag(s) -x. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written.
+ok   --commit x                                    [F T B] exit 1; A = B = C = | state import refused: more than one directory given (x, <scratch>\r24-B-named). Pass one project directory. Nothing writte
+ok   --commit x                                    [F B T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, x). Pass one project directory. Nothing writte
+ok   --commit x                                    [T F B] exit 1; A = B = C = | state import refused: more than one directory given (x, <scratch>\r24-B-named). Pass one project directory. Nothing writte
+ok   --commit x                                    [T B F] exit 1; A = B = C = | state import refused: more than one directory given (x, <scratch>\r24-B-named). Pass one project directory. Nothing writte
+ok   --commit x                                    [B F T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, x). Pass one project directory. Nothing writte
+ok   --commit x                                    [B T F] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, x). Pass one project directory. Nothing writte
+ok   --commit x                                    [T F] exit 1; A = B = C = | state import refused: x does not exist or is not a directory (resolved to <scratch>\r24-A-cwd\x). Nothing written.
+ok   --commit x                                    [F T] exit 1; A = B = C = | state import refused: x does not exist or is not a directory (resolved to <scratch>\r24-A-cwd\x). Nothing written.
+ok   --commit second positional (another project)  [F T B] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-C-other, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit second positional (another project)  [F B T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit second positional (another project)  [T F B] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-C-other, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit second positional (another project)  [T B F] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-C-other, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit second positional (another project)  [B F T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit second positional (another project)  [B T F] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit non-existent directory               [F T B] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\no-such-dir, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit non-existent directory               [F B T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit non-existent directory               [T F B] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\no-such-dir, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit non-existent directory               [T B F] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\no-such-dir, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit non-existent directory               [B F T] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit non-existent directory               [B T F] exit 1; A = B = C = | state import refused: more than one directory given (<scratch>\r24-B-named, C:\Users\melve\AppData\Local\Temp\claude\C--Us
+ok   --commit non-existent directory               [T F] exit 1; A = B = C = | state import refused: <scratch>\no-such-dir does not exist or is not a directory (resolved to C:\Users\melve\AppData\Local
+ok   --commit non-existent directory               [F T] exit 1; A = B = C = | state import refused: <scratch>\no-such-dir does not exist or is not a directory (resolved to C:\Users\melve\AppData\Local
+PASS IF-12 matrix: 60 runs: every one exits 1 and leaves A, B and C unchanged (hash, size, mtime, read-only bit); 0 did not
+NOTE IF-12 '' (an empty argument, as an unset "$DIR" gives): ["--commit",""] exit 0; changed: A | state import — committed [expected: refuse, or at least not A]
+NOTE IF-12 '' before a real directory: ["--commit","","<B>"] exit 1; changed: none | state import refused: more than one directory given (, <scratch>\r24-edge1-B-named). Pass one project directory. Nothing w [expected: refuse]
+NOTE IF-12 '-' alone: ["--commit","-","<B>"] exit 1; changed: none | state import refused: unrecognised flag(s) -. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written. [expected: refuse]
+NOTE IF-12 '--' (end of options): ["--commit","--","<B>"] exit 1; changed: none | state import refused: unrecognised flag(s) --. Known: --draft, --commit, --force-snapshot, --accept-stale. Nothing written. [expected: refuse]
+NOTE IF-12 an existing FILE as the directory: ["--commit","<B>/package.json"] exit 1; changed: none | state import refused: <scratch>\r24-edge4-B-named\package.json does not exist or is not a directory (resolved to C:\Users\ [expected: refuse]
+NOTE IF-12 B's own subdirectory .agents/TASKS (walk-up kept by design): ["--draft","<B>/.agents/TASKS"] exit 0; changed: B | state import — draft (nothing else changed) [expected: B only (a draft rewrite)]
+NOTE IF-12 the same directory twice: ["--commit","<B>","<B>"] exit 1; changed: none | state import refused: more than one directory given (<scratch>\r24-edge6-B-named, C:\Users\melve\AppData\Local\Temp\claude [expected: refuse (conservative) or B]
+NOTE IF-12 control: --commit <B> from A: ["--commit","<B>"] exit 0; changed: B | state import — committed [expected: B only]
+PASS IF-12 control: the named project, and only it, is committed, and the output names its root
+NOTE IF-12 control: <C> alone, flag after (the matrix's excluded orders): ["<B>","--commit"] exit 0; changed: B | state import — committed [expected: B only]
+PASS IF-12 control, directory before the flag: a single named project before the flag is committed, and nothing else
+
+SUMMARY: 24 passed, 1 failed
