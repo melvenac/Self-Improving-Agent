@@ -37,6 +37,19 @@ further adoption (T-181). There is no version bump in these commits: the release
     inputs at A2A-Hub `e0bc3f8`. It is on `.agents/retirements.json`'s `historical` list, like the
     other three fixture directories, because its text names SIA's retired mailbox.
 
+### Fixed in round 2 (`docs/loops/importer-fixes-round-2-brief.md`, after QA 102)
+
+- **A byte-order mark no longer hides a stale input (QA's D2).** A leading UTF-8 BOM kept the
+  `# ` title line from being found, so a stale input read as *could not tell* under a false reason
+  ("names no `Session N`"), and `--commit` went ahead without `--accept-stale`. Every file the
+  importer reads is now decoded at one point: a UTF-8 BOM is dropped, and UTF-16 with a BOM (what
+  Windows PowerShell 5.1's `>` and `Out-File` write) is decoded. A judged input that is neither
+  valid UTF-8 nor BOM-marked UTF-16 is *could not tell*, and the reason names the encoding. The
+  same read feeds the objective, the handoff, the INBOX parse and the latest log's date, which had
+  the same blind spot. `--commit` writes SUMMARY.md back as plain UTF-8 (the original is in the
+  snapshot), and refuses before any write when SUMMARY.md cannot be decoded, since it rewrites that
+  file in place. CRLF needed nothing: every split is `\r?\n`.
+
 ## [0.44.2] - 2026-09-24 — a Windows profile with a space in its name
 
 Found by the first full-suite run on the dedicated QA machine (`desktop-o4egb1e`, D-045), whose

@@ -88,6 +88,58 @@ export interface ImportReport {
 export interface ImportDraft { state: State; report: ImportReport }
 
 // ---------------------------------------------------------------------------
+// Reading: every text the importer judges or imports is decoded here, once.
+// ---------------------------------------------------------------------------
+
+/**
+ * How a file's bytes were turned into text. The byte-order mark is a property
+ * of the file, not of its first line: left in the text, U+FEFF hid a `# ` title
+ * from every `startsWith` in this module, and a stale input read as unmarked
+ * (QA 102, D2). UTF-16 is what Windows PowerShell 5.1's `>` and `Out-File`
+ * write, BOM first. Line endings need nothing here: every split is `\r?\n`.
+ */
+export type TextEncoding = "utf8" | "utf8-bom" | "utf16le-bom" | "utf16be-bom";
+export interface DecodedText {
+  text: string;
+  encoding: TextEncoding;
+  /** Why the text cannot be trusted as read, or null. Such an input is never judged. */
+  undecodable: string | null;
+}
+
+export function decodeText(buf: Buffer): DecodedText {
+  if (buf.length >= 3 && buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) return withCheck(buf.subarray(3), "utf8-bom");
+  if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) return { text: buf.subarray(2).toString("utf16le"), encoding: "utf16le-bom", undecodable: null };
+  if (buf.length >= 2 && buf[0] === 0xfe && buf[1] === 0xff) return { text: Buffer.from(buf.subarray(2)).swap16().toString("utf16le"), encoding: "utf16be-bom", undecodable: null };
+  return withCheck(buf, "utf8");
+}
+
+function withCheck(buf: Buffer, encoding: "utf8" | "utf8-bom"): DecodedText {
+  let text: string;
+  try {
+    text = new TextDecoder("utf-8", { fatal: true }).decode(buf);
+  } catch {
+    return { text: buf.toString("utf-8"), encoding, undecodable: "not valid UTF-8, and no UTF-16 byte-order mark: its encoding is unknown, so its words cannot be read" };
+  }
+  if (text.includes("\u0000")) return { text, encoding, undecodable: "contains NUL bytes, as UTF-16 without a byte-order mark would: its encoding is unknown, so its words cannot be read" };
+  return { text, encoding, undecodable: null };
+}
+
+/**
+ * SUMMARY.md goes back as plain UTF-8, whatever it was read as. The renderer
+ * that inserts its marked region straight after, and every ob_state write after
+ * that, reads it as UTF-8 and looks for its `# ` title with `startsWith` — so a
+ * BOM kept here would put the region above the title. The original bytes are in
+ * the snapshot.
+ */
+function summaryBytes(text: string): Buffer {
+  return Buffer.from(text, "utf-8");
+}
+
+export function readText(p: string): DecodedText | null {
+  return existsSync(p) ? decodeText(readFileSync(p)) : null;
+}
+
+// ---------------------------------------------------------------------------
 // INBOX.md → tasks[]
 // ---------------------------------------------------------------------------
 
@@ -350,7 +402,7 @@ export function findLastSession(sessionsDir: string, today: string): ImportRepor
     }
   }
   if (!best) return { n: 0, date: today, uuid: null, file: "(no Session_N.md)" };
-  const text = readFileSync(join(sessionsDir, best.file), "utf-8");
+  const text = decodeText(readFileSync(join(sessionsDir, best.file))).text;
   const date = text.match(/^# Session \d+\s+[—–-]+\s+(\d{4}-\d{2}-\d{2})/m)?.[1] ?? today;
   const uuid = text.match(/Session ID:\*{0,2}\s*`?([0-9a-fA-F-]{36})`?/)?.[1] ?? null;
   return { n: best.n, date, uuid, file: `.agents/SESSIONS/${best.file}` };
@@ -416,7 +468,7 @@ const NOT_JUDGED_REASON: Partial<Record<InputKey, string>> = {
   decisions: "imported as a dated log of past decisions, not as current state",
 };
 
-export function detectStaleness(texts: Record<InputKey, string | null>, last: ImportReport["last_session"]): StalenessReport {
+export function detectStaleness(texts: Record<InputKey, string | null>, last: ImportReport["last_session"], undecodable: Partial<Record<InputKey, string>> = {}): StalenessReport {
   const latest = last.n > 0 ? { n: last.n, file: last.file } : null;
   const inputs: InputStaleness[] = [];
   const not_judged: StalenessReport["not_judged"] = [];
@@ -425,6 +477,10 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
     const text = texts[key];
     if (text === null) { not_judged.push({ input, reason: "absent: nothing is imported from it" }); continue; }
     if (!JUDGED.includes(key)) { not_judged.push({ input, reason: NOT_JUDGED_REASON[key]! }); continue; }
+    if (undecodable[key]) {
+      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: undecodable[key]! });
+      continue;
+    }
     if (!latest) {
       inputs.push({ input, verdict: "could_not_tell", declared_session: declaredSession(text)?.n ?? null, evidence: `no SESSIONS/Session_N.md to compare against (${last.file})` });
       continue;
@@ -440,19 +496,21 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
   return { signal: STALENESS_SIGNAL, latest, inputs, not_judged };
 }
 
-function readInputs(root: string): { paths: Record<InputKey, string>; texts: Record<InputKey, string | null> } {
+function readInputs(root: string): { paths: Record<InputKey, string>; texts: Record<InputKey, string | null>; undecodable: Partial<Record<InputKey, string>> } {
   const paths = Object.fromEntries((Object.keys(INPUT_REL) as InputKey[]).map((k) => [k, join(root, INPUT_REL[k])])) as Record<InputKey, string>;
-  const texts = Object.fromEntries((Object.keys(paths) as InputKey[]).map((k) => [k, readOptional(paths[k])])) as Record<InputKey, string | null>;
-  return { paths, texts };
+  const texts = {} as Record<InputKey, string | null>;
+  const undecodable: Partial<Record<InputKey, string>> = {};
+  for (const k of Object.keys(paths) as InputKey[]) {
+    const d = readText(paths[k]);
+    texts[k] = d?.text ?? null;
+    if (d?.undecodable) undecodable[k] = d.undecodable;
+  }
+  return { paths, texts, undecodable };
 }
 
 // ---------------------------------------------------------------------------
 // The draft
 // ---------------------------------------------------------------------------
-
-function readOptional(p: string): string | null {
-  return existsSync(p) ? readFileSync(p, "utf-8") : null;
-}
 
 function lineCount(text: string | null): number {
   return text ? text.split(/\r?\n/).length : 0;
@@ -461,7 +519,7 @@ function lineCount(text: string | null): number {
 export function buildImportDraft(projectRoot: string, today: string): ImportDraft {
   const root = resolve(projectRoot);
   const pkg = readJson<{ name?: string; version?: string }>(join(root, "package.json"));
-  const { paths, texts } = readInputs(root);
+  const { paths, texts, undecodable } = readInputs(root);
 
   const last = findLastSession(join(root, ".agents/SESSIONS"), today);
   const current = last.n;
@@ -470,7 +528,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
     project: { name: pkg?.name ?? "unknown", version: pkg?.version ?? "0.0.0" },
     current_session: current,
     migration_date: today,
-    staleness: detectStaleness(texts, last),
+    staleness: detectStaleness(texts, last, undecodable),
     sources: Object.fromEntries(Object.entries(paths).map(([k, p]) => [k, { path: relative(root, p).replace(/\\/g, "/"), present: existsSync(p), lines: lineCount(texts[k as keyof typeof texts]) }])),
     inbox: {
       items: 0,
@@ -699,12 +757,17 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   if (parsed.data.revision !== 0) throw new Error(`${DRAFT_REL} revision must be 0 (is ${parsed.data.revision}) — nothing written`);
 
   // 0. T-180: a stale input refuses before anything is written, including the snapshot.
-  const staleness = detectStaleness(readInputs(root).texts, findLastSession(join(root, ".agents/SESSIONS"), today));
+  const onDisk = readInputs(root);
+  const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable);
   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
   if (stale.length > 0 && opts.acceptStale !== true) {
     const list = stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ");
     throw new Error(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${list}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
   }
+  // SUMMARY.md is the one input --commit rewrites in place rather than regenerates.
+  const summaryPath = join(root, ".agents/SYSTEM/SUMMARY.md");
+  const summaryRead = readText(summaryPath);
+  if (summaryRead?.undecodable) throw new Error(`.agents/SYSTEM/SUMMARY.md is ${summaryRead.undecodable}, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
 
   // 1. Snapshot before anything under .agents/ changes.
   const snapshot = takeSnapshot(root, today, opts.forceSnapshot === true);
@@ -713,11 +776,10 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   writeFileSync(statePath, serializeState(parsed.data), "utf-8");
 
   // 3. SUMMARY.md surgery (the removed text is in the snapshot).
-  const summaryPath = join(root, ".agents/SYSTEM/SUMMARY.md");
   let summary: CommitResult["summary"] = null;
-  if (existsSync(summaryPath)) {
-    const plan = planSummaryRemoval(readFileSync(summaryPath, "utf-8"));
-    writeFileSync(summaryPath, plan.text, "utf-8");
+  if (summaryRead) {
+    const plan = planSummaryRemoval(summaryRead.text);
+    writeFileSync(summaryPath, summaryBytes(plan.text));
     summary = plan.report;
   }
 

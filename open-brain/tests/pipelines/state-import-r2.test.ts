@@ -145,16 +145,38 @@ describe("R2-1 (IF-9): an encoding detail never turns a STALE input into 'could 
     expect(r.state.last_session.date).toBe("2026-09-20");
   });
 
-  it("SUMMARY.md with a BOM: --commit still cuts its status blockquote, and keeps the BOM it found", () => {
+  it("SUMMARY.md with a BOM: --commit still cuts its status blockquote, and the rendered region lands under the title", () => {
     writeProject(root, 7, bodies({ next: "Session 7", inbox: "Session 7", task: "Session 7" }));
     writeFileSync(join(root, ".agents/SYSTEM/SUMMARY.md"), `${BOM}# Summary\n\n> **Status:** old status line\n\n## About\n\nKept.\n`);
     const d = runDraft(root, TODAY).draft.report as { summary_removal: { blockquote_lines: number } | null };
     expect(d.summary_removal?.blockquote_lines).toBe(1);
     runCommit(root, TODAY);
     const after = readFileSync(join(root, ".agents/SYSTEM/SUMMARY.md"), "utf-8");
-    expect(after.startsWith(BOM)).toBe(true);
+    expect(after.startsWith("# Summary\n")).toBe(true);
+    expect(after).not.toContain(BOM);
     expect(after).not.toContain("old status line");
     expect(after).toContain("## About\n\nKept.");
+  });
+
+  it("SUMMARY.md in UTF-16: --commit cuts its blockquote and writes it back as UTF-8, which the renderer and ob_state read", () => {
+    writeProject(root, 7, bodies({ next: "Session 7", inbox: "Session 7", task: "Session 7" }));
+    writeFileSync(join(root, ".agents/SYSTEM/SUMMARY.md"), utf16leBom("# Summary\n\n> **Status:** old status line\n\n## About\n\nKept.\n"));
+    runDraft(root, TODAY);
+    runCommit(root, TODAY);
+    const after = readFileSync(join(root, ".agents/SYSTEM/SUMMARY.md"));
+    expect(after[0]).toBe(0x23); // "#": no BOM, no UTF-16
+    const text = after.toString("utf-8");
+    expect(text).not.toContain("old status line");
+    expect(text).toContain("## About\n\nKept.");
+  });
+
+  it("SUMMARY.md that cannot be decoded: --commit refuses before anything is written, since it rewrites that file in place", () => {
+    writeProject(root, 7, bodies({ next: "Session 7", inbox: "Session 7", task: "Session 7" }));
+    writeFileSync(join(root, ".agents/SYSTEM/SUMMARY.md"), Buffer.from("# Summary\n\n> st\xe9tus\n", "latin1"));
+    runDraft(root, TODAY);
+    const before = tree(root);
+    expect(() => runCommit(root, TODAY)).toThrow(/SUMMARY\.md is not valid UTF-8/);
+    expect(tree(root)).toEqual(before);
   });
 });
 
