@@ -461,7 +461,7 @@ const agrees = (snapshot: FileState, now: FileState | null): boolean => {
 const stateHash = (s: FileState | null): string => {
   if (s === null) return "absent";
   if (s.kind === "symlink") return `type:symlink readlink:${s.target}`;
-  if (s.unreadIdentity) return `identity:dev ${s.dev} ino ${s.ino} nlink ${s.nlink}; not read`;
+  if (s.unreadIdentity) return `identity:dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}; not read`;
   return `${hashOf(s.bytes)}/${s.mode.toString(8)}/nlink:${s.nlink}`;
 };
 
@@ -1090,6 +1090,12 @@ export class MachineConfigWatch {
       a.nlink === b.nlink &&
       a.size === b.size &&
       a.mtimeNs === b.mtimeNs;
+    const stageBefore = (opened: MachineSnap): string => {
+      if (opened.state === "read") return opened.hash;
+      if (opened.reason === "unreadable" || opened.hash === "unreadable") return "unreadable";
+      if (opened.resolvedPath === null) return "absent";
+      return `type ${opened.kind} dev ${opened.dev} ino ${opened.ino} nlink ${opened.nlink} size ${opened.size} mtimeNs ${opened.mtimeNs}`;
+    };
     for (const p of this.paths) {
       const base = this.loopBase.get(p.path)!;
       const opened = start.get(p.path)!;
@@ -1099,7 +1105,7 @@ export class MachineConfigWatch {
         continue;
       }
       if (end.state === "read") {
-        const before = base.state === "read" ? base.hash : base.resolvedPath === null ? "absent" : `type:${base.lexicalKind}`;
+        const before = stageBefore(opened);
         if (before !== end.hash || opened.state !== "read") {
           out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after: end.hash });
         }
@@ -1121,7 +1127,7 @@ export class MachineConfigWatch {
           base.resolvedPath === null
             ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through`
             : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: base ${base.resolvedPath ?? "unresolved"} dev ${base.dev} ino ${base.ino} nlink ${base.nlink}; current ${end.resolvedPath ?? "unresolved"} dev ${end.dev} ino ${end.ino} nlink ${end.nlink}`;
-        const before = base.state === "read" ? base.hash : base.resolvedPath === null ? "absent" : `type:${base.lexicalKind}`;
+        const before = stageBefore(opened);
         out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
         continue;
       }
@@ -1135,14 +1141,7 @@ export class MachineConfigWatch {
             : end.resolvedPath === null
               ? `unwatched: ${end.reason}; not read`
               : `not read: base ${opened.resolvedPath ?? "unresolved"} dev ${opened.dev} ino ${opened.ino} nlink ${opened.nlink} size ${opened.size} mtimeNs ${opened.mtimeNs}; current ${end.resolvedPath} dev ${end.dev} ino ${end.ino} nlink ${end.nlink} size ${end.size} mtimeNs ${end.mtimeNs}`;
-      const before =
-        opened.state !== "read" && opened.resolvedPath !== null
-          ? `type ${opened.kind} dev ${opened.dev} ino ${opened.ino} nlink ${opened.nlink} size ${opened.size} mtimeNs ${opened.mtimeNs}`
-          : base.state === "read"
-            ? base.hash
-            : base.resolvedPath === null
-              ? "absent"
-              : `type:${base.lexicalKind}`;
+      const before = stageBefore(opened);
       out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
     }
     return out;
