@@ -1166,7 +1166,7 @@ export class MachineConfigWatch {
             ? `unreadable; current ${factText(end)}`
             : end.resolvedPath === null
               ? `unwatched: ${end.reason}; not read`
-              : `not read: base ${factText(base)}; current ${factText(end)}`;
+              : `not read: base ${base.resolvedPath ?? "unresolved"} ${factText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
       const before = unreadBoth ? `unreadable; stage start ${factText(opened)}` : stageBefore(opened);
       out.push(row(before, after, true, p.path, p.scope));
     }
