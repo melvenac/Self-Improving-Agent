@@ -205,3 +205,8 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   `origin/loop/importer-fixes-r2`, rows IF-16 to IF-20.
 - **Relay recorded Aaron's "yes" as A2A-Hub D-014** on its branch `docs/session-18-d014` (`3d4f5ff`), not merged.
   Merging it is an A2A-Hub-only act, so Aaron gives Relay that word directly.
+- **R79 accepted at `afee764`** (handoff `0a01d4a`). Five mutants, each a one-line change to `configwatch.ts`,
+  verified on tcm: R61 hash-first 36195704206 (**the narrowed R61 detector is validated against a known
+  positive**), (a) 36195723043, (b) 36195745609, (c) 36195768996, (d) 36195795635, all killed. R80 dispatched.
+- **Forge 110** reported its effort as "low". **Aaron: "forge infra is on effort medium"** (verbatim). Recorded as
+  medium on Aaron's word, and the self-report disagreement is recorded as a finding for D-047.
