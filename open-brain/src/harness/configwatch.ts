@@ -1105,7 +1105,7 @@ export class MachineConfigWatch {
         continue;
       }
       if (end.state === "read") {
-        const before = stageBefore(opened);
+        const before = base.state === "read" ? base.hash : "absent";
         if (before !== end.hash || opened.state !== "read") {
           out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after: end.hash });
         }
@@ -1127,7 +1127,7 @@ export class MachineConfigWatch {
           base.resolvedPath === null
             ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through`
             : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: base ${base.resolvedPath ?? "unresolved"} dev ${base.dev} ino ${base.ino} nlink ${base.nlink}; current ${end.resolvedPath ?? "unresolved"} dev ${end.dev} ino ${end.ino} nlink ${end.nlink}`;
-        const before = stageBefore(opened);
+        const before = base.state === "read" ? base.hash : base.resolvedPath === null ? "absent" : `type:${base.lexicalKind}`;
         out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
         continue;
       }
@@ -1141,7 +1141,7 @@ export class MachineConfigWatch {
             : end.resolvedPath === null
               ? `unwatched: ${end.reason}; not read`
               : `not read: base ${opened.resolvedPath ?? "unresolved"} dev ${opened.dev} ino ${opened.ino} nlink ${opened.nlink} size ${opened.size} mtimeNs ${opened.mtimeNs}; current ${end.resolvedPath} dev ${end.dev} ino ${end.ino} nlink ${end.nlink} size ${end.size} mtimeNs ${end.mtimeNs}`;
-      const before = stageBefore(opened);
+      const before = base.state === "read" ? base.hash : base.resolvedPath === null ? "absent" : `type:${base.lexicalKind}`;
       out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
     }
     return out;
