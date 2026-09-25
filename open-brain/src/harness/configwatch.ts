@@ -398,6 +398,8 @@ interface FileState {
   target: string | null;
   /** Set when dev, ino or nlink disagreed with the baseline, so the bytes were not read (R43). */
   unreadIdentity: boolean;
+  /** Set when the bytes were refused (EACCES/EPERM). The record says unreadable, with the facts (R72, R73). */
+  readError: string | null;
 }
 
 const fileState = (id: PathIdentity, bytes: Buffer | null, unreadIdentity: boolean): FileState => ({
@@ -411,6 +413,7 @@ const fileState = (id: PathIdentity, bytes: Buffer | null, unreadIdentity: boole
   mtimeNs: id.mtimeNs,
   target: null,
   unreadIdentity,
+  readError: null,
 });
 
 /**
@@ -424,14 +427,20 @@ const fileState = (id: PathIdentity, bytes: Buffer | null, unreadIdentity: boole
 const readState = (p: string, baseline?: FileState | null, preflight = false): FileState | null => {
   const id = identify(p);
   if (id.kind === "symlink") {
-    return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false };
+    return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null };
   }
   if (id.kind !== "file") return null;
   const hadFile = baseline?.kind === "file";
   const same = hadFile && baseline.dev === id.dev && baseline.ino === id.ino && baseline.nlink === id.nlink;
   if (hadFile && !same) return fileState(id, null, true);
   if (!hadFile && id.nlink !== 1 && !preflight) return fileState(id, null, true);
-  return fileState(id, readFileSync(p), false);
+  try {
+    return fileState(id, readFileSync(p), false);
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code !== "EACCES" && code !== "EPERM") throw err;
+    return { ...fileState(id, null, true), readError: "unreadable" };
+  }
 };
 
 /** A change, including a hard link whose bytes still match (nlink or inode moved). */
@@ -439,8 +448,8 @@ const changed = (a: FileState | null, b: FileState | null): boolean => {
   if (a === null || b === null) return a !== b;
   if (a.kind !== b.kind) return true;
   if (a.kind === "symlink" || b.kind === "symlink") return a.target !== b.target;
-  if (a.unreadIdentity || b.unreadIdentity) {
-    return a.kind !== b.kind || a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink || a.size !== b.size || a.mtimeNs !== b.mtimeNs;
+  if (a.unreadIdentity || b.unreadIdentity || a.readError !== b.readError) {
+    return a.kind !== b.kind || a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink || a.size !== b.size || a.mtimeNs !== b.mtimeNs || a.readError !== b.readError;
   }
   if (a.dev !== b.dev || a.ino !== b.ino || a.nlink !== b.nlink) return true;
   return a.mode !== b.mode || !a.bytes!.equals(b.bytes!);
@@ -461,6 +470,7 @@ const agrees = (snapshot: FileState, now: FileState | null): boolean => {
 const stateHash = (s: FileState | null): string => {
   if (s === null) return "absent";
   if (s.kind === "symlink") return `type:symlink readlink:${s.target}`;
+  if (s.readError) return `unreadable; type file dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
   if (s.unreadIdentity) return `identity:dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}; not read`;
   return `${hashOf(s.bytes)}/${s.mode.toString(8)}/nlink:${s.nlink}`;
 };
@@ -624,6 +634,7 @@ export class ConfigWatch {
             mtimeNs: id.mtimeNs,
             target: id.target,
             unreadIdentity: false,
+            readError: null,
           });
         } else if (id.kind === "file") snap.set(f, fileState(id, null, true));
         else snap.set(f, null);
@@ -644,7 +655,7 @@ export class ConfigWatch {
     if (diff) {
       const id = identify(path);
       if (id.kind === "symlink") {
-        return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false };
+        return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null };
       }
       if (id.kind !== "file") return null;
       return fileState(id, null, true);
@@ -804,6 +815,8 @@ export interface MachineConfigFinding {
   path: string;
   before: string;
   after: string;
+  /** From the facts and hashes compared. Never from whether the two texts are equal (R72). */
+  changed: boolean;
 }
 
 /**
@@ -966,8 +979,9 @@ export class MachineConfigWatch {
       nlink = Number(st.nlink);
       size = st.size;
       mtimeNs = st.mtimeNs;
-    } catch {
-      return unresolved();
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
+      return { ...unresolved(), reason: `did not resolve: ${code}` };
     }
     const note: MachineSnap = {
       lexicalKind: lexical.kind,
@@ -1009,9 +1023,15 @@ export class MachineConfigWatch {
       fd = openSync(p, "r");
       const st = fstatSync(fd, { bigint: true });
       // R70. The single-name condition is re-checked on the handle, with dev, ino and type, before any byte.
-      // R70. The single-name condition is re-checked on the handle, with dev, ino and type, before any byte.
       if (!st.isFile() || st.dev !== dev || st.ino !== ino || Number(st.nlink) !== nlink) {
-        return { ...note, reason: "handle is a different file" };
+        const gained = st.isFile() && st.dev === dev && st.ino === ino && Number(st.nlink) > nlink;
+        return {
+          ...note,
+          nlink: Number(st.nlink),
+          reason: gained
+            ? "handle is a different file; the object gained a name inside open"
+            : "handle is a different file",
+        };
       }
       return { ...note, hash: hashOf(readFileSync(fd)), state: "read", reason: "read" };
     } catch {
@@ -1090,59 +1110,65 @@ export class MachineConfigWatch {
       a.nlink === b.nlink &&
       a.size === b.size &&
       a.mtimeNs === b.mtimeNs;
+    const factText = (s: MachineSnap): string =>
+      `type ${s.kind} dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
     const stageBefore = (opened: MachineSnap): string => {
       if (opened.state === "read") return opened.hash;
       if (opened.reason === "unreadable" || opened.hash === "unreadable") return "unreadable";
       if (opened.resolvedPath === null) return "absent";
-      return `type ${opened.kind} dev ${opened.dev} ino ${opened.ino} nlink ${opened.nlink} size ${opened.size} mtimeNs ${opened.mtimeNs}`;
+      return `stage start ${factText(opened)}`;
     };
+    const row = (before: string, after: string, changed: boolean, path: string, scope: string): MachineConfigFinding => ({
+      stage: this.stage, scope, path, before, after, changed,
+    });
     for (const p of this.paths) {
       const base = this.loopBase.get(p.path)!;
       const opened = start.get(p.path)!;
       const end = this.observe(p.path, base);
       if (end.state === "read" && opened.state === "read") {
-        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: opened.hash, after: end.hash });
+        out.push(row(opened.hash, end.hash, opened.hash !== end.hash, p.path, p.scope));
         continue;
       }
       if (end.state === "read") {
         const before = stageBefore(opened);
         if (before !== end.hash || opened.state !== "read") {
-          out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after: end.hash });
+          out.push(row(before, end.hash, true, p.path, p.scope));
         }
         continue;
       }
       const linkPlanted = end.viaLink !== null && end.viaLink !== opened.viaLink;
       if (sameId(opened, end) && opened.state !== "read" && !linkPlanted) {
-        const stable =
+        const label =
           end.reason === "unreadable" || end.hash === "unreadable"
             ? "unreadable"
             : end.state === "unwatched"
               ? `unwatched: ${end.reason}; not read`
               : `not read: ${end.reason}`;
-        out.push({ stage: this.stage, scope: p.scope, path: p.path, before: stable, after: stable });
+        const stable = end.resolvedPath === null ? label : `${label}; ${factText(end)}`;
+        out.push(row(stable, stable, false, p.path, p.scope));
         continue;
       }
       if (linkPlanted) {
         const after =
           base.resolvedPath === null
-            ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through`
-            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: base ${base.resolvedPath ?? "unresolved"} dev ${base.dev} ino ${base.ino} nlink ${base.nlink}; current ${end.resolvedPath ?? "unresolved"} dev ${end.dev} ino ${end.ino} nlink ${end.nlink}`;
-        const before = stageBefore(opened);
-        out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
+            ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${factText(end)}`
+            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: base ${base.resolvedPath ?? "unresolved"} ${factText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
+        out.push(row(stageBefore(opened), after, true, p.path, p.scope));
         continue;
       }
       const typeChange = end.lexicalKind === "symlink" && base.lexicalKind !== "symlink";
+      const unreadBoth = (end.reason === "unreadable" || end.hash === "unreadable") && (opened.reason === "unreadable" || opened.hash === "unreadable");
       const after = typeChange
-        ? `type change: ${p.path} is a ${end.lexicalKind}${end.lexicalTarget ? ` target ${end.lexicalTarget}` : ""}; not read through`
-        : end.reason === "handle is a different file"
-          ? "handle is a different file; not read"
+        ? `type change: ${p.path} is a ${end.lexicalKind}${end.lexicalTarget ? ` target ${end.lexicalTarget}` : ""}; not read through; ${factText(end)}`
+        : end.reason.startsWith("handle is a different file")
+          ? `${end.reason}; not read; ${factText(end)}`
           : end.reason === "unreadable" || end.hash === "unreadable"
-            ? "unreadable"
+            ? `unreadable; current ${factText(end)}`
             : end.resolvedPath === null
               ? `unwatched: ${end.reason}; not read`
-              : `not read: base ${opened.resolvedPath ?? "unresolved"} dev ${opened.dev} ino ${opened.ino} nlink ${opened.nlink} size ${opened.size} mtimeNs ${opened.mtimeNs}; current ${end.resolvedPath} dev ${end.dev} ino ${end.ino} nlink ${end.nlink} size ${end.size} mtimeNs ${end.mtimeNs}`;
-      const before = stageBefore(opened);
-      out.push({ stage: this.stage, scope: p.scope, path: p.path, before, after });
+              : `not read: base ${factText(base)}; current ${factText(end)}`;
+      const before = unreadBoth ? `unreadable; stage start ${factText(opened)}` : stageBefore(opened);
+      out.push(row(before, after, true, p.path, p.scope));
     }
     return out;
   }
