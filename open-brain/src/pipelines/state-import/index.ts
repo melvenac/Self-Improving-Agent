@@ -16,7 +16,7 @@
  * Parsing rules are the brief's, applied literally. Where a rule cannot
  * decide, the item is reported, never guessed silently.
  */
-import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, cpSync, renameSync, statSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, cpSync, renameSync, statSync, rmSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import {
   StateSchema,
@@ -775,32 +775,82 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   const summaryRead = readText(summaryPath);
   if (summaryRead?.undecodable) throw new Error(`.agents/SYSTEM/SUMMARY.md is ${summaryRead.undecodable}, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
 
-  // 1. Snapshot before anything under .agents/ changes.
-  const snapshot = takeSnapshot(root, today, opts.forceSnapshot === true);
-
-  // 2. state.json at revision 0, canonical bytes.
-  writeFileSync(statePath, serializeState(parsed.data), "utf-8");
-
-  // 3. SUMMARY.md surgery (the removed text is in the snapshot).
-  let summary: CommitResult["summary"] = null;
-  if (summaryRead) {
-    const plan = planSummaryRemoval(summaryRead.text);
-    writeFileSync(summaryPath, summaryBytes(plan.text));
-    summary = plan.report;
+  // 1. Snapshot before anything under .agents/ changes. From here on the
+  // import completes or changes nothing (R2-3): every later step runs inside
+  // `migrate`, and a failure in any of them puts .agents/ back from the snapshot.
+  const agents = join(root, ".agents");
+  const archive = join(agents, "archive");
+  const archiveExisted = existsSync(archive);
+  const snapshotDir = join(archive, `${SNAPSHOT_PREFIX}${today}`);
+  // --force-snapshot replaces an earlier snapshot; keep it aside until the import completes.
+  const aside = opts.forceSnapshot === true && existsSync(snapshotDir) ? `${snapshotDir}.replaced-${process.pid}` : null;
+  if (aside) renameSync(snapshotDir, aside);
+  let snapshot: SnapshotResult;
+  try {
+    snapshot = takeSnapshot(root, today, opts.forceSnapshot === true);
+  } catch (err) {
+    // .agents/ outside archive/ is untouched; only the partial snapshot goes.
+    rmSync(snapshotDir, { recursive: true, force: true });
+    if (!archiveExisted) rmSync(archive, { recursive: true, force: true });
+    if (aside) renameSync(aside, snapshotDir);
+    throw err;
   }
 
-  // 4. Render the four views through the Loop 3 renderers (empty batch = no revision bump).
-  const r = applyStateOps(root, { session: parsed.data.last_session.n, expected_revision: 0, ops: [], render: true, version: opts.version });
-  if (!r.ok) throw new Error(`render after commit refused: ${r.error}`);
+  const migrate = () => {
+    // 2. state.json at revision 0, canonical bytes.
+    writeFileSync(statePath, serializeState(parsed.data), "utf-8");
 
-  // 5. Move the draft and the report into the snapshot.
-  const moved: string[] = [];
-  for (const rel of [DRAFT_REL, REPORT_REL]) {
-    const from = join(root, rel);
-    if (!existsSync(from)) continue;
-    const to = join(snapshot.dir, rel.replace(/^\.agents\//, ""));
-    renameSync(from, to);
-    moved.push(relative(root, to).replace(/\\/g, "/"));
+    // 3. SUMMARY.md surgery (the removed text is in the snapshot).
+    let summary: CommitResult["summary"] = null;
+    if (summaryRead) {
+      const plan = planSummaryRemoval(summaryRead.text);
+      writeFileSync(summaryPath, summaryBytes(plan.text));
+      summary = plan.report;
+    }
+
+    // 4. Render the four views through the Loop 3 renderers (empty batch = no revision bump).
+    // A project may lack a directory a view lives in (QA 102's PROBE-2: no SESSIONS/).
+    for (const d of ["SESSIONS", "TASKS", "SYSTEM"]) mkdirSync(join(agents, d), { recursive: true });
+    const r = applyStateOps(root, { session: parsed.data.last_session.n, expected_revision: 0, ops: [], render: true, version: opts.version });
+    if (!r.ok) throw new Error(`render after commit refused: ${r.error}`);
+
+    // 5. Move the draft and the report into the snapshot.
+    const moved: string[] = [];
+    for (const rel of [DRAFT_REL, REPORT_REL]) {
+      const from = join(root, rel);
+      if (!existsSync(from)) continue;
+      const to = join(snapshot.dir, rel.replace(/^\.agents\//, ""));
+      renameSync(from, to);
+      moved.push(relative(root, to).replace(/\\/g, "/"));
+    }
+    return { summary, rendered: r.rendered, moved };
+  };
+
+  let done: ReturnType<typeof migrate>;
+  try {
+    done = migrate();
+  } catch (err) {
+    const why = err instanceof Error ? err.message : String(err);
+    throw new Error(`${why}. ${rollBack(agents, snapshot.dir, archiveExisted, aside)}`);
   }
-  return { statePath, snapshot, summary, rendered: r.rendered, moved, staleness, accepted_stale: stale.map((i) => i.input) };
+  if (aside) rmSync(aside, { recursive: true, force: true });
+  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input) };
+}
+
+/**
+ * Puts `.agents/` back as the snapshot recorded it, then removes the snapshot.
+ * The snapshot is deleted only after the restore finished, so a restore that
+ * fails part-way leaves the one copy that can repair it, and says where.
+ */
+function rollBack(agents: string, snapshotDir: string, archiveExisted: boolean, aside: string | null): string {
+  try {
+    for (const name of readdirSync(agents)) if (name !== "archive") rmSync(join(agents, name), { recursive: true, force: true });
+    for (const name of readdirSync(snapshotDir)) cpSync(join(snapshotDir, name), join(agents, name), { recursive: true });
+  } catch (err) {
+    return `ROLLBACK FAILED (${err instanceof Error ? err.message : String(err)}): .agents/ is part-migrated. Restore it by hand from ${snapshotDir}, which was kept`;
+  }
+  rmSync(snapshotDir, { recursive: true, force: true });
+  if (!archiveExisted) rmSync(join(agents, "archive"), { recursive: true, force: true });
+  if (aside) renameSync(aside, snapshotDir);
+  return "Rolled back: .agents/ was restored from the snapshot, and the snapshot removed, so nothing changed";
 }

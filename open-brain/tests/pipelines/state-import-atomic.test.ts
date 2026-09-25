@@ -90,6 +90,21 @@ describe("R2-3 (IF-11): a failure at any write after the snapshot leaves the pro
     });
   }
 
+  it("with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte", () => {
+    const earlier = join(root, `.agents/archive/pre-state-migration-${TODAY}`);
+    realFs.mkdirSync(earlier, { recursive: true });
+    realFs.writeFileSync(join(earlier, "from-an-earlier-run.md"), "keep me\n");
+    const before = tree(root);
+    inject.writeOn = ".agents/TASKS/task.md";
+    expect(() => runCommit(root, TODAY, { forceSnapshot: true })).toThrow(/induced failure/);
+    inject.writeOn = null;
+    expect(tree(root)).toEqual(before);
+    // And on success the replaced snapshot is gone, not merged into the new one.
+    runCommit(root, TODAY, { forceSnapshot: true });
+    expect(realFs.existsSync(join(earlier, "from-an-earlier-run.md"))).toBe(false);
+    expect(realFs.readdirSync(join(root, ".agents/archive"))).toEqual([`pre-state-migration-${TODAY}`]);
+  });
+
   it("the rollback says what it did in the error", () => {
     inject.writeOn = ".agents/TASKS/task.md";
     expect(() => runCommit(root, TODAY)).toThrow(/rolled back|restored|nothing (was )?changed/i);

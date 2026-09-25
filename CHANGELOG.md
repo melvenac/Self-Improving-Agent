@@ -53,6 +53,12 @@ further adoption (T-181). There is no version bump in these commits: the release
   disagreement 2).** Next-session at Session 20 against `Session_7.md` means renumbering, a
   per-worktree counter or a missing log. It is now *could not tell*, and the reason names both
   numbers.
+- **`--commit` completes or changes nothing (QA's D3).** With no `SESSIONS/` directory, it used to
+  write `state.json` and the snapshot and rewrite INBOX.md and task.md, then fail rendering
+  `next-session.md`. That left the project half-migrated, with every later run refused because
+  `state.json already exists`. It now creates any missing view directory, and a failure at any step
+  after the snapshot restores `.agents/` from the snapshot, removes it, and says so in the error.
+  With `--force-snapshot`, the snapshot being replaced is kept aside until the import completes.
 
 ## [0.44.2] - 2026-09-24 — a Windows profile with a space in its name
 
