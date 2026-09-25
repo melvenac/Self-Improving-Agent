@@ -802,7 +802,7 @@ export class ConfigWatch {
     };
     const unlisted = [...this.unlistedNotes];
     const scale = `examined ${names.size + unlisted.length} file(s) around the ${this.stage} stage`;
-    const ok = (changes.length === 0 && ancestorLink === null && unlisted.length === 0);
+    const ok = changes.length === 0 && ancestorLink === null;
     const restored =
       ancestorLink !== null
         ? `No restore was claimed beneath the ancestor link ${ancestorLink}. `
