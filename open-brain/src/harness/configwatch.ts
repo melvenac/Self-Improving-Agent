@@ -1144,7 +1144,7 @@ export class MachineConfigWatch {
             : end.state === "unwatched"
               ? `unwatched: ${end.reason}; not read`
               : `not read: ${end.reason}`;
-        const stable = end.resolvedPath === null ? label : `${label}; ${factText(end)}`;
+        const stable = label;
         out.push(row(stable, stable, false, p.path, p.scope));
         continue;
       }
