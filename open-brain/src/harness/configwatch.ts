@@ -461,7 +461,7 @@ const agrees = (snapshot: FileState, now: FileState | null): boolean => {
 const stateHash = (s: FileState | null): string => {
   if (s === null) return "absent";
   if (s.kind === "symlink") return `type:symlink readlink:${s.target}`;
-  if (s.unreadIdentity) return `identity:dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}; not read`;
+  if (s.unreadIdentity) return `identity:dev ${s.dev} ino ${s.ino} nlink ${s.nlink}; not read`;
   return `${hashOf(s.bytes)}/${s.mode.toString(8)}/nlink:${s.nlink}`;
 };
 
