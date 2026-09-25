@@ -70,7 +70,10 @@ machine-wide.
   wins. `git ls-files --eol` shows 429 files with `w/lf` and **0 with `w/crlf`**. The zero was checked
   against the non-zero lf count from the same instrument, so it is a count and not a pattern that
   matched nothing.
-- **Build:** `npm ci` rc 0 and `npm run build` rc 0 in `open-brain`. **`better-sqlite3` took its prebuilt
+- **Build:** `npm ci` and `npm run build` in `open-brain` succeeded. **The evidence is the end state**:
+  `build/cli.js` exists, and `better-sqlite3` loads (below). The `rc 0` I first recorded here was NOT
+  their exit code; see near-miss 2 in section 10. A later `npm run build` through the PowerShell runner
+  exited 0. **`better-sqlite3` took its prebuilt
   binary** (`prebuild-install`), with no compiler or build tools. It loads, and
   `select sqlite_version()` gives **3.51.3**. The only notable npm line was `prebuild-install@7.1.3`
   deprecated.
@@ -211,25 +214,30 @@ Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\Aaron' imported from 
 **Failure 2: 1 test in `tests/shared/paths.test.ts:117`,** `projectDirExists / existsCaseInsensitive >
 finds a mixed-case directory through its lowercased canonical path`: `expected false to be true` on
 `existsCaseInsensitive(lowered)`.
-- **Observed, as a separate check:** the same walk, replicated in `walk.cjs` and run alone over ssh, which
-  creates the same kind of temp dir under `C:\Users\Aaron Melven\AppData\Local\Temp`, **succeeds at every
-  level** and ends with `existsSync: true`. `%TEMP%` and `os.tmpdir()` are the long form, not an 8.3
-  short name; that hypothesis was checked and is FALSE.
-- **So the cause is NOT established.** The failure depends on something that differs between the suite's
-  run and an isolated run: the WMI launch context, concurrency within the suite, or something else.
-- **My attempt to run the diagnostic under the same WMI launch produced no output file.** That was my
-  instrument failing (most likely the nested quoting in the WMI command line), not a result.
-- **The discriminating next step:** run `npx vitest run tests/shared/paths.test.ts` alone through the WMI
-  launcher, and again in a plain ssh session, and compare.
+- **Observed:** `paths.test.ts` run ALONE at 6075f6b with the same runner in both contexts. In a plain
+  ssh session: 13/13, exit 0. Through the WMI launch (the baseline's context): **exit 1**. So the launch
+  context is the variable, not concurrency within the suite.
+- **Observed, with a context probe (`ctx.cjs`):** under WMI, `os.tmpdir()`, `TEMP` and `TMP` are
+  **`C:\Users\AARONM~1\AppData\Local\Temp`**, the 8.3 short name. Under ssh they are
+  `C:\Users\Aaron Melven\…`. `USERPROFILE` is the long form in both.
+- **Mechanism (read from the code, consistent with both observations):** the test lowercases the temp
+  path to `c:/users/aaronm~1/…`, and `existsCaseInsensitive` walks it by `readdir`. `C:\Users` lists
+  `Aaron Melven`, never the alias `AARONM~1`, so the walk returns false where `existsSync` is true.
+  **A product function's contract failure.** It is reached in production only behind `projectDirExists`'
+  `existsSync` fast path, which resolves short names on Windows.
+- **Fixed** in PR #156 (`chore/windows-space-path`, v0.44.2), under the planner's option (a):
+  - an unlisted segment is accepted when it resolves;
+  - a win32 regression test builds a real short-name path;
+  - a mutant that reverts the fix turns that test red on the QA PC;
+  - **the full suite at 5f3c898 through WMI on the QA PC: 1035 passed (1035), exit 0.**
+- My first hypothesis check said "8.3: FALSE". That was near-miss 1 (section 10).
 
 **What this does and does not say about G-042:**
 - **Observed:** a quiet, second machine ran the full suite once at 6075f6b with **no `onTaskUpdate` and
   no Unhandled errors**, and failed for two reasons that are not timing.
 - **Not inferred:** that G-042 is absent on this machine. It is n=1, and G-042 is load-dependent.
-- **A caution for anyone reading exit codes from this machine:** it is red at `origin/master` for
-  environment reasons (the space in the profile path). A QA verdict taken here must compare
-  against this baseline's 14 known failures rather than expect green. Or the two defects get fixed first:
-  the planner's call.
+- **The planner ruled: fix both defects** rather than make QA compare against a red baseline. PR #156
+  does. Once it merges, this machine is expected green at master, as observed at 5f3c898.
 
 ## 7. VS Code Remote-SSH (the planner's addition)
 
@@ -271,10 +279,35 @@ stays until the baseline has run.
 
 ## 9. What was not verified
 
-- **The cause of the `paths.test.ts` failure** (section 6.2): unexplained. The next step is named there.
-- **The `cli-bootstrap` cause is inferred** from the error text and the spawn options. No fix was tested.
+- **Both failure causes are now established and fixed in PR #156**, which is verified on the QA PC.
+  Neither fix is on master until Aaron merges it.
 - **Tailscale "Run unattended"** on that PC (section 6.1).
 - **Everything in step 4** (section 4).
 - **Remote-SSH from Aaron's side** (section 7).
 - **The `Members` sessions:** what they are and why they run are unknown, and they are Aaron's to
   explain.
+
+## 10. Near-misses (mine, caught before they reached a verdict)
+
+1. **A hypothesis ruled out in the wrong context.** I tested "the temp path is an 8.3 short name" in a
+   plain ssh session, found the long form, and wrote it down as FALSE. The failing run had been launched
+   through WMI, and there the temp path IS the short form. The check was correct for the context it ran
+   in and said nothing about the context that failed. **The rule I now follow:** test a hypothesis in
+   the SAME launch context as the failure. The same runner script in `-Direct` and WMI modes makes that
+   the default.
+2. **Exit codes that were not exit codes.** In a cmd one-liner, `cmd & echo rc=%ERRORLEVEL%` expands
+   `%ERRORLEVEL%` when cmd PARSES the line, before any of it runs. So the `clone rc=0`, `npm ci rc=0` and
+   `build rc=0` I recorded (and the `setup-git rc=0`) were whatever ERRORLEVEL held before the line.
+   Each of those steps did succeed, but the evidence is the end-state reads (HEAD, `build/cli.js`,
+   `better-sqlite3` loading, the helper read back), not those numbers. **The rule I now follow on that
+   PC:** exit codes come only from the PowerShell runner (`run-wmi.ps1`, `-Direct` or WMI). It captures
+   `$LASTEXITCODE` from `cmd /c "<command> > log 2>&1"`, through a redirect and never a pipe, and writes
+   it to a meta file.
+3. **Smaller, the same family:**
+   - two log reads returned zeros from a file that did not exist, because the copy had failed; the
+     zeros were discarded;
+   - my first WMI context probe passed an unquoted `%TEMP%` path and was cut at the same space it was
+     investigating;
+   - a Git Bash heredoc ate a backslash.
+
+   In each case the instrument failed silently and the output looked like a result.
