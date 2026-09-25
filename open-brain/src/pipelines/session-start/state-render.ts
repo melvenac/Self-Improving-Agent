@@ -186,7 +186,7 @@ function renderOneHandoff(h: Handoff): string[] {
   lines.push(`  pick up: ${h.pick_up}`);
   if (h.watch_out.length > 0) {
     lines.push(`  watch out:`);
-    for (const w of h.watch_out) lines.push(`    - ${w}`);
+    for (const w of h.watch_out) lines.push(`    - ${clip(w, GAP_CLIP, "handoff")}`);
   }
   if (h.open_questions.length > 0) {
     lines.push(`  open questions:`);
