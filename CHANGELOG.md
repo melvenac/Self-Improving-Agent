@@ -49,6 +49,10 @@ further adoption (T-181). There is no version bump in these commits: the release
   the same blind spot. `--commit` writes SUMMARY.md back as plain UTF-8 (the original is in the
   snapshot), and refuses before any write when SUMMARY.md cannot be decoded, since it rewrites that
   file in place. CRLF needed nothing: every split is `\r?\n`.
+- **An input that declares a session ahead of the latest log is no longer *current* (QA's
+  disagreement 2).** Next-session at Session 20 against `Session_7.md` means renumbering, a
+  per-worktree counter or a missing log. It is now *could not tell*, and the reason names both
+  numbers.
 
 ## [0.44.2] - 2026-09-24 — a Windows profile with a space in its name
 

@@ -491,6 +491,12 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
       continue;
     }
     const where = `line ${d.line} declares Session ${d.n} (\`${d.text.length > 160 ? d.text.slice(0, 157) + "…" : d.text}\`); the latest session log is Session ${latest.n} (${latest.file})`;
+    if (d.n > latest.n) {
+      // A session no log records: renumbering, a per-worktree counter (T-164) or
+      // a missing log. The comparison cannot say which, so it does not say current.
+      inputs.push({ input, verdict: "could_not_tell", declared_session: d.n, evidence: `${where}. It declares a session AHEAD of the latest log, so the numbers disagree and cannot say whether it is current` });
+      continue;
+    }
     inputs.push({ input, verdict: d.n < latest.n ? "stale" : "current", declared_session: d.n, evidence: where });
   }
   return { signal: STALENESS_SIGNAL, latest, inputs, not_judged };
