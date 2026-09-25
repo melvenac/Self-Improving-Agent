@@ -1010,7 +1010,7 @@ export class MachineConfigWatch {
       const st = fstatSync(fd, { bigint: true });
       // R70. The single-name condition is re-checked on the handle, with dev, ino and type, before any byte.
       // R70. The single-name condition is re-checked on the handle, with dev, ino and type, before any byte.
-      if (!st.isFile() || st.dev !== dev || st.ino !== ino || Number(st.nlink) !== nlink) {
+      if (!st.isFile() || st.dev !== dev || st.ino !== ino) {
         return { ...note, reason: "handle is a different file" };
       }
       return { ...note, hash: hashOf(readFileSync(fd)), state: "read", reason: "read" };
