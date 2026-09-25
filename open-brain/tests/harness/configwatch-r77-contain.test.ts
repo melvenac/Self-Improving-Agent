@@ -37,14 +37,17 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
     chmodSync(hooks, 0o000);
     const p = join(hooks, "nowhere");
     let thrown = "";
+    let kind = "";
     let code = "";
     try {
       const id = identify(p) as { kind: string; code?: string };
+      kind = id.kind;
       code = id.code ?? "";
     } catch (e) {
       thrown = (e as NodeJS.ErrnoException).code ?? (e as Error).message;
     }
     expect(thrown, "identify contains the lstat failure").toBe("");
+    expect(kind, "a contained EACCES is unreadable, never absent").not.toBe("absent");
     expect(code, "the record carries the error code").toBe("EACCES");
   });
 
@@ -52,12 +55,15 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
     const hooks = join(repo.root, ".git/hooks");
     chmodSync(hooks, 0o000);
     let thrown = "";
+    let reported = "";
     try {
-      repositoryLinksAtBase(repo.root, resolveGitDirs(repo.root));
+      reported = repositoryLinksAtBase(repo.root, resolveGitDirs(repo.root)).join("\n");
     } catch (e) {
       thrown = (e as NodeJS.ErrnoException).code ?? (e as Error).message;
     }
     expect(thrown, "listTree contains readdir").toBe("");
+    expect(reported, "an unlistable directory is reported unlisted, not silently absent").toContain("unlisted:");
+    expect(reported, "the unlist record carries the code").toContain("EACCES");
   });
 
   it.skipIf(isWin)("R77-BEGIN-TREE: begin contains listTree (currentFiles :592, begin :620)", () => {
