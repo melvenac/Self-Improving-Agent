@@ -73,8 +73,9 @@ reflexive.
 | Green, the three importer test files | local, `bdf9ddb`, then `f6b6d44` | 18/18 at `bdf9ddb`. 19/19 with `f6b6d44`'s addition (M4/M5 baseline, below). |
 | `tests/pipelines/sync/checks.test.ts` after the `retirements.json` edit | local | 102/102 |
 | `tsc --noEmit -p .` | local, each commit | exit 0 |
-| CI | run `36093008046` on `bdf9ddb` | **QUEUED**, not run: the tcm runners were paused for A2A-Hub's T-003 cutover. Neither a pass nor a fail. `f6b6d44` needs its own run once they resume. |
-| Full local suite | see §7 | pending |
+| **CI on the candidate** | run **`36093822945`**, `workflow_dispatch` on `loop/importer-fixes-ci`, a pointer branch pushed at exactly `f6b6d44` (headSha confirmed). A dispatch targets a branch, and `loop/importer-fixes` had moved to the handoff commit. Runner **`tcm-1`**, labels `self-hosted, linux, tcm`. | **success.** Test Files 73 passed. Tests: **1044 passed, 1 skipped** (1045). Per test: `state-import.test.ts` 9 ✓, `state-import-staleness.test.ts` 8 ✓, `state-import-seeds.test.ts` 2 ✓. The one skip is `tests/shared/paths.test.ts`, the win32-only short-name test from v0.44.2, which is not part of this change. There was no `onTaskUpdate` or unhandled error. |
+| CI, not the candidate | run `36093008046` on `bdf9ddb` | It queued during the runner pause (about 04:06 to 04:16Z) and started by itself after the resume. **Not scored:** it is not the candidate. |
+| **Full local suite** | `3b68500` (= `f6b6d44` + this handoff only), win32, 04:17:42Z to 04:19:32Z | **1045/1045 passed**, 73 files, **exit 0 captured unpiped**, 107.15 s, no `onTaskUpdate` or unhandled error. Peer listing, identical before and after: `a2a-qa-2e` idle, `a2a-planner-65` idle, `sia-planner-ac` idle (a background ssh poll every 5 min, ruled not load), `a2a-rivet-1b` *waiting* (blocked on its user, ruled not load). |
 
 **Live run of the built CLI** on a fresh `git archive e0bc3f8` of `~/Projects/A2A-Hub`, in this session's scratchpad
 (A2A-Hub's working tree was never touched):
@@ -149,13 +150,10 @@ A2A-Hub is a public repository.
 
 ## 7. Not verified
 
-- **CI.** Run `36093008046` (`bdf9ddb`) is queued behind the runner pause, and `f6b6d44` has no run. Its runner label
-  is unconfirmed, because no job has been picked up.
-- **Full local suite.** Atlas approved it on idle peers only. At the first check `a2a-rivet-1b` was busy and
-  `sia-planner-ac` was in a shell. The status is recorded in §8 when it has run.
+- **CI and the full suite are now verified** (§3): run `36093822945` on `f6b6d44` passed on tcm, and the local suite
+  passed 1045/1045 on idle peers. Linux is now covered through CI. The local runs were win32.
 - **worth-it-window-washing** (untracked `.agents/`) was not run. The signal reads content only, so tracking should
   not matter, but that has not been observed.
-- **Linux.** Local runs only, all on win32.
 - **GitNexus.** `impact` and `detect_changes` ran against the main tree's index (`f673d5e`, behind master), so some
   symbols show as "touched" only because lines shifted (`runDraft`, `takeSnapshot`). Every changed symbol is in
   `state-import/index.ts` and `cli.ts`. Impact was LOW on `buildImportDraft`, `runCommit` and `renderImportReport`.
