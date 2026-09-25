@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.44.2] - 2026-09-24 — a Windows profile with a space in its name
+
+Found by the first full-suite run on the dedicated QA machine (`desktop-o4egb1e`, D-045), whose
+Windows profile is `C:\Users\Aaron Melven`. `origin/master` at `6075f6b` failed 14 of 1034 there, for
+two reasons, neither of them timing; the account is on a real stranger's machine, which is T-154's
+question. Details: `docs/loops/infra-qa-machine-handoff.md` §6.2.
+
+### Fixed
+
+- **`existsCaseInsensitive` reported a real Windows 8.3 short-name path as absent.** A short alias
+  such as `AARONM~1` resolves on the filesystem but never appears in a `readdir` listing, which the
+  walk matched against. `os.tmpdir()` returns that form in some launch contexts; on the QA machine it
+  did for a process started through WMI. Now a segment with no listed match is accepted when it
+  resolves (`existsSync`). A case-sensitive filesystem behaves as before: no case-insensitive entry
+  means no exact one either. `projectDirExists`, the only product caller, tries `existsSync` first,
+  which on Windows already resolves short names, so no production path on Windows was known to reach
+  the defect. It was a contract failure of the function itself. A win32-only regression test builds a
+  real short-name path.
+- **The `cli-bootstrap` contract tests could not run under a profile path containing a space.** They
+  spawned `npx tsx <script>` with `shell: true` on win32, and a shell joins arguments unquoted, so the
+  path reached tsx cut at the space (`Cannot find module 'C:\Users\Aaron'`). They now run
+  `node <tsx's cli> <script>` with no shell, so arguments arrive verbatim. Test code only.
+
 ## [0.44.1] - 2026-09-22 — a deleted checked-out branch no longer crashes the runtime without a record
 
 Loop 15 slice three, §2 (`G-045`). Candidate `9ed674c`, accepted by the QA seat on §2 scope in
