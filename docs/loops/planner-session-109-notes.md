@@ -220,3 +220,9 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   `<snapshot>.import-incomplete` whose check is the refusal; the refusal must name the exit (restore, then remove
   the marker), and a dies-mid-migrate test is required. Rejected on good grounds: my same-day-snapshot rule (it
   fires on a legitimate `--force-snapshot`) and copy-over (`cpSync` on links, and writing through junctions).
+- **T-183 dispatched as a separate seat** on Aaron's question ("Can we dispatch another agent to work on only t 183?
+  Is that work isolated enough…"). Its isolation is checked by footprint: A10 is `harness/*`; importer round 3 is
+  `state-import/*` and `cli.ts`; T-183 is render-only (`session-start/state-render.ts` plus a `sync` check), with
+  **no schema change** as the binding condition. Worktree `~/Worktrees/sia-t183` created by the planner, detached at
+  `48acaa8`, with an untracked seat file. Brief: `docs/loops/t183-greeting-brief.md`. Record **113** (developer),
+  **114** (QA).
