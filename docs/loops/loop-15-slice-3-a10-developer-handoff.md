@@ -28,7 +28,7 @@ npx vitest run tests/harness/configwatch-r77-contain.test.ts tests/harness/confi
 
 ## R79
 
-A side prints what the runtime has. An unreadable stage start is `unreadable; stage start <facts>` on every combination. A missing path is `absent (ENOENT)`, and a loop base that did not exist is `absent at loop base` with no zeroed facts. A dangling link keeps its lstat facts. `R71 A6-5` now asserts that form. QA 99's `R71-UNREADABLE-START` and `R71-UNREADABLE-AT-BASE` are not in this tree.
+A side prints what the runtime has. An unreadable stage start is `unreadable; stage start <facts>` on every combination. A missing path is `absent (ENOENT)`, and a loop base that did not exist is `absent at loop base` with no zeroed facts. A dangling link keeps its lstat facts. `R71 A6-5` now asserts that form. QA 99's `R71-UNREADABLE-START` and `R71-UNREADABLE-AT-BASE` are not in this tree. They live on QA 99's probe branch, and QA 108 re-scores them in R79's form.
 
 ## R77
 
