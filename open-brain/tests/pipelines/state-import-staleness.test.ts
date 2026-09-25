@@ -146,7 +146,20 @@ describe("T-180: a stale input is named at the top of the report and gates --com
       const top = firstSection(readFileSync(join(root, REPORT_REL), "utf-8"));
       expect(top).toMatch(/could not tell.*INBOX\.md/i);
       expect(top).not.toMatch(/current.*INBOX\.md/i);
+      // One line per input, and the line says why (planner ruling, session 100).
+      const line = top.split("\n").find((l) => l.includes("INBOX.md"))!;
+      expect(line).toContain(inbox!.evidence);
     });
+
+    it("--commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report", () => {
+      writeProject(root, 7, { next: "Updated at end of Session 7.", inbox: null, task: null });
+      expect(cli(["state", "import", "--draft", root], root).status).toBe(0);
+      const c = cli(["state", "import", "--commit", root], root);
+      expect(c.status).toBe(0);
+      expect(existsSync(join(root, STATE_REL))).toBe(true);
+      const lines = c.stdout.split(/\r?\n/).filter((l) => l.startsWith("Could not tell whether current:"));
+      expect(lines).toEqual(["Could not tell whether current: .agents/TASKS/INBOX.md, .agents/TASKS/task.md"]);
+    }, 60_000);
 
     it("with no Session_N.md to compare against, every present input is 'could not tell'", () => {
       writeProject(root, 7, { next: "Session 7", inbox: "Session 7", task: "Session 7" });
