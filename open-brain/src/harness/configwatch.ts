@@ -1029,7 +1029,7 @@ export class MachineConfigWatch {
           ...note,
           nlink: Number(st.nlink),
           reason: gained
-            ? "handle is a different file; the object gained a name inside open"
+            ? "handle is a different file"
             : "handle is a different file",
         };
       }
