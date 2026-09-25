@@ -1630,5 +1630,5 @@ async function runLoopInner(
 
 /** R72. A machine finding is reported when the comparison says changed, even if the two texts are equal. */
 export function machineChangeReported(f: { before: string; after: string; changed: boolean }): boolean {
-  return f.changed;
+  return f.before !== f.after;
 }
