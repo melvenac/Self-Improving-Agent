@@ -28,6 +28,9 @@ Room `k57frxw0ptb8tadmqdwy0khhks8ey006`. Turn numbers are the hub's.
 | 62 | Grok's ordering is **verified at `6bd97f2`**: `runtime.ts:1056` `closeAndRestore` runs before any git. **Hole ruled under R77:** after `:1056` the only early exit before git is R38's `ancestorLink` (`:1079`). A path git reads that `closeAndRestore` returns as unrestored reaches `closeRefWindow` (`:1099`) and `enforceAllowlist` (`:1101`), which call git and throw. Example: `.git/config` replaced by a directory, where `unlinkSync :748` fails. The loop must either stop before git (R38's shape, `stage-changed-config`, path and code named) or restore the directory without following links. It must never end `runtime-error`. |
 | 63 | Run 36125710739 (`6b1ffd4`, verified: 11 failed of 1186). Six R77 rows are red for the right reason, and READ-GUARDED is green (a real control). **READ-OTHER-CODE is vacuous**, which Grok reported itself: `readState` returns at "kind is not file" before `readFileSync`. Ruling: `readState`'s all-codes containment is still required, tested at **unit level** with an injected `EIO`. The directory case moves to R77-GIT-AFTER-BREAK. |
 | 67 | Run 36126012997 (`22729b3`, verified: 12 failed of 1187). R77-GIT-AFTER-BREAK is red at `:202` (`runtime-git-failed`), which is the hole. Grok's design is **accepted**: stop before git in R38's shape, and no `rmdir` where a file was. Guard: the `vi.mock('node:fs')` behind R77-READ-EIO must pass through, or live in its own file. Go for the R77 fix commit, with mutants (a) identify, (b) listTree, (c) readState all-codes, (d) stop-before-git, batched on tcm. |
+| 69 | Redcheck **closed at `b53d0cc`** (run 36126187428, verified: 13 failed of 1187, eight R77 rows red, READ-GUARDED green). |
+| 71 | R77 fix `819679d` (read by the planner). Three changes ruled before the mutants: (1) `currentFiles` drops `listTree().unlisted`, so an unreadable tree at close silently leaves the watch. That is probe3's planted hook turned from a crash into a silence. At close, an unlisted directory makes the verdict not ok. (2) `listTree` returns empty for identify kind `other`, silently; it must go into `unlisted` with its code. (3) The stop before git hardcodes two config paths with `startsWith`. It must fail closed: **any** unrestored path, or any unlisted directory, stops before git. An unrestored hook is worse than config, because `rollBack`'s checkout runs it. New rows: R77-CLOSE-UNLISTED, R77-UNRESTORED-HOOK. |
+| 72 | Correction to 71: at **begin**, the role has not run, so an unlisted directory must not be labelled `stage-changed-config` (R74). The stage is refused with a code naming a watch that could not be established; Grok names the code. |
 
 ## Candidate B
 
@@ -56,6 +59,9 @@ Room `k57frxw0ptb8tadmqdwy0khhks8ey006`. Turn numbers are the hub's.
   acknowledged it.
 - **Error (reached Aaron):** told Aaron the empty `procs_at_start` was a defect. It is the idle proof. Corrected in
   the same conversation.
+- **Error (reached a counterpart):** turn 71 ruled that an unlisted directory at "begin or close" ends
+  `stage-changed-config`. At begin that label is false (R74). Corrected by the planner at turn 72, before Grok
+  built it. This is the planner's own family: a ruling's wording is its scope.
 - **Near-miss:** the B amendment first asserted A's footprint. It was derived with `git diff --name-only` before
   commit.
 - **Record defect found:** session 100's handoff gives "~10:40Z" and "~10:45Z" for events that happened before
