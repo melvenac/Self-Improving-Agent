@@ -167,7 +167,9 @@ export function dotGitLink(repoRoot: string): string | null {
  * caller decides what a link at the root means, and this function does not follow it.
  */
 function listTree(dir: string): { paths: string[]; unlisted: string[] } {
-  if (identify(dir).kind !== "dir") return { paths: [], unlisted: [] };
+  const id = identify(dir);
+  if (id.kind === "other" && id.code) return { paths: [], unlisted: [`unlisted: ${dir} (${id.code})`] };
+  if (id.kind !== "dir") return { paths: [], unlisted: [] };
   const out: string[] = [];
   const unlisted: string[] = [];
   const walk = (d: string): void => {
@@ -373,6 +375,8 @@ export interface ConfigVerdict {
   changes: ConfigChange[];
   /** Files the restore could not put back, with why. */
   unrestored: string[];
+  /** Directories that could not be listed, as `unlisted: <dir> (<code>)`. An empty list is not "no files". */
+  unlisted: string[];
   /**
    * Set when a link replaced an ancestor of a watched path. Nothing beneath it
    * was restored, and the runtime must not spawn git — including rollback.
@@ -597,17 +601,24 @@ export class ConfigWatch {
     this.repoRoot = repoRoot ?? resolve(dirs.gitDir, "..");
   }
 
+  /** Directories listTree could not list on the latest currentFiles call. */
+  private unlistedNotes: string[] = [];
+
   private currentFiles(): string[] {
     const { files, trees } = watchedLocations(this.dirs);
     const all = new Set<string>(files);
+    const unlisted: string[] = [];
     for (const t of trees) {
       // A link at the tree root is the change. Do not list what it points at.
       if (identify(t).kind === "symlink") {
         all.add(t);
         continue;
       }
-      for (const f of listTree(t).paths) all.add(f);
+      const listed = listTree(t);
+      for (const f of listed.paths) all.add(f);
+      unlisted.push(...listed.unlisted);
     }
+    this.unlistedNotes = unlisted;
     return [...all].sort();
   }
 
@@ -784,8 +795,9 @@ export class ConfigWatch {
       const r = relative(this.dirs.commonDir, p);
       return r.startsWith("..") ? p : `<common>/${r.replace(/\\/g, "/")}`;
     };
-    const scale = `examined ${names.size} file(s) around the ${this.stage} stage`;
-    const ok = changes.length === 0 && ancestorLink === null;
+    const scale = `examined ${names.size + unlisted.length} file(s) around the ${this.stage} stage`;
+    const unlisted = [...this.unlistedNotes];
+    const ok = (changes.length === 0 && ancestorLink === null && unlisted.length === 0);
     const restored =
       ancestorLink !== null
         ? `No restore was claimed beneath the ancestor link ${ancestorLink}. `
@@ -805,12 +817,13 @@ export class ConfigWatch {
             `runtime's own git calls. ` +
             restored +
             `${scale}. ${CONFIG_WATCH_LIMIT}`;
+    const named = unlisted.length === 0 ? message : `${message} Unlisted: ${unlisted.join("; ")}.`;
     const readNotes = [...before.values()].flatMap((s) =>
       s?.readError && s.readError !== "unreadable" ? [s.readError] : [],
     );
-    const withReads = readNotes.length === 0 ? message : `${message} Read failures: ${readNotes.join("; ")}.`;
+    const withReads = readNotes.length === 0 ? named : `${named} Read failures: ${readNotes.join("; ")}.`;
 
-    return { ok, stage: this.stage, examined: names.size, changes, unrestored, ancestorLink, message: withReads };
+    return { ok, stage: this.stage, examined: names.size + unlisted.length, changes, unrestored, unlisted, ancestorLink, message: withReads };
   }
 }
 
