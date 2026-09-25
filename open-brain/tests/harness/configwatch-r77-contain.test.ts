@@ -228,6 +228,32 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
     if (restored) expect(readFileSync(cfg).equals(before), "a restore puts the original bytes back").toBe(true);
   });
 
+  it.skipIf(isWin)("R77-BEGIN-UNLISTED: an unreadable hooks directory before the role refuses config-watch-unestablished", async () => {
+    const hooks = join(repo.root, ".git/hooks");
+    let ran = false;
+    chmodSync(hooks, 0o000);
+    const loop: LoopConfig = {
+      repoRoot: repo.root, loop: "t001",
+      roles: {
+        planner: new StubPlanner(),
+        developer: { role: "developer", run: async (ctx) => { ran = true; return new StubDeveloper().run(ctx); } },
+        qa: new StubQa(),
+      },
+      checks: exitingChecks(0, 0),
+      log: () => {},
+    };
+    let thrown = "";
+    let r: Awaited<ReturnType<typeof runLoop>> | null = null;
+    try { r = await runLoop(loop); } catch (e) { thrown = (e as Error).message; }
+    finally { try { chmodSync(hooks, 0o755); } catch { /* already */ } }
+    const record = JSON.stringify(r);
+    expect(thrown, "the loop does not throw").toBe("");
+    expect(r!.failure?.code, "the watch was not established").toBe("config-watch-unestablished");
+    expect(record, "the record names the directory").toContain(hooks);
+    expect(record, "the record names the code").toContain("EACCES");
+    expect(ran, "the role did not run").toBe(false);
+  });
+
   it.skipIf(isWin)("R77-CLOSE-UNLISTED: an unreadable hooks directory is stage-changed-config and is not 'no files'", async () => {
     const hooks = join(repo.root, ".git/hooks");
     const planted = join(hooks, "r77-hidden");

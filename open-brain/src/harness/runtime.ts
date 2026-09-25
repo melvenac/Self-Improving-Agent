@@ -206,6 +206,7 @@ export type FailureCode =
   | "gate-halted"
   | "policy-unreadable"
   | "stage-changed-config"
+  | "config-watch-unestablished"
   | "role-timeout"
   | "process-role-unwatched"
   | "remote-configured"
@@ -947,6 +948,19 @@ async function runLoopInner(
       // boundary, not at loop start (rulings-1 refinement), so the runtime's own
       // between-stage writes are never inside a window.
       configWatch?.begin(roleName);
+      // R77. An unlisted directory here is not the role's change: the role has
+      // not run. The stage does not start. Close still uses stage-changed-config.
+      const unopened = configWatch?.unlistedAtOpen() ?? [];
+      if (unopened.length > 0) {
+        return {
+          ok: false,
+          code: "config-watch-unestablished",
+          processRun: null,
+          reason:
+            `refusing to start the ${roleName} stage: the config watch could not be established. ` +
+            `${unopened.join("; ")}. The role did not run.`,
+        };
+      }
       machineWatch?.begin(roleName);
       // …and every REF difference likewise. The runtime writes its own refs
       // between stages, never inside a window, so a delta here is a role's.

@@ -622,6 +622,11 @@ export class ConfigWatch {
     return [...all].sort();
   }
 
+  /** Directories the latest listing could not read, as `unlisted: <dir> (<code>)`. */
+  unlistedAtOpen(): readonly string[] {
+    return this.unlistedNotes;
+  }
+
   /**
    * The loop's base, once (R57). A later call does not re-read. `begin` gates
    * its reads against this and must not be the thing that defines it.
