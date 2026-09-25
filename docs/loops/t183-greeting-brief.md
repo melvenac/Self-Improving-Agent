@@ -64,3 +64,17 @@ feels, and it is out of scope here.
 - On a refusal or a denied command: stop and tell atlas.
 - Hand back `docs/loops/t183-developer-handoff.md` on the branch: every row with its run id, each mutant, the
   before/after sizes, what was not verified, and your model and effort. No `/end` (T-163).
+
+## Amendment 1 (planner, record 109, on Forge 113's measured report)
+
+- **T183-1's 40,000 cannot be met under §2.3's constraints.** The unchanged parts alone come to about 37,700
+  characters (measured by Forge 113 at rev 131). The planner's own section table estimated about 45k before this
+  brief set 40k. **The planner's error.** The threshold is **kept** (no widening after measuring), T183-1 is scored
+  as an **honest no** with its before and after figures, and `/sync`'s `greeting-size` reports red until the
+  follow-up lands: **per-seat greeting profiles** (Aaron's question, 2026-09-25).
+- **Verified:** its count plus the newest 10, clipped at 100 characters, with a stated omission line.
+- **Role files stay whole** (V-050). The threshold is not raised.
+- **§2.1 is corrected to row T183-2:** text at or under the limit, on one line, prints whole with no marker. Longer
+  text is cut at the first sentence end or the limit, whichever comes first, with the marker.
+- **New row T183-6:** a live `ob_start` in a fresh session in this tree returns inline, not saved to a file. The
+  instrument is the host.

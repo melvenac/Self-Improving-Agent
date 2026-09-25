@@ -231,3 +231,8 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   fact rows went from the link's own lstat facts to the target's. Ruled (turn 117): the type-change and
   absent→symlink texts carry the link's lstat facts **and**, when it resolves, the resolved object's facts,
   **labelled**. Restore the link assertions, add the resolved ones. This is consistent with R79's dangling-link rule.
+- **Error (reached the artifact and a seat):** the T-183 brief set 40,000 characters when the planner's own
+  section table, written minutes earlier, estimated about 45k with the role files whole. Forge 113 measured it and
+  found the row unmeetable (unchanged parts ≈ 37,700). Ruled: keep 40k, score an honest no, verified becomes a
+  count plus the newest 10, role files stay whole, new row T183-6 (inline return in a live session). The follow-up
+  is per-seat greeting profiles. Brief amendment 1.
