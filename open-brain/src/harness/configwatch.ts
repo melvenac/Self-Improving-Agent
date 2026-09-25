@@ -1126,7 +1126,7 @@ export class MachineConfigWatch {
         const reason = sameObject && n > nlink
           ? "the object gained a name inside open"
           : sameObject && n < nlink
-            ? "the object lost a name inside open"
+            ? "handle is a different file"
             : "handle is a different file";
         return { ...note, nlink: n, reason };
       }
