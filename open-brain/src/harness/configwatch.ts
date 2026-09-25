@@ -1001,7 +1001,7 @@ export class MachineConfigWatch {
       basename(resolvedPath) === basename(p) &&
       parentReal !== null &&
       parentReal === gate.parentReal;
-    const same = gate === null || appeared || (gate.resolvedPath === resolvedPath && (sameObject || singleName));
+    const same = gate === null || (gate.resolvedPath === resolvedPath && (sameObject || singleName));
     if (!same) return { ...note, reason: "different file" };
     if (kind !== "file") return { ...note, reason: "not a file" };
     let fd: number | null = null;
