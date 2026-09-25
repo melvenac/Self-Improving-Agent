@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 121 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 122 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -59,6 +59,8 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-176** gitnexus-index measures distance in one direction only: an index on a different line of history reads as current
 - [ ] **T-178** ci.yml runs on push to seat working branches (loop/*, qa/*, docs/*, chore/*), per D-040, so no seat has to dispatch CI by hand
 - [ ] **T-179** Replace /end with a small 'store lessons' step: each session's lessons stored with the key that would have caught them (T-170); the record is written as work happens, and the rest of /end is cut
+- [ ] **T-180** `state import` cannot tell that an input predates the latest Session_N.md: a stale handoff or INBOX is imported as current. Refuse or warn
+- [ ] **T-181** Adopt Aaron's active projects onto SIA per docs/loops/adoption-plan-2026-09-25.md: frogger (fresh install) and co-op-mailer (import) as pilots, then Tarrant County Makerspace record-only BEFORE its cutover (D-048), then foundry and worth-it-window-washing
 
 ## P2
 
