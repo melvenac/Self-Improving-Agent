@@ -794,8 +794,10 @@ export class ConfigWatch {
             unrestored.push(`${path} (a ${cur.kind} was created; not removed recursively)`);
           }
         } else if (b.kind === "file" && b.bytes !== null) {
-          // A mode-000 file is still the owner's. chmod back to the snapshot mode, then write the bytes.
-          try { chmodSync(path, b.mode || 0o644); } catch { /* the write records unrestored */ }
+          // A mode-000 file is still the owner's. chmod follows a link, so only a real file is chmod'd.
+          if (identify(path).kind === "file") {
+            try { chmodSync(path, b.mode || 0o644); } catch { /* the write records unrestored */ }
+          }
           restoreNewFile(this.repoRoot, this.dirs, path, b.bytes, b.mode);
         } else {
           unrestored.push(`${path} (snapshot was ${b.kind}; not followed)`);
