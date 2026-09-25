@@ -272,7 +272,19 @@ box, with Windows PowerShell 5.1 writing the PowerShell shapes. Outputs are in `
 
 ## 7. Not verified
 
-- **The full suite:** not run locally. I will ask the planner first (G-042). The CI suites are the ones in §3.
+- **The full suite: not run locally, by the planner's ruling (the box is never quiet); it is covered by tcm CI
+  (`36198263294`, `063662b`, 1085 passed) and by QA 111's Windows run on the QA PC.** Aaron: *"This machine never
+  really goes quiet during the day"*, quoted by the planner (record 109). How it came to that:
+  - The planner cleared a run after checking that no test or build process was running.
+  - My pre-check found node pid 2604, **Grok's `cursor-agent`**, busy: 1.72 CPU-seconds in a 5 s sample, the busiest
+    process on the box. Total load read 81%, 13% and 45%. ListAgents does not show a Cursor seat, so "no vitest
+    process" is not "quiet" (the planner recorded its near-miss).
+  - I held and asked. The planner ruled that I wait for the agent to be under 0.2 CPU-s per 5 s for a minute AND total
+    load under 20% on 3 samples, bounded at 20 minutes.
+  - `dev-scripts-importer-r3/quiet-wait.ps1` sampled 186 times (17:56:54–18:15:35 local): the agent went quiet from
+    17:59:19; the load was at or over 20% on 30 of 186 samples, with spikes up to 100%.
+  - The planner then ruled the run skipped. The process list before is in
+    `evidence/procs-before-full-suite-precheck.txt`, and the samples in `evidence/quiet-samples.txt`.
 - **QA 102's `probes.mjs`, `fidelity.mjs` and QA 106's `mutants-r2.mjs`** were not run. IF-1 to IF-15 rest on their tests
   in CI and on `probes-r2.mjs`.
 - **GitNexus `impact` / `detect_changes`:** not run. The MUST rules name them, but this tree has no `.gitnexus/`
@@ -299,3 +311,8 @@ box, with Windows PowerShell 5.1 writing the PowerShell shapes. Outputs are in `
 - **Near-miss:** two patch scripts written as a bash heredoc of JavaScript failed to parse (template literals inside a
   shell string). They wrote nothing, and the edits were redone with the Edit tool.
 - **Near-miss:** the 1252 fixture described in §2.
+- **Near-miss (an instrument of mine that never fired):** `quiet-wait.ps1` never reported QUIET, although its rule
+  was met at 114 of its 186 samples. `@($loads + $load) | Select-Object -Last 3` returns a scalar when it has one
+  element, and `scalar + scalar` in PowerShell ADDS, so the 3-sample load window never held 3 readings. It failed
+  closed (it would have said TIMEOUT, never a false QUIET), and the planner stopped it before either. The log is kept
+  unedited, so the miss can be seen in it: its `run=` counter reached 173 with low loads in between.
