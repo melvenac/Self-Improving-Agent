@@ -193,3 +193,8 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   Aaron whether to dispatch one (D-040 does not cover master).
 - **Relay's D-003 question** (hub enrollment, Loop 6, T-067) is queued for Aaron after the CI question. SIA agrees
   with `--init-key --invite <code>`, and Relay has recorded that on A2A-Hub master (PR #27).
+- **Aaron, ~22:15Z, "dispatch it"** (verbatim), approving one tcm CI run on master. Dispatched: run 36195820923 on
+  `48acaa8`, `workflow_dispatch`, `hosted=false`.
+- **Aaron, 22:17Z, "yes"** (verbatim), answering Relay's D-003 question put to him verbatim: approves
+  `hub-talk --as <name> --init-key --invite <code>` for new hub names. It does not choose between command and button
+  for issuing a code (Loop 6's design). Relayed to Relay quoted, with where and when.
