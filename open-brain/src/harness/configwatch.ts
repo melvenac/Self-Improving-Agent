@@ -52,7 +52,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { basename, dirname, isAbsolute, join, parse, relative, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, parse, relative, resolve, sep } from "node:path";
 import { git, gitTry } from "./git.js";
 
 /** Where git keeps the files this layer watches, resolved once. */
@@ -757,6 +757,19 @@ export class ConfigWatch {
 
     for (const path of [...names].sort()) {
       if (ancestorLink) break;
+      const covered = this.unlistedNotes
+        .map((note) => {
+          const m = /^unlisted: (.+) \(([^)]+)\)$/.exec(note);
+          return m ? { dir: m[1]!, code: m[2]! } : null;
+        })
+        .find((u) => u !== null && (path === u.dir || path.startsWith(u.dir + sep) || path.startsWith(u.dir + "/")));
+      if (covered && before.has(path)) {
+        const b = before.get(path)!;
+        unrestored.push(
+          `${path} (unrestorable: under unlisted ${covered.dir} (${covered.code}); begin ${stateHash(b)})`,
+        );
+        continue;
+      }
       let b: FileState | null = null;
       let a: FileState | null = null;
       try {
@@ -779,6 +792,8 @@ export class ConfigWatch {
             unrestored.push(`${path} (a ${cur.kind} was created; not removed recursively)`);
           }
         } else if (b.kind === "file" && b.bytes !== null) {
+          // A mode-000 file is still the owner's. chmod back to the snapshot mode, then write the bytes.
+          try { chmodSync(path, b.mode || 0o644); } catch { /* the write records unrestored */ }
           restoreNewFile(this.repoRoot, this.dirs, path, b.bytes, b.mode);
         } else {
           unrestored.push(`${path} (snapshot was ${b.kind}; not followed)`);
@@ -852,6 +867,8 @@ export interface MachineConfigFinding {
   after: string;
   /** From the facts and hashes compared. Never from whether the two texts are equal (R72). */
   changed: boolean;
+  /** Set when the path was readable at stage start and could not be observed at close. */
+  unobservableCode?: string;
 }
 
 /**
@@ -1160,6 +1177,14 @@ export class MachineConfigWatch {
       const base = this.loopBase.get(p.path)!;
       const opened = start.get(p.path)!;
       const end = this.observe(p.path, base);
+      if (opened.state === "read" && end.state !== "read") {
+        const code = /\b(E[A-Z0-9]+)\b/.exec(end.reason)?.[1] ?? "UNKNOWN";
+        out.push({
+          stage: this.stage, scope: p.scope, path: p.path,
+          before: opened.hash, after: `unobservable (${code})`, changed: true, unobservableCode: code,
+        });
+        continue;
+      }
       if (end.state === "read" && opened.state === "read") {
         out.push(row(opened.hash, end.hash, opened.hash !== end.hash, p.path, p.scope));
         continue;

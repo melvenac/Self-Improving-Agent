@@ -207,6 +207,7 @@ export type FailureCode =
   | "policy-unreadable"
   | "stage-changed-config"
   | "config-watch-unestablished"
+  | "machine-config-unobservable"
   | "role-timeout"
   | "process-role-unwatched"
   | "remote-configured"
@@ -1085,6 +1086,18 @@ async function runLoopInner(
           result.findings.push(line);
           log(`  FINDING: ${line}`);
         }
+      }
+      const unseen = result.machineConfigFindings.filter((f) => f.stage === roleName && f.unobservableCode);
+      if (unseen.length > 0) {
+        return {
+          ok: false,
+          code: "machine-config-unobservable",
+          processRun,
+          reason:
+            `${roleName} was refused, not warned. A machine config path was readable at the stage start and could not ` +
+            `be observed at close: ${unseen.map((f) => `${f.path} (${f.unobservableCode})`).join("; ")}. ` +
+            `The runtime did not see it, so the stage fails. A visible machine change is still reported, not restored.`,
+        };
       }
 
       // R38: an ancestor link means the next git call, including rollback, would
