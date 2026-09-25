@@ -20,7 +20,7 @@ vi.mock("node:fs", async (importOriginal) => {
   return { ...m, default: { ...m, openSync }, openSync };
 });
 
-import { appendFileSync, linkSync, mkdirSync, mkdtempSync, realpathSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
+import { appendFileSync, linkSync, lstatSync, mkdirSync, mkdtempSync, realpathSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { MachineConfigWatch } from "../../src/harness/configwatch.js";
@@ -125,11 +125,15 @@ describe("R80 true words", () => {
     unlinkSync(cfg);
     symlinkSync(elsewhere, cfg);
     const row = watch.compare().find((f) => f.path === cfg)!;
-    const targetIno = statSync(elsewhere, { bigint: true }).ino;
+    const link = lstatSync(cfg, { bigint: true });
+    const target = statSync(elsewhere, { bigint: true });
     expect(row.after).toContain("type change");
-    expect(row.after).toContain("is a symlink");
-    expect(row.after).toContain(`ino ${targetIno}`);
-    expect(row.after).toMatch(/type file/);
+    expect(row.after).toContain("link: type symlink");
+    expect(row.after).toContain(`ino ${link.ino}`);
+    expect(row.after).toContain(`readlink ${elsewhere}`);
+    expect(row.after).toContain("resolves to:");
+    expect(row.after).toContain(`ino ${target.ino}`);
+    expect(row.after).toMatch(/resolves to: type file/);
   });
 
   it.skipIf(isWin)("R80-ABSENT-SYMLINK-FACTS: a link where nothing was carries the current facts", () => {
@@ -141,9 +145,14 @@ describe("R80 true words", () => {
     writeFileSync(elsewhere, "[user]\n\tname = else\n");
     symlinkSync(elsewhere, cfg);
     const row = watch.compare().find((f) => f.path === cfg)!;
-    const targetIno = statSync(elsewhere, { bigint: true }).ino;
+    const link = lstatSync(cfg, { bigint: true });
+    const target = statSync(elsewhere, { bigint: true });
     expect(row.after).toContain("absent → symlink");
-    expect(row.after).toContain(`ino ${targetIno}`);
-    expect(row.after).toMatch(/type file/);
+    expect(row.after).toContain("link: type symlink");
+    expect(row.after).toContain(`ino ${link.ino}`);
+    expect(row.after).toContain(`readlink ${elsewhere}`);
+    expect(row.after).toContain("resolves to:");
+    expect(row.after).toContain(`ino ${target.ino}`);
+    expect(row.after).toMatch(/resolves to: type file/);
   });
 });

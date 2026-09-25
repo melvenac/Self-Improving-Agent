@@ -953,6 +953,12 @@ interface MachineSnap {
   /** R68. An unread machine path is attributed by these, the same facts as R64. */
   size: bigint;
   mtimeNs: bigint;
+  /** R80. lstat of the path when the path itself is a symlink. Null otherwise. */
+  linkDev: bigint | null;
+  linkIno: bigint | null;
+  linkNlink: number;
+  linkSize: bigint;
+  linkMtimeNs: bigint;
   /** R69. The parent directory's realpath at this observation. Compared when a path was absent at base. */
   parentReal: string | null;
   hash: string;
@@ -1024,6 +1030,11 @@ export class MachineConfigWatch {
       nlink: 0,
       size: 0n,
       mtimeNs: 0n,
+      linkDev: lexical.kind === "symlink" ? lexical.dev : null,
+      linkIno: lexical.kind === "symlink" ? lexical.ino : null,
+      linkNlink: lexical.kind === "symlink" ? lexical.nlink : 0,
+      linkSize: lexical.kind === "symlink" ? lexical.size : 0n,
+      linkMtimeNs: lexical.kind === "symlink" ? lexical.mtimeNs : 0n,
       parentReal,
       hash: "unread",
       state: "unwatched",
@@ -1075,6 +1086,11 @@ export class MachineConfigWatch {
       nlink,
       size,
       mtimeNs,
+      linkDev: lexical.kind === "symlink" ? lexical.dev : null,
+      linkIno: lexical.kind === "symlink" ? lexical.ino : null,
+      linkNlink: lexical.kind === "symlink" ? lexical.nlink : 0,
+      linkSize: lexical.kind === "symlink" ? lexical.size : 0n,
+      linkMtimeNs: lexical.kind === "symlink" ? lexical.mtimeNs : 0n,
       parentReal,
       hash: "unread",
       state: "not-read",
@@ -1200,6 +1216,16 @@ export class MachineConfigWatch {
       `type ${s.kind} dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
     // R78. A side that was read prints the hash and the facts. "Read or not" includes a read.
     const readText = (s: MachineSnap): string => `${s.hash} ${factText(s)}`;
+    const linkSide = (s: MachineSnap): string => {
+      if (s.lexicalKind !== "symlink") return factText(s);
+      const link =
+        `link: type symlink dev ${s.linkDev} ino ${s.linkIno} nlink ${s.linkNlink} size ${s.linkSize} mtimeNs ${s.linkMtimeNs} readlink ${s.lexicalTarget}`;
+      if (s.resolvedPath === null) {
+        const code = s.reason.startsWith("absent (") ? s.reason.slice("absent (".length, -1) : (s.errno ?? "UNKNOWN");
+        return `${link}; does not resolve (${code})`;
+      }
+      return `${link}; resolves to: ${factText(s)}`;
+    };
     // R79. A loop base that was not there is that phrase, never zeroed facts.
     const baseText = (s: MachineSnap): string =>
       s.resolvedPath === null && s.lexicalKind !== "symlink" ? "absent at loop base" : `${s.resolvedPath ?? "unresolved"} ${factText(s)}`;
@@ -1252,14 +1278,14 @@ export class MachineConfigWatch {
       if (linkPlanted) {
         const after =
           base.resolvedPath === null
-            ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${factText(end)}`
-            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
+            ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${end.lexicalKind === "symlink" ? linkSide(end) : factText(end)}`
+            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${end.lexicalKind === "symlink" ? linkSide(end) : `${end.resolvedPath ?? "unresolved"} ${factText(end)}`}`;
         out.push(row(stageBefore(opened), after, true, p.path, p.scope));
         continue;
       }
       const typeChange = end.lexicalKind === "symlink" && base.lexicalKind !== "symlink";
       const after = typeChange
-        ? `type change: ${p.path} is a ${end.lexicalKind}${end.lexicalTarget ? ` target ${end.lexicalTarget}` : ""}; not read through; ${factText(end)}`
+        ? `type change: ${p.path} is a ${end.lexicalKind}; ${linkSide(end)}`
         : end.reason === "the object gained a name inside open" || end.reason === "the object lost a name inside open" || end.reason.startsWith("handle is a different file")
           ? `${end.reason}; not read; ${factText(end)}`
           : end.reason === "unreadable" || end.hash === "unreadable"
