@@ -1184,7 +1184,7 @@ export class MachineConfigWatch {
     const factText = (s: MachineSnap): string =>
       `type ${s.kind} dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
     // R78. A side that was read prints the hash and the facts. "Read or not" includes a read.
-    const readText = (s: MachineSnap): string => `${s.hash} ${factText(s)}`;
+    const readText = (s: MachineSnap): string => s.hash;
     const stageBefore = (opened: MachineSnap): string => {
       if (opened.state === "read") return readText(opened);
       if (opened.reason === "unreadable" || opened.hash === "unreadable") return "unreadable";
