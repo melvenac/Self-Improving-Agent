@@ -210,3 +210,6 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   positive**), (a) 36195723043, (b) 36195745609, (c) 36195768996, (d) 36195795635, all killed. R80 dispatched.
 - **Forge 110** reported its effort as "low". **Aaron: "forge infra is on effort medium"** (verbatim). Recorded as
   medium on Aaron's word, and the self-report disagreement is recorded as a finding for D-047.
+- **Forge 110 skipped `/start`** (Aaron noticed it). The role files still load through the SessionStart hook, but
+  the session registration, the session log, the state render and the watch-outs were missing. Told to run it now,
+  read the whole greeting, and confirm the role-file line.
