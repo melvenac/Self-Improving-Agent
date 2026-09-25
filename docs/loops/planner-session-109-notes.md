@@ -54,6 +54,27 @@ Room `k57frxw0ptb8tadmqdwy0khhks8ey006`. Turn numbers are the hub's.
 - The planner cannot read the QA PC over SSH (host classifier, "Production Reads"). Aaron ran the reads. The report
   arrives as `origin/qa/importer-fixes-r2-report`. At 10:45Z only `qa/importer-fixes-r2-ci` (`aba35de`) existed.
 
+## QA 106's verdict, and the planner's ruling
+
+- **Report:** `origin/qa/importer-fixes-r2-report` `9d50e1f`, 424 lines, ending `QA-106: REPORT COMPLETE`. The
+  planner read the header, the verdict, all 15 rows, Defects, Disagreements, the error entries and "Open for the
+  planner". It did **not** read the Probes, Mutants and Full-suite detail sections (lines 90–283).
+- **`aba35de` does not merge.** IF-1 to IF-15 pass as written. Tested by class, round 2 regresses: **D6 (high)**, a
+  refused `--commit` deletes the snapshot it names (site confirmed by the planner at `665b3a2`: the `:728` refusal
+  is thrown inside the `try`, and the catch `rmSync(snapshotDir)` runs regardless); **D5**, Windows-1252 text gets past
+  STALE; **D7**, a failed rollback has already deleted live files. Full suite 1070/1070 and CI 36124999356 are green.
+- **Scoring (disagreement 2):** IF-9 and IF-11 are **FAIL by class**, because the dispatch asked for the class.
+- **Round 3 brief:** `docs/loops/importer-fixes-round-3-brief.md`. D5 is ruled "decode as Windows-1252 and judge"
+  (QA's recommendation). D7 is ruled "restore-by-hand is acceptable only if a re-run refuses while half-restored".
+  O1 goes to T-185, O3 needs no change, and O5 goes to the driver template.
+
+## Record session numbers assigned by this session
+
+- 108: QA for candidate A10 (already reserved by session 100).
+- **110:** the developer, importer round 3 (`sia-infra`).
+- **111:** the QA seat for importer round 3.
+- **112:** the developer, B Step 0 (`sia-infra`, after round 3 leaves it), per R81.
+
 ## Errors and near-misses this session
 
 - **Error (reached a counterpart):** turn 49 gave the planner's record number as 108. Corrected at turn 50, and Grok

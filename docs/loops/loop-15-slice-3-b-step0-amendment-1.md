@@ -31,8 +31,8 @@ have had.
    (v0.44.2) today, or the importer merge if that lands first. The dispatch names the SHA. **Consequence, stated so
    B's criteria carry it:** if A merges before B's candidate is frozen, B's red-under-load is shown again on the
    new master before B's fix is judged. A red shown on an older base does not transfer.
-3. **Worktree.** Step 0 runs in `~/Worktrees/sia-infra`, **after the importer round-2 work has left it** (QA 106's
-   verdict, and Aaron's merge if it is accepted). `~/Worktrees/sia-forge` belongs to candidate A's seat while A10 is
+3. **Worktree.** Step 0 runs in `~/Worktrees/sia-infra`, **after the importer work has left it**. QA 106 rejected
+   round 2, so that now means round 3 (record 110) and Aaron's merge once it is accepted. `~/Worktrees/sia-forge` belongs to candidate A's seat while A10 is
    in build. Two seats never share one tree.
 
 ## What does not change
@@ -47,7 +47,7 @@ have had.
 
 Start a fresh Claude Code session in `~/Worktrees/sia-infra` and paste:
 
-> You are the developer seat (Forge), record session {N from the planner}. Read
+> You are the developer seat (Forge), record session 112. Read
 > `docs/loops/loop-15-slice-3-b-step0-brief.md` and `docs/loops/loop-15-slice-3-b-step0-amendment-1.md` on
 > `origin/docs/session-100-qa99-dispatch` (or master once merged), then the design at `e1173b1` on
 > `origin/loop/15-slice-3-forge-design-b`. Branch `loop/15-slice-3-b-step0` from the SHA the planner names. Ask atlas
