@@ -1095,24 +1095,6 @@ async function runLoopInner(
         };
       }
 
-      // R77. A path git will read that is still unrestored ends the stage here.
-      // No rmdir where a file was: that remove is a new write, and a link must not be followed.
-      if (configVerdict && gitDirs) {
-        const gitReads = [join(gitDirs.commonDir, "config"), join(gitDirs.gitDir, "config")];
-        const still = configVerdict.unrestored.filter((u) => gitReads.some((p) => u.startsWith(p)));
-        if (still.length > 0) {
-          return {
-            ok: false,
-            code: "stage-changed-config",
-            processRun,
-            reason:
-              `${roleName} was refused, not warned. ${configVerdict.message} ` +
-              `Rollback was not performed: ${still.join("; ")} is still unrestored, and a git call would read it. ` +
-              `The tree is left for a human.`,
-          };
-        }
-      }
-
       const closed = closeRefWindow();
       refVerdict = closed.verdict;
       const headNote = closed.headNote;
