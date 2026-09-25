@@ -21,6 +21,7 @@ import {
   checkRules,
   checkMirrorParity,
   checkStateSchema,
+  checkGreetingSize,
   checkCommandParity,
   checkCommandToolNames,
   checkCommandNames,
@@ -102,6 +103,8 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkStateViews(options.projectRoot));
   checks.push(checkCiStatus(options.projectRoot));
   checks.push(checkMergeMarkers(options.projectRoot));
+  // T-183: does the greeting still fit one tool result? Prints its count every run.
+  checks.push(checkGreetingSize(version, options.projectRoot));
 
   const fixed = checks.filter((c) => c.severity === "fixed");
   const issues = checks.filter((c) => c.severity === "issue");

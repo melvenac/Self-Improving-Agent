@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { renderState } from "../../../src/pipelines/session-start/state-render.js";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { renderState, GAP_CLIP, VERIFIED_CLIP, VERIFIED_SHOWN, VERIFIED_FULL_TEXT } from "../../../src/pipelines/session-start/state-render.js";
+import { parseState } from "../../../src/shared/state-schema.js";
 import type { State } from "../../../src/shared/state-schema.js";
 
 /**
@@ -107,5 +110,130 @@ describe("renderState — the startup read", () => {
     expect(text).toContain("Project: test-project v0.34.0");
     expect(renderState(state).join("\n")).toContain("Project: test-project");
     expect(renderState(state).join("\n")).not.toContain("v0.34.0");
+  });
+});
+
+/**
+ * T-183: the greeting stopped fitting one tool result (98,679 characters at rev
+ * 130, a third of it gap text), so gaps and verified claims are clipped to one
+ * line. The protection is that a clip is never silent: the marker, the full
+ * length and where the full text lives are printed every time one happens.
+ */
+describe("renderState — T-183 clipped gaps and verified claims", () => {
+  const LONG_GAP = `First sentence of a long gap. ${"Detail that must not reach the greeting. ".repeat(10)}`;
+  const LONG_GAP_NO_STOP = "x".repeat(GAP_CLIP + 60);
+  const SHORT_GAP = "A short gap. Two sentences, still under the limit.";
+  const LONG_CLAIM = `${"A verified claim that runs well past its limit ".repeat(4)}and keeps going.`;
+  const clipped: State = {
+    ...state,
+    verified: [
+      { id: "V-001", claim: LONG_CLAIM, evidence: [{}, {}] as never, since_session: 1, status: "active" },
+      { id: "V-002", claim: "short claim", evidence: [{}] as never, since_session: 1, status: "active" },
+    ],
+    gaps: [
+      { id: "G-001", what: LONG_GAP, evidence: "", recommended_update: "", opened_session: 54 },
+      { id: "G-002", what: SHORT_GAP, evidence: "", recommended_update: "", opened_session: 55 },
+      { id: "G-003", what: LONG_GAP_NO_STOP, evidence: "", recommended_update: "", opened_session: 56 },
+      { id: "G-004", what: "line one\nline two", evidence: "", recommended_update: "", opened_session: 57 },
+    ],
+  } as unknown as State;
+  const lines = renderState(clipped, "0.44.2");
+  const line = (id: string) => lines.filter((l) => l.startsWith(`  ${id} — `));
+
+  it("T183-2: a gap over the limit is ONE line, cut at its first sentence, with the marker and full length", () => {
+    const g = line("G-001");
+    expect(g).toHaveLength(1);
+    expect(g[0]).toBe(
+      `  G-001 — First sentence of a long gap.… (${LONG_GAP.length} chars; full text: state.json gaps[G-001]) (opened session 54)`
+    );
+    expect(lines.join("\n")).not.toContain("Detail that must not reach the greeting");
+  });
+
+  it("T183-2: with no sentence end inside the limit, the cut is at the limit — and still marked", () => {
+    expect(line("G-003")[0]).toBe(
+      `  G-003 — ${"x".repeat(GAP_CLIP)}… (${LONG_GAP_NO_STOP.length} chars; full text: state.json gaps[G-003]) (opened session 56)`
+    );
+  });
+
+  it("T183-2: a gap under the limit is printed whole, with no marker", () => {
+    expect(line("G-002")).toEqual([`  G-002 — ${SHORT_GAP} (opened session 55)`]);
+  });
+
+  it("a gap with a line break is still one line, and the break counts as a clip", () => {
+    expect(line("G-004")).toEqual([`  G-004 — line one… (17 chars; full text: state.json gaps[G-004]) (opened session 57)`]);
+    // No rendered line may begin with gap text: one gap, one line.
+    expect(lines).not.toContain("line two (opened session 57)");
+  });
+
+  it("clips a verified claim at its own limit and keeps the evidence count", () => {
+    const v = line("V-001");
+    expect(v).toHaveLength(1);
+    expect(v[0]).toMatch(new RegExp(`… \\(${LONG_CLAIM.length} chars; full text: state\\.json verified\\[V-001\\]\\) \\(2 evidence\\)$`));
+    const body = v[0].slice("  V-001 — ".length, v[0].indexOf("…"));
+    expect(body.length).toBeLessThanOrEqual(VERIFIED_CLIP);
+    expect(line("V-002")).toEqual(["  V-002 — short claim (1 evidence)"]);
+  });
+
+  it("verified is its count plus the newest VERIFIED_SHOWN, and the omission is counted and named", () => {
+    const many = Array.from({ length: VERIFIED_SHOWN + 5 }, (_, i) => ({
+      id: `V-${String(i + 1).padStart(3, "0")}`,
+      claim: `claim ${i + 1}`,
+      evidence: [],
+      since_session: 1,
+      status: i === 1 ? "reopened" : "active",
+    }));
+    const out = renderState({ ...state, verified: many } as unknown as State, "x");
+    const text = out.join("\n");
+    expect(text).toContain(`Verified (${many.length}):`);
+    // Newest ten by append order: V-006..V-015. V-002 is reopened, so it stays whatever its age.
+    for (let n = 6; n <= 15; n++) expect(out).toContain(`  V-${String(n).padStart(3, "0")} — claim ${n} (0 evidence)`);
+    expect(out).toContain("  V-002 — claim 2 (0 evidence) [REOPENED]");
+    for (const n of [1, 3, 4, 5]) expect(text).not.toContain(`V-00${n} —`);
+    expect(out).toContain(`  … 4 older verified claim(s) not shown (${many.length} total); all of them: ${VERIFIED_FULL_TEXT}`);
+  });
+
+  it("prints no omission line when nothing was omitted", () => {
+    expect(lines.join("\n")).not.toContain("not shown");
+  });
+
+  it("the marker is present exactly when text was cut, for every gap and claim", () => {
+    for (const g of clipped.gaps) {
+      const cut = g.what.length > GAP_CLIP || /[\r\n]/.test(g.what);
+      expect(line(g.id)[0].includes("full text: state.json"), g.id).toBe(cut);
+    }
+  });
+});
+
+/**
+ * T183-3: the render against THIS repository's own record. Every handoff
+ * watch-out and open question is byte-identical to state.json's (start.md: never
+ * summarise it, never drop items for length), and the tasks and objective are
+ * unchanged by the clip.
+ */
+describe("renderState — T183-3 the real record's handoffs are verbatim", () => {
+  const statePath = join(__dirname, "..", "..", "..", "..", ".agents", "state.json");
+  const parsed = parseState(readFileSync(statePath, "utf-8"));
+  if (!parsed.ok) throw new Error(`the repository's own state.json does not parse: ${parsed.error}`);
+  const real = parsed.data;
+
+  it("walks a non-empty set of handoff items (a vacuous pass is not a pass)", () => {
+    const items = real.handoffs.flatMap((h) => [...h.watch_out, ...h.open_questions]);
+    expect(items.length).toBeGreaterThan(0);
+  });
+
+  for (const h of real.handoffs) {
+    it(`renders the ${h.seat} seat's watch-outs and open questions as whole lines, byte-identical`, () => {
+      const lines = renderState(real, "x", { seat: h.seat });
+      for (const w of [...h.watch_out, ...h.open_questions]) expect(lines).toContain(`    - ${w}`);
+      expect(lines).toContain(`  pick up: ${h.pick_up}`);
+    });
+  }
+
+  it("leaves the objective and every active task title unchanged", () => {
+    const text = renderState(real, "x").join("\n");
+    if (real.objective) expect(text).toContain(`Objective: ${real.objective.text} (since session ${real.objective.since_session})`);
+    const active = real.tasks.filter((t) => t.status !== "done");
+    expect(active.length).toBeGreaterThan(0);
+    for (const t of active) expect(text).toContain(`${t.id} ${t.title}`);
   });
 });
