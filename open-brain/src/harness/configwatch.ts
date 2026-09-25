@@ -450,9 +450,9 @@ const readState = (p: string, baseline?: FileState | null, preflight = false): F
   try {
     return fileState(id, readFileSync(p), false);
   } catch (err) {
-    const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
-    const readError = code === "EACCES" || code === "EPERM" ? "unreadable" : `unreadable (${code})`;
-    return { ...fileState(id, null, true), readError };
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code !== "EACCES" && code !== "EPERM") throw err;
+    return { ...fileState(id, null, true), readError: "unreadable" };
   }
 };
 
