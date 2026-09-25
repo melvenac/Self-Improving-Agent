@@ -138,8 +138,9 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
 
   it.skipIf(isWin)("R77-READ-GUARDED: a mode-000 file is recorded, not thrown (readFileSync :438 is already inside readState's try)", () => {
     const cfg = join(repo.root, ".git/config");
+    const dirs = resolveGitDirs(repo.root);
     chmodSync(cfg, 0o000);
-    const watch = new ConfigWatch(resolveGitDirs(repo.root), repo.root);
+    const watch = new ConfigWatch(dirs, repo.root);
     let thrown = "";
     try {
       watch.begin("developer");
@@ -151,9 +152,10 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
 
   it.skipIf(isWin)("R77-READ-OTHER-CODE: .git/config replaced by a directory is recorded, not thrown (readState :438 rethrows EISDIR)", () => {
     const cfg = join(repo.root, ".git/config");
+    const dirs = resolveGitDirs(repo.root);
     unlinkSync(cfg);
     mkdirSync(cfg);
-    const watch = new ConfigWatch(resolveGitDirs(repo.root), repo.root);
+    const watch = new ConfigWatch(dirs, repo.root);
     let thrown = "";
     try {
       watch.begin("developer");
