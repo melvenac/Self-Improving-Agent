@@ -198,3 +198,5 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
 - **Aaron, 22:17Z, "yes"** (verbatim), answering Relay's D-003 question put to him verbatim: approves
   `hub-talk --as <name> --init-key --invite <code>` for new hub names. It does not choose between command and button
   for issuing a code (Loop 6's design). Relayed to Relay quoted, with where and when.
+- **Master on tcm:** run 36195820923 (`48acaa8`, runner `tcm-1`): **success, 1034 passed, 1 skipped (1035).** Master's
+  latest run now reads true. Until 2026-10-01, every future master push will again show GitHub's billing block.
