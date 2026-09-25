@@ -45,11 +45,16 @@ Read from A2A-Hub's own record and git on 2026-09-25 (origin/master `c4d2d1c`, s
 
 ## 3. Preconditions, before any other project is migrated
 
-1. **Candidate A closes** (Loop 15 slice three; A8 is in QA 99 as of this writing).
-2. **Forge fixes the importer: T-175 (delete the seeds) and T-180 (refuse or warn on stale inputs).** One short loop.
-   Without it, every adoption repeats two hand clean-ups.
-3. **T-167 is worth doing in the same stretch:** render the problem statement at `/start`. It is the structural fix
+1. **Forge fixes the importer: T-175 (delete the seeds) and T-180 (refuse or warn on stale inputs).** One short loop.
+   Without it, every adoption repeats two hand clean-ups. **Started the same day, in parallel with QA 99:**
+   `docs/loops/importer-fixes-brief.md`, developer record session 101 in `~/Worktrees/sia-infra`.
+2. **T-167 is worth doing in the same stretch:** render the problem statement at `/start`. It is the structural fix
    for §7's error, and every adopted project inherits the greeting.
+
+**Amended the same session: candidate A closing is NOT a precondition.** The first version of this section listed it
+first. Aaron asked whether the loop was blocking downstream work, and the answer was that it was not, technically. The
+importer code shares nothing with candidate A, and the gate was the planner's sequencing, not a dependency. Aaron:
+*"yes"* to briefing the importer fixes now.
 
 ## 4. The order
 

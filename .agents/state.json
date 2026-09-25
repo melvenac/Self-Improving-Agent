@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 122,
+  "revision": 123,
   "project": {
     "name": "self-improving-agent"
   },
@@ -607,7 +607,7 @@
       "opened_session": 100,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 100. Sequenced AFTER candidate A closes and AFTER T-175 + T-180 land. The plan file carries the order, the per-project state read on 2026-09-25, Makerspace's six guardrails, the seat-name collisions (foundry and co-op-mailer name 'Forge', Makerspace names 'Relay'), the Actions-minutes and machine-load hazards, and the A2A-Hub migration as the only precedent. Makerspace is the one Aaron said must not be messed up: record only, one seat, no loops, rehearsal in a throwaway clone first, its 17 uncommitted files settled by Aaron or its own seat first, --commit run by Aaron (G-007)."
+      "note": "Session 100. Sequenced AFTER T-175 + T-180 land (brief: docs/loops/importer-fixes-brief.md, developer record session 101, started 2026-09-25 in parallel with QA 99). Amended the same session: candidate A closing is NOT a gate; the planner had sequenced it so, and Aaron asked whether the loop blocked downstream work. It did not, technically. The plan file carries the order, the per-project state read on 2026-09-25, Makerspace's six guardrails, the seat-name collisions (foundry and co-op-mailer name 'Forge', Makerspace names 'Relay'), the Actions-minutes and machine-load hazards, and the A2A-Hub migration as the only precedent. Makerspace is the one Aaron said must not be messed up: record only, one seat, no loops, rehearsal in a throwaway clone first, its 17 uncommitted files settled by Aaron or its own seat first, --commit run by Aaron (G-007)."
     }
   ],
   "verified": [
