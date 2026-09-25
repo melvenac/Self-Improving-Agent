@@ -1216,16 +1216,7 @@ export class MachineConfigWatch {
       `type ${s.kind} dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
     // R78. A side that was read prints the hash and the facts. "Read or not" includes a read.
     const readText = (s: MachineSnap): string => `${s.hash} ${factText(s)}`;
-    const linkSide = (s: MachineSnap): string => {
-      if (s.lexicalKind !== "symlink") return factText(s);
-      const link =
-        `link: type symlink dev ${s.linkDev} ino ${s.linkIno} nlink ${s.linkNlink} size ${s.linkSize} mtimeNs ${s.linkMtimeNs} readlink ${s.lexicalTarget}`;
-      if (s.resolvedPath === null) {
-        const code = s.reason.startsWith("absent (") ? s.reason.slice("absent (".length, -1) : (s.errno ?? "UNKNOWN");
-        return `${link}; does not resolve (${code})`;
-      }
-      return `${link}; resolves to: ${factText(s)}`;
-    };
+    const linkSide = (s: MachineSnap): string => factText(s);
     // R79. A loop base that was not there is that phrase, never zeroed facts.
     const baseText = (s: MachineSnap): string =>
       s.resolvedPath === null && s.lexicalKind !== "symlink" ? "absent at loop base" : `${s.resolvedPath ?? "unresolved"} ${factText(s)}`;
