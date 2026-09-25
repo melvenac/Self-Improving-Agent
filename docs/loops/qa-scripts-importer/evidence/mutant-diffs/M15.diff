@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/cli.ts b/open-brain/src/cli.ts
+index de26508..dda29b7 100644
+--- a/open-brain/src/cli.ts
++++ b/open-brain/src/cli.ts
+@@ -461,7 +461,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
+       const judged = rep.staleness.inputs;
+       const stale = judged.filter((i) => i.verdict === "stale");
+       const unknown = judged.filter((i) => i.verdict === "could_not_tell");
+-      console.log(`Staleness: ${stale.length} stale${stale.length ? ` (${stale.map((i) => i.input).join(", ")})` : ""} · ${unknown.length} could not tell${unknown.length ? ` (${unknown.map((i) => i.input).join(", ")})` : ""} · ${judged.length - stale.length - unknown.length} current. Details are in the report's first section.`);
++      if (false) console.log(`Staleness: ${stale.length} stale${stale.length ? ` (${stale.map((i) => i.input).join(", ")})` : ""} · ${unknown.length} could not tell${unknown.length ? ` (${unknown.map((i) => i.input).join(", ")})` : ""} · ${judged.length - stale.length - unknown.length} current. Details are in the report's first section.`);
+       if (stale.length) console.log(`--commit will REFUSE until those inputs are updated and the draft is re-run, or until ${ACCEPT_STALE_FLAG} is passed.`);
+       const s = rep.inbox.by_status;
+       console.log(`Tasks: ${rep.inbox.items} (open ${s.open}, in_progress ${s.in_progress}, blocked ${s.blocked}, done ${s.done}); superseded links ${rep.inbox.superseded_links.length}; unparsed lines ${rep.inbox.unparsed.length}`);

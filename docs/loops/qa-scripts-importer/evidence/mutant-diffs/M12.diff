@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 7f98477..dc75556 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -435,7 +435,7 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
+       continue;
+     }
+     const where = `line ${d.line} declares Session ${d.n} (\`${d.text.length > 160 ? d.text.slice(0, 157) + "…" : d.text}\`); the latest session log is Session ${latest.n} (${latest.file})`;
+-    inputs.push({ input, verdict: d.n < latest.n ? "stale" : "current", declared_session: d.n, evidence: where });
++    inputs.push({ input, verdict: d.n < latest.n - 1 ? "stale" : "current", declared_session: d.n, evidence: where });
+   }
+   return { signal: STALENESS_SIGNAL, latest, inputs, not_judged };
+ }

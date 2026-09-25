@@ -1,0 +1,19 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 7f98477..f9f33c8 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -426,12 +426,12 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
+     if (text === null) { not_judged.push({ input, reason: "absent: nothing is imported from it" }); continue; }
+     if (!JUDGED.includes(key)) { not_judged.push({ input, reason: NOT_JUDGED_REASON[key]! }); continue; }
+     if (!latest) {
+-      inputs.push({ input, verdict: "could_not_tell", declared_session: declaredSession(text)?.n ?? null, evidence: `no SESSIONS/Session_N.md to compare against (${last.file})` });
++      inputs.push({ input, verdict: "current", declared_session: declaredSession(text)?.n ?? null, evidence: `no SESSIONS/Session_N.md to compare against (${last.file})` });
+       continue;
+     }
+     const d = declaredSession(text);
+     if (!d) {
+-      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: "names no `Session N` in its status blockquote or its headings" });
++      inputs.push({ input, verdict: "current", declared_session: null, evidence: "names no `Session N` in its status blockquote or its headings" });
+       continue;
+     }
+     const where = `line ${d.line} declares Session ${d.n} (\`${d.text.length > 160 ? d.text.slice(0, 157) + "…" : d.text}\`); the latest session log is Session ${latest.n} (${latest.file})`;

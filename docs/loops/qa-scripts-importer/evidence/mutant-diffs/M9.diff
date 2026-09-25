@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 7f98477..4c743c5 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -701,7 +701,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+   // 0. T-180: a stale input refuses before anything is written, including the snapshot.
+   const staleness = detectStaleness(readInputs(root).texts, findLastSession(join(root, ".agents/SESSIONS"), today));
+   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
+-  if (stale.length > 0 && opts.acceptStale !== true) {
++  if (stale.length > 0) {
+     const list = stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ");
+     throw new Error(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${list}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
+   }

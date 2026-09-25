@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 7f98477..0e49475 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -390,7 +390,6 @@ export function declaredSession(text: string): { n: number; line: number; text:
+       if (lines[i].startsWith(">")) candidates.push(i);
+     }
+   }
+-  lines.forEach((l, i) => { if (/^#{1,6} /.test(l)) candidates.push(i); });
+   let best: { n: number; line: number; text: string } | null = null;
+   for (const i of candidates) {
+     for (const m of lines[i].matchAll(DECLARED_RE)) {

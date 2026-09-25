@@ -1,0 +1,24 @@
+2026-09-25T04:45:35Z
+2026-09-25T04:47:42Z
+SUITE_EXIT=0
+ ✓ tests/shared/paths.test.ts (14 tests) 508ms
+   ✓ projectDirExists / existsCaseInsensitive > resolves a real 8.3 short-name segment (win32 only: short names exist only on Windows)  479ms
+ Test Files  73 passed (73)
+      Tests  1045 passed (1045)
+   Duration  124.39s (transform 2.24s, setup 1.35s, collect 11.96s, tests 308.93s, environment 25ms, prepare 13.83s)
+== processes before
+
+ProcessId ParentProcessId Name       Cmd                                                                                                                                                             
+--------- --------------- ----       ---                                                                                                                                                             
+     7728            9632 claude.exe "C:\Users\Aaron Melven\.local\bin\claude.exe" -p "You are the QA seat, record session 102, for the SIA importer fixes (T-175, T-180). Read docs/loops/importer-f
+
+
+
+== processes after
+
+ProcessId ParentProcessId Name       Cmd                                                                                                                                                             
+--------- --------------- ----       ---                                                                                                                                                             
+     7728            9632 claude.exe "C:\Users\Aaron Melven\.local\bin\claude.exe" -p "You are the QA seat, record session 102, for the SIA importer fixes (T-175, T-180). Read docs/loops/importer-f
+
+
+

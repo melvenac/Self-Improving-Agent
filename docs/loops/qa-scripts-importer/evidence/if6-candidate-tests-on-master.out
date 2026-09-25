@@ -1,0 +1,22 @@
+   × T-175: an import carries none of SIA's own history (IF-1) > verified[] and gaps[] are empty, the draft parses, and the report says 0 for both 66ms
+   × T-175: an import carries none of SIA's own history (IF-1) > the CLI's draft line says verified 0 · gaps 0 761ms
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > --draft names next-session.md as stale, with evidence, in the report's first section 52ms
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > --commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it 72ms
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale 1490ms
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-3: a project whose inputs are current, the known negative > no input is stale, every judged input is current, and --commit proceeds without the acknowledgement 15ms
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > an input with no session marker is 'could not tell', named in the report's first section 14ms
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > --commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report 1413ms
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > with no Session_N.md to compare against, every present input is 'could not tell' 13ms
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > inputs that are not imported as current state are listed as not judged, with a reason 15ms
+AssertionError: expected [ { id: 'V-001', …(4) }, …(4) ] to deeply equal []
+AssertionError: expected '\nstate import — draft (nothing else …' to contain 'verified 0 · gaps 0'
+AssertionError: expected undefined to be defined
+AssertionError: expected [Function] to throw an error
+AssertionError: expected +0 to be 1 // Object.is equality
+AssertionError: expected undefined to be defined
+AssertionError: expected undefined to be defined
+AssertionError: expected [] to deeply equal [ Array(1) ]
+AssertionError: expected undefined to be defined
+AssertionError: expected undefined to be defined
+ Test Files  2 failed (2)
+      Tests  10 failed (10)

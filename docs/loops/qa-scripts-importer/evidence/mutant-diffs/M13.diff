@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/cli.ts b/open-brain/src/cli.ts
+index de26508..7dfeb3a 100644
+--- a/open-brain/src/cli.ts
++++ b/open-brain/src/cli.ts
+@@ -435,7 +435,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
+     console.error("state import: pass --draft or --commit, not both");
+     process.exit(1);
+   }
+-  if (!commit && args.includes(ACCEPT_STALE_FLAG)) {
++  if (false && !commit && args.includes(ACCEPT_STALE_FLAG)) {
+     console.error(`state import refused: ${ACCEPT_STALE_FLAG} applies only to --commit. Nothing written.`);
+     process.exit(1);
+   }

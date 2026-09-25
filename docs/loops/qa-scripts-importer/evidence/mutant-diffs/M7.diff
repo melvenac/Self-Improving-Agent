@@ -1,0 +1,22 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 7f98477..0e487e9 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -698,6 +698,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+   if (!parsed.ok) throw new Error(`${DRAFT_REL} does not validate at ${parsed.error} — nothing written`);
+   if (parsed.data.revision !== 0) throw new Error(`${DRAFT_REL} revision must be 0 (is ${parsed.data.revision}) — nothing written`);
+ 
++  const snapshot = takeSnapshot(root, today, opts.forceSnapshot === true);
+   // 0. T-180: a stale input refuses before anything is written, including the snapshot.
+   const staleness = detectStaleness(readInputs(root).texts, findLastSession(join(root, ".agents/SESSIONS"), today));
+   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
+@@ -706,8 +707,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+     throw new Error(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${list}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
+   }
+ 
+-  // 1. Snapshot before anything under .agents/ changes.
+-  const snapshot = takeSnapshot(root, today, opts.forceSnapshot === true);
++  // 1. (mutant M7: the snapshot moved above the stale check)
+ 
+   // 2. state.json at revision 0, canonical bytes.
+   writeFileSync(statePath, serializeState(parsed.data), "utf-8");

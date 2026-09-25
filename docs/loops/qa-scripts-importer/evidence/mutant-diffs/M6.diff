@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/cli.ts b/open-brain/src/cli.ts
+index de26508..8595d13 100644
+--- a/open-brain/src/cli.ts
++++ b/open-brain/src/cli.ts
+@@ -426,7 +426,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
+   // acknowledgement would have been indistinguishable from none.
+   const importFlags = ["--draft", "--commit", "--force-snapshot", ACCEPT_STALE_FLAG];
+   const unknownFlags = args.slice(2).filter((a) => a.startsWith("--") && !importFlags.includes(a));
+-  if (unknownFlags.length > 0) {
++  if (false && unknownFlags.length > 0) {
+     console.error(`state import refused: unrecognised flag(s) ${unknownFlags.join(", ")}. Known: ${importFlags.join(", ")}. Nothing written.`);
+     process.exit(1);
+   }
