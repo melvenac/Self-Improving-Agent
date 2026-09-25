@@ -173,3 +173,8 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   The record's words "needs Aaron's nudge (T-160)" are superseded by this line.
 - **Turn 108:** a self-contained resume note to Grok. If the restart is a new session, it is **record 113**, pointed
   at the tracked files and turn 107's three outstanding items.
+- **Turn 110 (after the restart):** verified on tcm: candidate `f45c4c9` (36192597210) has the standing pair only;
+  ENOENT mutant `14655c3` (36192647557) is killed; R78 redcheck `c065652` (36192722723) has both rows red; R78 mutant
+  `ec24c67` (36192708146) is killed. **R78 and R82's ENOENT precision are accepted.** R35's win32 junction evidence
+  is local-only (Grok's seat), to be quoted in the handoff. Grok did not yet say whether it continues as 107 or is
+  a new 113. R79 started.
