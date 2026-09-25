@@ -3,7 +3,7 @@
  * EACCES on a directory is Linux; these rows skip on win32. tcm is the read.
  */
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
-import { chmodSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   ConfigWatch,
@@ -147,5 +147,19 @@ describe("R77 containment at A9", { timeout: 60_000 }, () => {
       thrown = (e as Error).message;
     }
     expect(thrown, "readFileSync EACCES is already contained").toBe("");
+  });
+
+  it.skipIf(isWin)("R77-READ-OTHER-CODE: .git/config replaced by a directory is recorded, not thrown (readState :438 rethrows EISDIR)", () => {
+    const cfg = join(repo.root, ".git/config");
+    unlinkSync(cfg);
+    mkdirSync(cfg);
+    const watch = new ConfigWatch(resolveGitDirs(repo.root), repo.root);
+    let thrown = "";
+    try {
+      watch.begin("developer");
+    } catch (e) {
+      thrown = (e as NodeJS.ErrnoException).code ?? (e as Error).message;
+    }
+    expect(thrown, "any read code, including EISDIR, stays inside the window").toBe("");
   });
 });
