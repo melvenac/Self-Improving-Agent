@@ -434,13 +434,7 @@ const readState = (p: string, baseline?: FileState | null, preflight = false): F
   const same = hadFile && baseline.dev === id.dev && baseline.ino === id.ino && baseline.nlink === id.nlink;
   if (hadFile && !same) return fileState(id, null, true);
   if (!hadFile && id.nlink !== 1 && !preflight) return fileState(id, null, true);
-  try {
-    return fileState(id, readFileSync(p), false);
-  } catch (err) {
-    const code = (err as NodeJS.ErrnoException).code;
-    if (code !== "EACCES" && code !== "EPERM") throw err;
-    return { ...fileState(id, null, true), readError: "unreadable" };
-  }
+  return fileState(id, readFileSync(p), false);
 };
 
 /** A change, including a hard link whose bytes still match (nlink or inode moved). */
