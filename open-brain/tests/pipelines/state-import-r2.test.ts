@@ -127,13 +127,17 @@ describe("R2-1 (IF-9): an encoding detail never turns a STALE input into 'could 
     expect(tree(root)).toEqual(before);
   }, 60_000);
 
-  it("an input that is not UTF-8 or BOM-marked UTF-16 says so, rather than 'names no Session N'", () => {
+  // Round 3 (R3-2) changed this test's rule. It used to read "an input that is
+  // not UTF-8 or BOM-marked UTF-16 says so", which is QA 106's D5: Windows-1252
+  // is not UTF-8 and its session marker is ASCII, so it is now read and judged
+  // (state-import-r3.test.ts). Only text with NUL bytes stays unreadable.
+  it("UTF-16 with no BOM (NUL bytes) is the shape that cannot be read: could not tell, and it says why rather than 'names no Session N'", () => {
     writeProject(root, 7, bodies(stale6));
     writeFileSync(join(root, INBOX), Buffer.from(bodies(stale6).inbox, "utf16le")); // UTF-16 with no BOM
     const inbox = judged(runDraft(root, TODAY).draft.report).find((i) => i.input === INBOX)!;
     expect(inbox.verdict).toBe("could_not_tell");
     expect(inbox.evidence).not.toContain("names no");
-    expect(inbox.evidence).toMatch(/encod|UTF/i);
+    expect(inbox.evidence).toMatch(/NUL/);
   });
 
   it("the sibling reads share the fix: a BOM-led task.md whose first line is `## Current Objective`, and a BOM-led log's date", () => {
