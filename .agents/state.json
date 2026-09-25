@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "revision": 126,
+  "revision": 127,
   "project": {
     "name": "self-improving-agent"
   },
@@ -678,6 +678,16 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Session 100. QA 102's Open 6: checks-state.ts:146's /auth|login|token|HTTP 401/ matches the hint. It reports a false reason for a legitimate skip. Minor; predates the importer work."
+    },
+    {
+      "id": "T-189",
+      "title": "The D-050 maintenance window: after importer round 2 hands back, upgrade GitNexus to 1.6.12, update and rebuild the SIA main checkout (T-172), reindex it fully, and reconnect /mcp in every open session",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 100,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Session 100, D-050. ORDER, each step read back before the next: (1) ListAgents: no seat mid-build and none using GitNexus MCP; tell Relay (A2A-Hub seats use the same global GitNexus). (2) npm i -g gitnexus@1.6.12; read back `gitnexus --version`. (3) Main checkout ~/Projects/Self-Improving-Agent (f673d5e, 111 behind master at 06:40Z): fetch, move to origin/master, npm ci and npm run build in open-brain; read back build-freshness PASS against the new HEAD. This tree serves every session's hooks and MCP server, so do it with no session mid-/start or mid-/end. (4) Full reindex there (T-055/G-043: use the full form, and read the indexed SHA back = HEAD). (5) Aaron runs /mcp reconnect for open-brain and gitnexus in each open session (a stale server reports success). (6) If the importer fixes are merged by then, the main-checkout rebuild is what makes them reach an adoption (T-181). A2A-Hub's own index (Relay's T-069) needs its own reindex after step 2."
     }
   ],
   "verified": [
@@ -2893,6 +2903,12 @@
       "title": "/sync REBUILDS the GitNexus index when it is behind (plain /sync, the fixing mode); `sync --check` stays read-only and reports. It is SIA work, not A2A-Hub work",
       "date": "2026-09-25",
       "note": "Aaron, SIA planner session (record session 100), 2026-09-25 about 06:45Z, verbatim: 'yes, sync should rebuild the index, sync is sia work, not a2a hub work'. Answering the planner's question 'Should /sync rebuild the GitNexus index when it is behind?' (recommendation: yes, plain /sync only). Raised by A2A-Hub's planner (Relay) on Aaron's request: A2A-Hub's index was 120 commits / two months behind and seats followed the MUST-run-impact rule on it; SIA's own main-checkout index is at 4550ee5, 98 commits behind that checkout's HEAD. Until now sync only WARNED (V-037's check) and the warning was not acted on: a detector firing into a warning nobody acts on is not a detector. The side effect that made rebuilds costly (analyze rewriting the tracked CLAUDE.md stats line) is already closed in SIA by .gitnexusrc noStats:true, which A2A-Hub adopts as its own T-069. Built as T-187."
+    },
+    {
+      "id": "D-050",
+      "title": "One maintenance window, after importer round 2 hands back: GitNexus 1.6.9 -> 1.6.12, the SIA main checkout updated and rebuilt (T-172), a full GitNexus reindex there, and /mcp reconnected in open sessions",
+      "date": "2026-09-25",
+      "note": "Aaron, SIA planner session (record session 100), 2026-09-25, verbatim: 'yes', to the planner's 'Shall I plan it that way?' (the three jobs as one window once round 2 hands back). Basis, from a read-only subagent's check of GitNexus's GitHub releases (v1.6.10 2026-08-27, v1.6.11 2026-09-04, v1.6.12 2026-09-12): only 1.6.10 breaks (Node floor ^22.18.0 || >=24.11.0, which this machine's v22.23.2 meets; unused group-matching config removed); no MCP tool is renamed or removed; every release requires a FULL reindex; 1.6.10 carries an FTS-reliability batch that may cover T-055 (not confirmed); G-043 (clean needs --force) and the npm 11 crash (#1939) are not mentioned, so assume both remain. Not now because developer 105 uses GitNexus MCP on this machine and replacing a global package under a running server on Windows can fail or break it. Steps are T-189."
     }
   ],
   "handoffs": [
