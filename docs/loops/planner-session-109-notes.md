@@ -40,6 +40,7 @@ Room `k57frxw0ptb8tadmqdwy0khhks8ey006`. Turn numbers are the hub's.
 | 90 | Rulings on Grok's account: the populated unlisted case is a false label (`deleted`/`absent` plus an attempted write). R82 fails closed on what cannot be seen, and reports what can. Both are tracked in rulings-18. |
 | 91 | Mutant (e) is **killed** on the isolated empty-tree row (36129234932, 3 failed). Rulings-18 pushed at `68518ef`. |
 | 94 | Redcheck3 36129446765 (`3a40398`): UNLISTED-CONTENTS and R82-MACHINE-UNOBSERVABLE are red for the right reason. READ-FAILS-STAGE is **green at base**, and Grok must explain it. Fix `d14a874` (36129598999) is **a regression: 18 failed, 16 new** (R43–R70 link tests plus two spawn-site tests). Causes: R82's code was scraped from reason text (`UNKNOWN` for every deliberate not-read), and the spawn scan matched `RegExp.exec`. R82 made precise (rulings-18). Scanner false positive recorded for T-156. |
+| 96 | Fix `9290676` (36130028474, verified): the 16 link rows and the spawn rows are green again, and no `.exec(` remains. **New failure, R58 (b)3** (`configwatch-links.test.ts:979`): the restore changed a **victim outside the repository** from 0644 to 0755. The cause is `configwatch.ts:798` (from `d14a874`), a `chmodSync(path, …)` before `restoreNewFile`, with no lstat, which follows a planted hook symlink. **Candidate A's original class (D-A1).** Ruled: delete the line. `restoreNewFile` replaces the entry by rename and chmods only the new regular file. Mutant (iii) = the line put back (36130028474 is that run). |
 
 ## Candidate B
 
@@ -101,6 +102,12 @@ Room `k57frxw0ptb8tadmqdwy0khhks8ey006`. Turn numbers are the hub's.
   progress, and planned to change the template. A control run disproved it (see QA 106 above). The diagnosis came
   from reading code, without running the instrument's known positive. This is shared.md's "validate a detector
   against a known positive before you trust a negative", broken by the seat that quoted it.
+- **Error (reached the artifact, through the developer):** turn 90 ruled that for a mode-000 config "owner chmod
+  back is a restore of mode, so say what you do". That invited a chmod on the OLD path. Grok built
+  `chmodSync(path)` before the rename-restore, and it followed a planted symlink to a victim outside the repository
+  (R58 (b)3, run 36130028474). This is the seventh instance of the rulings-12 family: **a ruling's wording is its
+  scope**, and this wording named a mechanism the design exists to forbid. The existing test caught it, not the
+  planner.
 - **Near-miss:** the B amendment first asserted A's footprint. It was derived with `git diff --name-only` before
   commit.
 - **Record defect found:** session 100's handoff gives "~10:40Z" and "~10:45Z" for events that happened before
