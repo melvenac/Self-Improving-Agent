@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.44.3] - Unreleased — the importer carries none of SIA's history into another project
+
+Brief: `docs/loops/importer-fixes-brief.md` (planner, record session 100). These fixes gate every
+further adoption (T-181). There is no version bump in these commits: the release is Aaron's (D-019).
+
+### Fixed
+
+- **`state import` seeded SIA's own history into every project it imported (T-175).**
+  `seedVerified()` and `seedGaps()` wrote V-001..V-005 and G-001..G-006, which are claims about this
+  repository at session 54, into the draft of any project. They are gone: an import starts with
+  `verified[]` and `gaps[]` empty. The report section formerly titled "Seeds" and the CLI's draft
+  line now print `verified 0 · gaps 0`, so the counts stay visible. The report fields are renamed
+  from `verified_seeded`/`gaps_seeded` to `verified_imported`/`gaps_imported`. SIA's own record is
+  unaffected: it was imported once, and `--commit` refuses a second run (V-009).
+
 ## [0.44.2] - 2026-09-24 — a Windows profile with a space in its name
 
 Found by the first full-suite run on the dedicated QA machine (`desktop-o4egb1e`, D-045), whose

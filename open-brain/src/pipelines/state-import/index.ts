@@ -73,8 +73,14 @@ export interface ImportReport {
   };
   handoff: { pick_up_lines: number; watch_out: number; open_questions: number; sections_not_imported: string[] };
   last_session: { n: number; date: string; uuid: string | null; file: string };
-  verified_seeded: number;
-  gaps_seeded: number;
+  /**
+   * Always 0. Prose files carry no verified claims or gaps in a form the
+   * importer reads, and it invents none: it used to seed SIA's own
+   * V-001..V-005 and G-001..G-006 into every project (T-175). The counts stay
+   * in the report so that it says 0 rather than going quiet.
+   */
+  verified_imported: number;
+  gaps_imported: number;
   summary_removal: { title_line: number; blockquote_lines: number; current_state_lines: number; total_lines_removed: number; kept_headings: string[] } | null;
 }
 
@@ -350,36 +356,6 @@ export function findLastSession(sessionsDir: string, today: string): ImportRepor
 }
 
 // ---------------------------------------------------------------------------
-// Seeds (the brief's V-001..V-005 and the carried gaps), since_session 54
-// ---------------------------------------------------------------------------
-
-export function seedVerified(): Verified[] {
-  const mk = (id: string, claim: string, testPath: string, testObs: string, tag: string, tagObs: string): Verified => ({
-    id, claim, since_session: 54, status: "verified",
-    evidence: [{ type: "test", path: testPath, observation: testObs }, { type: "tag", path: tag, observation: tagObs }],
-  });
-  return [
-    mk("V-001", "ob_start is the single startup implementation and returns state, drift, session and sizes", "open-brain/tests/server.test.ts", "handleStart shape pinned", "v0.28.0", "accepted Loop 1"),
-    mk("V-002", "state.json read side: strict schema, three-way reader, ob_start render, state-schema sync check", "open-brain/tests/shared/state-schema.test.ts", "strict schema + fixture round trip", "v0.29.0", "accepted Loop 2"),
-    mk("V-003", "state writer: revision check, atomic batch, retention, four views, ob_state", "open-brain/tests/shared/state-writer.test.ts", "refusals, atomicity, retention, views", "v0.30.0", "accepted Loop 3"),
-    mk("V-004", "/sync resolves the project root or refuses; identical from root and open-brain/", "open-brain/tests/pipelines/sync/repo-root.test.ts", "root from subdirectory; refusal names the cwd", "v0.30.0", "accepted Loop 3 (R4)"),
-    mk("V-005", "relocate existence check is case-insensitive; CI green on ubuntu", "open-brain/src/relocate.ts", "projectDirExists resolves the canonical path case-insensitively; CI run 34890412313 green on master 86ea010", "v0.29.1", "hotfix merged via PR #4"),
-  ];
-}
-
-export function seedGaps(): Gap[] {
-  const mk = (id: string, what: string, evidence: string, recommended_update: string): Gap => ({ id, what, evidence, recommended_update, opened_session: 54 });
-  return [
-    mk("G-001", "Cursor start.md/end.md copies are not on ob_start/ob_state", "Loop 1 and Loop 3 Developer reports (gaps[]); Loop 4 C2 freezes the Cursor copies", "Move the Cursor copies in a dedicated loop once ob_state is exercised from a Cursor seat"),
-    mk("G-002", "The repo's .claude/ is gitignored; mirror policy for slash commands is undecided", "Loop 1 Developer report (gaps[]); next-session.md carried items at Session 54", "Aaron decides: track .claude/commands/ or keep the template as the only tracked copy"),
-    mk("G-003", "SESSION_TEMPLATE.md pre-session checklist still says to read SUMMARY/INBOX by hand", "Loop 1 Developer report (gaps[]); template wording predates ob_start", "Reword the checklist to name ob_start / the /start greeting"),
-    mk("G-004", "vault-index-parity warns on one unindexed Checkpoints note", "/sync output at Sessions 53–55 (Loop 2 report, carried)", "Index the note through ob_store or remove it; then the check passes"),
-    mk("G-005", "DECISIONS.md is both the prose ADR log and the decisions[] index", "Loop 3 Developer report (gaps[]); importer reads ADR headings, add_decision writes state only", "Decide which is canonical after the first ob_state add_decision; render DECISIONS.md from state or stop importing"),
-    mk("G-006", "No CLI door for ob_state (only the MCP tool)", "Loop 3 Developer report (gaps[]); planned as Loop 7", "Add `open-brain state apply` once the tool contract has settled"),
-  ];
-}
-
-// ---------------------------------------------------------------------------
 // The draft
 // ---------------------------------------------------------------------------
 
@@ -427,8 +403,8 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
     decisions: { imported: 0, date_from_line: 0, date_partial: [], date_unknown: 0, skipped: [] },
     handoff: { pick_up_lines: 0, watch_out: 0, open_questions: 0, sections_not_imported: [] },
     last_session: last,
-    verified_seeded: 0,
-    gaps_seeded: 0,
+    verified_imported: 0,
+    gaps_imported: 0,
     summary_removal: null,
   };
 
@@ -437,10 +413,10 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
   report.objective = { found: objective !== null, preview };
   const decisions = texts.decisions ? importDecisions(texts.decisions, today, report.decisions) : [];
   const handoff = importHandoff(texts.next, current, report.handoff);
-  const verified = seedVerified();
-  const gaps = seedGaps();
-  report.verified_seeded = verified.length;
-  report.gaps_seeded = gaps.length;
+  const verified: Verified[] = [];
+  const gaps: Gap[] = [];
+  report.verified_imported = verified.length;
+  report.gaps_imported = gaps.length;
   if (texts.summary) report.summary_removal = planSummaryRemoval(texts.summary).report;
 
   const state: State = {
@@ -534,7 +510,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   L.push("", "## Handoff (next-session.md)", "");
   L.push(`pick_up: ${r.handoff.pick_up_lines} lines · watch_out: ${r.handoff.watch_out} bullets · open_questions: ${r.handoff.open_questions} bullets`);
   if (r.handoff.sections_not_imported.length) { L.push("", "Sections NOT imported (they stay in the snapshot):"); for (const s of r.handoff.sections_not_imported) L.push(`- ${s}`); }
-  L.push("", "## Seeds", "", `verified[]: ${r.verified_seeded} (V-001..V-00${r.verified_seeded}, since_session 54) · gaps[]: ${r.gaps_seeded} (G-001..G-00${r.gaps_seeded}, opened_session 54)`);
+  L.push("", "## Verified and gaps", "", `verified[]: ${r.verified_imported} · gaps[]: ${r.gaps_imported}. The prose files carry none in a form the importer reads, and it invents none. Record them with ob_state after the commit.`);
   L.push("", "## Last session", "", `Session ${r.last_session.n} — ${r.last_session.date} — uuid ${r.last_session.uuid ?? "none"} (${r.last_session.file})`);
   L.push("", "## SUMMARY.md lines `--commit` will remove", "");
   if (!r.summary_removal) L.push("_SUMMARY.md absent — nothing to remove._");
