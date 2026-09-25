@@ -51,6 +51,21 @@ the stage", both sides) and rulings-2 R8 (machine-wide config is reported, not r
   unobservable at the stage start is the environment. It stays a finding with `changed: false` (R73). A **visible**
   machine change stays reported, not restored, and the loop continues (R8, unchanged). The row is
   R82-MACHINE-UNOBSERVABLE (probe2's shape).
+- **Made precise at turn 94, after `d14a874` regressed 16 link tests:** "cannot be observed" means **an OS call on
+  that path failed with an error code** (`lstat`, `open`, `fstat` or `read` threw). The code must be carried as a
+  **structured field** from the catch that saw it, never scraped from message text. A deliberate not-read (D-041: a
+  link not followed, a handle refused, a different file reached) **is an observation**: its `lstat` and handle facts
+  are the record. It is never "unobservable". `d14a874` took the code from `end.reason` with a regex and defaulted to
+  `UNKNOWN`, so every deliberate not-read failed the stage. The planner's first wording said "fails with a code" but
+  did not say that a deliberate not-read is not a failure. It should have, because D-041's design turns on exactly
+  that distinction.
+
+## A finding for T-156, not fixed in A10
+
+The spawn-site scan (`the candidate's source has exactly one git spawn site`) matched `RegExp.prototype.exec` in
+`configwatch.ts` as a `child_process` exec. It matches by name, not by binding. That is G-040's family, a scan that
+cannot tell a thing from something with the same name. A10 avoids `.exec` at those sites rather than weakening the
+scan. The scan itself belongs to T-156.
 
 ## Standing
 
