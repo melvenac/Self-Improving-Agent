@@ -60,6 +60,13 @@ the stage", both sides) and rulings-2 R8 (machine-wide config is reported, not r
   did not say that a deliberate not-read is not a failure. It should have, because D-041's design turns on exactly
   that distinction.
 
+- **Made precise again at turn 107, after a win32-only R35 regression** (a junction on an XDG config failed the stage
+  `machine-config-unobservable` with errno ENOENT, at `e7fbe78`): **ENOENT and ENOTDIR are absence, not failure.** The
+  runtime observed that nothing is there, and `identify()` already says so. R82 fires only on codes meaning the runtime
+  could not see (EACCES, EPERM, EIO, ELOOP and the like). The exclusion lives in one place, and the row is
+  R82-ENOENT-IS-ABSENT. tcm cannot run the junction shape, so it is local-only evidence, and QA 108 on win32 re-runs
+  it.
+
 ## A finding for T-156, not fixed in A10
 
 The spawn-site scan (`the candidate's source has exactly one git spawn site`) matched `RegExp.prototype.exec` in
