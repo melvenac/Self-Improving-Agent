@@ -986,9 +986,6 @@ export class MachineConfigWatch {
       state: "not-read",
       reason: "not read",
     };
-    if (gate && lexical.kind === "symlink" && gate.lexicalKind !== "symlink") {
-      return { ...note, reason: "type change" };
-    }
     const sameObject = gate !== null && gate.kind === kind && gate.dev === dev && gate.ino === ino;
     const singleName = kind === "file" && nlink === 1 && gate !== null && gate.resolvedPath === resolvedPath;
     // R69. Absent at base may be read once it appears at the same parent and name, as one regular file.
@@ -997,7 +994,6 @@ export class MachineConfigWatch {
       gate.resolvedPath === null &&
       kind === "file" &&
       nlink === 1 &&
-      lexical.kind === "file" &&
       basename(resolvedPath) === basename(p) &&
       parentReal !== null &&
       parentReal === gate.parentReal;
