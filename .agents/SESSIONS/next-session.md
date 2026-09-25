@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 124 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 125 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,11 +6,11 @@
 
 ### Pick up here
 
-PLANNER SESSION 100 (Atlas), 2026-09-25 ~03:30Z. READ docs/loops/adoption-plan-2026-09-25.md FIRST: it is this session's whole state, written at Aaron's request so a fresh planner does not rebuild it (section 8 lists everything settled). CANDIDATE A: A8 9e2dd5d (Grok 4.7, record 98) is FROZEN and verified by the planner (ls-remote, each commit's diff --stat, every CI run's head and conclusion). QA 99 is RUNNING HEADLESS on the QA PC desktop-o4egb1e since 02:04Z (session 5ed40a1f, claude-opus-5-5, --effort high, dontAsk), launched by Aaron because the host classifier stopped the planner ('[Create Unsafe Agents]'). Its dispatch: docs/loops/loop-15-slice-3-dispatch-qa-a8.md; driver, push guard, early-stop text and live view: docs/loops/qa-99/ on branch docs/session-100-qa99-dispatch (not yet a PR). WHEN QA 99 FINISHES: read C:\Users\AARONM~1\sia-qa99\drive.meta over ssh (complete, attempts, refusal, ref_violations must be 'none'), then the report on origin qa/loop-15-slice-3-a8-report (last line 'QA-99: REPORT COMPLETE'), then rule: accepted -> B and C on the Claude developer seat; rejected -> rulings-16. THEN one record PR for the docs branch (dispatch, qa-99/, adoption plan, this state write) under D-032. RELAY (A2A-Hub): the T-003 tcm cutover window is OPEN since ~03:55Z (see the first watch-out); the derived SIA name list was sent. DEVELOPER 101 (Claude, ~/Worktrees/sia-infra) is building the importer fixes T-175 + T-180 per docs/loops/importer-fixes-brief.md.
+PLANNER SESSION 100 (Atlas), 2026-09-25 ~04:35Z. READ docs/loops/adoption-plan-2026-09-25.md FIRST (section 8 lists everything settled). CANDIDATE A: A8 9e2dd5d REJECTED by QA 99 (headless, report on origin/qa/loop-15-slice-3-a8-report 95727ef; A8-1, A8-2). Rulings-16 (R72-R76) and the A9 brief (docs/loops/loop-15-slice-3-a9-grok-brief.md, Grok record 103) are WRITTEN on the docs branch. A2A-Hub's T-003 window CLOSED at 04:27Z (K7 passed), so A9 may be dispatched: post the brief to hub room k57frxw0ptb8tadmqdwy0khhks8ey006 as atlas (the main-checkout client is now v1.10.0 with atlas's own key), and Aaron starts a fresh Grok session in ~/Worktrees/sia-forge. IMPORTER FIXES: candidate f6b6d44 (developer 101, done; handoff at 65e3a89 on loop/importer-fixes; CI 36093822945 on tcm-1 green; suite 1045/1045) is STAGED for headless QA 102 on the QA PC (tree at 3258372; dispatch docs/loops/importer-fixes-dispatch-qa.md; driver docs/loops/qa-102/). Aaron launches it with the QA 99 command, qa-99 replaced by qa-102; watch with watch.mjs --dir sia-qa102. On its verdict: accepted -> the merge and release are Aaron's (D-019), then the MAIN checkout must be updated and rebuilt (T-172) before any adoption (T-181). THEN one record PR for docs/session-100-qa99-dispatch under D-032.
 
 ### Watch out
 
-- T-003 TCM CUTOVER WINDOW OPENED 2026-09-25 ~03:55Z on Aaron's word ("dispatch relay A2A-Hub switchover"), relayed to Relay (a2a-planner-65). WHILE IT IS OPEN: dispatch NO A9 / no Grok hub work; the tcm runners may be paused (developer 101's CI queues). Relay tells the planner before and after the pause and when the window closes; each outward act still needs Aaron's word (A2A D-006). SIA names given as DERIVED: atlas and grok observed; forge planned but unobserved; probe released.
+- A2A-HUB T-003 IS DONE (window 2026-09-25 ~03:55Z-04:27Z, opened on Aaron's "dispatch relay A2A-Hub switchover"; K7 passed: 6 owned rows, the shared dev-key held by no name; tcm on v1.10.0, AUTH_MODE warn; ~/Projects/A2A-Hub at c4d2d1c). hub-talk now REQUIRES a key file: atlas's and grok's are in C:/Users/melve/.a2a-hub/keys/100.124.212.87-4000/ (created by the planner from ~/Worktrees/a2a-client-v1.10.0 on Aaron's word to Relay). A NEW SIA hub name needs `hub-talk --as <name> --init-key` against tcm AND Aaron's word first. Never copy a .key file anywhere. Relay's evidence: A2A-Hub docs/loops/t-003-cutover-log.md.
 - RECORD SESSION NUMBERS ARE NOT THE GREETING'S (T-164). Session 100's greeting said Session #7. The sequence: planner 90, Forge-infra 97, Grok 98, QA 99, planner 100. Put the record number in every dispatch.
 - READ THE INTENT DOCUMENTS AT /start (the Step-Back artifact on claude.ai, PRD.md, README.md) BEFORE THE FIRST RULING, and say in the briefing that you did. Sessions 90 AND 100 both skipped it; 100 read them only when Aaron pointed (error entry: adoption plan section 7). T-167 is the structural fix. The Step-Back stops at Loop 11 and needs a Part 6 at Loop 15 close (T-169).
 - QA 99 IS HEADLESS: nobody can talk to it and it cannot ask. Its questions land in the report's 'Open for the planner' section. Watch it with `node C:/Users/melve/Worktrees/sia-planner/docs/loops/qa-99/watch.mjs` (read-only; --once prints and exits). The driver resumes at most 3 times; a refusal is never resumed and its stop_details category is in drive.meta.
@@ -35,13 +35,14 @@ PLANNER SESSION 100 (Atlas), 2026-09-25 ~03:30Z. READ docs/loops/adoption-plan-2
 - Were Forge's two refusals false positives? /feedback was advised; not recorded as done.
 - T-165: every rejection of a Grok-built candidate (A2, A3, A4) traces at least partly to a planner ruling. Compare deliberately once slice three closes, reading it that way, not as a score for the developer seat.
 - Does medium effort (D-047) change report quality? Compare the first reports after 2026-09-25 against the earlier ones, labelled by effort.
+- gitnexus on the QA PC (QA 99 section 15 Q5): install it so /sync --check can run there? An install on Aaron's PC, so his call; until then it is recorded as unrun.
 
 ### Loop state
 
 **Open PRs:** 
-- docs/session-100-qa99-dispatch — QA: not_required — Branch, not yet a PR: QA 99 dispatch, docs/loops/qa-99/ (driver, push guard, early-stop text, live view), the adoption plan, and this state write. One record PR under D-032 after QA 99's verdict.
+- docs/session-100-qa99-dispatch — QA: not_required — Branch, not yet a PR: the QA 99 and QA 102 dispatches and drivers, the live view, the adoption plan, the importer brief, rulings-16, the A9 brief, and the state writes. One record PR under D-032 once QA 102 has reported.
 
-**SHA frozen for QA:** `9e2dd5dd8762f95431cffc80cab65f7c02885724`
+**SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** _None._
 
@@ -56,12 +57,12 @@ PLANNER SESSION 100 (Atlas), 2026-09-25 ~03:30Z. READ docs/loops/adoption-plan-2
 - D-039 A2A-Hub's planner routes through the SIA planner for shared work
 - D-040 seats dispatch CI on their own branches without asking; T-178 makes it automatic
 - D-041 A6 changes approach: the OS resolves links, the runtime compares the file reached
-- Rulings R1-R71 in docs/loops/loop-15-slice-3-rulings-1..15.md (R28 is the brief's)
+- Rulings R1-R76 in docs/loops/loop-15-slice-3-rulings-1..16.md (R28 is the brief's)
 - D-042 R67 approved: same place, not shared
 - D-043/D-044 two sandboxed self-hosted runners on tcm
 - D-045 QA moves to desktop-o4egb1e over SSH
 - D-046 A8 goes ahead with R69; v0.44.2 released
-- A to A7 rejected; A8 9e2dd5d frozen (Grok, record 98), in QA 99 (headless, desktop-o4egb1e) since 2026-09-25T02:04Z
+- A to A8 rejected (A8-1, A8-2; report 95727ef); rulings-16 R72-R76; A9 briefed, not dispatched
 - D-047 Opus 5.5 default effort medium; QA seats set effort explicitly
 - D-048 Makerspace record-only onto SIA before its cutover, after the pilots and T-175/T-180 (T-181; docs/loops/adoption-plan-2026-09-25.md)
 
