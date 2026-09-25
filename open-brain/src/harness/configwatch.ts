@@ -1050,14 +1050,6 @@ export class MachineConfigWatch {
       failed.reason = errno === null ? `absent (${code})` : `did not resolve: ${code}`;
       failed.errno = errno;
       // R79. A dangling link is not absence. lstat saw the link, so the record keeps those facts.
-      if (lexical.kind === "symlink") {
-        failed.kind = "symlink";
-        failed.dev = lexical.dev;
-        failed.ino = lexical.ino;
-        failed.nlink = lexical.nlink;
-        failed.size = lexical.size;
-        failed.mtimeNs = lexical.mtimeNs;
-      }
       return failed;
     }
     const note: MachineSnap = {
