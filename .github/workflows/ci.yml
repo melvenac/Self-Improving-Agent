@@ -5,12 +5,37 @@ on:
     branches: [master]
   pull_request:
   workflow_dispatch:
+    inputs:
+      hosted:
+        description: Run on GitHub-hosted ubuntu-latest instead of tcm (the fallback when tcm is down)
+        type: boolean
+        default: false
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Pushes to master run on GitHub-hosted ubuntu-latest; everything else (pull requests,
+    # dispatches) runs on the self-hosted runner on tcm, whose minutes are free (D-043).
+    # The job name stays `test`, so the check D-032's merge gate reads keeps its name.
+    runs-on: ${{ ((github.event_name == 'push' && github.ref == 'refs/heads/master') || inputs.hosted) && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
 
     steps:
+      # The tcm runner user is firewalled to the public internet only. If any of these connects,
+      # the isolation is gone and the job must not run the repository's code.
+      - name: Egress isolation self-check (tcm)
+        if: runner.environment == 'self-hosted'
+        run: |
+          fail=0
+          for t in 127.0.0.1/3210 172.20.0.2/3210 172.20.0.2/3211 172.20.0.3/4000 127.0.0.1/4000 \
+                   192.168.1.50/4000 100.124.212.87/4000 127.0.0.1/80 127.0.0.1/81; do
+            if timeout 5 bash -c "exec 3<>/dev/tcp/$t" 2>/dev/null; then
+              echo "::error::reachable from the runner: $t"; fail=1
+            else
+              echo "blocked: $t"
+            fi
+          done
+          if ls /opt/doorctl >/dev/null 2>&1; then echo "::error::/opt/doorctl is readable"; fail=1; else echo "denied: /opt/doorctl"; fi
+          exit "$fail"
+
       - uses: actions/checkout@v4
 
       # Node 22 LTS — v24 breaks the Smart Connections Obsidian plugin, so the
