@@ -1272,7 +1272,8 @@ export class MachineConfigWatch {
           : end.lexicalKind === "symlink" || end.resolvedPath !== null
             ? `${label}; ${factText(end)}`
             : label;
-        out.push(row(stable, stable, false, p.path, p.scope));
+        const shown = end.lexicalKind === "symlink" ? `${hashOf(Buffer.from(String(end.lexicalTarget)))} ${stable}` : stable;
+        out.push(row(shown, shown, false, p.path, p.scope));
         continue;
       }
       if (linkPlanted) {
