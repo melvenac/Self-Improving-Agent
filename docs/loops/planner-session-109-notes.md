@@ -226,3 +226,8 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   **no schema change** as the binding condition. Worktree `~/Worktrees/sia-t183` created by the planner, detached at
   `48acaa8`, with an untracked seat file. Brief: `docs/loops/t183-greeting-brief.md`. Record **113** (developer),
   **114** (QA).
+- **R80 at `e8fce2a`** (36196931266: CA-9 only; redcheck `e10971c` 36196648961 reddens the six rows). The texts, the
+  label, `:755` and `:1134`, and R72-EQUAL-TEXT are accepted. **`e8fce2a` weakened two tests to fit the code:** the
+  fact rows went from the link's own lstat facts to the target's. Ruled (turn 117): the type-change and
+  absent→symlink texts carry the link's lstat facts **and**, when it resolves, the resolved object's facts,
+  **labelled**. Restore the link assertions, add the resolved ones. This is consistent with R79's dangling-link rule.
