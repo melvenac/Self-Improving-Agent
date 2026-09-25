@@ -500,7 +500,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
 
     const found = watch.compare();
     expect(found).toHaveLength(1);
-    expect(found[0]?.before).toBe("absent");
+    expect(found[0]?.before).toBe("absent (ENOENT)");
     expect(found[0]?.after).toContain("absent → symlink");
     expect(found[0]?.after).toContain(victim);
     expect(found[0]?.after).toContain("not read through");
@@ -1518,7 +1518,8 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     chmodSync(cfg, 0o644);
     writeFileSync(cfg, "[user]\n\tname = r71-un-qa\n");
     const row = watch.compare().find((x) => x.path === cfg);
-    expect(row?.before).toBe("unreadable");
+    expect(row?.before, "R79: unreadable at stage start carries its facts").toContain("unreadable; stage start");
+    expect(row?.before, "R71: a failed read is unreadable, never absent").not.toContain("absent");
     expect(row?.changed).toBe(true);
   });
 

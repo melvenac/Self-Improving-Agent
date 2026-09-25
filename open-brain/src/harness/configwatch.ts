@@ -1046,7 +1046,19 @@ export class MachineConfigWatch {
     } catch (err) {
       const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
       const errno = resolutionUnobservable(code);
-      return { ...unresolved(), reason: errno === null ? `absent (${code})` : `did not resolve: ${code}`, errno };
+      const failed = unresolved();
+      failed.reason = errno === null ? `absent (${code})` : `did not resolve: ${code}`;
+      failed.errno = errno;
+      // R79. A dangling link is not absence. lstat saw the link, so the record keeps those facts.
+      if (lexical.kind === "symlink") {
+        failed.kind = "symlink";
+        failed.dev = lexical.dev;
+        failed.ino = lexical.ino;
+        failed.nlink = lexical.nlink;
+        failed.size = lexical.size;
+        failed.mtimeNs = lexical.mtimeNs;
+      }
+      return failed;
     }
     const note: MachineSnap = {
       lexicalKind: lexical.kind,
@@ -1185,10 +1197,14 @@ export class MachineConfigWatch {
       `type ${s.kind} dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
     // R78. A side that was read prints the hash and the facts. "Read or not" includes a read.
     const readText = (s: MachineSnap): string => `${s.hash} ${factText(s)}`;
+    // R79. A loop base that was not there is that phrase, never zeroed facts.
+    const baseText = (s: MachineSnap): string =>
+      s.resolvedPath === null && s.lexicalKind !== "symlink" ? "absent at loop base" : `${s.resolvedPath ?? "unresolved"} ${factText(s)}`;
     const stageBefore = (opened: MachineSnap): string => {
       if (opened.state === "read") return readText(opened);
-      if (opened.reason === "unreadable" || opened.hash === "unreadable") return "unreadable";
-      if (opened.resolvedPath === null) return "absent";
+      if (opened.reason === "unreadable" || opened.hash === "unreadable") return `unreadable; stage start ${factText(opened)}`;
+      if (opened.lexicalKind === "symlink" && opened.resolvedPath === null) return `${opened.reason}; ${factText(opened)}`;
+      if (opened.resolvedPath === null) return opened.reason.startsWith("absent (") ? opened.reason : "absent";
       return `stage start ${factText(opened)}`;
     };
     const row = (before: string, after: string, changed: boolean, path: string, scope: string): MachineConfigFinding => ({
@@ -1219,13 +1235,17 @@ export class MachineConfigWatch {
       }
       const linkPlanted = end.viaLink !== null && end.viaLink !== opened.viaLink;
       if (sameId(opened, end) && opened.state !== "read" && !linkPlanted) {
-        const label =
-          end.reason === "unreadable" || end.hash === "unreadable"
-            ? "unreadable"
-            : end.state === "unwatched"
-              ? `unwatched: ${end.reason}; not read`
-              : `not read: ${end.reason}`;
-        const stable = end.resolvedPath === null ? label : `${label}; ${factText(end)}`;
+        const unreadable = end.reason === "unreadable" || end.hash === "unreadable";
+        const label = unreadable
+          ? `unreadable; stage start ${factText(end)}`
+          : end.state === "unwatched"
+            ? `unwatched: ${end.reason}; not read`
+            : `not read: ${end.reason}`;
+        const stable = unreadable
+          ? label
+          : end.lexicalKind === "symlink" || end.resolvedPath !== null
+            ? `${label}; ${factText(end)}`
+            : label;
         out.push(row(stable, stable, false, p.path, p.scope));
         continue;
       }
@@ -1233,12 +1253,11 @@ export class MachineConfigWatch {
         const after =
           base.resolvedPath === null
             ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${factText(end)}`
-            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: base ${base.resolvedPath ?? "unresolved"} ${factText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
+            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: base ${baseText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
         out.push(row(stageBefore(opened), after, true, p.path, p.scope));
         continue;
       }
       const typeChange = end.lexicalKind === "symlink" && base.lexicalKind !== "symlink";
-      const unreadBoth = (end.reason === "unreadable" || end.hash === "unreadable") && (opened.reason === "unreadable" || opened.hash === "unreadable");
       const after = typeChange
         ? `type change: ${p.path} is a ${end.lexicalKind}${end.lexicalTarget ? ` target ${end.lexicalTarget}` : ""}; not read through; ${factText(end)}`
         : end.reason.startsWith("handle is a different file")
@@ -1249,8 +1268,8 @@ export class MachineConfigWatch {
               ? end.reason.startsWith("absent (")
                 ? end.reason
                 : `unwatched: ${end.reason}; not read`
-              : `not read: base ${base.resolvedPath ?? "unresolved"} ${factText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
-      const before = unreadBoth ? `unreadable; stage start ${factText(opened)}` : stageBefore(opened);
+              : `not read: base ${baseText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
+      const before = stageBefore(opened);
       out.push(row(before, after, true, p.path, p.scope));
     }
     return out;
