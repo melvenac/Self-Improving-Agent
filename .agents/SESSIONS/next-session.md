@@ -1,58 +1,67 @@
-<!-- generated from .agents/state.json rev 84 by open-brain v0.44.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 121 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner _(written session 77)_
+## planner _(written session 90)_
 
 ### Pick up here
 
-LOOP 15 SLICE THREE IS OPEN AND PARKED AT ITS FIRST ITEM, on Aaron's budget call (72% of the week used, Fable 100%, both reset Wednesday 00:00). G-045 IS DONE AND UNEVALUATED: candidate 9ed674c on origin/loop/15-slice-3-forge-candidate (tip 5759008, adding only the developer handoff), sitting on QA's criteria 17c9056 on origin/loop/15-slice-3. BOTH PUSHED, NEITHER MERGED - QA parked before running the criteria it wrote, so nothing has scored the candidate. The branch loop/15-slice-3 is checked out in the QA worktree; fast-forwarding it to 5759008 is a one-line move once that tree is free. Slice three's section 3 is untouched: no real roles through the runtime, no Jev thresholds, no F11, no T-155 - and T-155 is the instrument T-165 needs, so build it so something other than the real seat can be pointed at the gate. THE SEATS WERE STOOD DOWN WITHOUT /end, DELIBERATELY: V-074/T-163 means every close-out overwrites a shared slot with its own seat's value, so three more close-outs would have erased each other's uuids. Their durable work is in tracked files instead - QA's criteria at 17c9056 (all seven [mine] items ruled before any candidate existed, section 9), the developer's 222-line handoff at 5759008. WHAT THIS SESSION ACTUALLY SETTLED, none of it planned: native cross-session A2A works here (D-029 amends D-028, six directions receiver-attested, idle wake 1.486s); Loop 16's recorded cause for its missing transcripts is FALSE and the failure is per-launch (loop-16-closeout.md section 11); G-042 has a controlled measurement against it (V-076); and THE SCOPE LAYER NOW TRAVELS - PRD.md, DECISIONS.md and ENTITIES.md were untracked, reached one checkout, and are now on the allowlist. READ .agents/SYSTEM/PRD.md BEFORE RULING ANYTHING; its problem statement is four sentences and a planner seat ran a whole session without it.
+PLANNER SESSION 90 (Atlas), 2026-09-25 ~00:30Z, at the END of its context: a FRESH PLANNER takes over from here. CANDIDATE A: A7 REJECTED by QA 96 (report bd4c28b, PR #154). Rulings-15 (R68-R71) and the A8 brief are written. A8 is NOT YET DISPATCHED: post docs/loops/loop-15-slice-3-a8-grok-brief.md to hub room k57frxw0ptb8tadmqdwy0khhks8ey006 (write the message to a file and use --say "$(cat file)"; backticks inline get executed), and ask Aaron to start a fresh Grok session (record 98) in ~/Worktrees/sia-forge. R69 widens reads (a path absent at base is readable once it appears as a single-name file at the base parent's realpath). It is ruled on D-042's reasoning, but TELL AARON AND OFFER A VETO before A8 is built. QA 99 runs on the QA PC desktop-o4egb1e (D-045), driven over SSH with headless Claude Code launched via WMI; see Forge's docs/loops/infra-qa-machine-handoff.md on chore/qa-machine. FORGE (sia-infra-80, record 97, ~/Worktrees/sia-infra) is fixing two Windows-path defects the QA PC found: cli-bootstrap.test.ts's shell:true spawn breaks on a profile path with a space, and paths.ts existsCaseInsensitive misses 8.3 short names (a PRODUCT fix, option (a)). It is a PR for AARON to merge, a release per D-019; QA on that PC waits for it. INFRA LIVE: runners tcm-1/tcm-2 (D-043/D-044; PR #152 merged: branches and PRs on tcm, master on GitHub-hosted). A2A-Hub seats are RELEASED (QA 96's window ended 23:49Z); from A8 on, SIA QA needs no stops. The pending tcm key cutover (A2A D-006/D-007) touching grok/atlas waits until candidate A is decided. Aaron to fix: Tailscale 'Run unattended' on the QA PC. Merges: use a gate script that refuses unless checks have registered, all are SUCCESS and the state is CLEAN (C:/tmp/safe-merge.sh may not survive; rewrite it from rulings-14's error entry 3).
 
 ### Watch out
 
-- READ THE PRD BEFORE YOU RULE. .agents/SYSTEM/PRD.md is four sentences of problem statement and it now travels to every checkout (session 77). Before it did, a planner wrote a loop brief, ruled seven acceptance criteria and put a project-direction question to Aaron built on a dichotomy README.md lines 262-264 already resolve. THE RECORD IS MECHANISM; THE PRD IS PURPOSE. Reading the record exhaustively does not tell you what the project is for.
-- THE ORDERING FIX ALONE CONVERTED A LOUD CRASH INTO A SILENT PASS (V-075). After G-045's repair the stage that deleted the checked-out branch reported status: completed. IF D4 HAD ASSERTED THE GitFailed MESSAGE INSTEAD OF THE END STATE IT WOULD HAVE GONE GREEN THE MOMENT THE CRASH STOPPED, AND THIS WOULD HAVE SHIPPED. Assert the end state the repair must produce, never the symptom it removes.
-- A DETECTOR THAT FIRES INTO A BLOCK NOBODY ACTS ON IS NOT A DETECTOR. /sync reported `prd-version: PRD.md not found` as a WARNING on every run in every seat tree for as long as the worktrees have existed; this planner read past it three times in one session because it sat beside a missing specs/ and an unindexed vault note. With the file present the same check escalates to an ISSUE and immediately caught a real staleness. The check was right all along - its SEVERITY was load-bearing and wrong.
-- THE BASELINE AT eb14d09 IS RED UNDER CONTENTION AND GREEN IDLE (V-076). Same SHA, same 1031 tests: idle 1031/1031 exit 0; contended 1030 passed / 1 failed exit 1 with two unhandled onTaskUpdate. OBSERVATION, not conclusion - n=1 each side with the WORKTREE still uncontrolled. Do not score a candidate against an assumed-green base, and do not treat G-042 as explained until the repeat comparison exists in one tree.
-- 'RUN THE FULL SUITE ALONE' NAMED A CONDITION NO SEAT COULD VERIFY (T-168). Every seat believed it was following it. ListAgents makes the check possible - call it immediately before the run and RECORD the peer states beside the result, which is the field all eleven historical sightings lack. Limits: ListAgents has a registration lag, so an empty listing is not evidence of idleness; and it cannot see non-Claude load, so it is necessary and not sufficient.
-- impact() RETURNED risk LOW, epistemic 'exact', AND MISSED THE CALL SITE ON THE PATH UNDER REPAIR (T-166). Not staleness - subtree hash 281bbae5 matched at both commits. A LOW computed from half the call graph is indistinguishable from a LOW computed from all of it. The main index is 58 commits behind and pinned to the DELETED branch loop/4-dogfood; repo: 'Self-Improving-Agent' is ambiguous across three registered repos. CLAUDE.md's MUST-run-impact rule is only as good as the resolver.
-- EVERY CLOSE-OUT OVERWRITES A SHARED SLOT WITH ITS OWN SEAT'S VALUE (V-074, T-163). rev 61 removed the developer's uuid AND added its own in one commit. The record holds only the last seat to close. Nothing in /sync catches it. THIS IS WHY THE SEATS WERE STOOD DOWN WITHOUT /end at session 77 - fix T-163 before running three close-outs again.
-- THE SESSION COUNTER IS PER-WORKTREE (T-164). The developer greeted as #6 and QA as #5 against a record whose last session is #77. Tell every seat its RECORD number explicitly at dispatch.
-- A CONTROL MUST DISCRIMINATE THE TRANSITION, NOT MERELY BE PRESENT. I gave the developer a control reading 1 at BOTH revisions of the move it was meant to verify; it ran it on its unmoved tree and refused it. And a check against ABSENCE alone cannot separate 'the move failed' from 'the instrument is broken' - QA's addition, earned twice in five minutes.
-- WHEN A TASK IS CORRECTED, GREP FOR EVERY GAP AND FILE THAT CITES IT IN THE SAME WRITE. T-161 was corrected at rev 64 and G-044 - the gap it cites, and the gap ABOUT instruments that cannot tell 'nothing there' from 'I did not look' - was left asserting the falsified cause. The QA seat found it at /start. The gap is what a future seat reads first.
-- LABEL THE SOURCE WHEN YOU RELAY A FACT. A uuid mapping travelled planner -> QA -> developer unlabelled and was attributed to a file nobody had read. Caught by one grep, and only because the QA seat demanded a citation rather than accepting it.
-- BOTH SEATS REFUSED success:true AS EVIDENCE OF DELIVERY, refused to run /start on a peer's say-so when Aaron had named that gate, and the developer refused a planner ruling that would have silenced the row the planner had just named as the one that would notice. That behaviour is what made this session's findings trustworthy. Do not treat a refusal as friction.
-- NO add_gap BY ANY SEAT UNTIL T-158 LANDS (R28). update_gap is fine and was used three times this session (G-044, G-042 twice). New findings travel as verified entries, handoff rows and tasks.
-- PARALLEL BASH CALLS SHARE ONE CWD; MSYS MANGLES ref:path IN git show - USE POWERSHELL; the sync gate goes red on docs-only commits until you rebuild; GitHub Actions registers runs late. All four bit again, and the MSYS one was already in the developer's own watch-out list when both seats hit it independently within hours.
+- RECORD SESSION NUMBERS ARE NOT THE GREETING'S (T-164). Session 90's greeting said Session #6; QA 89's said 10. The sequence: planner 90, Grok 91, QA 92, then the next planner. Put the record number in every dispatch.
+- READ THE INTENT DOCUMENTS AT /start (the Step-Back artifact on claude.ai, not the vault copy; PRD.md; README.md). The memory entry saying so was loaded at session 90 and not acted on. /start does not name the reads, and T-167 is the structural fix.
+- FIVE PLANNER ERRORS IN ONE FAMILY ON CA-15 (rulings-9, -10, -11, and R49's lexical definition, owned in rulings-12). A principle defined by a list of what to record leaks at the list's edge. Define a rule by what it protects, and read back every row it touches before sending (rulings-12 has the table).
+- A CURSOR SEAT IS NEVER WOKEN BY A HUB MESSAGE (T-160; A2A-Hub T-050 still open). Read receipts make its silence VISIBLE: /reads shows 'unread by grok since T'. Aaron nudges it in Cursor. Always --session, never --peer; run hub-talk only from ~/Projects/A2A-Hub (v1.8.0); never --inbox/--wait without reading the output. A --wait-timeout 3600 in the background runs the full hour and exits 2 with the unread line.
+- FULL SUITES NEED A QUIET MACHINE (G-042). QA 89's idle run in the QA tree was clean (exit 0, 1121 passed); the developer tree's last run was heartbeat-only red, so the worktree is still a suspect (n=1 each). Other projects' sessions count too: at session 90 a '3d-printers' session was live, and Aaron kept it idle.
+- stop_reason "refusal" is the API safety layer. Candidate A's link-handling work goes to Grok (T-177); nobody rephrases around it. B and C go to Claude.
+- D-038/D-039/D-040: Aaron speaks only to the planner; quote him verbatim with where and when; a permission stop in another seat's window cannot be cleared by relay. CI on a seat's own branch no longer needs asking (D-040), but master, merges, tags and workflow edits still do.
+- update_task, update_gap, set_objective and set_handoff REPLACE their field. Compose in a SCRIPT FILE, DRY-RUN FIRST, and verify byte for byte. Git Bash's /tmp and node's /tmp are different directories on this machine (AppData\Local\Temp vs C:\tmp).
+- build-freshness fails after every docs commit in this tree; check `git diff --name-only <build> HEAD -- open-brain` before calling it stamp-only. /sync also carries a retirements ISSUE on ENTITIES.md (dream, reflection queue), recorded in T-169 part 3.
+- The recall trigger injects entry 299 (pipe-to-tail) on any Bash command with a pipe to tail/head. At session 90 it fired three times, and once it was right: `detach | tail -2` hid detach's exit code. Check the end state (HEAD, branch, porcelain) rather than the piped exit line.
+- DISPATCH TABLES ARE BUILT FROM EACH COMMIT'S `git diff --stat`, NEVER ITS SUBJECT. The A5 dispatch said 845dfaa was test-only when it also changed configwatch.ts (rulings-13, error entry 1).
+- A2A-Hub's Relay found tcm already runs the latest code (003f57d, v1.8.0), so there is NOTHING TO REBUILD. Aaron's 'Relay can rebuild the tcm hub when ready' was read as permission, not instruction; Relay will ask him what he meant.
+- MERGE ONLY THROUGH A GATE THAT REFUSES. `gh pr checks --watch` exits at once with 'no checks reported' when CI has not registered yet, and a chained merge then runs on UNSTABLE. PR #146 was merged that way (rulings-14, error entry 3).
+- GitHub Actions was at 1,802 of 2,000 minutes on 2026-09-24 (reset Oct 1). SIA is about 56% of the measured usage, then foundry and co-op-mailer. BATCH record PRs (one per milestone); probe branches from before PR #152 still run on hosted runners because they carry the old ci.yml.
+- A BRIEF'S CODE POINTERS ARE ITS SCOPE. The A7 brief named only repository-side sites for R64, and the developer built only there (rulings-15 error entry). Name every site on both sides, or name the class.
 
 ### Open questions
 
-- What should /start RENDER from the scope layer, now that it travels? The PRD's four-sentence problem statement is the candidate - short enough to sit above the objective, and unlike a hand-written intent field nobody has to maintain it. DECISIONS.md at 43KB is reference a seat fetches, not something to inject. T-167 carries this and it is the last open half of it.
-- Is G-042 concurrent-seat load rather than 'this machine'? V-076 supports it; the repeat comparison in ONE tree, three runs each way, is what would settle it.
-- Why did the two full-suite runs disagree before the controlled test - QA's red at eb14d09 against the developer's 1034/1034 at the candidate? Timing on a shared box is the obvious answer and nobody has established it.
-- Does the candidate carry a version bump and CHANGELOG entry? The developer followed the LOOP protocol (bump in a separate chore(release) commit after acceptance) over the global CLAUDE.md rule. The planner agrees; Aaron's to overrule. One commit on top either way.
-- When does a trigger injection change behaviour, and what counts it? Three injections now, all of entry 299, all apt to the command's shape and all changing nothing because the practice was already loaded. The trigger IS registered and live - the objective claimed otherwise until rev 70.
-- Should the seats run at all before Wednesday's reset, and at what count? T-165 (DeepSeek v4.1 Flash as a shadow DEVELOPER via T-155's gate) is the recorded answer and is gated on T-155, which this loop has not built.
-- What is the mechanism behind the per-launch transcript loss? Unknown and deliberately not chased. Aaron's rolled-terminals account is consistent and is NOT promoted to a cause.
+- Does Aaron accept R69's widening of reads (a path absent at base, read once it appears as a single-name file at the base parent's realpath)?
+- Is G-042 the machine's load, the worktree, or Cursor running in it? QA's tree is green when idle; the forge tree went red. Repeat runs in the SAME tree are the missing control.
+- T-050: can Cursor's stop hook wake an idle seat? A live trial is to be asked for through the SIA planner (A2A-Hub's D-003).
+- Were Forge's two refusals false positives? /feedback was advised; not recorded as done.
+- T-165: every rejection of a Grok-built candidate (A2, A3, A4) traces at least partly to a planner ruling. Compare deliberately once slice three closes, reading it that way, not as a score for the developer seat.
 
 ### Loop state
 
 **Open PRs:** _None._
 
-**SHA frozen for QA:** `9ed674c - G-045 candidate, pushed on origin/loop/15-slice-3-forge-candidate (tip 5759008), UNEVALUATED; QA criteria at 17c9056 on origin/loop/15-slice-3, unmoved`
+**SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- Keep the candidate free of the version bump (loop protocol) or bump at commit time (global CLAUDE.md rule)?
-- Run the G-042 repeat comparison in one tree - three idle, three contended?
-- What should /start render from the PRD, now that the scope layer travels?
+- R69: accept, or veto, before A8 is built.
+- Start a fresh Grok session (record 98) in ~/Worktrees/sia-forge for A8.
+- Merge Forge's Windows-path fix PR when it's green.
+- Turn on Tailscale 'Run unattended' on desktop-o4egb1e.
 
 **Rulings made mid-loop:** 
-- R1-R7 on the QA seat's seven [mine] criteria items, all ruled BEFORE any candidate existed, folded into 17c9056 at one SHA. R2 and R4 went against the QA seat: R2 inverted 'any read' from a HEAD-resolving blacklist to a whitelist of the restore's own plumbing (G-040's shape); R4 split A4 so a correct refusal cannot be scored as a real role completing a stage.
-- The G-045 restore gates on the WATCH'S OWN recorded delta, not on every stage and not on a caught exception. NARROWED BY THE DEVELOPER AND ACCEPTED: only a DELETED delta, because restoring a MOVED one before the read puts main back, headMoved goes false, and D2 reports nothing - the planner's ruling would have silenced the row it had named as the one that would notice.
-- D-029 amends D-028: native cross-session messaging for seats on one machine, hub for cross-machine.
-- The Loop 16 close-out is amended in place at section 11, dated, with nothing above it rewritten - Aaron's ruling. Acceptance does not reopen.
-- THE SCOPE LAYER TRAVELS - Aaron's ruling, against the planner's original T-167 framing of a one-or-two-sentence intent field. His objection: a sentence cannot carry the scope, and earlier SIA versions had the agent reconstruct it by reading multiple files, which captured enough. PRD.md, DECISIONS.md and ENTITIES.md are now tracked.
-- The seats stand down WITHOUT /end this session, because T-163's shared-slot overwrite would have had three close-outs erase each other.
+- D-031 release commit after acceptance
+- D-032 standing merge authority for record/docs-only PRs
+- D-033 and D-036: slice three closes at A, B and C
+- D-034 other projects' seats are recorded, pause on request
+- D-035 fresh seat sessions at each candidate boundary
+- D-037 memory is lookup by default (T-170)
+- D-038 Aaron speaks only to the planner; seats push their own working branches
+- D-039 A2A-Hub's planner routes through the SIA planner for shared work
+- D-040 seats dispatch CI on their own branches without asking; T-178 makes it automatic
+- D-041 A6 changes approach: the OS resolves links, the runtime compares the file reached
+- Rulings R1-R71 in docs/loops/loop-15-slice-3-rulings-1..15.md (R28 is the brief's)
+- A to A7 rejected (A7-1: no machine-side facts), report bd4c28b; A8 briefed, not dispatched
+- D-042 R67 approved: same place, not shared
+- D-043/D-044 two sandboxed self-hosted runners on tcm
+- D-045 QA moves to desktop-o4egb1e over SSH
 
 ## developer _(written session 74)_
 

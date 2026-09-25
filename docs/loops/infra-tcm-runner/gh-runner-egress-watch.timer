@@ -1,0 +1,10 @@
+# Installed by Forge (SIA record session 97, 2026-09-24) under D-043 and D-044.
+[Unit]
+Description=Every minute: check gh-runner's egress firewall
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

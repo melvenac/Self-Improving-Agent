@@ -3,6 +3,17 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { createRequire } from "node:module";
+
+/**
+ * The hook runs as `node <tsx's cli> <script>`: the node binary and tsx's own
+ * entry file, no npx and no shell. It used to be `npx tsx <script>` with
+ * `shell: true` on win32 (npx is a .cmd shim there), and a shell joins the
+ * arguments unquoted, so a script path containing a space (C:\Users\Aaron Melven\…)
+ * reached tsx cut at the space. Found on the QA machine, 2026-09-24. With no
+ * shell, every argument arrives verbatim on every platform.
+ */
+const TSX_CLI = createRequire(import.meta.url).resolve("tsx/cli");
 
 /**
  * Contract tests for the SessionStart hook's SESSION_UUID emission.
@@ -38,11 +49,10 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
 
   /** Run the hook with a payload on stdin, in an isolated HOME. */
   function run(payload: unknown): string {
-    return execFileSync("npx", ["tsx", script], {
+    return execFileSync(process.execPath, [TSX_CLI, script], {
       input: JSON.stringify(payload),
       encoding: "utf-8",
       env: { ...process.env, HOME: home, USERPROFILE: home },
-      shell: process.platform === "win32",
     });
   }
 
@@ -52,7 +62,7 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
    * not valid JSON — which is the whole subject of the F4 tests below.
    */
   function runRaw(raw: string): { status: number | null; stdout: string; stderr: string } {
-    const r = spawnSync("npx", ["tsx", script], {
+    const r = spawnSync(process.execPath, [TSX_CLI, script], {
       input: raw,
       encoding: "utf-8",
       // OPEN_BRAIN_ACTIVE_SESSION is pinned PER TEST, not left to $HOME.
@@ -65,7 +75,6 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
       // passed whatever the code did. A vacuous negative, and the third of that
       // family in this loop.
       env: { ...process.env, HOME: home, USERPROFILE: home, OPEN_BRAIN_ACTIVE_SESSION: slotPath },
-      shell: process.platform === "win32",
     });
     return { status: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "" };
   }
@@ -108,8 +117,8 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
     );
   });
 
-  // The only test here that spawns TWICE. Each `npx tsx` spawn costs ~2-3s
-  // (npx resolution + TypeScript compile), so two of them straddle vitest's 5s
+  // The only test here that spawns TWICE. Each tsx spawn costs ~2-3s (it was
+  // measured with npx resolution + TypeScript compile), so two of them straddle vitest's 5s
   // default and fail under load while every single-spawn sibling passes.
   it("generates a DIFFERENT uuid each run, never a reused one", () => {
     const first = uuidLines(run({ cwd }))[0];

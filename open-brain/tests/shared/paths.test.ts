@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { resolvePaths, obsidianVaultDir, canonicalizeProjectDir, projectDisplayName, projectDirExists, existsCaseInsensitive } from "../../src/shared/paths.js";
 import { mkdtempSync, mkdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
+import { execFileSync } from "node:child_process";
 
 describe("projectDisplayName", () => {
   // The regression: the display name used to be rebuilt from the canonical
@@ -137,4 +138,37 @@ describe("projectDirExists / existsCaseInsensitive", () => {
       rmSync(base, { recursive: true, force: true });
     }
   });
+
+  /**
+   * A Windows 8.3 short alias (AARONM~1) resolves on the filesystem but is never
+   * in a readdir listing, so the walk used to report it absent. os.tmpdir()
+   * returns that form in some launch contexts (a process started through WMI on
+   * a profile whose name has a space): found on the QA machine, 2026-09-24.
+   * The path is REAL: a directory with a long, spaced name is created, and
+   * Windows is asked for its short form, which is passed through an env var
+   * rather than a command line so it needs no quoting.
+   */
+  it.skipIf(process.platform !== "win32")(
+    "resolves a real 8.3 short-name segment (win32 only: short names exist only on Windows)",
+    () => {
+      const base = mkdtempSync(join(tmpdir(), "ob-Short-"));
+      try {
+        const long = join(base, "Long Folder Name With Space", "Deeper");
+        mkdirSync(long, { recursive: true });
+        const short = execFileSync(
+          "powershell",
+          ["-NoProfile", "-Command", "(New-Object -ComObject Scripting.FileSystemObject).GetFolder($env:OB_LONG).ShortPath"],
+          { encoding: "utf-8", env: { ...process.env, OB_LONG: long } },
+        ).trim();
+        // Fail loudly rather than pass vacuously if this volume makes no 8.3 names.
+        expect(short, "no 8.3 short name was generated for the test folder").toMatch(/~\d/);
+        expect(existsCaseInsensitive(short)).toBe(true);
+        expect(existsCaseInsensitive(short.replace(/\\/g, "/").toLowerCase())).toBe(true);
+        // The fallback accepts only what resolves: an alias that does not exist is still absent.
+        expect(existsCaseInsensitive(join(base, "NOSUCH~9", "Deeper"))).toBe(false);
+      } finally {
+        rmSync(base, { recursive: true, force: true });
+      }
+    },
+  );
 });

@@ -39,6 +39,30 @@ statement.** If you cannot, say so, and stop before acting.
 Seats still stop **without `/end`** (T-163 is unfixed; each close-out overwrites the shared slot).
 Durable work goes in tracked files.
 
+**Added the same session, on Aaron's word: record MODEL and EFFORT in every tracked report.** Both are
+variables. An unrecorded change to either confounds `T-165`'s later comparison of a different
+developer, and today's error entries are the first data on whether effort matters at all.
+
+**The instrument is the session transcript, not the settings.** *Corrected the same session; the QA
+seat found it.* This paragraph first said "read the effort level from your own session's settings".
+That instrument answers a different question. In the QA seat, three readings gave three answers:
+`~/.claude/settings.json` gave `high` (the configured default for the model), the inherited
+`CLAUDE_EFFORT` gave `max` (current, not at launch), and the host transcript
+(`~/.claude/projects/<slug>/<session-uuid>.jsonl`) carries a **per-entry `effort` field** that read
+`medium` on all 248 entries until 01:02:27Z and `max` after. `high` never appeared. **Read effort from
+the transcript's per-entry field, and report it as runs with timestamps**, because it can change
+mid-session. The planner's transcript confirms the instrument in a second seat: `medium` on 355
+entries 20:22Z → 00:59:43Z, `high` from 00:59:50Z. **So every ruling and every QA artefact written
+this session before those switches was produced at medium**: the G-045 acceptance (`76c728a`),
+criteria A (`770bcb9`, `ce8e6a1`, `96738a8`), rulings-1 and rulings-2. Each report states its
+commits' effort from the transcript.
+
+The planner's recommendation,
+**unmeasured and set by Aaron:** QA **max** (the last gate before merge, where the valuable work is
+thinking of the probe nobody else did); developer **xhigh** while building security-relevant
+candidates, **high** for mechanical work; planner **high**. The planner's own errors this session
+were failures to check, not to reason, and the fix for those is gates that code enforces.
+
 ## 2. Probe (QA): score the G-045 candidate first
 
 - Candidate **`9ed674c`** (on `origin/loop/15-slice-3-forge-candidate`, tip `5759008`, which adds

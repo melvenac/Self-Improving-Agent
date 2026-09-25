@@ -1,0 +1,118 @@
+#!/bin/bash
+# gh-runner-egress - owner-matched egress firewall for the GitHub Actions runner user on tcm.
+#
+# Installed by Forge (SIA developer seat, record session 97, 2026-09-24) under D-043 and D-044.
+# It owns ONLY the GH_RUNNER chain (IPv4 and IPv6) and one jump per family at OUTPUT position 1.
+# It never touches ufw's chains or files, Docker's chains, or any other rule.
+#
+#   apply   build the chains, put the jump first, snapshot both into /run (root only)
+#   check   exit 0 only if the jump is still OUTPUT rule 1 and the chain matches its snapshot
+#   watch   check; on failure log why and STOP every gh-runner@ instance (fail closed)
+#   remove  delete the jumps and the chains
+#
+# IPv4: the runner may reach systemd-resolved's DNS stubs and the public internet, nothing else.
+# IPv6: rejected entirely. tcm's global IPv6 /64 is shared with the LAN and the ISP can change it,
+#       so a prefix rule would go stale silently; clients fall back to IPv4.
+set -euo pipefail
+
+RUNNER_USER=gh-runner
+CHAIN=GH_RUNNER
+RUNNER_UNITS='gh-runner@*.service'   # every runner instance (D-044: tcm-1, tcm-2)
+STATE_DIR=/run/gh-runner-egress
+RUID=$(id -u "$RUNNER_USER")
+
+v4_rules() {
+  echo "-p udp -d 127.0.0.53/32 --dport 53 -j RETURN"
+  echo "-p tcp -d 127.0.0.53/32 --dport 53 -j RETURN"
+  echo "-p udp -d 127.0.0.54/32 --dport 53 -j RETURN"
+  echo "-p tcp -d 127.0.0.54/32 --dport 53 -j RETURN"
+  # Every address of this host: hub :4000, Convex :3210, traefik :80/:81, Samba, ssh.
+  echo "-m addrtype --dst-type LOCAL -j REJECT"
+  # Loopback, the docker bridges (Convex and the hub directly, Moonraker), the LAN, the tailnet,
+  # link-local, multicast and reserved.
+  local net
+  for net in 0.0.0.0/8 10.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 \
+             192.168.0.0/16 224.0.0.0/4 240.0.0.0/4; do
+    echo "-d $net -j REJECT"
+  done
+}
+
+v6_rules() {
+  # tcp-reset fails a connect at once; the ICMP reject took ~1s per address, so a client that tries
+  # a host's addresses in sequence (registry.npmjs.org has 12 AAAA) timed out before reaching IPv4.
+  echo "-p tcp -j REJECT --reject-with tcp-reset"
+  echo "-j REJECT"
+}
+
+tool() { if [ "$1" = 4 ]; then echo iptables; else echo ip6tables; fi; }
+
+remove_jumps() {
+  local t=$1
+  while $t -w -C OUTPUT -m owner --uid-owner "$RUID" -j "$CHAIN" 2>/dev/null; do
+    $t -w -D OUTPUT -m owner --uid-owner "$RUID" -j "$CHAIN"
+  done
+}
+
+apply_family() {
+  local fam=$1 t rule
+  t=$(tool "$fam")
+  if $t -w -n -L "$CHAIN" >/dev/null 2>&1; then $t -w -F "$CHAIN"; else $t -w -N "$CHAIN"; fi
+  while read -r rule; do
+    # shellcheck disable=SC2086  # rules are whitespace-separated words by construction
+    $t -w -A "$CHAIN" $rule
+  done < <("v${fam}_rules")
+  remove_jumps "$t"
+  $t -w -I OUTPUT 1 -m owner --uid-owner "$RUID" -j "$CHAIN"
+  $t -w -S "$CHAIN" > "$STATE_DIR/v$fam.chain"
+  $t -w -S OUTPUT | sed -n 2p > "$STATE_DIR/v$fam.jump"
+  grep -q -- "--uid-owner $RUID " "$STATE_DIR/v$fam.jump"
+  grep -q -- "-j $CHAIN\$" "$STATE_DIR/v$fam.jump"
+}
+
+check_family() {
+  local fam=$1 t
+  t=$(tool "$fam")
+  [ -s "$STATE_DIR/v$fam.chain" ] && [ -s "$STATE_DIR/v$fam.jump" ] \
+    || { echo "IPv$fam: no snapshot in $STATE_DIR (apply has not run since boot)"; return 1; }
+  [ "$($t -w -S OUTPUT | sed -n 2p)" = "$(cat "$STATE_DIR/v$fam.jump")" ] \
+    || { echo "IPv$fam: OUTPUT rule 1 is not the $RUNNER_USER jump to $CHAIN"; return 1; }
+  [ "$($t -w -S "$CHAIN" 2>/dev/null)" = "$(cat "$STATE_DIR/v$fam.chain")" ] \
+    || { echo "IPv$fam: chain $CHAIN is missing or differs from its snapshot"; return 1; }
+}
+
+case "${1:-}" in
+  apply)
+    install -d -m 0700 "$STATE_DIR"
+    apply_family 4
+    apply_family 6
+    echo "gh-runner-egress: applied for uid $RUID (IPv4 + IPv6)"
+    ;;
+  check)
+    rc=0
+    check_family 4 || rc=1
+    check_family 6 || rc=1
+    [ "$rc" -eq 0 ] && echo "gh-runner-egress: OK (IPv4 + IPv6 jump first, chains match snapshot)"
+    exit "$rc"
+    ;;
+  watch)
+    if ! out=$("$0" check 2>&1); then
+      logger -t gh-runner-egress -p auth.crit "egress firewall check FAILED, stopping $RUNNER_UNITS: $out"
+      echo "$out"
+      systemctl stop "$RUNNER_UNITS"
+      exit 1
+    fi
+    ;;
+  remove)
+    for fam in 4 6; do
+      t=$(tool "$fam")
+      remove_jumps "$t"
+      if $t -w -n -L "$CHAIN" >/dev/null 2>&1; then $t -w -F "$CHAIN"; $t -w -X "$CHAIN"; fi
+    done
+    rm -rf "$STATE_DIR"
+    echo "gh-runner-egress: removed"
+    ;;
+  *)
+    echo "usage: $0 apply|check|watch|remove" >&2
+    exit 2
+    ;;
+esac
