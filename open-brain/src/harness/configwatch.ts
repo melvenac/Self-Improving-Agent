@@ -1279,7 +1279,7 @@ export class MachineConfigWatch {
         const after =
           base.resolvedPath === null
             ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${end.lexicalKind === "symlink" ? linkSide(end) : factText(end)}`
-            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${end.lexicalKind === "symlink" ? linkSide(end) : `${end.resolvedPath ?? "unresolved"} ${factText(end)}`}`;
+            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: base ${baseText(base)}; current ${end.lexicalKind === "symlink" ? linkSide(end) : `${end.resolvedPath ?? "unresolved"} ${factText(end)}`}`;
         out.push(row(stageBefore(opened), after, true, p.path, p.scope));
         continue;
       }
@@ -1294,7 +1294,7 @@ export class MachineConfigWatch {
               ? end.reason.startsWith("absent (")
                 ? end.reason
                 : `unwatched: ${end.reason}; not read`
-              : `not read: loop base ${baseText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
+              : `not read: base ${baseText(base)}; current ${end.resolvedPath ?? "unresolved"} ${factText(end)}`;
       const before = stageBefore(opened);
       out.push(row(before, after, true, p.path, p.scope));
     }
