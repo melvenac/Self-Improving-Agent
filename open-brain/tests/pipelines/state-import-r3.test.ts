@@ -267,14 +267,22 @@ describe("R3-3 (IF-19): a failed rollback leaves a project that says so, and not
     }
   });
 
-  it("a completed rollback leaves no marker, and a re-run completes", () => {
-    writeProject(root, 7);
-    runDraft(root, TODAY);
-    const before = tree(root);
-    inject.writeOn = ".agents/TASKS/task.md";
-    expect(() => runCommit(root, TODAY)).toThrow(/Rolled back/);
-    inject.writeOn = null;
-    expect(tree(root)).toEqual(before);
-    expect(realFs.existsSync(runCommit(root, TODAY).statePath)).toBe(true);
-  });
+  // With archive/ absent, removing what the run created takes the marker with it; with archive/
+  // present, only the marker's own removal does. Both, so neither line can go unnoticed.
+  for (const archiveBefore of [false, true]) {
+    it(`a completed rollback leaves no marker, and a re-run completes (archive/ ${archiveBefore ? "already present" : "absent"} before)`, () => {
+      writeProject(root, 7);
+      runDraft(root, TODAY);
+      if (archiveBefore) {
+        realFs.mkdirSync(join(root, ".agents/archive/pre-state-migration-2026-09-01"), { recursive: true });
+        realFs.writeFileSync(join(root, ".agents/archive/pre-state-migration-2026-09-01/old.md"), "older\n");
+      }
+      const before = tree(root);
+      inject.writeOn = ".agents/TASKS/task.md";
+      expect(() => runCommit(root, TODAY)).toThrow(/Rolled back/);
+      inject.writeOn = null;
+      expect(tree(root)).toEqual(before);
+      expect(realFs.existsSync(runCommit(root, TODAY).statePath)).toBe(true);
+    });
+  }
 });
