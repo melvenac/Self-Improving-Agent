@@ -35,7 +35,7 @@ Answers **questions the planner or Aaron hand it**, each as a brief with a quest
 
 ## How it reports
 
-- Each deliverable is a file: `docs/research/<topic>.md` on a branch `research/<topic>`, pushed. **Label every claim
+- Each deliverable is a file: `docs/loops/research/<topic>.md` (inside `docs/loops/`, which `.gitignore` re-includes; `docs/research/` is IGNORED by `/docs/*`, and the first version of this charter named it, the planner's error, caught by Scout) on a branch `research/<topic>`, pushed. **Label every claim
   "read" (a source it opened) or "told" (a source quoting another).** A claim loses its source at each hop.
 - Then it messages atlas by SendMessage with the branch, the file and a five-line summary. The planner reads it, and
   merges it under D-032 when it is docs only.
