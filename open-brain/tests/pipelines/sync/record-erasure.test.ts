@@ -253,3 +253,27 @@ describe("record-erasure (T163-2)", () => {
     }
   });
 });
+
+// The brief's KNOWN POSITIVES, read from THIS repository's own committed history:
+// rev 60->61 (0ad9c29) and rev 61->62 (024dfa4) are T-163's measured failure,
+// each close-out replacing the other seat's uuid. Skipped (visibly) in a shallow
+// clone — CI's actions/checkout is depth 1, so this row runs in a seat checkout
+// only, and a green CI run says nothing about it.
+const REPO = join(import.meta.dirname, "../../../..");
+const shallow = execFileSync("git", ["rev-parse", "--is-shallow-repository"], { cwd: REPO, encoding: "utf8" }).trim() === "true";
+describe("record-erasure against this repository's history (T163-2 known positives)", () => {
+  it.skipIf(shallow)("flags rev 60->61 and rev 61->62, each naming the uuid removed and the session that replaced it", () => {
+    const r = scanErasures(REPO);
+    if (!r.ok) throw new Error(r.skip);
+    const at = (a: number, b: number) =>
+      r.erasures.filter((e) => e.revBefore === a && e.revAfter === b && e.removed.kind === "session");
+    const r61 = at(60, 61);
+    const r62 = at(61, 62);
+    expect(r61.map((e) => e.removed.uuid)).toEqual(["46758737-4461-4480-be96-fcf65ba9fa95"]);
+    expect(r61[0].addedBySameStep.map((x) => x.uuid)).toEqual(["6eab2c5c-8a09-4a22-9bdf-4af60df64f4e"]);
+    expect(r62.map((e) => e.removed.uuid)).toEqual(["6eab2c5c-8a09-4a22-9bdf-4af60df64f4e"]);
+    expect(r62[0].addedBySameStep.map((x) => x.uuid)).toEqual(["22631f4e-433a-4f29-8669-47ee2f543bec"]);
+    // Legacy: listed, never failed on.
+    expect([...r61, ...r62].every((e) => !e.enforced)).toBe(true);
+  }, 180_000);
+});
