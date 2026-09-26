@@ -32,7 +32,13 @@ function inScratch(cwd: string, args: readonly string[] = []): void {
   };
   const cwdOut = outside(cwd);
   if (cwdOut !== undefined) throw new Error(`refusing to run the CLI outside the temp dir: ${cwdOut}`);
-  void args; // R185-8 red first: the argument check is not built yet
+  // An argument is only a path if something is there; a flag or a word that
+  // names nothing cannot point the CLI at a checkout.
+  for (const a of args) {
+    const p = resolve(cwd, a);
+    const argOut = existsSync(p) ? outside(p) : undefined;
+    if (argOut !== undefined) throw new Error(`refusing to run the CLI on an argument outside the temp dir: ${a} -> ${argOut}`);
+  }
 }
 
 function cli(cwd: string, ...args: string[]): Run {
