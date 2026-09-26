@@ -83,3 +83,37 @@ All readings are from this machine (win32, Claude Code 2.1.283), this session's 
 ## Row #348
 
 Not touched. To be written up in the handoff as a one-off repair for Aaron.
+
+---
+
+# Step 0b (after Atlas's ruling: Q1 SIA-owned, Q2 Cursor refuses)
+
+**Instrument:** two isolated headless `claude -p` runs (Claude Code 2.1.283, `--setting-sources local
+--settings <probe> --strict-mcp-config --mcp-config <probe>`, so no user hooks, no SIA stores, no plugins).
+There was a probe SessionStart hook (busy-waits 4s and then 8s), a probe PreToolUse hook, and a probe stdio
+MCP server. Each probe logs **only its own process**: pid, ppid, ancestor chain with creation times, its
+own `CLAUDE*` env. `/clear` was sent over stream-json input. The scripts and logs are in this session's
+scratchpad (`probe/`), not tracked.
+
+| Question | Run 1 | Run 2 | Answer |
+|---|---|---|---|
+| **(a)** Does the hook see its claude's PID? | Hook `CLAUDE_PID=10300` = its claude.exe (chain: node ← bash ← bash ← claude 10300) | `13988` = its claude | **Yes, via `CLAUDE_PID`.** Not via `ppid`: the hook's parent is bash, and claude is three levels up. |
+| Does the MCP server's `ppid` name its claude? | 12992 ← 10300 | 2292 ← 13988 | **Yes**, and interactively too (8832 ← 2500). |
+| Does the MCP server's `CLAUDE_PID` name its claude? | **`2500`: WRONG** | **`2500`: WRONG** | **No.** Its value is inherited from whoever launched claude (here, my session). The host sets it for hooks, not for MCP servers. **The server must use `process.ppid`, never `CLAUDE_PID`.** This bites exactly in the nested case, a claude launched from a claude's tool shell, which is how headless QA seats run. |
+| Server survives `/clear`? | same pid 12992 serves `f90b2b58` then `2ceaa5d6` | same pid 2292 serves `121b333e` then `8df46daa` | **Yes** (with Step 0's interactive observation, three instances). |
+| Server's spawn env after `/clear` | `CLAUDE_CODE_SESSION_ID` = the pre-clear id | same | **Stale: observed**, now in the server's own env (no longer "not measured"). |
+| **(b)** SessionStart completes before a tool call? | startup: hook 40.716–44.717, first PreToolUse 47.466, prompt queued at t0 | startup: hook 55.144–03.144, first tool 05.998. **`/clear` and the next prompt queued back to back:** hook 29.020–37.021 (8s), first tool **40.811** | **Yes, 3 of 3**, including a prompt already queued behind `/clear`. In the event stream `hook_response` precedes `init` in every case. |
+
+**Limits of (b):** headless only (interactive agrees but is not timed: this session's `SessionStart:clear`
+output was in context before its first turn). **A hook that exceeds its timeout is not covered:** the host
+proceeds, and the file keeps the previous session's id. So the design does not rely on the ordering alone:
+
+- **SessionStart writes the by-pid file FIRST**, before anything slow.
+- **SessionEnd (it fires on `/clear` too) removes the by-pid file if it holds its own session id.** If
+  SessionStart then fails, the file is ABSENT and the server refuses. Stale adoption needs both hooks to fail.
+  That residual is stated as a limit.
+- **procStart:** the hook records its claude's creation time (queried by `CLAUDE_PID`); the server compares
+  it with its `ppid`'s creation time (queried once: the parent is fixed for the server's life). A mismatch
+  means a reused PID, and the server refuses.
+
+**Reconnect:** still not observed at 23:41Z (the server is still 8832, from 05:28Z).
