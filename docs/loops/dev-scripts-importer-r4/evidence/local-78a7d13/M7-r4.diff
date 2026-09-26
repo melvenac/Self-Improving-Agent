@@ -1,0 +1,30 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..075d391 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -863,12 +863,6 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
+   // R4-1: an input that cannot be read blocks like STALE; could-not-tell for any other reason does not.
+   const unreadable = staleness.inputs.filter((i) => i.verdict === "could_not_tell" && blocksCommit(i));
+-  if (stale.length + unreadable.length > 0 && opts.acceptStale !== true) {
+-    const why: string[] = [];
+-    if (stale.length > 0) why.push(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ")}`);
+-    if (unreadable.length > 0) why.push(`${unreadable.length} input(s) cannot be read, so whether they are current cannot be told: ${unreadable.map((i) => `${i.input} ${i.evidence}`).join("; ")}`);
+-    throw new Error(`${why.join(". ")}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
+-  }
+   // SUMMARY.md is the one input --commit rewrites in place rather than regenerates.
+   const summaryPath = join(root, ".agents/SYSTEM/SUMMARY.md");
+   const summaryRead = readText(summaryPath);
+@@ -901,6 +895,12 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+     throw err;
+   }
+ 
++  if (stale.length + unreadable.length > 0 && opts.acceptStale !== true) {
++    const why: string[] = [];
++    if (stale.length > 0) why.push(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ")}`);
++    if (unreadable.length > 0) why.push(`${unreadable.length} input(s) cannot be read, so whether they are current cannot be told: ${unreadable.map((i) => `${i.input} ${i.evidence}`).join("; ")}`);
++    throw new Error(`${why.join(". ")}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
++  }
+   const migrate = () => {
+     // 2. state.json at revision 0, canonical bytes.
+     writeFileSync(statePath, serializeState(parsed.data), "utf-8");

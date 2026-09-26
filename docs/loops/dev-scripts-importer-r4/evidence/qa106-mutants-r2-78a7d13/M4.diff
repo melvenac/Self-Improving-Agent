@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/cli.ts b/open-brain/src/cli.ts
+index ef7efbf..4e7b571 100644
+--- a/open-brain/src/cli.ts
++++ b/open-brain/src/cli.ts
+@@ -494,7 +494,6 @@ Read-only. Change state through ob_state — never by editing the file.`);
+     if (r.accepted_stale.length) console.log(`Imported STALE under ${ACCEPT_STALE_FLAG}: ${r.accepted_stale.join(", ")}`);
+     if (r.accepted_unreadable.length) console.log(`Imported UNREADABLE under ${ACCEPT_STALE_FLAG}: ${r.accepted_unreadable.join(", ")}`);
+     const unknown = r.staleness.inputs.filter((i) => i.verdict === "could_not_tell");
+-    if (unknown.length) console.log(`Could not tell whether current: ${unknown.map((i) => i.input).join(", ")}`);
+     console.log(`Snapshot: ${relative(projectRoot, r.snapshot.dir)} (${r.snapshot.files} files)`);
+     console.log(`Wrote:    ${STATE_REL} at revision 0`);
+     if (r.summary) console.log(`SUMMARY.md: removed ${r.summary.total_lines_removed} lines (${r.summary.blockquote_lines} blockquote + ${r.summary.current_state_lines} Current State); kept ${r.summary.kept_headings.join(", ")}`);

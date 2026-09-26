@@ -1,0 +1,13 @@
+source src/pipelines/state-import/index.ts sha256/12 18c7e9f35bf8 (restored after every mutant)
+
+R41-reason: RED 10/81 (vitest exit 1) — R4-1: the NUL verdict carries its reason, which is what blocks
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted
+    state-import-r4.test.ts > the draft's report says --commit refuses while an input cannot be read, and the CLI's draft summary says so too
+    state-import-r4.test.ts > unreadable (NUL bytes): blocks
+    state-import-r4.test.ts > each could-not-tell input carries its reason, so the report and the refusal read the same list

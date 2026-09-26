@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..147a339 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -692,7 +692,7 @@ export function renderStaleness(s: StalenessReport): string[] {
+   L.push(s.latest ? `Latest session: Session ${s.latest.n} (\`${s.latest.file}\`).` : "Latest session: none found, so no input can be judged.", "");
+   const order: StalenessVerdict[] = ["stale", "could_not_tell", "current"];
+   const label: Record<StalenessVerdict, string> = { stale: "**STALE**", could_not_tell: "could not tell", current: "current" };
+-  for (const v of order) for (const i of s.inputs.filter((x) => x.verdict === v)) L.push(`- ${label[v]} \`${i.input}\`: ${i.evidence}`);
++  for (const v of order) for (const i of s.inputs.filter((x) => x.verdict === v)) L.push(v === "stale" ? `- ${label[v]} \`${i.input}\`` : `- ${label[v]} \`${i.input}\`: ${i.evidence}`);
+   for (const n of s.not_judged) L.push(`- not judged \`${n.input}\`: ${n.reason}`);
+   L.push("");
+   const stale = s.inputs.filter((i) => i.verdict === "stale").length;

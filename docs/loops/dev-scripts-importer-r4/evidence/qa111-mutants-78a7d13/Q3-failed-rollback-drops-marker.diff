@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..af95d0c 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -953,7 +953,7 @@ function rollBack(agents: string, snapshotDir: string, created: string | null, a
+     for (const name of readdirSync(agents)) if (name !== "archive") rmSync(join(agents, name), { recursive: true, force: true });
+     for (const name of readdirSync(snapshotDir)) cpSync(join(snapshotDir, name), join(agents, name), { recursive: true });
+   } catch (err) {
+-    // The marker stays, so every later --draft and --commit refuses until it goes (D7).
++    rmSync(marker, { force: true });
+     return `ROLLBACK FAILED (${err instanceof Error ? err.message : String(err)}): .agents/ is part-migrated. Restore it by hand from ${snapshotDir}, which was kept. --draft and --commit refuse until ${marker} is deleted`;
+   }
+   if (created) rmSync(created, { recursive: true, force: true });

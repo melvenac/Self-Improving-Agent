@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..a110dc0 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -551,7 +551,7 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
+       inputs.push({ input, verdict: "could_not_tell", declared_session: d.n, evidence: `${where}. It declares a session AHEAD of the latest log, so the numbers disagree and cannot say whether it is current`, could_not_tell: "ahead_of_latest" });
+       continue;
+     }
+-    inputs.push({ input, verdict: d.n < latest.n ? "stale" : "current", declared_session: d.n, evidence: where });
++    inputs.push({ input, verdict: d.n < latest.n - 1 ? "stale" : "current", declared_session: d.n, evidence: where });
+   }
+   for (const i of inputs) {
+     const key = (Object.keys(INPUT_REL) as InputKey[]).find((k) => INPUT_REL[k] === i.input)!;
