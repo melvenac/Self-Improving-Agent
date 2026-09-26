@@ -64,3 +64,23 @@ ops and false of the door. And the `[legacy]` tags do not disappear (D5).
   **Never write SIA's live `state.json`.**
 - **Push only** `loop/t179-r2` and `loop/t179-r2-*`. **The handoff is pushed BEFORE messaging atlas.** No `/end`.
 - **The stacked `/bootstrap` fix (record 127)** merges `loop/t179-r2`'s tip in when round 2 is frozen.
+
+## Amendment 1 (same session): R179-1 re-ruled, and the planner's error entry
+
+**Error entry, planner:** R179-1 as first written ("refuse an unseen session above the record's newest `n` by more than
+5") breaks the live record. Its newest recorded `n` is **76**, because no close-out has run since, and every real
+session is 128 or later. So every write after the migration would be refused, permanently. Forge 128 found it before
+building. **The family:** a bound calibrated against an assumption about the data ("newest is recent") that the data
+does not hold. The containment for next time: before ruling a numeric bound, read the actual values it will compare.
+
+**R179-1, amended: retention and "newest" never use the caller's session number.**
+- Each entry records the record **revision** at which its session first wrote. "Newer" means a later first-write
+  revision.
+- An entry's age is the count of **distinct sessions that first wrote after it**.
+- Retention drops an entry only when a newer entry of the same (seat, checkout) exists AND more than 10 distinct
+  sessions have first-written since.
+- The greeting's newest per (seat, checkout) is by revision too.
+- **The session number is a label only:** rendered, never compared.
+- So a wrong or local (T-164) number can erase nothing. No jump confirmation is needed. QA's A2 and A5 stay as rows
+  and pass. A6, A6b and A6c show no erasure.
+- T163-2 recomputes retention by the same rule, and a mutant restoring number-based retention must be caught.
