@@ -306,6 +306,10 @@ describe("BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git proje
       ".agents/state.json", ".agents/SESSIONS/next-session.md"].sort();
     expect(committed).toEqual([...new Set(expectTracked)].sort());
 
+    // BF-8 (F12)'s sibling: the CLI's `start` printed the same nameless header line.
+    const cs = cli(["start", dir], dir);
+    expect(cs.stdout.split(/\r?\n/).find((l) => l.startsWith("Project:"))).toBe("Project: scratch-proj v0.1.0");
+
     // BF-7 (F10): a fresh clone under core.autocrlf=true still has LF record bytes.
     const clone = mkdtempSync(join(tmpdir(), "bf-clone-"));
     tmps.push(clone);

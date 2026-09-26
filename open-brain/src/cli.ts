@@ -190,7 +190,9 @@ if (command === "sync") {
   const result = sessionStart({ projectRoot, homePath: homedir() });
 
   console.log(`\nSession Start — ${result.state.mode} mode`);
-  console.log(`Project: v${result.state.version}`);
+  // Same line as ob_start's header, and the same fix (bootstrap-fix BF-8, F12).
+  const recordName = result.state.stateJson.data?.project.name ?? null;
+  console.log(recordName ? `Project: ${recordName} v${result.state.version}` : `Project: v${result.state.version}`);
 
   if (result.drift.length > 0) {
     console.log(`\nDrift detected:`);
