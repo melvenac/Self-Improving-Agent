@@ -1,0 +1,18 @@
+{
+  "omission_line": "  … 67 older verified claim(s) not shown (77 total); all of them: node open-brain/build/cli.js state show --json",
+  "command": "node open-brain/build/cli.js state show --json",
+  "command_matches_constant": true,
+  "shown": 10,
+  "omitted": 67,
+  "total": 77,
+  "output_chars": 362983,
+  "json_parse_error": null,
+  "omitted_missing_from_output": [],
+  "omitted_with_altered_claim": [],
+  "verified_array_identical_to_state_json": true,
+  "plain_state_show_verified_lines": [
+    "Verified: 77 · gaps: 39 · decisions: 81"
+  ],
+  "state_json_unchanged": true,
+  "git_status_unchanged": true
+}

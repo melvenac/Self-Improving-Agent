@@ -1,0 +1,80 @@
+{
+  "distinct_state_json_blobs": 118,
+  "parsed": 73,
+  "unparsed": 45,
+  "unparsed_reasons": {
+    "schema_version: Invalid input: expected 2": 45
+  },
+  "revisions_parsed": "53..132 (73 distinct)",
+  "renders": 292,
+  "watch_outs_checked": 2094,
+  "open_questions_checked": 966,
+  "planner_gap_lines": {
+    "clipped": 2059,
+    "whole": 803
+  },
+  "planner_verified_lines": 730,
+  "planner_reopened_older_than_newest10": 0,
+  "planner_omission_lines": 73,
+  "failures": 291
+}
+FAIL cfbb388 rev 132 seat planner: outside Verified/Gaps differs from base at line 151: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL cfbb388 rev 132 seat developer: outside Verified/Gaps differs from base at line 102: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL cfbb388 rev 132 seat qa: outside Verified/Gaps differs from base at line 103: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL cfbb388 rev 132 seat null: outside Verified/Gaps differs from base at line 87: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL a1d5b11 rev 131 seat planner: outside Verified/Gaps differs from base at line 150: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL a1d5b11 rev 131 seat developer: outside Verified/Gaps differs from base at line 101: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL a1d5b11 rev 131 seat qa: outside Verified/Gaps differs from base at line 102: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL a1d5b11 rev 131 seat null: outside Verified/Gaps differs from base at line 86: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL ccfb5fe rev 130 seat planner: outside Verified/Gaps differs from base at line 140: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL ccfb5fe rev 130 seat developer: outside Verified/Gaps differs from base at line 101: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL ccfb5fe rev 130 seat qa: outside Verified/Gaps differs from base at line 102: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL ccfb5fe rev 130 seat null: outside Verified/Gaps differs from base at line 86: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL b848a51 rev 129 seat planner: outside Verified/Gaps differs from base at line 139: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL b848a51 rev 129 seat developer: outside Verified/Gaps differs from base at line 101: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL b848a51 rev 129 seat qa: outside Verified/Gaps differs from base at line 102: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL b848a51 rev 129 seat null: outside Verified/Gaps differs from base at line 86: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 72cb257 rev 128 seat planner: outside Verified/Gaps differs from base at line 138: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 72cb257 rev 128 seat developer: outside Verified/Gaps differs from base at line 100: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 72cb257 rev 128 seat qa: outside Verified/Gaps differs from base at line 101: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL 72cb257 rev 128 seat null: outside Verified/Gaps differs from base at line 85: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 691eb68 rev 127 seat planner: outside Verified/Gaps differs from base at line 139: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 691eb68 rev 127 seat developer: outside Verified/Gaps differs from base at line 101: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 691eb68 rev 127 seat qa: outside Verified/Gaps differs from base at line 102: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL 691eb68 rev 127 seat null: outside Verified/Gaps differs from base at line 86: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL dd14852 rev 126 seat planner: outside Verified/Gaps differs from base at line 138: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL dd14852 rev 126 seat developer: outside Verified/Gaps differs from base at line 100: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL dd14852 rev 126 seat qa: outside Verified/Gaps differs from base at line 101: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL dd14852 rev 126 seat null: outside Verified/Gaps differs from base at line 85: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL d329c0d rev 125 seat planner: outside Verified/Gaps differs from base at line 126: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL d329c0d rev 125 seat developer: outside Verified/Gaps differs from base at line 92: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL d329c0d rev 125 seat qa: outside Verified/Gaps differs from base at line 93: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL d329c0d rev 125 seat null: outside Verified/Gaps differs from base at line 77: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 317c9ce rev 124 seat planner: outside Verified/Gaps differs from base at line 125: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 317c9ce rev 124 seat developer: outside Verified/Gaps differs from base at line 92: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 317c9ce rev 124 seat qa: outside Verified/Gaps differs from base at line 93: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL 317c9ce rev 124 seat null: outside Verified/Gaps differs from base at line 77: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 8323b0f rev 123 seat planner: outside Verified/Gaps differs from base at line 124: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 8323b0f rev 123 seat developer: outside Verified/Gaps differs from base at line 92: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 8323b0f rev 123 seat qa: outside Verified/Gaps differs from base at line 93: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL 8323b0f rev 123 seat null: outside Verified/Gaps differs from base at line 77: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL f5a3541 rev 122 seat planner: outside Verified/Gaps differs from base at line 124: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL f5a3541 rev 122 seat developer: outside Verified/Gaps differs from base at line 92: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL f5a3541 rev 122 seat qa: outside Verified/Gaps differs from base at line 93: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL f5a3541 rev 122 seat null: outside Verified/Gaps differs from base at line 77: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 2629427 rev 121 seat planner: outside Verified/Gaps differs from base at line 122: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 2629427 rev 121 seat developer: outside Verified/Gaps differs from base at line 90: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 2629427 rev 121 seat qa: outside Verified/Gaps differs from base at line 91: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL 2629427 rev 121 seat null: outside Verified/Gaps differs from base at line 75: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 582fbe1 rev 120 seat planner: outside Verified/Gaps differs from base at line 122: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 582fbe1 rev 120 seat developer: outside Verified/Gaps differs from base at line 90: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 582fbe1 rev 120 seat qa: outside Verified/Gaps differs from base at line 91: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL 582fbe1 rev 120 seat null: outside Verified/Gaps differs from base at line 75: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 3c54e41 rev 119 seat planner: outside Verified/Gaps differs from base at line 119: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 3c54e41 rev 119 seat developer: outside Verified/Gaps differs from base at line 90: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 3c54e41 rev 119 seat qa: outside Verified/Gaps differs from base at line 91: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL 3c54e41 rev 119 seat null: outside Verified/Gaps differs from base at line 75: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 3e44a66 rev 116 seat planner: outside Verified/Gaps differs from base at line 116: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 3e44a66 rev 116 seat developer: outside Verified/Gaps differs from base at line 90: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"
+FAIL 3e44a66 rev 116 seat qa: outside Verified/Gaps differs from base at line 91: cand "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/m..." base "    LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.4"
+FAIL 3e44a66 rev 116 seat null: outside Verified/Gaps differs from base at line 75: cand "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 reca..." base "    THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTE"

@@ -1,0 +1,4 @@
+ Test Files  72 passed (72)
+      Tests  1053 passed (1053)
+   Duration  134.41s (transform 2.65s, setup 1.49s, collect 11.97s, tests 339.38s, environment 23ms, prepare 14.43s)
+TEMP=C:\Users\AARONM~1\AppData\Local\Temp (default temp, Defender-on control); started 2026-09-26T01:46:42Z ended 01:48:59Z; exit=0; tree C:/qa-scratch/qa114/cand at 0f0e7ad; json: 72 files, 1053 tests, 1053 passed, 0 failed, 0 pending

@@ -1,0 +1,80 @@
+{
+  "distinct_state_json_blobs": 118,
+  "parsed": 73,
+  "unparsed": 45,
+  "unparsed_reasons": {
+    "schema_version: Invalid input: expected 2": 45
+  },
+  "revisions_parsed": "53..132 (73 distinct)",
+  "renders": 292,
+  "watch_outs_checked": 2094,
+  "open_questions_checked": 966,
+  "planner_gap_lines": {
+    "clipped": 2059,
+    "whole": 803
+  },
+  "planner_verified_lines": 730,
+  "planner_reopened_older_than_newest10": 0,
+  "planner_omission_lines": 73,
+  "failures": 4586
+}
+FAIL cfbb388 rev 132 seat planner: own handoff block (pick-up, watch-outs, open questions) not byte-identical and contiguous
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: RULINGS-18 BINDS QA 108 (docs/loops/loop-15-slice-3-rulings-
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: A RESTORE MUST NEVER TOUCH THE OLD PATH (R36): d14a874 added
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: ENOENT/ENOTDIR ARE ABSENCE, NOT FAILURE (R82 made precise, t
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: A DIRECTORY LISTING'S SIZE LIES FOR AN OPEN FILE: the planne
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: THE PLANNER CANNOT READ THE QA PC OVER SSH (host classifier,
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: THE GREETING NO LONGER FITS ONE TOOL RESULT (T-183): ob_star
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: THE MAIN CHECKOUT WAS UPDATED IN THE D-050 WINDOW (T-189): ~
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: A2A-HUB T-003 IS DONE (window 2026-09-25 ~03:55Z-04:27Z, ope
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: RECORD SESSION NUMBERS ARE NOT THE GREETING'S (T-164). Sessi
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: READ THE INTENT DOCUMENTS AT /start (the Step-Back artifact 
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: QA 99 IS HEADLESS: nobody can talk to it and it cannot ask. 
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: LAUNCHING A CLAUDE RUN ON THE QA PC IS DENIED TO THE PLANNER
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: master HAS NO BRANCH PROTECTION (read 2026-09-25). A headles
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: D-047: Opus 5.5 default effort is now MEDIUM. QA seats get -
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: FULL SUITES NEED A QUIET MACHINE (G-042). SIA's QA now runs 
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: stop_reason "refusal" is the API safety layer; Opus 5.5's st
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: D-038/D-039/D-040: Aaron speaks only to the planner; quote h
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: update_task, update_gap, set_objective and set_handoff REPLA
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: build-freshness fails in this tree: build a010557, and open-
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: The recall trigger injects entry 299 (pipe-to-tail) on any B
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: DISPATCH TABLES ARE BUILT FROM EACH COMMIT'S `git diff --sta
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: MERGE ONLY THROUGH A GATE THAT REFUSES. `gh pr checks --watc
+FAIL cfbb388 rev 132 seat planner: watch-out not whole: GitHub Actions: 1,802 of 2,000 minutes on 2026-09-24, then A
+FAIL cfbb388 rev 132 seat planner: outside Verified/Gaps differs from base at line 86: cand "    - RULINGS-18 BINDS QA 108 (docs/loops/loop-15-slice-3-rulings-18.md): R77's " base "    - RULINGS-18 BINDS QA 108 (docs/loops/loop-15-slice-3-rulings-18.md): R77's "
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - RULINGS-18 BINDS QA 108 (docs/loops/loop-15-slice-3-ru
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - A RESTORE MUST NEVER TOUCH THE OLD PATH (R36): d14a874
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - ENOENT/ENOTDIR ARE ABSENCE, NOT FAILURE (R82 made prec
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - A DIRECTORY LISTING'S SIZE LIES FOR AN OPEN FILE: the 
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - THE PLANNER CANNOT READ THE QA PC OVER SSH (host class
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - THE GREETING NO LONGER FITS ONE TOOL RESULT (T-183): o
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - THE MAIN CHECKOUT WAS UPDATED IN THE D-050 WINDOW (T-1
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - A2A-HUB T-003 IS DONE (window 2026-09-25 ~03:55Z-04:27
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - RECORD SESSION NUMBERS ARE NOT THE GREETING'S (T-164).
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - READ THE INTENT DOCUMENTS AT /start (the Step-Back art
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - QA 99 IS HEADLESS: nobody can talk to it and it cannot
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - LAUNCHING A CLAUDE RUN ON THE QA PC IS DENIED TO THE P
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - master HAS NO BRANCH PROTECTION (read 2026-09-25).… (2
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - D-047: Opus 5.5 default effort is now MEDIUM.… (167 ch
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - FULL SUITES NEED A QUIET MACHINE (G-042).… (187 chars;
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - stop_reason "refusal" is the API safety layer; Opus 5.
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - D-038/D-039/D-040: Aaron speaks only to the planner; q
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - update_task, update_gap, set_objective and set_handoff
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - build-freshness fails in this tree: build a010557, and
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - The recall trigger injects entry 299 (pipe-to-tail) on
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - DISPATCH TABLES ARE BUILT FROM EACH COMMIT'S `git diff
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - MERGE ONLY THROUGH A GATE THAT REFUSES.… (197 chars; f
+FAIL cfbb388 rev 132 seat planner: marker outside gaps/verified:     - GitHub Actions: 1,802 of 2,000 minutes on 2026-09-24, 
+FAIL cfbb388 rev 132 seat developer: own handoff block (pick-up, watch-outs, open questions) not byte-identical and contiguous
+FAIL cfbb388 rev 132 seat developer: watch-out not whole: A DERIVED VALUE IS ONLY AS GOOD AS THE CHANNEL THE ASSERTION
+FAIL cfbb388 rev 132 seat developer: watch-out not whole: A THRESHOLD COMPARED AGAINST bm25 IS CORPUS-RELATIVE, AND A 
+FAIL cfbb388 rev 132 seat developer: watch-out not whole: A STACKED FIXTURE PROVES AS LITTLE AS A VACUOUS ONE — IT JUS
+FAIL cfbb388 rev 132 seat developer: watch-out not whole: A RULING CAN BE ASKED FOR, AGREED, REPORTED AS SETTLED, AND 
+FAIL cfbb388 rev 132 seat developer: watch-out not whole: PER-INSERT TRANSACTIONS ON A FILE-BACKED SQLite FIXTURE ARE 
+FAIL cfbb388 rev 132 seat developer: watch-out not whole: A BULK EDIT THAT MATCHES `it(` DOES NOT MATCH `it.each([...]
+FAIL cfbb388 rev 132 seat developer: watch-out not whole: `git show <ref>:<path>` IS MANGLED BY MSYS IN THE BASH TOOL 
+FAIL cfbb388 rev 132 seat developer: watch-out not whole: THE HOOK RUNS THE BUILD ITS REGISTRATION POINTS AT, and ob_s
+FAIL cfbb388 rev 132 seat developer: outside Verified/Gaps differs from base at line 86: cand "    - A DERIVED VALUE IS ONLY AS GOOD AS THE CHANNEL THE ASSERTION READS FROM.… " base "    - A DERIVED VALUE IS ONLY AS GOOD AS THE CHANNEL THE ASSERTION READS FROM. e"
+FAIL cfbb388 rev 132 seat developer: marker outside gaps/verified:     - A DERIVED VALUE IS ONLY AS GOOD AS THE CHANNEL THE ASS
+FAIL cfbb388 rev 132 seat developer: marker outside gaps/verified:     - A THRESHOLD COMPARED AGAINST bm25 IS CORPUS-RELATIVE, 

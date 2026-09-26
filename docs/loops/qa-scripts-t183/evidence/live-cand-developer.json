@@ -1,0 +1,57 @@
+{
+  "root": "C:/qa-scratch/qa114/cand",
+  "seat": "developer",
+  "version": "0.44.2",
+  "isError": false,
+  "live": 47489,
+  "composed": 46768,
+  "parts": {
+    "treeAndSeat": 603,
+    "state": 24965,
+    "roleFiles": 21198
+  },
+  "check": {
+    "severity": "issue",
+    "message": "greeting is 46768 characters, over the 40000 limit (state render 24965, role files 21198, tree and seat 603). LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted."
+  },
+  "drift": 721,
+  "live_lines_not_composed": {
+    "count": 20,
+    "chars_incl_newlines": 745,
+    "lines": [
+      "Session Start — project mode",
+      "Project: v0.44.2",
+      "Drift: none",
+      "Session #1",
+      "Log: C:\\qa-scratch\\qa114\\cand\\.agents\\SESSIONS\\Session_1.md",
+      "Session ID: discovery failed",
+      "Seat: Forge (developer) — partner: Atlas",
+      "## Sizes (tokens estimated as chars/4)",
+      "  SUMMARY.md (.agents/SYSTEM/SUMMARY.md): 199 lines, 9469 words, ~14601 tokens, truncated: no",
+      "  INBOX.md (.agents/TASKS/INBOX.md): 91 lines, 1543 words, ~2264 tokens, truncated: no",
+      "  task.md (.agents/TASKS/task.md): 16 lines, 319 words, ~514 tokens, truncated: no",
+      "  next-session.md (.agents/SESSIONS/next-session.md): 136 lines, 3870 words, ~5817 tokens, truncated: no",
+      "  state.json (.agents/state.json): 3057 lines, 52601 words, ~90746 tokens, truncated: no",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Total returned words: 7566 (~11862 tokens)"
+    ]
+  },
+  "composed_lines_not_live": {
+    "count": 1,
+    "lines": [
+      "Seat: Forge (developer)"
+    ]
+  },
+  "state_block_verbatim_in_live": true,
+  "roles": {
+    "developer.md": "whole",
+    "planner.md": "absent",
+    "qa.md": "absent",
+    "shared.md": "whole"
+  }
+}

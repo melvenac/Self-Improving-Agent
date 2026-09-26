@@ -1,0 +1,13 @@
+{
+  "root": "C:/qa-scratch/qa114/base",
+  "seat": "developer",
+  "version": "0.44.2",
+  "isError": false,
+  "live": 88686,
+  "roles": {
+    "developer.md": "whole",
+    "planner.md": "absent",
+    "qa.md": "absent",
+    "shared.md": "whole"
+  }
+}

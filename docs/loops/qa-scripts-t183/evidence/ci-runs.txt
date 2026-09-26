@@ -1,0 +1,22 @@
+== run 36209242314 qa/t183-ci 0f0e7ad workflow_dispatch success
+Machine name: 'tcm'
+Runner name: 'tcm-1'
+== run 36209621699 qa/t183-mut-survivors cfb3aee workflow_dispatch failure
+##[error]AssertionError: expected 'Tree currency: NOT CHECKED — /tmp/ob-…' to contain 'Tasks (16 active; done: 11):'
+Machine name: 'tcm'
+Runner name: 'tcm-1'
+^[[31m^[[1mAssertionError^[[22m: expected 'Tree currency: NOT CHECKED — /tmp/ob-…' to contain 'Tasks (16 active; done: 11):'^[[39m
+^[[41m^[[1m FAIL ^[[22m^[[49m tests/server.test.ts^[[2m > ^[[22mserver handlers^[[2m > ^[[22mhandleStart^[[2m > ^[[22mrenders the State section from a valid state.json and withholds the prose files
+== run 36209655365 qa/t183-on-master df8af3b workflow_dispatch success
+Machine name: 'tcm'
+Runner name: 'tcm-2'
+== run 36209796211 qa/t183-mut-survivors6 a0c4024 workflow_dispatch success
+Machine name: 'tcm'
+Runner name: 'tcm-1'
+
+Counts, read from each run's log (the Tests/Test Files lines carry literal escape text the filter above missed):
+  36209242314 qa/t183-ci 0f0e7ad            Test Files 72 passed (72); Tests 1052 passed | 1 skipped (1053)
+  36209621699 qa/t183-mut-survivors cfb3aee  Test Files 1 failed | 71 passed (72); Tests 1 failed | 1051 passed | 1 skipped (1053)
+  36209655365 qa/t183-on-master df8af3b      Test Files 72 passed (72); Tests 1052 passed | 1 skipped (1053)
+  36209796211 qa/t183-mut-survivors6 a0c4024 Test Files 72 passed (72); Tests 1052 passed | 1 skipped (1053)
+The skip in every run is tests/shared/paths.test.ts (1 skipped of 14), as in the developer's runs.

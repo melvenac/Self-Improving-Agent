@@ -1,0 +1,288 @@
+{
+  "results": [
+    {
+      "id": "control (unmutated, wide set)",
+      "exit": 0,
+      "passed": 270,
+      "failed": 0,
+      "total": 270,
+      "failedNames": []
+    },
+    {
+      "id": "dev-i-marker",
+      "why": "-  return `${cut}… (${text.length} chars; full text: state.json ${where})`; | +  return cut;",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 20,
+      "failed": 5,
+      "total": 25,
+      "failedNames": [
+        "renderState — T-183 clipped gaps and verified claims T183-2: a gap over the limit is ONE line, cut at its first sentence, with the marker and full length",
+        "renderState — T-183 clipped gaps and verified claims T183-2: with no sentence end inside the limit, the cut is at the limit — and still marked",
+        "renderState — T-183 clipped gaps and verified claims a gap with a line break is still one line, and the break counts as a clip",
+        "renderState — T-183 clipped gaps and verified claims clips a verified claim at its own limit and keeps the evidence count",
+        "renderState — T-183 clipped gaps and verified claims the marker is present exactly when text was cut, for every gap and claim"
+      ]
+    },
+    {
+      "id": "dev-ii-verbatim",
+      "why": "-    for (const w of h.watch_out) lines.push(`    - ${w}`); | +    for (const w of h.watch_out) lines.push(`    - ${clip(w, GAP_CLIP, \"handoff\")}`);",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 22,
+      "failed": 3,
+      "total": 25,
+      "failedNames": [
+        "renderState — T183-3 the real record's handoffs are verbatim renders the qa seat's watch-outs and open questions as whole lines, byte-identical",
+        "renderState — T183-3 the real record's handoffs are verbatim renders the developer seat's watch-outs and open questions as whole lines, byte-identical",
+        "renderState — T183-3 the real record's handoffs are verbatim renders the planner seat's watch-outs and open questions as whole lines, byte-identical"
+      ]
+    },
+    {
+      "id": "dev-iii-threshold",
+      "why": "-  return n > limit | +  return n > limit * 2",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 24,
+      "failed": 1,
+      "total": 25,
+      "failedNames": [
+        "greeting-size — T183-4 is red on the known positive, and prints the count"
+      ]
+    },
+    {
+      "id": "dev-iv-omission",
+      "why": "-  if (omitted > 0) { | +  if (omitted > 0 && false) {",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 24,
+      "failed": 1,
+      "total": 25,
+      "failedNames": [
+        "renderState — T-183 clipped gaps and verified claims verified is its count plus the newest 10, and the omission is counted and named"
+      ]
+    },
+    {
+      "id": "q1-reopened-dropped",
+      "why": "a reopened claim older than the newest 10 is no longer shown",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 24,
+      "failed": 1,
+      "total": 25,
+      "failedNames": [
+        "renderState — T-183 clipped gaps and verified claims verified is its count plus the newest 10, and the omission is counted and named"
+      ]
+    },
+    {
+      "id": "q2-oldest-ten",
+      "why": "the OLDEST ten are shown instead of the newest",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 24,
+      "failed": 1,
+      "total": 25,
+      "failedNames": [
+        "renderState — T-183 clipped gaps and verified claims verified is its count plus the newest 10, and the omission is counted and named"
+      ]
+    },
+    {
+      "id": "q3-marker-length-of-cut",
+      "why": "the marker states the cut's length, not the full length",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 21,
+      "failed": 4,
+      "total": 25,
+      "failedNames": [
+        "renderState — T-183 clipped gaps and verified claims T183-2: a gap over the limit is ONE line, cut at its first sentence, with the marker and full length",
+        "renderState — T-183 clipped gaps and verified claims T183-2: with no sentence end inside the limit, the cut is at the limit — and still marked",
+        "renderState — T-183 clipped gaps and verified claims a gap with a line break is still one line, and the break counts as a clip",
+        "renderState — T-183 clipped gaps and verified claims clips a verified claim at its own limit and keeps the evidence count"
+      ]
+    },
+    {
+      "id": "q4-multiline-short-whole",
+      "why": "a short multi-line text is printed whole, breaking the one-line rule",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 23,
+      "failed": 2,
+      "total": 25,
+      "failedNames": [
+        "renderState — T-183 clipped gaps and verified claims a gap with a line break is still one line, and the break counts as a clip",
+        "renderState — T-183 clipped gaps and verified claims the marker is present exactly when text was cut, for every gap and claim"
+      ]
+    },
+    {
+      "id": "q5-no-sentence-cut",
+      "why": "the first-sentence rule is gone: cut only at the limit or a line break",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 24,
+      "failed": 1,
+      "total": 25,
+      "failedNames": [
+        "renderState — T-183 clipped gaps and verified claims T183-2: a gap over the limit is ONE line, cut at its first sentence, with the marker and full length"
+      ]
+    },
+    {
+      "id": "q6-omission-count-assumes-ten",
+      "why": "the omission count ignores the reopened claims shown beyond the ten",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 24,
+      "failed": 1,
+      "total": 25,
+      "failedNames": [
+        "renderState — T-183 clipped gaps and verified claims verified is its count plus the newest 10, and the omission is counted and named"
+      ]
+    },
+    {
+      "id": "q7-omission-command-wrong",
+      "why": "the omission line names the command that prints only the count",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 24,
+      "failed": 1,
+      "total": 25,
+      "failedNames": [
+        "renderState — T-183 clipped gaps and verified claims verified is its count plus the newest 10, and the omission is counted and named"
+      ]
+    },
+    {
+      "id": "q8-open-questions-clipped",
+      "why": "open questions clipped (the developer's mutant ii covers watch-outs only)",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 22,
+      "failed": 3,
+      "total": 25,
+      "failedNames": [
+        "renderState — T183-3 the real record's handoffs are verbatim renders the qa seat's watch-outs and open questions as whole lines, byte-identical",
+        "renderState — T183-3 the real record's handoffs are verbatim renders the developer seat's watch-outs and open questions as whole lines, byte-identical",
+        "renderState — T183-3 the real record's handoffs are verbatim renders the planner seat's watch-outs and open questions as whole lines, byte-identical"
+      ]
+    },
+    {
+      "id": "q9-pickup-clipped",
+      "why": "the own handoff's pick-up clipped",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 22,
+      "failed": 3,
+      "total": 25,
+      "failedNames": [
+        "renderState — T183-3 the real record's handoffs are verbatim renders the qa seat's watch-outs and open questions as whole lines, byte-identical",
+        "renderState — T183-3 the real record's handoffs are verbatim renders the developer seat's watch-outs and open questions as whole lines, byte-identical",
+        "renderState — T183-3 the real record's handoffs are verbatim renders the planner seat's watch-outs and open questions as whole lines, byte-identical"
+      ]
+    },
+    {
+      "id": "q10-loopstate-rulings-clipped",
+      "why": "loop-state rulings clipped (brief §2.3: the loop state unchanged)",
+      "tsc": 0,
+      "verdict": "SURVIVED",
+      "exit": 0,
+      "passed": 25,
+      "failed": 0,
+      "total": 25,
+      "failedNames": []
+    },
+    {
+      "id": "q11-threshold-inclusive",
+      "why": "boundary: exactly 40,000 becomes an ISSUE",
+      "tsc": 0,
+      "verdict": "SURVIVED",
+      "exit": 0,
+      "passed": 25,
+      "failed": 0,
+      "total": 25,
+      "failedNames": []
+    },
+    {
+      "id": "q12-role-files-not-composed",
+      "why": "greeting-size stops counting the role files (a fifth of the greeting)",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 24,
+      "failed": 1,
+      "total": 25,
+      "failedNames": [
+        "the composed greeting carries the role files whole — T183-3 contains every role file this repository loads, byte for byte"
+      ]
+    },
+    {
+      "id": "q13-state-not-composed",
+      "why": "greeting-size stops counting the state render",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 24,
+      "failed": 1,
+      "total": 25,
+      "failedNames": [
+        "greeting-size — T183-4 is red on the known positive, and prints the count"
+      ]
+    },
+    {
+      "id": "q14-severity-warning",
+      "why": "over the limit reported as a warning, not an ISSUE",
+      "tsc": 2,
+      "verdict": "tsc-rejected"
+    },
+    {
+      "id": "q15-not-wired",
+      "why": "greeting-size is never run by /sync",
+      "tsc": 0,
+      "verdict": "SURVIVED",
+      "exit": 0,
+      "passed": 270,
+      "failed": 0,
+      "total": 270,
+      "failedNames": []
+    },
+    {
+      "id": "q16-seat-ignored-in-compose",
+      "why": "greeting-size renders every handoff as the unresolved reader, not this seat's",
+      "tsc": 0,
+      "verdict": "SURVIVED",
+      "exit": 0,
+      "passed": 25,
+      "failed": 0,
+      "total": 25,
+      "failedNames": []
+    },
+    {
+      "id": "q17-gaps-unclipped",
+      "why": "gaps printed whole again (the base behaviour)",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 21,
+      "failed": 4,
+      "total": 25,
+      "failedNames": [
+        "renderState — T-183 clipped gaps and verified claims T183-2: a gap over the limit is ONE line, cut at its first sentence, with the marker and full length",
+        "renderState — T-183 clipped gaps and verified claims T183-2: with no sentence end inside the limit, the cut is at the limit — and still marked",
+        "renderState — T-183 clipped gaps and verified claims a gap with a line break is still one line, and the break counts as a clip",
+        "renderState — T-183 clipped gaps and verified claims the marker is present exactly when text was cut, for every gap and claim"
+      ]
+    }
+  ],
+  "worktree_clean_after": true
+}

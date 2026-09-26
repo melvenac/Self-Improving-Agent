@@ -1,0 +1,84 @@
+{
+  "edges": {
+    "exactly 140": {
+      "in_len": 140,
+      "out": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "invariant": "holds"
+    },
+    "141, no sentence end": {
+      "in_len": 141,
+      "out": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa… (141 chars; full text: state.json W)",
+      "invariant": "holds"
+    },
+    "short, trailing newline": {
+      "in_len": 11,
+      "out": "Short gap.… (11 chars; full text: state.json W)",
+      "invariant": "holds"
+    },
+    "short, CRLF inside": {
+      "in_len": 23,
+      "out": "First line… (23 chars; full text: state.json W)",
+      "invariant": "holds"
+    },
+    "starts with newline": {
+      "in_len": 29,
+      "out": "… (29 chars; full text: state.json W)",
+      "invariant": "holds"
+    },
+    "sentence at 1": {
+      "in_len": 170,
+      "out": "A.… (170 chars; full text: state.json W)",
+      "invariant": "holds"
+    },
+    "abbreviation e.g.": {
+      "in_len": 191,
+      "out": "Use e.g.… (191 chars; full text: state.json W)",
+      "invariant": "holds"
+    },
+    "version v0.39. then": {
+      "in_len": 155,
+      "out": "Seen at v0.39.… (155 chars; full text: state.json W)",
+      "invariant": "holds"
+    },
+    "period at 140 then space": {
+      "in_len": 145,
+      "out": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.… (145 chars; full text: state.json W)",
+      "invariant": "holds"
+    },
+    "surrogate pair at the cut": {
+      "in_len": 151,
+      "out": "ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\ud83d… (151 chars; full text: state.json W)",
+      "invariant": "holds"
+    },
+    "sentence end then newline": {
+      "in_len": 9,
+      "out": "One.… (9 chars; full text: state.json W)",
+      "invariant": "holds"
+    },
+    "ellipsis already in text": {
+      "in_len": 154,
+      "out": "Wait… this is zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz… (154 chars; full text: state.json W)",
+      "invariant": "holds"
+    },
+    "empty": {
+      "in_len": 0,
+      "out": "",
+      "invariant": "holds"
+    },
+    "tab only": {
+      "in_len": 1,
+      "out": "\t",
+      "invariant": "holds"
+    },
+    "U+2028 line separator": {
+      "in_len": 17,
+      "out": "Line one line two",
+      "invariant": "holds"
+    }
+  },
+  "fuzz": {
+    "runs": 200000,
+    "invariant_breaks": 0,
+    "examples": []
+  }
+}

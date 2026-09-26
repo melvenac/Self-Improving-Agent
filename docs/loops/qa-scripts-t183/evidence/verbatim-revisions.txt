@@ -1,0 +1,20 @@
+{
+  "distinct_state_json_blobs": 118,
+  "parsed": 73,
+  "unparsed": 45,
+  "unparsed_reasons": {
+    "schema_version: Invalid input: expected 2": 45
+  },
+  "revisions_parsed": "53..132 (73 distinct)",
+  "renders": 292,
+  "watch_outs_checked": 2094,
+  "open_questions_checked": 966,
+  "planner_gap_lines": {
+    "clipped": 2059,
+    "whole": 803
+  },
+  "planner_verified_lines": 730,
+  "planner_reopened_older_than_newest10": 0,
+  "planner_omission_lines": 73,
+  "failures": 0
+}

@@ -1,0 +1,97 @@
+{
+  "revision": 132,
+  "gaps": {
+    "under_20": 0,
+    "under_40": 0,
+    "at_limit_no_sentence": 13,
+    "total_clipped": 28
+  },
+  "shortest_gaps": [
+    {
+      "id": "G-029",
+      "full": 493,
+      "kept": 70,
+      "text": "The regression test added by PR #33 can pass without testing anything."
+    },
+    {
+      "id": "G-031",
+      "full": 3023,
+      "kept": 70,
+      "text": "APPENDED AT REV 48, BECAUSE T-151 ITSELF IS ABOUT TO LEAVE THE RECORD."
+    },
+    {
+      "id": "G-042",
+      "full": 4556,
+      "kept": 75,
+      "text": "THE TEST SUITE EXITED 1 WHILE EVERY LINE OF ITS OUTPUT REPORTED 805 PASSED."
+    },
+    {
+      "id": "G-027",
+      "full": 358,
+      "kept": 76,
+      "text": "expected_revision serialises writes within one lineage, not across branches."
+    },
+    {
+      "id": "G-040",
+      "full": 592,
+      "kept": 81,
+      "text": "A SCAN THAT MATCHES THE SENTENCE FORBIDDING A THING, AS THOUGH IT WERE THE THING."
+    },
+    {
+      "id": "G-037",
+      "full": 576,
+      "kept": 83,
+      "text": "The harness test suite made the FULL vitest run exit 1 while printing '805 passed'."
+    },
+    {
+      "id": "G-035",
+      "full": 898,
+      "kept": 87,
+      "text": "The record's objective goes stale when a loop closes, and nothing enforces updating it."
+    },
+    {
+      "id": "G-045",
+      "full": 717,
+      "kept": 98,
+      "text": "DELETING THE CHECKED-OUT BRANCH DURING A STAGE CRASHES THE RUNTIME WITH NO RECORD (D4, slice two)."
+    }
+  ],
+  "verified_newest10": {
+    "under_20": 0,
+    "under_40": 0,
+    "at_limit_no_sentence": 0,
+    "total_clipped": 9
+  },
+  "shortest_verified": [
+    {
+      "id": "V-071",
+      "full": 408,
+      "kept": 85,
+      "text": "CLOSED GAP IDS ARE REUSED BY THE NEXT add_gap, AND THE TRACKED TREE STILL CITES THEM."
+    },
+    {
+      "id": "V-074",
+      "full": 211,
+      "kept": 99,
+      "text": "A seat's close-out overwrites a shared slot with its own seat's value, so the record holds only the"
+    },
+    {
+      "id": "V-077",
+      "full": 225,
+      "kept": 99,
+      "text": "A correct detector was dismissed by BOTH seats that saw it, and severity alone would not have fixed"
+    },
+    {
+      "id": "V-068",
+      "full": 238,
+      "kept": 100,
+      "text": "R7 holds through the real built hook binary: an injected entry bumps recall_count and last_recalled_"
+    },
+    {
+      "id": "V-070",
+      "full": 134,
+      "kept": 100,
+      "text": "A looked-at entry cannot enter the rated set by construction rather than by a filter: every non-inje"
+    }
+  ]
+}

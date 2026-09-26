@@ -1,0 +1,59 @@
+{
+  "results": [
+    {
+      "id": "control (unmutated, wide set)",
+      "exit": 0,
+      "passed": 270,
+      "failed": 0,
+      "total": 270,
+      "failedNames": []
+    },
+    {
+      "id": "q14b-severity-warn",
+      "why": "over the limit reported as a warning, not an ISSUE",
+      "tsc": 0,
+      "verdict": "KILLED",
+      "exit": 1,
+      "passed": 24,
+      "failed": 1,
+      "total": 25,
+      "failedNames": [
+        "greeting-size — T183-4 is red on the known positive, and prints the count"
+      ]
+    },
+    {
+      "id": "q18-other-seats-line-shortened",
+      "why": "the other seats' lines shortened (brief §2.3: unchanged)",
+      "tsc": 0,
+      "verdict": "SURVIVED",
+      "exit": 0,
+      "passed": 25,
+      "failed": 0,
+      "total": 25,
+      "failedNames": []
+    },
+    {
+      "id": "q19-questions-for-aaron-clipped",
+      "why": "loop-state questions for Aaron clipped (brief §2.3: the loop state unchanged)",
+      "tsc": 0,
+      "verdict": "SURVIVED",
+      "exit": 0,
+      "passed": 25,
+      "failed": 0,
+      "total": 25,
+      "failedNames": []
+    },
+    {
+      "id": "q20-tasks-dropped-blocked",
+      "why": "blocked tasks silently dropped from the task list (brief §2.3: tasks unchanged)",
+      "tsc": 0,
+      "verdict": "SURVIVED",
+      "exit": 0,
+      "passed": 25,
+      "failed": 0,
+      "total": 25,
+      "failedNames": []
+    }
+  ],
+  "worktree_clean_after": true
+}
