@@ -475,7 +475,7 @@ const readState = (p: string, baseline?: FileState | null, preflight = false): F
   if (id.kind === "symlink") {
     return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null, readErrno: null };
   }
-  if (id.kind === "other" && id.code) return unreadableIdentity(id);
+  if (id.kind === "other" && id.code && !preflight) return unreadableIdentity(id);
   if (id.kind !== "file") return null;
   const hadFile = baseline?.kind === "file";
   const same = hadFile && baseline.dev === id.dev && baseline.ino === id.ino && baseline.nlink === id.nlink;
