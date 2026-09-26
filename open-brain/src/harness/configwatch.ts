@@ -988,9 +988,7 @@ interface MachineSnap {
  * a deliberate not-read. An errno, or an unreadable hash, is the environment.
  */
 function stageStartObserved(opened: MachineSnap): boolean {
-  if (opened.errno !== null) return false;
-  if (opened.reason === "unreadable" || opened.hash === "unreadable") return false;
-  return true;
+  return opened.state === "read";
 }
 
 export class MachineConfigWatch {
