@@ -227,5 +227,5 @@ function describeProvenance(h: Handoff, options: RenderStateOptions): string {
 
 function firstLine(text: string): string {
   const line = text.split(/\r?\n/).find((l) => l.trim()) ?? "";
-  return line.length > 160 ? `${line.slice(0, 157)}...` : line || "(nothing recorded)";
+  return line.length > 60 ? `${line.slice(0, 57)}...` : line || "(nothing recorded)";
 }
