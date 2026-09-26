@@ -155,6 +155,20 @@ describe("BF-5: role: none with no roles/ directory reports NOT A SEAT and raise
     const r = describeRoleFiles(dir, { name: "scratch-proj", role: "none", partner: null });
     expect(r.lines.join("\n")).toContain("NOT A SEAT");
     expect(r.problems).toEqual([]);
+    // The greeting said set_handoff was refused here; the writer accepts it (see the next row).
+    expect(r.lines.join("\n")).not.toMatch(/refused/);
+  });
+
+  it("a not-a-seat project CAN hand off: set_handoff through the writer, with the checkout's seat null", async () => {
+    const { applyStateOps } = await import("../../src/shared/state-writer.js");
+    const dir = scratchProject(tmps);
+    expect(cli(["bootstrap", "scaffold", dir], dir).status).toBe(0);
+    expect(cli(["state", "import", "--draft", dir], dir).status).toBe(0);
+    expect(cli(["state", "import", "--commit", dir], dir).status).toBe(0);
+    const r = applyStateOps(dir, { session: 1, expected_revision: 0, render: false, session_uuid: "00000000-0000-4000-8000-000000000001", seat: null,
+      ops: [{ op: "set_handoff", seat: "developer", pick_up: "Start on T-001.", watch_out: [], open_questions: [] }] });
+    expect(r.ok).toBe(true);
+    expect(JSON.parse(readFileSync(join(dir, STATE_REL), "utf8")).handoffs.some((h: { pick_up: string }) => h.pick_up === "Start on T-001.")).toBe(true);
   });
 
   it("negative: a real seat with no shared.md still reports ROLE FILE MISSING", () => {
