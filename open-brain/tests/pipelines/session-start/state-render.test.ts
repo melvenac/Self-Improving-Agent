@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { renderState, VERIFIED_FULL_TEXT } from "../../../src/pipelines/session-start/state-render.js";
+import { renderState, VERIFIED_FULL_TEXT, GAP_CLIP } from "../../../src/pipelines/session-start/state-render.js";
 import { parseState } from "../../../src/shared/state-schema.js";
 import type { State } from "../../../src/shared/state-schema.js";
 
@@ -206,6 +206,66 @@ describe("renderState — T-183 clipped gaps and verified claims", () => {
 });
 
 /**
+ * The base behaviour for another seat's line, stated independently of the
+ * renderer: its first non-blank line, cut to 157 characters plus "..." when it is
+ * over 160.
+ */
+function otherSeatLine(pickUp: string): string {
+  const line = pickUp.split(/\r?\n/).find((l) => l.trim()) ?? "";
+  if (!line) return "(nothing recorded)";
+  return line.length > 160 ? `${line.slice(0, 157)}...` : line;
+}
+
+/**
+ * R183-1, with fixtures that hold whatever the real record happens to contain:
+ * the real record's questions for Aaron are all short and single-sentence today,
+ * so a clip of them is invisible there. These items are long, multi-sentence and
+ * over the gap clip, and the other seats' lines sit either side of 160.
+ */
+describe("renderState — R183-1 the loop state and other seats' lines are not clipped", () => {
+  const long = (tag: string) =>
+    `${tag} first sentence ends here. ` + "A second sentence runs on well past the gap clip of one hundred and forty characters. ".repeat(3);
+  const mid = "M".repeat(150); // over 60, under 160: printed whole
+  const over = "L".repeat(200); // over 160: cut to 157 plus "..."
+  const withLoop: State = {
+    ...state,
+    handoffs: [
+      {
+        seat: "planner",
+        session: 61,
+        pick_up: "planner pick-up",
+        watch_out: [],
+        open_questions: [],
+        loop_state: {
+          open_prs: [],
+          frozen_sha: null,
+          questions_for_aaron: [long("QUESTION")],
+          rulings: [long("RULING")],
+        },
+      },
+      { seat: "developer", session: 60, pick_up: `${mid}\nsecond line`, watch_out: [], open_questions: [], loop_state: null },
+      { seat: "qa", session: 59, pick_up: over, watch_out: [], open_questions: [], loop_state: null },
+    ],
+  };
+
+  it("the fixture's items are over the gap clip, so a clip would change them", () => {
+    expect(long("X").length).toBeGreaterThan(GAP_CLIP);
+  });
+
+  it("prints every loop-state ruling and question for Aaron whole", () => {
+    const lines = renderState(withLoop, "x", { seat: "planner" });
+    expect(lines).toContain(`      - ${long("RULING")}`);
+    expect(lines).toContain(`      - ${long("QUESTION")}`);
+  });
+
+  it("prints another seat's first line whole up to 160, and cuts it to 157 plus '...' above", () => {
+    const lines = renderState(withLoop, "x", { seat: "planner" });
+    expect(lines).toContain(`    ${mid}`);
+    expect(lines).toContain(`    ${"L".repeat(157)}...`);
+  });
+});
+
+/**
  * T183-3: the render against THIS repository's own record. Every handoff
  * watch-out and open question is byte-identical to state.json's (start.md: never
  * summarise it, never drop items for length), and the tasks and objective are
@@ -228,7 +288,25 @@ describe("renderState — T183-3 the real record's handoffs are verbatim", () =>
       for (const w of [...h.watch_out, ...h.open_questions]) expect(lines).toContain(`    - ${w}`);
       expect(lines).toContain(`  pick up: ${h.pick_up}`);
     });
+
+    // R183-1: the loop state (rulings, questions for Aaron) is part of "the loop
+    // state unchanged" (brief §2.3), and nothing held it until QA 114 (q10, q19).
+    it(`renders the ${h.seat} seat's loop-state rulings and questions for Aaron as whole lines, byte-identical`, () => {
+      const lines = renderState(real, "x", { seat: h.seat });
+      const ls = h.loop_state;
+      for (const item of ls ? [...ls.rulings, ...ls.questions_for_aaron] : []) expect(lines).toContain(`      - ${item}`);
+    });
+
+    // R183-1: each OTHER seat's named line is unchanged from the base (q18).
+    it(`renders the other seats' lines for the ${h.seat} reader unchanged`, () => {
+      const lines = renderState(real, "x", { seat: h.seat });
+      for (const o of real.handoffs.filter((x) => x !== h)) expect(lines).toContain(`    ${otherSeatLine(o.pick_up)}`);
+    });
   }
+
+  it("walks a non-empty set of other-seat lines", () => {
+    expect(real.handoffs.length).toBeGreaterThan(1);
+  });
 
   it("leaves the objective and every active task title unchanged", () => {
     const text = renderState(real, "x").join("\n");

@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, cpSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { checkGreetingSize, composeGreeting, GREETING_LIMIT } from "../../../src/pipelines/sync/checks.js";
+import { runSync } from "../../../src/pipelines/sync/index.js";
 import { parseState } from "../../../src/shared/state-schema.js";
 import type { State } from "../../../src/shared/state-schema.js";
 
@@ -79,6 +80,37 @@ describe("greeting-size — T183-4", () => {
     expect(checkGreetingSize("0.0.0", negative).message).toContain("not counted");
   });
 
+  // R183-3: "above 40,000" — exactly the limit passes, one over is an ISSUE (q11).
+  it("pins the boundary: n == limit passes, n == limit + 1 is an ISSUE", () => {
+    const n = composeGreeting(negative, "0.0.0")!.text.length;
+    expect(checkGreetingSize("0.0.0", negative, n).severity).toBe("pass");
+    expect(checkGreetingSize("0.0.0", negative, n - 1).severity).toBe("issue");
+  });
+
+  // R183-2 (D3, q16): the composition renders the handoffs as THIS checkout's
+  // seat. Composed as the unresolved reader it under-counts by thousands.
+  it("composes for the checkout's seat, which differs from the unresolved reader", () => {
+    const withHandoff: State = {
+      ...realState(),
+      tasks: [],
+      gaps: [],
+      verified: [],
+      handoffs: [
+        { seat: "planner", session: 1, pick_up: "PLANNER PICK-UP", watch_out: ["PLANNER WATCH-OUT"], open_questions: [],
+          loop_state: { open_prs: [], frozen_sha: null, questions_for_aaron: [], rulings: [] } },
+      ],
+    };
+    const unresolved = fixture(join(base, "unresolved"), withHandoff);
+    const planner = fixture(join(base, "planner"), withHandoff);
+    writeFileSync(join(planner, ".agents", "AGENT.local.md"), "---\nname: Atlas\nrole: planner\npartner: Forge\n---\n");
+    const asUnresolved = composeGreeting(unresolved, "0.0.0")!.text;
+    const asPlanner = composeGreeting(planner, "0.0.0")!.text;
+    expect(asUnresolved).toContain("READER'S SEAT UNRESOLVED");
+    expect(asPlanner).toContain("Your handoff — planner, session 1:");
+    expect(asPlanner).toContain("    - PLANNER WATCH-OUT");
+    expect(asPlanner).not.toBe(asUnresolved);
+  });
+
   it("skips with a reason, rather than passing, when there is no state.json", () => {
     const empty = join(base, "empty");
     mkdirSync(empty, { recursive: true });
@@ -86,6 +118,23 @@ describe("greeting-size — T183-4", () => {
     expect(r.severity).toBe("skip");
     expect(r.message).toContain("no valid .agents/state.json");
   });
+});
+
+// R183-2 (D2, q15): the check is only a rule if /sync runs it.
+describe("greeting-size is wired into runSync", () => {
+  let dir: string;
+  beforeAll(() => {
+    dir = mkdtempSync(join(tmpdir(), "t183-runsync-"));
+    cpSync(join(__dirname, "..", "..", "fixtures"), dir, { recursive: true });
+  });
+  afterAll(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));
+
+  it("is among the checks runSync runs", () => {
+    const result = runSync({ projectRoot: dir, checkOnly: true, score: false, scoreJson: false, history: false });
+    const names = result.checks.map((c) => c.name);
+    expect(names.length).toBeGreaterThan(1);
+    expect(names).toContain("greeting-size");
+  }, 30_000);
 });
 
 describe("the composed greeting carries the role files whole — T183-3", () => {
