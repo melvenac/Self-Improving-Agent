@@ -1254,7 +1254,7 @@ export class MachineConfigWatch {
     // R85. A current side that did not resolve names that failure. Zeroed facts are not a stand-in for the code.
     const currentSide = (s: MachineSnap): string => {
       if (s.lexicalKind === "symlink") return linkSide(s);
-      if (s.resolvedPath === null) return s.reason;
+      if (s.resolvedPath === null) return factText(s);
       return `${s.resolvedPath} ${factText(s)}`;
     };
     // R79. A loop base that was not there is that phrase, never zeroed facts.
