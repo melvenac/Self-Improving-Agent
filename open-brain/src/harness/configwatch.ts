@@ -1303,7 +1303,7 @@ export class MachineConfigWatch {
     const unobservableSide = (s: MachineSnap): string => {
       if (s.lexicalKind === "symlink") return linkSide(s);
       if (s.viaLink !== null) return ancestorLinkText(s);
-      if (s.dev === null) return "no facts: realpath failed";
+      if (s.dev === null) return factText(s);
       return factText(s);
     };
     // R85. A current side that did not resolve names that failure. Zeroed facts are not a stand-in for the code.
