@@ -312,3 +312,25 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   brief** (Grok, record 115) are written. **Error entry (the planner's):** R77 reading 5 said "in every caller", and it
   was verified at the producer only. Record numbers: **115** is Grok for A11, **116** its QA.
 - **QA 111 launched** (importer round 3, pid 5624) after the QA tree moved to `30bf724`.
+
+## Later on 2026-09-26: the laptop runner, Relay's deploy, and QA 111
+
+- **The laptop's Windows job.** At Aaron's choice, Defender folder exclusions were tried first (the runner's `_work`
+  folder and NETWORK SERVICE's temp folder). They did NOT fix it: run 36206948482 had 10 timeouts at 5000 ms. As Aaron's
+  user, git takes about 28 ms a call, and a full bare-remote cycle takes 292 ms. The exclusions were REMOVED at his word.
+  With `--testTimeout=30000` (run 36207661776), all 1035 tests passed (`detach` took 33 s for 14 tests,
+  `tree-currency` 46 s for 13), but vitest's worker RPC timed out (`onTaskUpdate`). The cause is CPU and RAM
+  contention: 4 cores and 7.9 GB, 1.3 GB free during the run. The cleanup, done over SSH at Aaron's word: Brave closed,
+  the disconnected `lightburn` session signed out, Aaron's Dashlane and GoogleDriveFS startup entries disabled, and the
+  dead Rhythm entry plus its 2021 `BeatPlaylist` folder removed. After it, idle RAM was 2.1 GB free and CPU 2%. The
+  next change is `--maxWorkers=2` (`b3baba4`, run 36208034860). The laptop's own agent was asked for a report-only
+  performance survey.
+- **Relay's Loop 5 hub deploy (v1.11.0, warn).** The planner told Relay that SIA traffic IS live (Grok's room is
+  hub-only). A2A-Hub D-018 (PR #33, 2e3de2f, as Relay reports it and unread here): tcm deploys no longer pause the
+  runners, on the planner's code read that SIA CI touches no docker, hub or Convex, and its self-check requires them to
+  be unreachable. The planner is told when a deploy starts, and gets the containers' docker IPs before and after. The
+  addresses before: a2a-hub 172.20.0.3 and convex 172.20.0.2, the same as ci.yml's fixed list. The swap was at
+  01:22:11Z, and the room was held between Relay's two messages. The addresses after are still to come.
+- **QA 111 (importer round 3), `5abe44f`: all five rows pass; D5, D6 and D7 are closed; D8 is new.** Round 4 is ruled
+  in `importer-fixes-round-4-brief.md` (record 116, sia-builder): R4-1 means an unreadable judged input blocks like
+  STALE. The rulings are there.
