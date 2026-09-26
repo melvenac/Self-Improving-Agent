@@ -56,6 +56,44 @@ describe("parseArgs refuses what it was not told about", () => {
   });
 });
 
+describe("a typographic dash is an unrecognised flag (R185-5)", () => {
+  // Autocorrect turns "--" into an em or en dash. Such a token does not start
+  // with "-", so it used to be a positional: a file for `state migrate`, a
+  // directory for the rest.
+  const DASHES: [string, string][] = [
+    ["U+2010 hyphen", "‐"],
+    ["U+2011 non-breaking hyphen", "‑"],
+    ["U+2012 figure dash", "‒"],
+    ["U+2013 en dash", "–"],
+    ["U+2014 em dash", "—"],
+    ["U+2015 horizontal bar", "―"],
+    ["U+2212 minus sign", "−"],
+    ["U+FE58 small em dash", "﹘"],
+    ["U+FE63 small hyphen-minus", "﹣"],
+    ["U+FF0D fullwidth hyphen-minus", "－"],
+  ];
+
+  it.each(DASHES)("%s refuses as a flag, on an 'any' command and a 'directory' one", (_name, dash) => {
+    const tok = `${dash}dry-run`;
+    for (const spec of [COMMAND_SPECS.stateMigrate, SPEC] as CommandSpec[]) {
+      const e = refused(["--seat", "qa", tok], spec);
+      expect(e).toContain(`unrecognised flag "${tok}"`);
+      expect(e).toContain("a typographic dash");
+      expect(e).not.toMatch(/not an existing directory/);
+    }
+  });
+
+  it("is not taken as a value flag's value", () => {
+    expect(refused(["--seat", "—dry-run"], COMMAND_SPECS.stateMigrate)).toMatch(/--seat needs a value/);
+  });
+
+  it("a typographic dash that does not START the token leaves it a positional", () => {
+    const r = parseArgs(COMMAND_SPECS.stateMigrate, ["--seat", "qa", "a—b.json"], dir);
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.args.positionals).toEqual(["a—b.json"]);
+  });
+});
+
 describe("positionals", () => {
   it("a directory that does not exist refuses, with what it resolved to", () => {
     const e = refused(["nope"]);
@@ -155,7 +193,7 @@ describe("the declarations agree with the usage text the CLI prints", () => {
     expect(usage).toContain("Usage: open-brain state <show");
   });
 
-  it.each([
+  const LINES: [string, RegExp][] = [
     ["sync", /^\s+sync (.*)$/m],
     ["start", /^\s+start(.*)$/m],
     ["relocate", /^\s+relocate (.*)$/m],
@@ -163,17 +201,30 @@ describe("the declarations agree with the usage text the CLI prints", () => {
     ["detach", /^\s+detach (.*)$/m],
     ["state show", /^\s+state show (.*)$/m],
     ["state migrate", /^\s+state migrate (.*)$/m],
-  ])("every flag documented for %s is declared", (name, re) => {
+  ];
+  const specNamed = (name: string): CommandSpec =>
+    (Object.values(COMMAND_SPECS) as CommandSpec[]).find((s) => s.name === name)!;
+  const ownLine = (re: RegExp, name: string): string => {
     const line = usage.match(re)?.[1];
     expect(line, `no usage line for ${name}`).toBeDefined();
-    const spec = (Object.values(COMMAND_SPECS) as CommandSpec[]).find((s) => s.name === name)!;
-    // Only the flags before any "Description" column; the descriptions carry no flags.
-    for (const flag of flagsOn(line!)) expect(declaredFlags(spec), `${name} documents ${flag}`).toContain(flag);
+    return line!;
+  };
+
+  it("names a usage line for every command it declares (proves it looked)", () => {
+    expect(LINES.map(([n]) => n).sort()).toEqual((Object.values(COMMAND_SPECS) as CommandSpec[]).map((s) => s.name).sort());
   });
 
-  it("every declared flag is documented somewhere in the usage text", () => {
-    for (const spec of Object.values(COMMAND_SPECS) as CommandSpec[]) {
-      for (const flag of declaredFlags(spec)) expect(usage, `${spec.name} declares ${flag}`).toContain(flag);
-    }
+  it.each(LINES)("every flag documented for %s is declared", (name, re) => {
+    // Only the flags before any "Description" column; the descriptions carry no flags.
+    for (const flag of flagsOn(ownLine(re, name))) expect(declaredFlags(specNamed(name)), `${name} documents ${flag}`).toContain(flag);
+  });
+
+  // R185-6: matched against the command's OWN line. Searching the whole text let
+  // a command declare another command's flag (sync declaring --dry-run, which
+  // detach and state migrate document) and pass, and `sync --dry-run` then ran
+  // the fixing sync.
+  it.each(LINES)("every flag %s declares is documented on its own usage line", (name, re) => {
+    const documented = flagsOn(ownLine(re, name));
+    for (const flag of declaredFlags(specNamed(name))) expect(documented, `${name} declares ${flag}`).toContain(flag);
   });
 });

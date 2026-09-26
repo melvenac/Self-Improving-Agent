@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, statSync, existsSync, realpathSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { join, relative, resolve, parse, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync, execFileSync } from "node:child_process";
 
@@ -12,8 +12,10 @@ import { spawnSync, execFileSync } from "node:child_process";
  * under the OS temp dir. That matters for the red run: at the base commit
  * `sync -check` and `detach -dry-run` fall through to the cwd and do the real
  * thing, so the cwd is what a failure reaches. `inScratch` refuses to spawn
- * anywhere else, so a broken fixture cannot point a fixing sync or a detach at
- * this repository.
+ * when the cwd, or any argument that names an EXISTING path, resolves outside
+ * the temp dir (R185-8). It does not look inside the command: a path the CLI
+ * derives for itself (the project root it walks up to, the DB from the
+ * environment) is kept inside the scratch dir by the fixtures, not by this.
  */
 
 const cliEntry = join(import.meta.dirname, "../src/cli.ts");
@@ -23,21 +25,26 @@ const TMP = realpathSync(tmpdir());
 
 interface Run { status: number | null; stdout: string; stderr: string }
 
-function inScratch(dir: string): void {
-  const real = realpathSync(dir);
-  if (!real.startsWith(TMP + sep)) throw new Error(`refusing to run the CLI outside the temp dir: ${real}`);
+function inScratch(cwd: string, args: readonly string[] = []): void {
+  const outside = (p: string): string | undefined => {
+    const real = realpathSync(p);
+    return real.startsWith(TMP + sep) ? undefined : real;
+  };
+  const cwdOut = outside(cwd);
+  if (cwdOut !== undefined) throw new Error(`refusing to run the CLI outside the temp dir: ${cwdOut}`);
+  void args; // R185-8 red first: the argument check is not built yet
 }
 
 function cli(cwd: string, ...args: string[]): Run {
-  inScratch(cwd);
+  // setup-env.ts has redirected the DB, vault and slot files
+  return cliWith(process.env, cwd, ...args);
+}
+
+function cliWith(env: NodeJS.ProcessEnv, cwd: string, ...args: string[]): Run {
+  inScratch(cwd, args);
   // spawnSync, not execFileSync: stderr must be captured on success as well as
   // failure, or an assertion on it passes without looking.
-  const r = spawnSync(process.execPath, [tsxCli, cliEntry, ...args], {
-    cwd,
-    encoding: "utf8",
-    env: process.env, // setup-env.ts has redirected the DB, vault and slot files
-    timeout: 90_000,
-  });
+  const r = spawnSync(process.execPath, [tsxCli, cliEntry, ...args], { cwd, encoding: "utf8", env, timeout: 90_000 });
   return { status: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "" };
 }
 
@@ -202,8 +209,8 @@ describe("detach", () => {
 });
 
 describe("state migrate", () => {
-  function v1File(): string {
-    const f = join(root, "state.json");
+  function v1File(name = "state.json"): string {
+    const f = join(root, name);
     writeFileSync(
       f,
       JSON.stringify(
@@ -243,6 +250,50 @@ describe("state migrate", () => {
     expect(r.stdout).toContain("[dry run]");
     expect(readFileSync(f).equals(before)).toBe(true);
   }, 120_000);
+
+  it("state migrate —dry-run (an em dash, as autocorrect writes it) refuses and the file is byte-identical", () => {
+    // R185-5, QA 120's D1: the em dash does not start with "-", so it was taken
+    // as a second FILE, refused as missing, and state.json WAS migrated.
+    const f = v1File();
+    const before = readFileSync(f);
+    const tok = "—dry-run";
+    const r = cli(root, "state", "migrate", "--seat", "developer", tok, "state.json");
+    expectRefusal(r, tok);
+    expect(r.stderr).toContain("a typographic dash");
+    expect(readFileSync(f).equals(before)).toBe(true);
+  }, 120_000);
+
+  // R185-5's second half: a refusal that says "nothing was written" must be
+  // true of EVERY named file, so each is checked before any is written.
+  it.each([
+    ["a file that does not exist, named after", ["state.json", "missing.json"]],
+    ["a file that does not exist, named first", ["missing.json", "state.json"]],
+    ["a file that is not JSON", ["state.json", "bad.json"]],
+    ["a file that is not a state record", ["state.json", "other.json"]],
+  ])("state migrate with %s writes none of the files", (_what, files) => {
+    const f = v1File();
+    writeFileSync(join(root, "bad.json"), "{ not json\n");
+    writeFileSync(join(root, "other.json"), JSON.stringify({ hello: "world" }) + "\n");
+    const before = snapshot(root);
+    const r = cli(root, "state", "migrate", "--seat", "developer", ...files);
+    expect(r.status, r.stdout + r.stderr).toBe(1);
+    expect(r.stderr).toMatch(/nothing was written/);
+    expect(readFileSync(f, "utf8")).toContain('"schema_version": 1');
+    expect(snapshot(root)).toEqual(before);
+  }, 120_000);
+
+  it("state migrate with two valid files still migrates both (the check does not stop the good case)", () => {
+    const a = v1File("a.json");
+    const b = v1File("b.json");
+    const beforeA = readFileSync(a);
+    const beforeB = readFileSync(b);
+    const r = cli(root, "state", "migrate", "--seat", "developer", "a.json", "b.json");
+    expect(r.status, r.stdout + r.stderr).toBe(0);
+    expect(readFileSync(a).equals(beforeA)).toBe(false);
+    expect(readFileSync(b).equals(beforeB)).toBe(false);
+    expect(JSON.parse(readFileSync(a, "utf8")).schema_version).toBe(2);
+    expect(JSON.parse(readFileSync(b, "utf8")).schema_version).toBe(2);
+  }, 120_000);
 });
 
 describe("read-only and opt-in commands also refuse", () => {
@@ -260,6 +311,38 @@ describe("read-only and opt-in commands also refuse", () => {
     const r = cli(root, "topics", "--aply");
     expectRefusal(r, "--aply");
   }, 120_000);
+});
+
+describe("the refusal comes before the database is opened (R185-7, QA 120's rows)", () => {
+  // A DB path of this test's own, so "not created" is a fact about this spawn
+  // alone. better-sqlite3 creates the file on open, so its absence is the proof.
+  it.each([
+    [["relocate", "--from", "a", "--to", "b", "--aply"]],
+    [["relocate", "--aply"]],
+    [["topics", "--aply"]],
+  ])("%j refuses and the DB file is never created", (argv) => {
+    const db = join(root, "knowledge-v2.db");
+    const r = cliWith({ ...process.env, KNOWLEDGE_V2_DB: db }, root, ...argv);
+    expectRefusal(r, "--aply");
+    expect(existsSync(db)).toBe(false);
+  }, 120_000);
+});
+
+describe("inScratch refuses an argument outside the temp dir (R185-8)", () => {
+  // Every spawn here is `state show`, which is read-only, so at a commit where
+  // the guard is missing the spawn goes ahead and harms nothing.
+  it.each([
+    ["the filesystem root", () => parse(root).root],
+    ["a file outside (this test's own source)", () => cliEntry],
+    ["a relative path that climbs out", () => ".."],
+  ])("%s refuses before anything spawns", (_what, arg) => {
+    expect(() => cli(root, "state", "show", "--json", arg())).toThrow(/argument outside the temp dir/);
+  });
+
+  it("an argument inside the temp dir, and a word that names nothing, still pass", () => {
+    writeFileSync(join(root, "inside.json"), "{}\n");
+    expect(() => inScratch(root, ["inside.json", join(root, "inside.json"), "no-such-thing", "--check", "sync"])).not.toThrow();
+  });
 });
 
 describe("scripts/backfill-success-rate.mjs", () => {
