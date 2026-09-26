@@ -151,7 +151,7 @@ allowed them. **Both known positives are flagged:**
 ```
 
 The same result is pinned by a test that reads this repository's real history (`7ba177f`). It is green here in 11.7s
-and **skips on CI**, where the checkout is shallow (section 8). The fixture rows reproduce the rev 61/62 shape in a real
+and **skips on CI**, where the checkout is shallow (section 9). The fixture rows reproduce the rev 61/62 shape in a real
 git repository, and those do run on tcm.
 
 ## 5. `/sync` checks
@@ -211,7 +211,47 @@ on tcm, so no tcm run exercises it.**
 3. Install the new `end.md` into `~/.claude/commands/` (and the Cursor copies), so the parity checks pass.
 4. Retire "no `/end` (T-163)" from future briefs.
 
-## 8. Open
+## 8. Greeting size before and after: Addition 1 is NOT met (+86 characters per seat)
+
+**Atlas's ruling (Addition 1):** "greeting-size must stay under its current figure on this repo's migrated record: show
+before and after in the handoff." **Measured after the freeze, on atlas's request. `66b2173` is unchanged.**
+
+**Instrument:** the live `ob_start` text. `handleStart({project_root})` was imported from each build's own
+`build/server.js`, one process per seat, so this is not `greeting-size`'s composition. Each build ran in a scratch
+`git clone --shared` of this repository at its own SHA, and each clone was its own project root, so its git history is
+real. The seat came from an `AGENT.local.md` written into the clone per run. Both builds are stamped with their SHA in
+`build-info.json`.
+- **BEFORE:** master `be7ddfb`'s build on rev 131 (v2). The record is byte-identical at `be7ddfb` and `66b2173`.
+- **AFTER:** `66b2173`'s build on the same record, migrated to v3 (rev 132) by that build and committed in the clone.
+
+| Seat | BEFORE chars / words | AFTER chars / words | Δ chars / words |
+|---|---|---|---|
+| planner | 55,117 / 8,698 | 55,203 / 8,712 | **+86 / +14** |
+| developer | 47,650 / 7,585 | 47,736 / 7,599 | **+86 / +14** |
+| qa | 50,594 / 8,109 | 50,680 / 8,123 | **+86 / +14** |
+
+**AFTER is larger for every seat, by the same 86 characters.** A per-line diff of the developer greeting (517 lines
+both sides; every handoff body identical) puts all of it on five label lines:
+
+| Δ | Line |
+|---|---|
+| +37 | `Last session: … — 1 writing session(s) in the record` |
+| +23 | `Other seats' handoffs (named…` → `Other handoffs (newest per seat and checkout; named…` |
+| +9 ×3 | `[legacy]` on the own handoff and on the two others (their checkout is null after migration) |
+| −1 | the session-log path: the scratch directory `gs-after` is one character shorter than `gs-before` (an artefact of the measurement) |
+
+**Why:** T163-1's render adds a checkout tag and a heading that names the rule, and the last-session line now counts
+the writing sessions. The rendered content does not grow. The newest-per-(seat, checkout) rule shows the same three
+handoffs as before on this record, because v2 held only one per seat, so the rule has nothing to hide here yet. The
+**true label cost is +87**, measured as +86 because of the path artefact. The `[legacy]` tags disappear for a seat once
+it writes its first v3 handoff.
+
+**Scratch artefacts, same length on both sides:** the tree-currency line (the clones' `origin` is this checkout, so the
+ahead counts read 233 and 213 against a local `master`), and the size line's numbers for `state.json`.
+
+Stopped here per atlas's instruction. **No change was made to reduce it.**
+
+## 9. Open
 
 - **T-171 is still live** (section 1a): an `update_task` from one session replaces another session's note.
 - **The real-history row skips on CI** (depth-1 checkout). The known positives are proven in seat checkouts only.
