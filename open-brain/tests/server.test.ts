@@ -308,6 +308,19 @@ describe("server handlers", () => {
       expect(start).not.toContain("state-version:");
     });
 
+    /** T-171: the printed result carries every note change, in the dry run as in the write. */
+    it("ob_state prints each note change on its own line, dry run included", async () => {
+      proseProject(tmp);
+      cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+      await handleSetSession({ session_id: "t171-uuid", project_dir: tmp });
+      const ops = [{ op: "update_task", id: "T-005", append_note: "and more" }];
+      const dry = getText(await handleState({ project_root: tmp, session: 55, expected_revision: 7, ops, dry_run: true }));
+      expect(dry).toContain("ob_state dry run — nothing written");
+      expect(dry).toContain(`NOTE CHANGE: T-005 note APPENDED: +${" — and more".length} chars`);
+      const real = getText(await handleState({ project_root: tmp, session: 55, expected_revision: 7, ops }));
+      expect(real).toContain(`NOTE CHANGE: T-005 note APPENDED: +${" — and more".length} chars`);
+    });
+
     /** Loop 2 R1: .agents/ without SESSIONS/ no longer errors; the block says why there is no log. */
     it("says why no session log was created when SESSIONS/ is missing", async () => {
       writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "2.0.0" }));
