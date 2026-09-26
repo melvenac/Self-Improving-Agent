@@ -863,7 +863,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
   // R4-1: an input that cannot be read blocks like STALE; could-not-tell for any other reason does not.
   const unreadable = staleness.inputs.filter((i) => i.verdict === "could_not_tell" && blocksCommit(i));
-  if (stale.length + unreadable.length > 0 && opts.acceptStale !== true) {
+  if (stale.length > 0 && opts.acceptStale !== true) {
     const why: string[] = [];
     if (stale.length > 0) why.push(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ")}`);
     if (unreadable.length > 0) why.push(`${unreadable.length} input(s) cannot be read, so whether they are current cannot be told: ${unreadable.map((i) => `${i.input} ${i.evidence}`).join("; ")}`);
