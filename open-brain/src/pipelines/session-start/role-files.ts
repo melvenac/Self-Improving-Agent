@@ -140,6 +140,10 @@ export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | nul
 
   for (const f of files) {
     if (!f.present) {
+      // A checkout that declares it is not a seat has no seat rules to be
+      // missing — a fresh /bootstrap install is one (bootstrap-fix BF-5,
+      // frogger F8). shared.md is still loaded when it is there.
+      if (notASeat) continue;
       problems.push(
         `ROLE FILE MISSING: ${f.rel} does not exist — the "${f.owner}" seat's rules are not in this checkout. ` +
           `This is absence, not an empty ruleset.`
@@ -160,14 +164,14 @@ export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | nul
     }
   }
 
-  return { seat, files, lines: [...lines0, ...render(files, inGit)], problems };
+  return { seat, files, lines: [...lines0, ...render(files, inGit, notASeat)], problems };
 }
 
-function render(files: RoleFileReport[], inGit: boolean): string[] {
+function render(files: RoleFileReport[], inGit: boolean, notASeat: boolean): string[] {
   const lines: string[] = [`Role knowledge loaded (${files.filter((f) => f.present).length} of ${files.length}):`];
   for (const f of files) {
     if (!f.present) {
-      lines.push(`  ${f.rel} — ABSENT (${f.owner})`);
+      lines.push(`  ${f.rel} — ABSENT (${f.owner}${notASeat ? "; not a seat, so none is expected" : ""})`);
       continue;
     }
     const where = f.commit

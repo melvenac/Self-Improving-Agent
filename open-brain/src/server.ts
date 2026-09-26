@@ -222,7 +222,10 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     lines.push("");
 
     lines.push(`Session Start — ${result.state.mode} mode`);
-    lines.push(`Project: v${result.state.version}`);
+    // The name is the record's (bootstrap-fix BF-8, frogger F12): the header
+    // printed `Project: v0.0.1` while the State block below said `frogger v0.0.1`.
+    const recordName = result.state.stateJson.data?.project.name ?? null;
+    lines.push(recordName ? `Project: ${recordName} v${result.state.version}` : `Project: v${result.state.version}`);
 
     // Drift is a result, not an instruction: the caller relays it, it does not
     // re-derive it. An explicit "none" line keeps an empty drift[] observable.
