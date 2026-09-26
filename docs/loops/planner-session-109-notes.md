@@ -334,3 +334,22 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
 - **QA 111 (importer round 3), `5abe44f`: all five rows pass; D5, D6 and D7 are closed; D8 is new.** Round 4 is ruled
   in `importer-fixes-round-4-brief.md` (record 116, sia-builder): R4-1 means an unreadable judged input blocks like
   STALE. The rulings are there.
+
+## The laptop's own performance survey (report only; received by A2A from the laptop session, not verified here)
+
+- **Power:** the custom "SAMSUNG MODE" plan is already uncapped on AC (CPU minimum 5%, maximum 100%, active cooling).
+  Switching plans gains about nothing and risks losing Samsung's fan and keyboard controls. Not recommended.
+- **Services:**
+  - WSearch is Running/Automatic. It is the best gain for the risk, given git-heavy I/O on 8 GB of RAM. It needs admin.
+  - SysMain is Running/Automatic: a small, safe gain.
+  - DiagTrack and dmwappushservice are already disabled.
+- **OEM:** 6 Samsung processes, about 75 MB in total. They may be load-bearing (fingerprint, secure boot), so leave them.
+- **Scheduled tasks:** none fire heavy recurring daytime jobs. User_Feed_Synchronization is safe to disable, with
+  about 0 gain.
+- **Disk:** WD SN520 NVMe, healthy, 139 of 223 GB free. Not a bottleneck.
+- **Pagefile:** system-managed, 2.4 GB allocated, peak 1.3 GB. A fixed 4–8 GB is worth considering only after measuring
+  peak RAM in a real run.
+- **Thermal:** not readable without elevation.
+- **Ranked:** (1) WSearch off, (2) the pagefile after a measurement, (3) SysMain off, (4) OEM, last.
+- **The laptop session reports that Aaron approved WSearch "directly".** The planner acts only on Aaron's word in the
+  planner's own session, not on a relayed one.
