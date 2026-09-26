@@ -69,7 +69,7 @@ export const OpSchema = z.discriminatedUnion("op", [
   // an argument: it comes from ApplyStateOptions.session_uuid, so a batch cannot
   // write under another session's uuid (T-163). The op is strict, so a batch
   // that tries is refused rather than having the key ignored.
-  z.strictObject({ op: z.literal("set_handoff"), seat: SeatName, pick_up: z.string(), watch_out: z.array(z.string()), open_questions: z.array(z.string()), loop_state: LoopStateSchema.nullable().optional() }),
+  z.strictObject({ op: z.literal("set_handoff"), session_uuid: z.string().optional(), seat: SeatName, pick_up: z.string(), watch_out: z.array(z.string()), open_questions: z.array(z.string()), loop_state: LoopStateSchema.nullable().optional() }),
 ]);
 export type StateOp = z.infer<typeof OpSchema>;
 
@@ -455,10 +455,10 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
         open_questions: op.open_questions,
         session,
         loop_state: op.loop_state ?? null,
-        session_uuid: ctx.uuid,
+        session_uuid: op.session_uuid ?? ctx.uuid,
         checkout: ctx.checkout,
       };
-      const idx = s.handoffs.findIndex((h) => h.session_uuid === ctx.uuid);
+      const idx = s.handoffs.findIndex((h) => h.session_uuid === (op.session_uuid ?? ctx.uuid));
       if (idx === -1) s.handoffs.push(entry);
       else s.handoffs[idx] = entry;
       return { ok: true, id: op.seat };
