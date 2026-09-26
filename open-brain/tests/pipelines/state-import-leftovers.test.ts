@@ -168,13 +168,19 @@ describe("R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, b
     runDraft(root, TODAY);
     const report = readFileSync(join(root, REPORT_REL), "utf8");
     expect(report).toMatch(new RegExp(named));
+    // In the section read first, too: the not-judged line itself says it.
+    const line = report.split("\n").find((l) => l.startsWith(`- not judged \`${DECISIONS}\``)) ?? "";
+    expect(line).toContain(`contains ${nuls} NUL byte(s), the first at byte ${bytes.indexOf(0)}`);
     expect(report).toMatch(/ADRs imported: ADR-1\b/);
     expect(report).toMatch(/ADRs NOT imported[^\n]*: ADR-2\b/);
   });
 
   it("a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the ADRs not imported", () => {
     writeProject(root, inboxText(7), bytes);
-    expect(cli(["state", "import", "--draft", root], root).status).toBe(0);
+    const d = cli(["state", "import", "--draft", root], root);
+    expect(d.status).toBe(0);
+    expect(d.stdout).toMatch(new RegExp(named));
+    expect(d.stdout).toMatch(/ADRs NOT imported[^\n]*: ADR-2\b/);
     const c = cli(["state", "import", "--commit", root], root);
     expect(c.status).toBe(0);
     expect(c.stdout).toMatch(new RegExp(named));
