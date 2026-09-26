@@ -517,6 +517,7 @@ const agrees = (snapshot: FileState, now: FileState | null): boolean => {
 const stateHash = (s: FileState | null): string => {
   if (s === null) return "absent";
   if (s.kind === "symlink") return `type:symlink readlink:${s.target}`;
+  if (s.readError && s.dev === null) return `${s.readError}; no facts: lstat failed`;
   if (s.readError) return `${s.readError}; type file dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
   if (s.unreadIdentity) return `identity:dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}; not read`;
   return `${hashOf(s.bytes)}/${s.mode.toString(8)}/nlink:${s.nlink}`;
@@ -1302,7 +1303,7 @@ export class MachineConfigWatch {
     // R85b. A realpath failure with no lstat prints no zeros. The link itself, or a parent link, prints that lstat.
     const unobservableSide = (s: MachineSnap): string => {
       if (s.lexicalKind === "symlink") return linkSide(s);
-      if (s.viaLink !== null) return ancestorLinkText(s);
+      if (s.viaLink !== null) return s.dev === null ? ancestorLinkText(s) : `${ancestorLinkText(s)}; resolves to: ${factText(s)}`;
       if (s.dev === null) return "no facts: realpath failed";
       return factText(s);
     };
@@ -1367,7 +1368,7 @@ export class MachineConfigWatch {
       if (linkPlanted) {
         const after =
           base.resolvedPath === null
-            ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${currentSide(end)}`
+            ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${end.lexicalKind === "symlink" ? currentSide(end) : `${ancestorLinkText(end)}; ${currentSide(end)}`}`
             : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${end.lexicalKind === "symlink" ? currentSide(end) : `${ancestorLinkText(end)}; ${currentSide(end)}`}`;
         out.push(row(stageBefore(opened), after, true, p.path, p.scope));
         continue;
