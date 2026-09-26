@@ -445,7 +445,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       // SeatName is a role: three developer checkouts shared one slot, so a
       // developer's close-out erased another developer's (Step 0, record 118).
       // A session adds its own entry or updates it; it cannot reach another's.
-      if (ctx.uuid === null) {
+      if (ctx.uuid === "never") {
         return { ok: false, error: "set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing" };
       }
       const entry = {
