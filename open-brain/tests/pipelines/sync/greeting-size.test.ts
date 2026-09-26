@@ -154,8 +154,13 @@ function greetingRoot(): { root: string; cleanup: () => void } {
   const root = mkdtempSync(join(tmpdir(), "t183-repo-copy-"));
   fixture(root, state);
   cpSync(join(REPO_ROOT, ".agents", "roles"), join(root, ".agents", "roles"), { recursive: true });
-  const local = join(REPO_ROOT, ".agents", "AGENT.local.md");
-  if (existsSync(local)) cpSync(local, join(root, ".agents", "AGENT.local.md"));
+  // Both declarations: AGENT.local.md is untracked and exists only in a seat
+  // checkout; CI greets through the tracked AGENT.md. Copying only the local one
+  // passed here and greeted with NO seat on tcm (run 36218174861).
+  for (const name of ["AGENT.local.md", "AGENT.md"]) {
+    const src = join(REPO_ROOT, ".agents", name);
+    if (existsSync(src)) cpSync(src, join(root, ".agents", name));
+  }
   const git = (...a: string[]) => execFileSync("git", a, { cwd: root, stdio: "ignore" });
   git("init", "-q");
   git("add", ".agents/roles", ".agents/state.json");
