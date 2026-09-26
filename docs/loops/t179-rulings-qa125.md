@@ -102,3 +102,21 @@ does not hold. The containment for next time: before ruling a numeric bound, rea
     `first_rev` after the task's closing revision**. The closing revision is recorded on close.
   - Tasks closed before v3 are ordered before every keyed session.
   - A row: one write numbered 1124 drops no done task. A mutant restoring the number comparison must be caught.
+
+## Amendment 3 (overnight, same session): round 2 frozen at `1646567`; its three departures, ruled
+
+Frozen `1646567` (handoff `d0335d7`, Forge 128). Green `36231392345` (1307 passed, 2 skipped); redcheck `6c8f581`
+red `36230084527` (10 AssertionErrors, on exactly the new rows). All of QA 125's seven mutants are red on the new tip,
+including `erasure-blind-rev60`, now killed on CI by R179-7's fixture. The planner checked the SHAs, the conclusions,
+that the handoff is on the remote, and a clean `git merge-tree` against master `aae0dce`.
+
+1. **`end.md` names no SIA ids, T-003 included: ACCEPTED.** `mirror-parity` requires the repository and template
+   copies to be identical, so a template-safe text states the dependency in plain words. The handoff names T-003.
+2. **"Other projects" corrected: ACCEPTED.** `~/Projects/A2A-Hub` (v2 rev 66) and its `a2a-*` worktrees ARE on SIA,
+   and frogger is v2 rev 0. The planner's line was wrong. Checklist step 7 lists them, and each migrates as SIA's
+   record does. A2A-Hub's migration is Relay's seat's to run, or Aaron's, not SIA's.
+3. **An unattributed `ob_state` write ages no done task: ACCEPTED as the intended consequence.** Retention counts
+   sessions, and a write without a session is not one. Erring toward keeping is the safe side.
+
+**Next:** QA of round 2 goes in the next queue (record 134). The stacked `/bootstrap` fix merges `d0335d7` in
+(record 133, `sia-builder`), and so do the importer leftovers (a later cleared session).
