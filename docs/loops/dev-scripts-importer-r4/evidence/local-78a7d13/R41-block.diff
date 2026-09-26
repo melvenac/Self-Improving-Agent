@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..66f2372 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -455,7 +455,7 @@ export type StalenessVerdict = "current" | "stale" | "could_not_tell";
+  * --accept-stale. The other three were read, and say what they say.
+  */
+ export const COULD_NOT_TELL = {
+-  unreadable: { blocks: true, what: "the input contains NUL bytes, so its words cannot be read" },
++  unreadable: { blocks: false, what: "the input contains NUL bytes, so its words cannot be read" },
+   no_session_log: { blocks: false, what: "there is no SESSIONS/Session_N.md to compare against" },
+   no_declared_session: { blocks: false, what: "the input names no `Session N` in its status blockquote or its headings" },
+   ahead_of_latest: { blocks: false, what: "the input declares a session ahead of the latest log" },

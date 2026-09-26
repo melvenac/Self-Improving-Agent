@@ -16,7 +16,7 @@
  * Parsing rules are the brief's, applied literally. Where a rule cannot
  * decide, the item is reported, never guessed silently.
  */
-import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, cpSync, renameSync, statSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, cpSync, renameSync, statSync, rmSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import {
   StateSchema,
@@ -51,6 +51,7 @@ export interface ImportReport {
   project: { name: string; version: string };
   current_session: number;
   migration_date: string;
+  staleness: StalenessReport;
   sources: Record<string, { path: string; present: boolean; lines: number }>;
   inbox: {
     items: number;
@@ -74,12 +75,102 @@ export interface ImportReport {
   };
   handoff: { pick_up_lines: number; watch_out: number; open_questions: number; sections_not_imported: string[] };
   last_session: { n: number; date: string; uuid: string | null; file: string };
-  verified_seeded: number;
-  gaps_seeded: number;
+  /**
+   * Always 0. Prose files carry no verified claims or gaps in a form the
+   * importer reads, and it invents none: it used to seed SIA's own
+   * V-001..V-005 and G-001..G-006 into every project (T-175). The counts stay
+   * in the report so that it says 0 rather than going quiet.
+   */
+  verified_imported: number;
+  gaps_imported: number;
   summary_removal: { title_line: number; blockquote_lines: number; current_state_lines: number; total_lines_removed: number; kept_headings: string[] } | null;
 }
 
 export interface ImportDraft { state: State; report: ImportReport }
+
+// ---------------------------------------------------------------------------
+// Reading: every text the importer judges or imports is decoded here, once.
+// ---------------------------------------------------------------------------
+
+/**
+ * How a file's bytes were turned into text. The byte-order mark is a property
+ * of the file, not of its first line: left in the text, U+FEFF hid a `# ` title
+ * from every `startsWith` in this module, and a stale input read as unmarked
+ * (QA 102, D2). UTF-16 is what Windows PowerShell 5.1's `>` and `Out-File`
+ * write, BOM first. Line endings need nothing here: every split is `\r?\n`.
+ */
+export type TextEncoding = "utf8" | "utf8-bom" | "utf16le-bom" | "utf16be-bom" | "windows-1252";
+export interface DecodedText {
+  text: string;
+  encoding: TextEncoding;
+  /** Why the text cannot be trusted as read, or null. Such an input is never judged. */
+  undecodable: string | null;
+}
+
+/** Said in the evidence of an input read as Windows-1252, so the guess is visible. */
+export const READ_AS_1252 = "read as Windows-1252: not valid UTF-8, and no byte-order mark";
+
+// Windows-1252's 0x80–0x9F; every other byte is its own code point. Written
+// out rather than asked of TextDecoder, whose "windows-1252" has decoded this
+// range as Latin-1 on some Node builds.
+const CP1252_HIGH = "€\u0081‚ƒ„…†‡ˆ‰Š‹Œ\u008dŽ\u008f\u0090‘’“”•–—˜™š›œ\u009džŸ";
+function decode1252(buf: Buffer): string {
+  let s = "";
+  for (const b of buf) s += b >= 0x80 && b <= 0x9f ? CP1252_HIGH[b - 0x80] : String.fromCharCode(b);
+  return s;
+}
+
+export function decodeText(buf: Buffer): DecodedText {
+  if (buf.length >= 3 && buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) return withCheck(buf.subarray(3), "utf8-bom");
+  if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) return { text: buf.subarray(2).toString("utf16le"), encoding: "utf16le-bom", undecodable: null };
+  if (buf.length >= 2 && buf[0] === 0xfe && buf[1] === 0xff) return { text: Buffer.from(buf.subarray(2)).swap16().toString("utf16le"), encoding: "utf16be-bom", undecodable: null };
+  return withCheck(buf, "utf8");
+}
+
+function withCheck(buf: Buffer, encoding: "utf8" | "utf8-bom"): DecodedText {
+  let text: string;
+  try {
+    // ignoreBOM: TextDecoder drops a UTF-8 BOM by default, which made the strip
+    // in decodeText a second, unobservable protection. One, and it is that one.
+    text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(buf);
+  } catch {
+    // Not UTF-8 and no BOM: Windows PowerShell 5.1's Set-Content/Add-Content
+    // write the ANSI code page. Every ASCII byte means the same in it, and the
+    // session marker is ASCII, so the verdict holds (QA 106, D5). Only NUL
+    // bytes — UTF-16 without its BOM — leave the words unreadable.
+    if (!buf.includes(0)) return { text: decode1252(buf), encoding: "windows-1252", undecodable: null };
+    text = buf.toString("utf-8");
+  }
+  if (text.includes("\u0000")) return { text, encoding, undecodable: nulReason(buf, encoding === "utf8-bom" ? 3 : 0) };
+  return { text, encoding, undecodable: null };
+}
+
+/**
+ * Where the NUL bytes are, counted in the file. UTF-16 without a BOM is one
+ * source; Windows PowerShell 5.1's `>>` is another: it appends UTF-16LE with no
+ * BOM onto a UTF-8 or Windows-1252 file, so a readable head gets an unreadable
+ * tail (QA 111, D8).
+ */
+function nulReason(buf: Buffer, bomLength: number): string {
+  let count = 0;
+  for (const b of buf) if (b === 0) count++;
+  return `contains ${count} NUL byte(s), the first at byte ${buf.indexOf(0) + bomLength}, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's \`>>\`: its encoding is unknown, so its words cannot be read`;
+}
+
+/**
+ * SUMMARY.md goes back as plain UTF-8, whatever it was read as. The renderer
+ * that inserts its marked region straight after, and every ob_state write after
+ * that, reads it as UTF-8 and looks for its `# ` title with `startsWith` — so a
+ * BOM kept here would put the region above the title. The original bytes are in
+ * the snapshot.
+ */
+function summaryBytes(text: string): Buffer {
+  return Buffer.from(text, "utf-8");
+}
+
+export function readText(p: string): DecodedText | null {
+  return existsSync(p) ? decodeText(readFileSync(p)) : null;
+}
 
 // ---------------------------------------------------------------------------
 // INBOX.md → tasks[]
@@ -344,49 +435,149 @@ export function findLastSession(sessionsDir: string, today: string): ImportRepor
     }
   }
   if (!best) return { n: 0, date: today, uuid: null, file: "(no Session_N.md)" };
-  const text = readFileSync(join(sessionsDir, best.file), "utf-8");
+  const text = decodeText(readFileSync(join(sessionsDir, best.file))).text;
   const date = text.match(/^# Session \d+\s+[—–-]+\s+(\d{4}-\d{2}-\d{2})/m)?.[1] ?? today;
   const uuid = text.match(/Session ID:\*{0,2}\s*`?([0-9a-fA-F-]{36})`?/)?.[1] ?? null;
   return { n: best.n, date, uuid, file: `.agents/SESSIONS/${best.file}` };
 }
 
 // ---------------------------------------------------------------------------
-// Seeds (the brief's V-001..V-005 and the carried gaps), since_session 54
+// Staleness (T-180): an input that predates the latest session is named, not
+// imported as though it were current.
 // ---------------------------------------------------------------------------
 
-export function seedVerified(): Verified[] {
-  const mk = (id: string, claim: string, testPath: string, testObs: string, tag: string, tagObs: string): Verified => ({
-    id, claim, since_session: 54, status: "verified",
-    evidence: [{ type: "test", path: testPath, observation: testObs }, { type: "tag", path: tag, observation: tagObs }],
-  });
-  return [
-    mk("V-001", "ob_start is the single startup implementation and returns state, drift, session and sizes", "open-brain/tests/server.test.ts", "handleStart shape pinned", "v0.28.0", "accepted Loop 1"),
-    mk("V-002", "state.json read side: strict schema, three-way reader, ob_start render, state-schema sync check", "open-brain/tests/shared/state-schema.test.ts", "strict schema + fixture round trip", "v0.29.0", "accepted Loop 2"),
-    mk("V-003", "state writer: revision check, atomic batch, retention, four views, ob_state", "open-brain/tests/shared/state-writer.test.ts", "refusals, atomicity, retention, views", "v0.30.0", "accepted Loop 3"),
-    mk("V-004", "/sync resolves the project root or refuses; identical from root and open-brain/", "open-brain/tests/pipelines/sync/repo-root.test.ts", "root from subdirectory; refusal names the cwd", "v0.30.0", "accepted Loop 3 (R4)"),
-    mk("V-005", "relocate existence check is case-insensitive; CI green on ubuntu", "open-brain/src/relocate.ts", "projectDirExists resolves the canonical path case-insensitively; CI run 34890412313 green on master 86ea010", "v0.29.1", "hotfix merged via PR #4"),
-  ];
+export type StalenessVerdict = "current" | "stale" | "could_not_tell";
+
+/**
+ * Every reason detectStaleness gives for "could not tell", and whether it
+ * blocks a bare --commit as STALE does (R4-1). The verdict is the same for all
+ * four; the consequence is not. An input whose words cannot be read might be
+ * stale, and nothing else in the importer can say, so it blocks until
+ * --accept-stale. The other three were read, and say what they say.
+ */
+export const COULD_NOT_TELL = {
+  unreadable: { blocks: true, what: "the input contains NUL bytes, so its words cannot be read" },
+  no_session_log: { blocks: false, what: "there is no SESSIONS/Session_N.md to compare against" },
+  no_declared_session: { blocks: false, what: "the input names no `Session N` in its status blockquote or its headings" },
+  ahead_of_latest: { blocks: false, what: "the input declares a session ahead of the latest log" },
+} as const;
+export type CouldNotTell = keyof typeof COULD_NOT_TELL;
+
+export interface InputStaleness { input: string; verdict: StalenessVerdict; declared_session: number | null; evidence: string; could_not_tell?: CouldNotTell }
+
+/** Whether a judged input stops a bare --commit: STALE, or could not tell because it cannot be read. */
+export function blocksCommit(i: InputStaleness): boolean {
+  if (i.verdict === "stale") return true;
+  return i.verdict === "could_not_tell" && i.could_not_tell !== undefined && COULD_NOT_TELL[i.could_not_tell].blocks;
+}
+export interface StalenessReport {
+  signal: string;
+  latest: { n: number; file: string } | null;
+  inputs: InputStaleness[];
+  not_judged: Array<{ input: string; reason: string }>;
 }
 
-export function seedGaps(): Gap[] {
-  const mk = (id: string, what: string, evidence: string, recommended_update: string): Gap => ({ id, what, evidence, recommended_update, opened_session: 54 });
-  return [
-    mk("G-001", "Cursor start.md/end.md copies are not on ob_start/ob_state", "Loop 1 and Loop 3 Developer reports (gaps[]); Loop 4 C2 freezes the Cursor copies", "Move the Cursor copies in a dedicated loop once ob_state is exercised from a Cursor seat"),
-    mk("G-002", "The repo's .claude/ is gitignored; mirror policy for slash commands is undecided", "Loop 1 Developer report (gaps[]); next-session.md carried items at Session 54", "Aaron decides: track .claude/commands/ or keep the template as the only tracked copy"),
-    mk("G-003", "SESSION_TEMPLATE.md pre-session checklist still says to read SUMMARY/INBOX by hand", "Loop 1 Developer report (gaps[]); template wording predates ob_start", "Reword the checklist to name ob_start / the /start greeting"),
-    mk("G-004", "vault-index-parity warns on one unindexed Checkpoints note", "/sync output at Sessions 53–55 (Loop 2 report, carried)", "Index the note through ob_store or remove it; then the check passes"),
-    mk("G-005", "DECISIONS.md is both the prose ADR log and the decisions[] index", "Loop 3 Developer report (gaps[]); importer reads ADR headings, add_decision writes state only", "Decide which is canonical after the first ob_state add_decision; render DECISIONS.md from state or stop importing"),
-    mk("G-006", "No CLI door for ob_state (only the MCP tool)", "Loop 3 Developer report (gaps[]); planned as Loop 7", "Add `open-brain state apply` once the tool contract has settled"),
-  ];
+/**
+ * One signal, the file's own words. Not git: `.agents/` is untracked in some
+ * projects, and a tree snapshotted in one commit gives every file the same
+ * date. Not mtime: a checkout or a copy resets it.
+ */
+export const STALENESS_SIGNAL =
+  "the highest `Session N` an input names in its status blockquote (the `>` lines directly under its title) or in a heading, compared with the highest `SESSIONS/Session_N.md`";
+
+const DECLARED_RE = /\bSessions?\s+(\d+)(?:\s*[–-]\s*(\d+))?/g;
+
+/** The highest session an input declares, and the line that declares it. */
+export function declaredSession(text: string): { n: number; line: number; text: string } | null {
+  const lines = text.split(/\r?\n/);
+  const candidates: number[] = [];
+  const titleIdx = lines.findIndex((l) => l.startsWith("# "));
+  if (titleIdx !== -1) {
+    for (let i = titleIdx + 1; i < lines.length && (lines[i].trim() === "" || lines[i].startsWith(">")); i++) {
+      if (lines[i].startsWith(">")) candidates.push(i);
+    }
+  }
+  lines.forEach((l, i) => { if (/^#{1,6} /.test(l)) candidates.push(i); });
+  let best: { n: number; line: number; text: string } | null = null;
+  for (const i of candidates) {
+    for (const m of lines[i].matchAll(DECLARED_RE)) {
+      const n = Math.max(parseInt(m[1], 10), m[2] ? parseInt(m[2], 10) : 0);
+      if (!best || n > best.n) best = { n, line: i + 1, text: lines[i].trim() };
+    }
+  }
+  return best;
+}
+
+type InputKey = "inbox" | "task" | "next" | "summary" | "decisions";
+const INPUT_REL: Record<InputKey, string> = {
+  inbox: ".agents/TASKS/INBOX.md",
+  task: ".agents/TASKS/task.md",
+  next: ".agents/SESSIONS/next-session.md",
+  summary: ".agents/SYSTEM/SUMMARY.md",
+  decisions: ".agents/SYSTEM/DECISIONS.md",
+};
+/** The inputs imported AS CURRENT STATE: tasks, objective, handoff. */
+const JUDGED: InputKey[] = ["next", "inbox", "task"];
+const NOT_JUDGED_REASON: Partial<Record<InputKey, string>> = {
+  summary: "not imported as state: --commit only cuts its status blockquote and `## Current State`",
+  decisions: "imported as a dated log of past decisions, not as current state",
+};
+
+export function detectStaleness(texts: Record<InputKey, string | null>, last: ImportReport["last_session"], undecodable: Partial<Record<InputKey, string>> = {}, readAs: Partial<Record<InputKey, string>> = {}): StalenessReport {
+  const latest = last.n > 0 ? { n: last.n, file: last.file } : null;
+  const inputs: InputStaleness[] = [];
+  const not_judged: StalenessReport["not_judged"] = [];
+  for (const key of Object.keys(INPUT_REL) as InputKey[]) {
+    const input = INPUT_REL[key];
+    const text = texts[key];
+    if (text === null) { not_judged.push({ input, reason: "absent: nothing is imported from it" }); continue; }
+    if (!JUDGED.includes(key)) { not_judged.push({ input, reason: NOT_JUDGED_REASON[key]! }); continue; }
+    if (undecodable[key]) {
+      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: undecodable[key]!, could_not_tell: "unreadable" });
+      continue;
+    }
+    if (!latest) {
+      inputs.push({ input, verdict: "could_not_tell", declared_session: declaredSession(text)?.n ?? null, evidence: `no SESSIONS/Session_N.md to compare against (${last.file})`, could_not_tell: "no_session_log" });
+      continue;
+    }
+    const d = declaredSession(text);
+    if (!d) {
+      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: "names no `Session N` in its status blockquote or its headings", could_not_tell: "no_declared_session" });
+      continue;
+    }
+    const where = `line ${d.line} declares Session ${d.n} (\`${d.text.length > 160 ? d.text.slice(0, 157) + "…" : d.text}\`); the latest session log is Session ${latest.n} (${latest.file})`;
+    if (d.n > latest.n) {
+      // A session no log records: renumbering, a per-worktree counter (T-164) or
+      // a missing log. The comparison cannot say which, so it does not say current.
+      inputs.push({ input, verdict: "could_not_tell", declared_session: d.n, evidence: `${where}. It declares a session AHEAD of the latest log, so the numbers disagree and cannot say whether it is current`, could_not_tell: "ahead_of_latest" });
+      continue;
+    }
+    inputs.push({ input, verdict: d.n < latest.n ? "stale" : "current", declared_session: d.n, evidence: where });
+  }
+  for (const i of inputs) {
+    const key = (Object.keys(INPUT_REL) as InputKey[]).find((k) => INPUT_REL[k] === i.input)!;
+    if (readAs[key]) i.evidence += ` (${readAs[key]})`;
+  }
+  return { signal: STALENESS_SIGNAL, latest, inputs, not_judged };
+}
+
+function readInputs(root: string): { paths: Record<InputKey, string>; texts: Record<InputKey, string | null>; undecodable: Partial<Record<InputKey, string>>; readAs: Partial<Record<InputKey, string>> } {
+  const paths = Object.fromEntries((Object.keys(INPUT_REL) as InputKey[]).map((k) => [k, join(root, INPUT_REL[k])])) as Record<InputKey, string>;
+  const texts = {} as Record<InputKey, string | null>;
+  const undecodable: Partial<Record<InputKey, string>> = {};
+  const readAs: Partial<Record<InputKey, string>> = {};
+  for (const k of Object.keys(paths) as InputKey[]) {
+    const d = readText(paths[k]);
+    texts[k] = d?.text ?? null;
+    if (d?.undecodable) undecodable[k] = d.undecodable;
+    if (d?.encoding === "windows-1252") readAs[k] = READ_AS_1252;
+  }
+  return { paths, texts, undecodable, readAs };
 }
 
 // ---------------------------------------------------------------------------
 // The draft
 // ---------------------------------------------------------------------------
-
-function readOptional(p: string): string | null {
-  return existsSync(p) ? readFileSync(p, "utf-8") : null;
-}
 
 function lineCount(text: string | null): number {
   return text ? text.split(/\r?\n/).length : 0;
@@ -395,14 +586,7 @@ function lineCount(text: string | null): number {
 export function buildImportDraft(projectRoot: string, today: string): ImportDraft {
   const root = resolve(projectRoot);
   const pkg = readJson<{ name?: string; version?: string }>(join(root, "package.json"));
-  const paths = {
-    inbox: join(root, ".agents/TASKS/INBOX.md"),
-    task: join(root, ".agents/TASKS/task.md"),
-    next: join(root, ".agents/SESSIONS/next-session.md"),
-    summary: join(root, ".agents/SYSTEM/SUMMARY.md"),
-    decisions: join(root, ".agents/SYSTEM/DECISIONS.md"),
-  };
-  const texts = { inbox: readOptional(paths.inbox), task: readOptional(paths.task), next: readOptional(paths.next), summary: readOptional(paths.summary), decisions: readOptional(paths.decisions) };
+  const { paths, texts, undecodable, readAs } = readInputs(root);
 
   const last = findLastSession(join(root, ".agents/SESSIONS"), today);
   const current = last.n;
@@ -411,6 +595,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
     project: { name: pkg?.name ?? "unknown", version: pkg?.version ?? "0.0.0" },
     current_session: current,
     migration_date: today,
+    staleness: detectStaleness(texts, last, undecodable, readAs),
     sources: Object.fromEntries(Object.entries(paths).map(([k, p]) => [k, { path: relative(root, p).replace(/\\/g, "/"), present: existsSync(p), lines: lineCount(texts[k as keyof typeof texts]) }])),
     inbox: {
       items: 0,
@@ -428,8 +613,8 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
     decisions: { imported: 0, date_from_line: 0, date_partial: [], date_unknown: 0, skipped: [] },
     handoff: { pick_up_lines: 0, watch_out: 0, open_questions: 0, sections_not_imported: [] },
     last_session: last,
-    verified_seeded: 0,
-    gaps_seeded: 0,
+    verified_imported: 0,
+    gaps_imported: 0,
     summary_removal: null,
   };
 
@@ -438,10 +623,10 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
   report.objective = { found: objective !== null, preview };
   const decisions = texts.decisions ? importDecisions(texts.decisions, today, report.decisions) : [];
   const handoff = importHandoff(texts.next, current, report.handoff);
-  const verified = seedVerified();
-  const gaps = seedGaps();
-  report.verified_seeded = verified.length;
-  report.gaps_seeded = gaps.length;
+  const verified: Verified[] = [];
+  const gaps: Gap[] = [];
+  report.verified_imported = verified.length;
+  report.gaps_imported = gaps.length;
   if (texts.summary) report.summary_removal = planSummaryRemoval(texts.summary).report;
 
   const state: State = {
@@ -501,9 +686,32 @@ export function planSummaryRemoval(text: string): { text: string; report: NonNul
 // The report (markdown)
 // ---------------------------------------------------------------------------
 
+export const ACCEPT_STALE_FLAG = "--accept-stale";
+
+/** The report's first section: staleness goes where a reviewer reads first. */
+export function renderStaleness(s: StalenessReport): string[] {
+  const L: string[] = ["## Staleness — read this first", ""];
+  L.push(`Signal: ${s.signal}.`);
+  L.push(s.latest ? `Latest session: Session ${s.latest.n} (\`${s.latest.file}\`).` : "Latest session: none found, so no input can be judged.", "");
+  const order: StalenessVerdict[] = ["stale", "could_not_tell", "current"];
+  const label: Record<StalenessVerdict, string> = { stale: "**STALE**", could_not_tell: "could not tell", current: "current" };
+  for (const v of order) for (const i of s.inputs.filter((x) => x.verdict === v)) L.push(`- ${label[v]} \`${i.input}\`: ${i.evidence}`);
+  for (const n of s.not_judged) L.push(`- not judged \`${n.input}\`: ${n.reason}`);
+  L.push("");
+  const stale = s.inputs.filter((i) => i.verdict === "stale").length;
+  const unreadable = s.inputs.filter((i) => i.verdict === "could_not_tell" && blocksCommit(i)).length;
+  const unknown = s.inputs.filter((i) => i.verdict === "could_not_tell" && !blocksCommit(i)).length;
+  if (stale > 0) L.push(`**\`--commit\` refuses while an input above is STALE.** Update it and re-run \`--draft\`, or pass \`${ACCEPT_STALE_FLAG}\` to import it as it stands.`);
+  else L.push("No input is stale.");
+  if (unreadable > 0) L.push(`**\`--commit\` refuses while an input above cannot be read**, because it might be stale. Save it as UTF-8 and re-run \`--draft\`, or pass \`${ACCEPT_STALE_FLAG}\` to import it as it stands.`);
+  if (unknown > 0) L.push(`${unknown} input(s) could not be judged. That does not block \`--commit\`, and it is not a finding that they are up to date.`);
+  return L;
+}
+
 export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): string {
   const L: string[] = [];
   L.push(`# state.json import report — ${mode} (${r.migration_date})`, "");
+  L.push(...renderStaleness(r.staleness), "");
   L.push(`Project: ${r.project.name} v${r.project.version} · current session ${r.current_session} (from ${r.last_session.file}) · retention edge: done items closed ≤ session ${r.current_session - DONE_RETENTION_SESSIONS} are dropped on the first ob_state write`, "");
   L.push("## Sources", "");
   for (const [k, s] of Object.entries(r.sources)) L.push(`- ${k}: \`${s.path}\` — ${s.present ? `${s.lines} lines` : "ABSENT"}`);
@@ -537,7 +745,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   L.push("", "## Handoff (next-session.md)", "");
   L.push(`pick_up: ${r.handoff.pick_up_lines} lines · watch_out: ${r.handoff.watch_out} bullets · open_questions: ${r.handoff.open_questions} bullets`);
   if (r.handoff.sections_not_imported.length) { L.push("", "Sections NOT imported (they stay in the snapshot):"); for (const s of r.handoff.sections_not_imported) L.push(`- ${s}`); }
-  L.push("", "## Seeds", "", `verified[]: ${r.verified_seeded} (V-001..V-00${r.verified_seeded}, since_session 54) · gaps[]: ${r.gaps_seeded} (G-001..G-00${r.gaps_seeded}, opened_session 54)`);
+  L.push("", "## Verified and gaps", "", `verified[]: ${r.verified_imported} · gaps[]: ${r.gaps_imported}. The prose files carry none in a form the importer reads, and it invents none. Record them with ob_state after the commit.`);
   L.push("", "## Last session", "", `Session ${r.last_session.n} — ${r.last_session.date} — uuid ${r.last_session.uuid ?? "none"} (${r.last_session.file})`);
   L.push("", "## SUMMARY.md lines `--commit` will remove", "");
   if (!r.summary_removal) L.push("_SUMMARY.md absent — nothing to remove._");
@@ -556,10 +764,36 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
 // Doors
 // ---------------------------------------------------------------------------
 
+/**
+ * Written beside the snapshot before --commit changes anything, and removed
+ * when the import completes or rolls back. Left behind, it means a rollback
+ * did not finish (or the process died part-way), and .agents/ cannot be
+ * trusted: drafting from it, then committing over it, is how QA 106's D7 lost
+ * Session_7.md. The check that reads it is the refusal, first in both doors.
+ */
+const INCOMPLETE_SUFFIX = ".import-incomplete";
+
+function incompleteNote(snapshotRel: string): string {
+  return "A state import --commit started here and did not finish, and its rollback did not complete.\n\n" +
+    `.agents/ may be part-migrated. ${snapshotRel}/ holds every original: restore .agents/ from it by hand, then delete this file.\n` +
+    "Until then, `open-brain state import --draft` and `--commit` refuse.\n";
+}
+
+function refuseHalfRestored(root: string): void {
+  const archive = join(root, ".agents", "archive");
+  if (!existsSync(archive)) return;
+  const left = readdirSync(archive).filter((n) => n.startsWith(SNAPSHOT_PREFIX) && n.endsWith(INCOMPLETE_SUFFIX));
+  if (left.length === 0) return;
+  const snapshots = left.map((n) => `.agents/archive/${n.slice(0, -INCOMPLETE_SUFFIX.length)}/`).join(" and ");
+  const markers = left.map((n) => `.agents/archive/${n}`).join(" and ");
+  throw new Error(`.agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from ${snapshots}, which holds every original, then delete ${markers}. Nothing written. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success`);
+}
+
 export interface DraftResult { draftPath: string; reportPath: string; draft: ImportDraft; validation: { ok: true } | { ok: false; error: string } }
 
 export function runDraft(projectRoot: string, today: string): DraftResult {
   const root = resolve(projectRoot);
+  refuseHalfRestored(root);
   if (existsSync(join(root, STATE_REL))) throw new Error(`${STATE_REL} already exists — the importer runs once; nothing written`);
   const draft = buildImportDraft(root, today);
   const validation = StateSchema.safeParse(draft.state);
@@ -574,14 +808,18 @@ export function runDraft(projectRoot: string, today: string): DraftResult {
 
 export interface SnapshotResult { dir: string; files: number }
 
-/** Copies `.agents/` (minus `archive/`) into `.agents/archive/pre-state-migration-<date>/`. Refuses if it exists unless `force`. */
-export function takeSnapshot(projectRoot: string, today: string, force: boolean): SnapshotResult {
+/**
+ * Copies `.agents/` (minus `archive/`) into `.agents/archive/pre-state-migration-<date>/`. Refuses if it exists unless `force`.
+ * `made.created` is set to the first directory this call created (the snapshot, or `archive/` above it), so a
+ * caller cleaning up after a failure removes exactly that, and never a snapshot it found there (QA 106, D6).
+ */
+export function takeSnapshot(projectRoot: string, today: string, force: boolean, made: { created: string | null } = { created: null }): SnapshotResult {
   const root = resolve(projectRoot);
   const agents = join(root, ".agents");
   if (!existsSync(agents)) throw new Error(".agents/ does not exist — nothing to migrate");
   const dir = join(agents, "archive", `${SNAPSHOT_PREFIX}${today}`);
   if (existsSync(dir) && !force) throw new Error(`snapshot ${relative(root, dir).replace(/\\/g, "/")} already exists — pass --force-snapshot to overwrite it`);
-  mkdirSync(dir, { recursive: true });
+  made.created = mkdirSync(dir, { recursive: true }) ?? null;
   // Entry by entry: cpSync refuses to copy a directory into its own
   // subtree, and the snapshot lives under .agents/archive/.
   let files = 0;
@@ -603,10 +841,17 @@ export interface CommitResult {
   summary: NonNullable<ImportReport["summary_removal"]> | null;
   rendered: string[];
   moved: string[];
+  /** Judged again at commit, from the inputs on disk. */
+  staleness: StalenessReport;
+  /** The stale inputs imported anyway under --accept-stale; empty otherwise. */
+  accepted_stale: string[];
+  /** The inputs that could not be read, imported anyway under --accept-stale (R4-1); empty otherwise. */
+  accepted_unreadable: string[];
 }
 
-export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string } = {}): CommitResult {
+export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean } = {}): CommitResult {
   const root = resolve(projectRoot);
+  refuseHalfRestored(root);
   const statePath = join(root, STATE_REL);
   if (existsSync(statePath)) throw new Error(`${STATE_REL} already exists — the importer runs once; nothing written`);
   const draftPath = join(root, DRAFT_REL);
@@ -615,33 +860,107 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   if (!parsed.ok) throw new Error(`${DRAFT_REL} does not validate at ${parsed.error} — nothing written`);
   if (parsed.data.revision !== 0) throw new Error(`${DRAFT_REL} revision must be 0 (is ${parsed.data.revision}) — nothing written`);
 
-  // 1. Snapshot before anything under .agents/ changes.
-  const snapshot = takeSnapshot(root, today, opts.forceSnapshot === true);
-
-  // 2. state.json at revision 0, canonical bytes.
-  writeFileSync(statePath, serializeState(parsed.data), "utf-8");
-
-  // 3. SUMMARY.md surgery (the removed text is in the snapshot).
+  // 0. T-180: a stale input refuses before anything is written, including the snapshot.
+  const onDisk = readInputs(root);
+  const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable, onDisk.readAs);
+  const stale = staleness.inputs.filter((i) => i.verdict === "stale");
+  // R4-1: an input that cannot be read blocks like STALE; could-not-tell for any other reason does not.
+  const unreadable = staleness.inputs.filter((i) => i.verdict === "could_not_tell" && blocksCommit(i));
+  if (stale.length + unreadable.length > 0 && opts.acceptStale !== true) {
+    const why: string[] = [];
+    if (stale.length > 0) why.push(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ")}`);
+    if (unreadable.length > 0) why.push(`${unreadable.length} input(s) cannot be read, so whether they are current cannot be told: ${unreadable.map((i) => `${i.input} ${i.evidence}`).join("; ")}`);
+    throw new Error(`${why.join(". ")}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
+  }
+  // SUMMARY.md is the one input --commit rewrites in place rather than regenerates.
   const summaryPath = join(root, ".agents/SYSTEM/SUMMARY.md");
-  let summary: CommitResult["summary"] = null;
-  if (existsSync(summaryPath)) {
-    const plan = planSummaryRemoval(readFileSync(summaryPath, "utf-8"));
-    writeFileSync(summaryPath, plan.text, "utf-8");
-    summary = plan.report;
+  const summaryRead = readText(summaryPath);
+  if (summaryRead?.undecodable) throw new Error(`.agents/SYSTEM/SUMMARY.md ${summaryRead.undecodable}, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
+  // Windows-1252 is a guess. It is safe for a verdict, which reads only ASCII,
+  // but not for a file written back: a wrong guess would rewrite its other text.
+  if (summaryRead?.encoding === "windows-1252") throw new Error(`.agents/SYSTEM/SUMMARY.md is not valid UTF-8 and has no byte-order mark, so its encoding can only be guessed, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
+
+  // 1. Snapshot before anything under .agents/ changes. From here on the
+  // import completes or changes nothing (R2-3): every later step runs inside
+  // `migrate`, and a failure in any of them puts .agents/ back from the snapshot.
+  const agents = join(root, ".agents");
+  const archive = join(agents, "archive");
+  const snapshotDir = join(archive, `${SNAPSHOT_PREFIX}${today}`);
+  // --force-snapshot replaces an earlier snapshot; keep it aside until the import completes.
+  const aside = opts.forceSnapshot === true && existsSync(snapshotDir) ? `${snapshotDir}.replaced-${process.pid}` : null;
+  if (aside) renameSync(snapshotDir, aside);
+  let snapshot: SnapshotResult;
+  const made: { created: string | null } = { created: null };
+  const marker = `${snapshotDir}${INCOMPLETE_SUFFIX}`;
+  try {
+    snapshot = takeSnapshot(root, today, opts.forceSnapshot === true, made);
+    writeFileSync(marker, incompleteNote(relative(root, snapshotDir).replace(/\\/g, "/")), "utf-8");
+  } catch (err) {
+    // .agents/ outside archive/ is untouched. Only what this run created goes:
+    // the snapshot's "already exists" refusal is thrown in here, and that
+    // snapshot is the operator's, not this run's (QA 106, D6).
+    if (made.created) rmSync(made.created, { recursive: true, force: true });
+    if (aside) renameSync(aside, snapshotDir);
+    throw err;
   }
 
-  // 4. Render the four views through the Loop 3 renderers (empty batch = no revision bump).
-  const r = applyStateOps(root, { session: lastSession(parsed.data)?.n ?? 0, expected_revision: 0, ops: [], render: true, version: opts.version });
-  if (!r.ok) throw new Error(`render after commit refused: ${r.error}`);
+  const migrate = () => {
+    // 2. state.json at revision 0, canonical bytes.
+    writeFileSync(statePath, serializeState(parsed.data), "utf-8");
 
-  // 5. Move the draft and the report into the snapshot.
-  const moved: string[] = [];
-  for (const rel of [DRAFT_REL, REPORT_REL]) {
-    const from = join(root, rel);
-    if (!existsSync(from)) continue;
-    const to = join(snapshot.dir, rel.replace(/^\.agents\//, ""));
-    renameSync(from, to);
-    moved.push(relative(root, to).replace(/\\/g, "/"));
+    // 3. SUMMARY.md surgery (the removed text is in the snapshot).
+    let summary: CommitResult["summary"] = null;
+    if (summaryRead) {
+      const plan = planSummaryRemoval(summaryRead.text);
+      writeFileSync(summaryPath, summaryBytes(plan.text));
+      summary = plan.report;
+    }
+
+    // 4. Render the four views through the Loop 3 renderers (empty batch = no revision bump).
+    // A project may lack a directory a view lives in (QA 102's PROBE-2: no SESSIONS/).
+    for (const d of ["SESSIONS", "TASKS", "SYSTEM"]) mkdirSync(join(agents, d), { recursive: true });
+    const r = applyStateOps(root, { session: lastSession(parsed.data)?.n ?? 0, expected_revision: 0, ops: [], render: true, version: opts.version });
+    if (!r.ok) throw new Error(`render after commit refused: ${r.error}`);
+
+    // 5. Move the draft and the report into the snapshot.
+    const moved: string[] = [];
+    for (const rel of [DRAFT_REL, REPORT_REL]) {
+      const from = join(root, rel);
+      if (!existsSync(from)) continue;
+      const to = join(snapshot.dir, rel.replace(/^\.agents\//, ""));
+      renameSync(from, to);
+      moved.push(relative(root, to).replace(/\\/g, "/"));
+    }
+    return { summary, rendered: r.rendered, moved };
+  };
+
+  let done: ReturnType<typeof migrate>;
+  try {
+    done = migrate();
+  } catch (err) {
+    const why = err instanceof Error ? err.message : String(err);
+    throw new Error(`${why}. ${rollBack(agents, snapshot.dir, made.created, aside, marker)}`);
   }
-  return { statePath, snapshot, summary, rendered: r.rendered, moved };
+  rmSync(marker, { force: true });
+  if (aside) rmSync(aside, { recursive: true, force: true });
+  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input) };
+}
+
+/**
+ * Puts `.agents/` back as the snapshot recorded it, then removes the snapshot.
+ * The snapshot is deleted only after the restore finished, so a restore that
+ * fails part-way leaves the one copy that can repair it, and says where.
+ */
+function rollBack(agents: string, snapshotDir: string, created: string | null, aside: string | null, marker: string): string {
+  try {
+    for (const name of readdirSync(agents)) if (name !== "archive") rmSync(join(agents, name), { recursive: true, force: true });
+    for (const name of readdirSync(snapshotDir)) cpSync(join(snapshotDir, name), join(agents, name), { recursive: true });
+  } catch (err) {
+    // The marker stays, so every later --draft and --commit refuses until it goes (D7).
+    return `ROLLBACK FAILED (${err instanceof Error ? err.message : String(err)}): .agents/ is part-migrated. Restore it by hand from ${snapshotDir}, which was kept. --draft and --commit refuse until ${marker} is deleted`;
+  }
+  if (created) rmSync(created, { recursive: true, force: true });
+  rmSync(marker, { force: true });
+  if (aside) renameSync(aside, snapshotDir);
+  return "Rolled back: .agents/ was restored from the snapshot, and the snapshot removed, so nothing changed";
 }

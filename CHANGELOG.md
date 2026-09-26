@@ -1,5 +1,72 @@
 # Changelog
 
+## [0.44.3] - Unreleased — the importer carries none of SIA's history into another project
+
+Brief: `docs/loops/importer-fixes-brief.md` (planner, record session 100). These fixes gate every
+further adoption (T-181). There is no version bump in these commits: the release is Aaron's (D-019).
+
+### Fixed
+
+- **`state import` seeded SIA's own history into every project it imported (T-175).**
+  `seedVerified()` and `seedGaps()` wrote V-001..V-005 and G-001..G-006, which are claims about this
+  repository at session 54, into the draft of any project. They are gone: an import starts with
+  `verified[]` and `gaps[]` empty. The report section formerly titled "Seeds" and the CLI's draft
+  line now print `verified 0 · gaps 0`, so the counts stay visible. The report fields are renamed
+  from `verified_seeded`/`gaps_seeded` to `verified_imported`/`gaps_imported`. SIA's own record is
+  unaffected: it was imported once, and `--commit` refuses a second run (V-009).
+
+### Added
+
+- **`state import` names an input that predates the project's latest session, and `--commit`
+  refuses on it (T-180).** The importer used to present an old handoff or INBOX as current state
+  without comment. A2A-Hub at `e0bc3f8` is the known positive: its `next-session.md` is Session 13's
+  and its INBOX is Session 11's, while `Session_14.md` exists. The signal is the file's own words.
+  An input's declared session is the highest `Session N` in its status blockquote or its headings,
+  and it is compared with the highest `SESSIONS/Session_N.md`. Git and mtime are not used, because
+  `.agents/` is untracked in some projects and a copy resets mtimes.
+  - The draft report's **first section** lists each judged input (handoff, INBOX, task) as
+    **STALE**, *could not tell* or *current*, with the line that declares its session. SUMMARY and
+    DECISIONS are listed as *not judged*, with the reason. The CLI draft output prints the counts.
+  - `--commit` refuses while any input is STALE, before the snapshot or any write, unless you pass
+    **`--accept-stale`**. It judges the inputs on disk again at commit time.
+  - *Could not tell* (no marker, or no `Session_N.md`) is reported and never counted as current. It
+    does not block `--commit`: SIA's own session-54 prose has two inputs without a marker.
+  - Any flag `state import` does not recognise now refuses (T-150's rule). Before this, a
+    misspelled flag was ignored. `--accept-stale` without `--commit` also refuses.
+  - New known-positive fixture: `open-brain/tests/fixtures-import-a2a-hub/`, the importer's
+    inputs at A2A-Hub `e0bc3f8`. It is on `.agents/retirements.json`'s `historical` list, like the
+    other three fixture directories, because its text names SIA's retired mailbox.
+
+### Fixed in round 2 (`docs/loops/importer-fixes-round-2-brief.md`, after QA 102)
+
+- **A byte-order mark no longer hides a stale input (QA's D2).** A leading UTF-8 BOM kept the
+  `# ` title line from being found, so a stale input read as *could not tell* under a false reason
+  ("names no `Session N`"), and `--commit` went ahead without `--accept-stale`. Every file the
+  importer reads is now decoded at one point: a UTF-8 BOM is dropped, and UTF-16 with a BOM (what
+  Windows PowerShell 5.1's `>` and `Out-File` write) is decoded. A judged input that is neither
+  valid UTF-8 nor BOM-marked UTF-16 is *could not tell*, and the reason names the encoding. The
+  same read feeds the objective, the handoff, the INBOX parse and the latest log's date, which had
+  the same blind spot. `--commit` writes SUMMARY.md back as plain UTF-8 (the original is in the
+  snapshot), and refuses before any write when SUMMARY.md cannot be decoded, since it rewrites that
+  file in place. CRLF needed nothing: every split is `\r?\n`.
+- **An input that declares a session ahead of the latest log is no longer *current* (QA's
+  disagreement 2).** Next-session at Session 20 against `Session_7.md` means renumbering, a
+  per-worktree counter or a missing log. It is now *could not tell*, and the reason names both
+  numbers.
+- **`--commit` completes or changes nothing (QA's D3).** With no `SESSIONS/` directory, it used to
+  write `state.json` and the snapshot and rewrite INBOX.md and task.md, then fail rendering
+  `next-session.md`. That left the project half-migrated, with every later run refused because
+  `state.json already exists`. It now creates any missing view directory, and a failure at any step
+  after the snapshot restores `.agents/` from the snapshot, removes it, and says so in the error.
+  With `--force-snapshot`, the snapshot being replaced is kept aside until the import completes.
+- **`state import` acts only on the project named (QA's D4).** Round 1's "any flag it does not
+  recognise now refuses" was true only for `--` tokens: `-accept-stale` or `accept-stale` was taken
+  as the directory, and placed before the real one it resolved against the cwd, so **the cwd's
+  project was committed instead**. Now any unknown `-`-prefixed token refuses, more than one
+  positional refuses, and a positional that is not an existing directory refuses. Nothing is written
+  in any of these cases. `--commit` now prints the `Root:` it committed. Other subcommands share
+  the old shape. They are listed in the round-2 handoff and are not changed here.
+
 ## [0.44.2] - 2026-09-24 — a Windows profile with a space in its name
 
 Found by the first full-suite run on the dedicated QA machine (`desktop-o4egb1e`, D-045), whose

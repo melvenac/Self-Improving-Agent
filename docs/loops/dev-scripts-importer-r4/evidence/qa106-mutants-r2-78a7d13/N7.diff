@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..98f91f2 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -434,7 +434,7 @@ export function findLastSession(sessionsDir: string, today: string): ImportRepor
+     }
+   }
+   if (!best) return { n: 0, date: today, uuid: null, file: "(no Session_N.md)" };
+-  const text = decodeText(readFileSync(join(sessionsDir, best.file))).text;
++  const text = readFileSync(join(sessionsDir, best.file), "utf-8");
+   const date = text.match(/^# Session \d+\s+[—–-]+\s+(\d{4}-\d{2}-\d{2})/m)?.[1] ?? today;
+   const uuid = text.match(/Session ID:\*{0,2}\s*`?([0-9a-fA-F-]{36})`?/)?.[1] ?? null;
+   return { n: best.n, date, uuid, file: `.agents/SESSIONS/${best.file}` };

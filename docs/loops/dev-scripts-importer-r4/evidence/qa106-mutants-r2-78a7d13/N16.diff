@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/cli.ts b/open-brain/src/cli.ts
+index ef7efbf..4115e99 100644
+--- a/open-brain/src/cli.ts
++++ b/open-brain/src/cli.ts
+@@ -437,7 +437,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
+   // one, or one that names nothing, used to resolve against the cwd and walk up,
+   // committing the cwd's project instead of the one named (QA 102, PROBE-12).
+   const positionals = args.slice(2).filter((a) => !a.startsWith("-"));
+-  if (positionals.length > 1) {
++  if (positionals.length > 99) {
+     console.error(`state import refused: more than one directory given (${positionals.join(", ")}). Pass one project directory. Nothing written.`);
+     process.exit(1);
+   }

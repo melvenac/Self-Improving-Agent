@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..c43cef9 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -131,7 +131,7 @@ function withCheck(buf: Buffer, encoding: "utf8" | "utf8-bom"): DecodedText {
+   try {
+     // ignoreBOM: TextDecoder drops a UTF-8 BOM by default, which made the strip
+     // in decodeText a second, unobservable protection. One, and it is that one.
+-    text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(buf);
++    text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(buf);
+   } catch {
+     // Not UTF-8 and no BOM: Windows PowerShell 5.1's Set-Content/Add-Content
+     // write the ANSI code page. Every ASCII byte means the same in it, and the
