@@ -1279,7 +1279,7 @@ export class MachineConfigWatch {
         out.push({
           stage: this.stage, scope: p.scope, path: p.path,
           before: stageBefore(opened),
-          after: `unobservable (${end.errno}); ${end.lexicalKind === "symlink" ? linkSide(end) : factText(end)}`,
+          after: `unobservable (${end.errno})`,
           changed: true, unobservableCode: end.errno,
         });
         continue;
