@@ -185,7 +185,11 @@ interface RawItem {
   fromCompleted: boolean;
 }
 
-const SECTION_RE = /^## (P[0-3])\b/;
+// A symbol run may precede the priority: the template's own INBOX heads its
+// sections `## 🔴 P0 — Critical`, and every project scaffolded from it (or
+// copied by README's `cp -r`) carries that shape. Letters may not: `## Priority`
+// and `## Backlog P2` are not priority sections (bootstrap-fix BF-1).
+const SECTION_RE = /^## (?:[^\w\s]+\s*)?(P[0-3])\b/;
 const ITEM_RE = /^- \[( |~|!|x|X)\] (.*)$/;
 const SESSION_RE = /\(Sessions?\s+(\d+(?:\s*(?:,|–|-|and)\s*\d+)*)/g;
 
@@ -258,6 +262,38 @@ function splitTitle(body: string): { title: string; note: string; fallback: bool
   return { title, note, fallback: true };
 }
 
+/**
+ * The session a done item with no `(Session N)` marker is stamped closed in.
+ * Floored at 0: session numbers are non-negative in the schema, so at a fresh
+ * project's session 0 the unfloored edge (-3) made the draft fail validation
+ * (bootstrap-fix BF-8, frogger F9). Whether an item is old enough to drop is
+ * still judged against the unfloored edge.
+ */
+export function retentionEdge(current: number): number {
+  return Math.max(0, current - DONE_RETENTION_SESSIONS);
+}
+
+/** How the report states the retention edge: a negative session is never printed. */
+function describeRetentionEdge(current: number): string {
+  const raw = current - DONE_RETENTION_SESSIONS;
+  return raw >= 0
+    ? `retention edge: done items closed ≤ session ${raw} are dropped on the first ob_state write`
+    : `retention edge: none yet — at session ${current} no done item is ${DONE_RETENTION_SESSIONS} sessions old, so the first ob_state write drops nothing`;
+}
+
+/**
+ * BF-1 (frogger F1): an INBOX that exists and yields no task is almost always a
+ * heading the importer cannot read, and "Validates: yes" alone hid it. Null when
+ * there is no INBOX, or when at least one task parsed.
+ */
+export function inboxWarning(r: ImportReport): string | null {
+  const src = r.sources.inbox;
+  if (!src?.present || r.inbox.items > 0) return null;
+  const skipped = r.inbox.unparsed.length;
+  return `WARNING: ${src.path} exists but 0 tasks were parsed (${skipped} unparsed line${skipped === 1 ? "" : "s"}). ` +
+    "Tasks are read only under `## P0`..`## P3` (a leading emoji is fine) or `## Completed`. The draft validates, but it holds no tasks — fix the headings and re-run --draft.";
+}
+
 function emptyStatusCounts(): Record<Status, number> {
   return { open: 0, in_progress: 0, blocked: 0, done: 0 };
 }
@@ -265,7 +301,7 @@ function emptyStatusCounts(): Record<Status, number> {
 export function importTasks(text: string, current: number, report: ImportReport["inbox"]): Task[] {
   const items = parseInboxItems(text, report.unparsed);
   const tasks: Task[] = [];
-  const edge = current - DONE_RETENTION_SESSIONS;
+  const edge = retentionEdge(current);
   items.forEach((it, idx) => {
     const id = `T-${String(idx + 1).padStart(3, "0")}`;
     const boxStatus = BOX_STATUS[it.box];
@@ -290,7 +326,7 @@ export function importTasks(text: string, current: number, report: ImportReport[
       opened = current;
       closed = null;
     }
-    if (status === "done" && closed !== null && closed <= edge) report.retention_eligible_on_first_write++;
+    if (status === "done" && closed !== null && closed <= current - DONE_RETENTION_SESSIONS) report.retention_eligible_on_first_write++;
     if (it.fromCompleted) report.completed_section_items++;
     tasks.push({ id, title, priority: it.priority!, status, opened_session: opened, closed_session: closed, supersedes: null, note });
     if (superseded) {
@@ -712,10 +748,12 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   const L: string[] = [];
   L.push(`# state.json import report — ${mode} (${r.migration_date})`, "");
   L.push(...renderStaleness(r.staleness), "");
-  L.push(`Project: ${r.project.name} v${r.project.version} · current session ${r.current_session} (from ${r.last_session.file}) · retention edge: done items closed ≤ session ${r.current_session - DONE_RETENTION_SESSIONS} are dropped on the first ob_state write`, "");
+  L.push(`Project: ${r.project.name} v${r.project.version} · current session ${r.current_session} (from ${r.last_session.file}) · ${describeRetentionEdge(r.current_session)}`, "");
   L.push("## Sources", "");
   for (const [k, s] of Object.entries(r.sources)) L.push(`- ${k}: \`${s.path}\` — ${s.present ? `${s.lines} lines` : "ABSENT"}`);
   L.push("", "## Tasks (INBOX.md)", "");
+  const warning = inboxWarning(r);
+  if (warning) L.push(`**${warning}**`, "");
   L.push(`Items parsed: ${r.inbox.items} (of which ${r.inbox.completed_section_items} under \`## Completed\`, imported as P3).`, "");
   L.push("Box counts as written (before the `[superseded]` rule):", "");
   for (const s of STATUSES) L.push(`- ${s}: ${r.inbox.box_counts[s]}`);
@@ -726,7 +764,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
     L.push(`| ${p} | ${row.open} | ${row.in_progress} | ${row.blocked} | ${row.done} | ${STATUSES.reduce((a, s) => a + row[s], 0)} |`);
   }
   L.push(`| **all** | ${r.inbox.by_status.open} | ${r.inbox.by_status.in_progress} | ${r.inbox.by_status.blocked} | ${r.inbox.by_status.done} | ${r.inbox.items} |`);
-  L.push("", `Sessions: ${r.inbox.sessions.parsed} items had a \`(Session N)\` marker (opened = min, closed = max for done); ${r.inbox.sessions.inferred_open_as_current} open items had none → opened_session = ${r.current_session}; ${r.inbox.sessions.inferred_done_as_retention_edge} done items had none → closed_session = ${r.current_session - DONE_RETENTION_SESSIONS}.`);
+  L.push("", `Sessions: ${r.inbox.sessions.parsed} items had a \`(Session N)\` marker (opened = min, closed = max for done); ${r.inbox.sessions.inferred_open_as_current} open items had none → opened_session = ${r.current_session}; ${r.inbox.sessions.inferred_done_as_retention_edge} done items had none → closed_session = ${retentionEdge(r.current_session)}.`);
   L.push(`Retention-eligible on the first write: ${r.inbox.retention_eligible_on_first_write} done items (they stay in the snapshot and in git).`, "");
   L.push(`### Superseded links (${r.inbox.superseded_links.length})`, "");
   if (r.inbox.superseded_links.length === 0) L.push("_None._");
