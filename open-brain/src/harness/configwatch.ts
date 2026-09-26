@@ -713,7 +713,6 @@ export class ConfigWatch {
       if (id.kind === "symlink") {
         return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null };
       }
-      if (id.kind === "other" && id.code) return unreadableIdentity(id);
       if (id.kind !== "file") return null;
       return fileState(id, null, true);
     }
