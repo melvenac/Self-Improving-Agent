@@ -12,7 +12,8 @@
 # Everything it observes goes to %USERPROFILE%\sia-qa-queue\queue.log (key=value lines), and each driver still writes
 # its own %USERPROFILE%\sia-qaN\ folder.
 param(
-  [Parameter(Mandatory = $true)] [int[]] $Queue,
+  [Parameter(Mandatory = $true)] [string] $Queue,  # e.g. "130,132" or "130 132": TEXT, split below. As int[] under
+                                                  # -File, "130,132" arrived as the one number 130132 (2026-09-26).
   [int] $TimeoutMinutes = 300,      # one QA run longer than this is killed (with its process tree) and recorded
   [int] $QuietCpuPercent = 35,      # before each run, wait for the machine to be quiet: average CPU below this
   [int] $QuietWaitMinutes = 120,    # ... for at most this long; then run anyway, and record that it was busy
@@ -28,6 +29,10 @@ $log = Join-Path $logDir 'queue.log'
 function L([string] $k, [string] $v) { "$((Get-Date).ToUniversalTime().ToString('o')) $k=$v" | Add-Content $log -Encoding utf8 }
 
 Set-Location $tree
+$items = @($Queue -split '[,\s]+' | Where-Object { $_ -ne '' })
+$bad = @($items | Where-Object { $_ -notmatch '^\d+$' })
+if ($bad.Count -gt 0 -or $items.Count -eq 0) { L 'abort' "queue '$Queue' is not a list of record numbers"; exit 1 }
+$Queue = $items -join ','
 L 'start' "queue=$($Queue -join ',') checkout=$Checkout machine=$env:COMPUTERNAME timeout_min=$TimeoutMinutes"
 
 function Get-OtherDrivers { @(Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.CommandLine -match 'docs[\\/]loops[\\/]qa-\d+[\\/]drive\.ps1' }) }
@@ -46,7 +51,7 @@ $head = (git rev-parse HEAD).Trim()
 L 'head' $head
 
 # Every listed driver must be TRACKED at the launch commit. A driver that is not is skipped, never fetched.
-$plan = foreach ($n in $Queue) {
+$plan = foreach ($n in $items) {
   $rel = "docs/loops/qa-$n/drive.ps1"
   git cat-file -e "HEAD:$rel" 2>$null
   if ($LASTEXITCODE -eq 0) { $n } else { L "skip.$n" "not tracked at $head ($rel)" }

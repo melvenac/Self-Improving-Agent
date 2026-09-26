@@ -395,3 +395,15 @@ the morning.
 - The research checkout's claim that writes are refused was corrected (a rule, not code).
 - tcm runs only the hub and the CI runners.
 - Two ruled errors of this seat: R179-1's "+5" bound, and the charter's claim that writes are refused.
+
+## The overnight queue ran NOTHING: the planner's error entry (2026-09-26 22:40Z)
+
+- **The queue log** (read by Aaron on the QA PC): `start=queue=130132 … skip.130132=not tracked … end`, at 08:48Z.
+  `-Queue 130,132` was declared `[int[]]`. Under `powershell -File`, arguments arrive as strings, and "130,132"
+  became the ONE integer 130132. No driver ran, so QA 130 and QA 132 never started. The checkout itself worked.
+- **The family:** a dry run that exercised the parameter with a single value (9999) was taken as proof that the list
+  worked. The containment for next time: test the exact launch shape, with the exact argument form.
+- **Fix:** `$Queue` is TEXT, split on commas or spaces, and a non-number aborts loudly. It was tested through
+  `powershell -File` with `-Queue 9998,9999`: two separate skips.
+- **Separately:** this desktop could not reach GitHub all night (connection resets, one DNS failure), so the
+  planner's watchers saw nothing. Whether the QA PC was affected too is unknown; it ran nothing anyway.
