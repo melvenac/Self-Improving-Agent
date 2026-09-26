@@ -319,6 +319,64 @@ detach REFUSED: ${r.error}`);
   console.log(`
 HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " (detached)"} -> ${r.headAfter?.slice(0, 7)} (detached)`);
   process.exit(0);
+} else if (command === "bootstrap") {
+  // /bootstrap's deterministic half (bootstrap-fix BF-3/4/6). The directory is
+  // taken literally, never walked up: a fresh project may not be a repository
+  // yet, and walking up could land in a PARENT project and scaffold that.
+  const sub = args[1];
+  const { inspectProject, moveResidue, scaffold } = await import("./pipelines/bootstrap/index.js");
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  if (sub === "check") {
+    const opts = parseOrRefuse(COMMAND_SPECS.bootstrapCheck, args.slice(2));
+    const r = inspectProject(opts.directory ?? resolve("."));
+    if (opts.has("--json")) { console.log(JSON.stringify(r, null, 2)); process.exit(0); }
+    console.log(`bootstrap check — ${r.root}`);
+    console.log(`Template:  ${r.template}${r.templateFound ? "" : "  — NOT FOUND"}`);
+    const g = r.git;
+    console.log(`git:       ${g.kind === "none" ? "NOT a repository" : g.kind === "nested" ? `inside another repository at ${g.toplevel}` : `repository root; ${g.commits ? "has commits" : "NO commit yet"}; ${g.dirty.length} uncommitted change(s)`}`);
+    console.log(`CLAUDE.md: ${r.claudeMd === "absent" ? "absent" : r.claudeMd === "present" ? "present, without the SIA section" : "present, with the SIA section"}`);
+    const a = r.agents;
+    console.log(`.agents/:  ${a.kind === "residue" ? `RESIDUE — ${a.entries.join(", ")} (no state.json, no TASKS/)` : a.kind === "pre-state" ? "PRE-STATE — TASKS/ with no state.json (the import path)" : a.kind === "bootstrapped" ? "BOOTSTRAPPED — state.json exists" : a.kind}`);
+    console.log(`Next:      ${r.next}`);
+    process.exit(0);
+  } else if (sub === "move-residue") {
+    const opts = parseOrRefuse(COMMAND_SPECS.bootstrapMoveResidue, args.slice(2));
+    try {
+      const r = moveResidue(opts.directory ?? resolve("."), today);
+      console.log(`bootstrap move-residue — moved, nothing deleted`);
+      console.log(`To:      ${r.to}/`);
+      console.log(`Entries: ${r.entries.join(", ")}`);
+      console.log(`It is local (the template gitignore ignores .agents/archive/). Delete it yourself once you have looked.`);
+      process.exit(0);
+    } catch (err) {
+      console.error(`bootstrap move-residue refused: ${err instanceof Error ? err.message : String(err)}`);
+      process.exit(1);
+    }
+  } else if (sub === "scaffold") {
+    const opts = parseOrRefuse(COMMAND_SPECS.bootstrapScaffold, args.slice(2));
+    let r;
+    try {
+      r = scaffold(opts.directory ?? resolve("."));
+    } catch (err) {
+      console.error(`bootstrap scaffold refused: ${err instanceof Error ? err.message : String(err)}`);
+      process.exit(1);
+    }
+    if (opts.has("--json")) {
+      console.log(JSON.stringify(r, null, 2));
+    } else {
+      console.log(`bootstrap scaffold — ${r.root}`);
+      console.log(`Template: ${r.template}\n`);
+      console.log("Written (tracked = committed with the project; local = this disk only, by design):");
+      for (const w of r.written) console.log(`  ${w.tracked ? "tracked" : "local  "}  ${w.action.padEnd(9)} ${w.path} — ${w.why}`);
+      if (r.skipped.length) { console.log("Skipped:"); for (const s of r.skipped) console.log(`  ${s.path} — ${s.reason}`); }
+      console.log(r.verify.ok ? "\nVerified with git: every file above is tracked or ignored exactly as stated; state.json and next-session.md will be tracked; session logs and archive/ will not; .agents/ is eol=lf." : `\nVERIFY FAILED:\n${r.verify.problems.map((p) => `  ${p}`).join("\n")}`);
+    }
+    process.exit(r.verify.ok ? 0 : 1);
+  } else {
+    console.error(`bootstrap: expected check, move-residue or scaffold, got ${sub === undefined ? "nothing" : `"${sub}"`}. Nothing was run.`);
+    process.exit(2);
+  }
 } else if (command === "state") {
   // Loop 4 C1: the one-shot migration door. `state import --draft` (default)
   // writes a reviewable draft + report; `--commit` applies the reviewed draft.
@@ -466,7 +524,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     process.exit(0);
   }
 
-  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG, blocksCommit } = await import("./pipelines/state-import/index.js");
+  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG, blocksCommit, inboxWarning } = await import("./pipelines/state-import/index.js");
   const { relative } = await import("node:path");
   const { existsSync, statSync } = await import("node:fs");
   // T-150's rule: an unrecognised flag refuses. Before this, a misspelled flag
@@ -528,7 +586,9 @@ Read-only. Change state through ob_state — never by editing the file.`);
       const unreadable = unknown.filter(blocksCommit);
       if (unreadable.length) console.log(`--commit will REFUSE while ${unreadable.map((i) => i.input).join(", ")} cannot be read (NUL bytes): save as UTF-8 and re-run the draft, or pass ${ACCEPT_STALE_FLAG}.`);
       const s = rep.inbox.by_status;
-      console.log(`Tasks: ${rep.inbox.items} (open ${s.open}, in_progress ${s.in_progress}, blocked ${s.blocked}, done ${s.done}); superseded links ${rep.inbox.superseded_links.length}; unparsed lines ${rep.inbox.unparsed.length}`);
+      console.log(`Tasks: ${rep.inbox.items} (open ${s.open}, in_progress ${s.in_progress}, blocked ${s.blocked}, done ${s.done}); superseded links ${rep.inbox.superseded_links.length}; unparsed lines ${rep.inbox.unparsed.length}${inboxWarning(rep) ? " — WARNING: see below" : ""}`);
+      const warning = inboxWarning(rep);
+      if (warning) console.log(warning);
       console.log(`Decisions: ${rep.decisions.imported} (${rep.decisions.skipped.length} skipped) · verified ${rep.verified_imported} · gaps ${rep.gaps_imported} · objective ${rep.objective.found ? "found" : "NOT found"}`);
       console.log(`Handoff: pick_up ${rep.handoff.pick_up_lines} lines, watch_out ${rep.handoff.watch_out}, open_questions ${rep.handoff.open_questions}`);
       if (rep.summary_removal) console.log(`SUMMARY.md: --commit will remove ${rep.summary_removal.total_lines_removed} lines (${rep.summary_removal.blockquote_lines} blockquote + ${rep.summary_removal.current_state_lines} Current State)`);
@@ -566,5 +626,8 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  state migrate [--seat <planner|developer|qa>] [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>   (--seat and --last-session-seat: v1 records only)");
   console.log("                                             Migrate state.json schema v1 -> v2");
   console.log("  detach [--dry-run] [--no-fetch] [--force] [dir]      Return a seat worktree to detached at origin/master");
+  console.log("  bootstrap check [--json] [dir]                Read-only: git, CLAUDE.md and .agents/ as /bootstrap needs them");
+  console.log("  bootstrap move-residue [dir]                  Move a residue .agents/ under .agents/archive/ (never deletes)");
+  console.log("  bootstrap scaffold [--json] [dir]             Copy the fresh-install files from project-template/ and verify tracking");
   process.exit(1);
 }
