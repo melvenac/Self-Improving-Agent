@@ -1013,6 +1013,7 @@ interface MachineSnap {
  * a deliberate not-read. An errno, or an unreadable hash, is the environment.
  */
 function stageStartObserved(opened: MachineSnap): boolean {
+  if (opened.state === "unwatched") return false;
   if (opened.errno !== null) return false;
   if (opened.reason === "unreadable" || opened.hash === "unreadable") return false;
   return true;
