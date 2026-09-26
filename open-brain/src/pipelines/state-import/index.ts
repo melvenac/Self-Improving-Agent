@@ -783,7 +783,7 @@ function refuseHalfRestored(root: string): void {
   if (left.length === 0) return;
   const snapshots = left.map((n) => `.agents/archive/${n.slice(0, -INCOMPLETE_SUFFIX.length)}/`).join(" and ");
   const markers = left.map((n) => `.agents/archive/${n}`).join(" and ");
-  throw new Error(`.agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from ${snapshots}, which holds every original, then delete ${markers}. Nothing written. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success`);
+  throw new Error(`.agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from ${snapshots}, which holds every original, then delete ${markers}. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success. Nothing written`);
 }
 
 export interface DraftResult { draftPath: string; reportPath: string; draft: ImportDraft; validation: { ok: true } | { ok: false; error: string } }
