@@ -26,4 +26,4 @@ Run the **open-brain** `ob_sync` MCP tool to ensure downstream files match autho
 
 - Before any commit
 - After version bump or CHANGELOG update
-- During `/end` (step A9)
+- When docs may have drifted — `/end` no longer runs this (its old step A9 was retired, T-179)

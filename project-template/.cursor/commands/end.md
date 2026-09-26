@@ -1,126 +1,61 @@
-# /end — Session End (Cursor + SIA)
+# /end — Store this session's lessons (Cursor + SIA)
 
-> **Cursor Composer:** Execute all steps **inline**. Use **open-brain MCP** (`ob_sync`, `ob_store`, `ob_feedback`, `ob_end` if available). Requires `open-brain` in `~/.cursor/mcp.json`.
->
-> **Never skip /end** — next session quality depends on it.
+> **Cursor Composer:** execute inline, through the open-brain MCP (`ob_recall`, `ob_store`, `ob_store_chunk`,
+> `ob_recalled`, `ob_end`); requires `open-brain` in `~/.cursor/mcp.json`. Same steps as the Claude copy.
 
-## Step 0: Detect Context
+> **One job:** store each lesson this session learned, with the key that would have caught the
+> mistake, then close the session's memory with `ob_end`. That is all `/end` does.
 
-- **`.agents/` exists** → **Part A** (project close-out)
-- **No `.agents/`** → **Part B** (knowledge capture only)
+**`/end` writes no project state.** The record is written as the work happens, through `ob_state`:
+the handoff with `set_handoff` when you hand back, a decision with `add_decision` when it is made,
+a task's status when it moves. Every write records its session in `sessions[]` by itself, and a
+session can only add or update its own handoff (schema v3, T-163), so there is nothing left for a
+close-out to write and nothing it can erase. The SessionEnd hook writes the session summary,
+auto-feedback and logging whether or not `/end` runs.
 
----
+## 1. Find the lessons
 
-## Part A: Project Close-Out
+A lesson is a wrong turn, a surprise, or a correction that a later session could repeat. Look at
+what went wrong and what you had to re-do; most sessions have zero to three. Nothing to store is a
+fine answer: say so and go to step 3.
 
-### Meta mode
+## 2. Store each one with its KEY
 
-If `.agents/META/` exists, write tracking to `META/` — not `SYSTEM/` templates.
+The recall trigger injects an entry only on a **deterministic match against the act** (T-170). An
+entry with no machine-matchable key can only ever be found by someone who already knows to ask.
 
-### A1. Update session log
-
-Update current `.agents/SESSIONS/Session_*.md` or today's session file:
-
-- What Was Done · Files Modified · Files Created
-- Gotchas & Lessons · Decisions Made
-- Status: **Completed**
-
-### A2. Update SUMMARY.md
-
-Target: `.agents/SYSTEM/SUMMARY.md` (or `META/SUMMARY.md`)
-
-**Update the CURRENT STATE block** (top of file):
-
-1. Status line — version + one-line state
-2. Active blockers / what's working / what's next — match INBOX top items
-3. Do not bloat the milestones archive unless a major release landed
-
-### A3. DECISIONS.md (if applicable)
-
-Add entries for significant decisions this session.
-
-### A4. ENTITIES.md (if schema changed)
-
-Update schema doc; run `npm run validate:entities` if the project has it.
-
-### A5. INBOX.md
-
-Mark completed `[x]` · add new tasks · re-prioritize if needed.
-
-### A6. task.md
-
-Append phase completions to the ledger; do not use as live queue.
-
-### A7. next-session.md
-
-**Read first**, then overwrite:
-
-- **Pick up here** · **Watch out for** · **Open questions**
-
-### A8. Validation (if configured)
-
-```bash
-npm run validate:entities      # if schema changed
-npm run validate:session:post  # if script exists
-```
-
-### A9. Doc drift
-
-1. Call **`ob_sync`** MCP tool with `project_root: {cwd}`
-2. If features/commands changed: check `README.md`, `.agents/SYSTEM/PRD.md`, `CLAUDE.md`, `AGENTS.md`
-3. Fix factual staleness only — report "Doc audit: updated N files" or "all current"
-
-### A10–A14. Knowledge capture
-
-**A10 Research** — `ob_store` for external research (GitHub, docs, NotebookLM). **Do not write the vault note yourself** — `ob_store` is vault-first and writes `Experiences/{project}/{key}.md` itself; a second Write is a duplicate at a path nothing reads.
-
-**A11** — Review for non-obvious lessons hooks would miss
-
-**A12 Experiences** — `ob_recall` dedup first, then `ob_store` with `[EXPERIENCE]` format. Again no manual vault write: `ob_store` nests under the project, and a flat `Experiences/{key}.md` beside it is counted by /sync vault-index-parity as an unindexed experience.
-
-**A13 Summary** — Write `~/Obsidian Vault v2/Summaries/YYYY-MM-DD-{project-slug}.md` (What / Why / How / Lessons). The SessionEnd hook writes the same path but yields to an existing file, so this enriched version wins.
-
-**A14 Feedback** — call `ob_recalled` to resolve the entry ids (**never read `.recalled-entries.json`**; nothing writes it, and the resolver refuses a copy naming another session), then `ob_feedback({id, rating})` for each — those two arguments and no others (helpful / harmful / neutral)
-
-Call **`ob_end`** if available to run the session-end pipeline (vault summary, auto-feedback, invocation logging).
-
----
-
-## Part B: Knowledge Capture (no `.agents/`)
-
-Run B1–B5 mirroring A10–A14 (research, lessons, experiences, summary, feedback).
-
----
-
-## Present summary
-
-**Project session:**
+For each lesson, `ob_recall` its title first (explicit trigger); skip it if it is already stored,
+or add the new detail. Then call `ob_store` with `kind: "event"`:
 
 ```
-Session N Complete — [Date]
-
-Accomplished:
-- ...
-
-Files Changed:
-- ...
-
-Next Session:
-- (from next-session.md)
-
-Captured:
-- (supplemental experiences, or "ob_end / hooks handled it")
-
-Blockers:
-- None | ...
+[EXPERIENCE] {short title}
+MATCH: {exactly one of:}
+  command: {the command shape that did it, e.g. `| tail`, `git show <ref>:<path>`}
+  path: {the file or glob where it bites, e.g. open-brain/src/shared/state-writer.ts}
+  error: "{the exact error text you saw}"
+  none — lookup only   {only when no act identifies it; say so, never leave MATCH out}
+TRIGGER: {the moment it matters}
+ACTION: {what to do — name the command, file or check, not a principle}
+CONTEXT: {what happened and how it was found}
 ```
 
-**Lightweight:** Report captured experiences + "Session summary stored."
+Tags: one tool tag and one problem-area tag at least. A long write-up (a spec, a close-out) goes
+through `ob_store_chunk` instead. Read the stored row back if you passed anything new: a server
+that has not been restarted strips unknown parameters and still reports success.
 
----
+## 3. Close the session's memory
 
-## Judgment calls
+Call `ob_end` once. Pass `entry_ratings` only for entries that were **injected or recalled this
+session** (`ob_recalled` lists them): `helpful` if it changed what you did, `harmful` if it misled
+you, `neutral` if it was there and unused. Do not rate what you did not see.
 
-- Quick Q&A with nothing to capture is fine — still update project docs if `.agents/` exists.
-- If the user says "don't store that", respect immediately.
-- Prefer fewer, high-quality experiences over noise.
+## 4. Report
+
+`Lessons stored: {n} — {title} [MATCH: command|path|error|none], ... · Ratings: {ids} or none`
+
+## What moved out of /end
+
+Session log (A1): `ob_start` creates it, local and untracked. SUMMARY/INBOX/task/next-session
+(A2, A5–A7b): rendered from the record `ob_state` writes as work happens. DECISIONS/ENTITIES
+(A3–A4): written with the change that makes them true. Doc drift (A9): `/sync`. Vault summary
+(A13): the SessionEnd hook. Research (A10): step 2, `MATCH: none` unless an act identifies it.

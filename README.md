@@ -178,7 +178,7 @@ Start a Claude Code session and run `/start`. You should see:
 | Command | When | What it does |
 |---|---|---|
 | `/start` | Session start | Reads project state, recalls relevant knowledge, registers session UUID, creates session log |
-| `/end` | Session end | Captures lessons, updates project state, writes handoff notes |
+| `/end` | Session end | Stores the session's lessons, each with the key (command, path or error) that would have caught it, then `ob_end`. Writes no project state: the record is written through `ob_state` as work happens (T-179) |
 | `/checkpoint` | Mid-session | Captures phase-level work context before `/compact`, enabling multi-phase sessions |
 | `/sync` | Before commits | Validates version consistency, structural integrity, and installed copy drift (26 checks) |
 
