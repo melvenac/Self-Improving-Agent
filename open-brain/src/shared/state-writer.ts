@@ -587,7 +587,7 @@ export function applyRetention(
   s.tasks = s.tasks.filter((t) => {
     // Same predicate the INBOX view filters on, so the record and the rendered
     // Done list cannot disagree about what still exists (T-144).
-    const old = isDroppedByRetention(t, revs);
+    const old = t.status === "done" && t.closed_session !== null && t.closed_session <= Math.max(-1, ...s.sessions.map((x) => x.n)) - DONE_RETENTION_SESSIONS;
     if (!old) return true;
     // T-157 / G-024: an id the tracked tree refers to must not leave the record.
     // Rev 48 evicted T-151, which G-031 exists to correct; rev 49 evicted T-153,
