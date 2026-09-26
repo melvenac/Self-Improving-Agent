@@ -62,6 +62,7 @@ try {
       console.log(`[session-end] ${msg}`);
       console.error(`[session-end] ${msg}`);
       recordMissingHandoff(dir, id, check);
+      process.exit(2);
     } else if (check.status === "unknown") {
       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);
     } else {
