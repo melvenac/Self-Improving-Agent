@@ -15,7 +15,9 @@ param(
   [Parameter(Mandatory = $true)] [int[]] $Queue,
   [int] $TimeoutMinutes = 300,      # one QA run longer than this is killed (with its process tree) and recorded
   [int] $QuietCpuPercent = 35,      # before each run, wait for the machine to be quiet: average CPU below this
-  [int] $QuietWaitMinutes = 120     # ... for at most this long; then run anyway, and record that it was busy
+  [int] $QuietWaitMinutes = 120,    # ... for at most this long; then run anyway, and record that it was busy
+  [string] $Checkout = '',          # optional: the commit to move the tree to, after any running driver finishes
+  [int] $StartWaitMinutes = 480     # how long -Checkout waits for a hand-launched driver to finish
 )
 
 $ErrorActionPreference = 'Continue'
@@ -26,8 +28,22 @@ $log = Join-Path $logDir 'queue.log'
 function L([string] $k, [string] $v) { "$((Get-Date).ToUniversalTime().ToString('o')) $k=$v" | Add-Content $log -Encoding utf8 }
 
 Set-Location $tree
+L 'start' "queue=$($Queue -join ',') checkout=$Checkout machine=$env:COMPUTERNAME timeout_min=$TimeoutMinutes"
+
+function Get-OtherDrivers { @(Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.CommandLine -match 'docs[\\/]loops[\\/]qa-\d+[\\/]drive\.ps1' }) }
+
+# -Checkout: move the tree only AFTER any running driver has finished, so a QA seat already at work (launched by hand)
+# never has its files changed under it. The SHA is Aaron's, given at launch, like the list.
+if ($Checkout) {
+  $w = (Get-Date).AddMinutes($StartWaitMinutes)
+  while ((Get-OtherDrivers).Count -gt 0 -and (Get-Date) -lt $w) { Start-Sleep 60 }
+  if ((Get-OtherDrivers).Count -gt 0) { L 'abort' "a driver was still running after $StartWaitMinutes min; the tree was not moved"; exit 1 }
+  git fetch -q origin
+  git checkout -q --detach $Checkout
+  if ($LASTEXITCODE -ne 0) { L 'abort' "checkout of $Checkout failed"; exit 1 }
+}
 $head = (git rev-parse HEAD).Trim()
-L 'start' "queue=$($Queue -join ',') head=$head machine=$env:COMPUTERNAME timeout_min=$TimeoutMinutes"
+L 'head' $head
 
 # Every listed driver must be TRACKED at the launch commit. A driver that is not is skipped, never fetched.
 $plan = foreach ($n in $Queue) {
