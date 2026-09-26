@@ -494,7 +494,7 @@ export interface InstanceEntry {
  */
 export function isSuperseded(entry: InstanceEntry, all: readonly InstanceEntry[], newest: number): boolean {
   if (!(entry.session < newest - RECORD_RETENTION_SESSIONS)) return false;
-  return all.some((o) => o !== entry && o.seat === entry.seat && o.checkout === entry.checkout && o.session > entry.session);
+  return all.some((o) => o !== entry && o.seat === entry.seat && o.session > entry.session);
 }
 
 /** The record's newest session number: the highest `n` in sessions[], or -1 when there is none. */
