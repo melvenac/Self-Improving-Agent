@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/cli.ts b/open-brain/src/cli.ts
+index a7f8990..5220ec7 100644
+--- a/open-brain/src/cli.ts
++++ b/open-brain/src/cli.ts
+@@ -428,7 +428,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
+   // Any token starting with "-", not only "--": `-accept-stale` used to fall
+   // through to the directory slot (QA 102, D4).
+   const importFlags = ["--draft", "--commit", "--force-snapshot", ACCEPT_STALE_FLAG];
+-  const unknownFlags = args.slice(2).filter((a) => a.startsWith("-") && !importFlags.includes(a));
++  const unknownFlags = args.slice(2).filter((a) => a.startsWith("--") && !importFlags.includes(a));
+   if (unknownFlags.length > 0) {
+     console.error(`state import refused: unrecognised flag(s) ${unknownFlags.join(", ")}. Known: ${importFlags.join(", ")}. Nothing written.`);
+     process.exit(1);

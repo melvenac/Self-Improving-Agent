@@ -1,0 +1,69 @@
+source src/pipelines/state-import/index.ts sha256/12 b11130490235 (restored after every mutant)
+
+R31-path: RED 3/60 (vitest exit 1) — R3-1: the snapshot's catch removes what this run created (reverted to removal by path)
+    state-import-atomic.test.ts > a snapshot that fails part-way is removed, with archive/ if the snapshot created it, and a second run completes
+    state-import-r3.test.ts > a same-day snapshot plus a plain --commit: refused, and the snapshot is byte-identical afterwards
+    state-import-r3.test.ts > the same with --accept-stale on a stale project: refused, and the snapshot is byte-identical afterwards
+N13: RED 3/60 (vitest exit 1) — R3-1: the partial snapshot is removed at all (QA 106's N13, on this code)
+    state-import-atomic.test.ts > a snapshot that fails part-way is removed, with archive/ if the snapshot created it, and a second run completes
+    state-import-r3.test.ts > a snapshot that fails part-way when archive/ already existed: only the partial snapshot goes, and archive/'s other contents stay (N13)
+    state-import-r3.test.ts > --force-snapshot with a snapshot that fails part-way: the aside comes back byte for byte, and only the new partial snapshot goes
+R31-record: RED 11/60 (vitest exit 1) — R3-1: takeSnapshot records what it created
+    state-import-atomic.test.ts > failing while writing state.json: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while writing SUMMARY.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while rendering task.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while rendering next-session.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while moving the draft into the snapshot: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte
+    state-import-atomic.test.ts > a snapshot that fails part-way is removed, with archive/ if the snapshot created it, and a second run completes
+    state-import-r3.test.ts > a snapshot that fails part-way when archive/ already existed: only the partial snapshot goes, and archive/'s other contents stay (N13)
+    state-import-r3.test.ts > --force-snapshot with a snapshot that fails part-way: the aside comes back byte for byte, and only the new partial snapshot goes
+    state-import-r3.test.ts > a completed rollback leaves no marker, and a re-run completes (archive/ absent before)
+    state-import-r3.test.ts > a completed rollback leaves no marker, and a re-run completes (archive/ already present before)
+R31-rollback: RED 8/60 (vitest exit 1) — R3-1: a completed rollback removes what this run created
+    state-import-atomic.test.ts > failing while writing state.json: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while writing SUMMARY.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while rendering task.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while rendering next-session.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while moving the draft into the snapshot: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte
+    state-import-r3.test.ts > a completed rollback leaves no marker, and a re-run completes (archive/ absent before)
+    state-import-r3.test.ts > a completed rollback leaves no marker, and a re-run completes (archive/ already present before)
+R32-fallback: RED 5/60 (vitest exit 1) — R3-2: invalid UTF-8 with no NUL is read as Windows-1252 (reverted to aba35de's undecodable)
+    state-import-r3.test.ts > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > the text is decoded as Windows-1252, not as UTF-8 with replacement characters
+    state-import-r3.test.ts > UTF-16 with no BOM is still 'could not tell' (NUL bytes), whether or not it is also invalid UTF-8
+R32-nul: RED 1/60 (vitest exit 1) — R3-2: NUL bytes still stop the fallback
+    state-import-r3.test.ts > UTF-16 with no BOM is still 'could not tell' (NUL bytes), whether or not it is also invalid UTF-8
+R32-table: RED 1/60 (vitest exit 1) — R3-2: 0x80-0x9F decode through the Windows-1252 table, not as Latin-1
+    state-import-r3.test.ts > the text is decoded as Windows-1252, not as UTF-8 with replacement characters
+R32-evidence: RED 3/60 (vitest exit 1) — R3-2: the evidence names the encoding
+    state-import-r3.test.ts > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+R32-summary: RED 2/60 (vitest exit 1) — R3-2: a Windows-1252 SUMMARY.md refuses --commit
+    state-import-r2.test.ts > SUMMARY.md that cannot be decoded: --commit refuses before anything is written, since it rewrites that file in place
+    state-import-r3.test.ts > a Windows-1252 SUMMARY.md still refuses --commit: a guessed encoding is not written back
+R33-draft: RED 3/60 (vitest exit 1) — R3-3: --draft refuses while the marker exists
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+    state-import-r3.test.ts > a marker left by a process that died mid-migrate (no rollback ran): --draft and --commit refuse, naming the snapshot and the marker
+R33-commit: RED 3/60 (vitest exit 1) — R3-3: --commit refuses while the marker exists (first, before state.json)
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+    state-import-r3.test.ts > a marker left by a process that died mid-migrate (no rollback ran): --draft and --commit refuse, naming the snapshot and the marker
+R33-write: RED 3/60 (vitest exit 1) — R3-3: the marker is written before any live change
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+    state-import-r3.test.ts > the marker exists before --commit's first write to the live tree, so a process that dies there leaves a project that refuses
+R33-success: RED 3/60 (vitest exit 1) — R3-3: a completed commit removes the marker
+    state-import-atomic.test.ts > with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte
+    state-import-r3.test.ts > the marker exists before --commit's first write to the live tree, so a process that dies there leaves a project that refuses
+    state-import.test.ts > --commit: snapshot byte-complete before any change (P2), state.json rev 0, SUMMARY cut (line counts), four views rendered, draft moved, prose sections byte-identical (P8), second commit refuses (V5)
+R33-rolledback: RED 2/60 (vitest exit 1) — R3-3: a completed rollback removes the marker
+    state-import-atomic.test.ts > with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte
+    state-import-r3.test.ts > a completed rollback leaves no marker, and a re-run completes (archive/ already present before)
+exit=0
+2026-09-26T00:48:15Z

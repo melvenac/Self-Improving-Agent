@@ -1,0 +1,5 @@
+plain --commit: draft exit 0; --commit exit 1: state import refused: snapshot .agents/archive/pre-state-migration-2026-09-25 already exists — pass --force-snapshot to overwrite it
+   the earlier snapshot STILL EXISTS; its Session_6.md survives; archive/ now: pre-state-migration-2026-09-25
+--commit --accept-stale (stale project): draft exit 0; --commit --accept-stale exit 1: state import refused: snapshot .agents/archive/pre-state-migration-2026-09-25 already exists — pass --force-snapshot to overwrite it
+   the earlier snapshot STILL EXISTS; its Session_6.md survives; archive/ now: pre-state-migration-2026-09-25
+exit=0

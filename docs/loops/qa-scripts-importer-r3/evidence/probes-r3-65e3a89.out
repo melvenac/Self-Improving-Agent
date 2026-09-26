@@ -1,0 +1,69 @@
+probes-r3 against C:\qa-scratch\qa111\r1 @ 65e3a89; TEMP=C:\qa-tmp
+
+==================== R3-1: a failure removes only what this run created
+NOTE today: 2026-09-25 (local), so today's snapshot is pre-state-migration-2026-09-25
+PASS IF-16 same-day snapshot + plain --commit: exit 1; whole project incl. the snapshot, with mtimes and RO bit: identical | state import refused: snapshot .agents/archive/pre-state-migration-2026-09-25 already exists — pass --force-snapshot to overwrite it
+PASS IF-16 same-day snapshot + --commit --accept-stale, stale project: exit 1; whole project incl. the snapshot, with mtimes and RO bit: identical | state import refused: snapshot .agents/archive/pre-state-migration-2026-09-25 already exists — pass --force-snapshot to overwrite it
+FAIL R3-1 snapshot copy fails, archive/ absent: exit 1; whole project incl. archive/: +3 [.agents/archive/, .agents/archive/pre-state-migration-2026-09-25/, .agents/archive/pre-state-migration-2026-09-25/notes/] -0 [] ~0 []; archive/ now [pre-state-migration-2026-09-25] | state import refused: EBUSY: resource busy or locked, copyfile 'C:\qa-scratch\qa111\pr3-r1\r31-copyfail-0\.agents\notes\locked.md' -> 'C:\qa-scratch\qa111\pr3-r1\r31-copy
+FAIL R3-1 snapshot copy fails, archive/ present, empty: exit 1; whole project incl. archive/: +2 [.agents/archive/pre-state-migration-2026-09-25/, .agents/archive/pre-state-migration-2026-09-25/notes/] -0 [] ~0 []; archive/ now [pre-state-migration-2026-09-25] | state import refused: EBUSY: resource busy or locked, copyfile 'C:\qa-scratch\qa111\pr3-r1\r31-copyfail-1\.agents\notes\locked.md' -> 'C:\qa-scratch\qa111\pr3-r1\r31-copy
+FAIL R3-1 snapshot copy fails, archive/ holds an earlier dated snapshot: exit 1; whole project incl. archive/: +2 [.agents/archive/pre-state-migration-2026-09-25/, .agents/archive/pre-state-migration-2026-09-25/notes/] -0 [] ~0 []; archive/ now [pre-state-migration-2026-01-01, pre-state-migration-2026-09-25] | state import refused: EBUSY: resource busy or locked, copyfile 'C:\qa-scratch\qa111\pr3-r1\r31-copyfail-2\.agents\notes\locked.md' -> 'C:\qa-scratch\qa111\pr3-r1\r31-copy
+FAIL R3-1 snapshot copy fails, --force-snapshot over today's snapshot (the aside): exit 1; whole project incl. archive/: +1 [.agents/archive/pre-state-migration-2026-09-25/notes/] -0 [] ~0 []; archive/ now [pre-state-migration-2026-09-25] | state import refused: EBUSY: resource busy or locked, copyfile 'C:\qa-scratch\qa111\pr3-r1\r31-copyfail-3\.agents\notes\locked.md' -> 'C:\qa-scratch\qa111\pr3-r1\r31-copy
+FAIL R3-1 --force-snapshot + render failure: the aside comes back: exit 1; +11 [.agents/archive/pre-state-migration-2026-09-25/SESSIONS/next-session.md, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_6.md, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md, .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md, .agents/archive/pre-state-migration-2026-09-25/SYSTEM/, .agents/archive/pre-state-migration-2026-09-25/SYSTEM/SUMMARY.md, .agents/archive/pre-state-migration-2026-09-25/TASKS/] -0 [] ~1 [.agents/SYSTEM/SUMMARY.md]; archive/ now [pre-state-migration-2026-09-25] | state import refused: EPERM: operation not permitted, rename 'C:\qa-scratch\qa111\pr3-r1\r31-force-render\.agents\TASKS\INBOX.md.tmp-15212' -> 'C:\qa-scratch\qa111\pr3-r1\r31-force-render\.agents\TASK
+
+==================== R3-2: appended files (Windows PowerShell 5.1 appends onto an existing file)
+---- utf8 then PS 5.1 >> | first NUL at byte 103
+     stale  : 3 stale / 0 ctt / 0 current; bare --commit exit 1, state.json false
+              - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: 0 stale / 0 ctt / 3 current; bare --commit exit 0
+PASS R3-2 class: utf8 then PS 5.1 >>: stale inputs are all STALE, and bare --commit refuses
+---- utf8 then PS 5.1 Add-Content | first NUL at byte -1
+     stale  : 3 stale / 0 ctt / 0 current; bare --commit exit 1, state.json false
+              - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: 0 stale / 0 ctt / 3 current; bare --commit exit 0
+PASS R3-2 class: utf8 then PS 5.1 Add-Content: stale inputs are all STALE, and bare --commit refuses
+---- utf8-bom then PS 5.1 >> | first NUL at byte 106
+     stale  : 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+              - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     current: 0 stale / 3 ctt / 0 current; bare --commit exit 0
+FAIL R3-2 class: utf8-bom then PS 5.1 >>: stale inputs are all STALE, and bare --commit refuses
+---- utf8-bom then PS 5.1 Add-Content | first NUL at byte -1
+     stale  : 0 stale / 3 ctt / 0 current; bare --commit exit 0, state.json true
+              - could not tell `.agents/TASKS/INBOX.md`: names no `Session N` in its status blockquote or its headings
+     current: 0 stale / 3 ctt / 0 current; bare --commit exit 0
+FAIL R3-2 class: utf8-bom then PS 5.1 Add-Content: stale inputs are all STALE, and bare --commit refuses
+---- cp1252 then PS 5.1 >> | first NUL at byte 104
+     stale  : 3 stale / 0 ctt / 0 current; bare --commit exit 1, state.json false
+              - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: 0 stale / 0 ctt / 3 current; bare --commit exit 0
+PASS R3-2 class: cp1252 then PS 5.1 >>: stale inputs are all STALE, and bare --commit refuses
+---- cp1252 then PS 5.1 Add-Content | first NUL at byte -1
+     stale  : 3 stale / 0 ctt / 0 current; bare --commit exit 1, state.json false
+              - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: 0 stale / 0 ctt / 3 current; bare --commit exit 0
+PASS R3-2 class: cp1252 then PS 5.1 Add-Content: stale inputs are all STALE, and bare --commit refuses
+PASS R3-2 class: UTF-8 with one stray NUL at the end: 3 stale / 0 ctt / 0 current; bare --commit exit 1 | - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+FAIL R3-2 SUMMARY.md as UTF-16LE with no BOM: --commit exit 0; tree +14 [.agents/archive/, .agents/archive/pre-state-migration-2026-09-25/, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/next-session.md, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_6.md, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md, .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md] -2 [.agents/state.draft.json, .agents/state.import-report.md] ~4 [.agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md, .agents/TASKS/INBOX.md, .agents/TASKS/task.md] | state import — committed |  | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (8 files) | Wrote:    .agents/state.json at revision 0 | SUMMARY.md: removed 0 lines (0 blockquote + 0 Current St
+NOTE R3-2 content: a Windows-1251 INBOX item, drafted: --draft exit 0; INBOX verdict: - current `.agents/TASKS/INBOX.md`: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md); the draft's first item title: "������" (the source said "Задача")
+
+==================== R3-3: the rollback itself fails (SUMMARY.md held open, share=Read), then every re-run
+  step 0 drafted: exit -; originals lost: none; state.json false; archive/ []
+  step 1 --commit with SUMMARY.md held (share=Read): exit 1; originals lost: none; state.json true; archive/ [pre-state-migration-2026-09-25]
+         | state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\qa111\pr3-r1\r33-sequence\.agents\SYSTEM\SUMMARY.md'
+NOTE IF-19: the live tree right after step 1 (outside archive/): +1 [state.json] -0 [] ~0 []
+  step 2 --draft: exit 1; originals lost: none; state.json true; archive/ [pre-state-migration-2026-09-25]
+         | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+  step 3 --commit: exit 1; originals lost: none; state.json true; archive/ [pre-state-migration-2026-09-25]
+         | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+  step 4 --commit --force-snapshot: exit 1; originals lost: none; state.json true; archive/ [pre-state-migration-2026-09-25]
+         | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+  step 5 --commit --accept-stale --force-snapshot: exit 1; originals lost: none; state.json true; archive/ [pre-state-migration-2026-09-25]
+         | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+FAIL IF-19 re-runs refuse: --draft, --commit, --commit --force-snapshot and --commit --accept-stale --force-snapshot all exit 1 with "half-restored"
+PASS IF-19 no original lost: at steps 0-5, an original file missing from the live tree and from every directory under archive/: 0
+NOTE IF-19: the refusal does not name a snapshot and a marker in the expected words; the way out was not followed
+FAIL R3-3 a marker from an earlier day: --draft exit 0, --commit exit 0; tree +13 [.agents/archive/pre-state-migration-2026-09-25/, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/next-session.md, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_6.md, .agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md, .agents/archive/pre-state-migration-2026-09-25/state.draft.json, .agents/archive/pre-state-migration-2026-09-25/state.import-report.md, .agents/archive/pre-state-migration-2026-09-25/SYSTEM/] -2 [.agents/state.draft.json, .agents/state.import-report.md] ~4 [.agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md, .agents/TASKS/INBOX.md, .agents/TASKS/task.md] | state import — committed |  | Snapshot: .agents\archive\pre-state-migration-2026-09-25 (8 files) | Wrote:    .agents/state.json at revision 0 | SUMMARY.md: removed 3 lines (1 blockquote + 0 Current State); kept Architecture | Rendered: .agents/TASKS/INBOX.md, 
+NOTE R3-3 two markers: exit 1 | state import refused: .agents/state.json already exists — the importer runs once; nothing written
+FAIL R3-3 died after state.json: --draft exit 1: state import refused: .agents/state.json already exists — the importer runs once; nothing  ; --commit exit 1: state import refused: .agents/state.json already exists — the importer runs once; nothing 
+
+SUMMARY: 8 passed, 11 failed
+exit=1

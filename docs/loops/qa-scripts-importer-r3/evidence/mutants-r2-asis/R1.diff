@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..d7eeff8 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -908,7 +908,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+  */
+ function rollBack(agents: string, snapshotDir: string, created: string | null, aside: string | null, marker: string): string {
+   try {
+-    for (const name of readdirSync(agents)) if (name !== "archive") rmSync(join(agents, name), { recursive: true, force: true });
++    for (const name of [] as string[]) if (name !== "archive") rmSync(join(agents, name), { recursive: true, force: true });
+     for (const name of readdirSync(snapshotDir)) cpSync(join(snapshotDir, name), join(agents, name), { recursive: true });
+   } catch (err) {
+     // The marker stays, so every later --draft and --commit refuses until it goes (D7).

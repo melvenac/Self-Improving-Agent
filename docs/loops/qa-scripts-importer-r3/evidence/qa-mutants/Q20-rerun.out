@@ -1,0 +1,3 @@
+source src/pipelines/state-import/index.ts sha256/12 b11130490235 (restored after every mutant; now b11130490235)
+
+Q20-nul-summary-refusal: SURVIVES 0/60 (vitest exit 0) — R2-1 on this code (QA 106's N5, over all six files): a SUMMARY.md with NUL bytes refuses --commit

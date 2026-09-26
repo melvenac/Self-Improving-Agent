@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..81b028a 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -780,7 +780,7 @@ export function takeSnapshot(projectRoot: string, today: string, force: boolean,
+   if (!existsSync(agents)) throw new Error(".agents/ does not exist — nothing to migrate");
+   const dir = join(agents, "archive", `${SNAPSHOT_PREFIX}${today}`);
+   if (existsSync(dir) && !force) throw new Error(`snapshot ${relative(root, dir).replace(/\\/g, "/")} already exists — pass --force-snapshot to overwrite it`);
+-  made.created = mkdirSync(dir, { recursive: true }) ?? null;
++  mkdirSync(dir, { recursive: true }); made.created = dir;
+   // Entry by entry: cpSync refuses to copy a directory into its own
+   // subtree, and the snapshot lives under .agents/archive/.
+   let files = 0;

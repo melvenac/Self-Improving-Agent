@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..1b93eb4 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -560,7 +560,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
+     project: { name: pkg?.name ?? "unknown", version: pkg?.version ?? "0.0.0" },
+     current_session: current,
+     migration_date: today,
+-    staleness: detectStaleness(texts, last, undecodable, readAs),
++    staleness: detectStaleness(texts, last, undecodable),
+     sources: Object.fromEntries(Object.entries(paths).map(([k, p]) => [k, { path: relative(root, p).replace(/\\/g, "/"), present: existsSync(p), lines: lineCount(texts[k as keyof typeof texts]) }])),
+     inbox: {
+       items: 0,

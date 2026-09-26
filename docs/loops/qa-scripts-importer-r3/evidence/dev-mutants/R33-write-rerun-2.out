@@ -1,0 +1,6 @@
+source src/pipelines/state-import/index.ts sha256/12 b11130490235 (restored after every mutant)
+
+R33-write: RED 3/60 (vitest exit 1) — R3-3: the marker is written before any live change
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+    state-import-r3.test.ts > the marker exists before --commit's first write to the live tree, so a process that dies there leaves a project that refuses

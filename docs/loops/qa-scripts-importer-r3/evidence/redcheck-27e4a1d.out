@@ -1,0 +1,270 @@
+
+ RUN  v3.2.4 C:/qa-scratch/qa111/red/open-brain
+
+ × tests/pipelines/state-import-r3.test.ts > R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > a same-day snapshot plus a plain --commit: refused, and the snapshot is byte-identical afterwards 57ms
+   → expected { '.agents/archive/': '', …(8) } to deeply equal { …(10) }
+ × tests/pipelines/state-import-r3.test.ts > R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > the same with --accept-stale on a stale project: refused, and the snapshot is byte-identical afterwards 26ms
+   → expected { '.agents/archive/': '', …(8) } to deeply equal { …(10) }
+ ✓ tests/pipelines/state-import.test.ts > state import (Loop 4 C1) on a fixture built from this repo's prose files > --draft writes a schema-valid draft + report and changes nothing else; counts match the hand count of INBOX boxes (V5) 68ms
+ ✓ tests/pipelines/state-import.test.ts > state import (Loop 4 C1) on a fixture built from this repo's prose files > --draft refuses when state.json already exists 13ms
+ ✓ tests/pipelines/state-import-r3.test.ts > R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > a snapshot that fails part-way when archive/ already existed: only the partial snapshot goes, and archive/'s other contents stay (N13) 48ms
+ ✓ tests/pipelines/state-import-r3.test.ts > R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > --force-snapshot with a snapshot that fails part-way: the aside comes back byte for byte, and only the new partial snapshot goes 49ms
+ × tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits 21ms
+   → expected { …(3) } to deeply equal { …(3) }
+ × tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits 14ms
+   → expected { …(3) } to deeply equal { …(3) }
+ × tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits 13ms
+   → expected { …(3) } to deeply equal { …(3) }
+ × tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > the text is decoded as Windows-1252, not as UTF-8 with replacement characters 14ms
+   → expected [ [ 'A task', '\ufffd do it' ] ] to deeply equal [ [ 'A task', 'do it' ] ]
+ × tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > UTF-16 with no BOM is still 'could not tell' (NUL bytes), whether or not it is also invalid UTF-8 15ms
+   → expected 'not valid UTF-8, and no UTF-16 byte-o…' to match /NUL/
+ ✓ tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > a Windows-1252 SUMMARY.md still refuses --commit: a guessed encoding is not written back 19ms
+ ✓ tests/pipelines/state-import.test.ts > state import (Loop 4 C1) on a fixture built from this repo's prose files > --commit: snapshot byte-complete before any change (P2), state.json rev 0, SUMMARY cut (line counts), four views rendered, draft moved, prose sections byte-identical (P8), second commit refuses (V5) 129ms
+ ✓ tests/pipelines/state-import.test.ts > state import (Loop 4 C1) on a fixture built from this repo's prose files > --commit refuses without a draft, on a draft that does not validate, and on an existing snapshot without --force-snapshot 75ms
+ ✓ tests/pipelines/state-import.test.ts > state import (Loop 4 C1) on a fixture built from this repo's prose files > takeSnapshot excludes archive/ and refuses a second run without force 36ms
+ ✓ tests/pipelines/state-import.test.ts > state import parsing rules (unit) > INBOX rules: box → status, priority from section, title/note split, session markers, superseded link, unparsed lines reported 2ms
+ ✓ tests/pipelines/state-import.test.ts > state import parsing rules (unit) > DECISIONS rules: full date kept, partial and missing dates fall back to the migration date with a note, unnumbered ADR skipped 1ms
+ ✓ tests/pipelines/state-import.test.ts > state import parsing rules (unit) > next-session rules: pick_up text, watch_out bullets, open_questions bullets (empty when absent), other sections reported 1ms
+ ✓ tests/pipelines/state-import.test.ts > state import parsing rules (unit) > SUMMARY surgery removes exactly the title blockquote and the Current State section and leaves everything else byte for byte 1ms
+ × tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step 57ms
+   → expected [Function] to throw an error
+ × tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > QA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step 65ms
+   → expected [Function] to throw an error
+ × tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > the marker exists before --commit's first write to the live tree, so a process that dies there leaves a project that refuses 45ms
+   → expected false to be true // Object.is equality
+ × tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > a marker left by a process that died mid-migrate (no rollback ran): --draft and --commit refuse, naming the snapshot and the marker 20ms
+   → expected [Function] to throw an error
+ ✓ tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > a completed rollback leaves no marker, and a re-run completes 100ms
+ ✓ tests/pipelines/state-import-staleness.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > --draft names next-session.md as stale, with evidence, in the report's first section 38ms
+ ✓ tests/pipelines/state-import-staleness.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > --commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it 60ms
+ ✓ tests/pipelines/state-import-atomic.test.ts > R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before > failing while writing state.json: the error names the failure, the tree is unchanged, and a second run completes 124ms
+ ✓ tests/pipelines/state-import-atomic.test.ts > R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before > failing while writing SUMMARY.md: the error names the failure, the tree is unchanged, and a second run completes 96ms
+ ✓ tests/pipelines/state-import-atomic.test.ts > R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before > failing while rendering task.md: the error names the failure, the tree is unchanged, and a second run completes 97ms
+ ✓ tests/pipelines/state-import-atomic.test.ts > R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before > failing while rendering next-session.md: the error names the failure, the tree is unchanged, and a second run completes 85ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > PROBE-8: a leading UTF-8 BOM on each input gives the same verdicts, with the same evidence, as the same inputs without it 40ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > UTF-16 with a BOM (what Windows PowerShell 5.1's `>` and Out-File write) is read, not filed as unmarked 30ms
+ ✓ tests/pipelines/state-import-atomic.test.ts > R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before > failing while moving the draft into the snapshot: the error names the failure, the tree is unchanged, and a second run completes 99ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing 1762ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > UTF-16 with no BOM (NUL bytes) is the shape that cannot be read: could not tell, and it says why rather than 'names no Session N' 12ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > the sibling reads share the fix: a BOM-led task.md whose first line is `## Current Objective`, and a BOM-led log's date 12ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > SUMMARY.md with a BOM: --commit still cuts its status blockquote, and the rendered region lands under the title 54ms
+ ✓ tests/pipelines/state-import-atomic.test.ts > R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before > with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte 98ms
+ ✓ tests/pipelines/state-import-atomic.test.ts > R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before > a snapshot that fails part-way is removed, with archive/ if the snapshot created it, and a second run completes 61ms
+ ✓ tests/pipelines/state-import-atomic.test.ts > R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before > the rollback says what it did in the error 52ms
+ ✓ tests/pipelines/state-import-seeds.test.ts > T-175: an import carries none of SIA's own history (IF-1) > verified[] and gaps[] are empty, the draft parses, and the report says 0 for both 49ms
+ ✓ tests/pipelines/state-import-seeds.test.ts > T-175: an import carries none of SIA's own history (IF-1) > the CLI's draft line says verified 0 · gaps 0 874ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > SUMMARY.md in UTF-16: --commit cuts its blockquote and writes it back as UTF-8, which the renderer and ob_state read 45ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > SUMMARY.md that cannot be decoded: --commit refuses before anything is written, since it rewrites that file in place 22ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-2 (IF-10): an input that declares a session AHEAD of the latest log is not 'current' > PROBE-1: next-session declares 20 against log 7 → could not tell, with a reason naming both numbers 12ms
+ ✓ tests/pipelines/state-import-staleness.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale 3073ms
+ ✓ tests/pipelines/state-import-staleness.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-3: a project whose inputs are current, the known negative > no input is stale, every judged input is current, and --commit proceeds without the acknowledgement 38ms
+ ✓ tests/pipelines/state-import-staleness.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > an input with no session marker is 'could not tell', named in the report's first section 12ms
+ ✓ tests/pipelines/state-import-staleness.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > --commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report 1378ms
+ ✓ tests/pipelines/state-import-staleness.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > with no Session_N.md to compare against, every present input is 'could not tell' 11ms
+ ✓ tests/pipelines/state-import-staleness.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > inputs that are not imported as current state are listed as not judged, with a reason 13ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-3 (IF-11): an import completes, or it changes nothing > PROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist 1621ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-4 (IF-12): `state import` acts on exactly the project the operator named > a single-dash token that is not a known flag refuses, before or after the directory 2652ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-4 (IF-12): `state import` acts on exactly the project the operator named > PROBE-12: a bare word before the directory is a second positional and refuses; the cwd's project is not committed 1870ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-4 (IF-12): `state import` acts on exactly the project the operator named > PROBE-5b: a positional that names no existing directory refuses instead of walking up from the cwd 1229ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-5 (IF-13): every protection has a test that fails without it > M6: a misspelled acknowledgement on a CURRENT project is refused by the flag check itself 1233ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-5 (IF-13): every protection has a test that fails without it > M13: --accept-stale with --draft refuses and writes no draft 609ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-5 (IF-13): every protection has a test that fails without it > M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output 1264ms
+ ✓ tests/pipelines/state-import-r2.test.ts > R2-5 (IF-13): every protection has a test that fails without it > M16: a marker that appears only in a heading is read, in both directions 10ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/pipelines/state-import-r3.test.ts > R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > a same-day snapshot plus a plain --commit: refused, and the snapshot is byte-identical afterwards
+AssertionError: expected { '.agents/archive/': '', …(8) } to deeply equal { …(10) }
+
+- Expected
++ Received
+
+@@ -2,11 +2,10 @@
+    ".agents/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+    ".agents/SESSIONS/next-session.md": "23204e6578742053657373696f6e2048616e646f666620e2809420666f7220746865206e65787420736561740a0a3e205570646174656420617420656e64206f662053657373696f6e20372e0a0a2323205069636b20757020686572650a0a4361727279206f6e2e0a",
+    ".agents/SYSTEM/SUMMARY.md": "232053756d6d6172790a0a3e207374617475730a0a23232041626f75740a0a4b6570742e0a",
+    ".agents/TASKS/INBOX.md": "2320496e626f7820e28094207072696f7269746965730a0a3e202a2a4c61737420557064617465643a2a2a2053657373696f6e20370a0a232320503020e2809420437269746963616c0a0a2d205b205d202a2a41207461736b2a2a20e2809420646f2069740a",
+    ".agents/TASKS/task.md": "232043757272656e7420466f63757320e280942074686973207765656b0a0a3e202a2a466f6375733a2a2a2053657373696f6e20370a0a23232043757272656e74204f626a6563746976650a0a5368697020746865207468696e672e0a",
+-   ".agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+-   ".agents/archive/pre-state-migration-2026-09-25/from-an-earlier-run.md": "6b656570206d650a",
++   ".agents/archive/": "",
+    ".agents/state.draft.json": "7b0a202022736368656d615f76657273696f6e223a20322c0a2020227265766973696f6e223a20302c0a20202270726f6a656374223a207b0a20202020226e616d65223a2022666978747572652d70726f6a656374220a20207d2c0a2020226f626a656374697665223a207b0a202020202274657874223a20225368697020746865207468696e672e222c0a202020202273696e63655f73657373696f6e223a20370a20207d2c0a2020227461736b73223a205b0a202020207b0a202020202020226964223a2022542d303031222c0a202020202020227469746c65223a202241207461736b222c0a202020202020227072696f72697479223a20225030222c0a20202020202022737461747573223a20226f70656e222c0a202020202020226f70656e65645f73657373696f6e223a20372c0a20202020202022636c6f7365645f73657373696f6e223a206e756c6c2c0a2020202020202273757065727365646573223a206e756c6c2c0a202020202020226e6f7465223a2022646f206974220a202020207d0a20205d2c0a2020227665726966696564223a205b5d2c0a20202267617073223a205b5d2c0a2020226465636973696f6e73223a205b5d2c0a20202268616e646f666673223a205b0a202020207b0a2020202020202273656174223a2022646576656c6f706572222c0a202020202020227069636b5f7570223a20224361727279206f6e2e222c0a2020202020202277617463685f6f7574223a205b5d2c0a202020202020226f70656e5f7175657374696f6e73223a205b5d2c0a2020202020202273657373696f6e223a20372c0a202020202020226c6f6f705f7374617465223a206e756c6c0a202020207d0a20205d2c0a2020226c6173745f73657373696f6e223a207b0a20202020226e223a20372c0a202020202264617465223a2022323032362d30392d3230222c0a202020202275756964223a206e756c6c2c0a202020202273656174223a206e756c6c0a20207d0a7d0a",
+    ".agents/state.import-report.md": "232073746174652e6a736f6e20696d706f7274207265706f727420e280942064726166742028323032362d30392d3235290a0a2323205374616c656e65737320e28094207265616420746869732066697273740a0a5369676e616c3a207468652068696768657374206053657373696f6e204e6020616e20696e707574206e616d657320696e206974732073746174757320626c6f636b71756f7465202874686520603e60206c696e6573206469726563746c7920756e64657220697473207469746c6529206f7220696e20612068656164696e672c20636f6d70617265642077697468207468652068696768657374206053455353494f4e532f53657373696f6e5f4e2e6d64602e0a4c61746573742073657373696f6e3a2053657373696f6e20372028602e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d6460292e0a0a2d2063757272656e7420602e6167656e74732f5441534b532f494e424f582e6d64603a206c696e652033206465636c617265732053657373696f6e20372028603e202a2a4c61737420557064617465643a2a2a2053657373696f6e203760293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d2063757272656e7420602e6167656e74732f5441534b532f7461736b2e6d64603a206c696e652033206465636c617265732053657373696f6e20372028603e202a2a466f6375733a2a2a2053657373696f6e203760293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d2063757272656e7420602e6167656e74732f53455353494f4e532f6e6578742d73657373696f6e2e6d64603a206c696e652033206465636c617265732053657373696f6e20372028603e205570646174656420617420656e64206f662053657373696f6e20372e60293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d206e6f74206a756467656420602e6167656e74732f53595354454d2f53554d4d4152592e6d64603a206e6f7420696d706f727465642061732073746174653a202d2d636f6d6d6974206f6e6c792063757473206974732073746174757320626c6f636b71756f746520616e64206023232043757272656e74205374617465600a2d206e6f74206a756467656420602e6167656e74732f53595354454d2f4445434953494f4e532e6d64603a20616273656e743a206e6f7468696e6720697320696d706f727465642066726f6d2069740a0a4e6f20696e707574206973207374616c652e0a0a50726f6a6563743a20666978747572652d70726f6a6563742076312e302e3020c2b72063757272656e742073657373696f6e2037202866726f6d202e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d642920c2b720726574656e74696f6e20656467653a20646f6e65206974656d7320636c6f73656420e289a42073657373696f6e2034206172652064726f70706564206f6e20746865206669727374206f625f73746174652077726974650a0a232320536f75726365730a0a2d20696e626f783a20602e6167656e74732f5441534b532f494e424f582e6d646020e280942038206c696e65730a2d207461736b3a20602e6167656e74732f5441534b532f7461736b2e6d646020e280942038206c696e65730a2d206e6578743a20602e6167656e74732f53455353494f4e532f6e6578742d73657373696f6e2e6d646020e280942038206c696e65730a2d2073756d6d6172793a20602e6167656e74732f53595354454d2f53554d4d4152592e6d646020e280942038206c696e65730a2d206465636973696f6e733a20602e6167656e74732f53595354454d2f4445434953494f4e532e6d646020e2809420414253454e540a0a2323205461736b732028494e424f582e6d64290a0a4974656d73207061727365643a203120286f66207768696368203020756e6465722060232320436f6d706c65746564602c20696d706f72746564206173205033292e0a0a426f7820636f756e7473206173207772697474656e20286265666f72652074686520605b737570657273656465645d602072756c65293a0a0a2d206f70656e3a20310a2d20696e5f70726f67726573733a20300a2d20626c6f636b65643a20300a2d20646f6e653a20300a0a496d706f7274656420737461747573206279207072696f72697479202861667465722074686520605b737570657273656465645d602072756c6520e280942073757065727365646564206974656d732061726520646f6e65293a0a0a7c207072696f72697479207c206f70656e207c20696e5f70726f6772657373207c20626c6f636b6564207c20646f6e65207c20746f74616c207c0a7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c0a7c205030207c2031207c2030207c2030207c2030207c2031207c0a7c205031207c2030207c2030207c2030207c2030207c2030207c0a7c205032207c2030207c2030207c2030207c2030207c2030207c0a7c205033207c2030207c2030207c2030207c2030207c2030207c0a7c202a2a616c6c2a2a207c2031207c2030207c2030207c2030207c2031207c0a0a53657373696f6e733a2030206974656d7320686164206120602853657373696f6e204e2960206d61726b657220286f70656e6564203d206d696e2c20636c6f736564203d206d617820666f7220646f6e65293b2031206f70656e206974656d7320686164206e6f6e6520e28692206f70656e65645f73657373696f6e203d20373b203020646f6e65206974656d7320686164206e6f6e6520e2869220636c6f7365645f73657373696f6e203d20342e0a526574656e74696f6e2d656c696769626c65206f6e207468652066697273742077726974653a203020646f6e65206974656d73202874686579207374617920696e2074686520736e617073686f7420616e6420696e20676974292e0a0a2323232053757065727365646564206c696e6b73202830290a0a5f4e6f6e652e5f0a0a232323205469746c652066616c6c6261636b7320e28094206e6f20626f6c64206c6561642c2066697273742073656e74656e63652075736564202830290a0a5f4e6f6e652e5f0a0a23232320436f756c64206e6f7420626520706172736564206173206974656d73202831290a0a2d206c696e6520333a206e6f7420616e206974656d2c2068656164696e67206f7220626c616e6b206c696e6520e280942069676e6f72656420286b65707420696e2074686520736e617073686f742920e2809420603e202a2a4c61737420557064617465643a2a2a2053657373696f6e2037600a0a2323204f626a65637469766520287461736b2e6d64290a0a466f756e643a205368697020746865207468696e672e0a0a2323204465636973696f6e7320284445434953494f4e532e6d64290a0a496d706f72746564203020414452733a2030207769746820612066756c6c2060446174653a60206c696e652c203020776974682061207061727469616c206461746520286b65707420696e20746865206e6f7465292c20302077697468206e6f6e65202864617465203d206d6967726174696f6e20646174652c206e6f74652022696d706f727465643b206f726967696e616c206461746520756e6b6e6f776e22292e0a0a23232048616e646f666620286e6578742d73657373696f6e2e6d64290a0a7069636b5f75703a2031206c696e657320c2b72077617463685f6f75743a20302062756c6c65747320c2b7206f70656e5f7175657374696f6e733a20302062756c6c6574730a0a232320566572696669656420616e6420676170730a0a76657269666965645b5d3a203020c2b720676170735b5d3a20302e205468652070726f73652066696c6573206361727279206e6f6e6520696e206120666f726d2074686520696d706f727465722072656164732c20616e6420697420696e76656e7473206e6f6e652e205265636f7264207468656d2077697468206f625f73746174652061667465722074686520636f6d6d69742e0a0a2323204c6173742073657373696f6e0a0a53657373696f6e203720e2809420323032362d30392d323020e280942075756964206e6f6e6520282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a0a23232053554d4d4152592e6d64206c696e657320602d2d636f6d6d6974602077696c6c2072656d6f76650a0a2d2073746174757320626c6f636b71756f746520616674657220746865207469746c6520286c696e652031293a203120603e60206c696e65730a2d206023232043757272656e7420537461746560207468726f75676820746865206e6578742060232320602068656164696e673a2030206c696e65730a2d20746f74616c206c696e65732072656d6f7665642028626c6f636b71756f7465202b20737572726f756e64696e6720626c616e6b73202b2073656374696f6e293a20330a2d2068656164696e6773206b657074206279746520666f7220627974653a206041626f7574600a0a44726166742076616c69646174657320616761696e7374205374617465536368656d612e0a",
+    "package.json": "7b226e616d65223a22666978747572652d70726f6a656374222c2276657273696f6e223a22312e302e30227d",
+  }
+
+ ❯ tests/pipelines/state-import-r3.test.ts:103:24
+    101|     const before = tree(root);
+    102|     expect(() => runCommit(root, TODAY)).toThrow(/already exists/);
+    103|     expect(tree(root)).toEqual(before);
+       |                        ^
+    104|   });
+    105| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+ FAIL  tests/pipelines/state-import-r3.test.ts > R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > the same with --accept-stale on a stale project: refused, and the snapshot is byte-identical afterwards
+AssertionError: expected { '.agents/archive/': '', …(8) } to deeply equal { …(10) }
+
+- Expected
++ Received
+
+@@ -2,11 +2,10 @@
+    ".agents/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+    ".agents/SESSIONS/next-session.md": "23204e6578742053657373696f6e2048616e646f666620e2809420666f7220746865206e65787420736561740a0a3e205570646174656420617420656e64206f662053657373696f6e20362e0a0a2323205069636b20757020686572650a0a4361727279206f6e2e0a",
+    ".agents/SYSTEM/SUMMARY.md": "232053756d6d6172790a0a3e207374617475730a0a23232041626f75740a0a4b6570742e0a",
+    ".agents/TASKS/INBOX.md": "2320496e626f7820e28094207072696f7269746965730a0a3e202a2a4c61737420557064617465643a2a2a2053657373696f6e20360a0a232320503020e2809420437269746963616c0a0a2d205b205d202a2a41207461736b2a2a20e2809420646f2069740a",
+    ".agents/TASKS/task.md": "232043757272656e7420466f63757320e280942074686973207765656b0a0a3e202a2a466f6375733a2a2a2053657373696f6e20360a0a23232043757272656e74204f626a6563746976650a0a5368697020746865207468696e672e0a",
+-   ".agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+-   ".agents/archive/pre-state-migration-2026-09-25/from-an-earlier-run.md": "6b656570206d650a",
++   ".agents/archive/": "",
+    ".agents/state.draft.json": "7b0a202022736368656d615f76657273696f6e223a20322c0a2020227265766973696f6e223a20302c0a20202270726f6a656374223a207b0a20202020226e616d65223a2022666978747572652d70726f6a656374220a20207d2c0a2020226f626a656374697665223a207b0a202020202274657874223a20225368697020746865207468696e672e222c0a202020202273696e63655f73657373696f6e223a20370a20207d2c0a2020227461736b73223a205b0a202020207b0a202020202020226964223a2022542d303031222c0a202020202020227469746c65223a202241207461736b222c0a202020202020227072696f72697479223a20225030222c0a20202020202022737461747573223a20226f70656e222c0a202020202020226f70656e65645f73657373696f6e223a20372c0a20202020202022636c6f7365645f73657373696f6e223a206e756c6c2c0a2020202020202273757065727365646573223a206e756c6c2c0a202020202020226e6f7465223a2022646f206974220a202020207d0a20205d2c0a2020227665726966696564223a205b5d2c0a20202267617073223a205b5d2c0a2020226465636973696f6e73223a205b5d2c0a20202268616e646f666673223a205b0a202020207b0a2020202020202273656174223a2022646576656c6f706572222c0a202020202020227069636b5f7570223a20224361727279206f6e2e222c0a2020202020202277617463685f6f7574223a205b5d2c0a202020202020226f70656e5f7175657374696f6e73223a205b5d2c0a2020202020202273657373696f6e223a20372c0a202020202020226c6f6f705f7374617465223a206e756c6c0a202020207d0a20205d2c0a2020226c6173745f73657373696f6e223a207b0a20202020226e223a20372c0a202020202264617465223a2022323032362d30392d3230222c0a202020202275756964223a206e756c6c2c0a202020202273656174223a206e756c6c0a20207d0a7d0a",
+    ".agents/state.import-report.md": "232073746174652e6a736f6e20696d706f7274207265706f727420e280942064726166742028323032362d30392d3235290a0a2323205374616c656e65737320e28094207265616420746869732066697273740a0a5369676e616c3a207468652068696768657374206053657373696f6e204e6020616e20696e707574206e616d657320696e206974732073746174757320626c6f636b71756f7465202874686520603e60206c696e6573206469726563746c7920756e64657220697473207469746c6529206f7220696e20612068656164696e672c20636f6d70617265642077697468207468652068696768657374206053455353494f4e532f53657373696f6e5f4e2e6d64602e0a4c61746573742073657373696f6e3a2053657373696f6e20372028602e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d6460292e0a0a2d202a2a5354414c452a2a20602e6167656e74732f5441534b532f494e424f582e6d64603a206c696e652033206465636c617265732053657373696f6e20362028603e202a2a4c61737420557064617465643a2a2a2053657373696f6e203660293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d202a2a5354414c452a2a20602e6167656e74732f5441534b532f7461736b2e6d64603a206c696e652033206465636c617265732053657373696f6e20362028603e202a2a466f6375733a2a2a2053657373696f6e203660293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d202a2a5354414c452a2a20602e6167656e74732f53455353494f4e532f6e6578742d73657373696f6e2e6d64603a206c696e652033206465636c617265732053657373696f6e20362028603e205570646174656420617420656e64206f662053657373696f6e20362e60293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d206e6f74206a756467656420602e6167656e74732f53595354454d2f53554d4d4152592e6d64603a206e6f7420696d706f727465642061732073746174653a202d2d636f6d6d6974206f6e6c792063757473206974732073746174757320626c6f636b71756f746520616e64206023232043757272656e74205374617465600a2d206e6f74206a756467656420602e6167656e74732f53595354454d2f4445434953494f4e532e6d64603a20616273656e743a206e6f7468696e6720697320696d706f727465642066726f6d2069740a0a2a2a602d2d636f6d6d6974602072656675736573207768696c6520616e20696e7075742061626f7665206973205354414c452e2a2a2055706461746520697420616e642072652d72756e20602d2d6472616674602c206f72207061737320602d2d6163636570742d7374616c656020746f20696d706f7274206974206173206974207374616e64732e0a0a50726f6a6563743a20666978747572652d70726f6a6563742076312e302e3020c2b72063757272656e742073657373696f6e2037202866726f6d202e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d642920c2b720726574656e74696f6e20656467653a20646f6e65206974656d7320636c6f73656420e289a42073657373696f6e2034206172652064726f70706564206f6e20746865206669727374206f625f73746174652077726974650a0a232320536f75726365730a0a2d20696e626f783a20602e6167656e74732f5441534b532f494e424f582e6d646020e280942038206c696e65730a2d207461736b3a20602e6167656e74732f5441534b532f7461736b2e6d646020e280942038206c696e65730a2d206e6578743a20602e6167656e74732f53455353494f4e532f6e6578742d73657373696f6e2e6d646020e280942038206c696e65730a2d2073756d6d6172793a20602e6167656e74732f53595354454d2f53554d4d4152592e6d646020e280942038206c696e65730a2d206465636973696f6e733a20602e6167656e74732f53595354454d2f4445434953494f4e532e6d646020e2809420414253454e540a0a2323205461736b732028494e424f582e6d64290a0a4974656d73207061727365643a203120286f66207768696368203020756e6465722060232320436f6d706c65746564602c20696d706f72746564206173205033292e0a0a426f7820636f756e7473206173207772697474656e20286265666f72652074686520605b737570657273656465645d602072756c65293a0a0a2d206f70656e3a20310a2d20696e5f70726f67726573733a20300a2d20626c6f636b65643a20300a2d20646f6e653a20300a0a496d706f7274656420737461747573206279207072696f72697479202861667465722074686520605b737570657273656465645d602072756c6520e280942073757065727365646564206974656d732061726520646f6e65293a0a0a7c207072696f72697479207c206f70656e207c20696e5f70726f6772657373207c20626c6f636b6564207c20646f6e65207c20746f74616c207c0a7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c0a7c205030207c2031207c2030207c2030207c2030207c2031207c0a7c205031207c2030207c2030207c2030207c2030207c2030207c0a7c205032207c2030207c2030207c2030207c2030207c2030207c0a7c205033207c2030207c2030207c2030207c2030207c2030207c0a7c202a2a616c6c2a2a207c2031207c2030207c2030207c2030207c2031207c0a0a53657373696f6e733a2030206974656d7320686164206120602853657373696f6e204e2960206d61726b657220286f70656e6564203d206d696e2c20636c6f736564203d206d617820666f7220646f6e65293b2031206f70656e206974656d7320686164206e6f6e6520e28692206f70656e65645f73657373696f6e203d20373b203020646f6e65206974656d7320686164206e6f6e6520e2869220636c6f7365645f73657373696f6e203d20342e0a526574656e74696f6e2d656c696769626c65206f6e207468652066697273742077726974653a203020646f6e65206974656d73202874686579207374617920696e2074686520736e617073686f7420616e6420696e20676974292e0a0a2323232053757065727365646564206c696e6b73202830290a0a5f4e6f6e652e5f0a0a232323205469746c652066616c6c6261636b7320e28094206e6f20626f6c64206c6561642c2066697273742073656e74656e63652075736564202830290a0a5f4e6f6e652e5f0a0a23232320436f756c64206e6f7420626520706172736564206173206974656d73202831290a0a2d206c696e6520333a206e6f7420616e206974656d2c2068656164696e67206f7220626c616e6b206c696e6520e280942069676e6f72656420286b65707420696e2074686520736e617073686f742920e2809420603e202a2a4c61737420557064617465643a2a2a2053657373696f6e2036600a0a2323204f626a65637469766520287461736b2e6d64290a0a466f756e643a205368697020746865207468696e672e0a0a2323204465636973696f6e7320284445434953494f4e532e6d64290a0a496d706f72746564203020414452733a2030207769746820612066756c6c2060446174653a60206c696e652c203020776974682061207061727469616c206461746520286b65707420696e20746865206e6f7465292c20302077697468206e6f6e65202864617465203d206d6967726174696f6e20646174652c206e6f74652022696d706f727465643b206f726967696e616c206461746520756e6b6e6f776e22292e0a0a23232048616e646f666620286e6578742d73657373696f6e2e6d64290a0a7069636b5f75703a2031206c696e657320c2b72077617463685f6f75743a20302062756c6c65747320c2b7206f70656e5f7175657374696f6e733a20302062756c6c6574730a0a232320566572696669656420616e6420676170730a0a76657269666965645b5d3a203020c2b720676170735b5d3a20302e205468652070726f73652066696c6573206361727279206e6f6e6520696e206120666f726d2074686520696d706f727465722072656164732c20616e6420697420696e76656e7473206e6f6e652e205265636f7264207468656d2077697468206f625f73746174652061667465722074686520636f6d6d69742e0a0a2323204c6173742073657373696f6e0a0a53657373696f6e203720e2809420323032362d30392d323020e280942075756964206e6f6e6520282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a0a23232053554d4d4152592e6d64206c696e657320602d2d636f6d6d6974602077696c6c2072656d6f76650a0a2d2073746174757320626c6f636b71756f746520616674657220746865207469746c6520286c696e652031293a203120603e60206c696e65730a2d206023232043757272656e7420537461746560207468726f75676820746865206e6578742060232320602068656164696e673a2030206c696e65730a2d20746f74616c206c696e65732072656d6f7665642028626c6f636b71756f7465202b20737572726f756e64696e6720626c616e6b73202b2073656374696f6e293a20330a2d2068656164696e6773206b657074206279746520666f7220627974653a206041626f7574600a0a44726166742076616c69646174657320616761696e7374205374617465536368656d612e0a",
+    "package.json": "7b226e616d65223a22666978747572652d70726f6a656374222c2276657273696f6e223a22312e302e30227d",
+  }
+
+ ❯ tests/pipelines/state-import-r3.test.ts:112:24
+    110|     const before = tree(root);
+    111|     expect(() => runCommit(root, TODAY, { acceptStale: true })).toThro…
+    112|     expect(tree(root)).toEqual(before);
+       |                        ^
+    113|   });
+    114| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+
+ FAIL  tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+ FAIL  tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+ FAIL  tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+AssertionError: expected { …(3) } to deeply equal { …(3) }
+
+- Expected
++ Received
+
+  {
+-   ".agents/SESSIONS/next-session.md": "stale",
+-   ".agents/TASKS/INBOX.md": "stale",
+-   ".agents/TASKS/task.md": "stale",
++   ".agents/SESSIONS/next-session.md": "could_not_tell",
++   ".agents/TASKS/INBOX.md": "could_not_tell",
++   ".agents/TASKS/task.md": "could_not_tell",
+  }
+
+ ❯ tests/pipelines/state-import-r3.test.ts:153:92
+    151|       writeProject(root, 6, enc);
+    152|       const report = runDraft(root, TODAY).draft.report as { staleness…
+    153|       expect(Object.fromEntries(report.staleness.inputs.map((i) => [i.…
+       |                                                                                            ^
+    154|       for (const i of report.staleness.inputs) expect(i.evidence).toMa…
+    155|       const before = tree(root);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+
+ FAIL  tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > the text is decoded as Windows-1252, not as UTF-8 with replacement characters
+AssertionError: expected [ [ 'A task', '\ufffd do it' ] ] to deeply equal [ [ 'A task', 'do it' ] ]
+
+- Expected
++ Received
+
+  [
+    [
+      "A task",
+-     "do it",
++     "� do it",
+    ],
+  ]
+
+ ❯ tests/pipelines/state-import-r3.test.ts:166:57
+    164|     const r = runDraft(root, TODAY).draft;
+    165|     // "**A task** — do it": the title and note split only on a real e…
+    166|     expect(r.state.tasks.map((t) => [t.title, t.note])).toEqual([["A t…
+       |                                                         ^
+    167|     expect(JSON.stringify(r.state)).not.toContain("�");
+    168|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+
+ FAIL  tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > UTF-16 with no BOM is still 'could not tell' (NUL bytes), whether or not it is also invalid UTF-8
+AssertionError: expected 'not valid UTF-8, and no UTF-16 byte-o…' to match /NUL/
+
+- Expected: 
+/NUL/
+
++ Received: 
+"not valid UTF-8, and no UTF-16 byte-order mark: its encoding is unknown, so its words cannot be read"
+
+ ❯ tests/pipelines/state-import-r3.test.ts:178:26
+    176|       const i = report.staleness.inputs.find((x) => x.input === k)!;
+    177|       expect(i.verdict).toBe("could_not_tell");
+    178|       expect(i.evidence).toMatch(/NUL/);
+       |                          ^
+    179|     }
+    180|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+
+ FAIL  tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+ FAIL  tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > QA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+AssertionError: expected [Function] to throw an error
+
+- Expected: 
+null
+
++ Received: 
+undefined
+
+ ❯ tests/pipelines/state-import-r3.test.ts:223:21
+    221|       // 2–4. Every re-run refuses, names the snapshot, and changes no…
+    222|       for (const run of [() => runDraft(root, TODAY), () => runCommit(…
+    223|         expect(run).toThrow(/half-restored/);
+       |                     ^
+    224|         expect(run).toThrow(new RegExp(`pre-state-migration-${TODAY}/`…
+    225|         expect(tree(root)).toEqual(damaged);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+
+ FAIL  tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > the marker exists before --commit's first write to the live tree, so a process that dies there leaves a project that refuses
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/pipelines/state-import-r3.test.ts:252:21
+    250|     inject.onWrite = null;
+    251|     expect(seen.length).toBeGreaterThan(0);
+    252|     expect(seen[0]).toBe(true);
+       |                     ^
+    253|     // ...and a completed commit leaves none behind.
+    254|     expect(realFs.readdirSync(join(root, ".agents/archive")).filter((n…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+
+ FAIL  tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > a marker left by a process that died mid-migrate (no rollback ran): --draft and --commit refuse, naming the snapshot and the marker
+AssertionError: expected [Function] to throw an error
+
+- Expected: 
+null
+
++ Received: 
+undefined
+
+ ❯ tests/pipelines/state-import-r3.test.ts:264:19
+    262|     const before = tree(root);
+    263|     for (const run of [() => runDraft(root, TODAY), () => runCommit(ro…
+    264|       expect(run).toThrow(/half-restored/);
+       |                   ^
+    265|       expect(run).toThrow(new RegExp(`${SNAP}/.*${SNAP}\\.import-incom…
+    266|       expect(tree(root)).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  11 failed | 48 passed (59)
+   Start at  19:56:14
+   Duration  13.37s (transform 448ms, setup 183ms, collect 1.68s, tests 19.64s, environment 2ms, prepare 1.20s)
+

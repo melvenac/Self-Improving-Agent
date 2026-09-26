@@ -1,0 +1,272 @@
+
+ RUN  v3.2.4 C:/qa-scratch/qa111/r1/open-brain
+
+ ❯ tests/pipelines/state-import-fixes.test.ts (9 tests | 9 failed) 2159ms
+   × T-175: an import carries none of SIA's own history (IF-1) > verified[] and gaps[] are empty, the draft parses, and the report says 0 for both 57ms
+     → expected [ { id: 'V-001', …(4) }, …(4) ] to deeply equal []
+   × T-175: an import carries none of SIA's own history (IF-1) > the CLI's draft line says verified 0 · gaps 0 709ms
+     → expected '\nstate import — draft (nothing else …' to contain 'verified 0 · gaps 0'
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > --draft names next-session.md as stale, with evidence, in the report's first section 19ms
+     → expected undefined to be defined
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > --commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it 52ms
+     → expected [Function] to throw an error
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale 1276ms
+     → expected +0 to be 1 // Object.is equality
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-3: a project whose inputs are current, the known negative > no input is stale, every judged input is current, and --commit proceeds without the acknowledgement 11ms
+     → expected undefined to be defined
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > an input with no session marker is 'could not tell', named in the report's first section 11ms
+     → expected undefined to be defined
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > with no Session_N.md to compare against, every present input is 'could not tell' 11ms
+     → expected undefined to be defined
+   × T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > inputs that are not imported as current state are listed as not judged, with a reason 12ms
+     → expected undefined to be defined
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/pipelines/state-import-fixes.test.ts > T-175: an import carries none of SIA's own history (IF-1) > verified[] and gaps[] are empty, the draft parses, and the report says 0 for both
+AssertionError: expected [ { id: 'V-001', …(4) }, …(4) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "claim": "ob_start is the single startup implementation and returns state, drift, session and sizes",
++     "evidence": [
++       {
++         "observation": "handleStart shape pinned",
++         "path": "open-brain/tests/server.test.ts",
++         "type": "test",
++       },
++       {
++         "observation": "accepted Loop 1",
++         "path": "v0.28.0",
++         "type": "tag",
++       },
++     ],
++     "id": "V-001",
++     "since_session": 54,
++     "status": "verified",
++   },
++   {
++     "claim": "state.json read side: strict schema, three-way reader, ob_start render, state-schema sync check",
++     "evidence": [
++       {
++         "observation": "strict schema + fixture round trip",
++         "path": "open-brain/tests/shared/state-schema.test.ts",
++         "type": "test",
++       },
++       {
++         "observation": "accepted Loop 2",
++         "path": "v0.29.0",
++         "type": "tag",
++       },
++     ],
++     "id": "V-002",
++     "since_session": 54,
++     "status": "verified",
++   },
++   {
++     "claim": "state writer: revision check, atomic batch, retention, four views, ob_state",
++     "evidence": [
++       {
++         "observation": "refusals, atomicity, retention, views",
++         "path": "open-brain/tests/shared/state-writer.test.ts",
++         "type": "test",
++       },
++       {
++         "observation": "accepted Loop 3",
++         "path": "v0.30.0",
++         "type": "tag",
++       },
++     ],
++     "id": "V-003",
++     "since_session": 54,
++     "status": "verified",
++   },
++   {
++     "claim": "/sync resolves the project root or refuses; identical from root and open-brain/",
++     "evidence": [
++       {
++         "observation": "root from subdirectory; refusal names the cwd",
++         "path": "open-brain/tests/pipelines/sync/repo-root.test.ts",
++         "type": "test",
++       },
++       {
++         "observation": "accepted Loop 3 (R4)",
++         "path": "v0.30.0",
++         "type": "tag",
++       },
++     ],
++     "id": "V-004",
++     "since_session": 54,
++     "status": "verified",
++   },
++   {
++     "claim": "relocate existence check is case-insensitive; CI green on ubuntu",
++     "evidence": [
++       {
++         "observation": "projectDirExists resolves the canonical path case-insensitively; CI run 34890412313 green on master 86ea010",
++         "path": "open-brain/src/relocate.ts",
++         "type": "test",
++       },
++       {
++         "observation": "hotfix merged via PR #4",
++         "path": "v0.29.1",
++         "type": "tag",
++       },
++     ],
++     "id": "V-005",
++     "since_session": 54,
++     "status": "verified",
++   },
++ ]
+
+ ❯ tests/pipelines/state-import-fixes.test.ts:81:34
+     79|     expect(parsed.ok).toBe(true);
+     80|     if (!parsed.ok) return;
+     81|     expect(parsed.data.verified).toEqual([]);
+       |                                  ^
+     82|     expect(parsed.data.gaps).toEqual([]);
+     83|     const report = readFileSync(join(root, REPORT_REL), "utf-8");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/pipelines/state-import-fixes.test.ts > T-175: an import carries none of SIA's own history (IF-1) > the CLI's draft line says verified 0 · gaps 0
+AssertionError: expected '\nstate import — draft (nothing else …' to contain 'verified 0 · gaps 0'
+
+- Expected
++ Received
+
+- verified 0 · gaps 0
++
++ state import — draft (nothing else changed)
++
++ Root: C:\qa-tmp\ob-import-fix-83gyg0
++ Draft:  .agents/state.draft.json
++ Report: .agents/state.import-report.md
++ Validates: yes
++ Current session: 54 (.agents/SESSIONS/Session_54.md)
++ Tasks: 143 (open 42, in_progress 3, blocked 0, done 98); superseded links 14; unparsed lines 2
++ Decisions: 4 (1 skipped) · verified 5 · gaps 6 · objective found
++ Handoff: pick_up 2 lines, watch_out 9, open_questions 2
++ SUMMARY.md: --commit will remove 181 lines (74 blockquote + 105 Current State)
++
++ Review the report, then run: open-brain state import --commit
++
+
+ ❯ tests/pipelines/state-import-fixes.test.ts:92:22
+     90|     const r = cli(["state", "import", "--draft", root], root);
+     91|     expect(r.status).toBe(0);
+     92|     expect(r.stdout).toContain("verified 0 · gaps 0");
+       |                      ^
+     93|   }, 30_000);
+     94| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/pipelines/state-import-fixes.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > --draft names next-session.md as stale, with evidence, in the report's first section
+AssertionError: expected undefined to be defined
+ ❯ tests/pipelines/state-import-fixes.test.ts:106:18
+    104|       const r = runDraft(root, TODAY);
+    105|       const st = staleness(r.draft.report);
+    106|       expect(st).toBeDefined();
+       |                  ^
+    107|       const next = st!.inputs.find((i) => i.input === ".agents/SESSION…
+    108|       expect(next).toMatchObject({ verdict: "stale", declared_session:…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  tests/pipelines/state-import-fixes.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > --commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it
+AssertionError: expected [Function] to throw an error
+
+- Expected: 
+null
+
++ Received: 
+undefined
+
+ ❯ tests/pipelines/state-import-fixes.test.ts:120:44
+    118|     it("--commit refuses without the acknowledgement, writing nothing …
+    119|       runDraft(root, TODAY);
+    120|       expect(() => runCommit(root, TODAY)).toThrow(/next-session\.md/);
+       |                                            ^
+    121|       expect(existsSync(join(root, STATE_REL))).toBe(false);
+    122|       expect(existsSync(join(root, ".agents/archive"))).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  tests/pipelines/state-import-fixes.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/pipelines/state-import-fixes.test.ts:131:27
+    129| 
+    130|       const bare = cli(["state", "import", "--commit", root], root);
+    131|       expect(bare.status).toBe(1);
+       |                           ^
+    132|       expect(bare.stderr).toContain("next-session.md");
+    133|       expect(bare.stderr).toContain("--accept-stale");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  tests/pipelines/state-import-fixes.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-3: a project whose inputs are current, the known negative > no input is stale, every judged input is current, and --commit proceeds without the acknowledgement
+AssertionError: expected undefined to be defined
+ ❯ tests/pipelines/state-import-fixes.test.ts:156:18
+    154|       const r = runDraft(root, TODAY);
+    155|       const st = staleness(r.draft.report);
+    156|       expect(st).toBeDefined();
+       |                  ^
+    157|       expect(st!.inputs.map((i) => [i.input, i.verdict]).sort()).toEqu…
+    158|         [".agents/SESSIONS/next-session.md", "current"],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  tests/pipelines/state-import-fixes.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > an input with no session marker is 'could not tell', named in the report's first section
+AssertionError: expected undefined to be defined
+ ❯ tests/pipelines/state-import-fixes.test.ts:175:18
+    173|       const r = runDraft(root, TODAY);
+    174|       const st = staleness(r.draft.report);
+    175|       expect(st).toBeDefined();
+       |                  ^
+    176|       const inbox = st!.inputs.find((i) => i.input === ".agents/TASKS/…
+    177|       expect(inbox).toMatchObject({ verdict: "could_not_tell", declare…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  tests/pipelines/state-import-fixes.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > with no Session_N.md to compare against, every present input is 'could not tell'
+AssertionError: expected undefined to be defined
+ ❯ tests/pipelines/state-import-fixes.test.ts:189:18
+    187|       const r = runDraft(root, TODAY);
+    188|       const st = staleness(r.draft.report);
+    189|       expect(st).toBeDefined();
+       |                  ^
+    190|       expect(st!.inputs).toHaveLength(3);
+    191|       for (const i of st!.inputs) expect(i.verdict).toBe("could_not_te…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  tests/pipelines/state-import-fixes.test.ts > T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > inputs that are not imported as current state are listed as not judged, with a reason
+AssertionError: expected undefined to be defined
+ ❯ tests/pipelines/state-import-fixes.test.ts:198:18
+    196|       writeFileSync(join(root, ".agents/SYSTEM/DECISIONS.md"), "# Deci…
+    197|       const st = staleness(runDraft(root, TODAY).draft.report);
+    198|       expect(st).toBeDefined();
+       |                  ^
+    199|       expect(st!.not_judged.map((n) => n.input)).toContain(".agents/SY…
+    200|       for (const n of st!.not_judged) expect(n.reason).not.toBe("");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed (9)
+   Start at  20:13:48
+   Duration  2.94s (transform 196ms, setup 42ms, collect 305ms, tests 2.16s, environment 0ms, prepare 151ms)
+

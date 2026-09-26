@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..846631b 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -866,7 +866,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+     // 3. SUMMARY.md surgery (the removed text is in the snapshot).
+     let summary: CommitResult["summary"] = null;
+     if (summaryRead) {
+-      const plan = planSummaryRemoval(summaryRead.text);
++      const plan = planSummaryRemoval(readFileSync(summaryPath, "utf-8"));
+       writeFileSync(summaryPath, summaryBytes(plan.text));
+       summary = plan.report;
+     }

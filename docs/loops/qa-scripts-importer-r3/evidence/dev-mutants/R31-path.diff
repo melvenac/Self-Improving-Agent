@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..42cb936 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -854,7 +854,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+     // .agents/ outside archive/ is untouched. Only what this run created goes:
+     // the snapshot's "already exists" refusal is thrown in here, and that
+     // snapshot is the operator's, not this run's (QA 106, D6).
+-    if (made.created) rmSync(made.created, { recursive: true, force: true });
++    rmSync(snapshotDir, { recursive: true, force: true });
+     if (aside) renameSync(aside, snapshotDir);
+     throw err;
+   }

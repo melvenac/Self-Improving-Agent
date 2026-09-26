@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..0819054 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -823,7 +823,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+   const onDisk = readInputs(root);
+   const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable, onDisk.readAs);
+   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
+-  if (stale.length > 0 && opts.acceptStale !== true) {
++  if (false && stale.length > 0 && opts.acceptStale !== true) {
+     const list = stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ");
+     throw new Error(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${list}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
+   }

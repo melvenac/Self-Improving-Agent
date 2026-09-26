@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..bb265bb 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -842,7 +842,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+   const archive = join(agents, "archive");
+   const snapshotDir = join(archive, `${SNAPSHOT_PREFIX}${today}`);
+   // --force-snapshot replaces an earlier snapshot; keep it aside until the import completes.
+-  const aside = opts.forceSnapshot === true && existsSync(snapshotDir) ? `${snapshotDir}.replaced-${process.pid}` : null;
++  const aside = false && opts.forceSnapshot === true && existsSync(snapshotDir) ? `${snapshotDir}.replaced-${process.pid}` : null;
+   if (aside) renameSync(snapshotDir, aside);
+   let snapshot: SnapshotResult;
+   const made: { created: string | null } = { created: null };

@@ -1,0 +1,7 @@
+utc: 2026-09-26T01:13:59Z
+cpu load %: 0
+claude.exe      pid 12388  ppid 5624   "C:\Users\Aaron Melven\.local\bin\claude.exe" -p "You are the QA seat, record session 111, for SIA importer fixes round 3. Read docs/loops/importer-fixes-r3-dis
+MsMpEng.exe     pid 3352   ppid 844    
+powershell.exe  pid 3008   ppid 7836   C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:/qa-scratch/qa111/scripts/procs.ps1
+powershell.exe  pid 3884   ppid 5652   powershell  -NoProfile -Command [Console]::OutputEncoding=[Text.Encoding]::UTF8; Get-Content -Path C:\Users\AARONM~1\sia-qa99\run-0.jsonl -Encoding UTF8 -Wait
+powershell.exe  pid 5624   ppid 5492   powershell -NoProfile -ExecutionPolicy Bypass -File C:/Users/AARONM~1/Worktrees/sia-qa/docs/loops/qa-111/drive.ps1

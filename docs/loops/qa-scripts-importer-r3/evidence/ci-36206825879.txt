@@ -1,0 +1,786 @@
+test	Set up job	﻿2026-09-26T00:59:11.8211100Z Current runner version: '2.337.0'
+test	Set up job	2026-09-26T00:59:11.8222945Z Runner name: 'tcm-1'
+test	Set up job	2026-09-26T00:59:11.8224078Z Runner group name: 'Default'
+test	Set up job	2026-09-26T00:59:11.8225515Z Machine name: 'tcm'
+test	Set up job	2026-09-26T00:59:11.8229806Z ##[group]GITHUB_TOKEN Permissions
+test	Set up job	2026-09-26T00:59:11.8233954Z Contents: read
+test	Set up job	2026-09-26T00:59:11.8234909Z Metadata: read
+test	Set up job	2026-09-26T00:59:11.8235728Z Packages: read
+test	Set up job	2026-09-26T00:59:11.8236479Z ##[endgroup]
+test	Set up job	2026-09-26T00:59:11.8240332Z Secret source: Actions
+test	Set up job	2026-09-26T00:59:11.8241835Z Cache mode: write
+test	Set up job	2026-09-26T00:59:11.8243272Z Prepare workflow directory
+test	Set up job	2026-09-26T00:59:11.9053212Z Prepare all required actions
+test	Set up job	2026-09-26T00:59:11.9149087Z Getting action download info
+test	Set up job	2026-09-26T00:59:12.4735202Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+test	Set up job	2026-09-26T00:59:13.5610399Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+test	Set up job	2026-09-26T00:59:15.3412907Z Complete job name: test
+test	Egress isolation self-check (tcm)	﻿2026-09-26T00:59:15.4880672Z ##[group]Run fail=0
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4896572Z fail=0
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4897404Z for t in 127.0.0.1/3210 172.20.0.2/3210 172.20.0.2/3211 172.20.0.3/4000 127.0.0.1/4000 \
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4898349Z          192.168.1.50/4000 100.124.212.87/4000 127.0.0.1/80 127.0.0.1/81; do
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4899197Z   if timeout 5 bash -c "exec 3<>/dev/tcp/$t" 2>/dev/null; then
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4899991Z     echo "::error::reachable from the runner: $t"; fail=1
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4900662Z   else
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4901252Z     echo "blocked: $t"
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4901737Z   fi
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4902153Z done
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4903060Z if ls /opt/doorctl >/dev/null 2>&1; then echo "::error::/opt/doorctl is readable"; fail=1; else echo "denied: /opt/doorctl"; fi
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4904072Z exit "$fail"
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4943066Z shell: /usr/bin/bash -e {0}
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:15.4944815Z ##[endgroup]
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:16.5566106Z blocked: 127.0.0.1/3210
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:17.5772255Z blocked: 172.20.0.2/3210
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:18.6036052Z blocked: 172.20.0.2/3211
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:19.6251250Z blocked: 172.20.0.3/4000
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:20.6480867Z blocked: 127.0.0.1/4000
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:21.6723399Z blocked: 192.168.1.50/4000
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:22.6961811Z blocked: 100.124.212.87/4000
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:23.7220334Z blocked: 127.0.0.1/80
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:24.7451246Z blocked: 127.0.0.1/81
+test	Egress isolation self-check (tcm)	2026-09-26T00:59:24.7457272Z denied: /opt/doorctl
+test	Run actions/checkout@v4	﻿2026-09-26T00:59:24.7824845Z ##[group]Run actions/checkout@v4
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7825394Z with:
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7825773Z   repository: melvenac/Self-Improving-Agent
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7829589Z   token: ***
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7829992Z   ssh-strict: true
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7830318Z   ssh-user: git
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7830781Z   persist-credentials: true
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7831179Z   clean: true
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7831515Z   sparse-checkout-cone-mode: true
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7831998Z   fetch-depth: 1
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7832339Z   fetch-tags: false
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7832682Z   show-progress: true
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7833037Z   lfs: false
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7833359Z   submodules: false
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7833724Z   set-safe-directory: true
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7834134Z   allow-unsafe-pr-checkout: false
+test	Run actions/checkout@v4	2026-09-26T00:59:24.7834599Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9574520Z Syncing repository: melvenac/Self-Improving-Agent
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9577907Z ##[group]Getting Git version info
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9578810Z Working directory is '/srv/gh-runner/runner-1/_work/Self-Improving-Agent/Self-Improving-Agent'
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9580088Z [command]/usr/bin/git version
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9580537Z git version 2.43.0
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9582611Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9593189Z Temporarily overriding HOME='/srv/gh-runner/runner-1/_work/_temp/556ea8aa-623b-40a8-9f87-15aef49361d4' before making global git config changes
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9594503Z Adding repository directory to the temporary git global config as a safe directory
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9596177Z [command]/usr/bin/git config --global --add safe.directory /srv/gh-runner/runner-1/_work/Self-Improving-Agent/Self-Improving-Agent
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9618480Z [command]/usr/bin/git config --local --get remote.origin.url
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9666329Z https://github.com/melvenac/Self-Improving-Agent
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9690996Z ##[group]Removing previously created refs, to avoid conflicts
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9700093Z [command]/usr/bin/git rev-parse --symbolic-full-name --verify --quiet HEAD
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9748641Z refs/heads/qa/importer-fixes-r3-ci
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9766352Z [command]/usr/bin/git checkout --detach
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9878663Z HEAD is now at 063662b test(state-import): a completed rollback removes the marker itself, with archive/ present (R3-3)
+test	Run actions/checkout@v4	2026-09-26T00:59:24.9954702Z [command]/usr/bin/git branch --delete --force qa/importer-fixes-r3-ci
+test	Run actions/checkout@v4	2026-09-26T00:59:25.0002507Z Deleted branch qa/importer-fixes-r3-ci (was 063662b).
+test	Run actions/checkout@v4	2026-09-26T00:59:25.0107525Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T00:59:25.0108405Z [command]/usr/bin/git submodule status
+test	Run actions/checkout@v4	2026-09-26T00:59:25.0399875Z ##[group]Cleaning the repository
+test	Run actions/checkout@v4	2026-09-26T00:59:25.0423858Z [command]/usr/bin/git clean -ffdx
+test	Run actions/checkout@v4	2026-09-26T00:59:25.2312148Z Removing open-brain/node_modules/
+test	Run actions/checkout@v4	2026-09-26T00:59:25.2328020Z [command]/usr/bin/git reset --hard HEAD
+test	Run actions/checkout@v4	2026-09-26T00:59:25.2423770Z HEAD is now at 063662b test(state-import): a completed rollback removes the marker itself, with archive/ present (R3-3)
+test	Run actions/checkout@v4	2026-09-26T00:59:25.2437375Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T00:59:25.2438379Z ##[group]Disabling automatic garbage collection
+test	Run actions/checkout@v4	2026-09-26T00:59:25.2442608Z [command]/usr/bin/git config --local gc.auto 0
+test	Run actions/checkout@v4	2026-09-26T00:59:25.2485040Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T00:59:25.2485991Z ##[group]Setting up auth
+test	Run actions/checkout@v4	2026-09-26T00:59:25.2508133Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Run actions/checkout@v4	2026-09-26T00:59:25.2564578Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Run actions/checkout@v4	2026-09-26T00:59:25.3055610Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Run actions/checkout@v4	2026-09-26T00:59:25.3139654Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Run actions/checkout@v4	2026-09-26T00:59:25.3739595Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Run actions/checkout@v4	2026-09-26T00:59:25.3820101Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Run actions/checkout@v4	2026-09-26T00:59:25.4192662Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test	Run actions/checkout@v4	2026-09-26T00:59:25.4235443Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T00:59:25.4236616Z ##[group]Fetching the repository
+test	Run actions/checkout@v4	2026-09-26T00:59:25.4249595Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +27e4a1dc435ebd0c38c1710ca7e4d2d956d9fd1a:refs/remotes/origin/qa/importer-fixes-r3-redcheck
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2244911Z From https://github.com/melvenac/Self-Improving-Agent
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2284160Z  * [new ref]         27e4a1dc435ebd0c38c1710ca7e4d2d956d9fd1a -> origin/qa/importer-fixes-r3-redcheck
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2318234Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2346506Z ##[group]Determining the checkout info
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2375917Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2386275Z [command]/usr/bin/git sparse-checkout disable
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2388576Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2448890Z ##[group]Checking out the ref
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2450538Z [command]/usr/bin/git checkout --progress --force -B qa/importer-fixes-r3-redcheck refs/remotes/origin/qa/importer-fixes-r3-redcheck
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2542620Z Previous HEAD position was 063662b test(state-import): a completed rollback removes the marker itself, with archive/ present (R3-3)
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2549635Z Switched to a new branch 'qa/importer-fixes-r3-redcheck'
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2551645Z branch 'qa/importer-fixes-r3-redcheck' set up to track 'origin/qa/importer-fixes-r3-redcheck'.
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2564802Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2624668Z [command]/usr/bin/git log -1 --format=%H
+test	Run actions/checkout@v4	2026-09-26T00:59:26.2671708Z 27e4a1dc435ebd0c38c1710ca7e4d2d956d9fd1a
+test	Run actions/setup-node@v4	﻿2026-09-26T00:59:26.3220431Z ##[group]Run actions/setup-node@v4
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.3221070Z with:
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.3221381Z   node-version: 22
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.3221705Z   cache: npm
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.3222113Z   cache-dependency-path: open-brain/package-lock.json
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.3222629Z   always-auth: false
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.3223006Z   check-latest: false
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.3226586Z   token: ***
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.3226997Z ##[endgroup]
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.5411864Z (node:2731488) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.5422211Z (Use `node --trace-deprecation ...` to show where the warning was created)
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.5424320Z Found in cache @ /srv/gh-runner/runner-1/_work/_tool/node/22.23.3/x64
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.5425377Z ##[group]Environment details
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.7241341Z node: v22.23.3
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.7251962Z npm: 10.9.9
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.7261779Z yarn: 
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.7263060Z ##[endgroup]
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.7284792Z [command]/srv/gh-runner/runner-1/_work/_tool/node/22.23.3/x64/bin/npm config get cache
+test	Run actions/setup-node@v4	2026-09-26T00:59:26.9032651Z /srv/gh-runner/.npm
+test	Run actions/setup-node@v4	2026-09-26T00:59:27.3087601Z Cache hit for: node-cache-Linux-x64-npm-7dbad0ca8d59e7cb4229954eab604ea7b79c8a3ba5ab17b646d4446abe1b57db
+test	Run actions/setup-node@v4	2026-09-26T00:59:27.3202754Z (node:2731488) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+test	Run actions/setup-node@v4	2026-09-26T00:59:28.8110950Z Received 0 of 26710427 (0.0%), 0.0 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:29.8110447Z Received 0 of 26710427 (0.0%), 0.0 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:30.8104828Z Received 0 of 26710427 (0.0%), 0.0 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:31.8108564Z Received 0 of 26710427 (0.0%), 0.0 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:32.8111987Z Received 0 of 26710427 (0.0%), 0.0 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:33.8122392Z Received 0 of 26710427 (0.0%), 0.0 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:34.8115121Z Received 1544603 of 26710427 (5.8%), 0.2 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:35.8118885Z Received 1544603 of 26710427 (5.8%), 0.2 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:36.8123668Z Received 5738907 of 26710427 (21.5%), 0.6 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:37.8129937Z Received 22516123 of 26710427 (84.3%), 2.1 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:38.8133595Z Received 22516123 of 26710427 (84.3%), 2.0 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:39.8131142Z Received 22516123 of 26710427 (84.3%), 1.8 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:39.8854013Z Received 26710427 of 26710427 (100.0%), 2.1 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T00:59:39.8858548Z Cache Size: ~25 MB (26710427 B)
+test	Run actions/setup-node@v4	2026-09-26T00:59:39.8881937Z [command]/usr/bin/tar -xf /srv/gh-runner/runner-1/_work/_temp/a4e1f0de-587d-47ae-8e62-b2ff181d48c6/cache.tzst -P -C /srv/gh-runner/runner-1/_work/Self-Improving-Agent/Self-Improving-Agent --use-compress-program unzstd
+test	Run actions/setup-node@v4	2026-09-26T00:59:39.9840793Z Cache restored successfully
+test	Run actions/setup-node@v4	2026-09-26T00:59:39.9886190Z Cache restored from key: node-cache-Linux-x64-npm-7dbad0ca8d59e7cb4229954eab604ea7b79c8a3ba5ab17b646d4446abe1b57db
+test	Install	﻿2026-09-26T00:59:40.0092071Z ##[group]Run npm ci
+test	Install	2026-09-26T00:59:40.0092366Z npm ci
+test	Install	2026-09-26T00:59:40.0110884Z shell: /usr/bin/bash -e {0}
+test	Install	2026-09-26T00:59:40.0111185Z ##[endgroup]
+test	Install	2026-09-26T00:59:41.0665441Z npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+test	Install	2026-09-26T00:59:42.2598338Z 
+test	Install	2026-09-26T00:59:42.2599518Z added 183 packages, and audited 184 packages in 2s
+test	Install	2026-09-26T00:59:42.2600435Z 
+test	Install	2026-09-26T00:59:42.2600680Z 54 packages are looking for funding
+test	Install	2026-09-26T00:59:42.2601206Z   run `npm fund` for details
+test	Install	2026-09-26T00:59:42.2970238Z 
+test	Install	2026-09-26T00:59:42.2980526Z 13 vulnerabilities (2 low, 4 moderate, 6 high, 1 critical)
+test	Install	2026-09-26T00:59:42.2981759Z 
+test	Install	2026-09-26T00:59:42.2982302Z To address all issues, run:
+test	Install	2026-09-26T00:59:42.2982912Z   npm audit fix
+test	Install	2026-09-26T00:59:42.2983286Z 
+test	Install	2026-09-26T00:59:42.2983737Z Run `npm audit` for details.
+test	Typecheck	﻿2026-09-26T00:59:42.3259463Z ##[group]Run npx tsc --noEmit
+test	Typecheck	2026-09-26T00:59:42.3259885Z npx tsc --noEmit
+test	Typecheck	2026-09-26T00:59:42.3275167Z shell: /usr/bin/bash -e {0}
+test	Typecheck	2026-09-26T00:59:42.3275440Z ##[endgroup]
+test	Test	﻿2026-09-26T00:59:46.1950022Z ##[group]Run npm test
+test	Test	2026-09-26T00:59:46.1950605Z npm test
+test	Test	2026-09-26T00:59:46.1971599Z shell: /usr/bin/bash -e {0}
+test	Test	2026-09-26T00:59:46.1971898Z ##[endgroup]
+test	Test	2026-09-26T00:59:46.3000769Z 
+test	Test	2026-09-26T00:59:46.3001581Z > open-brain@0.1.0 test
+test	Test	2026-09-26T00:59:46.3002048Z > vitest run
+test	Test	2026-09-26T00:59:46.3002277Z 
+test	Test	2026-09-26T00:59:46.6046553Z 
+test	Test	2026-09-26T00:59:46.6048421Z  RUN  v3.2.4 /srv/gh-runner/runner-1/_work/Self-Improving-Agent/Self-Improving-Agent/open-brain
+test	Test	2026-09-26T00:59:46.6049311Z 
+test	Test	2026-09-26T00:59:47.6986666Z  ✓ tests/shared/state-writer.test.ts (36 tests) 415ms
+test	Test	2026-09-26T00:59:47.9062765Z  ✓ tests/pipelines/sync/checks.test.ts (102 tests) 510ms
+test	Test	2026-09-26T00:59:48.0878279Z  ✓ tests/server.test.ts (25 tests) 369ms
+test	Test	2026-09-26T00:59:49.7350172Z  ✓ tests/harness/policies.test.ts (25 tests) 1215ms
+test	Test	2026-09-26T00:59:49.7364408Z    ✓ gate policies > A6 — a threshold change in the file changes the decision > proceeds with the shipped threshold and is rejected by a stricter one  447ms
+test	Test	2026-09-26T00:59:49.7366692Z    ✓ gate policies > A6 — a threshold change in the file changes the decision > records the thresholds it applied in the gate artifact  348ms
+test	Test	2026-09-26T00:59:49.7369124Z    ✓ gate policies > F5 — addresses_top_failures has no referent when there are no prior failures > the done gate is REACHABLE live with stub roles and the shipped policy  347ms
+test	Test	2026-09-26T00:59:50.2867940Z  ✓ tests/pipelines/state-import.test.ts (9 tests) 145ms
+test	Test	2026-09-26T00:59:51.9754854Z  ✓ tests/harness/refwatch-stage.test.ts (19 tests) 3654ms
+test	Test	2026-09-26T00:59:51.9757023Z    ✓ G-041 A2 — a role that writes a ref fails the loop > (i) refuses `git tag -f loop-001-developer loop-001-base` and restores the tag  372ms
+test	Test	2026-09-26T00:59:51.9759089Z    ✓ G-041 A2 — a role that writes a ref fails the loop > lets a clean loop through and still writes its own three tags  338ms
+test	Test	2026-09-26T00:59:51.9761174Z    ✓ G-041 A2 — a role that writes a ref fails the loop > leaves the checked-out branch to the commit boundary, and says so  326ms
+test	Test	2026-09-26T00:59:51.9763155Z    ✓ G-041 A2 — a role that writes a ref fails the loop > reports the ref verdict on every stage, with its own limits stated  366ms
+test	Test	2026-09-26T00:59:52.5853338Z  ❯ tests/pipelines/state-import-r3.test.ts (15 tests | 11 failed) 158ms
+test	Test	2026-09-26T00:59:52.5856603Z    × R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > a same-day snapshot plus a plain --commit: refused, and the snapshot is byte-identical afterwards 35ms
+test	Test	2026-09-26T00:59:52.5859066Z      → expected { …(9) } to deeply equal { …(10) }
+test	Test	2026-09-26T00:59:52.5861310Z    × R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > the same with --accept-stale on a stale project: refused, and the snapshot is byte-identical afterwards 8ms
+test	Test	2026-09-26T00:59:52.5863074Z      → expected { …(9) } to deeply equal { …(10) }
+test	Test	2026-09-26T00:59:52.5865300Z    ✓ R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > a snapshot that fails part-way when archive/ already existed: only the partial snapshot goes, and archive/'s other contents stay (N13) 9ms
+test	Test	2026-09-26T00:59:52.5868821Z    ✓ R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > --force-snapshot with a snapshot that fails part-way: the aside comes back byte for byte, and only the new partial snapshot goes 8ms
+test	Test	2026-09-26T00:59:52.5888441Z    × R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits 6ms
+test	Test	2026-09-26T00:59:52.5890524Z      → expected { …(3) } to deeply equal { …(3) }
+test	Test	2026-09-26T00:59:52.5893012Z    × R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits 5ms
+test	Test	2026-09-26T00:59:52.5894935Z      → expected { …(3) } to deeply equal { …(3) }
+test	Test	2026-09-26T00:59:52.5897400Z    × R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits 5ms
+test	Test	2026-09-26T00:59:52.5899401Z      → expected { …(3) } to deeply equal { …(3) }
+test	Test	2026-09-26T00:59:52.5901571Z    × R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > the text is decoded as Windows-1252, not as UTF-8 with replacement characters 6ms
+test	Test	2026-09-26T00:59:52.5903383Z      → expected [ [ 'A task', '\ufffd do it' ] ] to deeply equal [ [ 'A task', 'do it' ] ]
+test	Test	2026-09-26T00:59:52.5905540Z    × R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > UTF-16 with no BOM is still 'could not tell' (NUL bytes), whether or not it is also invalid UTF-8 5ms
+test	Test	2026-09-26T00:59:52.5907352Z      → expected 'not valid UTF-8, and no UTF-16 byte-o…' to match /NUL/
+test	Test	2026-09-26T00:59:52.5909350Z    ✓ R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > a Windows-1252 SUMMARY.md still refuses --commit: a guessed encoding is not written back 5ms
+test	Test	2026-09-26T00:59:52.5912921Z    × R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step 21ms
+test	Test	2026-09-26T00:59:52.5929100Z      → expected [Function] to throw error matching /half-restored/ but got '.agents/state.json already exists — t…'
+test	Test	2026-09-26T00:59:52.5933042Z    × R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > QA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step 13ms
+test	Test	2026-09-26T00:59:52.5936324Z      → expected [Function] to throw an error
+test	Test	2026-09-26T00:59:52.5938678Z    × R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > the marker exists before --commit's first write to the live tree, so a process that dies there leaves a project that refuses 9ms
+test	Test	2026-09-26T00:59:52.5952149Z      → expected false to be true // Object.is equality
+test	Test	2026-09-26T00:59:52.5955478Z    × R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > a marker left by a process that died mid-migrate (no rollback ran): --draft and --commit refuse, naming the snapshot and the marker 5ms
+test	Test	2026-09-26T00:59:52.5958733Z      → expected [Function] to throw an error
+test	Test	2026-09-26T00:59:52.5964981Z    ✓ R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > a completed rollback leaves no marker, and a re-run completes 15ms
+test	Test	2026-09-26T00:59:52.9416231Z  ✓ tests/active-session.test.ts (48 tests) 33ms
+test	Test	2026-09-26T00:59:53.3188417Z stdout | tests/trigger/query.test.ts > A1(a) — precision: the conjunction excludes partial matches, and 299 ranks first > and it wins a SMALL field, which is what this fixture demonstrates
+test	Test	2026-09-26T00:59:53.3216307Z A1(a) match set (2 of 11 documents): pipe-to-tail-masks-exit-code, exit-code-from-variable
+test	Test	2026-09-26T00:59:53.3217438Z 
+test	Test	2026-09-26T00:59:53.3301394Z stdout | tests/trigger/query.test.ts > A1(b) — the field: ten real competitors, rank reported and not asserted > 299 is IN the match set — and its rank is reported, never asserted (R26)
+test	Test	2026-09-26T00:59:53.3306021Z A1(b) entry 299 ranks 4 of 11 against ten same-topic competitors (top: migration-exit-code). RANK REPORTED, NOT ASSERTED — R26 / amendment 10. bm25 length normalisation is the cause; the live 599-entry store ranks 299 first only because five entries there match all three terms, which is a thin field rather than discrimination.
+test	Test	2026-09-26T00:59:53.3308732Z 
+test	Test	2026-09-26T00:59:53.3433562Z  ✓ tests/trigger/query.test.ts (5 tests) 41ms
+test	Test	2026-09-26T01:00:00.2952907Z  ✓ tests/pipelines/state-import-r2.test.ts (17 tests) 9626ms
+test	Test	2026-09-26T01:00:00.3001897Z    ✓ R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing  1027ms
+test	Test	2026-09-26T01:00:00.3005344Z    ✓ R2-3 (IF-11): an import completes, or it changes nothing > PROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist  1078ms
+test	Test	2026-09-26T01:00:00.3007953Z    ✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > a single-dash token that is not a known flag refuses, before or after the directory  2165ms
+test	Test	2026-09-26T01:00:00.3069318Z    ✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > PROBE-12: a bare word before the directory is a second positional and refuses; the cwd's project is not committed  1588ms
+test	Test	2026-09-26T01:00:00.3073771Z    ✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > PROBE-5b: a positional that names no existing directory refuses instead of walking up from the cwd  1017ms
+test	Test	2026-09-26T01:00:00.3076971Z    ✓ R2-5 (IF-13): every protection has a test that fails without it > M6: a misspelled acknowledgement on a CURRENT project is refused by the flag check itself  1042ms
+test	Test	2026-09-26T01:00:00.3079703Z    ✓ R2-5 (IF-13): every protection has a test that fails without it > M13: --accept-stale with --draft refuses and writes no draft  530ms
+test	Test	2026-09-26T01:00:00.3082690Z    ✓ R2-5 (IF-13): every protection has a test that fails without it > M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output  1109ms
+test	Test	2026-09-26T01:00:00.6236439Z  ✓ tests/harness/gate-live.test.ts (16 tests) 30ms
+test	Test	2026-09-26T01:00:00.7389774Z  ✓ tests/harness/runtime.test.ts (44 tests) 12481ms
+test	Test	2026-09-26T01:00:00.7404342Z    ✓ harness runtime > A1 — end to end > completes, exits 0, and writes D_t.md, A_t.gitref and E_t.json  365ms
+test	Test	2026-09-26T01:00:00.7409859Z    ✓ harness runtime > A1 — end to end > records in A_t.gitref the sha QA was actually frozen at  313ms
+test	Test	2026-09-26T01:00:00.7412390Z    ✓ harness runtime > A1 — end to end > writes an E_t whose candidate_git matches the developer commit, not HEAD  319ms
+test	Test	2026-09-26T01:00:00.7414521Z    ✓ harness runtime > A1 — end to end > fills runtime_checks from exit codes rather than from the role  323ms
+test	Test	2026-09-26T01:00:00.7416505Z    ✓ harness runtime > A1 — end to end > leaves the tree clean when it is done  332ms
+test	Test	2026-09-26T01:00:00.7418548Z    ✓ harness runtime > A2 — schema retry and the cap > retries an invalid D_t and completes when a later attempt validates  382ms
+test	Test	2026-09-26T01:00:00.7420938Z    ✓ harness runtime > A2 — schema retry and the cap > hands the failing role the problems that rejected it, not a bare re-roll  380ms
+test	Test	2026-09-26T01:00:00.7423356Z    ✓ harness runtime > A2 — schema retry and the cap > gives the role its own JSON Schema on the retry  378ms
+test	Test	2026-09-26T01:00:00.7426110Z    ✓ harness runtime > A2 — schema retry and the cap > retries the QA role on an invalid E_t and caps there too  382ms
+test	Test	2026-09-26T01:00:00.7428175Z    ✓ harness runtime > A4 — the write allowlist refuses > honours a widened developer allowlist when one is given deliberately  395ms
+test	Test	2026-09-26T01:00:00.7431648Z    ✓ harness runtime > A4 — the write allowlist refuses > refuses a QA write outside its allowlist — QA may never touch the candidate  383ms
+test	Test	2026-09-26T01:00:00.7433982Z    ✓ harness runtime > A3/A4 — a role that COMMITS is refused > QA that overwrites and commits the candidate is refused — the loop does not complete  400ms
+test	Test	2026-09-26T01:00:00.7436352Z    ✓ harness runtime > A3/A4 — a role that COMMITS is refused > QA that commits is rolled back to the candidate, so the tree still matches the frozen sha  387ms
+test	Test	2026-09-26T01:00:00.7438606Z    ✓ harness runtime > A3/A4 — a role that COMMITS is refused > asserts the candidate is the evidence commit's parent on a clean run  401ms
+test	Test	2026-09-26T01:00:00.7440610Z    ✓ harness runtime > A5 — versioning and rollback > creates loop-001-developer and loop-001-qa  383ms
+test	Test	2026-09-26T01:00:00.7443018Z    ✓ harness runtime > A5 — versioning and rollback > restores the pre-loop state with git alone  381ms
+test	Test	2026-09-26T01:00:00.7445012Z    ✓ harness runtime > A5 — versioning and rollback > refuses to run a loop id whose tags already exist, rather than moving them  390ms
+test	Test	2026-09-26T01:00:00.7447114Z    ✓ harness runtime > A5 — versioning and rollback > commits the candidate separately from the evidence  382ms
+test	Test	2026-09-26T01:00:00.7449380Z    ✓ harness runtime > A3 — the frozen candidate > hands QA the candidate sha and the time it was frozen  379ms
+test	Test	2026-09-26T01:00:00.7451381Z    ✓ harness runtime > A3 — the frozen candidate > refuses to run QA when a check left the working tree dirty  317ms
+test	Test	2026-09-26T01:00:00.7453510Z    ✓ harness runtime > deterministic checks in the loop > completes the loop with a red build and reports it rather than hiding it  371ms
+test	Test	2026-09-26T01:00:00.7455764Z    ✓ harness runtime > deterministic checks in the loop > refuses a QA report whose runtime_checks contradict the measurement  334ms
+test	Test	2026-09-26T01:00:00.7458007Z    ✓ harness runtime > gates > skips the gates by default and records that no decision was taken  358ms
+test	Test	2026-09-26T01:00:00.7485940Z    ✓ harness runtime > gates > builds a payload for the two gates this slice owns  367ms
+test	Test	2026-09-26T01:00:00.7488070Z    ✓ harness runtime > gates > says in the log that the QA scoring gate was NOT consulted  398ms
+test	Test	2026-09-26T01:00:00.7489984Z    ✓ harness runtime > gates > prints every gate payload in dry-run mode and still sends nothing  364ms
+test	Test	2026-09-26T01:00:01.0188271Z  ✓ tests/pipelines/session-end/index-v2.test.ts (9 tests) 62ms
+test	Test	2026-09-26T01:00:01.3051825Z  ✓ tests/pipelines/sync/checks-state.test.ts (14 tests) 127ms
+test	Test	2026-09-26T01:00:01.7950137Z  ✓ tests/trigger/floor.test.ts (12 tests) 111ms
+test	Test	2026-09-26T01:00:02.2033009Z  ✓ tests/shadow-evaluate.test.ts (27 tests) 64ms
+test	Test	2026-09-26T01:00:03.2019913Z  ✓ tests/pipelines/session-start/tree-currency.test.ts (13 tests) 1822ms
+test	Test	2026-09-26T01:00:03.6842591Z  ✓ tests/db-v2.test.ts (15 tests) 122ms
+test	Test	2026-09-26T01:00:04.1183440Z  ✓ tests/trigger/fires.test.ts (14 tests) 62ms
+test	Test	2026-09-26T01:00:04.8729753Z  ✓ tests/trigger/hook.test.ts (12 tests) 11135ms
+test	Test	2026-09-26T01:00:04.8734729Z    ✓ A5 — what the hook emits > POSITIVE, at scale, through the shipped floor: additionalContext carries 299 and its ACTION  910ms
+test	Test	2026-09-26T01:00:04.8737029Z    ✓ A5 — what the hook emits > the POLICY FILE is what let 299 through — raise the floor and the same call goes silent  1812ms
+test	Test	2026-09-26T01:00:04.8739547Z    ✓ A5 — what the hook emits > NEGATIVE: git status --porcelain emits nothing at all — no key, no stdout, no stderr  916ms
+test	Test	2026-09-26T01:00:04.8745803Z    ✓ A5 — what the hook emits > NEGATIVE: ls -la emits nothing at all — no key, no stdout, no stderr  934ms
+test	Test	2026-09-26T01:00:04.8773598Z    ✓ A5 — what the hook emits > NEGATIVE: zzqx --flurb wibble emits nothing at all — no key, no stdout, no stderr  921ms
+test	Test	2026-09-26T01:00:04.8775625Z    ✓ A5 — what the hook emits > ignores a tool that is not Bash, and says nothing about it  903ms
+test	Test	2026-09-26T01:00:04.8777347Z    ✓ A6 — three failures, and the model hears none of them > store path absent  954ms
+test	Test	2026-09-26T01:00:04.8779171Z    ✓ A6 — three failures, and the model hears none of them > store locked by another writer  917ms
+test	Test	2026-09-26T01:00:04.8781877Z    ✓ A6 — three failures, and the model hears none of them > past its own deadline: the work finished, and the result is still not emitted  908ms
+test	Test	2026-09-26T01:00:04.8784219Z    ✓ A6 — three failures, and the model hears none of them > a malformed payload is logged and dropped, NOT refused with a non-zero exit  928ms
+test	Test	2026-09-26T01:00:04.8793215Z    ✓ A6 — three failures, and the model hears none of them > POSITIVE CONTROL: the same harness on a healthy store DOES emit  917ms
+test	Test	2026-09-26T01:00:05.9132591Z  ✓ tests/harness/checks.test.ts (24 tests) 1398ms
+test	Test	2026-09-26T01:00:05.9149221Z    ✓ runCheck > records a timeout as a failure rather than letting it hang the loop  403ms
+test	Test	2026-09-26T01:00:06.0918503Z  ✓ tests/pipelines/session-start/role-files.test.ts (13 tests) 953ms
+test	Test	2026-09-26T01:00:06.3485578Z  ✓ tests/pipelines/state-views.test.ts (13 tests) 22ms
+test	Test	2026-09-26T01:00:07.4141849Z  ✓ tests/pipelines/sync/staleness.test.ts (17 tests) 880ms
+test	Test	2026-09-26T01:00:07.4216836Z  ✓ tests/harness/workspace.test.ts (31 tests) 762ms
+test	Test	2026-09-26T01:00:07.7672446Z  ✓ tests/vault-writer.test.ts (21 tests) 25ms
+test	Test	2026-09-26T01:00:10.1069650Z  ✓ tests/cli-bootstrap.test.ts (13 tests) 7625ms
+test	Test	2026-09-26T01:00:10.1072820Z    ✓ cli-bootstrap SESSION_UUID contract > emits SESSION_UUID exactly once when the payload carries session_id  549ms
+test	Test	2026-09-26T01:00:10.1075262Z    ✓ cli-bootstrap SESSION_UUID contract > emits the id from the payload verbatim, not a filesystem guess  547ms
+test	Test	2026-09-26T01:00:10.1077201Z    ✓ cli-bootstrap SESSION_UUID contract > accepts payload fields other than Claude Code's session_id  554ms
+test	Test	2026-09-26T01:00:10.1079098Z    ✓ cli-bootstrap SESSION_UUID contract > generates a UUID when the IDE supplies none  580ms
+test	Test	2026-09-26T01:00:10.1080891Z    ✓ cli-bootstrap SESSION_UUID contract > generates a DIFFERENT uuid each run, never a reused one  1017ms
+test	Test	2026-09-26T01:00:10.1082664Z    ✓ cli-bootstrap SESSION_UUID contract > stays silent in a subagent context (anti-loop)  536ms
+test	Test	2026-09-26T01:00:10.1084402Z    ✓ cli-bootstrap SESSION_UUID contract > REFUSES malformed stdin rather than continuing without the payload  546ms
+test	Test	2026-09-26T01:00:10.1086538Z    ✓ cli-bootstrap SESSION_UUID contract > a well-formed payload with NO session id writes nothing to the slot  522ms
+test	Test	2026-09-26T01:00:10.1089312Z    ✓ cli-bootstrap SESSION_UUID contract > a payload WITH a session id still writes the slot — the guard is not a ban  563ms
+test	Test	2026-09-26T01:00:10.1091593Z    ✓ cli-bootstrap SESSION_UUID contract > still refuses to guess an id from the filesystem  566ms
+test	Test	2026-09-26T01:00:10.1093612Z    ✓ cli-bootstrap SESSION_UUID contract > F4: a MALFORMED payload refuses, writes nothing, and exits non-zero  536ms
+test	Test	2026-09-26T01:00:10.1095764Z    ✓ cli-bootstrap SESSION_UUID contract > F4: an ABSENT payload is still supported — absent and malformed are different  553ms
+test	Test	2026-09-26T01:00:10.1098226Z    ✓ cli-bootstrap SESSION_UUID contract > F4: a WELL-FORMED payload still registers the id it was given  552ms
+test	Test	2026-09-26T01:00:10.8845264Z  ✓ tests/harness/gate-artifacts.test.ts (7 tests) 2688ms
+test	Test	2026-09-26T01:00:10.8851083Z    ✓ gate artifacts > A5 — dry run > writes G_plan.json and G_done.json with sent: false  408ms
+test	Test	2026-09-26T01:00:10.8853035Z    ✓ gate artifacts > A5 — dry run > records the exact payload that WOULD have gone on the wire  376ms
+test	Test	2026-09-26T01:00:10.8860417Z    ✓ gate artifacts > A5 — dry run > carries the deterministic checks' EXIT CODES as data in the done-gate payload  385ms
+test	Test	2026-09-26T01:00:10.8874273Z    ✓ gate artifacts > A5 — dry run > contains no question about whether the tests passed — structurally, then by scan  362ms
+test	Test	2026-09-26T01:00:10.8889865Z    ✓ gate artifacts > A5 — dry run > prints the payload in a dry run and sends nothing  380ms
+test	Test	2026-09-26T01:00:10.8893011Z    ✓ gate artifacts > A3 — the key reaches no artifact and no log line > greps the whole iteration directory and the captured log after a live run  379ms
+test	Test	2026-09-26T01:00:10.8895418Z    ✓ gate artifacts > records a skipped gate as not consulted rather than omitting the file  390ms
+test	Test	2026-09-26T01:00:11.2446246Z  ✓ tests/pipelines/state-import-staleness.test.ts (8 tests) 3389ms
+test	Test	2026-09-26T01:00:11.2453426Z    ✓ T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale  2192ms
+test	Test	2026-09-26T01:00:11.2457179Z    ✓ T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > --commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report  1128ms
+test	Test	2026-09-26T01:00:11.3575893Z  ✓ tests/topics.test.ts (18 tests) 98ms
+test	Test	2026-09-26T01:00:11.6341019Z  ✓ tests/harness/git.test.ts (29 tests) 1229ms
+test	Test	2026-09-26T01:00:12.0443394Z  ✓ tests/harness/schema.test.ts (21 tests) 29ms
+test	Test	2026-09-26T01:00:12.3698333Z  ✓ tests/pipelines/session-start/handoff-provenance.test.ts (9 tests) 625ms
+test	Test	2026-09-26T01:00:12.4349338Z  ✓ tests/trigger/no-network.test.ts (3 tests) 23ms
+test	Test	2026-09-26T01:00:12.7743128Z  ✓ tests/shared/paths.test.ts (14 tests | 1 skipped) 51ms
+test	Test	2026-09-26T01:00:12.7891247Z  ✓ tests/pipelines/detach.test.ts (14 tests) 1241ms
+test	Test	2026-09-26T01:00:12.8413071Z  ✓ tests/trigger/negatives.test.ts (11 tests) 144ms
+test	Test	2026-09-26T01:00:13.1506976Z  ✓ tests/pipelines/session-end/recalled-ids.test.ts (17 tests) 44ms
+test	Test	2026-09-26T01:00:13.3497618Z  ✓ tests/pipelines/state-migrate.test.ts (11 tests) 36ms
+test	Test	2026-09-26T01:00:13.5519354Z  ✓ tests/ranking.test.ts (11 tests) 42ms
+test	Test	2026-09-26T01:00:13.9897232Z  ✓ tests/pipelines/session-start/state-reader.test.ts (13 tests) 52ms
+test	Test	2026-09-26T01:00:14.5501118Z  ✓ tests/pipelines/state-import-atomic.test.ts (8 tests) 129ms
+test	Test	2026-09-26T01:00:14.9443557Z  ✓ tests/rating-method.test.ts (8 tests) 54ms
+test	Test	2026-09-26T01:00:15.2953786Z  ✓ tests/index-upsert.test.ts (10 tests) 42ms
+test	Test	2026-09-26T01:00:15.3222464Z  ✓ tests/harness/refwatch.test.ts (8 tests) 1574ms
+test	Test	2026-09-26T01:00:15.3224182Z    ✓ G-041 A1 — runLoop refuses a role it did not construct > runs the same foreign roles when the ref-watch is active  417ms
+test	Test	2026-09-26T01:00:15.3226266Z    ✓ G-041 A1 — runLoop refuses a role it did not construct > has the ref-watch on by default, so omitting the flag permits foreign roles  361ms
+test	Test	2026-09-26T01:00:15.3228380Z    ✓ G-041 A1 — runLoop refuses a role it did not construct > still accepts the stubs themselves after the subclass rule  307ms
+test	Test	2026-09-26T01:00:15.3230396Z    ✓ G-041 A1 — runLoop refuses a role it did not construct > still runs runtime-constructed roles with the watch explicitly off  319ms
+test	Test	2026-09-26T01:00:15.6952191Z  ✓ tests/shadow-stage.test.ts (14 tests) 47ms
+test	Test	2026-09-26T01:00:15.7809381Z  ✓ tests/pipelines/sync/module-boundary.test.ts (12 tests) 37ms
+test	Test	2026-09-26T01:00:16.1303481Z  ✓ tests/relocate.test.ts (8 tests) 87ms
+test	Test	2026-09-26T01:00:16.2446053Z  ✓ tests/pipelines/sync/mirror-parity.test.ts (13 tests) 28ms
+test	Test	2026-09-26T01:00:16.5468561Z  ✓ tests/shared/state-schema.test.ts (10 tests) 42ms
+test	Test	2026-09-26T01:00:16.6958131Z  ✓ tests/pipelines/session-start/session-log.test.ts (9 tests) 34ms
+test	Test	2026-09-26T01:00:17.0390657Z  ✓ tests/harness/gate.test.ts (10 tests) 12ms
+test	Test	2026-09-26T01:00:17.5426570Z  ✓ tests/pipelines/sync/repo-root.test.ts (7 tests) 580ms
+test	Test	2026-09-26T01:00:17.5434506Z    ✓ resolveRepoRoot > the sync CLI refuses non-zero with one line naming the cwd (V6)  533ms
+test	Test	2026-09-26T01:00:17.8909704Z  ✓ tests/shadow-strategies.test.ts (9 tests) 31ms
+test	Test	2026-09-26T01:00:17.9996527Z  ✓ tests/pipelines/session-start/derived-artifacts.test.ts (9 tests) 565ms
+test	Test	2026-09-26T01:00:18.2082091Z  ✓ tests/pipelines/sync/pipeline-health.test.ts (12 tests) 13ms
+test	Test	2026-09-26T01:00:18.4230124Z  ✓ tests/pipelines/session-start/state-render.test.ts (7 tests) 8ms
+test	Test	2026-09-26T01:00:18.5117951Z  ✓ tests/pipelines/sync/scorer.test.ts (11 tests) 8ms
+test	Test	2026-09-26T01:00:18.7796199Z  ✓ tests/pipelines/store/index.test.ts (3 tests) 27ms
+test	Test	2026-09-26T01:00:18.8167361Z  ✓ tests/content-guard.test.ts (11 tests) 8ms
+test	Test	2026-09-26T01:00:19.1692924Z  ✓ tests/shared/skill-index.test.ts (10 tests) 12ms
+test	Test	2026-09-26T01:00:19.2410476Z  ✓ tests/pipelines/sync/command-parity.test.ts (9 tests) 24ms
+test	Test	2026-09-26T01:00:19.5000954Z  ✓ tests/session-provenance.test.ts (9 tests) 29ms
+test	Test	2026-09-26T01:00:19.8857562Z  ✓ tests/recall-broadening.test.ts (8 tests) 24ms
+test	Test	2026-09-26T01:00:20.1899332Z  ✓ tests/pipelines/template-seed.test.ts (3 tests) 42ms
+test	Test	2026-09-26T01:00:20.2129840Z  ✓ tests/vault-archive.test.ts (6 tests) 15ms
+test	Test	2026-09-26T01:00:20.4869230Z  ✓ tests/pipelines/session-start/agent-identity.test.ts (6 tests) 15ms
+test	Test	2026-09-26T01:00:20.5228488Z  ✓ tests/pipelines/sync/history.test.ts (7 tests) 12ms
+test	Test	2026-09-26T01:00:20.8100318Z  ✓ tests/pipelines/sync/scorer-integration.test.ts (5 tests) 21ms
+test	Test	2026-09-26T01:00:20.9868378Z  ✓ tests/pipelines/session-start/index.test.ts (8 tests) 42ms
+test	Test	2026-09-26T01:00:21.2172902Z  ✓ tests/pipelines/sync/hook-registration.test.ts (7 tests) 11ms
+test	Test	2026-09-26T01:00:21.5143145Z  ✓ tests/pipelines/session-start/session-discovery.test.ts (6 tests) 11ms
+test	Test	2026-09-26T01:00:21.9781915Z  ✓ tests/pipelines/state-import-seeds.test.ts (2 tests) 603ms
+test	Test	2026-09-26T01:00:21.9792531Z    ✓ T-175: an import carries none of SIA's own history (IF-1) > the CLI's draft line says verified 0 · gaps 0  574ms
+test	Test	2026-09-26T01:00:22.0142722Z  ✓ tests/pipelines/sync/index.test.ts (4 tests) 64ms
+test	Test	2026-09-26T01:00:22.2672777Z  ✓ tests/pipelines/session-start/drift-detector.test.ts (4 tests) 6ms
+test	Test	2026-09-26T01:00:24.1544803Z  ✓ tests/harness/cli.test.ts (17 tests) 10970ms
+test	Test	2026-09-26T01:00:24.1546599Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > prints usage and exits non-zero with no subcommand  573ms
+test	Test	2026-09-26T01:00:24.1548848Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > exits 0 for an explicit help request  521ms
+test	Test	2026-09-26T01:00:24.1550822Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses an unknown subcommand  534ms
+test	Test	2026-09-26T01:00:24.1552783Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses an unrecognised flag instead of selecting the default action  537ms
+test	Test	2026-09-26T01:00:24.1554661Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses a flag whose value is missing  586ms
+test	Test	2026-09-26T01:00:24.1556702Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > requires --loop  620ms
+test	Test	2026-09-26T01:00:24.1558270Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses a malformed loop id  570ms
+test	Test	2026-09-26T01:00:24.1559937Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses a non-numeric --max-attempts  555ms
+test	Test	2026-09-26T01:00:24.1561742Z    ✓ harness CLI > A1 — a full loop from the command line > exits 0 and writes the three artifacts  962ms
+test	Test	2026-09-26T01:00:24.1563620Z    ✓ harness CLI > A1 — a full loop from the command line > writes a plan artifact that validates against the plan schema  988ms
+test	Test	2026-09-26T01:00:24.1565380Z    ✓ harness CLI > A1 — a full loop from the command line > tags the loop with zero-padded three-digit numbers  905ms
+test	Test	2026-09-26T01:00:24.1567201Z    ✓ harness CLI > A1 — a full loop from the command line > exits non-zero when a deterministic check is red, and says so  996ms
+test	Test	2026-09-26T01:00:24.1568966Z    ✓ harness CLI > A1 — a full loop from the command line > emits a machine-readable result with --json  868ms
+test	Test	2026-09-26T01:00:24.1570630Z    ✓ harness CLI > A1 — a full loop from the command line > fails with a recorded reason on a dirty tree  376ms
+test	Test	2026-09-26T01:00:24.1572590Z    ✓ harness CLI > A6 — dry run from the command line > prints the gate payloads and completes  636ms
+test	Test	2026-09-26T01:00:24.1576037Z    ✓ harness CLI > schemas > prints both derived schemas  372ms
+test	Test	2026-09-26T01:00:24.1577653Z    ✓ harness CLI > schemas > refuses an unknown flag  365ms
+test	Test	2026-09-26T01:00:24.1700571Z 
+test	Test	2026-09-26T01:00:24.1702641Z ⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+test	Test	2026-09-26T01:00:24.1703373Z 
+test	Test	2026-09-26T01:00:24.1714917Z  FAIL  tests/pipelines/state-import-r3.test.ts > R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > a same-day snapshot plus a plain --commit: refused, and the snapshot is byte-identical afterwards
+test	Test	2026-09-26T01:00:24.1741818Z AssertionError: expected { …(9) } to deeply equal { …(10) }
+test	Test	2026-09-26T01:00:24.1742807Z 
+test	Test	2026-09-26T01:00:24.1743460Z - Expected
+test	Test	2026-09-26T01:00:24.1744362Z + Received
+test	Test	2026-09-26T01:00:24.1744923Z 
+test	Test	2026-09-26T01:00:24.1745508Z @@ -2,11 +2,10 @@
+test	Test	2026-09-26T01:00:24.1747318Z     ".agents/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+test	Test	2026-09-26T01:00:24.1751766Z     ".agents/SESSIONS/next-session.md": "23204e6578742053657373696f6e2048616e646f666620e2809420666f7220746865206e65787420736561740a0a3e205570646174656420617420656e64206f662053657373696f6e20372e0a0a2323205069636b20757020686572650a0a4361727279206f6e2e0a",
+test	Test	2026-09-26T01:00:24.1756057Z     ".agents/SYSTEM/SUMMARY.md": "232053756d6d6172790a0a3e207374617475730a0a23232041626f75740a0a4b6570742e0a",
+test	Test	2026-09-26T01:00:24.1760402Z     ".agents/TASKS/INBOX.md": "2320496e626f7820e28094207072696f7269746965730a0a3e202a2a4c61737420557064617465643a2a2a2053657373696f6e20370a0a232320503020e2809420437269746963616c0a0a2d205b205d202a2a41207461736b2a2a20e2809420646f2069740a",
+test	Test	2026-09-26T01:00:24.1765987Z     ".agents/TASKS/task.md": "232043757272656e7420466f63757320e280942074686973207765656b0a0a3e202a2a466f6375733a2a2a2053657373696f6e20370a0a23232043757272656e74204f626a6563746976650a0a5368697020746865207468696e672e0a",
+test	Test	2026-09-26T01:00:24.1771139Z -   ".agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+test	Test	2026-09-26T01:00:24.1773930Z -   ".agents/archive/pre-state-migration-2026-09-25/from-an-earlier-run.md": "6b656570206d650a",
+test	Test	2026-09-26T01:00:24.1775595Z +   ".agents/archive/": "",
+test	Test	2026-09-26T01:00:24.1801734Z     ".agents/state.draft.json": "7b0a202022736368656d615f76657273696f6e223a20322c0a2020227265766973696f6e223a20302c0a20202270726f6a656374223a207b0a20202020226e616d65223a2022666978747572652d70726f6a656374220a20207d2c0a2020226f626a656374697665223a207b0a202020202274657874223a20225368697020746865207468696e672e222c0a202020202273696e63655f73657373696f6e223a20370a20207d2c0a2020227461736b73223a205b0a202020207b0a202020202020226964223a2022542d303031222c0a202020202020227469746c65223a202241207461736b222c0a202020202020227072696f72697479223a20225030222c0a20202020202022737461747573223a20226f70656e222c0a202020202020226f70656e65645f73657373696f6e223a20372c0a20202020202022636c6f7365645f73657373696f6e223a206e756c6c2c0a2020202020202273757065727365646573223a206e756c6c2c0a202020202020226e6f7465223a2022646f206974220a202020207d0a20205d2c0a2020227665726966696564223a205b5d2c0a20202267617073223a205b5d2c0a2020226465636973696f6e73223a205b5d2c0a20202268616e646f666673223a205b0a202020207b0a2020202020202273656174223a2022646576656c6f706572222c0a202020202020227069636b5f7570223a20224361727279206f6e2e222c0a2020202020202277617463685f6f7574223a205b5d2c0a202020202020226f70656e5f7175657374696f6e73223a205b5d2c0a2020202020202273657373696f6e223a20372c0a202020202020226c6f6f705f7374617465223a206e756c6c0a202020207d0a20205d2c0a2020226c6173745f73657373696f6e223a207b0a20202020226e223a20372c0a202020202264617465223a2022323032362d30392d3230222c0a202020202275756964223a206e756c6c2c0a202020202273656174223a206e756c6c0a20207d0a7d0a",
+test	Test	2026-09-26T01:00:24.2082981Z     ".agents/state.import-report.md": "232073746174652e6a736f6e20696d706f7274207265706f727420e280942064726166742028323032362d30392d3235290a0a2323205374616c656e65737320e28094207265616420746869732066697273740a0a5369676e616c3a207468652068696768657374206053657373696f6e204e6020616e20696e707574206e616d657320696e206974732073746174757320626c6f636b71756f7465202874686520603e60206c696e6573206469726563746c7920756e64657220697473207469746c6529206f7220696e20612068656164696e672c20636f6d70617265642077697468207468652068696768657374206053455353494f4e532f53657373696f6e5f4e2e6d64602e0a4c61746573742073657373696f6e3a2053657373696f6e20372028602e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d6460292e0a0a2d2063757272656e7420602e6167656e74732f5441534b532f494e424f582e6d64603a206c696e652033206465636c617265732053657373696f6e20372028603e202a2a4c61737420557064617465643a2a2a2053657373696f6e203760293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d2063757272656e7420602e6167656e74732f5441534b532f7461736b2e6d64603a206c696e652033206465636c617265732053657373696f6e20372028603e202a2a466f6375733a2a2a2053657373696f6e203760293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d2063757272656e7420602e6167656e74732f53455353494f4e532f6e6578742d73657373696f6e2e6d64603a206c696e652033206465636c617265732053657373696f6e20372028603e205570646174656420617420656e64206f662053657373696f6e20372e60293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d206e6f74206a756467656420602e6167656e74732f53595354454d2f53554d4d4152592e6d64603a206e6f7420696d706f727465642061732073746174653a202d2d636f6d6d6974206f6e6c792063757473206974732073746174757320626c6f636b71756f746520616e64206023232043757272656e74205374617465600a2d206e6f74206a756467656420602e6167656e74732f53595354454d2f4445434953494f4e532e6d64603a20616273656e743a206e6f7468696e6720697320696d706f727465642066726f6d2069740a0a4e6f20696e707574206973207374616c652e0a0a50726f6a6563743a20666978747572652d70726f6a6563742076312e302e3020c2b72063757272656e742073657373696f6e2037202866726f6d202e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d642920c2b720726574656e74696f6e20656467653a20646f6e65206974656d7320636c6f73656420e289a42073657373696f6e2034206172652064726f70706564206f6e20746865206669727374206f625f73746174652077726974650a0a232320536f75726365730a0a2d20696e626f783a20602e6167656e74732f5441534b532f494e424f582e6d646020e280942038206c696e65730a2d207461736b3a20602e6167656e74732f5441534b532f7461736b2e6d646020e280942038206c696e65730a2d206e6578743a20602e6167656e74732f53455353494f4e532f6e6578742d73657373696f6e2e6d646020e280942038206c696e65730a2d2073756d6d6172793a20602e6167656e74732f53595354454d2f53554d4d4152592e6d646020e280942038206c696e65730a2d206465636973696f6e733a20602e6167656e74732f53595354454d2f4445434953494f4e532e6d646020e2809420414253454e540a0a2323205461736b732028494e424f582e6d64290a0a4974656d73207061727365643a203120286f66207768696368203020756e6465722060232320436f6d706c65746564602c20696d706f72746564206173205033292e0a0a426f7820636f756e7473206173207772697474656e20286265666f72652074686520605b737570657273656465645d602072756c65293a0a0a2d206f70656e3a20310a2d20696e5f70726f67726573733a20300a2d20626c6f636b65643a20300a2d20646f6e653a20300a0a496d706f7274656420737461747573206279207072696f72697479202861667465722074686520605b737570657273656465645d602072756c6520e280942073757065727365646564206974656d732061726520646f6e65293a0a0a7c207072696f72697479207c206f70656e207c20696e5f70726f6772657373207c20626c6f636b6564207c20646f6e65207c20746f74616c207c0a7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c0a7c205030207c2031207c2030207c2030207c2030207c2031207c0a7c205031207c2030207c2030207c2030207c2030207c2030207c0a7c205032207c2030207c2030207c2030207c2030207c2030207c0a7c205033207c2030207c2030207c2030207c2030207c2030207c0a7c202a2a616c6c2a2a207c2031207c2030207c2030207c2030207c2031207c0a0a53657373696f6e733a2030206974656d7320686164206120602853657373696f6e204e2960206d61726b657220286f70656e6564203d206d696e2c20636c6f736564203d206d617820666f7220646f6e65293b2031206f70656e206974656d7320686164206e6f6e6520e28692206f70656e65645f73657373696f6e203d20373b203020646f6e65206974656d7320686164206e6f6e6520e2869220636c6f7365645f73657373696f6e203d20342e0a526574656e74696f6e2d656c696769626c65206f6e207468652066697273742077726974653a203020646f6e65206974656d73202874686579207374617920696e2074686520736e617073686f7420616e6420696e20676974292e0a0a2323232053757065727365646564206c696e6b73202830290a0a5f4e6f6e652e5f0a0a232323205469746c652066616c6c6261636b7320e28094206e6f20626f6c64206c6561642c2066697273742073656e74656e63652075736564202830290a0a5f4e6f6e652e5f0a0a23232320436f756c64206e6f7420626520706172736564206173206974656d73202831290a0a2d206c696e6520333a206e6f7420616e206974656d2c2068656164696e67206f7220626c616e6b206c696e6520e280942069676e6f72656420286b65707420696e2074686520736e617073686f742920e2809420603e202a2a4c61737420557064617465643a2a2a2053657373696f6e2037600a0a2323204f626a65637469766520287461736b2e6d64290a0a466f756e643a205368697020746865207468696e672e0a0a2323204465636973696f6e7320284445434953494f4e532e6d64290a0a496d706f72746564203020414452733a2030207769746820612066756c6c2060446174653a60206c696e652c203020776974682061207061727469616c206461746520286b65707420696e20746865206e6f7465292c20302077697468206e6f6e65202864617465203d206d6967726174696f6e20646174652c206e6f74652022696d706f727465643b206f726967696e616c206461746520756e6b6e6f776e22292e0a0a23232048616e646f666620286e6578742d73657373696f6e2e6d64290a0a7069636b5f75703a2031206c696e657320c2b72077617463685f6f75743a20302062756c6c65747320c2b7206f70656e5f7175657374696f6e733a20302062756c6c6574730a0a232320566572696669656420616e6420676170730a0a76657269666965645b5d3a203020c2b720676170735b5d3a20302e205468652070726f73652066696c6573206361727279206e6f6e6520696e206120666f726d2074686520696d706f727465722072656164732c20616e6420697420696e76656e7473206e6f6e652e205265636f7264207468656d2077697468206f625f73746174652061667465722074686520636f6d6d69742e0a0a2323204c6173742073657373696f6e0a0a53657373696f6e203720e2809420323032362d30392d323020e280942075756964206e6f6e6520282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a0a23232053554d4d4152592e6d64206c696e657320602d2d636f6d6d6974602077696c6c2072656d6f76650a0a2d2073746174757320626c6f636b71756f746520616674657220746865207469746c6520286c696e652031293a203120603e60206c696e65730a2d206023232043757272656e7420537461746560207468726f75676820746865206e6578742060232320602068656164696e673a2030206c696e65730a2d20746f74616c206c696e65732072656d6f7665642028626c6f636b71756f7465202b20737572726f756e64696e6720626c616e6b73202b2073656374696f6e293a20330a2d2068656164696e6773206b657074206279746520666f7220627974653a206041626f7574600a0a44726166742076616c69646174657320616761696e7374205374617465536368656d612e0a",
+test	Test	2026-09-26T01:00:24.2246212Z     "package.json": "7b226e616d65223a22666978747572652d70726f6a656374222c2276657273696f6e223a22312e302e30227d",
+test	Test	2026-09-26T01:00:24.2247389Z   }
+test	Test	2026-09-26T01:00:24.2247638Z 
+test	Test	2026-09-26T01:00:24.2248215Z  ❯ tests/pipelines/state-import-r3.test.ts:103:24
+test	Test	2026-09-26T01:00:24.2249233Z     101|     const before = tree(root);
+test	Test	2026-09-26T01:00:24.2250559Z     102|     expect(() => runCommit(root, TODAY)).toThrow(/already exists/);
+test	Test	2026-09-26T01:00:24.2252009Z     103|     expect(tree(root)).toEqual(before);
+test	Test	2026-09-26T01:00:24.2252844Z        |                        ^
+test	Test	2026-09-26T01:00:24.2253381Z     104|   });
+test	Test	2026-09-26T01:00:24.2253855Z     105| 
+test	Test	2026-09-26T01:00:24.2254069Z 
+test	Test	2026-09-26T01:00:24.2254457Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+test	Test	2026-09-26T01:00:24.2254778Z 
+test	Test	2026-09-26T01:00:24.2256800Z  FAIL  tests/pipelines/state-import-r3.test.ts > R3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created > the same with --accept-stale on a stale project: refused, and the snapshot is byte-identical afterwards
+test	Test	2026-09-26T01:00:24.2258978Z AssertionError: expected { …(9) } to deeply equal { …(10) }
+test	Test	2026-09-26T01:00:24.2259482Z 
+test	Test	2026-09-26T01:00:24.2259713Z - Expected
+test	Test	2026-09-26T01:00:24.2260117Z + Received
+test	Test	2026-09-26T01:00:24.2260372Z 
+test	Test	2026-09-26T01:00:24.2260601Z @@ -2,11 +2,10 @@
+test	Test	2026-09-26T01:00:24.2261657Z     ".agents/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+test	Test	2026-09-26T01:00:24.2264111Z     ".agents/SESSIONS/next-session.md": "23204e6578742053657373696f6e2048616e646f666620e2809420666f7220746865206e65787420736561740a0a3e205570646174656420617420656e64206f662053657373696f6e20362e0a0a2323205069636b20757020686572650a0a4361727279206f6e2e0a",
+test	Test	2026-09-26T01:00:24.2266378Z     ".agents/SYSTEM/SUMMARY.md": "232053756d6d6172790a0a3e207374617475730a0a23232041626f75740a0a4b6570742e0a",
+test	Test	2026-09-26T01:00:24.2268871Z     ".agents/TASKS/INBOX.md": "2320496e626f7820e28094207072696f7269746965730a0a3e202a2a4c61737420557064617465643a2a2a2053657373696f6e20360a0a232320503020e2809420437269746963616c0a0a2d205b205d202a2a41207461736b2a2a20e2809420646f2069740a",
+test	Test	2026-09-26T01:00:24.2271892Z     ".agents/TASKS/task.md": "232043757272656e7420466f63757320e280942074686973207765656b0a0a3e202a2a466f6375733a2a2a2053657373696f6e20360a0a23232043757272656e74204f626a6563746976650a0a5368697020746865207468696e672e0a",
+test	Test	2026-09-26T01:00:24.2274177Z -   ".agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+test	Test	2026-09-26T01:00:24.2275746Z -   ".agents/archive/pre-state-migration-2026-09-25/from-an-earlier-run.md": "6b656570206d650a",
+test	Test	2026-09-26T01:00:24.2276663Z +   ".agents/archive/": "",
+test	Test	2026-09-26T01:00:24.2292204Z     ".agents/state.draft.json": "7b0a202022736368656d615f76657273696f6e223a20322c0a2020227265766973696f6e223a20302c0a20202270726f6a656374223a207b0a20202020226e616d65223a2022666978747572652d70726f6a656374220a20207d2c0a2020226f626a656374697665223a207b0a202020202274657874223a20225368697020746865207468696e672e222c0a202020202273696e63655f73657373696f6e223a20370a20207d2c0a2020227461736b73223a205b0a202020207b0a202020202020226964223a2022542d303031222c0a202020202020227469746c65223a202241207461736b222c0a202020202020227072696f72697479223a20225030222c0a20202020202022737461747573223a20226f70656e222c0a202020202020226f70656e65645f73657373696f6e223a20372c0a20202020202022636c6f7365645f73657373696f6e223a206e756c6c2c0a2020202020202273757065727365646573223a206e756c6c2c0a202020202020226e6f7465223a2022646f206974220a202020207d0a20205d2c0a2020227665726966696564223a205b5d2c0a20202267617073223a205b5d2c0a2020226465636973696f6e73223a205b5d2c0a20202268616e646f666673223a205b0a202020207b0a2020202020202273656174223a2022646576656c6f706572222c0a202020202020227069636b5f7570223a20224361727279206f6e2e222c0a2020202020202277617463685f6f7574223a205b5d2c0a202020202020226f70656e5f7175657374696f6e73223a205b5d2c0a2020202020202273657373696f6e223a20372c0a202020202020226c6f6f705f7374617465223a206e756c6c0a202020207d0a20205d2c0a2020226c6173745f73657373696f6e223a207b0a20202020226e223a20372c0a202020202264617465223a2022323032362d30392d3230222c0a202020202275756964223a206e756c6c2c0a202020202273656174223a206e756c6c0a20207d0a7d0a",
+test	Test	2026-09-26T01:00:24.2474723Z     ".agents/state.import-report.md": "232073746174652e6a736f6e20696d706f7274207265706f727420e280942064726166742028323032362d30392d3235290a0a2323205374616c656e65737320e28094207265616420746869732066697273740a0a5369676e616c3a207468652068696768657374206053657373696f6e204e6020616e20696e707574206e616d657320696e206974732073746174757320626c6f636b71756f7465202874686520603e60206c696e6573206469726563746c7920756e64657220697473207469746c6529206f7220696e20612068656164696e672c20636f6d70617265642077697468207468652068696768657374206053455353494f4e532f53657373696f6e5f4e2e6d64602e0a4c61746573742073657373696f6e3a2053657373696f6e20372028602e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d6460292e0a0a2d202a2a5354414c452a2a20602e6167656e74732f5441534b532f494e424f582e6d64603a206c696e652033206465636c617265732053657373696f6e20362028603e202a2a4c61737420557064617465643a2a2a2053657373696f6e203660293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d202a2a5354414c452a2a20602e6167656e74732f5441534b532f7461736b2e6d64603a206c696e652033206465636c617265732053657373696f6e20362028603e202a2a466f6375733a2a2a2053657373696f6e203660293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d202a2a5354414c452a2a20602e6167656e74732f53455353494f4e532f6e6578742d73657373696f6e2e6d64603a206c696e652033206465636c617265732053657373696f6e20362028603e205570646174656420617420656e64206f662053657373696f6e20362e60293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d206e6f74206a756467656420602e6167656e74732f53595354454d2f53554d4d4152592e6d64603a206e6f7420696d706f727465642061732073746174653a202d2d636f6d6d6974206f6e6c792063757473206974732073746174757320626c6f636b71756f746520616e64206023232043757272656e74205374617465600a2d206e6f74206a756467656420602e6167656e74732f53595354454d2f4445434953494f4e532e6d64603a20616273656e743a206e6f7468696e6720697320696d706f727465642066726f6d2069740a0a2a2a602d2d636f6d6d6974602072656675736573207768696c6520616e20696e7075742061626f7665206973205354414c452e2a2a2055706461746520697420616e642072652d72756e20602d2d6472616674602c206f72207061737320602d2d6163636570742d7374616c656020746f20696d706f7274206974206173206974207374616e64732e0a0a50726f6a6563743a20666978747572652d70726f6a6563742076312e302e3020c2b72063757272656e742073657373696f6e2037202866726f6d202e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d642920c2b720726574656e74696f6e20656467653a20646f6e65206974656d7320636c6f73656420e289a42073657373696f6e2034206172652064726f70706564206f6e20746865206669727374206f625f73746174652077726974650a0a232320536f75726365730a0a2d20696e626f783a20602e6167656e74732f5441534b532f494e424f582e6d646020e280942038206c696e65730a2d207461736b3a20602e6167656e74732f5441534b532f7461736b2e6d646020e280942038206c696e65730a2d206e6578743a20602e6167656e74732f53455353494f4e532f6e6578742d73657373696f6e2e6d646020e280942038206c696e65730a2d2073756d6d6172793a20602e6167656e74732f53595354454d2f53554d4d4152592e6d646020e280942038206c696e65730a2d206465636973696f6e733a20602e6167656e74732f53595354454d2f4445434953494f4e532e6d646020e2809420414253454e540a0a2323205461736b732028494e424f582e6d64290a0a4974656d73207061727365643a203120286f66207768696368203020756e6465722060232320436f6d706c65746564602c20696d706f72746564206173205033292e0a0a426f7820636f756e7473206173207772697474656e20286265666f72652074686520605b737570657273656465645d602072756c65293a0a0a2d206f70656e3a20310a2d20696e5f70726f67726573733a20300a2d20626c6f636b65643a20300a2d20646f6e653a20300a0a496d706f7274656420737461747573206279207072696f72697479202861667465722074686520605b737570657273656465645d602072756c6520e280942073757065727365646564206974656d732061726520646f6e65293a0a0a7c207072696f72697479207c206f70656e207c20696e5f70726f6772657373207c20626c6f636b6564207c20646f6e65207c20746f74616c207c0a7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c2d2d2d7c0a7c205030207c2031207c2030207c2030207c2030207c2031207c0a7c205031207c2030207c2030207c2030207c2030207c2030207c0a7c205032207c2030207c2030207c2030207c2030207c2030207c0a7c205033207c2030207c2030207c2030207c2030207c2030207c0a7c202a2a616c6c2a2a207c2031207c2030207c2030207c2030207c2031207c0a0a53657373696f6e733a2030206974656d7320686164206120602853657373696f6e204e2960206d61726b657220286f70656e6564203d206d696e2c20636c6f736564203d206d617820666f7220646f6e65293b2031206f70656e206974656d7320686164206e6f6e6520e28692206f70656e65645f73657373696f6e203d20373b203020646f6e65206974656d7320686164206e6f6e6520e2869220636c6f7365645f73657373696f6e203d20342e0a526574656e74696f6e2d656c696769626c65206f6e207468652066697273742077726974653a203020646f6e65206974656d73202874686579207374617920696e2074686520736e617073686f7420616e6420696e20676974292e0a0a2323232053757065727365646564206c696e6b73202830290a0a5f4e6f6e652e5f0a0a232323205469746c652066616c6c6261636b7320e28094206e6f20626f6c64206c6561642c2066697273742073656e74656e63652075736564202830290a0a5f4e6f6e652e5f0a0a23232320436f756c64206e6f7420626520706172736564206173206974656d73202831290a0a2d206c696e6520333a206e6f7420616e206974656d2c2068656164696e67206f7220626c616e6b206c696e6520e280942069676e6f72656420286b65707420696e2074686520736e617073686f742920e2809420603e202a2a4c61737420557064617465643a2a2a2053657373696f6e2036600a0a2323204f626a65637469766520287461736b2e6d64290a0a466f756e643a205368697020746865207468696e672e0a0a2323204465636973696f6e7320284445434953494f4e532e6d64290a0a496d706f72746564203020414452733a2030207769746820612066756c6c2060446174653a60206c696e652c203020776974682061207061727469616c206461746520286b65707420696e20746865206e6f7465292c20302077697468206e6f6e65202864617465203d206d6967726174696f6e20646174652c206e6f74652022696d706f727465643b206f726967696e616c206461746520756e6b6e6f776e22292e0a0a23232048616e646f666620286e6578742d73657373696f6e2e6d64290a0a7069636b5f75703a2031206c696e657320c2b72077617463685f6f75743a20302062756c6c65747320c2b7206f70656e5f7175657374696f6e733a20302062756c6c6574730a0a232320566572696669656420616e6420676170730a0a76657269666965645b5d3a203020c2b720676170735b5d3a20302e205468652070726f73652066696c6573206361727279206e6f6e6520696e206120666f726d2074686520696d706f727465722072656164732c20616e6420697420696e76656e7473206e6f6e652e205265636f7264207468656d2077697468206f625f73746174652061667465722074686520636f6d6d69742e0a0a2323204c6173742073657373696f6e0a0a53657373696f6e203720e2809420323032362d30392d323020e280942075756964206e6f6e6520282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a0a23232053554d4d4152592e6d64206c696e657320602d2d636f6d6d6974602077696c6c2072656d6f76650a0a2d2073746174757320626c6f636b71756f746520616674657220746865207469746c6520286c696e652031293a203120603e60206c696e65730a2d206023232043757272656e7420537461746560207468726f75676820746865206e6578742060232320602068656164696e673a2030206c696e65730a2d20746f74616c206c696e65732072656d6f7665642028626c6f636b71756f7465202b20737572726f756e64696e6720626c616e6b73202b2073656374696f6e293a20330a2d2068656164696e6773206b657074206279746520666f7220627974653a206041626f7574600a0a44726166742076616c69646174657320616761696e7374205374617465536368656d612e0a",
+test	Test	2026-09-26T01:00:24.2603735Z     "package.json": "7b226e616d65223a22666978747572652d70726f6a656374222c2276657273696f6e223a22312e302e30227d",
+test	Test	2026-09-26T01:00:24.2605055Z   }
+test	Test	2026-09-26T01:00:24.2605260Z 
+test	Test	2026-09-26T01:00:24.2605816Z  ❯ tests/pipelines/state-import-r3.test.ts:112:24
+test	Test	2026-09-26T01:00:24.2606771Z     110|     const before = tree(root);
+test	Test	2026-09-26T01:00:24.2607754Z     111|     expect(() => runCommit(root, TODAY, { acceptStale: true })).toThro…
+test	Test	2026-09-26T01:00:24.2608828Z     112|     expect(tree(root)).toEqual(before);
+test	Test	2026-09-26T01:00:24.2609637Z        |                        ^
+test	Test	2026-09-26T01:00:24.2610173Z     113|   });
+test	Test	2026-09-26T01:00:24.2610634Z     114| 
+test	Test	2026-09-26T01:00:24.2610924Z 
+test	Test	2026-09-26T01:00:24.2611327Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+test	Test	2026-09-26T01:00:24.2611644Z 
+test	Test	2026-09-26T01:00:24.2613782Z  FAIL  tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+test	Test	2026-09-26T01:00:24.2617550Z  FAIL  tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+test	Test	2026-09-26T01:00:24.2621627Z  FAIL  tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+test	Test	2026-09-26T01:00:24.2623915Z AssertionError: expected { …(3) } to deeply equal { …(3) }
+test	Test	2026-09-26T01:00:24.2624396Z 
+test	Test	2026-09-26T01:00:24.2624618Z - Expected
+test	Test	2026-09-26T01:00:24.2625022Z + Received
+test	Test	2026-09-26T01:00:24.2625240Z 
+test	Test	2026-09-26T01:00:24.2625420Z   {
+test	Test	2026-09-26T01:00:24.2625982Z -   ".agents/SESSIONS/next-session.md": "stale",
+test	Test	2026-09-26T01:00:24.2626672Z -   ".agents/TASKS/INBOX.md": "stale",
+test	Test	2026-09-26T01:00:24.2627329Z -   ".agents/TASKS/task.md": "stale",
+test	Test	2026-09-26T01:00:24.2628129Z +   ".agents/SESSIONS/next-session.md": "could_not_tell",
+test	Test	2026-09-26T01:00:24.2628876Z +   ".agents/TASKS/INBOX.md": "could_not_tell",
+test	Test	2026-09-26T01:00:24.2629565Z +   ".agents/TASKS/task.md": "could_not_tell",
+test	Test	2026-09-26T01:00:24.2630069Z   }
+test	Test	2026-09-26T01:00:24.2630247Z 
+test	Test	2026-09-26T01:00:24.2630863Z  ❯ tests/pipelines/state-import-r3.test.ts:153:92
+test	Test	2026-09-26T01:00:24.2631892Z     151|       writeProject(root, 6, enc);
+test	Test	2026-09-26T01:00:24.2632927Z     152|       const report = runDraft(root, TODAY).draft.report as { staleness…
+test	Test	2026-09-26T01:00:24.2633926Z     153|       expect(Object.fromEntries(report.staleness.inputs.map((i) => [i.…
+test	Test	2026-09-26T01:00:24.2635692Z        |                                                                                            ^
+test	Test	2026-09-26T01:00:24.2636648Z     154|       for (const i of report.staleness.inputs) expect(i.evidence).toMa…
+test	Test	2026-09-26T01:00:24.2637619Z     155|       const before = tree(root);
+test	Test	2026-09-26T01:00:24.2638073Z 
+test	Test	2026-09-26T01:00:24.2638462Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+test	Test	2026-09-26T01:00:24.2638778Z 
+test	Test	2026-09-26T01:00:24.2640485Z  FAIL  tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > the text is decoded as Windows-1252, not as UTF-8 with replacement characters
+test	Test	2026-09-26T01:00:24.2642817Z AssertionError: expected [ [ 'A task', '\ufffd do it' ] ] to deeply equal [ [ 'A task', 'do it' ] ]
+test	Test	2026-09-26T01:00:24.2643405Z 
+test	Test	2026-09-26T01:00:24.2643619Z - Expected
+test	Test	2026-09-26T01:00:24.2644024Z + Received
+test	Test	2026-09-26T01:00:24.2644226Z 
+test	Test	2026-09-26T01:00:24.2644397Z   [
+test	Test	2026-09-26T01:00:24.2644727Z     [
+test	Test	2026-09-26T01:00:24.2645104Z       "A task",
+test	Test	2026-09-26T01:00:24.2645517Z -     "do it",
+test	Test	2026-09-26T01:00:24.2645928Z +     "� do it",
+test	Test	2026-09-26T01:00:24.2646325Z     ],
+test	Test	2026-09-26T01:00:24.2646682Z   ]
+test	Test	2026-09-26T01:00:24.2646869Z 
+test	Test	2026-09-26T01:00:24.2647400Z  ❯ tests/pipelines/state-import-r3.test.ts:166:57
+test	Test	2026-09-26T01:00:24.2648540Z     164|     const r = runDraft(root, TODAY).draft;
+test	Test	2026-09-26T01:00:24.2649666Z     165|     // "**A task** — do it": the title and note split only on a real e…
+test	Test	2026-09-26T01:00:24.2650637Z     166|     expect(r.state.tasks.map((t) => [t.title, t.note])).toEqual([["A t…
+test	Test	2026-09-26T01:00:24.2651723Z        |                                                         ^
+test	Test	2026-09-26T01:00:24.2653133Z     167|     expect(JSON.stringify(r.state)).not.toContain("�");
+test	Test	2026-09-26T01:00:24.2654195Z     168|   });
+test	Test	2026-09-26T01:00:24.2654471Z 
+test	Test	2026-09-26T01:00:24.2654842Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+test	Test	2026-09-26T01:00:24.2655168Z 
+test	Test	2026-09-26T01:00:24.2656939Z  FAIL  tests/pipelines/state-import-r3.test.ts > R3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding > UTF-16 with no BOM is still 'could not tell' (NUL bytes), whether or not it is also invalid UTF-8
+test	Test	2026-09-26T01:00:24.2658853Z AssertionError: expected 'not valid UTF-8, and no UTF-16 byte-o…' to match /NUL/
+test	Test	2026-09-26T01:00:24.2659391Z 
+test	Test	2026-09-26T01:00:24.2659609Z - Expected: 
+test	Test	2026-09-26T01:00:24.2659954Z /NUL/
+test	Test	2026-09-26T01:00:24.2660152Z 
+test	Test	2026-09-26T01:00:24.2660368Z + Received: 
+test	Test	2026-09-26T01:00:24.2661247Z "not valid UTF-8, and no UTF-16 byte-order mark: its encoding is unknown, so its words cannot be read"
+test	Test	2026-09-26T01:00:24.2661810Z 
+test	Test	2026-09-26T01:00:24.2662378Z  ❯ tests/pipelines/state-import-r3.test.ts:178:26
+test	Test	2026-09-26T01:00:24.2663926Z     176|       const i = report.staleness.inputs.find((x) => x.input === k)!;
+test	Test	2026-09-26T01:00:24.2665495Z     177|       expect(i.verdict).toBe("could_not_tell");
+test	Test	2026-09-26T01:00:24.2666849Z     178|       expect(i.evidence).toMatch(/NUL/);
+test	Test	2026-09-26T01:00:24.2667718Z        |                          ^
+test	Test	2026-09-26T01:00:24.2668218Z     179|     }
+test	Test	2026-09-26T01:00:24.2668989Z     180|   });
+test	Test	2026-09-26T01:00:24.2669305Z 
+test	Test	2026-09-26T01:00:24.2669669Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+test	Test	2026-09-26T01:00:24.2670002Z 
+test	Test	2026-09-26T01:00:24.2672734Z  FAIL  tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+test	Test	2026-09-26T01:00:24.2685207Z AssertionError: expected [Function] to throw error matching /half-restored/ but got '.agents/state.json already exists — t…'
+test	Test	2026-09-26T01:00:24.2686511Z 
+test	Test	2026-09-26T01:00:24.2686773Z - Expected: 
+test	Test	2026-09-26T01:00:24.2687140Z /half-restored/
+test	Test	2026-09-26T01:00:24.2687343Z 
+test	Test	2026-09-26T01:00:24.2687549Z + Received: 
+test	Test	2026-09-26T01:00:24.2688278Z ".agents/state.json already exists — the importer runs once; nothing written"
+test	Test	2026-09-26T01:00:24.2688758Z 
+test	Test	2026-09-26T01:00:24.2689293Z  ❯ tests/pipelines/state-import-r3.test.ts:223:21
+test	Test	2026-09-26T01:00:24.2690247Z     221|       // 2–4. Every re-run refuses, names the snapshot, and changes no…
+test	Test	2026-09-26T01:00:24.2691349Z     222|       for (const run of [() => runDraft(root, TODAY), () => runCommit(…
+test	Test	2026-09-26T01:00:24.2692444Z     223|         expect(run).toThrow(/half-restored/);
+test	Test	2026-09-26T01:00:24.2693290Z        |                     ^
+test	Test	2026-09-26T01:00:24.2694069Z     224|         expect(run).toThrow(new RegExp(`pre-state-migration-${TODAY}/`…
+test	Test	2026-09-26T01:00:24.2695149Z     225|         expect(tree(root)).toEqual(damaged);
+test	Test	2026-09-26T01:00:24.2695677Z 
+test	Test	2026-09-26T01:00:24.2696047Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+test	Test	2026-09-26T01:00:24.2696384Z 
+test	Test	2026-09-26T01:00:24.2699114Z  FAIL  tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > QA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+test	Test	2026-09-26T01:00:24.2701623Z AssertionError: expected [Function] to throw an error
+test	Test	2026-09-26T01:00:24.2702060Z 
+test	Test	2026-09-26T01:00:24.2702261Z - Expected: 
+test	Test	2026-09-26T01:00:24.2702601Z null
+test	Test	2026-09-26T01:00:24.2702763Z 
+test	Test	2026-09-26T01:00:24.2703033Z + Received: 
+test	Test	2026-09-26T01:00:24.2703385Z undefined
+test	Test	2026-09-26T01:00:24.2703571Z 
+test	Test	2026-09-26T01:00:24.2704109Z  ❯ tests/pipelines/state-import-r3.test.ts:223:21
+test	Test	2026-09-26T01:00:24.2705040Z     221|       // 2–4. Every re-run refuses, names the snapshot, and changes no…
+test	Test	2026-09-26T01:00:24.2705981Z     222|       for (const run of [() => runDraft(root, TODAY), () => runCommit(…
+test	Test	2026-09-26T01:00:24.2707053Z     223|         expect(run).toThrow(/half-restored/);
+test	Test	2026-09-26T01:00:24.2707831Z        |                     ^
+test	Test	2026-09-26T01:00:24.2708622Z     224|         expect(run).toThrow(new RegExp(`pre-state-migration-${TODAY}/`…
+test	Test	2026-09-26T01:00:24.2709748Z     225|         expect(tree(root)).toEqual(damaged);
+test	Test	2026-09-26T01:00:24.2710310Z 
+test	Test	2026-09-26T01:00:24.2710684Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+test	Test	2026-09-26T01:00:24.2711103Z 
+test	Test	2026-09-26T01:00:24.2713091Z  FAIL  tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > the marker exists before --commit's first write to the live tree, so a process that dies there leaves a project that refuses
+test	Test	2026-09-26T01:00:24.2715499Z AssertionError: expected false to be true // Object.is equality
+test	Test	2026-09-26T01:00:24.2715998Z 
+test	Test	2026-09-26T01:00:24.2716214Z - Expected
+test	Test	2026-09-26T01:00:24.2716620Z + Received
+test	Test	2026-09-26T01:00:24.2716834Z 
+test	Test	2026-09-26T01:00:24.2717013Z - true
+test	Test	2026-09-26T01:00:24.2717402Z + false
+test	Test	2026-09-26T01:00:24.2717616Z 
+test	Test	2026-09-26T01:00:24.2718173Z  ❯ tests/pipelines/state-import-r3.test.ts:252:21
+test	Test	2026-09-26T01:00:24.2719136Z     250|     inject.onWrite = null;
+test	Test	2026-09-26T01:00:24.2720542Z     251|     expect(seen.length).toBeGreaterThan(0);
+test	Test	2026-09-26T01:00:24.2722064Z     252|     expect(seen[0]).toBe(true);
+test	Test	2026-09-26T01:00:24.2722900Z        |                     ^
+test	Test	2026-09-26T01:00:24.2723646Z     253|     // ...and a completed commit leaves none behind.
+test	Test	2026-09-26T01:00:24.2724565Z     254|     expect(realFs.readdirSync(join(root, ".agents/archive")).filter((n…
+test	Test	2026-09-26T01:00:24.2725046Z 
+test	Test	2026-09-26T01:00:24.2725402Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯
+test	Test	2026-09-26T01:00:24.2725706Z 
+test	Test	2026-09-26T01:00:24.2727881Z  FAIL  tests/pipelines/state-import-r3.test.ts > R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > a marker left by a process that died mid-migrate (no rollback ran): --draft and --commit refuse, naming the snapshot and the marker
+test	Test	2026-09-26T01:00:24.2730068Z AssertionError: expected [Function] to throw an error
+test	Test	2026-09-26T01:00:24.2730553Z 
+test	Test	2026-09-26T01:00:24.2730857Z - Expected: 
+test	Test	2026-09-26T01:00:24.2731206Z null
+test	Test	2026-09-26T01:00:24.2731384Z 
+test	Test	2026-09-26T01:00:24.2731621Z + Received: 
+test	Test	2026-09-26T01:00:24.2732020Z undefined
+test	Test	2026-09-26T01:00:24.2732200Z 
+test	Test	2026-09-26T01:00:24.2732760Z  ❯ tests/pipelines/state-import-r3.test.ts:264:19
+test	Test	2026-09-26T01:00:24.2733688Z     262|     const before = tree(root);
+test	Test	2026-09-26T01:00:24.2734640Z     263|     for (const run of [() => runDraft(root, TODAY), () => runCommit(ro…
+test	Test	2026-09-26T01:00:24.2735745Z     264|       expect(run).toThrow(/half-restored/);
+test	Test	2026-09-26T01:00:24.2736579Z        |                   ^
+test	Test	2026-09-26T01:00:24.2737360Z     265|       expect(run).toThrow(new RegExp(`${SNAP}/.*${SNAP}\\.import-incom…
+test	Test	2026-09-26T01:00:24.2738397Z     266|       expect(tree(root)).toEqual(before);
+test	Test	2026-09-26T01:00:24.2738949Z 
+test	Test	2026-09-26T01:00:24.2739308Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/11]⎯
+test	Test	2026-09-26T01:00:24.2739901Z 
+test	Test	2026-09-26T01:00:24.2739934Z 
+test	Test	2026-09-26T01:00:24.2740604Z  Test Files  1 failed | 75 passed (76)
+test	Test	2026-09-26T01:00:24.2750255Z       Tests  11 failed | 1073 passed | 1 skipped (1085)
+test	Test	2026-09-26T01:00:24.2751441Z    Start at  00:59:46
+test	Test	2026-09-26T01:00:24.2752496Z    Duration  37.56s (transform 1.89s, setup 1.04s, collect 7.80s, tests 78.77s, environment 25ms, prepare 7.35s)
+test	Test	2026-09-26T01:00:24.2753151Z 
+test	Test	2026-09-26T01:00:24.2753164Z 
+test	Test	2026-09-26T01:00:24.2937672Z ##[error]AssertionError: expected { …(9) } to deeply equal { …(10) }
+test	Test	
+test	Test	- Expected
+test	Test	+ Received
+test	Test	
+test	Test	@@ -2,11 +2,10 @@
+test	Test	    ".agents/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+test	Test	    ".agents/SESSIONS/next-session.md": "23204e6578742053657373696f6e2048616e646f666620e2809420666f7220746865206e65787420736561740a0a3e205570646174656420617420656e64206f662053657373696f6e20372e0a0a2323205069636b20757020686572650a0a4361727279206f6e2e0a",
+test	Test	    ".agents/SYSTEM/SUMMARY.md": "232053756d6d6172790a0a3e207374617475730a0a23232041626f75740a0a4b6570742e0a",
+test	Test	    ".agents/TASKS/INBOX.md": "2320496e626f7820e28094207072696f7269746965730a0a3e202a2a4c61737420557064617465643a2a2a2053657373696f6e20370a0a232320503020e2809420437269746963616c0a0a2d205b205d202a2a41207461736b2a2a20e2809420646f2069740a",
+test	Test	    ".agents/TASKS/task.md": "232043757272656e7420466f63757320e280942074686973207765656b0a0a3e202a2a466f6375733a2a2a2053657373696f6e20370a0a23232043757272656e74204f626a6563746976650a0a5368697020746865207468696e672e0a",
+test	Test	-   ".agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+test	Test	-   ".agents/archive/pre-state-migration-2026-09-25/from-an-earlier-run.md": "6b656570206d650a",
+test	Test	+   ".agents/archive/": "",
+test	Test	    ".agents/state.draft.json": "7b0a202022736368656d615f76657273696f6e223a20322c0a2020227265766973696f6e223a20302c0a20202270726f6a656374223a207b0a20202020226e616d65223a2022666978747572652d70726f6a656374220a20207d2c0a2020226f626a656374697665223a207b0a202020202274657874223a20225368697020746865207468696e672e222c0a202020202273696e63655f73657373696f6e223a20370a20207d2c0a2020227461736b73223a205b0a202020207b0a202020202020226964223a2022542d303031222c0a202020202020227469746c65223a202241207461736b222c0a202020202020227072696f72697479223a20225030222c0a20202020202022737461747573223a20226f70656e222c0a202020202020226f70656e65645f73657373696f6e223a20372c0a20202020202022636c6f7365645f73657373696f6e223a206e756c6c2c0a2020202020202273757065727365646573223a206e756c6c2c0a202020202020226e6f7465223a2022646f206974220a202020207d0a20205d2c0a2020227665726966696564223a205b5d2c0a20202267617073223a205b5d2c0a2020226465636973696f6e73223a205b5d2c0a20202268616e646f666673223a205b0a202020207b0a2020202020202273656174223a2022646576656c6f706572222c0a202020202020227069636b5f7570223a20224361727279206f6e2e222c0a2020202020202277617463685f6f7574223a205b5d2c0a202020202020226f70656e5f7175657374696f6e73223a205b5d2c0a2020202020202273657373696f6e223a20372c0a202020202020226c6f6f705f7374617465223a206e756c6c0a202020207d0a20205d2c0a2020226c6173745f73657373696f6e223a207b0a20202020226e223a20372c0a202020202264617465223a2022323032362d30392d3230222c0a202020202275756964223a206e756c6c2c0a202020202273656174223a206e756c6c0a20207d0a7d0a",
+test	Test	    ".agents/state.import-report.md": "232073746174652e6a736f6e20696d706f7274207265706f727420e280942064726166742028323032362d30392d3235290a0a2323205374616c656e65737320e28094207265616420746869732066697273740a0a5369676e616c3a207468652068696768657374206053657373696f6e204e6020616e20696e707574206e616d657320696e206974732073746174757320626c6f636b71756f7465202874686520603e60206c696e6573206469726563746c7920756e64657220697473207469746c6529206f7220696e20612068656164696e672c20636f6d70617265642077697468207468652068696768657374206053455353494f4e532f53657373696f6e5f4e2e6d64602e0a4c61746573742073657373696f6e3a2053657373696f6e20372028602e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d6460292e0a0a2d2063757272656e7420602e6167656e74732f5441534b532f494e424f582e6d64603a206c696e652033206465636c617265732053657373696f6e20372028603e202a2a4c61737420557064617465643a2a2a2053657373696f6e203760293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d2063757272656e7420602e6167656e74732f5441534b532f7461736b2e6d64603a206c696e652033206465636c617265732053657373696f6e20372028603e202a2a466f6375733a2a2a2053657373696f6e203760293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657
+test	Test	2026-09-26T01:00:24.2972473Z 
+test	Test	2026-09-26T01:00:24.3128645Z ##[error]AssertionError: expected { …(9) } to deeply equal { …(10) }
+test	Test	
+test	Test	- Expected
+test	Test	+ Received
+test	Test	
+test	Test	@@ -2,11 +2,10 @@
+test	Test	    ".agents/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+test	Test	    ".agents/SESSIONS/next-session.md": "23204e6578742053657373696f6e2048616e646f666620e2809420666f7220746865206e65787420736561740a0a3e205570646174656420617420656e64206f662053657373696f6e20362e0a0a2323205069636b20757020686572650a0a4361727279206f6e2e0a",
+test	Test	    ".agents/SYSTEM/SUMMARY.md": "232053756d6d6172790a0a3e207374617475730a0a23232041626f75740a0a4b6570742e0a",
+test	Test	    ".agents/TASKS/INBOX.md": "2320496e626f7820e28094207072696f7269746965730a0a3e202a2a4c61737420557064617465643a2a2a2053657373696f6e20360a0a232320503020e2809420437269746963616c0a0a2d205b205d202a2a41207461736b2a2a20e2809420646f2069740a",
+test	Test	    ".agents/TASKS/task.md": "232043757272656e7420466f63757320e280942074686973207765656b0a0a3e202a2a466f6375733a2a2a2053657373696f6e20360a0a23232043757272656e74204f626a6563746976650a0a5368697020746865207468696e672e0a",
+test	Test	-   ".agents/archive/pre-state-migration-2026-09-25/SESSIONS/Session_7.md": "232053657373696f6e203720e2809420323032362d30392d32300a",
+test	Test	-   ".agents/archive/pre-state-migration-2026-09-25/from-an-earlier-run.md": "6b656570206d650a",
+test	Test	+   ".agents/archive/": "",
+test	Test	    ".agents/state.draft.json": "7b0a202022736368656d615f76657273696f6e223a20322c0a2020227265766973696f6e223a20302c0a20202270726f6a656374223a207b0a20202020226e616d65223a2022666978747572652d70726f6a656374220a20207d2c0a2020226f626a656374697665223a207b0a202020202274657874223a20225368697020746865207468696e672e222c0a202020202273696e63655f73657373696f6e223a20370a20207d2c0a2020227461736b73223a205b0a202020207b0a202020202020226964223a2022542d303031222c0a202020202020227469746c65223a202241207461736b222c0a202020202020227072696f72697479223a20225030222c0a20202020202022737461747573223a20226f70656e222c0a202020202020226f70656e65645f73657373696f6e223a20372c0a20202020202022636c6f7365645f73657373696f6e223a206e756c6c2c0a2020202020202273757065727365646573223a206e756c6c2c0a202020202020226e6f7465223a2022646f206974220a202020207d0a20205d2c0a2020227665726966696564223a205b5d2c0a20202267617073223a205b5d2c0a2020226465636973696f6e73223a205b5d2c0a20202268616e646f666673223a205b0a202020207b0a2020202020202273656174223a2022646576656c6f706572222c0a202020202020227069636b5f7570223a20224361727279206f6e2e222c0a2020202020202277617463685f6f7574223a205b5d2c0a202020202020226f70656e5f7175657374696f6e73223a205b5d2c0a2020202020202273657373696f6e223a20372c0a202020202020226c6f6f705f7374617465223a206e756c6c0a202020207d0a20205d2c0a2020226c6173745f73657373696f6e223a207b0a20202020226e223a20372c0a202020202264617465223a2022323032362d30392d3230222c0a202020202275756964223a206e756c6c2c0a202020202273656174223a206e756c6c0a20207d0a7d0a",
+test	Test	    ".agents/state.import-report.md": "232073746174652e6a736f6e20696d706f7274207265706f727420e280942064726166742028323032362d30392d3235290a0a2323205374616c656e65737320e28094207265616420746869732066697273740a0a5369676e616c3a207468652068696768657374206053657373696f6e204e6020616e20696e707574206e616d657320696e206974732073746174757320626c6f636b71756f7465202874686520603e60206c696e6573206469726563746c7920756e64657220697473207469746c6529206f7220696e20612068656164696e672c20636f6d70617265642077697468207468652068696768657374206053455353494f4e532f53657373696f6e5f4e2e6d64602e0a4c61746573742073657373696f6e3a2053657373696f6e20372028602e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d6460292e0a0a2d202a2a5354414c452a2a20602e6167656e74732f5441534b532f494e424f582e6d64603a206c696e652033206465636c617265732053657373696f6e20362028603e202a2a4c61737420557064617465643a2a2a2053657373696f6e203660293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e532f53657373696f6e5f372e6d64290a2d202a2a5354414c452a2a20602e6167656e74732f5441534b532f7461736b2e6d64603a206c696e652033206465636c617265732053657373696f6e20362028603e202a2a466f6375733a2a2a2053657373696f6e203660293b20746865206c61746573742073657373696f6e206c6f672069732053657373696f6e203720282e6167656e74732f53455353494f4e5
+test	Test	2026-09-26T01:00:24.3151480Z 
+test	Test	2026-09-26T01:00:24.3156407Z ##[error]AssertionError: expected { …(3) } to deeply equal { …(3) }
+test	Test	
+test	Test	- Expected
+test	Test	+ Received
+test	Test	
+test	Test	  {
+test	Test	-   ".agents/SESSIONS/next-session.md": "stale",
+test	Test	-   ".agents/TASKS/INBOX.md": "stale",
+test	Test	-   ".agents/TASKS/task.md": "stale",
+test	Test	+   ".agents/SESSIONS/next-session.md": "could_not_tell",
+test	Test	+   ".agents/TASKS/INBOX.md": "could_not_tell",
+test	Test	+   ".agents/TASKS/task.md": "could_not_tell",
+test	Test	  }
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r3.test.ts:153:92
+test	Test	
+test	Test	
+test	Test	2026-09-26T01:00:24.3158941Z 
+test	Test	2026-09-26T01:00:24.3163394Z ##[error]AssertionError: expected { …(3) } to deeply equal { …(3) }
+test	Test	
+test	Test	- Expected
+test	Test	+ Received
+test	Test	
+test	Test	  {
+test	Test	-   ".agents/SESSIONS/next-session.md": "stale",
+test	Test	-   ".agents/TASKS/INBOX.md": "stale",
+test	Test	-   ".agents/TASKS/task.md": "stale",
+test	Test	+   ".agents/SESSIONS/next-session.md": "could_not_tell",
+test	Test	+   ".agents/TASKS/INBOX.md": "could_not_tell",
+test	Test	+   ".agents/TASKS/task.md": "could_not_tell",
+test	Test	  }
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r3.test.ts:153:92
+test	Test	
+test	Test	
+test	Test	2026-09-26T01:00:24.3165918Z 
+test	Test	2026-09-26T01:00:24.3170243Z ##[error]AssertionError: expected { …(3) } to deeply equal { …(3) }
+test	Test	
+test	Test	- Expected
+test	Test	+ Received
+test	Test	
+test	Test	  {
+test	Test	-   ".agents/SESSIONS/next-session.md": "stale",
+test	Test	-   ".agents/TASKS/INBOX.md": "stale",
+test	Test	-   ".agents/TASKS/task.md": "stale",
+test	Test	+   ".agents/SESSIONS/next-session.md": "could_not_tell",
+test	Test	+   ".agents/TASKS/INBOX.md": "could_not_tell",
+test	Test	+   ".agents/TASKS/task.md": "could_not_tell",
+test	Test	  }
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r3.test.ts:153:92
+test	Test	
+test	Test	
+test	Test	2026-09-26T01:00:24.3172804Z 
+test	Test	2026-09-26T01:00:24.3175402Z ##[error]AssertionError: expected [ [ 'A task', '\ufffd do it' ] ] to deeply equal [ [ 'A task', 'do it' ] ]
+test	Test	
+test	Test	- Expected
+test	Test	+ Received
+test	Test	
+test	Test	  [
+test	Test	    [
+test	Test	      "A task",
+test	Test	-     "do it",
+test	Test	+     "� do it",
+test	Test	    ],
+test	Test	  ]
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r3.test.ts:166:57
+test	Test	
+test	Test	
+test	Test	2026-09-26T01:00:24.3177098Z 
+test	Test	2026-09-26T01:00:24.3180231Z ##[error]AssertionError: expected 'not valid UTF-8, and no UTF-16 byte-o…' to match /NUL/
+test	Test	
+test	Test	- Expected: 
+test	Test	/NUL/
+test	Test	
+test	Test	+ Received: 
+test	Test	"not valid UTF-8, and no UTF-16 byte-order mark: its encoding is unknown, so its words cannot be read"
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r3.test.ts:178:26
+test	Test	
+test	Test	
+test	Test	2026-09-26T01:00:24.3182311Z 
+test	Test	2026-09-26T01:00:24.3185921Z ##[error]AssertionError: expected [Function] to throw error matching /half-restored/ but got '.agents/state.json already exists — t…'
+test	Test	
+test	Test	- Expected: 
+test	Test	/half-restored/
+test	Test	
+test	Test	+ Received: 
+test	Test	".agents/state.json already exists — the importer runs once; nothing written"
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r3.test.ts:223:21
+test	Test	
+test	Test	
+test	Test	2026-09-26T01:00:24.3188148Z 
+test	Test	2026-09-26T01:00:24.3190395Z ##[error]AssertionError: expected [Function] to throw an error
+test	Test	
+test	Test	- Expected: 
+test	Test	null
+test	Test	
+test	Test	+ Received: 
+test	Test	undefined
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r3.test.ts:223:21
+test	Test	
+test	Test	
+test	Test	2026-09-26T01:00:24.3191973Z 
+test	Test	2026-09-26T01:00:24.3194141Z ##[error]AssertionError: expected false to be true // Object.is equality
+test	Test	
+test	Test	- Expected
+test	Test	+ Received
+test	Test	
+test	Test	- true
+test	Test	+ false
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r3.test.ts:252:21
+test	Test	
+test	Test	
+test	Test	2026-09-26T01:00:24.3195707Z 
+test	Test	2026-09-26T01:00:24.3197746Z ##[error]AssertionError: expected [Function] to throw an error
+test	Test	
+test	Test	- Expected: 
+test	Test	null
+test	Test	
+test	Test	+ Received: 
+test	Test	undefined
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r3.test.ts:264:19
+test	Test	
+test	Test	
+test	Test	2026-09-26T01:00:24.3277830Z ##[error]Process completed with exit code 1.
+test	Post Run actions/checkout@v4	﻿2026-09-26T01:00:24.3415473Z Post job cleanup.
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4287206Z [command]/usr/bin/git version
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4324571Z git version 2.43.0
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4366096Z Temporarily overriding HOME='/srv/gh-runner/runner-1/_work/_temp/28166522-b736-4e7f-98d6-a1860f7a6bc2' before making global git config changes
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4367389Z Adding repository directory to the temporary git global config as a safe directory
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4372947Z [command]/usr/bin/git config --global --add safe.directory /srv/gh-runner/runner-1/_work/Self-Improving-Agent/Self-Improving-Agent
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4409606Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4446070Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4645537Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4669736Z http.https://github.com/.extraheader
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4682090Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4717595Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.4959223Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Post Run actions/checkout@v4	2026-09-26T01:00:24.5003327Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Complete job	﻿2026-09-26T01:00:24.5407993Z Cleaning up orphan processes
+test	Complete job	2026-09-26T01:00:24.5803796Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
