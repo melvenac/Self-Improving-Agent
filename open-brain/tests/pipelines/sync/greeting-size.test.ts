@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, cpSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, cpSync, existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { checkGreetingSize, composeGreeting, GREETING_LIMIT } from "../../../src/pipelines/sync/checks.js";
 import { runSync } from "../../../src/pipelines/sync/index.js";
-import { parseState } from "../../../src/shared/state-schema.js";
+import { readRepoRecord } from "../../helpers/repo-record.js";
 import type { State } from "../../../src/shared/state-schema.js";
 
 /**
@@ -20,10 +21,12 @@ import type { State } from "../../../src/shared/state-schema.js";
  */
 const REPO_ROOT = join(__dirname, "..", "..", "..", "..");
 
+/**
+ * The repository's own record at the CURRENT schema — migrated in memory when a
+ * branch has moved the schema ahead of the live file (T-163), never written.
+ */
 function realState(): State {
-  const parsed = parseState(readFileSync(join(REPO_ROOT, ".agents", "state.json"), "utf-8"));
-  if (!parsed.ok) throw new Error(`the repository's own state.json does not parse: ${parsed.error}`);
-  return parsed.data;
+  return readRepoRecord().state;
 }
 
 function fixture(root: string, state: State): string {
@@ -97,7 +100,8 @@ describe("greeting-size — T183-4", () => {
       verified: [],
       handoffs: [
         { seat: "planner", session: 1, pick_up: "PLANNER PICK-UP", watch_out: ["PLANNER WATCH-OUT"], open_questions: [],
-          loop_state: { open_prs: [], frozen_sha: null, questions_for_aaron: [], rulings: [] } },
+          loop_state: { open_prs: [], frozen_sha: null, questions_for_aaron: [], rulings: [] },
+          session_uuid: "u-planner", checkout: "sia-planner" },
       ],
     };
     const unresolved = fixture(join(base, "unresolved"), withHandoff);
@@ -106,7 +110,7 @@ describe("greeting-size — T183-4", () => {
     const asUnresolved = composeGreeting(unresolved, "0.0.0")!.text;
     const asPlanner = composeGreeting(planner, "0.0.0")!.text;
     expect(asUnresolved).toContain("READER'S SEAT UNRESOLVED");
-    expect(asPlanner).toContain("Your handoff — planner, session 1:");
+    expect(asPlanner).toContain("Your handoff — planner [sia-planner], session 1:");
     expect(asPlanner).toContain("    - PLANNER WATCH-OUT");
     expect(asPlanner).not.toBe(asUnresolved);
   });
@@ -137,9 +141,37 @@ describe("greeting-size is wired into runSync", () => {
   }, 30_000);
 });
 
+/**
+ * The root to compose THIS repository's greeting from. Normally the repository
+ * itself. While a branch has moved the schema ahead of the live record (T-163:
+ * the record is migrated after merge, never on a branch), the repository's own
+ * record cannot be read by this build, so a committed temp copy carries the
+ * record migrated in memory, the same role files and the same seat declaration.
+ */
+function greetingRoot(): { root: string; cleanup: () => void } {
+  const { state, migrated } = readRepoRecord();
+  if (!migrated) return { root: REPO_ROOT, cleanup: () => {} };
+  const root = mkdtempSync(join(tmpdir(), "t183-repo-copy-"));
+  fixture(root, state);
+  cpSync(join(REPO_ROOT, ".agents", "roles"), join(root, ".agents", "roles"), { recursive: true });
+  const local = join(REPO_ROOT, ".agents", "AGENT.local.md");
+  if (existsSync(local)) cpSync(local, join(root, ".agents", "AGENT.local.md"));
+  const git = (...a: string[]) => execFileSync("git", a, { cwd: root, stdio: "ignore" });
+  git("init", "-q");
+  git("add", ".agents/roles", ".agents/state.json");
+  git("-c", "user.email=t@example.com", "-c", "user.name=T", "commit", "-q", "-m", "copy");
+  return { root, cleanup: () => rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }) };
+}
+
 describe("the composed greeting carries the role files whole — T183-3", () => {
   it("contains every role file this repository loads, byte for byte", () => {
-    const g = composeGreeting(REPO_ROOT, "0.0.0");
+    const { root, cleanup } = greetingRoot();
+    let g: ReturnType<typeof composeGreeting>;
+    try {
+      g = composeGreeting(root, "0.0.0");
+    } finally {
+      cleanup();
+    }
     expect(g).not.toBeNull();
     const shared = readFileSync(join(REPO_ROOT, ".agents", "roles", "shared.md"), "utf-8").replace(/\s+$/, "");
     expect(shared.length).toBeGreaterThan(1_000);

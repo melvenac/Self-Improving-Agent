@@ -14,7 +14,11 @@
  *
  *   STATE  — replaced in place by a writer; the previous value is not kept:
  *     project, objective, tasks (a task row is updated in place; `status`
- *     moves, it does not append), handoff, last_session.
+ *     moves, it does not append).
+ *
+ *   PER SESSION — one entry per writing session, updated only by that session
+ *     (T-163, schema v3): handoffs, sessions. Retention supersedes an entry
+ *     only with a newer one from the same seat instance.
  *
  *   EVENT  — appended; an entry is never deleted, its `status` changes:
  *     verified (a claim is added when proven and flipped to "reopened" on
@@ -147,13 +151,21 @@ export const LoopStateSchema = z.strictObject({
 });
 
 /**
- * One seat's handoff.
+ * One SESSION's handoff (schema v3, T-163).
  *
- * `seat` exists because a single project-wide slot is a structural defect under
- * the roll rule (`G-046`): when two seats close out in sequence, the second
- * overwrites the first, and a fresh session's greeting reads only the last
- * seat's pick-up. That has already sent a seat to a file that no longer held
- * what it was said to hold.
+ * v2 keyed this by `seat`, which fixed G-046 between roles and left it open
+ * within one: `SeatName` is a ROLE, and three developer checkouts shared the one
+ * `developer` slot, so a developer's close-out still replaced another
+ * developer's. Step 0 of T-163 measured it on a scratch copy of this record.
+ *
+ * v3 keys it by `session_uuid`, the WRITING session, stamped by the writer from
+ * the registered session and never taken from an op. A session can therefore
+ * only add or update its own entry. `seat` stays for rendering; `checkout` (the
+ * project-root basename at write time) identifies the seat INSTANCE, which is
+ * what retention supersedes by — see `supersededBy` in the writer.
+ *
+ * `session_uuid` and `checkout` are null only on entries migrated from v2, which
+ * never recorded either.
  *
  * `loop_state` is required for the planner and optional for everyone else — the
  * rows are the planner's to answer, and a developer or QA seat that happens to
@@ -166,31 +178,48 @@ export const HandoffSchema = z.strictObject({
   open_questions: z.array(z.string()),
   session: sessionNumber,
   loop_state: LoopStateSchema.nullable(),
+  session_uuid: z.string().min(1).nullable(),
+  checkout: z.string().min(1).nullable(),
 }).refine((h) => h.seat !== "planner" || h.loop_state !== null, {
   message: "a planner handoff must carry loop_state (its fields may be empty, but not absent)",
   path: ["loop_state"],
 });
 
-export const LastSessionSchema = z.strictObject({
+/**
+ * One session that wrote the record (schema v3; replaces v2's single
+ * `last_session` slot, which every close-out overwrote — T-163's rev 61/62).
+ *
+ * Written by EVERY state write that carries a session uuid, not by a close-out
+ * step, so it no longer depends on `/end` being run. "The last session" is
+ * derived: `lastSession()`.
+ */
+export const SessionRecordSchema = z.strictObject({
   n: sessionNumber,
   date: z.string().regex(ISO_DATE, "expected YYYY-MM-DD"),
-  uuid: z.string().nullable(),
-  /** Which seat closed it. Null only for records written before seats existed. */
+  /** Null only on the entry migrated from a v2 `last_session` that had none. */
+  uuid: z.string().min(1).nullable(),
+  /** Null when the writing session never named its seat (no set_handoff yet) or for legacy entries. */
   seat: SeatName.nullable(),
+  checkout: z.string().min(1).nullable(),
 });
+
+function unique(values: Array<string | null>): boolean {
+  const real = values.filter((v): v is string => v !== null);
+  return new Set(real).size === real.length;
+}
 
 export const StateSchema = z.strictObject({
   /**
-   * 2 as of Loop 14: `handoff` became `handoffs`, an array keyed by seat.
+   * 3 as of T-163: handoffs keyed by the writing session, and `last_session`
+   * replaced by `sessions`. 2 was Loop 14's handoffs-by-seat.
    *
-   * A `z.literal`, so a v1 file fails to parse OUTRIGHT rather than being
-   * tolerated and read back as absence. There is no migration runner for this
-   * file, which is exactly why a hard failure is the right behaviour: every copy
-   * — the live record, the shipped template and the test fixture — must move in
-   * the same commit, and a loud refusal is what guarantees none was missed. The
-   * same argument ADR-027 used when `project.version` was removed.
+   * A `z.literal`, so an older file fails to parse OUTRIGHT rather than being
+   * tolerated and read back as absence. `open-brain state migrate` is the
+   * program that moves a record forward; every copy — the live record, the
+   * shipped template and the test fixture — must move, and a loud refusal is
+   * what guarantees none was missed.
    */
-  schema_version: z.literal(2),
+  schema_version: z.literal(3),
   revision: nonNegInt,
   project: ProjectSchema,
   objective: ObjectiveSchema.nullable(),
@@ -198,16 +227,20 @@ export const StateSchema = z.strictObject({
   verified: z.array(VerifiedSchema),
   gaps: z.array(GapSchema),
   decisions: z.array(DecisionSchema),
-  /** At most one per seat; see SeatName. Order is not significant. */
+  /** One per writing session; order is write order and not significant. */
   handoffs: z.array(HandoffSchema),
-  last_session: LastSessionSchema,
+  /** One per writing session. */
+  sessions: z.array(SessionRecordSchema),
+}).refine((s) => unique(s.handoffs.map((h) => h.session_uuid)), {
+  message: "handoffs must hold at most one entry per session_uuid",
+  path: ["handoffs"],
 }).refine(
-  (s) => {
-    const seats = s.handoffs.map((h) => h.seat);
-    return new Set(seats).size === seats.length;
-  },
-  { message: "handoffs must hold at most one entry per seat", path: ["handoffs"] }
-);
+  (s) => unique(s.handoffs.filter((h) => h.session_uuid === null).map((h) => h.seat)),
+  { message: "handoffs may hold at most one legacy (null session_uuid) entry per seat", path: ["handoffs"] }
+).refine((s) => unique(s.sessions.map((x) => x.uuid)), {
+  message: "sessions must hold at most one entry per uuid",
+  path: ["sessions"],
+});
 
 export type State = z.infer<typeof StateSchema>;
 export type Task = z.infer<typeof TaskSchema>;
@@ -217,8 +250,65 @@ export type Decision = z.infer<typeof DecisionSchema>;
 export type Handoff = z.infer<typeof HandoffSchema>;
 export type LoopState = z.infer<typeof LoopStateSchema>;
 export type OpenPr = z.infer<typeof OpenPrSchema>;
+export type SessionRecord = z.infer<typeof SessionRecordSchema>;
 
-export const SCHEMA_VERSION = 2 as const;
+export const SCHEMA_VERSION = 3 as const;
+
+/**
+ * What to do about a record this build cannot read BECAUSE OF ITS VERSION, or
+ * null when the version is not the problem. The two directions have different
+ * remedies and a refusal that names the wrong one sends the reader the wrong
+ * way: an OLDER record is migrated (T-163's v3 lands in code before the live
+ * record is migrated after merge); a NEWER one needs a newer build.
+ */
+export function schemaVersionAdvice(text: string): string | null {
+  let v: unknown;
+  try {
+    v = (JSON.parse(text) as { schema_version?: unknown }).schema_version;
+  } catch {
+    return null;
+  }
+  if (typeof v !== "number" || v === SCHEMA_VERSION) return null;
+  if (v < SCHEMA_VERSION) {
+    return `the record is schema v${v}, OLDER than this build's v${SCHEMA_VERSION}: migrate it with \`node open-brain/build/cli.js state migrate --dry-run .agents/state.json\`, read the changes, then run it without --dry-run`;
+  }
+  return `the record is schema v${v}, NEWER than this build's v${SCHEMA_VERSION}: rebuild this checkout from a commit that carries v${v}`;
+}
+
+/**
+ * The most recent session in the record: the highest `n`, the later entry on a
+ * tie. Derived, not stored — storing it is the single slot T-163 removed.
+ * Null for a record no session has written yet.
+ */
+export function lastSession(state: Pick<State, "sessions">): SessionRecord | null {
+  let best: SessionRecord | null = null;
+  for (const s of state.sessions) if (best === null || s.n >= best.n) best = s;
+  return best;
+}
+
+/**
+ * The handoffs a reader is shown: the newest per (seat, checkout), which is one
+ * per seat INSTANCE. Older entries stay in the record and are not rendered, so
+ * the greeting does not grow with the array (the planner's ruling on T-163,
+ * after T-183 cut the greeting). Input order is preserved among survivors.
+ */
+export function newestHandoffPerInstance(handoffs: readonly Handoff[]): Handoff[] {
+  const newest = new Map<string, Handoff>();
+  for (const h of handoffs) {
+    const key = `${h.seat}\u0000${h.checkout ?? ""}`;
+    const cur = newest.get(key);
+    if (!cur || h.session >= cur.session) newest.set(key, h);
+  }
+  const keep = new Set(newest.values());
+  return handoffs.filter((h) => keep.has(h));
+}
+
+/** The newest handoff of one seat role across its instances, or null. */
+export function newestHandoffForSeat(handoffs: readonly Handoff[], seat: Seat): Handoff | null {
+  let best: Handoff | null = null;
+  for (const h of handoffs) if (h.seat === seat && (best === null || h.session >= best.session)) best = h;
+  return best;
+}
 
 /**
  * `path` is the zod path of the FIRST issue, dot-joined, or `$` for the root —
@@ -263,7 +353,7 @@ export function serializeState(data: State): string {
 }
 
 const KEY_ORDER: Record<string, string[]> = {
-  $: ["schema_version", "revision", "project", "objective", "tasks", "verified", "gaps", "decisions", "handoffs", "last_session"],
+  $: ["schema_version", "revision", "project", "objective", "tasks", "verified", "gaps", "decisions", "handoffs", "sessions"],
   project: ["name"],
   objective: ["text", "since_session"],
   tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note"],
@@ -271,10 +361,10 @@ const KEY_ORDER: Record<string, string[]> = {
   evidence: ["type", "path", "observation"],
   gaps: ["id", "what", "evidence", "recommended_update", "opened_session"],
   decisions: ["id", "title", "date", "note"],
-  handoffs: ["seat", "pick_up", "watch_out", "open_questions", "session", "loop_state"],
+  handoffs: ["seat", "pick_up", "watch_out", "open_questions", "session", "loop_state", "session_uuid", "checkout"],
   loop_state: ["open_prs", "frozen_sha", "questions_for_aaron", "rulings"],
   open_prs: ["ref", "qa_status", "note"],
-  last_session: ["n", "date", "uuid", "seat"],
+  sessions: ["n", "date", "uuid", "seat", "checkout"],
 };
 
 function canonicalize(value: unknown, slot = "$"): unknown {

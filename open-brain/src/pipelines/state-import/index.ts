@@ -22,6 +22,7 @@ import {
   StateSchema,
   parseState,
   serializeState,
+  lastSession,
   type State,
   type Task,
   type Verified,
@@ -309,7 +310,7 @@ function bullets(body: string[]): string[] {
  * guess, so the assumption is recorded in the report instead.
  */
 export function importHandoff(text: string | null, current: number, report: ImportReport["handoff"]): State["handoffs"][number] {
-  const handoff: State["handoffs"][number] = { seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: current, loop_state: null };
+  const handoff: State["handoffs"][number] = { seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: current, loop_state: null, session_uuid: null, checkout: null };
   if (!text) return handoff;
   const lines = text.split(/\r?\n/);
   const headings = lines.map((l, i) => ({ l, i })).filter(({ l }) => /^#{2,6} /.test(l));
@@ -444,7 +445,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
   if (texts.summary) report.summary_removal = planSummaryRemoval(texts.summary).report;
 
   const state: State = {
-    schema_version: 2,
+    schema_version: 3,
     revision: 0,
     project: { name: report.project.name },
     objective,
@@ -453,7 +454,9 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
     gaps,
     decisions,
     handoffs: [handoff],
-    last_session: { n: last.n, date: last.date, uuid: last.uuid, seat: null },
+    // Schema v3 (T-163): the prose session log's last session becomes the first
+    // entry of sessions[]; its seat and checkout were never recorded.
+    sessions: [{ n: last.n, date: last.date, uuid: last.uuid, seat: null, checkout: null }],
   };
   return { state, report };
 }
@@ -628,7 +631,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   }
 
   // 4. Render the four views through the Loop 3 renderers (empty batch = no revision bump).
-  const r = applyStateOps(root, { session: parsed.data.last_session.n, expected_revision: 0, ops: [], render: true, version: opts.version });
+  const r = applyStateOps(root, { session: lastSession(parsed.data)?.n ?? 0, expected_revision: 0, ops: [], render: true, version: opts.version });
   if (!r.ok) throw new Error(`render after commit refused: ${r.error}`);
 
   // 5. Move the draft and the report into the snapshot.

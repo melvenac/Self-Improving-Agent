@@ -18,7 +18,7 @@ import { parseState, type State } from "../../src/shared/state-schema.js";
 const fixtureText = readFileSync(join(import.meta.dirname, "../fixtures-state/state.json"), "utf-8");
 const fixtureSummary = readFileSync(join(import.meta.dirname, "../fixtures/.agents/SYSTEM/SUMMARY.md"), "utf-8");
 const state: State = (() => { const r = parseState(fixtureText); if (!r.ok) throw new Error(r.error); return r.data; })();
-const opts = { version: "0.30.0", session: state.last_session.n };
+const opts = { version: "0.30.0", session: state.sessions[0].n };
 const HEADER = "<!-- generated from .agents/state.json rev 7 by open-brain v0.30.0 — do not edit; change state via ob_state -->";
 
 describe("state views (Loop 3 C3)", () => {
@@ -68,11 +68,27 @@ describe("state views (Loop 3 C3)", () => {
     // moved one level down. The seat heading is asserted too: a view that
     // rendered the fields without saying whose they are is the shape G-046
     // describes, and it read perfectly well right up until two seats had one.
-    expect(text).toContain("## developer _(written session 54)_");
+    expect(text).toContain("## developer [legacy] _(written session 54)_");
     expect(text).toContain("### Pick up here\n\nLoop 2: run V1–V9 on the frozen tag");
     expect(text).toContain("### Watch out\n\n- The live MCP server stays on the old build until /mcp reconnect open-brain.");
     expect(text).toContain("### Open questions\n\n- Q2:");
     expect(text).toContain("## Last session\n\nSession 54 — 2026-09-14 — `f7a1b3d9-ef6d-482f-aba1-ddaa296f722b`");
+  });
+
+  it("next-session.md renders the NEWEST handoff per seat and checkout, and counts the rest (T-163)", () => {
+    const base = state.handoffs[0];
+    const mk = (session: number, uuid: string, checkout: string, pick_up: string) => ({ ...base, session, session_uuid: uuid, checkout, pick_up });
+    const many: State = {
+      ...state,
+      handoffs: [base, mk(60, "a", "sia-builder", "OLDER BUILDER"), mk(70, "b", "sia-builder", "NEWER BUILDER"), mk(65, "c", "sia-forge", "FORGE WORDS")],
+    };
+    const text = renderNextSession(many, opts);
+    expect(text).toContain("## developer [sia-builder] _(written session 70)_");
+    expect(text).toContain("NEWER BUILDER");
+    expect(text).not.toContain("OLDER BUILDER");
+    expect(text).toContain("## developer [sia-forge] _(written session 65)_");
+    expect(text).toContain("## developer [legacy] _(written session 54)_");
+    expect(text).toContain("_1 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._");
   });
 
   it("SUMMARY region: status line, working / broken / next / decisions (V4)", () => {
@@ -135,7 +151,7 @@ describe("state views (Loop 3 C3)", () => {
 });
 
 describe("T-144: rendered Done obeys the retention window", () => {
-  const session = state.last_session.n;
+  const session = state.sessions[0].n;
   const doneIds = (text: string) =>
     [...text.matchAll(/^- \[x\] \*\*(T-\d+)\*\*/gm)].map((m) => m[1]);
 

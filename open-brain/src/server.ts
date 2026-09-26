@@ -24,12 +24,12 @@ import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/histo
 import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
 import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
 import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
-import { SeatName, type Seat } from "./shared/state-schema.js";
+import { SeatName, schemaVersionAdvice, type Seat } from "./shared/state-schema.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
-import { applyStateOps, DONE_RETENTION_SESSIONS } from "./shared/state-writer.js";
+import { applyStateOps, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/session-end/recalled-ids.js";
@@ -319,7 +319,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         lines.push(
           `\nSTATE RECORD REFUSED: ${sj.error}.`,
           `This build cannot read this record's schema version. NOT falling back to the prose files: they are a DIFFERENT and older account of the project, and a greeting built from them would look ordinary while describing a state the record has moved past.`,
-          `Rebuild the checkout this process runs from against a commit carrying the record's schema, then start again.`,
+          versionAdviceFor(projectRoot) ?? `Rebuild the checkout this process runs from against a commit carrying the record's schema, then start again.`,
         );
         const text = lines.join("\n");
         return {
@@ -368,6 +368,20 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
   }
 }
 
+/**
+ * The version-direction advice for this project's record, or null. An older
+ * record is MIGRATED; rebuilding (the only advice this refusal gave before
+ * T-163) would change nothing for it.
+ */
+function versionAdviceFor(projectRoot: string): string | null {
+  try {
+    const advice = schemaVersionAdvice(readFileSync(join(projectRoot, ".agents", "state.json"), "utf-8"));
+    return advice ? advice.charAt(0).toUpperCase() + advice.slice(1) + "." : null;
+  } catch {
+    return null;
+  }
+}
+
 export interface StateArgs {
   project_root?: string;
   session: number;
@@ -384,12 +398,19 @@ export interface StateArgs {
 export async function handleState(args: StateArgs): Promise<ToolResponse> {
   try {
     const projectRoot = resolve(args.project_root ?? ".");
+    // T-163: the WRITING session is this server's registered session, never an
+    // op argument, so a batch cannot write under another session's uuid. The
+    // checkout's declared seat labels the session record; set_handoff's own
+    // seat overrides it.
+    const identity = readAgentIdentity(projectRoot);
     const r = applyStateOps(projectRoot, {
       session: args.session,
       expected_revision: args.expected_revision,
       ops: args.ops,
       dry_run: args.dry_run,
       render: args.render,
+      session_uuid: writeSessionId().id,
+      seat: identity && isSeat(identity.role) ? identity.role : null,
     });
     const lines: string[] = [];
     if (!r.ok) {
@@ -432,6 +453,8 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
     // among several and read as routine.
     if (r.kept_cited_task_ids.length) lines.push(`KEPT despite retention (id cited in the tracked tree): ${r.kept_cited_task_ids.join(", ")}`);
     if (r.removed_gap_ids.length) lines.push(`Closed gaps removed: ${r.removed_gap_ids.join(", ")}`);
+    // T-163: an entry leaves the per-session arrays only by retention, and says so.
+    if (r.superseded.length) lines.push(`Superseded by a newer entry of the same seat and checkout (>${RECORD_RETENTION_SESSIONS} sessions old): ${r.superseded.join("; ")}`);
     // Anything the writer did differently from what was asked.
     for (const n of r.notes) lines.push(`NOTE: ${n}`);
     lines.push(`${r.dry_run ? "Would render" : "Rendered"} (${r.rendered.length}): ${r.rendered.length ? r.rendered.join(", ") : "none (render: false)"}`);
@@ -608,7 +631,7 @@ server.tool(
 
 server.tool(
   "ob_state",
-  "Write .agents/state.json through typed operations (open_task, update_task, close_task, reopen_task, add_verified, reopen_verified, add_gap, update_gap, close_gap, add_decision, set_objective, set_handoff, end_session). Atomic: all ops apply or none. Requires the file to exist and expected_revision to match; bumps revision, applies done-task retention, and regenerates INBOX.md, task.md, next-session.md and the marked region of SUMMARY.md. An empty ops array with render: true re-renders the views without touching state.json or its revision.",
+  "Write .agents/state.json through typed operations (open_task, update_task, close_task, reopen_task, add_verified, reopen_verified, add_gap, update_gap, close_gap, add_decision, set_objective, set_handoff). Every write records this session (its registered uuid) in sessions[]; set_handoff writes THIS session's handoff and cannot touch another session's, and refuses when no session is registered. end_session is retired (schema v3, T-163). Atomic: all ops apply or none. Requires the file to exist and expected_revision to match; bumps revision, applies done-task retention, and regenerates INBOX.md, task.md, next-session.md and the marked region of SUMMARY.md. An empty ops array with render: true re-renders the views without touching state.json or its revision.",
   {
     project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
     session: z.number().int().min(0).describe("Current session number — stamped on opened/closed/verified items"),

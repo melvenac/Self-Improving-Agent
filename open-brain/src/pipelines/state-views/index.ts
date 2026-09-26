@@ -8,7 +8,7 @@
  * outside it is the project's own prose and is preserved byte for byte.
  */
 import type { State, Task, Handoff } from "../../shared/state-schema.js";
-import { TaskPriority } from "../../shared/state-schema.js";
+import { TaskPriority, lastSession, newestHandoffPerInstance } from "../../shared/state-schema.js";
 
 export interface ViewOptions {
   version: string;
@@ -138,10 +138,17 @@ export function renderNextSession(state: State, o: ViewOptions): string {
   if (state.handoffs.length === 0) {
     lines.push("_No handoffs recorded._", "");
   } else {
+    // Schema v3 (T-163): one entry per writing session. The view renders the
+    // newest per seat INSTANCE (seat + checkout), the same set the greeting
+    // shows, so it does not grow with the array. Within a seat, instances sort
+    // by checkout name so a write cannot reorder another instance's section.
     const order: Array<Handoff["seat"]> = ["planner", "developer", "qa"];
-    const sorted = [...state.handoffs].sort((a, b) => order.indexOf(a.seat) - order.indexOf(b.seat));
+    const sorted = newestHandoffPerInstance(state.handoffs).sort(
+      (a, b) => order.indexOf(a.seat) - order.indexOf(b.seat) || (a.checkout ?? "").localeCompare(b.checkout ?? ""),
+    );
+    const hidden = state.handoffs.length - sorted.length;
     for (const h of sorted) {
-      lines.push(`## ${h.seat} _(written session ${h.session})_`, "");
+      lines.push(`## ${h.seat} [${h.checkout ?? "legacy"}] _(written session ${h.session})_`, "");
       lines.push("### Pick up here", "", h.pick_up || "_Nothing recorded._", "");
       lines.push("### Watch out", "");
       if (h.watch_out.length === 0) lines.push("_Nothing flagged._");
@@ -165,10 +172,18 @@ export function renderNextSession(state: State, o: ViewOptions): string {
         lines.push("");
       }
     }
+    if (hidden > 0) lines.push(`_${hidden} older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._`, "");
   }
 
-  const ls = state.last_session;
-  lines.push("## Last session", "", `Session ${ls.n} — ${ls.date}${ls.seat ? ` — ${ls.seat}` : ""}${ls.uuid ? ` — \`${ls.uuid}\`` : ""}`, "");
+  const ls = lastSession(state);
+  lines.push(
+    "## Last session",
+    "",
+    ls
+      ? `Session ${ls.n} — ${ls.date}${ls.seat ? ` — ${ls.seat}` : ""}${ls.checkout ? ` [${ls.checkout}]` : ""}${ls.uuid ? ` — \`${ls.uuid}\`` : ""} (${state.sessions.length} writing session(s) in the record)`
+      : "_None recorded._",
+    "",
+  );
   return lines.join("\n");
 }
 

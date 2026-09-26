@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "revision": 7,
   "project": {
     "name": "Self-Improving-Agent"
@@ -480,13 +480,18 @@
         "Q3: is the rating signal cut or replaced?"
       ],
       "session": 54,
-      "loop_state": null
+      "loop_state": null,
+      "session_uuid": null,
+      "checkout": null
     }
   ],
-  "last_session": {
-    "n": 54,
-    "date": "2026-09-14",
-    "uuid": "f7a1b3d9-ef6d-482f-aba1-ddaa296f722b",
-    "seat": null
-  }
+  "sessions": [
+    {
+      "n": 54,
+      "date": "2026-09-14",
+      "uuid": "f7a1b3d9-ef6d-482f-aba1-ddaa296f722b",
+      "seat": null,
+      "checkout": null
+    }
+  ]
 }

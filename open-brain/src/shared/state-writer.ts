@@ -20,7 +20,7 @@
  */
 import { existsSync, readFileSync, writeFileSync, renameSync, unlinkSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { join } from "node:path";
+import { basename, join, resolve } from "node:path";
 import { z } from "zod";
 import {
   StateSchema,
@@ -30,6 +30,7 @@ import {
   LoopStateSchema,
   parseState,
   serializeState,
+  type Seat,
   type State,
   type Task,
 } from "./state-schema.js";
@@ -63,13 +64,31 @@ export const OpSchema = z.discriminatedUnion("op", [
   z.strictObject({ op: z.literal("close_gap"), id: z.string() }),
   z.strictObject({ op: z.literal("add_decision"), id: z.string().optional(), title: z.string().min(1), date: z.string().regex(ISO_DATE, "expected YYYY-MM-DD"), note: z.string() }),
   z.strictObject({ op: z.literal("set_objective"), text: z.string().min(1).nullable() }),
-  // `seat` is REQUIRED on both, and is an enum so an unknown seat refuses rather
-  // than creating a fourth seat nobody reads. G-046: one project-wide slot means
-  // the second close-out of a roll overwrites the first, every loop.
+  // `seat` is REQUIRED and is an enum so an unknown seat refuses rather than
+  // creating a fourth seat nobody reads. The WRITING SESSION is deliberately not
+  // an argument: it comes from ApplyStateOptions.session_uuid, so a batch cannot
+  // write under another session's uuid (T-163). The op is strict, so a batch
+  // that tries is refused rather than having the key ignored.
   z.strictObject({ op: z.literal("set_handoff"), seat: SeatName, pick_up: z.string(), watch_out: z.array(z.string()), open_questions: z.array(z.string()), loop_state: LoopStateSchema.nullable().optional() }),
-  z.strictObject({ op: z.literal("end_session"), n: z.number().int().min(0), date: z.string().regex(ISO_DATE, "expected YYYY-MM-DD"), uuid: z.string().nullable(), seat: SeatName }),
 ]);
 export type StateOp = z.infer<typeof OpSchema>;
+
+/**
+ * Retired ops, refused by name before the schema sees them so the refusal says
+ * WHY rather than "invalid discriminator".
+ */
+const RETIRED_OPS: Record<string, string> = {
+  end_session:
+    "retired in schema v3 (T-163) — every state write now records its session in sessions[], so there is no close-out slot to set; the last session is derived",
+};
+
+/**
+ * Retention for the per-session arrays (handoffs, sessions): an entry is
+ * dropped only when a NEWER entry of the same seat instance exists and the
+ * entry is more than this many record sessions older than the newest session in
+ * the record. The planner's ruling on T-163 (record session 109).
+ */
+export const RECORD_RETENTION_SESSIONS = 10;
 
 export interface ApplyStateOptions {
   session: number;
@@ -79,6 +98,24 @@ export interface ApplyStateOptions {
   render?: boolean;
   /** Version stamped into the generated views; defaults to the root package.json. */
   version?: string;
+  /**
+   * The WRITING session's uuid — `ob_state` passes the server's registered
+   * session. Every write that carries one records that session in `sessions[]`;
+   * `set_handoff` refuses without one. Never taken from an op.
+   */
+  session_uuid?: string | null;
+  /**
+   * The seat instance's checkout: the basename of the project root unless given.
+   * With `seat` it identifies the instance retention supersedes by.
+   *
+   * LIMIT, stated because it bounds the rule: two machines whose checkouts share
+   * a basename are one instance to this writer.
+   */
+  checkout?: string;
+  /** The writing checkout's seat, when the caller resolved one. A set_handoff in the batch overrides it. */
+  seat?: Seat | null;
+  /** YYYY-MM-DD stamped on the session record; defaults to today (local). */
+  today?: string;
 }
 
 export interface WriteResult {
@@ -93,6 +130,8 @@ export interface WriteResult {
    * `dropped_task_ids` so a caller can say which is which.
    */
   kept_cited_task_ids: string[];
+  /** Per-session entries retention superseded (T-163), as `handoff <uuid|seat@n>` / `session <uuid|n>`. */
+  superseded: string[];
   removed_gap_ids: string[];
   rendered: string[];
   /**
@@ -142,7 +181,7 @@ export function readState(projectRoot: string): { ok: true; data: State; path: s
 export function applyStateOps(projectRoot: string, options: ApplyStateOptions): WriteResult {
   const dryRun = options.dry_run === true;
   const refuse = (before: number, error: string, errorPath?: string): WriteResult => ({
-    ok: false, revision_before: before, revision_after: before, applied: [], dropped_task_ids: [], kept_cited_task_ids: [], removed_gap_ids: [], rendered: [], notes: [], dry_run: dryRun, error, error_path: errorPath,
+    ok: false, revision_before: before, revision_after: before, applied: [], dropped_task_ids: [], kept_cited_task_ids: [], superseded: [], removed_gap_ids: [], rendered: [], notes: [], dry_run: dryRun, error, error_path: errorPath,
   });
 
   const statePath = join(projectRoot, STATE_REL);
@@ -162,34 +201,36 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
 
   // THE EFFECTIVE SESSION NUMBER, resolved BEFORE any op is applied.
   //
-  // G-047's fix made `end_session` keep the existing number when the uuid
-  // returns — but `end_session` runs LAST, so every earlier op in the same batch
-  // had already been stamped with the number the caller asked for. The record
-  // then said a handoff was written in session 72 while `last_session` said 71,
-  // and 72 did not exist. Found by reading the record back after the write that
-  // introduced it.
-  //
-  // A fix that leaves the record internally inconsistent is not a fix, so the
-  // whole batch is stamped with the number this session actually has.
-  const endOp = options.ops.find(
-    (o): o is { op: "end_session"; uuid: string | null; n: number } =>
-      typeof o === "object" && o !== null && (o as { op?: unknown }).op === "end_session",
-  );
-  const sessionIsAlreadyRecorded =
-    endOp !== undefined && endOp.uuid !== null && next.last_session.uuid === endOp.uuid;
-  const effectiveSession = sessionIsAlreadyRecorded ? next.last_session.n : options.session;
+  // G-047: the number counts SESSIONS, not writes. A session already in
+  // sessions[] keeps its number for every op in the batch, whatever the caller
+  // passed — a batch stamped with one number while the record says another left
+  // the record internally inconsistent once (a handoff "in session 72" when 72
+  // did not exist), so the whole batch takes the recorded number.
+  const uuid = options.session_uuid ?? null;
+  const checkout = options.checkout ?? basename(resolve(projectRoot));
+  const today = options.today ?? localIsoDate();
+  const mine = uuid === null ? undefined : next.sessions.find((s) => s.uuid === uuid);
+  const effectiveSession = mine ? mine.n : options.session;
   const applied: WriteResult["applied"] = [];
   const removedGaps: string[] = [];
   const notes: string[] = [];
+  if (mine && mine.n !== options.session) {
+    notes.push(`session ${uuid} is already recorded as session ${mine.n}; kept ${mine.n} rather than taking ${options.session}, and EVERY op in this batch was stamped ${mine.n} (G-047 - the number counts sessions, not writes)`);
+  }
+  const ctx: OpContext = { session: effectiveSession, uuid, checkout, removedGaps, notes };
 
   for (let i = 0; i < options.ops.length; i++) {
+    const opName = (options.ops[i] as { op?: unknown } | null)?.op;
+    if (typeof opName === "string" && opName in RETIRED_OPS) {
+      return refuse(before, `ops[${i}] (${opName}): ${RETIRED_OPS[opName]}`);
+    }
     const v = OpSchema.safeParse(options.ops[i]);
     if (!v.success) {
       const issue = v.error.issues[0];
       const path = issue.path.length ? issue.path.map(String).join(".") : "$";
       return refuse(before, `ops[${i}] invalid at ${path}: ${issue.message}`);
     }
-    const r = applyOne(next, v.data, effectiveSession, removedGaps, notes);
+    const r = applyOne(next, v.data, ctx);
     if (!r.ok) return refuse(before, `ops[${i}] (${v.data.op}): ${r.error}`);
     applied.push({ op: v.data.op, id: r.id });
   }
@@ -200,6 +241,24 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   // is what /sync uses to refresh stale view headers without inventing a
   // state change.
   const renderOnly = options.ops.length === 0;
+
+  // T-163: every write records the session that made it, so the record holds
+  // every writing session's uuid rather than the last closer's. Upserted by
+  // uuid: a session can only add or update its OWN entry.
+  if (!renderOnly) {
+    if (uuid === null) {
+      notes.push("no registered session: this write is not attributed and sessions[] is unchanged (set_handoff would refuse)");
+    } else {
+      const handedOffAs = [...options.ops].reverse().find(
+        (o): o is { op: "set_handoff"; seat: Seat } => (o as { op?: unknown }).op === "set_handoff",
+      )?.seat;
+      const seat = handedOffAs ?? mine?.seat ?? options.seat ?? null;
+      const entry = { n: effectiveSession, date: today, uuid, seat, checkout };
+      if (mine) Object.assign(mine, entry);
+      else next.sessions.push(entry);
+    }
+  }
+  const superseded = renderOnly ? [] : applyInstanceRetention(next);
   // T-157: a done task whose id is cited anywhere in the tracked tree is kept.
   // Retention has twice evicted a task that other tracked documents referred to
   // by id, reporting it as one line among several. Hand-preservation does not
@@ -251,6 +310,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
     applied,
     dropped_task_ids: dropped,
     kept_cited_task_ids: retention.kept,
+    superseded,
     removed_gap_ids: removedGaps,
     rendered: views.map((v) => v.rel),
     notes,
@@ -274,7 +334,16 @@ export function validateResultState(candidate: unknown): { ok: true; data: State
 
 type OpResult = { ok: true; id: string | null } | { ok: false; error: string };
 
-function applyOne(s: State, op: StateOp, session: number, removedGaps: string[], notes: string[]): OpResult {
+interface OpContext {
+  session: number;
+  uuid: string | null;
+  checkout: string;
+  removedGaps: string[];
+  notes: string[];
+}
+
+function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
+  const { session, removedGaps } = ctx;
   switch (op.op) {
     case "open_task": {
       const id = op.id ?? nextId("T", s.tasks.map((t) => t.id));
@@ -372,9 +441,13 @@ function applyOne(s: State, op: StateOp, session: number, removedGaps: string[],
       if (op.seat === "planner" && (op.loop_state === null || op.loop_state === undefined)) {
         return { ok: false, error: "a planner handoff must carry loop_state - open_prs, frozen_sha, questions_for_aaron and rulings may be EMPTY but not absent (C3)" };
       }
-      // Replace this seat's entry in place and leave every other seat's alone.
-      // That is the whole of G-046: under the roll rule two seats close out in
-      // sequence, and one slot meant the second erased the first.
+      // T-163: keyed by the WRITING SESSION, not the seat. v2 keyed by seat, and
+      // SeatName is a role: three developer checkouts shared one slot, so a
+      // developer's close-out erased another developer's (Step 0, record 118).
+      // A session adds its own entry or updates it; it cannot reach another's.
+      if (ctx.uuid === null) {
+        return { ok: false, error: "set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing" };
+      }
       const entry = {
         seat: op.seat,
         pick_up: op.pick_up,
@@ -382,40 +455,76 @@ function applyOne(s: State, op: StateOp, session: number, removedGaps: string[],
         open_questions: op.open_questions,
         session,
         loop_state: op.loop_state ?? null,
+        session_uuid: ctx.uuid,
+        checkout: ctx.checkout,
       };
-      const idx = s.handoffs.findIndex((h) => h.seat === op.seat);
+      const idx = s.handoffs.findIndex((h) => h.session_uuid === ctx.uuid);
       if (idx === -1) s.handoffs.push(entry);
       else s.handoffs[idx] = entry;
       return { ok: true, id: op.seat };
     }
-    case "end_session": {
-      // G-047: this number counted CLOSE-OUT WRITES, not sessions. One developer
-      // seat-session wrote end_session three times in slice two - n=67, 68, 69
-      // under one uuid, once per candidate and once at the roll - so every
-      // per-session rate was computed against a denominator that inflates most
-      // for the loops that went worst.
-      //
-      // A second write for the same uuid UPDATES that session rather than taking
-      // a new number, and says so. Normalising rather than refusing is deliberate:
-      // a second close-out mid-loop is an ordinary event, and refusing it would
-      // break the case that actually occurs.
-      //
-      // LIMIT, stated because it bounds the fix: the record keeps only
-      // `last_session`, so this recognises a uuid that returns IMMEDIATELY, which
-      // is the observed shape. A uuid returning after another seat has taken a
-      // number is not recognised and will take a new one.
-      const prev = s.last_session;
-      if (op.uuid !== null && prev.uuid === op.uuid) {
-        if (op.n !== prev.n) {
-          notes.push(`end_session: uuid ${op.uuid} is already recorded as session ${prev.n}; kept ${prev.n} rather than taking ${op.n}, and EVERY op in this batch was stamped ${prev.n} for the same reason (G-047 - the number counts sessions, not close-out writes)`);
-        }
-        s.last_session = { n: prev.n, date: op.date, uuid: op.uuid, seat: op.seat };
-        return { ok: true, id: null };
-      }
-      s.last_session = { n: op.n, date: op.date, uuid: op.uuid, seat: op.seat };
-      return { ok: true, id: null };
-    }
   }
+}
+
+/** Today as YYYY-MM-DD in local time — the date a human at this machine would write. */
+function localIsoDate(d = new Date()): string {
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+/** An entry of one of the per-session arrays, reduced to what retention reads. */
+export interface InstanceEntry {
+  seat: string | null;
+  checkout: string | null;
+  session: number;
+}
+
+/**
+ * Is `entry` superseded, given every entry of its array and the record's newest
+ * session number? True only when a NEWER entry of the same seat instance —
+ * same seat AND same checkout, null matching only null — exists, and the entry
+ * is more than RECORD_RETENTION_SESSIONS older than `newest`.
+ *
+ * The newest entry of an instance is therefore never superseded, so a seat
+ * that is still working keeps its last word however long it goes quiet, and a
+ * legacy entry (null checkout, migrated from v2) is its own instance and is
+ * never superseded by a new write. Exported because the record-erasure check
+ * recomputes exactly this rule: a removal it explains is retention, and any
+ * other removal of another session's entry is an erasure.
+ */
+export function isSuperseded(entry: InstanceEntry, all: readonly InstanceEntry[], newest: number): boolean {
+  if (!(entry.session < newest - RECORD_RETENTION_SESSIONS)) return false;
+  return all.some((o) => o !== entry && o.seat === entry.seat && o.checkout === entry.checkout && o.session > entry.session);
+}
+
+/** The record's newest session number: the highest `n` in sessions[], or -1 when there is none. */
+export function newestSessionNumber(s: Pick<State, "sessions">): number {
+  return s.sessions.reduce((m, x) => Math.max(m, x.n), -1);
+}
+
+/**
+ * Drops superseded handoffs and session records (see `isSuperseded`). Returns a
+ * label per dropped entry so the caller prints it — retention that is not
+ * reported is the G-024 shape.
+ */
+export function applyInstanceRetention(s: State): string[] {
+  const newest = newestSessionNumber(s);
+  const out: string[] = [];
+  const hAll = s.handoffs.map((h) => ({ seat: h.seat, checkout: h.checkout, session: h.session, ref: h }));
+  const hDrop = new Set(hAll.filter((e) => isSuperseded(e, hAll, newest)).map((e) => e.ref));
+  s.handoffs = s.handoffs.filter((h) => {
+    if (!hDrop.has(h)) return true;
+    out.push(`handoff ${h.session_uuid ?? `${h.seat}@${h.session}`} (${h.seat}, ${h.checkout ?? "legacy"}, session ${h.session})`);
+    return false;
+  });
+  const sAll = s.sessions.map((x) => ({ seat: x.seat, checkout: x.checkout, session: x.n, ref: x }));
+  const sDrop = new Set(sAll.filter((e) => isSuperseded(e, sAll, newest)).map((e) => e.ref));
+  s.sessions = s.sessions.filter((x) => {
+    if (!sDrop.has(x)) return true;
+    out.push(`session ${x.uuid ?? `#${x.n}`} (${x.seat ?? "no seat"}, ${x.checkout ?? "legacy"}, session ${x.n})`);
+    return false;
+  });
+  return out;
 }
 
 function findTask(s: State, id: string): Task | undefined {

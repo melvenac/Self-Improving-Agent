@@ -323,12 +323,12 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   // Loop 4 C1: the one-shot migration door. `state import --draft` (default)
   // writes a reviewable draft + report; `--commit` applies the reviewed draft.
   const sub = args[1];
-  if (sub !== "import" && sub !== "show" && sub !== "migrate") {
-    console.error("Usage: open-brain state <show [--json] | import [--draft | --commit] [--force-snapshot] | migrate --seat <planner|developer|qa> [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>> [dir]");
+  if (sub !== "import" && sub !== "show" && sub !== "migrate" && sub !== "erasures") {
+    console.error("Usage: open-brain state <show [--json] | erasures [dir] | import [--draft | --commit] [--force-snapshot] | migrate [--seat <planner|developer|qa>] [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>> [dir]");
     process.exit(1);
   }
 
-  // Loop 14 C2: schema v1 -> v2. `applyStateOps` cannot do this — it refuses a
+  // Loop 14 C2: schema v1 -> v2; T-163: v2 -> v3. `applyStateOps` cannot do this — it refuses a
   // file that does not validate against the CURRENT schema, so once the schema
   // moves the writer can no longer read the record it must migrate. The only
   // alternative is a hand-edit of the record, which is what the single-writer
@@ -337,12 +337,9 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   if (sub === "migrate") {
     const opts = parseOrRefuse(COMMAND_SPECS.stateMigrate, args.slice(2));
     const { migrateStateFile } = await import("./pipelines/state-migrate/index.js");
+    // --seat is read only for a v1 record (its one handoff does not say whose it
+    // is); a v1 file named without it is refused by the per-file check below.
     const seat = opts.value("--seat");
-    if (!seat) {
-      console.error("state migrate refused: --seat <planner|developer|qa> is REQUIRED.");
-      console.error("A v1 handoff does not say whose it is, and guessing would attribute one seat's words to another.");
-      process.exit(1);
-    }
     const files = opts.positionals;
     if (files.length === 0) {
       console.error("state migrate refused: name at least one state.json to migrate.");
@@ -351,7 +348,7 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
     const dryRun = opts.has("--dry-run");
     const migrate = (f: string, asDryRun: boolean) =>
       migrateStateFile(resolve(f), {
-        seat: seat as "planner" | "developer" | "qa",
+        seat: seat as "planner" | "developer" | "qa" | undefined,
         lastSessionSeat: (opts.value("--last-session-seat") as "planner" | "developer" | "qa" | undefined) ?? null,
         dryRun: asDryRun,
         keepRevision: opts.has("--keep-revision"),
@@ -388,9 +385,33 @@ ${failed} file(s) refused — nothing was written for any named file.`);
   // the MCP server down the only remaining option was opening the JSON by hand.
   // Read-only by construction — no write path is added here, so the
   // single-writer rule (every mutation goes through applyStateOps) still holds.
+  // T163-2: every record a committed write removed that another session had
+  // added, across the WHOLE history including schema <3 (which /sync counts and
+  // does not fail on). Read-only: it reads git objects and writes nothing.
+  if (sub === "erasures") {
+    const opts = parseOrRefuse(COMMAND_SPECS.stateErasures, args.slice(2));
+    const { scanErasures, describeErasure } = await import("./pipelines/sync/record-erasure.js");
+    const startDir = opts.directory ?? resolve(".");
+    const projectRoot = resolveRepoRoot(startDir);
+    if (!projectRoot) {
+      console.error(`state erasures refused: ${describeNoRoot(startDir)}`);
+      process.exit(1);
+    }
+    const r = scanErasures(projectRoot);
+    if (!r.ok) {
+      console.error(`state erasures could not run: ${r.skip}`);
+      process.exit(1);
+    }
+    console.log(`Walked ${r.commits} commits on HEAD; ${r.steps} changes to .agents/state.json (${r.enforcedSteps} at schema v3+).`);
+    console.log(`Erasures: ${r.erasures.length} (${r.erasures.filter((e) => e.enforced).length} at schema v3+, which /sync fails on)`);
+    for (const e of r.erasures) console.log(`  ${e.enforced ? "[v3+]   " : "[legacy]"} ${describeErasure(e)}`);
+    process.exit(0);
+  }
+
   if (sub === "show") {
     const opts = parseOrRefuse(COMMAND_SPECS.stateShow, args.slice(2));
     const { readState } = await import("./shared/state-writer.js");
+    const { lastSession } = await import("./shared/state-schema.js");
     const startDir = opts.directory ?? resolve(".");
     const projectRoot = resolveRepoRoot(startDir);
     if (!projectRoot) {
@@ -414,7 +435,8 @@ state — ${st.project.name}
     console.log(`Root: ${projectRoot}`);
     console.log(`File: ${r.path}`);
     console.log(`Revision: ${st.revision} · schema ${st.schema_version}`);
-    console.log(`Last session: ${st.last_session.n} (${st.last_session.date})${st.last_session.uuid ? ` · ${st.last_session.uuid}` : ""}`);
+    const last = lastSession(st);
+    console.log(last ? `Last session: ${last.n} (${last.date})${last.uuid ? ` · ${last.uuid}` : ""} · ${st.sessions.length} writing session(s) in the record` : `Last session: none recorded`);
     console.log(`Objective: ${st.objective ? `${st.objective.text} (since session ${st.objective.since_session})` : "none"}`);
     console.log(
       `Tasks: ${st.tasks.length} — open ${count((t) => t.status === "open")}, ` +
@@ -431,7 +453,7 @@ state — ${st.project.name}
     console.log(`Verified: ${st.verified.length} · gaps: ${st.gaps.length} · decisions: ${st.decisions.length}`);
     if (st.handoffs.length === 0) console.log(`Handoffs: none recorded`);
     for (const h of st.handoffs) {
-      console.log(`Handoff [${h.seat}] (session ${h.session}): ${h.pick_up || "nothing recorded"}`);
+      console.log(`Handoff [${h.seat} ${h.checkout ?? "legacy"}] (session ${h.session}${h.session_uuid ? ` · ${h.session_uuid}` : ""}): ${h.pick_up || "nothing recorded"}`);
       if (h.watch_out.length) console.log(`  watch out: ${h.watch_out.length} item(s)`);
       if (h.open_questions.length) console.log(`  open questions: ${h.open_questions.length}`);
       if (h.loop_state) {
@@ -500,7 +522,8 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft|--commit] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
-  console.log("  state migrate --seat <planner|developer|qa> [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>");
+  console.log("  state erasures [dir]                          Records a committed write removed that another session had added (T-163)");
+  console.log("  state migrate [--seat <planner|developer|qa>] [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>   (--seat and --last-session-seat: v1 records only)");
   console.log("                                             Migrate state.json schema v1 -> v2");
   console.log("  detach [--dry-run] [--no-fetch] [--force] [dir]      Return a seat worktree to detached at origin/master");
   process.exit(1);

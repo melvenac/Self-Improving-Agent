@@ -36,6 +36,18 @@ function writeV2(dir: string, revision: number, handoffs: unknown[]): void {
   );
 }
 
+function writeV3(dir: string, revision: number, handoffs: unknown[]): void {
+  mkdirSync(join(dir, ".agents"), { recursive: true });
+  writeFileSync(
+    join(dir, ".agents", "state.json"),
+    JSON.stringify(
+      { schema_version: 3, revision, ...BASE, handoffs, sessions: [{ n: 1, date: "2026-01-01", uuid: null, seat: null, checkout: null }] },
+      null,
+      2
+    ) + "\n"
+  );
+}
+
 function writeV1(dir: string, revision: number, handoff: unknown): void {
   mkdirSync(join(dir, ".agents"), { recursive: true });
   writeFileSync(
@@ -192,6 +204,30 @@ describe("findHandoffCommit", () => {
       loop_state: { open_prs: [], frozen_sha: "abc", questions_for_aaron: [], rulings: [] },
     };
     expect(findHandoffCommit(dir, "qa", undefined, withRows).commit).toBe(committed);
+  });
+
+  it("CROSSES THE v2 → v3 MIGRATION: a migrated entry is traced to the v2 commit that wrote its words (T-163)", () => {
+    // The v3 migration adds session_uuid and checkout to every entry. If a v2
+    // revision were unreadable to the walk, the migration commit would become
+    // every seat's close-out — the v1 → v2 defect, one schema later.
+    writeV2(dir, 1, [handoff("qa", "qa words before v3", 75)]);
+    const realCloseOut = commit(dir, "qa close-out under v2");
+    writeV3(dir, 2, [{ ...handoff("qa", "qa words before v3", 75), session_uuid: null, checkout: null }]);
+    commit(dir, "migrate v2 -> v3");
+
+    expect(findHandoffCommit(dir, "qa").commit).toBe(realCloseOut);
+  });
+
+  it("v3: two developer checkouts' entries are traced SEPARATELY, each to its own commit", () => {
+    const builder = { ...handoff("developer", "builder words", 118), session_uuid: "u-b", checkout: "sia-builder" };
+    const forge = { ...handoff("developer", "forge words", 107), session_uuid: "u-f", checkout: "sia-forge" };
+    writeV3(dir, 1, [forge]);
+    const forgeCommit = commit(dir, "forge hands off");
+    writeV3(dir, 2, [forge, builder]);
+    const builderCommit = commit(dir, "builder hands off");
+
+    expect(findHandoffCommit(dir, "developer", undefined, forge).commit).toBe(forgeCommit);
+    expect(findHandoffCommit(dir, "developer", undefined, builder).commit).toBe(builderCommit);
   });
 
   it("says there is nothing to trace when that seat has no handoff", () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, cpSync, rmSync, readFileSync, existsSync, readdirSync, statSync, mkdirSync, writeFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { basename, join, relative } from "node:path";
 import { tmpdir } from "node:os";
 import {
   applyStateOps,
@@ -127,7 +127,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
     // Canonical: parse + serialize reproduces the bytes on disk.
     const text = readFileSync(join(root, STATE), "utf-8");
     expect(text.endsWith("\n")).toBe(true);
-    expect(text.startsWith('{\n  "schema_version": 2,\n  "revision": 9,')).toBe(true);
+    expect(text.startsWith('{\n  "schema_version": 3,\n  "revision": 9,')).toBe(true);
   });
 
   it("dry_run returns the full result and changes nothing on disk (V1)", () => {
@@ -304,37 +304,53 @@ describe("applyStateOps (Loop 3 writer)", () => {
     expect(readState(root).objective).toBeNull();
   });
 
-  it("set_handoff replaces THAT SEAT's handoff and leaves the others alone (V2)", () => {
-    applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "set_handoff", seat: "developer", pick_up: "Here", watch_out: ["a"], open_questions: [] }] });
+  // ---- schema v3 (T-163): handoffs per SESSION, sessions[] per write ----
+  // The fixture carries one legacy (v2-migrated) developer handoff at session 54
+  // and one legacy session record for session 54.
+
+  const LEGACY_HANDOFF = () => readState(root).handoffs.find((h) => h.session_uuid === null)!;
+
+  it("set_handoff writes THIS session's entry, stamped with its uuid and checkout, and leaves the legacy entry alone", () => {
+    const legacy = LEGACY_HANDOFF();
+    const r = applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "u-1", checkout: "sia-builder", ops: [{ op: "set_handoff", seat: "developer", pick_up: "Here", watch_out: ["a"], open_questions: [] }] });
+    expect(r.ok).toBe(true);
     expect(readState(root).handoffs).toEqual([
-      { seat: "developer", pick_up: "Here", watch_out: ["a"], open_questions: [], session: SESSION, loop_state: null },
+      legacy,
+      { seat: "developer", pick_up: "Here", watch_out: ["a"], open_questions: [], session: SESSION, loop_state: null, session_uuid: "u-1", checkout: "sia-builder" },
     ]);
   });
 
-  it("set_handoff for a second seat ADDS rather than overwrites — G-046", () => {
-    // The defect this replaces: one project-wide slot, so under the roll rule
-    // the second seat to close out erased the first, every loop. A later
-    // message then sent a fresh seat to a file that no longer held what it was
-    // said to hold.
+  it("the checkout defaults to the project root's basename", () => {
+    applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "u-1", ops: [{ op: "set_handoff", seat: "developer", pick_up: "x", watch_out: [], open_questions: [] }] });
+    expect(readState(root).handoffs.find((h) => h.session_uuid === "u-1")?.checkout).toBe(basename(root));
+  });
+
+  it("two SEATS in two sessions both keep their handoffs — G-046, now by construction", () => {
+    applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "dev", ops: [{ op: "set_handoff", seat: "developer", pick_up: "dev", watch_out: [], open_questions: [] }] });
+    const r = applyStateOps(root, { session: SESSION, expected_revision: 8, session_uuid: "qa", ops: [{ op: "set_handoff", seat: "qa", pick_up: "qa", watch_out: [], open_questions: [] }] });
+    expect(r.ok).toBe(true);
+    const hs = readState(root).handoffs;
+    expect(hs.find((h) => h.session_uuid === "dev")?.pick_up).toBe("dev");
+    expect(hs.find((h) => h.session_uuid === "qa")?.pick_up).toBe("qa");
+  });
+
+  it("a session holds ONE handoff: a second set_handoff in the same batch replaces its first", () => {
     const r = applyStateOps(root, {
-      session: SESSION,
-      expected_revision: 7,
+      session: SESSION, expected_revision: 7, session_uuid: "u-1",
       ops: [
-        { op: "set_handoff", seat: "developer", pick_up: "dev", watch_out: [], open_questions: [] },
-        { op: "set_handoff", seat: "qa", pick_up: "qa", watch_out: [], open_questions: [] },
+        { op: "set_handoff", seat: "developer", pick_up: "first", watch_out: [], open_questions: [] },
+        { op: "set_handoff", seat: "developer", pick_up: "second", watch_out: [], open_questions: [] },
       ],
     });
     expect(r.ok).toBe(true);
-    const seats = readState(root).handoffs;
-    expect(seats).toHaveLength(2);
-    expect(seats.find((h) => h.seat === "developer")?.pick_up).toBe("dev");
-    expect(seats.find((h) => h.seat === "qa")?.pick_up).toBe("qa");
+    expect(readState(root).handoffs.filter((h) => h.session_uuid === "u-1").map((h) => h.pick_up)).toEqual(["second"]);
   });
 
   it("set_handoff REFUSES a seat outside the closed set, and a planner handoff with no loop_state", () => {
     const unknownSeat = applyStateOps(root, {
       session: SESSION,
       expected_revision: 7,
+      session_uuid: "u-1",
       ops: [{ op: "set_handoff", seat: "builder", pick_up: "x", watch_out: [], open_questions: [] }],
     });
     expectRefused(unknownSeat, /ops\[0\] invalid at seat/);
@@ -344,6 +360,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
     const noRows = applyStateOps(root, {
       session: SESSION,
       expected_revision: 7,
+      session_uuid: "u-1",
       ops: [{ op: "set_handoff", seat: "planner", pick_up: "x", watch_out: [], open_questions: [] }],
     });
     expectRefused(noRows, /must carry loop_state/);
@@ -352,6 +369,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
     const empty = applyStateOps(root, {
       session: SESSION,
       expected_revision: 7,
+      session_uuid: "u-1",
       ops: [
         {
           op: "set_handoff",
@@ -366,71 +384,68 @@ describe("applyStateOps (Loop 3 writer)", () => {
     expect(empty.ok).toBe(true);
   });
 
-  it("end_session sets last_session with the seat that closed it (V2)", () => {
-    applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "end_session", n: SESSION, date: "2026-09-15", uuid: "u-1", seat: "developer" }] });
-    expect(readState(root).last_session).toEqual({ n: SESSION, date: "2026-09-15", uuid: "u-1", seat: "developer" });
+  it("every write records its session in sessions[] with the seat it handed off as and its checkout", () => {
+    applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "u-1", checkout: "sia-builder", today: "2026-09-15", ops: [{ op: "set_handoff", seat: "developer", pick_up: "p", watch_out: [], open_questions: [] }] });
+    expect(readState(root).sessions.find((s) => s.uuid === "u-1")).toEqual({ n: SESSION, date: "2026-09-15", uuid: "u-1", seat: "developer", checkout: "sia-builder" });
   });
 
-  it("end_session is IDEMPOTENT per uuid: a second write keeps the number and says so (G-047)", () => {
-    // The number counted CLOSE-OUT WRITES, not sessions. One developer
-    // seat-session wrote end_session three times in slice two — 67, 68, 69
-    // under one uuid — so every per-session rate was divided by a denominator
-    // that inflates most for the loops that went worst.
-    applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "end_session", n: 55, date: "2026-09-15", uuid: "same", seat: "developer" }] });
-    const second = applyStateOps(root, {
-      session: SESSION,
-      expected_revision: 8,
-      ops: [{ op: "end_session", n: 56, date: "2026-09-16", uuid: "same", seat: "developer" }],
-    });
-
-    expect(second.ok).toBe(true);
-    const ls = readState(root).last_session;
-    expect(ls.n).toBe(55);
-    expect(ls.date).toBe("2026-09-16");
-    expect(second.notes.join(" ")).toMatch(/already recorded as session 55/);
+  it("a write with no set_handoff labels its session with the caller's resolved seat, or null", () => {
+    applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "u-1", seat: "qa", ops: [{ op: "set_objective", text: "x" }] });
+    applyStateOps(root, { session: SESSION, expected_revision: 8, session_uuid: "u-2", ops: [{ op: "set_objective", text: "y" }] });
+    const ss = readState(root).sessions;
+    expect(ss.find((s) => s.uuid === "u-1")?.seat).toBe("qa");
+    expect(ss.find((s) => s.uuid === "u-2")?.seat).toBeNull();
   });
 
-  it("G-047: a reused uuid stamps the WHOLE BATCH with the kept number, not just last_session", () => {
-    // The first version of this fix normalised only last_session. end_session
-    // runs LAST, so every earlier op in the same batch had already been stamped
-    // with the number the caller asked for: the record then said a handoff was
-    // written in session 72 while last_session said 71, and 72 did not exist.
-    //
-    // Found by reading the live record back after the write that introduced it,
-    // not by a test. A fix that leaves the record internally inconsistent is not
-    // a fix.
-    applyStateOps(root, { session: 55, expected_revision: 7, ops: [{ op: "end_session", n: 55, date: "2026-09-15", uuid: "same", seat: "developer" }] });
+  it("a write with NO registered session is not attributed, says so, and leaves sessions[] unchanged", () => {
+    const before = readState(root).sessions;
+    const r = applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "set_objective", text: "x" }] });
+    expect(r.ok).toBe(true);
+    expect(r.notes.join(" ")).toMatch(/no registered session: this write is not attributed/);
+    expect(readState(root).sessions).toEqual(before);
+  });
 
+  it("G-047: a session writing again keeps its recorded number, stamps the WHOLE BATCH with it, and says so", () => {
+    // The number counts SESSIONS, not writes. One developer seat-session once
+    // took three numbers in slice two; and when only the close-out slot was
+    // normalised, the record said a handoff was written in session 72 while the
+    // slot said 71. A fix that leaves the record inconsistent is not a fix.
+    applyStateOps(root, { session: 55, expected_revision: 7, session_uuid: "same", ops: [{ op: "set_objective", text: "x" }] });
     const second = applyStateOps(root, {
       session: 56,
       expected_revision: 8,
+      session_uuid: "same",
+      today: "2026-09-16",
       ops: [
-        { op: "set_handoff", seat: "developer", pick_up: "second close-out", watch_out: [], open_questions: [] },
+        { op: "set_handoff", seat: "developer", pick_up: "second write", watch_out: [], open_questions: [] },
         { op: "open_task", title: "opened in the same batch", priority: "P2" },
-        { op: "end_session", n: 56, date: "2026-09-16", uuid: "same", seat: "developer" },
       ],
     });
     expect(second.ok).toBe(true);
-
     const s = readState(root);
-    expect(s.last_session.n).toBe(55);
-    // The handoff and the task must agree with it. Before the fix these were 56.
-    expect(s.handoffs.find((h) => h.seat === "developer")?.session).toBe(55);
+    const mine = s.sessions.filter((x) => x.uuid === "same");
+    expect(mine).toHaveLength(1);
+    expect(mine[0].n).toBe(55);
+    expect(mine[0].date).toBe("2026-09-16");
+    expect(s.handoffs.find((h) => h.session_uuid === "same")?.session).toBe(55);
     expect(s.tasks.find((t) => t.title === "opened in the same batch")?.opened_session).toBe(55);
-    expect(second.notes.join(" ")).toMatch(/EVERY op in this batch was stamped 55/);
+    expect(second.notes.join(" ")).toMatch(/already recorded as session 55.*EVERY op in this batch was stamped 55/);
   });
 
-  it("a DIFFERENT uuid still takes a new number", () => {
-    // The other half: idempotency must not become a ban on new sessions.
-    applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "end_session", n: 55, date: "2026-09-15", uuid: "one", seat: "developer" }] });
-    const next = applyStateOps(root, {
-      session: SESSION,
-      expected_revision: 8,
-      ops: [{ op: "end_session", n: 56, date: "2026-09-16", uuid: "two", seat: "qa" }],
-    });
+  it("a DIFFERENT uuid takes its own entry and its own number, with no note", () => {
+    applyStateOps(root, { session: 55, expected_revision: 7, session_uuid: "one", ops: [{ op: "set_objective", text: "x" }] });
+    const next = applyStateOps(root, { session: 56, expected_revision: 8, session_uuid: "two", ops: [{ op: "set_objective", text: "y" }] });
     expect(next.ok).toBe(true);
-    expect(readState(root).last_session.n).toBe(56);
+    const ss = readState(root).sessions;
+    expect(ss.find((x) => x.uuid === "one")?.n).toBe(55);
+    expect(ss.find((x) => x.uuid === "two")?.n).toBe(56);
     expect(next.notes).toEqual([]);
+  });
+
+  it("an empty batch (re-render) records no session", () => {
+    const before = readState(root).sessions;
+    applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "u-1", ops: [], render: true });
+    expect(readState(root).sessions).toEqual(before);
   });
 
   // ---- V3: retention ----
@@ -564,7 +579,7 @@ describe("G-006: readState — the read door", () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.data.revision).toBe(7);
-    expect(r.data.last_session.n).toBe(54);
+    expect(r.data.sessions.map((s) => s.n)).toEqual([54]);
     expect(r.path).toBe(join(root, STATE));
 
     // The whole point of a read door: nothing on disk moves.

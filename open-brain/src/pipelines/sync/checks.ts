@@ -4,7 +4,7 @@ import { homedir } from "node:os";
 import { execSync, execFileSync } from "node:child_process";
 import type { CheckResult, SyncRuntime } from "./types.js";
 import { parseSkillIndexRows } from "../../shared/skill-index.js";
-import { parseState, SeatName } from "../../shared/state-schema.js";
+import { parseState, SeatName, schemaVersionAdvice } from "../../shared/state-schema.js";
 import { renderState } from "../session-start/state-render.js";
 import { describeRoleFiles } from "../session-start/role-files.js";
 import { readAgentIdentity } from "../session-start/agent-identity.js";
@@ -634,16 +634,21 @@ export function checkStateSchema(
       report: true,
     };
   }
-  const parsed = parseState(readFileSync(statePath, "utf-8"));
+  const stateText = readFileSync(statePath, "utf-8");
+  const parsed = parseState(stateText);
   if (!parsed.ok) {
+    const versionAdvice = parsed.path === "schema_version" ? schemaVersionAdvice(stateText) : null;
     const remedy =
       runtime === "mcp-server"
         ? " — the server's loaded schema cannot read the live file. If the schema changed this session, ask Aaron to run `/mcp reconnect open-brain`, then re-run this check: a stale server reports success."
         : " — note this is the CLI's schema, not the running server's. The server may hold a different one; run ob_sync as an MCP tool to test that.";
+    // T-163: which DIRECTION the version is off decides the remedy — an older
+    // record is migrated, which no reconnect or rebuild would do.
+    const direction = versionAdvice ? ` Version: ${versionAdvice}.` : "";
     return {
       name,
       severity: "issue",
-      message: `.agents/state.json invalid at ${parsed.error}, as parsed by ${where}${remedy}`,
+      message: `.agents/state.json invalid at ${parsed.error}, as parsed by ${where}${remedy}${direction}`,
       report: true,
     };
   }

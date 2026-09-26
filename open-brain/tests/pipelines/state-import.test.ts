@@ -141,7 +141,7 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     expect(s.handoffs[0].pick_up).toMatch(/^Loop 4 per /);
     expect(s.verified.map((v) => v.id)).toEqual(["V-001", "V-002", "V-003", "V-004", "V-005"]);
     expect(s.gaps.map((g) => g.id)).toEqual(["G-001", "G-002", "G-003", "G-004", "G-005", "G-006"]);
-    expect(s.last_session).toEqual({ n: 54, date: TODAY, uuid: "00000000-0000-4000-8000-000000000054", seat: null });
+    expect(s.sessions).toEqual([{ n: 54, date: TODAY, uuid: "00000000-0000-4000-8000-000000000054", seat: null, checkout: null }]);
 
     const report = readFileSync(join(root, REPORT_REL), "utf-8");
     expect(report).toContain("| **all** | 42 | 3 | 0 | 98 | 143 |");
@@ -204,7 +204,8 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     expect(() => runDraft(root, TODAY)).toThrow(/already exists/);
 
     // P3: the writer accepts the migrated file — first real write bumps to revision 1.
-    const w = applyStateOps(root, { session: 55, expected_revision: 0, ops: [{ op: "end_session", n: 55, date: "2026-09-14", uuid: null, seat: "developer" }], version: "0.30.0" });
+    // (end_session was retired in schema v3, T-163; any op is a write.)
+    const w = applyStateOps(root, { session: 55, expected_revision: 0, ops: [{ op: "set_objective", text: "first write" }], version: "0.30.0" });
     expect(w.ok).toBe(true);
     expect(w.revision_after).toBe(1);
     // Retention on the first write drops the done items closed ≤ 52 (session 55 − 3).
@@ -317,9 +318,9 @@ describe("state import parsing rules (unit)", () => {
     // seat "developer" is a DOCUMENTED ASSUMPTION, not a discovered fact: the
     // prose slot does not say whose it is, and the single slot was written by
     // /end, which was the developer's command.
-    expect(h).toEqual({ seat: "developer", pick_up: "Do this.\nThen that.", watch_out: ["one", "two"], open_questions: [], session: 55, loop_state: null });
+    expect(h).toEqual({ seat: "developer", pick_up: "Do this.\nThen that.", watch_out: ["one", "two"], open_questions: [], session: 55, loop_state: null, session_uuid: null, checkout: null });
     expect(rep).toEqual({ pick_up_lines: 2, watch_out: 2, open_questions: 0, sections_not_imported: ["Refs"] });
-    expect(importHandoff(null, 55, rep)).toEqual({ seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: 55, loop_state: null });
+    expect(importHandoff(null, 55, rep)).toEqual({ seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: 55, loop_state: null, session_uuid: null, checkout: null });
   });
 
   it("SUMMARY surgery removes exactly the title blockquote and the Current State section and leaves everything else byte for byte", () => {
