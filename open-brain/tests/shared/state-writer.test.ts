@@ -154,7 +154,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
     ] });
     expect(r.applied).toEqual([{ op: "open_task", id: "T-028" }, { op: "open_task", id: "T-029" }]);
     const t = readState(root).tasks.find((x) => x.id === "T-028")!;
-    expect(t).toEqual({ id: "T-028", title: "New thing", priority: "P1", status: "open", opened_session: SESSION, closed_session: null, supersedes: "T-024", note: "n" });
+    expect(t).toEqual({ id: "T-028", title: "New thing", priority: "P1", status: "open", opened_session: SESSION, closed_session: null, supersedes: "T-024", note: "n", closed_rev: null });
     expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "open_task", title: "x", priority: "P0", supersedes: "T-404" }] }), /supersedes unknown task T-404/);
     expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "open_task", id: "T-028", title: "dup", priority: "P0" }] }), /task T-028 already exists/);
   });
@@ -310,14 +310,21 @@ describe("applyStateOps (Loop 3 writer)", () => {
 
   const LEGACY_HANDOFF = () => readState(root).handoffs.find((h) => h.session_uuid === null)!;
 
-  it("set_handoff writes THIS session's entry, stamped with its uuid and checkout, and leaves the legacy entry alone", () => {
-    const legacy = LEGACY_HANDOFF();
-    const r = applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "u-1", checkout: "sia-builder", ops: [{ op: "set_handoff", seat: "developer", pick_up: "Here", watch_out: ["a"], open_questions: [] }] });
+  it("set_handoff writes THIS session's entry, stamped with its uuid, checkout and first-write revision, and leaves ANOTHER seat's legacy entry alone", () => {
+    const legacy = LEGACY_HANDOFF(); // the fixture's is a developer's
+    const r = applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "u-1", checkout: "sia-qa", ops: [{ op: "set_handoff", seat: "qa", pick_up: "Here", watch_out: ["a"], open_questions: [] }] });
     expect(r.ok).toBe(true);
     expect(readState(root).handoffs).toEqual([
       legacy,
-      { seat: "developer", pick_up: "Here", watch_out: ["a"], open_questions: [], session: SESSION, loop_state: null, session_uuid: "u-1", checkout: "sia-builder" },
+      { seat: "qa", pick_up: "Here", watch_out: ["a"], open_questions: [], session: SESSION, loop_state: null, session_uuid: "u-1", checkout: "sia-qa", first_rev: 8 },
     ]);
+  });
+
+  it("R179-3: the first keyed handoff of the legacy entry's OWN seat supersedes it, and the write reports it", () => {
+    const r = applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "u-1", checkout: "sia-builder", ops: [{ op: "set_handoff", seat: "developer", pick_up: "Here", watch_out: [], open_questions: [] }] });
+    expect(r.ok).toBe(true);
+    expect(readState(root).handoffs.map((h) => h.session_uuid)).toEqual(["u-1"]);
+    expect(r.superseded).toEqual(["handoff developer@54 (developer, legacy, session 54)"]);
   });
 
   it("the checkout defaults to the project root's basename", () => {
@@ -386,7 +393,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
 
   it("every write records its session in sessions[] with the seat it handed off as and its checkout", () => {
     applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "u-1", checkout: "sia-builder", today: "2026-09-15", ops: [{ op: "set_handoff", seat: "developer", pick_up: "p", watch_out: [], open_questions: [] }] });
-    expect(readState(root).sessions.find((s) => s.uuid === "u-1")).toEqual({ n: SESSION, date: "2026-09-15", uuid: "u-1", seat: "developer", checkout: "sia-builder" });
+    expect(readState(root).sessions.find((s) => s.uuid === "u-1")).toEqual({ n: SESSION, date: "2026-09-15", uuid: "u-1", seat: "developer", checkout: "sia-builder", first_rev: 8 });
   });
 
   it("a write with no set_handoff labels its session with the caller's resolved seat, or null", () => {
@@ -450,19 +457,23 @@ describe("applyStateOps (Loop 3 writer)", () => {
 
   // ---- V3: retention ----
 
-  it("drops done tasks closed at current-3 or earlier, keeps current-2, and lists the ids (V3)", () => {
-    // Fixture done tasks: T-001..T-004 closed 54; T-018/T-019 closed 53; T-020/T-021 52; T-022 51; T-023 50; T-026 49.
-    const r = applyStateOps(root, { session: 56, expected_revision: 7, ops: [{ op: "set_objective", text: "x" }] });
-    expect(r.dropped_task_ids).toEqual(["T-018", "T-019", "T-020", "T-021", "T-022", "T-023", "T-026"]);
-    const ids = readState(root).tasks.map((t) => t.id);
-    expect(ids).toContain("T-001"); // closed 54 = current-2 → kept
-    expect(ids).not.toContain("T-018"); // closed 53 = current-3 → dropped
-    expect(ids).toHaveLength(27 - 7);
-
-    const s = readState(root);
-    const { dropped, kept } = applyRetention(s, 57);
-    expect(dropped).toEqual(["T-001", "T-002", "T-003", "T-004"]); // closed 54 = 57-3 → dropped
-    expect(kept).toEqual([]);
+  it("drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the ids (V3, R179-1)", () => {
+    // Fixture done tasks were closed before v3 (closed_rev null), so they order
+    // before every keyed session: the third keyed session to write drops them.
+    const w = (n: number, uuid: string) => applyStateOps(root, { session: n, expected_revision: readState(root).revision, session_uuid: uuid, ops: [{ op: "set_objective", text: uuid }] });
+    const done = readState(root).tasks.filter((t) => t.status === "done").map((t) => t.id);
+    expect(done).toEqual(["T-001", "T-002", "T-003", "T-004", "T-018", "T-019", "T-020", "T-021", "T-022", "T-023", "T-026"]);
+    expect(w(9999, "s-1").dropped_task_ids).toEqual([]); // a huge number ages nothing
+    expect(w(1, "s-2").dropped_task_ids).toEqual([]);
+    const r = w(2, "s-3");
+    expect(r.dropped_task_ids).toEqual(done);
+    expect(readState(root).tasks).toHaveLength(27 - 11);
+    // A task closed NOW (closed_rev = this write's revision) needs three more.
+    const c = applyStateOps(root, { session: 3, expected_revision: readState(root).revision, session_uuid: "s-3", ops: [{ op: "close_task", id: "T-005" }] });
+    expect(readState(root).tasks.find((t) => t.id === "T-005")!.closed_rev).toBe(c.revision_after);
+    expect(w(4, "s-4").dropped_task_ids).toEqual([]);
+    expect(w(5, "s-5").dropped_task_ids).toEqual([]);
+    expect(w(6, "s-6").dropped_task_ids).toEqual(["T-005"]);
   });
 
   it("T-157: retention KEEPS a done task whose id the tracked tree cites", () => {
@@ -470,14 +481,20 @@ describe("applyStateOps (Loop 3 writer)", () => {
     // documents referred to by id — T-151, which G-031 exists to correct, and
     // T-153, cited by three files. Both survived only because a seat happened to
     // read one line of dry-run output and then grep the tree by hand.
-    const s = readState(root);
+    // Three keyed sessions in the record: every legacy done task is eligible.
+    const aged = () => {
+      const x = readState(root);
+      for (let i = 0; i < 3; i++) x.sessions.push({ n: 60 + i, date: "2026-09-26", uuid: `aged-${i}`, seat: null, checkout: "c", first_rev: 8 + i });
+      return x;
+    };
+    const s = aged();
     const before = s.tasks.filter((t) => t.status === "done").map((t) => t.id);
     expect(before).toContain("T-001");
 
-    const uncited = applyRetention(readState(root), 57, new Map()).dropped;
+    const uncited = applyRetention(aged(), new Map()).dropped;
     expect(uncited).toContain("T-001");
 
-    const { dropped, kept } = applyRetention(s, 57, new Map([["T-001", ["docs/loops/some-closeout.md"]]]));
+    const { dropped, kept } = applyRetention(s, new Map([["T-001", ["docs/loops/some-closeout.md"]]]));
     expect(kept).toEqual(["T-001"]);
     expect(dropped).not.toContain("T-001");
     expect(s.tasks.some((t) => t.id === "T-001")).toBe(true);
@@ -492,7 +509,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
   });
 
   it("retention never touches verified, gaps or decisions", () => {
-    applyStateOps(root, { session: 99, expected_revision: 7, ops: [{ op: "set_objective", text: "x" }] });
+    for (let i = 0; i < 3; i++) applyStateOps(root, { session: 99, expected_revision: 7 + i, session_uuid: `s-${i}`, ops: [{ op: "set_objective", text: `x${i}` }] });
     const s = readState(root);
     expect(s.verified).toHaveLength(8);
     expect(s.gaps).toHaveLength(5);

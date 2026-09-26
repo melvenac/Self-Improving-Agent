@@ -101,7 +101,7 @@ describe("greeting-size — T183-4", () => {
       handoffs: [
         { seat: "planner", session: 1, pick_up: "PLANNER PICK-UP", watch_out: ["PLANNER WATCH-OUT"], open_questions: [],
           loop_state: { open_prs: [], frozen_sha: null, questions_for_aaron: [], rulings: [] },
-          session_uuid: "u-planner", checkout: "sia-planner" },
+          session_uuid: "u-planner", checkout: "sia-planner", first_rev: 1 },
       ],
     };
     const unresolved = fixture(join(base, "unresolved"), withHandoff);

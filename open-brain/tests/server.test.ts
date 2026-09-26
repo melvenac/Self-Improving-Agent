@@ -271,7 +271,9 @@ describe("server handlers", () => {
       // set_handoff reports the SEAT as its id, so which seat wrote a handoff is
       // visible in the applied list rather than only inside the file.
       expect(out).toContain("  close_task T-005\n  open_task T-028\n  add_verified V-009\n  add_decision D-007\n  set_handoff developer");
-      expect(out).toContain("Dropped done tasks (retention 3 sessions): T-020, T-021, T-022, T-023, T-026");
+      // R179-1: done tasks age by sessions written since their close; the fixture's were closed
+      // before v3 (closed_rev null) and this is the first keyed session, so none goes yet.
+      expect(out).toContain("Dropped done tasks (retention 3 sessions): none");
       expect(out).toContain("Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md");
 
       // Views on disk, generated.

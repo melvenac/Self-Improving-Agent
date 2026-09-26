@@ -81,9 +81,21 @@ export const TaskSchema = z.strictObject({
   closed_session: sessionNumber.nullable(),
   supersedes: z.string().nullable(),
   note: z.string(),
+  /**
+   * The record revision the closing write produced (R179-1 as extended to done
+   * tasks, record 128). Done-task retention counts the sessions that first
+   * wrote AFTER it and never compares `closed_session`, which is the caller's
+   * number: a write numbered 1124 used to drop every uncited done task. Null on
+   * an open task, and on a task closed before schema v3 (never recorded; orders
+   * before every keyed session, like a legacy handoff).
+   */
+  closed_rev: nonNegInt.nullable(),
 }).refine((t) => (t.status === "done") === (t.closed_session !== null), {
   message: 'closed_session must be set when status is "done" and null otherwise',
   path: ["closed_session"],
+}).refine((t) => t.status === "done" || t.closed_rev === null, {
+  message: "closed_rev must be null unless status is \"done\"",
+  path: ["closed_rev"],
 });
 
 export const EvidenceSchema = z.strictObject({
@@ -180,6 +192,8 @@ export const HandoffSchema = z.strictObject({
   loop_state: LoopStateSchema.nullable(),
   session_uuid: z.string().min(1).nullable(),
   checkout: z.string().min(1).nullable(),
+  /** The writing session's first-write revision (see `SessionRecordSchema.first_rev`). */
+  first_rev: nonNegInt.nullable(),
 }).refine((h) => h.seat !== "planner" || h.loop_state !== null, {
   message: "a planner handoff must carry loop_state (its fields may be empty, but not absent)",
   path: ["loop_state"],
@@ -201,6 +215,20 @@ export const SessionRecordSchema = z.strictObject({
   /** Null when the writing session never named its seat (no set_handoff yet) or for legacy entries. */
   seat: SeatName.nullable(),
   checkout: z.string().min(1).nullable(),
+  /**
+   * The record revision this session's FIRST write produced (R179-1 as amended,
+   * QA 125's D1). This, not `n`, is what orders sessions: retention, "newest"
+   * and "last" all compare it, and `n` is a label that is rendered and never
+   * compared. `n` is the caller's number for a session the record has not seen,
+   * so one wrong number (1124 for 124, or T-164's local greeting number) used
+   * to decide which OTHER sessions' entries retention dropped.
+   *
+   * Null on legacy entries (migrated from v2, or imported from prose), which
+   * never recorded it. Null orders BEFORE every non-null value: a guessed
+   * revision would be a number nothing checked, which is the defect this field
+   * removes.
+   */
+  first_rev: nonNegInt.nullable(),
 });
 
 function unique(values: Array<string | null>): boolean {
@@ -276,37 +304,51 @@ export function schemaVersionAdvice(text: string): string | null {
 }
 
 /**
- * The most recent session in the record: the highest `n`, the later entry on a
- * tie. Derived, not stored — storing it is the single slot T-163 removed.
- * Null for a record no session has written yet.
+ * Write order of two per-session entries by `first_rev`: negative when `a` came
+ * first. Null (legacy) sorts before every revision; two nulls, or two equal
+ * revisions (possible only across a merge, G-027), compare equal and callers
+ * fall back to array order. The session NUMBER is never consulted (R179-1).
+ */
+export function compareFirstRev(a: number | null, b: number | null): number {
+  if (a === b) return 0;
+  if (a === null) return -1;
+  if (b === null) return 1;
+  return a - b;
+}
+
+/**
+ * The most recent session in the record: the latest `first_rev`, the later
+ * entry on a tie. Derived, not stored — storing it is the single slot T-163
+ * removed. Null for a record no session has written yet.
  */
 export function lastSession(state: Pick<State, "sessions">): SessionRecord | null {
   let best: SessionRecord | null = null;
-  for (const s of state.sessions) if (best === null || s.n >= best.n) best = s;
+  for (const s of state.sessions) if (best === null || compareFirstRev(s.first_rev, best.first_rev) >= 0) best = s;
   return best;
 }
 
 /**
  * The handoffs a reader is shown: the newest per (seat, checkout), which is one
- * per seat INSTANCE. Older entries stay in the record and are not rendered, so
- * the greeting does not grow with the array (the planner's ruling on T-163,
- * after T-183 cut the greeting). Input order is preserved among survivors.
+ * per seat INSTANCE, newest by `first_rev`. Older entries stay in the record and
+ * are not rendered, so the greeting does not grow with the array (the planner's
+ * ruling on T-163, after T-183 cut the greeting). Input order is preserved among
+ * survivors.
  */
 export function newestHandoffPerInstance(handoffs: readonly Handoff[]): Handoff[] {
   const newest = new Map<string, Handoff>();
   for (const h of handoffs) {
     const key = `${h.seat}\u0000${h.checkout ?? ""}`;
     const cur = newest.get(key);
-    if (!cur || h.session >= cur.session) newest.set(key, h);
+    if (!cur || compareFirstRev(h.first_rev, cur.first_rev) >= 0) newest.set(key, h);
   }
   const keep = new Set(newest.values());
   return handoffs.filter((h) => keep.has(h));
 }
 
-/** The newest handoff of one seat role across its instances, or null. */
+/** The newest handoff (by `first_rev`) of one seat role across its instances, or null. */
 export function newestHandoffForSeat(handoffs: readonly Handoff[], seat: Seat): Handoff | null {
   let best: Handoff | null = null;
-  for (const h of handoffs) if (h.seat === seat && (best === null || h.session >= best.session)) best = h;
+  for (const h of handoffs) if (h.seat === seat && (best === null || compareFirstRev(h.first_rev, best.first_rev) >= 0)) best = h;
   return best;
 }
 
@@ -356,15 +398,15 @@ const KEY_ORDER: Record<string, string[]> = {
   $: ["schema_version", "revision", "project", "objective", "tasks", "verified", "gaps", "decisions", "handoffs", "sessions"],
   project: ["name"],
   objective: ["text", "since_session"],
-  tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note"],
+  tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note", "closed_rev"],
   verified: ["id", "claim", "evidence", "since_session", "status"],
   evidence: ["type", "path", "observation"],
   gaps: ["id", "what", "evidence", "recommended_update", "opened_session"],
   decisions: ["id", "title", "date", "note"],
-  handoffs: ["seat", "pick_up", "watch_out", "open_questions", "session", "loop_state", "session_uuid", "checkout"],
+  handoffs: ["seat", "pick_up", "watch_out", "open_questions", "session", "loop_state", "session_uuid", "checkout", "first_rev"],
   loop_state: ["open_prs", "frozen_sha", "questions_for_aaron", "rulings"],
   open_prs: ["ref", "qa_status", "note"],
-  sessions: ["n", "date", "uuid", "seat", "checkout"],
+  sessions: ["n", "date", "uuid", "seat", "checkout", "first_rev"],
 };
 
 function canonicalize(value: unknown, slot = "$"): unknown {

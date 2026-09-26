@@ -17,7 +17,8 @@
       "opened_session": 53,
       "closed_session": 54,
       "supersedes": null,
-      "note": "Loop 1, v0.28.0"
+      "note": "Loop 1, v0.28.0",
+      "closed_rev": null
     },
     {
       "id": "T-002",
@@ -27,7 +28,8 @@
       "opened_session": 53,
       "closed_session": 54,
       "supersedes": null,
-      "note": ""
+      "note": "",
+      "closed_rev": null
     },
     {
       "id": "T-003",
@@ -37,7 +39,8 @@
       "opened_session": 53,
       "closed_session": 54,
       "supersedes": null,
-      "note": "three Claude Code copies moved together"
+      "note": "three Claude Code copies moved together",
+      "closed_rev": null
     },
     {
       "id": "T-004",
@@ -47,7 +50,8 @@
       "opened_session": 53,
       "closed_session": 54,
       "supersedes": null,
-      "note": "ADR-023 instrumentation"
+      "note": "ADR-023 instrumentation",
+      "closed_rev": null
     },
     {
       "id": "T-005",
@@ -57,7 +61,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": "Loop 2 capability half"
+      "note": "Loop 2 capability half",
+      "closed_rev": null
     },
     {
       "id": "T-006",
@@ -67,7 +72,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": ""
+      "note": "",
+      "closed_rev": null
     },
     {
       "id": "T-007",
@@ -77,7 +83,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": "prose files stay in the size block"
+      "note": "prose files stay in the size block",
+      "closed_rev": null
     },
     {
       "id": "T-008",
@@ -87,7 +94,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": ""
+      "note": "",
+      "closed_rev": null
     },
     {
       "id": "T-009",
@@ -97,7 +105,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": "Loop 1 gap 2"
+      "note": "Loop 1 gap 2",
+      "closed_rev": null
     },
     {
       "id": "T-010",
@@ -107,7 +116,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": "Loop 1 gap 3; makes P5 a code guarantee"
+      "note": "Loop 1 gap 3; makes P5 a code guarantee",
+      "closed_rev": null
     },
     {
       "id": "T-011",
@@ -117,7 +127,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": "Loop 1 gap 5"
+      "note": "Loop 1 gap 5",
+      "closed_rev": null
     },
     {
       "id": "T-012",
@@ -127,7 +138,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": "Loop 3; blocked on Loop 2 acceptance"
+      "note": "Loop 3; blocked on Loop 2 acceptance",
+      "closed_rev": null
     },
     {
       "id": "T-013",
@@ -137,7 +149,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": "Loop 3"
+      "note": "Loop 3",
+      "closed_rev": null
     },
     {
       "id": "T-014",
@@ -147,7 +160,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": "Loop 4 dogfood"
+      "note": "Loop 4 dogfood",
+      "closed_rev": null
     },
     {
       "id": "T-015",
@@ -157,7 +171,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": "inline Composer variant, deliberately untouched in Loops 1–2"
+      "note": "inline Composer variant, deliberately untouched in Loops 1–2",
+      "closed_rev": null
     },
     {
       "id": "T-016",
@@ -167,7 +182,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": ".gitignore:10"
+      "note": ".gitignore:10",
+      "closed_rev": null
     },
     {
       "id": "T-017",
@@ -177,7 +193,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": ""
+      "note": "",
+      "closed_rev": null
     },
     {
       "id": "T-018",
@@ -187,7 +204,8 @@
       "opened_session": 53,
       "closed_session": 53,
       "supersedes": null,
-      "note": "v0.27.1"
+      "note": "v0.27.1",
+      "closed_rev": null
     },
     {
       "id": "T-019",
@@ -197,7 +215,8 @@
       "opened_session": 53,
       "closed_session": 53,
       "supersedes": null,
-      "note": "v0.27.0"
+      "note": "v0.27.0",
+      "closed_rev": null
     },
     {
       "id": "T-020",
@@ -207,7 +226,8 @@
       "opened_session": 52,
       "closed_session": 52,
       "supersedes": null,
-      "note": "v0.26.0"
+      "note": "v0.26.0",
+      "closed_rev": null
     },
     {
       "id": "T-021",
@@ -217,7 +237,8 @@
       "opened_session": 52,
       "closed_session": 52,
       "supersedes": null,
-      "note": "v0.25.0"
+      "note": "v0.25.0",
+      "closed_rev": null
     },
     {
       "id": "T-022",
@@ -227,7 +248,8 @@
       "opened_session": 51,
       "closed_session": 51,
       "supersedes": null,
-      "note": "v0.24.0"
+      "note": "v0.24.0",
+      "closed_rev": null
     },
     {
       "id": "T-023",
@@ -237,7 +259,8 @@
       "opened_session": 50,
       "closed_session": 50,
       "supersedes": null,
-      "note": "v0.23.0; threshold decision deferred"
+      "note": "v0.23.0; threshold decision deferred",
+      "closed_rev": null
     },
     {
       "id": "T-024",
@@ -247,7 +270,8 @@
       "opened_session": 50,
       "closed_session": null,
       "supersedes": "T-023",
-      "note": "blocked on the default rating path being able to emit harmful"
+      "note": "blocked on the default rating path being able to emit harmful",
+      "closed_rev": null
     },
     {
       "id": "T-025",
@@ -257,7 +281,8 @@
       "opened_session": 52,
       "closed_session": null,
       "supersedes": null,
-      "note": "deliberately not shipped: would start auto-deleting"
+      "note": "deliberately not shipped: would start auto-deleting",
+      "closed_rev": null
     },
     {
       "id": "T-026",
@@ -267,7 +292,8 @@
       "opened_session": 49,
       "closed_session": 49,
       "supersedes": null,
-      "note": "v0.22.1"
+      "note": "v0.22.1",
+      "closed_rev": null
     },
     {
       "id": "T-027",
@@ -277,7 +303,8 @@
       "opened_session": 54,
       "closed_session": null,
       "supersedes": null,
-      "note": "Loop 5+, gated on Q2/Q3"
+      "note": "Loop 5+, gated on Q2/Q3",
+      "closed_rev": null
     }
   ],
   "verified": [
@@ -482,7 +509,8 @@
       "session": 54,
       "loop_state": null,
       "session_uuid": null,
-      "checkout": null
+      "checkout": null,
+      "first_rev": null
     }
   ],
   "sessions": [
@@ -491,7 +519,8 @@
       "date": "2026-09-14",
       "uuid": "f7a1b3d9-ef6d-482f-aba1-ddaa296f722b",
       "seat": null,
-      "checkout": null
+      "checkout": null,
+      "first_rev": null
     }
   ]
 }

@@ -52,7 +52,7 @@ function inboxReport(): ImportReport["inbox"] {
   return {
     items: 0, box_counts: zero(), by_priority: { P0: zero(), P1: zero(), P2: zero(), P3: zero() }, by_status: zero(),
     completed_section_items: 0, unparsed: [], superseded_links: [], sessions: { parsed: 0, inferred_open_as_current: 0, inferred_done_as_retention_edge: 0 },
-    title_fallbacks: [], retention_eligible_on_first_write: 0,
+    title_fallbacks: [], retention_eligible_done: 0,
   };
 }
 
@@ -142,7 +142,7 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     // T-175: no seeds. These two lines asserted SIA's V-001..V-005 and G-001..G-006.
     expect(s.verified).toEqual([]);
     expect(s.gaps).toEqual([]);
-    expect(s.sessions).toEqual([{ n: 54, date: TODAY, uuid: "00000000-0000-4000-8000-000000000054", seat: null, checkout: null }]);
+    expect(s.sessions).toEqual([{ n: 54, date: TODAY, uuid: "00000000-0000-4000-8000-000000000054", seat: null, checkout: null, first_rev: null }]);
 
     const report = readFileSync(join(root, REPORT_REL), "utf-8");
     expect(report).toContain("| **all** | 42 | 3 | 0 | 98 | 143 |");
@@ -209,8 +209,17 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     const w = applyStateOps(root, { session: 55, expected_revision: 0, ops: [{ op: "set_objective", text: "first write" }], version: "0.30.0" });
     expect(w.ok).toBe(true);
     expect(w.revision_after).toBe(1);
-    // Retention on the first write drops the done items closed ≤ 52 (session 55 − 3).
-    expect(w.dropped_task_ids.length).toBeGreaterThan(50);
+    // R179-1: imported done items (closed_rev null) leave once 3 SESSIONS have
+    // written; an unattributed write is not a session and ages nothing.
+    expect(w.dropped_task_ids).toEqual([]);
+    let rev = 1;
+    let last = w;
+    for (const u of ["s-1", "s-2", "s-3"]) {
+      last = applyStateOps(root, { session: 55, expected_revision: rev++, session_uuid: u, ops: [{ op: "set_objective", text: u }], version: "0.30.0" });
+      expect(last.ok, last.error).toBe(true);
+      if (u !== "s-3") expect(last.dropped_task_ids).toEqual([]);
+    }
+    expect(last.dropped_task_ids.length).toBeGreaterThan(50);
   });
 
   it("--commit refuses without a draft, on a draft that does not validate, and on an existing snapshot without --force-snapshot", () => {
@@ -319,9 +328,9 @@ describe("state import parsing rules (unit)", () => {
     // seat "developer" is a DOCUMENTED ASSUMPTION, not a discovered fact: the
     // prose slot does not say whose it is, and the single slot was written by
     // /end, which was the developer's command.
-    expect(h).toEqual({ seat: "developer", pick_up: "Do this.\nThen that.", watch_out: ["one", "two"], open_questions: [], session: 55, loop_state: null, session_uuid: null, checkout: null });
+    expect(h).toEqual({ seat: "developer", pick_up: "Do this.\nThen that.", watch_out: ["one", "two"], open_questions: [], session: 55, loop_state: null, session_uuid: null, checkout: null, first_rev: null });
     expect(rep).toEqual({ pick_up_lines: 2, watch_out: 2, open_questions: 0, sections_not_imported: ["Refs"] });
-    expect(importHandoff(null, 55, rep)).toEqual({ seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: 55, loop_state: null, session_uuid: null, checkout: null });
+    expect(importHandoff(null, 55, rep)).toEqual({ seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: 55, loop_state: null, session_uuid: null, checkout: null, first_rev: null });
   });
 
   it("SUMMARY surgery removes exactly the title blockquote and the Current State section and leaves everything else byte for byte", () => {

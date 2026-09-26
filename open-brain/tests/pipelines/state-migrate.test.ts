@@ -65,7 +65,7 @@ describe("migrateStateFile", () => {
     expect(parsed.data.handoffs[0].pick_up).toBe("THIS IS THE QA SEAT'S HANDOFF");
     expect(parsed.data.handoffs[0].session).toBe(70);
     expect(parsed.data.handoffs[0].session_uuid).toBeNull();
-    expect(parsed.data.sessions).toEqual([{ n: 70, date: "2026-09-20", uuid: "abc", seat: "qa", checkout: null }]);
+    expect(parsed.data.sessions).toEqual([{ n: 70, date: "2026-09-20", uuid: "abc", seat: "qa", checkout: null, first_rev: null }]);
   });
 
   it("carries every unrelated field through byte-identically", () => {
@@ -219,7 +219,7 @@ describe("migrateStateFile", () => {
     const parsed = parseState(readFileSync(path, "utf8"));
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
-    expect(parsed.data.handoffs).toEqual(before.handoffs.map((h) => ({ ...h, session_uuid: null, checkout: null })));
+    expect(parsed.data.handoffs).toEqual(before.handoffs.map((h) => ({ ...h, session_uuid: null, checkout: null, first_rev: null })));
   });
 
   it("v2 → v3 turns last_session into the one sessions[] entry, uuid and seat included", () => {
@@ -227,7 +227,7 @@ describe("migrateStateFile", () => {
     migrateStateFile(path, {});
     const after = JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;
     expect(after).not.toHaveProperty("last_session");
-    expect(after.sessions).toEqual([{ n: 76, date: "2026-09-21", uuid: U1, seat: "planner", checkout: null }]);
+    expect(after.sessions).toEqual([{ n: 76, date: "2026-09-21", uuid: U1, seat: "planner", checkout: null, first_rev: null }]);
   });
 
   it("v2 → v3 keeps EVERY uuid in the file, counted before and after (the planner's ruling on T-163)", () => {

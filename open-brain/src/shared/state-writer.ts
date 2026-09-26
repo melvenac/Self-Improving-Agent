@@ -30,6 +30,7 @@ import {
   LoopStateSchema,
   parseState,
   serializeState,
+  compareFirstRev,
   type Seat,
   type State,
   type Task,
@@ -84,9 +85,9 @@ const RETIRED_OPS: Record<string, string> = {
 
 /**
  * Retention for the per-session arrays (handoffs, sessions): an entry is
- * dropped only when a NEWER entry of the same seat instance exists and the
- * entry is more than this many record sessions older than the newest session in
- * the record. The planner's ruling on T-163 (record session 109).
+ * dropped only when a NEWER entry of the same seat instance exists and more
+ * than this many distinct sessions first wrote after it. The planner's ruling
+ * on T-163 (record session 109), counted by write order since R179-1.
  */
 export const RECORD_RETENTION_SESSIONS = 10;
 
@@ -217,7 +218,12 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   if (mine && mine.n !== options.session) {
     notes.push(`session ${uuid} is already recorded as session ${mine.n}; kept ${mine.n} rather than taking ${options.session}, and EVERY op in this batch was stamped ${mine.n} (G-047 - the number counts sessions, not writes)`);
   }
-  const ctx: OpContext = { session: effectiveSession, uuid, checkout, removedGaps, notes };
+  // R179-1 (as amended): what ORDERS sessions is the revision of each one's
+  // first write, which the writer assigns and the caller cannot supply. A
+  // session already recorded keeps its own; a new one — or a legacy entry
+  // writing for the first time since migration — takes this write's revision.
+  const firstRev = mine?.first_rev ?? before + 1;
+  const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes };
 
   for (let i = 0; i < options.ops.length; i++) {
     const opName = (options.ops[i] as { op?: unknown } | null)?.op;
@@ -253,7 +259,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
         (o): o is { op: "set_handoff"; seat: Seat } => (o as { op?: unknown }).op === "set_handoff",
       )?.seat;
       const seat = handedOffAs ?? mine?.seat ?? options.seat ?? null;
-      const entry = { n: effectiveSession, date: today, uuid, seat, checkout };
+      const entry = { n: effectiveSession, date: today, uuid, seat, checkout, first_rev: firstRev };
       if (mine) Object.assign(mine, entry);
       else next.sessions.push(entry);
     }
@@ -266,7 +272,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   const cited = renderOnly ? new Map<string, string[]>() : citedTaskIds(projectRoot);
   const retention = renderOnly
     ? { dropped: [] as string[], kept: [] as string[] }
-    : applyRetention(next, effectiveSession, cited);
+    : applyRetention(next, cited);
   const dropped = retention.dropped;
   for (const id of retention.kept) {
     const where = cited.get(id) ?? [];
@@ -336,6 +342,10 @@ type OpResult = { ok: true; id: string | null } | { ok: false; error: string };
 
 interface OpContext {
   session: number;
+  /** The writing session's first-write revision: its recorded one, or this write's. */
+  firstRev: number;
+  /** The revision this write produces. */
+  rev: number;
   uuid: string | null;
   checkout: string;
   removedGaps: string[];
@@ -349,7 +359,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       const id = op.id ?? nextId("T", s.tasks.map((t) => t.id));
       if (s.tasks.some((t) => t.id === id)) return { ok: false, error: `task ${id} already exists` };
       if (op.supersedes && !s.tasks.some((t) => t.id === op.supersedes)) return { ok: false, error: `supersedes unknown task ${op.supersedes}` };
-      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "" });
+      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "", closed_rev: null });
       return { ok: true, id };
     }
     case "update_task": {
@@ -368,6 +378,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       if (t.status === "done") return { ok: false, error: `task ${op.id} is already done (closed session ${t.closed_session})` };
       t.status = "done";
       t.closed_session = session;
+      t.closed_rev = ctx.rev;
       if (op.note !== undefined) t.note = op.note;
       return { ok: true, id: t.id };
     }
@@ -379,6 +390,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       if (t.status !== "done") return { ok: false, error: `task ${op.id} is not done (status ${t.status}); nothing to reopen` };
       t.status = "open";
       t.closed_session = null;
+      t.closed_rev = null;
       t.note = t.note ? `${t.note} — ${op.note}` : op.note;
       return { ok: true, id: t.id };
     }
@@ -457,6 +469,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
         loop_state: op.loop_state ?? null,
         session_uuid: ctx.uuid,
         checkout: ctx.checkout,
+        first_rev: ctx.firstRev,
       };
       const idx = s.handoffs.findIndex((h) => h.session_uuid === ctx.uuid);
       if (idx === -1) s.handoffs.push(entry);
@@ -476,30 +489,46 @@ function localIsoDate(d = new Date()): string {
 export interface InstanceEntry {
   seat: string | null;
   checkout: string | null;
-  session: number;
+  /** Its session's first-write revision; null for a legacy entry. The session NUMBER is not here: retention never reads it. */
+  first_rev: number | null;
 }
 
 /**
- * Is `entry` superseded, given every entry of its array and the record's newest
- * session number? True only when a NEWER entry of the same seat instance —
- * same seat AND same checkout, null matching only null — exists, and the entry
- * is more than RECORD_RETENTION_SESSIONS older than `newest`.
+ * Is `entry` superseded? Decided by write ORDER (`first_rev`), never by the
+ * session number, which is the caller's for a session the record has not seen
+ * (R179-1 as amended, QA 125's D1: a number typed 1124 for 124 dropped two
+ * other sessions' entries in one write).
  *
- * The newest entry of an instance is therefore never superseded, so a seat
- * that is still working keeps its last word however long it goes quiet, and a
- * legacy entry (null checkout, migrated from v2) is its own instance and is
- * never superseded by a new write. Exported because the record-erasure check
- * recomputes exactly this rule: a removal it explains is retention, and any
- * other removal of another session's entry is an erasure.
+ * - A KEYED entry is superseded only when a newer entry of the same seat
+ *   instance — same seat AND same checkout — exists, and more than
+ *   RECORD_RETENTION_SESSIONS distinct sessions (`sessionFirstRevs`, one per
+ *   entry of sessions[]) first wrote after it. The newest entry of an instance
+ *   is never superseded, so a seat still working keeps its last word however
+ *   long it goes quiet, and a wrong number cannot age anybody: a session counts
+ *   once however it is numbered.
+ * - A LEGACY HANDOFF (null first_rev and checkout: migrated from v2, or
+ *   imported from prose) is superseded by the FIRST keyed handoff of its seat
+ *   (R179-3, QA 125's D5): it is that seat's last word from before v3, and its
+ *   seat has now spoken. `legacyYields` says the entry is a handoff. A legacy
+ *   SESSION record is never superseded: it carries the uuid the migration swore
+ *   to keep, and it renders nowhere.
+ *
+ * Exported because the record-erasure check recomputes exactly this rule: a
+ * removal it explains is retention, and any other removal of another session's
+ * entry is an erasure.
  */
-export function isSuperseded(entry: InstanceEntry, all: readonly InstanceEntry[], newest: number): boolean {
-  if (!(entry.session < newest - RECORD_RETENTION_SESSIONS)) return false;
-  return all.some((o) => o !== entry && o.seat === entry.seat && o.checkout === entry.checkout && o.session > entry.session);
-}
-
-/** The record's newest session number: the highest `n` in sessions[], or -1 when there is none. */
-export function newestSessionNumber(s: Pick<State, "sessions">): number {
-  return s.sessions.reduce((m, x) => Math.max(m, x.n), -1);
+export function isSuperseded(
+  entry: InstanceEntry,
+  all: readonly InstanceEntry[],
+  sessionFirstRevs: readonly (number | null)[],
+  legacyYields = false,
+): boolean {
+  if (entry.first_rev === null && entry.checkout === null) {
+    return legacyYields && all.some((o) => o !== entry && o.seat === entry.seat && o.first_rev !== null);
+  }
+  const since = sessionFirstRevs.filter((r) => compareFirstRev(r, entry.first_rev) > 0).length;
+  if (!(since > RECORD_RETENTION_SESSIONS)) return false;
+  return all.some((o) => o !== entry && o.seat === entry.seat && o.checkout === entry.checkout && compareFirstRev(o.first_rev, entry.first_rev) > 0);
 }
 
 /**
@@ -508,17 +537,17 @@ export function newestSessionNumber(s: Pick<State, "sessions">): number {
  * reported is the G-024 shape.
  */
 export function applyInstanceRetention(s: State): string[] {
-  const newest = newestSessionNumber(s);
+  const revs = s.sessions.map((x) => x.first_rev);
   const out: string[] = [];
-  const hAll = s.handoffs.map((h) => ({ seat: h.seat, checkout: h.checkout, session: h.session, ref: h }));
-  const hDrop = new Set(hAll.filter((e) => isSuperseded(e, hAll, newest)).map((e) => e.ref));
+  const hAll = s.handoffs.map((h) => ({ seat: h.seat, checkout: h.checkout, first_rev: h.first_rev, ref: h }));
+  const hDrop = new Set(hAll.filter((e) => isSuperseded(e, hAll, revs, true)).map((e) => e.ref));
   s.handoffs = s.handoffs.filter((h) => {
     if (!hDrop.has(h)) return true;
     out.push(`handoff ${h.session_uuid ?? `${h.seat}@${h.session}`} (${h.seat}, ${h.checkout ?? "legacy"}, session ${h.session})`);
     return false;
   });
-  const sAll = s.sessions.map((x) => ({ seat: x.seat, checkout: x.checkout, session: x.n, ref: x }));
-  const sDrop = new Set(sAll.filter((e) => isSuperseded(e, sAll, newest)).map((e) => e.ref));
+  const sAll = s.sessions.map((x) => ({ seat: x.seat, checkout: x.checkout, first_rev: x.first_rev, ref: x }));
+  const sDrop = new Set(sAll.filter((e) => isSuperseded(e, sAll, revs)).map((e) => e.ref));
   s.sessions = s.sessions.filter((x) => {
     if (!sDrop.has(x)) return true;
     out.push(`session ${x.uuid ?? `#${x.n}`} (${x.seat ?? "no seat"}, ${x.checkout ?? "legacy"}, session ${x.n})`);
@@ -543,21 +572,22 @@ export function nextId(prefix: "T" | "V" | "G" | "D", existing: string[]): strin
 }
 
 /**
- * Drops done tasks outside the retention window. "Last 3 sessions" means the
- * current one and the two before it, so a task closed at `session - 3` is
- * the first to go. Returns the dropped ids so the caller can say so.
+ * Drops done tasks outside the retention window: closed before at least
+ * DONE_RETENTION_SESSIONS distinct sessions first wrote (`isDroppedByRetention`).
+ * Reads sessions[] as it stands, so call it after this write's own session
+ * record is in. Returns the dropped ids so the caller can say so.
  */
 export function applyRetention(
   s: State,
-  session: number,
   cited: ReadonlyMap<string, string[]> = new Map()
 ): { dropped: string[]; kept: string[] } {
   const dropped: string[] = [];
   const kept: string[] = [];
+  const revs = s.sessions.map((x) => x.first_rev);
   s.tasks = s.tasks.filter((t) => {
     // Same predicate the INBOX view filters on, so the record and the rendered
     // Done list cannot disagree about what still exists (T-144).
-    const old = isDroppedByRetention(t, session);
+    const old = isDroppedByRetention(t, revs);
     if (!old) return true;
     // T-157 / G-024: an id the tracked tree refers to must not leave the record.
     // Rev 48 evicted T-151, which G-031 exists to correct; rev 49 evicted T-153,

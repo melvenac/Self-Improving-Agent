@@ -52,6 +52,8 @@ export interface RecordRef {
   uuid: string | null;
   seat: string | null;
   checkout: string | null;
+  /** The session's first-write revision (schema v3, R179-1); null for legacy entries and older schemas. */
+  firstRev: number | null;
 }
 
 export interface Erasure {
@@ -85,27 +87,28 @@ export function recordsOf(raw: Raw | null): RecordRef[] {
   const out: RecordRef[] = [];
   const str = (v: unknown) => (typeof v === "string" && v.length > 0 ? v : null);
   const num = (v: unknown) => (typeof v === "number" ? v : -1);
+  const rev = (v: unknown) => (typeof v === "number" ? v : null);
 
   if (Array.isArray(raw.sessions)) {
     for (const x of raw.sessions as Raw[]) {
       const uuid = str(x.uuid);
-      out.push({ kind: "session", key: uuid ? `s:${uuid}` : `s#${num(x.n)}`, session: num(x.n), uuid, seat: str(x.seat), checkout: str(x.checkout) });
+      out.push({ kind: "session", key: uuid ? `s:${uuid}` : `s#${num(x.n)}`, session: num(x.n), uuid, seat: str(x.seat), checkout: str(x.checkout), firstRev: rev(x.first_rev) });
     }
   } else if (raw.last_session && typeof raw.last_session === "object") {
     const x = raw.last_session as Raw;
     const uuid = str(x.uuid);
-    out.push({ kind: "session", key: uuid ? `s:${uuid}` : `s#${num(x.n)}`, session: num(x.n), uuid, seat: str(x.seat), checkout: null });
+    out.push({ kind: "session", key: uuid ? `s:${uuid}` : `s#${num(x.n)}`, session: num(x.n), uuid, seat: str(x.seat), checkout: null, firstRev: null });
   }
 
   if (Array.isArray(raw.handoffs)) {
     for (const x of raw.handoffs as Raw[]) {
       const uuid = str(x.session_uuid);
       const seat = str(x.seat);
-      out.push({ kind: "handoff", key: uuid ? `h:${uuid}` : `h:${seat}@${num(x.session)}`, session: num(x.session), uuid, seat, checkout: str(x.checkout) });
+      out.push({ kind: "handoff", key: uuid ? `h:${uuid}` : `h:${seat}@${num(x.session)}`, session: num(x.session), uuid, seat, checkout: str(x.checkout), firstRev: rev(x.first_rev) });
     }
   } else if (raw.handoff && typeof raw.handoff === "object") {
     const x = raw.handoff as Raw;
-    out.push({ kind: "handoff", key: `h:?@${num(x.session)}`, session: num(x.session), uuid: null, seat: null, checkout: null });
+    out.push({ kind: "handoff", key: `h:?@${num(x.session)}`, session: num(x.session), uuid: null, seat: null, checkout: null, firstRev: null });
   }
   return out;
 }
@@ -130,14 +133,26 @@ function revisionOf(raw: Raw | null): number | null {
   return raw && typeof raw.revision === "number" ? raw.revision : null;
 }
 
-/** Retention, recomputed exactly as the writer applies it, from the state AFTER the step. */
-function explainedByRetention(r: RecordRef, after: Raw | null): boolean {
+/**
+ * Retention, recomputed exactly as the writer applies it, from the state AFTER
+ * the step: by write order (`first_rev`), never by session number (R179-1). A
+ * removal "explained" only by a number — a writer that trusts `n` again — is
+ * therefore flagged here, whatever that writer believed.
+ *
+ * The count of sessions written since the removed entry is taken from the
+ * after-state's sessions[] PLUS the removed entry's own session record when the
+ * same step removed that too: the writer counted it before dropping it.
+ */
+function explainedByRetention(r: RecordRef, after: Raw | null, before: RecordRef[]): boolean {
   if (schemaOf(after) < 3) return false;
-  const recs = recordsOf(after).filter((x) => x.kind === r.kind);
-  const newest = recordsOf(after).filter((x) => x.kind === "session").reduce((m, x) => Math.max(m, x.session), -1);
-  const entry: InstanceEntry = { seat: r.seat, checkout: r.checkout, session: r.session };
-  const all: InstanceEntry[] = [...recs.map((x) => ({ seat: x.seat, checkout: x.checkout, session: x.session })), entry];
-  return isSuperseded(entry, all, newest);
+  const a = recordsOf(after);
+  const recs = a.filter((x) => x.kind === r.kind);
+  const sessionsAfter = a.filter((x) => x.kind === "session");
+  const droppedSessions = before.filter((x) => x.kind === "session" && !sessionsAfter.some((y) => y.key === x.key));
+  const revs = [...sessionsAfter, ...droppedSessions].map((x) => x.firstRev);
+  const entry: InstanceEntry = { seat: r.seat, checkout: r.checkout, first_rev: r.firstRev };
+  const all: InstanceEntry[] = [...recs.map((x) => ({ seat: x.seat, checkout: x.checkout, first_rev: x.firstRev })), entry];
+  return isSuperseded(entry, all, revs, r.kind === "handoff");
 }
 
 /** Pure: the erasures between one parent state and the state after, for a NON-merge step. */
@@ -146,7 +161,7 @@ export function erasuresInStep(before: Raw | null, after: Raw | null): { removed
   const a = recordsOf(after);
   const out: { removed: RecordRef; added: RecordRef[] }[] = [];
   for (const r of b) {
-    if (presentIn(a, r) || explainedByRetention(r, after)) continue;
+    if (presentIn(a, r) || explainedByRetention(r, after, b)) continue;
     out.push({ removed: r, added: a.filter((x) => x.kind === r.kind && !presentIn(b, x)) });
   }
   return out;
@@ -161,7 +176,7 @@ export function erasuresInMerge(parents: Array<Raw | null>, base: Raw | null, af
   const out: { removed: RecordRef; added: RecordRef[] }[] = [];
   for (const recs of parentRecs) {
     for (const r of recs) {
-      if (seen.has(r.key) || presentIn(a, r) || explainedByRetention(r, after)) continue;
+      if (seen.has(r.key) || presentIn(a, r) || explainedByRetention(r, after, recs)) continue;
       const inEveryParent = parentRecs.every((p) => presentIn(p, r));
       const inBase = presentIn(baseRecs, r);
       if (!inEveryParent && inBase) continue; // removed on another line; reported there

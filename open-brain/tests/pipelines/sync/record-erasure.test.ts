@@ -92,13 +92,14 @@ describe("record-erasure (T163-2)", () => {
 
   it("does NOT flag a retention drop — the rule is recomputed from the state after the step", () => {
     handOff(dir, 40, "OLD", "old builder handoff");
-    handOff(dir, 56, "NEW", "new builder handoff"); // same seat + checkout, 16 sessions newer: retention drops OLD
+    for (let i = 0; i < 10; i++) handOff(dir, 41, `MID${i}`, `other ${i}`, `other-${i}`);
+    handOff(dir, 56, "NEW", "new builder handoff"); // same seat + checkout, the 11th session since OLD: retention drops OLD
     expect(read(dir).handoffs.some((h: { session_uuid: string | null }) => h.session_uuid === "OLD")).toBe(false);
     const r = scanErasures(dir);
     if (!r.ok) throw new Error(r.skip);
     expect(r.erasures.filter((e) => e.enforced)).toEqual([]);
     expect(checkRecordErasure(dir).severity).toBe("pass");
-  });
+  }, 60_000); // twelve real writes and commits: over vitest's 5 s default on a loaded machine
 
   it("DOES flag the same drop when retention does not explain it (another checkout's entry)", () => {
     handOff(dir, 40, "GROK", "grok in sia-forge", "sia-forge");
