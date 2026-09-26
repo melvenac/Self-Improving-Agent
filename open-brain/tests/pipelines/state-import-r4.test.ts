@@ -8,7 +8,7 @@
  * file runs the same on Linux (tcm) as on Windows.
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { spawnSync } from "node:child_process";
+import { spawnAsync } from "../spawn-async.js";
 import { createHash } from "node:crypto";
 import { mkdtempSync, mkdirSync, writeFileSync, readdirSync, lstatSync, readFileSync, rmSync, existsSync } from "node:fs";
 import { join, relative } from "node:path";
@@ -24,8 +24,9 @@ const TASK = ".agents/TASKS/task.md";
 const SUMMARY = ".agents/SYSTEM/SUMMARY.md";
 
 /** Both channels, and the real exit status: a helper that hardcodes stderr on success asserts nothing about it. */
-function cli(args: string[], cwd: string): { status: number | null; stdout: string; stderr: string } {
-  const r = spawnSync(process.execPath, [tsxCli, cliEntry, ...args], { cwd, encoding: "utf8", env: process.env });
+// Awaited, not spawnSync (G-042): this file's CLI spawns were one stretch of 30-31 s with no macrotask under load.
+async function cli(args: string[], cwd: string): Promise<{ status: number | null; stdout: string; stderr: string }> {
+  const r = await spawnAsync(process.execPath, [tsxCli, cliEntry, ...args], { cwd, env: process.env });
   return { status: r.status, stdout: r.stdout, stderr: r.stderr };
 }
 
@@ -110,14 +111,14 @@ describe("R4-1 (IF-21): an input the importer cannot read blocks a bare --commit
   });
 
   for (const [shape, bytes] of SHAPES) {
-    it(`${shape}: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes`, () => {
+    it(`${shape}: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes`, async () => {
       writeProject(root, bytes);
       // R3-2's verdict stands: the words cannot be read. What changes is its consequence.
       expect(inboxOf(runDraft(root, TODAY).draft.report).verdict).toBe("could_not_tell");
 
       // D8 first, so that at 063662b this row is red on D8 itself (the bare --commit goes through).
       const before = tree(root);
-      const bare = cli(["state", "import", "--commit", root], root);
+      const bare = await cli(["state", "import", "--commit", root], root);
       expect(bare.status).toBe(1);
       expect(tree(root)).toEqual(before);
       let nuls = 0;
@@ -126,7 +127,7 @@ describe("R4-1 (IF-21): an input the importer cannot read blocks a bare --commit
       expect(bare.stderr).toContain("--accept-stale");
       expect(bare.stderr).toContain("Nothing written");
 
-      const accepted = cli(["state", "import", "--commit", "--accept-stale", root], root);
+      const accepted = await cli(["state", "import", "--commit", "--accept-stale", root], root);
       expect(accepted.stderr).toBe("");
       expect(accepted.status).toBe(0);
       expect(accepted.stdout).toContain(`Imported UNREADABLE under --accept-stale: ${INBOX}`);
@@ -145,9 +146,9 @@ describe("R4-1 (IF-21): an input the importer cannot read blocks a bare --commit
     expect(r.accepted_unreadable).toEqual([INBOX]);
   });
 
-  it("the draft's report says --commit refuses while an input cannot be read, and the CLI's draft summary says so too", () => {
+  it("the draft's report says --commit refuses while an input cannot be read, and the CLI's draft summary says so too", async () => {
     writeProject(root, SHAPES[5][1]);
-    const d = cli(["state", "import", "--draft", root], root);
+    const d = await cli(["state", "import", "--draft", root], root);
     expect(d.status).toBe(0);
     expect(d.stdout).toContain(`--commit will REFUSE while ${INBOX} cannot be read`);
     const report = readFileSync(join(root, ".agents/state.import-report.md"), "utf8");
