@@ -254,4 +254,12 @@ describe("R4-3 (IF-24): the half-restored refusal", () => {
     writeFileSync(join(root, `${snap}.import-incomplete`), "died\n");
     expect(() => runDraft(root, TODAY)).toThrow(/Keep a copy of the snapshot until the re-run completes/);
   });
+
+  it("the way out stays machine-readable: 'then delete <marker>. Nothing written', the shape QA 111's probes-r3.mjs parses to follow it", () => {
+    writeProject(root, current);
+    const snap = `.agents/archive/pre-state-migration-${TODAY}`;
+    mkdirSync(join(root, snap), { recursive: true });
+    writeFileSync(join(root, `${snap}.import-incomplete`), "died\n");
+    expect(() => runDraft(root, TODAY)).toThrow(/Restore \.agents\/ by hand from (\S+?)\/?, which holds every original, then delete (\S+?)\. Nothing written/);
+  });
 });
