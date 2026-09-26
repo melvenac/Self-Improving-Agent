@@ -140,8 +140,9 @@ jobs:
             Where-Object { $_.Name -notin '_Total','Idle' } |
             Sort-Object PercentProcessorTime -Descending | Select-Object -First 5
           $top | ForEach-Object { "TOP5 $($_.Name) pid=$($_.IDProcess) cpu_pct=$($_.PercentProcessorTime) ws_mb=$([math]::Round($_.WorkingSet / 1MB))" }
-          $cores = [Environment]::ProcessorCount
-          $heavy = $top | Where-Object { $_.Name -notmatch '^(Runner\.|powershell|WmiPrvSE)' -and ($_.PercentProcessorTime / $cores) -gt 15 }
+          # PercentProcessorTime is percent of ONE logical processor, so 15 means 15 % of a core, as the handoff states.
+          # Dividing it by the processor count made this 120 % of a core on the 8-thread laptop (QA 123, E-4).
+          $heavy = $top | Where-Object { $_.Name -notmatch '^(Runner\.|powershell|WmiPrvSE)' -and $_.PercentProcessorTime -gt 15 }
           if ($cpu -gt 25 -or $heavy) { "::warning::BASELINE_NOT_QUIET cpu_load_pct=$cpu heavy=$(($heavy | ForEach-Object Name) -join ',') - this run does not count for Step 0" }
           else { "BASELINE_QUIET" }
 
