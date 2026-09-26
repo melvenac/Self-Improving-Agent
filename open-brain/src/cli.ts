@@ -208,13 +208,13 @@ if (command === "sync") {
   console.log(`Inbox: ${result.state.inbox ? "INBOX loaded" : "no INBOX"}`);
 } else if (command === "relocate") {
   // Parsed before the database is opened: a refusal must not have touched it.
-  const opts = parseOrRefuse(COMMAND_SPECS.relocate, args.slice(1));
   const { openV2Database } = await import("./db-v2.js");
   const { planRelocate, applyRelocate, detectMissingProjects } = await import("./relocate.js");
   const { obsidianVaultDir } = await import("./shared/paths.js");
 
   const paths = resolvePaths(resolve("."));
   const db = openV2Database(paths.knowledgeV2Db);
+  const opts = parseOrRefuse(COMMAND_SPECS.relocate, args.slice(1)); // QA 120 mutant: parsed AFTER the DB is opened
   const vaultDir = obsidianVaultDir();
 
   const from = opts.value("--from");
