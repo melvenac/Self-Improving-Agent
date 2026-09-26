@@ -1342,7 +1342,7 @@ export class MachineConfigWatch {
         const after =
           base.resolvedPath === null
             ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${currentSide(end)}`
-            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${end.lexicalKind === "symlink" ? currentSide(end) : `${ancestorLinkText(end)}; ${currentSide(end)}`}`;
+            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${currentSide(end)}`;
         out.push(row(stageBefore(opened), after, true, p.path, p.scope));
         continue;
       }
