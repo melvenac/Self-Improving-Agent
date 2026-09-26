@@ -49,14 +49,25 @@ export function renderState(state: State, version?: string, options: RenderState
   if (active.length === 0) lines.push(`  (none)`);
 
   lines.push(`\nVerified (${state.verified.length}):`);
-  for (const v of state.verified) {
+  // Verified is append-ordered like decisions, so the newest are the last
+  // VERIFIED_SHOWN. A reopened claim is shown whatever its age: it is a warning,
+  // not history. What is left out is counted and named, never dropped silently.
+  const newest = new Set(state.verified.slice(-VERIFIED_SHOWN));
+  const shown = state.verified.filter((v) => newest.has(v) || v.status === "reopened");
+  for (const v of shown) {
     const flag = v.status === "reopened" ? " [REOPENED]" : "";
-    lines.push(`  ${v.id} — ${v.claim} (${v.evidence.length} evidence)${flag}`);
+    lines.push(`  ${v.id} — ${clip(v.claim, VERIFIED_CLIP, `verified[${v.id}]`)} (${v.evidence.length} evidence)${flag}`);
+  }
+  const omitted = state.verified.length - shown.length;
+  if (omitted > 0) {
+    lines.push(`  … ${omitted} older verified claim(s) not shown (${state.verified.length} total); all of them: ${VERIFIED_FULL_TEXT}`);
   }
   if (state.verified.length === 0) lines.push(`  (none)`);
 
   lines.push(`\nGaps (${state.gaps.length}):`);
-  for (const g of state.gaps) lines.push(`  ${g.id} — ${g.what} (opened session ${g.opened_session})`);
+  for (const g of state.gaps) {
+    lines.push(`  ${g.id} — ${clip(g.what, GAP_CLIP, `gaps[${g.id}]`)} (opened session ${g.opened_session})`);
+  }
   if (state.gaps.length === 0) lines.push(`  (none)`);
 
   lines.push(`\nDecisions: ${state.decisions.length} recorded${state.decisions.length ? `; latest ${latestDecision(state)}` : ""}`);
@@ -87,6 +98,32 @@ export function renderState(state: State, version?: string, options: RenderState
 function formatTask(t: Task): string {
   const sup = t.supersedes ? ` (supersedes ${t.supersedes})` : "";
   return `[${t.status}] ${t.id} ${t.title}${sup}`;
+}
+
+/**
+ * T-183: gaps and verified claims are clipped to one line. At rev 130 the
+ * greeting was 98,679 characters and no longer fit one tool result; gap text
+ * alone was a third of it. Their full text stays in state.json.
+ */
+export const GAP_CLIP = 140;
+export const VERIFIED_CLIP = 100;
+/** Verified is its count plus the newest this many (planner ruling (a), T-183). */
+export const VERIFIED_SHOWN = 10;
+/** The read-only door that prints every verified claim in full (`state show` alone prints only the count). */
+export const VERIFIED_FULL_TEXT = "node open-brain/build/cli.js state show --json";
+
+/**
+ * Text within `limit` and on one line is returned whole, with no marker.
+ * Anything else is cut at the first sentence end or at `limit`, whichever comes
+ * first, and ALWAYS carries the marker with the full length and where the full
+ * text lives: a clip is never silent.
+ */
+export function clip(text: string, limit: number, where: string): string {
+  if (text.length <= limit && !/[\r\n]/.test(text)) return text;
+  const head = text.slice(0, limit);
+  const end = /[.!?](?=\s)|[\r\n]/.exec(head);
+  const cut = (end ? head.slice(0, end.index + (end[0] === "\n" || end[0] === "\r" ? 0 : 1)) : head).trimEnd();
+  return `${cut}… (${text.length} chars; full text: state.json ${where})`;
 }
 
 /** Decisions are append-ordered (Loop 3 R2): the latest is the last element, not a date sort. */
