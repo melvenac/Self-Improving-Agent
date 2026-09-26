@@ -458,7 +458,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
         session_uuid: ctx.uuid,
         checkout: ctx.checkout,
       };
-      const idx = s.handoffs.findIndex((h) => h.session_uuid === ctx.uuid);
+      const idx = s.handoffs.findIndex((h) => h.seat === op.seat);
       if (idx === -1) s.handoffs.push(entry);
       else s.handoffs[idx] = entry;
       return { ok: true, id: op.seat };
