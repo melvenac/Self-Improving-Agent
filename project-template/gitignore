@@ -10,11 +10,13 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# .agents/ is ignored EXCEPT the five state files: state.json is the record;
-# INBOX.md, task.md, next-session.md and SUMMARY.md are its rendered views.
+# .agents/ is ignored EXCEPT the five state files and AGENT.md: state.json is
+# the record; INBOX.md, task.md, next-session.md and SUMMARY.md are its rendered
+# views; AGENT.md says whether this checkout is a seat, and a clone needs it.
 # Session logs, archive/, PRD, docs etc. stay local (git is not their history).
 /.agents/*
 !/.agents/state.json
+!/.agents/AGENT.md
 !/.agents/TASKS/
 /.agents/TASKS/*
 !/.agents/TASKS/INBOX.md

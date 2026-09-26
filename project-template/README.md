@@ -27,11 +27,12 @@ git clone https://github.com/melvenac/Self-Improving-Agent.git
 cd Self-Improving-Agent && node scripts/setup.mjs
 # Restart Claude Code and Cursor
 
-# 2. Per project: copy the scaffold
-cp -r project-template/.agents /path/to/your-project/
-cp -r project-template/.claude/rules /path/to/your-project/.claude/   # optional
-cp project-template/CLAUDE.md /path/to/your-project/                   # customize
+# 2. Per project: open Claude Code in the project and run /bootstrap
 ```
+
+`/bootstrap` (`.claude/commands/bootstrap.md`) copies the files a fresh install needs from this
+template through `open-brain bootstrap scaffold`, then has the owner create the record with
+`open-brain state import`. Copying `.agents/` by hand gives a project with no `state.json`.
 
 ### Standalone (no SIA)
 
