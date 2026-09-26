@@ -71,10 +71,6 @@ export function parseArgs(spec: CommandSpec, tokens: readonly string[], cwd: str
 
   for (let i = 0; i < tokens.length; i += 1) {
     const tok = tokens[i]!;
-    if (TYPOGRAPHIC_DASH.test(tok)) {
-      unknown.push(tok);
-      continue;
-    }
     if (!tok.startsWith("-")) {
       positionals.push(tok);
       continue;
