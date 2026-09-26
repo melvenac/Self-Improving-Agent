@@ -398,7 +398,10 @@ None of these blocks this report. Each has my recommendation.
 6. **O5.** QA 99's log tail (PID 3884) is still running on the QA PC. The driver could end its own viewer on exit.
 
 **Branch:** this report and `docs/loops/qa-scripts-importer-r3/` are committed on `qa/importer-fixes-r3-report`, based
-on `30bf724`, and pushed with `push-qa.mjs`. The driver records the read-back. `qa/importer-fixes-r3-ci` (`063662b`)
+on `30bf724`, and pushed with `push-qa.mjs`. The driver records the read-back. I committed them from a separate
+worktree (`C:\qa-scratch\qa111\report`) so that the shared tree's HEAD would not move. As a result the file was at
+first missing from `C:\Users\Aaron Melven\Worktrees\sia-qa\docs\loops\`, where the run's check looks. It is now
+copied there, untracked, from this branch's tip, as the earlier QA seats' reports are. HEAD there is still `30bf724`. `qa/importer-fixes-r3-ci` (`063662b`)
 and `qa/importer-fixes-r3-redcheck` (`27e4a1d`) are this seat's only other pushes.
 
 QA-111: REPORT COMPLETE
