@@ -407,3 +407,9 @@ the morning.
   `powershell -File` with `-Queue 9998,9999`: two separate skips.
 - **Separately:** this desktop could not reach GitHub all night (connection resets, one DNS failure), so the
   planner's watchers saw nothing. Whether the QA PC was affected too is unknown; it ran nothing anyway.
+- **Second queue failure (23:15Z), the planner's again:** every driver exited `-196608` at once. `Start-Process
+  -ArgumentList` joins its arguments with spaces and does not quote them, and the QA PC's profile is
+  `C:\Users\Aaron Melven`, so the path was cut at the space. The desktop's dry run could not see it: its path
+  (`C:\Users\melve`) has no space, and the dry run launched no driver. **Fix:** the path is quoted. It was proven with
+  a script at a path containing a space: the old form reproduces `-196608`, and the fixed form runs. **The family is
+  the same as the first failure:** the test did not use the target machine's shape.

@@ -80,7 +80,9 @@ foreach ($n in $plan) {
   # 4. Run the driver and wait, with a hard limit.
   $driver = Join-Path $tree "docs\loops\qa-$n\drive.ps1"
   L "run.$n" 'started'
-  $p = Start-Process powershell -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $driver -PassThru -WindowStyle Hidden
+  # QUOTE the path: Start-Process joins -ArgumentList with spaces and does not quote, and the QA PC's profile is
+  # 'C:\Users\Aaron Melven', so an unquoted path was cut at the space and powershell exited -196608 (2026-09-26).
+  $p = Start-Process powershell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + $driver + '"')) -PassThru -WindowStyle Hidden
   if (-not $p.WaitForExit($TimeoutMinutes * 60 * 1000)) {
     L "timeout.$n" "killed after $TimeoutMinutes min (pid $($p.Id), process tree)"
     taskkill /PID $p.Id /T /F | Out-Null
