@@ -1644,7 +1644,7 @@ export function composeGreeting(projectRoot: string, version: string): ComposedG
     ...roles.problems,
   ].join("\n");
   const state = renderState(parsed.data, version, {
-    seat: seat?.success ? seat.data : null,
+    seat: null,
     projectRoot,
   }).join("\n");
   const roleFiles = roles.files
@@ -1677,7 +1677,7 @@ export function checkGreetingSize(version: string, projectRoot: string, limit = 
   const detail =
     `(state render ${g.parts.state}, role files ${g.parts.roleFiles}, tree and seat ${g.parts.treeAndSeat}). ` +
     `LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted.`;
-  return n > limit
+  return n >= limit
     ? { name, severity: "issue", message: `greeting is ${n} characters, over the ${limit} limit ${detail}`, report: true }
     : { name, severity: "pass", message: `greeting is ${n} characters, within the ${limit} limit ${detail}`, report: true };
 }

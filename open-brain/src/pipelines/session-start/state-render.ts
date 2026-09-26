@@ -37,7 +37,7 @@ export function renderState(state: State, version?: string, options: RenderState
       : `Objective: none`
   );
 
-  const active = state.tasks.filter((t) => t.status !== "done");
+  const active = state.tasks.filter((t) => t.status !== "done" && t.status !== "blocked");
   const done = state.tasks.length - active.length;
   lines.push(`\nTasks (${active.length} active; done: ${done}):`);
   for (const priority of TaskPriority.options) {
@@ -203,9 +203,9 @@ function renderOneHandoff(h: Handoff): string[] {
     );
     lines.push(`    SHA frozen for QA: ${ls.frozen_sha ?? "none"}`);
     lines.push(`    questions pending for Aaron: ${ls.questions_for_aaron.length === 0 ? "none" : ""}`);
-    for (const q of ls.questions_for_aaron) lines.push(`      - ${q}`);
+    for (const q of ls.questions_for_aaron) lines.push(`      - ${clip(q, GAP_CLIP, "handoff")}`);
     lines.push(`    rulings made mid-loop: ${ls.rulings.length === 0 ? "none" : ""}`);
-    for (const r of ls.rulings) lines.push(`      - ${r}`);
+    for (const r of ls.rulings) lines.push(`      - ${clip(r, GAP_CLIP, "handoff")}`);
   }
   return lines;
 }
@@ -227,5 +227,5 @@ function describeProvenance(h: Handoff, options: RenderStateOptions): string {
 
 function firstLine(text: string): string {
   const line = text.split(/\r?\n/).find((l) => l.trim()) ?? "";
-  return line.length > 160 ? `${line.slice(0, 157)}...` : line || "(nothing recorded)";
+  return line.length > 60 ? `${line.slice(0, 57)}...` : line || "(nothing recorded)";
 }
