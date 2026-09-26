@@ -353,3 +353,5 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
 - **Ranked:** (1) WSearch off, (2) the pagefile after a measurement, (3) SysMain off, (4) OEM, last.
 - **The laptop session reports that Aaron approved WSearch "directly".** The planner acts only on Aaron's word in the
   planner's own session, not on a relayed one.
+
+- **WSearch disabled** on the laptop over SSH at Aaron's word in the planner session (Stopped, Disabled), before B Step 0's first laptop run. SysMain was left running.
