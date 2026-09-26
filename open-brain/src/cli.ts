@@ -359,7 +359,7 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
     // R185-5: every named file is checked (a dry run: exists, parses, migrates
     // and validates) before ANY is written. Before this, a refusal said "nothing
     // was written for those" while an earlier file in the list had been migrated.
-    const checks = files.map((f) => migrate(f, true));
+    const checks = files.map((f) => migrate(f, dryRun));
     const failed = checks.filter((r) => !r.ok).length;
     if (failed > 0) {
       for (const r of checks) {
