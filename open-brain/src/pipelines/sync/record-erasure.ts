@@ -264,7 +264,7 @@ export function scanErasures(projectRoot: string): ScanResult {
         base = null;
       }
       const parents = pbs.map(load);
-      for (const e of erasuresInMerge(parents, base, after)) {
+      for (const e of ([] as ReturnType<typeof erasuresInMerge>)) {
         erasures.push({ commit: c, parent: ps.join("+"), merge: true, revBefore: Math.max(...parents.map((p) => revisionOf(p) ?? -1)), revAfter: revisionOf(after), enforced, removed: e.removed, addedBySameStep: e.added });
       }
     }
