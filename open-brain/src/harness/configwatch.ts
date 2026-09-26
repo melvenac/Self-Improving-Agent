@@ -982,6 +982,17 @@ interface MachineSnap {
   errno: string | null;
 }
 
+/**
+ * R84. Observed at the stage start means the runtime got an answer other than
+ * "could not see": a read, an absence with a code, a non-file, a two-name, or
+ * a deliberate not-read. An errno, or an unreadable hash, is the environment.
+ */
+function stageStartObserved(opened: MachineSnap): boolean {
+  if (opened.errno !== null) return false;
+  if (opened.reason === "unreadable" || opened.hash === "unreadable") return false;
+  return true;
+}
+
 export class MachineConfigWatch {
   /** Link types and targets at preflight. Never replaced (R44). */
   private loopBase: Map<string, MachineSnap> | null = null;
@@ -1257,10 +1268,10 @@ export class MachineConfigWatch {
       const base = this.loopBase.get(p.path)!;
       const opened = start.get(p.path)!;
       const end = this.observe(p.path, base);
-      if (opened.state === "read" && end.errno !== null) {
+      if (stageStartObserved(opened) && end.errno !== null) {
         out.push({
           stage: this.stage, scope: p.scope, path: p.path,
-          before: readText(opened), after: `unobservable (${end.errno})`, changed: true, unobservableCode: end.errno,
+          before: stageBefore(opened), after: `unobservable (${end.errno})`, changed: true, unobservableCode: end.errno,
         });
         continue;
       }
