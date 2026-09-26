@@ -1,0 +1,5 @@
+source src/pipelines/state-import/index.ts sha256/12 b11130490235 (restored after every mutant)
+
+R32-nul: RED 2/59 (vitest exit 1) — R3-2: NUL bytes still stop the fallback
+    state-import-atomic.test.ts > failing while rendering task.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-r3.test.ts > UTF-16 with no BOM is still 'could not tell' (NUL bytes), whether or not it is also invalid UTF-8

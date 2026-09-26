@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..df1ccb4 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -897,7 +897,6 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+     // the snapshot's "already exists" refusal is thrown in here, and that
+     // snapshot is the operator's, not this run's (QA 106, D6).
+     if (made.created) rmSync(made.created, { recursive: true, force: true });
+-    if (aside) renameSync(aside, snapshotDir);
+     throw err;
+   }
+ 

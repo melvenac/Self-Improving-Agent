@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..53220b0 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -521,7 +521,7 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
+   }
+   for (const i of inputs) {
+     const key = (Object.keys(INPUT_REL) as InputKey[]).find((k) => INPUT_REL[k] === i.input)!;
+-    if (readAs[key]) i.evidence += ` (${readAs[key]})`;
++    void key;
+   }
+   return { signal: STALENESS_SIGNAL, latest, inputs, not_judged };
+ }

@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..ef5725d 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -849,7 +849,6 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+   const marker = `${snapshotDir}${INCOMPLETE_SUFFIX}`;
+   try {
+     snapshot = takeSnapshot(root, today, opts.forceSnapshot === true, made);
+-    writeFileSync(marker, incompleteNote(relative(root, snapshotDir).replace(/\\/g, "/")), "utf-8");
+   } catch (err) {
+     // .agents/ outside archive/ is untouched. Only what this run created goes:
+     // the snapshot's "already exists" refusal is thrown in here, and that

@@ -1,0 +1,113 @@
+== r4 36212603856 runner=tcm-1 sha=78a7d13(want 78a7d13) | 1108 passed | 1 skipped (1109) | errors: onTaskUpdate/Unhandled=0
+== r4-redcheck 36212605596 runner=tcm-2 sha=94704f4(want 94704f4) | 12 failed | 1096 passed | 1 skipped (1109) | errors: 12 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r4.test.ts > each could-not-tell input carries its reason, so the report and the refusal read the same list
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it 
+    state-import-r4.test.ts > O10: the refusal says to keep a copy of the snapshot until the re-run completes
+    state-import-r4.test.ts > O8: the refusal reads 'SUMMARY.md contains', not 'SUMMARY.md is contains'
+    state-import-r4.test.ts > the draft's report says --commit refuses while an input cannot be read, and the CLI's draft sum
+    state-import-r4.test.ts > unreadable (NUL bytes): blocks
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree i
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 w
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identi
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the
+== r4-mut-m7-r4 36212607378 runner=tcm-1 sha=68ead49(want 68ead49) | 13 failed | 1095 passed | 1 skipped (1109) | errors: 13 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r2.test.ts > the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing
+    state-import-r3.test.ts > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commi
+    state-import-r3.test.ts > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --acc
+    state-import-r3.test.ts > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale an
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it 
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree i
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 w
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identi
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the
+    state-import-staleness.test.ts > --commit refuses without the acknowledgement, writing nothing and taking no snapshot, an
+    state-import-staleness.test.ts > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --acce
+== r4-mut-m8-r4 36212608997 runner=tcm-1 sha=13ad7e4(want 13ad7e4) | 14 failed | 1094 passed | 1 skipped (1109) | errors: 14 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r2.test.ts > the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing
+    state-import-r3.test.ts > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commi
+    state-import-r3.test.ts > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --acc
+    state-import-r3.test.ts > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale an
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it 
+    state-import-r4.test.ts > unreadable (NUL bytes): blocks
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree i
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 w
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identi
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the
+    state-import-staleness.test.ts > --commit refuses without the acknowledgement, writing nothing and taking no snapshot, an
+    state-import-staleness.test.ts > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --acce
+== r4-mut-m9-r4 36212610870 runner=tcm-1 sha=3712c7d(want 3712c7d) | 14 failed | 1094 passed | 1 skipped (1109) | errors: 9 AssertionError; 5 Error; onTaskUpdate/Unhandled=0
+    state-import-r2.test.ts > M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the
+    state-import-r3.test.ts > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commi
+    state-import-r3.test.ts > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --acc
+    state-import-r3.test.ts > the same with --accept-stale on a stale project: refused, and the snapshot is byte-identical af
+    state-import-r3.test.ts > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale an
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it 
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree i
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 w
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identi
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the
+    state-import-staleness.test.ts > --commit refuses without the acknowledgement, writing nothing and taking no snapshot, an
+    state-import-staleness.test.ts > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --acce
+== r4-mut-o10 36212612721 runner=tcm-1 sha=ad85cad(want ad85cad) | 1 failed | 1107 passed | 1 skipped (1109) | errors: 1 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r4.test.ts > O10: the refusal says to keep a copy of the snapshot until the re-run completes
+== r4-mut-o10-order 36212614288 runner=tcm-1 sha=4e79e89(want 4e79e89) | 1 failed | 1107 passed | 1 skipped (1109) | errors: 1 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r4.test.ts > the way out stays machine-readable: 'then delete <marker>. Nothing written', the shape QA 111's
+== r4-mut-o8 36212615939 runner=tcm-1 sha=caf483d(want caf483d) | 1 failed | 1107 passed | 1 skipped (1109) | errors: 1 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r4.test.ts > O8: the refusal reads 'SUMMARY.md contains', not 'SUMMARY.md is contains'
+== r4-mut-q1 36212617586 runner=tcm-1 sha=1fd749b(want 1fd749b) | 1 failed | 1107 passed | 1 skipped (1109) | errors: 1 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r4.test.ts > Q1: a marker with another day's date refuses both doors, and the tree is identical
+== r4-mut-q17 36212619095 runner=tcm-2 sha=60f72ae(want 60f72ae) | 2 failed | 1106 passed | 1 skipped (1109) | errors: 2 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --co
+    state-import-r4.test.ts > Q17: a marker plus a state.json: --draft gives the half-restored refusal, not 'already exists'
+== r4-mut-r41-block 36212620419 runner=tcm-2 sha=7eff9d9(want 7eff9d9) | 9 failed | 1099 passed | 1 skipped (1109) | errors: 9 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it 
+    state-import-r4.test.ts > the draft's report says --commit refuses while an input cannot be read, and the CLI's draft sum
+    state-import-r4.test.ts > unreadable (NUL bytes): blocks
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree i
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 w
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identi
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the
+== r4-mut-r41-reason 36212621898 runner=tcm-1 sha=34f0eca(want 34f0eca) | 10 failed | 1098 passed | 1 skipped (1109) | errors: 10 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r4.test.ts > each could-not-tell input carries its reason, so the report and the refusal read the same list
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it 
+    state-import-r4.test.ts > the draft's report says --commit refuses while an input cannot be read, and the CLI's draft sum
+    state-import-r4.test.ts > unreadable (NUL bytes): blocks
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree i
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 w
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identi
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the
+== r4-mut-r41-refusal 36212623619 runner=tcm-1 sha=e485b99(want e485b99) | 8 failed | 1100 passed | 1 skipped (1109) | errors: 8 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it 
+    state-import-r4.test.ts > unreadable (NUL bytes): blocks
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names 
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree i
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 w
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identi
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the
+== r4-mut-r41-scope 36212625387 runner=tcm-2 sha=7046cf0(want 7046cf0) | 9 failed | 1099 passed | 1 skipped (1109) | errors: 3 AssertionError; 6 Error; onTaskUpdate/Unhandled=0
+    state-import.test.ts > --commit refuses without a draft, on a draft that does not validate, and on an existing snapshot w
+    state-import.test.ts > --commit: snapshot byte-complete before any change (P2), state.json rev 0, SUMMARY cut (line count
+    state-import-r2.test.ts > PROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist
+    state-import-r4.test.ts > declares Session 20, ahead of the latest log (Session 7): does not block
+    state-import-r4.test.ts > IF-10: declares Session 20 against a latest of 7: could not tell, both numbers named, and --com
+    state-import-r4.test.ts > IF-10: declares Session 8 against a latest of 7: could not tell, both numbers named, and --comm
+    state-import-r4.test.ts > names no Session N: does not block
+    state-import-r4.test.ts > no SESSIONS/Session_N.md to compare against: does not block
+    state-import-staleness.test.ts > --commit proceeds past 'could not tell' and prints one line naming those inputs, since t
+== r4-mut-r42-q20 36212626961 runner=tcm-2 sha=a4d170b(want a4d170b) | 3 failed | 1105 passed | 1 skipped (1109) | errors: 3 AssertionError; onTaskUpdate/Unhandled=0
+    state-import-r2.test.ts > SUMMARY.md in UTF-16LE with no BOM (NUL bytes): --commit refuses before anything is written
+    state-import-r4.test.ts > O8: the refusal reads 'SUMMARY.md contains', not 'SUMMARY.md is contains'
+    state-import-r4.test.ts > UTF-16LE with no BOM: --commit refuses, names the NUL bytes, and the tree is identical afterwar

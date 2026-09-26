@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..a538cc7 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -532,7 +532,7 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
+     if (text === null) { not_judged.push({ input, reason: "absent: nothing is imported from it" }); continue; }
+     if (!JUDGED.includes(key)) { not_judged.push({ input, reason: NOT_JUDGED_REASON[key]! }); continue; }
+     if (undecodable[key]) {
+-      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: undecodable[key]!, could_not_tell: "unreadable" });
++      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: undecodable[key]! });
+       continue;
+     }
+     if (!latest) {
