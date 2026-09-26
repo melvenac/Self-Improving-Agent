@@ -14,7 +14,7 @@
  * Every assertion reads state.json back from disk after the write.
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, cpSync, rmSync, readFileSync } from "node:fs";
+import { mkdtempSync, cpSync, rmSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { applyStateOps } from "../../src/shared/state-writer.js";
@@ -197,6 +197,12 @@ describe("R179-3: a legacy handoff is superseded by its seat's first keyed hando
   });
 
   it("the legacy SESSION record is never superseded — it carries the uuid the migration kept", () => {
+    // With a SEAT, as SIA's migrated record has (planner@76): the fixture's is
+    // null, and a null seat could never match a keyed session, so the row would
+    // pass whether or not legacy sessions yield.
+    const rec = JSON.parse(readFileSync(join(root, STATE), "utf-8"));
+    rec.sessions[0].seat = "developer";
+    writeFileSync(join(root, STATE), JSON.stringify(rec, null, 2) + "\n");
     const legacyUuid = raw().sessions[0].uuid;
     expect(legacyUuid).not.toBeNull();
     for (let i = 0; i < 13; i++) expect(write(U(100 + i), "developer").ok).toBe(true);
