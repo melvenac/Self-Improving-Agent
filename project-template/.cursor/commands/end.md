@@ -57,5 +57,6 @@ you, `neutral` if it was there and unused. Do not rate what you did not see.
 
 Session log (A1): `ob_start` creates it, local and untracked. SUMMARY/INBOX/task/next-session
 (A2, A5–A7b): rendered from the record `ob_state` writes as work happens. DECISIONS/ENTITIES
-(A3–A4): written with the change that makes them true. Doc drift (A9): `/sync`. Vault summary
-(A13): the SessionEnd hook. Research (A10): step 2, `MATCH: none` unless an act identifies it.
+(A3–A4): written with the change that makes them true. Validation and doc drift (A8, A9): `/sync`.
+Vault summary (A13): the SessionEnd hook. Research (A10): step 2, `MATCH: none` unless an act
+identifies it. Lessons and ratings (A11, A12, A14): steps 1 to 3.
