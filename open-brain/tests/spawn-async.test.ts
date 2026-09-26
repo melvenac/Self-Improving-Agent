@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
-import { spawnAsync } from './spawn-async.js';
+import { spawnAsync, execAsync } from './spawn-async.js';
 
 /**
  * The helper replaces spawnSync in the harness (G-042), so every channel a test asserts on is checked here to carry
@@ -34,6 +34,14 @@ describe('spawnAsync', () => {
     const got = await spawnAsync('no-such-command-g042-xyz', []);
     expect(got.status).toBeNull();
     expect(got.error).toBeDefined();
+  });
+
+  it('execAsync returns stdout and THROWS on a non-zero exit, naming the command and its stderr', async () => {
+    const node = JSON.stringify(process.execPath);
+    await expect(execAsync(`${node} -e "process.stdout.write('ok')"`)).resolves.toBe('ok');
+    await expect(execAsync(`${node} -e "process.stderr.write('boom'); process.exit(2)"`))
+      .rejects.toThrow(/exit 2[\s\S]*boom/);
+    await expect(execAsync('no-such-command-g042-xyz')).rejects.toThrow(/Command failed/);
   });
 
   it('returns to the event loop while the child runs', async () => {

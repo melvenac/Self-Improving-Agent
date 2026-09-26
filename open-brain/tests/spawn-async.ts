@@ -68,3 +68,21 @@ export function spawnAsync(
     child.stdin!.end(input ?? '');
   });
 }
+
+/**
+ * execSync's contract, awaited: the command runs through the shell, stdout comes back, and a non-zero exit, a signal
+ * or a failure to start THROWS, with the command and its stderr in the message. It throws rather than returning a
+ * status on purpose: fixtures built on execSync rely on a broken git failing the test (G-029), and a helper that
+ * returned a result would let a caller drop it.
+ */
+export async function execAsync(
+  command: string,
+  options: Omit<SpawnAsyncOptions, 'shell'> = {},
+): Promise<string> {
+  const r = await spawnAsync(command, [], { ...options, shell: true });
+  if (r.error || r.status !== 0) {
+    const why = r.error ? r.error.message : r.status === null ? `signal ${r.signal}` : `exit ${r.status}`;
+    throw new Error(`Command failed (${why}): ${command}\n${r.stderr}`);
+  }
+  return r.stdout;
+}
