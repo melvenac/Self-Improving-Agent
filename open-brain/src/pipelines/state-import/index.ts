@@ -140,8 +140,20 @@ function withCheck(buf: Buffer, encoding: "utf8" | "utf8-bom"): DecodedText {
     if (!buf.includes(0)) return { text: decode1252(buf), encoding: "windows-1252", undecodable: null };
     text = buf.toString("utf-8");
   }
-  if (text.includes("\u0000")) return { text, encoding, undecodable: "contains NUL bytes, as UTF-16 without a byte-order mark would: its encoding is unknown, so its words cannot be read" };
+  if (text.includes("\u0000")) return { text, encoding, undecodable: nulReason(buf, encoding === "utf8-bom" ? 3 : 0) };
   return { text, encoding, undecodable: null };
+}
+
+/**
+ * Where the NUL bytes are, counted in the file. UTF-16 without a BOM is one
+ * source; Windows PowerShell 5.1's `>>` is another: it appends UTF-16LE with no
+ * BOM onto a UTF-8 or Windows-1252 file, so a readable head gets an unreadable
+ * tail (QA 111, D8).
+ */
+function nulReason(buf: Buffer, bomLength: number): string {
+  let count = 0;
+  for (const b of buf) if (b === 0) count++;
+  return `contains ${count} NUL byte(s), the first at byte ${buf.indexOf(0) + bomLength}, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's \`>>\`: its encoding is unknown, so its words cannot be read`;
 }
 
 /**
@@ -434,7 +446,29 @@ export function findLastSession(sessionsDir: string, today: string): ImportRepor
 // ---------------------------------------------------------------------------
 
 export type StalenessVerdict = "current" | "stale" | "could_not_tell";
-export interface InputStaleness { input: string; verdict: StalenessVerdict; declared_session: number | null; evidence: string }
+
+/**
+ * Every reason detectStaleness gives for "could not tell", and whether it
+ * blocks a bare --commit as STALE does (R4-1). The verdict is the same for all
+ * four; the consequence is not. An input whose words cannot be read might be
+ * stale, and nothing else in the importer can say, so it blocks until
+ * --accept-stale. The other three were read, and say what they say.
+ */
+export const COULD_NOT_TELL = {
+  unreadable: { blocks: true, what: "the input contains NUL bytes, so its words cannot be read" },
+  no_session_log: { blocks: false, what: "there is no SESSIONS/Session_N.md to compare against" },
+  no_declared_session: { blocks: false, what: "the input names no `Session N` in its status blockquote or its headings" },
+  ahead_of_latest: { blocks: false, what: "the input declares a session ahead of the latest log" },
+} as const;
+export type CouldNotTell = keyof typeof COULD_NOT_TELL;
+
+export interface InputStaleness { input: string; verdict: StalenessVerdict; declared_session: number | null; evidence: string; could_not_tell?: CouldNotTell }
+
+/** Whether a judged input stops a bare --commit: STALE, or could not tell because it cannot be read. */
+export function blocksCommit(i: InputStaleness): boolean {
+  if (i.verdict === "stale") return true;
+  return i.verdict === "could_not_tell" && i.could_not_tell !== undefined && COULD_NOT_TELL[i.could_not_tell].blocks;
+}
 export interface StalenessReport {
   signal: string;
   latest: { n: number; file: string } | null;
@@ -498,23 +532,23 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
     if (text === null) { not_judged.push({ input, reason: "absent: nothing is imported from it" }); continue; }
     if (!JUDGED.includes(key)) { not_judged.push({ input, reason: NOT_JUDGED_REASON[key]! }); continue; }
     if (undecodable[key]) {
-      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: undecodable[key]! });
+      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: undecodable[key]!, could_not_tell: "unreadable" });
       continue;
     }
     if (!latest) {
-      inputs.push({ input, verdict: "could_not_tell", declared_session: declaredSession(text)?.n ?? null, evidence: `no SESSIONS/Session_N.md to compare against (${last.file})` });
+      inputs.push({ input, verdict: "could_not_tell", declared_session: declaredSession(text)?.n ?? null, evidence: `no SESSIONS/Session_N.md to compare against (${last.file})`, could_not_tell: "no_session_log" });
       continue;
     }
     const d = declaredSession(text);
     if (!d) {
-      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: "names no `Session N` in its status blockquote or its headings" });
+      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: "names no `Session N` in its status blockquote or its headings", could_not_tell: "no_declared_session" });
       continue;
     }
     const where = `line ${d.line} declares Session ${d.n} (\`${d.text.length > 160 ? d.text.slice(0, 157) + "…" : d.text}\`); the latest session log is Session ${latest.n} (${latest.file})`;
     if (d.n > latest.n) {
       // A session no log records: renumbering, a per-worktree counter (T-164) or
       // a missing log. The comparison cannot say which, so it does not say current.
-      inputs.push({ input, verdict: "could_not_tell", declared_session: d.n, evidence: `${where}. It declares a session AHEAD of the latest log, so the numbers disagree and cannot say whether it is current` });
+      inputs.push({ input, verdict: "could_not_tell", declared_session: d.n, evidence: `${where}. It declares a session AHEAD of the latest log, so the numbers disagree and cannot say whether it is current`, could_not_tell: "ahead_of_latest" });
       continue;
     }
     inputs.push({ input, verdict: d.n < latest.n ? "stale" : "current", declared_session: d.n, evidence: where });
@@ -662,9 +696,11 @@ export function renderStaleness(s: StalenessReport): string[] {
   for (const n of s.not_judged) L.push(`- not judged \`${n.input}\`: ${n.reason}`);
   L.push("");
   const stale = s.inputs.filter((i) => i.verdict === "stale").length;
-  const unknown = s.inputs.filter((i) => i.verdict === "could_not_tell").length;
+  const unreadable = s.inputs.filter((i) => i.verdict === "could_not_tell" && blocksCommit(i)).length;
+  const unknown = s.inputs.filter((i) => i.verdict === "could_not_tell" && !blocksCommit(i)).length;
   if (stale > 0) L.push(`**\`--commit\` refuses while an input above is STALE.** Update it and re-run \`--draft\`, or pass \`${ACCEPT_STALE_FLAG}\` to import it as it stands.`);
   else L.push("No input is stale.");
+  if (unreadable > 0) L.push(`**\`--commit\` refuses while an input above cannot be read**, because it might be stale. Save it as UTF-8 and re-run \`--draft\`, or pass \`${ACCEPT_STALE_FLAG}\` to import it as it stands.`);
   if (unknown > 0) L.push(`${unknown} input(s) could not be judged. That does not block \`--commit\`, and it is not a finding that they are up to date.`);
   return L;
 }
@@ -747,7 +783,7 @@ function refuseHalfRestored(root: string): void {
   if (left.length === 0) return;
   const snapshots = left.map((n) => `.agents/archive/${n.slice(0, -INCOMPLETE_SUFFIX.length)}/`).join(" and ");
   const markers = left.map((n) => `.agents/archive/${n}`).join(" and ");
-  throw new Error(`.agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from ${snapshots}, which holds every original, then delete ${markers}. Nothing written`);
+  throw new Error(`.agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from ${snapshots}, which holds every original, then delete ${markers}. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success. Nothing written`);
 }
 
 export interface DraftResult { draftPath: string; reportPath: string; draft: ImportDraft; validation: { ok: true } | { ok: false; error: string } }
@@ -806,6 +842,8 @@ export interface CommitResult {
   staleness: StalenessReport;
   /** The stale inputs imported anyway under --accept-stale; empty otherwise. */
   accepted_stale: string[];
+  /** The inputs that could not be read, imported anyway under --accept-stale (R4-1); empty otherwise. */
+  accepted_unreadable: string[];
 }
 
 export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean } = {}): CommitResult {
@@ -823,14 +861,18 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   const onDisk = readInputs(root);
   const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable, onDisk.readAs);
   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
-  if (stale.length > 0 && opts.acceptStale !== true) {
-    const list = stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ");
-    throw new Error(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${list}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
+  // R4-1: an input that cannot be read blocks like STALE; could-not-tell for any other reason does not.
+  const unreadable = staleness.inputs.filter((i) => i.verdict === "could_not_tell" && blocksCommit(i));
+  if (stale.length + unreadable.length > 0 && opts.acceptStale !== true) {
+    const why: string[] = [];
+    if (stale.length > 0) why.push(`${stale.length} input(s) predate the latest session (Session ${staleness.latest!.n}): ${stale.map((i) => `${i.input} declares Session ${i.declared_session}`).join("; ")}`);
+    if (unreadable.length > 0) why.push(`${unreadable.length} input(s) cannot be read, so whether they are current cannot be told: ${unreadable.map((i) => `${i.input} ${i.evidence}`).join("; ")}`);
+    throw new Error(`${why.join(". ")}. Nothing written. Update them and re-run --draft, or pass ${ACCEPT_STALE_FLAG} to import them as they stand`);
   }
   // SUMMARY.md is the one input --commit rewrites in place rather than regenerates.
   const summaryPath = join(root, ".agents/SYSTEM/SUMMARY.md");
   const summaryRead = readText(summaryPath);
-  if (summaryRead?.undecodable) throw new Error(`.agents/SYSTEM/SUMMARY.md is ${summaryRead.undecodable}, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
+  if (summaryRead?.undecodable) throw new Error(`.agents/SYSTEM/SUMMARY.md ${summaryRead.undecodable}, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
   // Windows-1252 is a guess. It is safe for a verdict, which reads only ASCII,
   // but not for a file written back: a wrong guess would rewrite its other text.
   if (summaryRead?.encoding === "windows-1252") throw new Error(`.agents/SYSTEM/SUMMARY.md is not valid UTF-8 and has no byte-order mark, so its encoding can only be guessed, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
@@ -898,7 +940,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   }
   rmSync(marker, { force: true });
   if (aside) rmSync(aside, { recursive: true, force: true });
-  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input) };
+  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input) };
 }
 
 /**
