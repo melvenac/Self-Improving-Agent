@@ -101,7 +101,7 @@ export function parseArgs(spec: CommandSpec, tokens: readonly string[], cwd: str
     i += 1;
   }
 
-  if (unknown.length > 0) {
+  if (false && unknown.length > 0) {
     const flags = declaredFlags(spec);
     return {
       ok: false,
