@@ -540,14 +540,14 @@ export function applyInstanceRetention(s: State): string[] {
   const revs = s.sessions.map((x) => x.first_rev);
   const out: string[] = [];
   const hAll = s.handoffs.map((h) => ({ seat: h.seat, checkout: h.checkout, first_rev: h.first_rev, ref: h }));
-  const hDrop = new Set(hAll.filter((e) => isSuperseded(e, hAll, revs, true)).map((e) => e.ref));
+  const hDrop = new Set(hAll.filter((e) => e.ref.session < Math.max(-1, ...s.sessions.map((x) => x.n)) - RECORD_RETENTION_SESSIONS && hAll.some((o) => o !== e && o.seat === e.seat && o.checkout === e.checkout && o.ref.session > e.ref.session)).map((e) => e.ref));
   s.handoffs = s.handoffs.filter((h) => {
     if (!hDrop.has(h)) return true;
     out.push(`handoff ${h.session_uuid ?? `${h.seat}@${h.session}`} (${h.seat}, ${h.checkout ?? "legacy"}, session ${h.session})`);
     return false;
   });
   const sAll = s.sessions.map((x) => ({ seat: x.seat, checkout: x.checkout, first_rev: x.first_rev, ref: x }));
-  const sDrop = new Set(sAll.filter((e) => isSuperseded(e, sAll, revs)).map((e) => e.ref));
+  const sDrop = new Set(sAll.filter((e) => e.ref.n < Math.max(-1, ...s.sessions.map((x) => x.n)) - RECORD_RETENTION_SESSIONS && sAll.some((o) => o !== e && o.seat === e.seat && o.checkout === e.checkout && o.ref.n > e.ref.n)).map((e) => e.ref));
   s.sessions = s.sessions.filter((x) => {
     if (!sDrop.has(x)) return true;
     out.push(`session ${x.uuid ?? `#${x.n}`} (${x.seat ?? "no seat"}, ${x.checkout ?? "legacy"}, session ${x.n})`);
