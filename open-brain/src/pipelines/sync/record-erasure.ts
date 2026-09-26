@@ -231,6 +231,7 @@ export function scanErasures(projectRoot: string): ScanResult {
     if (ps.length === 0 || pbs.every((pb) => pb === bc)) continue;
     const after = load(bc);
     steps++;
+    if (steps === 1) continue;
     const enforced = schemaOf(after) >= 3;
     if (enforced) enforcedSteps++;
 
