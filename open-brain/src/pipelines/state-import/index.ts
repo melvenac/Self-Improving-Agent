@@ -467,7 +467,7 @@ export interface InputStaleness { input: string; verdict: StalenessVerdict; decl
 /** Whether a judged input stops a bare --commit: STALE, or could not tell because it cannot be read. */
 export function blocksCommit(i: InputStaleness): boolean {
   if (i.verdict === "stale") return true;
-  return i.verdict === "could_not_tell" && i.could_not_tell !== undefined && COULD_NOT_TELL[i.could_not_tell].blocks;
+  return i.verdict === "could_not_tell";
 }
 export interface StalenessReport {
   signal: string;
