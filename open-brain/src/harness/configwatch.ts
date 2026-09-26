@@ -1302,7 +1302,6 @@ export class MachineConfigWatch {
     // R85b. A realpath failure with no lstat prints no zeros. The link itself, or a parent link, prints that lstat.
     const unobservableSide = (s: MachineSnap): string => {
       if (s.lexicalKind === "symlink") return linkSide(s);
-      if (s.viaLink !== null) return ancestorLinkText(s);
       if (s.dev === null) return "no facts: realpath failed";
       return factText(s);
     };
