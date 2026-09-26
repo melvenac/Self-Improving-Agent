@@ -431,6 +431,8 @@ interface FileState {
   unreadIdentity: boolean;
   /** Set when the bytes were refused (EACCES/EPERM). The record says unreadable, with the facts (R72, R73). */
   readError: string | null;
+  /** R88. The errno from that read, kept even when the record's word is plain `unreadable`. */
+  readErrno: string | null;
 }
 
 const fileState = (id: PathIdentity, bytes: Buffer | null, unreadIdentity: boolean): FileState => ({
@@ -445,6 +447,7 @@ const fileState = (id: PathIdentity, bytes: Buffer | null, unreadIdentity: boole
   target: null,
   unreadIdentity,
   readError: null,
+  readErrno: null,
 });
 
 /**
@@ -456,6 +459,7 @@ const fileState = (id: PathIdentity, bytes: Buffer | null, unreadIdentity: boole
 const unreadableIdentity = (id: PathIdentity): FileState => ({
   ...fileState(id, null, true),
   readError: `unreadable (${id.code})`,
+  readErrno: id.code ?? "UNKNOWN",
 });
 
 /**
@@ -469,7 +473,7 @@ const unreadableIdentity = (id: PathIdentity): FileState => ({
 const readState = (p: string, baseline?: FileState | null, preflight = false): FileState | null => {
   const id = identify(p);
   if (id.kind === "symlink") {
-    return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null };
+    return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null, readErrno: null };
   }
   if (id.kind === "other" && id.code) return unreadableIdentity(id);
   if (id.kind !== "file") return null;
@@ -482,7 +486,7 @@ const readState = (p: string, baseline?: FileState | null, preflight = false): F
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code ?? "UNKNOWN";
     const readError = code === "EACCES" || code === "EPERM" ? "unreadable" : `unreadable (${code})`;
-    return { ...fileState(id, null, true), readError };
+    return { ...fileState(id, null, true), readError, readErrno: code };
   }
 };
 
@@ -654,6 +658,20 @@ export class ConfigWatch {
   }
 
   /**
+   * R88. Paths whose bytes could not be read when the window opened.
+   * A path the window cannot snapshot cannot be restored, so the watch is not established.
+   */
+  readFailuresAtOpen(): readonly string[] {
+    if (this.snapshot === null) return [];
+    const out: string[] = [];
+    for (const [path, state] of this.snapshot) {
+      if (!state?.readError) continue;
+      out.push(`unreadable: ${path} (${state.readErrno ?? "UNKNOWN"})`);
+    }
+    return out;
+  }
+
+  /**
    * The loop's base, once (R57). A later call does not re-read. `begin` gates
    * its reads against this and must not be the thing that defines it.
    */
@@ -690,6 +708,7 @@ export class ConfigWatch {
             target: id.target,
             unreadIdentity: false,
             readError: null,
+            readErrno: null,
           });
         } else if (id.kind === "file") snap.set(f, fileState(id, null, true));
         else if (id.kind === "other" && id.code) snap.set(f, unreadableIdentity(id));
@@ -711,7 +730,7 @@ export class ConfigWatch {
     if (diff) {
       const id = identify(path);
       if (id.kind === "symlink") {
-        return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null };
+        return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null, readErrno: null };
       }
       if (id.kind === "other" && id.code) return unreadableIdentity(id);
       if (id.kind !== "file") return null;

@@ -951,7 +951,10 @@ async function runLoopInner(
       configWatch?.begin(roleName);
       // R77. An unlisted directory here is not the role's change: the role has
       // not run. The stage does not start. Close still uses stage-changed-config.
-      const unopened = configWatch?.unlistedAtOpen() ?? [];
+      const unopened = [
+        ...(configWatch?.unlistedAtOpen() ?? []),
+        ...(configWatch?.readFailuresAtOpen() ?? []),
+      ];
       if (unopened.length > 0) {
         return {
           ok: false,
