@@ -1,0 +1,6 @@
+utc: 2026-09-26T03:55:51Z
+cpu load %: 1
+claude.exe      pid 10152  ppid 5692   "C:\Users\Aaron Melven\.local\bin\claude.exe" -p "You are the QA seat, record session 122, for the SIA importer fixes round 4. Read docs/loops/importer-fixes-r4
+MsMpEng.exe     pid 3352   ppid 844    
+powershell.exe  pid 3304   ppid 14568  C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -File C:/qa-scratch/qa122/scripts/q106/procs.ps1
+powershell.exe  pid 5692   ppid 7660   powershell -NoProfile -ExecutionPolicy Bypass -File C:/Users/AARONM~1/Worktrees/sia-qa/docs/loops/qa-122/drive.ps1

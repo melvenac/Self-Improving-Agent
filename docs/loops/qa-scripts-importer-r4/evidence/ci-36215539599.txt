@@ -1,0 +1,537 @@
+test	Set up job	﻿2026-09-26T03:44:44.9030958Z Current runner version: '2.337.0'
+test	Set up job	2026-09-26T03:44:44.9039135Z Runner name: 'tcm-1'
+test	Set up job	2026-09-26T03:44:44.9039958Z Runner group name: 'Default'
+test	Set up job	2026-09-26T03:44:44.9041262Z Machine name: 'tcm'
+test	Set up job	2026-09-26T03:44:44.9044564Z ##[group]GITHUB_TOKEN Permissions
+test	Set up job	2026-09-26T03:44:44.9047442Z Contents: read
+test	Set up job	2026-09-26T03:44:44.9048191Z Metadata: read
+test	Set up job	2026-09-26T03:44:44.9048801Z Packages: read
+test	Set up job	2026-09-26T03:44:44.9049414Z ##[endgroup]
+test	Set up job	2026-09-26T03:44:44.9052574Z Secret source: Actions
+test	Set up job	2026-09-26T03:44:44.9053559Z Cache mode: write
+test	Set up job	2026-09-26T03:44:44.9054621Z Prepare workflow directory
+test	Set up job	2026-09-26T03:44:44.9620456Z Prepare all required actions
+test	Set up job	2026-09-26T03:44:44.9678511Z Getting action download info
+test	Set up job	2026-09-26T03:44:45.3025057Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+test	Set up job	2026-09-26T03:44:45.9611205Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+test	Set up job	2026-09-26T03:44:47.0129672Z Complete job name: test
+test	Egress isolation self-check (tcm)	﻿2026-09-26T03:44:47.1085871Z ##[group]Run fail=0
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1087066Z fail=0
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1088542Z for t in 127.0.0.1/3210 172.20.0.2/3210 172.20.0.2/3211 172.20.0.3/4000 127.0.0.1/4000 \
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1090609Z          192.168.1.50/4000 100.124.212.87/4000 127.0.0.1/80 127.0.0.1/81; do
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1092542Z   if timeout 5 bash -c "exec 3<>/dev/tcp/$t" 2>/dev/null; then
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1094267Z     echo "::error::reachable from the runner: $t"; fail=1
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1095665Z   else
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1096592Z     echo "blocked: $t"
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1097641Z   fi
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1098479Z done
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1100404Z if ls /opt/doorctl >/dev/null 2>&1; then echo "::error::/opt/doorctl is readable"; fail=1; else echo "denied: /opt/doorctl"; fi
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1102705Z exit "$fail"
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1126954Z shell: /usr/bin/bash -e {0}
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:47.1128346Z ##[endgroup]
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:48.1396056Z blocked: 127.0.0.1/3210
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:49.1607221Z blocked: 172.20.0.2/3210
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:50.1849307Z blocked: 172.20.0.2/3211
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:51.2092249Z blocked: 172.20.0.3/4000
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:52.2335786Z blocked: 127.0.0.1/4000
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:53.2574231Z blocked: 192.168.1.50/4000
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:54.2811854Z blocked: 100.124.212.87/4000
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:55.3039723Z blocked: 127.0.0.1/80
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:56.3296871Z blocked: 127.0.0.1/81
+test	Egress isolation self-check (tcm)	2026-09-26T03:44:56.3325183Z denied: /opt/doorctl
+test	Run actions/checkout@v4	﻿2026-09-26T03:44:56.3641000Z ##[group]Run actions/checkout@v4
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3641378Z with:
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3641647Z   repository: melvenac/Self-Improving-Agent
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3644756Z   token: ***
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3645010Z   ssh-strict: true
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3645244Z   ssh-user: git
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3645522Z   persist-credentials: true
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3645792Z   clean: true
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3646039Z   sparse-checkout-cone-mode: true
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3646362Z   fetch-depth: 1
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3646605Z   fetch-tags: false
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3646844Z   show-progress: true
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3647088Z   lfs: false
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3647305Z   submodules: false
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3647546Z   set-safe-directory: true
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3647829Z   allow-unsafe-pr-checkout: false
+test	Run actions/checkout@v4	2026-09-26T03:44:56.3648170Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4696929Z Syncing repository: melvenac/Self-Improving-Agent
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4699140Z ##[group]Getting Git version info
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4700561Z Working directory is '/srv/gh-runner/runner-1/_work/Self-Improving-Agent/Self-Improving-Agent'
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4701762Z [command]/usr/bin/git version
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4702160Z git version 2.43.0
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4703545Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4713164Z Temporarily overriding HOME='/srv/gh-runner/runner-1/_work/_temp/95de9d66-1669-4f81-8f18-63e09cd4b002' before making global git config changes
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4714427Z Adding repository directory to the temporary git global config as a safe directory
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4718952Z [command]/usr/bin/git config --global --add safe.directory /srv/gh-runner/runner-1/_work/Self-Improving-Agent/Self-Improving-Agent
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4763382Z [command]/usr/bin/git config --local --get remote.origin.url
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4790206Z https://github.com/melvenac/Self-Improving-Agent
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4804748Z ##[group]Removing previously created refs, to avoid conflicts
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4809245Z [command]/usr/bin/git rev-parse --symbolic-full-name --verify --quiet HEAD
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4833749Z refs/heads/loop/t185-r2-mut-migrate-writes-first
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4843605Z [command]/usr/bin/git checkout --detach
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4893867Z HEAD is now at 473cc85 mutant: state migrate writes each file as it checks it (R185-5)
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4940647Z [command]/usr/bin/git branch --delete --force loop/t185-r2-mut-migrate-writes-first
+test	Run actions/checkout@v4	2026-09-26T03:44:56.4973676Z Deleted branch loop/t185-r2-mut-migrate-writes-first (was 473cc85).
+test	Run actions/checkout@v4	2026-09-26T03:44:56.5038846Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T03:44:56.5042352Z [command]/usr/bin/git submodule status
+test	Run actions/checkout@v4	2026-09-26T03:44:56.5275849Z ##[group]Cleaning the repository
+test	Run actions/checkout@v4	2026-09-26T03:44:56.5282264Z [command]/usr/bin/git clean -ffdx
+test	Run actions/checkout@v4	2026-09-26T03:44:56.6699526Z Removing open-brain/node_modules/
+test	Run actions/checkout@v4	2026-09-26T03:44:56.6709076Z [command]/usr/bin/git reset --hard HEAD
+test	Run actions/checkout@v4	2026-09-26T03:44:56.6760073Z HEAD is now at 473cc85 mutant: state migrate writes each file as it checks it (R185-5)
+test	Run actions/checkout@v4	2026-09-26T03:44:56.6764483Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T03:44:56.6767296Z ##[group]Disabling automatic garbage collection
+test	Run actions/checkout@v4	2026-09-26T03:44:56.6772663Z [command]/usr/bin/git config --local gc.auto 0
+test	Run actions/checkout@v4	2026-09-26T03:44:56.6801889Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T03:44:56.6802536Z ##[group]Setting up auth
+test	Run actions/checkout@v4	2026-09-26T03:44:56.6810651Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Run actions/checkout@v4	2026-09-26T03:44:56.6844531Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Run actions/checkout@v4	2026-09-26T03:44:56.7113328Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Run actions/checkout@v4	2026-09-26T03:44:56.7166441Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Run actions/checkout@v4	2026-09-26T03:44:56.7608955Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Run actions/checkout@v4	2026-09-26T03:44:56.7613574Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Run actions/checkout@v4	2026-09-26T03:44:56.7810339Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test	Run actions/checkout@v4	2026-09-26T03:44:56.7871725Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T03:44:56.7872367Z ##[group]Fetching the repository
+test	Run actions/checkout@v4	2026-09-26T03:44:56.7907942Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +5ddcce251ca1c18ece2ceb6f1321801b24d5e417:refs/remotes/origin/qa/importer-fixes-r4-mut-n5
+test	Run actions/checkout@v4	2026-09-26T03:44:59.2898536Z From https://github.com/melvenac/Self-Improving-Agent
+test	Run actions/checkout@v4	2026-09-26T03:44:59.2900451Z  * [new ref]         5ddcce251ca1c18ece2ceb6f1321801b24d5e417 -> origin/qa/importer-fixes-r4-mut-n5
+test	Run actions/checkout@v4	2026-09-26T03:44:59.2933625Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T03:44:59.2934580Z ##[group]Determining the checkout info
+test	Run actions/checkout@v4	2026-09-26T03:44:59.2937938Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T03:44:59.2947317Z [command]/usr/bin/git sparse-checkout disable
+test	Run actions/checkout@v4	2026-09-26T03:44:59.3025801Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+test	Run actions/checkout@v4	2026-09-26T03:44:59.3078382Z ##[group]Checking out the ref
+test	Run actions/checkout@v4	2026-09-26T03:44:59.3087306Z [command]/usr/bin/git checkout --progress --force -B qa/importer-fixes-r4-mut-n5 refs/remotes/origin/qa/importer-fixes-r4-mut-n5
+test	Run actions/checkout@v4	2026-09-26T03:44:59.3302549Z Previous HEAD position was 473cc85 mutant: state migrate writes each file as it checks it (R185-5)
+test	Run actions/checkout@v4	2026-09-26T03:44:59.3310433Z Switched to a new branch 'qa/importer-fixes-r4-mut-n5'
+test	Run actions/checkout@v4	2026-09-26T03:44:59.3311490Z branch 'qa/importer-fixes-r4-mut-n5' set up to track 'origin/qa/importer-fixes-r4-mut-n5'.
+test	Run actions/checkout@v4	2026-09-26T03:44:59.3318990Z ##[endgroup]
+test	Run actions/checkout@v4	2026-09-26T03:44:59.3358433Z [command]/usr/bin/git log -1 --format=%H
+test	Run actions/checkout@v4	2026-09-26T03:44:59.3391152Z 5ddcce251ca1c18ece2ceb6f1321801b24d5e417
+test	Run actions/setup-node@v4	﻿2026-09-26T03:44:59.3611626Z ##[group]Run actions/setup-node@v4
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.3611947Z with:
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.3612160Z   node-version: 22
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.3612380Z   cache: npm
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.3612652Z   cache-dependency-path: open-brain/package-lock.json
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.3613001Z   always-auth: false
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.3613234Z   check-latest: false
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.3616160Z   token: ***
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.3616389Z ##[endgroup]
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.5120271Z Found in cache @ /srv/gh-runner/runner-1/_work/_tool/node/22.23.3/x64
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.5126257Z (node:3872199) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.5127254Z (Use `node --trace-deprecation ...` to show where the warning was created)
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.5130101Z ##[group]Environment details
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.6239180Z node: v22.23.3
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.6239660Z npm: 10.9.9
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.6239981Z yarn: 
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.6240861Z ##[endgroup]
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.6260085Z [command]/srv/gh-runner/runner-1/_work/_tool/node/22.23.3/x64/bin/npm config get cache
+test	Run actions/setup-node@v4	2026-09-26T03:44:59.7441208Z /srv/gh-runner/.npm
+test	Run actions/setup-node@v4	2026-09-26T03:45:01.2091904Z Cache hit for: node-cache-Linux-x64-npm-7dbad0ca8d59e7cb4229954eab604ea7b79c8a3ba5ab17b646d4446abe1b57db
+test	Run actions/setup-node@v4	2026-09-26T03:45:01.2364580Z (node:3872199) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+test	Run actions/setup-node@v4	2026-09-26T03:45:02.5716400Z Received 0 of 26710427 (0.0%), 0.0 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T03:45:03.5720182Z Received 0 of 26710427 (0.0%), 0.0 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T03:45:04.5718074Z Received 1544603 of 26710427 (5.8%), 0.5 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T03:45:05.5721304Z Received 1544603 of 26710427 (5.8%), 0.4 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T03:45:06.5721807Z Received 22516123 of 26710427 (84.3%), 4.3 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T03:45:06.7643855Z Received 26710427 of 26710427 (100.0%), 4.9 MBs/sec
+test	Run actions/setup-node@v4	2026-09-26T03:45:06.7644984Z Cache Size: ~25 MB (26710427 B)
+test	Run actions/setup-node@v4	2026-09-26T03:45:06.7670455Z [command]/usr/bin/tar -xf /srv/gh-runner/runner-1/_work/_temp/94feea12-3ab1-47bf-bd91-21c0b094c7c8/cache.tzst -P -C /srv/gh-runner/runner-1/_work/Self-Improving-Agent/Self-Improving-Agent --use-compress-program unzstd
+test	Run actions/setup-node@v4	2026-09-26T03:45:06.8673493Z Cache restored successfully
+test	Run actions/setup-node@v4	2026-09-26T03:45:06.8718941Z Cache restored from key: node-cache-Linux-x64-npm-7dbad0ca8d59e7cb4229954eab604ea7b79c8a3ba5ab17b646d4446abe1b57db
+test	Install	﻿2026-09-26T03:45:06.8908406Z ##[group]Run npm ci
+test	Install	2026-09-26T03:45:06.8908722Z npm ci
+test	Install	2026-09-26T03:45:06.8934044Z shell: /usr/bin/bash -e {0}
+test	Install	2026-09-26T03:45:06.8934424Z ##[endgroup]
+test	Install	2026-09-26T03:45:08.4495454Z npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+test	Install	2026-09-26T03:45:10.6143143Z 
+test	Install	2026-09-26T03:45:10.6144271Z added 183 packages, and audited 184 packages in 4s
+test	Install	2026-09-26T03:45:10.6144783Z 
+test	Install	2026-09-26T03:45:10.6145493Z 54 packages are looking for funding
+test	Install	2026-09-26T03:45:10.6145949Z   run `npm fund` for details
+test	Install	2026-09-26T03:45:10.6690235Z 
+test	Install	2026-09-26T03:45:10.6691232Z 13 vulnerabilities (2 low, 4 moderate, 6 high, 1 critical)
+test	Install	2026-09-26T03:45:10.6691889Z 
+test	Install	2026-09-26T03:45:10.6692389Z To address all issues, run:
+test	Install	2026-09-26T03:45:10.6692913Z   npm audit fix
+test	Install	2026-09-26T03:45:10.6693224Z 
+test	Install	2026-09-26T03:45:10.6693572Z Run `npm audit` for details.
+test	Typecheck	﻿2026-09-26T03:45:10.7234002Z ##[group]Run npx tsc --noEmit
+test	Typecheck	2026-09-26T03:45:10.7234492Z npx tsc --noEmit
+test	Typecheck	2026-09-26T03:45:10.7257152Z shell: /usr/bin/bash -e {0}
+test	Typecheck	2026-09-26T03:45:10.7257556Z ##[endgroup]
+test	Test	﻿2026-09-26T03:45:17.3495468Z ##[group]Run npm test
+test	Test	2026-09-26T03:45:17.3495905Z npm test
+test	Test	2026-09-26T03:45:17.3521168Z shell: /usr/bin/bash -e {0}
+test	Test	2026-09-26T03:45:17.3521824Z ##[endgroup]
+test	Test	2026-09-26T03:45:17.5105368Z 
+test	Test	2026-09-26T03:45:17.5132390Z > open-brain@0.1.0 test
+test	Test	2026-09-26T03:45:17.5150899Z > vitest run
+test	Test	2026-09-26T03:45:17.5171822Z 
+test	Test	2026-09-26T03:45:17.9967798Z 
+test	Test	2026-09-26T03:45:17.9977821Z  RUN  v3.2.4 /srv/gh-runner/runner-1/_work/Self-Improving-Agent/Self-Improving-Agent/open-brain
+test	Test	2026-09-26T03:45:17.9991813Z 
+test	Test	2026-09-26T03:45:19.9902188Z  ✓ tests/shared/state-writer.test.ts (36 tests) 692ms
+test	Test	2026-09-26T03:45:20.4383159Z  ✓ tests/pipelines/sync/checks.test.ts (102 tests) 903ms
+test	Test	2026-09-26T03:45:20.9182950Z  ✓ tests/server.test.ts (25 tests) 706ms
+test	Test	2026-09-26T03:45:23.8921196Z  ✓ tests/harness/policies.test.ts (25 tests) 2138ms
+test	Test	2026-09-26T03:45:23.8923878Z    ✓ gate policies > A6 — a threshold change in the file changes the decision > proceeds with the shipped threshold and is rejected by a stricter one  800ms
+test	Test	2026-09-26T03:45:23.8926431Z    ✓ gate policies > A6 — a threshold change in the file changes the decision > records the thresholds it applied in the gate artifact  624ms
+test	Test	2026-09-26T03:45:23.8929225Z    ✓ gate policies > F5 — addresses_top_failures has no referent when there are no prior failures > the done gate is REACHABLE live with stub roles and the shipped policy  573ms
+test	Test	2026-09-26T03:45:25.0105825Z  ✓ tests/pipelines/state-import.test.ts (9 tests) 245ms
+test	Test	2026-09-26T03:45:27.6947265Z  ✓ tests/harness/refwatch-stage.test.ts (19 tests) 6493ms
+test	Test	2026-09-26T03:45:27.6984940Z    ✓ G-041 A2 — a role that writes a ref fails the loop > (i) refuses `git tag -f loop-001-developer loop-001-base` and restores the tag  652ms
+test	Test	2026-09-26T03:45:27.6991148Z    ✓ G-041 A2 — a role that writes a ref fails the loop > (ii) refuses `git branch -f` and puts the branch back  356ms
+test	Test	2026-09-26T03:45:27.7039592Z    ✓ G-041 A2 — a role that writes a ref fails the loop > (iii) refuses a bare `git update-ref` and deletes the ref it created  364ms
+test	Test	2026-09-26T03:45:27.7053226Z    ✓ G-041 A2 — a role that writes a ref fails the loop > (iv) refuses a role-created `loop-001-anything`, which a name rule would have allowed  325ms
+test	Test	2026-09-26T03:45:27.7055775Z    ✓ G-041 A2 — a role that writes a ref fails the loop > lets a clean loop through and still writes its own three tags  608ms
+test	Test	2026-09-26T03:45:27.7058007Z    ✓ G-041 A2 — a role that writes a ref fails the loop > leaves the checked-out branch to the commit boundary, and says so  631ms
+test	Test	2026-09-26T03:45:27.7060148Z    ✓ G-041 A2 — a role that writes a ref fails the loop > still reports a COMMITTING role as stage-committed, not as a ref write  340ms
+test	Test	2026-09-26T03:45:27.7062429Z    ✓ G-041 A2 — a role that writes a ref fails the loop > refuses a role that moves the checked-out branch with update-ref  326ms
+test	Test	2026-09-26T03:45:27.7090432Z    ✓ G-041 A2 — a role that writes a ref fails the loop > D1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human > D1 — `checkout -b evil` + commit is refused WITH a record, and HEAD still resolves  408ms
+test	Test	2026-09-26T03:45:27.7098968Z    ✓ G-041 A2 — a role that writes a ref fails the loop > D1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human > D2 — a backwards move of the checked-out branch is RESTORED, not left for a human  445ms
+test	Test	2026-09-26T03:45:27.7102573Z    ✓ G-041 A2 — a role that writes a ref fails the loop > D1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human > D4 — deleting the checked-out branch is refused WITH a record, and the ref comes back  401ms
+test	Test	2026-09-26T03:45:27.7105047Z    ✓ G-041 A2 — a role that writes a ref fails the loop > reports the ref verdict on every stage, with its own limits stated  645ms
+test	Test	2026-09-26T03:45:28.9472726Z  ✓ tests/pipelines/state-import-r3.test.ts (16 tests) 395ms
+test	Test	2026-09-26T03:45:43.8227196Z  ❯ tests/pipelines/state-import-r4.test.ts (22 tests | 2 failed) 14015ms
+test	Test	2026-09-26T03:45:43.8232224Z    ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > the known positive is the evidence file, byte for byte: its size and its first NUL are QA 111's 12ms
+test	Test	2026-09-26T03:45:43.8301644Z    ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  2210ms
+test	Test	2026-09-26T03:45:43.8394321Z    ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  2060ms
+test	Test	2026-09-26T03:45:43.8398460Z    ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  1996ms
+test	Test	2026-09-26T03:45:43.8402469Z    ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  2092ms
+test	Test	2026-09-26T03:45:43.8439238Z    ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  2037ms
+test	Test	2026-09-26T03:45:43.8443674Z    ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  2260ms
+test	Test	2026-09-26T03:45:43.8447023Z    ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted 39ms
+test	Test	2026-09-26T03:45:43.8450534Z    ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > the draft's report says --commit refuses while an input cannot be read, and the CLI's draft summary says so too  1067ms
+test	Test	2026-09-26T03:45:43.8502935Z    ✓ R4-1's list (IF-22): every could-not-tell reason, and which of them block > unreadable (NUL bytes): blocks 13ms
+test	Test	2026-09-26T03:45:43.8505570Z    ✓ R4-1's list (IF-22): every could-not-tell reason, and which of them block > no SESSIONS/Session_N.md to compare against: does not block 28ms
+test	Test	2026-09-26T03:45:43.8507901Z    ✓ R4-1's list (IF-22): every could-not-tell reason, and which of them block > names no Session N: does not block 25ms
+test	Test	2026-09-26T03:45:43.8525361Z    ✓ R4-1's list (IF-22): every could-not-tell reason, and which of them block > declares Session 20, ahead of the latest log (Session 7): does not block 17ms
+test	Test	2026-09-26T03:45:43.8528132Z    ✓ R4-1's list (IF-22): every could-not-tell reason, and which of them block > each could-not-tell input carries its reason, so the report and the refusal read the same list 19ms
+test	Test	2026-09-26T03:45:43.8531220Z    ✓ R4-1's list (IF-22): every could-not-tell reason, and which of them block > IF-10: declares Session 20 against a latest of 7: could not tell, both numbers named, and --commit completes 17ms
+test	Test	2026-09-26T03:45:43.8543104Z    ✓ R4-1's list (IF-22): every could-not-tell reason, and which of them block > IF-10: declares Session 8 against a latest of 7: could not tell, both numbers named, and --commit completes 21ms
+test	Test	2026-09-26T03:45:43.8546084Z    × R4-2 (IF-23): a SUMMARY.md with NUL bytes refuses --commit (index.ts:833) > UTF-16LE with no BOM: --commit refuses, names the NUL bytes, and the tree is identical afterwards 55ms
+test	Test	2026-09-26T03:45:43.8548111Z      → expected [Function] to throw an error
+test	Test	2026-09-26T03:45:43.8563427Z    × R4-2 (IF-23): a SUMMARY.md with NUL bytes refuses --commit (index.ts:833) > O8: the refusal reads 'SUMMARY.md contains', not 'SUMMARY.md is contains' 12ms
+test	Test	2026-09-26T03:45:43.8632318Z      → expected [Function] to throw an error
+test	Test	2026-09-26T03:45:43.8634172Z    ✓ R4-3 (IF-24): the half-restored refusal > Q1: a marker with another day's date refuses both doors, and the tree is identical 12ms
+test	Test	2026-09-26T03:45:43.8636642Z    ✓ R4-3 (IF-24): the half-restored refusal > Q17: a marker plus a state.json: --draft gives the half-restored refusal, not 'already exists' 9ms
+test	Test	2026-09-26T03:45:43.8638999Z    ✓ R4-3 (IF-24): the half-restored refusal > O10: the refusal says to keep a copy of the snapshot until the re-run completes 8ms
+test	Test	2026-09-26T03:45:43.8641417Z    ✓ R4-3 (IF-24): the half-restored refusal > the way out stays machine-readable: 'then delete <marker>. Nothing written', the shape QA 111's probes-r3.mjs parses to follow it 2ms
+test	Test	2026-09-26T03:45:44.5787629Z  ✓ tests/harness/runtime.test.ts (44 tests) 23449ms
+test	Test	2026-09-26T03:45:44.5823068Z    ✓ harness runtime > A1 — end to end > completes, exits 0, and writes D_t.md, A_t.gitref and E_t.json  682ms
+test	Test	2026-09-26T03:45:44.5862390Z    ✓ harness runtime > A1 — end to end > records in A_t.gitref the sha QA was actually frozen at  655ms
+test	Test	2026-09-26T03:45:44.5923319Z    ✓ harness runtime > A1 — end to end > writes an E_t whose candidate_git matches the developer commit, not HEAD  634ms
+test	Test	2026-09-26T03:45:44.5967722Z    ✓ harness runtime > A1 — end to end > fills runtime_checks from exit codes rather than from the role  660ms
+test	Test	2026-09-26T03:45:44.6046712Z    ✓ harness runtime > A1 — end to end > leaves the tree clean when it is done  637ms
+test	Test	2026-09-26T03:45:44.6122992Z    ✓ harness runtime > A2 — schema retry and the cap > retries an invalid D_t and completes when a later attempt validates  705ms
+test	Test	2026-09-26T03:45:44.6154508Z    ✓ harness runtime > A2 — schema retry and the cap > hands the failing role the problems that rejected it, not a bare re-roll  735ms
+test	Test	2026-09-26T03:45:44.6193030Z    ✓ harness runtime > A2 — schema retry and the cap > gives the role its own JSON Schema on the retry  776ms
+test	Test	2026-09-26T03:45:44.6243147Z    ✓ harness runtime > A2 — schema retry and the cap > writes FAILED.md, so the failure is an artifact and not just an exit code  306ms
+test	Test	2026-09-26T03:45:44.6313042Z    ✓ harness runtime > A2 — schema retry and the cap > retries the QA role on an invalid E_t and caps there too  697ms
+test	Test	2026-09-26T03:45:44.6315612Z    ✓ harness runtime > A4 — the write allowlist refuses > reverts the offending write rather than leaving it on disk  376ms
+test	Test	2026-09-26T03:45:44.6366606Z    ✓ harness runtime > A4 — the write allowlist refuses > never creates a candidate commit or a developer tag from a refused stage  405ms
+test	Test	2026-09-26T03:45:44.6413121Z    ✓ harness runtime > A4 — the write allowlist refuses > honours a widened developer allowlist when one is given deliberately  659ms
+test	Test	2026-09-26T03:45:44.6502434Z    ✓ harness runtime > A4 — the write allowlist refuses > refuses a QA write outside its allowlist — QA may never touch the candidate  591ms
+test	Test	2026-09-26T03:45:44.6562678Z    ✓ harness runtime > A4 — the write allowlist refuses > does not retry a boundary breach  437ms
+test	Test	2026-09-26T03:45:44.6624747Z    ✓ harness runtime > A3/A4 — a role that COMMITS is refused > QA that overwrites and commits the candidate is refused — the loop does not complete  730ms
+test	Test	2026-09-26T03:45:44.6736134Z    ✓ harness runtime > A3/A4 — a role that COMMITS is refused > QA that commits is rolled back to the candidate, so the tree still matches the frozen sha  775ms
+test	Test	2026-09-26T03:45:44.6945829Z    ✓ harness runtime > A3/A4 — a role that COMMITS is refused > a planner that commits outside its allowlist is refused  366ms
+test	Test	2026-09-26T03:45:44.7003274Z    ✓ harness runtime > A3/A4 — a role that COMMITS is refused > a developer that commits fails for the RIGHT reason, not 'changed nothing'  371ms
+test	Test	2026-09-26T03:45:44.7063474Z    ✓ harness runtime > A3/A4 — a role that COMMITS is refused > refuses a commit even when every path it touched was inside the allowlist  417ms
+test	Test	2026-09-26T03:45:44.7160177Z    ✓ harness runtime > A3/A4 — a role that COMMITS is refused > leaves the tree exactly where the loop started when the first stage commits  361ms
+test	Test	2026-09-26T03:45:44.7164441Z    ✓ harness runtime > A3/A4 — a role that COMMITS is refused > asserts the candidate is the evidence commit's parent on a clean run  774ms
+test	Test	2026-09-26T03:45:44.7170679Z    ✓ harness runtime > A5 — versioning and rollback > creates loop-001-developer and loop-001-qa  702ms
+test	Test	2026-09-26T03:45:44.7173569Z    ✓ harness runtime > A5 — versioning and rollback > restores the pre-loop state with git alone  743ms
+test	Test	2026-09-26T03:45:44.7175617Z    ✓ harness runtime > A5 — versioning and rollback > refuses to run a loop id whose tags already exist, rather than moving them  720ms
+test	Test	2026-09-26T03:45:44.7177726Z    ✓ harness runtime > A5 — versioning and rollback > commits the candidate separately from the evidence  657ms
+test	Test	2026-09-26T03:45:44.7179659Z    ✓ harness runtime > A3 — the frozen candidate > hands QA the candidate sha and the time it was frozen  654ms
+test	Test	2026-09-26T03:45:44.7181873Z    ✓ harness runtime > A3 — the frozen candidate > refuses to run QA when a deterministic check moved HEAD off the candidate  542ms
+test	Test	2026-09-26T03:45:44.7184121Z    ✓ harness runtime > A3 — the frozen candidate > refuses to run QA when a check left the working tree dirty  580ms
+test	Test	2026-09-26T03:45:44.7186414Z    ✓ harness runtime > deterministic checks in the loop > completes the loop with a red build and reports it rather than hiding it  833ms
+test	Test	2026-09-26T03:45:44.7188789Z    ✓ harness runtime > deterministic checks in the loop > refuses a QA report whose runtime_checks contradict the measurement  589ms
+test	Test	2026-09-26T03:45:44.7190989Z    ✓ harness runtime > preconditions > fails the loop when the developer stage changes nothing  332ms
+test	Test	2026-09-26T03:45:44.7192964Z    ✓ harness runtime > gates > skips the gates by default and records that no decision was taken  766ms
+test	Test	2026-09-26T03:45:44.7194822Z    ✓ harness runtime > gates > builds a payload for the two gates this slice owns  573ms
+test	Test	2026-09-26T03:45:44.7196654Z    ✓ harness runtime > gates > says in the log that the QA scoring gate was NOT consulted  704ms
+test	Test	2026-09-26T03:45:44.7198525Z    ✓ harness runtime > gates > prints every gate payload in dry-run mode and still sends nothing  748ms
+test	Test	2026-09-26T03:45:44.7200173Z  ✓ tests/active-session.test.ts (48 tests) 98ms
+test	Test	2026-09-26T03:45:45.2793194Z  ❯ tests/pipelines/state-import-r2.test.ts (18 tests | 1 failed) 19526ms
+test	Test	2026-09-26T03:45:45.2813493Z    ✓ R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > PROBE-8: a leading UTF-8 BOM on each input gives the same verdicts, with the same evidence, as the same inputs without it 24ms
+test	Test	2026-09-26T03:45:45.2843052Z    ✓ R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > UTF-16 with a BOM (what Windows PowerShell 5.1's `>` and Out-File write) is read, not filed as unmarked 8ms
+test	Test	2026-09-26T03:45:45.2873248Z    ✓ R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing  1960ms
+test	Test	2026-09-26T03:45:45.2903362Z    ✓ R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > UTF-16 with no BOM (NUL bytes) is the shape that cannot be read: could not tell, and it says why rather than 'names no Session N' 7ms
+test	Test	2026-09-26T03:45:45.2953471Z    ✓ R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > the sibling reads share the fix: a BOM-led task.md whose first line is `## Current Objective`, and a BOM-led log's date 3ms
+test	Test	2026-09-26T03:45:45.2977406Z    ✓ R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > SUMMARY.md with a BOM: --commit still cuts its status blockquote, and the rendered region lands under the title 48ms
+test	Test	2026-09-26T03:45:45.3007467Z    ✓ R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > SUMMARY.md in UTF-16: --commit cuts its blockquote and writes it back as UTF-8, which the renderer and ob_state read 27ms
+test	Test	2026-09-26T03:45:45.3039361Z    ✓ R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > SUMMARY.md that cannot be decoded: --commit refuses before anything is written, since it rewrites that file in place 20ms
+test	Test	2026-09-26T03:45:45.3073499Z    × R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > SUMMARY.md in UTF-16LE with no BOM (NUL bytes): --commit refuses before anything is written 49ms
+test	Test	2026-09-26T03:45:45.3079705Z      → expected [Function] to throw an error
+test	Test	2026-09-26T03:45:45.3097535Z    ✓ R2-2 (IF-10): an input that declares a session AHEAD of the latest log is not 'current' > PROBE-1: next-session declares 20 against log 7 → could not tell, with a reason naming both numbers 4ms
+test	Test	2026-09-26T03:45:45.3100523Z    ✓ R2-3 (IF-11): an import completes, or it changes nothing > PROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist  2238ms
+test	Test	2026-09-26T03:45:45.3103304Z    ✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > a single-dash token that is not a known flag refuses, before or after the directory  4497ms
+test	Test	2026-09-26T03:45:45.3106241Z    ✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > PROBE-12: a bare word before the directory is a second positional and refuses; the cwd's project is not committed  3251ms
+test	Test	2026-09-26T03:45:45.3109272Z    ✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > PROBE-5b: a positional that names no existing directory refuses instead of walking up from the cwd  2165ms
+test	Test	2026-09-26T03:45:45.3112278Z    ✓ R2-5 (IF-13): every protection has a test that fails without it > M6: a misspelled acknowledgement on a CURRENT project is refused by the flag check itself  2129ms
+test	Test	2026-09-26T03:45:45.3114837Z    ✓ R2-5 (IF-13): every protection has a test that fails without it > M13: --accept-stale with --draft refuses and writes no draft  1020ms
+test	Test	2026-09-26T03:45:45.3117842Z    ✓ R2-5 (IF-13): every protection has a test that fails without it > M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output  2062ms
+test	Test	2026-09-26T03:45:45.3120634Z    ✓ R2-5 (IF-13): every protection has a test that fails without it > M16: a marker that appears only in a heading is read, in both directions 6ms
+test	Test	2026-09-26T03:45:45.3666766Z stdout | tests/trigger/query.test.ts > A1(a) — precision: the conjunction excludes partial matches, and 299 ranks first > and it wins a SMALL field, which is what this fixture demonstrates
+test	Test	2026-09-26T03:45:45.3669355Z A1(a) match set (2 of 11 documents): pipe-to-tail-masks-exit-code, exit-code-from-variable
+test	Test	2026-09-26T03:45:45.3681830Z 
+test	Test	2026-09-26T03:45:45.3871482Z stdout | tests/trigger/query.test.ts > A1(b) — the field: ten real competitors, rank reported and not asserted > 299 is IN the match set — and its rank is reported, never asserted (R26)
+test	Test	2026-09-26T03:45:45.3924605Z A1(b) entry 299 ranks 4 of 11 against ten same-topic competitors (top: migration-exit-code). RANK REPORTED, NOT ASSERTED — R26 / amendment 10. bm25 length normalisation is the cause; the live 599-entry store ranks 299 first only because five entries there match all three terms, which is a thin field rather than discrimination.
+test	Test	2026-09-26T03:45:45.3982001Z 
+test	Test	2026-09-26T03:45:45.4284564Z  ✓ tests/trigger/query.test.ts (5 tests) 70ms
+test	Test	2026-09-26T03:45:45.9715804Z  ✓ tests/harness/gate-live.test.ts (16 tests) 32ms
+test	Test	2026-09-26T03:45:46.2892983Z  ✓ tests/pipelines/session-end/index-v2.test.ts (9 tests) 66ms
+test	Test	2026-09-26T03:45:46.9023142Z  ✓ tests/pipelines/sync/checks-state.test.ts (14 tests) 242ms
+test	Test	2026-09-26T03:45:47.8742571Z  ✓ tests/trigger/floor.test.ts (12 tests) 304ms
+test	Test	2026-09-26T03:45:48.6279988Z  ✓ tests/shadow-evaluate.test.ts (27 tests) 110ms
+test	Test	2026-09-26T03:45:50.2506027Z  ✓ tests/pipelines/session-start/tree-currency.test.ts (13 tests) 3090ms
+test	Test	2026-09-26T03:45:50.2512506Z    ✓ describeTreeCurrency > reports current when the clone is level with origin/master  332ms
+test	Test	2026-09-26T03:45:50.2517968Z    ✓ describeTreeCurrency > reports BEHIND with the commit count and both record revisions  382ms
+test	Test	2026-09-26T03:45:50.2542983Z    ✓ describeTreeCurrency > names the comparison so it cannot be read as the drift line  304ms
+test	Test	2026-09-26T03:45:50.2545176Z    ✓ describeTreeCurrency > RESOLVES a real last-fetch timestamp, rather than reporting it unknown  302ms
+test	Test	2026-09-26T03:45:51.2753343Z  ✓ tests/db-v2.test.ts (15 tests) 233ms
+test	Test	2026-09-26T03:45:52.0713189Z  ✓ tests/trigger/fires.test.ts (14 tests) 79ms
+test	Test	2026-09-26T03:45:55.5352645Z  ✓ tests/harness/checks.test.ts (24 tests) 2496ms
+test	Test	2026-09-26T03:45:55.5366221Z    ✓ runCheck > records a timeout as a failure rather than letting it hang the loop  409ms
+test	Test	2026-09-26T03:45:55.5443388Z    ✓ defaultChecks — D4 > the default BUILD check spawns successfully against a repo that has the scripts  397ms
+test	Test	2026-09-26T03:45:58.3792490Z  ✓ tests/pipelines/session-start/role-files.test.ts (13 tests) 2065ms
+test	Test	2026-09-26T03:45:58.3811956Z    ✓ describeRoleFiles > records HEAD-behind-upstream for a role file without calling it stale  401ms
+test	Test	2026-09-26T03:45:59.3542070Z  ✓ tests/pipelines/state-views.test.ts (13 tests) 25ms
+test	Test	2026-09-26T03:46:01.9237274Z  ✓ tests/pipelines/sync/staleness.test.ts (17 tests) 1745ms
+test	Test	2026-09-26T03:46:04.2094752Z  ✓ tests/cli-bootstrap.test.ts (13 tests) 14860ms
+test	Test	2026-09-26T03:46:04.2151424Z    ✓ cli-bootstrap SESSION_UUID contract > emits SESSION_UUID exactly once when the payload carries session_id  1080ms
+test	Test	2026-09-26T03:46:04.2171306Z    ✓ cli-bootstrap SESSION_UUID contract > emits the id from the payload verbatim, not a filesystem guess  1029ms
+test	Test	2026-09-26T03:46:04.2248319Z    ✓ cli-bootstrap SESSION_UUID contract > accepts payload fields other than Claude Code's session_id  1274ms
+test	Test	2026-09-26T03:46:04.2262190Z    ✓ cli-bootstrap SESSION_UUID contract > generates a UUID when the IDE supplies none  1066ms
+test	Test	2026-09-26T03:46:04.2266539Z    ✓ cli-bootstrap SESSION_UUID contract > generates a DIFFERENT uuid each run, never a reused one  2142ms
+test	Test	2026-09-26T03:46:04.2268502Z    ✓ cli-bootstrap SESSION_UUID contract > stays silent in a subagent context (anti-loop)  970ms
+test	Test	2026-09-26T03:46:04.2270500Z    ✓ cli-bootstrap SESSION_UUID contract > REFUSES malformed stdin rather than continuing without the payload  1009ms
+test	Test	2026-09-26T03:46:04.2273383Z    ✓ cli-bootstrap SESSION_UUID contract > a well-formed payload with NO session id writes nothing to the slot  1096ms
+test	Test	2026-09-26T03:46:04.2275557Z    ✓ cli-bootstrap SESSION_UUID contract > a payload WITH a session id still writes the slot — the guard is not a ban  1060ms
+test	Test	2026-09-26T03:46:04.2277590Z    ✓ cli-bootstrap SESSION_UUID contract > still refuses to guess an id from the filesystem  1211ms
+test	Test	2026-09-26T03:46:04.2279595Z    ✓ cli-bootstrap SESSION_UUID contract > F4: a MALFORMED payload refuses, writes nothing, and exits non-zero  995ms
+test	Test	2026-09-26T03:46:04.2281919Z    ✓ cli-bootstrap SESSION_UUID contract > F4: an ABSENT payload is still supported — absent and malformed are different  977ms
+test	Test	2026-09-26T03:46:04.2284099Z    ✓ cli-bootstrap SESSION_UUID contract > F4: a WELL-FORMED payload still registers the id it was given  942ms
+test	Test	2026-09-26T03:46:04.3483566Z  ✓ tests/harness/workspace.test.ts (31 tests) 1703ms
+test	Test	2026-09-26T03:46:05.0833023Z  ✓ tests/vault-writer.test.ts (21 tests) 29ms
+test	Test	2026-09-26T03:46:07.6594600Z  ✓ tests/trigger/hook.test.ts (12 tests) 22038ms
+test	Test	2026-09-26T03:46:07.6596415Z    ✓ A5 — what the hook emits > POSITIVE, at scale, through the shipped floor: additionalContext carries 299 and its ACTION  1786ms
+test	Test	2026-09-26T03:46:07.6598369Z    ✓ A5 — what the hook emits > the POLICY FILE is what let 299 through — raise the floor and the same call goes silent  3845ms
+test	Test	2026-09-26T03:46:07.6600261Z    ✓ A5 — what the hook emits > NEGATIVE: git status --porcelain emits nothing at all — no key, no stdout, no stderr  1826ms
+test	Test	2026-09-26T03:46:07.6602254Z    ✓ A5 — what the hook emits > NEGATIVE: ls -la emits nothing at all — no key, no stdout, no stderr  1606ms
+test	Test	2026-09-26T03:46:07.6603975Z    ✓ A5 — what the hook emits > NEGATIVE: zzqx --flurb wibble emits nothing at all — no key, no stdout, no stderr  2038ms
+test	Test	2026-09-26T03:46:07.6605614Z    ✓ A5 — what the hook emits > ignores a tool that is not Bash, and says nothing about it  1591ms
+test	Test	2026-09-26T03:46:07.6607080Z    ✓ A6 — three failures, and the model hears none of them > store path absent  1805ms
+test	Test	2026-09-26T03:46:07.6608575Z    ✓ A6 — three failures, and the model hears none of them > store locked by another writer  1747ms
+test	Test	2026-09-26T03:46:07.6649449Z    ✓ A6 — three failures, and the model hears none of them > past its own deadline: the work finished, and the result is still not emitted  1790ms
+test	Test	2026-09-26T03:46:07.6652346Z    ✓ A6 — three failures, and the model hears none of them > a malformed payload is logged and dropped, NOT refused with a non-zero exit  1909ms
+test	Test	2026-09-26T03:46:07.6654339Z    ✓ A6 — three failures, and the model hears none of them > POSITIVE CONTROL: the same harness on a healthy store DOES emit  1896ms
+test	Test	2026-09-26T03:46:10.5471629Z  ✓ tests/harness/git.test.ts (29 tests) 2261ms
+test	Test	2026-09-26T03:46:10.8159200Z  ✓ tests/harness/gate-artifacts.test.ts (7 tests) 5051ms
+test	Test	2026-09-26T03:46:10.8192799Z    ✓ gate artifacts > A5 — dry run > writes G_plan.json and G_done.json with sent: false  834ms
+test	Test	2026-09-26T03:46:10.8252891Z    ✓ gate artifacts > A5 — dry run > records the exact payload that WOULD have gone on the wire  727ms
+test	Test	2026-09-26T03:46:10.8283048Z    ✓ gate artifacts > A5 — dry run > carries the deterministic checks' EXIT CODES as data in the done-gate payload  730ms
+test	Test	2026-09-26T03:46:10.8331579Z    ✓ gate artifacts > A5 — dry run > contains no question about whether the tests passed — structurally, then by scan  839ms
+test	Test	2026-09-26T03:46:10.8363302Z    ✓ gate artifacts > A5 — dry run > prints the payload in a dry run and sends nothing  637ms
+test	Test	2026-09-26T03:46:10.8413332Z    ✓ gate artifacts > A3 — the key reaches no artifact and no log line > greps the whole iteration directory and the captured log after a live run  563ms
+test	Test	2026-09-26T03:46:10.8423929Z    ✓ gate artifacts > records a skipped gate as not consulted rather than omitting the file  709ms
+test	Test	2026-09-26T03:46:11.4263042Z  ✓ tests/pipelines/state-import-staleness.test.ts (8 tests) 6444ms
+test	Test	2026-09-26T03:46:11.4266056Z    ✓ T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale  4170ms
+test	Test	2026-09-26T03:46:11.4269952Z    ✓ T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > --commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report  2058ms
+test	Test	2026-09-26T03:46:11.4322696Z  ✓ tests/topics.test.ts (18 tests) 250ms
+test	Test	2026-09-26T03:46:12.3576000Z  ✓ tests/harness/schema.test.ts (21 tests) 74ms
+test	Test	2026-09-26T03:46:13.0953553Z  ✓ tests/trigger/no-network.test.ts (3 tests) 47ms
+test	Test	2026-09-26T03:46:13.3826898Z  ✓ tests/pipelines/session-start/handoff-provenance.test.ts (9 tests) 1130ms
+test	Test	2026-09-26T03:46:13.7583830Z  ✓ tests/pipelines/detach.test.ts (14 tests) 2294ms
+test	Test	2026-09-26T03:46:13.7663286Z    ✓ detachToUpstream > detaches a branch checkout onto origin/master and VERIFIES the end state  380ms
+test	Test	2026-09-26T03:46:13.7749181Z    ✓ detachToUpstream > detaches onto origin/master even when the local master has moved ahead  349ms
+test	Test	2026-09-26T03:46:14.0749958Z  ✓ tests/trigger/negatives.test.ts (11 tests) 239ms
+test	Test	2026-09-26T03:46:14.0873224Z  ✓ tests/shared/paths.test.ts (14 tests | 1 skipped) 108ms
+test	Test	2026-09-26T03:46:14.6021498Z  ✓ tests/pipelines/session-end/recalled-ids.test.ts (17 tests) 127ms
+test	Test	2026-09-26T03:46:15.1082428Z  ✓ tests/pipelines/state-migrate.test.ts (11 tests) 123ms
+test	Test	2026-09-26T03:46:15.2663619Z  ✓ tests/ranking.test.ts (11 tests) 64ms
+test	Test	2026-09-26T03:46:16.2162847Z  ✓ tests/pipelines/session-start/state-reader.test.ts (13 tests) 86ms
+test	Test	2026-09-26T03:46:17.1199256Z  ✓ tests/pipelines/state-import-atomic.test.ts (8 tests) 235ms
+test	Test	2026-09-26T03:46:18.0005409Z  ✓ tests/rating-method.test.ts (8 tests) 126ms
+test	Test	2026-09-26T03:46:18.7428169Z  ✓ tests/index-upsert.test.ts (10 tests) 108ms
+test	Test	2026-09-26T03:46:18.9828961Z  ✓ tests/harness/refwatch.test.ts (8 tests) 2980ms
+test	Test	2026-09-26T03:46:18.9831546Z    ✓ G-041 A1 — runLoop refuses a role it did not construct > runs the same foreign roles when the ref-watch is active  835ms
+test	Test	2026-09-26T03:46:18.9837954Z    ✓ G-041 A1 — runLoop refuses a role it did not construct > has the ref-watch on by default, so omitting the flag permits foreign roles  647ms
+test	Test	2026-09-26T03:46:18.9877379Z    ✓ G-041 A1 — runLoop refuses a role it did not construct > still accepts the stubs themselves after the subclass rule  540ms
+test	Test	2026-09-26T03:46:18.9884728Z    ✓ G-041 A1 — runLoop refuses a role it did not construct > still runs runtime-constructed roles with the watch explicitly off  654ms
+test	Test	2026-09-26T03:46:19.6545347Z  ✓ tests/pipelines/sync/module-boundary.test.ts (12 tests) 95ms
+test	Test	2026-09-26T03:46:19.8074623Z  ✓ tests/shadow-stage.test.ts (14 tests) 104ms
+test	Test	2026-09-26T03:46:20.5717621Z  ✓ tests/relocate.test.ts (8 tests) 121ms
+test	Test	2026-09-26T03:46:20.6013048Z  ✓ tests/pipelines/sync/mirror-parity.test.ts (13 tests) 67ms
+test	Test	2026-09-26T03:46:21.1155325Z  ✓ tests/pipelines/session-start/session-log.test.ts (9 tests) 34ms
+test	Test	2026-09-26T03:46:21.1442425Z  ✓ tests/shared/state-schema.test.ts (10 tests) 64ms
+test	Test	2026-09-26T03:46:21.6361210Z  ✓ tests/harness/gate.test.ts (10 tests) 13ms
+test	Test	2026-09-26T03:46:22.5212294Z  ✓ tests/pipelines/sync/repo-root.test.ts (7 tests) 833ms
+test	Test	2026-09-26T03:46:22.5216888Z    ✓ resolveRepoRoot > the sync CLI refuses non-zero with one line naming the cwd (V6)  745ms
+test	Test	2026-09-26T03:46:22.8765225Z  ✓ tests/pipelines/session-start/derived-artifacts.test.ts (9 tests) 711ms
+test	Test	2026-09-26T03:46:22.9552694Z  ✓ tests/shadow-strategies.test.ts (9 tests) 39ms
+test	Test	2026-09-26T03:46:23.3532793Z  ✓ tests/pipelines/sync/pipeline-health.test.ts (12 tests) 15ms
+test	Test	2026-09-26T03:46:23.4768620Z  ✓ tests/pipelines/session-start/state-render.test.ts (7 tests) 8ms
+test	Test	2026-09-26T03:46:23.8052927Z  ✓ tests/pipelines/sync/scorer.test.ts (11 tests) 19ms
+test	Test	2026-09-26T03:46:23.9735959Z  ✓ tests/pipelines/store/index.test.ts (3 tests) 24ms
+test	Test	2026-09-26T03:46:24.3352789Z  ✓ tests/content-guard.test.ts (11 tests) 17ms
+test	Test	2026-09-26T03:46:24.4354802Z  ✓ tests/shared/skill-index.test.ts (10 tests) 13ms
+test	Test	2026-09-26T03:46:24.8259629Z  ✓ tests/pipelines/sync/command-parity.test.ts (9 tests) 22ms
+test	Test	2026-09-26T03:46:24.8620596Z  ✓ tests/session-provenance.test.ts (9 tests) 33ms
+test	Test	2026-09-26T03:46:25.5623891Z  ✓ tests/recall-broadening.test.ts (8 tests) 24ms
+test	Test	2026-09-26T03:46:25.6183348Z  ✓ tests/pipelines/template-seed.test.ts (3 tests) 36ms
+test	Test	2026-09-26T03:46:25.8534659Z  ✓ tests/vault-archive.test.ts (6 tests) 16ms
+test	Test	2026-09-26T03:46:25.9042764Z  ✓ tests/pipelines/session-start/agent-identity.test.ts (6 tests) 11ms
+test	Test	2026-09-26T03:46:26.1683221Z  ✓ tests/pipelines/sync/history.test.ts (7 tests) 11ms
+test	Test	2026-09-26T03:46:26.2525763Z  ✓ tests/pipelines/sync/scorer-integration.test.ts (5 tests) 21ms
+test	Test	2026-09-26T03:46:26.5942611Z  ✓ tests/pipelines/session-start/index.test.ts (8 tests) 31ms
+test	Test	2026-09-26T03:46:26.6800251Z  ✓ tests/pipelines/sync/hook-registration.test.ts (7 tests) 11ms
+test	Test	2026-09-26T03:46:26.9663303Z  ✓ tests/pipelines/session-start/session-discovery.test.ts (6 tests) 11ms
+test	Test	2026-09-26T03:46:27.4446441Z  ✓ tests/pipelines/sync/index.test.ts (4 tests) 63ms
+test	Test	2026-09-26T03:46:27.6194562Z  ✓ tests/pipelines/state-import-seeds.test.ts (2 tests) 628ms
+test	Test	2026-09-26T03:46:27.6196297Z    ✓ T-175: an import carries none of SIA's own history (IF-1) > the CLI's draft line says verified 0 · gaps 0  595ms
+test	Test	2026-09-26T03:46:27.7727419Z  ✓ tests/pipelines/session-start/drift-detector.test.ts (4 tests) 6ms
+test	Test	2026-09-26T03:46:29.5426772Z  ✓ tests/harness/cli.test.ts (17 tests) 14757ms
+test	Test	2026-09-26T03:46:29.5428831Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > prints usage and exits non-zero with no subcommand  1148ms
+test	Test	2026-09-26T03:46:29.5431074Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > exits 0 for an explicit help request  1104ms
+test	Test	2026-09-26T03:46:29.5432872Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses an unknown subcommand  969ms
+test	Test	2026-09-26T03:46:29.5434821Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses an unrecognised flag instead of selecting the default action  906ms
+test	Test	2026-09-26T03:46:29.5436745Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses a flag whose value is missing  1152ms
+test	Test	2026-09-26T03:46:29.5438945Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > requires --loop  846ms
+test	Test	2026-09-26T03:46:29.5440815Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses a malformed loop id  693ms
+test	Test	2026-09-26T03:46:29.5442634Z    ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses a non-numeric --max-attempts  751ms
+test	Test	2026-09-26T03:46:29.5444312Z    ✓ harness CLI > A1 — a full loop from the command line > exits 0 and writes the three artifacts  1135ms
+test	Test	2026-09-26T03:46:29.5446084Z    ✓ harness CLI > A1 — a full loop from the command line > writes a plan artifact that validates against the plan schema  1231ms
+test	Test	2026-09-26T03:46:29.5447947Z    ✓ harness CLI > A1 — a full loop from the command line > tags the loop with zero-padded three-digit numbers  1086ms
+test	Test	2026-09-26T03:46:29.5449765Z    ✓ harness CLI > A1 — a full loop from the command line > exits non-zero when a deterministic check is red, and says so  939ms
+test	Test	2026-09-26T03:46:29.5451911Z    ✓ harness CLI > A1 — a full loop from the command line > emits a machine-readable result with --json  961ms
+test	Test	2026-09-26T03:46:29.5453630Z    ✓ harness CLI > A1 — a full loop from the command line > fails with a recorded reason on a dirty tree  438ms
+test	Test	2026-09-26T03:46:29.5463915Z    ✓ harness CLI > A6 — dry run from the command line > prints the gate payloads and completes  638ms
+test	Test	2026-09-26T03:46:29.5465449Z    ✓ harness CLI > schemas > prints both derived schemas  376ms
+test	Test	2026-09-26T03:46:29.5466603Z    ✓ harness CLI > schemas > refuses an unknown flag  365ms
+test	Test	2026-09-26T03:46:29.5582266Z 
+test	Test	2026-09-26T03:46:29.5583763Z ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+test	Test	2026-09-26T03:46:29.5584307Z 
+test	Test	2026-09-26T03:46:29.5588722Z  FAIL  tests/pipelines/state-import-r2.test.ts > R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > SUMMARY.md in UTF-16LE with no BOM (NUL bytes): --commit refuses before anything is written
+test	Test	2026-09-26T03:46:29.5613538Z AssertionError: expected [Function] to throw an error
+test	Test	2026-09-26T03:46:29.5614104Z 
+test	Test	2026-09-26T03:46:29.5614363Z - Expected: 
+test	Test	2026-09-26T03:46:29.5614698Z null
+test	Test	2026-09-26T03:46:29.5614893Z 
+test	Test	2026-09-26T03:46:29.5615094Z + Received: 
+test	Test	2026-09-26T03:46:29.5615407Z undefined
+test	Test	2026-09-26T03:46:29.5615572Z 
+test	Test	2026-09-26T03:46:29.5616115Z  ❯ tests/pipelines/state-import-r2.test.ts:194:42
+test	Test	2026-09-26T03:46:29.5712141Z     192|     runDraft(root, TODAY);
+test	Test	2026-09-26T03:46:29.5713672Z     193|     const before = tree(root);
+test	Test	2026-09-26T03:46:29.5714856Z     194|     expect(() => runCommit(root, TODAY)).toThrow(/SUMMARY\.md .*NUL by…
+test	Test	2026-09-26T03:46:29.5715825Z        |                                          ^
+test	Test	2026-09-26T03:46:29.5716978Z     195|     expect(tree(root)).toEqual(before);
+test	Test	2026-09-26T03:46:29.5717992Z     196|   });
+test	Test	2026-09-26T03:46:29.5718528Z 
+test	Test	2026-09-26T03:46:29.5719283Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+test	Test	2026-09-26T03:46:29.5720349Z 
+test	Test	2026-09-26T03:46:29.5722306Z  FAIL  tests/pipelines/state-import-r4.test.ts > R4-2 (IF-23): a SUMMARY.md with NUL bytes refuses --commit (index.ts:833) > UTF-16LE with no BOM: --commit refuses, names the NUL bytes, and the tree is identical afterwards
+test	Test	2026-09-26T03:46:29.5724615Z AssertionError: expected [Function] to throw an error
+test	Test	2026-09-26T03:46:29.5725299Z 
+test	Test	2026-09-26T03:46:29.5725733Z - Expected: 
+test	Test	2026-09-26T03:46:29.5726292Z null
+test	Test	2026-09-26T03:46:29.5726630Z 
+test	Test	2026-09-26T03:46:29.5726988Z + Received: 
+test	Test	2026-09-26T03:46:29.5727520Z undefined
+test	Test	2026-09-26T03:46:29.5727856Z 
+test	Test	2026-09-26T03:46:29.5728588Z  ❯ tests/pipelines/state-import-r4.test.ts:209:42
+test	Test	2026-09-26T03:46:29.5762314Z     207|     runDraft(root, TODAY);
+test	Test	2026-09-26T03:46:29.5793719Z     208|     const before = tree(root);
+test	Test	2026-09-26T03:46:29.5805536Z 
+test	Test	2026-09-26T03:46:29.5822537Z     209|     expect(() => runCommit(root, TODAY)).toThrow(/SUMMARY\.md .*NUL by…
+test	Test	2026-09-26T03:46:29.5852078Z        |                                          ^
+test	Test	2026-09-26T03:46:29.5853169Z     210|     expect(tree(root)).toEqual(before);
+test	Test	2026-09-26T03:46:29.5853988Z     211|   });
+test	Test	2026-09-26T03:46:29.5854940Z  Test Files  2 failed | 75 passed (77)
+test	Test	2026-09-26T03:46:29.5855581Z 
+test	Test	2026-09-26T03:46:29.5871734Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+test	Test	2026-09-26T03:46:29.5873291Z       Tests  3 failed | 1105 passed | 1 skipped (1109)
+test	Test	2026-09-26T03:46:29.5874302Z 
+test	Test	2026-09-26T03:46:29.5876229Z  FAIL  tests/pipelines/state-import-r4.test.ts > R4-2 (IF-23): a SUMMARY.md with NUL bytes refuses --commit (index.ts:833) > O8: the refusal reads 'SUMMARY.md contains', not 'SUMMARY.md is contains'
+test	Test	2026-09-26T03:46:29.5878338Z AssertionError: expected [Function] to throw an error
+test	Test	2026-09-26T03:46:29.5878942Z 
+test	Test	2026-09-26T03:46:29.5879274Z - Expected: 
+test	Test	2026-09-26T03:46:29.5879855Z null
+test	Test	2026-09-26T03:46:29.5880152Z 
+test	Test	2026-09-26T03:46:29.5880470Z + Received: 
+test	Test	2026-09-26T03:46:29.5881030Z undefined
+test	Test	2026-09-26T03:46:29.5881345Z 
+test	Test	2026-09-26T03:46:29.5882016Z  ❯ tests/pipelines/state-import-r4.test.ts:217:42
+test	Test	2026-09-26T03:46:29.5883134Z     215|     writeFileSync(join(root, SUMMARY), Buffer.from("# Summary\r\n", "u…
+test	Test	2026-09-26T03:46:29.5884224Z     216|     runDraft(root, TODAY);
+test	Test	2026-09-26T03:46:29.5885297Z     217|     expect(() => runCommit(root, TODAY)).toThrow(/SUMMARY\.md contains…
+test	Test	2026-09-26T03:46:29.5886304Z        |                                          ^
+test	Test	2026-09-26T03:46:29.5887067Z     218|   });
+test	Test	2026-09-26T03:46:29.5887688Z     219| });
+test	Test	2026-09-26T03:46:29.5888069Z 
+test	Test	2026-09-26T03:46:29.5888564Z ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+test	Test	2026-09-26T03:46:29.5888978Z 
+test	Test	2026-09-26T03:46:29.5911996Z    Start at  03:45:17
+test	Test	2026-09-26T03:46:29.5955047Z    Duration  71.56s (transform 3.67s, setup 1.71s, collect 14.16s, tests 157.46s, environment 56ms, prepare 13.72s)
+test	Test	2026-09-26T03:46:29.5956302Z 
+test	Test	2026-09-26T03:46:29.5956455Z 
+test	Test	2026-09-26T03:46:29.5989661Z ##[error]AssertionError: expected [Function] to throw an error
+test	Test	
+test	Test	- Expected: 
+test	Test	null
+test	Test	
+test	Test	+ Received: 
+test	Test	undefined
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r2.test.ts:194:42
+test	Test	
+test	Test	
+test	Test	2026-09-26T03:46:29.5998897Z 
+test	Test	2026-09-26T03:46:29.6002196Z ##[error]AssertionError: expected [Function] to throw an error
+test	Test	
+test	Test	- Expected: 
+test	Test	null
+test	Test	
+test	Test	+ Received: 
+test	Test	undefined
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r4.test.ts:209:42
+test	Test	
+test	Test	
+test	Test	2026-09-26T03:46:29.6003821Z 
+test	Test	2026-09-26T03:46:29.6006510Z ##[error]AssertionError: expected [Function] to throw an error
+test	Test	
+test	Test	- Expected: 
+test	Test	null
+test	Test	
+test	Test	+ Received: 
+test	Test	undefined
+test	Test	
+test	Test	 ❯ tests/pipelines/state-import-r4.test.ts:217:42
+test	Test	
+test	Test	
+test	Test	2026-09-26T03:46:29.7057299Z ##[error]Process completed with exit code 1.
+test	Post Run actions/checkout@v4	﻿2026-09-26T03:46:29.7206292Z Post job cleanup.
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8174428Z [command]/usr/bin/git version
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8220581Z git version 2.43.0
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8272897Z Temporarily overriding HOME='/srv/gh-runner/runner-1/_work/_temp/dffd1d69-f9d3-43e2-8a09-c9863a8672e5' before making global git config changes
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8274431Z Adding repository directory to the temporary git global config as a safe directory
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8278120Z [command]/usr/bin/git config --global --add safe.directory /srv/gh-runner/runner-1/_work/Self-Improving-Agent/Self-Improving-Agent
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8323708Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8369033Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8600980Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8627894Z http.https://github.com/.extraheader
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8641441Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8680594Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8905131Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Post Run actions/checkout@v4	2026-09-26T03:46:29.8941209Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Complete job	﻿2026-09-26T03:46:29.9452391Z Cleaning up orphan processes
+test	Complete job	2026-09-26T03:46:29.9918207Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

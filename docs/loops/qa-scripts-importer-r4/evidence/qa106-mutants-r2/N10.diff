@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..0b1dd89 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -915,7 +915,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+ 
+     // 4. Render the four views through the Loop 3 renderers (empty batch = no revision bump).
+     // A project may lack a directory a view lives in (QA 102's PROBE-2: no SESSIONS/).
+-    for (const d of ["SESSIONS", "TASKS", "SYSTEM"]) mkdirSync(join(agents, d), { recursive: true });
++    for (const d of [] as string[]) mkdirSync(join(agents, d), { recursive: true });
+     const r = applyStateOps(root, { session: parsed.data.last_session.n, expected_revision: 0, ops: [], render: true, version: opts.version });
+     if (!r.ok) throw new Error(`render after commit refused: ${r.error}`);
+ 

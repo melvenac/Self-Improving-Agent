@@ -1,0 +1,260 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/qa-scratch/qa122/red/open-brain[39m
+
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created[2m > [22ma same-day snapshot plus a plain --commit: refused, and the snapshot is byte-identical afterwards[32m 46[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created[2m > [22mthe same with --accept-stale on a stale project: refused, and the snapshot is byte-identical afterwards[32m 25[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created[2m > [22ma snapshot that fails part-way when archive/ already existed: only the partial snapshot goes, and archive/'s other contents stay (N13)[32m 38[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-1 (IF-16): a refusal never deletes what it names; a failure removes only what this run created[2m > [22m--force-snapshot with a snapshot that fails part-way: the aside comes back byte for byte, and only the new partial snapshot goes[32m 43[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import.test.ts[2m > [22mstate import (Loop 4 C1) on a fixture built from this repo's prose files[2m > [22m--draft writes a schema-valid draft + report and changes nothing else; counts match the hand count of INBOX boxes (V5)[32m 65[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import.test.ts[2m > [22mstate import (Loop 4 C1) on a fixture built from this repo's prose files[2m > [22m--draft refuses when state.json already exists[32m 13[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding[2m > [22mWindows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits[32m 59[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding[2m > [22mPS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits[32m 50[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import.test.ts[2m > [22mstate import (Loop 4 C1) on a fixture built from this repo's prose files[2m > [22m--commit: snapshot byte-complete before any change (P2), state.json rev 0, SUMMARY cut (line counts), four views rendered, draft moved, prose sections byte-identical (P8), second commit refuses (V5)[32m 144[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import.test.ts[2m > [22mstate import (Loop 4 C1) on a fixture built from this repo's prose files[2m > [22m--commit refuses without a draft, on a draft that does not validate, and on an existing snapshot without --force-snapshot[32m 97[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import.test.ts[2m > [22mstate import (Loop 4 C1) on a fixture built from this repo's prose files[2m > [22mtakeSnapshot excludes archive/ and refuses a second run without force[32m 38[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import.test.ts[2m > [22mstate import parsing rules (unit)[2m > [22mINBOX rules: box → status, priority from section, title/note split, session markers, superseded link, unparsed lines reported[32m 2[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import.test.ts[2m > [22mstate import parsing rules (unit)[2m > [22mDECISIONS rules: full date kept, partial and missing dates fall back to the migration date with a note, unnumbered ADR skipped[32m 1[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import.test.ts[2m > [22mstate import parsing rules (unit)[2m > [22mnext-session rules: pick_up text, watch_out bullets, open_questions bullets (empty when absent), other sections reported[32m 1[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import.test.ts[2m > [22mstate import parsing rules (unit)[2m > [22mSUMMARY surgery removes exactly the title blockquote and the Current State section and leaves everything else byte for byte[32m 1[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding[2m > [22mPS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits[32m 72[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding[2m > [22mthe text is decoded as Windows-1252, not as UTF-8 with replacement characters[32m 14[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding[2m > [22mUTF-16 with no BOM is still 'could not tell' (NUL bytes), whether or not it is also invalid UTF-8[32m 16[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-2 (IF-18): Windows-1252 input is read and judged, and the evidence names the encoding[2m > [22ma Windows-1252 SUMMARY.md still refuses --commit: a guessed encoding is not written back[32m 21[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse[2m > [22mQA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step[32m 156[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse[2m > [22mQA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step[32m 149[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse[2m > [22mthe marker exists before --commit's first write to the live tree, so a process that dies there leaves a project that refuses[32m 101[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse[2m > [22ma marker left by a process that died mid-migrate (no rollback ran): --draft and --commit refuse, naming the snapshot and the marker[32m 40[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse[2m > [22ma completed rollback leaves no marker, and a re-run completes (archive/ absent before)[32m 161[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r3.test.ts[2m > [22mR3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse[2m > [22ma completed rollback leaves no marker, and a re-run completes (archive/ already present before)[32m 134[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-staleness.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-2: A2A-Hub at e0bc3f8, the known positive[2m > [22m--draft names next-session.md as stale, with evidence, in the report's first section[32m 48[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell'[2m > [22mPROBE-8: a leading UTF-8 BOM on each input gives the same verdicts, with the same evidence, as the same inputs without it[32m 41[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell'[2m > [22mUTF-16 with a BOM (what Windows PowerShell 5.1's `>` and Out-File write) is read, not filed as unmarked[32m 24[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mthe known positive is the evidence file, byte for byte: its size and its first NUL are QA 111's[32m 5[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell'[2m > [22mthe CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing[33m 1892[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell'[2m > [22mUTF-16 with no BOM (NUL bytes) is the shape that cannot be read: could not tell, and it says why rather than 'names no Session N'[32m 12[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell'[2m > [22mthe sibling reads share the fix: a BOM-led task.md whose first line is `## Current Objective`, and a BOM-led log's date[32m 11[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell'[2m > [22mSUMMARY.md with a BOM: --commit still cuts its status blockquote, and the rendered region lands under the title[32m 52[2mms[22m[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mWindows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes[33m 869[2mms[22m[39m
+[31m   → expected +0 to be 1 // Object.is equality[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mUTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes[33m 902[2mms[22m[39m
+[31m   → expected +0 to be 1 // Object.is equality[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell'[2m > [22mSUMMARY.md in UTF-16: --commit cuts its blockquote and writes it back as UTF-8, which the renderer and ob_state read[32m 45[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell'[2m > [22mSUMMARY.md that cannot be decoded: --commit refuses before anything is written, since it rewrites that file in place[32m 21[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell'[2m > [22mSUMMARY.md in UTF-16LE with no BOM (NUL bytes): --commit refuses before anything is written[32m 20[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-2 (IF-10): an input that declares a session AHEAD of the latest log is not 'current'[2m > [22mPROBE-1: next-session declares 20 against log 7 → could not tell, with a reason naming both numbers[32m 13[2mms[22m[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mUTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes[33m 869[2mms[22m[39m
+[31m   → expected +0 to be 1 // Object.is equality[39m
+ [32m✓[39m tests/pipelines/state-import-staleness.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-2: A2A-Hub at e0bc3f8, the known positive[2m > [22m--commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it[32m 88[2mms[22m[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mUTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes[33m 854[2mms[22m[39m
+[31m   → expected +0 to be 1 // Object.is equality[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mUTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes[33m 862[2mms[22m[39m
+[31m   → expected +0 to be 1 // Object.is equality[39m
+ [32m✓[39m tests/pipelines/state-import-staleness.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-2: A2A-Hub at e0bc3f8, the known positive[2m > [22mthe CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale[33m 3412[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-staleness.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-3: a project whose inputs are current, the known negative[2m > [22mno input is stale, every judged input is current, and --commit proceeds without the acknowledgement[32m 50[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-staleness.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-4: an input the detector cannot judge is reported, never counted as current[2m > [22man input with no session marker is 'could not tell', named in the report's first section[32m 13[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-3 (IF-11): an import completes, or it changes nothing[2m > [22mPROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist[33m 1613[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-staleness.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-4: an input the detector cannot judge is reported, never counted as current[2m > [22m--commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report[33m 1645[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-staleness.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-4: an input the detector cannot judge is reported, never counted as current[2m > [22mwith no Session_N.md to compare against, every present input is 'could not tell'[32m 13[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-staleness.test.ts[2m > [22mT-180: a stale input is named at the top of the report and gates --commit[2m > [22mIF-4: an input the detector cannot judge is reported, never counted as current[2m > [22minputs that are not imported as current state are listed as not judged, with a reason[32m 12[2mms[22m[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mUTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes[33m 837[2mms[22m[39m
+[31m   → expected +0 to be 1 // Object.is equality[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22min process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted[32m 53[2mms[22m[39m
+[31m   → expected [Function] to throw an error[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mthe draft's report says --commit refuses while an input cannot be read, and the CLI's draft summary says so too[33m 800[2mms[22m[39m
+[31m   → expected '\nstate import — draft (nothing else …' to contain '--commit will REFUSE while .agents/TA…'[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1's list (IF-22): every could-not-tell reason, and which of them block[2m > [22munreadable (NUL bytes): blocks[32m 42[2mms[22m[39m
+[31m   → expected [Function] to throw an error[39m
+ [32m✓[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1's list (IF-22): every could-not-tell reason, and which of them block[2m > [22mno SESSIONS/Session_N.md to compare against: does not block[32m 39[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1's list (IF-22): every could-not-tell reason, and which of them block[2m > [22mnames no Session N: does not block[32m 41[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1's list (IF-22): every could-not-tell reason, and which of them block[2m > [22mdeclares Session 20, ahead of the latest log (Session 7): does not block[32m 39[2mms[22m[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1's list (IF-22): every could-not-tell reason, and which of them block[2m > [22meach could-not-tell input carries its reason, so the report and the refusal read the same list[32m 12[2mms[22m[39m
+[31m   → expected undefined to be 'unreadable' // Object.is equality[39m
+ [32m✓[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1's list (IF-22): every could-not-tell reason, and which of them block[2m > [22mIF-10: declares Session 20 against a latest of 7: could not tell, both numbers named, and --commit completes[32m 65[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1's list (IF-22): every could-not-tell reason, and which of them block[2m > [22mIF-10: declares Session 8 against a latest of 7: could not tell, both numbers named, and --commit completes[32m 40[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-2 (IF-23): a SUMMARY.md with NUL bytes refuses --commit (index.ts:833)[2m > [22mUTF-16LE with no BOM: --commit refuses, names the NUL bytes, and the tree is identical afterwards[32m 19[2mms[22m[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-2 (IF-23): a SUMMARY.md with NUL bytes refuses --commit (index.ts:833)[2m > [22mO8: the refusal reads 'SUMMARY.md contains', not 'SUMMARY.md is contains'[32m 17[2mms[22m[39m
+[31m   → expected [Function] to throw error matching /SUMMARY\.md contains \d+ NUL byte/ but got '.agents/SYSTEM/SUMMARY.md is contains…'[39m
+ [32m✓[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-3 (IF-24): the half-restored refusal[2m > [22mQ1: a marker with another day's date refuses both doors, and the tree is identical[32m 60[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-3 (IF-24): the half-restored refusal[2m > [22mQ17: a marker plus a state.json: --draft gives the half-restored refusal, not 'already exists'[32m 17[2mms[22m[39m
+ [31m×[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-3 (IF-24): the half-restored refusal[2m > [22mO10: the refusal says to keep a copy of the snapshot until the re-run completes[32m 16[2mms[22m[39m
+[31m   → expected [Function] to throw error matching /Keep a copy of the snapshot until the…/ but got '.agents/ is half-restored: an earlier…'[39m
+ [32m✓[39m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-3 (IF-24): the half-restored refusal[2m > [22mthe way out stays machine-readable: 'then delete <marker>. Nothing written', the shape QA 111's probes-r3.mjs parses to follow it[32m 9[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-atomic.test.ts[2m > [22mR2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before[2m > [22mfailing while writing state.json: the error names the failure, the tree is unchanged, and a second run completes[32m 125[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-atomic.test.ts[2m > [22mR2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before[2m > [22mfailing while writing SUMMARY.md: the error names the failure, the tree is unchanged, and a second run completes[32m 85[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-atomic.test.ts[2m > [22mR2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before[2m > [22mfailing while rendering task.md: the error names the failure, the tree is unchanged, and a second run completes[32m 87[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-atomic.test.ts[2m > [22mR2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before[2m > [22mfailing while rendering next-session.md: the error names the failure, the tree is unchanged, and a second run completes[32m 106[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-atomic.test.ts[2m > [22mR2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before[2m > [22mfailing while moving the draft into the snapshot: the error names the failure, the tree is unchanged, and a second run completes[32m 105[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-atomic.test.ts[2m > [22mR2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before[2m > [22mwith --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte[32m 95[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-atomic.test.ts[2m > [22mR2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before[2m > [22ma snapshot that fails part-way is removed, with archive/ if the snapshot created it, and a second run completes[32m 67[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-atomic.test.ts[2m > [22mR2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before[2m > [22mthe rollback says what it did in the error[32m 58[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-seeds.test.ts[2m > [22mT-175: an import carries none of SIA's own history (IF-1)[2m > [22mverified[] and gaps[] are empty, the draft parses, and the report says 0 for both[32m 48[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-seeds.test.ts[2m > [22mT-175: an import carries none of SIA's own history (IF-1)[2m > [22mthe CLI's draft line says verified 0 · gaps 0[33m 745[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-4 (IF-12): `state import` acts on exactly the project the operator named[2m > [22ma single-dash token that is not a known flag refuses, before or after the directory[33m 3294[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-4 (IF-12): `state import` acts on exactly the project the operator named[2m > [22mPROBE-12: a bare word before the directory is a second positional and refuses; the cwd's project is not committed[33m 2266[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-4 (IF-12): `state import` acts on exactly the project the operator named[2m > [22mPROBE-5b: a positional that names no existing directory refuses instead of walking up from the cwd[33m 1243[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-5 (IF-13): every protection has a test that fails without it[2m > [22mM6: a misspelled acknowledgement on a CURRENT project is refused by the flag check itself[33m 1224[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-5 (IF-13): every protection has a test that fails without it[2m > [22mM13: --accept-stale with --draft refuses and writes no draft[33m 611[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-5 (IF-13): every protection has a test that fails without it[2m > [22mM14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output[33m 1273[2mms[22m[39m
+ [32m✓[39m tests/pipelines/state-import-r2.test.ts[2m > [22mR2-5 (IF-13): every protection has a test that fails without it[2m > [22mM16: a marker that appears only in a heading is read, in both directions[32m 10[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 12 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mWindows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mUTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mUTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mUTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mUTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mUTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+[31m[1mAssertionError[22m: expected +0 to be 1 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 0[39m
+
+[36m [2m❯[22m tests/pipelines/state-import-r4.test.ts:[2m121:27[22m[39m
+    [90m119| [39m      [35mconst[39m before [33m=[39m [34mtree[39m(root)[33m;[39m
+    [90m120| [39m      [35mconst[39m bare [33m=[39m [34mcli[39m([[32m"state"[39m[33m,[39m [32m"import"[39m[33m,[39m [32m"--commit"[39m[33m,[39m root][33m,[39m root)[33m;[39m
+    [90m121| [39m      [34mexpect[39m(bare[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m1[39m)[33m;[39m
+    [90m   | [39m                          [31m^[39m
+    [90m122| [39m      [34mexpect[39m([34mtree[39m(root))[33m.[39m[34mtoEqual[39m(before)[33m;[39m
+    [90m123| [39m      [35mlet[39m nuls [33m=[39m [34m0[39m[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22min process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted
+[31m[1mAssertionError[22m: expected [Function] to throw an error[39m
+
+[32m- Expected:[39m 
+null
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2m❯[22m tests/pipelines/state-import-r4.test.ts:[2m141:42[22m[39m
+    [90m139| [39m    [34mrunDraft[39m(root[33m,[39m [33mTODAY[39m)[33m;[39m
+    [90m140| [39m    [35mconst[39m before [33m=[39m [34mtree[39m(root)[33m;[39m
+    [90m141| [39m    expect(() => runCommit(root, TODAY)).toThrow(new RegExp(`cannot be…
+    [90m   | [39m                                         [31m^[39m
+    [90m142| [39m    [34mexpect[39m([34mtree[39m(root))[33m.[39m[34mtoEqual[39m(before)[33m;[39m
+    [90m143| [39m    const r = runCommit(root, TODAY, { acceptStale: true }) as { accep…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale[2m > [22mthe draft's report says --commit refuses while an input cannot be read, and the CLI's draft summary says so too
+[31m[1mAssertionError[22m: expected '\nstate import — draft (nothing else …' to contain '--commit will REFUSE while .agents/TA…'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read[39m
+[31m+[39m
+[31m+ state import — draft (nothing else changed)[39m
+[31m+[39m
+[31m+ Root: C:\qa-tmp\ob-import-r4-DLnfxB[39m
+[31m+ Draft:  .agents/state.draft.json[39m
+[31m+ Report: .agents/state.import-report.md[39m
+[31m+ Validates: yes[39m
+[31m+ Current session: 7 (.agents/SESSIONS/Session_7.md)[39m
+[31m+ Staleness: 0 stale · 1 could not tell (.agents/TASKS/INBOX.md) · 2 current. Details are in the report's first section.[39m
+[31m+ Tasks: 0 (open 0, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 3[39m
+[31m+ Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found[39m
+[31m+ Handoff: pick_up 1 lines, watch_out 0, open_questions 0[39m
+[31m+ SUMMARY.md: --commit will remove 3 lines (1 blockquote + 0 Current State)[39m
+[31m+[39m
+[31m+ Review the report, then run: open-brain state import --commit[39m
+[31m+[39m
+
+[36m [2m❯[22m tests/pipelines/state-import-r4.test.ts:[2m152:22[22m[39m
+    [90m150| [39m    [35mconst[39m d [33m=[39m [34mcli[39m([[32m"state"[39m[33m,[39m [32m"import"[39m[33m,[39m [32m"--draft"[39m[33m,[39m root][33m,[39m root)[33m;[39m
+    [90m151| [39m    [34mexpect[39m(d[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m0[39m)[33m;[39m
+    [90m152| [39m    expect(d.stdout).toContain(`--commit will REFUSE while ${INBOX} ca…
+    [90m   | [39m                     [31m^[39m
+    [90m153| [39m    const report = readFileSync(join(root, ".agents/state.import-repor…
+    [90m154| [39m    expect(report).toContain("**`--commit` refuses while an input abov…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1's list (IF-22): every could-not-tell reason, and which of them block[2m > [22munreadable (NUL bytes): blocks
+[31m[1mAssertionError[22m: expected [Function] to throw an error[39m
+
+[32m- Expected:[39m 
+null
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2m❯[22m tests/pipelines/state-import-r4.test.ts:[2m173:56[22m[39m
+    [90m171| [39m      [34mmake[39m(root)[33m;[39m
+    [90m172| [39m      expect(inboxOf(runDraft(root, TODAY).draft.report).verdict).toBe…
+    [90m173| [39m      if (blocks) expect(() => runCommit(root, TODAY)).toThrow(/cannot…
+    [90m   | [39m                                                       [31m^[39m
+    [90m174| [39m      else expect(existsSync(runCommit(root, TODAY).statePath)).toBe(t…
+    [90m175| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-1's list (IF-22): every could-not-tell reason, and which of them block[2m > [22meach could-not-tell input carries its reason, so the report and the refusal read the same list
+[31m[1mAssertionError[22m: expected undefined to be 'unreadable' // Object.is equality[39m
+
+[32m- Expected:[39m 
+"unreadable"
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2m❯[22m tests/pipelines/state-import-r4.test.ts:[2m183:73[22m[39m
+    [90m181| [39m      [35mtry[39m {
+    [90m182| [39m        [34mmake[39m(r)[33m;[39m
+    [90m183| [39m        expect(inboxOf(runDraft(r, TODAY).draft.report).could_not_tell…
+    [90m   | [39m                                                                        [31m^[39m
+    [90m184| [39m      } [35mfinally[39m {
+    [90m185| [39m        rmSync(r, { recursive: true, force: true, maxRetries: 3, retry…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-2 (IF-23): a SUMMARY.md with NUL bytes refuses --commit (index.ts:833)[2m > [22mO8: the refusal reads 'SUMMARY.md contains', not 'SUMMARY.md is contains'
+[31m[1mAssertionError[22m: expected [Function] to throw error matching /SUMMARY\.md contains \d+ NUL byte/ but got '.agents/SYSTEM/SUMMARY.md is contains…'[39m
+
+[32m- Expected:[39m 
+/SUMMARY\.md contains \d+ NUL byte/
+
+[31m+ Received:[39m 
+".agents/SYSTEM/SUMMARY.md is contains NUL bytes, as UTF-16 without a byte-order mark would: its encoding is unknown, so its words cannot be read, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft"
+
+[36m [2m❯[22m tests/pipelines/state-import-r4.test.ts:[2m217:42[22m[39m
+    [90m215| [39m    writeFileSync(join(root, SUMMARY), Buffer.from("# Summary\r\n", "u…
+    [90m216| [39m    [34mrunDraft[39m(root[33m,[39m [33mTODAY[39m)[33m;[39m
+    [90m217| [39m    expect(() => runCommit(root, TODAY)).toThrow(/SUMMARY\.md contains…
+    [90m   | [39m                                         [31m^[39m
+    [90m218| [39m  })[33m;[39m
+    [90m219| [39m})[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/pipelines/state-import-r4.test.ts[2m > [22mR4-3 (IF-24): the half-restored refusal[2m > [22mO10: the refusal says to keep a copy of the snapshot until the re-run completes
+[31m[1mAssertionError[22m: expected [Function] to throw error matching /Keep a copy of the snapshot until the…/ but got '.agents/ is half-restored: an earlier…'[39m
+
+[32m- Expected:[39m 
+/Keep a copy of the snapshot until the re-run completes/
+
+[31m+ Received:[39m 
+".agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from .agents/archive/pre-state-migration-2026-09-25/, which holds every original, then delete .agents/archive/pre-state-migration-2026-09-25.import-incomplete. Nothing written"
+
+[36m [2m❯[22m tests/pipelines/state-import-r4.test.ts:[2m255:41[22m[39m
+    [90m253| [39m    [34mmkdirSync[39m([34mjoin[39m(root[33m,[39m snap)[33m,[39m { recursive[33m:[39m [35mtrue[39m })[33m;[39m
+    [90m254| [39m    [34mwriteFileSync[39m([34mjoin[39m(root[33m,[39m [32m`[39m[36m${[39msnap[36m}[39m[32m.import-incomplete`[39m)[33m,[39m [32m"died\n"[39m)[33m;[39m
+    [90m255| [39m    expect(() => runDraft(root, TODAY)).toThrow(/Keep a copy of the sn…
+    [90m   | [39m                                        [31m^[39m
+    [90m256| [39m  })[33m;[39m
+    [90m257| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m6 passed[39m[22m[90m (7)[39m
+[2m      Tests [22m [1m[31m12 failed[39m[22m[2m | [22m[1m[32m71 passed[39m[22m[90m (83)[39m
+[2m   Start at [22m 22:52:18
+[2m   Duration [22m 14.67s[2m (transform 484ms, setup 285ms, collect 2.00s, tests 28.44s, environment 2ms, prepare 1.42s)[22m
+

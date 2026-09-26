@@ -1,0 +1,107 @@
+original hashes: index.ts cd7922a2cfdf, cli.ts c4250168cc3a; HEAD 2005a3e
+M1 [T-175: no seeds (IF-1)] diff 28	2	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 3/45
+    red: state-import-seeds.test.ts :: T-175: an import carries none of SIA's own history (IF-1) verified[] and gaps[] are empty, the draft parses, and the report says 0 for both
+    red: state-import-seeds.test.ts :: T-175: an import carries none of SIA's own history (IF-1) the CLI's draft line says verified 0 · gaps 0
+    red: state-import.test.ts :: state import (Loop 4 C1) on a fixture built from this repo's prose files --draft writes a schema-valid draft + report and changes nothing else; counts match the hand count of INBOX boxes (V5)
+M2 [T-180: the detector (IF-2)] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 9/45
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' PROBE-8: a leading UTF-8 BOM on each input gives the same verdicts, with the same evidence, as the same inputs without it
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' UTF-16 with a BOM (what Windows PowerShell 5.1's `>` and Out-File write) is read, not filed as unmarked
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing
+    red: state-import-r2.test.ts :: R2-2 (IF-10): an input that declares a session AHEAD of the latest log is not 'current' PROBE-1: next-session declares 20 against log 7 → could not tell, with a reason naming both numbers
+    red: state-import-r2.test.ts :: R2-5 (IF-13): every protection has a test that fails without it M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output
+    red: state-import-r2.test.ts :: R2-5 (IF-13): every protection has a test that fails without it M16: a marker that appears only in a heading is read, in both directions
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-2: A2A-Hub at e0bc3f8, the known positive --draft names next-session.md as stale, with evidence, in the report's first section
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-2: A2A-Hub at e0bc3f8, the known positive --commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-2: A2A-Hub at e0bc3f8, the known positive the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale
+M3 [T-180: could-not-tell is never current (IF-4); re-anchored on round 1's two pushes] diff 2	2	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 3/45
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-4: an input the detector cannot judge is reported, never counted as current an input with no session marker is 'could not tell', named in the report's first section
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-4: an input the detector cannot judge is reported, never counted as current --commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-4: an input the detector cannot judge is reported, never counted as current with no Session_N.md to compare against, every present input is 'could not tell'
+M4 [ruling 1b: --commit prints the could-not-tell line] diff 0	1	open-brain/src/cli.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-4: an input the detector cannot judge is reported, never counted as current --commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report
+M5 [ruling 1a: a could-not-tell line carries its reason] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-4: an input the detector cannot judge is reported, never counted as current an input with no session marker is 'could not tell', named in the report's first section
+M6 [T-150: an unrecognised flag refuses] diff 1	1	open-brain/src/cli.ts | tsc exit 0 | vitest exit 1 | red 3/45
+    red: state-import-r2.test.ts :: R2-4 (IF-12): `state import` acts on exactly the project the operator named a single-dash token that is not a known flag refuses, before or after the directory
+    red: state-import-r2.test.ts :: R2-5 (IF-13): every protection has a test that fails without it M6: a misspelled acknowledgement on a CURRENT project is refused by the flag check itself
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-2: A2A-Hub at e0bc3f8, the known positive the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale
+VOID M7: edit in src/pipelines/state-import/index.ts matched 0 times, expected 1: "  if (stale.length > 0 && opts.acceptStale !== true) {\n    const list "
+VOID M8: edit in src/pipelines/state-import/index.ts matched 0 times, expected 1: "if (stale.length > 0 && opts.acceptStale !== true) {"
+VOID M9: edit in src/pipelines/state-import/index.ts matched 0 times, expected 1: "if (stale.length > 0 && opts.acceptStale !== true) {"
+M10 [T-180: the staleness section is FIRST] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 2/45
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-2: A2A-Hub at e0bc3f8, the known positive --draft names next-session.md as stale, with evidence, in the report's first section
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-4: an input the detector cannot judge is reported, never counted as current an input with no session marker is 'could not tell', named in the report's first section
+M11 [T-180: a STALE line carries its evidence] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-2: A2A-Hub at e0bc3f8, the known positive --draft names next-session.md as stale, with evidence, in the report's first section
+M12 [T-180: one session behind is stale] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 8/45
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' PROBE-8: a leading UTF-8 BOM on each input gives the same verdicts, with the same evidence, as the same inputs without it
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' UTF-16 with a BOM (what Windows PowerShell 5.1's `>` and Out-File write) is read, not filed as unmarked
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing
+    red: state-import-r2.test.ts :: R2-2 (IF-10): an input that declares a session AHEAD of the latest log is not 'current' PROBE-1: next-session declares 20 against log 7 → could not tell, with a reason naming both numbers
+    red: state-import-r2.test.ts :: R2-5 (IF-13): every protection has a test that fails without it M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-2: A2A-Hub at e0bc3f8, the known positive --draft names next-session.md as stale, with evidence, in the report's first section
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-2: A2A-Hub at e0bc3f8, the known positive --commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it
+    red: state-import-staleness.test.ts :: T-180: a stale input is named at the top of the report and gates --commit IF-2: A2A-Hub at e0bc3f8, the known positive the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale
+M13 [CLI: --accept-stale refused with --draft] diff 1	1	open-brain/src/cli.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-5 (IF-13): every protection has a test that fails without it M13: --accept-stale with --draft refuses and writes no draft
+M14 [CLI: --commit names what it imported STALE] diff 0	1	open-brain/src/cli.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-5 (IF-13): every protection has a test that fails without it M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output
+M15 [CLI: the --draft Staleness: summary] diff 1	1	open-brain/src/cli.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-5 (IF-13): every protection has a test that fails without it M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output
+M16 [the detector reads headings] diff 0	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-5 (IF-13): every protection has a test that fails without it M16: a marker that appears only in a heading is read, in both directions
+N1 [R2-1: the UTF-8 BOM strip] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 4/45
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' PROBE-8: a leading UTF-8 BOM on each input gives the same verdicts, with the same evidence, as the same inputs without it
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' the sibling reads share the fix: a BOM-led task.md whose first line is `## Current Objective`, and a BOM-led log's date
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' SUMMARY.md with a BOM: --commit still cuts its status blockquote, and the rendered region lands under the title
+N2 [R2-1: UTF-16LE (BOM) decode] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 2/45
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' UTF-16 with a BOM (what Windows PowerShell 5.1's `>` and Out-File write) is read, not filed as unmarked
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' SUMMARY.md in UTF-16: --commit cuts its blockquote and writes it back as UTF-8, which the renderer and ob_state read
+N3 [R2-1: UTF-16BE (BOM) decode] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' UTF-16 with a BOM (what Windows PowerShell 5.1's `>` and Out-File write) is read, not filed as unmarked
+N4 [R2-1: an undecodable input gets an encoding reason] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' UTF-16 with no BOM (NUL bytes) is the shape that cannot be read: could not tell, and it says why rather than 'names no Session N'
+N5 [R2-1: an undecodable SUMMARY.md refuses --commit] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' SUMMARY.md in UTF-16LE with no BOM (NUL bytes): --commit refuses before anything is written
+N6 [R2-1: SUMMARY.md read through the decoder] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 2/45
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' SUMMARY.md with a BOM: --commit still cuts its status blockquote, and the rendered region lands under the title
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' SUMMARY.md in UTF-16: --commit cuts its blockquote and writes it back as UTF-8, which the renderer and ob_state read
+N7 [R2-1: the latest log's date read through the decoder] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' the sibling reads share the fix: a BOM-led task.md whose first line is `## Current Objective`, and a BOM-led log's date
+N8 [R2-2: ahead of the log is not current] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-2 (IF-10): an input that declares a session AHEAD of the latest log is not 'current' PROBE-1: next-session declares 20 against log 7 → could not tell, with a reason naming both numbers
+VOID N9: edit in src/pipelines/state-import/index.ts matched 0 times, expected 1: "throw new Error(`${why}. ${rollBack(agents, snapshot.dir, archiveExist"
+N10 [R2-3: view directories created] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-3 (IF-11): an import completes, or it changes nothing PROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist
+N11 [R2-3: a replaced snapshot is kept aside] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte
+N12 [R2-3: the aside copy is removed on success] diff 0	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte
+VOID N13: edit in src/pipelines/state-import/index.ts matched 0 times, expected 1: "    rmSync(snapshotDir, { recursive: true, force: true });\n    if (!ar"
+VOID N13b: edit in src/pipelines/state-import/index.ts matched 0 times, expected 1: "    rmSync(snapshotDir, { recursive: true, force: true });\n    if (!ar"
+VOID N14: edit in src/pipelines/state-import/index.ts matched 0 times, expected 1: "  if (!archiveExisted) rmSync(join(agents, \"archive\"), { recursive: tr"
+N15 [R2-4: a '-'-prefixed unknown token refuses] diff 1	1	open-brain/src/cli.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-4 (IF-12): `state import` acts on exactly the project the operator named a single-dash token that is not a known flag refuses, before or after the directory
+N16 [R2-4: a second positional refuses] diff 1	1	open-brain/src/cli.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-4 (IF-12): `state import` acts on exactly the project the operator named PROBE-12: a bare word before the directory is a second positional and refuses; the cwd's project is not committed
+N17 [R2-4: a missing directory refuses] diff 1	1	open-brain/src/cli.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-r2.test.ts :: R2-4 (IF-12): `state import` acts on exactly the project the operator named PROBE-5b: a positional that names no existing directory refuses instead of walking up from the cwd
+R1 [rollback: delete what the failed import wrote] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 5/45
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before failing while writing SUMMARY.md: the error names the failure, the tree is unchanged, and a second run completes
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before failing while rendering task.md: the error names the failure, the tree is unchanged, and a second run completes
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before failing while rendering next-session.md: the error names the failure, the tree is unchanged, and a second run completes
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before failing while moving the draft into the snapshot: the error names the failure, the tree is unchanged, and a second run completes
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte
+R2 [rollback: copy the snapshot back] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 6/45
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before failing while writing state.json: the error names the failure, the tree is unchanged, and a second run completes
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before failing while writing SUMMARY.md: the error names the failure, the tree is unchanged, and a second run completes
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before failing while rendering task.md: the error names the failure, the tree is unchanged, and a second run completes
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before failing while rendering next-session.md: the error names the failure, the tree is unchanged, and a second run completes
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before failing while moving the draft into the snapshot: the error names the failure, the tree is unchanged, and a second run completes
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte
+VOID R3: edit in src/pipelines/state-import/index.ts matched 0 times, expected 1: "  rmSync(snapshotDir, { recursive: true, force: true });\n  if (!archiv"
+R4 [rollback: put a --force-snapshot's earlier snapshot back] diff 0	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 1 | red 1/45
+    red: state-import-atomic.test.ts :: R2-3 (IF-11): a failure at any write after the snapshot leaves the project byte-identical to before with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte
+E1 [(equivalent) ignoreBOM back to TextDecoder's default] diff 1	1	open-brain/src/pipelines/state-import/index.ts | tsc exit 0 | vitest exit 0 | red 0/45
+restored: index.ts cd7922a2cfdf cli.ts c4250168cc3a (original cd7922a2cfdf / c4250168cc3a); git status --porcelain: clean

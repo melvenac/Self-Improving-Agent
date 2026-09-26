@@ -1,0 +1,100 @@
+source src/pipelines/state-import/index.ts sha256/12 cd7922a2cfdf (restored after every mutant)
+
+M7-r4: RED 13/83 (vitest exit 1) — QA 106's M7 on R4-1's line: the stale/unreadable refusal comes before the snapshot (moved below the snapshot's try/catch)
+    state-import-r2.test.ts > the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing
+    state-import-r3.test.ts > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted
+    state-import-staleness.test.ts > --commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it
+    state-import-staleness.test.ts > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale
+M8-r4: RED 14/83 (vitest exit 1) — QA 106's M8 on R4-1's line: --commit re-judges and refuses
+    state-import-r2.test.ts > the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing
+    state-import-r3.test.ts > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted
+    state-import-r4.test.ts > unreadable (NUL bytes): blocks
+    state-import-staleness.test.ts > --commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it
+    state-import-staleness.test.ts > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale
+M9-r4: RED 14/83 (vitest exit 1) — QA 106's M9 on R4-1's line: --accept-stale lets --commit proceed
+    state-import-r2.test.ts > M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output
+    state-import-r3.test.ts > the same with --accept-stale on a stale project: refused, and the snapshot is byte-identical afterwards
+    state-import-r3.test.ts > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted
+    state-import-staleness.test.ts > --commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it
+    state-import-staleness.test.ts > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale
+R41-block: RED 9/83 (vitest exit 1) — R4-1: an unreadable input blocks a bare --commit
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted
+    state-import-r4.test.ts > the draft's report says --commit refuses while an input cannot be read, and the CLI's draft summary says so too
+    state-import-r4.test.ts > unreadable (NUL bytes): blocks
+R41-scope: RED 9/83 (vitest exit 1) — R4-1's list: only the unreadable reason blocks; the other three could-not-tell reasons do not
+    state-import-r2.test.ts > PROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist
+    state-import-r4.test.ts > no SESSIONS/Session_N.md to compare against: does not block
+    state-import-r4.test.ts > names no Session N: does not block
+    state-import-r4.test.ts > declares Session 20, ahead of the latest log (Session 7): does not block
+    state-import-r4.test.ts > IF-10: declares Session 20 against a latest of 7: could not tell, both numbers named, and --commit completes
+    state-import-r4.test.ts > IF-10: declares Session 8 against a latest of 7: could not tell, both numbers named, and --commit completes
+    state-import-staleness.test.ts > --commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report
+    state-import.test.ts > --commit: snapshot byte-complete before any change (P2), state.json rev 0, SUMMARY cut (line counts), four views rendered, draft moved, prose sections byte-identical (P8), second commit refuses (V5)
+    state-import.test.ts > --commit refuses without a draft, on a draft that does not validate, and on an existing snapshot without --force-snapshot
+R41-reason: RED 10/83 (vitest exit 1) — R4-1: the NUL verdict carries its reason, which is what blocks
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted
+    state-import-r4.test.ts > the draft's report says --commit refuses while an input cannot be read, and the CLI's draft summary says so too
+    state-import-r4.test.ts > unreadable (NUL bytes): blocks
+    state-import-r4.test.ts > each could-not-tell input carries its reason, so the report and the refusal read the same list
+R41-refusal: RED 8/83 (vitest exit 1) — R4-1: runCommit's refusal counts the unreadable inputs, not only the stale ones
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted
+    state-import-r4.test.ts > unreadable (NUL bytes): blocks
+R42-Q20: RED 3/83 (vitest exit 1) — R4-2: a SUMMARY.md with NUL bytes refuses --commit (index.ts:833; QA 111 Q20 = QA 106 N5)
+    state-import-r2.test.ts > SUMMARY.md in UTF-16LE with no BOM (NUL bytes): --commit refuses before anything is written
+    state-import-r4.test.ts > UTF-16LE with no BOM: --commit refuses, names the NUL bytes, and the tree is identical afterwards
+    state-import-r4.test.ts > O8: the refusal reads 'SUMMARY.md contains', not 'SUMMARY.md is contains'
+Q1: RED 1/83 (vitest exit 1) — R4-3: a marker from ANY day refuses, not only today's
+    state-import-r4.test.ts > Q1: a marker with another day's date refuses both doors, and the tree is identical
+Q17: RED 1/83 (vitest exit 1) — R4-3: --draft reads the marker before state.json's own refusal
+    state-import-r4.test.ts > Q17: a marker plus a state.json: --draft gives the half-restored refusal, not 'already exists'
+O8: RED 1/83 (vitest exit 1) — O8: the :833 refusal reads 'SUMMARY.md contains', not 'is contains'
+    state-import-r4.test.ts > O8: the refusal reads 'SUMMARY.md contains', not 'SUMMARY.md is contains'
+O10: RED 1/83 (vitest exit 1) — O10: the half-restored refusal says to keep a copy of the snapshot
+    state-import-r4.test.ts > O10: the refusal says to keep a copy of the snapshot until the re-run completes
+O10-order: RED 1/83 (vitest exit 1) — O10: the added sentence comes after 'Nothing written', so the way out stays parseable (this seat's first placement)
+    state-import-r4.test.ts > the way out stays machine-readable: 'then delete <marker>. Nothing written', the shape QA 111's probes-r3.mjs parses to follow it
