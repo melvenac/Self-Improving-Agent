@@ -1,0 +1,98 @@
+
+> P6: bootstrap interrupted after step 3 (scaffold) and resumed in a new session: step 1's check, then step 1's table (PRE-STATE -> skip to step 6)
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p5
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 10 uncommitted change(s)
+CLAUDE.md: present, without the SIA section
+.agents/:  PRE-STATE — TASKS/ with no state.json (the import path)
+Next:      An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.
+[exit 0]
+
+$ OB state import --draft
+
+state import — draft (nothing else changed)
+
+Root: C:\qa-scratch\probes\p5
+Draft:  .agents/state.draft.json
+Report: .agents/state.import-report.md
+Validates: yes
+Current session: 0 ((no Session_N.md))
+Staleness: 0 stale · 2 could not tell (.agents/TASKS/INBOX.md, .agents/TASKS/task.md) · 0 current. Details are in the report's first section.
+Tasks: 10 (open 10, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 17
+Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+Handoff: pick_up 0 lines, watch_out 0, open_questions 0
+SUMMARY.md: --commit will remove 24 lines (2 blockquote + 20 Current State)
+
+Review the report, then run: open-brain state import --commit
+[exit 0]
+
+$ node -e const d=require("./.agents/state.draft.json");console.log(d.tasks.map(t=>t.priority+" "+t.title).join("\n"));console.log("objective:",JSON.stringify(d.objective))
+P0 Write the PRD (`.agents/SYSTEM/PRD.md`)
+P1 Derive ENTITIES.md from PRD data model
+P1 Derive RULES.md from PRD tech stack
+P1 Create initial SUMMARY.md with project state
+P1 Start Session 1
+P2 Create first tech-specific skill (after Session 2-3)
+P2 Wire up validation scripts (after Session 5+)
+P3 Create TESTING.md after first feature ships
+P3 Create RUNBOOK.md before production deploy
+P3 Create SECURITY.md before production deploy
+objective: {"text":"**Write the PRD**","since_session":0}
+[exit 0]
+
+> P7: a project with no package.json inside a PARENT folder that has package.json + .agents/SYSTEM + .agents/TASKS (a pre-state project, not a git repo), the child being its own git repository
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p7\child
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 0 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  absent
+Next:      Scaffold (`bootstrap scaffold`).
+[exit 0]
+
+$ OB bootstrap scaffold
+bootstrap scaffold — C:\qa-scratch\probes\p7\child
+Template: C:\qa-scratch\cand\project-template
+
+Written (tracked = committed with the project; local = this disk only, by design):
+  tracked  copied    .agents/TASKS/INBOX.md — the task list `state import` reads into the record; afterwards a rendered view of it
+  tracked  copied    .agents/TASKS/task.md — the current objective `state import` reads; afterwards a rendered view
+  tracked  copied    .agents/SYSTEM/SUMMARY.md — the project summary; its marked region is rendered from the record
+  local    copied    .agents/SESSIONS/SESSION_TEMPLATE.md — the shape of each per-session log, and session logs are local
+  tracked  generated .agents/AGENT.md — declares this checkout is not a seat (role: none), so /start says so instead of NO SEAT IDENTITY RESOLVED
+  tracked  copied    .claude/commands/start.md — /start — travels with the project, so a clone on another machine has it
+  tracked  copied    .claude/commands/end.md — /end — store the session's lessons
+  tracked  copied    .claude/commands/task.md — /task — pick up the next priority
+  tracked  copied    .claude/commands/sync.md — /sync — validate before a commit
+  tracked  created   .gitignore — tracks the record and its views under .agents/ and keeps the rest local
+  tracked  created   .gitattributes — keeps .agents/ LF on every checkout, so core.autocrlf cannot rewrite the record's bytes
+
+Verified with git: every file above is tracked or ignored exactly as stated; state.json and next-session.md will be tracked; session logs and archive/ will not; .agents/ is eol=lf.
+[exit 0]
+
+$ OB state import --draft
+
+state import — draft (nothing else changed)
+
+Root: C:\qa-scratch\probes\p7
+Draft:  .agents/state.draft.json
+Report: .agents/state.import-report.md
+Validates: yes
+Current session: 0 ((no SESSIONS/ directory))
+Staleness: 0 stale · 1 could not tell (.agents/TASKS/INBOX.md) · 0 current. Details are in the report's first section.
+Tasks: 1 (open 1, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 0
+Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective NOT found
+Handoff: pick_up 0 lines, watch_out 0, open_questions 0
+
+Review the report, then run: open-brain state import --commit
+[exit 0]
+
+$ ls ../.agents
+SYSTEM
+TASKS
+state.draft.json
+state.import-report.md
+[exit 0]

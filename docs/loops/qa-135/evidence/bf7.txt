@@ -1,0 +1,130 @@
+
+> BF-7: clone install (i) with the system's core.autocrlf=true, count CR bytes, then an ob_state write in the clone.
+
+$ git clone -q /c/qa-scratch/i/arcade clone
+[exit 0]
+
+$ git config --show-origin --get core.autocrlf
+file:C:/Program Files/Git/etc/gitconfig	true
+[exit 0]
+.agents/state.json CR=0
+.agents/TASKS/INBOX.md CR=0
+.agents/TASKS/task.md CR=0
+.agents/SESSIONS/next-session.md CR=0
+.agents/SYSTEM/SUMMARY.md CR=0
+.agents/AGENT.md CR=0
+CLAUDE.md CR=16
+.gitattributes CR=10
+
+> ob_state write 1 in the clone (session 1, rev 0): close_task T-001, then set_handoff developer. The checkout is role: none.
+
+$ node /c/qa-scratch/ob-state.mjs C:\qa-scratch\bf7\clone aaaaaaaa-1111-4111-8111-000000000001 1 0 [{"op":"close_task","id":"T-001"},{"op":"set_handoff","seat":"developer","pick_up":"level 3","watch_out":[],"open_questions":[]}]
+[ob_set_session] Session registered: aaaaaaaa-1111-4111-8111-000000000001 (C:\qa-scratch\bf7\clone) [via argument]
+ob_state applied
+Revision: 0 → 1
+Applied (2):
+  close_task T-001
+  set_handoff developer
+Dropped done tasks (retention 3 sessions): none
+Superseded (a newer entry of the same seat and checkout, with >10 sessions written since; or a legacy handoff whose seat has written a keyed one): handoff developer@0 (developer, legacy, session 0)
+Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+[exit 0]
+
+$ git status --short
+ M .agents/SESSIONS/next-session.md
+ M .agents/SYSTEM/SUMMARY.md
+ M .agents/TASKS/INBOX.md
+ M .agents/TASKS/task.md
+ M .agents/state.json
+[exit 0]
+
+$ git diff --stat
+ .agents/SESSIONS/next-session.md |  8 ++++----
+ .agents/SYSTEM/SUMMARY.md        |  3 +--
+ .agents/TASKS/INBOX.md           |  5 ++---
+ .agents/TASKS/task.md            |  3 +--
+ .agents/state.json               | 26 +++++++++++++++++---------
+ 5 files changed, 25 insertions(+), 20 deletions(-)
+[exit 0]
+.agents/state.json CR=0
+.agents/TASKS/INBOX.md CR=0
+.agents/SYSTEM/SUMMARY.md CR=0
+
+$ git -c user.name=QA135 -c user.email=qa135@example.invalid commit -qam session 1
+[exit 0]
+
+> Round trip: delete the working files and check them out again, then write 2 at rev 1.
+
+$ git checkout -- .
+[exit 0]
+
+$ git status --short
+[exit 0]
+state.json CR=0
+
+$ node /c/qa-scratch/ob-state.mjs C:\qa-scratch\bf7\clone aaaaaaaa-1111-4111-8111-000000000002 2 1 [{"op":"update_task","id":"T-002","status":"in_progress"}]
+[ob_set_session] Session registered: aaaaaaaa-1111-4111-8111-000000000002 (C:\qa-scratch\bf7\clone) [via argument]
+ob_state applied
+Revision: 1 → 2
+Applied (1):
+  update_task T-002
+Dropped done tasks (retention 3 sessions): none
+Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+[exit 0]
+
+$ git status --short
+ M .agents/SESSIONS/next-session.md
+ M .agents/SYSTEM/SUMMARY.md
+ M .agents/TASKS/INBOX.md
+ M .agents/TASKS/task.md
+ M .agents/state.json
+[exit 0]
+
+$ git diff --stat
+ .agents/SESSIONS/next-session.md |  4 ++--
+ .agents/SYSTEM/SUMMARY.md        |  3 +--
+ .agents/TASKS/INBOX.md           |  4 ++--
+ .agents/TASKS/task.md            |  4 ++--
+ .agents/state.json               | 12 ++++++++++--
+ 5 files changed, 17 insertions(+), 10 deletions(-)
+[exit 0]
+
+> Control (known positive): the same clone with .gitattributes removed and the tree checked out again.
+control .agents/state.json CR=72
+control .agents/TASKS/INBOX.md CR=20
+control .agents/SYSTEM/SUMMARY.md CR=42
+
+$ node /c/qa-scratch/ob-state.mjs C:\qa-scratch\bf7\ctl aaaaaaaa-1111-4111-8111-00000000000c 1 0 [{"op":"close_task","id":"T-001"}]
+[ob_set_session] Session registered: aaaaaaaa-1111-4111-8111-00000000000c (C:\qa-scratch\bf7\ctl) [via argument]
+ob_state applied
+Revision: 0 → 1
+Applied (1):
+  close_task T-001
+Dropped done tasks (retention 3 sessions): none
+Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+[exit 0]
+control after write .agents/state.json CR=0
+control after write .agents/TASKS/INBOX.md CR=0
+control after write .agents/SYSTEM/SUMMARY.md CR=21
+
+$ git status --short
+ M .agents/SESSIONS/next-session.md
+ M .agents/SYSTEM/SUMMARY.md
+ M .agents/TASKS/INBOX.md
+ M .agents/TASKS/task.md
+ M .agents/state.json
+[exit 0]
+
+$ git diff --stat
+warning: in the working copy of '.agents/SESSIONS/next-session.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/SUMMARY.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/TASKS/INBOX.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/TASKS/task.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/state.json', LF will be replaced by CRLF the next time Git touches it
+ .agents/SESSIONS/next-session.md |  4 ++--
+ .agents/SYSTEM/SUMMARY.md        |  3 +--
+ .agents/TASKS/INBOX.md           |  5 ++---
+ .agents/TASKS/task.md            |  3 +--
+ .agents/state.json               | 16 ++++++++++++----
+ 5 files changed, 18 insertions(+), 13 deletions(-)
+[exit 0]

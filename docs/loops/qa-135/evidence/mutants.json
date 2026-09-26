@@ -1,0 +1,265 @@
+[
+  {
+    "name": "M1-residue-deleted",
+    "why": "move-residue deletes the residue and reports it moved",
+    "landed": true,
+    "tsc": 2,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-3: `open-brain bootstrap check` / `move-residue` move-residue moves it under .agents/archive/, byte for byte, and deletes nothing :: AssertionError: expected false to be true // Object.is equality"
+    ],
+    "passed": 51,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M1b-residue-emptied",
+    "why": "move-residue moves the names but not the bytes (each file emptied)",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-3: `open-brain bootstrap check` / `move-residue` move-residue moves it under .agents/archive/, byte for byte, and deletes nothing :: AssertionError: expected false to be true // Object.is equality"
+    ],
+    "passed": 51,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M2-no-zero-task-warning",
+    "why": "the 0-task WARNING is removed",
+    "landed": true,
+    "tsc": 2,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-1: the scaffolded INBOX imports, and an INBOX that yields 0 tasks says so an INBOX with items but no P-section: the draft summary and the report both carry a WARNING naming 0 tasks :: AssertionError: expected 'Tasks: 0 (open 0, in_progress 0, bloc…' to match /WARNING/"
+    ],
+    "passed": 51,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M3a-template-state-restored",
+    "why": "the template's placeholder state.json is back in project-template/",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project BF-2: the template ships no state.json (the importer is its only producer) :: AssertionError: expected true to be false // Object.is equality",
+      "template-seed.test.ts > project-template/.agents ships no state.json seed :: AssertionError: expected true to be false // Object.is equality"
+    ],
+    "passed": 50,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M3b-template-state-copied",
+    "why": "the template state.json is back AND scaffold copies it",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-5: role: none with no roles/ directory reports NOT A SEAT and raises no problem a not-a-seat project CAN hand off: set_handoff through the writer, with the checkout's seat null :: AssertionError: expected 1 to be +0 // Object.is equality",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project BF-2: the template ships no state.json (the importer is its only producer) :: AssertionError: expected true to be false // Object.is equality",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project the whole path: scaffold -> draft -> commit -> ob_start, with tracked/local exactly as scaffold said :: AssertionError: expected [ '.agents/state.json', …(11) ] to not include '.agents/state.json'",
+      "template-seed.test.ts > project-template/.agents ships no state.json seed :: AssertionError: expected true to be false // Object.is equality"
+    ],
+    "passed": 48,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M4-pre-state-is-residue",
+    "why": "prose TASKS/ is no longer PRE-STATE, so move-residue would move a real project's tasks aside",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-3: `open-brain bootstrap check` / `move-residue` a record (state.json) is BOOTSTRAPPED and prose TASKS/ is PRE-STATE; move-residue refuses both and moves nothing :: AssertionError: expected 'residue' to be 'pre-state' // Object.is equality"
+    ],
+    "passed": 51,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M5-record-is-residue",
+    "why": "a state.json no longer means BOOTSTRAPPED",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-3: `open-brain bootstrap check` / `move-residue` a record (state.json) is BOOTSTRAPPED and prose TASKS/ is PRE-STATE; move-residue refuses both and moves nothing :: AssertionError: expected 'residue' to be 'bootstrapped' // Object.is equality"
+    ],
+    "passed": 51,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M6-not-a-seat-role-missing",
+    "why": "role: none reports ROLE FILE MISSING again (BF-5)",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-5: role: none with no roles/ directory reports NOT A SEAT and raises no problem no ROLE FILE MISSING for shared.md when the checkout declares it is not a seat :: AssertionError: expected [ Array(1) ] to deeply equal []",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project the whole path: scaffold -> draft -> commit -> ob_start, with tracked/local exactly as scaffold said :: AssertionError: expected 'Tree currency: NOT CHECKED — origin/m…' not to contain 'ROLE FILE MISSING'"
+    ],
+    "passed": 50,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M7-template-eol-dropped",
+    "why": "the template gitattributes no longer forces eol=lf (BF-7)",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-5: role: none with no roles/ directory reports NOT A SEAT and raises no problem a not-a-seat project CAN hand off: set_handoff through the writer, with the checkout's seat null :: AssertionError: expected 1 to be +0 // Object.is equality",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project the whole path: scaffold -> draft -> commit -> ob_start, with tracked/local exactly as scaffold said :: AssertionError: expected 1 to be +0 // Object.is equality",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project scaffold never overwrites: an existing .claude/commands/start.md is kept and reported as skipped :: AssertionError: expected 1 to be +0 // Object.is equality",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project residue moved BEFORE git init: the pre-SIA commit leaves .agents/ out, and the moved residue does not make scaffold refuse :: AssertionError: expected 1 to be +0 // Object.is equality",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project residue git already tracked: check names the removal commit, and after it scaffold proceeds :: AssertionError: expected 1 to be +0 // Object.is equality",
+      "template-seed.test.ts > project-template/.agents the template's gitattributes (shipped without the dot) keeps .agents/ LF :: AssertionError: expected [ '/.agents/** text' ] to deeply equal [ '/.agents/** text eol=lf' ]"
+    ],
+    "passed": 46,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M8-scaffold-overwrites",
+    "why": "scaffold overwrites an existing file",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project scaffold never overwrites: an existing .claude/commands/start.md is kept and reported as skipped :: AssertionError: expected [] to include '.claude/commands/start.md'"
+    ],
+    "passed": 51,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M9-future-tracked-unchecked",
+    "why": "verify no longer checks that state.json/next-session.md will be tracked",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project the tracking check fires (known positive): an owner's `.agents/` rule shadows the template's, and scaffold exits 1 naming it :: AssertionError: expected '.agents/TASKS/INBOX.md: scaffold call…' to match /…/state\\.json: the import writes it and it must be tracked, but git ignores it"
+    ],
+    "passed": 51,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M10-agent-md-untracked",
+    "why": "the template gitignore no longer tracks AGENT.md (BF-5 in a clone)",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-5: role: none with no roles/ directory reports NOT A SEAT and raises no problem a not-a-seat project CAN hand off: set_handoff through the writer, with the checkout's seat null :: AssertionError: expected 1 to be +0 // Object.is equality",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project the whole path: scaffold -> draft -> commit -> ob_start, with tracked/local exactly as scaffold said :: AssertionError: expected 1 to be +0 // Object.is equality",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project scaffold never overwrites: an existing .claude/commands/start.md is kept and reported as skipped :: AssertionError: expected 1 to be +0 // Object.is equality",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project residue moved BEFORE git init: the pre-SIA commit leaves .agents/ out, and the moved residue does not make scaffold refuse :: AssertionError: expected 1 to be +0 // Object.is equality",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project residue git already tracked: check names the removal commit, and after it scaffold proceeds :: AssertionError: expected 1 to be +0 // Object.is equality",
+      "template-seed.test.ts > project-template/.agents the template's gitignore (shipped without the dot) tracks exactly the five state files and AGENT.md :: AssertionError: expected [ '/.agents/*', …(11) ] to deeply equal [ '/.agents/*', …(12) ]"
+    ],
+    "passed": 46,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M11-archive-counts-dirty",
+    "why": "the moved residue under archive/ makes the tree dirty (scaffold would refuse)",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project residue moved BEFORE git init: the pre-SIA commit leaves .agents/ out, and the moved residue does not make scaffold refuse :: AssertionError: expected [ Array(1) ] to deeply equal []",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project residue git already tracked: check names the removal commit, and after it scaffold proceeds :: AssertionError: expected [ …(2) ] to deeply equal [ ' D .agents/reflection-queue.json' ]"
+    ],
+    "passed": 50,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M12-section-re-reverted",
+    "why": "SECTION_RE back to /^## (P[0-3])\\b/ (the template's emoji headings stop parsing)",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-1: the scaffolded INBOX imports, and an INBOX that yields 0 tasks says so the template's own INBOX.md imports every item in it (its headings carry an emoji before P0..P3) :: AssertionError: expected +0 to be 10 // Object.is equality",
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project the whole path: scaffold -> draft -> commit -> ob_start, with tracked/local exactly as scaffold said :: AssertionError: expected '\\nstate import — draft (nothing else …' not to match /WARNING/"
+    ],
+    "passed": 50,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M13-landed-check-removed",
+    "why": "move-residue no longer reads back what landed",
+    "landed": true,
+    "tsc": 0,
+    "failed": [],
+    "passed": 52,
+    "total": 52,
+    "verdict": "SURVIVED",
+    "restored": true
+  },
+  {
+    "name": "M14-claude-md-any-heading",
+    "why": "check treats any CLAUDE.md as already carrying the SIA section (the append is never offered)",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-3: `open-brain bootstrap check` / `move-residue` an .agents/ with no state.json and no TASKS/ is RESIDUE, and names what is in it :: AssertionError: expected 'has-sia-section' to be 'present' // Object.is equality",
+      "bootstrap-fix.test.ts > BF-3: `open-brain bootstrap check` / `move-residue` CLAUDE.md: absent, present, and present with the SIA section are three answers :: AssertionError: expected 'has-sia-section' to be 'present' // Object.is equality"
+    ],
+    "passed": 50,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M15-agent-md-role-developer",
+    "why": "scaffold's AGENT.md declares role: developer (a fresh install is a seat again)",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project the whole path: scaffold -> draft -> commit -> ob_start, with tracked/local exactly as scaffold said :: AssertionError: expected 'Tree currency: NOT CHECKED — origin/m…' to contain 'NOT A SEAT'"
+    ],
+    "passed": 51,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M1t-residue-deleted-typed",
+    "why": "M1 in a form that typechecks: delete the residue, report it moved",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-3: `open-brain bootstrap check` / `move-residue` move-residue moves it under .agents/archive/, byte for byte, and deletes nothing :: AssertionError: expected false to be true // Object.is equality"
+    ],
+    "passed": 51,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "M2t-no-zero-task-warning-typed",
+    "why": "M2 in a form that typechecks: inboxWarning always null",
+    "landed": true,
+    "tsc": 0,
+    "failed": [
+      "bootstrap-fix.test.ts > BF-1: the scaffolded INBOX imports, and an INBOX that yields 0 tasks says so an INBOX with items but no P-section: the draft summary and the report both carry a WARNING naming 0 tasks :: AssertionError: expected 'Tasks: 0 (open 0, in_progress 0, bloc…' to match /WARNING/"
+    ],
+    "passed": 51,
+    "total": 52,
+    "verdict": "KILLED",
+    "restored": true
+  }
+]

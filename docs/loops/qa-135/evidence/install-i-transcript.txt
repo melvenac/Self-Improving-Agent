@@ -1,0 +1,682 @@
+
+> Install (i): frogger's shape. Machine DESKTOP-0GV3HAD (Aaron's desktop). core.autocrlf=true from C:/Program Files/Git/etc/gitconfig (system).
+
+> Step 0: ~/.claude/settings.json on this machine has NO SessionStart hook (grep cli-bootstrap: no match), so Step 0's rule does not resolve <SIA>. Used <SIA> = C:/qa-scratch/cand (6543e8e, built).
+
+$ git config --show-origin --get core.autocrlf
+file:C:/Program Files/Git/etc/gitconfig	true
+[exit 0]
+
+> Step 1
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\i\arcade
+Template:  C:\qa-scratch\cand\project-template
+git:       NOT a repository
+CLAUDE.md: present, without the SIA section
+.agents/:  RESIDUE — reflection-queue.json (no state.json, no TASKS/)
+Next:      Move the residue aside first (`bootstrap move-residue`), then run check again.
+[exit 0]
+
+> Step 2.1: shown to the owner (stand-in: QA): reflection-queue.json will be moved, not deleted. Yes.
+
+$ OB bootstrap move-residue
+bootstrap move-residue — moved, nothing deleted
+To:      .agents/archive/pre-bootstrap-residue-2026-09-26/
+Entries: reflection-queue.json
+It is local (the template gitignore ignores .agents/archive/). Delete it yourself once you have looked.
+[exit 0]
+
+$ find .agents -type f
+.agents/archive/pre-bootstrap-residue-2026-09-26/reflection-queue.json
+[exit 0]
+
+$ cat .agents/archive/pre-bootstrap-residue-2026-09-26/reflection-queue.json
+{"queue":[{"id":1,"text":"old reflection"}]}
+[exit 0]
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\i\arcade
+Template:  C:\qa-scratch\cand\project-template
+git:       NOT a repository
+CLAUDE.md: present, without the SIA section
+.agents/:  empty
+Next:      git init, then commit the project as it stands, leaving .agents/ out of that commit (`git add -A -- . ":(exclude).agents"`), before anything is scaffolded.
+[exit 0]
+
+> Step 2.2: owner: yes, initialize git. .gitignore exists (node_modules/, dist/), so no question about what to leave out.
+
+$ git init
+Initialized empty Git repository in C:/qa-scratch/i/arcade/.git/
+[exit 0]
+
+$ git status --short
+?? .agents/
+?? .gitignore
+?? CLAUDE.md
+?? README.md
+?? package.json
+?? src/
+[exit 0]
+
+$ git add -A -- . :(exclude).agents
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+[exit 0]
+
+$ git -c user.name=QA135 -c user.email=qa135@example.invalid commit -m The project before SIA
+[master (root-commit) ef7f335] The project before SIA
+ 5 files changed, 23 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 CLAUDE.md
+ create mode 100644 README.md
+ create mode 100644 package.json
+ create mode 100644 src/game.js
+[exit 0]
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\i\arcade
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 0 uncommitted change(s)
+CLAUDE.md: present, without the SIA section
+.agents/:  empty
+Next:      Scaffold (`bootstrap scaffold`).
+[exit 0]
+
+> Step 3
+
+$ OB bootstrap scaffold
+bootstrap scaffold — C:\qa-scratch\i\arcade
+Template: C:\qa-scratch\cand\project-template
+
+Written (tracked = committed with the project; local = this disk only, by design):
+  tracked  copied    .agents/TASKS/INBOX.md — the task list `state import` reads into the record; afterwards a rendered view of it
+  tracked  copied    .agents/TASKS/task.md — the current objective `state import` reads; afterwards a rendered view
+  tracked  copied    .agents/SYSTEM/SUMMARY.md — the project summary; its marked region is rendered from the record
+  local    copied    .agents/SESSIONS/SESSION_TEMPLATE.md — the shape of each per-session log, and session logs are local
+  tracked  generated .agents/AGENT.md — declares this checkout is not a seat (role: none), so /start says so instead of NO SEAT IDENTITY RESOLVED
+  tracked  copied    .claude/commands/start.md — /start — travels with the project, so a clone on another machine has it
+  tracked  copied    .claude/commands/end.md — /end — store the session's lessons
+  tracked  copied    .claude/commands/task.md — /task — pick up the next priority
+  tracked  copied    .claude/commands/sync.md — /sync — validate before a commit
+  tracked  merged    .gitignore — tracks the record and its views under .agents/ and keeps the rest local
+  tracked  created   .gitattributes — keeps .agents/ LF on every checkout, so core.autocrlf cannot rewrite the record's bytes
+
+Verified with git: every file above is tracked or ignored exactly as stated; state.json and next-session.md will be tracked; session logs and archive/ will not; .agents/ is eol=lf.
+[exit 0]
+
+$ git status --short --untracked-files=all
+ M .gitignore
+?? .agents/AGENT.md
+?? .agents/SYSTEM/SUMMARY.md
+?? .agents/TASKS/INBOX.md
+?? .agents/TASKS/task.md
+?? .claude/commands/end.md
+?? .claude/commands/start.md
+?? .claude/commands/sync.md
+?? .claude/commands/task.md
+?? .gitattributes
+[exit 0]
+
+$ cat .gitignore
+node_modules/
+dist/
+
+# --- SIA (Self-Improving Agent): from project-template/gitignore ---
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+/.agents/*
+!/.agents/state.json
+!/.agents/AGENT.md
+!/.agents/TASKS/
+/.agents/TASKS/*
+!/.agents/TASKS/INBOX.md
+!/.agents/TASKS/task.md
+!/.agents/SESSIONS/
+/.agents/SESSIONS/*
+!/.agents/SESSIONS/next-session.md
+!/.agents/SYSTEM/
+/.agents/SYSTEM/*
+!/.agents/SYSTEM/SUMMARY.md
+/.recalled-entries.json
+[exit 0]
+
+$ cat .gitattributes
+# Copied to your project root as `.gitattributes` by `open-brain bootstrap scaffold`
+# (merged into an existing one). It ships without the leading dot, like
+# `gitignore`, so it does not act inside the framework repo.
+#
+# The record (.agents/state.json) and its rendered views are written with LF
+# line endings. Without this, git on Windows (core.autocrlf=true, the default)
+# checks them out CRLF, and every ob_state write turns them back to LF: the
+# views churn, and SUMMARY.md's rendered region ends up LF inside a CRLF file.
+# `eol=lf` makes the checkout LF whatever the local git config says.
+/.agents/** text eol=lf
+[exit 0]
+
+> Step 4: check's CLAUDE.md line (step 1) = 'present, without the SIA section'. Section shown to the owner; owner: yes. Appended verbatim (CRLF kept, as the file is CRLF).
+
+$ cat CLAUDE.md
+# Arcade
+
+A browser Frogger clone.
+
+## Commands
+
+- `npm run dev`
+- `npm run build`
+
+## Self-Improving Agent (SIA)
+
+- The project record is `.agents/state.json`. Change it only through the `ob_state` tool, never by
+  hand. `TASKS/INBOX.md`, `TASKS/task.md`, `SESSIONS/next-session.md` and `SYSTEM/SUMMARY.md` are
+  rendered from it.
+- Start a session with `/start`, and end it with `/end` (it stores the session's lessons).
+- Run `/sync` before a commit.
+[exit 0]
+
+> Not asked for by bootstrap.md: check after step 4 (dispatch item 6).
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\i\arcade
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 11 uncommitted change(s)
+CLAUDE.md: present, with the SIA section
+.agents/:  PRE-STATE — TASKS/ with no state.json (the import path)
+Next:      An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.
+[exit 0]
+
+$ cat .agents/TASKS/INBOX.md
+# Task Inbox — Prioritized Backlog
+
+> **Last Updated:** Session 0 (Initial Setup)
+
+---
+
+## How to Use This Document
+
+Tasks are organized by priority. Agents should work top-down unless directed otherwise.
+
+**Priority Levels:**
+- 🔴 **P0 — Critical:** Blocking all progress
+- 🟠 **P1 — High:** Needed for current milestone
+- 🟡 **P2 — Medium:** Important but not blocking
+- 🟢 **P3 — Low:** Nice to have
+
+**Status:**
+- `[ ]` — Not started
+- `[~]` — In progress
+- `[x]` — Done
+- `[!]` — Blocked
+
+---
+
+## 🔴 P0 — Critical
+
+- [ ] Write the PRD (`.agents/SYSTEM/PRD.md`)
+
+## 🟠 P1 — High
+
+- [ ] Derive ENTITIES.md from PRD data model
+- [ ] Derive RULES.md from PRD tech stack
+- [ ] Create initial SUMMARY.md with project state
+- [ ] Start Session 1
+
+## 🟡 P2 — Medium
+
+- [ ] Create first tech-specific skill (after Session 2-3)
+- [ ] Wire up validation scripts (after Session 5+)
+
+## 🟢 P3 — Low
+
+- [ ] Create TESTING.md after first feature ships
+- [ ] Create RUNBOOK.md before production deploy
+- [ ] Create SECURITY.md before production deploy
+
+---
+
+## Completed
+
+_None yet._
+[exit 0]
+
+$ cat .agents/TASKS/task.md
+# Current Sprint / Focus
+
+> **Last Updated:** Session 0 (Initial Setup)
+
+---
+
+## Current Objective
+
+**Write the PRD**
+
+The Product Requirements Document is the foundation everything else derives from. Until the PRD is written, no development work should begin.
+
+---
+
+## Active Tasks
+
+| # | Task | Status | Notes |
+|---|---|---|---|
+| 1 | Write PRD.md | Not Started | Fill in all 8 sections |
+| 2 | Derive ENTITIES.md from PRD §6 | Blocked | Waiting on PRD |
+| 3 | Derive RULES.md from PRD §3 | Blocked | Waiting on PRD |
+
+---
+
+## Acceptance Criteria
+
+- [ ] PRD has all 8 sections filled in
+- [ ] Tech stack is decided
+- [ ] Core features are enumerated
+- [ ] Data model sketch is complete enough to derive ENTITIES.md
+
+---
+
+## Notes
+
+_None yet._
+[exit 0]
+
+$ cat .agents/SYSTEM/SUMMARY.md
+# Project Summary
+
+> **Last Updated:** Session 0 (Initial Setup)  
+> **Status:** Framework scaffolded — awaiting PRD
+
+---
+
+## Current State
+
+The AI-first development framework has been scaffolded. No application code exists yet.
+
+### What's Working
+- Framework file structure is in place
+- Session lifecycle workflows are defined
+
+### What's Broken / Blocked
+- Nothing yet — project hasn't started
+
+### What's Next
+- [ ] Write the PRD (`.agents/SYSTEM/PRD.md`)
+- [ ] Derive ENTITIES.md from PRD data model
+- [ ] Derive RULES.md from PRD tech stack
+- [ ] Create initial INBOX.md task backlog from PRD
+- [ ] Start Session 1
+
+---
+
+## Architecture Overview
+
+<!-- Update this as the project takes shape -->
+
+_Not yet defined. Will be populated after PRD is written._
+
+---
+
+## Key Metrics
+
+| Metric | Value |
+|---|---|
+| Total Sessions | 0 |
+| Features Shipped | 0 |
+| Open Tasks | 0 |
+| Known Bugs | 0 |
+[exit 0]
+
+> Step 5: INBOX: the example tasks replaced by src/game.js's two TODOs and one FIXME, the four headings kept exactly. task.md: objective replaced (only the objective, as written; the PRD 'Active Tasks' table and acceptance criteria are left, since step 5 does not mention them). SUMMARY.md: title and status only. Shown to the owner.
+
+
+$ sed -n /## 🔴 P0/,$p .agents/TASKS/INBOX.md
+## 🔴 P0 — Critical
+
+## 🟠 P1 — High
+
+- [ ] Lives counter resets on level 2
+- [ ] Logs overlap at the right edge
+
+## 🟡 P2 — Medium
+
+- [ ] Add a high-score table
+
+## 🟢 P3 — Low
+
+---
+
+## Completed
+
+_None yet._
+[exit 0]
+
+$ sed -n 1,16p .agents/TASKS/task.md
+# Current Sprint / Focus
+
+> **Last Updated:** Session 0 (Initial Setup)
+
+---
+
+## Current Objective
+
+**Frogger is playable through level 3 without a reset bug**
+
+---
+
+## Active Tasks
+
+| # | Task | Status | Notes |
+|---|---|---|---|
+[exit 0]
+
+$ sed -n 1,5p .agents/SYSTEM/SUMMARY.md
+# Arcade (frogger)
+
+> **Last Updated:** Session 0 (Initial Setup)  
+> **Status:** Just bootstrapped
+
+[exit 0]
+
+> Step 6
+
+$ OB state import --draft
+
+state import — draft (nothing else changed)
+
+Root: C:\qa-scratch\i\arcade
+Draft:  .agents/state.draft.json
+Report: .agents/state.import-report.md
+Validates: yes
+Current session: 0 ((no Session_N.md))
+Staleness: 0 stale · 2 could not tell (.agents/TASKS/INBOX.md, .agents/TASKS/task.md) · 0 current. Details are in the report's first section.
+Tasks: 3 (open 3, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 17
+Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+Handoff: pick_up 0 lines, watch_out 0, open_questions 0
+SUMMARY.md: --commit will remove 24 lines (2 blockquote + 20 Current State)
+
+Review the report, then run: open-brain state import --commit
+[exit 0]
+
+$ ls .agents
+AGENT.md
+SESSIONS
+SYSTEM
+TASKS
+archive
+state.draft.json
+state.import-report.md
+[exit 0]
+
+$ grep -n -i -E warning|retention|closed_session|unparsed .agents/state.import-report.md
+17:Project: frogger v0.0.1 · current session 0 (from (no Session_N.md)) · retention: every imported done item (closed before the record existed, closed_rev null) is dropped once 3 sessions have written to the record, unless its id is cited in the tracked tree
+48:Sessions: 0 items had a `(Session N)` marker (opened = min, closed = max for done); 3 open items had none → opened_session = 0; 0 done items had none → closed_session = 0.
+49:Retention-eligible once 3 sessions have written: 0 done items (they stay in the snapshot and in git).
+[exit 0]
+
+> Step 6 summary shown to the owner. Step 7: the owner's command, run by QA as the owner's stand-in, in the scratch project only.
+
+$ OB state import --commit
+
+state import — committed
+
+Root: C:\qa-scratch\i\arcade
+Could not tell whether current: .agents/TASKS/INBOX.md, .agents/TASKS/task.md
+Snapshot: .agents\archive\pre-state-migration-2026-09-26 (7 files)
+Wrote:    .agents/state.json at revision 0
+SUMMARY.md: removed 24 lines (2 blockquote + 20 Current State); kept Architecture Overview, Key Metrics
+Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+Moved into snapshot: .agents/archive/pre-state-migration-2026-09-26/state.draft.json, .agents/archive/pre-state-migration-2026-09-26/state.import-report.md
+[exit 0]
+
+$ sed -n 1,12p .agents/SYSTEM/SUMMARY.md
+# Arcade (frogger)
+
+<!-- state:begin -->
+<!-- generated from .agents/state.json rev 0 by open-brain v0.0.1 — do not edit; change state via ob_state -->
+> **Status:** v0.0.1 — **Frogger is playable through level 3 without a reset bug**
+
+## What's working
+
+_Nothing verified yet._
+
+## What's broken
+
+[exit 0]
+
+$ cat .agents/state.json
+{
+  "schema_version": 3,
+  "revision": 0,
+  "project": {
+    "name": "frogger"
+  },
+  "objective": {
+    "text": "**Frogger is playable through level 3 without a reset bug**",
+    "since_session": 0
+  },
+  "tasks": [
+    {
+      "id": "T-001",
+      "title": "Lives counter resets on level 2",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 0,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "",
+      "closed_rev": null
+    },
+    {
+      "id": "T-002",
+      "title": "Logs overlap at the right edge",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 0,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "",
+      "closed_rev": null
+    },
+    {
+      "id": "T-003",
+      "title": "Add a high-score table",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 0,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "",
+      "closed_rev": null
+    }
+  ],
+  "verified": [],
+  "gaps": [],
+  "decisions": [],
+  "handoffs": [
+    {
+      "seat": "developer",
+      "pick_up": "",
+      "watch_out": [],
+      "open_questions": [],
+      "session": 0,
+      "loop_state": null,
+      "session_uuid": null,
+      "checkout": null,
+      "first_rev": null
+    }
+  ],
+  "sessions": [
+    {
+      "n": 0,
+      "date": "2026-09-26",
+      "uuid": null,
+      "seat": null,
+      "checkout": null,
+      "first_rev": null
+    }
+  ]
+}
+[exit 0]
+
+> Step 8. Predicted by step 8's rule: step 3's 10 tracked + state.json + next-session.md + CLAUDE.md (step 4 changed it) = 13.
+
+$ git status --short --untracked-files=all
+ M .gitignore
+ M CLAUDE.md
+?? .agents/AGENT.md
+?? .agents/SESSIONS/next-session.md
+?? .agents/SYSTEM/SUMMARY.md
+?? .agents/TASKS/INBOX.md
+?? .agents/TASKS/task.md
+?? .agents/state.json
+?? .claude/commands/end.md
+?? .claude/commands/start.md
+?? .claude/commands/sync.md
+?? .claude/commands/task.md
+?? .gitattributes
+[exit 0]
+
+$ git add -A
+warning: in the working copy of '.claude/commands/end.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/start.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/sync.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/task.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.gitattributes', LF will be replaced by CRLF the next time Git touches it
+[exit 0]
+
+$ git -c user.name=QA135 -c user.email=qa135@example.invalid commit -m Bootstrap SIA
+[master 42a54ef] Bootstrap SIA
+ 13 files changed, 516 insertions(+)
+ create mode 100644 .agents/AGENT.md
+ create mode 100644 .agents/SESSIONS/next-session.md
+ create mode 100644 .agents/SYSTEM/SUMMARY.md
+ create mode 100644 .agents/TASKS/INBOX.md
+ create mode 100644 .agents/TASKS/task.md
+ create mode 100644 .agents/state.json
+ create mode 100644 .claude/commands/end.md
+ create mode 100644 .claude/commands/start.md
+ create mode 100644 .claude/commands/sync.md
+ create mode 100644 .claude/commands/task.md
+ create mode 100644 .gitattributes
+[exit 0]
+
+$ git status --short --untracked-files=all
+[exit 0]
+
+$ git status --short --ignored --untracked-files=all
+!! .agents/SESSIONS/SESSION_TEMPLATE.md
+!! .agents/archive/pre-bootstrap-residue-2026-09-26/reflection-queue.json
+!! .agents/archive/pre-state-migration-2026-09-26/AGENT.md
+!! .agents/archive/pre-state-migration-2026-09-26/SESSIONS/SESSION_TEMPLATE.md
+!! .agents/archive/pre-state-migration-2026-09-26/SYSTEM/SUMMARY.md
+!! .agents/archive/pre-state-migration-2026-09-26/TASKS/INBOX.md
+!! .agents/archive/pre-state-migration-2026-09-26/TASKS/task.md
+!! .agents/archive/pre-state-migration-2026-09-26/state.draft.json
+!! .agents/archive/pre-state-migration-2026-09-26/state.import-report.md
+[exit 0]
+
+$ git ls-files
+.agents/AGENT.md
+.agents/SESSIONS/next-session.md
+.agents/SYSTEM/SUMMARY.md
+.agents/TASKS/INBOX.md
+.agents/TASKS/task.md
+.agents/state.json
+.claude/commands/end.md
+.claude/commands/start.md
+.claude/commands/sync.md
+.claude/commands/task.md
+.gitattributes
+.gitignore
+CLAUDE.md
+README.md
+package.json
+src/game.js
+[exit 0]
+
+> (c) ob_start: the candidate build's handleStart (build/server.js at 6543e8e) called from C:/qa-scratch/ob-start.mjs, with USERPROFILE/HOME=C:/qa-scratch/home and KNOWLEDGE_V2_DB=C:/qa-scratch/home/kv2.db so no real home or DB is touched. Not /start in a fresh Claude session (dispatch: /start and the MCP server are not available).
+
+$ node /c/qa-scratch/ob-start.mjs C:\qa-scratch\i\arcade
+Tree currency: NOT CHECKED — origin/master does not exist in this checkout — nothing to compare against. This is not a pass.
+
+Session Start — project mode
+Project: frogger v0.0.1
+
+Drift: none
+
+Session #1
+Log: C:\qa-scratch\i\arcade\.agents\SESSIONS\Session_1.md
+Session ID: discovery failed
+
+Seat: arcade (none)
+This checkout is NOT A SEAT (arcade, role: none) — no seat-specific role file is expected here.
+  Its sessions are recorded with no seat; a set_handoff names its seat in the op.
+Role knowledge loaded (0 of 1):
+  .agents/roles/shared.md — ABSENT (shared; not a seat, so none is expected)
+
+## Sizes (tokens estimated as chars/4)
+  SUMMARY.md (.agents/SYSTEM/SUMMARY.md): 43 lines, 141 words, ~196 tokens, truncated: no
+  INBOX.md (.agents/TASKS/INBOX.md): 21 lines, 96 words, ~131 tokens, truncated: no
+  task.md (.agents/TASKS/task.md): 14 lines, 70 words, ~97 tokens, truncated: no
+  next-session.md (.agents/SESSIONS/next-session.md): 22 lines, 56 words, ~91 tokens, truncated: no
+  state.json (.agents/state.json): 73 lines, 149 words, ~364 tokens, truncated: no
+
+## State (state.json rev 0)
+Project: frogger v0.0.1
+Objective: **Frogger is playable through level 3 without a reset bug** (since session 0)
+
+Tasks (3 active; done: 0):
+  P1:
+    [open] T-001 Lives counter resets on level 2
+    [open] T-002 Logs overlap at the right edge
+  P2:
+    [open] T-003 Add a high-score table
+
+Verified (0):
+  (none)
+
+Gaps (0):
+  (none)
+
+Decisions: 0 recorded
+
+Handoffs (1) — READER'S SEAT UNRESOLVED, so none is rendered as "yours":
+
+Other handoffs (newest per seat and checkout; named, not rendered — read one by its commit):
+  developer [legacy] (session 0): close-out 42a54ef 2026-09-26
+    (nothing recorded)
+
+Last session: #0 2026-09-26 — 1 writing session(s) in the record
+
+Total returned words: 256 (~446 tokens)
+[exit 0]
+
+$ git status --short --untracked-files=all
+[exit 0]
+
+> The SessionStart hook (frogger F8 was seen there), fed a synthetic hook payload, with the scratch home.
+
+$ sh -c node C:/qa-scratch/cand/open-brain/build/cli-bootstrap.js < /c/qa-tmp/hook.json
+SessionStart hook REFUSED: the payload on stdin is not valid JSON — Bad escaped character in JSON at position 63 (line 1 column 64)
+Nothing was written: no session was registered and no identity was resolved. A malformed payload is not an absent one; proceeding would have greeted this shell's working directory with a generated session id.
+[exit 1]
+
+$ git status --short --untracked-files=all
+[exit 0]
+
+> (first attempt's payload was mis-escaped by my shell; the hook refused it, correctly. Re-run with forward slashes.)
+
+$ sh -c node C:/qa-scratch/cand/open-brain/build/cli-bootstrap.js < /c/qa-tmp/hook.json
+Project detected: C:/qa-scratch/i/arcade (.agents/ found)
+Tree currency: NOT CHECKED — origin/master does not exist in this checkout — nothing to compare against. This is not a pass.
+SESSION_UUID: 11111111-2222-4333-8444-555555555555
+Agent: arcade (none) — no partner
+This checkout is NOT A SEAT (arcade, role: none) — no seat-specific role file is expected here.
+  Its sessions are recorded with no seat; a set_handoff names its seat in the op.
+Role knowledge loaded (0 of 1):
+  .agents/roles/shared.md — ABSENT (shared; not a seat, so none is expected)
+[exit 0]
+
+$ git status --short --untracked-files=all
+[exit 0]

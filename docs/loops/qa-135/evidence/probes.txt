@@ -1,0 +1,336 @@
+
+> P1a: .agents/ holding ONLY a valid-looking state.json (no TASKS/, no views)
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p1a
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 1 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  BOOTSTRAPPED — state.json exists
+Next:      Already bootstrapped (.agents/state.json exists). Run /start.
+[exit 0]
+
+$ OB bootstrap scaffold
+bootstrap scaffold refused: 1 uncommitted change(s) (?? .agents/state.json) — commit them first, so the SIA commit holds only what bootstrap added. Nothing written
+[exit 1]
+
+> P1b: .agents/ holding ONLY the OLD template placeholder state.json ({{PROJECT}}, f618b73), as a wholesale copy of an old template would leave it
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p1b
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 1 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  BOOTSTRAPPED — state.json exists
+Next:      Already bootstrapped (.agents/state.json exists). Run /start.
+[exit 0]
+
+$ node /c/qa-scratch/ob-start.mjs .
+Tree currency: NOT CHECKED — origin/master does not exist in this checkout — nothing to compare against. This is not a pass.
+
+Session Start — project mode
+Project: {{PROJECT}} v1.0.0
+
+Drift: none
+
+Session log: no .agents/SESSIONS/ dir — log not created
+Session ID: discovery failed
+
+Seat: UNRESOLVED
+Role knowledge loaded (0 of 1):
+  .agents/roles/shared.md — ABSENT (shared)
+
+ROLE KNOWLEDGE PROBLEMS (2):
+  NO SEAT IDENTITY RESOLVED — neither .agents/AGENT.local.md nor .agents/AGENT.md yielded a name and role, so no seat-specific role file could be chosen. Only .agents/roles/shared.md was loaded.
+  ROLE FILE MISSING: .agents/roles/shared.md does not exist — the "shared" seat's rules are not in this checkout. This is absence, not an empty ruleset.
+
+## Sizes (tokens estimated as chars/4)
+  SUMMARY.md (.agents/SYSTEM/SUMMARY.md): absent
+  INBOX.md (.agents/TASKS/INBOX.md): absent
+  task.md (.agents/TASKS/task.md): absent
+  next-session.md (.agents/SESSIONS/next-session.md): absent
+  state.json (.agents/state.json): 15 lines, 25 words, ~53 tokens, truncated: no
+
+## State (state.json rev 0)
+Project: {{PROJECT}} v1.0.0
+Objective: none
+
+Tasks (0 active; done: 0):
+  (none)
+
+Verified (0):
+  (none)
+
+Gaps (0):
+  (none)
+
+Decisions: 0 recorded
+
+Handoffs: none recorded.
+
+Last session: none recorded
+
+Total returned words: 171 (~326 tokens)
+[exit 0]
+
+> P1c: .agents/ holding ONLY a zero-byte state.json
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p1c
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 1 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  BOOTSTRAPPED — state.json exists
+Next:      Already bootstrapped (.agents/state.json exists). Run /start.
+[exit 0]
+
+> P2a: .agents/ holding ONLY an empty TASKS/ directory
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p2a
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 0 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  PRE-STATE — TASKS/ with no state.json (the import path)
+Next:      An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.
+[exit 0]
+
+$ OB bootstrap scaffold
+bootstrap scaffold refused: .agents/TASKS/ exists with no state.json — this is the import path (`state import --draft`), not a fresh install. Nothing written
+[exit 1]
+
+$ OB state import --draft
+
+state import — draft (nothing else changed)
+
+Root: C:\qa-scratch\probes\p2a
+Draft:  .agents/state.draft.json
+Report: .agents/state.import-report.md
+Validates: yes
+Current session: 0 ((no SESSIONS/ directory))
+Staleness: 0 stale · 0 could not tell · 0 current. Details are in the report's first section.
+Tasks: 0 (open 0, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 0
+Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective NOT found
+Handoff: pick_up 0 lines, watch_out 0, open_questions 0
+
+Review the report, then run: open-brain state import --commit
+[exit 0]
+
+> P2b: .agents/ holding ONLY TASKS/INBOX.md with frogger's old headings (## Priority / ## Backlog)
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p2b
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 1 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  PRE-STATE — TASKS/ with no state.json (the import path)
+Next:      An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.
+[exit 0]
+
+$ OB state import --draft
+
+state import — draft (nothing else changed)
+
+Root: C:\qa-scratch\probes\p2b
+Draft:  .agents/state.draft.json
+Report: .agents/state.import-report.md
+Validates: yes
+Current session: 0 ((no SESSIONS/ directory))
+Staleness: 0 stale · 1 could not tell (.agents/TASKS/INBOX.md) · 0 current. Details are in the report's first section.
+Tasks: 0 (open 0, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 5 — WARNING: see below
+WARNING: .agents/TASKS/INBOX.md exists but 0 tasks were parsed (5 unparsed lines). Tasks are read only under `## P0`..`## P3` (a leading emoji is fine) or `## Completed`. The draft validates, but it holds no tasks — fix the headings and re-run --draft.
+Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective NOT found
+Handoff: pick_up 0 lines, watch_out 0, open_questions 0
+
+Review the report, then run: open-brain state import --commit
+[exit 0]
+
+$ grep -n WARNING .agents/state.import-report.md
+29:**WARNING: .agents/TASKS/INBOX.md exists but 0 tasks were parsed (5 unparsed lines). Tasks are read only under `## P0`..`## P3` (a leading emoji is fine) or `## Completed`. The draft validates, but it holds no tasks — fix the headings and re-run --draft.**
+[exit 0]
+
+> P2c: .agents/ holding ONLY a file named TASKS (not a directory)
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p2c
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 1 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  PRE-STATE — TASKS/ with no state.json (the import path)
+Next:      An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.
+[exit 0]
+
+> P3a: nested residue (a directory and a file), one file tracked by git
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p3a
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 1 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  RESIDUE — META/, reflection-queue.json (no state.json, no TASKS/)
+Next:      Move the residue aside first (`bootstrap move-residue`), then run check again.
+[exit 0]
+
+$ OB bootstrap move-residue
+bootstrap move-residue — moved, nothing deleted
+To:      .agents/archive/pre-bootstrap-residue-2026-09-26/
+Entries: META/, reflection-queue.json
+It is local (the template gitignore ignores .agents/archive/). Delete it yourself once you have looked.
+[exit 0]
+
+$ find .agents -type f
+.agents/archive/pre-bootstrap-residue-2026-09-26/META/notes.md
+.agents/archive/pre-bootstrap-residue-2026-09-26/reflection-queue.json
+[exit 0]
+
+> P3a: content hashes identical before and after the move
+
+$ git status --short
+ D .agents/META/notes.md
+?? .agents/archive/
+[exit 0]
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p3a
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 1 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  empty
+Next:      The residue was tracked by git: commit its removal on its own (`git add -u -- .agents`, then `git commit -m "Move old .agents/ files aside"`). The files are kept, local, under .agents/archive/.
+[exit 0]
+
+> P3b: a second residue appears on the same day, after a first move-residue
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p3b
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 1 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  RESIDUE — b.json (no state.json, no TASKS/)
+Next:      Move the residue aside first (`bootstrap move-residue`), then run check again.
+[exit 0]
+
+$ OB bootstrap move-residue
+bootstrap move-residue refused: residue moved to .agents/archive/pre-bootstrap-residue-2026-09-26 but it holds [archive/, b.json], not [b.json] — check it by hand
+[exit 1]
+
+$ find .agents -type f
+.agents/archive/pre-bootstrap-residue-2026-09-26/archive/pre-bootstrap-residue-2026-09-26/a.json
+.agents/archive/pre-bootstrap-residue-2026-09-26/b.json
+[exit 0]
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p3b
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 0 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  empty
+Next:      Scaffold (`bootstrap scaffold`).
+[exit 0]
+
+> P3c: move-residue when .agents/ is not residue (empty, absent, pre-state)
+
+$ OB bootstrap move-residue
+bootstrap move-residue refused: .agents/ is absent, not residue — nothing moved
+[exit 1]
+
+$ OB bootstrap move-residue
+bootstrap move-residue refused: .agents/ is empty, not residue — nothing moved
+[exit 1]
+
+$ OB bootstrap move-residue
+bootstrap move-residue refused: .agents/ is pre-state, not residue — nothing moved
+[exit 1]
+
+> P4a: scaffold over an owner's existing .claude/commands/start.md and INBOX-free tree: never overwritten
+
+$ OB bootstrap scaffold
+bootstrap scaffold — C:\qa-scratch\probes\p4a
+Template: C:\qa-scratch\cand\project-template
+
+Written (tracked = committed with the project; local = this disk only, by design):
+  tracked  copied    .agents/TASKS/INBOX.md — the task list `state import` reads into the record; afterwards a rendered view of it
+  tracked  copied    .agents/TASKS/task.md — the current objective `state import` reads; afterwards a rendered view
+  tracked  copied    .agents/SYSTEM/SUMMARY.md — the project summary; its marked region is rendered from the record
+  local    copied    .agents/SESSIONS/SESSION_TEMPLATE.md — the shape of each per-session log, and session logs are local
+  tracked  generated .agents/AGENT.md — declares this checkout is not a seat (role: none), so /start says so instead of NO SEAT IDENTITY RESOLVED
+  tracked  copied    .claude/commands/end.md — /end — store the session's lessons
+  tracked  copied    .claude/commands/task.md — /task — pick up the next priority
+  tracked  copied    .claude/commands/sync.md — /sync — validate before a commit
+  tracked  created   .gitignore — tracks the record and its views under .agents/ and keeps the rest local
+  tracked  created   .gitattributes — keeps .agents/ LF on every checkout, so core.autocrlf cannot rewrite the record's bytes
+Skipped:
+  .claude/commands/start.md — already exists — never overwritten
+
+Verified with git: every file above is tracked or ignored exactly as stated; state.json and next-session.md will be tracked; session logs and archive/ will not; .agents/ is eol=lf.
+[exit 0]
+
+$ cat .claude/commands/start.md
+my own start
+[exit 0]
+
+> P4b: an owner's .gitignore that ignores .agents/ wholesale
+
+$ OB bootstrap scaffold
+bootstrap scaffold — C:\qa-scratch\probes\p4b
+Template: C:\qa-scratch\cand\project-template
+
+Written (tracked = committed with the project; local = this disk only, by design):
+  tracked  copied    .agents/TASKS/INBOX.md — the task list `state import` reads into the record; afterwards a rendered view of it
+  tracked  copied    .agents/TASKS/task.md — the current objective `state import` reads; afterwards a rendered view
+  tracked  copied    .agents/SYSTEM/SUMMARY.md — the project summary; its marked region is rendered from the record
+  local    copied    .agents/SESSIONS/SESSION_TEMPLATE.md — the shape of each per-session log, and session logs are local
+  tracked  generated .agents/AGENT.md — declares this checkout is not a seat (role: none), so /start says so instead of NO SEAT IDENTITY RESOLVED
+  tracked  copied    .claude/commands/start.md — /start — travels with the project, so a clone on another machine has it
+  tracked  copied    .claude/commands/end.md — /end — store the session's lessons
+  tracked  copied    .claude/commands/task.md — /task — pick up the next priority
+  tracked  copied    .claude/commands/sync.md — /sync — validate before a commit
+  tracked  merged    .gitignore — tracks the record and its views under .agents/ and keeps the rest local
+  tracked  created   .gitattributes — keeps .agents/ LF on every checkout, so core.autocrlf cannot rewrite the record's bytes
+
+VERIFY FAILED:
+  .agents/TASKS/INBOX.md: scaffold calls it tracked, but git ignores it
+  .agents/TASKS/task.md: scaffold calls it tracked, but git ignores it
+  .agents/SYSTEM/SUMMARY.md: scaffold calls it tracked, but git ignores it
+  .agents/AGENT.md: scaffold calls it tracked, but git ignores it
+  .agents/state.json: the import writes it and it must be tracked, but git ignores it
+  .agents/SESSIONS/next-session.md: the import writes it and it must be tracked, but git ignores it
+[exit 1]
+
+> P4c: scaffold on a dirty tree, and with no commit
+
+$ OB bootstrap scaffold
+bootstrap scaffold refused: 1 uncommitted change(s) (?? dirt.txt) — commit them first, so the SIA commit holds only what bootstrap added. Nothing written
+[exit 1]
+
+$ OB bootstrap scaffold
+bootstrap scaffold refused: the git repository has no commit — commit the project as it stands first, so the pre-SIA project is its own commit. Nothing written
+[exit 1]
+
+> P4e: scaffold inside another repository
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p4e\sub
+Template:  C:\qa-scratch\cand\project-template
+git:       inside another repository at C:/qa-scratch/probes/p4e
+CLAUDE.md: absent
+.agents/:  absent
+Next:      STOP: this folder is inside another repository (C:/qa-scratch/probes/p4e). Bootstrap a project at its own repository root.
+[exit 0]
+
+$ OB bootstrap scaffold
+bootstrap scaffold refused: inside another git repository (C:/qa-scratch/probes/p4e) — bootstrap a project at its own repository root. Nothing written
+[exit 1]
+
+> P5: an existing CLAUDE.md is byte-identical after check, move-residue and scaffold
+
+> P5: before a3e613661376f63b5db350266063e16dbd4cc5c8 *CLAUDE.md / after a3e613661376f63b5db350266063e16dbd4cc5c8 *CLAUDE.md
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\probes\p5
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 10 uncommitted change(s)
+CLAUDE.md: present, without the SIA section
+.agents/:  PRE-STATE — TASKS/ with no state.json (the import path)
+Next:      An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.
+[exit 0]

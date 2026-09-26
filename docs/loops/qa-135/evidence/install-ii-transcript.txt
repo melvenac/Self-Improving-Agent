@@ -1,0 +1,344 @@
+
+> Install (ii): a clean empty folder C:/qa-scratch/ii/blank. Same machine, same <SIA> (C:/qa-scratch/cand at 6543e8e). core.autocrlf=true (system).
+
+$ ls -A
+[exit 0]
+
+> Step 1
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\ii\blank
+Template:  C:\qa-scratch\cand\project-template
+git:       NOT a repository
+CLAUDE.md: absent
+.agents/:  absent
+Next:      git init, then commit the project as it stands, leaving .agents/ out of that commit (`git add -A -- . ":(exclude).agents"`), before anything is scaffolded.
+[exit 0]
+
+> Step 2.1: no residue, skipped. Step 2.2: owner: yes, git init. No .gitignore, so asked what to leave out; owner (stand-in): 'nothing yet, the folder is empty'. So no .gitignore is written.
+
+$ git init
+Initialized empty Git repository in C:/qa-scratch/ii/blank/.git/
+[exit 0]
+
+$ git status --short
+[exit 0]
+
+$ git add -A -- . :(exclude).agents
+[exit 0]
+
+$ git -c user.name=QA135 -c user.email=qa135@example.invalid commit -m The project before SIA
+On branch master
+
+Initial commit
+
+nothing to commit (create/copy files and use "git add" to track)
+[exit 1]
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\ii\blank
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; NO commit yet; 0 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  absent
+Next:      Commit the project as it stands (the repository has no commit yet), leaving .agents/ out of that commit (`git add -A -- . ":(exclude).agents"`), before anything is scaffolded.
+[exit 0]
+
+> DEAD END: with nothing to commit, git commit exits 1 and check's Next repeats 'Commit the project as it stands'. bootstrap.md has no instruction for this. MANUAL FIX (QA, not in bootstrap.md): an empty commit.
+
+$ git -c user.name=QA135 -c user.email=qa135@example.invalid commit --allow-empty -m The project before SIA
+[master (root-commit) 9776c90] The project before SIA
+[exit 0]
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\ii\blank
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 0 uncommitted change(s)
+CLAUDE.md: absent
+.agents/:  absent
+Next:      Scaffold (`bootstrap scaffold`).
+[exit 0]
+
+> Step 3
+
+$ OB bootstrap scaffold
+bootstrap scaffold — C:\qa-scratch\ii\blank
+Template: C:\qa-scratch\cand\project-template
+
+Written (tracked = committed with the project; local = this disk only, by design):
+  tracked  copied    .agents/TASKS/INBOX.md — the task list `state import` reads into the record; afterwards a rendered view of it
+  tracked  copied    .agents/TASKS/task.md — the current objective `state import` reads; afterwards a rendered view
+  tracked  copied    .agents/SYSTEM/SUMMARY.md — the project summary; its marked region is rendered from the record
+  local    copied    .agents/SESSIONS/SESSION_TEMPLATE.md — the shape of each per-session log, and session logs are local
+  tracked  generated .agents/AGENT.md — declares this checkout is not a seat (role: none), so /start says so instead of NO SEAT IDENTITY RESOLVED
+  tracked  copied    .claude/commands/start.md — /start — travels with the project, so a clone on another machine has it
+  tracked  copied    .claude/commands/end.md — /end — store the session's lessons
+  tracked  copied    .claude/commands/task.md — /task — pick up the next priority
+  tracked  copied    .claude/commands/sync.md — /sync — validate before a commit
+  tracked  created   .gitignore — tracks the record and its views under .agents/ and keeps the rest local
+  tracked  created   .gitattributes — keeps .agents/ LF on every checkout, so core.autocrlf cannot rewrite the record's bytes
+
+Verified with git: every file above is tracked or ignored exactly as stated; state.json and next-session.md will be tracked; session logs and archive/ will not; .agents/ is eol=lf.
+[exit 0]
+
+$ git status --short --untracked-files=all
+?? .agents/AGENT.md
+?? .agents/SYSTEM/SUMMARY.md
+?? .agents/TASKS/INBOX.md
+?? .agents/TASKS/task.md
+?? .claude/commands/end.md
+?? .claude/commands/start.md
+?? .claude/commands/sync.md
+?? .claude/commands/task.md
+?? .gitattributes
+?? .gitignore
+[exit 0]
+
+> Step 4: CLAUDE.md absent. Scanned: no package.json, requirements.txt, Cargo.toml, go.mod, README or configs (the folder is empty). Asked the owner what this is (stand-in answer: 'a small CLI that converts CSV to JSON'). Draft shown; owner: yes.
+
+$ cat CLAUDE.md
+# blank
+
+**About:** a small CLI that converts CSV to JSON.
+
+## Commands
+
+- Build: TBD
+- Test: TBD
+- Lint: TBD
+- Dev: TBD
+
+## Conventions
+
+- Keep the CLI dependency-free until a need is shown.
+- Every command prints what it did.
+
+## Key directories
+
+- None yet: the project is empty.
+
+## Self-Improving Agent (SIA)
+
+- The project record is `.agents/state.json`. Change it only through the `ob_state` tool, never by
+  hand. `TASKS/INBOX.md`, `TASKS/task.md`, `SESSIONS/next-session.md` and `SYSTEM/SUMMARY.md` are
+  rendered from it.
+- Start a session with `/start`, and end it with `/end` (it stores the session's lessons).
+- Run `/sync` before a commit.
+[exit 0]
+
+$ OB bootstrap check
+bootstrap check — C:\qa-scratch\ii\blank
+Template:  C:\qa-scratch\cand\project-template
+git:       repository root; has commits; 11 uncommitted change(s)
+CLAUDE.md: present, with the SIA section
+.agents/:  PRE-STATE — TASKS/ with no state.json (the import path)
+Next:      An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.
+[exit 0]
+
+> Step 5: new project, so the owner was asked what they are building (stand-in: the CSV->JSON CLI). INBOX: four tasks, one per heading, headings kept. task.md: objective replaced. SUMMARY.md: title and status. Shown to the owner.
+
+$ sed -n /## 🔴 P0/,$p .agents/TASKS/INBOX.md
+## 🔴 P0 — Critical
+
+- [ ] Read a CSV file into rows
+
+## 🟠 P1 — High
+
+- [ ] Write the rows as JSON to stdout
+
+## 🟡 P2 — Medium
+
+- [ ] Handle quoted fields with commas
+
+## 🟢 P3 — Low
+
+- [ ] A --pretty flag
+
+---
+
+## Completed
+
+_None yet._
+[exit 0]
+
+$ grep -n -A2 Current Objective .agents/TASKS/task.md
+7:## Current Objective
+8-
+9-**Convert a CSV file to JSON from the command line**
+[exit 0]
+
+> Step 6
+
+$ OB state import --draft
+state import refused: no project root found walking up from C:\qa-scratch\ii\blank — need a directory with package.json beside .agents/SYSTEM/, .agents/META/ or open-brain/
+[exit 1]
+
+> BLOCKED at step 6: state import needs a package.json (repo-root.ts resolveRepoRoot). bootstrap.md never mentions it, and nothing before step 6 says so. MANUAL FIX 2 (QA, not in bootstrap.md): a minimal package.json, the refusal's named remedy.
+
+$ OB state import --draft C:\qa-scratch\ii\blank
+state import refused: no project root found walking up from C:\qa-scratch\ii\blank — need a directory with package.json beside .agents/SYSTEM/, .agents/META/ or open-brain/
+[exit 1]
+
+$ OB state import --draft
+
+state import — draft (nothing else changed)
+
+Root: C:\qa-scratch\ii\blank
+Draft:  .agents/state.draft.json
+Report: .agents/state.import-report.md
+Validates: yes
+Current session: 0 ((no Session_N.md))
+Staleness: 0 stale · 2 could not tell (.agents/TASKS/INBOX.md, .agents/TASKS/task.md) · 0 current. Details are in the report's first section.
+Tasks: 4 (open 4, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 17
+Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+Handoff: pick_up 0 lines, watch_out 0, open_questions 0
+SUMMARY.md: --commit will remove 24 lines (2 blockquote + 20 Current State)
+
+Review the report, then run: open-brain state import --commit
+[exit 0]
+
+$ OB state import --commit
+
+state import — committed
+
+Root: C:\qa-scratch\ii\blank
+Could not tell whether current: .agents/TASKS/INBOX.md, .agents/TASKS/task.md
+Snapshot: .agents\archive\pre-state-migration-2026-09-26 (7 files)
+Wrote:    .agents/state.json at revision 0
+SUMMARY.md: removed 24 lines (2 blockquote + 20 Current State); kept Architecture Overview, Key Metrics
+Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+Moved into snapshot: .agents/archive/pre-state-migration-2026-09-26/state.draft.json, .agents/archive/pre-state-migration-2026-09-26/state.import-report.md
+[exit 0]
+
+$ sed -n 1,8p .agents/SYSTEM/SUMMARY.md
+# blank
+
+<!-- state:begin -->
+<!-- generated from .agents/state.json rev 0 by open-brain v0.0.0 — do not edit; change state via ob_state -->
+> **Status:** v0.0.0 — **Convert a CSV file to JSON from the command line**
+
+## What's working
+
+[exit 0]
+
+$ node -e const s=require("./.agents/state.json");console.log(JSON.stringify({schema:s.schema_version,rev:s.revision,project:s.project,objective:s.objective,tasks:s.tasks.map(t=>[t.id,t.priority,t.status,t.closed_rev]),verified:s.verified.length,gaps:s.gaps.length,decisions:s.decisions.length,handoffs:s.handoffs,sessions:s.sessions}))
+{"schema":3,"rev":0,"project":{"name":"blank"},"objective":{"text":"**Convert a CSV file to JSON from the command line**","since_session":0},"tasks":[["T-001","P0","open",null],["T-002","P1","open",null],["T-003","P2","open",null],["T-004","P3","open",null]],"verified":0,"gaps":0,"decisions":0,"handoffs":[{"seat":"developer","pick_up":"","watch_out":[],"open_questions":[],"session":0,"loop_state":null,"session_uuid":null,"checkout":null,"first_rev":null}],"sessions":[{"n":0,"date":"2026-09-26","uuid":null,"seat":null,"checkout":null,"first_rev":null}]}
+[exit 0]
+
+> Step 8. Predicted: step 3's 10 tracked + state.json + next-session.md + CLAUDE.md (step 4 wrote it) = 13. package.json (manual fix 2) is the one extra: step 8 says stop and ask the owner; owner: include it.
+
+$ git status --short --untracked-files=all
+?? .agents/AGENT.md
+?? .agents/SESSIONS/next-session.md
+?? .agents/SYSTEM/SUMMARY.md
+?? .agents/TASKS/INBOX.md
+?? .agents/TASKS/task.md
+?? .agents/state.json
+?? .claude/commands/end.md
+?? .claude/commands/start.md
+?? .claude/commands/sync.md
+?? .claude/commands/task.md
+?? .gitattributes
+?? .gitignore
+?? CLAUDE.md
+?? package.json
+[exit 0]
+
+$ git add -A
+warning: in the working copy of '.claude/commands/end.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/start.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/sync.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/task.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.gitattributes', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'CLAUDE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+[exit 0]
+
+$ git -c user.name=QA135 -c user.email=qa135@example.invalid commit -q -m Bootstrap SIA
+[exit 0]
+
+$ git status --short --untracked-files=all
+[exit 0]
+
+$ git status --short --ignored --untracked-files=all
+!! .agents/SESSIONS/SESSION_TEMPLATE.md
+!! .agents/archive/pre-state-migration-2026-09-26/AGENT.md
+!! .agents/archive/pre-state-migration-2026-09-26/SESSIONS/SESSION_TEMPLATE.md
+!! .agents/archive/pre-state-migration-2026-09-26/SYSTEM/SUMMARY.md
+!! .agents/archive/pre-state-migration-2026-09-26/TASKS/INBOX.md
+!! .agents/archive/pre-state-migration-2026-09-26/TASKS/task.md
+!! .agents/archive/pre-state-migration-2026-09-26/state.draft.json
+!! .agents/archive/pre-state-migration-2026-09-26/state.import-report.md
+[exit 0]
+
+> (c)
+
+$ node /c/qa-scratch/ob-start.mjs C:\qa-scratch\ii\blank
+Tree currency: NOT CHECKED — origin/master does not exist in this checkout — nothing to compare against. This is not a pass.
+
+Session Start — project mode
+Project: blank v0.0.0
+
+Drift: none
+
+Session #1
+Log: C:\qa-scratch\ii\blank\.agents\SESSIONS\Session_1.md
+Session ID: discovery failed
+
+Seat: blank (none)
+This checkout is NOT A SEAT (blank, role: none) — no seat-specific role file is expected here.
+  Its sessions are recorded with no seat; a set_handoff names its seat in the op.
+Role knowledge loaded (0 of 1):
+  .agents/roles/shared.md — ABSENT (shared; not a seat, so none is expected)
+
+## Sizes (tokens estimated as chars/4)
+  SUMMARY.md (.agents/SYSTEM/SUMMARY.md): 44 lines, 148 words, ~200 tokens, truncated: no
+  INBOX.md (.agents/TASKS/INBOX.md): 28 lines, 109 words, ~144 tokens, truncated: no
+  task.md (.agents/TASKS/task.md): 15 lines, 80 words, ~106 tokens, truncated: no
+  next-session.md (.agents/SESSIONS/next-session.md): 22 lines, 56 words, ~91 tokens, truncated: no
+  state.json (.agents/state.json): 84 lines, 173 words, ~424 tokens, truncated: no
+
+## State (state.json rev 0)
+Project: blank v0.0.0
+Objective: **Convert a CSV file to JSON from the command line** (since session 0)
+
+Tasks (4 active; done: 0):
+  P0:
+    [open] T-001 Read a CSV file into rows
+  P1:
+    [open] T-002 Write the rows as JSON to stdout
+  P2:
+    [open] T-003 Handle quoted fields with commas
+  P3:
+    [open] T-004 A --pretty flag
+
+Verified (0):
+  (none)
+
+Gaps (0):
+  (none)
+
+Decisions: 0 recorded
+
+Handoffs (1) — READER'S SEAT UNRESOLVED, so none is rendered as "yours":
+
+Other handoffs (newest per seat and checkout; named, not rendered — read one by its commit):
+  developer [legacy] (session 0): close-out 4245a2a 2026-09-26
+    (nothing recorded)
+
+Last session: #0 2026-09-26 — 1 writing session(s) in the record
+
+Total returned words: 265 (~456 tokens)
+[exit 0]
+
+$ sh -c node C:/qa-scratch/cand/open-brain/build/cli-bootstrap.js < /c/qa-tmp/hook2.json
+Project detected: C:/qa-scratch/ii/blank (.agents/ found)
+Tree currency: NOT CHECKED — origin/master does not exist in this checkout — nothing to compare against. This is not a pass.
+SESSION_UUID: 22222222-2222-4333-8444-555555555555
+Agent: blank (none) — no partner
+This checkout is NOT A SEAT (blank, role: none) — no seat-specific role file is expected here.
+  Its sessions are recorded with no seat; a set_handoff names its seat in the op.
+Role knowledge loaded (0 of 1):
+  .agents/roles/shared.md — ABSENT (shared; not a seat, so none is expected)
+[exit 0]
