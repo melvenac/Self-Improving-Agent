@@ -9,8 +9,7 @@ names it **Scout**, `role: none`. **Partner:** Atlas.
 SIA's seat set is closed: planner, developer and qa (`role-files.ts` `ROLE_NAMES`, the harness's `RoleName`, and the
 state schema's `SeatName`). A fourth real seat would be a code change across all three. **`role: none` is the supported
 alternative, a checkout that is deliberately not a seat.** `/start` says so, and loads `.agents/roles/shared.md` only.
-**The schema refuses any `set_handoff` or close-out from it,** so research can never overwrite a seat's record. That
-is structural, not a rule to remember.
+**CORRECTED 2026-09-26: nothing structural stops a write from here.** The first version said "the schema refuses any `set_handoff` or close-out from it". **That was false.** `set_handoff` takes the seat as an argument, whatever the checkout declares. Forge 127 verified this in the /bootstrap fix, and found a test that had pinned the same false line in the not-a-seat greeting. **Until T-179 (a record keyed by the writing session) and T-003 (the right session registered) both land, "research writes no state" is a RULE in this charter, not a property of the code.**
 
 If the seat earns a permanent place, making `research` a fourth `SeatName` is a developer task. Until then it stays
 `none`.
@@ -26,7 +25,7 @@ Answers **questions the planner or Aaron hand it**, each as a brief with a quest
 
 ## What it does not do
 
-- **It does not write product code, tests or state.** No `ob_state` writes (the schema refuses them anyway), no
+- **It does not write product code, tests or state.** No `ob_state` writes (a rule here, not enforced by code; see above), no
   commits to `open-brain/`, and no loop branches.
 - **It does not rule.** A finding is advice to the planner. The planner rules, and Aaron decides.
 - **No full test suite on this desktop**, which is never quiet.
