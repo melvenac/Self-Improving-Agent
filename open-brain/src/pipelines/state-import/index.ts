@@ -872,7 +872,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   // SUMMARY.md is the one input --commit rewrites in place rather than regenerates.
   const summaryPath = join(root, ".agents/SYSTEM/SUMMARY.md");
   const summaryRead = readText(summaryPath);
-  if (summaryRead?.undecodable) throw new Error(`.agents/SYSTEM/SUMMARY.md ${summaryRead.undecodable}, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
+  if (summaryRead?.undecodable) throw new Error(`.agents/SYSTEM/SUMMARY.md is ${summaryRead.undecodable}, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
   // Windows-1252 is a guess. It is safe for a verdict, which reads only ASCII,
   // but not for a file written back: a wrong guess would rewrite its other text.
   if (summaryRead?.encoding === "windows-1252") throw new Error(`.agents/SYSTEM/SUMMARY.md is not valid UTF-8 and has no byte-order mark, so its encoding can only be guessed, and --commit rewrites it in place. Nothing written. Save it as UTF-8 and re-run --draft`);
