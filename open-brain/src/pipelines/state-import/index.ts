@@ -849,7 +849,7 @@ function refuseHalfRestored(root: string): void {
   const archive = join(root, ".agents", "archive");
   if (!existsSync(archive)) return;
   // The names end in the date, so sorted is oldest first, whatever order the directory lists them in.
-  const left = readdirSync(archive).filter((n) => n.startsWith(SNAPSHOT_PREFIX) && n.endsWith(INCOMPLETE_SUFFIX)).sort();
+  const left = readdirSync(archive).filter((n) => n.startsWith(SNAPSHOT_PREFIX) && n.endsWith(INCOMPLETE_SUFFIX));
   if (left.length === 0) return;
   const snapshots = left.map((n) => `.agents/archive/${n.slice(0, -INCOMPLETE_SUFFIX.length)}/`);
   const markers = left.map((n) => `.agents/archive/${n}`).join(" and ");
