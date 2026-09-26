@@ -45,6 +45,10 @@ parser reports unknown flags before value problems, so the fixed code refuses wi
 typographic dash…)` instead. The row now asserts that text. It is still red at the base for the same reason: the
 parse is **ok** there. M4 kills it.
 
+**The planner's ruling on row V (Atlas, after the first handback):** a changed assertion that was only argued red at the
+base would not count on its own. M4 (dash-as-value, run `36215380590`) kills the new form, so the mutant proves the
+protection, and row V is accepted on that basis.
+
 ## 3. Green, and the mutants
 
 **Green:** run `36215373898`, `loop/t185-r2` `b8958a0` (the log's fetch line shows `+b8958a0…`), tcm-1. The result was
@@ -71,16 +75,47 @@ text documents, and M1 is that declaration.
 
 - **`qa120-t185.test.ts`**, copied into `open-brain/tests/` at `b8958a0` and removed afterwards (never committed):
   **9/9 pass, exit 0.** The em-dash row was red at `9473b0d` (D1) and is now green. The other 8 are unchanged.
-- **`probes.mjs`**: not run by me. It needs a built scratch clone per QA's README. The rows I expect to change are the
-  em-dash migrate row (now exit 2, `refuse2`, file unchanged) and any directory command given a dash token (N4: now
-  named as a flag). The top-level usage text also gains `[--last-session-seat <seat>]`. As far as I can see, no probe
-  captures the usage text.
+- **`probes.mjs`**: run at the planner's request. The result is in §5.
 - **`qa120-inscratch.test.ts`** carries its own verbatim copy of the **old** `inScratch`, so its A3 still records the
   bypass. That row is the one R185-8 changes. The equivalent attacks against the new guard are the three rows in §2.
 
-## 5. What I did not do, and why
+## 5. QA 120's `probes.mjs` against `b8958a0`'s build: 0 FAIL
 
-- **No full local suite** (the planner's ruling). The two T-185 files and QA's file were run locally, one at a time.
+**How it was run:**
+- **The script.** Extracted with `git cat-file blob` from `origin/qa/t185-report:docs/loops/qa-scripts-t185/probes.mjs`
+  (blob `f0f96c22…`), and checked with `git hash-object`, which gives `f0f96c22bc59b5db589fec3c905ed372edb48f3c`: a
+  match. QA's recorded output was extracted and checked the same way: `out/cand.json` `019d65ab…`. **The script was
+  run unmodified.**
+- **The tree.** A scratch `git clone` of this repo checked out at `b8958a0` in my session scratchpad, with 0 porcelain.
+  `npm ci` and `npm run build` in `open-brain/` both exited 0.
+- **Where it wrote.** The fixtures go under the OS temp dir. Every CLI state path (DB, vault, slot, score history,
+  shadow log, HOME) is redirected per probe by the script itself. After the run, no `qa120-*` directory was left in the
+  temp dir.
+- **The one write outside my scratchpad.** The script's output path is hardcoded to `C:\qa-scratch\t185-probes\`,
+  which did not exist on this machine, so the script created it. I copied the result out and removed that directory.
+- **The result**, tracked for the planner to read: `docs/loops/t185-r2-probes-b8958a0.json` (blob `5c3d7b24…`).
+
+**The result: `r2-b8958a0: 75 probes, 74 PASS, 0 FAIL, 1 INFO`.** At `9473b0d`, QA's `cand.json` has 73 PASS, 1 FAIL
+and 1 INFO.
+
+**Row by row against QA's `cand.json`**, comparing `status`, `verdict`, `changed`, `stateChanged`, `headBefore`,
+`headAfter`, `porcelain`, `stderr`, `stdout` and `argv`:
+
+| Rows | Difference | Ruling |
+|---|---|---|
+| **65** | None, once the environment is normalised: the temp root (`C:\qa-tmp` on the QA PC, `%TEMP%` here), the random fixture directory names, and the SHAs of freshly committed fixture repos. 45 rows are identical without any normalising at all | none needed |
+| **1**: `qa: state migrate --seat developer —dry-run <f> (em dash)` | **FAIL → PASS.** Status 1 → 2. `changed` `["~state.json"]` → `[]`: the file is no longer migrated. The stderr is now `unrecognised flag "—dry-run" (a typographic dash, not "-")`, and stdout is empty | **R185-5** (D1) |
+| **8**: `sync —check`, `sync —dry-run`, `sync –check`, `start —dry-run`, `detach —dry-run --no-fetch`, `state show —json`, `relocate —apply`, `topics —apply` | PASS → PASS (still exit 2, nothing changed). **Only the stderr wording changed.** It was `"—check" is not an existing directory` (or `takes no positional arguments` for relocate and topics). It is now `unrecognised flag "—check" (a typographic dash, not "-")` plus the accepted flags | **R185-5** (N4, which the rulings say R185-5 fixes) |
+| **1**: `backfill-success-rate.mjs --apply --apply (twice)`, INFO | The stack trace's absolute path to the build tree's `node_modules`. Everything from `node_modules` onwards is identical (180 of 180 characters) | none: it is the environment, and the backfill script is untouched in round 2 |
+
+**Every row that differs is explained by R185-5 or by the environment.** No FAIL is left for a ruling to cover. R185-6,
+R185-7 and R185-8 change no probe row. R185-6 changes only the tests and the top-level usage line, and no probe
+captures that line. R185-7 adds tests only. R185-8 is a test helper.
+
+## 6. What I did not do, and why
+
+- **No full local suite** (the planner's ruling). The two T-185 files and QA's test file were run locally, one at a
+  time, and QA's `probes.mjs` was run against a scratch build (§5).
 - **GitNexus `impact`** was not run. The index lives in one checkout and is skipped in this worktree. `parseArgs`'
   callers were found by grep instead: `cli.ts` `parseOrRefuse`, the two test files, and QA's `doc-invocations.mjs`.
 - **`tsc --noEmit -p .`** covers `src/` only (T-152). It was clean on every branch before every push. The test files
@@ -91,7 +126,7 @@ text documents, and M1 is that declaration.
 - **Residual on migrate:** the check and the write are separate passes. A file that changes between them is refused at
   write time, and the message then says that the files listed before it WERE written. No test covers that window.
 
-## 6. Branches pushed (each read back with `git ls-remote`)
+## 7. Branches pushed (each read back with `git ls-remote`)
 
 `loop/t185-r2` `b8958a0` · `loop/t185-r2-redcheck` `4dbbe55` · `loop/t185-r2-mut-sync-declares-dry-run` `905bfdd` ·
 `loop/t185-r2-mut-db-before-parse` `c5c1e24` · `loop/t185-r2-mut-no-dash` `2f8372c` · `loop/t185-r2-mut-dash-as-value`
