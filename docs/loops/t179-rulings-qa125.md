@@ -1,0 +1,66 @@
+# T-179 + T-163: rulings on QA 125 (REJECTED: D1), and round 2 (record 128)
+
+**By:** Atlas (planner), record session 109 · 2026-09-26. **On:** `origin/qa/t179-report` `7df2ed0`,
+`docs/loops/t179-qa-report.md`, 420 lines, ending `QA-125: REPORT COMPLETE`. The planner read the Verdict, Defects,
+Disagreements and "Open for the planner". It did not read checks 1–7 in detail.
+
+## The verdict, accepted: REJECT `3c0bfdc`
+
+**D1 is exactly T-163's class,** through a door the candidate opened: per-session retention trusts a caller-supplied
+session number. One wrong number erases other sessions' records through `ob_state` itself. It cannot be corrected
+(G-047), and T163-2 cannot see it, because retention "explains" the removal. What holds (op-level refusal, the
+migration, the history scan, `end.md`, the guard, the importer, Addition 1) stays accepted, and round 2 must not
+regress it.
+
+**QA's disagreements are all accepted.** In particular, the handoff's "no op can address another's entry" is true of
+ops and false of the door. And the `[legacy]` tags do not disappear (D5).
+
+## Round 2 rulings
+
+- **R179-1 (D1, blocking): retention never trusts a number the record cannot check.** For a uuid that `sessions[]`
+  has not seen, the writer refuses a `session` above the record's newest `n` by more than **5**. It also refuses any
+  `session` low enough that retention would drop the new entry at once. The refusal names the number, the record's
+  newest and the rule. **Tests:** QA's A6, A6b and A6c as rows; one wrong number cannot drop another session's entry;
+  and T-164's local-greeting number (Forge 124 greeted as 6) is refused, not silently self-erasing. **T163-2** is
+  also given the case of a removal that retention would explain only through a number above the bound. It must flag
+  it.
+- **R179-2 (D2): the guarantee is claimed only as far as it holds,** and one check is added. `ob_set_session` refuses
+  a uuid that `sessions[]` already records under a **different checkout**. That covers A8's reconnect-adoption and A7
+  against a recorded victim. `end.md` and the handoff state the dependency plainly: "keyed by the registered session;
+  until T-003, the registration can be wrong". **T-003 is scheduled next** after this merges. A9 (the server
+  surviving `/clear`) is recorded as unobserved, and it becomes a T-003 row.
+- **R179-3 (D5): a legacy entry is superseded by the first keyed entry of its seat.** `record-erasure` explains that
+  removal. The three stale legacy handoffs (qa@75, developer@74, planner@109) then leave the greeting as each seat
+  writes.
+- **R179-4 (D6): the after-merge steps (handoff §7) are rewritten in QA's order,** as a checklist Aaron runs:
+  1. rebuild;
+  2. migrate the live record, re-rendering the four views in the same commit, so `summary-version` passes;
+  3. reconnect;
+  4. install the new `end.md`;
+  5. the SessionEnd hook, registered by `setup.mjs` (R179-5);
+  6. seat worktrees, detached or re-branched;
+  7. other projects: frogger has a v3 record already, and the rest are not on SIA.
+- **R179-5 (D3): `setup.mjs` registers the SessionEnd hook,** so T179-2 does not rest on a README step.
+- **R179-6 (D7): `end.md` claims only what the code does.** No "nothing it can erase" until D2's root is fixed. No
+  "injects only on a deterministic match" while nothing reads `MATCH:`. Say that step 3 needs a registered session.
+  No SIA ids in the template copy.
+- **R179-7 (QA Open 6): T163-2's known positives are guarded on CI by a FIXTURE row** that reproduces a removal at a
+  revision the walk could skip singly. That is deterministic and costs no CI time. `fetch-depth: 0` is not taken. QA's
+  `erasure-blind-rev60` mutant must turn red on tcm.
+
+**Not in round 2:**
+- **D4** (`close_task`'s note replaces, like `update_task`'s): folded into **T-171**'s scope, which is widened to name
+  both.
+- **D8** (`ob_state` writes `state.json` before the views; pre-existing on master): a task.
+
+## Round 2 brief (record 128)
+
+- **To:** a fresh Claude developer session (D-035), record **128**, in **`~/Worktrees/sia-infra` once B Step 1 hands
+  back.** Branch `loop/t179-r2` from `origin/loop/t179-merge` (`f618b73`).
+- **Read ONLY:** this file, QA 125's Verdict, Defects, checks 1 and 7 and its scripts, and the two T-179 handoffs.
+- **Red first:** QA's A6, A6b and A6c, and the R179-7 fixture, on `3c0bfdc`, read on tcm per test. **A code mutant
+  per protection,** including one that raises the R179-1 bound to infinity. QA's own mutants
+  (`qa/t179-mut-*`) must be red on the new tip. `npx tsc --noEmit -p .` before every push. No full local suite.
+  **Never write SIA's live `state.json`.**
+- **Push only** `loop/t179-r2` and `loop/t179-r2-*`. **The handoff is pushed BEFORE messaging atlas.** No `/end`.
+- **The stacked `/bootstrap` fix (record 127)** merges `loop/t179-r2`'s tip in when round 2 is frozen.
