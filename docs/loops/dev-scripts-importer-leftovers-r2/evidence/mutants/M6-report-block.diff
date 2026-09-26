@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 34a366c..be793e6 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -807,7 +807,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
+   L.push(`Imported ${r.decisions.imported} ADRs: ${r.decisions.date_from_line} with a full \`Date:\` line, ${r.decisions.date_partial.length} with a partial date (kept in the note), ${r.decisions.date_unknown} with none (date = migration date, note "imported; original date unknown").`);
+   for (const d of r.decisions.date_partial) L.push(`- ${d.id}: original date \`${d.original}\``);
+   if (r.decisions.skipped.length) { L.push("", "Skipped:"); for (const s of r.decisions.skipped) L.push(`- line ${s.line}: ${s.reason} — \`${s.heading}\``); }
+-  if (r.decisions_unreadable) { L.push("", "**Not read in full:**"); for (const l of describeDecisionsUnreadable(r.decisions_unreadable)) L.push(`- ${l}`); }
++  if (r.decisions_unreadable && r.migration_date === "never") { L.push("", "**Not read in full:**"); for (const l of describeDecisionsUnreadable(r.decisions_unreadable)) L.push(`- ${l}`); }
+   L.push("", "## Handoff (next-session.md)", "");
+   L.push(`pick_up: ${r.handoff.pick_up_lines} lines · watch_out: ${r.handoff.watch_out} bullets · open_questions: ${r.handoff.open_questions} bullets`);
+   if (r.handoff.sections_not_imported.length) { L.push("", "Sections NOT imported (they stay in the snapshot):"); for (const s of r.handoff.sections_not_imported) L.push(`- ${s}`); }
