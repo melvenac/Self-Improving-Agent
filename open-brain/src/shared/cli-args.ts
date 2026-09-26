@@ -107,7 +107,7 @@ export function parseArgs(spec: CommandSpec, tokens: readonly string[], cwd: str
       continue;
     }
     const next = tokens[i + 1];
-    if (next === undefined || looksLikeFlag(next)) {
+    if (next === undefined || next.startsWith("-")) {
       problems.push(`${name} needs a value`);
       continue;
     }
