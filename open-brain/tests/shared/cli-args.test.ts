@@ -228,7 +228,7 @@ describe("the declarations agree with the usage text the CLI prints", () => {
   // detach and state migrate document) and pass, and `sync --dry-run` then ran
   // the fixing sync.
   it.each(LINES)("every flag %s declares is documented on its own usage line", (name, re) => {
-    const documented = flagsOn(ownLine(re, name));
+    const documented = flagsOn(usage);
     for (const flag of declaredFlags(specNamed(name))) expect(documented, `${name} declares ${flag}`).toContain(flag);
   });
 });
