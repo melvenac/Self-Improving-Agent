@@ -958,6 +958,12 @@ interface MachineSnap {
   /** First symlink on the path as written, if any. Not a followed route. */
   viaLink: string | null;
   viaTarget: string | null;
+  /** R86. lstat of viaLink, including a link that is only an ancestor. Null when there is no link. */
+  viaDev: bigint | null;
+  viaIno: bigint | null;
+  viaNlink: number;
+  viaSize: bigint;
+  viaMtimeNs: bigint;
   /** What the OS reaches. Null when the path does not resolve. */
   resolvedPath: string | null;
   kind: PathIdentity["kind"];
@@ -1034,11 +1040,21 @@ export class MachineConfigWatch {
     }
     let viaLink: string | null = null;
     let viaTarget: string | null = null;
+    let viaDev: bigint | null = null;
+    let viaIno: bigint | null = null;
+    let viaNlink = 0;
+    let viaSize = 0n;
+    let viaMtimeNs = 0n;
     for (const c of lexicalPaths(this.anchorOf(p), p, true)) {
       const id = identify(c);
       if (id.kind === "symlink" && id.target) {
         viaLink = c;
         viaTarget = id.target;
+        viaDev = id.dev;
+        viaIno = id.ino;
+        viaNlink = id.nlink;
+        viaSize = id.size;
+        viaMtimeNs = id.mtimeNs;
         break;
       }
       if (id.kind === "absent") break;
@@ -1048,6 +1064,11 @@ export class MachineConfigWatch {
       lexicalTarget: lexical.target,
       viaLink,
       viaTarget,
+      viaDev,
+      viaIno,
+      viaNlink,
+      viaSize,
+      viaMtimeNs,
       resolvedPath: null,
       kind: "absent",
       dev: null,
@@ -1104,6 +1125,11 @@ export class MachineConfigWatch {
       lexicalTarget: lexical.target,
       viaLink,
       viaTarget,
+      viaDev,
+      viaIno,
+      viaNlink,
+      viaSize,
+      viaMtimeNs,
       resolvedPath,
       kind,
       dev,
@@ -1251,6 +1277,9 @@ export class MachineConfigWatch {
       }
       return `${link}; resolves to: ${factText(s)}`;
     };
+    // R86. A link above the watched path is labelled the same way as a link at the path.
+    const ancestorLinkText = (s: MachineSnap): string =>
+      `link: type symlink dev ${s.viaDev} ino ${s.viaIno} nlink ${s.viaNlink} size ${s.viaSize} mtimeNs ${s.viaMtimeNs} readlink ${s.viaTarget}`;
     // R85. A current side that did not resolve names that failure. Zeroed facts are not a stand-in for the code.
     const currentSide = (s: MachineSnap): string => {
       if (s.lexicalKind === "symlink") return linkSide(s);
@@ -1313,7 +1342,7 @@ export class MachineConfigWatch {
         const after =
           base.resolvedPath === null
             ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${currentSide(end)}`
-            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${currentSide(end)}`;
+            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${end.lexicalKind === "symlink" ? currentSide(end) : `${ancestorLinkText(end)}; ${currentSide(end)}`}`;
         out.push(row(stageBefore(opened), after, true, p.path, p.scope));
         continue;
       }
