@@ -146,3 +146,43 @@ changed during this batch by this seat.** SysMain was not touched, and all six b
 
 No full suite ran on this desktop. The local runs were two test files (a 1.5 s probe and `topics.test.ts`, three
 times, for the instrument), `tsc --noEmit` twice, and the generator for 2 to 3 s at 1 to 3 children.
+
+## 9. Row 2, added at the planner's request: Step 2's cap alone under the red load
+
+Asked by Atlas after Step 0 was accepted: does `--maxWorkers=2` **alone** hold under `spawn=2`, the set that
+turns the code red 3 of 3? Everything else was the same as rows 0 and 1: `laptop-win`, head `b32d3b8`,
+`--testTimeout=30000`, ELD on, `cpu=0 disk=0`. The job log shows the command as
+`npm test -- --testTimeout=30000 --maxWorkers=2`, so the flag was read, not assumed.
+
+| Row | workers | spawn | Run | Baseline (CPU %, free RAM) | SUITE_EXIT | onTaskUpdate | Tests | Duration | Worst file, gap |
+|---|---|---|---|---|---|---|---|---|---|
+| 2 | 2 | 2 | 36215801426 | 1.0, 2036 MB, QUIET | **0** | 0 | 1035/1035 | 376.3 s | hook.test.ts, **41 858 ms** |
+| 2 | 2 | 2 | 36216184200 | 1.3, 2426 MB, QUIET | **0** | 0 | 1035/1035 | 415.1 s | hook.test.ts, **53 299 ms** |
+| 2 | 2 | 2 | 36216582552 | 1.3, 2265 MB, QUIET | **0** | 0 | 1035/1035 | 419.5 s | hook.test.ts, **49 807 ms** |
+
+Every generator report showed deadBeforeStop 0 and leaked 0, and the independent `aliveNow` check was 0. The
+baselines were quiet. The first run's top process was `tailscale-ipn` at 5 %, and the other two showed only idle
+`svchost`.
+
+**ELD, top five per run (ms):**
+
+| Run | 1st | 2nd | 3rd | 4th | 5th |
+|---|---|---|---|---|---|
+| 36215801426 | hook 41 858 | cli-bootstrap 24 863 | staleness 18 719 | cli 12 169 (wall 73 767) | derived-artifacts 10 651 |
+| 36216184200 | hook 53 299 | staleness 25 078 | cli-bootstrap 21 583 | derived-artifacts 13 860 | runtime 11 681 (wall 224 344) |
+| 36216582552 | hook 49 807 | cli-bootstrap 20 080 | staleness 19 618 | derived-artifacts 14 833 | cli 11 720 (wall 83 906) |
+
+### What it says
+
+- **The cap alone turns the red set green, 3 of 3.** Every run stayed under the 60 s threshold, which fits
+  H-worker: the cap shortened the stretches, and no run crossed 60 s.
+- **The margin is thin.** Under the cap `hook.test.ts` still reached **53.3 s**, 6.7 s short of 60. Without the cap,
+  at the same load, it ran 86 to 99 s. The cap cuts the worst stretch by roughly half. It does not bound it: the
+  file still never yields, and its stretch still grows with load. **Inference, not measured:** a load row heavier
+  than `spawn=2` would plausibly take the capped `hook.test.ts` over 60 s. That was not run.
+- **The cost is wall time.** 376 to 420 s under the cap, against 266 to 295 s uncapped at the same load, about 45 %
+  longer.
+- **For the design:** this supports design §2's reading of Step 2, "the second layer, not the fix". It lowers
+  contention but leaves the macrotask-free stretch in place. On this evidence, a criterion stated as "green under
+  `spawn=2`" would be met by the cap alone. **A criterion that bounds each file's worst stretch** (design §3 B-3)
+  would not be met, because 53 s is not "well below 60 s". Which of the two B's criteria use is QA's to write.
