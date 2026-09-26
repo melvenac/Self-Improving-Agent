@@ -357,6 +357,48 @@ describe("BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git proje
     expect(sj.verify.problems.join("\n")).toMatch(/expected eol=lf/);
   }, E2E_TIMEOUT);
 
+  it("residue moved BEFORE git init: the pre-SIA commit leaves .agents/ out, and the moved residue does not make scaffold refuse", () => {
+    // Found by the acceptance run (record 127, run 1): the order bootstrap.md gave put the
+    // residue into the pre-SIA commit, and the other order made the tree read as dirty.
+    const dir = scratchProject(tmps, { git: false, residue: true });
+    expect(cli(["bootstrap", "move-residue", dir], dir).status).toBe(0);
+    git(dir, "init", "-q", "-b", "master");
+    git(dir, "config", "user.email", "t@example.com");
+    git(dir, "config", "user.name", "T");
+    git(dir, "add", "-A", "--", ".", ":(exclude).agents");
+    git(dir, "commit", "-q", "-m", "the project before SIA");
+    expect(git(dir, "ls-files")).not.toMatch(/\.agents/);
+    const chk = JSON.parse(cli(["bootstrap", "check", "--json", dir], dir).stdout);
+    expect(chk.git.dirty).toEqual([]);
+    expect(chk.next).toMatch(/Scaffold/);
+    const s = cli(["bootstrap", "scaffold", "--json", dir], dir);
+    expect(s.stderr).toBe("");
+    expect(s.status).toBe(0);
+    // And after scaffold the moved residue is ignored, not something to commit.
+    expect(git(dir, "status", "--porcelain", "--untracked-files=all")).not.toMatch(/pre-bootstrap-residue/);
+  }, E2E_TIMEOUT);
+
+  it("residue git already tracked: check names the removal commit, and after it scaffold proceeds", () => {
+    const dir = scratchProject(tmps, { residue: true }); // the residue is in the first commit
+    expect(cli(["bootstrap", "move-residue", dir], dir).status).toBe(0);
+    const chk = JSON.parse(cli(["bootstrap", "check", "--json", dir], dir).stdout);
+    expect(chk.git.dirty).toEqual([" D .agents/reflection-queue.json"]);
+    expect(chk.next).toMatch(/git add -u -- \.agents/);
+    git(dir, "add", "-u", "--", ".agents");
+    git(dir, "commit", "-q", "-m", "Move old .agents/ files aside");
+    const s = cli(["bootstrap", "scaffold", dir], dir);
+    expect(s.stderr).toBe("");
+    expect(s.status).toBe(0);
+  }, E2E_TIMEOUT);
+
+  it("negative: a real uncommitted change still makes scaffold refuse", () => {
+    const dir = scratchProject(tmps);
+    writeFileSync(join(dir, "index.js"), "console.log('changed');\n");
+    const s = cli(["bootstrap", "scaffold", dir], dir);
+    expect(s.status).toBe(1);
+    expect(s.stderr).toMatch(/uncommitted/);
+  }, E2E_TIMEOUT);
+
   it("scaffold refuses over residue and moves nothing", () => {
     const dir = scratchProject(tmps, { residue: true });
     const r = cli(["bootstrap", "scaffold", dir], dir);

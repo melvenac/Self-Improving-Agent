@@ -33,6 +33,11 @@ no version bump in these commits, because the release is Aaron's (D-019).
   declares it is not a seat.
 - **The `ob_start` header prints the record's project name**: `Project: frogger v0.0.1`, not `Project: v0.0.1`
   (BF-8, F12).
+  The CLI's `open-brain start` printed the same line and is fixed the same way.
+- **Residue before the first commit.** `/bootstrap` moves residue aside BEFORE the pre-SIA commit, and that commit
+  leaves `.agents/` out. Scaffold's dirty check ignores what `move-residue` set aside, and `check` names the
+  removal commit when git already tracked the residue. The acceptance run found this: in the first order written,
+  the residue went into the pre-SIA commit.
 
 ### Removed
 

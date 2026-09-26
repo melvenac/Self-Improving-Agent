@@ -31,26 +31,36 @@ It reports git, `CLAUDE.md` and `.agents/`, and ends with a `Next:` line. Act on
 
 If `git:` says `inside another repository`, **stop**: bootstrap a project at its own repository root.
 
-## Step 2: The project is its own commit first
+## Step 2: Residue aside, then the project is its own commit
 
-- **Not a repository:** ask the owner, "Initialize git here and commit the project as it stands?"
-  On yes, `git init`, then look at `git status --short` **before** committing. If there is no
-  `.gitignore`, ask the owner what to leave out (dependencies like `node_modules/`, build output,
-  `.env` files) and write a `.gitignore` for those first. Then commit: `git add -A` and
-  `git commit -m "The project before SIA"`.
-- **No commit yet, or uncommitted changes:** ask the owner to commit them (or commit on their word).
-  Scaffold refuses a dirty tree, so that the SIA commit holds only what bootstrap added.
-- **Residue:** show the owner the entries `check` listed and say they will be moved, not deleted.
-  On yes:
+Do these **in this order**, running `OB bootstrap check` after each. Its `Next:` line says which one
+comes next.
 
-  ```
-  OB bootstrap move-residue
-  ```
+1. **Residue first.** Show the owner the entries `check` listed and say they will be moved, not
+   deleted. On yes:
 
-  They land in `.agents/archive/pre-bootstrap-residue-<date>/`, which stays local. The owner deletes
-  it when they have looked.
+   ```
+   OB bootstrap move-residue
+   ```
 
-Run `OB bootstrap check` again. `Next:` must now say to scaffold.
+   They land in `.agents/archive/pre-bootstrap-residue-<date>/`, which stays local. The owner deletes
+   it when they have looked. If git already tracked those files, `Next:` says to commit their
+   removal on its own. Do that.
+2. **Not a repository:** ask the owner, "Initialize git here and commit the project as it stands?"
+   On yes, `git init`, then look at `git status --short` **before** committing. If there is no
+   `.gitignore`, ask the owner what to leave out (dependencies like `node_modules/`, build output,
+   `.env` files) and write a `.gitignore` for those first. Then commit, **leaving `.agents/` out**:
+
+   ```
+   git add -A -- . ":(exclude).agents"
+   git commit -m "The project before SIA"
+   ```
+
+3. **No commit yet, or uncommitted changes:** ask the owner to commit them the same way (or commit
+   on their word). Scaffold refuses a dirty tree, so that the SIA commit holds only what bootstrap
+   added.
+
+`Next:` must now say to scaffold.
 
 ## Step 3: CLAUDE.md
 

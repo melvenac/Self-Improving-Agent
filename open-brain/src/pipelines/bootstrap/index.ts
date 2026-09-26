@@ -71,8 +71,14 @@ function gitState(root: string): GitState {
   if (top === null) return { kind: "none" };
   if (samePath(top, root)) {
     const commits = git(root, ["rev-parse", "--verify", "-q", "HEAD"]) !== null;
-    const porcelain = git(root, ["status", "--porcelain"]) ?? "";
-    return { kind: "root", commits, dirty: porcelain.split("\n").filter(Boolean) };
+    // Per file, so the residue move-residue set aside is seen as itself rather than
+    // as `?? .agents/`: it is local by design and not a change for the owner to commit.
+    // Not trimmed: porcelain's status is column-sensitive, and a trim eats the
+    // first line's leading space (` D path` would read as `D path`).
+    const porcelain = gitRaw(root, ["status", "--porcelain", "--untracked-files=all"]) ?? "";
+    const dirty = porcelain.split("\n").filter(Boolean)
+      .filter((l) => !(l.startsWith("?? ") && l.slice(3).replace(/^"|"$/g, "").startsWith(`.agents/archive/${RESIDUE_PREFIX}`)));
+    return { kind: "root", commits, dirty };
   }
   return { kind: "nested", toplevel: top };
 }
@@ -114,10 +120,16 @@ function nextStep(g: GitState, a: AgentsState, templateFound: boolean): string {
   if (a.kind === "bootstrapped") return "Already bootstrapped (.agents/state.json exists). Run /start.";
   if (a.kind === "pre-state") return "An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.";
   if (g.kind === "nested") return `STOP: this folder is inside another repository (${g.toplevel}). Bootstrap a project at its own repository root.`;
-  if (g.kind === "none") return "git init, then commit the project as it stands, before anything is scaffolded.";
-  if (!g.commits) return "Commit the project as it stands (the repository has no commit yet), before anything is scaffolded.";
-  if (g.dirty.length > 0) return `Commit or set aside the ${g.dirty.length} uncommitted change(s) first, so the SIA commit holds only what bootstrap added.`;
-  if (a.kind === "residue") return "Move the residue aside (`bootstrap move-residue`), then scaffold.";
+  // Residue first: moved before the pre-SIA commit, it never enters it.
+  if (a.kind === "residue") return "Move the residue aside first (`bootstrap move-residue`), then run check again.";
+  const leaveOut = "leaving .agents/ out of that commit (`git add -A -- . \":(exclude).agents\"`)";
+  if (g.kind === "none") return `git init, then commit the project as it stands, ${leaveOut}, before anything is scaffolded.`;
+  if (!g.commits) return `Commit the project as it stands (the repository has no commit yet), ${leaveOut}, before anything is scaffolded.`;
+  // Residue that git already tracked shows, once moved, as deletions under .agents/.
+  if (g.dirty.length > 0 && g.dirty.every((l) => /^( D|D ) \.agents\//.test(l))) {
+    return "The residue was tracked by git: commit its removal on its own (`git add -u -- .agents`, then `git commit -m \"Move old .agents/ files aside\"`). The files are kept, local, under .agents/archive/.";
+  }
+  if (g.dirty.length > 0) return `Commit the ${g.dirty.length} uncommitted change(s) first, ${leaveOut}, so the SIA commit holds only what bootstrap added.`;
   return "Scaffold (`bootstrap scaffold`).";
 }
 
@@ -318,6 +330,14 @@ To make a checkout a seat later, write \`.agents/AGENT.local.md\` (local to that
 function git(cwd: string, args: string[]): string | null {
   try {
     return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  } catch {
+    return null;
+  }
+}
+
+function gitRaw(cwd: string, args: string[]): string | null {
+  try {
+    return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).replace(/\r?\n$/, "");
   } catch {
     return null;
   }
