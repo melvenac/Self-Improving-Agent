@@ -1,0 +1,14 @@
+{
+  "schema_version": 3,
+  "revision": 0,
+  "project": {
+    "name": "{{PROJECT}}"
+  },
+  "objective": null,
+  "tasks": [],
+  "verified": [],
+  "gaps": [],
+  "decisions": [],
+  "handoffs": [],
+  "sessions": []
+}
