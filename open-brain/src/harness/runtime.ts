@@ -1076,7 +1076,7 @@ async function runLoopInner(
       if (machineWatch) {
         for (const f of machineWatch.compare()) {
           result.machineConfigFindings.push(f);
-          if (!machineChangeReported(f)) continue;
+          if (f.before === f.after) continue;
           const typeChange = f.after.startsWith("type change:");
           const line =
             `machine-wide git config changed during the ${f.stage} stage: ${f.scope} ${f.path} ${f.before} → ${f.after}. ` +
