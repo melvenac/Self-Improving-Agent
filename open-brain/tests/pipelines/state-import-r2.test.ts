@@ -182,6 +182,18 @@ describe("R2-1 (IF-9): an encoding detail never turns a STALE input into 'could 
     expect(() => runCommit(root, TODAY)).toThrow(/SUMMARY\.md is not valid UTF-8/);
     expect(tree(root)).toEqual(before);
   });
+
+  // Round 4 (R4-2, QA 111's D9). Round 3 sent the test above to the Windows-1252 check, and the
+  // NUL refusal was left with no test. It is here, not only in state-import-r4.test.ts, because
+  // QA 106's mutants-r2.mjs runs a fixed list of files that includes this one, and its N5 must see it.
+  it("SUMMARY.md in UTF-16LE with no BOM (NUL bytes): --commit refuses before anything is written", () => {
+    writeProject(root, 7, bodies({ next: "Session 7", inbox: "Session 7", task: "Session 7" }));
+    writeFileSync(join(root, ".agents/SYSTEM/SUMMARY.md"), Buffer.from("# Summary\n\n> **Status:** old status line\n\n## About\n\nKept.\n", "utf16le"));
+    runDraft(root, TODAY);
+    const before = tree(root);
+    expect(() => runCommit(root, TODAY)).toThrow(/SUMMARY\.md .*NUL byte/);
+    expect(tree(root)).toEqual(before);
+  });
 });
 
 describe("R2-2 (IF-10): an input that declares a session AHEAD of the latest log is not 'current'", () => {
