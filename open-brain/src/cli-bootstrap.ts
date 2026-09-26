@@ -26,6 +26,7 @@ import {
   resolveAgentIdentity,
 } from "./shared/active-session.js";
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
+import { takeMissingHandoffNotices } from "./shared/handoff-guard.js";
 
 // Anti-loop: read hook input from stdin to detect subagent context.
 // Claude Code includes `agent_id` when the hook fires inside a subagent.
@@ -228,6 +229,16 @@ if (hasAgents) {
   for (const line of describeDerivedArtifacts(cwd)) {
     lines.push("");
     lines.push(line);
+  }
+}
+
+// T179-2: a previous session in this checkout ended with committed loop work
+// and no handoff. Its SessionEnd hook recorded that; shown here ONCE, because
+// whether a SessionEnd hook's output reaches anyone is up to the host.
+if (hasAgents) {
+  for (const notice of takeMissingHandoffNotices(cwd)) {
+    lines.push("");
+    lines.push(notice);
   }
 }
 
