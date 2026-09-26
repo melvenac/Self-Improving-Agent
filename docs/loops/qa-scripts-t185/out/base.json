@@ -1,0 +1,1649 @@
+[
+  {
+    "group": "sync",
+    "id": "control: sync (no flags)",
+    "argv": [
+      "sync"
+    ],
+    "expect": "control-change",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "control: sync --check",
+    "argv": [
+      "sync",
+      "--check"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 1,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | ISSUES:"
+  },
+  {
+    "group": "sync",
+    "id": "dev: sync -check",
+    "argv": [
+      "sync",
+      "-check"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "dev: sync --chek",
+    "argv": [
+      "sync",
+      "--chek"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "dev: sync --help",
+    "argv": [
+      "sync",
+      "--help"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "dev: sync -h",
+    "argv": [
+      "sync",
+      "-h"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync --dry_run",
+    "argv": [
+      "sync",
+      "--dry_run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync —check",
+    "argv": [
+      "sync",
+      "—check"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync —dry-run",
+    "argv": [
+      "sync",
+      "—dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync –check",
+    "argv": [
+      "sync",
+      "–check"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync -n",
+    "argv": [
+      "sync",
+      "-n"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync --check=1",
+    "argv": [
+      "sync",
+      "--check=1"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync -",
+    "argv": [
+      "sync",
+      "-"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync --",
+    "argv": [
+      "sync",
+      "--"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync . --chek (flag after positional)",
+    "argv": [
+      "sync",
+      ".",
+      "--chek"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync --check --check (flag twice)",
+    "argv": [
+      "sync",
+      "--check",
+      "--check"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 1,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | ISSUES:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync no-such-dir",
+    "argv": [
+      "sync",
+      "no-such-dir"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync package.json (a file, not a dir)",
+    "argv": [
+      "sync",
+      "package.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync . .. (two dirs)",
+    "argv": [
+      "sync",
+      ".",
+      ".."
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "start",
+    "id": "control: start (no flags)",
+    "argv": [
+      "start"
+    ],
+    "expect": "control-change",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [
+      "+.agents\\SESSIONS\\Session_1.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Session Start — project mode | Project: v1.2.3 | "
+  },
+  {
+    "group": "start",
+    "id": "dev: start -dry-run",
+    "argv": [
+      "start",
+      "-dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Session Start — lightweight mode | Project: v0.0.0 | "
+  },
+  {
+    "group": "start",
+    "id": "dev: start --dry-run",
+    "argv": [
+      "start",
+      "--dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "+.agents\\SESSIONS\\Session_1.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Session Start — project mode | Project: v1.2.3 | "
+  },
+  {
+    "group": "start",
+    "id": "qa: start --dry_run",
+    "argv": [
+      "start",
+      "--dry_run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "+.agents\\SESSIONS\\Session_1.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Session Start — project mode | Project: v1.2.3 | "
+  },
+  {
+    "group": "start",
+    "id": "qa: start —dry-run",
+    "argv": [
+      "start",
+      "—dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Session Start — lightweight mode | Project: v0.0.0 | "
+  },
+  {
+    "group": "start",
+    "id": "qa: start -n",
+    "argv": [
+      "start",
+      "-n"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Session Start — lightweight mode | Project: v0.0.0 | "
+  },
+  {
+    "group": "start",
+    "id": "qa: start -",
+    "argv": [
+      "start",
+      "-"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Session Start — lightweight mode | Project: v0.0.0 | "
+  },
+  {
+    "group": "start",
+    "id": "qa: start --check=1",
+    "argv": [
+      "start",
+      "--check=1"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "+.agents\\SESSIONS\\Session_1.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Session Start — project mode | Project: v1.2.3 | "
+  },
+  {
+    "group": "start",
+    "id": "qa: start . --dry-run (flag after positional)",
+    "argv": [
+      "start",
+      ".",
+      "--dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "+.agents\\SESSIONS\\Session_1.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Session Start — project mode | Project: v1.2.3 | "
+  },
+  {
+    "group": "start",
+    "id": "qa: start no-such-dir",
+    "argv": [
+      "start",
+      "no-such-dir"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Session Start — lightweight mode | Project: v0.0.0 | "
+  },
+  {
+    "group": "detach",
+    "id": "control: detach --no-fetch",
+    "argv": [
+      "detach",
+      "--no-fetch"
+    ],
+    "expect": "control-change",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "d5e8a1237d9451187b96f9926d963bde2e6285a7",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-oy0uHB\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "control: detach --dry-run --no-fetch",
+    "argv": [
+      "detach",
+      "--dry-run",
+      "--no-fetch"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-QOyqXR\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   would run: git checkout --detach origin/master  (from branch master c2d0dbb -> c2d0dbb)"
+  },
+  {
+    "group": "detach",
+    "id": "dev: detach -dry-run --no-fetch",
+    "argv": [
+      "detach",
+      "-dry-run",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "a60ce5a55b02158bd893765b2a557a4c910a3633",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-YwRLzu\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "dev: detach --dry-rn --no-fetch",
+    "argv": [
+      "detach",
+      "--dry-rn",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "3ba1971ec462a4702ef77aacf77ba013bae33613",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-oNjgGc\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach --dry_run --no-fetch",
+    "argv": [
+      "detach",
+      "--dry_run",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "4dafdfd8c800e1bafc284b148a03543090f7c696",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-lsFXHR\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach —dry-run --no-fetch",
+    "argv": [
+      "detach",
+      "—dry-run",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "7ea8fe49f3bdba39ab7a11ba2ec70e48fd43c783",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-muxAZQ\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach -n --no-fetch",
+    "argv": [
+      "detach",
+      "-n",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "1e8093bd3c70177428168965d3fb8334987835ac",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-SIg6mV\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach - --no-fetch",
+    "argv": [
+      "detach",
+      "-",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "1eaf932422bb91fa685f7d442689ea5fd0fbcd86",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-uEsgEW\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach --dry-run=1 --no-fetch",
+    "argv": [
+      "detach",
+      "--dry-run=1",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "c3b37b741ac243e66216034cc8e7fe2c4dcd7c70",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-sXOG1G\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach --force=1 --no-fetch",
+    "argv": [
+      "detach",
+      "--force=1",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "8d7f5cf2654b38d5185c80906ef5d22a1affd573",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-voE1f7\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach -dry-run (fetch allowed)",
+    "argv": [
+      "detach",
+      "-dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "+.git\\FETCH_HEAD",
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "19d39cb6eae16f15708013fd4203c50d7e9612dc",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-80G9nP\\clone |   git fetch origin |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach . -dry-run --no-fetch (after positional)",
+    "argv": [
+      "detach",
+      ".",
+      "-dry-run",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "e7e9e54d2bd3423150b18ef457784e4248ec99ed",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-HWjJbd\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach --dry-run --dry-run --no-fetch (twice)",
+    "argv": [
+      "detach",
+      "--dry-run",
+      "--dry-run",
+      "--no-fetch"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-jh5fTa\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   would run: git checkout --detach origin/master  (from branch master 3e0a0da -> 3e0a0da)"
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach no-such-dir --no-fetch",
+    "argv": [
+      "detach",
+      "no-such-dir",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "17684614b103fb8e5f680da60e8f060634053f7a",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\qa-tmp\\qa120-base-tnYX7L\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "migrate",
+    "id": "control: state migrate --seat developer <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "C:\\qa-tmp\\qa120-base-NoC8Lz\\state.json"
+    ],
+    "expect": "control-change",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [
+      "~state.json"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "C:\\qa-tmp\\qa120-base-NoC8Lz\\state.json |   schema_version 1 → 2 |   revision 52 → 53"
+  },
+  {
+    "group": "migrate",
+    "id": "control: state migrate --seat developer --dry-run <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--dry-run",
+      "C:\\qa-tmp\\qa120-base-V8DYO3\\state.json"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "[dry run] C:\\qa-tmp\\qa120-base-V8DYO3\\state.json |   schema_version 1 → 2 |   revision 52 → 53"
+  },
+  {
+    "group": "migrate",
+    "id": "dev: state migrate --seat developer -dry-run <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "-dry-run",
+      "C:\\qa-tmp\\qa120-base-ujlPKB\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [
+      "~state.json"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "1 file(s) refused — nothing was written for those.",
+    "stdout": "C:\\qa-tmp\\qa120-base-ujlPKB\\-dry-run |   REFUSED: C:\\qa-tmp\\qa120-base-ujlPKB\\-dry-run does not exist | C:\\qa-tmp\\qa120-base-ujlPKB\\state.json"
+  },
+  {
+    "group": "migrate",
+    "id": "dev: state migrate --seat developer --dry-rn <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--dry-rn",
+      "C:\\qa-tmp\\qa120-base-YdT3YM\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~state.json"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "C:\\qa-tmp\\qa120-base-YdT3YM\\state.json |   schema_version 1 → 2 |   revision 52 → 53"
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer --dry_run <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--dry_run",
+      "C:\\qa-tmp\\qa120-base-1mefQU\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~state.json"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "C:\\qa-tmp\\qa120-base-1mefQU\\state.json |   schema_version 1 → 2 |   revision 52 → 53"
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer -n <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "-n",
+      "C:\\qa-tmp\\qa120-base-s2sAvB\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [
+      "~state.json"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "1 file(s) refused — nothing was written for those.",
+    "stdout": "C:\\qa-tmp\\qa120-base-s2sAvB\\-n |   REFUSED: C:\\qa-tmp\\qa120-base-s2sAvB\\-n does not exist | C:\\qa-tmp\\qa120-base-s2sAvB\\state.json"
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer - <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "-",
+      "C:\\qa-tmp\\qa120-base-Owai64\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [
+      "~state.json"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "1 file(s) refused — nothing was written for those.",
+    "stdout": "C:\\qa-tmp\\qa120-base-Owai64\\- |   REFUSED: C:\\qa-tmp\\qa120-base-Owai64\\- does not exist | C:\\qa-tmp\\qa120-base-Owai64\\state.json"
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer --dry-run=1 <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--dry-run=1",
+      "C:\\qa-tmp\\qa120-base-Ee0TBx\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~state.json"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "C:\\qa-tmp\\qa120-base-Ee0TBx\\state.json |   schema_version 1 → 2 |   revision 52 → 53"
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer —dry-run <f> (em dash)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "—dry-run",
+      "C:\\qa-tmp\\qa120-base-FZDlhm\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "em dash does not start with '-', so it is a positional; positionals are 'any' here",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [
+      "~state.json"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "1 file(s) refused — nothing was written for those.",
+    "stdout": "C:\\qa-tmp\\qa120-base-FZDlhm\\—dry-run |   REFUSED: C:\\qa-tmp\\qa120-base-FZDlhm\\—dry-run does not exist | C:\\qa-tmp\\qa120-base-FZDlhm\\state.json"
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer <f> --dry-rn (after positional)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "C:\\qa-tmp\\qa120-base-eavFBb\\state.json",
+      "--dry-rn"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~state.json"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "C:\\qa-tmp\\qa120-base-eavFBb\\state.json |   schema_version 1 → 2 |   revision 52 → 53"
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer --dry-run --dry-run <f> (twice)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--dry-run",
+      "--dry-run",
+      "C:\\qa-tmp\\qa120-base-e1rz9i\\state.json"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "[dry run] C:\\qa-tmp\\qa120-base-e1rz9i\\state.json |   schema_version 1 → 2 |   revision 52 → 53"
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat=developer <f> (equals form, space-only flag)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat=developer",
+      "C:\\qa-tmp\\qa120-base-TSk9Od\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: --seat <planner|developer|qa> is REQUIRED. | A v1 handoff does not say whose it is, and guessing would attribute one seat's words to another.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer --seat developer <f> (value twice)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--seat",
+      "developer",
+      "C:\\qa-tmp\\qa120-base-jVhYlD\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [
+      "~state.json"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "C:\\qa-tmp\\qa120-base-jVhYlD\\state.json |   schema_version 1 → 2 |   revision 52 → 53"
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat -dry-run <f> (dash token as value)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "-dry-run",
+      "C:\\qa-tmp\\qa120-base-ZiGh2z\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "1 file(s) refused — nothing was written for those.",
+    "stdout": "C:\\qa-tmp\\qa120-base-ZiGh2z\\state.json |   REFUSED: seat must be one of planner / developer / qa — it is not inferred from the file"
+  },
+  {
+    "group": "show",
+    "id": "state show -json",
+    "argv": [
+      "state",
+      "show",
+      "-json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state show refused: no project root found walking up from C:\\qa-tmp\\qa120-base-8kWHpy\\-json — need a directory with package.json beside .agents/SYSTEM/, .agents/META/ or open-brain/",
+    "stdout": ""
+  },
+  {
+    "group": "show",
+    "id": "state show --jsn",
+    "argv": [
+      "state",
+      "show",
+      "--jsn"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state show refused: no project root found walking up from C:\\qa-tmp\\qa120-base-hs03nN — need a directory with package.json beside .agents/SYSTEM/, .agents/META/ or open-brain/",
+    "stdout": ""
+  },
+  {
+    "group": "show",
+    "id": "state show —json",
+    "argv": [
+      "state",
+      "show",
+      "—json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state show refused: no project root found walking up from C:\\qa-tmp\\qa120-base-hK8Uc9\\—json — need a directory with package.json beside .agents/SYSTEM/, .agents/META/ or open-brain/",
+    "stdout": ""
+  },
+  {
+    "group": "show",
+    "id": "state show -",
+    "argv": [
+      "state",
+      "show",
+      "-"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state show refused: no project root found walking up from C:\\qa-tmp\\qa120-base-hD4jNH\\- — need a directory with package.json beside .agents/SYSTEM/, .agents/META/ or open-brain/",
+    "stdout": ""
+  },
+  {
+    "group": "relocate",
+    "id": "relocate --aply",
+    "argv": [
+      "relocate",
+      "--aply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db",
+      "+knowledge-v2.db-shm",
+      "+knowledge-v2.db-wal"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Project directories that no longer exist on disk: 0 |  | "
+  },
+  {
+    "group": "relocate",
+    "id": "relocate -apply",
+    "argv": [
+      "relocate",
+      "-apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db",
+      "+knowledge-v2.db-shm",
+      "+knowledge-v2.db-wal"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Project directories that no longer exist on disk: 0 |  | "
+  },
+  {
+    "group": "relocate",
+    "id": "relocate --from a --to b --aply",
+    "argv": [
+      "relocate",
+      "--from",
+      "a",
+      "--to",
+      "b",
+      "--aply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db",
+      "+knowledge-v2.db-shm",
+      "+knowledge-v2.db-wal"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Relocate  a |        →  b | "
+  },
+  {
+    "group": "relocate",
+    "id": "relocate --from",
+    "argv": [
+      "relocate",
+      "--from"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db",
+      "+knowledge-v2.db-shm",
+      "+knowledge-v2.db-wal"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Project directories that no longer exist on disk: 0 |  | "
+  },
+  {
+    "group": "relocate",
+    "id": "relocate —apply",
+    "argv": [
+      "relocate",
+      "—apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db",
+      "+knowledge-v2.db-shm",
+      "+knowledge-v2.db-wal"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Project directories that no longer exist on disk: 0 |  | "
+  },
+  {
+    "group": "topics",
+    "id": "topics --aply",
+    "argv": [
+      "topics",
+      "--aply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db",
+      "+knowledge-v2.db-shm",
+      "+knowledge-v2.db-wal"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Topics — 0 tags with >= 5 entries |  | "
+  },
+  {
+    "group": "topics",
+    "id": "topics -apply",
+    "argv": [
+      "topics",
+      "-apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db",
+      "+knowledge-v2.db-shm",
+      "+knowledge-v2.db-wal"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Topics — 0 tags with >= 5 entries |  | "
+  },
+  {
+    "group": "topics",
+    "id": "topics --min 3",
+    "argv": [
+      "topics",
+      "--min",
+      "3"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db",
+      "+knowledge-v2.db-shm",
+      "+knowledge-v2.db-wal"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Topics — 0 tags with >= 5 entries |  | "
+  },
+  {
+    "group": "topics",
+    "id": "topics —apply",
+    "argv": [
+      "topics",
+      "—apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 0,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db",
+      "+knowledge-v2.db-shm",
+      "+knowledge-v2.db-wal"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Topics — 0 tags with >= 5 entries |  | "
+  },
+  {
+    "group": "backfill",
+    "id": "backfill-success-rate.mjs --aply",
+    "argv": [
+      "--aply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "C:\\qa-scratch\\t185-base\\open-brain\\node_modules\\better-sqlite3\\lib\\methods\\wrappers.js:5 | \treturn this[cppdb].prepare(sql, this, false); | \t                   ^ | SqliteError: no such table: knowledge_index",
+    "stdout": ""
+  },
+  {
+    "group": "backfill",
+    "id": "backfill-success-rate.mjs -apply",
+    "argv": [
+      "-apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "C:\\qa-scratch\\t185-base\\open-brain\\node_modules\\better-sqlite3\\lib\\methods\\wrappers.js:5 | \treturn this[cppdb].prepare(sql, this, false); | \t                   ^ | SqliteError: no such table: knowledge_index",
+    "stdout": ""
+  },
+  {
+    "group": "backfill",
+    "id": "backfill-success-rate.mjs -",
+    "argv": [
+      "-"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "C:\\qa-scratch\\t185-base\\open-brain\\node_modules\\better-sqlite3\\lib\\methods\\wrappers.js:5 | \treturn this[cppdb].prepare(sql, this, false); | \t                   ^ | SqliteError: no such table: knowledge_index",
+    "stdout": ""
+  },
+  {
+    "group": "backfill",
+    "id": "backfill-success-rate.mjs —apply",
+    "argv": [
+      "—apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 1,
+    "verdict": "FAIL",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "C:\\qa-scratch\\t185-base\\open-brain\\node_modules\\better-sqlite3\\lib\\methods\\wrappers.js:5 | \treturn this[cppdb].prepare(sql, this, false); | \t                   ^ | SqliteError: no such table: knowledge_index",
+    "stdout": ""
+  },
+  {
+    "group": "backfill",
+    "id": "backfill-success-rate.mjs --apply --apply (twice)",
+    "argv": [
+      "--apply",
+      "--apply"
+    ],
+    "expect": "info",
+    "note": "",
+    "status": 1,
+    "verdict": "INFO",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "C:\\qa-scratch\\t185-base\\open-brain\\node_modules\\better-sqlite3\\lib\\methods\\wrappers.js:5 | \treturn this[cppdb].prepare(sql, this, false); | \t                   ^ | SqliteError: no such table: knowledge_index",
+    "stdout": ""
+  }
+]
