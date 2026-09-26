@@ -1,0 +1,126 @@
+Note: switching to '3c0bfdcf917a5bfbc4fd56072a1735020b289189'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+=== live-rev132
+B before: occurrences=2 distinct=2
+B before, by path:
+  $.gaps.12.evidence=d7e514f8-df2a-483c-a8c7-57f2e0a931b0
+  $.last_session.uuid=22631f4e-433a-4f29-8669-47ee2f543bec
+[dry run] C:\qa-scratch\qa125\c2-live-rev132\.agents\state.json
+  schema_version 2 → 3
+  revision 132 → 133
+  handoffs: 3 kept word for word (qa@75, developer@74, planner@109), session_uuid and checkout null — v2 never recorded either
+  last_session → sessions[0]: n 76, 2026-09-21, uuid 22631f4e-433a-4f29-8669-47ee2f543bec, seat planner, checkout null
+  uuids: 2 distinct before, 2 after, none lost
+dry-run exit=0
+after dry-run sha: f486846efb4fe4b4
+C:\qa-scratch\qa125\c2-live-rev132\.agents\state.json
+  schema_version 2 → 3
+  revision 132 → 133
+  handoffs: 3 kept word for word (qa@75, developer@74, planner@109), session_uuid and checkout null — v2 never recorded either
+  last_session → sessions[0]: n 76, 2026-09-21, uuid 22631f4e-433a-4f29-8669-47ee2f543bec, seat planner, checkout null
+  uuids: 2 distinct before, 2 after, none lost
+run1 exit=0
+B after: occurrences=2 distinct=2
+B after, by path:
+  $.gaps.12.evidence=d7e514f8-df2a-483c-a8c7-57f2e0a931b0
+  $.sessions.0.uuid=22631f4e-433a-4f29-8669-47ee2f543bec
+distinct uuid sets equal: yes
+C:\qa-scratch\qa125\c2-live-rev132\.agents\state.json
+  already at schema v3 (revision 133) — nothing to do
+run2 exit=0
+idempotent (sha after run1 == after run2): yes 53313f811f83f82bbfe3fca6edfbcfe674580c47cecb1512a2b0e58eb0008859
+unmoved fields differing: none
+handoffs word-for-word: yes ; new keys null: true
+last_session == sessions[0] minus checkout: true sessions.length 1
+set_session: Session registered: aa125000-0000-4000-8000-000000000125 (C:/qa-scratch/qa125/c2-live-rev132) [via argument]
+ob_state applied
+Revision: 133 → 134
+Applied (2):
+  set_handoff qa
+  add_gap G-046
+Dropped done tasks (retention 3 sessions): none
+KEPT despite retention (id cited in the tracked tree): T-157, T-189
+NOTE: retention KEPT done task T-157: cited in 13 tracked file(s) — CHANGELOG.md, docs/loops/loop-14-closeout.md, docs/loops/loop-14-developer-handoff.md +10 more. Dropping it would leave a dangling reference (T-157). Matches the id PATTERN, so a mention in a test fixture counts.
+NOTE: retention KEPT done task T-189: cited in 1 tracked file(s) — docs/loops/planner-session-109-notes.md. Dropping it would leave a dangling reference (T-157). Matches the id PATTERN, so a mention in a test fixture counts.
+Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+after write: schema 3 rev 134 handoffs qa@75:legacy, developer@74:legacy, planner@109:legacy, qa@125:aa125000-0000-4000-8000-000000000125 sessions 76:22631f4e-433a-4f29-8669-47ee2f543bec:planner:null, 125:aa125000-0000-4000-8000-000000000125:qa:c2-live-rev132
+B after write: distinct=3
+Note: switching to '3c0bfdcf917a5bfbc4fd56072a1735020b289189'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Not currently on any branch.
+nothing to commit, working tree clean
+=== live-master
+B before: occurrences=2 distinct=2
+B before, by path:
+  $.gaps.12.evidence=d7e514f8-df2a-483c-a8c7-57f2e0a931b0
+  $.last_session.uuid=22631f4e-433a-4f29-8669-47ee2f543bec
+[dry run] C:\qa-scratch\qa125\c2-live-master\.agents\state.json
+  schema_version 2 → 3
+  revision 131 → 132
+  handoffs: 3 kept word for word (qa@75, developer@74, planner@109), session_uuid and checkout null — v2 never recorded either
+  last_session → sessions[0]: n 76, 2026-09-21, uuid 22631f4e-433a-4f29-8669-47ee2f543bec, seat planner, checkout null
+  uuids: 2 distinct before, 2 after, none lost
+dry-run exit=0
+after dry-run sha: b75b6530353e5f13
+C:\qa-scratch\qa125\c2-live-master\.agents\state.json
+  schema_version 2 → 3
+  revision 131 → 132
+  handoffs: 3 kept word for word (qa@75, developer@74, planner@109), session_uuid and checkout null — v2 never recorded either
+  last_session → sessions[0]: n 76, 2026-09-21, uuid 22631f4e-433a-4f29-8669-47ee2f543bec, seat planner, checkout null
+  uuids: 2 distinct before, 2 after, none lost
+run1 exit=0
+B after: occurrences=2 distinct=2
+B after, by path:
+  $.gaps.12.evidence=d7e514f8-df2a-483c-a8c7-57f2e0a931b0
+  $.sessions.0.uuid=22631f4e-433a-4f29-8669-47ee2f543bec
+distinct uuid sets equal: yes
+C:\qa-scratch\qa125\c2-live-master\.agents\state.json
+  already at schema v3 (revision 132) — nothing to do
+run2 exit=0
+idempotent (sha after run1 == after run2): yes 491d5f703a6891cce60b71a4f3fb43f3150563502c6f105a0d11e9ff1cbeee2c
+unmoved fields differing: none
+handoffs word-for-word: yes ; new keys null: true
+last_session == sessions[0] minus checkout: true sessions.length 1
+set_session: Session registered: aa125000-0000-4000-8000-000000000125 (C:/qa-scratch/qa125/c2-live-master) [via argument]
+ob_state applied
+Revision: 132 → 133
+Applied (2):
+  set_handoff qa
+  add_gap G-046
+Dropped done tasks (retention 3 sessions): none
+KEPT despite retention (id cited in the tracked tree): T-157, T-189
+NOTE: retention KEPT done task T-157: cited in 13 tracked file(s) — CHANGELOG.md, docs/loops/loop-14-closeout.md, docs/loops/loop-14-developer-handoff.md +10 more. Dropping it would leave a dangling reference (T-157). Matches the id PATTERN, so a mention in a test fixture counts.
+NOTE: retention KEPT done task T-189: cited in 1 tracked file(s) — docs/loops/planner-session-109-notes.md. Dropping it would leave a dangling reference (T-157). Matches the id PATTERN, so a mention in a test fixture counts.
+Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+after write: schema 3 rev 133 handoffs qa@75:legacy, developer@74:legacy, planner@109:legacy, qa@125:aa125000-0000-4000-8000-000000000125 sessions 76:22631f4e-433a-4f29-8669-47ee2f543bec:planner:null, 125:aa125000-0000-4000-8000-000000000125:qa:c2-live-master
+B after write: distinct=3

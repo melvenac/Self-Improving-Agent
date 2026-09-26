@@ -1,0 +1,28 @@
+Note: switching to 'f92e19c68034b4a2f5b0f8904924406c1ae79c64'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+1ef01bd rev 134: S118 developer handoff (sia-builder)
+2bad682 rev 135: S120 qa handoff (sia-qa)
+29fec2b rev 136: S121 qa handoff (sia-qa)
+9642f7f rev 137: A6: S124 writes with a mistyped number 1124 [superseded 4]
+b835a2d rev 138: A7: a session registered as S121's uuid overwrites its handoff
+845c8c2 control: hand edit removes S124's handoff
+
+--- state erasures (candidate CLI), v3+ lines only:
+Walked 834 commits on HEAD; 230 changes to .agents/state.json (7 at schema v3+).
+Erasures: 45 (1 at schema v3+, which /sync fails on)
+  [v3+]    rev 138→139 (845c8c2): removed handoff 00000124-0000-4000-8000-000000000124 (session 1124, developer [sia-builder]); added by the same step: no record of the same kind added

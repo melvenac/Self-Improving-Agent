@@ -1,0 +1,33 @@
+T0 no commits in the window (only loop/old, committed before the session start):
+  exit=0 stdout: [session-end] handoff check: no loop/* commits this session
+  stderr: 
+T1 session A commits on loop/a with NO handoff:
+  exit=0 stdout: [session-end] HANDOFF MISSING: session aaaaaaaa-0000-4000-8000-000000000001 committed 1 commit(s) on loop/a since 2026-09-26T06:07:46.000Z and committed no docs/loops/*-handoff.md. Its reasoning is not in any file. Write and push the handoff before the next /c
+  stderr: [session-end] HANDOFF MISSING: session aaaaaaaa-0000-4000-8000-000000000001 comm
+  marker: 1 line(s); git status sees it: 0 ignored/untracked entry, tracked-dirty: 0
+T2 the next session's greeting, twice:
+  exit=0 HANDOFF lines in greeting: 1
+HANDOFF MISSING: session aaaaaaaa-0000-4000-8000-000000000001 committed 1 commit(s) on loop/a since 2026-09-26T06:07:46.000Z and committed no docs/loops/*-handoff.md. Its reasoning is not in any file.
+  exit=0 HANDOFF lines in greeting: 0
+  marker after: moved-aside; shown log: 1 line(s)
+T3 session commits work AND a handoff on another loop/* branch (per session, not per branch):
+  exit=0 stdout: [session-end] handoff check: handoff committed (docs/loops/b-developer-handoff.md)
+  stderr: 
+  marker: none
+T4 a handoff named otherwise (docs/loops/b-notes.md) and one outside docs/loops (HANDOFF.md):
+  exit=0 stdout: [session-end] HANDOFF MISSING: session dddddddd-0000-4000-8000-000000000004 committed 1 commit(s) on loop/c since 2026-09-26T06:07:46.000Z and committed no docs/loops/*-handoff.md. Its reasoning is not in any file. Write and push the handoff before the next /c
+  stderr: [session-end] HANDOFF MISSING: session dddddddd-0000-4000-8000-000000000004 comm
+T5 never blocks: no transcript; a corrupt transcript; git broken (HEAD file garbage); stdin not JSON:
+  exit=0 stdout: [session-end] handoff check NOT RUN: this session's start could not be read from its transcript, so its commits cannot be told from anyone else's
+  stderr: 
+  exit=0 stdout: [session-end] handoff check NOT RUN: this session's start could not be read from its transcript, so its commits cannot be told from anyone else's
+  stderr: 
+  exit=0 stdout: [session-end] handoff check NOT RUN: git could not list local branches here
+  stderr: 
+  stdin garbage: exit=0 [session-end] handoff check NOT RUN: this session's start could not be read from its transcript, so its commits cannot be told from anyone else's
+T6 another session committing to loop/* in this checkout in the same window is counted as this one's (stated limit):
+  exit=0 stdout: [session-end] HANDOFF MISSING: session ffffffff-0000-4000-8000-000000000006 committed 2 commit(s) on loop/c, loop/e since 2026-09-26T06:07:46.000Z and committed no docs/loops/*-handoff.md. Its reasoning is not in any file. Write and push the handoff before the
+  stderr: [session-end] HANDOFF MISSING: session ffffffff-0000-4000-8000-000000000006 comm
+T7 a handoff arriving only through a MERGE commit (merge of a docs branch into loop/f):
+  exit=0 stdout: [session-end] handoff check: handoff committed (docs/loops/f-developer-handoff.md)
+  stderr: 

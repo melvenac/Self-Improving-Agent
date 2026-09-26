@@ -1,0 +1,135 @@
+Note: switching to '3c0bfdcf917a5bfbc4fd56072a1735020b289189'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+main tree at aae0dce, record: v2 rev 131
+warning: in the working copy of '.agents/AGENT.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/FRAMEWORK.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SESSIONS/SESSION_TEMPLATE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/DECISIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/ENTITIES.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/PRD.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/RULES.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/RUNBOOK.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/SECURITY.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/SUMMARY.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/TESTING.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/TASKS/INBOX.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/TASKS/task.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/examples/e2e.yml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/skills/INDEX.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/skills/playwright-tester/SKILL.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/skills/session-manager/SKILL.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/state.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/bootstrap.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/checkpoint.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/end.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/start.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/sync.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/task.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/test.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/rules/agents.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/rules/backend.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/rules/database.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/rules/frontend.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/rules/testing.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.cursor/commands/checkpoint.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.cursor/commands/end.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.cursor/commands/start.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.cursor/commands/sync.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'CLAUDE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'gitignore', LF will be replaced by CRLF the next time Git touches it
+
+== 0. before the merge: OLD server on the v2 record
+OLD on main (v2)
+   ob_start: 47296 chars; ## State (state.json rev 131) | Objective: Loop 15 slice three, on master 9bc06e3 (v0.44.2). SCOPE (D-033 as amended by D-036): the slice CLOSES when candidates A, B and C are ACCEPTED; Jev calibration is the next slice. A: A to A9 REJECTED (reports an |     [open] T-150 An unrecognised CLI flag must refuse, not select the mutating default
+   ob_state dry run: ob_state dry run — nothing written / Revision: 131 → 132
+   /sync --check with the OLD build on master (baseline):
+     greeting-size: greeting is 46572 characters, over the 40000 limit (state render 24965, role files 21198, tree and seat 407). LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted.
+     greeting-size [issue]: greeting is 46572 characters, over the 40000 limit (state render 24965, role files 21198, tree and seat 407). LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted.
+   Summary: 22 passed, 0 fixed, 4 warnings, 2 issues, 3 skipped
+
+== 1a. merge (Aaron's act; scratch here)
+merged: 45c07d5
+record after the merge: v2 rev 131
+
+== 1b. between merge and rebuild: the OLD server still running (no reconnect yet)
+OLD on merged main (v2 record)
+   ob_start: 47519 chars; ## State (state.json rev 131) | Objective: Loop 15 slice three, on master 9bc06e3 (v0.44.2). SCOPE (D-033 as amended by D-036): the slice CLOSES when candidates A, B and C are ACCEPTED; Jev calibration is the next slice. A: A to A9 REJECTED (reports an |     [open] T-150 An unrecognised CLI flag must refuse, not select the mutating default
+   ob_state dry run: ob_state dry run — nothing written / Revision: 131 → 132
+
+== 1c. rebuild, as a stranger would: node scripts/setup.mjs (builds, registers, copies commands) under the scratch HOME
+setup exit=0
+   Self-Improving Agent Setup
+   ✓ Prerequisites OK (Node v22.23.3)
+   ✓ open-brain built → C:\qa-scratch\qa125\c7\main\open-brain/build/
+   ✓ MCP server registered in .mcp.json
+   ✓ SessionStart hook registered in settings.json
+   ✓ 7 Claude slash command(s) copied → C:\qa-scratch\qa125\c7\home\.claude\commands
+   ✓ open-brain registered in ~/.cursor/mcp.json
+   ✓ Cursor sessionStart hook registered in ~/.cursor/hooks.json
+   ✓ 4 Cursor slash command(s) copied → C:\qa-scratch\qa125\c7\home\.cursor\commands
+   ✓ Obsidian vault scaffolded (8 items) → C:/qa-scratch/qa125/c7/store/vault
+   Setup complete! Restart Claude Code and Cursor to activate MCP + hooks.
+
+== 1d. NEW server, record not yet migrated (the window between steps 1 and 2)
+NEW on main (v2 record)
+   ob_start: isError 1858 chars; STATE RECORD REFUSED: schema_version: Invalid input: expected 3. | This build cannot read this record's schema version. NOT falling back to the prose files: they are a DIFFERENT and older account of the project, and a greeting built from them would look ordinary while describing a state | The record is schema v2, OLDER than this build's v3: migrate it with `node open-brain/build/cli.js state migrate --dry-run .agents/state.json`, read the changes, then run it without --dry-run.
+   ob_state dry run: ob_state refused: .agents/state.json invalid at schema_version: Invalid input: expected 3 — refusing to write over a file that does not validate / Nothing written.
+NEW on another SIA project (v2 record), which section 7 does not mention
+   ob_start: isError 1749 chars; STATE RECORD REFUSED: schema_version: Invalid input: expected 3. | This build cannot read this record's schema version. NOT falling back to the prose files: they are a DIFFERENT and older account of the project, and a greeting built from them would look ordinary while describing a state | The record is schema v2, OLDER than this build's v3: migrate it with `node open-brain/build/cli.js state migrate --dry-run .agents/state.json`, read the changes, then run it without --dry-run.
+   ob_state dry run: ob_state refused: .agents/state.json invalid at schema_version: Invalid input: expected 3 — refusing to write over a file that does not validate / Nothing written.
+
+== 2. migrate: dry run, then real, then commit
+[dry run] C:\qa-scratch\qa125\c7\main\.agents\state.json
+  schema_version 2 → 3
+  revision 131 → 132
+  handoffs: 3 kept word for word (qa@75, developer@74, planner@109), session_uuid and checkout null — v2 never recorded either
+  last_session → sessions[0]: n 76, 2026-09-21, uuid 22631f4e-433a-4f29-8669-47ee2f543bec, seat planner, checkout null
+  uuids: 2 distinct before, 2 after, none lost
+C:\qa-scratch\qa125\c7\main\.agents\state.json
+  schema_version 2 → 3
+  revision 131 → 132
+  handoffs: 3 kept word for word (qa@75, developer@74, planner@109), session_uuid and checkout null — v2 never recorded either
+  last_session → sessions[0]: n 76, 2026-09-21, uuid 22631f4e-433a-4f29-8669-47ee2f543bec, seat planner, checkout null
+  uuids: 2 distinct before, 2 after, none lost
+committed 9c718bb
+NEW on main (v3)
+   ob_start: 47606 chars; ## State (state.json rev 132) | Objective: Loop 15 slice three, on master 9bc06e3 (v0.44.2). SCOPE (D-033 as amended by D-036): the slice CLOSES when candidates A, B and C are ACCEPTED; Jev calibration is the next slice. A: A to A9 REJECTED (reports an |     [open] T-150 An unrecognised CLI flag must refuse, not select the mutating default
+   ob_state dry run: ob_state dry run — nothing written / Revision: 132 → 133
+OLD (a seat that did not rebuild/reconnect) on main (v3)
+   ob_start: isError 1774 chars; STATE RECORD REFUSED: schema_version: Invalid input: expected 2. | This build cannot read this record's schema version. NOT falling back to the prose files: they are a DIFFERENT and older account of the project, and a greeting built from them would look ordinary while describing a state | Rebuild the checkout this process runs from against a commit carrying the record's schema, then start again.
+   ob_state dry run: ob_state refused: .agents/state.json invalid at schema_version: Invalid input: expected 2 — refusing to write over a file that does not validate / Nothing written.
+
+== 3. installed commands (scratch HOME) vs the merged tree
+   ~/.claude/commands/end.md == project-template/.claude/commands/end.md: yes
+   ~/.cursor/commands/end.md == project-template/.cursor/commands/end.md: yes
+   ~/.claude/commands/sync.md == project-template/.claude/commands/sync.md: yes
+   ~/.cursor/commands/sync.md == project-template/.cursor/commands/sync.md: yes
+   .claude/commands/end.md (the repo copy) == installed: yes
+
+== 4. /sync --check on the migrated main tree with the installed commands
+   sync exit=1
+   ISSUES:
+     retirements: retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+     greeting-size: greeting is 46882 characters, over the 40000 limit (state render 25052, role files 21198, tree and seat 630). LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted.
+     command-parity [pass]: 6 shared commands identical across repo, template and user scope
+     build-freshness [issue]: build was made from 45c07d5 but HEAD is 9c718bb — the MCP server and both hooks run from THIS tree's build, so they are running code from a different commit, and a stale server reports success. Rebuild. (built 2026-09-26T07:15:09.645Z) LIMIT: compares commits, not working-tree edits.
+     state-schema [pass]: .agents/state.json readable by this CLI process (schema v3, rev 132, 69 tasks)
+     record-erasure [pass]: 0 erasures since schema v3; walked 829 commits, 224 .agents/state.json changes (1 at schema v3+); 44 erasure(s) in schema <3 history, which allowed them and cannot be repaired — listed by `open-brain state erasures`, failing nothing. LIMIT: reads HEAD's committed history only — an uncommitted edit is not seen
+     greeting-size [issue]: greeting is 46882 characters, over the 40000 limit (state render 25052, role files 21198, tree and seat 630). LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted.
+   Summary: 24 passed, 0 fixed, 2 warnings, 4 issues, 2 skipped

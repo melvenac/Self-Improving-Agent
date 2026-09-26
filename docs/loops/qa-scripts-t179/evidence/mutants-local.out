@@ -1,0 +1,49 @@
+
+ret-seat -> qa/t179-mut-ret-seat bc65624 |  1 file changed, 1 insertion(+), 1 deletion(-) | tsc 0 | local (3 file(s)) vitest exit 1
+   [2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (3)[39m
+   [2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m61 passed[39m[22m[90m (63)[39m
+   [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+   [41m[1m FAIL [22m[49m tests/shared/closeout-erasure.test.ts[2m > [22mT163-1: a close-out can only add its own record[2m > [22mretention NEVER drops another checkout's newest entry, however old — a still-open seat keeps its handoff
+   [41m[1m FAIL [22m[49m tests/pipelines/sync/record-erasure.test.ts[2m > [22mrecord-erasure (T163-2)[2m > [22mDOES flag the same drop when retention does not explain it (another checkout's entry)
+
+render-seat -> qa/t179-mut-render-seat aefac69 |  1 file changed, 1 insertion(+), 1 deletion(-) | tsc 0 | local (3 file(s)) vitest exit 1
+   [2m Test Files [22m [1m[31m3 failed[39m[22m[90m (3)[39m
+   [2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m60 passed[39m[22m[90m (63)[39m
+   [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+   [41m[1m FAIL [22m[49m tests/pipelines/state-views.test.ts[2m > [22mstate views (Loop 3 C3)[2m > [22mnext-session.md renders the NEWEST handoff per seat and checkout, and counts the rest (T-163)
+   [41m[1m FAIL [22m[49m tests/shared/state-schema.test.ts[2m > [22mstate-schema (Loop 2, read side)[2m > [22mnewestHandoffPerInstance keeps one per (seat, checkout), legacy null checkout as its own instance
+   [41m[1m FAIL [22m[49m tests/pipelines/session-start/state-render.test.ts[2m > [22mrenderState — the startup read[2m > [22mT-163: another CHECKOUT of the same seat is named, not hidden — a still-open seat stays visible
+
+uuid-skip-delete -> qa/t179-mut-uuid-skip-delete 804687f |  1 file changed, 1 insertion(+), 1 deletion(-) | tsc 0 | local (3 file(s)) vitest exit 1
+   [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (3)[39m
+   [2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m52 passed[39m[22m[90m (54)[39m
+   [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+   [41m[1m FAIL [22m[49m tests/shared/closeout-erasure.test.ts[2m > [22mT163-1: a close-out can only add its own record[2m > [22mtwo sessions of the SAME seat hand off in sequence and the first's handoff survives, word for word
+   [41m[1m FAIL [22m[49m tests/shared/closeout-erasure.test.ts[2m > [22mT163-1: a close-out can only add its own record[2m > [22mretention keeps a superseded entry that is 10 or fewer sessions old
+
+session-by-checkout -> qa/t179-mut-session-by-checkout aba2d60 |  1 file changed, 1 insertion(+), 1 deletion(-) | tsc 0 | local (3 file(s)) vitest exit 1
+   [2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (3)[39m
+   [2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m50 passed[39m[22m[90m (54)[39m
+   [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+   [41m[1m FAIL [22m[49m tests/shared/closeout-erasure.test.ts[2m > [22mT163-1: a close-out can only add its own record[2m > [22mboth sessions' uuids are in the record afterwards — the evidence T-163 exists to protect
+   [41m[1m FAIL [22m[49m tests/shared/closeout-erasure.test.ts[2m > [22mT163-1: a close-out can only add its own record[2m > [22mretention drops a superseded entry of the SAME seat and checkout once it is more than 10 sessions old
+   [41m[1m FAIL [22m[49m tests/shared/state-writer.test.ts[2m > [22mapplyStateOps (Loop 3 writer)[2m > [22ma write with no set_handoff labels its session with the caller's resolved seat, or null
+   [41m[1m FAIL [22m[49m tests/shared/state-writer.test.ts[2m > [22mapplyStateOps (Loop 3 writer)[2m > [22ma DIFFERENT uuid takes its own entry and its own number, with no note
+
+erasure-blind-rev60 -> qa/t179-mut-erasure-blind-rev60 f37ef8d |  1 file changed, 1 insertion(+) | tsc 0 | local (1 file(s)) vitest exit 1
+   [2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+   [2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m12 passed[39m[22m[90m (13)[39m
+   [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+   [41m[1m FAIL [22m[49m tests/pipelines/sync/record-erasure.test.ts[2m > [22mrecord-erasure against this repository's history (T163-2 known positives)[2m > [22mflags rev 60->61 and rev 61->62, each naming the uuid removed and the session that replaced it
+
+erasure-blind-merge -> qa/t179-mut-erasure-blind-merge 3702c13 |  1 file changed, 1 insertion(+), 1 deletion(-) | tsc 0 | local (1 file(s)) vitest exit 1
+   [2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+   [2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m12 passed[39m[22m[90m (13)[39m
+   [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+   [41m[1m FAIL [22m[49m tests/pipelines/sync/record-erasure.test.ts[2m > [22mrecord-erasure (T163-2)[2m > [22mflags a MERGE resolution that keeps one branch's record and drops the other's (G-027)
+
+guard-repeat -> qa/t179-mut-guard-repeat cb1c280 |  1 file changed, 1 insertion(+), 1 deletion(-) | tsc 0 | local (1 file(s)) vitest exit 1
+   [2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+   [2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m10 passed[39m[22m[90m (11)[39m
+   [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+   [41m[1m FAIL [22m[49m tests/shared/handoff-guard.test.ts[2m > [22mhandoff guard (T179-2)[2m > [22mthe warning is recorded for the next greeting and shown ONCE

@@ -1,0 +1,279 @@
+Note: switching to 'f92e19c68034b4a2f5b0f8904924406c1ae79c64'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+layout      N/seat  seat       handoffs sessions   chars   words
+ 1 checkout     0   planner         3        1   54854    8674
+ 1 checkout     0   developer       3        1   47387    7561
+ 1 checkout     0   qa              3        1   50328    8085
+ 1 checkout     1   planner         6        4   44404    7021
+ 1 checkout     1   developer       6        4   43219    6844
+ 1 checkout     1   qa              6        4   43935    6992
+ 1 checkout    10   planner        33       31   44500    7036
+ 1 checkout    10   developer      33       31   43315    6859
+ 1 checkout    10   qa             33       31   44031    7007
+ 1 checkout    50   planner       153      151   44503    7036
+ 1 checkout    50   developer     153      151   43318    6859
+ 1 checkout    50   qa            153      151   44034    7007
+ 3 checkout     1   planner         6        4   44404    7021
+ 3 checkout     1   developer       6        4   43219    6844
+ 3 checkout     1   qa              6        4   43935    6992
+ 3 checkout    10   planner        33       31   45482    7186
+ 3 checkout    10   developer      33       31   44297    7009
+ 3 checkout    10   qa             33       31   45013    7157
+ 3 checkout    50   planner       153      151   45485    7186
+ 3 checkout    50   developer     153      151   44300    7009
+ 3 checkout    50   qa            153      151   45016    7157
+
+[1 checkout(s)] planner: N=1 -> N=10: +96 chars; lines only in N=1: 9, only in N=10: 10
+   -   state.json (.agents/state.json): 3138 lines, 52993 words, ~91618 tokens, truncated: no
+   - Your handoff — planner [sia-pla-0], session 201:
+   -   pick up: planner handoff of session 201, a fixed-length body.
+   -   developer [sia-dev-0] (session 201): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+   -     developer handoff of session 201, a fixed-length body.
+   -   qa [sia-qa-0] (session 201): no commit: no committed handoff for "qa" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   + Your handoff — planner [sia-pla-0], session 210:
+   +   pick up: planner handoff of session 210, a fixed-length body.
+   +   developer [sia-dev-0] (session 210): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+   +     developer handoff of session 210, a fixed-length body.
+   +   qa [sia-qa-0] (session 210): no commit: no committed handoff for "qa" at HEAD — nothing to trace
+   +     qa handoff of session 210, a fixed-length body.
+   +   (27 older handoff(s) superseded within their seat and checkout are in the record, not shown)
+
+[1 checkout(s)] planner: N=10 -> N=50: +3 chars; lines only in N=10: 10, only in N=50: 10
+   -   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   - Your handoff — planner [sia-pla-0], session 210:
+   -   pick up: planner handoff of session 210, a fixed-length body.
+   -   developer [sia-dev-0] (session 210): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+   -     developer handoff of session 210, a fixed-length body.
+   -   qa [sia-qa-0] (session 210): no commit: no committed handoff for "qa" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 6176 lines, 59167 words, ~110777 tokens, truncated: no
+   + Your handoff — planner [sia-pla-0], session 250:
+   +   pick up: planner handoff of session 250, a fixed-length body.
+   +   developer [sia-dev-0] (session 250): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+   +     developer handoff of session 250, a fixed-length body.
+   +   qa [sia-qa-0] (session 250): no commit: no committed handoff for "qa" at HEAD — nothing to trace
+   +     qa handoff of session 250, a fixed-length body.
+   +   (147 older handoff(s) superseded within their seat and checkout are in the record, not shown)
+
+[1 checkout(s)] planner: N=0 -> N=1: -10450 chars; lines only in N=0: 65, only in N=1: 15
+   -   state.json (.agents/state.json): 3076 lines, 52867 words, ~91227 tokens, truncated: no
+   - Your handoff — planner [legacy], session 109:
+   -   pick up: PLANNER SESSION 109 (Atlas), 2026-09-25, ran overnight while Aaron slept. READ docs/loops/planner-session-109-notes.md FIRST: every ruling of the night, with i
+   -     - RULINGS-18 BINDS QA 108 (docs/loops/loop-15-slice-3-rulings-18.md): R77's eight readings, R81 and R82. The hub keeps no record; the rulings file and the session not
+   -     - A RESTORE MUST NEVER TOUCH THE OLD PATH (R36): d14a874 added chmodSync(path) before the rename-restore, which followed a planted hook symlink to a victim outside th
+   -     - ENOENT/ENOTDIR ARE ABSENCE, NOT FAILURE (R82 made precise, turn 107): a win32 junction shape (R35) failed machine-config-unobservable with ENOENT. tcm cannot run it
+   +   state.json (.agents/state.json): 3138 lines, 52993 words, ~91618 tokens, truncated: no
+   + Your handoff — planner [sia-pla-0], session 201:
+   +   pick up: planner handoff of session 201, a fixed-length body.
+   +     - w
+   +     open PRs: none
+   +     questions pending for Aaron: none
+   +     rulings made mid-loop: none
+   +   planner [legacy] (session 109): close-out a1d5b11 2026-09-25
+
+[1 checkout(s)] developer: N=1 -> N=10: +96 chars; lines only in N=1: 9, only in N=10: 10
+   -   state.json (.agents/state.json): 3138 lines, 52993 words, ~91618 tokens, truncated: no
+   - Your handoff — developer [sia-dev-0], session 201:
+   -   pick up: developer handoff of session 201, a fixed-length body.
+   -   planner [sia-pla-0] (session 201): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   -     planner handoff of session 201, a fixed-length body.
+   -   qa [sia-qa-0] (session 201): no commit: no committed handoff for "qa" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   + Your handoff — developer [sia-dev-0], session 210:
+   +   pick up: developer handoff of session 210, a fixed-length body.
+   +   planner [sia-pla-0] (session 210): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 210, a fixed-length body.
+   +   qa [sia-qa-0] (session 210): no commit: no committed handoff for "qa" at HEAD — nothing to trace
+   +     qa handoff of session 210, a fixed-length body.
+   +   (27 older handoff(s) superseded within their seat and checkout are in the record, not shown)
+
+[1 checkout(s)] developer: N=10 -> N=50: +3 chars; lines only in N=10: 10, only in N=50: 10
+   -   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   - Your handoff — developer [sia-dev-0], session 210:
+   -   pick up: developer handoff of session 210, a fixed-length body.
+   -   planner [sia-pla-0] (session 210): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   -     planner handoff of session 210, a fixed-length body.
+   -   qa [sia-qa-0] (session 210): no commit: no committed handoff for "qa" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 6176 lines, 59167 words, ~110777 tokens, truncated: no
+   + Your handoff — developer [sia-dev-0], session 250:
+   +   pick up: developer handoff of session 250, a fixed-length body.
+   +   planner [sia-pla-0] (session 250): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 250, a fixed-length body.
+   +   qa [sia-qa-0] (session 250): no commit: no committed handoff for "qa" at HEAD — nothing to trace
+   +     qa handoff of session 250, a fixed-length body.
+   +   (147 older handoff(s) superseded within their seat and checkout are in the record, not shown)
+
+[1 checkout(s)] developer: N=0 -> N=1: -4168 chars; lines only in N=0: 18, only in N=1: 12
+   -   state.json (.agents/state.json): 3076 lines, 52867 words, ~91227 tokens, truncated: no
+   - Your handoff — developer [legacy], session 74:
+   -   pick up: LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.44.0. The recall trigger is live — it fired in a real session and the production sto
+   -     - A DERIVED VALUE IS ONLY AS GOOD AS THE CHANNEL THE ASSERTION READS FROM. execFileSync returns ONLY STDOUT, so a harness that hardcoded stderr:'' made every expect(s
+   -     - A THRESHOLD COMPARED AGAINST bm25 IS CORPUS-RELATIVE, AND A FIXTURE THAT DOES NOT RESEMBLE THE CORPUS CANNOT TEST IT. The same query scores about 5e-6 against three
+   -     - A STACKED FIXTURE PROVES AS LITTLE AS A VACUOUS ONE — IT JUST FAILS IN THE FLATTERING DIRECTION. Decoys at 235-343 characters against a 566-character target reporte
+   +   state.json (.agents/state.json): 3138 lines, 52993 words, ~91618 tokens, truncated: no
+   + Your handoff — developer [sia-dev-0], session 201:
+   +   pick up: developer handoff of session 201, a fixed-length body.
+   +     - w
+   +   developer [legacy] (session 74): no commit: unchanged through all 50 commits examined — the close-out is older than this window, so no SHA is claimed
+   +     LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.44.0. The recall trigger is live — it fired in a real session and the production s...
+   +   planner [sia-pla-0] (session 201): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 201, a fixed-length body.
+
+[1 checkout(s)] qa: N=1 -> N=10: +96 chars; lines only in N=1: 9, only in N=10: 10
+   -   state.json (.agents/state.json): 3138 lines, 52993 words, ~91618 tokens, truncated: no
+   - Your handoff — qa [sia-qa-0], session 201:
+   -   pick up: qa handoff of session 201, a fixed-length body.
+   -   planner [sia-pla-0] (session 201): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   -     planner handoff of session 201, a fixed-length body.
+   -   developer [sia-dev-0] (session 201): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   + Your handoff — qa [sia-qa-0], session 210:
+   +   pick up: qa handoff of session 210, a fixed-length body.
+   +   planner [sia-pla-0] (session 210): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 210, a fixed-length body.
+   +   developer [sia-dev-0] (session 210): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+   +     developer handoff of session 210, a fixed-length body.
+   +   (27 older handoff(s) superseded within their seat and checkout are in the record, not shown)
+
+[1 checkout(s)] qa: N=10 -> N=50: +3 chars; lines only in N=10: 10, only in N=50: 10
+   -   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   - Your handoff — qa [sia-qa-0], session 210:
+   -   pick up: qa handoff of session 210, a fixed-length body.
+   -   planner [sia-pla-0] (session 210): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   -     planner handoff of session 210, a fixed-length body.
+   -   developer [sia-dev-0] (session 210): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 6176 lines, 59167 words, ~110777 tokens, truncated: no
+   + Your handoff — qa [sia-qa-0], session 250:
+   +   pick up: qa handoff of session 250, a fixed-length body.
+   +   planner [sia-pla-0] (session 250): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 250, a fixed-length body.
+   +   developer [sia-dev-0] (session 250): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+   +     developer handoff of session 250, a fixed-length body.
+   +   (147 older handoff(s) superseded within their seat and checkout are in the record, not shown)
+
+[1 checkout(s)] qa: N=0 -> N=1: -6393 chars; lines only in N=0: 19, only in N=1: 12
+   -   state.json (.agents/state.json): 3076 lines, 52867 words, ~91227 tokens, truncated: no
+   - Your handoff — qa [legacy], session 75:
+   -   pick up: THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at 5351270 and released as v0.44.0. Read the planner's close-out at docs/loops/lo
+   -     - CLOSED GAP IDS ARE HANDED BACK BY THE NEXT add_gap. At rev 60 a dry run assigned G-046 and G-047 — ids closed at rev 59 whose OLD meanings are cited in ten tracked 
+   -     - ob_stats SHOWING `hook: 1` IS NOT EVIDENCE THE SERVER KNOWS ABOUT THE TRIGGER. That census is a GROUP BY over recall_log values, so a stale build prints it from dat
+   -     - A QUOTING LAYER BETWEEN YOU AND THE ARTIFACT EDITS THE CONTENT AND REPORTS SUCCESS. Four instances this session: a heredoc'd backslash became a real newline inside 
+   +   state.json (.agents/state.json): 3138 lines, 52993 words, ~91618 tokens, truncated: no
+   + Your handoff — qa [sia-qa-0], session 201:
+   +   pick up: qa handoff of session 201, a fixed-length body.
+   +     - w
+   +   qa [legacy] (session 75): no commit: unchanged through all 50 commits examined — the close-out is older than this window, so no SHA is claimed
+   +     THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at 5351270 and released as v0.44.0. Read the planner's close-out at docs/loops/...
+   +   planner [sia-pla-0] (session 201): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 201, a fixed-length body.
+
+[3 checkout(s)] planner: N=1 -> N=10: +1078 chars; lines only in N=1: 9, only in N=10: 22
+   -   state.json (.agents/state.json): 3138 lines, 52993 words, ~91618 tokens, truncated: no
+   - Your handoff — planner [sia-pla-0], session 201:
+   -   pick up: planner handoff of session 201, a fixed-length body.
+   -   developer [sia-dev-0] (session 201): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+   -     developer handoff of session 201, a fixed-length body.
+   -   qa [sia-qa-0] (session 201): no commit: no committed handoff for "qa" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   + Your handoff — planner [sia-pla-0], session 210:
+   +   pick up: planner handoff of session 210, a fixed-length body.
+   +   planner [sia-pla-1] (session 208): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 208, a fixed-length body.
+   +   planner [sia-pla-2] (session 209): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 209, a fixed-length body.
+   +   developer [sia-dev-1] (session 208): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+
+[3 checkout(s)] planner: N=10 -> N=50: +3 chars; lines only in N=10: 22, only in N=50: 22
+   -   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   - Your handoff — planner [sia-pla-0], session 210:
+   -   pick up: planner handoff of session 210, a fixed-length body.
+   -   planner [sia-pla-1] (session 208): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   -     planner handoff of session 208, a fixed-length body.
+   -   planner [sia-pla-2] (session 209): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 6176 lines, 59167 words, ~110777 tokens, truncated: no
+   + Your handoff — planner [sia-pla-1], session 250:
+   +   pick up: planner handoff of session 250, a fixed-length body.
+   +   planner [sia-pla-2] (session 248): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 248, a fixed-length body.
+   +   planner [sia-pla-0] (session 249): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 249, a fixed-length body.
+   +   developer [sia-dev-2] (session 248): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+
+[3 checkout(s)] developer: N=1 -> N=10: +1078 chars; lines only in N=1: 9, only in N=10: 22
+   -   state.json (.agents/state.json): 3138 lines, 52993 words, ~91618 tokens, truncated: no
+   - Your handoff — developer [sia-dev-0], session 201:
+   -   pick up: developer handoff of session 201, a fixed-length body.
+   -   planner [sia-pla-0] (session 201): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   -     planner handoff of session 201, a fixed-length body.
+   -   qa [sia-qa-0] (session 201): no commit: no committed handoff for "qa" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   + Your handoff — developer [sia-dev-0], session 210:
+   +   pick up: developer handoff of session 210, a fixed-length body.
+   +   planner [sia-pla-1] (session 208): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 208, a fixed-length body.
+   +   planner [sia-pla-2] (session 209): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 209, a fixed-length body.
+   +   planner [sia-pla-0] (session 210): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+
+[3 checkout(s)] developer: N=10 -> N=50: +3 chars; lines only in N=10: 21, only in N=50: 21
+   -   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   - Your handoff — developer [sia-dev-0], session 210:
+   -   pick up: developer handoff of session 210, a fixed-length body.
+   -   planner [sia-pla-1] (session 208): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   -     planner handoff of session 208, a fixed-length body.
+   -   planner [sia-pla-2] (session 209): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 6176 lines, 59167 words, ~110777 tokens, truncated: no
+   + Your handoff — developer [sia-dev-1], session 250:
+   +   pick up: developer handoff of session 250, a fixed-length body.
+   +   planner [sia-pla-2] (session 248): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 248, a fixed-length body.
+   +   planner [sia-pla-0] (session 249): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 249, a fixed-length body.
+   +   planner [sia-pla-1] (session 250): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+
+[3 checkout(s)] qa: N=1 -> N=10: +1078 chars; lines only in N=1: 9, only in N=10: 22
+   -   state.json (.agents/state.json): 3138 lines, 52993 words, ~91618 tokens, truncated: no
+   - Your handoff — qa [sia-qa-0], session 201:
+   -   pick up: qa handoff of session 201, a fixed-length body.
+   -   planner [sia-pla-0] (session 201): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   -     planner handoff of session 201, a fixed-length body.
+   -   developer [sia-dev-0] (session 201): no commit: no committed handoff for "developer" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   + Your handoff — qa [sia-qa-0], session 210:
+   +   pick up: qa handoff of session 210, a fixed-length body.
+   +   planner [sia-pla-1] (session 208): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 208, a fixed-length body.
+   +   planner [sia-pla-2] (session 209): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 209, a fixed-length body.
+   +   planner [sia-pla-0] (session 210): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+
+[3 checkout(s)] qa: N=10 -> N=50: +3 chars; lines only in N=10: 21, only in N=50: 21
+   -   state.json (.agents/state.json): 3696 lines, 54127 words, ~95137 tokens, truncated: no
+   - Your handoff — qa [sia-qa-0], session 210:
+   -   pick up: qa handoff of session 210, a fixed-length body.
+   -   planner [sia-pla-1] (session 208): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   -     planner handoff of session 208, a fixed-length body.
+   -   planner [sia-pla-2] (session 209): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +   state.json (.agents/state.json): 6176 lines, 59167 words, ~110777 tokens, truncated: no
+   + Your handoff — qa [sia-qa-1], session 250:
+   +   pick up: qa handoff of session 250, a fixed-length body.
+   +   planner [sia-pla-2] (session 248): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 248, a fixed-length body.
+   +   planner [sia-pla-0] (session 249): no commit: no committed handoff for "planner" at HEAD — nothing to trace
+   +     planner handoff of session 249, a fixed-length body.
+   +   planner [sia-pla-1] (session 250): no commit: no committed handoff for "planner" at HEAD — nothing to trace

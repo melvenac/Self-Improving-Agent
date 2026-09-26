@@ -1,0 +1,49 @@
+state.json sha256 before: 11cbc64d18e722a1dd91a639505d06c6dcae31448c0440f9c682b0c66b29c70a; files snapshotted: 37
+
+>> ob_set_session {"session_id":"c4c4c4c4-0000-4000-8000-000000000125","project_dir":"C:/qa-scratch/qa125/c4-stranger"}
+Session registered: c4c4c4c4-0000-4000-8000-000000000125 (C:/qa-scratch/qa125/c4-stranger) [via argument]
+
+>> ob_recall {"queries":["git show <ref>:<path> under Git Bash is mangled by MSYS path conversion"],"trigger":"explicit","project":"C:/qa-scratch/qa125/c4-stranger"}
+## git show <ref>:<path> under Git Bash is mangled by MSYS path conversion
+No results found.
+
+
+>> ob_store {"content":"[EXPERIENCE] git show <ref>:<path> under Git Bash is mangled by MSYS path conversion\nMATCH: command: `git show <ref>:<path>`\nTRIGGER: running git 
+Stored knowledge (id: 1) with key "git show <ref>:<path> under Git Bash is mangled by MSYS path conversion" [project: c:/qa-scratch/qa125/c4-stranger] — tags: git, windows-paths — kind: event
+
+>> ob_recall {"queries":["MSYS path conversion"],"trigger":"explicit","project":"C:/qa-scratch/qa125/c4-stranger","verbose":true}
+## MSYS path conversion
+### [stored knowledge] git show <ref>:<path> under Git Bash is mangled by MSYS path conversion (id: 1)
+Session: 2026-09-26T07:06:13.228Z | Project: c:/qa-scratch/qa125/c4-stranger
+[EXPERIENCE] git show <ref>:<path> under Git Bash is mangled by MSYS path conversion
+MATCH: command: `git show <ref>:<path>`
+TRIGGER: running git show origin/x:path from Git Bash on Windows
+ACTION: export MSYS_NO_PATHCONV=1 before the command, and pass C:/ paths, not /c/ paths, to node
+CONTEXT: QA 125 extracted the live record with git show origin/master:.agents/state.json and got "ambiguous a
+
+>> ob_recalled {}
+Recalled 1 entries this session (source: recall-log):
+
+  [1] git show <ref>:<path> under Git Bash is mangled by MSYS path conversion — progenitor
+
+>> ob_end {"project_root":"C:/qa-scratch/qa125/c4-stranger","session_id":"c4c4c4c4-0000-4000-8000-000000000125","session_summary":"QA 125 check 4: end.md run as written",
+Session End:
+  Summary: written
+  Recalled ids: 1 from recall-log
+  Feedback: 1 entries rated
+  Invocations: 0 logged
+  Shadow recall: 7 strategies over 1 queries (best: live)
+
+Shadow recall — 1 session(s) evaluated
+  live             nDCG 1.000  MRR 1.000  harmful 0
+  no_recency       nDCG 1.000  MRR 1.000  harmful 0
+  recency_strong   nDCG 1.000  MRR 1.000  harmful 0
+  recency_0_01     nDCG 1.000  MRR 1.000  harmful 0
+  recency_0_02     nDCG 1.000  MRR 1.000  harmful 0
+  recency_0_04     nDCG 1.000  MRR 1.000  harmful 0
+  bm25_only        nDCG 1.000  MRR 1.000  harmful 0
+  (sample too small 
+
+state.json sha256 after:  11cbc64d18e722a1dd91a639505d06c6dcae31448c0440f9c682b0c66b29c70a  => BYTE-IDENTICAL
+files in the project changed/added/removed by the run: none
+stored id parsed from ob_store: 1; ratings passed: {"1":"helpful"}

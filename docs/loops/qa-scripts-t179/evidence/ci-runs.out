@@ -1,0 +1,26 @@
+36224382093 loop/t179-merge 3c0bfdc success | runner tcm-1 | tests 1285 passed | 2 skipped (1287) | files 84 passed (84)
+36226601200 qa/t179-mut-ret-seat bc65624 failure | runner tcm-1 | tests 2 failed | 1283 passed | 2 skipped (1287) | files 2 failed | 82 passed (84)
+    FAIL tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > retention NEVER drops another checkout's newest entry, however old — a still-open seat keeps its handoff
+    FAIL tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > DOES flag the same drop when retention does not explain it (another checkout's entry)
+36226604213 qa/t179-mut-render-seat aefac69 failure | runner tcm-2 | tests 3 failed | 1282 passed | 2 skipped (1287) | files 3 failed | 81 passed (84)
+    FAIL tests/pipelines/state-views.test.ts > state views (Loop 3 C3) > next-session.md renders the NEWEST handoff per seat and checkout, and counts the rest (T-163)
+    FAIL tests/shared/state-schema.test.ts > state-schema (Loop 2, read side) > newestHandoffPerInstance keeps one per (seat, checkout), legacy null checkout as its own instance
+    FAIL tests/pipelines/session-start/state-render.test.ts > renderState — the startup read > T-163: another CHECKOUT of the same seat is named, not hidden — a still-open seat stays visible
+36226607194 qa/t179-mut-uuid-skip-delete 804687f failure | runner tcm-2 | tests 4 failed | 1281 passed | 2 skipped (1287) | files 2 failed | 82 passed (84)
+    FAIL tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > two sessions of the SAME seat hand off in sequence and the first's handoff survives, word for word
+    FAIL tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > retention keeps a superseded entry that is 10 or fewer sessions old
+    FAIL tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > KNOWN NEGATIVE: two sessions handing off through the writer erase nothing, and the check passes printing what it walked
+    FAIL tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > KNOWN POSITIVE: a hand edit that drops another session's handoff FAILS, naming both revisions and both sessions
+36226610360 qa/t179-mut-session-by-checkout aba2d60 failure | runner tcm-1 | tests 7 failed | 1278 passed | 2 skipped (1287) | files 3 failed | 81 passed (84)
+    FAIL tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > both sessions' uuids are in the record afterwards — the evidence T-163 exists to protect
+    FAIL tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > retention drops a superseded entry of the SAME seat and checkout once it is more than 10 sessions old
+    FAIL tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > a write with no set_handoff labels its session with the caller's resolved seat, or null
+    FAIL tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > a DIFFERENT uuid takes its own entry and its own number, with no note
+    FAIL tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > KNOWN NEGATIVE: two sessions handing off through the writer erase nothing, and the check passes printing what it walked
+    FAIL tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > KNOWN POSITIVE: a hand edit that drops another session's handoff FAILS, naming both revisions and both sessions
+    FAIL tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > does NOT flag a retention drop — the rule is recomputed from the state after the step
+36226613268 qa/t179-mut-erasure-blind-rev60 f37ef8d success | runner tcm-1 | tests 1285 passed | 2 skipped (1287) | files 84 passed (84)
+36226615839 qa/t179-mut-erasure-blind-merge 3702c13 failure | runner tcm-1 | tests 1 failed | 1284 passed | 2 skipped (1287) | files 1 failed | 83 passed (84)
+    FAIL tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > flags a MERGE resolution that keeps one branch's record and drops the other's (G-027)
+36226618554 qa/t179-mut-guard-repeat cb1c280 failure | runner tcm-2 | tests 1 failed | 1284 passed | 2 skipped (1287) | files 1 failed | 83 passed (84)
+    FAIL tests/shared/handoff-guard.test.ts > handoff guard (T179-2) > the warning is recorded for the next greeting and shown ONCE
