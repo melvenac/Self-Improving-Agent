@@ -163,7 +163,8 @@ It writes `.agents/state.json` at revision 0 and renders the views.
 
 ## Step 8: The SIA commit
 
-Run `git status --short`. It must list exactly the tracked files from step 3, plus
+Run `git status --short --untracked-files=all`. Without `--untracked-files=all`, new folders show as one
+line (`?? .agents/`) and cannot be compared. It must list exactly the tracked files from step 3, plus
 `.agents/state.json` and `.agents/SESSIONS/next-session.md`, plus `CLAUDE.md` if step 4 changed it.
 If anything else appears, stop and ask the owner. Then, on the owner's word:
 
