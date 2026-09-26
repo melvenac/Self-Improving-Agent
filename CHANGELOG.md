@@ -38,6 +38,10 @@ no version bump in these commits, because the release is Aaron's (D-019).
   leaves `.agents/` out. Scaffold's dirty check ignores what `move-residue` set aside, and `check` names the
   removal commit when git already tracked the residue. The acceptance run found this: in the first order written,
   the residue went into the pre-SIA commit.
+- **Scaffold before `CLAUDE.md`.** Changing or writing `CLAUDE.md` makes the tree dirty, and scaffold refuses a dirty
+  tree, so the `CLAUDE.md` step now follows scaffold. Its change belongs in the SIA commit. The acceptance run found
+  this too. A test now reads `bootstrap.md` top to bottom and asserts that every act comes after the one it depends
+  on. It is shown red on both earlier orders.
 
 ### Removed
 

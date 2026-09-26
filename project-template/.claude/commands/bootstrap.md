@@ -3,7 +3,7 @@
 > **One command, from an existing folder to a project `/start` can read.** The file copying and
 > the checks are done by `open-brain bootstrap`, so they happen the same way every time. This file
 > is the order and the owner's decisions. Follow it step by step and do not improvise file content:
-> **every file comes from `project-template/`, through step 4.**
+> **every file comes from `project-template/`, through step 3.**
 
 ## Step 0: Find the SIA install
 
@@ -62,31 +62,7 @@ comes next.
 
 `Next:` must now say to scaffold.
 
-## Step 3: CLAUDE.md
-
-`check`'s `CLAUDE.md:` line decides this step. **Never overwrite the owner's file.**
-
-- **present, without the SIA section:** show the owner the section below and ask,
-  "Append this SIA section to your CLAUDE.md?" Append it only on yes. On no, leave the file as it is.
-- **present, with the SIA section:** nothing to do.
-- **absent:** scan the project (`package.json`, `requirements.txt`, `Cargo.toml`, `go.mod`, the
-  README, lint and test configs) and draft a short `CLAUDE.md`: a title, a one-line **About**, the
-  **Commands** (build, test, lint, dev: detected or "TBD"), 2–5 **Conventions**, the key directories.
-  End it with the section below. Show the draft to the owner before writing it.
-
-The SIA section, verbatim (the heading is how `check` finds it):
-
-```markdown
-## Self-Improving Agent (SIA)
-
-- The project record is `.agents/state.json`. Change it only through the `ob_state` tool, never by
-  hand. `TASKS/INBOX.md`, `TASKS/task.md`, `SESSIONS/next-session.md` and `SYSTEM/SUMMARY.md` are
-  rendered from it.
-- Start a session with `/start`, and end it with `/end` (it stores the session's lessons).
-- Run `/sync` before a commit.
-```
-
-## Step 4: Scaffold
+## Step 3: Scaffold
 
 ```
 OB bootstrap scaffold
@@ -115,6 +91,33 @@ developer, QA) are for a multi-checkout loop, and this project does not run one.
 If it ends with **`VERIFY FAILED`**, stop and show the owner the problems. It is almost always an
 older rule in their `.gitignore` or `.gitattributes`, for example `.agents/`. Fix it with the owner,
 then continue. Do not work around it.
+
+## Step 4: CLAUDE.md
+
+This comes **after** scaffold on purpose: scaffold refuses a tree with uncommitted changes, and a
+changed `CLAUDE.md` belongs in the SIA commit (step 8), not in the project's own.
+
+`check`'s `CLAUDE.md:` line (step 1) decides this step. **Never overwrite the owner's file.**
+
+- **present, without the SIA section:** show the owner the section below and ask,
+  "Append this SIA section to your CLAUDE.md?" Append it only on yes. On no, leave the file as it is.
+- **present, with the SIA section:** nothing to do.
+- **absent:** scan the project (`package.json`, `requirements.txt`, `Cargo.toml`, `go.mod`, the
+  README, lint and test configs) and draft a short `CLAUDE.md`: a title, a one-line **About**, the
+  **Commands** (build, test, lint, dev: detected or "TBD"), 2–5 **Conventions**, the key directories.
+  End it with the section below. Show the draft to the owner before writing it.
+
+The SIA section, verbatim (the heading is how `check` finds it):
+
+```markdown
+## Self-Improving Agent (SIA)
+
+- The project record is `.agents/state.json`. Change it only through the `ob_state` tool, never by
+  hand. `TASKS/INBOX.md`, `TASKS/task.md`, `SESSIONS/next-session.md` and `SYSTEM/SUMMARY.md` are
+  rendered from it.
+- Start a session with `/start`, and end it with `/end` (it stores the session's lessons).
+- Run `/sync` before a commit.
+```
 
 ## Step 5: Make the three files this project's own
 
@@ -160,8 +163,8 @@ It writes `.agents/state.json` at revision 0 and renders the views.
 
 ## Step 8: The SIA commit
 
-Run `git status --short`. It must list exactly the tracked files from step 4, plus
-`.agents/state.json` and `.agents/SESSIONS/next-session.md`, plus `CLAUDE.md` if step 3 changed it.
+Run `git status --short`. It must list exactly the tracked files from step 3, plus
+`.agents/state.json` and `.agents/SESSIONS/next-session.md`, plus `CLAUDE.md` if step 4 changed it.
 If anything else appears, stop and ask the owner. Then, on the owner's word:
 
 ```

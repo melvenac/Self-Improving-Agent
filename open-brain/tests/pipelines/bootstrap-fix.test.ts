@@ -227,6 +227,58 @@ describe("BF-3: `open-brain bootstrap check` / `move-residue`", { timeout: E2E_T
   });
 });
 
+/**
+ * The line each marker first appears on. A stranger follows the file top to bottom, so line
+ * order IS execution order; comparing step numbers instead would miss two acts inside one
+ * step, which is exactly run 1's defect (residue move and pre-SIA commit, both in step 2).
+ */
+function lineOf(md: string, markers: string[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  md.split(/\r?\n/).forEach((line, i) => {
+    for (const m of markers) if (!(m in out) && line.includes(m)) out[m] = i + 1;
+  });
+  return out;
+}
+
+const ORDER: Array<[string, string]> = [
+  // [must come first, then this]
+  ["OB bootstrap move-residue", 'git commit -m "The project before SIA"'],
+  ['git commit -m "The project before SIA"', "OB bootstrap scaffold"],
+  ["OB bootstrap scaffold", "Append this SIA section"],
+  ["OB bootstrap scaffold", "OB state import --draft"],
+  ["OB state import --draft", "state import --commit"],
+  ["state import --commit", 'git commit -m "Bootstrap SIA"'],
+];
+
+function orderProblems(md: string): string[] {
+  const at = lineOf(md, [...new Set(ORDER.flat())]);
+  const problems: string[] = [];
+  for (const [a, b] of ORDER) {
+    if (!(a in at) || !(b in at)) { problems.push(`missing: ${!(a in at) ? a : b}`); continue; }
+    if (at[a] >= at[b]) problems.push(`${a} (line ${at[a]}) is not before ${b} (line ${at[b]})`);
+  }
+  return problems;
+}
+
+describe("bootstrap.md's order (found by the acceptance runs, record 127)", { timeout: E2E_TIMEOUT }, () => {
+  it("every step that makes the tree dirty comes after the step that needs it clean", () => {
+    const md = readFileSync(join(templateDir, ".claude", "commands", "bootstrap.md"), "utf8");
+    expect(orderProblems(md)).toEqual([]);
+  });
+
+  it("known negative: run 2's order (CLAUDE.md before scaffold) is caught", () => {
+    const run2 = [
+      "## Step 2: x", "```", "OB bootstrap move-residue", "```", '```', 'git commit -m "The project before SIA"', "```",
+      "## Step 3: CLAUDE.md", '"Append this SIA section to your CLAUDE.md?"', "```markdown", "## Self-Improving Agent (SIA)", "```",
+      "## Step 4: Scaffold", "```", "OB bootstrap scaffold", "```",
+      "## Step 6: d", "```", "OB state import --draft", "```",
+      "## Step 7: c", "```", "! node x state import --commit", "```",
+      "## Step 8: g", "```", 'git commit -m "Bootstrap SIA"', "```",
+    ].join("\n");
+    expect(orderProblems(run2)).toEqual(["OB bootstrap scaffold (line 15) is not before Append this SIA section (line 9)"]);
+  });
+});
+
 function localToday(): string {
   const n = new Date();
   return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
