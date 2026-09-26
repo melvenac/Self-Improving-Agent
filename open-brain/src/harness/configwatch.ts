@@ -448,6 +448,17 @@ const fileState = (id: PathIdentity, bytes: Buffer | null, unreadIdentity: boole
 });
 
 /**
+ * R83. `identify` contained an `lstat` failure as kind `other` plus a code.
+ * That state is unreadable, with the code and the identity's facts. It is
+ * never absent: a null here is what let a planted hook complete and what
+ * made the restore delete a hook it had never read.
+ */
+const unreadableIdentity = (id: PathIdentity): FileState => ({
+  ...fileState(id, null, true),
+  readError: `unreadable (${id.code})`,
+});
+
+/**
  * Read a path only when `lstat` says it is a regular file whose dev, ino and
  * nlink match the baseline. A mismatch is an identity change and is not read
  * (R43). A symlink is recorded, not followed. A hard link that appears with no
@@ -460,6 +471,7 @@ const readState = (p: string, baseline?: FileState | null, preflight = false): F
   if (id.kind === "symlink") {
     return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null };
   }
+  if (id.kind === "other" && id.code) return unreadableIdentity(id);
   if (id.kind !== "file") return null;
   const hadFile = baseline?.kind === "file";
   const same = hadFile && baseline.dev === id.dev && baseline.ino === id.ino && baseline.nlink === id.nlink;
@@ -680,6 +692,7 @@ export class ConfigWatch {
             readError: null,
           });
         } else if (id.kind === "file") snap.set(f, fileState(id, null, true));
+        else if (id.kind === "other" && id.code) snap.set(f, unreadableIdentity(id));
         else snap.set(f, null);
       } else {
         snap.set(f, readState(f, undefined, true));
@@ -700,6 +713,7 @@ export class ConfigWatch {
       if (id.kind === "symlink") {
         return { kind: "symlink", bytes: null, mode: id.mode, nlink: id.nlink, ino: id.ino, dev: id.dev, size: id.size, mtimeNs: id.mtimeNs, target: id.target, unreadIdentity: false, readError: null };
       }
+      if (id.kind === "other" && id.code) return unreadableIdentity(id);
       if (id.kind !== "file") return null;
       return fileState(id, null, true);
     }
