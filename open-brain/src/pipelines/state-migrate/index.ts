@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync, renameSync, unlinkSync } from "node:fs";
 import { z } from "zod";
 import { StateSchema, serializeState, SeatName, SCHEMA_VERSION, type State, type Seat } from "../../shared/state-schema.js";
+import { DONE_RETENTION_SESSIONS } from "../state-views/index.js";
 
 /**
  * `.agents/state.json` schema v1 → v2: the single `handoff` becomes `handoffs`,
@@ -57,9 +58,11 @@ import { StateSchema, serializeState, SeatName, SCHEMA_VERSION, type State, type
  * `sessions[]`, uuid included. Every uuid in the record before is in it after;
  * the tests count them.
  *
- * A null-checkout entry is its own seat instance to retention, so no new write
- * supersedes a migrated entry: the legacy entries leave the record only by a
- * deliberate act, never as a side effect of the next close-out.
+ * `first_rev` is null on every migrated entry: v2 never recorded the revision a
+ * session first wrote at, and a guessed one would be a number nothing checked
+ * (R179-1). Null orders before every keyed entry. A legacy SESSION record is
+ * never superseded; a legacy HANDOFF leaves when its seat writes its first keyed
+ * handoff (R179-3), which `record-erasure` recomputes and so explains.
  */
 
 /** A v1 record, validated strictly so a malformed input refuses rather than half-migrating. */
@@ -265,8 +268,10 @@ export function migrateStateText(
     ...v2,
     schema_version: SCHEMA_VERSION,
     revision: nextRevision,
-    handoffs: v2.handoffs.map((h) => ({ ...h, session_uuid: null, checkout: null })),
-    sessions: [{ ...v2.last_session, checkout: null }],
+    handoffs: v2.handoffs.map((h) => ({ ...h, session_uuid: null, checkout: null, first_rev: null })),
+    sessions: [{ ...v2.last_session, checkout: null, first_rev: null }],
+    // Not validated here: v3's schema re-validates every task after the move.
+    tasks: Array.isArray(v2.tasks) ? (v2.tasks as Record<string, unknown>[]).map((t) => ({ ...t, closed_rev: null })) : v2.tasks,
   };
   delete migrated.last_session;
 
@@ -278,11 +283,21 @@ export function migrateStateText(
   );
   changes.push(
     `handoffs: ${v2.handoffs.length} kept word for word (${v2.handoffs.map((h) => `${h.seat}@${h.session}`).join(", ") || "none"}), ` +
-      `session_uuid and checkout null — v2 never recorded either`
+      `session_uuid, checkout and first_rev null — v2 never recorded any of them`
   );
   changes.push(
-    `last_session → sessions[0]: n ${v2.last_session.n}, ${v2.last_session.date}, uuid ${v2.last_session.uuid ?? "null"}, seat ${v2.last_session.seat ?? "null"}, checkout null`
+    `last_session → sessions[0]: n ${v2.last_session.n}, ${v2.last_session.date}, uuid ${v2.last_session.uuid ?? "null"}, seat ${v2.last_session.seat ?? "null"}, checkout null, first_rev null`
   );
+  changes.push(
+    `legacy entries (first_rev null) order BEFORE every keyed entry; each legacy handoff is superseded by its seat's first keyed handoff (R179-3)`
+  );
+  if (Array.isArray(v2.tasks)) {
+    const done = (v2.tasks as Array<{ status?: unknown }>).filter((t) => t.status === "done").length;
+    changes.push(
+      `tasks: ${v2.tasks.length} kept, each with closed_rev null (v2 never recorded it); the ${done} done ` +
+        `task(s) age out once ${DONE_RETENTION_SESSIONS} sessions have written, unless cited in the tracked tree`
+    );
+  }
 
   const check = StateSchema.safeParse(migrated);
   if (!check.success) {

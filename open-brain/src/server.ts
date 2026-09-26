@@ -3,7 +3,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { resolve, join, dirname } from "node:path";
+import { resolve, join, dirname, basename } from "node:path";
 import { homedir } from "node:os";
 import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, appendFileSync, statSync } from "node:fs";
 import type Database from "better-sqlite3";
@@ -29,7 +29,7 @@ import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
-import { applyStateOps, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
+import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/session-end/recalled-ids.js";
@@ -457,7 +457,7 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
     if (r.kept_cited_task_ids.length) lines.push(`KEPT despite retention (id cited in the tracked tree): ${r.kept_cited_task_ids.join(", ")}`);
     if (r.removed_gap_ids.length) lines.push(`Closed gaps removed: ${r.removed_gap_ids.join(", ")}`);
     // T-163: an entry leaves the per-session arrays only by retention, and says so.
-    if (r.superseded.length) lines.push(`Superseded by a newer entry of the same seat and checkout (>${RECORD_RETENTION_SESSIONS} sessions old): ${r.superseded.join("; ")}`);
+    if (r.superseded.length) lines.push(`Superseded (a newer entry of the same seat and checkout, with >${RECORD_RETENTION_SESSIONS} sessions written since; or a legacy handoff whose seat has written a keyed one): ${r.superseded.join("; ")}`);
     // Anything the writer did differently from what was asked.
     for (const n of r.notes) lines.push(`NOTE: ${n}`);
     lines.push(`${r.dry_run ? "Would render" : "Rendered"} (${r.rendered.length}): ${r.rendered.length ? r.rendered.join(", ") : "none (render: false)"}`);
@@ -746,6 +746,42 @@ export async function handleSetSession(args: SetSessionArgs): Promise<ToolRespon
           + `SessionStart hook for ide "${ide}" has not run in this workspace, so work `
           + `may be filed under a previous session. Check that the hook is registered `
           + `and actually executing before trusting this id.`;
+      }
+    }
+
+    // R179-2 (QA 125's D2): refuse a uuid the record already holds under a
+    // DIFFERENT checkout. Every state write is stamped with the registered
+    // uuid, so registering as another checkout's recorded session would let
+    // this session replace that session's handoff in place — invisibly to
+    // record-erasure, because the key is still present. The registration is
+    // refused and the previous one (if any) is kept.
+    //
+    // LIMITS, stated because the guarantee reaches only this far: a uuid the
+    // record has not seen, or one recorded under THIS checkout, is accepted — so
+    // a second session in the same checkout registering as the first, and a
+    // reconnected server adopting the other session's uuid from the per-checkout
+    // slot (T-003), are NOT caught here. The checkout is the project root's
+    // basename, as the writer stamps it; two machines sharing a basename are one
+    // checkout to this check. A project_dir that is not the project root (no
+    // .agents/state.json there) is not checked.
+    {
+      const root = resolve(cwd);
+      const st = readState(root);
+      if (st.ok) {
+        const here = basename(root);
+        const rec = st.data.sessions.find((x) => x.uuid === session_id);
+        if (rec && rec.checkout !== null && rec.checkout !== here) {
+          return {
+            content: [{
+              type: "text" as const,
+              text: `ob_set_session refused: ${session_id} is recorded in ${root}/.agents/state.json as session ${rec.n} of checkout "${rec.checkout}", `
+                + `and this is checkout "${here}". Registering it would stamp this session's writes with another checkout's session, `
+                + `which can replace that session's handoff in place (R179-2). Nothing registered`
+                + (_activeSessionId ? `; the registration stays ${_activeSessionId}.` : "."),
+            }],
+            isError: true,
+          };
+        }
       }
     }
 

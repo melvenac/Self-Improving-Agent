@@ -107,7 +107,7 @@ Register it in your Claude Code MCP settings (`~/.claude/.mcp.json` or `~/.claud
 
 ### 3. Set up automation hooks
 
-The session bootstrap and session-end hooks are compiled TypeScript under `open-brain/build/`. After installing dependencies and building (`cd open-brain && npm install && npm run build`), register the hooks in `~/.claude/settings.json`:
+The session bootstrap and session-end hooks are compiled TypeScript under `open-brain/build/`. **`node scripts/setup.mjs` builds them and registers `SessionStart` and `SessionEnd` for you** (each checked on its own, so a machine set up before `SessionEnd` was added gets it on the next run). Run it from the checkout the hooks should serve: it replaces a registration of the same script from another checkout. `PostToolUse` (the recall trigger) is not registered by `setup.mjs`; add it by hand. The full block, for a manual install (`cd open-brain && npm install && npm run build`), in `~/.claude/settings.json`:
 
 ```jsonc
 {

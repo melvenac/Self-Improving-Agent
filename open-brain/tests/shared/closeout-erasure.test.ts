@@ -135,25 +135,35 @@ describe("T163-1: a close-out can only add its own record", () => {
     expect(r.error).toMatch(/end_session.*retired/);
   });
 
-  it("retention drops a superseded entry of the SAME seat and checkout once it is more than 10 sessions old", () => {
+  // Retention counts the distinct sessions that FIRST WROTE after an entry, not
+  // session numbers (R179-1 as amended): `others(k)` writes k sessions in
+  // checkouts of their own, each its instance's only entry.
+  const others = (k: number) => {
+    for (let i = 0; i < k; i++) handoff(root, 1, `cccccccc-3333-4333-8333-${String(i).padStart(12, "0")}`, `other ${i}`, `other-${i}`, "qa");
+  };
+
+  it("retention drops a superseded entry of the SAME seat and checkout once more than 10 sessions have written since", () => {
     handoff(root, 40, A, "old builder handoff", "sia-builder");
-    handoff(root, 56, B, "new builder handoff", "sia-builder");
+    others(10);
+    handoff(root, 41, B, "new builder handoff", "sia-builder"); // the 11th session since A
     const picks = raw(root).handoffs.map((h) => h.pick_up);
     expect(picks).not.toContain("old builder handoff");
     expect(picks).toContain("new builder handoff");
   });
 
-  it("retention NEVER drops another checkout's newest entry, however old — a still-open seat keeps its handoff", () => {
+  it("retention NEVER drops another checkout's newest entry, however many sessions have written since — a still-open seat keeps its handoff", () => {
     handoff(root, 40, A, "grok in sia-forge", "sia-forge");
+    others(12);
     handoff(root, 56, B, "forge in sia-builder", "sia-builder");
     const picks = raw(root).handoffs.map((h) => h.pick_up);
     expect(picks).toContain("grok in sia-forge");
     expect(picks).toContain("forge in sia-builder");
   });
 
-  it("retention keeps a superseded entry that is 10 or fewer sessions old", () => {
+  it("retention keeps a superseded entry when 10 or fewer sessions have written since", () => {
     handoff(root, 46, A, "recent builder handoff", "sia-builder");
-    handoff(root, 56, B, "newer builder handoff", "sia-builder");
+    others(9);
+    handoff(root, 5600, B, "newer builder handoff", "sia-builder"); // the 10th since A, numbered absurdly
     const picks = raw(root).handoffs.map((h) => h.pick_up);
     expect(picks).toContain("recent builder handoff");
   });

@@ -6,12 +6,13 @@
 > **One job:** store each lesson this session learned, with the key that would have caught the
 > mistake, then close the session's memory with `ob_end`. That is all `/end` does.
 
-**`/end` writes no project state.** The record is written as the work happens, through `ob_state`:
-the handoff with `set_handoff` when you hand back, a decision with `add_decision` when it is made,
-a task's status when it moves. Every write records its session in `sessions[]` by itself, and a
-session can only add or update its own handoff (schema v3, T-163), so there is nothing left for a
-close-out to write and nothing it can erase. The SessionEnd hook writes the session summary,
-auto-feedback and logging whether or not `/end` runs.
+**`/end` writes no project state.** The record is written as the work happens, through `ob_state`
+(`set_handoff`, `add_decision`, a task's status). Every write records its session in `sessions[]`,
+and no op can name, update or delete another session's handoff. **That rests on the REGISTERED
+session, and the registration can be wrong:** a second session in the same checkout, a reconnected
+server re-reading the checkout's hook slot, or a server that outlives a context clear can hold another
+session's id. Only a different checkout's recorded session is refused. The SessionEnd hook, if
+registered (`node scripts/setup.mjs` does it), writes the summary and logging whether or not `/end` runs.
 
 ## 1. Find the lessons
 
@@ -21,8 +22,9 @@ fine answer: say so and go to step 3.
 
 ## 2. Store each one with its KEY
 
-The recall trigger injects an entry only on a **deterministic match against the act** (T-170). An
-entry with no machine-matchable key can only ever be found by someone who already knows to ask.
+Give every lesson the key a machine could match against the act that repeats it. **Nothing reads
+`MATCH:` yet:** the recall trigger matches on the command text, not on this line. The line is
+written now so the entries exist, keyed, when something does read it.
 
 For each lesson, `ob_recall` its title first (explicit trigger); skip it if it is already stored,
 or add the new detail. Then call `ob_store` with `kind: "event"`:
@@ -31,7 +33,7 @@ or add the new detail. Then call `ob_store` with `kind: "event"`:
 [EXPERIENCE] {short title}
 MATCH: {exactly one of:}
   command: {the command shape that did it, e.g. `| tail`, `git show <ref>:<path>`}
-  path: {the file or glob where it bites, e.g. open-brain/src/shared/state-writer.ts}
+  path: {the file or glob where it bites, e.g. src/db/migrate.ts}
   error: "{the exact error text you saw}"
   none — lookup only   {only when no act identifies it; say so, never leave MATCH out}
 TRIGGER: {the moment it matters}
@@ -45,18 +47,16 @@ that has not been restarted strips unknown parameters and still reports success.
 
 ## 3. Close the session's memory
 
-Call `ob_end` once. Pass `entry_ratings` only for entries that were **injected or recalled this
-session** (`ob_recalled` lists them): `helpful` if it changed what you did, `harmful` if it misled
-you, `neutral` if it was there and unused. Do not rate what you did not see.
+**Needs a registered session** (the SessionStart hook, or `/start`'s `ob_set_session`); without one
+`ob_recalled` lists nothing and the ratings are silently zero, so report that, not "none". Call
+`ob_end` once, with `entry_ratings` only for entries `ob_recalled` lists: `helpful` if it changed what
+you did, `harmful` if it misled you, `neutral` if unused. Do not rate what you did not see.
 
 ## 4. Report
 
-`Lessons stored: {n} — {title} [MATCH: command|path|error|none], ... · Ratings: {ids} or none`
+`Lessons stored: {n} — {title} [MATCH: command|path|error|none], ... · Ratings: {ids}, none, or "no registered session"`
 
 ## What moved out of /end
 
-Session log (A1): `ob_start` creates it, local and untracked. SUMMARY/INBOX/task/next-session
-(A2, A5–A7b): rendered from the record `ob_state` writes as work happens. DECISIONS/ENTITIES
-(A3–A4): written with the change that makes them true. Validation and doc drift (A8, A9): `/sync`.
-Vault summary (A13): the SessionEnd hook. Research (A10): step 2, `MATCH: none` unless an act
-identifies it. Lessons and ratings (A11, A12, A14): steps 1 to 3.
+Session log: `ob_start`. SUMMARY, INBOX, task, next-session: rendered from what `ob_state` writes.
+DECISIONS, ENTITIES: with the change that makes them true. Validation: `/sync`. Vault summary: the SessionEnd hook.

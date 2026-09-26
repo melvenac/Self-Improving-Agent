@@ -8,7 +8,7 @@
  * outside it is the project's own prose and is preserved byte for byte.
  */
 import type { State, Task, Handoff } from "../../shared/state-schema.js";
-import { TaskPriority, lastSession, newestHandoffPerInstance } from "../../shared/state-schema.js";
+import { TaskPriority, lastSession, newestHandoffPerInstance, compareFirstRev } from "../../shared/state-schema.js";
 
 export interface ViewOptions {
   version: string;
@@ -21,8 +21,8 @@ export interface ViewOptions {
 }
 
 /**
- * How many sessions of done tasks are kept. "Last 3 sessions" means the current
- * one and the two before it, so a task closed at `session - 3` is the first to go.
+ * How many sessions of done tasks are kept: a done task leaves once this many
+ * distinct sessions have first written after the write that closed it.
  *
  * Defined here rather than in the writer because both need it and the writer
  * already imports this module; re-exported from `state-writer.ts` so existing
@@ -40,8 +40,15 @@ export const DONE_RETENTION_SESSIONS = 3;
  * path deliberately skips retention, so a repo could sit in that state
  * indefinitely. One function now decides, and both call it.
  */
-export function isDroppedByRetention(t: Task, session: number): boolean {
-  return t.status === "done" && t.closed_session !== null && t.closed_session <= session - DONE_RETENTION_SESSIONS;
+export function isDroppedByRetention(t: Task, sessionFirstRevs: readonly (number | null)[]): boolean {
+  if (t.status !== "done") return false;
+  // R179-1 extended to done tasks (record 128): aged by the DISTINCT sessions
+  // that first wrote after the closing revision, never by `closed_session`
+  // against the caller's number — one write numbered 1124 dropped every
+  // uncited done task. A task closed before v3 (closed_rev null) orders before
+  // every keyed session, as a legacy handoff does.
+  const since = sessionFirstRevs.filter((r) => compareFirstRev(r, t.closed_rev) > 0).length;
+  return since >= DONE_RETENTION_SESSIONS;
 }
 
 export const SUMMARY_BEGIN = "<!-- state:begin -->";
@@ -98,8 +105,8 @@ export function renderInbox(state: State, o: ViewOptions): string {
   }
   if (active.length === 0) lines.push("_No open tasks._", "");
   const done = state.tasks
-    .filter((t) => t.status === "done" && !isDroppedByRetention(t, o.session))
-    .sort((a, b) => (b.closed_session ?? 0) - (a.closed_session ?? 0));
+    .filter((t) => t.status === "done" && !isDroppedByRetention(t, state.sessions.map((x) => x.first_rev)))
+    .sort((a, b) => compareFirstRev(b.closed_rev, a.closed_rev));
   lines.push(`## Done (last ${DONE_RETENTION_SESSIONS} sessions)`, "");
   if (done.length === 0) lines.push("_None retained._");
   for (const t of done) lines.push(`- [x] **${t.id}** ${t.title} (session ${t.closed_session})${t.note ? ` — ${t.note}` : ""}`);

@@ -52,13 +52,13 @@ describe("T-179 merge: an import writes a schema v3 record that ob_state accepts
     const s = StateSchema.parse(JSON.parse(importAndRead()));
     expect(s.handoffs).toHaveLength(1);
     expect(s.handoffs[0]).toMatchObject({ seat: "developer", session: 54, session_uuid: null, checkout: null });
-    expect(s.sessions).toEqual([{ n: 54, date: TODAY, uuid: "00000000-0000-4000-8000-000000000054", seat: null, checkout: null }]);
+    expect(s.sessions).toEqual([{ n: 54, date: TODAY, uuid: "00000000-0000-4000-8000-000000000054", seat: null, checkout: null, first_rev: null }]);
     // T-175 still holds on the v3 record.
     expect(s.verified).toEqual([]);
     expect(s.gaps).toEqual([]);
   });
 
-  it("ob_state's writer accepts it: a registered session's set_handoff lands beside the legacy entry, which survives", () => {
+  it("ob_state's writer accepts it: another seat's set_handoff lands beside the legacy entry, which survives until its OWN seat writes (R179-3)", () => {
     importAndRead();
     const w = applyStateOps(root, {
       session: 55,
@@ -68,7 +68,7 @@ describe("T-179 merge: an import writes a schema v3 record that ob_state accepts
       today: TODAY,
       ops: [
         { op: "open_task", title: "first task after import", priority: "P2" },
-        { op: "set_handoff", seat: "developer", pick_up: "after import", watch_out: [], open_questions: [] },
+        { op: "set_handoff", seat: "qa", pick_up: "after import", watch_out: [], open_questions: [] },
       ],
     });
     expect(w.error ?? "ok").toBe("ok");
@@ -76,8 +76,17 @@ describe("T-179 merge: an import writes a schema v3 record that ob_state accepts
     expect(w.revision_after).toBe(1);
     const s = StateSchema.parse(JSON.parse(readFileSync(join(root, STATE_REL), "utf-8")));
     expect(s.handoffs.map((h) => h.session_uuid)).toEqual([null, WRITER]);
-    expect(s.handoffs.find((h) => h.session_uuid === WRITER)).toMatchObject({ seat: "developer", checkout: "sia-builder", session: 55 });
+    expect(s.handoffs.find((h) => h.session_uuid === WRITER)).toMatchObject({ seat: "qa", checkout: "sia-builder", session: 55, first_rev: 1 });
     expect(s.sessions.map((x) => x.uuid)).toEqual(["00000000-0000-4000-8000-000000000054", WRITER]);
+    // The developer's first keyed handoff supersedes the imported (developer) one.
+    const DEV = "dddddddd-4444-4444-8444-000000000056";
+    const d = applyStateOps(root, { session: 56, expected_revision: 1, session_uuid: DEV, checkout: "sia-builder", today: TODAY, ops: [{ op: "set_handoff", seat: "developer", pick_up: "dev after import", watch_out: [], open_questions: [] }] });
+    expect(d.ok, d.error).toBe(true);
+    expect(d.superseded).toEqual(["handoff developer@54 (developer, legacy, session 54)"]);
+    const s2 = StateSchema.parse(JSON.parse(readFileSync(join(root, STATE_REL), "utf-8")));
+    expect(s2.handoffs.map((h) => h.session_uuid)).toEqual([WRITER, DEV]);
+    // The imported SESSION record stays: it is never superseded.
+    expect(s2.sessions.map((x) => x.uuid)).toContain("00000000-0000-4000-8000-000000000054");
   });
 
   it("the migration leaves the imported record unchanged: nothing to write, same revision, same bytes on disk", () => {

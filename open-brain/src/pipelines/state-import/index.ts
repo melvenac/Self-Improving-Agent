@@ -63,7 +63,7 @@ export interface ImportReport {
     superseded_links: SupersededLink[];
     sessions: { parsed: number; inferred_open_as_current: number; inferred_done_as_retention_edge: number };
     title_fallbacks: Array<{ line: number; title: string }>;
-    retention_eligible_on_first_write: number;
+    retention_eligible_done: number;
   };
   objective: { found: boolean; preview: string };
   decisions: {
@@ -266,19 +266,12 @@ function splitTitle(body: string): { title: string; note: string; fallback: bool
  * The session a done item with no `(Session N)` marker is stamped closed in.
  * Floored at 0: session numbers are non-negative in the schema, so at a fresh
  * project's session 0 the unfloored edge (-3) made the draft fail validation
- * (bootstrap-fix BF-8, frogger F9). Whether an item is old enough to drop is
- * still judged against the unfloored edge.
+ * (bootstrap-fix BF-8, frogger F9). The stamp is a label only: since T-179
+ * round 2, whether a done item is dropped is judged by closed_rev and the
+ * sessions written since, never by this number.
  */
 export function retentionEdge(current: number): number {
   return Math.max(0, current - DONE_RETENTION_SESSIONS);
-}
-
-/** How the report states the retention edge: a negative session is never printed. */
-function describeRetentionEdge(current: number): string {
-  const raw = current - DONE_RETENTION_SESSIONS;
-  return raw >= 0
-    ? `retention edge: done items closed ≤ session ${raw} are dropped on the first ob_state write`
-    : `retention edge: none yet — at session ${current} no done item is ${DONE_RETENTION_SESSIONS} sessions old, so the first ob_state write drops nothing`;
 }
 
 /**
@@ -326,9 +319,9 @@ export function importTasks(text: string, current: number, report: ImportReport[
       opened = current;
       closed = null;
     }
-    if (status === "done" && closed !== null && closed <= current - DONE_RETENTION_SESSIONS) report.retention_eligible_on_first_write++;
+    if (status === "done") report.retention_eligible_done++;
     if (it.fromCompleted) report.completed_section_items++;
-    tasks.push({ id, title, priority: it.priority!, status, opened_session: opened, closed_session: closed, supersedes: null, note });
+    tasks.push({ id, title, priority: it.priority!, status, opened_session: opened, closed_session: closed, supersedes: null, note, closed_rev: null });
     if (superseded) {
       const prev = tasks[idx - 1];
       if (prev) {
@@ -437,7 +430,7 @@ function bullets(body: string[]): string[] {
  * guess, so the assumption is recorded in the report instead.
  */
 export function importHandoff(text: string | null, current: number, report: ImportReport["handoff"]): State["handoffs"][number] {
-  const handoff: State["handoffs"][number] = { seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: current, loop_state: null, session_uuid: null, checkout: null };
+  const handoff: State["handoffs"][number] = { seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: current, loop_state: null, session_uuid: null, checkout: null, first_rev: null };
   if (!text) return handoff;
   const lines = text.split(/\r?\n/);
   const headings = lines.map((l, i) => ({ l, i })).filter(({ l }) => /^#{2,6} /.test(l));
@@ -643,7 +636,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
       superseded_links: [],
       sessions: { parsed: 0, inferred_open_as_current: 0, inferred_done_as_retention_edge: 0 },
       title_fallbacks: [],
-      retention_eligible_on_first_write: 0,
+      retention_eligible_done: 0,
     },
     objective: { found: false, preview: "" },
     decisions: { imported: 0, date_from_line: 0, date_partial: [], date_unknown: 0, skipped: [] },
@@ -677,7 +670,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
     handoffs: [handoff],
     // Schema v3 (T-163): the prose session log's last session becomes the first
     // entry of sessions[]; its seat and checkout were never recorded.
-    sessions: [{ n: last.n, date: last.date, uuid: last.uuid, seat: null, checkout: null }],
+    sessions: [{ n: last.n, date: last.date, uuid: last.uuid, seat: null, checkout: null, first_rev: null }],
   };
   return { state, report };
 }
@@ -748,7 +741,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   const L: string[] = [];
   L.push(`# state.json import report — ${mode} (${r.migration_date})`, "");
   L.push(...renderStaleness(r.staleness), "");
-  L.push(`Project: ${r.project.name} v${r.project.version} · current session ${r.current_session} (from ${r.last_session.file}) · ${describeRetentionEdge(r.current_session)}`, "");
+  L.push(`Project: ${r.project.name} v${r.project.version} · current session ${r.current_session} (from ${r.last_session.file}) · retention: every imported done item (closed before the record existed, closed_rev null) is dropped once ${DONE_RETENTION_SESSIONS} sessions have written to the record, unless its id is cited in the tracked tree`, "");
   L.push("## Sources", "");
   for (const [k, s] of Object.entries(r.sources)) L.push(`- ${k}: \`${s.path}\` — ${s.present ? `${s.lines} lines` : "ABSENT"}`);
   L.push("", "## Tasks (INBOX.md)", "");
@@ -765,7 +758,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   }
   L.push(`| **all** | ${r.inbox.by_status.open} | ${r.inbox.by_status.in_progress} | ${r.inbox.by_status.blocked} | ${r.inbox.by_status.done} | ${r.inbox.items} |`);
   L.push("", `Sessions: ${r.inbox.sessions.parsed} items had a \`(Session N)\` marker (opened = min, closed = max for done); ${r.inbox.sessions.inferred_open_as_current} open items had none → opened_session = ${r.current_session}; ${r.inbox.sessions.inferred_done_as_retention_edge} done items had none → closed_session = ${retentionEdge(r.current_session)}.`);
-  L.push(`Retention-eligible on the first write: ${r.inbox.retention_eligible_on_first_write} done items (they stay in the snapshot and in git).`, "");
+  L.push(`Retention-eligible once ${DONE_RETENTION_SESSIONS} sessions have written: ${r.inbox.retention_eligible_done} done items (they stay in the snapshot and in git).`, "");
   L.push(`### Superseded links (${r.inbox.superseded_links.length})`, "");
   if (r.inbox.superseded_links.length === 0) L.push("_None._");
   for (const s of r.inbox.superseded_links) L.push(`- ${s.from} (line ${s.from_line}) supersedes ${s.to} (line ${s.to_line})`);

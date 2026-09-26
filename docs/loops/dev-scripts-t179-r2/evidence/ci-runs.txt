@@ -1,0 +1,75 @@
+== 36231224891 loop/t179-r2 2c99df1 success Runner name: 'tcm-1' | Tests  1307 passed | 2 skipped (1309)
+   assertion-class errors: 0, other errors: 0
+== 36231226220 loop/t179-r2-qa-ret-seat eb68743 failure Runner name: 'tcm-2' | Tests  1 failed | 1306 passed | 2 skipped (1309)
+tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > retention NEVER drops another checkout's newest entry, however many sessions hav
+   assertion-class errors: 2, other errors: 0
+== 36231227538 loop/t179-r2-qa-render-seat 5d45fd0 failure Runner name: 'tcm-2' | Tests  3 failed | 1304 passed | 2 skipped (1309)
+tests/pipelines/session-start/state-render.test.ts > renderState — the startup read > T-163: another CHECKOUT of the same seat is named, not hidden — a still-open sea
+tests/pipelines/state-views.test.ts > state views (Loop 3 C3) > next-session.md renders the NEWEST handoff per seat and checkout, and counts the rest (T-163)
+tests/shared/state-schema.test.ts > state-schema (Loop 2, read side) > newestHandoffPerInstance keeps one per (seat, checkout) by first_rev, never by session number; lega
+   assertion-class errors: 6, other errors: 0
+== 36231229081 loop/t179-r2-qa-uuid-skip-delete 9b61ce2 failure Runner name: 'tcm-1' | Tests  11 failed | 1296 passed | 2 skipped (1309)
+tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > KNOWN NEGATIVE: two sessions handing off through the writer erase nothing, and the check passes pr
+tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > KNOWN POSITIVE: a hand edit that drops another session's handoff FAILS, naming both revisions and 
+tests/pipelines/sync/record-erasure.test.ts > record-erasure recomputes retention by write order (R179-1) > KNOWN NEGATIVE: QA's A6 through the writer (1124 for 124) remo
+tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > retention keeps a superseded entry when 10 or fewer sessions have written since
+tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > two sessions of the SAME seat hand off in sequence and the first's handoff survi
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A2 as QA wrote it: two sessions of one seat and checkout numbered 11 apart, nothing between
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A5 as QA wrote it: a jump to 500 drops nothing — the newest per (seat, checkout) and buil
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6: a mistyped number (1124 for 124) removes NO other session's handoff or session record
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last 
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6c: a session passing its LOCAL greeting number (6) keeps its own new handoff, and the rea
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more
+   assertion-class errors: 22, other errors: 0
+== 36231230309 loop/t179-r2-qa-session-by-checkout 9881323 failure Runner name: 'tcm-1' | Tests  15 failed | 1292 passed | 2 skipped (1309)
+tests/pipelines/state-import.test.ts > state import (Loop 4 C1) on a fixture built from this repo's prose files > --commit: snapshot byte-complete before any change (P2),
+tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > does NOT flag a retention drop — the rule is recomputed from the state after the step
+tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > KNOWN NEGATIVE: two sessions handing off through the writer erase nothing, and the check passes pr
+tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > KNOWN POSITIVE: a hand edit that drops another session's handoff FAILS, naming both revisions and 
+tests/pipelines/sync/record-erasure.test.ts > record-erasure recomputes retention by write order (R179-1) > KNOWN NEGATIVE: QA's A6 through the writer (1124 for 124) remo
+tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > both sessions' uuids are in the record afterwards — the evidence T-163 exists 
+tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > retention drops a superseded entry of the SAME seat and checkout once more than 
+tests/shared/session-order.test.ts > R179-1 extended to done tasks: a done task ages by sessions written since its close, never by number > a done task leaves once 3 DIST
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6: a mistyped number (1124 for 124) removes NO other session's handoff or session record
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last 
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more
+tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > a DIFFERENT uuid takes its own entry and its own number, with no note
+tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > a write with no set_handoff labels its session with the caller's resolved seat, or null
+tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers 
+tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > retention never touches verified, gaps or decisions
+   assertion-class errors: 30, other errors: 0
+== 36231231511 loop/t179-r2-qa-erasure-blind-rev60 ea49b15 failure Runner name: 'tcm-2' | Tests  1 failed | 1306 passed | 2 skipped (1309)
+tests/pipelines/sync/record-erasure.test.ts > record-erasure: T-163's known positives as a fixture (R179-7) > flags rev 60->61 and rev 61->62 — each the uuid AND the ha
+   assertion-class errors: 2, other errors: 0
+== 36231232729 loop/t179-r2-qa-erasure-blind-merge 0e9d3b0 failure Runner name: 'tcm-1' | Tests  1 failed | 1306 passed | 2 skipped (1309)
+tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > flags a MERGE resolution that keeps one branch's record and drops the other's (G-027)
+   assertion-class errors: 2, other errors: 0
+== 36231233920 loop/t179-r2-qa-guard-repeat 7b6ed99 failure Runner name: 'tcm-2' | Tests  1 failed | 1306 passed | 2 skipped (1309)
+tests/shared/handoff-guard.test.ts > handoff guard (T179-2) > the warning is recorded for the next greeting and shown ONCE
+   assertion-class errors: 2, other errors: 0
+== 36231235127 loop/t179-r2-mut-ret-by-number ccdb55f failure Runner name: 'tcm-2' | Tests  12 failed | 1295 passed | 2 skipped (1309)
+tests/pipelines/state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) > ob_state's writer accepts it: another s
+tests/pipelines/sync/record-erasure.test.ts > record-erasure recomputes retention by write order (R179-1) > KNOWN NEGATIVE: QA's A6 through the writer (1124 for 124) remo
+tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > retention keeps a superseded entry when 10 or fewer sessions have written since
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A2 as QA wrote it: two sessions of one seat and checkout numbered 11 apart, nothing between
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A5 as QA wrote it: a jump to 500 drops nothing — the newest per (seat, checkout) and buil
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6: a mistyped number (1124 for 124) removes NO other session's handoff or session record
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last 
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6c: a session passing its LOCAL greeting number (6) keeps its own new handoff, and the rea
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more
+tests/shared/session-order.test.ts > R179-3: a legacy handoff is superseded by its seat's first keyed handoff > the fixture's legacy developer@54 survives ANOTHER seat's 
+tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers 
+tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > R179-3: the first keyed handoff of the legacy entry's OWN seat supersedes it, and the write reports it
+   assertion-class errors: 24, other errors: 0
+== 36231236391 loop/t179-r2-mut-done-by-number 6e6c02e failure Runner name: 'tcm-1' | Tests  5 failed | 1302 passed | 2 skipped (1309)
+tests/pipelines/state-import.test.ts > state import (Loop 4 C1) on a fixture built from this repo's prose files > --commit: snapshot byte-complete before any change (P2),
+tests/pipelines/state-views.test.ts > T-144: rendered Done obeys the retention window > view and writer agree on exactly which done tasks exist
+tests/server.test.ts > server handlers > handleStart > ob_state applies a batch, renders the views, and ob_start reads the result back
+tests/shared/session-order.test.ts > R179-1 extended to done tasks: a done task ages by sessions written since its close, never by number > one write numbered 1124 drops 
+tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers 
+   assertion-class errors: 10, other errors: 0
+== 36231237629 loop/t179-r2-mut-retention-infinite 30e2500 failure Runner name: 'tcm-2' | Tests  3 failed | 1304 passed | 2 skipped (1309)
+tests/pipelines/sync/record-erasure.test.ts > record-erasure (T163-2) > does NOT flag a retention drop — the rule is recomputed from the state after the step
+tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > retention drops a superseded entry of the SAME seat and checkout once more than 
+tests/shared/session-order.test.ts > R179-1: a session number orders nothing > retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more
+   assertion-class errors: 6, other errors: 0
