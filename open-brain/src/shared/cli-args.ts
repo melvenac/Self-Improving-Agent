@@ -3,7 +3,8 @@ import { resolve } from "node:path";
 
 /**
  * T-185 (T-150's rule, every subcommand): a command declares the flags it
- * accepts, and any token starting with "-" that it did not declare REFUSES.
+ * accepts, and any token starting with "-" (or with a typographic dash, R185-5)
+ * that it did not declare REFUSES.
  *
  * Before this, each subcommand took `args.find((a) => !a.startsWith("--"))` as
  * its directory and `args.includes("--x")` for its flags. So a misspelled flag
@@ -52,6 +53,15 @@ export function declaredFlags(spec: CommandSpec): string[] {
   return [...spec.booleans, ...Object.keys(spec.values)];
 }
 
+/**
+ * R185-5: autocorrect turns "--" into an em or en dash, and a token that starts
+ * with one does not start with "-". It used to become a positional: a second
+ * FILE for `state migrate`, a directory for the rest. It is a mistyped flag.
+ */
+const TYPOGRAPHIC_DASH = /^[‐-―−﹘﹣－]/;
+
+const looksLikeFlag = (tok: string): boolean => tok.startsWith("-") || TYPOGRAPHIC_DASH.test(tok);
+
 export function parseArgs(spec: CommandSpec, tokens: readonly string[], cwd: string = process.cwd()): ParseResult {
   const booleans = new Set<string>();
   const values = new Map<string, string>();
@@ -61,6 +71,10 @@ export function parseArgs(spec: CommandSpec, tokens: readonly string[], cwd: str
 
   for (let i = 0; i < tokens.length; i += 1) {
     const tok = tokens[i]!;
+    if (TYPOGRAPHIC_DASH.test(tok)) {
+      unknown.push(tok);
+      continue;
+    }
     if (!tok.startsWith("-")) {
       positionals.push(tok);
       continue;
@@ -93,7 +107,7 @@ export function parseArgs(spec: CommandSpec, tokens: readonly string[], cwd: str
       continue;
     }
     const next = tokens[i + 1];
-    if (next === undefined || next.startsWith("-")) {
+    if (next === undefined || looksLikeFlag(next)) {
       problems.push(`${name} needs a value`);
       continue;
     }
@@ -103,10 +117,11 @@ export function parseArgs(spec: CommandSpec, tokens: readonly string[], cwd: str
 
   if (unknown.length > 0) {
     const flags = declaredFlags(spec);
+    const named = (u: string): string => (TYPOGRAPHIC_DASH.test(u) ? `"${u}" (a typographic dash, not "-")` : `"${u}"`);
     return {
       ok: false,
       error:
-        `unrecognised flag${unknown.length > 1 ? "s" : ""} ${unknown.map((u) => `"${u}"`).join(", ")}.\n` +
+        `unrecognised flag${unknown.length > 1 ? "s" : ""} ${unknown.map(named).join(", ")}.\n` +
         `Accepted flags: ${flags.length > 0 ? flags.join(", ") : "(none)"}`,
     };
   }

@@ -84,7 +84,11 @@ describe("a typographic dash is an unrecognised flag (R185-5)", () => {
   });
 
   it("is not taken as a value flag's value", () => {
-    expect(refused(["--seat", "—dry-run"], COMMAND_SPECS.stateMigrate)).toMatch(/--seat needs a value/);
+    // Refused as a flag (unknown flags are reported before a missing value), not
+    // swallowed as the seat's name.
+    expect(refused(["--seat", "—dry-run"], COMMAND_SPECS.stateMigrate)).toContain(
+      'unrecognised flag "—dry-run" (a typographic dash, not "-")'
+    );
   });
 
   it("a typographic dash that does not START the token leaves it a positional", () => {
