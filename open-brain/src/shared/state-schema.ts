@@ -337,7 +337,7 @@ export function lastSession(state: Pick<State, "sessions">): SessionRecord | nul
 export function newestHandoffPerInstance(handoffs: readonly Handoff[]): Handoff[] {
   const newest = new Map<string, Handoff>();
   for (const h of handoffs) {
-    const key = `${h.seat}\u0000${h.checkout ?? ""}`;
+    const key = `${h.seat}`;
     const cur = newest.get(key);
     if (!cur || compareFirstRev(h.first_rev, cur.first_rev) >= 0) newest.set(key, h);
   }
