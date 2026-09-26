@@ -1644,7 +1644,7 @@ export function composeGreeting(projectRoot: string, version: string): ComposedG
     ...roles.problems,
   ].join("\n");
   const state = renderState(parsed.data, version, {
-    seat: seat?.success ? seat.data : null,
+    seat: null,
     projectRoot,
   }).join("\n");
   const roleFiles = roles.files
