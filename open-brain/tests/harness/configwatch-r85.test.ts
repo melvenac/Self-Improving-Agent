@@ -1,6 +1,6 @@
 /**
  * R85. No side stands alone. A failed lstat at stage start prints its code,
- * an unobservable close carries the facts observe() has, and an ancestor
+ * an unobservable close with no lstat says the realpath failed and prints no zeros, and an ancestor
  * link's current side names ENOENT instead of zeroed facts. Directory chmod
  * and a directory symlink are Linux; these rows skip on win32. tcm is the read.
  */
@@ -90,7 +90,11 @@ describe("R85 no side stands alone", { timeout: 60_000 }, () => {
     const row = r?.machineConfigFindings.find((f) => f.path === cfg && f.unobservableCode === "EACCES");
     expect(r!.failure?.code, "the close that cannot see the path fails the stage").toBe("machine-config-unobservable");
     expect(row, "the finding carries the code").toBeTruthy();
-    expect(row!.after, "the unobservable side is not the code alone").toContain("dev ");
+    expect(row!.after, "a realpath failure prints no zeroed dev").not.toContain("dev null");
+    expect(row!.after, "a realpath failure prints no zeroed nlink").not.toContain("nlink 0");
+    expect(row!.after, "a realpath failure prints no zeroed size").not.toContain("size 0");
+    expect(row!.after, "a realpath failure prints no zeroed mtime").not.toContain("mtimeNs 0");
+    expect(row!.after, "no lstat facts says the realpath failed").toContain("no facts: realpath failed");
   });
 
   it.skipIf(isWin)("R85-ANCESTOR-ENOENT: an ancestor link planted where the path was absent names ENOENT and prints no zeroed facts", () => {

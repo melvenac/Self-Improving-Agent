@@ -1299,6 +1299,13 @@ export class MachineConfigWatch {
     // R86. A link above the watched path is labelled the same way as a link at the path.
     const ancestorLinkText = (s: MachineSnap): string =>
       `link: type symlink dev ${s.viaDev} ino ${s.viaIno} nlink ${s.viaNlink} size ${s.viaSize} mtimeNs ${s.viaMtimeNs} readlink ${s.viaTarget}`;
+    // R85b. A realpath failure with no lstat prints no zeros. The link itself, or a parent link, prints that lstat.
+    const unobservableSide = (s: MachineSnap): string => {
+      if (s.lexicalKind === "symlink") return linkSide(s);
+      if (s.viaLink !== null) return ancestorLinkText(s);
+      if (s.dev === null) return "no facts: realpath failed";
+      return factText(s);
+    };
     // R85. A current side that did not resolve names that failure. Zeroed facts are not a stand-in for the code.
     const currentSide = (s: MachineSnap): string => {
       if (s.lexicalKind === "symlink") return linkSide(s);
@@ -1327,7 +1334,7 @@ export class MachineConfigWatch {
         out.push({
           stage: this.stage, scope: p.scope, path: p.path,
           before: stageBefore(opened),
-          after: `unobservable (${end.errno}); ${end.lexicalKind === "symlink" ? linkSide(end) : factText(end)}`,
+          after: `unobservable (${end.errno}); ${unobservableSide(end)}`,
           changed: true, unobservableCode: end.errno,
         });
         continue;
