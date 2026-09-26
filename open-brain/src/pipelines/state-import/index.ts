@@ -845,11 +845,21 @@ function incompleteNote(snapshotRel: string): string {
     "Until then, `open-brain state import --draft` and `--commit` refuse.\n";
 }
 
+/**
+ * The markers in a directory listing, oldest first. The names end in the date,
+ * so name order is date order, whatever order the directory lists them in. A
+ * function of its own because neither filesystem it was tried on listed them
+ * out of order (NTFS, and tcm's), so a test through the directory could not
+ * tell a missing sort; only a direct test can hold it.
+ */
+export function markersOldestFirst(names: string[]): string[] {
+  return names.filter((n) => n.startsWith(SNAPSHOT_PREFIX) && n.endsWith(INCOMPLETE_SUFFIX)).sort();
+}
+
 function refuseHalfRestored(root: string): void {
   const archive = join(root, ".agents", "archive");
   if (!existsSync(archive)) return;
-  // The names end in the date, so sorted is oldest first, whatever order the directory lists them in.
-  const left = readdirSync(archive).filter((n) => n.startsWith(SNAPSHOT_PREFIX) && n.endsWith(INCOMPLETE_SUFFIX)).sort();
+  const left = markersOldestFirst(readdirSync(archive));
   if (left.length === 0) return;
   const snapshots = left.map((n) => `.agents/archive/${n.slice(0, -INCOMPLETE_SUFFIX.length)}/`);
   const markers = left.map((n) => `.agents/archive/${n}`).join(" and ");

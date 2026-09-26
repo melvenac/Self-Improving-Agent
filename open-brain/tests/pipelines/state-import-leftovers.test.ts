@@ -15,7 +15,7 @@ import { createHash } from "node:crypto";
 import { mkdtempSync, mkdirSync, writeFileSync, readdirSync, lstatSync, readFileSync, rmSync, existsSync } from "node:fs";
 import { join, relative } from "node:path";
 import { tmpdir } from "node:os";
-import { runDraft, runCommit, STATE_REL, REPORT_REL } from "../../src/pipelines/state-import/index.js";
+import { runDraft, runCommit, markersOldestFirst, STATE_REL, REPORT_REL } from "../../src/pipelines/state-import/index.js";
 
 const cliEntry = join(import.meta.dirname, "../../src/cli.ts");
 const tsxCli = join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
@@ -201,6 +201,12 @@ describe("R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, b
 });
 
 describe("O7: two markers name the OLDEST snapshot, and say what the newer one holds", () => {
+  it("the markers are put oldest first whatever order the directory lists them in", () => {
+    const m = (d: string) => `pre-state-migration-${d}.import-incomplete`;
+    expect(markersOldestFirst([m("2026-09-24"), "pre-state-migration-2026-09-22", "notes.md", m("2026-09-23"), m("2026-09-21")]))
+      .toEqual([m("2026-09-21"), m("2026-09-23"), m("2026-09-24")]);
+  });
+
   it("the refusal restores from the oldest snapshot and names the newer as a later run's", () => {
     writeProject(root, inboxText(7));
     runDraft(root, TODAY);
