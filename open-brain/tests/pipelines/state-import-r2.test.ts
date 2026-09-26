@@ -11,7 +11,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync, readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { tmpdir } from "node:os";
-import { spawnAsync } from "../spawn-async.js";
+import { execFileSync } from "node:child_process";
 import { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL } from "../../src/pipelines/state-import/index.js";
 
 const cliEntry = join(import.meta.dirname, "../../src/cli.ts");
@@ -32,11 +32,14 @@ function verdicts(report: unknown): Record<string, string> {
   return Object.fromEntries(judged(report).map((i) => [i.input, i.verdict]));
 }
 
-// Awaited, not execFileSync (G-042): this file's CLI spawns were one stretch of 41-43 s with no macrotask under load.
-async function cli(args: string[], cwd: string): Promise<{ status: number | null; stdout: string; stderr: string }> {
-  const r = await spawnAsync(process.execPath, [tsxCli, cliEntry, ...args], { cwd, env: process.env });
-  if (r.error) throw r.error;
-  return { status: r.status, stdout: r.stdout, stderr: r.stderr };
+function cli(args: string[], cwd: string): { status: number; stdout: string; stderr: string } {
+  try {
+    const stdout = execFileSync(process.execPath, [tsxCli, cliEntry, ...args], { cwd, stdio: ["ignore", "pipe", "pipe"], env: process.env }).toString();
+    return { status: 0, stdout, stderr: "" };
+  } catch (err) {
+    const e = err as { status: number; stdout: Buffer; stderr: Buffer };
+    return { status: e.status, stdout: e.stdout.toString(), stderr: e.stderr.toString() };
+  }
 }
 
 /** Every file under `dir`, relative path → bytes (hex). Empty directories are listed as `<dir>/`. */
@@ -114,11 +117,11 @@ describe("R2-1 (IF-9): an encoding detail never turns a STALE input into 'could 
     }
   });
 
-  it("the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing", async () => {
+  it("the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing", () => {
     writeProject(root, 7, bodies(stale6), utf8Bom);
-    expect((await cli(["state", "import", "--draft", root], root)).status).toBe(0);
+    expect(cli(["state", "import", "--draft", root], root).status).toBe(0);
     const before = tree(root);
-    const c = await cli(["state", "import", "--commit", root], root);
+    const c = cli(["state", "import", "--commit", root], root);
     expect(c.status).toBe(1);
     expect(c.stderr).toContain("predate the latest session");
     expect(tree(root)).toEqual(before);
@@ -214,11 +217,11 @@ describe("R2-3 (IF-11): an import completes, or it changes nothing", () => {
   const cur = { next: "Session 7", inbox: "Session 7", task: "Session 7" };
   beforeEach(() => { root = mkdtempSync(join(tmpdir(), "ob-import-r2-atomic-")); });
 
-  it("PROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist", async () => {
+  it("PROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist", () => {
     writeProject(root, null, bodies(cur));
     writeFileSync(join(root, ".agents/SYSTEM/SUMMARY.md"), "# Summary\n\n> status\n\n## About\n\nKept.\n");
-    expect((await cli(["state", "import", "--draft", root], root)).status).toBe(0);
-    const c = await cli(["state", "import", "--commit", root], root);
+    expect(cli(["state", "import", "--draft", root], root).status).toBe(0);
+    const c = cli(["state", "import", "--commit", root], root);
     expect(c.stderr).toBe("");
     expect(c.status).toBe(0);
     expect(existsSync(join(root, STATE_REL))).toBe(true);
@@ -240,63 +243,63 @@ describe("R2-4 (IF-12): `state import` acts on exactly the project the operator 
   });
   afterEach(() => { rmSync(other, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }); });
 
-  async function refusedAndUntouched(args: string[], expectText: RegExp): Promise<void> {
+  function refusedAndUntouched(args: string[], expectText: RegExp): void {
     const beforeRoot = tree(root);
     const beforeOther = tree(other);
-    const r = await cli(["state", "import", ...args], other);
+    const r = cli(["state", "import", ...args], other);
     expect(r.status).toBe(1);
     expect(r.stderr).toMatch(expectText);
     expect(tree(root)).toEqual(beforeRoot);
     expect(tree(other)).toEqual(beforeOther);
   }
 
-  it("a single-dash token that is not a known flag refuses, before or after the directory", async () => {
-    expect((await cli(["state", "import", "--draft", root], root)).status).toBe(0);
-    expect((await cli(["state", "import", "--draft", other], other)).status).toBe(0);
-    await refusedAndUntouched(["--commit", root, "-accept-stale"], /unrecognised.*-accept-stale/);
-    await refusedAndUntouched(["--commit", "-accept-stale", root], /unrecognised.*-accept-stale/);
+  it("a single-dash token that is not a known flag refuses, before or after the directory", () => {
+    expect(cli(["state", "import", "--draft", root], root).status).toBe(0);
+    expect(cli(["state", "import", "--draft", other], other).status).toBe(0);
+    refusedAndUntouched(["--commit", root, "-accept-stale"], /unrecognised.*-accept-stale/);
+    refusedAndUntouched(["--commit", "-accept-stale", root], /unrecognised.*-accept-stale/);
   }, 60_000);
 
-  it("PROBE-12: a bare word before the directory is a second positional and refuses; the cwd's project is not committed", async () => {
-    expect((await cli(["state", "import", "--draft", root], root)).status).toBe(0);
-    expect((await cli(["state", "import", "--draft", other], other)).status).toBe(0);
-    await refusedAndUntouched(["--commit", "accept-stale", root], /more than one|positional|directory/i);
+  it("PROBE-12: a bare word before the directory is a second positional and refuses; the cwd's project is not committed", () => {
+    expect(cli(["state", "import", "--draft", root], root).status).toBe(0);
+    expect(cli(["state", "import", "--draft", other], other).status).toBe(0);
+    refusedAndUntouched(["--commit", "accept-stale", root], /more than one|positional|directory/i);
   }, 60_000);
 
-  it("PROBE-5b: a positional that names no existing directory refuses instead of walking up from the cwd", async () => {
-    expect((await cli(["state", "import", "--draft", other], other)).status).toBe(0);
-    await refusedAndUntouched(["--commit", "accept-stale"], /does not exist|not a directory|no such directory/i);
+  it("PROBE-5b: a positional that names no existing directory refuses instead of walking up from the cwd", () => {
+    expect(cli(["state", "import", "--draft", other], other).status).toBe(0);
+    refusedAndUntouched(["--commit", "accept-stale"], /does not exist|not a directory|no such directory/i);
   }, 60_000);
 });
 
 describe("R2-5 (IF-13): every protection has a test that fails without it", () => {
   beforeEach(() => { root = mkdtempSync(join(tmpdir(), "ob-import-r2-guards-")); });
 
-  it("M6: a misspelled acknowledgement on a CURRENT project is refused by the flag check itself", async () => {
+  it("M6: a misspelled acknowledgement on a CURRENT project is refused by the flag check itself", () => {
     writeProject(root, 7, bodies({ next: "Session 7", inbox: "Session 7", task: "Session 7" }));
-    expect((await cli(["state", "import", "--draft", root], root)).status).toBe(0);
-    const typo = await cli(["state", "import", "--commit", "--accept-stal", root], root);
+    expect(cli(["state", "import", "--draft", root], root).status).toBe(0);
+    const typo = cli(["state", "import", "--commit", "--accept-stal", root], root);
     expect(typo.status).toBe(1);
     expect(typo.stderr).toContain("unrecognised flag(s) --accept-stal.");
     expect(existsSync(join(root, STATE_REL))).toBe(false);
   }, 60_000);
 
-  it("M13: --accept-stale with --draft refuses and writes no draft", async () => {
+  it("M13: --accept-stale with --draft refuses and writes no draft", () => {
     writeProject(root, 7, bodies({ next: "Session 6", inbox: "Session 7", task: "Session 7" }));
-    const r = await cli(["state", "import", "--draft", "--accept-stale", root], root);
+    const r = cli(["state", "import", "--draft", "--accept-stale", root], root);
     expect(r.status).toBe(1);
     expect(r.stderr).toContain("--accept-stale applies only to --commit");
     expect(existsSync(join(root, DRAFT_REL))).toBe(false);
     expect(existsSync(join(root, REPORT_REL))).toBe(false);
   }, 60_000);
 
-  it("M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output", async () => {
+  it("M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output", () => {
     writeProject(root, 7, bodies({ next: "Session 6", inbox: "Session 7", task: "Session 7" }));
-    const d = await cli(["state", "import", "--draft", root], root);
+    const d = cli(["state", "import", "--draft", root], root);
     expect(d.status).toBe(0);
     expect(d.stdout).toContain(`Staleness: 1 stale (${NEXT}) · 0 could not tell · 2 current.`);
     expect(d.stdout).toContain("--commit will REFUSE until those inputs are updated");
-    const c = await cli(["state", "import", "--commit", "--accept-stale", root], root);
+    const c = cli(["state", "import", "--commit", "--accept-stale", root], root);
     expect(c.status).toBe(0);
     expect(c.stdout).toContain(`Imported STALE under --accept-stale: ${NEXT}`);
   }, 60_000);

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { execAsync } from "../../spawn-async.js";
+import { execSync } from "node:child_process";
 import { checkGitNexusIndex, checkBuildFreshness } from "../../../src/pipelines/sync/checks.js";
 
 /**
@@ -15,17 +15,14 @@ import { checkGitNexusIndex, checkBuildFreshness } from "../../../src/pipelines/
  * lets the error throw, so a broken git FAILS these tests rather than passing
  * them. That is the whole difference.
  */
-//
-// Awaited, not execSync (G-042): this file's git calls were one stretch of 52-67 s with no macrotask under load.
-// execAsync throws exactly where execSync did, so the property above holds.
-async function initRepo(dir: string): Promise<string> {
-  const run = async (cmd: string) => (await execAsync(cmd, { cwd: dir })).trim();
-  await run("git init -q -b main");
-  await run('git config user.email "t@example.com"');
-  await run('git config user.name "T"');
+function initRepo(dir: string): string {
+  const run = (cmd: string) => execSync(cmd, { cwd: dir, stdio: ["ignore", "pipe", "pipe"] }).toString().trim();
+  run("git init -q -b main");
+  run('git config user.email "t@example.com"');
+  run('git config user.name "T"');
   writeFileSync(join(dir, "seed.txt"), "seed\n");
-  await run("git add -A");
-  await run('git commit -q -m seed');
+  run("git add -A");
+  run('git commit -q -m seed');
   return run("git rev-parse HEAD");
 }
 
@@ -38,9 +35,9 @@ describe("checkGitNexusIndex", () => {
     writeFileSync(join(dir, ".gitnexus", "meta.json"), JSON.stringify(meta));
   };
 
-  beforeEach(async () => {
+  beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "stale-idx-"));
-    head = await initRepo(dir);
+    head = initRepo(dir);
   });
   afterEach(() => rmSync(dir, { recursive: true, force: true }));
 
@@ -61,10 +58,10 @@ describe("checkGitNexusIndex", () => {
     expect(r.message).toContain("LIMIT:");
   });
 
-  it("warns with a count when merely behind", async () => {
+  it("warns with a count when merely behind", () => {
     writeMeta({ lastCommit: head, branch: "main" });
     writeFileSync(join(dir, "b.txt"), "b\n");
-    await execAsync("git add -A && git commit -q -m b", { cwd: dir });
+    execSync("git add -A && git commit -q -m b", { cwd: dir, stdio: "ignore" });
     const r = checkGitNexusIndex(dir);
     expect(r.severity).toBe("warn");
     expect(r.message).toContain("1 commit(s) behind");
@@ -82,10 +79,10 @@ describe("checkGitNexusIndex", () => {
     expect(r.message).toContain("not evidence of staleness");
   });
 
-  it("a dead branch pin on a BEHIND index still reports the count, and stays a warn", async () => {
+  it("a dead branch pin on a BEHIND index still reports the count, and stays a warn", () => {
     writeMeta({ lastCommit: head, branch: "loop/4-dogfood" });
     writeFileSync(join(dir, "d.txt"), "d\n");
-    await execAsync("git add -A && git commit -q -m d", { cwd: dir });
+    execSync("git add -A && git commit -q -m d", { cwd: dir, stdio: "ignore" });
     const r = checkGitNexusIndex(dir);
     expect(r.severity).toBe("warn");
     expect(r.message).toContain("1 commit(s) behind");
@@ -123,9 +120,9 @@ describe("checkBuildFreshness", () => {
     writeFileSync(join(dir, "open-brain", "build", "build-info.json"), JSON.stringify(info));
   };
 
-  beforeEach(async () => {
+  beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "stale-build-"));
-    head = await initRepo(dir);
+    head = initRepo(dir);
   });
   afterEach(() => rmSync(dir, { recursive: true, force: true }));
 
@@ -142,24 +139,24 @@ describe("checkBuildFreshness", () => {
     expect(r.message).toContain("LIMIT: compares commits, not working-tree edits");
   });
 
-  it("fails when the build was made from a different commit", async () => {
+  it("fails when the build was made from a different commit", () => {
     writeInfo({ commit: head, builtAt: "2026-09-17T00:00:00.000Z", reason: null });
     writeFileSync(join(dir, "c.txt"), "c\n");
-    await execAsync("git add -A && git commit -q -m c", { cwd: dir });
+    execSync("git add -A && git commit -q -m c", { cwd: dir, stdio: "ignore" });
     const r = checkBuildFreshness(dir);
     expect(r.severity).toBe("issue");
     expect(r.message).toContain("was made from");
   });
 
-  it("in a MAIN checkout, names the hooks and server as affected", async () => {
+  it("in a MAIN checkout, names the hooks and server as affected", () => {
     writeInfo({ commit: head, builtAt: "2026-09-17T00:00:00.000Z", reason: null });
-    await execAsync("git commit -q --allow-empty -m moved", { cwd: dir });
+    execSync("git commit -q --allow-empty -m moved", { cwd: dir, stdio: "ignore" });
     const r = checkBuildFreshness(dir);
     expect(r.severity).toBe("issue");
     expect(r.message).toContain("a stale server reports success");
   });
 
-  it("in a LINKED WORKTREE, says the hooks and server are UNAFFECTED", async () => {
+  it("in a LINKED WORKTREE, says the hooks and server are UNAFFECTED", () => {
     // The consequence was asserted unconditionally and is true only in the main
     // checkout: both hooks hardcode absolute paths into the MAIN tree's build,
     // so here a stale build means a stale local CLI and nothing more. Two of the
@@ -171,7 +168,7 @@ describe("checkBuildFreshness", () => {
     // it, which is the shape of the defect itself.
     const wt = join(dir, "..", `wt-${Date.now()}`);
     try {
-      await execAsync(`git worktree add -q --detach "${wt}"`, { cwd: dir });
+      execSync(`git worktree add -q --detach "${wt}"`, { cwd: dir, stdio: "ignore" });
       mkdirSync(join(wt, "open-brain", "build"), { recursive: true });
       writeFileSync(
         join(wt, "open-brain", "build", "build-info.json"),
@@ -185,20 +182,20 @@ describe("checkBuildFreshness", () => {
       expect(r.message).not.toContain("a stale server reports success");
     } finally {
       try {
-        await execAsync(`git worktree remove --force "${wt}"`, { cwd: dir });
+        execSync(`git worktree remove --force "${wt}"`, { cwd: dir, stdio: "ignore" });
       } catch {
         rmSync(wt, { recursive: true, force: true });
       }
     }
   });
 
-  it("the UNSTAMPED message carries the same tree-aware consequence, not a universal one", async () => {
+  it("the UNSTAMPED message carries the same tree-aware consequence, not a universal one", () => {
     // The same false invariant lived in a second message that was not flagged:
     // the unstamped branch also asserted the hooks run from this tree. Fixing
     // only the reported instance would have left the defect one branch away.
     const wt = join(dir, "..", `wt2-${Date.now()}`);
     try {
-      await execAsync(`git worktree add -q --detach "${wt}"`, { cwd: dir });
+      execSync(`git worktree add -q --detach "${wt}"`, { cwd: dir, stdio: "ignore" });
       mkdirSync(join(wt, "open-brain", "build"), { recursive: true });
       const r = checkBuildFreshness(wt);
       expect(r.severity).toBe("issue");
@@ -207,7 +204,7 @@ describe("checkBuildFreshness", () => {
       expect(r.message).not.toContain("a stale server reports success");
     } finally {
       try {
-        await execAsync(`git worktree remove --force "${wt}"`, { cwd: dir });
+        execSync(`git worktree remove --force "${wt}"`, { cwd: dir, stdio: "ignore" });
       } catch {
         rmSync(wt, { recursive: true, force: true });
       }
