@@ -210,7 +210,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   const uuid = options.session_uuid ?? null;
   const checkout = options.checkout ?? basename(resolve(projectRoot));
   const today = options.today ?? localIsoDate();
-  const mine = uuid === null ? undefined : next.sessions.find((s) => s.uuid === uuid);
+  const mine = uuid === null ? undefined : next.sessions.find((s) => s.uuid === uuid || (s.checkout !== null && s.checkout === checkout));
   const effectiveSession = mine ? mine.n : options.session;
   const applied: WriteResult["applied"] = [];
   const removedGaps: string[] = [];
