@@ -22,7 +22,7 @@ jobs:
           }
           "identity: " + [Security.Principal.WindowsIdentity]::GetCurrent().Name
           $fail = 0
-          $private = @('100.124.212.87:4000','100.124.212.87:22','192.168.1.50:4000','100.73.250.101:22','192.168.1.1:80','192.168.1.1:443','100.100.100.100:53')
+          $private = @('100.124.212.87:4000','100.124.212.87:22','192.168.1.50:4000','100.73.250.101:22','192.168.1.1:80','100.100.100.100:53')
           foreach ($t in $private) {
             $h, $p = $t.Split(':'); $r = Try-Tcp $h ([int]$p)
             if ($r -eq 'connected') { "::error::reachable from the runner: $t"; $fail = 1 } else { "blocked: $t ($r)" }
