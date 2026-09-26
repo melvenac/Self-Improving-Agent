@@ -110,7 +110,9 @@ describe("sync", () => {
   it("sync <a directory that does not exist> refuses rather than walking up from the cwd", () => {
     const p = syncProject();
     const before = snapshot(p);
-    const r = cli(p, "sync", "no-such-dir", "--check");
+    // No --check: at the base the walk-up reaches the cwd's project and runs the
+    // FIXING sync there, which is the harm this row exists for.
+    const r = cli(p, "sync", "no-such-dir");
     expect(r.status, r.stdout + r.stderr).toBe(2);
     expect(r.stderr).toContain("no-such-dir");
     expect(r.stderr).toMatch(/not an existing directory/);
@@ -257,5 +259,21 @@ describe("read-only and opt-in commands also refuse", () => {
   it("topics --aply refuses", () => {
     const r = cli(root, "topics", "--aply");
     expectRefusal(r, "--aply");
+  }, 120_000);
+});
+
+describe("scripts/backfill-success-rate.mjs", () => {
+  it("--aply refuses before the database is opened", () => {
+    const db = join(root, "knowledge-v2.db");
+    const r = spawnSync(process.execPath, [join(import.meta.dirname, "../scripts/backfill-success-rate.mjs"), "--aply"], {
+      cwd: root,
+      encoding: "utf8",
+      env: { ...process.env, KNOWLEDGE_V2_DB: db },
+      timeout: 60_000,
+    });
+    expect(r.status, `${r.stdout}\n${r.stderr}`).toBe(2);
+    expect(r.stderr).toContain('unrecognised argument(s) "--aply"');
+    // better-sqlite3 creates the file on open, so its absence is the proof.
+    expect(existsSync(db)).toBe(false);
   }, 120_000);
 });
