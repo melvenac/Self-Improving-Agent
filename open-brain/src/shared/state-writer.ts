@@ -89,7 +89,7 @@ const RETIRED_OPS: Record<string, string> = {
  * than this many distinct sessions first wrote after it. The planner's ruling
  * on T-163 (record session 109), counted by write order since R179-1.
  */
-export const RECORD_RETENTION_SESSIONS = 10;
+export const RECORD_RETENTION_SESSIONS = Infinity;
 
 export interface ApplyStateOptions {
   session: number;
