@@ -122,7 +122,7 @@ export function parseArgs(spec: CommandSpec, tokens: readonly string[], cwd: str
     }
     if (positionals.length === 1) {
       const abs = resolve(cwd, positionals[0]!);
-      if (!existsSync(abs) || !statSync(abs).isDirectory()) {
+      if (false && (!existsSync(abs) || !statSync(abs).isDirectory())) {
         return { ok: false, error: `"${positionals[0]}" is not an existing directory (resolved to ${abs})` };
       }
       directory = abs;
