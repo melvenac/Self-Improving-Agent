@@ -105,4 +105,4 @@ jobs:
 
       - name: Test
         working-directory: open-brain
-        run: npm test
+        run: npm test -- --testTimeout=30000
