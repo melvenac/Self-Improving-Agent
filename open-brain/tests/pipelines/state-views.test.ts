@@ -151,13 +151,18 @@ describe("state views (Loop 3 C3)", () => {
 });
 
 describe("T-144: rendered Done obeys the retention window", () => {
-  const session = state.sessions[0].n;
+  // R179-1 extended to done tasks: a done task ages by the DISTINCT sessions
+  // that first wrote after its closing revision. The fixture's done tasks were
+  // closed before v3 (closed_rev null), so three keyed sessions age them all.
+  const aged: State = JSON.parse(JSON.stringify(state));
+  for (let i = 0; i < DONE_RETENTION_SESSIONS; i++) aged.sessions.push({ n: 60 + i, date: "2026-09-26", uuid: `aged-${i}`, seat: null, checkout: "c", first_rev: 8 + i });
+  const revs = (s: State) => s.sessions.map((x) => x.first_rev);
   const doneIds = (text: string) =>
     [...text.matchAll(/^- \[x\] \*\*(T-\d+)\*\*/gm)].map((m) => m[1]);
 
   it("hides done tasks the writer would drop — fails against pre-T-144 code", () => {
-    const rendered = doneIds(renderInbox(state, opts));
-    const stale = state.tasks.filter((t) => isDroppedByRetention(t, session)).map((t) => t.id);
+    const rendered = doneIds(renderInbox(aged, opts));
+    const stale = aged.tasks.filter((t) => isDroppedByRetention(t, revs(aged))).map((t) => t.id);
 
     // The fixture must actually exercise this, or the test proves nothing.
     expect(stale.length).toBeGreaterThan(0);
@@ -165,22 +170,25 @@ describe("T-144: rendered Done obeys the retention window", () => {
   });
 
   it("view and writer agree on exactly which done tasks exist", () => {
-    const rendered = doneIds(renderInbox(state, opts));
-
-    // What the record holds after the writer applies retention at the same session.
-    const copy: State = JSON.parse(JSON.stringify(state));
-    applyRetention(copy, session);
-    const kept = copy.tasks.filter((t) => t.status === "done").map((t) => t.id);
-
-    expect([...rendered].sort()).toEqual([...kept].sort());
+    for (const s of [state, aged]) {
+      const rendered = doneIds(renderInbox(s, opts));
+      const copy: State = JSON.parse(JSON.stringify(s));
+      applyRetention(copy);
+      const kept = copy.tasks.filter((t) => t.status === "done").map((t) => t.id);
+      expect([...rendered].sort()).toEqual([...kept].sort());
+    }
   });
 
-  it("renders the retention edge correctly: > cutoff kept, == cutoff dropped", () => {
-    const cutoff = session - DONE_RETENTION_SESSIONS;
+  it("renders the retention edge correctly: 3 sessions written since the close dropped, 2 kept — whatever the session numbers", () => {
     const edge: State = JSON.parse(JSON.stringify(state));
+    edge.sessions = [
+      { n: 9999, date: "2026-09-26", uuid: "s9", seat: null, checkout: "c", first_rev: 9 },
+      { n: 1, date: "2026-09-26", uuid: "s10", seat: null, checkout: "c", first_rev: 10 },
+      { n: 2, date: "2026-09-26", uuid: "s11", seat: null, checkout: "c", first_rev: 11 },
+    ];
     edge.tasks = [
-      { id: "T-900", title: "at the cutoff", priority: "P2", status: "done", opened_session: 1, closed_session: cutoff, supersedes: null, note: null },
-      { id: "T-901", title: "one past the cutoff", priority: "P2", status: "done", opened_session: 1, closed_session: cutoff + 1, supersedes: null, note: null },
+      { id: "T-900", title: "3 sessions since", priority: "P2", status: "done", opened_session: 1, closed_session: 9000, supersedes: null, note: "", closed_rev: 8 },
+      { id: "T-901", title: "2 sessions since", priority: "P2", status: "done", opened_session: 1, closed_session: 1, supersedes: null, note: "", closed_rev: 9 },
     ];
     const rendered = doneIds(renderInbox(edge, opts));
     expect(rendered).not.toContain("T-900");

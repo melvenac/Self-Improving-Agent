@@ -139,7 +139,7 @@ describe("state-schema (Loop 2, read side)", () => {
 
   // ---- schema v3 (T-163): per-session handoffs and sessions[] ----
 
-  const h = (over: Record<string, unknown>) => ({ seat: "developer", pick_up: "p", watch_out: [], open_questions: [], session: 60, loop_state: null, session_uuid: "u-1", checkout: "sia-builder", ...over });
+  const h = (over: Record<string, unknown>) => ({ seat: "developer", pick_up: "p", watch_out: [], open_questions: [], session: 60, loop_state: null, session_uuid: "u-1", checkout: "sia-builder", first_rev: 10, ...over });
 
   it("refuses two handoffs from the same session_uuid", () => {
     const d = valid() as unknown as Record<string, unknown>;
@@ -151,23 +151,23 @@ describe("state-schema (Loop 2, read side)", () => {
 
   it("accepts two handoffs of one seat from DIFFERENT sessions — the v2 rule that made them collide is gone", () => {
     const d = valid() as unknown as Record<string, unknown>;
-    d.handoffs = [h({}), h({ session_uuid: "u-2", session: 61 })];
+    d.handoffs = [h({}), h({ session_uuid: "u-2", session: 61, first_rev: 11 })];
     expect(parseState(JSON.stringify(d)).ok).toBe(true);
   });
 
   it("refuses two LEGACY (null session_uuid) handoffs for one seat, and accepts one per seat", () => {
     const d = valid() as unknown as Record<string, unknown>;
-    d.handoffs = [h({ session_uuid: null, checkout: null }), h({ session_uuid: null, checkout: null, session: 61 })];
+    d.handoffs = [h({ session_uuid: null, checkout: null, first_rev: null }), h({ session_uuid: null, checkout: null, first_rev: null, session: 61 })];
     const r = parseState(JSON.stringify(d));
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.error).toMatch(/at most one legacy/);
-    d.handoffs = [h({ session_uuid: null, checkout: null }), h({ seat: "qa", session_uuid: null, checkout: null })];
+    d.handoffs = [h({ session_uuid: null, checkout: null, first_rev: null }), h({ seat: "qa", session_uuid: null, checkout: null, first_rev: null })];
     expect(parseState(JSON.stringify(d)).ok).toBe(true);
   });
 
   it("refuses two sessions[] entries with one uuid, and refuses a record still carrying last_session", () => {
     const d = valid() as unknown as Record<string, unknown>;
-    const s = { n: 60, date: "2026-09-25", uuid: "u-1", seat: "developer", checkout: "sia-builder" };
+    const s = { n: 60, date: "2026-09-25", uuid: "u-1", seat: "developer", checkout: "sia-builder", first_rev: 10 };
     d.sessions = [s, { ...s, n: 61 }];
     const r = parseState(JSON.stringify(d));
     expect(r.ok).toBe(false);
@@ -185,23 +185,34 @@ describe("state-schema (Loop 2, read side)", () => {
     expect(schemaVersionAdvice(JSON.stringify({}))).toBeNull();
   });
 
-  it("lastSession is DERIVED: the highest n, the later entry on a tie, null when none", () => {
-    const s = (n: number, uuid: string) => ({ n, date: "2026-09-25", uuid, seat: null, checkout: null });
+  it("lastSession is DERIVED by WRITE ORDER (first_rev), never by n: the later entry on a tie, legacy (null) before every keyed one, null when none", () => {
+    const s = (n: number, uuid: string, first_rev: number | null) => ({ n, date: "2026-09-25", uuid, seat: null, checkout: null, first_rev });
     expect(lastSession({ sessions: [] })).toBeNull();
-    expect(lastSession({ sessions: [s(5, "a"), s(9, "b"), s(7, "c")] })!.uuid).toBe("b");
-    expect(lastSession({ sessions: [s(9, "a"), s(9, "b")] })!.uuid).toBe("b");
+    // The numbers contradict the order on purpose: 1124 first wrote BEFORE 9.
+    expect(lastSession({ sessions: [s(5, "a", 3), s(1124, "b", 4), s(9, "c", 5)] })!.uuid).toBe("c");
+    expect(lastSession({ sessions: [s(9, "a", 4), s(9, "b", 4)] })!.uuid).toBe("b");
+    expect(lastSession({ sessions: [s(500, "legacy", null), s(1, "keyed", 1)] })!.uuid).toBe("keyed");
   });
 
-  it("newestHandoffPerInstance keeps one per (seat, checkout), legacy null checkout as its own instance", () => {
+  it("newestHandoffPerInstance keeps one per (seat, checkout) by first_rev, never by session number; legacy null checkout is its own instance", () => {
     const all = [
-      h({ session_uuid: "a", session: 50 }),
-      h({ session_uuid: "b", session: 58 }),
-      h({ session_uuid: "c", session: 40, checkout: "sia-forge" }),
-      h({ session_uuid: null, checkout: null, session: 30 }),
-      h({ session_uuid: "d", session: 57, seat: "qa" }),
+      h({ session_uuid: "a", session: 1124, first_rev: 20 }),
+      h({ session_uuid: "b", session: 6, first_rev: 25 }),
+      h({ session_uuid: "c", session: 40, checkout: "sia-forge", first_rev: 5 }),
+      h({ session_uuid: null, checkout: null, session: 900, first_rev: null }),
+      h({ session_uuid: "d", session: 57, seat: "qa", first_rev: 22 }),
     ] as unknown as Parameters<typeof newestHandoffPerInstance>[0];
     expect(newestHandoffPerInstance(all).map((x) => x.session_uuid)).toEqual(["b", "c", null, "d"]);
     expect(newestHandoffForSeat(all, "developer")!.session_uuid).toBe("b");
     expect(newestHandoffForSeat(all, "planner")).toBeNull();
+  });
+
+  it("a task carries closed_rev only when done (R179-1 extended to done tasks)", () => {
+    const d = valid() as unknown as { tasks: Array<Record<string, unknown>> };
+    const open = d.tasks.find((t) => t.status !== "done")!;
+    open.closed_rev = 12;
+    const r = parseState(JSON.stringify(d));
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.error).toMatch(/closed_rev must be null unless status is "done"/);
   });
 });

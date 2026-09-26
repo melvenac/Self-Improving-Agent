@@ -277,6 +277,16 @@
           "path": "scripts/setup.mjs",
           "class": "code",
           "why": "migration code that removes stale knowledge-mcp hook entries — it must name the old value to erase it"
+        },
+        {
+          "path": "scripts/setup-hooks.mjs",
+          "class": "code",
+          "why": "the same hook migration, moved out of setup.mjs in T-179 round 2 (R179-5) — it must name the old value to erase it"
+        },
+        {
+          "path": "open-brain/tests/setup-hooks.test.ts",
+          "class": "code",
+          "why": "the test row proving the retired knowledge-mcp SessionEnd hook is removed — a fixture must carry the value it asserts is erased"
         }
       ]
     },

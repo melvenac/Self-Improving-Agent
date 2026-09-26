@@ -92,13 +92,14 @@ describe("record-erasure (T163-2)", () => {
 
   it("does NOT flag a retention drop — the rule is recomputed from the state after the step", () => {
     handOff(dir, 40, "OLD", "old builder handoff");
-    handOff(dir, 56, "NEW", "new builder handoff"); // same seat + checkout, 16 sessions newer: retention drops OLD
+    for (let i = 0; i < 10; i++) handOff(dir, 41, `MID${i}`, `other ${i}`, `other-${i}`);
+    handOff(dir, 56, "NEW", "new builder handoff"); // same seat + checkout, the 11th session since OLD: retention drops OLD
     expect(read(dir).handoffs.some((h: { session_uuid: string | null }) => h.session_uuid === "OLD")).toBe(false);
     const r = scanErasures(dir);
     if (!r.ok) throw new Error(r.skip);
     expect(r.erasures.filter((e) => e.enforced)).toEqual([]);
     expect(checkRecordErasure(dir).severity).toBe("pass");
-  });
+  }, 60_000); // twelve real writes and commits: over vitest's 5 s default on a loaded machine
 
   it("DOES flag the same drop when retention does not explain it (another checkout's entry)", () => {
     handOff(dir, 40, "GROK", "grok in sia-forge", "sia-forge");
@@ -276,4 +277,113 @@ describe("record-erasure against this repository's history (T163-2 known positiv
     // Legacy: listed, never failed on.
     expect([...r61, ...r62].every((e) => !e.enforced)).toBe(true);
   }, 180_000);
+});
+
+/**
+ * R179-1 (as amended) in T163-2: retention is recomputed by WRITE ORDER
+ * (first_rev), never by session number. QA 125's A6 through the writer is a
+ * known negative; the same step as a number-trusting writer would have made it
+ * — 1124 "aging" two other sessions' entries — is a known positive, and it is
+ * what a mutant restoring number-based retention in the writer produces.
+ */
+describe("record-erasure recomputes retention by write order (R179-1)", () => {
+  let dir: string;
+  const U = (n: number) => `${String(n).padStart(8, "0")}-0000-4000-8000-${String(n).padStart(12, "0")}`;
+  const hand = (session: number, n: number, checkout: string, seat = "developer") => {
+    const r = applyStateOps(dir, {
+      session, expected_revision: read(dir).revision, session_uuid: U(n), checkout, render: false,
+      ops: [{ op: "set_handoff", seat, pick_up: `${seat} ${n}`, watch_out: [], open_questions: [] }],
+    } as Parameters<typeof applyStateOps>[1]);
+    if (!r.ok) throw new Error(r.error);
+    commit(dir, `${n} hands off`);
+  };
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), "t163-order-"));
+    git(dir, "init", "-q", "-b", "master");
+    mkdirSync(join(dir, ".agents"), { recursive: true });
+    cpSync(stateFixture, join(dir, STATE));
+    commit(dir, "base record (v3, rev 7)");
+    hand(118, 118, "sia-builder");
+    hand(120, 120, "sia-qa", "qa");
+    hand(121, 121, "sia-qa", "qa");
+  });
+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));
+
+  it("KNOWN NEGATIVE: QA's A6 through the writer (1124 for 124) removes nothing — and the legacy handoff's exit is explained (R179-3)", () => {
+    hand(1124, 124, "sia-builder");
+    const r = scanErasures(dir);
+    if (!r.ok) throw new Error(r.skip);
+    expect(r.erasures).toEqual([]);
+    expect(checkRecordErasure(dir).severity).toBe("pass");
+  });
+
+  it("KNOWN POSITIVE: the 1124 write as a NUMBER-trusting writer made it — two other sessions' entries dropped — is FLAGGED, each named", () => {
+    hand(1124, 124, "sia-builder");
+    const s = read(dir);
+    // What 3c0bfdc's retention did at this write (QA 125, A6): 118 and 120 are
+    // "more than 10 sessions older than 1124" and each has a newer entry of its
+    // seat and checkout, so both went — handoff and session record.
+    s.handoffs = s.handoffs.filter((h: { session_uuid: string | null }) => h.session_uuid !== U(118) && h.session_uuid !== U(120));
+    s.sessions = s.sessions.filter((x: { uuid: string | null }) => x.uuid !== U(118) && x.uuid !== U(120));
+    s.revision += 1;
+    write(dir, s);
+    commit(dir, "amend: retention by number");
+    const c = checkRecordErasure(dir);
+    expect(c.severity).toBe("issue");
+    expect(c.message).toContain("4 record(s) another session added were REMOVED since schema v3");
+    expect(c.message).toContain(`removed handoff ${U(118)} (session 118, developer [sia-builder])`);
+    expect(c.message).toContain(`removed session ${U(120)} (session 120, qa [sia-qa])`);
+  });
+});
+
+/**
+ * R179-7 (QA 125's Open 6): T-163's known positives — rev 60->61 (0ad9c29) and
+ * rev 61->62 (024dfa4), each close-out replacing the other seat's uuid and
+ * handoff — reproduced as a FIXTURE with the real uuids, revisions and shapes,
+ * so they are guarded on CI, where the real-history row below skips (depth-1
+ * checkout). QA's `erasure-blind-rev60` mutant (a walk that skips the step out
+ * of rev 60) survived CI because only the real-history row could kill it.
+ */
+describe("record-erasure: T-163's known positives as a fixture (R179-7)", () => {
+  let dir: string;
+  const DEV74 = "46758737-4461-4480-be96-fcf65ba9fa95";
+  const QA75 = "6eab2c5c-8a09-4a22-9bdf-4af60df64f4e";
+  const PL76 = "22631f4e-433a-4f29-8669-47ee2f543bec";
+  const h = (seat: string, session: number) => ({ seat, pick_up: `${seat} ${session}`, watch_out: [], open_questions: [], session, loop_state: null });
+  const v2 = (revision: number, handoffs: unknown[], last: { n: number; uuid: string; seat: string }) => ({
+    schema_version: 2, revision, project: { name: "sia" }, objective: null, tasks: [], verified: [], gaps: [],
+    decisions: revision === 59 ? [] : [{ id: "D-001", title: "d", date: "2026-09-21", note: "" }],
+    handoffs, last_session: { n: last.n, date: "2026-09-21", uuid: last.uuid, seat: last.seat },
+  });
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), "t163-fixture-"));
+    git(dir, "init", "-q", "-b", "master");
+    mkdirSync(join(dir, ".agents"), { recursive: true });
+    const dev74 = { n: 74, uuid: DEV74, seat: "developer" };
+    write(dir, v2(59, [h("qa", 72), h("developer", 74), h("planner", 73)], dev74));
+    commit(dir, "rev 59");
+    write(dir, v2(60, [h("qa", 72), h("developer", 74), h("planner", 73)], dev74)); // no per-session change
+    commit(dir, "rev 60");
+    write(dir, v2(61, [h("qa", 75), h("developer", 74), h("planner", 73)], { n: 75, uuid: QA75, seat: "qa" }));
+    commit(dir, "rev 61: QA close-out (0ad9c29's shape)");
+    write(dir, v2(62, [h("qa", 75), h("developer", 74), h("planner", 76)], { n: 76, uuid: PL76, seat: "planner" }));
+    commit(dir, "rev 62: planner close-out (024dfa4's shape)");
+  });
+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));
+
+  it("flags rev 60->61 and rev 61->62 — each the uuid AND the handoff removed, naming who replaced them — and nothing at rev 59->60", () => {
+    const r = scanErasures(dir);
+    if (!r.ok) throw new Error(r.skip);
+    const at = (a: number, b: number) => r.erasures.filter((e) => e.revBefore === a && e.revAfter === b);
+    expect(at(59, 60)).toEqual([]);
+    const r61 = at(60, 61);
+    expect(r61.map((e) => `${e.removed.kind}:${e.removed.uuid ?? `${e.removed.seat}@${e.removed.session}`}`).sort()).toEqual([`handoff:qa@72`, `session:${DEV74}`]);
+    expect(r61.find((e) => e.removed.kind === "session")!.addedBySameStep.map((x) => x.uuid)).toEqual([QA75]);
+    const r62 = at(61, 62);
+    expect(r62.map((e) => `${e.removed.kind}:${e.removed.uuid ?? `${e.removed.seat}@${e.removed.session}`}`).sort()).toEqual([`handoff:planner@73`, `session:${QA75}`]);
+    expect(r62.find((e) => e.removed.kind === "session")!.addedBySameStep.map((x) => x.uuid)).toEqual([PL76]);
+    // Legacy: listed, never failed on.
+    expect(r.erasures.every((e) => !e.enforced)).toBe(true);
+    expect(r.erasures).toHaveLength(4);
+  });
 });

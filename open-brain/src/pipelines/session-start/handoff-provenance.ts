@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { parseState } from "../../shared/state-schema.js";
+import { parseState, compareFirstRev } from "../../shared/state-schema.js";
 import type { Handoff, Seat } from "../../shared/state-schema.js";
 
 /**
@@ -62,7 +62,7 @@ export function findHandoffCommit(
   const atHead = handoffsAt(projectRoot, "HEAD", seat);
   const head = current
     ? atHead.find((h) => sameEntry(h, current)) ?? null
-    : atHead.reduce<Handoff | null>((best, h) => (best === null || h.session >= best.session ? h : best), null);
+    : atHead.reduce<Handoff | null>((best, h) => (best === null || compareFirstRev(h.first_rev, best.first_rev) >= 0 ? h : best), null);
   if (head === null) {
     return { ...base, note: `no committed handoff for "${seat}" at HEAD — nothing to trace` };
   }
@@ -172,6 +172,7 @@ function handoffsAt(projectRoot: string, ref: string, seat: Seat): Handoff[] {
           loop_state: null,
           session_uuid: typeof h.session_uuid === "string" ? h.session_uuid : null,
           checkout: typeof h.checkout === "string" ? h.checkout : null,
+          first_rev: typeof h.first_rev === "number" ? h.first_rev : null,
         }];
       });
     }
@@ -215,6 +216,7 @@ function v1HandoffAt(text: string): Handoff | null {
       loop_state: null,
       session_uuid: null,
       checkout: null,
+      first_rev: null,
     };
   } catch {
     return null;

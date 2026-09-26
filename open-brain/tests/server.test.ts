@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync } from "node
 import { basename, join } from "node:path";
 import { tmpdir } from "node:os";
 import { handleStart, handleEnd, handleSync, handleScore, computeScore, handleSetSession, handleState } from "../src/server.js";
+import { applyStateOps } from "../src/shared/state-writer.js";
 import { readFileSync, cpSync } from "node:fs";
 
 const stateFixture = join(import.meta.dirname, "fixtures-state/state.json");
@@ -270,7 +271,9 @@ describe("server handlers", () => {
       // set_handoff reports the SEAT as its id, so which seat wrote a handoff is
       // visible in the applied list rather than only inside the file.
       expect(out).toContain("  close_task T-005\n  open_task T-028\n  add_verified V-009\n  add_decision D-007\n  set_handoff developer");
-      expect(out).toContain("Dropped done tasks (retention 3 sessions): T-020, T-021, T-022, T-023, T-026");
+      // R179-1: done tasks age by sessions written since their close; the fixture's were closed
+      // before v3 (closed_rev null) and this is the first keyed session, so none goes yet.
+      expect(out).toContain("Dropped done tasks (retention 3 sessions): none");
       expect(out).toContain("Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md");
 
       // Views on disk, generated.
@@ -611,5 +614,66 @@ describe("F2 / F3 — a refusal must name the condition it is actually about", (
     expect(text).toMatch(/invalid at revision/);
     expect(text).toMatch(/falling back to files/);
     expect(text).toMatch(/PROSE-SENTINEL/);
+  });
+});
+
+/**
+ * R179-2 (QA 125's D2, A7): ob_set_session refuses a uuid the record already
+ * holds under a DIFFERENT checkout. Registering as it would stamp this
+ * session's writes with that session's uuid, and set_handoff would replace that
+ * session's handoff in place — invisibly to record-erasure, because the key is
+ * still present. Same-checkout registration and slot adoption (A7/A8 in one
+ * checkout, A9) are T-003's and are NOT covered: the last row pins that limit so
+ * it is not read as covered.
+ */
+describe("R179-2: ob_set_session and another checkout's recorded session", () => {
+  let tmp: string;
+  const VICTIM = "00000700-0000-4000-8000-000000000700";
+  const OTHER = "00000701-0000-4000-8000-000000000701";
+  const recordAs = (uuid: string, checkout: string, pick_up: string) => {
+    const s = JSON.parse(readFileSync(join(tmp, ".agents", "state.json"), "utf-8")) as { revision: number };
+    const r = applyStateOps(tmp, {
+      session: 700, expected_revision: s.revision, session_uuid: uuid, checkout, render: false,
+      ops: [{ op: "set_handoff", seat: "developer", pick_up, watch_out: [], open_questions: [] }],
+    });
+    if (!r.ok) throw new Error(r.error);
+  };
+
+  beforeEach(() => {
+    tmp = mkdtempSync(join(tmpdir(), "ob-r1792-"));
+    proseProject(tmp);
+    cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+  });
+  afterEach(() => rmSync(tmp, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));
+
+  it("A7 across checkouts: registering as a session recorded in ANOTHER checkout is refused, names both checkouts, and the victim's handoff cannot be reached", async () => {
+    recordAs(VICTIM, "sia-builder", "victim session 700's handoff");
+    await handleSetSession({ session_id: OTHER, project_dir: tmp });
+    const res = await handleSetSession({ session_id: VICTIM, project_dir: tmp });
+    expect(res.isError).toBe(true);
+    const text = getText(res);
+    expect(text).toContain(`ob_set_session refused: ${VICTIM} is recorded`);
+    expect(text).toContain(`of checkout "sia-builder", and this is checkout "${basename(tmp)}"`);
+    expect(text).toContain(`the registration stays ${OTHER}`);
+    // The next write is stamped with the registration that STAYED, so the victim is untouched.
+    const s = JSON.parse(readFileSync(join(tmp, ".agents", "state.json"), "utf-8")) as { revision: number; handoffs: Array<{ session_uuid: string | null; pick_up: string }> };
+    const w = await handleState({ project_root: tmp, session: 701, expected_revision: s.revision, ops: [{ op: "set_handoff", seat: "developer", pick_up: "attacker overwrote it", watch_out: [], open_questions: [] }] });
+    expect(w.isError).toBeUndefined();
+    const after = JSON.parse(readFileSync(join(tmp, ".agents", "state.json"), "utf-8")) as { handoffs: Array<{ session_uuid: string | null; pick_up: string }> };
+    expect(after.handoffs.find((h) => h.session_uuid === VICTIM)?.pick_up).toBe("victim session 700's handoff");
+    expect(after.handoffs.find((h) => h.session_uuid === OTHER)?.pick_up).toBe("attacker overwrote it");
+  });
+
+  it("a uuid the record has not seen is registered", async () => {
+    const res = await handleSetSession({ session_id: OTHER, project_dir: tmp });
+    expect(res.isError).toBeUndefined();
+    expect(getText(res)).toContain(`Session registered: ${OTHER}`);
+  });
+
+  it("LIMIT, pinned: a uuid recorded under THIS checkout is registered — same-checkout impersonation is T-003's, not caught here", async () => {
+    recordAs(VICTIM, basename(tmp), "same-checkout victim");
+    const res = await handleSetSession({ session_id: VICTIM, project_dir: tmp });
+    expect(res.isError).toBeUndefined();
+    expect(getText(res)).toContain(`Session registered: ${VICTIM}`);
   });
 });
