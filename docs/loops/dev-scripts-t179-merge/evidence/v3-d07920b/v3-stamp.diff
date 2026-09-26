@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index f47bddc..4d98c4b 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -401,7 +401,7 @@ function bullets(body: string[]): string[] {
+  * guess, so the assumption is recorded in the report instead.
+  */
+ export function importHandoff(text: string | null, current: number, report: ImportReport["handoff"]): State["handoffs"][number] {
+-  const handoff: State["handoffs"][number] = { seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: current, loop_state: null, session_uuid: null, checkout: null };
++  const handoff: State["handoffs"][number] = { seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: current, loop_state: null, session_uuid: "imported", checkout: null };
+   if (!text) return handoff;
+   const lines = text.split(/\r?\n/);
+   const headings = lines.map((l, i) => ({ l, i })).filter(({ l }) => /^#{2,6} /.test(l));

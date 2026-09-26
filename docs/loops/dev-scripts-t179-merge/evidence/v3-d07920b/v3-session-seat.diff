@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index f47bddc..321ec71 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -641,7 +641,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
+     handoffs: [handoff],
+     // Schema v3 (T-163): the prose session log's last session becomes the first
+     // entry of sessions[]; its seat and checkout were never recorded.
+-    sessions: [{ n: last.n, date: last.date, uuid: last.uuid, seat: null, checkout: null }],
++    sessions: [{ n: last.n, date: last.date, uuid: last.uuid, seat: "developer", checkout: null }],
+   };
+   return { state, report };
+ }
