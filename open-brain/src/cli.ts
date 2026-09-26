@@ -296,7 +296,7 @@ if (command === "sync") {
   // C3's concrete first piece: "return the tree to detached after a push." It had
   // been run by hand more than twenty times, which is exactly the shape C3
   // describes — a step that works because a seat remembers it.
-  const opts = parseOrRefuse(COMMAND_SPECS.detach, args.slice(1));
+  const opts = parseOrRefuse(COMMAND_SPECS.detach, args.slice(1).filter((a) => !a.startsWith("-") || (COMMAND_SPECS.detach.booleans as readonly string[]).includes(a)));
   const { detachToUpstream } = await import("./pipelines/detach/index.js");
   const startDir = opts.directory ?? resolve(".");
   const repoRoot = resolveRepoRoot(startDir);
