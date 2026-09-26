@@ -77,7 +77,7 @@ afterEach(() => { for (const t of tmps.splice(0)) rmSync(t, { recursive: true, f
 // BF-1 (F1): the INBOX bootstrap ships is one the importer reads, and 0 tasks is loud
 // ---------------------------------------------------------------------------
 
-describe("BF-1: the scaffolded INBOX imports, and an INBOX that yields 0 tasks says so", () => {
+describe("BF-1: the scaffolded INBOX imports, and an INBOX that yields 0 tasks says so", { timeout: E2E_TIMEOUT }, () => {
   it("the template's own INBOX.md imports every item in it (its headings carry an emoji before P0..P3)", () => {
     const dir = mkdtempSync(join(tmpdir(), "bf1-"));
     tmps.push(dir);
@@ -90,7 +90,9 @@ describe("BF-1: the scaffolded INBOX imports, and an INBOX that yields 0 tasks s
     const r = runDraft(dir, TODAY);
     expect(r.validation.ok).toBe(true);
     expect(r.draft.report.inbox.items).toBe(expected);
-    expect(r.draft.report.inbox.unparsed.filter((u) => /no priority/.test(u.reason))).toEqual([]);
+    // No ITEM was dropped for want of a priority. (A heading like "How to Use This Document",
+    // which holds no items, is reported as unparsed and loses nothing.)
+    expect(r.draft.report.inbox.unparsed.filter((u) => /^item under/.test(u.reason))).toEqual([]);
   });
 
   it("an INBOX with items but no P-section: the draft summary and the report both carry a WARNING naming 0 tasks", () => {
@@ -123,7 +125,7 @@ describe("BF-1: the scaffolded INBOX imports, and an INBOX that yields 0 tasks s
 // BF-8 (F9): the retention edge at session 0
 // ---------------------------------------------------------------------------
 
-describe("BF-8 (F9): a fresh project at session 0 has no negative session anywhere", () => {
+describe("BF-8 (F9): a fresh project at session 0 has no negative session anywhere", { timeout: E2E_TIMEOUT }, () => {
   it("a done item with no (Session N) marker validates, and nothing prints session -3", () => {
     const dir = mkdtempSync(join(tmpdir(), "bf8r-"));
     tmps.push(dir);
@@ -145,7 +147,7 @@ describe("BF-8 (F9): a fresh project at session 0 has no negative session anywhe
 // BF-5 (F8): a fresh install is NOT a seat, and says so without a problem line
 // ---------------------------------------------------------------------------
 
-describe("BF-5: role: none with no roles/ directory reports NOT A SEAT and raises no problem", () => {
+describe("BF-5: role: none with no roles/ directory reports NOT A SEAT and raises no problem", { timeout: E2E_TIMEOUT }, () => {
   it("no ROLE FILE MISSING for shared.md when the checkout declares it is not a seat", () => {
     const dir = mkdtempSync(join(tmpdir(), "bf5-"));
     tmps.push(dir);
@@ -168,7 +170,7 @@ describe("BF-5: role: none with no roles/ directory reports NOT A SEAT and raise
 // BF-3 (F5): residue is detected, moved aside and named, never deleted
 // ---------------------------------------------------------------------------
 
-describe("BF-3: `open-brain bootstrap check` / `move-residue`", () => {
+describe("BF-3: `open-brain bootstrap check` / `move-residue`", { timeout: E2E_TIMEOUT }, () => {
   it("an .agents/ with no state.json and no TASKS/ is RESIDUE, and names what is in it", () => {
     const dir = scratchProject(tmps, { residue: true });
     const r = cli(["bootstrap", "check", "--json", dir], dir);
@@ -234,7 +236,7 @@ function localToday(): string {
 // BF-2, BF-4, BF-6, BF-7, BF-8 (F12): the fresh install, end to end
 // ---------------------------------------------------------------------------
 
-describe("BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project", () => {
+describe("BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project", { timeout: E2E_TIMEOUT }, () => {
   it("BF-2: the template ships no state.json (the importer is its only producer)", () => {
     expect(existsSync(join(templateDir, ".agents", "state.json"))).toBe(false);
   });
@@ -317,11 +319,38 @@ describe("BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git proje
     const dir = scratchProject(tmps);
     mkdirSync(join(dir, ".claude", "commands"), { recursive: true });
     writeFileSync(join(dir, ".claude", "commands", "start.md"), "# mine\n");
+    git(dir, "add", "-A");
+    git(dir, "commit", "-q", "-m", "the owner's own /start");
     const s = cli(["bootstrap", "scaffold", "--json", dir], dir);
     expect(s.status).toBe(0);
     const sj = JSON.parse(s.stdout) as { skipped: { path: string; reason: string }[] };
     expect(sj.skipped.map((x) => x.path)).toContain(".claude/commands/start.md");
     expect(readFileSync(join(dir, ".claude", "commands", "start.md"), "utf8")).toBe("# mine\n");
+  }, E2E_TIMEOUT);
+
+  it("the tracking check fires (known positive): an owner's `.agents/` rule shadows the template's, and scaffold exits 1 naming it", () => {
+    const dir = scratchProject(tmps);
+    writeFileSync(join(dir, ".gitignore"), "node_modules/\n.agents/\n");
+    git(dir, "add", "-A");
+    git(dir, "commit", "-q", "-m", "owner ignores .agents/");
+    const s = cli(["bootstrap", "scaffold", "--json", dir], dir);
+    expect(s.status).toBe(1);
+    const sj = JSON.parse(s.stdout) as { verify: { ok: boolean; problems: string[] } };
+    expect(sj.verify.ok).toBe(false);
+    expect(sj.verify.problems.join("\n")).toMatch(/\.agents\/state\.json: the import writes it and it must be tracked, but git ignores it/);
+    // The owner's rule is kept: scaffold appends, it never rewrites.
+    expect(readFileSync(join(dir, ".gitignore"), "utf8").startsWith("node_modules/\n.agents/\n")).toBe(true);
+  }, E2E_TIMEOUT);
+
+  it("the eol check fires (known positive): an owner's later CRLF rule overrides the template's, and scaffold says so", () => {
+    const dir = scratchProject(tmps);
+    writeFileSync(join(dir, ".gitattributes"), "/.agents/** text eol=lf\n/.agents/** eol=crlf\n");
+    git(dir, "add", "-A");
+    git(dir, "commit", "-q", "-m", "owner forces CRLF");
+    const s = cli(["bootstrap", "scaffold", "--json", dir], dir);
+    expect(s.status).toBe(1);
+    const sj = JSON.parse(s.stdout) as { verify: { problems: string[] } };
+    expect(sj.verify.problems.join("\n")).toMatch(/expected eol=lf/);
   }, E2E_TIMEOUT);
 
   it("scaffold refuses over residue and moves nothing", () => {
