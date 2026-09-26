@@ -205,7 +205,7 @@ function renderOneHandoff(h: Handoff): string[] {
     lines.push(`    questions pending for Aaron: ${ls.questions_for_aaron.length === 0 ? "none" : ""}`);
     for (const q of ls.questions_for_aaron) lines.push(`      - ${q}`);
     lines.push(`    rulings made mid-loop: ${ls.rulings.length === 0 ? "none" : ""}`);
-    for (const r of ls.rulings) lines.push(`      - ${r}`);
+    for (const r of ls.rulings) lines.push(`      - ${clip(r, GAP_CLIP, "handoff")}`);
   }
   return lines;
 }
