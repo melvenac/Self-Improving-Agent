@@ -305,3 +305,10 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   `Bash(ssh *@100.110.244.10 *)` and the matching PowerShell rule.
 - **Found in passing:** the desktop's global `autoMode.environment` describes the FluidNC project as the trusted
   repo, and it applies to every project, SIA included. Raised with Aaron, and not copied to the laptop.
+- **QA 108: A10 REJECTED** (`d352af3`). High: A10-1, where `identify()`'s contained failure is turned into `null`
+  (absent) by `readState :463`, `readForCompare :703` and `begin :683`. A planted hook passes a completed loop, and a
+  user's existing hook is deleted by the restore. Medium: A10-2 (R82 fires only for read, not observed), A10-3 and A10-4
+  (lone placeholders). Low: A10-5, -6, -7. No regressions; full suite exit 0. **Rulings-19** (R83–R88) and the **A11
+  brief** (Grok, record 115) are written. **Error entry (the planner's):** R77 reading 5 said "in every caller", and it
+  was verified at the producer only. Record numbers: **115** is Grok for A11, **116** its QA.
+- **QA 111 launched** (importer round 3, pid 5624) after the QA tree moved to `30bf724`.
