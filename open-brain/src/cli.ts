@@ -349,26 +349,37 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
       process.exit(1);
     }
     const dryRun = opts.has("--dry-run");
-    let failed = 0;
-    for (const f of files) {
-      const r = migrateStateFile(resolve(f), {
+    const migrate = (f: string, asDryRun: boolean) =>
+      migrateStateFile(resolve(f), {
         seat: seat as "planner" | "developer" | "qa",
         lastSessionSeat: (opts.value("--last-session-seat") as "planner" | "developer" | "qa" | undefined) ?? null,
-        dryRun,
+        dryRun: asDryRun,
         keepRevision: opts.has("--keep-revision"),
       });
+    // R185-5: every named file is checked (a dry run: exists, parses, migrates
+    // and validates) before ANY is written. Before this, a refusal said "nothing
+    // was written for those" while an earlier file in the list had been migrated.
+    const checks = files.map((f) => migrate(f, true));
+    const failed = checks.filter((r) => !r.ok).length;
+    if (failed > 0) {
+      for (const r of checks) {
+        console.log(`${dryRun ? "[dry run] " : ""}${r.path}`);
+        console.log(r.ok ? "  not written: another named file was refused" : `  REFUSED: ${r.error}`);
+      }
+      console.error(`
+${failed} file(s) refused — nothing was written for any named file.`);
+      process.exit(1);
+    }
+    for (const [i, f] of files.entries()) {
+      const r = dryRun ? checks[i]! : migrate(f, false);
       console.log(`${dryRun ? "[dry run] " : ""}${r.path}`);
       if (!r.ok) {
+        // Only reachable if a file changed between the check and the write.
         console.log(`  REFUSED: ${r.error}`);
-        failed++;
-        continue;
+        console.error(`\n${r.path} refused after the check passed — files listed before it WERE written.`);
+        process.exit(1);
       }
       for (const c of r.changes) console.log(`  ${c}`);
-    }
-    if (failed > 0) {
-      console.error(`
-${failed} file(s) refused — nothing was written for those.`);
-      process.exit(1);
     }
     process.exit(0);
   }
@@ -489,7 +500,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft|--commit] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
-  console.log("  state migrate --seat <planner|developer|qa> [--keep-revision] [--dry-run] <file...>");
+  console.log("  state migrate --seat <planner|developer|qa> [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>");
   console.log("                                             Migrate state.json schema v1 -> v2");
   console.log("  detach [--dry-run] [--no-fetch] [--force] [dir]      Return a seat worktree to detached at origin/master");
   process.exit(1);
