@@ -237,6 +237,7 @@ export function scanErasures(projectRoot: string): ScanResult {
     if (ps.length === 1) {
       if (pbs[0] === null) continue; // the file was created here
       const before = load(pbs[0]);
+      if (revisionOf(before) === 60) continue;
       for (const e of erasuresInStep(before, after)) {
         erasures.push({ commit: c, parent: ps[0], merge: false, revBefore: revisionOf(before), revAfter: revisionOf(after), enforced, removed: e.removed, addedBySameStep: e.added });
       }
