@@ -139,17 +139,17 @@ function revisionOf(raw: Raw | null): number | null {
  * removal "explained" only by a number — a writer that trusts `n` again — is
  * therefore flagged here, whatever that writer believed.
  *
- * The count of sessions written since the removed entry is taken from the
- * after-state's sessions[] PLUS the removed entry's own session record when the
- * same step removed that too: the writer counted it before dropping it.
+ * The sessions counted are the after-state's. The writer counts before it
+ * drops, but the difference never decides: a session record dropped in the
+ * same step and later than `r` had more than 10 sessions after it, and those
+ * are all later than `r` and all kept (the latest dropped one's successors
+ * cannot themselves be dropped), so `r`'s count exceeds 10 without it.
  */
-function explainedByRetention(r: RecordRef, after: Raw | null, before: RecordRef[]): boolean {
+function explainedByRetention(r: RecordRef, after: Raw | null): boolean {
   if (schemaOf(after) < 3) return false;
   const a = recordsOf(after);
   const recs = a.filter((x) => x.kind === r.kind);
-  const sessionsAfter = a.filter((x) => x.kind === "session");
-  const droppedSessions = before.filter((x) => x.kind === "session" && !sessionsAfter.some((y) => y.key === x.key));
-  const revs = [...sessionsAfter, ...droppedSessions].map((x) => x.firstRev);
+  const revs = a.filter((x) => x.kind === "session").map((x) => x.firstRev);
   const entry: InstanceEntry = { seat: r.seat, checkout: r.checkout, first_rev: r.firstRev };
   const all: InstanceEntry[] = [...recs.map((x) => ({ seat: x.seat, checkout: x.checkout, first_rev: x.firstRev })), entry];
   return isSuperseded(entry, all, revs, r.kind === "handoff");
@@ -161,7 +161,7 @@ export function erasuresInStep(before: Raw | null, after: Raw | null): { removed
   const a = recordsOf(after);
   const out: { removed: RecordRef; added: RecordRef[] }[] = [];
   for (const r of b) {
-    if (presentIn(a, r) || explainedByRetention(r, after, b)) continue;
+    if (presentIn(a, r) || explainedByRetention(r, after)) continue;
     out.push({ removed: r, added: a.filter((x) => x.kind === r.kind && !presentIn(b, x)) });
   }
   return out;
@@ -176,7 +176,7 @@ export function erasuresInMerge(parents: Array<Raw | null>, base: Raw | null, af
   const out: { removed: RecordRef; added: RecordRef[] }[] = [];
   for (const recs of parentRecs) {
     for (const r of recs) {
-      if (seen.has(r.key) || presentIn(a, r) || explainedByRetention(r, after, recs)) continue;
+      if (seen.has(r.key) || presentIn(a, r) || explainedByRetention(r, after)) continue;
       const inEveryParent = parentRecs.every((p) => presentIn(p, r));
       const inBase = presentIn(baseRecs, r);
       if (!inEveryParent && inBase) continue; // removed on another line; reported there
