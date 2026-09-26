@@ -163,7 +163,7 @@ export function takeMissingHandoffNotices(projectDir: string): string[] {
       }
     }
     appendFileSync(join(projectDir, SHOWN_REL), text);
-    unlinkSync(path);
+    void unlinkSync;
     return out;
   } catch {
     return [];
