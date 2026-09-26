@@ -1,0 +1,34 @@
+name: Laptop runner isolation check
+
+# Runs ONLY on the laptop runner and checks out NO repository code. It proves the runner's jobs
+# cannot reach private networks (tailnet, LAN, tcm) while the public internet still works.
+# Planner session 109, on Aaron's word ("yes" to building isolation before any job runs there).
+on:
+  push:
+    branches: [chore/laptop-runner-isolation]
+  workflow_dispatch:
+
+jobs:
+  isolation:
+    runs-on: [self-hosted, Windows, laptop]
+    steps:
+      - name: Egress isolation self-check (laptop)
+        shell: powershell
+        run: |
+          function Try-Tcp($h, $p) {
+            $c = New-Object System.Net.Sockets.TcpClient
+            try { $t = $c.ConnectAsync($h, $p); if ($t.Wait(4000) -and $c.Connected) { 'connected' } else { 'no-connect' } }
+            catch { 'no-connect: ' + $_.Exception.InnerException.Message } finally { $c.Close() }
+          }
+          "identity: " + [Security.Principal.WindowsIdentity]::GetCurrent().Name
+          $fail = 0
+          $private = @('100.124.212.87:4000','100.124.212.87:22','192.168.1.50:4000','100.73.250.101:22','192.168.1.1:80','192.168.1.1:443','100.100.100.100:53')
+          foreach ($t in $private) {
+            $h, $p = $t.Split(':'); $r = Try-Tcp $h ([int]$p)
+            if ($r -eq 'connected') { "::error::reachable from the runner: $t"; $fail = 1 } else { "blocked: $t ($r)" }
+          }
+          foreach ($t in @('github.com:443','registry.npmjs.org:443')) {
+            $h, $p = $t.Split(':'); $r = Try-Tcp $h ([int]$p)
+            if ($r -eq 'connected') { "control ok: $t" } else { "::error::public control failed: $t ($r)"; $fail = 1 }
+          }
+          exit $fail
