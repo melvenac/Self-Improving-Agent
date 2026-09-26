@@ -24,7 +24,7 @@ yield site.
 
 1. `/start`. Your record number is **126**. **Aaron sets your effort in the session.** A line in a dispatch sets
    nothing; report yours from the transcript.
-2. **Base, frozen now:** `origin/master` = **`d2685fd`** (rulings §7.1). Name it in every run's record.
+2. **Base, frozen now:** `origin/master` = **`d2685fd`**, or a later master whose diff from `d2685fd` outside `docs/` is empty (check with `git diff --name-only d2685fd origin/master`). Name the SHA you branch from in every run's record (rulings §7.1).
 3. `git fetch origin && git switch -c loop/15-slice-3-b-step1 origin/master`, then bring in Step 0's tools
    (`load-generator.mjs`, `eld-setup.ts`, the `vitest.config.ts` hook and `ci.yml`'s step0 inputs and steps) from
    `origin/loop/15-slice-3-b-step0` `b32d3b8`, **byte-identical** (B-0.1). Commit that alone first. QA 123's
