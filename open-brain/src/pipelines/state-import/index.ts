@@ -776,10 +776,10 @@ function incompleteNote(snapshotRel: string): string {
     "Until then, `open-brain state import --draft` and `--commit` refuse.\n";
 }
 
-function refuseHalfRestored(root: string): void {
+function refuseHalfRestored(root: string, today = ""): void {
   const archive = join(root, ".agents", "archive");
   if (!existsSync(archive)) return;
-  const left = readdirSync(archive).filter((n) => n.startsWith(SNAPSHOT_PREFIX) && n.endsWith(INCOMPLETE_SUFFIX));
+  const left = readdirSync(archive).filter((n) => n === `${SNAPSHOT_PREFIX}${today}${INCOMPLETE_SUFFIX}`);
   if (left.length === 0) return;
   const snapshots = left.map((n) => `.agents/archive/${n.slice(0, -INCOMPLETE_SUFFIX.length)}/`).join(" and ");
   const markers = left.map((n) => `.agents/archive/${n}`).join(" and ");
@@ -790,7 +790,7 @@ export interface DraftResult { draftPath: string; reportPath: string; draft: Imp
 
 export function runDraft(projectRoot: string, today: string): DraftResult {
   const root = resolve(projectRoot);
-  refuseHalfRestored(root);
+  refuseHalfRestored(root, today);
   if (existsSync(join(root, STATE_REL))) throw new Error(`${STATE_REL} already exists — the importer runs once; nothing written`);
   const draft = buildImportDraft(root, today);
   const validation = StateSchema.safeParse(draft.state);
@@ -848,7 +848,7 @@ export interface CommitResult {
 
 export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean } = {}): CommitResult {
   const root = resolve(projectRoot);
-  refuseHalfRestored(root);
+  refuseHalfRestored(root, today);
   const statePath = join(root, STATE_REL);
   if (existsSync(statePath)) throw new Error(`${STATE_REL} already exists — the importer runs once; nothing written`);
   const draftPath = join(root, DRAFT_REL);
