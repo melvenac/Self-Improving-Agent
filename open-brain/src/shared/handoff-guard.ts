@@ -111,7 +111,7 @@ export function checkSessionHandoff(projectDir: string, since: string | null): H
   const withWork: string[] = [];
   const handoffs = new Set<string>();
   for (const b of branches) {
-    const shas = git(projectDir, ["rev-list", `--since=${since}`, b, ...exclude]).split(/\r?\n/).filter(Boolean);
+    const shas = git(projectDir, ["rev-list", b, ...exclude]).split(/\r?\n/).filter(Boolean);
     if (shas.length === 0) continue;
     withWork.push(b);
     for (const s of shas) commits.add(s);
