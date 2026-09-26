@@ -692,7 +692,6 @@ export class ConfigWatch {
             readError: null,
           });
         } else if (id.kind === "file") snap.set(f, fileState(id, null, true));
-        else if (id.kind === "other" && id.code) snap.set(f, unreadableIdentity(id));
         else snap.set(f, null);
       } else {
         snap.set(f, readState(f, undefined, true));
