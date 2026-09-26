@@ -64,6 +64,15 @@ known positives. Tell atlas if they are not.
 - After this lands, **the "no `/end` (T-163)" line in future briefs is retired.** Say so in the handoff, and the
   planner retires it.
 
+**T179-2: a session that ends with pushed work and no handoff says so (Aaron, session 109: "before clear, always have
+the agent write the handoff").** The case: an earlier `sia-infra` session built T-183 round 2 (`dd68ece`, six mutants
+and their CI runs) and was cleared before writing `t183-r2-developer-handoff.md`, so its reasoning is lost. `/clear`
+fires SessionEnd. In `cli-session-end`, when the session pushed or committed on a `loop/*` branch and no
+`docs/loops/*-handoff.md` on that branch was written by this session, print a visible warning that names the branch
+and the missing handoff. **It warns and never blocks:** a hook that fails at `/clear` traps the user. It also records the
+fact where the next session's `/start` shows it. Say how you detect "this session's" commits (the session uuid in a
+trailer, or the log's time window) and what the check misses.
+
 **Out of scope:** `/start`, `/checkpoint` (except as a destination for a moved step), T-164's counter, and T-170's
 recall side.
 
