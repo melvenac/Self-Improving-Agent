@@ -1251,6 +1251,12 @@ export class MachineConfigWatch {
       }
       return `${link}; resolves to: ${factText(s)}`;
     };
+    // R85. A current side that did not resolve names that failure. Zeroed facts are not a stand-in for the code.
+    const currentSide = (s: MachineSnap): string => {
+      if (s.lexicalKind === "symlink") return linkSide(s);
+      if (s.resolvedPath === null) return s.reason;
+      return `${s.resolvedPath} ${factText(s)}`;
+    };
     // R79. A loop base that was not there is that phrase, never zeroed facts.
     const baseText = (s: MachineSnap): string =>
       s.resolvedPath === null && s.lexicalKind !== "symlink" ? "absent at loop base" : `${s.resolvedPath ?? "unresolved"} ${factText(s)}`;
@@ -1258,7 +1264,8 @@ export class MachineConfigWatch {
       if (opened.state === "read") return readText(opened);
       if (opened.reason === "unreadable" || opened.hash === "unreadable") return `unreadable; stage start ${factText(opened)}`;
       if (opened.lexicalKind === "symlink" && opened.resolvedPath === null) return `${opened.reason}; ${factText(opened)}`;
-      if (opened.resolvedPath === null) return opened.reason.startsWith("absent (") ? opened.reason : "absent";
+      // R85. A failed lstat's reason is "did not resolve: <code>". Print it. The word absent is not that failure.
+      if (opened.resolvedPath === null) return opened.reason;
       return `stage start ${factText(opened)}`;
     };
     const row = (before: string, after: string, changed: boolean, path: string, scope: string): MachineConfigFinding => ({
@@ -1271,7 +1278,9 @@ export class MachineConfigWatch {
       if (stageStartObserved(opened) && end.errno !== null) {
         out.push({
           stage: this.stage, scope: p.scope, path: p.path,
-          before: stageBefore(opened), after: `unobservable (${end.errno})`, changed: true, unobservableCode: end.errno,
+          before: stageBefore(opened),
+          after: `unobservable (${end.errno}); ${end.lexicalKind === "symlink" ? linkSide(end) : factText(end)}`,
+          changed: true, unobservableCode: end.errno,
         });
         continue;
       }
@@ -1303,8 +1312,8 @@ export class MachineConfigWatch {
       if (linkPlanted) {
         const after =
           base.resolvedPath === null
-            ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${end.lexicalKind === "symlink" ? linkSide(end) : factText(end)}`
-            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${end.lexicalKind === "symlink" ? linkSide(end) : `${end.resolvedPath ?? "unresolved"} ${factText(end)}`}`;
+            ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${currentSide(end)}`
+            : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${currentSide(end)}`;
         out.push(row(stageBefore(opened), after, true, p.path, p.scope));
         continue;
       }
