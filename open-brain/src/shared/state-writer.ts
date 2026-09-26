@@ -528,7 +528,7 @@ export function isSuperseded(
   }
   const since = sessionFirstRevs.filter((r) => compareFirstRev(r, entry.first_rev) > 0).length;
   if (!(since > RECORD_RETENTION_SESSIONS)) return false;
-  return all.some((o) => o !== entry && o.seat === entry.seat && o.checkout === entry.checkout && compareFirstRev(o.first_rev, entry.first_rev) > 0);
+  return all.some((o) => o !== entry && o.seat === entry.seat && compareFirstRev(o.first_rev, entry.first_rev) > 0);
 }
 
 /**
