@@ -84,3 +84,21 @@ does not hold. The containment for next time: before ruling a numeric bound, rea
 - So a wrong or local (T-164) number can erase nothing. No jump confirmation is needed. QA's A2 and A5 stay as rows
   and pass. A6, A6b and A6c show no erasure.
 - T163-2 recomputes retention by the same rule, and a mutant restoring number-based retention must be caught.
+
+## Amendment 2 (same session): Forge 128's questions, ruled
+
+- **R179-1 as built, accepted.**
+  - `first_rev` is assigned by the writer, never by the caller.
+  - Legacy entries (`first_rev` null) are ordered before every keyed entry. No revision is inferred for them.
+  - Everything orders by `first_rev`: `lastSession`, the newest per instance or seat, and handoff provenance.
+- **R179-3 as built, accepted.** A legacy handoff is superseded by its seat's first keyed handoff. A legacy SESSION
+  record is never superseded: it keeps the uuid the migration promised, and it renders nowhere.
+- **R179-2 is narrower than first written, and accepted as stated.** The different-checkout refusal is built. QA's A7
+  and A8 in the same checkout, and A9, remain **T-003's**, recorded as not fixed. The slot-adoption check is NOT built
+  here; it belongs to T-003's whole registration path.
+- **R179-8 (new): done-task retention stops trusting the caller's number.**
+  - `closed_session <= session − 3` is D1's class: one write numbered 1124 drops every uncited done task.
+  - Instead, a done task is dropped (still kept if cited in tracked files) when at least **3 distinct sessions have a
+    `first_rev` after the task's closing revision**. The closing revision is recorded on close.
+  - Tasks closed before v3 are ordered before every keyed session.
+  - A row: one write numbered 1124 drops no done task. A mutant restoring the number comparison must be caught.
