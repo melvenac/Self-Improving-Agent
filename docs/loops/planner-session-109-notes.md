@@ -355,3 +355,43 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   planner's own session, not on a relayed one.
 
 - **WSearch disabled** on the laptop over SSH at Aaron's word in the planner session (Stopped, Disabled), before B Step 0's first laptop run. SysMain was left running.
+
+## State at Aaron's departure, 2026-09-26 ~09:00Z (the overnight plan; read this first after any compaction)
+
+**Running:**
+- The QA PC runs `qa-queue.ps1 -Queue 130,132 -Checkout d1c3baf` (pid 3312): QA 130 = A11 (product `ef2a8a7`, handoff
+  `bbf9d07`), then QA 132 = writing `E_t`'s criteria. The planner's watchers poll `qa/loop-15-slice-3-a11-report` and
+  `qa/b-et-criteria-report`.
+- `sia-infra` builds **T-179 round 2** (record 128) on `loop/t179-r2`. The rulings are `t179-rulings-qa125.md` plus
+  amendments 1 and 2 (R179-1 re-ruled: order by `first_rev`, never by session number; R179-8: done-task retention by
+  revision).
+
+**Ready and idle:** `sia-builder` is CLEARED, for the `/bootstrap` fix merge-in (record 133) once T-179 round 2 is
+frozen. Grok, research, frogger and the laptop agent are closed. The laptop runner is idle.
+
+**Waiting on T-179 round 2:**
+- the `/bootstrap` fix (`loop/bootstrap-fix`, candidate `8aba3df`, handoff `8a6c3e9`, Forge 127);
+- the importer leftovers (`loop/importer-leftovers`, candidate `e222124`, handoff `8562ad0`, Forge 131).
+
+Both are stacked on `loop/t179-merge` and merge round 2's tip in (never rebase), then go to QA. The importer
+leftovers' merge-in needs a second cleared session, so it waits for the morning.
+
+**The overnight rule:** rule each QA report as it lands, and write it down in `docs/loops/`. Dispatch developer
+rounds only to an already-CLEARED session (`sia-builder`, once). Never launch QA runs: the next queue is Aaron's, in
+the morning.
+
+**Aaron's morning list:**
+- Merge PR #165 (B Step 1, passed QA 129).
+- The verdicts of QA 130 and QA 132.
+- T-179 round 2's hand-back, and its QA for the next queue.
+- Tomorrow night's queue, across the QA PC and this desktop (qa-queue.ps1 supports both; the desktop's
+  `~/Worktrees/sia-qa` exists).
+- Whether Grok needs a fresh session for A12.
+
+**Also decided today:**
+- R4-4/R4-5 are built (the importer leftovers).
+- Frogger is on SIA on its local branch `sia/bootstrap`. Pilot 1b re-runs the fixed `/bootstrap` on a restored
+  frogger.
+- The research checkout's claim that writes are refused was corrected (a rule, not code).
+- tcm runs only the hub and the CI runners.
+- Two ruled errors of this seat: R179-1's "+5" bound, and the charter's claim that writes are refused.
