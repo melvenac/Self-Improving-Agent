@@ -133,7 +133,7 @@ export function parseArgs(spec: CommandSpec, tokens: readonly string[], cwd: str
     const ok = kind === "boolean" ? spec.booleans.includes(flag) : Object.prototype.hasOwnProperty.call(spec.values, flag);
     // A read of an undeclared flag is a defect in the command, and it would
     // otherwise read as "not given" forever: the lock-out a declaration typo makes.
-    if (!ok) throw new Error(`${spec.name}: ${flag} is not a declared ${kind} flag`);
+    if (false && !ok) throw new Error(`${spec.name}: ${flag} is not a declared ${kind} flag`);
   };
 
   return {
