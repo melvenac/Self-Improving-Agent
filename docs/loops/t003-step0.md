@@ -117,3 +117,25 @@ proceeds, and the file keeps the previous session's id. So the design does not r
   means a reused PID, and the server refuses.
 
 **Reconnect:** still not observed at 23:41Z (the server is still 8832, from 05:28Z).
+
+## Reconnect (measured 23:47Z, after Aaron ran `/mcp reconnect open-brain` in this window)
+
+| | Before | After |
+|---|---|---|
+| open-brain server for this session | PID 8832, parent 2500, created 05:28:56Z | **PID 15820, parent 2500**, created **23:45:23Z** |
+| old server 8832 | — | **exited** (absent from the process table) |
+| parent 2500 | claude.exe, created 05:28:52.53Z | unchanged |
+
+- **The reconnected server's `ppid` is still this session's claude process:** the key the proof is filed under
+  survives a reconnect.
+- **procStart:** `processStartTime(2500)` (this branch's implementation, `Get-Process … StartTime.ToFileTimeUtc()`)
+  reads `134348741325326178`. That is **byte-identical** to the `procStart` Claude Code recorded for PID 2500 in
+  Step 0, observation 2: two independent instruments agree on the value the reused-pid check compares.
+- **The proof read at the next attributed write: NOT observable live.** The serving server and the SessionStart
+  hook both run the MAIN checkout's build, which writes and reads no by-pid proof. So there is no
+  `by-pid/2500.json` to read yet. What the reconnect row proves is the half the design keys on: same parent,
+  same start time, a new process with no memory. The read itself is covered by the A8 row, where a fresh module
+  instance stands in for the respawned process. A live read needs this branch built into the main tree, which
+  is Aaron's merge and T-172's update.
+- Other sessions' servers were also respawned in the same minutes (parents 9888 and 9224, at 23:43Z). They are
+  listed only because they appear in the same table; nothing was read from them.
