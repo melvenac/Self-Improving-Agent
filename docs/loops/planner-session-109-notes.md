@@ -296,3 +296,12 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
   by ruling, not a defect.
 - **Aaron asked whether the QA PC has two CI runners. It does not.** GitHub lists exactly `tcm-1` and `tcm-2`, both
   Linux, on tcm (D-043/D-044). The QA PC (D-045) has none. A Windows runner there would be new (his call).
+- **Aaron's idle laptop, DESKTOP-0GV3HAD (Tailscale 100.110.244.10, user `aaron`)**, as a candidate Windows CI
+  runner. Reached through Claude Code Remote Control, with the laptop's own Claude session doing the setup: OpenSSH
+  server, this machine's public key in `administrators_authorized_keys`. Verified by the planner over SSH: i7-8565U
+  4C/8T, 7.9 GB RAM, NVMe SSD 238 GB (140 GB free), Win10 Pro 19045, on AC with AC sleep never, node v24.19.0.
+  **Git for Windows is not installed** (WSL bash only), so it is needed for a runner and for the status line.
+  Verdict: sufficient for a quiet, slower Windows runner. A user-settings allow rule was added on Aaron's word:
+  `Bash(ssh *@100.110.244.10 *)` and the matching PowerShell rule.
+- **Found in passing:** the desktop's global `autoMode.environment` describes the FluidNC project as the trusted
+  repo, and it applies to every project, SIA included. Raised with Aaron, and not copied to the laptop.
