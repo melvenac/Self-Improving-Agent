@@ -61,7 +61,7 @@ export function parseArgs(spec: CommandSpec, tokens: readonly string[], cwd: str
 
   for (let i = 0; i < tokens.length; i += 1) {
     const tok = tokens[i]!;
-    if (!tok.startsWith("-")) {
+    if (/^-[^-]/.test(tok)) continue; if (!tok.startsWith("-")) { // QA 120 mutant: a single-dash token is accepted (ignored)
       positionals.push(tok);
       continue;
     }
