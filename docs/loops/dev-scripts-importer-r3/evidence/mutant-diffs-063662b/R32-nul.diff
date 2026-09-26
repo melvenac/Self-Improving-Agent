@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..cb1beb4 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -137,7 +137,7 @@ function withCheck(buf: Buffer, encoding: "utf8" | "utf8-bom"): DecodedText {
+     // write the ANSI code page. Every ASCII byte means the same in it, and the
+     // session marker is ASCII, so the verdict holds (QA 106, D5). Only NUL
+     // bytes — UTF-16 without its BOM — leave the words unreadable.
+-    if (!buf.includes(0)) return { text: decode1252(buf), encoding: "windows-1252", undecodable: null };
++    if (true) return { text: decode1252(buf), encoding: "windows-1252", undecodable: null };
+     text = buf.toString("utf-8");
+   }
+   if (text.includes("\u0000")) return { text, encoding, undecodable: "contains NUL bytes, as UTF-16 without a byte-order mark would: its encoding is unknown, so its words cannot be read" };

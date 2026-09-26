@@ -1,0 +1,68 @@
+probes-r3 against C:\Users\melve\Worktrees\sia-builder @ 4b88f5d; TEMP=C:\Users\melve\AppData\Local\Temp
+
+==================== R3-1: a failure removes only what this run created
+NOTE today: 2026-09-25 (local), so today's snapshot is pre-state-migration-2026-09-25
+PASS IF-16 same-day snapshot + plain --commit: exit 1; whole project incl. the snapshot, with mtimes and RO bit: identical | state import refused: snapshot .agents/archive/pre-state-migration-2026-09-25 already exists — pass --force-snapshot to overwrite it
+PASS IF-16 same-day snapshot + --commit --accept-stale, stale project: exit 1; whole project incl. the snapshot, with mtimes and RO bit: identical | state import refused: snapshot .agents/archive/pre-state-migration-2026-09-25 already exists — pass --force-snapshot to overwrite it
+PASS R3-1 snapshot copy fails, archive/ absent: exit 1; whole project incl. archive/: identical; archive/ now [] | state import refused: EBUSY: resource busy or locked, copyfile 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-builder\6c2dffdd-d4db-4b6c-8906-7e3b
+PASS R3-1 snapshot copy fails, archive/ present, empty: exit 1; whole project incl. archive/: identical; archive/ now [] | state import refused: EBUSY: resource busy or locked, copyfile 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-builder\6c2dffdd-d4db-4b6c-8906-7e3b
+PASS R3-1 snapshot copy fails, archive/ holds an earlier dated snapshot: exit 1; whole project incl. archive/: identical; archive/ now [pre-state-migration-2026-01-01] | state import refused: EBUSY: resource busy or locked, copyfile 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-builder\6c2dffdd-d4db-4b6c-8906-7e3b
+PASS R3-1 snapshot copy fails, --force-snapshot over today's snapshot (the aside): exit 1; whole project incl. archive/: identical; archive/ now [pre-state-migration-2026-09-25] | state import refused: EBUSY: resource busy or locked, copyfile 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-builder\6c2dffdd-d4db-4b6c-8906-7e3b
+PASS R3-1 --force-snapshot + render failure: the aside comes back: exit 1; identical; archive/ now [pre-state-migration-2026-09-25] | state import refused: EPERM: operation not permitted, rename 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-builder\6c2dffdd-d4db-4b6c-8906-7e3b12016c26\scratchpad\p\pr3\r31-fo
+
+==================== R3-2: appended files (Windows PowerShell 5.1 appends onto an existing file)
+---- utf8 then PS 5.1 >> | first NUL at byte 103
+     stale  : 0 stale / 3 ctt / 0 current; bare --commit exit 1, state.json false
+              - could not tell `.agents/TASKS/INBOX.md`: contains 25 NUL byte(s), the first at byte 103, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+     current: 0 stale / 3 ctt / 0 current; bare --commit exit 1
+FAIL R3-2 class: utf8 then PS 5.1 >>: stale inputs are all STALE, and bare --commit refuses
+---- utf8 then PS 5.1 Add-Content | first NUL at byte -1
+     stale  : 3 stale / 0 ctt / 0 current; bare --commit exit 1, state.json false
+              - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) (read as Windows-1252: not valid UTF-8, and no byte-order mark)
+     current: 0 stale / 0 ctt / 3 current; bare --commit exit 0
+PASS R3-2 class: utf8 then PS 5.1 Add-Content: stale inputs are all STALE, and bare --commit refuses
+---- utf8-bom then PS 5.1 >> | first NUL at byte 106
+     stale  : 0 stale / 3 ctt / 0 current; bare --commit exit 1, state.json false
+              - could not tell `.agents/TASKS/INBOX.md`: contains 25 NUL byte(s), the first at byte 106, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+     current: 0 stale / 3 ctt / 0 current; bare --commit exit 1
+FAIL R3-2 class: utf8-bom then PS 5.1 >>: stale inputs are all STALE, and bare --commit refuses
+---- utf8-bom then PS 5.1 Add-Content | first NUL at byte -1
+     stale  : 3 stale / 0 ctt / 0 current; bare --commit exit 1, state.json false
+              - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+     current: 0 stale / 0 ctt / 3 current; bare --commit exit 0
+PASS R3-2 class: utf8-bom then PS 5.1 Add-Content: stale inputs are all STALE, and bare --commit refuses
+---- cp1252 then PS 5.1 >> | first NUL at byte 104
+     stale  : 0 stale / 3 ctt / 0 current; bare --commit exit 1, state.json false
+              - could not tell `.agents/TASKS/INBOX.md`: contains 25 NUL byte(s), the first at byte 104, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+     current: 0 stale / 3 ctt / 0 current; bare --commit exit 1
+FAIL R3-2 class: cp1252 then PS 5.1 >>: stale inputs are all STALE, and bare --commit refuses
+---- cp1252 then PS 5.1 Add-Content | first NUL at byte -1
+     stale  : 3 stale / 0 ctt / 0 current; bare --commit exit 1, state.json false
+              - **STALE** `.agents/TASKS/INBOX.md`: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) (read as Windows-1252: not valid UTF-8, and no byte-order mark)
+     current: 0 stale / 0 ctt / 3 current; bare --commit exit 0
+PASS R3-2 class: cp1252 then PS 5.1 Add-Content: stale inputs are all STALE, and bare --commit refuses
+FAIL R3-2 class: UTF-8 with one stray NUL at the end: 0 stale / 3 ctt / 0 current; bare --commit exit 1 | - could not tell `.agents/TASKS/INBOX.md`: contains 1 NUL byte(s), the first at byte 102, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding i
+PASS R3-2 SUMMARY.md as UTF-16LE with no BOM: --commit exit 1; tree identical | state import refused: .agents/SYSTEM/SUMMARY.md contains 67 NUL byte(s), the first at byte 1, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encodi
+NOTE R3-2 content: a Windows-1251 INBOX item, drafted: --draft exit 0; INBOX verdict: - current `.agents/TASKS/INBOX.md`: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md) (read as Windows-1252: not valid UTF-8, and no byte-ord; the draft's first item title: "Çàäà÷à" (the source said "Задача")
+
+==================== R3-3: the rollback itself fails (SUMMARY.md held open, share=Read), then every re-run
+  step 0 drafted: exit -; originals lost: none; state.json false; archive/ []
+  step 1 --commit with SUMMARY.md held (share=Read): exit 1; originals lost: none; state.json false; archive/ [pre-state-migration-2026-09-25, pre-state-migration-2026-09-25.import-incomplete]
+         | state import refused: EBUSY: resource busy or locked, open 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-builder\6c2dffdd-d4db-4b6c-8906-7e3b12016c26\scratchpad\p\pr3\r33-sequence\.agents\SYSTEM\SUMMARY.md'. ROLLBACK FAILED (EBUSY: resource busy or locked, unlink 'C:\Users\melve\AppData\Local\Temp\claude\C--Users-melve-Worktrees-sia-builder\6c2dffdd-d4db-4b6c-8906-7e3b12016c26\scratchpad\p\pr
+NOTE IF-19: the live tree right after step 1 (outside archive/): +0 [] -6 [SESSIONS/, SESSIONS/next-session.md, SESSIONS/Session_6.md, SESSIONS/Session_7.md, state.draft.json, state.import-report.md] ~0 []
+  step 2 --draft: exit 1; originals lost: none; state.json false; archive/ [pre-state-migration-2026-09-25, pre-state-migration-2026-09-25.import-incomplete]
+         | state import refused: .agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from .agents/archive/pre-state-migration-2026-09-25/, which holds every original, then delete .agents/archive/pre-state-migration-2026-09-25.import-incomplete. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success. Nothi
+  step 3 --commit: exit 1; originals lost: none; state.json false; archive/ [pre-state-migration-2026-09-25, pre-state-migration-2026-09-25.import-incomplete]
+         | state import refused: .agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from .agents/archive/pre-state-migration-2026-09-25/, which holds every original, then delete .agents/archive/pre-state-migration-2026-09-25.import-incomplete. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success. Nothi
+  step 4 --commit --force-snapshot: exit 1; originals lost: none; state.json false; archive/ [pre-state-migration-2026-09-25, pre-state-migration-2026-09-25.import-incomplete]
+         | state import refused: .agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from .agents/archive/pre-state-migration-2026-09-25/, which holds every original, then delete .agents/archive/pre-state-migration-2026-09-25.import-incomplete. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success. Nothi
+  step 5 --commit --accept-stale --force-snapshot: exit 1; originals lost: none; state.json false; archive/ [pre-state-migration-2026-09-25, pre-state-migration-2026-09-25.import-incomplete]
+         | state import refused: .agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from .agents/archive/pre-state-migration-2026-09-25/, which holds every original, then delete .agents/archive/pre-state-migration-2026-09-25.import-incomplete. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success. Nothi
+PASS IF-19 re-runs refuse: --draft, --commit, --commit --force-snapshot and --commit --accept-stale --force-snapshot all exit 1 with "half-restored"
+PASS IF-19 no original lost: at steps 0-5, an original file missing from the live tree and from every directory under archive/: 0
+NOTE IF-19: the refusal does not name a snapshot and a marker in the expected words; the way out was not followed
+PASS R3-3 a marker from an earlier day: --draft exit 1, --commit exit 1; tree identical | state import refused: .agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from .agents/archive/pre-state-migration-2026-01-01/, which holds every original, then delete .agents/archive/pre-state-migrat
+NOTE R3-3 two markers: exit 1 | state import refused: .agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from .agents/archive/pre-state-migration-2026-01-01/ and .agents/archive/pre-state-migration-2026-02-02/, which holds every original, then delete .agents/archive/pre-state-migration-2026-01-01.import-incomplete and .agents/archive/pre-state-migration-2026-02-02.import-incomplete. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success. Nothing written
+PASS R3-3 died after state.json: --draft exit 1: state import refused: .agents/ is half-restored: an earlier --commit failed and its rollba ; --commit exit 1: state import refused: .agents/ is half-restored: an earlier --commit failed and its rollba
+
+SUMMARY: 15 passed, 4 failed

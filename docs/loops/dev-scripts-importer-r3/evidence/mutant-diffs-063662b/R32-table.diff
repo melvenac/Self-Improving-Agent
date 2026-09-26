@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..0b4955e 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -115,7 +115,7 @@ export const READ_AS_1252 = "read as Windows-1252: not valid UTF-8, and no byte-
+ const CP1252_HIGH = "€\u0081‚ƒ„…†‡ˆ‰Š‹Œ\u008dŽ\u008f\u0090‘’“”•–—˜™š›œ\u009džŸ";
+ function decode1252(buf: Buffer): string {
+   let s = "";
+-  for (const b of buf) s += b >= 0x80 && b <= 0x9f ? CP1252_HIGH[b - 0x80] : String.fromCharCode(b);
++  for (const b of buf) s += String.fromCharCode(b);
+   return s;
+ }
+ 
