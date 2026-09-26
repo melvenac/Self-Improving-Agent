@@ -2,7 +2,7 @@
 
 Record 115, continuing through a desktop restart. Model: Grok 4.7. No effort setting is shown. GitNexus impact is unavailable on this seat. The index is at `6bd97f2`. Callers below are from grep.
 
-Candidate `loop/15-slice-3-candidate-a11`. The product tree is `0f42cc8c11420374564916f5dce2582029c2d37d` (R88). This file is the commit after it. Parent of the series is A10 `4b7a5ae`. CA-9 (T-182, `claude` lacks `--permission-prompts`) fails every tcm run and is not this seat's.
+Candidate `loop/15-slice-3-candidate-a11`. The product tree is `ef2a8a76d8183de8c32c0cfb5322856f644cb03c` (R85b). An earlier copy of this handoff was `143b9b1`, the commit after R88 `0f42cc8`. Atlas read that copy, accepted the consumer answers, and ruled R85b before that freeze stood. This file is the commit after `ef2a8a7`. Parent of the series is A10 `4b7a5ae`. CA-9 (T-182, `claude` lacks `--permission-prompts`) fails every tcm run and is not this seat's.
 
 ## No merge of master
 
@@ -10,7 +10,7 @@ At dispatch, `git diff --name-only 9bc06e3 origin/master` was only `docs/` and `
 
 ## Commit table
 
-`git diff --stat` for each commit in `4b7a5ae..0f42cc8`, oldest first. Each commit is one ruling.
+`git diff --stat` for each commit in `4b7a5ae..ef2a8a7`, oldest first. R83 through R88 are one ruling each. `143b9b1` is the first handoff. `ef2a8a7` is R85b.
 
 | SHA | diff --stat | Ruling |
 |---|---|---|
@@ -20,6 +20,8 @@ At dispatch, `git diff --name-only 9bc06e3 origin/master` was only `docs/` and `
 | `adb20a4` | 2 files, +71 −1. `configwatch.ts` +31 −1, `configwatch-r86.test.ts` +41 | R86. An ancestor link's type-change text carries that link's `lstat`. |
 | `ff637a2` | 1 file, +83. `configwatch-r87.test.ts` | R87. The `runLoop` call site, not the helper. |
 | `0f42cc8` | 3 files, +86 −4. `configwatch.ts` +25 −2, `runtime.ts` +5 −4, `configwatch-r88.test.ts` +60 | R88. A read failure at open refuses the stage. |
+| `143b9b1` | 1 file, +107. this handoff | First freeze, after R88. Superseded by the commit that adds this R85b section. |
+| `ef2a8a7` | 2 files, +14 −3. `configwatch.ts` +8 −1, `configwatch-r85.test.ts` +6 −2 | R85b. A realpath failure with no lstat prints no zeroed facts. |
 
 ## R83 consumer list
 
@@ -55,9 +57,9 @@ Printed with the failure, not as a stand-in for it:
 - A link side is `link: type symlink` plus `lstat`, then `resolves to:` or `does not resolve (<code>)`.
 - An open that throws `ENOENT` sets `reason` to `absent (<code>)` and `currentSide` prints that reason.
 
-Still zeroed, and the row does not forbid it:
+Closed by R85b (`ef2a8a7`):
 
-- When `realpath` throws, `observe` returns the unresolved snap (`kind absent`, `dev null`, `nlink 0`, `size 0`, `mtimeNs 0`). The unobservable close text is `unobservable (<code>);` plus `factText` of that snap, so the zeros are printed. `R85-UNOBSERVABLE-FACTS` requires `dev `, which `dev null` satisfies. The facts `observe` has there are the code, not an `lstat`.
+- When `realpath` throws, `observe` still returns the unresolved snap (`kind absent`, `dev null`, `nlink 0`, `size 0`, `mtimeNs 0`). The close text no longer prints that snap. `unobservableSide` (`configwatch.ts:1303`) prints `linkSide` when the path itself is a symlink, `ancestorLinkText` when a parent link was `lstat`'d, `factText` when `dev` is set, and otherwise `no facts: realpath failed`. The chmod-000 row's text is `unobservable (EACCES); no facts: realpath failed`. The link and parent-link branches have no separate row. The mutant that restores `factText` for a null `dev` is what kills `R85-UNOBSERVABLE-FACTS`.
 
 ## Per ruling
 
@@ -86,9 +88,13 @@ CA-9 is on every run below and is not counted.
 
 **R88.** Red `36223778379`, head `f0c215a`. `R88-EACCES-AT-OPEN` expected `config-watch-unestablished` and the failure was undefined (the loop completed). Green `36224103396`, head `0f42cc8`. The row passed. Mutant `r88-open` `57b75a2`, `36224104646`. Drops the open read-failure check and kills only that row, same undefined code.
 
+**R85b.** Red `36229056199`, head `2a417f7`, parent `0f42cc8`. `R85-UNOBSERVABLE-FACTS` failed: expected the close text not to contain `dev null`, received `unobservable (EACCES); type absent dev null ino null nlink 0 size 0 mtimeNs 0`. 2 failed, 1218 passed, 5 skipped (1225); the other failure is CA-9. Green `36229232046`, head `ef2a8a7`. The row passed. The same chmod-000 shape prints `unobservable (EACCES); no facts: realpath failed`. 1 failed, 1219 passed, 5 skipped (1225); the failure is CA-9. Mutant `r85b-zeros` `6888ee9`, branch `loop/15-slice-3-a11-mut-r85b-zeros`, CI `36229376868`. `unobservableSide` returns `factText` when `dev` is null. Kills only `R85-UNOBSERVABLE-FACTS`, same `dev null` text. 2 failed, 1218 passed, 5 skipped (1225); the other failure is CA-9.
+
 ## Existing assertions that changed
 
-None. `git diff --name-status 4b7a5ae..0f42cc8` is the two source files modified and the six new test files added. No existing test file was modified.
+Through R88, none. `git diff --name-status 4b7a5ae..0f42cc8` is the two source files modified and the six new test files added.
+
+R85b changed one existing assertion, in `configwatch-r85.test.ts` `R85-UNOBSERVABLE-FACTS`. It dropped `toContain("dev ")` and now rejects `dev null`, `nlink 0`, `size 0`, and `mtimeNs 0`, and requires `no facts: realpath failed`.
 
 ## Callers found by grep
 
@@ -97,6 +103,7 @@ GitNexus impact was not run. The index is at `6bd97f2`.
 - `machineChangeReported`: defined in `runtime.ts`. The production call is the machine-finding loop inside `runLoop`. `cli.ts` calls `runLoop`. `configwatch-r80-report.test.ts` calls the helper directly (`R72-EQUAL-TEXT`).
 - `readFailuresAtOpen`: defined on `ConfigWatch`, called from `runLoop` beside `unlistedAtOpen`.
 - `runLoop`: `cli.ts`, and the harness tests.
+- `unobservableSide`: local to `MachineConfigWatch.compare`. The production call of `compare` is `runtime.ts:1080` (`machineWatch.compare()`). The harness tests call `compare` directly.
 
 ## Not verified
 
@@ -104,4 +111,4 @@ No full local suite (the planner's ruling). The win32 rows these tests `skipIf` 
 
 ## Rulings
 
-Rulings-19 is `bddb289c4c335c1cb6d09246de7739e40bcb7468` on `origin/docs/session-100-qa99-dispatch` (`docs/loops/loop-15-slice-3-rulings-19.md`). R83 through R88.
+Rulings-19 is `bddb289c4c335c1cb6d09246de7739e40bcb7468` on `origin/docs/session-100-qa99-dispatch` (`docs/loops/loop-15-slice-3-rulings-19.md`). R83 through R88, then R85b from the hub after the first freeze.
