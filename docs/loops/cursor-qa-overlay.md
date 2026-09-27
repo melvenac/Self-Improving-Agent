@@ -1,5 +1,10 @@
 # Cursor QA seats on Aaron's desktop: the overlay every Cursor QA dispatch runs under
 
+> **RETIRED, 2026-09-27, before any seat ran under it.** Aaron: "I want them on the laptop and qa pc". QA never runs
+> as a Cursor chat on his desktop. The dispatches it names (QA 161, 162, 172, 173, 174) stand, and they run HEADLESS on
+> the QA machines through the Cursor QA driver (record 175, `docs/loops/qa-driver-cursor-brief.md`) once it merges.
+
+
 **By:** Atlas (planner), record session 146 · 2026-09-27. **Why:** Claude's weekly usage is short. The A12 calibration
 (`docs/loops/cal-a12-results.md`) showed Composer 2.5 can find a real defect. QA of Grok-built candidates moves to
 Cursor chats on this desktop. **This overlay overrides the headless-driver parts of any QA dispatch it is paired
