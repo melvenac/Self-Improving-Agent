@@ -19,23 +19,24 @@ import { execFileSync } from "node:child_process";
  * object is synthetic, and the checks are asserted to treat ANY throw as
  * unreadable, which is the property that matters.
  */
-const { denied } = vi.hoisted(() => ({ denied: new Set<string>() }));
+// path -> the fs ops that refuse it (all three when unspecified).
+const { denied } = vi.hoisted(() => ({ denied: new Map<string, Set<string>>() }));
 
 vi.mock("node:fs", async (importOriginal) => {
   const actual = await importOriginal<typeof import("node:fs")>();
   const { resolve: res } = await import("node:path");
-  const guard = <F extends (...a: any[]) => any>(fn: F): F =>
+  const guard = <F extends (...a: any[]) => any>(op: string, fn: F): F =>
     ((p: unknown, ...rest: unknown[]) => {
-      if (typeof p === "string" && denied.has(res(p))) {
+      if (typeof p === "string" && denied.get(res(p))?.has(op)) {
         throw Object.assign(new Error(`EACCES: permission denied, '${p}'`), { code: "EACCES" });
       }
       return fn(p, ...rest);
     }) as F;
   return {
     ...actual,
-    readFileSync: guard(actual.readFileSync),
-    readdirSync: guard(actual.readdirSync),
-    statSync: guard(actual.statSync),
+    readFileSync: guard("readFileSync", actual.readFileSync),
+    readdirSync: guard("readdirSync", actual.readdirSync),
+    statSync: guard("statSync", actual.statSync),
   };
 });
 
@@ -44,7 +45,8 @@ const { checkRetirements, checkModuleBoundary, checkTemplatePersonalNames } = aw
 );
 
 let root: string;
-const deny = (rel: string): void => { denied.add(resolve(root, rel)); };
+const ALL_OPS = ["readFileSync", "readdirSync", "statSync"];
+const deny = (rel: string, ops = ALL_OPS): void => { denied.set(resolve(root, rel), new Set(ops)); };
 const write = (rel: string, body: string): void => {
   const abs = join(root, rel);
   mkdirSync(dirname(abs), { recursive: true });
@@ -74,7 +76,9 @@ function retirementsTree(files: Record<string, string> = {}): string {
 describe("SILENT 1 — checkRetirements: an unreadable file is an issue, not a counted pass", () => {
   it("names the file it could not read, and does not pass", () => {
     retirementsTree({ "docs/b.md": "run `widgetizer`\n" });
-    deny("docs/b.md");
+    // readFileSync only: listed and statable, refused at the read. Denying all
+    // three let the walk's stat catch it first, and mutant P1 survived (run 6).
+    deny("docs/b.md", ["readFileSync"]);
     const r = checkRetirements(root);
     expect(r.severity).toBe("issue");
     expect(r.message).toContain("unreadable");
@@ -128,7 +132,7 @@ describe("SILENT 26 — walkTracked fallback: says it is the fallback, and a par
 
   it("an unreadable directory makes the walk partial, and the issue names it", () => {
     retirementsTree({ "docs/b.md": "run `widgetizer`\n" });
-    deny("docs");
+    deny("docs", ["readdirSync"]); // statable, not listable
     const r = checkRetirements(root);
     expect(r.severity).toBe("issue");
     expect(r.message).toContain("partial");
