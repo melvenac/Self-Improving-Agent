@@ -20,7 +20,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runLoop, type GateMode } from "./runtime.js";
 import { stubRoles } from "./roles.js";
-import { jsonSchemas, serialiseSchema, validateEvidence, type DeliverableKind } from "./schema.js";
+import { EVIDENCE_LOOP_PATTERN, jsonSchemas, serialiseSchema, validateEvidence, type DeliverableKind } from "./schema.js";
 import { defaultChecks, type CheckSpec } from "./checks.js";
 import { policyJsonSchemas } from "./policies.js";
 
@@ -125,7 +125,8 @@ function parseRun(argv: readonly string[]): ParsedRun {
   }
 
   if (out.loop === "") throw new UsageError("--loop is required, e.g. --loop t001");
-  if (!/^t\d{3,}$/.test(out.loop)) throw new UsageError(`--loop must look like t001, got "${out.loop}"`);
+  // QA-189 mutant: widen --loop to accept human-seat ids (violates BE-1.2).
+  if (!EVIDENCE_LOOP_PATTERN.test(out.loop)) throw new UsageError(`--loop must look like t001, got "${out.loop}"`);
   return out;
 }
 
