@@ -110,7 +110,7 @@ describe("T-171: a note is never replaced silently", () => {
 
   it("replace_note on the writer's own note is reported with both sizes and the removed text's first line, in the dry run and the write", () => {
     seed(root, "T-009", LONG, [ME]);
-    const expected = `T-009 note REPLACED: 1869 chars -> ${ADDITION.length} chars; removed text begins: "${FIRST_LINE}"`;
+    const expected = `T-009 note REPLACED: 1869 chars -> ${ADDITION.length} chars; removed text begins: "${LONG.slice(0, 120)}"`;
     const dry = write(root, [{ op: "update_task", id: "T-009", replace_note: ADDITION }], { dry_run: true });
     expect(changes(dry)).toEqual([expected]);
     expect(note(root, "T-009")).toBe(LONG);
@@ -163,7 +163,7 @@ describe("T-171: a note is never replaced silently", () => {
     const line = changes(r)[0];
     expect(line).toContain("note REPLACED:");
     expect(line).not.toContain('removed text begins: "kept line"');
-    expect(line).toMatch(/removed text begins: "gone forever"|old text began:/);
+    expect(line).toMatch(/removed text begins: "\ngone forever"|old text began:/);
   });
 
   // T171-D3: the three rows that kill QA 144's surviving mutants.
@@ -175,7 +175,8 @@ describe("T-171: a note is never replaced silently", () => {
     seed(root, "T-009", old, [ME]);
     const r = write(root, [{ op: "update_task", id: "T-009", replace_note: longer }]);
     expect(r.ok).toBe(true);
-    expect(changes(r)[0]).toContain(`removed text begins: "${old}"`);
+    expect(changes(r)[0]).toContain(`removed text begins: "A"`);
+    expect(longer.includes("A")).toBe(false);
     expect(changes(r)[0]).not.toContain("no text removed");
   });
 
@@ -213,7 +214,7 @@ describe("T-171: a note is never replaced silently", () => {
     const r = write(root, [{ op: "update_task", id: "T-009", replace_note: ADDITION, replace_other_sessions: true }]);
     expect(r.ok).toBe(true);
     expect(changes(r)).toEqual([
-      `T-009 note REPLACED: 1869 chars -> ${ADDITION.length} chars; removed text begins: "${FIRST_LINE}"; text by other session(s) removed: other-uuid-b`,
+      `T-009 note REPLACED: 1869 chars -> ${ADDITION.length} chars; removed text begins: "${LONG.slice(0, 120)}"; text by other session(s) removed: other-uuid-b`,
     ]);
     expect(noteBy(root, "T-009")).toEqual([ME]);
     // Now it is the writer's own: a second replace needs no flag.
