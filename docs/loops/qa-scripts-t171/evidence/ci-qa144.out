@@ -1,0 +1,28 @@
+== run 36286216812: qa/t171-mut-append-as-replace @ d436ee3 runner tcm-2: completed failure
+   Test Files  2 failed | 85 passed (87) | Tests  3 failed | 1322 passed | 2 skipped (1327)
+   error lines by kind: {"AssertionError":6,"Process":1}
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > append_note adds to the note, and the dry run and the write both report it with sizes
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > close_task follows the same rules: append reported, a foreign replace refused
+   FAIL tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > reopen_task moves done → open, clears closed_session, appends the note, and refuses a task that is not done (R1)
+== run 36286217950: qa/t171-mut-dry-run-hides-replace @ 0ba9918 runner tcm-1: completed success
+   Test Files  87 passed (87) | Tests  1325 passed | 2 skipped (1327)
+   error lines by kind: {}
+== run 36286219442: qa/t171-mut-note-by-ignored @ f0b7fb4 runner tcm-1: completed failure
+   Test Files  2 failed | 85 passed (87) | Tests  6 failed | 1319 passed | 2 skipped (1327)
+   error lines by kind: {"AssertionError":12,"Process":1}
+   FAIL tests/pipelines/state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) > T-171: an imported note has no recorded author, so a later session cannot replace it unnamed
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > replace_note on a note another session wrote is refused, naming that session, and nothing is written
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > with replace_other_sessions: true it replaces, the report names the session whose text went, and the note becomes the writer's
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > a note with no recorded author (written before per-note keys) counts as another session's
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > an unregistered writer cannot prove any note is its own, so its replace is refused
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > close_task follows the same rules: append reported, a foreign replace refused
+== run 36286223642: qa/t171-mut-superset-foreign-unflagged @ 0e87991 runner tcm-2: completed success
+   Test Files  87 passed (87) | Tests  1325 passed | 2 skipped (1327)
+   error lines by kind: {}
+== run 36286220756: qa/t171-mut-removes-by-length @ 89c3c77 runner tcm-2: completed success
+   Test Files  87 passed (87) | Tests  1325 passed | 2 skipped (1327)
+   error lines by kind: {}
+== run 36286222154: qa/t171-mut-append-legacy-owned @ 114e6b9 runner tcm-1: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  1 failed | 1324 passed | 2 skipped (1327)
+   error lines by kind: {"AssertionError":2,"Process":1}
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > a note with no recorded author (written before per-note keys) counts as another session's

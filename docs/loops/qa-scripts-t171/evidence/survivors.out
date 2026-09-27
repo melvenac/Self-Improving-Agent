@@ -1,0 +1,20 @@
+== candidate b371176
+S1 dry run of a replace through ob_state: ob_state dry run — nothing written | NOTE CHANGE lines: ["NOTE CHANGE: T-009 note REPLACED: 39 chars -> 5 chars; removed text begins: \"the session's own long note\""]
+S2 own 16-char note rewritten to a longer text without it: ["T-009 note REPLACED: 16 chars -> 44 chars; removed text begins: \"decision: ship A\""]
+S3 B superset-replaces A's note, no flag: refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replaci; note_by ["uuid-A"]
+   then B replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replaci
+== mutant dry-run-hides-replace 0ba9918 build=0
+S1 dry run of a replace through ob_state: ob_state dry run — nothing written | NOTE CHANGE lines: []
+S2 own 16-char note rewritten to a longer text without it: ["T-009 note REPLACED: 16 chars -> 44 chars; removed text begins: \"decision: ship A\""]
+S3 B superset-replaces A's note, no flag: refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replaci; note_by ["uuid-A"]
+   then B replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replaci
+== mutant removes-by-length 89c3c77 build=0
+S1 dry run of a replace through ob_state: ob_state dry run — nothing written | NOTE CHANGE lines: ["NOTE CHANGE: T-009 note REPLACED: 39 chars -> 5 chars; removed text begins: \"the session's own long note\""]
+S2 own 16-char note rewritten to a longer text without it: ["T-009 note REPLACED: 16 chars -> 44 chars; no text removed"]
+S3 B superset-replaces A's note, no flag: refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replaci; note_by ["uuid-A"]
+   then B replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replaci
+== mutant superset-foreign-unflagged 0e87991 build=0
+S1 dry run of a replace through ob_state: ob_state dry run — nothing written | NOTE CHANGE lines: ["NOTE CHANGE: T-009 note REPLACED: 39 chars -> 5 chars; removed text begins: \"the session's own long note\""]
+S2 own 16-char note rewritten to a longer text without it: ["T-009 note REPLACED: 16 chars -> 44 chars; removed text begins: \"decision: ship A\""]
+S3 B superset-replaces A's note, no flag: ACCEPTED ["T-009 note REPLACED: 12 chars -> 26 chars; no text removed"]; note_by ["uuid-B"]
+   then B replaces it, no flag: ACCEPTED ["T-009 note REPLACED: 26 chars -> 9 chars; removed text begins: \"A's finding. B's addition.\""]

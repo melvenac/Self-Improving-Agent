@@ -1,0 +1,113 @@
+candidate build: b3711763a4b9f5624803e8992234c51e793872ef; scratch C:\qa-scratch\qa144\t171-proj @ 58479c7
+migrate output:
+  C:\qa-scratch\qa144\t171-proj\.agents\state.json
+    schema_version 2 → 3
+    revision 133 → 134
+    handoffs: 3 kept word for word (qa@75, developer@74, planner@109), session_uuid, checkout and first_rev null — v2 never recorded any of them
+    last_session → sessions[0]: n 76, 2026-09-21, uuid 22631f4e-433a-4f29-8669-47ee2f543bec, seat planner, checkout null, first_rev null
+    legacy entries (first_rev null) order BEFORE every keyed entry; each legacy handoff is superseded by its seat's first keyed handoff (R179-3)
+    tasks: 70 kept, each with closed_rev null (v2 never recorded it); the 3 done task(s) age out once 3 sessions have written, unless cited in the tracked tree
+    task notes: 70 non-empty note(s) get note_by null — v2 never recorded who wrote a note, so replacing any of them needs replace_other_sessions: true; append_note works as before (T-171)
+    uuids: 2 distinct before, 2 after, none lost
+HOLDS   C0 master rev 133 migrates to v3; every one of its 70 non-empty notes (of 70 tasks) gets note_by null
+        schema_version 3, revision 134, note_by values: ["null"]
+open tasks 67, done 3; T-169 open, note 3256 chars; working task T-003
+HOLDS   C1a bare `note` on update_task (dry run) is refused by name, naming append_note and replace_note, nothing written
+        REFUSED: ops[0] (update_task): `note` is retired on update_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)
+HOLDS   C1a bare `note` on update_task is refused by name, naming append_note and replace_note, nothing written
+        REFUSED: ops[0] (update_task): `note` is retired on update_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)
+HOLDS   C1b update_task with note AND append_note is refused by the retired name first
+        REFUSED: ops[0] (update_task): `note` is retired on update_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)
+HOLDS   C1c update_task: six near-miss field names (notes, Note, new_note, set_note, note_text, text) all refused as unrecognized
+HOLDS   C1a bare `note` on close_task (dry run) is refused by name, naming append_note and replace_note, nothing written
+        REFUSED: ops[0] (close_task): `note` is retired on close_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)
+HOLDS   C1a bare `note` on close_task is refused by name, naming append_note and replace_note, nothing written
+        REFUSED: ops[0] (close_task): `note` is retired on close_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)
+HOLDS   C1b close_task with note AND append_note is refused by the retired name first
+        REFUSED: ops[0] (close_task): `note` is retired on close_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)
+HOLDS   C1c close_task: six near-miss field names (notes, Note, new_note, set_note, note_text, text) all refused as unrecognized
+HOLDS   C1d six non-note ops (update_task title/priority/status, add_verified, add_gap, add_decision, set_objective, set_handoff) change no task note and report no note change
+        ok rev 134->135 note_changes=[]
+HOLDS   C1e append_note (update_task and close_task) keeps every character, reports sizes identically in dry run and write, and keys note_by (null stays null)
+        legacy (null) update_task: T-003 note APPENDED: +8 chars (776 -> 784) note_by null -> null dry==write true dry-untouched true
+        legacy (null) close_task: T-003 note APPENDED: +8 chars (776 -> 784) note_by null -> null dry==write true dry-untouched true
+        own update_task: T-003 note APPENDED: +8 chars (8 -> 16) note_by ["00000001-0000-4000-8000-000000000001"] -> ["00000001-0000-4000-8000-000000000001"] dry==write true dry-untouched true
+        own close_task: T-003 note APPENDED: +8 chars (8 -> 16) note_by ["00000001-0000-4000-8000-000000000001"] -> ["00000001-0000-4000-8000-000000000001"] dry==write true dry-untouched true
+        foreign update_task: T-003 note APPENDED: +8 chars (12 -> 20) note_by ["00000002-0000-4000-8000-000000000002"] -> ["00000002-0000-4000-8000-000000000002","00000001-0000-4000-8000-000000000001"] dry==write true dry-untouched true
+        foreign close_task: T-003 note APPENDED: +8 chars (12 -> 20) note_by ["00000002-0000-4000-8000-000000000002"] -> ["00000002-0000-4000-8000-000000000002","00000001-0000-4000-8000-000000000001"] dry==write true dry-untouched true
+        mixed update_task: T-003 note APPENDED: +8 chars (4 -> 12) note_by ["00000002-0000-4000-8000-000000000002","00000001-0000-4000-8000-000000000001"] -> ["00000002-0000-4000-8000-000000000002","00000001-0000-4000-8000-000000000001"] dry==write true dry-untouched true
+        mixed close_task: T-003 note APPENDED: +8 chars (4 -> 12) note_by ["00000002-0000-4000-8000-000000000002","00000001-0000-4000-8000-000000000001"] -> ["00000002-0000-4000-8000-000000000002","00000001-0000-4000-8000-000000000001"] dry==write true dry-untouched true
+        ends with the join update_task: T-003 note APPENDED: +8 chars (11 -> 19) note_by ["00000002-0000-4000-8000-000000000002"] -> ["00000002-0000-4000-8000-000000000002","00000001-0000-4000-8000-000000000001"] dry==write true dry-untouched true
+        ends with the join close_task: T-003 note APPENDED: +8 chars (11 -> 19) note_by ["00000002-0000-4000-8000-000000000002"] -> ["00000002-0000-4000-8000-000000000002","00000001-0000-4000-8000-000000000001"] dry==write true dry-untouched true
+        multiline+unicode update_task: T-003 note APPENDED: +8 chars (17 -> 25) note_by ["00000002-0000-4000-8000-000000000002"] -> ["00000002-0000-4000-8000-000000000002","00000001-0000-4000-8000-000000000001"] dry==write true dry-untouched true
+        multiline+unicode close_task: T-003 note APPENDED: +8 chars (17 -> 25) note_by ["00000002-0000-4000-8000-000000000002"] -> ["00000002-0000-4000-8000-000000000002","00000001-0000-4000-8000-000000000001"] dry==write true dry-untouched true
+HOLDS   C1f append_note "" is refused (nothing to add)
+        REFUSED: ops[0] invalid at append_note: Too small: expected string to have >=1 characters
+HOLDS   C1g reopen_task T-056 appends and reports it, dry run identical
+        ok rev 134->135 note_changes=["T-056 note APPENDED: +12 chars (307 -> 319)"]
+HOLDS   C1h open_task with a note reports SET, dry run identical
+        ok rev 134->135 note_changes=["T-192 note SET: 0 -> 3 chars"]
+HOLDS   C1i a batch whose second op is refused writes nothing and reports no note change
+        REFUSED: ops[1] (update_task): unknown task T-99999
+HOLDS   C2a no op can set note_by, and replace_other_sessions accepts only literal true with a replace_note
+        {"op":"update_task","id":"T-003","note_by":["00000001-0000-4000-8000-000000000001"]} -> refused: ops[0] invalid at $: Unrecognized key: "note_by"
+        {"op":"update_task","id":"T-003","append_note":"x","note_by":["00000001-0000-4000-8000-000000000001"]} -> refused: ops[0] invalid at $: Unrecognized key: "note_by"
+        {"op":"close_task","id":"T-003","replace_note":"x","note_by":["00000001-0000-4000-8000-000000000001"]} -> refused: ops[0] invalid at $: Unrecognized key: "note_by"
+        {"op":"open_task","title":"t","priority":"P2","note":"x","note_by":["00000002-0000-4000-8000-000000000002"]} -> refused: ops[0] invalid at $: Unrecognized key: "note_by"
+        {"op":"reopen_task","id":"T-056","note":"x","note_by":["00000001-0000-4000-8000-000000000001"]} -> refused: ops[0] invalid at $: Unrecognized key: "note_by"
+        {"op":"update_task","id":"T-003","replace_note":"x","replace_other_sessions":false} -> refused: ops[0] invalid at replace_other_sessions: Invalid input: expected true
+        {"op":"update_task","id":"T-003","replace_note":"x","replace_other_sessions":"true"} -> refused: ops[0] invalid at replace_other_sessions: Invalid input: expected true
+        {"op":"update_task","id":"T-003","append_note":"x","replace_other_sessions":true} -> refused: ops[0] (update_task): replace_other_sessions names a replacement, and this op has no replace_note
+HOLDS   C2b through ob_state, extra arguments (note_by, session_uuid) are ignored: the append is keyed to the REGISTERED session only (legacy note stays null)
+        ob_state applied | NOTE CHANGE: T-003 note APPENDED: +11 chars (776 -> 787)
+HOLDS   C2c an append adds the writer's (registered) uuid: [A] + B -> [A, B]
+        ["00000001-0000-4000-8000-000000000001","00000002-0000-4000-8000-000000000002"]
+HOLDS   C2d a migrated (null) note: replace_note without the flag is refused, nothing written
+        REFUSED: ops[0] (update_task): T-003's note holds text written by an unrecorded session (no per-note author: written before schema v3, imported, or by an unregistered write). Replacing it would remove that text (776 chars). Use append_note to add to it, or name the replacement with replace_other_sessions: true
+HOLDS   C2e with replace_other_sessions: true it replaces; the report (dry run identical) names 'unrecorded'; note_by becomes [writer]
+        ok rev 134->135 note_changes=["T-003 note REPLACED: 776 chars -> 3 chars; removed text begins: \"**a reconnect adopts the WRONG session's uuid** NEW (Session 53). `active-session.json` keys on `<project_dir>::<ide>`, \"; text by other session(s) removed: unrecorded"]
+HOLDS   C2f a hand-edited record that breaks the note_by rule (or omits the key) is refused at load by the writer
+        non-empty note, note_by []: refused: .agents/state.json invalid at tasks.0.note_by: note_by must be [] exactly when note is empty — refusing to write over a 
+        empty note, note_by null: refused: .agents/state.json invalid at tasks.0.note_by: note_by must be [] exactly when note is empty — refusing to write over a 
+        empty note, note_by [A]: refused: .agents/state.json invalid at tasks.0.note_by: note_by must be [] exactly when note is empty — refusing to write over a 
+        note_by [""]: refused: .agents/state.json invalid at tasks.0.note_by.0: Too small: expected string to have >=1 characters — refusing to write o
+        note_by a string: refused: .agents/state.json invalid at tasks.0.note_by: Invalid input: expected array, received string — refusing to write over a
+        note_by key absent: refused: .agents/state.json invalid at tasks.0.note_by: Invalid input: expected array, received undefined — refusing to write ove
+HOLDS   C2g open_task with "" -> [], unregistered open_task -> null, replace to "" -> []: the rule holds after each
+        {"op":"open_task","title":"empty","priority":"P2","note":""}  -> ok; violations 0; new task note_by []
+        {"op":"open_task","title":"unreg","priority":"P2","note":"u"} (unregistered) -> ok; violations 0; new task note_by null
+        {"op":"update_task","id":"T-003","replace_note":"","replace_other_sessions":true  -> ok; violations 0; note_by []
+BROKEN  C2h a flagged replace that removes NOTHING still drops the previous authors from note_by, so the next replace of their text needs no flag and names no other session
+        B superset-replace of A's note (flag): ok rev 134->135 note_changes=["T-003 note REPLACED: 13 chars -> 27 chars; no text removed"]; note_by now ["00000002-0000-4000-8000-000000000002"]
+        B then replaces WITHOUT the flag: ok rev 135->136 note_changes=["T-003 note REPLACED: 27 chars -> 11 chars; removed text begins: \"A wrote this. B added this.\""]; note "only B now."
+        legacy 776-char note: superset replace (flag): ok rev 134->135 note_changes=["T-003 note REPLACED: 776 chars -> 789 chars; no text removed"]
+          then unflagged replace: ok rev 135->136 note_changes=["T-003 note REPLACED: 789 chars -> 4 chars; removed text begins: \"**a reconnect adopts the WRONG session's uuid** NEW (Session 53). `active-session.json` keys on `<project_dir>::<ide>`, \""]
+HOLDS   C2h' contrast: after append_note the same unflagged replace IS refused (A still keyed)
+        REFUSED: ops[0] (update_task): T-003's note holds text written by session 00000001-0000-4000-8000-000000000001. Replacing it would remove that text (29 chars). Use append_note to add to it, or name the replacement with replace_other_sessions: true
+HOLDS   C2i (known limit, T-003) a second session in the SAME checkout that registers A's uuid replaces A's note with no flag; the report names no other session
+        register: accepted; replace: NOTE CHANGE: T-003 note REPLACED: 38 chars -> 3 chars; removed text begins: "A's note, A's session in this checkout"
+HOLDS   C3a R171-1: the stale global /end line `close_task {id, note?}` (dry run) is refused through ob_state, the refusal names append_note and replace_note, and nothing is written
+        ob_state refused: ops[0] (close_task): `note` is retired on close_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true) | Revision: 134 (unchanged) | Nothing written.
+HOLDS   C3a R171-1: the stale global /end line `close_task {id, note?}` is refused through ob_state, the refusal names append_note and replace_note, and nothing is written
+        ob_state refused: ops[0] (close_task): `note` is retired on close_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true) | Revision: 134 (unchanged) | Nothing written.
+HOLDS   C3a R171-1: the stale global /end line `update_task {id, status?, priority?, title?, note?}` (dry run) is refused through ob_state, the refusal names append_note and replace_note, and nothing is written
+        ob_state refused: ops[0] (update_task): `note` is retired on update_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true) | Revision: 134 (unchanged) | Nothing written.
+HOLDS   C3a R171-1: the stale global /end line `update_task {id, status?, priority?, title?, note?}` is refused through ob_state, the refusal names append_note and replace_note, and nothing is written
+        ob_state refused: ops[0] (update_task): `note` is retired on update_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true) | Revision: 134 (unchanged) | Nothing written.
+HOLDS   C3b ob_state prints the same NOTE CHANGE lines in the dry run and the write
+        dry: NOTE CHANGE: T-003 note APPENDED: +14 chars (776 -> 790)
+         write: NOTE CHANGE: T-003 note APPENDED: +14 chars (776 -> 790)
+HOLDS   C3c ... and for a flagged replace of a migrated note (the destructive case)
+        dry: NOTE CHANGE: T-003 note REPLACED: 790 chars -> 12 chars; removed text begins: "**a reconnect adopts the WRONG session's uuid** NEW (Session 53). `active-session.json` keys on `<project_dir>::<ide>`, "; text by other session(s) removed: unrecorded
+         write: NOTE CHANGE: T-003 note REPLACED: 790 chars -> 12 chars; removed text begins: "**a reconnect adopts the WRONG session's uuid** NEW (Session 53). `active-session.json` keys on `<project_dir>::<ide>`, "; text by other session(s) removed: unrecorded
+HOLDS   C4 T-169 shape: no path loses the long note without a NOTE CHANGE line (bare note refused; unflagged replace of migrated text refused; append keeps it; own replace reported)
+        target T-169, note 3256 chars, first line "Session 78, planner, on Aaron's word ('the agent started wor"...
+        bare note: dry refused; write refused: ops[0] (update_task): `note` is retired on update_task (T-171): it replaced the whole note; text kept true
+        replace_note, no flag: dry refused; write refused: ops[0] (update_task): T-169's note holds text written by an unrecorded session (no per-not; text kept true
+        append_note: dry ["T-169 note APPENDED: +59 chars (3256 -> 3315)"]; write ["T-169 note APPENDED: +59 chars (3256 -> 3315)"]; text kept true
+        own note, replace_note: dry ["T-169 note REPLACED: 3256 chars -> 56 chars; removed text begins: \"Session 78, planner, on Aaron's word ('the agent started work and asked what the project was for halfway through the loo\""]; write ["T-169 note REPLACED: 3256 chars -> 56 chars; removed text begins: \"Session 78, planner, on Aaron's word ('the agent started work and asked what the project was for halfway through the loo\""]
+        own note, prefix-keeping replace: ["T-169 note REPLACED: 3256 chars -> 257 chars; removed text begins: \"Session 78, planner, on Aaron's word ('the agent started work and asked what the project was for halfway through the loo\""]; the quoted "removed" text is still in the new note: true
+BROKEN  C4b the REPLACED line's "removed text begins" quotes the old note's first line even when that line is KEPT (prefix-keeping edit)
+        quoted: "Session 78, planner, on Aaron's word ('the agent started work and asked what the project w"
+
+2 BROKEN

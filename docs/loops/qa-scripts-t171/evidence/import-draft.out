@@ -1,0 +1,15 @@
+
+state import — draft (nothing else changed)
+
+Root: C:\qa-scratch\qa144\imp
+Draft:  .agents/state.draft.json
+Report: .agents/state.import-report.md
+Validates: yes
+Current session: 0 ((no Session_N.md))
+Staleness: 0 stale · 3 could not tell (.agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md) · 0 current. Details are in the report's first section.
+Tasks: 67 (open 67, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 5
+Decisions: 26 (1 skipped) · verified 0 · gaps 0 · objective NOT found
+Handoff: pick_up 1 lines, watch_out 9, open_questions 4
+SUMMARY.md: --commit will remove 0 lines (0 blockquote + 0 Current State)
+
+Review the report, then run: open-brain state import --commit

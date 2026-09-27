@@ -1,0 +1,69 @@
+[
+  {
+    "id": "append-as-replace",
+    "what": "append_note REPLACES the note; the APPENDED line still carries the sizes an append would have",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "KILLED (3/148)",
+    "failed": [
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently append_note adds to the note, and the dry run and the write both report it with sizes",
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently close_task follows the same rules: append reported, a foreign replace refused",
+      "state-writer.test.ts > applyStateOps (Loop 3 writer) reopen_task moves done → open, clears closed_session, appends the note, and refuses a task that is not done (R1)"
+    ]
+  },
+  {
+    "id": "dry-run-hides-replace",
+    "what": "ob_state's dry run prints APPENDED/SET lines but drops every REPLACED line (the write still prints it)",
+    "landed": [
+      "src/server.ts"
+    ],
+    "status": "SURVIVED (0/148)",
+    "failed": []
+  },
+  {
+    "id": "note-by-ignored",
+    "what": "the replace refusal never reads note_by: a registered writer owns every note; only an unregistered one is refused",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "KILLED (6/148)",
+    "failed": [
+      "state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) T-171: an imported note has no recorded author, so a later session cannot replace it unnamed",
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently replace_note on a note another session wrote is refused, naming that session, and nothing is written",
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently with replace_other_sessions: true it replaces, the report names the session whose text went, and the note becomes the writer's",
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently a note with no recorded author (written before per-note keys) counts as another session's",
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently an unregistered writer cannot prove any note is its own, so its replace is refused",
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently close_task follows the same rules: append reported, a foreign replace refused"
+    ]
+  },
+  {
+    "id": "removes-by-length",
+    "what": "a replace counts as removing text only when the new note is SHORTER (a longer rewrite reports 'no text removed')",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "SURVIVED (0/148)",
+    "failed": []
+  },
+  {
+    "id": "append-legacy-owned",
+    "what": "append_note to a note with no recorded author (null) keys it to the appender alone",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "KILLED (1/148)",
+    "failed": [
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently a note with no recorded author (written before per-note keys) counts as another session's"
+    ]
+  },
+  {
+    "id": "superset-foreign-unflagged",
+    "what": "replacing another session's note with a superset of it needs no replace_other_sessions",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "SURVIVED (0/148)",
+    "failed": []
+  }
+]
