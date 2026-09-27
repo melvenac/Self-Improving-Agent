@@ -36,7 +36,7 @@ import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/sessio
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVaultDir } from "./shared/paths.js";
-import { readActiveSession, activeSessionKey, currentIde, isStaleSession, sessionEntryAgeMs, resolveWriteSession } from "./shared/active-session.js";
+import { byPidDir, processStartTime, proveSession, type ProvenSession } from "./shared/process-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { slugify, archiveVaultNote } from "./vault-writer.js";
 import { findToolCallScaffolding, scaffoldRejectionMessage } from "./shared/content-guard.js";
@@ -75,34 +75,47 @@ function skewWarning(): string {
     + `newer schema — run /mcp reconnect open-brain here before trusting its writes.`;
 }
 
-let _activeSessionId: string | null = null;
+/**
+ * T-003: the session this server can PROVE is its own, read at EVERY
+ * attributed write and never cached, because one server outlives many
+ * sessions (`/clear`) and a reconnected one has no memory at all. See
+ * shared/process-session.ts for the proof and its limits.
+ *
+ * There is no in-memory registration and no fallback. The per-project slot in
+ * active-session.json is never read here: it holds whichever session in the
+ * checkout started last, and adopting it was the defect ("v0.21.0 fixed an
+ * absence by introducing a wrong value"). No proof means no id, with the
+ * reason, and every caller refuses or says "not logged" out loud.
+ *
+ * The parent is `process.ppid`, NEVER `CLAUDE_PID`: in an MCP server that
+ * variable is inherited from whoever launched claude, so it names the OUTER
+ * session when claude runs inside another one (T-003 Step 0b).
+ */
+let _parentStart: { pid: number; start: string | null } | null = null;
+function writeSessionId(): ProvenSession {
+  const parent = process.ppid;
+  // The parent is fixed for this process's life, so its start time is read
+  // once (it costs a process spawn on Windows). The pid is re-checked anyway.
+  if (!_parentStart || _parentStart.pid !== parent) _parentStart = { pid: parent, start: processStartTime(parent) };
+  return proveSession(byPidDir(resolvePaths(process.cwd()).activeSession), parent, _parentStart.start);
+}
 
 /**
- * Times a write path had to recover the session from the slot file because the
- * in-memory registration was gone — i.e. operations that v0.19.x and earlier
- * would have silently not logged. Surfaced unconditionally in ob_stats: a
- * harness regression shows up as this number climbing, not as rows quietly
- * not existing. Per-instance by nature — the loss it counts is per-instance.
+ * The session an attributed write may use, given the id its caller NAMED (if
+ * any). A named id is a claim to check, never a source: it must equal the
+ * proven one. Returns the refusal text when the write must not happen.
  */
-let _sessionSelfRegistrations = 0;
-
-/**
- * Session id for recall/feedback writes, self-registering from the hook's slot
- * file after a reconnect. Returns why there is no id when there is none, so
- * every caller can say "not logged" out loud instead of skipping silently.
- */
-function writeSessionId(): { id: string | null; selfRegistered: boolean; reason?: string } {
-  const cwd = process.cwd();
-  const slot = _activeSessionId ? null : readActiveSession(
-    resolvePaths(cwd).activeSession,
-    activeSessionKey(canonicalizeProjectDir(cwd) || cwd, currentIde()),
-  );
-  const resolved = resolveWriteSession(_activeSessionId, slot);
-  if (resolved.selfRegistered && resolved.id) {
-    _activeSessionId = resolved.id;
-    _sessionSelfRegistrations++;
+function attributedSession(named: string | null | undefined): { id: string | null; refusal?: string; reason?: string } {
+  const proven = writeSessionId();
+  const claim = named && named !== "none" ? named : null;
+  if (proven.id === null) {
+    if (claim) return { id: null, refusal: `${claim} cannot be checked: this server cannot prove its session (${proven.reason}). Nothing written.` };
+    return { id: null, reason: proven.reason };
   }
-  return resolved;
+  if (claim && claim !== proven.id) {
+    return { id: null, refusal: `${claim} is not this server's session: this server's parent process ${proven.pid} is session ${proven.id}. Nothing written.` };
+  }
+  return { id: proven.id };
 }
 const _recalledKnowledgeIds = new Set<number>();
 
@@ -202,12 +215,18 @@ const STATE_FILE_LABEL: Record<StateFileSize["file"], string> = {
 export async function handleStart(args: StartArgs): Promise<ToolResponse> {
   try {
     const projectRoot = resolve(args.project_root ?? ".");
+    const proven = writeSessionId();
     const result = sessionStart({
       projectRoot,
       homePath: homedir(),
-      sessionId: _activeSessionId,
+      // The PROVEN session (T-003). null means there is no proof: do not
+      // discover, or a shared checkout stamps the other session's transcript.
+      sessionId: proven.id,
       stateBudgetLines: args.state_budget_lines,
     });
+    const sessionIdLine = proven.id === null
+      ? `Session ID: none — ${proven.reason}`
+      : `Session ID: ${result.session.sessionId ?? "discovery failed"}`;
 
     const lines: string[] = [];
 
@@ -238,10 +257,10 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     if (result.session.logPath) {
       lines.push(`\nSession #${result.session.sessionNumber}${result.session.reused ? " (existing log for this session id — reused, nothing created)" : ""}`);
       lines.push(`Log: ${result.session.logPath}`);
-      lines.push(`Session ID: ${result.session.sessionId ?? "discovery failed"}`);
+      lines.push(sessionIdLine);
     } else if (result.session.skippedReason) {
       lines.push(`\nSession log: ${result.session.skippedReason}`);
-      lines.push(`Session ID: ${result.session.sessionId ?? "discovery failed"}`);
+      lines.push(sessionIdLine);
     }
 
     if (result.health.warnings.length > 0) {
@@ -403,13 +422,16 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
     // checkout's declared seat labels the session record; set_handoff's own
     // seat overrides it.
     const identity = readAgentIdentity(projectRoot);
+    const stateSession = attributedSession(null);
     const r = applyStateOps(projectRoot, {
       session: args.session,
       expected_revision: args.expected_revision,
       ops: args.ops,
       dry_run: args.dry_run,
       render: args.render,
-      session_uuid: writeSessionId().id,
+      // T-003: the PROVEN session. With none, set_handoff refuses (T-163) and the
+      // reason is added to the refusal below.
+      session_uuid: stateSession.id,
       seat: identity && isSeat(identity.role) ? identity.role : null,
     });
     const lines: string[] = [];
@@ -417,6 +439,7 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
       lines.push(`ob_state refused: ${r.error}`);
       if (r.revision_before >= 0) lines.push(`Revision: ${r.revision_before} (unchanged)`);
       lines.push(`Nothing written.`);
+      if (stateSession.id === null) lines.push(`No proven session (T-003): ${stateSession.reason}`);
       // Loop 10 R2 — the refusal names its remedy.
       //
       // Fail-closed is correct and stays. What was missing is that this was
@@ -481,13 +504,22 @@ export interface EndArgs {
 export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
   try {
     const projectRoot = resolve(args.project_root ?? ".");
+    // T-003: a named session_id is checked against the proven one, never
+    // trusted: ob_end writes ratings under it.
+    const endSession = attributedSession(args.session_id);
+    if (endSession.refusal) {
+      return { content: [{ type: "text" as const, text: `ob_end refused: ${endSession.refusal}` }], isError: true };
+    }
     const v2db = getV2Db();
 
     // recall_log is authoritative when the session is known; the file is only
     // consulted when it names this same session. See resolveRecalledIds.
+    // No named id means the proven one. end.md calls ob_end that way, and a
+    // rating ob_recalled lists is in recall_log under that id (D3).
+    const endedId = endSession.id;
     const resolved = resolveRecalledIds({
       db: v2db,
-      sessionId: args.session_id || null,
+      sessionId: endedId,
       explicitIds: args.recalled_entry_ids,
       filePaths: [resolve(projectRoot, ".recalled-entries.json")],
       readFile: (p) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
@@ -498,7 +530,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       db: v2db,
       vaultDir: v2VaultDir(),
       agentsDir: resolve(projectRoot, ".agents"),
-      sessionId: args.session_id || "",
+      sessionId: endedId ?? "",
       sessionSummary: args.session_summary || "",
       project: projectRoot.split(/[/\\]/).filter(Boolean).pop() || "General",
       recalledEntryIds: recalledIds,
@@ -650,7 +682,7 @@ server.tool(
   "End a session — self-generate summary from session .db, record any entry_ratings passed, write the vault summary, log invocations. (The reflection queue was cut in Loop 10; this no longer flags reflection clusters.)",
   {
     project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
-    session_id: z.string().nullable().optional().default(null).describe("Session UUID (null if unknown)"),
+    session_id: z.string().nullable().optional().default(null).describe("Session UUID (null if unknown). Checked against the proven session: a different id refuses (T-003)."),
     session_summary: z.string().optional().default("").describe("Session summary text for tag matching (self-generates if empty)"),
     recalled_entry_ids: z.array(z.number()).optional().default([]).describe("IDs of knowledge entries recalled this session"),
     entry_ratings: z.record(z.string(), z.enum(["helpful", "harmful", "neutral"])).optional().describe("Explicit per-entry judgments keyed by entry ID, e.g. {\"42\": \"harmful\"}. Rate an entry harmful when it was applied and proved wrong or misleading — not merely when it went unused. Entries omitted here fall back to tag matching against the summary."),
@@ -676,11 +708,11 @@ server.tool(
 // --- ob_set_session ---
 server.tool(
   "ob_set_session",
-  "Register the active session ID. Call once at session start for provenance tracking.",
+  "Check and record this session. The session id is PROVEN from the SessionStart hook's per-process record, never taken from the argument: an id other than the proven one is refused, and with no proof nothing is registered and attributed writes refuse (T-003). Call once at session start.",
   {
     session_id: z.string().optional().describe(
-      "The session UUID. Omit (or pass \"none\") when the IDE does not surface one — "
-      + "the UUID recorded by the SessionStart hook is used instead."
+      "The session UUID, as a claim to check against the proven one. Omit (or pass \"none\") to register "
+      + "the proven id without naming it."
     ),
     project_dir: z.string().optional().describe("Current working directory"),
   },
@@ -693,120 +725,62 @@ export interface SetSessionArgs {
 }
 
 /**
- * Exported like the other handlers so the registered-id path can be exercised
- * without the MCP transport (Loop 1's P7 was only inspectable until this).
- * Body unchanged from the inline registration it replaces.
+ * T-003: ob_set_session is a CHECK, not a source.
+ *
+ * It used to take the id from its argument (unchecked: QA 125's A7) or, with
+ * none, from the per-project slot (T-003's adoption), and hold it in memory,
+ * where it outlived the session that set it (`/clear`, A9) and was lost by a
+ * reconnect (A8). Now the id is the PROVEN one (writeSessionId): an argument
+ * that differs from it is refused, naming both, and with no proof nothing is
+ * registered. Registering changes no write: every attributed write reads the
+ * proof itself. What this call still does is persist the proven id to the
+ * sessions table and say, in its answer, where the id came from.
+ *
+ * R179-2's different-checkout refusal stood here. It is superseded, not lost:
+ * it refused registering as ANOTHER checkout's recorded session, and no id but
+ * this server's own can register now, in any checkout.
  */
 export async function handleSetSession(args: SetSessionArgs): Promise<ToolResponse> {
-  let { session_id } = args;
   const project_dir = args.project_dir;
-  {
-    const cwd = project_dir || process.cwd();
+  const claim = args.session_id && args.session_id !== "none" ? args.session_id : null;
+  const proven = writeSessionId();
+  const refuse = (text: string): ToolResponse => ({ content: [{ type: "text" as const, text }], isError: true });
 
-    // Fall back to the hook's file handoff. Cursor does not reliably put the
-    // hook's stdout into agent context, so a Cursor agent has no UUID to pass
-    // and previously registered nothing at all — leaving recall_log and
-    // feedback_log empty and shadow recall with no ground truth.
-    let resolvedFrom = "argument";
-    let staleWarning = "";
-    if (!session_id || session_id === "none") {
-      const ide = currentIde();
-      const active = readActiveSession(
-        resolvePaths(cwd).activeSession,
-        activeSessionKey(canonicalizeProjectDir(cwd) || cwd, ide),
-      );
-      if (!active) {
-        return {
-          content: [{
-            type: "text" as const,
-            text: `Error: no session_id given and no active session recorded for `
-              + `ide "${ide}" in this project. Check that the SessionStart hook is `
-              + `registered for this IDE, and that its MCP registration sets `
-              + `OPEN_BRAIN_IDE. Re-run scripts/setup.mjs if unsure.`,
-          }],
-          isError: true,
-        };
-      }
-      session_id = active.uuid;
-      resolvedFrom = `hook file (${active.source}, ide ${active.ide ?? "unset"})`;
-
-      // A slot the SessionStart hook never refreshed keeps answering forever. A
-      // Cursor seat was handed a sixteen-day-old UUID in this same confident
-      // wording and filed a session's worth of chunks and ratings under it. The
-      // read still succeeds — the id is better than nothing — but it stops
-      // sounding like a live registration.
-      if (isStaleSession(active)) {
-        const ageMs = sessionEntryAgeMs(active);
-        const age = ageMs === null
-          ? "an unreadable timestamp"
-          : `${Math.floor(ageMs / 86_400_000)}d ${Math.floor((ageMs % 86_400_000) / 3_600_000)}h old`;
-        staleWarning = `\n\nWARNING: this id came from a slot ${age} (started_at `
-          + `${active.started_at || "missing"}), not from a fresh session start. The `
-          + `SessionStart hook for ide "${ide}" has not run in this workspace, so work `
-          + `may be filed under a previous session. Check that the hook is registered `
-          + `and actually executing before trusting this id.`;
-      }
-    }
-
-    // R179-2 (QA 125's D2): refuse a uuid the record already holds under a
-    // DIFFERENT checkout. Every state write is stamped with the registered
-    // uuid, so registering as another checkout's recorded session would let
-    // this session replace that session's handoff in place — invisibly to
-    // record-erasure, because the key is still present. The registration is
-    // refused and the previous one (if any) is kept.
-    //
-    // LIMITS, stated because the guarantee reaches only this far: a uuid the
-    // record has not seen, or one recorded under THIS checkout, is accepted — so
-    // a second session in the same checkout registering as the first, and a
-    // reconnected server adopting the other session's uuid from the per-checkout
-    // slot (T-003), are NOT caught here. The checkout is the project root's
-    // basename, as the writer stamps it; two machines sharing a basename are one
-    // checkout to this check. A project_dir that is not the project root (no
-    // .agents/state.json there) is not checked.
-    {
-      const root = resolve(cwd);
-      const st = readState(root);
-      if (st.ok) {
-        const here = basename(root);
-        const rec = st.data.sessions.find((x) => x.uuid === session_id);
-        if (rec && rec.checkout !== null && rec.checkout !== here) {
-          return {
-            content: [{
-              type: "text" as const,
-              text: `ob_set_session refused: ${session_id} is recorded in ${root}/.agents/state.json as session ${rec.n} of checkout "${rec.checkout}", `
-                + `and this is checkout "${here}". Registering it would stamp this session's writes with another checkout's session, `
-                + `which can replace that session's handoff in place (R179-2). Nothing registered`
-                + (_activeSessionId ? `; the registration stays ${_activeSessionId}.` : "."),
-            }],
-            isError: true,
-          };
-        }
-      }
-    }
-
-    _activeSessionId = session_id;
-
-    // Persist as well as hold in memory: an in-memory-only registration left no
-    // record to verify against after the session ended, which is why the
-    // SESSION_UUID wiring had to be checked by hand every time.
-    let persisted = false;
-    try {
-      recordSession(getV2Db(), session_id, canonicalizeProjectDir(project_dir));
-      persisted = true;
-    } catch {
-      // Registration must not fail the session if the DB is unavailable.
-    }
-
-    return {
-      content: [{
-        type: "text" as const,
-        text: `Session registered: ${session_id}${project_dir ? ` (${project_dir})` : ""}`
-          + ` [via ${resolvedFrom}]`
-          + (persisted ? "" : " — warning: not persisted to the sessions table")
-          + staleWarning,
-      }],
-    };
+  if (proven.id === null) {
+    return refuse(
+      `ob_set_session refused: this server cannot prove its session (${proven.reason}). Nothing registered. `
+        + `Until it can, attributed writes refuse or say "not logged": ob_state's set_handoff, the recall and feedback logs, ob_end and ob_store_chunk with a session_id. `
+        + `In Claude Code the SessionStart hook writes the proof; a host that writes none (Cursor) cannot attribute (T-003, ruling Q2).`
+        + (claim ? ` The id given, ${claim}, was not used: an argument is a claim to check, not proof.` : ""),
+    );
   }
+  if (claim && claim !== proven.id) {
+    return refuse(
+      `ob_set_session refused: ${claim} is not this server's session: this server's parent process ${proven.pid} is session ${proven.id}. `
+        + `Nothing registered; attributed writes use ${proven.id}.`,
+    );
+  }
+
+  // Persist as well as report: an in-memory-only registration left no record to
+  // verify against after the session ended, which is why the SESSION_UUID
+  // wiring had to be checked by hand every time.
+  let persisted = false;
+  try {
+    recordSession(getV2Db(), proven.id, canonicalizeProjectDir(project_dir));
+    persisted = true;
+  } catch {
+    // Registration must not fail the session if the DB is unavailable.
+  }
+
+  return {
+    content: [{
+      type: "text" as const,
+      text: `Session registered: ${proven.id}${project_dir ? ` (${project_dir})` : ""}`
+        + ` [via process proof: parent ${proven.pid}]`
+        + (claim ? "" : " (no id given; the proven id was used)")
+        + (persisted ? "" : " — warning: not persisted to the sessions table"),
+    }],
+  };
 }
 
 // --- ob_recall ---
@@ -911,15 +885,12 @@ server.tool(
         // never break a recall — but never a SILENT skip: a recall that is not
         // logged says so in its own output.
         const session = writeSessionId();
-        if (session.id) {
+        if (session.id !== null) {
           try {
             recordRecallEvent(v2db, session.id, query, rows.map((r) => r.id), trigger);
           } catch { /* non-critical */ }
-          if (session.selfRegistered) {
-            results.push(`_(session ${session.id} self-registered from the hook slot after a server restart)_`);
-          }
         } else {
-          results.push(`_(NOT LOGGED: no active session — ${session.reason === "stale-slot" ? "the hook slot is stale" : "no hook slot found"}; run ob_set_session to restore recall logging)_`);
+          results.push(`_(NOT LOGGED: this server cannot prove its session — ${session.reason})_`);
         }
 
         // Track recall hits
@@ -1049,14 +1020,8 @@ function deriveKey(content: string): string {
 }
 
 // --- ob_feedback ---
-server.tool(
-  "ob_feedback",
-  "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Increments the entry's counter and writes a feedback_log row; nothing is derived from it further (maturity promotion was cut with E3 and apoptosis with E18 in Loop 10). Use ob_forget to retire an entry.",
-  {
-    id: z.coerce.number().describe("Knowledge entry ID"),
-    rating: z.enum(["helpful", "harmful", "neutral"]).describe("Was this knowledge helpful, harmful, or neutral?"),
-  },
-  async ({ id, rating }) => {
+export async function handleFeedback(args: { id: number; rating: "helpful" | "harmful" | "neutral" }): Promise<ToolResponse> {
+  const { id, rating } = args;
     const v2db = getV2Db();
     const entry = v2db.prepare(
       // vault_path is selected for the apoptosis branch: the note has to be
@@ -1104,9 +1069,21 @@ server.tool(
       `Feedback recorded for entry ${id} (${entry.key || "no key"}): ${rating}`,
       `Counts: ${entry.helpful + (rating === "helpful" ? 1 : 0)} helpful, ${entry.harmful + (rating === "harmful" ? 1 : 0)} harmful, ${entry.neutral + (rating === "neutral" ? 1 : 0)} neutral`,
     ];
+    if (feedbackSession.id === null) {
+      lines.push(`NOT LOGGED: this server cannot prove its session — ${feedbackSession.reason}`);
+    }
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };
-  }
+}
+
+server.tool(
+  "ob_feedback",
+  "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Increments the entry's counter and writes a feedback_log row; nothing is derived from it further (maturity promotion was cut with E3 and apoptosis with E18 in Loop 10). Use ob_forget to retire an entry.",
+  {
+    id: z.coerce.number().describe("Knowledge entry ID"),
+    rating: z.enum(["helpful", "harmful", "neutral"]).describe("Was this knowledge helpful, harmful, or neutral?"),
+  },
+  async ({ id, rating }) => handleFeedback({ id, rating }),
 );
 
 // --- ob_forget ---
@@ -1282,7 +1259,14 @@ server.tool(
       ``,
       // Unconditional, including at zero — a line that only appears when
       // something went wrong reads identically to a healthy silence.
-      `Session self-registrations (this server instance): ${_sessionSelfRegistrations}`,
+      // T-003: the self-registration count went with slot adoption. What replaces
+      // it is the proof itself, read now, with the reason when there is none.
+      (() => {
+        const p = writeSessionId();
+        return p.id !== null
+          ? `Session proof (this server instance): ${p.id}, via parent process ${p.pid}`
+          : `Session proof (this server instance): NONE — ${p.reason}`;
+      })(),
       `Schema: code v${_schemaSkew?.codeVersion ?? "?"}, database v${_schemaSkew?.dbVersion ?? "?"}${_schemaSkew?.writerIsStale ? " — STALE WRITER" : ""}`,
     ];
 
@@ -1328,7 +1312,7 @@ server.tool(
     if (ids.length === 0) {
       const why = resolved.rejected
         ? `\nIgnored ${resolved.rejected.path}: ${resolved.rejected.reason}`
-        : session.id ? "" : `\nNo session id: ${session.reason ?? "unknown"}`;
+        : session.id !== null ? "" : `\nNo session id: ${session.reason}`;
       return { content: [{ type: "text" as const, text: `No knowledge entries recalled this session.${why}` }] };
     }
 
@@ -1365,84 +1349,107 @@ server.tool(
     tags: z.array(z.string()).optional().describe("Tags for categorization"),
     category: z.enum(["checkpoint", "spec", "note", "other"]).optional().default("checkpoint").describe("Chunk category"),
     project_dir: z.string().optional().describe("Project working directory"),
-    session_id: z.string().optional().describe("Session UUID for provenance"),
+    session_id: z.string().optional().describe("Session UUID for provenance. Checked against the proven session: a different id refuses (T-003). Omit to link the proven one."),
     phase: z.number().optional().describe("Phase number for multi-phase work"),
   },
-  async ({ content, key, tags, category, project_dir, session_id, phase }) => {
-    // Same guard as ob_store: a chunk is stored the same way and leaks the same way.
-    const chunkScaffold = findToolCallScaffolding(content);
-    if (chunkScaffold) {
-      return { content: [{ type: "text" as const, text: scaffoldRejectionMessage(chunkScaffold) }], isError: true };
-    }
-
-    const v2db = getV2Db();
-    const now = new Date().toISOString();
-    const date = now.slice(0, 10);
-    const tagsStr = tags ? tags.join(", ") : "";
-    const normalizedProject = canonicalizeProjectDir(project_dir);
-    // Same rule as ob_store: the canonical path is lowercased, so the display
-    // name comes from the raw dir. Matches existing checkpoint filenames.
-    const projectSlug = normalizedProject ? projectDisplayName(project_dir, "general") : "general";
-    const slug = slugify(key);
-    const phaseStr = phase != null ? `-phase-${phase}` : "";
-
-    // Vault-first: write markdown file
-    const categoryDir = category === "checkpoint" ? "Checkpoints" : category === "spec" ? "Specs" : "Chunks";
-    const fileName = `${date}-${projectSlug}-${slug}${phaseStr}.md`;
-    const vaultPath = join(v2VaultDir(), categoryDir, fileName);
-
-    const frontmatter = [
-      "---",
-      `type: ${category}`,
-      `key: ${key}`,
-      `project: ${projectSlug}`,
-      `date: ${date}`,
-      ...(session_id ? [`session: ${session_id}`] : []),
-      ...(phase != null ? [`phase: ${phase}`] : []),
-      `tags: [${[category, ...tags || []].join(", ")}]`,
-      ...(normalizedProject ? [`working_dir: ${normalizedProject}`] : []),
-      "---",
-    ].join("\n");
-
-    const fileContent = `${frontmatter}\n\n${content}\n`;
-
-    mkdirSync(join(v2VaultDir(), categoryDir), { recursive: true });
-    writeFileSync(vaultPath, fileContent, "utf-8");
-
-    // DB index: store in knowledge_index so ob_recall can find it
-    const result = v2db.prepare(`
-      INSERT INTO knowledge_index
-        (vault_path, key, content, tags, source, project_dir, maturity,
-         helpful, harmful, neutral, recall_count, last_recalled_at, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, 'progenitor', 0, 0, 0, 0, NULL, ?, ?)
-    `).run(vaultPath, key, content, [category, ...tags || []].join(", "), category, normalizedProject, now, now);
-
-    const id = Number(result.lastInsertRowid);
-
-    // Session provenance: knowledge_index has no session column, so link the
-    // artifact to its producing session here. Stores the vault path, not a
-    // second copy of the text — the vault file stays the source of truth.
-    const sessionUuid = session_id ?? writeSessionId().id;
-    let linkedToSession = false;
-    if (sessionUuid) {
-      try {
-        const sessionRowId = recordSession(v2db, sessionUuid, normalizedProject);
-        recordChunk(v2db, sessionRowId, category, vaultPath, { key, knowledge_index_id: id, phase });
-        linkedToSession = true;
-      } catch {
-        // Provenance is additive — never fail the store because of it.
-      }
-    }
-
-    return {
-      content: [{
-        type: "text" as const,
-        text: `${category === "checkpoint" ? "Checkpoint" : "Chunk"} stored (id: ${id}):\n  Key: ${key}\n  Vault: ${vaultPath}\n  Tags: ${[category, ...tags || []].join(", ")}`
-          + (linkedToSession ? `\n  Session: ${sessionUuid}` : ""),
-      }],
-    };
-  }
+  async (args) => handleStoreChunk(args)
 );
+
+export interface StoreChunkArgs {
+  content: string;
+  key: string;
+  tags?: string[];
+  category?: "checkpoint" | "spec" | "note" | "other";
+  project_dir?: string;
+  session_id?: string;
+  phase?: number;
+}
+
+/** ob_store_chunk, exported so its session check is testable without the transport (T-003). */
+export async function handleStoreChunk(args: StoreChunkArgs): Promise<ToolResponse> {
+  const { content, key, tags, project_dir, phase } = args;
+  const category = args.category ?? "checkpoint";
+  // Same guard as ob_store: a chunk is stored the same way and leaks the same way.
+  const chunkScaffold = findToolCallScaffolding(content);
+  if (chunkScaffold) {
+    return { content: [{ type: "text" as const, text: scaffoldRejectionMessage(chunkScaffold) }], isError: true };
+  }
+  // T-003: a named session_id is a claim, checked before anything is written.
+  // With none named the chunk is linked to the PROVEN session, or to none.
+  const chunkSession = attributedSession(args.session_id);
+  if (chunkSession.refusal) {
+    return { content: [{ type: "text" as const, text: `ob_store_chunk refused: ${chunkSession.refusal}` }], isError: true };
+  }
+  const session_id = chunkSession.id;
+
+  const v2db = getV2Db();
+  const now = new Date().toISOString();
+  const date = now.slice(0, 10);
+  const tagsStr = tags ? tags.join(", ") : "";
+  const normalizedProject = canonicalizeProjectDir(project_dir);
+  // Same rule as ob_store: the canonical path is lowercased, so the display
+  // name comes from the raw dir. Matches existing checkpoint filenames.
+  const projectSlug = normalizedProject ? projectDisplayName(project_dir, "general") : "general";
+  const slug = slugify(key);
+  const phaseStr = phase != null ? `-phase-${phase}` : "";
+
+  // Vault-first: write markdown file
+  const categoryDir = category === "checkpoint" ? "Checkpoints" : category === "spec" ? "Specs" : "Chunks";
+  const fileName = `${date}-${projectSlug}-${slug}${phaseStr}.md`;
+  const vaultPath = join(v2VaultDir(), categoryDir, fileName);
+
+  const frontmatter = [
+    "---",
+    `type: ${category}`,
+    `key: ${key}`,
+    `project: ${projectSlug}`,
+    `date: ${date}`,
+    ...(session_id ? [`session: ${session_id}`] : []),
+    ...(phase != null ? [`phase: ${phase}`] : []),
+    `tags: [${[category, ...tags || []].join(", ")}]`,
+    ...(normalizedProject ? [`working_dir: ${normalizedProject}`] : []),
+    "---",
+  ].join("\n");
+
+  const fileContent = `${frontmatter}\n\n${content}\n`;
+
+  mkdirSync(join(v2VaultDir(), categoryDir), { recursive: true });
+  writeFileSync(vaultPath, fileContent, "utf-8");
+
+  // DB index: store in knowledge_index so ob_recall can find it
+  const result = v2db.prepare(`
+    INSERT INTO knowledge_index
+      (vault_path, key, content, tags, source, project_dir, maturity,
+       helpful, harmful, neutral, recall_count, last_recalled_at, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, 'progenitor', 0, 0, 0, 0, NULL, ?, ?)
+  `).run(vaultPath, key, content, [category, ...tags || []].join(", "), category, normalizedProject, now, now);
+
+  const id = Number(result.lastInsertRowid);
+
+  // Session provenance: knowledge_index has no session column, so link the
+  // artifact to its producing session here. Stores the vault path, not a
+  // second copy of the text — the vault file stays the source of truth.
+  const sessionUuid = session_id;
+  let linkedToSession = false;
+  if (sessionUuid) {
+    try {
+      const sessionRowId = recordSession(v2db, sessionUuid, normalizedProject);
+      recordChunk(v2db, sessionRowId, category, vaultPath, { key, knowledge_index_id: id, phase });
+      linkedToSession = true;
+    } catch {
+      // Provenance is additive — never fail the store because of it.
+    }
+  }
+
+  return {
+    content: [{
+      type: "text" as const,
+      text: `${category === "checkpoint" ? "Checkpoint" : "Chunk"} stored (id: ${id}):\n  Key: ${key}\n  Vault: ${vaultPath}\n  Tags: ${[category, ...tags || []].join(", ")}`
+        + (linkedToSession ? `\n  Session: ${sessionUuid}` : "")
+        + (chunkSession.id === null ? `\n  Session: NOT linked — ${chunkSession.reason}` : ""),
+    }],
+  };
+}
 
 // --- Shared scoring logic ---
 // The implementation lives in pipelines/sync/score.ts so the CLI uses the same

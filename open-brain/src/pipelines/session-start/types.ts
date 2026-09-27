@@ -4,8 +4,10 @@ export interface SessionStartOptions {
   projectRoot: string;
   homePath: string;
   /**
-   * Authoritative session UUID, when the caller already knows it (hook payload
-   * or a prior ob_set_session). Falls back to transcript discovery if omitted.
+   * Authoritative session UUID, when the caller already knows it.
+   * `undefined` falls back to transcript discovery. `null` does not: discovery
+   * picks the newest transcript in the checkout, which is another session's
+   * when this caller cannot prove its own (T-003 D1).
    */
   sessionId?: string | null;
   /**

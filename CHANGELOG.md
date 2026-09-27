@@ -1,5 +1,47 @@
 # Changelog
 
+## Unreleased (T-003) — a server knows its own session
+
+Brief: `docs/loops/t003-session-identity-brief.md` (planner, record session 109). Measurements and rulings:
+`docs/loops/t003-step0.md`. Stacked on T-179 round 2. There is no version bump in these commits: the
+release is Aaron's (D-019).
+
+### Fixed
+
+- **A server wrote under another session's id (T-003; QA 125's A7, A8, A9).** The id came from
+  `ob_set_session`'s unchecked argument, or from the per-project slot in `active-session.json` (which
+  holds whichever session in the checkout started last), and was held in memory, where it outlived its
+  session: one claude process serves many sessions by `/clear` and the MCP server survives every one
+  (observed: five sessions, one server). Now the session is proven per claude **process**:
+  - the SessionStart hook writes `~/.claude/open-brain/by-pid/<CLAUDE_PID>.json` (session id plus the
+    claude process's start time) **first**, before anything slow;
+  - every attributed write reads the file named by the server's own `process.ppid` (never `CLAUDE_PID`,
+    which an MCP server inherits from whoever launched claude), requires the start time to match (a
+    reused pid refuses), and is never cached, so after `/clear` the next write is the new session's;
+  - SessionEnd removes the file when it still holds its own session, so a failed SessionStart leaves no
+    proof and the server refuses rather than writing as the old session;
+  - `ob_set_session` is a **check**: an id other than the proven one is refused, naming both. `ob_end` and
+    `ob_store_chunk` refuse a `session_id` that is not the proven one;
+  - no proof means no attributed write: `set_handoff` refuses, recall and feedback say "NOT LOGGED" with
+    the reason. **Slot adoption is removed** (`resolveWriteSession` is gone), not guarded.
+- **R179-2's different-checkout refusal is superseded:** no id but the server's own can register now, in
+  any checkout, so its pinned LIMIT (same-checkout impersonation) is closed.
+
+### Changed
+
+- **Cursor no longer attributes writes** (ruling Q2): Cursor writes no proof, so a Cursor server refuses
+  attributed writes. A measured Cursor proof is a follow-up task. `end.md` (all three copies) says so.
+- `ob_stats` reports the session proof (id and parent pid, or the reason there is none) in place of the
+  self-registration count.
+
+### Limits
+
+- Stale adoption needs SessionStart AND SessionEnd to fail across one `/clear`; either alone is caught.
+- The ordering "SessionStart completes before the new session's first tool call" was measured headless,
+  3 of 3, not interactively timed.
+- The server must be claude's **direct** child (setup registers `command: node`, which is). A wrapper
+  between them makes every attributed write refuse.
+
 ## [0.44.3] - Unreleased — the importer carries none of SIA's history into another project
 
 Brief: `docs/loops/importer-fixes-brief.md` (planner, record session 100). These fixes gate every

@@ -1,0 +1,41 @@
+
+ RUN  v3.2.4 C:/Users/melve/Worktrees/sia-builder/open-brain
+
+ ✓ tests/pipelines/state-import-r3.test.ts (16 tests) 2609ms
+   ✓ R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step  527ms
+   ✓ R3-3 (IF-19): a failed rollback leaves a project that says so, and nothing later makes it worse > QA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step  336ms
+ ✓ tests/pipelines/state-import-atomic.test.ts (8 tests) 1187ms
+ ✓ tests/pipelines/state-import-leftovers.test.ts (21 tests) 4864ms
+   ✓ R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED > a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the ADRs not imported  2172ms
+   ✓ R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED > guard: a readable DECISIONS.md says nothing about NUL bytes  1089ms
+ ✓ tests/pipelines/state-import-v3.test.ts (4 tests) 621ms
+ ✓ tests/pipelines/state-import.test.ts (9 tests) 556ms
+ ✓ tests/pipelines/state-import-qa122.test.ts (4 tests) 165ms
+ ✓ tests/pipelines/state-import-staleness.test.ts (8 tests) 6999ms
+   ✓ T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale  4644ms
+   ✓ T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > --commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report  1973ms
+ ✓ tests/pipelines/state-import-seeds.test.ts (2 tests) 957ms
+   ✓ T-175: an import carries none of SIA's own history (IF-1) > the CLI's draft line says verified 0 · gaps 0  894ms
+ ✓ tests/pipelines/state-import-r4.test.ts (22 tests) 13072ms
+   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  2622ms
+   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  2190ms
+   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  2142ms
+   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  1607ms
+   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  1532ms
+   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  1491ms
+   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > the draft's report says --commit refuses while an input cannot be read, and the CLI's draft summary says so too  758ms
+ ✓ tests/pipelines/state-import-r2.test.ts (18 tests) 16166ms
+   ✓ R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing  2566ms
+   ✓ R2-3 (IF-11): an import completes, or it changes nothing > PROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist  2167ms
+   ✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > a single-dash token that is not a known flag refuses, before or after the directory  3633ms
+   ✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > PROBE-12: a bare word before the directory is a second positional and refuses; the cwd's project is not committed  2260ms
+   ✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > PROBE-5b: a positional that names no existing directory refuses instead of walking up from the cwd  1495ms
+   ✓ R2-5 (IF-13): every protection has a test that fails without it > M6: a misspelled acknowledgement on a CURRENT project is refused by the flag check itself  1571ms
+   ✓ R2-5 (IF-13): every protection has a test that fails without it > M13: --accept-stale with --draft refuses and writes no draft  634ms
+   ✓ R2-5 (IF-13): every protection has a test that fails without it > M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output  1423ms
+
+ Test Files  10 passed (10)
+      Tests  112 passed (112)
+   Start at  03:17:08
+   Duration  17.16s (transform 773ms, setup 306ms, collect 2.85s, tests 47.20s, environment 4ms, prepare 2.04s)
+
