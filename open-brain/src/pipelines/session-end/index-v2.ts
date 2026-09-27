@@ -125,10 +125,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
       .prepare(`SELECT id, vault_path, tags FROM knowledge_index WHERE id = ?`)
       .get(id) as KnowledgeIndexRow | undefined;
 
-    if (!row) {
-      vanished.push(id);
-      continue;
-    }
+    if (!row) continue;
 
     const tags = row.tags
       .split(",")
