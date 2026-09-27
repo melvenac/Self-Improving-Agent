@@ -168,10 +168,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     if (sessionId) {
       try {
         recordFeedbackEvent(db, sessionId, id, rating, input.recalledOrigin, method);
-      } catch (err) {
-        wrote = false;
-        notWritten.push({ id, reason: err instanceof Error ? err.message : String(err) });
-      }
+      } catch { /* non-critical */ }
     }
     if (!wrote) continue;
     updateFeedbackV2(db, row.vault_path, rating);
