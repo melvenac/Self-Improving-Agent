@@ -450,7 +450,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       const id = op.id ?? nextId("T", s.tasks.map((t) => t.id));
       if (s.tasks.some((t) => t.id === id)) return { ok: false, error: `task ${id} already exists` };
       if (op.supersedes && !s.tasks.some((t) => t.id === op.supersedes)) return { ok: false, error: `supersedes unknown task ${op.supersedes}` };
-      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "", note_by: !op.note ? [] : ctx.uuid === null ? null : [ctx.uuid], closed_rev: null });
+      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "", note_by: [], closed_rev: null });
       if (op.note) ctx.noteChanges.push(`${id} note SET: 0 -> ${op.note.length} chars`);
       return { ok: true, id };
     }
