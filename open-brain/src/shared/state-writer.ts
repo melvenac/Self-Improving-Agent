@@ -397,8 +397,9 @@ function appendedBy(prev: string[] | null, prevNote: string, uuid: string | null
 function appendNote(t: Task, add: string, ctx: OpContext): void {
   const before = t.note.length;
   t.note_by = appendedBy(t.note_by, t.note, ctx.uuid);
-  t.note = t.note ? `${t.note}${NOTE_JOIN}${add}` : add;
-  ctx.noteChanges.push(`${t.id} note APPENDED: +${t.note.length - before} chars (${before} -> ${t.note.length})`);
+  const after = t.note ? before + NOTE_JOIN.length + add.length : add.length;
+  t.note = add;
+  ctx.noteChanges.push(`${t.id} note APPENDED: +${after - before} chars (${before} -> ${after})`);
 }
 
 /**
