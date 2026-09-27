@@ -1,0 +1,14 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 3fcb7c8..8ae8b37 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -496,8 +496,7 @@ function adrNotImported(u: DecisionsUnreadable): string {
+ 
+ /** The line the report and both CLI modes print, so a latest log cannot be named in only one of them. */
+ export function describeLastSession(last: ImportReport["last_session"]): string | null {
+-  if (!last.unreadable) return null;
+-  return `${last.file} ${last.unreadable}. Date used: ${last.date}, ${last.date_why}.`;
++  return null;
+ }
+ 
+ export function findLastSession(sessionsDir: string, today: string): ImportReport["last_session"] {

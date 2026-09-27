@@ -1,0 +1,14 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 3fcb7c8..ed8669d 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -869,8 +869,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
+   if (r.handoff.sections_not_imported.length) { L.push("", "Sections NOT imported (they stay in the snapshot):"); for (const s of r.handoff.sections_not_imported) L.push(`- ${s}`); }
+   L.push("", "## Verified and gaps", "", `verified[]: ${r.verified_imported} · gaps[]: ${r.gaps_imported}. The prose files carry none in a form the importer reads, and it invents none. Record them with ob_state after the commit.`);
+   L.push("", "## Last session", "", `Session ${r.last_session.n} — ${r.last_session.date} — uuid ${r.last_session.uuid ?? "none"} (${r.last_session.file})`);
+-  const lastLine = describeLastSession(r.last_session);
+-  if (lastLine) L.push(lastLine);
++  // last session unreadable line dropped
+   L.push("", "## SUMMARY.md lines `--commit` will remove", "");
+   if (!r.summary_removal) L.push("_SUMMARY.md absent — nothing to remove._");
+   else {

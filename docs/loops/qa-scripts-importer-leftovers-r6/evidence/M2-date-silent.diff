@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 3fcb7c8..4fdd102 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -519,7 +519,7 @@ export function findLastSession(sessionsDir: string, today: string): ImportRepor
+   const file = `.agents/SESSIONS/${best.file}`;
+   if (decoded.undecodable) {
+     if (fromLog) return row(best.n, file, fromLog, uuid, "read from the log heading", decoded.undecodable);
+-    return row(best.n, file, today, uuid, "the migration date, because the log's date line could not be read", decoded.undecodable);
++    return row(best.n, file, today, uuid, "the migration date", decoded.undecodable);
+   }
+   if (fromLog) return row(best.n, file, fromLog, uuid, "read from the log heading", null);
+   return row(best.n, file, today, uuid, "the migration date, because the log heading has no date", null);

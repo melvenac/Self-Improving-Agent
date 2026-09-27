@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 3fcb7c8..3fabc2d 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -490,7 +490,7 @@ function adrNotImported(u: DecisionsUnreadable): string {
+   // An odd-length FE FF file is not the NUL-stripping case. "none found" would
+   // claim the bytes were searched and held no ADR, which is how QA 153's lie
+   // hid `### ADR-1` written as UTF-8 under the mark.
+-  if (/odd number of bytes/.test(u.evidence)) return "could not be read";
++  if (/odd number of bytes/.test(u.evidence)) return "none found";
+   return "none found";
+ }
+ 
