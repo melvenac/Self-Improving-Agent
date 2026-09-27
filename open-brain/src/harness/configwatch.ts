@@ -1320,7 +1320,7 @@ export class MachineConfigWatch {
       if (s.lexicalKind === "symlink") return linkSide(s);
       // R91. A parent link prints its lstat, and the file's stat when observe has one.
       if (s.viaLink !== null) {
-        return s.dev === null ? ancestorLinkText(s) : `${ancestorLinkText(s)}; resolves to: ${factText(s)}`;
+        return ancestorLinkText(s);
       }
       if (s.dev === null) return "no facts: realpath failed";
       return factText(s);
