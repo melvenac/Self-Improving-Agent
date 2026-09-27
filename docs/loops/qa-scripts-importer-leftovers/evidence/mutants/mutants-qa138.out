@@ -1,0 +1,3 @@
+mutants-qa138 at d500730, 2026-09-27T00:39:37.300Z
+Q4-no-title-inbox-only: SURVIVED (R4-4: the no-title rule applied to INBOX.md only (not task.md, next-session.md)); tsc clean; vitest exit 0, red 0 of 113; 23s
+restored: src/pipelines/state-import/index.ts clean, src/cli.ts clean; 2026-09-27T00:40:00.830Z

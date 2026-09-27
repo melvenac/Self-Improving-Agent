@@ -1,0 +1,14 @@
+.agents/SESSIONS/next-session.md: 135 blob(s), 0 with no "# " line
+.agents/TASKS/INBOX.md: 135 blob(s), 0 with no "# " line
+.agents/TASKS/task.md: 135 blob(s), 0 with no "# " line
+open-brain/tests/fixtures-import-a2a-hub/.agents/SESSIONS/next-session.md: 1 blob(s), 0 with no "# " line
+open-brain/tests/fixtures-import-a2a-hub/.agents/TASKS/INBOX.md: 1 blob(s), 0 with no "# " line
+open-brain/tests/fixtures-import-a2a-hub/.agents/TASKS/task.md: 1 blob(s), 0 with no "# " line
+open-brain/tests/fixtures-import/.agents/SESSIONS/next-session.md: 1 blob(s), 0 with no "# " line
+open-brain/tests/fixtures-import/.agents/TASKS/INBOX.md: 1 blob(s), 0 with no "# " line
+open-brain/tests/fixtures-import/.agents/TASKS/task.md: 1 blob(s), 0 with no "# " line
+open-brain/tests/fixtures/.agents/TASKS/INBOX.md: 1 blob(s), 0 with no "# " line
+project-template/.agents/TASKS/INBOX.md: 1 blob(s), 0 with no "# " line
+project-template/.agents/TASKS/task.md: 1 blob(s), 0 with no "# " line
+
+414 distinct blobs; 0 with no "# " line

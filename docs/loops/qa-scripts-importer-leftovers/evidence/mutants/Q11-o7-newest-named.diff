@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 34a366c..81cddf5 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -859,7 +859,7 @@ export function markersOldestFirst(names: string[]): string[] {
+ function refuseHalfRestored(root: string): void {
+   const archive = join(root, ".agents", "archive");
+   if (!existsSync(archive)) return;
+-  const left = markersOldestFirst(readdirSync(archive));
++  const left = markersOldestFirst(readdirSync(archive)).reverse();
+   if (left.length === 0) return;
+   const snapshots = left.map((n) => `.agents/archive/${n.slice(0, -INCOMPLETE_SUFFIX.length)}/`);
+   const markers = left.map((n) => `.agents/archive/${n}`).join(" and ");

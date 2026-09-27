@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 34a366c..1e273a9 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -595,7 +595,7 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
+     // Every judged input opens with a `# ` title. None readable means the text
+     // is empty or was decoded wrongly (UTF-7, or any encoding nobody named), so
+     // its words were not read either (R4-4; O12's zero bytes).
+-    if (!text.split(/\r?\n/).some((l) => l.startsWith("# "))) {
++    if (!text.split(/\r?\n/).some((l) => l.startsWith("# ")) && false) {
+       inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: `has no readable \`# \` title (${text.length === 0 ? "it is empty" : "its encoding is not one the importer reads, UTF-7 among them"}), so its words cannot be read`, could_not_tell: "unreadable" });
+       continue;
+     }

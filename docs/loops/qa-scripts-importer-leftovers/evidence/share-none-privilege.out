@@ -1,0 +1,22 @@
+== child with SeBackupPrivilege DISABLED
+HELD pid=2992 share=None access=Read mode=Open
+parent node readFileSync: OK
+SeBackupPrivilege disabled True err=0
+
+SeBackupPrivilege                         Back up files and directories                                      Disabled
+SeRestorePrivilege                        Restore files and directories                                      Enabled 
+child node readFileSync: EBUSY 
+== child with SeRestorePrivilege disabled (control)
+HELD pid=12232 share=None access=Read mode=Open
+parent node readFileSync: OK
+SeRestorePrivilege disabled True err=0
+
+SeBackupPrivilege                         Back up files and directories                                      Enabled 
+SeRestorePrivilege                        Restore files and directories                                      Disabled
+child node readFileSync: OK 20 bytes 
+== same hold: Node readFileSync, Node copyFileSync, .NET ReadAllText (parent, elevated)
+HELD pid=8848 share=None access=Read mode=Open
+node readFileSync: OK 20 bytes
+node copyFileSync: EBUSY
+ps ReadAllText: The process cannot access the file 'C:\qa-scratch\il138\ebusy\INBOX.md' because it is being used by another process.Exception calling "ReadAllText" with "1" argument(s): "The process cannot access the file 'C:\qa-scratch\il138\ebusy\INBOX.md' because it is being used by another process."
+hold released

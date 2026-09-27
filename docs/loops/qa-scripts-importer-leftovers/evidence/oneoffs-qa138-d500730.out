@@ -1,0 +1,10 @@
+(a) DECISIONS.md FE FF, odd length 55
+    --draft exit 1: state import refused: Buffer size must be a multiple of 16-bits
+    --commit exit 1: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+    state.json false
+(b) Session_7.md FE FF, odd length 35
+    --draft exit 1: state import refused: Buffer size must be a multiple of 16-bits
+(c) INBOX.md: PS 5.1 '>' then Git Bash 'echo >>': size 195, head fffe2300, tail 682a2a202d206c617465720a
+    --draft exit 0: state import — draft (nothing else changed) | Root: C:\qa-scratch\il138\oneoff-cand\c-utf16-then-gitbash-append | Draft:  .agents/state.draft.json | Report: .agents/state.import-report.md | Validates: yes | Current session: 7 (.agents/SESSIONS/Session_7.md) | Staleness: 0 stale · 0 could not tell · 3 current. Details are in the report's first section. | Tasks: 1 (open 1, in_progress 0, blocked 0, done 0); superseded links 0; unparsed lines 2 | Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found | Handoff: pick_up 1 lines, watch_out 0, open_questions 0 | SUMMARY.md: --commit will remove 3 lines (1 blockquote + 0 Current State) | Review the report, then run: open-brain state import --commit
+    --commit exit 0: state import — committed | Root: C:\qa-scratch\il138\oneoff-cand\c-utf16-then-gitbash-append | Snapshot: .agents\archive\pre-state-migration-2026-09-26 (8 files) | Wrote:    .agents/state.json at revision 0 | SUMMARY.md: removed 3 lines (1 blockquote + 0 Current State); kept Architecture | Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md | Moved into snapshot: .agents/archive/pre-state-migration-2026-09-26/state.draft.json, .agents/archive/pre-state-migration-2026-09-26/state.import-report.md
+    state.json tasks ["A task"]

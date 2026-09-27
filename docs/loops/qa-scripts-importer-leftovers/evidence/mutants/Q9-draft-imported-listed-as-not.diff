@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 34a366c..374bbf4 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -398,7 +398,7 @@ export function decisionsUnreadable(text: string, evidence: string, imported: st
+ export function describeDecisionsUnreadable(u: DecisionsUnreadable): string[] {
+   return [
+     `.agents/SYSTEM/DECISIONS.md ${u.evidence}. It is not judged, so it does not block --commit: it is imported as far as it reads.`,
+-    `ADRs imported: ${u.imported.length ? u.imported.join(", ") : "none"}`,
++    `ADRs imported: none`,
+     `ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ${u.not_imported.length ? u.not_imported.join(", ") : "none found"}`,
+   ];
+ }

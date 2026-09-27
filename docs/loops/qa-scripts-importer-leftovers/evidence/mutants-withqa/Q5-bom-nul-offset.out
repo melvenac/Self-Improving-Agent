@@ -1,0 +1,7 @@
+mutants-qa138 at d500730, 2026-09-27T00:44:22.143Z
+Q5-bom-nul-offset: KILLED (R4-4: the BOM path's first-NUL byte counted in characters, not bytes); tsc clean; vitest exit 1, red 4 of 123; 26s
+    red: pipelines/state-import-qa138.test.ts > QA 138 D1 (RED): a UTF-16BE mark over an odd number of bytes a judged INBOX.md is filed unreadable, not thrown :: RangeError: Buffer size must be a multiple of 16-bits
+    red: pipelines/state-import-qa138.test.ts > QA 138 D1 (RED): a UTF-16BE mark over an odd number of bytes a NOT-judged DECISIONS.md does not stop the draft (R4-5: not judged, so it does not block) :: AssertionError: expected [Function] to not throw an error but 'RangeError [ERR_INVALID_BUFFER_SIZE]:…' was thrown
+    red: pipelines/state-import-qa138.test.ts > QA 138 D2 (RED): the no-title rule's evidence on a file the importer read correctly a valid UTF-8 next-session.md with `##` sections and no `# ` line is not said to be in an unread encoding :: AssertionError: expected 'has no readable `# ` title (its encod…' not to match /encoding is not one the importer reads/
+    red: pipelines/state-import-qa138.test.ts > QA 138 coverage (GREEN): what the candidate's own tests left open a UTF-16LE mark whose text holds a NUL names the NUL's byte in the file :: AssertionError: expected 'has a UTF-16LE byte-order mark, but t…' to contain '1 NUL character(s), the first at byte…'
+restored: src/pipelines/state-import/index.ts clean, src/cli.ts clean; 2026-09-27T00:44:48.212Z

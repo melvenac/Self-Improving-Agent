@@ -1,0 +1,100 @@
+test	Set up job	2026-09-27T00:47:20.8836224Z Runner name: 'tcm-2'
+test	Set up job	2026-09-27T00:47:20.8838036Z Machine name: 'tcm'
+test	Typecheck	﻿2026-09-27T00:47:44.7222444Z ##[group]Run npx tsc --noEmit
+test	Typecheck	2026-09-27T00:47:44.7222787Z npx tsc --noEmit
+test	Test	2026-09-27T00:47:50.3382544Z  ✓ tests/shared/state-writer.test.ts (41 tests) 511ms
+test	Test	2026-09-27T00:47:50.4660289Z  ✓ tests/pipelines/sync/checks.test.ts (102 tests) 482ms
+test	Test	2026-09-27T00:47:50.6983292Z  ✓ tests/server.test.ts (28 tests) 436ms
+test	Test	2026-09-27T00:47:52.9700243Z  ✓ tests/pipelines/sync/record-erasure.test.ts (16 tests | 1 skipped) 1884ms
+test	Test	2026-09-27T00:47:54.3543548Z  ✓ tests/harness/refwatch-stage.test.ts (19 tests) 3434ms
+test	Test	2026-09-27T00:47:54.5841326Z  ✓ tests/harness/policies.test.ts (25 tests) 1206ms
+test	Test	2026-09-27T00:47:54.9982248Z  ✓ tests/pipelines/state-import.test.ts (9 tests) 208ms
+test	Test	2026-09-27T00:47:55.5119936Z  ✓ tests/pipelines/session-start/state-render.test.ts (32 tests) 34ms
+test	Test	2026-09-27T00:47:56.1453469Z  ✓ tests/pipelines/state-import-r3.test.ts (16 tests) 218ms
+test	Test	2026-09-27T00:48:02.9210395Z  ✓ tests/harness/runtime.test.ts (44 tests) 11999ms
+test	Test	2026-09-27T00:48:05.1197977Z  ✓ tests/pipelines/state-import-r2.test.ts (18 tests) 10115ms
+test	Test	2026-09-27T00:48:05.4822721Z  ✓ tests/active-session.test.ts (48 tests) 35ms
+test	Test	2026-09-27T00:48:05.8632345Z  ✓ tests/trigger/query.test.ts (5 tests) 37ms
+test	Test	2026-09-27T00:48:11.1272986Z  ✓ tests/pipelines/state-import-r4.test.ts (22 tests) 7763ms
+test	Test	2026-09-27T00:48:11.2571368Z  ✓ tests/cli-flags.test.ts (33 tests) 14805ms
+test	Test	2026-09-27T00:48:11.4485917Z  ✓ tests/harness/gate-live.test.ts (16 tests) 28ms
+test	Test	2026-09-27T00:48:11.7052728Z  ✓ tests/pipelines/session-end/index-v2.test.ts (9 tests) 60ms
+test	Test	2026-09-27T00:48:12.1354675Z  ✓ tests/pipelines/state-views.test.ts (14 tests) 30ms
+test	Test	2026-09-27T00:48:12.6904760Z  ✓ tests/pipelines/sync/checks-state.test.ts (14 tests) 126ms
+test	Test	2026-09-27T00:48:13.7635990Z  ✓ tests/pipelines/state-import-leftovers.test.ts (22 tests) 1891ms
+test	Test	2026-09-27T00:48:14.6296464Z  ✓ tests/shared/session-order.test.ts (10 tests) 434ms
+test	Test	2026-09-27T00:48:14.9509308Z  ✓ tests/pipelines/session-start/tree-currency.test.ts (13 tests) 1883ms
+test	Test	2026-09-27T00:48:15.1278215Z  ✓ tests/trigger/floor.test.ts (12 tests) 121ms
+test	Test	2026-09-27T00:48:15.3632851Z  ✓ tests/shadow-evaluate.test.ts (27 tests) 65ms
+test	Test	2026-09-27T00:48:15.8203708Z  ✓ tests/db-v2.test.ts (15 tests) 107ms
+test	Test	2026-09-27T00:48:16.2391132Z  ✓ tests/trigger/fires.test.ts (14 tests) 53ms
+test	Test	2026-09-27T00:48:17.7697520Z  ✓ tests/trigger/hook.test.ts (12 tests) 11479ms
+test	Test	2026-09-27T00:48:18.0943022Z  ✓ tests/harness/checks.test.ts (24 tests) 1441ms
+test	Test	2026-09-27T00:48:18.5535518Z  ✓ tests/shared/state-schema.test.ts (18 tests) 68ms
+test	Test	2026-09-27T00:48:19.1576981Z  ✓ tests/pipelines/session-start/role-files.test.ts (13 tests) 1075ms
+test	Test	2026-09-27T00:48:19.8922379Z  ✓ tests/pipelines/sync/staleness.test.ts (17 tests) 923ms
+test	Test	2026-09-27T00:48:20.3009124Z  ✓ tests/harness/workspace.test.ts (31 tests) 829ms
+test	Test	2026-09-27T00:48:21.0952557Z  ✓ tests/pipelines/session-start/handoff-provenance.test.ts (11 tests) 848ms
+test	Test	2026-09-27T00:48:21.5712847Z  ✓ tests/pipelines/state-migrate.test.ts (15 tests) 57ms
+test	Test	2026-09-27T00:48:21.9090235Z  ✓ tests/vault-writer.test.ts (21 tests) 25ms
+test	Test	2026-09-27T00:48:23.2297501Z  ✓ tests/cli-bootstrap.test.ts (13 tests) 7794ms
+test	Test	2026-09-27T00:48:23.4304111Z  ✓ tests/shared/cli-args.test.ts (56 tests) 1185ms
+test	Test	2026-09-27T00:48:24.2500155Z  ✓ tests/pipelines/state-import-staleness.test.ts (8 tests) 3560ms
+test	Test	2026-09-27T00:48:24.6485856Z  ✓ tests/topics.test.ts (18 tests) 99ms
+test	Test	2026-09-27T00:48:24.8296228Z  ✓ tests/harness/git.test.ts (29 tests) 1086ms
+test	Test	2026-09-27T00:48:25.4578610Z  ✓ tests/pipelines/sync/greeting-size.test.ts (8 tests) 408ms
+test	Test	2026-09-27T00:48:26.1668118Z  ✓ tests/harness/gate-artifacts.test.ts (7 tests) 2528ms
+test	Test	2026-09-27T00:48:26.2219054Z  ✓ tests/pipelines/detach.test.ts (14 tests) 1096ms
+test	Test	2026-09-27T00:48:26.5707494Z  ✓ tests/harness/schema.test.ts (21 tests) 37ms
+test	Test	2026-09-27T00:48:26.6392483Z  ✓ tests/trigger/no-network.test.ts (3 tests) 22ms
+test	Test	2026-09-27T00:48:27.0242780Z  ✓ tests/trigger/negatives.test.ts (11 tests) 127ms
+test	Test	2026-09-27T00:48:27.0502989Z  ✓ tests/shared/paths.test.ts (14 tests | 1 skipped) 121ms
+test	Test	2026-09-27T00:48:27.3957350Z  ✓ tests/shared/handoff-guard.test.ts (11 tests) 1628ms
+test	Test	2026-09-27T00:48:27.4262308Z  ✓ tests/pipelines/session-end/recalled-ids.test.ts (17 tests) 46ms
+test	Test	2026-09-27T00:48:27.8037737Z  ✓ tests/ranking.test.ts (11 tests) 41ms
+test	Test	2026-09-27T00:48:27.8660234Z  ✓ tests/shared/closeout-erasure.test.ts (10 tests) 398ms
+test	Test	2026-09-27T00:48:28.3151756Z  ✓ tests/pipelines/session-start/state-reader.test.ts (13 tests) 69ms
+test	Test	2026-09-27T00:48:28.8492520Z  ✓ tests/pipelines/state-import-atomic.test.ts (8 tests) 152ms
+test	Test	2026-09-27T00:48:29.2182891Z  ✓ tests/rating-method.test.ts (8 tests) 52ms
+test	Test	2026-09-27T00:48:29.5642640Z  ✓ tests/index-upsert.test.ts (10 tests) 39ms
+test	Test	2026-09-27T00:48:29.7303337Z  ✓ tests/harness/refwatch.test.ts (8 tests) 1520ms
+test	Test	2026-09-27T00:48:30.0266941Z  ✓ tests/pipelines/sync/module-boundary.test.ts (12 tests) 40ms
+test	Test	2026-09-27T00:48:30.2139097Z    × QA 138 D1 (RED): a UTF-16BE mark over an odd number of bytes > a judged INBOX.md is filed unreadable, not thrown 15ms
+test	Test	2026-09-27T00:48:30.2142347Z    × QA 138 D1 (RED): a UTF-16BE mark over an odd number of bytes > a NOT-judged DECISIONS.md does not stop the draft (R4-5: not judged, so it does not block) 8ms
+test	Test	2026-09-27T00:48:30.2146604Z    × QA 138 D2 (RED): the no-title rule's evidence on a file the importer read correctly > a valid UTF-8 next-session.md with `##` sections and no `# ` line is not said to be in an unread encoding 13ms
+test	Test	2026-09-27T00:48:30.3922654Z  ✓ tests/shadow-stage.test.ts (14 tests) 59ms
+test	Test	2026-09-27T00:48:30.6371096Z  ✓ tests/relocate.test.ts (8 tests) 75ms
+test	Test	2026-09-27T00:48:30.8289075Z  ✓ tests/pipelines/sync/mirror-parity.test.ts (13 tests) 29ms
+test	Test	2026-09-27T00:48:31.2529022Z  ✓ tests/pipelines/state-import-v3.test.ts (4 tests) 200ms
+test	Test	2026-09-27T00:48:31.2749929Z  ✓ tests/pipelines/session-start/session-log.test.ts (9 tests) 31ms
+test	Test	2026-09-27T00:48:31.6107489Z  ✓ tests/harness/gate.test.ts (10 tests) 13ms
+test	Test	2026-09-27T00:48:32.2785159Z  ✓ tests/pipelines/sync/repo-root.test.ts (7 tests) 610ms
+test	Test	2026-09-27T00:48:32.5976850Z  ✓ tests/shadow-strategies.test.ts (9 tests) 32ms
+test	Test	2026-09-27T00:48:32.6303050Z  ✓ tests/pipelines/session-start/derived-artifacts.test.ts (9 tests) 628ms
+test	Test	2026-09-27T00:48:32.9753078Z  ✓ tests/pipelines/sync/pipeline-health.test.ts (12 tests) 13ms
+test	Test	2026-09-27T00:48:33.0343940Z  ✓ tests/pipelines/state-import-qa122.test.ts (4 tests) 33ms
+test	Test	2026-09-27T00:48:33.2981488Z  ✓ tests/pipelines/sync/scorer.test.ts (11 tests) 9ms
+test	Test	2026-09-27T00:48:33.3901863Z  ✓ tests/pipelines/store/index.test.ts (3 tests) 27ms
+test	Test	2026-09-27T00:48:33.5956508Z  ✓ tests/content-guard.test.ts (11 tests) 10ms
+test	Test	2026-09-27T00:48:33.6966279Z  ✓ tests/shared/skill-index.test.ts (10 tests) 13ms
+test	Test	2026-09-27T00:48:34.0241238Z  ✓ tests/pipelines/sync/command-parity.test.ts (9 tests) 25ms
+test	Test	2026-09-27T00:48:34.0550093Z  ✓ tests/session-provenance.test.ts (9 tests) 28ms
+test	Test	2026-09-27T00:48:34.7078126Z  ✓ tests/recall-broadening.test.ts (8 tests) 24ms
+test	Test	2026-09-27T00:48:34.7468293Z  ✓ tests/pipelines/template-seed.test.ts (3 tests) 31ms
+test	Test	2026-09-27T00:48:35.0282620Z  ✓ tests/vault-archive.test.ts (6 tests) 17ms
+test	Test	2026-09-27T00:48:35.0552760Z  ✓ tests/pipelines/session-start/agent-identity.test.ts (6 tests) 12ms
+test	Test	2026-09-27T00:48:35.3325855Z  ✓ tests/pipelines/sync/history.test.ts (7 tests) 12ms
+test	Test	2026-09-27T00:48:35.4002708Z  ✓ tests/pipelines/sync/scorer-integration.test.ts (5 tests) 20ms
+test	Test	2026-09-27T00:48:35.7273134Z  ✓ tests/setup-hooks.test.ts (4 tests) 9ms
+test	Test	2026-09-27T00:48:35.7543791Z  ✓ tests/pipelines/session-start/index.test.ts (8 tests) 31ms
+test	Test	2026-09-27T00:48:36.1334960Z  ✓ tests/pipelines/sync/hook-registration.test.ts (7 tests) 15ms
+test	Test	2026-09-27T00:48:36.4461829Z  ✓ tests/pipelines/session-start/session-discovery.test.ts (6 tests) 11ms
+test	Test	2026-09-27T00:48:36.7689767Z  ✓ tests/pipelines/state-import-seeds.test.ts (2 tests) 621ms
+test	Test	2026-09-27T00:48:36.9287316Z  ✓ tests/pipelines/sync/index.test.ts (4 tests) 76ms
+test	Test	2026-09-27T00:48:37.0557537Z  ✓ tests/pipelines/session-start/drift-detector.test.ts (4 tests) 7ms
+test	Test	2026-09-27T00:48:38.7594146Z  ✓ tests/harness/cli.test.ts (17 tests) 10962ms
+test	Test	2026-09-27T00:48:38.7751442Z  FAIL  tests/pipelines/state-import-qa138.test.ts > QA 138 D1 (RED): a UTF-16BE mark over an odd number of bytes > a judged INBOX.md is filed unreadable, not thrown
+test	Test	2026-09-27T00:48:38.8115399Z  FAIL  tests/pipelines/state-import-qa138.test.ts > QA 138 D1 (RED): a UTF-16BE mark over an odd number of bytes > a NOT-judged DECISIONS.md does not stop the draft (R4-5: not judged, so it does not block)
+test	Test	2026-09-27T00:48:38.8139762Z  FAIL  tests/pipelines/state-import-qa138.test.ts > QA 138 D2 (RED): the no-title rule's evidence on a file the importer read correctly > a valid UTF-8 next-session.md with `##` sections and no `# ` line is not said to be in an unread encoding
+test	Test	2026-09-27T00:48:38.8194133Z  Test Files  1 failed | 88 passed (89)
+test	Test	2026-09-27T00:48:38.8202454Z       Tests  3 failed | 1340 passed | 2 skipped (1345)
