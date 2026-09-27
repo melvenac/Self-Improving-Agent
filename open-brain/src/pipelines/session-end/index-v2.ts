@@ -164,6 +164,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     // auto-feedback labels never reach the shadow harness and most sessions
     // would score as having no ground truth at all. The counter moves only
     // after that write lands: a throw used to be counted anyway (SILENT 16).
+    updateFeedbackV2(db, row.vault_path, rating);
     let wrote = true;
     if (sessionId) {
       try {
@@ -174,7 +175,6 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
       }
     }
     if (!wrote) continue;
-    updateFeedbackV2(db, row.vault_path, rating);
     ratings.push({ id, rating });
   }
 
