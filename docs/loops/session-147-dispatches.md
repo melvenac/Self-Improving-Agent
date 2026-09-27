@@ -467,3 +467,13 @@ QA PC: 182, 183.
   view)"). A small follow-up round, not a merge blocker: T-192 fixes the live billing block.
 - **PR and pushes held** until the QA queue finishes (the no-push-during-QA rule above). Then: open the T-192 PR for
   Aaron, and push this file.
+
+### QA 161 (/bootstrap r4 reconciled, `d74c0e5`): ACCEPT; ruled ACCEPTED; record 190 sent (21:57:18Z)
+
+- `qa/bootstrap-fix-r4-report` `ac04e7d`, ending `QA-161: REPORT COMPLETE`. R-BF-17 to R-BF-21 hold; all four installs pass
+  with no manual fix; five mutants killed on tcm. QA 145's regression rows pass 13 of 15: the two failures pin the pre-r4
+  `Next:` wording that R-BF-19 replaced, covered by `bootstrap-fix-r4.test.ts`'s install-N row. Expected, not a defect.
+- **Conflicts with master again,** as predicted: importer r6 (#184) changed the same `cli.ts:535` import line. **Record 190**
+  (cursor-builder, hub turn after 26): merge `origin/master` into `loop/bootstrap-fix-r4-rec`, resolved to the union of
+  `inboxWarning`, `describeDecisionsUnreadable` and `describeLastSession`, proven on tcm. The planner verifies the `--cc`
+  hunk and the runs, then opens the PR for Aaron. The accepted behaviour is unchanged; this is mechanical.
