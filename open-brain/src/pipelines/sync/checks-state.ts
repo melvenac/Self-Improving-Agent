@@ -137,17 +137,22 @@ export const execRunner: CommandRunner = (cmd, args, cwd) => {
  * anything else naming the sha, skip with the reason when `gh` is absent, not
  * authenticated, or cannot see a repository. The conclusion is in every
  * message, because absent is not green.
+ *
+ * T-192: a failure whose `test` job recorded no steps is `never-started`, not
+ * `failure`. GitHub's billing refusal looks like a failure and has no log.
+ * The check reads `gh run view <id> --json jobs` and the `test` job's `steps`
+ * array. It does not read the check-run annotation.
  */
 export function checkCiStatus(projectRoot: string, run: CommandRunner = execRunner, branch = "master"): CheckResult {
   const name = "ci-status";
-  const r = run("gh", ["run", "list", "--branch", branch, "--limit", "1", "--json", "conclusion,headSha,status"], projectRoot);
+  const r = run("gh", ["run", "list", "--branch", branch, "--limit", "1", "--json", "databaseId,conclusion,headSha,status"], projectRoot);
   if (!r.ok) {
     const why = /ENOENT|not found/i.test(r.error) ? "gh is not installed"
       : /auth|login|token|HTTP 401/i.test(r.error) ? "gh is not authenticated"
       : `gh failed: ${r.error.split("\n")[0]}`;
     return { name, report: true, severity: "skip", message: `skipped — ${why}; conclusion: unknown (absent is not green)` };
   }
-  let runs: Array<{ conclusion?: string; headSha?: string; status?: string }>;
+  let runs: Array<{ conclusion?: string; headSha?: string; status?: string; databaseId?: number }>;
   try {
     runs = JSON.parse(r.stdout);
   } catch {
@@ -161,6 +166,30 @@ export function checkCiStatus(projectRoot: string, run: CommandRunner = execRunn
   const conclusion = latest.conclusion || (latest.status ? `pending (${latest.status})` : "unknown");
   if (conclusion === "success") {
     return { name, report: true, severity: "pass", message: `${branch} ${sha} conclusion: success` };
+  }
+  if (conclusion === "failure" && latest.databaseId == null) {
+    return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure (steps not read: no databaseId)` };
+  }
+  if (conclusion === "failure") {
+    const view = run("gh", ["run", "view", String(latest.databaseId), "--json", "jobs"], projectRoot);
+    if (!view.ok) {
+      return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure (steps not read: ${view.error.split("\n")[0]})` };
+    }
+    let body: { jobs?: Array<{ name?: string; steps?: unknown[] }> };
+    try {
+      body = JSON.parse(view.stdout) as { jobs?: Array<{ name?: string; steps?: unknown[] }> };
+    } catch {
+      return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure (steps not read: unparseable job list)` };
+    }
+    const test = body.jobs?.find((j) => j.name === "test");
+    if (test && Array.isArray(test.steps) && test.steps.length === 0) {
+      return {
+        name,
+        report: true,
+        severity: "warn",
+        message: `${branch} ${sha} conclusion: never-started — job test recorded 0 steps. LIMIT: read from gh run view jobs[].steps, not the billing annotation; a failure with no steps for another reason is named never-started`,
+      };
+    }
   }
   return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: ${conclusion}` };
 }

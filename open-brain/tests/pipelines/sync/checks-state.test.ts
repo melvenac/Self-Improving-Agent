@@ -160,7 +160,7 @@ describe("ci-status (Loop 4 R4)", () => {
   it("warns on failure naming the sha, and on a pending run", () => {
     const failed = checkCiStatus(root, runner({ ok: true, stdout: JSON.stringify([{ conclusion: "failure", headSha: "deadbeefcafe", status: "completed" }]) }));
     expect(failed.severity).toBe("warn");
-    expect(failed.message).toBe("master deadbee conclusion: failure");
+    expect(failed.message).toBe("master deadbee conclusion: failure (steps not read: no databaseId)");
     const pending = checkCiStatus(root, runner({ ok: true, stdout: JSON.stringify([{ conclusion: "", headSha: "0123456789", status: "in_progress" }]) }));
     expect(pending.severity).toBe("warn");
     expect(pending.message).toBe("master 0123456 conclusion: pending (in_progress)");
@@ -186,6 +186,80 @@ describe("ci-status (Loop 4 R4)", () => {
     expect(r.severity).toBe("skip");
     expect(r.message).toMatch(/^skipped — /);
     expect(r.message).toContain("conclusion: unknown");
+  });
+});
+
+describe("ci-status names a job that never started (T-192)", () => {
+  const root = tmpdir();
+  /** Recorded `gh` payloads. The runner answers `run list` and `run view` separately. */
+  function gh(list: unknown, view?: unknown): CommandRunner {
+    return (_cmd, args) => {
+      if (args[1] === "list") return { ok: true, stdout: JSON.stringify(list) };
+      if (args[1] === "view") return { ok: true, stdout: JSON.stringify(view) };
+      return { ok: false, error: `unexpected gh ${args.join(" ")}` };
+    };
+  }
+
+  it("a failure with zero steps is never-started, not a failure", () => {
+    // gh run view 36304185040: job test conclusion failure, steps 0.
+    // Annotation on check-run 108577433405 begins "The job was not started because".
+    const r = checkCiStatus(root, gh(
+      [{ conclusion: "failure", headSha: "e201baa324414e52a37b5051aa76e4bdba1d1523", status: "completed", databaseId: 36304185040 }],
+      { jobs: [{ name: "test", conclusion: "failure", steps: [] }, { name: "test-windows", conclusion: "skipped", steps: [] }] },
+    ));
+    expect(r.severity).toBe("warn");
+    expect(r.message).toBe(
+      "master e201baa conclusion: never-started — job test recorded 0 steps. LIMIT: read from gh run view jobs[].steps, not the billing annotation; a failure with no steps for another reason is named never-started",
+    );
+    expect(r.message).not.toContain("conclusion: failure");
+  });
+
+  it("a failure whose test job ran steps stays a failure", () => {
+    // gh run view 36301870766: job test conclusion failure, 10 steps.
+    const r = checkCiStatus(root, gh(
+      [{ conclusion: "failure", headSha: "98c40af97622098645789c2cd22bef1d0019da35", status: "completed", databaseId: 36301870766 }],
+      { jobs: [{ name: "test", conclusion: "failure", steps: Array.from({ length: 10 }, () => ({ name: "step" })) }, { name: "test-windows", conclusion: "skipped", steps: [] }] },
+    ));
+    expect(r.severity).toBe("warn");
+    expect(r.message).toBe("master 98c40af conclusion: failure");
+  });
+
+  it("a success stays a success", () => {
+    // gh run view 36304366630.
+    const r = checkCiStatus(root, gh(
+      [{ conclusion: "success", headSha: "2dcc68a52f8fe1e2423ca5a3530d72ed293cecf8", status: "completed", databaseId: 36304366630 }],
+    ));
+    expect(r).toEqual({ name: "ci-status", report: true, severity: "pass", message: "master 2dcc68a conclusion: success" });
+  });
+});
+
+describe("ci-status names an unreadable step list (T-192 r181b)", () => {
+  const root = tmpdir();
+  const failed = [{ conclusion: "failure", headSha: "deadbeefcafe", status: "completed", databaseId: 1 }];
+  function gh(list: unknown, view?: { ok: true; stdout: string } | { ok: false; error: string }): CommandRunner {
+    return (_cmd, args) => {
+      if (args[1] === "list") return { ok: true, stdout: JSON.stringify(list) };
+      if (args[1] === "view" && view) return view;
+      return { ok: false, error: `unexpected gh ${args.join(" ")}` };
+    };
+  }
+
+  it("a failed run view names the error's first line", () => {
+    const r = checkCiStatus(root, gh(failed, { ok: false, error: "could not find run\nsecond line" }));
+    expect(r.severity).toBe("warn");
+    expect(r.message).toBe("master deadbee conclusion: failure (steps not read: could not find run)");
+  });
+
+  it("an unparseable job list says so", () => {
+    const r = checkCiStatus(root, gh(failed, { ok: true, stdout: "not json" }));
+    expect(r.severity).toBe("warn");
+    expect(r.message).toBe("master deadbee conclusion: failure (steps not read: unparseable job list)");
+  });
+
+  it("a failure with no databaseId says the steps were not read", () => {
+    const r = checkCiStatus(root, gh([{ conclusion: "failure", headSha: "deadbeefcafe", status: "completed" }]));
+    expect(r.severity).toBe("warn");
+    expect(r.message).toBe("master deadbee conclusion: failure (steps not read: no databaseId)");
   });
 });
 

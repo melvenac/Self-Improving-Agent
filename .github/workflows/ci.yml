@@ -4,6 +4,12 @@ on:
   push:
     branches: [master]
   pull_request:
+    # D-055: a PR that changes only docs or the README does not start CI.
+    # Anything else, including .agents/state.json, still runs. push and
+    # workflow_dispatch are not filtered.
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
   workflow_dispatch:
     inputs:
       hosted:
@@ -38,10 +44,11 @@ on:
 
 jobs:
   test:
-    # Pushes to master run on GitHub-hosted ubuntu-latest; everything else (pull requests,
-    # dispatches) runs on the self-hosted runner on tcm, whose minutes are free (D-043).
+    # Every run, including a push to master, runs on the self-hosted runner on tcm,
+    # whose minutes are free (D-043, T-192). inputs.hosted is the fallback when tcm
+    # is down: only a dispatch with hosted=true selects ubuntu-latest.
     # The job name stays `test`, so the check D-032's merge gate reads keeps its name.
-    runs-on: ${{ ((github.event_name == 'push' && github.ref == 'refs/heads/master') || inputs.hosted) && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
+    runs-on: ${{ inputs.hosted && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
 
     steps:
       # The tcm runner user is firewalled to the public internet only. If any of these connects,
