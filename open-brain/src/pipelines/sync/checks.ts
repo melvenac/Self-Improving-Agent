@@ -419,17 +419,20 @@ export function checkTemplatePersonalNames(projectRoot: string): CheckResult {
     : "";
   // D1. An unreadable path used to return here, so a name in a file that was
   // read never appeared. Every hit is named, and so is every unreadable path.
-  if (hits.length > 0 || unreadable.length > 0) {
-    const shown = hits.slice(0, 5).join(", ");
-    const more = hits.length > 5 ? ` (+${hits.length - 5} more)` : "";
-    const hitNote = hits.length > 0
-      ? `Template ships personal names — consumers' agents will use them: ${shown}${more}. `
-      : "";
+  if (unreadable.length > 0) {
     return {
       name: "template-personal-names",
       severity: "issue",
-      message: `${hitNote}${unreadNote}${scope}`,
-      report: true,
+      message: `${unreadable.length} unreadable path(s) under project-template/ — a leak there cannot be ruled out: ${unreadable.slice(0, 5).join(", ")}${unreadable.length > 5 ? ` (+${unreadable.length - 5} more)` : ""}`,
+    };
+  }
+  if (hits.length > 0) {
+    const shown = hits.slice(0, 5).join(", ");
+    const more = hits.length > 5 ? ` (+${hits.length - 5} more)` : "";
+    return {
+      name: "template-personal-names",
+      severity: "issue",
+      message: `Template ships personal names — consumers' agents will use them: ${shown}${more}`,
     };
   }
   return {
