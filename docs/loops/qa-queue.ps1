@@ -229,8 +229,18 @@ try {
       exit 1
     }
     git fetch -q origin
-    git checkout -q --detach $Checkout
-    if ($LASTEXITCODE -ne 0) { L 'abort' "checkout of $Checkout failed"; exit 1 }
+    $wantSha = (git rev-parse --verify "${Checkout}^{commit}" 2>$null)
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($wantSha)) {
+      L 'abort' "checkout of $Checkout could not be resolved"
+      exit 1
+    }
+    $wantSha = $wantSha.Trim()
+    git checkout -f -q --detach $Checkout 2>$null | Out-Null
+    $gotSha = (git rev-parse HEAD).Trim()
+    if ($gotSha -ne $wantSha) {
+      L 'abort' "checkout of $Checkout wanted $wantSha got $gotSha"
+      exit 1
+    }
   }
   $head = (git rev-parse HEAD).Trim()
   L 'head' $head
@@ -263,9 +273,19 @@ try {
     if ($cpu -ge $QuietCpuPercent) { L "busy.$n" "ran although CPU averaged $cpu% (>= $QuietCpuPercent) after the wait" }
 
     # 3. The tree must still be at the launch commit. QA seats commit from their own scratch worktrees, but if one moved
-    #    this HEAD, put it back. Untracked report copies are left alone.
+    #    this HEAD, put it back. Everything a seat must keep is pushed before its report; -f overwrites local leftovers.
     $now = (git rev-parse HEAD).Trim()
-    if ($now -ne $head) { L "head_moved.$n" "$now; restoring $head"; git checkout -q --detach $head }
+    if ($now -ne $head) {
+      L "head_moved.$n" "$now; restoring $head"
+      $restoreErr = (git checkout -f -q --detach $head 2>&1 | Out-String).Trim()
+      $after = (git rev-parse HEAD).Trim()
+      if ($after -ne $head) {
+        $errLine = if ($restoreErr) { ($restoreErr -split "`n" | Select-Object -First 1) } else { "exit=$LASTEXITCODE" }
+        L "restore_failed.$n" "wanted=$head got=$after error=$errLine"
+        L 'abort' "restore failed before $n; remaining items need the launch tree"
+        exit 1
+      }
+    }
 
     # 4. Run the driver and wait, with a hard limit.
     $driver = Join-Path $tree "docs\loops\qa-$n\drive.ps1"

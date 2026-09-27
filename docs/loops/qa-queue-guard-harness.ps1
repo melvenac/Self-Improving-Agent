@@ -9,7 +9,8 @@
 # inherited, and `cmd /c set` is.
 param(
   [Parameter(Mandatory = $true)] [string] $NewScript,
-  [string] $OldScript = ''
+  [string] $OldScript = '',
+  [switch] $RestoreOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -76,14 +77,14 @@ Set-Content (Join-Path $dest "done") "1"
   return @{ tree = $tree; shaA = $shaA; shaB = $shaB; user = $userProfile }
 }
 
-function Start-DetachedQueue([string] $scriptPath, [string] $userProfile, [string] $sha) {
+function Start-DetachedQueue([string] $scriptPath, [string] $userProfile, [string] $sha, [string] $queueItems = '9997') {
   $fullScript = [System.IO.Path]::GetFullPath($scriptPath)
   $fullUser = [System.IO.Path]::GetFullPath($userProfile)
   if ($fullScript -eq $realScript) { Fail 'refusing to launch the real qa-queue.ps1' }
   if ($fullUser -notlike "$tempRoot*") { Fail "USERPROFILE outside temp: $fullUser" }
   # ShowWindow 0 hides the Create. -WindowStyle Hidden is on the powershell cmd starts, so that
   # child does not open a console of its own. A non-zero MainWindowHandle is a visible window.
-  $cmd = "cmd.exe /d /c set `"USERPROFILE=$fullUser`"&& set `"GIT_TERMINAL_PROMPT=0`"&& `"$ps`" -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -File `"$fullScript`" -Queue 9997 -Checkout $sha -QuietCpuPercent 101 -TimeoutMinutes 2 -StartWaitMinutes 2"
+  $cmd = "cmd.exe /d /c set `"USERPROFILE=$fullUser`"&& set `"GIT_TERMINAL_PROMPT=0`"&& `"$ps`" -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -File `"$fullScript`" -Queue $queueItems -Checkout $sha -QuietCpuPercent 101 -TimeoutMinutes 2 -StartWaitMinutes 2"
   $startup = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly -Property @{ ShowWindow = [uint16]0 }
   $created = Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{
     CommandLine = $cmd
@@ -136,6 +137,114 @@ function Wait-LogCount([string] $path, [int] $atLeast, [int] $seconds) {
     Start-Sleep -Milliseconds 400
   }
   return $false
+}
+
+function New-TwoItemRestoreRepo([string] $userProfile, [switch] $LockGeneration) {
+  $tree = Join-Path $userProfile 'Worktrees\sia-qa'
+  $full = [System.IO.Path]::GetFullPath($tree)
+  if ($full -eq $realTree) { Fail "stub tree resolved to the real QA tree: $full" }
+  if ($full -notlike "$tempRoot*") { Fail "stub tree is outside the temp root: $full" }
+  if ($userProfile -notlike '* *') { Fail "profile path has no space: $userProfile" }
+  New-Item -ItemType Directory -Force (Join-Path $tree 'docs\loops\qa-9996') | Out-Null
+  New-Item -ItemType Directory -Force (Join-Path $tree 'docs\loops\qa-9997') | Out-Null
+  $lockBlock = ''
+  if ($LockGeneration) {
+    $lockBlock = @'
+
+$indexLock = Join-Path $env:USERPROFILE "Worktrees\sia-qa\.git\index.lock"
+Set-Content -LiteralPath $indexLock -Value "harness lock" -Encoding ascii
+'@
+  }
+  $driver9996 = @"
+`$dest = Join-Path `$env:USERPROFILE "sia-qa9996"
+New-Item -ItemType Directory -Force `$dest | Out-Null
+Set-Content (Join-Path `$dest "alive") `$PID
+Set-Location (Join-Path `$env:USERPROFILE "Worktrees\sia-qa")
+`$shaB = (Get-Content ".shaB" -Raw).Trim()
+git checkout -q --detach `$shaB
+New-Item -ItemType Directory -Force "docs\loops\qa-9997" | Out-Null
+Set-Content "docs\loops\qa-9997\drive.ps1" "# untracked blocker" -Encoding ascii
+$lockBlock
+Set-Content (Join-Path `$dest "done") "1"
+"@
+  $driver9997 = @'
+$dest = Join-Path $env:USERPROFILE "sia-qa9997"
+New-Item -ItemType Directory -Force $dest | Out-Null
+Set-Content (Join-Path $dest "item2-ran") "1"
+Set-Content (Join-Path $dest "done") "1"
+'@
+  Set-Content -LiteralPath (Join-Path $tree 'docs\loops\qa-9996\drive.ps1') -Value $driver9996 -Encoding ascii
+  Set-Content -LiteralPath (Join-Path $tree 'docs\loops\qa-9997\drive.ps1') -Value $driver9997 -Encoding ascii
+  Set-Content -LiteralPath (Join-Path $tree 'generation.txt') -Value "A`n" -Encoding ascii
+  $git = {
+    param([string[]] $gitArgs)
+    & git -C $tree -c user.email=qa-queue-guard@example.com -c user.name=qa-queue-guard -c commit.gpgsign=false @gitArgs
+    if ($LASTEXITCODE -ne 0) { Fail "git $($gitArgs -join ' ') failed in $tree" }
+  }
+  & $git @('init', '-q')
+  & $git @('add', 'generation.txt', 'docs/loops/qa-9996/drive.ps1', 'docs/loops/qa-9997/drive.ps1')
+  & $git @('commit', '-q', '-m', 'A')
+  $shaA = (& git -C $tree rev-parse HEAD).Trim()
+  Set-Content -LiteralPath (Join-Path $tree 'generation.txt') -Value "B`n" -Encoding ascii
+  Remove-Item -LiteralPath (Join-Path $tree 'docs\loops\qa-9997\drive.ps1') -Force
+  & $git @('add', 'generation.txt')
+  & $git @('add', '-u')
+  & $git @('commit', '-q', '-m', 'B')
+  $shaB = (& git -C $tree rev-parse HEAD).Trim()
+  Set-Content -LiteralPath (Join-Path $tree '.shaB') -Value "$shaB`n" -Encoding ascii
+  & $git @('checkout', '-q', '--detach', $shaA)
+  return @{ tree = $tree; shaA = $shaA; shaB = $shaB; user = $userProfile }
+}
+
+function Run-RestoreHarness([string] $scriptPath, [string] $label) {
+  $restoreUser = Join-Path $tempRoot "restore-$label\Aaron Melven"
+  if (Test-Path (Split-Path $restoreUser -Parent)) { Remove-Item -LiteralPath (Split-Path $restoreUser -Parent) -Recurse -Force }
+  $untracked = New-TwoItemRestoreRepo $restoreUser
+  $lockUser = Join-Path $tempRoot "restore-lock-$label\Aaron Melven"
+  if (Test-Path (Split-Path $lockUser -Parent)) { Remove-Item -LiteralPath (Split-Path $lockUser -Parent) -Recurse -Force }
+  $locked = New-TwoItemRestoreRepo $lockUser -LockGeneration
+
+  foreach ($case in @(
+    @{ name = 'untracked_block'; repo = $untracked; user = $restoreUser; expectItem2 = $true }
+    @{ name = 'locked_generation'; repo = $locked; user = $lockUser; expectItem2 = $false }
+  )) {
+    $logDir = Join-Path $case.user 'sia-qa-queue'
+    if (Test-Path $logDir) { Remove-Item -LiteralPath $logDir -Recurse -Force }
+    $launch = Start-DetachedQueue $scriptPath $case.user $case.repo.shaA '9996,9997'
+    $log = Join-Path $logDir 'queue.log'
+    $deadline = (Get-Date).AddSeconds(120)
+    $done = $false
+    while ((Get-Date) -lt $deadline) {
+      $lines = Read-Lines $log
+      if (@($lines | Where-Object { $_ -match ' end=' }).Count -ge 1) { $done = $true; break }
+      if (@($lines | Where-Object { $_ -match ' abort=' }).Count -ge 1) { $done = $true; break }
+      Start-Sleep -Milliseconds 500
+    }
+    Start-Sleep -Seconds 2
+    $lines = Read-Lines $log
+    $headEnd = (& git -C $case.repo.tree rev-parse HEAD).Trim()
+    $item2Ran = Test-Path (Join-Path $case.user 'sia-qa9997\item2-ran')
+    $restoreFailed = @($lines | Where-Object { $_ -match ' restore_failed\.9997=' })
+    $run9997 = @($lines | Where-Object { $_ -match ' run\.9997=' })
+    $exit9997 = @($lines | Where-Object { $_ -match ' exit\.9997=' })
+    Stop-Pid $launch.pid
+    $exitText = ($exit9997 -join '; ')
+    Note ("restore_${label}_$($case.name) done=$done head=$headEnd shaA=$($case.repo.shaA) item2_ran=$item2Ran restore_failed=$($restoreFailed.Count) run9997=$($run9997.Count) exit9997=$exitText")
+    if ($case.expectItem2) {
+      Note ("restore_${label}_$($case.name)_expect item2_on_shaA=$($item2Ran -and $headEnd -eq $case.repo.shaA)")
+    } else {
+      Note ("restore_${label}_$($case.name)_expect no_run_and_failed=$($restoreFailed.Count -ge 1 -and $run9997.Count -eq 0)")
+    }
+  }
+}
+
+if ($RestoreOnly) {
+  Note '--- restore scenarios only ---'
+  Run-RestoreHarness $NewScript 'new'
+  if ($OldScript -and (Test-Path -LiteralPath $OldScript)) {
+    Run-RestoreHarness $OldScript 'old'
+  }
+  exit 0
 }
 
 # --- live holder is not taken over ---
@@ -269,6 +378,12 @@ if ($OldScript -and (Test-Path -LiteralPath $OldScript)) {
   if ($oldSecond) { Stop-Pid $oldSecond.pid }
   Stop-Pid $oldFirst.pid
   if ($oldDriver) { Stop-Pid $oldDriver }
+}
+
+Note '--- restore scenarios ---'
+Run-RestoreHarness $NewScript 'new'
+if ($OldScript -and (Test-Path -LiteralPath $OldScript)) {
+  Run-RestoreHarness $OldScript 'old'
 }
 
 Note '--- summary ---'
