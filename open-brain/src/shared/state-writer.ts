@@ -222,7 +222,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   // first write, which the writer assigns and the caller cannot supply. A
   // session already recorded keeps its own; a new one — or a legacy entry
   // writing for the first time since migration — takes this write's revision.
-  const firstRev = mine?.first_rev ?? before + 1;
+  const firstRev = mine?.first_rev ?? options.session;
   const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes };
 
   for (let i = 0; i < options.ops.length; i++) {
