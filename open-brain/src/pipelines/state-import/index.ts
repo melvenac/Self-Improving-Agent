@@ -292,7 +292,7 @@ export function importTasks(text: string, current: number, report: ImportReport[
     }
     if (status === "done") report.retention_eligible_done++;
     if (it.fromCompleted) report.completed_section_items++;
-    tasks.push({ id, title, priority: it.priority!, status, opened_session: opened, closed_session: closed, supersedes: null, note, note_by: note === "" ? [] : null, closed_rev: null });
+    tasks.push({ id, title, priority: it.priority!, status, opened_session: opened, closed_session: closed, supersedes: null, note, note_by: [], closed_rev: null });
     if (superseded) {
       const prev = tasks[idx - 1];
       if (prev) {
