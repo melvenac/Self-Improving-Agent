@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 141 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 142 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,36 +6,42 @@
 
 ### Pick up here
 
-Read docs/loops/session-147-dispatches.md first (on origin/docs/session-100-qa99-dispatch; its incident and rulings sections are the newest). Three dev seats are WORKING, each having read its turn at ~11:2xZ: Grok/sia-forge record 187, candidate B part 2 (E_t schema, R10), room k57frxw0...; Grok/sia-builder record 186, T-193 worktree-layout check, room k57098ep...; Composer/sia-infra record 185, the qa-queue head-restore fix, room k5702788.... Read each delivery's DIFF and failed logs before accepting (D-060 evidence rules). When 185 is accepted, re-copy qa-queue.ps1 to both QA machines, clean both QA trees (the laptop's is stuck at fc8d8cd; the QA PC's at daec2b8, dirty), and relaunch QA 161 + 178 (laptop) and 182 + 183 (QA PC). Dry-run every line on its target machine first. Candidate A (A13) is MERGED (677c1dd); master is green on tcm (36312931414, 1658 passed).
+Read docs/loops/session-147-dispatches.md first (on origin/docs/session-100-qa99-dispatch; newest sections at the end). All three dev rounds are DELIVERED and ruled: record 185 (qa-queue restore + 185b fail-closed harness) ACCEPTED at a planner boundary check, PR #188; record 186 (T-193 worktree-layout check) ACCEPTED, PR #186; record 187 (candidate B part 2, 8c7769f) evidence checked, PR #187, goes to QA 189. MORNING, all Aaron's: (1) merge #186 and #188; (2) QA relaunch: copy qa-queue.ps1 from 78fd6ce to both QA machines, clean both QA trees (laptop stuck at fc8d8cd; QA PC at daec2b8, dirty), launch laptop 189,161,178 and QA PC 182,183 at a commit carrying qa-189 (80f3383 or later); dry-run every line on its target first; (3) his word to remove the four stray scratch worktrees T-193 found (listed in the record 186 section). Candidate A merged (677c1dd); master green on tcm.
 
 ### Watch out
 
 - After ANY context-mode or Grok Build update, re-test Cursor CLI (a headless cursor-agent -p 'echo x' in a scratch dir): context-mode 1.0.169's plugin PreToolUse hook fail-closes every Cursor tool (T-046). The fix (PreToolUse stripped from the plugin cache hooks.json) is NOT durable.
 - Cursor seats stop listening when --wait times out after ~1 h; check /a2a/agents/live + /a2a/session/<room>/reads before asking Aaron to nudge, and nudge only for a turn that is unread with no listener.
-- Composer (sia-infra, D-060) defaults to evidence with the right SHAPE that cannot fail: seeded reds, in-test or option 'mutants'. Read the failed log of every red and mutant run.
+- Composer (sia-infra, D-060) defaults to evidence with the right SHAPE that cannot fail; its first live rounds (185, 185b) were real, but read the failed log of every red and mutant anyway.
 - Master's push CI still runs on GitHub-hosted ubuntu (billing-blocked) until T-192 (a38ff92, QA 183 pending) merges; dispatch tcm CI on master by hand after every merge.
 - Derive every time and count in a tracked note from its source (date -u, run ids): three were written as guesses this session.
-- Relay (A2A-Hub planner, uds pipe cc-msg-f149...) is mid Loop 6 deploy; seat-transport questions (Loop 8a/8b) come to the planner, not Aaron.
+- QA 189 must rule the BE-5 question: the B2 fixture gained order 'shown' because a met row without order is now refused. Do not rule it from the planner seat.
 
 ### Open questions
 
-- Aaron: Telegram approval for QA (D-058) is on HOLD by his choice ('I have to think about this'); do not dispatch it until he decides.
-- Owed to Relay when T-193 is accepted: the seat data file's path and format.
+- Aaron: Telegram approval for QA (D-058) is on HOLD by his choice; do not dispatch it until he decides.
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #186 loop/t193-worktree-check (683b61c) — QA: accepted — T-193; planner-accepted; Aaron merges; then close T-193 and T-149
+- #187 loop/15-slice-3-candidate-b2 (8c7769f) — QA: not_started — candidate B part 2; QA 189 launches in the morning
+- #188 loop/qa-queue-restore (78fd6ce) — QA: accepted — record 185/185b; planner boundary check (no QA seat overnight); Aaron merges
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `8c7769f (candidate B part 2, for QA 189)`
 
 **Questions pending for Aaron:** 
+- Merge #186 and #188
+- Launch the QA relaunch lines (planner dry-runs them first)
+- Remove the four stray scratch worktrees?
 - Telegram approval (D-058): on hold until he decides
 
 **Rulings made mid-loop:** 
-- session-147-dispatches.md: rulings on QA 162/174/177/172/173 (A13, T-171 r3b, importer r6, T-048 r1b ACCEPTED; all merged)
-- D-055 (docs-only PRs need no CI)
-- D-060 (Composer on sia-infra; evidence rules)
+- session-147-dispatches.md: rulings on QA 162/174/177/172/173 (all merged)
+- D-055, D-060
 - record 184 (Composer replay) result
+- record 185/185b ACCEPTED (planner boundary check)
+- record 186 (T-193) ACCEPTED
 
 ## developer [legacy] _(written session 74)_
 
