@@ -1,0 +1,85 @@
+# baseline (unmutated 706c029): build ok
+  c1-t003.mjs: 1 BROKEN
+
+  c2-stdio.mjs: 3 BROKEN
+
+  c4-hooks.mjs: 0 BROKEN
+
+  vitest (3 files): rc 0, [22m [1m[32m89 passed[39m[22m[90m (89)[39m
+## Q1-cached-at-first-use: the proof read once, at the first attributed write, and kept for the server's life
+  build+tsc: ok
+  Forge's rows (t003 + server + active-session): rc 1, [22m [1m[31m8 failed[39m[22m[2m | [22m[1m[32m81 passed[39m[22m[90m (89)[39m
+    failing: [22m[49m tests/server.test.ts[2m > [22mserver handlers[2m > [22mhandleStart[2m > [22mob_state applies a batch, renders the views, and ob_start reads the result back
+    failing: [22m[49m tests/server.test.ts[2m > [22mserver handlers[2m > [22mhandleStart[2m > [22mstamps the registered session id into the log and reuses it on a second call
+    failing: [22m[49m tests/server.test.ts[2m > [22mserver handlers[2m > [22mhandleEnd[2m > [22msays which file it refused and why
+    failing: [22m[49m tests/server.test.ts[2m > [22mR179-2 → T-003: ob_set_session and another session's uuid[2m > [22mA7 across checkouts: registering as a session recorded in ANOTHER checkout is refused, and the victim's handoff cannot be reached
+    failing: [22m[49m tests/server.test.ts[2m > [22mR179-2 → T-003: ob_set_session and another session's uuid[2m > [22ma uuid the record has not seen is refused unless it is the proven one: an unseen id is a claim, not proof
+    failing: [22m[49m tests/server.test.ts[2m > [22mR179-2 → T-003: ob_set_session and another session's uuid[2m > [22mFLIPPED LIMIT: a uuid recorded under THIS checkout is refused too — same-checkout impersonation was T-003's, and is closed
+    failing: [22m[49m tests/t003-session-proof.test.ts[2m > [22mT-003: the server proves its own session[2m > [22mA9 /clear: the surviving server writes under the NEW session with no re-registration, and ob_start stamps the new id
+    failing: [22m[49m tests/t003-session-proof.test.ts[2m > [22mT-003: the server proves its own session[2m > [22m/clear with a FAILED SessionStart: SessionEnd removed the proof, so the surviving server refuses instead of writing as the old session
+  c1-t003.mjs: 7 BROKEN
+ — NEW: A7 ob_set_session(victim uuid) is refused and set_handoff cannot replace the victim's handoff || A7b with no proof, ob_set_session(victim) is refused and set_handoff refuses || A9 after /clear the new session's write goes under 902 and 901's handoff is intact || A9b /clear + failed SessionStart: the write refuses rather than landing under 902 || P1b our pid's file carrying another pid's claude_pid/proc_start: refuses || P6b after /clear both servers move to the new session with no re-registration
+  c2-stdio.mjs: 5 BROKEN
+ — NEW: S2 ob_stats names the proven session via THIS process as parent || S2b recall_log and feedback_log rows under A; chunk linked to A || S3 after /clear (same server process) the next recall and feedback log under B || S3b ob_recalled reports B's recalls (1), not A's
+  c4-hooks.mjs: 5 BROKEN
+ — NEW: H2 /clear: the same server now proves B || H3 reversed order: SessionEnd(B) keeps C's proof || H4 /clear with a failed SessionStart: NONE, not C || H5 a subagent's SessionStart writes no proof || O1 old install, /clear with SessionStart working: B (SessionStart alone suffices)
+
+## Q2-claude-pid: the server keys the proof on CLAUDE_PID (inherited) instead of process.ppid
+  build+tsc: ok
+  Forge's rows (t003 + server + active-session): rc 1, [22m [1m[31m15 failed[39m[22m[2m | [22m[1m[32m74 passed[39m[22m[90m (89)[39m
+    failing: [22m[49m tests/server.test.ts[2m > [22mserver handlers[2m > [22mhandleStart[2m > [22mob_state applies a batch, renders the views, and ob_start reads the result back
+    failing: [22m[49m tests/server.test.ts[2m > [22mserver handlers[2m > [22mhandleStart[2m > [22mstamps the registered session id into the log and reuses it on a second call
+    failing: [22m[49m tests/server.test.ts[2m > [22mserver handlers[2m > [22mhandleEnd[2m > [22msays which file it refused and why
+    failing: [22m[49m tests/server.test.ts[2m > [22mR179-2 → T-003: ob_set_session and another session's uuid[2m > [22mA7 across checkouts: registering as a session recorded in ANOTHER checkout is refused, and the victim's handoff cannot be reached
+    failing: [22m[49m tests/server.test.ts[2m > [22mR179-2 → T-003: ob_set_session and another session's uuid[2m > [22ma uuid the record has not seen is refused unless it is the proven one: an unseen id is a claim, not proof
+    failing: [22m[49m tests/server.test.ts[2m > [22mR179-2 → T-003: ob_set_session and another session's uuid[2m > [22mFLIPPED LIMIT: a uuid recorded under THIS checkout is refused too — same-checkout impersonation was T-003's, and is closed
+    failing: [22m[49m tests/t003-session-proof.test.ts[2m > [22mT-003: the server proves its own session[2m > [22mA7 in ONE checkout: registering as another session is refused, naming both ids, and the write lands under the proven id
+    failing: [22m[49m tests/t003-session-proof.test.ts[2m > [22mT-003: the server proves its own session[2m > [22mob_set_session with the proven id is accepted and says where the proof came from; with no argument it registers the proven id, not the slot's
+  c1-t003.mjs: 12 BROKEN
+ — NEW: A7 ob_set_session(victim uuid) is refused and set_handoff cannot replace the victim's handoff || A7b with no proof, ob_set_session(victim) is refused and set_handoff refuses || A8 a reconnected server lands A's write under A, not the slot's B || A9 after /clear the new session's write goes under 902 and 901's handoff is intact || A9b /clear + failed SessionStart: the write refuses rather than landing under 902 || P1 a proof forged under another live pid is ignored: the write is SELF's || P4 nested: CLAUDE_PID names another claude with a valid proof; the server still uses its own parent || P5 ob_set_session(different id) refused naming both || P5 ob_store_chunk(foreign id) refused; unnamed links the proven id || P6 two servers under one claude both prove that claude's session || P6b after /clear both servers move to the new session with no re-registration
+  c2-stdio.mjs: 5 BROKEN
+ — NEW: S2 ob_stats names the proven session via THIS process as parent || S2b recall_log and feedback_log rows under A; chunk linked to A || S3 after /clear (same server process) the next recall and feedback log under B || S3b ob_recalled reports B's recalls (1), not A's
+  c4-hooks.mjs: 0 BROKEN
+
+
+## Q3-no-start-time: the start-time comparison skipped (a reused pid is believed)
+  build+tsc: ok
+  Forge's rows (t003 + server + active-session): rc 1, [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m87 passed[39m[22m[90m (89)[39m
+    failing: [22m[49m tests/t003-session-proof.test.ts[2m > [22mT-003: the server proves its own session[2m > [22ma reused pid: a proof written for an earlier process with this pid is refused
+    failing: [22m[49m tests/t003-session-proof.test.ts[2m > [22mproveSession: every refusal is named, and nothing falls back[2m > [22mabsent, unreadable, no id, wrong pid, unreadable parent start, and start mismatch each refuse with their own reason
+  c1-t003.mjs: 3 BROKEN
+ — NEW: P3 a proof whose start time differs from the parent's (reused pid) refuses || P3b a proof with no proc_start refuses
+  c2-stdio.mjs: 3 BROKEN
+
+  c4-hooks.mjs: 0 BROKEN
+
+
+## Q4-slot-adoption: with no proof, the per-project slot is adopted again
+  build+tsc: ok
+  Forge's rows (t003 + server + active-session): rc 1, [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m88 passed[39m[22m[90m (89)[39m
+    failing: [22m[49m tests/t003-session-proof.test.ts[2m > [22mT-003: the server proves its own session[2m > [22mno proof: a fresh slot is NOT adopted, the attributed write refuses, and the reason is named
+  c1-t003.mjs: 3 BROKEN
+ — NEW: A8b no proof + a fresh slot naming B: set_handoff refuses, slot never adopted || A9b /clear + failed SessionStart: the write refuses rather than landing under 902
+  c2-stdio.mjs: 3 BROKEN
+
+  c4-hooks.mjs: 2 BROKEN
+ — NEW: H4 /clear with a failed SessionStart: NONE, not C || H5 a subagent's SessionStart writes no proof
+
+## Q5-claims-unchecked: attributedSession accepts a named id that differs from the proof (ob_end, ob_store_chunk)
+  build+tsc: ok
+  Forge's rows (t003 + server + active-session): rc 1, [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m87 passed[39m[22m[90m (89)[39m
+    failing: [22m[49m tests/t003-session-proof.test.ts[2m > [22mT-003: the server proves its own session[2m > [22mob_end refuses a session_id that is not the proven one
+    failing: [22m[49m tests/t003-session-proof.test.ts[2m > [22mT-003: the server proves its own session[2m > [22mob_store_chunk refuses a session_id that is not the proven one, and links a chunk to the proven one when none is named
+  c1-t003.mjs: 3 BROKEN
+ — NEW: P5 ob_end(foreign id) refused || P5 ob_store_chunk(foreign id) refused; unnamed links the proven id
+  c2-stdio.mjs: 3 BROKEN
+
+  c4-hooks.mjs: 0 BROKEN
+
+
+# restored: build ok; git diff --stat: ''
+Q1-cached-at-first-use: KILLED (Forge rows + QA probes x15)
+Q2-claude-pid: KILLED (Forge rows + QA probes x15)
+Q3-no-start-time: KILLED (Forge rows + QA probes x2)
+Q4-slot-adoption: KILLED (Forge rows + QA probes x4)
+Q5-claims-unchecked: KILLED (Forge rows + QA probes x2)

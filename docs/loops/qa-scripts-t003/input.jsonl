@@ -1,0 +1,3 @@
+{"type":"user","message":{"role":"user","content":"Call the tool mcp__open-brain__ob_stats once. Then reply with only the line of its output that starts with 'Session proof', verbatim."}}
+{"type":"user","message":{"role":"user","content":"/clear"}}
+{"type":"user","message":{"role":"user","content":"Call the tool mcp__open-brain__ob_stats once. Then reply with only the line of its output that starts with 'Session proof', verbatim."}}

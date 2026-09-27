@@ -1,0 +1,6 @@
+{
+  "hooks": {
+    "SessionStart": [ { "matcher": "", "hooks": [ { "type": "command", "command": "node \"C:/qa-scratch/t003/cand/open-brain/build/cli-bootstrap.js\"" } ] } ],
+    "SessionEnd":   [ { "matcher": "", "hooks": [ { "type": "command", "command": "node \"C:/qa-scratch/t003/cand/open-brain/build/cli-session-end.js\"" } ] } ]
+  }
+}

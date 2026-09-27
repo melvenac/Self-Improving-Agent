@@ -1,0 +1,2 @@
+--ide cursor, payload WITHOUT cursor_version: Session proof written: session c0c0c0c0-0000-4000-8000-00000000c0c0 for claude process 6480. ; files: 6480.json
+--ide cursor, payload WITH cursor_version: Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2). ; files: none

@@ -1,0 +1,16 @@
+
+Self-Improving Agent Setup
+
+✓ Prerequisites OK (Node v22.23.2)
+✓ open-brain built → C:\qa-scratch\t003\cand\open-brain/build/
+✓ MCP server registered in .mcp.json
+· SessionStart hook already registered (cli-bootstrap.js)
+✓ SessionEnd hook registered (cli-session-end.js)
+✓ Hooks written to C:\qa-scratch\t003\setup-home\.claude\settings.json
+✓ 7 Claude slash command(s) copied → C:\qa-scratch\t003\setup-home\.claude\commands
+✓ open-brain registered in ~/.cursor/mcp.json
+✓ Cursor sessionStart hook registered in ~/.cursor/hooks.json
+✓ 4 Cursor slash command(s) copied → C:\qa-scratch\t003\setup-home\.cursor\commands
+✓ Obsidian vault scaffolded (8 items) → C:\qa-scratch\t003\setup-home\vault
+
+Setup complete! Restart Claude Code and Cursor to activate MCP + hooks.

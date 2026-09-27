@@ -1,0 +1,23 @@
+# c2-stdio on cand 706c029; stand-in claude pid 8212, start win:134349450807522440
+INFO    no proof yet: Session proof (this server instance): NONE — no session proof for this server's parent process 8212 (C:\qa-scratch\t003\s2\c2-store\by-pid\8212.json absent: the SessionStart hook did not write one, or SessionEnd removed it)
+INFO    seeded entry 1
+HOLDS   S1 no proof: ob_recall says NOT LOGGED with the reason
+        ## lighthouse ledger
+BROKEN  S1b no proof: ob_feedback says NOT LOGGED (the handoff's claim)
+        Feedback recorded for entry 1 (qa142-target): helpful / Counts: 1 helpful, 0 harmful, 0 neutral
+HOLDS   S1c no proof: no recall_log / feedback_log rows
+HOLDS   S2 ob_stats names the proven session via THIS process as parent
+        Session proof (this server instance): aaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeea, via parent process 8212
+HOLDS   S2b recall_log and feedback_log rows under A; chunk linked to A
+        {"recall":[{"s":"aaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeea"}],"feedback":[{"s":"aaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeea"}]}
+HOLDS   S3 after /clear (same server process) the next recall and feedback log under B
+        {"rl":[{"s":"aaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeea"},{"s":"baaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeb"}],"fl":[{"s":"aaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeea"},{"s":"baaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeb"}]}
+HOLDS   S3b ob_recalled reports B's recalls (1), not A's
+        Recalled 1 entries this session (source: recall-log): /  /   [1] qa142-target — progenitor
+INFO    S4 ob_end with no session_id while the proof names B: feedback_log rows 2 -> 2;   Recalled ids: 1 from explicit; rows: [{"s":"aaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeea","o":"direct","m":"direct"},{"s":"baaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeb","o":"direct","m":"direct"}]
+BROKEN  S5 a proof holding JSON null: ob_recall still returns its results (a logging failure must never break a recall)
+        ## lighthouse ledger / ## lighthouse ledger / FTS search error — index may be empty. / 
+BROKEN  S5b a proof holding JSON null: ob_stats still answers
+        Cannot read properties of null (reading 'session_id')
+
+3 BROKEN

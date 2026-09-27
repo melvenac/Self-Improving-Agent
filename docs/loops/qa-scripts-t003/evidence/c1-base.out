@@ -1,0 +1,57 @@
+# c1-t003 on base d0335d7; server parent (this node's ppid) 6924, start null; proof module ABSENT
+BROKEN  A7 ob_set_session(victim uuid) is refused and set_handoff cannot replace the victim's handoff
+        set_session: Session registered: 00000700-0000-4000-8000-000000000700 (C:\qa-scratch\t003\s1b\c1-proj) [via argument]
+        state: ob_state applied / Revision: 134 → 135 / Applied (1):
+        victim: "attacker overwrote it"; 701's: "undefined"
+BROKEN  A7b with no proof, ob_set_session(victim) is refused and set_handoff refuses
+        set_session: Session registered: 00000700-0000-4000-8000-000000000700 (C:\qa-scratch\t003\s1b\c1-proj) [via argument]
+        state: ob_state applied / Revision: 135 → 136 / Applied (1):
+BROKEN  A8 a reconnected server lands A's write under A, not the slot's B
+        ob_state applied / Revision: 134 → 135 / Applied (1):
+        B: "session A's handoff after a reconnect"  A: "undefined"
+BROKEN  A8b no proof + a fresh slot naming B: set_handoff refuses, slot never adopted
+        ob_state applied / Revision: 135 → 136 / Applied (1):
+BROKEN  A9 after /clear the new session's write goes under 902 and 901's handoff is intact
+        ob_state applied / Revision: 134 → 135 / Applied (1):
+        901: "session 902's handoff, after /clear, no /start"
+BROKEN  A9b /clear + failed SessionStart: the write refuses rather than landing under 902
+        ob_state applied / Revision: 135 → 136 / Applied (1):
+BROKEN  P1 a proof forged under another live pid is ignored: the write is SELF's
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P1b our pid's file carrying another pid's claude_pid/proc_start: refuses
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+LIMIT   P2 both hooks failed across /clear: the next session's write lands under ?
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3 a proof whose start time differs from the parent's (reused pid) refuses
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3b a proof with no proc_start refuses
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3c proof body array: refuses without throwing
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3c proof body null: refuses without throwing
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3c proof body string: refuses without throwing
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3c proof body number session_id: refuses without throwing
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3c proof body claude_pid as string: refuses without throwing
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+BROKEN  P4 nested: CLAUDE_PID names another claude with a valid proof; the server still uses its own parent
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+        set_session: Error: no session_id given and no active session recorded for ide "claude" in this project. Check that the SessionStart hook is registered for this IDE, and that its MCP registration sets OPEN_BRAIN_IDE. Re-run scripts/setup.mjs if unsure.
+BROKEN  P5 ob_set_session(different id) refused naming both
+        Session registered: 00001499-0000-4000-8000-000000001499 (C:\qa-scratch\t003\s1b\c1-proj) [via argument]
+INFO    P5 upper-case spelling of the proven id: accepted; padded: accepted; exact: accepted; "none": refused (Error: no session_id given and no active session recorded for ide "claude" in this project. Check that the SessionStart hook is registered for this IDE, and that its MCP registration sets OPEN_BRAIN_IDE. Re-run scripts/setup.mjs if unsure.)
+BROKEN  P5 ob_end(foreign id) refused
+        Session End: /   Summary: skipped /   Recalled ids: 0 from none
+BROKEN  P5 ob_store_chunk(foreign id) refused
+        no handleStoreChunk export (red by absence)
+BROKEN  P6 two servers under one claude both prove that claude's session
+        Error: no session_id given and no active session recorded for ide "claude" in this project. Check that the SessionStart hook is registered for this IDE, and that its MCP registration sets OPEN_BRAIN_IDE. Re-run scripts/setup.mjs if unsure. || Error: no session_id given and no active session recorded for ide "claude" in this project. Check that the SessionStart hook is registered for this IDE, and that its MCP registration sets OPEN_BRAIN_IDE. Re-run scripts/setup.mjs if unsure.
+BROKEN  P6b after /clear both servers move to the new session with no re-registration
+        Error: no session_id given and no active session recorded for ide "claude" in this project. Check that the SessionStart hook is registered for this IDE, and that its MCP registration sets OPEN_BRAIN_IDE. Re-run scripts/setup.mjs if unsure. || Error: no session_id given and no active session recorded for ide "claude" in this project. Check that the SessionStart hook is registered for this IDE, and that its MCP registration sets OPEN_BRAIN_IDE. Re-run scripts/setup.mjs if unsure.
+BROKEN  P7 ob_start with no proof does not stamp an unproven id (here: the newest transcript's, another session)
+        Session ID: 00001666-0000-4000-8000-000000001666
+        session logs written: next-session.md, Session_1.md; contain the other session's id: true
+
+14 BROKEN

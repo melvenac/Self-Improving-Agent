@@ -1,0 +1,4 @@
+{ "mcpServers": { "open-brain": { "command": "node", "args": ["C:/qa-scratch/t003/cand/open-brain/build/server.js"], "env": {
+  "KNOWLEDGE_V2_DB": "C:/qa-scratch/t003/live/store/k.db", "OPEN_BRAIN_ACTIVE_SESSION": "C:/qa-scratch/t003/live/store/active-session.json",
+  "OPEN_BRAIN_VAULT_DIR": "C:/qa-scratch/t003/live/store/vault", "OPEN_BRAIN_SCORE_HISTORY": "C:/qa-scratch/t003/live/store/score.jsonl",
+  "OPEN_BRAIN_SHADOW_LOG": "C:/qa-scratch/t003/live/store/shadow.jsonl", "OPEN_BRAIN_IDE": "claude" } } } }
