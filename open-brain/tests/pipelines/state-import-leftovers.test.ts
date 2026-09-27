@@ -22,6 +22,8 @@ const tsxCli = join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
 const TODAY = "2026-09-25";
 const INBOX = ".agents/TASKS/INBOX.md";
 const DECISIONS = ".agents/SYSTEM/DECISIONS.md";
+/** Two tsx spawns sat at vitest's 5 s default on Windows and timed out (QA 138, O-c; R5-4). */
+const SPAWN_TIMEOUT_MS = 30_000;
 
 function cli(args: string[], cwd: string): { status: number | null; stdout: string; stderr: string } {
   const r = spawnSync(process.execPath, [tsxCli, cliEntry, ...args], { cwd, encoding: "utf8", env: process.env });
@@ -95,12 +97,12 @@ describe("R4-4 (D11): a judged input the importer reads wrongly is unreadable, a
   const UNREADABLE: Array<[string, Buffer, RegExp]> = [
     ["UTF-32LE with a BOM (Set-Content -Encoding UTF32)", utf32(INBOX6, false), /UTF-32/],
     ["UTF-32BE with a BOM (Set-Content -Encoding BigEndianUTF32)", utf32(INBOX6, true), /NUL byte/],
-    ["UTF-7 (Set-Content -Encoding UTF7)", UTF7, /no readable `# ` title/],
-    ["zero bytes (New-Item)", Buffer.alloc(0), /no readable `# ` title/],
+    ["UTF-7 (Set-Content -Encoding UTF7)", UTF7, /has no heading line/],
+    ["zero bytes (New-Item)", Buffer.alloc(0), /has no heading line/],
     ["a UTF-8 BOM, then UTF-16LE (a BOM-only file, then >>)", Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), utf16le(INBOX6)]), /NUL byte/],
     ["a UTF-16LE BOM whose text holds a NUL (a stray [char]0 added)", Buffer.concat([BOM_LE, utf16le(INBOX6 + "\u0000")]), /UTF-16LE byte-order mark.*NUL/],
     ["a UTF-16BE BOM whose text holds a NUL", Buffer.concat([BOM_BE, utf16be(INBOX6 + "\u0000")]), /UTF-16BE byte-order mark.*NUL/],
-    ["a UTF-16LE BOM over UTF-8 bytes (a BOM that lies, with no NUL)", Buffer.concat([BOM_LE, Buffer.from(INBOX6, "utf8")]), /no readable `# ` title/],
+    ["a UTF-16LE BOM over UTF-8 bytes (a BOM that lies, with no NUL)", Buffer.concat([BOM_LE, Buffer.from(INBOX6, "utf8")]), /has no heading line/],
   ];
   for (const [shape, bytes, why] of UNREADABLE) {
     it(`${shape}: could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes`, () => {
@@ -120,7 +122,7 @@ describe("R4-4 (D11): a judged input the importer reads wrongly is unreadable, a
   it("the refusal names the file and why, for a shape with no NUL at all (UTF-7)", () => {
     writeProject(root, UTF7);
     runDraft(root, TODAY);
-    expect(() => runCommit(root, TODAY)).toThrow(new RegExp(`${INBOX.replace(/\./g, "\\.")} has no readable \`# \` title`));
+    expect(() => runCommit(root, TODAY)).toThrow(new RegExp(`${INBOX.replace(/\./g, "\\.")} has no heading line`));
   });
 
   // The guards: what the importer reads correctly is still judged as it reads.
@@ -188,7 +190,7 @@ describe("R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, b
     expect(c.stdout).toMatch(/ADRs NOT imported[^\n]*: ADR-2\b/);
     const state = JSON.parse(readFileSync(join(root, STATE_REL), "utf8")) as { decisions: Array<{ id: string }> };
     expect(state.decisions.map((d) => d.id)).toEqual(["ADR-1"]);
-  });
+  }, SPAWN_TIMEOUT_MS);
 
   it("guard: a readable DECISIONS.md says nothing about NUL bytes", () => {
     writeProject(root, inboxText(7), Buffer.from(head + tail.replace(/—/g, "-"), "utf8"));
@@ -197,7 +199,7 @@ describe("R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, b
     expect(c.status).toBe(0);
     expect(c.stdout).not.toMatch(/NUL byte/);
     expect(c.stdout).not.toMatch(/ADRs NOT imported/);
-  });
+  }, SPAWN_TIMEOUT_MS);
 });
 
 describe("O7: two markers name the OLDEST snapshot, and say what the newer one holds", () => {

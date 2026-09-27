@@ -6,6 +6,13 @@ import { execFileSync } from "node:child_process";
 import { describeTreeCurrency } from "../../../src/pipelines/session-start/tree-currency.js";
 
 /**
+ * Every row clones and commits with real git. DIVERGED timed out at vitest's 5 s
+ * default on Windows (QA 135, QA 138 O-c, Forge 141), and BEHIND and two more
+ * did in record 147's runs (6.7 s), so the whole block has it (R5-4).
+ */
+const SPAWN_TIMEOUT_MS = 30_000;
+
+/**
  * A real clone with a real remote, because the thing under test is exactly the
  * relationship between a checkout and its remote-tracking ref. A fixture that
  * faked `origin/master` would test the fake.
@@ -81,7 +88,7 @@ function advanceOrigin(root: string, revision: number, message: string): void {
   git(seed, "push", "-q", "origin", "master");
 }
 
-describe("describeTreeCurrency", () => {
+describe("describeTreeCurrency", { timeout: SPAWN_TIMEOUT_MS }, () => {
   let root: string;
 
   beforeEach(() => {
