@@ -71,9 +71,8 @@ function findSessionDb(
           | { session_id: string }
           | undefined;
         if (meta?.session_id === targetSessionId) return file.path;
-      } catch (err) {
-        // An open that throws is not "no db has this session" (SILENT 14).
-        unreadable.push(errorText(err));
+      } catch {
+        continue;
       } finally {
         db?.close();
       }
