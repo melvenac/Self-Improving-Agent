@@ -1,0 +1,5 @@
+{
+  "description": "Linked git worktrees must be named <project>-<seat>. The main checkout is exempt. Read by the worktree-layout /sync check. A project with no copy of this file is skipped, never passed. Extra keys are ignored.",
+  "project": "sia",
+  "seats": ["planner", "builder", "forge", "infra", "research", "qa"]
+}
