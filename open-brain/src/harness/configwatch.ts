@@ -836,7 +836,6 @@ export class ConfigWatch {
             before: "absent",
             after: `unobservable (${code}); ${stateHash(a)}`,
           });
-          unrestored.push(leftInPlace);
           continue;
         }
         changes.push({
