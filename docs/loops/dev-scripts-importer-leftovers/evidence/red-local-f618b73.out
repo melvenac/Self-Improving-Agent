@@ -1,0 +1,249 @@
+
+ RUN  v3.2.4 C:/Users/melve/Worktrees/sia-builder/open-brain
+
+ ❯ tests/pipelines/state-import-leftovers.test.ts (21 tests | 10 failed) 2790ms
+   ✓ R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > the fixtures are the shapes named: UTF-32LE begins FF FE 00 00, UTF-32BE 00 00 FE FF, and UTF-7 holds no NUL and no `# ` 4ms
+   × R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > UTF-32LE with a BOM (Set-Content -Encoding UTF32): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes 50ms
+     → expected 'could_not_tell/no_declared_session' to be 'could_not_tell/unreadable' // Object.is equality
+   ✓ R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > UTF-32BE with a BOM (Set-Content -Encoding BigEndianUTF32): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes 75ms
+   × R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > UTF-7 (Set-Content -Encoding UTF7): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes 15ms
+     → expected 'could_not_tell/no_declared_session' to be 'could_not_tell/unreadable' // Object.is equality
+   × R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > zero bytes (New-Item): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes 15ms
+     → expected 'could_not_tell/no_declared_session' to be 'could_not_tell/unreadable' // Object.is equality
+   ✓ R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > a UTF-8 BOM, then UTF-16LE (a BOM-only file, then >>): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes 67ms
+   × R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > a UTF-16LE BOM whose text holds a NUL (a stray [char]0 added): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes 16ms
+     → expected 'stale' to be 'could_not_tell/unreadable' // Object.is equality
+   × R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > a UTF-16BE BOM whose text holds a NUL: could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes 15ms
+     → expected 'stale' to be 'could_not_tell/unreadable' // Object.is equality
+   × R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > a UTF-16LE BOM over UTF-8 bytes (a BOM that lies, with no NUL): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes 15ms
+     → expected 'could_not_tell/no_declared_session' to be 'could_not_tell/unreadable' // Object.is equality
+   × R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > the refusal names the file and why, for a shape with no NUL at all (UTF-7) 51ms
+     → expected [Function] to throw an error
+   ✓ R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > guard: UTF-16LE with a BOM, stale is judged stale, not unreadable 14ms
+   ✓ R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > guard: UTF-16BE with a BOM, stale is judged stale, not unreadable 14ms
+   ✓ R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > guard: Windows-1252, stale is judged stale, not unreadable 15ms
+   ✓ R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > guard: UTF-8 with a BOM, current is judged current, not unreadable 14ms
+   ✓ R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > guard (IF-10): +13: declares Session 20 is could_not_tell/ahead_of_latest and a bare --commit completes 49ms
+   ✓ R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > guard (IF-10): +1: declares Session 8 is could_not_tell/ahead_of_latest and a bare --commit completes 53ms
+   ✓ R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > guard (IF-10): a title and no Session N is could_not_tell/no_declared_session and a bare --commit completes 51ms
+   × R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED > the report names its NUL bytes, the ADRs imported, and the ADRs not imported 19ms
+     → expected '# state.json import report — draft (2…' to match /\.agents\/SYSTEM\/DECISIONS\.m…/SYSTEM\
+   × R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED > a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the ADRs not imported 1496ms
+     → expected '\nstate import — committed\n\nRoot: C…' to match /\.agents\/SYSTEM\/DECISIONS\.m…/SYSTEM\
+   ✓ R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED > guard: a readable DECISIONS.md says nothing about NUL bytes  713ms
+   × O7: two markers name the OLDEST snapshot, and say what the newer one holds > the refusal restores from the oldest snapshot and names the newer as a later run's 25ms
+     → expected [Function] to throw error matching /Restore \.agen…/ by hand from \.agents\ but got '.agents/ is half-restored: an earlier…'
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > UTF-32LE with a BOM (Set-Content -Encoding UTF32): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > UTF-7 (Set-Content -Encoding UTF7): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > zero bytes (New-Item): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > a UTF-16LE BOM over UTF-8 bytes (a BOM that lies, with no NUL): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+AssertionError: expected 'could_not_tell/no_declared_session' to be 'could_not_tell/unreadable' // Object.is equality
+
+Expected: "could_not_tell/unreadable"
+Received: "could_not_tell/no_declared_session"
+
+ ❯ tests/pipelines/state-import-leftovers.test.ts:109:28
+    107|       writeProject(root, bytes);
+    108|       const j = inboxOf(runDraft(root, TODAY).draft.report);
+    109|       expect(verdictOf(j)).toBe("could_not_tell/unreadable");
+       |                            ^
+    110|       expect(j.evidence).toMatch(why);
+    111|       const before = tree(root);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > a UTF-16LE BOM whose text holds a NUL (a stray [char]0 added): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > a UTF-16BE BOM whose text holds a NUL: could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+AssertionError: expected 'stale' to be 'could_not_tell/unreadable' // Object.is equality
+
+Expected: "could_not_tell/unreadable"
+Received: "stale"
+
+ ❯ tests/pipelines/state-import-leftovers.test.ts:109:28
+    107|       writeProject(root, bytes);
+    108|       const j = inboxOf(runDraft(root, TODAY).draft.report);
+    109|       expect(verdictOf(j)).toBe("could_not_tell/unreadable");
+       |                            ^
+    110|       expect(j.evidence).toMatch(why);
+    111|       const before = tree(root);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > the refusal names the file and why, for a shape with no NUL at all (UTF-7)
+AssertionError: expected [Function] to throw an error
+
+- Expected: 
+null
+
++ Received: 
+undefined
+
+ ❯ tests/pipelines/state-import-leftovers.test.ts:123:42
+    121|     writeProject(root, UTF7);
+    122|     runDraft(root, TODAY);
+    123|     expect(() => runCommit(root, TODAY)).toThrow(new RegExp(`${INBOX.r…
+       |                                          ^
+    124|   });
+    125| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED > the report names its NUL bytes, the ADRs imported, and the ADRs not imported
+AssertionError: expected '# state.json import report — draft (2…' to match /\.agents\/SYSTEM\/DECISIONS\.m…/SYSTEM\
+
+- Expected: 
+/\.agents\/SYSTEM\/DECISIONS\.md[^\n]*contains 88 NUL byte\(s\), the first at byte 86/
+
++ Received: 
+"# state.json import report — draft (2026-09-25)
+
+## Staleness — read this first
+
+Signal: the highest `Session N` an input names in its status blockquote (the `>` lines directly under its title) or in a heading, compared with the highest `SESSIONS/Session_N.md`.
+Latest session: Session 7 (`.agents/SESSIONS/Session_7.md`).
+
+- current `.agents/TASKS/INBOX.md`: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+- current `.agents/TASKS/task.md`: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+- current `.agents/SESSIONS/next-session.md`: line 3 declares Session 7 (`> Updated at end of Session 7.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+- not judged `.agents/SYSTEM/SUMMARY.md`: not imported as state: --commit only cuts its status blockquote and `## Current State`
+- not judged `.agents/SYSTEM/DECISIONS.md`: imported as a dated log of past decisions, not as current state
+
+No input is stale.
+
+Project: fixture-project v1.0.0 · current session 7 (from .agents/SESSIONS/Session_7.md) · retention edge: done items closed ≤ session 4 are dropped on the first ob_state write
+
+## Sources
+
+- inbox: `.agents/TASKS/INBOX.md` — 8 lines
+- task: `.agents/TASKS/task.md` — 8 lines
+- next: `.agents/SESSIONS/next-session.md` — 8 lines
+- summary: `.agents/SYSTEM/SUMMARY.md` — 8 lines
+- decisions: `.agents/SYSTEM/DECISIONS.md` — 14 lines
+
+## Tasks (INBOX.md)
+
+Items parsed: 1 (of which 0 under `## Completed`, imported as P3).
+
+Box counts as written (before the `[superseded]` rule):
+
+- open: 1
+- in_progress: 0
+- blocked: 0
+- done: 0
+
+Imported status by priority (after the `[superseded]` rule — superseded items are done):
+
+| priority | open | in_progress | blocked | done | total |
+|---|---|---|---|---|---|
+| P0 | 1 | 0 | 0 | 0 | 1 |
+| P1 | 0 | 0 | 0 | 0 | 0 |
+| P2 | 0 | 0 | 0 | 0 | 0 |
+| P3 | 0 | 0 | 0 | 0 | 0 |
+| **all** | 1 | 0 | 0 | 0 | 1 |
+
+Sessions: 0 items had a `(Session N)` marker (opened = min, closed = max for done); 1 open items had none → opened_session = 7; 0 done items had none → closed_session = 4.
+Retention-eligible on the first write: 0 done items (they stay in the snapshot and in git).
+
+### Superseded links (0)
+
+_None._
+
+### Title fallbacks — no bold lead, first sentence used (0)
+
+_None._
+
+### Could not be parsed as items (1)
+
+- line 3: not an item, heading or blank line — ignored (kept in the snapshot) — `> **Last Updated:** Session 7`
+
+## Objective (task.md)
+
+Found: Ship the thing.
+
+## Decisions (DECISIONS.md)
+
+Imported 1 ADRs: 1 with a full `Date:` line, 0 with a partial date (kept in the note), 0 with none (date = migration date, note \"imported; original date unknown\").
+
+## Handoff (next-session.md)
+
+pick_up: 1 lines · watch_out: 0 bullets · open_questions: 0 bullets
+
+## Verified and gaps
+
+verified[]: 0 · gaps[]: 0. The prose files carry none in a form the importer reads, and it invents none. Record them with ob_state after the commit.
+
+## Last session
+
+Session 7 — 2026-09-20 — uuid none (.agents/SESSIONS/Session_7.md)
+
+## SUMMARY.md lines `--commit` will remove
+
+- status blockquote after the title (line 1): 1 `>` lines
+- `## Current State` through the next `## ` heading: 0 lines
+- total lines removed (blockquote + surrounding blanks + section): 3
+- headings kept byte for byte: `About`
+
+Draft validates against StateSchema.
+"
+
+ ❯ tests/pipelines/state-import-leftovers.test.ts:170:20
+    168|     runDraft(root, TODAY);
+    169|     const report = readFileSync(join(root, REPORT_REL), "utf8");
+    170|     expect(report).toMatch(new RegExp(named));
+       |                    ^
+    171|     expect(report).toMatch(/ADRs imported: ADR-1\b/);
+    172|     expect(report).toMatch(/ADRs NOT imported[^\n]*: ADR-2\b/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED > a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the ADRs not imported
+AssertionError: expected '\nstate import — committed\n\nRoot: C…' to match /\.agents\/SYSTEM\/DECISIONS\.m…/SYSTEM\
+
+- Expected: 
+/\.agents\/SYSTEM\/DECISIONS\.md[^\n]*contains 88 NUL byte\(s\), the first at byte 86/
+
++ Received: 
+"
+state import — committed
+
+Root: C:\\Users\\melve\\AppData\\Local\\Temp\\ob-import-leftovers-4k5UkE
+Snapshot: .agents\\archive\\pre-state-migration-2026-09-26 (8 files)
+Wrote:    .agents/state.json at revision 0
+SUMMARY.md: removed 3 lines (1 blockquote + 0 Current State); kept About
+Rendered: .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+Moved into snapshot: .agents/archive/pre-state-migration-2026-09-26/state.draft.json, .agents/archive/pre-state-migration-2026-09-26/state.import-report.md
+"
+
+ ❯ tests/pipelines/state-import-leftovers.test.ts:180:22
+    178|     const c = cli(["state", "import", "--commit", root], root);
+    179|     expect(c.status).toBe(0);
+    180|     expect(c.stdout).toMatch(new RegExp(named));
+       |                      ^
+    181|     expect(c.stdout).toMatch(/ADRs imported: ADR-1\b/);
+    182|     expect(c.stdout).toMatch(/ADRs NOT imported[^\n]*: ADR-2\b/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > O7: two markers name the OLDEST snapshot, and say what the newer one holds > the refusal restores from the oldest snapshot and names the newer as a later run's
+AssertionError: expected [Function] to throw error matching /Restore \.agen…/ by hand from \.agents\ but got '.agents/ is half-restored: an earlier…'
+
+- Expected: 
+/Restore \.agents\/ by hand from \.agents\/archive\/pre-state-migration-2026-09-23\/ \(the oldest; it holds the originals from before the first failed --commit\)/
+
++ Received: 
+".agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from .agents/archive/pre-state-migration-2026-09-23/ and .agents/archive/pre-state-migration-2026-09-24/, which holds every original, then delete .agents/archive/pre-state-migration-2026-09-23.import-incomplete and .agents/archive/pre-state-migration-2026-09-24.import-incomplete. Nothing written. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success"
+
+ ❯ tests/pipelines/state-import-leftovers.test.ts:208:19
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  10 failed | 11 passed (21)
+   Start at  03:14:09
+   Duration  3.63s (transform 189ms, setup 40ms, collect 306ms, tests 2.79s, environment 0ms, prepare 172ms)
+

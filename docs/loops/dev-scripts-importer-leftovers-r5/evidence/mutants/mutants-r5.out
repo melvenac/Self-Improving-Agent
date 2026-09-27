@@ -1,0 +1,56 @@
+HEAD e2f202b; sources src/pipelines/state-import/index.ts cc3214ec47d9, src/cli.ts 4bf5d4c0ef8f; 2026-09-27T01:42:30.182Z
+R5M1-hash-space-only: KILLED — tsc 0; vitest exit 1, 6 of 148 red — R5-1: the old `# `-only rule, so a `##`-only file is unreadable again
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' a `##`-only next-session.md is judged by its heading: stale when it names an older session
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' a `##`-only next-session.md naming the latest session is current, and a bare --commit imports its pick_up
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' an INBOX.md whose only heading is `###### ` (level 6) is judged (stale), not unreadable
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' an INBOX.md whose only heading is `## ` (level 2) is judged (stale), not unreadable
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' an INBOX.md whose only heading is a bare `#` line (end of line) is judged (could_not_tell/no_declared_session), not unreadable
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' an INBOX.md whose only heading is a bare `###` line is judged (could_not_tell/no_declared_session), not unreadable
+R5M2-be-odd-throws: KILLED — tsc 0; vitest exit 1, 6 of 148 red — R5-2: an odd-length UTF-16BE input reaches swap16 and throws
+    pipelines/state-import-qa138.test.ts > QA 138 D1 (RED): a UTF-16BE mark over an odd number of bytes a judged INBOX.md is filed unreadable, not thrown
+    pipelines/state-import-qa138.test.ts > QA 138 D1 (RED): a UTF-16BE mark over an odd number of bytes a NOT-judged DECISIONS.md does not stop the draft (R4-5: not judged, so it does not block)
+    pipelines/state-import-r5.test.ts > R5-2: an odd-length input with a UTF-16BE mark is filed unreadable, never thrown a judged .agents/TASKS/INBOX.md is unreadable, its evidence names FE FF and the odd byte count, and a bare --commit refuses naming it
+    pipelines/state-import-r5.test.ts > R5-2: an odd-length input with a UTF-16BE mark is filed unreadable, never thrown a judged .agents/TASKS/task.md is unreadable, its evidence names FE FF and the odd byte count, and a bare --commit refuses naming it
+    pipelines/state-import-r5.test.ts > R5-2: an odd-length input with a UTF-16BE mark is filed unreadable, never thrown a not-judged DECISIONS.md is named in not_judged and does not block (R4-5)
+    pipelines/state-import-r5.test.ts > R5-2: an odd-length input with a UTF-16BE mark is filed unreadable, never thrown the latest session log of that shape does not stop the draft or the commit
+R5M3-utf8-encoding-claim: KILLED — tsc 0; vitest exit 1, 3 of 148 red — R5-1: the old encoding wording on a valid-UTF-8 file
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' the wording on a valid UTF-8 file says it has no heading line, and makes no claim about its encoding
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' the wording on a UTF-8-BOM file makes no claim about its encoding either
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' UTF-7 stays blocked on every judged input, worded without an encoding claim (UTF-7 is valid UTF-8 bytes)
+R5M4-utf16-wording: KILLED — tsc 0; vitest exit 1, 1 of 148 red — R5-1: a UTF-16 mark's decode no longer named in the evidence
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' a UTF-16LE mark over UTF-8 bytes stays blocked, and the evidence names the mark its decode followed
+R5M5-1252-wording: KILLED — tsc 0; vitest exit 1, 1 of 148 red — R5-1: a Windows-1252 guess loses its encoding sentence
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' a Windows-1252 read with no heading line keeps the encoding sentence: that decode was a guess
+R5M6-seven-hashes: KILLED — tsc 0; vitest exit 1, 1 of 148 red — R5-1: `#######` counted as a heading
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' guard: an INBOX.md whose only candidate is `####### ` (seven) has no heading line
+R5M7-no-end-of-line: KILLED — tsc 0; vitest exit 1, 2 of 148 red — R5-1: a bare `#` line not counted as a heading
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' an INBOX.md whose only heading is a bare `#` line (end of line) is judged (could_not_tell/no_declared_session), not unreadable
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' an INBOX.md whose only heading is a bare `###` line is judged (could_not_tell/no_declared_session), not unreadable
+R5M8-ebusy-raw: KILLED — tsc 0; vitest exit 1, 2 of 148 red — R5-3: EBUSY is Node's raw message again
+    pipelines/state-import-ebusy.test.ts > R5-3: an EBUSY read names the cause and the remedy .agents/TASKS/INBOX.md held open: Node's message, then who holds it and what to do
+    pipelines/state-import-ebusy.test.ts > R5-3: an EBUSY read names the cause and the remedy .agents/SESSIONS/Session_7.md held open: Node's message, then who holds it and what to do
+R5M10-no-heading-rule-off: KILLED — tsc 0; vitest exit 1, 20 of 148 red — R4-4 (was M4): a judged input with no heading line is no longer unreadable
+    pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project UTF-7 (Set-Content -Encoding UTF7): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+    pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project zero bytes (New-Item): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+    pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project a UTF-16LE BOM over UTF-8 bytes (a BOM that lies, with no NUL): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+    pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project the refusal names the file and why, for a shape with no NUL at all (UTF-7)
+    pipelines/state-import-qa122.test.ts > QA 122 D11: an INBOX.md the importer reads wrongly, without NUL detection, does not block UTF-7 (Set-Content -Encoding UTF7), declaring Session 6 against a latest of 7: a bare --commit refuses, and the tree is identical
+    pipelines/state-import-qa138.test.ts > QA 138 coverage (GREEN): what the candidate's own tests left open task.md in UTF-7: unreadable, and a bare --commit refuses naming it
+    pipelines/state-import-qa138.test.ts > QA 138 coverage (GREEN): what the candidate's own tests left open task.md with zero bytes: unreadable, and a bare --commit refuses naming it
+    pipelines/state-import-qa138.test.ts > QA 138 coverage (GREEN): what the candidate's own tests left open next-session.md in UTF-7: unreadable, and a bare --commit refuses naming it
+    pipelines/state-import-qa138.test.ts > QA 138 coverage (GREEN): what the candidate's own tests left open next-session.md with zero bytes: unreadable, and a bare --commit refuses naming it
+    pipelines/state-import-qa138.test.ts > QA 138 coverage (GREEN): what the candidate's own tests left open zero bytes: the evidence says it is empty
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' guard: an INBOX.md whose only candidate is `####### ` (seven) has no heading line
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' guard: an INBOX.md whose only candidate is `#Inbox` (no space) has no heading line
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' guard: an INBOX.md whose only candidate is `#<TAB>Inbox` has no heading line
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' guard: an INBOX.md whose only candidate is an indented `  # Inbox` has no heading line
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' the wording on a valid UTF-8 file says it has no heading line, and makes no claim about its encoding
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' the wording on a UTF-8-BOM file makes no claim about its encoding either
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' UTF-7 stays blocked on every judged input, worded without an encoding claim (UTF-7 is valid UTF-8 bytes)
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' zero bytes stay blocked and are said to be empty
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' a UTF-16LE mark over UTF-8 bytes stays blocked, and the evidence names the mark its decode followed
+    pipelines/state-import-r5.test.ts > R5-1: the title rule is 'no ATX heading at any level' a Windows-1252 read with no heading line keeps the encoding sentence: that decode was a guess
+R5M11-o14-producer: KILLED by tsc (exit 2, 1 error(s): src/pipelines/state-import/index.ts(630,19): error TS2345: Argument of type '{ input: string; verdict: "could_not_tell"; declared_session: null; evidence: string; }' is not assignable to parameter of type 'InputStaleness'.) — O14 (was M16): a producer leaves the reason out
+R5M9-oe-singular: KILLED — tsc 0; vitest exit 1, 1 of 148 red — O-e: two markers speak of one snapshot again
+    pipelines/state-import-r5.test.ts > O-e: two or more markers do not speak of one snapshot the refusal says every snapshot, not the snapshot
+restored: src/ clean; 2026-09-27T01:47:01.907Z

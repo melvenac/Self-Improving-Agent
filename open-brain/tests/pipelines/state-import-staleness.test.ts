@@ -12,7 +12,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, cpSync, rmSync, readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { execFileSync } from "node:child_process";
+import { spawnAsync } from "../spawn-async.js";
 import { runDraft, runCommit, REPORT_REL, STATE_REL } from "../../src/pipelines/state-import/index.js";
 
 const hubFixture = join(import.meta.dirname, "../fixtures-import-a2a-hub");
@@ -28,14 +28,11 @@ function staleness(report: unknown): { inputs: Judged[]; not_judged: Array<{ inp
   return (report as { staleness?: { inputs: Judged[]; not_judged: Array<{ input: string; reason: string }> } }).staleness;
 }
 
-function cli(args: string[], cwd: string): { status: number; stdout: string; stderr: string } {
-  try {
-    const stdout = execFileSync(process.execPath, [tsxCli, cliEntry, ...args], { cwd, stdio: ["ignore", "pipe", "pipe"], env: process.env }).toString();
-    return { status: 0, stdout, stderr: "" };
-  } catch (err) {
-    const e = err as { status: number; stdout: Buffer; stderr: Buffer };
-    return { status: e.status, stdout: e.stdout.toString(), stderr: e.stderr.toString() };
-  }
+// Awaited, not execFileSync (G-042): this file's CLI spawns were one stretch of about 16 s with no macrotask at R1.
+async function cli(args: string[], cwd: string): Promise<{ status: number | null; stdout: string; stderr: string }> {
+  const r = await spawnAsync(process.execPath, [tsxCli, cliEntry, ...args], { cwd, env: process.env });
+  if (r.error) throw r.error;
+  return { status: r.status, stdout: r.stdout, stderr: r.stderr };
 }
 
 /** The first `## ` heading of a markdown text and the lines under it, up to the next one. */
@@ -91,23 +88,23 @@ describe("T-180: a stale input is named at the top of the report and gates --com
       expect(existsSync(ok.statePath)).toBe(true);
     });
 
-    it("the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale", () => {
-      expect(cli(["state", "import", "--draft", root], root).status).toBe(0);
+    it("the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale", async () => {
+      expect((await cli(["state", "import", "--draft", root], root)).status).toBe(0);
 
-      const bare = cli(["state", "import", "--commit", root], root);
+      const bare = await cli(["state", "import", "--commit", root], root);
       expect(bare.status).toBe(1);
       expect(bare.stderr).toContain("next-session.md");
       expect(bare.stderr).toContain("--accept-stale");
       expect(existsSync(join(root, STATE_REL))).toBe(false);
 
-      const typo = cli(["state", "import", "--commit", "--accept-stal", root], root);
+      const typo = await cli(["state", "import", "--commit", "--accept-stal", root], root);
       expect(typo.status).toBe(1);
       // The flag check's own words: "--accept-stal" alone is also inside the
       // stale refusal's "--accept-stale" (QA 102, D1).
       expect(typo.stderr).toContain("unrecognised flag(s) --accept-stal.");
       expect(existsSync(join(root, STATE_REL))).toBe(false);
 
-      const acked = cli(["state", "import", "--commit", "--accept-stale", root], root);
+      const acked = await cli(["state", "import", "--commit", "--accept-stale", root], root);
       expect(acked.status).toBe(0);
       expect(existsSync(join(root, STATE_REL))).toBe(true);
     }, 60_000);
@@ -153,10 +150,10 @@ describe("T-180: a stale input is named at the top of the report and gates --com
       expect(line).toContain(inbox!.evidence);
     });
 
-    it("--commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report", () => {
+    it("--commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report", async () => {
       writeProject(root, 7, { next: "Updated at end of Session 7.", inbox: null, task: null });
-      expect(cli(["state", "import", "--draft", root], root).status).toBe(0);
-      const c = cli(["state", "import", "--commit", root], root);
+      expect((await cli(["state", "import", "--draft", root], root)).status).toBe(0);
+      const c = await cli(["state", "import", "--commit", root], root);
       expect(c.status).toBe(0);
       expect(existsSync(join(root, STATE_REL))).toBe(true);
       const lines = c.stdout.split(/\r?\n/).filter((l) => l.startsWith("Could not tell whether current:"));

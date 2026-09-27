@@ -57,6 +57,13 @@ const INVOCATION_LOG_PATH = join(homedir(), ".claude", "open-brain", "skill-invo
  * Scans all entries rather than trusting the last line: entries are appended per
  * session and backfill can write older sessions after newer ones.
  */
+/** A log that is present but not a list of timestamps, or that cannot be read.
+ *  Null stays reserved for a missing file. One mutant restores that null for
+ *  both kinds (SILENT 6). */
+function unusableLog(kind: "corrupt" | "unreadable", detail?: string): string | null {
+  return detail ? `${kind}: ${detail}` : kind;
+}
+
 export function readLastInvocationTs(logPath: string = INVOCATION_LOG_PATH): string | null {
   if (!existsSync(logPath)) return null;
   try {
@@ -77,9 +84,9 @@ export function readLastInvocationTs(logPath: string = INVOCATION_LOG_PATH): str
         // Skip malformed lines rather than failing the whole score.
       }
     }
-    return newestRaw;
-  } catch {
-    return null;
+    return newestRaw ?? unusableLog("corrupt");
+  } catch (err) {
+    return unusableLog("unreadable", err instanceof Error ? err.message : String(err));
   }
 }
 const SESSIONS_DB_DIR = join(homedir(), ".claude", "context-mode", "sessions");

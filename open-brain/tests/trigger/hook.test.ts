@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { spawnSync } from 'node:child_process';
+import { spawnAsync } from '../spawn-async.js';
 import { mkdtempSync, rmSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -60,10 +60,10 @@ interface HookResult { status: number; stdout: string; stderr: string }
  * stderr survived the whole file. The instrument could not see the thing it
  * was asserting about, which is this loop's own subject one layer down.
  */
-function runHook(payload: unknown, env: Record<string, string> = {}): HookResult {
-  const r = spawnSync('npx', ['tsx', HOOK], {
+async function runHook(payload: unknown, env: Record<string, string> = {}): Promise<HookResult> {
+  // Awaited, not spawnSync: twelve synchronous spawns were one stretch of 86-99 s with no macrotask under load (G-042).
+  const r = await spawnAsync('npx', ['tsx', HOOK], {
     input: JSON.stringify(payload),
-    encoding: 'utf-8',
     env: { ...process.env, KNOWLEDGE_V2_DB: dbPath, RECALL_TRIGGER_LOG: logPath, ...env },
     shell: true,
   });
@@ -150,8 +150,8 @@ const SPAWN_TIMEOUT = 60_000;
 // everywhere, with the gap only visible under load.
 
 describe('A5 — what the hook emits', () => {
-  it('POSITIVE, at scale, through the shipped floor: additionalContext carries 299 and its ACTION', () => {
-    const result = runHook(postToolUse(G039_COMMAND));
+  it('POSITIVE, at scale, through the shipped floor: additionalContext carries 299 and its ACTION', async () => {
+    const result = await runHook(postToolUse(G039_COMMAND));
 
     expect(result.status).toBe(0);
     const emitted = JSON.parse(result.stdout) as {
@@ -177,7 +177,7 @@ describe('A5 — what the hook emits', () => {
     expect(result.stderr).toBe('');
   }, SPAWN_TIMEOUT);
 
-  it('the POLICY FILE is what let 299 through — raise the floor and the same call goes silent', () => {
+  it('the POLICY FILE is what let 299 through — raise the floor and the same call goes silent', async () => {
     // Guards the positive above, and it needed strengthening: asserting only
     // that the emission happened cannot tell a policy-driven floor from an
     // internal default. Both directions, same command, same store, one
@@ -189,8 +189,8 @@ describe('A5 — what the hook emits', () => {
       'utf-8',
     );
 
-    expect(runHook(postToolUse(G039_COMMAND), { TRIGGER_POLICY_DIR: high }).stdout.trim()).toBe('');
-    expect(runHook(postToolUse(G039_COMMAND)).stdout.trim()).not.toBe('');
+    expect((await runHook(postToolUse(G039_COMMAND), { TRIGGER_POLICY_DIR: high })).stdout.trim()).toBe('');
+    expect((await runHook(postToolUse(G039_COMMAND))).stdout.trim()).not.toBe('');
     rmSync(high, { recursive: true, force: true });
   }, SPAWN_TIMEOUT);
 
@@ -198,8 +198,8 @@ describe('A5 — what the hook emits', () => {
     ['git status --porcelain'],
     ['ls -la'],
     ['zzqx --flurb wibble'],
-  ])('NEGATIVE: %s emits nothing at all — no key, no stdout, no stderr', (command) => {
-    const result = runHook(postToolUse(command));
+  ])('NEGATIVE: %s emits nothing at all — no key, no stdout, no stderr', async (command) => {
+    const result = await runHook(postToolUse(command));
 
     expect(result.status).toBe(0);
     // Not "additionalContext is empty" — NOTHING. Present-and-empty is a fail
@@ -209,8 +209,8 @@ describe('A5 — what the hook emits', () => {
     expect(result.stderr).toBe('');
   }, SPAWN_TIMEOUT);
 
-  it('ignores a tool that is not Bash, and says nothing about it', () => {
-    const result = runHook({
+  it('ignores a tool that is not Bash, and says nothing about it', async () => {
+    const result = await runHook({
       session_id: SESSION, hook_event_name: 'PostToolUse',
       tool_name: 'Read', tool_input: { file_path: '/tmp/x' },
     });
@@ -219,7 +219,7 @@ describe('A5 — what the hook emits', () => {
     expect(result.stderr).toBe('');
   }, SPAWN_TIMEOUT);
 
-  it('the fire is recorded for every invocation, in the right state', () => {
+  it('the fire is recorded for every invocation, in the right state', async () => {
     const db = new Database(dbPath, { readonly: true });
     const rows = db.prepare('SELECT state, COUNT(*) AS n FROM trigger_fires GROUP BY state')
       .all() as Array<{ state: string; n: number }>;
@@ -233,9 +233,9 @@ describe('A5 — what the hook emits', () => {
 });
 
 describe('A6 — three failures, and the model hears none of them', () => {
-  it('store path absent', () => {
+  it('store path absent', async () => {
     const missing = join(dir, 'no-such-store.db');
-    const result = runHook(postToolUse(G039_COMMAND), { KNOWLEDGE_V2_DB: missing });
+    const result = await runHook(postToolUse(G039_COMMAND), { KNOWLEDGE_V2_DB: missing });
 
     expect(result.status).toBe(0);
     expect(result.stdout.trim()).toBe('');
@@ -252,12 +252,12 @@ describe('A6 — three failures, and the model hears none of them', () => {
     expect(existsSync(missing)).toBe(false);
   }, SPAWN_TIMEOUT);
 
-  it('store locked by another writer', () => {
+  it('store locked by another writer', async () => {
     const locker = new Database(dbPath);
     locker.pragma('locking_mode = EXCLUSIVE');
     locker.exec('BEGIN EXCLUSIVE');
     try {
-      const result = runHook(postToolUse(G039_COMMAND));
+      const result = await runHook(postToolUse(G039_COMMAND));
 
       expect(result.status).toBe(0);
       expect(result.stdout.trim()).toBe('');
@@ -269,7 +269,7 @@ describe('A6 — three failures, and the model hears none of them', () => {
     }
   }, SPAWN_TIMEOUT);
 
-  it('past its own deadline: the work finished, and the result is still not emitted', () => {
+  it('past its own deadline: the work finished, and the result is still not emitted', async () => {
     // The deadline is data, so the case is reachable without a slow query:
     // point the hook at a policy whose deadline is 1ms and every invocation
     // is late. What is asserted is the EMISSION rule — a reminder that
@@ -282,7 +282,7 @@ describe('A6 — three failures, and the model hears none of them', () => {
       'utf-8',
     );
 
-    const result = runHook(postToolUse(G039_COMMAND), { TRIGGER_POLICY_DIR: lateDir });
+    const result = await runHook(postToolUse(G039_COMMAND), { TRIGGER_POLICY_DIR: lateDir });
 
     expect(result.status).toBe(0);
     expect(result.stdout.trim()).toBe('');
@@ -291,13 +291,13 @@ describe('A6 — three failures, and the model hears none of them', () => {
     expect(logLines()[0]).toContain('deadline exceeded');
   }, SPAWN_TIMEOUT);
 
-  it('a malformed payload is logged and dropped, NOT refused with a non-zero exit', () => {
+  it('a malformed payload is logged and dropped, NOT refused with a non-zero exit', async () => {
     // Deliberately unlike SessionStart's F4. That hook runs once and a
     // refusal is visible; this one runs after every tool call, and a host
     // that malforms payloads would turn a memory feature into a wall of
     // stderr in front of the model — on an event where stderr IS shown to it.
-    const r = spawnSync('npx', ['tsx', HOOK], {
-      input: '{ "tool_name": "Bash", ', encoding: 'utf-8',
+    const r = await spawnAsync('npx', ['tsx', HOOK], {
+      input: '{ "tool_name": "Bash", ',
       env: { ...process.env, KNOWLEDGE_V2_DB: dbPath, RECALL_TRIGGER_LOG: logPath },
       shell: true,
     });
@@ -309,11 +309,11 @@ describe('A6 — three failures, and the model hears none of them', () => {
     expect(logLines()[0]).toContain('not valid JSON');
   }, SPAWN_TIMEOUT);
 
-  it('POSITIVE CONTROL: the same harness on a healthy store DOES emit', () => {
+  it('POSITIVE CONTROL: the same harness on a healthy store DOES emit', async () => {
     // Every row in this block asserts an absence. Without this, a broken
     // runHook — a bad path, a spawn that never starts — would make all five
     // pass. This is the row that proves the harness can see an emission.
-    const result = runHook(postToolUse(G039_COMMAND));
+    const result = await runHook(postToolUse(G039_COMMAND));
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('additionalContext');
     expect(logLines()).toHaveLength(0);

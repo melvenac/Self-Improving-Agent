@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 34a366c..69bf16f 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -391,7 +391,7 @@ export interface DecisionsUnreadable { evidence: string; imported: string[]; not
+ export function decisionsUnreadable(text: string, evidence: string, imported: string[]): DecisionsUnreadable {
+   const scratch: ImportReport["decisions"] = { imported: 0, date_from_line: 0, date_partial: [], date_unknown: 0, skipped: [] };
+   const seen = importDecisions(text.replace(/\u0000/g, ""), "0000-00-00", scratch).map((d) => d.id);
+-  return { evidence, imported, not_imported: seen.filter((id) => !imported.includes(id)) };
++  return { evidence, imported, not_imported: seen };
+ }
+ 
+ /** The lines the report and the CLI both print for it, so they cannot say different things. */

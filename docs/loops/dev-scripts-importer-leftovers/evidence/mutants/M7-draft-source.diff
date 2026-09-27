@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index e0023af..893c751 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -686,7 +686,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
+   const { objective, preview } = importObjective(texts.task, current);
+   report.objective = { found: objective !== null, preview };
+   const decisions = texts.decisions ? importDecisions(texts.decisions, today, report.decisions) : [];
+-  if (texts.decisions && undecodable.decisions) report.decisions_unreadable = decisionsUnreadable(texts.decisions, undecodable.decisions, decisions.map((d) => d.id));
++  if (texts.decisions && undecodable.decisions && today === "never") report.decisions_unreadable = decisionsUnreadable(texts.decisions, undecodable.decisions, decisions.map((d) => d.id));
+   const handoff = importHandoff(texts.next, current, report.handoff);
+   const verified: Verified[] = [];
+   const gaps: Gap[] = [];

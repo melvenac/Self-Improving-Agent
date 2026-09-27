@@ -51,7 +51,7 @@ export function resolveRepoRoot(start: string): string | null {
 export function isProjectRoot(dir: string): boolean {
   if (existsSync(join(dir, ".agents", "SYSTEM"))
     || existsSync(join(dir, ".agents", "META"))
-    || isStateRecord(join(dir, ".agents", "state.json"))) return true;
+    || existsSync(join(dir, ".agents", "state.json"))) return true; // mutant
   return existsSync(join(dir, "package.json")) && existsSync(join(dir, "open-brain"));
 }
 

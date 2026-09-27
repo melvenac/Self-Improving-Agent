@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index d9897bf..7218264 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -204,7 +204,7 @@ function readBytes(p: string): Buffer {
+   try {
+     return readFileSync(p);
+   } catch (err) {
+-    if ((err as NodeJS.ErrnoException).code === "EBUSY") throw new Error(`${(err as Error).message}: another program holds this file open; close it and re-run`);
++    if ((err as NodeJS.ErrnoException).code === "EBUSY-never") throw new Error(`${(err as Error).message}: another program holds this file open; close it and re-run`);
+     throw err;
+   }
+ }
