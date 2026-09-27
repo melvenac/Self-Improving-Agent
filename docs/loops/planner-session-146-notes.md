@@ -58,3 +58,15 @@ Cursor seats are not woken by hub messages. The planner asks Aaron to nudge ("re
 - It gave Aaron an unreadable base64 launch line, and wrote a redundant copy step; the queue script was already on
   both machines.
 - It launched QA on this desktop while Aaron and the agents were active. Stopped before the driver started.
+
+## Hub rooms: one per Cursor seat (Aaron, 2026-09-27, after two seats read each other's dispatches in the shared room)
+
+| Seat | `--as` | Room (`--session`) |
+|---|---|---|
+| Grok, `sia-forge` | `grok` | `k57frxw0ptb8tadmqdwy0khhks8ey006` (its original room) |
+| `sia-infra` | `cursor-infra` | `k5702788wctxj75begyt4x2k5x8f6mav` (turn 1 = T-171 r2, record 155) |
+| `sia-builder` | `cursor-builder` | `k57098epn7qz32vt0cazfjpbes8f6kdq` (turn 1 = /bootstrap r4, record 156) |
+
+These were created with `hub-talk --as atlas --peer <name>`. That creates the `{atlas, name}` room, and it no longer
+rewrites the peer's card (`bc157f5`). **Each seat always passes its own `--session`.** Turns 171 and 172 in the shared
+room are superseded by these rooms' turn 1.
