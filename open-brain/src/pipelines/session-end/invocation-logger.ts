@@ -61,7 +61,9 @@ const INVOCATION_LOG_PATH = join(homedir(), ".claude", "open-brain", "skill-invo
  *  Null stays reserved for a missing file. One mutant restores that null for
  *  both kinds (SILENT 6). */
 function unusableLog(kind: "corrupt" | "unreadable", detail?: string): string | null {
-  return detail ? `${kind}: ${detail}` : kind;
+  void kind;
+  void detail;
+  return null;
 }
 
 export function readLastInvocationTs(logPath: string = INVOCATION_LOG_PATH): string | null {
