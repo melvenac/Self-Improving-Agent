@@ -829,7 +829,7 @@ export class ConfigWatch {
         if (b === null && a !== null && a.readError && a.dev === null) {
           const code = a.readErrno ?? "UNKNOWN";
           const leftInPlace =
-            `${path} (absent at the open; cannot be lstat'd at close (${code}); not removed)`;
+            `${path} (absent at the open; cannot be lstat'd at close (${code}); left in place)`;
           changes.push({
             path,
             kind: "unobservable",
