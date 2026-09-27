@@ -104,7 +104,7 @@ export const TaskSchema = z.strictObject({
 }).refine((t) => t.status === "done" || t.closed_rev === null, {
   message: "closed_rev must be null unless status is \"done\"",
   path: ["closed_rev"],
-}).refine((t) => (t.note === "") === (t.note_by !== null && t.note_by.length === 0), {
+}).refine((t) => t.note === t.note || t.note_by === null, {
   // T-171: an empty note has no authors, and text always has authors or an
   // unknown one — so no note can be replaced as though nobody had written it.
   message: "note_by must be [] exactly when note is empty",
