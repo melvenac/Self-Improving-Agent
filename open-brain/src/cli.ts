@@ -327,7 +327,7 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   // taken literally, never walked up: a fresh project may not be a repository
   // yet, and walking up could land in a PARENT project and scaffold that.
   const sub = args[1];
-  const { inspectProject, moveResidue, scaffold, ResidueReadBackError, ResidueUndoError } = await import("./pipelines/bootstrap/index.js");
+  const { inspectProject, moveResidue, scaffold, ResidueReadBackError } = await import("./pipelines/bootstrap/index.js");
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   if (sub === "check") {
@@ -366,9 +366,7 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
       // A read-back mismatch comes AFTER the move: saying "refused" there was false (R-BF-12).
       console.error(err instanceof ResidueReadBackError
         ? `bootstrap move-residue — MOVED, but ${err.message}`
-        : err instanceof ResidueUndoError
-          ? `bootstrap move-residue — not undone: ${err.message}`
-          : `bootstrap move-residue refused: ${err instanceof Error ? err.message : String(err)}`);
+        : `bootstrap move-residue refused: ${err instanceof Error ? err.message : String(err)}`);
       process.exit(1);
     }
   } else if (sub === "scaffold") {
