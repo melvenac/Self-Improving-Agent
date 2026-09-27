@@ -210,3 +210,13 @@ dev agents? Worth testing?", then "write the replay brief, composer is set in in
 4. **(Added.) Two read times written as guesses, twice in a row** ("09:40Z" and "09:45-09:48Z"), each pushed and
    then corrected from the send timestamp. The fix is not care; it is to print `date -u` in the same command that
    writes the time.
+
+### Record 184c (`bc91919`, product `887ae4c`), read by the planner 09:52:15-09:53:05Z; round 184d sent 09:53:05Z (turn 27); this note written 09:53:15Z
+
+- **R184-2 MET:** `loop/t192-replay-composer-red` `4fa4f62` carries the candidate's tests on the pre-fix product.
+  `ci.yml` is byte-identical to `7243fd5`, and `checks-state.ts` has `4aeda0a`'s behaviour behind the new
+  signature, disclosed in a comment. tcm `36310482876` fails on exactly the two real rows (master push →
+  `ubuntu-latest`; run view failed → plain `failure`). No seeded line anywhere.
+- **R184-3 MET:** `loop/t192-replay-composer-mut-silent` `fd57197` changes `checks-state.ts` only. tcm `36310577168`
+  fails on the inconclusive-case row. `silentFallback` is absent from the candidate's `src/`. Green: `36310587246`.
+- **Round 184d** gives Composer the D-055 `paths-ignore` addition, as Grok received it, for parity.
