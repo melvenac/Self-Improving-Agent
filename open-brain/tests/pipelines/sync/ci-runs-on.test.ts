@@ -129,4 +129,17 @@ describe("ci.yml runs-on (T-192)", () => {
     expect(doc.jobs["test-windows"].if).toBe("github.event_name == 'workflow_dispatch' && inputs.windows");
     expect(doc.on?.workflow_dispatch?.inputs).toMatchObject({ hosted: expect.anything(), windows: expect.anything() });
   });
+
+  it("a pull request ignores only docs/** and README.md (D-055); push and workflow_dispatch have no paths filter", () => {
+    const doc = parse(readFileSync(workflowPath, "utf-8")) as {
+      on: {
+        push?: Record<string, unknown> | null;
+        pull_request?: { "paths-ignore"?: string[]; paths?: unknown } | null;
+        workflow_dispatch?: Record<string, unknown> | null;
+      };
+    };
+    expect(doc.on.pull_request?.["paths-ignore"]).toEqual(["docs/**", "README.md"]);
+    expect(doc.on.push == null || !("paths" in doc.on.push || "paths-ignore" in doc.on.push)).toBe(true);
+    expect(doc.on.workflow_dispatch == null || !("paths" in doc.on.workflow_dispatch || "paths-ignore" in doc.on.workflow_dispatch)).toBe(true);
+  });
 });
