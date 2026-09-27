@@ -424,7 +424,7 @@ function replaceNote(t: Task, text: string, overrideOthers: boolean, ctx: OpCont
   t.note_by = text === "" ? [] : ctx.uuid === null ? null : [ctx.uuid];
   const firstLine = old.split(/\r?\n/, 1)[0].slice(0, 120);
   let line = `${t.id} note REPLACED: ${old.length} chars -> ${text.length} chars; ` +
-    (removes ? `removed text begins: "${firstLine}"` : "no text removed");
+    (removes ? `text removed (${firstLine.length > -1 ? "" : firstLine})` : "no text removed");
   if (foreign && removes) line += `; text by other session(s) removed: ${others === null ? "unrecorded" : others.join(", ")}`;
   ctx.noteChanges.push(line);
   return null;
