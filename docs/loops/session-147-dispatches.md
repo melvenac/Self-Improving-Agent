@@ -606,3 +606,11 @@ driver-level guard may be worth a round.
 - **Update 23:28Z: QA 191 LAUNCHED** by Aaron (QA PC pid 12704; queue `start=queue=191` at 23:27:51Z, `head=d8166b6`). All
   three dev seats had read their turns (Grok 194, infra 37, builder 30) and were working. **This commit is LOCAL and
   unpushed** (the no-push-during-QA rule). The next planner pushes it once QA 191's log shows `end=queue finished`.
+- **Windows CI on master `bf33fe4`** (`36358221545`, laptop-win): **1 failed**, 1723 passed. Linux on tcm-2: 1799 passed.
+  The failure is `tests/harness/qa104-a9-probe2.test.ts`, "QA 104 probe 2 (not for merge)":
+  `EPERM … symlink` under the runner's NetworkService account (no symlink privilege). **Two findings for the next
+  planner:** (1) a QA probe test marked "not for merge" reached master with candidate A's branch history. Find every
+  `qa*-probe*` / "not for merge" test on master, and decide to remove it or keep it as a real row. (2) Any symlink test
+  must skip on Windows `EPERM` or the runner needs the privilege. A small developer round (cursor-builder), and a `/sync`
+  check for "not for merge" test files is worth considering.
+- cursor-infra read record 192 (turn 37) and went idle without replying; Aaron was given an "act now" line.
