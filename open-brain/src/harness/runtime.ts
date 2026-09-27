@@ -1533,6 +1533,9 @@ async function runLoopInner(
         // at once, before E_t.json is written: retrying would record a mismatch
         // as a schema failure, and the ledger key would be the wrong loop.
         if (validated.value.loop !== loop) {
+          // QA-189 mutant: write E_t.json even when the loop id mismatches.
+          const writeEarly = makeWriter(repoRoot, qaAllow, "qa");
+          writeEarly(evidencePath(loop), renderEvidence(validated.value));
           return fail(
             "qa",
             "evidence-loop-mismatch",
