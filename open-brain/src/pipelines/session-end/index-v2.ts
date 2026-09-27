@@ -82,9 +82,12 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
 
   // ── Self-generate summary if not provided ─────────────────────────────────
   let selfGenerated = false;
+  let summarySkip: string | undefined;
   if (!sessionSummary) {
     const result = getSessionSummary(sessionId || undefined, input.sessionsDir);
-    if (result) {
+    if (result && "skipped" in result) {
+      summarySkip = result.skipped;
+    } else if (result?.summary) {
       sessionSummary = result.summary;
       selfGenerated = true;
     }
@@ -112,6 +115,9 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   // IF E3/E18's TRIGGER FIRES, THE CAPTURE COMES BACK IN THE SAME CHANGE.
 
   const ratings: Array<{ id: number; rating: string }> = [];
+  const vanished: number[] = [];
+  const omitted: number[] = [];
+  const notWritten: Array<{ id: number; reason: string }> = [];
   const summaryLower = sessionSummary.toLowerCase();
 
   for (const id of recalledEntryIds) {
@@ -119,7 +125,10 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
       .prepare(`SELECT id, vault_path, tags FROM knowledge_index WHERE id = ?`)
       .get(id) as KnowledgeIndexRow | undefined;
 
-    if (!row) continue;
+    if (!row) {
+      vanished.push(id);
+      continue;
+    }
 
     const tags = row.tags
       .split(",")
@@ -135,7 +144,10 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     // recording a neutral matters: a neutral here would be indistinguishable
     // from a rater's considered "retrieved and not used", which is the one
     // signal the corpus still has.
-    if (supplied === undefined) continue;
+    if (supplied === undefined) {
+      omitted.push(id);
+      continue;
+    }
 
     const matched = tags.some((tag) => summaryLower.includes(tag.toLowerCase()));
     const rating: FeedbackRating = supplied ?? (matched ? "helpful" : "neutral");
@@ -148,15 +160,21 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     // it: the 347 pre-column rows cannot, and that is why the column exists.
     const method: RatingMethod = "supplied";
 
-    updateFeedbackV2(db, row.vault_path, rating);
     // This path bypasses ob_feedback, so log the event explicitly — otherwise
     // auto-feedback labels never reach the shadow harness and most sessions
-    // would score as having no ground truth at all.
+    // would score as having no ground truth at all. The counter moves only
+    // after that write lands: a throw used to be counted anyway (SILENT 16).
+    let wrote = true;
     if (sessionId) {
       try {
         recordFeedbackEvent(db, sessionId, id, rating, input.recalledOrigin, method);
-      } catch { /* non-critical */ }
+      } catch (err) {
+        wrote = false;
+        notWritten.push({ id, reason: err instanceof Error ? err.message : String(err) });
+      }
     }
+    if (!wrote) continue;
+    updateFeedbackV2(db, row.vault_path, rating);
     ratings.push({ id, rating });
   }
 
@@ -212,8 +230,8 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   }
 
   return {
-    summary: { written: summaryWritten, selfGenerated },
-    feedback: { processed: ratings.length, ratings },
+    summary: { written: summaryWritten, selfGenerated, skip: summarySkip },
+    feedback: { processed: ratings.length, ratings, vanished, omitted, notWritten },
     invocations: invocationResult,
     shadow,
     topics,

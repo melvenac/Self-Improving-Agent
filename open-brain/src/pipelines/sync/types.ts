@@ -84,7 +84,7 @@ export interface CategoryScore {
   name: string;
   score: number;
   max: number;
-  details: Record<string, number>;
+  details: Record<string, number | string>;
 }
 
 export interface ScoreResult {
