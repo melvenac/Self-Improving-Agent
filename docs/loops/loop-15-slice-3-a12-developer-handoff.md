@@ -1,7 +1,7 @@
 # Loop 15 slice three — A12 developer handoff
 
 **By:** Grok 4.7 (developer), record session 143. **Planner:** Atlas, hub room `k57frxw0ptb8tadmqdwy0khhks8ey006`.
-**Candidate:** `loop/15-slice-3-candidate-a12` at `7200e1c`. Base: A11 `bbf9d07` merged with `origin/master` `ebda33d` (merge `afe1c3b`).
+**Candidate:** `loop/15-slice-3-candidate-a12`. Product `7200e1c`. This handoff is the commit after it. Base: A11 `bbf9d07` merged with `origin/master` `ebda33d` (merge `afe1c3b`).
 **Model:** Grok 4.7. This Cursor session did not surface an effort setting.
 No `/end`. No laptop CI. No full local suite. `tsc --noEmit` before every push. This worktree has no GitNexus index, so impact was not run; the edit is the text sites below.
 
