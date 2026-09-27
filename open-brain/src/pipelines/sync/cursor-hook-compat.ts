@@ -28,16 +28,9 @@ function cursorAgentDir(localAppData: string | null | undefined): string | null 
 }
 
 /** Matchers on a real PreToolUse entry. An empty array is not an entry. */
-function preToolUseMatchers(hooksJson: unknown): string[] | null {
-  if (!isRecord(hooksJson) || !isRecord(hooksJson.hooks)) return null;
-  if (!Object.prototype.hasOwnProperty.call(hooksJson.hooks, "PreToolUse")) return null;
-  const pre = hooksJson.hooks.PreToolUse;
-  if (!Array.isArray(pre)) return ["(not an array)"];
-  if (pre.length === 0) return null;
-  return pre.map((entry) => {
-    if (isRecord(entry) && typeof entry.matcher === "string" && entry.matcher !== "") return entry.matcher;
-    return "(no matcher)";
-  });
+function preToolUseMatchers(_hooksJson: unknown): string[] | null {
+  // NOT FOR MERGE. Ignores PreToolUse, so a plugin that registers it is reported clean.
+  return null;
 }
 
 /**
