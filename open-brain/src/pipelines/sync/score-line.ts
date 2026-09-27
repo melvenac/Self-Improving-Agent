@@ -10,7 +10,7 @@ import type { CategoryScore } from "./types.js";
 /** The parenthetical r2b prints, and the two server.ts score renderers print. Empty when the log ran. */
 export function invocationLogSuffix(cat: CategoryScore): string {
   const log = cat.details.invocationLog;
-  return cat.name === "Pipeline Health" && typeof log === "string" && log !== "ran"
+  return cat.name === "Pipeline Health" && typeof log === "string" && log !== "ran" && log !== "missing" && log !== "unreadable"
     ? ` (invocation log: ${log})`
     : "";
 }
