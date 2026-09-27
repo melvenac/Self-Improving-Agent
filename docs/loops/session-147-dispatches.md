@@ -294,3 +294,35 @@ candidate, not only its handoff). Verdict sections of all five reports read; the
   one-line reconciliation.
 - **QA 162's report calls `DESKTOP-0GV3HAD` "the QA PC".** That is the laptop. Noted, not blocking.
 - **161 and 178 did not run** (record 185): the laptop's queue restore failed and left the tree at `fc8d8cd`.
+
+## Record 186, `cursor-builder` (Grok 4.7, `sia-builder`, room `k57098epn7qz32vt0cazfjpbes8f6kdq`): T-193, the worktree-layout check
+
+**Why:** Relay traced A2A-Hub's six loop- and occupant-named worktrees to a gap in SIA's own rules. The one-per-seat
+convention was never written down, and T-149 is still open. The text is now in `.agents/roles/shared.md` (PR #181).
+This check makes it a rule. The record: T-193 (rev 140).
+
+**Do (branch `loop/t193-worktree-check` from `origin/master`):**
+- A `/sync` check, `worktree-layout`. It walks `git worktree list --porcelain` (a parser over the porcelain format,
+  never a pattern over the human output). Every entry must be the main checkout, or a folder named
+  `<project>-<seat>`, where `<project>` and the seats come from a **tracked data file**, not from the code. Add the
+  file to `.gitignore`'s `.agents/` allowlist if it lives there. SIA's seats: planner, builder, forge, infra,
+  research, qa.
+- Any other entry is an ISSUE naming the folder, its branch or detached SHA, and why it fails the rule. A project
+  with no data file is a SKIP that says so, never a PASS.
+- **Its output states its limit:** it sees registered worktrees only. An orphan directory with no git registration
+  is not seen (`sia-qa2-gpt-cand` was one, an empty folder, on 2026-09-27).
+- Report what was walked (the count of entries), and assert that count in a test.
+
+**Evidence (`.agents/roles/developer.md`, "Building checks"):**
+- **Red:** real worktrees in a scratch repository, a seat folder and a loop-named folder, with the check absent or
+  passing wrongly. The real rows run against the unfixed product.
+- **Green:** the loop-named folder is named as an ISSUE; the seat folder and the main checkout pass; no data file
+  gives a SKIP.
+- **Mutants on their own branches:** accept any folder name (the loop-named row goes red); drop the data file read and
+  hard-code the seats (a row with a different seat list goes red).
+- tcm, at most 6 runs. Handoff at `docs/loops/t193-developer-handoff.md`.
+
+## The planner's own error entries (continued)
+
+6. **An `ob_state` write without its dry run first** (rev 139 → 140, `open_task T-193`). It applied cleanly, but
+   `shared.md` says to read the dry run before every real call, and this one was skipped.

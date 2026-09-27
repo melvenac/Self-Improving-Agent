@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 139,
+  "revision": 140,
   "project": {
     "name": "self-improving-agent"
   },
@@ -788,6 +788,17 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Opened as a TASK, not a gap: add_gap would assign G-046, a closed id the tracked tree cites (T-158, V-071), so no seat uses add_gap until T-158 lands. Evidence: ci.yml:44 sends a master push to GitHub-hosted ubuntu-latest. Runs 36303132573 (ecd28dd, #171) to 36304185040 (e201baa, #177): job 'test' failure, zero steps, no log; the check-run annotation reads 'The job was not started because recent account payments have failed or your spending limit needs to be increased.' The planner dispatched the suite on e201baa to tcm: run 36305346883, success, 97/97 test files, so merged master is sound. Two halves: (1) Aaron decides whether to fix the billing or move master pushes to tcm (D-043 already runs dispatches there); (2) ci-status names a job that never started (zero steps, or the billing annotation) as its own state, not as a failure. Recorded 2026-09-27, record session 147 (planner).",
+      "closed_rev": null
+    },
+    {
+      "id": "T-193",
+      "title": "A /sync check that every git worktree is the main checkout or <project>-<known seat>, with the seat list as data; closes T-149 against it",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 147,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Record session 147, planner. Relay (A2A-Hub planner) traced A2A-Hub's six loop- and occupant-named worktrees (a2a-loop6-build, a2a-loop6-deploy, a2a-rivet-grok, a2a-client-v1.10.0, qa3-cand, qa3-old) to a gap in SIA: .agents/roles/shared.md said only 'Seat worktrees are detached at rest' and never stated one worktree per seat named <project>-<seat>. The planner confirmed it by grep (shared.md:211). The text was added to shared.md the same session (PR #181), including the occupant clause: a new model in a seat uses that seat's folder. Text alone is an intention; this check makes it a rule (deterministic first). Shape: walk `git worktree list --porcelain`; every entry is the main checkout or <project>-<seat> for a seat named in a tracked data file (not hard-coded); a branch-named or unregistered-seat folder is an ISSUE naming it. LIMIT to state in its output: it sees registered worktrees only. An orphan folder with no git registration (sia-qa2-gpt-cand was an empty directory on 2026-09-27) is not a worktree, so it is not seen. Built as record 186 by cursor-builder. When accepted, close T-149 against it.",
       "closed_rev": null
     }
   ],
