@@ -517,6 +517,8 @@ const agrees = (snapshot: FileState, now: FileState | null): boolean => {
 const stateHash = (s: FileState | null): string => {
   if (s === null) return "absent";
   if (s.kind === "symlink") return `type:symlink readlink:${s.target}`;
+  // R90. A contained lstat failure has no identity. type file and zeroes would invent one.
+  if (s.readError && s.dev === null) return `${s.readError}; no facts: lstat failed`;
   if (s.readError) return `${s.readError}; type file dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}`;
   if (s.unreadIdentity) return `identity:dev ${s.dev} ino ${s.ino} nlink ${s.nlink} size ${s.size} mtimeNs ${s.mtimeNs}; not read`;
   return `${hashOf(s.bytes)}/${s.mode.toString(8)}/nlink:${s.nlink}`;
@@ -821,6 +823,18 @@ export class ConfigWatch {
         b = before.has(path) ? before.get(path)! : null;
         a = this.readForCompare(path, b, chains);
         if (!changed(b, a)) continue;
+        // R90. Absent at the open, and lstat failed at the close: that is not a created file.
+        // The record is absent → unobservable (<code>). Nothing is removed, and the note does not say one was.
+        if (b === null && a !== null && a.readError && a.dev === null) {
+          const code = a.readErrno ?? "UNKNOWN";
+          changes.push({
+            path,
+            kind: "modified",
+            before: "absent",
+            after: `unobservable (${code}); ${stateHash(a)}`,
+          });
+          continue;
+        }
         changes.push({
           path,
           kind: b === null ? "created" : a === null ? "deleted" : "modified",
@@ -877,7 +891,9 @@ export class ConfigWatch {
         : ok
           ? `no repository config or hook changed (${scale}). ${CONFIG_WATCH_LIMIT}`
           : `${changes.length} repository config/hook file(s) changed during the ${this.stage} stage: ` +
-            `${changes.map((c) => `${rel(c.path)} ${c.kind} (${c.before} → ${c.after})`).join("; ")}. ` +
+            `${changes.map((c) => c.after.startsWith("unobservable (")
+              ? `${rel(c.path)} (${c.before} → ${c.after})`
+              : `${rel(c.path)} ${c.kind} (${c.before} → ${c.after})`).join("; ")}. ` +
             `A role may not change what git executes: a hook or a program-valued config key runs inside the ` +
             `runtime's own git calls. ` +
             restored +
@@ -1302,7 +1318,10 @@ export class MachineConfigWatch {
     // R85b. A realpath failure with no lstat prints no zeros. The link itself, or a parent link, prints that lstat.
     const unobservableSide = (s: MachineSnap): string => {
       if (s.lexicalKind === "symlink") return linkSide(s);
-      if (s.viaLink !== null) return ancestorLinkText(s);
+      // R91. A parent link prints its lstat, and the file's stat when observe has one.
+      if (s.viaLink !== null) {
+        return s.dev === null ? ancestorLinkText(s) : `${ancestorLinkText(s)}; resolves to: ${factText(s)}`;
+      }
       if (s.dev === null) return "no facts: realpath failed";
       return factText(s);
     };
@@ -1367,7 +1386,7 @@ export class MachineConfigWatch {
       if (linkPlanted) {
         const after =
           base.resolvedPath === null
-            ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${currentSide(end)}`
+            ? `absent → symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read through; ${end.lexicalKind === "symlink" ? currentSide(end) : `${ancestorLinkText(end)}; ${currentSide(end)}`}`
             : `type change: ${end.viaLink} is a symlink${end.viaTarget ? ` target ${end.viaTarget}` : ""}; not read: loop base ${baseText(base)}; current ${end.lexicalKind === "symlink" ? currentSide(end) : `${ancestorLinkText(end)}; ${currentSide(end)}`}`;
         out.push(row(stageBefore(opened), after, true, p.path, p.scope));
         continue;
