@@ -5,6 +5,26 @@
 Aaron went to bed around 10:40Z and said "do as much as you can without me", and "if there are any issues with
 the hub, report it to relay".
 
+## Morning summary (for Aaron, written 13:05Z)
+
+**Waiting on you, in this order:**
+1. **Nudge Grok's Cursor window** (`~/Worktrees/sia-forge`). It has been quiet since 11:53Z and owes hub turn 107:
+   R78's tcm redcheck and mutant, and the ENOENT-is-absence fix. Paste: *"Read turn 107 in hub room
+   k57frxw0ptb8tadmqdwy0khhks8ey006 and continue."*
+2. **Start developer 110** (importer round 3): a fresh Claude Code session in `~/Worktrees/sia-infra`, told to read
+   `docs/loops/importer-fixes-round-3-brief.md`. QA 106 rejected round 2 (D6 data loss, D5, D7).
+
+**Done overnight:**
+- A10 R77 and R82 are complete: every protection red first on tcm, with a killed mutant. R78 is built.
+- Two defects caught before any QA seat saw them:
+  - **the restore chmodded a file outside the repository through a planted link.** My own ruling invited it, and
+    an existing test caught it;
+  - a win32 regression.
+- Rulings-18; the B Step 0 amendment (R81); the importer round-3 brief; state rev 131.
+- The record PR **#158 merged** (`48acaa8`) under D-032.
+
+**Planner errors tonight:** five, listed below. The worst was the turn-90 wording that invited the chmod.
+
 ## Intent documents
 
 Read at this session, **after** the /start briefing and before the first ruling: the Step-Back artifact (all 899
@@ -144,3 +164,312 @@ read "dangling reference (T-157)", which names the wrong id: a copy slip in the 
  "note": "Done 2026-09-25 by the planner (session 100) on D-050, with Aaron's added word 'stop the five idle GitNexus server processes and then run the upgrade'. Each step was read back before the next. (1) Relay confirmed no A2A-Hub seat was mid-call; the planner found 4 running gitnexus MCP processes (the fifth had exited) and stopped them; 0 remained. (2) npm 11.19.0 on node v22.23.2: `npm i -g gitnexus@1.6.12`, rc 0; read back `gitnexus --version` = 1.6.12. npm 11 SKIPPED the install scripts of the native packages (@ladybugdb/core, tree-sitter and its grammars, onnxruntime-node, protobufjs, and gitnexus's own build-tree-sitter-grammars postinstall). Each native module still `require`s cleanly (they ship prebuilds); non-TS grammars are untested. (3) Main checkout ~/Projects/Self-Improving-Agent: clean, f673d5e -> origin/master 9bc06e3 (v0.44.2; 111 commits). Only root package.json changed among the dependency files (the version line), so no npm ci, avoiding the Windows lock on better-sqlite3 held by every session's open-brain server. `npm run build` rc 0, stamped 9bc06e3; `sync --check` there: build-freshness PASS against 9bc06e3; 27 passed, 1 issue (the known ENTITIES.md retirements). (4) `gitnexus analyze --force --skip-agents-md --skip-skills`: 1.6.12 detected the schema change and recreated the database; indexed in 47.1s; meta.json lastCommit 9bc06e3 = HEAD; 7,123 nodes, 15,635 edges, 297 clusters, 173 flows; the tracked tree stayed clean. (5) OUTSTANDING, Aaron's: /mcp reconnect of open-brain and gitnexus in every open session. Until then those sessions run the OLD open-brain server code (v0.44.1) and have no gitnexus. A2A-Hub's own index is Relay's to rebuild. This closes the window, not T-172: that task's lasting fix (the greeting prints the serving build's distance; one refusing command updates it) is still open."
 }
 ```
+
+## After the morning summary
+
+- **21:3xZ, Aaron:** "Grok had a network error, i've restarted it" (verbatim, in the planner session). The silence
+  from 11:53Z was a **network error**, not the Cursor wait-expiry limitation (T-160) that the planner had inferred
+  and written into the objective and the handoff as the likely cause. That was an inference presented as a cause.
+  The record's words "needs Aaron's nudge (T-160)" are superseded by this line.
+- **Turn 108:** a self-contained resume note to Grok. If the restart is a new session, it is **record 113**, pointed
+  at the tracked files and turn 107's three outstanding items.
+- **Turn 110 (after the restart):** verified on tcm: candidate `f45c4c9` (36192597210) has the standing pair only;
+  ENOENT mutant `14655c3` (36192647557) is killed; R78 redcheck `c065652` (36192722723) has both rows red; R78 mutant
+  `ec24c67` (36192708146) is killed. **R78 and R82's ENOENT precision are accepted.** R35's win32 junction evidence
+  is local-only (Grok's seat), to be quoted in the handoff. Grok did not yet say whether it continues as 107 or is
+  a new 113. R79 started.
+- **Grok, 21:44Z:** "Continuing record 107, not a new 113. Same seat, context held." **Record 113 is not used.**
+  Its first post-restart turn (109) crossed the planner's resume note (108) in the hub, so turn 108's "still at
+  fb2fbe9" was already stale when Grok read it.
+- **Turn 113:** R79 at `afee764`. Redcheck `b44cb1d` (36195158562) reddens its six rows. The fix run 36195386155
+  fails CA-9 only, and **R72-BEFORE-ABSENT-DANGLING is green**, so the standing pair is now CA-9 alone. Existing-test
+  edits accepted as reasoned: R45 (R79's words), R71 A6-5 (listed in rulings-17), and R61, whose `/[0-9a-f]{16}/`
+  matched R79's new mtime digits and was narrowed to "no side opens with a hash". Owed before R80: a mutant proving the
+  narrowed R61 still catches a read, and R79 mutants (a)–(d).
+- **Hosted Actions minutes exhausted** (Aaron's screenshot, 2,000/2,000; resets 2026-10-01). GitHub's annotation on
+  master-push run 36138505219: "The job was not started because recent account payments have failed or your spending
+  limit needs to be increased", so it was blocked, not billed. Only master pushes run hosted (`ci.yml:19`, D-043), so
+  seat and PR CI on tcm is unaffected, but master's latest run reads as failure until a tcm run exists. Asked
+  Aaron whether to dispatch one (D-040 does not cover master).
+- **Relay's D-003 question** (hub enrollment, Loop 6, T-067) is queued for Aaron after the CI question. SIA agrees
+  with `--init-key --invite <code>`, and Relay has recorded that on A2A-Hub master (PR #27).
+- **Aaron, ~22:15Z, "dispatch it"** (verbatim), approving one tcm CI run on master. Dispatched: run 36195820923 on
+  `48acaa8`, `workflow_dispatch`, `hosted=false`.
+- **Aaron, 22:17Z, "yes"** (verbatim), answering Relay's D-003 question put to him verbatim: approves
+  `hub-talk --as <name> --init-key --invite <code>` for new hub names. It does not choose between command and button
+  for issuing a code (Loop 6's design). Relayed to Relay quoted, with where and when.
+- **Master on tcm:** run 36195820923 (`48acaa8`, runner `tcm-1`): **success, 1034 passed, 1 skipped (1035).** Master's
+  latest run now reads true. Until 2026-10-01, every future master push will again show GitHub's billing block.
+- **Developer 110 (importer round 3)** started by Aaron in `sia-infra` ("forge in infra folder is up"). Session
+  `sia-infra-41`, dispatched by cross-session message: the round-3 brief on master, branch from
+  `origin/loop/importer-fixes-r2`, rows IF-16 to IF-20.
+- **Relay recorded Aaron's "yes" as A2A-Hub D-014** on its branch `docs/session-18-d014` (`3d4f5ff`), not merged.
+  Merging it is an A2A-Hub-only act, so Aaron gives Relay that word directly.
+- **R79 accepted at `afee764`** (handoff `0a01d4a`). Five mutants, each a one-line change to `configwatch.ts`,
+  verified on tcm: R61 hash-first 36195704206 (**the narrowed R61 detector is validated against a known
+  positive**), (a) 36195723043, (b) 36195745609, (c) 36195768996, (d) 36195795635, all killed. R80 dispatched.
+- **Forge 110** reported its effort as "low". **Aaron: "forge infra is on effort medium"** (verbatim). Recorded as
+  medium on Aaron's word, and the self-report disagreement is recorded as a finding for D-047.
+- **Forge 110 skipped `/start`** (Aaron noticed it). The role files still load through the SessionStart hook, but
+  the session registration, the session log, the state render and the watch-outs were missing. Told to run it now,
+  read the whole greeting, and confirm the role-file line.
+- **Forge 110 ran `/start`:** read the whole 88,074-character greeting; role files `developer.md @ 876029d` and
+  `shared.md @ ed7f762` loaded through the hook; the greeting's local number is Session #4 (record 110). Design calls
+  **accepted with conditions:** R3-1 removes only mkdirSync's first-created directory, and a partial-copy test with
+  `archive/` present kills N13; the `--force-snapshot` aside must be shown not to overlap. R3-3 uses a marker file
+  `<snapshot>.import-incomplete` whose check is the refusal; the refusal must name the exit (restore, then remove
+  the marker), and a dies-mid-migrate test is required. Rejected on good grounds: my same-day-snapshot rule (it
+  fires on a legitimate `--force-snapshot`) and copy-over (`cpSync` on links, and writing through junctions).
+- **T-183 dispatched as a separate seat** on Aaron's question ("Can we dispatch another agent to work on only t 183?
+  Is that work isolated enough…"). Its isolation is checked by footprint: A10 is `harness/*`; importer round 3 is
+  `state-import/*` and `cli.ts`; T-183 is render-only (`session-start/state-render.ts` plus a `sync` check), with
+  **no schema change** as the binding condition. Worktree created by the planner as `~/Worktrees/sia-t183`, then renamed on Aaron's word to `~/Worktrees/sia-builder` ("change the agent name, t183 is too spacific.  We can use that agent as a builder for other isolated builds"), detached at
+  `48acaa8`, with an untracked seat file. Brief: `docs/loops/t183-greeting-brief.md`. Record **113** (developer),
+  **114** (QA).
+- **R80 at `e8fce2a`** (36196931266: CA-9 only; redcheck `e10971c` 36196648961 reddens the six rows). The texts, the
+  label, `:755` and `:1134`, and R72-EQUAL-TEXT are accepted. **`e8fce2a` weakened two tests to fit the code:** the
+  fact rows went from the link's own lstat facts to the target's. Ruled (turn 117): the type-change and
+  absent→symlink texts carry the link's lstat facts **and**, when it resolves, the resolved object's facts,
+  **labelled**. Restore the link assertions, add the resolved ones. This is consistent with R79's dangling-link rule.
+- **Error (reached the artifact and a seat):** the T-183 brief set 40,000 characters when the planner's own
+  section table, written minutes earlier, estimated about 45k with the role files whole. Forge 113 measured it and
+  found the row unmeetable (unchanged parts ≈ 37,700). Ruled: keep 40k, score an honest no, verified becomes a
+  count plus the newest 10, role files stay whole, new row T183-6 (inline return in a live session). The follow-up
+  is per-seat greeting profiles. Brief amendment 1.
+- **T-191 opened** (rev 132), per-seat greeting profiles, after T-183, on Aaron's "yes".
+- **Aaron asked: "is there a way to score every line and judge if the agent needs that context?"** The planner's
+  answer, recorded here because T-191's note points at it:
+  - **"Needs" is not directly observable.** V-024: whether recalled knowledge changed what an agent did is not
+    answerable on the record, and Loop 10 found that guaranteed delivery (CLAUDE.md) still failed to change behaviour.
+    A scorer that predicts need therefore has no ground truth to be graded against, unless one is built.
+  - **The measurable proxy is lookup.** If a line is omitted and the seat then asks for it (`state show`, a grep of
+    `state.json`, reading the file), the omission cost something. Log every such lookup against the id. That is the
+    miss rate.
+  - **Order, deterministic first:** (1) seat profiles (T-191); (2) exact-match inclusion: any id the seat's brief,
+    handoff or objective names is always shown in full (T-170's "injection only on a deterministic match"); (3) only
+    then a scorer (Jev, a typed judgement per line) in SHADOW, logging what it would have dropped and compared against
+    the lookup log, the same meter-before-gate shape as T-155 and T-173. It is promoted only on a measured miss rate.
+  - **Never scored away:** watch-outs and open questions. They are the curated part, and G-039 is the cost of a
+    lesson that existed and did not reach the act.
+- **Forge 110, importer round 3:** verified r3 `dfa1a2a` (36197519049, tcm-1, success, 1084 passed) and redcheck
+  `27e4a1d` (36197521563, tcm-2, 11 failed). **Its finding:** D7's damage depends on readdir order (NTFS removes
+  state.json before SYSTEM/, Linux does not), so a data-loss test can pass on one filesystem for the wrong reason.
+  A copy-back variant reproduces D7 on both. 14 local mutants, as the developer reports them (N13 dead); QA 111
+  re-runs them, from committed scripts. An intermittent Windows rename EPERM was seen on unrelated tests: noise,
+  named.
+- **R80 accepted at `ecf1f62`.** Red `016d3d8` (36197418005); fix 36197403513 (CA-9 only); six mutants, each one
+  source file, killed: 36197666218, 36197704680, 36197730757, 36197760017, 36197900577, 36197931021. **R77–R82 are
+  all built at `ecf1f62`.** No master merge is needed (0 non-doc paths since `9bc06e3`). The handoff and freeze are
+  ordered, with a seven-item handoff contract.
+- **Importer r3 handed back:** candidate `063662b` (CI 36198263294, tcm-2, 1085 passed), handoff `1c15943`
+  (docs only). The 14 mutants were re-run and are committed in `docs/loops/dev-scripts-importer-r3/`. QA 106's probes
+  byte-exact: 24/1. The one fail is utf16le-nobom, which the planner scores. The full local suite was **approved**
+  once the box was checked quiet: Forge 113 holding, Grok asked to hold (turn 120), no vitest/tsc process; a non-SIA
+  `@deepseek-ai/dsh web` process was live and noted.
+- **T-183 handed back:** code `0f0e7ad`, handoff `777c7ba`. Verified: fix 36198351955 (1052 passed), redcheck
+  36198349278 (11 red), mutants (i) 36198525222, (ii) 36198530073, (iii) 36198534363 and (iv) 36198539151, each one
+  source file and killed. Footprint within the brief. T183-1 is an honest no (87,587 → 46,578). T183-6 was not run: it
+  needs the main checkout's build.
+- **Near-miss (the planner's; caught by Forge 110 before the run):** the planner declared the box quiet after
+  checking only for vitest/tsc/build process NAMES. Forge 110 sampled CPU: Grok's `cursor-agent` (pid 2604) was the
+  busiest process, and ListAgents cannot see a Cursor seat. "No test process" is not "quiet" (G-042, V-076). The
+  full suite waits for a CPU-sampled idle minute, bounded at 20 minutes.
+- **A10 FROZEN at `4b7a5ae`** (verified by the planner: ls-remote; parent `ecf1f62`; 0 non-doc paths; CI 36198950992
+  fails CA-9 only). Grok's session is done (turn 123). QA 108's dispatch (`loop-15-slice-3-dispatch-qa-a10.md`)
+  carries the commit table the planner built from each commit's own diff. **That table found
+  `configwatch-a7-seam.test.ts` edited in `e6a3fd4` and missing from the handoff's list of changed existing
+  tests,** so it is flagged for QA. Driver set `docs/loops/qa-108/` was copied by `qa-driver-copy.mjs` (effort high).
+- **QA 108 launched by Aaron:** the QA tree was moved to `f4b1723` (fetch plus a detached checkout, read back), then
+  the driver was started with `ReturnValue 0`, ProcessId 232. Its report will arrive as
+  `origin/qa/loop-15-slice-3-a10-report`.
+- **Aaron: "This machine never really goes quiet during the day, what are my other options."** Ruled: developer
+  seats do **not** run the full local suite on this box. Full-suite evidence comes from tcm CI (Linux, quiet) and the
+  QA seat's one run on the QA PC (Windows, quiet, the Defender-on control, T-190). Forge 110 skips its run and hands
+  off; Forge 113's hold is lifted. Offered to Aaron: a self-hosted Windows runner on the QA PC (his machine, his
+  call), and candidate B, which is the G-042 repair itself.
+- **Grok's hub hold (turn 120)** was superseded by the freeze (turn 123), which ended its session.
+- **Importer r3 FROZEN at `063662b`** (handoff `00244d3`, 0 non-doc paths; verified). Forge 110 is done. Its
+  sampler-script near-miss (a PowerShell one-element pipe to a scalar, so the window never held 3) failed closed.
+- **QA dispatches written:** QA 111 (`importer-fixes-r3-dispatch-qa.md`, driver `qa-111/`) and QA 114
+  (`t183-dispatch-qa.md`, driver `qa-114/`). **QA seats run ONE AT A TIME on the QA PC**, because they share its one
+  tree. Order: QA 108 (running), then 111, then 114. IF-20's utf16le-nobom is ruled in advance as the rule changing
+  by ruling, not a defect.
+- **Aaron asked whether the QA PC has two CI runners. It does not.** GitHub lists exactly `tcm-1` and `tcm-2`, both
+  Linux, on tcm (D-043/D-044). The QA PC (D-045) has none. A Windows runner there would be new (his call).
+- **Aaron's idle laptop, DESKTOP-0GV3HAD (Tailscale 100.110.244.10, user `aaron`)**, as a candidate Windows CI
+  runner. Reached through Claude Code Remote Control, with the laptop's own Claude session doing the setup: OpenSSH
+  server, this machine's public key in `administrators_authorized_keys`. Verified by the planner over SSH: i7-8565U
+  4C/8T, 7.9 GB RAM, NVMe SSD 238 GB (140 GB free), Win10 Pro 19045, on AC with AC sleep never, node v24.19.0.
+  **Git for Windows is not installed** (WSL bash only), so it is needed for a runner and for the status line.
+  Verdict: sufficient for a quiet, slower Windows runner. A user-settings allow rule was added on Aaron's word:
+  `Bash(ssh *@100.110.244.10 *)` and the matching PowerShell rule.
+- **Found in passing:** the desktop's global `autoMode.environment` describes the FluidNC project as the trusted
+  repo, and it applies to every project, SIA included. Raised with Aaron, and not copied to the laptop.
+- **QA 108: A10 REJECTED** (`d352af3`). High: A10-1, where `identify()`'s contained failure is turned into `null`
+  (absent) by `readState :463`, `readForCompare :703` and `begin :683`. A planted hook passes a completed loop, and a
+  user's existing hook is deleted by the restore. Medium: A10-2 (R82 fires only for read, not observed), A10-3 and A10-4
+  (lone placeholders). Low: A10-5, -6, -7. No regressions; full suite exit 0. **Rulings-19** (R83–R88) and the **A11
+  brief** (Grok, record 115) are written. **Error entry (the planner's):** R77 reading 5 said "in every caller", and it
+  was verified at the producer only. Record numbers: **115** is Grok for A11, **116** its QA.
+- **QA 111 launched** (importer round 3, pid 5624) after the QA tree moved to `30bf724`.
+
+## Later on 2026-09-26: the laptop runner, Relay's deploy, and QA 111
+
+- **The laptop's Windows job.** At Aaron's choice, Defender folder exclusions were tried first (the runner's `_work`
+  folder and NETWORK SERVICE's temp folder). They did NOT fix it: run 36206948482 had 10 timeouts at 5000 ms. As Aaron's
+  user, git takes about 28 ms a call, and a full bare-remote cycle takes 292 ms. The exclusions were REMOVED at his word.
+  With `--testTimeout=30000` (run 36207661776), all 1035 tests passed (`detach` took 33 s for 14 tests,
+  `tree-currency` 46 s for 13), but vitest's worker RPC timed out (`onTaskUpdate`). The cause is CPU and RAM
+  contention: 4 cores and 7.9 GB, 1.3 GB free during the run. The cleanup, done over SSH at Aaron's word: Brave closed,
+  the disconnected `lightburn` session signed out, Aaron's Dashlane and GoogleDriveFS startup entries disabled, and the
+  dead Rhythm entry plus its 2021 `BeatPlaylist` folder removed. After it, idle RAM was 2.1 GB free and CPU 2%. The
+  next change is `--maxWorkers=2` (`b3baba4`, run 36208034860). The laptop's own agent was asked for a report-only
+  performance survey.
+- **Relay's Loop 5 hub deploy (v1.11.0, warn).** The planner told Relay that SIA traffic IS live (Grok's room is
+  hub-only). A2A-Hub D-018 (PR #33, 2e3de2f, as Relay reports it and unread here): tcm deploys no longer pause the
+  runners, on the planner's code read that SIA CI touches no docker, hub or Convex, and its self-check requires them to
+  be unreachable. The planner is told when a deploy starts, and gets the containers' docker IPs before and after. The
+  addresses before: a2a-hub 172.20.0.3 and convex 172.20.0.2, the same as ci.yml's fixed list. The swap was at
+  01:22:11Z, and the room was held between Relay's two messages. The addresses after are still to come.
+- **QA 111 (importer round 3), `5abe44f`: all five rows pass; D5, D6 and D7 are closed; D8 is new.** Round 4 is ruled
+  in `importer-fixes-round-4-brief.md` (record 116, sia-builder): R4-1 means an unreadable judged input blocks like
+  STALE. The rulings are there.
+
+## The laptop's own performance survey (report only; received by A2A from the laptop session, not verified here)
+
+- **Power:** the custom "SAMSUNG MODE" plan is already uncapped on AC (CPU minimum 5%, maximum 100%, active cooling).
+  Switching plans gains about nothing and risks losing Samsung's fan and keyboard controls. Not recommended.
+- **Services:**
+  - WSearch is Running/Automatic. It is the best gain for the risk, given git-heavy I/O on 8 GB of RAM. It needs admin.
+  - SysMain is Running/Automatic: a small, safe gain.
+  - DiagTrack and dmwappushservice are already disabled.
+- **OEM:** 6 Samsung processes, about 75 MB in total. They may be load-bearing (fingerprint, secure boot), so leave them.
+- **Scheduled tasks:** none fire heavy recurring daytime jobs. User_Feed_Synchronization is safe to disable, with
+  about 0 gain.
+- **Disk:** WD SN520 NVMe, healthy, 139 of 223 GB free. Not a bottleneck.
+- **Pagefile:** system-managed, 2.4 GB allocated, peak 1.3 GB. A fixed 4–8 GB is worth considering only after measuring
+  peak RAM in a real run.
+- **Thermal:** not readable without elevation.
+- **Ranked:** (1) WSearch off, (2) the pagefile after a measurement, (3) SysMain off, (4) OEM, last.
+- **The laptop session reports that Aaron approved WSearch "directly".** The planner acts only on Aaron's word in the
+  planner's own session, not on a relayed one.
+
+- **WSearch disabled** on the laptop over SSH at Aaron's word in the planner session (Stopped, Disabled), before B Step 0's first laptop run. SysMain was left running.
+
+## State at Aaron's departure, 2026-09-26 ~09:00Z (the overnight plan; read this first after any compaction)
+
+**Running:**
+- The QA PC runs `qa-queue.ps1 -Queue 130,132 -Checkout d1c3baf` (pid 3312): QA 130 = A11 (product `ef2a8a7`, handoff
+  `bbf9d07`), then QA 132 = writing `E_t`'s criteria. The planner's watchers poll `qa/loop-15-slice-3-a11-report` and
+  `qa/b-et-criteria-report`.
+- `sia-infra` builds **T-179 round 2** (record 128) on `loop/t179-r2`. The rulings are `t179-rulings-qa125.md` plus
+  amendments 1 and 2 (R179-1 re-ruled: order by `first_rev`, never by session number; R179-8: done-task retention by
+  revision).
+
+**Ready and idle:** `sia-builder` is CLEARED, for the `/bootstrap` fix merge-in (record 133) once T-179 round 2 is
+frozen. Grok, research, frogger and the laptop agent are closed. The laptop runner is idle.
+
+**Waiting on T-179 round 2:**
+- the `/bootstrap` fix (`loop/bootstrap-fix`, candidate `8aba3df`, handoff `8a6c3e9`, Forge 127);
+- the importer leftovers (`loop/importer-leftovers`, candidate `e222124`, handoff `8562ad0`, Forge 131).
+
+Both are stacked on `loop/t179-merge` and merge round 2's tip in (never rebase), then go to QA. The importer
+leftovers' merge-in needs a second cleared session, so it waits for the morning.
+
+**The overnight rule:** rule each QA report as it lands, and write it down in `docs/loops/`. Dispatch developer
+rounds only to an already-CLEARED session (`sia-builder`, once). Never launch QA runs: the next queue is Aaron's, in
+the morning.
+
+**Aaron's morning list:**
+- Merge PR #165 (B Step 1, passed QA 129).
+- The verdicts of QA 130 and QA 132.
+- T-179 round 2's hand-back, and its QA for the next queue.
+- Tomorrow night's queue, across the QA PC and this desktop (qa-queue.ps1 supports both; the desktop's
+  `~/Worktrees/sia-qa` exists).
+- Whether Grok needs a fresh session for A12.
+
+**Also decided today:**
+- R4-4/R4-5 are built (the importer leftovers).
+- Frogger is on SIA on its local branch `sia/bootstrap`. Pilot 1b re-runs the fixed `/bootstrap` on a restored
+  frogger.
+- The research checkout's claim that writes are refused was corrected (a rule, not code).
+- tcm runs only the hub and the CI runners.
+- Two ruled errors of this seat: R179-1's "+5" bound, and the charter's claim that writes are refused.
+
+## The overnight queue ran NOTHING: the planner's error entry (2026-09-26 22:40Z)
+
+- **The queue log** (read by Aaron on the QA PC): `start=queue=130132 … skip.130132=not tracked … end`, at 08:48Z.
+  `-Queue 130,132` was declared `[int[]]`. Under `powershell -File`, arguments arrive as strings, and "130,132"
+  became the ONE integer 130132. No driver ran, so QA 130 and QA 132 never started. The checkout itself worked.
+- **The family:** a dry run that exercised the parameter with a single value (9999) was taken as proof that the list
+  worked. The containment for next time: test the exact launch shape, with the exact argument form.
+- **Fix:** `$Queue` is TEXT, split on commas or spaces, and a non-number aborts loudly. It was tested through
+  `powershell -File` with `-Queue 9998,9999`: two separate skips.
+- **Separately:** this desktop could not reach GitHub all night (connection resets, one DNS failure), so the
+  planner's watchers saw nothing. Whether the QA PC was affected too is unknown; it ran nothing anyway.
+- **Second queue failure (23:15Z), the planner's again:** every driver exited `-196608` at once. `Start-Process
+  -ArgumentList` joins its arguments with spaces and does not quote them, and the QA PC's profile is
+  `C:\Users\Aaron Melven`, so the path was cut at the space. The desktop's dry run could not see it: its path
+  (`C:\Users\melve`) has no space, and the dry run launched no driver. **Fix:** the path is quoted. It was proven with
+  a script at a path containing a space: the old form reproduces `-196608`, and the fixed form runs. **The family is
+  the same as the first failure:** the test did not use the target machine's shape.
+
+## HANDOFF TO THE NEXT PLANNER (session 109 rolls here, 2026-09-27 ~00:45Z). Read this section first.
+
+**In flight right now:**
+- **QA PC** (`qa-queue.ps1 -Queue 130,132,134 -Checkout 2667c6b`): 130 (A11) DONE, REJECTED (rulings-20). **132** (E_t
+  criteria) and then **134** (T-179 round 2) are running or queued. Report branches: `qa/b-et-criteria-report` and
+  `qa/t179-r2-report`.
+- **Laptop** (`-Queue 138 -Checkout 7b0598c`): **138** (importer leftovers) is running; the report goes to
+  `qa/importer-leftovers-report`.
+- **Dispatched, waiting for a free QA machine** (the drivers are pushed): **142** (T-003, `706c029`) and **144**
+  (T-171, `b371176`). **Launch per machine: Aaron runs the queue**; the planner is refused that by the host
+  classifier. The commands are in this file's earlier sections (copy the queue script, then `Invoke-CimMethod …
+  qa-queue.ps1 -Queue N -Checkout <sha>`). The laptop's checkout is `C:/Users/Aaron/Worktrees/sia-qa`, and the QA PC's
+  is `C:/Users/AARONM~1/Worktrees/sia-qa`.
+- **`sia-builder`:** the `/bootstrap` fix ROUND 3 (record 141, `loop/bootstrap-fix-r3`), per
+  `bootstrap-fix-rulings-qa135.md`.
+- **Grok:** needs a FRESH Cursor chat for **A12** (record 143), per `loop-15-slice-3-rulings-20.md` §"A12 brief".
+- **`sia-infra`:** FREE (T-171 handed back).
+
+**The candidates and where each stands:**
+
+| Item | Candidate | State |
+|---|---|---|
+| A (config watch) | A11 `ef2a8a7` REJECTED by QA 130, narrowly | A12 = R90–R94 (small); QA scores it narrowly |
+| B part 1 (G-042) | MERGED (PR #165, `7640b93`) | done |
+| B part 2 (E_t, R10) | criteria in QA 132 | build after A merges (`harness/schemas`) |
+| C (T-155) | not started | after B is accepted |
+| T-179+T-163 round 2 | `1646567` (handoff `d0335d7`) | QA 134. Merging MIGRATES the live record: Aaron runs the checklist |
+| /bootstrap fix | r2 `6543e8e` passed BF-1..8 (QA 135) | round 3 building (non-Node projects, the parent walk-up) |
+| importer leftovers | `d500730` | QA 138 running |
+| T-003 | `706c029` | QA 142 queued. Row #348's repair UPDATE is in its handoff §6, for Aaron |
+| T-171 | `b371176` | QA 144 queued |
+
+**Everything below is stacked on T-179 round 2 (`d0335d7`):** the /bootstrap fix, the importer leftovers, T-003 and
+T-171. **Merge order:** T-179 round 2 first, then each stacked branch, which merge cleanly per the planner's
+`merge-tree` checks.
+
+**New rules this session (in force):**
+- a handoff is pushed before any `/clear` (a memory);
+- no laptop (`windows=true`) CI without asking the planner (a memory);
+- dispatches do not set effort; the seat's own setting does, and each seat reports its effort from its transcript;
+- a QA report is committed from a separate worktree;
+- tcm runs only the hub and the CI runners.
+
+**Tasks to OPEN in the record** (not yet written through `ob_state`; this planner did no state write after rev 132):
+- T-048's 26 SILENT drops (`docs/loops/research/t048-silent-drops.md`), the top three in `/sync`'s own checks;
+- `update_gap` replacing silently (R171-2);
+- a measured Cursor session proof (T-003 Q2);
+- `ob_state` writing `state.json` before the views (QA 125 D8);
+- the view header stamped with the project's version, the objective keeping markdown bold, and the template README's
+  `cp -r` path (QA 135);
+- the ci.yml master-push minutes issue (hosted minutes until 2026-10-01);
+- D7 `state show --verified` (QA 114).
+
+**Close:** T-056 (fixed in v0.14.2, and its rows are already correct).
+
+**Research merged:** jev-mcp (#163), typesafe-computer-use (#164), T-048 (#166), qa-offload (#167).
+
+**Frogger:** on SIA on its local branch `sia/bootstrap`, unmerged. Pilot 1b = a restored frogger plus the fixed
+`/bootstrap`, after round 3 merges.

@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 131 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 133 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,80 +6,42 @@
 
 ### Pick up here
 
-PLANNER SESSION 109 (Atlas), 2026-09-25, ran overnight while Aaron slept. READ docs/loops/planner-session-109-notes.md FIRST: every ruling of the night, with its hub turn and a run id the planner read itself. A10: R77+R82 complete; R78 built. Grok owes (turn 107) the R78 tcm redcheck and mutant, and the ENOENT-is-absence fix (R82-ENOENT-IS-ABSENT) with win32 R35 evidence, then R79, R80, the handoff, and the freeze. Grok went quiet after 11:53Z: ask Aaron to nudge the Cursor window (hub room k57frxw0ptb8tadmqdwy0khhks8ey006). When A10 freezes, write the QA 108 dispatch from rulings-17 plus rulings-18, and copy the driver with docs/loops/qa-driver-copy.mjs. IMPORTER: round 2 rejected; round 3 is briefed, and Aaron starts developer 110 in sia-infra. B Step 0 (record 112) follows round 3 in sia-infra.
+Read docs/loops/planner-session-109-notes.md, section 'HANDOFF TO THE NEXT PLANNER (session 109 rolls here)', first: it lists what is in flight on each machine and seat, every candidate's state, the merge order (T-179 round 2 first, then its stacked branches), and the tasks to open. Then rule each QA report as it lands (132, 134, 138; then 142, 144, A12) and dispatch fix rounds to cleared developer checkouts.
 
 ### Watch out
 
-- RULINGS-18 BINDS QA 108 (docs/loops/loop-15-slice-3-rulings-18.md): R77's eight readings, R81 and R82. The hub keeps no record; the rulings file and the session notes are the record.
-- A RESTORE MUST NEVER TOUCH THE OLD PATH (R36): d14a874 added chmodSync(path) before the rename-restore, which followed a planted hook symlink to a victim outside the repository (R58 (b)3). A kind==='file' guard does not help, because a hard link is kind file. The planner's own turn-90 wording invited it.
-- ENOENT/ENOTDIR ARE ABSENCE, NOT FAILURE (R82 made precise, turn 107): a win32 junction shape (R35) failed machine-config-unobservable with ENOENT. tcm cannot run it; QA 108 on win32 must.
-- A DIRECTORY LISTING'S SIZE LIES FOR AN OPEN FILE: the planner read run-0.jsonl as 0 bytes via Get-ChildItem at 17 minutes, called it Out-File buffering, and a control run disproved that (Out-File wrote at 2.5 s). Count lines, or read from a handle.
-- THE PLANNER CANNOT READ THE QA PC OVER SSH (host classifier, 'Production Reads'). Aaron runs the reads; a QA report arrives as its origin/qa/*-report branch, which the planner can read.
-- THE GREETING NO LONGER FITS ONE TOOL RESULT (T-183): ob_start's output was 92,131 characters at rev 121 and is saved to a file. READ THE WHOLE FILE IN CHUNKS before acting; the watch-outs and the handoff are inside it.
-- THE MAIN CHECKOUT WAS UPDATED IN THE D-050 WINDOW (T-189): ~/Projects/Self-Improving-Agent is at 9bc06e3 (v0.44.2), built and indexed on GitNexus 1.6.12, and Aaron reconnected /mcp in all five sessions (every server process started after the build). A later merge (the importer fixes) needs the same update and rebuild again, and T-172's lasting fix is still open.
-- A2A-HUB T-003 IS DONE (window 2026-09-25 ~03:55Z-04:27Z, opened on Aaron's "dispatch relay A2A-Hub switchover"; K7 passed: 6 owned rows, the shared dev-key held by no name; tcm on v1.10.0, AUTH_MODE warn; ~/Projects/A2A-Hub at c4d2d1c). hub-talk now REQUIRES a key file: atlas's and grok's are in C:/Users/melve/.a2a-hub/keys/100.124.212.87-4000/ (created by the planner from ~/Worktrees/a2a-client-v1.10.0 on Aaron's word to Relay). A NEW SIA hub name needs `hub-talk --as <name> --init-key` against tcm AND Aaron's word first. Never copy a .key file anywhere. Relay's evidence: A2A-Hub docs/loops/t-003-cutover-log.md.
-- RECORD SESSION NUMBERS ARE NOT THE GREETING'S (T-164). Session 100's greeting said Session #7. The sequence: planner 90, Forge-infra 97, Grok 98, QA 99, planner 100. Put the record number in every dispatch.
-- READ THE INTENT DOCUMENTS AT /start (the Step-Back artifact on claude.ai, PRD.md, README.md) BEFORE THE FIRST RULING, and say in the briefing that you did. Sessions 90 AND 100 both skipped it; 100 read them only when Aaron pointed (error entry: adoption plan section 7). T-167 is the structural fix. The Step-Back stops at Loop 11 and needs a Part 6 at Loop 15 close (T-169).
-- QA 99 IS HEADLESS: nobody can talk to it and it cannot ask. Its questions land in the report's 'Open for the planner' section. Watch it with `node C:/Users/melve/Worktrees/sia-planner/docs/loops/qa-99/watch.mjs` (read-only; --once prints and exits). The driver resumes at most 3 times; a refusal is never resumed and its stop_details category is in drive.meta.
-- LAUNCHING A CLAUDE RUN ON THE QA PC IS DENIED TO THE PLANNER by the host classifier ('[Create Unsafe Agents]'). Do not route around it. Aaron launches with `! ssh -l "Aaron Melven" 100.73.250.101 "powershell -NoProfile -Command Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{CommandLine='powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\AARONM~1\Worktrees\sia-qa\docs\loops\qa-99\drive.ps1'}"`. Remote cmd mangles nested quotes: use the 8.3 path (no space) or copy a script over.
-- AARON'S TERMINAL IS OFTEN GIT BASH: it drops backslashes in Windows paths he pastes. Give him forward-slash paths.
-- master HAS NO BRANCH PROTECTION (read 2026-09-25). A headless seat with git push could push it; QA 99's driver denies `git push` and audits every remote head and tag before and after. Keep that shape for any unattended seat.
-- D-047: Opus 5.5 default effort is now MEDIUM. QA seats get --effort explicitly; record effort from the transcript, not the init line (the init line does not carry it).
-- FULL SUITES NEED A QUIET MACHINE (G-042). SIA's QA now runs on the QA PC; A2A-Hub's seats need not pause for it. Other projects' sessions on THIS box still count for any local suite here.
-- stop_reason "refusal" is the API safety layer; Opus 5.5's stop_details names the category (bio, cyber, reasoning_extraction). Record the category. Candidate A's link-handling work stays with Grok (T-177); B and C go to Claude.
-- D-038/D-039/D-040: Aaron speaks only to the planner; quote him verbatim with where and when; a permission stop in another seat's window cannot be cleared by relay. A relay to A2A-Hub is acted on by Relay only for SHARED work: for A2A-Hub-only acts it confirms with Aaron directly (2026-09-25, Loop 4 merge). Relay exactly his words; do not read a tag into 'merge'.
-- update_task, update_gap, set_objective and set_handoff REPLACE their field. Compose in a SCRIPT FILE, DRY-RUN FIRST, and verify byte for byte. Git Bash's /tmp and node's /tmp are different directories on this machine (AppData\Local\Temp vs C:\tmp); it bit session 100 once (a node read of a Git-Bash /tmp file printed nothing).
-- build-freshness fails in this tree: build a010557, and open-brain changed since (paths.ts, PR #156), so it is a REAL staleness, not stamp-only. /sync also carries the retirements ISSUE on ENTITIES.md (dream, reflection queue), recorded in T-169 part 3.
-- The recall trigger injects entry 299 (pipe-to-tail) on any Bash command with a pipe to tail/head. Check the end state or read ${PIPESTATUS[0]} rather than the piped exit line.
-- DISPATCH TABLES ARE BUILT FROM EACH COMMIT'S `git diff --stat`, NEVER ITS SUBJECT (rulings-13, error entry 1). A BRIEF'S CODE POINTERS ARE ITS SCOPE (rulings-15 error entry): name every site on both sides, or name the class.
-- MERGE ONLY THROUGH A GATE THAT REFUSES. `gh pr checks --watch` exits at once with 'no checks reported' when CI has not registered; a chained merge then runs on UNSTABLE (rulings-14, error entry 3).
-- GitHub Actions: 1,802 of 2,000 minutes on 2026-09-24, then A8's 7 hosted runs (~21 min); QA 99 is capped at 8 hosted runs; resets Oct 1. The billing API needs the gh 'user' scope, which this machine's token lacks, so the live figure is unread. Candidate-based probe branches carry the old ci.yml and run hosted (planner 90's ruling: stay hosted, tcm has git 2.43).
+- QA runs are launched only by Aaron (the host classifier refuses the planner). Use docs/loops/qa-queue.ps1 with a FIXED list per machine; it failed twice on planner bugs (an int[] parse, then an unquoted path with a space). Both are fixed at 2667c6b and proven with the target's shape.
+- Three QA machines: the QA PC (i5-3570, 8 GB, C:/Users/AARONM~1/Worktrees/sia-qa), the laptop DESKTOP-0GV3HAD (i7-8565U, 8 GB, C:/Users/Aaron/Worktrees/sia-qa; ALSO the Windows CI runner, so no windows=true CI while it runs QA), and this desktop at night (~/Worktrees/sia-qa). One QA seat per machine.
+- Merging T-179 migrates the live .agents/state.json to schema v3: Aaron runs its after-merge checklist (the round-2 handoff), including A2A-Hub's own record (v2 rev 66), which Relay's seat or Aaron migrates.
+- Dispatch lines do not set effort; only the seat's own setting does. Every seat reports its effort from its transcript.
+- A seat pushes its handoff BEFORE any /clear; the planner verifies it on the remote before calling a checkout free.
+- Before ruling a numeric bound, read the values it will compare (R179-1's error: the live record's newest session is 76).
+- Master pushes run hosted, and hosted minutes are exhausted until 2026-10-01: master CI 'failure' is billing, not tests.
+- The research checkout (Scout, role: none) writes no state BY RULE, not by code, until T-179 and T-003 land.
 
 ### Open questions
 
-- A10's R79 and R80 are not started. Does Grok's context last them, or does D-035 want a fresh Grok session at the R78 boundary? Grok's own read of its context decides.
-- The spawn-site scan matches by name (RegExp.exec read as child_process exec): T-156's, not A10's. Does it get a row in T-156's note?
-- Is G-042 the machine's load, the worktree, or Cursor running in it? Repeat runs in the SAME tree are the missing control.
-- T-050: can Cursor's stop hook wake an idle seat? Deferred by Relay (2026-09-25) until it writes a brief for Aaron after the tcm cutover; not a trial on Grok's seat.
-- Were Forge's two refusals false positives? /feedback was advised; not recorded as done.
-- T-165: every rejection of a Grok-built candidate (A2, A3, A4) traces at least partly to a planner ruling. Compare deliberately once slice three closes, reading it that way, not as a score for the developer seat.
-- Does medium effort (D-047) change report quality? Compare the first reports after 2026-09-25 against the earlier ones, labelled by effort.
-- gitnexus on the QA PC (QA 99 section 15 Q5): install it so /sync --check can run there? An install on Aaron's PC, so his call; D-049 makes /sync rebuild an index where one exists, which does not put one on that PC.
-- tcm's Claude Code (T-182): update it so CA-9 can pass there? Aaron's machine, so his call.
+- Aaron: apply T-003's row #348 repair (handoff section 6), after checking it against Session_53.md?
+- Aaron: an EC2 Windows QA machine (docs/loops/research/qa-offload.md) only after the machine-versus-agent split is measured from run-N.jsonl.
 
 ### Loop state
 
-**Open PRs:** 
-- docs/session-100-qa99-dispatch — QA: not_required — The record PR under D-032: sessions 100 and 109's docs and state. Every path is docs/** or .agents state (checked at session 109: 37 of 37). Opened by planner 109.
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- Nudge Grok's Cursor window: quiet since 11:53Z, owes turn 107's items.
-- Start developer 110 (importer round 3) in ~/Worktrees/sia-infra with the round-3 brief.
+- Start Grok in a fresh Cursor chat for A12 (rulings-20).
+- Launch QA 142 and 144 on the next free machine (queue commands are in the session-109 notes).
+- Frogger: merge sia/bootstrap, or restore it for pilot 1b after /bootstrap round 3.
 
 **Rulings made mid-loop:** 
-- D-031 release commit after acceptance
-- D-032 standing merge authority for record/docs-only PRs
-- D-033 and D-036: slice three closes at A, B and C
-- D-034 other projects' seats are recorded, pause on request
-- D-035 fresh seat sessions at each candidate boundary
-- D-037 memory is lookup by default (T-170)
-- D-038 Aaron speaks only to the planner; seats push their own working branches
-- D-039 A2A-Hub's planner routes through the SIA planner for shared work
-- D-040 seats dispatch CI on their own branches without asking; T-178 makes it automatic
-- D-041 A6 changes approach: the OS resolves links, the runtime compares the file reached
-- Rulings R1-R80 in docs/loops/loop-15-slice-3-rulings-1..17.md (R28 is the brief's)
-- D-042 R67 approved: same place, not shared
-- D-043/D-044 two sandboxed self-hosted runners on tcm
-- D-045 QA moves to desktop-o4egb1e over SSH
-- D-046 A8 goes ahead with R69; v0.44.2 released
-- A to A9 rejected (A9-1..A9-4; report e80acd4); rulings-17 R77-R80; A10 dispatched (turn 46), waits for a fresh Grok session
-- D-047 Opus 5.5 default effort medium; QA seats set effort explicitly
-- D-048 Makerspace record-only onto SIA before its cutover, after the pilots and T-175/T-180 (T-181; docs/loops/adoption-plan-2026-09-25.md)
-- D-049 /sync rebuilds the GitNexus index when behind (T-187)
-- D-050 one maintenance window: GitNexus 1.6.12, main checkout v0.44.2, full reindex (T-189 done)
-- Session 109: rulings-18 (R77 as applied, R81 B Step 0 does not wait for A, R82 fail closed on what cannot be seen); QA 106 verdict (aba35de does not merge) and the round-3 brief
+- rulings-20 (A11 rejected; R90-R94)
+- t179-rulings-qa125 plus amendments 1-3 (R179-1 by first_rev; R179-8)
+- bootstrap-fix-rulings-qa135 (R-BF-9..13)
+- loop-15-slice-3-b-criteria-rulings, b-step1-rulings-qa129
+- importer-fixes-r4-rulings-qa122 (R4-4/R4-5)
+- t185-rulings-qa120, t183-rulings-qa114
 
 ## developer _(written session 74)_
 

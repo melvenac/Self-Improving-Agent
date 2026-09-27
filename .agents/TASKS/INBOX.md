@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 131 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 133 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -35,7 +35,6 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-050** v0.15.1 made a foreign `.recalled-entries.json` writer unreachable *and* uncountable
 - [ ] **T-051** Add a `/sync` validator for the `.agents/skills/` frontmatter contract, asserting all three identity sources agree
 - [ ] **T-055** GitNexus's incremental analyze is unreliable on this repo
-- [ ] **T-056** `ob_store` derives the vault folder from a canonicalized path, so it lowercases the project name
 - [ ] **T-061** Collect shadow-recall sessions
 - [ ] **T-065** Port `cli.ts` off the v1 database, then repoint `paths.knowledgeDb`
 - [ ] **T-067** Close the remaining 153 open checkboxes across session logs
@@ -65,6 +64,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-183** ob_start's greeting has grown about 7x since V-025 (2,142 words at rev 14; about 14,900 words, 92,131 characters, at rev 121) and no longer fits one tool result: render gaps and verified by TITLE, as tasks already are
 - [ ] **T-185** Other open-brain subcommands take the first non-'--' token as their directory: `detach -dry-run` and `state migrate -dry-run` would do the REAL thing; sync and start share the shape. Refuse unknown '-' tokens everywhere
 - [ ] **T-187** /sync rebuilds the GitNexus index when it is behind (D-049): plain /sync runs analyze where a .gitnexus exists and the indexed SHA is not HEAD, then verifies the new SHA; sync --check stays read-only; a tree with no index stays SKIP (never PASS)
+- [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 
 ## P2
 
@@ -87,4 +87,4 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 
 ## Done (last 3 sessions)
 
-_None retained._
+- [x] **T-056** `ob_store` derives the vault folder from a canonicalized path, so it lowercases the project name (session 109) — Session 109: already fixed in v0.14.2 (96c8d5e, 'derive vault folder names from the raw path'; server.ts uses projectDisplayName(project_dir)). Both named rows, #235 and #365, now point at Experiences/Self-Improving-Agent/ (read in knowledge_index). The three lowercase-path rows are filenames, not folders.
