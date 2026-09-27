@@ -148,3 +148,16 @@ plus the comment above it at `:40-42`. `/sync`'s check is `ci-status` in
 - **Not observable before merge:** the first real master push landing on tcm. After Aaron merges, the planner reads
   that run's runner name, and that read is the acceptance.
 - Handoff at `docs/loops/t192-developer-handoff.md`. Branch `loop/t192-ci-tcm` from `origin/master`.
+
+## The planner's own error entries, record session 147
+
+Each of these escaped to Aaron, a PR or a tracked file, so each is an error rather than a near-miss:
+1. **"The PR gets no automatic CI" was false.** `ci.yml` has a `pull_request:` trigger (line 6), and every PR gets a
+   tcm run. This was asserted without reading the file, in PR #178's body, in its merge comment, and to Aaron ("GitHub
+   CI won't run on this PR by itself"). The runs the planner dispatched on #178's and #179's branches duplicated
+   automatic ones. Found at #180, when a `pull_request` run appeared that nobody had dispatched. Rule 14: derive it.
+2. **"162 and 174 are GPT-5.6 Sol"** was written in this file from the session 146 handoff's wording, before the
+   dispatches were read. Only 174 is. Corrected above before any driver was generated.
+3. **Two dispatches went out before the Step-Back, PRD.md and README.md were read.** It was the third time, and
+   Aaron had to send the link. The dispatches carried out earlier rulings, but the rule is to read first. T-167 is
+   the structural fix.
