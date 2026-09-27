@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 135,
+  "revision": 137,
   "project": {
     "name": "self-improving-agent"
   },
@@ -777,6 +777,17 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Session 109, on Aaron's word ('Could the greeting be dynamic per seat depending on what context that agent needs' and then 'yes' to recording it, 2026-09-25, planner session). SEQUENCED AFTER T-183, which clips lines for everyone and is scored an honest no against 40,000 characters (T-183 brief amendment 1): per-seat profiles are the change that gets a non-planner greeting under. SHAPE (planner's, the developer designs): a zod-validated profile file, like the gate policies, mapping the seat (already known from AGENT.local.md at start) to its sections. Planner: everything. Developer: objective, own handoff, watch-outs, verified (count plus newest), gap ids and titles, role files. QA: verified and gaps in full, watch-outs, role files. RULE: every omitted section is PRINTED as omitted, with its count and the read-only command that shows it (G-032: a section a seat never sees is the failure). Per-seat WATCH-OUTS need a seats tag on each watch-out, a schema change, so that part waits for a migration window. NOT this task: task-aware selection (reading the brief to pick lines) or model-scored relevance. Aaron asked the same session whether each line could be scored; the planner's answer is recorded in docs/loops/planner-session-109-notes.md (exact-match rules first, a scorer only in shadow with a measured miss rate). Candidate seat: sia-builder, which touches only the render and sync code.",
+      "closed_rev": null
+    },
+    {
+      "id": "T-192",
+      "title": "Master's push CI has not run since #171: GitHub refuses the ubuntu-latest job for billing, and /sync ci-status reports that as an ordinary 'failure'",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 147,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened as a TASK, not a gap: add_gap would assign G-046, a closed id the tracked tree cites (T-158, V-071), so no seat uses add_gap until T-158 lands. Evidence: ci.yml:44 sends a master push to GitHub-hosted ubuntu-latest. Runs 36303132573 (ecd28dd, #171) to 36304185040 (e201baa, #177): job 'test' failure, zero steps, no log; the check-run annotation reads 'The job was not started because recent account payments have failed or your spending limit needs to be increased.' The planner dispatched the suite on e201baa to tcm: run 36305346883, success, 97/97 test files, so merged master is sound. Two halves: (1) Aaron decides whether to fix the billing or move master pushes to tcm (D-043 already runs dispatches there); (2) ci-status names a job that never started (zero steps, or the billing annotation) as its own state, not as a failure. Recorded 2026-09-27, record session 147 (planner).",
       "closed_rev": null
     }
   ],
@@ -2999,6 +3010,54 @@
       "title": "One maintenance window, after importer round 2 hands back: GitNexus 1.6.9 -> 1.6.12, the SIA main checkout updated and rebuilt (T-172), a full GitNexus reindex there, and /mcp reconnected in open sessions",
       "date": "2026-09-25",
       "note": "Aaron, SIA planner session (record session 100), 2026-09-25, verbatim: 'yes', to the planner's 'Shall I plan it that way?' (the three jobs as one window once round 2 hands back). Basis, from a read-only subagent's check of GitNexus's GitHub releases (v1.6.10 2026-08-27, v1.6.11 2026-09-04, v1.6.12 2026-09-12): only 1.6.10 breaks (Node floor ^22.18.0 || >=24.11.0, which this machine's v22.23.2 meets; unused group-matching config removed); no MCP tool is renamed or removed; every release requires a FULL reindex; 1.6.10 carries an FTS-reliability batch that may cover T-055 (not confirmed); G-043 (clean needs --force) and the npm 11 crash (#1939) are not mentioned, so assume both remain. Not now because developer 105 uses GitNexus MCP on this machine and replacing a global package under a running server on Windows can fail or break it. Steps are T-189."
+    },
+    {
+      "id": "D-051",
+      "title": "QA runs only on the laptop and the QA PC; this desktop runs QA only when Aaron is away from it AND no agent session is running on it",
+      "date": "2026-09-27",
+      "note": "Aaron, 2026-09-27, verbatim as recorded in planner session 146: 'I want them on the laptop and qa pc' and 'this desktop cant run qa while I'm here or other agents are running'. Recorded by the planner at record session 147; session 146 owed it (docs/loops/planner-session-146-notes.md, Owed 1). Launch lines: docs/loops/qa-launch.md."
+    },
+    {
+      "id": "D-052",
+      "title": "All developer and QA seats run in Cursor to save Claude Code usage: developers sia-builder, sia-forge and sia-infra (Grok 4.7); QA seats Cursor Composer 2.5, after the A12 calibration",
+      "date": "2026-09-27",
+      "note": "Aaron, planner session 147, verbatim: 'Our dev agents are all using cursor to save on cc usage, 3 are open sia builder, forge and infra. Qa agents are also cursor using composer 2.5'. The Composer 2.5 calibration: docs/loops/cal-a12-results.md. Consequence found this session: the seven waiting QA drivers (161, 162, 172, 173, 174, 177, 178) were generated from the CLAUDE template and must be regenerated with qa-driver-copy.mjs --harness cursor once PR #178 merges (docs/loops/session-147-dispatches.md)."
+    },
+    {
+      "id": "D-053",
+      "title": "One A2A-Hub room per Cursor seat, with listeners on both sides: the planner runs one background --wait per room; each seat runs --wait after posting",
+      "date": "2026-09-27",
+      "note": "Aaron, 2026-09-27 (planner session 146): 'Why arnt you talking to each agent via the hub? You need a listener for each room. Those agents need a listener as well after they complete work.' One room per seat after two seats acted on each other's dispatches in a shared room. Rooms: docs/loops/planner-session-146-notes.md, 'Hub rooms'."
+    },
+    {
+      "id": "D-054",
+      "title": "At Loop 15 close, update the SIA Step-Back artifact, PRD.md and README.md together, against what ships",
+      "date": "2026-09-27",
+      "note": "Aaron, planner session 147, verbatim: 'https://claude.ai/artifact/3Kv8BuKYrj5vaKQgD8NKC7 read this before any ruling, the plan is to update this artifact, prd and readme once loop 15 is complete.' Extends T-169, which names PRD.md and README.md only. The artifact is the planner's intent source and must be read before any ruling; it stops at Part 5 (Loop 12 briefed). At 5a85602 README still describes Loop 10's cuts (maturity lifecycle, skill proposals, reflection cycle, the Smart Connections Node pin), and PRD.md marks its feature list stale on purpose."
+    },
+    {
+      "id": "D-055",
+      "title": "D-032 amended: a docs-only PR merges once every changed path is on the docs allowlist and the PR is MERGEABLE/CLEAN, with no CI run",
+      "date": "2026-09-27",
+      "note": "Aaron, planner session 147, verbatim: 'change D-032 so a docs-only PR merges once every changed path is on the docs allowlist and the PR is mergeable, with no CI run'. Asked after the planner ran tcm CI on research 4 (#179, one .md file; run 36306582968 queued behind two seats' code runs). He asked: 'research are docs only merge, why run ci if no code is changed?' Everything else in D-032 stands: the path list and allowlist check posted as a PR comment, the merge pinned with --match-head-commit, the result read back from origin/master; one unlisted path, or any loop candidate, goes to Aaron. Carried into .agents/roles/shared.md (the Authority section)."
+    },
+    {
+      "id": "D-056",
+      "title": "Master's CI moves to tcm: a push to master runs on the self-hosted tcm runner; GitHub-hosted ubuntu-latest only on a dispatch with hosted=true",
+      "date": "2026-09-27",
+      "note": "Aaron, planner session 147, verbatim: 'move master's CI to tcm'. Cause: GitHub refused every master-push job since #171 for billing (T-192). Built by cursor-builder as record 181 on loop/t192-ci-tcm (candidate 53d3638; round 181b in progress for a silent fall-through in ci-status). Acceptance after Aaron's merge: the planner reads the first master push run's runner name."
+    },
+    {
+      "id": "D-057",
+      "title": "The A2A-Hub main checkout takes master (its D-005): fast-forwarded to origin/master b0f143b, record schema v3 rev 72",
+      "date": "2026-09-27",
+      "note": "Aaron, planner session 147, verbatim: 'May the A2A-Hub main checkout take master, yes'. Done by the planner the same session: ~/Projects/A2A-Hub was clean and on master, 38 behind; the 38 commits touched only docs/ and .agents/ (no scripts/, no package.json), so hub-talk.mjs and every running listener were unaffected. git merge --ff-only origin/master; read back HEAD = origin/master = b0f143b, local state.json schema 3 rev 72."
+    },
+    {
+      "id": "D-058",
+      "title": "Build Scout's Telegram approval for QA runs (research 4); the build brief amends rules 3.5 and 3.7 for the Cursor driver",
+      "date": "2026-09-27",
+      "note": "Aaron, planner session 147, verbatim: 'Scout's Telegram approval: build it'. Research 4 merged under D-032 as #179 (e6d04b7). It predates the Cursor QA driver (PR #178): rules 3.5/3.7 pin the Claude template; the brief must pin docs/loops/qa-driver-template-cursor/ including cli.json (the deny fence), and rule 3.6's cost note reads total_cost_usd, which the Cursor CLI does not report. Still open for Aaron: token option (a) a separate Windows account per QA machine (Scout's recommendation) or (b) the same account."
     }
   ],
   "handoffs": [
@@ -3106,6 +3165,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 135
+    },
+    {
+      "n": 147,
+      "date": "2026-09-27",
+      "uuid": "4ed2836c-1dd1-43e5-8a06-c829d50548f3",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 136
     }
   ]
 }

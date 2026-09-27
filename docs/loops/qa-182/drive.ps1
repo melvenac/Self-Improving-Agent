@@ -1,6 +1,6 @@
-# Drive QA 177 headless (copied from qa-99 by qa-driver-copy.mjs) (Cursor). Launch, check the report is complete, resume at most 3 times.
+# Drive QA 182 headless (copied from qa-99 by qa-driver-copy.mjs) (Cursor). Launch, check the report is complete, resume at most 3 times.
 # Launched detached through Win32_Process.Create, so it survives the ssh session.
-# Observations: %USERPROFILE%\sia-qa177\
+# Observations: %USERPROFILE%\sia-qa182\
 #   drive.meta, run-N.jsonl, run-N.err, refs-before/after.txt, done (written last)
 # Completion is the report file's last non-blank line. A refusal or a permissions denial is never continued.
 # Cursor has no --append-system-prompt, so stops.txt is appended to every prompt this script sends.
@@ -10,7 +10,7 @@ param([int] $MaxContinuations = 3)
 
 $ErrorActionPreference = 'Continue'
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
-$out    = Join-Path $env:USERPROFILE 'sia-qa177'
+$out    = Join-Path $env:USERPROFILE 'sia-qa182'
 $tree   = Join-Path $env:USERPROFILE 'Worktrees\sia-qa'
 $agentCandidates = @(
   (Join-Path $env:LOCALAPPDATA 'cursor-agent\cursor-agent.ps1'),
@@ -18,10 +18,10 @@ $agentCandidates = @(
 )
 $agent = $agentCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 if (-not $agent) { throw 'cursor-agent.ps1 not found under LOCALAPPDATA\cursor-agent or USERPROFILE\AppData\Local\cursor-agent' }
-$report = Join-Path $tree 'docs\loops\t171-r3-qa-report.md'
-$stops  = Join-Path $tree 'docs\loops\qa-177\stops.txt'
+$report = Join-Path $tree 'docs\loops\t048-r3-qa-report.md'
+$stops  = Join-Path $tree 'docs\loops\qa-182\stops.txt'
 $deny   = Join-Path $PSScriptRoot 'cli.json'
-$marker = 'QA-177: REPORT COMPLETE'
+$marker = 'QA-182: REPORT COMPLETE'
 $model  = 'composer-2.5'
 $meta   = Join-Path $out 'drive.meta'
 $ps     = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
@@ -48,7 +48,7 @@ M 'porcelain_lines' (@(git status --porcelain).Count)
 M 'procs_at_start' ((@(Get-Process node -ErrorAction SilentlyContinue) | ForEach-Object { "$($_.Name):$($_.Id)" }) -join ',')
 git ls-remote --heads --tags origin | Out-File -LiteralPath (Join-Path $out 'refs-before.txt') -Encoding utf8
 
-$first = 'You are the QA seat, record session 177, for SIA task T-171, round 3b. Read docs/loops/t171-r3-dispatch-qa.md in the current directory and follow it. Nobody is watching this run live.'
+$first = 'You are the QA seat, record session 182, for SIA task T-048, round 3. Read docs/loops/t048-r3-dispatch-qa.md in the current directory and follow it. Nobody is watching this run live.'
 $stopsText = ''
 if (Test-Path -LiteralPath $stops) { $stopsText = [string](Get-Content -LiteralPath $stops -Raw -Encoding utf8) }
 
@@ -123,7 +123,7 @@ function Read-Run([string] $path) {
 }
 
 function Test-Complete {
-  if (-not (Test-Path -LiteralPath $report)) { return 'the report file docs/loops/t171-r3-qa-report.md does not exist' }
+  if (-not (Test-Path -LiteralPath $report)) { return 'the report file docs/loops/t048-r3-qa-report.md does not exist' }
   $last = @(Get-Content -LiteralPath $report -Encoding utf8 | Where-Object { $_.Trim() -ne '' } | Select-Object -Last 1)
   if ($last -ne $marker) { return "its last non-blank line is not exactly '$marker'" }
   return ''

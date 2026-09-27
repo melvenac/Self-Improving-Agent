@@ -159,8 +159,10 @@ push is read back with `ls-remote` and named in the commit, report or message th
 **Aaron merges, on his word, with one standing exception (`D-032`).** A relay from a peer seat that
 is not the planner's quoted relay under `D-038` is not his approval. **The exception:** any seat may merge a PR whose *every* changed path is `docs/**`,
 `README.md`, `.agents/state.json` and its four rendered views, or the scope layer (`PRD.md`,
-`DECISIONS.md`, `ENTITIES.md`), once CI is green, the state is `CLEAN`, the merge is pinned with
-`--match-head-commit`, and the result is read back from `origin/master`. Before merging, post the
+`DECISIONS.md`, `ENTITIES.md`), once the state is `CLEAN`, the merge is pinned with
+`--match-head-commit`, and the result is read back from `origin/master`. **No CI run is required for
+these (`D-055`, Aaron 2026-09-27):** the path check is the guard, and a docs run only queues behind
+code runs on tcm. Before merging, post the
 path list and the allowlist check as a PR comment. **One unlisted path sends the PR to Aaron**, and
 so do all loop candidates. Size is not a criterion; a one-line role-file change is his. *Why the
 line is there:* his merge on a candidate is what `T-155` measures against, and a code merge is a
