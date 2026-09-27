@@ -1156,7 +1156,7 @@ export function checkRetirements(projectRoot: string): CheckResult {
     // D2. A finding used to replace the listing label, so FALLBACK and PARTIAL
     // disappeared. The label stays, and D3 prints this issue.
     const scanNote = unreadable.length > 0
-      ? ` The scan is ${listing.source === "git" ? "incomplete" : "partial"} (${listing.label}).`
+      ? ""
       : ` (${listing.label}).`;
     return {
       name,
