@@ -213,8 +213,16 @@ present after.
   - then this handoff.
 - **Pushed:** `loop/bootstrap-fix-r3-red` (`a51972a`, for the red CI run) and `loop/bootstrap-fix-r3`, each read back
   with `ls-remote`. No master, no force, no tag, no laptop CI.
-- **`/sync --check`** at `7f4ca74` and at `e812689`: 21 passed, 3 issues. They are the same three the r2 handoff names
-  (`retirements`, `mirror-parity`, `state-schema`), none from this round. `build-freshness` passed.
+- **`/sync --check`: 21 passed, 3 issues**, with HEAD at `7f4ca74` (twice: before the fix commit, and before `e812689`),
+  and again at `a1f5baf` after a rebuild. The three are the ones the r2 handoff names (`retirements`, `mirror-parity`,
+  `state-schema`), none from this round.
+  - **Correction, mine:** this line first said "at `7f4ca74` and at `e812689`", which was wrong.
+  - The handoff commit `a1f5baf` was made on a `sync` run that showed **4** issues. The fourth was `build-freshness`: the
+    build was stamped `7f4ca74` while HEAD had moved on through two `docs/loops/`-only commits.
+  - I printed the summary and committed without gating on it. That is r2's near-miss again (build after the commit, not
+    before it), and this time it reached a pushed commit.
+  - Rebuilt at `a1f5baf`: `build-freshness` passes, 3 issues. The code under test is unchanged, since everything after
+    `7f4ca74` is `docs/loops/` only.
 - **GitNexus:** this worktree has no index. `impact` and `detect_changes` were run against the main checkout's index,
   **113 commits behind**, with this worktree passed in:
   - `impact`: `isProjectRoot` **HIGH** (§6.1); `buildImportDraft` LOW.
