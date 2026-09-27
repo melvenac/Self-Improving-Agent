@@ -40,3 +40,29 @@ were not re-read.
 3. A (config watch) merges when its QA accepts.
 4. **Every candidate listed in step 2 has passed QA except** T-048 r1, importer r5 and T-003 r2 (QA 151 and 153 are
    done, 154 is running) and `/bootstrap` r4 (QA 161 is held).
+
+## Addendum: QA 151 (T-048 r1 `7913c5f`) and QA 153 (importer r5 `e2f202b`), both PASS
+
+The planner read the Verdict sections only.
+
+**QA 151: PASS.**
+- All five checks name a truly unreadable path as an ISSUE, and nothing reads as a false pass.
+- This was tested on real icacls, share-None, EISDIR and ENOENT paths.
+
+**Its output defects go into T-048 round 3:**
+- **D1:** an unreadable path hides a real finding: `module-boundary` and `template-personal-names` return on the first
+  one, and `retirements` cuts at six with the unreadables listed first. **Ruling:** real findings are listed before
+  unreadables, and a check never returns before it has named every finding.
+- **D2:** PARTIAL and FALLBACK drop off when there is also a finding.
+- **D3:** the scope statement is only partial.
+
+**QA 153: PASS** on R5-1, R5-3, R5-4 and O-e, and on every preserve. QA 138's §1 shapes: 32/0.
+- **R5-2 is PARTIAL (D1):** the latest session log of the odd-length `FE FF` shape is named nowhere, and its date
+  silently becomes the migration date.
+  - That is a silent substitution, the class this project exists to remove.
+  - **Ruling:** it is fixed in the importer's next round, before any adoption that imports a real project (T-181).
+  - It does not block the merge, because it needs a session log written by a non-cmdlet writer.
+- The DECISIONS.md "ADRs NOT imported: none found" line is in the same round.
+
+**The merge order is unchanged.** Every stacked candidate has now passed QA except T-003 r2 (QA 154 is running) and
+`/bootstrap` r4 (QA 161 is held for the Cursor calibration).
