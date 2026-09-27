@@ -1,28 +1,25 @@
-<!-- generated from .agents/state.json rev 134 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 135 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [legacy] _(written session 109)_
+## planner [sia-planner] _(written session 146)_
 
 ### Pick up here
 
-Read docs/loops/planner-session-109-notes.md, section 'HANDOFF TO THE NEXT PLANNER (session 109 rolls here)', first: it lists what is in flight on each machine and seat, every candidate's state, the merge order (T-179 round 2 first, then its stacked branches), and the tasks to open. Then rule each QA report as it lands (132, 134, 138; then 142, 144, A12) and dispatch fix rounds to cleared developer checkouts.
+Read docs/loops/planner-session-146-notes.md, section 'HANDOFF TO THE NEXT PLANNER (session 146 rolls here)', first. T-179 r2 is merged and the record is v3. Verify which of PRs #172-#176 merged. Re-arm one hub listener per developer room. Then send the /bootstrap cli.ts reconciliation to cursor-builder, and follow the Cursor QA driver (record 175) to merge, so the seven waiting QA runs go to the laptop and QA PC.
 
 ### Watch out
 
-- QA runs are launched only by Aaron (the host classifier refuses the planner). Use docs/loops/qa-queue.ps1 with a FIXED list per machine; it failed twice on planner bugs (an int[] parse, then an unquoted path with a space). Both are fixed at 2667c6b and proven with the target's shape.
-- Three QA machines: the QA PC (i5-3570, 8 GB, C:/Users/AARONM~1/Worktrees/sia-qa), the laptop DESKTOP-0GV3HAD (i7-8565U, 8 GB, C:/Users/Aaron/Worktrees/sia-qa; ALSO the Windows CI runner, so no windows=true CI while it runs QA), and this desktop at night (~/Worktrees/sia-qa). One QA seat per machine.
-- Merging T-179 migrates the live .agents/state.json to schema v3: Aaron runs its after-merge checklist (the round-2 handoff), including A2A-Hub's own record (v2 rev 66), which Relay's seat or Aaron migrates.
-- Dispatch lines do not set effort; only the seat's own setting does. Every seat reports its effort from its transcript.
-- A seat pushes its handoff BEFORE any /clear; the planner verifies it on the remote before calling a checkout free.
-- Before ruling a numeric bound, read the values it will compare (R179-1's error: the live record's newest session is 76).
-- Master pushes run hosted, and hosted minutes are exhausted until 2026-10-01: master CI 'failure' is billing, not tests.
-- The research checkout (Scout, role: none) writes no state BY RULE, not by code, until T-179 and T-003 land.
+- QA runs ONLY on the laptop and QA PC (Aaron), headless via the Cursor QA driver once merged; never as chats on his desktop.
+- Dry-run every command on its target machine before giving it to Aaron: the QA PC's profile paths contain a space, and bash expands $env: before ssh.
+- Read a candidate's diffed code before ruling, not only its handoff.
+- Developer seats are Cursor (Grok 4.7), one hub room each. The planner must run a listener per room; cursor-builder needs Aaron's nudge to read its room.
+- Nothing was written to the record in session 146 except the v3 migration: the owed ob_state writes are listed in the handoff section.
 
 ### Open questions
 
-- Aaron: apply T-003's row #348 repair (handoff section 6), after checking it against Session_53.md?
-- Aaron: an EC2 Windows QA machine (docs/loops/research/qa-offload.md) only after the machine-versus-agent split is measured from run-N.jsonl.
+- Aaron: build Scout's Telegram approval (research 4)? If yes, token option (a) a separate Windows account, or (b) the same account?
+- Aaron: may the A2A-Hub main checkout take master (its D-005)?
 
 ### Loop state
 
@@ -31,17 +28,17 @@ Read docs/loops/planner-session-109-notes.md, section 'HANDOFF TO THE NEXT PLANN
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- Start Grok in a fresh Cursor chat for A12 (rulings-20).
-- Launch QA 142 and 144 on the next free machine (queue commands are in the session-109 notes).
-- Frogger: merge sia/bootstrap, or restore it for pilot 1b after /bootstrap round 3.
+- Build Scout's Telegram approval? Token option (a) or (b)?
+- May the A2A-Hub main checkout take master (D-005)?
 
 **Rulings made mid-loop:** 
-- rulings-20 (A11 rejected; R90-R94)
-- t179-rulings-qa125 plus amendments 1-3 (R179-1 by first_rev; R179-8)
-- bootstrap-fix-rulings-qa135 (R-BF-9..13)
-- loop-15-slice-3-b-criteria-rulings, b-step1-rulings-qa129
-- importer-fixes-r4-rulings-qa122 (R4-4/R4-5)
-- t185-rulings-qa120, t183-rulings-qa114
+- t179-t003-rulings-qa134-qa142 (T-179 r2 ACCEPTED; T-003 r2 brief)
+- t171-bootstrap-rulings-qa144-qa145 (R-BF-17..20)
+- bootstrap-r4-amend-and-queue-guard-brief (R-BF-21)
+- loop-15-slice-3-rulings-21 (A12 REJECTED; R95-R97)
+- t048-t171-rulings-qa157-qa158 plus addenda 1-2
+- importer-leftovers-rulings-qa138 (R5-1..4)
+- cal-a12-results (Composer 2.5 passes QA calibration)
 
 ## developer [legacy] _(written session 74)_
 
@@ -94,4 +91,4 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 
 ## Last session
 
-Session 76 — 2026-09-21 — planner — `22631f4e-433a-4f29-8669-47ee2f543bec` (1 writing session(s) in the record)
+Session 146 — 2026-09-27 — planner [sia-planner] — `cd5e385d-865d-498e-bb8c-53ff4eee82ad` (2 writing session(s) in the record)
