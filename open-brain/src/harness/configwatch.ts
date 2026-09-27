@@ -667,7 +667,7 @@ export class ConfigWatch {
     if (this.snapshot === null) return [];
     const out: string[] = [];
     for (const [path, state] of this.snapshot) {
-      if (!state?.readError) continue;
+      if (!state?.readError || state.dev === null) continue;
       out.push(`unreadable: ${path} (${state.readErrno ?? "UNKNOWN"})`);
     }
     return out;
