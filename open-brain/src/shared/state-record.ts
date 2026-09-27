@@ -12,13 +12,7 @@ export function whyNotARecord(path: string): string | null {
   if (text.trim() === "") return text.length === 0 ? "zero bytes" : "only whitespace";
   let data: unknown;
   try { data = JSON.parse(text); } catch (err) { return `not JSON (${(err as Error).message})`; }
-  if (data === null || typeof data !== "object" || Array.isArray(data)) {
-    if (data === null) return "JSON null";
-    if (Array.isArray(data)) return "JSON array";
-    return `JSON ${typeof data}`;
-  }
-  if (!Object.hasOwn(data, "schema_version")) return "a JSON object with no schema_version";
-  const name = (data as { project?: { name?: unknown } }).project?.name;
+  const name = (data as { project?: { name?: unknown } } | null)?.project?.name;
   if (typeof name === "string" && name.includes("{{")) return `the old template's placeholder seed (project "${name}")`;
   return null;
 }
