@@ -68,7 +68,7 @@ export function readLastInvocationTs(logPath: string = INVOCATION_LOG_PATH): str
   if (!existsSync(logPath)) return null;
   try {
     const raw = readFileSync(logPath, "utf8");
-    if (raw.trim() === "") return "empty";
+    if (raw.trim() === "") return unusableLog("corrupt");
     const lines = raw.split("\n").filter(Boolean);
     let newest: number | null = null;
     let newestRaw: string | null = null;
