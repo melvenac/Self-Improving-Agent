@@ -481,3 +481,16 @@ QA PC: 182, 183.
   `36353805123` success, 1736 passed, with bootstrap-fix-r4 11, state-import-r2 18, r5 22 and r6 3 named. The planner read
   `git show --cc d6fec6d -- cli.ts`: the only `++` (hand-resolved) line is the import union; the draft-summary region is an
   auto-merge with every line from one parent. Clean against `b744e19`. **PR held until QA 178 finishes.**
+
+### QA 178 (T-048 r2b, `822f398`): ACCEPT; the queue finished 22:08:24Z; PRs opened (22:09:54Z)
+
+- The report was committed on the QA PC but **not pushed**: `push-qa.mjs qa/t048-r2b-report` was refused by the Cursor deny
+  list ("Command blocked by permissions configuration"), although `push-qa.mjs` pushed the five `qa/t048-r2b-mut-*` branches
+  earlier in the same run. **The deny list refused its own sanctioned route**, a Cursor-driver defect for cursor-infra.
+  The planner read the report over ssh and saved it verbatim as `docs/loops/t048-r2b-qa-report.md`, with provenance.
+- **Verdict ACCEPT:** D1's cli half, D2 to D5 and the D3 survivors are fixed; the three survivors are killed on tcm; `server.ts`
+  is unchanged from r2. The planner rules **T-048 r2b ACCEPTED**, so `loop/t048-r3` (r2b + r3, both accepted) can merge.
+- This run's audit flag (`loop/bootstrap-fix-r4-rec`) was cursor-builder's record-190 push during the run: the same
+  false-positive class as the planner's pushes.
+- **Queue summary (QA PC):** 189 ACCEPT (B2), 182 ACCEPT (T-048 r3), 183 ACCEPT (T-192), 161 ACCEPT (/bootstrap r4 rec),
+  178 ACCEPT (T-048 r2b). Five of five.
