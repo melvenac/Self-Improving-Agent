@@ -477,3 +477,7 @@ QA PC: 182, 183.
   (cursor-builder, hub turn after 26): merge `origin/master` into `loop/bootstrap-fix-r4-rec`, resolved to the union of
   `inboxWarning`, `describeDecisionsUnreadable` and `describeLastSession`, proven on tcm. The planner verifies the `--cc`
   hunk and the runs, then opens the PR for Aaron. The accepted behaviour is unchanged; this is mechanical.
+- **Record 190 ACCEPTED (22:07:50Z):** merge `d6fec6d` (parents `ade630d` and master `b744e19`), tip `bc738aa` (handoff only). tcm
+  `36353805123` success, 1736 passed, with bootstrap-fix-r4 11, state-import-r2 18, r5 22 and r6 3 named. The planner read
+  `git show --cc d6fec6d -- cli.ts`: the only `++` (hand-resolved) line is the import union; the draft-summary region is an
+  auto-merge with every line from one parent. Clean against `b744e19`. **PR held until QA 178 finishes.**
