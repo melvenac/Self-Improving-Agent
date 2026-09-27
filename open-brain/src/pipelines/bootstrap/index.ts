@@ -155,7 +155,7 @@ function nextStep(g: GitState, a: AgentsState, templateFound: boolean): string {
       (a.inboxIsTemplate ? " .agents/TASKS/INBOX.md still holds the template's example tasks: step 5 replaces them with this project's." : "");
   }
   if (a.kind === "pre-state") return "An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.";
-  if (g.kind === "nested") return `STOP: this folder is inside another repository (${g.toplevel}). \`git init\` here makes this folder its own project, or move the folder out of the enclosing repository.`;
+  if (g.kind === "nested") return `STOP: this folder is inside another repository (${g.toplevel}). Bootstrap a project at its own repository root.`;
   // Residue first: moved before the pre-SIA commit, it never enters it.
   if (a.kind === "residue") return "Move the residue aside first (`bootstrap move-residue`), then run check again.";
   const leaveOut = "leaving .agents/ out of that commit (`git add -A -- . \":(exclude).agents\"`)";
