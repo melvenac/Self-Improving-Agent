@@ -64,7 +64,7 @@ export const OpSchema = z.discriminatedUnion("op", [
   z.strictObject({ op: z.literal("open_task"), id: z.string().optional(), title: z.string().min(1), priority: TaskPriority, note: z.string().optional(), supersedes: z.string().nullable().optional() }),
   // T-171: adding to a note and replacing it are different fields, named at the
   // call. `note` is gone from both ops (refused by name below, not ignored).
-  z.strictObject({ op: z.literal("update_task"), id: z.string(), title: z.string().min(1).optional(), priority: TaskPriority.optional(), status: ActiveStatus.optional(), ...NoteEdit }),
+  z.strictObject({ op: z.literal("update_task"), id: z.string(), title: z.string().min(1).optional(), priority: TaskPriority.optional(), status: ActiveStatus.optional(), note: z.string().optional(), ...NoteEdit }),
   z.strictObject({ op: z.literal("close_task"), id: z.string(), ...NoteEdit }),
   z.strictObject({ op: z.literal("reopen_task"), id: z.string(), note: z.string().min(1) }),
   z.strictObject({ op: z.literal("add_verified"), id: z.string().optional(), claim: z.string().min(1), evidence: z.array(EvidenceSchema).min(1) }),
@@ -98,7 +98,7 @@ const RETIRED_OPS: Record<string, string> = {
  * as an addition erased what it corrected.
  */
 const RETIRED_FIELDS: Record<string, Record<string, string>> = {
-  update_task: { note: "`note` is retired on update_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)" },
+  update_task_x: { note: "`note` is retired on update_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)" },
   close_task: { note: "`note` is retired on close_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)" },
 };
 
@@ -461,6 +461,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       if (op.title !== undefined) t.title = op.title;
       if (op.priority !== undefined) t.priority = op.priority;
       if (op.status !== undefined) t.status = op.status;
+      if (op.note !== undefined) t.note = op.note;
       const refused = editNote(t, op, ctx);
       if (refused) return { ok: false, error: refused };
       return { ok: true, id: t.id };
