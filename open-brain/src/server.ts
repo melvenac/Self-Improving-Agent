@@ -1067,9 +1067,6 @@ export async function handleFeedback(args: { id: number; rating: "helpful" | "ha
       `Feedback recorded for entry ${id} (${entry.key || "no key"}): ${rating}`,
       `Counts: ${entry.helpful + (rating === "helpful" ? 1 : 0)} helpful, ${entry.harmful + (rating === "harmful" ? 1 : 0)} harmful, ${entry.neutral + (rating === "neutral" ? 1 : 0)} neutral`,
     ];
-    if (feedbackSession.id === null) {
-      lines.push(`NOT LOGGED: this server cannot prove its session — ${feedbackSession.reason}`);
-    }
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };
 }
