@@ -526,7 +526,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
       console.log(`Staleness: ${stale.length} stale${stale.length ? ` (${stale.map((i) => i.input).join(", ")})` : ""} · ${unknown.length} could not tell${unknown.length ? ` (${unknown.map((i) => i.input).join(", ")})` : ""} · ${judged.length - stale.length - unknown.length} current. Details are in the report's first section.`);
       if (stale.length) console.log(`--commit will REFUSE until those inputs are updated and the draft is re-run, or until ${ACCEPT_STALE_FLAG} is passed.`);
       const unreadable = unknown.filter(blocksCommit);
-      if (unreadable.length) console.log(`--commit will REFUSE while ${unreadable.map((i) => i.input).join(", ")} cannot be read (NUL bytes, UTF-32, or no readable \`# \` title; the report says which): save as UTF-8 and re-run the draft, or pass ${ACCEPT_STALE_FLAG}.`);
+      if (unreadable.length) console.log(`--commit will REFUSE while ${unreadable.map((i) => i.input).join(", ")} cannot be read or judged (NUL bytes, UTF-32, an odd-length UTF-16BE file, or no heading line; the report says which): save as UTF-8 with a title and re-run the draft, or pass ${ACCEPT_STALE_FLAG}.`);
       const s = rep.inbox.by_status;
       console.log(`Tasks: ${rep.inbox.items} (open ${s.open}, in_progress ${s.in_progress}, blocked ${s.blocked}, done ${s.done}); superseded links ${rep.inbox.superseded_links.length}; unparsed lines ${rep.inbox.unparsed.length}`);
       console.log(`Decisions: ${rep.decisions.imported} (${rep.decisions.skipped.length} skipped) · verified ${rep.verified_imported} · gaps ${rep.gaps_imported} · objective ${rep.objective.found ? "found" : "NOT found"}`);
