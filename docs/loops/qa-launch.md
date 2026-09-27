@@ -41,6 +41,13 @@ folder.
 ! ssh -i C:/Users/melve/.ssh/id_ed25519 -l "Aaron Melven" 100.73.250.101 "powershell -NoProfile -Command Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\AARONM~1\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'}"
 ```
 
+**This desktop (night QA; the tree is `~/Worktrees/sia-qa`).** Run it locally; no ssh is needed. It copies the queue
+script out of the commit first, because the desktop had no copy as of 2026-09-27.
+
+```
+! cd ~/Worktrees/sia-qa && git fetch -q origin && git show <sha>:docs/loops/qa-queue.ps1 > ~/qa-queue.ps1 && powershell -NoProfile -Command "Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\melve\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'}"
+```
+
 **Success looks like** `ReturnValue : 0` plus a `ProcessId`. Then the planner reads
 `%USERPROFILE%\sia-qa-queue\queue.log` over ssh, and it must show `start=queue=<N,M>` and `run.<N>=started`.
 
