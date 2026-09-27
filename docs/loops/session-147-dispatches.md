@@ -397,3 +397,15 @@ edit: the shared fixture gained `order: "shown"` because a `met` row without it 
 as a BE-5 question, not ruled by the planner. **QA 189** (`docs/loops/loop-15-slice-3-b2-dispatch-qa.md`, Composer
 2.5, a different model from the builder) **launches in the morning with the others.** Laptop order: 189, 161, 178;
 QA PC: 182, 183.
+
+## The next day (21:11:36Z), on Aaron's word
+
+- **Merged:** #186 (T-193) as `a1fa4b1` and #188 (record 185/185b) as `b744e19`. The #188 head `ac683f4` adds only
+  the handoff over the verified `78fd6ce`. Master tcm CI `36350589982` dispatched. T-193 and T-149 closed (rev 143).
+- **Removed** the four stray scratch worktrees, each re-checked clean with nothing unpushed immediately before. SIA now
+  has only the main checkout and the six seat folders.
+- **QA relaunched on the QA PC only** (the laptop is in use): `qa-queue.ps1` copied from `b744e19` (15,068 bytes,
+  SHA-256 `40aea6e28954383c`, read back); queue `189,182,183,161,178` at `9a79ff1`, started 21:10:59Z. The launch
+  checkout moved a dirty tree to `9a79ff1`: the record-185 `-f` fix working on a real machine for the first time.
+- **The main checkout** (`~/Projects/Self-Improving-Agent`) is still at `ecd28dd`, far behind master. Hooks and the
+  MCP server run from it, and T-193 only reaches A2A-Hub once it is updated. Updating it is Aaron's word (T-172, D-050).
