@@ -14,6 +14,27 @@ on:
         description: Also run the suite on the Windows laptop runner (laptop-win; opt-in until it proves stable)
         type: boolean
         default: false
+      # G-042 Step 0 (brief loop-15-slice-3-b-step0, amendment 2 R89): the suite under a generated load, on laptop-win.
+      step0:
+        description: "Step 0: run the Windows suite under open-brain/scripts/load-generator.mjs, with the ELD instrument on (needs windows=true)"
+        type: boolean
+        default: false
+      workers:
+        description: "--maxWorkers for the Windows suite. Empty = vitest's default on a step0 run, 2 otherwise. A step0 red-first row must leave it empty."
+        type: string
+        default: ""
+      cpu:
+        description: "step0: busy-loop processes (--cpu)"
+        type: string
+        default: "0"
+      disk:
+        description: "step0: 4 MiB write+fsync writers (--disk)"
+        type: string
+        default: "0"
+      spawn:
+        description: "step0: git --version spawn loops (--spawn)"
+        type: string
+        default: "0"
 
 jobs:
   test:
@@ -103,6 +124,73 @@ jobs:
         working-directory: open-brain
         run: npx tsc --noEmit
 
+      # Step 0 counts only on a quiet laptop (R89 item 4). This records the baseline and MARKS a run that is not quiet;
+      # it does not fail it, because whether a row counts is the handoff's call, made from this log.
+      - name: Laptop baseline (CPU, free RAM, top 5 by CPU)
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          Start-Sleep -Seconds 5
+          $loads = 1..3 | ForEach-Object { (Get-CimInstance Win32_Processor | Measure-Object LoadPercentage -Average).Average; Start-Sleep -Seconds 2 }
+          $cpu = [math]::Round(($loads | Measure-Object -Average).Average, 1)
+          $os = Get-CimInstance Win32_OperatingSystem
+          $freeMb = [math]::Round($os.FreePhysicalMemory / 1024)
+          $totalMb = [math]::Round($os.TotalVisibleMemorySize / 1024)
+          "BASELINE cpu_load_pct=$cpu samples=$($loads -join ',') free_ram_mb=$freeMb total_ram_mb=$totalMb at=$((Get-Date).ToUniversalTime().ToString('o'))"
+          $top = Get-CimInstance Win32_PerfFormattedData_PerfProc_Process |
+            Where-Object { $_.Name -notin '_Total','Idle' } |
+            Sort-Object PercentProcessorTime -Descending | Select-Object -First 5
+          $top | ForEach-Object { "TOP5 $($_.Name) pid=$($_.IDProcess) cpu_pct=$($_.PercentProcessorTime) ws_mb=$([math]::Round($_.WorkingSet / 1MB))" }
+          # PercentProcessorTime is percent of ONE logical processor, so 15 means 15 % of a core, as the handoff states.
+          # Dividing it by the processor count made this 120 % of a core on the 8-thread laptop (QA 123, E-4).
+          $heavy = $top | Where-Object { $_.Name -notmatch '^(Runner\.|powershell|WmiPrvSE)' -and $_.PercentProcessorTime -gt 15 }
+          if ($cpu -gt 25 -or $heavy) { "::warning::BASELINE_NOT_QUIET cpu_load_pct=$cpu heavy=$(($heavy | ForEach-Object Name) -join ',') - this run does not count for Step 0" }
+          else { "BASELINE_QUIET" }
+
       - name: Test
+        if: ${{ !inputs.step0 }}
         working-directory: open-brain
-        run: npm test -- --testTimeout=30000 --maxWorkers=2
+        run: npm test -- --testTimeout=30000 --maxWorkers=${{ inputs.workers || '2' }}
+
+      # The load runs for the suite's whole duration: the generator wraps the suite, stops its children when the suite
+      # exits, proves them dead, and exits with the suite's code (90/91 if the load leaked or was not as stated).
+      - name: Test under generated load (Step 0)
+        if: ${{ inputs.step0 }}
+        working-directory: open-brain
+        env:
+          OPEN_BRAIN_ELD_DIR: ${{ runner.temp }}\step0\eld
+        run: >-
+          node scripts/load-generator.mjs --cpu ${{ inputs.cpu }} --disk ${{ inputs.disk }} --spawn ${{ inputs.spawn }}
+          --duration 2700 --report "${{ runner.temp }}\step0\loadgen.json" --log "${{ runner.temp }}\step0\suite.log"
+          -- npm test -- --testTimeout=30000 ${{ inputs.workers && format('--maxWorkers={0}', inputs.workers) || '' }}
+
+      # An instrument independent of the generator's own report: every child PID it launched must be gone now.
+      - name: Step 0 check (children dead, summary)
+        if: ${{ always() && inputs.step0 }}
+        shell: powershell -NoProfile -ExecutionPolicy Bypass -File {0}
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP 'step0'
+          $reportPath = Join-Path $dir 'loadgen.json'
+          if (-not (Test-Path $reportPath)) { "::error::no load-generator report at $reportPath"; exit 1 }
+          $r = Get-Content $reportPath -Raw | ConvertFrom-Json
+          $left = @($r.children | Where-Object { Get-Process -Id $_.pid -ErrorAction SilentlyContinue | Where-Object ProcessName -eq 'node' })
+          "PARAMS cpu=$($r.params.cpu) disk=$($r.params.disk) spawn=$($r.params.spawn) children=$(@($r.children).Count) started=$($r.startedAt) stopped=$($r.stoppedAt)"
+          "SUITE_EXIT=$($r.commandExit) capped=$($r.cappedByDuration) deadBeforeStop=$(@($r.deadBeforeStop).Count) leakedByReport=$(@($r.leaked).Count) aliveNow=$($left.Count)"
+          $log = Join-Path $dir 'suite.log'
+          if (Test-Path $log) {
+            "ON_TASK_UPDATE_TIMEOUTS=$(@(Select-String -Path $log -Pattern 'Timeout calling \"onTaskUpdate\"').Count)"
+            Select-String -Path $log -Pattern '(Test Files|\sTests\s|Errors\s|Duration\s)' | Select-Object -Last 6 | ForEach-Object { "VITEST $($_.Line.Trim())" }
+          }
+          $rows = Get-ChildItem (Join-Path $dir 'eld') -Filter *.jsonl -ErrorAction SilentlyContinue | Get-Content | ForEach-Object { $_ | ConvertFrom-Json }
+          "ELD rows=$(@($rows).Count); top 10 by gapMaxMs:"
+          $rows | Sort-Object gapMaxMs -Descending | Select-Object -First 10 | ForEach-Object {
+            "ELD gap=$($_.gapMaxMs) eldMax=$($_.eldMaxMs) p99=$($_.eldP99Ms) wall=$($_.wallMs) pid=$($_.pid) ended=$($_.gapMaxEndedAt) $(Split-Path $_.file -Leaf)"
+          }
+          if ($left.Count -gt 0) { "::error::load-generator children still alive: $(($left | ForEach-Object pid) -join ',')"; exit 1 }
+
+      - name: Upload Step 0 artifacts
+        if: ${{ always() && inputs.step0 }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: step0-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}\step0
+          if-no-files-found: warn

@@ -1,0 +1,17 @@
+Runner name: 'tcm-2'
+Machine name: 'tcm'
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > UTF-32LE with a BOM (Set-Content -Encoding UTF32): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > UTF-7 (Set-Content -Encoding UTF7): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > zero bytes (New-Item): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > a UTF-16LE BOM over UTF-8 bytes (a BOM that lies, with no NUL): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > a UTF-16LE BOM whose text holds a NUL (a stray [char]0 added): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > a UTF-16BE BOM whose text holds a NUL: could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+ Test Files  2 failed | 84 passed (86)
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project > the refusal names the file and why, for a shape with no NUL at all (UTF-7)
+      Tests  12 failed | 1298 passed | 2 skipped (1312)
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED > the report names its NUL bytes, the ADRs imported, and the ADRs not imported
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED > a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the ADRs not imported
+ FAIL  tests/pipelines/state-import-leftovers.test.ts > O7: two markers name the OLDEST snapshot, and say what the newer one holds > the refusal restores from the oldest snapshot and names the newer as a later run's
+ FAIL  tests/pipelines/state-import-qa122.test.ts > QA 122 D11: an INBOX.md the importer reads wrongly, without NUL detection, does not block > UTF-32LE with a BOM (Set-Content -Encoding UTF32), declaring Session 6 against a latest of 7: a bare --commit refuses, and the tree is identical
+ FAIL  tests/pipelines/state-import-qa122.test.ts > QA 122 D11: an INBOX.md the importer reads wrongly, without NUL detection, does not block > UTF-7 (Set-Content -Encoding UTF7), declaring Session 6 against a latest of 7: a bare --commit refuses, and the tree is identical
