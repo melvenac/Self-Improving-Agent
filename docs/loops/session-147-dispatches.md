@@ -521,3 +521,54 @@ QA PC: 182, 183.
   T-172's "one refusing command".
 - **Running sessions still use their old in-memory MCP server** until `/mcp` reconnects open-brain. New sessions get the new
   build.
+
+## Records 192-194: three follow-up rounds from today's findings (the common rules at the top of this file apply; the evidence rules in `.agents/roles/developer.md` bind every round)
+
+### Record 192, `cursor-infra` (Composer 2.5): two Cursor QA-driver defects
+
+**Branch** `loop/qa-driver-cursor-r2` from `origin/master`. Stubs only, on this desktop, hidden, local bare repo. Never touch
+a QA machine or `%USERPROFILE%\Worktrees\sia-qa`. Handoff: `docs/loops/qa-driver-cursor-r2-developer-handoff.md`.
+1. **The sanctioned push route was refused.** In QA 178 (QA PC, 2026-09-27 ~22:00Z), `node docs/loops/qa-178/push-qa.mjs
+   qa/t048-r2b-report` was denied, "Command blocked by permissions configuration" (drive.meta `denial=…`; report
+   `docs/loops/t048-r2b-qa-report.md`, "Report branch push"). Earlier in the same run, `push-qa.mjs` pushed five
+   `qa/t048-r2b-mut-*` branches. **Find which deny pattern matched which command form** (the seat's exact command is in
+   its stream-json transcript on the QA PC, but you cannot read it: reproduce the form with stubs). **Make the sanctioned
+   route pass in every form a seat plausibly uses** (plain, `cd … &&`, through PowerShell), while every push form stays
+   denied. Rows: each form, pass and deny, against the real `cli.json`.
+2. **The ref audit blames the QA seat for other seats' pushes.** `ref_violations` fired on the planner's branch (QA 189,
+   182) and on `loop/bootstrap-fix-r4-rec` (QA 178), all moved by OTHER seats' legitimate pushes mid-run (traced in this
+   file, "RESOLVED"). **Attribution rule to implement:** a QA seat can push only commits that exist in its own repository.
+   So a ref that moved on origin to a SHA the QA tree did not have before its own post-run fetch was moved by someone
+   else. Report it as `ref_moved_elsewhere`, not `ref_violations`. State the rule's limit in drive.meta. Rows: a stub
+   "other seat" push mid-run (not a violation), a stub seat push outside `qa/<prefix>-*` (a violation), and a mutant
+   that drops the attribution.
+
+### Record 193, `cursor-builder` (Grok 4.7): two small gaps QA found
+
+**Branch** `loop/t192-d1` from `origin/master`. tcm, at most 6 runs. Handoff: `docs/loops/t192-d1-developer-handoff.md`.
+1. **T192-D1** (QA 183): when `gh run view` succeeds but the `test` job is absent, or its `steps` field is missing (not
+   `[]`), `checkCiStatus` says plain `failure`. Name each case ("steps not read: job test absent" / "steps field
+   missing"). Record 184's replay already names "job test absent in run view"; match its wording where it fits.
+2. **T-048 r3 test gap** (QA 182): `tests/t048-r3.test.ts` asserts only the corrupt and ran states on the two
+   `server.ts` score routes (`handleSync`, `handleScore`). Add the missing and unreadable rows. Product unchanged unless a
+   row goes red; if one does, that is a finding: report it.
+Red first on the real rows against `origin/master`; one mutant per item on its own branch.
+
+### Record 194, Grok (`sia-forge`): T-046's detector, so this morning's incident announces itself
+
+**Why:** at 09:48Z a Grok Build self-update pulled context-mode 1.0.169, whose plugin `hooks/hooks.json` registers
+PreToolUse for Bash/Read/Grep/WebFetch/Agent/`mcp__`. Cursor CLI imports Claude plugin hooks and runs them through a
+PowerShell wrapper executed by bash (T-046), so every Cursor tool call failed closed. The fix (PreToolUse stripped from
+the plugin cache) is **not durable**, and nothing detects it coming back. This file, "Incident".
+**Do (branch `loop/t046-detector` from `origin/master`):** a `/sync` check, `cursor-hook-compat`:
+- Read `~/.claude/plugins/installed_plugins.json` (parser, never a pattern). For each installed plugin's `installPath`,
+  parse `hooks/hooks.json`.
+- If a `PreToolUse` entry exists AND Cursor CLI is installed (`%LOCALAPPDATA%\cursor-agent` exists), it is an ISSUE,
+  naming the plugin, the version, the matchers, and T-046, with the one-line remedy.
+- No registry, or no Cursor CLI: a SKIP that says why, never a PASS. State the limit: it checks config, not whether Cursor
+  actually runs the hook.
+- The check reads the real files under the user profile. Tests use a fixture home, never the real one (G-044).
+- Rows red against `origin/master`; mutants on their own branches: ignore PreToolUse; treat no-Cursor as PASS.
+- **Do not edit anything under `~/.claude` or `~/.cursor`.** This round is detection only. The preventer (the
+  cache-heal hook) is Aaron's config.
+tcm, at most 6 runs. Handoff: `docs/loops/t046-detector-developer-handoff.md`.
