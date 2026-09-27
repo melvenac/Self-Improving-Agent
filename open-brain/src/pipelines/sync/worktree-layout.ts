@@ -52,32 +52,12 @@ function folderName(p: string): string {
   return i === -1 ? norm : norm.slice(i + 1);
 }
 
-function loadSeatFile(projectRoot: string): { kind: "missing" } | { kind: "error"; detail: string } | { kind: "ok"; file: SeatFile } {
-  let text: string;
-  try {
-    text = readFileSync(seatFilePath(projectRoot), "utf8");
-  } catch (e) {
-    const code = (e as NodeJS.ErrnoException).code;
-    if (code === "ENOENT") return { kind: "missing" };
-    return { kind: "error", detail: `${WORKTREE_SEATS_REL} unreadable (${code ?? "error"})` };
-  }
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(text);
-  } catch (e) {
-    return { kind: "error", detail: `${WORKTREE_SEATS_REL} is not JSON (${(e as Error).message})` };
-  }
-  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-    return { kind: "error", detail: `${WORKTREE_SEATS_REL} must be an object with "project" and "seats"` };
-  }
-  const rec = parsed as { project?: unknown; seats?: unknown };
-  if (typeof rec.project !== "string" || !TOKEN.test(rec.project)) {
-    return { kind: "error", detail: `${WORKTREE_SEATS_REL} "project" must be a token (letters, digits, hyphens)` };
-  }
-  if (!Array.isArray(rec.seats) || rec.seats.some((s) => typeof s !== "string" || !TOKEN.test(s))) {
-    return { kind: "error", detail: `${WORKTREE_SEATS_REL} "seats" must be an array of tokens` };
-  }
-  return { kind: "ok", file: { project: rec.project, seats: rec.seats } };
+function loadSeatFile(_projectRoot: string): { kind: "missing" } | { kind: "error"; detail: string } | { kind: "ok"; file: SeatFile } {
+  // Mutant: the seat file is not read. The seats are hard-coded.
+  return {
+    kind: "ok",
+    file: { project: "sia", seats: ["planner", "builder", "forge", "infra", "research", "qa"] },
+  };
 }
 
 function gitPorcelain(projectRoot: string): { ok: true; stdout: string } | { ok: false; detail: string } {
