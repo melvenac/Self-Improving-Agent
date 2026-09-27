@@ -41,6 +41,18 @@ and commit from a separate worktree. **Record the machine.** **Never write any l
 - **R-BF-15 (§6.2): ACCEPTED. `archive/` is never residue.** "Never nest" cannot hold otherwise.
 - **R-BF-16 (§6.3): ACCEPTED, bounded.** `move-residue` may move `state.json` ONLY when `check` calls it `NOT A RECORD`.
   A parseable record is never residue.
+- **What the planner read before these rulings (amended at Aaron's question, "have you read the artifact before
+  ruling?").**
+  - **The first version of this file ruled on the handoff's account.** The only code it had read was `isProjectRoot`.
+  - **The rulings were then checked against the code at `7f4ca74`:** `gitState`, `agentsState`, `notARecord`,
+    `nextStep` and `moveResidue` in `pipelines/bootstrap/index.ts`. Also checked: PRD.md ("Project Template: `.agents/`
+    scaffold for any new codebase"; automatic accumulation through the session-end hook).
+  - **The code agrees with R-BF-15 and R-BF-16:**
+    - `moveResidue` throws unless the state is `residue` or `not-a-record`, and in the second case it moves
+      `state.json` alone.
+    - The `archive/` filter drops only untracked (`?? `) lines, so a tracked file under `archive/` that has been
+      modified still counts as dirty.
+  - **The acceptance transcripts and the tests were NOT read by the planner.** Check 5 below is where they get read.
 - **The not-done item:** "READER'S SEAT UNRESOLVED" on a not-a-seat checkout (handoff §8) is out of this round and
   becomes a task. It is not a defect of round 3.
 - **The developer's own error entry** is accepted as that seat's, as written in handoff §9: the handoff commit `a1f5baf`
@@ -72,6 +84,12 @@ and commit from a separate worktree. **Record the machine.** **Never write any l
    - A valid, parseable `state.json` is never moved.
    - A tracked zero-byte `state.json` that gets moved shows as deleted in `git status`.
    - `Next:` names restore-from-git.
+   - **PROBE, report and do not fail on it:** `notARecord` treats any JSON that parses and is not the seed as a record.
+     So a `state.json` of `{}`, `[]`, `null` or `42` should read as BOOTSTRAPPED, as the planner read the code.
+     - Confirm or refute that by running it.
+     - Say what `/start` then does on each.
+     - R-BF-11's wording ("parses") is met, so this is not a round-3 defect. **Put the result in "Open for the
+       planner"**; the planner rules on it after the report.
 5. **The acceptance, re-run by you, not read:**
    - installs (i) frogger's shape, (ii) an empty folder, and (iii-a)/(iii-b), all with no manual fix;
    - the developer's driver may be reused, but **validate it against `6543e8e` first**. It must fail there, as the
