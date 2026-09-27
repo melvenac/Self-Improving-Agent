@@ -156,10 +156,6 @@ export function extractSessionSummary(
       summary,
       eventCount: meta.event_count,
     };
-  } catch (err) {
-    // better-sqlite3 reports a garbage file on the first statement, not the
-    // constructor. That throw used to escape session end (SILENT 15).
-    return { skipped: `summary db unreadable: ${errorText(err)}` };
   } finally {
     db.close();
   }
