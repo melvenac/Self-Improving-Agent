@@ -554,7 +554,11 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     // Same lines the session-end hook prints, including the reason a none-origin
     // resolved nothing. The count alone made "no session id" and "no recall_log
     // rows" look identical.
-    const originLine = formatRecalledResolution(resolved).join("\n");
+    const originLine =
+      `  Recalled ids: ${recalledIds.length} from ${resolved.origin}` +
+      (resolved.rejected
+        ? `\n  Ignored ${resolved.rejected.path}: ${resolved.rejected.reason}`
+        : ``);
 
     const shadowLine = result.shadow.evaluated
       ? `  Shadow recall: ${result.shadow.strategies} strategies over ${result.shadow.queries} queries (best: ${result.shadow.leader})`
