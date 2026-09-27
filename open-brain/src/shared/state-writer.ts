@@ -378,7 +378,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       if (t.status === "done") return { ok: false, error: `task ${op.id} is already done (closed session ${t.closed_session})` };
       t.status = "done";
       t.closed_session = session;
-      t.closed_rev = ctx.rev;
+      t.closed_rev = ctx.firstRev;
       if (op.note !== undefined) t.note = op.note;
       return { ok: true, id: t.id };
     }
