@@ -349,7 +349,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
     kept_cited_task_ids: retention.kept,
     superseded,
     removed_gap_ids: removedGaps,
-    note_changes: noteChanges,
+    note_changes: dryRun ? [] : noteChanges,
     rendered: views.map((v) => v.rel),
     notes,
     dry_run: dryRun,
