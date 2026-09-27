@@ -891,8 +891,7 @@ export async function handleRecall(args: {
           try {
             recordRecallEvent(v2db, session.id, query, rows.map((r) => r.id), trigger);
           } catch (err) {
-            const message = err instanceof Error ? err.message : String(err);
-            results.push(`_(NOT LOGGED: recall log write failed — ${message})_`);
+            throw err;
           }
         } else {
           results.push(`_(NOT LOGGED: this server cannot prove its session — ${session.reason})_`);
