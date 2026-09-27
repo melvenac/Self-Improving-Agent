@@ -141,9 +141,6 @@ export function proveSession(dir: string, parentPid: number, parentStart: string
   }
   // JSON null is a value, and reading `.session_id` on it throws. A named
   // refusal, the same as any other body that is not a session record (D2).
-  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-    return { id: null, reason: `the session proof ${path} is not a session record` };
-  }
   const proof = parsed as Partial<ProcessSessionProof>;
   if (typeof proof.session_id !== "string" || !proof.session_id.trim()) {
     return { id: null, reason: `the session proof ${path} carries no session_id` };
