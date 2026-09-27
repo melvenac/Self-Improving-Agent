@@ -200,6 +200,8 @@ export const EvidenceSchema = z
     regressions: z.array(z.string().min(1)),
     gaps: z.array(z.string().min(1)),
     notes: z.string(),
+    // QA-189 mutant: seat-written verdict field (violates BE-3.3).
+    verdict: z.enum(["would-merge", "would-not-merge", "undefined"]).optional(),
   })
   .superRefine((ev, ctx) => {
     const seen = new Set<string>();
