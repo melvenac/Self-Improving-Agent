@@ -17,13 +17,28 @@ export type CiGithubContext = {
   inputs: { hosted: boolean };
 };
 
+type CiWorkflowDoc = {
+  on?: Record<string, unknown>;
+  jobs?: { test?: { "runs-on"?: unknown } };
+};
+
+function readCiWorkflow(projectRoot: string): CiWorkflowDoc {
+  const raw = readFileSync(join(projectRoot, ".github/workflows/ci.yml"), "utf-8");
+  return parseYaml(raw) as CiWorkflowDoc;
+}
+
 /** Parses the `test` job `runs-on` field from ci.yml (YAML parser, not regex). */
 export function readCiTestRunsOnExpr(projectRoot: string): string {
-  const raw = readFileSync(join(projectRoot, ".github/workflows/ci.yml"), "utf-8");
-  const doc = parseYaml(raw) as { jobs?: { test?: { "runs-on"?: unknown } } };
-  const runsOn = doc?.jobs?.test?.["runs-on"];
+  const runsOn = readCiWorkflow(projectRoot)?.jobs?.test?.["runs-on"];
   if (typeof runsOn !== "string") throw new Error("ci.yml test job runs-on is missing or not a string");
   return runsOn.trim();
+}
+
+export const PR_PATHS_IGNORE = ["docs/**", "README.md"] as const;
+
+/** Reads the workflow `on:` triggers from ci.yml. */
+export function readCiWorkflowTriggers(projectRoot: string): Record<string, unknown> {
+  return readCiWorkflow(projectRoot).on ?? {};
 }
 
 /** Evaluates the expression string read from ci.yml for the GitHub context given. */
@@ -56,6 +71,15 @@ describe("ci.yml test job runs-on (T-192 item 1)", () => {
     for (const [label, ctx, want] of cases) {
       expect(evaluateRunsOnExpression(expr, ctx), label).toEqual(want);
     }
+  });
+
+  it("pull_request paths-ignore is exactly docs/** and README.md; push and dispatch have no paths filter (D-055)", () => {
+    const on = readCiWorkflowTriggers(repoRoot);
+    expect(on.push).toEqual({ branches: ["master"] });
+    expect(on.pull_request).toEqual({ "paths-ignore": [...PR_PATHS_IGNORE] });
+    expect(on.workflow_dispatch).toBeTypeOf("object");
+    expect(on.workflow_dispatch).not.toHaveProperty("paths");
+    expect(on.workflow_dispatch).not.toHaveProperty("paths-ignore");
   });
 
   describe("mutant: ci.yml runs-on restored to pre-T-192 master-push clause", () => {
