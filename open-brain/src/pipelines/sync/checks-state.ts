@@ -152,41 +152,23 @@ export type CiInspectState = {
 };
 
 /**
- * Classifies a run's conclusion for ci-status. "never started" is separate from
- * failure: GitHub reports conclusion `failure` with zero steps when billing blocks
- * the runner, and an annotation beginning CI_NEVER_STARTED_PREFIX.
- * When the inspect chain breaks, names the case instead of reporting plain failure.
+ * Classifies a run's conclusion for ci-status (4aeda0a behavior — plain failure
+ * when inspect is inconclusive; kept on the red/mut branches only).
  */
 export function classifyCiConclusion(run: CiRunRow, inspect: CiInspectState = {}): string {
-  const { testJob, annotations = null, viewOk, viewParseOk, annFetchOk, annParseOk } = inspect;
+  const { testJob, annotations = null } = inspect;
   const runConclusion = run.conclusion ?? "";
   if (runConclusion === "success") return "success";
   if (run.status && run.status !== "completed") {
     return runConclusion || `pending (${run.status})`;
   }
-  if (runConclusion !== "failure") {
-    return runConclusion || (run.status ? `pending (${run.status})` : "unknown");
-  }
-
-  const plain = (detail: string) => `failure (${detail})`;
-
-  if (viewOk === false) return plain("run view failed; cannot inspect job test");
-  if (viewParseOk === false) return plain("run view not JSON; cannot inspect job test");
-  if (viewOk === true && viewParseOk === true && !testJob) {
-    return plain("job test absent in run view");
-  }
-  if (testJob && (testJob.steps ?? []).length === 0) {
-    if (annFetchOk === false) return plain("zero steps on job test; annotations fetch failed");
-    if (annParseOk === false) return plain("zero steps on job test; annotations not JSON");
+  if (runConclusion === "failure" && testJob && (testJob.steps ?? []).length === 0) {
     const neverStarted = (annotations ?? []).some(
       (a) => typeof a.message === "string" && a.message.startsWith(CI_NEVER_STARTED_PREFIX),
     );
     if (neverStarted) return "never started";
-    if (annFetchOk === true && annParseOk === true) {
-      return plain("zero steps on job test; no never-started annotation prefix");
-    }
   }
-  return runConclusion;
+  return runConclusion || (run.status ? `pending (${run.status})` : "unknown");
 }
 
 /**
@@ -219,34 +201,31 @@ export function checkCiStatus(projectRoot: string, run: CommandRunner = execRunn
   const latest = runs[0];
   const sha = (latest.headSha ?? "unknown").slice(0, 7);
 
-  const inspect: CiInspectState = {};
+  let testJob: CiJobRow | undefined;
+  let annotations: CiAnnotationRow[] | null = null;
   if (latest.conclusion === "failure" && latest.databaseId != null) {
     const view = run("gh", ["run", "view", String(latest.databaseId), "--json", "jobs"], projectRoot);
-    inspect.viewOk = view.ok;
     if (view.ok) {
       try {
         const body = JSON.parse(view.stdout) as { jobs?: CiJobRow[] };
-        inspect.viewParseOk = true;
-        inspect.testJob = (body.jobs ?? []).find((j) => j.name === CI_STATUS_JOB);
-        if (inspect.testJob && (inspect.testJob.steps ?? []).length === 0 && inspect.testJob.databaseId != null) {
-          const ann = run("gh", ["api", `repos/{owner}/{repo}/check-runs/${inspect.testJob.databaseId}/annotations`], projectRoot);
-          inspect.annFetchOk = ann.ok;
+        testJob = (body.jobs ?? []).find((j) => j.name === CI_STATUS_JOB);
+        if (testJob && (testJob.steps ?? []).length === 0 && testJob.databaseId != null) {
+          const ann = run("gh", ["api", `repos/{owner}/{repo}/check-runs/${testJob.databaseId}/annotations`], projectRoot);
           if (ann.ok) {
             try {
-              inspect.annotations = JSON.parse(ann.stdout) as CiAnnotationRow[];
-              inspect.annParseOk = true;
+              annotations = JSON.parse(ann.stdout) as CiAnnotationRow[];
             } catch {
-              inspect.annParseOk = false;
+              annotations = null;
             }
           }
         }
       } catch {
-        inspect.viewParseOk = false;
+        testJob = undefined;
       }
     }
   }
 
-  const conclusion = classifyCiConclusion(latest, inspect);
+  const conclusion = classifyCiConclusion(latest, { testJob, annotations });
   if (conclusion === "success") {
     return { name, report: true, severity: "pass", message: `${branch} ${sha} conclusion: success; ${CI_STATUS_LIMIT}` };
   }
