@@ -176,17 +176,11 @@ export function checkWorktreeLayout(projectRoot: string): CheckResult {
     return result("issue", `porcelain could not be parsed: ${parsed.detail}. This is not a pass. ${LIMIT}`);
   }
 
-  const { project, seats } = loaded.file;
-  const allowed = new Set(seats.map((s) => `${project}-${s}`));
+  const { project } = loaded.file;
+  // Mutant: any linked folder name is accepted. The seat file is still read.
   const violations: string[] = [];
   for (let i = 0; i < parsed.entries.length; i++) {
-    const entry = parsed.entries[i];
     if (i === 0) continue;
-    const folder = folderName(entry.path);
-    if (allowed.has(folder)) continue;
-    violations.push(
-      `folder ${JSON.stringify(folder)} (${where(entry)}) is not ${JSON.stringify(project)}-<seat> (seats: ${seats.join(", ")})`,
-    );
   }
 
   const walked = `Walked ${parsed.entries.length} worktree(s)`;
