@@ -149,8 +149,6 @@ export type CiInspectState = {
   viewParseOk?: boolean;
   annFetchOk?: boolean;
   annParseOk?: boolean;
-  /** Mutant: plain failure with no reason when classification was inconclusive. */
-  silentFallback?: boolean;
 };
 
 /**
@@ -160,15 +158,7 @@ export type CiInspectState = {
  * When the inspect chain breaks, names the case instead of reporting plain failure.
  */
 export function classifyCiConclusion(run: CiRunRow, inspect: CiInspectState = {}): string {
-  const {
-    testJob,
-    annotations = null,
-    viewOk,
-    viewParseOk,
-    annFetchOk,
-    annParseOk,
-    silentFallback = false,
-  } = inspect;
+  const { testJob, annotations = null, viewOk, viewParseOk, annFetchOk, annParseOk } = inspect;
   const runConclusion = run.conclusion ?? "";
   if (runConclusion === "success") return "success";
   if (run.status && run.status !== "completed") {
@@ -178,7 +168,7 @@ export function classifyCiConclusion(run: CiRunRow, inspect: CiInspectState = {}
     return runConclusion || (run.status ? `pending (${run.status})` : "unknown");
   }
 
-  const plain = (detail: string) => (silentFallback ? "failure" : `failure (${detail})`);
+  const plain = (detail: string) => `failure (${detail})`;
 
   if (viewOk === false) return plain("run view failed; cannot inspect job test");
   if (viewParseOk === false) return plain("run view not JSON; cannot inspect job test");

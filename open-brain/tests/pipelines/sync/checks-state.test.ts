@@ -258,22 +258,6 @@ describe("ci-status (Loop 4 R4, T-192 item 2)", () => {
     ).toBe("failure (zero steps on job test; no never-started annotation prefix)");
   });
 
-  it("mutant: silentFallback restores plain failure for inconclusive inspect", () => {
-    const run = neverStartedList[0];
-    const job = testJob(neverStartedView.jobs)!;
-    expect(classifyCiConclusion(run, { viewOk: false, silentFallback: true })).toBe("failure");
-    expect(
-      classifyCiConclusion(run, {
-        testJob: job,
-        annotations: neverStartedAnn,
-        viewOk: true,
-        viewParseOk: true,
-        annFetchOk: true,
-        annParseOk: true,
-      }),
-    ).toBe("never started");
-  });
-
   it("warns on a pending run and when no runs exist", () => {
     const pending = checkCiStatus(root, fixtureRunner([{ conclusion: "", headSha: "0123456789abcdef", status: "in_progress", databaseId: 1 }]));
     expect(pending.severity).toBe("warn");
