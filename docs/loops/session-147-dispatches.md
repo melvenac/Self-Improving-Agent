@@ -242,3 +242,35 @@ dev agents? Worth testing?", then "write the replay brief, composer is set in in
 5. **(Added.) A run count asserted, not counted:** "12 tcm runs (1, 3, 3, 3) plus 2 run by hand" was pushed in
    `b58fd1b`. Round 1 had no tcm runs and there were no hand-run extras: the ids sum to 9. Corrected from the list of
    run ids. Rule 14, a third time today in one file.
+
+## Record 185, `cursor-infra` (Composer 2.5, `sia-infra`, room `k5702788wctxj75begyt4x2k5x8f6mav`): the queue's head restore fails open
+
+**What happened, read from the laptop's `queue.log` and its QA tree, 2026-09-27:** QA 177 committed its report in the
+shared QA tree, which left HEAD at `fc8d8cd` with an untracked `docs/loops/qa-177/` and a modified
+`open-brain/package-lock.json`. Before 161, the queue logged `head_moved.161=fc8d8cd…; restoring b463ff2` and ran
+`git checkout -q --detach $head` (`qa-queue.ps1:268`). That checkout failed: `qa-177/` is tracked at `b463ff2`, so the
+untracked copy was in the way. **Nothing checked it.** The tree stayed at `fc8d8cd`, where `docs/loops/qa-161/drive.ps1`
+does not exist, and PowerShell exited `-196608` in under a second. The same happened to 178. At 10:09Z the tree was
+still at `fc8d8cd` with 11 porcelain lines. The QA PC's restore before 173 worked, so this depends on what the previous
+seat left.
+
+**Do (branch `loop/qa-queue-restore` from `origin/master`):**
+1. **The restore must be verified.** After the restore, read HEAD back. If it is not `$head`, log
+   `restore_failed.<n>` naming both SHAs and git's first error line, and do NOT start that driver. Say whether the
+   queue then skips to the next item (which would face the same tree) or aborts, and why.
+2. **Restore with `git checkout -f -q --detach $head`,** which discards changes to tracked files and overwrites
+   untracked files in the way. Everything a QA seat must keep is pushed through `push-qa.mjs` before its report's last
+   line is written. Say in the handoff if you find a case where it is not.
+3. **The same for the launch `-Checkout` (`:232`):** use `-f`, and read HEAD back after it.
+
+**Evidence (`.agents/roles/developer.md`, "Building checks"; D-060):**
+- **Red:** extend `docs/loops/qa-queue-guard-harness.ps1`, whose stub repo and stub driver already exist. The
+  scenario: the stub queue lists two items, and between them the tree's HEAD moves to a commit where item 2's driver
+  is untracked, with an untracked file in the way. Run the harness against the CURRENT `qa-queue.ps1` (`c6fb300`) and
+  show item 2 launched on the wrong tree, or exited `-196608`, from the log. That output is the red.
+- **Green:** the same harness against your script: the restore succeeds and item 2 runs on `$head`. A second scenario,
+  where the restore cannot succeed (lock a file so the checkout fails), logs `restore_failed` and starts no driver.
+- **Mutant:** on its own branch, remove the read-back; the second scenario's assertion must fail.
+- This runs on this desktop, hidden, stubs only, as the queue-guard harness does. **Never on a QA machine, and never
+  in `%USERPROFILE%\Worktrees\sia-qa`.** No tcm runs are needed unless you touch `open-brain/`.
+- Handoff at `docs/loops/qa-queue-restore-developer-handoff.md`.
