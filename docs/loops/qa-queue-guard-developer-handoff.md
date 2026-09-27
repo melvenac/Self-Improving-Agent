@@ -4,7 +4,7 @@
 
 ## Candidate
 
-The lock and the harness are commit `c6fb300`. This handoff is the commit after it.
+The lock and the harness are commit `c6fb300`. The hidden-launch follow-up is the commit that changes `qa-launch.md` and `Start-DetachedQueue`.
 
 `docs/loops/qa-queue.ps1` holds `%USERPROFILE%\sia-qa-queue\queue.lock` for the life of the queue.
 
@@ -34,10 +34,16 @@ The queue runs from the user-folder copy, because `-Checkout` moves the checkout
 
 Until that copy, the bytes on the machines are still the ones that moved the tree.
 
+## Hidden launch
+
+The first harness runs used `Win32_Process Create` without a startup object, so `cmd.exe` windows opened on this desktop (seven of them, from 23:39 local). That was wrong while Aaron is here.
+
+Every Create in the harness now passes `Win32_ProcessStartup` with `ShowWindow` 0, and the powershell that `cmd` starts uses `-WindowStyle Hidden`. The harness refuses the run if that process or its child has a non-zero `MainWindowHandle`. A one-process probe (sleep 8s, then killed) reported `cmd.exe`, `conhost.exe`, and `powershell.exe` all with `MainWindowHandle` 0. The harness was then run again and the same three rows passed, including the known positive.
+
 ## qa-launch.md
 
-The three `Invoke-CimMethod` lines do not need a change. There is no new flag.
+This branch now carries `docs/loops/qa-launch.md` (it was only on `origin/docs/session-100-qa99-dispatch`) so the three launch lines can include the same hidden startup. Each line builds `$si` with `ShowWindow` 0 and passes `ProcessStartupInformation`, and the queue powershell is `-WindowStyle Hidden`. The `\$si` backslashes stay: the `!` runner is Git bash and would otherwise expand `$si` away. No new queue flag.
 
-`docs/loops/qa-launch.md` is on `origin/docs/session-100-qa99-dispatch` and is not on `origin/master`, so it was not edited here. Its "launch only on an idle machine" paragraph is what this lock replaces, and only after the machine copies are replaced. Until then that paragraph still describes the bytes on the machines.
+The "launch only on an idle machine" paragraph is unchanged on purpose. It still describes the bytes on the machines until Aaron replaces the user-folder copies. The desktop rule is unchanged: this desktop does not run a real QA queue while Aaron is here.
 
 `/sync` on this checkout reports pre-existing issues (retired names in `ENTITIES.md`, a stale local build from `b371176`, greeting size). None of them are this diff. No `.gitnexus/` in this worktree. No `/end`. No `state.json` write.

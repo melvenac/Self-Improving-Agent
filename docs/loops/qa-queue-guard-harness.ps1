@@ -81,12 +81,29 @@ function Start-DetachedQueue([string] $scriptPath, [string] $userProfile, [strin
   $fullUser = [System.IO.Path]::GetFullPath($userProfile)
   if ($fullScript -eq $realScript) { Fail 'refusing to launch the real qa-queue.ps1' }
   if ($fullUser -notlike "$tempRoot*") { Fail "USERPROFILE outside temp: $fullUser" }
-  $cmd = "cmd.exe /d /c set `"USERPROFILE=$fullUser`"&& set `"GIT_TERMINAL_PROMPT=0`"&& `"$ps`" -NoProfile -ExecutionPolicy Bypass -File `"$fullScript`" -Queue 9997 -Checkout $sha -QuietCpuPercent 101 -TimeoutMinutes 2 -StartWaitMinutes 2"
+  # ShowWindow 0 hides the Create. -WindowStyle Hidden is on the powershell cmd starts, so that
+  # child does not open a console of its own. A non-zero MainWindowHandle is a visible window.
+  $cmd = "cmd.exe /d /c set `"USERPROFILE=$fullUser`"&& set `"GIT_TERMINAL_PROMPT=0`"&& `"$ps`" -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -File `"$fullScript`" -Queue 9997 -Checkout $sha -QuietCpuPercent 101 -TimeoutMinutes 2 -StartWaitMinutes 2"
+  $startup = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly -Property @{ ShowWindow = [uint16]0 }
   $created = Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{
     CommandLine = $cmd
     CurrentDirectory = $fullUser
+    ProcessStartupInformation = $startup
   }
   if ($created.ReturnValue -ne 0) { Fail "Win32_Process Create ReturnValue=$($created.ReturnValue)" }
+  Start-Sleep -Milliseconds 500
+  $visible = @()
+  $ids = @([int]$created.ProcessId)
+  $kids = @(Get-CimInstance Win32_Process -Filter "ParentProcessId=$($created.ProcessId)" -ErrorAction SilentlyContinue)
+  foreach ($k in $kids) { if ($k.ProcessId) { $ids += [int]$k.ProcessId } }
+  foreach ($id in $ids) {
+    $gp = Get-Process -Id $id -ErrorAction SilentlyContinue
+    if ($gp -and $gp.MainWindowHandle -ne 0) { $visible += $id }
+  }
+  if ($visible.Count -gt 0) {
+    Stop-Pid ([int]$created.ProcessId)
+    Fail "Create opened a window (pids $($visible -join ','))"
+  }
   return @{ pid = [int]$created.ProcessId; cmd = $cmd }
 }
 
