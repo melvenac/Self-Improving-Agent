@@ -165,8 +165,10 @@ function formatEventPrefix(type: string): string {
  * Get the session summary for a given session ID (or the most recent session).
  * This is the main entry point — reads from ~/.claude/context-mode/sessions/.
  */
-export function getSessionSummary(sessionId?: string): SessionSummaryResult | null {
-  const sessionsDir = join(homedir(), ".claude", "context-mode", "sessions");
+export function getSessionSummary(
+  sessionId?: string,
+  sessionsDir: string = join(homedir(), ".claude", "context-mode", "sessions"),
+): SessionSummaryResult | null {
   const dbPath = findSessionDb(sessionsDir, sessionId);
   if (!dbPath) return null;
   return extractSessionSummary(dbPath);

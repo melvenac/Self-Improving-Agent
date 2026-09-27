@@ -48,11 +48,23 @@ export interface SessionEndV2Input {
   /** Where the shadow-recall history is appended. Injected rather than resolved
    *  here so tests cannot write into the real ~/.claude history. */
   shadowLogPath?: string;
+  /** Session .db directory for summary self-generation. Defaults to the
+   *  context-mode sessions dir. Tests pass a scratch directory. */
+  sessionsDir?: string;
 }
 
 interface SessionEndV2Result {
-  summary: { written: boolean; selfGenerated: boolean };
-  feedback: { processed: number; ratings: Array<{ id: number; rating: string }> };
+  summary: { written: boolean; selfGenerated: boolean; skip?: string };
+  feedback: {
+    processed: number;
+    ratings: Array<{ id: number; rating: string }>;
+    /** Recalled ids whose knowledge_index row is gone (SILENT 5). */
+    vanished?: number[];
+    /** Recalled ids present in the index with no supplied judgment (SILENT 5). */
+    omitted?: number[];
+    /** Ratings whose feedback_log write threw (SILENT 16). */
+    notWritten?: Array<{ id: number; reason: string }>;
+  };
   invocations: { logged: number; skippedSessions: number };
   topics: { written: number; removed: number; orphans: number };
   shadow: ShadowStageResult;
@@ -71,7 +83,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   // ── Self-generate summary if not provided ─────────────────────────────────
   let selfGenerated = false;
   if (!sessionSummary) {
-    const result = getSessionSummary(sessionId || undefined);
+    const result = getSessionSummary(sessionId || undefined, input.sessionsDir);
     if (result) {
       sessionSummary = result.summary;
       selfGenerated = true;
@@ -206,4 +218,32 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     shadow,
     topics,
   };
+}
+
+/** Lines the session-end hook prints. A distinction that is not on one of
+ *  these lines is still the collapsed gap the audit named. */
+export function formatSessionEndLines(result: SessionEndV2Result): string[] {
+  const genLabel = result.summary.selfGenerated ? " (self-generated)" : "";
+  const skip = !result.summary.written && result.summary.skip ? ` — ${result.summary.skip}` : "";
+  const lines = [
+    `Summary: ${result.summary.written ? "written" : "skipped"}${skip}${genLabel}`,
+    `Feedback: ${result.feedback.processed} entries`,
+  ];
+  if (result.feedback.vanished?.length) {
+    lines.push(
+      `Feedback vanished: ${result.feedback.vanished.join(", ")} (no knowledge_index row)`,
+    );
+  }
+  if (result.feedback.omitted?.length) {
+    lines.push(`Feedback omitted: ${result.feedback.omitted.join(", ")} (no judgment)`);
+  }
+  if (result.feedback.notWritten?.length) {
+    lines.push(
+      `Feedback NOT WRITTEN: ${result.feedback.notWritten
+        .map((row) => `${row.id} (${row.reason})`)
+        .join(", ")}`,
+    );
+  }
+  lines.push(`Invocations: ${result.invocations.logged} logged`);
+  return lines;
 }
