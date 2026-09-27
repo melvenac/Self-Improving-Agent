@@ -328,3 +328,22 @@ This check makes it a rule. The record: T-193 (rev 140).
    `shared.md` says to read the dry run before every real call, and this one was skipped.
 - **Owed to Relay when T-193 is accepted:** the seat data file's path and format, so A2A-Hub can add `a2a-planner`,
   `a2a-rivet` and `a2a-qa` as a docs-only change (Relay's message, record session 147).
+
+## Incident: every Cursor CLI tool call blocked after context-mode 1.0.169 (fixed 10:59:55Z)
+
+- **Cause, measured:** Grok Build updated itself (09:46-09:57Z) and pulled context-mode to 1.0.169. At 10:28:27Z the
+  plugin registry moved to `…/context-mode/1.0.169`, whose `hooks/hooks.json` registers **PreToolUse for Bash, Read,
+  Grep, WebFetch, Agent and `mcp__`**. The April-trimmed copy had **no** PreToolUse. Cursor CLI imports Claude plugin
+  hooks, and it runs them through a PowerShell wrapper that is executed by bash (**T-046**), so every tool failed
+  closed: `Hook blocked with message: --: eval: line 1: syntax error near unexpected token '&'` (Rivet, and reproduced by
+  the planner with a headless `cursor-agent` started from PowerShell with no `SHELL` set, so `SHELL` is not the cause).
+- **Fix:** removed the 9 PreToolUse entries from `~/.claude/plugins/cache/context-mode/context-mode/1.0.169/hooks/hooks.json`
+  (backup: `hooks.json.1.0.169.bak` in the planner's scratchpad). Same test afterwards: `echo` runs,
+  result `hooktest-ok`. Also done: `context-mode upgrade` (bundled CLI) removed the duplicate context-mode entries
+  that the upgrade had re-added to `~/.claude/settings.json`.
+- **NOT durable:** the next context-mode update rewrites the plugin cache, and the block returns. **The durable fix is
+  T-046** (the hook wrapper under Cursor + Git Bash), or a deterministic re-strip, for example in
+  `~/.claude/hooks/context-mode-cache-heal.mjs`. **Until then, after any context-mode or Grok Build update, re-run the
+  test in this section.**
+- The one remaining doctor FAIL ("plugin cache integrity", `scripts/` missing) is upstream packaging: neither
+  install folder has `scripts/`.
