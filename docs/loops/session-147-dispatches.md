@@ -274,3 +274,23 @@ seat left.
 - This runs on this desktop, hidden, stubs only, as the queue-guard harness does. **Never on a QA machine, and never
   in `%USERPROFILE%\Worktrees\sia-qa`.** No tcm runs are needed unless you touch `open-brain/`.
 - Handoff at `docs/loops/qa-queue-restore-developer-handoff.md`.
+
+## Rulings on QA 162, 174, 177, 172 and 173 (planner, record session 147; written 10:13:49Z)
+
+**The planner read each candidate's product diff before ruling** (`.agents/roles/planner.md`; memory: read the
+candidate, not only its handoff). Verdict sections of all five reports read; the defect tables were not re-read.
+
+| Candidate | QA | Ruling | What the planner read |
+|---|---|---|---|
+| A13 `4b43410` (loop 15 candidate A) | 162 Composer, 174 GPT-5.6 Sol: both ACCEPTED | **ACCEPTED** | `configwatch.ts` +7/-3: R95 pushes the true note into `unrestored` (R77 stops before git); R96 adds `kind: "unobservable"`. `git grep` of `.kind` comparisons in `src/harness` finds only file-identity kinds, so no consumer mishandles the fourth kind. |
+| T-171 r3b `2dcc68a` | 177 ACCEPT | **ACCEPTED** | `state-schema.ts` `note_by` defaults to null; `state-writer.ts` re-omits the key for untouched tasks; the note quote starts from the first differing character. |
+| importer r6 `c2ee52d` | 172 PASS | **ACCEPTED** | `describeLastSession` in the report and both CLI modes; `adrNotImported` says "could not be read" for an odd-length FE FF list. |
+| T-048 r1b `d5b78cb` | 173 PASS | **ACCEPTED** | `checks.ts`: no early return on unreadables; findings listed before unreadables. |
+
+- **PRs for Aaron's merge:** #182 (A13), #183 (T-171 r1-r3b; #174 closed as superseded), #184 (importer r6), #185
+  (T-048 r1b). Each tip adds only `docs/` over its scored candidate, and each merges into `origin/master`
+  `895da58` cleanly on its own.
+- **Merge-order note:** #184 and `loop/bootstrap-fix-r4-rec` both edit `cli.ts:535`. Whichever merges second needs a
+  one-line reconciliation.
+- **QA 162's report calls `DESKTOP-0GV3HAD` "the QA PC".** That is the laptop. Noted, not blocking.
+- **161 and 178 did not run** (record 185): the laptop's queue restore failed and left the tree at `fc8d8cd`.
