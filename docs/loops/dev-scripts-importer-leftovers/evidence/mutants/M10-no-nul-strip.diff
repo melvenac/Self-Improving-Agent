@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index e0023af..0184a35 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -390,7 +390,7 @@ export interface DecisionsUnreadable { evidence: string; imported: string[]; not
+  */
+ export function decisionsUnreadable(text: string, evidence: string, imported: string[]): DecisionsUnreadable {
+   const scratch: ImportReport["decisions"] = { imported: 0, date_from_line: 0, date_partial: [], date_unknown: 0, skipped: [] };
+-  const seen = importDecisions(text.replace(/\u0000/g, ""), "0000-00-00", scratch).map((d) => d.id);
++  const seen = importDecisions(text, "0000-00-00", scratch).map((d) => d.id);
+   return { evidence, imported, not_imported: seen.filter((id) => !imported.includes(id)) };
+ }
+ 
