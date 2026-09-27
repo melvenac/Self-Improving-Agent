@@ -81,9 +81,9 @@ on the issue, not a verdict change.
 
 | Mutant | Branch | Targets | Local (8 r1b rows) | tcm |
 |---|---|---|---|---|
-| `m-d1-early-return` | `qa/t048-r1b-m-d1-early-return` | D1 template early return | **killed** (2 fail) | pending — see CI |
-| `m-d2-drop-label` | `qa/t048-r1b-m-d2-drop-label` | D2 `scanNote` removal | **killed** (2 fail) | pending |
-| `m-d3-no-report` | `qa/t048-r1b-m-d3-no-report` | D3 `report: true` on template issue | **killed** (1 fail) | pending |
+| `m-d1-early-return` | `qa/t048-r1b-m-d1-early-return` | D1 template early return | **killed** (2 fail) | **killed** `36308411613` |
+| `m-d2-drop-label` | `qa/t048-r1b-m-d2-drop-label` | D2 `scanNote` removal | **killed** (2 fail) | **killed** `36308413141` |
+| `m-d3-no-report` | `qa/t048-r1b-m-d3-no-report` | D3 `report: true` on template issue | **killed** (1 fail) | **killed** `36308414840` |
 
 **Developer mutants (dispatch):** `loop/t048-r1b-mut-d1` run `36297377709`, d2 `36297433772`, d3
 `36297488383` — all **failed** on tcm (killed). Red-before-green: `36296837114` at `9c1438a`
@@ -99,7 +99,10 @@ pass among 1329 total.
 | `36297377709` | `loop/t048-r1b-mut-d1` | failure | developer mutant killed |
 | `36297433772` | `loop/t048-r1b-mut-d2` | failure | developer mutant killed |
 | `36297488383` | `loop/t048-r1b-mut-d3` | failure | developer mutant killed |
-| *(this seat)* | `qa/t048-r1b-report` + three `qa/t048-r1b-m-*` | pending | pushed with this report; `gh workflow run ci.yml --ref <branch>` |
+| `36308401104` | `qa/t048-r1b-report` @ `87c3171` | success | 1329+ passed; r1b 8/8 pass (this seat's control) |
+| `36308411613` | `qa/t048-r1b-m-d1-early-return` | failure | QA mutant killed |
+| `36308413141` | `qa/t048-r1b-m-d2-drop-label` | failure | QA mutant killed |
+| `36308414840` | `qa/t048-r1b-m-d3-no-report` | failure | QA mutant killed |
 
 ## What could not be verified
 
@@ -122,10 +125,12 @@ None.
 
 ## Open for the planner
 
-- Confirm tcm results for the four QA-173 CI dispatches once runs complete.
 - D3 on `retirements` when **only** unreadables (no finding) already had `report: true` at r1; r1b's
   D3 win is mainly `template-personal-names` reaching CLI output and the listing label on
   finding+unreadable issues.
+- Helper scripts (`docs/loops/qa-scripts-t048-r1b/`, `docs/loops/qa-173/push-qa.mjs`) exist locally
+  but were not committed: one `git commit` for the script tree was blocked by the seat's permissions
+  fence after the report commit succeeded.
 
 ## Model
 
