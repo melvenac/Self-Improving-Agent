@@ -1,5 +1,29 @@
 # T-048 round 1: developer handoff (Forge, record 148)
 
+## Update after atlas's reply: the tcm runs, and a correction
+
+**Correction: the six runs below marked "tcm run N" were LOCAL runs on this desktop, not tcm.** I read "tcm" as
+this machine. tcm is the self-hosted Linux CI runner (`ci.yml`, `runs-on: [self-hosted, linux, tcm]`), and the branch
+had **no CI run at all** before this update: tcm runs only on a dispatch or a PR. So the first pass of this handoff
+made 0 tcm runs. After atlas's reply I dispatched three. Two are the runs atlas authorized. The third is red at base,
+spent from the brief's original 6-run tcm budget, which had not been touched. That is 3 tcm runs in all.
+`windows=false`, `hosted=false` on each.
+
+| Run id | Ref (SHA) | Runner | Result |
+|---|---|---|---|
+| **36286042335** | `loop/t048-r1-red` = `a061f72` (red rows on `1646567`) | tcm-1 | **13 failed** \| 1308 passed \| 2 skipped. The 13 are exactly the red rows, each on its assertion. The SILENT 1 row is `expected 'pass' to be 'issue'`. **Red at base on tcm.** |
+| **36286037658** | `loop/t048-r1` = `b93e927` (candidate `7913c5f` plus this doc) | tcm-1 | **87/87 files, 1321 passed \| 2 skipped, 0 failed.** tsc is green. The SILENT 1 row is green. |
+| **36286040025** | `loop/t048-r1-mut-p1` = `ec67acd` (P1 on `b93e927`, `catch { continue }` put back, NOT FOR MERGE) | tcm-2 | **1 failed**: exactly the SILENT 1 row, `AssertionError: expected 'pass' to be 'issue'`. **P1 killed on tcm.** |
+
+**The candidate SHA does not move: it is still `7913c5f`.** The SILENT 1 row fix (deny `readFileSync` only) was
+made before `7913c5f` was committed, so it is inside that commit. What was unverified was only its run, and 36286037658
+plus 36286040025 cover that. **13 of 13 mutants are now killed**: P1 on tcm, P2–P13 in the local mutant script.
+
+**The three local 5000ms timeouts passed on tcm, in run 36286037658.** `tree-currency.test.ts` 13/13 (3456ms),
+`role-files.test.ts` 13/13 (2034ms), `repo-root.test.ts` 7/7 (1081ms), none skipped. The run's 2 skips are in
+`record-erasure.test.ts` and a paths test, not these. The three failures were local load (three seats on this
+desktop) and passed on tcm run 36286037658.
+
 **Branch** `loop/t048-r1` from `1646567`. **Candidate `7913c5f`** (red rows `a061f72`).
 **Model:** Claude Opus 5.5 (1M context), `claude-opus-5-5[1m]`. **Effort:** my transcript gives no effort level, so I
 am not reporting one. Fresh session: `/clear` before the dispatch, with nothing from `/bootstrap` or any earlier round.
@@ -85,7 +109,7 @@ out in 5000ms`, in files this round does not touch (`describeRoleFiles`, `descri
 all git-subprocess tests). **I did not rerun them at base, because there was no run to spare, so "pre-existing" is
 unverified.** They take about 5.1s under full-suite load.
 
-## Runs: 6 of 6 used
+## Local runs (on this desktop, NOT tcm; see the correction at the top)
 
 1 red at base · 2 failure reasons at base · 3 tsc and sync dir · 4 failed script (wasted) · 5 tsc and full suite ·
 6 mutants. No laptop or windows CI. The live `.agents/state.json` was not written. No `/end`.
