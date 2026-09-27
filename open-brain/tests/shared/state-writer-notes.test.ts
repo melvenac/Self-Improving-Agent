@@ -12,7 +12,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, cpSync, rmSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { applyStateOps, type WriteResult } from "../../src/shared/state-writer.js";
+import { applyStateOps, readState, type WriteResult } from "../../src/shared/state-writer.js";
 
 const fixturesDir = join(import.meta.dirname, "../fixtures");
 const stateFixture = join(import.meta.dirname, "../fixtures-state/state.json");
@@ -26,7 +26,7 @@ const FIRST_LINE = "T-169 ORIGINAL: at Loop 15 close, rewrite PRD.md and README.
 const LONG = (FIRST_LINE + "\n" + "x".repeat(2000)).slice(0, 1869);
 const ADDITION = "Correction: README.md is rewritten too, not only PRD.md.";
 
-type RawTask = { id: string; note: string; note_by?: string[] | null };
+type RawTask = { id: string; title?: string; note: string; note_by?: string[] | null };
 
 function raw(root: string): { revision: number; tasks: RawTask[] } {
   return JSON.parse(readFileSync(join(root, STATE), "utf-8"));
@@ -329,5 +329,35 @@ describe("T-171: a note is never replaced silently", () => {
     const r = write(root, [{ op: "update_task", id: "T-009", status: "in_progress" }]);
     expect(r.ok).toBe(true);
     expect(changes(r)).toEqual([]);
+  });
+
+  it("T-171 r3b: a missing note_by loads as null and is not written until an op touches that task", () => {
+    const path = join(root, STATE);
+    const s = JSON.parse(readFileSync(path, "utf-8")) as { tasks: RawTask[] };
+    for (const id of ["T-009", "T-010"]) delete s.tasks.find((t) => t.id === id)!.note_by;
+    writeFileSync(path, JSON.stringify(s, null, 2) + "\n");
+    const before = readFileSync(path, "utf-8");
+
+    const loaded = readState(root);
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+    expect(loaded.data.tasks.find((t) => t.id === "T-009")!.note_by).toBeNull();
+    expect(readFileSync(path, "utf-8")).toBe(before);
+
+    const held = write(root, [{ op: "set_objective", text: "hold the record" }]);
+    expect(held.ok).toBe(true);
+    const afterHold = JSON.parse(readFileSync(path, "utf-8")) as { tasks: RawTask[] };
+    for (const id of ["T-009", "T-010"]) {
+      expect(Object.prototype.hasOwnProperty.call(afterHold.tasks.find((t) => t.id === id), "note_by")).toBe(false);
+    }
+
+    const upd = write(root, [{ op: "update_task", id: "T-009", title: "touched" }]);
+    expect(upd.ok).toBe(true);
+    const after = JSON.parse(readFileSync(path, "utf-8")) as { tasks: RawTask[] };
+    const touched = after.tasks.find((t) => t.id === "T-009")!;
+    const other = after.tasks.find((t) => t.id === "T-010")!;
+    expect(touched.title).toBe("touched");
+    expect(touched.note_by).toBeNull();
+    expect(Object.prototype.hasOwnProperty.call(other, "note_by")).toBe(false);
   });
 });
