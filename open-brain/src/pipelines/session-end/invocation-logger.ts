@@ -48,26 +48,28 @@ function projectFromDir(dir: string | null): string {
 
 const INVOCATION_LOG_PATH = join(homedir(), ".claude", "open-brain", "skill-invocations.jsonl");
 
+/** A present log that is not a list of timestamps, or that cannot be read.
+ *  The return is that word. Null is not a return value; a missing file is null
+ *  from the caller. */
+function unusableLog(kind: "corrupt" | "unreadable", detail?: string): string {
+  return detail ? `${kind}: ${detail}` : kind;
+}
+
 /**
- * Timestamp of the most recent logged invocation, or null if the log is missing
- * or unreadable. This is the SessionEnd pipeline's own write marker, so it is
- * the most direct evidence available that the hook actually ran — used by the
- * Pipeline Health score, which previously hardcoded null and could never score.
+ * Timestamp of the most recent logged invocation.
+ * Returns null when the file is missing. An empty file returns "empty".
+ * A file that cannot be read returns an unreadable string. A file with no
+ * usable timestamp returns "corrupt".
  *
  * Scans all entries rather than trusting the last line: entries are appended per
  * session and backfill can write older sessions after newer ones.
  */
-/** A log that is present but not a list of timestamps, or that cannot be read.
- *  Null stays reserved for a missing file. One mutant restores that null for
- *  both kinds (SILENT 6). */
-function unusableLog(kind: "corrupt" | "unreadable", detail?: string): string | null {
-  return detail ? `${kind}: ${detail}` : kind;
-}
-
 export function readLastInvocationTs(logPath: string = INVOCATION_LOG_PATH): string | null {
   if (!existsSync(logPath)) return null;
   try {
-    const lines = readFileSync(logPath, "utf8").split("\n").filter(Boolean);
+    const raw = readFileSync(logPath, "utf8");
+    if (raw.trim() === "") return "empty";
+    const lines = raw.split("\n").filter(Boolean);
     let newest: number | null = null;
     let newestRaw: string | null = null;
     for (const line of lines) {
