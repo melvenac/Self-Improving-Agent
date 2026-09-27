@@ -165,7 +165,7 @@ export const RequirementFindingSchema = z.strictObject({
  */
 export const AcceptanceFindingSchema = z.strictObject({
   id: z.string().min(1),
-  status: z.enum(["met", "unmet", "partial", "not_evaluated", "pending"]),
+  status: z.enum(["met", "unmet", "partial", "not_evaluated"]),
   evidence: z.string().min(1),
   order: z.enum(["shown", "attributed"]).optional(),
 });
@@ -220,7 +220,7 @@ export const EvidenceSchema = z
         });
       }
       if (
-        (a.status === "unmet" || a.status === "not_evaluated" || a.status === "pending") &&
+        (a.status === "unmet" || a.status === "not_evaluated") &&
         a.order !== undefined
       ) {
         ctx.addIssue({

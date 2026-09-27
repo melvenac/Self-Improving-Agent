@@ -176,8 +176,7 @@
               "met",
               "unmet",
               "partial",
-              "not_evaluated",
-              "pending"
+              "not_evaluated"
             ]
           },
           "evidence": {
