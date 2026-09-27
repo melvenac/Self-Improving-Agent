@@ -1,0 +1,4 @@
+== plants on a readable tree, cand
+checkRetirements [issue] retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+checkModuleBoundary [issue] core imports memory in 1 place(s) — the module boundary has re-closed: shared/qa151-leak.ts -> db-v2.ts. Core must never import memory; memory may import core. Checked 74 file(s), 53 core; excluded 8 non-.ts file(s), not modules in the graph. LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.
+checkTemplatePersonalNames [issue] Template ships personal names — consumers' agents will use them: project-template/.claude/rules/frontend.md ("Clark")

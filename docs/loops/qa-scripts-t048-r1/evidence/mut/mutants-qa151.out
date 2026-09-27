@@ -1,0 +1,72 @@
+
+######## P1: SILENT 1 (developer's P1, re-run): retirements read `catch { continue }` put back
+build exit 0
+vitest exit 1; 13 passed, 1 failed: SILENT 1 — checkRetirements: an unreadable file is an issue, not a counted pass names the file it could not read, and does not pass
+DEV ROWS: KILLED
+== P1 real: ACL-denied files, git path
+checkRetirements [issue] retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut); scripts/qa151-plant.yml names knowledge-mcp (retired 2026-08, rename)
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 2 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM), project-template/.cursor/ (EPERM)
+
+######## Q1: SILENT 1: unreadable paths make it an issue but are not NAMED in the message
+build exit 0
+vitest exit 1; 11 passed, 3 failed: SILENT 1 — checkRetirements: an unreadable file is an issue, not a counted pass names the file it could not read, and does not pass | SILENT 26 — walkTracked fallback: says it is the fallback, and a partial walk does not pass an unreadable directory makes the walk partial, and the issue names it | SILENT 26 — walkTracked fallback: says it is the fallback, and a partial walk does not pass an unstatable path is named, not skipped
+DEV ROWS: KILLED
+== Q1 real: ACL-denied files, git path
+checkRetirements [issue] retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut); scripts/qa151-plant.yml names knowledge-mcp (retired 2026-08, rename)
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 2 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM), project-template/.cursor/ (EPERM)
+
+######## Q2: SILENT 20: the widened list loses yml|yaml|toml (only .sh has a row)
+build exit 0
+vitest exit 0; 14 passed, 0 failed
+DEV ROWS: SURVIVED
+== Q2 real: staged scripts/qa151-plant.yml names knowledge-mcp
+checkRetirements [issue] retired names still referenced outside the record: unreadable: docs/hoh_jev.md (EPERM); unreadable: open-brain/src/relocate.ts (EPERM); unreadable: project-template/.claude/rules/backend.md (EPERM); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 2 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM), project-template/.cursor/ (EPERM)
+
+######## Q3: SILENT 26 / addition (d): `git ls-files` listing nothing is trusted as a git listing (no fallback)
+build exit 0
+vitest exit 0; 14 passed, 0 failed
+DEV ROWS: SURVIVED
+== Q3 real: GIT_INDEX_FILE -> nonexistent (ls-files lists nothing)
+checkRetirements [pass] 10 retirements across 6 event classes, 49 allowed referrers all present and still naming their retirement, 0 unexpected across 0 live files read (listed by git ls-files); excluded by extension: none; historical: none — resolvable against a registry: command, tool; guarded by this record alone: cli-subcommand, config-key, convention, enum-value, flag, package, path, prose, schema-field, symbol (green means every RECORDED retirement is finished, not that every retirement is recorded)
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 2 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM), project-template/.cursor/ (EPERM)
+
+######## Q4: SILENT 2: module-boundary records an unreadable .ts only when the code is EACCES (the mock's code)
+build exit 0
+vitest exit 0; 14 passed, 0 failed
+DEV ROWS: SURVIVED
+== Q4 real: ACL-denied relocate.ts (EPERM)
+checkRetirements [issue] retired names still referenced outside the record: unreadable: docs/hoh_jev.md (EPERM); unreadable: open-brain/src/relocate.ts (EPERM); unreadable: project-template/.claude/rules/backend.md (EPERM); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut); scripts/qa151-plant.yml names knowledge-mcp (retired 2026-08, rename)
+checkModuleBoundary [pass] core does not import memory (73 file(s), 52 core; excluded 8 non-.ts file(s), not modules in the graph). LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.
+checkTemplatePersonalNames [issue] 2 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM), project-template/.cursor/ (EPERM)
+
+######## Q5: SILENT 3: template treats any read error but EACCES as a binary (the old comment, restored by code)
+build exit 0
+vitest exit 0; 14 passed, 0 failed
+DEV ROWS: SURVIVED
+== Q5 real: ACL-denied template file (EPERM); .cursor dir denied too
+checkRetirements [issue] retired names still referenced outside the record: unreadable: docs/hoh_jev.md (EPERM); unreadable: open-brain/src/relocate.ts (EPERM); unreadable: project-template/.claude/rules/backend.md (EPERM); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut); scripts/qa151-plant.yml names knowledge-mcp (retired 2026-08, rename)
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 1 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.cursor/ (EPERM)
+
+######## Q6: SILENT 26: the walk's unreadable paths reach the LABEL (PARTIAL) but not the verdict
+build exit 0
+vitest exit 1; 12 passed, 2 failed: SILENT 26 — walkTracked fallback: says it is the fallback, and a partial walk does not pass an unreadable directory makes the walk partial, and the issue names it | SILENT 26 — walkTracked fallback: says it is the fallback, and a partial walk does not pass an unstatable path is named, not skipped
+DEV ROWS: KILLED
+== Q6 real: GIT_DIR -> nonexistent (fallback) with denied dirs
+checkRetirements [issue] retired names still referenced outside the record: unreadable: docs/hoh_jev.md (EPERM); unreadable: open-brain/src/relocate.ts (EPERM); unreadable: project-template/.claude/rules/backend.md (EPERM); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut); scripts/qa151-plant.yml names knowledge-mcp (retired 2026-08, rename)
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 2 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM), project-template/.cursor/ (EPERM)
+
+######## Q7: SILENT 3: template does not report an unreadable DOT directory (.claude/.cursor)
+build exit 0
+vitest exit 1; 13 passed, 1 failed: SILENT 3 — checkTemplatePersonalNames: an unreadable file is not 'no personal names' names an unreadable directory, and does not pass
+DEV ROWS: KILLED
+== Q7 real: ACL-denied project-template/.cursor
+checkRetirements [issue] retired names still referenced outside the record: unreadable: docs/hoh_jev.md (EPERM); unreadable: open-brain/src/relocate.ts (EPERM); unreadable: project-template/.claude/rules/backend.md (EPERM); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut); scripts/qa151-plant.yml names knowledge-mcp (retired 2026-08, rename)
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 1 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM)

@@ -1,0 +1,5 @@
+Runner name: 'tcm-1'
+ ✓ tests/pipelines/sync/t048-qa151-real.test.ts (17 tests) 243ms
+ ✓ tests/pipelines/sync/t048-qa151-codes.test.ts (24 tests) 104ms
+ Test Files  89 passed (89)
+      Tests  1362 passed | 2 skipped (1364)

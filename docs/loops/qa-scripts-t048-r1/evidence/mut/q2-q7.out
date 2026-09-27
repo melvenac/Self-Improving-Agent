@@ -1,0 +1,20 @@
+
+######## Q2: SILENT 20: the widened list loses yml|yaml|toml (only .sh has a row)
+build exit 0
+vitest exit 0; 14 passed, 0 failed
+DEV ROWS: SURVIVED
+== Q2 real: staged scripts/qa151-plant.yml names knowledge-mcp
+checkRetirements [issue] retired names still referenced outside the record: unreadable: docs/hoh_jev.md (EPERM); unreadable: open-brain/src/relocate.ts (EPERM); unreadable: project-template/.claude/rules/backend.md (EPERM); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 2 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM), project-template/.cursor/ (EPERM)
+
+######## Q7: SILENT 3: template does not report an unreadable DOT directory (.claude/.cursor)
+build exit 0
+vitest exit 1; 13 passed, 1 failed: SILENT 3 — checkTemplatePersonalNames: an unreadable file is not 'no personal names' names an unreadable directory, and does not pass
+DEV ROWS: KILLED
+== Q7 real: ACL-denied project-template/.cursor
+checkRetirements [issue] retired names still referenced outside the record: unreadable: docs/hoh_jev.md (EPERM); unreadable: open-brain/src/relocate.ts (EPERM); unreadable: project-template/.claude/rules/backend.md (EPERM); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut); scripts/qa151-plant.yml names knowledge-mcp (retired 2026-08, rename)
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 1 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM)
+restored checks.ts and rebuilt
+EXIT: 0

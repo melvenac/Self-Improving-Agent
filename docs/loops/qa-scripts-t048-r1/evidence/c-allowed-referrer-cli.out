@@ -1,0 +1,16 @@
+######## (c) CLI sync --check, only scripts/setup-hooks.mjs (an allowed referrer) denied, base nopriv
+PRIV: SeBackupPrivilege Back up files and directories Disabled
+Error: EPERM: operation not permitted, open 'C:\qa-scratch\t048\rc\scripts\setup-hooks.mjs'
+    at readFileSync (node:fs:440:20)
+    at checkRetirements (file:///C:/qa-scratch/t048/base/open-brain/build/pipelines/sync/checks.js:999:28)
+    at runSync (file:///C:/qa-scratch/t048/base/open-brain/build/pipelines/sync/index.js:59:17)
+    at file:///C:/qa-scratch/t048/base/open-brain/build/cli.js:83:20 {
+EXIT: 1
+######## (c) CLI sync --check, only scripts/setup-hooks.mjs (an allowed referrer) denied, cand nopriv
+PRIV: SeBackupPrivilege Back up files and directories Disabled
+Error: EPERM: operation not permitted, open 'C:\qa-scratch\t048\rc\scripts\setup-hooks.mjs'
+    at readFileSync (node:fs:440:20)
+    at checkRetirements (file:///C:/qa-scratch/t048/cand/open-brain/build/pipelines/sync/checks.js:1055:28)
+    at runSync (file:///C:/qa-scratch/t048/cand/open-brain/build/pipelines/sync/index.js:59:17)
+    at file:///C:/qa-scratch/t048/cand/open-brain/build/cli.js:83:20 {
+EXIT: 1

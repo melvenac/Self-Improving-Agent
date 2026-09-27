@@ -1,0 +1,10 @@
+Runner name: 'tcm-1'
+ ✓ tests/pipelines/sync/t048-qa151-real.test.ts (17 tests) 249ms
+ ✓ tests/pipelines/sync/t048-qa151-codes.test.ts (24 tests) 93ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/pipelines/sync/t048-qa151-defects.test.ts > QA 151 D1: an unreadable path must not hide a real finding > template-personal-names: one unreadable file, and a readable file that ships a personal name
+ FAIL  tests/pipelines/sync/t048-qa151-defects.test.ts > QA 151 D1: an unreadable path must not hide a real finding > module-boundary: one unreadable .ts file, and a readable core file that imports memory
+ FAIL  tests/pipelines/sync/t048-qa151-defects.test.ts > QA 151 D1: an unreadable path must not hide a real finding > retirements: six unreadable files and one real finding; the finding is shown, not cut into '+N more'
+ FAIL  tests/pipelines/sync/t048-qa151-defects.test.ts > QA 151 D2: a PARTIAL fallback walk says so even when there is also a finding > fallback walk, one unlistable directory, one real finding
+ Test Files  1 failed | 89 passed (90)
+      Tests  4 failed | 1362 passed | 2 skipped (1368)

@@ -1,0 +1,40 @@
+######## CLI sync --check, A2 state, base priv
+PRIV: SeBackupPrivilege Back up files and directories Enabled
+  retirements: retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+  state-schema: .agents/state.json invalid at schema_version: Invalid input: expected 3, as parsed by this CLI process — note this is the CLI's schema, not the running server's. The server may hold a different one; run ob_sync as an MCP tool to test that. Version: the record is schema v2, OLDER than this build's v3: migrate it with `node open-brain/build/cli.js state migrate --dry-run .agents/state.json`, read the changes, then run it without --dry-run.
+  summary-version: skipped — .agents/state.json invalid at schema_version: Invalid input: expected 3 (see state-schema); not touching SUMMARY.md
+  state-views: skipped — .agents/state.json invalid at schema_version: Invalid input: expected 3 (see state-schema)
+  module-boundary [pass]: core does not import memory (73 file(s), 52 core). LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.
+  state-schema [issue]: .agents/state.json invalid at schema_version: Invalid input: expected 3, as parsed by this CLI process — note this is the CLI's schema, not the running server's. The server may hold a different one; run ob_sync as an MCP tool to test that. Version: the record is schema v2, OLDER than this build's v3: migrate it with `node open-brain/build/cli.js state migrate --dry-run .agents/state.json`, read the changes, then run it without --dry-run.
+  record-erasure [pass]: 0 erasures since schema v3; walked 837 commits, 223 .agents/state.json changes (0 at schema v3+); 44 erasure(s) in schema <3 history, which allowed them and cannot be repaired — listed by `open-brain state erasures`, failing nothing. LIMIT: reads HEAD's committed history only — an uncommitted edit is not seen
+Summary: 22 passed, 0 fixed, 2 warnings, 2 issues, 6 skipped
+EXIT: 1
+######## CLI sync --check, A2 state, base nopriv
+PRIV: SeBackupPrivilege Back up files and directories Disabled
+Error: EPERM: operation not permitted, open 'C:\qa-scratch\t048\rc\README.md'
+    at readFileSync (node:fs:440:20)
+    at syncReadmeVersion (file:///C:/qa-scratch/t048/base/open-brain/build/pipelines/sync/checks.js:39:21)
+    at runSync (file:///C:/qa-scratch/t048/base/open-brain/build/pipelines/sync/index.js:21:17)
+    at file:///C:/qa-scratch/t048/base/open-brain/build/cli.js:83:20 {
+  code: 'EPERM',
+EXIT: 1
+######## CLI sync --check, A2 state, cand priv
+PRIV: SeBackupPrivilege Back up files and directories Enabled
+  retirements: retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+  state-schema: .agents/state.json invalid at schema_version: Invalid input: expected 3, as parsed by this CLI process — note this is the CLI's schema, not the running server's. The server may hold a different one; run ob_sync as an MCP tool to test that. Version: the record is schema v2, OLDER than this build's v3: migrate it with `node open-brain/build/cli.js state migrate --dry-run .agents/state.json`, read the changes, then run it without --dry-run.
+  summary-version: skipped — .agents/state.json invalid at schema_version: Invalid input: expected 3 (see state-schema); not touching SUMMARY.md
+  state-views: skipped — .agents/state.json invalid at schema_version: Invalid input: expected 3 (see state-schema)
+  module-boundary [pass]: core does not import memory (73 file(s), 52 core; excluded 8 non-.ts file(s), not modules in the graph). LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.
+  state-schema [issue]: .agents/state.json invalid at schema_version: Invalid input: expected 3, as parsed by this CLI process — note this is the CLI's schema, not the running server's. The server may hold a different one; run ob_sync as an MCP tool to test that. Version: the record is schema v2, OLDER than this build's v3: migrate it with `node open-brain/build/cli.js state migrate --dry-run .agents/state.json`, read the changes, then run it without --dry-run.
+  record-erasure [pass]: 0 erasures since schema v3; walked 837 commits, 223 .agents/state.json changes (0 at schema v3+); 44 erasure(s) in schema <3 history, which allowed them and cannot be repaired — listed by `open-brain state erasures`, failing nothing. LIMIT: reads HEAD's committed history only — an uncommitted edit is not seen
+Summary: 22 passed, 0 fixed, 2 warnings, 2 issues, 6 skipped
+EXIT: 1
+######## CLI sync --check, A2 state, cand nopriv
+PRIV: SeBackupPrivilege Back up files and directories Disabled
+Error: EPERM: operation not permitted, open 'C:\qa-scratch\t048\rc\README.md'
+    at readFileSync (node:fs:440:20)
+    at syncReadmeVersion (file:///C:/qa-scratch/t048/cand/open-brain/build/pipelines/sync/checks.js:39:21)
+    at runSync (file:///C:/qa-scratch/t048/cand/open-brain/build/pipelines/sync/index.js:21:17)
+    at file:///C:/qa-scratch/t048/cand/open-brain/build/cli.js:83:20 {
+  code: 'EPERM',
+EXIT: 1

@@ -1,0 +1,34 @@
+######## I 6 unreadable files + real findings (ENTITIES retired names, template 'Clark', core->db-v2 leak) / priv
+PRIV: SeBackupPrivilege Back up files and directories Enabled
+SEE docs/hoh_jev.md: file READABLE
+SEE docs/HOH-JEV.md: file READABLE
+SEE open-brain/src/relocate.ts: file READABLE
+SEE project-template/.claude/rules/backend.md: file READABLE
+SEE .claude/commands/task.md: file READABLE
+SEE open-brain/src/lifecycle.ts: file READABLE
+EXIT: 0
+== base priv
+checkRetirements [issue] retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+checkModuleBoundary [issue] core imports memory in 1 place(s) — the module boundary has re-closed: shared/qa151-leak.ts -> db-v2.ts. Core must never import memory; memory may import core. Checked 74 file(s), 53 core. LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.
+checkTemplatePersonalNames [issue] Template ships personal names — consumers' agents will use them: project-template/.claude/rules/frontend.md ("Clark")
+== cand priv
+checkRetirements [issue] retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+checkModuleBoundary [issue] core imports memory in 1 place(s) — the module boundary has re-closed: shared/qa151-leak.ts -> db-v2.ts. Core must never import memory; memory may import core. Checked 74 file(s), 53 core; excluded 8 non-.ts file(s), not modules in the graph. LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.
+checkTemplatePersonalNames [issue] Template ships personal names — consumers' agents will use them: project-template/.claude/rules/frontend.md ("Clark")
+######## I 6 unreadable files + real findings (ENTITIES retired names, template 'Clark', core->db-v2 leak) / nopriv
+PRIV: SeBackupPrivilege Back up files and directories Disabled
+SEE docs/hoh_jev.md: file EPERM
+SEE docs/HOH-JEV.md: file EPERM
+SEE open-brain/src/relocate.ts: file EPERM
+SEE project-template/.claude/rules/backend.md: file EPERM
+SEE .claude/commands/task.md: file EPERM
+SEE open-brain/src/lifecycle.ts: file EPERM
+EXIT: 0
+== base nopriv
+checkRetirements [issue] retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+checkModuleBoundary THREW EPERM EPERM: operation not permitted, open 'C:\qa-scratch\t048\rc\open-brain\src\lifecycle.ts'
+checkTemplatePersonalNames [issue] Template ships personal names — consumers' agents will use them: project-template/.claude/rules/frontend.md ("Clark")
+== cand nopriv
+checkRetirements [issue] retired names still referenced outside the record: unreadable: .claude/commands/task.md (EPERM); unreadable: docs/HOH-JEV.md (EPERM); unreadable: docs/hoh_jev.md (EPERM); unreadable: open-brain/src/lifecycle.ts (EPERM); unreadable: open-brain/src/relocate.ts (EPERM); unreadable: project-template/.claude/rules/backend.md (EPERM); +2 more
+checkModuleBoundary [issue] 2 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: lifecycle.ts (EPERM), relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 1 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM)

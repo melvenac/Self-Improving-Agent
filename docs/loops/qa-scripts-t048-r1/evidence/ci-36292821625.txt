@@ -1,0 +1,10 @@
+Runner name: 'tcm-2'
+ ✓ tests/pipelines/sync/t048-qa151-codes.test.ts (24 tests) 236ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/pipelines/sync/t048-qa151-real.test.ts > QA 151: SILENT 20, every widened extension is scanned through git ls-files (real fs) > a retired name in a tracked .yml file is a finding
+ FAIL  tests/pipelines/sync/t048-qa151-real.test.ts > QA 151: SILENT 20, every widened extension is scanned through git ls-files (real fs) > a retired name in a tracked .yaml file is a finding
+ FAIL  tests/pipelines/sync/t048-qa151-real.test.ts > QA 151: SILENT 20, every widened extension is scanned through git ls-files (real fs) > a retired name in a tracked .toml file is a finding
+ FAIL  tests/pipelines/sync/t048-qa151-real.test.ts > QA 151: SILENT 26 and addition (d), when git cannot give the listing (real fs, real git) > a repository whose index lists nothing falls back to the walk, says why, and still finds the name
+ Test Files  1 failed | 88 passed (89)
+      Tests  5 failed | 1357 passed | 2 skipped (1364)
+ FAIL  tests/pipelines/sync/t048-qa151-real.test.ts > QA 151: SILENT 26 and addition (d), when git cannot give the listing (real fs, real git) > the empty-listing fallback's pass says FALLBACK and the reason

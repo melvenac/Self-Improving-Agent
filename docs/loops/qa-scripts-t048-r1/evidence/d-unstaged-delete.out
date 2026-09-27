@@ -1,0 +1,4 @@
+== unstaged delete of tracked docs/hoh_jev.md, base
+checkRetirements [issue] retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+== unstaged delete of tracked docs/hoh_jev.md, cand
+checkRetirements [issue] retired names still referenced outside the record: unreadable: docs/hoh_jev.md (ENOENT); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)

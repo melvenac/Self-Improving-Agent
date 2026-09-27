@@ -1,0 +1,21 @@
+######## H fallback (git fails) + unlistable .claude/commands (live) and docs/loops (historical) / priv
+PRIV: SeBackupPrivilege Back up files and directories Enabled
+SEE .claude/commands: dir READABLE
+SEE docs/loops: dir READABLE
+EXIT: 0
+== base priv
+checkRetirements [pass] 10 retirements across 6 event classes, 49 allowed referrers all present and still naming their retirement, 0 unexpected across 245 live files — resolvable against a registry: command, tool; guarded by this record alone: cli-subcommand, config-key, convention, enum-value, flag, package, path, prose, schema-field, symbol (green means every RECORDED retirement is finished, not that every retirement is recorded)
+== cand priv
+checkRetirements [pass] 10 retirements across 6 event classes, 49 allowed referrers all present and still naming their retirement, 0 unexpected across 247 live files read (listed by a filesystem walk — FALLBACK, git ls-files failed — not a git repo, or git unavailable, skipped 1 build/dependency dir(s) with no .gitignore to ask: .git/); excluded by extension (not source or prose a retired name ships in): (no extension) 4; historical: 392 (by rule) — resolvable against a registry: command, tool; guarded by this record alone: cli-subcommand, config-key, convention, enum-value, flag, package, path, prose, schema-field, symbol (green means every RECORDED retirement is finished, not that every retirement is recorded)
+######## H fallback (git fails) + unlistable .claude/commands (live) and docs/loops (historical) / nopriv
+PRIV: SeBackupPrivilege Back up files and directories Disabled
+SEE .claude/commands: dir EPERM
+SEE docs/loops: dir EPERM
+EXIT: 0
+== base nopriv
+checkRetirements [pass] 10 retirements across 6 event classes, 49 allowed referrers all present and still naming their retirement, 0 unexpected across 238 live files — resolvable against a registry: command, tool; guarded by this record alone: cli-subcommand, config-key, convention, enum-value, flag, package, path, prose, schema-field, symbol (green means every RECORDED retirement is finished, not that every retirement is recorded)
+== cand nopriv
+checkRetirements [issue] 2 path(s) could not be read, so the scan is partial (listed by a filesystem walk — FALLBACK, git ls-files failed — not a git repo, or git unavailable, PARTIAL: 2 path(s) unreadable, skipped 1 build/dependency dir(s) with no .gitignore to ask: .git/): unreadable: .claude/commands/ (EPERM); unreadable: docs/loops/ (EPERM)
+PRIV: SeBackupPrivilege Back up files and directories Disabled
+== H2 empty listing + same denies, cand nopriv
+checkRetirements [issue] 2 path(s) could not be read, so the scan is partial (listed by a filesystem walk — FALLBACK, git ls-files listed nothing, PARTIAL: 2 path(s) unreadable, skipped 1 build/dependency dir(s) with no .gitignore to ask: .git/): unreadable: .claude/commands/ (EPERM); unreadable: docs/loops/ (EPERM)

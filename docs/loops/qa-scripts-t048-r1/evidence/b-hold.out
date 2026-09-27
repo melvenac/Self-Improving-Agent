@@ -1,0 +1,28 @@
+######## B share-None hold / priv
+PRIV: SeBackupPrivilege Back up files and directories Enabled
+SEE docs/hoh_jev.md: file READABLE
+SEE open-brain/src/relocate.ts: file READABLE
+SEE project-template/.claude/rules/backend.md: file READABLE
+EXIT: 0
+== base priv
+checkRetirements [issue] retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+checkModuleBoundary [pass] core does not import memory (73 file(s), 52 core). LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.
+checkTemplatePersonalNames [pass] No personal names in project-template/
+== cand priv
+checkRetirements [issue] retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+checkModuleBoundary [pass] core does not import memory (73 file(s), 52 core; excluded 8 non-.ts file(s), not modules in the graph). LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.
+checkTemplatePersonalNames [pass] No personal names in project-template/ — 37 file(s) read; excluded: none (node_modules, .git would be skipped as not shipped prose)
+######## B share-None hold / nopriv
+PRIV: SeBackupPrivilege Back up files and directories Disabled
+SEE docs/hoh_jev.md: file EBUSY
+SEE open-brain/src/relocate.ts: file EBUSY
+SEE project-template/.claude/rules/backend.md: file EBUSY
+EXIT: 0
+== base nopriv
+checkRetirements [issue] retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+checkModuleBoundary THREW EBUSY EBUSY: resource busy or locked, open 'C:\qa-scratch\t048\rc\open-brain\src\relocate.ts'
+checkTemplatePersonalNames [pass] No personal names in project-template/
+== cand nopriv
+checkRetirements [issue] retired names still referenced outside the record: unreadable: docs/hoh_jev.md (EBUSY); unreadable: open-brain/src/relocate.ts (EBUSY); unreadable: project-template/.claude/rules/backend.md (EBUSY); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EBUSY)
+checkTemplatePersonalNames [issue] 1 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EBUSY)

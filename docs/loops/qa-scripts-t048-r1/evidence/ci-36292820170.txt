@@ -1,0 +1,18 @@
+Runner name: 'tcm-1'
+⎯⎯⎯⎯⎯⎯ Failed Tests 14 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 1 retirements read: EPERM (icacls deny)
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 1 retirements read: EBUSY (share None hold)
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 1 retirements read: EISDIR (a directory where a tracked file was)
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 1 retirements read: no code at all
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 2 module-boundary file read: EPERM (icacls deny)
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 2 module-boundary file read: EBUSY (share None hold)
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 2 module-boundary file read: EISDIR (a directory where a tracked file was)
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 2 module-boundary file read: no code at all
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 3 template file read: EPERM (icacls deny)
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 3 template file read: EBUSY (share None hold)
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 3 template file read: EISDIR (a directory where a tracked file was)
+ FAIL  tests/pipelines/sync/t048-qa151-codes.test.ts > QA 151: any read error is unreadable, whatever its code > SILENT 3 template file read: no code at all
+ FAIL  tests/pipelines/sync/t048-qa151-real.test.ts > QA 151: a real kernel denial (chmod 000, non-root POSIX) in each of the five checks > SILENT 1: a tracked file the kernel refuses is an issue naming it (git path)
+ FAIL  tests/pipelines/sync/t048-unreadable.test.ts > SILENT 1 — checkRetirements: an unreadable file is an issue, not a counted pass > names the file it could not read, and does not pass
+ Test Files  3 failed | 86 passed (89)
+      Tests  14 failed | 1348 passed | 2 skipped (1364)

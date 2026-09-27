@@ -1,0 +1,19 @@
+######## CONTROL (unmutated 7913c5f build), same scenario
+PRIV: SeBackupPrivilege Back up files and directories Disabled
+== control git path
+checkRetirements [issue] retired names still referenced outside the record: unreadable: docs/hoh_jev.md (EPERM); unreadable: open-brain/src/relocate.ts (EPERM); unreadable: project-template/.claude/rules/backend.md (EPERM); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut); scripts/qa151-plant.yml names knowledge-mcp (retired 2026-08, rename)
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 2 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM), project-template/.cursor/ (EPERM)
+EXIT: 0
+PRIV: SeBackupPrivilege Back up files and directories Disabled
+== control GIT_INDEX_FILE=C:/qa-tmp/t048-no-such-index
+checkRetirements [issue] retired names still referenced outside the record: unreadable: .claude/commands/ (EPERM); unreadable: project-template/.cursor/ (EPERM); unreadable: docs/hoh_jev.md (EPERM); unreadable: open-brain/src/relocate.ts (EPERM); unreadable: project-template/.claude/rules/backend.md (EPERM); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); +2 more
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 2 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM), project-template/.cursor/ (EPERM)
+EXIT: 0
+PRIV: SeBackupPrivilege Back up files and directories Disabled
+== control GIT_DIR=C:/qa-tmp/t048-no-such-gitdir
+checkRetirements [issue] retired names still referenced outside the record: unreadable: .claude/commands/ (EPERM); unreadable: project-template/.cursor/ (EPERM); unreadable: docs/hoh_jev.md (EPERM); unreadable: open-brain/src/relocate.ts (EPERM); unreadable: project-template/.claude/rules/backend.md (EPERM); .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); +2 more
+checkModuleBoundary [issue] 1 unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: relocate.ts (EPERM)
+checkTemplatePersonalNames [issue] 2 unreadable path(s) under project-template/ — a leak there cannot be ruled out: project-template/.claude/rules/backend.md (EPERM), project-template/.cursor/ (EPERM)
+EXIT: 0

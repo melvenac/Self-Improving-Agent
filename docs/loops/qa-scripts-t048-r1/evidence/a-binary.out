@@ -1,0 +1,6 @@
+== (a) binaries in project-template: qa151-logo.png (contains ' Aaron '), qa151-blob.bin (no name), base
+checkTemplatePersonalNames [issue] Template ships personal names — consumers' agents will use them: project-template/qa151-logo.png ("Aaron")
+== (a) binaries in project-template: qa151-logo.png (contains ' Aaron '), qa151-blob.bin (no name), cand
+checkTemplatePersonalNames [issue] Template ships personal names — consumers' agents will use them: project-template/qa151-logo.png ("Aaron")
+== (a) blob.bin only, cand
+checkTemplatePersonalNames [pass] No personal names in project-template/ — 38 file(s) read; excluded: none (node_modules, .git would be skipped as not shipped prose)

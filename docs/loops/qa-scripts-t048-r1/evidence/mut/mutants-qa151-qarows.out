@@ -1,0 +1,40 @@
+
+######## P1: SILENT 1 (developer's P1, re-run): retirements read `catch { continue }` put back
+build exit 0
+vitest exit 1; 31 passed, 4 failed: QA 151: any read error is unreadable, whatever its code SILENT 1 retirements read: EPERM (icacls deny) | QA 151: any read error is unreadable, whatever its code SILENT 1 retirements read: EBUSY (share None hold) | QA 151: any read error is unreadable, whatever its code SILENT 1 retirements read: EISDIR (a directory where a tracked file was) | QA 151: any read error is unreadable, whatever its code SILENT 1 retirements read: no code at all
+ROWS (t048-qa151-real.test.ts, t048-qa151-codes.test.ts): KILLED
+
+######## Q1: SILENT 1: unreadable paths make it an issue but are not NAMED in the message
+build exit 0
+vitest exit 1; 27 passed, 8 failed: QA 151: any read error is unreadable, whatever its code SILENT 1 retirements read: EPERM (icacls deny) | QA 151: any read error is unreadable, whatever its code SILENT 1 retirements read: EBUSY (share None hold) | QA 151: any read error is unreadable, whatever its code SILENT 1 retirements read: EISDIR (a directory where a tracked file was) | QA 151: any read error is unreadable, whatever its code SILENT 1 retirements read: no code at all | QA 151: any read error is unreadable, whatever its code SILENT 26 walk readdir: EPERM (icacls deny) | QA 151: any read error is unreadable, whatever its code SILENT 26 walk readdir: EBUSY (share None hold) | QA 151: any read error is unreadable, whatever its code SILENT 26 walk readdir: EISDIR (a directory where a tracked file was) | QA 151: any read error is unreadable, whatever its code SILENT 26 walk readdir: no code at all
+ROWS (t048-qa151-real.test.ts, t048-qa151-codes.test.ts): KILLED
+
+######## Q2: SILENT 20: the widened list loses yml|yaml|toml (only .sh has a row)
+build exit 0
+vitest exit 1; 32 passed, 3 failed: QA 151: SILENT 20, every widened extension is scanned through git ls-files (real fs) a retired name in a tracked .yml file is a finding | QA 151: SILENT 20, every widened extension is scanned through git ls-files (real fs) a retired name in a tracked .yaml file is a finding | QA 151: SILENT 20, every widened extension is scanned through git ls-files (real fs) a retired name in a tracked .toml file is a finding
+ROWS (t048-qa151-real.test.ts, t048-qa151-codes.test.ts): KILLED
+
+######## Q3: SILENT 26 / addition (d): `git ls-files` listing nothing is trusted as a git listing (no fallback)
+build exit 0
+vitest exit 1; 33 passed, 2 failed: QA 151: SILENT 26 and addition (d), when git cannot give the listing (real fs, real git) a repository whose index lists nothing falls back to the walk, says why, and still finds the name | QA 151: SILENT 26 and addition (d), when git cannot give the listing (real fs, real git) the empty-listing fallback's pass says FALLBACK and the reason
+ROWS (t048-qa151-real.test.ts, t048-qa151-codes.test.ts): KILLED
+
+######## Q4: SILENT 2: module-boundary records an unreadable .ts only when the code is EACCES (the mock's code)
+build exit 0
+vitest exit 1; 31 passed, 4 failed: QA 151: any read error is unreadable, whatever its code SILENT 2 module-boundary file read: EPERM (icacls deny) | QA 151: any read error is unreadable, whatever its code SILENT 2 module-boundary file read: EBUSY (share None hold) | QA 151: any read error is unreadable, whatever its code SILENT 2 module-boundary file read: EISDIR (a directory where a tracked file was) | QA 151: any read error is unreadable, whatever its code SILENT 2 module-boundary file read: no code at all
+ROWS (t048-qa151-real.test.ts, t048-qa151-codes.test.ts): KILLED
+
+######## Q5: SILENT 3: template treats any read error but EACCES as a binary (the old comment, restored by code)
+build exit 0
+vitest exit 1; 31 passed, 4 failed: QA 151: any read error is unreadable, whatever its code SILENT 3 template file read: EPERM (icacls deny) | QA 151: any read error is unreadable, whatever its code SILENT 3 template file read: EBUSY (share None hold) | QA 151: any read error is unreadable, whatever its code SILENT 3 template file read: EISDIR (a directory where a tracked file was) | QA 151: any read error is unreadable, whatever its code SILENT 3 template file read: no code at all
+ROWS (t048-qa151-real.test.ts, t048-qa151-codes.test.ts): KILLED
+
+######## Q6: SILENT 26: the walk's unreadable paths reach the LABEL (PARTIAL) but not the verdict
+build exit 0
+vitest exit 1; 31 passed, 4 failed: QA 151: any read error is unreadable, whatever its code SILENT 26 walk readdir: EPERM (icacls deny) | QA 151: any read error is unreadable, whatever its code SILENT 26 walk readdir: EBUSY (share None hold) | QA 151: any read error is unreadable, whatever its code SILENT 26 walk readdir: EISDIR (a directory where a tracked file was) | QA 151: any read error is unreadable, whatever its code SILENT 26 walk readdir: no code at all
+ROWS (t048-qa151-real.test.ts, t048-qa151-codes.test.ts): KILLED
+
+######## Q7: SILENT 3: template does not report an unreadable DOT directory (.claude/.cursor)
+build exit 0
+vitest exit 1; 31 passed, 4 failed: QA 151: any read error is unreadable, whatever its code SILENT 3 template readdir: EPERM (icacls deny) | QA 151: any read error is unreadable, whatever its code SILENT 3 template readdir: EBUSY (share None hold) | QA 151: any read error is unreadable, whatever its code SILENT 3 template readdir: EISDIR (a directory where a tracked file was) | QA 151: any read error is unreadable, whatever its code SILENT 3 template readdir: no code at all
+ROWS (t048-qa151-real.test.ts, t048-qa151-codes.test.ts): KILLED

@@ -1,0 +1,32 @@
+
+Sync — v0.44.2
+
+ISSUES:
+  retirements: retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+  state-schema: .agents/state.json invalid at schema_version: Invalid input: expected 3, as parsed by this CLI process — note this is the CLI's schema, not the running server's. The server may hold a different one; run ob_sync as an MCP tool to test that. Version: the record is schema v2, OLDER than this build's v3: migrate it with `node open-brain/build/cli.js state migrate --dry-run .agents/state.json`, read the changes, then run it without --dry-run.
+
+WARNINGS:
+  obsidian-vault: Vault directory not found: C:\Users\Aaron\Obsidian Vault v2
+  spec-provenance: specs/ directory not found
+  ci-status: master 36a33bc conclusion: failure
+
+SKIPPED:
+  summary-version: skipped — .agents/state.json invalid at schema_version: Invalid input: expected 3 (see state-schema); not touching SUMMARY.md
+  gitnexus-index: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  state-views: skipped — .agents/state.json invalid at schema_version: Invalid input: expected 3 (see state-schema)
+  greeting-size: skipped — no valid .agents/state.json, so ob_start returns the prose fallback, which this check does not measure
+
+REPORTED (printed whatever the severity):
+  command-parity [pass]: 6 shared commands identical to the template (user scope absent — not checked)
+  command-tool-names [pass]: 49 tool references across 18 command files all resolve to 14 registered tools (names only — this cannot tell whether a tool's description is true)
+  command-names [pass]: 47 command references across 22 instruction files all resolve to 8 command files or 2 declared host commands (names only — this cannot tell whether a command's description is true)
+  module-boundary [pass]: core does not import memory (73 file(s), 52 core). LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.
+  gitnexus-index [skip]: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  build-freshness [pass]: build matches HEAD 1646567 (built 2026-09-27T03:34:03.589Z). LIMIT: compares commits, not working-tree edits — uncommitted source changes are not in this build either.
+  state-schema [issue]: .agents/state.json invalid at schema_version: Invalid input: expected 3, as parsed by this CLI process — note this is the CLI's schema, not the running server's. The server may hold a different one; run ob_sync as an MCP tool to test that. Version: the record is schema v2, OLDER than this build's v3: migrate it with `node open-brain/build/cli.js state migrate --dry-run .agents/state.json`, read the changes, then run it without --dry-run.
+  record-erasure [pass]: 0 erasures since schema v3; walked 835 commits, 223 .agents/state.json changes (0 at schema v3+); 44 erasure(s) in schema <3 history, which allowed them and cannot be repaired — listed by `open-brain state erasures`, failing nothing. LIMIT: reads HEAD's committed history only — an uncommitted edit is not seen
+  ci-status [warn]: master 36a33bc conclusion: failure
+  merge-markers [pass]: 0 conflict markers in 642 tracked text files
+  greeting-size [skip]: skipped — no valid .agents/state.json, so ob_start returns the prose fallback, which this check does not measure
+
+Summary: 23 passed, 0 fixed, 3 warnings, 2 issues, 4 skipped
