@@ -1216,14 +1216,14 @@ interface FileListing {
  * thing are now read; the rest (`.diff`, `.out`, `.txt` evidence, dotfiles) is
  * excluded by extension and counted in the output.
  */
-const SCANNED_EXT = /\.(md|ts|mts|cts|mjs|cjs|js|json|sh|ps1|yml|yaml|toml)$/;
+const SCANNED_EXT = /\.(md|ts|mts|cts|mjs|cjs|js|json|sh|ps1)$/;
 
 function listScannableFiles(root: string): FileListing {
   let why: string;
   try {
     const out = execSync("git ls-files -z", { cwd: root, encoding: "buffer", stdio: ["ignore", "pipe", "ignore"] });
     const files = out.toString("utf8").split("\0").filter(Boolean);
-    if (files.length > 0) return { files, source: "git", label: "listed by git ls-files", unreadable: [] };
+    return { files, source: "git", label: "listed by git ls-files", unreadable: [] };
     why = "git ls-files listed nothing";
   } catch {
     why = "git ls-files failed — not a git repo, or git unavailable";
