@@ -160,7 +160,7 @@ describe("ci-status (Loop 4 R4)", () => {
   it("warns on failure naming the sha, and on a pending run", () => {
     const failed = checkCiStatus(root, runner({ ok: true, stdout: JSON.stringify([{ conclusion: "failure", headSha: "deadbeefcafe", status: "completed" }]) }));
     expect(failed.severity).toBe("warn");
-    expect(failed.message).toBe("master deadbee conclusion: failure");
+    expect(failed.message).toBe("master deadbee conclusion: failure (steps not read: no databaseId)");
     const pending = checkCiStatus(root, runner({ ok: true, stdout: JSON.stringify([{ conclusion: "", headSha: "0123456789", status: "in_progress" }]) }));
     expect(pending.severity).toBe("warn");
     expect(pending.message).toBe("master 0123456 conclusion: pending (in_progress)");
