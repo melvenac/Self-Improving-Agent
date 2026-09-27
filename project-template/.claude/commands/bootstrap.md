@@ -25,6 +25,8 @@ It reports git, `CLAUDE.md` and `.agents/`, and ends with a `Next:` line. Act on
 | `.agents/` says | Do this |
 |---|---|
 | `BOOTSTRAPPED` | Stop. Tell the owner: "This project is already on SIA. Run `/start`." |
+| `NOT A RECORD` | A `state.json` that is not a record (empty, not JSON, or an old template's placeholder). Show the owner `Next:`. If it is left over, step 2.1 moves it aside. |
+| `SCAFFOLDED` | A bootstrap that stopped after step 3. Go on at step 4. |
 | `PRE-STATE` | Not a fresh install: the project already has `.agents/TASKS/`. Skip to step 6 (the import). |
 | `RESIDUE — …` | Old files with no record. Step 2 moves them aside. |
 | `absent` or `empty` | Go on. |
@@ -54,6 +56,13 @@ comes next.
    ```
    git add -A -- . ":(exclude).agents"
    git commit -m "The project before SIA"
+   ```
+
+   **An empty folder** has nothing to commit, and `git commit` stops with `nothing to commit`. Make
+   the commit empty instead (`check` says so too):
+
+   ```
+   git commit --allow-empty -m "The project before SIA"
    ```
 
 3. **No commit yet, or uncommitted changes:** ask the owner to commit them the same way (or commit
@@ -129,8 +138,8 @@ Edit the scaffolded files **in place**, and keep their structure:
   `## 🟢 P3 — Low`): tasks are read only under a P0–P3 heading. Each task is one line, `- [ ] Title`.
 - **`.agents/TASKS/task.md`:** replace the objective under `## Current Objective` with the owner's
   first goal.
-- **`.agents/SYSTEM/SUMMARY.md`:** set the title to the project's name and the status to
-  "Just bootstrapped".
+- **`.agents/SYSTEM/SUMMARY.md`:** set the title to the project's name. Leave the status line: step 7
+  replaces it with one rendered from the record.
 
 Show the owner the three files.
 
@@ -141,11 +150,14 @@ OB state import --draft
 ```
 
 It writes nothing but a draft and a report (`.agents/state.draft.json`,
-`.agents/state.import-report.md`). Check the summary:
+`.agents/state.import-report.md`), in this folder's `.agents/` and never a parent's. The project
+needs no `package.json`: without one, the project's name is the folder's name, and the draft says
+so. Check the summary:
 
 - `Validates: yes`.
 - `Tasks:` is the number of tasks you wrote. If it says **`WARNING: … 0 tasks were parsed`**, a heading
-  is wrong. Fix it and re-run the draft.
+  is wrong. If it says **`WARNING: … is the template's, unchanged`**, step 5 was skipped. Fix either
+  and re-run the draft.
 
 Show the owner the summary lines.
 

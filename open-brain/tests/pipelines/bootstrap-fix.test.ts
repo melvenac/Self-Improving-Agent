@@ -342,8 +342,11 @@ describe("BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git proje
     const d = cli(["state", "import", "--draft", dir], dir);
     expect(d.status).toBe(0);
     expect(d.stdout).toMatch(/^Validates: yes/m);
-    expect(d.stdout).not.toMatch(/WARNING/);
+    expect(d.stdout).not.toMatch(/0 tasks were parsed/);
     expect(d.stdout).not.toMatch(/^Tasks: 0 /m);
+    // Round 3 (R-BF-10): this INBOX is the template's, unedited, so the draft now says so.
+    // It was `not.toMatch(/WARNING/)` when the only warning was the 0-task one above.
+    expect(d.stdout).toMatch(/WARNING: .*is the template's, unchanged/);
 
     // (b): --commit gives a schema v3 record with no SIA history (T-175).
     const c = cli(["state", "import", "--commit", dir], dir);

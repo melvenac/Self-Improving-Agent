@@ -64,9 +64,10 @@ export type RoleName = (typeof ROLE_NAMES)[number];
  * the closed set and had no role file — an accident that read as a seat.
  *
  * `none` is a READ-side value only. It never enters the record: `set_handoff`
- * takes `SeatName` (end_session did too until schema v3 retired it), so a write
- * attempted from such a checkout is refused by the schema rather than by a
- * separate rule that could drift from it.
+ * takes `SeatName`, so the seat a handoff is filed under is named in the op
+ * itself. A write from such a checkout is NOT refused: it is applied with the
+ * checkout's seat null (bootstrap-fix BF-5; QA 135 applied one). This comment
+ * used to say the schema refuses it, which was false.
  */
 export const NOT_A_SEAT = "none";
 

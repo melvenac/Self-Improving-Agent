@@ -326,7 +326,7 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   // taken literally, never walked up: a fresh project may not be a repository
   // yet, and walking up could land in a PARENT project and scaffold that.
   const sub = args[1];
-  const { inspectProject, moveResidue, scaffold } = await import("./pipelines/bootstrap/index.js");
+  const { inspectProject, moveResidue, scaffold, ResidueReadBackError } = await import("./pipelines/bootstrap/index.js");
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   if (sub === "check") {
@@ -339,7 +339,11 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
     console.log(`git:       ${g.kind === "none" ? "NOT a repository" : g.kind === "nested" ? `inside another repository at ${g.toplevel}` : `repository root; ${g.commits ? "has commits" : "NO commit yet"}; ${g.dirty.length} uncommitted change(s)`}`);
     console.log(`CLAUDE.md: ${r.claudeMd === "absent" ? "absent" : r.claudeMd === "present" ? "present, without the SIA section" : "present, with the SIA section"}`);
     const a = r.agents;
-    console.log(`.agents/:  ${a.kind === "residue" ? `RESIDUE — ${a.entries.join(", ")} (no state.json, no TASKS/)` : a.kind === "pre-state" ? "PRE-STATE — TASKS/ with no state.json (the import path)" : a.kind === "bootstrapped" ? "BOOTSTRAPPED — state.json exists" : a.kind}`);
+    console.log(`.agents/:  ${a.kind === "residue" ? `RESIDUE — ${a.entries.join(", ")} (no state.json, no TASKS/)`
+      : a.kind === "pre-state" ? "PRE-STATE — TASKS/ with no state.json (the import path)"
+      : a.kind === "scaffolded" ? `SCAFFOLDED — not yet imported${a.inboxIsTemplate ? "; INBOX.md is still the template's" : ""}`
+      : a.kind === "not-a-record" ? `NOT A RECORD — state.json is ${a.why}`
+      : a.kind === "bootstrapped" ? "BOOTSTRAPPED — state.json is a record" : a.kind}`);
     console.log(`Next:      ${r.next}`);
     process.exit(0);
   } else if (sub === "move-residue") {
@@ -352,7 +356,10 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
       console.log(`It is local (the template gitignore ignores .agents/archive/). Delete it yourself once you have looked.`);
       process.exit(0);
     } catch (err) {
-      console.error(`bootstrap move-residue refused: ${err instanceof Error ? err.message : String(err)}`);
+      // A read-back mismatch comes AFTER the move: saying "refused" there was false (R-BF-12).
+      console.error(err instanceof ResidueReadBackError
+        ? `bootstrap move-residue — MOVED, but ${err.message}`
+        : `bootstrap move-residue refused: ${err instanceof Error ? err.message : String(err)}`);
       process.exit(1);
     }
   } else if (sub === "scaffold") {
@@ -561,10 +568,14 @@ Read-only. Change state through ob_state — never by editing the file.`);
     console.error(`state import refused: ${ACCEPT_STALE_FLAG} applies only to --commit. Nothing written.`);
     process.exit(1);
   }
-  const startDir = resolve(positionals[0] ?? ".");
-  const projectRoot = resolveRepoRoot(startDir);
-  if (!projectRoot) {
-    console.error(`state import refused: ${describeNoRoot(startDir)}`);
+  // R-BF-9 (QA 135 D1, D2): the directory is taken literally, as `bootstrap
+  // check` takes it. The import is the one command that writes a record, and a
+  // walk up from a project with no package.json drafted — and would have
+  // committed — a PARENT project's record. No package.json is needed: the
+  // project name falls back to the folder's, and the draft says so.
+  const projectRoot = resolve(positionals[0] ?? ".");
+  if (!(existsSync(resolve(projectRoot, ".agents")) && statSync(resolve(projectRoot, ".agents")).isDirectory())) {
+    console.error(`state import refused: ${projectRoot} has no .agents/ directory. The import reads THIS directory's .agents/ and never walks up into a parent, whose record is not this project's. Run it from the project root, or pass the project directory. Nothing written.`);
     process.exit(1);
   }
   // Local calendar date, not UTC: an evening run must not stamp tomorrow.
@@ -576,6 +587,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
       const rep = r.draft.report;
       console.log(`\nstate import — draft (nothing else changed)\n`);
       console.log(`Root: ${projectRoot}`);
+      console.log(`Project: ${rep.project.name}${rep.project.name_from === "folder" ? " — the folder's name: there is no package.json name, and none is needed" : ""}`);
       console.log(`Draft:  ${DRAFT_REL}`);
       console.log(`Report: ${REPORT_REL}`);
       console.log(`Validates: ${r.validation.ok ? "yes" : `NO — ${r.validation.error}`}`);

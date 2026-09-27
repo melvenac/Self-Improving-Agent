@@ -31,8 +31,9 @@ export function defaultTemplateDir(): string {
 // ---------------------------------------------------------------------------
 
 export type GitState =
-  | { kind: "none" }
-  | { kind: "root"; commits: boolean; dirty: string[] }
+  /** `empty`: nothing outside .agents/ to commit, so the before-SIA commit must be --allow-empty (R-BF-13). */
+  | { kind: "none"; empty: boolean }
+  | { kind: "root"; commits: boolean; dirty: string[]; empty: boolean }
   | { kind: "nested"; toplevel: string };
 
 export type AgentsState =
@@ -40,6 +41,10 @@ export type AgentsState =
   | { kind: "empty" }
   | { kind: "residue"; entries: string[] }
   | { kind: "pre-state" }
+  /** Scaffold's files, no record yet (R-BF-10). `inboxIsTemplate`: step 5 has not replaced the example tasks. */
+  | { kind: "scaffolded"; inboxIsTemplate: boolean }
+  /** A state.json that is not a record (R-BF-11): zero bytes, not JSON, or the old template's {{PROJECT}} seed. */
+  | { kind: "not-a-record"; why: string }
   | { kind: "bootstrapped" };
 
 export type ClaudeMdState = "absent" | "present" | "has-sia-section";
@@ -61,24 +66,27 @@ export function inspectProject(projectRoot: string, templateDir = defaultTemplat
   const root = resolve(projectRoot);
   const git = gitState(root);
   const claudeMd = claudeMdState(root);
-  const agents = agentsState(root);
+  const agents = agentsState(root, templateDir);
   const templateFound = existsSync(join(templateDir, ".agents"));
   return { root, template: templateDir, templateFound, git, claudeMd, agents, next: nextStep(git, agents, templateFound) };
 }
 
 function gitState(root: string): GitState {
   const top = git(root, ["rev-parse", "--show-toplevel"]);
-  if (top === null) return { kind: "none" };
+  if (top === null) return { kind: "none", empty: readdirSync(root).every((n) => n === ".agents" || n === ".git") };
   if (samePath(top, root)) {
     const commits = git(root, ["rev-parse", "--verify", "-q", "HEAD"]) !== null;
-    // Per file, so the residue move-residue set aside is seen as itself rather than
-    // as `?? .agents/`: it is local by design and not a change for the owner to commit.
+    // Per file, so an untracked .agents/archive/ (the residue move-residue set aside,
+    // or an older archive) is seen as itself rather than as `?? .agents/`: it is
+    // local by design and not a change for the owner to commit.
     // Not trimmed: porcelain's status is column-sensitive, and a trim eats the
     // first line's leading space (` D path` would read as `D path`).
     const porcelain = gitRaw(root, ["status", "--porcelain", "--untracked-files=all"]) ?? "";
     const dirty = porcelain.split("\n").filter(Boolean)
-      .filter((l) => !(l.startsWith("?? ") && l.slice(3).replace(/^"|"$/g, "").startsWith(`.agents/archive/${RESIDUE_PREFIX}`)));
-    return { kind: "root", commits, dirty };
+      .filter((l) => !(l.startsWith("?? ") && l.slice(3).replace(/^"|"$/g, "").startsWith(".agents/archive/")));
+    // Nothing but .agents/ to commit: an empty project, whose first commit has to be --allow-empty.
+    const empty = !commits && dirty.every((l) => l.slice(3).replace(/^"|"$/g, "").startsWith(".agents/"));
+    return { kind: "root", commits, dirty, empty };
   }
   return { kind: "nested", toplevel: top };
 }
@@ -95,36 +103,82 @@ function claudeMdState(root: string): ClaudeMdState {
  * bootstrapped. A record means bootstrapped; prose `TASKS/` means an existing
  * project on the pre-record framework, which goes the IMPORT path; anything
  * else is residue — named here, moved aside by `moveResidue`, never deleted.
+ *
+ * Round 3: a record is one that PARSES and is not the old template's seed
+ * (R-BF-11); and scaffold's own `AGENT.md` marks a scaffold that has not been
+ * imported yet, which goes on at step 4, not the import (R-BF-10) — a resumed
+ * bootstrap used to skip steps 4 and 5 and import the template's example tasks.
  */
-function agentsState(root: string): AgentsState {
+function agentsState(root: string, templateDir = defaultTemplateDir()): AgentsState {
   const agents = join(root, ".agents");
   if (!existsSync(agents)) return { kind: "absent" };
-  if (existsSync(join(agents, "state.json"))) return { kind: "bootstrapped" };
+  const statePath = join(agents, "state.json");
+  if (existsSync(statePath)) {
+    const why = notARecord(statePath);
+    return why === null ? { kind: "bootstrapped" } : { kind: "not-a-record", why };
+  }
+  if (isScaffoldAgentMd(join(agents, "AGENT.md"))) {
+    return { kind: "scaffolded", inboxIsTemplate: sameText(join(agents, "TASKS", "INBOX.md"), join(templateDir, ".agents", "TASKS", "INBOX.md")) };
+  }
   if (existsSync(join(agents, "TASKS"))) return { kind: "pre-state" };
+  // `archive/` is never residue: it is where things are set aside, the template
+  // gitignore keeps it local, and nothing reads it as state. Counting it moved
+  // an earlier residue folder INTO the next one (QA 135 D5).
   const entries = readdirSync(agents)
-    .filter((n) => !(n === "archive" && onlyMovedResidue(join(agents, n))))
+    .filter((n) => !(n === "archive" && statSync(join(agents, n)).isDirectory()))
     .map((n) => (statSync(join(agents, n)).isDirectory() ? `${n}/` : n))
     .sort();
   return entries.length === 0 ? { kind: "empty" } : { kind: "residue", entries };
 }
 
-/** An archive/ holding nothing but what `moveResidue` put there is not residue — it is where residue went. */
-function onlyMovedResidue(archive: string): boolean {
-  if (!statSync(archive).isDirectory()) return false;
-  const names = readdirSync(archive);
-  return names.length > 0 && names.every((n) => n.startsWith(RESIDUE_PREFIX));
+/** Null when the file is a record; otherwise why not. Parsing is the test, not the schema: an older schema is still a record, and migrating it is not bootstrap's job. */
+function notARecord(path: string): string | null {
+  const text = readFileSync(path, "utf8");
+  if (text.trim() === "") return text.length === 0 ? "zero bytes" : "only whitespace";
+  let data: unknown;
+  try { data = JSON.parse(text); } catch (err) { return `not JSON (${(err as Error).message})`; }
+  const name = (data as { project?: { name?: unknown } } | null)?.project?.name;
+  if (typeof name === "string" && name.includes("{{")) return `the old template's placeholder seed (project "${name}")`;
+  return null;
+}
+
+/** The line scaffold writes into `.agents/AGENT.md`, and the one `check` reads to tell a scaffold from a pre-record project. */
+export const SCAFFOLD_SIGNATURE = "Written by `open-brain bootstrap scaffold`.";
+
+function isScaffoldAgentMd(path: string): boolean {
+  return existsSync(path) && statSync(path).isFile() && readFileSync(path, "utf8").includes(SCAFFOLD_SIGNATURE);
+}
+
+/** Line ends aside: a checkout under core.autocrlf holds the same text. */
+function sameText(a: string, b: string): boolean {
+  if (!existsSync(a) || !existsSync(b)) return false;
+  return readFileSync(a, "utf8").replace(/\r\n/g, "\n") === readFileSync(b, "utf8").replace(/\r\n/g, "\n");
 }
 
 function nextStep(g: GitState, a: AgentsState, templateFound: boolean): string {
   if (!templateFound) return "STOP: project-template/ was not found beside this open-brain install — the install is incomplete.";
   if (a.kind === "bootstrapped") return "Already bootstrapped (.agents/state.json exists). Run /start.";
+  if (a.kind === "not-a-record") return `.agents/state.json is not a record (${a.why}), so this project is NOT bootstrapped. If it is left over, \`bootstrap move-residue\` moves it aside (nothing is deleted); then run check again. If it was this project's record, restore it from git instead (\`git checkout -- .agents/state.json\`).`;
+  if (a.kind === "scaffolded") {
+    return "Scaffolded, not yet imported: continue at step 4 (CLAUDE.md), then step 5, then step 6 (`state import --draft`)." +
+      (a.inboxIsTemplate ? " .agents/TASKS/INBOX.md still holds the template's example tasks: step 5 replaces them with this project's." : "");
+  }
   if (a.kind === "pre-state") return "An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.";
   if (g.kind === "nested") return `STOP: this folder is inside another repository (${g.toplevel}). Bootstrap a project at its own repository root.`;
   // Residue first: moved before the pre-SIA commit, it never enters it.
   if (a.kind === "residue") return "Move the residue aside first (`bootstrap move-residue`), then run check again.";
   const leaveOut = "leaving .agents/ out of that commit (`git add -A -- . \":(exclude).agents\"`)";
-  if (g.kind === "none") return `git init, then commit the project as it stands, ${leaveOut}, before anything is scaffolded.`;
-  if (!g.commits) return `Commit the project as it stands (the repository has no commit yet), ${leaveOut}, before anything is scaffolded.`;
+  const emptyCommit = "`git commit --allow-empty -m \"The project before SIA\"`";
+  if (g.kind === "none") {
+    return g.empty
+      ? `git init, then make the before-SIA commit. The folder has nothing to commit yet, so make it empty: ${emptyCommit}.`
+      : `git init, then commit the project as it stands, ${leaveOut}, before anything is scaffolded.`;
+  }
+  if (!g.commits) {
+    return g.empty
+      ? `The repository has no commit and nothing to commit yet: make the before-SIA commit empty, ${emptyCommit}, before anything is scaffolded.`
+      : `Commit the project as it stands (the repository has no commit yet), ${leaveOut}, before anything is scaffolded.`;
+  }
   // Residue that git already tracked shows, once moved, as deletions under .agents/.
   if (g.dirty.length > 0 && g.dirty.every((l) => /^( D|D ) \.agents\//.test(l))) {
     return "The residue was tracked by git: commit its removal on its own (`git add -u -- .agents`, then `git commit -m \"Move old .agents/ files aside\"`). The files are kept, local, under .agents/archive/.";
@@ -142,40 +196,55 @@ export interface MoveResidueResult { to: string; entries: string[] }
 export const RESIDUE_PREFIX = "pre-bootstrap-residue-";
 
 /**
- * Moves the whole residue `.agents/` to `.agents/archive/pre-bootstrap-residue-<date>/`.
- * Inside `.agents/archive/`, which the template gitignore ignores: kept, named,
- * local, and out of the scaffold's way. Nothing is deleted, and the moved
- * entries are read back before the move is reported.
+ * A move that happened, and whose read-back does not match what was named. It
+ * is NOT a refusal — the files moved — so the CLI must never print it as one
+ * (R-BF-12; QA 135 D5 printed "refused" after moving everything).
  */
-export function moveResidue(projectRoot: string, today: string): MoveResidueResult {
+export class ResidueReadBackError extends Error {}
+
+/**
+ * Moves each residue entry of `.agents/` into a NEW folder,
+ * `.agents/archive/pre-bootstrap-residue-<date>/` (then `-2`, `-3` … when that
+ * exists), inside `.agents/archive/`, which the template gitignore ignores:
+ * kept, named, local, and out of the scaffold's way. Only the named entries
+ * move — never `archive/` itself, so no residue folder lands inside another
+ * (R-BF-12). A `state.json` that is not a record is moved alone (R-BF-11).
+ * Nothing is deleted; a failure part-way moves back what it moved; and every
+ * entry is read back before the move is reported. `rename` is injectable so a
+ * test can make a rename that silently does nothing (QA 135's M13).
+ */
+export function moveResidue(projectRoot: string, today: string, deps: { rename?: (from: string, to: string) => void } = {}): MoveResidueResult {
+  const rename = deps.rename ?? renameSync;
   const root = resolve(projectRoot);
   const a = agentsState(root);
-  if (a.kind !== "residue") throw new Error(`.agents/ is ${a.kind}, not residue — nothing moved`);
+  if (a.kind !== "residue" && a.kind !== "not-a-record") throw new Error(`.agents/ is ${a.kind}, not residue — nothing moved`);
+  const entries = a.kind === "residue" ? a.entries : ["state.json"];
   const agents = join(root, ".agents");
-  const rel = `.agents/archive/${RESIDUE_PREFIX}${today}`;
-  const aside = join(root, `.agents.residue-moving-${process.pid}`);
-  if (existsSync(aside)) throw new Error(`${basename(aside)} already exists — nothing moved`);
-  renameSync(agents, aside);
+  let rel = `.agents/archive/${RESIDUE_PREFIX}${today}`;
+  for (let n = 2; existsSync(join(root, rel)); n++) rel = `.agents/archive/${RESIDUE_PREFIX}${today}-${n}`;
+  const dest = join(root, rel);
+  mkdirSync(dest, { recursive: true });
+  const names = entries.map((e) => e.replace(/\/$/, ""));
+  const moved: string[] = [];
   try {
-    mkdirSync(join(agents, "archive"), { recursive: true });
-    renameSync(aside, join(root, rel));
+    for (const n of names) { rename(join(agents, n), join(dest, n)); moved.push(n); }
   } catch (err) {
-    // Put it back exactly as it was. The only things removed are the two empty
-    // directories this function just made; the refusal names where the residue
-    // is if even that fails.
+    // Put back what moved, then remove the one empty folder this call made; the
+    // refusal names where each entry is if even that fails.
     try {
-      if (existsSync(join(agents, "archive"))) rmdirSync(join(agents, "archive"));
-      if (existsSync(agents)) rmdirSync(agents);
-      renameSync(aside, agents);
+      for (const n of moved.reverse()) renameSync(join(dest, n), join(agents, n));
+      rmdirSync(dest);
     } catch {
-      throw new Error(`residue move failed (${(err as Error).message}) and could not be undone: the residue is at ${aside}`);
+      throw new Error(`residue move failed (${(err as Error).message}) and could not be undone: ${moved.join(", ")} are in ${rel}/, the rest in .agents/`);
     }
-    throw new Error(`residue move failed: ${(err as Error).message} — .agents/ restored, nothing moved`);
+    throw new Error(`residue move failed: ${(err as Error).message} — every entry put back, nothing moved`);
   }
-  const landed = readdirSync(join(root, rel)).map((n) => (statSync(join(root, rel, n)).isDirectory() ? `${n}/` : n)).sort();
-  if (JSON.stringify(landed) !== JSON.stringify(a.entries)) {
-    throw new Error(`residue moved to ${rel} but it holds [${landed.join(", ")}], not [${a.entries.join(", ")}] — check it by hand`);
+  const missing = names.filter((n) => !existsSync(join(dest, n)));
+  const stayed = names.filter((n) => existsSync(join(agents, n)));
+  if (missing.length > 0 || stayed.length > 0) {
+    throw new ResidueReadBackError(`the residue was MOVED to ${rel}/, but the read-back does not match: ${missing.length ? `not in the new folder: ${missing.join(", ")}` : ""}${missing.length && stayed.length ? "; " : ""}${stayed.length ? `still in .agents/: ${stayed.join(", ")}` : ""}. Nothing was deleted. Look at both places by hand before going on`);
   }
+  const landed = readdirSync(dest).map((n) => (statSync(join(dest, n)).isDirectory() ? `${n}/` : n)).sort();
   return { to: rel, entries: landed };
 }
 
@@ -238,6 +307,8 @@ export function scaffold(projectRoot: string, templateDir = defaultTemplateDir()
   const ins = inspectProject(projectRoot, templateDir);
   const root = ins.root;
   if (!ins.templateFound) throw new Error(`project-template/ not found at ${templateDir} — nothing written`);
+  // Before the git checks: a scaffold's own files make the tree dirty, and "commit them first" would be the wrong advice.
+  if (ins.agents.kind === "scaffolded") throw new Error("already scaffolded (.agents/AGENT.md is scaffold's) and not yet imported — continue at step 4. Nothing written");
   if (ins.git.kind !== "root") {
     throw new Error(ins.git.kind === "none"
       ? "not a git repository — run `git init` and commit the project as it stands first, so the pre-SIA project is its own commit. Nothing written"
@@ -247,6 +318,7 @@ export function scaffold(projectRoot: string, templateDir = defaultTemplateDir()
   if (ins.git.dirty.length > 0) throw new Error(`${ins.git.dirty.length} uncommitted change(s) (${ins.git.dirty.slice(0, 5).join("; ")}) — commit them first, so the SIA commit holds only what bootstrap added. Nothing written`);
   if (ins.agents.kind === "residue") throw new Error(`.agents/ holds residue (${ins.agents.entries.join(", ")}) — run \`bootstrap move-residue\` first. Nothing written`);
   if (ins.agents.kind === "bootstrapped") throw new Error("already bootstrapped: .agents/state.json exists. Nothing written");
+  if (ins.agents.kind === "not-a-record") throw new Error(`.agents/state.json is not a record (${ins.agents.why}) — run \`bootstrap check\` and follow its Next line. Nothing written`);
   if (ins.agents.kind === "pre-state") throw new Error(".agents/TASKS/ exists with no state.json — this is the import path (`state import --draft`), not a fresh install. Nothing written");
 
   const written: ScaffoldResult["written"] = [];
@@ -316,7 +388,7 @@ partner:
 
 # ${name} — not a seat
 
-Written by \`open-brain bootstrap scaffold\`. This checkout is **not a seat**: a project
+${SCAFFOLD_SIGNATURE} This checkout is **not a seat**: a project
 bootstrapped with one agent has no planner / developer / QA loop, so there are no seat rules to
 load, and \`/start\` says NOT A SEAT rather than reporting a missing identity.
 

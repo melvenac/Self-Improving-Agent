@@ -17,7 +17,8 @@
  * decide, the item is reported, never guessed silently.
  */
 import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, cpSync, renameSync, statSync, rmSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { basename, join, relative, resolve } from "node:path";
+import { defaultTemplateDir } from "../bootstrap/index.js";
 import {
   StateSchema,
   parseState,
@@ -48,7 +49,8 @@ export interface UnparsedLine { line: number; text: string; reason: string }
 export interface SupersededLink { from: string; from_line: number; to: string; to_line: number }
 
 export interface ImportReport {
-  project: { name: string; version: string };
+  /** `name_from: "folder"` when there is no package.json name (R-BF-9): the draft says so. */
+  project: { name: string; version: string; name_from: "package.json" | "folder" };
   current_session: number;
   migration_date: string;
   staleness: StalenessReport;
@@ -64,6 +66,8 @@ export interface ImportReport {
     sessions: { parsed: number; inferred_open_as_current: number; inferred_done_as_retention_edge: number };
     title_fallbacks: Array<{ line: number; title: string }>;
     retention_eligible_done: number;
+    /** R-BF-10: INBOX.md is the template's own, line ends aside — its tasks are placeholders. */
+    template_copy: boolean;
   };
   objective: { found: boolean; preview: string };
   decisions: {
@@ -280,6 +284,10 @@ export function retentionEdge(current: number): number {
  * there is no INBOX, or when at least one task parsed.
  */
 export function inboxWarning(r: ImportReport): string | null {
+  if (r.inbox.template_copy) {
+    return `WARNING: ${r.sources.inbox?.path ?? "INBOX.md"} is the template's, unchanged: its ${r.inbox.items} task(s) are placeholders ("Write the PRD" and the rest), not this project's. ` +
+      "Replace them with this project's tasks (bootstrap.md step 5), then re-run --draft.";
+  }
   const src = r.sources.inbox;
   if (!src?.present || r.inbox.items > 0) return null;
   const skipped = r.inbox.unparsed.length;
@@ -612,7 +620,7 @@ function lineCount(text: string | null): number {
   return text ? text.split(/\r?\n/).length : 0;
 }
 
-export function buildImportDraft(projectRoot: string, today: string): ImportDraft {
+export function buildImportDraft(projectRoot: string, today: string, templateDir = defaultTemplateDir()): ImportDraft {
   const root = resolve(projectRoot);
   const pkg = readJson<{ name?: string; version?: string }>(join(root, "package.json"));
   const { paths, texts, undecodable, readAs } = readInputs(root);
@@ -621,7 +629,9 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
   const current = last.n;
 
   const report: ImportReport = {
-    project: { name: pkg?.name ?? "unknown", version: pkg?.version ?? "0.0.0" },
+    project: pkg?.name
+      ? { name: pkg.name, version: pkg.version ?? "0.0.0", name_from: "package.json" }
+      : { name: basename(root), version: pkg?.version ?? "0.0.0", name_from: "folder" },
     current_session: current,
     migration_date: today,
     staleness: detectStaleness(texts, last, undecodable, readAs),
@@ -637,6 +647,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
       sessions: { parsed: 0, inferred_open_as_current: 0, inferred_done_as_retention_edge: 0 },
       title_fallbacks: [],
       retention_eligible_done: 0,
+      template_copy: isTemplateInbox(texts.inbox, templateDir),
     },
     objective: { found: false, preview: "" },
     decisions: { imported: 0, date_from_line: 0, date_partial: [], date_unknown: 0, skipped: [] },
@@ -673,6 +684,13 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
     sessions: [{ n: last.n, date: last.date, uuid: last.uuid, seat: null, checkout: null, first_rev: null }],
   };
   return { state, report };
+}
+
+/** Line ends aside: autocrlf may have rewritten a checkout of the same bytes. */
+function isTemplateInbox(text: string | null, templateDir: string): boolean {
+  if (text === null) return false;
+  const tmpl = readText(join(templateDir, INPUT_REL.inbox));
+  return tmpl !== null && tmpl.text.replace(/\r\n/g, "\n") === text.replace(/\r\n/g, "\n");
 }
 
 // ---------------------------------------------------------------------------
@@ -741,6 +759,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   const L: string[] = [];
   L.push(`# state.json import report — ${mode} (${r.migration_date})`, "");
   L.push(...renderStaleness(r.staleness), "");
+  if (r.project.name_from === "folder") L.push(`Project name: \`${r.project.name}\` is the folder's name: there is no package.json name. It can be changed later; nothing else depends on package.json.`, "");
   L.push(`Project: ${r.project.name} v${r.project.version} · current session ${r.current_session} (from ${r.last_session.file}) · retention: every imported done item (closed before the record existed, closed_rev null) is dropped once ${DONE_RETENTION_SESSIONS} sessions have written to the record, unless its id is cited in the tracked tree`, "");
   L.push("## Sources", "");
   for (const [k, s] of Object.entries(r.sources)) L.push(`- ${k}: \`${s.path}\` — ${s.present ? `${s.lines} lines` : "ABSENT"}`);
