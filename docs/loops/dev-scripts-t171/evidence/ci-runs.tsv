@@ -1,0 +1,19 @@
+loop/t171-m-import-owned	3078773	36281654627	tcm-2	failure	46 failed | 1279 passed | 2 skipped (1327)	62	0
+loop/t171-m-migrate-owned	b06b335	36281651066	tcm-1	failure	2 failed | 1285 passed | 8 skipped (1295)	2	0
+loop/t171-m-both-fields	373b667	36281647526	tcm-1	failure	1 failed | 1324 passed | 2 skipped (1327)	2	0
+loop/t171-m-open-unkeyed	a4e0dda	36281644086	tcm-2	failure	2 failed | 1323 passed | 2 skipped (1327)	4	0
+loop/t171-m-append-unkeyed	c6b6f17	36281640809	tcm-1	failure	1 failed | 1324 passed | 2 skipped (1327)	2	0
+loop/t171-m-replace-keeps-authors	6fa57e9	36281637239	tcm-2	failure	3 failed | 1322 passed | 2 skipped (1327)	6	0
+loop/t171-m-note-by-invariant-off	518351c	36281633094	tcm-2	failure	1 failed | 1324 passed | 2 skipped (1327)	2	0
+loop/t171-m-unregistered-is-mine	8eec8b0	36281628445	tcm-2	failure	1 failed | 1324 passed | 2 skipped (1327)	2	0
+loop/t171-m-legacy-is-mine	2402131	36281623806	tcm-1	failure	2 failed | 1323 passed | 2 skipped (1327)	4	0
+loop/t171-m-foreign-allowed	372197a	36281619067	tcm-1	failure	4 failed | 1321 passed | 2 skipped (1327)	8	0
+loop/t171-m-server-silent	a1659fb	36281614558	tcm-2	failure	1 failed | 1324 passed | 2 skipped (1327)	2	0
+loop/t171-m-dry-run-silent	31b6116	36281609856	tcm-2	failure	3 failed | 1322 passed | 2 skipped (1327)	6	0
+loop/t171-m-replace-sizes-wrong	592b7ef	36281605662	tcm-1	failure	4 failed | 1321 passed | 2 skipped (1327)	8	0
+loop/t171-m-replace-no-first-line	676677d	36281601736	tcm-1	failure	2 failed | 1323 passed | 2 skipped (1327)	4	0
+loop/t171-m-append-unreported	99903ab	36281598398	tcm-1	failure	4 failed | 1321 passed | 2 skipped (1327)	8	0
+loop/t171-m-bare-note-close	20165a3	36281595338	tcm-2	failure	1 failed | 1324 passed | 2 skipped (1327)	2	0
+loop/t171-m-bare-note-update	018ebdf	36281592035	tcm-1	failure	1 failed | 1324 passed | 2 skipped (1327)	2	0
+loop/t171	b371176	36281579531	tcm-2	success	1325 passed | 2 skipped (1327)	0	0
+loop/t171-redcheck	bc34347	36280808413	tcm-1	failure	14 failed | 1308 passed | 2 skipped (1324)	28	0
