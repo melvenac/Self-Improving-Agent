@@ -161,8 +161,10 @@ export function scorePipelineHealth(input: PipelineHealthInput): CategoryScore {
     invocationLog = "missing";
   } else if (lastHookRun === "corrupt" || lastHookRun.startsWith("corrupt:")) {
     invocationLog = "corrupt";
+    hookRecency = 4;
   } else if (lastHookRun === "unreadable" || lastHookRun.startsWith("unreadable")) {
     invocationLog = "unreadable";
+    hookRecency = 4;
   } else {
     invocationLog = "ran";
     const age = now - new Date(lastHookRun).getTime();
