@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 135 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 136 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -91,4 +91,4 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 
 ## Last session
 
-Session 146 — 2026-09-27 — planner [sia-planner] — `cd5e385d-865d-498e-bb8c-53ff4eee82ad` (2 writing session(s) in the record)
+Session 147 — 2026-09-27 — planner [sia-planner] — `4ed2836c-1dd1-43e5-8a06-c829d50548f3` (3 writing session(s) in the record)
