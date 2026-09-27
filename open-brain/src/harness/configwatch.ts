@@ -376,7 +376,7 @@ function repositoryResolutionDiff(floor: string, file: string, base: ResolutionC
 
 export interface ConfigChange {
   path: string;
-  kind: "created" | "deleted" | "modified";
+  kind: "created" | "deleted" | "modified" | "unobservable";
   before: string;
   after: string;
 }
@@ -824,15 +824,19 @@ export class ConfigWatch {
         a = this.readForCompare(path, b, chains);
         if (!changed(b, a)) continue;
         // R90. Absent at the open, and lstat failed at the close: that is not a created file.
-        // The record is absent → unobservable (<code>). Nothing is removed, and the note does not say one was.
+        // R95. The path was not put back, so it is unrestored and R77 stops before git.
+        // R96. The stored kind is unobservable. The note says what is true: absent, lstat failed, not removed.
         if (b === null && a !== null && a.readError && a.dev === null) {
           const code = a.readErrno ?? "UNKNOWN";
+          const leftInPlace =
+            `${path} (absent at the open; cannot be lstat'd at close (${code}); not removed)`;
           changes.push({
             path,
-            kind: "modified",
+            kind: "unobservable",
             before: "absent",
             after: `unobservable (${code}); ${stateHash(a)}`,
           });
+          unrestored.push(leftInPlace);
           continue;
         }
         changes.push({
