@@ -2,7 +2,7 @@
 
 **By:** Forge (developer), record session **181**. This Cursor seat had no `SESSION_UUID`, so `ob_set_session` was not bound.
 **Model / effort:** Grok 4.7, in Cursor. This transcript has no Claude Code per-entry `effort` field, so none is reported.
-**Candidate (181b):** `loop/t192-ci-tcm` at **`029b4a4`**, after `53d3638` (the runs-on and never-started fix), from `origin/master` `7243fd5`.
+**Candidate (D-055):** `loop/t192-ci-tcm` at **`a38ff92`**, after `029b4a4` (181b) and `53d3638` (runs-on and never-started), from `origin/master` `7243fd5`.
 **Brief:** `docs/loops/session-147-dispatches.md` on `origin/docs/session-100-qa99-dispatch` (`418e75a`), section Record 181.
 **No `/end`.** The live `.agents/state.json` was not written.
 
@@ -40,6 +40,18 @@ The Loop 4 failure row had no `databaseId`, so its expected message is now the `
 | Red | `aa19498` | 36307585948 | **failure.** 3 failed (view error, unparseable list, no `databaseId`). 1429 passed, 2 skipped (1434). `test-windows` skipped. |
 | Green | `029b4a4` | 36307618596 | **success.** **1432 passed, 2 skipped** (1434). `test-windows` skipped. |
 | Mutant: silent fall-through restored | `loop/t192-ci-tcm-mut-unread` `6363edd` | 36307665393 | **failure.** The three rows, and the Loop 4 row that now expects `no databaseId`. 4 failed, 1428 passed, 2 skipped. The zero-step row stayed green. `test-windows` skipped. |
+
+## D-055 — a docs-only pull request does not start CI
+
+Aaron's ruling: a docs-only PR merges with no CI run. `pull_request` now has `paths-ignore: [docs/**, README.md]`. `push` and `workflow_dispatch` have no paths filter. A PR that also touches anything else, including `.agents/state.json`, still runs, because that path is not ignored.
+
+No branch protection exists on this plan. The GitHub API 403s, so there is no required check that can hang a docs-only PR waiting for a run that will not start.
+
+| | SHA | tcm run | Result |
+|---|---|---|---|
+| Red | `dc2dc94` | 36308121998 | **failure.** The D-055 row only (`paths-ignore` absent). 1 failed, 1432 passed, 2 skipped (1435). `test-windows` skipped. |
+| Green | `a38ff92` | 36308198672 | **success.** **1433 passed, 2 skipped** (1435). `test-windows` skipped. |
+| Mutant: `.agents/**` also ignored | `loop/t192-ci-tcm-mut-paths` `5660a00` | 36308231327 | **failure.** The D-055 row only. 1 failed, 1432 passed, 2 skipped. `test-windows` skipped. |
 
 ## What is not shown
 
