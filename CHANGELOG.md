@@ -1,5 +1,64 @@
 # Changelog
 
+## [0.45.0] - Unreleased — `/bootstrap` produces a working SIA project
+
+Brief: `docs/loops/bootstrap-fix-brief.md` (planner, record session 109). Acceptance list: frogger's pilot report
+`docs/loops/t181-frogger-pilot-report.md` (F1–F15), as rows BF-1..BF-8. Stacked on the T-179 merge candidate. There is
+no version bump in these commits, because the release is Aaron's (D-019).
+
+### Added
+
+- **`open-brain bootstrap check | move-residue | scaffold`**, the deterministic half of `/bootstrap`.
+  - `check` is read-only. It reports git (none, repository root, or nested), `CLAUDE.md` (absent, present, or with
+    the SIA section) and `.agents/` (absent, empty, RESIDUE, PRE-STATE or BOOTSTRAPPED), and names the next step.
+  - `move-residue` moves a leftover `.agents/` with no record and no `TASKS/` to
+    `.agents/archive/pre-bootstrap-residue-<date>/`, reads the moved entries back, and deletes nothing (BF-3, F5).
+  - `scaffold` copies the fresh-install files byte for byte from `project-template/` and never overwrites a file.
+    It merges the template's `gitignore` and `gitattributes`, then checks with `git check-ignore` and
+    `git check-attr` that each file is tracked or local as it says, including the files the import will write
+    (BF-4, BF-6, F3, F6).
+  - `scaffold` refuses when the project is not its own repository root with a clean commit, so the pre-SIA project
+    is always its own commit (F7).
+- **`project-template/gitattributes`** (`/.agents/** text eol=lf`), merged by scaffold (BF-7, F10).
+
+### Changed
+
+- **`/bootstrap` (`project-template/.claude/commands/bootstrap.md`) is rewritten.** It carries no file content, and
+  every file comes from the template through `scaffold`. It adds the import step: `--draft` is shown to the owner,
+  and the owner runs `--commit` (G-007) (BF-2, F2). An existing `CLAUDE.md` gets an offer to append a short SIA
+  section, never a skip or an overwrite (BF-3). The command source is `project-template/.claude/commands/`, and the
+  commands are always installed in the project; the global-commands skip is gone (F4).
+- **A fresh install is not a seat (BF-5, F8).** Scaffold writes `.agents/AGENT.md` with `role: none`, and the
+  template gitignore tracks it. `/start` no longer reports `ROLE FILE MISSING` for `shared.md` in a checkout that
+  declares it is not a seat.
+- **The `ob_start` header prints the record's project name**: `Project: frogger v0.0.1`, not `Project: v0.0.1`
+  (BF-8, F12).
+  The CLI's `open-brain start` printed the same line and is fixed the same way.
+- **Residue before the first commit.** `/bootstrap` moves residue aside BEFORE the pre-SIA commit, and that commit
+  leaves `.agents/` out. Scaffold's dirty check ignores what `move-residue` set aside, and `check` names the
+  removal commit when git already tracked the residue. The acceptance run found this: in the first order written,
+  the residue went into the pre-SIA commit.
+- **Scaffold before `CLAUDE.md`.** Changing or writing `CLAUDE.md` makes the tree dirty, and scaffold refuses a dirty
+  tree, so the `CLAUDE.md` step now follows scaffold. Its change belongs in the SIA commit. The acceptance run found
+  this too. A test now reads `bootstrap.md` top to bottom and asserts that every act comes after the one it depends
+  on. It is shown red on both earlier orders.
+
+### Removed
+
+- **`project-template/.agents/state.json`**, the `{{PROJECT}}` seed. `state import` is the only thing that writes a
+  record, and it refuses when one exists; nothing ever substituted the placeholder (BF-2, F2).
+
+### Fixed
+
+- **`state import` read none of the template INBOX's tasks.** `## 🔴 P0 — Critical` did not match `^## (P[0-3])`,
+  so a project scaffolded or copied from the template imported 0 tasks. A symbol run may now precede the priority
+  (BF-1).
+- **An INBOX that yields 0 tasks is loud.** `--draft`'s `Tasks:` line and the report now carry a `WARNING` naming the
+  file, instead of `Validates: yes` alone (BF-1, F1).
+- **At session 0, a done item with no `(Session N)` marker made the draft invalid.** Its `closed_session` was -3,
+  and the schema's session numbers are non-negative. It is now floored at 0, and the report no longer prints a
+  negative retention edge (BF-8, F9).
+
 ## Unreleased (T-003) — a server knows its own session
 
 Brief: `docs/loops/t003-session-identity-brief.md` (planner, record session 109). Measurements and rulings:

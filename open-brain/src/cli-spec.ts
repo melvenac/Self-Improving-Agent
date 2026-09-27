@@ -56,4 +56,22 @@ export const COMMAND_SPECS = {
     values: { "--seat": "space", "--last-session-seat": "space" },
     positionals: "any",
   },
+  bootstrapCheck: {
+    name: "bootstrap check",
+    booleans: ["--json"],
+    values: {},
+    positionals: "directory",
+  },
+  bootstrapMoveResidue: {
+    name: "bootstrap move-residue",
+    booleans: [],
+    values: {},
+    positionals: "directory",
+  },
+  bootstrapScaffold: {
+    name: "bootstrap scaffold",
+    booleans: ["--json"],
+    values: {},
+    positionals: "directory",
+  },
 } as const satisfies Record<string, CommandSpec>;

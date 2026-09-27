@@ -1,178 +1,208 @@
-# /bootstrap — Project Bootstrap
+# /bootstrap — Put a project on SIA
 
-> **One command to go from empty folder to AI-ready project.** Combines `/init`-style CLAUDE.md generation with `.agents/` framework scaffolding.
+> **One command, from an existing folder to a project `/start` can read.** The file copying and
+> the checks are done by `open-brain bootstrap`, so they happen the same way every time. This file
+> is the order and the owner's decisions. Follow it step by step and do not improvise file content:
+> **every file comes from `project-template/`, through step 3.**
 
-## What This Does
+## Step 0: Find the SIA install
 
-1. Generates a project-aware `CLAUDE.md` (like `/init`)
-2. Scaffolds the `.agents/` framework for task tracking and session management
-3. Initializes git if needed
-4. Gets you productive in under 60 seconds
+SIA is the folder the owner cloned `Self-Improving-Agent` into (where they ran `node scripts/setup.mjs`).
+If you do not know it, read `~/.claude/settings.json`: the `SessionStart` hook runs
+`node "<SIA>/open-brain/build/cli-bootstrap.js"`. Everything before `/open-brain/` is `<SIA>`.
 
-## Step 1: Check Current State
+Below, **`OB`** means `node "<SIA>/open-brain/build/cli.js"`. Run every `OB` command from the
+project root.
 
-- Does `CLAUDE.md` already exist? If yes, skip generation (don't overwrite).
-- Does `.agents/` already exist? If yes, skip scaffolding (don't overwrite).
-- Is this a git repo? Note for Step 4.
+## Step 1: Look before touching anything
 
-If both exist, tell the user: "This project is already bootstrapped. Run `/start` to begin a session."
+```
+OB bootstrap check
+```
 
-## Step 2: Generate CLAUDE.md (if missing)
+It reports git, `CLAUDE.md` and `.agents/`, and ends with a `Next:` line. Act on that line:
 
-Scan the project directory to understand:
-- **Tech stack** — check `package.json`, `requirements.txt`, `Cargo.toml`, `go.mod`, etc.
-- **Structure** — key directories, entry points, config files
-- **Conventions** — linting configs, test patterns, existing docs
+| `.agents/` says | Do this |
+|---|---|
+| `BOOTSTRAPPED` | Stop. Tell the owner: "This project is already on SIA. Run `/start`." |
+| `NOT A RECORD` | A `state.json` that is not a record (empty, not JSON, or an old template's placeholder). Show the owner `Next:`. If it is left over, step 2.1 moves it aside. |
+| `SCAFFOLDED` | A bootstrap that stopped after step 3. Go on at step 4. |
+| `PRE-STATE` | Not a fresh install: the project already has `.agents/TASKS/`. Skip to step 6 (the import). |
+| `RESIDUE — …` | Old files with no record. Step 2 moves them aside. |
+| `absent` or `empty` | Go on. |
 
-Generate a concise `CLAUDE.md` with:
+If `git:` says `inside another repository`, **stop**. `git init` here makes this folder its own project, or move the folder out of the enclosing repository.
+
+## Step 2: Residue aside, then the project is its own commit
+
+Do these **in this order**, running `OB bootstrap check` after each. Its `Next:` line says which one
+comes next.
+
+1. **Residue first.** Show the owner the entries `check` listed and say they will be moved, not
+   deleted. On yes:
+
+   ```
+   OB bootstrap move-residue
+   ```
+
+   They land in `.agents/archive/pre-bootstrap-residue-<date>/`, which stays local. The owner deletes
+   it when they have looked. If git already tracked those files, `Next:` says to commit their
+   removal on its own. Do that.
+2. **Not a repository:** ask the owner, "Initialize git here and commit the project as it stands?"
+   On yes, `git init`, then look at `git status --short` **before** committing. If there is no
+   `.gitignore`, ask the owner what to leave out (dependencies like `node_modules/`, build output,
+   `.env` files) and write a `.gitignore` for those first. Then commit, **leaving `.agents/` out**:
+
+   ```
+   git add -A -- . ":(exclude).agents"
+   git commit -m "The project before SIA"
+   ```
+
+   **An empty folder** has nothing to commit, and `git commit` stops with `nothing to commit`. Make
+   the commit empty instead (`check` says so too):
+
+   ```
+   git commit --allow-empty -m "The project before SIA"
+   ```
+
+3. **No commit yet, or uncommitted changes:** ask the owner to commit them the same way (or commit
+   on their word). Scaffold refuses a dirty tree, so that the SIA commit holds only what bootstrap
+   added.
+
+`Next:` must now say to scaffold.
+
+## Step 3: Scaffold
+
+```
+OB bootstrap scaffold
+```
+
+It copies the fresh-install files from `project-template/`, never overwrites a file that exists
+(it lists what it skipped), merges the template's `gitignore` and `gitattributes` into the
+project's, and then **checks with git** that every file is tracked or local exactly as it says.
+It prints each file as `tracked` or `local` with the reason. **Read that list to the owner**:
+
+- **Tracked** (committed with the project): `.agents/TASKS/INBOX.md`, `.agents/TASKS/task.md`,
+  `.agents/SYSTEM/SUMMARY.md`, `.agents/AGENT.md`, the four session commands in
+  `.claude/commands/` (`/start`, `/end`, `/task`, `/sync`), `.gitignore` and `.gitattributes`.
+- **Local** (this disk only, by design): `.agents/SESSIONS/SESSION_TEMPLATE.md`, because session logs
+  are local. The template's PRD, DECISIONS, ENTITIES, RULES and similar files are **not** scaffolded:
+  the gitignore keeps them local, so they would exist on one disk only. Write them when the project
+  needs them.
+
+About the commands: they are installed **in the project** even if the owner has the same commands
+globally, so a clone on another machine has them too. Scaffold skips any that already exist here.
+
+`.agents/AGENT.md` says `role: none`: a project with one agent is **not a seat**. Seats (planner,
+developer, QA) are for a multi-checkout loop, and this project does not run one. `/start` will say
+`NOT A SEAT`, which is correct.
+
+If it ends with **`VERIFY FAILED`**, stop and show the owner the problems. It is almost always an
+older rule in their `.gitignore` or `.gitattributes`, for example `.agents/`. Fix it with the owner,
+then continue. Do not work around it.
+
+## Step 4: CLAUDE.md
+
+This comes **after** scaffold on purpose: scaffold refuses a tree with uncommitted changes, and a
+changed `CLAUDE.md` belongs in the SIA commit (step 8), not in the project's own.
+
+`check`'s `CLAUDE.md:` line (step 1) decides this step. **Never overwrite the owner's file.**
+
+- **present, without the SIA section:** show the owner the section below and ask,
+  "Append this SIA section to your CLAUDE.md?" Append it only on yes. On no, leave the file as it is.
+- **present, with the SIA section:** nothing to do.
+- **absent:** scan the project (`package.json`, `requirements.txt`, `Cargo.toml`, `go.mod`, the
+  README, lint and test configs) and draft a short `CLAUDE.md`: a title, a one-line **About**, the
+  **Commands** (build, test, lint, dev: detected or "TBD"), 2–5 **Conventions**, the key directories.
+  End it with the section below. Show the draft to the owner before writing it.
+
+The SIA section, verbatim (the heading is how `check` finds it):
+
 ```markdown
-# [Project Name] — Project Instructions
+## Self-Improving Agent (SIA)
 
-## About
-[One-line description based on README or package.json]
-
-## Tech Stack
-[Detected stack with versions]
-
-## Commands
-- Build: [detected or "TBD"]
-- Test: [detected or "TBD"]
-- Lint: [detected or "TBD"]
-- Dev: [detected or "TBD"]
-
-## Conventions
-[2-5 key conventions detected from config files]
-
-## Structure
-[Key directories and what they contain]
+- The project record is `.agents/state.json`. Change it only through the `ob_state` tool, never by
+  hand. `TASKS/INBOX.md`, `TASKS/task.md`, `SESSIONS/next-session.md` and `SYSTEM/SUMMARY.md` are
+  rendered from it.
+- Start a session with `/start`, and end it with `/end` (it stores the session's lessons).
+- Run `/sync` before a commit.
 ```
 
-Ask the user to review before writing: "Here's what I'd generate for CLAUDE.md — look good?"
+## Step 5: Make the three files this project's own
 
-## Step 3: Scaffold .agents/ (if missing)
+Edit the scaffolded files **in place**, and keep their structure:
 
-Create the following structure:
+- **`.agents/TASKS/INBOX.md`:** replace the example tasks with this project's. If it has substantial
+  code, use its TODOs, FIXMEs and obvious next steps. If it is new, ask the owner what they are
+  building. **Keep the four headings exactly as they are** (`## 🔴 P0 — Critical` through
+  `## 🟢 P3 — Low`): tasks are read only under a P0–P3 heading. Each task is one line, `- [ ] Title`.
+- **`.agents/TASKS/task.md`:** replace the objective under `## Current Objective` with the owner's
+  first goal.
+- **`.agents/SYSTEM/SUMMARY.md`:** set the title to the project's name. Leave the status line: step 7
+  replaces it with one rendered from the record.
 
-```
-.agents/
-├── TASKS/
-│   └── INBOX.md          # Task backlog — what needs doing
-├── SESSIONS/
-│   └── SESSION_TEMPLATE.md  # Template for session logs
-├── SYSTEM/
-│   ├── SUMMARY.md         # Project state snapshot
-│   ├── ENTITIES.md         # Key data models / domain objects
-│   └── RULES.md            # Project-specific rules and constraints
-└── skills/
-    └── INDEX.md            # Project-specific skills (empty to start)
-```
+Show the owner the three files.
 
-### TASKS/INBOX.md
-```markdown
-# [Project Name] — Task Inbox
-
-## Priority
-- [ ] [First task based on project state]
-
-## Backlog
-- [ ] [Additional tasks if detectable]
-```
-
-### SESSIONS/SESSION_TEMPLATE.md
-```markdown
-# Session N — [Date]
-
-## Objective
-[What we're working on]
-
-## Progress
-- [ ] [Tasks tackled]
-
-## Decisions
-- [Key decisions made]
-
-## Handoff
-- [State for next session]
-```
-
-### SYSTEM/SUMMARY.md
-```markdown
-# [Project Name]
-
-## Status
-[Current state — just bootstrapped]
-
-## What's Working
-[Detected from project state, or "Fresh project — nothing yet"]
-
-## What's Next
-[First priority from INBOX]
-```
-
-### SYSTEM/ENTITIES.md
-```markdown
-# Entities
-
-[Detected from schema files, models, types — or placeholder]
-```
-
-### SYSTEM/RULES.md
-```markdown
-# Rules & Conventions
-
-[Pulled from linting config, CLAUDE.md conventions, or starter set]
-```
-
-### skills/INDEX.md
-```markdown
-# Project Skills
-
-No project-specific skills yet. Skills emerge from repeated patterns — they'll be proposed as you work.
-```
-
-## Step 4: Install Session Commands (if missing)
-
-Check if `.claude/commands/` exists. If not, create it and add these lightweight session commands:
+## Step 6: Draft the record
 
 ```
-.claude/commands/
-├── start.md    → /start (load project state, begin session)
-├── end.md      → /end (store the session's lessons with their matching key)
-├── task.md     → /task (pick up next priority)
-└── sync.md     → /sync (validate docs before commit)
+OB state import --draft
 ```
 
-These commands power the session workflow: `/start → work → /sync → /end`
+It writes nothing but a draft and a report (`.agents/state.draft.json`,
+`.agents/state.import-report.md`), in this folder's `.agents/` and never a parent's. The project
+needs no `package.json`: without one, the project's name is the folder's name, and the draft says
+so. Check the summary:
 
-If the user already has these commands (e.g., from a global setup), skip this step.
+- `Validates: yes`.
+- `Tasks:` is the number of tasks you wrote. If it says **`WARNING: … 0 tasks were parsed`**, a heading
+  is wrong. If it says **`WARNING: … is the template's, unchanged`**, step 5 was skipped. Fix either
+  and re-run the draft.
 
-Source for lightweight command templates: the power-user curriculum repo (`commands/` directory).
+Show the owner the summary lines.
 
-## Step 5: Git Setup
+## Step 7: The owner commits the record
 
-- If not a git repo, ask: "Initialize git here?"
-- If yes, `git init` and create initial commit with CLAUDE.md + .agents/ + .claude/commands/
-- Copy the template's `gitignore` file to the project root as `.gitignore` (merge if one exists). It tracks exactly five state files under `.agents/` — `state.json` (the record) and its rendered views `TASKS/INBOX.md`, `TASKS/task.md`, `SESSIONS/next-session.md`, `SYSTEM/SUMMARY.md` — and ignores everything else there (session logs, archive/, PRD, docs). Verify with `git check-ignore -v .agents/SESSIONS/Session_1.md` (ignored) and `git check-ignore -v .agents/state.json` (not ignored).
-
-## Step 6: Summary
+The import writes `.agents/state.json` once and cannot be re-run over it, so **the owner runs it,
+not the agent**. Agent sessions are often not allowed to run it at all. Ask the owner to type, in
+this session:
 
 ```
-Project bootstrapped!
-
-✓ CLAUDE.md    — project instructions for Claude Code
-✓ .agents/     — task tracking, session management, project state
-✓ .claude/     — session commands (/start, /end, /task, /sync)
-✓ git          — initialized with initial commit
-
-Next steps:
-- Run /start to begin your first session
-- Edit CLAUDE.md to add project-specific conventions
-- Add tasks to .agents/TASKS/INBOX.md
+! node "<SIA>/open-brain/build/cli.js" state import --commit
 ```
 
-## Judgment Calls
+It writes `.agents/state.json` at revision 0 and renders the views.
 
-- If the project already has substantial code, populate INBOX.md with detected TODOs, FIXMEs, or obvious next steps
-- If it's a brand new empty project, ask the user what they're building and populate from there
-- Don't over-scaffold — keep files minimal. They'll grow organically as the user works
-- If the user seems overwhelmed, just say: "You don't need to understand all of this yet. Run `/start` when you're ready to work."
+## Step 8: The SIA commit
+
+Run `git status --short --untracked-files=all`. Without `--untracked-files=all`, new folders show as one
+line (`?? .agents/`) and cannot be compared. It must list exactly the tracked files from step 3, plus
+`.agents/state.json` and `.agents/SESSIONS/next-session.md`, plus `CLAUDE.md` if step 4 changed it.
+If anything else appears, stop and ask the owner. Then, on the owner's word:
+
+```
+git add -A
+git commit -m "Bootstrap SIA"
+```
+
+## Step 9: Summary
+
+```
+Project on SIA.
+
+✓ git         — the project before SIA is its own commit; SIA's files are the next
+✓ .agents/    — state.json (the record) + its views; session logs stay local
+✓ .claude/    — /start, /end, /task, /sync
+✓ CLAUDE.md   — {kept as it was | SIA section appended | written}
+
+Next: open a NEW session here and run /start.
+```
+
+## Judgment calls
+
+- Never delete anything. Residue is moved, files are never overwritten, and the owner decides about
+  their `CLAUDE.md`.
+- Every `OB` command prints what it did. If a command refuses, show the owner its message as it
+  stands. The refusal names the fix.
+- If the owner seems overwhelmed, say: "You don't need to understand all of this yet. When it's done,
+  run `/start` in a new session."

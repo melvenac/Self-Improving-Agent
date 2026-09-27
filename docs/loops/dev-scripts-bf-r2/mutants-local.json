@@ -1,0 +1,103 @@
+[
+  {
+    "name": "verify-always-ok",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "red": 2,
+    "failed": [
+      "× tests/pipelines/bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project > the tracking check fires (known positive): an owner's `.agents/` rule shadows the tem",
+      "× tests/pipelines/bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project > the eol check fires (known positive): an owner's later CRLF rule overrides the templa"
+    ],
+    "errs": [
+      "→ expected +0 to be 1 // Object.is equality",
+      "AssertionError: expected +0 to be 1 // Object.is equality"
+    ],
+    "summary": [
+      "Tests  2 failed | 21 passed (23)",
+      "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯"
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "cli-start-header-reverted",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "red": 1,
+    "failed": [
+      "× tests/pipelines/bootstrap-fix.test.ts > BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project > the whole path: scaffold -> draft -> commit -> ob_start, with tracked/local exactly a"
+    ],
+    "errs": [
+      "→ expected 'Project: v0.1.0' to be 'Project: scratch-proj v0.1.0' // Object.is equality",
+      "AssertionError: expected 'Project: v0.1.0' to be 'Project: scratch-proj v0.1.0' // Object.is equality"
+    ],
+    "summary": [
+      "Tests  1 failed | 22 passed (23)",
+      "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯"
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "order-guard-vs-1c9cb74",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "red": 1,
+    "failed": [
+      "× tests/pipelines/bootstrap-fix.test.ts > bootstrap.md's order (found by the acceptance runs, record 127) > every step that makes the tree dirty comes after the step that needs it clean 16ms"
+    ],
+    "errs": [
+      "→ expected [ …(2) ] to deeply equal []",
+      "AssertionError: expected [ …(2) ] to deeply equal []"
+    ],
+    "summary": [
+      "Tests  1 failed | 22 skipped (23)",
+      "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯"
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "order-guard-vs-a71b4cb",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "red": 1,
+    "failed": [
+      "× tests/pipelines/bootstrap-fix.test.ts > bootstrap.md's order (found by the acceptance runs, record 127) > every step that makes the tree dirty comes after the step that needs it clean 16ms"
+    ],
+    "errs": [
+      "→ expected [ Array(1) ] to deeply equal []",
+      "AssertionError: expected [ Array(1) ] to deeply equal []"
+    ],
+    "summary": [
+      "Tests  1 failed | 22 skipped (23)",
+      "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯"
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "merge-hunk3-unfloored",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "red": 1,
+    "failed": [
+      "× tests/pipelines/bootstrap-fix.test.ts > BF-8 (F9): a fresh project at session 0 has no negative session anywhere > a done item with no (Session N) marker validates, and nothing prints session -3 29m"
+    ],
+    "errs": [
+      "→ expected '# state.json import report — draft (2…' not to match /= -\\d/",
+      "AssertionError: expected '# state.json import report — draft (2…' not to match /= -\\d/"
+    ],
+    "summary": [
+      "Tests  1 failed | 22 skipped (23)",
+      "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯"
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  }
+]

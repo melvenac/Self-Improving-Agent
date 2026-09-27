@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { isStateRecord } from "./state-record.js";
 
 /**
  * Finds the project root by walking up from `start` (Loop 3, R4).
@@ -16,6 +17,12 @@ import { dirname, join, resolve } from "node:path";
  * its own `package.json` is accepted as-is (a bare project with no
  * `.agents/` yet). A start with no `package.json` anywhere above it returns
  * null and the caller refuses, naming the start directory.
+ *
+ * The protocol layout needs no `package.json` (bootstrap-fix round 3, the
+ * sibling of QA 135's D2): a Python or Go project bootstrapped inside a Node
+ * project that is itself on SIA used to fail its own marker and walk up, so
+ * `sync` scored the parent and the session-end hook wrote into the parent's
+ * `.agents/`.
  */
 export function resolveRepoRoot(start: string): string | null {
   const from = resolve(start);
@@ -34,13 +41,18 @@ export function resolveRepoRoot(start: string): string | null {
  * as a stray (one reflection-queue.json from a hook run with a drifted cwd),
  * and a bare-directory marker would stop there and reproduce the wrong
  * answer this module exists to prevent. `.agents/SYSTEM/` or `.agents/META/`
- * is what readProjectState actually reads, so it is what counts.
+ * is what readProjectState actually reads, so it is what counts, and so is
+ * a record (`.agents/state.json` that is a JSON object carrying
+ * `schema_version`, R-BF-18). A file that is not a record does not count.
+ * None of the three needs a `package.json`:
+ * the stray is excluded by having none of them, not by the missing file.
+ * `open-brain/` alone still does, since it is only a marker beside one.
  */
 export function isProjectRoot(dir: string): boolean {
-  if (!existsSync(join(dir, "package.json"))) return false;
-  return existsSync(join(dir, ".agents", "SYSTEM"))
+  if (existsSync(join(dir, ".agents", "SYSTEM"))
     || existsSync(join(dir, ".agents", "META"))
-    || existsSync(join(dir, "open-brain"));
+    || isStateRecord(join(dir, ".agents", "state.json"))) return true;
+  return existsSync(join(dir, "package.json")) && existsSync(join(dir, "open-brain"));
 }
 
 /**
@@ -56,5 +68,5 @@ export function resolveHookProjectDir(candidate: string): string {
 }
 
 export function describeNoRoot(start: string): string {
-  return `no project root found walking up from ${resolve(start)} — need a directory with package.json beside .agents/SYSTEM/, .agents/META/ or open-brain/`;
+  return `no project root found walking up from ${resolve(start)} — need a directory holding .agents/SYSTEM/, .agents/META/, or a .agents/state.json that is a record, or package.json beside open-brain/`;
 }

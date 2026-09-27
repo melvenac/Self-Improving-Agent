@@ -64,9 +64,10 @@ export type RoleName = (typeof ROLE_NAMES)[number];
  * the closed set and had no role file — an accident that read as a seat.
  *
  * `none` is a READ-side value only. It never enters the record: `set_handoff`
- * takes `SeatName` (end_session did too until schema v3 retired it), so a write
- * attempted from such a checkout is refused by the schema rather than by a
- * separate rule that could drift from it.
+ * takes `SeatName`, so the seat a handoff is filed under is named in the op
+ * itself. A write from such a checkout is NOT refused: it is applied with the
+ * checkout's seat null (bootstrap-fix BF-5; QA 135 applied one). This comment
+ * used to say the schema refuses it, which was false.
  */
 export const NOT_A_SEAT = "none";
 
@@ -116,7 +117,11 @@ export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | nul
     // and reporting it as a missing role file would train readers to ignore the
     // line that matters.
     lines0.push(`This checkout is NOT A SEAT (${seat!.name}, role: ${NOT_A_SEAT}) — no seat-specific role file is expected here.`);
-    lines0.push(`  Seat-taking writes (set_handoff) are refused from a checkout with no seat.`);
+    // This line said set_handoff was REFUSED from such a checkout. It is not: the
+    // writer records the session with no seat, and set_handoff names its own seat
+    // (verified, record 127). After bootstrap-fix BF-5 every fresh install reads
+    // this line at every /start, so it has to be true.
+    lines0.push(`  Its sessions are recorded with no seat; a set_handoff names its seat in the op.`);
   } else if (seat) {
     wanted.push({ rel: `${ROLES_DIR}/${seat.role}.md`, owner: seat.role });
     if (!(ROLE_NAMES as readonly string[]).includes(seat.role)) {
@@ -140,6 +145,10 @@ export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | nul
 
   for (const f of files) {
     if (!f.present) {
+      // A checkout that declares it is not a seat has no seat rules to be
+      // missing — a fresh /bootstrap install is one (bootstrap-fix BF-5,
+      // frogger F8). shared.md is still loaded when it is there.
+      if (notASeat) continue;
       problems.push(
         `ROLE FILE MISSING: ${f.rel} does not exist — the "${f.owner}" seat's rules are not in this checkout. ` +
           `This is absence, not an empty ruleset.`
@@ -160,14 +169,14 @@ export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | nul
     }
   }
 
-  return { seat, files, lines: [...lines0, ...render(files, inGit)], problems };
+  return { seat, files, lines: [...lines0, ...render(files, inGit, notASeat)], problems };
 }
 
-function render(files: RoleFileReport[], inGit: boolean): string[] {
+function render(files: RoleFileReport[], inGit: boolean, notASeat: boolean): string[] {
   const lines: string[] = [`Role knowledge loaded (${files.filter((f) => f.present).length} of ${files.length}):`];
   for (const f of files) {
     if (!f.present) {
-      lines.push(`  ${f.rel} — ABSENT (${f.owner})`);
+      lines.push(`  ${f.rel} — ABSENT (${f.owner}${notASeat ? "; not a seat, so none is expected" : ""})`);
       continue;
     }
     const where = f.commit

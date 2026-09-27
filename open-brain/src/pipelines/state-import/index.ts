@@ -17,7 +17,8 @@
  * decide, the item is reported, never guessed silently.
  */
 import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, cpSync, renameSync, statSync, rmSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { basename, join, relative, resolve } from "node:path";
+import { defaultTemplateDir } from "../bootstrap/index.js";
 import {
   StateSchema,
   parseState,
@@ -48,7 +49,8 @@ export interface UnparsedLine { line: number; text: string; reason: string }
 export interface SupersededLink { from: string; from_line: number; to: string; to_line: number }
 
 export interface ImportReport {
-  project: { name: string; version: string };
+  /** `name_from: "folder"` when there is no package.json name (R-BF-9): the draft says so. */
+  project: { name: string; version: string; name_from: "package.json" | "folder" };
   current_session: number;
   migration_date: string;
   staleness: StalenessReport;
@@ -64,6 +66,8 @@ export interface ImportReport {
     sessions: { parsed: number; inferred_open_as_current: number; inferred_done_as_retention_edge: number };
     title_fallbacks: Array<{ line: number; title: string }>;
     retention_eligible_done: number;
+    /** R-BF-10: INBOX.md is the template's own, line ends aside — its tasks are placeholders. */
+    template_copy: boolean;
   };
   objective: { found: boolean; preview: string };
   decisions: {
@@ -222,7 +226,11 @@ interface RawItem {
   fromCompleted: boolean;
 }
 
-const SECTION_RE = /^## (P[0-3])\b/;
+// A symbol run may precede the priority: the template's own INBOX heads its
+// sections `## 🔴 P0 — Critical`, and every project scaffolded from it (or
+// copied by README's `cp -r`) carries that shape. Letters may not: `## Priority`
+// and `## Backlog P2` are not priority sections (bootstrap-fix BF-1).
+const SECTION_RE = /^## (?:[^\w\s]+\s*)?(P[0-3])\b/;
 const ITEM_RE = /^- \[( |~|!|x|X)\] (.*)$/;
 const SESSION_RE = /\(Sessions?\s+(\d+(?:\s*(?:,|–|-|and)\s*\d+)*)/g;
 
@@ -295,6 +303,35 @@ function splitTitle(body: string): { title: string; note: string; fallback: bool
   return { title, note, fallback: true };
 }
 
+/**
+ * The session a done item with no `(Session N)` marker is stamped closed in.
+ * Floored at 0: session numbers are non-negative in the schema, so at a fresh
+ * project's session 0 the unfloored edge (-3) made the draft fail validation
+ * (bootstrap-fix BF-8, frogger F9). The stamp is a label only: since T-179
+ * round 2, whether a done item is dropped is judged by closed_rev and the
+ * sessions written since, never by this number.
+ */
+export function retentionEdge(current: number): number {
+  return Math.max(0, current - DONE_RETENTION_SESSIONS);
+}
+
+/**
+ * BF-1 (frogger F1): an INBOX that exists and yields no task is almost always a
+ * heading the importer cannot read, and "Validates: yes" alone hid it. Null when
+ * there is no INBOX, or when at least one task parsed.
+ */
+export function inboxWarning(r: ImportReport): string | null {
+  if (r.inbox.template_copy) {
+    return `WARNING: ${r.sources.inbox?.path ?? "INBOX.md"} is the template's, unchanged: its ${r.inbox.items} task(s) are placeholders ("Write the PRD" and the rest), not this project's. ` +
+      "Replace them with this project's tasks (bootstrap.md step 5), then re-run --draft.";
+  }
+  const src = r.sources.inbox;
+  if (!src?.present || r.inbox.items > 0) return null;
+  const skipped = r.inbox.unparsed.length;
+  return `WARNING: ${src.path} exists but 0 tasks were parsed (${skipped} unparsed line${skipped === 1 ? "" : "s"}). ` +
+    "Tasks are read only under `## P0`..`## P3` (a leading emoji is fine) or `## Completed`. The draft validates, but it holds no tasks — fix the headings and re-run --draft.";
+}
+
 function emptyStatusCounts(): Record<Status, number> {
   return { open: 0, in_progress: 0, blocked: 0, done: 0 };
 }
@@ -302,7 +339,7 @@ function emptyStatusCounts(): Record<Status, number> {
 export function importTasks(text: string, current: number, report: ImportReport["inbox"]): Task[] {
   const items = parseInboxItems(text, report.unparsed);
   const tasks: Task[] = [];
-  const edge = current - DONE_RETENTION_SESSIONS;
+  const edge = retentionEdge(current);
   items.forEach((it, idx) => {
     const id = `T-${String(idx + 1).padStart(3, "0")}`;
     const boxStatus = BOX_STATUS[it.box];
@@ -702,7 +739,7 @@ function lineCount(text: string | null): number {
   return text ? text.split(/\r?\n/).length : 0;
 }
 
-export function buildImportDraft(projectRoot: string, today: string): ImportDraft {
+export function buildImportDraft(projectRoot: string, today: string, templateDir = defaultTemplateDir()): ImportDraft {
   const root = resolve(projectRoot);
   const pkg = readJson<{ name?: string; version?: string }>(join(root, "package.json"));
   const { paths, texts, undecodable, readAs, encodings } = readInputs(root);
@@ -711,7 +748,9 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
   const current = last.n;
 
   const report: ImportReport = {
-    project: { name: pkg?.name ?? "unknown", version: pkg?.version ?? "0.0.0" },
+    project: pkg?.name
+      ? { name: pkg.name, version: pkg.version ?? "0.0.0", name_from: "package.json" }
+      : { name: basename(root), version: pkg?.version ?? "0.0.0", name_from: "folder" },
     current_session: current,
     migration_date: today,
     staleness: detectStaleness(texts, last, undecodable, readAs, encodings),
@@ -727,6 +766,7 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
       sessions: { parsed: 0, inferred_open_as_current: 0, inferred_done_as_retention_edge: 0 },
       title_fallbacks: [],
       retention_eligible_done: 0,
+      template_copy: isTemplateInbox(texts.inbox, templateDir),
     },
     objective: { found: false, preview: "" },
     decisions: { imported: 0, date_from_line: 0, date_partial: [], date_unknown: 0, skipped: [] },
@@ -765,6 +805,13 @@ export function buildImportDraft(projectRoot: string, today: string): ImportDraf
     sessions: [{ n: last.n, date: last.date, uuid: last.uuid, seat: null, checkout: null, first_rev: null }],
   };
   return { state, report };
+}
+
+/** Line ends aside: autocrlf may have rewritten a checkout of the same bytes. */
+function isTemplateInbox(text: string | null, templateDir: string): boolean {
+  if (text === null) return false;
+  const tmpl = readText(join(templateDir, INPUT_REL.inbox));
+  return tmpl !== null && tmpl.text.replace(/\r\n/g, "\n") === text.replace(/\r\n/g, "\n");
 }
 
 // ---------------------------------------------------------------------------
@@ -833,10 +880,13 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   const L: string[] = [];
   L.push(`# state.json import report — ${mode} (${r.migration_date})`, "");
   L.push(...renderStaleness(r.staleness), "");
+  if (r.project.name_from === "folder") L.push(`Project name: \`${r.project.name}\` is the folder's name: there is no package.json name. It can be changed later; nothing else depends on package.json.`, "");
   L.push(`Project: ${r.project.name} v${r.project.version} · current session ${r.current_session} (from ${r.last_session.file}) · retention: every imported done item (closed before the record existed, closed_rev null) is dropped once ${DONE_RETENTION_SESSIONS} sessions have written to the record, unless its id is cited in the tracked tree`, "");
   L.push("## Sources", "");
   for (const [k, s] of Object.entries(r.sources)) L.push(`- ${k}: \`${s.path}\` — ${s.present ? `${s.lines} lines` : "ABSENT"}`);
   L.push("", "## Tasks (INBOX.md)", "");
+  const warning = inboxWarning(r);
+  if (warning) L.push(`**${warning}**`, "");
   L.push(`Items parsed: ${r.inbox.items} (of which ${r.inbox.completed_section_items} under \`## Completed\`, imported as P3).`, "");
   L.push("Box counts as written (before the `[superseded]` rule):", "");
   for (const s of STATUSES) L.push(`- ${s}: ${r.inbox.box_counts[s]}`);
@@ -847,7 +897,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
     L.push(`| ${p} | ${row.open} | ${row.in_progress} | ${row.blocked} | ${row.done} | ${STATUSES.reduce((a, s) => a + row[s], 0)} |`);
   }
   L.push(`| **all** | ${r.inbox.by_status.open} | ${r.inbox.by_status.in_progress} | ${r.inbox.by_status.blocked} | ${r.inbox.by_status.done} | ${r.inbox.items} |`);
-  L.push("", `Sessions: ${r.inbox.sessions.parsed} items had a \`(Session N)\` marker (opened = min, closed = max for done); ${r.inbox.sessions.inferred_open_as_current} open items had none → opened_session = ${r.current_session}; ${r.inbox.sessions.inferred_done_as_retention_edge} done items had none → closed_session = ${r.current_session - DONE_RETENTION_SESSIONS}.`);
+  L.push("", `Sessions: ${r.inbox.sessions.parsed} items had a \`(Session N)\` marker (opened = min, closed = max for done); ${r.inbox.sessions.inferred_open_as_current} open items had none → opened_session = ${r.current_session}; ${r.inbox.sessions.inferred_done_as_retention_edge} done items had none → closed_session = ${retentionEdge(r.current_session)}.`);
   L.push(`Retention-eligible once ${DONE_RETENTION_SESSIONS} sessions have written: ${r.inbox.retention_eligible_done} done items (they stay in the snapshot and in git).`, "");
   L.push(`### Superseded links (${r.inbox.superseded_links.length})`, "");
   if (r.inbox.superseded_links.length === 0) L.push("_None._");

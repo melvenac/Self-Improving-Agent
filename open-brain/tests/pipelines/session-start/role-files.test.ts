@@ -198,7 +198,11 @@ describe("describeRoleFiles", () => {
     expect(r.problems).toEqual([]);
     const text = r.lines.join("\n");
     expect(text).toMatch(/NOT A SEAT/);
-    expect(text).toMatch(/refused/);
+    // This row asserted /refused/: the line claimed set_handoff was refused from a
+    // not-a-seat checkout, and the writer never refused it (record 127 verified it
+    // through applyStateOps; bootstrap-fix.test.ts holds that row). It now says what happens.
+    expect(text).toMatch(/recorded with no seat; a set_handoff names its seat/);
+    expect(text).not.toMatch(/refused/);
     // No seat-specific role file is looked for, but shared.md still loads: rules
     // everyone holds are not conditional on holding a seat.
     expect(r.files.some((f) => f.rel.endsWith("none.md"))).toBe(false);

@@ -1,0 +1,10 @@
+# Copied to your project root as `.gitattributes` by `open-brain bootstrap scaffold`
+# (merged into an existing one). It ships without the leading dot, like
+# `gitignore`, so it does not act inside the framework repo.
+#
+# The record (.agents/state.json) and its rendered views are written with LF
+# line endings. Without this, git on Windows (core.autocrlf=true, the default)
+# checks them out CRLF, and every ob_state write turns them back to LF: the
+# views churn, and SUMMARY.md's rendered region ends up LF inside a CRLF file.
+# `eol=lf` makes the checkout LF whatever the local git config says.
+/.agents/** text eol=lf

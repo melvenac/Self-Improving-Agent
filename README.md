@@ -279,12 +279,7 @@ See [`docs/HOH-JEV.md`](docs/HOH-JEV.md) for the loop contract.
 
 ## Project Template
 
-New projects benefit from a standard folder structure that gives the AI agent immediate context. The included template sets up an `.agents/` directory with a PRD, task tracking, and session logs.
-
-```bash
-cp -r project-template/.agents your-project/.agents
-cp -r project-template/.claude your-project/.claude
-```
+New projects benefit from a standard folder structure that gives the AI agent immediate context. To put a project on SIA, open Claude Code in it and run **`/bootstrap`**. It works through `open-brain bootstrap check | move-residue | scaffold`: it detects an existing `CLAUDE.md` and leftover `.agents/` files, and never overwrites or deletes either. It copies the fresh-install files from `project-template/` and checks with git that each is tracked or local as it says. Then the owner creates the record with `open-brain state import --draft` and `--commit`. The project is not a seat (`role: none`).
 
 See [project-template/README.md](project-template/README.md) for details.
 

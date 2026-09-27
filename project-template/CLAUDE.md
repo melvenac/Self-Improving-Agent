@@ -5,7 +5,9 @@
 ## Key Rules
 
 - **Run `/sync` before any commit.** Validates version consistency across docs.
-- **`.agents/` is gitignored.** PRD, SUMMARY, INBOX, and session logs are local-only project state.
+- **`.agents/` is gitignored except the record.** `state.json` and its rendered views (`TASKS/INBOX.md`,
+  `TASKS/task.md`, `SESSIONS/next-session.md`, `SYSTEM/SUMMARY.md`) and `AGENT.md` are tracked; session
+  logs, PRD and the rest are local. Change the record only through `ob_state`.
 
 ## Architecture
 

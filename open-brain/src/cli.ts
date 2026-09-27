@@ -190,7 +190,9 @@ if (command === "sync") {
   const result = sessionStart({ projectRoot, homePath: homedir() });
 
   console.log(`\nSession Start — ${result.state.mode} mode`);
-  console.log(`Project: v${result.state.version}`);
+  // Same line as ob_start's header, and the same fix (bootstrap-fix BF-8, F12).
+  const recordName = result.state.stateJson.data?.project.name ?? null;
+  console.log(recordName ? `Project: ${recordName} v${result.state.version}` : `Project: v${result.state.version}`);
 
   if (result.drift.length > 0) {
     console.log(`\nDrift detected:`);
@@ -319,6 +321,70 @@ detach REFUSED: ${r.error}`);
   console.log(`
 HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " (detached)"} -> ${r.headAfter?.slice(0, 7)} (detached)`);
   process.exit(0);
+} else if (command === "bootstrap") {
+  // /bootstrap's deterministic half (bootstrap-fix BF-3/4/6). The directory is
+  // taken literally, never walked up: a fresh project may not be a repository
+  // yet, and walking up could land in a PARENT project and scaffold that.
+  const sub = args[1];
+  const { inspectProject, moveResidue, scaffold, formatMoveResidueFailure } = await import("./pipelines/bootstrap/index.js");
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  if (sub === "check") {
+    const opts = parseOrRefuse(COMMAND_SPECS.bootstrapCheck, args.slice(2));
+    const r = inspectProject(opts.directory ?? resolve("."));
+    if (opts.has("--json")) { console.log(JSON.stringify(r, null, 2)); process.exit(0); }
+    console.log(`bootstrap check — ${r.root}`);
+    console.log(`Template:  ${r.template}${r.templateFound ? "" : "  — NOT FOUND"}`);
+    const g = r.git;
+    console.log(`git:       ${g.kind === "none" ? "NOT a repository" : g.kind === "nested" ? `inside another repository at ${g.toplevel}` : `repository root; ${g.commits ? "has commits" : "NO commit yet"}; ${g.dirty.length} uncommitted change(s)`}`);
+    console.log(`CLAUDE.md: ${r.claudeMd === "absent" ? "absent" : r.claudeMd === "present" ? "present, without the SIA section" : "present, with the SIA section"}`);
+    const a = r.agents;
+    console.log(`.agents/:  ${a.kind === "residue" ? `RESIDUE — ${a.entries.join(", ")} (no state.json, no TASKS/)`
+      : a.kind === "pre-state" ? "PRE-STATE — TASKS/ with no state.json (the import path)"
+      : a.kind === "scaffolded" ? `SCAFFOLDED — not yet imported${a.inboxIsTemplate ? "; INBOX.md is still the template's" : ""}`
+      : a.kind === "not-a-record" ? `NOT A RECORD — state.json is ${a.why}`
+      : a.kind === "bootstrapped" ? "BOOTSTRAPPED — state.json is a record" : a.kind}`);
+    console.log(`Next:      ${r.next}`);
+    process.exit(0);
+  } else if (sub === "move-residue") {
+    const opts = parseOrRefuse(COMMAND_SPECS.bootstrapMoveResidue, args.slice(2));
+    try {
+      const r = moveResidue(opts.directory ?? resolve("."), today);
+      console.log(`bootstrap move-residue — moved, nothing deleted`);
+      console.log(`To:      ${r.to}/`);
+      console.log(`Entries: ${r.entries.join(", ")}`);
+      console.log(`It is local (the template gitignore ignores .agents/archive/). Delete it yourself once you have looked.`);
+      process.exit(0);
+    } catch (err) {
+      // The words live in formatMoveResidueFailure. A read-back mismatch and a
+      // failed undo both happen after a move, so neither is printed as "refused".
+      console.error(formatMoveResidueFailure(err));
+      process.exit(1);
+    }
+  } else if (sub === "scaffold") {
+    const opts = parseOrRefuse(COMMAND_SPECS.bootstrapScaffold, args.slice(2));
+    let r;
+    try {
+      r = scaffold(opts.directory ?? resolve("."));
+    } catch (err) {
+      console.error(`bootstrap scaffold refused: ${err instanceof Error ? err.message : String(err)}`);
+      process.exit(1);
+    }
+    if (opts.has("--json")) {
+      console.log(JSON.stringify(r, null, 2));
+    } else {
+      console.log(`bootstrap scaffold — ${r.root}`);
+      console.log(`Template: ${r.template}\n`);
+      console.log("Written (tracked = committed with the project; local = this disk only, by design):");
+      for (const w of r.written) console.log(`  ${w.tracked ? "tracked" : "local  "}  ${w.action.padEnd(9)} ${w.path} — ${w.why}`);
+      if (r.skipped.length) { console.log("Skipped:"); for (const s of r.skipped) console.log(`  ${s.path} — ${s.reason}`); }
+      console.log(r.verify.ok ? "\nVerified with git: every file above is tracked or ignored exactly as stated; state.json and next-session.md will be tracked; session logs and archive/ will not; .agents/ is eol=lf." : `\nVERIFY FAILED:\n${r.verify.problems.map((p) => `  ${p}`).join("\n")}`);
+    }
+    process.exit(r.verify.ok ? 0 : 1);
+  } else {
+    console.error(`bootstrap: expected check, move-residue or scaffold, got ${sub === undefined ? "nothing" : `"${sub}"`}. Nothing was run.`);
+    process.exit(2);
+  }
 } else if (command === "state") {
   // Loop 4 C1: the one-shot migration door. `state import --draft` (default)
   // writes a reviewable draft + report; `--commit` applies the reviewed draft.
@@ -466,7 +532,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     process.exit(0);
   }
 
-  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG, blocksCommit, describeDecisionsUnreadable, describeLastSession } = await import("./pipelines/state-import/index.js");
+  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG, blocksCommit, inboxWarning, describeDecisionsUnreadable, describeLastSession } = await import("./pipelines/state-import/index.js");
   const { relative } = await import("node:path");
   const { existsSync, statSync } = await import("node:fs");
   // T-150's rule: an unrecognised flag refuses. Before this, a misspelled flag
@@ -501,10 +567,14 @@ Read-only. Change state through ob_state — never by editing the file.`);
     console.error(`state import refused: ${ACCEPT_STALE_FLAG} applies only to --commit. Nothing written.`);
     process.exit(1);
   }
-  const startDir = resolve(positionals[0] ?? ".");
-  const projectRoot = resolveRepoRoot(startDir);
-  if (!projectRoot) {
-    console.error(`state import refused: ${describeNoRoot(startDir)}`);
+  // R-BF-9 (QA 135 D1, D2): the directory is taken literally, as `bootstrap
+  // check` takes it. The import is the one command that writes a record, and a
+  // walk up from a project with no package.json drafted — and would have
+  // committed — a PARENT project's record. No package.json is needed: the
+  // project name falls back to the folder's, and the draft says so.
+  const projectRoot = resolve(positionals[0] ?? ".");
+  if (!(existsSync(resolve(projectRoot, ".agents")) && statSync(resolve(projectRoot, ".agents")).isDirectory())) {
+    console.error(`state import refused: ${projectRoot} has no .agents/ directory. The import reads THIS directory's .agents/ and never walks up into a parent, whose record is not this project's. Run it from the project root, or pass the project directory. Nothing written.`);
     process.exit(1);
   }
   // Local calendar date, not UTC: an evening run must not stamp tomorrow.
@@ -516,6 +586,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
       const rep = r.draft.report;
       console.log(`\nstate import — draft (nothing else changed)\n`);
       console.log(`Root: ${projectRoot}`);
+      console.log(`Project: ${rep.project.name}${rep.project.name_from === "folder" ? " — the folder's name: there is no package.json name, and none is needed" : ""}`);
       console.log(`Draft:  ${DRAFT_REL}`);
       console.log(`Report: ${REPORT_REL}`);
       console.log(`Validates: ${r.validation.ok ? "yes" : `NO — ${r.validation.error}`}`);
@@ -528,7 +599,9 @@ Read-only. Change state through ob_state — never by editing the file.`);
       const unreadable = unknown.filter(blocksCommit);
       if (unreadable.length) console.log(`--commit will REFUSE while ${unreadable.map((i) => i.input).join(", ")} cannot be read or judged (NUL bytes, UTF-32, an odd-length UTF-16BE file, or no heading line; the report says which): save as UTF-8 with a title and re-run the draft, or pass ${ACCEPT_STALE_FLAG}.`);
       const s = rep.inbox.by_status;
-      console.log(`Tasks: ${rep.inbox.items} (open ${s.open}, in_progress ${s.in_progress}, blocked ${s.blocked}, done ${s.done}); superseded links ${rep.inbox.superseded_links.length}; unparsed lines ${rep.inbox.unparsed.length}`);
+      console.log(`Tasks: ${rep.inbox.items} (open ${s.open}, in_progress ${s.in_progress}, blocked ${s.blocked}, done ${s.done}); superseded links ${rep.inbox.superseded_links.length}; unparsed lines ${rep.inbox.unparsed.length}${inboxWarning(rep) ? " — WARNING: see below" : ""}`);
+      const warning = inboxWarning(rep);
+      if (warning) console.log(warning);
       console.log(`Decisions: ${rep.decisions.imported} (${rep.decisions.skipped.length} skipped) · verified ${rep.verified_imported} · gaps ${rep.gaps_imported} · objective ${rep.objective.found ? "found" : "NOT found"}`);
       if (rep.decisions_unreadable) for (const l of describeDecisionsUnreadable(rep.decisions_unreadable)) console.log(`  ${l}`);
       const lastDraft = describeLastSession(rep.last_session);
@@ -572,5 +645,8 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  state migrate [--seat <planner|developer|qa>] [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>   (--seat and --last-session-seat: v1 records only)");
   console.log("                                             Migrate state.json schema v1 -> v2");
   console.log("  detach [--dry-run] [--no-fetch] [--force] [dir]      Return a seat worktree to detached at origin/master");
+  console.log("  bootstrap check [--json] [dir]                Read-only: git, CLAUDE.md and .agents/ as /bootstrap needs them");
+  console.log("  bootstrap move-residue [dir]                  Move a residue .agents/ under .agents/archive/ (never deletes)");
+  console.log("  bootstrap scaffold [--json] [dir]             Copy the fresh-install files from project-template/ and verify tracking");
   process.exit(1);
 }
