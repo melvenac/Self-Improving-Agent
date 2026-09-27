@@ -1,25 +1,26 @@
-<!-- generated from .agents/state.json rev 140 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 141 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 146)_
+## planner [sia-planner] _(written session 147)_
 
 ### Pick up here
 
-Read docs/loops/planner-session-146-notes.md, section 'HANDOFF TO THE NEXT PLANNER (session 146 rolls here)', first. T-179 r2 is merged and the record is v3. Verify which of PRs #172-#176 merged. Re-arm one hub listener per developer room. Then send the /bootstrap cli.ts reconciliation to cursor-builder, and follow the Cursor QA driver (record 175) to merge, so the seven waiting QA runs go to the laptop and QA PC.
+Read docs/loops/session-147-dispatches.md first (on origin/docs/session-100-qa99-dispatch; its incident and rulings sections are the newest). Three dev seats are WORKING, each having read its turn at ~11:2xZ: Grok/sia-forge record 187, candidate B part 2 (E_t schema, R10), room k57frxw0...; Grok/sia-builder record 186, T-193 worktree-layout check, room k57098ep...; Composer/sia-infra record 185, the qa-queue head-restore fix, room k5702788.... Read each delivery's DIFF and failed logs before accepting (D-060 evidence rules). When 185 is accepted, re-copy qa-queue.ps1 to both QA machines, clean both QA trees (the laptop's is stuck at fc8d8cd; the QA PC's at daec2b8, dirty), and relaunch QA 161 + 178 (laptop) and 182 + 183 (QA PC). Dry-run every line on its target machine first. Candidate A (A13) is MERGED (677c1dd); master is green on tcm (36312931414, 1658 passed).
 
 ### Watch out
 
-- QA runs ONLY on the laptop and QA PC (Aaron), headless via the Cursor QA driver once merged; never as chats on his desktop.
-- Dry-run every command on its target machine before giving it to Aaron: the QA PC's profile paths contain a space, and bash expands $env: before ssh.
-- Read a candidate's diffed code before ruling, not only its handoff.
-- Developer seats are Cursor (Grok 4.7), one hub room each. The planner must run a listener per room; cursor-builder needs Aaron's nudge to read its room.
-- Nothing was written to the record in session 146 except the v3 migration: the owed ob_state writes are listed in the handoff section.
+- After ANY context-mode or Grok Build update, re-test Cursor CLI (a headless cursor-agent -p 'echo x' in a scratch dir): context-mode 1.0.169's plugin PreToolUse hook fail-closes every Cursor tool (T-046). The fix (PreToolUse stripped from the plugin cache hooks.json) is NOT durable.
+- Cursor seats stop listening when --wait times out after ~1 h; check /a2a/agents/live + /a2a/session/<room>/reads before asking Aaron to nudge, and nudge only for a turn that is unread with no listener.
+- Composer (sia-infra, D-060) defaults to evidence with the right SHAPE that cannot fail: seeded reds, in-test or option 'mutants'. Read the failed log of every red and mutant run.
+- Master's push CI still runs on GitHub-hosted ubuntu (billing-blocked) until T-192 (a38ff92, QA 183 pending) merges; dispatch tcm CI on master by hand after every merge.
+- Derive every time and count in a tracked note from its source (date -u, run ids): three were written as guesses this session.
+- Relay (A2A-Hub planner, uds pipe cc-msg-f149...) is mid Loop 6 deploy; seat-transport questions (Loop 8a/8b) come to the planner, not Aaron.
 
 ### Open questions
 
-- Aaron: build Scout's Telegram approval (research 4)? If yes, token option (a) a separate Windows account, or (b) the same account?
-- Aaron: may the A2A-Hub main checkout take master (its D-005)?
+- Aaron: Telegram approval for QA (D-058) is on HOLD by his choice ('I have to think about this'); do not dispatch it until he decides.
+- Owed to Relay when T-193 is accepted: the seat data file's path and format.
 
 ### Loop state
 
@@ -28,17 +29,13 @@ Read docs/loops/planner-session-146-notes.md, section 'HANDOFF TO THE NEXT PLANN
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- Build Scout's Telegram approval? Token option (a) or (b)?
-- May the A2A-Hub main checkout take master (D-005)?
+- Telegram approval (D-058): on hold until he decides
 
 **Rulings made mid-loop:** 
-- t179-t003-rulings-qa134-qa142 (T-179 r2 ACCEPTED; T-003 r2 brief)
-- t171-bootstrap-rulings-qa144-qa145 (R-BF-17..20)
-- bootstrap-r4-amend-and-queue-guard-brief (R-BF-21)
-- loop-15-slice-3-rulings-21 (A12 REJECTED; R95-R97)
-- t048-t171-rulings-qa157-qa158 plus addenda 1-2
-- importer-leftovers-rulings-qa138 (R5-1..4)
-- cal-a12-results (Composer 2.5 passes QA calibration)
+- session-147-dispatches.md: rulings on QA 162/174/177/172/173 (A13, T-171 r3b, importer r6, T-048 r1b ACCEPTED; all merged)
+- D-055 (docs-only PRs need no CI)
+- D-060 (Composer on sia-infra; evidence rules)
+- record 184 (Composer replay) result
 
 ## developer [legacy] _(written session 74)_
 
@@ -88,6 +85,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - DOES A SEAT APPLY WHAT THE TRIGGER SURFACES? Unchanged and unmeasured, and the loop's own premise was demonstrated against it while the candidate was being built — the developer piped to tail and read tail's exit code while measuring A10, against a store containing entry 299, with the hook built and not registered. A trigger built and not registered is exactly as useful as no trigger.
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
+
+_1 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
