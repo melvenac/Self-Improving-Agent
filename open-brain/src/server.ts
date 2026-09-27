@@ -1011,14 +1011,8 @@ function deriveKey(content: string): string {
 }
 
 // --- ob_feedback ---
-server.tool(
-  "ob_feedback",
-  "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Increments the entry's counter and writes a feedback_log row; nothing is derived from it further (maturity promotion was cut with E3 and apoptosis with E18 in Loop 10). Use ob_forget to retire an entry.",
-  {
-    id: z.coerce.number().describe("Knowledge entry ID"),
-    rating: z.enum(["helpful", "harmful", "neutral"]).describe("Was this knowledge helpful, harmful, or neutral?"),
-  },
-  async ({ id, rating }) => {
+export async function handleFeedback(args: { id: number; rating: "helpful" | "harmful" | "neutral" }): Promise<ToolResponse> {
+  const { id, rating } = args;
     const v2db = getV2Db();
     const entry = v2db.prepare(
       // vault_path is selected for the apoptosis branch: the note has to be
@@ -1068,7 +1062,16 @@ server.tool(
     ];
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };
-  }
+}
+
+server.tool(
+  "ob_feedback",
+  "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Increments the entry's counter and writes a feedback_log row; nothing is derived from it further (maturity promotion was cut with E3 and apoptosis with E18 in Loop 10). Use ob_forget to retire an entry.",
+  {
+    id: z.coerce.number().describe("Knowledge entry ID"),
+    rating: z.enum(["helpful", "harmful", "neutral"]).describe("Was this knowledge helpful, harmful, or neutral?"),
+  },
+  async ({ id, rating }) => handleFeedback({ id, rating }),
 );
 
 // --- ob_forget ---
