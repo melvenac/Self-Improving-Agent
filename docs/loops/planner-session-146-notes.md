@@ -188,3 +188,8 @@ per room, and re-arm after each firing. The first firing can dump old unread tur
 - **The class, for the record:** two candidates each changed the v3 schema's meaning. Each passed its own QA, and they
   only failed together on master. **A stacked candidate's QA must run against the merge with master once master
   changes the record's schema.** Worth a rule (a gap entry).
+
+**Late update 3: T-171 r3b is DONE** (`2dcc68a`, handoff `dad58bc`). A missing `note_by` loads as `null`, and master's
+real record parses. Its run on the merge with master is `36304454993` (1450 passed). The QA 177 dispatch is amended to
+`2dcc68a`, and it scores on the merge with master. **#174 should be closed:** T-171 merges as r1–r3b from
+`loop/t171-r3` after QA 177.
