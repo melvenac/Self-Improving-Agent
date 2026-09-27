@@ -16,9 +16,9 @@
 
 | Run | ID | Result | Why |
 |-----|-----|--------|-----|
-| red-first (before fix) | **36310020528** | failure | tcm job `test`; vitest red on intentional `tcm-red-seed` assertion (bcb dd7f) |
-| green (184b fix) | _(pending push)_ | | |
-| mutant ci.yml master-push clause | _(pending)_ | | vitest master-push row red on ubuntu-latest |
+| red-first (before fix) | **36310020528** | failure | tcm; vitest red on intentional `tcm-red-seed` assertion (bcbdd7f) |
+| green (184b fix) | **36310124469** | success | tcm; all 20 T-192 tests pass (2901538) |
+| mutant ci.yml master-push clause | **36310226139** | failure | tcm; master-push row evaluates to ubuntu-latest (7c02c7d) |
 
 Runner proof: run 36310020528 step **Egress isolation self-check (tcm)** succeeded.
 
