@@ -17,7 +17,7 @@ export function whyNotARecord(path: string): string | null {
     if (Array.isArray(data)) return "JSON array";
     return `JSON ${typeof data}`;
   }
-  if (!Object.hasOwn(data, "schema_version")) return "a JSON object with no schema_version";
+  if (!Object.hasOwn(data, "schema_version")) return null; // mutant
   const name = (data as { project?: { name?: unknown } }).project?.name;
   if (typeof name === "string" && name.includes("{{")) return `the old template's placeholder seed (project "${name}")`;
   return null;

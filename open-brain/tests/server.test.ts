@@ -22,6 +22,22 @@ function proseProject(tmp: string): void {
 }
 import Database from "better-sqlite3";
 import { initSchemaV2, indexKnowledge } from "../src/db-v2.js";
+import { byPidDir, processStartTime, writeProcessSession } from "../src/shared/process-session.js";
+
+/**
+ * T-003: the server writes only under the session it can PROVE, so a test that
+ * needs an attributed write gives it a real proof: for this worker's real parent
+ * process, with that process's real start time. Removed after every test, so
+ * no row inherits another's session.
+ */
+let ppidStart: string | null | undefined;
+function proveOwn(id: string): void {
+  if (ppidStart === undefined) ppidStart = processStartTime(process.ppid);
+  writeProcessSession(byPidDir(process.env.OPEN_BRAIN_ACTIVE_SESSION!), {
+    session_id: id, claude_pid: process.ppid, proc_start: ppidStart!, ide: "claude", written_at: new Date().toISOString(),
+  });
+}
+afterEach(() => rmSync(byPidDir(process.env.OPEN_BRAIN_ACTIVE_SESSION!), { recursive: true, force: true }));
 
 function getText(response: { content: { type: string; text: string }[] }): string {
   return response.content[0].text;
@@ -249,6 +265,7 @@ describe("server handlers", () => {
 
       // T-163: the writing session is the server's REGISTERED session, never an op
       // argument, so the round trip registers one first.
+      proveOwn("round-trip-uuid");
       await handleSetSession({ session_id: "round-trip-uuid", project_dir: tmp });
       const refused = await handleState({ project_root: tmp, session: 55, expected_revision: 3, ops: [{ op: "set_objective", text: "x" }] });
       expect(refused.isError).toBe(true);
@@ -329,10 +346,11 @@ describe("server handlers", () => {
     it("stamps the registered session id into the log and reuses it on a second call", async () => {
       proseProject(tmp);
       const id = "11111111-2222-4333-8444-555555555555";
+      proveOwn(id);
       const reg = await handleSetSession({ session_id: id, project_dir: tmp });
       expect(reg.isError).toBeUndefined();
       expect(getText(reg)).toContain(`Session registered: ${id}`);
-      expect(getText(reg)).toContain("[via argument]");
+      expect(getText(reg)).toContain(`[via process proof: parent ${process.ppid}]`);
 
       const first = getText(await handleStart({ project_root: tmp }));
       expect(first).toMatch(new RegExp(`Session #1\\nLog: .*Session_1\\.md\\nSession ID: ${id}`));
@@ -405,6 +423,7 @@ describe("server handlers", () => {
         JSON.stringify({ session_id: "2fb67133-stale", entries: [{ id: 138 }, { id: 184 }] })
       );
 
+      proveOwn("efcaeb75-current");
       const res = await handleEnd({
         project_root: tmp,
         dry_run: true,
@@ -626,10 +645,16 @@ describe("F2 / F3 — a refusal must name the condition it is actually about", (
  * checkout, A9) are T-003's and are NOT covered: the last row pins that limit so
  * it is not read as covered.
  */
-describe("R179-2: ob_set_session and another checkout's recorded session", () => {
+/**
+ * R179-2 is superseded by T-003 (not lost): R179-2 refused registering as ANOTHER
+ * checkout's recorded session and pinned same-checkout impersonation as a LIMIT.
+ * Now only the PROVEN id registers, in any checkout, so both are refused and the
+ * LIMIT row below is flipped: what it pinned as open is closed.
+ */
+describe("R179-2 → T-003: ob_set_session and another session's uuid", () => {
   let tmp: string;
   const VICTIM = "00000700-0000-4000-8000-000000000700";
-  const OTHER = "00000701-0000-4000-8000-000000000701";
+  const OWN = "00000701-0000-4000-8000-000000000701";
   const recordAs = (uuid: string, checkout: string, pick_up: string) => {
     const s = JSON.parse(readFileSync(join(tmp, ".agents", "state.json"), "utf-8")) as { revision: number };
     const r = applyStateOps(tmp, {
@@ -643,37 +668,36 @@ describe("R179-2: ob_set_session and another checkout's recorded session", () =>
     tmp = mkdtempSync(join(tmpdir(), "ob-r1792-"));
     proseProject(tmp);
     cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+    proveOwn(OWN);
   });
   afterEach(() => rmSync(tmp, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));
 
-  it("A7 across checkouts: registering as a session recorded in ANOTHER checkout is refused, names both checkouts, and the victim's handoff cannot be reached", async () => {
+  it("A7 across checkouts: registering as a session recorded in ANOTHER checkout is refused, and the victim's handoff cannot be reached", async () => {
     recordAs(VICTIM, "sia-builder", "victim session 700's handoff");
-    await handleSetSession({ session_id: OTHER, project_dir: tmp });
     const res = await handleSetSession({ session_id: VICTIM, project_dir: tmp });
     expect(res.isError).toBe(true);
-    const text = getText(res);
-    expect(text).toContain(`ob_set_session refused: ${VICTIM} is recorded`);
-    expect(text).toContain(`of checkout "sia-builder", and this is checkout "${basename(tmp)}"`);
-    expect(text).toContain(`the registration stays ${OTHER}`);
-    // The next write is stamped with the registration that STAYED, so the victim is untouched.
-    const s = JSON.parse(readFileSync(join(tmp, ".agents", "state.json"), "utf-8")) as { revision: number; handoffs: Array<{ session_uuid: string | null; pick_up: string }> };
+    expect(getText(res)).toContain(`ob_set_session refused: ${VICTIM} is not this server's session`);
+    expect(getText(res)).toContain(`attributed writes use ${OWN}`);
+    const s = JSON.parse(readFileSync(join(tmp, ".agents", "state.json"), "utf-8")) as { revision: number };
     const w = await handleState({ project_root: tmp, session: 701, expected_revision: s.revision, ops: [{ op: "set_handoff", seat: "developer", pick_up: "attacker overwrote it", watch_out: [], open_questions: [] }] });
     expect(w.isError).toBeUndefined();
     const after = JSON.parse(readFileSync(join(tmp, ".agents", "state.json"), "utf-8")) as { handoffs: Array<{ session_uuid: string | null; pick_up: string }> };
     expect(after.handoffs.find((h) => h.session_uuid === VICTIM)?.pick_up).toBe("victim session 700's handoff");
-    expect(after.handoffs.find((h) => h.session_uuid === OTHER)?.pick_up).toBe("attacker overwrote it");
+    expect(after.handoffs.find((h) => h.session_uuid === OWN)?.pick_up).toBe("attacker overwrote it");
   });
 
-  it("a uuid the record has not seen is registered", async () => {
-    const res = await handleSetSession({ session_id: OTHER, project_dir: tmp });
-    expect(res.isError).toBeUndefined();
-    expect(getText(res)).toContain(`Session registered: ${OTHER}`);
+  it("a uuid the record has not seen is refused unless it is the proven one: an unseen id is a claim, not proof", async () => {
+    const unseen = await handleSetSession({ session_id: "00000702-0000-4000-8000-000000000702", project_dir: tmp });
+    expect(unseen.isError).toBe(true);
+    const own = await handleSetSession({ session_id: OWN, project_dir: tmp });
+    expect(own.isError).toBeUndefined();
+    expect(getText(own)).toContain(`Session registered: ${OWN}`);
   });
 
-  it("LIMIT, pinned: a uuid recorded under THIS checkout is registered — same-checkout impersonation is T-003's, not caught here", async () => {
+  it("FLIPPED LIMIT: a uuid recorded under THIS checkout is refused too — same-checkout impersonation was T-003's, and is closed", async () => {
     recordAs(VICTIM, basename(tmp), "same-checkout victim");
     const res = await handleSetSession({ session_id: VICTIM, project_dir: tmp });
-    expect(res.isError).toBeUndefined();
-    expect(getText(res)).toContain(`Session registered: ${VICTIM}`);
+    expect(res.isError).toBe(true);
+    expect(getText(res)).toContain(`${VICTIM} is not this server's session`);
   });
 });

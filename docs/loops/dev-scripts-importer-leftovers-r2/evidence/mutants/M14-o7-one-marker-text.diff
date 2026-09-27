@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 34a366c..8a1f8e1 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -866,7 +866,7 @@ function refuseHalfRestored(root: string): void {
+   // Every door refuses while any marker exists, so a second one means the first
+   // was deleted without a restore, or put back by hand. The oldest snapshot then
+   // holds the originals; a newer one holds what a later run found (QA 122, O7).
+-  const from = snapshots.length === 1
++  const from = snapshots.length >= 1
+     ? `${snapshots[0]}, which holds every original`
+     : `${snapshots[0]} (the oldest; it holds the originals from before the first failed --commit); ${snapshots.slice(1).join(" and ")} ${snapshots.length === 2 ? "holds" : "hold"} the tree as a later run found it`;
+   throw new Error(`.agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from ${from}, then delete ${markers}. Nothing written. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success`);

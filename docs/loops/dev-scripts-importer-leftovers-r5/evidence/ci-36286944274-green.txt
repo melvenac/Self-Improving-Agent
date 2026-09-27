@@ -1,0 +1,263 @@
+run 36286944274 loop/importer-leftovers-r5-green @ e2f202b. test-windows skipped.
+Runner name: 'tcm-1'
+Machine name: 'tcm'
+[command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +e2f202be6ec0c412e7564d8807ef87e7793bc1cb:refs/remotes/origin/loop/importer-leftovers-r5-green
+e2f202be6ec0c412e7564d8807ef87e7793bc1cb
+✓ tests/shared/state-writer.test.ts (41 tests) 855ms
+✓ tests/pipelines/sync/checks.test.ts (102 tests) 819ms
+✓ tests/server.test.ts (28 tests) 733ms
+✓ tests/pipelines/sync/record-erasure.test.ts (16 tests | 1 skipped) 3693ms
+✓ record-erasure (T163-2) > does NOT flag a retention drop — the rule is recomputed from the state after the step  787ms
+✓ record-erasure recomputes retention by write order (R179-1) > KNOWN NEGATIVE: QA's A6 through the writer (1124 for 124) removes nothing — and the legacy handoff's exit is explained (R179-3)  340ms
+✓ tests/harness/refwatch-stage.test.ts (19 tests) 6139ms
+✓ G-041 A2 — a role that writes a ref fails the loop > (i) refuses `git tag -f loop-001-developer loop-001-base` and restores the tag  620ms
+✓ G-041 A2 — a role that writes a ref fails the loop > (ii) refuses `git branch -f` and puts the branch back  311ms
+✓ G-041 A2 — a role that writes a ref fails the loop > (iii) refuses a bare `git update-ref` and deletes the ref it created  320ms
+✓ G-041 A2 — a role that writes a ref fails the loop > (iv) refuses a role-created `loop-001-anything`, which a name rule would have allowed  330ms
+✓ G-041 A2 — a role that writes a ref fails the loop > lets a clean loop through and still writes its own three tags  591ms
+✓ G-041 A2 — a role that writes a ref fails the loop > leaves the checked-out branch to the commit boundary, and says so  603ms
+✓ G-041 A2 — a role that writes a ref fails the loop > still reports a COMMITTING role as stage-committed, not as a ref write  351ms
+✓ G-041 A2 — a role that writes a ref fails the loop > refuses a role that moves the checked-out branch with update-ref  326ms
+✓ G-041 A2 — a role that writes a ref fails the loop > D1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human > D1 — `checkout -b evil` + commit is refused WITH a record, and HEAD still resolves  354ms
+✓ G-041 A2 — a role that writes a ref fails the loop > D1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human > D1b — `symbolic-ref HEAD refs/heads/side` is refused and HEAD is put back  346ms
+✓ G-041 A2 — a role that writes a ref fails the loop > D1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human > D2 — a backwards move of the checked-out branch is RESTORED, not left for a human  399ms
+✓ G-041 A2 — a role that writes a ref fails the loop > D1/D2 — the restore never leaves HEAD dangling and never leaves a ref for a human > D4 — deleting the checked-out branch is refused WITH a record, and the ref comes back  364ms
+✓ G-041 A2 — a role that writes a ref fails the loop > reports the ref verdict on every stage, with its own limits stated  590ms
+✓ tests/harness/policies.test.ts (25 tests) 2238ms
+✓ gate policies > A6 — a threshold change in the file changes the decision > proceeds with the shipped threshold and is rejected by a stricter one  807ms
+✓ gate policies > A6 — a threshold change in the file changes the decision > records the thresholds it applied in the gate artifact  626ms
+✓ gate policies > F5 — addresses_top_failures has no referent when there are no prior failures > the done gate is REACHABLE live with stub roles and the shipped policy  654ms
+✓ tests/pipelines/state-import.test.ts (9 tests) 310ms
+✓ tests/pipelines/session-start/state-render.test.ts (32 tests) 57ms
+✓ tests/pipelines/state-import-r3.test.ts (16 tests) 446ms
+✓ tests/harness/runtime.test.ts (44 tests) 22291ms
+✓ harness runtime > A1 — end to end > completes, exits 0, and writes D_t.md, A_t.gitref and E_t.json  636ms
+✓ harness runtime > A1 — end to end > records in A_t.gitref the sha QA was actually frozen at  613ms
+✓ harness runtime > A1 — end to end > writes an E_t whose candidate_git matches the developer commit, not HEAD  641ms
+✓ harness runtime > A1 — end to end > fills runtime_checks from exit codes rather than from the role  597ms
+✓ harness runtime > A1 — end to end > leaves the tree clean when it is done  613ms
+✓ harness runtime > A2 — schema retry and the cap > retries an invalid D_t and completes when a later attempt validates  666ms
+✓ harness runtime > A2 — schema retry and the cap > hands the failing role the problems that rejected it, not a bare re-roll  649ms
+✓ harness runtime > A2 — schema retry and the cap > gives the role its own JSON Schema on the retry  627ms
+✓ harness runtime > A2 — schema retry and the cap > fails the loop with a recorded reason when the cap is exhausted  309ms
+✓ harness runtime > A2 — schema retry and the cap > retries the QA role on an invalid E_t and caps there too  600ms
+✓ harness runtime > A4 — the write allowlist refuses > refuses a developer write outside the allowlist, bypassing the helper  342ms
+✓ harness runtime > A4 — the write allowlist refuses > reverts the offending write rather than leaving it on disk  318ms
+✓ harness runtime > A4 — the write allowlist refuses > never creates a candidate commit or a developer tag from a refused stage  331ms
+✓ harness runtime > A4 — the write allowlist refuses > refuses a write that escapes the repository through ..  349ms
+✓ harness runtime > A4 — the write allowlist refuses > honours a widened developer allowlist when one is given deliberately  635ms
+✓ harness runtime > A4 — the write allowlist refuses > refuses a QA write outside its allowlist — QA may never touch the candidate  621ms
+✓ harness runtime > A4 — the write allowlist refuses > does not retry a boundary breach  328ms
+✓ harness runtime > A3/A4 — a role that COMMITS is refused > QA that overwrites and commits the candidate is refused — the loop does not complete  827ms
+✓ harness runtime > A3/A4 — a role that COMMITS is refused > QA that commits is rolled back to the candidate, so the tree still matches the frozen sha  777ms
+✓ harness runtime > A3/A4 — a role that COMMITS is refused > a developer that commits fails for the RIGHT reason, not 'changed nothing'  408ms
+✓ harness runtime > A3/A4 — a role that COMMITS is refused > refuses a commit even when every path it touched was inside the allowlist  418ms
+✓ harness runtime > A3/A4 — a role that COMMITS is refused > asserts the candidate is the evidence commit's parent on a clean run  721ms
+✓ harness runtime > A5 — versioning and rollback > creates loop-001-developer and loop-001-qa  581ms
+✓ harness runtime > A5 — versioning and rollback > restores the pre-loop state with git alone  749ms
+✓ harness runtime > A5 — versioning and rollback > refuses to run a loop id whose tags already exist, rather than moving them  705ms
+✓ harness runtime > A5 — versioning and rollback > commits the candidate separately from the evidence  702ms
+✓ harness runtime > A3 — the frozen candidate > hands QA the candidate sha and the time it was frozen  617ms
+✓ harness runtime > A3 — the frozen candidate > refuses to run QA when a deterministic check moved HEAD off the candidate  693ms
+✓ harness runtime > A3 — the frozen candidate > refuses to run QA when a check left the working tree dirty  531ms
+✓ harness runtime > deterministic checks in the loop > completes the loop with a red build and reports it rather than hiding it  624ms
+✓ harness runtime > deterministic checks in the loop > refuses a QA report whose runtime_checks contradict the measurement  633ms
+✓ harness runtime > preconditions > fails the loop when the developer stage changes nothing  351ms
+✓ harness runtime > preconditions > records a role that throws without pretending the stage passed  323ms
+✓ harness runtime > gates > skips the gates by default and records that no decision was taken  553ms
+✓ harness runtime > gates > builds a payload for the two gates this slice owns  525ms
+✓ harness runtime > gates > says in the log that the QA scoring gate was NOT consulted  677ms
+✓ harness runtime > gates > prints every gate payload in dry-run mode and still sends nothing  719ms
+✓ tests/pipelines/state-import-r2.test.ts (18 tests) 22026ms
+✓ R2-1 (IF-9): an encoding detail never turns a STALE input into 'could not tell' > the CLI refuses --commit on BOM-marked stale inputs without --accept-stale, and writes nothing  2563ms
+✓ R2-3 (IF-11): an import completes, or it changes nothing > PROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist  2453ms
+✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > a single-dash token that is not a known flag refuses, before or after the directory  4827ms
+✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > PROBE-12: a bare word before the directory is a second positional and refuses; the cwd's project is not committed  3624ms
+✓ R2-4 (IF-12): `state import` acts on exactly the project the operator named > PROBE-5b: a positional that names no existing directory refuses instead of walking up from the cwd  2687ms
+✓ R2-5 (IF-13): every protection has a test that fails without it > M6: a misspelled acknowledgement on a CURRENT project is refused by the flag check itself  2281ms
+✓ R2-5 (IF-13): every protection has a test that fails without it > M13: --accept-stale with --draft refuses and writes no draft  1243ms
+✓ R2-5 (IF-13): every protection has a test that fails without it > M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output  2148ms
+✓ tests/active-session.test.ts (48 tests) 64ms
+✓ tests/trigger/query.test.ts (5 tests) 120ms
+✓ tests/pipelines/state-import-r4.test.ts (22 tests) 14881ms
+✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL b
+✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; -
+✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names th
+✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --acce
+✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale comple
+✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale comple
+✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > the draft's report says --commit refuses while an input cannot be read, and the CLI's draft summary says so too  1091ms
+✓ tests/harness/gate-live.test.ts (16 tests) 41ms
+✓ tests/cli-flags.test.ts (33 tests) 30974ms
+✓ sync > sync -check refuses and touches no file  1056ms
+✓ sync > sync --chek refuses and touches no file  1187ms
+✓ sync > sync --help refuses and touches no file  1150ms
+✓ sync > sync -h refuses and touches no file  1173ms
+✓ sync > sync <a directory that does not exist> refuses rather than walking up from the cwd  1259ms
+✓ start > start -dry-run refuses and creates no session log  1168ms
+✓ start > start --dry-run refuses and creates no session log  1413ms
+✓ start > start <a directory that does not exist> refuses  1040ms
+✓ detach > detach -dry-run refuses and leaves HEAD and the tree alone  1241ms
+✓ detach > detach --dry-rn refuses and leaves HEAD and the tree alone  1362ms
+✓ detach > detach <a directory that does not exist> refuses rather than walking up from the cwd  1286ms
+✓ state migrate > state migrate -dry-run refuses and the file is byte-identical  1146ms
+✓ state migrate > state migrate --dry-rn refuses and the file is byte-identical  1418ms
+✓ state migrate > state migrate --dry-run (spelled right) is still a dry run  1286ms
+✓ state migrate > state migrate —dry-run (an em dash, as autocorrect writes it) refuses and the file is byte-identical  1119ms
+✓ state migrate > state migrate with a file that does not exist, named after writes none of the files  1097ms
+✓ state migrate > state migrate with a file that does not exist, named first writes none of the files  1037ms
+✓ state migrate > state migrate with a file that is not JSON writes none of the files  1246ms
+✓ state migrate > state migrate with a file that is not a state record writes none of the files  1148ms
+✓ state migrate > state migrate with two valid files still migrates both (the check does not stop the good case)  1000ms
+✓ read-only and opt-in commands also refuse > state show -json refuses  979ms
+✓ read-only and opt-in commands also refuse > relocate --aply refuses  1316ms
+✓ read-only and opt-in commands also refuse > topics --aply refuses  966ms
+✓ the refusal comes before the database is opened (R185-7, QA 120's rows) > ["relocate","--from","a","--to","b","--aply"] refuses and the DB file is never created  1177ms
+✓ the refusal comes before the database is opened (R185-7, QA 120's rows) > ["relocate","--aply"] refuses and the DB file is never created  1054ms
+✓ the refusal comes before the database is opened (R185-7, QA 120's rows) > ["topics","--aply"] refuses and the DB file is never created  1279ms
+✓ tests/pipelines/session-end/index-v2.test.ts (9 tests) 111ms
+✓ tests/pipelines/state-import-leftovers.test.ts (22 tests) 3550ms
+✓ R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED > a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the ADRs not imported  2171ms
+✓ R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED > guard: a readable DECISIONS.md says nothing about NUL bytes  1130ms
+✓ tests/pipelines/state-views.test.ts (14 tests) 41ms
+✓ tests/pipelines/sync/checks-state.test.ts (14 tests) 168ms
+✓ tests/shared/session-order.test.ts (10 tests) 762ms
+✓ tests/trigger/floor.test.ts (12 tests) 318ms
+✓ tests/pipelines/session-start/tree-currency.test.ts (13 tests) 3450ms
+✓ describeTreeCurrency > reports BEHIND with the commit count and both record revisions  489ms
+✓ describeTreeCurrency > names the comparison so it cannot be read as the drift line  383ms
+✓ describeTreeCurrency > RESOLVES a real last-fetch timestamp, rather than reporting it unknown  357ms
+✓ describeTreeCurrency > reports DIVERGED when both sides moved  377ms
+✓ tests/shadow-evaluate.test.ts (27 tests) 123ms
+✓ tests/db-v2.test.ts (15 tests) 232ms
+✓ tests/trigger/fires.test.ts (14 tests) 114ms
+✓ tests/pipelines/state-import-r5.test.ts (22 tests) 247ms
+✓ tests/harness/checks.test.ts (24 tests) 2231ms
+✓ runCheck > records a timeout as a failure rather than letting it hang the loop  406ms
+✓ tests/trigger/hook.test.ts (12 tests) 21806ms
+✓ A5 — what the hook emits > POSITIVE, at scale, through the shipped floor: additionalContext carries 299 and its ACTION  1669ms
+✓ A5 — what the hook emits > the POLICY FILE is what let 299 through — raise the floor and the same call goes silent  3733ms
+✓ A5 — what the hook emits > NEGATIVE: git status --porcelain emits nothing at all — no key, no stdout, no stderr  1940ms
+✓ A5 — what the hook emits > NEGATIVE: ls -la emits nothing at all — no key, no stdout, no stderr  1732ms
+✓ A5 — what the hook emits > NEGATIVE: zzqx --flurb wibble emits nothing at all — no key, no stdout, no stderr  1896ms
+✓ A5 — what the hook emits > ignores a tool that is not Bash, and says nothing about it  1670ms
+✓ A6 — three failures, and the model hears none of them > store path absent  1990ms
+✓ A6 — three failures, and the model hears none of them > store locked by another writer  1670ms
+✓ A6 — three failures, and the model hears none of them > past its own deadline: the work finished, and the result is still not emitted  1939ms
+✓ A6 — three failures, and the model hears none of them > a malformed payload is logged and dropped, NOT refused with a non-zero exit  1567ms
+✓ A6 — three failures, and the model hears none of them > POSITIVE CONTROL: the same harness on a healthy store DOES emit  1763ms
+✓ tests/shared/state-schema.test.ts (18 tests) 85ms
+✓ tests/pipelines/session-start/role-files.test.ts (13 tests) 1853ms
+✓ describeRoleFiles > records HEAD-behind-upstream for a role file without calling it stale  346ms
+✓ tests/pipelines/sync/staleness.test.ts (17 tests) 1751ms
+✓ tests/harness/workspace.test.ts (31 tests) 1611ms
+✓ tests/pipelines/session-start/handoff-provenance.test.ts (11 tests) 1558ms
+✓ tests/pipelines/state-migrate.test.ts (15 tests) 90ms
+✓ tests/vault-writer.test.ts (21 tests) 55ms
+✓ tests/cli-bootstrap.test.ts (13 tests) 14967ms
+✓ cli-bootstrap SESSION_UUID contract > emits SESSION_UUID exactly once when the payload carries session_id  978ms
+✓ cli-bootstrap SESSION_UUID contract > emits the id from the payload verbatim, not a filesystem guess  1095ms
+✓ cli-bootstrap SESSION_UUID contract > accepts payload fields other than Claude Code's session_id  1208ms
+✓ cli-bootstrap SESSION_UUID contract > generates a UUID when the IDE supplies none  1068ms
+✓ cli-bootstrap SESSION_UUID contract > generates a DIFFERENT uuid each run, never a reused one  2256ms
+✓ cli-bootstrap SESSION_UUID contract > stays silent in a subagent context (anti-loop)  1019ms
+✓ cli-bootstrap SESSION_UUID contract > REFUSES malformed stdin rather than continuing without the payload  931ms
+✓ cli-bootstrap SESSION_UUID contract > a well-formed payload with NO session id writes nothing to the slot  1023ms
+✓ cli-bootstrap SESSION_UUID contract > a payload WITH a session id still writes the slot — the guard is not a ban  864ms
+✓ cli-bootstrap SESSION_UUID contract > still refuses to guess an id from the filesystem  1070ms
+✓ cli-bootstrap SESSION_UUID contract > F4: a MALFORMED payload refuses, writes nothing, and exits non-zero  1065ms
+✓ cli-bootstrap SESSION_UUID contract > F4: an ABSENT payload is still supported — absent and malformed are different  1066ms
+✓ cli-bootstrap SESSION_UUID contract > F4: a WELL-FORMED payload still registers the id it was given  1315ms
+✓ tests/pipelines/state-import-staleness.test.ts (8 tests) 6153ms
+✓ T-180: a stale input is named at the top of the report and gates --commit > IF-2: A2A-Hub at e0bc3f8, the known positive > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale  4097ms
+✓ T-180: a stale input is named at the top of the report and gates --commit > IF-4: an input the detector cannot judge is reported, never counted as current > --commit proceeds past 'could not tell' and prints one line naming those inputs, 
+✓ tests/shared/cli-args.test.ts (56 tests) 2291ms
+✓ tests/topics.test.ts (18 tests) 185ms
+✓ tests/harness/git.test.ts (29 tests) 2000ms
+✓ tests/pipelines/sync/greeting-size.test.ts (8 tests) 711ms
+✓ the composed greeting carries the role files whole — T183-3 > contains every role file this repository loads, byte for byte  316ms
+✓ tests/harness/gate-artifacts.test.ts (7 tests) 4965ms
+✓ gate artifacts > A5 — dry run > writes G_plan.json and G_done.json with sent: false  846ms
+✓ gate artifacts > A5 — dry run > records the exact payload that WOULD have gone on the wire  759ms
+✓ gate artifacts > A5 — dry run > carries the deterministic checks' EXIT CODES as data in the done-gate payload  719ms
+✓ gate artifacts > A5 — dry run > contains no question about whether the tests passed — structurally, then by scan  727ms
+✓ gate artifacts > A5 — dry run > prints the payload in a dry run and sends nothing  632ms
+✓ gate artifacts > A3 — the key reaches no artifact and no log line > greps the whole iteration directory and the captured log after a live run  672ms
+✓ gate artifacts > records a skipped gate as not consulted rather than omitting the file  603ms
+✓ tests/harness/schema.test.ts (21 tests) 65ms
+✓ tests/trigger/no-network.test.ts (3 tests) 46ms
+✓ tests/pipelines/detach.test.ts (14 tests) 2152ms
+✓ detachToUpstream > --force proceeds past that refusal, and only then  329ms
+✓ tests/trigger/negatives.test.ts (11 tests) 219ms
+✓ tests/shared/paths.test.ts (14 tests | 1 skipped) 240ms
+✓ tests/shared/handoff-guard.test.ts (11 tests) 2922ms
+✓ the SessionEnd hook runs the guard and NEVER blocks (T179-2) > warns on stdout AND stderr, records the marker, and exits 0  855ms
+✓ the SessionEnd hook runs the guard and NEVER blocks (T179-2) > outside a git repository it says NOT RUN and still exits 0  870ms
+✓ tests/pipelines/session-end/recalled-ids.test.ts (17 tests) 94ms
+✓ tests/ranking.test.ts (11 tests) 95ms
+✓ tests/shared/closeout-erasure.test.ts (10 tests) 752ms
+✓ tests/pipelines/session-start/state-reader.test.ts (13 tests) 92ms
+✓ tests/pipelines/state-import-atomic.test.ts (8 tests) 221ms
+✓ tests/rating-method.test.ts (8 tests) 90ms
+✓ tests/index-upsert.test.ts (10 tests) 68ms
+✓ tests/harness/refwatch.test.ts (8 tests) 2956ms
+✓ G-041 A1 — runLoop refuses a role it did not construct > runs the same foreign roles when the ref-watch is active  811ms
+✓ G-041 A1 — runLoop refuses a role it did not construct > has the ref-watch on by default, so omitting the flag permits foreign roles  688ms
+✓ G-041 A1 — runLoop refuses a role it did not construct > still accepts the stubs themselves after the subclass rule  519ms
+✓ G-041 A1 — runLoop refuses a role it did not construct > still runs runtime-constructed roles with the watch explicitly off  649ms
+✓ tests/pipelines/sync/module-boundary.test.ts (12 tests) 77ms
+✓ tests/pipelines/state-import-qa138.test.ts (10 tests) 68ms
+✓ tests/shadow-stage.test.ts (14 tests) 135ms
+✓ tests/relocate.test.ts (8 tests) 95ms
+✓ tests/pipelines/sync/mirror-parity.test.ts (13 tests) 38ms
+✓ tests/pipelines/state-import-v3.test.ts (4 tests) 250ms
+✓ tests/pipelines/session-start/session-log.test.ts (9 tests) 55ms
+✓ tests/harness/gate.test.ts (10 tests) 15ms
+✓ tests/pipelines/sync/repo-root.test.ts (7 tests) 731ms
+✓ resolveRepoRoot > the sync CLI refuses non-zero with one line naming the cwd (V6)  659ms
+✓ tests/shadow-strategies.test.ts (9 tests) 34ms
+✓ tests/pipelines/session-start/derived-artifacts.test.ts (9 tests) 612ms
+✓ tests/pipelines/sync/pipeline-health.test.ts (12 tests) 12ms
+✓ tests/pipelines/state-import-qa122.test.ts (4 tests) 36ms
+✓ tests/pipelines/sync/scorer.test.ts (11 tests) 10ms
+✓ tests/pipelines/store/index.test.ts (3 tests) 26ms
+✓ tests/content-guard.test.ts (11 tests) 8ms
+✓ tests/shared/skill-index.test.ts (10 tests) 12ms
+✓ tests/pipelines/sync/command-parity.test.ts (9 tests) 27ms
+✓ tests/session-provenance.test.ts (9 tests) 28ms
+✓ tests/pipelines/template-seed.test.ts (3 tests) 30ms
+✓ tests/recall-broadening.test.ts (8 tests) 24ms
+✓ tests/vault-archive.test.ts (6 tests) 14ms
+✓ tests/pipelines/session-start/agent-identity.test.ts (6 tests) 12ms
+✓ tests/pipelines/sync/history.test.ts (7 tests) 12ms
+✓ tests/pipelines/sync/scorer-integration.test.ts (5 tests) 25ms
+✓ tests/setup-hooks.test.ts (4 tests) 9ms
+✓ tests/pipelines/session-start/index.test.ts (8 tests) 35ms
+✓ tests/pipelines/state-import-ebusy.test.ts (3 tests) 23ms
+✓ tests/pipelines/sync/hook-registration.test.ts (7 tests) 11ms
+✓ tests/pipelines/session-start/session-discovery.test.ts (6 tests) 11ms
+✓ tests/pipelines/sync/index.test.ts (4 tests) 82ms
+✓ tests/pipelines/state-import-seeds.test.ts (2 tests) 640ms
+✓ T-175: an import carries none of SIA's own history (IF-1) > the CLI's draft line says verified 0 · gaps 0  609ms
+✓ tests/pipelines/session-start/drift-detector.test.ts (4 tests) 6ms
+✓ tests/harness/cli.test.ts (17 tests) 14877ms
+✓ harness CLI > argument handling refuses rather than defaulting — T-150 > prints usage and exits non-zero with no subcommand  1012ms
+✓ harness CLI > argument handling refuses rather than defaulting — T-150 > exits 0 for an explicit help request  959ms
+✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses an unknown subcommand  1187ms
+✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses an unrecognised flag instead of selecting the default action  1050ms
+✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses a flag whose value is missing  1186ms
+✓ harness CLI > argument handling refuses rather than defaulting — T-150 > requires --loop  847ms
+✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses a malformed loop id  694ms
+✓ harness CLI > argument handling refuses rather than defaulting — T-150 > refuses a non-numeric --max-attempts  826ms
+✓ harness CLI > A1 — a full loop from the command line > exits 0 and writes the three artifacts  1076ms
+✓ harness CLI > A1 — a full loop from the command line > writes a plan artifact that validates against the plan schema  936ms
+✓ harness CLI > A1 — a full loop from the command line > tags the loop with zero-padded three-digit numbers  1017ms
+✓ harness CLI > A1 — a full loop from the command line > exits non-zero when a deterministic check is red, and says so  983ms
+✓ harness CLI > A1 — a full loop from the command line > emits a machine-readable result with --json  917ms
+✓ harness CLI > A1 — a full loop from the command line > fails with a recorded reason on a dirty tree  602ms
+✓ harness CLI > A6 — dry run from the command line > prints the gate payloads and completes  691ms
+✓ harness CLI > schemas > prints both derived schemas  437ms
+✓ harness CLI > schemas > refuses an unknown flag  441ms
+Test Files  91 passed (91)
+Tests  1368 passed | 2 skipped (1370)
+Duration  90.40s (transform 4.16s, setup 2.05s, collect 17.04s, tests 205.21s, environment 45ms, prepare 15.70s)
