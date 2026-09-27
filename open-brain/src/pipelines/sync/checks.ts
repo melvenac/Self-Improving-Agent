@@ -410,30 +410,33 @@ export function checkTemplatePersonalNames(projectRoot: string): CheckResult {
   };
   walk(templateRoot);
 
-  if (unreadable.length > 0) {
-    return {
-      name: "template-personal-names",
-      severity: "issue",
-      message: `${unreadable.length} unreadable path(s) under project-template/ — a leak there cannot be ruled out: ${unreadable.slice(0, 5).join(", ")}${unreadable.length > 5 ? ` (+${unreadable.length - 5} more)` : ""}`,
-    };
-  }
-
-  if (hits.length > 0) {
-    const shown = hits.slice(0, 5).join(", ");
-    const more = hits.length > 5 ? ` (+${hits.length - 5} more)` : "";
-    return {
-      name: "template-personal-names",
-      severity: "issue",
-      message: `Template ships personal names — consumers' agents will use them: ${shown}${more}`,
-    };
-  }
   const skippedNote = skipped.length > 0
     ? `excluded ${skipped.length} dependency/VCS dir(s), not shipped prose: ${skipped.slice(0, 3).join(", ")}${skipped.length > 3 ? ` (+${skipped.length - 3} more)` : ""}`
     : `excluded: none (${[...skipDirs].join(", ")} would be skipped as not shipped prose)`;
+  const scope = `${read} file(s) read; ${skippedNote}`;
+  const unreadNote = unreadable.length > 0
+    ? `${unreadable.length} unreadable path(s) under project-template/ — a leak there cannot be ruled out: ${unreadable.slice(0, 5).join(", ")}${unreadable.length > 5 ? ` (+${unreadable.length - 5} more)` : ""}. `
+    : "";
+  // D1. An unreadable path used to return here, so a name in a file that was
+  // read never appeared. Every hit is named, and so is every unreadable path.
+  if (hits.length > 0 || unreadable.length > 0) {
+    const shown = hits.slice(0, 5).join(", ");
+    const more = hits.length > 5 ? ` (+${hits.length - 5} more)` : "";
+    const hitNote = hits.length > 0
+      ? `Template ships personal names — consumers' agents will use them: ${shown}${more}. `
+      : "";
+    return {
+      name: "template-personal-names",
+      severity: "issue",
+      message: `${hitNote}${unreadNote}${scope}`,
+      report: true,
+    };
+  }
   return {
     name: "template-personal-names",
     severity: "pass",
-    message: `No personal names in project-template/ — ${read} file(s) read; ${skippedNote}`,
+    message: `No personal names in project-template/ — ${scope}`,
+    report: true,
   };
 }
 
@@ -1139,13 +1142,28 @@ export function checkRetirements(projectRoot: string): CheckResult {
   // An unread file is an issue naming the path, never a skip: a retired name in
   // it would otherwise ship under "0 unexpected across N live files".
   if (unexpected.length || stale.length || unreadable.length) {
-    const all = [...unreadable.map((u) => `unreadable: ${u}`), ...unexpected, ...stale];
-    const shown = all.slice(0, 6).join("; ");
-    const more = all.length > 6 ? `; +${all.length - 6} more` : "";
-    const lead = unexpected.length || stale.length
-      ? "retired names still referenced outside the record"
-      : `${unreadable.length} path(s) could not be read, so the scan is ${listing.source === "git" ? "incomplete" : "partial"} (${listing.label})`;
-    return { name, severity: "issue", message: `${lead}: ${shown}${more}` };
+    const findings = [...unexpected, ...stale];
+    const unreadNotes = unreadable.map((u) => `unreadable: ${u}`);
+    // D1. Findings come first and are all named. Unreadables used to occupy
+    // the six slots, so a retired name fell into "+N more".
+    const unreadShown = unreadNotes.slice(0, 6).join("; ");
+    const unreadMore = unreadNotes.length > 6 ? `; +${unreadNotes.length - 6} more` : "";
+    if (findings.length === 0) {
+      const lead = `${unreadable.length} path(s) could not be read, so the scan is ${listing.source === "git" ? "incomplete" : "partial"} (${listing.label})`;
+      return { name, severity: "issue", message: `${lead}: ${unreadShown}${unreadMore}`, report: true };
+    }
+    const parts = [findings.join("; "), unreadShown].filter(Boolean).join("; ");
+    // D2. A finding used to replace the listing label, so FALLBACK and PARTIAL
+    // disappeared. The label stays, and D3 prints this issue.
+    const scanNote = unreadable.length > 0
+      ? ` The scan is ${listing.source === "git" ? "incomplete" : "partial"} (${listing.label}).`
+      : ` (${listing.label}).`;
+    return {
+      name,
+      severity: "issue",
+      message: `retired names still referenced outside the record: ${parts}${unreadMore}.${scanNote}`,
+      report: true,
+    };
   }
 
   // The unverifiable half is stated, not omitted. `command` and `tool` names can
@@ -1357,16 +1375,7 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
       unreadable.push(`${rel} (${(e as NodeJS.ErrnoException).code ?? "error"})`);
     }
   }
-  if (unreadable.length > 0) {
-    return {
-      name,
-      severity: "issue",
-      message: `${unreadable.length} unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: ${unreadable.slice(0, 4).join(", ")}${unreadable.length > 4 ? ` (+${unreadable.length - 4} more)` : ""}`,
-      report: true,
-    };
-  }
-
-  if (files.length === 0) {
+  if (files.length === 0 && unreadable.length === 0) {
     return { name, severity: "skip", message: "open-brain/src contains no .ts files — nothing to check" };
   }
 
@@ -1383,7 +1392,8 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
   let unresolved = 0;
 
   for (const rel of files) {
-    const src = sources.get(rel)!;
+    const src = sources.get(rel);
+    if (src === undefined) continue;
     const out: string[] = [];
     let m: RegExpExecArray | null;
     specPattern.lastIndex = 0;
@@ -1446,14 +1456,22 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
   }
 
   const scale = `${files.length} file(s), ${files.filter((f) => !isMemorySide(f)).length} core; excluded ${excluded} non-.ts file(s), not modules in the graph`;
-  if (violations.length > 0) {
+  const unreadNote = unreadable.length > 0
+    ? `${unreadable.length} unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: ${unreadable.slice(0, 4).join(", ")}${unreadable.length > 4 ? ` (+${unreadable.length - 4} more)` : ""}. `
+    : "";
+  // D1. The unreadable return used to happen before this graph, so a crossing
+  // in a file that was read was never named. D3: the file count is on the issue.
+  if (violations.length > 0 || unreadable.length > 0) {
+    const cross = violations.length > 0
+      ? `core imports memory in ${violations.length} place(s) — the module boundary has re-closed: ` +
+        `${violations.slice(0, 4).join("; ")}${violations.length > 4 ? `; +${violations.length - 4} more` : ""}. ` +
+        `Core must never import memory; memory may import core. `
+      : "";
     return {
       name,
       severity: "issue",
       message:
-        `core imports memory in ${violations.length} place(s) — the module boundary has re-closed: ` +
-        `${violations.slice(0, 4).join("; ")}${violations.length > 4 ? `; +${violations.length - 4} more` : ""}. ` +
-        `Core must never import memory; memory may import core. Checked ${scale}. ` +
+        `${cross}${unreadNote}Checked ${scale}. ` +
         `LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.`,
       report: true,
     };
