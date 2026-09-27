@@ -47,8 +47,7 @@ export function isDroppedByRetention(t: Task, sessionFirstRevs: readonly (number
   // against the caller's number — one write numbered 1124 dropped every
   // uncited done task. A task closed before v3 (closed_rev null) orders before
   // every keyed session, as a legacy handoff does.
-  const since = sessionFirstRevs.filter((r) => compareFirstRev(r, t.closed_rev) > 0).length;
-  return since >= DONE_RETENTION_SESSIONS;
+  return t.closed_session !== null && t.closed_session <= Math.max(-1, ...sessionFirstRevs.map((r) => r ?? -1)) - DONE_RETENTION_SESSIONS;
 }
 
 export const SUMMARY_BEGIN = "<!-- state:begin -->";

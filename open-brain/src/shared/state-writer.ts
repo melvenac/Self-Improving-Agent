@@ -583,7 +583,7 @@ export function applyRetention(
 ): { dropped: string[]; kept: string[] } {
   const dropped: string[] = [];
   const kept: string[] = [];
-  const revs = s.sessions.map((x) => x.first_rev);
+  const revs = s.sessions.map((x) => x.n);
   s.tasks = s.tasks.filter((t) => {
     // Same predicate the INBOX view filters on, so the record and the rendered
     // Done list cannot disagree about what still exists (T-144).
