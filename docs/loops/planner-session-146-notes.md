@@ -70,3 +70,94 @@ Cursor seats are not woken by hub messages. The planner asks Aaron to nudge ("re
 These were created with `hub-talk --as atlas --peer <name>`. That creates the `{atlas, name}` room, and it no longer
 rewrites the peer's card (`bc157f5`). **Each seat always passes its own `--session`.** Turns 171 and 172 in the shared
 room are superseded by these rooms' turn 1.
+
+## HANDOFF TO THE NEXT PLANNER (session 146 rolls here, 2026-09-27 about 07:45Z). Read this section first.
+
+**The record is schema v3 (rev 134)**, and T-179 r2 is merged (#170, `c91673d`). The migration is merged (#171, `ecd28dd`).
+- The main checkout is detached at `ecd28dd`, built and stamped `ecd28dd`. `setup.mjs` was run: `end.md` installed,
+  hooks registered.
+- A2A-Hub was migrated by Relay: v3 rev 72, `b0f143b`. Its other `a2a-*` worktrees stay v2 until their seats take
+  master. **The A2A-Hub main checkout needs Aaron's word** (its D-005).
+
+**In flight when this session rolled:**
+- **Background merge job** (planner session): PRs **#172** importer r2+r5, **#173** T-003 r1+r2, **#174** T-171 r1+r2,
+  **#175** T-048 r1, **#176** T-048 r2, merged in that order on Aaron's word ("Merge those five now").
+  - Each merges pinned to its head and only on `COMPLETED:SUCCESS` + `MERGEABLE CLEAN`.
+  - **Verify on `origin/master` which merged:** `gh pr view <n> --json state`. The job stops at the first failure.
+- **`/bootstrap` r3+r4 do NOT merge yet.** `cli.ts` conflicts with importer r5 (a genuine overlap in the `state import`
+  section).
+  - **Next:** send `cursor-builder` a reconciliation round. Merge the new master into `loop/bootstrap-fix-r4` (r3 + r4,
+    candidate `7bd47f4`), resolve `cli.ts`, and prove it on tcm.
+  - **Then QA 161 scores the reconciled tip.** Amend `bootstrap-fix-r4-dispatch-qa.md`'s candidate SHA.
+- **`cursor-infra`, record 175: the Cursor QA driver** (`chore/qa-driver-cursor`, driver `42fb122`, handoff `df35602`).
+  - The deny list is proven: a refusal, the allowed route and a known positive.
+  - **Owed (hub turn 18):** the SELF-EDIT gap. `.cursor/cli.json` is in the QA tree, so the seat could edit it. It
+    must be denied or proven harmless, and the driver must hash the fence before and after each attempt. Plus a report
+    on wrapper forms (`git -C`, `cmd /c`, …), which is parity with the Claude driver, whose ref audit detects them.
+  - **When that holds:** Aaron merges it, copies the new files to the QA machines, and launches the Cursor QA queue.
+- **SEVEN Cursor QA runs are waiting for that driver** (all dispatched, drivers generated):
+  - **162** A13 and **174** A13 spot-check (GPT-5.6 Sol);
+  - **161** `/bootstrap` r4 (after the reconciliation);
+  - **172** importer r6 `c2ee52d`;
+  - **173** T-048 r1b `d5b78cb`;
+  - **177** T-171 r3 `993ed08`;
+  - **178** T-048 r2b `822f398`.
+
+  All run as Composer 2.5 unless named. **QA runs ONLY on the laptop and the QA PC** (Aaron). Both have
+  `cursor-agent` installed and logged in. Launch lines are in `qa-launch.md`: hidden, and only on an idle machine.
+- **The desktop overlay `cursor-qa-overlay.md` is RETIRED.**
+
+**Developer seats: all Cursor (Grok 4.7).** They listen on the hub after posting, and the planner listens per room.
+| Seat | `--as` | Room | State |
+|---|---|---|---|
+| `sia-forge` | `grok` | `k57frxw0ptb8tadmqdwy0khhks8ey006` | idle; next is T-048 r3 (`server.ts`: SILENT 4/9 + the T048-D1 `server.ts` renderers), now unblocked by the T-179 merge |
+| `sia-infra` | `cursor-infra` | `k5702788wctxj75begyt4x2k5x8f6mav` | record 175, driver hardening |
+| `sia-builder` | `cursor-builder` | `k57098epn7qz32vt0cazfjpbes8f6kdq` | idle; next is the `/bootstrap` reconciliation. **It does not read its room reliably: Aaron nudges it with "Read turn N in hub room …"** |
+
+**The next planner must re-arm its listeners.** Run one background `hub-talk --as atlas --session <room> --wait --wait-timeout 3500`
+per room, and re-arm after each firing. The first firing can dump old unread turns.
+
+**Owed by the planner (not done this session):**
+1. **`ob_state` writes.** Nothing was written to the record this session except by the migration. Open tasks for:
+   - READER'S SEAT UNRESOLVED;
+   - QA 134 R2-D2;
+   - QA 142 O-1, O-2 and Open 3;
+   - QA 154's QA154-1 rows;
+   - QA 157 R-1;
+   - T171-D2's char-level fix (done in r3; close it when QA 177 passes);
+   - importer D3 as a gap;
+   - SIA `/sync` misfiring in non-SIA projects (command-names reading HTTP routes; mirror-parity with no template),
+     from Relay;
+   - the `cli-recall-trigger` hook shelling out through `cmd` (use `execFile` and `windowsHide`);
+   - `/start` falling back to the prose files for a non-object `state.json`;
+   - Open 2's second narrowing (`sync` auto-fix on a non-literal root).
+
+   **Record decisions** from Aaron today:
+   - QA only on the QA machines;
+   - Cursor QA with Composer 2.5, after the calibration;
+   - one hub room per seat, with listeners on both sides;
+   - the desktop runs QA only when Aaron is away and no agent is running.
+
+   **Raise T-167/T-191:** the planner missed the Step-Back and PRD again this session.
+2. **Scout's research 4** (`research/qa-telegram-approval` `124d748`): merge it under D-032, then ask Aaron (build it?
+   token option a or b?).
+3. **Loose ends:**
+   - delete `~/Worktrees/sia-qa2-gpt-cand` (locked; its work is pushed at `a6de057`);
+   - the void `qa/cal-a12-*` branches (keep, or delete on Aaron's word);
+   - ask Relay whether the `a2a-*` and `qa3-*` worktrees can go.
+
+**Watch-outs learned this session:**
+- **Dry-run every line on its target machine before giving it to Aaron.** The QA PC's `%USERPROFILE%` and
+  `%LOCALAPPDATA%` contain a space. Bash expands `$env:` before ssh.
+- **`irm | iex` is blocked by Defender** (`Trojan:Win32/Commando.A!ml`). Download to a file, read it, then run it.
+- **A `Win32_Process Create` without `ShowWindow=0` opens visible windows** on the machine.
+- **Read the candidate's diffed code before ruling,** not only the handoff (Aaron asked twice). A12-1 was found that
+  way.
+- **The QA 149 finding holds:** a ruling's reach includes earlier rulings (R77); trace the effects, not only the text.
+
+**This session's own error entries** (additions to the "misses" list above):
+- a guessed full SHA in a launch line (caught before use);
+- `$env:TEMP` expanded by bash;
+- unquoted paths with a space, twice;
+- desktop QA overlay seats assumed to be running;
+- the calibration kickoff lines let chats open in the old worktrees.
