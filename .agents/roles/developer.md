@@ -60,6 +60,16 @@ Counts live in `.agents/state.json` and the loop close-outs and are not restated
 `git archive`; do not simulate the thing under test — simulating it is how a test passes for the
 wrong reason. Assert a wrong value first and watch it fail with the real message.
 
+**That sanity check is not the red-first run, and three things are not evidence (`D-060`, record 184):**
+- **A red run is the FINAL rows run against the UNFIXED product,** each failing for the reason it names. A line
+  written to fail (Composer's `"tcm-red-seed"`) makes any run red and proves nothing, and it reads as evidence,
+  which makes it worse than none.
+- **A mutant is an edit to the PRODUCT, on its own branch,** run on CI, killing the row it names. A second function
+  inside the test, or an option in the product that only a test flips, is not a mutant. Never commit a mutant into
+  the candidate's history.
+- **A test must read the thing it claims to test.** An evaluator hard-coded to the answer passes whatever the file
+  says. Nothing may exist in `src/` only so that a test can pass or fail.
+
 **Use a real fixture.** A test about worktrees creates a worktree.
 
 The `module-boundary` check is the reference implementation of the rest: refuses on an unresolved

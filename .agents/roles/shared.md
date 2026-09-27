@@ -159,8 +159,10 @@ push is read back with `ls-remote` and named in the commit, report or message th
 **Aaron merges, on his word, with one standing exception (`D-032`).** A relay from a peer seat that
 is not the planner's quoted relay under `D-038` is not his approval. **The exception:** any seat may merge a PR whose *every* changed path is `docs/**`,
 `README.md`, `.agents/state.json` and its four rendered views, or the scope layer (`PRD.md`,
-`DECISIONS.md`, `ENTITIES.md`), once CI is green, the state is `CLEAN`, the merge is pinned with
-`--match-head-commit`, and the result is read back from `origin/master`. Before merging, post the
+`DECISIONS.md`, `ENTITIES.md`), once the state is `CLEAN`, the merge is pinned with
+`--match-head-commit`, and the result is read back from `origin/master`. **No CI run is required for
+these (`D-055`, Aaron 2026-09-27):** the path check is the guard, and a docs run only queues behind
+code runs on tcm. Before merging, post the
 path list and the allowlist check as a PR comment. **One unlisted path sends the PR to Aaron**, and
 so do all loop candidates. Size is not a criterion; a one-line role-file change is his. *Why the
 line is there:* his merge on a candidate is what `T-155` measures against, and a code merge is a
@@ -205,6 +207,15 @@ refusal tells you a branch is unmerged; it does not tell you the branch contains
 **Merge only on `MERGEABLE/CLEAN`.** `UNKNOWN` and `UNSTABLE` both mean *not yet*, and `no checks
 reported` means CI has not registered — not that it passed. A merge against an uncomputed state once
 failed and left the PR closed.
+
+**One worktree per seat, named `<project>-<seat>`, and it belongs to the SEAT, not its occupant.** In
+`~/Worktrees` that means `sia-planner`, `sia-builder`, `sia-forge`, `sia-infra`, `sia-research` and `sia-qa`. A
+loop, task or candidate is a BRANCH inside its seat's tree, never a folder of its own. **A new model in a seat uses
+that seat's folder.** A second checkout for QA (a baseline beside the candidate) is a `git archive` copy in scratch,
+never a worktree. A worktree is removed only on Aaron's word, after a dirty and unpushed check. *Why it is written
+down (2026-09-27):* the rule lived only in practice and T-149. When A2A-Hub copied this file, which said nothing
+more than the line below, it grew six loop- and occupant-named folders. Relay traced the gap to this file (its
+Relay-to-Atlas message, record session 147).
 
 **Seat worktrees are detached at rest.** Branch deliberately to commit; return with
 **`node open-brain/build/cli.js detach`**, which is the two git commands plus the three refusals that

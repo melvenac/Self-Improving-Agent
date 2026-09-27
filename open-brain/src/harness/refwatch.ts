@@ -121,6 +121,9 @@ export interface RefVerdict {
 
 const short = (sha: string | null): string => (sha === null ? "(absent)" : sha.slice(0, 12));
 
+/** Git's old-value for "must not exist" in `update-ref`'s compare-and-swap. */
+export const ZERO_OID = "0000000000000000000000000000000000000000";
+
 const describe = (d: RefDelta): string =>
   d.symbolic === true
     ? `${d.ref} moved from ${d.before ?? "(detached)"} to ${d.after ?? "(detached)"}`
@@ -359,15 +362,24 @@ export class RefWatch {
     const d = verdict.deferredDelta;
     if (d === null || d.kind !== "deleted" || d.before === null) return "";
     try {
-      // No compare-and-swap: the ref does not exist, so there is no old value
-      // to swap against. `before` is what the window opened on.
-      setRefTo(this.repoRoot, d.ref, d.before, null);
+      // A compare-and-swap against ABSENCE. The all-zero old value is git's own
+      // spelling of "this ref must not exist": `update-ref <ref> <sha> <zero>`
+      // exits 0 when the ref is absent and 128 when it is present. So a ref
+      // that something RE-CREATED between the comparison and this restore — at
+      // a sha nobody has judged — is refused and reported, never overwritten.
+      //
+      // Correction, recorded where the defect was: the first version of this
+      // said "no compare-and-swap: the ref does not exist, so there is no old
+      // value to swap against", passed `null`, and made this an unconditional
+      // write. That was false (QA report 1 §5; conceded as a developer error).
+      setRefTo(this.repoRoot, d.ref, d.before, ZERO_OID);
       return ` ${d.ref} was deleted during the stage and was put back at ${short(d.before)} before HEAD was read.`;
     } catch (err) {
       const why = err instanceof GitFailed ? err.stderr || err.message : (err as Error).message;
       return (
         ` ${d.ref} WAS DELETED DURING THE STAGE AND COULD NOT BE PUT BACK (${why}). ` +
-        `Recover by hand before rerunning — HEAD does not resolve.`
+        `If it exists again it was re-created by something other than this watch, at a sha this watch ` +
+        `did not judge, and it was left alone rather than overwritten. Recover by hand before rerunning.`
       );
     }
   }

@@ -58,6 +58,17 @@ describe("T-179 merge: an import writes a schema v3 record that ob_state accepts
     expect(s.gaps).toEqual([]);
   });
 
+  it("T-171: an imported note has no recorded author, so a later session cannot replace it unnamed", () => {
+    const s = StateSchema.parse(JSON.parse(importAndRead()));
+    const written = s.tasks.filter((t) => t.note !== "");
+    expect(written.length).toBeGreaterThan(0);
+    for (const t of s.tasks) expect([t.id, t.note_by]).toEqual([t.id, t.note === "" ? [] : null]);
+    const open = written.find((t) => t.status !== "done")!;
+    const r = applyStateOps(root, { session: 55, expected_revision: s.revision, session_uuid: WRITER, ops: [{ op: "update_task", id: open.id, replace_note: "x" }] });
+    expect(r.ok).toBe(false);
+    expect(r.error).toMatch(/written by an unrecorded session/);
+  });
+
   it("ob_state's writer accepts it: another seat's set_handoff lands beside the legacy entry, which survives until its OWN seat writes (R179-3)", () => {
     importAndRead();
     const w = applyStateOps(root, {

@@ -1,0 +1,29 @@
+   × T-171: a note is never replaced silently > the T-169 shape: a bare `note` on update_task, meant as an addition, does not erase a 1,869-character note 161ms
+   × T-171: a note is never replaced silently > D4: a bare `note` on close_task does not erase the note either 76ms
+   × T-171: a note is never replaced silently > append_note adds to the note, and the dry run and the write both report it with sizes 28ms
+   × T-171: a note is never replaced silently > replace_note on the writer's own note is reported with both sizes and the removed text's first line, in the dry run and the write 27ms
+   × T-171: a note is never replaced silently > a replace that keeps every character of the old note says nothing was removed 24ms
+   × T-171: a note is never replaced silently > append_note and replace_note together are refused 28ms
+   × T-171: a note is never replaced silently > replace_note on a note another session wrote is refused, naming that session, and nothing is written 32ms
+   × T-171: a note is never replaced silently > with replace_other_sessions: true it replaces, the report names the session whose text went, and the note becomes the writer's 31ms
+   × T-171: a note is never replaced silently > a note with no recorded author (written before per-note keys) counts as another session's 31ms
+   × T-171: a note is never replaced silently > an unregistered writer cannot prove any note is its own, so its replace is refused 30ms
+   × T-171: a note is never replaced silently > replacing an EMPTY note needs no flag and removes nothing 28ms
+   × T-171: a note is never replaced silently > close_task follows the same rules: append reported, a foreign replace refused 34ms
+   × T-171: a note is never replaced silently > open_task reports the note it sets and keys it to the writer; reopen_task reports its append 74ms
+   ✓ T-171: a note is never replaced silently > an op that does not touch the note reports no note change 68ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected 'Correction: README.md is rewritten to…' to be 'T-169 ORIGINAL: at Loop 15 close, rew…' // Object.is equality
+AssertionError: expected 'Correction: README.md is rewritten to…' to be 'T-169 ORIGINAL: at Loop 15 close, rew…' // Object.is equality
+AssertionError: expected false to be true // Object.is equality
+AssertionError: expected [] to deeply equal [ Array(1) ]
+AssertionError: expected [] to deeply equal [ Array(1) ]
+AssertionError: expected 'ops[0] invalid at $: Unrecognized key…' to match /append_note or replace_note, not both/
+AssertionError: expected 'ops[0] invalid at $: Unrecognized key…' to match /T-009's note holds text written by se…/
+AssertionError: expected false to be true // Object.is equality
+AssertionError: expected 'ops[0] invalid at $: Unrecognized key…' to match /T-010's note holds text written by an…/
+AssertionError: expected 'ops[0] invalid at $: Unrecognized key…' to match /this write has no registered session/
+AssertionError: expected false to be true // Object.is equality
+AssertionError: expected 'ops[0] invalid at $: Unrecognized key…' to match /^ops\[0\] \(close_task\): T-005's not…/
+AssertionError: expected [] to deeply equal [ 'T-028 note SET: 0 -> 3 chars' ]
+      Tests  13 failed | 1 passed (14)

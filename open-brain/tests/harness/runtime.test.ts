@@ -192,7 +192,9 @@ describe("harness runtime", { timeout: 60_000 }, () => {
         const abs = join(ctx.repoRoot, this.target);
         mkdirSync(dirname(abs), { recursive: true });
         writeFileSync(abs, "written outside the allowlist, bypassing ctx.write\n", "utf-8");
-        return { summary: "wrote two files, one of them out of bounds" };
+        // A schema-valid R_t (candidate A): the refusal under test is the
+        // allowlist, and a malformed report would fail the loop first.
+        return { loop: ctx.loop, summary: "wrote two files, one of them out of bounds", changes: [], commands: [], claims: [] };
       }
     }
 
@@ -564,7 +566,12 @@ describe("harness runtime", { timeout: 60_000 }, () => {
     });
 
     it("fails the loop when the developer stage changes nothing", async () => {
-      const idle: RoleSession = { role: "developer", run: () => ({ summary: "did nothing" }) };
+      // A schema-valid R_t reporting no changes, so the row under test is the
+      // empty candidate and not the report schema (candidate A).
+      const idle: RoleSession = {
+        role: "developer",
+        run: (ctx: RoleContext) => ({ loop: ctx.loop, summary: "did nothing", changes: [], commands: [], claims: [] }),
+      };
       const r = await runLoop(config({ roles: { planner: new StubPlanner(), developer: idle, qa: new StubQa() } }));
       expect(r.failure?.code).toBe("developer-no-change");
       expect(r.failure?.reason).toContain("no candidate for QA to evaluate");

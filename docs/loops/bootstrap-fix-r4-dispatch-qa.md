@@ -6,7 +6,15 @@
 
 ## The candidate
 
-- **`7bd47f4`** on `origin/loop/bootstrap-fix-r4`. The handoff is at `dad50d2` (`docs/loops/` only after `7bd47f4`).
+- **AMENDED in record session 147: score `d74c0e5` on `origin/loop/bootstrap-fix-r4-rec`.** That is r4 (`7bd47f4`,
+  handoff `dad50d2`) merged with `origin/master` `e201baa` (record 179, handoff `ade630d`), because r4 conflicted with
+  importer r5 in `cli.ts` and could not merge as it stood. The merge resolves `cli.ts:535` to import both
+  `inboxWarning` and `describeDecisionsUnreadable`, and keeps both CHANGELOG sections. tcm `36305482242`: 1493 passed.
+  - **Score round 4's rulings on the merge commit,** and add one item: the importer r2/r5 rows still pass there, and
+    the merged `cli.ts` changes nothing beyond the union of the two import lists (`git show --cc d74c0e5 --
+    open-brain/src/cli.ts`).
+- Round 4 itself: **`7bd47f4`** on `origin/loop/bootstrap-fix-r4`. The handoff is at `dad50d2` (`docs/loops/` only
+  after `7bd47f4`).
 - Stacked on r3 `7f4ca74` (via its handoff `ee3acce`), which QA 145 ACCEPTED. **Score only what round 4 adds.**
 - **Product:** `cli.ts`, `bootstrap/index.ts`, `shared/repo-root.ts`, the new `shared/state-record.ts`, and
   `bootstrap.md`.

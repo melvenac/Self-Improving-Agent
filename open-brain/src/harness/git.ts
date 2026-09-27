@@ -17,9 +17,331 @@
  *
  * The deny list is checked on the **subcommand actually passed to git**, not on
  * a string somebody assembled, so it cannot be slipped past by quoting.
+ *
+ * ## Every runtime git call goes through ONE function, and it carries three layers
+ *
+ * A role process can plant a hook, or a program-valued config key, and get
+ * **code execution inside the runtime's own git calls**, with the runtime's
+ * environment — which in live mode holds `TYPESAFE_API_KEY`. `--no-verify`
+ * does not stop it: it skips `pre-commit` and `commit-msg` only. Measured
+ * 2026-09-22 on git 2.54.0.windows.1 (design §2.3, reproduced by QA): a
+ * planted `post-commit` ran under `commitPaths`' exact flags, a
+ * `reference-transaction` hook ran ten times, and `core.fsmonitor` ran on
+ * `status`, `add` and `commit`. A `filter.<x>.clean` in the GLOBAL config ran
+ * with the repo-level overrides on (QA, rulings-2).
+ *
+ * - **Layer 0 (R7): the machine's git config is not read.** `GIT_CONFIG_GLOBAL`
+ *   and `core.hooksPath` point at the NULL DEVICE, `GIT_CONFIG_NOSYSTEM=1`, and
+ *   identity is passed with `-c`. The null device and not a runtime-owned empty
+ *   file in a temp directory: a role can write to a file outside the
+ *   repository, and a "known empty" file it can fill is a layer it can remove.
+ *   Nothing can be written into `/dev/null` — measured on Git for Windows from
+ *   both MSYS and Node, where git maps it to `NUL`.
+ * - **Layer 1: repo-local program-valued keys are overridden on the command
+ *   line.** `-c core.hooksPath=/dev/null -c core.fsmonitor=false`, which outrank
+ *   every config file. Defence in depth against an ORDERING defect in layer 2
+ *   (`configwatch.ts`), which restores `.git/config` and the hooks before any
+ *   git read — a runtime git read moved ahead of that restore is exactly what
+ *   this layer still stops (CA-4b-L1).
+ * - Inherited environment variables that REDIRECT git (`GIT_DIR`,
+ *   `GIT_CONFIG_PARAMETERS`, …) are removed, so a variable set in the shell
+ *   that launched the runtime cannot point these calls somewhere else.
+ *
+ * **Limit, stated where the layers live:** these protect the RUNTIME's git
+ * calls. A role's own git calls are the role's; what they leave behind is what
+ * the ref, config and allowlist windows judge.
  */
 
-import { execFileSync, spawnSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+/**
+ * The identity the runtime commits and tags as. Passed with `-c` on every call,
+ * because layer 0 removes the global config a repository would otherwise
+ * inherit its identity from — and a layer that silences config and then cannot
+ * commit is not a pass (CA-4c).
+ */
+export const RUNTIME_IDENTITY = {
+  name: "HoH harness runtime",
+  email: "harness-runtime@sia.invalid",
+} as const;
+
+/**
+ * The null device, as git spells it on every platform it runs on here. Git for
+ * Windows maps `/dev/null` to `NUL` itself; passing `NUL` would be read as a
+ * relative path named `NUL` by git's own path handling.
+ */
+export const NULL_DEVICE = "/dev/null";
+
+/** Layer 1 and identity: `-c` arguments placed before every subcommand. */
+export const RUNTIME_GIT_OPTIONS: readonly string[] = [
+  "-c",
+  `core.hooksPath=${NULL_DEVICE}`,
+  "-c",
+  "core.fsmonitor=false",
+  "-c",
+  `user.name=${RUNTIME_IDENTITY.name}`,
+  "-c",
+  `user.email=${RUNTIME_IDENTITY.email}`,
+];
+
+/**
+ * Inherited variables that redirect where git reads config or which repository
+ * it operates on. Removed from the runtime's git environment, whoever set them.
+ */
+const REDIRECTING_GIT_VARS = /^GIT_(CONFIG(_.*)?|DIR|WORK_TREE|INDEX_FILE|COMMON_DIR|OBJECT_DIRECTORY|ALTERNATE_OBJECT_DIRECTORIES|NAMESPACE)$/;
+
+/** The three variables that DEFINE the machine config — kept, and only, when reading it (R19). */
+const MACHINE_CONFIG_VARS = new Set(["GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM", "GIT_CONFIG_NOSYSTEM"]);
+
+/**
+ * Layer 1 as ENVIRONMENT (R17). `-c` reaches only the git process it is
+ * passed to; `GIT_CONFIG_COUNT` reaches every git a child process starts —
+ * `write-build-info.mjs` runs git inside the build check, where a `-c` never
+ * arrives. Both are applied: the argument for the runtime's own call, the
+ * environment for anything downstream of it.
+ */
+export const LAYER1_ENV: Readonly<Record<string, string>> = {
+  GIT_CONFIG_COUNT: "2",
+  GIT_CONFIG_KEY_0: "core.hooksPath",
+  GIT_CONFIG_VALUE_0: NULL_DEVICE,
+  GIT_CONFIG_KEY_1: "core.fsmonitor",
+  GIT_CONFIG_VALUE_1: "false",
+};
+
+/* ------------------------------------------------------------------------- *
+ * The per-repository pin (R18, R19)
+ *
+ * A loop resolves, at preflight and once, which git dir and work tree it is
+ * operating on, and which generated global config it runs under. Every runtime
+ * git call in that repository then carries them in its environment. A role
+ * that rewrites a linked worktree's `.git` pointer file cannot send the next
+ * call into another repository (measured by QA), and a role that edits the
+ * generated config file is caught before the call that would read it.
+ * ------------------------------------------------------------------------- */
+
+export interface RepoPin {
+  gitDir: string;
+  workTree: string;
+  /**
+   * The generated global config (R19). Its exact bytes are checked before every
+   * call. Null during the part of preflight that runs BEFORE the safe keys have
+   * been read: the pin is in place from the moment the dirs are resolved, with
+   * the null device as the global config, so every preflight query already runs
+   * pinned (the planner's ordering condition on R19).
+   */
+  globalConfigPath: string | null;
+  globalConfigBytes: Buffer | null;
+}
+
+const pins = new Map<string, RepoPin>();
+const pinKey = (p: string): string => {
+  const r = resolve(p);
+  return process.platform === "win32" ? r.toLowerCase() : r;
+};
+
+/** Pin a repository for the duration of a loop. The runtime calls this at preflight. */
+export function pinRepo(repoRoot: string, pin: RepoPin): void {
+  pins.set(pinKey(repoRoot), pin);
+}
+
+/** Release a pin. The runtime calls this when the loop ends, however it ends. */
+export function unpinRepo(repoRoot: string): void {
+  pins.delete(pinKey(repoRoot));
+}
+
+/** The pin in force for `cwd`, if any. Exported for tests and for the iteration record. */
+export function pinFor(cwd: string): RepoPin | null {
+  return pins.get(pinKey(cwd)) ?? null;
+}
+
+/**
+ * Layer 0: the environment every runtime git call runs with.
+ *
+ * Built from the current process environment on each call rather than cached,
+ * so a test that changes `process.env` sees the change — and so nothing here
+ * depends on remembering to rebuild it.
+ *
+ * `machineRead` is the ONE exception, used only at preflight (R19): reading
+ * the machine's non-program keys needs the machine's config visible. It still
+ * carries layer 1, and it never runs after a role has.
+ */
+export function runtimeGitEnv(
+  base: NodeJS.ProcessEnv = process.env,
+  pin: RepoPin | null = null,
+  machineRead = false,
+): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = {};
+  for (const [k, v] of Object.entries(base)) {
+    const K = k.toUpperCase();
+    if (machineRead && MACHINE_CONFIG_VARS.has(K)) {
+      env[k] = v;
+      continue;
+    }
+    if (REDIRECTING_GIT_VARS.test(K)) continue;
+    env[k] = v;
+  }
+  if (!machineRead) {
+    env.GIT_CONFIG_GLOBAL = pin?.globalConfigPath ?? NULL_DEVICE;
+    env.GIT_CONFIG_NOSYSTEM = "1";
+  }
+  Object.assign(env, LAYER1_ENV);
+  if (pin !== null) {
+    env.GIT_DIR = pin.gitDir;
+    env.GIT_WORK_TREE = pin.workTree;
+  }
+  return env;
+}
+
+/**
+ * THE one place the runtime spawns git. Every other function in this module,
+ * and every other module, goes through here — asserted by a scan in the tests
+ * that is itself shown to find a planted bare spawn (CA-4b, R16).
+ */
+function spawnGit(cwd: string, args: readonly string[], machineRead = false) {
+  assertAllowed(args);
+  const pin = machineRead ? null : pinFor(cwd);
+  if (pin !== null && pin.globalConfigPath !== null && pin.globalConfigBytes !== null) {
+    // R19's file lives outside the repository, so a role can write it. The
+    // runtime holds its exact bytes and refuses to run git over a changed one.
+    let now: Buffer | null = null;
+    try {
+      now = readFileSync(pin.globalConfigPath);
+    } catch {
+      now = null;
+    }
+    if (now === null || !now.equals(pin.globalConfigBytes)) {
+      throw new GitRefused(
+        `the runtime's generated global git config at ${pin.globalConfigPath} is ${now === null ? "missing" : "not the bytes the runtime wrote"} — ` +
+          `something outside the runtime changed it, and running git over it would read config nobody vetted. ` +
+          `Refused before the call: git ${args.join(" ")}`,
+      );
+    }
+  }
+  return spawnSync("git", [...RUNTIME_GIT_OPTIONS, ...args], {
+    cwd,
+    encoding: "utf-8",
+    shell: false,
+    env: runtimeGitEnv(process.env, pin, machineRead),
+    stdio: ["ignore", "pipe", "pipe"],
+    maxBuffer: 64 * 1024 * 1024,
+  });
+}
+
+/* ------------------------------------------------------------------------- *
+ * R19 — the machine's NON-program keys, carried; everything else, not
+ * ------------------------------------------------------------------------- */
+
+/**
+ * Keys that change how git reads and writes files but never name a program.
+ * Dropping them changes behaviour: with `core.autocrlf=true` on the machine
+ * and layer 0 reading nothing, an untouched file reads as modified and a CRLF
+ * save commits as CRLF (QA, measured). An ALLOWLIST: a key not named here is
+ * not carried, whatever it is.
+ */
+export const SAFE_MACHINE_KEYS: readonly string[] = [
+  "core.autocrlf",
+  "core.eol",
+  "core.safecrlf",
+  "core.symlinks",
+  "core.ignorecase",
+  "core.longpaths",
+  "core.filemode",
+  "core.precomposeunicode",
+  "core.protectntfs",
+  "core.checkstat",
+  "core.trustctime",
+];
+
+export interface MachineSafeConfig {
+  /** key → value, the machine's effective value (global over system). */
+  values: Record<string, string>;
+  /** `filter.<x>.required` set true in machine OR repository config: refused, by name. */
+  requiredFilters: string[];
+}
+
+function readScope(cwd: string, scope: "--system" | "--global" | "--local", pattern: string): Array<[string, string]> {
+  const r = spawnGit(cwd, ["config", scope, "--get-regexp", pattern], scope !== "--local");
+  if (r.status === 1) return [];
+  if (r.error || r.status !== 0) {
+    throw new GitFailed(`git config ${scope} --get-regexp ${pattern} failed in ${cwd}: ${(r.stderr ?? "").trim() || `exit ${r.status}`}`, r.status ?? null, (r.stderr ?? "").trim());
+  }
+  const out: Array<[string, string]> = [];
+  for (const line of (r.stdout ?? "").split("\n")) {
+    const t = line.trim();
+    if (t === "") continue;
+    const i = t.indexOf(" ");
+    out.push(i < 0 ? [t.toLowerCase(), ""] : [t.slice(0, i).toLowerCase(), t.slice(i + 1)]);
+  }
+  return out;
+}
+
+/**
+ * Read the machine's effective values for {@link SAFE_MACHINE_KEYS}, and every
+ * required filter. Preflight only: this is the one call made with the
+ * machine's config visible, and it reads — `git config --get-regexp` runs no
+ * hook, filter or monitor.
+ */
+export function readMachineSafeConfig(repoRoot: string): MachineSafeConfig {
+  const keyPattern = `^(${SAFE_MACHINE_KEYS.map((k) => k.replace(/\./g, "\\.")).join("|")})$`;
+  const values: Record<string, string> = {};
+  for (const scope of ["--system", "--global"] as const) {
+    for (const [k, v] of readScope(repoRoot, scope, keyPattern)) values[k] = v;
+  }
+  const requiredFilters: string[] = [];
+  for (const scope of ["--system", "--global", "--local"] as const) {
+    for (const [k, v] of readScope(repoRoot, scope, "^filter\\..*\\.required$")) {
+      if (/^(true|yes|on|1)$/i.test(v.trim())) requiredFilters.push(`${k} (${scope.slice(2)})`);
+    }
+  }
+  return { values, requiredFilters };
+}
+
+/**
+ * Which `filter` attribute values the target's TRACKED paths carry.
+ *
+ * R19 refuses "a target that NEEDS" a required filter. Having one CONFIGURED
+ * is not needing it: Git for Windows ships `filter.lfs.required=true` in its
+ * system config, so refusing on configuration alone would refuse every loop on
+ * every Git for Windows machine (measured: 144 of this suite's loops). A target
+ * needs a filter when a tracked path's attributes name it — asked of git's own
+ * attribute parser, `check-attr`, which runs no filter. Chunked so a large tree
+ * cannot exceed a command-line limit.
+ */
+export function filtersUsedByTrackedPaths(repoRoot: string): Set<string> {
+  const listed = gitRaw(repoRoot, ["ls-files", "-z"]).split("\0").filter((p) => p !== "");
+  const used = new Set<string>();
+  const CHUNK = 200;
+  for (let i = 0; i < listed.length; i += CHUNK) {
+    const out = gitRaw(repoRoot, ["check-attr", "-z", "filter", "--", ...listed.slice(i, i + CHUNK)]);
+    // -z output: path NUL attribute NUL value NUL, repeated.
+    const f = out.split("\0");
+    for (let j = 0; j + 2 < f.length; j += 3) {
+      const value = f[j + 2]!;
+      if (value !== "unspecified" && value !== "unset" && value !== "set" && value !== "") used.add(value);
+    }
+  }
+  return used;
+}
+
+/** The generated global config's text: one section per key, values quoted, nothing else. */
+export function renderSafeConfig(values: Readonly<Record<string, string>>): string {
+  const lines = ["# Generated by the HoH runtime at preflight (rulings R19): non-program keys only.", ""];
+  const bySection = new Map<string, Array<[string, string]>>();
+  for (const [key, value] of Object.entries(values).sort()) {
+    const dot = key.indexOf(".");
+    const section = key.slice(0, dot);
+    const name = key.slice(dot + 1);
+    if (!bySection.has(section)) bySection.set(section, []);
+    bySection.get(section)!.push([name, value]);
+  }
+  for (const [section, entries] of bySection) {
+    lines.push(`[${section}]`);
+    for (const [name, value] of entries) lines.push(`\t${name} = "${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`);
+  }
+  return `${lines.join("\n")}\n`;
+}
 
 /** Subcommands the harness must never run. Refused at the call, not reviewed later. */
 export const DENIED_SUBCOMMANDS: readonly string[] = [
@@ -55,6 +377,8 @@ export class GitFailed extends Error {
 }
 
 function assertAllowed(args: readonly string[]): void {
+  // Two informational flags that take no subcommand and touch no repository.
+  if (args.length === 1 && (args[0] === "--exec-path" || args[0] === "--version")) return;
   // The subcommand is the first argument that is not a leading global option.
   let i = 0;
   while (i < args.length && args[i]!.startsWith("-")) {
@@ -81,23 +405,24 @@ function assertAllowed(args: readonly string[]): void {
  * value that could be mistaken for an answer.
  */
 export function git(cwd: string, args: readonly string[]): string {
-  assertAllowed(args);
-  try {
-    return execFileSync("git", [...args], {
-      cwd,
-      encoding: "utf-8",
-      shell: false,
-      stdio: ["ignore", "pipe", "pipe"],
-    }).trim();
-  } catch (err) {
-    const e = err as { status?: number | null; stderr?: Buffer | string; message?: string };
-    const stderr = typeof e.stderr === "string" ? e.stderr : (e.stderr?.toString() ?? "");
+  return gitRaw(cwd, args).trim();
+}
+
+/**
+ * {@link git} without the trim — for `-z` output, where a leading or trailing
+ * NUL is part of the record structure.
+ */
+function gitRaw(cwd: string, args: readonly string[]): string {
+  const r = spawnGit(cwd, args);
+  const stderr = (r.stderr ?? "").trim();
+  if (r.error || r.status !== 0) {
     throw new GitFailed(
-      `git ${args.join(" ")} failed in ${cwd}: ${stderr.trim() || e.message || "no stderr"}`,
-      e.status ?? null,
-      stderr.trim(),
+      `git ${args.join(" ")} failed in ${cwd}: ${stderr || r.error?.message || `exit ${r.status ?? "none"}, no stderr`}`,
+      r.status ?? null,
+      stderr,
     );
   }
+  return r.stdout ?? "";
 }
 
 /**
@@ -111,8 +436,7 @@ export function gitTry(
   cwd: string,
   args: readonly string[],
 ): { ok: boolean; stdout: string; stderr: string; status: number | null } {
-  assertAllowed(args);
-  const r = spawnSync("git", [...args], { cwd, encoding: "utf-8", shell: false });
+  const r = spawnGit(cwd, args);
   if (r.error) {
     return { ok: false, stdout: "", stderr: String(r.error.message), status: null };
   }
@@ -143,11 +467,7 @@ export const currentBranch = (cwd: string): string =>
  * allowlist might well permit.
  */
 export function changedPaths(cwd: string): string[] {
-  const raw = execFileSync(
-    "git",
-    ["status", "--porcelain=v1", "-z", "--untracked-files=all"],
-    { cwd, encoding: "utf-8", shell: false, stdio: ["ignore", "pipe", "pipe"] },
-  );
+  const raw = gitRaw(cwd, ["status", "--porcelain=v1", "-z", "--untracked-files=all"]);
   const out: string[] = [];
   const records = raw.split("\0");
   for (let i = 0; i < records.length; i += 1) {
@@ -189,11 +509,7 @@ export const isClean = (cwd: string): boolean => changedPaths(cwd).length === 0;
  */
 export function committedPaths(cwd: string, base: string, head: string): string[] {
   if (base === head) return [];
-  const raw = execFileSync(
-    "git",
-    ["diff", "--name-only", "--no-renames", "-z", base, head],
-    { cwd, encoding: "utf-8", shell: false, stdio: ["ignore", "pipe", "pipe"] },
-  );
+  const raw = gitRaw(cwd, ["diff", "--name-only", "--no-renames", "-z", base, head]);
   return raw.split("\0").filter((p) => p !== "");
 }
 

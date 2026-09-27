@@ -275,7 +275,7 @@ describe("server handlers", () => {
       const res = await handleState({
         project_root: tmp, session: 55, expected_revision: 7,
         ops: [
-          { op: "close_task", id: "T-005", note: "shipped in Loop 2" },
+          { op: "close_task", id: "T-005", append_note: "shipped in Loop 2" },
           { op: "open_task", title: "Loop 3 writer", priority: "P0" },
           { op: "add_verified", claim: "ob_state round-trips", evidence: [{ type: "test", path: "open-brain/tests/server.test.ts", observation: "this test" }] },
           { op: "add_decision", title: "Views are generated", date: "2026-09-15", note: "" },
@@ -323,6 +323,31 @@ describe("server handlers", () => {
       expect(start).toMatch(/Last session: #55 \d{4}-\d{2}-\d{2} \(round-trip-uuid\)/);
       // R3: state.json still says 0.29.0 while package.json says 0.30.0 → reported, not fixed.
       expect(start).not.toContain("state-version:");
+    });
+
+    /** T-171: the printed result carries every note change, in the dry run as in the write. */
+    it("ob_state prints each note change on its own line, dry run included", async () => {
+      proseProject(tmp);
+      cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+      await handleSetSession({ session_id: "t171-uuid", project_dir: tmp });
+      const ops = [{ op: "update_task", id: "T-005", append_note: "and more" }];
+      const dry = getText(await handleState({ project_root: tmp, session: 55, expected_revision: 7, ops, dry_run: true }));
+      expect(dry).toContain("ob_state dry run — nothing written");
+      expect(dry).toContain(`NOTE CHANGE: T-005 note APPENDED: +${" — and more".length} chars`);
+      const real = getText(await handleState({ project_root: tmp, session: 55, expected_revision: 7, ops }));
+      expect(real).toContain(`NOTE CHANGE: T-005 note APPENDED: +${" — and more".length} chars`);
+    });
+
+    /** T171-D3: the dry run of a replace is the door the agent reads. QA 144's dry-run-hides-replace drops this line. */
+    it("ob_state dry run of replace_note prints the REPLACED line", async () => {
+      proseProject(tmp);
+      cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+      await handleSetSession({ session_id: "t171-uuid", project_dir: tmp });
+      const ops = [{ op: "update_task", id: "T-008", replace_note: "first words" }];
+      const dry = getText(await handleState({ project_root: tmp, session: 55, expected_revision: 7, ops, dry_run: true }));
+      expect(dry).toContain("ob_state dry run — nothing written");
+      expect(dry).toContain("NOTE CHANGE: T-008 note REPLACED:");
+      expect(readFileSync(join(tmp, ".agents", "state.json"), "utf-8")).toBe(readFileSync(stateFixture, "utf-8"));
     });
 
     /** Loop 2 R1: .agents/ without SESSIONS/ no longer errors; the block says why there is no log. */

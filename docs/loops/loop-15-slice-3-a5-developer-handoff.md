@@ -1,0 +1,67 @@
+# Candidate A5 developer handoff
+
+**Model:** Grok 4.7, as Cursor shows this session. **Seat:** developer, record session 91, `~/Worktrees/sia-forge`. **Base:** A4 `f9a1aa8`. **Branch:** `loop/15-slice-3-candidate-a5`.
+
+Not in A5: D-A2-7, D-A5, and the R37 race. The compare-then-open window is the same class of race as R37 and is not closed.
+
+## R55 — the object and the route
+
+`routeChain` walks every component as written. A link is on the route, and so is every component of its target from that target's own anchor, recursively, including a link in the last position. Compare type, `dev`, `ino` (`{ bigint: true }`), `readlink` text, and `nlink` on the object. A difference is named and not opened. An in-place edit of the base target is still read.
+
+**Red:** the new R55 tests are `skipIf(isWin)`. This machine cannot plant a file symlink (`EPERM`). They are red at `f9a1aa8` on Linux (QA probe `qa89-a4-probe.test.ts` A4-1, CI run `35928008495`). Mutant that turns them red: stop following a final link in `routeChain` (A4 `componentPaths`).
+
+**Linux run `35947532386` on `70ec18c` failed.** 1 failed | 1132 passed | 6 skipped. The failure is `R55 CONTROL` at `configwatch-links.test.ts:798`: an in-place edit of the base target produced no finding. `path.resolve` does not follow links, so `snap` treated the target file and `~/.gitconfig` as different paths and did not read. H, J, and R passed on that run (swapped targets stayed unread). The fix compares `realpath`. Mutant that turns the control red: compare with `path.resolve` instead of `realpath`. Mutant that turns H/J/R red: stop following a final link in `routeChain`.
+
+## R57 — repository `begin` against the loop base
+
+`ConfigWatch.captureBase` records the route once. `begin` reads a repository file only when that route still matches. Attribution stays the stage snapshot.
+
+**Red:** branch `loop/15-slice-3-a5-redcheck` at `79af55f` is `f9a1aa8` plus these tests and no implementation. Its CI run is named below. Mutant: read inside `begin` even when `repositoryResolutionDiff` is set.
+
+**Green:** `R57: a later stage does not read...` passed on win32 (exit 0, targeted file).
+
+## R59 — the record says what happened
+
+`mismatchFinding` keeps "not read" only when `compare` left the hash `unread`. `rollBack` prints "The offending paths were reverted." only after `revertPaths` runs on a non-empty list.
+
+**Red at `f9a1aa8`:** `rollBack` printed that sentence whenever it was called. Mutant: restore the unconditional return in `rollBack`.
+
+**Green:** `R59: a config-only refusal...` passed on win32.
+
+## R58 — tests that can fail
+
+POSIX, `skipIf(isWin)`, so not executed here:
+
+- `(b)3` plants a symlink on a hook entry the snapshot held, asserts the snapshot mode and the victim mode differ, asserts `isSymbolicLink`, and has its write-through and plant controls in the same test.
+- R29 plants a link to a mode-000 victim and requires `EACCES` on a direct read.
+- R35 asserts the base note's type and `readlink` target.
+
+Mutant for (b)3: drop the mode assertion (or plant the symlink where the snapshot has no hook). Mutant for R29: chmod the watched file itself instead of a link. Mutant for R35: delete the `type symlink` / `readlink` assertions.
+
+## What was not verified
+
+- R55 and R58 were not executed on this win32 seat.
+- Full local suite was not run (G-042: ask atlas first).
+- GitNexus `impact` was not run; the index is not available in this session. The edits are `routeChain` / `recordChain` / `resolutionMismatch` / `ConfigWatch.begin` / `rollBack`.
+
+## Targeted run
+
+`open-brain/`, `npx vitest run tests/harness/configwatch-links.test.ts tests/harness/config-channel.test.ts`. Exit 0. Test Files 2 passed. Tests 57 passed, 14 skipped.
+
+Linux CI on the implementation: run `35947532386` on `70ec18c` failed as above. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35947532386
+
+Red check: `loop/15-slice-3-a5-redcheck` `79af55f`, run `35948167777`. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35948167777
+
+Fix `63a7932` CI: run `35948192903`, success. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35948192903
+
+Tip `5b3a0d1` CI: run `35948435287`, success, 1133 passed, 6 skipped, 0 failed. https://github.com/melvenac/Self-Improving-Agent/actions/runs/35948435287
+
+Redcheck `35948167777` on `79af55f`: 5 failed | 1128 passed | 6 skipped. Failed: R55 hard link, R55 directory symlink, R55 new file, R57, R59. R55 CONTROL passed on A4 (the in-place edit was already read). R58 and R35 were not in the failure list.
+
+R59's read half: `R59: qa reads a machine file restored to its base resolution and does not say not read`. Red on `loop/15-slice-3-a5-redcheck` `8bd34aa`, run `35949006640`: 6 failed | 1128 passed | 6 skipped. The new failure is that test (the other five are the earlier reds). Mutant: leave `mismatchFinding`'s "not read" text in place when `compare` did read (`end.hash` is a content hash). Green on `845dfaa`, run `35949008244`: 1134 passed | 6 skipped | 0 failed.
+
+R58 code mutants, each a branch off `845dfaa`:
+
+- `(b)3`: `loop/15-slice-3-a5-mut-b3` `23269d3` chmods through the symlink on restore. Run `35949009974`: 1 failed | 1133 passed | 6 skipped. The failure is `R58 (b)3`.
+- R29: `loop/15-slice-3-a5-mut-r29` `c9232ad` reads through the link and records `unreadable`. Run `35949011700`: 12 failed | 1122 passed | 6 skipped. `R58 R29` is one of them.
+- R35: `loop/15-slice-3-a5-mut-r35` `4e3a850` drops type and readlink from the base note. Run `35949013391`: 2 failed | 1132 passed | 6 skipped. Failures: the R35 symlink test, and `R46: baseNotes names a link at a parent component`.

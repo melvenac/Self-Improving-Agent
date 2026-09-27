@@ -168,6 +168,24 @@ further adoption (T-181). There is no version bump in these commits: the release
   in any of these cases. `--commit` now prints the `Root:` it committed. Other subcommands share
   the old shape. They are listed in the round-2 handoff and are not changed here.
 
+### Changed: a task note is never replaced silently (T-171, with QA 125's D4)
+
+Brief: `docs/loops/t171-note-replace-brief.md`. Stacked on T-179 round 2 (schema v3, not yet on
+master). **Breaking for `ob_state` callers:** `note` on `update_task` and `close_task` is refused.
+
+- **`update_task` and `close_task` take `append_note` or `replace_note`, never `note`.** `note`
+  replaced the whole note, and the dry run said only `Applied (1): update_task T-169`. It is now
+  refused by name, with the two replacements in the message. `open_task`'s and `reopen_task`'s
+  `note` are unchanged: the first sets a new task's note, and the second already appended.
+- **Every note change is reported with sizes, in the dry run and the write:** `note SET`,
+  `note APPENDED: +N chars (A -> B)`, and `note REPLACED: A chars -> B chars` with the removed text's
+  first line. `ob_state` prints each one as a `NOTE CHANGE:` line.
+- **A task records whose text is in its note (`note_by`).** A replace that would remove text written
+  by another session, or text with no recorded author, is refused unless the op sets
+  `replace_other_sessions: true`. The report then names the sessions whose text went. Migration and
+  import give every existing non-empty note an unknown author (`null`), so replacing one needs the
+  flag. `append_note` never needs it.
+
 ## [0.44.2] - 2026-09-24 — a Windows profile with a space in its name
 
 Found by the first full-suite run on the dedicated QA machine (`desktop-o4egb1e`, D-045), whose

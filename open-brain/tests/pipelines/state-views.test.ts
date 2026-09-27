@@ -187,8 +187,8 @@ describe("T-144: rendered Done obeys the retention window", () => {
       { n: 2, date: "2026-09-26", uuid: "s11", seat: null, checkout: "c", first_rev: 11 },
     ];
     edge.tasks = [
-      { id: "T-900", title: "3 sessions since", priority: "P2", status: "done", opened_session: 1, closed_session: 9000, supersedes: null, note: "", closed_rev: 8 },
-      { id: "T-901", title: "2 sessions since", priority: "P2", status: "done", opened_session: 1, closed_session: 1, supersedes: null, note: "", closed_rev: 9 },
+      { id: "T-900", title: "3 sessions since", priority: "P2", status: "done", opened_session: 1, closed_session: 9000, supersedes: null, note: "", note_by: [], closed_rev: 8 },
+      { id: "T-901", title: "2 sessions since", priority: "P2", status: "done", opened_session: 1, closed_session: 1, supersedes: null, note: "", note_by: [], closed_rev: 9 },
     ];
     const rendered = doneIds(renderInbox(edge, opts));
     expect(rendered).not.toContain("T-900");
