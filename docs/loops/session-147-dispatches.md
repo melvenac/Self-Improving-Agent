@@ -507,3 +507,17 @@ QA PC: 182, 183.
 - **QA 191, candidate C's criteria:** `docs/loops/loop-15-slice-3-c-criteria-dispatch-qa.md`, with its driver in `qa-191/`.
   It carries B's Open 3 (does an attributed `met` count as met?), R10(c)/(d) as verdict rows, and R2's now-binding `E_t`
   obligation. Launch on the QA PC.
+
+### The main checkout updated to master (T-172's step), on Aaron's word (23:21:49Z)
+
+- `~/Projects/Self-Improving-Agent`: clean, detached `ecd28dd` → `bf33fe4` (303 behind). Build stamped `bf33fe4`;
+  build-freshness PASS, worktree-layout PASS (7 worktrees, its first main-tree run), state-schema PASS. The recall-trigger
+  hook smoke test on the new build: rc 0.
+- **Trap, hit and recovered:** `npm ci` failed with `EPERM unlink …better-sqlite3/build/Release/better_sqlite3.node`. The
+  native module is LOCKED by every running open-brain MCP server (one per open Claude session), and `npm ci` had already
+  deleted most of `node_modules` (8 entries left). **For about 1 minute, hooks loading from the main tree could fail.**
+  Recovered with `npm install` (no wipe; the lockfile's better-sqlite3 was unchanged): 172 packages, then `npm run build`.
+  **Rule: in the main checkout, use `npm install`, never `npm ci`, while any Claude session is open.** It belongs in
+  T-172's "one refusing command".
+- **Running sessions still use their old in-memory MCP server** until `/mcp` reconnects open-brain. New sessions get the new
+  build.
