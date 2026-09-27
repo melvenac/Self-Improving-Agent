@@ -334,6 +334,32 @@ describe("record-erasure recomputes retention by write order (R179-1)", () => {
     expect(c.message).toContain(`removed handoff ${U(118)} (session 118, developer [sia-builder])`);
     expect(c.message).toContain(`removed session ${U(120)} (session 120, qa [sia-qa])`);
   });
+
+  it("a hand removal of the migrated legacy session record, after that seat has written a keyed session, is flagged", () => {
+    const s0 = read(dir);
+    const legacy0 = s0.sessions.find((x: { first_rev: number | null }) => x.first_rev === null);
+    expect(legacy0?.uuid).toBeTruthy();
+    legacy0.seat = "planner";
+    write(dir, s0);
+    commit(dir, "the legacy session record is the planner's");
+    const keyed = applyStateOps(dir, {
+      session: 150, expected_revision: read(dir).revision, session_uuid: "00000150-0000-4000-8000-000000000150",
+      checkout: "sia-planner", render: false,
+      ops: [{ op: "set_handoff", seat: "planner", pick_up: "keyed planner 150", watch_out: [], open_questions: [],
+        loop_state: { open_prs: [], frozen_sha: null, questions_for_aaron: [], rulings: [] } }],
+    });
+    expect(keyed.ok, keyed.ok ? "" : keyed.error).toBe(true);
+    commit(dir, "keyed planner session");
+    const s = read(dir);
+    const legacy = s.sessions.find((x: { first_rev: number | null }) => x.first_rev === null);
+    s.sessions = s.sessions.filter((x: { uuid: string }) => x.uuid !== legacy.uuid);
+    s.revision += 1;
+    write(dir, s);
+    commit(dir, "HAND EDIT: remove the legacy session record");
+    const c = checkRecordErasure(dir);
+    expect(c.severity).toBe("issue");
+    expect(c.message).toContain(legacy.uuid);
+  });
 });
 
 /**

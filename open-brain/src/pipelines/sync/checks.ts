@@ -375,24 +375,48 @@ export function checkTemplatePersonalNames(projectRoot: string): CheckResult {
     return { name: "template-personal-names", severity: "warn", message: "project-template/ not found" };
   }
 
+  // T-048 SILENT 3. The old catch here was labelled "binary or unreadable", but
+  // a utf-8 read of a binary does not throw — it decodes to replacement chars and
+  // is scanned. Only an UNREADABLE file ever reached that catch, so a leak in a
+  // file nobody could read was reported as "no personal names".
   const skipDirs = new Set(["node_modules", ".git"]);
+  const rel = (p: string) => p.replace(templateRoot, "project-template").replace(/\\/g, "/");
   const hits: string[] = [];
+  const unreadable: string[] = [];
+  const skipped: string[] = [];
+  let read = 0;
   const walk = (dir: string): void => {
     let entries;
-    try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    try { entries = readdirSync(dir, { withFileTypes: true }); } catch (e) {
+      unreadable.push(`${rel(dir)}/ (${(e as NodeJS.ErrnoException).code ?? "error"})`);
+      return;
+    }
     for (const entry of entries) {
       const full = join(dir, entry.name);
       if (entry.isDirectory()) {
-        if (!skipDirs.has(entry.name)) walk(full);
+        if (skipDirs.has(entry.name)) skipped.push(`${rel(full)}/`);
+        else walk(full);
         continue;
       }
-      try {
-        const match = readFileSync(full, "utf-8").match(PERSONAL_NAMES);
-        if (match) hits.push(`${full.replace(templateRoot, "project-template").replace(/\\/g, "/")} ("${match[1]}")`);
-      } catch { /* binary or unreadable — not prose, not a leak */ }
+      let txt: string;
+      try { txt = readFileSync(full, "utf-8"); } catch (e) {
+        unreadable.push(`${rel(full)} (${(e as NodeJS.ErrnoException).code ?? "error"})`);
+        continue;
+      }
+      read++;
+      const match = txt.match(PERSONAL_NAMES);
+      if (match) hits.push(`${rel(full)} ("${match[1]}")`);
     }
   };
   walk(templateRoot);
+
+  if (unreadable.length > 0) {
+    return {
+      name: "template-personal-names",
+      severity: "issue",
+      message: `${unreadable.length} unreadable path(s) under project-template/ — a leak there cannot be ruled out: ${unreadable.slice(0, 5).join(", ")}${unreadable.length > 5 ? ` (+${unreadable.length - 5} more)` : ""}`,
+    };
+  }
 
   if (hits.length > 0) {
     const shown = hits.slice(0, 5).join(", ");
@@ -403,7 +427,14 @@ export function checkTemplatePersonalNames(projectRoot: string): CheckResult {
       message: `Template ships personal names — consumers' agents will use them: ${shown}${more}`,
     };
   }
-  return { name: "template-personal-names", severity: "pass", message: "No personal names in project-template/" };
+  const skippedNote = skipped.length > 0
+    ? `excluded ${skipped.length} dependency/VCS dir(s), not shipped prose: ${skipped.slice(0, 3).join(", ")}${skipped.length > 3 ? ` (+${skipped.length - 3} more)` : ""}`
+    : `excluded: none (${[...skipDirs].join(", ")} would be skipped as not shipped prose)`;
+  return {
+    name: "template-personal-names",
+    severity: "pass",
+    message: `No personal names in project-template/ — ${read} file(s) read; ${skippedNote}`,
+  };
 }
 
 
@@ -1045,7 +1076,28 @@ export function checkRetirements(projectRoot: string): CheckResult {
   const historical = record.historical ?? [];
   const isHistorical = (rel: string) => historical.some((h) => rel === h || rel.startsWith(h));
 
-  const surface = listScannableFiles(projectRoot).filter((rel) => !isHistorical(rel));
+  // T-048 SILENT 20/26. The listing says where it came from and what it could
+  // not reach; the extension filter's exclusions are counted, not dropped.
+  const listing = listScannableFiles(projectRoot);
+  const live = listing.files.filter((rel) => !isHistorical(rel));
+  const surface = live.filter((rel) => SCANNED_EXT.test(rel));
+  const excludedByExt = new Map<string, number>();
+  for (const rel of live) {
+    if (SCANNED_EXT.test(rel)) continue;
+    const base = rel.slice(rel.lastIndexOf("/") + 1);
+    const ext = base.lastIndexOf(".") > 0 ? base.slice(base.lastIndexOf(".")) : "(no extension)";
+    excludedByExt.set(ext, (excludedByExt.get(ext) ?? 0) + 1);
+  }
+  const excludedNote = excludedByExt.size === 0
+    ? "excluded by extension: none"
+    : `excluded by extension (not source or prose a retired name ships in): ${[...excludedByExt].sort((a, b) => b[1] - a[1]).map(([e, n]) => `${e} ${n}`).join(", ")}`;
+  const unreadable = [...listing.unreadable];
+  const texts = new Map<string, string>();
+  for (const rel of surface) {
+    try { texts.set(rel, readFileSync(join(projectRoot, rel), "utf8")); } catch (e) {
+      unreadable.push(`${rel} (${(e as NodeJS.ErrnoException).code ?? "error"})`);
+    }
+  }
 
   const unexpected: string[] = [];
   const stale: string[] = [];
@@ -1079,17 +1131,21 @@ export function checkRetirements(projectRoot: string): CheckResult {
 
     for (const rel of surface) {
       if (allowed.has(rel)) continue;
-      let txt: string;
-      try { txt = readFileSync(join(projectRoot, rel), "utf8"); } catch { continue; }
-      if (re().test(txt)) unexpected.push(`${rel} names ${r.name} (retired ${r.ruled}, ${r.event})`);
+      const txt = texts.get(rel);
+      if (txt !== undefined && re().test(txt)) unexpected.push(`${rel} names ${r.name} (retired ${r.ruled}, ${r.event})`);
     }
   }
 
-  if (unexpected.length || stale.length) {
-    const all = [...unexpected, ...stale];
+  // An unread file is an issue naming the path, never a skip: a retired name in
+  // it would otherwise ship under "0 unexpected across N live files".
+  if (unexpected.length || stale.length || unreadable.length) {
+    const all = [...unreadable.map((u) => `unreadable: ${u}`), ...unexpected, ...stale];
     const shown = all.slice(0, 6).join("; ");
     const more = all.length > 6 ? `; +${all.length - 6} more` : "";
-    return { name, severity: "issue", message: `retired names still referenced outside the record: ${shown}${more}` };
+    const lead = unexpected.length || stale.length
+      ? "retired names still referenced outside the record"
+      : `${unreadable.length} path(s) could not be read, so the scan is ${listing.source === "git" ? "incomplete" : "partial"} (${listing.label})`;
+    return { name, severity: "issue", message: `${lead}: ${shown}${more}` };
   }
 
   // The unverifiable half is stated, not omitted. `command` and `tool` names can
@@ -1102,7 +1158,7 @@ export function checkRetirements(projectRoot: string): CheckResult {
     severity: "pass",
     message:
       `${retirements.length} retirements across ${events.size} event classes, ${verified} allowed referrers all present and still naming their retirement, ` +
-      `0 unexpected across ${surface.length} live files — ` +
+      `0 unexpected across ${surface.length} live files read (${listing.label}); ${excludedNote}; ${live.length === listing.files.length ? "historical: none" : `historical: ${listing.files.length - live.length} (by rule)`} — ` +
       `resolvable against a registry: ${RESOLVABLE.join(", ")}; guarded by this record alone: ${unresolvable.join(", ")} ` +
       `(green means every RECORDED retirement is finished, not that every retirement is recorded)`,
     report: true,
@@ -1143,28 +1199,62 @@ interface RetirementRecord {
  * survives only as a fallback for a temp directory under test, where there is
  * no git repo to ask.
  */
-function listScannableFiles(root: string): string[] {
+interface FileListing {
+  /** Every listed file, before the extension filter — the caller counts what it excludes. */
+  files: string[];
+  source: "git" | "walk";
+  /** Printed in the check's output, so a fallback never reads as the primary path. */
+  label: string;
+  /** Paths the walk could not list or stat. Always empty on the git path. */
+  unreadable: string[];
+}
+
+/**
+ * What `checkRetirements` reads. T-048 SILENT 20: this was md/ts/mjs/cjs/js/json
+ * only, and a retired name in a tracked `.sh`, `.yml` or `.toml` was neither a
+ * finding nor a dropped count. Scripts and config that can invoke a retired
+ * thing are now read; the rest (`.diff`, `.out`, `.txt` evidence, dotfiles) is
+ * excluded by extension and counted in the output.
+ */
+const SCANNED_EXT = /\.(md|ts|mts|cts|mjs|cjs|js|json|sh|ps1|yml|yaml|toml)$/;
+
+function listScannableFiles(root: string): FileListing {
+  let why: string;
   try {
     const out = execSync("git ls-files -z", { cwd: root, encoding: "buffer", stdio: ["ignore", "pipe", "ignore"] });
     const files = out.toString("utf8").split("\0").filter(Boolean);
-    if (files.length > 0) return files.filter((f) => /\.(md|ts|mjs|cjs|js|json)$/.test(f));
-  } catch { /* not a git repo, or git unavailable — fall back to the walk */ }
-  return walkTracked(root);
+    if (files.length > 0) return { files, source: "git", label: "listed by git ls-files", unreadable: [] };
+    why = "git ls-files listed nothing";
+  } catch {
+    why = "git ls-files failed — not a git repo, or git unavailable";
+  }
+  const unreadable: string[] = [];
+  const skipped: string[] = [];
+  const files = walkTracked(root, "", [], unreadable, skipped);
+  const partial = unreadable.length > 0 ? `, PARTIAL: ${unreadable.length} path(s) unreadable` : "";
+  const skipNote = skipped.length > 0 ? `, skipped ${skipped.length} build/dependency dir(s) with no .gitignore to ask: ${skipped.slice(0, 3).join(", ")}` : "";
+  return { files, source: "walk", label: `listed by a filesystem walk — FALLBACK, ${why}${partial}${skipNote}`, unreadable };
 }
 
 /** Fallback only: a temp dir under test has no git repo to ask. */
-function walkTracked(root: string, rel = "", out: string[] = []): string[] {
+function walkTracked(root: string, rel: string, out: string[], unreadable: string[], skipped: string[]): string[] {
   const SKIP = new Set(["node_modules", ".git", "build", "dist", "coverage", ".vitest"]);
   let entries: string[];
-  try { entries = readdirSync(join(root, rel)); } catch { return out; }
+  try { entries = readdirSync(join(root, rel)); } catch (e) {
+    unreadable.push(`${rel || "."}/ (${(e as NodeJS.ErrnoException).code ?? "error"})`);
+    return out;
+  }
   for (const e of entries) {
-    if (SKIP.has(e)) continue;
     const childRel = rel ? `${rel}/${e}` : e;
+    if (SKIP.has(e)) { skipped.push(`${childRel}/`); continue; }
     const abs = join(root, childRel);
     let isDir = false;
-    try { isDir = statSync(abs).isDirectory(); } catch { continue; }
-    if (isDir) walkTracked(root, childRel, out);
-    else if (/\.(md|ts|mjs|cjs|js|json)$/.test(e)) out.push(childRel);
+    try { isDir = statSync(abs).isDirectory(); } catch (err) {
+      unreadable.push(`${childRel} (${(err as NodeJS.ErrnoException).code ?? "error"})`);
+      continue;
+    }
+    if (isDir) walkTracked(root, childRel, out, unreadable, skipped);
+    else out.push(childRel);
   }
   return out;
 }
@@ -1239,17 +1329,42 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
     return { name, severity: "skip", message: "open-brain/src not present — dependency direction not checked" };
   }
 
+  // T-048 SILENT 2. An unreadable directory used to `return` out of the walk, so
+  // its files never entered the graph and a crossing inside it was a pass. An
+  // unreadable directory or file is now an issue naming it, checked before the
+  // graph is trusted.
   const files: string[] = [];
+  const unreadable: string[] = [];
+  let excluded = 0;
   const walk = (dir: string, prefix: string): void => {
     let entries;
-    try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    try { entries = readdirSync(dir, { withFileTypes: true }); } catch (e) {
+      unreadable.push(`${prefix || "."}/ (${(e as NodeJS.ErrnoException).code ?? "error"})`);
+      return;
+    }
     for (const e of entries) {
       const rel = prefix ? `${prefix}/${e.name}` : e.name;
       if (e.isDirectory()) walk(join(dir, e.name), rel);
       else if (e.name.endsWith(".ts")) files.push(rel);
+      else excluded++;
     }
   };
   walk(srcDir, "");
+
+  const sources = new Map<string, string>();
+  for (const rel of files) {
+    try { sources.set(rel, readFileSync(join(srcDir, rel), "utf8")); } catch (e) {
+      unreadable.push(`${rel} (${(e as NodeJS.ErrnoException).code ?? "error"})`);
+    }
+  }
+  if (unreadable.length > 0) {
+    return {
+      name,
+      severity: "issue",
+      message: `${unreadable.length} unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: ${unreadable.slice(0, 4).join(", ")}${unreadable.length > 4 ? ` (+${unreadable.length - 4} more)` : ""}`,
+      report: true,
+    };
+  }
 
   if (files.length === 0) {
     return { name, severity: "skip", message: "open-brain/src contains no .ts files — nothing to check" };
@@ -1268,7 +1383,7 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
   let unresolved = 0;
 
   for (const rel of files) {
-    const src = readFileSync(join(srcDir, rel), "utf8");
+    const src = sources.get(rel)!;
     const out: string[] = [];
     let m: RegExpExecArray | null;
     specPattern.lastIndex = 0;
@@ -1330,7 +1445,7 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
     if (nativeImporters.has(rel)) violations.push(`${rel} -> better-sqlite3 (native build, direct)`);
   }
 
-  const scale = `${files.length} file(s), ${files.filter((f) => !isMemorySide(f)).length} core`;
+  const scale = `${files.length} file(s), ${files.filter((f) => !isMemorySide(f)).length} core; excluded ${excluded} non-.ts file(s), not modules in the graph`;
   if (violations.length > 0) {
     return {
       name,

@@ -1,0 +1,37 @@
+HEAD e2f202b; sources src/pipelines/state-import/index.ts cc3214ec47d9, src/cli.ts 4bf5d4c0ef8f; 2026-09-27T01:36:39.120Z
+M1-utf32-first: KILLED — tsc 0; vitest exit 1, 1 of 148 red — R4-4: UTF-32LE's mark is no longer tested before UTF-16LE's
+    pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project UTF-32LE with a BOM (Set-Content -Encoding UTF32): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+M2-le-bom-nul: KILLED — tsc 0; vitest exit 1, 2 of 148 red — R4-4: no NUL check on the UTF-16LE BOM path
+    pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project a UTF-16LE BOM whose text holds a NUL (a stray [char]0 added): could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+    pipelines/state-import-qa138.test.ts > QA 138 coverage (GREEN): what the candidate's own tests left open a UTF-16LE mark whose text holds a NUL names the NUL's byte in the file
+M3-be-bom-nul: KILLED — tsc 0; vitest exit 1, 1 of 148 red — R4-4: no NUL check on the UTF-16BE BOM path
+    pipelines/state-import-leftovers.test.ts > R4-4 (D11): a judged input the importer reads wrongly is unreadable, and blocks a stale project a UTF-16BE BOM whose text holds a NUL: could not tell (unreadable), a bare --commit refuses with the tree identical, and --accept-stale completes
+M4-no-title: REFUSED — the edit matches 0 times in src/pipelines/state-import/index.ts
+M5-not-judged-line: KILLED — tsc 0; vitest exit 1, 2 of 148 red — R4-5: the not-judged line no longer names the unreadable bytes
+    pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED the report names its NUL bytes, the ADRs imported, and the ADRs not imported
+    pipelines/state-import-r5.test.ts > R5-2: an odd-length input with a UTF-16BE mark is filed unreadable, never thrown a not-judged DECISIONS.md is named in not_judged and does not block (R4-5)
+M6-report-block: KILLED — tsc 0; vitest exit 1, 1 of 148 red — R4-5: the report's Decisions section no longer names them
+    pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED the report names its NUL bytes, the ADRs imported, and the ADRs not imported
+M7-draft-source: KILLED — tsc 0; vitest exit 1, 2 of 148 red — R4-5: the draft never computes decisions_unreadable
+    pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED the report names its NUL bytes, the ADRs imported, and the ADRs not imported
+    pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the ADRs not imported
+M8-commit-output: KILLED — tsc 0; vitest exit 1, 1 of 148 red — R4-5: --commit's output no longer names them
+    pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the ADRs not imported
+M9-draft-output: KILLED — tsc 0; vitest exit 1, 1 of 148 red — R4-5: --draft's output no longer names them
+    pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the ADRs not imported
+M10-no-nul-strip: KILLED — tsc 0; vitest exit 1, 2 of 148 red — R4-5: the not-imported ADRs are looked for without removing the NULs
+    pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED the report names its NUL bytes, the ADRs imported, and the ADRs not imported
+    pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the ADRs not imported
+M11-no-filter: KILLED — tsc 0; vitest exit 1, 2 of 148 red — R4-5: not_imported also lists what was imported
+    pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED the report names its NUL bytes, the ADRs imported, and the ADRs not imported
+    pipelines/state-import-leftovers.test.ts > R4-5 (D12): a not-judged DECISIONS.md with NUL bytes does not block, but it is NAMED a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the ADRs not imported
+M12-o7-reversed: KILLED — tsc 0; vitest exit 1, 2 of 148 red — O7: the newest snapshot is named as the oldest
+    pipelines/state-import-leftovers.test.ts > O7: two markers name the OLDEST snapshot, and say what the newer one holds the markers are put oldest first whatever order the directory lists them in
+    pipelines/state-import-leftovers.test.ts > O7: two markers name the OLDEST snapshot, and say what the newer one holds the refusal restores from the oldest snapshot and names the newer as a later run's
+M13-o7-unsorted: KILLED — tsc 0; vitest exit 1, 1 of 148 red — O7: directory order, not date order
+    pipelines/state-import-leftovers.test.ts > O7: two markers name the OLDEST snapshot, and say what the newer one holds the markers are put oldest first whatever order the directory lists them in
+M14-o7-one-marker-text: KILLED — tsc 0; vitest exit 1, 1 of 148 red — O7: two markers get the one-marker sentence
+    pipelines/state-import-leftovers.test.ts > O7: two markers name the OLDEST snapshot, and say what the newer one holds the refusal restores from the oldest snapshot and names the newer as a later run's
+M15-o14-optional: KILLED by tsc (exit 2, 1 error(s): src/pipelines/state-import/index.ts(540,59): error TS2538: Type 'undefined' cannot be used as an index type.) — O14: the reason is optional again
+M16-o14-producer: REFUSED — the edit matches 0 times in src/pipelines/state-import/index.ts
+restored: src/ clean; 2026-09-27T01:42:14.092Z

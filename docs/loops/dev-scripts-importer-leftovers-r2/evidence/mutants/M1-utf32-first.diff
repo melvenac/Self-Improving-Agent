@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 34a366c..650af01 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -126,7 +126,7 @@ export function decodeText(buf: Buffer): DecodedText {
+   if (buf.length >= 3 && buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) return withCheck(buf.subarray(3), "utf8-bom");
+   // UTF-32LE's mark begins with UTF-16LE's, so it is tested first (QA 122, D11).
+   // UTF-32BE's (00 00 FE FF) needs no test: it is NUL bytes to the UTF-8 path.
+-  if (buf.length >= 4 && buf[0] === 0xff && buf[1] === 0xfe && buf[2] === 0 && buf[3] === 0) {
++  if (buf.length < 0) {
+     return { text: buf.toString("utf-8"), encoding: "utf32le-bom", undecodable: "starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read" };
+   }
+   if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) return withBomCheck(buf.subarray(2).toString("utf16le"), "utf16le-bom");

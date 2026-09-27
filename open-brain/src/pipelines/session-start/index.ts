@@ -10,11 +10,13 @@ import type { SessionInfo, SessionStartOptions, SessionStartResult } from "./typ
 export function sessionStart(options: SessionStartOptions): SessionStartResult {
   const state = readProjectState(options.projectRoot, { stateBudgetLines: options.stateBudgetLines });
   const drift = detectDrift(state);
-  // Prefer a UUID the caller already knows. Transcript discovery is a fallback
-  // for mid-session callers only — it cannot identify a session that has not
-  // written its .jsonl yet, and picks the newest by mtime regardless of owner.
+  // undefined discovers. null does not: ob_start passes null when it cannot
+  // prove a session, and discovery would stamp the newest transcript in the
+  // checkout, which belongs to another session (T-003 D1).
   const sessionId =
-    options.sessionId ?? discoverSessionUuid(options.projectRoot, options.homePath);
+    options.sessionId === undefined
+      ? discoverSessionUuid(options.projectRoot, options.homePath)
+      : options.sessionId;
   const health = runHealthChecks(options.homePath);
 
   let session: SessionInfo = { sessionId, sessionNumber: 0, logPath: "", reused: false, skippedReason: null };
