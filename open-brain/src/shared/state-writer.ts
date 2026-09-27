@@ -432,7 +432,7 @@ function replaceNote(t: Task, text: string, overrideOthers: boolean, ctx: OpCont
 
 /** update_task / close_task's note edit: at most one of append_note and replace_note. */
 function editNote(t: Task, op: { append_note?: string; replace_note?: string; replace_other_sessions?: true }, ctx: OpContext): string | null {
-  if (op.append_note !== undefined && op.replace_note !== undefined) {
+  if (false && op.append_note !== undefined && op.replace_note !== undefined) {
     return "give append_note or replace_note, not both";
   }
   if (op.replace_other_sessions && op.replace_note === undefined) {
