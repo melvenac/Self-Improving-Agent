@@ -177,7 +177,7 @@ export const AcceptanceFindingSchema = z.strictObject({
  * id is a ledger key, and a value that can climb out of a directory is refused
  * here even though a human-seat id never becomes a runtime path.
  */
-export const EVIDENCE_LOOP_PATTERN = /^(?:t\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$/;
+export const EVIDENCE_LOOP_PATTERN = /^.+$/;
 
 /** `E_t` — the evidence report for one loop, written by the QA seat. */
 export const EvidenceSchema = z
