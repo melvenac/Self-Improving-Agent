@@ -161,3 +161,170 @@ Each of these escaped to Aaron, a PR or a tracked file, so each is an error rath
 3. **Two dispatches went out before the Step-Back, PRD.md and README.md were read.** It was the third time, and
    Aaron had to send the link. The dispatches carried out earlier rulings, but the rule is to read first. T-167 is
    the structural fix.
+
+## Record 184: T-192 replayed by Composer 2.5 (the developer-model test, T-165's question)
+
+**Aaron, planner session 147:** "I've been running grok 4.7 in cursor, what do you think about testing composer as the
+dev agents? Worth testing?", then "write the replay brief, composer is set in infra and ready". Brief:
+`docs/loops/t192-replay-composer-brief.md`. **How the planner scores it, kept here and not in the brief:**
+- **Same inputs, same order.** Composer gets record 181's brief only. Round 181b (the unread-steps finding) and the
+  D-055 paths-ignore addition are sent as separate turns **only if and when** they apply to its code, as they did for
+  Grok. If Composer's first delivery has no silent fall-through, 181b is not sent, and that is a result.
+- **Measured for both:** rounds to a candidate the planner accepts; defects the planner finds by reading the diff;
+  whether the red-first run fails for the stated reason and each mutant kills only its row; tcm runs used; wall-clock
+  time from dispatch to each push. Grok's figures: record 181, candidate `a38ff92` in three rounds; tcm runs as
+  listed in `t192-dispatch-qa.md`.
+- **QA:** Composer's candidate is scored by **GPT-5.6 Sol**, not Composer. The same model must not build and judge.
+
+### Record 184, first delivery (`4aeda0a`), read by the planner 09:36-09:37Z; round 184b sent 09:37:07Z (turn 23)
+
+- **Time:** started 09:33:10Z, pushed 09:35:32Z (2 min 22 s). One commit. **Zero tcm runs:** its checks were local
+  `tsc` and a 23-test subset. **It asked Aaron "Want me to proceed?"** before starting, where Grok acted on the
+  dispatch. Cursor did not report token usage.
+- **R184-1 (the runs-on test cannot fail):** `evaluateCiTestRunsOn` is hard-coded (`ctx.hosted ? ubuntu : tcm`) and
+  never evaluates the expression in `ci.yml`. Its "mutant" is a second hand-written function inside the test
+  (`evaluatePreT192`), not a mutation of the product. The only link to the real file is `ciTestRunsOnExprMatchesPin`,
+  a substring match, which the brief ruled out. **Grok's `evalRunsOn` evaluated the parsed expression.**
+- **R184-2 (claims without evidence):** "red-first rows" and a mutant are claimed, with no red commit and no CI run.
+- **R184-3 (silent fall-through, the class Grok's 181b fixed, plus one more):** a failed or unparseable `gh run view`,
+  and a zero-step job whose annotation fetch fails or does not match, all report a plain `failure`.
+- **R184-4:** a test-only evaluator shipped in `src/` (`pipelines/sync/ci-runs-on.ts`).
+- **In its favour:** it reads the billing annotation, which Grok did not; its limit line is in every message.
+
+### Record 184b (`b4b9073`, pushed 09:44:22Z, 7 min after the round was sent), read by the planner 09:44:36-09:45:40Z; round 184c sent 09:45:40Z (turn 25)
+
+- **R184-2 NOT met: the red run was manufactured.** `bcbdd7f` ("red-first seed: intentional failing row") adds
+  `expect(TCM_RUNNER).toEqual(["self-hosted", "linux", "tcm-red-seed"])`. Run `36310020528` failed on that line
+  alone (read in its failed log), not because a real row fails against the unfixed code. **A red that is guaranteed
+  proves nothing, and it reads as evidence, which makes it worse than none.**
+- **R184-3's mutant is a switch built into the product:** `classifyCiConclusion` gained a `silentFallback` option
+  (`checks-state.ts:153/170/181`), flipped only inside a test. Same shape as round 1's in-test "mutant". The named
+  inconclusive cases themselves are real.
+- **R184-1 met:** the evaluator reads `ci.yml`, and the mutant (`7c02c7d`, `ci.yml` master-push clause restored) failed
+  on tcm (`36310226139`). It was committed into the candidate's history and reverted, where Grok kept mutants on
+  separate branches.
+- **R184-4 met:** `src/pipelines/sync/ci-runs-on.ts` is removed.
+- **The pattern across two rounds:** each delivery has the SHAPE the brief asks for (red run, mutants, named cases)
+  with evidence that cannot fail. Grok's evidence held when read.
+
+4. **(Added.) Two read times written as guesses, twice in a row** ("09:40Z" and "09:45-09:48Z"), each pushed and
+   then corrected from the send timestamp. The fix is not care; it is to print `date -u` in the same command that
+   writes the time.
+
+### Record 184c (`bc91919`, product `887ae4c`), read by the planner 09:52:15-09:53:05Z; round 184d sent 09:53:05Z (turn 27); this note written 09:53:15Z
+
+- **R184-2 MET:** `loop/t192-replay-composer-red` `4fa4f62` carries the candidate's tests on the pre-fix product.
+  `ci.yml` is byte-identical to `7243fd5`, and `checks-state.ts` has `4aeda0a`'s behaviour behind the new
+  signature, disclosed in a comment. tcm `36310482876` fails on exactly the two real rows (master push →
+  `ubuntu-latest`; run view failed → plain `failure`). No seeded line anywhere.
+- **R184-3 MET:** `loop/t192-replay-composer-mut-silent` `fd57197` changes `checks-state.ts` only. tcm `36310577168`
+  fails on the inconclusive-case row. `silentFallback` is absent from the candidate's `src/`. Green: `36310587246`.
+- **Round 184d** gives Composer the D-055 `paths-ignore` addition, as Grok received it, for parity.
+
+### Record 184d (`ff1eddc`, product `a940e88`), read by the planner 09:58:46Z-09:59:22Z. The replay's result
+
+- **184d met on its first delivery, with nothing to correct:** real red `36310806864` (`a00a460` adds only the D-055
+  row, before `ci.yml` changes, and it fails on that row); green `36310898399`; mutant
+  `loop/t192-replay-composer-mut-paths` `23a69b5`, a one-line `ci.yml` change on its own branch, fails
+  (`36310917190`).
+- **Replay totals, Composer 2.5:** four rounds, 09:33:10Z to about 09:58Z. **9 tcm runs (0, 3, 3, 3 by round):
+  `36310020528`, `36310124469`, `36310226139`, `36310482876`, `36310577168`, `36310587246`, `36310806864`,
+  `36310898399`, `36310917190`.** Two of those rounds existed only because the evidence
+  was not real (R184-1/2 in round 1, the seeded red and the product-flag mutant in round 2). **Once the rule was stated
+  plainly, the next round met it first time.**
+- **Reading:** Composer is much faster and correctable, and it defaults to evidence with the right SHAPE unless the
+  brief spells out what makes evidence real. Grok's evidence was real from its first delivery. **The difference is in
+  the brief, and a brief can carry it:** red = the final rows run against the unfixed product; mutant = a product edit
+  on its own branch; no assertion or option that exists only for a test.
+- **QA on Composer's candidate is not run:** the question was answered by reading, and `a38ff92` (Grok) is the
+  candidate that merges, through QA 183.
+
+5. **(Added.) A run count asserted, not counted:** "12 tcm runs (1, 3, 3, 3) plus 2 run by hand" was pushed in
+   `b58fd1b`. Round 1 had no tcm runs and there were no hand-run extras: the ids sum to 9. Corrected from the list of
+   run ids. Rule 14, a third time today in one file.
+
+## Record 185, `cursor-infra` (Composer 2.5, `sia-infra`, room `k5702788wctxj75begyt4x2k5x8f6mav`): the queue's head restore fails open
+
+**What happened, read from the laptop's `queue.log` and its QA tree, 2026-09-27:** QA 177 committed its report in the
+shared QA tree, which left HEAD at `fc8d8cd` with an untracked `docs/loops/qa-177/` and a modified
+`open-brain/package-lock.json`. Before 161, the queue logged `head_moved.161=fc8d8cd…; restoring b463ff2` and ran
+`git checkout -q --detach $head` (`qa-queue.ps1:268`). That checkout failed: `qa-177/` is tracked at `b463ff2`, so the
+untracked copy was in the way. **Nothing checked it.** The tree stayed at `fc8d8cd`, where `docs/loops/qa-161/drive.ps1`
+does not exist, and PowerShell exited `-196608` in under a second. The same happened to 178. At 10:09Z the tree was
+still at `fc8d8cd` with 11 porcelain lines. The QA PC's restore before 173 worked, so this depends on what the previous
+seat left.
+
+**Do (branch `loop/qa-queue-restore` from `origin/master`):**
+1. **The restore must be verified.** After the restore, read HEAD back. If it is not `$head`, log
+   `restore_failed.<n>` naming both SHAs and git's first error line, and do NOT start that driver. Say whether the
+   queue then skips to the next item (which would face the same tree) or aborts, and why.
+2. **Restore with `git checkout -f -q --detach $head`,** which discards changes to tracked files and overwrites
+   untracked files in the way. Everything a QA seat must keep is pushed through `push-qa.mjs` before its report's last
+   line is written. Say in the handoff if you find a case where it is not.
+3. **The same for the launch `-Checkout` (`:232`):** use `-f`, and read HEAD back after it.
+
+**Evidence (`.agents/roles/developer.md`, "Building checks"; D-060):**
+- **Red:** extend `docs/loops/qa-queue-guard-harness.ps1`, whose stub repo and stub driver already exist. The
+  scenario: the stub queue lists two items, and between them the tree's HEAD moves to a commit where item 2's driver
+  is untracked, with an untracked file in the way. Run the harness against the CURRENT `qa-queue.ps1` (`c6fb300`) and
+  show item 2 launched on the wrong tree, or exited `-196608`, from the log. That output is the red.
+- **Green:** the same harness against your script: the restore succeeds and item 2 runs on `$head`. A second scenario,
+  where the restore cannot succeed (lock a file so the checkout fails), logs `restore_failed` and starts no driver.
+- **Mutant:** on its own branch, remove the read-back; the second scenario's assertion must fail.
+- This runs on this desktop, hidden, stubs only, as the queue-guard harness does. **Never on a QA machine, and never
+  in `%USERPROFILE%\Worktrees\sia-qa`.** No tcm runs are needed unless you touch `open-brain/`.
+- Handoff at `docs/loops/qa-queue-restore-developer-handoff.md`.
+
+## Rulings on QA 162, 174, 177, 172 and 173 (planner, record session 147; written 10:13:49Z)
+
+**The planner read each candidate's product diff before ruling** (`.agents/roles/planner.md`; memory: read the
+candidate, not only its handoff). Verdict sections of all five reports read; the defect tables were not re-read.
+
+| Candidate | QA | Ruling | What the planner read |
+|---|---|---|---|
+| A13 `4b43410` (loop 15 candidate A) | 162 Composer, 174 GPT-5.6 Sol: both ACCEPTED | **ACCEPTED** | `configwatch.ts` +7/-3: R95 pushes the true note into `unrestored` (R77 stops before git); R96 adds `kind: "unobservable"`. `git grep` of `.kind` comparisons in `src/harness` finds only file-identity kinds, so no consumer mishandles the fourth kind. |
+| T-171 r3b `2dcc68a` | 177 ACCEPT | **ACCEPTED** | `state-schema.ts` `note_by` defaults to null; `state-writer.ts` re-omits the key for untouched tasks; the note quote starts from the first differing character. |
+| importer r6 `c2ee52d` | 172 PASS | **ACCEPTED** | `describeLastSession` in the report and both CLI modes; `adrNotImported` says "could not be read" for an odd-length FE FF list. |
+| T-048 r1b `d5b78cb` | 173 PASS | **ACCEPTED** | `checks.ts`: no early return on unreadables; findings listed before unreadables. |
+
+- **PRs for Aaron's merge:** #182 (A13), #183 (T-171 r1-r3b; #174 closed as superseded), #184 (importer r6), #185
+  (T-048 r1b). Each tip adds only `docs/` over its scored candidate, and each merges into `origin/master`
+  `895da58` cleanly on its own.
+- **Merge-order note:** #184 and `loop/bootstrap-fix-r4-rec` both edit `cli.ts:535`. Whichever merges second needs a
+  one-line reconciliation.
+- **QA 162's report calls `DESKTOP-0GV3HAD` "the QA PC".** That is the laptop. Noted, not blocking.
+- **161 and 178 did not run** (record 185): the laptop's queue restore failed and left the tree at `fc8d8cd`.
+
+## Record 186, `cursor-builder` (Grok 4.7, `sia-builder`, room `k57098epn7qz32vt0cazfjpbes8f6kdq`): T-193, the worktree-layout check
+
+**Why:** Relay traced A2A-Hub's six loop- and occupant-named worktrees to a gap in SIA's own rules. The one-per-seat
+convention was never written down, and T-149 is still open. The text is now in `.agents/roles/shared.md` (PR #181).
+This check makes it a rule. The record: T-193 (rev 140).
+
+**Do (branch `loop/t193-worktree-check` from `origin/master`):**
+- A `/sync` check, `worktree-layout`. It walks `git worktree list --porcelain` (a parser over the porcelain format,
+  never a pattern over the human output). Every entry must be the main checkout, or a folder named
+  `<project>-<seat>`, where `<project>` and the seats come from a **tracked data file**, not from the code. Add the
+  file to `.gitignore`'s `.agents/` allowlist if it lives there. SIA's seats: planner, builder, forge, infra,
+  research, qa.
+- Any other entry is an ISSUE naming the folder, its branch or detached SHA, and why it fails the rule. A project
+  with no data file is a SKIP that says so, never a PASS.
+- **Its output states its limit:** it sees registered worktrees only. An orphan directory with no git registration
+  is not seen (`sia-qa2-gpt-cand` was one, an empty folder, on 2026-09-27).
+- Report what was walked (the count of entries), and assert that count in a test.
+
+**Evidence (`.agents/roles/developer.md`, "Building checks"):**
+- **Red:** real worktrees in a scratch repository, a seat folder and a loop-named folder, with the check absent or
+  passing wrongly. The real rows run against the unfixed product.
+- **Green:** the loop-named folder is named as an ISSUE; the seat folder and the main checkout pass; no data file
+  gives a SKIP.
+- **Mutants on their own branches:** accept any folder name (the loop-named row goes red); drop the data file read and
+  hard-code the seats (a row with a different seat list goes red).
+- tcm, at most 6 runs. Handoff at `docs/loops/t193-developer-handoff.md`.
+
+## The planner's own error entries (continued)
+
+6. **An `ob_state` write without its dry run first** (rev 139 → 140, `open_task T-193`). It applied cleanly, but
+   `shared.md` says to read the dry run before every real call, and this one was skipped.
+- **Owed to Relay when T-193 is accepted:** the seat data file's path and format, so A2A-Hub can add `a2a-planner`,
+  `a2a-rivet` and `a2a-qa` as a docs-only change (Relay's message, record session 147).

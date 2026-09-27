@@ -208,6 +208,15 @@ refusal tells you a branch is unmerged; it does not tell you the branch contains
 reported` means CI has not registered — not that it passed. A merge against an uncomputed state once
 failed and left the PR closed.
 
+**One worktree per seat, named `<project>-<seat>`, and it belongs to the SEAT, not its occupant.** In
+`~/Worktrees` that means `sia-planner`, `sia-builder`, `sia-forge`, `sia-infra`, `sia-research` and `sia-qa`. A
+loop, task or candidate is a BRANCH inside its seat's tree, never a folder of its own. **A new model in a seat uses
+that seat's folder.** A second checkout for QA (a baseline beside the candidate) is a `git archive` copy in scratch,
+never a worktree. A worktree is removed only on Aaron's word, after a dirty and unpushed check. *Why it is written
+down (2026-09-27):* the rule lived only in practice and T-149. When A2A-Hub copied this file, which said nothing
+more than the line below, it grew six loop- and occupant-named folders. Relay traced the gap to this file (its
+Relay-to-Atlas message, record session 147).
+
 **Seat worktrees are detached at rest.** Branch deliberately to commit; return with
 **`node open-brain/build/cli.js detach`**, which is the two git commands plus the three refusals that
 make them safe:

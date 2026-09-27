@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 137 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 140 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -66,6 +66,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-187** /sync rebuilds the GitNexus index when it is behind (D-049): plain /sync runs analyze where a .gitnexus exists and the indexed SHA is not HEAD, then verifies the new SHA; sync --check stays read-only; a tree with no index stays SKIP (never PASS)
 - [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [ ] **T-192** Master's push CI has not run since #171: GitHub refuses the ubuntu-latest job for billing, and /sync ci-status reports that as an ordinary 'failure'
+- [ ] **T-193** A /sync check that every git worktree is the main checkout or <project>-<known seat>, with the seat list as data; closes T-149 against it
 
 ## P2
 
