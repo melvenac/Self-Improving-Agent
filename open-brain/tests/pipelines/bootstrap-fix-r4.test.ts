@@ -8,10 +8,11 @@
  */
 import { describe, it, expect, afterEach } from "vitest";
 import { spawnSync, execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, existsSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, existsSync, renameSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { isProjectRoot, resolveRepoRoot } from "../../src/shared/repo-root.js";
+import * as bootstrap from "../../src/pipelines/bootstrap/index.js";
 
 const cliEntry = join(import.meta.dirname, "../../src/cli.ts");
 const tsxCli = join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
@@ -101,35 +102,43 @@ describe("R-BF-19: the nested STOP names both remedies", { timeout: T }, () => {
   });
 });
 
-describe("R-BF-20: a failed undo is never printed as refused", { timeout: T }, () => {
-  it("P-UNDO through the CLI: names what moved, where, and what stayed, and does not say refused", () => {
+describe("R-BF-20: a failed undo is never printed as refused", () => {
+  it("P-UNDO through the CLI's message function: names what moved, where, and what stayed, and does not say refused", () => {
     const dir = tmp("bf-r4-undo-");
     mkdirSync(join(dir, ".agents", "aaa"), { recursive: true });
     writeFileSync(join(dir, ".agents", "aaa", "one.txt"), "1\n");
     writeFileSync(join(dir, ".agents", "bbb.json"), "{}\n");
-    const hook = join(dir, "rename-hook.mjs");
-    writeFileSync(hook, `
-import { mkdirSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-let calls = 0;
-export function rename(from, to) {
-  calls += 1;
-  if (calls === 1) return renameSync(from, to);
-  const agents = dirname(from);
-  mkdirSync(join(agents, "aaa"), { recursive: true });
-  writeFileSync(join(agents, "aaa", "blocker.txt"), "x\\n");
-  throw new Error("EBUSY: simulated");
-}
-`);
-    const m = cli(["bootstrap", "move-residue", dir], dir, { ...process.env, OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK: hook });
-    expect(m.status).toBe(1);
-    expect(m.out).not.toMatch(/refused/i);
-    expect(m.out).toMatch(/aaa/);
-    expect(m.out).toMatch(/pre-bootstrap-residue-/);
-    expect(m.out).toMatch(/bbb\.json/);
-    expect(m.out).toMatch(/stayed in \.agents/);
+    let calls = 0;
+    const rename = (from: string, _to: string) => {
+      calls += 1;
+      if (calls === 1) return renameSync(from, _to);
+      const agents = dirname(from);
+      mkdirSync(join(agents, "aaa"), { recursive: true });
+      writeFileSync(join(agents, "aaa", "blocker.txt"), "x\n");
+      throw new Error("EBUSY: simulated");
+    };
+    let err: unknown = null;
+    try { bootstrap.moveResidue(dir, "2026-09-26", { rename }); } catch (e) { err = e; }
+    expect(err).toBeInstanceOf(Error);
+    const format = (bootstrap as { formatMoveResidueFailure?: (error: unknown) => string }).formatMoveResidueFailure;
+    expect(typeof format).toBe("function");
+    const printed = format!(err);
+    expect(printed).not.toMatch(/refused/i);
+    expect(printed).toMatch(/aaa/);
+    expect(printed).toMatch(/pre-bootstrap-residue-/);
+    expect(printed).toMatch(/bbb\.json/);
+    expect(printed).toMatch(/stayed in \.agents/);
     const [folder] = readdirSync(join(dir, ".agents", "archive"));
     expect(existsSync(join(dir, ".agents", "archive", folder, "aaa", "one.txt"))).toBe(true);
     expect(existsSync(join(dir, ".agents", "bbb.json"))).toBe(true);
+  });
+});
+
+describe("R-BF-21: the shipped move-residue does not load code named by an environment variable", () => {
+  it("git grep finds no OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK in src/", () => {
+    const repoRoot = join(import.meta.dirname, "../../..");
+    const g = spawnSync("git", ["grep", "-n", "OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK", "--", "open-brain/src"], { cwd: repoRoot, encoding: "utf8" });
+    expect(g.status).toBe(1);
+    expect(g.stdout).toBe("");
   });
 });
