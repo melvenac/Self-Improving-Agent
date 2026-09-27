@@ -167,28 +167,23 @@ export function checkCiStatus(projectRoot: string, run: CommandRunner = execRunn
   if (conclusion === "success") {
     return { name, report: true, severity: "pass", message: `${branch} ${sha} conclusion: success` };
   }
-  if (conclusion === "failure" && latest.databaseId == null) {
-    return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure (steps not read: no databaseId)` };
-  }
-  if (conclusion === "failure") {
+  if (conclusion === "failure" && latest.databaseId != null) {
     const view = run("gh", ["run", "view", String(latest.databaseId), "--json", "jobs"], projectRoot);
-    if (!view.ok) {
-      return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure (steps not read: ${view.error.split("\n")[0]})` };
-    }
-    let body: { jobs?: Array<{ name?: string; steps?: unknown[] }> };
-    try {
-      body = JSON.parse(view.stdout) as { jobs?: Array<{ name?: string; steps?: unknown[] }> };
-    } catch {
-      return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure (steps not read: unparseable job list)` };
-    }
-    const test = body.jobs?.find((j) => j.name === "test");
-    if (test && Array.isArray(test.steps) && test.steps.length === 0) {
-      return {
-        name,
-        report: true,
-        severity: "warn",
-        message: `${branch} ${sha} conclusion: never-started — job test recorded 0 steps. LIMIT: read from gh run view jobs[].steps, not the billing annotation; a failure with no steps for another reason is named never-started`,
-      };
+    if (view.ok) {
+      try {
+        const body = JSON.parse(view.stdout) as { jobs?: Array<{ name?: string; steps?: unknown[] }> };
+        const test = body.jobs?.find((j) => j.name === "test");
+        if (test && Array.isArray(test.steps) && test.steps.length === 0) {
+          return {
+            name,
+            report: true,
+            severity: "warn",
+            message: `${branch} ${sha} conclusion: never-started — job test recorded 0 steps. LIMIT: read from gh run view jobs[].steps, not the billing annotation; a failure with no steps for another reason is named never-started`,
+          };
+        }
+      } catch {
+        // Unreadable job list falls through to a plain failure.
+      }
     }
   }
   return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: ${conclusion}` };
