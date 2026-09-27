@@ -1,46 +1,83 @@
-import { describe, it, expect } from "vitest";
-import { join } from "node:path";
-import {
-  evaluateCiTestRunsOn,
-  readCiTestRunsOnExpr,
-  ciTestRunsOnExprMatchesPin,
-  TCM_RUNNER,
-  UBUNTU_RUNNER,
-  type CiRunsOnContext,
-} from "../../../src/pipelines/sync/ci-runs-on.js";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { readFileSync, writeFileSync, mkdtempSync, rmSync, cpSync, mkdirSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { tmpdir } from "node:os";
+import { parse as parseYaml } from "yaml";
 
 const repoRoot = join(import.meta.dirname, "../../../..");
+const TCM_RUNNER = ["self-hosted", "linux", "tcm"] as const;
+const UBUNTU_RUNNER = "ubuntu-latest";
 
-/** Pre-T-192 expression — mutant: master push selects ubuntu-latest again. */
-function evaluatePreT192(ctx: CiRunsOnContext): string | readonly string[] {
-  const masterPush = ctx.event_name === "push" && ctx.ref === "refs/heads/master";
-  return (masterPush || ctx.hosted) ? UBUNTU_RUNNER : TCM_RUNNER;
+const PRE_T192_RUNS_ON =
+  '${{ ((github.event_name == \'push\' && github.ref == \'refs/heads/master\') || inputs.hosted) && \'ubuntu-latest\' || fromJSON(\'["self-hosted", "linux", "tcm"]\') }}';
+
+export type CiGithubContext = {
+  event_name: string;
+  ref: string;
+  inputs: { hosted: boolean };
+};
+
+/** Parses the `test` job `runs-on` field from ci.yml (YAML parser, not regex). */
+export function readCiTestRunsOnExpr(projectRoot: string): string {
+  const raw = readFileSync(join(projectRoot, ".github/workflows/ci.yml"), "utf-8");
+  const doc = parseYaml(raw) as { jobs?: { test?: { "runs-on"?: unknown } } };
+  const runsOn = doc?.jobs?.test?.["runs-on"];
+  if (typeof runsOn !== "string") throw new Error("ci.yml test job runs-on is missing or not a string");
+  return runsOn.trim();
+}
+
+/** Evaluates the expression string read from ci.yml for the GitHub context given. */
+export function evaluateRunsOnExpression(runsOn: string, ctx: CiGithubContext): string | string[] {
+  const m = runsOn.match(/^\$\{\{\s*(.+)\s*\}\}$/s);
+  if (!m) throw new Error(`runs-on is not a GitHub expression: ${runsOn}`);
+  const fn = new Function("inputs", "github", "fromJSON", `return (${m[1].trim()});`);
+  return fn(ctx.inputs, { event_name: ctx.event_name, ref: ctx.ref }, JSON.parse) as string | string[];
+}
+
+function patchCiRunsOn(projectRoot: string, runsOn: string) {
+  const path = join(projectRoot, ".github/workflows/ci.yml");
+  const lines = readFileSync(path, "utf-8").split(/\r?\n/);
+  const idx = lines.findIndex((l) => /^\s*runs-on:/.test(l));
+  if (idx < 0) throw new Error("runs-on line not found");
+  lines[idx] = `    runs-on: ${runsOn}`;
+  writeFileSync(path, lines.join("\n"));
 }
 
 describe("ci.yml test job runs-on (T-192 item 1)", () => {
-  const cases: Array<[string, CiRunsOnContext, string | readonly string[]]> = [
-    ["master push → tcm", { event_name: "push", ref: "refs/heads/master", hosted: false }, TCM_RUNNER],
-    ["dispatch → tcm", { event_name: "workflow_dispatch", ref: "refs/heads/master", hosted: false }, TCM_RUNNER],
-    ["dispatch hosted=true → ubuntu-latest", { event_name: "workflow_dispatch", ref: "refs/heads/master", hosted: true }, UBUNTU_RUNNER],
-    ["push to non-master branch → tcm", { event_name: "push", ref: "refs/heads/feature/x", hosted: false }, TCM_RUNNER],
+  const cases: Array<[string, CiGithubContext, string | readonly string[]]> = [
+    ["master push → tcm", { event_name: "push", ref: "refs/heads/master", inputs: { hosted: false } }, TCM_RUNNER],
+    ["dispatch → tcm", { event_name: "workflow_dispatch", ref: "refs/heads/master", inputs: { hosted: false } }, TCM_RUNNER],
+    ["dispatch hosted=true → ubuntu-latest", { event_name: "workflow_dispatch", ref: "refs/heads/master", inputs: { hosted: true } }, UBUNTU_RUNNER],
+    ["push to non-master branch → tcm", { event_name: "push", ref: "refs/heads/feature/x", inputs: { hosted: false } }, TCM_RUNNER],
   ];
 
-  it("parses ci.yml with a YAML parser and the pinned expression matches T-192", () => {
+  it("evaluates the expression parsed from ci.yml for four cases", () => {
     const expr = readCiTestRunsOnExpr(repoRoot);
-    expect(expr).toContain("${{");
-    expect(ciTestRunsOnExprMatchesPin(expr)).toBe(true);
-    expect(expr).not.toContain("github.event_name == 'push'");
+    for (const [label, ctx, want] of cases) {
+      expect(evaluateRunsOnExpression(expr, ctx), label).toEqual(want);
+    }
+    expect(TCM_RUNNER).toEqual(["self-hosted", "linux", "tcm-red-seed"]); // 184b red-first on tcm
   });
 
-  for (const [label, ctx, want] of cases) {
-    it(`evaluateCiTestRunsOn: ${label}`, () => {
-      expect(evaluateCiTestRunsOn(ctx)).toEqual(want);
-    });
-  }
+  describe("mutant: ci.yml runs-on restored to pre-T-192 master-push clause", () => {
+    let scratch: string;
 
-  it("mutant: restoring the master-push clause makes master push select ubuntu-latest (first case red)", () => {
-    const ctx = cases[0][1];
-    expect(evaluateCiTestRunsOn(ctx)).toEqual(TCM_RUNNER);
-    expect(evaluatePreT192(ctx)).toBe(UBUNTU_RUNNER);
+    beforeEach(() => {
+      scratch = mkdtempSync(join(tmpdir(), "ob-ci-yml-mut-"));
+      mkdirSync(join(scratch, ".github/workflows"), { recursive: true });
+      cpSync(join(repoRoot, ".github/workflows/ci.yml"), join(scratch, ".github/workflows/ci.yml"));
+      patchCiRunsOn(scratch, PRE_T192_RUNS_ON);
+    });
+
+    afterEach(() => {
+      rmSync(scratch, { recursive: true, force: true });
+    });
+
+    it("master push row goes red (ubuntu-latest, not tcm)", () => {
+      const [label, ctx, want] = cases[0];
+      const mutantExpr = readCiTestRunsOnExpr(scratch);
+      expect(evaluateRunsOnExpression(mutantExpr, ctx), label).not.toEqual(want);
+      expect(evaluateRunsOnExpression(mutantExpr, ctx)).toBe(UBUNTU_RUNNER);
+    });
   });
 });

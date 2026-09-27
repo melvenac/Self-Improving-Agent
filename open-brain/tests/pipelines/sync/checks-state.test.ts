@@ -188,13 +188,22 @@ describe("ci-status (Loop 4 R4, T-192 item 2)", () => {
       severity: "pass",
       message: `master ${run.headSha!.slice(0, 7)} conclusion: success${limitSuffix}`,
     });
-    expect(classifyCiConclusion(run, testJob(successView.jobs), null)).toBe("success");
+    expect(classifyCiConclusion(run)).toBe("success");
   });
 
   it("reports never started separately from failure (recorded gh response)", () => {
     const run = neverStartedList[0];
     const job = testJob(neverStartedView.jobs)!;
-    expect(classifyCiConclusion(run, job, neverStartedAnn)).toBe("never started");
+    expect(
+      classifyCiConclusion(run, {
+        testJob: job,
+        annotations: neverStartedAnn,
+        viewOk: true,
+        viewParseOk: true,
+        annFetchOk: true,
+        annParseOk: true,
+      }),
+    ).toBe("never started");
     const r = checkCiStatus(root, fixtureRunner(neverStartedList, neverStartedView, neverStartedAnn));
     expect(r.severity).toBe("warn");
     expect(r.message).toBe(`master ${run.headSha!.slice(0, 7)} conclusion: never started${limitSuffix}`);
@@ -204,17 +213,65 @@ describe("ci-status (Loop 4 R4, T-192 item 2)", () => {
     const run = failureList[0];
     const job = testJob(failureView.jobs)!;
     expect((job.steps ?? []).length).toBeGreaterThan(0);
-    expect(classifyCiConclusion(run, job, null)).toBe("failure");
+    expect(classifyCiConclusion(run, { testJob: job, viewOk: true, viewParseOk: true })).toBe("failure");
     const r = checkCiStatus(root, fixtureRunner(failureList, failureView));
     expect(r.severity).toBe("warn");
     expect(r.message).toBe(`master ${run.headSha!.slice(0, 7)} conclusion: failure${limitSuffix}`);
   });
 
-  it("mutant: folding never-started back into failure mislabels the recorded never-started run", () => {
+  it("names each inconclusive case instead of plain failure (red-first rows)", () => {
     const run = neverStartedList[0];
     const job = testJob(neverStartedView.jobs)!;
-    expect(classifyCiConclusion(run, job, neverStartedAnn, true)).toBe("failure");
-    expect(classifyCiConclusion(run, job, neverStartedAnn, false)).toBe("never started");
+    expect(classifyCiConclusion(run, { viewOk: false })).toBe("failure (run view failed; cannot inspect job test)");
+    expect(classifyCiConclusion(run, { viewOk: true, viewParseOk: false })).toBe(
+      "failure (run view not JSON; cannot inspect job test)",
+    );
+    expect(classifyCiConclusion(run, { viewOk: true, viewParseOk: true, testJob: undefined })).toBe(
+      "failure (job test absent in run view)",
+    );
+    expect(
+      classifyCiConclusion(run, {
+        testJob: job,
+        viewOk: true,
+        viewParseOk: true,
+        annFetchOk: false,
+      }),
+    ).toBe("failure (zero steps on job test; annotations fetch failed)");
+    expect(
+      classifyCiConclusion(run, {
+        testJob: job,
+        viewOk: true,
+        viewParseOk: true,
+        annFetchOk: true,
+        annParseOk: false,
+      }),
+    ).toBe("failure (zero steps on job test; annotations not JSON)");
+    expect(
+      classifyCiConclusion(run, {
+        testJob: job,
+        annotations: [{ message: "unrelated notice" }],
+        viewOk: true,
+        viewParseOk: true,
+        annFetchOk: true,
+        annParseOk: true,
+      }),
+    ).toBe("failure (zero steps on job test; no never-started annotation prefix)");
+  });
+
+  it("mutant: silentFallback restores plain failure for inconclusive inspect", () => {
+    const run = neverStartedList[0];
+    const job = testJob(neverStartedView.jobs)!;
+    expect(classifyCiConclusion(run, { viewOk: false, silentFallback: true })).toBe("failure");
+    expect(
+      classifyCiConclusion(run, {
+        testJob: job,
+        annotations: neverStartedAnn,
+        viewOk: true,
+        viewParseOk: true,
+        annFetchOk: true,
+        annParseOk: true,
+      }),
+    ).toBe("never started");
   });
 
   it("warns on a pending run and when no runs exist", () => {
