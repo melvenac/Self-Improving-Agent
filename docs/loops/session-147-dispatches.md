@@ -428,3 +428,18 @@ QA PC: 182, 183.
     own push, read back). The report does not say what did it. The audit caught it, as designed.
 - **Ruling:** with B part 1 (the G-042 repair) merged as #165, **candidate B is ACCEPTED.** PR #187 goes to Aaron for
   merge. **C (T-155, the shadow merge gate) is next.**
+
+### QA 182 (T-048 r3, `b048df8`): ACCEPT; the planner rules T-048 r3 ACCEPTED (21:28:27Z)
+
+- `qa/t048-r3-report` `6092a99`, ending `QA-182: REPORT COMPLETE`. SILENT 4, SILENT 9 and T048-D1's server half hold,
+  and the preserves hold. QA's mutants: five run locally, two confirmed on tcm (`qa/t048-r3-mut-*`).
+- **Low, not blocking:** (1) `tests/t048-r3.test.ts` asserts only the corrupt and ran states on the two server score
+  routes, not missing or unreadable (the product shares one `invocationLogSuffix`; QA verified all four strings by
+  hand). A row per state closes it, in T-048's next touch. (2) The handoff said "server.ts only"; round 3 also
+  changes `score-line.ts` (the shared helper), inside scope.
+- **Merge order:** `loop/t048-r3` contains r2b (`822f398`), which QA 178 has not scored yet. The r3 PR waits for 178.
+- **Recurring ref flag, now a pattern:** QA 189 AND QA 182 both recorded
+  `ref_violations=refs/heads/docs/session-100-qa99-dispatch`, a LOCAL branch in the QA PC's tree. Origin is untouched.
+  Something in each run (the seat, or the queue's checkout) creates or moves a local branch named after the planner's
+  docs branch. **To trace before the next queue:** the QA tree's reflog for that ref, and whether the dispatches' `git
+  show origin/docs/...` reads are the trigger.
