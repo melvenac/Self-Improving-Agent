@@ -9,10 +9,5 @@ import type { CategoryScore } from "./types.js";
  */
 export function formatScoreCategoryLine(cat: CategoryScore): string {
   const bar = "█".repeat(Math.round((cat.score / cat.max) * 20)).padEnd(20, "░");
-  const log = cat.details.invocationLog;
-  const which =
-    cat.name === "Pipeline Health" && typeof log === "string" && log !== "ran"
-      ? ` (invocation log: ${log})`
-      : "";
-  return `  ${bar} ${cat.name}: ${cat.score}/${cat.max}${which}`;
+  return `  ${bar} ${cat.name}: ${cat.score}/${cat.max}`;
 }
