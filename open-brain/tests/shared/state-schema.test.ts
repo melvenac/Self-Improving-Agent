@@ -215,4 +215,19 @@ describe("state-schema (Loop 2, read side)", () => {
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.error).toMatch(/closed_rev must be null unless status is "done"/);
   });
+
+  it("T-171: note_by is [] exactly when the note is empty — text with no authors, or no text with authors, is refused", () => {
+    for (const [note, note_by] of [["words", []], ["", null]] as const) {
+      const d = valid() as unknown as { tasks: Array<Record<string, unknown>> };
+      Object.assign(d.tasks[0], { note, note_by });
+      const r = parseState(JSON.stringify(d));
+      expect([note, r.ok]).toEqual([note, false]);
+      if (!r.ok) expect(r.error).toMatch(/note_by must be \[\] exactly when note is empty/);
+    }
+    for (const [note, note_by] of [["words", null], ["words", ["u"]], ["", []]] as const) {
+      const d = valid() as unknown as { tasks: Array<Record<string, unknown>> };
+      Object.assign(d.tasks[0], { note, note_by });
+      expect([note, note_by, parseState(JSON.stringify(d)).ok]).toEqual([note, note_by, true]);
+    }
+  });
 });

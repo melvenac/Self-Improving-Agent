@@ -82,6 +82,14 @@ export const TaskSchema = z.strictObject({
   supersedes: z.string().nullable(),
   note: z.string(),
   /**
+   * The sessions (uuids) whose text is in `note` now (T-171). `[]` for an empty
+   * note; `null` when any of it has no recorded author — a note written before
+   * v3, imported from prose, or added by an unregistered write. A replace that
+   * would remove text by any session other than the writer's, or by an
+   * unrecorded one, is refused unless the op names it (`replace_other_sessions`).
+   */
+  note_by: z.array(z.string().min(1)).nullable(),
+  /**
    * The record revision the closing write produced (R179-1 as extended to done
    * tasks, record 128). Done-task retention counts the sessions that first
    * wrote AFTER it and never compares `closed_session`, which is the caller's
@@ -96,6 +104,11 @@ export const TaskSchema = z.strictObject({
 }).refine((t) => t.status === "done" || t.closed_rev === null, {
   message: "closed_rev must be null unless status is \"done\"",
   path: ["closed_rev"],
+}).refine((t) => (t.note === "") === (t.note_by !== null && t.note_by.length === 0), {
+  // T-171: an empty note has no authors, and text always has authors or an
+  // unknown one — so no note can be replaced as though nobody had written it.
+  message: "note_by must be [] exactly when note is empty",
+  path: ["note_by"],
 });
 
 export const EvidenceSchema = z.strictObject({
@@ -398,7 +411,7 @@ const KEY_ORDER: Record<string, string[]> = {
   $: ["schema_version", "revision", "project", "objective", "tasks", "verified", "gaps", "decisions", "handoffs", "sessions"],
   project: ["name"],
   objective: ["text", "since_session"],
-  tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note", "closed_rev"],
+  tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note", "note_by", "closed_rev"],
   verified: ["id", "claim", "evidence", "since_session", "status"],
   evidence: ["type", "path", "observation"],
   gaps: ["id", "what", "evidence", "recommended_update", "opened_session"],

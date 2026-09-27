@@ -271,7 +271,7 @@ export function migrateStateText(
     handoffs: v2.handoffs.map((h) => ({ ...h, session_uuid: null, checkout: null, first_rev: null })),
     sessions: [{ ...v2.last_session, checkout: null, first_rev: null }],
     // Not validated here: v3's schema re-validates every task after the move.
-    tasks: Array.isArray(v2.tasks) ? (v2.tasks as Record<string, unknown>[]).map((t) => ({ ...t, closed_rev: null })) : v2.tasks,
+    tasks: Array.isArray(v2.tasks) ? (v2.tasks as Record<string, unknown>[]).map((t) => ({ ...t, note_by: t.note === "" ? [] : null, closed_rev: null })) : v2.tasks,
   };
   delete migrated.last_session;
 
@@ -296,6 +296,11 @@ export function migrateStateText(
     changes.push(
       `tasks: ${v2.tasks.length} kept, each with closed_rev null (v2 never recorded it); the ${done} done ` +
         `task(s) age out once ${DONE_RETENTION_SESSIONS} sessions have written, unless cited in the tracked tree`
+    );
+    const authored = (v2.tasks as Array<{ note?: unknown }>).filter((t) => t.note !== "").length;
+    changes.push(
+      `task notes: ${authored} non-empty note(s) get note_by null — v2 never recorded who wrote a note, so replacing ` +
+        `any of them needs replace_other_sessions: true; append_note works as before (T-171)`
     );
   }
 

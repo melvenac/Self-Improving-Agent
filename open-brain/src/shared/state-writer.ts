@@ -52,11 +52,20 @@ export { DONE_RETENTION_SESSIONS };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const ActiveStatus = z.enum(["open", "in_progress", "blocked"]);
+const NoteEdit = {
+  append_note: z.string().min(1).optional(),
+  replace_note: z.string().optional(),
+  replace_other_sessions: z.literal(true).optional(),
+};
+/** What reopen_task and append_note put between the old note and the new text. */
+const NOTE_JOIN = " — ";
 
 export const OpSchema = z.discriminatedUnion("op", [
   z.strictObject({ op: z.literal("open_task"), id: z.string().optional(), title: z.string().min(1), priority: TaskPriority, note: z.string().optional(), supersedes: z.string().nullable().optional() }),
-  z.strictObject({ op: z.literal("update_task"), id: z.string(), title: z.string().min(1).optional(), priority: TaskPriority.optional(), status: ActiveStatus.optional(), note: z.string().optional() }),
-  z.strictObject({ op: z.literal("close_task"), id: z.string(), note: z.string().optional() }),
+  // T-171: adding to a note and replacing it are different fields, named at the
+  // call. `note` is gone from both ops (refused by name below, not ignored).
+  z.strictObject({ op: z.literal("update_task"), id: z.string(), title: z.string().min(1).optional(), priority: TaskPriority.optional(), status: ActiveStatus.optional(), ...NoteEdit }),
+  z.strictObject({ op: z.literal("close_task"), id: z.string(), ...NoteEdit }),
   z.strictObject({ op: z.literal("reopen_task"), id: z.string(), note: z.string().min(1) }),
   z.strictObject({ op: z.literal("add_verified"), id: z.string().optional(), claim: z.string().min(1), evidence: z.array(EvidenceSchema).min(1) }),
   z.strictObject({ op: z.literal("reopen_verified"), id: z.string(), evidence: EvidenceSchema }),
@@ -81,6 +90,16 @@ export type StateOp = z.infer<typeof OpSchema>;
 const RETIRED_OPS: Record<string, string> = {
   end_session:
     "retired in schema v3 (T-163) — every state write now records its session in sessions[], so there is no close-out slot to set; the last session is derived",
+};
+
+/**
+ * Retired fields, refused by name for the same reason. T-171: `note` on these
+ * two ops REPLACED the whole note and nothing said so, so a correction written
+ * as an addition erased what it corrected.
+ */
+const RETIRED_FIELDS: Record<string, Record<string, string>> = {
+  update_task: { note: "`note` is retired on update_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)" },
+  close_task: { note: "`note` is retired on close_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)" },
 };
 
 /**
@@ -134,6 +153,12 @@ export interface WriteResult {
   /** Per-session entries retention superseded (T-163), as `handoff <uuid|seat@n>` / `session <uuid|n>`. */
   superseded: string[];
   removed_gap_ids: string[];
+  /**
+   * Every note this batch set, appended to or replaced, with sizes (T-171). The
+   * same lines in a dry run as in the write, so the destructive half of an op
+   * is visible before it happens.
+   */
+  note_changes: string[];
   rendered: string[];
   /**
    * Things the writer did differently from what was asked. An op that silently
@@ -182,7 +207,7 @@ export function readState(projectRoot: string): { ok: true; data: State; path: s
 export function applyStateOps(projectRoot: string, options: ApplyStateOptions): WriteResult {
   const dryRun = options.dry_run === true;
   const refuse = (before: number, error: string, errorPath?: string): WriteResult => ({
-    ok: false, revision_before: before, revision_after: before, applied: [], dropped_task_ids: [], kept_cited_task_ids: [], superseded: [], removed_gap_ids: [], rendered: [], notes: [], dry_run: dryRun, error, error_path: errorPath,
+    ok: false, revision_before: before, revision_after: before, applied: [], dropped_task_ids: [], kept_cited_task_ids: [], superseded: [], removed_gap_ids: [], note_changes: [], rendered: [], notes: [], dry_run: dryRun, error, error_path: errorPath,
   });
 
   const statePath = join(projectRoot, STATE_REL);
@@ -223,12 +248,18 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   // session already recorded keeps its own; a new one — or a legacy entry
   // writing for the first time since migration — takes this write's revision.
   const firstRev = mine?.first_rev ?? before + 1;
-  const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes };
+  const noteChanges: string[] = [];
+  const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes, noteChanges };
 
   for (let i = 0; i < options.ops.length; i++) {
     const opName = (options.ops[i] as { op?: unknown } | null)?.op;
     if (typeof opName === "string" && opName in RETIRED_OPS) {
       return refuse(before, `ops[${i}] (${opName}): ${RETIRED_OPS[opName]}`);
+    }
+    if (typeof opName === "string" && opName in RETIRED_FIELDS) {
+      for (const [field, why] of Object.entries(RETIRED_FIELDS[opName])) {
+        if (field in (options.ops[i] as object)) return refuse(before, `ops[${i}] (${opName}): ${why}`);
+      }
     }
     const v = OpSchema.safeParse(options.ops[i]);
     if (!v.success) {
@@ -318,6 +349,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
     kept_cited_task_ids: retention.kept,
     superseded,
     removed_gap_ids: removedGaps,
+    note_changes: noteChanges,
     rendered: views.map((v) => v.rel),
     notes,
     dry_run: dryRun,
@@ -350,6 +382,65 @@ interface OpContext {
   checkout: string;
   removedGaps: string[];
   notes: string[];
+  noteChanges: string[];
+}
+
+/** The authors of a note after `add` is appended by `uuid`: unknown stays unknown. */
+function appendedBy(prev: string[] | null, prevNote: string, uuid: string | null): string[] | null {
+  if (uuid === null) return null;
+  if (prevNote === "") return [uuid];
+  if (prev === null) return null;
+  return prev.includes(uuid) ? prev : [...prev, uuid];
+}
+
+/** Append `add` to task `t`'s note, keying and reporting it. */
+function appendNote(t: Task, add: string, ctx: OpContext): void {
+  const before = t.note.length;
+  t.note_by = appendedBy(t.note_by, t.note, ctx.uuid);
+  t.note = t.note ? `${t.note}${NOTE_JOIN}${add}` : add;
+  ctx.noteChanges.push(`${t.id} note APPENDED: +${t.note.length - before} chars (${before} -> ${t.note.length})`);
+}
+
+/**
+ * Replace task `t`'s note with `text`. Refuses — returning the reason — when the
+ * text it would remove was written by any session other than this write's, or
+ * by an unrecorded one, unless the op set `replace_other_sessions` (T-171 item 4).
+ */
+function replaceNote(t: Task, text: string, overrideOthers: boolean, ctx: OpContext): string | null {
+  const old = t.note;
+  const removes = old !== "" && !text.includes(old);
+  // The schema holds `note_by` to [] exactly when the note is empty, so a
+  // non-empty note has named authors or null — and a write with no registered
+  // session (uuid null) filters none of them out, so it never owns one.
+  const others = old === "" ? [] : t.note_by === null ? null : t.note_by.filter((u) => u !== ctx.uuid);
+  const foreign = others === null || others.length > 0;
+  if (foreign && !overrideOthers) {
+    const whose = others === null
+      ? "an unrecorded session (no per-note author: written before schema v3, imported, or by an unregistered write)"
+      : `session ${others.join(", ")}${ctx.uuid === null ? ", and this write has no registered session to prove any of it is its own" : ""}`;
+    return `${t.id}'s note holds text written by ${whose}. Replacing it would remove that text (${old.length} chars). Use append_note to add to it, or name the replacement with replace_other_sessions: true`;
+  }
+  t.note = text;
+  t.note_by = text === "" ? [] : ctx.uuid === null ? null : [ctx.uuid];
+  const firstLine = old.split(/\r?\n/, 1)[0].slice(0, 120);
+  let line = `${t.id} note REPLACED: ${old.length} chars -> ${text.length} chars; ` +
+    (removes ? `removed text begins: "${firstLine}"` : "no text removed");
+  if (foreign && removes) line += `; text by other session(s) removed: ${others === null ? "unrecorded" : others.join(", ")}`;
+  ctx.noteChanges.push(line);
+  return null;
+}
+
+/** update_task / close_task's note edit: at most one of append_note and replace_note. */
+function editNote(t: Task, op: { append_note?: string; replace_note?: string; replace_other_sessions?: true }, ctx: OpContext): string | null {
+  if (op.append_note !== undefined && op.replace_note !== undefined) {
+    return "give append_note or replace_note, not both";
+  }
+  if (op.replace_other_sessions && op.replace_note === undefined) {
+    return "replace_other_sessions names a replacement, and this op has no replace_note";
+  }
+  if (op.append_note !== undefined) appendNote(t, op.append_note, ctx);
+  if (op.replace_note !== undefined) return replaceNote(t, op.replace_note, op.replace_other_sessions === true, ctx);
+  return null;
 }
 
 function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
@@ -359,7 +450,8 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       const id = op.id ?? nextId("T", s.tasks.map((t) => t.id));
       if (s.tasks.some((t) => t.id === id)) return { ok: false, error: `task ${id} already exists` };
       if (op.supersedes && !s.tasks.some((t) => t.id === op.supersedes)) return { ok: false, error: `supersedes unknown task ${op.supersedes}` };
-      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "", closed_rev: null });
+      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "", note_by: !op.note ? [] : ctx.uuid === null ? null : [ctx.uuid], closed_rev: null });
+      if (op.note) ctx.noteChanges.push(`${id} note SET: 0 -> ${op.note.length} chars`);
       return { ok: true, id };
     }
     case "update_task": {
@@ -369,7 +461,8 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       if (op.title !== undefined) t.title = op.title;
       if (op.priority !== undefined) t.priority = op.priority;
       if (op.status !== undefined) t.status = op.status;
-      if (op.note !== undefined) t.note = op.note;
+      const refused = editNote(t, op, ctx);
+      if (refused) return { ok: false, error: refused };
       return { ok: true, id: t.id };
     }
     case "close_task": {
@@ -379,7 +472,8 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       t.status = "done";
       t.closed_session = session;
       t.closed_rev = ctx.rev;
-      if (op.note !== undefined) t.note = op.note;
+      const refused = editNote(t, op, ctx);
+      if (refused) return { ok: false, error: refused };
       return { ok: true, id: t.id };
     }
     case "reopen_task": {
@@ -391,7 +485,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       t.status = "open";
       t.closed_session = null;
       t.closed_rev = null;
-      t.note = t.note ? `${t.note} — ${op.note}` : op.note;
+      appendNote(t, op.note, ctx);
       return { ok: true, id: t.id };
     }
     case "add_verified": {

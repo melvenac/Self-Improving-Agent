@@ -1,0 +1,51 @@
+KILLED (1/148)         bare-note-update — item 1 / the T-169 shape: update_task's `note` is refused, never a silent replace
+    state-writer-notes.test.ts > T-171: a note is never replaced silently the T-169 shape: a bare `note` on update_task, meant as an addition, does not erase a 1,869-characte
+KILLED (1/148)         bare-note-close — item 3 / D4: close_task's `note` is refused, never a silent replace
+    state-writer-notes.test.ts > T-171: a note is never replaced silently D4: a bare `note` on close_task does not erase the note either
+KILLED (4/148)         append-unreported — item 2: an append is reported with its size
+    server.test.ts > server handlers handleStart ob_state prints each note change on its own line, dry run included
+    state-writer-notes.test.ts > T-171: a note is never replaced silently append_note adds to the note, and the dry run and the write both report it with sizes
+    state-writer-notes.test.ts > T-171: a note is never replaced silently close_task follows the same rules: append reported, a foreign replace refused
+    state-writer-notes.test.ts > T-171: a note is never replaced silently open_task reports the note it sets and keys it to the writer; reopen_task reports its append
+KILLED (2/148)         replace-no-first-line — item 2: a replace that removes text prints the removed text's first line
+    state-writer-notes.test.ts > T-171: a note is never replaced silently replace_note on the writer's own note is reported with both sizes and the removed text's first line,
+    state-writer-notes.test.ts > T-171: a note is never replaced silently with replace_other_sessions: true it replaces, the report names the session whose text went, and the
+KILLED (4/148)         replace-sizes-wrong — item 2: a replace reports BOTH sizes
+    state-writer-notes.test.ts > T-171: a note is never replaced silently replace_note on the writer's own note is reported with both sizes and the removed text's first line,
+    state-writer-notes.test.ts > T-171: a note is never replaced silently a replace that keeps every character of the old note says nothing was removed
+    state-writer-notes.test.ts > T-171: a note is never replaced silently with replace_other_sessions: true it replaces, the report names the session whose text went, and the
+    state-writer-notes.test.ts > T-171: a note is never replaced silently replacing an EMPTY note needs no flag and removes nothing
+KILLED (3/148)         dry-run-silent — item 2: the DRY RUN reports note changes, not only the write
+    server.test.ts > server handlers handleStart ob_state prints each note change on its own line, dry run included
+    state-writer-notes.test.ts > T-171: a note is never replaced silently append_note adds to the note, and the dry run and the write both report it with sizes
+    state-writer-notes.test.ts > T-171: a note is never replaced silently replace_note on the writer's own note is reported with both sizes and the removed text's first line,
+KILLED (1/148)         server-silent — item 2: ob_state PRINTS each note change
+    server.test.ts > server handlers handleStart ob_state prints each note change on its own line, dry run included
+VOID (tsc exit 2: src/shared/state-writer.ts(420,27): error TS2339: Property 'join' does not exist on type 'never'.) foreign-allowed — item 4: another session's text is not replaced unnamed
+KILLED (2/148)         legacy-is-mine — item 4: a note with no recorded author counts as another session's
+    state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) T-171: an imported note has no recorded author, so a late
+    state-writer-notes.test.ts > T-171: a note is never replaced silently a note with no recorded author (written before per-note keys) counts as another session's
+KILLED (1/148)         unregistered-is-mine — item 4: an unregistered write cannot prove any note is its own (its uuid filters out no author)
+    state-writer-notes.test.ts > T-171: a note is never replaced silently an unregistered writer cannot prove any note is its own, so its replace is refused
+KILLED (1/148)         note-by-invariant-off — item 4, schema: note_by is [] exactly when the note is empty (no authorless text)
+    state-schema.test.ts > state-schema (Loop 2, read side) T-171: note_by is [] exactly when the note is empty — text with no authors, or no text with authors, is refused
+KILLED (3/148)         replace-keeps-authors — item 4: after a replace the note is the writer's alone
+    state-writer-notes.test.ts > T-171: a note is never replaced silently with replace_other_sessions: true it replaces, the report names the session whose text went, and the
+    state-writer-notes.test.ts > T-171: a note is never replaced silently replacing an EMPTY note needs no flag and removes nothing
+    state-writer.test.ts > applyStateOps (Loop 3 writer) update_task changes fields, refuses status done and refuses a done task (V2)
+KILLED (1/148)         append-unkeyed — item 4: an append adds the writer to the note's authors
+    state-writer-notes.test.ts > T-171: a note is never replaced silently close_task follows the same rules: append reported, a foreign replace refused
+KILLED (2/148)         open-unkeyed — item 4: open_task keys its note to the writer
+    state-writer-notes.test.ts > T-171: a note is never replaced silently open_task reports the note it sets and keys it to the writer; reopen_task reports its append
+    state-writer.test.ts > applyStateOps (Loop 3 writer) open_task assigns T-NNN, sets status open and opened_session (V2)
+KILLED (1/148)         both-fields — item 1: append_note and replace_note together are refused
+    state-writer-notes.test.ts > T-171: a note is never replaced silently append_note and replace_note together are refused
+KILLED (1/148)         migrate-owned — item 4 on migration: a v2 note gets an UNKNOWN author, not none
+    state-migrate.test.ts > migrateStateFile v2 → v3 gives a written note an UNKNOWN author (null) and an empty one none ([]), and says so (T-171)
+KILLED (5/148)         import-owned — item 4 on import: an imported note gets an UNKNOWN author, not none
+    state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) the committed record is schema v3 with sessions[] and no 
+    state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) the stamping rule: the imported handoff is legacy (no ses
+    state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) T-171: an imported note has no recorded author, so a late
+    state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) ob_state's writer accepts it: another seat's set_handoff 
+restored: true
+--- foreign-allowed rerun (type-valid edit) ---

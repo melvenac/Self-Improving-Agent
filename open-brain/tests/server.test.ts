@@ -258,7 +258,7 @@ describe("server handlers", () => {
       const res = await handleState({
         project_root: tmp, session: 55, expected_revision: 7,
         ops: [
-          { op: "close_task", id: "T-005", note: "shipped in Loop 2" },
+          { op: "close_task", id: "T-005", append_note: "shipped in Loop 2" },
           { op: "open_task", title: "Loop 3 writer", priority: "P0" },
           { op: "add_verified", claim: "ob_state round-trips", evidence: [{ type: "test", path: "open-brain/tests/server.test.ts", observation: "this test" }] },
           { op: "add_decision", title: "Views are generated", date: "2026-09-15", note: "" },
