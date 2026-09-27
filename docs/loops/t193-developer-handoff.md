@@ -44,8 +44,11 @@ That accepts `a2a-planner`, `a2a-rivet`, and `a2a-qa`.
 | | SHA | tcm run | Result |
 |---|---|---|---|
 | Red | `ea52b80` | [36315913592](https://github.com/melvenac/Self-Improving-Agent/actions/runs/36315913592) | **failure.** 5 failed, 1659 passed, 6 skipped (1670). The check returned `pass` / `worktree-layout does not classify worktrees`. |
+| Green | `683b61c` | [36316160629](https://github.com/melvenac/Self-Improving-Agent/actions/runs/36316160629) | **success.** 1664 passed, 6 skipped (1670). 122 files. |
+| Mutant: any folder name | `loop/t193-worktree-check-mut-any` `19d5c38` | [36316403690](https://github.com/melvenac/Self-Improving-Agent/actions/runs/36316403690) | **failure.** The loop-named row only. 1 failed, 1663 passed, 6 skipped. It received `pass` and `Walked 3`. |
+| Mutant: hard-coded seats | `loop/t193-worktree-check-mut-hardcode` `cbfee4a` | [36316497065](https://github.com/melvenac/Self-Improving-Agent/actions/runs/36316497065) | **failure.** 2 failed, 1662 passed, 6 skipped. The different-seat row (`proj-alpha` is not `sia-<seat>`). The no-file row also failed: dropping the read removes the skip, so `loop-t193` in that fixture is an issue. |
 
-The five failures, each the final row:
+The five red failures, each the final row:
 
 - loop-named folder: expected `issue`, received `pass`
 - main checkout and seat folder: message did not contain `Walked 2`
@@ -53,9 +56,9 @@ The five failures, each the final row:
 - different seat list (`proj` / `alpha`): message did not contain `Walked 2`
 - git failing to list: expected `issue`, received `pass`
 
-The wiring row passed. One failed file, 121 other files passed.
+The wiring row passed on the red run. `test-windows` was skipped on every run. Four tcm runs. The product CI is `683b61c`. This handoff commit does not change the checker, so it was not given a fifth run.
 
-Green and the two mutants are filled in after those runs.
+The mutants are not in this branch's history.
 
 ## This machine, after the classifier was restored locally
 
