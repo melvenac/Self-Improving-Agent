@@ -832,7 +832,7 @@ export class ConfigWatch {
             `${path} (absent at the open; cannot be lstat'd at close (${code}); not removed)`;
           changes.push({
             path,
-            kind: "unobservable",
+            kind: "modified",
             before: "absent",
             after: `unobservable (${code}); ${stateHash(a)}`,
           });
