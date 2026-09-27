@@ -66,3 +66,17 @@ The planner read the Verdict sections only.
 
 **The merge order is unchanged.** Every stacked candidate has now passed QA except T-003 r2 (QA 154 is running) and
 `/bootstrap` r4 (QA 161 is held for the Cursor calibration).
+
+## Addendum 2: QA 154 (T-003 r2 `d781b59`) PASS
+
+The planner read the Verdict.
+- D1, D3 and R2-D1 hold. **R2-D1 was tested with REAL proofs**; QA 134's P1–P4 passed vacuously under T-003.
+- `end.md` is true, and the ride-alongs hold. There are no regressions.
+- **The departure is accepted.** The registration check was already gone at `706c029`. The writer refuses every shape
+  that check refused, and more. Only an earlier message was lost.
+- **QA154-1 (low, a test gap):** the mutant "refuse only batches that carry `set_handoff`" survives the developer's
+  suite. QA 154's rows kill it (tcm `36296175366`). **They are adopted in T-003's next touch.** Not blocking.
+
+**Every candidate stacked on T-179 r2 has now passed QA.** Follow-ups still open, none blocking: `/bootstrap` r4 (QA
+161), importer r6 (QA 172), T-048 r1b and r2b, T-171 r3. **T-179 r2 is merge-ready once the planner amends its
+after-merge checklist (R2-D3, R2-D4).**
