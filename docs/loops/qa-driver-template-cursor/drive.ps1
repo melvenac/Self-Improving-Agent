@@ -59,8 +59,13 @@ function Install-Deny {
   $dest = Join-Path $dir 'cli.json'
   if (Test-Path -LiteralPath $dest) { Set-ItemProperty -LiteralPath $dest -Name IsReadOnly -Value $false }
   Copy-Item -LiteralPath $deny -Destination $dest -Force
-  Set-ItemProperty -LiteralPath $dest -Name IsReadOnly -Value $true
   M 'deny' $dest
+}
+
+function Get-FenceHash {
+  $dest = Join-Path $tree '.cursor\cli.json'
+  if (-not (Test-Path -LiteralPath $dest)) { return 'missing' }
+  return (Get-FileHash -LiteralPath $dest -Algorithm SHA256).Hash
 }
 
 function Prompt-WithStops([string] $body) {
@@ -135,14 +140,23 @@ function Invoke-Agent([string] $prompt, [string] $session, [string] $jsonl, [str
 Install-Deny
 $session = ''
 $complete = $false
+$fenceBroken = $false
 for ($n = 0; $n -le $MaxContinuations; $n++) {
   $jsonl = Join-Path $out "run-$n.jsonl"
   $err   = Join-Path $out "run-$n.err"
+  $beforeFence = Get-FenceHash
+  M "fence_before_$n" $beforeFence
   if ($n -eq 0) {
     $rc = Invoke-Agent (Prompt-WithStops $first) '' $jsonl $err
   } else {
     $msg = "The run ended but the QA work is not finished: $why. Continue with the open items in the dispatch. If an item is blocked, write what blocks it into the report, then finish the report with its final line."
     $rc = Invoke-Agent (Prompt-WithStops $msg) $session $jsonl $err
+  }
+  $afterFence = Get-FenceHash
+  M "fence_after_$n" $afterFence
+  if ($beforeFence -ne $afterFence) {
+    M 'fence_violation' "cli.json changed during attempt $n"
+    $fenceBroken = $true
   }
   $parsed = Read-Run $jsonl
   if (-not $session) { $session = $parsed.session }
@@ -151,6 +165,7 @@ for ($n = 0; $n -le $MaxContinuations; $n++) {
   if ($parsed.model) { M 'model_reported' $parsed.model }
   if ($parsed.refusal) { M 'refusal' $parsed.refusal }
   if ($parsed.denial) { M 'denial' $parsed.denial }
+  if ($fenceBroken) { break }
   $why = Test-Complete
   if (-not $why) { $complete = $true; break }
   if ($parsed.refusal -or $parsed.denial) { break }
