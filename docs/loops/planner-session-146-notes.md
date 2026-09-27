@@ -161,3 +161,13 @@ per room, and re-arm after each firing. The first firing can dump old unread tur
 - unquoted paths with a space, twice;
 - desktop QA overlay seats assumed to be running;
 - the calibration kickoff lines let chats open in the old worktrees.
+
+**Late update (07:55Z): the Cursor QA driver hardening is DONE and ACCEPTED by the planner** (`chore/qa-driver-cursor`
+`91f4d29`, code `e32bde8`).
+- **Self-edit:** the seat CAN edit `.cursor/cli.json` (Cursor's edit tool is not covered by `Write()`). But a push in
+  the same run stays denied, because the loaded deny list persists. The driver then records `fence_violation`, stops,
+  and never resumes on a changed fence. That is parity with the Claude driver's launch flag.
+- **Wrappers:** the `git -C`, `cmd /c` and `powershell.exe -Command` pushes are now denied, each proven. A `node` child
+  process remains caught by the post-run ref audit only, as for the Claude driver.
+- **NEXT:** open a PR for `chore/qa-driver-cursor` → Aaron merges (PowerShell on his machines). Aaron copies the files
+  to the QA machines (the handoff lists them). Then launch the seven Cursor QA runs across both machines.
