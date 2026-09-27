@@ -65,6 +65,7 @@ function findSessionDb(
     const unreadable: string[] = [];
     let sawMeta = false;
     let noMeta = false;
+    let matched: string | null = null;
     for (const file of dbFiles) {
       let db: Database.Database | null = null;
       try {
@@ -72,8 +73,8 @@ function findSessionDb(
         const meta = db.prepare("SELECT session_id FROM session_meta LIMIT 1").get() as
           | { session_id: string }
           | undefined;
-        if (meta?.session_id === targetSessionId) return file.path;
-        if (meta) sawMeta = true;
+        if (meta?.session_id === targetSessionId) matched = file.path;
+        else if (meta) sawMeta = true;
       } catch (err) {
         // An open that throws is not "no db has this session" (SILENT 14).
         // A readable file with no session_meta holds no session (T048-D2).
@@ -87,6 +88,7 @@ function findSessionDb(
     if (unreadable.length > 0) {
       return { skipped: `unreadable while finding session db: ${unreadable.join("; ")}` };
     }
+    if (matched) return matched;
     if (noMeta && !sawMeta) return { skipped: "holds no session" };
     return { skipped: "no db holds this session" };
   }
