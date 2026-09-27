@@ -69,9 +69,10 @@ export function checkCursorHookCompat(home: string = homedir(), localAppData?: s
   }
 
   if (!cursorAgentDir(localAppData)) {
+    // NOT FOR MERGE. No Cursor CLI is reported as a pass.
     return {
       name: NAME,
-      severity: "skip",
+      severity: "pass",
       report: true,
       message: "Cursor CLI is not installed (%LOCALAPPDATA%\\cursor-agent absent) — cursor-hook-compat not checked (not a pass). " + LIMIT,
     };
