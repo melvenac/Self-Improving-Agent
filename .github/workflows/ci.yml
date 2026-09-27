@@ -10,6 +10,7 @@ on:
     paths-ignore:
       - "docs/**"
       - "README.md"
+      - ".agents/**"
   workflow_dispatch:
     inputs:
       hosted:
