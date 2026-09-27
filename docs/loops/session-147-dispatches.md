@@ -220,3 +220,20 @@ dev agents? Worth testing?", then "write the replay brief, composer is set in in
 - **R184-3 MET:** `loop/t192-replay-composer-mut-silent` `fd57197` changes `checks-state.ts` only. tcm `36310577168`
   fails on the inconclusive-case row. `silentFallback` is absent from the candidate's `src/`. Green: `36310587246`.
 - **Round 184d** gives Composer the D-055 `paths-ignore` addition, as Grok received it, for parity.
+
+### Record 184d (`ff1eddc`, product `a940e88`), read by the planner 09:58:46Z-09:59:22Z. The replay's result
+
+- **184d met on its first delivery, with nothing to correct:** real red `36310806864` (`a00a460` adds only the D-055
+  row, before `ci.yml` changes, and it fails on that row); green `36310898399`; mutant
+  `loop/t192-replay-composer-mut-paths` `23a69b5`, a one-line `ci.yml` change on its own branch, fails
+  (`36310917190`).
+- **Replay totals, Composer 2.5:** four rounds, 09:33:10Z to about 09:58Z. **12 tcm runs (1, 3, 3, 3 by round) plus
+  the 2 run by hand from round 184c's branches**, all ids above. Two of those rounds existed only because the evidence
+  was not real (R184-1/2 in round 1, the seeded red and the product-flag mutant in round 2). **Once the rule was stated
+  plainly, the next round met it first time.**
+- **Reading:** Composer is much faster and correctable, and it defaults to evidence with the right SHAPE unless the
+  brief spells out what makes evidence real. Grok's evidence was real from its first delivery. **The difference is in
+  the brief, and a brief can carry it:** red = the final rows run against the unfixed product; mutant = a product edit
+  on its own branch; no assertion or option that exists only for a test.
+- **QA on Composer's candidate is not run:** the question was answered by reading, and `a38ff92` (Grok) is the
+  candidate that merges, through QA 183.
