@@ -1323,7 +1323,7 @@ export class MachineConfigWatch {
         return s.dev === null ? ancestorLinkText(s) : `${ancestorLinkText(s)}; resolves to: ${factText(s)}`;
       }
       if (s.dev === null) return "no facts: realpath failed";
-      return factText(s);
+      return "no facts: realpath failed";
     };
     // R85. A current side that did not resolve names that failure. Zeroed facts are not a stand-in for the code.
     const currentSide = (s: MachineSnap): string => {
