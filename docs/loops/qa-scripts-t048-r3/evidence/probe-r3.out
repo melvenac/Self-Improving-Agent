@@ -1,0 +1,268 @@
+== t048-r3.test.ts ==
+exit=0
+
+ RUN  v3.2.4 C:/qa-scratch/qa182/cand/open-brain
+
+ ✓ tests/t048-r3.test.ts (3 tests) 1990ms
+   ✓ T-048 round 3 > T048-D1: ob_sync --score and ob_score name the invocation-log state, and say nothing extra when it ran  836ms
+   ✓ T-048 round 3 > SILENT 9: no session id and no recall_log rows print different reasons, and a refused file is still named  767ms
+   ✓ T-048 round 3 > SILENT 4: a failed recall-log write with a live session names the error and still returns the hit  386ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  16:20:37
+   Duration  3.35s (transform 429ms, setup 38ms, collect 922ms, tests 1.99s, environment 0ms, prepare 138ms)
+
+
+
+== score-missing ==
+sync:
+Sync — v0.0.0
+
+ISSUES:
+  mirror-parity: Slash-command mirrors out of sync — repo↔template (.claude): missing directory
+
+WARNINGS:
+  readme-version: README.md not found
+  prd-version: PRD.md not found
+  changelog: CHANGELOG.md not found
+  readme-refs: README.md not found
+  hook-configs: settings.json not found
+  hook-registration: settings.json not found
+  summary-version: .agents/SYSTEM/SUMMARY.md not found
+  claude-md: CLAUDE.md not found
+  obsidian-vault: Vault missing directories: Experiences, Skill-Candidates, Summaries
+  template-personal-names: project-template/ not found
+  template: project-template/ directory not found
+  spec-provenance: specs/ directory not found
+  rules: RULES.md not found
+
+SKIPPED:
+  command-parity: skipped — .claude/commands or project-template/.claude/commands absent
+  command-tool-names: skipped — open-brain/src/server.ts not found (running outside the source tree)
+  command-names: skipped — no command directories found
+  retirements: skipped — .agents/retirements.json not found
+  module-boundary: open-brain/src not present — dependency direction not checked
+  gitnexus-index: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  build-freshness: open-brain/build absent — nothing built here to compare (not a pass)
+  state-schema: skipped — no .agents/state.json (this project has not been migrated; ob_state never creates the file)
+  state-views: skipped — no .agents/state.json (views are prose, not generated)
+  record-erasure: skipped — not a git repository with a HEAD — there is no committed history to read
+  ci-status: skipped — gh failed: failed to determine base repo: failed to run git: fatal: not a git repository (or any of the parent directories): .git; conclusion: unknown (absent is not green)
+  merge-markers: skipped — git ls-files failed (fatal: not a git repository (or any of the parent directories): .git); markers: unknown
+  greeting-size: skipped — no valid .agents/state.json, so ob_start returns the prose fallback, which this check does not measure
+
+REPORTED (printed whatever the severity):
+  gitnexus-index [skip]: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  build-freshness [skip]: open-brain/build absent — nothing built here to compare (not a pass)
+  state-schema [skip]: skipped — no .agents/state.json (this project has not been migrated; ob_state never creates the file)
+  record-erasure [skip]: skipped — not a git repository with a HEAD — there is no committed history to read
+  ci-status [skip]: skipped — gh failed: failed to determine base repo: failed to run git: fatal: not a git repository (or any of the parent directories): .git; conclusion: unknown (absent is not green)
+  merge-markers [skip]: skipped — git ls-files failed (fatal: not a git repository (or any of the parent directories): .git); markers: unknown
+  greeting-size [skip]: skipped — no valid .agents/state.json, so ob_start returns the prose fallback, which this check does not measure
+
+Summary: 5 passed, 0 fixed, 13 warnings, 1 issues, 13 skipped
+
+Health Score: 47/100
+  Config & Structure: 15/25 (60%)
+  Knowledge Quality: 7/25 (28%)
+  Staleness: 20/20 (100%)
+  Coverage: 5/20 (25%)
+  Pipeline Health: 0/10 (0%) (invocation log: missing)
+
+Appended to score history.
+
+score:
+Health Score: 47/100
+  Config & Structure: 15/25 (60%)
+  Knowledge Quality: 7/25 (28%)
+  Staleness: 20/20 (100%)
+  Coverage: 5/20 (25%)
+  Pipeline Health: 0/10 (0%) (invocation log: missing)
+
+Appended to score history.
+Trend: stable
+
+== score-corrupt ==
+sync:
+Sync — v0.0.0
+
+ISSUES:
+  mirror-parity: Slash-command mirrors out of sync — repo↔template (.claude): missing directory
+
+WARNINGS:
+  readme-version: README.md not found
+  prd-version: PRD.md not found
+  changelog: CHANGELOG.md not found
+  readme-refs: README.md not found
+  hook-configs: settings.json not found
+  hook-registration: settings.json not found
+  summary-version: .agents/SYSTEM/SUMMARY.md not found
+  claude-md: CLAUDE.md not found
+  obsidian-vault: Vault missing directories: Experiences, Skill-Candidates, Summaries
+  template-personal-names: project-template/ not found
+  template: project-template/ directory not found
+  spec-provenance: specs/ directory not found
+  rules: RULES.md not found
+
+SKIPPED:
+  command-parity: skipped — .claude/commands or project-template/.claude/commands absent
+  command-tool-names: skipped — open-brain/src/server.ts not found (running outside the source tree)
+  command-names: skipped — no command directories found
+  retirements: skipped — .agents/retirements.json not found
+  module-boundary: open-brain/src not present — dependency direction not checked
+  gitnexus-index: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  build-freshness: open-brain/build absent — nothing built here to compare (not a pass)
+  state-schema: skipped — no .agents/state.json (this project has not been migrated; ob_state never creates the file)
+  state-views: skipped — no .agents/state.json (views are prose, not generated)
+  record-erasure: skipped — not a git repository with a HEAD — there is no committed history to read
+  ci-status: skipped — gh failed: failed to determine base repo: failed to run git: fatal: not a git repository (or any of the parent directories): .git; conclusion: unknown (absent is not green)
+  merge-markers: skipped — git ls-files failed (fatal: not a git repository (or any of the parent directories): .git); markers: unknown
+  greeting-size: skipped — no valid .agents/state.json, so ob_start returns the prose fallback, which this check does not measure
+
+REPORTED (printed whatever the severity):
+  gitnexus-index [skip]: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  build-freshness [skip]: open-brain/build absent — nothing built here to compare (not a pass)
+  state-schema [skip]: skipped — no .agents/state.json (this project has not been migrated; ob_state never creates the file)
+  record-erasure [skip]: skipped — not a git repository with a HEAD — there is no committed history to read
+  ci-status [skip]: skipped — gh failed: failed to determine base repo: failed to run git: fatal: not a git repository (or any of the parent directories): .git; conclusion: unknown (absent is not green)
+  merge-markers [skip]: skipped — git ls-files failed (fatal: not a git repository (or any of the parent directories): .git); markers: unknown
+  greeting-size [skip]: skipped — no valid .agents/state.json, so ob_start returns the prose fallback, which this check does not measure
+
+Summary: 5 passed, 0 fixed, 13 warnings, 1 issues, 13 skipped
+
+Health Score: 49/100
+  Config & Structure: 15/25 (60%)
+  Knowledge Quality: 7/25 (28%)
+  Staleness: 20/20 (100%)
+  Coverage: 5/20 (25%)
+  Pipeline Health: 2/10 (20%) (invocation log: missing)
+
+Appended to score history.
+
+score:
+Health Score: 49/100
+  Config & Structure: 15/25 (60%)
+  Knowledge Quality: 7/25 (28%)
+  Staleness: 20/20 (100%)
+  Coverage: 5/20 (25%)
+  Pipeline Health: 2/10 (20%) (invocation log: missing)
+
+Appended to score history.
+Trend: stable
+
+== score-unreadable ==
+sync:
+Sync — v0.0.0
+
+ISSUES:
+  mirror-parity: Slash-command mirrors out of sync — repo↔template (.claude): missing directory
+
+WARNINGS:
+  readme-version: README.md not found
+  prd-version: PRD.md not found
+  changelog: CHANGELOG.md not found
+  readme-refs: README.md not found
+  hook-configs: settings.json not found
+  hook-registration: settings.json not found
+  summary-version: .agents/SYSTEM/SUMMARY.md not found
+  claude-md: CLAUDE.md not found
+  obsidian-vault: Vault missing directories: Experiences, Skill-Candidates, Summaries
+  template-personal-names: project-template/ not found
+  template: project-template/ directory not found
+  spec-provenance: specs/ directory not found
+  rules: RULES.md not found
+
+SKIPPED:
+  command-parity: skipped — .claude/commands or project-template/.claude/commands absent
+  command-tool-names: skipped — open-brain/src/server.ts not found (running outside the source tree)
+  command-names: skipped — no command directories found
+  retirements: skipped — .agents/retirements.json not found
+  module-boundary: open-brain/src not present — dependency direction not checked
+  gitnexus-index: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  build-freshness: open-brain/build absent — nothing built here to compare (not a pass)
+  state-schema: skipped — no .agents/state.json (this project has not been migrated; ob_state never creates the file)
+  state-views: skipped — no .agents/state.json (views are prose, not generated)
+  record-erasure: skipped — not a git repository with a HEAD — there is no committed history to read
+  ci-status: skipped — gh failed: failed to determine base repo: failed to run git: fatal: not a git repository (or any of the parent directories): .git; conclusion: unknown (absent is not green)
+  merge-markers: skipped — git ls-files failed (fatal: not a git repository (or any of the parent directories): .git); markers: unknown
+  greeting-size: skipped — no valid .agents/state.json, so ob_start returns the prose fallback, which this check does not measure
+
+REPORTED (printed whatever the severity):
+  gitnexus-index [skip]: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  build-freshness [skip]: open-brain/build absent — nothing built here to compare (not a pass)
+  state-schema [skip]: skipped — no .agents/state.json (this project has not been migrated; ob_state never creates the file)
+  record-erasure [skip]: skipped — not a git repository with a HEAD — there is no committed history to read
+  ci-status [skip]: skipped — gh failed: failed to determine base repo: failed to run git: fatal: not a git repository (or any of the parent directories): .git; conclusion: unknown (absent is not green)
+  merge-markers [skip]: skipped — git ls-files failed (fatal: not a git repository (or any of the parent directories): .git); markers: unknown
+  greeting-size [skip]: skipped — no valid .agents/state.json, so ob_start returns the prose fallback, which this check does not measure
+
+Summary: 5 passed, 0 fixed, 13 warnings, 1 issues, 13 skipped
+
+Health Score: 49/100
+  Config & Structure: 15/25 (60%)
+  Knowledge Quality: 7/25 (28%)
+  Staleness: 20/20 (100%)
+  Coverage: 5/20 (25%)
+  Pipeline Health: 2/10 (20%) (invocation log: missing)
+
+Appended to score history.
+
+score:
+Health Score: 49/100
+  Config & Structure: 15/25 (60%)
+  Knowledge Quality: 7/25 (28%)
+  Staleness: 20/20 (100%)
+  Coverage: 5/20 (25%)
+  Pipeline Health: 2/10 (20%) (invocation log: missing)
+
+Appended to score history.
+Trend: stable
+
+== silent9 ==
+noId:
+Session End:
+  Summary: skipped
+  Recalled ids: 0 from none
+  Nothing rated: no session id (ob_set_session never ran) and no readable .recalled-entries.json (looked in 1 location(s))
+  Feedback: 0 entries rated
+  Invocations: 0 logged
+  Shadow recall: skipped (dry run)
+
+Shadow recall: no evaluated sessions yet.
+
+rejected:
+Session End:
+  Summary: skipped
+  Recalled ids: 0 from none
+  Ignored C:\qa-tmp\t048r3probe-3SD7MB\proj-clB2D0\.recalled-entries.json: unparseable
+  Nothing rated: the only candidate file was refused (above)
+  Feedback: 0 entries rated
+  Invocations: 0 logged
+  Shadow recall: skipped (dry run)
+
+Shadow recall: no evaluated sessions yet.
+
+noRows:
+Session End:
+  Summary: skipped
+  Recalled ids: 0 from none
+  Nothing rated: no session id (ob_set_session never ran) and no readable .recalled-entries.json (looked in 1 location(s))
+  Feedback: 0 entries rated
+  Invocations: 0 logged
+  Shadow recall: skipped (dry run)
+
+Shadow recall: no evaluated sessions yet.
+
+== silent4 ==
+## xylophonequartz
+No results found.
+
+
+== preserve-ob_end ==
+handleEnd returned in noId, rejected, noRows without throw
+
+== cli-parity ==
+corrupt line:   ░░░░░░░░░░░░░░░░░░░░ Pipeline Health: 0/10 (invocation log: corrupt)
+suffix corrupt:  (invocation log: corrupt)
+suffix ran: ""
