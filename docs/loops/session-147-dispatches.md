@@ -326,3 +326,5 @@ This check makes it a rule. The record: T-193 (rev 140).
 
 6. **An `ob_state` write without its dry run first** (rev 139 → 140, `open_task T-193`). It applied cleanly, but
    `shared.md` says to read the dry run before every real call, and this one was skipped.
+- **Owed to Relay when T-193 is accepted:** the seat data file's path and format, so A2A-Hub can add `a2a-planner`,
+  `a2a-rivet` and `a2a-qa` as a docs-only change (Relay's message, record session 147).
