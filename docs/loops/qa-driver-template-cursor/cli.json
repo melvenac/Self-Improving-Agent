@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [],
+    "deny": [
+      "Shell(git:push*)",
+      "Shell(git push)",
+      "Shell(git push *)",
+      "Shell(gh:pr*)",
+      "Shell(gh pr)",
+      "Shell(gh pr *)",
+      "Shell(gh:release*)",
+      "Shell(gh release)",
+      "Shell(gh release *)",
+      "Shell(gh:api*)",
+      "Shell(gh api)",
+      "Shell(gh api *)",
+      "Shell(gh:repo*)",
+      "Shell(gh repo)",
+      "Shell(gh repo *)"
+    ]
+  }
+}
