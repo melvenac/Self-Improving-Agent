@@ -12,7 +12,8 @@ import { runDraft, runCommit, renderImportReport, STATE_REL } from "../../src/pi
 
 const cliEntry = join(import.meta.dirname, "../../src/cli.ts");
 const tsxCli = join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
-const TODAY = "2026-09-26";
+const now = new Date();
+const TODAY = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 const LOG_DATE = "2026-09-23";
 const INBOX = ".agents/TASKS/INBOX.md";
 const TASK = ".agents/TASKS/task.md";
@@ -68,21 +69,21 @@ describe("QA 153 D1: an odd-length FE FF latest session log is named, and its da
     const draft = runDraft(root, TODAY);
     const report = renderImportReport(draft.draft.report, "draft");
     expect(report).toMatch(named);
-    expect(report).toMatch(/Date used: 2026-09-26, the migration date, because the log's date line could not be read/);
+    expect(report).toMatch(new RegExp(`Date used: ${TODAY}, the migration date, because the log's date line could not be read`));
     expect(draft.draft.report.last_session.date).toBe(TODAY);
     expect(draft.draft.report.last_session.date).not.toBe(LOG_DATE);
 
     const d = cli(["state", "import", "--draft"], root);
     expect(d.status).toBe(0);
     expect(d.stdout).toMatch(named);
-    expect(d.stdout).toMatch(/Date used: 2026-09-26, the migration date, because the log's date line could not be read/);
+    expect(d.stdout).toMatch(new RegExp(`Date used: ${TODAY}, the migration date, because the log's date line could not be read`));
 
     const c = cli(["state", "import", "--commit"], root);
     expect(c.status).toBe(0);
     expect(c.stdout).toMatch(named);
-    expect(c.stdout).toMatch(/Date used: 2026-09-26, the migration date, because the log's date line could not be read/);
-    const state = JSON.parse(readFileSync(join(root, STATE_REL), "utf8")) as { last_session: { date: string } };
-    expect(state.last_session.date).toBe(TODAY);
+    expect(c.stdout).toMatch(new RegExp(`Date used: ${TODAY}, the migration date, because the log's date line could not be read`));
+    const state = JSON.parse(readFileSync(join(root, STATE_REL), "utf8")) as { sessions: Array<{ date: string }> };
+    expect(state.sessions[0].date).toBe(TODAY);
   });
 
   it("the genuine odd-length file is named too, and the date read from the even part is not replaced", () => {
