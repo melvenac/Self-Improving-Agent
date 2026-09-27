@@ -176,7 +176,7 @@ dev agents? Worth testing?", then "write the replay brief, composer is set in in
   listed in `t192-dispatch-qa.md`.
 - **QA:** Composer's candidate is scored by **GPT-5.6 Sol**, not Composer. The same model must not build and judge.
 
-### Record 184, first delivery (`4aeda0a`), read by the planner at 09:40Z
+### Record 184, first delivery (`4aeda0a`), read by the planner 09:36-09:37Z; round 184b sent 09:37:07Z (turn 23)
 
 - **Time:** started 09:33:10Z, pushed 09:35:32Z (2 min 22 s). One commit. **Zero tcm runs:** its checks were local
   `tsc` and a 23-test subset. **It asked Aaron "Want me to proceed?"** before starting, where Grok acted on the
