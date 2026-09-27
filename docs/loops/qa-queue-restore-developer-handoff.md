@@ -43,6 +43,20 @@ restore_new_locked_generation_expect no_run_and_failed=False
 
 Assertion fails: driver started despite failed restore.
 
+## 185b harness (fail-closed + log read race)
+
+**Role:** `-NewScript` is the candidate (every `_expect` must be True). `-OldScript` is the red (every `_expect` must be False). `Finish-RestoreExpectations` exits non-zero naming each `FAIL_EXPECT`.
+
+**Log read:** `Read-Lines` opens with `FileShare.ReadWrite`, retries 2s, then `read_failed`.
+
+**Runs, 11:39–11:43Z desktop:**
+
+| Script | Exit | Summary |
+|--------|------|---------|
+| Mutant (`3b63a93`) | 1 | `FAIL_EXPECT restore_new_locked_generation_expect no_run_and_failed=False role=new` |
+| Candidate (`f590448` + harness) | 0 | `expect_summary passed=2 failed=0` |
+| Old + new (`-OldScript` master) | 0 | `restore_old_*_expect` both False; `passed=4 failed=0` |
+
 ## Copy step after merge
 
 Same as record 160: `git show <sha>:docs/loops/qa-queue.ps1` → `%USERPROFILE%\qa-queue.ps1` on each QA machine.
