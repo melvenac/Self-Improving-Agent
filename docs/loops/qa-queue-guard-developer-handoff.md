@@ -4,7 +4,7 @@
 
 ## Candidate
 
-The lock and the harness are commit `c6fb300`. The hidden-launch follow-up is the commit that changes `qa-launch.md` and `Start-DetachedQueue`.
+The lock and the harness are commit `c6fb300`. Hidden `Create` is `1fc03d0` plus the handoff commit after it. `qa-launch.md` is not on this branch.
 
 `docs/loops/qa-queue.ps1` holds `%USERPROFILE%\sia-qa-queue\queue.lock` for the life of the queue.
 
@@ -40,10 +40,30 @@ The first harness runs used `Win32_Process Create` without a startup object, so 
 
 Every Create in the harness now passes `Win32_ProcessStartup` with `ShowWindow` 0, and the powershell that `cmd` starts uses `-WindowStyle Hidden`. The harness refuses the run if that process or its child has a non-zero `MainWindowHandle`. A one-process probe (sleep 8s, then killed) reported `cmd.exe`, `conhost.exe`, and `powershell.exe` all with `MainWindowHandle` 0. The harness was then run again and the same three rows passed, including the known positive.
 
-## qa-launch.md
+## Watch-out
 
-This branch now carries `docs/loops/qa-launch.md` (it was only on `origin/docs/session-100-qa99-dispatch`) so the three launch lines can include the same hidden startup. Each line builds `$si` with `ShowWindow` 0 and passes `ProcessStartupInformation`, and the queue powershell is `-WindowStyle Hidden`. The `\$si` backslashes stay: the `!` runner is Git bash and would otherwise expand `$si` away. No new queue flag.
+Any `powershell.exe` whose `CommandLine` is null or blank is treated as maybe a driver (this process is excluded). That wait is logged (`wait=` ... `commandline_unreadable`). On `-Checkout` it blocks until `StartWaitMinutes` (default 480) and then refuses to move the tree. Before each driver it blocks until `QuietWaitMinutes` (default 120) and then skips that driver.
 
-The "launch only on an idle machine" paragraph is unchanged on purpose. It still describes the bytes on the machines until Aaron replaces the user-folder copies. The desktop rule is unchanged: this desktop does not run a real QA queue while Aaron is here.
+## Hidden launch line for qa-launch.md
+
+`qa-launch.md` stays the planner's file. It is not edited on this branch.
+
+The Create shape below was tested on this desktop: `ShowWindow` 0, `-WindowStyle Hidden`, full `powershell.exe` path. A sleep probe reported `cmd.exe`, `conhost.exe`, and `powershell.exe` all with `MainWindowHandle` 0. The harness uses that same Create and aborts if a handle is non-zero; the hidden re-run passed the rows above. The `\$` is for the Git bash `!` runner so `$si` reaches PowerShell.
+
+Desktop line (this shape was tested; the real `C:\Users\melve\qa-queue.ps1` was not launched):
+
+```
+! powershell -NoProfile -Command "\$si = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly -Property @{ShowWindow=[uint16]0}; Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File C:\Users\melve\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'; CurrentDirectory='C:\Users\melve'; ProcessStartupInformation=\$si}"
+```
+
+Same startup for the other two machines, not executed here:
+
+```
+! ssh -i C:/Users/melve/.ssh/id_ed25519 aaron@100.110.244.10 "powershell -NoProfile -Command \"\$si = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly -Property @{ShowWindow=[uint16]0}; Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File C:\Users\Aaron\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'; ProcessStartupInformation=\$si}\""
+```
+
+```
+! ssh -i C:/Users/melve/.ssh/id_ed25519 -l "Aaron Melven" 100.73.250.101 "powershell -NoProfile -Command \"\$si = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly -Property @{ShowWindow=[uint16]0}; Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File C:\Users\AARONM~1\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'; ProcessStartupInformation=\$si}\""
+```
 
 `/sync` on this checkout reports pre-existing issues (retired names in `ENTITIES.md`, a stale local build from `b371176`, greeting size). None of them are this diff. No `.gitnexus/` in this worktree. No `/end`. No `state.json` write.
