@@ -766,7 +766,7 @@ export async function handleSetSession(args: SetSessionArgs): Promise<ToolRespon
       const st = readState(root);
       if (st.ok) {
         const here = basename(root);
-        const rec = st.data.sessions.find((x) => x.uuid === session_id);
+        const rec = st.data.sessions.find((x) => x.uuid === session_id && x.checkout === here);
         if (rec && rec.checkout !== null && rec.checkout !== here) {
           return {
             content: [{
