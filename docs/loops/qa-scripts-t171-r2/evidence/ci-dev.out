@@ -1,0 +1,9 @@
+== run 36292359527: loop/t171-r2-red @ 1086335 runner tcm-1: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  3 failed | 1328 passed | 2 skipped (1333)
+   error lines by kind: {"AssertionError":6,"Process":1}
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > T171-D1: a flagged replace that removes nothing keeps the prior authors and adds the writer
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > T171-D1: a flagged superset of an unrecorded note stays unrecorded
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > T171-D2: the REPLACED line quotes text that was removed, not a line the new note still has
+== run 36292477609: loop/t171-r2-green @ a78a883 runner tcm-2: completed success
+   Test Files  87 passed (87) | Tests  1331 passed | 2 skipped (1333)
+   error lines by kind: {}

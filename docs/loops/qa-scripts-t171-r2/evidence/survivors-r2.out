@@ -1,0 +1,54 @@
+### candidate a78a883
+S1 B prepends to A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 25 chars; no text removed"]; note_by ["uuid-A","uuid-B"]
+   then B replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replacing it would remove t
+S2 unregistered superset of A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 39 chars; no text removed"]; note_by null
+   then A replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by an unrecorded session (no per-note author: 
+S3 own note "intro / kept second line / gone third line" -> first two lines: ACCEPTED ["T-009 note REPLACED: 38 chars -> 22 chars; removed text begins: \"gone third line\""]
+S4 B's flagged replace of A's note through ob_state: dry run ob_state dry run — nothing written NOTE CHANGE ["NOTE CHANGE: T-009 note REPLACED: 28 chars -> 5 chars; removed text begins: \"A's long finding\"; text by other session(s) removed: uuid-A"]
+   the write: NOTE CHANGE ["NOTE CHANGE: T-009 note REPLACED: 28 chars -> 5 chars; removed text begins: \"A's long finding\"; text by other session(s) removed: uuid-A"]
+S5 own 881-char note truncated to 300 chars: ACCEPTED ["T-009 note REPLACED: 881 chars -> 300 chars; removed text begins: \"Own long note: detail detail detail detail detail detail detail detail detail detail detail detail detail detail detail \""]
+### mutant d1-superset-prefix-only
+S1 B prepends to A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 25 chars; removed text begins: \"A's finding.\"; text by other session(s) removed: uuid-A"]; note_by ["uuid-B"]
+   then B replaces it, no flag: ACCEPTED ["T-009 note REPLACED: 25 chars -> 9 chars; removed text begins: \"B's preface. A's finding.\""]
+S2 unregistered superset of A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 39 chars; no text removed"]; note_by null
+   then A replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by an unrecorded session (no per-note author: 
+S3 own note "intro / kept second line / gone third line" -> first two lines: ACCEPTED ["T-009 note REPLACED: 38 chars -> 22 chars; removed text begins: \"gone third line\""]
+S4 B's flagged replace of A's note through ob_state: dry run ob_state dry run — nothing written NOTE CHANGE ["NOTE CHANGE: T-009 note REPLACED: 28 chars -> 5 chars; removed text begins: \"A's long finding\"; text by other session(s) removed: uuid-A"]
+   the write: NOTE CHANGE ["NOTE CHANGE: T-009 note REPLACED: 28 chars -> 5 chars; removed text begins: \"A's long finding\"; text by other session(s) removed: uuid-A"]
+S5 own 881-char note truncated to 300 chars: ACCEPTED ["T-009 note REPLACED: 881 chars -> 300 chars; removed text begins: \"Own long note: detail detail detail detail detail detail detail detail detail detail detail detail detail detail detail \""]
+### mutant d1-unregistered-superset-keeps-nonempty
+S1 B prepends to A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 25 chars; no text removed"]; note_by ["uuid-A","uuid-B"]
+   then B replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replacing it would remove t
+S2 unregistered superset of A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 39 chars; no text removed"]; note_by ["uuid-A"]
+   then A replaces it, no flag: ACCEPTED ["T-009 note REPLACED: 39 chars -> 9 chars; removed text begins: \"A's finding. Unknown writer's addition.\""]
+S3 own note "intro / kept second line / gone third line" -> first two lines: ACCEPTED ["T-009 note REPLACED: 38 chars -> 22 chars; removed text begins: \"gone third line\""]
+S4 B's flagged replace of A's note through ob_state: dry run ob_state dry run — nothing written NOTE CHANGE ["NOTE CHANGE: T-009 note REPLACED: 28 chars -> 5 chars; removed text begins: \"A's long finding\"; text by other session(s) removed: uuid-A"]
+   the write: NOTE CHANGE ["NOTE CHANGE: T-009 note REPLACED: 28 chars -> 5 chars; removed text begins: \"A's long finding\"; text by other session(s) removed: uuid-A"]
+S5 own 881-char note truncated to 300 chars: ACCEPTED ["T-009 note REPLACED: 881 chars -> 300 chars; removed text begins: \"Own long note: detail detail detail detail detail detail detail detail detail detail detail detail detail detail detail \""]
+### mutant d2-kept-by-prefix
+S1 B prepends to A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 25 chars; no text removed"]; note_by ["uuid-A","uuid-B"]
+   then B replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replacing it would remove t
+S2 unregistered superset of A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 39 chars; no text removed"]; note_by null
+   then A replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by an unrecorded session (no per-note author: 
+S3 own note "intro / kept second line / gone third line" -> first two lines: ACCEPTED ["T-009 note REPLACED: 38 chars -> 22 chars; removed text begins: \"kept second line\""]
+S4 B's flagged replace of A's note through ob_state: dry run ob_state dry run — nothing written NOTE CHANGE ["NOTE CHANGE: T-009 note REPLACED: 28 chars -> 5 chars; removed text begins: \"A's long finding\"; text by other session(s) removed: uuid-A"]
+   the write: NOTE CHANGE ["NOTE CHANGE: T-009 note REPLACED: 28 chars -> 5 chars; removed text begins: \"A's long finding\"; text by other session(s) removed: uuid-A"]
+S5 own 881-char note truncated to 300 chars: ACCEPTED ["T-009 note REPLACED: 881 chars -> 300 chars; removed text begins: \"Own long note: detail detail detail detail detail detail detail detail detail detail detail detail detail detail detail \""]
+### mutant dry-run-hides-foreign-replace
+S1 B prepends to A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 25 chars; no text removed"]; note_by ["uuid-A","uuid-B"]
+   then B replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replacing it would remove t
+S2 unregistered superset of A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 39 chars; no text removed"]; note_by null
+   then A replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by an unrecorded session (no per-note author: 
+S3 own note "intro / kept second line / gone third line" -> first two lines: ACCEPTED ["T-009 note REPLACED: 38 chars -> 22 chars; removed text begins: \"gone third line\""]
+S4 B's flagged replace of A's note through ob_state: dry run ob_state dry run — nothing written NOTE CHANGE []
+   the write: NOTE CHANGE ["NOTE CHANGE: T-009 note REPLACED: 28 chars -> 5 chars; removed text begins: \"A's long finding\"; text by other session(s) removed: uuid-A"]
+S5 own 881-char note truncated to 300 chars: ACCEPTED ["T-009 note REPLACED: 881 chars -> 300 chars; removed text begins: \"Own long note: detail detail detail detail detail detail detail detail detail detail detail detail detail detail detail \""]
+### mutant removes-by-head
+S1 B prepends to A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 25 chars; no text removed"]; note_by ["uuid-A","uuid-B"]
+   then B replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replacing it would remove t
+S2 unregistered superset of A's note (flag): ACCEPTED ["T-009 note REPLACED: 12 chars -> 39 chars; no text removed"]; note_by null
+   then A replaces it, no flag: refused: ops[0] (update_task): T-009's note holds text written by an unrecorded session (no per-note author: 
+S3 own note "intro / kept second line / gone third line" -> first two lines: ACCEPTED ["T-009 note REPLACED: 38 chars -> 22 chars; removed text begins: \"gone third line\""]
+S4 B's flagged replace of A's note through ob_state: dry run ob_state dry run — nothing written NOTE CHANGE ["NOTE CHANGE: T-009 note REPLACED: 28 chars -> 5 chars; removed text begins: \"A's long finding\"; text by other session(s) removed: uuid-A"]
+   the write: NOTE CHANGE ["NOTE CHANGE: T-009 note REPLACED: 28 chars -> 5 chars; removed text begins: \"A's long finding\"; text by other session(s) removed: uuid-A"]
+S5 own 881-char note truncated to 300 chars: ACCEPTED ["T-009 note REPLACED: 881 chars -> 300 chars; no text removed"]

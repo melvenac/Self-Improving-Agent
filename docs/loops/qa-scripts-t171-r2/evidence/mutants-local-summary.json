@@ -1,0 +1,104 @@
+[
+  {
+    "id": "dry-run-hides-replace",
+    "what": "ob_state's dry run prints APPENDED/SET lines but drops every REPLACED line (the write still prints it)",
+    "landed": [
+      "src/server.ts"
+    ],
+    "status": "KILLED (1/154)",
+    "failed": [
+      "server.test.ts > server handlers handleStart ob_state dry run of replace_note prints the REPLACED line"
+    ]
+  },
+  {
+    "id": "removes-by-length",
+    "what": "a replace counts as removing text only when the new note is SHORTER (a longer rewrite reports 'no text removed')",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "KILLED (1/154)",
+    "failed": [
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently T171-D3: a longer replacement that drops the old text still names the removed text"
+    ]
+  },
+  {
+    "id": "superset-foreign-unflagged",
+    "what": "replacing another session's note with a superset of it needs no replace_other_sessions",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "KILLED (1/154)",
+    "failed": [
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently T171-D3: a superset replace of another session's note is refused without the flag"
+    ]
+  },
+  {
+    "id": "d1-superset-prefix-only",
+    "what": "a replace removes nothing only when the new note STARTS with the old one: a prepended superset resets note_by to the writer (D1 back)",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "SURVIVED (0/154)",
+    "failed": []
+  },
+  {
+    "id": "d1-unregistered-superset-keeps",
+    "what": "an unregistered write's superset keeps note_by as it was (the unknown writer's text is credited to the named authors)",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "KILLED (2/154)",
+    "failed": [
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently replacing an EMPTY note needs no flag and removes nothing",
+      "state-writer.test.ts > applyStateOps (Loop 3 writer) update_task changes fields, refuses status done and refuses a done task (V2)"
+    ]
+  },
+  {
+    "id": "d2-kept-by-prefix",
+    "what": "the quote skips only old lines the new note starts with, so a kept later line is quoted as removed",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "SURVIVED (0/154)",
+    "failed": []
+  },
+  {
+    "id": "d2-last-missing-line",
+    "what": "the REPLACED line quotes the LAST old line the new note lacks, not the first",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "KILLED (2/154)",
+    "failed": [
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently replace_note on the writer's own note is reported with both sizes and the removed text's first line, in the dry run and the write",
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently with replace_other_sessions: true it replaces, the report names the session whose text went, and the note becomes the writer's"
+    ]
+  },
+  {
+    "id": "dry-run-hides-foreign-replace",
+    "what": "ob_state's dry run drops a REPLACED line only when it removes another session's text (the write still prints it)",
+    "landed": [
+      "src/server.ts"
+    ],
+    "status": "SURVIVED (0/154)",
+    "failed": []
+  },
+  {
+    "id": "removes-by-head",
+    "what": "a replace removes text only if the new note lacks the old note's first 120 chars: truncating a long note reports 'no text removed'",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "SURVIVED (0/154)",
+    "failed": []
+  },
+  {
+    "id": "d1-unregistered-superset-keeps-nonempty",
+    "what": "an unregistered write's superset of a NON-EMPTY note keeps note_by as it was (the unknown writer's text is credited to the named authors)",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "SURVIVED (0/154)",
+    "failed": []
+  }
+]

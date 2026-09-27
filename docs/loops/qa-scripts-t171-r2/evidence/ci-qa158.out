@@ -1,0 +1,27 @@
+== run 36295576856: qa/t171-r2-mut-dry-run-hides-replace @ 6e5a749 runner tcm-2: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  1 failed | 1330 passed | 2 skipped (1333)
+   error lines by kind: {"AssertionError":2,"Process":1}
+   FAIL tests/server.test.ts > server handlers > handleStart > ob_state dry run of replace_note prints the REPLACED line
+== run 36295578461: qa/t171-r2-mut-removes-by-length @ bf3f56c runner tcm-1: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  1 failed | 1330 passed | 2 skipped (1333)
+   error lines by kind: {"AssertionError":2,"Process":1}
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > T171-D3: a longer replacement that drops the old text still names the removed text
+== run 36295580131: qa/t171-r2-mut-superset-foreign-unflagged @ f3968e8 runner tcm-2: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  1 failed | 1330 passed | 2 skipped (1333)
+   error lines by kind: {"AssertionError":2,"Process":1}
+   FAIL tests/shared/state-writer-notes.test.ts > T-171: a note is never replaced silently > T171-D3: a superset replace of another session's note is refused without the flag
+== run 36295581720: qa/t171-r2-mut-d1-superset-prefix-only @ f0cef83 runner tcm-2: completed success
+   Test Files  87 passed (87) | Tests  1331 passed | 2 skipped (1333)
+   error lines by kind: {}
+== run 36295583540: qa/t171-r2-mut-d2-kept-by-prefix @ 28ceab2 runner tcm-1: completed success
+   Test Files  87 passed (87) | Tests  1331 passed | 2 skipped (1333)
+   error lines by kind: {}
+== run 36295585003: qa/t171-r2-mut-dry-run-hides-foreign-replace @ cbcb909 runner tcm-1: completed success
+   Test Files  87 passed (87) | Tests  1331 passed | 2 skipped (1333)
+   error lines by kind: {}
+36295576856 workflow_dispatch | test=failure, test-windows=skipped
+36295578461 workflow_dispatch | test=failure, test-windows=skipped
+36295580131 workflow_dispatch | test=failure, test-windows=skipped
+36295581720 workflow_dispatch | test=success, test-windows=skipped
+36295583540 workflow_dispatch | test=success, test-windows=skipped
+36295585003 workflow_dispatch | test=success, test-windows=skipped

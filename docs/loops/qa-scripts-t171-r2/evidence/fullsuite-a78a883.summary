@@ -1,0 +1,4 @@
+start 04:53:21Z TEMP=C:\Users\AARONM~1\AppData\Local\Temp
+exit 0 end 04:56:33Z
+files 346 (failed suites 0); tests total 1333 passed 1333 failed 0 pending 0 todo 0; success true; files in testResults 87
+shallow false head a78a883

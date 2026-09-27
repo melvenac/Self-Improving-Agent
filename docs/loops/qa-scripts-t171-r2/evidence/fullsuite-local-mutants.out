@@ -1,0 +1,6 @@
+removes-by-head applied
+removes-by-head vitest-exit=0
+removes-by-head: files 87; tests 1333 passed 1333 failed 0 pending 0 []
+d1-unregistered-superset-keeps-nonempty applied
+d1-unregistered-superset-keeps-nonempty vitest-exit=0
+d1-unregistered-superset-keeps-nonempty: files 87; tests 1333 passed 1333 failed 0 pending 0 []

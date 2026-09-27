@@ -1,0 +1,2 @@
+SURVIVED (0/154)       d1-unregistered-superset-keeps-nonempty — an unregistered write's superset of a NON-EMPTY note keeps note_by as it was (the unknown writer's text is credited to the named authors)
+restored: true

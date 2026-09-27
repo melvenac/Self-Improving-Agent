@@ -1,0 +1,17 @@
+KILLED (1/154)         dry-run-hides-replace — ob_state's dry run prints APPENDED/SET lines but drops every REPLACED line (the write still prints it)
+    server.test.ts > server handlers handleStart ob_state dry run of replace_note prints the REPLACED line
+KILLED (1/154)         removes-by-length — a replace counts as removing text only when the new note is SHORTER (a longer rewrite reports 'no text removed')
+    state-writer-notes.test.ts > T-171: a note is never replaced silently T171-D3: a longer replacement that drops the old text still names the removed text
+KILLED (1/154)         superset-foreign-unflagged — replacing another session's note with a superset of it needs no replace_other_sessions
+    state-writer-notes.test.ts > T-171: a note is never replaced silently T171-D3: a superset replace of another session's note is refused without the flag
+SURVIVED (0/154)       d1-superset-prefix-only — a replace removes nothing only when the new note STARTS with the old one: a prepended superset resets note_by to the writer (D1 back)
+KILLED (2/154)         d1-unregistered-superset-keeps — an unregistered write's superset keeps note_by as it was (the unknown writer's text is credited to the named authors)
+    state-writer-notes.test.ts > T-171: a note is never replaced silently replacing an EMPTY note needs no flag and removes nothing
+    state-writer.test.ts > applyStateOps (Loop 3 writer) update_task changes fields, refuses status done and refuses a done task (V2)
+SURVIVED (0/154)       d2-kept-by-prefix — the quote skips only old lines the new note starts with, so a kept later line is quoted as removed
+KILLED (2/154)         d2-last-missing-line — the REPLACED line quotes the LAST old line the new note lacks, not the first
+    state-writer-notes.test.ts > T-171: a note is never replaced silently replace_note on the writer's own note is reported with both sizes and the removed text's first line,
+    state-writer-notes.test.ts > T-171: a note is never replaced silently with replace_other_sessions: true it replaces, the report names the session whose text went, and the
+SURVIVED (0/154)       dry-run-hides-foreign-replace — ob_state's dry run drops a REPLACED line only when it removes another session's text (the write still prints it)
+SURVIVED (0/154)       removes-by-head — a replace removes text only if the new note lacks the old note's first 120 chars: truncating a long note reports 'no text removed'
+restored: true

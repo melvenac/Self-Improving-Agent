@@ -1,0 +1,67 @@
+HOLDS   D1a C2h: B's flagged superset of A's note keeps A and adds B; B's next unflagged replace is refused naming A; with the flag it goes through and names A as removed
+        superset: ok ["T-009 note REPLACED: 13 chars -> 27 chars; no text removed"] note_by ["uuid-A","uuid-B"]
+        unflagged: REFUSED: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replacing it would remove that text (27 chars). Use append_note to add to it,
+        flagged: ok ["T-009 note REPLACED: 27 chars -> 11 chars; removed text begins: \"A wrote this. B added this.\"; text by other session(s) removed: uuid-A"] note_by ["uuid-B"]
+HOLDS   D1b a flagged superset of an unrecorded (null) note stays null, and the next unflagged replace is refused as unrecorded
+        superset: ok ["T-009 note REPLACED: 11 chars -> 20 chars; no text removed"] note_by null
+        unflagged: REFUSED: ops[0] (update_task): T-009's note holds text written by an unrecorded session (no per-note author: written before schema v3, imported, or by an unreg
+HOLDS   D1c close_task: a flagged superset keeps A and adds B
+        ok ["T-009 note REPLACED: 13 chars -> 26 chars; no text removed"] note_by ["uuid-A","uuid-B"]
+HOLDS   D1d through ob_state (registered B): dry run and write print the same line, the dry run leaves note_by, the write keeps [A, B], and B's next unflagged replace is refused
+        dry ["NOTE CHANGE: T-009 note REPLACED: 13 chars -> 25 chars; no text removed"]
+        write ["NOTE CHANGE: T-009 note REPLACED: 13 chars -> 25 chars; no text removed"] note_by ["uuid-A","uuid-B"]
+        next unflagged: ob_state refused: ops[0] (update_task): T-009's note holds text written by session uuid-A. Replacing it would remove that text (25 chars). Use append_note to ad
+HOLDS   D1e every replace that removes nothing (prepend, surround, identical, own, mixed, unregistered, from empty) keeps the prior authors and adds the writer; null/unregistered stays null
+        prepend: ok ["T-009 note REPLACED: 13 chars -> 26 chars; no text removed"] note_by ["uuid-A"] -> ["uuid-A","uuid-B"] (expected ["uuid-A","uuid-B"])
+        surround: ok ["T-009 note REPLACED: 13 chars -> 21 chars; no text removed"] note_by ["uuid-A"] -> ["uuid-A","uuid-B"] (expected ["uuid-A","uuid-B"])
+        identical: ok ["T-009 note REPLACED: 13 chars -> 13 chars; no text removed"] note_by ["uuid-A"] -> ["uuid-A","uuid-B"] (expected ["uuid-A","uuid-B"])
+        own superset: ok ["T-009 note REPLACED: 8 chars -> 14 chars; no text removed"] note_by ["uuid-B"] -> ["uuid-B"] (expected ["uuid-B"])
+        mixed [A,B] by B: ok ["T-009 note REPLACED: 7 chars -> 18 chars; no text removed"] note_by ["uuid-A","uuid-B"] -> ["uuid-A","uuid-B"] (expected ["uuid-A","uuid-B"])
+        unregistered superset of [A]: ok ["T-009 note REPLACED: 13 chars -> 19 chars; no text removed"] note_by ["uuid-A"] -> null (expected null)
+        registered superset of empty: ok ["T-009 note REPLACED: 0 chars -> 5 chars; no text removed"] note_by [] -> ["uuid-B"] (expected ["uuid-B"])
+INFO    D1f (outside the ruling) B's flagged edit that keeps A's text but changes its own: ok ["T-009 note REPLACED: 31 chars -> 35 chars; removed text begins: \"A's finding. — B's first draft.\"; text by other session(s) removed: uuid-A"] note_by -> ["uuid-B"]
+        then B's unflagged replace: ok ["T-009 note REPLACED: 35 chars -> 7 chars; removed text begins: \"A's finding. — B's corrected draft.\""]
+INFO    D1f' the T-171 workaround shape on an unrecorded note ("pass it back whole with the edit inside it", one word changed): ok ["T-009 note REPLACED: 108 chars -> 108 chars; removed text begins: \"Loop 1 gap 2: the three Claude Code copies moved together, and the session log names each one — A's addition\"; text by other session(s) removed: unrecorded"] note_by -> ["uuid-B"]
+        then B's unflagged replace: ok ["T-009 note REPLACED: 108 chars -> 7 chars; removed text begins: \"Loop 1 gap 2: the three Claude Code copies MOVED together, and the session log names each one — A's addition\""]
+D2      prefix-keeping, multi-line: quotes text that is NOT in the new note (the first missing line, as expected)
+        T-009 note REPLACED: 22 chars -> 9 chars; removed text begins: "gone forever"
+D2      middle deletion, multi-line: quotes text that is NOT in the new note (the first missing line, as expected)
+        T-009 note REPLACED: 13 chars -> 9 chars; removed text begins: "two"
+D2      one word changed, every line kept, multi-line: quotes text that is NOT in the new note (the first missing line, as expected)
+        T-009 note REPLACED: 30 chars -> 30 chars; removed text begins: "gamma delta"
+D2      prefix-keeping, one line (' — ' joins): quotes text that is NOT in the new note
+        T-009 note REPLACED: 30 chars -> 13 chars; removed text begins: "first finding — second finding"
+D2      middle deletion, one line: quotes text that is NOT in the new note
+        T-009 note REPLACED: 17 chars -> 11 chars; removed text begins: "one — two — three"
+D2      one word changed, one line: quotes text that is NOT in the new note
+        T-009 note REPLACED: 29 chars -> 29 chars; removed text begins: "decision: ship A, then review"
+D2      duplicate line removed: quotes text that IS STILL in the new note
+        T-009 note REPLACED: 14 chars -> 8 chars; removed text begins: "retry"
+D2      short line deleted that is a substring of a kept line: quotes text that IS STILL in the new note
+        T-009 note REPLACED: 11 chars -> 9 chars; removed text begins: "one"
+D2      CRLF kept head: quotes text that is NOT in the new note (the first missing line, as expected)
+        T-009 note REPLACED: 10 chars -> 4 chars; removed text begins: "gone"
+D2      prefix-keeping, one long line: quotes text that IS STILL in the new note
+        T-009 note REPLACED: 881 chars -> 600 chars; removed text begins: "Session 78, planner: the finding and its evidence, detail detail detail detail detail detail detail detail detail detail"
+D2      middle deletion, one long line: quotes text that IS STILL in the new note
+        T-009 note REPLACED: 881 chars -> 681 chars; removed text begins: "Session 78, planner: the finding and its evidence, detail detail detail detail detail detail detail detail detail detail"
+D2      one word changed, one long line: quotes text that IS STILL in the new note
+        T-009 note REPLACED: 881 chars -> 884 chars; removed text begins: "Session 78, planner: the finding and its evidence, detail detail detail detail detail detail detail detail detail detail"
+HOLDS   D2a the dispatch's three edits on multi-line notes (and CRLF): the REPLACED line quotes the first old line the new text does not contain, and that text is gone
+        prefix-keeping, multi-line: "gone forever"
+        middle deletion, multi-line: "two"
+        one word changed, every line kept, multi-line: "gamma delta"
+        CRLF kept head: "gone"
+HOLDS   D2b the same three edits on a SHORT one-line note (under 120 chars): the quoted string, as printed, is not in the new note (the whole old line is quoted, so it begins with kept text)
+        prefix-keeping, one line (' — ' joins): "first finding — second finding" still in new note: false
+        middle deletion, one line: "one — two — three" still in new note: false
+        one word changed, one line: "decision: ship A, then review" still in new note: false
+BROKEN  D2c the fallback (every old line still appears somewhere in the new text): the quote is removed text or 'old text began:'
+        duplicate line removed: "retry" still in new note: true
+        short line deleted that is a substring of a kept line: "one" still in new note: true
+BROKEN  D2d the same three edits on SIA's real shape at its real size (one line of 881 chars, edit after char 120; QA 144's C4b): the quote is removed text or 'old text began:'
+        prefix-keeping, one long line: "Session 78, planner: the finding and its evidence, detail de"... still in new note: true
+        middle deletion, one long line: "Session 78, planner: the finding and its evidence, detail de"... still in new note: true
+        one word changed, one long line: "Session 78, planner: the finding and its evidence, detail de"... still in new note: true
+
+2 BROKEN
