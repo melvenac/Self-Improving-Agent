@@ -118,7 +118,7 @@ const proofLine: string = (() => {
   const payloadId = resolveSessionId(hookInput as Record<string, unknown>);
   const claudePid = Number(process.env.CLAUDE_PID);
   if (!payloadId) return "Session proof NOT written: the payload carried no session id.";
-  if (ide !== "claude") return "Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2).";
+  if (detectIde(payload, "claude") !== "claude") return "Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2).";
   if (!Number.isInteger(claudePid) || claudePid <= 0) return `Session proof NOT written: CLAUDE_PID is ${process.env.CLAUDE_PID === undefined ? "unset" : `"${process.env.CLAUDE_PID}"`}, so the claude process is unknown and this session's server will refuse attributed writes.`;
   const procStart = processStartTime(claudePid);
   if (procStart === null) return `Session proof NOT written: the start time of claude process ${claudePid} could not be read, so this session's server will refuse attributed writes.`;
