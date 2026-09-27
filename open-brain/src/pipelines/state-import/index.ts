@@ -77,6 +77,8 @@ export interface ImportReport {
     date_unknown: number;
     skipped: Array<{ line: number; heading: string; reason: string }>;
   };
+  /** DECISIONS.md holds bytes that cannot be read; it is not judged, so this names it rather than blocks (R4-5). */
+  decisions_unreadable: DecisionsUnreadable | null;
   handoff: { pick_up_lines: number; watch_out: number; open_questions: number; sections_not_imported: string[] };
   last_session: { n: number; date: string; uuid: string | null; file: string };
   /**
@@ -103,7 +105,7 @@ export interface ImportDraft { state: State; report: ImportReport }
  * (QA 102, D2). UTF-16 is what Windows PowerShell 5.1's `>` and `Out-File`
  * write, BOM first. Line endings need nothing here: every split is `\r?\n`.
  */
-export type TextEncoding = "utf8" | "utf8-bom" | "utf16le-bom" | "utf16be-bom" | "windows-1252";
+export type TextEncoding = "utf8" | "utf8-bom" | "utf16le-bom" | "utf16be-bom" | "utf32le-bom" | "windows-1252";
 export interface DecodedText {
   text: string;
   encoding: TextEncoding;
@@ -126,9 +128,34 @@ function decode1252(buf: Buffer): string {
 
 export function decodeText(buf: Buffer): DecodedText {
   if (buf.length >= 3 && buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) return withCheck(buf.subarray(3), "utf8-bom");
-  if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) return { text: buf.subarray(2).toString("utf16le"), encoding: "utf16le-bom", undecodable: null };
-  if (buf.length >= 2 && buf[0] === 0xfe && buf[1] === 0xff) return { text: Buffer.from(buf.subarray(2)).swap16().toString("utf16le"), encoding: "utf16be-bom", undecodable: null };
+  // UTF-32LE's mark begins with UTF-16LE's, so it is tested first (QA 122, D11).
+  // UTF-32BE's (00 00 FE FF) needs no test: it is NUL bytes to the UTF-8 path.
+  if (buf.length >= 4 && buf[0] === 0xff && buf[1] === 0xfe && buf[2] === 0 && buf[3] === 0) {
+    return { text: buf.toString("utf-8"), encoding: "utf32le-bom", undecodable: "starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read" };
+  }
+  if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) return withBomCheck(buf.subarray(2).toString("utf16le"), "utf16le-bom");
+  if (buf.length >= 2 && buf[0] === 0xfe && buf[1] === 0xff) {
+    // swap16 throws on an odd length (QA 138, D1), so that shape is filed here:
+    // UTF-16 is two bytes a character, and the mark cannot be right about them.
+    if (buf.length % 2 === 1) {
+      return { text: Buffer.from(buf.subarray(2, buf.length - 1)).swap16().toString("utf16le"), encoding: "utf16be-bom", undecodable: `has a UTF-16BE byte-order mark (FE FF), but an odd number of bytes (${buf.length}): UTF-16 is two bytes a character, so the mark does not match the bytes, and its words cannot be read` };
+    }
+    return withBomCheck(Buffer.from(buf.subarray(2)).swap16().toString("utf16le"), "utf16be-bom");
+  }
   return withCheck(buf, "utf8");
+}
+
+/**
+ * A UTF-16 mark says how to read the bytes, and a NUL in the text it gives
+ * says the mark was wrong about them, as UTF-8's NUL check does for no mark
+ * (QA 122, D11). Counted in the file: two bytes of mark, two per character.
+ */
+function withBomCheck(text: string, encoding: "utf16le-bom" | "utf16be-bom"): DecodedText {
+  const first = text.indexOf("\u0000");
+  if (first === -1) return { text, encoding, undecodable: null };
+  const count = text.split("\u0000").length - 1;
+  const mark = encoding === "utf16le-bom" ? "UTF-16LE" : "UTF-16BE";
+  return { text, encoding, undecodable: `has a ${mark} byte-order mark, but the text it gives holds ${count} NUL character(s), the first at byte ${2 + first * 2}: the mark does not match the bytes, so its words cannot be read` };
 }
 
 function withCheck(buf: Buffer, encoding: "utf8" | "utf8-bom"): DecodedText {
@@ -173,7 +200,17 @@ function summaryBytes(text: string): Buffer {
 }
 
 export function readText(p: string): DecodedText | null {
-  return existsSync(p) ? decodeText(readFileSync(p)) : null;
+  return existsSync(p) ? decodeText(readBytes(p)) : null;
+}
+
+/** Node's EBUSY names the file, but not why, nor what to do (QA 138, O-b). */
+function readBytes(p: string): Buffer {
+  try {
+    return readFileSync(p);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "EBUSY") throw new Error(`${(err as Error).message}: another program holds this file open; close it and re-run`);
+    throw err;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -396,6 +433,30 @@ export function importDecisions(text: string, migrationDate: string, report: Imp
   return out;
 }
 
+export interface DecisionsUnreadable { evidence: string; imported: string[]; not_imported: string[] }
+
+/**
+ * DECISIONS.md is imported as far as it reads (R4-5 keeps it from blocking).
+ * What it lost is found by reading it again with the NUL bytes removed, which
+ * recovers the ASCII of a UTF-16 tail such as PS 5.1's `>>` writes: an ADR
+ * heading seen there and not imported was dropped. The unreadable bytes may
+ * hold more than that, and the sentence the report prints says so.
+ */
+export function decisionsUnreadable(text: string, evidence: string, imported: string[]): DecisionsUnreadable {
+  const scratch: ImportReport["decisions"] = { imported: 0, date_from_line: 0, date_partial: [], date_unknown: 0, skipped: [] };
+  const seen = importDecisions(text.replace(/\u0000/g, ""), "0000-00-00", scratch).map((d) => d.id);
+  return { evidence, imported, not_imported: seen.filter((id) => !imported.includes(id)) };
+}
+
+/** The lines the report and the CLI both print for it, so they cannot say different things. */
+export function describeDecisionsUnreadable(u: DecisionsUnreadable): string[] {
+  return [
+    `.agents/SYSTEM/DECISIONS.md ${u.evidence}. It is not judged, so it does not block --commit: it is imported as far as it reads.`,
+    `ADRs imported: ${u.imported.length ? u.imported.join(", ") : "none"}`,
+    `ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ${u.not_imported.length ? u.not_imported.join(", ") : "none found"}`,
+  ];
+}
+
 // ---------------------------------------------------------------------------
 // task.md → objective, next-session.md → handoff, SESSIONS/ → last_session
 // ---------------------------------------------------------------------------
@@ -472,7 +533,7 @@ export function findLastSession(sessionsDir: string, today: string): ImportRepor
     }
   }
   if (!best) return { n: 0, date: today, uuid: null, file: "(no Session_N.md)" };
-  const text = decodeText(readFileSync(join(sessionsDir, best.file))).text;
+  const text = decodeText(readBytes(join(sessionsDir, best.file))).text;
   const date = text.match(/^# Session \d+\s+[—–-]+\s+(\d{4}-\d{2}-\d{2})/m)?.[1] ?? today;
   const uuid = text.match(/Session ID:\*{0,2}\s*`?([0-9a-fA-F-]{36})`?/)?.[1] ?? null;
   return { n: best.n, date, uuid, file: `.agents/SESSIONS/${best.file}` };
@@ -493,19 +554,27 @@ export type StalenessVerdict = "current" | "stale" | "could_not_tell";
  * --accept-stale. The other three were read, and say what they say.
  */
 export const COULD_NOT_TELL = {
-  unreadable: { blocks: true, what: "the input contains NUL bytes, so its words cannot be read" },
+  unreadable: { blocks: true, what: "the input's words cannot be read: NUL bytes, UTF-32, an odd-length UTF-16BE file, or no heading line (empty, or read in an encoding that is not its own)" },
   no_session_log: { blocks: false, what: "there is no SESSIONS/Session_N.md to compare against" },
   no_declared_session: { blocks: false, what: "the input names no `Session N` in its status blockquote or its headings" },
   ahead_of_latest: { blocks: false, what: "the input declares a session ahead of the latest log" },
 } as const;
 export type CouldNotTell = keyof typeof COULD_NOT_TELL;
 
-export interface InputStaleness { input: string; verdict: StalenessVerdict; declared_session: number | null; evidence: string; could_not_tell?: CouldNotTell }
+interface JudgedInput { input: string; declared_session: number | null; evidence: string }
+/**
+ * A could-not-tell verdict carries its reason by type (QA 122, O14): with the
+ * reason optional, a producer that left it out made blocksCommit fail open, and
+ * only a test could notice. Now the compiler refuses the producer.
+ */
+export type InputStaleness =
+  | (JudgedInput & { verdict: "current" | "stale" })
+  | (JudgedInput & { verdict: "could_not_tell"; could_not_tell: CouldNotTell });
 
 /** Whether a judged input stops a bare --commit: STALE, or could not tell because it cannot be read. */
 export function blocksCommit(i: InputStaleness): boolean {
   if (i.verdict === "stale") return true;
-  return i.verdict === "could_not_tell" && i.could_not_tell !== undefined && COULD_NOT_TELL[i.could_not_tell].blocks;
+  return i.verdict === "could_not_tell" && COULD_NOT_TELL[i.could_not_tell].blocks;
 }
 export interface StalenessReport {
   signal: string;
@@ -560,7 +629,20 @@ const NOT_JUDGED_REASON: Partial<Record<InputKey, string>> = {
   decisions: "imported as a dated log of past decisions, not as current state",
 };
 
-export function detectStaleness(texts: Record<InputKey, string | null>, last: ImportReport["last_session"], undecodable: Partial<Record<InputKey, string>> = {}, readAs: Partial<Record<InputKey, string>> = {}): StalenessReport {
+/** `#` to `######`, then a space or the end of the line (R5-1). */
+const ATX_HEADING = /^#{1,6}( |$)/;
+
+function noHeading(text: string, encoding: TextEncoding | undefined): string {
+  if (text.length === 0) return "has no heading line (it is empty), so its words cannot be read";
+  const rule = "no line is `#` to `######` followed by a space";
+  if (encoding === "utf16le-bom" || encoding === "utf16be-bom") {
+    return `has no heading line as its ${encoding === "utf16le-bom" ? "UTF-16LE" : "UTF-16BE"} byte-order mark reads it (${rule}): the mark may not match the bytes, as when UTF-8 text follows it, so its words cannot be read`;
+  }
+  if (encoding === "windows-1252") return `has no heading line (${rule}): its encoding may be one the importer does not read, so its words cannot be read`;
+  return `has no heading line (${rule}), so it cannot be judged: give it a title, or pass ${ACCEPT_STALE_FLAG}`;
+}
+
+export function detectStaleness(texts: Record<InputKey, string | null>, last: ImportReport["last_session"], undecodable: Partial<Record<InputKey, string>> = {}, readAs: Partial<Record<InputKey, string>> = {}, encodings: Partial<Record<InputKey, TextEncoding>> = {}): StalenessReport {
   const latest = last.n > 0 ? { n: last.n, file: last.file } : null;
   const inputs: InputStaleness[] = [];
   const not_judged: StalenessReport["not_judged"] = [];
@@ -568,9 +650,21 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
     const input = INPUT_REL[key];
     const text = texts[key];
     if (text === null) { not_judged.push({ input, reason: "absent: nothing is imported from it" }); continue; }
-    if (!JUDGED.includes(key)) { not_judged.push({ input, reason: NOT_JUDGED_REASON[key]! }); continue; }
+    if (!JUDGED.includes(key)) {
+      // Not judged, so it does not block; but what could not be read is said (R4-5).
+      not_judged.push({ input, reason: NOT_JUDGED_REASON[key]! + (undecodable[key] ? `. It ${undecodable[key]}` : "") });
+      continue;
+    }
     if (undecodable[key]) {
       inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: undecodable[key]!, could_not_tell: "unreadable" });
+      continue;
+    }
+    // No ATX heading at any level means the text is empty or was decoded
+    // wrongly: UTF-7 writes `#` as `+ACM-`, and a UTF-16 mark over UTF-8 gives
+    // CJK. Its words were not read either (R4-4; O12's zero bytes). The evidence
+    // blames an encoding only where the decode path justifies it (R5-1).
+    if (!text.split(/\r?\n/).some((l) => ATX_HEADING.test(l))) {
+      inputs.push({ input, verdict: "could_not_tell", declared_session: null, evidence: noHeading(text, encodings[key]), could_not_tell: "unreadable" });
       continue;
     }
     if (!latest) {
@@ -598,18 +692,20 @@ export function detectStaleness(texts: Record<InputKey, string | null>, last: Im
   return { signal: STALENESS_SIGNAL, latest, inputs, not_judged };
 }
 
-function readInputs(root: string): { paths: Record<InputKey, string>; texts: Record<InputKey, string | null>; undecodable: Partial<Record<InputKey, string>>; readAs: Partial<Record<InputKey, string>> } {
+function readInputs(root: string): { paths: Record<InputKey, string>; texts: Record<InputKey, string | null>; undecodable: Partial<Record<InputKey, string>>; readAs: Partial<Record<InputKey, string>>; encodings: Partial<Record<InputKey, TextEncoding>> } {
   const paths = Object.fromEntries((Object.keys(INPUT_REL) as InputKey[]).map((k) => [k, join(root, INPUT_REL[k])])) as Record<InputKey, string>;
   const texts = {} as Record<InputKey, string | null>;
   const undecodable: Partial<Record<InputKey, string>> = {};
   const readAs: Partial<Record<InputKey, string>> = {};
+  const encodings: Partial<Record<InputKey, TextEncoding>> = {};
   for (const k of Object.keys(paths) as InputKey[]) {
     const d = readText(paths[k]);
     texts[k] = d?.text ?? null;
     if (d?.undecodable) undecodable[k] = d.undecodable;
     if (d?.encoding === "windows-1252") readAs[k] = READ_AS_1252;
+    if (d) encodings[k] = d.encoding;
   }
-  return { paths, texts, undecodable, readAs };
+  return { paths, texts, undecodable, readAs, encodings };
 }
 
 // ---------------------------------------------------------------------------
@@ -623,7 +719,7 @@ function lineCount(text: string | null): number {
 export function buildImportDraft(projectRoot: string, today: string, templateDir = defaultTemplateDir()): ImportDraft {
   const root = resolve(projectRoot);
   const pkg = readJson<{ name?: string; version?: string }>(join(root, "package.json"));
-  const { paths, texts, undecodable, readAs } = readInputs(root);
+  const { paths, texts, undecodable, readAs, encodings } = readInputs(root);
 
   const last = findLastSession(join(root, ".agents/SESSIONS"), today);
   const current = last.n;
@@ -634,7 +730,7 @@ export function buildImportDraft(projectRoot: string, today: string, templateDir
       : { name: basename(root), version: pkg?.version ?? "0.0.0", name_from: "folder" },
     current_session: current,
     migration_date: today,
-    staleness: detectStaleness(texts, last, undecodable, readAs),
+    staleness: detectStaleness(texts, last, undecodable, readAs, encodings),
     sources: Object.fromEntries(Object.entries(paths).map(([k, p]) => [k, { path: relative(root, p).replace(/\\/g, "/"), present: existsSync(p), lines: lineCount(texts[k as keyof typeof texts]) }])),
     inbox: {
       items: 0,
@@ -651,6 +747,7 @@ export function buildImportDraft(projectRoot: string, today: string, templateDir
     },
     objective: { found: false, preview: "" },
     decisions: { imported: 0, date_from_line: 0, date_partial: [], date_unknown: 0, skipped: [] },
+    decisions_unreadable: null,
     handoff: { pick_up_lines: 0, watch_out: 0, open_questions: 0, sections_not_imported: [] },
     last_session: last,
     verified_imported: 0,
@@ -662,6 +759,7 @@ export function buildImportDraft(projectRoot: string, today: string, templateDir
   const { objective, preview } = importObjective(texts.task, current);
   report.objective = { found: objective !== null, preview };
   const decisions = texts.decisions ? importDecisions(texts.decisions, today, report.decisions) : [];
+  if (texts.decisions && undecodable.decisions) report.decisions_unreadable = decisionsUnreadable(texts.decisions, undecodable.decisions, decisions.map((d) => d.id));
   const handoff = importHandoff(texts.next, current, report.handoff);
   const verified: Verified[] = [];
   const gaps: Gap[] = [];
@@ -792,6 +890,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   L.push(`Imported ${r.decisions.imported} ADRs: ${r.decisions.date_from_line} with a full \`Date:\` line, ${r.decisions.date_partial.length} with a partial date (kept in the note), ${r.decisions.date_unknown} with none (date = migration date, note "imported; original date unknown").`);
   for (const d of r.decisions.date_partial) L.push(`- ${d.id}: original date \`${d.original}\``);
   if (r.decisions.skipped.length) { L.push("", "Skipped:"); for (const s of r.decisions.skipped) L.push(`- line ${s.line}: ${s.reason} — \`${s.heading}\``); }
+  if (r.decisions_unreadable) { L.push("", "**Not read in full:**"); for (const l of describeDecisionsUnreadable(r.decisions_unreadable)) L.push(`- ${l}`); }
   L.push("", "## Handoff (next-session.md)", "");
   L.push(`pick_up: ${r.handoff.pick_up_lines} lines · watch_out: ${r.handoff.watch_out} bullets · open_questions: ${r.handoff.open_questions} bullets`);
   if (r.handoff.sections_not_imported.length) { L.push("", "Sections NOT imported (they stay in the snapshot):"); for (const s of r.handoff.sections_not_imported) L.push(`- ${s}`); }
@@ -829,14 +928,31 @@ function incompleteNote(snapshotRel: string): string {
     "Until then, `open-brain state import --draft` and `--commit` refuse.\n";
 }
 
+/**
+ * The markers in a directory listing, oldest first. The names end in the date,
+ * so name order is date order, whatever order the directory lists them in. A
+ * function of its own because neither filesystem it was tried on listed them
+ * out of order (NTFS, and tcm's), so a test through the directory could not
+ * tell a missing sort; only a direct test can hold it.
+ */
+export function markersOldestFirst(names: string[]): string[] {
+  return names.filter((n) => n.startsWith(SNAPSHOT_PREFIX) && n.endsWith(INCOMPLETE_SUFFIX)).sort();
+}
+
 function refuseHalfRestored(root: string): void {
   const archive = join(root, ".agents", "archive");
   if (!existsSync(archive)) return;
-  const left = readdirSync(archive).filter((n) => n.startsWith(SNAPSHOT_PREFIX) && n.endsWith(INCOMPLETE_SUFFIX));
+  const left = markersOldestFirst(readdirSync(archive));
   if (left.length === 0) return;
-  const snapshots = left.map((n) => `.agents/archive/${n.slice(0, -INCOMPLETE_SUFFIX.length)}/`).join(" and ");
+  const snapshots = left.map((n) => `.agents/archive/${n.slice(0, -INCOMPLETE_SUFFIX.length)}/`);
   const markers = left.map((n) => `.agents/archive/${n}`).join(" and ");
-  throw new Error(`.agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from ${snapshots}, which holds every original, then delete ${markers}. Nothing written. Keep a copy of the snapshot until the re-run completes: that re-run needs --force-snapshot, which deletes it on success`);
+  // Every door refuses while any marker exists, so a second one means the first
+  // was deleted without a restore, or put back by hand. The oldest snapshot then
+  // holds the originals; a newer one holds what a later run found (QA 122, O7).
+  const from = snapshots.length === 1
+    ? `${snapshots[0]}, which holds every original`
+    : `${snapshots[0]} (the oldest; it holds the originals from before the first failed --commit); ${snapshots.slice(1).join(" and ")} ${snapshots.length === 2 ? "holds" : "hold"} the tree as a later run found it`;
+  throw new Error(`.agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from ${from}, then delete ${markers}. Nothing written. Keep a copy of ${left.length === 1 ? "the snapshot" : "every snapshot"} until the re-run completes: that re-run needs --force-snapshot, which deletes ${left.length === 1 ? "it" : "today's"} on success`);
 }
 
 export interface DraftResult { draftPath: string; reportPath: string; draft: ImportDraft; validation: { ok: true } | { ok: false; error: string } }
@@ -897,6 +1013,8 @@ export interface CommitResult {
   accepted_stale: string[];
   /** The inputs that could not be read, imported anyway under --accept-stale (R4-1); empty otherwise. */
   accepted_unreadable: string[];
+  /** DECISIONS.md on disk holds bytes that cannot be read; null when it reads (R4-5). */
+  decisions_unreadable: DecisionsUnreadable | null;
 }
 
 export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean } = {}): CommitResult {
@@ -912,7 +1030,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
 
   // 0. T-180: a stale input refuses before anything is written, including the snapshot.
   const onDisk = readInputs(root);
-  const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable, onDisk.readAs);
+  const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable, onDisk.readAs, onDisk.encodings);
   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
   // R4-1: an input that cannot be read blocks like STALE; could-not-tell for any other reason does not.
   const unreadable = staleness.inputs.filter((i) => i.verdict === "could_not_tell" && blocksCommit(i));
@@ -993,7 +1111,9 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   }
   rmSync(marker, { force: true });
   if (aside) rmSync(aside, { recursive: true, force: true });
-  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input) };
+  const decisionsText = onDisk.texts.decisions;
+  const decisions_unreadable = decisionsText !== null && onDisk.undecodable.decisions ? decisionsUnreadable(decisionsText, onDisk.undecodable.decisions, parsed.data.decisions.map((d) => d.id)) : null;
+  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input), decisions_unreadable };
 }
 
 /**

@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, cpSync, rmSync, existsSync } from "node:fs";
+import { mkdtempSync, cpSync, rmSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { sessionStart } from "../../../src/pipelines/session-start/index.js";
+import { deriveProjectKey } from "../../../src/pipelines/session-start/session-discovery.js";
 
 describe("sessionStart", () => {
   let tempDir: string;
@@ -47,9 +48,15 @@ describe("sessionStart", () => {
     expect(result.session.sessionId).toBe("11111111-2222-3333-4444-555555555555");
   });
 
-  it("falls back to discovery when the supplied session ID is null", () => {
-    const result = sessionStart({ projectRoot: tempDir, homePath: tempDir, sessionId: null });
-    expect(result.session.sessionId).toBeNull();
+  it("a null session id does not fall back to transcript discovery", () => {
+    const other = "0be70be7-dddd-4eee-8fff-000000000be7";
+    const pdir = join(tempDir, ".claude", "projects", deriveProjectKey(tempDir));
+    mkdirSync(pdir, { recursive: true });
+    writeFileSync(join(pdir, `${other}.jsonl`), "{}\n");
+    const omitted = sessionStart({ projectRoot: tempDir, homePath: tempDir });
+    const explicitNull = sessionStart({ projectRoot: tempDir, homePath: tempDir, sessionId: null });
+    expect(omitted.session.sessionId).toBe(other);
+    expect(explicitNull.session.sessionId).toBeNull();
   });
 
   it("skips session log creation in lightweight mode", () => {
