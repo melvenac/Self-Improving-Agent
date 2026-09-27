@@ -466,7 +466,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     process.exit(0);
   }
 
-  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG, blocksCommit, describeDecisionsUnreadable } = await import("./pipelines/state-import/index.js");
+  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG, blocksCommit, describeDecisionsUnreadable, describeLastSession } = await import("./pipelines/state-import/index.js");
   const { relative } = await import("node:path");
   const { existsSync, statSync } = await import("node:fs");
   // T-150's rule: an unrecognised flag refuses. Before this, a misspelled flag
@@ -531,6 +531,8 @@ Read-only. Change state through ob_state — never by editing the file.`);
       console.log(`Tasks: ${rep.inbox.items} (open ${s.open}, in_progress ${s.in_progress}, blocked ${s.blocked}, done ${s.done}); superseded links ${rep.inbox.superseded_links.length}; unparsed lines ${rep.inbox.unparsed.length}`);
       console.log(`Decisions: ${rep.decisions.imported} (${rep.decisions.skipped.length} skipped) · verified ${rep.verified_imported} · gaps ${rep.gaps_imported} · objective ${rep.objective.found ? "found" : "NOT found"}`);
       if (rep.decisions_unreadable) for (const l of describeDecisionsUnreadable(rep.decisions_unreadable)) console.log(`  ${l}`);
+      const lastDraft = describeLastSession(rep.last_session);
+      if (lastDraft) console.log(lastDraft);
       console.log(`Handoff: pick_up ${rep.handoff.pick_up_lines} lines, watch_out ${rep.handoff.watch_out}, open_questions ${rep.handoff.open_questions}`);
       if (rep.summary_removal) console.log(`SUMMARY.md: --commit will remove ${rep.summary_removal.total_lines_removed} lines (${rep.summary_removal.blockquote_lines} blockquote + ${rep.summary_removal.current_state_lines} Current State)`);
       console.log(`\nReview the report, then run: open-brain state import --commit`);
@@ -544,6 +546,8 @@ Read-only. Change state through ob_state — never by editing the file.`);
     const unknown = r.staleness.inputs.filter((i) => i.verdict === "could_not_tell");
     if (unknown.length) console.log(`Could not tell whether current: ${unknown.map((i) => i.input).join(", ")}`);
     if (r.decisions_unreadable) for (const l of describeDecisionsUnreadable(r.decisions_unreadable)) console.log(l);
+    const lastCommit = describeLastSession(r.last_session);
+    if (lastCommit) console.log(lastCommit);
     console.log(`Snapshot: ${relative(projectRoot, r.snapshot.dir)} (${r.snapshot.files} files)`);
     console.log(`Wrote:    ${STATE_REL} at revision 0`);
     if (r.summary) console.log(`SUMMARY.md: removed ${r.summary.total_lines_removed} lines (${r.summary.blockquote_lines} blockquote + ${r.summary.current_state_lines} Current State); kept ${r.summary.kept_headings.join(", ")}`);

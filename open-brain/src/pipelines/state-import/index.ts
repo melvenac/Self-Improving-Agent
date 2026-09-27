@@ -76,7 +76,7 @@ export interface ImportReport {
   /** DECISIONS.md holds bytes that cannot be read; it is not judged, so this names it rather than blocks (R4-5). */
   decisions_unreadable: DecisionsUnreadable | null;
   handoff: { pick_up_lines: number; watch_out: number; open_questions: number; sections_not_imported: string[] };
-  last_session: { n: number; date: string; uuid: string | null; file: string };
+  last_session: { n: number; date: string; uuid: string | null; file: string; unreadable: string | null; date_why: string };
   /**
    * Always 0. Prose files carry no verified claims or gaps in a form the
    * importer reads, and it invents none: it used to seed SIA's own
@@ -416,7 +416,7 @@ export function describeDecisionsUnreadable(u: DecisionsUnreadable): string[] {
   return [
     `.agents/SYSTEM/DECISIONS.md ${u.evidence}. It is not judged, so it does not block --commit: it is imported as far as it reads.`,
     `ADRs imported: ${u.imported.length ? u.imported.join(", ") : "none"}`,
-    `ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ${u.not_imported.length ? u.not_imported.join(", ") : "none found"}`,
+    `ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ${adrNotImported(u)}`,
   ];
 }
 
@@ -485,8 +485,25 @@ export function importHandoff(text: string | null, current: number, report: Impo
   return handoff;
 }
 
+function adrNotImported(u: DecisionsUnreadable): string {
+  if (u.not_imported.length) return u.not_imported.join(", ");
+  // An odd-length FE FF file is not the NUL-stripping case. "none found" would
+  // claim the bytes were searched and held no ADR, which is how QA 153's lie
+  // hid `### ADR-1` written as UTF-8 under the mark.
+  if (/odd number of bytes/.test(u.evidence)) return "could not be read";
+  return "none found";
+}
+
+/** The line the report and both CLI modes print, so a latest log cannot be named in only one of them. */
+export function describeLastSession(last: ImportReport["last_session"]): string | null {
+  if (!last.unreadable) return null;
+  return `${last.file} ${last.unreadable}. Date used: ${last.date}, ${last.date_why}.`;
+}
+
 export function findLastSession(sessionsDir: string, today: string): ImportReport["last_session"] {
-  if (!existsSync(sessionsDir)) return { n: 0, date: today, uuid: null, file: "(no SESSIONS/ directory)" };
+  const row = (n: number, file: string, date: string, uuid: string | null, date_why: string, unreadable: string | null): ImportReport["last_session"] =>
+    ({ n, date, uuid, file, unreadable, date_why });
+  if (!existsSync(sessionsDir)) return row(0, "(no SESSIONS/ directory)", today, null, "the migration date, because there is no session log", null);
   let best: { n: number; file: string } | null = null;
   for (const f of readdirSync(sessionsDir)) {
     const m = f.match(/^Session_(\d+)\.md$/);
@@ -495,11 +512,17 @@ export function findLastSession(sessionsDir: string, today: string): ImportRepor
       if (!best || n > best.n) best = { n, file: f };
     }
   }
-  if (!best) return { n: 0, date: today, uuid: null, file: "(no Session_N.md)" };
-  const text = decodeText(readBytes(join(sessionsDir, best.file))).text;
-  const date = text.match(/^# Session \d+\s+[—–-]+\s+(\d{4}-\d{2}-\d{2})/m)?.[1] ?? today;
-  const uuid = text.match(/Session ID:\*{0,2}\s*`?([0-9a-fA-F-]{36})`?/)?.[1] ?? null;
-  return { n: best.n, date, uuid, file: `.agents/SESSIONS/${best.file}` };
+  if (!best) return row(0, "(no Session_N.md)", today, null, "the migration date, because there is no session log", null);
+  const decoded = decodeText(readBytes(join(sessionsDir, best.file)));
+  const fromLog = decoded.text.match(/^# Session \d+\s+[—–-]+\s+(\d{4}-\d{2}-\d{2})/m)?.[1] ?? null;
+  const uuid = decoded.text.match(/Session ID:\*{0,2}\s*`?([0-9a-fA-F-]{36})`?/)?.[1] ?? null;
+  const file = `.agents/SESSIONS/${best.file}`;
+  if (decoded.undecodable) {
+    if (fromLog) return row(best.n, file, fromLog, uuid, "read from the log heading", decoded.undecodable);
+    return row(best.n, file, today, uuid, "the migration date, because the log's date line could not be read", decoded.undecodable);
+  }
+  if (fromLog) return row(best.n, file, fromLog, uuid, "read from the log heading", null);
+  return row(best.n, file, today, uuid, "the migration date, because the log heading has no date", null);
 }
 
 // ---------------------------------------------------------------------------
@@ -846,6 +869,8 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   if (r.handoff.sections_not_imported.length) { L.push("", "Sections NOT imported (they stay in the snapshot):"); for (const s of r.handoff.sections_not_imported) L.push(`- ${s}`); }
   L.push("", "## Verified and gaps", "", `verified[]: ${r.verified_imported} · gaps[]: ${r.gaps_imported}. The prose files carry none in a form the importer reads, and it invents none. Record them with ob_state after the commit.`);
   L.push("", "## Last session", "", `Session ${r.last_session.n} — ${r.last_session.date} — uuid ${r.last_session.uuid ?? "none"} (${r.last_session.file})`);
+  const lastLine = describeLastSession(r.last_session);
+  if (lastLine) L.push(lastLine);
   L.push("", "## SUMMARY.md lines `--commit` will remove", "");
   if (!r.summary_removal) L.push("_SUMMARY.md absent — nothing to remove._");
   else {
@@ -965,6 +990,8 @@ export interface CommitResult {
   accepted_unreadable: string[];
   /** DECISIONS.md on disk holds bytes that cannot be read; null when it reads (R4-5). */
   decisions_unreadable: DecisionsUnreadable | null;
+  /** The latest session log, including when its bytes could not be read (QA 153 D1). */
+  last_session: ImportReport["last_session"];
 }
 
 export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean } = {}): CommitResult {
@@ -980,7 +1007,8 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
 
   // 0. T-180: a stale input refuses before anything is written, including the snapshot.
   const onDisk = readInputs(root);
-  const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable, onDisk.readAs, onDisk.encodings);
+  const last_session = findLastSession(join(root, ".agents/SESSIONS"), today);
+  const staleness = detectStaleness(onDisk.texts, last_session, onDisk.undecodable, onDisk.readAs, onDisk.encodings);
   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
   // R4-1: an input that cannot be read blocks like STALE; could-not-tell for any other reason does not.
   const unreadable = staleness.inputs.filter((i) => i.verdict === "could_not_tell" && blocksCommit(i));
@@ -1063,7 +1091,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   if (aside) rmSync(aside, { recursive: true, force: true });
   const decisionsText = onDisk.texts.decisions;
   const decisions_unreadable = decisionsText !== null && onDisk.undecodable.decisions ? decisionsUnreadable(decisionsText, onDisk.undecodable.decisions, parsed.data.decisions.map((d) => d.id)) : null;
-  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input), decisions_unreadable };
+  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input), decisions_unreadable, last_session };
 }
 
 /**
