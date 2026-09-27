@@ -1,0 +1,120 @@
+---- hold .agents/TASKS/INBOX.md share=None; --draft; SeBackupPrivilege DISABLED (HELD pid=12848 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\il153\ebusy\INBOX_md__draft_SeBackupPrivilege\.agents\TASKS\INBOX.md': another program holds this file open; close it and re-run
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/TASKS/INBOX.md share=None; --draft; SeBackupPrivilege left as is (HELD pid=1264 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 0
+     state import — draft (nothing else changed)
+     Staleness: 0 stale · 0 could not tell · 3 current. Details are in the report's first section.
+     tree CHANGED; state.json false; archive absent
+       + F \.agents\state.draft.json 2952e41be752 1790482885896.3982
+       + F \.agents\state.import-report.md b0b3da75a37b 1790482885896.3982
+       - F \.agents\state.draft.json 2952e41be752 1790482884619.8313
+       - F \.agents\state.import-report.md b0b3da75a37b 1790482884619.8313
+---- hold .agents/TASKS/INBOX.md share=None; --commit; SeBackupPrivilege DISABLED (HELD pid=2704 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\il153\ebusy\INBOX_md__commit_SeBackupPrivilege\.agents\TASKS\INBOX.md': another program holds this file open; close it and re-run
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/TASKS/INBOX.md share=None; --commit; SeBackupPrivilege left as is (HELD pid=11504 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, copyfile 'C:\qa-scratch\il153\ebusy\INBOX_md__commit_none\.agents\TASKS\INBOX.md' -> 'C:\qa-scratch\il153\ebusy\INBOX_md__commit_none\.agents\archive\pre-state-migration-2026-09-26\TASKS\INBOX.md'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SESSIONS/Session_7.md share=None; --draft; SeBackupPrivilege DISABLED (HELD pid=16816 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\il153\ebusy\Session_7_md__draft_SeBackupPrivilege\.agents\SESSIONS\Session_7.md': another program holds this file open; close it and re-run
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SESSIONS/Session_7.md share=None; --draft; SeBackupPrivilege left as is (HELD pid=3092 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 0
+     state import — draft (nothing else changed)
+     Staleness: 0 stale · 0 could not tell · 3 current. Details are in the report's first section.
+     tree CHANGED; state.json false; archive absent
+       + F \.agents\state.draft.json 2952e41be752 1790482927521.6692
+       + F \.agents\state.import-report.md b0b3da75a37b 1790482927521.6692
+       - F \.agents\state.draft.json 2952e41be752 1790482926237.1946
+       - F \.agents\state.import-report.md b0b3da75a37b 1790482926252.823
+---- hold .agents/SESSIONS/Session_7.md share=None; --commit; SeBackupPrivilege DISABLED (HELD pid=13820 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\il153\ebusy\Session_7_md__commit_SeBackupPrivilege\.agents\SESSIONS\Session_7.md': another program holds this file open; close it and re-run
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SESSIONS/Session_7.md share=None; --commit; SeBackupPrivilege left as is (HELD pid=4524 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, copyfile 'C:\qa-scratch\il153\ebusy\Session_7_md__commit_none\.agents\SESSIONS\Session_7.md' -> 'C:\qa-scratch\il153\ebusy\Session_7_md__commit_none\.agents\archive\pre-state-migration-2026-09-26\SESSIONS\Session_7.md'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/SUMMARY.md share=None; --draft; SeBackupPrivilege DISABLED (HELD pid=2344 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\il153\ebusy\SUMMARY_md__draft_SeBackupPrivilege\.agents\SYSTEM\SUMMARY.md': another program holds this file open; close it and re-run
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/SUMMARY.md share=None; --draft; SeBackupPrivilege left as is (HELD pid=11832 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 0
+     state import — draft (nothing else changed)
+     Staleness: 0 stale · 0 could not tell · 3 current. Details are in the report's first section.
+     tree CHANGED; state.json false; archive absent
+       + F \.agents\state.draft.json 2952e41be752 1790482969256.5688
+       + F \.agents\state.import-report.md b0b3da75a37b 1790482969256.5688
+       - F \.agents\state.draft.json 2952e41be752 1790482968006.5623
+       - F \.agents\state.import-report.md b0b3da75a37b 1790482968006.5623
+---- hold .agents/SYSTEM/SUMMARY.md share=None; --commit; SeBackupPrivilege DISABLED (HELD pid=13936 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\il153\ebusy\SUMMARY_md__commit_SeBackupPrivilege\.agents\SYSTEM\SUMMARY.md': another program holds this file open; close it and re-run
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/SUMMARY.md share=None; --commit; SeBackupPrivilege left as is (HELD pid=5908 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, copyfile 'C:\qa-scratch\il153\ebusy\SUMMARY_md__commit_none\.agents\SYSTEM\SUMMARY.md' -> 'C:\qa-scratch\il153\ebusy\SUMMARY_md__commit_none\.agents\archive\pre-state-migration-2026-09-26\SYSTEM\SUMMARY.md'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/DECISIONS.md share=None; --draft; SeBackupPrivilege DISABLED (HELD pid=10580 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\il153\ebusy\DECISIONS_md__draft_SeBackupPrivilege\.agents\SYSTEM\DECISIONS.md': another program holds this file open; close it and re-run
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/DECISIONS.md share=None; --draft; SeBackupPrivilege left as is (HELD pid=6064 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 0
+     state import — draft (nothing else changed)
+     Staleness: 0 stale · 0 could not tell · 3 current. Details are in the report's first section.
+     tree CHANGED; state.json false; archive absent
+       + F \.agents\state.draft.json 2952e41be752 1790483011071.4873
+       + F \.agents\state.import-report.md 3f15324a3943 1790483011071.4873
+       - F \.agents\state.draft.json 2952e41be752 1790483009777.4392
+       - F \.agents\state.import-report.md 3f15324a3943 1790483009777.4392
+---- hold .agents/SYSTEM/DECISIONS.md share=None; --commit; SeBackupPrivilege DISABLED (HELD pid=12944 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\il153\ebusy\DECISIONS_md__commit_SeBackupPrivilege\.agents\SYSTEM\DECISIONS.md': another program holds this file open; close it and re-run
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/DECISIONS.md share=None; --commit; SeBackupPrivilege left as is (HELD pid=9924 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, copyfile 'C:\qa-scratch\il153\ebusy\DECISIONS_md__commit_none\.agents\SYSTEM\DECISIONS.md' -> 'C:\qa-scratch\il153\ebusy\DECISIONS_md__commit_none\.agents\archive\pre-state-migration-2026-09-26\SYSTEM\DECISIONS.md'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/state.draft.json share=None; --draft; SeBackupPrivilege DISABLED (HELD pid=1696 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\il153\ebusy\state_draft_json__draft_SeBackupPrivilege\.agents\state.draft.json'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/state.draft.json share=None; --draft; SeBackupPrivilege left as is (HELD pid=7704 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\il153\ebusy\state_draft_json__draft_none\.agents\state.draft.json'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/state.draft.json share=None; --commit; SeBackupPrivilege DISABLED (HELD pid=13760 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, open 'C:\qa-scratch\il153\ebusy\state_draft_json__commit_SeBackupPrivilege\.agents\state.draft.json'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/state.draft.json share=None; --commit; SeBackupPrivilege left as is (HELD pid=17468 share=None access=Read mode=Open); pre-hold draft exit 0
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     state import refused: EBUSY: resource busy or locked, copyfile 'C:\qa-scratch\il153\ebusy\state_draft_json__commit_none\.agents\state.draft.json' -> 'C:\qa-scratch\il153\ebusy\state_draft_json__commit_none\.agents\archive\pre-state-migration-2026-09-26\state.draft.json'
+     tree IDENTICAL; state.json false; archive absent

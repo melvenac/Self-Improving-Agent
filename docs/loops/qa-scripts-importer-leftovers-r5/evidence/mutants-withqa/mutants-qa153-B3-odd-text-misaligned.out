@@ -1,0 +1,7 @@
+mutants-qa153 at e2f202b, 2026-09-27T04:36:55.009Z; tests: tests/pipelines/state-import* 
+B3-odd-text-misaligned: KILLED (R5-2: the odd file's text decoded one byte off (subarray(3, len)), so 'as far as it reads' reads nothing); tsc clean; vitest exit 1, red 4 of 158; 32s
+    red: pipelines/state-import-qa153-ebusy.test.ts > QA 153 D3 (RED): --commit's own read of the draft state.draft.json held at --commit: Node's message, then the cause and the remedy :: AssertionError: expected 'EBUSY: resource busy or locked, open …' to match /another program holds this file open;…/
+    red: pipelines/state-import-qa153.test.ts > QA 153 D1 (RED): an odd-length FE FF session log is named (R5-2, as R4-5 names DECISIONS.md) the draft's report names Session_7.md and the FE FF mark :: AssertionError: expected '# state.json import report — draft (2…' to match /Session_7\.md[^\n]*UTF-16BE byte-orde…/
+    red: pipelines/state-import-qa153.test.ts > QA 153 D2 (RED): an odd-length FE FF DECISIONS.md names the ADRs it did not import ADR-1 is in the file's bytes and not imported, so it is listed as NOT imported :: AssertionError: expected [] to include 'ADR-1'
+    red: pipelines/state-import-qa153.test.ts > QA 153 coverage (GREEN): what the candidate's own tests left open a genuine UTF-16BE DECISIONS.md with one byte appended imports ADR-1, and does not block :: AssertionError: expected [] to deeply equal [ 'ADR-1' ]
+restored: src/pipelines/state-import/index.ts clean, src/cli.ts clean; 2026-09-27T04:37:27.371Z

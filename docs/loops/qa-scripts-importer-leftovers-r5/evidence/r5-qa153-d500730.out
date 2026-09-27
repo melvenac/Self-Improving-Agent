@@ -1,0 +1,328 @@
+r5-qa153 against C:\qa-scratch\il153\base @ d500730; TEMP=C:\qa-tmp; today (local) 2026-09-26
+NOTE powershell: Windows PowerShell 5.1.19041.6456 writes every input
+
+---- R5-1 next-session.md `##` sections only, UTF-8 (.NET)
+     stale  : size 76, head 2323205069636b20, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 76, head 2323205069636b20, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 next-session.md `##` sections only, UTF-8 (.NET): could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 next-session.md `##` sections only, Set-Content (ANSI; ASCII text)
+     stale  : size 76, head 2323205069636b20, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 76, head 2323205069636b20, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 next-session.md `##` sections only, Set-Content (ANSI; ASCII text): could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 next-session.md `##` sections only, Out-File -Encoding utf8 (BOM)
+     stale  : size 79 (ODD), head efbbbf2323205069, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 79 (ODD), head efbbbf2323205069, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 next-session.md `##` sections only, Out-File -Encoding utf8 (BOM): could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 next-session.md `##` sections only, PS 5.1 `>` (UTF-16LE BOM)
+     stale  : size 158, head fffe230023002000, NULs 78; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 158, head fffe230023002000, NULs 78; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 next-session.md `##` sections only, PS 5.1 `>` (UTF-16LE BOM): could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 INBOX.md `##` only, session in the heading
+     stale  : size 47 (ODD), head 2323205030202853, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 47 (ODD), head 2323205030202853, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 INBOX.md `##` only, session in the heading: could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 INBOX.md `##` only, session in the blockquote only (not declared: blockquote read under `# ` only)
+     stale  : size 68, head 23232050300d0a0d, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 68, head 23232050300d0a0d, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 INBOX.md `##` only, session in the blockquote only (not declared: blockquote read under `# ` only): could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 INBOX.md `###### ` (level 6)
+     stale  : size 54, head 2323232323232049, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 54, head 2323232323232049, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 INBOX.md `###### ` (level 6): could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 INBOX.md `####### ` (seven): no heading line
+     stale  : size 55 (ODD), head 2323232323232320, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 55 (ODD), head 2323232323232320, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 INBOX.md `####### ` (seven): no heading line: could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 next-session.md /end A7 as bold lines: no heading line
+     stale  : size 70, head 2a2a5069636b2075, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 70, head 2a2a5069636b2075, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 next-session.md /end A7 as bold lines: no heading line: could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 INBOX.md `#Inbox`
+     stale  : size 41 (ODD), head 23496e626f780d0a, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 41 (ODD), head 23496e626f780d0a, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 INBOX.md `#Inbox`: could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 INBOX.md `#<TAB>Inbox`
+     stale  : size 42, head 2309496e626f780d, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 42, head 2309496e626f780d, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 INBOX.md `#<TAB>Inbox`: could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 INBOX.md `  # Inbox` (indented)
+     stale  : size 44, head 20202320496e626f, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 44, head 20202320496e626f, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 INBOX.md `  # Inbox` (indented): could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 INBOX.md setext
+     stale  : size 47 (ODD), head 496e626f780d0a3d, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 47 (ODD), head 496e626f780d0a3d, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 INBOX.md setext: could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 INBOX.md `#Inbox`, Out-File -Encoding utf8 (BOM path)
+     stale  : size 44, head efbbbf23496e626f, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 44, head efbbbf23496e626f, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+FAIL R5-1 INBOX.md `#Inbox`, Out-File -Encoding utf8 (BOM path): could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 INBOX.md a U+FEFF inside the text, then `# Inbox` (Out-File utf8: two marks)
+     stale  : size 115 (ODD), head efbbbfefbbbf2320, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 115 (ODD), head efbbbfefbbbf2320, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+NOTE R5-1 INBOX.md a U+FEFF inside the text, then `# Inbox` (Out-File utf8: two marks): stale could_not_tell/unreadable exit 1; current could_not_tell/unreadable exit 1
+
+---- R5-1 INBOX.md UTF-7 (Set-Content -Encoding UTF7)
+     stale  : size 161 (ODD), head 2b41434d2d20496e, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 161 (ODD), head 2b41434d2d20496e, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS R5-1 INBOX.md UTF-7 (Set-Content -Encoding UTF7): could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 task.md UTF-7
+     stale  : size 123 (ODD), head 2b41434d2d204375, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/task.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 123 (ODD), head 2b41434d2d204375, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/task.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS R5-1 task.md UTF-7: could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 next-session.md UTF-7
+     stale  : size 116, head 2b41434d2d204e65, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 116, head 2b41434d2d204e65, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS R5-1 next-session.md UTF-7: could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 INBOX.md Windows-1252 (Set-Content, an e-acute), no heading: the encoding sentence stays
+     stale  : size 46, head 496e626f782c2063, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read (read as Windows-1252: not valid UTF-8, and no byte-order mark)
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read (read as Windows-1252: not valid UTF-8, and no byte-order mark). Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 46, head 496e626f782c2063, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read (read as Windows-1252: not valid UTF-8, and no byte-order mark)
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read (read as Windows-1252: not valid UTF-8, and no byte-order mark). Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS R5-1 INBOX.md Windows-1252 (Set-Content, an e-acute), no heading: the encoding sentence stays: could_not_tell/unreadable exit 1 [evidence names an encoding]; could_not_tell/unreadable exit 1 [evidence names an encoding]
+
+---- R5-1 next-session.md bold lines, PS 5.1 `>` (a GENUINE UTF-16LE file with no heading)
+     stale  : size 146, head fffe2a002a005000, NULs 72; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 146, head fffe2a002a005000, NULs 72; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/SESSIONS/next-session.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no readable `# ` title (its encoding is not one the importer reads, UTF-7 among them), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+NOTE R5-1 next-session.md bold lines, PS 5.1 `>` (a GENUINE UTF-16LE file with no heading): stale could_not_tell/unreadable exit 1; current could_not_tell/unreadable exit 1
+
+---- R5-2 INBOX.md FE FF then UTF-8, odd (.NET)
+     stale  : size 111 (ODD), head feff2320496e626f, NULs 0; verdict THREW; draft exit 1; bare --commit exit 1, tree identical, state.json false
+              evidence: RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits
+              commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+     current: size 111 (ODD), head feff2320496e626f, NULs 0; verdict THREW; draft exit 1; bare --commit exit 1, tree identical, state.json false
+              evidence: RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits
+              commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+FAIL R5-2 INBOX.md FE FF then UTF-8, odd (.NET): THREW exit 1; THREW exit 1
+
+---- R5-2 task.md FE FF then UTF-8, odd (.NET)
+     stale  : size 97 (ODD), head feff232043757272, NULs 0; verdict THREW; draft exit 1; bare --commit exit 1, tree identical, state.json false
+              evidence: RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits
+              commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+     current: size 97 (ODD), head feff232043757272, NULs 0; verdict THREW; draft exit 1; bare --commit exit 1, tree identical, state.json false
+              evidence: RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits
+              commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+FAIL R5-2 task.md FE FF then UTF-8, odd (.NET): THREW exit 1; THREW exit 1
+
+---- R5-2 next-session.md FE FF then UTF-8, odd (.NET)
+     stale  : size 103 (ODD), head feff23204e657874, NULs 0; verdict THREW; draft exit 1; bare --commit exit 1, tree identical, state.json false
+              evidence: RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits
+              commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+     current: size 103 (ODD), head feff23204e657874, NULs 0; verdict THREW; draft exit 1; bare --commit exit 1, tree identical, state.json false
+              evidence: RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits
+              commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+FAIL R5-2 next-session.md FE FF then UTF-8, odd (.NET): THREW exit 1; THREW exit 1
+
+---- R5-2 INBOX.md a genuine UTF-16BE file (Set-Content BigEndianUnicode), then one byte appended
+     stale  : size 209 (ODD), head feff002300200049, NULs 100; verdict THREW; draft exit 1; bare --commit exit 1, tree identical, state.json false
+              evidence: RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits
+              commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+     current: size 209 (ODD), head feff002300200049, NULs 100; verdict THREW; draft exit 1; bare --commit exit 1, tree identical, state.json false
+              evidence: RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits
+              commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+FAIL R5-2 INBOX.md a genuine UTF-16BE file (Set-Content BigEndianUnicode), then one byte appended: THREW exit 1; THREW exit 1
+
+---- R5-2 guard: INBOX.md a genuine UTF-16LE file (>), then one byte appended
+     stale  : size 213 (ODD), head fffe230020004900, NULs 102; verdict stale; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              commit: state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 213 (ODD), head fffe230020004900, NULs 102; verdict current; draft exit 0; bare --commit exit 0, tree changed, state.json true (pick_up "Carry on.", tasks 1)
+              evidence: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+NOTE R5-2 guard: INBOX.md a genuine UTF-16LE file (>), then one byte appended: stale stale exit 1; current current exit 0
+
+---- R5-2 INBOX.md FE FF alone (2 bytes)
+     stale  : size 2, head feff, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (it is empty), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 2, head feff, NULs 0; verdict could_not_tell/unreadable; draft exit 0; bare --commit exit 1, tree identical, state.json false
+              evidence: has no readable `# ` title (it is empty), so its words cannot be read
+              draft stdout: --commit will REFUSE while .agents/TASKS/INBOX.md cannot be read (NUL bytes, UTF-32, or no readable `# ` title; the report says which): save as UTF-8 and re-run the draft, or pass --accept-stale.
+              commit: state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no readable `# ` title (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS R5-2 INBOX.md FE FF alone (2 bytes): could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- R5-2 INBOX.md FE FF 23 (3 bytes)
+     stale  : size 3 (ODD), head feff23, NULs 0; verdict THREW; draft exit 1; bare --commit exit 1, tree identical, state.json false
+              evidence: RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits
+              commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+     current: size 3 (ODD), head feff23, NULs 0; verdict THREW; draft exit 1; bare --commit exit 1, tree identical, state.json false
+              evidence: RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits
+              commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+FAIL R5-2 INBOX.md FE FF 23 (3 bytes): THREW exit 1; THREW exit 1
+
+---- R5-2 DECISIONS.md FE FF then UTF-8, odd (.NET) (CURRENT project)
+     size 81 (ODD), head feff232044656369, NULs 0; in-process THREW RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits; draft exit 1; bare --commit exit 1, tree identical, state.json false
+     report file lines naming DECISIONS.md: (none)
+     draft stdout naming it: (none)
+     commit stdout naming it: (none)
+     commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+FAIL R5-2 DECISIONS.md FE FF then UTF-8, odd (.NET): named in draft and commit stdout, does not block
+
+---- R5-2 DECISIONS.md a genuine UTF-16BE file, then one byte appended (CURRENT project)
+     size 161 (ODD), head feff002300200044, NULs 79; in-process THREW RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits; draft exit 1; bare --commit exit 1, tree identical, state.json false
+     report file lines naming DECISIONS.md: (none)
+     draft stdout naming it: (none)
+     commit stdout naming it: (none)
+     commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+FAIL R5-2 DECISIONS.md a genuine UTF-16BE file, then one byte appended: named in draft and commit stdout, does not block
+
+---- R5-2 Session_7.md (the latest log) FE FF then UTF-8, odd (.NET) (CURRENT project)
+     size 79 (ODD), head feff232053657373, NULs 0; in-process THREW RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits; draft exit 1; bare --commit exit 1, tree identical, state.json false
+     report file lines naming Session_7.md: (none)
+     draft stdout naming it: (none)
+     commit stdout naming it: (none)
+     commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+FAIL R5-2 Session_7.md (the latest log) FE FF then UTF-8, odd (.NET): does not stop the draft or the commit; NOT named anywhere (report, draft stdout)
+
+---- R5-2 Session_7.md a genuine UTF-16BE file, then one byte appended (CURRENT project)
+     size 151 (ODD), head feff002300200053, NULs 73; in-process THREW RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits; draft exit 1; bare --commit exit 1, tree identical, state.json false
+     report file lines naming Session_7.md: (none)
+     draft stdout naming it: (none)
+     commit stdout naming it: (none)
+     commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+FAIL R5-2 Session_7.md a genuine UTF-16BE file, then one byte appended: does not stop the draft or the commit; NOT named anywhere (report, draft stdout)
+
+---- R5-2 SUMMARY.md FE FF then UTF-8, odd (.NET) (CURRENT project)
+     size 69 (ODD), head feff232053756d6d, NULs 0; in-process THREW RangeError: ERR_INVALID_BUFFER_SIZE Buffer size must be a multiple of 16-bits; draft exit 1; bare --commit exit 1, tree identical, state.json false
+     report file lines naming SUMMARY.md: (none)
+     draft stdout naming it: (none)
+     commit stdout naming it: (none)
+     commit: state import refused: .agents/state.draft.json not found — run `open-brain state import --draft` first and have the draft reviewed
+NOTE R5-2 SUMMARY.md FE FF then UTF-8, odd (.NET): draft exit 1, bare --commit exit 1
+
+SUMMARY: 5 passed, 23 failed

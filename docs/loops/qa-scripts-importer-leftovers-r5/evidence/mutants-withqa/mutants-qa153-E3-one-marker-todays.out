@@ -1,0 +1,7 @@
+mutants-qa153 at e2f202b, 2026-09-27T04:38:01.273Z; tests: tests/pipelines/state-import* 
+E3-one-marker-todays: KILLED (O7: the one-marker text changed ('today's' for one marker)); tsc clean; vitest exit 1, red 4 of 158; 27s
+    red: pipelines/state-import-qa153-ebusy.test.ts > QA 153 D3 (RED): --commit's own read of the draft state.draft.json held at --commit: Node's message, then the cause and the remedy :: AssertionError: expected 'EBUSY: resource busy or locked, open …' to match /another program holds this file open;…/
+    red: pipelines/state-import-qa153.test.ts > QA 153 D1 (RED): an odd-length FE FF session log is named (R5-2, as R4-5 names DECISIONS.md) the draft's report names Session_7.md and the FE FF mark :: AssertionError: expected '# state.json import report — draft (2…' to match /Session_7\.md[^\n]*UTF-16BE byte-orde…/
+    red: pipelines/state-import-qa153.test.ts > QA 153 D2 (RED): an odd-length FE FF DECISIONS.md names the ADRs it did not import ADR-1 is in the file's bytes and not imported, so it is listed as NOT imported :: AssertionError: expected [] to include 'ADR-1'
+    red: pipelines/state-import-qa153.test.ts > QA 153 coverage (GREEN): what the candidate's own tests left open two markers: the refusal says --force-snapshot deletes today's, and one marker says it :: AssertionError: expected [Function] to throw error matching /Keep a copy of the snapshot until the…/ but got '.agents/ is half-restored: an earlier…'
+restored: src/pipelines/state-import/index.ts clean, src/cli.ts clean; 2026-09-27T04:38:27.848Z

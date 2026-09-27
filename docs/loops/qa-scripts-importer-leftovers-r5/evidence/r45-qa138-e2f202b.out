@@ -1,0 +1,100 @@
+
+==== UTF-8 ADR-1, then ADR-2 and ADR-3 appended by PS 5.1 >>
+     bytes: size 343, head 232044656369, NULs 132, first at 80
+     --draft exit 0; stdout lines naming it:
+       | Decisions: 1 (0 skipped) · verified 0 · gaps 0 · objective found
+       |   .agents/SYSTEM/DECISIONS.md contains 132 NUL byte(s), the first at byte 80, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       |   ADRs imported: ADR-1
+       |   ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ADR-2, ADR-3
+     report lines naming it:
+       | - not judged `.agents/SYSTEM/DECISIONS.md`: imported as a dated log of past decisions, not as current state. It contains 132 NUL byte(s), the first at byte 80, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+       | - decisions: `.agents/SYSTEM/DECISIONS.md` — 20 lines
+       | ## Decisions (DECISIONS.md)
+       | Imported 1 ADRs: 1 with a full `Date:` line, 0 with a partial date (kept in the note), 0 with none (date = migration date, note "imported; original date unknown").
+       | **Not read in full:**
+       | - .agents/SYSTEM/DECISIONS.md contains 132 NUL byte(s), the first at byte 80, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       | - ADRs imported: ADR-1
+       | - ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ADR-2, ADR-3
+     --commit exit 0; stdout lines naming it:
+       | .agents/SYSTEM/DECISIONS.md contains 132 NUL byte(s), the first at byte 80, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       | ADRs imported: ADR-1
+       | ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ADR-2, ADR-3
+     state.json decisions ["ADR-1"]; NUL in state.json false
+
+==== UTF-16LE with no BOM, the whole file (UnicodeEncoding(false,false))
+     bytes: size 286, head 230020004400, NULs 143, first at 1
+     --draft exit 0; stdout lines naming it:
+       | Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+       |   .agents/SYSTEM/DECISIONS.md contains 143 NUL byte(s), the first at byte 1, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       |   ADRs imported: none
+       |   ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ADR-1, ADR-2
+     report lines naming it:
+       | - not judged `.agents/SYSTEM/DECISIONS.md`: imported as a dated log of past decisions, not as current state. It contains 143 NUL byte(s), the first at byte 1, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+       | - decisions: `.agents/SYSTEM/DECISIONS.md` — 13 lines
+       | ## Decisions (DECISIONS.md)
+       | Imported 0 ADRs: 0 with a full `Date:` line, 0 with a partial date (kept in the note), 0 with none (date = migration date, note "imported; original date unknown").
+       | **Not read in full:**
+       | - .agents/SYSTEM/DECISIONS.md contains 143 NUL byte(s), the first at byte 1, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       | - ADRs imported: none
+       | - ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ADR-1, ADR-2
+     --commit exit 0; stdout lines naming it:
+       | .agents/SYSTEM/DECISIONS.md contains 143 NUL byte(s), the first at byte 1, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       | ADRs imported: none
+       | ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ADR-1, ADR-2
+     state.json decisions []; NUL in state.json false
+
+==== UTF-32LE (Set-Content -Encoding UTF32)
+     bytes: size 328, head fffe00002300, NULs 245, first at 2
+     --draft exit 0; stdout lines naming it:
+       | Decisions: 0 (0 skipped) · verified 0 · gaps 0 · objective found
+       |   .agents/SYSTEM/DECISIONS.md starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       |   ADRs imported: none
+       |   ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ADR-1
+     report lines naming it:
+       | - not judged `.agents/SYSTEM/DECISIONS.md`: imported as a dated log of past decisions, not as current state. It starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read
+       | - decisions: `.agents/SYSTEM/DECISIONS.md` — 9 lines
+       | ## Decisions (DECISIONS.md)
+       | Imported 0 ADRs: 0 with a full `Date:` line, 0 with a partial date (kept in the note), 0 with none (date = migration date, note "imported; original date unknown").
+       | **Not read in full:**
+       | - .agents/SYSTEM/DECISIONS.md starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       | - ADRs imported: none
+       | - ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ADR-1
+     --commit exit 0; stdout lines naming it:
+       | .agents/SYSTEM/DECISIONS.md starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       | ADRs imported: none
+       | ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): ADR-1
+     state.json decisions []; NUL in state.json false
+
+==== UTF-8, one stray NUL (Add-Content [char]0), no ADR lost
+     bytes: size 80, head 232044656369, NULs 1, first at 79
+     --draft exit 0; stdout lines naming it:
+       | Decisions: 1 (0 skipped) · verified 0 · gaps 0 · objective found
+       |   .agents/SYSTEM/DECISIONS.md contains 1 NUL byte(s), the first at byte 79, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       |   ADRs imported: ADR-1
+       |   ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): none found
+     report lines naming it:
+       | - not judged `.agents/SYSTEM/DECISIONS.md`: imported as a dated log of past decisions, not as current state. It contains 1 NUL byte(s), the first at byte 79, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+       | - decisions: `.agents/SYSTEM/DECISIONS.md` — 8 lines
+       | ## Decisions (DECISIONS.md)
+       | Imported 1 ADRs: 1 with a full `Date:` line, 0 with a partial date (kept in the note), 0 with none (date = migration date, note "imported; original date unknown").
+       | **Not read in full:**
+       | - .agents/SYSTEM/DECISIONS.md contains 1 NUL byte(s), the first at byte 79, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       | - ADRs imported: ADR-1
+       | - ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): none found
+     --commit exit 0; stdout lines naming it:
+       | .agents/SYSTEM/DECISIONS.md contains 1 NUL byte(s), the first at byte 79, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read. It is not judged, so it does not block --commit: it is imported as far as it reads.
+       | ADRs imported: ADR-1
+       | ADRs NOT imported (headings found once the NUL bytes are removed; the unreadable bytes may hold more): none found
+     state.json decisions ["ADR-1"]; NUL in state.json false
+
+==== readable UTF-8 (control: nothing is named)
+     bytes: size 79, head 232044656369, NULs 0
+     --draft exit 0; stdout lines naming it:
+       | Decisions: 1 (0 skipped) · verified 0 · gaps 0 · objective found
+     report lines naming it:
+       | - not judged `.agents/SYSTEM/DECISIONS.md`: imported as a dated log of past decisions, not as current state
+       | - decisions: `.agents/SYSTEM/DECISIONS.md` — 8 lines
+       | ## Decisions (DECISIONS.md)
+       | Imported 1 ADRs: 1 with a full `Date:` line, 0 with a partial date (kept in the note), 0 with none (date = migration date, note "imported; original date unknown").
+     --commit exit 0; stdout lines naming it:
+     state.json decisions ["ADR-1"]; NUL in state.json false

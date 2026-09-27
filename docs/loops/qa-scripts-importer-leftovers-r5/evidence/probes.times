@@ -1,0 +1,8 @@
+r3 start 04:15:03Z
+r3 exit 1 end 04:15:29Z
+r4 start 04:15:29Z
+r4 exit 0 end 04:16:28Z
+r4n start 04:16:28Z
+r4n exit 0 end 04:17:24Z
+r4np start 04:17:24Z
+r4np exit 0 end 04:17:50Z

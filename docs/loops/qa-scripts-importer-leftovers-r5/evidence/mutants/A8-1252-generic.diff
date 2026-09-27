@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index d9897bf..67227e8 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -601,7 +601,7 @@ function noHeading(text: string, encoding: TextEncoding | undefined): string {
+   if (encoding === "utf16le-bom" || encoding === "utf16be-bom") {
+     return `has no heading line as its ${encoding === "utf16le-bom" ? "UTF-16LE" : "UTF-16BE"} byte-order mark reads it (${rule}): the mark may not match the bytes, as when UTF-8 text follows it, so its words cannot be read`;
+   }
+-  if (encoding === "windows-1252") return `has no heading line (${rule}): its encoding may be one the importer does not read, so its words cannot be read`;
++  if (false) return `has no heading line (${rule}): its encoding may be one the importer does not read, so its words cannot be read`;
+   return `has no heading line (${rule}), so it cannot be judged: give it a title, or pass ${ACCEPT_STALE_FLAG}`;
+ }
+ 

@@ -1,0 +1,638 @@
+shapes-qa138 against C:\qa-scratch\il153\cand @ e2f202b; TEMP=C:\qa-tmp; today (local) 2026-09-26
+NOTE powershell: Windows PowerShell 5.1.19041.6456 (powershell.exe) writes every shape
+
+---- [inbox] UTF-32LE (Set-Content -Encoding UTF32)
+     stale  : size 416, head fffe0000230000002000, NULs 308 (first at 2); draft exit 0; verdict could_not_tell/unreadable
+              evidence: starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read. Nothing written. Update them and re-ru
+     current: size 416, head fffe0000230000002000, NULs 308 (first at 2); draft exit 0; verdict could_not_tell/unreadable
+              evidence: starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read. Nothing written. Update them and re-ru
+PASS [inbox] UTF-32LE (Set-Content -Encoding UTF32): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [inbox] UTF-32BE (Set-Content -Encoding BigEndianUTF32)
+     stale  : size 416, head 0000feff000000230000, NULs 308 (first at 0); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 308 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md contains 308 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words can
+     current: size 416, head 0000feff000000230000, NULs 308 (first at 0); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 308 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md contains 308 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words can
+PASS [inbox] UTF-32BE (Set-Content -Encoding BigEndianUTF32): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [inbox] UTF-7 (Set-Content -Encoding UTF7)
+     stale  : size 161, head 2b41434d2d20496e626f, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale. Nothing written. Update them and re-run --draft, 
+     current: size 161, head 2b41434d2d20496e626f, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale. Nothing written. Update them and re-run --draft, 
+PASS [inbox] UTF-7 (Set-Content -Encoding UTF7): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [inbox] zero bytes (New-Item)
+     stale  : size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS [inbox] zero bytes (New-Item): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [inbox] zero bytes (Clear-Content)
+     stale  : size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS [inbox] zero bytes (Clear-Content): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [inbox] a UTF-8 BOM (Out-File -Encoding utf8 of ''), then UTF-16 (>>)
+     stale  : size 213, head efbbbf2300200049006e, NULs 102 (first at 4); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 102 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md contains 102 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words can
+     current: size 213, head efbbbf2300200049006e, NULs 102 (first at 4); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 102 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md contains 102 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words can
+PASS [inbox] a UTF-8 BOM (Out-File -Encoding utf8 of ''), then UTF-16 (>>): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [inbox] a UTF-16LE BOM that lies (.NET): FF FE, then the whole text in UTF-8 (AppendAllText)
+     stale  : size 111, head fffe2320496e626f7820, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its w
+     current: size 111, head fffe2320496e626f7820, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its w
+PASS [inbox] a UTF-16LE BOM that lies (.NET): FF FE, then the whole text in UTF-8 (AppendAllText): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [inbox] a UTF-16BE BOM that lies (.NET): FE FF, then the whole text in UTF-8 (AppendAllText)
+     stale  : size 111, head feff2320496e626f7820, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has a UTF-16BE byte-order mark (FE FF), but an odd number of bytes (111): UTF-16 is two bytes a character, so the mark does not match the bytes, and its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has a UTF-16BE byte-order mark (FE FF), but an odd number of bytes (111): UTF-16 is two bytes a character, so the mark does not match the bytes, and its words cannot be read. Nothing w
+     current: size 111, head feff2320496e626f7820, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has a UTF-16BE byte-order mark (FE FF), but an odd number of bytes (111): UTF-16 is two bytes a character, so the mark does not match the bytes, and its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has a UTF-16BE byte-order mark (FE FF), but an odd number of bytes (111): UTF-16 is two bytes a character, so the mark does not match the bytes, and its words cannot be read. Nothing w
+PASS [inbox] a UTF-16BE BOM that lies (.NET): FE FF, then the whole text in UTF-8 (AppendAllText): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [inbox] a UTF-8 BOM, then Add-Content -Encoding Unicode (PS follows the UTF-8 BOM)
+     stale  : size 112, head efbbbf2320496e626f78, NULs 0; draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 112, head efbbbf2320496e626f78, NULs 0; draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] a UTF-8 BOM, then Add-Content -Encoding Unicode (PS follows the UTF-8 BOM): stale stale exit 1; current current exit 0
+
+---- [inbox] a UTF-16LE BOM FF FE (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie)
+     stale  : size 208, head fffe2300200049006e00, NULs 100 (first at 3); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 208, head fffe2300200049006e00, NULs 100 (first at 3); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] a UTF-16LE BOM FF FE (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie): stale stale exit 1; current current exit 0
+
+---- [inbox] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie)
+     stale  : size 208, head feff002300200049006e, NULs 100 (first at 2); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 208, head feff002300200049006e, NULs 100 (first at 2); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie): stale stale exit 1; current current exit 0
+
+---- [inbox] a UTF-16LE BOM that lies: FF FE (.NET), then UTF-32LE text (Add-Content -Encoding UTF32)
+     stale  : size 414, head fffe2300000020000000, NULs 306 (first at 3); draft exit 0; verdict could_not_tell/unreadable
+              evidence: has a UTF-16LE byte-order mark, but the text it gives holds 103 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has a UTF-16LE byte-order mark, but the text it gives holds 103 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read. Nothing written. 
+     current: size 414, head fffe2300000020000000, NULs 306 (first at 3); draft exit 0; verdict could_not_tell/unreadable
+              evidence: has a UTF-16LE byte-order mark, but the text it gives holds 103 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/INBOX.md has a UTF-16LE byte-order mark, but the text it gives holds 103 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read. Nothing written. 
+PASS [inbox] a UTF-16LE BOM that lies: FF FE (.NET), then UTF-32LE text (Add-Content -Encoding UTF32): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [inbox] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding Unicode (PS follows the BOM: not a lie)
+     stale  : size 208, head feff002300200049006e, NULs 100 (first at 2); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 208, head feff002300200049006e, NULs 100 (first at 2); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding Unicode (PS follows the BOM: not a lie): stale stale exit 1; current current exit 0
+
+---- [inbox] UTF-16LE (>), then Add-Content -Encoding UTF8 (PS follows the BOM)
+     stale  : size 272, head fffe2300200049006e00, NULs 131 (first at 3); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 272, head fffe2300200049006e00, NULs 131 (first at 3); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task","Appended"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] UTF-16LE (>), then Add-Content -Encoding UTF8 (PS follows the BOM): stale stale exit 1; current current exit 0
+
+---- [inbox] UTF-16LE (>), then a UTF-8 tail (.NET AppendAllText, as a bash >> would)
+     stale  : size 243, head fffe2300200049006e00, NULs 102 (first at 3); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 243, head fffe2300200049006e00, NULs 102 (first at 3); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] UTF-16LE (>), then a UTF-8 tail (.NET AppendAllText, as a bash >> would): stale stale exit 1; current current exit 0
+
+---- [inbox] UTF-16BE (Set-Content -Encoding BigEndianUnicode), then Add-Content -Encoding UTF8 (PS follows the BOM)
+     stale  : size 268, head feff002300200049006e, NULs 129 (first at 2); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 268, head feff002300200049006e, NULs 129 (first at 2); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task","Appended"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] UTF-16BE (Set-Content -Encoding BigEndianUnicode), then Add-Content -Encoding UTF8 (PS follows the BOM): stale stale exit 1; current current exit 0
+
+---- [task] UTF-32LE (Set-Content -Encoding UTF32)
+     stale  : size 376, head fffe0000230000002000, NULs 280 (first at 2); draft exit 0; verdict could_not_tell/unreadable
+              evidence: starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read. Nothing written. Update them and re-run
+     current: size 376, head fffe0000230000002000, NULs 280 (first at 2); draft exit 0; verdict could_not_tell/unreadable
+              evidence: starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read. Nothing written. Update them and re-run
+PASS [task] UTF-32LE (Set-Content -Encoding UTF32): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [task] UTF-32BE (Set-Content -Encoding BigEndianUTF32)
+     stale  : size 376, head 0000feff000000230000, NULs 280 (first at 0); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 280 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md contains 280 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cann
+     current: size 376, head 0000feff000000230000, NULs 280 (first at 0); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 280 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md contains 280 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cann
+PASS [task] UTF-32BE (Set-Content -Encoding BigEndianUTF32): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [task] UTF-7 (Set-Content -Encoding UTF7)
+     stale  : size 123, head 2b41434d2d2043757272, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale. Nothing written. Update them and re-run --draft, o
+     current: size 123, head 2b41434d2d2043757272, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale. Nothing written. Update them and re-run --draft, o
+PASS [task] UTF-7 (Set-Content -Encoding UTF7): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [task] zero bytes (New-Item)
+     stale  : size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS [task] zero bytes (New-Item): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [task] zero bytes (Clear-Content)
+     stale  : size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS [task] zero bytes (Clear-Content): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [task] a UTF-8 BOM (Out-File -Encoding utf8 of ''), then UTF-16 (>>)
+     stale  : size 193, head efbbbf23002000430075, NULs 94 (first at 4); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 94 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md contains 94 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words canno
+     current: size 193, head efbbbf23002000430075, NULs 94 (first at 4); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 94 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md contains 94 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words canno
+PASS [task] a UTF-8 BOM (Out-File -Encoding utf8 of ''), then UTF-16 (>>): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [task] a UTF-16LE BOM that lies (.NET): FF FE, then the whole text in UTF-8 (AppendAllText)
+     stale  : size 97, head fffe232043757272656e, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its wo
+     current: size 97, head fffe232043757272656e, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its wo
+PASS [task] a UTF-16LE BOM that lies (.NET): FF FE, then the whole text in UTF-8 (AppendAllText): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [task] a UTF-16BE BOM that lies (.NET): FE FF, then the whole text in UTF-8 (AppendAllText)
+     stale  : size 97, head feff232043757272656e, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has a UTF-16BE byte-order mark (FE FF), but an odd number of bytes (97): UTF-16 is two bytes a character, so the mark does not match the bytes, and its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has a UTF-16BE byte-order mark (FE FF), but an odd number of bytes (97): UTF-16 is two bytes a character, so the mark does not match the bytes, and its words cannot be read. Nothing wri
+     current: size 97, head feff232043757272656e, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has a UTF-16BE byte-order mark (FE FF), but an odd number of bytes (97): UTF-16 is two bytes a character, so the mark does not match the bytes, and its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has a UTF-16BE byte-order mark (FE FF), but an odd number of bytes (97): UTF-16 is two bytes a character, so the mark does not match the bytes, and its words cannot be read. Nothing wri
+PASS [task] a UTF-16BE BOM that lies (.NET): FE FF, then the whole text in UTF-8 (AppendAllText): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [task] a UTF-8 BOM, then Add-Content -Encoding Unicode (PS follows the UTF-8 BOM)
+     stale  : size 98, head efbbbf23204375727265, NULs 0; draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Focus:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/task.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 98, head efbbbf23204375727265, NULs 0; draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [task] a UTF-8 BOM, then Add-Content -Encoding Unicode (PS follows the UTF-8 BOM): stale stale exit 1; current current exit 0
+
+---- [task] a UTF-16LE BOM FF FE (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie)
+     stale  : size 188, head fffe2300200043007500, NULs 92 (first at 3); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Focus:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/task.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 188, head fffe2300200043007500, NULs 92 (first at 3); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [task] a UTF-16LE BOM FF FE (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie): stale stale exit 1; current current exit 0
+
+---- [task] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie)
+     stale  : size 188, head feff0023002000430075, NULs 92 (first at 2); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Focus:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/task.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 188, head feff0023002000430075, NULs 92 (first at 2); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [task] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie): stale stale exit 1; current current exit 0
+
+---- [task] a UTF-16LE BOM that lies: FF FE (.NET), then UTF-32LE text (Add-Content -Encoding UTF32)
+     stale  : size 374, head fffe2300000020000000, NULs 278 (first at 3); draft exit 0; verdict could_not_tell/unreadable
+              evidence: has a UTF-16LE byte-order mark, but the text it gives holds 93 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has a UTF-16LE byte-order mark, but the text it gives holds 93 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read. Nothing written. Up
+     current: size 374, head fffe2300000020000000, NULs 278 (first at 3); draft exit 0; verdict could_not_tell/unreadable
+              evidence: has a UTF-16LE byte-order mark, but the text it gives holds 93 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/TASKS/task.md has a UTF-16LE byte-order mark, but the text it gives holds 93 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read. Nothing written. Up
+PASS [task] a UTF-16LE BOM that lies: FF FE (.NET), then UTF-32LE text (Add-Content -Encoding UTF32): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [task] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding Unicode (PS follows the BOM: not a lie)
+     stale  : size 188, head feff0023002000430075, NULs 92 (first at 2); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Focus:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/task.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 188, head feff0023002000430075, NULs 92 (first at 2); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [task] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding Unicode (PS follows the BOM: not a lie): stale stale exit 1; current current exit 0
+
+---- [task] UTF-16LE (>), then Add-Content -Encoding UTF8 (PS follows the BOM)
+     stale  : size 226, head fffe2300200043007500, NULs 111 (first at 3); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Focus:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/task.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 226, head fffe2300200043007500, NULs 111 (first at 3); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [task] UTF-16LE (>), then Add-Content -Encoding UTF8 (PS follows the BOM): stale stale exit 1; current current exit 0
+
+---- [task] UTF-16LE (>), then a UTF-8 tail (.NET AppendAllText, as a bash >> would)
+     stale  : size 208, head fffe2300200043007500, NULs 94 (first at 3); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Focus:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/task.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 208, head fffe2300200043007500, NULs 94 (first at 3); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [task] UTF-16LE (>), then a UTF-8 tail (.NET AppendAllText, as a bash >> would): stale stale exit 1; current current exit 0
+
+---- [task] UTF-16BE (Set-Content -Encoding BigEndianUnicode), then Add-Content -Encoding UTF8 (PS follows the BOM)
+     stale  : size 222, head feff0023002000430075, NULs 109 (first at 2); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Focus:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/task.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 222, head feff0023002000430075, NULs 109 (first at 2); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Focus:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing. More objective.", pick_up "Carry on."
+NOTE [task] UTF-16BE (Set-Content -Encoding BigEndianUnicode), then Add-Content -Encoding UTF8 (PS follows the BOM): stale stale exit 1; current current exit 0
+
+---- [next] UTF-32LE (Set-Content -Encoding UTF32)
+     stale  : size 396, head fffe0000230000002000, NULs 295 (first at 2); draft exit 0; verdict could_not_tell/unreadable
+              evidence: starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read. Nothing written. Update them
+     current: size 396, head fffe0000230000002000, NULs 295 (first at 2); draft exit 0; verdict could_not_tell/unreadable
+              evidence: starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read. Nothing written. Update them
+PASS [next] UTF-32LE (Set-Content -Encoding UTF32): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [next] UTF-32BE (Set-Content -Encoding BigEndianUTF32)
+     stale  : size 396, head 0000feff000000230000, NULs 295 (first at 0); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 295 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md contains 295 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its
+     current: size 396, head 0000feff000000230000, NULs 295 (first at 0); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 295 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md contains 295 NUL byte(s), the first at byte 0, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its
+PASS [next] UTF-32BE (Set-Content -Encoding BigEndianUTF32): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [next] UTF-7 (Set-Content -Encoding UTF7)
+     stale  : size 116, head 2b41434d2d204e657874, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale. Nothing written. Update them and re-run
+     current: size 116, head 2b41434d2d204e657874, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale. Nothing written. Update them and re-run
+PASS [next] UTF-7 (Set-Content -Encoding UTF7): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [next] zero bytes (New-Item)
+     stale  : size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS [next] zero bytes (New-Item): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [next] zero bytes (Clear-Content)
+     stale  : size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 0, head , NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (it is empty), so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line (it is empty), so its words cannot be read. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+PASS [next] zero bytes (Clear-Content): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [next] a UTF-8 BOM (Out-File -Encoding utf8 of ''), then UTF-16 (>>)
+     stale  : size 203, head efbbbf230020004e0065, NULs 99 (first at 4); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 99 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md contains 99 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its 
+     current: size 203, head efbbbf230020004e0065, NULs 99 (first at 4); draft exit 0; verdict could_not_tell/unreadable
+              evidence: contains 99 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md contains 99 NUL byte(s), the first at byte 4, as UTF-16 without a byte-order mark would, or a line appended by Windows PowerShell 5.1's `>>`: its encoding is unknown, so its 
+PASS [next] a UTF-8 BOM (Out-File -Encoding utf8 of ''), then UTF-16 (>>): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [next] a UTF-16LE BOM that lies (.NET): FF FE, then the whole text in UTF-8 (AppendAllText)
+     stale  : size 102, head fffe23204e6578742053, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it
+     current: size 102, head fffe23204e6578742053, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line as its UTF-16LE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it
+PASS [next] a UTF-16LE BOM that lies (.NET): FF FE, then the whole text in UTF-8 (AppendAllText): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [next] a UTF-16BE BOM that lies (.NET): FE FF, then the whole text in UTF-8 (AppendAllText)
+     stale  : size 102, head feff23204e6578742053, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line as its UTF-16BE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line as its UTF-16BE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it
+     current: size 102, head feff23204e6578742053, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line as its UTF-16BE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line as its UTF-16BE byte-order mark reads it (no line is `#` to `######` followed by a space): the mark may not match the bytes, as when UTF-8 text follows it
+PASS [next] a UTF-16BE BOM that lies (.NET): FE FF, then the whole text in UTF-8 (AppendAllText): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [next] a UTF-8 BOM, then Add-Content -Encoding Unicode (PS follows the UTF-8 BOM)
+     stale  : size 103, head efbbbf23204e65787420, NULs 0; draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> Updated at end of Session 6.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 103, head efbbbf23204e65787420, NULs 0; draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> Updated at end of Session 7.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [next] a UTF-8 BOM, then Add-Content -Encoding Unicode (PS follows the UTF-8 BOM): stale stale exit 1; current current exit 0
+
+---- [next] a UTF-16LE BOM FF FE (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie)
+     stale  : size 198, head fffe230020004e006500, NULs 97 (first at 3); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> Updated at end of Session 6.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 198, head fffe230020004e006500, NULs 97 (first at 3); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> Updated at end of Session 7.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [next] a UTF-16LE BOM FF FE (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie): stale stale exit 1; current current exit 0
+
+---- [next] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie)
+     stale  : size 198, head feff00230020004e0065, NULs 97 (first at 2); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> Updated at end of Session 6.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 198, head feff00230020004e0065, NULs 97 (first at 2); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> Updated at end of Session 7.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [next] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding UTF8 (PS follows the BOM: not a lie): stale stale exit 1; current current exit 0
+
+---- [next] a UTF-16LE BOM that lies: FF FE (.NET), then UTF-32LE text (Add-Content -Encoding UTF32)
+     stale  : size 394, head fffe2300000020000000, NULs 293 (first at 3); draft exit 0; verdict could_not_tell/unreadable
+              evidence: has a UTF-16LE byte-order mark, but the text it gives holds 98 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has a UTF-16LE byte-order mark, but the text it gives holds 98 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read. Nothing 
+     current: size 394, head fffe2300000020000000, NULs 293 (first at 3); draft exit 0; verdict could_not_tell/unreadable
+              evidence: has a UTF-16LE byte-order mark, but the text it gives holds 98 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has a UTF-16LE byte-order mark, but the text it gives holds 98 NUL character(s), the first at byte 4: the mark does not match the bytes, so its words cannot be read. Nothing 
+PASS [next] a UTF-16LE BOM that lies: FF FE (.NET), then UTF-32LE text (Add-Content -Encoding UTF32): unreadable and bare --commit refuses, stale and current: could_not_tell/unreadable exit 1; could_not_tell/unreadable exit 1
+
+---- [next] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding Unicode (PS follows the BOM: not a lie)
+     stale  : size 198, head feff00230020004e0065, NULs 97 (first at 2); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> Updated at end of Session 6.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 198, head feff00230020004e0065, NULs 97 (first at 2); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> Updated at end of Session 7.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [next] a UTF-16BE BOM FE FF (.NET), then Add-Content -Encoding Unicode (PS follows the BOM: not a lie): stale stale exit 1; current current exit 0
+
+---- [next] UTF-16LE (>), then Add-Content -Encoding UTF8 (PS follows the BOM)
+     stale  : size 226, head fffe230020004e006500, NULs 111 (first at 3); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> Updated at end of Session 6.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 226, head fffe230020004e006500, NULs 111 (first at 3); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> Updated at end of Session 7.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on.\n- appended"
+NOTE [next] UTF-16LE (>), then Add-Content -Encoding UTF8 (PS follows the BOM): stale stale exit 1; current current exit 0
+
+---- [next] UTF-16LE (>), then a UTF-8 tail (.NET AppendAllText, as a bash >> would)
+     stale  : size 213, head fffe230020004e006500, NULs 99 (first at 3); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> Updated at end of Session 6.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 213, head fffe230020004e006500, NULs 99 (first at 3); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> Updated at end of Session 7.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on.\n‭灡数摮摥"
+NOTE [next] UTF-16LE (>), then a UTF-8 tail (.NET AppendAllText, as a bash >> would): stale stale exit 1; current current exit 0
+
+---- [next] UTF-16BE (Set-Content -Encoding BigEndianUnicode), then Add-Content -Encoding UTF8 (PS follows the BOM)
+     stale  : size 222, head feff00230020004e0065, NULs 109 (first at 2); draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> Updated at end of Session 6.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 222, head feff00230020004e0065, NULs 109 (first at 2); draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> Updated at end of Session 7.`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on.\n- appended"
+NOTE [next] UTF-16BE (Set-Content -Encoding BigEndianUnicode), then Add-Content -Encoding UTF8 (PS follows the BOM): stale stale exit 1; current current exit 0
+
+---- [inbox] no `# ` title: INBOX.md with `##` headings only
+     stale  : size 83, head 232320503020e2809420, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+     current: size 83, head 232320503020e2809420, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] no `# ` title: INBOX.md with `##` headings only: stale could_not_tell/no_declared_session exit 0; current could_not_tell/no_declared_session exit 0
+
+---- [next] no `# ` title: next-session.md with `##` sections only (/end A7's three parts)
+     stale  : size 76, head 2323205069636b207570, NULs 0; draft exit 0; verdict stale
+              evidence: line 1 declares Session 6 (`## Pick up here (Session 6)`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/SESSIONS/next-session.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 76, head 2323205069636b207570, NULs 0; draft exit 0; verdict current
+              evidence: line 1 declares Session 7 (`## Pick up here (Session 7)`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [next] no `# ` title: next-session.md with `##` sections only (/end A7's three parts): stale stale exit 1; current current exit 0
+
+---- [next] no `# ` title: next-session.md with /end A7's three parts as bold lines
+     stale  : size 70, head 2a2a5069636b20757020, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale. Nothing written. Update them and re-run
+     current: size 70, head 2a2a5069636b20757020, NULs 0; draft exit 0; verdict could_not_tell/unreadable
+              evidence: has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) cannot be read, so whether they are current cannot be told: .agents/SESSIONS/next-session.md has no heading line (no line is `#` to `######` followed by a space), so it cannot be judged: give it a title, or pass --accept-stale. Nothing written. Update them and re-run
+NOTE [next] no `# ` title: next-session.md with /end A7's three parts as bold lines: stale could_not_tell/unreadable exit 1; current could_not_tell/unreadable exit 1
+
+---- [inbox] INBOX.md: YAML front matter, then `# Inbox`
+     stale  : size 95, head 2d2d2d0d0a7469746c65, NULs 0; draft exit 0; verdict stale
+              evidence: line 6 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 95, head 2d2d2d0d0a7469746c65, NULs 0; draft exit 0; verdict current
+              evidence: line 6 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+PASS [inbox] INBOX.md: YAML front matter, then `# Inbox`: judged as it reads: stale exit 1; current exit 0
+
+---- [inbox] INBOX.md: an HTML comment, then `# Inbox`
+     stale  : size 96, head 3c212d2d206b65707420, NULs 0; draft exit 0; verdict stale
+              evidence: line 5 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 96, head 3c212d2d206b65707420, NULs 0; draft exit 0; verdict current
+              evidence: line 5 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+PASS [inbox] INBOX.md: an HTML comment, then `# Inbox`: judged as it reads: stale exit 1; current exit 0
+
+---- [inbox] INBOX.md: two blank lines, then `# Inbox`
+     stale  : size 75, head 0d0a0d0a2320496e626f, NULs 0; draft exit 0; verdict stale
+              evidence: line 5 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 75, head 0d0a0d0a2320496e626f, NULs 0; draft exit 0; verdict current
+              evidence: line 5 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+PASS [inbox] INBOX.md: two blank lines, then `# Inbox`: judged as it reads: stale exit 1; current exit 0
+
+---- [inbox] no `# ` title: INBOX.md `#Inbox` (no space)
+     stale  : size 70, head 23496e626f780d0a0d0a, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+     current: size 70, head 23496e626f780d0a0d0a, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] no `# ` title: INBOX.md `#Inbox` (no space): stale could_not_tell/no_declared_session exit 0; current could_not_tell/no_declared_session exit 0
+
+---- [inbox] no `# ` title: INBOX.md `#<TAB>Inbox` (a CommonMark heading)
+     stale  : size 71, head 2309496e626f780d0a0d, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+     current: size 71, head 2309496e626f780d0a0d, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] no `# ` title: INBOX.md `#<TAB>Inbox` (a CommonMark heading): stale could_not_tell/no_declared_session exit 0; current could_not_tell/no_declared_session exit 0
+
+---- [inbox] no `# ` title: INBOX.md `  # Inbox` (indented 2; a CommonMark heading)
+     stale  : size 73, head 20202320496e626f780d, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+     current: size 73, head 20202320496e626f780d, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] no `# ` title: INBOX.md `  # Inbox` (indented 2; a CommonMark heading): stale could_not_tell/no_declared_session exit 0; current could_not_tell/no_declared_session exit 0
+
+---- [inbox] no `# ` title: INBOX.md with a setext title (`Inbox` / `=====`)
+     stale  : size 76, head 496e626f780d0a3d3d3d, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+     current: size 76, head 496e626f780d0a3d3d3d, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] no `# ` title: INBOX.md with a setext title (`Inbox` / `=====`): stale could_not_tell/no_declared_session exit 0; current could_not_tell/no_declared_session exit 0
+
+---- [inbox] a UTF-8 BOM twice: Out-File -Encoding utf8 of '', then Add-Content -Encoding UTF8
+     stale  : size 112, head efbbbf2320496e626f78, NULs 0; draft exit 0; verdict stale
+              evidence: line 3 declares Session 6 (`> **Last Updated:** Session 6`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 1, tree identical, state.json false
+              state import refused: 1 input(s) predate the latest session (Session 7): .agents/TASKS/INBOX.md declares Session 6. Nothing written. Update them and re-run --draft, or pass --accept-stale to import them as they stand
+     current: size 112, head efbbbf2320496e626f78, NULs 0; draft exit 0; verdict current
+              evidence: line 3 declares Session 7 (`> **Last Updated:** Session 7`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md)
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] a UTF-8 BOM twice: Out-File -Encoding utf8 of '', then Add-Content -Encoding UTF8: stale stale exit 1; current current exit 0
+
+---- [inbox] a UTF-8 BOM twice (.NET): the text itself begins with U+FEFF, Out-File -Encoding utf8
+     stale  : size 115, head efbbbfefbbbf2320496e, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+     current: size 115, head efbbbfefbbbf2320496e, NULs 0; draft exit 0; verdict could_not_tell/no_declared_session
+              evidence: names no `Session N` in its status blockquote or its headings
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+NOTE [inbox] a UTF-8 BOM twice (.NET): the text itself begins with U+FEFF, Out-File -Encoding utf8: stale could_not_tell/no_declared_session exit 0; current could_not_tell/no_declared_session exit 0
+
+---- [inbox] IF-10 +13: INBOX.md declares Session 20 (latest 7)
+     current: size 110, head 2320496e626f7820e280, NULs 0; draft exit 0; verdict could_not_tell/ahead_of_latest
+              evidence: line 3 declares Session 20 (`> **Last Updated:** Session 20`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md). It declares a session AHEAD of the latest log, so the numbers disagree and cannot say whether it is current
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+PASS [inbox] IF-10 +13: INBOX.md declares Session 20 (latest 7): could_not_tell/ahead_of_latest, bare --commit exit 0, state.json true
+
+---- [inbox] IF-10 +1: INBOX.md declares Session 8 (latest 7)
+     current: size 109, head 2320496e626f7820e280, NULs 0; draft exit 0; verdict could_not_tell/ahead_of_latest
+              evidence: line 3 declares Session 8 (`> **Last Updated:** Session 8`); the latest session log is Session 7 (.agents/SESSIONS/Session_7.md). It declares a session AHEAD of the latest log, so the numbers disagree and cannot say whether it is current
+              bare --commit exit 0, tree changed, state.json true; state.json: tasks ["A task"], objective "Ship the thing.", pick_up "Carry on."
+PASS [inbox] IF-10 +1: INBOX.md declares Session 8 (latest 7): could_not_tell/ahead_of_latest, bare --commit exit 0, state.json true
+
+SUMMARY: 32 passed, 0 failed

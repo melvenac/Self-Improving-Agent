@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index d9897bf..3cf27d4 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -151,7 +151,7 @@ function withBomCheck(text: string, encoding: "utf16le-bom" | "utf16be-bom"): De
+   if (first === -1) return { text, encoding, undecodable: null };
+   const count = text.split("\u0000").length - 1;
+   const mark = encoding === "utf16le-bom" ? "UTF-16LE" : "UTF-16BE";
+-  return { text, encoding, undecodable: `has a ${mark} byte-order mark, but the text it gives holds ${count} NUL character(s), the first at byte ${2 + first * 2}: the mark does not match the bytes, so its words cannot be read` };
++  return { text, encoding, undecodable: `has a ${mark} byte-order mark, but the text it gives holds ${count} NUL character(s), the first at byte ${2 + first}: the mark does not match the bytes, so its words cannot be read` };
+ }
+ 
+ function withCheck(buf: Buffer, encoding: "utf8" | "utf8-bom"): DecodedText {

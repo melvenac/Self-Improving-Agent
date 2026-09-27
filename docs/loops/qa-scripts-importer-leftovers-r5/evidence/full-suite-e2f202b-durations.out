@@ -1,0 +1,30 @@
+rows over 5000 ms: 39
+18433 ms  pipelines/sync/record-erasure.test.ts > flags rev 60->61 and rev 61->62, each naming the uuid removed and the session that replace
+13791 ms  trigger/hook.test.ts > the POLICY FILE is what let 299 through — raise the floor and the same call goes silent
+9866 ms  trigger/hook.test.ts > NEGATIVE: ls -la emits nothing at all — no key, no stdout, no stderr
+9135 ms  harness/cli.test.ts > exits 0 and writes the three artifacts
+8529 ms  trigger/hook.test.ts > NEGATIVE: zzqx --flurb wibble emits nothing at all — no key, no stdout, no stderr
+7679 ms  pipelines/state-import-staleness.test.ts > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept
+7584 ms  pipelines/sync/record-erasure.test.ts > does NOT flag a retention drop — the rule is recomputed from the state after the step
+7391 ms  trigger/hook.test.ts > NEGATIVE: git status --porcelain emits nothing at all — no key, no stdout, no stderr
+7387 ms  pipelines/state-import-r2.test.ts > a single-dash token that is not a known flag refuses, before or after the directory
+7386 ms  trigger/hook.test.ts > store locked by another writer
+7351 ms  trigger/hook.test.ts > store path absent
+7193 ms  trigger/hook.test.ts > past its own deadline: the work finished, and the result is still not emitted
+7187 ms  trigger/hook.test.ts > POSITIVE, at scale, through the shipped floor: additionalContext carries 299 and its ACTIO
+7124 ms  harness/cli.test.ts > writes a plan artifact that validates against the plan schema
+7014 ms  trigger/hook.test.ts > ignores a tool that is not Bash, and says nothing about it
+--- tree-currency and leftovers CLI rows:
+6324 ms  pipelines/session-start/tree-currency.test.ts > reports BEHIND with the commit count and both record revisions
+4604 ms  pipelines/session-start/tree-currency.test.ts > names the comparison so it cannot be read as the drift line
+4598 ms  pipelines/state-import-leftovers.test.ts > a bare --commit completes, and its output names the NUL bytes, the ADRs imported and the A
+4119 ms  pipelines/session-start/tree-currency.test.ts > reports DIVERGED when both sides moved
+3738 ms  pipelines/session-start/tree-currency.test.ts > RESOLVES a real last-fetch timestamp, rather than reporting it unknown
+3110 ms  pipelines/session-start/tree-currency.test.ts > finds FETCH_HEAD in a LINKED WORKTREE, where it is not under .git/
+3095 ms  pipelines/state-import-leftovers.test.ts > guard: a readable DECISIONS.md says nothing about NUL bytes
+2931 ms  pipelines/session-start/tree-currency.test.ts > SAYS SO when current — a silent pass would look like a check that did not run
+2902 ms  pipelines/session-start/tree-currency.test.ts > reports current when the clone is level with origin/master
+2728 ms  pipelines/session-start/tree-currency.test.ts > reports ahead without calling it behind, and stays quiet about staleness
+2482 ms  pipelines/session-start/tree-currency.test.ts > states that the comparison is only as fresh as the last fetch
+2418 ms  pipelines/session-start/tree-currency.test.ts > reports a record revision behind even when HEAD is level, and says both numbers
+2114 ms  pipelines/session-start/tree-currency.test.ts > reports the record revision as unknown rather than 0 when state.json is absent upstream

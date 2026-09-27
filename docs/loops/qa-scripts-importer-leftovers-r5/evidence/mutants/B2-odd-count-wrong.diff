@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index d9897bf..7ef4210 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -134,7 +134,7 @@ export function decodeText(buf: Buffer): DecodedText {
+     // swap16 throws on an odd length (QA 138, D1), so that shape is filed here:
+     // UTF-16 is two bytes a character, and the mark cannot be right about them.
+     if (buf.length % 2 === 1) {
+-      return { text: Buffer.from(buf.subarray(2, buf.length - 1)).swap16().toString("utf16le"), encoding: "utf16be-bom", undecodable: `has a UTF-16BE byte-order mark (FE FF), but an odd number of bytes (${buf.length}): UTF-16 is two bytes a character, so the mark does not match the bytes, and its words cannot be read` };
++      return { text: Buffer.from(buf.subarray(2, buf.length - 1)).swap16().toString("utf16le"), encoding: "utf16be-bom", undecodable: `has a UTF-16BE byte-order mark (FE FF), but an odd number of bytes (${buf.length - 2}): UTF-16 is two bytes a character, so the mark does not match the bytes, and its words cannot be read` };
+     }
+     return withBomCheck(Buffer.from(buf.subarray(2)).swap16().toString("utf16le"), "utf16be-bom");
+   }

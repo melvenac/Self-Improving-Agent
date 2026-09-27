@@ -1,0 +1,144 @@
+---- hold .agents/TASKS/INBOX.md share=None; --draft; SeBackupPrivilege DISABLED (HELD pid=11700 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\INBOX_md__draft_SeBackupPrivilege\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/TASKS/INBOX.md share=None; --draft; SeBackupPrivilege left as is (HELD pid=17904 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\INBOX_md__draft_none\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/TASKS/INBOX.md share=None; --commit; SeBackupPrivilege DISABLED (HELD pid=4308 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\INBOX_md__commit_SeBackupPrivilege\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/TASKS/INBOX.md share=None; --commit; SeBackupPrivilege left as is (HELD pid=4360 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\INBOX_md__commit_none\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SESSIONS/Session_7.md share=None; --draft; SeBackupPrivilege DISABLED (HELD pid=11880 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\Session_7_md__draft_SeBackupPrivilege\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SESSIONS/Session_7.md share=None; --draft; SeBackupPrivilege left as is (HELD pid=5892 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\Session_7_md__draft_none\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SESSIONS/Session_7.md share=None; --commit; SeBackupPrivilege DISABLED (HELD pid=16940 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\Session_7_md__commit_SeBackupPrivilege\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SESSIONS/Session_7.md share=None; --commit; SeBackupPrivilege left as is (HELD pid=16460 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\Session_7_md__commit_none\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/SUMMARY.md share=None; --draft; SeBackupPrivilege DISABLED (HELD pid=16568 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\SUMMARY_md__draft_SeBackupPrivilege\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/SUMMARY.md share=None; --draft; SeBackupPrivilege left as is (HELD pid=12408 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\SUMMARY_md__draft_none\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/SUMMARY.md share=None; --commit; SeBackupPrivilege DISABLED (HELD pid=12136 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\SUMMARY_md__commit_SeBackupPrivilege\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/SUMMARY.md share=None; --commit; SeBackupPrivilege left as is (HELD pid=7892 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\SUMMARY_md__commit_none\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/DECISIONS.md share=None; --draft; SeBackupPrivilege DISABLED (HELD pid=1276 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\DECISIONS_md__draft_SeBackupPrivilege\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/DECISIONS.md share=None; --draft; SeBackupPrivilege left as is (HELD pid=9028 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\DECISIONS_md__draft_none\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/DECISIONS.md share=None; --commit; SeBackupPrivilege DISABLED (HELD pid=9040 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\DECISIONS_md__commit_SeBackupPrivilege\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/SYSTEM/DECISIONS.md share=None; --commit; SeBackupPrivilege left as is (HELD pid=15540 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\DECISIONS_md__commit_none\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/state.draft.json share=None; --draft; SeBackupPrivilege DISABLED (HELD pid=8744 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Disabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\state_draft_json__draft_SeBackupPrivilege\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+---- hold .agents/state.draft.json share=None; --draft; SeBackupPrivilege left as is (HELD pid=2328 share=None access=Read mode=Open); pre-hold draft exit 1
+     PRIV: SeBackupPrivilege Back up files and directories Enabled
+     EXIT: 1
+     node:internal/modules/cjs/loader:1433
+     throw err;
+     Error: Cannot find module 'C:\qa-scratch\il153\ebusy\state_draft_json__draft_none\cand\open-brain\build\cli.js'
+     tree IDENTICAL; state.json false; archive absent
+node:fs:1948
+  binding.unlink(getValidatedPath(path));
+          ^
+
+Error: EBUSY: resource busy or locked, unlink 'C:\qa-scratch\il153\ebusy\state_draft_json__commit_SeBackupPrivilege\.agents\state.draft.json.held'
+    at unlinkSync (node:fs:1948:11)
+    at _unlinkSync (node:internal/fs/rimraf:215:14)
+    at rimrafSync (node:internal/fs/rimraf:196:7)
+    at rmSync (node:fs:1239:10)
+    at file:///C:/qa-scratch/il153/s153/ebusy-importer-qa153.mjs:28:65
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  errno: -4082,
+  code: 'EBUSY',
+  syscall: 'unlink',
+  path: 'C:\\qa-scratch\\il153\\ebusy\\state_draft_json__commit_SeBackupPrivilege\\.agents\\state.draft.json.held'
+}
+
+Node.js v22.23.2
