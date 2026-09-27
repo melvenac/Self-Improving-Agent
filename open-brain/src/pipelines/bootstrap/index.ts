@@ -199,6 +199,14 @@ export class ResidueReadBackError extends Error {}
  */
 export class ResidueUndoError extends Error {}
 
+/** The line `bootstrap move-residue` prints for a thrown error. A failed undo is not a refusal (R-BF-20, R-BF-21). */
+export function formatMoveResidueFailure(err: unknown): string {
+  if (err instanceof ResidueReadBackError) return `bootstrap move-residue — MOVED, but ${err.message}`;
+  if (err instanceof ResidueUndoError) return `bootstrap move-residue — not undone: ${err.message}`;
+  const message = err instanceof Error ? err.message : String(err);
+  return `bootstrap move-residue refused: ${message}`;
+}
+
 /**
  * Moves each residue entry of `.agents/` into a NEW folder,
  * `.agents/archive/pre-bootstrap-residue-<date>/` (then `-2`, `-3` … when that

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
 import { runSync } from "./pipelines/sync/index.js";
 import {
   scoreConfigStructure,
@@ -327,7 +326,7 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   // taken literally, never walked up: a fresh project may not be a repository
   // yet, and walking up could land in a PARENT project and scaffold that.
   const sub = args[1];
-  const { inspectProject, moveResidue, scaffold, ResidueReadBackError, ResidueUndoError } = await import("./pipelines/bootstrap/index.js");
+  const { inspectProject, moveResidue, scaffold, formatMoveResidueFailure } = await import("./pipelines/bootstrap/index.js");
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   if (sub === "check") {
@@ -350,25 +349,16 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   } else if (sub === "move-residue") {
     const opts = parseOrRefuse(COMMAND_SPECS.bootstrapMoveResidue, args.slice(2));
     try {
-      // The failed-undo path is not reachable from a fixture (QA 145 P-UNDO). A
-      // test module exporting `rename` is passed through only when this is set.
-      const hookPath = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK;
-      const rename = hookPath
-        ? (await import(pathToFileURL(hookPath).href) as { rename: (from: string, to: string) => void }).rename
-        : undefined;
-      const r = moveResidue(opts.directory ?? resolve("."), today, rename ? { rename } : {});
+      const r = moveResidue(opts.directory ?? resolve("."), today);
       console.log(`bootstrap move-residue — moved, nothing deleted`);
       console.log(`To:      ${r.to}/`);
       console.log(`Entries: ${r.entries.join(", ")}`);
       console.log(`It is local (the template gitignore ignores .agents/archive/). Delete it yourself once you have looked.`);
       process.exit(0);
     } catch (err) {
-      // A read-back mismatch comes AFTER the move: saying "refused" there was false (R-BF-12).
-      console.error(err instanceof ResidueReadBackError
-        ? `bootstrap move-residue — MOVED, but ${err.message}`
-        : err instanceof ResidueUndoError
-          ? `bootstrap move-residue — not undone: ${err.message}`
-          : `bootstrap move-residue refused: ${err instanceof Error ? err.message : String(err)}`);
+      // The words live in formatMoveResidueFailure. A read-back mismatch and a
+      // failed undo both happen after a move, so neither is printed as "refused".
+      console.error(formatMoveResidueFailure(err));
       process.exit(1);
     }
   } else if (sub === "scaffold") {
