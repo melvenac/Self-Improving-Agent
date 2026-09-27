@@ -417,8 +417,14 @@ export function checkTemplatePersonalNames(projectRoot: string): CheckResult {
   const unreadNote = unreadable.length > 0
     ? `${unreadable.length} unreadable path(s) under project-template/ — a leak there cannot be ruled out: ${unreadable.slice(0, 5).join(", ")}${unreadable.length > 5 ? ` (+${unreadable.length - 5} more)` : ""}. `
     : "";
-  // D1. An unreadable path used to return here, so a name in a file that was
-  // read never appeared. Every hit is named, and so is every unreadable path.
+  if (unreadable.length > 0) {
+    return {
+      name: "template-personal-names",
+      severity: "issue",
+      message: `${unreadNote}${scope}`,
+      report: true,
+    };
+  }
   if (hits.length > 0 || unreadable.length > 0) {
     const shown = hits.slice(0, 5).join(", ");
     const more = hits.length > 5 ? ` (+${hits.length - 5} more)` : "";
@@ -1152,16 +1158,17 @@ export function checkRetirements(projectRoot: string): CheckResult {
       const lead = `${unreadable.length} path(s) could not be read, so the scan is ${listing.source === "git" ? "incomplete" : "partial"} (${listing.label})`;
       return { name, severity: "issue", message: `${lead}: ${unreadShown}${unreadMore}`, report: true };
     }
-    const parts = [findings.join("; "), unreadShown].filter(Boolean).join("; ");
-    // D2. A finding used to replace the listing label, so FALLBACK and PARTIAL
-    // disappeared. The label stays, and D3 prints this issue.
+    const capped = [...unreadNotes, ...findings].slice(0, 6);
+    const hidden = unreadNotes.length + findings.length - capped.length;
+    const parts = capped.join("; ");
+    const more = hidden > 0 ? `; +${hidden} more` : "";
     const scanNote = unreadable.length > 0
       ? ` The scan is ${listing.source === "git" ? "incomplete" : "partial"} (${listing.label}).`
       : ` (${listing.label}).`;
     return {
       name,
       severity: "issue",
-      message: `retired names still referenced outside the record: ${parts}${unreadMore}.${scanNote}`,
+      message: `retired names still referenced outside the record: ${parts}${more}.${scanNote}`,
       report: true,
     };
   }
@@ -1377,6 +1384,18 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
   }
   if (files.length === 0 && unreadable.length === 0) {
     return { name, severity: "skip", message: "open-brain/src contains no .ts files — nothing to check" };
+  }
+  if (unreadable.length > 0) {
+    const scaleEarly = `${files.length} file(s), ${files.filter((f) => !isMemorySide(f)).length} core; excluded ${excluded} non-.ts file(s), not modules in the graph`;
+    const unreadEarly = `${unreadable.length} unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: ${unreadable.slice(0, 4).join(", ")}${unreadable.length > 4 ? ` (+${unreadable.length - 4} more)` : ""}. `;
+    return {
+      name,
+      severity: "issue",
+      message:
+        `${unreadEarly}Checked ${scaleEarly}. ` +
+        `LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.`,
+      report: true,
+    };
   }
 
   // Group 1 = type-only (erased by tsc, NOT a runtime edge). Group 2/3 = value.
