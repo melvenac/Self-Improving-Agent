@@ -10,6 +10,7 @@ import {
   scorePipelineHealth,
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
+import { formatScoreCategoryLine } from "./pipelines/sync/score-line.js";
 import { resolvePaths } from "./shared/paths.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import type { ScoreResult, CategoryScore, MemoryChecks } from "./pipelines/sync/types.js";
@@ -170,8 +171,7 @@ if (command === "sync") {
     } else {
       console.log(`\nHealth Score: ${total}/100\n`);
       for (const cat of categories) {
-        const bar = "█".repeat(Math.round((cat.score / cat.max) * 20)).padEnd(20, "░");
-        console.log(`  ${bar} ${cat.name}: ${cat.score}/${cat.max}`);
+        console.log(formatScoreCategoryLine(cat));
       }
       appendScore(paths.scoreHistory, scoreResult);
       console.log(`\nAppended to score history.`);

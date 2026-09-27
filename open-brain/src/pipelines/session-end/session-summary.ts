@@ -63,6 +63,8 @@ function findSessionDb(
 
   if (targetSessionId) {
     const unreadable: string[] = [];
+    let sawMeta = false;
+    let noMeta = false;
     for (const file of dbFiles) {
       let db: Database.Database | null = null;
       try {
@@ -71,9 +73,13 @@ function findSessionDb(
           | { session_id: string }
           | undefined;
         if (meta?.session_id === targetSessionId) return file.path;
+        if (meta) sawMeta = true;
       } catch (err) {
         // An open that throws is not "no db has this session" (SILENT 14).
-        unreadable.push(errorText(err));
+        // A readable file with no session_meta holds no session (T048-D2).
+        const msg = errorText(err);
+        if (msg.includes("no such table: session_meta")) noMeta = true;
+        else unreadable.push(msg);
       } finally {
         db?.close();
       }
@@ -81,6 +87,7 @@ function findSessionDb(
     if (unreadable.length > 0) {
       return { skipped: `unreadable while finding session db: ${unreadable.join("; ")}` };
     }
+    if (noMeta && !sawMeta) return { skipped: "holds no session" };
     return { skipped: "no db holds this session" };
   }
 
@@ -125,7 +132,10 @@ export function extractSessionSummary(
       )
       .all(...SUMMARY_EVENT_TYPES) as SessionEvent[];
 
-    if (events.length === 0) return { skipped: "no events" };
+    if (events.length === 0) {
+      const any = db.prepare("SELECT COUNT(*) AS n FROM session_events").get() as { n: number };
+      return { skipped: any.n === 0 ? "no events" : "no summary events" };
+    }
 
     // Build summary: label each event type for readability
     const parts: string[] = [];
@@ -192,6 +202,7 @@ export function getSessionSummary(
   sessionId?: string,
   sessionsDir: string = join(homedir(), ".claude", "context-mode", "sessions"),
 ): SessionSummaryResult | SessionSummarySkipped | null {
+  if (!existsSync(sessionsDir)) return { skipped: "no session db" };
   const found = findSessionDb(sessionsDir, sessionId);
   if (found && typeof found === "object") return found;
   if (!found) return { skipped: sessionId ? "no db holds this session" : "no session db" };
