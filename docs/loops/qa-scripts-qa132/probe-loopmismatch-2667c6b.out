@@ -1,0 +1,2 @@
+result={"status":"completed","loop":"t001","repoRoot":"C:\\qa-tmp\\qa132-loopmm-gHIfJz","baseSha":"015add61279d3dc65e2c1d15b36d981f5f7e2735","candidateSha":"bd04eeab5f14887909caeaa38eb55ca22837f780","evidenceSha":"8e400cbfd795e552e8d069e45174473a7ec1792b","checksPassed":true,"failure":null,"exitCode":0} evidence_written=true
+E_t.loop=t002

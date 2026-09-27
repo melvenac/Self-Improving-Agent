@@ -1,0 +1,14 @@
+control: t001, met, no order | ok=true
+(a) human-seat loop 15-slice-3 | ok=false | loop: loop must look like t001
+(a) human-seat loop loop-15-slice-3-b | ok=false | loop: loop must look like t001
+(a) traversal ../x | ok=false | loop: loop must look like t001
+(b) met + order: attributed | ok=false | acceptance.0: Unrecognized key: "order"
+(b) met + order: shown | ok=false | acceptance.0: Unrecognized key: "order"
+(b) status attributed | ok=false | acceptance.0.status: Invalid option: expected one of "met"|"unmet"|"partial"|"not_evaluated"
+(c) status pending | ok=false | acceptance.0.status: Invalid option: expected one of "met"|"unmet"|"partial"|"not_evaluated"
+(c) requirements pending | ok=false | requirements.0.status: Invalid option: expected one of "met"|"unmet"|"partial"|"not_evaluated"
+(d) status out_of_scope | ok=false | acceptance.0.status: Invalid option: expected one of "met"|"unmet"|"partial"|"not_evaluated"
+(d) top-level out_of_scope[] | ok=false | (root): Unrecognized key: "out_of_scope"
+(d) top-level invisible[] | ok=false | (root): Unrecognized key: "invisible"
+dup acceptance id | ok=false | acceptance.1.id: duplicate acceptance id "A1" in the evidence
+json acceptance.status enum = ["met","unmet","partial","not_evaluated"]
