@@ -81,7 +81,7 @@ jobs:
 
       - name: Test
         working-directory: open-brain
-        run: npm test
+        run: npm test -- --reporter=verbose
 
   # Windows, on the laptop runner (laptop-win). Opt-in: only a dispatch with windows=true runs it, so a new
   # platform cannot block D-032's merge gate while it proves itself. Its jobs are firewalled from every private

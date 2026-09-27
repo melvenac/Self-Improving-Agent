@@ -185,6 +185,47 @@ export const EvidenceSchema = z
     }
   });
 
+/**
+ * `R_t` — what the developer role SAYS it did.
+ *
+ * **Never trusted.** It is the role's account, validated for shape and then
+ * compared with the runtime's own measurement: a path `R_t.changes` claims that
+ * the measured diff does not contain, or a measured path it omits, is recorded
+ * as a finding (design §2.2 — build the thing that can disagree with you). The
+ * done-gate's inputs remain the measured diffstat and exit codes. `commands`
+ * exists because HOH-JEV §4 lists "recent commands" as done-gate state and the
+ * runtime has no other source for them — which is exactly why they are
+ * labelled as the role's claim wherever they travel.
+ */
+export const DeveloperReportSchema = z.strictObject({
+  loop: z.string().regex(/^t\d{3,}$/, "loop must look like t001"),
+  summary: z.string().min(1),
+  changes: z.array(z.strictObject({ path: z.string().min(1), what: z.string().min(1) })),
+  commands: z.array(
+    z.strictObject({ argv: z.array(z.string()).min(1), exit_code: z.number().int().nullable() }),
+  ),
+  claims: z.array(z.string().min(1)),
+});
+
+export type DeveloperReport = z.infer<typeof DeveloperReportSchema>;
+
+export function validateDeveloperReport(input: unknown): ValidationOutcome<DeveloperReport> {
+  const r = DeveloperReportSchema.safeParse(input);
+  return r.success ? { ok: true, value: r.data } : { ok: false, problems: describe(r.error.issues) };
+}
+
+/** The derived JSON Schema for `R_t`, handed to a retried developer role and written beside the others. */
+export function developerReportJsonSchema(): Record<string, unknown> {
+  return {
+    ...(z.toJSONSchema(DeveloperReportSchema, { io: "input" }) as Record<string, unknown>),
+    title: "R_t — HoH developer report",
+    description:
+      "What the developer role says it did. NEVER TRUSTED: validated for shape, then compared with the " +
+      "runtime's own measured diff, and any disagreement is recorded as a finding. " +
+      "Derived from open-brain/src/harness/schema.ts; do not edit by hand.",
+  };
+}
+
 export type Plan = z.infer<typeof PlanSchema>;
 export type Evidence = z.infer<typeof EvidenceSchema>;
 export type CheckOutcome = z.infer<typeof CheckOutcomeSchema>;

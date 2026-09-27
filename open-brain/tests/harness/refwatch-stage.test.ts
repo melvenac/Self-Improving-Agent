@@ -341,11 +341,16 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
      */
     it("D4 — deleting the checked-out branch is refused WITH a record, and the ref comes back", async () => {
       const preLoop = repo.sha();
+      let mainAtWindow = "";
       const r = await runLoop(
         config({
           roles: {
             planner: new StubPlanner(),
-            developer: sabotage(new StubDeveloper(), () => ["update-ref", "-d", "refs/heads/main"]),
+            developer: sabotage(new StubDeveloper(), () => {
+              // The value the developer window opened on: the planner's commit.
+              mainAtWindow = rawGit(repo.root, ["rev-parse", "refs/heads/main"]);
+              return ["update-ref", "-d", "refs/heads/main"];
+            }),
             qa: new StubQa(),
           },
         }),
@@ -372,7 +377,15 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
         .split("\n")
         .filter((l) => l !== "" && !l.includes("FAILED.md"));
       expect(dirty, `the tree was left dirty: ${dirty.join(" | ")}`).toEqual([]);
-      expect(preLoop).toMatch(/^[0-9a-f]{40}$/);
+
+      // CA-10.2: main's VALUE, equal to the value the window opened on — not
+      // merely "a sha". The old `expect(preLoop).toMatch(sha)` asserted a
+      // variable the loop never touched, and passed whatever main became. The
+      // pre-loop sha is a different commit (the planner committed on top), so
+      // an end state landing there reads red here.
+      expect(mainAtWindow).toMatch(/^[0-9a-f]{40}$/);
+      expect(mainAtWindow, "the probe's window value is the pre-loop sha — it cannot discriminate").not.toBe(preLoop);
+      expect(resolveRef(repo.root, "refs/heads/main")).toBe(mainAtWindow);
     });
   });
 
@@ -465,6 +478,44 @@ describe("G-041 A2 — a role that writes a ref fails the loop", { timeout: 60_0
       expect(v.deferredDelta, "the stage changed nothing, so there is no delta").toBeNull();
       expect(w.restoreDeletedDeferred(v), "it spoke when it had nothing to do").toBe("");
       expect(rawGit(repo.root, ["show-ref"]), "it wrote a ref with no delta to act on").toBe(refsBefore);
+    });
+
+    /**
+     * CA-10.1: the early restore is a compare-and-swap against ABSENCE.
+     *
+     * The ref is deleted, compared, then RE-CREATED at a different sha before
+     * the restore runs. `update-ref <ref> <sha> <zero-oid>` must refuse — the
+     * ref exists — and the restore must say so and leave it alone. With the old
+     * `null` old-value this overwrote the re-created ref silently.
+     */
+    it("restoreDeletedDeferred refuses and reports a ref re-created at a different sha, and does not overwrite it", async () => {
+      const preLoop = repo.sha();
+      repo.write("later.txt", "later\n");
+      const windowValue = repo.commitAll("main moves off the pre-loop sha");
+
+      const w = new RefWatch(repo.root);
+      w.begin("test");
+      rawGit(repo.root, ["update-ref", "-d", "refs/heads/main"]);
+      const v = w.compare();
+      expect(v.deferredDelta?.kind, "this probe is meant to produce a deletion").toBe("deleted");
+
+      rawGit(repo.root, ["update-ref", "refs/heads/main", preLoop]);
+      const note = w.restoreDeletedDeferred(v);
+      expect(note).toContain("COULD NOT BE PUT BACK");
+      expect(note).toContain("left alone rather than overwritten");
+      expect(resolveRef(repo.root, "refs/heads/main"), "the re-created ref was overwritten").toBe(preLoop);
+      expect(windowValue).not.toBe(preLoop);
+    });
+
+    it("CONTROL: with nothing re-created, the same restore puts the ref back at the window value", async () => {
+      repo.write("later.txt", "later\n");
+      const windowValue = repo.commitAll("main moves");
+      const w = new RefWatch(repo.root);
+      w.begin("test");
+      rawGit(repo.root, ["update-ref", "-d", "refs/heads/main"]);
+      const v = w.compare();
+      expect(w.restoreDeletedDeferred(v)).toContain("was put back");
+      expect(resolveRef(repo.root, "refs/heads/main")).toBe(windowValue);
     });
 
     /**
