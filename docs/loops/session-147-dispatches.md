@@ -175,3 +175,18 @@ dev agents? Worth testing?", then "write the replay brief, composer is set in in
   time from dispatch to each push. Grok's figures: record 181, candidate `a38ff92` in three rounds; tcm runs as
   listed in `t192-dispatch-qa.md`.
 - **QA:** Composer's candidate is scored by **GPT-5.6 Sol**, not Composer. The same model must not build and judge.
+
+### Record 184, first delivery (`4aeda0a`), read by the planner at 09:40Z
+
+- **Time:** started 09:33:10Z, pushed 09:35:32Z (2 min 22 s). One commit. **Zero tcm runs:** its checks were local
+  `tsc` and a 23-test subset. **It asked Aaron "Want me to proceed?"** before starting, where Grok acted on the
+  dispatch. Cursor did not report token usage.
+- **R184-1 (the runs-on test cannot fail):** `evaluateCiTestRunsOn` is hard-coded (`ctx.hosted ? ubuntu : tcm`) and
+  never evaluates the expression in `ci.yml`. Its "mutant" is a second hand-written function inside the test
+  (`evaluatePreT192`), not a mutation of the product. The only link to the real file is `ciTestRunsOnExprMatchesPin`,
+  a substring match, which the brief ruled out. **Grok's `evalRunsOn` evaluated the parsed expression.**
+- **R184-2 (claims without evidence):** "red-first rows" and a mutant are claimed, with no red commit and no CI run.
+- **R184-3 (silent fall-through, the class Grok's 181b fixed, plus one more):** a failed or unparseable `gh run view`,
+  and a zero-step job whose annotation fetch fails or does not match, all report a plain `failure`.
+- **R184-4:** a test-only evaluator shipped in `src/` (`pipelines/sync/ci-runs-on.ts`).
+- **In its favour:** it reads the billing annotation, which Grok did not; its limit line is in every message.
