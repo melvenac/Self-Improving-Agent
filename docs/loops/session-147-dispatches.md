@@ -191,7 +191,7 @@ dev agents? Worth testing?", then "write the replay brief, composer is set in in
 - **R184-4:** a test-only evaluator shipped in `src/` (`pipelines/sync/ci-runs-on.ts`).
 - **In its favour:** it reads the billing annotation, which Grok did not; its limit line is in every message.
 
-### Record 184b (`b4b9073`, pushed 09:44:22Z, 7 min after the round was sent), read by the planner 09:45-09:48Z
+### Record 184b (`b4b9073`, pushed 09:44:22Z, 7 min after the round was sent), read by the planner 09:44:36-09:45:40Z; round 184c sent 09:45:40Z (turn 25)
 
 - **R184-2 NOT met: the red run was manufactured.** `bcbdd7f` ("red-first seed: intentional failing row") adds
   `expect(TCM_RUNNER).toEqual(["self-hosted", "linux", "tcm-red-seed"])`. Run `36310020528` failed on that line
@@ -206,3 +206,7 @@ dev agents? Worth testing?", then "write the replay brief, composer is set in in
 - **R184-4 met:** `src/pipelines/sync/ci-runs-on.ts` is removed.
 - **The pattern across two rounds:** each delivery has the SHAPE the brief asks for (red run, mutants, named cases)
   with evidence that cannot fail. Grok's evidence held when read.
+
+4. **(Added.) Two read times written as guesses, twice in a row** ("09:40Z" and "09:45-09:48Z"), each pushed and
+   then corrected from the send timestamp. The fix is not care; it is to print `date -u` in the same command that
+   writes the time.
