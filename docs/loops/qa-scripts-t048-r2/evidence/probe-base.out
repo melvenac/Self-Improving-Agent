@@ -1,0 +1,139 @@
+
+===== [base] case s5 (child exit 0) =====
+ids: gone=1 omitted=2 rated=3; omitted counters before {"helpful":0,"harmful":0,"neutral":0}
+sessionEndV2 returned. result.summary={"written":true,"selfGenerated":false} feedback={"processed":1}
+  LINE Summary: written
+  LINE Feedback: 1 entries
+  LINE Invocations: 0 logged
+omitted counters after {"helpful":0,"harmful":0,"neutral":0}; rated counters {"helpful":0,"harmful":0,"neutral":1}
+feedback_log rows: [{"knowledge_id":3,"rating":"neutral","rating_method":"supplied"}]
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":2}
+  LINE Summary: skipped
+  LINE Feedback: 2 entries
+  LINE Invocations: 0 logged
+rule: helpful-untagged {"helpful":1,"harmful":0,"neutral":0} neutral-tagged {"helpful":0,"harmful":0,"neutral":1}; log [{"knowledge_id":4,"rating":"helpful","rating_method":"supplied"},{"knowledge_id":5,"rating":"neutral","rating_method":"supplied"}]
+
+===== [base] case s16 (child exit 0) =====
+-- drop-table: ids a=1 b=2
+sessionEndV2 returned. result.summary={"written":true,"selfGenerated":false} feedback={"processed":2}
+  LINE Summary: written
+  LINE Feedback: 2 entries
+  LINE Invocations: 0 logged
+   counters a {"helpful":1,"harmful":0,"neutral":0} b {"helpful":1,"harmful":0,"neutral":0}; feedback_log "THROWS SQLITE_ERROR no such table: feedback_log"
+-- trigger-abort: ids a=1 b=2
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":2}
+  LINE Summary: skipped
+  LINE Feedback: 2 entries
+  LINE Invocations: 0 logged
+   counters a {"helpful":1,"harmful":0,"neutral":0} b {"helpful":1,"harmful":0,"neutral":0}; feedback_log [{"knowledge_id":2,"rating":"helpful","rating_method":"supplied"}]
+-- no-session-id: ids a=1 b=2
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":2}
+  LINE Summary: skipped
+  LINE Feedback: 2 entries
+  LINE Invocations: 0 logged
+   counters a {"helpful":1,"harmful":0,"neutral":0} b {"helpful":1,"harmful":0,"neutral":0}; feedback_log []
+
+===== [base] case s16lock (child exit 1) =====
+-- lock held by pid 4704; id a=1
+sessionEndV2 THREW: SQLITE_BUSY database is locked
+   took 5547 ms
+--- stderr ---
+
+C:\qa-scratch\qa157\base\open-brain\node_modules\better-sqlite3\lib\methods\wrappers.js:5
+	return this[cppdb].prepare(sql, this, false);
+	                   ^
+SqliteError: disk I/O error
+    at Database.prepare (C:\qa-scratch\qa157\base\open-brain\node_modules\better-sqlite3\lib\methods\wrappers.js:5:21)
+    at counters (file:///C:/qa-scratch/qa157/scripts/probe.mjs:54:35)
+    at child (file:///C:/qa-scratch/qa157/scripts/probe.mjs:121:64)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async file:///C:/qa-scratch/qa157/scripts/probe.mjs:16:3 {
+  code: 'SQLITE_IOERR_TRUNCATE'
+}
+
+Node.js v22.23.3
+
+===== [base] case s6 (child exit 0) =====
+icacls deny read for Aaron Melven: exit 0
+missing.jsonl  read=null  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+good.jsonl     read="2026-09-27 03:21:51"  health=score 4/10 details {"hookRecency":4,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+corrupt.jsonl  read=null  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+bad-ts.jsonl   read=null  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+empty.jsonl    read=null  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+mixed.jsonl    read="2026-09-20 10:00:00"  health=score 2/10 details {"hookRecency":2,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+dir.jsonl      read=null  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+denied.jsonl   read="2026-09-20 10:00:00"  health=score 2/10 details {"hookRecency":2,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+
+===== [base] case s14 (child exit 1) =====
+--- stderr ---
+node:fs:2430
+    return binding.writeFileUtf8(
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\qa-scratch\qa157\p\base\s14\home\.claude\context-mode\sessions\bad.db'
+    at writeFileSync (node:fs:2430:20)
+    at file:///C:/qa-scratch/qa157/scripts/probe.mjs:153:39
+    at child (file:///C:/qa-scratch/qa157/scripts/probe.mjs:171:7)
+    at async file:///C:/qa-scratch/qa157/scripts/probe.mjs:16:3 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\qa-scratch\\qa157\\p\\base\\s14\\home\\.claude\\context-mode\\sessions\\bad.db'
+}
+
+Node.js v22.23.3
+
+===== [base] case s15 (child exit 0) =====
+-- garbage file (no session id)
+sessionEndV2 THREW: SQLITE_NOTADB file is not a database
+-- no session_events (plain sqlite)
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- real context-mode db, no ensureSession (no session_meta row)
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- real context-mode db, session, zero events
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- real context-mode db, only non-summary events
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- real context-mode db with events (control)
+sessionEndV2 returned. result.summary={"written":true,"selfGenerated":true} feedback={"processed":0}
+  LINE Summary: written (self-generated)
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- no sessions dir, no session id
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+
+===== [base] case hook (child exit 0) =====
+-- hook: real db for the session: exit=0 signal=null
+  OUT [session-end] Recalled ids: 2 from recall-log
+  OUT [session-end] Summary: written (self-generated)
+  OUT [session-end] Feedback: 0 entries
+  OUT [session-end] Invocations: 0 logged
+-- hook: garbage db only: exit=0 signal=null
+  OUT [session-end] Recalled ids: 2 from recall-log
+  OUT [session-end] Summary: skipped
+  OUT [session-end] Feedback: 0 entries
+  OUT [session-end] Invocations: 0 logged
+-- hook: no sessions dir: exit=0 signal=null
+  OUT [session-end] Recalled ids: 2 from recall-log
+  OUT [session-end] Summary: skipped
+  OUT [session-end] Feedback: 0 entries
+  OUT [session-end] Invocations: 0 logged
+-- hook: garbage db + no session id in payload: exit=0 signal=null
+  OUT [session-end] Recalled ids: 0 from none
+  OUT [session-end] Nothing rated: no session id (ob_set_session never ran) and no readable .recalled-entries.json (looked in 2 location(s))
+  ERR [session-end] Error: file is not a database

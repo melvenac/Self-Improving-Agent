@@ -1,0 +1,32 @@
+== run 36291877179: loop/t048-r2 @ 38b3211 runner tcm-2: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  5 failed | 1307 passed | 2 skipped (1314)
+   error lines by kind: {"AssertionError":8,"SqliteError":1,"Process":1}
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 5 names a vanished knowledge row separately from an omitted judgment
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 16 counts only a feedback_log write that landed, and names the one that threw
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 6 tells a corrupt log from an unreadable log, and the health score says which
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 14 says an unreadable session db is not 'no db holds this session'
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 15 gives each summary-skip cause its own printed reason
+== run 36292013590: loop/t048-r2 @ 5b9a403 runner tcm-2: completed success
+   Test Files  87 passed (87) | Tests  1312 passed | 2 skipped (1314)
+   error lines by kind: {}
+== run 36292064156: loop/t048-r2-mut-s5 @ 596a722 runner tcm-1: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  1 failed | 1311 passed | 2 skipped (1314)
+   error lines by kind: {"AssertionError":2,"Process":1}
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 5 names a vanished knowledge row separately from an omitted judgment
+== run 36292091960: loop/t048-r2-mut-s16 @ 136484c runner tcm-2: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  1 failed | 1311 passed | 2 skipped (1314)
+   error lines by kind: {"AssertionError":2,"Process":1}
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 16 counts only a feedback_log write that landed, and names the one that threw
+== run 36292109835: loop/t048-r2-mut-s6 @ 3afc503 runner tcm-1: completed failure
+   Test Files  2 failed | 85 passed (87) | Tests  2 failed | 1310 passed | 2 skipped (1314)
+   error lines by kind: {"AssertionError":4,"Process":1}
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 6 tells a corrupt log from an unreadable log, and the health score says which
+   FAIL tests/pipelines/sync/pipeline-health.test.ts > readLastInvocationTs > names a log with no usable timestamp as corrupt, not as a missing file
+== run 36292133183: loop/t048-r2-mut-s14 @ 0a1d1b8 runner tcm-1: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  1 failed | 1311 passed | 2 skipped (1314)
+   error lines by kind: {"AssertionError":2,"Process":1}
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 14 says an unreadable session db is not 'no db holds this session'
+== run 36292154461: loop/t048-r2-mut-s15 @ 6a59912 runner tcm-2: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  1 failed | 1311 passed | 2 skipped (1314)
+   error lines by kind: {"AssertionError":2,"Process":1}
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 15 gives each summary-skip cause its own printed reason

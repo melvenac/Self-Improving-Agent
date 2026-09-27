@@ -1,0 +1,12 @@
+[base]
+ids gone=1 refused=2 fine=3 unjudged=4
+  Summary: written
+  Recalled ids: 4 from explicit
+  Feedback: 2 entries rated
+  Invocations: 0 logged
+[cand]
+ids gone=1 refused=2 fine=3 unjudged=4
+  Summary: written
+  Recalled ids: 4 from explicit
+  Feedback: 1 entries rated
+  Invocations: 0 logged

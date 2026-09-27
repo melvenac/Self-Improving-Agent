@@ -1,0 +1,6 @@
+[base] session morning: {"written":true,"selfGenerated":false} -> "Summary: written"
+[base] session evening: {"written":false,"selfGenerated":false} -> "Summary: skipped"
+[base] vault/Summaries: 2026-09-27-qa-proj.md
+[cand] session morning: {"written":true,"selfGenerated":true} -> "Summary: written (self-generated)"
+[cand] session evening: {"written":false,"selfGenerated":true} -> "Summary: skipped (self-generated)"
+[cand] vault/Summaries: 2026-09-27-qa-proj.md

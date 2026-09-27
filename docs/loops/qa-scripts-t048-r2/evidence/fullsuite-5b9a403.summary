@@ -1,0 +1,6 @@
+ Test Files  87 passed (87)
+      Tests  1314 passed (1314)
+   Duration  194.90s (transform 4.40s, setup 1.66s, collect 15.35s, tests 507.26s, environment 28ms, prepare 16.43s)
+exit 0
+2026-09-27T04:34:55Z
+start 2026-09-27T04:31:37Z; TEMP=TMP=C:\Users\AARONM~1\AppData\Local\Temp; tree C:/qa-scratch/qa157/cand @ 5b9a403, not shallow

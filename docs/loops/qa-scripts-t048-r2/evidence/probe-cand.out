@@ -1,0 +1,137 @@
+
+===== [cand] case s5 (child exit 0) =====
+ids: gone=1 omitted=2 rated=3; omitted counters before {"helpful":0,"harmful":0,"neutral":0}
+sessionEndV2 returned. result.summary={"written":true,"selfGenerated":false} feedback={"processed":1,"vanished":[1],"omitted":[2],"notWritten":[]}
+  LINE Summary: written
+  LINE Feedback: 1 entries
+  LINE Feedback vanished: 1 (no knowledge_index row)
+  LINE Feedback omitted: 2 (no judgment)
+  LINE Invocations: 0 logged
+omitted counters after {"helpful":0,"harmful":0,"neutral":0}; rated counters {"helpful":0,"harmful":0,"neutral":1}
+feedback_log rows: [{"knowledge_id":3,"rating":"neutral","rating_method":"supplied"}]
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":2,"vanished":[],"omitted":[],"notWritten":[]}
+  LINE Summary: skipped
+  LINE Feedback: 2 entries
+  LINE Invocations: 0 logged
+rule: helpful-untagged {"helpful":1,"harmful":0,"neutral":0} neutral-tagged {"helpful":0,"harmful":0,"neutral":1}; log [{"knowledge_id":4,"rating":"helpful","rating_method":"supplied"},{"knowledge_id":5,"rating":"neutral","rating_method":"supplied"}]
+
+===== [cand] case s16 (child exit 0) =====
+-- drop-table: ids a=1 b=2
+sessionEndV2 returned. result.summary={"written":true,"selfGenerated":false} feedback={"processed":0,"vanished":[],"omitted":[],"notWritten":[{"id":1,"reason":"no such table: feedback_log"},{"id":2,"reason":"no such table: feedback_log"}]}
+  LINE Summary: written
+  LINE Feedback: 0 entries
+  LINE Feedback NOT WRITTEN: 1 (no such table: feedback_log), 2 (no such table: feedback_log)
+  LINE Invocations: 0 logged
+   counters a {"helpful":0,"harmful":0,"neutral":0} b {"helpful":0,"harmful":0,"neutral":0}; feedback_log "THROWS SQLITE_ERROR no such table: feedback_log"
+-- trigger-abort: ids a=1 b=2
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":1,"vanished":[],"omitted":[],"notWritten":[{"id":1,"reason":"qa157 trigger refuses id 1"}]}
+  LINE Summary: skipped
+  LINE Feedback: 1 entries
+  LINE Feedback NOT WRITTEN: 1 (qa157 trigger refuses id 1)
+  LINE Invocations: 0 logged
+   counters a {"helpful":0,"harmful":0,"neutral":0} b {"helpful":1,"harmful":0,"neutral":0}; feedback_log [{"knowledge_id":2,"rating":"helpful","rating_method":"supplied"}]
+-- no-session-id: ids a=1 b=2
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":2,"vanished":[],"omitted":[],"notWritten":[]}
+  LINE Summary: skipped
+  LINE Feedback: 2 entries
+  LINE Invocations: 0 logged
+   counters a {"helpful":1,"harmful":0,"neutral":0} b {"helpful":1,"harmful":0,"neutral":0}; feedback_log []
+
+===== [cand] case s16lock (child exit 0) =====
+-- lock held by pid 12368; id a=1
+sessionEndV2 returned. result.summary={"written":true,"selfGenerated":false} feedback={"processed":0,"vanished":[],"omitted":[],"notWritten":[{"id":1,"reason":"database is locked"}]}
+  LINE Summary: written
+  LINE Feedback: 0 entries
+  LINE Feedback NOT WRITTEN: 1 (database is locked)
+  LINE Invocations: 0 logged
+   took 5639 ms
+   after release: counters a {"helpful":0,"harmful":0,"neutral":0}; feedback_log []
+
+===== [cand] case s6 (child exit 0) =====
+icacls deny read for Aaron Melven: exit 0
+missing.jsonl  read=null  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"missing"}
+good.jsonl     read="2026-09-27 03:21:59"  health=score 4/10 details {"hookRecency":4,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"ran"}
+corrupt.jsonl  read="corrupt"  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"corrupt"}
+bad-ts.jsonl   read="corrupt"  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"corrupt"}
+empty.jsonl    read="corrupt"  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"corrupt"}
+mixed.jsonl    read="2026-09-20 10:00:00"  health=score 2/10 details {"hookRecency":2,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"ran"}
+dir.jsonl      read="unreadable: EISDIR: illegal operation on a directory, read"  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"unreadable"}
+denied.jsonl   read="2026-09-20 10:00:00"  health=score 2/10 details {"hookRecency":2,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"ran"}
+
+===== [cand] case s14 (child exit 1) =====
+--- stderr ---
+node:fs:2430
+    return binding.writeFileUtf8(
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\qa-scratch\qa157\p\cand\s14\home\.claude\context-mode\sessions\bad.db'
+    at writeFileSync (node:fs:2430:20)
+    at file:///C:/qa-scratch/qa157/scripts/probe.mjs:153:39
+    at child (file:///C:/qa-scratch/qa157/scripts/probe.mjs:171:7)
+    at async file:///C:/qa-scratch/qa157/scripts/probe.mjs:16:3 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\qa-scratch\\qa157\\p\\cand\\s14\\home\\.claude\\context-mode\\sessions\\bad.db'
+}
+
+Node.js v22.23.3
+
+===== [cand] case s15 (child exit 1) =====
+-- garbage file (no session id)
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false,"skip":"summary db unreadable: file is not a database"} feedback={"processed":0,"vanished":[],"omitted":[],"notWritten":[]}
+  LINE Summary: skipped — summary db unreadable: file is not a database
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+--- stderr ---
+node:fs:1948
+  binding.unlink(getValidatedPath(path));
+          ^
+
+Error: EBUSY: resource busy or locked, unlink 'C:\qa-scratch\qa157\p\cand\s15\home\.claude\context-mode\sessions\bad.db'
+    at unlinkSync (node:fs:1948:11)
+    at _unlinkSync (node:internal/fs/rimraf:215:14)
+    at rimrafSync (node:internal/fs/rimraf:196:7)
+    at node:internal/fs/rimraf:254:9
+    at Array.forEach (<anonymous>)
+    at _rmdirSync (node:internal/fs/rimraf:251:7)
+    at rimrafSync (node:internal/fs/rimraf:194:7)
+    at node:internal/fs/rimraf:254:9
+    at Array.forEach (<anonymous>)
+    at _rmdirSync (node:internal/fs/rimraf:251:7) {
+  errno: -4082,
+  code: 'EBUSY',
+  syscall: 'unlink',
+  path: 'C:\\qa-scratch\\qa157\\p\\cand\\s15\\home\\.claude\\context-mode\\sessions\\bad.db'
+}
+
+Node.js v22.23.3
+
+===== [cand] case hook (child exit 0) =====
+-- hook: real db for the session: exit=0 signal=null
+  OUT [session-end] Recalled ids: 2 from recall-log
+  OUT [session-end] Summary: written (self-generated)
+  OUT [session-end] Feedback: 0 entries
+  OUT [session-end] Feedback vanished: 1 (no knowledge_index row)
+  OUT [session-end] Feedback omitted: 2 (no judgment)
+  OUT [session-end] Invocations: 0 logged
+-- hook: garbage db only: exit=0 signal=null
+  OUT [session-end] Recalled ids: 2 from recall-log
+  OUT [session-end] Summary: skipped — unreadable while finding session db: file is not a database
+  OUT [session-end] Feedback: 0 entries
+  OUT [session-end] Feedback vanished: 1 (no knowledge_index row)
+  OUT [session-end] Feedback omitted: 2 (no judgment)
+  OUT [session-end] Invocations: 0 logged
+-- hook: no sessions dir: exit=0 signal=null
+  OUT [session-end] Recalled ids: 2 from recall-log
+  OUT [session-end] Summary: skipped — no db holds this session
+  OUT [session-end] Feedback: 0 entries
+  OUT [session-end] Feedback vanished: 1 (no knowledge_index row)
+  OUT [session-end] Feedback omitted: 2 (no judgment)
+  OUT [session-end] Invocations: 0 logged
+-- hook: garbage db + no session id in payload: exit=0 signal=null
+  OUT [session-end] Recalled ids: 0 from none
+  OUT [session-end] Nothing rated: no session id (ob_set_session never ran) and no readable .recalled-entries.json (looked in 2 location(s))
+  OUT [session-end] Summary: skipped — summary db unreadable: file is not a database
+  OUT [session-end] Feedback: 0 entries
+  OUT [session-end] Invocations: 0 logged

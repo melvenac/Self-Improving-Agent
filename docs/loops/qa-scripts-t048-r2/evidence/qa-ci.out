@@ -1,0 +1,24 @@
+== run 36294539144: qa/t048-r2-mut-hook-old-lines @ d0972fa runner tcm-2: completed success
+   Test Files  87 passed (87) | Tests  1312 passed | 2 skipped (1314)
+   error lines by kind: {}
+== run 36294540565: qa/t048-r2-mut-s5-omitted-fabricated @ a1f2419 runner tcm-1: completed failure
+   Test Files  2 failed | 85 passed (87) | Tests  4 failed | 1308 passed | 2 skipped (1314)
+   error lines by kind: {"AssertionError":8,"Process":1}
+   FAIL tests/rating-method.test.ts > rating_method > writes nothing for an entry the agent did not judge
+   FAIL tests/rating-method.test.ts > rating_method > the supplied/heuristic neutral ambiguity is gone by construction, not by labelling
+   FAIL tests/pipelines/session-end/index-v2.test.ts > sessionEndV2 > heuristic rating arm — CUT in Loop 12 (R-010) > rates nothing when the agent supplied no judgment (default: arm off)
+   FAIL tests/pipelines/session-end/index-v2.test.ts > sessionEndV2 > heuristic rating arm — CUT in Loop 12 (R-010) > cannot be switched back on, and heuristic is out of the vocabulary
+== run 36294542139: qa/t048-r2-mut-s16-counter-before-event @ 8fd1a5c runner tcm-1: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  1 failed | 1311 passed | 2 skipped (1314)
+   error lines by kind: {"AssertionError":2,"Process":1}
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 16 counts only a feedback_log write that landed, and names the one that threw
+== run 36294543682: qa/t048-r2-mut-s6-corrupt-earns-recency @ 33428ed runner tcm-1: completed success
+   Test Files  87 passed (87) | Tests  1312 passed | 2 skipped (1314)
+   error lines by kind: {}
+== run 36294545133: qa/t048-r2-mut-s14-skip-over-match @ f931c2d runner tcm-2: completed success
+   Test Files  87 passed (87) | Tests  1312 passed | 2 skipped (1314)
+   error lines by kind: {}
+== run 36294546663: qa/t048-r2-mut-s15-notadb-escapes @ 0e98ab7 runner tcm-2: completed failure
+   Test Files  1 failed | 86 passed (87) | Tests  1 failed | 1311 passed | 2 skipped (1314)
+   error lines by kind: {"SqliteError":1,"Process":1}
+   FAIL tests/t048-r2.test.ts > T-048 round 2 > SILENT 15 gives each summary-skip cause its own printed reason

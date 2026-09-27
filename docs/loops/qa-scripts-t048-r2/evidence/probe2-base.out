@@ -1,0 +1,93 @@
+
+===== [base] case s16lock (child exit 0) =====
+-- lock held by pid 2752; id a=1
+sessionEndV2 THREW: SQLITE_BUSY database is locked
+   took 5625 ms
+   after release: counters a {"helpful":0,"harmful":0,"neutral":0}; feedback_log []
+
+===== [base] case s6 (child exit 0) =====
+icacls deny read for Aaron Melven: exit 0
+locked.jsonl   read="2026-09-20 10:00:00"  health=score 2/10 details {"hookRecency":2,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+missing.jsonl  read=null  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+good.jsonl     read="2026-09-27 03:23:17"  health=score 4/10 details {"hookRecency":4,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+corrupt.jsonl  read=null  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+bad-ts.jsonl   read=null  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+empty.jsonl    read=null  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+mixed.jsonl    read="2026-09-20 10:00:00"  health=score 2/10 details {"hookRecency":2,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+dir.jsonl      read=null  health=score 0/10 details {"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+denied.jsonl   read="2026-09-20 10:00:00"  health=score 2/10 details {"hookRecency":2,"trendScore":0,"shadowScore":0,"shadowSessions":0}
+icacls on denied.jsonl: C:\qa-scratch\qa157\p\base\s6\home\logs\denied.jsonl DESKTOP-O4EGB1E\Aaron Melven:(DENY)(R) BUILTIN\Administrators:(I)(F) NT AUTHORITY\SYSTEM:(I)(F) BUILTIN\Users:(I)(RX) NT AUTHORITY\Authenticated Users:(I)(M) Successfully processed 1 files; Failed processing 0 files 
+
+===== [base] case s14 (child exit 0) =====
+-- garbage file + target
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+   bad.db deletable after session end: NO, EBUSY (a handle is still open)
+-- real db, other session + target
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- garbage + real db FOR target
+sessionEndV2 returned. result.summary={"written":true,"selfGenerated":true} feedback={"processed":0}
+  LINE Summary: written (self-generated)
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+   bad.db deletable after session end: NO, EBUSY (a handle is still open)
+-- zero-byte .db + target
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- valid sqlite, not a session db + target
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- sessions dir missing + target
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- real db, target in 2nd session_meta row
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+
+===== [base] case s15 (child exit 0) =====
+-- garbage file (no session id)
+sessionEndV2 THREW: SQLITE_NOTADB file is not a database
+   bad.db deletable after session end: yes
+-- no session_events (plain sqlite)
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- real context-mode db, no ensureSession (no session_meta row)
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- real context-mode db, session, zero events
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- real context-mode db, only non-summary events
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- real context-mode db with events (control)
+sessionEndV2 returned. result.summary={"written":true,"selfGenerated":true} feedback={"processed":0}
+  LINE Summary: written (self-generated)
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged
+-- no sessions dir, no session id
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false} feedback={"processed":0}
+  LINE Summary: skipped
+  LINE Feedback: 0 entries
+  LINE Invocations: 0 logged

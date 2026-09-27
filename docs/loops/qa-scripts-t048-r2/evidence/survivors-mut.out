@@ -1,0 +1,45 @@
+hook-old-lines build 0 @ d0972fa
+
+===== [mut-hook-old-lines] case hook (child exit 0) =====
+-- hook: real db for the session: exit=0 signal=null
+  OUT [session-end] Recalled ids: 2 from recall-log
+  OUT [session-end] Summary: written (self-generated)
+  OUT [session-end] Feedback: 0 entries
+  OUT [session-end] Invocations: 0 logged
+-- hook: garbage db only: exit=0 signal=null
+  OUT [session-end] Recalled ids: 2 from recall-log
+  OUT [session-end] Summary: skipped
+  OUT [session-end] Feedback: 0 entries
+  OUT [session-end] Invocations: 0 logged
+-- hook: no sessions dir: exit=0 signal=null
+  OUT [session-end] Recalled ids: 2 from recall-log
+  OUT [session-end] Summary: skipped
+  OUT [session-end] Feedback: 0 entries
+  OUT [session-end] Invocations: 0 logged
+-- hook: garbage db + no session id in payload: exit=0 signal=null
+  OUT [session-end] Recalled ids: 0 from none
+  OUT [session-end] Nothing rated: no session id (ob_set_session never ran) and no readable .recalled-entries.json (looked in 2 location(s))
+  OUT [session-end] Summary: skipped
+  OUT [session-end] Feedback: 0 entries
+  OUT [session-end] Invocations: 0 logged
+s6-corrupt-earns-recency build 0 @ 33428ed
+===== [mut-s6-corrupt-earns-recency] invocation log missing =====
+      ░░░░░░░░░░░░░░░░░░░░ Pipeline Health: 0/10
+    {"name":"Pipeline Health","score":0,"max":10,"details":{"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"missing"}}
+      Pipeline Health: 0/10 (0%)
+===== [mut-s6-corrupt-earns-recency] invocation log corrupt =====
+      ████████░░░░░░░░░░░░ Pipeline Health: 4/10
+    {"name":"Pipeline Health","score":4,"max":10,"details":{"hookRecency":4,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"corrupt"}}
+      Pipeline Health: 4/10 (40%)
+===== [mut-s6-corrupt-earns-recency] invocation log unreadable =====
+      ████████░░░░░░░░░░░░ Pipeline Health: 4/10
+    {"name":"Pipeline Health","score":4,"max":10,"details":{"hookRecency":4,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"unreadable"}}
+      Pipeline Health: 4/10 (40%)
+s14-skip-over-match build 0 @ f931c2d
+-- garbage + real db FOR target
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false,"skip":"unreadable while finding session db: file is not a database"} feedback={"processed":0,"vanished":[],"omitted":[],"notWritten":[]}
+  LINE Summary: skipped — unreadable while finding session db: file is not a database
+--
+-- real db FOR target + NEWER garbage
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":false,"skip":"unreadable while finding session db: file is not a database"} feedback={"processed":0,"vanished":[],"omitted":[],"notWritten":[]}
+  LINE Summary: skipped — unreadable while finding session db: file is not a database

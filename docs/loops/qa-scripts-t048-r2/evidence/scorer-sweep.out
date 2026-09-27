@@ -1,0 +1,17 @@
+null                                             base 0 cand 0 invocationLog=missing
+"2026-09-27T04:34:03.372Z"                       base 4 cand 4 invocationLog=ran
+"2026-09-27 03:35:03"                            base 4 cand 4 invocationLog=ran
+"2026-09-26T05:35:03.372Z"                       base 4 cand 4 invocationLog=ran
+"2026-09-26T03:35:03.372Z"                       base 2 cand 2 invocationLog=ran
+"2026-09-21T04:35:03.372Z"                       base 2 cand 2 invocationLog=ran
+"2026-09-19T04:35:03.372Z"                       base 0 cand 0 invocationLog=ran
+"2026-09-27T05:35:03.372Z"                       base 4 cand 4 invocationLog=ran
+"corrupt"                                        base 0 cand 0 invocationLog=corrupt
+"unreadable: EBUSY: resource busy or locked"     base 0 cand 0 invocationLog=unreadable
+"unreadable"                                     base 0 cand 0 invocationLog=unreadable
+"corrupt: x"                                     base 0 cand 0 invocationLog=corrupt
+""                                               base 0 cand 0 invocationLog=ran
+"garbage"                                        base 0 cand 0 invocationLog=ran
+"not a date"                                     base 0 cand 0 invocationLog=ran
+"2026-13-45"                                     base 0 cand 0 invocationLog=ran
+256 inputs, 0 differ in anything but the added details.invocationLog

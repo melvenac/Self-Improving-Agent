@@ -1,0 +1,63 @@
+
+===== [cand] invocation log missing =====
+$ open-brain sync --check --score (exit 1)
+    Health Score: 48/100
+      █████████████░░░░░░░ Config & Structure: 16/25
+      ██████░░░░░░░░░░░░░░ Knowledge Quality: 7/25
+      ████████████████████ Staleness: 20/20
+      █████░░░░░░░░░░░░░░░ Coverage: 5/20
+      ░░░░░░░░░░░░░░░░░░░░ Pipeline Health: 0/10
+    Appended to score history.
+$ open-brain sync --check --score --json (exit 1)
+    {"name":"Pipeline Health","score":0,"max":10,"details":{"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"missing"}}
+$ ob_score (handleScore):
+    Health Score: 48/100
+      Config & Structure: 16/25 (64%)
+      Knowledge Quality: 7/25 (28%)
+      Staleness: 20/20 (100%)
+      Coverage: 5/20 (25%)
+      Pipeline Health: 0/10 (0%)
+    Appended to score history.
+    Trend: stable
+
+===== [cand] invocation log corrupt =====
+$ open-brain sync --check --score (exit 1)
+    Health Score: 48/100
+      █████████████░░░░░░░ Config & Structure: 16/25
+      ██████░░░░░░░░░░░░░░ Knowledge Quality: 7/25
+      ████████████████████ Staleness: 20/20
+      █████░░░░░░░░░░░░░░░ Coverage: 5/20
+      ░░░░░░░░░░░░░░░░░░░░ Pipeline Health: 0/10
+    Appended to score history.
+$ open-brain sync --check --score --json (exit 1)
+    {"name":"Pipeline Health","score":0,"max":10,"details":{"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"corrupt"}}
+$ ob_score (handleScore):
+    Health Score: 48/100
+      Config & Structure: 16/25 (64%)
+      Knowledge Quality: 7/25 (28%)
+      Staleness: 20/20 (100%)
+      Coverage: 5/20 (25%)
+      Pipeline Health: 0/10 (0%)
+    Appended to score history.
+    Trend: stable
+
+===== [cand] invocation log unreadable =====
+$ open-brain sync --check --score (exit 1)
+    Health Score: 48/100
+      █████████████░░░░░░░ Config & Structure: 16/25
+      ██████░░░░░░░░░░░░░░ Knowledge Quality: 7/25
+      ████████████████████ Staleness: 20/20
+      █████░░░░░░░░░░░░░░░ Coverage: 5/20
+      ░░░░░░░░░░░░░░░░░░░░ Pipeline Health: 0/10
+    Appended to score history.
+$ open-brain sync --check --score --json (exit 1)
+    {"name":"Pipeline Health","score":0,"max":10,"details":{"hookRecency":0,"trendScore":0,"shadowScore":0,"shadowSessions":0,"invocationLog":"unreadable"}}
+$ ob_score (handleScore):
+    Health Score: 48/100
+      Config & Structure: 16/25 (64%)
+      Knowledge Quality: 7/25 (28%)
+      Staleness: 20/20 (100%)
+      Coverage: 5/20 (25%)
+      Pipeline Health: 0/10 (0%)
+    Appended to score history.
+    Trend: stable

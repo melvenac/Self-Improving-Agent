@@ -1,0 +1,12 @@
+== hook-old-lines: diff non-empty; tsc exit 0; Tests  84 passed (84); restored: true
+== s5-omitted-fabricated: diff non-empty; tsc exit 0; Tests  4 failed | 80 passed (84); restored: true
+   FAIL  tests/rating-method.test.ts > rating_method > writes nothing for an entry the agent did not judge
+   FAIL  tests/rating-method.test.ts > rating_method > the supplied/heuristic neutral ambiguity is gone by construction, not by labelling
+   FAIL  tests/pipelines/session-end/index-v2.test.ts > sessionEndV2 > heuristic rating arm — CUT in Loop 12 (R-010) > rates nothing when the agent supplied no judgment (default: arm off)
+   FAIL  tests/pipelines/session-end/index-v2.test.ts > sessionEndV2 > heuristic rating arm — CUT in Loop 12 (R-010) > cannot be switched back on, and heuristic is out of the vocabulary
+== s16-counter-before-event: diff non-empty; tsc exit 0; Tests  1 failed | 83 passed (84); restored: true
+   FAIL  tests/t048-r2.test.ts > T-048 round 2 > SILENT 16 counts only a feedback_log write that landed, and names the one that threw
+== s6-corrupt-earns-recency: diff non-empty; tsc exit 0; Tests  84 passed (84); restored: true
+== s14-skip-over-match: diff non-empty; tsc exit 0; Tests  84 passed (84); restored: true
+== s15-notadb-escapes: diff non-empty; tsc exit 0; Tests  1 failed | 83 passed (84); restored: true
+   FAIL  tests/t048-r2.test.ts > T-048 round 2 > SILENT 15 gives each summary-skip cause its own printed reason

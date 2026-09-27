@@ -1,0 +1,6 @@
+getSessionSummary(target): null; bad.db deletable
+getSessionSummary(no id): null; bad.db deletable
+extractSessionSummary(garbage): THREW file is not a database; bad.db deletable
+getSessionSummary(target): {"skipped":"unreadable while finding session db: file is not a database"}; bad.db deletable
+getSessionSummary(no id): {"skipped":"summary db unreadable: file is not a database"}; bad.db deletable
+extractSessionSummary(garbage): {"skipped":"summary db unreadable: file is not a database"}; bad.db deletable

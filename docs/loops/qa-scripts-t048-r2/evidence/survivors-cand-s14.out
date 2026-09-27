@@ -1,0 +1,7 @@
+-- garbage + real db FOR target
+sessionEndV2 returned. result.summary={"written":true,"selfGenerated":true} feedback={"processed":0,"vanished":[],"omitted":[],"notWritten":[]}
+  LINE Summary: written (self-generated)
+--
+-- real db FOR target + NEWER garbage
+sessionEndV2 returned. result.summary={"written":false,"selfGenerated":true} feedback={"processed":0,"vanished":[],"omitted":[],"notWritten":[]}
+  LINE Summary: skipped (self-generated)

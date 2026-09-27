@@ -1,0 +1,6 @@
+push-qa: pushed and read back: qa/t048-r2-mut-hook-old-lines d0972fab856e781f338251be2d08a5d033e20c21
+push-qa: pushed and read back: qa/t048-r2-mut-s5-omitted-fabricated a1f2419494308c319aa6c60e30c53beffbf59f98
+push-qa: pushed and read back: qa/t048-r2-mut-s16-counter-before-event 8fd1a5c4021804f23a0e1e93dde7701c1291ffa8
+push-qa: pushed and read back: qa/t048-r2-mut-s6-corrupt-earns-recency 33428ed187a9a0a21020282e10473b47e1f196f1
+push-qa: pushed and read back: qa/t048-r2-mut-s14-skip-over-match f931c2ddb5e9f63aa5b9d0f78fe29b805616b9da
+push-qa: pushed and read back: qa/t048-r2-mut-s15-notadb-escapes 0e98ab77126cb9de9e5677a4d75738a6b9a4d044
