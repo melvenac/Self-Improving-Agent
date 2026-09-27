@@ -215,12 +215,6 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   // lands. Registration only checks that the id is this server's; it does
   // not compare checkouts. A null checkout (a legacy session record) is
   // not refused.
-  if (mine && mine.checkout != null && mine.checkout !== checkout) {
-    return refuse(
-      before,
-      `session ${uuid} is recorded under checkout ${mine.checkout}, and this write is checkout ${checkout}: a different checkout's recorded session is refused`,
-    );
-  }
   const effectiveSession = mine ? mine.n : options.session;
   const applied: WriteResult["applied"] = [];
   const removedGaps: string[] = [];
