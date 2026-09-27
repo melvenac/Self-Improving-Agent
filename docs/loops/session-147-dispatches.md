@@ -347,3 +347,25 @@ This check makes it a rule. The record: T-193 (rev 140).
   test in this section.**
 - The one remaining doctor FAIL ("plugin cache integrity", `scripts/` missing) is upstream packaging: neither
   install folder has `scripts/`.
+
+### Record 185 (Composer, `f590448`; mutant `3b63a93`): ACCEPTED at a planner boundary check, written 11:29:50Z
+
+**No QA seat could run** (launching QA needs Aaron, who was asleep), so the planner ran Composer's harness itself,
+from `origin/loop/qa-queue-restore`, against `origin/master`'s `qa-queue.ps1` (old), the candidate (new) and the mutant:
+- old: `restore_old_untracked_block_expect item2_on_shaA=False` (the bug reproduced);
+  `restore_old_locked_generation_expect no_run_and_failed=False`;
+- new: `item2_on_shaA=True`; `no_run_and_failed=True`, with `restore_failed=1 run9997=0`;
+- mutant (read-back removed): `no_run_and_failed=False`, with `restore_failed=0 run9997=1`. Killed.
+
+The product diff was read: `-Checkout` resolves the SHA, checks out with `-f` and reads HEAD back; the per-driver
+restore does `-f`, reads back, logs `restore_failed.<n>` with both SHAs and git's first error line, then aborts. **These
+match Composer's reported lines. Its first live round under D-060 had real evidence on first delivery.**
+
+**Two harness defects (round 185b, not blocking the product):**
+- **R185-1:** the harness exits 0 when an `_expect` line is False. The mutant run printed `no_run_and_failed=False`
+  and exited 0. Anything reading its exit status passes the mutant.
+- **R185-2:** `Get-Content` of `queue.log` races the detached queue, which still has the file open. The planner's
+  first run died with `IOException … being used by another process`; the second completed.
+
+**Morning:** re-copy `qa-queue.ps1` from `f590448` to both QA machines, clean both QA trees, and relaunch 161+178
+(laptop) and 182+183 (QA PC). Each line is Aaron's, dry-run first.
