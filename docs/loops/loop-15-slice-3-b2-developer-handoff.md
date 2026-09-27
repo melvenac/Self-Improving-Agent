@@ -53,8 +53,14 @@ GitNexus in this worktree is 395 commits behind (`ob_sync`). Callers above were 
 
 ## tcm
 
-At most 8 runs, no `windows=true`. Run ids go in the next handoff commit after they exist.
+Seven runs, no `windows=true`. Each is `workflow_dispatch` on the self-hosted linux tcm runner except the green, which is the pull-request run for #187. This handoff commit is the eighth: it is pushed to the same PR and is not dispatched again.
 
-- Red: `loop/15-slice-3-candidate-b2-red` @ `043fb8b`
-- Green: `loop/15-slice-3-candidate-b2` at the product commit
-- Mutants, each a product edit on its own branch off that commit, not in this history: accept a traversal loop id; accept `met` with no `order`; drop `pending`; merge the two declared lists; skip the loop comparison
+- **Green** `36316975390` success. `loop/15-slice-3-candidate-b2` @ `8c7769ff6c5c16cacdb7b08cd47144af04d15ef0`. Test Files 122 passed. Tests **1699 passed | 6 skipped (1705)**. https://github.com/melvenac/Self-Improving-Agent/actions/runs/36316975390
+- **Red** `36316975271` failure. `loop/15-slice-3-candidate-b2-red` @ `043fb8b1a128d66a1061c22cfd0561442a853352`. Test Files 1 failed | 121 passed. Tests **23 failed | 1676 passed | 6 skipped (1705)**. All 23 FAIL lines are `b2-et.test.ts`: human-seat ids refused as `t001`; `order` unrecognized; `met` with no `order` accepted; `pending` an invalid option; parser rows `no parser`; BE-6; `validate` an unknown subcommand; BE-1.3 `t002` completed with `E_t.loop=t002`; BE-1.3 human-seat `schema-cap-exhausted`; BE-2.4 unrecognized `order`; BE-3.2 invalid `pending`. https://github.com/melvenac/Self-Improving-Agent/actions/runs/36316975271
+- **mut-a** `36316976945` failure. `loop/15-slice-3-candidate-b2-mut-a` @ `2ae7201f83458d093e6742ca81844f2c460c0457`. Pattern widened to `.+`. **5 failed | 1694 passed | 6 skipped.** FAIL: BE-1.1 `" "`, `a/b`, `a\\b`, `..`, `../x` (accepted). Empty and newline stayed green. https://github.com/melvenac/Self-Improving-Agent/actions/runs/36316976945
+- **mut-b** `36316978635` failure. `loop/15-slice-3-candidate-b2-mut-b` @ `594d044ae8fca61d41ae4215a904460ae9a9541a`. The required-on-`met` refinement deleted. **2 failed | 1697 passed | 6 skipped.** FAIL: BE-2.2 `ACCEPTED` (met with no order). Also BE-7.1, whose invalid file is that same met row, so the CLI and the schema fail together. https://github.com/melvenac/Self-Improving-Agent/actions/runs/36316978635
+- **mut-c** `36316980342` failure. `loop/15-slice-3-candidate-b2-mut-c` @ `dec9e99c15807c7f38bcc6a167d15f592ebd32b5`. `pending` dropped from the acceptance enum. tsc ran, no TS errors. **5 failed | 1694 passed | 6 skipped.** FAIL: BE-2.1, BE-2.3, BE-3.1 (`expected met|unmet|partial|not_evaluated`), BE-6, BE-3.2. https://github.com/melvenac/Self-Improving-Agent/actions/runs/36316980342
+- **mut-d** `36316982075` failure. `loop/15-slice-3-candidate-b2-mut-d` @ `9fe3f5915720d6f01253580bbe37add1f7a855e3`. `parseDeclared` concatenates the two lists into `unrunnable`. **3 failed | 1696 passed | 6 skipped.** FAIL: BE-4.2 (lists not separate), BE-4.4 (empty unrunnable came back as BC-1..BC-5), BE-6. https://github.com/melvenac/Self-Improving-Agent/actions/runs/36316982075
+- **mut-loop** `36316983679` failure. `loop/15-slice-3-candidate-b2-mut-loop` @ `0e66f2ca795bb8b8b4c7a8e04aa9773f1b85ee92`. The runtime loop comparison removed. **2 failed | 1697 passed | 6 skipped.** Both BE-1.3: status `completed`, `code=none`, and the t002 row names `E_t.loop=t002`. https://github.com/melvenac/Self-Improving-Agent/actions/runs/36316983679
+
+Mutant branches are product edits off `8c7769f` and are not in this history. They are not for merge. PR: https://github.com/melvenac/Self-Improving-Agent/pull/187
