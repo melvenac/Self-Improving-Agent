@@ -1,0 +1,8 @@
+ob_state applied
+Revision: 133 → 134
+Applied (1):
+  add_decision D-051
+Dropped done tasks (retention 3 sessions): none
+NOTE: no registered session: this write is not attributed and sessions[] is unchanged (set_handoff would refuse)
+Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+sessions[] 1 -> 1

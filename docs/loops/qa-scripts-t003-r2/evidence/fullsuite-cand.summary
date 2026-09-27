@@ -1,0 +1,12 @@
+TEMP=C:\Users\Aaron\AppData\Local\Temp start 2026-09-27T04:59:43Z
+rc=1 end 2026-09-27T05:02:34Z
+     → Test timed out in 5000ms.
+     → Test timed out in 5000ms.
+ FAIL  tests/pipelines/detach.test.ts > detachToUpstream > REFUSES when HEAD carries commits origin/master does not — the work-loss case
+Error: Test timed out in 5000ms.
+ FAIL  tests/pipelines/detach.test.ts > detachToUpstream > --force proceeds past that refusal, and only then
+Error: Test timed out in 5000ms.
+ Test Files  1 failed | 88 passed (89)
+      Tests  2 failed | 1336 passed (1338)
+   Start at  23:59:46
+   Duration  168.18s (transform 5.23s, setup 3.71s, collect 26.44s, tests 953.66s, environment 69ms, prepare 36.45s)

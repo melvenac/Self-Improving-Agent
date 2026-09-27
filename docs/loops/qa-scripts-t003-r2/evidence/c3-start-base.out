@@ -1,0 +1,7 @@
+# c3-start on base
+INFO    the OTHER session's /start (no proof in this process): Log: C:\qa-scratch\t003r2\r142-base-c3-start\c3-proj\.agents\SESSIONS\Session_1.md / Session ID: 0be70be7-dddd-4eee-8fff-000000000be7; logs: Session_1.md
+BROKEN  P7b a second session's ob_start with no proof does not take the other session's id or log
+        Session #1 (existing log for this session id — reused, nothing created) / Log: C:\qa-scratch\t003r2\r142-base-c3-start\c3-proj\.agents\SESSIONS\Session_1.md / Session ID: 0be70be7-dddd-4eee-8fff-000000000be7
+HOLDS   P7c with a proof, ob_start stamps the proven id, not the newest transcript's
+        Log: C:\qa-scratch\t003r2\r142-base-c3-start\c3-proj\.agents\SESSIONS\Session_2.md / Session ID: 5e1f5e1f-aaaa-4bbb-8ccc-000000005e1f
+INFO    P5c a claim that is the proven id in upper case: refused — ob_set_session refused: 5E1F5E1F-AAAA-4BBB-8CCC-000000005E1F is not this server's session: this server's parent process 6720 is session 5e1f5e1f-aaaa-4bbb-8ccc-

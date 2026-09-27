@@ -1,0 +1,7 @@
+# c3-start on cand
+INFO    the OTHER session's /start (no proof in this process): Log: C:\qa-scratch\t003r2\r142-cand-c3-start\c3-proj\.agents\SESSIONS\Session_1.md / Session ID: none — no session proof for this server's parent process 9404 (C:\qa-scratch\t003r2\r142-cand-c3-start\c3-store\by-pid\9404.json absent: the SessionStart hook did not write one, or SessionEnd removed it); logs: Session_1.md
+HOLDS   P7b a second session's ob_start with no proof does not take the other session's id or log
+        Log: C:\qa-scratch\t003r2\r142-cand-c3-start\c3-proj\.agents\SESSIONS\Session_2.md / Session ID: none — no session proof for this server's parent process 9404 (C:\qa-scratch\t003r2\r142-cand-c3-start\c3-store\by-pid\9404.json absent: the SessionStart hook did not write one, or SessionEnd removed it)
+HOLDS   P7c with a proof, ob_start stamps the proven id, not the newest transcript's
+        Log: C:\qa-scratch\t003r2\r142-cand-c3-start\c3-proj\.agents\SESSIONS\Session_3.md / Session ID: 5e1f5e1f-aaaa-4bbb-8ccc-000000005e1f
+INFO    P5c a claim that is the proven id in upper case: refused — ob_set_session refused: 5E1F5E1F-AAAA-4BBB-8CCC-000000005E1F is not this server's session: this server's parent process 9404 is session 5e1f5e1f-aaaa-4bbb-8ccc-

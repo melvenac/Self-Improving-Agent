@@ -1,0 +1,79 @@
+Note: switching to '7331a208213c6ef9ebd709db48d91b1f04625e1d'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HOLDS   R1a extra writer OPTIONS first_rev/firstRev/closed_rev/rev are ignored: first_rev = the file's revision + 1
+        ok rev 133->134 superseded=handoff developer@74 (developer, legacy, session 74); session fr=134 handoff fr=134, file rev before 133
+HOLDS   R1b op set_handoff+first_rev is refused
+        REFUSED: ops[0] invalid at $: Unrecognized key: "first_rev"
+HOLDS   R1b op close_task+closed_rev is refused
+        REFUSED: ops[0] invalid at $: Unrecognized key: "closed_rev"
+HOLDS   R1b op open_task+closed_rev is refused
+        REFUSED: ops[0] invalid at $: Unrecognized key: "closed_rev"
+HOLDS   R1b op reopen_task+closed_rev is refused
+        REFUSED: ops[0] invalid at $: Unrecognized key: "closed_rev"
+HOLDS   R1c a recorded session writing later under another number keeps its first_rev (not restamped)
+        ok rev 137->138; fr=134 n=300
+HOLDS   R1d expected_revision other than the file's is refused (first_rev cannot come from it)
+        REFUSED: revision mismatch: expected_revision 5 but .agents/state.json is at revision 138 — re-read and retry
+HOLDS   R1e a dry run first does not fix a session's first_rev
+        ok rev 138->139
+HOLDS   R1f closed_rev = the closing write's revision; reopen clears it; a re-close (numbered 5) sets the LATER revision
+        close ok rev 134->135 cr=135; reopen cr=null; re-close ok rev 136->137 cr=137
+BROKEN  R1g ob_state (server handler) with extra first_rev/closed_rev/session_uuid/checkout args: writer-assigned, registered uuid, checkout = root basename
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing Revision: 137 (unchanged) Nothing written. No proven session (T-003): no s; session undefined
+HOLDS   R2a ONE write numbered 1124 drops no done task
+        ok rev 135->136; done before T-157(cr=null),T-189(cr=null),T-9201(cr=135),T-9202(cr=135); after T-157(cr=null),T-189(cr=null),T-9201(cr=135),T-9202(cr=135)
+HOLDS   R2b an unattributed write numbered 99999 drops no done task
+        ok rev 136->137
+HOLDS   R2c a SECOND distinct session (numbered 2) still drops none (2 < 3)
+        ok rev 137->138
+HOLDS   R2d the THIRD distinct session drops the two uncited done tasks T-9201/T-9202 (and the two legacy done tasks only if uncited)
+        ok rev 138->139 dropped=T-9201,T-9202 kept-cited=T-157,T-189
+HOLDS   R2e ONE session writing 3 times, numbered 1124 / 5000 / 1, ages the done task by one session only
+        dropped: none
+HOLDS   R3a A2: numbered 11 apart, nothing between: the first is KEPT (a number gap ages nothing)
+        ok rev 134->135; qa@75[legacy]fr=null | planner@109[legacy]fr=null | developer@200[sia-builder]fr=134 | developer@211[sia-builder]fr=135
+HOLDS   R3b A5: a jump to 500 drops no keyed entry (only the legacy qa@75 leaves, by R179-3)
+        ok rev 136->137 superseded=handoff qa@75 (qa, legacy, session 75)
+HOLDS   R3c the real boundary: 10 distinct sessions first-wrote after E (numbered 601, then 50 down to 42): E kept
+        last write ok rev 143->144; E present: true
+HOLDS   R3c the real boundary: 11 distinct sessions first-wrote after E (numbered 601, then 50 down to 41): E dropped
+        last write ok rev 144->145 superseded=handoff 00000600-0000-4000-8000-000000000600 (developer, sia-builder, session 600);session 00000600-0000-4000-8000-000000000600 (developer, sia-builder, session 600); E present: false
+HOLDS   R3d after 1124 then 125: lastSession, newest per (seat,checkout) and newest for the seat are 125's (write order), not 1124's
+        last n=125; newest [sia-builder] n=125; forSeat n=125
+HOLDS   R3e a later session numbered 6 (T-164 local number) is the newest and the last
+        last n=6
+BROKEN  P1 ob_set_session(a uuid recorded under ANOTHER checkout, project_dir = this root) is refused and the previous registration kept
+        ob_set_session refused: this server cannot prove its session (no session proof for this server's parent process 6164 (C:\qa-scratch\t003r2\r134-cand\c1r2-store\by-pid\6164.json absent: the SessionStart hook did not write one, or SessionEnd removed it)). Nothing registered. Until it can, attributed w
+HOLDS   P2 registering the other checkout's uuid with project_dir = a SUBDIRECTORY (no record there), then ob_state on the root, cannot replace its handoff
+        set_session: ob_set_session refused: this server cannot prove its session (no session proof for this server's parent process 6164 (C:
+        ob_state: ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no regis
+        victim now: "victim in sia-builder" checkout sia-builder
+HOLDS   P3 registering with project_dir = the victim's OWN checkout (basename matches), then ob_state on THIS root, cannot replace its handoff
+        set_session: ob_set_session refused: this server cannot prove its session (no session proof for this server's parent process 6164 (C:
+        ob_state: ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no regis
+        victim now: "victim in sia-builder" checkout sia-builder
+HOLDS   P4 no project_dir, server cwd a subdirectory: the other checkout's uuid cannot be registered and used
+        set_session: ob_set_session refused: this server cannot prove its session (no session proof for this server's parent process 6164 (C:
+        victim now: "victim in sia-builder" checkout sia-builder
+INFO  P5 registering the legacy session uuid (22631f4e, n 76, checkout null): refused; after one write its record is n 76, checkout null, seat planner, first_rev null; legacy planner handoff still present: true
+HOLDS   L1 a write with no set_handoff removes no legacy handoff; qa's first keyed handoff removes qa@75 only
+        before qa@75,developer@74,planner@109; r1 ok rev 133->134; r2 ok rev 134->135 superseded=handoff qa@75 (qa, legacy, session 75); after developer@74,planner@109
+HOLDS   L2 after 13+ keyed sessions (12 planner, in 12 checkouts), the legacy SESSION record (planner, n 76) is still there
+        legacy sessions: 76:planner; 15 sessions
+
+2 BROKEN

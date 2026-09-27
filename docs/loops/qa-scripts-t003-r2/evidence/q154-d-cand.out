@@ -1,0 +1,42 @@
+# q154-d on cand
+INFO    A0 the OTHER session (proved) ran ob_start: Session #1 / Session ID: 0be70be7-dddd-4eee-8fff-000000000be7
+INFO    A0 discovery, asked directly, would return: 0be70be7-dddd-4eee-8fff-000000000be7
+HOLDS   A1 no proof: ob_start prints 'Session ID: none — <reason>', does not reuse the other session's log, and stamps no id
+        Session #2 / Log: C:\qa-scratch\t003r2\q154-cand\d-proj\.agents\SESSIONS\Session_2.md / Session ID: none — no session proof for this server's parent process 11164 (C:\qa-scratch\t003r2\q154-cand\d-store\by-pid\11164.json absent: the SessionStart hook did not write one, or SessionEnd removed it)
+        logs: Session_1.md, Session_2.md; the other session's Session_1.md still carries its own id: true
+HOLDS   A2 a proof holding JSON null: ob_start names it ('not a session record') and discovers nothing
+        Session ID: none — the session proof C:\qa-scratch\t003r2\q154-cand\d-store\by-pid\11164.json is not a session record
+HOLDS   A3 no SESSIONS dir (the skipped-log branch): 'Session ID: none — <reason>' there too
+        Session log: no .agents/SESSIONS/ dir — log not created / Session ID: none — no session proof for this server's parent process 11164 (C:\qa-scratch\t003r2\q154-cand\d-store\by-pid\11164.json absent: the SessionStart hook did not write one, or SessionEnd removed it)
+HOLDS   A4 control: with a proof, ob_start stamps the proven id
+        Session #1 / Session ID: 5e1f5e1f-aaaa-4bbb-8ccc-000000005e1f
+HOLDS   B1 end.md's call (entry_ratings only): the entry ob_recalled lists is rated, and the rating reaches feedback_log under the PROVEN id
+        ob_recalled: Recalled 1 entries this session (source: recall-log): /   [1] qa154-d3-one — progenitor
+        ob_end:   Recalled ids: 1 from recall-log /   Feedback: 1 entries rated
+        feedback_log: [{"s":"a1540000-0000-4000-8000-0000000000a1","k":1,"r":"helpful","o":"recall-log","m":"supplied"}]
+HOLDS   B2 after /clear the same server's ob_end resolves the NEW session's recalls: id2 rated under B; id1 (A's recall) not rated
+        ob_end:   Recalled ids: 1 from recall-log /   Feedback: 1 entries rated
+        new feedback_log rows: [{"s":"b1540000-0000-4000-8000-0000000000b1","k":2,"r":"neutral","o":"recall-log","m":"supplied"}]
+INFO    B3 control: ob_end naming the proven id gives the same resolution:   Recalled ids: 1 from recall-log /   Feedback: 1 entries rated
+HOLDS   B4 no proof: ob_end (end.md's call) writes no feedback_log row and does not error
+        ob_end:   Recalled ids: 0 from none /   Feedback: 0 entries rated
+HOLDS   B5 (D4) no proof: ob_feedback says NOT LOGGED with the reason, and writes no row
+        Feedback recorded for entry 1 (qa154-d3-one): neutral / NOT LOGGED: this server cannot prove its session — no session proof for this server's parent process 18308 (C:\qa-scratch\t003r2\q154-cand\d-store\by-pid\18308.json absent: the SessionStart hook did not write one, or SessionEnd removed it)
+HOLDS   B6 (D2) a JSON null proof: ob_recall returns results with a named NOT LOGGED, and no 'FTS search error'
+        _(NOT LOGGED: this server cannot prove its session — the session proof C:\qa-scratch\t003r2\q154-cand\d-store\by-pid\18308.json is not a session record)_
+HOLDS   B7 (D2/D4) a JSON null proof: ob_feedback names it
+        NOT LOGGED: this server cannot prove its session — the session proof C:\qa-scratch\t003r2\q154-cand\d-store\by-pid\18308.json is not a session record
+INFO    B8 a JSON null proof, ob_state on a project with no record: error: ob_state refused: .agents/state.json is absent — this writer never creates it; run the migration first
+HOLDS   C1 --ide cursor, inherited CLAUDE_PID, no cursor_version: NO Claude proof
+        Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2). ; files: none
+HOLDS   C2 --ide Cursor (capitalised): NO Claude proof
+        Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2). ; files: none
+HOLDS   C3 no flag, payload cursor_version: NO proof (payload wins)
+        Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2). ; files: none
+HOLDS   C4 --ide claude but payload cursor_version: NO proof (payload wins over the flag)
+        Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2). ; files: none
+INFO    C5 no flag, OPEN_BRAIN_IDE=cursor, no cursor_version: Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2). ; files: none
+HOLDS   C6 control: no flag, OPEN_BRAIN_IDE=claude, no cursor_version: the Claude proof IS written
+        Session proof written: session c0c0c0c0-0000-4000-8000-00000000c0c0 for claude process 18308. ; files: 18308.json
+
+0 BROKEN

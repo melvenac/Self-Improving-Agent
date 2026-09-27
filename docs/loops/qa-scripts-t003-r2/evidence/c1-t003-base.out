@@ -1,0 +1,58 @@
+# c1-t003 on base; server parent (this node's ppid) 11476, start win:134349581154315766; proof module present
+HOLDS   A7 ob_set_session(victim uuid) is refused and set_handoff cannot replace the victim's handoff
+        set_session: ob_set_session refused: 00000700-0000-4000-8000-000000000700 is not this server's session: this server's parent process 11476 is session 00000701-0000-4000-8000-000000000701. Nothing registered; attributed writes use 00000701-0000-4000-8000-000000000701.
+        state: ob_state applied / Revision: 134 → 135 / Applied (1):
+        victim: "victim session 700's handoff"; 701's: "attacker overwrote it"
+HOLDS   A7b with no proof, ob_set_session(victim) is refused and set_handoff refuses
+        set_session: ob_set_session refused: this server cannot prove its session (no session proof for this server's parent process 11476 (C:\qa-scratch\t003r2\r142-base-c1-t003\c1-store\by-pid\11476.json absent: the SessionStart hook did not write one, or SessionEnd removed it)). Nothing registered. Until it can, attr
+        state: ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 135 (unchanged) / Nothing written.
+HOLDS   A8 a reconnected server lands A's write under A, not the slot's B
+        ob_state applied / Revision: 134 → 135 / Applied (1):
+        B: "session B's handoff"  A: "session A's handoff after a reconnect"
+HOLDS   A8b no proof + a fresh slot naming B: set_handoff refuses, slot never adopted
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 135 (unchanged) / Nothing written.
+HOLDS   A9 after /clear the new session's write goes under 902 and 901's handoff is intact
+        ob_state applied / Revision: 134 → 135 / Applied (1):
+        901: "session 901's handoff, before /clear"
+HOLDS   A9b /clear + failed SessionStart: the write refuses rather than landing under 902
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 135 (unchanged) / Nothing written.
+HOLDS   P1 a proof forged under another live pid is ignored: the write is SELF's
+        ob_state applied / Revision: 133 → 134 / Applied (1):
+HOLDS   P1b our pid's file carrying another pid's claude_pid/proc_start: refuses
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 134 (unchanged) / Nothing written.
+LIMIT   P2 both hooks failed across /clear: the next session's write lands under 1101 (STALE ADOPTION, the stated limit 1)
+        ob_state applied / Revision: 134 → 135 / Applied (1):
+HOLDS   P3 a proof whose start time differs from the parent's (reused pid) refuses
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3b a proof with no proc_start refuses
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3c proof body array: refuses without throwing
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3c proof body null: refuses without throwing
+        ob_state error: Cannot read properties of null (reading 'session_id')
+HOLDS   P3c proof body string: refuses without throwing
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3c proof body number session_id: refuses without throwing
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P3c proof body claude_pid as string: refuses without throwing
+        ob_state refused: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing / Revision: 133 (unchanged) / Nothing written.
+HOLDS   P4 nested: CLAUDE_PID names another claude with a valid proof; the server still uses its own parent
+        ob_state applied / Revision: 133 → 134 / Applied (1):
+        set_session: Session registered: 00001301-0000-4000-8000-000000001301 (C:\qa-scratch\t003r2\r142-base-c1-t003\c1-proj) [via process proof: parent 11476] (no id given; the proven id was used)
+HOLDS   P5 ob_set_session(different id) refused naming both
+        ob_set_session refused: 00001499-0000-4000-8000-000000001499 is not this server's session: this server's parent process 11476 is session 00001401-0000-4000-8000-000000001401. Nothing registered; attributed writes use 00001401-0000-4000-8000-000000001401.
+INFO    P5 upper-case spelling of the proven id: accepted; padded: refused; exact: accepted; "none": accepted (Session registered: 00001401-0000-4000-8000-000000001401 (C:\qa-scratch\t003r2\r142-base-c1-t003\c1-proj) [via process proof: parent 11476] (no id given; the proven id was used))
+HOLDS   P5 ob_end(foreign id) refused
+        ob_end refused: 00001499-0000-4000-8000-000000001499 is not this server's session: this server's parent process 11476 is session 00001401-0000-4000-8000-000000001401. Nothing written.
+HOLDS   P5 ob_store_chunk(foreign id) refused; unnamed links the proven id
+        ob_store_chunk refused: 00001499-0000-4000-8000-000000001499 is not this server's session: this server's parent process 11476 is session 00001401-0000-4000-8000-000000001401. Nothing written.
+        unnamed: Checkpoint stored (id: 1): /   Key: qa142-p5b /   Vault: C:\qa-scratch\t003r2\r142-base-c1-t003\c1-store\vault\Checkpoints\2026-09-27-general-qa142-p5b.md
+HOLDS   P6 two servers under one claude both prove that claude's session
+        Session registered: 00001501-0000-4000-8000-000000001501 (C:\qa-scratch\t003r2\r142-base-c1-t003\c1-proj) [via process proof: parent 11476] (no id given; the proven id was used) || Session registered: 00001501-0000-4000-8000-000000001501 (C:\qa-scratch\t003r2\r142-base-c1-t003\c1-proj) [via process proof: parent 11476] (no id given; the proven id was used)
+HOLDS   P6b after /clear both servers move to the new session with no re-registration
+        Session registered: 00001502-0000-4000-8000-000000001502 (C:\qa-scratch\t003r2\r142-base-c1-t003\c1-proj) [via process proof: parent 11476] (no id given; the proven id was used) || Session registered: 00001502-0000-4000-8000-000000001502 (C:\qa-scratch\t003r2\r142-base-c1-t003\c1-proj) [via process proof: parent 11476] (no id given; the proven id was used)
+BROKEN  P7 ob_start with no proof does not stamp an unproven id (here: the newest transcript's, another session)
+        Session ID: 00001666-0000-4000-8000-000000001666
+        session logs written: next-session.md, Session_1.md; contain the other session's id: true
+
+1 BROKEN

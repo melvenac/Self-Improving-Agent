@@ -1,0 +1,24 @@
+6d13f24 rev 134: (a) qa's first keyed handoff (R179-3: qa@75 legacy leaves) [superseded: handoff qa@75 (qa, legacy, session 75)]
+54a71d1 rev 135: HAND EDIT: (b) control: remove the legacy developer@74 handoff by hand
+41f70f3 rev 136: filler session 150 (checkout co-0)
+28663a7 rev 137: filler session 151 (checkout co-1)
+52d7eda rev 138: filler session 152 (checkout co-2)
+2adf35c rev 139: filler session 153 (checkout co-3)
+ecece7c rev 140: filler session 154 (checkout co-4)
+86d282a rev 141: filler session 155 (checkout co-5)
+de98007 rev 142: filler session 156 (checkout co-6)
+d4a3684 rev 143: filler session 157 (checkout co-7)
+d1f97a6 rev 144: filler session 158 (checkout co-8)
+7f15bc4 rev 145: filler session 159 (checkout co-9)
+824c011 rev 146: filler session 160 (checkout co-10)
+5657a86 rev 147: filler session 161 (checkout co-11)
+bb59175 rev 148: victim S170 developer handoff (sia-builder)
+8d63494 rev 149: S171 developer handoff (sia-builder), newer of the same instance
+dc2a1ac rev 150: HAND EDIT: (c) rewrite victim S170's first_rev to 0 (handoff and session record); nothing removed
+ab44488 rev 151: (c) an ordinary ob_state write by a new session [superseded: handoff 00000170-0000-4000-8000-000000000170 (developer, sia-builder, session 170); session 00000170-0000-4000-8000-000000000170 (developer, sia-builder, session 170)]
+victim S170 handoff present after: false
+
+--- state erasures (candidate CLI), lines at schema v3+ and the totals:
+Walked 854 commits on HEAD; 242 changes to .agents/state.json (19 at schema v3+).
+Erasures: 45 (1 at schema v3+, which /sync fails on)
+  [v3+]    rev 134→135 (54a71d1): removed handoff developer@74 (session 74, developer); added by the same step: no record of the same kind added

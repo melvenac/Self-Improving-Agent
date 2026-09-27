@@ -1,0 +1,84 @@
+# mutants-qa154 on d781b59 at 2026-09-27T05:03:23.378Z
+BASELINE (unmutated): build ok; vitest rc 1: Tests 2 failed | 1336 passed (1338)
+    vitest FAIL tests/pipelines/session-start/tree-currency.test.ts > describeTreeCurrency > reports BEHIND with the commit count and both record revisions
+    vitest FAIL tests/pipelines/session-start/tree-currency.test.ts > describeTreeCurrency > names the comparison so it cannot be read as the drift line
+    probe qd: BROKEN 0: none
+    probe qr: BROKEN 0: none
+    probe c1: BROKEN 0: none
+    probe c3: NO SUMMARY (rc 0) BROKEN 0: none
+
+## M1-d1-callsite (D1): ob_start turns 'no proof' back into 'discover' at the call site (sessionStart itself unchanged)
+open-brain/src/server.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+M1-d1-callsite: build ok; vitest rc 1: Tests 1 failed | 1337 passed (1338)
+    vitest FAIL tests/qa142-t003.test.ts > QA 142: T-003 findings > D1 ob_start with NO proof does not stamp another session's id (the newest transcript in the project)
+    probe qd: BROKEN 1; newly BROKEN vs baseline: A1
+    probe qr: BROKEN 0; newly BROKEN vs baseline: none
+    probe c1: BROKEN 1; newly BROKEN vs baseline: P7
+    probe c3: NO SUMMARY (rc 0) BROKEN 0; newly BROKEN vs baseline: none
+
+## M2-d1-greeting (D1): the greeting prints the pipeline's id, not 'none — <reason>' (discovery stays off)
+open-brain/src/server.ts | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+M2-d1-greeting: build ok; vitest rc 1: Tests 1 failed | 1337 passed (1338)
+    vitest FAIL tests/t003-r2.test.ts > T-003 round 2 > D1 ob_start with no proof prints Session ID: none and does not stamp the newest transcript
+    probe qd: BROKEN 3; newly BROKEN vs baseline: A1, A2, A3
+    probe qr: BROKEN 0; newly BROKEN vs baseline: none
+    probe c1: BROKEN 0; newly BROKEN vs baseline: none
+    probe c3: NO SUMMARY (rc 0) BROKEN 0; newly BROKEN vs baseline: none
+
+## M3-d3-sessionEnd-half (D3): ob_end resolves recalls under the proven id but passes the NAMED id (none) to sessionEndV2
+open-brain/src/server.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+M3-d3-sessionEnd-half: build ok; vitest rc 1: Tests 1 failed | 1337 passed (1338)
+    vitest FAIL tests/t003-r2.test.ts > T-003 round 2 > D3 ob_end with no session_id rates what recall_log holds for the proven id
+    probe qd: BROKEN 2; newly BROKEN vs baseline: B1, B2
+    probe qr: BROKEN 0; newly BROKEN vs baseline: none
+    probe c1: BROKEN 0; newly BROKEN vs baseline: none
+    probe c3: NO SUMMARY (rc 0) BROKEN 0; newly BROKEN vs baseline: none
+
+## M4-d3-resolve-half (D3): ob_end resolves recalls under the NAMED id (none) and passes the proven id to sessionEndV2
+open-brain/src/server.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+M4-d3-resolve-half: build ok; vitest rc 1: Tests 1 failed | 1337 passed (1338)
+    vitest FAIL tests/t003-r2.test.ts > T-003 round 2 > D3 ob_end with no session_id rates what recall_log holds for the proven id
+    probe qd: BROKEN 2; newly BROKEN vs baseline: B1, B2
+    probe qr: BROKEN 0; newly BROKEN vs baseline: none
+    probe c1: BROKEN 0; newly BROKEN vs baseline: none
+    probe c3: NO SUMMARY (rc 0) BROKEN 0; newly BROKEN vs baseline: none
+
+## M5-r2d1-explicit-checkout-only (R2-D1): the writer compares only when the caller passed `checkout` (the server never does)
+open-brain/src/shared/state-writer.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+M5-r2d1-explicit-checkout-only: build ok; vitest rc 1: Tests 3 failed | 1335 passed (1338)
+    vitest FAIL tests/t003-r2.test.ts > T-003 round 2 > P2 a subdirectory registration cannot write the other checkout's session
+    vitest FAIL tests/t003-r2.test.ts > T-003 round 2 > P3 registering against the victim checkout's basename cannot write this root
+    vitest FAIL tests/t003-r2.test.ts > T-003 round 2 > P4 no project_dir, cwd a subdirectory, cannot write the other checkout's session
+    probe qd: BROKEN 0; newly BROKEN vs baseline: none
+    probe qr: BROKEN 8; newly BROKEN vs baseline: P1w, P2w, P3w, P4w, N1, N2, N3, W1
+    probe c1: BROKEN 0; newly BROKEN vs baseline: none
+    probe c3: NO SUMMARY (rc 0) BROKEN 0; newly BROKEN vs baseline: none
+
+## M6-r2d1-handoff-batches-only (R2-D1): the writer refuses only batches that carry set_handoff; any other write moves the session record's checkout
+open-brain/src/shared/state-writer.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+M6-r2d1-handoff-batches-only: build ok; vitest rc 1: Tests 1338 passed (1338)
+    probe qd: BROKEN 0; newly BROKEN vs baseline: none
+    probe qr: BROKEN 2; newly BROKEN vs baseline: N1, N3
+    probe c1: BROKEN 0; newly BROKEN vs baseline: none
+    probe c3: NO SUMMARY (rc 0) BROKEN 0; newly BROKEN vs baseline: none
+
+## M7-r2d1-null-refused (R2-D1): a legacy session record (checkout null) is refused too (over-refusal)
+open-brain/src/shared/state-writer.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+M7-r2d1-null-refused: build ok; vitest rc 1: Tests 2 failed | 1336 passed (1338)
+    vitest FAIL tests/t003-r2.test.ts > T-003 round 2 > a session recorded under THIS checkout still writes, and a null checkout is not refused
+    vitest FAIL tests/pipelines/session-start/role-files.test.ts > describeRoleFiles > records HEAD-behind-upstream for a role file without calling it stale
+    probe qd: BROKEN 0; newly BROKEN vs baseline: none
+    probe qr: BROKEN 1; newly BROKEN vs baseline: K2
+    probe c1: BROKEN 0; newly BROKEN vs baseline: none
+    probe c3: NO SUMMARY (rc 0) BROKEN 0; newly BROKEN vs baseline: none
+
+restored; git diff --stat: ''
+final build: ok
+rc=0

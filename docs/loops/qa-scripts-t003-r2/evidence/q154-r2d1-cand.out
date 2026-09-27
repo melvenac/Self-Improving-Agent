@@ -1,0 +1,40 @@
+# q154-r2d1 on cand; server parent 736
+HOLDS   P1w project_dir = THIS root (the old registration check's own refusal): the writer refuses
+        registration: accepted: Session registered: 00000800-0000-4000-8000-000000000800 (C:\qa-scratch\t003r2\q154-cand\c1r2-proj) [via process proof: parent 736] (no id given; the proven id was used)
+        ob_state: ob_state refused: session 00000800-0000-4000-8000-000000000800 is recorded under checkout sia-builder, and this write is checkout c1r2-proj: a different checkout's recorded session is refused / Revision: 134 (unchanged)
+        victim handoff "victim in sia-builder" checkout sia-builder; session record checkout sia-builder; revision 134 -> 134
+HOLDS   P2w project_dir = a subdirectory of this checkout: the writer refuses
+        registration: accepted: Session registered: 00000800-0000-4000-8000-000000000800 (C:\qa-scratch\t003r2\q154-cand\c1r2-proj\open-brain) [via process proof: parent 736] (no id given; the proven id was used)
+        ob_state: ob_state refused: session 00000800-0000-4000-8000-000000000800 is recorded under checkout sia-builder, and this write is checkout c1r2-proj: a different checkout's recorded session is refused / Revision: 134 (unchanged)
+        victim handoff "victim in sia-builder" checkout sia-builder; session record checkout sia-builder; revision 134 -> 134
+HOLDS   P3w project_dir = the victim's own checkout (basename sia-builder): the writer refuses
+        registration: accepted: Session registered: 00000800-0000-4000-8000-000000000800 (C:\qa-scratch\t003r2\q154-cand\p3\sia-builder) [via process proof: parent 736] (no id given; the proven id was used)
+        ob_state: ob_state refused: session 00000800-0000-4000-8000-000000000800 is recorded under checkout sia-builder, and this write is checkout c1r2-proj: a different checkout's recorded session is refused / Revision: 134 (unchanged)
+        victim handoff "victim in sia-builder" checkout sia-builder; session record checkout sia-builder; revision 134 -> 134
+HOLDS   P4w no project_dir, server cwd a subdirectory: the writer refuses
+        registration: accepted: Session registered: 00000800-0000-4000-8000-000000000800 [via process proof: parent 736] (no id given; the proven id was used)
+        ob_state: ob_state refused: session 00000800-0000-4000-8000-000000000800 is recorded under checkout sia-builder, and this write is checkout c1r2-proj: a different checkout's recorded session is refused / Revision: 134 (unchanged)
+        victim handoff "victim in sia-builder" checkout sia-builder; session record checkout sia-builder; revision 134 -> 134
+HOLDS   N1 a write with NO handoff (add_decision) is refused too, so the session record's checkout cannot be moved first
+        registration: accepted: Session registered: 00000800-0000-4000-8000-000000000800 (C:\qa-scratch\t003r2\q154-cand\c1r2-proj) [via process proof: parent 736] (no id given; the proven id was used)
+        ob_state: ob_state refused: session 00000800-0000-4000-8000-000000000800 is recorded under checkout sia-builder, and this write is checkout c1r2-proj: a different checkout's recorded session is refused / Revision: 134 (unchanged)
+        victim handoff "victim in sia-builder" checkout sia-builder; session record checkout sia-builder; revision 134 -> 134
+HOLDS   N2 a dry run is refused the same way
+        registration: accepted: Session registered: 00000800-0000-4000-8000-000000000800 (C:\qa-scratch\t003r2\q154-cand\c1r2-proj) [via process proof: parent 736] (no id given; the proven id was used)
+        ob_state: ob_state refused: session 00000800-0000-4000-8000-000000000800 is recorded under checkout sia-builder, and this write is checkout c1r2-proj: a different checkout's recorded session is refused / Revision: 134 (unchanged)
+        victim handoff "victim in sia-builder" checkout sia-builder; session record checkout sia-builder; revision 134 -> 134
+HOLDS   N3 two steps (a decision, then a handoff) cannot move the session record and then replace the handoff
+        step 1: ob_state refused: session 00000800-0000-4000-8000-000000000800 is recorded under checkout sia-builder, and this write is checkout c1r2-proj: a different checkout's recorded session is refused / Revision: 134 (unchanged)
+        step 2: ob_state refused: session 00000800-0000-4000-8000-000000000800 is recorded under checkout sia-builder, and this write is checkout c1r2-proj: a different checkout's recorded session is refused / Revision: 134 (unchanged)
+        victim handoff "victim in sia-builder" checkout sia-builder; session record checkout sia-builder
+HOLDS   W1 applyStateOps(session_uuid = the victim's, checkout defaulted to this root's basename) refuses
+        session 00000800-0000-4000-8000-000000000800 is recorded under checkout sia-builder, and this write is checkout c1r2-proj: a different checkout's recorded session is refused
+        victim handoff "victim in sia-builder" checkout sia-builder; session record checkout sia-builder
+INFO    W2 the same uuid writing AS checkout sia-builder (its own) is applied
+HOLDS   K1 a session recorded under THIS checkout still writes
+        ob_state applied / Revision: 134 → 135
+HOLDS   K2 a legacy session record (checkout null) is not refused (the ruling's stated exception)
+        22631f4e n 76: ob_state applied / Revision: 135 → 136; record now checkout c1r2-proj, seat qa
+INFO    E1 the victim's handoff with NO session record (orphaned): ob_state applied; victim handoff "orphan: replaced" checkout c1r2-proj; session record checkout c1r2-proj
+
+0 BROKEN

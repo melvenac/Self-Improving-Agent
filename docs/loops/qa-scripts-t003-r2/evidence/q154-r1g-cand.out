@@ -1,0 +1,6 @@
+HOLDS   R1g-p extra checkout "sia-builder" / session_uuid arguments to ob_state do not reach the writer
+        ob_state refused: session 00000800-0000-4000-8000-000000000800 is recorded under checkout sia-builder, and this write is checkout c1r2-proj: a different checkout's recorded session is refused / Revision: 134 (unchanged)
+HOLDS   R1g-p2 checkout inside an op is refused
+        ob_state refused: session 00000800-0000-4000-8000-000000000800 is recorded under checkout sia-builder, and this write is checkout c1r2-proj: a different checkout's recorded session is refused / Revision: 134 (unchanged)
+
+0 BROKEN

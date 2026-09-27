@@ -1,0 +1,40 @@
+# q154-d on base
+INFO    A0 the OTHER session (proved) ran ob_start: Session #1 / Session ID: 0be70be7-dddd-4eee-8fff-000000000be7
+INFO    A0 discovery, asked directly, would return: 0be70be7-dddd-4eee-8fff-000000000be7
+BROKEN  A1 no proof: ob_start prints 'Session ID: none — <reason>', does not reuse the other session's log, and stamps no id
+        Session #1 (existing log for this session id — reused, nothing created) / Log: C:\qa-scratch\t003r2\q154-base\d-proj\.agents\SESSIONS\Session_1.md / Session ID: 0be70be7-dddd-4eee-8fff-000000000be7
+        logs: Session_1.md; the other session's Session_1.md still carries its own id: true
+BROKEN  A2 a proof holding JSON null: ob_start names it ('not a session record') and discovers nothing
+BROKEN  A3 no SESSIONS dir (the skipped-log branch): 'Session ID: none — <reason>' there too
+        Session log: no .agents/SESSIONS/ dir — log not created / Session ID: 0be70be7-dddd-4eee-8fff-000000000be7
+HOLDS   A4 control: with a proof, ob_start stamps the proven id
+        Session #1 / Session ID: 5e1f5e1f-aaaa-4bbb-8ccc-000000005e1f
+BROKEN  B1 end.md's call (entry_ratings only): the entry ob_recalled lists is rated, and the rating reaches feedback_log under the PROVEN id
+        ob_recalled: Recalled 1 entries this session (source: recall-log): /   [1] qa154-d3-one — progenitor
+        ob_end:   Recalled ids: 0 from none /   Feedback: 0 entries rated
+        feedback_log: []
+BROKEN  B2 after /clear the same server's ob_end resolves the NEW session's recalls: id2 rated under B; id1 (A's recall) not rated
+        ob_end:   Recalled ids: 0 from none /   Feedback: 0 entries rated
+        new feedback_log rows: []
+INFO    B3 control: ob_end naming the proven id gives the same resolution:   Recalled ids: 1 from recall-log /   Feedback: 1 entries rated
+HOLDS   B4 no proof: ob_end (end.md's call) writes no feedback_log row and does not error
+        ob_end:   Recalled ids: 0 from none /   Feedback: 0 entries rated
+BROKEN  B5 (D4) no proof: ob_feedback says NOT LOGGED with the reason, and writes no row
+        Feedback recorded for entry 1 (qa154-d3-one): neutral
+BROKEN  B6 (D2) a JSON null proof: ob_recall returns results with a named NOT LOGGED, and no 'FTS search error'
+        FTS search error — index may be empty.
+BROKEN  B7 (D2/D4) a JSON null proof: ob_feedback names it
+INFO    B8 a JSON null proof, ob_state on a project with no record: error: ob_state error: Cannot read properties of null (reading 'session_id')
+BROKEN  C1 --ide cursor, inherited CLAUDE_PID, no cursor_version: NO Claude proof
+        Session proof written: session c0c0c0c0-0000-4000-8000-00000000c0c0 for claude process 11652. ; files: 11652.json
+BROKEN  C2 --ide Cursor (capitalised): NO Claude proof
+        Session proof written: session c0c0c0c0-0000-4000-8000-00000000c0c0 for claude process 11652. ; files: 11652.json
+HOLDS   C3 no flag, payload cursor_version: NO proof (payload wins)
+        Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2). ; files: none
+HOLDS   C4 --ide claude but payload cursor_version: NO proof (payload wins over the flag)
+        Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2). ; files: none
+INFO    C5 no flag, OPEN_BRAIN_IDE=cursor, no cursor_version: Session proof written: session c0c0c0c0-0000-4000-8000-00000000c0c0 for claude process 11652. ; files: 11652.json
+HOLDS   C6 control: no flag, OPEN_BRAIN_IDE=claude, no cursor_version: the Claude proof IS written
+        Session proof written: session c0c0c0c0-0000-4000-8000-00000000c0c0 for claude process 11652. ; files: 11652.json
+
+10 BROKEN

@@ -1,0 +1,31 @@
+# c4-hooks on base; stand-in claude 1716
+## full install: SessionStart + SessionEnd
+  start(A): Session proof written: session aaaaaaaa-0000-4000-8000-00000000000a for claude process 1716.
+HOLDS   H1 after SessionStart(A) the server proves A
+        Session proof (this server instance): aaaaaaaa-0000-4000-8000-00000000000a, via parent process 1716
+  end(A):   [session-end] session proof for claude process 1716: removed
+  start(B): Session proof written: session bbbbbbbb-0000-4000-8000-00000000000b for claude process 1716.
+HOLDS   H2 /clear: the same server now proves B
+        Session proof (this server instance): bbbbbbbb-0000-4000-8000-00000000000b, via parent process 1716
+  start(C) BEFORE end(B) (reversed order): Session proof written: session cccccccc-0000-4000-8000-00000000000c for claude process 1716.
+  end(B):   [session-end] session proof for claude process 1716: kept: holds another session
+HOLDS   H3 reversed order: SessionEnd(B) keeps C's proof
+        Session proof (this server instance): cccccccc-0000-4000-8000-00000000000c, via parent process 1716
+  end(C):   [session-end] session proof for claude process 1716: removed   (then SessionStart FAILS: not run)
+HOLDS   H4 /clear with a failed SessionStart: NONE, not C
+        Session proof (this server instance): NONE — no session proof for this server's parent process 1716 (C:\qa-scratch\t003r2\r142-base-c4-hooks\c4-store\by-pid\1716.json absent: the SessionStart hook did not write one, or SessionEnd removed it)
+  subagent start: 
+HOLDS   H5 a subagent's SessionStart writes no proof
+        Session proof (this server instance): NONE — no session proof for this server's parent process 1716 (C:\qa-scratch\t003r2\r142-base-c4-hooks\c4-store\by-pid\1716.json absent: the SessionStart hook did not write one, or SessionEnd removed it)
+  exit end(A) on an absent file: [session-end] session proof for claude process 1716: absent
+## old install: SessionStart only (SessionEnd never runs)
+  start(A): Session proof written: session aaaaaaaa-0000-4000-8000-00000000000a for claude process 1716.
+  start(B): Session proof written: session bbbbbbbb-0000-4000-8000-00000000000b for claude process 1716.
+HOLDS   O1 old install, /clear with SessionStart working: B (SessionStart alone suffices)
+        Session proof (this server instance): bbbbbbbb-0000-4000-8000-00000000000b, via parent process 1716
+  /clear again, SessionStart FAILS (not run), no SessionEnd registered
+LIMIT   O2 old install + failed SessionStart: the server still proves B, the PREVIOUS session (stale adoption)
+        Session proof (this server instance): bbbbbbbb-0000-4000-8000-00000000000b, via parent process 1716
+  claude exits (no SessionEnd): leftover proof files: 1716.json
+
+0 BROKEN
