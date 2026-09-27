@@ -1,0 +1,16 @@
+[
+  {
+    "id": "foreign-allowed",
+    "what": "item 4: another session's text is not replaced unnamed",
+    "landed": [
+      "src/shared/state-writer.ts"
+    ],
+    "status": "KILLED (4/148)",
+    "failed": [
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently replace_note on a note another session wrote is refused, naming that session, and nothing is written",
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently with replace_other_sessions: true it replaces, the report names the session whose text went, and the note becomes the writer's",
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently an unregistered writer cannot prove any note is its own, so its replace is refused",
+      "state-writer-notes.test.ts > T-171: a note is never replaced silently close_task follows the same rules: append reported, a foreign replace refused"
+    ]
+  }
+]

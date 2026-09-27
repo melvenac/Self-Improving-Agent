@@ -478,6 +478,8 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
     if (r.removed_gap_ids.length) lines.push(`Closed gaps removed: ${r.removed_gap_ids.join(", ")}`);
     // T-163: an entry leaves the per-session arrays only by retention, and says so.
     if (r.superseded.length) lines.push(`Superseded (a newer entry of the same seat and checkout, with >${RECORD_RETENTION_SESSIONS} sessions written since; or a legacy handoff whose seat has written a keyed one): ${r.superseded.join("; ")}`);
+    // T-171: every note set, appended to or replaced, with sizes — dry run included.
+    for (const c of r.note_changes) lines.push(`NOTE CHANGE: ${c}`);
     // Anything the writer did differently from what was asked.
     for (const n of r.notes) lines.push(`NOTE: ${n}`);
     lines.push(`${r.dry_run ? "Would render" : "Rendered"} (${r.rendered.length}): ${r.rendered.length ? r.rendered.join(", ") : "none (render: false)"}`);
@@ -663,7 +665,7 @@ server.tool(
 
 server.tool(
   "ob_state",
-  "Write .agents/state.json through typed operations (open_task, update_task, close_task, reopen_task, add_verified, reopen_verified, add_gap, update_gap, close_gap, add_decision, set_objective, set_handoff). Every write records this session (its registered uuid) in sessions[]; set_handoff writes THIS session's handoff and cannot touch another session's, and refuses when no session is registered. end_session is retired (schema v3, T-163). Atomic: all ops apply or none. Requires the file to exist and expected_revision to match; bumps revision, applies done-task retention, and regenerates INBOX.md, task.md, next-session.md and the marked region of SUMMARY.md. An empty ops array with render: true re-renders the views without touching state.json or its revision.",
+  "Write .agents/state.json through typed operations (open_task, update_task, close_task, reopen_task, add_verified, reopen_verified, add_gap, update_gap, close_gap, add_decision, set_objective, set_handoff). Every write records this session (its registered uuid) in sessions[]; set_handoff writes THIS session's handoff and cannot touch another session's, and refuses when no session is registered. end_session is retired (schema v3, T-163). Task notes (T-171): update_task and close_task take append_note (adds) or replace_note (replaces) — never `note`, which is refused; a replace that would remove another session's text, or text with no recorded author, is refused unless the op also sets replace_other_sessions: true; every note change is printed with its sizes, dry run included. Atomic: all ops apply or none. Requires the file to exist and expected_revision to match; bumps revision, applies done-task retention, and regenerates INBOX.md, task.md, next-session.md and the marked region of SUMMARY.md. An empty ops array with render: true re-renders the views without touching state.json or its revision.",
   {
     project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
     session: z.number().int().min(0).describe("Current session number — stamped on opened/closed/verified items"),

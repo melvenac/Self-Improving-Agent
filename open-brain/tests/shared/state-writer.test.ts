@@ -154,25 +154,25 @@ describe("applyStateOps (Loop 3 writer)", () => {
     ] });
     expect(r.applied).toEqual([{ op: "open_task", id: "T-028" }, { op: "open_task", id: "T-029" }]);
     const t = readState(root).tasks.find((x) => x.id === "T-028")!;
-    expect(t).toEqual({ id: "T-028", title: "New thing", priority: "P1", status: "open", opened_session: SESSION, closed_session: null, supersedes: "T-024", note: "n", closed_rev: null });
+    expect(t).toEqual({ id: "T-028", title: "New thing", priority: "P1", status: "open", opened_session: SESSION, closed_session: null, supersedes: "T-024", note: "n", note_by: null, closed_rev: null });
     expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "open_task", title: "x", priority: "P0", supersedes: "T-404" }] }), /supersedes unknown task T-404/);
     expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "open_task", id: "T-028", title: "dup", priority: "P0" }] }), /task T-028 already exists/);
   });
 
   it("update_task changes fields, refuses status done and refuses a done task (V2)", () => {
     const r = applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [
-      { op: "update_task", id: "T-008", title: "Renamed", priority: "P0", status: "in_progress", note: "moving" },
+      { op: "update_task", id: "T-008", title: "Renamed", priority: "P0", status: "in_progress", replace_note: "moving" },
     ] });
     expect(r.ok).toBe(true);
     const t = readState(root).tasks.find((x) => x.id === "T-008")!;
     expect(t).toMatchObject({ title: "Renamed", priority: "P0", status: "in_progress", note: "moving", opened_session: 54, closed_session: null });
     expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "update_task", id: "T-008", status: "done" }] }), /^ops\[0\] invalid at status: /);
-    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "update_task", id: "T-001", note: "x" }] }), /task T-001 is done/);
-    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "update_task", id: "T-777", note: "x" }] }), /unknown task T-777/);
+    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "update_task", id: "T-001", append_note: "x" }] }), /task T-001 is done/);
+    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "update_task", id: "T-777", append_note: "x" }] }), /unknown task T-777/);
   });
 
   it("close_task sets done + closed_session, and refuses a second close (V2)", () => {
-    const r = applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "close_task", id: "T-005", note: "shipped" }] });
+    const r = applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "close_task", id: "T-005", replace_note: "shipped", replace_other_sessions: true }] });
     expect(r.applied).toEqual([{ op: "close_task", id: "T-005" }]);
     const t = readState(root).tasks.find((x) => x.id === "T-005")!;
     expect(t).toMatchObject({ status: "done", closed_session: SESSION, note: "shipped" });
@@ -186,7 +186,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
     const t = readState(root).tasks.find((x) => x.id === "T-001")!;
     expect(t).toMatchObject({ status: "open", closed_session: null, opened_session: 53, note: "Loop 1, v0.28.0 — regressed in 0.30.1" });
     // It is an ordinary open task again: update and close both work.
-    const r2 = applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "update_task", id: "T-001", status: "in_progress" }, { op: "close_task", id: "T-001", note: "fixed again" }] });
+    const r2 = applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "update_task", id: "T-001", status: "in_progress" }, { op: "close_task", id: "T-001", replace_note: "fixed again", replace_other_sessions: true }] });
     expect(r2.ok).toBe(true);
     expect(readState(root).tasks.find((x) => x.id === "T-001")).toMatchObject({ status: "done", closed_session: SESSION, note: "fixed again" });
     // Refusals: not done, unknown, empty note.

@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseState, serializeState, lastSession, newestHandoffPerInstance, newestHandoffForSeat, schemaVersionAdvice, type State } from "../../src/shared/state-schema.js";
@@ -214,5 +215,41 @@ describe("state-schema (Loop 2, read side)", () => {
     const r = parseState(JSON.stringify(d));
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.error).toMatch(/closed_rev must be null unless status is "done"/);
+  });
+
+  it("T-171: note_by is [] exactly when the note is empty — text with no authors, or no text with authors, is refused", () => {
+    for (const [note, note_by] of [["words", []], ["", null]] as const) {
+      const d = valid() as unknown as { tasks: Array<Record<string, unknown>> };
+      Object.assign(d.tasks[0], { note, note_by });
+      const r = parseState(JSON.stringify(d));
+      expect([note, r.ok]).toEqual([note, false]);
+      if (!r.ok) expect(r.error).toMatch(/note_by must be \[\] exactly when note is empty/);
+    }
+    for (const [note, note_by] of [["words", null], ["words", ["u"]], ["", []]] as const) {
+      const d = valid() as unknown as { tasks: Array<Record<string, unknown>> };
+      Object.assign(d.tasks[0], { note, note_by });
+      expect([note, note_by, parseState(JSON.stringify(d)).ok]).toEqual([note, note_by, true]);
+    }
+  });
+
+  it("T-171 r3b: origin/master's real state.json parses, and a missing note_by is null", () => {
+    const root = join(import.meta.dirname, "..", "..", "..");
+    const show = (rev: string) =>
+      execFileSync("git", ["show", `${rev}:.agents/state.json`], { cwd: root, encoding: "utf8" });
+    let text: string;
+    try {
+      text = show("origin/master");
+    } catch {
+      execFileSync("git", ["fetch", "origin", "master", "--depth", "1"], { cwd: root, stdio: "ignore" });
+      text = show("FETCH_HEAD");
+    }
+    const raw = JSON.parse(text) as { tasks: Array<Record<string, unknown>> };
+    expect(raw.tasks.length).toBeGreaterThan(0);
+    expect(Object.prototype.hasOwnProperty.call(raw.tasks[0], "note_by")).toBe(false);
+    const r = parseState(text);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.data.tasks[0].note_by).toBeNull();
+    expect(r.data.tasks.every((t) => t.note_by === null)).toBe(true);
   });
 });

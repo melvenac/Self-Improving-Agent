@@ -18,6 +18,7 @@
       "closed_session": 54,
       "supersedes": null,
       "note": "Loop 1, v0.28.0",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -29,6 +30,7 @@
       "closed_session": 54,
       "supersedes": null,
       "note": "",
+      "note_by": [],
       "closed_rev": null
     },
     {
@@ -40,6 +42,7 @@
       "closed_session": 54,
       "supersedes": null,
       "note": "three Claude Code copies moved together",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -51,6 +54,7 @@
       "closed_session": 54,
       "supersedes": null,
       "note": "ADR-023 instrumentation",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -62,6 +66,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Loop 2 capability half",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -73,6 +78,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "",
+      "note_by": [],
       "closed_rev": null
     },
     {
@@ -84,6 +90,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "prose files stay in the size block",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -95,6 +102,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "",
+      "note_by": [],
       "closed_rev": null
     },
     {
@@ -106,6 +114,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Loop 1 gap 2",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -117,6 +126,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Loop 1 gap 3; makes P5 a code guarantee",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -128,6 +138,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Loop 1 gap 5",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -139,6 +150,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Loop 3; blocked on Loop 2 acceptance",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -150,6 +162,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Loop 3",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -161,6 +174,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Loop 4 dogfood",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -172,6 +186,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "inline Composer variant, deliberately untouched in Loops 1–2",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -183,6 +198,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": ".gitignore:10",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -194,6 +210,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "",
+      "note_by": [],
       "closed_rev": null
     },
     {
@@ -205,6 +222,7 @@
       "closed_session": 53,
       "supersedes": null,
       "note": "v0.27.1",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -216,6 +234,7 @@
       "closed_session": 53,
       "supersedes": null,
       "note": "v0.27.0",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -227,6 +246,7 @@
       "closed_session": 52,
       "supersedes": null,
       "note": "v0.26.0",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -238,6 +258,7 @@
       "closed_session": 52,
       "supersedes": null,
       "note": "v0.25.0",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -249,6 +270,7 @@
       "closed_session": 51,
       "supersedes": null,
       "note": "v0.24.0",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -260,6 +282,7 @@
       "closed_session": 50,
       "supersedes": null,
       "note": "v0.23.0; threshold decision deferred",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -271,6 +294,7 @@
       "closed_session": null,
       "supersedes": "T-023",
       "note": "blocked on the default rating path being able to emit harmful",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -282,6 +306,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "deliberately not shipped: would start auto-deleting",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -293,6 +318,7 @@
       "closed_session": 49,
       "supersedes": null,
       "note": "v0.22.1",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -304,6 +330,7 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Loop 5+, gated on Q2/Q3",
+      "note_by": null,
       "closed_rev": null
     }
   ],

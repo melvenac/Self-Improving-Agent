@@ -222,6 +222,20 @@ describe("migrateStateFile", () => {
     expect(parsed.data.handoffs).toEqual(before.handoffs.map((h) => ({ ...h, session_uuid: null, checkout: null, first_rev: null })));
   });
 
+  it("v2 → v3 gives a written note an UNKNOWN author (null) and an empty one none ([]), and says so (T-171)", () => {
+    const task = (id: string, note: string) => ({ id, title: id, priority: "P2", status: "open", opened_session: 1, closed_session: null, supersedes: null, note });
+    const doc = JSON.parse(v2());
+    doc.tasks = [task("T-001", "written before anyone kept authors"), task("T-002", "")];
+    writeFileSync(path, JSON.stringify(doc, null, 2) + "\n");
+    const r = migrateStateFile(path, {});
+    expect(r.ok).toBe(true);
+    const parsed = parseState(readFileSync(path, "utf8"));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.data.tasks.map((t) => [t.id, t.note_by])).toEqual([["T-001", null], ["T-002", []]]);
+    expect(r.changes.join("\n")).toMatch(/task notes: 1 non-empty note\(s\) get note_by null/);
+  });
+
   it("v2 → v3 turns last_session into the one sessions[] entry, uuid and seat included", () => {
     writeFileSync(path, v2());
     migrateStateFile(path, {});
