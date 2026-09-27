@@ -494,3 +494,16 @@ QA PC: 182, 183.
   false-positive class as the planner's pushes.
 - **Queue summary (QA PC):** 189 ACCEPT (B2), 182 ACCEPT (T-048 r3), 183 ACCEPT (T-192), 161 ACCEPT (/bootstrap r4 rec),
   178 ACCEPT (T-048 r2b). Five of five.
+
+### All four merged; T-192 live; candidate C's criteria dispatched (23:19:02Z)
+
+- **Merged on Aaron's word, in his order:** #189 (T-192) as `2b121d9`, #187 (candidate B part 2) as `c9a7acc`, #190
+  (/bootstrap r3+r4) as `d0b63a3`, #191 (T-048 r2b+r3) as `bf33fe4`. Each was CLEAN, with test SUCCESS, and clean
+  against the master left by the one before.
+- **T-192's post-merge acceptance read:** master push runs now carry the `self-hosted,linux,tcm` labels. Run
+  `36358116586` (`2b121d9`) ran on **tcm-2**, and `36358133855` (`c9a7acc`) on **tcm-1**. Master's CI works again.
+- Aaron: "laptop and qa pc are available for ci". A `windows=true` run on master `bf33fe4` was dispatched to the laptop:
+  `36358221545`.
+- **QA 191, candidate C's criteria:** `docs/loops/loop-15-slice-3-c-criteria-dispatch-qa.md`, with its driver in `qa-191/`.
+  It carries B's Open 3 (does an attributed `met` count as met?), R10(c)/(d) as verdict rows, and R2's now-binding `E_t`
+  obligation. Launch on the QA PC.
