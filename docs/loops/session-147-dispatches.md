@@ -105,3 +105,14 @@ reads: *"The job was not started because recent account payments have failed or 
 increased."* **Those reds are billing, not code, and they are also not a pass:** merged master was not tested as a
 whole. `/sync`'s `ci-status` reports them only as `conclusion: failure`. Seat and QA runs dispatch to tcm and are
 unaffected. The planner dispatched the suite on `master` `e201baa` to tcm as run `36305346883`.
+
+## QA launched, 2026-09-27 ~08:27Z (Aaron ran the lines; the planner dry-ran each on its target machine first)
+
+- **`qa-queue.ps1` re-copied to both machines from `b463ff2`** (the `c6fb300` queue lock). Read back over ssh: 14,232
+  bytes, SHA-256 `4dbfcaad60e8e38d…` on both, matching the commit.
+- **Laptop** (DESKTOP-0GV3HAD), pid 304: `-Queue 162,177,161,178 -Checkout b463ff2`. The log shows
+  `start=queue=162,177,161,178`, `head=b463ff2`, `run.162=started` at 08:27:10Z. `drive.meta` shows the deny file
+  installed and `fence_before_0` recorded.
+  - Two things to read in QA 162's report: `porcelain_lines=7` at start, and `defender_exclusions=` empty.
+- **QA PC** (DESKTOP-O4EGB1E), pid 5656: `-Queue 174,172,173 -Checkout b463ff2`. The log shows
+  `start=queue=174,172,173` and `head=b463ff2` at 08:27:56Z. The quiet-CPU wait comes before `run.174`.
