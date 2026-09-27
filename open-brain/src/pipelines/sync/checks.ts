@@ -429,7 +429,6 @@ export function checkTemplatePersonalNames(projectRoot: string): CheckResult {
       name: "template-personal-names",
       severity: "issue",
       message: `${hitNote}${unreadNote}${scope}`,
-      report: true,
     };
   }
   return {
@@ -1155,10 +1154,13 @@ export function checkRetirements(projectRoot: string): CheckResult {
     const parts = [findings.join("; "), unreadShown].filter(Boolean).join("; ");
     // D2. A finding used to replace the listing label, so FALLBACK and PARTIAL
     // disappeared. The label stays, and D3 prints this issue.
+    const scanNote = unreadable.length > 0
+      ? ` The scan is ${listing.source === "git" ? "incomplete" : "partial"} (${listing.label}).`
+      : ` (${listing.label}).`;
     return {
       name,
       severity: "issue",
-      message: `retired names still referenced outside the record: ${parts}${unreadMore}.`,
+      message: `retired names still referenced outside the record: ${parts}${unreadMore}.${scanNote}`,
       report: true,
     };
   }
