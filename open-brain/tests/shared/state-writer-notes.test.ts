@@ -248,6 +248,55 @@ describe("T-171: a note is never replaced silently", () => {
     expect(changes(r)).toEqual(["T-008 note REPLACED: 0 chars -> 11 chars; no text removed"]);
   });
 
+  // T-171 round 3: the REPLACED line quotes from the first differing character.
+  const T169 = readFileSync(join(import.meta.dirname, "../fixtures/t169-note.txt"), "utf8");
+
+  it("C4b: a prefix-keeping replace of the real T-169 note quotes from the first differing character", () => {
+    expect(T169.length).toBe(3256);
+    expect(T169.includes("\n")).toBe(false);
+    expect(T169.startsWith("Session 78, planner, on Aaron's word")).toBe(true);
+    seed(root, "T-009", T169, [ME]);
+    const next = `${T169.slice(0, 200)} ${ADDITION}`;
+    const r = write(root, [{ op: "update_task", id: "T-009", replace_note: next }]);
+    expect(r.ok).toBe(true);
+    let p = 0;
+    while (p < T169.length && p < next.length && T169[p] === next[p]) p++;
+    expect(p).toBe(200);
+    const quote = T169.slice(p, p + 120);
+    const line = changes(r)[0];
+    expect(line).toContain(`removed text begins: "${quote}"`);
+    expect(next.includes(quote)).toBe(false);
+    expect(line).not.toContain(`removed text begins: "${T169.slice(0, 120)}"`);
+  });
+
+  it("QA 158's fallback: a removed duplicate, and a removed line that is a substring of a kept line, are quoted from the first differing character", () => {
+    seed(root, "T-009", "retry\nok\nretry", [ME]);
+    const dup = write(root, [{ op: "update_task", id: "T-009", replace_note: "retry\nok" }]);
+    expect(changes(dup)[0]).toContain(`removed text begins: "\nretry"`);
+    expect(changes(dup)[0]).not.toContain(`removed text begins: "retry"`);
+
+    seed(root, "T-009", "one\nt\nthree", [ME]);
+    const sub = write(root, [{ op: "update_task", id: "T-009", replace_note: "one\nthree" }]);
+    expect(changes(sub)[0]).toContain(`removed text begins: "\nthree"`);
+    expect(changes(sub)[0]).not.toContain(`removed text begins: "one"`);
+  });
+
+  it("a one-word change inside a single-line note quotes from that word, not the note's start", () => {
+    const old = `${"prefix ".repeat(30)}gamma${" suffix".repeat(30)}`;
+    expect(old.includes("\n")).toBe(false);
+    const at = old.indexOf("gamma");
+    expect(at).toBeGreaterThan(120);
+    const next = old.replace("gamma", "delta");
+    seed(root, "T-009", old, [ME]);
+    const r = write(root, [{ op: "update_task", id: "T-009", replace_note: next }]);
+    expect(r.ok).toBe(true);
+    const quote = old.slice(at, at + 120);
+    const line = changes(r)[0];
+    expect(line).toContain(`removed text begins: "${quote}"`);
+    expect(next.includes(quote)).toBe(false);
+    expect(line).not.toContain(`removed text begins: "${old.slice(0, 120)}"`);
+  });
+
   // ---- close_task (D4), open_task, reopen_task ----
 
   it("close_task follows the same rules: append reported, a foreign replace refused", () => {
