@@ -456,7 +456,7 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
     // T-163: an entry leaves the per-session arrays only by retention, and says so.
     if (r.superseded.length) lines.push(`Superseded (a newer entry of the same seat and checkout, with >${RECORD_RETENTION_SESSIONS} sessions written since; or a legacy handoff whose seat has written a keyed one): ${r.superseded.join("; ")}`);
     // T-171: every note set, appended to or replaced, with sizes — dry run included.
-    for (const c of r.note_changes) lines.push(`NOTE CHANGE: ${c}`);
+    for (const c of r.note_changes) if (!r.dry_run || !c.includes("other session(s) removed")) lines.push(`NOTE CHANGE: ${c}`);
     // Anything the writer did differently from what was asked.
     for (const n of r.notes) lines.push(`NOTE: ${n}`);
     lines.push(`${r.dry_run ? "Would render" : "Rendered"} (${r.rendered.length}): ${r.rendered.length ? r.rendered.join(", ") : "none (render: false)"}`);
