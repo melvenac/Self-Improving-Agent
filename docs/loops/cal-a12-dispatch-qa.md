@@ -54,12 +54,12 @@ set. QA 130's rows are on `qa/loop-15-slice-3-a11-probe` (`5564ef6`); QA 130's r
 
 1. **Each ruling R90–R94 against its known positives** from rulings 20. Re-run them byte-exact.
 2. **The R85 search:** check the handoff's table against your own search of `configwatch.ts`. For each site that
-   builds a side's text, what does it print, and **what does the whole change record then cause downstream:** the
-   summary message, `unrestored`, and whether the runtime stops before git (R77)? Trace the effect, not only the text.
+   builds a side's text, what does it print? Then follow each changed branch to everything that consumes its result,
+   inside and outside `configwatch.ts`. Trace the effect, not only the text.
 3. **Regressions:** QA 130's full row set at the candidate.
 4. **Your own mutants,** at least one per ruling, run on tcm.
-5. **Defects:** anything that breaks a ruling's words, including rulings older than R90 that A12's change could reach
-   (R77 among them). For each defect: a row, a run id, and the exact output.
+5. **Defects:** anything that breaks a ruling's words, including earlier rulings (rulings 1–19) that A12's change
+   could reach. For each defect: a row, a run id, and the exact output.
 
 ## The report
 
