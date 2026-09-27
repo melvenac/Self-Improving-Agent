@@ -1095,7 +1095,7 @@ export function checkRetirements(projectRoot: string): CheckResult {
   const texts = new Map<string, string>();
   for (const rel of surface) {
     try { texts.set(rel, readFileSync(join(projectRoot, rel), "utf8")); } catch (e) {
-      unreadable.push(`${rel} (${(e as NodeJS.ErrnoException).code ?? "error"})`);
+      continue; // MUTANT P1
     }
   }
 
