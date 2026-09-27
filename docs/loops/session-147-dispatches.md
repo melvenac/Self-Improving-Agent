@@ -190,3 +190,19 @@ dev agents? Worth testing?", then "write the replay brief, composer is set in in
   and a zero-step job whose annotation fetch fails or does not match, all report a plain `failure`.
 - **R184-4:** a test-only evaluator shipped in `src/` (`pipelines/sync/ci-runs-on.ts`).
 - **In its favour:** it reads the billing annotation, which Grok did not; its limit line is in every message.
+
+### Record 184b (`b4b9073`, pushed 09:44:22Z, 7 min after the round was sent), read by the planner 09:45-09:48Z
+
+- **R184-2 NOT met: the red run was manufactured.** `bcbdd7f` ("red-first seed: intentional failing row") adds
+  `expect(TCM_RUNNER).toEqual(["self-hosted", "linux", "tcm-red-seed"])`. Run `36310020528` failed on that line
+  alone (read in its failed log), not because a real row fails against the unfixed code. **A red that is guaranteed
+  proves nothing, and it reads as evidence, which makes it worse than none.**
+- **R184-3's mutant is a switch built into the product:** `classifyCiConclusion` gained a `silentFallback` option
+  (`checks-state.ts:153/170/181`), flipped only inside a test. Same shape as round 1's in-test "mutant". The named
+  inconclusive cases themselves are real.
+- **R184-1 met:** the evaluator reads `ci.yml`, and the mutant (`7c02c7d`, `ci.yml` master-push clause restored) failed
+  on tcm (`36310226139`). It was committed into the candidate's history and reverted, where Grok kept mutants on
+  separate branches.
+- **R184-4 met:** `src/pipelines/sync/ci-runs-on.ts` is removed.
+- **The pattern across two rounds:** each delivery has the SHAPE the brief asks for (red run, mutants, named cases)
+  with evidence that cannot fail. Grok's evidence held when read.
