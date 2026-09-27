@@ -45,8 +45,14 @@ folder.
 script out of the commit first, because the desktop had no copy as of 2026-09-27.
 
 ```
-! cd ~/Worktrees/sia-qa && git fetch -q origin && git show <sha>:docs/loops/qa-queue.ps1 > ~/qa-queue.ps1 && powershell -NoProfile -Command "Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\melve\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'}"
+! cd ~/Worktrees/sia-qa && git fetch -q origin && git show <sha>:docs/loops/qa-queue.ps1 > ~/qa-queue.ps1
+! powershell -NoProfile -Command "Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Users\melve\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'; CurrentDirectory='C:\Users\melve'}"
 ```
+
+**On this desktop, use the full `powershell.exe` path and `CurrentDirectory`.** The bare `powershell` form, which works
+over ssh on the other two machines, returned `ReturnValue 9` (path not found) here, and nothing started (2026-09-27
+01:36Z). The form above returned 0 and started QA 149. The cause is not confirmed: `powershell` is on the machine
+PATH. Only the working form is recorded here.
 
 **Success looks like** `ReturnValue : 0` plus a `ProcessId`. Then the planner reads
 `%USERPROFILE%\sia-qa-queue\queue.log` over ssh, and it must show `start=queue=<N,M>` and `run.<N>=started`.
