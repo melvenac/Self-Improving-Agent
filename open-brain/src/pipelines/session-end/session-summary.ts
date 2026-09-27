@@ -78,8 +78,7 @@ function findSessionDb(
         // An open that throws is not "no db has this session" (SILENT 14).
         // A readable file with no session_meta holds no session (T048-D2).
         const msg = errorText(err);
-        if (msg.includes("no such table: session_meta")) noMeta = true;
-        else unreadable.push(msg);
+        unreadable.push(msg);
       } finally {
         db?.close();
       }
