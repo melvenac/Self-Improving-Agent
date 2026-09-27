@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { isStateRecord } from "./state-record.js";
 
 /**
  * Finds the project root by walking up from `start` (Loop 3, R4).
@@ -41,14 +42,16 @@ export function resolveRepoRoot(start: string): string | null {
  * and a bare-directory marker would stop there and reproduce the wrong
  * answer this module exists to prevent. `.agents/SYSTEM/` or `.agents/META/`
  * is what readProjectState actually reads, so it is what counts, and so is
- * a record (`.agents/state.json`). None of the three needs a `package.json`:
+ * a record (`.agents/state.json` that is a JSON object carrying
+ * `schema_version`, R-BF-18). A file that is not a record does not count.
+ * None of the three needs a `package.json`:
  * the stray is excluded by having none of them, not by the missing file.
  * `open-brain/` alone still does, since it is only a marker beside one.
  */
 export function isProjectRoot(dir: string): boolean {
   if (existsSync(join(dir, ".agents", "SYSTEM"))
     || existsSync(join(dir, ".agents", "META"))
-    || existsSync(join(dir, ".agents", "state.json"))) return true;
+    || isStateRecord(join(dir, ".agents", "state.json"))) return true;
   return existsSync(join(dir, "package.json")) && existsSync(join(dir, "open-brain"));
 }
 
@@ -65,5 +68,5 @@ export function resolveHookProjectDir(candidate: string): string {
 }
 
 export function describeNoRoot(start: string): string {
-  return `no project root found walking up from ${resolve(start)} — need a directory holding .agents/SYSTEM/, .agents/META/ or .agents/state.json, or package.json beside open-brain/`;
+  return `no project root found walking up from ${resolve(start)} — need a directory holding .agents/SYSTEM/, .agents/META/, or a .agents/state.json that is a record, or package.json beside open-brain/`;
 }

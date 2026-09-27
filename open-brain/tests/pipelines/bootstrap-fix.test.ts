@@ -214,7 +214,7 @@ describe("BF-3: `open-brain bootstrap check` / `move-residue`", { timeout: E2E_T
   it("a record (state.json) is BOOTSTRAPPED and prose TASKS/ is PRE-STATE; move-residue refuses both and moves nothing", () => {
     const a = scratchProject(tmps);
     mkdirSync(join(a, ".agents"));
-    writeFileSync(join(a, STATE_REL), "{}\n");
+    writeFileSync(join(a, STATE_REL), '{"schema_version":3,"revision":0,"project":{"name":"q"}}\n');
     expect(JSON.parse(cli(["bootstrap", "check", "--json", a], a).stdout).agents.kind).toBe("bootstrapped");
     const ra = cli(["bootstrap", "move-residue", a], a);
     expect(ra.status).toBe(1);

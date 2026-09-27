@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSyn
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync, spawnSync } from "node:child_process";
+import { whyNotARecord } from "../../shared/state-record.js";
 
 /**
  * `/bootstrap`'s deterministic half (docs/loops/bootstrap-fix-brief.md,
@@ -43,7 +44,7 @@ export type AgentsState =
   | { kind: "pre-state" }
   /** Scaffold's files, no record yet (R-BF-10). `inboxIsTemplate`: step 5 has not replaced the example tasks. */
   | { kind: "scaffolded"; inboxIsTemplate: boolean }
-  /** A state.json that is not a record (R-BF-11): zero bytes, not JSON, or the old template's {{PROJECT}} seed. */
+  /** A state.json that is not a record (R-BF-11, R-BF-17): not a JSON object carrying schema_version, or the old template's {{PROJECT}} seed. */
   | { kind: "not-a-record"; why: string }
   | { kind: "bootstrapped" };
 
@@ -104,8 +105,9 @@ function claudeMdState(root: string): ClaudeMdState {
  * project on the pre-record framework, which goes the IMPORT path; anything
  * else is residue — named here, moved aside by `moveResidue`, never deleted.
  *
- * Round 3: a record is one that PARSES and is not the old template's seed
- * (R-BF-11); and scaffold's own `AGENT.md` marks a scaffold that has not been
+ * Round 3: a record is one that parses and is not the old template's seed
+ * (R-BF-11). Round 4: it must be a JSON object that carries `schema_version`
+ * (R-BF-17). Scaffold's own `AGENT.md` marks a scaffold that has not been
  * imported yet, which goes on at step 4, not the import (R-BF-10) — a resumed
  * bootstrap used to skip steps 4 and 5 and import the template's example tasks.
  */
@@ -114,7 +116,7 @@ function agentsState(root: string, templateDir = defaultTemplateDir()): AgentsSt
   if (!existsSync(agents)) return { kind: "absent" };
   const statePath = join(agents, "state.json");
   if (existsSync(statePath)) {
-    const why = notARecord(statePath);
+    const why = whyNotARecord(statePath);
     return why === null ? { kind: "bootstrapped" } : { kind: "not-a-record", why };
   }
   if (isScaffoldAgentMd(join(agents, "AGENT.md"))) {
@@ -129,17 +131,6 @@ function agentsState(root: string, templateDir = defaultTemplateDir()): AgentsSt
     .map((n) => (statSync(join(agents, n)).isDirectory() ? `${n}/` : n))
     .sort();
   return entries.length === 0 ? { kind: "empty" } : { kind: "residue", entries };
-}
-
-/** Null when the file is a record; otherwise why not. Parsing is the test, not the schema: an older schema is still a record, and migrating it is not bootstrap's job. */
-function notARecord(path: string): string | null {
-  const text = readFileSync(path, "utf8");
-  if (text.trim() === "") return text.length === 0 ? "zero bytes" : "only whitespace";
-  let data: unknown;
-  try { data = JSON.parse(text); } catch (err) { return `not JSON (${(err as Error).message})`; }
-  const name = (data as { project?: { name?: unknown } } | null)?.project?.name;
-  if (typeof name === "string" && name.includes("{{")) return `the old template's placeholder seed (project "${name}")`;
-  return null;
 }
 
 /** The line scaffold writes into `.agents/AGENT.md`, and the one `check` reads to tell a scaffold from a pre-record project. */
@@ -164,7 +155,7 @@ function nextStep(g: GitState, a: AgentsState, templateFound: boolean): string {
       (a.inboxIsTemplate ? " .agents/TASKS/INBOX.md still holds the template's example tasks: step 5 replaces them with this project's." : "");
   }
   if (a.kind === "pre-state") return "An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.";
-  if (g.kind === "nested") return `STOP: this folder is inside another repository (${g.toplevel}). Bootstrap a project at its own repository root.`;
+  if (g.kind === "nested") return `STOP: this folder is inside another repository (${g.toplevel}). \`git init\` here makes this folder its own project, or move the folder out of the enclosing repository.`;
   // Residue first: moved before the pre-SIA commit, it never enters it.
   if (a.kind === "residue") return "Move the residue aside first (`bootstrap move-residue`), then run check again.";
   const leaveOut = "leaving .agents/ out of that commit (`git add -A -- . \":(exclude).agents\"`)";
@@ -203,6 +194,12 @@ export const RESIDUE_PREFIX = "pre-bootstrap-residue-";
 export class ResidueReadBackError extends Error {}
 
 /**
+ * A move that happened and could not be put back. It is NOT a refusal — some
+ * entries moved — so the CLI must never print it as one (R-BF-20).
+ */
+export class ResidueUndoError extends Error {}
+
+/**
  * Moves each residue entry of `.agents/` into a NEW folder,
  * `.agents/archive/pre-bootstrap-residue-<date>/` (then `-2`, `-3` … when that
  * exists), inside `.agents/archive/`, which the template gitignore ignores:
@@ -229,13 +226,14 @@ export function moveResidue(projectRoot: string, today: string, deps: { rename?:
   try {
     for (const n of names) { rename(join(agents, n), join(dest, n)); moved.push(n); }
   } catch (err) {
-    // Put back what moved, then remove the one empty folder this call made; the
-    // refusal names where each entry is if even that fails.
+    // Put back what moved, then remove the empty folder this call made. If even
+    // that fails, name what moved and what stayed: that path is not a refusal (R-BF-20).
     try {
       for (const n of moved.reverse()) renameSync(join(dest, n), join(agents, n));
       rmdirSync(dest);
     } catch {
-      throw new Error(`residue move failed (${(err as Error).message}) and could not be undone: ${moved.join(", ")} are in ${rel}/, the rest in .agents/`);
+      const stayed = names.filter((n) => !moved.includes(n));
+      throw new ResidueUndoError(`residue move failed (${(err as Error).message}) and could not be undone: ${moved.join(", ")} moved to ${rel}/, and ${stayed.join(", ")} stayed in .agents/`);
     }
     throw new Error(`residue move failed: ${(err as Error).message} — every entry put back, nothing moved`);
   }

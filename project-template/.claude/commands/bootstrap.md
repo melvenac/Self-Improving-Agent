@@ -31,7 +31,7 @@ It reports git, `CLAUDE.md` and `.agents/`, and ends with a `Next:` line. Act on
 | `RESIDUE — …` | Old files with no record. Step 2 moves them aside. |
 | `absent` or `empty` | Go on. |
 
-If `git:` says `inside another repository`, **stop**: bootstrap a project at its own repository root.
+If `git:` says `inside another repository`, **stop**. `git init` here makes this folder its own project, or move the folder out of the enclosing repository.
 
 ## Step 2: Residue aside, then the project is its own commit
 
