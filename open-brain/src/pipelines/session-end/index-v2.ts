@@ -146,7 +146,6 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     // signal the corpus still has.
     if (supplied === undefined) {
       omitted.push(id);
-      continue;
     }
 
     const matched = tags.some((tag) => summaryLower.includes(tag.toLowerCase()));
