@@ -12,8 +12,15 @@ classifier, so Aaron runs it by typing these lines, with the leading `!`, into t
   - **The queue runs from that copy, never from inside the QA checkout, because `-Checkout` moves the checkout.**
   - If `docs/loops/qa-queue.ps1` changes, re-copy it first:
     `git show <sha>:docs/loops/qa-queue.ps1 > %USERPROFILE%\qa-queue.ps1`, run through `cmd /c` on the machine.
-- The queue fetches, waits for any running QA driver to finish, and only then moves the checkout to `-Checkout`. So a
-  second queue can be launched while one is still running.
+- **Do NOT launch a second queue on a machine while a QA run is still going there.**
+  - The script is DESIGNED to wait for a running driver before it moves the checkout. **On 2026-09-27 that wait did not
+    hold.** The QA 144 queue, started at 01:12:12Z on the QA PC while QA 134's driver (pid 1748) was running, moved the
+    checkout `2667c6b` → `46efa7e` two seconds later. That move changed 176 files, source included.
+  - From an ssh shell, the same detector found pid 1748. **Why it failed inside the queue is not known.** The planner's
+    probe of the queue's own launch context was refused by the auto-mode classifier as a remote shell write.
+  - QA 134 was not disturbed: it works in its own worktrees under `C:\qa-scratch\qa134`.
+  - **Until the cause is found, launch a queue only on an idle machine:** check the queue log's last line (`end=` or
+    `exit.N=`) first.
 - `Invoke-CimMethod Win32_Process Create` starts it detached, so it survives the ssh session closing.
 
 ## The lines
