@@ -46,10 +46,10 @@ export function resolveRepoRoot(start: string): string | null {
  * `open-brain/` alone still does, since it is only a marker beside one.
  */
 export function isProjectRoot(dir: string): boolean {
-  if (existsSync(join(dir, ".agents", "SYSTEM"))
+  if (!existsSync(join(dir, "package.json"))) return false;
+  return existsSync(join(dir, ".agents", "SYSTEM"))
     || existsSync(join(dir, ".agents", "META"))
-    || existsSync(join(dir, ".agents", "state.json"))) return true;
-  return existsSync(join(dir, "package.json")) && existsSync(join(dir, "open-brain"));
+    || existsSync(join(dir, "open-brain"));
 }
 
 /**
