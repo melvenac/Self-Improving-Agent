@@ -34,7 +34,24 @@ if (Test-Path $tempRoot) { Remove-Item -LiteralPath $tempRoot -Recurse -Force }
 New-Item -ItemType Directory -Force $tempRoot | Out-Null
 
 $results = New-Object System.Collections.Generic.List[string]
+$script:Expectations = New-Object System.Collections.Generic.List[object]
 function Note([string] $line) { $results.Add($line); Write-Output $line }
+
+function Register-Expect([string] $line, [string] $role) {
+  # role new: every _expect must be True. role old: every _expect is the red (must be False).
+  if ($line -notmatch '_expect (.+)=(True|False)$') { return }
+  $actual = ($Matches[2] -eq 'True')
+  $passed = if ($role -eq 'old') { -not $actual } else { $actual }
+  $script:Expectations.Add([pscustomobject]@{ line = $line; role = $role; passed = $passed })
+}
+
+function Finish-RestoreExpectations {
+  $failed = @($script:Expectations | Where-Object { -not $_.passed })
+  $passed = @($script:Expectations | Where-Object { $_.passed })
+  Note ("expect_summary role=new|old passed=$($passed.Count) failed=$($failed.Count)")
+  foreach ($f in $failed) { Note ("FAIL_EXPECT $($f.line) role=$($f.role)") }
+  if ($failed.Count -gt 0) { exit 1 }
+}
 
 function New-StubRepo([string] $userProfile) {
   $tree = Join-Path $userProfile 'Worktrees\sia-qa'
@@ -116,9 +133,25 @@ function Stop-Pid([int] $procId) {
   $ErrorActionPreference = $prev
 }
 
-function Read-Lines([string] $path) {
+function Read-Lines([string] $path, [int] $maxWaitMs = 2000) {
   if (-not (Test-Path -LiteralPath $path)) { return @() }
-  return @(Get-Content -LiteralPath $path)
+  $deadline = (Get-Date).AddMilliseconds($maxWaitMs)
+  while ($true) {
+    try {
+      $fs = New-Object System.IO.FileStream($path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+      try {
+        $sr = New-Object System.IO.StreamReader($fs)
+        $text = $sr.ReadToEnd()
+        $sr.Dispose()
+        return @($text -split '\r?\n' | Where-Object { $_ -ne '' })
+      } finally {
+        $fs.Dispose()
+      }
+    } catch {
+      if ((Get-Date) -ge $deadline) { Fail "read_failed path=$path error=$($_.Exception.Message)" }
+      Start-Sleep -Milliseconds 200
+    }
+  }
 }
 
 function Wait-File([string] $path, [int] $seconds) {
@@ -231,9 +264,13 @@ function Run-RestoreHarness([string] $scriptPath, [string] $label) {
     $exitText = ($exit9997 -join '; ')
     Note ("restore_${label}_$($case.name) done=$done head=$headEnd shaA=$($case.repo.shaA) item2_ran=$item2Ran restore_failed=$($restoreFailed.Count) run9997=$($run9997.Count) exit9997=$exitText")
     if ($case.expectItem2) {
-      Note ("restore_${label}_$($case.name)_expect item2_on_shaA=$($item2Ran -and $headEnd -eq $case.repo.shaA)")
+      $expectLine = "restore_${label}_$($case.name)_expect item2_on_shaA=$($item2Ran -and $headEnd -eq $case.repo.shaA)"
+      Note $expectLine
+      Register-Expect $expectLine $label
     } else {
-      Note ("restore_${label}_$($case.name)_expect no_run_and_failed=$($restoreFailed.Count -ge 1 -and $run9997.Count -eq 0)")
+      $expectLine = "restore_${label}_$($case.name)_expect no_run_and_failed=$($restoreFailed.Count -ge 1 -and $run9997.Count -eq 0)"
+      Note $expectLine
+      Register-Expect $expectLine $label
     }
   }
 }
@@ -244,6 +281,7 @@ if ($RestoreOnly) {
   if ($OldScript -and (Test-Path -LiteralPath $OldScript)) {
     Run-RestoreHarness $OldScript 'old'
   }
+  Finish-RestoreExpectations
   exit 0
 }
 
@@ -385,6 +423,7 @@ Run-RestoreHarness $NewScript 'new'
 if ($OldScript -and (Test-Path -LiteralPath $OldScript)) {
   Run-RestoreHarness $OldScript 'old'
 }
+Finish-RestoreExpectations
 
 Note '--- summary ---'
 Note ("PASS live_holder_refused=$liveOk")
