@@ -1,8 +1,8 @@
-<!-- generated from .agents/state.json rev 133 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 134 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner _(written session 109)_
+## planner [legacy] _(written session 109)_
 
 ### Pick up here
 
@@ -43,7 +43,7 @@ Read docs/loops/planner-session-109-notes.md, section 'HANDOFF TO THE NEXT PLANN
 - importer-fixes-r4-rulings-qa122 (R4-4/R4-5)
 - t185-rulings-qa120, t183-rulings-qa114
 
-## developer _(written session 74)_
+## developer [legacy] _(written session 74)_
 
 ### Pick up here
 
@@ -67,7 +67,7 @@ LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.44.0.
 - IS THE 0.28s PER Bash CALL ACCEPTABLE? R22 kept the census's denominator for the evaluation period and put the cost to Aaron. The named follow-up is a cheap not-asked path that appends to the log the hook already writes and lets the session-end hook reconcile it into trigger_fires.
 - SHOULD THE RANKING BE REPAIRED, AND HOW? Entry 299 ranks 4 of 11 against ten same-topic competitors; the live store ranks it first only because five entries match all three terms. Key-column weighting moves it (x10 to first, by 0.56) but a weight chosen to make a test pass is tuning to the test.
 
-## qa _(written session 75)_
+## qa [legacy] _(written session 75)_
 
 ### Pick up here
 
@@ -94,4 +94,4 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 
 ## Last session
 
-Session 76 — 2026-09-21 — planner — `22631f4e-433a-4f29-8669-47ee2f543bec`
+Session 76 — 2026-09-21 — planner — `22631f4e-433a-4f29-8669-47ee2f543bec` (1 writing session(s) in the record)
