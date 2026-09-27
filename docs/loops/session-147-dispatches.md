@@ -369,3 +369,18 @@ match Composer's reported lines. Its first live round under D-060 had real evide
 
 **Morning:** re-copy `qa-queue.ps1` from `f590448` to both QA machines, clean both QA trees, and relaunch 161+178
 (laptop) and 182+183 (QA PC). Each line is Aaron's, dry-run first.
+
+### Record 186 (T-193, cursor-builder / Grok, product `683b61c`, PR #186): ACCEPTED by the planner, written 11:46:01Z
+
+- **Evidence checked:** red `36315913592` at `ea52b80`. Its product is a stub that passes every root, and its test file
+  is byte-identical to the final one, so the red is the final rows against the unfixed product. No seeded assertion.
+  Green `36316160629`. Mutants on their own branches: any-name `19d5c38` (`36316403690`, only the loop-named row) and
+  hard-coded seats `cbfee4a` (`36316497065`). All four conclusions read on GitHub.
+- **Code read:** a porcelain parser that refuses unknown keys, with `locked` and `prunable` known; the main checkout is
+  exempt; the seat file is `.agents/SYSTEM/worktree-seats.json` (allowlisted); no file is a SKIP; every message
+  carries the LIMIT line and the walked count.
+- **PR #186 awaits Aaron's merge** (code). On merge, close T-193, and T-149 against it. Relay has the path and format.
+- **Its first live run found four stray registered worktrees in SIA's repo**, all in old sessions' temp scratchpads, all
+  clean, with nothing unpushed: `…/sia-builder/6a780747…/scratchpad/tip`, `…/sia-infra/f18c4d9e…/scratchpad/tip`,
+  `…/sia-planner/9a149231…/scratchpad/wt-iso` and `%TEMP%/sia-r5-probe-e2f`. Removal needs Aaron's word (shared.md).
+  QA's second checkout is now `git archive`, never a worktree; seats' scratch probes should follow that too.
