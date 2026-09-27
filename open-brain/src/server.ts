@@ -181,7 +181,9 @@ export async function handleSync(args: {
       lines.push(`\nHealth Score: ${scoreResult.total}/100`);
       for (const cat of scoreResult.categories) {
         const pct = Math.round((cat.score / cat.max) * 100);
-        lines.push(`  ${cat.name}: ${cat.score}/${cat.max} (${pct}%)${invocationLogSuffix(cat)}`);
+        const logNote = invocationLogSuffix(cat);
+        const hidden = logNote === " (invocation log: missing)" || logNote === " (invocation log: unreadable)" ? "" : logNote;
+        lines.push(`  ${cat.name}: ${cat.score}/${cat.max} (${pct}%)${hidden}`);
       }
       // /sync --score is the route actually used in practice; without this the
       // trend history silently stopped collecting (no entries Apr–Jul 2026).
@@ -614,7 +616,9 @@ export async function handleScore(args: {
       lines.push(`Health Score: ${scoreResult.total}/100`);
       for (const cat of scoreResult.categories) {
         const pct = Math.round((cat.score / cat.max) * 100);
-        lines.push(`  ${cat.name}: ${cat.score}/${cat.max} (${pct}%)${invocationLogSuffix(cat)}`);
+        const logNote = invocationLogSuffix(cat);
+        const hidden = logNote === " (invocation log: missing)" || logNote === " (invocation log: unreadable)" ? "" : logNote;
+        lines.push(`  ${cat.name}: ${cat.score}/${cat.max} (${pct}%)${hidden}`);
       }
 
       // Append to history
