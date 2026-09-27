@@ -1128,7 +1128,7 @@ async function runLoopInner(
       // R77. Anything still unrestored, or any directory that could not be listed,
       // ends the stage before git. A planted hook in an unreadable directory must
       // not be read as "no files there", and rollback's checkout would run it.
-      if (configVerdict && (configVerdict.unrestored.length > 0 || configVerdict.unlisted.length > 0)) {
+      if (configVerdict && configVerdict.unlisted.length > 0) {
         const named = [...configVerdict.unlisted, ...configVerdict.unrestored];
         return {
           ok: false,
