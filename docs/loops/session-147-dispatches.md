@@ -161,3 +161,17 @@ Each of these escaped to Aaron, a PR or a tracked file, so each is an error rath
 3. **Two dispatches went out before the Step-Back, PRD.md and README.md were read.** It was the third time, and
    Aaron had to send the link. The dispatches carried out earlier rulings, but the rule is to read first. T-167 is
    the structural fix.
+
+## Record 184: T-192 replayed by Composer 2.5 (the developer-model test, T-165's question)
+
+**Aaron, planner session 147:** "I've been running grok 4.7 in cursor, what do you think about testing composer as the
+dev agents? Worth testing?", then "write the replay brief, composer is set in infra and ready". Brief:
+`docs/loops/t192-replay-composer-brief.md`. **How the planner scores it, kept here and not in the brief:**
+- **Same inputs, same order.** Composer gets record 181's brief only. Round 181b (the unread-steps finding) and the
+  D-055 paths-ignore addition are sent as separate turns **only if and when** they apply to its code, as they did for
+  Grok. If Composer's first delivery has no silent fall-through, 181b is not sent, and that is a result.
+- **Measured for both:** rounds to a candidate the planner accepts; defects the planner finds by reading the diff;
+  whether the red-first run fails for the stated reason and each mutant kills only its row; tcm runs used; wall-clock
+  time from dispatch to each push. Grok's figures: record 181, candidate `a38ff92` in three rounds; tcm runs as
+  listed in `t192-dispatch-qa.md`.
+- **QA:** Composer's candidate is scored by **GPT-5.6 Sol**, not Composer. The same model must not build and judge.
