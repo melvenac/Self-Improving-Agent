@@ -141,10 +141,7 @@ export const execRunner: CommandRunner = (cmd, args, cwd) => {
  * T-192: a failure whose `test` job recorded no steps is `never-started`, not
  * `failure`. GitHub's billing refusal looks like a failure and has no log.
  * The check reads `gh run view <id> --json jobs` and the `test` job's `steps`
- * array. It does not read the check-run annotation. A view that succeeded
- * with no job named `test` is `steps not read: job test absent in run view`.
- * A `test` job whose `steps` field is not an array (absent or null, not `[]`)
- * is `steps not read: steps field missing`. An empty array stays never-started.
+ * array. It does not read the check-run annotation.
  */
 export function checkCiStatus(projectRoot: string, run: CommandRunner = execRunner, branch = "master"): CheckResult {
   const name = "ci-status";
@@ -185,13 +182,7 @@ export function checkCiStatus(projectRoot: string, run: CommandRunner = execRunn
       return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure (steps not read: unparseable job list)` };
     }
     const test = body.jobs?.find((j) => j.name === "test");
-    if (!test) {
-      return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure (steps not read: job test absent in run view)` };
-    }
-    if (!Array.isArray(test.steps)) {
-      return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure (steps not read: steps field missing)` };
-    }
-    if (test.steps.length === 0) {
+    if (test && Array.isArray(test.steps) && test.steps.length === 0) {
       return {
         name,
         report: true,
