@@ -828,15 +828,12 @@ export class ConfigWatch {
         // R96. The stored kind is unobservable. The note says what is true: absent, lstat failed, not removed.
         if (b === null && a !== null && a.readError && a.dev === null) {
           const code = a.readErrno ?? "UNKNOWN";
-          const leftInPlace =
-            `${path} (absent at the open; cannot be lstat'd at close (${code}); not removed)`;
           changes.push({
             path,
             kind: "unobservable",
             before: "absent",
             after: `unobservable (${code}); ${stateHash(a)}`,
           });
-          unrestored.push(leftInPlace);
           continue;
         }
         changes.push({
