@@ -91,7 +91,7 @@ export const TaskSchema = z.strictObject({
    * than the writer's, or by an unrecorded one, is refused unless the op names
    * it (`replace_other_sessions`).
    */
-  note_by: z.array(z.string().min(1)).nullable().default(null),
+  note_by: z.array(z.string().min(1)).nullable(),
   /**
    * The record revision the closing write produced (R179-1 as extended to done
    * tasks, record 128). Done-task retention counts the sessions that first
