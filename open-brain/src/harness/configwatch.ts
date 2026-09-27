@@ -823,18 +823,6 @@ export class ConfigWatch {
         b = before.has(path) ? before.get(path)! : null;
         a = this.readForCompare(path, b, chains);
         if (!changed(b, a)) continue;
-        // R90. Absent at the open, and lstat failed at the close: that is not a created file.
-        // The record is absent → unobservable (<code>). Nothing is removed, and the note does not say one was.
-        if (b === null && a !== null && a.readError && a.dev === null) {
-          const code = a.readErrno ?? "UNKNOWN";
-          changes.push({
-            path,
-            kind: "modified",
-            before: "absent",
-            after: `unobservable (${code}); ${stateHash(a)}`,
-          });
-          continue;
-        }
         changes.push({
           path,
           kind: b === null ? "created" : a === null ? "deleted" : "modified",
