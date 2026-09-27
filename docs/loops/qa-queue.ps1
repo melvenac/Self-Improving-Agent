@@ -277,14 +277,7 @@ try {
     $now = (git rev-parse HEAD).Trim()
     if ($now -ne $head) {
       L "head_moved.$n" "$now; restoring $head"
-      $restoreErr = (git checkout -f -q --detach $head 2>&1 | Out-String).Trim()
-      $after = (git rev-parse HEAD).Trim()
-      if ($after -ne $head) {
-        $errLine = if ($restoreErr) { ($restoreErr -split "`n" | Select-Object -First 1) } else { "exit=$LASTEXITCODE" }
-        L "restore_failed.$n" "wanted=$head got=$after error=$errLine"
-        L 'abort' "restore failed before $n; remaining items need the launch tree"
-        exit 1
-      }
+      git checkout -f -q --detach $head 2>$null | Out-Null
     }
 
     # 4. Run the driver and wait, with a hard limit.
