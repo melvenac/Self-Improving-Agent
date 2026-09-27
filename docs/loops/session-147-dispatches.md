@@ -572,3 +572,34 @@ the plugin cache) is **not durable**, and nothing detects it coming back. This f
 - **Do not edit anything under `~/.claude` or `~/.cursor`.** This round is detection only. The preventer (the
   cache-heal hook) is Aaron's config.
 tcm, at most 6 runs. Handoff: `docs/loops/t046-detector-developer-handoff.md`.
+
+## HANDOFF TO THE NEXT PLANNER (record session 147 rolls here, 2026-09-27T23:25Z). Read this section first.
+
+**Why it is here and not in the record's handoff slot:** Aaron reconnected `/mcp` onto the new build, and T-003 then
+correctly refused `set_handoff` and `ob_set_session` for this session. It started before the build, so its SessionStart
+hook wrote no session proof (`by-pid/15644.json` absent). The record's slot still holds rev 142's handoff; **this
+section supersedes it.** First act next session: `ob_set_session`, then write this handoff into the record.
+
+**State:**
+- **Loop 15 slice three:** A MERGED (#182); B MERGED (#187, QA 189 ACCEPTED). **C (T-155) is next:** QA 191 (C's criteria)
+  is written and dry-run on the QA PC, **awaiting Aaron's launch** (`-Queue 191 -Checkout d8166b6bbb1a6493a9e219096fa4b88bf68f6165`,
+  in `qa-launch.md`'s QA PC form). Then rule the criteria, then brief C's build.
+- **Merged today:** #186, #188, #189, #187, #190, #191. Master `bf33fe4`. **Master push CI runs on tcm** (T-192 verified on
+  tcm-2/tcm-1). **The main checkout is at `bf33fe4`, rebuilt**; build-freshness PASS.
+- **In flight:** record 192 (cursor-infra, Composer: the Cursor QA driver's push-route refusal and ref-audit attribution);
+  record 193 (cursor-builder, Grok: T192-D1 and T-048 r3's server rows; READ, working); record 194 (Grok/sia-forge: the
+  T-046 `cursor-hook-compat` detector). **At 23:24Z Grok had not read 193-194, and infra had not read 36-37;** Aaron has
+  nudge lines. Review every delivery's diff and failed logs (D-060).
+- **A `windows=true` CI run on master** (`36358221545`, laptop) was in progress. Read its result.
+
+**Watch out:**
+- **No planner push while a QA run is in flight** (the audit reads origin's refs). Record 192 fixes the attribution.
+- **Main checkout: `npm install`, never `npm ci`,** while sessions are open.
+- **After any context-mode or Grok Build update, re-test Cursor CLI** (T-046); record 194 is the detector.
+- **Pre-upgrade sessions** show a non-blocking "UserPromptSubmit hook error … 1.0.22/hooks/userpromptsubmit.mjs". A restart
+  or `/reload-plugins` fixes it.
+- **Cursor seats' `--wait` lapses after about 1 h.** Check `/a2a/agents/live` and `/reads` before asking Aaron to nudge.
+- **Derive every time and count from its source.**
+
+**Open:** Telegram approval (D-058) is on HOLD by Aaron. QA seats keep checking candidates out in the shared tree; a
+driver-level guard may be worth a round.
