@@ -116,3 +116,35 @@ unaffected. The planner dispatched the suite on `master` `e201baa` to tcm as run
   - Two things to read in QA 162's report: `porcelain_lines=7` at start, and `defender_exclusions=` empty.
 - **QA PC** (DESKTOP-O4EGB1E), pid 5656: `-Queue 174,172,173 -Checkout b463ff2`. The log shows
   `start=queue=174,172,173` and `head=b463ff2` at 08:27:56Z. The quiet-CPU wait comes before `run.174`.
+
+## Record 181, `cursor-builder` (`sia-builder`, room `k57098epn7qz32vt0cazfjpbes8f6kdq`): T-192, master's CI moves to tcm
+
+**Aaron's ruling, planner session 147, verbatim:** "move master's CI to tcm". **Why:** GitHub refuses the
+`ubuntu-latest` job on master pushes for billing, so master has had no push CI since #171 (T-192; this file, "master's
+push CI has not run since #171").
+
+**The site, read at `c4845b9`:** `.github/workflows/ci.yml:43`:
+`runs-on: ${{ ((github.event_name == 'push' && github.ref == 'refs/heads/master') || inputs.hosted) && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}`,
+plus the comment above it at `:40-42`. `/sync`'s check is `ci-status` in
+`open-brain/src/pipelines/sync/checks-state.ts`. The planner found it by `grep` and has not read the function.
+
+**Do:**
+1. **A master push runs on tcm.** Only `inputs.hosted == true` selects `ubuntu-latest`, as the fallback when tcm is
+   down. Update the comment, and keep the job name `test` (D-032's gate reads it).
+2. **`ci-status` names a job that never started as its own state,** not as `failure`. The signature seen on all six
+   master runs from `36303132573` to `36304185040`: conclusion `failure`, zero steps, no log, and a check-run
+   annotation beginning "The job was not started because". Say what the check reads to tell the two apart, and state
+   the limit in its output.
+
+**Done means:**
+- Item 1: a test that parses `ci.yml` (a YAML parser, never a regex; `shared.md`) and asserts the `runs-on`
+  expression's result for four cases: master push → tcm; dispatch → tcm; dispatch with `hosted=true` →
+  `ubuntu-latest`; push to a non-master branch → tcm. Evaluate the expression with a small evaluator you name, or pin
+  the exact string and say why that is enough. Mutant: restore the master-push clause, and the first case goes red.
+- Item 2: red-first rows for "never started", a real failure, and a success, on recorded `gh` responses. One mutant
+  that folds never-started back into failure.
+- **Preserve:** the egress self-check runs on every tcm job, and so on master pushes now. `test-windows` stays
+  opt-in. Dispatch inputs are unchanged.
+- **Not observable before merge:** the first real master push landing on tcm. After Aaron merges, the planner reads
+  that run's runner name, and that read is the acceptance.
+- Handoff at `docs/loops/t192-developer-handoff.md`. Branch `loop/t192-ci-tcm` from `origin/master`.
