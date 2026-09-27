@@ -413,3 +413,63 @@ the morning.
   (`C:\Users\melve`) has no space, and the dry run launched no driver. **Fix:** the path is quoted. It was proven with
   a script at a path containing a space: the old form reproduces `-196608`, and the fixed form runs. **The family is
   the same as the first failure:** the test did not use the target machine's shape.
+
+## HANDOFF TO THE NEXT PLANNER (session 109 rolls here, 2026-09-27 ~00:45Z). Read this section first.
+
+**In flight right now:**
+- **QA PC** (`qa-queue.ps1 -Queue 130,132,134 -Checkout 2667c6b`): 130 (A11) DONE, REJECTED (rulings-20). **132** (E_t
+  criteria) and then **134** (T-179 round 2) are running or queued. Report branches: `qa/b-et-criteria-report` and
+  `qa/t179-r2-report`.
+- **Laptop** (`-Queue 138 -Checkout 7b0598c`): **138** (importer leftovers) is running; the report goes to
+  `qa/importer-leftovers-report`.
+- **Dispatched, waiting for a free QA machine** (the drivers are pushed): **142** (T-003, `706c029`) and **144**
+  (T-171, `b371176`). **Launch per machine: Aaron runs the queue**; the planner is refused that by the host
+  classifier. The commands are in this file's earlier sections (copy the queue script, then `Invoke-CimMethod …
+  qa-queue.ps1 -Queue N -Checkout <sha>`). The laptop's checkout is `C:/Users/Aaron/Worktrees/sia-qa`, and the QA PC's
+  is `C:/Users/AARONM~1/Worktrees/sia-qa`.
+- **`sia-builder`:** the `/bootstrap` fix ROUND 3 (record 141, `loop/bootstrap-fix-r3`), per
+  `bootstrap-fix-rulings-qa135.md`.
+- **Grok:** needs a FRESH Cursor chat for **A12** (record 143), per `loop-15-slice-3-rulings-20.md` §"A12 brief".
+- **`sia-infra`:** FREE (T-171 handed back).
+
+**The candidates and where each stands:**
+
+| Item | Candidate | State |
+|---|---|---|
+| A (config watch) | A11 `ef2a8a7` REJECTED by QA 130, narrowly | A12 = R90–R94 (small); QA scores it narrowly |
+| B part 1 (G-042) | MERGED (PR #165, `7640b93`) | done |
+| B part 2 (E_t, R10) | criteria in QA 132 | build after A merges (`harness/schemas`) |
+| C (T-155) | not started | after B is accepted |
+| T-179+T-163 round 2 | `1646567` (handoff `d0335d7`) | QA 134. Merging MIGRATES the live record: Aaron runs the checklist |
+| /bootstrap fix | r2 `6543e8e` passed BF-1..8 (QA 135) | round 3 building (non-Node projects, the parent walk-up) |
+| importer leftovers | `d500730` | QA 138 running |
+| T-003 | `706c029` | QA 142 queued. Row #348's repair UPDATE is in its handoff §6, for Aaron |
+| T-171 | `b371176` | QA 144 queued |
+
+**Everything below is stacked on T-179 round 2 (`d0335d7`):** the /bootstrap fix, the importer leftovers, T-003 and
+T-171. **Merge order:** T-179 round 2 first, then each stacked branch, which merge cleanly per the planner's
+`merge-tree` checks.
+
+**New rules this session (in force):**
+- a handoff is pushed before any `/clear` (a memory);
+- no laptop (`windows=true`) CI without asking the planner (a memory);
+- dispatches do not set effort; the seat's own setting does, and each seat reports its effort from its transcript;
+- a QA report is committed from a separate worktree;
+- tcm runs only the hub and the CI runners.
+
+**Tasks to OPEN in the record** (not yet written through `ob_state`; this planner did no state write after rev 132):
+- T-048's 26 SILENT drops (`docs/loops/research/t048-silent-drops.md`), the top three in `/sync`'s own checks;
+- `update_gap` replacing silently (R171-2);
+- a measured Cursor session proof (T-003 Q2);
+- `ob_state` writing `state.json` before the views (QA 125 D8);
+- the view header stamped with the project's version, the objective keeping markdown bold, and the template README's
+  `cp -r` path (QA 135);
+- the ci.yml master-push minutes issue (hosted minutes until 2026-10-01);
+- D7 `state show --verified` (QA 114).
+
+**Close:** T-056 (fixed in v0.14.2, and its rows are already correct).
+
+**Research merged:** jev-mcp (#163), typesafe-computer-use (#164), T-048 (#166), qa-offload (#167).
+
+**Frogger:** on SIA on its local branch `sia/bootstrap`, unmerged. Pilot 1b = a restored frogger plus the fixed
+`/bootstrap`, after round 3 merges.
