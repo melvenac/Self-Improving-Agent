@@ -132,37 +132,100 @@ export const execRunner: CommandRunner = (cmd, args, cwd) => {
   }
 };
 
+export const CI_STATUS_JOB = "test";
+export const CI_NEVER_STARTED_PREFIX = "The job was not started because";
+/** Stated in every ci-status message so a reader knows what was and was not inspected. */
+export const CI_STATUS_LIMIT =
+  "limit: job `test` only; check-run annotations fetched only when that job has zero steps";
+
+export type CiRunRow = { conclusion?: string; headSha?: string; status?: string; databaseId?: number };
+export type CiJobRow = { name: string; conclusion?: string; steps?: unknown[]; databaseId?: number };
+export type CiAnnotationRow = { message?: string };
+
+/**
+ * Classifies a run's conclusion for ci-status. "never started" is separate from
+ * failure: GitHub reports conclusion `failure` with zero steps when billing blocks
+ * the runner, and an annotation beginning CI_NEVER_STARTED_PREFIX.
+ */
+export function classifyCiConclusion(
+  run: CiRunRow,
+  testJob: CiJobRow | undefined,
+  annotations: CiAnnotationRow[] | null,
+  foldNeverStarted = false,
+): string {
+  const runConclusion = run.conclusion ?? "";
+  if (runConclusion === "success") return "success";
+  if (run.status && run.status !== "completed") {
+    return runConclusion || `pending (${run.status})`;
+  }
+  if (runConclusion === "failure" && testJob && (testJob.steps ?? []).length === 0) {
+    const neverStarted = (annotations ?? []).some(
+      (a) => typeof a.message === "string" && a.message.startsWith(CI_NEVER_STARTED_PREFIX),
+    );
+    if (neverStarted && !foldNeverStarted) return "never started";
+  }
+  return runConclusion || (run.status ? `pending (${run.status})` : "unknown");
+}
+
 /**
  * R4 — the last CI run on master, via `gh run list`. Pass on success, warn on
  * anything else naming the sha, skip with the reason when `gh` is absent, not
  * authenticated, or cannot see a repository. The conclusion is in every
  * message, because absent is not green.
+ *
+ * T-192: a job that never started (zero steps on `test`, annotation prefix above)
+ * is reported as `never started`, not folded into `failure`.
  */
 export function checkCiStatus(projectRoot: string, run: CommandRunner = execRunner, branch = "master"): CheckResult {
   const name = "ci-status";
-  const r = run("gh", ["run", "list", "--branch", branch, "--limit", "1", "--json", "conclusion,headSha,status"], projectRoot);
+  const r = run("gh", ["run", "list", "--branch", branch, "--limit", "1", "--json", "conclusion,headSha,status,databaseId"], projectRoot);
   if (!r.ok) {
     const why = /ENOENT|not found/i.test(r.error) ? "gh is not installed"
       : /auth|login|token|HTTP 401/i.test(r.error) ? "gh is not authenticated"
       : `gh failed: ${r.error.split("\n")[0]}`;
-    return { name, report: true, severity: "skip", message: `skipped — ${why}; conclusion: unknown (absent is not green)` };
+    return { name, report: true, severity: "skip", message: `skipped — ${why}; conclusion: unknown (absent is not green); ${CI_STATUS_LIMIT}` };
   }
-  let runs: Array<{ conclusion?: string; headSha?: string; status?: string }>;
+  let runs: CiRunRow[];
   try {
     runs = JSON.parse(r.stdout);
   } catch {
-    return { name, report: true, severity: "skip", message: `skipped — gh returned non-JSON; conclusion: unknown` };
+    return { name, report: true, severity: "skip", message: `skipped — gh returned non-JSON; conclusion: unknown; ${CI_STATUS_LIMIT}` };
   }
   if (!Array.isArray(runs) || runs.length === 0) {
-    return { name, report: true, severity: "warn", message: `no CI runs found on ${branch}; conclusion: none` };
+    return { name, report: true, severity: "warn", message: `no CI runs found on ${branch}; conclusion: none; ${CI_STATUS_LIMIT}` };
   }
   const latest = runs[0];
   const sha = (latest.headSha ?? "unknown").slice(0, 7);
-  const conclusion = latest.conclusion || (latest.status ? `pending (${latest.status})` : "unknown");
-  if (conclusion === "success") {
-    return { name, report: true, severity: "pass", message: `${branch} ${sha} conclusion: success` };
+
+  let testJob: CiJobRow | undefined;
+  let annotations: CiAnnotationRow[] | null = null;
+  if (latest.conclusion === "failure" && latest.databaseId != null) {
+    const view = run("gh", ["run", "view", String(latest.databaseId), "--json", "jobs"], projectRoot);
+    if (view.ok) {
+      try {
+        const body = JSON.parse(view.stdout) as { jobs?: CiJobRow[] };
+        testJob = (body.jobs ?? []).find((j) => j.name === CI_STATUS_JOB);
+        if (testJob && (testJob.steps ?? []).length === 0 && testJob.databaseId != null) {
+          const ann = run("gh", ["api", `repos/{owner}/{repo}/check-runs/${testJob.databaseId}/annotations`], projectRoot);
+          if (ann.ok) {
+            try {
+              annotations = JSON.parse(ann.stdout) as CiAnnotationRow[];
+            } catch {
+              annotations = null;
+            }
+          }
+        }
+      } catch {
+        testJob = undefined;
+      }
+    }
   }
-  return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: ${conclusion}` };
+
+  const conclusion = classifyCiConclusion(latest, testJob, annotations);
+  if (conclusion === "success") {
+    return { name, report: true, severity: "pass", message: `${branch} ${sha} conclusion: success; ${CI_STATUS_LIMIT}` };
+  }
+  return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: ${conclusion}; ${CI_STATUS_LIMIT}` };
 }
 
 const MARKER_RES = [/^<<<<<<< /, /^=======$/, /^>>>>>>> /];

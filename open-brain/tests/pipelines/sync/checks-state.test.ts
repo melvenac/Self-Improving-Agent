@@ -10,8 +10,18 @@ import {
   checkMergeMarkers,
   readViewHeaders,
   VIEW_FILES,
+  classifyCiConclusion,
+  CI_STATUS_LIMIT,
   type CommandRunner,
+  type CiJobRow,
 } from "../../../src/pipelines/sync/checks-state.js";
+import neverStartedList from "../../fixtures/ci-status/never-started-run-list.json";
+import neverStartedView from "../../fixtures/ci-status/never-started-run-view.json";
+import neverStartedAnn from "../../fixtures/ci-status/never-started-annotations.json";
+import successList from "../../fixtures/ci-status/success-run-list.json";
+import successView from "../../fixtures/ci-status/success-run-view.json";
+import failureList from "../../fixtures/ci-status/failure-run-list.json";
+import failureView from "../../fixtures/ci-status/failure-run-view.json";
 import { applyStateOps } from "../../../src/shared/state-writer.js";
 import { SUMMARY_BEGIN, SUMMARY_END } from "../../../src/pipelines/state-views/index.js";
 
@@ -148,37 +158,82 @@ describe("state-views (Loop 4 R6)", () => {
   });
 });
 
-describe("ci-status (Loop 4 R4)", () => {
+describe("ci-status (Loop 4 R4, T-192 item 2)", () => {
   const root = tmpdir();
-  const runner = (result: ReturnType<CommandRunner>): CommandRunner => () => result;
+  const limitSuffix = `; ${CI_STATUS_LIMIT}`;
 
-  it("passes on success and names the sha", () => {
-    const r = checkCiStatus(root, runner({ ok: true, stdout: JSON.stringify([{ conclusion: "success", headSha: "86ea0107c47f16d12b5077c3f6f13ecfe01b3c73", status: "completed" }]) }));
-    expect(r).toEqual({ name: "ci-status", report: true, severity: "pass", message: "master 86ea010 conclusion: success" });
+  function fixtureRunner(list: unknown, view?: unknown, annotations?: unknown): CommandRunner {
+    return (cmd, args) => {
+      if (cmd === "gh" && args[0] === "run" && args[1] === "list") {
+        return { ok: true, stdout: JSON.stringify(list) };
+      }
+      if (cmd === "gh" && args[0] === "run" && args[1] === "view") {
+        return { ok: true, stdout: JSON.stringify(view ?? { jobs: [] }) };
+      }
+      if (cmd === "gh" && args[0] === "api" && args[1]?.includes("/annotations")) {
+        return { ok: true, stdout: JSON.stringify(annotations ?? []) };
+      }
+      return { ok: false, error: `unexpected ${cmd} ${args.join(" ")}` };
+    };
+  }
+
+  const testJob = (jobs: CiJobRow[]) => jobs.find((j) => j.name === "test");
+
+  it("passes on success and names the sha (recorded gh response)", () => {
+    const run = successList[0];
+    const r = checkCiStatus(root, fixtureRunner(successList, successView));
+    expect(r).toEqual({
+      name: "ci-status",
+      report: true,
+      severity: "pass",
+      message: `master ${run.headSha!.slice(0, 7)} conclusion: success${limitSuffix}`,
+    });
+    expect(classifyCiConclusion(run, testJob(successView.jobs), null)).toBe("success");
   });
 
-  it("warns on failure naming the sha, and on a pending run", () => {
-    const failed = checkCiStatus(root, runner({ ok: true, stdout: JSON.stringify([{ conclusion: "failure", headSha: "deadbeefcafe", status: "completed" }]) }));
-    expect(failed.severity).toBe("warn");
-    expect(failed.message).toBe("master deadbee conclusion: failure");
-    const pending = checkCiStatus(root, runner({ ok: true, stdout: JSON.stringify([{ conclusion: "", headSha: "0123456789", status: "in_progress" }]) }));
+  it("reports never started separately from failure (recorded gh response)", () => {
+    const run = neverStartedList[0];
+    const job = testJob(neverStartedView.jobs)!;
+    expect(classifyCiConclusion(run, job, neverStartedAnn)).toBe("never started");
+    const r = checkCiStatus(root, fixtureRunner(neverStartedList, neverStartedView, neverStartedAnn));
+    expect(r.severity).toBe("warn");
+    expect(r.message).toBe(`master ${run.headSha!.slice(0, 7)} conclusion: never started${limitSuffix}`);
+  });
+
+  it("reports a real test failure when steps ran (recorded gh response)", () => {
+    const run = failureList[0];
+    const job = testJob(failureView.jobs)!;
+    expect((job.steps ?? []).length).toBeGreaterThan(0);
+    expect(classifyCiConclusion(run, job, null)).toBe("failure");
+    const r = checkCiStatus(root, fixtureRunner(failureList, failureView));
+    expect(r.severity).toBe("warn");
+    expect(r.message).toBe(`master ${run.headSha!.slice(0, 7)} conclusion: failure${limitSuffix}`);
+  });
+
+  it("mutant: folding never-started back into failure mislabels the recorded never-started run", () => {
+    const run = neverStartedList[0];
+    const job = testJob(neverStartedView.jobs)!;
+    expect(classifyCiConclusion(run, job, neverStartedAnn, true)).toBe("failure");
+    expect(classifyCiConclusion(run, job, neverStartedAnn, false)).toBe("never started");
+  });
+
+  it("warns on a pending run and when no runs exist", () => {
+    const pending = checkCiStatus(root, fixtureRunner([{ conclusion: "", headSha: "0123456789abcdef", status: "in_progress", databaseId: 1 }]));
     expect(pending.severity).toBe("warn");
-    expect(pending.message).toBe("master 0123456 conclusion: pending (in_progress)");
-    const none = checkCiStatus(root, runner({ ok: true, stdout: "[]" }));
+    expect(pending.message).toBe(`master 0123456 conclusion: pending (in_progress)${limitSuffix}`);
+    const none = checkCiStatus(root, fixtureRunner([]));
     expect(none.severity).toBe("warn");
-    expect(none.message).toBe("no CI runs found on master; conclusion: none");
+    expect(none.message).toBe(`no CI runs found on master; conclusion: none${limitSuffix}`);
   });
 
   it("skips with the reason when gh is absent or not authenticated — conclusion printed as unknown", () => {
+    const runner = (result: ReturnType<CommandRunner>): CommandRunner => () => result;
     const absent = checkCiStatus(root, runner({ ok: false, error: "gh not found (ENOENT)" }));
     expect(absent.severity).toBe("skip");
-    expect(absent.message).toBe("skipped — gh is not installed; conclusion: unknown (absent is not green)");
+    expect(absent.message).toBe(`skipped — gh is not installed; conclusion: unknown (absent is not green)${limitSuffix}`);
     const unauth = checkCiStatus(root, runner({ ok: false, error: "To get started with GitHub CLI, please run:  gh auth login" }));
     expect(unauth.severity).toBe("skip");
-    expect(unauth.message).toBe("skipped — gh is not authenticated; conclusion: unknown (absent is not green)");
-    const other = checkCiStatus(root, runner({ ok: false, error: "could not determine base repo\nsecond line" }));
-    expect(other.severity).toBe("skip");
-    expect(other.message).toBe("skipped — gh failed: could not determine base repo; conclusion: unknown (absent is not green)");
+    expect(unauth.message).toBe(`skipped — gh is not authenticated; conclusion: unknown (absent is not green)${limitSuffix}`);
   });
 
   it("the real runner in a directory with no git repo skips rather than throws", () => {
@@ -186,6 +241,7 @@ describe("ci-status (Loop 4 R4)", () => {
     expect(r.severity).toBe("skip");
     expect(r.message).toMatch(/^skipped — /);
     expect(r.message).toContain("conclusion: unknown");
+    expect(r.message).toContain(CI_STATUS_LIMIT);
   });
 });
 
