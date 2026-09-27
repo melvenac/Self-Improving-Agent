@@ -14,7 +14,7 @@ import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
 import { openV2Database } from "./db-v2.js";
-import { formatSessionEndLines, sessionEndV2 } from "./pipelines/session-end/index-v2.js";
+import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/session-end/recalled-ids.js";
 import { obsidianVaultDir } from "./shared/paths.js";
 import { resolveHookProjectDir } from "./shared/repo-root.js";
@@ -122,7 +122,10 @@ try {
       dryRun: false,
     });
 
-    for (const line of formatSessionEndLines(result)) console.log(`[session-end] ${line}`);
+    const genLabel = result.summary.selfGenerated ? " (self-generated)" : "";
+    console.log(`[session-end] Summary: ${result.summary.written ? "written" : "skipped"}${genLabel}`);
+    console.log(`[session-end] Feedback: ${result.feedback.processed} entries`);
+    console.log(`[session-end] Invocations: ${result.invocations.logged} logged`);
   } finally {
     db.close();
   }
