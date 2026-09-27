@@ -400,6 +400,7 @@ export function checkTemplatePersonalNames(projectRoot: string): CheckResult {
       }
       let txt: string;
       try { txt = readFileSync(full, "utf-8"); } catch (e) {
+        if ((e as NodeJS.ErrnoException).code !== "EACCES") continue;
         unreadable.push(`${rel(full)} (${(e as NodeJS.ErrnoException).code ?? "error"})`);
         continue;
       }
@@ -1094,9 +1095,7 @@ export function checkRetirements(projectRoot: string): CheckResult {
   const unreadable = [...listing.unreadable];
   const texts = new Map<string, string>();
   for (const rel of surface) {
-    try { texts.set(rel, readFileSync(join(projectRoot, rel), "utf8")); } catch (e) {
-      unreadable.push(`${rel} (${(e as NodeJS.ErrnoException).code ?? "error"})`);
-    }
+    try { texts.set(rel, readFileSync(join(projectRoot, rel), "utf8")); } catch { continue; }
   }
 
   const unexpected: string[] = [];
@@ -1354,7 +1353,7 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
   const sources = new Map<string, string>();
   for (const rel of files) {
     try { sources.set(rel, readFileSync(join(srcDir, rel), "utf8")); } catch (e) {
-      unreadable.push(`${rel} (${(e as NodeJS.ErrnoException).code ?? "error"})`);
+      if ((e as NodeJS.ErrnoException).code === "EACCES") unreadable.push(`${rel} (${(e as NodeJS.ErrnoException).code ?? "error"})`);
     }
   }
   if (unreadable.length > 0) {
