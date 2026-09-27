@@ -41,7 +41,7 @@ jobs:
     # Master pushes, pull requests, and dispatches run on the self-hosted runner on tcm
     # (D-043). Only `inputs.hosted == true` selects ubuntu-latest — the fallback when tcm
     # is down. The job name stays `test`, so the check D-032's merge gate reads keeps its name.
-    runs-on: ${{ inputs.hosted && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
+    runs-on: ${{ ((github.event_name == 'push' && github.ref == 'refs/heads/master') || inputs.hosted) && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
 
     steps:
       # The tcm runner user is firewalled to the public internet only. If any of these connects,
