@@ -44,14 +44,16 @@ that has not been restarted strips unknown parameters and still reports success.
 
 ## 3. Close the session's memory
 
-**Needs a registered session** (the SessionStart hook, or `/start`'s `ob_set_session`); without one
-`ob_recalled` lists nothing and the ratings are silently zero, so report that, not "none". Call
+**Needs a session the server can PROVE is its own** (T-003): in Claude Code the SessionStart hook writes
+the proof and `ob_set_session` only checks it. **Cursor writes no proof, so under Cursor nothing is
+attributed** (ruling Q2). Without a proof `ob_recalled` says why and lists nothing, and the ratings are
+zero, so report that, not "none". Call
 `ob_end` once, with `entry_ratings` only for entries `ob_recalled` lists: `helpful` if it changed what
 you did, `harmful` if it misled you, `neutral` if unused. Do not rate what you did not see.
 
 ## 4. Report
 
-`Lessons stored: {n} — {title} [MATCH: command|path|error|none], ... · Ratings: {ids}, none, or "no registered session"`
+`Lessons stored: {n} — {title} [MATCH: command|path|error|none], ... · Ratings: {ids}, none, or "no proven session"`
 
 ## What moved out of /end
 
