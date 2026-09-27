@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index d9897bf..565df1c 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -902,7 +902,7 @@ function refuseHalfRestored(root: string): void {
+   const from = snapshots.length === 1
+     ? `${snapshots[0]}, which holds every original`
+     : `${snapshots[0]} (the oldest; it holds the originals from before the first failed --commit); ${snapshots.slice(1).join(" and ")} ${snapshots.length === 2 ? "holds" : "hold"} the tree as a later run found it`;
+-  throw new Error(`.agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from ${from}, then delete ${markers}. Nothing written. Keep a copy of ${left.length === 1 ? "the snapshot" : "every snapshot"} until the re-run completes: that re-run needs --force-snapshot, which deletes ${left.length === 1 ? "it" : "today's"} on success`);
++  throw new Error(`.agents/ is half-restored: an earlier --commit failed and its rollback did not finish. Restore .agents/ by hand from ${from}, then delete ${markers}. Nothing written. Keep a copy of ${"the snapshot"} until the re-run completes: that re-run needs --force-snapshot, which deletes ${left.length === 1 ? "it" : "today's"} on success`);
+ }
+ 
+ export interface DraftResult { draftPath: string; reportPath: string; draft: ImportDraft; validation: { ok: true } | { ok: false; error: string } }
