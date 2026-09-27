@@ -152,7 +152,7 @@ function explainedByRetention(r: RecordRef, after: Raw | null): boolean {
   const revs = a.filter((x) => x.kind === "session").map((x) => x.firstRev);
   const entry: InstanceEntry = { seat: r.seat, checkout: r.checkout, first_rev: r.firstRev };
   const all: InstanceEntry[] = [...recs.map((x) => ({ seat: x.seat, checkout: x.checkout, first_rev: x.firstRev })), entry];
-  return isSuperseded(entry, all, revs, r.kind === "handoff");
+  return isSuperseded(entry, all, revs, true);
 }
 
 /** Pure: the erasures between one parent state and the state after, for a NON-merge step. */
