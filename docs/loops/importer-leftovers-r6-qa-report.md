@@ -34,7 +34,8 @@ mutants: `C:\qa-tmp`. Scratch: `C:\qa-scratch\il172\` (worktree `cand` at `c2ee5
 - **Mutants:** 5 of my own on round-6 protections, all killed. QA 153's 23 mutants re-run with `state-import-r6.test.ts`
   included: 20 killed, 3 survived (A10, E2, E3 — the same three QA 153 named, unchanged by this diff).
 - **CI (tcm):** developer green `36297098487` on `c2ee52d` (1371 passed, 2 skipped, 92 files); developer red
-  `36296846773` on `fb34624` (3 failed, the r6 rows only). QA 172's own tcm run is pending below.
+  `36296846773` on `fb34624` (3 failed, the r6 rows only). QA 172 green `36308066499` on `b9acb96` (1375 passed, 2
+  skipped, 93 files).
 
 ## 1. QA 153 D1: odd-length FE FF latest session log
 
@@ -104,7 +105,7 @@ through `state-import-r6.test.ts` where they only hit r5 rows before.
 |---|---|---|---|
 | `36296846773` | `fb34624` | `loop/importer-leftovers-r6` | **failure** — 3 failed (r6 rows only), 1368 passed, 2 skipped, 91 files passed |
 | `36297098487` | `c2ee52d` | `loop/importer-leftovers-r6` | **success** — 1371 passed, 2 skipped, 92 files |
-| *(QA 172)* | *(pending commit)* | `qa/importer-leftovers-r6-report` | triggered after this commit; see hub post |
+| `36308066499` | `b9acb96` | `qa/importer-leftovers-r6-report` | **success** — 1375 passed, 2 skipped (1377), 93 files; includes `state-import-qa172.test.ts` (4 rows) |
 
 `test-windows` skipped on all runs (no `windows` input), per developer handoff.
 
