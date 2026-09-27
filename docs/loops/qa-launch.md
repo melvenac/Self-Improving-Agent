@@ -41,7 +41,10 @@ folder.
 ! ssh -i C:/Users/melve/.ssh/id_ed25519 -l "Aaron Melven" 100.73.250.101 "powershell -NoProfile -Command Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\AARONM~1\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'}"
 ```
 
-**This desktop (night QA; the tree is `~/Worktrees/sia-qa`).** Run it locally; no ssh is needed. It copies the queue
+**This desktop: ONLY when Aaron is away from it AND no agent session is running on it** (Aaron, 2026-09-27: "this
+desktop cant run qa while I'm here or other agents are running"). QA 149 was launched here at 01:39Z while both were
+true, and stopped before its driver started. "Night" was the old shorthand, and it is not the rule. Before offering
+this line, ask Aaron whether both conditions hold. The tree is `~/Worktrees/sia-qa`. Run it locally; no ssh is needed. It copies the queue
 script out of the commit first, because the desktop had no copy as of 2026-09-27.
 
 ```
