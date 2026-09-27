@@ -139,8 +139,9 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     expect(s.handoffs[0].watch_out).toHaveLength(9);
     expect(s.handoffs[0].open_questions).toHaveLength(2);
     expect(s.handoffs[0].pick_up).toMatch(/^Loop 4 per /);
-    expect(s.verified.map((v) => v.id)).toEqual(["V-001", "V-002", "V-003", "V-004", "V-005"]);
-    expect(s.gaps.map((g) => g.id)).toEqual(["G-001", "G-002", "G-003", "G-004", "G-005", "G-006"]);
+    // T-175: no seeds. These two lines asserted SIA's V-001..V-005 and G-001..G-006.
+    expect(s.verified).toEqual([]);
+    expect(s.gaps).toEqual([]);
     expect(s.last_session).toEqual({ n: 54, date: TODAY, uuid: "00000000-0000-4000-8000-000000000054", seat: null });
 
     const report = readFileSync(join(root, REPORT_REL), "utf-8");

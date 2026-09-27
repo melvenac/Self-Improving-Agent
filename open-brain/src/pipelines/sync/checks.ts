@@ -4,7 +4,11 @@ import { homedir } from "node:os";
 import { execSync, execFileSync } from "node:child_process";
 import type { CheckResult, SyncRuntime } from "./types.js";
 import { parseSkillIndexRows } from "../../shared/skill-index.js";
-import { parseState } from "../../shared/state-schema.js";
+import { parseState, SeatName } from "../../shared/state-schema.js";
+import { renderState } from "../session-start/state-render.js";
+import { describeRoleFiles } from "../session-start/role-files.js";
+import { readAgentIdentity } from "../session-start/agent-identity.js";
+import { describeTreeCurrency } from "../session-start/tree-currency.js";
 import { checkSummaryFromState } from "./checks-state.js";
 
 /**
@@ -1604,4 +1608,76 @@ export function checkBuildFreshness(projectRoot: string): CheckResult {
       `LIMIT: compares commits, not working-tree edits.`,
     report: true,
   };
+}
+
+/** Above this many characters the greeting is an ISSUE (T-183). */
+export const GREETING_LIMIT = 40_000;
+
+export interface ComposedGreeting {
+  text: string;
+  parts: { treeAndSeat: number; state: number; roleFiles: number };
+}
+
+/**
+ * T-183: the greeting `ob_start` returns, composed from the same functions
+ * `handleStart` uses and in its order — tree currency, seat, the state render,
+ * then the role files whole. `handleStart` itself is not called: it creates a
+ * session log on every call (G-008), and a check must write nothing.
+ *
+ * NOT COUNTED, and the check says so: the mode, version, drift, session, warnings
+ * and sizes lines `handleStart` adds around these parts. Their size is measured
+ * in docs/loops/t183-developer-handoff.md, not restated here, where it would go
+ * stale. Null when there is no valid state.json to render.
+ */
+export function composeGreeting(projectRoot: string, version: string): ComposedGreeting | null {
+  const statePath = join(projectRoot, ".agents", "state.json");
+  if (!existsSync(statePath)) return null;
+  const parsed = parseState(readFileSync(statePath, "utf-8"));
+  if (!parsed.ok) return null;
+
+  const roles = describeRoleFiles(projectRoot, readAgentIdentity(projectRoot));
+  const seat = roles.seat ? SeatName.safeParse(roles.seat.role) : null;
+  const treeAndSeat = [
+    ...describeTreeCurrency(projectRoot).lines,
+    roles.seat ? `Seat: ${roles.seat.name} (${roles.seat.role})` : "Seat: UNRESOLVED",
+    ...roles.lines,
+    ...roles.problems,
+  ].join("\n");
+  const state = renderState(parsed.data, version, {
+    seat: seat?.success ? seat.data : null,
+    projectRoot,
+  }).join("\n");
+  const roleFiles = roles.files
+    .filter((f) => f.content !== null)
+    .map((f) => `\n## ${f.rel}${f.commit ? ` @ ${f.commit.slice(0, 7)}` : ""}\n${(f.content as string).replace(/\s+$/, "")}`)
+    .join("\n");
+  const text = [treeAndSeat, state, roleFiles].join("\n");
+  return { text, parts: { treeAndSeat: treeAndSeat.length, state: state.length, roleFiles: roleFiles.length } };
+}
+
+/**
+ * T-183 — does the greeting still fit one tool result? At rev 130 it was 98,679
+ * characters and did not: every seat read it in chunks and one skipped it.
+ *
+ * The count is printed on every run, whatever the severity, because the number is
+ * the point. ISSUE above `limit`.
+ */
+export function checkGreetingSize(version: string, projectRoot: string, limit = GREETING_LIMIT): CheckResult {
+  const name = "greeting-size";
+  const g = composeGreeting(projectRoot, version);
+  if (!g) {
+    return {
+      name,
+      severity: "skip",
+      message: "skipped — no valid .agents/state.json, so ob_start returns the prose fallback, which this check does not measure",
+      report: true,
+    };
+  }
+  const n = g.text.length;
+  const detail =
+    `(state render ${g.parts.state}, role files ${g.parts.roleFiles}, tree and seat ${g.parts.treeAndSeat}). ` +
+    `LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted.`;
+  return n > limit
+    ? { name, severity: "issue", message: `greeting is ${n} characters, over the ${limit} limit ${detail}`, report: true }
+    : { name, severity: "pass", message: `greeting is ${n} characters, within the ${limit} limit ${detail}`, report: true };
 }

@@ -13,6 +13,8 @@ import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/histo
 import { resolvePaths } from "./shared/paths.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import type { ScoreResult, CategoryScore, MemoryChecks } from "./pipelines/sync/types.js";
+import { parseArgs, type CommandSpec, type ParsedArgs } from "./shared/cli-args.js";
+import { COMMAND_SPECS } from "./cli-spec.js";
 
 /**
  * Load the memory module's sync checks, or return undefined if it is not
@@ -41,17 +43,34 @@ async function loadMemoryChecks(): Promise<MemoryChecks | undefined> {
   }
 }
 
+/**
+ * T-185: parse a subcommand's tokens against its declared flags, or refuse with
+ * exit 2 before anything is read or written. Exit 2 is a usage refusal; the
+ * commands' own refusals stay at 1.
+ */
+function parseOrRefuse(spec: CommandSpec, tokens: readonly string[]): ParsedArgs {
+  const r = parseArgs(spec, tokens);
+  if (!r.ok) {
+    console.error(`${spec.name} refused: ${r.error}\nNothing was run.`);
+    process.exit(2);
+  }
+  return r.args;
+}
+
 const args = process.argv.slice(2);
 const command = args[0];
 
 if (command === "sync") {
-  const checkOnly = args.includes("--check");
-  const score = args.includes("--score");
-  const scoreJson = args.includes("--json");
-  const history = args.includes("--history");
+  const opts = parseOrRefuse(COMMAND_SPECS.sync, args.slice(1));
+  const checkOnly = opts.has("--check");
+  const score = opts.has("--score");
+  const scoreJson = opts.has("--json");
+  const history = opts.has("--history");
   // R4 (Loop 3): resolve the real root before anything reads it. Run from
   // open-brain/ this used to score the sub-package and print a wrong answer.
-  const startDir = resolve(args.find((a) => !a.startsWith("--") && a !== "sync") ?? ".");
+  // An EXISTING directory still walks up to its project root; one that does not
+  // exist was refused above, rather than walking up from the cwd (T-185).
+  const startDir = opts.directory ?? resolve(".");
   const projectRoot = resolveRepoRoot(startDir);
   if (!projectRoot) {
     console.error(`sync refused: ${describeNoRoot(startDir)}`);
@@ -163,7 +182,7 @@ if (command === "sync") {
     process.exit(1);
   }
 } else if (command === "start") {
-  const projectRoot = resolve(args.find((a) => !a.startsWith("--") && a !== "start") ?? ".");
+  const projectRoot = parseOrRefuse(COMMAND_SPECS.start, args.slice(1)).directory ?? resolve(".");
 
   // Dynamic import to avoid loading session-start code when running sync
   const { sessionStart } = await import("./pipelines/session-start/index.js");
@@ -188,6 +207,8 @@ if (command === "sync") {
   console.log(`\nState: ${result.state.summary ? "SUMMARY loaded" : "no SUMMARY"}`);
   console.log(`Inbox: ${result.state.inbox ? "INBOX loaded" : "no INBOX"}`);
 } else if (command === "relocate") {
+  // Parsed before the database is opened: a refusal must not have touched it.
+  const opts = parseOrRefuse(COMMAND_SPECS.relocate, args.slice(1));
   const { openV2Database } = await import("./db-v2.js");
   const { planRelocate, applyRelocate, detectMissingProjects } = await import("./relocate.js");
   const { obsidianVaultDir } = await import("./shared/paths.js");
@@ -196,15 +217,8 @@ if (command === "sync") {
   const db = openV2Database(paths.knowledgeV2Db);
   const vaultDir = obsidianVaultDir();
 
-  const flag = (name: string): string | undefined => {
-    const eq = args.find((a) => a.startsWith(`--${name}=`));
-    if (eq) return eq.slice(name.length + 3);
-    const idx = args.indexOf(`--${name}`);
-    return idx >= 0 ? args[idx + 1] : undefined;
-  };
-
-  const from = flag("from");
-  const to = flag("to");
+  const from = opts.value("--from");
+  const to = opts.value("--to");
 
   if (!from || !to) {
     // No arguments means "tell me what is wrong", not an error. The detector is
@@ -236,7 +250,7 @@ if (command === "sync") {
     for (const c of plan.collisions) console.log(`    ${c.from}`);
   }
 
-  if (!args.includes("--apply")) {
+  if (!opts.has("--apply")) {
     console.log(`\nDry run. Re-run with --apply to make these changes.`);
     process.exit(0);
   }
@@ -246,6 +260,7 @@ if (command === "sync") {
   for (const f of result.noteFailures) console.log(`  FAILED to move ${f.path}: ${f.reason}`);
   process.exit(result.noteFailures.length > 0 ? 1 : 0);
 } else if (command === "topics") {
+  const opts = parseOrRefuse(COMMAND_SPECS.topics, args.slice(1));
   const { openV2Database } = await import("./db-v2.js");
   const { planTopics, writeTopics } = await import("./pipelines/topics/index.js");
   const { obsidianVaultDir } = await import("./shared/paths.js");
@@ -254,8 +269,8 @@ if (command === "sync") {
   const db = openV2Database(paths.knowledgeV2Db);
   const vaultDir = obsidianVaultDir();
 
-  const minArg = args.find((a) => a.startsWith("--min="));
-  const min = minArg ? Number(minArg.slice("--min=".length)) : 5;
+  const minArg = opts.value("--min");
+  const min = minArg !== undefined ? Number(minArg) : 5;
   if (!Number.isFinite(min) || min < 1) {
     console.error(`Invalid --min: expected a positive number, got "${minArg}".`);
     process.exit(1);
@@ -266,7 +281,7 @@ if (command === "sync") {
   for (const p of plans.slice(0, 20)) console.log(`  ${String(p.links.length).padStart(4)}  ${p.tag}`);
   if (plans.length > 20) console.log(`  ... +${plans.length - 20} more`);
 
-  if (!args.includes("--apply")) {
+  if (!opts.has("--apply")) {
     console.log(`\nDry run. Re-run with --apply to write Topics/ into the vault.`);
     process.exit(0);
   }
@@ -281,17 +296,18 @@ if (command === "sync") {
   // C3's concrete first piece: "return the tree to detached after a push." It had
   // been run by hand more than twenty times, which is exactly the shape C3
   // describes — a step that works because a seat remembers it.
+  const opts = parseOrRefuse(COMMAND_SPECS.detach, args.slice(1));
   const { detachToUpstream } = await import("./pipelines/detach/index.js");
-  const startDir = resolve(args.slice(1).find((a) => !a.startsWith("--")) ?? ".");
+  const startDir = opts.directory ?? resolve(".");
   const repoRoot = resolveRepoRoot(startDir);
   if (!repoRoot) {
     console.error(`detach refused: ${describeNoRoot(startDir)}`);
     process.exit(1);
   }
   const r = detachToUpstream(repoRoot, {
-    dryRun: args.includes("--dry-run"),
-    noFetch: args.includes("--no-fetch"),
-    force: args.includes("--force"),
+    dryRun: opts.has("--dry-run"),
+    noFetch: opts.has("--no-fetch"),
+    force: opts.has("--force"),
   });
   console.log(`detach — ${repoRoot}`);
   for (const step of r.steps) console.log(`  ${step}`);
@@ -308,7 +324,7 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   // writes a reviewable draft + report; `--commit` applies the reviewed draft.
   const sub = args[1];
   if (sub !== "import" && sub !== "show" && sub !== "migrate") {
-    console.error("Usage: open-brain state <show [--json] | import [--draft | --commit] [--force-snapshot] | migrate --seat <planner|developer|qa> [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>> [dir]");
+    console.error("Usage: open-brain state <show [--json] | import [--draft | --commit [--accept-stale]] [--force-snapshot] | migrate --seat <planner|developer|qa> [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>> [dir]");
     process.exit(1);
   }
 
@@ -319,43 +335,51 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   // rule exists to prevent. So the migration is a program, with a dry run, and
   // it runs identically on the live record, the shipped template and the fixture.
   if (sub === "migrate") {
+    const opts = parseOrRefuse(COMMAND_SPECS.stateMigrate, args.slice(2));
     const { migrateStateFile } = await import("./pipelines/state-migrate/index.js");
-    const flag = (name: string): string | null => {
-      const i = args.indexOf(name);
-      return i >= 0 && args[i + 1] && !args[i + 1].startsWith("--") ? args[i + 1] : null;
-    };
-    const seat = flag("--seat");
+    const seat = opts.value("--seat");
     if (!seat) {
       console.error("state migrate refused: --seat <planner|developer|qa> is REQUIRED.");
       console.error("A v1 handoff does not say whose it is, and guessing would attribute one seat's words to another.");
       process.exit(1);
     }
-    const files = args.slice(2).filter((a) => !a.startsWith("--") && a !== seat && a !== flag("--last-session-seat"));
+    const files = opts.positionals;
     if (files.length === 0) {
       console.error("state migrate refused: name at least one state.json to migrate.");
       process.exit(1);
     }
-    const dryRun = args.includes("--dry-run");
-    let failed = 0;
-    for (const f of files) {
-      const r = migrateStateFile(resolve(f), {
+    const dryRun = opts.has("--dry-run");
+    const migrate = (f: string, asDryRun: boolean) =>
+      migrateStateFile(resolve(f), {
         seat: seat as "planner" | "developer" | "qa",
-        lastSessionSeat: (flag("--last-session-seat") as "planner" | "developer" | "qa" | null) ?? null,
-        dryRun,
-        keepRevision: args.includes("--keep-revision"),
+        lastSessionSeat: (opts.value("--last-session-seat") as "planner" | "developer" | "qa" | undefined) ?? null,
+        dryRun: asDryRun,
+        keepRevision: opts.has("--keep-revision"),
       });
+    // R185-5: every named file is checked (a dry run: exists, parses, migrates
+    // and validates) before ANY is written. Before this, a refusal said "nothing
+    // was written for those" while an earlier file in the list had been migrated.
+    const checks = files.map((f) => migrate(f, true));
+    const failed = checks.filter((r) => !r.ok).length;
+    if (failed > 0) {
+      for (const r of checks) {
+        console.log(`${dryRun ? "[dry run] " : ""}${r.path}`);
+        console.log(r.ok ? "  not written: another named file was refused" : `  REFUSED: ${r.error}`);
+      }
+      console.error(`
+${failed} file(s) refused — nothing was written for any named file.`);
+      process.exit(1);
+    }
+    for (const [i, f] of files.entries()) {
+      const r = dryRun ? checks[i]! : migrate(f, false);
       console.log(`${dryRun ? "[dry run] " : ""}${r.path}`);
       if (!r.ok) {
+        // Only reachable if a file changed between the check and the write.
         console.log(`  REFUSED: ${r.error}`);
-        failed++;
-        continue;
+        console.error(`\n${r.path} refused after the check passed — files listed before it WERE written.`);
+        process.exit(1);
       }
       for (const c of r.changes) console.log(`  ${c}`);
-    }
-    if (failed > 0) {
-      console.error(`
-${failed} file(s) refused — nothing was written for those.`);
-      process.exit(1);
     }
     process.exit(0);
   }
@@ -365,8 +389,9 @@ ${failed} file(s) refused — nothing was written for those.`);
   // Read-only by construction — no write path is added here, so the
   // single-writer rule (every mutation goes through applyStateOps) still holds.
   if (sub === "show") {
+    const opts = parseOrRefuse(COMMAND_SPECS.stateShow, args.slice(2));
     const { readState } = await import("./shared/state-writer.js");
-    const startDir = resolve(args.slice(2).find((a) => !a.startsWith("--")) ?? ".");
+    const startDir = opts.directory ?? resolve(".");
     const projectRoot = resolveRepoRoot(startDir);
     if (!projectRoot) {
       console.error(`state show refused: ${describeNoRoot(startDir)}`);
@@ -377,7 +402,7 @@ ${failed} file(s) refused — nothing was written for those.`);
       console.error(`state show refused: ${r.error}`);
       process.exit(1);
     }
-    if (args.includes("--json")) {
+    if (opts.has("--json")) {
       console.log(JSON.stringify(r.data, null, 2));
       process.exit(0);
     }
@@ -419,14 +444,42 @@ Read-only. Change state through ob_state — never by editing the file.`);
     process.exit(0);
   }
 
-  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL } = await import("./pipelines/state-import/index.js");
+  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG, blocksCommit } = await import("./pipelines/state-import/index.js");
   const { relative } = await import("node:path");
+  const { existsSync, statSync } = await import("node:fs");
+  // T-150's rule: an unrecognised flag refuses. Before this, a misspelled flag
+  // was ignored, so `--comit` quietly ran a draft, and a misspelled
+  // acknowledgement would have been indistinguishable from none.
+  // Any token starting with "-", not only "--": `-accept-stale` used to fall
+  // through to the directory slot (QA 102, D4).
+  const importFlags = ["--draft", "--commit", "--force-snapshot", ACCEPT_STALE_FLAG];
+  const unknownFlags = args.slice(2).filter((a) => a.startsWith("-") && !importFlags.includes(a));
+  if (unknownFlags.length > 0) {
+    console.error(`state import refused: unrecognised flag(s) ${unknownFlags.join(", ")}. Known: ${importFlags.join(", ")}. Nothing written.`);
+    process.exit(1);
+  }
+  // At most one positional, and it must name a directory that exists. A second
+  // one, or one that names nothing, used to resolve against the cwd and walk up,
+  // committing the cwd's project instead of the one named (QA 102, PROBE-12).
+  const positionals = args.slice(2).filter((a) => !a.startsWith("-"));
+  if (positionals.length > 1) {
+    console.error(`state import refused: more than one directory given (${positionals.join(", ")}). Pass one project directory. Nothing written.`);
+    process.exit(1);
+  }
+  if (positionals.length === 1 && !(existsSync(resolve(positionals[0])) && statSync(resolve(positionals[0])).isDirectory())) {
+    console.error(`state import refused: ${positionals[0]} does not exist or is not a directory (resolved to ${resolve(positionals[0])}). Nothing written.`);
+    process.exit(1);
+  }
   const commit = args.includes("--commit");
   if (commit && args.includes("--draft")) {
     console.error("state import: pass --draft or --commit, not both");
     process.exit(1);
   }
-  const startDir = resolve(args.slice(2).find((a) => !a.startsWith("--")) ?? ".");
+  if (!commit && args.includes(ACCEPT_STALE_FLAG)) {
+    console.error(`state import refused: ${ACCEPT_STALE_FLAG} applies only to --commit. Nothing written.`);
+    process.exit(1);
+  }
+  const startDir = resolve(positionals[0] ?? ".");
   const projectRoot = resolveRepoRoot(startDir);
   if (!projectRoot) {
     console.error(`state import refused: ${describeNoRoot(startDir)}`);
@@ -445,16 +498,28 @@ Read-only. Change state through ob_state — never by editing the file.`);
       console.log(`Report: ${REPORT_REL}`);
       console.log(`Validates: ${r.validation.ok ? "yes" : `NO — ${r.validation.error}`}`);
       console.log(`Current session: ${rep.current_session} (${rep.last_session.file})`);
+      const judged = rep.staleness.inputs;
+      const stale = judged.filter((i) => i.verdict === "stale");
+      const unknown = judged.filter((i) => i.verdict === "could_not_tell");
+      console.log(`Staleness: ${stale.length} stale${stale.length ? ` (${stale.map((i) => i.input).join(", ")})` : ""} · ${unknown.length} could not tell${unknown.length ? ` (${unknown.map((i) => i.input).join(", ")})` : ""} · ${judged.length - stale.length - unknown.length} current. Details are in the report's first section.`);
+      if (stale.length) console.log(`--commit will REFUSE until those inputs are updated and the draft is re-run, or until ${ACCEPT_STALE_FLAG} is passed.`);
+      const unreadable = unknown.filter(blocksCommit);
+      if (unreadable.length) console.log(`--commit will REFUSE while ${unreadable.map((i) => i.input).join(", ")} cannot be read (NUL bytes): save as UTF-8 and re-run the draft, or pass ${ACCEPT_STALE_FLAG}.`);
       const s = rep.inbox.by_status;
       console.log(`Tasks: ${rep.inbox.items} (open ${s.open}, in_progress ${s.in_progress}, blocked ${s.blocked}, done ${s.done}); superseded links ${rep.inbox.superseded_links.length}; unparsed lines ${rep.inbox.unparsed.length}`);
-      console.log(`Decisions: ${rep.decisions.imported} (${rep.decisions.skipped.length} skipped) · verified ${rep.verified_seeded} · gaps ${rep.gaps_seeded} · objective ${rep.objective.found ? "found" : "NOT found"}`);
+      console.log(`Decisions: ${rep.decisions.imported} (${rep.decisions.skipped.length} skipped) · verified ${rep.verified_imported} · gaps ${rep.gaps_imported} · objective ${rep.objective.found ? "found" : "NOT found"}`);
       console.log(`Handoff: pick_up ${rep.handoff.pick_up_lines} lines, watch_out ${rep.handoff.watch_out}, open_questions ${rep.handoff.open_questions}`);
       if (rep.summary_removal) console.log(`SUMMARY.md: --commit will remove ${rep.summary_removal.total_lines_removed} lines (${rep.summary_removal.blockquote_lines} blockquote + ${rep.summary_removal.current_state_lines} Current State)`);
       console.log(`\nReview the report, then run: open-brain state import --commit`);
       process.exit(r.validation.ok ? 0 : 1);
     }
-    const r = runCommit(projectRoot, today, { forceSnapshot: args.includes("--force-snapshot") });
+    const r = runCommit(projectRoot, today, { forceSnapshot: args.includes("--force-snapshot"), acceptStale: args.includes(ACCEPT_STALE_FLAG) });
     console.log(`\nstate import — committed\n`);
+    console.log(`Root: ${projectRoot}`);
+    if (r.accepted_stale.length) console.log(`Imported STALE under ${ACCEPT_STALE_FLAG}: ${r.accepted_stale.join(", ")}`);
+    if (r.accepted_unreadable.length) console.log(`Imported UNREADABLE under ${ACCEPT_STALE_FLAG}: ${r.accepted_unreadable.join(", ")}`);
+    const unknown = r.staleness.inputs.filter((i) => i.verdict === "could_not_tell");
+    if (unknown.length) console.log(`Could not tell whether current: ${unknown.map((i) => i.input).join(", ")}`);
     console.log(`Snapshot: ${relative(projectRoot, r.snapshot.dir)} (${r.snapshot.files} files)`);
     console.log(`Wrote:    ${STATE_REL} at revision 0`);
     if (r.summary) console.log(`SUMMARY.md: removed ${r.summary.total_lines_removed} lines (${r.summary.blockquote_lines} blockquote + ${r.summary.current_state_lines} Current State); kept ${r.summary.kept_headings.join(", ")}`);
@@ -474,8 +539,8 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  relocate [--from <dir> --to <dir>] [--apply]  Fold a renamed project's history forward");
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
-  console.log("  state import [--draft|--commit] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
-  console.log("  state migrate --seat <planner|developer|qa> [--keep-revision] [--dry-run] <file...>");
+  console.log("  state import [--draft|--commit [--accept-stale]] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
+  console.log("  state migrate --seat <planner|developer|qa> [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>");
   console.log("                                             Migrate state.json schema v1 -> v2");
   console.log("  detach [--dry-run] [--no-fetch] [--force] [dir]      Return a seat worktree to detached at origin/master");
   process.exit(1);

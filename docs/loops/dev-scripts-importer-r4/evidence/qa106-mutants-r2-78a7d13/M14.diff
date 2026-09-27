@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/cli.ts b/open-brain/src/cli.ts
+index ef7efbf..b035d60 100644
+--- a/open-brain/src/cli.ts
++++ b/open-brain/src/cli.ts
+@@ -491,7 +491,6 @@ Read-only. Change state through ob_state — never by editing the file.`);
+     const r = runCommit(projectRoot, today, { forceSnapshot: args.includes("--force-snapshot"), acceptStale: args.includes(ACCEPT_STALE_FLAG) });
+     console.log(`\nstate import — committed\n`);
+     console.log(`Root: ${projectRoot}`);
+-    if (r.accepted_stale.length) console.log(`Imported STALE under ${ACCEPT_STALE_FLAG}: ${r.accepted_stale.join(", ")}`);
+     if (r.accepted_unreadable.length) console.log(`Imported UNREADABLE under ${ACCEPT_STALE_FLAG}: ${r.accepted_unreadable.join(", ")}`);
+     const unknown = r.staleness.inputs.filter((i) => i.verdict === "could_not_tell");
+     if (unknown.length) console.log(`Could not tell whether current: ${unknown.map((i) => i.input).join(", ")}`);

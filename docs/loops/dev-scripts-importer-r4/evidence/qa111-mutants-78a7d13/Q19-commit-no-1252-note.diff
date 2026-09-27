@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..0e0d532 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -859,7 +859,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+ 
+   // 0. T-180: a stale input refuses before anything is written, including the snapshot.
+   const onDisk = readInputs(root);
+-  const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable, onDisk.readAs);
++  const staleness = detectStaleness(onDisk.texts, findLastSession(join(root, ".agents/SESSIONS"), today), onDisk.undecodable);
+   const stale = staleness.inputs.filter((i) => i.verdict === "stale");
+   // R4-1: an input that cannot be read blocks like STALE; could-not-tell for any other reason does not.
+   const unreadable = staleness.inputs.filter((i) => i.verdict === "could_not_tell" && blocksCommit(i));

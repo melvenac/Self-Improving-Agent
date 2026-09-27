@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index 4a76862..26eb412 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -140,7 +140,7 @@ function withCheck(buf: Buffer, encoding: "utf8" | "utf8-bom"): DecodedText {
+     if (!buf.includes(0)) return { text: decode1252(buf), encoding: "windows-1252", undecodable: null };
+     text = buf.toString("utf-8");
+   }
+-  if (text.includes("\u0000")) return { text, encoding, undecodable: nulReason(buf, encoding === "utf8-bom" ? 3 : 0) };
++  if (text.includes("\u0000") && false) return { text, encoding, undecodable: nulReason(buf, encoding === "utf8-bom" ? 3 : 0) };
+   return { text, encoding, undecodable: null };
+ }
+ 

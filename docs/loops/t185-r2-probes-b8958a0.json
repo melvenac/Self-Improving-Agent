@@ -1,0 +1,1513 @@
+[
+  {
+    "group": "sync",
+    "id": "control: sync (no flags)",
+    "argv": [
+      "sync"
+    ],
+    "expect": "control-change",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [
+      "~README.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | FIXED:"
+  },
+  {
+    "group": "sync",
+    "id": "control: sync --check",
+    "argv": [
+      "sync",
+      "--check"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 1,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | ISSUES:"
+  },
+  {
+    "group": "sync",
+    "id": "dev: sync -check",
+    "argv": [
+      "sync",
+      "-check"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"-check\". | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "dev: sync --chek",
+    "argv": [
+      "sync",
+      "--chek"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"--chek\". | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "dev: sync --help",
+    "argv": [
+      "sync",
+      "--help"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"--help\". | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "dev: sync -h",
+    "argv": [
+      "sync",
+      "-h"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"-h\". | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync --dry_run",
+    "argv": [
+      "sync",
+      "--dry_run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"--dry_run\". | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync —check",
+    "argv": [
+      "sync",
+      "—check"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"—check\" (a typographic dash, not \"-\"). | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync —dry-run",
+    "argv": [
+      "sync",
+      "—dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"—dry-run\" (a typographic dash, not \"-\"). | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync –check",
+    "argv": [
+      "sync",
+      "–check"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"–check\" (a typographic dash, not \"-\"). | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync -n",
+    "argv": [
+      "sync",
+      "-n"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"-n\". | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync --check=1",
+    "argv": [
+      "sync",
+      "--check=1"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"--check=1\". | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync -",
+    "argv": [
+      "sync",
+      "-"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"-\". | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync --",
+    "argv": [
+      "sync",
+      "--"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"--\". | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync . --chek (flag after positional)",
+    "argv": [
+      "sync",
+      ".",
+      "--chek"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: unrecognised flag \"--chek\". | Accepted flags: --check, --score, --json, --history | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync --check --check (flag twice)",
+    "argv": [
+      "sync",
+      "--check",
+      "--check"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 1,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Sync — v1.2.3 |  | ISSUES:"
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync no-such-dir",
+    "argv": [
+      "sync",
+      "no-such-dir"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: \"no-such-dir\" is not an existing directory (resolved to C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-MlhzIK\\proj\\no-such-dir) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync package.json (a file, not a dir)",
+    "argv": [
+      "sync",
+      "package.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: \"package.json\" is not an existing directory (resolved to C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-s5l1VV\\proj\\package.json) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "sync",
+    "id": "qa: sync . .. (two dirs)",
+    "argv": [
+      "sync",
+      ".",
+      ".."
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "sync refused: takes at most one directory, got \".\", \"..\" | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "start",
+    "id": "control: start (no flags)",
+    "argv": [
+      "start"
+    ],
+    "expect": "control-change",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [
+      "+.agents\\SESSIONS\\Session_1.md"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "Session Start — project mode | Project: v1.2.3 | "
+  },
+  {
+    "group": "start",
+    "id": "dev: start -dry-run",
+    "argv": [
+      "start",
+      "-dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "start refused: unrecognised flag \"-dry-run\". | Accepted flags: (none) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "start",
+    "id": "dev: start --dry-run",
+    "argv": [
+      "start",
+      "--dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "start refused: unrecognised flag \"--dry-run\". | Accepted flags: (none) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "start",
+    "id": "qa: start --dry_run",
+    "argv": [
+      "start",
+      "--dry_run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "start refused: unrecognised flag \"--dry_run\". | Accepted flags: (none) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "start",
+    "id": "qa: start —dry-run",
+    "argv": [
+      "start",
+      "—dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "start refused: unrecognised flag \"—dry-run\" (a typographic dash, not \"-\"). | Accepted flags: (none) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "start",
+    "id": "qa: start -n",
+    "argv": [
+      "start",
+      "-n"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "start refused: unrecognised flag \"-n\". | Accepted flags: (none) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "start",
+    "id": "qa: start -",
+    "argv": [
+      "start",
+      "-"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "start refused: unrecognised flag \"-\". | Accepted flags: (none) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "start",
+    "id": "qa: start --check=1",
+    "argv": [
+      "start",
+      "--check=1"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "start refused: unrecognised flag \"--check=1\". | Accepted flags: (none) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "start",
+    "id": "qa: start . --dry-run (flag after positional)",
+    "argv": [
+      "start",
+      ".",
+      "--dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "start refused: unrecognised flag \"--dry-run\". | Accepted flags: (none) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "start",
+    "id": "qa: start no-such-dir",
+    "argv": [
+      "start",
+      "no-such-dir"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "start refused: \"no-such-dir\" is not an existing directory (resolved to C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-HE63kb\\proj\\no-such-dir) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "detach",
+    "id": "control: detach --no-fetch",
+    "argv": [
+      "detach",
+      "--no-fetch"
+    ],
+    "expect": "control-change",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [
+      "~.git\\HEAD",
+      "~.git\\logs\\HEAD"
+    ],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "7e673c10ce3acde75b95166ba3a3381909ece28e",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-VLWRJC\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   git checkout --detach origin/master"
+  },
+  {
+    "group": "detach",
+    "id": "control: detach --dry-run --no-fetch",
+    "argv": [
+      "detach",
+      "--dry-run",
+      "--no-fetch"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-SLRubd\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   would run: git checkout --detach origin/master  (from branch master edf5b04 -> edf5b04)"
+  },
+  {
+    "group": "detach",
+    "id": "dev: detach -dry-run --no-fetch",
+    "argv": [
+      "detach",
+      "-dry-run",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "detach refused: unrecognised flag \"-dry-run\". | Accepted flags: --dry-run, --no-fetch, --force | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "detach",
+    "id": "dev: detach --dry-rn --no-fetch",
+    "argv": [
+      "detach",
+      "--dry-rn",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "detach refused: unrecognised flag \"--dry-rn\". | Accepted flags: --dry-run, --no-fetch, --force | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach --dry_run --no-fetch",
+    "argv": [
+      "detach",
+      "--dry_run",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "detach refused: unrecognised flag \"--dry_run\". | Accepted flags: --dry-run, --no-fetch, --force | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach —dry-run --no-fetch",
+    "argv": [
+      "detach",
+      "—dry-run",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "detach refused: unrecognised flag \"—dry-run\" (a typographic dash, not \"-\"). | Accepted flags: --dry-run, --no-fetch, --force | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach -n --no-fetch",
+    "argv": [
+      "detach",
+      "-n",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "detach refused: unrecognised flag \"-n\". | Accepted flags: --dry-run, --no-fetch, --force | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach - --no-fetch",
+    "argv": [
+      "detach",
+      "-",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "detach refused: unrecognised flag \"-\". | Accepted flags: --dry-run, --no-fetch, --force | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach --dry-run=1 --no-fetch",
+    "argv": [
+      "detach",
+      "--dry-run=1",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "detach refused: unrecognised flag \"--dry-run=1\". | Accepted flags: --dry-run, --no-fetch, --force | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach --force=1 --no-fetch",
+    "argv": [
+      "detach",
+      "--force=1",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "detach refused: unrecognised flag \"--force=1\". | Accepted flags: --dry-run, --no-fetch, --force | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach -dry-run (fetch allowed)",
+    "argv": [
+      "detach",
+      "-dry-run"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "detach refused: unrecognised flag \"-dry-run\". | Accepted flags: --dry-run, --no-fetch, --force | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach . -dry-run --no-fetch (after positional)",
+    "argv": [
+      "detach",
+      ".",
+      "-dry-run",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "detach refused: unrecognised flag \"-dry-run\". | Accepted flags: --dry-run, --no-fetch, --force | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach --dry-run --dry-run --no-fetch (twice)",
+    "argv": [
+      "detach",
+      "--dry-run",
+      "--dry-run",
+      "--no-fetch"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "",
+    "stdout": "detach — C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-skY0vu\\clone |   skipped git fetch (--no-fetch) — origin/master is only as current as the last fetch |   would run: git checkout --detach origin/master  (from branch master f1e6147 -> f1e6147)"
+  },
+  {
+    "group": "detach",
+    "id": "qa: detach no-such-dir --no-fetch",
+    "argv": [
+      "detach",
+      "no-such-dir",
+      "--no-fetch"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": "ref: refs/heads/master",
+    "headAfter": "ref: refs/heads/master",
+    "porcelain": "",
+    "stderr": "detach refused: \"no-such-dir\" is not an existing directory (resolved to C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-1cZZNW\\clone\\no-such-dir) | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "control: state migrate --seat developer <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-66WrUI\\state.json"
+    ],
+    "expect": "control-change",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [
+      "~state.json"
+    ],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-66WrUI\\state.json |   schema_version 1 → 2 |   revision 52 → 53"
+  },
+  {
+    "group": "migrate",
+    "id": "control: state migrate --seat developer --dry-run <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--dry-run",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-8iPZFB\\state.json"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "[dry run] C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-8iPZFB\\state.json |   schema_version 1 → 2 |   revision 52 → 53"
+  },
+  {
+    "group": "migrate",
+    "id": "dev: state migrate --seat developer -dry-run <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "-dry-run",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-YDwka7\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: unrecognised flag \"-dry-run\". | Accepted flags: --keep-revision, --dry-run, --seat, --last-session-seat | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "dev: state migrate --seat developer --dry-rn <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--dry-rn",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-KoF0VH\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: unrecognised flag \"--dry-rn\". | Accepted flags: --keep-revision, --dry-run, --seat, --last-session-seat | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer --dry_run <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--dry_run",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-pO0sYh\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: unrecognised flag \"--dry_run\". | Accepted flags: --keep-revision, --dry-run, --seat, --last-session-seat | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer -n <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "-n",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-qKdslZ\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: unrecognised flag \"-n\". | Accepted flags: --keep-revision, --dry-run, --seat, --last-session-seat | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer - <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "-",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-gKsZ6I\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: unrecognised flag \"-\". | Accepted flags: --keep-revision, --dry-run, --seat, --last-session-seat | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer --dry-run=1 <f>",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--dry-run=1",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-ThbhCz\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: unrecognised flag \"--dry-run=1\". | Accepted flags: --keep-revision, --dry-run, --seat, --last-session-seat | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer —dry-run <f> (em dash)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "—dry-run",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-Pf5RtR\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "em dash does not start with '-', so it is a positional; positionals are 'any' here",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: unrecognised flag \"—dry-run\" (a typographic dash, not \"-\"). | Accepted flags: --keep-revision, --dry-run, --seat, --last-session-seat | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer <f> --dry-rn (after positional)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-8iBBhP\\state.json",
+      "--dry-rn"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: unrecognised flag \"--dry-rn\". | Accepted flags: --keep-revision, --dry-run, --seat, --last-session-seat | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer --dry-run --dry-run <f> (twice)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--dry-run",
+      "--dry-run",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-pwrlT7\\state.json"
+    ],
+    "expect": "ok-nochange",
+    "note": "",
+    "status": 0,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "",
+    "stdout": "[dry run] C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-pwrlT7\\state.json |   schema_version 1 → 2 |   revision 52 → 53"
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat=developer <f> (equals form, space-only flag)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat=developer",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-9Tl5SX\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: --seat takes its value as \"--seat <value>\", not \"--seat=developer\" | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat developer --seat developer <f> (value twice)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "developer",
+      "--seat",
+      "developer",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-yXrL4L\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: --seat given more than once | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "migrate",
+    "id": "qa: state migrate --seat -dry-run <f> (dash token as value)",
+    "argv": [
+      "state",
+      "migrate",
+      "--seat",
+      "-dry-run",
+      "C:\\Users\\melve\\AppData\\Local\\Temp\\qa120-r2-b8958a0-4v4BK1\\state.json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state migrate refused: unrecognised flag \"-dry-run\". | Accepted flags: --keep-revision, --dry-run, --seat, --last-session-seat | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "show",
+    "id": "state show -json",
+    "argv": [
+      "state",
+      "show",
+      "-json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state show refused: unrecognised flag \"-json\". | Accepted flags: --json | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "show",
+    "id": "state show --jsn",
+    "argv": [
+      "state",
+      "show",
+      "--jsn"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state show refused: unrecognised flag \"--jsn\". | Accepted flags: --json | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "show",
+    "id": "state show —json",
+    "argv": [
+      "state",
+      "show",
+      "—json"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state show refused: unrecognised flag \"—json\" (a typographic dash, not \"-\"). | Accepted flags: --json | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "show",
+    "id": "state show -",
+    "argv": [
+      "state",
+      "show",
+      "-"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "state show refused: unrecognised flag \"-\". | Accepted flags: --json | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "relocate",
+    "id": "relocate --aply",
+    "argv": [
+      "relocate",
+      "--aply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "relocate refused: unrecognised flag \"--aply\". | Accepted flags: --apply, --from, --to | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "relocate",
+    "id": "relocate -apply",
+    "argv": [
+      "relocate",
+      "-apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "relocate refused: unrecognised flag \"-apply\". | Accepted flags: --apply, --from, --to | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "relocate",
+    "id": "relocate --from a --to b --aply",
+    "argv": [
+      "relocate",
+      "--from",
+      "a",
+      "--to",
+      "b",
+      "--aply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "relocate refused: unrecognised flag \"--aply\". | Accepted flags: --apply, --from, --to | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "relocate",
+    "id": "relocate --from",
+    "argv": [
+      "relocate",
+      "--from"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "relocate refused: --from needs a value | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "relocate",
+    "id": "relocate —apply",
+    "argv": [
+      "relocate",
+      "—apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "relocate refused: unrecognised flag \"—apply\" (a typographic dash, not \"-\"). | Accepted flags: --apply, --from, --to | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "topics",
+    "id": "topics --aply",
+    "argv": [
+      "topics",
+      "--aply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "topics refused: unrecognised flag \"--aply\". | Accepted flags: --apply, --min | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "topics",
+    "id": "topics -apply",
+    "argv": [
+      "topics",
+      "-apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "topics refused: unrecognised flag \"-apply\". | Accepted flags: --apply, --min | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "topics",
+    "id": "topics --min 3",
+    "argv": [
+      "topics",
+      "--min",
+      "3"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "topics refused: --min takes its value as \"--min=<value>\" | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "topics",
+    "id": "topics —apply",
+    "argv": [
+      "topics",
+      "—apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "topics refused: unrecognised flag \"—apply\" (a typographic dash, not \"-\"). | Accepted flags: --apply, --min | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "backfill",
+    "id": "backfill-success-rate.mjs --aply",
+    "argv": [
+      "--aply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "backfill-success-rate refused: unrecognised argument(s) \"--aply\". | Accepted flags: --apply | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "backfill",
+    "id": "backfill-success-rate.mjs -apply",
+    "argv": [
+      "-apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "backfill-success-rate refused: unrecognised argument(s) \"-apply\". | Accepted flags: --apply | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "backfill",
+    "id": "backfill-success-rate.mjs -",
+    "argv": [
+      "-"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "backfill-success-rate refused: unrecognised argument(s) \"-\". | Accepted flags: --apply | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "backfill",
+    "id": "backfill-success-rate.mjs —apply",
+    "argv": [
+      "—apply"
+    ],
+    "expect": "refuse2",
+    "note": "",
+    "status": 2,
+    "verdict": "PASS",
+    "changed": [],
+    "stateChanged": [],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "backfill-success-rate refused: unrecognised argument(s) \"—apply\". | Accepted flags: --apply | Nothing was run.",
+    "stdout": ""
+  },
+  {
+    "group": "backfill",
+    "id": "backfill-success-rate.mjs --apply --apply (twice)",
+    "argv": [
+      "--apply",
+      "--apply"
+    ],
+    "expect": "info",
+    "note": "",
+    "status": 1,
+    "verdict": "INFO",
+    "changed": [],
+    "stateChanged": [
+      "+knowledge-v2.db"
+    ],
+    "headBefore": null,
+    "headAfter": null,
+    "porcelain": null,
+    "stderr": "C:\\Users\\melve\\AppData\\Local\\Temp\\claude\\C--Users-melve-Worktrees-sia-builder\\fdff74bd-cc7e-40a8-9c2b-638ad27a9ca0\\scratchpad\\probes\\tree\\open-brain\\node_modules\\better-sqlite3\\lib\\methods\\wrappers.js:5 | \treturn this[cppdb].prepare(sql, this, false); | \t                   ^ | SqliteError: no such table: knowledge_index",
+    "stdout": ""
+  }
+]

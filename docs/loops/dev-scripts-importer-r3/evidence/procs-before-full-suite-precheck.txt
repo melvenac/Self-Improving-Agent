@@ -1,0 +1,42 @@
+﻿time 2026-09-25T17:55:44.3754363-05:00 cpu 81%
+
+ProcessId Name           Cmd                                                                                                                                                             
+--------- ----           ---                                                                                                                                                             
+    14676 node.exe       "C:\Program Files\nodejs\node.exe" C:\Users\melve\AppData\Roaming\npm\node_modules\@deepseek-ai\dsh\lib\bin.js web                                              
+     8296 powershell.exe C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe  -NoProfile -ExecutionPolicy Bypass -File "C:\Users\melve\AppData\Local\cursor-agent\cursor-agent.ps1"
+     2604 node.exe       "C:\Users\melve\AppData\Local\cursor-agent\versions\2026.09.23-86fc751\node.exe" C:\Users\melve\AppData\Local\cursor-agent\versions\2026.09.23-86fc751\index.js 
+    12964 node.exe       node C:\Users\melve\Projects\Self-Improving-Agent\open-brain\build\server.js                                                                                    
+     5944 node.exe       node C:\Users\melve\.claude\plugins\cache\context-mode\context-mode\1.0.22/start.mjs                                                                            
+    11028 claude.exe     C:\Users\melve\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\bin\claude.exe                                                                        
+     3548 node.exe       node C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/server.js                                                                                    
+    10980 node.exe       "node"   "C:\Users\melve\AppData\Roaming\npm\\node_modules\gitnexus\dist\cli\index.js" "mcp"                                                                    
+     3340 node.exe       node C:/Users/melve/.claude/plugins/cache/context-mode/context-mode/1.0.22/start.mjs                                                                            
+    12672 node.exe       "C:\Program Files\nodejs\node.exe" C:/Users/melve/AppData/Roaming/npm/node_modules/@easyuseai/nano-banana-pro-mcp/dist/index.js                                 
+     7560 python.exe     "C:\Users\melve\AppData\Local\uv\cache\archive-v0\LTYX8BPQJcES9wkcjb-2O\Scripts\python.exe" "C:\Users\melve\AppData\Local\uv\cache\archive-v0\LTYX8BPQJcES9wkcjb
+    14860 python.exe     "C:\Users\melve\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\python.exe" "C:\Users\melve\AppData\Local\uv\cache\archive-v0\LTYX8BPQJcES9wkcjb-2
+     2756 claude.exe     C:\Users\melve\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\bin\claude.exe                                                                        
+     4692 node.exe       node C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/server.js                                                                                    
+    14516 node.exe       "node"   "C:\Users\melve\AppData\Roaming\npm\\node_modules\gitnexus\dist\cli\index.js" "mcp"                                                                    
+     6752 node.exe       node C:/Users/melve/.claude/plugins/cache/context-mode/context-mode/1.0.22/start.mjs                                                                            
+     2436 node.exe       "C:\Program Files\nodejs\node.exe" C:/Users/melve/AppData/Roaming/npm/node_modules/@easyuseai/nano-banana-pro-mcp/dist/index.js                                 
+     6876 python.exe     "C:\Users\melve\AppData\Local\uv\cache\archive-v0\LTYX8BPQJcES9wkcjb-2O\Scripts\python.exe" "C:\Users\melve\AppData\Local\uv\cache\archive-v0\LTYX8BPQJcES9wkcjb
+     7936 python.exe     "C:\Users\melve\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\python.exe" "C:\Users\melve\AppData\Local\uv\cache\archive-v0\LTYX8BPQJcES9wkcjb-2
+    15900 claude.exe     C:\Users\melve\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\bin\claude.exe                                                                        
+    16560 node.exe       node C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/server.js                                                                                    
+    19308 node.exe       node C:/Users/melve/.claude/plugins/cache/context-mode/context-mode/1.0.22/start.mjs                                                                            
+    19776 node.exe       "node"   "C:\Users\melve\AppData\Roaming\npm\\node_modules\gitnexus\dist\cli\index.js" "mcp"                                                                    
+     9176 node.exe       "C:\Program Files\nodejs\node.exe" C:/Users/melve/AppData/Roaming/npm/node_modules/@easyuseai/nano-banana-pro-mcp/dist/index.js                                 
+    18372 python.exe     "C:\Users\melve\AppData\Local\uv\cache\archive-v0\OYu8WWCF15e_Ge9-ufhza\Scripts\python.exe" "C:\Users\melve\AppData\Local\uv\cache\archive-v0\OYu8WWCF15e_Ge9-uf
+    17476 python.exe     "C:\Users\melve\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\python.exe" "C:\Users\melve\AppData\Local\uv\cache\archive-v0\OYu8WWCF15e_Ge9-ufhz
+    12752 claude.exe     C:\Users\melve\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\bin\claude.exe                                                                        
+    15440 node.exe       node C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/server.js                                                                                    
+    20408 node.exe       node C:/Users/melve/.claude/plugins/cache/context-mode/context-mode/1.0.22/start.mjs                                                                            
+    16572 node.exe       "node"   "C:\Users\melve\AppData\Roaming\npm\\node_modules\gitnexus\dist\cli\index.js" "mcp"                                                                    
+    18416 node.exe       "C:\Program Files\nodejs\node.exe" C:/Users/melve/AppData/Roaming/npm/node_modules/@easyuseai/nano-banana-pro-mcp/dist/index.js                                 
+     1740 python.exe     "C:\Users\melve\AppData\Local\uv\cache\archive-v0\OYu8WWCF15e_Ge9-ufhza\Scripts\python.exe" "C:\Users\melve\AppData\Local\uv\cache\archive-v0\OYu8WWCF15e_Ge9-uf
+    11608 python.exe     "C:\Users\melve\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\python.exe" "C:\Users\melve\AppData\Local\uv\cache\archive-v0\OYu8WWCF15e_Ge9-ufhz
+    12720 node.exe       "C:\Program Files\nodejs\node.exe" scripts/hub-talk.mjs --as atlas --session k57frxw0ptb8tadmqdwy0khhks8ey006 --wait --wait-timeout 3600                        
+    15036 powershell.exe "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"  -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$__claudeCodeScript = $env:CLAUDE_CODE
+
+
+

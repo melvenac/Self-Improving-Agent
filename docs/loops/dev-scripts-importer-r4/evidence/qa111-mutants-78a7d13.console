@@ -1,0 +1,48 @@
+source src/pipelines/state-import/index.ts sha256/12 cd7922a2cfdf (restored after every mutant; now cd7922a2cfdf)
+
+Q1-marker-today-only: RED 1/83 (vitest exit 1) — R3-3: a marker from ANY day refuses, not only today's (no test uses another day's marker)
+    state-import-r4.test.ts > Q1: a marker with another day's date refuses both doors, and the tree is identical
+Q3-failed-rollback-drops-marker: RED 2/83 (vitest exit 1) — R3-3: a FAILED rollback keeps the marker
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+Q6-evidence-stale-only: SURVIVES 0/83 (vitest exit 0) — R3-2: the Windows-1252 note is on every judged input, not only the STALE ones
+Q8-snapshot-fail-no-aside: RED 1/83 (vitest exit 1) — R3-1: a failed snapshot puts the --force-snapshot aside back
+    state-import-r3.test.ts > --force-snapshot with a snapshot that fails part-way: the aside comes back byte for byte, and only the new partial snapshot goes
+Q10-rollback-no-aside: RED 1/83 (vitest exit 1) — R2-3/R3-1: a completed rollback puts the --force-snapshot aside back
+    state-import-atomic.test.ts > with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte
+Q13-valid-utf8-nul-judged: RED 15/83 (vitest exit 1) — the NUL rule for VALID UTF-8 (D8's site: a file with an appended UTF-16 line)
+    state-import-r2.test.ts > UTF-16 with no BOM (NUL bytes) is the shape that cannot be read: could not tell, and it says why rather than 'names no Session N'
+    state-import-r2.test.ts > SUMMARY.md in UTF-16LE with no BOM (NUL bytes): --commit refuses before anything is written
+    state-import-r3.test.ts > UTF-16 with no BOM is still 'could not tell' (NUL bytes), whether or not it is also invalid UTF-8
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted
+    state-import-r4.test.ts > the draft's report says --commit refuses while an input cannot be read, and the CLI's draft summary says so too
+    state-import-r4.test.ts > unreadable (NUL bytes): blocks
+    state-import-r4.test.ts > each could-not-tell input carries its reason, so the report and the refusal read the same list
+    state-import-r4.test.ts > UTF-16LE with no BOM: --commit refuses, names the NUL bytes, and the tree is identical afterwards
+    state-import-r4.test.ts > O8: the refusal reads 'SUMMARY.md contains', not 'SUMMARY.md is contains'
+Q15-rollback-msg-no-marker: SURVIVES 0/83 (vitest exit 0) — R3-3: ROLLBACK FAILED says which marker to delete
+Q16-created-is-snapshot: RED 7/83 (vitest exit 1) — R3-1: made.created is the FIRST directory created (archive/ when it was absent), not always the snapshot
+    state-import-atomic.test.ts > failing while writing state.json: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while writing SUMMARY.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while rendering task.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while rendering next-session.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while moving the draft into the snapshot: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > a snapshot that fails part-way is removed, with archive/ if the snapshot created it, and a second run completes
+    state-import-r3.test.ts > a completed rollback leaves no marker, and a re-run completes (archive/ absent before)
+Q17-draft-marker-after-state: RED 1/83 (vitest exit 1) — R3-3: --draft reads the marker before state.json's own refusal
+    state-import-r4.test.ts > Q17: a marker plus a state.json: --draft gives the half-restored refusal, not 'already exists'
+Q18-draft-no-1252-note: RED 3/83 (vitest exit 1) — R3-2: --draft's report names the encoding too (buildImportDraft passes readAs)
+    state-import-r3.test.ts > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+Q20-nul-summary-refusal: RED 3/83 (vitest exit 1) — R2-1 on this code (QA 106's N5, over all six files): a SUMMARY.md with NUL bytes refuses --commit
+    state-import-r2.test.ts > SUMMARY.md in UTF-16LE with no BOM (NUL bytes): --commit refuses before anything is written
+    state-import-r4.test.ts > UTF-16LE with no BOM: --commit refuses, names the NUL bytes, and the tree is identical afterwards
+    state-import-r4.test.ts > O8: the refusal reads 'SUMMARY.md contains', not 'SUMMARY.md is contains'
+Q19-commit-no-1252-note: SURVIVES 0/83 (vitest exit 0) — R3-2: --commit's re-judgement passes readAs (evidence at commit)

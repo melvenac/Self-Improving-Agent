@@ -32,6 +32,13 @@ const DB_PATH =
   process.env.KNOWLEDGE_V2_DB ||
   join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 
+// T-185: an unrecognised token refuses before the database is opened, rather
+// than being ignored (`--aply` used to run the dry run and say nothing).
+const unknown = process.argv.slice(2).filter((a) => a !== "--apply");
+if (unknown.length > 0) {
+  console.error(`backfill-success-rate refused: unrecognised argument(s) ${unknown.map((u) => `"${u}"`).join(", ")}.\nAccepted flags: --apply\nNothing was run.`);
+  process.exit(2);
+}
 const apply = process.argv.includes("--apply");
 
 const db = new Database(DB_PATH);

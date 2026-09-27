@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index fbbfdff..4c2a99d 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -896,7 +896,6 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+     const why = err instanceof Error ? err.message : String(err);
+     throw new Error(`${why}. ${rollBack(agents, snapshot.dir, made.created, aside, marker)}`);
+   }
+-  rmSync(marker, { force: true });
+   if (aside) rmSync(aside, { recursive: true, force: true });
+   return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input) };
+ }
