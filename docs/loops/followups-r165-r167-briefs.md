@@ -61,3 +61,24 @@ QA-accepted candidate, and each is scoped to findings already ruled in
 - **Rows:** QA 144's C4b, the real T-169 note (200 characters), red first; QA 158's fallback shape; and a one-word
   change inside a single-line note.
 - Everything QA 158 accepted must still hold.
+
+## Record 176, Grok (`sia-forge`, room `k57frxw0ptb8tadmqdwy0khhks8ey006`): T-048 round 2b
+
+**Branch** `loop/t048-r2b` from `5b9a403` (T-048 r2, which QA 157 accepted). The common rules are at the top of this
+file.
+
+**Read ONLY:**
+- this section;
+- the QA 157 part of `t048-t171-rulings-qa157-qa158.md`;
+- QA 157's report, Defects and Open (`origin/qa/t048-r2-report`), and its mutant branches.
+
+**Scope, QA 157's findings, and nothing in `server.ts`:**
+- **T048-D1, the `cli.ts` half only:** `open-brain sync --score` prints which invocation-log state it saw. The two
+  `server.ts` renderers wait for T-048 round 3, after T-179 r2 merges.
+- **T048-D2:** a readable SQLite file with no `session_meta` is not reported as "unreadable". Word it as "holds no
+  session".
+- **T048-D3:** a row for each of QA 157's three surviving mutants (`hook-old-lines`, `s6-corrupt-earns-recency`,
+  `s14-skip-over-match`), each killing its mutant on tcm.
+- **T048-D4:** the stale JSDoc and the `string | null` type on `unusableLog`.
+- **T048-D5:** labels. A zero-byte log is not "corrupt". "No events" is used only when there are no events. "No db
+  holds this session" is not used when the sessions directory is missing.
