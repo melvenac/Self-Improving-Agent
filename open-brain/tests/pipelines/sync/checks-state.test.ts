@@ -233,6 +233,36 @@ describe("ci-status names a job that never started (T-192)", () => {
   });
 });
 
+describe("ci-status names an unreadable step list (T-192 r181b)", () => {
+  const root = tmpdir();
+  const failed = [{ conclusion: "failure", headSha: "deadbeefcafe", status: "completed", databaseId: 1 }];
+  function gh(list: unknown, view?: { ok: true; stdout: string } | { ok: false; error: string }): CommandRunner {
+    return (_cmd, args) => {
+      if (args[1] === "list") return { ok: true, stdout: JSON.stringify(list) };
+      if (args[1] === "view" && view) return view;
+      return { ok: false, error: `unexpected gh ${args.join(" ")}` };
+    };
+  }
+
+  it("a failed run view names the error's first line", () => {
+    const r = checkCiStatus(root, gh(failed, { ok: false, error: "could not find run\nsecond line" }));
+    expect(r.severity).toBe("warn");
+    expect(r.message).toBe("master deadbee conclusion: failure (steps not read: could not find run)");
+  });
+
+  it("an unparseable job list says so", () => {
+    const r = checkCiStatus(root, gh(failed, { ok: true, stdout: "not json" }));
+    expect(r.severity).toBe("warn");
+    expect(r.message).toBe("master deadbee conclusion: failure (steps not read: unparseable job list)");
+  });
+
+  it("a failure with no databaseId says the steps were not read", () => {
+    const r = checkCiStatus(root, gh([{ conclusion: "failure", headSha: "deadbeefcafe", status: "completed" }]));
+    expect(r.severity).toBe("warn");
+    expect(r.message).toBe("master deadbee conclusion: failure (steps not read: no databaseId)");
+  });
+});
+
 describe("merge-markers (Loop 4 R7)", () => {
   let root: string;
   const git = (...args: string[]) => execFileSync("git", args, { cwd: root, encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] });
