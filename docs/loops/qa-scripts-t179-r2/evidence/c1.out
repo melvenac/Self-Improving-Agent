@@ -1,0 +1,74 @@
+HOLDS  A1 set_handoff carrying session_uuid is refused
+        REFUSED: ops[0] invalid at $: Unrecognized key: "session_uuid"
+HOLDS  A1 set_handoff carrying uuid is refused
+        REFUSED: ops[0] invalid at $: Unrecognized key: "uuid"
+HOLDS  A1 set_handoff carrying checkout is refused
+        REFUSED: ops[0] invalid at $: Unrecognized key: "checkout"
+HOLDS  A1 set_handoff carrying session is refused
+        REFUSED: ops[0] invalid at $: Unrecognized key: "session"
+HOLDS  A1 set_handoff carrying sessionUuid is refused
+        REFUSED: ops[0] invalid at $: Unrecognized key: "sessionUuid"
+BROKEN  A2 same seat+checkout, 5 sessions apart: first survives; legacy developer@74 survives
+        a: ok rev 133->134 superseded=handoff developer@74 (developer, legacy, session 74)
+        b: ok rev 134->135
+        handoffs: qa@75[legacy]="THIS IS THE QA SEAT'S HA" | planner@109[legacy]="PLANNER SESSION 109 (Atl" | developer@200[sia-builder]:00000200="first dev session" | developer@205[sia-builder]:00000201="second dev session"
+BROKEN  A2 same seat+checkout, 10 sessions apart: first survives; legacy developer@74 survives
+        a: ok rev 133->134 superseded=handoff developer@74 (developer, legacy, session 74)
+        b: ok rev 134->135
+        handoffs: qa@75[legacy]="THIS IS THE QA SEAT'S HA" | planner@109[legacy]="PLANNER SESSION 109 (Atl" | developer@200[sia-builder]:00000200="first dev session" | developer@210[sia-builder]:00000201="second dev session"
+BROKEN  A2 same seat+checkout, 11 sessions apart: first leaves by retention (ruled); legacy developer@74 survives
+        a: ok rev 133->134 superseded=handoff developer@74 (developer, legacy, session 74)
+        b: ok rev 134->135
+        handoffs: qa@75[legacy]="THIS IS THE QA SEAT'S HA" | planner@109[legacy]="PLANNER SESSION 109 (Atl" | developer@200[sia-builder]:00000200="first dev session" | developer@211[sia-builder]:00000201="second dev session"
+HOLDS  A3 set_handoff with no registered session refuses
+        REFUSED: ops[0] (set_handoff): set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing
+HOLDS  A3 an unattributed write (session 9999) leaves handoffs[] and sessions[] untouched
+        ok rev 133->134 NOTE no registered session: this write is not attributed and sessions[] is unchanged (set_handoff would refuse)
+HOLDS  A4 delete_handoff naming the victim's uuid cannot touch the victim
+        REFUSED: ops[0] invalid at op: Invalid input
+HOLDS  A4 remove_handoff cannot touch the victim
+        REFUSED: ops[0] invalid at op: Invalid input
+HOLDS  A4 update_handoff naming the victim's uuid cannot touch the victim
+        REFUSED: ops[0] invalid at op: Invalid input
+HOLDS  A4 clear_handoffs cannot touch the victim
+        REFUSED: ops[0] invalid at op: Invalid input
+HOLDS  A4 delete_session cannot touch the victim
+        REFUSED: ops[0] invalid at op: Invalid input
+HOLDS  A4 end_session cannot touch the victim
+        REFUSED: ops[0] (end_session): retired in schema v3 (T-163) — every state write now records its session in sessions[], so there is no close-out slot to set; the last session is derived
+HOLDS  A4 set_handoff naming the victim's uuid cannot touch the victim
+        REFUSED: ops[0] invalid at $: Unrecognized key: "session_uuid"
+BROKEN  A5 newest per (seat,checkout) never dropped: infra@110 and builder@115 kept at newest 500; builder@111 dropped (ruled)
+        ok rev 136->137 superseded=handoff qa@75 (qa, legacy, session 75)
+        handoffs: planner@109[legacy]="PLANNER SESSION 109 (Atl" | developer@110[sia-infra]:00000110="infra dev, old, only one" | developer@111[sia-builder]:00000111="builder dev old" | developer@115[sia-builder]:00000115="builder dev newer" | qa@500[sia-qa]:00000500="far future qa"
+HOLDS  A6 one session's mistyped number (1124) removes no OTHER session's handoff
+        ok rev 136->137
+        removed: none
+        handoffs: planner@109[legacy]="PLANNER SESSION 109 (Atl" | developer@118[sia-builder]:00000118="Forge 118 handoff" | qa@120[sia-qa]:00000120="QA 120 handoff" | qa@121[sia-qa]:00000121="QA 121 handoff" | developer@1124[sia-builder]:00000124="Forge 124, typo 1124"
+        sessions: 76:22631f4e:planner:legacy | 118:00000118:developer:sia-builder | 120:00000120:qa:sia-qa | 121:00000121:qa:sia-qa | 1124:00000124:developer:sia-builder
+BROKEN  A6b the session can correct its number afterwards
+        ok rev 137->138 NOTE session 00000124-0000-4000-8000-000000000124 is already recorded as session 1124; kept 1124 rather than taking 124, and 
+HOLDS  A6c a session that passes its local greeting number (6) keeps its own new handoff
+        ok rev 135->136
+        handoffs: qa@75[legacy]="THIS IS THE QA SEAT'S HA" | planner@109[legacy]="PLANNER SESSION 109 (Atl" | developer@118[sia-builder]:00000118="Forge 118 handoff" | developer@124[sia-infra]:00000124="infra 124" | developer@6[sia-builder]:00000006="Forge, local number 6"
+BROKEN  A7 ob_set_session(victim uuid) + set_handoff cannot replace the victim's handoff
+        ob_state applied / Revision: 134 → 135 / Applied (1):
+        victim entry now: "attacker overwrote it" session 700
+BROKEN  A8 a reconnected server in the same checkout cannot overwrite the other session's handoff (T-003's slot)
+        ob_state applied / Revision: 134 → 135
+        B's entry now: "session A's handoff after a reconnect" (session 801)
+        handoffs: developer@74[legacy]="LOOP 16 IS MERGED AND TA" | planner@109[legacy]="PLANNER SESSION 109 (Atl" | qa@801[c1-proj]:00000801="session A's handoff afte"
+BROKEN  A9 after /clear, the new session's write does not replace the previous session's handoff
+        ob_state applied / Revision: 134 → 135
+        901's entry now: "session 902's handoff, after /clear, no /start" (session 901)
+HOLDS  A10 a session cannot supersede another seat's entries by naming that seat (seat is not checked against the checkout)
+        ok rev 135->136
+        handoffs: qa@75[legacy]="THIS IS THE QA SEAT'S HA" | planner@109[legacy]="PLANNER SESSION 109 (Atl" | developer@118[sia-builder]:00000118="Forge 118 handoff" | developer@119[sia-builder]:00000119="Forge 119 handoff" | developer@130[sia-builder]:00000130="a qa session calling its"
+INFO  A11 ok rev 134->135
+        update_task T-900 note -> "attacker" (T-171)
+        close_task T-901 note -> "attacker close"
+        update_gap G-900 evidence -> "attacker evidence"
+INFO  A11 close_gap on another session's gap: ok rev 135->136; G-900 present after: false
+INFO  A12 after three qa writes 20 sessions apart, the legacy qa@75 is gone; handoffs: developer@74[legacy]="LOOP 16 IS MERGED AND TA" | planner@109[legacy]="PLANNER SESSION 109 (Atl" | qa@200[sia-qa]:00000200="qa 200" | qa@220[sia-qa]:00000220="qa 220" | qa@240[sia-qa]:00000240="qa 240"
+
+8 BROKEN

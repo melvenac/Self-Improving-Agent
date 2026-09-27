@@ -1,0 +1,35 @@
+
+Sync — v1.11.0
+
+ISSUES:
+  mirror-parity: Slash-command mirrors out of sync — repo↔template (.claude): missing directory
+
+WARNINGS:
+  readme-version: No version pattern found in README.md
+  prd-version: No version pattern found in PRD.md
+  claude-md: CLAUDE.md references missing dirs: opensrc/
+  obsidian-vault: Vault directory not found: C:\Users\Aaron Melven\Obsidian Vault v2
+  template-personal-names: project-template/ not found
+  template: project-template/ directory not found
+  spec-provenance: specs/ directory not found
+
+SKIPPED:
+  command-parity: skipped — .claude/commands or project-template/.claude/commands absent
+  command-tool-names: skipped — open-brain/src/server.ts not found (running outside the source tree)
+  command-names: skipped — no command directories found
+  retirements: skipped — .agents/retirements.json not found
+  module-boundary: open-brain/src not present — dependency direction not checked
+  gitnexus-index: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  build-freshness: open-brain/build absent — nothing built here to compare (not a pass)
+  ci-status: skipped — gh is not authenticated; conclusion: unknown (absent is not green)
+
+REPORTED (printed whatever the severity):
+  gitnexus-index [skip]: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  build-freshness [skip]: open-brain/build absent — nothing built here to compare (not a pass)
+  state-schema [pass]: .agents/state.json readable by this CLI process (schema v3, rev 67, 67 tasks)
+  record-erasure [pass]: 0 erasures since schema v3; walked 222 commits, 77 .agents/state.json changes (1 at schema v3+); 7 erasure(s) in schema <3 history, which allowed them and cannot be repaired — listed by `open-brain state erasures`, failing nothing. LIMIT: reads HEAD's committed history only — an uncommitted edit is not seen
+  ci-status [skip]: skipped — gh is not authenticated; conclusion: unknown (absent is not green)
+  merge-markers [pass]: 0 conflict markers in 1367 tracked text files
+  greeting-size [pass]: greeting is 21677 characters, within the 40000 limit (state render 8864, role files 12193, tree and seat 618). LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted.
+
+Summary: 16 passed, 0 fixed, 7 warnings, 1 issues, 8 skipped

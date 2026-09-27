@@ -1,0 +1,7 @@
+== run 36284965962: qa/t179-r2-mut-closed-rev-firstrev @ 8342f0a runner tcm-2: completed failure
+   Test Files  1 failed | 85 passed (86) | Tests  1 failed | 1306 passed | 2 skipped (1309)
+   error lines by kind: {"AssertionError":2,"Process":1}
+   FAIL tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the ids (V3, R179-1)
+== run 36284967199: qa/t179-r2-mut-erasure-legacy-session @ 4baae38 runner tcm-1: completed success
+   Test Files  86 passed (86) | Tests  1307 passed | 2 skipped (1309)
+   error lines by kind: {}

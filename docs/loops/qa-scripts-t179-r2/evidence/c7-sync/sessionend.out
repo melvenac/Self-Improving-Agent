@@ -1,0 +1,6 @@
+[session-end] handoff check NOT RUN: this session's start could not be read from its transcript, so its commits cannot be told from anyone else's
+[session-end] Recalled ids: 0 from none
+[session-end] Nothing rated: no recall_log rows for session c7c7c7c7-0000-4000-8000-000000000134 and no readable .recalled-entries.json (looked in 2 location(s))
+[session-end] Summary: skipped
+[session-end] Feedback: 0 entries
+[session-end] Invocations: 0 logged

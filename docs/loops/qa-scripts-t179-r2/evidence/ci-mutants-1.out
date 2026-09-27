@@ -1,0 +1,17 @@
+== run 36284960415: qa/t179-r2-mut-firstrev-caller @ 75aa2b6 runner tcm-1: completed failure
+   Test Files  4 failed | 82 passed (86) | Tests  9 failed | 1298 passed | 2 skipped (1309)
+   error lines by kind: {"AssertionError":18,"Process":1}
+   FAIL tests/pipelines/state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) > ob_state's writer accepts it: another seat's set_handoff lands beside the legacy entry, which survi
+   FAIL tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > retention drops a superseded entry of the SAME seat and checkout once more than 10 sessions have written since
+   FAIL tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last session' is by write order
+   FAIL tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6c: a session passing its LOCAL greeting number (6) keeps its own new handoff, and the reader is shown it
+   FAIL tests/shared/session-order.test.ts > R179-1: a session number orders nothing > retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more than 10 distinct sessions have first written after it, and 
+   FAIL tests/shared/session-order.test.ts > R179-1 extended to done tasks: a done task ages by sessions written since its close, never by number > a done task leaves once 3 DISTINCT sessions have first written after its closing write, an
+   FAIL tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > set_handoff writes THIS session's entry, stamped with its uuid, checkout and first-write revision, and leaves ANOTHER seat's legacy entry alone
+   FAIL tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > every write records its session in sessions[] with the seat it handed off as and its checkout
+   FAIL tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the ids (V3, R179-1)
+== run 36284961834: qa/t179-r2-mut-last-by-n @ bdf4a9e runner tcm-2: completed failure
+   Test Files  2 failed | 84 passed (86) | Tests  2 failed | 1305 passed | 2 skipped (1309)
+   error lines by kind: {"AssertionError":4,"Process":1}
+   FAIL tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last session' is by write order
+   FAIL tests/shared/state-schema.test.ts > state-schema (Loop 2, read side) > lastSession is DERIVED by WRITE ORDER (first_rev), never by n: the later entry on a tie, legacy (null) before every keyed one, null when none

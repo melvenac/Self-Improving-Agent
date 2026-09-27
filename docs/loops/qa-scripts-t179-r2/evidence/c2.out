@@ -1,0 +1,267 @@
+Note: switching to '16465675d0d146e00ef29fe8e31ed92216fc3695'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+=== rev132 (C:/qa-scratch/qa134/cand @ 1646567, record live-rev132.json) sha256 f486846efb4fe4b4
+B before: occurrences=2 distinct=2
+B before, by path:
+  $.gaps.12.evidence=d7e514f8-df2a-483c-a8c7-57f2e0a931b0
+  $.last_session.uuid=22631f4e-433a-4f29-8669-47ee2f543bec
+[dry run] C:\qa-scratch\qa134\c2-rev132\.agents\state.json
+  schema_version 2 → 3
+  revision 132 → 133
+  handoffs: 3 kept word for word (qa@75, developer@74, planner@109), session_uuid, checkout and first_rev null — v2 never recorded any of them
+  last_session → sessions[0]: n 76, 2026-09-21, uuid 22631f4e-433a-4f29-8669-47ee2f543bec, seat planner, checkout null, first_rev null
+  legacy entries (first_rev null) order BEFORE every keyed entry; each legacy handoff is superseded by its seat's first keyed handoff (R179-3)
+  tasks: 70 kept, each with closed_rev null (v2 never recorded it); the 2 done task(s) age out once 3 sessions have written, unless cited in the tracked tree
+  uuids: 2 distinct before, 2 after, none lost
+dry-run exit=0
+after dry-run file unchanged: yes
+C:\qa-scratch\qa134\c2-rev132\.agents\state.json
+  schema_version 2 → 3
+  revision 132 → 133
+  handoffs: 3 kept word for word (qa@75, developer@74, planner@109), session_uuid, checkout and first_rev null — v2 never recorded any of them
+  last_session → sessions[0]: n 76, 2026-09-21, uuid 22631f4e-433a-4f29-8669-47ee2f543bec, seat planner, checkout null, first_rev null
+  legacy entries (first_rev null) order BEFORE every keyed entry; each legacy handoff is superseded by its seat's first keyed handoff (R179-3)
+  tasks: 70 kept, each with closed_rev null (v2 never recorded it); the 2 done task(s) age out once 3 sessions have written, unless cited in the tracked tree
+  uuids: 2 distinct before, 2 after, none lost
+run1 exit=0
+files changed by run1:  M .agents/state.json 
+B after: occurrences=2 distinct=2
+B after, by path:
+  $.gaps.12.evidence=d7e514f8-df2a-483c-a8c7-57f2e0a931b0
+  $.sessions.0.uuid=22631f4e-433a-4f29-8669-47ee2f543bec
+distinct uuid sets equal: yes
+C:\qa-scratch\qa134\c2-rev132\.agents\state.json
+  already at schema v3 (revision 133) — nothing to do
+run2 exit=0
+idempotent (sha after run1 == after run2): yes 5f61eb58ac4b543e
+schema 2 -> 3 ; revision 132 -> 133
+unmoved fields differing: none
+tasks: same count true ; each word-for-word + closed_rev:null: true ; done: 2
+handoffs: 3 -> 3 ; word-for-word: true ; new keys null: true
+last_session == sessions[0] minus checkout/first_rev (both null): true true ; sessions.length 1
+plain sync exit=0
+    summary-version: re-rendered 4 views at rev 133 / v0.44.2 (revision unchanged; was stale: .agents/TASKS/INBOX.md (rev 131, v0.44.2), .agents/TASKS/task.md (rev 131, v0.44.2), .agents/SESSIONS/next-session.md (rev 131, v0.44.2), .agents/SYSTEM/SUMMARY.md (rev 131, v0.44.2))
+files changed after migrate+sync:  M .agents/SESSIONS/next-session.md  M .agents/SYSTEM/SUMMARY.md  M .agents/TASKS/INBOX.md  M .agents/TASKS/task.md  M .agents/state.json 
+sync --check exit=1
+    state-schema [pass]: .agents/state.json readable by this CLI process (schema v3, rev 133, 70 tasks)
+    record-erasure [pass]: 0 erasures since schema v3; walked 837 commits, 225 .agents/state.json changes (1 at schema v3+); 44 erasure(s) in schema <3 history, which allowed them and cannot be repaired — listed by `open-brain state erasures`, failing nothing. LIMIT: reads HEAD's committed history only — an uncommitted edit is not seen
+set_session: Session registered: aa134000-0000-4000-8000-000000000134 (C:/qa-scratch/qa134/c2-rev132) [via argument]
+  ob_state applied
+  Revision: 133 → 134
+  Applied (2):
+    set_handoff qa
+    add_gap G-046
+  Dropped done tasks (retention 3 sessions): none
+  Superseded (a newer entry of the same seat and checkout, with >10 sessions written since; or a legacy handoff whose seat has written a keyed one): handoff qa@75 (qa, legacy, session 75)
+  Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+after write: schema 3 rev 134 
+  handoffs developer@74:legacy:fr=null, planner@109:legacy:fr=null, qa@134:aa134000-0000-4000-8000-000000000134:fr=134 
+  sessions 76:22631f4e-433a-4f29-8669-47ee2f543bec:planner:null:fr=null, 134:aa134000-0000-4000-8000-000000000134:qa:c2-rev132:fr=134
+B after write: distinct=3
+Note: switching to '16465675d0d146e00ef29fe8e31ed92216fc3695'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+=== master133 (C:/qa-scratch/qa134/cand @ 1646567, record live-master133.json) sha256 10fa61eafbe8ae0f
+B before: occurrences=2 distinct=2
+B before, by path:
+  $.gaps.12.evidence=d7e514f8-df2a-483c-a8c7-57f2e0a931b0
+  $.last_session.uuid=22631f4e-433a-4f29-8669-47ee2f543bec
+[dry run] C:\qa-scratch\qa134\c2-master133\.agents\state.json
+  schema_version 2 → 3
+  revision 133 → 134
+  handoffs: 3 kept word for word (qa@75, developer@74, planner@109), session_uuid, checkout and first_rev null — v2 never recorded any of them
+  last_session → sessions[0]: n 76, 2026-09-21, uuid 22631f4e-433a-4f29-8669-47ee2f543bec, seat planner, checkout null, first_rev null
+  legacy entries (first_rev null) order BEFORE every keyed entry; each legacy handoff is superseded by its seat's first keyed handoff (R179-3)
+  tasks: 70 kept, each with closed_rev null (v2 never recorded it); the 3 done task(s) age out once 3 sessions have written, unless cited in the tracked tree
+  uuids: 2 distinct before, 2 after, none lost
+dry-run exit=0
+after dry-run file unchanged: yes
+C:\qa-scratch\qa134\c2-master133\.agents\state.json
+  schema_version 2 → 3
+  revision 133 → 134
+  handoffs: 3 kept word for word (qa@75, developer@74, planner@109), session_uuid, checkout and first_rev null — v2 never recorded any of them
+  last_session → sessions[0]: n 76, 2026-09-21, uuid 22631f4e-433a-4f29-8669-47ee2f543bec, seat planner, checkout null, first_rev null
+  legacy entries (first_rev null) order BEFORE every keyed entry; each legacy handoff is superseded by its seat's first keyed handoff (R179-3)
+  tasks: 70 kept, each with closed_rev null (v2 never recorded it); the 3 done task(s) age out once 3 sessions have written, unless cited in the tracked tree
+  uuids: 2 distinct before, 2 after, none lost
+run1 exit=0
+files changed by run1:  M .agents/state.json 
+B after: occurrences=2 distinct=2
+B after, by path:
+  $.gaps.12.evidence=d7e514f8-df2a-483c-a8c7-57f2e0a931b0
+  $.sessions.0.uuid=22631f4e-433a-4f29-8669-47ee2f543bec
+distinct uuid sets equal: yes
+C:\qa-scratch\qa134\c2-master133\.agents\state.json
+  already at schema v3 (revision 134) — nothing to do
+run2 exit=0
+idempotent (sha after run1 == after run2): yes 6deeebd5654b7152
+schema 2 -> 3 ; revision 133 -> 134
+unmoved fields differing: none
+tasks: same count true ; each word-for-word + closed_rev:null: true ; done: 3
+handoffs: 3 -> 3 ; word-for-word: true ; new keys null: true
+last_session == sessions[0] minus checkout/first_rev (both null): true true ; sessions.length 1
+plain sync exit=0
+    summary-version: re-rendered 4 views at rev 134 / v0.44.2 (revision unchanged; was stale: .agents/TASKS/INBOX.md (rev 131, v0.44.2), .agents/TASKS/task.md (rev 131, v0.44.2), .agents/SESSIONS/next-session.md (rev 131, v0.44.2), .agents/SYSTEM/SUMMARY.md (rev 131, v0.44.2))
+files changed after migrate+sync:  M .agents/SESSIONS/next-session.md  M .agents/SYSTEM/SUMMARY.md  M .agents/TASKS/INBOX.md  M .agents/TASKS/task.md  M .agents/state.json 
+sync --check exit=1
+    state-schema [pass]: .agents/state.json readable by this CLI process (schema v3, rev 134, 70 tasks)
+    record-erasure [pass]: 0 erasures since schema v3; walked 837 commits, 225 .agents/state.json changes (1 at schema v3+); 44 erasure(s) in schema <3 history, which allowed them and cannot be repaired — listed by `open-brain state erasures`, failing nothing. LIMIT: reads HEAD's committed history only — an uncommitted edit is not seen
+set_session: Session registered: aa134000-0000-4000-8000-000000000134 (C:/qa-scratch/qa134/c2-master133) [via argument]
+  ob_state applied
+  Revision: 134 → 135
+  Applied (2):
+    set_handoff qa
+    add_gap G-046
+  Dropped done tasks (retention 3 sessions): none
+  Superseded (a newer entry of the same seat and checkout, with >10 sessions written since; or a legacy handoff whose seat has written a keyed one): handoff qa@75 (qa, legacy, session 75)
+  Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+after write: schema 3 rev 135 
+  handoffs developer@74:legacy:fr=null, planner@109:legacy:fr=null, qa@134:aa134000-0000-4000-8000-000000000134:fr=135 
+  sessions 76:22631f4e-433a-4f29-8669-47ee2f543bec:planner:null:fr=null, 134:aa134000-0000-4000-8000-000000000134:qa:c2-master133:fr=135
+B after write: distinct=3
+=== a2a-rev71 (C:/qa-scratch/qa134/a2a @ a63d9de) sha256 079e5a126c655037
+B before: occurrences=2 distinct=2
+B before, by path:
+  $.decisions.26.note=9a149231-b394-4290-9cfe-7118be1d6ba0
+  $.last_session.uuid=9794e748-290e-4f81-a3a5-b406d8e144c7
+[dry run] C:\qa-scratch\qa134\c2-a2a-rev71\.agents\state.json
+  schema_version 2 → 3
+  revision 71 → 72
+  handoffs: 3 kept word for word (developer@17, planner@18, qa@16), session_uuid, checkout and first_rev null — v2 never recorded any of them
+  last_session → sessions[0]: n 15, 2026-09-23, uuid 9794e748-290e-4f81-a3a5-b406d8e144c7, seat planner, checkout null, first_rev null
+  legacy entries (first_rev null) order BEFORE every keyed entry; each legacy handoff is superseded by its seat's first keyed handoff (R179-3)
+  tasks: 67 kept, each with closed_rev null (v2 never recorded it); the 9 done task(s) age out once 3 sessions have written, unless cited in the tracked tree
+  uuids: 2 distinct before, 2 after, none lost
+dry-run exit=0
+after dry-run file unchanged: yes
+C:\qa-scratch\qa134\c2-a2a-rev71\.agents\state.json
+  schema_version 2 → 3
+  revision 71 → 72
+  handoffs: 3 kept word for word (developer@17, planner@18, qa@16), session_uuid, checkout and first_rev null — v2 never recorded any of them
+  last_session → sessions[0]: n 15, 2026-09-23, uuid 9794e748-290e-4f81-a3a5-b406d8e144c7, seat planner, checkout null, first_rev null
+  legacy entries (first_rev null) order BEFORE every keyed entry; each legacy handoff is superseded by its seat's first keyed handoff (R179-3)
+  tasks: 67 kept, each with closed_rev null (v2 never recorded it); the 9 done task(s) age out once 3 sessions have written, unless cited in the tracked tree
+  uuids: 2 distinct before, 2 after, none lost
+run1 exit=0
+files changed by run1:  M .agents/state.json 
+B after: occurrences=2 distinct=2
+B after, by path:
+  $.decisions.26.note=9a149231-b394-4290-9cfe-7118be1d6ba0
+  $.sessions.0.uuid=9794e748-290e-4f81-a3a5-b406d8e144c7
+distinct uuid sets equal: yes
+C:\qa-scratch\qa134\c2-a2a-rev71\.agents\state.json
+  already at schema v3 (revision 72) — nothing to do
+run2 exit=0
+idempotent (sha after run1 == after run2): yes 5144f6909077c195
+schema 2 -> 3 ; revision 71 -> 72
+unmoved fields differing: none
+tasks: same count true ; each word-for-word + closed_rev:null: true ; done: 9
+handoffs: 3 -> 3 ; word-for-word: true ; new keys null: true
+last_session == sessions[0] minus checkout/first_rev (both null): true true ; sessions.length 1
+plain sync exit=0
+    summary-version: re-rendered 4 views at rev 72 / v1.11.0 (revision unchanged; was stale: .agents/TASKS/INBOX.md (rev 71, v1.11.0), .agents/TASKS/task.md (rev 71, v1.11.0), .agents/SESSIONS/next-session.md (rev 71, v1.11.0), .agents/SYSTEM/SUMMARY.md (rev 71, v1.11.0))
+files changed after migrate+sync:  M .agents/SESSIONS/next-session.md  M .agents/SYSTEM/SUMMARY.md  M .agents/TASKS/INBOX.md  M .agents/TASKS/task.md  M .agents/state.json 
+sync --check exit=1
+    state-schema [pass]: .agents/state.json readable by this CLI process (schema v3, rev 72, 67 tasks)
+    record-erasure [pass]: 0 erasures since schema v3; walked 245 commits, 90 .agents/state.json changes (1 at schema v3+); 7 erasure(s) in schema <3 history, which allowed them and cannot be repaired — listed by `open-brain state erasures`, failing nothing. LIMIT: reads HEAD's committed history only — an uncommitted edit is not seen
+set_session: Session registered: aa134000-0000-4000-8000-000000000134 (C:/qa-scratch/qa134/c2-a2a-rev71) [via argument]
+  ob_state applied
+  Revision: 72 → 73
+  Applied (2):
+    set_handoff qa
+    add_gap G-002
+  Dropped done tasks (retention 3 sessions): none
+  Superseded (a newer entry of the same seat and checkout, with >10 sessions written since; or a legacy handoff whose seat has written a keyed one): handoff qa@16 (qa, legacy, session 16)
+  Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+after write: schema 3 rev 73 
+  handoffs developer@17:legacy:fr=null, planner@18:legacy:fr=null, qa@134:aa134000-0000-4000-8000-000000000134:fr=73 
+  sessions 15:9794e748-290e-4f81-a3a5-b406d8e144c7:planner:null:fr=null, 134:aa134000-0000-4000-8000-000000000134:qa:c2-a2a-rev71:fr=73
+B after write: distinct=3
+=== a2a-rev66 (C:/qa-scratch/qa134/a2a @ 4c713b3) sha256 03279fa9ac795b96
+B before: occurrences=2 distinct=2
+B before, by path:
+  $.decisions.26.note=9a149231-b394-4290-9cfe-7118be1d6ba0
+  $.last_session.uuid=9794e748-290e-4f81-a3a5-b406d8e144c7
+[dry run] C:\qa-scratch\qa134\c2-a2a-rev66\.agents\state.json
+  schema_version 2 → 3
+  revision 66 → 67
+  handoffs: 3 kept word for word (developer@17, planner@18, qa@16), session_uuid, checkout and first_rev null — v2 never recorded any of them
+  last_session → sessions[0]: n 15, 2026-09-23, uuid 9794e748-290e-4f81-a3a5-b406d8e144c7, seat planner, checkout null, first_rev null
+  legacy entries (first_rev null) order BEFORE every keyed entry; each legacy handoff is superseded by its seat's first keyed handoff (R179-3)
+  tasks: 67 kept, each with closed_rev null (v2 never recorded it); the 8 done task(s) age out once 3 sessions have written, unless cited in the tracked tree
+  uuids: 2 distinct before, 2 after, none lost
+dry-run exit=0
+after dry-run file unchanged: yes
+C:\qa-scratch\qa134\c2-a2a-rev66\.agents\state.json
+  schema_version 2 → 3
+  revision 66 → 67
+  handoffs: 3 kept word for word (developer@17, planner@18, qa@16), session_uuid, checkout and first_rev null — v2 never recorded any of them
+  last_session → sessions[0]: n 15, 2026-09-23, uuid 9794e748-290e-4f81-a3a5-b406d8e144c7, seat planner, checkout null, first_rev null
+  legacy entries (first_rev null) order BEFORE every keyed entry; each legacy handoff is superseded by its seat's first keyed handoff (R179-3)
+  tasks: 67 kept, each with closed_rev null (v2 never recorded it); the 8 done task(s) age out once 3 sessions have written, unless cited in the tracked tree
+  uuids: 2 distinct before, 2 after, none lost
+run1 exit=0
+files changed by run1:  M .agents/state.json 
+B after: occurrences=2 distinct=2
+B after, by path:
+  $.decisions.26.note=9a149231-b394-4290-9cfe-7118be1d6ba0
+  $.sessions.0.uuid=9794e748-290e-4f81-a3a5-b406d8e144c7
+distinct uuid sets equal: yes
+C:\qa-scratch\qa134\c2-a2a-rev66\.agents\state.json
+  already at schema v3 (revision 67) — nothing to do
+run2 exit=0
+idempotent (sha after run1 == after run2): yes 9fa863b89940e691
+schema 2 -> 3 ; revision 66 -> 67
+unmoved fields differing: none
+tasks: same count true ; each word-for-word + closed_rev:null: true ; done: 8
+handoffs: 3 -> 3 ; word-for-word: true ; new keys null: true
+last_session == sessions[0] minus checkout/first_rev (both null): true true ; sessions.length 1
+plain sync exit=0
+    summary-version: re-rendered 4 views at rev 67 / v1.11.0 (revision unchanged; was stale: .agents/TASKS/INBOX.md (rev 66, v1.11.0), .agents/TASKS/task.md (rev 66, v1.11.0), .agents/SESSIONS/next-session.md (rev 66, v1.11.0), .agents/SYSTEM/SUMMARY.md (rev 66, v1.11.0))
+files changed after migrate+sync:  M .agents/SESSIONS/next-session.md  M .agents/SYSTEM/SUMMARY.md  M .agents/TASKS/INBOX.md  M .agents/TASKS/task.md  M .agents/state.json 
+sync --check exit=1
+    state-schema [pass]: .agents/state.json readable by this CLI process (schema v3, rev 67, 67 tasks)
+    record-erasure [pass]: 0 erasures since schema v3; walked 222 commits, 77 .agents/state.json changes (1 at schema v3+); 7 erasure(s) in schema <3 history, which allowed them and cannot be repaired — listed by `open-brain state erasures`, failing nothing. LIMIT: reads HEAD's committed history only — an uncommitted edit is not seen
+set_session: Session registered: aa134000-0000-4000-8000-000000000134 (C:/qa-scratch/qa134/c2-a2a-rev66) [via argument]
+  ob_state applied
+  Revision: 67 → 68
+  Applied (2):
+    set_handoff qa
+    add_gap G-002
+  Dropped done tasks (retention 3 sessions): none
+  Superseded (a newer entry of the same seat and checkout, with >10 sessions written since; or a legacy handoff whose seat has written a keyed one): handoff qa@16 (qa, legacy, session 16)
+  Rendered (4): .agents/TASKS/INBOX.md, .agents/TASKS/task.md, .agents/SESSIONS/next-session.md, .agents/SYSTEM/SUMMARY.md
+after write: schema 3 rev 68 
+  handoffs developer@17:legacy:fr=null, planner@18:legacy:fr=null, qa@134:aa134000-0000-4000-8000-000000000134:fr=68 
+  sessions 15:9794e748-290e-4f81-a3a5-b406d8e144c7:planner:null:fr=null, 134:aa134000-0000-4000-8000-000000000134:qa:c2-a2a-rev66:fr=68
+B after write: distinct=3
+exit=0

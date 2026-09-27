@@ -1,0 +1,28 @@
+fresh machine: {}
+  changed=true; notes: SessionStart hook registered (cli-bootstrap.js) | SessionEnd hook registered (cli-session-end.js)
+  result: {"SessionStart":["cand/open-brain/build/cli-bootstrap.js\""],"SessionEnd":["cand/open-brain/build/cli-session-end.js\""]}
+  re-run changed=false
+undefined settings
+  changed=true; notes: SessionStart hook registered (cli-bootstrap.js) | SessionEnd hook registered (cli-session-end.js)
+  result: {"SessionStart":["cand/open-brain/build/cli-bootstrap.js\""],"SessionEnd":["cand/open-brain/build/cli-session-end.js\""]}
+  re-run changed=false
+SessionStart only (set up before R179-5)
+  changed=true; notes: SessionStart hook already registered (cli-bootstrap.js) | SessionEnd hook registered (cli-session-end.js)
+  result: {"SessionStart":["cand/open-brain/build/cli-bootstrap.js\""],"SessionEnd":["cand/open-brain/build/cli-session-end.js\""]}
+  re-run changed=false
+forward-slash spelling of both (an earlier install)
+  changed=false; notes: SessionStart hook already registered (cli-bootstrap.js) | SessionEnd hook already registered (cli-session-end.js)
+  result: {"SessionStart":["cand/open-brain/build/cli-bootstrap.js\""],"SessionEnd":["cand/open-brain/build/cli-session-end.js\""]}
+  re-run changed=false
+SessionEnd registered from ANOTHER checkout (a seat)
+  changed=true; notes: SessionStart hook registered (cli-bootstrap.js) | Replaced 1 cli-session-end.js SessionEnd registration(s) differing by path | SessionEnd hook registered (cli-session-end.js)
+  result: {"SessionEnd":["cand/open-brain/build/cli-session-end.js\""],"SessionStart":["cand/open-brain/build/cli-bootstrap.js\""]}
+  re-run changed=false
+stale knowledge-mcp SessionEnd + another tool's SessionEnd
+  changed=true; notes: SessionStart hook registered (cli-bootstrap.js) | SessionEnd hook registered (cli-session-end.js) | Removed 1 stale knowledge-mcp SessionEnd hook(s)
+  result: {"SessionEnd":["other-tool end","cand/open-brain/build/cli-session-end.js\""],"SessionStart":["cand/open-brain/build/cli-bootstrap.js\""]}
+  re-run changed=false
+hooks.SessionEnd not an array (malformed)
+  changed=true; notes: SessionStart hook registered (cli-bootstrap.js) | SessionEnd hook registered (cli-session-end.js)
+  result: {"SessionEnd":["cand/open-brain/build/cli-session-end.js\""],"SessionStart":["cand/open-brain/build/cli-bootstrap.js\""]}
+  re-run changed=false

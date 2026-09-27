@@ -1,0 +1,68 @@
+
+=== firstrev-caller: first_rev taken from the caller's session number (dispatch)
+  diff lines 2; tsc 0; KILLED: 9 red
+  Test Files  4 failed | 8 passed (12) |       Tests  9 failed | 174 passed (183) | ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+    × T163-1: a close-out can only add its own record > retention drops a superseded entry of the SAME seat and checkout once more than 10 sessions have written since 496ms
+    × R179-1: a session number orders nothing > A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last session' is by write order 225ms
+    × R179-1: a session number orders nothing > A6c: a session passing its LOCAL greeting number (6) keeps its own new handoff, and the reader is shown it 143ms
+    × R179-1: a session number orders nothing > retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more than 10 distinct sessions have first written after it, and not a
+    × R179-1 extended to done tasks: a done task ages by sessions written since its close, never by number > a done task leaves once 3 DISTINCT sessions have first written after its closing write, and not
+    × applyStateOps (Loop 3 writer) > set_handoff writes THIS session's entry, stamped with its uuid, checkout and first-write revision, and leaves ANOTHER seat's legacy entry alone 93ms
+    × applyStateOps (Loop 3 writer) > every write records its session in sessions[] with the seat it handed off as and its checkout 56ms
+    × applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the ids (V3, R179-1) 256ms
+    × T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) > ob_state's writer accepts it: another seat's set_handoff lands beside the legacy entry, which survives until 
+    FAIL  tests/pipelines/state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) > ob_state's writer accepts it: another seat's set_handoff lands 
+    FAIL  tests/shared/closeout-erasure.test.ts > T163-1: a close-out can only add its own record > retention drops a superseded entry of the SAME seat and checkout once more than 10 sessions have written
+    FAIL  tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last session' is by write order
+    FAIL  tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6c: a session passing its LOCAL greeting number (6) keeps its own new handoff, and the reader is shown it
+    FAIL  tests/shared/session-order.test.ts > R179-1: a session number orders nothing > retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more than 10 distinct sessio
+    FAIL  tests/shared/session-order.test.ts > R179-1 extended to done tasks: a done task ages by sessions written since its close, never by number > a done task leaves once 3 DISTINCT sessions have first
+    FAIL  tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > set_handoff writes THIS session's entry, stamped with its uuid, checkout and first-write revision, and leaves ANOTHER seat's l
+    FAIL  tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > every write records its session in sessions[] with the seat it handed off as and its checkout
+    FAIL  tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the ids (V3, R
+
+=== last-by-n: lastSession() by the session NUMBER again (dispatch: one of lastSession/retention/done)
+  diff lines 2; tsc 0; KILLED: 2 red
+  Test Files  2 failed | 10 passed (12) |       Tests  2 failed | 181 passed (183) | ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+    × R179-1: a session number orders nothing > A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last session' is by write order 338ms
+    × state-schema (Loop 2, read side) > lastSession is DERIVED by WRITE ORDER (first_rev), never by n: the later entry on a tie, legacy (null) before every keyed one, null when none 15ms
+    FAIL  tests/shared/session-order.test.ts > R179-1: a session number orders nothing > A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last session' is by write order
+    FAIL  tests/shared/state-schema.test.ts > state-schema (Loop 2, read side) > lastSession is DERIVED by WRITE ORDER (first_rev), never by n: the later entry on a tie, legacy (null) before every keyed o
+
+=== done-by-n: done-task retention by NUMBER again: closed_session <= newest n - 3 (dispatch: done-task retention)
+  diff lines 5; tsc 0; KILLED: 7 red
+  Test Files  5 failed | 7 passed (12) |       Tests  7 failed | 176 passed (183) | ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+    × R179-1 extended to done tasks: a done task ages by sessions written since its close, never by number > one write numbered 1124 drops NO done task — neither one just closed nor the record's older one
+    × applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the ids (V3, R179-1) 77ms
+    × server handlers > handleStart > ob_state applies a batch, renders the views, and ob_start reads the result back 100ms
+    × state import (Loop 4 C1) on a fixture built from this repo's prose files > --commit: snapshot byte-complete before any change (P2), state.json rev 0, SUMMARY cut (line counts), four views rendered, 
+    × T-144: rendered Done obeys the retention window > hides done tasks the writer would drop — fails against pre-T-144 code 10ms
+    × T-144: rendered Done obeys the retention window > view and writer agree on exactly which done tasks exist 7ms
+    × T-144: rendered Done obeys the retention window > renders the retention edge correctly: 3 sessions written since the close dropped, 2 kept — whatever the session numbers 4ms
+    FAIL  tests/server.test.ts > server handlers > handleStart > ob_state applies a batch, renders the views, and ob_start reads the result back
+    FAIL  tests/pipelines/state-import.test.ts > state import (Loop 4 C1) on a fixture built from this repo's prose files > --commit: snapshot byte-complete before any change (P2), state.json rev 0, SUMMA
+    FAIL  tests/pipelines/state-views.test.ts > T-144: rendered Done obeys the retention window > hides done tasks the writer would drop — fails against pre-T-144 code
+    FAIL  tests/pipelines/state-views.test.ts > T-144: rendered Done obeys the retention window > view and writer agree on exactly which done tasks exist
+    FAIL  tests/pipelines/state-views.test.ts > T-144: rendered Done obeys the retention window > renders the retention edge correctly: 3 sessions written since the close dropped, 2 kept — whatever the se
+    FAIL  tests/shared/session-order.test.ts > R179-1 extended to done tasks: a done task ages by sessions written since its close, never by number > one write numbered 1124 drops NO done task — neither o
+    FAIL  tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the ids (V3, R
+
+=== checkout-refusal-off: VOID (tsc 2, diff 622)
+src/server.ts(770,29): error TS18048: 'rec' is possibly 'undefined'.
+src/server.ts(770,54): error TS18048: 'rec' is possibly 'undefined'.
+src/server.ts(774,115): error TS18048: 'rec' is possibly 'undefined'.
+src/server.ts(774,137): error TS18048: 'rec' is possibly 'undefined'.
+
+
+=== closed-rev-firstrev: close_task records the closing SESSION's first-write revision, not the closing write's
+  diff lines 2; tsc 0; KILLED: 1 red
+  Test Files  1 failed | 11 passed (12) |       Tests  1 failed | 182 passed (183) | ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+    × applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the ids (V3, R179-1) 157ms
+    FAIL  tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the ids (V3, R
+
+=== erasure-legacy-session: record-erasure explains the removal of a legacy SESSION record as R179-3 (only handoffs yield)
+  diff lines 2; tsc 0; SURVIVED (0 red)
+  Test Files  12 passed (12) |       Tests  183 passed (183)
+
+[{"name":"firstrev-caller","tsc":0,"red":9,"restored":true},{"name":"last-by-n","tsc":0,"red":2,"restored":true},{"name":"done-by-n","tsc":0,"red":7,"restored":true},{"name":"checkout-refusal-off","tsc":2,"red":null,"restored":true},{"name":"closed-rev-firstrev","tsc":0,"red":1,"restored":true},{"name":"erasure-legacy-session","tsc":0,"red":0,"restored":true}]
+exit=0

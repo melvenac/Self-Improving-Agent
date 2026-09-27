@@ -1,0 +1,30 @@
+
+Sync — v0.44.2
+
+ISSUES:
+  retirements: retired names still referenced outside the record: .agents/SYSTEM/ENTITIES.md names dream (retired 2026-09-15, cut); .agents/SYSTEM/ENTITIES.md names reflection queue (retired 2026-09-15, cut)
+  greeting-size: greeting is 47018 characters, over the 40000 limit (state render 25187, role files 21198, tree and seat 631). LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted.
+
+WARNINGS:
+  obsidian-vault: Vault directory not found: C:\Users\Aaron Melven\Obsidian Vault v2
+  spec-provenance: specs/ directory not found
+
+SKIPPED:
+  gitnexus-index: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  build-freshness: open-brain/build absent — nothing built here to compare (not a pass)
+  ci-status: skipped — gh is not authenticated; conclusion: unknown (absent is not green)
+
+REPORTED (printed whatever the severity):
+  command-parity [pass]: 6 shared commands identical to the template (user scope absent — not checked)
+  command-tool-names [pass]: 49 tool references across 18 command files all resolve to 14 registered tools (names only — this cannot tell whether a tool's description is true)
+  command-names [pass]: 47 command references across 22 instruction files all resolve to 8 command files or 2 declared host commands (names only — this cannot tell whether a command's description is true)
+  module-boundary [pass]: core does not import memory (73 file(s), 52 core). LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.
+  gitnexus-index [skip]: no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)
+  build-freshness [skip]: open-brain/build absent — nothing built here to compare (not a pass)
+  state-schema [pass]: .agents/state.json readable by this CLI process (schema v3, rev 133, 70 tasks)
+  record-erasure [pass]: 0 erasures since schema v3; walked 837 commits, 225 .agents/state.json changes (1 at schema v3+); 44 erasure(s) in schema <3 history, which allowed them and cannot be repaired — listed by `open-brain state erasures`, failing nothing. LIMIT: reads HEAD's committed history only — an uncommitted edit is not seen
+  ci-status [skip]: skipped — gh is not authenticated; conclusion: unknown (absent is not green)
+  merge-markers [pass]: 0 conflict markers in 642 tracked text files
+  greeting-size [issue]: greeting is 47018 characters, over the 40000 limit (state render 25187, role files 21198, tree and seat 631). LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted.
+
+Summary: 25 passed, 0 fixed, 2 warnings, 2 issues, 3 skipped

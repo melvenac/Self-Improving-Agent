@@ -1,0 +1,8 @@
+
+=== checkout-refusal-off: R179-2's different-checkout refusal skipped (dispatch)
+  diff lines 2; tsc 0; KILLED: 1 red
+  Test Files  1 failed | 11 passed (12) |       Tests  1 failed | 182 passed (183) | ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+    × R179-2: ob_set_session and another checkout's recorded session > A7 across checkouts: registering as a session recorded in ANOTHER checkout is refused, names both checkouts, and the victim's handoff
+    FAIL  tests/server.test.ts > R179-2: ob_set_session and another checkout's recorded session > A7 across checkouts: registering as a session recorded in ANOTHER checkout is refused, names both checkout
+
+[{"name":"checkout-refusal-off","tsc":0,"red":1,"restored":true}]

@@ -1,0 +1,5 @@
+ Test Files  86 passed (86)
+      Tests  1309 passed (1309)
+   Duration  171.08s (transform 3.05s, setup 1.74s, collect 14.32s, tests 439.35s, environment 29ms, prepare 17.28s)
+exit=0
+start 2026-09-27T01:15:27Z end 2026-09-27T01:18:21Z TEMP=TMP=C:\Users\AARONM~1\AppData\Local\Temp (default, not Defender-excluded) cwd cand/open-brain @ 1646567, full checkout (is-shallow false)

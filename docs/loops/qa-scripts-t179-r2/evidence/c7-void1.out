@@ -1,0 +1,537 @@
+guard: os.homedir() = C:/qa-scratch/qa134/c7/home (scratch)
+fatal: refusing to fetch into branch 'refs/heads/master' checked out at 'C:/qa-scratch/qa134/c7/origin'
+error: pathspec 'master' did not match any file(s) known to git
+fatal: Needed a single revision
+fatal: Needed a single revision
+O master , loop/t179-r2 
+warning: You appear to have cloned an empty repository.
+fatal: Needed a single revision
+node:fs:440
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\qa-scratch\qa134\c7\main\.agents\state.json'
+    at Object.readFileSync (node:fs:440:20)
+    at [eval]:1:34
+    at runScriptInThisContext (node:internal/vm:209:10)
+    at node:internal/process/execution:446:12
+    at [eval]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:444:60)
+    at evalFunction (node:internal/process/execution:279:30)
+    at evalTypeScript (node:internal/process/execution:291:3)
+    at node:internal/main/eval_string:74:3 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\qa-scratch\\qa134\\c7\\main\\.agents\\state.json'
+}
+
+Node.js v22.23.3
+main checkout at , record 
+fatal: invalid reference: origin/master
+fatal: invalid reference: origin/master
+scripts/c7r2-walk.sh: line 46: C:/qa-scratch/qa134/c7/seat-branch/docs/loops/seat-note.md: No such file or directory
+fatal: cannot change to 'C:/qa-scratch/qa134/c7/seat-branch': No such file or directory
+fatal: cannot change to 'C:/qa-scratch/qa134/c7/seat-branch': No such file or directory
+fatal: invalid reference: origin/master
+node:fs:440
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\qa-scratch\qa134\c7\seat-state\.agents\state.json'
+    at Module.readFileSync (node:fs:440:20)
+    at file:///C:/qa-scratch/qa134/[eval1]:3:80 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\qa-scratch\\qa134\\c7\\seat-state\\.agents\\state.json'
+}
+
+Node.js v22.23.3
+fatal: cannot change to 'C:/qa-scratch/qa134/c7/seat-state': No such file or directory
+warning: in the working copy of '.agents/AGENT.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/FRAMEWORK.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SESSIONS/SESSION_TEMPLATE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/DECISIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/ENTITIES.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/PRD.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/RULES.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/RUNBOOK.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/SECURITY.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/SUMMARY.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/SYSTEM/TESTING.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/TASKS/INBOX.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/TASKS/task.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/examples/e2e.yml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/skills/INDEX.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/skills/playwright-tester/SKILL.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/skills/session-manager/SKILL.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.agents/state.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/bootstrap.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/checkpoint.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/end.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/start.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/sync.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/task.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/commands/test.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/rules/agents.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/rules/backend.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/rules/database.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/rules/frontend.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.claude/rules/testing.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.cursor/commands/checkpoint.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.cursor/commands/end.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.cursor/commands/start.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.cursor/commands/sync.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'CLAUDE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'gitignore', LF will be replaced by CRLF the next time Git touches it
+A2A-Hub record v2 rev 71; frogger stand-in record v2 rev 0
+
+== 0. before: OLD server on main (v2)
+node:fs:440
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\qa-scratch\qa134\c7\main\.agents\state.json'
+    at Module.readFileSync (node:fs:440:20)
+    at file:///C:/qa-scratch/qa134/[eval1]:7:50 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\qa-scratch\\qa134\\c7\\main\\.agents\\state.json'
+}
+
+Node.js v22.23.3
+
+== merge on GitHub (Aaron's act): loop/t179-r2 into master
+fatal: Non-fast-forward commit does not make sense into an empty head
+
+== STEP 1: rebuild the main checkout: git pull, then cd open-brain && npm ci && npm run build. Do NOT reconnect.
+Your configuration specifies to merge with the ref 'refs/heads/master'
+from the remote, but no such ref was fetched.
+scripts/c7r2-walk.sh: line 69: cd: C:/qa-scratch/qa134/c7/main/open-brain: No such file or directory
+   npm ci + build exit=1
+tail: cannot open 'C:/qa-scratch/qa134/c7/build.out' for reading: No such file or directory
+node:fs:440
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\qa-scratch\qa134\c7\main\.agents\state.json'
+    at Module.readFileSync (node:fs:440:20)
+    at file:///C:/qa-scratch/qa134/[eval1]:7:50 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\qa-scratch\\qa134\\c7\\main\\.agents\\state.json'
+}
+
+Node.js v22.23.3
+node:internal/modules/esm/resolve:275
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\server.js' imported from C:\qa-scratch\qa134\[eval1]
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:989:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    at ModuleLoader.import (node:internal/modules/esm/loader:679:21)
+    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/qa-scratch/qa134/c7/main/open-brain/build/server.js'
+}
+
+Node.js v22.23.3
+
+== STEP 2: migrate the live record and re-render its views, in ONE commit
+node:internal/modules/cjs/loader:1433
+  throw err;
+  ^
+
+Error: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\cli.js'
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+    at Function._load (node:internal/modules/cjs/loader:1216:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v22.23.3
+   dry-run exit=1
+node:internal/modules/cjs/loader:1433
+  throw err;
+  ^
+
+Error: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\cli.js'
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+    at Function._load (node:internal/modules/cjs/loader:1216:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v22.23.3
+   migrate exit=1
+   plain sync exit=1
+   changed: 
+fatal: pathspec '.agents/state.json' did not match any files
+   left uncommitted after the commit: 0 path(s)
+fatal: couldn't find remote ref docs/state-v3-migration
+error: pathspec 'master' did not match any file(s) known to git
+   sync --check (after-step2) exit=1
+
+== STEP 3: reconnect: a greeting from the NEW server shows the v3 record
+node:internal/modules/esm/resolve:275
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\server.js' imported from C:\qa-scratch\qa134\[eval1]
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:989:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    at ModuleLoader.import (node:internal/modules/esm/loader:679:21)
+    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/qa-scratch/qa134/c7/main/open-brain/build/server.js'
+}
+
+Node.js v22.23.3
+node:fs:440
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\qa-scratch\qa134\c7\main\.agents\state.json'
+    at Module.readFileSync (node:fs:440:20)
+    at file:///C:/qa-scratch/qa134/[eval1]:7:50 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\qa-scratch\\qa134\\c7\\main\\.agents\\state.json'
+}
+
+Node.js v22.23.3
+
+== STEPS 4 and 5: node scripts/setup.mjs in the MAIN checkout (end.md + SessionEnd hook; it also rebuilds)
+   setup (1st) exit=1
+   Error: Cannot find module 'C:\qa-scratch\qa134\c7\main\scripts\setup.mjs'
+       at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+   settings SessionStart: node "C:\qa-scratch\qa134\c7\main\open-brain\build\cli-bootstrap.js"
+   settings SessionEnd: node other-tool-end.js
+   theme kept: true
+   setup (2nd, re-run) exit=1
+       at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+   settings.json unchanged by the re-run: yes
+   ~/.claude/commands/end.md == main .claude/commands/end.md: NO
+   ~/.cursor/commands/end.md == main project-template/.cursor/commands/end.md: NO
+   the registered SessionEnd hook runs (NOT RUN expected without a transcript; exit code is what matters):
+     cli-session-end exit=1
+     node:internal/modules/cjs/loader:1433
+       throw err;
+       ^
+     
+     Error: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\cli-session-end.js'
+         at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+         at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+         at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+         at Function._load (nod
+   sync --check (after-step5) exit=1
+
+== STEP 6: seat worktrees (created before the merge)
+node:fs:440
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\qa-scratch\qa134\c7\seat-detached\.agents\state.json'
+    at Object.readFileSync (node:fs:440:20)
+    at [eval]:1:34
+    at runScriptInThisContext (node:internal/vm:209:10)
+    at node:internal/process/execution:446:12
+    at [eval]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:444:60)
+    at evalFunction (node:internal/process/execution:279:30)
+    at evalTypeScript (node:internal/process/execution:291:3)
+    at node:internal/main/eval_string:74:3 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\qa-scratch\\qa134\\c7\\seat-detached\\.agents\\state.json'
+}
+
+Node.js v22.23.3
+   seat-detached record ; has its own build: no
+scripts/c7r2-walk.sh: line 107: cd: C:/qa-scratch/qa134/c7/seat-detached: No such file or directory
+   'node open-brain/build/cli.js detach' in the seat, as written: exit=1
+head: cannot open 'C:/qa-scratch/qa134/c7/detach-own.out' for reading: No such file or directory
+scripts/c7r2-walk.sh: line 108: cd: C:/qa-scratch/qa134/c7/seat-detached: No such file or directory
+   the MAIN checkout's cli.js detach, run in the seat: exit=1
+head: cannot open 'C:/qa-scratch/qa134/c7/detach-main.out' for reading: No such file or directory
+fatal: cannot change to 'C:/qa-scratch/qa134/c7/seat-detached': No such file or directory
+node:fs:440
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\qa-scratch\qa134\c7\seat-detached\.agents\state.json'
+    at Object.readFileSync (node:fs:440:20)
+    at [eval]:1:34
+    at runScriptInThisContext (node:internal/vm:209:10)
+    at node:internal/process/execution:446:12
+    at [eval]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:444:60)
+    at evalFunction (node:internal/process/execution:279:30)
+    at evalTypeScript (node:internal/process/execution:291:3)
+    at node:internal/main/eval_string:74:3 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\qa-scratch\\qa134\\c7\\seat-detached\\.agents\\state.json'
+}
+
+Node.js v22.23.3
+   seat-detached now at , record 
+node:internal/modules/esm/resolve:275
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\server.js' imported from C:\qa-scratch\qa134\[eval1]
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:989:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    at ModuleLoader.import (node:internal/modules/esm/loader:679:21)
+    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/qa-scratch/qa134/c7/main/open-brain/build/server.js'
+}
+
+Node.js v22.23.3
+scripts/c7r2-walk.sh: line 111: cd: C:/qa-scratch/qa134/c7/seat-branch: No such file or directory
+   seat on a working branch (docs only) merges origin/master: exit=1
+node:fs:440
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\qa-scratch\qa134\c7\seat-branch\.agents\state.json'
+    at Object.readFileSync (node:fs:440:20)
+    at [eval]:1:34
+    at runScriptInThisContext (node:internal/vm:209:10)
+    at node:internal/process/execution:446:12
+    at [eval]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:444:60)
+    at evalFunction (node:internal/process/execution:279:30)
+    at evalTypeScript (node:internal/process/execution:291:3)
+    at node:internal/main/eval_string:74:3 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\qa-scratch\\qa134\\c7\\seat-branch\\.agents\\state.json'
+}
+
+Node.js v22.23.3
+   seat-branch record 
+node:internal/modules/esm/resolve:275
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\server.js' imported from C:\qa-scratch\qa134\[eval1]
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:989:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    at ModuleLoader.import (node:internal/modules/esm/loader:679:21)
+    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/qa-scratch/qa134/c7/main/open-brain/build/server.js'
+}
+
+Node.js v22.23.3
+scripts/c7r2-walk.sh: line 113: cd: C:/qa-scratch/qa134/c7/seat-state: No such file or directory
+   seat that WROTE its record on its branch (v2) merges origin/master: exit=1
+cut: 'C:/qa-scratch/qa134/c7/merge-seat-state.out': No such file or directory
+fatal: cannot change to 'C:/qa-scratch/qa134/c7/seat-state': No such file or directory
+   seat-state: status 
+scripts/c7r2-walk.sh: line 115: cd: C:/qa-scratch/qa134/c7/seat-state: No such file or directory
+
+== STEP 7: other projects on this machine with a v2 record
+node:internal/modules/esm/resolve:275
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\server.js' imported from C:\qa-scratch\qa134\[eval1]
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:989:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    at ModuleLoader.import (node:internal/modules/esm/loader:679:21)
+    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/qa-scratch/qa134/c7/main/open-brain/build/server.js'
+}
+
+Node.js v22.23.3
+node:internal/modules/cjs/loader:1433
+  throw err;
+  ^
+
+Error: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\cli.js'
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+    at Function._load (node:internal/modules/cjs/loader:1216:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v22.23.3
+node:internal/modules/cjs/loader:1433
+  throw err;
+  ^
+
+Error: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\cli.js'
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+    at Function._load (node:internal/modules/cjs/loader:1216:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v22.23.3
+   a2a-hub migrate exit=1
+   a2a-hub record v2 rev 71; changed: 
+node:internal/modules/esm/resolve:275
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\server.js' imported from C:\qa-scratch\qa134\[eval1]
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:989:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    at ModuleLoader.import (node:internal/modules/esm/loader:679:21)
+    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/qa-scratch/qa134/c7/main/open-brain/build/server.js'
+}
+
+Node.js v22.23.3
+   a2a-hub sync --check (MAIN's cli) exit=1
+node:internal/modules/esm/resolve:275
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\server.js' imported from C:\qa-scratch\qa134\[eval1]
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:989:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    at ModuleLoader.import (node:internal/modules/esm/loader:679:21)
+    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/qa-scratch/qa134/c7/main/open-brain/build/server.js'
+}
+
+Node.js v22.23.3
+node:internal/modules/cjs/loader:1433
+  throw err;
+  ^
+
+Error: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\cli.js'
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+    at Function._load (node:internal/modules/cjs/loader:1216:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v22.23.3
+node:internal/modules/cjs/loader:1433
+  throw err;
+  ^
+
+Error: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\cli.js'
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+    at Function._load (node:internal/modules/cjs/loader:1216:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v22.23.3
+   frogger migrate exit=1
+   frogger record v2 rev 0; changed: 
+node:internal/modules/esm/resolve:275
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\qa-scratch\qa134\c7\main\open-brain\build\server.js' imported from C:\qa-scratch\qa134\[eval1]
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:989:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:36)
+    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    at ModuleLoader.import (node:internal/modules/esm/loader:679:21)
+    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/qa-scratch/qa134/c7/main/open-brain/build/server.js'
+}
+
+Node.js v22.23.3
+   frogger sync --check (MAIN's cli) exit=1
+
+walk done
+exit=0

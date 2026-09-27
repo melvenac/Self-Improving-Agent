@@ -1,0 +1,7 @@
+Auto-merging .agents/SESSIONS/next-session.md
+Auto-merging .agents/SYSTEM/SUMMARY.md
+Auto-merging .agents/TASKS/INBOX.md
+CONFLICT (content): Merge conflict in .agents/TASKS/INBOX.md
+Auto-merging .agents/state.json
+CONFLICT (content): Merge conflict in .agents/state.json
+Automatic merge failed; fix conflicts and then commit the result.

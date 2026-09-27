@@ -1,0 +1,6 @@
+detach — C:\qa-scratch\qa134\c7\seat-detached
+  git fetch origin
+  git checkout --detach origin/master
+  verified: detached at 9f41223, no branch
+
+HEAD: 36a33bc (detached) -> 9f41223 (detached)

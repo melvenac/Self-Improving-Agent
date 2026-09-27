@@ -1,0 +1,14 @@
+== run 36284963271: qa/t179-r2-mut-done-by-n @ d968626 runner tcm-1: completed failure
+   Test Files  5 failed | 81 passed (86) | Tests  7 failed | 1300 passed | 2 skipped (1309)
+   error lines by kind: {"AssertionError":14,"Process":1}
+   FAIL tests/server.test.ts > server handlers > handleStart > ob_state applies a batch, renders the views, and ob_start reads the result back
+   FAIL tests/pipelines/state-import.test.ts > state import (Loop 4 C1) on a fixture built from this repo's prose files > --commit: snapshot byte-complete before any change (P2), state.json rev 0, SUMMARY cut (line counts), four views ren
+   FAIL tests/pipelines/state-views.test.ts > T-144: rendered Done obeys the retention window > hides done tasks the writer would drop — fails against pre-T-144 code
+   FAIL tests/pipelines/state-views.test.ts > T-144: rendered Done obeys the retention window > view and writer agree on exactly which done tasks exist
+   FAIL tests/pipelines/state-views.test.ts > T-144: rendered Done obeys the retention window > renders the retention edge correctly: 3 sessions written since the close dropped, 2 kept — whatever the session numbers
+   FAIL tests/shared/session-order.test.ts > R179-1 extended to done tasks: a done task ages by sessions written since its close, never by number > one write numbered 1124 drops NO done task — neither one just closed nor the record's olde
+   FAIL tests/shared/state-writer.test.ts > applyStateOps (Loop 3 writer) > drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the ids (V3, R179-1)
+== run 36284964650: qa/t179-r2-mut-checkout-refusal-off @ 3203594 runner tcm-2: completed failure
+   Test Files  1 failed | 85 passed (86) | Tests  1 failed | 1306 passed | 2 skipped (1309)
+   error lines by kind: {"AssertionError":2,"Process":1}
+   FAIL tests/server.test.ts > R179-2: ob_set_session and another checkout's recorded session > A7 across checkouts: registering as a session recorded in ANOTHER checkout is refused, names both checkouts, and the victim's handoff cannot b
