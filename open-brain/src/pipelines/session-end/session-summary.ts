@@ -195,5 +195,7 @@ export function getSessionSummary(
   const found = findSessionDb(sessionsDir, sessionId);
   if (found && typeof found === "object") return found;
   if (!found) return { skipped: sessionId ? "no db holds this session" : "no session db" };
-  return extractSessionSummary(found);
+  const summary = extractSessionSummary(found);
+  if (summary && "skipped" in summary) return null;
+  return summary;
 }
