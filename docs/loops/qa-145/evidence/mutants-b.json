@@ -1,0 +1,81 @@
+{
+  "results": [
+    {
+      "id": "Q5",
+      "name": "gitState's archive/ filter hides TRACKED changes too",
+      "landed": true,
+      "tsc": 0,
+      "build": 0,
+      "tests": 74,
+      "failedTests": 1,
+      "failed": [
+        {
+          "file": "qa145-bootstrap-r3.test.ts",
+          "title": "F3: a TRACKED file under .agents/archive/ that is modified is still an uncommitted change; an untracked one is not",
+          "msg": "AssertionError: expected 'repository root; has commits; 0 uncom…' to be 'repository root; has commits; 1 uncom…' // Object.is equality"
+        }
+      ],
+      "probeFails": [],
+      "restored": true
+    },
+    {
+      "id": "Q6",
+      "name": "isProjectRoot without the .agents/state.json clause",
+      "landed": true,
+      "tsc": 0,
+      "build": 0,
+      "tests": 74,
+      "failedTests": 0,
+      "failed": [],
+      "probeFails": [],
+      "restored": true
+    },
+    {
+      "id": "Q7",
+      "name": "notARecord: the {{...}} seed check removed",
+      "landed": true,
+      "tsc": 0,
+      "build": 0,
+      "tests": 74,
+      "failedTests": 1,
+      "failed": [
+        {
+          "file": "bootstrap-fix-r3.test.ts",
+          "title": "the {{PROJECT}} seed: NOT A RECORD, named, and move-residue sets it aside",
+          "msg": "AssertionError: expected 'bootstrap check — C:\\qa-tmp\\bf-r3-gGq…' not to match /BOOTSTRAPPED/"
+        }
+      ],
+      "probeFails": [],
+      "restored": true
+    },
+    {
+      "id": "Q8",
+      "name": "state import walks up again (resolveRepoRoot ?? literal)",
+      "landed": true,
+      "tsc": 0,
+      "build": 0,
+      "tests": 74,
+      "failedTests": 3,
+      "failed": [
+        {
+          "file": "bootstrap-fix-r3.test.ts",
+          "title": "from a subdirectory with no .agents/ it refuses and names why, and writes nothing here or above",
+          "msg": "AssertionError: expected +0 to be 1 // Object.is equality"
+        },
+        {
+          "file": "qa145-bootstrap-r3.test.ts",
+          "title": "N: the child untracked: check STOPs and names the enclosing repository; scaffold and import refuse; the parent gains nothing",
+          "msg": "AssertionError: expected +0 to be 1 // Object.is equality"
+        },
+        {
+          "file": "qa145-bootstrap-r3.test.ts",
+          "title": "N: the child's files tracked by the parent: check STOPs and names the enclosing repository; scaffold and import refuse; the parent gains nothing",
+          "msg": "AssertionError: expected +0 to be 1 // Object.is equality"
+        }
+      ],
+      "probeFails": [],
+      "restored": true
+    }
+  ],
+  "rebuilt": 0
+}

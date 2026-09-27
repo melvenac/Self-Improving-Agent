@@ -1,0 +1,10 @@
+local control, 7f4ca74 + qa145-bootstrap-r3.test.ts, default TEMP (C:\Users\Aaron\AppData\Local\Temp)
+ RUN  v3.2.4 C:/qa-scratch/bf145/cand/open-brain
+   ✓ the SessionEnd hook runs the guard and NEVER blocks (T179-2) > outside a git repository it says NOT RUN and still exits 0  1594ms
+ FAIL  tests/pipelines/session-start/tree-currency.test.ts > describeTreeCurrency > reports BEHIND with the commit count and both record revisions
+ Test Files  1 failed | 89 passed (90)
+      Tests  1 failed | 1384 passed (1385)
+   Start at  20:57:08
+   Duration  202.44s (transform 4.70s, setup 3.88s, collect 25.32s, tests 1215.39s, environment 62ms, prepare 34.11s)
+exit=1
+Error: Test timed out in 5000ms.

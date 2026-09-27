@@ -1,0 +1,67 @@
+== run 36282324821
+Runner name: 'tcm-2'
+Machine name: 'tcm'
+ Test Files  2 failed | 87 passed (89)
+      Tests  20 failed | 1348 passed | 2 skipped (1370)
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-10: check knows a scaffold that has not been imported > after scaffold: SCAFFOLDED, continue at step 4, and it says INBOX is still the template's
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-10: check knows a scaffold that has not been imported > negative: once INBOX is edited, check no longer says it is the template's
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-10: check knows a scaffold that has not been imported > the importer WARNS when INBOX.md is the template's, byte for byte (CRLF too), and not once it is edited
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-11: a state.json that is not a record is not BOOTSTRAPPED > not JSON: NOT A RECORD, named, and move-residue sets it aside
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-11: a state.json that is not a record is not BOOTSTRAPPED > the {{PROJECT}} seed: NOT A RECORD, named, and move-residue sets it aside
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-11: a state.json that is not a record is not BOOTSTRAPPED > zero bytes: NOT A RECORD, named, and move-residue sets it aside
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-12: move-residue twice on one day > M13: a rename that silently leaves an entry behind is caught by the read-back, named, and reported as MOVED, not refused
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-12: move-residue twice on one day > the second move goes to a suffixed folder beside the first; neither nests; both hold their own bytes
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-13: an empty project can make its before-SIA commit > an empty folder with no git: Next names --allow-empty
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-13: an empty project can make its before-SIA commit > bootstrap.md step 2.2 names the empty commit
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-13: an empty project can make its before-SIA commit > git init'd with nothing to commit: Next names --allow-empty, and following it reaches scaffold
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-9: state import takes the directory literally > a Node parent with .agents/: --draft AND --commit in the child write only the child, and the parent's .agents/ gains nothing
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-9: state import takes the directory literally > from a subdirectory with no .agents/ it refuses and names why, and writes nothing here or above
+tests/pipelines/bootstrap-fix-r3.test.ts > R-BF-9: state import takes the directory literally > no package.json: the project name is the folder's, and the draft says so
+tests/pipelines/bootstrap-fix-r3.test.ts > the root walker: a bootstrapped non-Node child is its own root > resolveRepoRoot and resolveHookProjectDir stop at a child with .agents/SYSTEM/ and no package.json
+tests/pipelines/qa135-bootstrap.test.ts > QA 135: a project with no package.json > DEFECT D1: a scaffolded project with no package.json (Python, Go, an empty folder) can draft its record
+tests/pipelines/qa135-bootstrap.test.ts > QA 135: a project with no package.json > DEFECT D2: step 6 run in a scaffolded child with no package.json never drafts a PARENT project
+tests/pipelines/qa135-bootstrap.test.ts > QA 135: check's classification > DEFECT D3: check right after scaffold does not say this is 'not a fresh install' (step 1's table would skip steps 4 and 5)
+tests/pipelines/qa135-bootstrap.test.ts > QA 135: check's classification > DEFECT D4: a zero-byte state.json is not reported BOOTSTRAPPED (a record that cannot be read is not a record)
+tests/pipelines/qa135-bootstrap.test.ts > QA 135: move-residue a second time on the same day > DEFECT D5: a move-residue that exits non-zero has moved nothing (or it exits 0 and nests nothing)
+== run 36282961647
+Runner name: 'tcm-1'
+Machine name: 'tcm'
+ Test Files  89 passed (89)
+      Tests  1368 passed | 2 skipped (1370)
+== run 36287045804
+Runner name: 'tcm-2'
+Machine name: 'tcm'
+ Test Files  90 passed (90)
+      Tests  1383 passed | 2 skipped (1385)
+== run 36287047197
+Runner name: 'tcm-1'
+Machine name: 'tcm'
+ Test Files  2 failed | 87 passed (89)
+      Tests  17 failed | 1344 passed | 2 skipped (1363)
+tests/pipelines/qa135-bootstrap.test.ts > QA 135: a project with no package.json > DEFECT D1: a scaffolded project with no package.json (Python, Go, an empty folder) can draft its record
+tests/pipelines/qa135-bootstrap.test.ts > QA 135: a project with no package.json > DEFECT D2: step 6 run in a scaffolded child with no package.json never drafts a PARENT project
+tests/pipelines/qa135-bootstrap.test.ts > QA 135: check's classification > DEFECT D3: check right after scaffold does not say this is 'not a fresh install' (step 1's table would skip steps 4 and 5)
+tests/pipelines/qa135-bootstrap.test.ts > QA 135: check's classification > DEFECT D4: a zero-byte state.json is not reported BOOTSTRAPPED (a record that cannot be read is not a record)
+tests/pipelines/qa135-bootstrap.test.ts > QA 135: move-residue a second time on the same day > DEFECT D5: a move-residue that exits non-zero has moved nothing (or it exits 0 and nests nothing)
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 F: archive/ is never residue, and a tracked archive/ change is still a change (R-BF-15) > F1: an archive/ that exists before move-residue is untouched, and the new residue folder holds only the residue
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 F: archive/ is never residue, and a tracked archive/ change is still a change (R-BF-15) > F2: a same-day folder already there gets a suffix; nothing nests inside either
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 F: archive/ is never residue, and a tracked archive/ change is still a change (R-BF-15) > F3: a TRACKED file under .agents/archive/ that is modified is still an uncommitted change; an untracked one is not
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 G: move-residue and state.json (R-BF-16) > G1: a parseable state.json is never moved, even beside residue, and check calls it BOOTSTRAPPED
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 G: move-residue and state.json (R-BF-16) > G2: a TRACKED zero-byte state.json: Next names restore-from-git; once moved, git status shows it deleted
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 H: the session-end hook in install (iii) writes to the CHILD, never the parent (R-BF-14) > H: (iii-a) parent is not a repository, CLAUDE_PROJECT_DIR = the child: the missing-handoff marker lands in the child and the parent gains nothing
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 H: the session-end hook in install (iii) writes to the CHILD, never the parent (R-BF-14) > H: (iii-a) parent is not a repository, no CLAUDE_PROJECT_DIR, cwd in child/csvtool/: the missing-handoff marker lands in the child and the parent gains nothing
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 H: the session-end hook in install (iii) writes to the CHILD, never the parent (R-BF-14) > H: (iii-b) parent is a repository, CLAUDE_PROJECT_DIR = the child: the missing-handoff marker lands in the child and the parent gains nothing
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 H: the session-end hook in install (iii) writes to the CHILD, never the parent (R-BF-14) > H: (iii-b) parent is a repository, no CLAUDE_PROJECT_DIR, cwd in child/csvtool/: the missing-handoff marker lands in the child and the parent gains nothing
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 N: a child inside the parent's repository that is NOT its own repository > N: the child untracked: check STOPs and names the enclosing repository; scaffold and import refuse; the parent gains nothing
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 N: a child inside the parent's repository that is NOT its own repository > N: the child's files tracked by the parent: check STOPs and names the enclosing repository; scaffold and import refuse; the parent gains nothing
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 S: SCAFFOLDED (R-BF-10) > S1: right after scaffold, check says SCAFFOLDED and continues at step 4; scaffold's re-run refuses before the git checks
+== run 36287048514
+Runner name: 'tcm-2'
+Machine name: 'tcm'
+ Test Files  2 failed | 88 passed (90)
+      Tests  5 failed | 1378 passed | 2 skipped (1385)
+tests/pipelines/bootstrap-fix-r3.test.ts > the root walker: a bootstrapped non-Node child is its own root > resolveRepoRoot and resolveHookProjectDir stop at a child with .agents/SYSTEM/ and no package.json
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 H: the session-end hook in install (iii) writes to the CHILD, never the parent (R-BF-14) > H: (iii-a) parent is not a repository, CLAUDE_PROJECT_DIR = the child: the missing-handoff marker lands in the child and the parent gains nothing
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 H: the session-end hook in install (iii) writes to the CHILD, never the parent (R-BF-14) > H: (iii-a) parent is not a repository, no CLAUDE_PROJECT_DIR, cwd in child/csvtool/: the missing-handoff marker lands in the child and the parent gains nothing
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 H: the session-end hook in install (iii) writes to the CHILD, never the parent (R-BF-14) > H: (iii-b) parent is a repository, CLAUDE_PROJECT_DIR = the child: the missing-handoff marker lands in the child and the parent gains nothing
+tests/pipelines/qa145-bootstrap-r3.test.ts > QA 145 H: the session-end hook in install (iii) writes to the CHILD, never the parent (R-BF-14) > H: (iii-b) parent is a repository, no CLAUDE_PROJECT_DIR, cwd in child/csvtool/: the missing-handoff marker lands in the child and the parent gains nothing

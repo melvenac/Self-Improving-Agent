@@ -1,0 +1,10 @@
+Q5 gitState's archive/ filter hides TRACKED changes too: landed=true tsc=0 build=0 tests 1/74 red; probe rows red 0; restored=true
+   test  qa145-bootstrap-r3.test.ts :: F3: a TRACKED file under .agents/archive/ that is modified is still an uncommitted change; an untracked one is not :: AssertionError: expected 'repository root; has commits; 0 uncom…' to be 'repository root; has commits; 1 uncom…' // Object.is equality
+Q6 isProjectRoot without the .agents/state.json clause: landed=true tsc=0 build=0 tests 0/74 red; probe rows red 0; restored=true
+Q7 notARecord: the {{...}} seed check removed: landed=true tsc=0 build=0 tests 1/74 red; probe rows red 0; restored=true
+   test  bootstrap-fix-r3.test.ts :: the {{PROJECT}} seed: NOT A RECORD, named, and move-residue sets it aside :: AssertionError: expected 'bootstrap check — C:\qa-tmp\bf-r3-gGq…' not to match /BOOTSTRAPPED/
+Q8 state import walks up again (resolveRepoRoot ?? literal): landed=true tsc=0 build=0 tests 3/74 red; probe rows red 0; restored=true
+   test  bootstrap-fix-r3.test.ts :: from a subdirectory with no .agents/ it refuses and names why, and writes nothing here or above :: AssertionError: expected +0 to be 1 // Object.is equality
+   test  qa145-bootstrap-r3.test.ts :: N: the child untracked: check STOPs and names the enclosing repository; scaffold and import refuse; the parent gains nothing :: AssertionError: expected +0 to be 1 // Object.is equality
+   test  qa145-bootstrap-r3.test.ts :: N: the child's files tracked by the parent: check STOPs and names the enclosing repository; scaffold and import refuse; the parent gains nothing :: AssertionError: expected +0 to be 1 // Object.is equality
+rebuilt at 7f4ca74: tsc exit 0

@@ -1,0 +1,38 @@
+Q1 isProjectRoot reverted to b45900f's rule (package.json required): landed=true tsc=0 build=0 tests 5/74 red; probe rows red 11; restored=true
+   test  bootstrap-fix-r3.test.ts :: resolveRepoRoot and resolveHookProjectDir stop at a child with .agents/SYSTEM/ and no package.json :: AssertionError: expected false to be true // Object.is equality
+   test  qa145-bootstrap-r3.test.ts :: H: (iii-b) parent is a repository, CLAUDE_PROJECT_DIR = the child: the missing-handoff marker lands in the child and the parent gains nothing :: AssertionError: [session-end] HANDOFF MISSING: session qa145-hook committed 2 commit(s) on loop/parent-work since 2026-09-27T01:44:41.521Z and committed no docs/loops/*-handoff.md. Its reasoning is no
+   test  qa145-bootstrap-r3.test.ts :: H: (iii-b) parent is a repository, no CLAUDE_PROJECT_DIR, cwd in child/csvtool/: the missing-handoff marker lands in the child and the parent gains nothing :: AssertionError: [session-end] HANDOFF MISSING: session qa145-hook committed 2 commit(s) on loop/parent-work since 2026-09-27T01:44:46.295Z and committed no docs/loops/*-handoff.md. Its reasoning is no
+   test  qa145-bootstrap-r3.test.ts :: H: (iii-a) parent is not a repository, CLAUDE_PROJECT_DIR = the child: the missing-handoff marker lands in the child and the parent gains nothing :: AssertionError: expected '[session-end] handoff check NOT RUN: …' to match /HANDOFF MISSING/
+   test  qa145-bootstrap-r3.test.ts :: H: (iii-a) parent is not a repository, no CLAUDE_PROJECT_DIR, cwd in child/csvtool/: the missing-handoff marker lands in the child and the parent gains nothing :: AssertionError: expected '[session-end] handoff check NOT RUN: …' to match /HANDOFF MISSING/
+   probe FAIL H-iii-b-env its handoff guard answered for the CHILD's branch [session-end] HANDOFF MISSING: session qa145-iii-b committed 2 commit(s) on loop/parent-work since 2026-09-27T01:45:40.989Z and commi
+   probe FAIL H-iii-b-env its write (the missing-handoff marker) landed in the CHILD 
+   probe FAIL H-iii-b-env the parent gained nothing (every file outside tools/ and .git/ has the same bytes, none new) .agents/SESSIONS/.missing-handoff.jsonl
+   probe FAIL H-iii-b-env the parent's git status and refs are what they were 
+   probe FAIL H-iii-b-cwd its handoff guard answered for the CHILD's branch [session-end] HANDOFF MISSING: session qa145-iii-b committed 2 commit(s) on loop/parent-work since 2026-09-27T01:45:40.989Z and commi
+   probe FAIL H-iii-b-cwd its write (the missing-handoff marker) landed in the CHILD 
+   probe FAIL H-iii-b-cwd the parent gained nothing (every file outside tools/ and .git/ has the same bytes, none new) .agents/SESSIONS/.missing-handoff.jsonl
+   probe FAIL H-iii-a-env its handoff guard answered for the CHILD's branch [session-end] handoff check NOT RUN: git could not list local branches here
+   probe FAIL H-iii-a-env its write (the missing-handoff marker) landed in the CHILD 
+   probe FAIL H-iii-a-cwd its handoff guard answered for the CHILD's branch [session-end] handoff check NOT RUN: git could not list local branches here
+   probe FAIL H-iii-a-cwd its write (the missing-handoff marker) landed in the CHILD 
+Q2 archive/ treated as residue again: landed=true tsc=0 build=0 tests 11/74 red; probe rows red 0; restored=true
+   test  bootstrap-fix-r3.test.ts :: zero bytes: NOT A RECORD, named, and move-residue sets it aside :: AssertionError: expected 'bootstrap check — C:\qa-tmp\bf-r3-XMD…' to match /\.agents\/:\s+empty/:\s+empty
+   test  bootstrap-fix-r3.test.ts :: not JSON: NOT A RECORD, named, and move-residue sets it aside :: AssertionError: expected 'bootstrap check — C:\qa-tmp\bf-r3-0uW…' to match /\.agents\/:\s+empty/:\s+empty
+   test  bootstrap-fix-r3.test.ts :: the {{PROJECT}} seed: NOT A RECORD, named, and move-residue sets it aside :: AssertionError: expected 'bootstrap check — C:\qa-tmp\bf-r3-o66…' to match /\.agents\/:\s+empty/:\s+empty
+   test  bootstrap-fix-r3.test.ts :: the second move goes to a suffixed folder beside the first; neither nests; both hold their own bytes :: AssertionError: expected 1 to be +0 // Object.is equality
+   test  bootstrap-fix.test.ts :: move-residue moves it under .agents/archive/, byte for byte, and deletes nothing :: AssertionError: expected 'residue' to be 'empty' // Object.is equality
+   test  bootstrap-fix.test.ts :: residue moved BEFORE git init: the pre-SIA commit leaves .agents/ out, and the moved residue does not make scaffold refuse :: AssertionError: expected 'Move the residue aside first (`bootst…' to match /Scaffold/
+   test  bootstrap-fix.test.ts :: residue git already tracked: check names the removal commit, and after it scaffold proceeds :: AssertionError: expected 'Move the residue aside first (`bootst…' to match /git add -u -- \.agents/
+   test  qa145-bootstrap-r3.test.ts :: F1: an archive/ that exists before move-residue is untouched, and the new residue folder holds only the residue :: AssertionError: expected 'RESIDUE — archive/, reflection-queue.…' to be 'RESIDUE — reflection-queue.json (no s…' // Object.is equality
+   test  qa145-bootstrap-r3.test.ts :: F2: a same-day folder already there gets a suffix; nothing nests inside either :: AssertionError: bootstrap move-residue refused: residue move failed: EPERM: operation not permitted, rename 'C:\qa-tmp\qa145-Hx8sa4\.agents\archive' -> 'C:\qa-tmp\qa145-Hx8sa4\.agents\archive\pre-boot
+   test  qa145-bootstrap-r3.test.ts :: F3: a TRACKED file under .agents/archive/ that is modified is still an uncommitted change; an untracked one is not :: AssertionError: expected 'Move the residue aside first (`bootst…' to match /^Commit the 1 uncommitted change\(s\)…/
+   test  qa145-bootstrap-r3.test.ts :: G2: a TRACKED zero-byte state.json: Next names restore-from-git; once moved, git status shows it deleted :: AssertionError: expected 'Move the residue aside first (`bootst…' to match /^The residue was tracked by git: comm…/
+Q3 move-residue accepts a parseable state.json (a record): landed=true tsc=0 build=0 tests 2/74 red; probe rows red 0; restored=true
+   test  bootstrap-fix.test.ts :: a record (state.json) is BOOTSTRAPPED and prose TASKS/ is PRE-STATE; move-residue refuses both and moves nothing :: AssertionError: expected +0 to be 1 // Object.is equality
+   test  qa145-bootstrap-r3.test.ts :: G1: a parseable state.json is never moved, even beside residue, and check calls it BOOTSTRAPPED :: AssertionError: expected +0 to be 1 // Object.is equality
+Q4 the SCAFFOLDED state removed: landed=true tsc=0 build=0 tests 4/74 red; probe rows red 0; restored=true
+   test  bootstrap-fix-r3.test.ts :: after scaffold: SCAFFOLDED, continue at step 4, and it says INBOX is still the template's :: AssertionError: expected 'bootstrap check — C:\qa-tmp\bf-r3-4IC…' to match /SCAFFOLDED/
+   test  bootstrap-fix-r3.test.ts :: negative: once INBOX is edited, check no longer says it is the template's :: AssertionError: expected 'bootstrap check — C:\qa-tmp\bf-r3-f4Q…' to match /SCAFFOLDED/
+   test  qa135-bootstrap.test.ts :: DEFECT D3: check right after scaffold does not say this is 'not a fresh install' (step 1's table would skip steps 4 and 5) :: AssertionError: expected 'bootstrap check — C:\qa-tmp\qa135-qzM…' not to match /not a fresh install/
+   test  qa145-bootstrap-r3.test.ts :: S1: right after scaffold, check says SCAFFOLDED and continues at step 4; scaffold's re-run refuses before the git checks :: AssertionError: expected 'PRE-STATE — TASKS/ with no state.json…' to be 'SCAFFOLDED — not yet imported; INBOX.…' // Object.is equality
+rebuilt at 7f4ca74: tsc exit 0
