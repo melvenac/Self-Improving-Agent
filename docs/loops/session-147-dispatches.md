@@ -388,3 +388,12 @@ match Composer's reported lines. Its first live round under D-060 had real evide
   `FAIL_EXPECT restore_new_locked_generation_expect no_run_and_failed=False`; candidate exit 0 (2 passed); old+new
   exit 0 (4 passed, with the old role's reds counted as expected). No log-read IOException in three runs. R185-1 and
   R185-2 are closed. **The QA relaunch copies `qa-queue.ps1` from `78fd6ce`** (the same script as `f590448`).
+
+### Record 187 (candidate B part 2, Grok, product `8c7769f`, PR #187): evidence checked, sent to QA 189, 12:06:53Z
+
+The red commit `043fb8b` adds only the tests to `677c1dd` (no `src/`), so the red is real. Five mutants are product
+edits on their own branches, all failed on tcm. Green: 1699 passed. The planner read the schema diff and one test
+edit: the shared fixture gained `order: "shown"` because a `met` row without it is now refused. That goes to QA
+as a BE-5 question, not ruled by the planner. **QA 189** (`docs/loops/loop-15-slice-3-b2-dispatch-qa.md`, Composer
+2.5, a different model from the builder) **launches in the morning with the others.** Laptop order: 189, 161, 178;
+QA PC: 182, 183.
