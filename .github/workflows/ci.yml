@@ -54,7 +54,7 @@ jobs:
       # The tcm runner user is firewalled to the public internet only. If any of these connects,
       # the isolation is gone and the job must not run the repository's code.
       - name: Egress isolation self-check (tcm)
-        if: runner.environment == 'self-hosted'
+        if: runner.environment == 'github-hosted'
         run: |
           fail=0
           for t in 127.0.0.1/3210 172.20.0.2/3210 172.20.0.2/3211 172.20.0.3/4000 127.0.0.1/4000 \
