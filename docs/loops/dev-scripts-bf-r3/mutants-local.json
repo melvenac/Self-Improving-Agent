@@ -1,0 +1,313 @@
+[
+  {
+    "name": "R9-import-walks-again",
+    "why": "state import resolves up through resolveRepoRoot again",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "58/59",
+    "red": 1,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "from a subdirectory with no .agents/ it refuses and names why, and writes nothing here or above",
+        "first": "AssertionError: expected +0 to be 1 // Object.is equality"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R9-name-unknown",
+    "why": "no package.json: the name is 'unknown' instead of the folder's",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "58/59",
+    "red": 1,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "no package.json: the project name is the folder's, and the draft says so",
+        "first": "AssertionError: expected 'unknown' to be 'bf-r3-f7nF1J' // Object.is equality"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R9-sibling-root-needs-package-json",
+    "why": "isProjectRoot requires package.json beside the protocol layout again",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "58/59",
+    "red": 1,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "resolveRepoRoot and resolveHookProjectDir stop at a child with .agents/SYSTEM/ and no package.json",
+        "first": "AssertionError: expected false to be true // Object.is equality"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R10-scaffolded-never-seen",
+    "why": "check never recognises scaffold's AGENT.md",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "56/59",
+    "red": 3,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "after scaffold: SCAFFOLDED, continue at step 4, and it says INBOX is still the template's",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' to match /SCAFFOLDED/"
+      },
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "negative: once INBOX is edited, check no longer says it is the template's",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' to match /SCAFFOLDED/"
+      },
+      {
+        "file": "qa135-bootstrap.test.ts",
+        "test": "DEFECT D3: check right after scaffold does not say this is 'not a fresh install' (step 1's table would skip steps 4 and 5)",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' not to match /not a fresh install/"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R10-template-inbox-warning-off",
+    "why": "the importer never flags a template INBOX",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "57/59",
+    "red": 2,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "the importer WARNS when INBOX.md is the template's, byte for byte (CRLF too), and not once it is edited",
+        "first": "AssertionError: expected '\\nstate import — draft (nothing else …' to match /WARNING: .*INBOX\\.md is the template's/"
+      },
+      {
+        "file": "bootstrap-fix.test.ts",
+        "test": "the whole path: scaffold -> draft -> commit -> ob_start, with tracked/local exactly as scaffold said",
+        "first": "AssertionError: expected '\\nstate import — draft (nothing else …' to match /WARNING: .*is the template's, unchang…/"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R10-scaffold-rerun-not-refused-first",
+    "why": "scaffold's scaffolded refusal removed (the dirty check answers instead)",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "58/59",
+    "red": 1,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "after scaffold: SCAFFOLDED, continue at step 4, and it says INBOX is still the template's",
+        "first": "AssertionError: expected 'bootstrap scaffold refused: 10 uncomm…' to match /already scaffolded/"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R11-any-state-json-is-a-record",
+    "why": "notARecord always null: a zero-byte or seed state.json is BOOTSTRAPPED again",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "55/59",
+    "red": 4,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "zero bytes: NOT A RECORD, named, and move-residue sets it aside",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' not to match /BOOTSTRAPPED/"
+      },
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "not JSON: NOT A RECORD, named, and move-residue sets it aside",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' not to match /BOOTSTRAPPED/"
+      },
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "the {{PROJECT}} seed: NOT A RECORD, named, and move-residue sets it aside",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' not to match /BOOTSTRAPPED/"
+      },
+      {
+        "file": "qa135-bootstrap.test.ts",
+        "test": "DEFECT D4: a zero-byte state.json is not reported BOOTSTRAPPED (a record that cannot be read is not a record)",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' not to match /BOOTSTRAPPED/"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R11-seed-accepted",
+    "why": "the {{PROJECT}} seed check never matches",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "58/59",
+    "red": 1,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "the {{PROJECT}} seed: NOT A RECORD, named, and move-residue sets it aside",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' not to match /BOOTSTRAPPED/"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R12-archive-is-residue-again",
+    "why": "archive/ counted as residue, so a second move nests the first",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "52/59",
+    "red": 7,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "zero bytes: NOT A RECORD, named, and move-residue sets it aside",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' to match /\\.agents\\/:\\s+empty/:\\s+empty"
+      },
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "not JSON: NOT A RECORD, named, and move-residue sets it aside",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' to match /\\.agents\\/:\\s+empty/:\\s+empty"
+      },
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "the {{PROJECT}} seed: NOT A RECORD, named, and move-residue sets it aside",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' to match /\\.agents\\/:\\s+empty/:\\s+empty"
+      },
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "the second move goes to a suffixed folder beside the first; neither nests; both hold their own bytes",
+        "first": "AssertionError: expected 1 to be +0 // Object.is equality"
+      },
+      {
+        "file": "bootstrap-fix.test.ts",
+        "test": "move-residue moves it under .agents/archive/, byte for byte, and deletes nothing",
+        "first": "AssertionError: expected 'residue' to be 'empty' // Object.is equality"
+      },
+      {
+        "file": "bootstrap-fix.test.ts",
+        "test": "residue moved BEFORE git init: the pre-SIA commit leaves .agents/ out, and the moved residue does not make scaffold refuse",
+        "first": "AssertionError: expected 'Move the residue aside first (`bootst…' to match /Scaffold/"
+      },
+      {
+        "file": "bootstrap-fix.test.ts",
+        "test": "residue git already tracked: check names the removal commit, and after it scaffold proceeds",
+        "first": "AssertionError: expected 'Move the residue aside first (`bootst…' to match /git add -u -- \\.agents/"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R12-no-suffix",
+    "why": "the second move on one day reuses the first folder",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "58/59",
+    "red": 1,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "the second move goes to a suffixed folder beside the first; neither nests; both hold their own bytes",
+        "first": "AssertionError: expected [ 'pre-bootstrap-residue-2026-09-26' ] to have a length of 2 but got 1"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R12-M13-readback-removed",
+    "why": "moveResidue no longer reads back what landed (QA 135's surviving M13)",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "58/59",
+    "red": 1,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "M13: a rename that silently leaves an entry behind is caught by the read-back, named, and reported as MOVED, not refused",
+        "first": "AssertionError: expected null not to be null"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R12-cli-readback-says-refused",
+    "why": "the CLI prints a read-back mismatch as 'refused' again (expected to SURVIVE: no CLI row reaches it)",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 0,
+    "passed": "59/59",
+    "red": 0,
+    "failed": [],
+    "verdict": "SURVIVED",
+    "restored": true
+  },
+  {
+    "name": "R13-empty-never-detected",
+    "why": "check never sees an empty project (both git states)",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "57/59",
+    "red": 2,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "an empty folder with no git: Next names --allow-empty",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' to match /--allow-empty/"
+      },
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "git init'd with nothing to commit: Next names --allow-empty, and following it reaches scaffold",
+        "first": "AssertionError: expected 'bootstrap check — C:\\Users\\melve\\AppD…' to match /nothing to commit/"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  },
+  {
+    "name": "R13-doc-allow-empty-dropped",
+    "why": "bootstrap.md step 2.2 loses the empty commit",
+    "landed": true,
+    "tsc": 0,
+    "vitest_exit": 1,
+    "passed": "58/59",
+    "red": 1,
+    "failed": [
+      {
+        "file": "bootstrap-fix-r3.test.ts",
+        "test": "bootstrap.md step 2.2 names the empty commit",
+        "first": "AssertionError: expected '## Step 2: Residue aside, then the pr…' to contain 'git commit --allow-empty -m \"The proj…'"
+      }
+    ],
+    "verdict": "KILLED",
+    "restored": true
+  }
+]
