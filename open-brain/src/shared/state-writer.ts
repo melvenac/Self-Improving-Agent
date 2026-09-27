@@ -423,7 +423,7 @@ function replaceNote(t: Task, text: string, overrideOthers: boolean, ctx: OpCont
   t.note = text;
   // A replace that removes nothing still holds the prior authors' text (T171-D1).
   // One that removes text leaves only this write, or unknown if it has no session.
-  t.note_by = text === "" ? [] : removes ? (ctx.uuid === null ? null : [ctx.uuid]) : appendedBy(t.note_by, old, ctx.uuid);
+  t.note_by = text === "" ? [] : removes ? (ctx.uuid === null ? null : [ctx.uuid]) : ctx.uuid === null && old !== "" ? t.note_by : appendedBy(t.note_by, old, ctx.uuid);
   // Quote a line the new note does not still contain (T171-D2), not the old first line blindly.
   const quoted = (old.split(/\r?\n/).find((ln) => !text.includes(ln)) ?? old.split(/\r?\n/, 1)[0]).slice(0, 120);
   let line = `${t.id} note REPLACED: ${old.length} chars -> ${text.length} chars; ` +
