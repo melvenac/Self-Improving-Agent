@@ -63,6 +63,7 @@ function findSessionDb(
 
   if (targetSessionId) {
     const unreadable: string[] = [];
+    let matched: string | null = null;
     for (const file of dbFiles) {
       let db: Database.Database | null = null;
       try {
@@ -70,7 +71,7 @@ function findSessionDb(
         const meta = db.prepare("SELECT session_id FROM session_meta LIMIT 1").get() as
           | { session_id: string }
           | undefined;
-        if (meta?.session_id === targetSessionId) return file.path;
+        if (meta?.session_id === targetSessionId) matched = file.path;
       } catch (err) {
         // An open that throws is not "no db has this session" (SILENT 14).
         unreadable.push(errorText(err));
@@ -81,6 +82,7 @@ function findSessionDb(
     if (unreadable.length > 0) {
       return { skipped: `unreadable while finding session db: ${unreadable.join("; ")}` };
     }
+    if (matched) return matched;
     return { skipped: "no db holds this session" };
   }
 
