@@ -414,7 +414,7 @@ function replaceNote(t: Task, text: string, overrideOthers: boolean, ctx: OpCont
   // session (uuid null) filters none of them out, so it never owns one.
   const others = old === "" ? [] : t.note_by === null ? null : t.note_by.filter((u) => u !== ctx.uuid);
   const foreign = others === null || others.length > 0;
-  if (foreign && !overrideOthers) {
+  if (foreign && !overrideOthers && removes) {
     const whose = others === null
       ? "an unrecorded session (no per-note author: written before schema v3, imported, or by an unregistered write)"
       : `session ${others.join(", ")}${ctx.uuid === null ? ", and this write has no registered session to prove any of it is its own" : ""}`;
