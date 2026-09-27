@@ -4,7 +4,7 @@
   "properties": {
     "loop": {
       "type": "string",
-      "pattern": "^t\\d{3,}$"
+      "pattern": "^(?:t\\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$"
     },
     "candidate_git": {
       "type": "object",
@@ -176,12 +176,20 @@
               "met",
               "unmet",
               "partial",
-              "not_evaluated"
+              "not_evaluated",
+              "pending"
             ]
           },
           "evidence": {
             "type": "string",
             "minLength": 1
+          },
+          "order": {
+            "type": "string",
+            "enum": [
+              "shown",
+              "attributed"
+            ]
           }
         },
         "required": [
@@ -222,5 +230,5 @@
   ],
   "additionalProperties": false,
   "title": "E_t — HoH loop evidence",
-  "description": "The QA evidence report for one HoH loop. LIMIT: runtime_checks are supplied by the runtime from process exit codes, not by the QA role; a role-supplied value that disagrees with the measurement is refused. Derived from open-brain/src/harness/schema.ts; do not edit by hand."
+  "description": "The QA evidence report for one HoH loop. LIMIT: rules this file cannot express, enforced by validateEvidence (schema.ts) or parseDeclared (declared.ts) — duplicate acceptance ids are refused; order is required on a met row (shown | attributed) and refused on unmet, not_evaluated and pending, and optional on partial; unrunnable and out-of-scope stay separate lists in the criteria file and are not fields of E_t. runtime_checks are supplied by the runtime from process exit codes inside a loop, not by the QA role; a role-supplied value that disagrees with the measurement is refused. A human seat, validating outside a loop, fills build and unit from its own runs and names each run id. Derived from open-brain/src/harness/schema.ts; do not edit by hand."
 }

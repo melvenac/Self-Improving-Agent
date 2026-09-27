@@ -34,7 +34,8 @@ const validEvidence = (): Record<string, unknown> => ({
   candidate_git: { sha: "a".repeat(40), branch: "main", frozen_at: "2026-09-19T00:00:00.000Z" },
   runtime_checks: { build: passingCheck, unit: passingCheck },
   requirements: [],
-  acceptance: [{ id: "A1", status: "met", evidence: "observed the three files" }],
+  // BE-5.2: a met row carries order. The pre-B form (met with no order) is refused on purpose.
+  acceptance: [{ id: "A1", status: "met", order: "shown", evidence: "observed the three files" }],
   regressions: [],
   gaps: [],
   notes: "",

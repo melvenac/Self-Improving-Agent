@@ -191,6 +191,7 @@ export type FailureCode =
   | "dirty-tree"
   | "tag-exists"
   | "schema-cap-exhausted"
+  | "evidence-loop-mismatch"
   | "allowlist-violation"
   | "role-threw"
   | "stage-committed"
@@ -1528,6 +1529,18 @@ async function runLoopInner(
       };
       const validated = validateEvidence(candidateEvidence);
       if (validated.ok) {
+        // BE-1.3. A schema-valid id can still name a different loop. Refused
+        // at once, before E_t.json is written: retrying would record a mismatch
+        // as a schema failure, and the ledger key would be the wrong loop.
+        if (validated.value.loop !== loop) {
+          return fail(
+            "qa",
+            "evidence-loop-mismatch",
+            `E_t.loop is "${validated.value.loop}" but this run is "${loop}". ` +
+              `The evidence names a different loop, so it is not this run's record. ` +
+              `Refused before any E_t.json is written.`,
+          );
+        }
         evidence = validated.value;
         break;
       }
