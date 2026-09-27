@@ -31,14 +31,14 @@ Replace `<N,M>` with the QA numbers in order, and `<sha>` with a commit that tra
 **Laptop, DESKTOP-0GV3HAD.** It is also the Windows CI runner, so no `windows=true` CI while it runs QA.
 
 ```
-! ssh -i C:/Users/melve/.ssh/id_ed25519 aaron@100.110.244.10 "powershell -NoProfile -Command Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Aaron\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'}"
+! ssh -i C:/Users/melve/.ssh/id_ed25519 aaron@100.110.244.10 "powershell -NoProfile -Command \"\$si = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly -Property @{ShowWindow=[uint16]0}; Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File C:\Users\Aaron\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'; ProcessStartupInformation=\$si}\""
 ```
 
 **QA PC, DESKTOP-O4EGB1E.** The user is `Aaron Melven`, with a space. `AARONM~1` is the space-free short path to the same
 folder.
 
 ```
-! ssh -i C:/Users/melve/.ssh/id_ed25519 -l "Aaron Melven" 100.73.250.101 "powershell -NoProfile -Command Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\AARONM~1\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'}"
+! ssh -i C:/Users/melve/.ssh/id_ed25519 -l "Aaron Melven" 100.73.250.101 "powershell -NoProfile -Command \"\$si = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly -Property @{ShowWindow=[uint16]0}; Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File C:\Users\AARONM~1\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'; ProcessStartupInformation=\$si}\""
 ```
 
 **This desktop: ONLY when Aaron is away from it AND no agent session is running on it** (Aaron, 2026-09-27: "this
@@ -49,7 +49,7 @@ script out of the commit first, because the desktop had no copy as of 2026-09-27
 
 ```
 ! cd ~/Worktrees/sia-qa && git fetch -q origin && git show <sha>:docs/loops/qa-queue.ps1 > ~/qa-queue.ps1
-! powershell -NoProfile -Command "Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Users\melve\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'; CurrentDirectory='C:\Users\melve'}"
+! powershell -NoProfile -Command "\$si = New-CimInstance -ClassName Win32_ProcessStartup -ClientOnly -Property @{ShowWindow=[uint16]0}; Invoke-CimMethod Win32_Process -MethodName Create -Arguments @{CommandLine='C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File C:\Users\melve\qa-queue.ps1 -Queue <N,M> -Checkout <sha>'; CurrentDirectory='C:\Users\melve'; ProcessStartupInformation=\$si}"
 ```
 
 **On this desktop, use the full `powershell.exe` path and `CurrentDirectory`.** The bare `powershell` form, which works
@@ -59,6 +59,12 @@ PATH. Only the working form is recorded here.
 
 **Success looks like** `ReturnValue : 0` plus a `ProcessId`. Then the planner reads
 `%USERPROFILE%\sia-qa-queue\queue.log` over ssh, and it must show `start=queue=<N,M>` and `run.<N>=started`.
+
+**All three lines launch HIDDEN** (`ShowWindow=0` plus `-WindowStyle Hidden`).
+- Without it, a `Win32_Process Create` opens a visible console on the machine. On 2026-09-27 the queue-guard harness
+  popped `cmd.exe` windows on Aaron's desktop while he worked.
+- The forms come from `chore/qa-queue-guard` `1fc03d0`, tested hidden on this desktop.
+- The planner dry-ran the QA PC form over ssh on 2026-09-27: `ShowWindow=0`, with the CommandLine intact.
 
 **The QA PC line's quoting** was checked on 2026-09-27 by a dry run through all three shells (Git Bash, the remote cmd,
 PowerShell) with `Write-Output` in place of `Invoke-CimMethod`. The `CommandLine` arrived byte for byte.
