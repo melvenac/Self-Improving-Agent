@@ -98,5 +98,9 @@ export function parseDeclared(text: string): DeclaredBlock {
           if (header === "[out-of-scope]") return "outOfScope";
           return null;
         }, true);
-  return { present: true, unrunnable: parsed.unrunnable, outOfScope: parsed.outOfScope };
+  return {
+    present: true,
+    unrunnable: [...parsed.unrunnable, ...parsed.outOfScope],
+    outOfScope: parsed.outOfScope,
+  };
 }
