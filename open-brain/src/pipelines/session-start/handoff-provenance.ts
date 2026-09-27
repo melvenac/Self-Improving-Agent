@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { parseState } from "../../shared/state-schema.js";
+import { parseState, compareFirstRev } from "../../shared/state-schema.js";
 import type { Handoff, Seat } from "../../shared/state-schema.js";
 
 /**
@@ -56,7 +56,13 @@ export function findHandoffCommit(
 ): HandoffProvenance {
   const base: HandoffProvenance = { seat, commit: null, date: null, searched: 0, bound, note: null };
 
-  const head = handoffAt(projectRoot, "HEAD", seat);
+  // Schema v3 (T-163) holds one entry per SESSION, so a seat can have several.
+  // The entry traced is the one the caller is rendering, found at HEAD by its
+  // identity; with no caller entry, the seat's newest.
+  const atHead = handoffsAt(projectRoot, "HEAD", seat);
+  const head = current
+    ? atHead.find((h) => sameEntry(h, current)) ?? null
+    : atHead.reduce<Handoff | null>((best, h) => (best === null || compareFirstRev(h.first_rev, best.first_rev) >= 0 ? h : best), null);
   if (head === null) {
     return { ...base, note: `no committed handoff for "${seat}" at HEAD — nothing to trace` };
   }
@@ -104,8 +110,8 @@ export function findHandoffCommit(
   let searched = 0;
   for (let i = 0; i < commits.length; i++) {
     searched++;
-    const entry = handoffAt(projectRoot, commits[i].sha, seat);
-    if (entry !== null && stable(entry) === target) {
+    const entries = handoffsAt(projectRoot, commits[i].sha, seat);
+    if (entries.some((e) => stable(e) === target)) {
       lastEqual = i;
       continue;
     }
@@ -127,13 +133,54 @@ export function findHandoffCommit(
   return { ...base, commit: commits[lastEqual].sha, date: commits[lastEqual].date ?? null, searched, note: null };
 }
 
-/** That seat's handoff as committed at `ref`, or null when absent/unreadable there. */
-function handoffAt(projectRoot: string, ref: string, seat: Seat): Handoff | null {
+/** Same entry across revisions: its session uuid, or for a legacy entry its seat and session. */
+function sameEntry(a: Handoff, b: Handoff): boolean {
+  // `?? null`: a caller built from a pre-v3 shape has no session_uuid at all.
+  const bu = b.session_uuid ?? null;
+  const au = a.session_uuid ?? null;
+  if (bu !== null) return au === bu;
+  return au === null && a.seat === b.seat && a.session === b.session;
+}
+
+/**
+ * The handoffs committed at `ref` that may be `seat`'s, whatever the schema
+ * version there; [] when absent or unreadable. A v1 record's single handoff
+ * names no seat, so it is returned for ANY seat and matched on its words alone.
+ *
+ * Read LOOSELY, not through the current schema. The walk crosses migrations:
+ * a v2 revision fails v3's parse, and treating that as "no handoff" would stop
+ * the walk at the v3 migration commit and name it as every seat's close-out —
+ * the exact defect the v1 → v2 migration caused once (see `stable`).
+ */
+function handoffsAt(projectRoot: string, ref: string, seat: Seat): Handoff[] {
   const text = gitOut(projectRoot, ["show", `${ref}:${STATE_REL}`]);
-  if (text === null) return null;
+  if (text === null) return [];
   const parsed = parseState(text);
-  if (parsed.ok) return parsed.data.handoffs.find((h) => h.seat === seat) ?? null;
-  return v1HandoffAt(text);
+  if (parsed.ok) return parsed.data.handoffs.filter((h) => h.seat === seat);
+  try {
+    const raw = JSON.parse(text) as { handoffs?: unknown };
+    if (Array.isArray(raw.handoffs)) {
+      return raw.handoffs.flatMap((x) => {
+        const h = x as Record<string, unknown>;
+        if (h.seat !== seat || typeof h.pick_up !== "string" || !Array.isArray(h.watch_out) || !Array.isArray(h.open_questions)) return [];
+        return [{
+          seat: h.seat as Seat,
+          pick_up: h.pick_up,
+          watch_out: h.watch_out as string[],
+          open_questions: h.open_questions as string[],
+          session: typeof h.session === "number" ? h.session : 0,
+          loop_state: null,
+          session_uuid: typeof h.session_uuid === "string" ? h.session_uuid : null,
+          checkout: typeof h.checkout === "string" ? h.checkout : null,
+          first_rev: typeof h.first_rev === "number" ? h.first_rev : null,
+        }];
+      });
+    }
+  } catch {
+    return [];
+  }
+  const v1 = v1HandoffAt(text);
+  return v1 ? [v1] : [];
 }
 
 /**
@@ -167,6 +214,9 @@ function v1HandoffAt(text: string): Handoff | null {
       open_questions: h.open_questions as string[],
       session: typeof h.session === "number" ? h.session : 0,
       loop_state: null,
+      session_uuid: null,
+      checkout: null,
+      first_rev: null,
     };
   } catch {
     return null;

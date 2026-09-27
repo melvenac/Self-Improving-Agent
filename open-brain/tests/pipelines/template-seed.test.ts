@@ -23,7 +23,7 @@ describe("project-template/.agents/state.json seed", () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.data).toMatchObject({
-      schema_version: 2,
+      schema_version: 3,
       revision: 0,
       project: { name: "{{PROJECT}}" },
       objective: null,
@@ -31,10 +31,12 @@ describe("project-template/.agents/state.json seed", () => {
       verified: [],
       gaps: [],
       decisions: [],
-      handoffs: [{ seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: 0, loop_state: null }],
-      last_session: { n: 0, uuid: null, seat: null },
+      // T-163: a fresh project has no sessions and no handoffs. A placeholder
+      // entry would be a legacy (null-checkout) instance nothing ever supersedes,
+      // rendered in every greeting of every project made from this template.
+      handoffs: [],
+      sessions: [],
     });
-    expect(r.data.last_session.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
   it("/start on a scaffolded temp project renders `State (state.json rev 0)` (V8)", async () => {

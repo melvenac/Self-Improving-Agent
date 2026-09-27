@@ -65,7 +65,7 @@ describe("checkStateSchema", () => {
     const r = checkStateSchema("0.29.0", tempDir);
     expect(r.severity).toBe("pass");
     expect(r.message).toBe(
-      ".agents/state.json readable by this CLI process (schema v2, rev 7, 27 tasks)",
+      ".agents/state.json readable by this CLI process (schema v3, rev 7, 27 tasks)",
     );
   });
 
@@ -129,7 +129,7 @@ describe("checkStateSchema", () => {
     // schema_version 2 so the file is valid UP TO the field under test: the
     // point is the zod PATH, and a v1 file now fails at schema_version first,
     // which would make this assert something else.
-    writeFileSync(join(tempDir, ".agents", "state.json"), JSON.stringify({ schema_version: 2, revision: -1 }));
+    writeFileSync(join(tempDir, ".agents", "state.json"), JSON.stringify({ schema_version: 3, revision: -1 }));
     const r = checkStateSchema("0.29.0", tempDir);
     expect(r.severity).toBe("issue");
     expect(r.message).toMatch(/^\.agents\/state\.json invalid at revision: /);

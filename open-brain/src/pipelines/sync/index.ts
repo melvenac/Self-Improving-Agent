@@ -31,6 +31,7 @@ import {
   checkBuildFreshness,
 } from "./checks.js";
 import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-state.js";
+import { checkRecordErasure } from "./record-erasure.js";
 
 export function runSync(input: SyncOptions): SyncResult {
   // R4 (Loop 3): the given root may be a subdirectory (open-brain/ has its
@@ -101,6 +102,8 @@ export function runSync(input: SyncOptions): SyncResult {
   // Loop 4: R6 view headers vs state.json revision, R4 master CI conclusion,
   // R7 conflict markers in tracked files. Each prints its number unconditionally.
   checks.push(checkStateViews(options.projectRoot));
+  // T163-2: no committed write removed a record another session added.
+  checks.push(checkRecordErasure(options.projectRoot));
   checks.push(checkCiStatus(options.projectRoot));
   checks.push(checkMergeMarkers(options.projectRoot));
   // T-183: does the greeting still fit one tool result? Prints its count every run.

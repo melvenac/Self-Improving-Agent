@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index f47bddc..5db99b1 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -906,7 +906,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
+ 
+   const migrate = () => {
+     // 2. state.json at revision 0, canonical bytes.
+-    writeFileSync(statePath, serializeState(parsed.data), "utf-8");
++    writeFileSync(statePath, JSON.stringify({ ...parsed.data, schema_version: 2 }, null, 2), "utf-8");
+ 
+     // 3. SUMMARY.md surgery (the removed text is in the snapshot).
+     let summary: CommitResult["summary"] = null;

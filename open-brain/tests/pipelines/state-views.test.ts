@@ -18,7 +18,7 @@ import { parseState, type State } from "../../src/shared/state-schema.js";
 const fixtureText = readFileSync(join(import.meta.dirname, "../fixtures-state/state.json"), "utf-8");
 const fixtureSummary = readFileSync(join(import.meta.dirname, "../fixtures/.agents/SYSTEM/SUMMARY.md"), "utf-8");
 const state: State = (() => { const r = parseState(fixtureText); if (!r.ok) throw new Error(r.error); return r.data; })();
-const opts = { version: "0.30.0", session: state.last_session.n };
+const opts = { version: "0.30.0", session: state.sessions[0].n };
 const HEADER = "<!-- generated from .agents/state.json rev 7 by open-brain v0.30.0 — do not edit; change state via ob_state -->";
 
 describe("state views (Loop 3 C3)", () => {
@@ -68,11 +68,27 @@ describe("state views (Loop 3 C3)", () => {
     // moved one level down. The seat heading is asserted too: a view that
     // rendered the fields without saying whose they are is the shape G-046
     // describes, and it read perfectly well right up until two seats had one.
-    expect(text).toContain("## developer _(written session 54)_");
+    expect(text).toContain("## developer [legacy] _(written session 54)_");
     expect(text).toContain("### Pick up here\n\nLoop 2: run V1–V9 on the frozen tag");
     expect(text).toContain("### Watch out\n\n- The live MCP server stays on the old build until /mcp reconnect open-brain.");
     expect(text).toContain("### Open questions\n\n- Q2:");
     expect(text).toContain("## Last session\n\nSession 54 — 2026-09-14 — `f7a1b3d9-ef6d-482f-aba1-ddaa296f722b`");
+  });
+
+  it("next-session.md renders the NEWEST handoff per seat and checkout, and counts the rest (T-163)", () => {
+    const base = state.handoffs[0];
+    const mk = (session: number, uuid: string, checkout: string, pick_up: string) => ({ ...base, session, session_uuid: uuid, checkout, pick_up });
+    const many: State = {
+      ...state,
+      handoffs: [base, mk(60, "a", "sia-builder", "OLDER BUILDER"), mk(70, "b", "sia-builder", "NEWER BUILDER"), mk(65, "c", "sia-forge", "FORGE WORDS")],
+    };
+    const text = renderNextSession(many, opts);
+    expect(text).toContain("## developer [sia-builder] _(written session 70)_");
+    expect(text).toContain("NEWER BUILDER");
+    expect(text).not.toContain("OLDER BUILDER");
+    expect(text).toContain("## developer [sia-forge] _(written session 65)_");
+    expect(text).toContain("## developer [legacy] _(written session 54)_");
+    expect(text).toContain("_1 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._");
   });
 
   it("SUMMARY region: status line, working / broken / next / decisions (V4)", () => {
@@ -135,13 +151,18 @@ describe("state views (Loop 3 C3)", () => {
 });
 
 describe("T-144: rendered Done obeys the retention window", () => {
-  const session = state.last_session.n;
+  // R179-1 extended to done tasks: a done task ages by the DISTINCT sessions
+  // that first wrote after its closing revision. The fixture's done tasks were
+  // closed before v3 (closed_rev null), so three keyed sessions age them all.
+  const aged: State = JSON.parse(JSON.stringify(state));
+  for (let i = 0; i < DONE_RETENTION_SESSIONS; i++) aged.sessions.push({ n: 60 + i, date: "2026-09-26", uuid: `aged-${i}`, seat: null, checkout: "c", first_rev: 8 + i });
+  const revs = (s: State) => s.sessions.map((x) => x.first_rev);
   const doneIds = (text: string) =>
     [...text.matchAll(/^- \[x\] \*\*(T-\d+)\*\*/gm)].map((m) => m[1]);
 
   it("hides done tasks the writer would drop — fails against pre-T-144 code", () => {
-    const rendered = doneIds(renderInbox(state, opts));
-    const stale = state.tasks.filter((t) => isDroppedByRetention(t, session)).map((t) => t.id);
+    const rendered = doneIds(renderInbox(aged, opts));
+    const stale = aged.tasks.filter((t) => isDroppedByRetention(t, revs(aged))).map((t) => t.id);
 
     // The fixture must actually exercise this, or the test proves nothing.
     expect(stale.length).toBeGreaterThan(0);
@@ -149,22 +170,25 @@ describe("T-144: rendered Done obeys the retention window", () => {
   });
 
   it("view and writer agree on exactly which done tasks exist", () => {
-    const rendered = doneIds(renderInbox(state, opts));
-
-    // What the record holds after the writer applies retention at the same session.
-    const copy: State = JSON.parse(JSON.stringify(state));
-    applyRetention(copy, session);
-    const kept = copy.tasks.filter((t) => t.status === "done").map((t) => t.id);
-
-    expect([...rendered].sort()).toEqual([...kept].sort());
+    for (const s of [state, aged]) {
+      const rendered = doneIds(renderInbox(s, opts));
+      const copy: State = JSON.parse(JSON.stringify(s));
+      applyRetention(copy);
+      const kept = copy.tasks.filter((t) => t.status === "done").map((t) => t.id);
+      expect([...rendered].sort()).toEqual([...kept].sort());
+    }
   });
 
-  it("renders the retention edge correctly: > cutoff kept, == cutoff dropped", () => {
-    const cutoff = session - DONE_RETENTION_SESSIONS;
+  it("renders the retention edge correctly: 3 sessions written since the close dropped, 2 kept — whatever the session numbers", () => {
     const edge: State = JSON.parse(JSON.stringify(state));
+    edge.sessions = [
+      { n: 9999, date: "2026-09-26", uuid: "s9", seat: null, checkout: "c", first_rev: 9 },
+      { n: 1, date: "2026-09-26", uuid: "s10", seat: null, checkout: "c", first_rev: 10 },
+      { n: 2, date: "2026-09-26", uuid: "s11", seat: null, checkout: "c", first_rev: 11 },
+    ];
     edge.tasks = [
-      { id: "T-900", title: "at the cutoff", priority: "P2", status: "done", opened_session: 1, closed_session: cutoff, supersedes: null, note: null },
-      { id: "T-901", title: "one past the cutoff", priority: "P2", status: "done", opened_session: 1, closed_session: cutoff + 1, supersedes: null, note: null },
+      { id: "T-900", title: "3 sessions since", priority: "P2", status: "done", opened_session: 1, closed_session: 9000, supersedes: null, note: "", closed_rev: 8 },
+      { id: "T-901", title: "2 sessions since", priority: "P2", status: "done", opened_session: 1, closed_session: 1, supersedes: null, note: "", closed_rev: 9 },
     ];
     const rendered = doneIds(renderInbox(edge, opts));
     expect(rendered).not.toContain("T-900");

@@ -6,7 +6,7 @@ globs: .agents/**
 # Agent Framework Rules
 
 - Always read `SUMMARY.md` at session start
-- Always update `SUMMARY.md` at session end
+- Write project state through `ob_state` as the work happens — `SUMMARY.md` is rendered from it, and `/end` only stores lessons
 - Log gotchas in the session log — don't let hard-won knowledge disappear
 - When modifying the data model, update `ENTITIES.md` immediately
 - When making architectural decisions, log them in `DECISIONS.md`

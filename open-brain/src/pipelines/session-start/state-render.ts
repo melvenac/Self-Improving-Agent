@@ -1,5 +1,5 @@
 import type { State, Task, Handoff, Seat } from "../../shared/state-schema.js";
-import { TaskPriority } from "../../shared/state-schema.js";
+import { TaskPriority, lastSession, newestHandoffPerInstance, newestHandoffForSeat } from "../../shared/state-schema.js";
 import { findHandoffCommit } from "./handoff-provenance.js";
 
 /**
@@ -74,7 +74,12 @@ export function renderState(state: State, version?: string, options: RenderState
 
   lines.push(...renderHandoffs(state, options));
 
-  lines.push(`\nLast session: #${state.last_session.n} ${state.last_session.date}${state.last_session.uuid ? ` (${state.last_session.uuid})` : ""}`);
+  const last = lastSession(state);
+  lines.push(
+    last
+      ? `\nLast session: #${last.n} ${last.date}${last.uuid ? ` (${last.uuid})` : ""} — ${state.sessions.length} writing session(s) in the record`
+      : `\nLast session: none recorded`
+  );
   return lines;
 }
 
@@ -154,31 +159,42 @@ function renderHandoffs(state: State, options: RenderStateOptions): string[] {
     return lines;
   }
 
+  // Schema v3 (T-163) keeps one entry per writing session. The greeting shows
+  // the newest per seat INSTANCE (seat + checkout) and no more, so it does not
+  // grow with the array; older entries are counted, and live in the record.
+  const visible = newestHandoffPerInstance(state.handoffs);
+  const hidden = state.handoffs.length - visible.length;
   const seat = options.seat ?? null;
-  const own = seat ? state.handoffs.find((h) => h.seat === seat) ?? null : null;
+  const own = seat ? newestHandoffForSeat(state.handoffs, seat) : null;
 
   if (seat === null) {
     lines.push(
-      `\nHandoffs (${state.handoffs.length}) — READER'S SEAT UNRESOLVED, so none is rendered as "yours":`
+      `\nHandoffs (${visible.length}) — READER'S SEAT UNRESOLVED, so none is rendered as "yours":`
     );
   } else if (own === null) {
-    lines.push(`\nHandoffs (${state.handoffs.length}) — no handoff recorded for this seat (${seat}):`);
+    lines.push(`\nHandoffs (${visible.length}) — no handoff recorded for this seat (${seat}):`);
   }
 
   if (own) {
-    lines.push(`\nYour handoff — ${own.seat}, session ${own.session}:`);
+    lines.push(`\nYour handoff — ${own.seat}${instanceLabel(own)}, session ${own.session}:`);
     lines.push(...renderOneHandoff(own));
   }
 
-  const others = state.handoffs.filter((h) => h !== own);
+  const others = visible.filter((h) => h !== own);
   if (others.length > 0) {
-    lines.push(`\nOther seats' handoffs (named, not rendered — read one by its commit):`);
+    lines.push(`\nOther handoffs (newest per seat and checkout; named, not rendered — read one by its commit):`);
     for (const h of others) {
-      lines.push(`  ${h.seat} (session ${h.session}): ${describeProvenance(h, options)}`);
+      lines.push(`  ${h.seat}${instanceLabel(h)} (session ${h.session}): ${describeProvenance(h, options)}`);
       lines.push(`    ${firstLine(h.pick_up)}`);
     }
   }
+  if (hidden > 0) lines.push(`  (${hidden} older handoff(s) superseded within their seat and checkout are in the record, not shown)`);
   return lines;
+}
+
+/** ` [sia-builder]`, or ` [legacy]` for an entry migrated from v2, which recorded no checkout. */
+function instanceLabel(h: Handoff): string {
+  return ` [${h.checkout ?? "legacy"}]`;
 }
 
 function renderOneHandoff(h: Handoff): string[] {

@@ -137,7 +137,7 @@ Check if `.claude/commands/` exists. If not, create it and add these lightweight
 ```
 .claude/commands/
 ├── start.md    → /start (load project state, begin session)
-├── end.md      → /end (save state, write handoff notes)
+├── end.md      → /end (store the session's lessons with their matching key)
 ├── task.md     → /task (pick up next priority)
 └── sync.md     → /sync (validate docs before commit)
 ```

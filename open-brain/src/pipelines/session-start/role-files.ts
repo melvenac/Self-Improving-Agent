@@ -64,7 +64,7 @@ export type RoleName = (typeof ROLE_NAMES)[number];
  * the closed set and had no role file — an accident that read as a seat.
  *
  * `none` is a READ-side value only. It never enters the record: `set_handoff`
- * and `end_session` take `SeatName`, which is the three real seats, so a write
+ * takes `SeatName` (end_session did too until schema v3 retired it), so a write
  * attempted from such a checkout is refused by the schema rather than by a
  * separate rule that could drift from it.
  */
@@ -116,7 +116,7 @@ export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | nul
     // and reporting it as a missing role file would train readers to ignore the
     // line that matters.
     lines0.push(`This checkout is NOT A SEAT (${seat!.name}, role: ${NOT_A_SEAT}) — no seat-specific role file is expected here.`);
-    lines0.push(`  Seat-taking writes (set_handoff, end_session) are refused from a checkout with no seat.`);
+    lines0.push(`  Seat-taking writes (set_handoff) are refused from a checkout with no seat.`);
   } else if (seat) {
     wanted.push({ rel: `${ROLES_DIR}/${seat.role}.md`, owner: seat.role });
     if (!(ROLE_NAMES as readonly string[]).includes(seat.role)) {

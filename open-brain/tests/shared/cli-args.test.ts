@@ -155,9 +155,9 @@ describe("reading an undeclared flag is a defect, not 'not given'", () => {
 describe("every declared flag of every command is accepted", () => {
   const specs = Object.values(COMMAND_SPECS) as CommandSpec[];
 
-  it("walks at least the seven commands (proves it looked)", () => {
+  it("walks at least the eight commands (proves it looked)", () => {
     expect(specs.map((s) => s.name).sort()).toEqual(
-      ["detach", "relocate", "start", "state migrate", "state show", "sync", "topics"]
+      ["detach", "relocate", "start", "state erasures", "state migrate", "state show", "sync", "topics"]
     );
   });
 
@@ -204,6 +204,7 @@ describe("the declarations agree with the usage text the CLI prints", () => {
     ["topics", /^\s+topics (.*)$/m],
     ["detach", /^\s+detach (.*)$/m],
     ["state show", /^\s+state show (.*)$/m],
+    ["state erasures", /^\s+state erasures (.*)$/m],
     ["state migrate", /^\s+state migrate (.*)$/m],
   ];
   const specNamed = (name: string): CommandSpec =>

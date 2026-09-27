@@ -297,8 +297,8 @@ describe("state migrate", () => {
     expect(r.status, r.stdout + r.stderr).toBe(0);
     expect(readFileSync(a).equals(beforeA)).toBe(false);
     expect(readFileSync(b).equals(beforeB)).toBe(false);
-    expect(JSON.parse(readFileSync(a, "utf8")).schema_version).toBe(2);
-    expect(JSON.parse(readFileSync(b, "utf8")).schema_version).toBe(2);
+    expect(JSON.parse(readFileSync(a, "utf8")).schema_version).toBe(3);
+    expect(JSON.parse(readFileSync(b, "utf8")).schema_version).toBe(3);
   }, 120_000);
 });
 
