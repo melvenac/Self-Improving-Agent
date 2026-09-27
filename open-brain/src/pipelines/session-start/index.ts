@@ -14,9 +14,7 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
   // prove a session, and discovery would stamp the newest transcript in the
   // checkout, which belongs to another session (T-003 D1).
   const sessionId =
-    options.sessionId === undefined
-      ? discoverSessionUuid(options.projectRoot, options.homePath)
-      : options.sessionId;
+    options.sessionId ?? discoverSessionUuid(options.projectRoot, options.homePath);
   const health = runHealthChecks(options.homePath);
 
   let session: SessionInfo = { sessionId, sessionNumber: 0, logPath: "", reused: false, skippedReason: null };
