@@ -171,3 +171,20 @@ per room, and re-arm after each firing. The first firing can dump old unread tur
   process remains caught by the post-run ref audit only, as for the Claude driver.
 - **NEXT:** open a PR for `chore/qa-driver-cursor` → Aaron merges (PowerShell on his machines). Aaron copies the files
   to the QA machines (the handoff lists them). Then launch the seven Cursor QA runs across both machines.
+
+**Late update 2 (about 08:05Z): the merge results, and a T-171 blocker.**
+- **#172 (importer r2+r5) and #173 (T-003 r1+r2) are MERGED.** #175 and #176 (T-048 r1 and r2) are merging in a
+  background job; verify them on master.
+- **#174 (T-171 r1+r2) FAILED CI** (run `36303618279`): origin/master's own `state.json` does not parse under T-171,
+  with `tasks.0.note_by` undefined.
+  - **Cause:** the live record was migrated to v3 by T-179's migrator, which predates T-171's required `note_by`.
+    Merging #174 would have broken every greeting. CI caught it.
+  - **Ruling sent to `cursor-builder`** (its room, turn 11): **T-171 r3b.** A v3 record whose tasks lack `note_by`
+    loads, with a missing value read as `null` (unknown author).
+    - Red-first row: master's real `state.json` parses.
+    - Test on a branch that merges master.
+    - **QA 177 then scores the new tip.** Amend its candidate SHA.
+  - **#174 stays open** until then. Close it or retarget it at the r3b tip.
+- **The class, for the record:** two candidates each changed the v3 schema's meaning. Each passed its own QA, and they
+  only failed together on master. **A stacked candidate's QA must run against the merge with master once master
+  changes the record's schema.** Worth a rule (a gap entry).
