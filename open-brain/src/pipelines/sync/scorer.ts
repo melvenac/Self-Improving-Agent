@@ -153,9 +153,20 @@ export function scorePipelineHealth(input: PipelineHealthInput): CategoryScore {
   const d7 = 7 * 24 * 60 * 60 * 1000;
 
   let hookRecency = 0;
-  if (lastHookRun !== null) {
+  // A missing log is null ("the hook has not run"). A corrupt log and an
+  // unreadable log are different strings from readLastInvocationTs, and this
+  // score repeats that word. Neither is a timestamp, so neither earns recency.
+  let invocationLog = "missing";
+  if (lastHookRun === null) {
+    invocationLog = "missing";
+  } else if (lastHookRun === "corrupt" || lastHookRun.startsWith("corrupt:")) {
+    invocationLog = "corrupt";
+  } else if (lastHookRun === "unreadable" || lastHookRun.startsWith("unreadable")) {
+    invocationLog = "unreadable";
+  } else {
+    invocationLog = "ran";
     const age = now - new Date(lastHookRun).getTime();
-    hookRecency = age <= h24 ? 4 : age <= d7 ? 2 : 0;
+    if (!Number.isNaN(age)) hookRecency = age <= h24 ? 4 : age <= d7 ? 2 : 0;
   }
 
   const trendScore =
@@ -173,6 +184,6 @@ export function scorePipelineHealth(input: PipelineHealthInput): CategoryScore {
     name: "Pipeline Health",
     score,
     max: 10,
-    details: { hookRecency, trendScore, shadowScore, shadowSessions },
+    details: { hookRecency, trendScore, shadowScore, shadowSessions, invocationLog },
   };
 }

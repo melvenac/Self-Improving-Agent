@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { execFileSync, spawnSync } from "node:child_process";
+import { spawnAsync } from "./spawn-async.js";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
@@ -48,12 +48,17 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
   });
 
   /** Run the hook with a payload on stdin, in an isolated HOME. */
-  function run(payload: unknown): string {
-    return execFileSync(process.execPath, [TSX_CLI, script], {
+  //
+  // Both helpers are awaited, not execFileSync/spawnSync (G-042): this file's spawns were one stretch of 33-39 s with
+  // no macrotask under load. await run() still throws on a non-zero exit, as execFileSync did.
+  async function run(payload: unknown): Promise<string> {
+    const r = await spawnAsync(process.execPath, [TSX_CLI, script], {
       input: JSON.stringify(payload),
-      encoding: "utf-8",
       env: { ...process.env, HOME: home, USERPROFILE: home },
     });
+    if (r.error) throw r.error;
+    if (r.status !== 0) throw new Error(`hook exited ${r.status ?? r.signal}: ${r.stderr}`);
+    return r.stdout;
   }
 
   /**
@@ -61,10 +66,9 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
    * `run` above stringifies its argument, so it cannot express a payload that is
    * not valid JSON — which is the whole subject of the F4 tests below.
    */
-  function runRaw(raw: string): { status: number | null; stdout: string; stderr: string } {
-    const r = spawnSync(process.execPath, [TSX_CLI, script], {
+  async function runRaw(raw: string): Promise<{ status: number | null; stdout: string; stderr: string }> {
+    const r = await spawnAsync(process.execPath, [TSX_CLI, script], {
       input: raw,
-      encoding: "utf-8",
       // OPEN_BRAIN_ACTIVE_SESSION is pinned PER TEST, not left to $HOME.
       //
       // tests/setup-env.ts sets it globally to one shared temp file so the suite
@@ -82,35 +86,35 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
   const uuidLines = (out: string) =>
     out.split("\n").filter((l) => l.startsWith("SESSION_UUID:"));
 
-  it("emits SESSION_UUID exactly once when the payload carries session_id", () => {
+  it("emits SESSION_UUID exactly once when the payload carries session_id", async () => {
     const id = "11111111-2222-3333-4444-555555555555";
-    const lines = uuidLines(run({ cwd, session_id: id }));
+    const lines = uuidLines(await run({ cwd, session_id: id }));
 
     expect(lines).toHaveLength(1);
     expect(lines[0]).toBe(`SESSION_UUID: ${id}`);
   });
 
-  it("emits the id from the payload verbatim, not a filesystem guess", () => {
+  it("emits the id from the payload verbatim, not a filesystem guess", async () => {
     // Regression guard for the mtime-scan bug, which returned the PREVIOUS
     // session's UUID and mis-attributed everything stored in the new session.
     const id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
-    expect(uuidLines(run({ cwd, session_id: id }))[0]).toContain(id);
+    expect(uuidLines(await run({ cwd, session_id: id }))[0]).toContain(id);
   });
 
-  it("accepts payload fields other than Claude Code's session_id", () => {
+  it("accepts payload fields other than Claude Code's session_id", async () => {
     // Cursor sessions produced no UUID at all because only `session_id` was
     // read, so ob_set_session was never called and provenance was empty.
-    expect(uuidLines(run({ cwd, conversation_id: "conv-1" }))[0]).toContain("conv-1");
+    expect(uuidLines(await run({ cwd, conversation_id: "conv-1" }))[0]).toContain("conv-1");
   });
 
-  it("generates a UUID when the IDE supplies none", () => {
+  it("generates a UUID when the IDE supplies none", async () => {
     // Contract change (Session 42): this used to emit nothing, on the grounds
     // that no id beats a wrong id. That guard was aimed at the mtime SCAN,
     // which returned a DIFFERENT REAL session's UUID and mis-attributed data.
     // A generated UUID cannot collide with another session — what the system
     // needs is a stable per-session key, not the IDE's own id — so the choice
     // is between synthetic provenance and none at all.
-    const lines = uuidLines(run({ cwd }));
+    const lines = uuidLines(await run({ cwd }));
     expect(lines).toHaveLength(1);
     expect(lines[0]).toMatch(
       /^SESSION_UUID: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
@@ -120,20 +124,20 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
   // The only test here that spawns TWICE. Each tsx spawn costs ~2-3s (it was
   // measured with npx resolution + TypeScript compile), so two of them straddle vitest's 5s
   // default and fail under load while every single-spawn sibling passes.
-  it("generates a DIFFERENT uuid each run, never a reused one", () => {
-    const first = uuidLines(run({ cwd }))[0];
-    const second = uuidLines(run({ cwd }))[0];
+  it("generates a DIFFERENT uuid each run, never a reused one", async () => {
+    const first = uuidLines(await run({ cwd }))[0];
+    const second = uuidLines(await run({ cwd }))[0];
     expect(first).not.toBe(second);
   }, 20000);
 
-  it("stays silent in a subagent context (anti-loop)", () => {
-    const out = run({ cwd, session_id: "should-not-appear", agent_id: "sub-1" });
+  it("stays silent in a subagent context (anti-loop)", async () => {
+    const out = await run({ cwd, session_id: "should-not-appear", agent_id: "sub-1" });
 
     expect(out.trim()).toBe("");
     expect(uuidLines(out)).toHaveLength(0);
   });
 
-  it("REFUSES malformed stdin rather than continuing without the payload", () => {
+  it("REFUSES malformed stdin rather than continuing without the payload", async () => {
     // THIS TEST ASSERTED THE DEFECT UNTIL 2026-09-20, and its reasoning was the
     // trap: "malformed stdin means no usable payload, so a UUID is generated
     // rather than the session losing provenance entirely." The second half is
@@ -146,18 +150,18 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
     //
     // Both seats hit it through the same mechanism, a Windows path in the
     // payload whose backslashes are invalid JSON escapes.
-    const r = runRaw("{not json");
+    const r = await runRaw("{not json");
     expect(r.status).not.toBe(0);
     expect(r.stderr).toMatch(/REFUSED/);
     expect(r.stdout).not.toMatch(/SESSION_UUID/);
   });
 
-  it("a well-formed payload with NO session id writes nothing to the slot", () => {
+  it("a well-formed payload with NO session id writes nothing to the slot", async () => {
     // Ruled after QA's criteria pass: generating a uuid and stamping it over the
     // checkout's identity is the defect WHATEVER the payload's shape. Printing
     // one is fine — /start registers it — but the slot is the checkout's session
     // identity, read as a fallback by every later write.
-    const r = runRaw(JSON.stringify({ cwd }));
+    const r = await runRaw(JSON.stringify({ cwd }));
     expect(r.status).toBe(0);
     // The greeting still resolves an id, read-only.
     expect(r.stdout).toMatch(/SESSION_UUID/);
@@ -167,22 +171,22 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
     expect(existsSync(slotPath)).toBe(false);
   });
 
-  it("a payload WITH a session id still writes the slot — the guard is not a ban", () => {
-    const r = runRaw(JSON.stringify({ cwd, session_id: "supplied-9876" }));
+  it("a payload WITH a session id still writes the slot — the guard is not a ban", async () => {
+    const r = await runRaw(JSON.stringify({ cwd, session_id: "supplied-9876" }));
     expect(r.status).toBe(0);
     expect(r.stdout).toMatch(/SESSION_UUID: supplied-9876/);
     expect(r.stdout).not.toMatch(/Session slot NOT written/);
     expect(existsSync(slotPath)).toBe(true);
   });
 
-  it("still refuses to guess an id from the filesystem", () => {
+  it("still refuses to guess an id from the filesystem", async () => {
     // The mtime-scan regression this suite exists for: a prior session's
     // transcript in HOME must never become this session's UUID.
     const stale = "99999999-9999-9999-9999-999999999999";
     mkdirSync(join(home, ".claude", "projects", "x"), { recursive: true });
     writeFileSync(join(home, ".claude", "projects", "x", `${stale}.jsonl`), "{}\n");
 
-    expect(uuidLines(run({ cwd }))[0]).not.toContain(stale);
+    expect(uuidLines(await run({ cwd }))[0]).not.toContain(stale);
   });
 
   // F4 — QA reproduced this from a second seat with the same mechanism: a payload
@@ -194,7 +198,7 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
   //
   // Every part of that looks right and none of it is. G-044's family: an
   // instrument that changes what it measures while answering about somewhere else.
-  it("F4: a MALFORMED payload refuses, writes nothing, and exits non-zero", () => {
+  it("F4: a MALFORMED payload refuses, writes nothing, and exits non-zero", async () => {
     // The real shape that caused it, twice, from two seats: a Windows path whose
     // single backslashes are invalid JSON escape sequences.
     //
@@ -205,7 +209,7 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
     const malformed = '{"session_id":"abc","cwd":"C:\\Users\\melve"}';
     expect(() => JSON.parse(malformed)).toThrow();
 
-    const r = runRaw(malformed);
+    const r = await runRaw(malformed);
 
     expect(r.status).not.toBe(0);
     expect(r.stderr).toMatch(/REFUSED/);
@@ -216,16 +220,16 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
     expect(existsSync(slotPath)).toBe(false);
   });
 
-  it("F4: an ABSENT payload is still supported — absent and malformed are different", () => {
+  it("F4: an ABSENT payload is still supported — absent and malformed are different", async () => {
     // An IDE that supplies nothing is a supported case and is why a uuid is
     // generated at all. Refusing it too would turn a fix into an outage.
-    const r = runRaw("");
+    const r = await runRaw("");
     expect(r.status).toBe(0);
     expect(r.stdout).toMatch(/SESSION_UUID/);
   });
 
-  it("F4: a WELL-FORMED payload still registers the id it was given", () => {
-    const r = runRaw(JSON.stringify({ cwd, session_id: "real-1234" }));
+  it("F4: a WELL-FORMED payload still registers the id it was given", async () => {
+    const r = await runRaw(JSON.stringify({ cwd, session_id: "real-1234" }));
     expect(r.status).toBe(0);
     expect(r.stdout).toMatch(/SESSION_UUID: real-1234/);
   });

@@ -326,7 +326,7 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   // taken literally, never walked up: a fresh project may not be a repository
   // yet, and walking up could land in a PARENT project and scaffold that.
   const sub = args[1];
-  const { inspectProject, moveResidue, scaffold, formatMoveResidueFailure } = await import("./pipelines/bootstrap/index.js");
+  const hook = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK; if (hook) await import(hook); const { inspectProject, moveResidue, scaffold, formatMoveResidueFailure } = await import("./pipelines/bootstrap/index.js"); // mutant
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   if (sub === "check") {
@@ -532,7 +532,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     process.exit(0);
   }
 
-  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG, blocksCommit, inboxWarning } = await import("./pipelines/state-import/index.js");
+  const { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG, blocksCommit, inboxWarning, describeDecisionsUnreadable } = await import("./pipelines/state-import/index.js");
   const { relative } = await import("node:path");
   const { existsSync, statSync } = await import("node:fs");
   // T-150's rule: an unrecognised flag refuses. Before this, a misspelled flag
@@ -597,12 +597,13 @@ Read-only. Change state through ob_state — never by editing the file.`);
       console.log(`Staleness: ${stale.length} stale${stale.length ? ` (${stale.map((i) => i.input).join(", ")})` : ""} · ${unknown.length} could not tell${unknown.length ? ` (${unknown.map((i) => i.input).join(", ")})` : ""} · ${judged.length - stale.length - unknown.length} current. Details are in the report's first section.`);
       if (stale.length) console.log(`--commit will REFUSE until those inputs are updated and the draft is re-run, or until ${ACCEPT_STALE_FLAG} is passed.`);
       const unreadable = unknown.filter(blocksCommit);
-      if (unreadable.length) console.log(`--commit will REFUSE while ${unreadable.map((i) => i.input).join(", ")} cannot be read (NUL bytes): save as UTF-8 and re-run the draft, or pass ${ACCEPT_STALE_FLAG}.`);
+      if (unreadable.length) console.log(`--commit will REFUSE while ${unreadable.map((i) => i.input).join(", ")} cannot be read or judged (NUL bytes, UTF-32, an odd-length UTF-16BE file, or no heading line; the report says which): save as UTF-8 with a title and re-run the draft, or pass ${ACCEPT_STALE_FLAG}.`);
       const s = rep.inbox.by_status;
       console.log(`Tasks: ${rep.inbox.items} (open ${s.open}, in_progress ${s.in_progress}, blocked ${s.blocked}, done ${s.done}); superseded links ${rep.inbox.superseded_links.length}; unparsed lines ${rep.inbox.unparsed.length}${inboxWarning(rep) ? " — WARNING: see below" : ""}`);
       const warning = inboxWarning(rep);
       if (warning) console.log(warning);
       console.log(`Decisions: ${rep.decisions.imported} (${rep.decisions.skipped.length} skipped) · verified ${rep.verified_imported} · gaps ${rep.gaps_imported} · objective ${rep.objective.found ? "found" : "NOT found"}`);
+      if (rep.decisions_unreadable) for (const l of describeDecisionsUnreadable(rep.decisions_unreadable)) console.log(`  ${l}`);
       console.log(`Handoff: pick_up ${rep.handoff.pick_up_lines} lines, watch_out ${rep.handoff.watch_out}, open_questions ${rep.handoff.open_questions}`);
       if (rep.summary_removal) console.log(`SUMMARY.md: --commit will remove ${rep.summary_removal.total_lines_removed} lines (${rep.summary_removal.blockquote_lines} blockquote + ${rep.summary_removal.current_state_lines} Current State)`);
       console.log(`\nReview the report, then run: open-brain state import --commit`);
@@ -615,6 +616,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     if (r.accepted_unreadable.length) console.log(`Imported UNREADABLE under ${ACCEPT_STALE_FLAG}: ${r.accepted_unreadable.join(", ")}`);
     const unknown = r.staleness.inputs.filter((i) => i.verdict === "could_not_tell");
     if (unknown.length) console.log(`Could not tell whether current: ${unknown.map((i) => i.input).join(", ")}`);
+    if (r.decisions_unreadable) for (const l of describeDecisionsUnreadable(r.decisions_unreadable)) console.log(l);
     console.log(`Snapshot: ${relative(projectRoot, r.snapshot.dir)} (${r.snapshot.files} files)`);
     console.log(`Wrote:    ${STATE_REL} at revision 0`);
     if (r.summary) console.log(`SUMMARY.md: removed ${r.summary.total_lines_removed} lines (${r.summary.blockquote_lines} blockquote + ${r.summary.current_state_lines} Current State); kept ${r.summary.kept_headings.join(", ")}`);

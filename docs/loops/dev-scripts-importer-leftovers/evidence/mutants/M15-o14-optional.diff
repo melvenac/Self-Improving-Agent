@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index e0023af..049d860 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -515,7 +515,7 @@ interface JudgedInput { input: string; declared_session: number | null; evidence
+  */
+ export type InputStaleness =
+   | (JudgedInput & { verdict: "current" | "stale" })
+-  | (JudgedInput & { verdict: "could_not_tell"; could_not_tell: CouldNotTell });
++  | (JudgedInput & { verdict: "could_not_tell"; could_not_tell?: CouldNotTell });
+ 
+ /** Whether a judged input stops a bare --commit: STALE, or could not tell because it cannot be read. */
+ export function blocksCommit(i: InputStaleness): boolean {
