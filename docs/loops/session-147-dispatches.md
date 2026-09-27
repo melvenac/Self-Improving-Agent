@@ -87,6 +87,16 @@ and none has a `cli.json`** (checked 2026-09-27 at `4394921`). The Cursor copier
 exists only on `chore/qa-driver-cursor` `91f4d29`, which is not merged. **Once it merges, regenerate each driver with
 `--harness cursor`:** Composer 2.5, except 162 and 174, which are named GPT-5.6 Sol.
 
+**DONE after PR #178 merged (`7243fd5`), and one claim above corrected.** Only **174** is GPT-5.6 Sol: its dispatch
+title names it, and the A13 dispatch names no model. **162 is Composer 2.5.** The Cursor CLI lists GPT-5.6 Sol only
+with an effort suffix. The calibration recorded none, so 174 uses `gpt-5.6-sol-medium`, the id listed as the plain
+"GPT-5.6 Sol 1M". **Also found:** the old drivers for 172, 173, 174, 177 and 178 had the literal first prompt
+`QA <n>`, so a seat started with it would never have been told to read its dispatch. The regenerated drivers name
+the dispatch. QA 161's dispatch is amended to the reconciled merge `d74c0e5`.
+- 162's push pattern `qa/loop-15-slice-3-a13-*` also matches 174's `qa/loop-15-slice-3-a13-spot-*` branches. This
+  was true of the old drivers too. Run 162 and 174 on different machines, and have each report name the branches it
+  pushed.
+
 ## Note for the planner: master's push CI has not run since #171
 
 `ci.yml:44` sends a push to `master` to GitHub-hosted `ubuntu-latest`. Every master push from #171 (`ecd28dd`,
