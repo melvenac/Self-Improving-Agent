@@ -215,14 +215,18 @@ const STATE_FILE_LABEL: Record<StateFileSize["file"], string> = {
 export async function handleStart(args: StartArgs): Promise<ToolResponse> {
   try {
     const projectRoot = resolve(args.project_root ?? ".");
+    const proven = writeSessionId();
     const result = sessionStart({
       projectRoot,
       homePath: homedir(),
-      // The PROVEN session (T-003): after /clear the surviving server stamps the
-      // new session's log, never the registration of the one before.
-      sessionId: writeSessionId().id,
+      // The PROVEN session (T-003). null means there is no proof: do not
+      // discover, or a shared checkout stamps the other session's transcript.
+      sessionId: proven.id,
       stateBudgetLines: args.state_budget_lines,
     });
+    const sessionIdLine = proven.id === null
+      ? `Session ID: none — ${proven.reason}`
+      : `Session ID: ${result.session.sessionId ?? "discovery failed"}`;
 
     const lines: string[] = [];
 
@@ -253,10 +257,10 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     if (result.session.logPath) {
       lines.push(`\nSession #${result.session.sessionNumber}${result.session.reused ? " (existing log for this session id — reused, nothing created)" : ""}`);
       lines.push(`Log: ${result.session.logPath}`);
-      lines.push(`Session ID: ${result.session.sessionId ?? "discovery failed"}`);
+      lines.push(sessionIdLine);
     } else if (result.session.skippedReason) {
       lines.push(`\nSession log: ${result.session.skippedReason}`);
-      lines.push(`Session ID: ${result.session.sessionId ?? "discovery failed"}`);
+      lines.push(sessionIdLine);
     }
 
     if (result.health.warnings.length > 0) {
@@ -508,9 +512,12 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
 
     // recall_log is authoritative when the session is known; the file is only
     // consulted when it names this same session. See resolveRecalledIds.
+    // No named id means the proven one. end.md calls ob_end that way, and a
+    // rating ob_recalled lists is in recall_log under that id (D3).
+    const endedId = endSession.id;
     const resolved = resolveRecalledIds({
       db: v2db,
-      sessionId: args.session_id || null,
+      sessionId: endedId,
       explicitIds: args.recalled_entry_ids,
       filePaths: [resolve(projectRoot, ".recalled-entries.json")],
       readFile: (p) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
@@ -521,7 +528,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       db: v2db,
       vaultDir: v2VaultDir(),
       agentsDir: resolve(projectRoot, ".agents"),
-      sessionId: args.session_id || "",
+      sessionId: endedId ?? "",
       sessionSummary: args.session_summary || "",
       project: projectRoot.split(/[/\\]/).filter(Boolean).pop() || "General",
       recalledEntryIds: recalledIds,
@@ -1060,6 +1067,9 @@ export async function handleFeedback(args: { id: number; rating: "helpful" | "ha
       `Feedback recorded for entry ${id} (${entry.key || "no key"}): ${rating}`,
       `Counts: ${entry.helpful + (rating === "helpful" ? 1 : 0)} helpful, ${entry.harmful + (rating === "harmful" ? 1 : 0)} harmful, ${entry.neutral + (rating === "neutral" ? 1 : 0)} neutral`,
     ];
+    if (feedbackSession.id === null) {
+      lines.push(`NOT LOGGED: this server cannot prove its session — ${feedbackSession.reason}`);
+    }
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };
 }

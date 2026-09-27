@@ -88,6 +88,16 @@ const payload = hookInput as Record<string, unknown>;
 const workspace = describeWorkspaceDir(payload, hookInput.cwd || process.cwd());
 const cwd = workspace.dir;
 const home = process.env.HOME || process.env.USERPROFILE || "";
+
+// Payload, then the registration flag. The proof block below must use this
+// same result: detectIde(payload, "claude") ignores `--ide cursor`, and a
+// Cursor hook launched from a Claude shell would write a Claude proof (D5).
+const ideFlagIndex = process.argv.indexOf("--ide");
+const registeredAs =
+  ideFlagIndex >= 0 && process.argv[ideFlagIndex + 1]
+    ? process.argv[ideFlagIndex + 1].toLowerCase()
+    : currentIde();
+const ide = detectIde(payload, registeredAs);
 const lines: string[] = [];
 
 // T-003: the SESSION PROOF, written FIRST — before anything slow — because the
@@ -108,7 +118,7 @@ const proofLine: string = (() => {
   const payloadId = resolveSessionId(hookInput as Record<string, unknown>);
   const claudePid = Number(process.env.CLAUDE_PID);
   if (!payloadId) return "Session proof NOT written: the payload carried no session id.";
-  if (detectIde(payload, "claude") !== "claude") return "Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2).";
+  if (ide !== "claude") return "Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2).";
   if (!Number.isInteger(claudePid) || claudePid <= 0) return `Session proof NOT written: CLAUDE_PID is ${process.env.CLAUDE_PID === undefined ? "unset" : `"${process.env.CLAUDE_PID}"`}, so the claude process is unknown and this session's server will refuse attributed writes.`;
   const procStart = processStartTime(claudePid);
   if (procStart === null) return `Session proof NOT written: the start time of claude process ${claudePid} could not be read, so this session's server will refuse attributed writes.`;
@@ -170,20 +180,9 @@ lines.push(proofLine);
 // Written to disk as well as printed, because printing only helps in an IDE
 // that injects hook stdout into agent context. The MCP server falls back to
 // this file when the agent has no UUID to pass.
-// Scoped per IDE: `--ide cursor` (set by setup.mjs when it registers the Cursor
-// hook), else OPEN_BRAIN_IDE, else "claude". Without this, Claude Code and
-// Cursor on the same repo overwrite each other's slot and one of them adopts
-// the other's session UUID.
-const ideFlagIndex = process.argv.indexOf("--ide");
-const registeredAs =
-  ideFlagIndex >= 0 && process.argv[ideFlagIndex + 1]
-    ? process.argv[ideFlagIndex + 1].toLowerCase()
-    : currentIde();
-
-// The payload wins over the flag. Cursor also executes ~/.claude/settings.json
-// hooks, and that copy has no --ide flag, so registration alone would label a
-// Cursor session "claude" and let it overwrite a real Claude Code slot.
-const ide = detectIde(payload, registeredAs);
+// `ide` is the payload-then-flag result computed above, shared with the proof
+// block. Cursor also executes ~/.claude/settings.json hooks, and that copy has
+// no --ide flag, so registration alone would label a Cursor session "claude".
 
 // THE SLOT IS WRITTEN ONLY WHEN THE PAYLOAD SUPPLIED AN ID.
 //

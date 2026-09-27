@@ -4,11 +4,11 @@
 > mistake, then close the session's memory with `ob_end`. That is all `/end` does.
 
 **`/end` writes no project state.** The record is written as the work happens, through `ob_state`
-(`set_handoff`, `add_decision`, a task's status). Every write records its session in `sessions[]`,
-and no op can name, update or delete another session's handoff. **That rests on the REGISTERED
-session, and the registration can be wrong:** a second session in the same checkout, a reconnected
-server re-reading the checkout's hook slot, or a server that outlives a context clear can hold another
-session's id. Only a different checkout's recorded session is refused. The SessionEnd hook, if
+(`set_handoff`, `add_decision`, a task's status). A write that carries a session records that session
+in `sessions[]`. A write with no session records nothing there, and says so. No op can name, update
+or delete another session's handoff. A write is refused when its session is already recorded under a
+different checkout (`checkout` set, and not this write's). A legacy session record (`checkout` null)
+is not refused on that comparison. The SessionEnd hook, if
 registered (`node scripts/setup.mjs` does it), writes the summary and logging whether or not `/end` runs.
 
 ## 1. Find the lessons

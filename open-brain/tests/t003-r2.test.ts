@@ -227,8 +227,9 @@ describe("T-003 round 2", { timeout: 60_000 }, () => {
     ];
     for (const rel of files) {
       const body = readFileSync(join(root, rel), "utf-8");
-      expect(body, rel).toContain("A write with no session records nothing there, and says so.");
-      expect(body, rel).toContain("A write is refused when its session is already recorded under a different checkout");
+      const flat = body.replace(/\s+/g, " ");
+      expect(flat, rel).toContain("A write with no session records nothing there, and says so.");
+      expect(flat, rel).toContain("A write is refused when its session is already recorded under a different checkout");
       expect(body, rel).not.toContain("Every write records its session in `sessions[]`");
       expect(body, rel).not.toContain("Only a different checkout's recorded session is refused.");
     }
