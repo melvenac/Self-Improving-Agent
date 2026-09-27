@@ -84,11 +84,14 @@ export const TaskSchema = z.strictObject({
   /**
    * The sessions (uuids) whose text is in `note` now (T-171). `[]` for an empty
    * note; `null` when any of it has no recorded author — a note written before
-   * v3, imported from prose, or added by an unregistered write. A replace that
-   * would remove text by any session other than the writer's, or by an
-   * unrecorded one, is refused unless the op names it (`replace_other_sessions`).
+   * v3, imported from prose, or added by an unregistered write. A key that is
+   * absent is read as null (unknown author): T-179's migrator wrote v3 records
+   * before this field existed, and nothing is filled in on disk until a write
+   * touches that task. A replace that would remove text by any session other
+   * than the writer's, or by an unrecorded one, is refused unless the op names
+   * it (`replace_other_sessions`).
    */
-  note_by: z.array(z.string().min(1)).nullable(),
+  note_by: z.array(z.string().min(1)).nullable().default(null),
   /**
    * The record revision the closing write produced (R179-1 as extended to done
    * tasks, record 128). Done-task retention counts the sessions that first

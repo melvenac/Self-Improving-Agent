@@ -194,6 +194,26 @@ const VIEW_REL = {
  * Same absent/invalid refusals as `applyStateOps`, so both doors describe a
  * broken file the same way.
  */
+/** Task ids whose on-disk object has no `note_by` key. Load reads that as null; a write puts the key back only for a task an op touched. */
+function tasksOmittingNoteBy(text: string): Set<string> {
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    return new Set();
+  }
+  const tasks = (raw as { tasks?: unknown }).tasks;
+  if (!Array.isArray(tasks)) return new Set();
+  const ids = new Set<string>();
+  for (const t of tasks) {
+    if (t !== null && typeof t === "object" && !Object.prototype.hasOwnProperty.call(t, "note_by")) {
+      const id = (t as { id?: unknown }).id;
+      if (typeof id === "string") ids.add(id);
+    }
+  }
+  return ids;
+}
+
 export function readState(projectRoot: string): { ok: true; data: State; path: string } | { ok: false; error: string } {
   const statePath = join(projectRoot, STATE_REL);
   if (!existsSync(statePath)) {
@@ -214,7 +234,9 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   if (!existsSync(statePath)) {
     return refuse(-1, `${STATE_REL} is absent — this writer never creates it; run the migration first`);
   }
-  const parsed = parseState(readFileSync(statePath, "utf-8"));
+  const rawText = readFileSync(statePath, "utf-8");
+  const omittedNoteBy = tasksOmittingNoteBy(rawText);
+  const parsed = parseState(rawText);
   if (!parsed.ok) return refuse(-1, `${STATE_REL} invalid at ${parsed.error} — refusing to write over a file that does not validate`, parsed.path);
 
   const before = parsed.data.revision;
@@ -336,7 +358,18 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   }
 
   if (!dryRun) {
-    if (!renderOnly) atomicWrite(statePath, serializeState(finalState));
+    if (!renderOnly) {
+      // A missing note_by loaded as null. Leave it off disk until an op touches
+      // that task, so a write about something else does not stamp the key onto
+      // every task T-179 migrated (T-171 r3b).
+      const touched = new Set(applied.map((a) => a.id).filter((id): id is string => id !== null));
+      for (const t of finalState.tasks) {
+        if (omittedNoteBy.has(t.id) && !touched.has(t.id)) {
+          delete (t as { note_by?: string[] | null }).note_by;
+        }
+      }
+      atomicWrite(statePath, serializeState(finalState));
+    }
     for (const v of views) atomicWrite(join(projectRoot, v.rel), v.text);
   }
 
