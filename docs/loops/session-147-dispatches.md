@@ -443,3 +443,14 @@ QA PC: 182, 183.
   Something in each run (the seat, or the queue's checkout) creates or moves a local branch named after the planner's
   docs branch. **To trace before the next queue:** the QA tree's reflog for that ref, and whether the dispatches' `git
   show origin/docs/...` reads are the trigger.
+- **RESOLVED (21:29:03Z): the ref flag was the PLANNER's own pushes.** The QA PC tree has no local
+  `refs/heads/docs/session-100-qa99-dispatch` (`git rev-parse --verify` finds nothing; `for-each-ref refs/heads/docs` is
+  empty). The driver's audit snapshots origin's ref list (`refs_counted=before=624 after=628`: the remote's branches, the
+  4 being the QA branches). The planner pushed `5c0af5b` (about 21:11Z) during QA 189 (21:11:17-21:18:35Z) and
+  `9a1bf1e`/`ce787ca` (about 21:22-21:24Z) during QA 182 (21:18:50-21:27:00Z). A true detection with the wrong
+  suspect. **Fix, either:** (a) the planner does not push to origin while a QA run is in flight, or (b) the audit names
+  WHO moved a ref (committer, or the seat's push log) before calling it a violation. Until (b) exists, (a) is the rule,
+  and an audit flag on a planner branch is checked against the planner's push times first.
+- **Also seen in the reflog:** QA 183 (running now) checked its candidate out IN the shared QA tree (`16:27:31` local, to
+  `a38ff92`, then `qa/t192-report`), as QA 177 did. The record-185 restore now handles it, but the dispatches' "separate
+  worktree / git archive" instruction is still not being followed.
