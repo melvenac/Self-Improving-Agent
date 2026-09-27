@@ -409,3 +409,22 @@ QA PC: 182, 183.
   checkout moved a dirty tree to `9a79ff1`: the record-185 `-f` fix working on a real machine for the first time.
 - **The main checkout** (`~/Projects/Self-Improving-Agent`) is still at `ecd28dd`, far behind master. Hooks and the
   MCP server run from it, and T-193 only reaches A2A-Hub once it is updated. Updating it is Aaron's word (T-172, D-050).
+
+### QA 189 (candidate B part 2): ACCEPTED; the planner rules candidate B ACCEPTED (21:20:33Z)
+
+- **QA 189** (Composer 2.5, QA PC, 21:11-21:18Z; `qa/b2-report` `75c2c95`, ending `QA-189: REPORT COMPLETE`): ACCEPTED,
+  BE-0 to BE-8 all PASS. On the dispatch's five items:
+  - **BE-5.2:** refusing a pre-B `met` row without `order` is what BE-5.2 names, and QA lists every producer and
+    fixture it affects.
+  - **mut-b** couples BE-2.2 and BE-7.1 by design.
+  - **mut-a's** empty and newline ids stay refused by the pattern.
+  - **BE-1.3's no-write path** was verified on disk.
+  - **BE-7** has no writer.
+- **Caveats, not blocking:**
+  - QA's own three mutants (`qa/b2-mut-*`) were run LOCALLY, not on tcm, so BE-8's tcm evidence is the developer's
+    green `36316975390`.
+  - The driver's post-run ref audit recorded `ref_violations=refs/heads/docs/session-100-qa99-dispatch`: a LOCAL
+    branch in the QA PC's tree changed, and it no longer exists there. **Origin is untouched** (`5c0af5b`, the planner's
+    own push, read back). The report does not say what did it. The audit caught it, as designed.
+- **Ruling:** with B part 1 (the G-042 repair) merged as #165, **candidate B is ACCEPTED.** PR #187 goes to Aaron for
+  merge. **C (T-155, the shadow merge gate) is next.**
