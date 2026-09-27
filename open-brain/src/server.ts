@@ -514,7 +514,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     // consulted when it names this same session. See resolveRecalledIds.
     // No named id means the proven one. end.md calls ob_end that way, and a
     // rating ob_recalled lists is in recall_log under that id (D3).
-    const endedId = endSession.id;
+    const endedId = args.session_id || null;
     const resolved = resolveRecalledIds({
       db: v2db,
       sessionId: endedId,
