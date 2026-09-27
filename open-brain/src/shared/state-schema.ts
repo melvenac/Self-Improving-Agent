@@ -323,7 +323,7 @@ export function compareFirstRev(a: number | null, b: number | null): number {
  */
 export function lastSession(state: Pick<State, "sessions">): SessionRecord | null {
   let best: SessionRecord | null = null;
-  for (const s of state.sessions) if (best === null || compareFirstRev(s.first_rev, best.first_rev) >= 0) best = s;
+  for (const s of state.sessions) if (best === null || s.n >= best.n) best = s;
   return best;
 }
 
