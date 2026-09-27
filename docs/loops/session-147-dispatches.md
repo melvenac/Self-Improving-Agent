@@ -454,3 +454,16 @@ QA PC: 182, 183.
 - **Also seen in the reflog:** QA 183 (running now) checked its candidate out IN the shared QA tree (`16:27:31` local, to
   `a38ff92`, then `qa/t192-report`), as QA 177 did. The record-185 restore now handles it, but the dispatches' "separate
   worktree / git archive" instruction is still not being followed.
+
+### QA 183 (T-192, `a38ff92`): ACCEPT; the planner rules T-192 ACCEPTED (21:34:37Z)
+
+- `qa/t192-report` `1bef8ea`, ending `QA-183: REPORT COMPLETE`. `runs-on`, `ci-status` never-started and the unread cases,
+  D-055's `paths-ignore`, and the preserves all hold. QA-only mutants killed on tcm: `36351923059` (`.agents/**` in
+  `paths-ignore`) and `36351924217` (egress `if` flipped).
+- **Low:** (1) the four-case `evalRunsOn` is enough for today's expression but would not notice new event-specific
+  terms. (2) **T192-D1:** when `gh run view` succeeds but the `test` job is absent or its `steps` field is missing (not
+  `[]`), `checkCiStatus` says plain `failure` without naming that the steps were not read. It is the 181b class, one
+  case further. **Composer's replay (record 184, `887ae4c`) names exactly this case** ("failure (job test absent in run
+  view)"). A small follow-up round, not a merge blocker: T-192 fixes the live billing block.
+- **PR and pushes held** until the QA queue finishes (the no-push-during-QA rule above). Then: open the T-192 PR for
+  Aaron, and push this file.
