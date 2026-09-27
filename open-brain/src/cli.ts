@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { runSync } from "./pipelines/sync/index.js";
 import {
   scoreConfigStructure,
@@ -349,7 +350,13 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   } else if (sub === "move-residue") {
     const opts = parseOrRefuse(COMMAND_SPECS.bootstrapMoveResidue, args.slice(2));
     try {
-      const r = moveResidue(opts.directory ?? resolve("."), today);
+      // The failed-undo path is not reachable from a fixture (QA 145 P-UNDO). A
+      // test module exporting `rename` is passed through only when this is set.
+      const hookPath = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK;
+      const rename = hookPath
+        ? (await import(pathToFileURL(hookPath).href) as { rename: (from: string, to: string) => void }).rename
+        : undefined;
+      const r = moveResidue(opts.directory ?? resolve("."), today, rename ? { rename } : {});
       console.log(`bootstrap move-residue — moved, nothing deleted`);
       console.log(`To:      ${r.to}/`);
       console.log(`Entries: ${r.entries.join(", ")}`);
