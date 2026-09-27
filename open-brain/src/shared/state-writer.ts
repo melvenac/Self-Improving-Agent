@@ -457,12 +457,10 @@ function replaceNote(t: Task, text: string, overrideOthers: boolean, ctx: OpCont
   // A replace that removes nothing still holds the prior authors' text (T171-D1).
   // One that removes text leaves only this write, or unknown if it has no session.
   t.note_by = text === "" ? [] : removes ? (ctx.uuid === null ? null : [ctx.uuid]) : appendedBy(t.note_by, old, ctx.uuid);
-  // Quote from the first differing character (T-171 round 3). SIA's notes are one
-  // line, so a line-based quote named the kept start. 120 characters, as before.
-  let diff = 0;
-  const shared = Math.min(old.length, text.length);
-  while (diff < shared && old[diff] === text[diff]) diff++;
-  const quoted = old.slice(diff, diff + 120);
+  // MUTANT: line-based quote restored (QA 177).
+  const oldLines = old.split(/\r?\n/);
+  const removed = oldLines.filter((line) => !text.includes(line));
+  const quoted = (removed[0] ?? oldLines[0] ?? "").slice(0, 120);
   let line = `${t.id} note REPLACED: ${old.length} chars -> ${text.length} chars; ` +
     (removes ? `removed text begins: "${quoted}"` : "no text removed");
   if (foreign && removes) line += `; text by other session(s) removed: ${others === null ? "unrecorded" : others.join(", ")}`;
