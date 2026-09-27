@@ -1,6 +1,5 @@
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { isStateRecord } from "./state-record.js";
 
 /**
  * Finds the project root by walking up from `start` (Loop 3, R4).
@@ -50,8 +49,7 @@ export function resolveRepoRoot(start: string): string | null {
  */
 export function isProjectRoot(dir: string): boolean {
   if (existsSync(join(dir, ".agents", "SYSTEM"))
-    || existsSync(join(dir, ".agents", "META"))
-    || isStateRecord(join(dir, ".agents", "state.json"))) return true;
+    || existsSync(join(dir, ".agents", "META"))) return true;
   return existsSync(join(dir, "package.json")) && existsSync(join(dir, "open-brain"));
 }
 
