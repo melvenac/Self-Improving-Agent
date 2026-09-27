@@ -56,7 +56,6 @@ describe("ci.yml test job runs-on (T-192 item 1)", () => {
     for (const [label, ctx, want] of cases) {
       expect(evaluateRunsOnExpression(expr, ctx), label).toEqual(want);
     }
-    expect(TCM_RUNNER).toEqual(["self-hosted", "linux", "tcm-red-seed"]); // 184b red-first on tcm
   });
 
   describe("mutant: ci.yml runs-on restored to pre-T-192 master-push clause", () => {

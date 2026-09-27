@@ -1,47 +1,42 @@
-# T-192 replay — Composer 2.5 developer handoff (record 184)
+# T-192 replay — Composer 2.5 developer handoff (record 184 / 184b)
 
 **By:** cursor-infra (Forge seat), record session **184**, 2026-09-27, in `~/Worktrees/sia-infra`.
 **Model:** Composer 2.5. **Base:** `7243fd5`. **Branch:** `loop/t192-replay-composer`.
-**Started:** 2026-09-27T09:33:10Z.
 
-## Item 1 — master push runs on tcm
+## Round 184b — Atlas findings R184-1..4
 
-**Change:** `.github/workflows/ci.yml` `test.runs-on` is now
-`inputs.hosted && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]')`.
-Comment updated. Egress self-check still gated on `runner.environment == 'self-hosted'`.
+### R184-1 — evaluate ci.yml expression, not a hard-coded function
 
-**Tests:** `open-brain/tests/pipelines/sync/ci-runs-on.test.ts`
-- Parses `ci.yml` with the `yaml` package (not regex).
-- `evaluateCiTestRunsOn` asserts four cases (master push, dispatch, dispatch+hosted, non-master push).
-- Mutant: pre-T-192 expression makes master push → `ubuntu-latest` (first case would go red).
+- Evaluator lives in **tests only**: `readCiTestRunsOnExpr` + `evaluateRunsOnExpression` in
+  `open-brain/tests/pipelines/sync/ci-runs-on.test.ts` (YAML parse + `Function` on the `${{ … }}` string).
+- Four cases read the expression from the tracked `ci.yml`.
+- Mutant: scratch copy with pre-T-192 `runs-on` restored; master-push row expects tcm, gets `ubuntu-latest`.
 
-## Item 2 — ci-status names never-started separately
+### R184-2 — red-first on tcm (workflow_dispatch, hosted=false)
 
-**Change:** `checkCiStatus` in `checks-state.ts` now:
-1. `gh run list --json conclusion,headSha,status,databaseId`
-2. On failure, `gh run view <id> --json jobs` for job `test`
-3. When `test` has zero steps, `gh api repos/{owner}/{repo}/check-runs/<id>/annotations`
-4. Classifies as `never started` when an annotation message begins `The job was not started because`
+| Run | ID | Result | Why |
+|-----|-----|--------|-----|
+| red-first (before fix) | **36310020528** | failure | tcm job `test`; vitest red on intentional `tcm-red-seed` assertion (bcb dd7f) |
+| green (184b fix) | _(pending push)_ | | |
+| mutant ci.yml master-push clause | _(pending)_ | | vitest master-push row red on ubuntu-latest |
 
-**Limit (in every message):** `limit: job test only; check-run annotations fetched only when that job has zero steps`
+Runner proof: run 36310020528 step **Egress isolation self-check (tcm)** succeeded.
 
-**Tests:** red-first rows on recorded fixtures in `open-brain/tests/fixtures/ci-status/`:
-- never-started: run 36308772222 / job 108590501268
-- success: run 36305346883
-- real failure: run 36308414840 (Test step failed after steps ran)
-- Mutant: `classifyCiConclusion(..., foldNeverStarted=true)` folds back to `failure`
+### R184-3 — ci-status names inconclusive cases
 
-## Checks run (this tree)
+`classifyCiConclusion` + `checkCiStatus` now report:
+- `failure (run view failed; …)`
+- `failure (run view not JSON; …)`
+- `failure (job test absent in run view)`
+- `failure (zero steps on job test; annotations fetch failed)`
+- `failure (zero steps on job test; annotations not JSON)`
+- `failure (zero steps on job test; no never-started annotation prefix)`
 
-```
-npx tsc --noEmit -p open-brain
-npm test -- tests/pipelines/sync/ci-runs-on.test.ts tests/pipelines/sync/checks-state.test.ts
-→ 23 passed
-```
+Mutant: `silentFallback: true` → plain `failure` (test in checks-state.test.ts).
 
-## Not observable before merge
+### R184-4 — no runtime evaluator
 
-First real master push on tcm after merge — planner acceptance read per brief.
+Removed `open-brain/src/pipelines/sync/ci-runs-on.ts`; evaluator is test-only.
 
 ## Token usage
 
