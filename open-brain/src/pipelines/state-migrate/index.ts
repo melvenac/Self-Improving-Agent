@@ -271,7 +271,7 @@ export function migrateStateText(
     handoffs: v2.handoffs.map((h) => ({ ...h, session_uuid: null, checkout: null, first_rev: null })),
     sessions: [{ ...v2.last_session, checkout: null, first_rev: null }],
     // Not validated here: v3's schema re-validates every task after the move.
-    tasks: Array.isArray(v2.tasks) ? (v2.tasks as Record<string, unknown>[]).map((t) => ({ ...t, note_by: t.note === "" ? [] : null, closed_rev: null })) : v2.tasks,
+    tasks: Array.isArray(v2.tasks) ? (v2.tasks as Record<string, unknown>[]).map((t) => ({ ...t, note_by: [], closed_rev: null })) : v2.tasks,
   };
   delete migrated.last_session;
 
