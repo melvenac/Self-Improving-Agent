@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 import type { CheckResult } from "./types.js";
-import { parseState, type State } from "../../shared/state-schema.js";
+import { parseState, lastSession, type State } from "../../shared/state-schema.js";
 import { applyStateOps } from "../../shared/state-writer.js";
 
 const STATE_REL = ".agents/state.json";
@@ -82,7 +82,7 @@ export function checkSummaryFromState(version: string, projectRoot: string, chec
   if (checkOnly) {
     return { name, severity: "issue", message: `views stale vs rev ${state.revision} / v${version}: ${named} — run sync without --check to re-render` };
   }
-  const r = applyStateOps(projectRoot, { session: state.last_session.n, expected_revision: state.revision, ops: [], render: true, version });
+  const r = applyStateOps(projectRoot, { session: lastSession(state)?.n ?? 0, expected_revision: state.revision, ops: [], render: true, version });
   if (!r.ok) {
     return { name, severity: "issue", message: `re-render refused: ${r.error}` };
   }

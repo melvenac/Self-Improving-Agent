@@ -13,6 +13,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { withSessionHooks } from './setup-hooks.mjs';
 
 const HOME = os.homedir();
 const CLAUDE_DIR = path.join(HOME, '.claude');
@@ -145,79 +146,12 @@ function registerHooks() {
     settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
   }
 
-  if (!settings.hooks) settings.hooks = {};
-
-  const bootstrapPath = path.join(OPEN_BRAIN_DIR, 'build', 'cli-bootstrap.js');
-  const command = `node "${bootstrapPath}"`;
-
-  // SessionStart hook for bootstrap
-  if (!settings.hooks.SessionStart) settings.hooks.SessionStart = [];
-
-  // Compare normalised, not literal. path.join yields backslashes on Windows
-  // while an earlier install may have written forward slashes; exact-string
-  // matching then misses the existing entry and appends a SECOND registration,
-  // so the SessionStart hook fires twice and SESSION_UUID is emitted twice.
-  // (This is exactly what a re-run of setup.mjs did on 2026-07-28.)
-  const norm = (s) => String(s || '').replace(/\\/g, '/').toLowerCase();
-  const target = norm(command);
-
-  const alreadyExists = settings.hooks.SessionStart.some(entry =>
-    entry.hooks?.some(h => norm(h.command) === target)
-  );
-
-  if (alreadyExists) {
-    log(SKIP, 'Hooks already configured \u2014 skipped');
-    return;
-  }
-
-  // Drop any prior cli-bootstrap registration that differs only by path
-  // spelling, so a re-run repairs a duplicate rather than adding to it.
-  let removedDupes = 0;
-  settings.hooks.SessionStart = settings.hooks.SessionStart.filter(entry => {
-    const cmds = (entry.hooks || []).map(h => norm(h.command));
-    const isBootstrap = cmds.some(c => c.includes('cli-bootstrap.js'));
-    if (isBootstrap) removedDupes++;
-    return !isBootstrap;
-  });
-  if (removedDupes > 0) {
-    log(OK, `Replaced ${removedDupes} cli-bootstrap SessionStart registration(s) differing by path spelling`);
-  }
-
-  settings.hooks.SessionStart.push({
-    matcher: '',
-    hooks: [{
-      type: 'command',
-      command
-    }]
-  });
-
-  // Remove stale session-bootstrap.mjs and knowledge-mcp hooks
-  if (settings.hooks.SessionStart) {
-    const beforeStart = settings.hooks.SessionStart.length;
-    settings.hooks.SessionStart = settings.hooks.SessionStart.filter(entry => {
-      const cmds = entry.hooks?.map(h => h.command) || [];
-      return !cmds.some(c => c.includes('session-bootstrap.mjs'));
-    });
-    const removedStart = beforeStart - settings.hooks.SessionStart.length;
-    if (removedStart > 0) {
-      log(OK, `Removed ${removedStart} stale session-bootstrap.mjs hook(s)`);
-    }
-  }
-
-  if (settings.hooks.SessionEnd) {
-    const before = settings.hooks.SessionEnd.length;
-    settings.hooks.SessionEnd = settings.hooks.SessionEnd.filter(entry => {
-      const cmds = entry.hooks?.map(h => h.command) || [];
-      return !cmds.some(c => c.includes('knowledge-mcp'));
-    });
-    const removed = before - settings.hooks.SessionEnd.length;
-    if (removed > 0) {
-      log(OK, `Removed ${removed} stale knowledge-mcp SessionEnd hook(s)`);
-    }
-  }
-
-  fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n');
-  log(OK, 'SessionStart hook registered in settings.json');
+  // SessionStart and SessionEnd, each checked on its own (R179-5).
+  const r = withSessionHooks(settings, OPEN_BRAIN_DIR);
+  for (const n of r.notes) log(n.includes('already registered') ? SKIP : OK, n);
+  if (!r.changed) return;
+  fs.writeFileSync(settingsPath, JSON.stringify(r.settings, null, 2) + '\n');
+  log(OK, `Hooks written to ${settingsPath}`);
 }
 
 function copySlashCommands() {

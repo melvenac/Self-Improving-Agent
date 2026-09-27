@@ -2,8 +2,9 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderState, VERIFIED_FULL_TEXT, GAP_CLIP } from "../../../src/pipelines/session-start/state-render.js";
-import { parseState } from "../../../src/shared/state-schema.js";
+import { newestHandoffPerInstance, newestHandoffForSeat } from "../../../src/shared/state-schema.js";
 import type { State } from "../../../src/shared/state-schema.js";
+import { readRepoRecord } from "../../helpers/repo-record.js";
 
 /**
  * `renderState` composes what `ob_start` returns whenever `state.json` is valid —
@@ -55,8 +56,8 @@ const state: State = {
   verified: [],
   gaps: [],
   decisions: [],
-  handoffs: [{ seat: "developer", session: 60, pick_up: "here", watch_out: ["a hazard"], open_questions: [] , loop_state: null }],
-  last_session: { n: 60, date: "2026-09-17", uuid: null , seat: null },
+  handoffs: [{ seat: "developer", session: 60, pick_up: "here", watch_out: ["a hazard"], open_questions: [] , loop_state: null, session_uuid: "u-60", checkout: "sia-builder" }],
+  sessions: [{ n: 60, date: "2026-09-17", uuid: "u-60", seat: "developer", checkout: "sia-builder" }],
 } as unknown as State;
 
 describe("renderState — the startup read", () => {
@@ -97,8 +98,40 @@ describe("renderState — the startup read", () => {
     expect(asPlanner).toContain("no handoff recorded for this seat (planner)");
     // The developer's is still NAMED — withholding it entirely would be its own
     // kind of silence — but as another seat's, not as this reader's.
-    expect(asPlanner).toContain("Other seats' handoffs");
-    expect(asPlanner).toContain("developer (session");
+    expect(asPlanner).toContain("Other handoffs (newest per seat and checkout");
+    expect(asPlanner).toContain("developer [sia-builder] (session 60)");
+  });
+
+  it("T-163: the reader's own handoff is the NEWEST of its seat, and the greeting does not grow with the array", () => {
+    const entry = (session: number, checkout: string, pick_up: string) => ({
+      seat: "developer", session, pick_up, watch_out: [`watch ${session}`], open_questions: [], loop_state: null, session_uuid: `u-${session}`, checkout,
+    });
+    const few: State = { ...state, handoffs: [entry(60, "sia-builder", "OLD"), entry(70, "sia-builder", "NEW")] } as unknown as State;
+    const many: State = {
+      ...state,
+      handoffs: [...Array.from({ length: 10 }, (_, i) => entry(40 + i, "sia-builder", `ANCIENT ${i}`)), entry(60, "sia-builder", "OLD"), entry(70, "sia-builder", "NEW")],
+    } as unknown as State;
+    const a = renderState(few, "x", { seat: "developer" });
+    const b = renderState(many, "x", { seat: "developer" });
+    const text = b.join("\n");
+    expect(text).toContain("Your handoff — developer [sia-builder], session 70:");
+    expect(text).toContain("pick up: NEW");
+    expect(text).not.toContain("ANCIENT");
+    expect(text).not.toContain("pick up: OLD");
+    expect(text).toContain("(11 older handoff(s) superseded within their seat and checkout are in the record, not shown)");
+    // Same number of lines for 2 entries and 12: the array grew, the greeting did not.
+    expect(b.length).toBe(a.length);
+  });
+
+  it("T-163: another CHECKOUT of the same seat is named, not hidden — a still-open seat stays visible", () => {
+    const e = (session: number, checkout: string) => ({
+      seat: "developer", session, pick_up: `words from ${checkout}`, watch_out: [], open_questions: [], loop_state: null, session_uuid: `u-${checkout}`, checkout,
+    });
+    const s: State = { ...state, handoffs: [e(107, "sia-forge"), e(118, "sia-builder")] } as unknown as State;
+    const text = renderState(s, "x", { seat: "developer" }).join("\n");
+    expect(text).toContain("Your handoff — developer [sia-builder], session 118:");
+    expect(text).toContain("developer [sia-forge] (session 107)");
+    expect(text).toContain("words from sia-forge");
   });
 
   it("says the reader's seat is unresolved rather than picking one", () => {
@@ -272,17 +305,21 @@ describe("renderState — R183-1 the loop state and other seats' lines are not c
  * unchanged by the clip.
  */
 describe("renderState — T183-3 the real record's handoffs are verbatim", () => {
-  const statePath = join(__dirname, "..", "..", "..", "..", ".agents", "state.json");
-  const parsed = parseState(readFileSync(statePath, "utf-8"));
-  if (!parsed.ok) throw new Error(`the repository's own state.json does not parse: ${parsed.error}`);
-  const real = parsed.data;
+  // T-163: read at the CURRENT schema. On a branch that moves the schema the
+  // live file is one version behind until it is migrated after merge, so the
+  // helper migrates it in memory (writing nothing) and says which it did.
+  const { state: real } = readRepoRecord();
+  // The entries a reader is shown: the newest per seat is "yours", the newest
+  // per seat and checkout is named. Older entries are record-only.
+  const visible = newestHandoffPerInstance(real.handoffs);
+  const ownEntries = [...new Set(real.handoffs.map((h) => h.seat))].map((seat) => newestHandoffForSeat(real.handoffs, seat)!);
 
   it("walks a non-empty set of handoff items (a vacuous pass is not a pass)", () => {
-    const items = real.handoffs.flatMap((h) => [...h.watch_out, ...h.open_questions]);
+    const items = ownEntries.flatMap((h) => [...h.watch_out, ...h.open_questions]);
     expect(items.length).toBeGreaterThan(0);
   });
 
-  for (const h of real.handoffs) {
+  for (const h of ownEntries) {
     it(`renders the ${h.seat} seat's watch-outs and open questions as whole lines, byte-identical`, () => {
       const lines = renderState(real, "x", { seat: h.seat });
       for (const w of [...h.watch_out, ...h.open_questions]) expect(lines).toContain(`    - ${w}`);
@@ -300,12 +337,12 @@ describe("renderState — T183-3 the real record's handoffs are verbatim", () =>
     // R183-1: each OTHER seat's named line is unchanged from the base (q18).
     it(`renders the other seats' lines for the ${h.seat} reader unchanged`, () => {
       const lines = renderState(real, "x", { seat: h.seat });
-      for (const o of real.handoffs.filter((x) => x !== h)) expect(lines).toContain(`    ${otherSeatLine(o.pick_up)}`);
+      for (const o of visible.filter((x) => x !== h)) expect(lines).toContain(`    ${otherSeatLine(o.pick_up)}`);
     });
   }
 
   it("walks a non-empty set of other-seat lines", () => {
-    expect(real.handoffs.length).toBeGreaterThan(1);
+    expect(visible.length).toBeGreaterThan(1);
   });
 
   it("leaves the objective and every active task title unchanged", () => {

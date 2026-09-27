@@ -44,6 +44,12 @@ export const COMMAND_SPECS = {
     values: {},
     positionals: "directory",
   },
+  stateErasures: {
+    name: "state erasures",
+    booleans: [],
+    values: {},
+    positionals: "directory",
+  },
   stateMigrate: {
     name: "state migrate",
     booleans: ["--keep-revision", "--dry-run"],

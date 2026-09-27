@@ -107,7 +107,7 @@ Register it in your Claude Code MCP settings (`~/.claude/.mcp.json` or `~/.claud
 
 ### 3. Set up automation hooks
 
-The session bootstrap and session-end hooks are compiled TypeScript under `open-brain/build/`. After installing dependencies and building (`cd open-brain && npm install && npm run build`), register the hooks in `~/.claude/settings.json`:
+The session bootstrap and session-end hooks are compiled TypeScript under `open-brain/build/`. **`node scripts/setup.mjs` builds them and registers `SessionStart` and `SessionEnd` for you** (each checked on its own, so a machine set up before `SessionEnd` was added gets it on the next run). Run it from the checkout the hooks should serve: it replaces a registration of the same script from another checkout. `PostToolUse` (the recall trigger) is not registered by `setup.mjs`; add it by hand. The full block, for a manual install (`cd open-brain && npm install && npm run build`), in `~/.claude/settings.json`:
 
 ```jsonc
 {
@@ -178,7 +178,7 @@ Start a Claude Code session and run `/start`. You should see:
 | Command | When | What it does |
 |---|---|---|
 | `/start` | Session start | Reads project state, recalls relevant knowledge, registers session UUID, creates session log |
-| `/end` | Session end | Captures lessons, updates project state, writes handoff notes |
+| `/end` | Session end | Stores the session's lessons, each with the key (command, path or error) that would have caught it, then `ob_end`. Writes no project state: the record is written through `ob_state` as work happens (T-179) |
 | `/checkpoint` | Mid-session | Captures phase-level work context before `/compact`, enabling multi-phase sessions |
 | `/sync` | Before commits | Validates version consistency, structural integrity, and installed copy drift (26 checks) |
 

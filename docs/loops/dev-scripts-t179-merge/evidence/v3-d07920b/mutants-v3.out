@@ -1,0 +1,52 @@
+source src/pipelines/state-import/index.ts sha256/12 38011ea54f3e (restored after every mutant)
+
+v3-stamp: RED 3/87 (vitest exit 1) — the imported handoff is legacy: the importer never stamps a session_uuid on prose an earlier session wrote
+    state-import-v3.test.ts > the stamping rule: the imported handoff is legacy (no session_uuid, no checkout) and sessions[0] is the prose log's session
+    state-import-v3.test.ts > ob_state's writer accepts it: a registered session's set_handoff lands beside the legacy entry, which survives
+    state-import.test.ts > next-session rules: pick_up text, watch_out bullets, open_questions bullets (empty when absent), other sections reported
+v3-session-seat: RED 2/87 (vitest exit 1) — sessions[0] from the prose log records no seat the log never named
+    state-import-v3.test.ts > the stamping rule: the imported handoff is legacy (no session_uuid, no checkout) and sessions[0] is the prose log's session
+    state-import.test.ts > --draft writes a schema-valid draft + report and changes nothing else; counts match the hand count of INBOX boxes (V5)
+v3-shape: RED 41/87 (vitest exit 1) — --commit writes the record at schema v3 (a v2-shaped write is what master's importer did)
+    state-import-atomic.test.ts > failing while writing state.json: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while writing SUMMARY.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while rendering task.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while rendering next-session.md: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > failing while moving the draft into the snapshot: the error names the failure, the tree is unchanged, and a second run completes
+    state-import-atomic.test.ts > with --force-snapshot, a failure puts back the earlier snapshot it was replacing, byte for byte
+    state-import-atomic.test.ts > a snapshot that fails part-way is removed, with archive/ if the snapshot created it, and a second run completes
+    state-import-r2.test.ts > SUMMARY.md with a BOM: --commit still cuts its status blockquote, and the rendered region lands under the title
+    state-import-r2.test.ts > SUMMARY.md in UTF-16: --commit cuts its blockquote and writes it back as UTF-8, which the renderer and ob_state read
+    state-import-r2.test.ts > PROBE-2: with no SESSIONS/ directory, --commit completes: state.json and all four views exist
+    state-import-r2.test.ts > M14 and M15: the --draft summary names the stale input, and --commit --accept-stale records the acknowledgement in its output
+    state-import-r3.test.ts > Windows-1252 with em dashes: STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Set-Content (Windows-1252, CRLF): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > PS 5.1 Add-Content (Windows-1252, CRLF, appended line by line): STALE inputs are STALE, --commit refuses without --accept-stale and writes nothing, and --accept-stale commits
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while removing SYSTEM/ (QA 106's handle): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+    state-import-r3.test.ts > QA 106's sequence, the rollback failing while copying SYSTEM/ back, after every live entry is gone (state.json too, on every platform): --draft, --commit and --commit --force-snapshot each refuse, and no original is lost at any step
+    state-import-r3.test.ts > the marker exists before --commit's first write to the live tree, so a process that dies there leaves a project that refuses
+    state-import-r3.test.ts > a completed rollback leaves no marker, and a re-run completes (archive/ absent before)
+    state-import-r3.test.ts > a completed rollback leaves no marker, and a re-run completes (archive/ already present before)
+    state-import-r4.test.ts > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes
+    state-import-r4.test.ts > in process: runCommit refuses the unreadable input and names it, and --accept-stale reports it as accepted
+    state-import-r4.test.ts > no SESSIONS/Session_N.md to compare against: does not block
+    state-import-r4.test.ts > names no Session N: does not block
+    state-import-r4.test.ts > declares Session 20, ahead of the latest log (Session 7): does not block
+    state-import-r4.test.ts > IF-10: declares Session 20 against a latest of 7: could not tell, both numbers named, and --commit completes
+    state-import-r4.test.ts > IF-10: declares Session 8 against a latest of 7: could not tell, both numbers named, and --commit completes
+    state-import-staleness.test.ts > --commit refuses without the acknowledgement, writing nothing and taking no snapshot, and proceeds with it
+    state-import-staleness.test.ts > the CLI refuses --commit, refuses a misspelled acknowledgement, and proceeds with --accept-stale
+    state-import-staleness.test.ts > no input is stale, every judged input is current, and --commit proceeds without the acknowledgement
+    state-import-staleness.test.ts > --commit proceeds past 'could not tell' and prints one line naming those inputs, since the operator may never open the report
+    state-import-v3.test.ts > the committed record is schema v3 with sessions[] and no last_session, and parses against the current schema
+    state-import-v3.test.ts > the stamping rule: the imported handoff is legacy (no session_uuid, no checkout) and sessions[0] is the prose log's session
+    state-import-v3.test.ts > ob_state's writer accepts it: a registered session's set_handoff lands beside the legacy entry, which survives
+    state-import-v3.test.ts > the migration leaves the imported record unchanged: nothing to write, same revision, same bytes on disk
+    state-import.test.ts > --commit: snapshot byte-complete before any change (P2), state.json rev 0, SUMMARY cut (line counts), four views rendered, draft moved, prose sections byte-identical (P8), second commit refuses (V5)
+    state-import.test.ts > --commit refuses without a draft, on a draft that does not validate, and on an existing snapshot without --force-snapshot
+merge-render-session: SURVIVES 0/87 (vitest exit 0) — the merge's resolution line: the render after commit is stamped with the imported last session, not 0

@@ -1,0 +1,61 @@
+KILLED (12/203)        ret-by-number — R179-1 (Atlas): per-session retention restored to 3c0bfdc's NUMBER rule in the writer
+    state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) ob_state's writer accepts it: another seat's set_handoff 
+    closeout-erasure.test.ts > T163-1: a close-out can only add its own record retention keeps a superseded entry when 10 or fewer sessions have written since
+    session-order.test.ts > R179-1: a session number orders nothing A6: a mistyped number (1124 for 124) removes NO other session's handoff or session record
+    session-order.test.ts > R179-1: a session number orders nothing A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last session' is by wr
+KILLED (3/203)         retention-infinite — R179-1: the retention threshold raised to infinity (the brief's 'bound to infinity'; the amended rule has no number bound, so its one threshold)
+    closeout-erasure.test.ts > T163-1: a close-out can only add its own record retention drops a superseded entry of the SAME seat and checkout once more than 10 sessions hav
+    session-order.test.ts > R179-1: a session number orders nothing retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more than 10 distin
+    record-erasure.test.ts > record-erasure (T163-2) does NOT flag a retention drop — the rule is recomputed from the state after the step
+KILLED (10/203)        firstrev-from-caller — R179-1: first_rev is the writer's revision, never the caller's session number
+    state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) ob_state's writer accepts it: another seat's set_handoff 
+    state-migrate.test.ts > migrateStateFile carries every unrelated field through byte-identically
+    closeout-erasure.test.ts > T163-1: a close-out can only add its own record retention drops a superseded entry of the SAME seat and checkout once more than 10 sessions hav
+    session-order.test.ts > R179-1: a session number orders nothing A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last session' is by wr
+KILLED (1/203)         firstrev-restamp — R179-1: a recorded session keeps its first_rev; a later write does not move it forward
+    session-order.test.ts > R179-1: a session number orders nothing A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last session' is by wr
+KILLED (2/203)         last-by-number — R179-1: lastSession() orders by first_rev, not n
+    session-order.test.ts > R179-1: a session number orders nothing A6b: the wrong number stays a LABEL — the session's next write erases nothing, and 'last session' is by wr
+    state-schema.test.ts > state-schema (Loop 2, read side) lastSession is DERIVED by WRITE ORDER (first_rev), never by n: the later entry on a tie, legacy (null) before ever
+KILLED (2/203)         newest-by-number — R179-1: the rendered newest handoff per (seat, checkout) is by first_rev, not session
+    session-order.test.ts > R179-1: a session number orders nothing A6c: a session passing its LOCAL greeting number (6) keeps its own new handoff, and the reader is shown it
+    state-schema.test.ts > state-schema (Loop 2, read side) newestHandoffPerInstance keeps one per (seat, checkout) by first_rev, never by session number; legacy null checkou
+KILLED (4/203)         done-by-number — done tasks (Atlas): retention restored to 'closed_session <= newest number - 3'
+    server.test.ts > server handlers handleStart ob_state applies a batch, renders the views, and ob_start reads the result back
+    state-views.test.ts > T-144: rendered Done obeys the retention window view and writer agree on exactly which done tasks exist
+    session-order.test.ts > R179-1 extended to done tasks: a done task ages by sessions written since its close, never by number one write numbered 1124 drops NO done task — 
+    state-writer.test.ts > applyStateOps (Loop 3 writer) drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the i
+KILLED (6/203)         done-infinite — done tasks: the 3-session threshold raised to infinity
+    state-views.test.ts > T-144: rendered Done obeys the retention window hides done tasks the writer would drop — fails against pre-T-144 code
+    state-views.test.ts > T-144: rendered Done obeys the retention window renders the retention edge correctly: 3 sessions written since the close dropped, 2 kept — whatever 
+    session-order.test.ts > R179-1 extended to done tasks: a done task ages by sessions written since its close, never by number a done task leaves once 3 DISTINCT sessions h
+    state-writer.test.ts > applyStateOps (Loop 3 writer) drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the i
+KILLED (3/203)         closed-rev-unset — done tasks: close_task records closed_rev
+    session-order.test.ts > R179-1 extended to done tasks: a done task ages by sessions written since its close, never by number a done task leaves once 3 DISTINCT sessions h
+    state-writer.test.ts > applyStateOps (Loop 3 writer) ops: [] with render: true re-renders the views, leaves revision and state.json bytes unchanged, and runs no retention
+    state-writer.test.ts > applyStateOps (Loop 3 writer) drops done tasks once 3 DISTINCT sessions have first written after the close — whatever the numbers — and lists the i
+KILLED (3/203)         legacy-never-yields — R179-3: a legacy handoff is superseded by its seat's first keyed handoff
+    state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) ob_state's writer accepts it: another seat's set_handoff 
+    session-order.test.ts > R179-3: a legacy handoff is superseded by its seat's first keyed handoff the fixture's legacy developer@54 survives ANOTHER seat's keyed handoff, 
+    state-writer.test.ts > applyStateOps (Loop 3 writer) R179-3: the first keyed handoff of the legacy entry's OWN seat supersedes it, and the write reports it
+KILLED (3/203)         legacy-yields-any-seat — R179-3: ...by ITS OWN seat's keyed handoff only
+    state-import-v3.test.ts > T-179 merge: an import writes a schema v3 record that ob_state accepts (v3 in, v3 out) ob_state's writer accepts it: another seat's set_handoff 
+    session-order.test.ts > R179-3: a legacy handoff is superseded by its seat's first keyed handoff the fixture's legacy developer@54 survives ANOTHER seat's keyed handoff, 
+    state-writer.test.ts > applyStateOps (Loop 3 writer) set_handoff writes THIS session's entry, stamped with its uuid, checkout and first-write revision, and leaves ANOTHER
+KILLED (1/203)         legacy-session-yields — R179-3: a legacy SESSION record is never superseded
+    session-order.test.ts > R179-3: a legacy handoff is superseded by its seat's first keyed handoff the legacy SESSION record is never superseded — it carries the uuid the m
+KILLED (6/203)         erasure-by-number — T163-2 (Atlas): record-erasure explains a removal by 3c0bfdc's NUMBER rule
+    record-erasure.test.ts > record-erasure (T163-2) KNOWN NEGATIVE: two sessions handing off through the writer erase nothing, and the check passes printing what it walked
+    record-erasure.test.ts > record-erasure (T163-2) KNOWN POSITIVE: a hand edit that drops another session's handoff FAILS, naming both revisions and both sessions
+    record-erasure.test.ts > record-erasure (T163-2) does NOT flag a retention drop — the rule is recomputed from the state after the step
+    record-erasure.test.ts > record-erasure (T163-2) a merge that KEEPS both branches' records is clean
+KILLED (1/203)         r1792-off — R179-2: ob_set_session refuses another checkout's recorded session
+    server.test.ts > R179-2: ob_set_session and another checkout's recorded session A7 across checkouts: registering as a session recorded in ANOTHER checkout is refused, nam
+KILLED (4/203)         hooks-no-sessionend — R179-5: setup.mjs registers SessionEnd
+    setup-hooks.test.ts > setup.mjs hook registration (R179-5) QA's machine: SessionStart already registered and no SessionEnd — SessionEnd is ADDED, SessionStart untouched
+    setup-hooks.test.ts > setup.mjs hook registration (R179-5) an empty settings file gets both, and other settings keys survive
+    setup-hooks.test.ts > setup.mjs hook registration (R179-5) is idempotent: a second run changes nothing and registers nothing twice — including across a path-spelling diff
+    setup-hooks.test.ts > setup.mjs hook registration (R179-5) leaves another tool's SessionEnd hook alone, and removes the retired knowledge-mcp one
+KILLED (1/203)         hooks-early-return — R179-5: each event is checked on its own (the old early return)
+    setup-hooks.test.ts > setup.mjs hook registration (R179-5) QA's machine: SessionStart already registered and no SessionEnd — SessionEnd is ADDED, SessionStart untouched
+restored: true

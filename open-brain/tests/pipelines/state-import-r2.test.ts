@@ -13,6 +13,7 @@ import { join, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnAsync } from "../spawn-async.js";
 import { runDraft, runCommit, DRAFT_REL, REPORT_REL, STATE_REL } from "../../src/pipelines/state-import/index.js";
+import { lastSession } from "../../src/shared/state-schema.js";
 
 const cliEntry = join(import.meta.dirname, "../../src/cli.ts");
 const tsxCli = join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
@@ -143,7 +144,7 @@ describe("R2-1 (IF-9): an encoding detail never turns a STALE input into 'could 
     writeFileSync(join(root, ".agents/SESSIONS/Session_7.md"), `${BOM}# Session 7 — 2026-09-20\n\n> **Status:** Completed\n`);
     const r = runDraft(root, TODAY).draft;
     expect(r.state.objective?.text).toBe("Ship the thing.");
-    expect(r.state.last_session.date).toBe("2026-09-20");
+    expect(lastSession(r.state)?.date).toBe("2026-09-20");
   });
 
   it("SUMMARY.md with a BOM: --commit still cuts its status blockquote, and the rendered region lands under the title", () => {

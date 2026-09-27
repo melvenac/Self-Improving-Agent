@@ -19,6 +19,7 @@ import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/sessio
 import { obsidianVaultDir } from "./shared/paths.js";
 import { resolveHookProjectDir } from "./shared/repo-root.js";
 import { resolveSessionId } from "./shared/active-session.js";
+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from "./shared/handoff-guard.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const V2_VAULT = obsidianVaultDir();
@@ -47,6 +48,29 @@ try {
   const raw = Buffer.concat(chunks).toString().trim();
   if (raw) hookPayload = JSON.parse(raw);
 } catch { /* stdin unavailable — fall back to the environment below */ }
+
+// T179-2: committed loop work with no handoff WARNS, before anything that can
+// exit early (it needs git, not the memory module). It never blocks: /clear
+// fires this hook, and a hook that fails there traps the user.
+try {
+  const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
+  if (existsSync(join(dir, ".agents"))) {
+    const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));
+    if (check.status === "missing") {
+      const msg = describeMissing(check, id);
+      console.log(`[session-end] ${msg}`);
+      console.error(`[session-end] ${msg}`);
+      recordMissingHandoff(dir, id, check);
+    } else if (check.status === "unknown") {
+      console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);
+    } else {
+      console.log(`[session-end] handoff check: ${check.status === "ok" ? `handoff committed (${check.handoffs.join(", ")})` : "no loop/* commits this session"}`);
+    }
+  }
+} catch (err) {
+  console.log(`[session-end] handoff check NOT RUN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
+}
 
 try {
   if (!existsSync(V2_DB)) {
