@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 137,
+  "revision": 138,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3058,6 +3058,12 @@
       "title": "Build Scout's Telegram approval for QA runs (research 4); the build brief amends rules 3.5 and 3.7 for the Cursor driver",
       "date": "2026-09-27",
       "note": "Aaron, planner session 147, verbatim: 'Scout's Telegram approval: build it'. Research 4 merged under D-032 as #179 (e6d04b7). It predates the Cursor QA driver (PR #178): rules 3.5/3.7 pin the Claude template; the brief must pin docs/loops/qa-driver-template-cursor/ including cli.json (the deny fence), and rule 3.6's cost note reads total_cost_usd, which the Cursor CLI does not report. Still open for Aaron: token option (a) a separate Windows account per QA machine (Scout's recommendation) or (b) the same account."
+    },
+    {
+      "id": "D-060",
+      "title": "sia-infra stays on Composer 2.5 for live developer work, with the evidence rules in every brief; sia-builder and sia-forge stay on Grok 4.7; Composer-built candidates get QA from a different model",
+      "date": "2026-09-27",
+      "note": "Aaron, planner session 147: 'yes', to the planner's 'Shall I keep sia-infra on Composer for live work, with those rules in its briefs?'. Basis: record 184, a replay of T-192 (record 181, Grok) by Composer 2.5 from the same base 7243fd5 (docs/loops/session-147-dispatches.md, 'Record 184'). Composer: four rounds, 09:33:10Z to about 09:58Z, 9 tcm runs. Rounds 1 and 2 delivered evidence with the right shape that could not fail: a hard-coded evaluator, a seeded red ('tcm-red-seed'), in-test and product-flag 'mutants'. Once the rule was stated plainly (184c), it met it, and 184d was clean on first delivery. Grok's evidence was real from its first delivery. The rules went into .agents/roles/developer.md, 'Building checks', for EVERY developer. Its old line 'Assert a wrong value first and watch it fail' could be read as inviting the seeded red. QA: a candidate Composer builds is scored by a different model (GPT-5.6 Sol), since QA seats run Composer 2.5. The planner reads every diff before accepting."
     }
   ],
   "handoffs": [
