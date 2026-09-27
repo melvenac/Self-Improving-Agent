@@ -127,6 +127,68 @@ describe("T-171: a note is never replaced silently", () => {
     expect(changes(r)).toEqual(["T-009 note REPLACED: 5 chars -> 17 chars; no text removed"]);
   });
 
+  // T171-D1 (QA 144 C2h): a replace that removes nothing still holds the prior authors' text.
+  it("T171-D1: a flagged replace that removes nothing keeps the prior authors and adds the writer", () => {
+    seed(root, "T-009", "keep me", [OTHER]);
+    const next = "keep me, and more";
+    const r = write(root, [{ op: "update_task", id: "T-009", replace_note: next, replace_other_sessions: true }]);
+    expect(r.ok).toBe(true);
+    expect(note(root, "T-009")).toBe(next);
+    expect(changes(r)[0]).toContain("no text removed");
+    expect(noteBy(root, "T-009")).toEqual([OTHER, ME]);
+    // The prior author's text is still in the note, so the next unflagged replace is refused.
+    const again = write(root, [{ op: "update_task", id: "T-009", replace_note: "only mine" }]);
+    expect(again.ok).toBe(false);
+    expect(again.error).toMatch(/other-uuid-b/);
+    expect(note(root, "T-009")).toBe(next);
+  });
+
+  it("T171-D1: a flagged superset of an unrecorded note stays unrecorded", () => {
+    seed(root, "T-009", "keep me", null);
+    const next = "keep me, and more";
+    const r = write(root, [{ op: "update_task", id: "T-009", replace_note: next, replace_other_sessions: true }]);
+    expect(r.ok).toBe(true);
+    expect(noteBy(root, "T-009")).toBeNull();
+    const again = write(root, [{ op: "update_task", id: "T-009", replace_note: "only mine" }]);
+    expect(again.ok).toBe(false);
+    expect(again.error).toMatch(/unrecorded session/);
+    expect(note(root, "T-009")).toBe(next);
+  });
+
+  // T171-D2: do not name a line the new note still contains as text that was removed.
+  it("T171-D2: the REPLACED line quotes text that was removed, not a line the new note still has", () => {
+    seed(root, "T-009", "kept line\ngone forever", [ME]);
+    const r = write(root, [{ op: "update_task", id: "T-009", replace_note: "kept line" }]);
+    expect(r.ok).toBe(true);
+    const line = changes(r)[0];
+    expect(line).toContain("note REPLACED:");
+    expect(line).not.toContain('removed text begins: "kept line"');
+    expect(line).toMatch(/removed text begins: "gone forever"|old text began:/);
+  });
+
+  // T171-D3: the three rows that kill QA 144's surviving mutants.
+  it("T171-D3: a longer replacement that drops the old text still names the removed text", () => {
+    const old = "decision: ship A";
+    const longer = "decision: ship B, and also the migration notes from the review";
+    expect(longer.length).toBeGreaterThan(old.length);
+    expect(longer.includes(old)).toBe(false);
+    seed(root, "T-009", old, [ME]);
+    const r = write(root, [{ op: "update_task", id: "T-009", replace_note: longer }]);
+    expect(r.ok).toBe(true);
+    expect(changes(r)[0]).toContain(`removed text begins: "${old}"`);
+    expect(changes(r)[0]).not.toContain("no text removed");
+  });
+
+  it("T171-D3: a superset replace of another session's note is refused without the flag", () => {
+    seed(root, "T-009", "keep me", [OTHER]);
+    const r = write(root, [{ op: "update_task", id: "T-009", replace_note: "keep me, plus" }]);
+    expect(r.ok).toBe(false);
+    expect(r.error).toMatch(/session other-uuid-b/);
+    expect(r.error).toMatch(/replace_other_sessions: true/);
+    expect(note(root, "T-009")).toBe("keep me");
+    expect(noteBy(root, "T-009")).toEqual([OTHER]);
+  });
+
   it("append_note and replace_note together are refused", () => {
     seed(root, "T-009", LONG, [ME]);
     const r = write(root, [{ op: "update_task", id: "T-009", append_note: "a", replace_note: "b" }]);

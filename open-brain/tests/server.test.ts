@@ -321,6 +321,18 @@ describe("server handlers", () => {
       expect(real).toContain(`NOTE CHANGE: T-005 note APPENDED: +${" — and more".length} chars`);
     });
 
+    /** T171-D3: the dry run of a replace is the door the agent reads. QA 144's dry-run-hides-replace drops this line. */
+    it("ob_state dry run of replace_note prints the REPLACED line", async () => {
+      proseProject(tmp);
+      cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+      await handleSetSession({ session_id: "t171-uuid", project_dir: tmp });
+      const ops = [{ op: "update_task", id: "T-008", replace_note: "first words" }];
+      const dry = getText(await handleState({ project_root: tmp, session: 55, expected_revision: 7, ops, dry_run: true }));
+      expect(dry).toContain("ob_state dry run — nothing written");
+      expect(dry).toContain("NOTE CHANGE: T-008 note REPLACED:");
+      expect(readFileSync(join(tmp, ".agents", "state.json"), "utf-8")).toBe(readFileSync(stateFixture, "utf-8"));
+    });
+
     /** Loop 2 R1: .agents/ without SESSIONS/ no longer errors; the block says why there is no log. */
     it("says why no session log was created when SESSIONS/ is missing", async () => {
       writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "2.0.0" }));
