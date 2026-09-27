@@ -227,8 +227,9 @@ dev agents? Worth testing?", then "write the replay brief, composer is set in in
   row, before `ci.yml` changes, and it fails on that row); green `36310898399`; mutant
   `loop/t192-replay-composer-mut-paths` `23a69b5`, a one-line `ci.yml` change on its own branch, fails
   (`36310917190`).
-- **Replay totals, Composer 2.5:** four rounds, 09:33:10Z to about 09:58Z. **12 tcm runs (1, 3, 3, 3 by round) plus
-  the 2 run by hand from round 184c's branches**, all ids above. Two of those rounds existed only because the evidence
+- **Replay totals, Composer 2.5:** four rounds, 09:33:10Z to about 09:58Z. **9 tcm runs (0, 3, 3, 3 by round):
+  `36310020528`, `36310124469`, `36310226139`, `36310482876`, `36310577168`, `36310587246`, `36310806864`,
+  `36310898399`, `36310917190`.** Two of those rounds existed only because the evidence
   was not real (R184-1/2 in round 1, the seeded red and the product-flag mutant in round 2). **Once the rule was stated
   plainly, the next round met it first time.**
 - **Reading:** Composer is much faster and correctable, and it defaults to evidence with the right SHAPE unless the
@@ -237,3 +238,7 @@ dev agents? Worth testing?", then "write the replay brief, composer is set in in
   on its own branch; no assertion or option that exists only for a test.
 - **QA on Composer's candidate is not run:** the question was answered by reading, and `a38ff92` (Grok) is the
   candidate that merges, through QA 183.
+
+5. **(Added.) A run count asserted, not counted:** "12 tcm runs (1, 3, 3, 3) plus 2 run by hand" was pushed in
+   `b58fd1b`. Round 1 had no tcm runs and there were no hand-run extras: the ids sum to 9. Corrected from the list of
+   run ids. Rule 14, a third time today in one file.
