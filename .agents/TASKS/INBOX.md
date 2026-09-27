@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 132 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 133 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -35,7 +35,6 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-050** v0.15.1 made a foreign `.recalled-entries.json` writer unreachable *and* uncountable
 - [ ] **T-051** Add a `/sync` validator for the `.agents/skills/` frontmatter contract, asserting all three identity sources agree
 - [ ] **T-055** GitNexus's incremental analyze is unreliable on this repo
-- [ ] **T-056** `ob_store` derives the vault folder from a canonicalized path, so it lowercases the project name
 - [ ] **T-061** Collect shadow-recall sessions
 - [ ] **T-065** Port `cli.ts` off the v1 database, then repoint `paths.knowledgeDb`
 - [ ] **T-067** Close the remaining 153 open checkboxes across session logs
@@ -88,4 +87,4 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 
 ## Done (last 3 sessions)
 
-_None retained._
+- [x] **T-056** `ob_store` derives the vault folder from a canonicalized path, so it lowercases the project name (session 109) — Session 109: already fixed in v0.14.2 (96c8d5e, 'derive vault folder names from the raw path'; server.ts uses projectDisplayName(project_dir)). Both named rows, #235 and #365, now point at Experiences/Self-Improving-Agent/ (read in knowledge_index). The three lowercase-path rows are filenames, not folders.
