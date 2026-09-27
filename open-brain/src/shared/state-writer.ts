@@ -389,7 +389,7 @@ interface OpContext {
 function appendedBy(prev: string[] | null, prevNote: string, uuid: string | null): string[] | null {
   if (uuid === null) return null;
   if (prevNote === "") return [uuid];
-  if (prev === null) return null;
+  if (prev === null) return [uuid];
   return prev.includes(uuid) ? prev : [...prev, uuid];
 }
 
