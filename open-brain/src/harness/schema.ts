@@ -212,13 +212,6 @@ export const EvidenceSchema = z
         });
       }
       seen.add(a.id);
-      if (a.status === "met" && a.order === undefined) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["acceptance", i, "order"],
-          message: "order is required on a met row (shown | attributed)",
-        });
-      }
       if (
         (a.status === "unmet" || a.status === "not_evaluated" || a.status === "pending") &&
         a.order !== undefined
