@@ -429,14 +429,12 @@ export function checkTemplatePersonalNames(projectRoot: string): CheckResult {
       name: "template-personal-names",
       severity: "issue",
       message: `${hitNote}${unreadNote}${scope}`,
-      report: true,
     };
   }
   return {
     name: "template-personal-names",
     severity: "pass",
     message: `No personal names in project-template/ — ${scope}`,
-    report: true,
   };
 }
 
@@ -1162,7 +1160,6 @@ export function checkRetirements(projectRoot: string): CheckResult {
       name,
       severity: "issue",
       message: `retired names still referenced outside the record: ${parts}${unreadMore}.${scanNote}`,
-      report: true,
     };
   }
 
@@ -1471,7 +1468,7 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
       name,
       severity: "issue",
       message:
-        `${cross}${unreadNote}Checked ${scale}. ` +
+        `${cross}${unreadNote}` +
         `LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.`,
       report: true,
     };
