@@ -408,7 +408,7 @@ function appendNote(t: Task, add: string, ctx: OpContext): void {
  */
 function replaceNote(t: Task, text: string, overrideOthers: boolean, ctx: OpContext): string | null {
   const old = t.note;
-  const removes = old !== "" && !text.includes(old);
+  const removes = old !== "" && !text.startsWith(old);
   // The schema holds `note_by` to [] exactly when the note is empty, so a
   // non-empty note has named authors or null — and a write with no registered
   // session (uuid null) filters none of them out, so it never owns one.
