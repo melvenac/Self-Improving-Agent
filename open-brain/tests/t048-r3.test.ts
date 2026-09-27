@@ -111,11 +111,18 @@ describe("T-048 round 3", () => {
     db.exec(`CREATE TRIGGER IF NOT EXISTS t048_r3_refuse_recall BEFORE INSERT ON recall_log BEGIN SELECT RAISE(ABORT, 'recall-log-refused'); END;`);
     db.close();
 
-    prove(SESSION);
-    const out = text(await recall({ queries: ["xylophonequartz"] }));
-    expect(out).toContain("t048-r3-hit");
-    expect(out).toContain("NOT LOGGED");
-    expect(out).toContain("recall-log-refused");
-    expect(out).not.toContain("cannot prove its session");
+    try {
+      prove(SESSION);
+      const out = text(await recall({ queries: ["xylophonequartz"] }));
+      expect(out).toContain("t048-r3-hit");
+      expect(out).toContain("NOT LOGGED");
+      expect(out).toContain("recall-log-refused");
+      expect(out).not.toContain("cannot prove its session");
+    } finally {
+      const cleanup = openV2Database(process.env.KNOWLEDGE_V2_DB!);
+      cleanup.exec(`DROP TRIGGER IF EXISTS t048_r3_refuse_recall`);
+      cleanup.prepare(`DELETE FROM knowledge_index WHERE key = ?`).run("t048-r3-hit");
+      cleanup.close();
+    }
   });
 });

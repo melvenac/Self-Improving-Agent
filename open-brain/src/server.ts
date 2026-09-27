@@ -30,11 +30,12 @@ import { countWords, estimateTokens } from "./pipelines/session-start/state-read
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
-import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew } from "./db-v2.js";
+import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
+import { invocationLogSuffix } from "./pipelines/sync/score-line.js";
 import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVaultDir } from "./shared/paths.js";
 import { byPidDir, processStartTime, proveSession, type ProvenSession } from "./shared/process-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
@@ -180,7 +181,7 @@ export async function handleSync(args: {
       lines.push(`\nHealth Score: ${scoreResult.total}/100`);
       for (const cat of scoreResult.categories) {
         const pct = Math.round((cat.score / cat.max) * 100);
-        lines.push(`  ${cat.name}: ${cat.score}/${cat.max} (${pct}%)`);
+        lines.push(`  ${cat.name}: ${cat.score}/${cat.max} (${pct}%)${invocationLogSuffix(cat)}`);
       }
       // /sync --score is the route actually used in practice; without this the
       // trend history silently stopped collecting (no entries Apr–Jul 2026).
@@ -550,11 +551,10 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     // stale server produce identical output. Without this line, `Feedback: N
     // entries rated` reads the same whether the ids came from recall_log or
     // from a file belonging to someone else's session.
-    const originLine =
-      `  Recalled ids: ${recalledIds.length} from ${resolved.origin}` +
-      (resolved.rejected
-        ? `\n  Ignored ${resolved.rejected.path}: ${resolved.rejected.reason}`
-        : ``);
+    // Same lines the session-end hook prints, including the reason a none-origin
+    // resolved nothing. The count alone made "no session id" and "no recall_log
+    // rows" look identical.
+    const originLine = formatRecalledResolution(resolved).join("\n");
 
     const shadowLine = result.shadow.evaluated
       ? `  Shadow recall: ${result.shadow.strategies} strategies over ${result.shadow.queries} queries (best: ${result.shadow.leader})`
@@ -609,7 +609,7 @@ export async function handleScore(args: {
       lines.push(`Health Score: ${scoreResult.total}/100`);
       for (const cat of scoreResult.categories) {
         const pct = Math.round((cat.score / cat.max) * 100);
-        lines.push(`  ${cat.name}: ${cat.score}/${cat.max} (${pct}%)`);
+        lines.push(`  ${cat.name}: ${cat.score}/${cat.max} (${pct}%)${invocationLogSuffix(cat)}`);
       }
 
       // Append to history
@@ -782,20 +782,24 @@ export async function handleSetSession(args: SetSessionArgs): Promise<ToolRespon
 }
 
 // --- ob_recall ---
-server.tool(
-  "ob_recall",
-  "Search across all stored knowledge. Returns ranked results. Passing `project` scopes results to that project's entries plus global ones. Omitting `project` searches every project — the same reach as `global: true` — so pass it when you want scoping.",
-  {
-    queries: z.array(z.string()).min(1).describe("Search queries — batch all questions in one call"),
-    project: z.string().optional().describe("Your current working directory — used to scope results"),
-    global: z.boolean().optional().default(false).describe("If true, search across ALL projects"),
-    tags: z.array(z.string()).optional().describe("Filter by tags"),
-    verbose: z.boolean().optional().default(false).describe("If true, return full content instead of snippets"),
-    limit: z.number().optional().default(5).describe("Results per query (default: 5)"),
-    trigger: z.enum(["start", "checkpoint", "explicit", "unspecified"]).optional().default("unspecified")
-      .describe("How this recall reached the agent: 'start' = session-start injection, 'checkpoint' = checkpoint restoration, 'explicit' = deliberate mid-task fetch. ALWAYS pass one of the first three; an omitted trigger is recorded as 'unspecified' (a countable labeling gap, never assumed to be a deliberate fetch). Recorded for analysis — injection and on-demand fetch are different treatments."),
-  },
-  async ({ queries, project, global: globalSearch, tags, verbose, limit, trigger }) => {
+export async function handleRecall(args: {
+  queries: string[];
+  project?: string;
+  global?: boolean;
+  tags?: string[];
+  verbose?: boolean;
+  limit?: number;
+  trigger?: RecallTrigger;
+}): Promise<ToolResponse> {
+  const {
+    queries,
+    project,
+    global: globalSearch = false,
+    tags,
+    verbose = false,
+    limit = 5,
+    trigger = "unspecified",
+  } = args;
     const v2db = getV2Db();
     const normalizedProject = canonicalizeProjectDir(project);
     const results: string[] = [];
@@ -886,7 +890,10 @@ server.tool(
         if (session.id !== null) {
           try {
             recordRecallEvent(v2db, session.id, query, rows.map((r) => r.id), trigger);
-          } catch { /* non-critical */ }
+          } catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            results.push(`_(NOT LOGGED: recall log write failed — ${message})_`);
+          }
         } else {
           results.push(`_(NOT LOGGED: this server cannot prove its session — ${session.reason})_`);
         }
@@ -914,7 +921,22 @@ server.tool(
     }
 
     return { content: [{ type: "text" as const, text: results.join("\n") + skewWarning() }] };
-  }
+}
+
+server.tool(
+  "ob_recall",
+  "Search across all stored knowledge. Returns ranked results. Passing `project` scopes results to that project's entries plus global ones. Omitting `project` searches every project — the same reach as `global: true` — so pass it when you want scoping.",
+  {
+    queries: z.array(z.string()).min(1).describe("Search queries — batch all questions in one call"),
+    project: z.string().optional().describe("Your current working directory — used to scope results"),
+    global: z.boolean().optional().default(false).describe("If true, search across ALL projects"),
+    tags: z.array(z.string()).optional().describe("Filter by tags"),
+    verbose: z.boolean().optional().default(false).describe("If true, return full content instead of snippets"),
+    limit: z.number().optional().default(5).describe("Results per query (default: 5)"),
+    trigger: z.enum(["start", "checkpoint", "explicit", "unspecified"]).optional().default("unspecified")
+      .describe("How this recall reached the agent: 'start' = session-start injection, 'checkpoint' = checkpoint restoration, 'explicit' = deliberate mid-task fetch. ALWAYS pass one of the first three; an omitted trigger is recorded as 'unspecified' (a countable labeling gap, never assumed to be a deliberate fetch). Recorded for analysis — injection and on-demand fetch are different treatments."),
+  },
+  async (args) => handleRecall(args),
 );
 
 // --- ob_store ---
