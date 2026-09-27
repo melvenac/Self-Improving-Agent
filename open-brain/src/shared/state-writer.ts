@@ -390,7 +390,7 @@ function appendedBy(prev: string[] | null, prevNote: string, uuid: string | null
   if (uuid === null) return null;
   if (prevNote === "") return [uuid];
   if (prev === null) return null;
-  return prev.includes(uuid) ? prev : [...prev, uuid];
+  return prev;
 }
 
 /** Append `add` to task `t`'s note, keying and reporting it. */
