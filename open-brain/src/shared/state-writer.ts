@@ -413,7 +413,7 @@ function replaceNote(t: Task, text: string, overrideOthers: boolean, ctx: OpCont
   // non-empty note has named authors or null — and a write with no registered
   // session (uuid null) filters none of them out, so it never owns one.
   const others = old === "" ? [] : t.note_by === null ? null : t.note_by.filter((u) => u !== ctx.uuid);
-  const foreign = others === null || others.length > 0;
+  const foreign = others !== null && others.length > 0;
   if (foreign && !overrideOthers) {
     const whose = others === null
       ? "an unrecorded session (no per-note author: written before schema v3, imported, or by an unregistered write)"
