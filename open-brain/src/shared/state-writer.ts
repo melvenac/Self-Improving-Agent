@@ -425,7 +425,7 @@ function replaceNote(t: Task, text: string, overrideOthers: boolean, ctx: OpCont
   // One that removes text leaves only this write, or unknown if it has no session.
   t.note_by = text === "" ? [] : removes ? (ctx.uuid === null ? null : [ctx.uuid]) : appendedBy(t.note_by, old, ctx.uuid);
   // Quote a line the new note does not still contain (T171-D2), not the old first line blindly.
-  const quoted = (old.split(/\r?\n/).find((ln) => !text.includes(ln)) ?? old.split(/\r?\n/, 1)[0]).slice(0, 120);
+  const quoted = (old.split(/\r?\n/).find((ln) => !text.startsWith(ln)) ?? old.split(/\r?\n/, 1)[0]).slice(0, 120);
   let line = `${t.id} note REPLACED: ${old.length} chars -> ${text.length} chars; ` +
     (removes ? `removed text begins: "${quoted}"` : "no text removed");
   if (foreign && removes) line += `; text by other session(s) removed: ${others === null ? "unrecorded" : others.join(", ")}`;
