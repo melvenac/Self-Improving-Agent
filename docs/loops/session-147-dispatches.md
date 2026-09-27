@@ -603,3 +603,6 @@ section supersedes it.** First act next session: `ob_set_session`, then write th
 
 **Open:** Telegram approval (D-058) is on HOLD by Aaron. QA seats keep checking candidates out in the shared tree; a
 driver-level guard may be worth a round.
+- **Update 23:28Z: QA 191 LAUNCHED** by Aaron (QA PC pid 12704; queue `start=queue=191` at 23:27:51Z, `head=d8166b6`). All
+  three dev seats had read their turns (Grok 194, infra 37, builder 30) and were working. **This commit is LOCAL and
+  unpushed** (the no-push-during-QA rule). The next planner pushes it once QA 191's log shows `end=queue finished`.
