@@ -1,42 +1,40 @@
-# T-192 replay — Composer 2.5 developer handoff (record 184 / 184b)
+# T-192 replay — Composer 2.5 developer handoff (record 184 / 184b / 184c)
 
 **By:** cursor-infra (Forge seat), record session **184**, 2026-09-27, in `~/Worktrees/sia-infra`.
-**Model:** Composer 2.5. **Base:** `7243fd5`. **Branch:** `loop/t192-replay-composer`.
+**Model:** Composer 2.5. **Candidate branch:** `loop/t192-replay-composer` @ **887ae4c**.
 
-## Round 184b — Atlas findings R184-1..4
+## Round 184c — real red-first on tcm
 
-### R184-1 — evaluate ci.yml expression, not a hard-coded function
+### R184-2 — real rows vs pre-fix product (no manufactured failures)
 
-- Evaluator lives in **tests only**: `readCiTestRunsOnExpr` + `evaluateRunsOnExpression` in
-  `open-brain/tests/pipelines/sync/ci-runs-on.test.ts` (YAML parse + `Function` on the `${{ … }}` string).
-- Four cases read the expression from the tracked `ci.yml`.
-- Mutant: scratch copy with pre-T-192 `runs-on` restored; master-push row expects tcm, gets `ubuntu-latest`.
-
-### R184-2 — red-first on tcm (workflow_dispatch, hosted=false)
+Branch **`loop/t192-replay-composer-red`** @ 4fa4f62: final test files from 887ae4c, product
+`7243fd5` ci.yml + 4aeda0a ci-status behavior (plain failure when inspect inconclusive).
 
 | Run | ID | Result | Why |
 |-----|-----|--------|-----|
-| red-first (before fix) | **36310020528** | failure | tcm; vitest red on intentional `tcm-red-seed` assertion (bcbdd7f) |
-| green (184b fix) | **36310124469** | success | tcm; all 20 T-192 tests pass (2901538) |
-| mutant ci.yml master-push clause | **36310226139** | failure | tcm; master-push row evaluates to ubuntu-latest (7c02c7d) |
+| **real red** | **36310482876** | failure | tcm; master-push evaluates to `ubuntu-latest` (pre-T-192 ci.yml); inconclusive-case row expects named failure, gets plain `failure` |
 
-Runner proof: run 36310020528 step **Egress isolation self-check (tcm)** succeeded.
+### R184-3 — product mutant on own branch
 
-### R184-3 — ci-status names inconclusive cases
+Branch **`loop/t192-replay-composer-mut-silent`** @ fd57197: `checks-state.ts` restores plain
+failure fall-through (4aeda0a logic). `silentFallback` removed from candidate product.
 
-`classifyCiConclusion` + `checkCiStatus` now report:
-- `failure (run view failed; …)`
-- `failure (run view not JSON; …)`
-- `failure (job test absent in run view)`
-- `failure (zero steps on job test; annotations fetch failed)`
-- `failure (zero steps on job test; annotations not JSON)`
-- `failure (zero steps on job test; no never-started annotation prefix)`
+| Run | ID | Result | Why |
+|-----|-----|--------|-----|
+| **mut-silent** | **36310577168** | failure | tcm; inconclusive-case rows expect `failure (…)` detail, product returns plain `failure` |
 
-Mutant: `silentFallback: true` → plain `failure` (test in checks-state.test.ts).
+### Candidate green (184c)
 
-### R184-4 — no runtime evaluator
+| Run | ID | Result | Why |
+|-----|-----|--------|-----|
+| **green** | **36310587246** | success | tcm; `loop/t192-replay-composer` @ 887ae4c, 19 tests pass |
 
-Removed `open-brain/src/pipelines/sync/ci-runs-on.ts`; evaluator is test-only.
+Mutant branches are **not** in the candidate history.
+
+## Prior rounds (184 / 184b)
+
+See git history on `loop/t192-replay-composer`. 184b manufactured red 36310020528 is superseded by
+36310482876 above.
 
 ## Token usage
 
