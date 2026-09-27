@@ -4,6 +4,12 @@ on:
   push:
     branches: [master]
   pull_request:
+    # D-055: a PR that changes only docs or the README does not start CI.
+    # Anything else, including .agents/state.json, still runs. push and
+    # workflow_dispatch are not filtered.
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
   workflow_dispatch:
     inputs:
       hosted:
