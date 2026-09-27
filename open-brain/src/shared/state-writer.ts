@@ -421,7 +421,6 @@ function replaceNote(t: Task, text: string, overrideOthers: boolean, ctx: OpCont
     return `${t.id}'s note holds text written by ${whose}. Replacing it would remove that text (${old.length} chars). Use append_note to add to it, or name the replacement with replace_other_sessions: true`;
   }
   t.note = text;
-  t.note_by = text === "" ? [] : ctx.uuid === null ? null : [ctx.uuid];
   const firstLine = old.split(/\r?\n/, 1)[0].slice(0, 120);
   let line = `${t.id} note REPLACED: ${old.length} chars -> ${text.length} chars; ` +
     (removes ? `removed text begins: "${firstLine}"` : "no text removed");
