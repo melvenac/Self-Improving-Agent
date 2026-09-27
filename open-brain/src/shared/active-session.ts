@@ -29,10 +29,10 @@
 // The IDE is supplied by whoever registered the hook and the MCP server (see
 // setup.mjs), defaulting to "claude" so existing installs keep working.
 //
-// REMAINING LIMITATION: two windows of the SAME IDE on the SAME project still
-// share a slot, and the later session start wins. Explicit session_id always
-// takes precedence over this file, so any agent that can see its own UUID is
-// unaffected regardless.
+// T-003: because two windows of the SAME IDE on the SAME project share a slot
+// (the later session start wins), NOTHING attributes a write from this file any
+// more. It is a hint for /start and a diagnostic record. The session a server
+// writes under is proven per claude PROCESS: see shared/process-session.ts.
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname } from "path";
@@ -231,37 +231,6 @@ export function isStaleSession(
   const age = sessionEntryAgeMs(entry, now);
   if (age === null) return true;
   return age > maxAgeMs;
-}
-
-/**
- * Session id for a write-path operation, when the in-memory registration may
- * be gone.
- *
- * `/mcp reconnect` restarts the MCP server, which loses `_activeSessionId`;
- * every recall after that succeeded visibly while writing no `recall_log` row,
- * so the /end sweep rated from a partial log (Session 52, confirmed by
- * experiment). The slot file exists precisely to carry the uuid across
- * processes, so a fresh slot is adopted — but a stale one is refused, not
- * silently trusted (the 16-day-slot lesson, v0.16.0), and the caller is told
- * which, so "not logged" is never invisible.
- */
-export interface WriteSessionResolution {
-  id: string | null;
-  /** True when the id was adopted from the slot file, not already in memory. */
-  selfRegistered: boolean;
-  /** Why id is null: the slot was missing, or too old to trust. */
-  reason?: "no-slot" | "stale-slot";
-}
-
-export function resolveWriteSession(
-  currentId: string | null,
-  slot: ActiveSessionEntry | null,
-  now: number = Date.now(),
-): WriteSessionResolution {
-  if (currentId) return { id: currentId, selfRegistered: false };
-  if (!slot) return { id: null, selfRegistered: false, reason: "no-slot" };
-  if (isStaleSession(slot, now)) return { id: null, selfRegistered: false, reason: "stale-slot" };
-  return { id: slot.uuid, selfRegistered: true };
 }
 
 type ActiveSessionFile = Record<string, ActiveSessionEntry>;

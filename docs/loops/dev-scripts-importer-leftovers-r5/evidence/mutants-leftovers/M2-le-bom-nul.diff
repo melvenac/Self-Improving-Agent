@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-import/index.ts b/open-brain/src/pipelines/state-import/index.ts
+index d9897bf..4d5608d 100644
+--- a/open-brain/src/pipelines/state-import/index.ts
++++ b/open-brain/src/pipelines/state-import/index.ts
+@@ -129,7 +129,7 @@ export function decodeText(buf: Buffer): DecodedText {
+   if (buf.length >= 4 && buf[0] === 0xff && buf[1] === 0xfe && buf[2] === 0 && buf[3] === 0) {
+     return { text: buf.toString("utf-8"), encoding: "utf32le-bom", undecodable: "starts with a UTF-32LE byte-order mark (FF FE 00 00): the importer reads UTF-8, UTF-16 and Windows-1252, not UTF-32, so its words cannot be read" };
+   }
+-  if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) return withBomCheck(buf.subarray(2).toString("utf16le"), "utf16le-bom");
++  if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) return { text: buf.subarray(2).toString("utf16le"), encoding: "utf16le-bom", undecodable: null };
+   if (buf.length >= 2 && buf[0] === 0xfe && buf[1] === 0xff) {
+     // swap16 throws on an odd length (QA 138, D1), so that shape is filed here:
+     // UTF-16 is two bytes a character, and the mark cannot be right about them.

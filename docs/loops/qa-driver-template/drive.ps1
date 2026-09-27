@@ -12,7 +12,11 @@ $ErrorActionPreference = 'Continue'
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 $out    = Join-Path $env:USERPROFILE 'sia-qa99'
 $tree   = Join-Path $env:USERPROFILE 'Worktrees\sia-qa'
-$claude = Join-Path $env:USERPROFILE '.local\bin\claude.exe'
+# The QA PC keeps claude in .local\bin, and Aaron's desktop in npm's global folder (qa-queue, 2026-09-26). First found wins.
+$claude = @((Join-Path $env:USERPROFILE '.local\bin\claude.exe'),
+            (Join-Path $env:APPDATA 'npm\node_modules\@anthropic-ai\claude-code\bin\claude.exe')) |
+          Where-Object { Test-Path $_ } | Select-Object -First 1
+if (-not $claude) { throw 'claude.exe not found in .local\bin or the npm global folder' }
 $report = Join-Path $tree 'docs\loops\loop-15-slice-3-qa-report-a8.md'
 $stops  = Join-Path $tree 'docs\loops\qa-99\stops.txt'
 $marker = 'QA-99: REPORT COMPLETE'

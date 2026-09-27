@@ -107,8 +107,8 @@ describe("readLastInvocationTs", () => {
     expect(readLastInvocationTs(p)).toBe("2026-07-27 09:00:00");
   });
 
-  it("returns null when no line carries a usable timestamp", () => {
+  it("names a log with no usable timestamp as corrupt, not as a missing file", () => {
     const p = logAt("log.jsonl", [JSON.stringify({ noTs: true }), "garbage"]);
-    expect(readLastInvocationTs(p)).toBeNull();
+    expect(readLastInvocationTs(p)).toBe("corrupt");
   });
 });

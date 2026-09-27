@@ -14,11 +14,13 @@ import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
 import { openV2Database } from "./db-v2.js";
-import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
+import { formatSessionEndLines, sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/session-end/recalled-ids.js";
 import { obsidianVaultDir } from "./shared/paths.js";
 import { resolveHookProjectDir } from "./shared/repo-root.js";
 import { resolveSessionId } from "./shared/active-session.js";
+import { byPidDir, removeProcessSession } from "./shared/process-session.js";
+import { resolvePaths } from "./shared/paths.js";
 import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from "./shared/handoff-guard.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
@@ -48,6 +50,25 @@ try {
   const raw = Buffer.concat(chunks).toString().trim();
   if (raw) hookPayload = JSON.parse(raw);
 } catch { /* stdin unavailable — fall back to the environment below */ }
+
+// T-003: remove THIS session's proof first, before anything slow or anything
+// that can exit early. SessionEnd fires on /clear as well as on exit, so if the
+// next session's SessionStart then fails, the server finds NO proof and refuses
+// rather than writing as this session. Only this session's own id is removed:
+// a proof the next SessionStart already wrote is left alone, whichever hook ran
+// first. CLAUDE_PID is set by the host for hooks (see cli-bootstrap.ts).
+try {
+  const endingId = resolveSessionId(hookPayload)?.uuid;
+  const claudePid = Number(process.env.CLAUDE_PID);
+  if (endingId && Number.isInteger(claudePid) && claudePid > 0) {
+    const r = removeProcessSession(byPidDir(resolvePaths(process.cwd()).activeSession), claudePid, endingId);
+    console.log(`[session-end] session proof for claude process ${claudePid}: ${r}`);
+  } else {
+    console.log(`[session-end] session proof NOT checked: ${endingId ? "CLAUDE_PID is unset" : "the payload carried no session id"}`);
+  }
+} catch (err) {
+  console.log(`[session-end] session proof NOT removed: ${err instanceof Error ? err.message : String(err)}`);
+}
 
 // T179-2: committed loop work with no handoff WARNS, before anything that can
 // exit early (it needs git, not the memory module). It never blocks: /clear
@@ -122,10 +143,7 @@ try {
       dryRun: false,
     });
 
-    const genLabel = result.summary.selfGenerated ? " (self-generated)" : "";
-    console.log(`[session-end] Summary: ${result.summary.written ? "written" : "skipped"}${genLabel}`);
-    console.log(`[session-end] Feedback: ${result.feedback.processed} entries`);
-    console.log(`[session-end] Invocations: ${result.invocations.logged} logged`);
+    for (const line of formatSessionEndLines(result)) console.log(`[session-end] ${line}`);
   } finally {
     db.close();
   }
