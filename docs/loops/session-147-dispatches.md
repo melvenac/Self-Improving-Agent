@@ -384,3 +384,7 @@ match Composer's reported lines. Its first live round under D-060 had real evide
   clean, with nothing unpushed: `…/sia-builder/6a780747…/scratchpad/tip`, `…/sia-infra/f18c4d9e…/scratchpad/tip`,
   `…/sia-planner/9a149231…/scratchpad/wt-iso` and `%TEMP%/sia-r5-probe-e2f`. Removal needs Aaron's word (shared.md).
   QA's second checkout is now `git archive`, never a worktree; seats' scratch probes should follow that too.
+- **185b (`78fd6ce`, harness only) ACCEPTED, re-run by the planner at 11:51:42Z:** mutant exit 1 with
+  `FAIL_EXPECT restore_new_locked_generation_expect no_run_and_failed=False`; candidate exit 0 (2 passed); old+new
+  exit 0 (4 passed, with the old role's reds counted as expected). No log-read IOException in three runs. R185-1 and
+  R185-2 are closed. **The QA relaunch copies `qa-queue.ps1` from `78fd6ce`** (the same script as `f590448`).
