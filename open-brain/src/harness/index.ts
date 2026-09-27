@@ -18,6 +18,7 @@
 export {
   PlanSchema,
   EvidenceSchema,
+  EVIDENCE_LOOP_PATTERN,
   AcceptanceCriterionSchema,
   CheckOutcomeSchema,
   validatePlan,
@@ -32,6 +33,8 @@ export {
   type DeliverableKind,
   type ValidationOutcome,
 } from "./schema.js";
+
+export { parseDeclared, DeclaredParseError, type DeclaredBlock } from "./declared.js";
 
 export {
   git,

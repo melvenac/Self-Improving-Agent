@@ -145,17 +145,47 @@ export const RequirementFindingSchema = z.strictObject({
  * **Missing evidence is a gap, not a pass** (brief §7). A criterion nobody
  * looked at and a criterion that was checked and held must not render
  * identically, which is rule 11 applied to the evidence record itself.
+ *
+ * **`pending` is an acceptance status only.** It means the observation is
+ * unfinished (R10(c)). A requirement that has not been looked at is already
+ * `not_evaluated`. Putting `pending` on requirements would invent a fifth
+ * requirement outcome for a verdict that only knows to treat pending on
+ * acceptance items as undefined, and that verdict is candidate C's.
+ *
+ * **`order` is how a satisfaction was established, not a status** (R10(b)).
+ * - `met`: `order` is required, `shown` or `attributed`. A missing order would
+ *   be read as shown, and that is the widening R10(b) exists to stop.
+ * - `partial`: `order` is optional. A partial observation can still have been
+ *   shown or attributed. `inferred` and any other value are refused.
+ * - `unmet`, `not_evaluated`, `pending`: `order` is refused. Those are not
+ *   satisfactions, and an order on them would say how something was met.
+ *
+ * The required-on-`met` rule is a refinement. JSON Schema cannot say it; the
+ * derived file names it under LIMIT.
  */
 export const AcceptanceFindingSchema = z.strictObject({
   id: z.string().min(1),
-  status: z.enum(["met", "unmet", "partial", "not_evaluated"]),
+  status: z.enum(["met", "unmet", "partial", "not_evaluated", "pending"]),
   evidence: z.string().min(1),
+  order: z.enum(["shown", "attributed"]).optional(),
 });
+
+/**
+ * Runtime loops stay `t001`. A human-seat loop is the number the record uses,
+ * then one or more hyphenated lowercase segments: `15-slice-3`, `15-slice-3-b`.
+ * The form is `[0-9]+(?:-[a-z0-9]+)+`. No slash, backslash, dot or space: the
+ * id is a ledger key, and a value that can climb out of a directory is refused
+ * here even though a human-seat id never becomes a runtime path.
+ */
+export const EVIDENCE_LOOP_PATTERN = /^(?:t\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$/;
 
 /** `E_t` — the evidence report for one loop, written by the QA seat. */
 export const EvidenceSchema = z
   .strictObject({
-    loop: z.string().regex(/^t\d{3,}$/, "loop must look like t001"),
+    loop: z.string().regex(
+      EVIDENCE_LOOP_PATTERN,
+      "loop must be a runtime id (t001) or a human-seat id (15-slice-3)",
+    ),
     candidate_git: z.strictObject({
       sha: z.string().regex(/^[0-9a-f]{40}$/, "candidate sha must be a full 40-character sha"),
       branch: z.string().min(1),
@@ -182,6 +212,23 @@ export const EvidenceSchema = z
         });
       }
       seen.add(a.id);
+      if (a.status === "met" && a.order === undefined) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["acceptance", i, "order"],
+          message: "order is required on a met row (shown | attributed)",
+        });
+      }
+      if (
+        (a.status === "unmet" || a.status === "not_evaluated" || a.status === "pending") &&
+        a.order !== undefined
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["acceptance", i, "order"],
+          message: `order is refused on status "${a.status}"`,
+        });
+      }
     }
   });
 
@@ -297,9 +344,16 @@ export function jsonSchemas(): Record<DeliverableKind, Record<string, unknown>> 
       ...(z.toJSONSchema(EvidenceSchema, { io: "input" }) as Record<string, unknown>),
       title: "E_t — HoH loop evidence",
       description:
-        "The QA evidence report for one HoH loop. LIMIT: runtime_checks are supplied by the " +
-        "runtime from process exit codes, not by the QA role; a role-supplied value that " +
-        "disagrees with the measurement is refused. " +
+        "The QA evidence report for one HoH loop. LIMIT: rules this file cannot express, " +
+        "enforced by validateEvidence (schema.ts) or parseDeclared (declared.ts) — " +
+        "duplicate acceptance ids are refused; order is required on a met row " +
+        "(shown | attributed) and refused on unmet, not_evaluated and pending, and optional " +
+        "on partial; unrunnable and out-of-scope stay separate lists in the criteria file " +
+        "and are not fields of E_t. " +
+        "runtime_checks are supplied by the runtime from process exit codes inside a loop, " +
+        "not by the QA role; a role-supplied value that disagrees with the measurement is refused. " +
+        "A human seat, validating outside a loop, fills build and unit from its own runs and " +
+        "names each run id. " +
         "Derived from open-brain/src/harness/schema.ts; do not edit by hand.",
     },
   };

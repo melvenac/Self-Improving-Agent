@@ -15,12 +15,12 @@
  * boundary cannot widen by omission* — applied to argument parsing.
  */
 
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runLoop, type GateMode } from "./runtime.js";
 import { stubRoles } from "./roles.js";
-import { jsonSchemas, serialiseSchema, type DeliverableKind } from "./schema.js";
+import { jsonSchemas, serialiseSchema, validateEvidence, type DeliverableKind } from "./schema.js";
 import { defaultChecks, type CheckSpec } from "./checks.js";
 import { policyJsonSchemas } from "./policies.js";
 
@@ -28,6 +28,7 @@ const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
 
   harness run --loop <tNNN> [options]
   harness schemas [--write]
+  harness validate evidence <file>
   harness help
 
 run options
@@ -155,6 +156,37 @@ export const schemaFileName = (kind: DeliverableKind): string =>
 export const policySchemaFileName = (kind: "plan" | "done"): string =>
   kind === "plan" ? "policy-plan.schema.json" : "policy-developer-done.schema.json";
 
+/**
+ * Validate an `E_t` file with the runtime's own validator.
+ *
+ * Prints every problem `validateEvidence` returns. This is not a JSON Schema
+ * check: the derived file cannot see the refinements (order on met, duplicate
+ * ids), and a seat that used one would accept a document the runtime refuses.
+ */
+function cmdValidate(argv: readonly string[]): number {
+  if (argv.length !== 2 || argv[0] !== "evidence") {
+    throw new UsageError("usage: harness validate evidence <file>");
+  }
+  const file = resolve(argv[1]!);
+  let text: string;
+  try {
+    text = readFileSync(file, "utf-8");
+  } catch (err) {
+    throw new UsageError(`cannot read ${file}: ${(err as Error).message}`);
+  }
+  let json: unknown;
+  try {
+    json = JSON.parse(text);
+  } catch (err) {
+    process.stdout.write(`(root): not JSON: ${(err as Error).message}\n`);
+    return 1;
+  }
+  const result = validateEvidence(json);
+  if (result.ok) return 0;
+  for (const problem of result.problems) process.stdout.write(`${problem}\n`);
+  return 1;
+}
+
 function cmdSchemas(argv: readonly string[]): number {
   let write = false;
   for (const arg of argv) {
@@ -235,6 +267,7 @@ export async function main(argv: readonly string[]): Promise<number> {
     }
     if (sub === "run") return await cmdRun(rest);
     if (sub === "schemas") return cmdSchemas(rest);
+    if (sub === "validate") return cmdValidate(rest);
     throw new UsageError(`unknown subcommand "${sub}"`);
   } catch (err) {
     if (err instanceof UsageError) {
