@@ -231,9 +231,6 @@ export function decideShadowVerdict(input: {
       throw new Error(`decide --merged refuses ${input.mergeCommitSha ?? "(none)"}: it is not reachable from origin/master`);
     }
   }
-  if (input.action === "replaced" && (input.replacedSha === undefined || !/^[0-9a-f]{40}$/.test(input.replacedSha))) {
-    throw new Error(`decide --replaced refuses ${input.replacedSha ?? "(none)"}: a replacement sha must be 40 hex characters`);
-  }
   const shadow = verdict.verdict;
   let disagreed: boolean | null;
   if (shadow === "undefined") disagreed = null;
@@ -248,7 +245,7 @@ export function decideShadowVerdict(input: {
     shadow_verdict: shadow,
     aaron_action: input.action,
     merge_commit_sha: input.action === "merged" ? input.mergeCommitSha : null,
-    replaced_sha: input.action === "replaced" ? input.replacedSha : null,
+    replaced_sha: input.action === "replaced" ? input.replacedSha ?? null : null,
     disagreed,
     written_at: writtenAt,
     decided_at: decidedAt,
