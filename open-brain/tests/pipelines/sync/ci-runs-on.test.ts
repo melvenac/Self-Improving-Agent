@@ -242,6 +242,13 @@ describe("ci.yml runs-on (T-192)", () => {
     expect(testJobRuns({ event: "push", ref: "refs/heads/qa/y", hosted: null }, ["open-brain/src/cli.ts"])).toBe(true);
   });
 
+  it("a seat push of a code path outside the prefix list plus a docs file still runs (T-178)", () => {
+    expect(
+      testJobRuns({ event: "push", ref: "refs/heads/loop/x", hosted: null }, ["LICENSE", "docs/a.md"]),
+      "a code file outside the prefix list was skipped because a docs file was in the same push",
+    ).toBe(true);
+  });
+
   it("cancel-in-progress evaluates to false for a push to refs/heads/master (T-178)", () => {
     const cancel = String(workflow().concurrency?.["cancel-in-progress"] ?? "");
     expect(truthy(evalRunsOn(cancel, { event: "push", ref: "refs/heads/master", hosted: null }))).toBe(false);
