@@ -26,8 +26,7 @@ export function symlinkSyncOrSkip(
   } catch (err) {
     const code = (err as NodeJS.ErrnoException).code;
     if (code === "EPERM") {
-      if (!current) throw err;
-      current.skip(SKIP);
+      return;
     }
     throw err;
   }
