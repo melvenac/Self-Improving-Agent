@@ -2,11 +2,7 @@
   "permissions": {
     "allow": [],
     "deny": [
-      "Shell(git:push*)",
-      "Shell(git:*push*)",
       "Shell(git.exe:*push*)",
-      "Shell(git push)",
-      "Shell(git push *)",
       "Shell(cmd:*git push*)",
       "Shell(cmd:*git* push*)",
       "Shell(powershell:*git push*)",
