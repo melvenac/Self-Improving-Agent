@@ -1,47 +1,48 @@
-<!-- generated from .agents/state.json rev 146 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 147 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 147)_
+## planner [sia-planner] _(written session 148)_
 
 ### Pick up here
 
-Read docs/loops/session-147-dispatches.md first (on origin/docs/session-100-qa99-dispatch; newest sections at the end). All three dev rounds are DELIVERED and ruled: record 185 (qa-queue restore + 185b fail-closed harness) ACCEPTED at a planner boundary check, PR #188; record 186 (T-193 worktree-layout check) ACCEPTED, PR #186; record 187 (candidate B part 2, 8c7769f) evidence checked, PR #187, goes to QA 189. MORNING, all Aaron's: (1) merge #186 and #188; (2) QA relaunch: copy qa-queue.ps1 from 78fd6ce to both QA machines, clean both QA trees (laptop stuck at fc8d8cd; QA PC at daec2b8, dirty), launch laptop 189,161,178 and QA PC 182,183 at a commit carrying qa-189 (80f3383 or later); dry-run every line on its target first; (3) his word to remove the four stray scratch worktrees T-193 found (listed in the record 186 section). Candidate A merged (677c1dd); master green on tcm.
+Read docs/loops/session-147-dispatches.md from 'Planner session 11' to the end (origin/docs/session-100-qa99-dispatch). Slice three is OPEN: candidate C (2035e89) was REJECTED by QA 204 (qa/c-report b16d5b5). Forge is building record 201 r2 against the criteria at 23ebd86 (§9 corrects CC-6's path). Accepted and waiting for Aaron's merge: #196 (record 200), #197 (record 207) and #198 (record 198). QA dispatches for 192 r4 (QA 210) and 205 r3 (QA 211) are pushed at b7f963a, awaiting Aaron's launch line. The QA PC and the laptop are both idle and available.
 
 ### Watch out
 
-- After ANY context-mode or Grok Build update, re-test Cursor CLI (a headless cursor-agent -p 'echo x' in a scratch dir): context-mode 1.0.169's plugin PreToolUse hook fail-closes every Cursor tool (T-046). The fix (PreToolUse stripped from the plugin cache hooks.json) is NOT durable.
-- Cursor seats stop listening when --wait times out after ~1 h; check /a2a/agents/live + /a2a/session/<room>/reads before asking Aaron to nudge, and nudge only for a turn that is unread with no listener.
-- Composer (sia-infra, D-060) defaults to evidence with the right SHAPE that cannot fail; its first live rounds (185, 185b) were real, but read the failed log of every red and mutant anyway.
-- Master's push CI still runs on GitHub-hosted ubuntu (billing-blocked) until T-192 (a38ff92, QA 183 pending) merges; dispatch tcm CI on master by hand after every merge.
-- Derive every time and count in a tracked note from its source (date -u, run ids): three were written as guesses this session.
-- QA 189 must rule the BE-5 question: the B2 fixture gained order 'shown' because a met row without order is now refused. Do not rule it from the planner seat.
+- QA 203's report for record 198 is on the QA PC ONLY (local 120dc44 on qa/qa-probes-report, plus two mutant branches): its push-qa.mjs push was refused by Cursor's permission fence. That is the QA-178 defect record 192 fixes. The planner did not push it for the seat (that would be permission laundering). Aaron decides.
+- Every QA seat still runs the OLD driver template until #194 (record 192) merges: a sanctioned push can be refused, and another seat's mid-run push reads as ref_violations. Hold seat pushes during QA runs, or trace them by SHA.
+- D-061: developers NEVER run CI. QA dispatches it. Seats echo old briefs ('tcm at most 6'); correct them on sight.
+- Composer (sia-infra) ends its turn on a bare acknowledgement. Say 'do it in this turn; no acknowledgement'. Its hub --wait runs in the foreground of its chat, so a new turn wakes it without Aaron.
+- Every QA dispatch requires an E_t.json beside the report, validated (C criteria §8 P1). QA 204, 208, 209 and 202 produced one.
+- Candidate C's merge is the gate's first live episode (§8 P4): run shadow-verdict prepare before Aaron merges it, and decide after.
 
 ### Open questions
 
-- Aaron: Telegram approval for QA (D-058) is on HOLD by his choice; do not dispatch it until he decides.
+- Aaron: push QA 203's stranded report from the QA PC (his hand), or wait until #194 lets a QA seat push it?
+- Aaron: Telegram approval for QA (D-058) is on HOLD by his choice.
 
 ### Loop state
 
 **Open PRs:** 
-- #186 loop/t193-worktree-check (683b61c) — QA: accepted — T-193; planner-accepted; Aaron merges; then close T-193 and T-149
-- #187 loop/15-slice-3-candidate-b2 (8c7769f) — QA: not_started — candidate B part 2; QA 189 launches in the morning
-- #188 loop/qa-queue-restore (78fd6ce) — QA: accepted — record 185/185b; planner boundary check (no QA seat overnight); Aaron merges
+- #194 loop/qa-driver-cursor-r2 (0f816bb) — QA: in_progress — record 192 r4 (harness only); QA 210 awaits launch
+- #195 loop/15-slice-3-candidate-c (7099b20) — QA: rejected — candidate C; QA 204 REJECT; Forge building r2
+- #196 loop/t176-index-direction (8d3143c) — QA: accepted — record 200; Aaron merges
+- #197 loop/t046-d1 (a8adca0) — QA: accepted — record 207; Aaron merges
+- #198 loop/qa-probes-on-master (c025800) — QA: accepted — record 198; Aaron merges
 
-**SHA frozen for QA:** `8c7769f (candidate B part 2, for QA 189)`
+**SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- Merge #186 and #188
-- Launch the QA relaunch lines (planner dry-runs them first)
-- Remove the four stray scratch worktrees?
-- Telegram approval (D-058): on hold until he decides
+- Merge #196, #197, #198
+- Launch QA 210+211 (one line; dispatches at b7f963a)
+- QA 203's stranded report: push it yourself or wait for #194?
 
 **Rulings made mid-loop:** 
-- session-147-dispatches.md: rulings on QA 162/174/177/172/173 (all merged)
-- D-055, D-060
-- record 184 (Composer replay) result
-- record 185/185b ACCEPTED (planner boundary check)
-- record 186 (T-193) ACCEPTED
+- D-061 developers never run CI
+- C criteria accepted with §8 P1-P4; §9 P5
+- QA 195/202 reject record 192 r2/r3; QA 196/197/203/208/209 ACCEPT records 193/194/198/200/207
+- QA 204 REJECT candidate C
 
 ## developer [legacy] _(written session 74)_
 
@@ -92,8 +93,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_1 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_2 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
-Session 148 — 2026-09-27 — planner [sia-planner] — `db06e512-6040-4764-b9b9-038e61d842ee` (4 writing session(s) in the record)
+Session 148 — 2026-09-28 — planner [sia-planner] — `db06e512-6040-4764-b9b9-038e61d842ee` (4 writing session(s) in the record)

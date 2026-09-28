@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 146,
+  "revision": 147,
   "project": {
     "name": "self-improving-agent"
   },
@@ -622,12 +622,13 @@
       "id": "T-177",
       "title": "Candidate A2 is blocked: the developer seat's responses were stopped twice by a host safety classifier, and slice three cannot close until A2 is built or re-planned",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 81,
-      "closed_session": null,
+      "closed_session": 148,
       "supersedes": null,
-      "note": "Recorded by the planner (record session 81), 2026-09-23, from the developer seat's two reports (Forge, record session 83; relayed to the planner by A2A, not seen first-hand). Dispatched A2 = rulings-6 R24 as amended by rulings-7 R30/R31 (D-A1 closed for a link at the watched path, an ancestor link and a hard link) plus D-A3. While reading harness source to design the repair, one developer response was stopped by a safety classifier; Aaron paused the build in that window. Aaron then restarted it ('A2 build started again', typed in the developer window before D-038 reached that seat), and the next response was stopped the same way; none of its tool calls ran. The seat did not retry and did not work around it. Which content trips it is unknown to both seats. STATE: local branch loop/15-slice-3-candidate-a2 at 4f752ca in ~/Worktrees/sia-forge (918a1c9 + the final criteria 6672e83 merged); no upstream, clean, no source or test change; nothing pushed; read back by the planner. BOUND: under shared.md's permission-laundering rule and D-038's limit, no other seat takes over the same work to get past the stop, and no seat rephrases around it. Only Aaron decides how A2 proceeds. CONSEQUENCE: D-033/D-036 close slice three at A, B and C in that order, and B's Step 0 runs at A2's accepted SHA, so the slice is blocked on this. --- UPDATE, planner (record session 81), 2026-09-23: Opus 4.8 was not selectable for Aaron. Aaron chose ONE ATTEMPT by Grok 4.7 in Cursor on this Windows machine, opened on ~/Worktrees/sia-forge, as the developer seat, RECORD SESSION 84 (Aaron in the planner session: \"We can hand it off to Grok 4.7. See if grok will do A2s work.\" and \"yes\" to Cursor on this PC). The Claude developer session 83 is closed. Dispatch: docs/loops/loop-15-slice-3-dispatch-a2-grok.md. Transport: A2A-Hub on tcm (native cross-session messaging does not reach Cursor). The same criteria (6672e83) and a fresh Claude QA seat judge the result, so the developer model changes nothing about acceptance. This is also the first real data point for T-165 (an alternate model in the developer seat). If this seat cannot build A2 either, the slice is re-planned; no further model is tried. --- RESULT, planner (record session 81), 2026-09-23: Grok built A2 at 2add792 (65752b4 plus a CI gating fix), with the Windows full suite exit 0 (1107 passed) and CI green. QA (Probe, record session 85) REJECTED it: docs/loops/loop-15-slice-3-qa-report-a2.md at 8cddfc7. The write/delete half of D-A1 is closed in 13 probe shapes; CA-15 fails on the read half (A2-1, A2-5), the record (A2-3, A2-4) and a silent pass (A2-2); CA-2.5 and CA-4c are not met because the planner's dispatch omitted D-A2 and D-A4. Rulings-9 scopes A3 (R43-R48), a new commit on 2add792. Because A3 is the same link-handling subject that drew the refusals, the planner recommends a fresh Grok session (record session 86) with docs/loops/loop-15-slice-3-a3-grok-brief.md; the builder is Aaron's to confirm. The first Grok session reached about 80% of its context and was not given A3. The hub-transport cost of a Cursor seat (no wake, needs Aaron to nudge it) is T-160. --- A3 RESULT, planner (record session 81), 2026-09-23: Grok (session 86) built A3 at 5010199: eight commits on 2add792, one per rulings-9 item; CI green with per-test lines. QA (session 87) REJECTED it: docs/loops/loop-15-slice-3-qa-report-a3.md at 9c8176f. Every A2 defect and D-A2/D-A4 are fixed, and 26 mutants are killed; CA-15 clause 3's read half fails on three shapes QA added (A3-1 absent-at-base hard link, A3-2 a link beyond a base dotfiles link, A3-3 a base hard link giving a false record). The planner's error: R43/R44 were instance rulings. Rulings-10 R49 states the principle (read only if the whole resolution is unchanged since base). A4 = R49-R52 on 5010199, to a fresh Grok session (record session 88) with docs/loops/loop-15-slice-3-a4-grok-brief.md; QA is 89. --- A4, planner (record session 81), 2026-09-23: Grok (session 88) built A4 and froze it at f9a1aa8, six commits on 5010199: R49 9788d32, R50 27c0e63, R51 403296d, R52 544cf15, R54 2db806a (after its first suite failed CA-4f on the planner's R44 wording; rulings-11), and the handoff f9a1aa8. Both of its full suites had every test passing at 2db806a, with exit 1 on the G-042 heartbeat only. QA 89 has NOT started. Its dispatch is the tracked file docs/loops/loop-15-slice-3-dispatch-qa-a4.md, because every seat rolls with a VS Code restart.",
-      "closed_rev": null
+      "note": "Recorded by the planner (record session 81), 2026-09-23, from the developer seat's two reports (Forge, record session 83; relayed to the planner by A2A, not seen first-hand). Dispatched A2 = rulings-6 R24 as amended by rulings-7 R30/R31 (D-A1 closed for a link at the watched path, an ancestor link and a hard link) plus D-A3. While reading harness source to design the repair, one developer response was stopped by a safety classifier; Aaron paused the build in that window. Aaron then restarted it ('A2 build started again', typed in the developer window before D-038 reached that seat), and the next response was stopped the same way; none of its tool calls ran. The seat did not retry and did not work around it. Which content trips it is unknown to both seats. STATE: local branch loop/15-slice-3-candidate-a2 at 4f752ca in ~/Worktrees/sia-forge (918a1c9 + the final criteria 6672e83 merged); no upstream, clean, no source or test change; nothing pushed; read back by the planner. BOUND: under shared.md's permission-laundering rule and D-038's limit, no other seat takes over the same work to get past the stop, and no seat rephrases around it. Only Aaron decides how A2 proceeds. CONSEQUENCE: D-033/D-036 close slice three at A, B and C in that order, and B's Step 0 runs at A2's accepted SHA, so the slice is blocked on this. --- UPDATE, planner (record session 81), 2026-09-23: Opus 4.8 was not selectable for Aaron. Aaron chose ONE ATTEMPT by Grok 4.7 in Cursor on this Windows machine, opened on ~/Worktrees/sia-forge, as the developer seat, RECORD SESSION 84 (Aaron in the planner session: \"We can hand it off to Grok 4.7. See if grok will do A2s work.\" and \"yes\" to Cursor on this PC). The Claude developer session 83 is closed. Dispatch: docs/loops/loop-15-slice-3-dispatch-a2-grok.md. Transport: A2A-Hub on tcm (native cross-session messaging does not reach Cursor). The same criteria (6672e83) and a fresh Claude QA seat judge the result, so the developer model changes nothing about acceptance. This is also the first real data point for T-165 (an alternate model in the developer seat). If this seat cannot build A2 either, the slice is re-planned; no further model is tried. --- RESULT, planner (record session 81), 2026-09-23: Grok built A2 at 2add792 (65752b4 plus a CI gating fix), with the Windows full suite exit 0 (1107 passed) and CI green. QA (Probe, record session 85) REJECTED it: docs/loops/loop-15-slice-3-qa-report-a2.md at 8cddfc7. The write/delete half of D-A1 is closed in 13 probe shapes; CA-15 fails on the read half (A2-1, A2-5), the record (A2-3, A2-4) and a silent pass (A2-2); CA-2.5 and CA-4c are not met because the planner's dispatch omitted D-A2 and D-A4. Rulings-9 scopes A3 (R43-R48), a new commit on 2add792. Because A3 is the same link-handling subject that drew the refusals, the planner recommends a fresh Grok session (record session 86) with docs/loops/loop-15-slice-3-a3-grok-brief.md; the builder is Aaron's to confirm. The first Grok session reached about 80% of its context and was not given A3. The hub-transport cost of a Cursor seat (no wake, needs Aaron to nudge it) is T-160. --- A3 RESULT, planner (record session 81), 2026-09-23: Grok (session 86) built A3 at 5010199: eight commits on 2add792, one per rulings-9 item; CI green with per-test lines. QA (session 87) REJECTED it: docs/loops/loop-15-slice-3-qa-report-a3.md at 9c8176f. Every A2 defect and D-A2/D-A4 are fixed, and 26 mutants are killed; CA-15 clause 3's read half fails on three shapes QA added (A3-1 absent-at-base hard link, A3-2 a link beyond a base dotfiles link, A3-3 a base hard link giving a false record). The planner's error: R43/R44 were instance rulings. Rulings-10 R49 states the principle (read only if the whole resolution is unchanged since base). A4 = R49-R52 on 5010199, to a fresh Grok session (record session 88) with docs/loops/loop-15-slice-3-a4-grok-brief.md; QA is 89. --- A4, planner (record session 81), 2026-09-23: Grok (session 88) built A4 and froze it at f9a1aa8, six commits on 5010199: R49 9788d32, R50 27c0e63, R51 403296d, R52 544cf15, R54 2db806a (after its first suite failed CA-4f on the planner's R44 wording; rulings-11), and the handoff f9a1aa8. Both of its full suites had every test passing at 2db806a, with exit 1 on the G-042 heartbeat only. QA 89 has NOT started. Its dispatch is the tracked file docs/loops/loop-15-slice-3-dispatch-qa-a4.md, because every seat rolls with a VS Code restart. — Closed session 148: the blocker is gone. A was rebuilt (A4 through A13) and A13 merged as #182 (677c1dd), so candidate A is ACCEPTED and MERGED per the objective. A2's classifier stop no longer gates slice three.",
+      "note_by": null,
+      "closed_rev": 147
     },
     {
       "id": "T-178",
@@ -3230,6 +3231,67 @@
       "session_uuid": "4ed2836c-1dd1-43e5-8a06-c829d50548f3",
       "checkout": "sia-planner",
       "first_rev": 136
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Read docs/loops/session-147-dispatches.md from 'Planner session 11' to the end (origin/docs/session-100-qa99-dispatch). Slice three is OPEN: candidate C (2035e89) was REJECTED by QA 204 (qa/c-report b16d5b5). Forge is building record 201 r2 against the criteria at 23ebd86 (§9 corrects CC-6's path). Accepted and waiting for Aaron's merge: #196 (record 200), #197 (record 207) and #198 (record 198). QA dispatches for 192 r4 (QA 210) and 205 r3 (QA 211) are pushed at b7f963a, awaiting Aaron's launch line. The QA PC and the laptop are both idle and available.",
+      "watch_out": [
+        "QA 203's report for record 198 is on the QA PC ONLY (local 120dc44 on qa/qa-probes-report, plus two mutant branches): its push-qa.mjs push was refused by Cursor's permission fence. That is the QA-178 defect record 192 fixes. The planner did not push it for the seat (that would be permission laundering). Aaron decides.",
+        "Every QA seat still runs the OLD driver template until #194 (record 192) merges: a sanctioned push can be refused, and another seat's mid-run push reads as ref_violations. Hold seat pushes during QA runs, or trace them by SHA.",
+        "D-061: developers NEVER run CI. QA dispatches it. Seats echo old briefs ('tcm at most 6'); correct them on sight.",
+        "Composer (sia-infra) ends its turn on a bare acknowledgement. Say 'do it in this turn; no acknowledgement'. Its hub --wait runs in the foreground of its chat, so a new turn wakes it without Aaron.",
+        "Every QA dispatch requires an E_t.json beside the report, validated (C criteria §8 P1). QA 204, 208, 209 and 202 produced one.",
+        "Candidate C's merge is the gate's first live episode (§8 P4): run shadow-verdict prepare before Aaron merges it, and decide after."
+      ],
+      "open_questions": [
+        "Aaron: push QA 203's stranded report from the QA PC (his hand), or wait until #194 lets a QA seat push it?",
+        "Aaron: Telegram approval for QA (D-058) is on HOLD by his choice."
+      ],
+      "session": 148,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#194 loop/qa-driver-cursor-r2 (0f816bb)",
+            "qa_status": "in_progress",
+            "note": "record 192 r4 (harness only); QA 210 awaits launch"
+          },
+          {
+            "ref": "#195 loop/15-slice-3-candidate-c (7099b20)",
+            "qa_status": "rejected",
+            "note": "candidate C; QA 204 REJECT; Forge building r2"
+          },
+          {
+            "ref": "#196 loop/t176-index-direction (8d3143c)",
+            "qa_status": "accepted",
+            "note": "record 200; Aaron merges"
+          },
+          {
+            "ref": "#197 loop/t046-d1 (a8adca0)",
+            "qa_status": "accepted",
+            "note": "record 207; Aaron merges"
+          },
+          {
+            "ref": "#198 loop/qa-probes-on-master (c025800)",
+            "qa_status": "accepted",
+            "note": "record 198; Aaron merges"
+          }
+        ],
+        "frozen_sha": null,
+        "questions_for_aaron": [
+          "Merge #196, #197, #198",
+          "Launch QA 210+211 (one line; dispatches at b7f963a)",
+          "QA 203's stranded report: push it yourself or wait for #194?"
+        ],
+        "rulings": [
+          "D-061 developers never run CI",
+          "C criteria accepted with §8 P1-P4; §9 P5",
+          "QA 195/202 reject record 192 r2/r3; QA 196/197/203/208/209 ACCEPT records 193/194/198/200/207",
+          "QA 204 REJECT candidate C"
+        ]
+      },
+      "session_uuid": "db06e512-6040-4764-b9b9-038e61d842ee",
+      "checkout": "sia-planner",
+      "first_rev": 145
     }
   ],
   "sessions": [
@@ -3259,7 +3321,7 @@
     },
     {
       "n": 148,
-      "date": "2026-09-27",
+      "date": "2026-09-28",
       "uuid": "db06e512-6040-4764-b9b9-038e61d842ee",
       "seat": "planner",
       "checkout": "sia-planner",
