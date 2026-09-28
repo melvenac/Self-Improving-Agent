@@ -261,6 +261,7 @@ export function summariseLedger(text: string): {
   for (const row of rows) {
     if (row.shadow_verdict === "undefined") {
       undefinedCount += 1;
+      evaluated += 1;
       continue;
     }
     evaluated += 1;
