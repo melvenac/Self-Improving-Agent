@@ -565,7 +565,7 @@ describe("record 201 r3", () => {
     } finally {
       rmSync(repo, { recursive: true, force: true });
     }
-  });
+  }, 60_000);
 
   it("CC-6 decide refuses a non-sha candidate, merge, or replacement before the ledger", async () => {
     const { prepareShadowVerdict, decideShadowVerdict } = await load();

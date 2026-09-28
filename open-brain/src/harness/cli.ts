@@ -23,7 +23,7 @@ import { stubRoles } from "./roles.js";
 import { jsonSchemas, serialiseSchema, validateEvidence, type DeliverableKind } from "./schema.js";
 import { defaultChecks, type CheckSpec } from "./checks.js";
 import { policyJsonSchemas } from "./policies.js";
-import { decideShadowVerdict, ledgerPath, prepareShadowVerdict, summariseLedger } from "./shadow-merge.js";
+import { decideShadowVerdict, isLowerHexSha, ledgerPath, prepareShadowVerdict, summariseLedger } from "./shadow-merge.js";
 
 const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
 
@@ -221,6 +221,14 @@ function requiredFlag(flags: Map<string, string | true>, name: string): string {
  * T-155. prepare writes the verdict. decide records Aaron's action. Neither
  * merges, pushes, or touches a remote.
  */
+function requireCliSha(flag: string, value: unknown): string {
+  if (!isLowerHexSha(value)) {
+    const shown = typeof value === "string" && value !== "" ? value : "(none)";
+    throw new UsageError(`--${flag} refuses ${shown}: a sha must be 40 lowercase hex characters`);
+  }
+  return value;
+}
+
 function cmdShadow(argv: readonly string[]): number {
   const [action, ...rest] = argv;
   if (action !== "prepare" && action !== "decide" && action !== "summary") {
@@ -237,13 +245,14 @@ function cmdShadow(argv: readonly string[]): number {
   }
   const repo = typeof flags.get("repo") === "string" ? (flags.get("repo") as string) : process.cwd();
   if (action === "summary") {
+    // Summary reads the ledger and writes nothing. It takes no sha.
     const path = ledgerPath(repo);
     const text = existsSync(path) ? readFileSync(path, "utf8") : "";
     process.stdout.write(`${JSON.stringify(summariseLedger(text), null, 2)}\n`);
     return 0;
   }
   const loop = requiredFlag(flags, "loop");
-  const candidate = requiredFlag(flags, "candidate");
+  const candidate = requireCliSha("candidate", requiredFlag(flags, "candidate"));
   if (action === "prepare") {
     const gate = flags.get("gate");
     if (gate !== undefined && gate !== "live" && gate !== "dry-run" && gate !== "skip") {
@@ -261,7 +270,7 @@ function cmdShadow(argv: readonly string[]): number {
       repo,
       loop,
       candidateSha: candidate,
-      criteriaSha: requiredFlag(flags, "criteria-sha"),
+      criteriaSha: requireCliSha("criteria-sha", requiredFlag(flags, "criteria-sha")),
       criteriaPath: requiredFlag(flags, "criteria"),
       evidence,
       gateMode,
@@ -272,9 +281,9 @@ function cmdShadow(argv: readonly string[]): number {
   const merged = flags.get("merged");
   const replaced = flags.get("replaced");
   const declined = flags.get("declined");
-  if (replaced === true || (typeof replaced === "string" && !/^[0-9a-f]{40}$/.test(replaced))) {
-    throw new UsageError("--replaced requires a 40-character sha");
-  }
+  if (replaced === true) throw new UsageError("--replaced requires a 40-character sha");
+  if (typeof replaced === "string") requireCliSha("replaced", replaced);
+  if (typeof merged === "string") requireCliSha("merged", merged);
   const chosen = [merged, replaced, declined].filter((v) => v !== undefined).length;
   if (chosen !== 1) throw new UsageError("decide takes exactly one of --merged, --declined, --replaced");
   const result = decideShadowVerdict({

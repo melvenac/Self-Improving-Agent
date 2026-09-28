@@ -40,6 +40,18 @@ export interface ShadowVerdictResult {
 const NOTE =
   "Zero disagreements is not evidence the gate can be removed. undefined is excluded from evaluated.";
 
+/** A stored git object name. The gate refuses anything else before it writes. */
+export function isLowerHexSha(value: unknown): value is string {
+  return typeof value === "string" && /^[0-9a-f]{40}$/.test(value);
+}
+
+function requireLowerHexSha(label: string, value: unknown): asserts value is string {
+  if (!isLowerHexSha(value)) {
+    const shown = typeof value === "string" && value !== "" ? value : "(none)";
+    throw new Error(`${label} refuses ${shown}: a sha must be 40 lowercase hex characters`);
+  }
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -164,6 +176,8 @@ export function prepareShadowVerdict(input: {
   doneGate?: { verdict: string } | null | "missing";
   planGate?: { verdict: string } | null | "missing";
 }): { path: string; verdict: ShadowVerdictResult } {
+  requireLowerHexSha("prepare candidate_sha", input.candidateSha);
+  requireLowerHexSha("prepare criteria_sha", input.criteriaSha);
   const path = verdictPath(input.repo, input.loop, input.candidateSha);
   if (existsSync(path)) {
     throw new Error(`${path} already exists. A verdict is written once.`);
@@ -223,16 +237,16 @@ export function decideShadowVerdict(input: {
   mergeCommitSha?: string;
   replacedSha?: string;
 }): { line: Record<string, unknown> } {
+  requireLowerHexSha("decide --candidate", input.candidateSha);
+  if (input.action === "merged") requireLowerHexSha("decide --merged", input.mergeCommitSha);
+  if (input.action === "replaced") requireLowerHexSha("decide --replaced", input.replacedSha);
   const path = verdictPath(input.repo, input.loop, input.candidateSha);
   if (!existsSync(path)) throw new Error(`no verdict at ${path}. prepare comes first.`);
   const verdict = JSON.parse(readFileSync(path, "utf8")) as { verdict: ShadowVerdict; written_at: string };
   if (input.action === "merged") {
-    if (!input.mergeCommitSha || !isAncestor(input.repo, input.mergeCommitSha, "origin/master")) {
-      throw new Error(`decide --merged refuses ${input.mergeCommitSha ?? "(none)"}: it is not reachable from origin/master`);
+    if (!isAncestor(input.repo, input.mergeCommitSha as string, "origin/master")) {
+      throw new Error(`decide --merged refuses ${input.mergeCommitSha}: it is not reachable from origin/master`);
     }
-  }
-  if (input.action === "replaced" && (input.replacedSha === undefined || !/^[0-9a-f]{40}$/.test(input.replacedSha))) {
-    throw new Error(`decide --replaced refuses ${input.replacedSha ?? "(none)"}: a replacement sha must be 40 hex characters`);
   }
   const shadow = verdict.verdict;
   let disagreed: boolean | null;
