@@ -1,0 +1,9 @@
+T192-D1 edge probes (QA 196), candidate ecd378d
+
+dual-first-empty: master deadbee conclusion: never-started — job test recorded 0 steps. LIMIT: read from gh run view jobs[].steps, not the billing annotation; a failure with no steps for another reason is named never-started
+
+dual-first-steps: master deadbee conclusion: failure
+
+steps-null-entry: master deadbee conclusion: failure
+
+steps-string: master deadbee conclusion: failure (steps not read: steps field missing)
