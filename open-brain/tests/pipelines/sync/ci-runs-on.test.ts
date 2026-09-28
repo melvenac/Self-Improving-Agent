@@ -142,4 +142,36 @@ describe("ci.yml runs-on (T-192)", () => {
     expect(doc.on.push == null || !("paths" in doc.on.push || "paths-ignore" in doc.on.push)).toBe(true);
     expect(doc.on.workflow_dispatch == null || !("paths" in doc.on.workflow_dispatch || "paths-ignore" in doc.on.workflow_dispatch)).toBe(true);
   });
+
+  it("push branches are master, loop/**, and qa/** (T-178)", () => {
+    const doc = parse(readFileSync(workflowPath, "utf-8")) as {
+      on: { push?: { branches?: string[] } };
+    };
+    expect(doc.on.push?.branches).toEqual(["master", "loop/**", "qa/**"]);
+  });
+
+  it("a push ignores docs/** and README.md, the same list as a pull request, and a dispatch has no paths filter (T-178)", () => {
+    const doc = parse(readFileSync(workflowPath, "utf-8")) as {
+      on: {
+        push?: { "paths-ignore"?: string[] };
+        pull_request?: { "paths-ignore"?: string[] };
+        workflow_dispatch?: Record<string, unknown> | null;
+      };
+    };
+    expect(doc.on.push?.["paths-ignore"]).toEqual(["docs/**", "README.md"]);
+    expect(doc.on.pull_request?.["paths-ignore"]).toEqual(["docs/**", "README.md"]);
+    const dispatch = doc.on.workflow_dispatch;
+    expect(dispatch == null || !("paths" in dispatch || "paths-ignore" in dispatch)).toBe(true);
+  });
+
+  it("a push and the pull request for that branch share one concurrency group, and a dispatch does not join it (T-178)", () => {
+    const doc = parse(readFileSync(workflowPath, "utf-8")) as {
+      concurrency?: { group?: unknown; "cancel-in-progress"?: unknown };
+    };
+    expect(doc.concurrency, "concurrency is absent").toBeTruthy();
+    const group = String(doc.concurrency?.group ?? "");
+    expect(group).toContain("github.head_ref || github.ref_name");
+    expect(group).toContain("github.event_name == 'workflow_dispatch'");
+    expect(String(doc.concurrency?.["cancel-in-progress"] ?? "")).toBe("${{ github.event_name != 'workflow_dispatch' }}");
+  });
 });
