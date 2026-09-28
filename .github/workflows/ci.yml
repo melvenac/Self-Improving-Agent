@@ -84,7 +84,7 @@ jobs:
     # function. !cancelled() is that call, so a pull request and a master push
     # still run test. A failed changed job is not success, so the suite runs.
     needs: changed
-    if: "${{ !cancelled() && (needs.changed.result != 'success' || needs.changed.outputs.skip != 'true') }}"
+    if: "${{ needs.changed.result != 'success' || needs.changed.outputs.skip != 'true' }}"
     runs-on: ${{ inputs.hosted && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
 
     steps:
