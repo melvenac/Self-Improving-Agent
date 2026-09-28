@@ -186,7 +186,7 @@ export function checkCiStatus(projectRoot: string, run: CommandRunner = execRunn
     }
     const test = body.jobs?.find((j) => j.name === "test");
     if (!test) {
-      return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure` };
+      return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure (steps not read: job test absent in run view)` };
     }
     if (!Array.isArray(test.steps)) {
       return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure` };
