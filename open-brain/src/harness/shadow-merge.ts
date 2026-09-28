@@ -165,9 +165,6 @@ export function prepareShadowVerdict(input: {
   planGate?: { verdict: string } | null | "missing";
 }): { path: string; verdict: ShadowVerdictResult } {
   const path = verdictPath(input.repo, input.loop, input.candidateSha);
-  if (existsSync(path)) {
-    throw new Error(`${path} already exists. A verdict is written once.`);
-  }
   let criteriaText: string | { error: string };
   try {
     criteriaText = git(input.repo, ["show", `${input.criteriaSha}:${input.criteriaPath}`]);
