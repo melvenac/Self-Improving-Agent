@@ -315,6 +315,14 @@ describe("ci.yml runs-on (T-192)", () => {
     }))).toBe(true);
   });
 
+  it("test's if names a status function, so a skipped changed job does not skip test (T-178)", () => {
+    const jobIf = workflow().jobs.test.if ?? "";
+    expect(
+      jobIf.includes("!cancelled()") || jobIf.includes("always("),
+      "GitHub skips a needed job unless the if calls always, cancelled, or success",
+    ).toBe(true);
+  });
+
   it("the change list is git diff of before..sha, and the test job runs unless that output is exactly true (T-178)", () => {
     const doc = workflow() as Workflow & {
       jobs: Record<string, {
