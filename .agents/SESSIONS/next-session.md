@@ -1,12 +1,12 @@
-<!-- generated from .agents/state.json rev 147 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 149 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 148)_
+## planner [sia-planner] _(written session 149)_
 
 ### Pick up here
 
-Read docs/loops/session-147-dispatches.md from 'Planner session 11' to the end (origin/docs/session-100-qa99-dispatch). Slice three is OPEN: candidate C (2035e89) was REJECTED by QA 204 (qa/c-report b16d5b5). Forge is building record 201 r2 against the criteria at 23ebd86 (§9 corrects CC-6's path). Accepted and waiting for Aaron's merge: #196 (record 200), #197 (record 207) and #198 (record 198). QA dispatches for 192 r4 (QA 210) and 205 r3 (QA 211) are pushed at b7f963a, awaiting Aaron's launch line. The QA PC and the laptop are both idle and available.
+Planner session 149 (record number; the greeting showed #12, T-164). Live state is docs/loops/session-147-dispatches.md from 'STATE AT VS CODE RESTART' (83c08b4) onward, plus this handoff. Slice three is OPEN: candidate C r3 (product 20c2dfd, tip 5f7c9a0, PR #195 CLEAN) awaits QA 213 (dispatch at db8edc7; laptop line '-Queue 213 -Checkout db8edc74599802b97e3aef00f58419157f6dbe61'), which needs Aaron's launch word. #200 (record 205 r4, fixes #199's CI skip) awaits Aaron's merge word; #198 merges after #200 once its own PR run shows test green. Infra is on record 192 r5. Aaron, relayed 2026-09-28 by a general session (worktrees-d5), approved the planner's steps (a)-(h) with this record update first, and ordered two NEW tasks worked now: the planner seat hook and a D_t file + plan gate for interactive briefs.
 
 ### Watch out
 
@@ -16,6 +16,9 @@ Read docs/loops/session-147-dispatches.md from 'Planner session 11' to the end (
 - Composer (sia-infra) ends its turn on a bare acknowledgement. Say 'do it in this turn; no acknowledgement'. Its hub --wait runs in the foreground of its chat, so a new turn wakes it without Aaron.
 - Every QA dispatch requires an E_t.json beside the report, validated (C criteria §8 P1). QA 204, 208, 209 and 202 produced one.
 - Candidate C's merge is the gate's first live episode (§8 P4): run shadow-verdict prepare before Aaron merges it, and decide after.
+- MASTER AND PR CI RUN NO TESTS from 8467cb1 (#199) until #200 merges: test has needs: changed and changed skips on master/pull_request. Do not read a green master or PR check as tests having run until then.
+- #200 reads UNSTABLE, not CLEAN, because push run 36486110602 (loop/t178-fix-needs 367936c) was CANCELLED (its test job shows fail, conclusion cancelled); PR run 36486143303 is success with test RUN. Merge only on CLEAN (shared.md): resolve the cancelled run first.
+- The record handoff at rev 147 was older than the dispatches doc (it listed #196/#197 as unmerged, QA 210/211 as unlaunched). Before trusting a handoff, compare it against the newest docs/loops section and the live PR list.
 
 ### Open questions
 
@@ -25,24 +28,25 @@ Read docs/loops/session-147-dispatches.md from 'Planner session 11' to the end (
 ### Loop state
 
 **Open PRs:** 
-- #194 loop/qa-driver-cursor-r2 (0f816bb) — QA: in_progress — record 192 r4 (harness only); QA 210 awaits launch
-- #195 loop/15-slice-3-candidate-c (7099b20) — QA: rejected — candidate C; QA 204 REJECT; Forge building r2
-- #196 loop/t176-index-direction (8d3143c) — QA: accepted — record 200; Aaron merges
-- #197 loop/t046-d1 (a8adca0) — QA: accepted — record 207; Aaron merges
-- #198 loop/qa-probes-on-master (c025800) — QA: accepted — record 198; Aaron merges
+- #194 loop/qa-driver-cursor-r2 (0f816bb) — QA: rejected — record 192 r4 REJECTED by QA 210 (laptop cmd /c route denial=False moved=False); infra building r5 (diagnose environment vs route)
+- #195 loop/15-slice-3-candidate-c (5f7c9a0) — QA: in_progress — candidate C r3 (product 20c2dfd); QA 213 dispatched at db8edc7, awaits Aaron's launch line; closes slice three on ACCEPT
+- #198 loop/qa-probes-on-master (1c2fbb1) — QA: accepted — record 198; conflict resolved at 1c2fbb1; merges after #200 once its PR run shows test green
+- #200 loop/t178-fix-needs (367936c) — QA: accepted — record 205 r4, fixes #199's master/PR skip; PR run 36486143303 green with test RUN; UNSTABLE from cancelled push run 36486110602; awaits Aaron's merge word
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `20c2dfd (candidate C r3, for QA 213)`
 
 **Questions pending for Aaron:** 
-- Merge #196, #197, #198
-- Launch QA 210+211 (one line; dispatches at b7f963a)
+- Merge #200 (after it reads CLEAN)
+- Launch QA 213 (laptop line at db8edc7)
+- Merge #198 after #200 and its green PR run (per-occasion)
 - QA 203's stranded report: push it yourself or wait for #194?
 
 **Rulings made mid-loop:** 
-- D-061 developers never run CI
-- C criteria accepted with §8 P1-P4; §9 P5
-- QA 195/202 reject record 192 r2/r3; QA 196/197/203/208/209 ACCEPT records 193/194/198/200/207
-- QA 204 REJECT candidate C
+- QA 212 REJECT candidate C r2 (CC-6 SHA validation) -> r3
+- QA 210 REJECT record 192 r4 -> r5
+- QA 211 ACCEPT record 205 (T-178)
+- #196, #197, #199 merged on Aaron's 'merge all'; #199 broke master/PR CI -> record 205 r4 (#200)
+- Aaron (relayed by worktrees-d5, 2026-09-28): steps (a)-(h) approved, record update first; two new tasks worked now
 
 ## developer [legacy] _(written session 74)_
 
@@ -93,8 +97,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_2 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_3 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
-Session 148 — 2026-09-28 — planner [sia-planner] — `db06e512-6040-4764-b9b9-038e61d842ee` (4 writing session(s) in the record)
+Session 149 — 2026-09-28 — planner [sia-planner] — `c407df9c-3dd7-4273-891b-798b4bd527f4` (5 writing session(s) in the record)

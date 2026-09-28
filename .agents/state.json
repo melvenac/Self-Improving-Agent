@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 147,
+  "revision": 149,
   "project": {
     "name": "self-improving-agent"
   },
@@ -809,6 +809,34 @@
       "supersedes": null,
       "note": "Merged as PR #186 (a1fa4b1) on Aaron's word, record session 147. The worktree-layout /sync check, product 683b61c, accepted by the planner (red 36315913592, green 36316160629, mutants 36316403690 and 36316497065). Its first live run found four stray scratch worktrees in SIA's repo, removed on Aaron's word the same session.",
       "closed_rev": 143
+    },
+    {
+      "id": "T-194",
+      "title": "Planner seat hook: a tracked PreToolUse hook mechanically refuses the planner's out-of-boundary acts (source/tests/hooks/build writes, hand edits to rendered views, git merge/push/tag without per-occasion authority), fails closed, and names the rule it enforces",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 149,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "AUTHORITY: Aaron, relayed verbatim 2026-09-28 by a general Claude session (worktrees-d5, 'Clark'), to the planner (session 149): \"tell Atlas to go ahead with its steps (a) to (h), with (g), the record update, moved to the front, add the two new tasks: the planner seat hook, and the D_t file plus plan gate for interactive briefs. This needs to be done now sice it's causing issues running the loops.\" Two links: Aaron -> worktrees-d5 -> Atlas. PROBLEM: the planner's write boundary exists only as prose (.agents/roles/planner.md, 'Authority, stated as a boundary'); sia-planner/.claude/settings.local.json has no hooks key (checked session 149). A prose boundary is probabilistic (CLAUDE.md 'Deterministic First'). OBSERVABLE GOAL: in an interactive planner session, each of these is refused by the hook, and the refusal names the rule: (1) Edit/Write/NotebookEdit outside the planner allowlist (source, tests, hooks, builds); (2) a hand edit to a rendered view (INBOX.md, task.md, next-session.md, SUMMARY.md's marked region); (3) Bash git merge / push / tag (and gh pr merge) without per-occasion authority. Fails CLOSED (unparseable input, unknown seat, missing AGENT.local.md -> refuse, and say why). An allowed planner act (docs/loops writes, ob_state, read-only git, push of the planner's own docs/* branch under D-038) still passes. Suggested shape, for the developer to accept or beat: a tracked PreToolUse hook script keyed on the seat named in AGENT.local.md, registered per checkout (mechanism local, knowledge tracked). Deterministic, no Jev. Must also fire under the context-mode plugin's own PreToolUse hooks. REGISTRATION: adding the hook to sia-planner's settings.local.json changes the planner session's own permissions; it is Aaron's hand, not the planner's and not on a peer's relay. SEQUENCING (planner ruling, session 149): runs NOW, alongside slice three, outside it; D-036 is not amended. Seat: cursor-builder (idle since #200).",
+      "note_by": [
+        "c407df9c-3dd7-4273-891b-798b4bd527f4"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-195",
+      "title": "Every interactive planner brief ships a D_t JSON beside it, validated against plan.schema.json by a new `harness validate plan`, judged by the live plan gate (gate.ts, policies/plan-gate.json); a gate failure is fed back and blocks dispatch; decisions logged with the resolved model; fails closed when Jev is unreachable",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 149,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "AUTHORITY: same relay as T-194 (Aaron -> worktrees-d5 -> Atlas, 2026-09-28, planner session 149; quoted verbatim in T-194's note). PROBLEM: docs/loops holds prose briefs and zero D_t JSON, so the plan gate, built and ACCEPTED in slice two (HOH-JEV.md §7) and wired into the runtime (runtime.ts, index.ts import gate.js; policies.ts maps plan -> plan-gate.json), has never judged a real planner plan. QA's output carries E_t; the planner's carries no equivalent. `harness validate evidence` exists; `validate plan` does not. OBSERVABLE GOAL: (1) each new brief in docs/loops has a sibling D_t JSON that validates against open-brain/src/harness/schemas/plan.schema.json; (2) a `validate plan` command refuses an invalid one, naming the field; (3) the plan gate runs on the file per HOH-JEV §4 'Plan gate' with thresholds from policies/, never in a prompt; (4) a gate failure is written back to the planner and blocks the brief from dispatch; (5) each gate decision is logged with the resolved model per HOH-JEV §3; (6) Jev unreachable -> the brief is refused with that cause named, never passed. SEQUENCING (planner ruling, session 149): NOT part of slice three; D-036 is not amended and slice three still closes at A, B and C. It runs now, alongside, and its gate decisions on real briefs are the first real data the Jev calibration slice (D-033) needs. If QA 213 rejects candidate C r3, C r4 takes precedence on the building seat. Seat: Forge (sia-forge, Grok 4.7), which built candidate C and knows the harness schemas.",
+      "note_by": [
+        "c407df9c-3dd7-4273-891b-798b4bd527f4"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
@@ -3292,6 +3320,67 @@
       "session_uuid": "db06e512-6040-4764-b9b9-038e61d842ee",
       "checkout": "sia-planner",
       "first_rev": 145
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Planner session 149 (record number; the greeting showed #12, T-164). Live state is docs/loops/session-147-dispatches.md from 'STATE AT VS CODE RESTART' (83c08b4) onward, plus this handoff. Slice three is OPEN: candidate C r3 (product 20c2dfd, tip 5f7c9a0, PR #195 CLEAN) awaits QA 213 (dispatch at db8edc7; laptop line '-Queue 213 -Checkout db8edc74599802b97e3aef00f58419157f6dbe61'), which needs Aaron's launch word. #200 (record 205 r4, fixes #199's CI skip) awaits Aaron's merge word; #198 merges after #200 once its own PR run shows test green. Infra is on record 192 r5. Aaron, relayed 2026-09-28 by a general session (worktrees-d5), approved the planner's steps (a)-(h) with this record update first, and ordered two NEW tasks worked now: the planner seat hook and a D_t file + plan gate for interactive briefs.",
+      "watch_out": [
+        "QA 203's report for record 198 is on the QA PC ONLY (local 120dc44 on qa/qa-probes-report, plus two mutant branches): its push-qa.mjs push was refused by Cursor's permission fence. That is the QA-178 defect record 192 fixes. The planner did not push it for the seat (that would be permission laundering). Aaron decides.",
+        "Every QA seat still runs the OLD driver template until #194 (record 192) merges: a sanctioned push can be refused, and another seat's mid-run push reads as ref_violations. Hold seat pushes during QA runs, or trace them by SHA.",
+        "D-061: developers NEVER run CI. QA dispatches it. Seats echo old briefs ('tcm at most 6'); correct them on sight.",
+        "Composer (sia-infra) ends its turn on a bare acknowledgement. Say 'do it in this turn; no acknowledgement'. Its hub --wait runs in the foreground of its chat, so a new turn wakes it without Aaron.",
+        "Every QA dispatch requires an E_t.json beside the report, validated (C criteria §8 P1). QA 204, 208, 209 and 202 produced one.",
+        "Candidate C's merge is the gate's first live episode (§8 P4): run shadow-verdict prepare before Aaron merges it, and decide after.",
+        "MASTER AND PR CI RUN NO TESTS from 8467cb1 (#199) until #200 merges: test has needs: changed and changed skips on master/pull_request. Do not read a green master or PR check as tests having run until then.",
+        "#200 reads UNSTABLE, not CLEAN, because push run 36486110602 (loop/t178-fix-needs 367936c) was CANCELLED (its test job shows fail, conclusion cancelled); PR run 36486143303 is success with test RUN. Merge only on CLEAN (shared.md): resolve the cancelled run first.",
+        "The record handoff at rev 147 was older than the dispatches doc (it listed #196/#197 as unmerged, QA 210/211 as unlaunched). Before trusting a handoff, compare it against the newest docs/loops section and the live PR list."
+      ],
+      "open_questions": [
+        "Aaron: push QA 203's stranded report from the QA PC (his hand), or wait until #194 lets a QA seat push it?",
+        "Aaron: Telegram approval for QA (D-058) is on HOLD by his choice."
+      ],
+      "session": 149,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#194 loop/qa-driver-cursor-r2 (0f816bb)",
+            "qa_status": "rejected",
+            "note": "record 192 r4 REJECTED by QA 210 (laptop cmd /c route denial=False moved=False); infra building r5 (diagnose environment vs route)"
+          },
+          {
+            "ref": "#195 loop/15-slice-3-candidate-c (5f7c9a0)",
+            "qa_status": "in_progress",
+            "note": "candidate C r3 (product 20c2dfd); QA 213 dispatched at db8edc7, awaits Aaron's launch line; closes slice three on ACCEPT"
+          },
+          {
+            "ref": "#198 loop/qa-probes-on-master (1c2fbb1)",
+            "qa_status": "accepted",
+            "note": "record 198; conflict resolved at 1c2fbb1; merges after #200 once its PR run shows test green"
+          },
+          {
+            "ref": "#200 loop/t178-fix-needs (367936c)",
+            "qa_status": "accepted",
+            "note": "record 205 r4, fixes #199's master/PR skip; PR run 36486143303 green with test RUN; UNSTABLE from cancelled push run 36486110602; awaits Aaron's merge word"
+          }
+        ],
+        "frozen_sha": "20c2dfd (candidate C r3, for QA 213)",
+        "questions_for_aaron": [
+          "Merge #200 (after it reads CLEAN)",
+          "Launch QA 213 (laptop line at db8edc7)",
+          "Merge #198 after #200 and its green PR run (per-occasion)",
+          "QA 203's stranded report: push it yourself or wait for #194?"
+        ],
+        "rulings": [
+          "QA 212 REJECT candidate C r2 (CC-6 SHA validation) -> r3",
+          "QA 210 REJECT record 192 r4 -> r5",
+          "QA 211 ACCEPT record 205 (T-178)",
+          "#196, #197, #199 merged on Aaron's 'merge all'; #199 broke master/PR CI -> record 205 r4 (#200)",
+          "Aaron (relayed by worktrees-d5, 2026-09-28): steps (a)-(h) approved, record update first; two new tasks worked now"
+        ]
+      },
+      "session_uuid": "c407df9c-3dd7-4273-891b-798b4bd527f4",
+      "checkout": "sia-planner",
+      "first_rev": 148
     }
   ],
   "sessions": [
@@ -3326,6 +3415,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 145
+    },
+    {
+      "n": 149,
+      "date": "2026-09-28",
+      "uuid": "c407df9c-3dd7-4273-891b-798b4bd527f4",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 148
     }
   ]
 }

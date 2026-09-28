@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 147 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 149 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -24,6 +24,8 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-164** The session counter is per-worktree, so a seat can close out on a number that collides with the record's sequence
 - [ ] **T-167** The scope layer did not travel: PRD/DECISIONS/ENTITIES were untracked, so no seat worktree had them — tracked at session 77; make prd-version an ISSUE, and render the problem statement at /start
 - [ ] **T-178** ci.yml runs on push to seat working branches (loop/*, qa/*, docs/*, chore/*), per D-040, so no seat has to dispatch CI by hand
+- [ ] **T-194** Planner seat hook: a tracked PreToolUse hook mechanically refuses the planner's out-of-boundary acts (source/tests/hooks/build writes, hand edits to rendered views, git merge/push/tag without per-occasion authority), fails closed, and names the rule it enforces
+- [ ] **T-195** Every interactive planner brief ships a D_t JSON beside it, validated against plan.schema.json by a new `harness validate plan`, judged by the live plan gate (gate.ts, policies/plan-gate.json); a gate failure is fed back and blocks dispatch; decisions logged with the resolved model; fails closed when Jev is unreachable
 
 ## P1
 

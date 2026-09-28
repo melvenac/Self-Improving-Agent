@@ -730,3 +730,10 @@ Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819e
 - **Forge and builder: idle.** Forge's last turn was C r3; the builder's was #200.
 - **Still open for Aaron:** QA 203's report stranded on the QA PC (local `120dc44`), and Telegram (D-058, on hold).
 - Listener PIDs and watchers die with the session. Re-arm one `hub-talk --as atlas --session <room> --wait --wait-timeout 3500` per room: builder `k57098epn7qz32vt0cazfjpbes8f6kdq`, forge `k57frxw0ptb8tadmqdwy0khhks8ey006`, infra `k5702788wctxj75begyt4x2k5x8f6mav`.
+
+## Planner session 149 (record number; the greeting showed #12): record caught up, T-194 and T-195 opened and dispatched
+
+- **Rev 148:** the handoff now carries the restart state above, plus three things found live. #199 means master/PR CI runs no tests. #200 is UNSTABLE, not CLEAN, because push run `36486110602` was CANCELLED; its PR run `36486143303` passed with `test` RUN. And the rev-147 handoff was older than this file.
+- **Rev 149: T-194 (P0) and T-195 (P0) opened**, on Aaron's word relayed by a general session (`worktrees-d5`). The quote and both links are in T-194's note and in the brief. **Neither task is part of slice three, and D-036 is not amended.**
+- **Brief:** `docs/loops/t194-t195-dispatch.md`. **Record 214** (T-194, the planner seat hook) goes to `cursor-builder`; **record 215** (T-195, a D_t plus the plan gate for interactive briefs) goes to Forge. If QA 213 rejects C r3, C r4 takes precedence on Forge.
+- **A near-miss, recorded by family:** the planner first read the harness facts (`cli.ts` subcommands, gate exports) from this seat tree, which is 216 commits behind `origin/master`. There they showed no `validate` subcommand at all. The peer's claim that `validate evidence` exists was correct at `8467cb1`. The brief cites master only.
