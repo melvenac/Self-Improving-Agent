@@ -2,47 +2,46 @@
 
 **By:** Forge (developer). This Cursor seat had no `SESSION_UUID`, so `ob_set_session` was not bound.
 **Model / effort:** Grok 4.7, in Cursor. This transcript has no Claude Code per-entry `effort` field, so none is reported.
-**Branch:** `loop/t178-ci-on-push` from `origin/master` `d1e8674`. Product **`02043db`**. This handoff is the commit after it.
-**Push is held** until the planner posts that QA 202-204 has ended. Nothing from this correction is on the remote.
+**Branch:** `loop/t178-ci-on-push` from `origin/master` `d1e8674`. Product **`bc6c6d2`**. This handoff is the commit after it.
+**Push is held** until the planner posts that QA 202-204 has ended. Nothing from this round is on the remote.
 **No CI was dispatched.** D-061. No `/end`. This seat did not write the live `.agents/state.json`.
 **GitNexus:** this worktree has no `.gitnexus/`, and this session has no GitNexus MCP. `impact` and `detect_changes` were not run. `/sync` reports `gitnexus-index` as a skip.
 
-**"It works" is not a claim this seat can make.** The rows parse `.github/workflows/ci.yml` and evaluate the `if` and `cancel-in-progress` expressions. They do not fire GitHub's trigger. The first real push after merge is the live test, and QA or the planner observes it.
+**"It works" is not a claim this seat can make.** The rows parse `.github/workflows/ci.yml`, evaluate the `if` and `cancel-in-progress` expressions, and run `open-brain/scripts/ci-seat-skip.mjs` against real git repositories. They do not fire GitHub's trigger. The first real push after merge is the live test, and QA or the planner observes it.
 
 ## What the product does
 
-`on.push.branches` is `master`, `loop/**`, `qa/**`. `docs/*` and `chore/*` are not triggers. `on.push` has no `paths` and no `paths-ignore`. A docs-only push to master still triggers. `workflow_dispatch` has no paths filter, and its inputs are unchanged. `test-windows` stays `github.event_name == 'workflow_dispatch' && inputs.windows`. The pull request still ignores only `docs/**` and `README.md` (D-055).
+`on.push.branches` is `master`, `loop/**`, `qa/**`. `on.push` has no `paths` and no `paths-ignore`. A docs-only push to master still triggers, and the `test` job runs. `workflow_dispatch` has no paths filter, and its inputs are unchanged. `test-windows` stays `github.event_name == 'workflow_dispatch' && inputs.windows`. The pull request still ignores only `docs/**` and `README.md` (D-055).
 
-GitHub allows one paths filter per push event, so the seat-branch docs skip is the `test` job's `if`, not `paths-ignore`. A docs-only push to `loop/**` or `qa/**` still creates a workflow run, and the `test` job is skipped. It does not take a runner. The `if` is true for master, for any event that is not a push, and for a seat push whose `toJSON(github.event.commits)` contains a listed code prefix (`open-brain/`, `.github/`, `.agents/`, `.claude/`, `.cursor/`, `project-template/`, `scripts/`, `package.json`, `CHANGELOG.md`, `CLAUDE.md`) or does not contain `docs/` or `README.md`. `contains` reads the JSON text: a docs path or a commit message that itself contains a code prefix still runs, and a code path outside that list pushed in the same commit as a docs file can be skipped. An empty `commits` list runs.
+A seat push (`loop/**` or `qa/**`) runs a `changed` job on the same runner expression as `test`. That job checks out with `fetch-depth: 0` and runs `git diff --name-only --no-renames` from `github.event.before` to `github.sha`. The push payload's `commits[]` lists are not read. `skip=true` only when that command succeeds and every path is under `docs/` or is `README.md`. An empty list, a `before` of all zeros, or any git error prints `skip=false`. If the node step itself fails, the shell appends `skip=false`. The `test` job runs unless `changed` succeeded and `skip` is exactly `true`. A skipped or failed `changed` job is not success, so master, a pull request, a dispatch, and a broken preflight all run the suite.
 
-`concurrency.group` is `ci-<head_ref or ref_name>` for a push or a pull request, so both events for one seat branch share a group and the newer run cancels the older. A `workflow_dispatch` uses `ci-dispatch-<run_id>`. `cancel-in-progress` evaluates to false for `refs/heads/master` and for `workflow_dispatch`, and to true for a seat push and for a pull request. A second push to master waits in `ci-master`. It is not cancelled.
+`cancel-in-progress` evaluates to false for `refs/heads/master` and for `workflow_dispatch`, and to true for a seat push and for a pull request. A second push to master waits in `ci-master`. It is not cancelled. A seat push and its pull request still share `ci-<head_ref or ref_name>`.
 
 ## Local runs
 
 | | Commit | Exit | Result |
 |---|---|---|---|
-| Red, against the first product (`5651b67`), which filtered every push and cancelled master | `fad556e76db0cc31b3616272dc0e7f89880d2a3f` | **1** | 2 failed, 10 passed (12) |
-| Green | `02043db07603cc73089f3fa66a9bbcd18c1c7b03` | **0** | 12 passed |
+| Red, against `02043db`, whose `contains()` list skipped `LICENSE` beside `docs/a.md` | `77ea0e0a406897a1d130ca2374d61acf00e0f10b` | **1** | 1 failed, 12 passed (13) |
+| Green | `bc6c6d206a6b3261b43cccc3972fff23b5d86791` | **0** | 16 passed |
 | `npx tsc --noEmit -p .` in `open-brain`, on the green tree and on each mutant before its test run | | **0** | |
 
-Red failing lines:
+Red failing line: `a seat push of a code path outside the prefix list plus a docs file still runs` — `a code file outside the prefix list was skipped because a docs file was in the same push: expected false to be true`.
 
-- `a master push whose only path is under docs still runs the test job` — `a docs-only master push did not run the test job: expected false to be true`.
-- `cancel-in-progress evaluates to false for a push to refs/heads/master` — expected `false`, received `true`.
+The green file also runs a real repo of `docs/a.md` plus `README.md` (skip), a real repo of `open-brain/src/cli.ts` (run), a real repo of `LICENSE` plus `docs/a.md` (run), and `git diff` against `deadbeefdeadbeefdeadbeefdeadbeefdeadbeef` (run). A parsed `changed` result of `failure` with `skip=true` still runs the test job.
 
 `/sync --check` before each commit exited **1**. Summary each time: 24 passed, 0 fixed, 4 warnings, 5 issues, 1 skipped. Those issues are already on this tree (retirements, build-freshness, probe-markers on master's three "not for merge" files, mirror-parity, greeting-size). `worktree-layout` passed.
 
 ## Mutants (local, not in the candidate)
 
-The first pair (`208d9be`, `e7cf7b1`) was never pushed. Atlas sent that contract back, so those branch tips were replaced.
+Earlier tips on these branches were never pushed. They were replaced so each tip is this product plus one defect.
 
 | Branch | Tip | Edit | Run |
 |---|---|---|---|
-| `loop/t178-ci-on-push-mut-concurrency` | `fa90a9352baa5bbdb37ca676bfc0fbfeec341828` | `cancel-in-progress` drops the master clause | exit **1**. 1 failed, 11 passed. The master row expected `false` and received `true`. |
-| `loop/t178-ci-on-push-mut-paths` | `fb4c39ba849405eb52ec82ca4b2b0f4d2d4d4aaf` | the `test` job has no `if` | exit **1**. 1 failed, 11 passed. A seat push of `docs/a.md` and `README.md` expected `false` and received `true`. |
+| `loop/t178-ci-on-push-mut-paths` | `6280f6900932d43cd8c3ddd76e6f43c18f23593b` | `some` instead of `every`: skip when any file is docs | exit **1**. 1 failed, 15 passed. `LICENSE` plus `docs/a.md` expected the test job to run and it did not. Docs plus README still skips. The unreadable sha still runs. |
+| `loop/t178-ci-on-push-mut-concurrency` | `e7f66172d8a6f47cc31be86d87bfd662853817af` | `cancel-in-progress` drops the master clause | exit **1**. 1 failed, 15 passed. The master row expected `false` and received `true`. |
 
 Do not merge either branch.
 
-## First delivery, sent back
+## What came back
 
-`5651b67` put `paths-ignore` on the whole push event, so a docs-only push to master started no run, and `cancel-in-progress` was true for every push including master. Red for that delivery was `aa1ed66`, exit 1, 3 failed, 6 passed. Atlas returned it before QA: master stays unfiltered, and a master run must not be cancelled.
+`5651b67` filtered every push and cancelled master. `02043db` left master unfiltered and stopped cancelling master, and decided a seat docs skip with `contains()` on `toJSON(commits)`. That list skipped a code path it did not name. This round replaces that decision with `git diff`.
