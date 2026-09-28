@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 145,
+  "revision": 146,
   "project": {
     "name": "self-improving-agent"
   },
@@ -632,12 +632,13 @@
     {
       "id": "T-178",
       "title": "ci.yml runs on push to seat working branches (loop/*, qa/*, docs/*, chore/*), per D-040, so no seat has to dispatch CI by hand",
-      "priority": "P1",
+      "priority": "P0",
       "status": "open",
       "opened_session": 90,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened record session 90 (planner), 2026-09-23, from D-040 on Aaron's word 'ci should run autonoumously'. Today ci.yml triggers on push to master, pull_request and workflow_dispatch only, so a working branch without a PR runs no CI unless someone dispatches it. D-040 part 1 makes dispatching standing in the meantime; this task removes the need for it. For the developer seat to decide HOW, with the planner ruling only on the result. Two things to settle there: (a) a branch with an open PR would run twice (push plus pull_request), so choose a de-duplication (e.g. a concurrency group, or push on qa/** only with PRs covering loop/**) rather than paying double; (b) docs/* and chore/* pushes touch no source, so paths-ignore may be right for them. ACCEPTANCE: a push to a fresh qa/* branch with no PR starts a CI run with no manual act, observed by run id; a push to master still runs; a PR still runs; and no branch runs twice for one push. ci.yml is outside D-032's allowlist, so the PR is Aaron's to merge. Sequencing: not slice-three scope. It can ride with B on the Claude developer seat if the planner scopes it in, otherwise it waits for the slice to close.",
+      "note": "Opened record session 90 (planner), 2026-09-23, from D-040 on Aaron's word 'ci should run autonoumously'. Today ci.yml triggers on push to master, pull_request and workflow_dispatch only, so a working branch without a PR runs no CI unless someone dispatches it. D-040 part 1 makes dispatching standing in the meantime; this task removes the need for it. For the developer seat to decide HOW, with the planner ruling only on the result. Two things to settle there: (a) a branch with an open PR would run twice (push plus pull_request), so choose a de-duplication (e.g. a concurrency group, or push on qa/** only with PRs covering loop/**) rather than paying double; (b) docs/* and chore/* pushes touch no source, so paths-ignore may be right for them. ACCEPTANCE: a push to a fresh qa/* branch with no PR starts a CI run with no manual act, observed by run id; a push to master still runs; a PR still runs; and no branch runs twice for one push. ci.yml is outside D-032's allowlist, so the PR is Aaron's to merge. Sequencing: not slice-three scope. It can ride with B on the Claude developer seat if the planner scopes it in, otherwise it waits for the slice to close. — Session 148: raised to P0 by Aaron with D-061. Under HoH, automatic CI on push is the runtime's deterministic-test step; until it lands, QA dispatches CI by hand.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -3082,6 +3083,12 @@
       "title": "sia-infra stays on Composer 2.5 for live developer work, with the evidence rules in every brief; sia-builder and sia-forge stay on Grok 4.7; Composer-built candidates get QA from a different model",
       "date": "2026-09-27",
       "note": "Aaron, planner session 147: 'yes', to the planner's 'Shall I keep sia-infra on Composer for live work, with those rules in its briefs?'. Basis: record 184, a replay of T-192 (record 181, Grok) by Composer 2.5 from the same base 7243fd5 (docs/loops/session-147-dispatches.md, 'Record 184'). Composer: four rounds, 09:33:10Z to about 09:58Z, 9 tcm runs. Rounds 1 and 2 delivered evidence with the right shape that could not fail: a hard-coded evaluator, a seeded red ('tcm-red-seed'), in-test and product-flag 'mutants'. Once the rule was stated plainly (184c), it met it, and 184d was clean on first delivery. Grok's evidence was real from its first delivery. The rules went into .agents/roles/developer.md, 'Building checks', for EVERY developer. Its old line 'Assert a wrong value first and watch it fail' could be read as inviting the seeded red. QA: a candidate Composer builds is scored by a different model (GPT-5.6 Sol), since QA seats run Composer 2.5. The planner reads every diff before accepting."
+    },
+    {
+      "id": "D-061",
+      "title": "Developers never run CI: local tests only (shift-left, not acceptance). CI is the runtime's deterministic step (T-178, now P0); until it lands, QA dispatches CI on the frozen candidate",
+      "date": "2026-09-28",
+      "note": "Aaron, planner session 148, 2026-09-28: 'yes and T-178 raised to P0', answering the planner's proposal. He had first said 'I thought we ruled that devs never run ci, that's qa work'. The planner found no such ruling in the record: D-040 had given every seat CI on its own branches, and developer.md:67 said a mutant runs on CI. Basis, docs/hoh_jev.md:89-112 and 174-190: the developer does 'implementation + local tests', which do not count as acceptance; the RUNTIME runs deterministic tests between developer and QA; QA may run tests on the frozen candidate. AMENDS D-040 for developer seats: a developer never dispatches tcm or Windows CI and reports local test output only. QA dispatches the red, green and mutant runs until T-178 makes CI automatic on push. First applied to records 198 and 200 (briefed with CI budgets before this ruling) and to every brief after it."
     }
   ],
   "handoffs": [

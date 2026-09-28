@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 145 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 146 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -24,6 +24,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-164** The session counter is per-worktree, so a seat can close out on a number that collides with the record's sequence
 - [ ] **T-167** The scope layer did not travel: PRD/DECISIONS/ENTITIES were untracked, so no seat worktree had them — tracked at session 77; make prd-version an ISSUE, and render the problem statement at /start
 - [ ] **T-177** Candidate A2 is blocked: the developer seat's responses were stopped twice by a host safety classifier, and slice three cannot close until A2 is built or re-planned
+- [ ] **T-178** ci.yml runs on push to seat working branches (loop/*, qa/*, docs/*, chore/*), per D-040, so no seat has to dispatch CI by hand
 
 ## P1
 
@@ -51,7 +52,6 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-172** The main tree serves every session and nothing says when it is behind master: the greeting must print the SERVING build's distance from origin/master, and one refusing command must update, rebuild and verify it
 - [ ] **T-173** Per-stage effort chosen by a deterministic policy, with Jev in shadow. Sequenced AFTER candidate A (it needs ProcessRole)
 - [ ] **T-176** gitnexus-index measures distance in one direction only: an index on a different line of history reads as current
-- [ ] **T-178** ci.yml runs on push to seat working branches (loop/*, qa/*, docs/*, chore/*), per D-040, so no seat has to dispatch CI by hand
 - [ ] **T-179** Replace /end with a small 'store lessons' step: each session's lessons stored with the key that would have caught them (T-170); the record is written as work happens, and the rest of /end is cut
 - [ ] **T-181** Adopt Aaron's active projects onto SIA per docs/loops/adoption-plan-2026-09-25.md: frogger (fresh install) and co-op-mailer (import) as pilots, then Tarrant County Makerspace record-only BEFORE its cutover (D-048), then foundry and worth-it-window-washing
 - [ ] **T-182** The claude adapter passes --permission-prompts, which tcm's installed Claude Code lacks (2.1.282 on the QA PC has it): declare a minimum Claude Code version, make CA-9 name the installed and required versions, and decide whether tcm's claude is updated
