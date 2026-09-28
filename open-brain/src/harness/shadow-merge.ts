@@ -194,7 +194,6 @@ export function prepareShadowVerdict(input: {
     written_at: writtenAt,
     inputs: {
       declared: verdict.declared,
-      runtime_checks: isRecord(input.evidence) ? input.evidence.runtime_checks : undefined,
     },
   };
   mkdirSync(join(path, ".."), { recursive: true });
