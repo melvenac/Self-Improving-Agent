@@ -1,0 +1,66 @@
+{
+  "loop": "205-ci-on-push",
+  "candidate_git": {
+    "sha": "bc6c6d206a6b3261b43cccc3972fff23b5d86791",
+    "branch": "origin/loop/t178-ci-on-push",
+    "frozen_at": "2026-09-28T21:12:00Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "ci.yml run 36483710580: npx tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 8000,
+      "detail": "Live push run 36483710580 typecheck step succeeded on tcm; local npm run typecheck also exited 0 on bc6c6d2."
+    },
+    "unit": {
+      "command": "ci.yml run 36483710580: npm test",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 187000,
+      "detail": "Live push run 36483710580 concluded success: 131 files, 1820 passed and 6 skipped (Vitest 186.57s)."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "1-seat-pushes-run-ci",
+      "status": "met",
+      "evidence": "ci.yml push branches are master, loop/**, and qa/**; live push qa/t178-live-code 05d31f6 started run 36483710580 on push with changed and test jobs both executing.",
+      "order": "shown"
+    },
+    {
+      "id": "2-skip-proven-by-git-diff",
+      "status": "met",
+      "evidence": "changed job uses fetch-depth 0 and ci-seat-skip.mjs on github.event.before..github.sha; unit rows cover docs-only skip, code+docs run, unreadable list, failed changed job, and all-zero before fail-open; developer mut-paths 6280f69 failed the code+docs row locally.",
+      "order": "shown"
+    },
+    {
+      "id": "3-master-unchanged",
+      "status": "met",
+      "evidence": "push has no paths filter; master docs-only still runs test in unit rows; cancel-in-progress is false for refs/heads/master; workflow_dispatch inputs and test-windows opt-in unchanged from T-192.",
+      "order": "shown"
+    },
+    {
+      "id": "4-no-double-run",
+      "status": "met",
+      "evidence": "concurrency group uses github.head_ref || github.ref_name with cancel-in-progress true for seat push and pull_request but false for master and workflow_dispatch; developer mut-concurrency e7f6617 failed the master cancel row locally.",
+      "order": "shown"
+    },
+    {
+      "id": "5-live-test",
+      "status": "met",
+      "evidence": "qa/t178-live-code push run 36483710580 started test on its own; qa/t178-live-docs second push run 36484239686 skipped the test job after changed proved docs-only (first push 36483731097 ran test because before was all zeros, per fail-open).",
+      "order": "shown"
+    },
+    {
+      "id": "6-qa-mutants",
+      "status": "met",
+      "evidence": "qa/t178-mut-any-doc-skip af4ebbb and qa/t178-mut-drop-qa-trigger 7a7bd59 typechecked and each killed one focused ci-runs-on.test.ts row locally.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [],
+  "gaps": [],
+  "notes": "Product SHA is bc6c6d2; branch tip 6c74a1b is docs-only handoff. Three workflow_dispatch runs were skipped because test needs changed, which only runs on non-master push; the live code push at bc6c6d2 is the green CI evidence. GitNexus impact tooling was unavailable."
+}
