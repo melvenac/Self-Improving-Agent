@@ -51,12 +51,10 @@ on:
         default: "0"
 
 # T-178: a push and the pull request for that branch share one group, and the
-# newer run cancels the older. A dispatch uses its own group. A push to master
-# does not cancel: two merges close together must both get a result. The second
-# master push waits in the ci-master group; it is not cancelled.
+# Mutant: a push to master cancels, the same as a seat branch. A dispatch does not.
 concurrency:
   group: "${{ github.event_name == 'workflow_dispatch' && format('ci-dispatch-{0}', github.run_id) || format('ci-{0}', github.head_ref || github.ref_name) }}"
-  cancel-in-progress: "${{ github.event_name != 'workflow_dispatch' && github.ref != 'refs/heads/master' }}"
+  cancel-in-progress: "${{ github.event_name != 'workflow_dispatch' }}"
 
 jobs:
   # T-178: the push payload's commits[] lists are truncated, so they cannot prove
