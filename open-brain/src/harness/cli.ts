@@ -227,14 +227,6 @@ function cmdShadow(argv: readonly string[]): number {
     throw new UsageError("usage: harness shadow-verdict <prepare|decide|summary>");
   }
   const flags = flagMap(rest);
-  const allowed: Record<typeof action, ReadonlySet<string>> = {
-    summary: new Set(["repo"]),
-    prepare: new Set(["repo", "loop", "candidate", "criteria-sha", "criteria", "evidence", "gate"]),
-    decide: new Set(["repo", "loop", "candidate", "merged", "declined", "replaced"]),
-  };
-  for (const key of flags.keys()) {
-    if (!allowed[action].has(key)) throw new UsageError(`unrecognised flag "--${key}"`);
-  }
   const repo = typeof flags.get("repo") === "string" ? (flags.get("repo") as string) : process.cwd();
   if (action === "summary") {
     const path = ledgerPath(repo);
