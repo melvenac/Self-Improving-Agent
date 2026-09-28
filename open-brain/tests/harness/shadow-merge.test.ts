@@ -206,7 +206,7 @@ function fixtureRepo(): string {
   writeFileSync(join(root, "docs", "loops", "criteria.md"), A4_OUT);
   git(root, ["add", "docs"]);
   git(root, ["commit", "-q", "-m", "criteria"]);
-  const bare = join(root, "..", "origin.git");
+  const bare = join(root, "origin.git");
   git(root, ["init", "-q", "--bare", "-b", "master", bare]);
   git(root, ["remote", "add", "origin", bare]);
   git(root, ["push", "-q", "origin", "master"]);

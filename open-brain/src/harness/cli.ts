@@ -15,7 +15,7 @@
  * boundary cannot widen by omission* — applied to argument parsing.
  */
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runLoop, type GateMode } from "./runtime.js";
@@ -23,12 +23,16 @@ import { stubRoles } from "./roles.js";
 import { jsonSchemas, serialiseSchema, validateEvidence, type DeliverableKind } from "./schema.js";
 import { defaultChecks, type CheckSpec } from "./checks.js";
 import { policyJsonSchemas } from "./policies.js";
+import { decideShadowVerdict, ledgerPath, prepareShadowVerdict, summariseLedger } from "./shadow-merge.js";
 
 const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
 
   harness run --loop <tNNN> [options]
   harness schemas [--write]
   harness validate evidence <file>
+  harness shadow-verdict prepare --loop <id> --candidate <sha> --criteria-sha <sha> --criteria <path> --evidence <file>
+  harness shadow-verdict decide --loop <id> --candidate <sha> (--merged <sha> | --declined | --replaced <sha>)
+  harness shadow-verdict summary
   harness help
 
 run options
@@ -153,8 +157,12 @@ export const schemaFileName = (kind: DeliverableKind): string =>
  * too — becoming exactly the stale authoritative-looking artifact this file
  * already refuses to create.
  */
-export const policySchemaFileName = (kind: "plan" | "done"): string =>
-  kind === "plan" ? "policy-plan.schema.json" : "policy-developer-done.schema.json";
+export const policySchemaFileName = (kind: "plan" | "done" | "merge"): string =>
+  kind === "plan"
+    ? "policy-plan.schema.json"
+    : kind === "done"
+      ? "policy-developer-done.schema.json"
+      : "policy-merge.schema.json";
 
 /**
  * Validate an `E_t` file with the runtime's own validator.
@@ -187,6 +195,81 @@ function cmdValidate(argv: readonly string[]): number {
   return 1;
 }
 
+function flagMap(argv: readonly string[]): Map<string, string | true> {
+  const flags = new Map<string, string | true>();
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]!;
+    if (!arg.startsWith("--")) throw new UsageError(`unrecognised argument "${arg}"`);
+    const key = arg.slice(2);
+    const next = argv[i + 1];
+    if (next === undefined || next.startsWith("--")) flags.set(key, true);
+    else {
+      flags.set(key, next);
+      i += 1;
+    }
+  }
+  return flags;
+}
+
+function requiredFlag(flags: Map<string, string | true>, name: string): string {
+  const value = flags.get(name);
+  if (typeof value !== "string" || value === "") throw new UsageError(`--${name} requires a value`);
+  return value;
+}
+
+/**
+ * T-155. prepare writes the verdict. decide records Aaron's action. Neither
+ * merges, pushes, or touches a remote.
+ */
+function cmdShadow(argv: readonly string[]): number {
+  const [action, ...rest] = argv;
+  if (action !== "prepare" && action !== "decide" && action !== "summary") {
+    throw new UsageError("usage: harness shadow-verdict <prepare|decide|summary>");
+  }
+  const flags = flagMap(rest);
+  const repo = typeof flags.get("repo") === "string" ? (flags.get("repo") as string) : process.cwd();
+  if (action === "summary") {
+    const path = ledgerPath(repo);
+    const text = existsSync(path) ? readFileSync(path, "utf8") : "";
+    process.stdout.write(`${JSON.stringify(summariseLedger(text), null, 2)}\n`);
+    return 0;
+  }
+  const loop = requiredFlag(flags, "loop");
+  const candidate = requiredFlag(flags, "candidate");
+  if (action === "prepare") {
+    const evidencePath = resolve(requiredFlag(flags, "evidence"));
+    const evidence = JSON.parse(readFileSync(evidencePath, "utf8")) as unknown;
+    const gate = flags.get("gate");
+    const gateMode = gate === "live" || gate === "dry-run" || gate === "skip" ? gate : "skip";
+    const result = prepareShadowVerdict({
+      repo,
+      loop,
+      candidateSha: candidate,
+      criteriaSha: requiredFlag(flags, "criteria-sha"),
+      criteriaPath: requiredFlag(flags, "criteria"),
+      evidence,
+      gateMode,
+    });
+    process.stdout.write(`${result.path}\n`);
+    return 0;
+  }
+  const merged = flags.get("merged");
+  const replaced = flags.get("replaced");
+  const declined = flags.get("declined");
+  const chosen = [merged, replaced, declined].filter((v) => v !== undefined).length;
+  if (chosen !== 1) throw new UsageError("decide takes exactly one of --merged, --declined, --replaced");
+  const result = decideShadowVerdict({
+    repo,
+    loop,
+    candidateSha: candidate,
+    action: typeof merged === "string" ? "merged" : typeof replaced === "string" ? "replaced" : "declined",
+    mergeCommitSha: typeof merged === "string" ? merged : undefined,
+    replacedSha: typeof replaced === "string" ? replaced : undefined,
+  });
+  process.stdout.write(`${JSON.stringify(result.line)}\n`);
+  return 0;
+}
+
 function cmdSchemas(argv: readonly string[]): number {
   let write = false;
   for (const arg of argv) {
@@ -205,7 +288,7 @@ function cmdSchemas(argv: readonly string[]): number {
   }
   const schemas = jsonSchemas();
   const policySchemas = policyJsonSchemas();
-  for (const kind of ["plan", "done"] as const) {
+  for (const kind of ["plan", "done", "merge"] as const) {
     const text = serialiseSchema(policySchemas[kind]);
     if (write) {
       const target = join(schemaDir(), policySchemaFileName(kind));
@@ -268,6 +351,7 @@ export async function main(argv: readonly string[]): Promise<number> {
     if (sub === "run") return await cmdRun(rest);
     if (sub === "schemas") return cmdSchemas(rest);
     if (sub === "validate") return cmdValidate(rest);
+    if (sub === "shadow-verdict") return cmdShadow(rest);
     throw new UsageError(`unknown subcommand "${sub}"`);
   } catch (err) {
     if (err instanceof UsageError) {

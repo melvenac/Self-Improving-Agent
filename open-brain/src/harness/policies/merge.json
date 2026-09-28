@@ -1,0 +1,10 @@
+{
+  "gate": "merge",
+  "require_plan_gate": false,
+  "require_done_gate": false,
+  "unmet_is_would_not_merge": true,
+  "not_evaluated_is_would_not_merge": true,
+  "partial_is_would_not_merge": true,
+  "failed_check_is_would_not_merge": true,
+  "gate_reject_or_halt_is_would_not_merge": true
+}

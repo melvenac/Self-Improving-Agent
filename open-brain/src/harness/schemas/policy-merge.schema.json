@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "gate": {
+      "type": "string",
+      "const": "merge"
+    },
+    "require_plan_gate": {
+      "type": "boolean"
+    },
+    "require_done_gate": {
+      "type": "boolean"
+    },
+    "unmet_is_would_not_merge": {
+      "type": "boolean"
+    },
+    "not_evaluated_is_would_not_merge": {
+      "type": "boolean"
+    },
+    "partial_is_would_not_merge": {
+      "type": "boolean"
+    },
+    "failed_check_is_would_not_merge": {
+      "type": "boolean"
+    },
+    "gate_reject_or_halt_is_would_not_merge": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "gate",
+    "require_plan_gate",
+    "require_done_gate",
+    "unmet_is_would_not_merge",
+    "not_evaluated_is_would_not_merge",
+    "partial_is_would_not_merge",
+    "failed_check_is_would_not_merge",
+    "gate_reject_or_halt_is_would_not_merge"
+  ],
+  "additionalProperties": false,
+  "title": "Shadow merge policy",
+  "description": "Flags for the shadow merge gate (T-155). Values are data and may be edited; the SHAPE is derived from open-brain/src/harness/policies.ts and this file must not be edited by hand. LIMIT: require_plan_gate and require_done_gate default false until Jev is calibrated. A required gate with no record is undefined, never would-merge. PROVENANCE: the fail-closed flags are the candidate C criteria, not a calibration."
+}

@@ -34,6 +34,7 @@ import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-stat
 import { checkRecordErasure } from "./record-erasure.js";
 import { checkWorktreeLayout } from "./worktree-layout.js";
 import { checkCursorHookCompat } from "./cursor-hook-compat.js";
+import { checkShadowMergeLedger } from "../../harness/shadow-merge.js";
 
 export function runSync(input: SyncOptions): SyncResult {
   // R4 (Loop 3): the given root may be a subdirectory (open-brain/ has its
@@ -116,6 +117,8 @@ export function runSync(input: SyncOptions): SyncResult {
   // T-046: a Claude plugin PreToolUse hook plus Cursor CLI is the block from
   // the 1.0.169 incident. Detection only; the check does not edit the profile.
   checks.push(checkCursorHookCompat(home, localAppData));
+  // T-155: the shadow-merge ledger is append-only. Absent is a first use.
+  checks.push(checkShadowMergeLedger(options.projectRoot));
 
   const fixed = checks.filter((c) => c.severity === "fixed");
   const issues = checks.filter((c) => c.severity === "issue");

@@ -124,8 +124,27 @@ export const DoneGatePolicySchema = z
   })
   .strict();
 
+/**
+ * T-155. Gates stay optional until Jev is calibrated, so a missing gate record
+ * is not `undefined` unless the flag says it is required. The fail-closed
+ * flags are the default; turning one off is a recorded decision, not a default.
+ */
+export const MergePolicySchema = z
+  .object({
+    gate: z.literal("merge"),
+    require_plan_gate: z.boolean(),
+    require_done_gate: z.boolean(),
+    unmet_is_would_not_merge: z.boolean(),
+    not_evaluated_is_would_not_merge: z.boolean(),
+    partial_is_would_not_merge: z.boolean(),
+    failed_check_is_would_not_merge: z.boolean(),
+    gate_reject_or_halt_is_would_not_merge: z.boolean(),
+  })
+  .strict();
+
 export type PlanGatePolicy = z.infer<typeof PlanGatePolicySchema>;
 export type DoneGatePolicy = z.infer<typeof DoneGatePolicySchema>;
+export type MergePolicy = z.infer<typeof MergePolicySchema>;
 
 export interface Policies {
   plan: PlanGatePolicy;
@@ -184,8 +203,29 @@ export function loadPolicies(dir: string = policiesDir()): Policies {
   };
 }
 
+/**
+ * The merge policy is loaded on its own. `loadPolicies` stays plan + done so a
+ * caller that writes only those two files into a temp directory still passes.
+ */
+export function loadMergePolicy(dir: string = policiesDir()): MergePolicy {
+  const path = join(dir, "merge.json");
+  if (!existsSync(path)) throw new PolicyUnreadable(`policy file missing: ${path}`);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(path, "utf-8"));
+  } catch (err) {
+    throw new PolicyUnreadable(`policy file ${path} is not valid JSON: ${(err as Error).message}`);
+  }
+  const r = MergePolicySchema.safeParse(parsed);
+  if (!r.success) {
+    const problems = r.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`);
+    throw new PolicyUnreadable(`policy file ${path} does not match the policy schema: ${problems.join("; ")}`);
+  }
+  return r.data;
+}
+
 /** The derived JSON Schema files, one per policy. `D-021`'s shape. */
-export function policyJsonSchemas(): Record<"plan" | "done", Record<string, unknown>> {
+export function policyJsonSchemas(): Record<"plan" | "done" | "merge", Record<string, unknown>> {
   return {
     plan: {
       ...(z.toJSONSchema(PlanGatePolicySchema, { io: "input" }) as Record<string, unknown>),
@@ -212,6 +252,16 @@ export function policyJsonSchemas(): Record<"plan" | "done", Record<string, unkn
         "high, touches_out_of_scope low and tests green; roll back when stuck_repeating_prior_" +
         "failure is high, or risk_of_regression is high AND tests failed) and no numbers at all. " +
         "Every number in the shipped developer-done.json is the developer's starting position.",
+    },
+    merge: {
+      ...(z.toJSONSchema(MergePolicySchema, { io: "input" }) as Record<string, unknown>),
+      title: "Shadow merge policy",
+      description:
+        "Flags for the shadow merge gate (T-155). Values are data and may be edited; the SHAPE is " +
+        "derived from open-brain/src/harness/policies.ts and this file must not be edited by hand. " +
+        "LIMIT: require_plan_gate and require_done_gate default false until Jev is calibrated. " +
+        "A required gate with no record is undefined, never would-merge. " +
+        "PROVENANCE: the fail-closed flags are the candidate C criteria, not a calibration.",
     },
   };
 }
