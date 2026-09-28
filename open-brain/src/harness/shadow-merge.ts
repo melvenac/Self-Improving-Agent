@@ -202,7 +202,6 @@ export function prepareShadowVerdict(input: {
     written_at: writtenAt,
     inputs: {
       runtime_checks: evidenceRecord && isRecord(evidenceRecord.runtime_checks) ? evidenceRecord.runtime_checks : null,
-      acceptance,
       gates: {
         plan: input.planGate ?? null,
         done: input.doneGate ?? null,
