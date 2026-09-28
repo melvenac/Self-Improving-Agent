@@ -22,7 +22,7 @@ try {
     finish(false);
     process.exit(0);
   }
-  const docsOnly = files.every((file) => file === "README.md" || file.startsWith("docs/"));
+  const docsOnly = files.some((file) => file === "README.md" || file.startsWith("docs/"));
   finish(docsOnly);
 } catch {
   finish(false);
