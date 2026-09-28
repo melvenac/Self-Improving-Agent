@@ -706,3 +706,10 @@ Forge delivered **candidate C r2** overnight: product `8054f9f`, tip `09a517f`, 
 - **QA PC: `-Queue 212`** (candidate C r2, which closes slice three).
 - **Laptop: `-Queue 210,211`** (192 r4 harness; 205 r3 CI on push).
 Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819ebd59be6ea21630eb3edd2784562cf`.
+
+## Laptop queue 212, 210, 211 ruled (ended 21:11:13Z)
+
+- **QA 212 (candidate C r2 `8054f9f`, GPT): REJECT. The rejection stands.** `qa/c-r2-report` `2ffece8`, E_t present. All five C-204 findings are closed, and tcm is green. The one remaining defect is CC-6: `prepare` accepts a non-SHA candidate id and writes `artifacts/iterations/t001/bad/shadow_merge.json` with `candidate_sha: "bad"`. Returned as **record 201 r3**: validate every SHA input before any write.
+- **QA 210 (record 192 r4 `0f816bb`, GPT): REJECT. The rejection stands.** `qa/qa-driver-r4-report` `f94a79d`. The fixture repair works; but on the LAPTOP the sanctioned `cmd /c` route gave `denial=False moved=False` twice, where QA 202 on the QA PC saw it work. Returned as **record 192 r5**: diagnose whether the environment or the route is at fault, and state which.
+- **QA 211 (record 205 r3 `bc6c6d2`, Composer): ACCEPT. Record 205 (T-178) is ruled ACCEPTED.** `qa/t178-report` `2f222fc`, E_t present. The live pushes (`qa/t178-live-code` `05d31f6`, `qa/t178-live-docs` `1497149`) confirmed GitHub's trigger. The builder opens the PR, and Aaron merges.
+- The laptop was unreachable on port 22 once (a connect timeout, with Tailscale active and ping at 5 ms), and reachable a few minutes later. It was probably waking from sleep.
