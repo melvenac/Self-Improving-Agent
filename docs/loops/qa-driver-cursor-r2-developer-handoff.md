@@ -1,74 +1,45 @@
-# Cursor QA driver r2 — developer handoff (record 192)
+# Cursor QA driver r2 — developer handoff (record 192 r3)
 
-**By:** Forge, `cursor-infra`, Composer 2.5. **Branch:** `loop/qa-driver-cursor-r2` from `origin/master` (`bf33fe4`). **Desktop only:** harness `docs/loops/qa-driver-cursor-r2-harness.ps1`, hidden `Win32_Process.Create`, local bare origin under `C:\qa-tmp\qa-driver-cursor-r2-<pid>`. No QA machine, no `%USERPROFILE%\Worktrees\sia-qa`.
+**By:** Forge, `cursor-infra`, Composer 2.5. **Branch:** `loop/qa-driver-cursor-r2` from `origin/master` (`bf33fe4`). **Desktop only:** `docs/loops/qa-driver-cursor-r2-harness.ps1`, hidden `Win32_Process.Create`, local bare origin under `C:\qa-tmp\qa-driver-cursor-r2-<pid>`. No QA machine.
 
-## 1. Push-route refusal (QA 178)
+## 1. QA 195 rejection (r2) and r3 fix
 
-**Cause:** record-175 wrapper denies `Shell(powershell*:*push*)` (and siblings for `powershell`, `bash`, `cmd`) match the **argument glob** against the full shell command text. The seat ran `powershell … node docs/loops/qa-178/push-qa.mjs …`. The path segment `push-qa.mjs` contains `push`, so `*push*` matched even though the command is not `git push`.
+QA 195 (`462403d`) rejected: a commit created mid-run and pushed to a non-`qa/` ref was classified `ref_moved_elsewhere` because its SHA was absent from `KnownShasAtStart`.
 
-**Fix (`docs/loops/qa-driver-template-cursor/cli.json`):** narrow those four wrapper patterns from `*push*` to `*git push*`. Direct `Shell(git push)`, `Shell(git:*push*)`, and `Shell(cmd:*git*push*)` denies are unchanged.
+**Fix (`drive.ps1`):** snapshot `head_at_start` and local `refs/heads/*` tips at run start. At audit, `Get-SeatCreatedShas` collects commits on `HEAD..` and on any local branch tip advance (or new local branch since start). `Audit-NonQaRefs` treats `knownAtStart ∪ seatCreated` as seat-owned → `ref_violations`; unknown SHAs → `ref_moved_elsewhere`. Logs `seat_created_shas` and `ref_audit_limit` (mid-run `git fetch` of a foreign object can still look seat-owned if present locally).
 
-### What decides denial=True/False
+## 2. Push routes (real cursor-agent)
 
-**Real cursor-agent**, not a harness glob re-implementation. `Invoke-PushProbe` copies the test `cli.json` into the stub tree's `.cursor/cli.json`, then runs headless:
+`denial=True/False` comes from stream-json `permissionDenied` after headless `cursor-agent.ps1` with the test `cli.json` copied into `.cursor/cli.json`. Not a harness glob re-implementation.
 
-`powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File cursor-agent.ps1 -p <prompt> --model composer-2.5 --output-format stream-json --trust --force --workspace <stub tree>`
+`cd … &&` on this desktop runs through `cmd /c "cd . && node …/push-qa.mjs …"` (PowerShell 5.1 rejects bare `&&`).
 
-The harness reads `run-0.jsonl` for `permissionDenied` and checks the bare remote for ref movement. Example from `push_red` (old `qa-178/cli.json`, session `b64479fb-32a2-4234-ac64-2c8444f2a619`):
+## 3. Evidence (desktop, 2026-09-28 ~05:10Z)
 
-```
-"permissionDenied":{"command":"powershell -NoProfile -Command node docs/loops/qa-9992/push-qa.mjs qa/zz-probe-red","error":"Command blocked by permissions configuration"}
-```
+Ordinary harness (no flags), product `drive.ps1` from workspace:
 
-Ref-attribution rows do **not** use cursor-agent; they load `Read-Refs` / `Compare-Refs` / `Audit-NonQaRefs` from the product `drive.ps1` at the requested git ref (`-DriveRef`).
-
-## 2. Ref-audit attribution
-
-**Rule:** at run start the driver records `known_commits_at_start` (`git rev-list --all`). After the run, any non-`qa/` ref that moved on origin is `ref_violations` when the remote tip SHA was already in that set, else `ref_moved_elsewhere`. `drive.meta` logs `ref_audit_limit`.
-
-**Limit:** SHAs known at run start only; mid-run `git fetch` of foreign objects is out of scope. QA protocol forbids planner pushes during an in-flight run.
-
-## 3. Evidence (desktop, hidden, 2026-09-28 ~00:10Z)
-
-Harness loads product `drive.ps1` via `-DriveRef` (or workspace copy when omitted).
-
-### Red — pre-fix attribution (`-DriveRef bf33fe4 -SkipAgent`)
-
-```
-ref_other_seat violations=refs/heads/loop/other-seat elsewhere=
-FAIL ref attribution rows
-exit=1
-```
-
-### Mutant — `e385f0d` product, ordinary harness (`-DriveRef e385f0d -SkipAgent`, no flags)
-
-```
-ref_other_seat violations=refs/heads/loop/other-seat elsewhere=
-FAIL ref attribution rows
-exit=1
-```
-
-### Green — candidate `drive.ps1` (`-SkipAgent`)
-
-```
+```text
 ref_other_seat violations= elsewhere=refs/heads/loop/other-seat=<sha>
-ref_seat_outside_qa violations=refs/heads/loop/local-violation elsewhere=refs/heads/loop/other-seat=<sha>
-PASS ref_attribution
-exit=0
-```
-
-### Push routes — real cursor-agent (`-OldCliJson docs/loops/qa-178/cli.json`)
-
-```
-push_red_old_cli powershell … push-qa.mjs … denial=True moved=False
-push_pass node …/push-qa.mjs … denial=False moved=True
-push_pass powershell … push-qa.mjs … denial=False moved=True
+ref_seat_new violations=refs/heads/loop/seat-new elsewhere=refs/heads/loop/other-seat=<sha> seat_created=<new-sha>
+push_pass node docs/loops/qa-9992/push-qa.mjs qa/zz-probe-plain denial=False moved=True
+push_pass cmd /c "cd . && node docs/loops/qa-9992/push-qa.mjs qa/zz-probe-cd" denial=False moved=True
+push_pass powershell -NoProfile -Command "node … push-qa.mjs qa/zz-probe-ps" denial=False moved=True
 push_deny git push … denial=True blocked=True
 push_deny powershell … git push … denial=True blocked=True
+push_deny powershell … "& git push …" denial=True blocked=True push_deny_git_ran=True
+PASS ref_attribution
 PASS push_routes
 exit=0
 ```
 
+**Mutant (start-of-run-only rule):** ordinary harness `-DriveRef 462403d -SkipAgent`:
+
+```text
+ref_seat_new violations= elsewhere=refs/heads/loop/other-seat=…,refs/heads/loop/seat-new=<new-sha>
+FAIL ref attribution rows
+exit=1
+```
+
 ## 4. After merge
 
-Template only via `qa-driver-copy.mjs`. `qa-queue.ps1` unchanged. No writes to QA machines.
+Template via `qa-driver-copy.mjs` only. `qa-queue.ps1` unchanged.
