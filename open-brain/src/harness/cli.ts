@@ -20,7 +20,13 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runLoop, type GateMode } from "./runtime.js";
 import { stubRoles } from "./roles.js";
-import { jsonSchemas, serialiseSchema, validateEvidence, type DeliverableKind } from "./schema.js";
+import {
+  BriefPlanGateError,
+  checkBriefDispatchReady,
+  runBriefPlanGate,
+  type BriefPlanGateMode,
+} from "./brief-plan-gate.js";
+import { jsonSchemas, serialiseSchema, validateEvidence, validatePlan, type DeliverableKind } from "./schema.js";
 import { defaultChecks, type CheckSpec } from "./checks.js";
 import { policyJsonSchemas } from "./policies.js";
 
@@ -29,6 +35,9 @@ const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
   harness run --loop <tNNN> [options]
   harness schemas [--write]
   harness validate evidence <file>
+  harness validate plan <file>
+  harness plan-gate <D_t.json> [--brief <brief.md>] [--mode live|dry-run]
+  harness dispatch-check <brief.md> [--repo <dir>]
   harness help
 
 run options
@@ -164,10 +173,14 @@ export const policySchemaFileName = (kind: "plan" | "done"): string =>
  * ids), and a seat that used one would accept a document the runtime refuses.
  */
 function cmdValidate(argv: readonly string[]): number {
-  if (argv.length !== 2 || argv[0] !== "evidence") {
-    throw new UsageError("usage: harness validate evidence <file>");
+  if (argv.length !== 2) {
+    throw new UsageError("usage: harness validate (evidence|plan) <file>");
   }
+  const kind = argv[0]!;
   const file = resolve(argv[1]!);
+  if (kind !== "evidence" && kind !== "plan") {
+    throw new UsageError("usage: harness validate (evidence|plan) <file>");
+  }
   let text: string;
   try {
     text = readFileSync(file, "utf-8");
@@ -181,9 +194,97 @@ function cmdValidate(argv: readonly string[]): number {
     process.stdout.write(`(root): not JSON: ${(err as Error).message}\n`);
     return 1;
   }
-  const result = validateEvidence(json);
+  const result = kind === "plan" ? validatePlan(json) : validateEvidence(json);
   if (result.ok) return 0;
   for (const problem of result.problems) process.stdout.write(`${problem}\n`);
+  return 1;
+}
+
+function flagMap(argv: readonly string[]): Map<string, string | true> {
+  const flags = new Map<string, string | true>();
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]!;
+    if (!arg.startsWith("--")) continue;
+    const key = arg.slice(2);
+    const next = argv[i + 1];
+    if (next === undefined || next.startsWith("--")) flags.set(key, true);
+    else {
+      flags.set(key, next);
+      i += 1;
+    }
+  }
+  return flags;
+}
+
+const PLAN_GATE_MODES: readonly BriefPlanGateMode[] = ["live", "dry-run"];
+
+function positionalArgs(argv: readonly string[], flags: Map<string, string | true>): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]!;
+    if (!arg.startsWith("--")) {
+      out.push(arg);
+      continue;
+    }
+    const val = flags.get(arg.slice(2));
+    if (typeof val === "string") i += 1;
+  }
+  return out;
+}
+
+async function cmdPlanGate(argv: readonly string[]): Promise<number> {
+  const flags = flagMap(argv);
+  for (const key of flags.keys()) {
+    if (key !== "brief" && key !== "mode" && key !== "repo") {
+      throw new UsageError(`unrecognised flag "--${key}"`);
+    }
+  }
+  const positional = positionalArgs(argv, flags);
+  if (positional.length !== 1) throw new UsageError("usage: harness plan-gate <D_t.json> [--brief <brief.md>] [--mode live|dry-run]");
+  const modeRaw = flags.get("mode");
+  const mode: BriefPlanGateMode =
+    modeRaw === undefined ? "live" : modeRaw === true ? "live" : (modeRaw as BriefPlanGateMode);
+  if (!PLAN_GATE_MODES.includes(mode)) {
+    throw new UsageError(`--mode must be one of ${PLAN_GATE_MODES.join(", ")}, got "${String(modeRaw)}"`);
+  }
+  const brief = flags.get("brief");
+  if (brief === true) throw new UsageError("--brief requires a path");
+  const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  try {
+    const result = await runBriefPlanGate({
+      dtPath: resolve(positional[0]!),
+      briefPath: typeof brief === "string" ? resolve(brief) : null,
+      repoRoot: repo,
+      mode,
+    });
+    process.stdout.write(`${result.recordPath}\n`);
+    for (const [field, source] of Object.entries(result.record.sources)) {
+      process.stdout.write(`source ${field}: ${source}\n`);
+    }
+    return result.exitCode;
+  } catch (err) {
+    if (err instanceof BriefPlanGateError) {
+      process.stderr.write(`${err.message}\n`);
+      return err.exitCode;
+    }
+    throw err;
+  }
+}
+
+function cmdDispatchCheck(argv: readonly string[]): number {
+  const flags = flagMap(argv);
+  for (const key of flags.keys()) {
+    if (key !== "repo") throw new UsageError(`unrecognised flag "--${key}"`);
+  }
+  const positional = positionalArgs(argv, flags);
+  if (positional.length !== 1) throw new UsageError("usage: harness dispatch-check <brief.md> [--repo <dir>]");
+  const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  const check = checkBriefDispatchReady(resolve(positional[0]!), repo);
+  if (check.ok) {
+    process.stdout.write("dispatch-check: ok\n");
+    return 0;
+  }
+  for (const reason of check.reasons) process.stderr.write(`dispatch-check: ${reason}\n`);
   return 1;
 }
 
@@ -268,6 +369,8 @@ export async function main(argv: readonly string[]): Promise<number> {
     if (sub === "run") return await cmdRun(rest);
     if (sub === "schemas") return cmdSchemas(rest);
     if (sub === "validate") return cmdValidate(rest);
+    if (sub === "plan-gate") return await cmdPlanGate(rest);
+    if (sub === "dispatch-check") return cmdDispatchCheck(rest);
     throw new UsageError(`unknown subcommand "${sub}"`);
   } catch (err) {
     if (err instanceof UsageError) {

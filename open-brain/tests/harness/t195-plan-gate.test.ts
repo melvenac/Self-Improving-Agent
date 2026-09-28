@@ -1,0 +1,327 @@
+/**
+ * T-195 — D_t beside briefs, validate plan, plan-gate CLI, dispatch-check.
+ */
+
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { mkdtempSync, readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { spawnSync } from "node:child_process";
+import { resolve } from "node:path";
+import { validatePlan, type Plan } from "../../src/harness/schema.js";
+import {
+  briefDtPath,
+  checkBriefDispatchReady,
+  listBriefGateRecords,
+  nextBriefGateRecordPath,
+  policyFileHash,
+  runBriefPlanGate,
+} from "../../src/harness/brief-plan-gate.js";
+import { decidePlanGate, loadPolicies, policiesDir } from "../../src/harness/policies.js";
+import type { GateAnswer, GatePayload, GateTransport } from "../../src/harness/gate.js";
+import { GateUnavailable, JEV_KEY_VAR } from "../../src/harness/gate.js";
+import { runLoop } from "../../src/harness/runtime.js";
+import { StubDeveloper, StubPlanner, StubQa } from "../../src/harness/roles.js";
+import { exitingChecks, makeRepo, requireGit } from "./fixture.js";
+
+const TSX = resolve(__dirname, "../../node_modules/tsx/dist/cli.mjs");
+const CLI = resolve(__dirname, "../../src/harness/cli.ts");
+
+const validPlan = (): Plan => ({
+  loop: "t195",
+  objective: "Add D_t and plan gate beside interactive briefs.",
+  tasks: ["implement harness plan-gate"],
+  out_of_scope: ["runtime merge path"],
+  preserve: ["validate evidence unchanged"],
+  acceptance: [{ id: "DT-1", observable: "harness validate plan exits 0", type: "blackbox" }],
+  repair_targets: [],
+  new_capability: "brief-side plan gate",
+});
+
+const PLAN_ANSWERS = {
+  plan_mode: { type: "choice", choice: "mixed", confidence: 0.9 },
+  scope_size: { type: "score", score: 1, confidence: 0.9 },
+  preserves_validated: { type: "noul", noul: 0.9 },
+  addresses_top_failures: { type: "noul", noul: 0.9 },
+  has_observable_acceptance: { type: "noul", noul: 0.95 },
+};
+
+class TableTransport implements GateTransport {
+  readonly name = "table";
+  constructor(
+    private readonly answers: Record<string, unknown> = PLAN_ANSWERS,
+    private readonly fail?: (payload: GatePayload) => never,
+  ) {}
+  async dispatch(payload: GatePayload): Promise<GateAnswer> {
+    if (this.fail) this.fail(payload);
+    return {
+      gate: payload.gate,
+      answers: this.answers,
+      consulted: true,
+      note: "stub",
+      resolvedModel: "jev-1.13.0",
+      usage: { input_tokens: 1, output_tokens: 1 },
+    };
+  }
+}
+
+function harness(args: readonly string[], cwd: string, env: NodeJS.ProcessEnv = {}): {
+  status: number | null;
+  stdout: string;
+  stderr: string;
+} {
+  const r = spawnSync(process.execPath, [TSX, CLI, ...args], {
+    cwd,
+    encoding: "utf-8",
+    shell: false,
+    timeout: 120_000,
+    env: { ...process.env, ...env },
+  });
+  if (r.error) throw r.error;
+  return { status: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "" };
+}
+
+function writeBriefFixture(dir: string): { brief: string; dt: string } {
+  const brief = join(dir, "sample-brief.md");
+  const dt = briefDtPath(brief);
+  writeFileSync(brief, "# Sample brief\n\nBuild the plan gate.\n", "utf-8");
+  writeFileSync(dt, `${JSON.stringify(validPlan(), null, 2)}\n`, "utf-8");
+  return { brief, dt };
+}
+
+describe("T-195 brief plan gate", { timeout: 120_000 }, () => {
+  let dir: string;
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), "t195-"));
+  });
+
+  describe("DT-1 validate plan", () => {
+    it("exits 0 on valid, 1 with every problem on invalid, 2 on usage error", () => {
+      const { dt } = writeBriefFixture(dir);
+      const badPath = join(dir, "bad.json");
+      const badDoc = { ...validPlan(), tasks: [] };
+      writeFileSync(badPath, JSON.stringify(badDoc), "utf-8");
+
+      expect(harness(["validate", "plan", dt], dir).status).toBe(0);
+
+      const invalid = harness(["validate", "plan", badPath], dir);
+      const expected = validatePlan(badDoc);
+      expect(expected.ok).toBe(false);
+      if (expected.ok) return;
+      expect(invalid.status).toBe(1);
+      expect(invalid.stdout.trim().split(/\r?\n/)).toEqual(expected.problems);
+
+      expect(harness(["validate", "plan"], dir).status).toBe(2);
+    });
+  });
+
+  describe("DT-2 plan-gate payload sources", () => {
+    it("prints named source for each HOH-JEV field", async () => {
+      const { brief, dt } = writeBriefFixture(dir);
+      const result = await runBriefPlanGate({
+        dtPath: dt,
+        briefPath: brief,
+        repoRoot: dir,
+        mode: "live",
+        transport: new TableTransport(),
+        env: {},
+      });
+      expect(result.record.sources.spec_excerpt).toContain("brief markdown");
+      expect(result.record.sources.plan_summary).toBe("D_t.objective");
+      expect(result.record.sources.prior_failures).toContain("D_t.repair_targets");
+      expect(result.record.sources.validated_behaviours).toContain("D_t.preserve");
+      expect(result.record.sources.changed_area_hints).toContain("D_t.tasks");
+      expect(result.record.request.state).toBeDefined();
+    });
+  });
+
+  describe("DT-3 thresholds from policy file only", () => {
+    it("changing plan-gate.json changes the decision without source edits", () => {
+      const policies = loadPolicies();
+      const ctx = { deterministicFailure: false, qaHistorySupportsStopShip: false, hasPriorFailures: false };
+      const low = { ...PLAN_ANSWERS, has_observable_acceptance: { type: "noul", noul: 0.55 } };
+      const strict = decidePlanGate(low, { ...policies.plan, has_observable_acceptance_min: 0.7 }, ctx);
+      const lenient = decidePlanGate(low, { ...policies.plan, has_observable_acceptance_min: 0.5 }, ctx);
+      expect(strict.verdict).toBe("reject");
+      expect(lenient.verdict).toBe("proceed");
+      expect(policyFileHash()).toHaveLength(64);
+      expect(readFileSync(join(policiesDir(), "plan-gate.json"), "utf-8")).toContain("has_observable_acceptance_min");
+    });
+  });
+
+  describe("DT-4 append-only decision records", () => {
+    it("writes a second record without overwriting the first", async () => {
+      const { brief, dt } = writeBriefFixture(dir);
+      const t1 = new Date("2026-09-28T12:00:00.000Z");
+      const t2 = new Date("2026-09-28T12:01:00.000Z");
+      const r1 = await runBriefPlanGate({
+        dtPath: dt,
+        briefPath: brief,
+        repoRoot: dir,
+        mode: "live",
+        transport: new TableTransport(),
+        env: {},
+        at: t1,
+      });
+      const r2 = await runBriefPlanGate({
+        dtPath: dt,
+        briefPath: brief,
+        repoRoot: dir,
+        mode: "live",
+        transport: new TableTransport(),
+        env: {},
+        at: t2,
+      });
+      expect(r1.recordPath).not.toBe(r2.recordPath);
+      expect(existsSync(r1.recordPath)).toBe(true);
+      expect(existsSync(r2.recordPath)).toBe(true);
+      expect(listBriefGateRecords(brief)).toHaveLength(2);
+      const rec = JSON.parse(readFileSync(r1.recordPath, "utf-8")) as { policy_hash: string; model_resolved: string };
+      expect(rec.policy_hash).toBe(policyFileHash());
+      expect(rec.model_resolved).toBe("jev-1.13.0");
+    });
+  });
+
+  describe("DT-5 feedback on rejection", () => {
+    it("names failing questions with value and threshold", async () => {
+      const { brief, dt } = writeBriefFixture(dir);
+      await expect(
+        runBriefPlanGate({
+          dtPath: dt,
+          briefPath: brief,
+          repoRoot: dir,
+          mode: "live",
+          transport: new TableTransport({
+            ...PLAN_ANSWERS,
+            has_observable_acceptance: { type: "noul", noul: 0.55 },
+          }),
+          env: {},
+        }),
+      ).rejects.toThrow(/has_observable_acceptance.*0\.55.*0\.7|below the required 0\.7/);
+    });
+  });
+
+  describe("DT-6 fails closed", () => {
+    it("refuses missing TYPESAFE_API_KEY without passing", async () => {
+      const { brief, dt } = writeBriefFixture(dir);
+      await expect(
+        runBriefPlanGate({
+          dtPath: dt,
+          briefPath: brief,
+          repoRoot: dir,
+          mode: "live",
+          env: {},
+        }),
+      ).rejects.toThrow(/TYPESAFE_API_KEY/);
+    });
+
+    it("refuses transport and malformed envelope failures", async () => {
+      const { brief, dt } = writeBriefFixture(dir);
+      await expect(
+        runBriefPlanGate({
+          dtPath: dt,
+          briefPath: brief,
+          repoRoot: dir,
+          mode: "live",
+          transport: new TableTransport(PLAN_ANSWERS, () => {
+            throw new GateUnavailable("network error simulated");
+          }),
+          env: { [JEV_KEY_VAR]: "sk-test-key-never-logged-1234567890" },
+        }),
+      ).rejects.toThrow(/network error simulated/);
+    });
+  });
+
+  describe("DT-7 dispatch-check", () => {
+    it("refuses a brief without D_t or passing live gate record", async () => {
+      const { brief, dt } = writeBriefFixture(dir);
+      let check = checkBriefDispatchReady(brief, dir);
+      expect(check.ok).toBe(false);
+      expect(check.reasons.some((r) => r.includes("no plan-gate"))).toBe(true);
+
+      await runBriefPlanGate({
+        dtPath: dt,
+        briefPath: brief,
+        repoRoot: dir,
+        mode: "dry-run",
+        transport: new TableTransport(),
+        env: {},
+      });
+      check = checkBriefDispatchReady(brief, dir);
+      expect(check.ok).toBe(false);
+      expect(check.reasons.some((r) => r.includes("no live plan-gate"))).toBe(true);
+
+      await runBriefPlanGate({
+        dtPath: dt,
+        briefPath: brief,
+        repoRoot: dir,
+        mode: "live",
+        transport: new TableTransport(),
+        env: {},
+        at: new Date("2026-09-28T13:00:00.000Z"),
+      });
+      check = checkBriefDispatchReady(brief, dir);
+      expect(check.ok).toBe(true);
+
+      const cli = harness(["dispatch-check", brief, "--repo", dir], dir);
+      expect(cli.status).toBe(0);
+      expect(cli.stdout).toContain("dispatch-check: ok");
+
+      writeFileSync(brief.replace(".md", ".D_t.json"), "{}", "utf-8");
+      expect(harness(["dispatch-check", brief, "--repo", dir], dir).status).toBe(1);
+    });
+  });
+
+  describe("DT-8 preserved runtime paths", () => {
+    let repo: ReturnType<typeof makeRepo>;
+
+    beforeEach(() => {
+      requireGit();
+      repo = makeRepo("t195-runtime-");
+    });
+    afterEach(() => repo.cleanup());
+
+    it("validate evidence and runLoop still pass unchanged", async () => {
+      const validPath = join(dir, "evidence.json");
+      writeFileSync(
+        validPath,
+        JSON.stringify({
+          loop: "t001",
+          candidate_git: { sha: "a".repeat(40), branch: "main", frozen_at: "2026-09-19T00:00:00.000Z" },
+          runtime_checks: {
+            build: { command: "node", exit_code: 0, passed: true, duration_ms: 1, detail: "ok" },
+            unit: { command: "node", exit_code: 0, passed: true, duration_ms: 1, detail: "ok" },
+          },
+          requirements: [],
+          acceptance: [{ id: "A1", status: "met", order: "shown", evidence: "ok" }],
+          regressions: [],
+          gaps: [],
+          notes: "",
+        }),
+        "utf-8",
+      );
+      expect(harness(["validate", "evidence", validPath], dir).status).toBe(0);
+
+      const r = await runLoop({
+        repoRoot: repo.root,
+        loop: "t001",
+        roles: { planner: new StubPlanner(), developer: new StubDeveloper(), qa: new StubQa() },
+        checks: exitingChecks(0, 0),
+        gateMode: "skip",
+        log: () => {},
+      });
+      expect(r.status).toBe("completed");
+    });
+  });
+});
+
+describe("T-195 sidecar paths", () => {
+  it("allocates monotonic record filenames", () => {
+    const brief = join(tmpdir(), "foo-brief.md");
+    const p1 = nextBriefGateRecordPath(brief, new Date("2026-09-28T10:00:00.000Z"));
+    const p2 = nextBriefGateRecordPath(brief, new Date("2026-09-28T10:00:01.000Z"));
+    expect(p1).not.toBe(p2);
+    expect(p1).toContain("foo-brief.G_plan.");
+  });
+});
