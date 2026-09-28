@@ -8,7 +8,7 @@ real knowledge DB.** Commit the report from a separate worktree.
 
 - Product **`20c2dfd`** on `origin/loop/15-slice-3-candidate-c` (tip `5f7c9a0`, the handoff; red tests `3854b2f`),
   from `origin/master` `d1e8674`. PR #195. Handoff: `docs/loops/loop-15-slice-3-c-r3-developer-handoff.md`.
-- **This is r3.** QA 212 REJECTED r2 `8054f9f` (`qa/c-r3-report` `2ffece8`) on one defect: a non-SHA candidate id
+- **This is r3.** QA 212 REJECTED r2 `8054f9f` (`qa/c-r2-report` `2ffece8`) on one defect: a non-SHA candidate id
   was accepted and written. QA 204 (`qa/c-report` `b16d5b5`) found five, which QA 212 confirmed closed. **Read QA 212
   first.** Every row QA 212 scored `met` must still be met.
 - Mutant branches: `origin/loop/15-slice-3-candidate-c-r3-mut-sha`, plus the r2 set
