@@ -1638,7 +1638,7 @@ export function checkGitNexusIndex(projectRoot: string): CheckResult {
   if (ahead > 0) {
     return {
       name,
-      severity: "issue",
+      severity: "warn",
       message: `index is ${ahead} commit(s) ahead of HEAD — indexed ${indexed.slice(0, 7)} is not HEAD ${head}. Reindex. ${tail}`,
       report: true,
     };
