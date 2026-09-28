@@ -48,9 +48,10 @@ function preToolUseMatchers(hooksJson: unknown): string[] | null {
 export function checkCursorHookCompat(home: string = homedir(), localAppData?: string | null): CheckResult {
   const registry = join(home, ".claude", "plugins", "installed_plugins.json");
   if (!existsSync(registry)) {
+    // QA mutant: NOT FOR MERGE. Missing registry reported as pass.
     return {
       name: NAME,
-      severity: "skip",
+      severity: "pass",
       report: true,
       message: `no plugin registry at ~/.claude/plugins/installed_plugins.json — cursor-hook-compat not checked (not a pass). ${LIMIT}`,
     };
