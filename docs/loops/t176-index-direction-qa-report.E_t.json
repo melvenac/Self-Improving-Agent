@@ -1,0 +1,60 @@
+{
+  "loop": "200-index-direction",
+  "candidate_git": {
+    "sha": "6adc07ef34e9021765adacb7816bc0f213806a3c",
+    "branch": "origin/loop/t176-index-direction",
+    "frozen_at": "2026-09-28T06:32:07Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "ci.yml run 36386954884: npx tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 8000,
+      "detail": "CI typecheck step succeeded from 06:32:49Z to 06:32:57Z; local npm run typecheck also exited 0."
+    },
+    "unit": {
+      "command": "ci.yml run 36386954884: npm test",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 188000,
+      "detail": "CI run concluded success: 131 files, 1812 passed and 6 skipped; test step ran from 06:32:57Z to 06:36:05Z (Vitest reported 187.22s)."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "1-direction-states",
+      "status": "met",
+      "evidence": "Independent real repositories showed distinct behind WARN, ahead ISSUE, diverged ISSUE, and unknown-commit ISSUE results; diverged and unknown messages named indexed and HEAD SHAs.",
+      "order": "shown"
+    },
+    {
+      "id": "2-preserves",
+      "status": "met",
+      "evidence": "At-HEAD was PASS, absent .gitnexus was a reasoned SKIP, and a whole runSync checkOnly probe left every non-.git fixture byte unchanged.",
+      "order": "shown"
+    },
+    {
+      "id": "3-detached-branch",
+      "status": "met",
+      "evidence": "A current index with a dead recorded branch remained PASS and explicitly said the branch is not evidence of staleness.",
+      "order": "shown"
+    },
+    {
+      "id": "4-red-green-developer-mutants",
+      "status": "met",
+      "evidence": "CI red 36386952159 failed three intended rows; green 36386954884 succeeded with 1812 passed and 6 skipped; behind mutant 36386957786 failed three direction rows; unknown mutant 36386960517 failed only the unknown-SHA row. Head SHAs matched the dispatched refs.",
+      "order": "shown"
+    },
+    {
+      "id": "5-qa-mutants",
+      "status": "met",
+      "evidence": "QA mutants 02e09ead (ahead downgraded to WARN) and d1686ea (no index reported PASS) both typechecked and were killed by focused final rows.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [],
+  "gaps": [],
+  "notes": "Product SHA is 6adc07e; branch tip 8d3143c adds only the amended handoff. GitNexus impact tooling was unavailable, so QA used direct caller inspection and changed no candidate product code."
+}
