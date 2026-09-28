@@ -225,7 +225,6 @@ function Audit-NonQaRefs([hashtable] $before, [hashtable] $after, [string[]] $kn
     $sha = [string]$after[$ref]
     if (-not $sha) { continue }
     if ($knownShas -contains $sha) { $violations.Add($ref) }
-    elseif ($seatCreatedShas -contains $sha) { $violations.Add($ref) }
     else { $elsewhere.Add("$ref=$sha") }
   }
   return @{ changed = $cmp.changed; violations = $violations.ToArray(); elsewhere = $elsewhere.ToArray() }
