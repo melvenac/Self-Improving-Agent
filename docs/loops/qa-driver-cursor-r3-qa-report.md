@@ -116,5 +116,6 @@ Both mutant files parse with zero PowerShell errors. Both branches were pushed o
 ## 8. Open for the planner
 
 - I treated item 4 literally and rejected. The product attribution fix itself passes every direct and second-path probe. If fixture-only adaptations are allowed under “ordinary harness,” item 4 would be met and the product verdict would be accept; the candidate bytes do not contain that adaptation.
+- **Driver completion-check mismatch:** the dispatch says never to touch `%USERPROFILE%\Worktrees\sia-qa` beyond reading and to commit this report from a separate worktree. I complied: this file is on `qa/qa-driver-r3-report` in `C:\qa-scratch\qa202\wt-r3`. The headless driver's `Test-Complete` instead checks for the file in the protected dispatch checkout, so it reports the file missing after a completed, pushed report. Copying it there would violate the dispatch. The report branch is the durable result.
 
 QA-202: REPORT COMPLETE
