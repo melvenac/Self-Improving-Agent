@@ -101,7 +101,6 @@ export function checkCursorHookCompat(home: string = homedir(), localAppData?: s
         continue;
       }
       if (inst.installPath === "") {
-        findings.push(`${id} ${version}: installPath is empty — could not read hooks/hooks.json`);
         continue;
       }
       if (!existsSync(inst.installPath)) {
