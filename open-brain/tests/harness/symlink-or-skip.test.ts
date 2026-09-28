@@ -43,7 +43,13 @@ describe("symlink EPERM", () => {
       err.code = "ENOENT";
       throw err;
     };
-    expect(() => symlinkSyncOrSkip("target", join(tmpdir(), "no-such-link"), undefined, enoent)).toThrow(/ENOENT/);
+    let caught: NodeJS.ErrnoException | undefined;
+    try {
+      symlinkSyncOrSkip("target", join(tmpdir(), "no-such-link"), undefined, enoent);
+    } catch (err) {
+      caught = err as NodeJS.ErrnoException;
+    }
+    expect(caught?.code).toBe("ENOENT");
     expect(notes).toEqual([]);
   });
 

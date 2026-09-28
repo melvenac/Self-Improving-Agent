@@ -1,15 +1,10 @@
 /**
- * QA 138 (record session 138) on the importer leftovers, candidate d500730.
- * QA evidence, not for merge. Byte fixtures, so the file runs the same on tcm (Linux) as on Windows.
- *
- * RED on d500730 by design (the defects in docs/loops/importer-leftovers-qa-report.md):
- *   - D1: a UTF-16BE mark over an ODD number of bytes throws a RangeError from Buffer.swap16 instead of being
- *     filed unreadable; for DECISIONS.md, which is not judged, the throw blocks the whole import (R4-5 says it must not).
- *   - D2: a valid UTF-8 judged input with no `# ` line is refused with evidence that blames its encoding.
- * GREEN on d500730, and each kills a QA 138 mutant that survived the candidate's own tests:
- *   - the no-title rule on task.md and next-session.md, not only INBOX.md (Q4);
- *   - the BOM path's first-NUL byte, counted in bytes (Q5);
- *   - zero bytes are said to be empty (Q6).
+ * Guards the importer's unreadable-input rows that QA 138 first wrote, kept
+ * because they still name the behavior: an odd-length UTF-16BE mark is filed
+ * unreadable and does not throw; a judged file with no title line is not
+ * blamed on its encoding; task.md and next-session.md follow the same
+ * no-title rule as INBOX.md; a NUL is named by its byte; zero bytes are
+ * said to be empty. Byte fixtures, so the file runs on tcm and on Windows.
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
@@ -47,7 +42,7 @@ let root: string;
 beforeEach(() => { root = mkdtempSync(join(tmpdir(), "ob-import-qa138-")); });
 afterEach(() => { rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }); });
 
-describe("QA 138 D1 (RED): a UTF-16BE mark over an odd number of bytes", () => {
+describe("an odd-length UTF-16BE mark is unreadable and does not throw", () => {
   it("the fixture is odd: FE FF, then UTF-8 bytes", () => {
     const b = oddBe(inboxText(6));
     expect(b.subarray(0, 2).toString("hex")).toBe("feff");
@@ -66,7 +61,7 @@ describe("QA 138 D1 (RED): a UTF-16BE mark over an odd number of bytes", () => {
   });
 });
 
-describe("QA 138 D2 (RED): the no-title rule's evidence on a file the importer read correctly", () => {
+describe("a file the importer read, with no title line, is not blamed on its encoding", () => {
   it("a valid UTF-8 next-session.md with `##` sections and no `# ` line is not said to be in an unread encoding", () => {
     writeProject(root, { [NEXT]: "## Pick up here (Session 7)\r\n\r\nCarry on.\r\n\r\n## Watch out for\r\n\r\n- the hold\r\n" });
     const j = judged(root, NEXT);
@@ -74,7 +69,7 @@ describe("QA 138 D2 (RED): the no-title rule's evidence on a file the importer r
   });
 });
 
-describe("QA 138 coverage (GREEN): what the candidate's own tests left open", () => {
+describe("task.md and next-session.md follow the no-title rule, and a NUL or an empty file says which", () => {
   // Q4: the rule applied to INBOX.md only survived every candidate test.
   const OTHERS: Array<[string, string, Buffer]> = [
     ["task.md in UTF-7", TASK, utf7("Current Focus", 6)],

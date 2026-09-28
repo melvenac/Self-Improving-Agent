@@ -1,11 +1,9 @@
 /**
- * QA 122 (importer fixes round 4), D11: two encodings Windows PowerShell 5.1
- * writes on request are read without error and judged "names no Session N",
- * which does not block. A STALE project then commits with a bare --commit and
- * imports none of the INBOX's tasks. Bytes only, so it runs on tcm too; the
- * bytes are what PS 5.1.19041.6456 wrote on the QA PC (probes-r4.mjs).
- *
- * Red on 78a7d13 by design: this file is QA's evidence, not a candidate test.
+ * Guards the bytes Windows PowerShell 5.1 writes for UTF-32 and UTF-7.
+ * UTF-32LE and UTF-7 are judged and a bare --commit does not import a stale
+ * INBOX. UTF-32BE holds NUL bytes, so it is unreadable and blocks. The bytes
+ * are what PS 5.1.19041.6456 wrote. Kept because those exact buffers are the
+ * fixture, and the file runs on tcm.
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { createHash } from "node:crypto";
