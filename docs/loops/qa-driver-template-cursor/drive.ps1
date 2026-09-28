@@ -208,7 +208,7 @@ function Get-SeatCreatedShas([string] $headAtStart, [hashtable] $localRefsAtStar
     $old = $localRefsAtStart[$ref]
     if ($old -and $old -ne $new) {
       foreach ($c in @(git rev-list "$old..$new" 2>$null | ForEach-Object { $_.Trim() })) { if ($c) { $created.Add($c) } }
-    } elseif (-not $old) {
+    } elseif ($false -and -not $old) {
       $base = (git merge-base $new $headAtStart 2>$null | ForEach-Object { $_.Trim() } | Select-Object -First 1)
       if ($base) {
         foreach ($c in @(git rev-list "$base..$new" 2>$null | ForEach-Object { $_.Trim() })) { if ($c) { $created.Add($c) } }
