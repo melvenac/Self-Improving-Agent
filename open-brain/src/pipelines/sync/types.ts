@@ -61,6 +61,16 @@ export interface SyncOptions {
   /** Defaults to "cli". `ob_sync` passes "mcp-server". */
   runtime?: SyncRuntime;
   /**
+   * Home the cursor-hook-compat check reads. Defaults to `os.homedir()`.
+   * Tests pass a fixture (G-044). The CLI and the MCP server omit it.
+   */
+  home?: string;
+  /**
+   * Directory that holds `cursor-agent`. Defaults to `LOCALAPPDATA`.
+   * `null` means Cursor CLI is not installed.
+   */
+  localAppData?: string | null;
+  /**
    * Absent means the memory module is not installed. `runSync` then reports the
    * three memory checks as `skipped` with that reason — NOT as passing. An
    * absent module and a clean database must not render identically (rule 11).
