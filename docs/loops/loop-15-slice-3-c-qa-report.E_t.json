@@ -1,0 +1,203 @@
+{
+  "loop": "15-slice-3-c",
+  "candidate_git": {
+    "sha": "2035e893497cf37f4224835dd95a7d3838e45cca",
+    "branch": "origin/loop/15-slice-3-candidate-c",
+    "frozen_at": "2026-09-28T00:18:54-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "gh workflow run ci.yml --ref qa/c-green (run 36388788476, Typecheck step)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 6000,
+      "detail": "tcm Typecheck step succeeded; candidate local npm run build also exited 0"
+    },
+    "unit": {
+      "command": "gh workflow run ci.yml --ref qa/c-green (run 36388788476, full vitest)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 191130,
+      "detail": "132 files, 1828 tests passed, 6 skipped; frozen base also succeeded"
+    }
+  },
+  "requirements": [
+    {
+      "id": "C-204-1",
+      "status": "unmet",
+      "evidence": "CC-6 artifact uses an unapproved runtime path and omits acceptance and gate summaries.",
+      "severity": "blocker"
+    },
+    {
+      "id": "C-204-2",
+      "status": "unmet",
+      "evidence": "CC-10 replacement accepts no new SHA and CLI can record it as declined.",
+      "severity": "blocker"
+    },
+    {
+      "id": "C-204-3",
+      "status": "unmet",
+      "evidence": "CC-13 ledger check passes an empty object and treats line_hash as optional.",
+      "severity": "blocker"
+    },
+    {
+      "id": "C-204-4",
+      "status": "unmet",
+      "evidence": "CC-18 unreadable evidence exits before an undefined verdict is recorded.",
+      "severity": "major"
+    },
+    {
+      "id": "C-204-5",
+      "status": "unmet",
+      "evidence": "CC-20 accepts unknown flags and silently maps an invalid gate mode to skip.",
+      "severity": "major"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "CC-0",
+      "status": "met",
+      "evidence": "Static diff scope and preservation checks hold.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-1",
+      "status": "partial",
+      "evidence": "Strict derived merge policy exists, but merge.json does not state required evidence inputs."
+    },
+    {
+      "id": "CC-2",
+      "status": "partial",
+      "evidence": "Three outcomes and reasons exist; required named fixture files do not."
+    },
+    {
+      "id": "CC-3",
+      "status": "met",
+      "evidence": "Green attributed fixture returns would-merge.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-4",
+      "status": "met",
+      "evidence": "All five would-not-merge causes are asserted.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-5",
+      "status": "partial",
+      "evidence": "Causes 5.1 through 5.5 are asserted; 5.6 lacks its required fixture."
+    },
+    {
+      "id": "CC-6",
+      "status": "unmet",
+      "evidence": "Wrong runtime path and missing acceptance/gate input summaries."
+    },
+    {
+      "id": "CC-7",
+      "status": "met",
+      "evidence": "Second prepare refuses and leaves artifact bytes unchanged.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-8",
+      "status": "met",
+      "evidence": "Prepare precedes decide, timestamps are strictly ordered, and artifacts are immutable.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-9",
+      "status": "met",
+      "evidence": "Merged decision records the required fields and reachability is fixture-tested.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-10",
+      "status": "unmet",
+      "evidence": "Replacement without a new SHA is accepted and can be misrecorded as declined."
+    },
+    {
+      "id": "CC-11",
+      "status": "met",
+      "evidence": "Ledger summary reports disagreements, evaluated, undefined_count, and disclaimer.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-12",
+      "status": "met",
+      "evidence": "Undefined is null disagreement and excluded from evaluated.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-13",
+      "status": "partial",
+      "evidence": "Malformed JSON fails every sync, but structural validation and hash enforcement are bypassable."
+    },
+    {
+      "id": "CC-14",
+      "status": "met",
+      "evidence": "Pending returns undefined.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-15",
+      "status": "met",
+      "evidence": "Declared lists remain separate, exclude rows, and are recorded separately.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-16",
+      "status": "met",
+      "evidence": "In-scope not_evaluated blocks and criteria declarations control exclusions.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-17",
+      "status": "met",
+      "evidence": "Attributed met counts as met and is named in reasons.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-18",
+      "status": "partial",
+      "evidence": "Required shape and matching rules work; unreadable evidence does not yield an undefined artifact."
+    },
+    {
+      "id": "CC-19",
+      "status": "met",
+      "evidence": "Prepare is the adjacent human merge point and runLoop remains unchanged.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-20",
+      "status": "partial",
+      "evidence": "Commands work, but unknown flags and invalid gate modes do not refuse."
+    },
+    {
+      "id": "CC-22",
+      "status": "met",
+      "evidence": "Candidate and base full suites succeeded on tcm with no new failures.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-29",
+      "status": "met",
+      "evidence": "Human artifacts are under non-ignored docs paths.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-30",
+      "status": "met",
+      "evidence": "Tracked procedure and unreachable-merge fixture satisfy the amended row.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "CC-6 artifact contract is incomplete.",
+    "CC-10 replacement action is unsafe.",
+    "CC-13 ledger integrity is bypassable.",
+    "CC-18 unreadable evidence does not form an undefined verdict.",
+    "CC-20 usage parsing is permissive."
+  ],
+  "notes": "QA-204 final evidence. Red failed all 17 new gate tests; candidate and base were green; both independent mutants survived."
+}
