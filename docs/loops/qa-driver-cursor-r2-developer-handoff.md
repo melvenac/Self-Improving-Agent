@@ -40,6 +40,26 @@ FAIL ref attribution rows
 exit=1
 ```
 
-## 4. After merge
+## 4. Record 192 r4 (harness only, QA 202)
+
+QA 202 rejected r3 evidence only: on Git 2.55 the bare fixture lacked `HEAD → refs/heads/seed`, so `git clone` warned and `ErrorActionPreference=Stop` aborted before attribution rows.
+
+**Harness fix:** after seed push, `git --git-dir=$bare symbolic-ref HEAD refs/heads/seed`; `Run-FixtureGit` wraps fixture git calls with `Continue` so native stderr warnings are not fatal (exit code still checked).
+
+Product unchanged (`d67c5e7`).
+
+```text
+# candidate -SkipAgent
+ref_seat_new violations=refs/heads/loop/seat-new ...
+PASS ref_attribution
+exit=0
+
+# -DriveRef 462403d -SkipAgent
+ref_seat_new violations= elsewhere=...,refs/heads/loop/seat-new=...
+FAIL ref attribution rows
+exit=1
+```
+
+## 5. After merge
 
 Template via `qa-driver-copy.mjs` only. `qa-queue.ps1` unchanged.

@@ -20,6 +20,12 @@ $ps = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
 $results = New-Object System.Collections.Generic.List[string]
 function Say([string] $line) { $results.Add($line); Write-Output $line }
 function Fail([string] $msg) { Say "FAIL $msg"; exit 1 }
+function Run-FixtureGit([scriptblock] $body) {
+  $prev = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  try { & $body } finally { $ErrorActionPreference = $prev }
+  if ($LASTEXITCODE -ne 0) { throw "git fixture failed with exit $LASTEXITCODE" }
+}
 
 if (Test-Path -LiteralPath $root) {
   cmd.exe /d /c "rd /s /q `"$root`"" 2>$null | Out-Null
@@ -36,7 +42,8 @@ $env:GIT_COMMITTER_NAME = 'probe'; $env:GIT_COMMITTER_EMAIL = 'p@e.com'
 git -C $tree add README.md
 git -C $tree commit -q -m seed
 $seedSha = (git -C $tree rev-parse HEAD).Trim()
-git -C $tree push -q origin HEAD:refs/heads/seed
+Run-FixtureGit { git -C $tree push -q origin HEAD:refs/heads/seed }
+Run-FixtureGit { git --git-dir=$bare symbolic-ref HEAD refs/heads/seed }
 Copy-Item -LiteralPath $cliPath -Destination (Join-Path $tree '.cursor\cli.json') -Force
 Copy-Item -LiteralPath $cliPath -Destination (Join-Path $tree 'docs\loops\qa-9992\cli.json') -Force
 Copy-Item -LiteralPath (Join-Path $repo 'docs\loops\qa-driver-template-cursor\push-qa.mjs') -Destination (Join-Path $tree 'docs\loops\qa-9992\push-qa.mjs') -Force
@@ -113,7 +120,7 @@ git -C $tree for-each-ref --format='%(refname) %(objectname)' refs/heads | ForEa
 }
 
 $otherDir = Join-Path $root 'other'
-git clone -q $bare $otherDir
+Run-FixtureGit { git clone -q $bare $otherDir }
 Set-Content (Join-Path $otherDir 'other.txt') 'x' -Encoding ascii
 git -C $otherDir add other.txt
 git -C $otherDir commit -q -m other
