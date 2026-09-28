@@ -1,0 +1,61 @@
+{
+  "loop": "192-qa-driver-r3",
+  "candidate_git": {
+    "sha": "d67c5e7044df129d61deba68c489f9f89cdb87fc",
+    "branch": "origin/loop/qa-driver-cursor-r2",
+    "frozen_at": "2026-09-28T06:12:40.0655637Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci; npm run build (open-brain, candidate handoff 13e183c containing product d67c5e7)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 12025,
+      "detail": "Candidate TypeScript build and postbuild completed; build stamped 13e183c. No CI was requested or run."
+    },
+    "unit": {
+      "command": "docs/loops/qa-driver-cursor-r2-harness.ps1 (candidate bytes; only fixed developer-machine repo path changed)",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 1693,
+      "detail": "The shipped harness aborted before ref rows because Git 2.55 warned that the bare fixture's remote HEAD names no ref and ErrorActionPreference=Stop promoted stderr to a terminating NativeCommandError. With only the fixture HEAD pointed to seed, the ordinary candidate run exited 0."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "1",
+      "status": "met",
+      "evidence": "Candidate Audit-NonQaRefs classified the direct post-start commit as ref_violations. Independent amended-commit, cherry-pick, and same-repository other-worktree probes also classified their non-qa refs as violations.",
+      "order": "shown"
+    },
+    {
+      "id": "2",
+      "status": "met",
+      "evidence": "Both the candidate harness and an independent probe classified an external clone's mid-run push only as ref_moved_elsewhere.",
+      "order": "shown"
+    },
+    {
+      "id": "3",
+      "status": "met",
+      "evidence": "After the fixture-only adaptation, real cursor-agent moved all three push-qa refs (plain node, cmd /c cd . && node, and PowerShell node) and did not move any direct git-push ref; direct, PowerShell, and call-operator forms produced real permissionDenied events.",
+      "order": "shown"
+    },
+    {
+      "id": "4",
+      "status": "unmet",
+      "evidence": "The shipped ordinary harness against 462403d exits 1 before the seat-new row because its bare origin has no valid HEAD. With one fixture-only symbolic-ref line added, it reaches seat-new and exits 1 on the expected false negative."
+    },
+    {
+      "id": "5",
+      "status": "met",
+      "evidence": "qa/qa-driver-r3-mut-seat-check 92589992c5bb1a9f020f482090d131de5d8647db is killed by the ordinary seat-new row. qa/qa-driver-r3-mut-new-ref 6bbf0be3150789ccaf011ffae57bfa6735ebb9a0 is killed by the same-repository other-worktree probe.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "The harness's raw denial Select-String can report denial=True on a passing push after the stub reads the generated drive.ps1, because that file itself contains the permissionDenied search literal."
+  ],
+  "notes": "Local Windows PowerShell only; no CI and no windows=true run. Node was v24.5.0 although v22 is the repository's tested version. Product behavior passed; verdict is controlled by the shipped harness failing acceptance item 4 before its asserted row."
+}
