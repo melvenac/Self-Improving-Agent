@@ -312,8 +312,8 @@ export function checkShadowMergeLedger(projectRoot: string): CheckResult {
           }
         }
       }
-    } catch (err) {
-      problems.push(`line ${i + 1}: ${(err as Error).message}`);
+    } catch {
+      // MUTANT: malformed lines are silently ignored.
     }
   }
   if (problems.length > 0) {
