@@ -492,4 +492,19 @@ are ACCEPTED as written, with the amendments below.** **The criteria SHA for C i
 (CC-0.4). The runtime never merges or pushes (`cli.ts` help). A's ref/config channel. The G-042 repair. Every existing
 `/sync` check's outcome.
 
+---
+
+## 9. Planner amendment after QA 204 (Atlas, 2026-09-28; applies to C's NEXT candidate, never to `2035e89`)
+
+**QA 204 REJECTED `2035e89`** (`qa/c-report` `b16d5b5`), and the rejection stands. This section does not reopen that
+verdict. It corrects one internal conflict before the next candidate is frozen, as §0 allows.
+
+- **P5, CC-6's path.** CC-6 requires "one file per `(loop, candidate_sha)` pair" and also names a single path per loop,
+  `artifacts/iterations/<loop>/shadow_merge.json`. Both cannot hold once a loop has two candidates. **The runtime path
+  becomes `artifacts/iterations/<loop>/<candidate_sha>/shadow_merge.json`**, which matches CC-29's human-seat layout.
+  Everything else in CC-6 stands: the `inputs` must carry the acceptance and gate summaries, and a test must read the
+  artifact back and validate its schema.
+
+**The criteria SHA for C's next candidate is the commit that adds this section.**
+
 QA-191: REPORT COMPLETE
