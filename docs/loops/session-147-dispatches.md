@@ -674,3 +674,9 @@ This does not start the module-boundary loop: that is Aaron's ruling, and the re
 ### Record 207, `cursor-infra` (Composer 2.5): QA 197's D1, `cursor-hook-compat` must not pass without reading
 
 A registry entry with a missing or empty `installPath` makes `cursor-hook-compat` report PASS without reading any hook file. Make that case a SKIP or an ISSUE that names the plugin and says the check could not read it. Zero installs, and an install whose `hooks/hooks.json` is absent, stay PASS: there is nothing that could register a hook. Rows: missing `installPath`, empty `installPath`, and an `installPath` that does not exist on disk, each red against master. Mutant: treat a missing `installPath` as PASS. Fixture home only (G-044). Handoff `docs/loops/t046-d1-developer-handoff.md`, branch `loop/t046-d1`. Record 200 stays committed locally and unpushed until the release.
+
+## Laptop queue 208-209, launched while QA 202-204 runs (2026-09-28, Aaron: both QA machines available; he waited to launch)
+
+- **Push exception, the planner's call:** infra pushed records 200 and 207, and the planner pushed this branch, while QA 202-204 was running on the QA PC. The running drivers (the old template, before 192 r3) may list these as `ref_violations`. They are traceable by SHA: `loop/t176-index-direction` `8d3143c` (mutants `08f9176`, `aca9911`), `loop/t046-d1` `a8adca0` (mutant `4686eee`), and this branch's own tip. Rule them out by those SHAs when ruling 202-204.
+- The laptop's `qa-queue.ps1` was re-copied from `b744e19` and read back: 15,068 bytes, SHA-256 prefix `40aea6e28954383c`, identical to the QA PC's copy. Its QA tree was at `fc8d8cd` with 11 dirty paths; the queue's record-185 checkout handles that.
+- **Record 205 (T-178) was returned to the builder:** its `push.paths-ignore` also filtered master, against D-055, and its cancel-in-progress also cancelled master runs. Master stays unchanged. It goes to QA in the morning.
