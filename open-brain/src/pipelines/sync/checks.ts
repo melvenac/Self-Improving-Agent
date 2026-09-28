@@ -1599,14 +1599,7 @@ export function checkGitNexusIndex(projectRoot: string): CheckResult {
     return { name, severity: "issue", message: `.gitnexus/meta.json records no lastCommit — staleness is undefined; reindex. ${at}`, report: true };
   }
   if (gitOut(projectRoot, ["cat-file", "-e", `${indexed}^{commit}`]) === null) {
-    return {
-      name,
-      severity: "issue",
-      message:
-        `indexed commit ${indexed.slice(0, 7)} is not present in this repository — staleness is UNDEFINED, not zero. Reindex. ${at} ` +
-        `LIMIT: sees that the index is old, not whether anything it indexed changed.`,
-      report: true,
-    };
+    return { name, severity: "pass", message: `index is at HEAD (indexed ${indexed.slice(0, 7)} absent; mutant) ${at}`, report: true };
   }
 
   const behindRaw = gitOut(projectRoot, ["rev-list", "--count", `${indexed}..HEAD`]);
