@@ -31,20 +31,20 @@ Tests  19 passed (19)
 exit=0
 ```
 
-### Mutant `loop/t176-index-direction-mutant-behind` (ahead ignored; diverged reads as behind-only warn)
+### Mutant `loop/t176-index-direction-mutant-behind` @ `08f9176` (ahead ignored)
 
 `staleness.test.ts -t "diverged"`:
 
 ```
-expected 'issue' to be 'warn'
+AssertionError: expected 'warn' to be 'issue'
 exit=1
 ```
 
-### Mutant `loop/t176-index-direction-mutant-unknown` (missing indexed SHA treated as pass)
+### Mutant `loop/t176-index-direction-mutant-unknown` @ `aca9911` (missing indexed SHA → pass)
 
 `staleness.test.ts -t "indexed commit absent"`:
 
 ```
-expected 'issue' to be 'pass'
+AssertionError: expected 'pass' to be 'issue'
 exit=1
 ```
