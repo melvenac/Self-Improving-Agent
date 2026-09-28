@@ -189,7 +189,7 @@ export function checkCiStatus(projectRoot: string, run: CommandRunner = execRunn
       return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure` };
     }
     if (!Array.isArray(test.steps)) {
-      return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure (steps not read: steps field missing)` };
+      return { name, report: true, severity: "warn", message: `${branch} ${sha} conclusion: failure` };
     }
     if (test.steps.length === 0) {
       return {
