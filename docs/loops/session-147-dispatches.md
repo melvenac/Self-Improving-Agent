@@ -699,3 +699,10 @@ A registry entry with a missing or empty `installPath` makes `cursor-hook-compat
 - **Criteria §9 (P5)** corrects CC-6's path for the NEXT candidate only (`<loop>/<candidate_sha>/`). It does not reopen `2035e89`.
 - **Slice three stays open.** C goes back to Forge as record 201 r2.
 - **Record 192 r4** (harness only, `0f816bb`): the mutant now fails ON the seat-new row. It is queued for QA.
+
+## MORNING (supersedes the record handoff's launch line): three QA runs, two machines, checkout `1affe9d`
+
+Forge delivered **candidate C r2** overnight: product `8054f9f`, tip `09a517f`, and five mutants, one per C-204 finding. The QA 212 dispatch (GPT) is at `1affe9d`, and that commit also carries QA 210 and 211.
+- **QA PC: `-Queue 212`** (candidate C r2, which closes slice three).
+- **Laptop: `-Queue 210,211`** (192 r4 harness; 205 r3 CI on push).
+Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819ebd59be6ea21630eb3edd2784562cf`.
