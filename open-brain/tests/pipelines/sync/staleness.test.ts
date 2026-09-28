@@ -68,6 +68,35 @@ describe("checkGitNexusIndex", () => {
     const r = checkGitNexusIndex(dir);
     expect(r.severity).toBe("warn");
     expect(r.message).toContain("1 commit(s) behind");
+    expect(r.message).toContain("ahead=0");
+  });
+
+  it("issues when the index is ahead of HEAD on the same line (T-176 red row)", async () => {
+    writeFileSync(join(dir, "ahead.txt"), "ahead\n");
+    await execAsync("git add -A && git commit -q -m ahead", { cwd: dir });
+    const indexed = (await execAsync("git rev-parse HEAD", { cwd: dir })).trim();
+    await execAsync(`git reset -q --hard ${head}`, { cwd: dir });
+    writeMeta({ lastCommit: indexed, branch: "main" });
+    const r = checkGitNexusIndex(dir);
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("ahead of HEAD");
+    expect(r.severity).not.toBe("pass");
+  });
+
+  it("issues when the index diverged from HEAD", async () => {
+    writeFileSync(join(dir, "side.txt"), "side\n");
+    await execAsync("git add -A && git commit -q -m side", { cwd: dir });
+    const side = (await execAsync("git rev-parse HEAD", { cwd: dir })).trim();
+    await execAsync(`git checkout -q ${head}`, { cwd: dir });
+    writeFileSync(join(dir, "mainline.txt"), "mainline\n");
+    await execAsync("git add -A && git commit -q -m mainline", { cwd: dir });
+    const currentHead = (await execAsync("git rev-parse HEAD", { cwd: dir })).trim();
+    writeMeta({ lastCommit: side, branch: "main" });
+    const r = checkGitNexusIndex(dir);
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("diverged");
+    expect(r.message).toContain(`indexed ${side.slice(0, 7)}`);
+    expect(r.message).toContain(`HEAD ${currentHead.slice(0, 7)}`);
   });
 
   it("a dead branch pin on a CURRENT index is not staleness — the SHA is the anchor", () => {
