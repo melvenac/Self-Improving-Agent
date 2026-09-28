@@ -680,3 +680,10 @@ A registry entry with a missing or empty `installPath` makes `cursor-hook-compat
 - **Push exception, the planner's call:** infra pushed records 200 and 207, and the planner pushed this branch, while QA 202-204 was running on the QA PC. The running drivers (the old template, before 192 r3) may list these as `ref_violations`. They are traceable by SHA: `loop/t176-index-direction` `8d3143c` (mutants `08f9176`, `aca9911`), `loop/t046-d1` `a8adca0` (mutant `4686eee`), and this branch's own tip. Rule them out by those SHAs when ruling 202-204.
 - The laptop's `qa-queue.ps1` was re-copied from `b744e19` and read back: 15,068 bytes, SHA-256 prefix `40aea6e28954383c`, identical to the QA PC's copy. Its QA tree was at `fc8d8cd` with 11 dirty paths; the queue's record-185 checkout handles that.
 - **Record 205 (T-178) was returned to the builder:** its `push.paths-ignore` also filtered master, against D-055, and its cancel-in-progress also cancelled master runs. Master stays unchanged. It goes to QA in the morning.
+
+## QA 208-209 ruled (laptop queue ended 07:10:02Z)
+
+- **QA 208 (record 200, T-176, GPT): ACCEPT. Record 200 is ruled ACCEPTED.** `qa/t176-report` `9b56409`. The evidence file is present, and `validate evidence` exited 0. At HEAD is PASS, behind is WARN, and ahead, diverged or unknown is an ISSUE naming both SHAs. A dead recorded branch does not override a current SHA.
+- **QA 209 (record 207, T-046 D1, GPT): ACCEPT. Record 207 is ruled ACCEPTED.** `qa/t046-d1-report` `f41d310`. The evidence file is present and validated. QA split the developer's combined red into three independent rows (`qa/t046-d1-tests` `0081dab`), because the combined row stopped at its first assertion.
+- **The first two E_t.json files a QA seat has written** (C's criteria §8 P1). Infra opens the PRs, and Aaron merges.
+- **Record 205 r3** (T-178, `bc6c6d2`, local): it now fails closed (`git diff before..sha`, and any error runs the suite), and master is unchanged. It goes to QA in the morning.
