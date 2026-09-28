@@ -109,6 +109,7 @@ export function evalRunsOn(runsOn: string, ctx: Ctx): unknown {
         }
       }
       if (s[i] === ")") i++;
+      if (m[0] === "cancelled") return false;
       if (m[0] === "fromJSON") return JSON.parse(String(args[0]));
       if (m[0] === "toJSON") return JSON.stringify(args[0] ?? null);
       if (m[0] === "contains") return String(args[0] ?? "").includes(String(args[1] ?? ""));
