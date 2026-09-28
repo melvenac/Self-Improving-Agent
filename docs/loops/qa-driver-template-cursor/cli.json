@@ -9,7 +9,7 @@
       "Shell(git push *)",
       "Shell(cmd:*git push*)",
       "Shell(cmd:*git* push*)",
-      "Shell(powershell:*git push*)",
+      "Shell(powershell:*push*)",
       "Shell(powershell.exe:*git push*)",
       "Shell(powershell*:*git push*)",
       "Shell(bash:*git push*)",
