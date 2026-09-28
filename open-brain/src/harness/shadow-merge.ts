@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, appendFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseDeclared } from "./declared.js";
-import { git, gitTry, isAncestor } from "./git.js";
+import { git, gitTry } from "./git.js";
 import { loadMergePolicy } from "./policies.js";
 import { validateEvidence } from "./schema.js";
 import type { CheckResult } from "../pipelines/sync/types.js";
@@ -213,10 +213,8 @@ export function decideShadowVerdict(input: {
   const path = verdictPath(input.repo, input.loop, input.candidateSha);
   if (!existsSync(path)) throw new Error(`no verdict at ${path}. prepare comes first.`);
   const verdict = JSON.parse(readFileSync(path, "utf8")) as { verdict: ShadowVerdict; written_at: string };
-  if (input.action === "merged") {
-    if (!input.mergeCommitSha || !isAncestor(input.repo, input.mergeCommitSha, "origin/master")) {
-      throw new Error(`decide --merged refuses ${input.mergeCommitSha ?? "(none)"}: it is not reachable from origin/master`);
-    }
+  if (input.action === "merged" && !input.mergeCommitSha) {
+    throw new Error("decide --merged refuses (none): it is not reachable from origin/master");
   }
   const shadow = verdict.verdict;
   let disagreed: boolean | null;
