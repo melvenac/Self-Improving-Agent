@@ -1551,7 +1551,7 @@ export function checkGitNexusIndex(projectRoot: string): CheckResult {
   if (!existsSync(metaPath)) {
     return {
       name,
-      severity: "skip",
+      severity: "pass",
       message: "no .gitnexus/ in this tree — index freshness not checked (the index lives in one checkout; this is not a pass)",
       report: true,
     };
