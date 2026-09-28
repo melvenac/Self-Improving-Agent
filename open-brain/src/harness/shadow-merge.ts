@@ -73,7 +73,7 @@ export function computeShadowMergeVerdict(input: {
   let declared: DeclaredLists = empty;
   try {
     const parsed = parseDeclared(input.criteriaText as string);
-    if (parsed.present) declared = { unrunnable: [...parsed.unrunnable], outOfScope: [...parsed.outOfScope] };
+    if (parsed.present) declared = { unrunnable: [...parsed.unrunnable, ...parsed.outOfScope], outOfScope: [] };
   } catch (err) {
     return { verdict: "undefined", reasons: [`criteria block refused: ${(err as Error).message}`], declared: empty };
   }
