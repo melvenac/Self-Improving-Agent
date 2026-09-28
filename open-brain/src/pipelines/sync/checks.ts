@@ -1611,15 +1611,39 @@ export function checkGitNexusIndex(projectRoot: string): CheckResult {
 
   const behindRaw = gitOut(projectRoot, ["rev-list", "--count", `${indexed}..HEAD`]);
   if (behindRaw === null || !/^\d+$/.test(behindRaw)) {
-    return { name, severity: "issue", message: `could not count commits since ${indexed.slice(0, 7)} — staleness undefined, not zero. ${at}`, report: true };
+    return { name, severity: "issue", message: `could not count commits behind indexed ${indexed.slice(0, 7)} — staleness undefined, not zero. ${at}`, report: true };
+  }
+  const aheadRaw = gitOut(projectRoot, ["rev-list", "--count", `HEAD..${indexed}`]);
+  if (aheadRaw === null || !/^\d+$/.test(aheadRaw)) {
+    return { name, severity: "issue", message: `could not count commits ahead of HEAD to indexed ${indexed.slice(0, 7)} — staleness undefined, not zero. ${at}`, report: true };
   }
   const behind = Number(behindRaw);
+  const ahead = Number(aheadRaw);
 
-  const tail = `(indexed ${indexed.slice(0, 7)}, ${meta.indexedAt ?? "time unrecorded"}; ${at}) ` +
+  const tail = `(indexed ${indexed.slice(0, 7)}, HEAD ${head}; behind=${behind} ahead=${ahead}; ${meta.indexedAt ?? "time unrecorded"}; ${at}) ` +
     `LIMIT: sees that the index is old, not whether anything it indexed changed.${branchNote}`;
 
-  if (behind === 0) return { name, severity: "pass", message: `index is at HEAD ${tail}`, report: true };
-  return { name, severity: "warn", message: `index is ${behind} commit(s) behind HEAD — run analyze ${tail}`, report: true };
+  if (behind === 0 && ahead === 0) {
+    return { name, severity: "pass", message: `index is at HEAD ${tail}`, report: true };
+  }
+  if (behind > 0 && ahead > 0) {
+    return {
+      name,
+      severity: "issue",
+      message:
+        `index diverged from HEAD — ${behind} commit(s) behind and ${ahead} ahead; neither is an ancestor of the other. Reindex. ${tail}`,
+      report: true,
+    };
+  }
+  if (ahead > 0) {
+    return {
+      name,
+      severity: "issue",
+      message: `index is ${ahead} commit(s) ahead of HEAD — indexed ${indexed.slice(0, 7)} is not HEAD ${head}. Reindex. ${tail}`,
+      report: true,
+    };
+  }
+  return { name, severity: "warn", message: `index is ${behind} commit(s) behind HEAD, ahead=0 — run analyze ${tail}`, report: true };
 }
 
 /**
