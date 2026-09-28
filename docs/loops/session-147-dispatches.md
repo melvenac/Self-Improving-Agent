@@ -614,3 +614,11 @@ driver-level guard may be worth a round.
   must skip on Windows `EPERM` or the runner needs the privilege. A small developer round (cursor-builder), and a `/sync`
   check for "not for merge" test files is worth considering.
 - cursor-infra read record 192 (turn 37) and went idle without replying; Aaron was given an "act now" line.
+
+## Planner session 11 (worktree counter), hub round-up, 2026-09-28T00:09Z
+
+All three dev rounds were delivered over the hub. The planner read back each branch with ls-remote and each run id with gh run view. None is ruled. All three go to the QA queue.
+
+- **Record 194** (T-046 detector, Forge/sia-forge): PR #192. Product 3af41f5, tip 44d672a. Green run 36359225675, red run 36359225141, mutants 36359226699 and 36359228066.
+- **Record 193** (T192-D1 + T-048 r3, builder/sia-builder): PR #193. Product ecd378d, tip 9d449f4. Red run 36358778248, green run 36359004908, mutant run 36360002881 (routes). The builder named mut-score as too wide, and it does not count.
+- **Record 192** (Cursor QA driver r2, infra/sia-infra, Composer): PR #194. Tip 462403d; product unchanged since 997f2c7. The first delivery was sent back, because its mutant was run under a flag that flips the expectation (it printed PASS), its attribution red was asserted rather than run, and the source of the denial was unstated. The amendment adds FAIL with exit 1 for the ordinary harness on mutant e385f0d, FAIL with exit 1 on bf33fe4, and the denial read from real cursor-agent stream-json (session b64479fb).
