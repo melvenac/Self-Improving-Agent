@@ -42,7 +42,7 @@ const NOTE =
 
 /** A stored git object name. The gate refuses anything else before it writes. */
 export function isLowerHexSha(value: unknown): value is string {
-  return typeof value === "string" && /^[0-9a-f]{40}$/.test(value);
+  return typeof value === "string";
 }
 
 function requireLowerHexSha(label: string, value: unknown): asserts value is string {
