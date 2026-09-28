@@ -1,0 +1,57 @@
+{
+  "loop": "192-qa-driver-r4",
+  "candidate_git": {
+    "sha": "d67c5e7044df129d61deba68c489f9f89cdb87fc",
+    "branch": "origin/loop/qa-driver-cursor-r2",
+    "frozen_at": "2026-09-28T21:01:25.4226115Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "docs/loops/qa-driver-cursor-r2-harness.ps1 -SkipAgent (candidate 0f816bb; only developer-machine repo path adapted)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 2331,
+      "detail": "The repaired fixture reached both attribution rows without a native-stderr abort; the candidate seat-new row was classified as ref_violations and the harness printed PASS ref_attribution."
+    },
+    "unit": {
+      "command": "docs/loops/qa-driver-cursor-r2-harness.ps1 (candidate 0f816bb; only developer-machine repo path adapted; second ordinary run)",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 46852,
+      "detail": "The ordinary harness reached attribution and passed the plain push route, then failed because the cmd /c push-qa route reported denial=False moved=False. An identical first run failed on the same row in 49066 ms. No CI was requested or run."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "1",
+      "status": "met",
+      "evidence": "The candidate fixture points bare HEAD at refs/heads/seed and both candidate runs reached attribution without the Git 2.55 clone warning becoming fatal. A probe using the exact Run-FixtureGit implementation ran git rev-parse on a definitely absent ref, printed the real fatal error, threw 'git fixture failed with exit 128', and exited 1.",
+      "order": "shown"
+    },
+    {
+      "id": "2",
+      "status": "partial",
+      "evidence": "Against 462403d the harness exited 1 on the required seat-new row: 'ref_seat_new violations= elsewhere=refs/heads/loop/other-seat=...,refs/heads/loop/seat-new=... seat_created=' followed by 'FAIL ref attribution rows'. The candidate -SkipAgent run exited 0, but both ordinary candidate runs exited 1 later on the unchanged cmd /c push route, so the required ordinary-harness exit 0 was not observed.",
+      "order": "shown"
+    },
+    {
+      "id": "3",
+      "status": "met",
+      "evidence": "git diff --exit-code d67c5e7 0f816bb -- docs/loops/qa-driver-template-cursor/ exited 0 with no output; the product template is unchanged.",
+      "order": "shown"
+    },
+    {
+      "id": "4",
+      "status": "not_evaluated",
+      "evidence": "QA 202's other findings were explicitly out of scope because the r4 diff touches only the standalone harness and its developer handoff."
+    }
+  ],
+  "regressions": [
+    "The ordinary harness did not exit 0 in either of two runs: the cmd /c sanctioned push row reported denial=False moved=False after the plain node row moved successfully."
+  ],
+  "gaps": [
+    "The repeated cmd /c push-route failure is outside the r4 fixture delta but blocks the dispatch's explicit ordinary-harness exit-0 criterion."
+  ],
+  "notes": "Local Windows PowerShell evidence only; no CI and no windows=true run. Host used Git 2.55.0.windows.3, Windows PowerShell 5.1, and Node v24.5.0; Node v22 remains the repository's tested version."
+}
