@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 149 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 150 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -20,12 +20,15 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-044** The slot needs an OWNER, not just a timestamp
 - [ ] **T-046** Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
 - [ ] **T-158** close_gap must tombstone (or refuse an id the tracked tree cites) — a reused gap id points at something wrong and announces nothing
+- [ ] **T-160** Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [ ] **T-163** Close-outs must APPEND a per-seat record, not overwrite a shared slot — plus a /sync check that no close-out reduces the recorded seat-uuid count for an open loop
 - [ ] **T-164** The session counter is per-worktree, so a seat can close out on a number that collides with the record's sequence
 - [ ] **T-167** The scope layer did not travel: PRD/DECISIONS/ENTITIES were untracked, so no seat worktree had them — tracked at session 77; make prd-version an ISSUE, and render the problem statement at /start
 - [ ] **T-178** ci.yml runs on push to seat working branches (loop/*, qa/*, docs/*, chore/*), per D-040, so no seat has to dispatch CI by hand
 - [ ] **T-194** Planner seat hook: a tracked PreToolUse hook mechanically refuses the planner's out-of-boundary acts (source/tests/hooks/build writes, hand edits to rendered views, git merge/push/tag without per-occasion authority), fails closed, and names the rule it enforces
 - [ ] **T-195** Every interactive planner brief ships a D_t JSON beside it, validated against plan.schema.json by a new `harness validate plan`, judged by the live plan gate (gate.ts, policies/plan-gate.json); a gate failure is fed back and blocks dispatch; decisions logged with the resolved model; fails closed when Jev is unreachable
+- [ ] **T-196** The hub procedure is tracked knowledge: each seat's hub room and hub-talk invocation in a tracked data file beside .agents/SYSTEM/worktree-seats.json; a short 'Talking to Cursor seats' section in planner.md (printed in full at /start) pointing at it; a tracked alwaysApply .cursor/rules hub rule; and Cursor's /start joins the seat's room and reads unread atlas turns before proposing anything
+- [ ] **T-197** Cursor's /start matches Claude Code's /start except for documented tool-call differences, and /sync fails on any other difference: it reads ob_start's State block, never hand-edits rendered views, lets ob_start create the session log, and presents NEXT as a ranked backlog rather than a proposal
 
 ## P1
 
@@ -44,7 +47,6 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-154** Give /start a memory-free documented route, and make the SessionStart hook installable by a stranger
 - [ ] **T-155** Shadow merge gate: the runtime records what it would have done at each merge, and disagreements with Aaron are counted
 - [ ] **T-159** The trigger's cheap not-asked path — record a not-asked fire without opening the store
-- [ ] **T-160** Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [ ] **T-161** /start must assert a transcript exists for the session's own uuid — the CLAUDE_CODE_CHILD_SESSION check would be a permanent false positive
 - [ ] **T-166** GitNexus impact() missed a call site on the exact path under repair while reporting epistemic 'exact' - the MUST-run-impact rule is only as good as the resolver
 - [ ] **T-168** 'Run the full suite alone' must become a check: assert peer idleness before the run and refuse or flag when a peer is busy
