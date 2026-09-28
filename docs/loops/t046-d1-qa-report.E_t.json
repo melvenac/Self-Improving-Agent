@@ -1,0 +1,67 @@
+{
+  "loop": "207-hook-compat-d1",
+  "candidate_git": {
+    "sha": "a8adca0140342ced92bcc7bc847c4ea73b1f4b22",
+    "branch": "origin/loop/t046-d1",
+    "frozen_at": "2026-09-28T06:45:38Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "CI run 36388061123: npm ci && npx tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 5000,
+      "detail": "tcm Typecheck step succeeded at candidate SHA a8adca0140342ced92bcc7bc847c4ea73b1f4b22."
+    },
+    "unit": {
+      "command": "CI run 36388061123: npm test -- --reporter=verbose",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 101000,
+      "detail": "tcm Test step succeeded: 131 files, 1812 passed, 6 skipped."
+    }
+  },
+  "requirements": [
+    {
+      "id": "candidate-frozen",
+      "status": "met",
+      "evidence": "Run 36388061123 reports headSha a8adca0140342ced92bcc7bc847c4ea73b1f4b22; candidate diff is one product commit over d1e86740bd68827979cfbd5757034f849c38ad41.",
+      "severity": "info"
+    },
+    {
+      "id": "ci-authority",
+      "status": "met",
+      "evidence": "Green 36388061123 succeeded; red 36388552496 failed on the three intended base rows; mutant runs 36388868490 and 36388868410 each failed on the developer combined row plus its independently targeted QA row.",
+      "severity": "info"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "installPath-red-green",
+      "status": "met",
+      "evidence": "QA branch 552021048fc42662746602db1790992b20ee38ad splits missing, empty, and nonexistent paths into independent tests. Run 36388552496 failed all three on base; candidate run 36388061123 passed the developer row and QA local run passed all five QA tests.",
+      "order": "shown"
+    },
+    {
+      "id": "preserve",
+      "status": "met",
+      "evidence": "QA tests independently show PASS for zero installs and for an existing install without hooks/hooks.json; both were green on base and candidate. Candidate full CI also passed all prior T-046 rows.",
+      "order": "shown"
+    },
+    {
+      "id": "fixture-isolation",
+      "status": "met",
+      "evidence": "Every QA row creates a temporary home and LOCALAPPDATA stand-in, asserts the home differs from homedir(), and passes both paths explicitly. Developer tests use the same explicit fixture pattern.",
+      "order": "shown"
+    },
+    {
+      "id": "qa-mutants",
+      "status": "met",
+      "evidence": "Two QA-owned, type-clean product mutants were killed on tcm: run 36388868490 ignored empty installPath and failed the combined developer row plus the independent empty-path row; run 36388868410 ignored nonexistent installPath and failed the combined row plus the independent nonexistent-path row.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [],
+  "gaps": [],
+  "notes": "QA used GPT-5.6 Sol medium. Four tcm runs were dispatched, the allowed maximum. No windows=true run was requested."
+}
