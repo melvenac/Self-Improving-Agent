@@ -105,7 +105,6 @@ export function checkCursorHookCompat(home: string = homedir(), localAppData?: s
         continue;
       }
       if (!existsSync(inst.installPath)) {
-        findings.push(`${id} ${version}: installPath does not exist (${inst.installPath}) — could not read hooks/hooks.json`);
         continue;
       }
       const hooksPath = join(inst.installPath, "hooks", "hooks.json");
