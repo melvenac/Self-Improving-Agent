@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync, execFileSync } from "node:child_process";
@@ -452,6 +452,152 @@ describe("record 201 r2", () => {
       const written = join(repo, "artifacts", "iterations", "t001", SHA_A, "shadow_merge.json");
       const body = JSON.parse(readFileSync(written, "utf8")) as { verdict: string };
       expect(body.verdict).toBe("undefined");
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  });
+});
+
+const NOT_A_SHA = ["bad", "a".repeat(39), "a".repeat(41), "A".repeat(40)];
+
+function artifact(repo: string, id: string): string {
+  return join(repo, "artifacts", "iterations", "t001", id, "shadow_merge.json");
+}
+
+function ledgerOf(repo: string): string {
+  return join(repo, "docs", "loops", "shadow-merge", "ledger.jsonl");
+}
+
+function seedVerdict(repo: string, id: string): void {
+  const path = artifact(repo, id);
+  mkdirSync(join(path, ".."), { recursive: true });
+  writeFileSync(path, `${JSON.stringify({ verdict: "would-not-merge", written_at: "2026-09-28T00:00:00.000Z" })}\n`);
+}
+
+function harness(args: string[]) {
+  const cli = join(import.meta.dirname, "../../src/harness/cli.ts");
+  const tsx = join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
+  return spawnSync(process.execPath, [tsx, cli, ...args], { encoding: "utf8" });
+}
+
+function refusal(label: string, fn: () => void, written?: string): string[] {
+  const problems: string[] = [];
+  if (written) rmSync(written, { force: true });
+  try {
+    fn();
+    problems.push(`${label}: did not throw`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (!/40 lowercase hex/.test(msg)) problems.push(`${label}: threw ${msg}`);
+  }
+  if (written && existsSync(written)) problems.push(`${label}: wrote ${written}`);
+  return problems;
+}
+
+describe("record 201 r3", () => {
+  it("CC-6 prepare refuses a candidate or criteria sha that is not 40 lowercase hex and writes nothing", async () => {
+    const { prepareShadowVerdict } = await load();
+    const repo = fixtureRepo();
+    try {
+      const criteriaSha = git(repo, ["rev-parse", "HEAD"]);
+      const problems: string[] = [];
+      for (const bad of NOT_A_SHA) {
+        problems.push(...refusal(`candidate ${bad}`, () => prepareShadowVerdict({
+          repo, loop: "t001", candidateSha: bad, criteriaSha, criteriaPath: "docs/loops/criteria.md",
+          evidence: evidence(), gateMode: "skip",
+        }), artifact(repo, bad)));
+        problems.push(...refusal(`criteria ${bad}`, () => prepareShadowVerdict({
+          repo, loop: "t001", candidateSha: SHA_A, criteriaSha: bad, criteriaPath: "docs/loops/criteria.md",
+          evidence: evidence(), gateMode: "skip",
+        }), artifact(repo, SHA_A)));
+        rmSync(join(repo, "artifacts", "iterations", "t001", SHA_A), { recursive: true, force: true });
+      }
+      const ok = prepareShadowVerdict({
+        repo, loop: "t001", candidateSha: SHA_A, criteriaSha, criteriaPath: "docs/loops/criteria.md",
+        evidence: evidence(), gateMode: "skip",
+      });
+      expect(existsSync(ok.path)).toBe(true);
+      expect(JSON.parse(readFileSync(ok.path, "utf8")).candidate_sha).toBe(SHA_A);
+      expect(problems).toEqual([]);
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  });
+
+  it("CC-6 the CLI refuses the same sha shapes before prepare or decide writes", async () => {
+    const repo = fixtureRepo();
+    try {
+      const criteriaSha = git(repo, ["rev-parse", "HEAD"]);
+      const evidencePath = join(repo, "evidence.json");
+      writeFileSync(evidencePath, JSON.stringify(evidence()));
+      const base = ["--repo", repo, "--loop", "t001", "--criteria", "docs/loops/criteria.md", "--evidence", evidencePath];
+      const problems: string[] = [];
+      const cliRefusal = (label: string, args: string[], written?: string): void => {
+        if (written) rmSync(written, { force: true });
+        const ledgerBefore = existsSync(ledgerOf(repo)) ? readFileSync(ledgerOf(repo), "utf8") : "";
+        const result = harness(args);
+        if (result.status === 0) problems.push(`${label}: exit 0`);
+        if (!/40 lowercase hex/.test(`${result.stderr}`)) problems.push(`${label}: stderr ${result.stderr.trim()}`);
+        if (written && existsSync(written)) problems.push(`${label}: wrote ${written}`);
+        const ledgerAfter = existsSync(ledgerOf(repo)) ? readFileSync(ledgerOf(repo), "utf8") : "";
+        if (ledgerAfter !== ledgerBefore) problems.push(`${label}: ledger changed`);
+      };
+      for (const bad of NOT_A_SHA) {
+        cliRefusal(`prepare --candidate ${bad}`, ["shadow-verdict", "prepare", ...base, "--candidate", bad, "--criteria-sha", criteriaSha], artifact(repo, bad));
+        cliRefusal(`prepare --criteria-sha ${bad}`, ["shadow-verdict", "prepare", ...base, "--candidate", SHA_A, "--criteria-sha", bad], artifact(repo, SHA_A));
+        rmSync(join(repo, "artifacts", "iterations", "t001", SHA_A), { recursive: true, force: true });
+      }
+      const ok = harness(["shadow-verdict", "prepare", ...base, "--candidate", SHA_A, "--criteria-sha", criteriaSha]);
+      expect(ok.status, ok.stderr).toBe(0);
+      expect(existsSync(artifact(repo, SHA_A))).toBe(true);
+      for (const bad of NOT_A_SHA) {
+        seedVerdict(repo, bad);
+        cliRefusal(`decide --candidate ${bad}`, ["shadow-verdict", "decide", "--repo", repo, "--loop", "t001", "--candidate", bad, "--declined"]);
+        cliRefusal(`decide --merged ${bad}`, ["shadow-verdict", "decide", "--repo", repo, "--loop", "t001", "--candidate", SHA_A, "--merged", bad]);
+        cliRefusal(`decide --replaced ${bad}`, ["shadow-verdict", "decide", "--repo", repo, "--loop", "t001", "--candidate", SHA_A, "--replaced", bad]);
+      }
+      const beforeSummary = existsSync(ledgerOf(repo)) ? readFileSync(ledgerOf(repo), "utf8") : "";
+      const summary = harness(["shadow-verdict", "summary", "--repo", repo]);
+      expect(summary.status, summary.stderr).toBe(0);
+      const afterSummary = existsSync(ledgerOf(repo)) ? readFileSync(ledgerOf(repo), "utf8") : "";
+      expect(afterSummary).toBe(beforeSummary);
+      expect(problems).toEqual([]);
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  });
+
+  it("CC-6 decide refuses a non-sha candidate, merge, or replacement before the ledger", async () => {
+    const { prepareShadowVerdict, decideShadowVerdict } = await load();
+    const repo = fixtureRepo();
+    try {
+      const criteriaSha = git(repo, ["rev-parse", "HEAD"]);
+      prepareShadowVerdict({
+        repo, loop: "t001", candidateSha: SHA_A, criteriaSha, criteriaPath: "docs/loops/criteria.md",
+        evidence: evidence(), gateMode: "skip",
+      });
+      const problems: string[] = [];
+      for (const bad of NOT_A_SHA) {
+        seedVerdict(repo, bad);
+        const before = existsSync(ledgerOf(repo)) ? readFileSync(ledgerOf(repo), "utf8") : "";
+        problems.push(...refusal(`candidate ${bad}`, () => decideShadowVerdict({
+          repo, loop: "t001", candidateSha: bad, action: "declined",
+        })));
+        problems.push(...refusal(`merged ${bad}`, () => decideShadowVerdict({
+          repo, loop: "t001", candidateSha: SHA_A, action: "merged", mergeCommitSha: bad,
+        })));
+        problems.push(...refusal(`replaced ${bad}`, () => decideShadowVerdict({
+          repo, loop: "t001", candidateSha: SHA_A, action: "replaced", replacedSha: bad,
+        })));
+        const after = existsSync(ledgerOf(repo)) ? readFileSync(ledgerOf(repo), "utf8") : "";
+        if (after !== before) problems.push(`${bad}: ledger changed`);
+      }
+      const ok = decideShadowVerdict({
+        repo, loop: "t001", candidateSha: SHA_A, action: "declined",
+      });
+      expect(ok.line.candidate_sha).toBe(SHA_A);
+      expect(existsSync(ledgerOf(repo))).toBe(true);
+      expect(problems).toEqual([]);
     } finally {
       rmSync(repo, { recursive: true, force: true });
     }
