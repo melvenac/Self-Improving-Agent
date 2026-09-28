@@ -74,6 +74,24 @@ describe("T-048 round 3", () => {
     expect(scoreRan).not.toMatch(/invocation log:/);
   });
 
+  it("T048-D1: the two score routes name a missing invocation log", async () => {
+    const tmp = scratch();
+    logState.value = null;
+    const sync = text(await handleSync({ project_root: tmp, check_only: true, score: true }));
+    const score = text(await handleScore({ project_root: tmp }));
+    expect(sync).toMatch(/Pipeline Health: \d+\/10 \(\d+%\) \(invocation log: missing\)/);
+    expect(score).toMatch(/Pipeline Health: \d+\/10 \(\d+%\) \(invocation log: missing\)/);
+  });
+
+  it("T048-D1: the two score routes name an unreadable invocation log", async () => {
+    const tmp = scratch();
+    logState.value = "unreadable";
+    const sync = text(await handleSync({ project_root: tmp, check_only: true, score: true }));
+    const score = text(await handleScore({ project_root: tmp }));
+    expect(sync).toMatch(/Pipeline Health: \d+\/10 \(\d+%\) \(invocation log: unreadable\)/);
+    expect(score).toMatch(/Pipeline Health: \d+\/10 \(\d+%\) \(invocation log: unreadable\)/);
+  });
+
   it("SILENT 9: no session id and no recall_log rows print different reasons, and a refused file is still named", async () => {
     const tmp = scratch();
     const noId = text(await handleEnd({ project_root: tmp, dry_run: true, session_summary: "s" }));
