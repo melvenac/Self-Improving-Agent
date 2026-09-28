@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 144 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 145 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 > **Status:** v0.44.2 — Loop 15 slice three (D-033/D-036): closes when candidates A, B and C are ACCEPTED; Jev calibration is the next slice. A: A13 ACCEPTED and MERGED (#182, 677c1dd). B: part 1 (G-042 repair) MERGED (#165); part 2 (E_t schema, R10; 8c7769f) ACCEPTED by QA 189 and the planner, so B is ACCEPTED; PR #187 awaits Aaron's merge. C (T-155, the shadow merge gate): NEXT. It has no acceptance criteria yet: as B's were (QA 132), C's are written by a QA seat before any build, then ruled by the planner. Alongside, waiting for QA on the QA PC (laptop unavailable): 182 (T-048 r3), 183 (T-192), 161 (/bootstrap r4 reconciled), 178 (T-048 r2b).
 
 ## What's working
@@ -155,11 +155,11 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 
 ## What's next
 
-- [P0] T-003 Session identity is keyed per project, not per session
 - [P0] T-008 Add a `/sync` validator that stats every MCP command path in `~/.claude.json`
 - [P0] T-014 Make point-of-use rating reachable
 - [P0] T-022 Replace-on-write for `state` facts
 - [P0] T-023 Improve state-side classifier precision
+- [P0] T-024 Rewrite the two genuine `obsolete-reference` hits
 
 ## Decisions
 
