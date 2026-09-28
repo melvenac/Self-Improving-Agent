@@ -2,14 +2,14 @@
 param(
   [string] $CliJson = '',
   [string] $OldCliJson = '',
-  [switch] $SkipAgent,
-  [switch] $MutantRef
+  [string] $DriveRef = '',
+  [switch] $SkipAgent
 )
 
 $ErrorActionPreference = 'Stop'
 $repo = 'C:\Users\melve\Worktrees\sia-infra'
 $cliPath = if ($CliJson) { $CliJson } else { Join-Path $repo 'docs\loops\qa-driver-template-cursor\cli.json' }
-$root = 'C:\qa-tmp\qa-driver-cursor-r2'
+$root = "C:\qa-tmp\qa-driver-cursor-r2-$PID"
 $profileDir = Join-Path $root 'Aaron Melven\profile'
 $localApp = Join-Path $root 'LocalAppData'
 $tree = Join-Path $profileDir 'Worktrees\sia-qa'
@@ -21,7 +21,10 @@ $results = New-Object System.Collections.Generic.List[string]
 function Say([string] $line) { $results.Add($line); Write-Output $line }
 function Fail([string] $msg) { Say "FAIL $msg"; exit 1 }
 
-if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
+if (Test-Path -LiteralPath $root) {
+  cmd.exe /d /c "rd /s /q `"$root`"" 2>$null | Out-Null
+  if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction SilentlyContinue }
+}
 New-Item -ItemType Directory -Force -Path $profileDir, $localApp, $tree, (Join-Path $tree 'docs\loops\qa-9992'), (Join-Path $tree '.cursor') | Out-Null
 cmd.exe /d /c mklink /J (Join-Path $localApp 'cursor-agent') $realAgent 2>$null | Out-Null
 git init --bare $bare | Out-Null
@@ -43,27 +46,49 @@ git -C $tree checkout -q -b qa/zz-probe-cd
 git -C $tree checkout -q -b qa/zz-probe-ps
 git -C $tree checkout -q seed
 
+function Resolve-DrivePath {
+  if ($DriveRef) {
+    $tmp = Join-Path $root 'product-drive.ps1'
+    git -C $repo show "${DriveRef}:docs/loops/qa-driver-template-cursor/drive.ps1" | Out-File -LiteralPath $tmp -Encoding utf8
+    return $tmp
+  }
+  return Join-Path $repo 'docs\loops\qa-driver-template-cursor\drive.ps1'
+}
+function Build-RefAuditModule([string] $drivePath) {
+  $lines = @(Get-Content -LiteralPath $drivePath -Encoding utf8)
+  $start = -1
+  for ($i = 0; $i -lt $lines.Count; $i++) {
+    if ($lines[$i] -match '^function Read-Refs') { $start = $i; break }
+  }
+  if ($start -lt 0) { throw "Read-Refs not found in $drivePath" }
+  $end = $start
+  for ($i = $start; $i -lt $lines.Count; $i++) {
+    if ($lines[$i] -match "^git ls-remote --heads --tags origin") { $end = $i - 1; break }
+  }
+  $chunk = ($lines[$start..$end] | Where-Object { $_ -notmatch '^function (Get-FenceHash|Prompt-WithStops|Read-Event|Install-Deny)' }) -join "`n"
+  $script = @"
+$chunk
+function Invoke-ProductRefAudit([hashtable] `$before, [hashtable] `$after, [string[]] `$knownShas) {
+  if (Get-Command Audit-NonQaRefs -ErrorAction SilentlyContinue) {
+    `$a = Audit-NonQaRefs `$before `$after `$knownShas
+    return @{ violations = @(`$a.violations); elsewhere = @(`$a.elsewhere) }
+  }
+  `$cmp = Compare-Refs `$before `$after
+  return @{ violations = @(`$cmp.bad); elsewhere = @() }
+}
+"@
+  $mod = Join-Path $root 'ref-audit-mod.ps1'
+  Set-Content -LiteralPath $mod -Value $script -Encoding utf8
+  return $mod
+}
 function Read-Refs([string] $path) {
   $h = @{}
   foreach ($l in @(Get-Content -LiteralPath $path -Encoding utf8)) { $p = $l -split "`t"; if ($p.Count -eq 2) { $h[$p[1].Trim()] = $p[0].Trim() } }
   return $h
 }
-function Compare-Refs([hashtable] $before, [hashtable] $after) {
-  $names = @(@($before.Keys) + @($after.Keys) | Sort-Object -Unique)
-  $changed = @($names | Where-Object { $before[$_] -ne $after[$_] })
-  $bad = @($changed | Where-Object { -not $_.StartsWith('refs/heads/qa/') })
-  return @{ changed = $changed; bad = $bad }
-}
-function Audit-NonQaRefs([hashtable] $before, [hashtable] $after, [string[]] $knownShas) {
-  $cmp = Compare-Refs $before $after
-  $violations = @(); $elsewhere = @()
-  foreach ($ref in @($cmp.bad)) {
-    $sha = [string]$after[$ref]
-    if (-not $sha) { continue }
-    if ($knownShas -contains $sha) { $violations += $ref } else { $elsewhere += "$ref=$sha" }
-  }
-  return @{ violations = $violations; elsewhere = $elsewhere }
-}
+$drivePath = Resolve-DrivePath
+Say "drive_ref=$DriveRef path=$drivePath"
+. (Build-RefAuditModule $drivePath)
 
 # --- ref attribution (no agent) ---
 git -C $tree ls-remote origin | Out-File (Join-Path $root 'refs-before.txt') -Encoding utf8
@@ -79,30 +104,19 @@ $otherSha = (git -C $otherDir rev-parse HEAD).Trim()
 git -C $otherDir push -q origin HEAD:refs/heads/loop/other-seat
 git -C $tree ls-remote origin | Out-File (Join-Path $root 'refs-after-other.txt') -Encoding utf8
 $afterOther = Read-Refs (Join-Path $root 'refs-after-other.txt')
-if ($MutantRef) {
-  $cmpOther = Compare-Refs $before $afterOther
-  Say ("ref_other_seat_mutant violations=$($cmpOther.bad -join ',')")
-  $otherOk = $cmpOther.bad.Count -ge 1
-} else {
-  $auditOther = Audit-NonQaRefs $before $afterOther $known
-  Say ("ref_other_seat violations=$($auditOther.violations -join ',') elsewhere=$($auditOther.elsewhere -join ',')")
-  $otherOk = ($auditOther.violations.Count -eq 0) -and ($auditOther.elsewhere.Count -ge 1)
-}
+$auditOther = Invoke-ProductRefAudit $before $afterOther $known
+Say ("ref_other_seat violations=$($auditOther.violations -join ',') elsewhere=$($auditOther.elsewhere -join ',')")
+$otherOk = ($auditOther.violations.Count -eq 0) -and ($auditOther.elsewhere.Count -ge 1)
 
 git -C $tree branch loop/local-violation $seedSha
 git -C $tree push -q origin HEAD:refs/heads/loop/local-violation
 $known2 = @(git -C $tree rev-list --all)
 git -C $tree ls-remote origin | Out-File (Join-Path $root 'refs-after-local.txt') -Encoding utf8
 $afterLocal = Read-Refs (Join-Path $root 'refs-after-local.txt')
-$auditLocal = Audit-NonQaRefs $before $afterLocal $known2
+$auditLocal = Invoke-ProductRefAudit $before $afterLocal $known2
 Say ("ref_seat_outside_qa violations=$($auditLocal.violations -join ',') elsewhere=$($auditLocal.elsewhere -join ',')")
 $localOk = ($auditLocal.violations.Count -ge 1)
 
-if ($MutantRef) {
-  if (-not $otherOk) { Fail 'mutant ref audit should blame other-seat as violation' }
-  Say 'PASS ref_attribution_mutant'
-  exit 0
-}
 if (-not $otherOk -or -not $localOk) { Fail 'ref attribution rows' }
 
 if ($SkipAgent) {
