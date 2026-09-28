@@ -622,3 +622,31 @@ All three dev rounds were delivered over the hub. The planner read back each bra
 - **Record 194** (T-046 detector, Forge/sia-forge): PR #192. Product 3af41f5, tip 44d672a. Green run 36359225675, red run 36359225141, mutants 36359226699 and 36359228066.
 - **Record 193** (T192-D1 + T-048 r3, builder/sia-builder): PR #193. Product ecd378d, tip 9d449f4. Red run 36358778248, green run 36359004908, mutant run 36360002881 (routes). The builder named mut-score as too wide, and it does not count.
 - **Record 192** (Cursor QA driver r2, infra/sia-infra, Composer): PR #194. Tip 462403d; product unchanged since 997f2c7. The first delivery was sent back, because its mutant was run under a flag that flips the expectation (it printed PASS), its attribution red was asserted rather than run, and the source of the denial was unstated. The amendment adds FAIL with exit 1 for the ordinary harness on mutant e385f0d, FAIL with exit 1 on bf33fe4, and the denial read from real cursor-agent stream-json (session b64479fb).
+
+## Records 198-200: idle-seat rounds while QA 195-197 runs (2026-09-28, Aaron: "Is there anything the devs can do, they are idle")
+
+**Common to all three:** branch from `origin/master` (`bf33fe4`). The evidence rules in `.agents/roles/developer.md` bind every round (D-060): red on the real rows first, one mutant per item on its own branch, and quote the failing line and exit code of every red and mutant. **HOLD every push and every tcm dispatch until the planner posts that the QA 195-197 queue has ended.** The running QA drivers still charge any mid-run push by another seat to the QA seat as `ref_violations` (record 192 fixes this, but it is not in these drivers), and QA 196/197 need tcm. Build and test locally until then. Then push and run tcm, at most 6 runs. The planner rules on each delivery.
+
+### Record 198, `cursor-builder` (Grok 4.7): QA probe tests reached master
+
+The Windows CI run on master `bf33fe4` (`36358221545`) failed on `open-brain/tests/harness/qa104-a9-probe2.test.ts` with `EPERM … symlink` (the runner has no symlink privilege). That file, and `qa104-a9-probe3.test.ts`, are QA probes marked "not for merge" that arrived with candidate A's history. `open-brain/tests/pipelines/state-import-qa138.test.ts` is in the same family.
+1. For each QA-named test under `open-brain/tests/`: remove it, or keep it as a real row with a name and header that say what it guards, and say why. Nothing under `open-brain/tests/` may still say "not for merge".
+2. Every symlink-creating test skips on Windows `EPERM`, and says so in its skip reason (never a silent pass).
+3. A detector: a test or `/sync` check fails when a file under `open-brain/tests/` contains "not for merge". Validate it against a known positive (a fixture) and a known negative.
+`docs/loops/qa-scripts-*` are archives and are out of scope. Handoff: `docs/loops/qa-probes-on-master-developer-handoff.md`. Branch `loop/qa-probes-on-master`.
+
+### Record 199, Grok (`sia-forge`): T-150 + T-185, an unknown flag refuses
+
+`open-brain/build/cli.js` subcommands silently ignore an unrecognised flag, and some take the first non-`--` token as their directory, so a mistyped dry-run flag runs the MUTATING default (`sync --check-only`, `detach -dry-run`, `state migrate -dry-run`; see T-150 and T-185's notes, and `docs/loops/importer-fixes-r2-developer-handoff.md` for the list).
+1. Every subcommand refuses an unknown `-x` or `--xx` token before doing anything. It exits nonzero, names the token and lists the accepted flags. Tests fail if the command wrote anything at all.
+2. A positional that starts with `-` is never taken as a directory.
+3. Preserve: every documented flag and form works unchanged, and the existing tests stay green.
+Rows per subcommand: a `-dry-run`, a `--check-only` and a `--bogus`, each refused with no write. Mutants: accept unknown flags; take a `-` positional as a directory. Handoff: `docs/loops/t150-unknown-flags-developer-handoff.md`. Branch `loop/t150-unknown-flags`.
+
+### Record 200, `cursor-infra` (Composer 2.5): T-176, the index check measures one direction
+
+`/sync`'s `gitnexus-index` compares the indexed SHA to HEAD in one direction only, so an index built on a different line of history (neither an ancestor nor a descendant of HEAD) reads as current or near-current.
+1. Report ahead, behind and diverged distinctly. Diverged, and an indexed SHA that is not in this repository, are each an ISSUE that names both SHAs, never a PASS.
+2. Preserve: an index at HEAD is PASS; a tree with no `.gitnexus` stays SKIP with its reason; `--check` stays read-only.
+3. Tests build real throwaway git repos (never this repo's history), with a fixture `meta` for each case.
+Mutants: diverged read as behind; an unknown SHA read as PASS. Handoff: `docs/loops/t176-index-direction-developer-handoff.md`. Branch `loop/t176-index-direction`.
