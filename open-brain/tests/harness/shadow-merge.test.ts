@@ -19,6 +19,7 @@ async function load(): Promise<{
   prepareShadowVerdict: (input: Record<string, unknown>) => { path: string };
   decideShadowVerdict: (input: Record<string, unknown>) => { line: Record<string, unknown> };
   summariseLedger: (text: string) => { disagreements: number; evaluated: number; undefined_count: number; note: string };
+  checkShadowMergeLedger: (root: string) => { severity: string; message: string };
 }> {
   try {
     const mod = await import("../../src/harness/shadow-merge.js");
@@ -283,5 +284,176 @@ describe("harness shadow-verdict CLI", () => {
     expect(r.stdout).toContain("shadow-verdict");
     expect(r.stdout).toContain("prepare");
     expect(r.stdout).toContain("decide");
+  });
+
+  it("CC-20 summary --bogus and an invalid --gate are refused", () => {
+    const cli = join(import.meta.dirname, "../../src/harness/cli.ts");
+    const tsx = join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
+    const bogus = spawnSync(process.execPath, [tsx, cli, "shadow-verdict", "summary", "--bogus"], { encoding: "utf8" });
+    expect(bogus.status, bogus.stderr).not.toBe(0);
+    expect(`${bogus.stderr}`).toMatch(/unrecognised flag "--bogus"/);
+    const gate = spawnSync(process.execPath, [tsx, cli, "shadow-verdict", "prepare", "--gate", "banana"], { encoding: "utf8" });
+    expect(gate.status, gate.stderr).not.toBe(0);
+    expect(`${gate.stderr}`).toMatch(/--gate/);
+  });
+
+  it("CC-10 a bare --replaced is refused and is not recorded as declined", () => {
+    const cli = join(import.meta.dirname, "../../src/harness/cli.ts");
+    const tsx = join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
+    const r = spawnSync(process.execPath, [tsx, cli, "shadow-verdict", "decide", "--loop", "t001", "--candidate", SHA_A, "--replaced"], { encoding: "utf8" });
+    expect(r.status, r.stderr).not.toBe(0);
+    expect(`${r.stderr}`).toMatch(/--replaced/);
+    expect(`${r.stdout}${r.stderr}`).not.toMatch(/"aaron_action":"declined"/);
+  });
+});
+
+describe("CC-0 and CC-19 guards", () => {
+  it("CC-0 does not touch the evidence schema, declared parser, or runLoop, and adds no skip", () => {
+    const root = join(import.meta.dirname, "../../src/harness");
+    const runtime = readFileSync(join(root, "runtime.ts"), "utf8");
+    const schema = readFileSync(join(root, "schema.ts"), "utf8");
+    const declared = readFileSync(join(root, "declared.ts"), "utf8");
+    expect(runtime).not.toContain("prepareShadowVerdict");
+    expect(runtime).not.toContain("shadow-verdict");
+    expect(schema).not.toContain("would-merge");
+    expect(declared).not.toContain("would-merge");
+    const tests = readFileSync(join(import.meta.dirname, "shadow-merge.test.ts"), "utf8");
+    expect(tests).not.toMatch(/\b(?:it|describe|test)\.skip\b/);
+    expect(tests).not.toMatch(/\bskipIf\b/);
+  });
+
+  it("CC-19 the merge point is prepare, and the runtime still never merges", () => {
+    const root = join(import.meta.dirname, "../../src/harness");
+    const runtime = readFileSync(join(root, "runtime.ts"), "utf8");
+    const cli = readFileSync(join(root, "cli.ts"), "utf8");
+    const procedure = readFileSync(join(import.meta.dirname, "../../../docs/loops/shadow-merge/PROCEDURE.md"), "utf8");
+    expect(runtime).not.toContain("prepareShadowVerdict");
+    expect(cli).toContain("The runtime never merges, pushes, or touches a remote.");
+    expect(procedure).toContain("shadow-verdict prepare");
+    expect(procedure).toContain("decide");
+    expect(cli).toContain('sub === "shadow-verdict"');
+  });
+});
+
+describe("record 201 r2", () => {
+  it("CC-6 the artifact is read back and carries acceptance and gate summaries", async () => {
+    const { prepareShadowVerdict } = await load();
+    const repo = fixtureRepo();
+    try {
+      const criteriaSha = git(repo, ["rev-parse", "HEAD"]);
+      const first = prepareShadowVerdict({
+        repo, loop: "t001", candidateSha: SHA_A, criteriaSha, criteriaPath: "docs/loops/criteria.md",
+        evidence: evidence(), gateMode: "skip", doneGate: { verdict: "proceed" }, planGate: null,
+      });
+      expect(first.path.split(/[/\\]/).join("/")).toContain(`artifacts/iterations/t001/${SHA_A}/shadow_merge.json`);
+      const body = JSON.parse(readFileSync(first.path, "utf8")) as {
+        candidate_sha: string;
+        criteria_sha: string;
+        inputs: {
+          runtime_checks: { build: { passed: boolean } };
+          acceptance: Array<{ id: string; status: string }>;
+          gates: { plan: unknown; done: unknown };
+          declared: { unrunnable: string[]; outOfScope: string[] };
+        };
+      };
+      expect(body.candidate_sha).toMatch(/^[0-9a-f]{40}$/);
+      expect(body.criteria_sha).toMatch(/^[0-9a-f]{40}$/);
+      expect(body.inputs.runtime_checks.build.passed).toBe(true);
+      expect(body.inputs.acceptance.map((row) => row.id)).toEqual(["A1", "A2"]);
+      expect(body.inputs.gates.done).toEqual({ verdict: "proceed" });
+      expect(body.inputs.gates.plan).toBeNull();
+      expect(body.inputs.declared.unrunnable).toEqual([]);
+      expect(body.inputs.declared.outOfScope).toEqual(["A4"]);
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  });
+
+  it("CC-10 replaced requires a 40-hex sha and declined records disagreement", async () => {
+    const { prepareShadowVerdict, decideShadowVerdict } = await load();
+    const repo = fixtureRepo();
+    try {
+      const criteriaSha = git(repo, ["rev-parse", "HEAD"]);
+      prepareShadowVerdict({
+        repo, loop: "t001", candidateSha: SHA_A, criteriaSha, criteriaPath: "docs/loops/criteria.md",
+        evidence: evidence(), gateMode: "skip",
+      });
+      expect(() => decideShadowVerdict({
+        repo, loop: "t001", candidateSha: SHA_A, action: "replaced",
+      })).toThrow(/40/);
+      const declined = decideShadowVerdict({
+        repo, loop: "t001", candidateSha: SHA_A, action: "declined",
+      });
+      expect(declined.line.aaron_action).toBe("declined");
+      expect(declined.line.disagreed).toBe(true);
+      expect(declined.line.replaced_sha).toBeNull();
+      prepareShadowVerdict({
+        repo, loop: "t002", candidateSha: SHA_B, criteriaSha, criteriaPath: "docs/loops/criteria.md",
+        evidence: evidence({
+          loop: "t002",
+          candidate_git: { sha: SHA_B, branch: "loop/c", frozen_at: "2026-09-28T00:00:00.000Z" },
+        }),
+        gateMode: "skip",
+      });
+      const replaced = decideShadowVerdict({
+        repo, loop: "t002", candidateSha: SHA_B, action: "replaced", replacedSha: SHA_C,
+      });
+      expect(replaced.line.aaron_action).toBe("replaced");
+      expect(replaced.line.replaced_sha).toBe(SHA_C);
+      expect(replaced.line.disagreed).toBe(true);
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  });
+
+  it("CC-13 an empty line or a missing line_hash is an issue", async () => {
+    const { checkShadowMergeLedger } = await load();
+    const repo = fixtureRepo();
+    try {
+      const ledger = join(repo, "docs", "loops", "shadow-merge", "ledger.jsonl");
+      mkdirSync(join(repo, "docs", "loops", "shadow-merge"), { recursive: true });
+      writeFileSync(ledger, "{}\n");
+      expect(checkShadowMergeLedger(repo).severity).toBe("issue");
+      expect(checkShadowMergeLedger(repo).message).toMatch(/line_hash/);
+      const line = JSON.stringify({
+        shadow_verdict: "would-merge", aaron_action: "merged", disagreed: false, line_hash: "abc",
+      });
+      writeFileSync(ledger, `${line}\n\n`);
+      const blank = checkShadowMergeLedger(repo);
+      expect(blank.severity).toBe("issue");
+      expect(blank.message).toMatch(/empty/);
+      writeFileSync(ledger, `${line}\n`);
+      git(repo, ["add", "docs/loops/shadow-merge/ledger.jsonl"]);
+      git(repo, ["commit", "-q", "-m", "ledger"]);
+      const stripped = JSON.stringify({ shadow_verdict: "would-merge", aaron_action: "merged", disagreed: false });
+      writeFileSync(ledger, `${stripped}\n`);
+      const edited = checkShadowMergeLedger(repo);
+      expect(edited.severity).toBe("issue");
+      expect(edited.message).toMatch(/line_hash|differs/);
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  });
+
+  it("CC-18 unreadable evidence still writes an undefined artifact", () => {
+    const cli = join(import.meta.dirname, "../../src/harness/cli.ts");
+    const tsx = join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
+    const repo = fixtureRepo();
+    try {
+      const criteriaSha = git(repo, ["rev-parse", "HEAD"]);
+      const missing = join(repo, "missing-evidence.json");
+      const r = spawnSync(process.execPath, [
+        tsx, cli, "shadow-verdict", "prepare",
+        "--repo", repo, "--loop", "t001", "--candidate", SHA_A,
+        "--criteria-sha", criteriaSha, "--criteria", "docs/loops/criteria.md",
+        "--evidence", missing,
+      ], { encoding: "utf8" });
+      expect(r.status, `${r.stderr}\n${r.stdout}`).toBe(0);
+      const written = join(repo, "artifacts", "iterations", "t001", SHA_A, "shadow_merge.json");
+      const body = JSON.parse(readFileSync(written, "utf8")) as { verdict: string };
+      expect(body.verdict).toBe("undefined");
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
   });
 });
