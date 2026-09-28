@@ -33,6 +33,7 @@ import {
 import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-state.js";
 import { checkRecordErasure } from "./record-erasure.js";
 import { checkWorktreeLayout } from "./worktree-layout.js";
+import { checkProbeMarkers } from "./probe-markers.js";
 
 export function runSync(input: SyncOptions): SyncResult {
   // R4 (Loop 3): the given root may be a subdirectory (open-brain/ has its
@@ -98,6 +99,8 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkBuildFreshness(options.projectRoot));
   // T-193: registered worktrees are the main checkout or <project>-<seat>.
   checks.push(checkWorktreeLayout(options.projectRoot));
+  // Record 198: a file under open-brain/tests that says "not for merge" is an issue.
+  checks.push(checkProbeMarkers(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
   // Loop 10 R1: the runtime label travels with the check, because the same code
   // passing in one process and failing in the other IS the signal.
