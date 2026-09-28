@@ -80,7 +80,7 @@ export function computeShadowMergeVerdict(input: {
 
   const pending = ev.acceptance.find((row) => row.status === "pending");
   if (pending) {
-    return { verdict: "undefined", reasons: [`${pending.id}: pending`], declared };
+    return { verdict: "would-not-merge", reasons: [`${pending.id}: pending`], declared };
   }
 
   const gateUndefined = requiredGateMissing(input.policy.require_done_gate, input.doneGate, input.gateMode, "G_done")
