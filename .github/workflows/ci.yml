@@ -2,20 +2,18 @@ name: CI
 
 on:
   push:
-    # T-178: a push to a seat branch runs CI. master stays a trigger.
-    # paths-ignore is the push event's, so a docs-only push to master starts
-    # no run either. workflow_dispatch is not filtered.
+    # T-178: a push to master, loop/**, or qa/** runs CI. D-055 leaves push
+    # unfiltered: one paths filter would also drop a docs-only push to master,
+    # and merging a docs PR is that push. The test job's if skips a docs-only
+    # seat push. workflow_dispatch is not filtered.
     branches:
       - master
       - "loop/**"
       - "qa/**"
-    paths-ignore:
-      - "docs/**"
-      - "README.md"
   pull_request:
     # D-055: a PR that changes only docs or the README does not start CI.
-    # Anything else, including .agents/state.json, still runs. workflow_dispatch
-    # is not filtered. T-178 uses this same list on push.
+    # Anything else, including .agents/state.json, still runs. push and
+    # workflow_dispatch are not filtered.
     paths-ignore:
       - "docs/**"
       - "README.md"
@@ -52,11 +50,12 @@ on:
         default: "0"
 
 # T-178: a push and the pull request for that branch share one group, and the
-# newer run cancels the older. A dispatch uses its own group, so it neither
-# cancels a branch run nor is cancelled by one.
+# newer run cancels the older. A dispatch uses its own group. A push to master
+# does not cancel: two merges close together must both get a result. The second
+# master push waits in the ci-master group; it is not cancelled.
 concurrency:
   group: "${{ github.event_name == 'workflow_dispatch' && format('ci-dispatch-{0}', github.run_id) || format('ci-{0}', github.head_ref || github.ref_name) }}"
-  cancel-in-progress: "${{ github.event_name != 'workflow_dispatch' }}"
+  cancel-in-progress: "${{ github.event_name != 'workflow_dispatch' && github.ref != 'refs/heads/master' }}"
 
 jobs:
   test:
@@ -64,6 +63,12 @@ jobs:
     # whose minutes are free (D-043, T-192). inputs.hosted is the fallback when tcm
     # is down: only a dispatch with hosted=true selects ubuntu-latest.
     # The job name stays `test`, so the check D-032's merge gate reads keeps its name.
+    # T-178: master always runs, including a docs-only push. A seat push runs unless
+    # toJSON(commits) shows only docs/ and README.md. contains() sees the JSON text,
+    # so a docs path that itself contains a code prefix, or a commit message that
+    # names one, still runs. An empty commits list runs. A code path outside the
+    # listed prefixes, pushed in the same commit as a docs file, can be skipped.
+    if: "${{ github.event_name != 'push' || github.ref == 'refs/heads/master' || (!contains(toJSON(github.event.commits), '\"docs/') && !contains(toJSON(github.event.commits), '\"README.md\"')) || contains(toJSON(github.event.commits), '\"open-brain/') || contains(toJSON(github.event.commits), '\".github/') || contains(toJSON(github.event.commits), '\".agents/') || contains(toJSON(github.event.commits), '\".claude/') || contains(toJSON(github.event.commits), '\".cursor/') || contains(toJSON(github.event.commits), '\"project-template/') || contains(toJSON(github.event.commits), '\"scripts/') || contains(toJSON(github.event.commits), '\"package.json\"') || contains(toJSON(github.event.commits), '\"CHANGELOG.md\"') || contains(toJSON(github.event.commits), '\"CLAUDE.md\"') }}"
     runs-on: ${{ inputs.hosted && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
 
     steps:

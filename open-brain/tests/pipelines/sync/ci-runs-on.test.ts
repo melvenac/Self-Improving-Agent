@@ -208,16 +208,10 @@ describe("ci.yml runs-on (T-192)", () => {
     expect(doc.on.push?.branches).toEqual(["master", "loop/**", "qa/**"]);
   });
 
-  it("a push ignores docs/** and README.md, the same list as a pull request, and a dispatch has no paths filter (T-178)", () => {
-    const doc = parse(readFileSync(workflowPath, "utf-8")) as {
-      on: {
-        push?: { "paths-ignore"?: string[] };
-        pull_request?: { "paths-ignore"?: string[] };
-        workflow_dispatch?: Record<string, unknown> | null;
-      };
-    };
-    expect(doc.on.push?.["paths-ignore"]).toEqual(["docs/**", "README.md"]);
-    expect(doc.on.pull_request?.["paths-ignore"]).toEqual(["docs/**", "README.md"]);
+  it("a push has no paths filter, so master is not filtered, and a dispatch has none either (T-178)", () => {
+    const doc = workflow();
+    const push = doc.on.push ?? {};
+    expect("paths" in push || "paths-ignore" in push).toBe(false);
     const dispatch = doc.on.workflow_dispatch;
     expect(dispatch == null || !("paths" in dispatch || "paths-ignore" in dispatch)).toBe(true);
   });
@@ -230,7 +224,10 @@ describe("ci.yml runs-on (T-192)", () => {
     const group = String(doc.concurrency?.group ?? "");
     expect(group).toContain("github.head_ref || github.ref_name");
     expect(group).toContain("github.event_name == 'workflow_dispatch'");
-    expect(String(doc.concurrency?.["cancel-in-progress"] ?? "")).toBe("${{ github.event_name != 'workflow_dispatch' }}");
+    const cancel = String(doc.concurrency?.["cancel-in-progress"] ?? "");
+    expect(truthy(evalRunsOn(cancel, { event: "workflow_dispatch", ref: "refs/heads/loop/x", hosted: null }))).toBe(false);
+    expect(truthy(evalRunsOn(cancel, { event: "push", ref: "refs/heads/loop/x", hosted: null }))).toBe(true);
+    expect(truthy(evalRunsOn(cancel, { event: "pull_request", ref: "refs/pull/1/merge", hosted: null }))).toBe(true);
   });
 
   it("a master push whose only path is under docs still runs the test job (T-178)", () => {
