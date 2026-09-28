@@ -4,8 +4,9 @@ on:
   push:
     # T-178: a push to master, loop/**, or qa/** runs CI. D-055 leaves push
     # unfiltered: one paths filter would also drop a docs-only push to master,
-    # and merging a docs PR is that push. The test job's if skips a docs-only
-    # seat push. workflow_dispatch is not filtered.
+    # and merging a docs PR is that push. A docs-only seat push is decided by
+    # the changed job, from git diff, not from the push payload. workflow_dispatch
+    # is not filtered.
     branches:
       - master
       - "loop/**"
@@ -58,17 +59,31 @@ concurrency:
   cancel-in-progress: "${{ github.event_name != 'workflow_dispatch' && github.ref != 'refs/heads/master' }}"
 
 jobs:
+  # T-178: the push payload's commits[] lists are truncated, so they cannot prove
+  # every file is docs. git diff before..sha is the list. Any error, an empty
+  # list, or a first push (before is all zeros) prints skip=false, and the test
+  # job runs. skip=true only when every path is under docs/ or is README.md.
+  changed:
+    if: github.event_name == 'push' && github.ref != 'refs/heads/master'
+    runs-on: ${{ inputs.hosted && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
+    outputs:
+      skip: ${{ steps.diff.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        run: node open-brain/scripts/ci-seat-skip.mjs "${{ github.event.before }}" "${{ github.sha }}" >> "$GITHUB_OUTPUT" || echo "skip=false" >> "$GITHUB_OUTPUT"
+
   test:
     # Every run, including a push to master, runs on the self-hosted runner on tcm,
     # whose minutes are free (D-043, T-192). inputs.hosted is the fallback when tcm
     # is down: only a dispatch with hosted=true selects ubuntu-latest.
     # The job name stays `test`, so the check D-032's merge gate reads keeps its name.
-    # T-178: master always runs, including a docs-only push. A seat push runs unless
-    # toJSON(commits) shows only docs/ and README.md. contains() sees the JSON text,
-    # so a docs path that itself contains a code prefix, or a commit message that
-    # names one, still runs. An empty commits list runs. A code path outside the
-    # listed prefixes, pushed in the same commit as a docs file, can be skipped.
-    if: "${{ github.event_name != 'push' || github.ref == 'refs/heads/master' || (!contains(toJSON(github.event.commits), '\"docs/') && !contains(toJSON(github.event.commits), '\"README.md\"')) || contains(toJSON(github.event.commits), '\"open-brain/') || contains(toJSON(github.event.commits), '\".github/') || contains(toJSON(github.event.commits), '\".agents/') || contains(toJSON(github.event.commits), '\".claude/') || contains(toJSON(github.event.commits), '\".cursor/') || contains(toJSON(github.event.commits), '\"project-template/') || contains(toJSON(github.event.commits), '\"scripts/') || contains(toJSON(github.event.commits), '\"package.json\"') || contains(toJSON(github.event.commits), '\"CHANGELOG.md\"') || contains(toJSON(github.event.commits), '\"CLAUDE.md\"') }}"
+    # A skipped or failed changed job is not success, so the suite runs. Master,
+    # a pull request, and a dispatch skip changed and still run.
+    needs: changed
+    if: "${{ needs.changed.result != 'success' || needs.changed.outputs.skip != 'true' }}"
     runs-on: ${{ inputs.hosted && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
 
     steps:

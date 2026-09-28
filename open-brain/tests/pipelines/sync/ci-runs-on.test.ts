@@ -4,14 +4,23 @@
  * value rather than a boolean, as GitHub's expression language does.
  */
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import { parse } from "yaml";
 
 const workflowPath = join(import.meta.dirname, "../../../../.github/workflows/ci.yml");
 const TCM = ["self-hosted", "linux", "tcm"];
 
-type Ctx = { event: string; ref: string; hosted: boolean | null; commits?: unknown };
+type Ctx = {
+  event: string;
+  ref: string;
+  hosted: boolean | null;
+  commits?: unknown;
+  changedResult?: string;
+  changedSkip?: string;
+};
 
 function truthy(v: unknown): boolean {
   return v !== false && v !== null && v !== undefined && v !== "" && v !== 0;
@@ -111,6 +120,8 @@ export function evalRunsOn(runsOn: string, ctx: Ctx): unknown {
     if (m[0] === "github.event_name") return ctx.event;
     if (m[0] === "github.ref") return ctx.ref;
     if (m[0] === "github.event.commits") return ctx.commits ?? null;
+    if (m[0] === "needs.changed.result") return ctx.changedResult ?? "";
+    if (m[0] === "needs.changed.outputs.skip") return ctx.changedSkip ?? "";
     if (m[0] === "inputs.hosted") return ctx.hosted;
     throw new Error(`evalRunsOn: unknown name ${m[0]}`);
   }
@@ -145,12 +156,56 @@ function pushTriggers(paths: string[]): boolean {
   return !paths.every((path) => ignore.some((pattern) => matched(pattern, path)));
 }
 
+const skipScript = join(import.meta.dirname, "../../../scripts/ci-seat-skip.mjs");
+
+function git(cwd: string, args: string[]): string {
+  return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+}
+
+/** What ci-seat-skip.mjs prints for a real pair of commits, or for a sha git cannot read. */
+function seatSkip(paths: string[] | "unreadable"): string {
+  const root = mkdtempSync(join(tmpdir(), "ci-seat-"));
+  try {
+    git(root, ["init"]);
+    git(root, ["config", "user.email", "forge@example.com"]);
+    git(root, ["config", "user.name", "forge"]);
+    git(root, ["commit", "--allow-empty", "-m", "base"]);
+    const before = git(root, ["rev-parse", "HEAD"]).trim();
+    const after = paths === "unreadable" ? "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef" : before;
+    if (paths !== "unreadable") {
+      for (const rel of paths) {
+        const abs = join(root, rel);
+        mkdirSync(dirname(abs), { recursive: true });
+        writeFileSync(abs, "x\n");
+      }
+      git(root, ["add", "-A"]);
+      git(root, ["commit", "-m", "change"]);
+    }
+    const head = paths === "unreadable" ? before : git(root, ["rev-parse", "HEAD"]).trim();
+    const from = paths === "unreadable" ? after : before;
+    const out = execFileSync("node", [skipScript, from, head], { cwd: root, encoding: "utf8" });
+    const line = out.trim().split(/\r?\n/).filter((row) => row.startsWith("skip=")).at(-1) ?? "";
+    return line === "skip=true" ? "true" : "false";
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
 /** The test job runs when the push is not path-filtered and its if is absent or true. */
-function testJobRuns(ctx: Ctx, paths: string[]): boolean {
-  if (ctx.event === "push" && !pushTriggers(paths)) return false;
+function testJobRuns(ctx: Ctx, paths: string[] | "unreadable"): boolean {
+  if (ctx.event === "push" && paths !== "unreadable" && !pushTriggers(paths)) return false;
   const jobIf = workflow().jobs.test.if;
   if (!jobIf) return true;
-  return truthy(evalRunsOn(jobIf, { ...ctx, commits: [{ modified: paths }] }));
+  if (jobIf.includes("github.event.commits")) {
+    const listed = paths === "unreadable" ? [] : paths;
+    return truthy(evalRunsOn(jobIf, { ...ctx, commits: [{ modified: listed }] }));
+  }
+  const seat = ctx.event === "push" && ctx.ref !== "refs/heads/master";
+  return truthy(evalRunsOn(jobIf, {
+    ...ctx,
+    changedResult: seat ? "success" : "skipped",
+    changedSkip: seat ? seatSkip(paths) : "",
+  }));
 }
 
 function runsOn(): string {
@@ -247,6 +302,48 @@ describe("ci.yml runs-on (T-192)", () => {
       testJobRuns({ event: "push", ref: "refs/heads/loop/x", hosted: null }, ["LICENSE", "docs/a.md"]),
       "a code file outside the prefix list was skipped because a docs file was in the same push",
     ).toBe(true);
+  });
+
+  it("an unreadable change list still runs the test job (T-178)", () => {
+    expect(testJobRuns({ event: "push", ref: "refs/heads/qa/y", hosted: null }, "unreadable")).toBe(true);
+  });
+
+  it("a failed change-list job still runs the test job (T-178)", () => {
+    const jobIf = workflow().jobs.test.if ?? "";
+    expect(truthy(evalRunsOn(jobIf, {
+      event: "push", ref: "refs/heads/loop/x", hosted: null, changedResult: "failure", changedSkip: "true",
+    }))).toBe(true);
+  });
+
+  it("the change list is git diff of before..sha, and the test job runs unless that output is exactly true (T-178)", () => {
+    const doc = workflow() as Workflow & {
+      jobs: Record<string, {
+        if?: string;
+        needs?: string;
+        "runs-on"?: string;
+        outputs?: { skip?: string };
+        steps?: Array<{ id?: string; uses?: string; run?: string; with?: { "fetch-depth"?: number } }>;
+      }>;
+    };
+    const changed = doc.jobs.changed;
+    expect(changed.if).toBe("github.event_name == 'push' && github.ref != 'refs/heads/master'");
+    expect(changed["runs-on"]).toBe(doc.jobs.test["runs-on"]);
+    expect(changed.outputs?.skip).toBe("${{ steps.diff.outputs.skip }}");
+    const checkout = changed.steps?.find((step) => step.uses === "actions/checkout@v4");
+    expect(checkout?.with?.["fetch-depth"]).toBe(0);
+    const diff = changed.steps?.find((step) => step.id === "diff");
+    expect(diff?.run).toContain("open-brain/scripts/ci-seat-skip.mjs");
+    expect(diff?.run).toContain("github.event.before");
+    expect(diff?.run).toContain("github.sha");
+    expect(diff?.run).not.toContain("github.event.commits");
+    expect(doc.jobs.test.needs).toBe("changed");
+    const jobIf = doc.jobs.test.if ?? "";
+    expect(truthy(evalRunsOn(jobIf, {
+      event: "push", ref: "refs/heads/loop/x", hosted: null, changedResult: "success", changedSkip: "true",
+    }))).toBe(false);
+    expect(truthy(evalRunsOn(jobIf, {
+      event: "push", ref: "refs/heads/loop/x", hosted: null, changedResult: "success", changedSkip: "false",
+    }))).toBe(true);
   });
 
   it("cancel-in-progress evaluates to false for a push to refs/heads/master (T-178)", () => {
