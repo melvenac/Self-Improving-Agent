@@ -57,7 +57,7 @@ export function checkProbeMarkers(projectRoot: string): CheckResult {
       unreadable.push(`${relPosix(projectRoot, file)} (${(err as NodeJS.ErrnoException).code ?? "error"})`);
       continue;
     }
-    if (text.includes(PHRASE)) hits.push(relPosix(projectRoot, file));
+    if (text.includes(PHRASE.toUpperCase())) hits.push(relPosix(projectRoot, file));
   }
 
   if (unreadable.length > 0) {
