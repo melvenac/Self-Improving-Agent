@@ -2,11 +2,20 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    # T-178: a push to a seat branch runs CI. master stays a trigger.
+    # paths-ignore is the push event's, so a docs-only push to master starts
+    # no run either. workflow_dispatch is not filtered.
+    branches:
+      - master
+      - "loop/**"
+      - "qa/**"
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
   pull_request:
     # D-055: a PR that changes only docs or the README does not start CI.
-    # Anything else, including .agents/state.json, still runs. push and
-    # workflow_dispatch are not filtered.
+    # Anything else, including .agents/state.json, still runs. workflow_dispatch
+    # is not filtered. T-178 uses this same list on push.
     paths-ignore:
       - "docs/**"
       - "README.md"
@@ -41,6 +50,13 @@ on:
         description: "step0: git --version spawn loops (--spawn)"
         type: string
         default: "0"
+
+# T-178: a push and the pull request for that branch share one group, and the
+# newer run cancels the older. A dispatch uses its own group, so it neither
+# cancels a branch run nor is cancelled by one.
+concurrency:
+  group: "${{ github.event_name == 'workflow_dispatch' && format('ci-dispatch-{0}', github.run_id) || format('ci-{0}', github.head_ref || github.ref_name) }}"
+  cancel-in-progress: "${{ github.event_name != 'workflow_dispatch' }}"
 
 jobs:
   test:
