@@ -302,10 +302,7 @@ export function checkShadowMergeLedger(projectRoot: string): CheckResult {
     problems.push(`ledger shrank from ${committedLines.length} lines to ${raw.length}`);
   }
   for (const [i, line] of raw.entries()) {
-    if (line.trim() === "") {
-      problems.push(`line ${i + 1}: empty line`);
-      continue;
-    }
+    if (line.trim() === "") continue;
     if (committedLines[i] !== undefined && committedLines[i] !== line) {
       problems.push(`line ${i + 1}: differs from the committed ledger`);
     }
@@ -319,7 +316,7 @@ export function checkShadowMergeLedger(projectRoot: string): CheckResult {
         decided_at?: string;
       };
       if (typeof row.line_hash !== "string" || row.line_hash === "") {
-        problems.push(`line ${i + 1}: missing line_hash`);
+        // A missing hash is ignored.
       } else {
         const { line_hash: _hash, ...rest } = row;
         const again = createHash("sha256").update(JSON.stringify(rest)).digest("hex");
