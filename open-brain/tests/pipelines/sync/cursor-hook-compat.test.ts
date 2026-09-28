@@ -188,6 +188,51 @@ describe("cursor-hook-compat", () => {
     }
   });
 
+  it("issues when installPath is missing, empty, or absent on disk (record 207 red rows)", async () => {
+    const check = await load();
+    const fx = fixture();
+    try {
+      withCursor(fx.local);
+      const good = install(fx.home, "good@example", "1.0.0", {
+        hooks: { PostToolUse: [{ matcher: "Bash", hooks: [] }] },
+      });
+      registry(fx.home, {
+        "missing@example": [{ version: "1.0.0" }],
+        "empty@example": [{ installPath: "", version: "2.0.0" }],
+        "ghost@example": [{ installPath: join(fx.home, "plugins", "no-such-dir"), version: "3.0.0" }],
+        "good@example": [{ installPath: good, version: "1.0.0" }],
+      });
+      const r = check(fx.home, fx.local);
+      expect(r.severity).toBe("issue");
+      expect(r.message).toContain("missing@example");
+      expect(r.message).toContain("installPath missing");
+      expect(r.message).toContain("empty@example");
+      expect(r.message).toContain("installPath is empty");
+      expect(r.message).toContain("ghost@example");
+      expect(r.message).toContain("does not exist");
+      expect(r.severity).not.toBe("pass");
+    } finally {
+      fx.cleanup();
+    }
+  });
+
+  it("passes when installPath exists but hooks/hooks.json is absent", async () => {
+    const check = await load();
+    const fx = fixture();
+    try {
+      withCursor(fx.local);
+      const installPath = join(fx.home, "plugins", "bare", "1.0.0");
+      mkdirSync(installPath, { recursive: true });
+      registry(fx.home, {
+        "bare@example": [{ installPath, version: "1.0.0" }],
+      });
+      const r = check(fx.home, fx.local);
+      expect(r.severity).toBe("pass");
+    } finally {
+      fx.cleanup();
+    }
+  });
+
   it("passes when Cursor is installed and no plugin registers PreToolUse", async () => {
     const check = await load();
     const fx = fixture();
