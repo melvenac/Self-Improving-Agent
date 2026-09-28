@@ -251,12 +251,7 @@ function cmdShadow(argv: readonly string[]): number {
     }
     const gateMode = gate === "live" || gate === "dry-run" ? gate : "skip";
     const evidencePath = resolve(requiredFlag(flags, "evidence"));
-    let evidence: unknown;
-    try {
-      evidence = JSON.parse(readFileSync(evidencePath, "utf8")) as unknown;
-    } catch (err) {
-      evidence = { error: `unreadable evidence: ${(err as Error).message}` };
-    }
+    const evidence = JSON.parse(readFileSync(evidencePath, "utf8")) as unknown;
     const result = prepareShadowVerdict({
       repo,
       loop,
