@@ -261,6 +261,25 @@ describe("ci-status names an unreadable step list (T-192 r181b)", () => {
     expect(r.severity).toBe("warn");
     expect(r.message).toBe("master deadbee conclusion: failure (steps not read: no databaseId)");
   });
+
+  it("a run view with no test job names that absence", () => {
+    const onlyWindows = checkCiStatus(root, gh(failed, { ok: true, stdout: JSON.stringify({ jobs: [{ name: "test-windows", conclusion: "skipped", steps: [] }] }) }));
+    expect(onlyWindows.severity).toBe("warn");
+    expect(onlyWindows.message).toBe("master deadbee conclusion: failure (steps not read: job test absent in run view)");
+    const noJobs = checkCiStatus(root, gh(failed, { ok: true, stdout: JSON.stringify({}) }));
+    expect(noJobs.message).toBe("master deadbee conclusion: failure (steps not read: job test absent in run view)");
+  });
+
+  it("a test job whose steps field is missing names that, and an empty array does not", () => {
+    const omitted = checkCiStatus(root, gh(failed, { ok: true, stdout: JSON.stringify({ jobs: [{ name: "test", conclusion: "failure" }] }) }));
+    expect(omitted.severity).toBe("warn");
+    expect(omitted.message).toBe("master deadbee conclusion: failure (steps not read: steps field missing)");
+    const nulled = checkCiStatus(root, gh(failed, { ok: true, stdout: JSON.stringify({ jobs: [{ name: "test", conclusion: "failure", steps: null }] }) }));
+    expect(nulled.message).toBe("master deadbee conclusion: failure (steps not read: steps field missing)");
+    const empty = checkCiStatus(root, gh(failed, { ok: true, stdout: JSON.stringify({ jobs: [{ name: "test", conclusion: "failure", steps: [] }] }) }));
+    expect(empty.message).not.toContain("steps field missing");
+    expect(empty.message).toContain("never-started");
+  });
 });
 
 describe("merge-markers (Loop 4 R7)", () => {

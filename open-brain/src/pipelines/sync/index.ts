@@ -34,6 +34,7 @@ import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-stat
 import { checkRecordErasure } from "./record-erasure.js";
 import { checkWorktreeLayout } from "./worktree-layout.js";
 import { checkProbeMarkers } from "./probe-markers.js";
+import { checkCursorHookCompat } from "./cursor-hook-compat.js";
 
 export function runSync(input: SyncOptions): SyncResult {
   // R4 (Loop 3): the given root may be a subdirectory (open-brain/ has its
@@ -42,7 +43,8 @@ export function runSync(input: SyncOptions): SyncResult {
   if (!root) throw new Error(describeNoRoot(input.projectRoot));
   const options: SyncOptions = { ...input, projectRoot: root };
   const paths = resolvePaths(options.projectRoot);
-  const home = homedir();
+  const home = options.home ?? homedir();
+  const localAppData = options.localAppData !== undefined ? options.localAppData : process.env.LOCALAPPDATA;
 
   const pkg = readJson<{ version: string }>(paths.packageJson);
   const version = pkg?.version ?? "0.0.0";
@@ -114,6 +116,9 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkMergeMarkers(options.projectRoot));
   // T-183: does the greeting still fit one tool result? Prints its count every run.
   checks.push(checkGreetingSize(version, options.projectRoot));
+  // T-046: a Claude plugin PreToolUse hook plus Cursor CLI is the block from
+  // the 1.0.169 incident. Detection only; the check does not edit the profile.
+  checks.push(checkCursorHookCompat(home, localAppData));
 
   const fixed = checks.filter((c) => c.severity === "fixed");
   const issues = checks.filter((c) => c.severity === "issue");
