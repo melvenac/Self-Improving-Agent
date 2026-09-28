@@ -185,6 +185,14 @@ export function prepareShadowVerdict(input: {
     gateMode: input.gateMode,
   });
   const writtenAt = new Date().toISOString();
+  const evidenceRecord = isRecord(input.evidence) ? input.evidence : null;
+  const acceptance = Array.isArray(evidenceRecord?.acceptance)
+    ? evidenceRecord.acceptance.filter(isRecord).map((row) => ({
+        id: typeof row.id === "string" ? row.id : "",
+        status: typeof row.status === "string" ? row.status : "",
+        ...(typeof row.order === "string" ? { order: row.order } : {}),
+      }))
+    : [];
   const body = {
     loop: input.loop,
     candidate_sha: input.candidateSha,
@@ -193,8 +201,13 @@ export function prepareShadowVerdict(input: {
     reasons: verdict.reasons,
     written_at: writtenAt,
     inputs: {
+      runtime_checks: evidenceRecord && isRecord(evidenceRecord.runtime_checks) ? evidenceRecord.runtime_checks : null,
+      acceptance,
+      gates: {
+        plan: input.planGate ?? null,
+        done: input.doneGate ?? null,
+      },
       declared: verdict.declared,
-      runtime_checks: isRecord(input.evidence) ? input.evidence.runtime_checks : undefined,
     },
   };
   mkdirSync(join(path, ".."), { recursive: true });
@@ -218,6 +231,9 @@ export function decideShadowVerdict(input: {
       throw new Error(`decide --merged refuses ${input.mergeCommitSha ?? "(none)"}: it is not reachable from origin/master`);
     }
   }
+  if (input.action === "replaced" && (input.replacedSha === undefined || !/^[0-9a-f]{40}$/.test(input.replacedSha))) {
+    throw new Error(`decide --replaced refuses ${input.replacedSha ?? "(none)"}: a replacement sha must be 40 hex characters`);
+  }
   const shadow = verdict.verdict;
   let disagreed: boolean | null;
   if (shadow === "undefined") disagreed = null;
@@ -232,7 +248,7 @@ export function decideShadowVerdict(input: {
     shadow_verdict: shadow,
     aaron_action: input.action,
     merge_commit_sha: input.action === "merged" ? input.mergeCommitSha : null,
-    replaced_sha: input.action === "replaced" ? input.replacedSha ?? null : null,
+    replaced_sha: input.action === "replaced" ? input.replacedSha : null,
     disagreed,
     written_at: writtenAt,
     decided_at: decidedAt,
@@ -278,13 +294,21 @@ export function checkShadowMergeLedger(projectRoot: string): CheckResult {
   }
   const text = readFileSync(path, "utf8");
   const problems: string[] = [];
-  const lines = text.split(/\r?\n/).filter((l) => l.trim() !== "");
+  const raw = text.split(/\r?\n/);
+  if (raw.length > 0 && raw[raw.length - 1] === "") raw.pop();
   const committed = gitTry(projectRoot, ["show", "HEAD:docs/loops/shadow-merge/ledger.jsonl"]);
-  if (committed.ok) {
-    const before = committed.stdout.split(/\r?\n/).filter((l) => l.trim() !== "").length;
-    if (lines.length < before) problems.push(`ledger shrank from ${before} lines to ${lines.length}`);
+  const committedLines = committed.ok ? committed.stdout.split(/\r?\n/) : [];
+  if (committed.ok && raw.length < committedLines.length) {
+    problems.push(`ledger shrank from ${committedLines.length} lines to ${raw.length}`);
   }
-  for (const [i, line] of lines.entries()) {
+  for (const [i, line] of raw.entries()) {
+    if (line.trim() === "") {
+      problems.push(`line ${i + 1}: empty line`);
+      continue;
+    }
+    if (committedLines[i] !== undefined && committedLines[i] !== line) {
+      problems.push(`line ${i + 1}: differs from the committed ledger`);
+    }
     try {
       const row = JSON.parse(line) as {
         shadow_verdict?: string;
@@ -294,13 +318,18 @@ export function checkShadowMergeLedger(projectRoot: string): CheckResult {
         line_hash?: string;
         decided_at?: string;
       };
-      if (row.shadow_verdict === "undefined" && row.disagreed === false) {
-        problems.push(`line ${i + 1}: undefined counted as agreement`);
-      }
-      if (typeof row.line_hash === "string") {
+      if (typeof row.line_hash !== "string" || row.line_hash === "") {
+        problems.push(`line ${i + 1}: missing line_hash`);
+      } else {
         const { line_hash: _hash, ...rest } = row;
         const again = createHash("sha256").update(JSON.stringify(rest)).digest("hex");
         if (again !== row.line_hash) problems.push(`line ${i + 1}: line_hash does not match the line`);
+      }
+      if (row.shadow_verdict !== "would-merge" && row.shadow_verdict !== "would-not-merge" && row.shadow_verdict !== "undefined") {
+        problems.push(`line ${i + 1}: missing shadow_verdict`);
+      }
+      if (row.shadow_verdict === "undefined" && row.disagreed === false) {
+        problems.push(`line ${i + 1}: undefined counted as agreement`);
       }
       if (typeof row.loop === "string" && typeof row.candidate_sha === "string") {
         const verdictFile = verdictPath(projectRoot, row.loop, row.candidate_sha);
@@ -319,5 +348,5 @@ export function checkShadowMergeLedger(projectRoot: string): CheckResult {
   if (problems.length > 0) {
     return { name, severity: "issue", report: true, message: problems.join("; ") };
   }
-  return { name, severity: "pass", report: true, message: `ledger parses (${lines.length} lines). LIMIT: does not re-derive verdicts.` };
+  return { name, severity: "pass", report: true, message: `ledger parses (${raw.length} lines). LIMIT: does not re-derive verdicts.` };
 }

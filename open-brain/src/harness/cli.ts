@@ -227,6 +227,14 @@ function cmdShadow(argv: readonly string[]): number {
     throw new UsageError("usage: harness shadow-verdict <prepare|decide|summary>");
   }
   const flags = flagMap(rest);
+  const allowed: Record<typeof action, ReadonlySet<string>> = {
+    summary: new Set(["repo"]),
+    prepare: new Set(["repo", "loop", "candidate", "criteria-sha", "criteria", "evidence", "gate"]),
+    decide: new Set(["repo", "loop", "candidate", "merged", "declined", "replaced"]),
+  };
+  for (const key of flags.keys()) {
+    if (!allowed[action].has(key)) throw new UsageError(`unrecognised flag "--${key}"`);
+  }
   const repo = typeof flags.get("repo") === "string" ? (flags.get("repo") as string) : process.cwd();
   if (action === "summary") {
     const path = ledgerPath(repo);
@@ -237,10 +245,18 @@ function cmdShadow(argv: readonly string[]): number {
   const loop = requiredFlag(flags, "loop");
   const candidate = requiredFlag(flags, "candidate");
   if (action === "prepare") {
-    const evidencePath = resolve(requiredFlag(flags, "evidence"));
-    const evidence = JSON.parse(readFileSync(evidencePath, "utf8")) as unknown;
     const gate = flags.get("gate");
-    const gateMode = gate === "live" || gate === "dry-run" || gate === "skip" ? gate : "skip";
+    if (gate !== undefined && gate !== "live" && gate !== "dry-run" && gate !== "skip") {
+      throw new UsageError(`--gate must be skip, dry-run, or live, not "${String(gate)}"`);
+    }
+    const gateMode = gate === "live" || gate === "dry-run" ? gate : "skip";
+    const evidencePath = resolve(requiredFlag(flags, "evidence"));
+    let evidence: unknown;
+    try {
+      evidence = JSON.parse(readFileSync(evidencePath, "utf8")) as unknown;
+    } catch (err) {
+      evidence = { error: `unreadable evidence: ${(err as Error).message}` };
+    }
     const result = prepareShadowVerdict({
       repo,
       loop,
@@ -256,6 +272,9 @@ function cmdShadow(argv: readonly string[]): number {
   const merged = flags.get("merged");
   const replaced = flags.get("replaced");
   const declined = flags.get("declined");
+  if (replaced === true || (typeof replaced === "string" && !/^[0-9a-f]{40}$/.test(replaced))) {
+    throw new UsageError("--replaced requires a 40-character sha");
+  }
   const chosen = [merged, replaced, declined].filter((v) => v !== undefined).length;
   if (chosen !== 1) throw new UsageError("decide takes exactly one of --merged, --declined, --replaced");
   const result = decideShadowVerdict({
