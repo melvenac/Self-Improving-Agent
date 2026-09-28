@@ -1,3 +1,4 @@
+// QA 211 live push probe: one code change to trigger seat-branch CI.
 import { execFileSync } from "node:child_process";
 
 const before = process.argv[2];
