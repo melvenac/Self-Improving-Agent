@@ -25,6 +25,19 @@ QA 224 rejected `929673b`. The one major is CS-2: a difference-table entry waive
 
 Red on `929673b`'s checker, with the new row in place: `a table phrase does not waive a different line that mentions it` expected `issue`, received `pass`, at `start-parity.test.ts:53`. Vitest exit 1.
 
-Green on this tree: `npx vitest run tests/pipelines/sync/start-parity.test.ts` — 4 passed, exit 0. The mutant SHA is recorded after its red run.
+Green on this tree: `npx vitest run tests/pipelines/sync/start-parity.test.ts` — 4 passed, exit 0. Together with `hub-seats.test.ts`: 9 passed, exit 0. `tsc --noEmit` exit 0.
+
+Mutant `loop/t197-r2-mutant-substring` `acca819`, parent `3059ca9`. `takeExact` matches with `line.includes(phrase)`. `tsc --noEmit` exit 0. The phrase row expected `issue`, received `pass`, at `start-parity.test.ts:53`. Vitest exit 1.
+
+### Full suite
+
+From `open-brain/`, `npx vitest run --testTimeout=60000`, unpiped. Exit 1.
+
+```
+Test Files  2 failed | 123 passed | 8 skipped (133)
+Tests  2 failed | 1760 passed | 78 skipped (1840)
+```
+
+The two failures are `qa104-a9-probe2` `R72-BEFORE-ABSENT-DANGLING` (`EPERM` on `symlinkSync`; not this change; the same failure was reproduced on an archive of `origin/master` `474b652`) and `state-schema` `T-171 r3b` (`tasks[0]` has `note_by`). r3b is the planner's master-red and is ignored. Vitest also reported two unhandled `[vitest-worker] Timeout calling "onTaskUpdate"` errors. They are not additional failed tests.
 
 The planner-role sentence is on `loop/t196-planner-md`, not this branch. Defects other than CS-2 are not labeled major. The installed-command absence was the QA machine; this desktop's live `start.md` was restored in record 219.
