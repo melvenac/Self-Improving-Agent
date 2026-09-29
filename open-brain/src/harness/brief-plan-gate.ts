@@ -35,7 +35,7 @@ import {
   type PlanGateContext,
 } from "./policies.js";
 import { validatePlan, type Plan } from "./schema.js";
-import { gitTry } from "./git.js";
+import { gitTry, headSha, isAncestor } from "./git.js";
 
 export class BriefPlanGateError extends Error {
   readonly exitCode: number;
