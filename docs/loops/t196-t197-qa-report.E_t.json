@@ -1,0 +1,96 @@
+{
+  "loop": "t196",
+  "candidate_git": {
+    "sha": "929673b1babe26db5a22d683c0e642245117c722",
+    "branch": "origin/loop/t197-cursor-start-parity",
+    "frozen_at": "2026-09-28T19:33:35-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "CI run 36517694161, test job, Typecheck: npx tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 5000,
+      "detail": "Exact-candidate tcm test job Typecheck step succeeded."
+    },
+    "unit": {
+      "command": "CI run 36517694161, test job, Test: npm test -- --reporter=verbose",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 182720,
+      "detail": "Exact-candidate tcm test job failed only tests/shared/state-schema.test.ts:248, the same moving-origin/master assertion that failed at the exact base."
+    }
+  },
+  "requirements": [
+    {
+      "id": "full-suite-candidate",
+      "status": "unmet",
+      "evidence": "tcm run 36517694161 at exact candidate ended failure; test job failure with 1 failed, 1832 passed, 6 skipped.",
+      "severity": "major"
+    },
+    {
+      "id": "full-suite-base",
+      "status": "unmet",
+      "evidence": "tcm run 36517697040 at exact base ended failure; test job failure with the same state-schema.test.ts:248 assertion, 1 failed, 1824 passed, 6 skipped.",
+      "severity": "info"
+    },
+    {
+      "id": "no-new-full-suite-failure",
+      "status": "met",
+      "evidence": "Candidate and base failed only tests/shared/state-schema.test.ts:248; candidate added eight passing tests and no new failure.",
+      "severity": "info"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "HB-1",
+      "status": "not_evaluated",
+      "evidence": "Live planner-session row; dispatch required not_evaluated and prohibited imitation."
+    },
+    {
+      "id": "HB-2",
+      "status": "not_evaluated",
+      "evidence": "Live fresh-Cursor-chat row across each seat; dispatch required not_evaluated and prohibited imitation."
+    },
+    {
+      "id": "HB-3",
+      "status": "not_evaluated",
+      "evidence": "Live sia-forge Cursor /start row with unread atlas turn; dispatch required not_evaluated and prohibited imitation."
+    },
+    {
+      "id": "HB-4",
+      "status": "met",
+      "evidence": "Candidate focused suite passed unknown-seat, missing-room and valid-file rows; exact-candidate developer mutant 43b90b3 typechecked then failed missing-room at hub-seats.test.ts:60.",
+      "order": "shown"
+    },
+    {
+      "id": "CS-1",
+      "status": "met",
+      "evidence": "Direct template diff showed only the Cursor MCP-tool sentence and Hub-room block; each nonblank addition is represented by the tracked difference table and the candidate green-tree parity test passed.",
+      "order": "shown"
+    },
+    {
+      "id": "CS-2",
+      "status": "unmet",
+      "evidence": "Plain undocumented line made sync --check exit 1, but QA mutant 9120244 added an undocumented destructive line containing CallDynamicTool; it typechecked, all 3 parity tests passed, and checkCursorStartParity returned pass."
+    },
+    {
+      "id": "CS-3",
+      "status": "met",
+      "evidence": "Search and full procedure read found only read-only references to state.json and rendered views, explicit do-not-open/do-not-create instructions, and no hand-edit step.",
+      "order": "shown"
+    },
+    {
+      "id": "CS-4",
+      "status": "not_evaluated",
+      "evidence": "Live developer-seat Cursor /start row; dispatch required not_evaluated and prohibited imitation."
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "CS-2: each documented phrase is a substring waiver, so an arbitrary undocumented line passes when it mentions CallDynamicTool or another allowlisted phrase.",
+    "The live HB-1, HB-2, HB-3 and CS-4 observations remain unevaluated by dispatch rule.",
+    "The tracked talk command leaves <A2A-Hub> unresolved while instructing seats to substitute only the three brace placeholders."
+  ],
+  "notes": "QA 224, scoring record 219. Installed ~/.cursor/commands/start.md was absent on this QA machine. T-198's parser accepts candidate blob 344bd46; either merge order creates an add/add conflict. Missing Cursor by-pid proof is deliberate T-003 ruling Q2 behavior, not T-046 PreToolUse fail-closed behavior."
+}
