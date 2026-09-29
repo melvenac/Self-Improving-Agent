@@ -26,6 +26,7 @@ import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js
 import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
 import { SeatName, schemaVersionAdvice, type Seat } from "./shared/state-schema.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
+import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
@@ -297,6 +298,16 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
       lines.push(`
 ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       for (const p of roles.problems) lines.push(`  ${p}`);
+    }
+
+    const presence = await describeHubPresence({
+      projectRoot,
+      identity: roles.seat,
+      callerLabel: "open-brain MCP server",
+    });
+    if (presence.lines.length > 0) {
+      lines.push("");
+      lines.push(...presence.lines);
     }
 
     // Size block precedes the content so a reader sees what is coming before

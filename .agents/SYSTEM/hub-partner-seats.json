@@ -1,0 +1,27 @@
+{
+  "description": "Interim partner-seat hub roster until T-196. Seat names and rooms from docs/loops/planner-session-146-notes.md § Hub rooms.",
+  "readers": {
+    "atlas": {
+      "partners": [
+        { "label": "grok", "hub_as": "grok", "session_id": "k57frxw0ptb8tadmqdwy0khhks8ey006" },
+        { "label": "cursor-infra", "hub_as": "cursor-infra", "session_id": "k5702788wctxj75begyt4x2k5x8f6mav" },
+        { "label": "cursor-builder", "hub_as": "cursor-builder", "session_id": "k57098epn7qz32vt0cazfjpbes8f6kdq" }
+      ]
+    },
+    "grok": {
+      "partners": [
+        { "label": "Atlas", "hub_as": "atlas", "session_id": "k57frxw0ptb8tadmqdwy0khhks8ey006" }
+      ]
+    },
+    "cursor-infra": {
+      "partners": [
+        { "label": "Atlas", "hub_as": "atlas", "session_id": "k5702788wctxj75begyt4x2k5x8f6mav" }
+      ]
+    },
+    "cursor-builder": {
+      "partners": [
+        { "label": "Atlas", "hub_as": "atlas", "session_id": "k57098epn7qz32vt0cazfjpbes8f6kdq" }
+      ]
+    }
+  }
+}
