@@ -1,0 +1,115 @@
+{
+  "loop": "t195",
+  "candidate_git": {
+    "sha": "647cc74ebb66eae6cd36acc9c09d0804b2972387",
+    "branch": "origin/loop/t195-dt-plan-gate",
+    "frozen_at": "2026-09-29T03:13:05Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "CI run 36515473117, test job, Typecheck: npx tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 6000,
+      "detail": "Exact-candidate tcm test job Typecheck step succeeded."
+    },
+    "unit": {
+      "command": "CI run 36515473117, test job, Test: npm test -- --reporter=verbose",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 195000,
+      "detail": "Exact-candidate tcm test job Test step succeeded."
+    }
+  },
+  "requirements": [
+    {
+      "id": "full-suite-candidate",
+      "status": "met",
+      "evidence": "tcm run 36515473117 at exact candidate 647cc74ebb66eae6cd36acc9c09d0804b2972387 completed success; test job success.",
+      "severity": "info"
+    },
+    {
+      "id": "full-suite-base",
+      "status": "met",
+      "evidence": "tcm run 36515473106 at exact base 8467cb10837d2da4b13237c22a8be4e8bc5d6a1a completed success; test job success.",
+      "severity": "info"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "DT-1",
+      "status": "met",
+      "evidence": "Focused candidate suite passed validate-plan valid/invalid/usage behavior; 117/117 focused tests passed.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-2",
+      "status": "met",
+      "evidence": "Focused candidate suite showed all five HOH-JEV fields and each named source in the decision record.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-3",
+      "status": "met",
+      "evidence": "Policy preservation tests passed; reapplied c5da6ea typechecked and DT-5 killed its inlined 0.5 threshold.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-4",
+      "status": "met",
+      "evidence": "Independent QA probe ran two gates at one timestamp: distinct base and -1 files existed, and the first remained byte-identical; exclusive wx creation is used.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-5",
+      "status": "met",
+      "evidence": "Focused suite rejected 0.55 against 0.7 and named the missed threshold; threshold mutant went red.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-6",
+      "status": "met",
+      "evidence": "Independent fixture-env stubs refused missing key, transport failure, HTTP 503 and malformed HTTP 200, each exit 1 naming its cause; no live call.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-7",
+      "status": "met",
+      "evidence": "runBriefDispatch checks before transport.send; refused stub never sent, refused CLI exit 1 emitted zero stdout bytes, passing CLI emitted only the supplied payload then 'dispatch: sent'. Type-clean b450ad5 was killed.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-8",
+      "status": "met",
+      "evidence": "Preserved runtime/schema/gate/policy files are byte-identical to base; 117/117 focused preservation tests and the exact-candidate tcm suite passed.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-9a",
+      "status": "met",
+      "evidence": "Focused test refused a side-branch-only brief; reapplied ancestry mutant made DT-9a red.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-9b",
+      "status": "met",
+      "evidence": "Focused real-git test refused a working-tree brief differing from origin/master; ancestry mutant made DT-9b red.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-9c",
+      "status": "met",
+      "evidence": "Focused test refused a D_t absent on origin/master; ancestry mutant made DT-9c red.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-9d",
+      "status": "met",
+      "evidence": "Focused test passed when brief and D_t disk blobs matched origin/master; it stayed green under the ancestry mutant.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [],
+  "gaps": [],
+  "notes": "QA 222, record 215 r2. No live Jev call. Candidate and base both passed exact-SHA tcm suites. All four QA-216 findings are closed."
+}
