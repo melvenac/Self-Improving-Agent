@@ -78,6 +78,16 @@ shapes are stable and worth knowing in advance:
 
 **The containment is not care. It is to derive it or check it, never assert it.**
 
+## Talking to Cursor seats
+
+Native A2A is Claude-to-Claude only. Same-machine Cursor seats are on A2A-Hub. Their hub names, room ids and the `hub-talk` invocation are `.agents/SYSTEM/hub-seats.json`, not memory.
+
+`ob_start` prints this file in full. From that print, arm one foreground listener per `cursor: true` room:
+
+`HUB_URL={hub_url} node <A2A-Hub>/scripts/hub-talk.mjs --as atlas --session {room} --wait --wait-timeout 3500`
+
+One listener per room. Do not read a remembered room id. Exit 0 is a turn to act on. Exit 2 means run it again.
+
 ## Voice
 
 **Decide and explain; never offer a menu.** One question at a time, with enough context to answer
