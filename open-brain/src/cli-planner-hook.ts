@@ -10,39 +10,16 @@
  * Registration is Aaron's hand; run with --print-registration for the snippet.
  */
 
-import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { resolveHookProjectDir } from "./shared/repo-root.js";
 import { formatDeny } from "./planner-hook/emit.js";
-import {
-  allPathsOnDocsMergeAllowlist,
-  extractGhPrMergeRef,
-} from "./planner-hook/git.js";
 import { formatRegistrationSnippet } from "./planner-hook/registration.js";
-import { runPlannerHook, type PlannerHookDeps } from "./planner-hook/run.js";
+import { runPlannerHook } from "./planner-hook/run.js";
 
 async function readStdin(): Promise<string> {
   const chunks: Buffer[] = [];
   for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
   return Buffer.concat(chunks).toString("utf-8").trim();
-}
-
-function ghPrChangedPaths(prRef: string): string[] | "fail" {
-  const gh = process.env.PLANNER_HOOK_GH || "gh";
-  try {
-    const out = execFileSync(
-      gh,
-      ["pr", "view", prRef, "--json", "files", "-q", ".files[].path"],
-      { encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] },
-    );
-    const paths = out
-      .split(/\r?\n/)
-      .map((l) => l.trim())
-      .filter(Boolean);
-    return paths;
-  } catch {
-    return "fail";
-  }
 }
 
 async function main(): Promise<void> {
@@ -69,15 +46,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  const deps: PlannerHookDeps = {
-    prChangedPaths: (ref) => {
-      const paths = ghPrChangedPaths(ref);
-      if (paths === "fail") return "fail";
-      return allPathsOnDocsMergeAllowlist(paths) ? paths : [];
-    },
-  };
-
-  const result = runPlannerHook(payload, deps);
+  const result = runPlannerHook(payload);
 
   if (result.decision === "passthrough" || result.decision === "allow") {
     process.exit(0);

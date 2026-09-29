@@ -162,11 +162,15 @@ describe("PH-4 — allowed planner acts", () => {
     expect(runPlannerHook(payload("Bash", { command })).decision).toBe("allow");
   });
 
-  it("gh pr merge passes when every changed file is on the D-032 allowlist", () => {
+  it("gh pr merge allowlist is testable via injected prChangedPaths (live path uses PH-3 grant)", () => {
     const r = runPlannerHook(payload("Bash", { command: "gh pr merge 12 --merge" }), {
       prChangedPaths: () => ["docs/loops/x.md", "README.md"],
     });
     expect(r.decision).toBe("allow");
+  });
+
+  it("gh pr merge without grant is denied on the live hook path", () => {
+    expect(runPlannerHook(payload("Bash", { command: "gh pr merge 12 --merge" })).decision).toBe("deny");
   });
 });
 
