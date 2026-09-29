@@ -172,6 +172,7 @@ function Wait-Done([string] $done, [int] $procId, [int] $sec) {
 function Invoke-PushProbe([string] $n, [string] $prompt, [string] $ref) {
   $out = Join-Path $profileDir "sia-qa$n"
   $driver = Join-Path $tree "docs\loops\qa-$n\drive.ps1"
+  $agent = Join-Path $localApp 'cursor-agent\cursor-agent.ps1'
   $report = Join-Path $tree "docs\loops\qa-push-$n.md"
   $marker = "QA-$n`: REPORT COMPLETE"
   $denySrc = Join-Path $tree 'docs\loops\qa-9992\cli.json'
@@ -187,14 +188,16 @@ M 'harness' 'push-probe'
 `$dir = Join-Path `$tree '.cursor'
 New-Item -ItemType Directory -Force `$dir | Out-Null
 Copy-Item -LiteralPath '$denySrc' -Destination (Join-Path `$dir 'cli.json') -Force
+`$agent = '$agent'
+`$ps = '$ps'
 `$prompt = '$($prompt -replace "'", "''")'
 `$report = '$report'
 `$marker = '$marker'
 `$jsonl = Join-Path `$out 'run-0.jsonl'
 `$err = Join-Path `$out 'run-0.err'
+`$env:CURSOR_INVOKED_AS = 'agent.cmd'
 Set-Location -LiteralPath `$tree
-. '$($launch.Replace("'", "''"))'
-Invoke-CursorAgentQuoted -Prompt `$prompt -Jsonl `$jsonl -Err `$err -Workspace `$tree -Model 'composer-2.5' | Out-Null
+& `$ps -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `$agent -p `$prompt --model composer-2.5 --output-format stream-json --trust --force --workspace `$tree 1> `$jsonl 2> `$err
 `$pat = ('"permission' + 'Denied":{"command":') + '|' + ('Command ' + 'blocked by permissions configuration')
 `$denial = (Select-String -LiteralPath `$jsonl -Pattern `$pat -ErrorAction SilentlyContinue).Count -gt 0
 M 'denial' `$denial
