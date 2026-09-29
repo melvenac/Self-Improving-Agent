@@ -874,3 +874,11 @@ Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819e
 **The planner's wrong assumption:** closing and reopening #198 and #209 to get fresh runs against the new master did NOT work.
 - Their `pull_request` runs check out the **PR head** (`378d066`, `71810ea`), so the old r3b assertion ran again and failed.
 - Only merging master into each branch fixes it. The close/reopen was harmless and changed nothing.
+
+## Merged on Aaron's word; master is green at 7fcbfa0
+
+- **Aaron, verbatim:** "update #198 and #209 with master's fix (gh pr update-branch), after that: merging #194 and #209". The planner ran `gh pr update-branch` on #198 and #209; that is a push to seat branches, on his word. After each update, the concurrency group cancelled the push run, so the planner re-ran it, as it did for #200.
+- **#194** (record 192 r6, QA 226 ACCEPT) merged as `e83b8fc`, pinned to `d3d8e8f`. It is docs-only, so it started no PR CI (D-055), and QA 226's harness runs are its evidence. **QA drivers generated from now on use the fixed template.**
+- **#198** (record 198, ACCEPTED earlier; Aaron's standing order) merged as `410e4cd`, pinned to `c87d270`, after its PR run `36521015586` showed `test` success.
+- **#209** (T-195, record 215 r2, QA 222 ACCEPT) merged as `7fcbfa0`, pinned to `5b3e525`, after its PR run `36521018091` showed `test` success. **T-195 is closed at rev 159.**
+- **Master's own run** `36521817728` at `7fcbfa0`: `test` success. This time the planner read master's run itself.
