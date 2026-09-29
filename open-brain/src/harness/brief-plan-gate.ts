@@ -372,7 +372,7 @@ export function checkBriefReachableFromMaster(
   }
   const masterSha = master.stdout;
   const reasons: string[] = [];
-  for (const abs of [briefPath, dtPath]) {
+  for (const abs of [briefPath]) { // QA-216 MUTANT: ignores whether D_t matches master.
     const rel = relInRepo(repoRoot, abs);
     if (!existsSync(abs)) {
       reasons.push(`${rel}: missing on disk`);
