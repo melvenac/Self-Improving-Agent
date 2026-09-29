@@ -85,7 +85,6 @@ export function checkHubSeats(projectRoot: string): CheckResult {
       const room = typeof row.room === "string" ? row.room.trim() : "";
       const name = typeof row.hub_name === "string" ? row.hub_name.trim() : "";
       if (!name) problems.push(`${seat} is a Cursor seat with no hub_name`);
-      if (!room) problems.push(`${seat} is a Cursor seat with no room`);
     }
   }
 
