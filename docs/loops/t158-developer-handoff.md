@@ -33,6 +33,43 @@ The one failure is `tests/harness/qa104-a9-probe2.test.ts` `R72-BEFORE-ABSENT-DA
 
 QA 223 rejected `c9ba1db`. Two holes: an explicit `add_gap` id skipped the citation check, and a failed `git grep` was read as no citations. Exit 1 from `git grep` is still no match. Any other exit refuses `add_gap` and names `git grep exited N`.
 
-`tests/shared/state-writer.test.ts`: `an explicit cited id is refused, and an uncited one is not` and `a citation scan that cannot run refuses add_gap and names the failure`. On this tree, with the rest of that file: 45 passed, exit 0. `tsc --noEmit` exit 0.
+Candidate `e23e622`. `tsc --noEmit` exit 0. `npx vitest run tests/shared/state-writer.test.ts` — Test Files 1 passed (1), Tests 45 passed (45), exit 0.
 
-QA 223 is the red on `c9ba1db`: explicit `id: "G-046"` applied, and a scan with `git` off PATH assigned G-046. Mutant SHAs are recorded after those red runs.
+### Red on c9ba1db
+
+`git checkout c9ba1db -- open-brain/src/shared/state-writer.ts`, then the two rows. The explicit row's `scan.ok` prelude was skipped for that run only: `c9ba1db`'s `citedGapIds` returns a Map, so `scan.ok` is undefined and the test would have returned before the assertion. Both rows then failed the refusal assertion. Exit 1.
+
+```
+FAIL  an explicit cited id is refused, and an uncited one is not
+AssertionError: expected true to be false
+ ❯ tests/shared/state-writer.test.ts:324:24
+    expect(refused.ok).toBe(false);
+
+FAIL  a citation scan that cannot run refuses add_gap and names the failure
+AssertionError: expected true to be false
+ ❯ tests/shared/state-writer.test.ts:350:18
+    expect(r.ok).toBe(false);
+```
+
+The writer and the test were restored from `e23e622` after that run. Working tree clean.
+
+### Green after
+
+Same two rows on `e23e622`: both passed (the 45-passed run above).
+
+### Mutants (tsc-clean, parent e23e622)
+
+`loop/t158-r2-mutant-explicit` `652e749` drops the explicit-id citation check. `tsc --noEmit` exit 0. The explicit row: expected true to be false at `state-writer.test.ts:327`. The scan row passed. Vitest exit 1.
+
+`loop/t158-r2-mutant-scan-open` `258852f` reads every non-zero `git grep` as no citations. `tsc --noEmit` exit 0. The scan row: expected true to be false at `state-writer.test.ts:353`. The explicit row passed. Vitest exit 1.
+
+### Full suite
+
+From `open-brain/`, `npx vitest run --testTimeout=60000`, unpiped. Exit 1.
+
+```
+Test Files  2 failed | 121 passed | 8 skipped (131)
+Tests  2 failed | 1756 passed | 78 skipped (1836)
+```
+
+The two failures are `tests/harness/qa104-a9-probe2.test.ts` `R72-BEFORE-ABSENT-DANGLING` (`EPERM` on `symlinkSync`; the title says it is not for merge; it does not call the gap writer; the same failure was reproduced on an archive of `origin/master` `474b652`) and `tests/shared/state-schema.test.ts` `T-171 r3b` (`tasks[0]` has `note_by`). r3b is the planner's master-red and is ignored. Vitest also reported two unhandled `[vitest-worker] Timeout calling "onTaskUpdate"` errors. They are not additional failed tests.
