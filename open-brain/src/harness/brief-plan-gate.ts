@@ -35,7 +35,7 @@ import {
   type PlanGateContext,
 } from "./policies.js";
 import { validatePlan, type Plan } from "./schema.js";
-import { gitTry, headSha, isAncestor } from "./git.js";
+import { gitTry } from "./git.js";
 
 export class BriefPlanGateError extends Error {
   readonly exitCode: number;
@@ -348,7 +348,7 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
 export interface DispatchCheckResult {
   ok: boolean;
   reasons: string[];
-  /** The HEAD sha checked for reachability (DT-9). */
+  /** origin/master SHA used for the brief blob comparison (DT-9). */
   checked_sha?: string;
 }
 
@@ -357,7 +357,8 @@ function relInRepo(repoRoot: string, absPath: string): string {
 }
 
 /**
- * DT-9 (D-062): the brief and its D_t must be on a commit descended from origin/master.
+ * DT-9 (D-062): the brief and D_t as dispatched must match their blobs at origin/master.
+ * Refuses when a path is absent on master or its working-tree content differs.
  */
 export function checkBriefReachableFromMaster(
   repoRoot: string,
@@ -365,26 +366,29 @@ export function checkBriefReachableFromMaster(
   dtPath: string,
   upstream = "origin/master",
 ): { ok: boolean; sha: string; reasons: string[] } {
-  const head = headSha(repoRoot);
   const master = gitTry(repoRoot, ["rev-parse", "--verify", "--quiet", upstream]);
   if (!master.ok || !/^[0-9a-f]{40}$/.test(master.stdout)) {
-    return { ok: false, sha: head, reasons: [`${upstream} could not be resolved`] };
+    return { ok: false, sha: "", reasons: [`${upstream} could not be resolved`] };
   }
   const masterSha = master.stdout;
-  if (!isAncestor(repoRoot, masterSha, head)) {
-    return {
-      ok: false,
-      sha: head,
-      reasons: [`brief and D_t at HEAD ${head} are not reachable from ${upstream} ${masterSha}`],
-    };
-  }
+  const reasons: string[] = [];
   for (const abs of [briefPath, dtPath]) {
     const rel = relInRepo(repoRoot, abs);
-    if (!gitTry(repoRoot, ["cat-file", "-e", `HEAD:${rel}`]).ok) {
-      return { ok: false, sha: head, reasons: [`${rel} is not committed at HEAD ${head}`] };
+    if (!existsSync(abs)) {
+      reasons.push(`${rel}: missing on disk`);
+      continue;
+    }
+    const masterBlob = gitTry(repoRoot, ["rev-parse", "--verify", "--quiet", `${upstream}:${rel}`]);
+    if (!masterBlob.ok || !/^[0-9a-f]{40}$/.test(masterBlob.stdout)) {
+      reasons.push(`${rel}: absent on ${upstream} ${masterSha}`);
+      continue;
+    }
+    const diskBlob = gitTry(repoRoot, ["hash-object", abs]);
+    if (!diskBlob.ok || diskBlob.stdout !== masterBlob.stdout) {
+      reasons.push(`${rel}: differs from ${upstream} ${masterSha}`);
     }
   }
-  return { ok: true, sha: head, reasons: [] };
+  return { ok: reasons.length === 0, sha: masterSha, reasons };
 }
 
 /**

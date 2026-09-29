@@ -284,7 +284,7 @@ function cmdDispatchCheck(argv: readonly string[]): number {
     process.stdout.write("dispatch-check: ok\n");
     return 0;
   }
-  if (check.checked_sha) process.stderr.write(`dispatch-check: checked HEAD ${check.checked_sha}\n`);
+  if (check.checked_sha) process.stderr.write(`dispatch-check: checked ${check.checked_sha} (origin/master)\n`);
   for (const reason of check.reasons) process.stderr.write(`dispatch-check: ${reason}\n`);
   return 1;
 }

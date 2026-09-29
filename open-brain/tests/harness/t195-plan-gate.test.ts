@@ -285,37 +285,66 @@ describe("T-195 brief plan gate", { timeout: 120_000 }, () => {
     });
   });
 
-  describe("DT-9 reachability from origin/master", () => {
-    it("refuses when HEAD is not descended from origin/master, naming the sha", () => {
+  describe("DT-9 brief blobs must match origin/master", () => {
+    it("DT-9a refuses when the brief exists only on a side branch (absent on master)", () => {
       requireGit();
-      const repo = makeRepo("t195-reach-");
-      const base = repo.sha();
-      rawGit(repo.root, ["update-ref", "refs/remotes/origin/master", base]);
-      rawGit(repo.root, ["checkout", "--orphan", "orphan-dispatch"]);
-      const brief = join(repo.root, "docs/loops/orphan-brief.md");
+      const repo = makeRepo("t195-9a-");
+      rawGit(repo.root, ["update-ref", "refs/remotes/origin/master", repo.sha()]);
+      rawGit(repo.root, ["checkout", "-b", "side-brief"]);
+      const brief = join(repo.root, "docs/loops/side-brief.md");
       const dt = briefDtPath(brief);
-      repo.write("docs/loops/orphan-brief.md", "# orphan\n");
-      repo.write("docs/loops/orphan-brief.D_t.json", `${JSON.stringify(validPlan(), null, 2)}\n`);
-      repo.commitAll("orphan brief");
-      const head = repo.sha();
-
+      repo.write("docs/loops/side-brief.md", "# side only\n");
+      repo.write("docs/loops/side-brief.D_t.json", `${JSON.stringify(validPlan(), null, 2)}\n`);
+      repo.commitAll("side brief");
+      const master = rawGit(repo.root, ["rev-parse", "origin/master"]);
       const reach = checkBriefReachableFromMaster(repo.root, brief, dt);
       expect(reach.ok).toBe(false);
-      expect(reach.sha).toBe(head);
-      expect(reach.reasons[0]).toContain(head);
-      expect(reach.reasons[0]).toContain("origin/master");
-
+      expect(reach.sha).toBe(master);
+      expect(reach.reasons.some((r) => r.includes("absent on origin/master"))).toBe(true);
       void repo.cleanup();
     });
 
-    it("passes when origin/master is an ancestor of HEAD", () => {
+    it("DT-9b refuses when HEAD is on master but the brief is edited in the working tree", () => {
       requireGit();
-      const repo = makeRepo("t195-reach-ok-");
+      const repo = makeRepo("t195-9b-");
+      const brief = join(repo.root, "docs/loops/wt-brief.md");
+      const dt = briefDtPath(brief);
+      repo.write("docs/loops/wt-brief.md", "# on master\n");
+      repo.write("docs/loops/wt-brief.D_t.json", `${JSON.stringify(validPlan(), null, 2)}\n`);
+      repo.commitAll("commit brief to master");
+      rawGit(repo.root, ["update-ref", "refs/remotes/origin/master", repo.sha()]);
+      repo.write("docs/loops/wt-brief.md", "# edited locally\n");
+      const master = rawGit(repo.root, ["rev-parse", "origin/master"]);
+      const reach = checkBriefReachableFromMaster(repo.root, brief, dt);
+      expect(reach.ok).toBe(false);
+      expect(reach.sha).toBe(master);
+      expect(reach.reasons.some((r) => r.includes("wt-brief.md: differs from origin/master"))).toBe(true);
+      void repo.cleanup();
+    });
+
+    it("DT-9c refuses when D_t is absent on master", () => {
+      requireGit();
+      const repo = makeRepo("t195-9c-");
+      const brief = join(repo.root, "docs/loops/dt-missing.md");
+      const dt = briefDtPath(brief);
+      repo.write("docs/loops/dt-missing.md", "# brief only on master\n");
+      repo.commitAll("brief without dt on master");
+      rawGit(repo.root, ["update-ref", "refs/remotes/origin/master", repo.sha()]);
+      repo.write("docs/loops/dt-missing.D_t.json", `${JSON.stringify(validPlan(), null, 2)}\n`);
+      const reach = checkBriefReachableFromMaster(repo.root, brief, dt);
+      expect(reach.ok).toBe(false);
+      expect(reach.reasons.some((r) => r.includes("D_t.json: absent on origin/master"))).toBe(true);
+      void repo.cleanup();
+    });
+
+    it("DT-9d passes when brief and D_t match origin/master exactly", () => {
+      requireGit();
+      const repo = makeRepo("t195-9d-");
       const brief = join(repo.root, "docs/loops/ok-brief.md");
       const dt = briefDtPath(brief);
       repo.write("docs/loops/ok-brief.md", "# ok\n");
       repo.write("docs/loops/ok-brief.D_t.json", `${JSON.stringify(validPlan(), null, 2)}\n`);
-      repo.commitAll("tracked brief");
+      repo.commitAll("tracked brief and dt");
       rawGit(repo.root, ["update-ref", "refs/remotes/origin/master", repo.sha()]);
       expect(checkBriefReachableFromMaster(repo.root, brief, dt).ok).toBe(true);
       void repo.cleanup();
