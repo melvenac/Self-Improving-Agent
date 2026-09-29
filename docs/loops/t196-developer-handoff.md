@@ -20,6 +20,6 @@
 | HB-1 | `loop/t196-planner-md` `planner.md` tells a fresh planner to arm one listener per Cursor room from `hub-seats.json`, which `/start` already prints in full. No memory read. | The section names the file and the wait line. Live arming is the next planner session. |
 | HB-2 | `.cursor/rules/hub-room.mdc` (`alwaysApply`) and the `talk` line in the data file. | Live, once per seat, for the planner to observe. Not run from this seat. |
 | HB-3 | `project-template/.cursor/commands/start.md` step A6b: an unread atlas turn is the assignment and nothing else is proposed. | Live in `sia-forge`. Not run from `sia-infra`. |
-| HB-4 | `open-brain/src/pipelines/sync/hub-seats.ts`, wired in `runSync`. | `npx vitest run tests/pipelines/sync/hub-seats.test.ts`: the stranger-seat case and the missing-room case expect `issue` (red fixtures), the valid file expects `pass`. 4 passed, exit 0. Mutant branch `loop/t196-hub-knowledge-mutant` drops the missing-room issue; that test then fails. |
+| HB-4 | `open-brain/src/pipelines/sync/hub-seats.ts`, wired in `runSync`. | Green: `npx vitest run tests/pipelines/sync/hub-seats.test.ts` — 4 passed, exit 0. The stranger-seat case and the missing-room case expect `issue`. Mutant `loop/t196-hub-knowledge-mutant` `20898e5` drops the missing-room line. Same command: `expected 'pass' to be 'issue'` at `hub-seats.test.ts:42`, 1 failed, exit 1. |
 
 A project with no `hub-seats.json` is `skip`, not `pass`.
