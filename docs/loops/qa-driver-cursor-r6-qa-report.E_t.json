@@ -1,0 +1,63 @@
+{
+  "loop": "192-qa-driver-r6",
+  "candidate_git": {
+    "sha": "d3d8e8f4acdc8b6427eb317f475a6031fd5dc110",
+    "branch": "origin/loop/qa-driver-cursor-r2",
+    "frozen_at": "2026-09-29T04:12:47Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File docs/loops/qa-driver-cursor-r6-quote.ps1",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 134174,
+      "detail": "On DESKTOP-0GV3HAD the candidate product template reported drive_exit=0 and template_quotes_kept=True. The parsed first user event contained the exact span \"Open for the planner\"."
+    },
+    "unit": {
+      "command": "qa226-direct-resume.ps1 -Session 25aaf766-186c-4c55-9463-040bf0abeec3; qa226-direct-resume.ps1 -Edge; qa226-static.mjs",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 10016,
+      "detail": "The resumed Cursor user event preserved \"Open for the planner\"; the edge event preserved dollar, backtick, ampersand and embedded quotes; the generated driver parsed and retained completion, resume-cap, refusal, denial and drive.meta-key controls."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "1",
+      "status": "met",
+      "evidence": "The candidate first-prompt harness exited 0 with template_quotes_kept=True. A resumed event on the same generated-driver session contained the exact quoted span. The r5 control exited 1 with template_quotes_stripped and user_has_quotes=False.",
+      "order": "shown"
+    },
+    {
+      "id": "2",
+      "status": "met",
+      "evidence": "The developer's splat mutation was semantically reapplied to the frozen candidate, typechecked successfully, and exited 1 at FAIL template_quotes_stripped.",
+      "order": "shown"
+    },
+    {
+      "id": "3",
+      "status": "met",
+      "evidence": "Static and runtime probes preserved completion, MaxContinuations=3, refusal and denial stops, and the r5 literal drive.meta key set. qa-driver-copy.mjs generated a PowerShell-parseable driver that ran an initial attempt and entered its resume branch.",
+      "order": "shown"
+    },
+    {
+      "id": "4",
+      "status": "met",
+      "evidence": "A parsed Cursor user event was exactly: EDGE: dollar=$HOME; backtick=`; ampersand=&; quotes=\"Open for the planner\".",
+      "order": "shown"
+    },
+    {
+      "id": "5",
+      "status": "met",
+      "evidence": "QA branch qa/qa-driver-r6-mut-quote-escape at 71e37ce33af8f2277f6f741d88be0d6ba0c577d2 typechecked and was killed by the supplied quote harness.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "The committed r6 quote harness covers only the initial user event; QA used an instrumented stdout capture with the candidate's exact argv construction to observe the required resumed event.",
+    "The advertised developer-mutant commit is not based on the frozen candidate and required semantic reapplication."
+  ],
+  "notes": "Verdict ACCEPT. Local Windows PowerShell evidence only; no CI per dispatch. Host DESKTOP-0GV3HAD used Windows PowerShell 5.1.19041.6456, Git 2.55.0.windows.3, Node v24.5.0 and cursor-agent 2026.09.28-64d2043. QA model GPT-5.6 Sol; builder Composer 2.5."
+}
