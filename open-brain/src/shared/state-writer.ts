@@ -584,17 +584,10 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       return { ok: true, id: g.id };
     }
     case "close_gap": {
-      // T-158: splice handed the closed id back to the next add_gap. The entry
-      // stays, with the close stamped on it, so the id is occupied.
-      const g = s.gaps.find((x) => x.id === op.id);
-      if (!g) return { ok: false, error: `unknown gap ${op.id}` };
-      if (g.status === "closed") {
-        return { ok: false, error: `gap ${op.id} is already closed (closed session ${g.closed_session}, rev ${g.closed_rev})` };
-      }
-      g.status = "closed";
-      g.closed_session = session;
-      g.closed_rev = ctx.rev;
-      ctx.notes.push(`close_gap ${op.id}: tombstone kept (status closed, closed_session ${session}, closed_rev ${ctx.rev})`);
+      const idx = s.gaps.findIndex((g) => g.id === op.id);
+      if (idx === -1) return { ok: false, error: `unknown gap ${op.id}` };
+      s.gaps.splice(idx, 1);
+      ctx.removedGaps.push(op.id);
       return { ok: true, id: op.id };
     }
     case "add_decision": {
