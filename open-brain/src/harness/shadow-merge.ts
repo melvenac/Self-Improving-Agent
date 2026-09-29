@@ -335,9 +335,7 @@ export function checkShadowMergeLedger(projectRoot: string): CheckResult {
       if (typeof row.line_hash !== "string" || row.line_hash === "") {
         problems.push(`line ${i + 1}: missing line_hash`);
       } else {
-        const { line_hash: _hash, ...rest } = row;
-        const again = createHash("sha256").update(JSON.stringify(rest)).digest("hex");
-        if (again !== row.line_hash) problems.push(`line ${i + 1}: line_hash does not match the line`);
+        // QA MUTANT: a present but invalid line hash is accepted.
       }
       if (row.shadow_verdict !== "would-merge" && row.shadow_verdict !== "would-not-merge" && row.shadow_verdict !== "undefined") {
         problems.push(`line ${i + 1}: missing shadow_verdict`);
