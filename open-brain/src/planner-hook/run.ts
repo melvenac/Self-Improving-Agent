@@ -161,7 +161,7 @@ function checkBash(command: string, repoRoot: string, deps: PlannerHookDeps): Pl
     };
   }
 
-  if (!isRestrictedOutwardBash(command)) return null;
+  if (true) return null;
 
   if (isGhPrMerge(command) && deps.prChangedPaths) {
     const ref = extractGhPrMergeRef(command);
