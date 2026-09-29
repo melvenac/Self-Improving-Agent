@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 152,
+  "revision": 153,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3387,59 +3387,64 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Planner session 149 (record number; the greeting showed #12, T-164). Live state is docs/loops/session-147-dispatches.md from 'STATE AT VS CODE RESTART' (83c08b4) onward, plus this handoff. Slice three is OPEN: candidate C r3 (product 20c2dfd, tip 5f7c9a0, PR #195 CLEAN) awaits QA 213 (dispatch at db8edc7; laptop line '-Queue 213 -Checkout db8edc74599802b97e3aef00f58419157f6dbe61'), which needs Aaron's launch word. #200 (record 205 r4, fixes #199's CI skip) awaits Aaron's merge word; #198 merges after #200 once its own PR run shows test green. Infra is on record 192 r5. Aaron, relayed 2026-09-28 by a general session (worktrees-d5), approved the planner's steps (a)-(h) with this record update first, and ordered two NEW tasks worked now: the planner seat hook and a D_t file + plan gate for interactive briefs.",
+      "pick_up": "Planner session 149. THREE QA RUNS ARE LIVE: QA 216 (record 215, T-195) on the QA PC since 00:31:11Z from 315b245; QA 213 (candidate C r3; ACCEPT closes slice three) then QA 218 (192 r5) on the laptop since 00:34:05Z from 842375f. Read each report and its drive.meta when the queues end (queue.log 'end='). If QA 213 ACCEPTs: shadow-verdict prepare on its E_t BEFORE Aaron merges #195, decide after (C criteria §8 P4). AARON'S STANDING ORDER (this session, verbatim): 'launch QA 216 on the QA PC  one at a time: the laptop queue (QA 213, then QA 218), #201, and #198'. Launches are done; #201 (the record catch-up, including the D-061 developer.md change) and then #198 are HELD by the planner until the queues end, because a master merge mid-run lands in every running driver's ref_violations. #198 also needs its own PR run showing test green. THIS REVISION (153) IS COMMITTED LOCALLY ON docs/session-100-qa99-dispatch AND NOT PUSHED, for the same reason; push it when the queues end, then #201 carries it. Seats, all on PUSH HOLD (clearances withdrawn at hub turns 227/71/58): Forge has T-198 (record 217) done locally (b920b98, mutant bbf4b78); infra has record 219 (T-196 56b06a2, planner.md 6d01c12, T-197 35fc1d8, mutant 20898e5) locally, with two fixes owed (restore the live ~/.cursor/commands/start.md it overwrote; one seat file with Forge's hub-partner-seats.json); builder has T-194 committed locally (7d68bcf, handoff 36dd9c9) but has not posted. Hub listeners die with the session: re-arm one per room (rooms in docs/loops/t196-t197-dispatch.md on master).",
       "watch_out": [
-        "QA 203's report for record 198 is on the QA PC ONLY (local 120dc44 on qa/qa-probes-report, plus two mutant branches): its push-qa.mjs push was refused by Cursor's permission fence. That is the QA-178 defect record 192 fixes. The planner did not push it for the seat (that would be permission laundering). Aaron decides.",
+        "REF-AUDIT TRACE FOR QA 216 (started 00:31:11Z): the PLANNER moved two refs mid-run: refs/heads/docs/qa-213-to-master created at a4205c9, and refs/heads/master 334fee5 -> 842375f (#205's merge, docs-only). Both will appear in QA 216's ref_violations. They are the planner's, not the QA seat's: do not charge QA 216 with them. Anything else in that list needs tracing by SHA.",
+        "QA drivers record ANY non-qa/ remote ref that moves during a run as ref_violations (drive.ps1 Compare-Refs). That includes master merges and the planner's own docs branches. Do not merge or push while a queue runs, or trace every move by SHA at the time.",
         "Every QA seat still runs the OLD driver template until #194 (record 192) merges: a sanctioned push can be refused, and another seat's mid-run push reads as ref_violations. Hold seat pushes during QA runs, or trace them by SHA.",
+        "D-062 (this session): briefs and QA dispatches reach master BEFORE they are cited, through a docs-only PR the planner merges (four this session: #202, #203, #204, #205). A dispatch cites an origin/master SHA. Role-file changes go in their own PR to Aaron.",
+        "Every QA dispatch requires an E_t.json beside the report, validated (C criteria §8 P1). QA 216, 213 and 218's dispatches all require one.",
         "D-061: developers NEVER run CI. QA dispatches it. Seats echo old briefs ('tcm at most 6'); correct them on sight.",
-        "Composer (sia-infra) ends its turn on a bare acknowledgement. Say 'do it in this turn; no acknowledgement'. Its hub --wait runs in the foreground of its chat, so a new turn wakes it without Aaron.",
-        "Every QA dispatch requires an E_t.json beside the report, validated (C criteria §8 P1). QA 204, 208, 209 and 202 produced one.",
-        "Candidate C's merge is the gate's first live episode (§8 P4): run shadow-verdict prepare before Aaron merges it, and decide after.",
-        "MASTER AND PR CI RUN NO TESTS from 8467cb1 (#199) until #200 merges: test has needs: changed and changed skips on master/pull_request. Do not read a green master or PR check as tests having run until then.",
-        "#200 reads UNSTABLE, not CLEAN, because push run 36486110602 (loop/t178-fix-needs 367936c) was CANCELLED (its test job shows fail, conclusion cancelled); PR run 36486143303 is success with test RUN. Merge only on CLEAN (shared.md): resolve the cancelled run first.",
-        "The record handoff at rev 147 was older than the dispatches doc (it listed #196/#197 as unmerged, QA 210/211 as unlaunched). Before trusting a handoff, compare it against the newest docs/loops section and the live PR list."
+        "Composer (sia-infra) ends its turn on a bare acknowledgement, and this session it also wrote OUTSIDE its worktree (it copied its candidate /start into the live ~/.cursor/commands/start.md). Say 'do it in this turn; no acknowledgement' and 'write nothing outside your worktree'.",
+        "Cursor seats do not read the hub on their own until T-196 lands: builder and Forge sat on their dispatches for about an hour. Aaron needs a first line per seat (hub-talk --as <name> --session <room> --inbox). Hub names: builder cursor-builder, Forge grok, infra cursor-infra.",
+        "Presence check (until T-198 lands): GET http://100.124.212.87:4000/a2a/agents/presence?name=<one agent> with X-Agent-Key dev-key. It reads ONLY ?name= (hub T-079). 0 unread with pollingNow false means 'read and idle', not 'working'.",
+        "qa-launch.md is stale: it says qa-queue.ps1 is 6,330 bytes and unchanged since 2667c6b. It is 15,068 bytes on both QA machines and on master (SHA-1 9FF81DE0...), changed by c6fb300 and f590448. The launch lines themselves still work (both ran this session).",
+        "A process search whose pattern appears in its own command line matches itself: two 'running driver' PIDs on the QA PC were the planner's own query. List processes by name and print their command lines, never filter on the words you are searching for.",
+        "QA 203's report for record 198 is on the QA PC ONLY (local 120dc44 on qa/qa-probes-report, plus two mutant branches); it is Aaron's call, still open."
       ],
       "open_questions": [
         "Aaron: push QA 203's stranded report from the QA PC (his hand), or wait until #194 lets a QA seat push it?",
-        "Aaron: Telegram approval for QA (D-058) is on HOLD by his choice."
+        "Aaron: Telegram approval for QA (D-058) is on HOLD by his choice.",
+        "Aaron: register T-194's planner hook in sia-planner/.claude/settings.local.json once QA accepts it (his hand, not the planner's).",
+        "Aaron: his memory file reference_a2a_hub_tcm.md says the hub is cross-machine only, which is wrong for Cursor seats; his to correct."
       ],
       "session": 149,
       "loop_state": {
         "open_prs": [
           {
-            "ref": "#194 loop/qa-driver-cursor-r2 (0f816bb)",
-            "qa_status": "rejected",
-            "note": "record 192 r4 REJECTED by QA 210 (laptop cmd /c route denial=False moved=False); infra building r5 (diagnose environment vs route)"
+            "ref": "#194 loop/qa-driver-cursor-r2 (bbfb724)",
+            "qa_status": "in_progress",
+            "note": "record 192 r5 (harness-only launch-quoting fix); QA 218 queued on the laptop after 213"
           },
           {
             "ref": "#195 loop/15-slice-3-candidate-c (5f7c9a0)",
             "qa_status": "in_progress",
-            "note": "candidate C r3 (product 20c2dfd); QA 213 dispatched at db8edc7, awaits Aaron's launch line; closes slice three on ACCEPT"
+            "note": "candidate C r3 (product 20c2dfd); QA 213 RUNNING on the laptop since 00:34Z; ACCEPT closes slice three"
           },
           {
             "ref": "#198 loop/qa-probes-on-master (1c2fbb1)",
             "qa_status": "accepted",
-            "note": "record 198; conflict resolved at 1c2fbb1; merges after #200 once its PR run shows test green"
+            "note": "record 198; Aaron ordered it merged after #201; held until the QA queues end and its PR run shows test green"
           },
           {
-            "ref": "#200 loop/t178-fix-needs (367936c)",
-            "qa_status": "accepted",
-            "note": "record 205 r4, fixes #199's master/PR skip; PR run 36486143303 green with test RUN; UNSTABLE from cancelled push run 36486110602; awaits Aaron's merge word"
+            "ref": "#201 docs/session-100-qa99-dispatch",
+            "qa_status": "not_required",
+            "note": "the record catch-up + D-061 developer.md; Aaron ordered the merge; held until the QA queues end; CI test passed on run 36502407979 at 1d286a3"
           }
         ],
-        "frozen_sha": "20c2dfd (candidate C r3, for QA 213)",
+        "frozen_sha": "603be51 (record 215, QA 216); 20c2dfd (candidate C r3, QA 213); bbfb724 (192 r5, QA 218)",
         "questions_for_aaron": [
-          "Merge #200 (after it reads CLEAN)",
-          "Launch QA 213 (laptop line at db8edc7)",
-          "Merge #198 after #200 and its green PR run (per-occasion)",
-          "QA 203's stranded report: push it yourself or wait for #194?"
+          "QA 203's stranded report",
+          "Register T-194's hook after QA",
+          "Correct reference_a2a_hub_tcm.md"
         ],
         "rulings": [
-          "QA 212 REJECT candidate C r2 (CC-6 SHA validation) -> r3",
-          "QA 210 REJECT record 192 r4 -> r5",
-          "QA 211 ACCEPT record 205 (T-178)",
-          "#196, #197, #199 merged on Aaron's 'merge all'; #199 broke master/PR CI -> record 205 r4 (#200)",
-          "Aaron (relayed by worktrees-d5, 2026-09-28): steps (a)-(h) approved, record update first; two new tasks worked now"
+          "D-062: the record reaches seats through origin/master only",
+          "T-194..T-199 opened (T-160 raised to P0; T-191 not raised)",
+          "#200 merged on Aaron's word (c933a44); live master run 36494231337 ran test green",
+          "Record 215's DT-9 returned (it compared ancestry, not content); fixed at 603be51",
+          "192 r5: the laptop cmd /c failure is the route (PS 5.1 drops quotes), not the environment",
+          "A2A-Hub builds the idle-seat wake (hub T-076, D-029/D-030); SIA T-160 tracks it"
         ]
       },
       "session_uuid": "c407df9c-3dd7-4273-891b-798b4bd527f4",
