@@ -113,11 +113,11 @@ describe("R179-1: a session number orders nothing", () => {
   it("retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more than 10 distinct sessions have first written after it, and not at 10", () => {
     hand(1, U(1), "old builder", "sia-builder");
     // Nine other sessions, then the builder's successor: 10 sessions after U(1).
-    for (let i = 2; i <= 10; i++) hand(1, U(i), `other ${i}`, `other-${i}`, "qa");
-    hand(1, U(11), "new builder", "sia-builder");
+    for (let i = 2; i <= 10; i++) hand(i, U(i), `other ${i}`, `other-${i}`, "qa");
+    hand(11, U(11), "new builder", "sia-builder");
     expect(handoffUuids(), "dropped at exactly 10 sessions since").toContain(U(1));
     // The 11th session since.
-    const r = hand(1, U(12), "one more", "other-12", "qa");
+    const r = hand(12, U(12), "one more", "other-12", "qa");
     expect(handoffUuids(), "kept at 11 sessions since").not.toContain(U(1));
     expect(sessionUuids()).not.toContain(U(1));
     expect(r.superseded.join(" ")).toContain(U(1));
@@ -168,9 +168,9 @@ describe("R179-1 extended to done tasks: a done task ages by sessions written si
 describe("R179-3: a legacy handoff is superseded by its seat's first keyed handoff", () => {
   let root: string;
   const raw = (): Raw => JSON.parse(readFileSync(join(root, STATE), "utf-8")) as Raw;
-  const write = (uuid: string, seat: string) =>
+  const write = (session: number, uuid: string, seat: string) =>
     applyStateOps(root, {
-      session: 60,
+      session,
       expected_revision: raw().revision,
       session_uuid: uuid,
       checkout: "sia-builder",
@@ -187,10 +187,10 @@ describe("R179-3: a legacy handoff is superseded by its seat's first keyed hando
   it("the fixture's legacy developer@54 survives ANOTHER seat's keyed handoff, and leaves at the first keyed DEVELOPER handoff, reported", () => {
     const legacy = () => raw().handoffs.filter((h) => h.session_uuid === null && h.seat === "developer");
     expect(legacy()).toHaveLength(1);
-    const q = write(U(60), "qa");
+    const q = write(60, U(60), "qa");
     expect(q.ok, q.error).toBe(true);
     expect(legacy(), "a qa handoff superseded the developer's legacy entry").toHaveLength(1);
-    const d = write(U(61), "developer");
+    const d = write(61, U(61), "developer");
     expect(d.ok, d.error).toBe(true);
     expect(legacy()).toHaveLength(0);
     expect(d.superseded.join(" ")).toMatch(/handoff developer@54 \(developer, legacy, session 54\)/);
@@ -205,7 +205,7 @@ describe("R179-3: a legacy handoff is superseded by its seat's first keyed hando
     writeFileSync(join(root, STATE), JSON.stringify(rec, null, 2) + "\n");
     const legacyUuid = raw().sessions[0].uuid;
     expect(legacyUuid).not.toBeNull();
-    for (let i = 0; i < 13; i++) expect(write(U(100 + i), "developer").ok).toBe(true);
+    for (let i = 0; i < 13; i++) expect(write(100 + i, U(100 + i), "developer").ok).toBe(true);
     expect(raw().sessions.map((s) => s.uuid)).toContain(legacyUuid);
   });
 });

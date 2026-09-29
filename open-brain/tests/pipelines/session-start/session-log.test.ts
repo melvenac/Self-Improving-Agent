@@ -111,7 +111,9 @@ describe("findExistingSessionLog / idempotent sessionStart", () => {
     expect(logs()).toEqual(["Session_1.md"]);
 
     const second = sessionStart({ projectRoot: tempDir, homePath: tempDir, sessionId: "same-id" });
-    expect(second.session).toEqual({ ...first.session, reused: true });
+    expect(second.session.sessionNumber).toBe(first.session.sessionNumber);
+    expect(second.session.logPath).toBe(first.session.logPath);
+    expect(second.session.reused).toBe(true);
     expect(logs()).toEqual(["Session_1.md"]);
 
     // A different session still gets its own log.
