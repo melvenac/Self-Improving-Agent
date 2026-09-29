@@ -1,0 +1,76 @@
+{
+  "loop": "t158",
+  "candidate_git": {
+    "sha": "c9ba1dbf9bf14240ba4ddbe6c96d4cc335461720",
+    "branch": "origin/loop/t158-gap-tombstone",
+    "frozen_at": "2026-09-28T21:05:08-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "CI run 36516875607, test job, Typecheck: npx tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 5000,
+      "detail": "Exact-candidate tcm test job Typecheck step succeeded."
+    },
+    "unit": {
+      "command": "CI run 36516875607, test job, Test: npm test -- --reporter=verbose",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 179670,
+      "detail": "Exact-candidate tcm test job failed only the moving-origin/master T-171 r3b assertion; exact-base run 36516890826 failed the same assertion."
+    }
+  },
+  "requirements": [
+    {
+      "id": "full-suite-candidate",
+      "status": "partial",
+      "evidence": "tcm run 36516875607 at exact candidate ran the test job: typecheck passed; tests were 1 failed, 1827 passed, 6 skipped. The sole failure also occurred at the base.",
+      "severity": "info"
+    },
+    {
+      "id": "full-suite-base",
+      "status": "partial",
+      "evidence": "tcm run 36516890826 at exact base ran the test job: typecheck passed; tests were 1 failed, 1824 passed, 6 skipped. The sole failure was the same moving-origin/master T-171 r3b assertion.",
+      "severity": "info"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "TG-1",
+      "status": "met",
+      "evidence": "Candidate close_gap kept G-001 with status closed, closed_session and closed_rev; targeted writer and renderer tests passed, and an independent render probe omitted the tombstone from both greeting and SUMMARY.",
+      "order": "shown"
+    },
+    {
+      "id": "TG-2",
+      "status": "partial",
+      "evidence": "Generated-id dry-run assigned G-049, named G-046/G-047/G-048 and why each was skipped, and left state.json unchanged. However explicit op.id G-046 was accepted, and a forced git-scan failure silently assigned G-046 with no skip note.",
+      "order": "shown"
+    },
+    {
+      "id": "TG-3",
+      "status": "met",
+      "evidence": "Fixture test proved cited G-040 is skipped and uncited G-041 is assigned. Against the base tree the candidate scanner found G-048 in exactly its two punctuation-wrapped Markdown citations, including a code span.",
+      "order": "shown"
+    },
+    {
+      "id": "TG-4",
+      "status": "met",
+      "evidence": "Reapplied splice and scan mutants both typechecked and each made its named row red. QA render mutant ac2aa5ce typechecked and made the closed-gap greeting test red.",
+      "order": "shown"
+    },
+    {
+      "id": "TG-5",
+      "status": "met",
+      "evidence": "Schema remains v3; a synthetic rev-156 copy with every gap status absent parsed, state-schema passed on the same legacy shape, and independent greeting/SUMMARY probes omitted a closed gap. Focused close_task, retention, writer and view tests passed.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "add_gap accepts an explicit cited id such as G-046 when that id is absent from gaps[].",
+    "citedGapIds converts every git grep failure into an empty map, so generated add_gap fails open and can assign G-046 without a warning."
+  ],
+  "notes": "QA 223, record 220. Reject pending fail-closed protection for explicit ids and citation-scan failure. Candidate and base have the same unrelated moving-origin/master suite failure."
+}
