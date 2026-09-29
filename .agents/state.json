@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 155,
+  "revision": 156,
   "project": {
     "name": "self-improving-agent"
   },
@@ -416,7 +416,8 @@
       "opened_session": 76,
       "closed_session": null,
       "supersedes": null,
-      "note": "Found by the QA seat at its Loop 16 close-out write (session 75): close_gap splices the entry out (state-writer.ts, G-010), so nextId hands the next add_gap a CLOSED id — the dry run assigned G-046 and G-047, whose old meanings are cited in ten tracked files including end.md, CHANGELOG.md and the Loop 14 documents. QA dropped both ops rather than repoint ten citations; the planner adopted the same rule for its own write. Done-task retention already refuses to evict a cited task id (T-157); gaps have no guard, and the gap failure is strictly worse: an evicted task id goes dangling and announces itself; a reused gap id points at something wrong and announces nothing. Until fixed: NO add_gap by any seat; new gaps travel as verified entries, handoff rows and tasks. Fix shape: tombstone with status/closed_session rather than splice, and refuse an id the tracked tree cites.",
+      "note": "Found by the QA seat at its Loop 16 close-out write (session 75): close_gap splices the entry out (state-writer.ts, G-010), so nextId hands the next add_gap a CLOSED id — the dry run assigned G-046 and G-047, whose old meanings are cited in ten tracked files including end.md, CHANGELOG.md and the Loop 14 documents. QA dropped both ops rather than repoint ten citations; the planner adopted the same rule for its own write. Done-task retention already refuses to evict a cited task id (T-157); gaps have no guard, and the gap failure is strictly worse: an evicted task id goes dangling and announces itself; a reused gap id points at something wrong and announces nothing. Until fixed: NO add_gap by any seat; new gaps travel as verified entries, handoff rows and tasks. Fix shape: tombstone with status/closed_session rather than splice, and refuse an id the tracked tree cites. — DISPATCHED session 149 as record 220 to cursor-infra (brief docs/loops/t158-t164-dispatch.md). Planner-verified at origin/master 842375f: the record's gaps[] stops at G-045, while G-046 (14 tracked files), G-047 (15) AND G-048 (2) are cited in the tracked tree outside state.json. A naive nextId would reuse all three.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -483,7 +484,8 @@
       "opened_session": 77,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened session 77, flagged by the developer seat in its own /start greeting. ob_start greeted the developer as Session #6 and opened .agents/SESSIONS/Session_6.md while the record's last session is #76; .agents/SESSIONS/Session_*.md is gitignored, so the counter reflects logs in THAT checkout only. A seat that closes out on its local number writes a colliding session id into a shared record. This is T-003's shape (session identity keyed per project, not per session) observed concretely in the worktree regime, and it is live for every seat session from here on: three seats now run in three checkouts, each with its own counter. Until it is fixed, a seat must be told its record session number rather than using the one its greeting shows. Related: T-149 (per-seat worktrees), T-003.",
+      "note": "Opened session 77, flagged by the developer seat in its own /start greeting. ob_start greeted the developer as Session #6 and opened .agents/SESSIONS/Session_6.md while the record's last session is #76; .agents/SESSIONS/Session_*.md is gitignored, so the counter reflects logs in THAT checkout only. A seat that closes out on its local number writes a colliding session id into a shared record. This is T-003's shape (session identity keyed per project, not per session) observed concretely in the worktree regime, and it is live for every seat session from here on: three seats now run in three checkouts, each with its own counter. Until it is fixed, a seat must be told its record session number rather than using the one its greeting shows. Related: T-149 (per-seat worktrees), T-003. — LIVE AGAIN session 149: the planner's greeting said Session #12 (sia-planner's local log count) while the record's last session was #148; the planner used 149. DISPATCHED as record 221 to cursor-builder, after it posts T-194 (brief docs/loops/t158-t164-dispatch.md).",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -635,13 +637,13 @@
       "id": "T-178",
       "title": "ci.yml runs on push to seat working branches (loop/*, qa/*, docs/*, chore/*), per D-040, so no seat has to dispatch CI by hand",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 90,
-      "closed_session": null,
+      "closed_session": 149,
       "supersedes": null,
-      "note": "Opened record session 90 (planner), 2026-09-23, from D-040 on Aaron's word 'ci should run autonoumously'. Today ci.yml triggers on push to master, pull_request and workflow_dispatch only, so a working branch without a PR runs no CI unless someone dispatches it. D-040 part 1 makes dispatching standing in the meantime; this task removes the need for it. For the developer seat to decide HOW, with the planner ruling only on the result. Two things to settle there: (a) a branch with an open PR would run twice (push plus pull_request), so choose a de-duplication (e.g. a concurrency group, or push on qa/** only with PRs covering loop/**) rather than paying double; (b) docs/* and chore/* pushes touch no source, so paths-ignore may be right for them. ACCEPTANCE: a push to a fresh qa/* branch with no PR starts a CI run with no manual act, observed by run id; a push to master still runs; a PR still runs; and no branch runs twice for one push. ci.yml is outside D-032's allowlist, so the PR is Aaron's to merge. Sequencing: not slice-three scope. It can ride with B on the Claude developer seat if the planner scopes it in, otherwise it waits for the slice to close. — Session 148: raised to P0 by Aaron with D-061. Under HoH, automatic CI on push is the runtime's deterministic-test step; until it lands, QA dispatches CI by hand.",
+      "note": "Opened record session 90 (planner), 2026-09-23, from D-040 on Aaron's word 'ci should run autonoumously'. Today ci.yml triggers on push to master, pull_request and workflow_dispatch only, so a working branch without a PR runs no CI unless someone dispatches it. D-040 part 1 makes dispatching standing in the meantime; this task removes the need for it. For the developer seat to decide HOW, with the planner ruling only on the result. Two things to settle there: (a) a branch with an open PR would run twice (push plus pull_request), so choose a de-duplication (e.g. a concurrency group, or push on qa/** only with PRs covering loop/**) rather than paying double; (b) docs/* and chore/* pushes touch no source, so paths-ignore may be right for them. ACCEPTANCE: a push to a fresh qa/* branch with no PR starts a CI run with no manual act, observed by run id; a push to master still runs; a PR still runs; and no branch runs twice for one push. ci.yml is outside D-032's allowlist, so the PR is Aaron's to merge. Sequencing: not slice-three scope. It can ride with B on the Claude developer seat if the planner scopes it in, otherwise it waits for the slice to close. — Session 148: raised to P0 by Aaron with D-061. Under HoH, automatic CI on push is the runtime's deterministic-test step; until it lands, QA dispatches CI by hand. — CLOSED by the planner, session 149 (2026-09-28). Accepted by QA 211 (record 205, qa/t178-report 2f222fc); merged as #199 (8467cb1); its one shipped defect (test skipped on master and PRs, needs-skip propagation) fixed by #200 (c933a44) on Aaron's word. Every acceptance condition observed LIVE by run id: a master push ran test (36494231337 at c933a44, test=success); a fresh qa/* branch push with no PR started CI with no manual act (36503607220, QA 216's qa/t195-ci-candidate); a PR runs (#201, 36502407979, test=success). No double run was ruled on in QA 211.",
       "note_by": null,
-      "closed_rev": null
+      "closed_rev": 156
     },
     {
       "id": "T-179",
