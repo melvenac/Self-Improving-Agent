@@ -1,0 +1,78 @@
+import { normalizeRelPath } from "./paths.js";
+
+const FORCE_PUSH_RE = /\bgit\s+push\b[^;\n|&]*(?:--force|-f)\b/;
+const PUSH_TAGS_RE = /\bgit\s+push\b[^;\n|&]*--tags\b/;
+const PUSH_MASTER_RE = /\bgit\s+push\b[^;\n|&]*(?:\s(?:origin\s+)?master\b|:\s*master\b|HEAD:master\b)/;
+const GIT_MERGE_RE = /\bgit\s+merge\b/;
+const GIT_TAG_RE = /\bgit\s+tag\b/;
+const GH_PR_MERGE_RE = /\bgh\s+pr\s+merge\b/;
+
+const STANDING_PUSH_BRANCH_RE =
+  /\bgit\s+push\b[^;\n|&]*(?:origin\s+)?(?:loop\/|qa\/|docs\/|chore\/)[^\s;|&]*/;
+
+const DOCS_MERGE_ALLOWLIST_PREFIXES = ["docs/"];
+const DOCS_MERGE_ALLOWLIST_EXACT = new Set([
+  "README.md",
+  ".agents/state.json",
+  ".agents/TASKS/INBOX.md",
+  ".agents/TASKS/task.md",
+  ".agents/SESSIONS/next-session.md",
+  ".agents/SYSTEM/SUMMARY.md",
+  ".agents/SYSTEM/PRD.md",
+  ".agents/SYSTEM/DECISIONS.md",
+  ".agents/SYSTEM/ENTITIES.md",
+]);
+
+export function isForcePush(command: string): boolean {
+  return FORCE_PUSH_RE.test(command);
+}
+
+export function isPushTags(command: string): boolean {
+  return PUSH_TAGS_RE.test(command);
+}
+
+export function isPushToMaster(command: string): boolean {
+  return PUSH_MASTER_RE.test(command);
+}
+
+export function isGitMerge(command: string): boolean {
+  return GIT_MERGE_RE.test(command);
+}
+
+export function isGitTag(command: string): boolean {
+  return GIT_TAG_RE.test(command);
+}
+
+export function isGhPrMerge(command: string): boolean {
+  return GH_PR_MERGE_RE.test(command);
+}
+
+/** PH-4 / D-038: standing push to own working branch without a grant. */
+export function isStandingBranchPush(command: string): boolean {
+  if (isForcePush(command) || isPushTags(command) || isPushToMaster(command)) return false;
+  return STANDING_PUSH_BRANCH_RE.test(command);
+}
+
+export function isRestrictedOutwardBash(command: string): boolean {
+  if (isGitMerge(command) || isGitTag(command) || isPushTags(command) || isForcePush(command)) return true;
+  if (isPushToMaster(command)) return true;
+  if (isGhPrMerge(command)) return true;
+  if (/\bgit\s+push\b/.test(command) && !isStandingBranchPush(command)) return true;
+  return false;
+}
+
+export function pathOnDocsMergeAllowlist(path: string): boolean {
+  const p = normalizeRelPath(path);
+  if (DOCS_MERGE_ALLOWLIST_EXACT.has(p)) return true;
+  return DOCS_MERGE_ALLOWLIST_PREFIXES.some((pref) => p.startsWith(pref));
+}
+
+export function allPathsOnDocsMergeAllowlist(paths: readonly string[]): boolean {
+  if (paths.length === 0) return false;
+  return paths.every(pathOnDocsMergeAllowlist);
+}
+
+export function extractGhPrMergeRef(command: string): string | null {
+  const m = command.match(/\bgh\s+pr\s+merge\s+(\S+)/);
+  return m ? m[1] : null;
+}
