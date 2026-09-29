@@ -85,6 +85,38 @@ exit=0
 
 The shell stdout for that `cmd /c` row included `push-qa: pushed and read back: qa/zz-probe-cd`.
 
-## 6. After merge
+## 6. Record 192 r6 (QA 218)
+
+QA 218 rejected `bbfb724`. The harness route kept quotes. The product `docs/loops/qa-driver-template-cursor/drive.ps1` still launched `cursor-agent.ps1` with `& $ps @agentArgs` and `-File $agent -p $prompt`. `Prompt-WithStops` appends `stops.txt`, whose quoted span is `"Open for the planner"`. On the laptop the first user event had lost those quotes.
+
+`Invoke-Agent` now starts cursor-agent's node with the same `ProcessStartInfo` quoting as r5, including `--resume` when a session id is present. Completion, the resume cap of 3, refusal and denial handling, and the `drive.meta` keys are unchanged.
+
+Rows, this desktop `DESKTOP-UGEKR74` only. None of these were run on the laptop.
+
+(a) `docs/loops/qa-driver-cursor-r6-quote.ps1` runs the template with `-MaxContinuations 0` and requires the first user event to contain that quoted span.
+
+Red, `-Rev bbfb724` (the r5 template), exit 1:
+
+```text
+quoted_span="Open for the planner"
+drive_exit=0
+FAIL template_quotes_stripped
+user_has_quotes=False
+```
+
+Green, the template in this tree, exit 0:
+
+```text
+quoted_span="Open for the planner"
+drive=...\docs\loops\qa-driver-template-cursor\drive.ps1
+drive_exit=0
+template_quotes_kept=True
+```
+
+(b) Mutant branch restores `& $ps @agentArgs`. Same script, red on (a). SHA recorded after that run.
+
+(c) `node docs/loops/qa-driver-copy.mjs --harness cursor --model composer-2.5-fast 9991 ...` exit 0. The copy contains `ProcessStartInfo`, `composer-2.5-fast`, `qa-9991`, and `--resume`, and does not contain `& $ps @agentArgs`. PowerShell parsed it (`PARSE_OK`). The throwaway `docs/loops/qa-9991/` was deleted and is not in the commit.
+
+## 7. After merge
 
 Template via `qa-driver-copy.mjs` only. `qa-queue.ps1` unchanged.
