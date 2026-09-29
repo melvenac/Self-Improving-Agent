@@ -11,7 +11,8 @@
 
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
 import { spawnSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { symlinkSyncOrSkip } from "./symlink-or-skip.js";
 import { join } from "node:path";
 import { runLoop, LoopRefused, type LoopConfig } from "../../src/harness/runtime.js";
 import {
@@ -201,7 +202,7 @@ describe("candidate A — a role that is a real process", { timeout: 180_000 }, 
         );
       } else {
         shim = join(tmp.dir, "fake-shim");
-        symlinkSync(script, shim);
+        symlinkSyncOrSkip(script, shim);
       }
       const role = new ProcessRole("developer", { adapter: commandAdapter(shim, [config, ...PROBE]) });
       const r = await runLoop(loopWith(role));

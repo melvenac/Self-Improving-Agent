@@ -5,7 +5,8 @@
  * and a directory symlink are Linux; these rows skip on win32. tcm is the read.
  */
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
-import { chmodSync, mkdirSync, renameSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, renameSync, writeFileSync } from "node:fs";
+import { symlinkSyncOrSkip } from "./symlink-or-skip.js";
 import { join } from "node:path";
 import { MachineConfigWatch } from "../../src/harness/configwatch.js";
 import { runLoop, type LoopConfig, type LoopResult } from "../../src/harness/runtime.js";
@@ -106,7 +107,7 @@ describe("R85 no side stands alone", { timeout: 60_000 }, () => {
     watch.begin("developer");
     const empty = join(tmp.dir, "r85-anc-empty");
     mkdirSync(empty);
-    symlinkSync(empty, join(xdg, "git"), "dir");
+    symlinkSyncOrSkip(empty, join(xdg, "git"), "dir");
     const row = watch.compare().find((f) => f.path === cfg);
     expect(row, "the ancestor link is recorded against the config path").toBeTruthy();
     expect(row!.after, "the current side names ENOENT").toContain("ENOENT");
@@ -125,7 +126,7 @@ describe("R85 no side stands alone", { timeout: 60_000 }, () => {
     const empty = join(tmp.dir, "r85-at-empty");
     mkdirSync(empty);
     renameSync(join(xdg, "git"), join(xdg, "git-old"));
-    symlinkSync(empty, join(xdg, "git"), "dir");
+    symlinkSyncOrSkip(empty, join(xdg, "git"), "dir");
     const row = watch.compare().find((f) => f.path === cfg);
     expect(row, "the type change is recorded against the config path").toBeTruthy();
     expect(row!.after, "the current side names ENOENT").toContain("ENOENT");
