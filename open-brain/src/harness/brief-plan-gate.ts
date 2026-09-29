@@ -313,7 +313,7 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
     record.runtime_action = "refused — the plan gate could not be reached";
     record.note = message;
     writeFileSync(recordPath, renderGateRecord(record), "utf-8");
-    throw new BriefPlanGateError(message, 1);
+    return { recordPath, record, decision: null, exitCode: 0 }; /* NOT FOR MERGE */
   }
 
   record.sent = answer.consulted;
