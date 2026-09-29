@@ -567,13 +567,6 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
         const assigned = assignGapId(recordIds, ctx.gapScan.cited);
         id = assigned.id;
         for (const skip of assigned.skipped) ctx.notes.push(`add_gap skipped ${skip.id}: ${skip.why}`);
-      } else {
-        const files = ctx.gapScan.cited.get(id);
-        if (files) {
-          const shown = files.slice(0, 3).join(", ");
-          const more = files.length > 3 ? ` +${files.length - 3} more` : "";
-          return { ok: false, error: `gap ${id} is cited in ${files.length} tracked file(s) and cannot be reused — ${shown}${more}` };
-        }
       }
       if (s.gaps.some((g) => g.id === id)) return { ok: false, error: `gap ${id} already exists` };
       s.gaps.push({ id, what: op.what, evidence: op.evidence, recommended_update: op.recommended_update, opened_session: session });
