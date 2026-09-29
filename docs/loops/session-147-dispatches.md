@@ -774,3 +774,15 @@ Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819e
 - **Major:** DT-4 records overwrite each other at the same timestamp.
 - **Minor:** the DT-7 mutant `4e0cce9` does not typecheck.
 - **Returned as r2 at hub turn 228.** The return requires a local full-suite run. Blocking a planner's raw `hub-talk --say` that bypasses the dispatch path is named as T-194's job, not T-195's.
+
+## Records 220 and 221 dispatched while QA 213 runs, and their ref trace
+
+- **Dispatched, on Aaron's "Infra and builder are idle, anything to send them?"** Both are existing P0s; no new task was opened.
+  - **Record 220 (T-158, gap tombstones):** to `cursor-infra`, at hub turn 76.
+  - **Record 221 (T-164, the record session number):** to `cursor-builder`, at turn 59, after it posts T-194 with a full-suite run.
+  - **The brief** is `docs/loops/t158-t164-dispatch.md`, on master through #206.
+- **T-178 closed at rev 156.** Every one of its acceptance conditions was observed live, with run ids.
+- **Ref-audit trace for QA 213 (laptop, started 00:34:05Z).** The planner moved these refs during the run. They are not the QA seat's:
+  - `refs/heads/docs/t158-t164-dispatch` was created at `f4cecd9` at 01:32:07Z;
+  - `refs/heads/master` moved `842375f` → `474b652` (#206, docs-only) at 01:32:42Z.
+- **Why these were not held:** two seats were idle, and D-062 needs the brief on master first. The planner chose a traced move over leaving two seats idle for hours. "Trace them by SHA" is the sanctioned alternative to holding.
