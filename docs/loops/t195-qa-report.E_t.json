@@ -1,0 +1,120 @@
+{
+  "loop": "t195",
+  "candidate_git": {
+    "sha": "603be51e4c0a639ef08a0d04fc02fce6669aba02",
+    "branch": "origin/loop/t195-dt-plan-gate",
+    "frozen_at": "2026-09-29T00:32:41Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "CI run 36503607220, test job, Typecheck: npx tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 7000,
+      "detail": "Candidate test job Typecheck step succeeded."
+    },
+    "unit": {
+      "command": "CI run 36503607220, test job, Test: npm test -- --reporter=verbose",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 189000,
+      "detail": "1 file failed, 131 passed; 2 tests failed, 1836 passed, 6 skipped. Both failures were in tests/harness/spawn-sites.test.ts."
+    }
+  },
+  "requirements": [
+    {
+      "id": "full-suite-candidate",
+      "status": "unmet",
+      "evidence": "tcm run 36503607220 at the exact candidate SHA failed its test job.",
+      "severity": "blocker"
+    },
+    {
+      "id": "full-suite-base",
+      "status": "met",
+      "evidence": "tcm run 36503973763 at base 8467cb10837d2da4b13237c22a8be4e8bc5d6a1a passed its test job.",
+      "severity": "info"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "DT-1",
+      "status": "met",
+      "evidence": "Focused candidate suite: validate plan valid=0, invalid=1 with all paths, usage=2.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-2",
+      "status": "met",
+      "evidence": "Focused candidate suite showed all five payload fields and named sources in the decision record.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-3",
+      "status": "met",
+      "evidence": "Policy suite passed and reapplied threshold mutant aab12f3 was killed by DT-5.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-4",
+      "status": "partial",
+      "evidence": "Distinct timestamps append, but QA probe showed two runs with the same timestamp overwrite one path.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-5",
+      "status": "met",
+      "evidence": "Focused suite showed has_observable_acceptance 0.55 against the 0.7 threshold.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-6",
+      "status": "met",
+      "evidence": "QA stubs independently refused missing key, transport error, HTTP 503 and malformed 200 envelope, each at exit 1 with its cause.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-7",
+      "status": "partial",
+      "evidence": "harness dispatch-check refuses correctly, but repository search found no caller in the planner's actual dispatch path.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-8",
+      "status": "met",
+      "evidence": "Preserved files are byte-identical to base; unchanged policies/gate/b2-et/cli suites passed 93/93.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-9a",
+      "status": "met",
+      "evidence": "Focused suite refused a brief absent on origin/master and ancestry mutant 8d919d7 went red.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-9b",
+      "status": "met",
+      "evidence": "QA scratch clone edited real brief session-147-dispatches.md and dispatch-check refused, naming path and master SHA.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-9c",
+      "status": "met",
+      "evidence": "Focused suite refused a D_t absent on origin/master; QA mutant 9af3250 was killed locally and on tcm.",
+      "order": "shown"
+    },
+    {
+      "id": "DT-9d",
+      "status": "met",
+      "evidence": "Focused suite passed when brief and D_t content matched origin/master.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [
+    "New candidate-only full-suite failure: parseBriefGateRecordName's RegExp.exec call is misclassified as an unreviewed child-process spawn by spawn-sites.test.ts."
+  ],
+  "gaps": [
+    "Decision-record allocation is not collision-safe and writeFileSync does not use exclusive creation.",
+    "Nothing in the planner's actual dispatch route invokes harness dispatch-check."
+  ],
+  "notes": "QA 216. No live Jev call. All network cases used fixture environments and stub fetch implementations."
+}
