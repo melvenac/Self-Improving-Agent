@@ -25,16 +25,14 @@
 
 | Row | Test(s) | Red | Green |
 | --- | --- | --- | --- |
-| **PH-1** | `PH-1 — artifact writes denied` (4) | `loop/t194-planner-hook-mut-ph1` — vitest **1 failed**, 38 passed | this branch, 39 passed |
-| **PH-2** | `PH-2 — rendered views…` (6) | `loop/t194-planner-hook-mut-ph2` — **2 failed**, 37 passed | 39 passed |
-| **PH-3** | `PH-3 — outward git acts need grant` (7) | `loop/t194-planner-hook-mut-ph3` — **3 failed**, 36 passed | 39 passed |
-| **PH-4** | `PH-4 — allowed planner acts` (7) | `loop/t194-planner-hook-mut-ph4` — **1 failed**, 38 passed | 39 passed |
-| **PH-5** | `PH-5 — fail closed…` (3) | `loop/t194-planner-hook-mut-ph5` — **1 failed**, 38 passed | 39 passed |
-| **PH-6** | `PH-6 — Bash write detection` (5) | `loop/t194-planner-hook-mut-ph6` — **1 failed**, 38 passed | 39 passed |
-| **PH-7** | `PH-7 — JSON parser…` + mutant turns deny→allow on malformed JSON | `loop/t194-planner-hook-mut-ph7` — **1 failed**, 38 passed | 39 passed |
-| **PH-8** | `PH-8 — CLI deny contract…` (3) + registration | `loop/t194-planner-hook-mut-ph8` — **1 failed**, 38 passed | 39 passed |
-
-Mutant tips are filled in after the mutant commits (see below).
+| **PH-1** | `PH-1 — artifact writes denied` (4) | `mut-ph1` `f22ce62` — **5 failed**, 34 passed | **39 passed** |
+| **PH-2** | `PH-2 — rendered views…` (6) | `mut-ph2` `a2dacdb` — **4 failed**, 35 passed | **39 passed** |
+| **PH-3** | `PH-3 — outward git acts need grant` (7) | `mut-ph3` `5de6430` — **7 failed**, 32 passed | **39 passed** |
+| **PH-4** | `PH-4 — allowed planner acts` (7) | `mut-ph4` `61062d8` — **2 failed**, 37 passed | **39 passed** |
+| **PH-5** | `PH-5 — fail closed…` (3) | `mut-ph5` `86dbe20` — **2 failed**, 37 passed | **39 passed** |
+| **PH-6** | `PH-6 — Bash write detection` (5) | `mut-ph6` `c5ba934` — **6 failed**, 33 passed | **39 passed** |
+| **PH-7** | `PH-7 — JSON parser…` (malformed JSON must deny) | `mut-ph7` `29a622e` — **1 failed**, 38 passed | **39 passed** |
+| **PH-8** | `PH-8 — CLI deny contract…` (3) + registration | `mut-ph8` `f3266e0` — **1 failed**, 38 passed | **39 passed** |
 
 **Red on master:** no hook and no test file — boundary is prose-only (`planner.md`).
 
@@ -46,11 +44,13 @@ After Aaron registers the snippet in the planner checkout: one denied `Edit` to 
 
 | Branch | Defect | SHA |
 | --- | --- | --- |
-| `loop/t194-planner-hook-mut-ph1` | skips `isProtectedArtifactPath` | _(after commit)_ |
-| `loop/t194-planner-hook-mut-ph2` | skips rendered-view deny | _(after commit)_ |
-| `loop/t194-planner-hook-mut-ph3` | ignores grant / outward deny | _(after commit)_ |
-| `loop/t194-planner-hook-mut-ph4` | denies `docs/loops/` writes | _(after commit)_ |
-| `loop/t194-planner-hook-mut-ph5` | missing `AGENT.local.md` → passthrough | _(after commit)_ |
-| `loop/t194-planner-hook-mut-ph6` | `detectBashWriteTargets` always `[]` | _(after commit)_ |
-| `loop/t194-planner-hook-mut-ph7` | regex on raw JSON instead of `JSON.parse` | _(after commit)_ |
-| `loop/t194-planner-hook-mut-ph8` | deny exits **0** | _(after commit)_ |
+| `loop/t194-planner-hook-mut-ph1` | skips `isProtectedArtifactPath` | `f22ce62` |
+| `loop/t194-planner-hook-mut-ph2` | skips rendered-view deny | `a2dacdb` |
+| `loop/t194-planner-hook-mut-ph3` | `checkBash` always allows | `5de6430` |
+| `loop/t194-planner-hook-mut-ph4` | denies `docs/loops/` writes | `61062d8` |
+| `loop/t194-planner-hook-mut-ph5` | missing `AGENT.local.md` → passthrough | `86dbe20` |
+| `loop/t194-planner-hook-mut-ph6` | `detectBashWriteTargets` always `[]` | `c5ba934` |
+| `loop/t194-planner-hook-mut-ph7` | malformed JSON exits **0** | `29a622e` |
+| `loop/t194-planner-hook-mut-ph8` | deny exits **0** | `f3266e0` |
+
+**Product tip:** `loop/t194-planner-hook` `7d68bcf`.
