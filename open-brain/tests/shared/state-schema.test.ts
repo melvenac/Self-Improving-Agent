@@ -245,11 +245,20 @@ describe("state-schema (Loop 2, read side)", () => {
     }
     const raw = JSON.parse(text) as { tasks: Array<Record<string, unknown>> };
     expect(raw.tasks.length).toBeGreaterThan(0);
-    expect(Object.prototype.hasOwnProperty.call(raw.tasks[0], "note_by")).toBe(false);
     const r = parseState(text);
     expect(r.ok).toBe(true);
     if (!r.ok) return;
-    expect(r.data.tasks[0].note_by).toBeNull();
-    expect(r.data.tasks.every((t) => t.note_by === null)).toBe(true);
+
+    const legacy = raw.tasks.find((t) => !Object.prototype.hasOwnProperty.call(t, "note_by"));
+    if (legacy) {
+      const id = legacy.id as string;
+      expect(r.data.tasks.find((t) => t.id === id)?.note_by).toBeNull();
+    }
+
+    const d = valid() as unknown as { tasks: Array<Record<string, unknown>> };
+    delete d.tasks[0].note_by;
+    const fixture = parseState(JSON.stringify(d));
+    expect(fixture.ok).toBe(true);
+    if (fixture.ok) expect(fixture.data.tasks[0].note_by).toBeNull();
   });
 });
