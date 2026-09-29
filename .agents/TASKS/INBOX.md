@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 150 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 151 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -29,6 +29,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-195** Every interactive planner brief ships a D_t JSON beside it, validated against plan.schema.json by a new `harness validate plan`, judged by the live plan gate (gate.ts, policies/plan-gate.json); a gate failure is fed back and blocks dispatch; decisions logged with the resolved model; fails closed when Jev is unreachable
 - [ ] **T-196** The hub procedure is tracked knowledge: each seat's hub room and hub-talk invocation in a tracked data file beside .agents/SYSTEM/worktree-seats.json; a short 'Talking to Cursor seats' section in planner.md (printed in full at /start) pointing at it; a tracked alwaysApply .cursor/rules hub rule; and Cursor's /start joins the seat's room and reads unread atlas turns before proposing anything
 - [ ] **T-197** Cursor's /start matches Claude Code's /start except for documented tool-call differences, and /sync fails on any other difference: it reads ob_start's State block, never hand-edits rendered views, lets ob_start create the session log, and presents NEXT as a ranked backlog rather than a proposal
+- [ ] **T-198** ob_start prints one line per partner seat from the hub's presence endpoint (listening or not, unread turns and since when), and says so visibly when the hub is unreachable, never silently
 
 ## P1
 
@@ -61,6 +62,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-183** ob_start's greeting has grown about 7x since V-025 (2,142 words at rev 14; about 14,900 words, 92,131 characters, at rev 121) and no longer fits one tool result: render gaps and verified by TITLE, as tasks already are
 - [ ] **T-187** /sync rebuilds the GitNexus index when it is behind (D-049): plain /sync runs analyze where a .gitnexus exists and the indexed SHA is not HEAD, then verifies the new SHA; sync --check stays read-only; a tree with no index stays SKIP (never PASS)
 - [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
+- [ ] **T-199** A seat session that wrote the record but left no handoff is DETECTED at that seat's next /start, and planner.md's stale 'one handoff slot, C2 unfixed' paragraph is corrected (the per-seat slot exists since schema v3)
 
 ## P2
 
