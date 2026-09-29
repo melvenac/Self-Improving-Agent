@@ -177,7 +177,7 @@ export function prepareShadowVerdict(input: {
   planGate?: { verdict: string } | null | "missing";
 }): { path: string; verdict: ShadowVerdictResult } {
   requireLowerHexSha("prepare candidate_sha", input.candidateSha);
-  requireLowerHexSha("prepare criteria_sha", input.criteriaSha);
+  // QA MUTANT: criteria SHA validation removed.
   const path = verdictPath(input.repo, input.loop, input.candidateSha);
   if (existsSync(path)) {
     throw new Error(`${path} already exists. A verdict is written once.`);
