@@ -851,3 +851,26 @@ Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819e
 - **Effect:** every PR's run fails that test until it is fixed, because PR CI tests the merge with master.
 - **Owned by the planner.** The merge was the planner's act on Aaron's order. The planner read the PR run, never the master run that followed, before calling it done. **Shared.md's rule: verify against the thing (master's own run), not a report of it (the PR's run).**
 - **The fix is dispatched to the builder** at hub turn 64, on branch `fix/state-schema-live-note-by`. Keep what r3b protects; stop depending on live data. It is a code PR, so Aaron merges it.
+
+## QA 222-226 ruled; master green again; an instrument assumption corrected
+
+| QA | Record | Verdict | Planner ruling |
+| --- | --- | --- | --- |
+| 222 | 215 r2 (T-195) | ACCEPT | stands; PR #209 (code, Aaron merges) |
+| 223 | 220 (T-158) | REJECT | stands; 220 r2 to infra |
+| 224 | 219 (T-196+197) | REJECT | stands; 219 r2 to infra, after 220 r2 |
+| 225 | 217 (T-198) | REJECT | stands; 217 r2 to Forge, after C r4 |
+| 226 | 192 r6 | ACCEPT | stands; PR #194 (a loop candidate, Aaron merges) |
+
+**On the machines:**
+- On the new QA PC (i5-14500), QA 222 to 225 ran 12 to 15 minutes each.
+- QA 226 ran 33 minutes on the laptop.
+- During QA 225 the QA PC sampled **1.7% CPU while paging at an average of 632 pages/s**. Runs wait on the cloud model and on tcm, so **8 GB of RAM, not the CPU, is its constraint.**
+
+**Master is green again.**
+- #210 (the builder's r3b fix, one test file) merged on Aaron's word as `3592f11`.
+- Master's own push run `36519826339` has `test` success. This time the planner read master's own run, not the PR's.
+
+**The planner's wrong assumption:** closing and reopening #198 and #209 to get fresh runs against the new master did NOT work.
+- Their `pull_request` runs check out the **PR head** (`378d066`, `71810ea`), so the old r3b assertion ran again and failed.
+- Only merging master into each branch fixes it. The close/reopen was harmless and changed nothing.
