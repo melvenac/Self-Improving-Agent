@@ -842,3 +842,43 @@ Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819e
 - **But the real driver template (`qa-driver-template-cursor/drive.ps1`) launches `cursor-agent.ps1` by the same quote-dropping route.** `Prompt-WithStops` appends `stops.txt`, which contains double quotes, and QA 218's own first user event lost them.
 - **Returned as 192 r6: fix the template's launch route**, with a row asserting that the first user event carries `stops.txt`'s quotes intact.
 - **QA 222-225, running now on the QA PC, use the unfixed template.** Their standing instructions arrive with a quote pair dropped: degraded, not broken.
+
+## ERROR (planner): the #201 merge turned master red, and its PR run could not see it
+
+- **#201** (the record catch-up, rev 157) merged at 03:11:01Z as `838b1bd`, on a green PR run (`36515788740`, `test` pass at `77015cc`).
+- **Master's push run `36515995562` at `838b1bd` FAILED** on `tests/shared/state-schema.test.ts:248`: "T-171 r3b: origin/master's real state.json parses, and a missing note_by is null". It asserts that `tasks[0]` of **origin/master's live `state.json`** has no `note_by`. Today's `ob_state` writes record `note_by`, so the merged record falsified it.
+- **Why the PR run was green:** the test reads `origin/master`, not the PR's tree. In the PR run, origin/master was still rev 140. **A test whose input is origin/master's live data is invisible to PR CI**, and ordinary record writes can break it. That is Rule 14 and G-044's class, in a test.
+- **Effect:** every PR's run fails that test until it is fixed, because PR CI tests the merge with master.
+- **Owned by the planner.** The merge was the planner's act on Aaron's order. The planner read the PR run, never the master run that followed, before calling it done. **Shared.md's rule: verify against the thing (master's own run), not a report of it (the PR's run).**
+- **The fix is dispatched to the builder** at hub turn 64, on branch `fix/state-schema-live-note-by`. Keep what r3b protects; stop depending on live data. It is a code PR, so Aaron merges it.
+
+## QA 222-226 ruled; master green again; an instrument assumption corrected
+
+| QA | Record | Verdict | Planner ruling |
+| --- | --- | --- | --- |
+| 222 | 215 r2 (T-195) | ACCEPT | stands; PR #209 (code, Aaron merges) |
+| 223 | 220 (T-158) | REJECT | stands; 220 r2 to infra |
+| 224 | 219 (T-196+197) | REJECT | stands; 219 r2 to infra, after 220 r2 |
+| 225 | 217 (T-198) | REJECT | stands; 217 r2 to Forge, after C r4 |
+| 226 | 192 r6 | ACCEPT | stands; PR #194 (a loop candidate, Aaron merges) |
+
+**On the machines:**
+- On the new QA PC (i5-14500), QA 222 to 225 ran 12 to 15 minutes each.
+- QA 226 ran 33 minutes on the laptop.
+- During QA 225 the QA PC sampled **1.7% CPU while paging at an average of 632 pages/s**. Runs wait on the cloud model and on tcm, so **8 GB of RAM, not the CPU, is its constraint.**
+
+**Master is green again.**
+- #210 (the builder's r3b fix, one test file) merged on Aaron's word as `3592f11`.
+- Master's own push run `36519826339` has `test` success. This time the planner read master's own run, not the PR's.
+
+**The planner's wrong assumption:** closing and reopening #198 and #209 to get fresh runs against the new master did NOT work.
+- Their `pull_request` runs check out the **PR head** (`378d066`, `71810ea`), so the old r3b assertion ran again and failed.
+- Only merging master into each branch fixes it. The close/reopen was harmless and changed nothing.
+
+## Merged on Aaron's word; master is green at 7fcbfa0
+
+- **Aaron, verbatim:** "update #198 and #209 with master's fix (gh pr update-branch), after that: merging #194 and #209". The planner ran `gh pr update-branch` on #198 and #209; that is a push to seat branches, on his word. After each update, the concurrency group cancelled the push run, so the planner re-ran it, as it did for #200.
+- **#194** (record 192 r6, QA 226 ACCEPT) merged as `e83b8fc`, pinned to `d3d8e8f`. It is docs-only, so it started no PR CI (D-055), and QA 226's harness runs are its evidence. **QA drivers generated from now on use the fixed template.**
+- **#198** (record 198, ACCEPTED earlier; Aaron's standing order) merged as `410e4cd`, pinned to `c87d270`, after its PR run `36521015586` showed `test` success.
+- **#209** (T-195, record 215 r2, QA 222 ACCEPT) merged as `7fcbfa0`, pinned to `5b3e525`, after its PR run `36521018091` showed `test` success. **T-195 is closed at rev 159.**
+- **Master's own run** `36521817728` at `7fcbfa0`: `test` success. This time the planner read master's run itself.
