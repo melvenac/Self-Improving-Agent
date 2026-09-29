@@ -11,7 +11,7 @@
 
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import type { GateRecord } from "./artifacts.js";
 import { renderGateRecord } from "./artifacts.js";
 import {
@@ -35,6 +35,7 @@ import {
   type PlanGateContext,
 } from "./policies.js";
 import { validatePlan, type Plan } from "./schema.js";
+import { gitTry, headSha, isAncestor } from "./git.js";
 
 export class BriefPlanGateError extends Error {
   readonly exitCode: number;
@@ -347,6 +348,43 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
 export interface DispatchCheckResult {
   ok: boolean;
   reasons: string[];
+  /** The HEAD sha checked for reachability (DT-9). */
+  checked_sha?: string;
+}
+
+function relInRepo(repoRoot: string, absPath: string): string {
+  return relative(repoRoot, absPath).split("\\").join("/");
+}
+
+/**
+ * DT-9 (D-062): the brief and its D_t must be on a commit descended from origin/master.
+ */
+export function checkBriefReachableFromMaster(
+  repoRoot: string,
+  briefPath: string,
+  dtPath: string,
+  upstream = "origin/master",
+): { ok: boolean; sha: string; reasons: string[] } {
+  const head = headSha(repoRoot);
+  const master = gitTry(repoRoot, ["rev-parse", "--verify", "--quiet", upstream]);
+  if (!master.ok || !/^[0-9a-f]{40}$/.test(master.stdout)) {
+    return { ok: false, sha: head, reasons: [`${upstream} could not be resolved`] };
+  }
+  const masterSha = master.stdout;
+  if (!isAncestor(repoRoot, masterSha, head)) {
+    return {
+      ok: false,
+      sha: head,
+      reasons: [`brief and D_t at HEAD ${head} are not reachable from ${upstream} ${masterSha}`],
+    };
+  }
+  for (const abs of [briefPath, dtPath]) {
+    const rel = relInRepo(repoRoot, abs);
+    if (!gitTry(repoRoot, ["cat-file", "-e", `HEAD:${rel}`]).ok) {
+      return { ok: false, sha: head, reasons: [`${rel} is not committed at HEAD ${head}`] };
+    }
+  }
+  return { ok: true, sha: head, reasons: [] };
 }
 
 /**
@@ -373,6 +411,10 @@ export function checkBriefDispatchReady(briefPath: string, repoRoot: string = pr
   const validated = validatePlan(json);
   if (!validated.ok) {
     return { ok: false, reasons: validated.problems.map((p) => `D_t invalid: ${p}`) };
+  }
+  const reach = checkBriefReachableFromMaster(repoRoot, briefAbs, dtPath);
+  if (!reach.ok) {
+    return { ok: false, reasons: reach.reasons, checked_sha: reach.sha };
   }
   const records = listBriefGateRecords(briefAbs);
   if (records.length === 0) {
@@ -407,7 +449,7 @@ export function checkBriefDispatchReady(briefPath: string, repoRoot: string = pr
   if (verdict !== "proceed") {
     reasons.push(`latest gate record verdict is ${verdict ?? "absent"}, not proceed`);
   }
-  return { ok: reasons.length === 0, reasons };
+  return { ok: reasons.length === 0, reasons, checked_sha: reach.sha };
 }
 
 /** Parse a gate-record filename; exposed for tests. */

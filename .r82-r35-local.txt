@@ -1,0 +1,93 @@
+
+ RUN  v3.2.4 C:/Users/melve/Worktrees/sia-forge/open-brain
+
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-IDENTIFY: lstat EACCES is recorded, not rethrown (identify :115, catch :121)
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-LISTTREE: an unreadable tree is unlisted, not thrown (listTree readdir :171 via repositoryLinksAtBase :201)
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-BEGIN-TREE: begin contains listTree (currentFiles :592, begin :620)
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-CLOSE-TREE: closeAndRestore lists after the role and still restores (currentFiles :727)
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-CLOSE-VERDICT-NOT-OK: closeAndRestore is not ok when a directory cannot be listed
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-OBSERVE-BEGIN: begin's observe contains lstat (observe identify :931, begin :1092)
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-OBSERVE-COMPARE: compare contains lstat and records the code (observe :931, compare :1127)
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-READ-GUARDED: a mode-000 file is recorded, not thrown (readFileSync :438 is already inside readState's try)
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-READ-EIO: a readFileSync EIO is recorded as unreadable, not absent and not thrown
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-GIT-AFTER-BREAK: replacing .git/config with a directory ends stage-changed-config and restores it
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-BEGIN-UNLISTED: an unreadable hooks directory before the role refuses config-watch-unestablished
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-CLOSE-UNLISTED: an unreadable hooks directory is stage-changed-config and is not 'no files'
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-UNRESTORED-HOOK: a hook replaced by a directory stops before git
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-UNLISTED-CONTENTS: a file under an unlisted directory is unrestorable, never deleted or absent
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R77-READ-FAILS-STAGE: mode 000 on .git/config fails the stage and the mode is restored
+ ↓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R82-MACHINE-UNOBSERVABLE: HOME made mode 000 fails the stage with a machine code
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R41: non-recursive rmdir removes a win32 junction and leaves the victim (win32 only: symlinkSync type junction is a junction here; on POSIX it is a symlink and rmdir throws ENOTDIR)
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > (a) a junction at .git/info does not write or delete the victim
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > (c) a hard link created inside .git/hooks does not change the victim
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > POSIX symlinks > a symlink at .git/config does not overwrite the victim
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > POSIX symlinks > CA-15 (b)2: a directory symlink at .git/hooks is removed via the ENOTDIR fallback and the victim is untouched
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > POSIX symlinks > a symlink at .git does not write the victim and claims no restore
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > (a) a junction at .git/hooks does not write or delete the victim
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > (a) a junction entry inside .git/hooks does not write the victim
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > (b) a junction at .git writes nothing into the victim and claims no restore
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > (c) a hard link at .git/config does not change the victim's bytes
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > (b) a loop whose role junctions .git does not roll back through it
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > a junction at a watched path at base is refused before any tag
+ ✓ tests/harness/configwatch-r77-contain.test.ts > R77 containment at A9 > R82-ENOENT-IS-ABSENT: a machine path removed during the stage is absent (ENOENT) and the stage continues 3024ms
+ ✓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R35: a machine-config junction at base is not refused, and one planted later is a type change 5662ms
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R35: a symlink at $XDG_CONFIG_HOME/git at base proceeds past preflight
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R44: a machine-config link planted after base is not read through on the next stage
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R45: a junction at a tree root that was absent is removed and the absence restored
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R45: a machine-config path absent at base, later a link, is reported and not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R46: a tree-root link is named with its type and readlink target
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R46: a link entry is named with its type and readlink target
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R46: baseNotes names a link at a parent component of a machine-config path
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R43: a hard link that replaces a watched file is not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R43: a machine-config hard link is not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R49: a machine-config file absent at base, later a hard link, is reported from lstat and not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R49: a directory replaced beyond a machine-config link at base is not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R49: a hard link beyond a machine-config link at base is not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R49: a repository file absent at base is not read when it appears
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R50: a hard link already at a repository file at base is no change and carries no exception text
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R52 (b)3: chmod through a link leaves the victim's mode unchanged
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R52 (b)4: HOME/.gitconfig as a symlink to a file is reported and not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R52 R29: mode 000 shows EACCES on a direct read, and the bytes are not recorded
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R52 control: a write through the link changes the victim, and a plant without the runtime does not
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R55 CONTROL: the base link's target edited in place is read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R55: the base link's target replaced by a hard link is not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R55: the base link's target directory replaced by a symlink is not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R55: the base link's target replaced by a new file is read (D-042)
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R57: a later stage does not read a repository file whose route differs from the loop base
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R59: qa reads a machine file restored to its base resolution and does not say not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R58 (b)3: a symlink planted on a hook entry does not change the victim, and the modes differ
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R58 R29: a link to a mode-000 victim is not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R60: an in-place edit through a stow relative link is read and hashed
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R60: an in-place edit below a linked config directory is read and hashed
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R60: a different file reached through a stow link is not read, and both resolutions are named
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R61: a link that does not resolve is reported unwatched and is not claimed as read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R62: a repository file new since the loop base and untouched by the stage is no change
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R60: a repository link with two components after it names the real file, not a doubled path
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R64: a repository file rewritten between base and the stage, then untouched, is no change
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R65: an unchanged machine path appears in the stage record as read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R65: a path unreadable at base is recorded unreadable, never absent
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R67: a lock-and-rename in one stage and an in-place append in the next are both hashed
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R67: a hard link made elsewhere does not stop an in-place read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R67: the base link's target replaced by a new single-name file is read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R66 R50: an in-place edit of a hook hard-linked at base is a change
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R66: a symlink planted at the watched path is a type change and is not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R66 TRADE-DIFF: a mid-path link to a different file names both resolutions and both identities
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R68: an in-place write to an unread machine path reports both fact sets
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R69: a machine path absent at base is read once it appears as a single-name file
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R69: a two-name file appearing where the path was absent is not read
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R71: an unread repository record prints both fact sets
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R73: a stable unread machine record carries the lstat facts
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R73: a directory at the path carries its facts
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R73: a stable unreadable file says unreadable and carries its facts
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R72: an in-place write to an unreadable file is a change
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R72: an unreadable repository file is reported from its facts, not dropped
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R71 A6-5: a failed read at stage start is the word unreadable, not absent
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R74: the word base names the loop base, and both sides print type
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R75: size alone, with mtime pinned, is a change
+ ↓ tests/harness/configwatch-links.test.ts > CA-15 — restore does not follow links > R75: mtimeNs alone, same size, is a change
+
+ Test Files  2 passed (2)
+      Tests  2 passed | 82 skipped (84)
+   Start at  16:37:34
+   Duration  8.02s (transform 546ms, setup 106ms, collect 2.08s, tests 8.76s, environment 1ms, prepare 1.47s)
+

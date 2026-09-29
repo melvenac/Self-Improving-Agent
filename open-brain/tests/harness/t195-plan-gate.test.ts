@@ -12,6 +12,7 @@ import { validatePlan, type Plan } from "../../src/harness/schema.js";
 import {
   briefDtPath,
   checkBriefDispatchReady,
+  checkBriefReachableFromMaster,
   listBriefGateRecords,
   nextBriefGateRecordPath,
   policyFileHash,
@@ -22,7 +23,7 @@ import type { GateAnswer, GatePayload, GateTransport } from "../../src/harness/g
 import { GateUnavailable, JEV_KEY_VAR } from "../../src/harness/gate.js";
 import { runLoop } from "../../src/harness/runtime.js";
 import { StubDeveloper, StubPlanner, StubQa } from "../../src/harness/roles.js";
-import { exitingChecks, makeRepo, requireGit } from "./fixture.js";
+import { exitingChecks, makeRepo, rawGit, requireGit } from "./fixture.js";
 
 const TSX = resolve(__dirname, "../../node_modules/tsx/dist/cli.mjs");
 const CLI = resolve(__dirname, "../../src/harness/cli.ts");
@@ -235,41 +236,89 @@ describe("T-195 brief plan gate", { timeout: 120_000 }, () => {
 
   describe("DT-7 dispatch-check", () => {
     it("refuses a brief without D_t or passing live gate record", async () => {
-      const { brief, dt } = writeBriefFixture(dir);
-      let check = checkBriefDispatchReady(brief, dir);
+      requireGit();
+      const repo = makeRepo("t195-dispatch-");
+      const brief = join(repo.root, "docs/loops/sample-brief.md");
+      const dt = briefDtPath(brief);
+      repo.write("docs/loops/sample-brief.md", "# Sample brief\n\nBuild the plan gate.\n");
+      repo.write("docs/loops/sample-brief.D_t.json", `${JSON.stringify(validPlan(), null, 2)}\n`);
+      repo.commitAll("add brief sidecar");
+      rawGit(repo.root, ["update-ref", "refs/remotes/origin/master", repo.sha()]);
+
+      let check = checkBriefDispatchReady(brief, repo.root);
       expect(check.ok).toBe(false);
       expect(check.reasons.some((r) => r.includes("no plan-gate"))).toBe(true);
 
       await runBriefPlanGate({
         dtPath: dt,
         briefPath: brief,
-        repoRoot: dir,
+        repoRoot: repo.root,
         mode: "dry-run",
         transport: new TableTransport(),
         env: {},
       });
-      check = checkBriefDispatchReady(brief, dir);
+      check = checkBriefDispatchReady(brief, repo.root);
       expect(check.ok).toBe(false);
       expect(check.reasons.some((r) => r.includes("no live plan-gate"))).toBe(true);
 
       await runBriefPlanGate({
         dtPath: dt,
         briefPath: brief,
-        repoRoot: dir,
+        repoRoot: repo.root,
         mode: "live",
         transport: new TableTransport(),
         env: {},
         at: new Date("2026-09-28T13:00:00.000Z"),
       });
-      check = checkBriefDispatchReady(brief, dir);
+      check = checkBriefDispatchReady(brief, repo.root);
       expect(check.ok).toBe(true);
 
-      const cli = harness(["dispatch-check", brief, "--repo", dir], dir);
+      const cli = harness(["dispatch-check", brief, "--repo", repo.root], repo.root);
       expect(cli.status).toBe(0);
       expect(cli.stdout).toContain("dispatch-check: ok");
 
-      writeFileSync(brief.replace(".md", ".D_t.json"), "{}", "utf-8");
-      expect(harness(["dispatch-check", brief, "--repo", dir], dir).status).toBe(1);
+      repo.write("docs/loops/sample-brief.D_t.json", "{}\n");
+      repo.commitAll("break D_t");
+      expect(harness(["dispatch-check", brief, "--repo", repo.root], repo.root).status).toBe(1);
+
+      await repo.cleanup();
+    });
+  });
+
+  describe("DT-9 reachability from origin/master", () => {
+    it("refuses when HEAD is not descended from origin/master, naming the sha", () => {
+      requireGit();
+      const repo = makeRepo("t195-reach-");
+      const base = repo.sha();
+      rawGit(repo.root, ["update-ref", "refs/remotes/origin/master", base]);
+      rawGit(repo.root, ["checkout", "--orphan", "orphan-dispatch"]);
+      const brief = join(repo.root, "docs/loops/orphan-brief.md");
+      const dt = briefDtPath(brief);
+      repo.write("docs/loops/orphan-brief.md", "# orphan\n");
+      repo.write("docs/loops/orphan-brief.D_t.json", `${JSON.stringify(validPlan(), null, 2)}\n`);
+      repo.commitAll("orphan brief");
+      const head = repo.sha();
+
+      const reach = checkBriefReachableFromMaster(repo.root, brief, dt);
+      expect(reach.ok).toBe(false);
+      expect(reach.sha).toBe(head);
+      expect(reach.reasons[0]).toContain(head);
+      expect(reach.reasons[0]).toContain("origin/master");
+
+      void repo.cleanup();
+    });
+
+    it("passes when origin/master is an ancestor of HEAD", () => {
+      requireGit();
+      const repo = makeRepo("t195-reach-ok-");
+      const brief = join(repo.root, "docs/loops/ok-brief.md");
+      const dt = briefDtPath(brief);
+      repo.write("docs/loops/ok-brief.md", "# ok\n");
+      repo.write("docs/loops/ok-brief.D_t.json", `${JSON.stringify(validPlan(), null, 2)}\n`);
+      repo.commitAll("tracked brief");
+      rawGit(repo.root, ["update-ref", "refs/remotes/origin/master", repo.sha()]);
+      expect(checkBriefReachableFromMaster(repo.root, brief, dt).ok).toBe(true);
+      void repo.cleanup();
     });
   });
 
