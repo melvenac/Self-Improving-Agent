@@ -281,7 +281,10 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   // writing for the first time since migration — takes this write's revision.
   const firstRev = mine?.first_rev ?? before + 1;
   const noteChanges: string[] = [];
-  const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes, noteChanges };
+  // Loop 4 R3: an empty batch is a re-render, not a write.
+  const renderOnly = options.ops.length === 0;
+  const citedGaps = renderOnly ? new Map<string, string[]>() : citedGapIds(projectRoot);
+  const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes, noteChanges, citedGaps };
 
   for (let i = 0; i < options.ops.length; i++) {
     const opName = (options.ops[i] as { op?: unknown } | null)?.op;
@@ -308,8 +311,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   // not move, retention does not run and state.json is not touched — only
   // the views are regenerated (with the current package.json version). This
   // is what /sync uses to refresh stale view headers without inventing a
-  // state change.
-  const renderOnly = options.ops.length === 0;
+  // state change. `renderOnly` is decided above, before the ops run.
 
   // T-163: every write records the session that made it, so the record holds
   // every writing session's uuid rather than the last closer's. Upserted by
@@ -426,6 +428,8 @@ interface OpContext {
   removedGaps: string[];
   notes: string[];
   noteChanges: string[];
+  /** Gap ids cited in the tracked tree, excluding the record and its views. */
+  citedGaps: Map<string, string[]>;
 }
 
 /** The authors of a note after `add` is appended by `uuid`: unknown stays unknown. */
@@ -494,7 +498,7 @@ function editNote(t: Task, op: { append_note?: string; replace_note?: string; re
 }
 
 function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
-  const { session, removedGaps } = ctx;
+  const { session } = ctx;
   switch (op.op) {
     case "open_task": {
       const id = op.id ?? nextId("T", s.tasks.map((t) => t.id));
@@ -552,7 +556,13 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       return { ok: true, id: v.id };
     }
     case "add_gap": {
-      const id = op.id ?? nextId("G", s.gaps.map((g) => g.id));
+      const recordIds = s.gaps.map((g) => g.id);
+      let id = op.id;
+      if (id === undefined) {
+        const assigned = assignGapId(recordIds, ctx.citedGaps);
+        id = assigned.id;
+        for (const skip of assigned.skipped) ctx.notes.push(`add_gap skipped ${skip.id}: ${skip.why}`);
+      }
       if (s.gaps.some((g) => g.id === id)) return { ok: false, error: `gap ${id} already exists` };
       s.gaps.push({ id, what: op.what, evidence: op.evidence, recommended_update: op.recommended_update, opened_session: session });
       return { ok: true, id };
@@ -574,10 +584,17 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       return { ok: true, id: g.id };
     }
     case "close_gap": {
-      const idx = s.gaps.findIndex((g) => g.id === op.id);
-      if (idx === -1) return { ok: false, error: `unknown gap ${op.id}` };
-      s.gaps.splice(idx, 1);
-      removedGaps.push(op.id);
+      // T-158: splice handed the closed id back to the next add_gap. The entry
+      // stays, with the close stamped on it, so the id is occupied.
+      const g = s.gaps.find((x) => x.id === op.id);
+      if (!g) return { ok: false, error: `unknown gap ${op.id}` };
+      if (g.status === "closed") {
+        return { ok: false, error: `gap ${op.id} is already closed (closed session ${g.closed_session}, rev ${g.closed_rev})` };
+      }
+      g.status = "closed";
+      g.closed_session = session;
+      g.closed_rev = ctx.rev;
+      ctx.notes.push(`close_gap ${op.id}: tombstone kept (status closed, closed_session ${session}, closed_rev ${ctx.rev})`);
       return { ok: true, id: op.id };
     }
     case "add_decision": {
@@ -704,6 +721,41 @@ function findTask(s: State, id: string): Task | undefined {
   return s.tasks.find((t) => t.id === id);
 }
 
+const GAP_ID = /^G-(\d+)$/;
+
+/**
+ * The next gap id that is neither in the record nor cited in the tracked tree.
+ * Walks forward from the record's max, so a hole that nobody cites can still
+ * be used, and a cited id above the record (G-046 while gaps[] ends at G-045)
+ * is named in `skipped` with the reason.
+ */
+export function assignGapId(
+  recordIds: readonly string[],
+  cited: ReadonlyMap<string, readonly string[]>,
+): { id: string; skipped: Array<{ id: string; why: string }> } {
+  const record = new Set(recordIds);
+  let n = 0;
+  for (const id of recordIds) {
+    const m = id.match(GAP_ID);
+    if (m) n = Math.max(n, parseInt(m[1], 10));
+  }
+  const skipped: Array<{ id: string; why: string }> = [];
+  for (;;) {
+    n += 1;
+    const id = `G-${String(n).padStart(3, "0")}`;
+    const files = cited.get(id);
+    if (!record.has(id) && !files) return { id, skipped };
+    const why: string[] = [];
+    if (record.has(id)) why.push("in the record, tombstones included");
+    if (files) {
+      const shown = files.slice(0, 3).join(", ");
+      const more = files.length > 3 ? ` +${files.length - 3} more` : "";
+      why.push(`cited in ${files.length} tracked file(s) outside the record and its rendered views — ${shown}${more}`);
+    }
+    skipped.push({ id, why: why.join("; ") });
+  }
+}
+
 /** `T-007` style: max existing numeric suffix + 1, zero-padded to 3. */
 export function nextId(prefix: "T" | "V" | "G" | "D", existing: string[]): string {
   let max = 0;
@@ -780,13 +832,27 @@ export function applyRetention(
  * the id and the writer's note prints them — a reader can then see at a glance
  * whether a retention was earned or was a test fixture.
  */
+/**
+ * Gap ids named anywhere in the tracked tree, excluding the record and its
+ * rendered views. Same exclusion as `citedTaskIds`: counting state.json would
+ * make every live gap cite itself. G-046, G-047 and G-048 are cited only
+ * outside the record; a scan that misses them is how a closed id gets reused.
+ */
+export function citedGapIds(projectRoot: string): Map<string, string[]> {
+  return citedIds(projectRoot, "G-[0-9]+");
+}
+
 export function citedTaskIds(projectRoot: string): Map<string, string[]> {
+  return citedIds(projectRoot, "T-[0-9]+");
+}
+
+function citedIds(projectRoot: string, pattern: string): Map<string, string[]> {
   const out = gitOut(projectRoot, [
     "grep",
     "--no-color",
     "-oI",
     "-E",
-    "T-[0-9]+",
+    pattern,
     "--",
     ".",
     ":(exclude).agents/state.json",
