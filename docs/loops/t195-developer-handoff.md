@@ -4,7 +4,7 @@ Forge (Grok 4.7), worktree `C:\Users\melve\Worktrees\sia-forge`. Record 215 **r2
 
 ## Product branch
 
-`loop/t195-dt-plan-gate` @ **`647cc74`** (local only).
+`loop/t195-dt-plan-gate` @ **`06f698f`** (local only).
 
 ## Mutant branches (local)
 
@@ -12,7 +12,7 @@ Forge (Grok 4.7), worktree `C:\Users\melve\Worktrees\sia-forge`. Record 215 **r2
 | --- | --- | --- |
 | `loop/t195-dt-plan-gate-mut-threshold` | `c5da6ea` | DT-3 / DT-5 |
 | `loop/t195-dt-plan-gate-mut-pass-on-error` | `908167a` | DT-6 |
-| `loop/t195-dt-plan-gate-mut-dispatch-ok` | **`<MUT_SHA>`** | DT-7 dispatch test |
+| `loop/t195-dt-plan-gate-mut-dispatch-ok` | **`b450ad5`** | DT-7 dispatch test |
 | `loop/t195-dt-plan-gate-mut-dt9-ancestry` | `8d919d7` | DT-9a/b/c |
 
 ## r2 fixes (turn 228)
@@ -35,7 +35,7 @@ Forge (Grok 4.7), worktree `C:\Users\melve\Worktrees\sia-forge`. Record 215 **r2
 | DT-7 dispatch | `mut-dispatch-ok` | `npx vitest run … -t "dispatch sends only"` exit **1**: `expect(blocked.ok).toBe(false)` got **true** |
 | DT-7 mutant (old) | `4e0cce9` | `npx tsc --noEmit -p .` exit **2**: unreachable code after early return |
 
-## Green (product `647cc74`)
+## Green (product `06f698f`)
 
 | Command | Exit | Result |
 | --- | --- | --- |
