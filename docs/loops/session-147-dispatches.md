@@ -842,3 +842,12 @@ Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819e
 - **But the real driver template (`qa-driver-template-cursor/drive.ps1`) launches `cursor-agent.ps1` by the same quote-dropping route.** `Prompt-WithStops` appends `stops.txt`, which contains double quotes, and QA 218's own first user event lost them.
 - **Returned as 192 r6: fix the template's launch route**, with a row asserting that the first user event carries `stops.txt`'s quotes intact.
 - **QA 222-225, running now on the QA PC, use the unfixed template.** Their standing instructions arrive with a quote pair dropped: degraded, not broken.
+
+## ERROR (planner): the #201 merge turned master red, and its PR run could not see it
+
+- **#201** (the record catch-up, rev 157) merged at 03:11:01Z as `838b1bd`, on a green PR run (`36515788740`, `test` pass at `77015cc`).
+- **Master's push run `36515995562` at `838b1bd` FAILED** on `tests/shared/state-schema.test.ts:248`: "T-171 r3b: origin/master's real state.json parses, and a missing note_by is null". It asserts that `tasks[0]` of **origin/master's live `state.json`** has no `note_by`. Today's `ob_state` writes record `note_by`, so the merged record falsified it.
+- **Why the PR run was green:** the test reads `origin/master`, not the PR's tree. In the PR run, origin/master was still rev 140. **A test whose input is origin/master's live data is invisible to PR CI**, and ordinary record writes can break it. That is Rule 14 and G-044's class, in a test.
+- **Effect:** every PR's run fails that test until it is fixed, because PR CI tests the merge with master.
+- **Owned by the planner.** The merge was the planner's act on Aaron's order. The planner read the PR run, never the master run that followed, before calling it done. **Shared.md's rule: verify against the thing (master's own run), not a report of it (the PR's run).**
+- **The fix is dispatched to the builder** at hub turn 64, on branch `fix/state-schema-live-note-by`. Keep what r3b protects; stop depending on live data. It is a code PR, so Aaron merges it.
