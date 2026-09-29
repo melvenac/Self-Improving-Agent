@@ -1,44 +1,57 @@
-<!-- generated from .agents/state.json rev 140 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 157 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 146)_
+## planner [sia-planner] _(written session 149)_
 
 ### Pick up here
 
-Read docs/loops/planner-session-146-notes.md, section 'HANDOFF TO THE NEXT PLANNER (session 146 rolls here)', first. T-179 r2 is merged and the record is v3. Verify which of PRs #172-#176 merged. Re-arm one hub listener per developer room. Then send the /bootstrap cli.ts reconciliation to cursor-builder, and follow the Cursor QA driver (record 175) to merge, so the seven waiting QA runs go to the laptop and QA PC.
+Planner session 149. THREE QA RUNS ARE LIVE: QA 216 (record 215, T-195) on the QA PC since 00:31:11Z from 315b245; QA 213 (candidate C r3; ACCEPT closes slice three) then QA 218 (192 r5) on the laptop since 00:34:05Z from 842375f. Read each report and its drive.meta when the queues end (queue.log 'end='). If QA 213 ACCEPTs: shadow-verdict prepare on its E_t BEFORE Aaron merges #195, decide after (C criteria §8 P4). AARON'S STANDING ORDER (this session, verbatim): 'launch QA 216 on the QA PC  one at a time: the laptop queue (QA 213, then QA 218), #201, and #198'. Launches are done; #201 (the record catch-up, including the D-061 developer.md change) and then #198 are HELD by the planner until the queues end, because a master merge mid-run lands in every running driver's ref_violations. #198 also needs its own PR run showing test green. THIS REVISION (153) IS COMMITTED LOCALLY ON docs/session-100-qa99-dispatch AND NOT PUSHED, for the same reason; push it when the queues end, then #201 carries it. Seats, all on PUSH HOLD (clearances withdrawn at hub turns 227/71/58): Forge has T-198 (record 217) done locally (b920b98, mutant bbf4b78); infra has record 219 (T-196 56b06a2, planner.md 6d01c12, T-197 35fc1d8, mutant 20898e5) locally, with two fixes owed (restore the live ~/.cursor/commands/start.md it overwrote; one seat file with Forge's hub-partner-seats.json); builder has T-194 committed locally (7d68bcf, handoff 36dd9c9) but has not posted. Hub listeners die with the session: re-arm one per room (rooms in docs/loops/t196-t197-dispatch.md on master).
 
 ### Watch out
 
-- QA runs ONLY on the laptop and QA PC (Aaron), headless via the Cursor QA driver once merged; never as chats on his desktop.
-- Dry-run every command on its target machine before giving it to Aaron: the QA PC's profile paths contain a space, and bash expands $env: before ssh.
-- Read a candidate's diffed code before ruling, not only its handoff.
-- Developer seats are Cursor (Grok 4.7), one hub room each. The planner must run a listener per room; cursor-builder needs Aaron's nudge to read its room.
-- Nothing was written to the record in session 146 except the v3 migration: the owed ob_state writes are listed in the handoff section.
+- REF-AUDIT TRACE FOR QA 216 (started 00:31:11Z): the PLANNER moved two refs mid-run: refs/heads/docs/qa-213-to-master created at a4205c9, and refs/heads/master 334fee5 -> 842375f (#205's merge, docs-only). Both will appear in QA 216's ref_violations. They are the planner's, not the QA seat's: do not charge QA 216 with them. Anything else in that list needs tracing by SHA.
+- QA drivers record ANY non-qa/ remote ref that moves during a run as ref_violations (drive.ps1 Compare-Refs). That includes master merges and the planner's own docs branches. Do not merge or push while a queue runs, or trace every move by SHA at the time.
+- Every QA seat still runs the OLD driver template until #194 (record 192) merges: a sanctioned push can be refused, and another seat's mid-run push reads as ref_violations. Hold seat pushes during QA runs, or trace them by SHA.
+- D-062 (this session): briefs and QA dispatches reach master BEFORE they are cited, through a docs-only PR the planner merges (four this session: #202, #203, #204, #205). A dispatch cites an origin/master SHA. Role-file changes go in their own PR to Aaron.
+- Every QA dispatch requires an E_t.json beside the report, validated (C criteria §8 P1). QA 216, 213 and 218's dispatches all require one.
+- D-061: developers NEVER run CI. QA dispatches it. Seats echo old briefs ('tcm at most 6'); correct them on sight.
+- Composer (sia-infra) ends its turn on a bare acknowledgement, and this session it also wrote OUTSIDE its worktree (it copied its candidate /start into the live ~/.cursor/commands/start.md). Say 'do it in this turn; no acknowledgement' and 'write nothing outside your worktree'.
+- Cursor seats do not read the hub on their own until T-196 lands: builder and Forge sat on their dispatches for about an hour. Aaron needs a first line per seat (hub-talk --as <name> --session <room> --inbox). Hub names: builder cursor-builder, Forge grok, infra cursor-infra.
+- Presence check (until T-198 lands): GET http://100.124.212.87:4000/a2a/agents/presence?name=<one agent> with X-Agent-Key dev-key. It reads ONLY ?name= (hub T-079). 0 unread with pollingNow false means 'read and idle', not 'working'.
+- qa-launch.md is stale: it says qa-queue.ps1 is 6,330 bytes and unchanged since 2667c6b. It is 15,068 bytes on both QA machines and on master (SHA-1 9FF81DE0...), changed by c6fb300 and f590448. The launch lines themselves still work (both ran this session).
+- A process search whose pattern appears in its own command line matches itself: two 'running driver' PIDs on the QA PC were the planner's own query. List processes by name and print their command lines, never filter on the words you are searching for.
+- QA 203's report for record 198 is on the QA PC ONLY (local 120dc44 on qa/qa-probes-report, plus two mutant branches); it is Aaron's call, still open.
 
 ### Open questions
 
-- Aaron: build Scout's Telegram approval (research 4)? If yes, token option (a) a separate Windows account, or (b) the same account?
-- Aaron: may the A2A-Hub main checkout take master (its D-005)?
+- Aaron: push QA 203's stranded report from the QA PC (his hand), or wait until #194 lets a QA seat push it?
+- Aaron: Telegram approval for QA (D-058) is on HOLD by his choice.
+- Aaron: register T-194's planner hook in sia-planner/.claude/settings.local.json once QA accepts it (his hand, not the planner's).
+- Aaron: his memory file reference_a2a_hub_tcm.md says the hub is cross-machine only, which is wrong for Cursor seats; his to correct.
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #194 loop/qa-driver-cursor-r2 (bbfb724) — QA: in_progress — record 192 r5 (harness-only launch-quoting fix); QA 218 queued on the laptop after 213
+- #195 loop/15-slice-3-candidate-c (5f7c9a0) — QA: in_progress — candidate C r3 (product 20c2dfd); QA 213 RUNNING on the laptop since 00:34Z; ACCEPT closes slice three
+- #198 loop/qa-probes-on-master (1c2fbb1) — QA: accepted — record 198; Aaron ordered it merged after #201; held until the QA queues end and its PR run shows test green
+- #201 docs/session-100-qa99-dispatch — QA: not_required — the record catch-up + D-061 developer.md; Aaron ordered the merge; held until the QA queues end; CI test passed on run 36502407979 at 1d286a3
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `603be51 (record 215, QA 216); 20c2dfd (candidate C r3, QA 213); bbfb724 (192 r5, QA 218)`
 
 **Questions pending for Aaron:** 
-- Build Scout's Telegram approval? Token option (a) or (b)?
-- May the A2A-Hub main checkout take master (D-005)?
+- QA 203's stranded report
+- Register T-194's hook after QA
+- Correct reference_a2a_hub_tcm.md
 
 **Rulings made mid-loop:** 
-- t179-t003-rulings-qa134-qa142 (T-179 r2 ACCEPTED; T-003 r2 brief)
-- t171-bootstrap-rulings-qa144-qa145 (R-BF-17..20)
-- bootstrap-r4-amend-and-queue-guard-brief (R-BF-21)
-- loop-15-slice-3-rulings-21 (A12 REJECTED; R95-R97)
-- t048-t171-rulings-qa157-qa158 plus addenda 1-2
-- importer-leftovers-rulings-qa138 (R5-1..4)
-- cal-a12-results (Composer 2.5 passes QA calibration)
+- D-062: the record reaches seats through origin/master only
+- T-194..T-199 opened (T-160 raised to P0; T-191 not raised)
+- #200 merged on Aaron's word (c933a44); live master run 36494231337 ran test green
+- Record 215's DT-9 returned (it compared ancestry, not content); fixed at 603be51
+- 192 r5: the laptop cmd /c failure is the route (PS 5.1 drops quotes), not the environment
+- A2A-Hub builds the idle-seat wake (hub T-076, D-029/D-030); SIA T-160 tracks it
 
 ## developer [legacy] _(written session 74)_
 
@@ -89,6 +102,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
+_3 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+
 ## Last session
 
-Session 147 — 2026-09-27 — planner [sia-planner] — `4ed2836c-1dd1-43e5-8a06-c829d50548f3` (3 writing session(s) in the record)
+Session 149 — 2026-09-28 — planner [sia-planner] — `c407df9c-3dd7-4273-891b-798b4bd527f4` (5 writing session(s) in the record)
