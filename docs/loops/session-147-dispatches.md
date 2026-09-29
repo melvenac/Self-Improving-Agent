@@ -760,3 +760,17 @@ Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819e
 - **The first two are the planner's:** they happened after QA 216 started.
 - **The last four are infra's.** Infra acted on the planner's push clearance (hub turn 70) before it read the hold (turn 71). Presence showed turn 71 unread at 00:36:10Z.
 - **The planner's own lesson:** the clearance at turn 70 went out while the planner had already decided to launch QA runs that evening. **Clear a push only once the machines are known to be idle for the push's whole window.**
+- **Checked against QA 216's actual audit** (`drive.meta`, which ended 01:16:27Z): `ref_violations` lists exactly the four infra branches and `refs/heads/master`. **`docs/qa-213-to-master` is NOT in it.** The table above claimed one move more than the audit saw. It is the planner's own, and it was written before the audit was read. That branch was pushed and merged in the same minute, so it was probably never seen, or it was created and read inside one window. **Read the audit before writing its trace.**
+
+## QA 216 ruled: record 215 (T-195) REJECTED, and returned as r2
+
+- **QA 216** ran on GPT-5.6 Sol on the QA PC, 00:31-01:16Z. Its report is `origin/qa/t195-report` `73728dd`, with a valid E_t. **The rejection stands.**
+- **Met:** DT-1, 2, 3, 5, 6 and 8, and DT-9a to DT-9d. The content check is sound.
+- **Blocker, a full-suite regression, which the planner verified:**
+  - Candidate run `36503607220` has `test` = failure: 2 tests in `spawn-sites.test.ts` (CA-4b/R16) fail. `GATE_RECORD_RE.exec` is read as a child-process `exec`.
+  - Base run `36503973763` has `test` = success.
+  - Forge ran four named suites, never the full suite.
+- **Major:** DT-7 has no caller, so it is a tool, not a gate.
+- **Major:** DT-4 records overwrite each other at the same timestamp.
+- **Minor:** the DT-7 mutant `4e0cce9` does not typecheck.
+- **Returned as r2 at hub turn 228.** The return requires a local full-suite run. Blocking a planner's raw `hub-talk --say` that bypasses the dispatch path is named as T-194's job, not T-195's.
