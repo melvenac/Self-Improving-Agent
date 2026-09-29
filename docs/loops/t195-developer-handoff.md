@@ -26,6 +26,14 @@ Forge (Grok 4.7), worktree `C:\Users\melve\Worktrees\sia-forge`. Record 215 **r2
 
 **Planner dispatch path:** `node open-brain/build/harness/cli.js dispatch <brief.md> --say "..." --repo <root>` (exit 0 → sent; exit 1 → no send).
 
+## Full-suite failure (this machine, not r2 regression)
+
+| File | Test | First error | At `origin/master` `474b652`? |
+| --- | --- | --- | --- |
+| `tests/harness/qa104-a9-probe2.test.ts` | R72-BEFORE-ABSENT-DANGLING: … 'before' is not a bare 'absent' | `EPERM: operation not permitted, symlink …` | **Yes** — same EPERM in scratch `git archive` run (exit **1**) |
+
+Windows symlink EPERM on this desktop; not introduced by r2. spawn-sites + all T-195 rows green.
+
 ## Red evidence (quoted)
 
 | Row | Red | Failing line / exit |
