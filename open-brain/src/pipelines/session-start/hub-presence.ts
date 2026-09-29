@@ -164,7 +164,8 @@ export async function describeHubPresence(opts: HubPresenceOptions): Promise<Hub
   const roster = await fetchPresenceRoster(hubUrl, fetchFn, timeoutMs);
 
   if (!roster.ok) {
-    if (opts.swallowFetchErrors) {
+    const swallow = opts.swallowFetchErrors ?? true;
+    if (swallow) {
       return { lines: [], sourceRel: seatsFile.rel, charCount: 0 };
     }
     const line = `presence: UNKNOWN (${roster.reason})`;
