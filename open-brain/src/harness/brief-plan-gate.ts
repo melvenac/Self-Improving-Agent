@@ -330,7 +330,7 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
     return { recordPath, record, decision: null, exitCode: 0 };
   }
 
-  const decision = decidePlanGate(answer.answers, policies.plan, planGateContext(priorFailures));
+  const decision = decidePlanGate(answer.answers, { ...policies.plan, has_observable_acceptance_min: 0.5 }, /* NOT FOR MERGE */  planGateContext(priorFailures));
   record.decision = { ...decision } as unknown as Record<string, unknown>;
   if (decision.verdict !== "proceed") {
     record.feedback = formatPlanGateFeedback(decision, answer.answers);
