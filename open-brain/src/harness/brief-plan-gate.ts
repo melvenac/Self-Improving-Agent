@@ -371,24 +371,15 @@ export function checkBriefReachableFromMaster(
     return { ok: false, sha: "", reasons: [`${upstream} could not be resolved`] };
   }
   const masterSha = master.stdout;
-  const reasons: string[] = [];
-  for (const abs of [briefPath, dtPath]) {
-    const rel = relInRepo(repoRoot, abs);
-    if (!existsSync(abs)) {
-      reasons.push(`${rel}: missing on disk`);
-      continue;
-    }
-    const masterBlob = gitTry(repoRoot, ["rev-parse", "--verify", "--quiet", `${upstream}:${rel}`]);
-    if (!masterBlob.ok || !/^[0-9a-f]{40}$/.test(masterBlob.stdout)) {
-      reasons.push(`${rel}: absent on ${upstream} ${masterSha}`);
-      continue;
-    }
-    const diskBlob = gitTry(repoRoot, ["hash-object", abs]);
-    if (!diskBlob.ok || diskBlob.stdout !== masterBlob.stdout) {
-      reasons.push(`${rel}: differs from ${upstream} ${masterSha}`);
-    }
+  const head = headSha(repoRoot);
+  if (!isAncestor(repoRoot, masterSha, head)) {
+    return {
+      ok: false,
+      sha: masterSha,
+      reasons: [`HEAD ${head} is not descended from ${upstream} ${masterSha}`],
+    };
   }
-  return { ok: reasons.length === 0, sha: masterSha, reasons };
+  return { ok: true, sha: masterSha, reasons: [] };
 }
 
 /**
