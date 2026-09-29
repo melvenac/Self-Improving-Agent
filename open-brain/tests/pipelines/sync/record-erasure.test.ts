@@ -92,7 +92,7 @@ describe("record-erasure (T163-2)", () => {
 
   it("does NOT flag a retention drop — the rule is recomputed from the state after the step", () => {
     handOff(dir, 40, "OLD", "old builder handoff");
-    for (let i = 0; i < 10; i++) handOff(dir, 41, `MID${i}`, `other ${i}`, `other-${i}`);
+    for (let i = 0; i < 10; i++) handOff(dir, 41 + i, `MID${i}`, `other ${i}`, `other-${i}`);
     handOff(dir, 56, "NEW", "new builder handoff"); // same seat + checkout, the 11th session since OLD: retention drops OLD
     expect(read(dir).handoffs.some((h: { session_uuid: string | null }) => h.session_uuid === "OLD")).toBe(false);
     const r = scanErasures(dir);

@@ -481,7 +481,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
 
   it("two SEATS in two sessions both keep their handoffs — G-046, now by construction", () => {
     applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "dev", ops: [{ op: "set_handoff", seat: "developer", pick_up: "dev", watch_out: [], open_questions: [] }] });
-    const r = applyStateOps(root, { session: SESSION, expected_revision: 8, session_uuid: "qa", ops: [{ op: "set_handoff", seat: "qa", pick_up: "qa", watch_out: [], open_questions: [] }] });
+    const r = applyStateOps(root, { session: SESSION + 1, expected_revision: 8, session_uuid: "qa", ops: [{ op: "set_handoff", seat: "qa", pick_up: "qa", watch_out: [], open_questions: [] }] });
     expect(r.ok).toBe(true);
     const hs = readState(root).handoffs;
     expect(hs.find((h) => h.session_uuid === "dev")?.pick_up).toBe("dev");
@@ -545,7 +545,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
 
   it("a write with no set_handoff labels its session with the caller's resolved seat, or null", () => {
     applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "u-1", seat: "qa", ops: [{ op: "set_objective", text: "x" }] });
-    applyStateOps(root, { session: SESSION, expected_revision: 8, session_uuid: "u-2", ops: [{ op: "set_objective", text: "y" }] });
+    applyStateOps(root, { session: SESSION + 1, expected_revision: 8, session_uuid: "u-2", ops: [{ op: "set_objective", text: "y" }] });
     const ss = readState(root).sessions;
     expect(ss.find((s) => s.uuid === "u-1")?.seat).toBe("qa");
     expect(ss.find((s) => s.uuid === "u-2")?.seat).toBeNull();
@@ -656,7 +656,7 @@ describe("applyStateOps (Loop 3 writer)", () => {
   });
 
   it("retention never touches verified, gaps or decisions", () => {
-    for (let i = 0; i < 3; i++) applyStateOps(root, { session: 99, expected_revision: 7 + i, session_uuid: `s-${i}`, ops: [{ op: "set_objective", text: `x${i}` }] });
+    for (let i = 0; i < 3; i++) applyStateOps(root, { session: 99 + i, expected_revision: 7 + i, session_uuid: `s-${i}`, ops: [{ op: "set_objective", text: `x${i}` }] });
     const s = readState(root);
     expect(s.verified).toHaveLength(8);
     expect(s.gaps).toHaveLength(5);
