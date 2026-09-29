@@ -4,7 +4,7 @@ Forge (Grok 4.7), worktree `C:\Users\melve\Worktrees\sia-forge`. Record 217. Bas
 
 ## Product branch
 
-`loop/t198-presence` @ **`28d77b6`** (local only — planner clears push).
+`loop/t198-presence` @ **`b920b98`** (local only — planner clears push).
 
 ## Mutant branch (local)
 
