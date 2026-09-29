@@ -17,9 +17,9 @@
 
 | Row | Where | Red then green |
 | --- | --- | --- |
-| HB-1 | `loop/t196-planner-md` `planner.md` tells a fresh planner to arm one listener per Cursor room from `hub-seats.json`, which `/start` already prints in full. No memory read. | The section names the file and the wait line. Live arming is the next planner session. |
+| HB-1 | `loop/t196-planner-md` `planner.md` tells a fresh planner to arm one listener per Cursor room from `hub-partner-seats.json`, which `/start` already prints in full. No memory read. | The section names the file and the wait line. Live arming is the next planner session. |
 | HB-2 | `.cursor/rules/hub-room.mdc` (`alwaysApply`) and the `talk` line in the data file. | Live, once per seat, for the planner to observe. Not run from this seat. |
 | HB-3 | `project-template/.cursor/commands/start.md` step A6b: an unread atlas turn is the assignment and nothing else is proposed. | Live in `sia-forge`. Not run from `sia-infra`. |
-| HB-4 | `open-brain/src/pipelines/sync/hub-seats.ts`, wired in `runSync`. | Green: `npx vitest run tests/pipelines/sync/hub-seats.test.ts` — 4 passed, exit 0. The stranger-seat case and the missing-room case expect `issue`. Mutant `loop/t196-hub-knowledge-mutant` `20898e5` drops the missing-room line. Same command: `expected 'pass' to be 'issue'` at `hub-seats.test.ts:42`, 1 failed, exit 1. |
+| HB-4 | `open-brain/src/pipelines/sync/hub-seats.ts`, wired in `runSync`. It reads `.agents/SYSTEM/hub-partner-seats.json`, the file `ob_start` reads. | Green: `npx vitest run tests/pipelines/sync/hub-seats.test.ts`. The stranger-seat case, the missing-room case, and a file with no `readers` map expect `issue`. The absent-file case expects skip and the line `hub-seats: not checked: no seat file`. |
 
-A project with no `hub-seats.json` is `skip`, not `pass`.
+One file: Forge's T-198 roster is `readers` in `hub-partner-seats.json`. T-196 adds `talk`, `seats`, `hub_url`, and `wait` to that file. `/sync` does not validate a second seat file. A project with no `hub-partner-seats.json` is `skip`, and the printed line is `hub-seats: not checked: no seat file`.

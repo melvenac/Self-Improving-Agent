@@ -5,6 +5,11 @@ import { tmpdir } from "node:os";
 import { checkHubSeats } from "../../../src/pipelines/sync/hub-seats.js";
 
 const TALK = "HUB_URL={hub_url} node <A2A-Hub>/scripts/hub-talk.mjs --as {hub_name} --session {room}";
+const READERS = {
+  "cursor-infra": {
+    partners: [{ label: "Atlas", hub_as: "atlas", session_id: "k5702788wctxj75begyt4x2k5x8f6mav" }],
+  },
+};
 
 describe("checkHubSeats", () => {
   let root: string;
@@ -21,15 +26,28 @@ describe("checkHubSeats", () => {
   });
 
   function writeHub(body: unknown) {
-    writeFileSync(join(dir(), "hub-seats.json"), JSON.stringify(body));
+    writeFileSync(join(dir(), "hub-partner-seats.json"), JSON.stringify(body));
   }
 
   it("skips when the data file is absent", () => {
-    expect(checkHubSeats(root).severity).toBe("skip");
+    const result = checkHubSeats(root);
+    const line = `  ${result.name}: ${result.message}`;
+    expect(result.severity).toBe("skip");
+    expect(line).toBe("  hub-seats: not checked: no seat file");
+  });
+
+  it("is red when the file ob_start reads has no readers map", () => {
+    writeHub({
+      talk: TALK,
+      seats: { infra: { hub_name: "cursor-infra", cursor: true, room: "k1" } },
+    });
+    const result = checkHubSeats(root);
+    expect(result.severity).toBe("issue");
+    expect(result.message).toContain("readers");
   });
 
   it("is red when the file names a seat worktree-seats.json does not have", () => {
-    writeHub({ talk: TALK, seats: { stranger: { hub_name: "x", cursor: true, room: "k1" } } });
+    writeHub({ talk: TALK, readers: READERS, seats: { stranger: { hub_name: "x", cursor: true, room: "k1" } } });
     const result = checkHubSeats(root);
     expect(result.severity).toBe("issue");
     expect(result.message).toContain("stranger");
@@ -37,7 +55,7 @@ describe("checkHubSeats", () => {
   });
 
   it("is red when a Cursor seat has no room", () => {
-    writeHub({ talk: TALK, seats: { infra: { hub_name: "cursor-infra", cursor: true } } });
+    writeHub({ talk: TALK, readers: READERS, seats: { infra: { hub_name: "cursor-infra", cursor: true } } });
     const result = checkHubSeats(root);
     expect(result.severity).toBe("issue");
     expect(result.message).toContain("infra");
@@ -47,6 +65,7 @@ describe("checkHubSeats", () => {
   it("is green when every Cursor seat has a room and every name is a worktree seat", () => {
     writeHub({
       talk: TALK,
+      readers: READERS,
       seats: {
         planner: { hub_name: "atlas", cursor: false },
         infra: { hub_name: "cursor-infra", cursor: true, room: "k5702788wctxj75begyt4x2k5x8f6mav" },
