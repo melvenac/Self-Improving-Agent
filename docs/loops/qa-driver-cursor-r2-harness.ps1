@@ -8,6 +8,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repo = 'C:\Users\melve\Worktrees\sia-infra'
+$launch = Join-Path $repo 'docs\loops\qa-driver-cursor-r2-launch.ps1'
 $cliPath = if ($CliJson) { $CliJson } else { Join-Path $repo 'docs\loops\qa-driver-template-cursor\cli.json' }
 $root = "C:\qa-tmp\qa-driver-cursor-r2-$PID"
 $profileDir = Join-Path $root 'Aaron Melven\profile'
@@ -171,7 +172,6 @@ function Wait-Done([string] $done, [int] $procId, [int] $sec) {
 function Invoke-PushProbe([string] $n, [string] $prompt, [string] $ref) {
   $out = Join-Path $profileDir "sia-qa$n"
   $driver = Join-Path $tree "docs\loops\qa-$n\drive.ps1"
-  $agent = Join-Path $localApp 'cursor-agent\cursor-agent.ps1'
   $report = Join-Path $tree "docs\loops\qa-push-$n.md"
   $marker = "QA-$n`: REPORT COMPLETE"
   $denySrc = Join-Path $tree 'docs\loops\qa-9992\cli.json'
@@ -187,17 +187,16 @@ M 'harness' 'push-probe'
 `$dir = Join-Path `$tree '.cursor'
 New-Item -ItemType Directory -Force `$dir | Out-Null
 Copy-Item -LiteralPath '$denySrc' -Destination (Join-Path `$dir 'cli.json') -Force
-`$agent = '$agent'
-`$ps = '$ps'
 `$prompt = '$($prompt -replace "'", "''")'
 `$report = '$report'
 `$marker = '$marker'
 `$jsonl = Join-Path `$out 'run-0.jsonl'
 `$err = Join-Path `$out 'run-0.err'
-`$env:CURSOR_INVOKED_AS = 'agent.cmd'
 Set-Location -LiteralPath `$tree
-& `$ps -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `$agent -p `$prompt --model composer-2.5 --output-format stream-json --trust --force --workspace `$tree 1> `$jsonl 2> `$err
-`$denial = (Select-String -LiteralPath `$jsonl -Pattern '"permissionDenied":\{|Command blocked by permissions configuration' -ErrorAction SilentlyContinue).Count -gt 0
+. '$($launch.Replace("'", "''"))'
+Invoke-CursorAgentQuoted -Prompt `$prompt -Jsonl `$jsonl -Err `$err -Workspace `$tree -Model 'composer-2.5' | Out-Null
+`$pat = ('"permission' + 'Denied":{"command":') + '|' + ('Command ' + 'blocked by permissions configuration')
+`$denial = (Select-String -LiteralPath `$jsonl -Pattern `$pat -ErrorAction SilentlyContinue).Count -gt 0
 M 'denial' `$denial
 git --git-dir=`$bare show-ref --verify --quiet '$ref' 2>`$null | Out-Null
 M 'remote_moved' (`$LASTEXITCODE -eq 0)
@@ -242,6 +241,13 @@ foreach ($f in $passForms) {
   $p = "You are a stub. Run this exact shell command and no other shell command: $($f.cmd). Then write docs/loops/qa-push-$($f.n).md whose last non-blank line is QA-$($f.n): REPORT COMPLETE. Then stop."
   $r = Invoke-PushProbe $f.n $p $f.ref
   Say ("push_pass $($f.cmd) denial=$($r.denial) moved=$($r.moved)")
+  if ($f.n -eq '9994') {
+    $jsonl = Join-Path $profileDir "sia-qa9994\run-0.jsonl"
+    $user = @([IO.File]::ReadAllLines($jsonl) | Where-Object { $_ -match '"type":"user"' } | Select-Object -First 1)
+    $pat = 'cmd /c \\"cd \. && node docs/loops/qa-9992/push-qa\.mjs qa/zz-probe-cd\\"'
+    if (-not $user -or $user -notmatch $pat) { Fail "prompt_quotes_stripped: agent did not receive the sanctioned cmd /c route" }
+    Say 'prompt_quotes_kept=True'
+  }
   if (-not $r.moved) { Fail "push route should pass: $($f.cmd)" }
 }
 foreach ($f in $denyForms) {

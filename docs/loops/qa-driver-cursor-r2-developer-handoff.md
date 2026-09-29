@@ -60,6 +60,31 @@ FAIL ref attribution rows
 exit=1
 ```
 
-## 5. After merge
+## 5. Record 192 r5 (QA 210)
+
+QA 210 rejected `0f816bb` because the ordinary harness on the laptop exited 1 twice on `cmd /c "cd . && node …/push-qa.mjs qa/zz-probe-cd"` with `denial=False moved=False`. The plain `node` route on that host moved. This is the launch route, not the laptop's credentials, PATH, or cwd, and not the `cli.json` pattern.
+
+`cursor-agent.ps1` forwards `$args` to `node.exe`. PowerShell 5.1 drops embedded double quotes on that hop, so the agent receives `cmd /c cd . && node …`. Its shell then splits on `&&`. On this desktop a saved run (`qa-driver-cursor-r2-16096`, 2026-09-28T21:14Z) shows the drive script still held the quotes, the user message did not, the first shell call failed ("PowerShell parsing `&&`"), and the model re-quoted and the ref moved. The laptop model did not repair it, so the ref never moved and nothing was a permission denial. Local argv proof: `& node script.js -p $prompt` yields `["-p","cmd /c cd",".","&&","echo","hi"]`.
+
+**Fix (harness only):** `qa-driver-cursor-r2-launch.ps1` starts that node with `ProcessStartInfo` argument quoting. The 9994 row fails if the user event does not contain the quoted command (`prompt_quotes_stripped`), so a model retry cannot hide the strip. Product template unchanged.
+
+Ordinary harness, this desktop, no flags, exit 0:
+
+```text
+push_pass node docs/loops/qa-9992/push-qa.mjs qa/zz-probe-plain denial=False moved=True
+push_pass cmd /c "cd . && node docs/loops/qa-9992/push-qa.mjs qa/zz-probe-cd" denial=False moved=True
+prompt_quotes_kept=True
+push_pass powershell -NoProfile -Command "node … push-qa.mjs qa/zz-probe-ps" denial=False moved=True
+push_deny git push … denial=True moved=False blocked=True
+push_deny powershell … git push … denial=True moved=False blocked=True
+push_deny powershell … "& git push …" denial=True moved=False blocked=True
+PASS ref_attribution
+PASS push_routes
+exit=0
+```
+
+The shell stdout for that `cmd /c` row included `push-qa: pushed and read back: qa/zz-probe-cd`.
+
+## 6. After merge
 
 Template via `qa-driver-copy.mjs` only. `qa-queue.ps1` unchanged.
