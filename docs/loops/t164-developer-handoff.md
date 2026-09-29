@@ -30,4 +30,4 @@
 
 | Branch | Defect | SHA |
 | --- | --- | --- |
-| `loop/t164-record-session-number-mut-sc4` | `index.ts` uses `findNextSessionNumber` instead of `nextGreetingSessionNumber` | *(after commit)* |
+| `loop/t164-record-session-number-mut-sc4` | `index.ts` uses `findNextSessionNumber` instead of `nextGreetingSessionNumber` | 956755d |
