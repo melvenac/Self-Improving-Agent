@@ -91,7 +91,7 @@ export function formatPartnerLine(partner: HubPartnerSeat, agents: PresenceAgent
   if (!agent) return `${partner.label}: absent`;
   const room = agent.rooms?.find((r) => r.sessionId === partner.session_id);
   if (!room) return `${partner.label}: absent`;
-  if (room.pollingNow) return `${partner.label}: polling`;
+  if (room.pollingNow) return `${partner.label}: polling (seat has seen this turn)`;
   const unread = room.unread ?? 0;
   if (unread > 0) {
     const age = formatPollAge(room.pollAgeMs ?? 0);
