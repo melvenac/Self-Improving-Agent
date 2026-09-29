@@ -1,0 +1,87 @@
+{
+  "loop": "t198",
+  "candidate_git": {
+    "sha": "231f501f99b217fd65ab496139cb0d11feba8eb1",
+    "branch": "origin/loop/t198-presence",
+    "frozen_at": "2026-09-28T19:24:33-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "CI run 36518581106, test job, Typecheck: npx tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 5000,
+      "detail": "Exact-candidate tcm Typecheck step succeeded."
+    },
+    "unit": {
+      "command": "CI run 36518581106, test job, Test: npm test -- --reporter=verbose",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 170210,
+      "detail": "Exact-candidate tcm test step failed 6 tests: the base's moving-origin/master state-schema assertion plus five new hub-presence fixture-fetch failures."
+    }
+  },
+  "requirements": [
+    {
+      "id": "full-suite-candidate",
+      "status": "unmet",
+      "evidence": "Exact-candidate tcm run 36518581106 and test job failed: 6 failed, 1828 passed, 6 skipped; five hub-presence failures are new.",
+      "severity": "major"
+    },
+    {
+      "id": "full-suite-base",
+      "status": "unmet",
+      "evidence": "Exact-base tcm run 36518584681 and test job failed only the moving-origin/master state-schema.test.ts:248 assertion: 1 failed, 1824 passed, 6 skipped.",
+      "severity": "info"
+    },
+    {
+      "id": "no-new-full-suite-failure",
+      "status": "unmet",
+      "evidence": "Candidate added five failures where fixture fetches returned presence: UNKNOWN (fetch failed); base did not contain those tests or failures.",
+      "severity": "major"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "PR-1",
+      "status": "partial",
+      "evidence": "Fixture test passed pollingNow=true to 'grok: polling', but the unqualified Partner presence/seat wording can be read as proof the seat saw the turn when only a listener process polled."
+    },
+    {
+      "id": "PR-2",
+      "status": "partial",
+      "evidence": "Fixture test passed count and age ('3 unread since 5m'), but polling/not polling is still presented as seat state instead of listener state."
+    },
+    {
+      "id": "PR-3",
+      "status": "partial",
+      "evidence": "Unreachable, HTTP 503 and invalid-JSON tests passed; hanging fixture returned one timeout line in 3011 ms. A 200 body with rooms:{} threw agent.rooms?.find is not a function instead of returning UNKNOWN."
+    },
+    {
+      "id": "PR-4",
+      "status": "met",
+      "evidence": "Focused candidate test returned cursor-builder: absent for a missing partner.",
+      "order": "shown"
+    },
+    {
+      "id": "PR-5",
+      "status": "met",
+      "evidence": "Reapplied exact-candidate mutant b461300 typechecked and made all three selected PR-3 tests fail with missing lines.",
+      "order": "shown"
+    },
+    {
+      "id": "PR-6",
+      "status": "partial",
+      "evidence": "Existing handleStart tests passed 13/13 and are unchanged; presence 9/9 and greeting-size 8/8 passed. sync's composeGreeting measured 48244 without presence; representative block adds 180 to 48424, but greeting-size does not include it."
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "Listener polling is labelled as partner/seat presence, so a planner can infer the seat saw a turn.",
+    "Nested presence fields are not validated; structurally malformed rooms can throw instead of printing UNKNOWN.",
+    "The greeting-size composition omits the new presence block.",
+    "QA semantic mutant 26a4679 falsely claims the seat saw the turn and survives all nine focused tests.",
+    "Five candidate fixture-server tests fail in mandatory tcm CI under egress isolation."
+  ],
+  "notes": "QA 225, scoring record 217. One permitted live GET was read only for field names and matched the fixture shape. T-198 parses T-196 extended blob 344bd46, but merging both add/add files requires preserving the T-196 superset."
+}
