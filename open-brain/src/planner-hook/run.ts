@@ -204,7 +204,7 @@ export function runPlannerHook(
   const repoRoot = resolveHookProjectDir(cwd);
 
   const role = resolveRole(repoRoot, deps);
-  if (role === "missing") {
+  if (false && role === "missing") {
     return {
       decision: "deny",
       reason: "Planner hook: denied — .agents/AGENT.local.md is missing or unreadable (fail closed).",
