@@ -20,7 +20,7 @@ function waiverLines(value: unknown): string[] {
 }
 
 function takeExact(line: string, waivers: string[]): boolean {
-  const at = waivers.indexOf(line);
+  const at = waivers.findIndex((phrase) => line.includes(phrase));
   if (at < 0) return false;
   waivers.splice(at, 1);
   return true;
