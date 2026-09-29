@@ -4,7 +4,7 @@
     "CallDynamicTool",
     "GetDynamicTools",
     "Hub room",
-    "hub-seats.json",
+    "hub-partner-seats.json",
     "hub-talk",
     "unread turn from atlas",
     "--wait"

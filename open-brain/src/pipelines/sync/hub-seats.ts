@@ -3,20 +3,32 @@ import { join } from "node:path";
 import type { CheckResult } from "./types.js";
 
 type HubSeat = { hub_name?: unknown; cursor?: unknown; room?: unknown };
-type HubFile = { talk?: unknown; seats?: Record<string, HubSeat> };
+type Partner = { label?: unknown; hub_as?: unknown; session_id?: unknown };
+type HubFile = {
+  talk?: unknown;
+  seats?: Record<string, HubSeat>;
+  readers?: Record<string, { partners?: unknown }>;
+};
 type SeatFile = { seats?: unknown };
+
+/** The file ob_start reads for partner presence. T-196 extends that file; it does not add a second one. */
+export const HUB_PARTNER_SEATS_REL = ".agents/SYSTEM/hub-partner-seats.json";
 
 function issue(message: string): CheckResult {
   return { name: "hub-seats", severity: "issue", message };
 }
 
+function filled(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 export function checkHubSeats(projectRoot: string): CheckResult {
-  const hubPath = join(projectRoot, ".agents", "SYSTEM", "hub-seats.json");
+  const hubPath = join(projectRoot, HUB_PARTNER_SEATS_REL);
   if (!existsSync(hubPath)) {
     return {
       name: "hub-seats",
       severity: "skip",
-      message: "hub-seats.json not present — seat rooms are not checked (a project without the file is skipped, not passed)",
+      message: "not checked: no seat file",
     };
   }
 
@@ -24,12 +36,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {
   try {
     hub = JSON.parse(readFileSync(hubPath, "utf-8")) as HubFile;
   } catch (error) {
-    return issue(`hub-seats.json did not parse: ${error instanceof Error ? error.message : String(error)}`);
+    return issue(`hub-partner-seats.json did not parse: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   const seatsPath = join(projectRoot, ".agents", "SYSTEM", "worktree-seats.json");
   if (!existsSync(seatsPath)) {
-    return issue("hub-seats.json is present but worktree-seats.json is not, so seat names cannot be checked");
+    return issue("hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked");
   }
   let known: string[];
   try {
@@ -41,10 +53,28 @@ export function checkHubSeats(projectRoot: string): CheckResult {
 
   const talk = typeof hub.talk === "string" ? hub.talk : "";
   if (!talk.includes("hub-talk") || !talk.includes("{hub_name}") || !talk.includes("{room}")) {
-    return issue("hub-seats.json talk line must name hub-talk and the {hub_name} and {room} placeholders");
+    return issue("hub-partner-seats.json talk line must name hub-talk and the {hub_name} and {room} placeholders");
   }
 
   const problems: string[] = [];
+  if (!hub.readers || typeof hub.readers !== "object" || Array.isArray(hub.readers)) {
+    problems.push("no readers map (ob_start reads readers)");
+  } else {
+    for (const [reader, block] of Object.entries(hub.readers)) {
+      const partners = block && typeof block === "object" && Array.isArray(block.partners) ? block.partners : null;
+      if (!partners) {
+        problems.push(`${reader} has no partners list`);
+        continue;
+      }
+      partners.forEach((partner, index) => {
+        const row = partner as Partner;
+        if (!filled(row?.label) || !filled(row?.hub_as) || !filled(row?.session_id)) {
+          problems.push(`${reader} partner ${index} is missing label, hub_as, or session_id`);
+        }
+      });
+    }
+  }
+
   const entries = hub.seats && typeof hub.seats === "object" ? hub.seats : {};
   for (const [seat, row] of Object.entries(entries)) {
     if (!known.includes(seat)) {
@@ -66,6 +96,6 @@ export function checkHubSeats(projectRoot: string): CheckResult {
   return {
     name: "hub-seats",
     severity: "pass",
-    message: `hub seats match worktree-seats.json (${cursorSeats.length} Cursor room(s): ${cursorSeats.join(", ")})`,
+    message: `hub-partner-seats.json matches worktree-seats.json and the readers map ob_start reads (${cursorSeats.length} Cursor room(s): ${cursorSeats.join(", ")})`,
   };
 }

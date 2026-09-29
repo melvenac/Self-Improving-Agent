@@ -104,7 +104,7 @@ the exchange ends — session 61’s close-out travelled by A2A alone and exists
 
 ### Hub room
 
-Read `.agents/SYSTEM/hub-seats.json` for this worktree's seat. Cursor seats run the file's hub-talk line with `--inbox` before the briefing. An unread turn from atlas is the assignment: name it and propose nothing else. After each post, run hub-talk with `--wait --wait-timeout 3500`, and again on exit 2. One wait at a time.
+Read `.agents/SYSTEM/hub-partner-seats.json` for this worktree's seat. Cursor seats run the file's hub-talk line with `--inbox` before the briefing. An unread turn from atlas is the assignment: name it and propose nothing else. After each post, run hub-talk with `--wait --wait-timeout 3500`, and again on exit 2. One wait at a time.
 
 ### 6. Present the briefing
 
