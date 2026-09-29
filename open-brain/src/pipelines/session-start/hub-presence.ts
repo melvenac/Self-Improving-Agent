@@ -7,6 +7,7 @@ export const HUB_PARTNER_SEATS_REL = ".agents/SYSTEM/hub-partner-seats.json";
 
 const DEFAULT_HUB_URL = "http://100.124.212.87:4000";
 const PRESENCE_PATH = "/a2a/agents/presence";
+/** Hub T-079: route reads only ?name=; we fetch the roster once and filter client-side. */
 const FETCH_TIMEOUT_MS = 3_000;
 
 export interface HubPartnerSeat {

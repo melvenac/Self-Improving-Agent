@@ -4,7 +4,7 @@ Forge (Grok 4.7), worktree `C:\Users\melve\Worktrees\sia-forge`. Record 217. Bas
 
 ## Product branch
 
-`loop/t198-presence` @ **`b920b98`** (local only — planner clears push).
+`loop/t198-presence` @ **`c168ef0`** (local only — planner clears push).
 
 ## Mutant branch (local)
 
@@ -15,6 +15,10 @@ Forge (Grok 4.7), worktree `C:\Users\melve\Worktrees\sia-forge`. Record 217. Bas
 ## Interim source
 
 `.agents/SYSTEM/hub-partner-seats.json` (until T-196). Hub room table from `docs/loops/planner-session-146-notes.md`.
+
+## Presence fetch strategy
+
+**Roster fetch + client-side filter** (not `?name=` per seat). One `GET /a2a/agents/presence` with no query params; partner rows matched by `hub_as` and `session_id` in code. The hub route reads only `?name=<one agent>` today (A2A-Hub `src/index.ts:542-548`; hub T-079 will fix multi-filter); a bulk `?agents=` filter is ignored.
 
 ## Red evidence (quoted)
 
