@@ -64,8 +64,8 @@ async function main(): Promise<void> {
   try {
     payload = JSON.parse(raw) as Record<string, unknown>;
   } catch {
-    process.stdout.write(formatDeny("Planner hook: denied — hook payload is not valid JSON (fail closed)."));
-    process.exit(2);
+    // MUTANT PH-7: malformed JSON is treated as allow (must not ship).
+    process.exit(0);
     return;
   }
 
