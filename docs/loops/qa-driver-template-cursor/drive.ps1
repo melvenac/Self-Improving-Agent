@@ -147,7 +147,7 @@ function ConvertTo-WinArg([string] $s) {
   foreach ($ch in $s.ToCharArray()) {
     if ($ch -eq '\') { $slashes++; continue }
     if ($ch -eq '"') {
-      [void]$sb.Append('\', ($slashes * 2 + 1))
+      [void]$sb.Append('\', ($slashes * 2))
       [void]$sb.Append('"')
       $slashes = 0
       continue
