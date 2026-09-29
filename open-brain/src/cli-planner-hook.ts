@@ -85,7 +85,7 @@ async function main(): Promise<void> {
   }
 
   process.stdout.write(formatDeny(result.reason ?? "Planner hook: denied."));
-  process.exit(2);
+  process.exit(0);
 }
 
 main().then(
