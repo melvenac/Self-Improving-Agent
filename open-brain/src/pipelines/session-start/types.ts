@@ -81,6 +81,9 @@ export interface DriftResult {
   fixed: boolean;
 }
 
+/** T-164: record vs local checkout counter. */
+export type SessionNumberSource = "record" | "local";
+
 export interface SessionInfo {
   sessionId: string | null;
   sessionNumber: number;
@@ -89,6 +92,8 @@ export interface SessionInfo {
   reused: boolean;
   /** Set when no log was created and the caller should say why (e.g. no SESSIONS/ dir). */
   skippedReason: string | null;
+  /** Where sessionNumber came from when the log was created (T-164). Omitted when reused or skipped. */
+  sessionNumberSource?: SessionNumberSource;
 }
 
 export interface HealthCheckResult {
