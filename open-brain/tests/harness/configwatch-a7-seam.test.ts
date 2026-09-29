@@ -28,7 +28,8 @@ vi.mock("node:fs", async (importOriginal) => {
   return { ...m, default: { ...m, openSync }, openSync };
 });
 
-import { chmodSync, linkSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, linkSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { symlinkSyncOrSkip } from "./symlink-or-skip.js";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { MachineConfigWatch } from "../../src/harness/configwatch.js";
@@ -97,7 +98,7 @@ describe("R66 — openSync seam", { timeout: 60_000 }, () => {
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     watch.begin("developer");
     unlinkSync(cfg);
-    symlinkSync(victim, cfg);
+    symlinkSyncOrSkip(victim, cfg);
     seam.opened = [];
     try {
       let code = "";
