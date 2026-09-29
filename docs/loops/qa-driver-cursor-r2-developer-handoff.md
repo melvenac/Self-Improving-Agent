@@ -113,7 +113,14 @@ drive_exit=0
 template_quotes_kept=True
 ```
 
-(b) Mutant branch restores `& $ps @agentArgs`. Same script, red on (a). SHA recorded after that run.
+(b) `loop/qa-driver-cursor-r6-mutant-splat` `69e5231bb67990e24371326f9dc9cd904a52e280` restores `& $ps @agentArgs`. Same script, this desktop, exit 1:
+
+```text
+drive=...\qa-driver-template-cursor\drive.ps1
+drive_exit=0
+FAIL template_quotes_stripped
+user_has_quotes=False
+```
 
 (c) `node docs/loops/qa-driver-copy.mjs --harness cursor --model composer-2.5-fast 9991 ...` exit 0. The copy contains `ProcessStartInfo`, `composer-2.5-fast`, `qa-9991`, and `--resume`, and does not contain `& $ps @agentArgs`. PowerShell parsed it (`PARSE_OK`). The throwaway `docs/loops/qa-9991/` was deleted and is not in the commit.
 
