@@ -23,3 +23,5 @@
 | HB-4 | `open-brain/src/pipelines/sync/hub-seats.ts`, wired in `runSync`. It reads `.agents/SYSTEM/hub-partner-seats.json`, the file `ob_start` reads. | Green: `npx vitest run tests/pipelines/sync/hub-seats.test.ts`. The stranger-seat case, the missing-room case, and a file with no `readers` map expect `issue`. The absent-file case expects skip and the line `hub-seats: not checked: no seat file`. |
 
 One file: Forge's T-198 roster is `readers` in `hub-partner-seats.json`. T-196 adds `talk`, `seats`, `hub_url`, and `wait` to that file. `/sync` does not validate a second seat file. A project with no `hub-partner-seats.json` is `skip`, and the printed line is `hub-seats: not checked: no seat file`.
+
+Mutant `loop/t196-hub-knowledge-mutant` `b8fd067` drops the missing-room line. Same command: `expected 'pass' to be 'issue'` at `hub-seats.test.ts:60`, 1 failed | 4 passed, exit 1. On the candidate the same command is 5 passed, exit 0.
