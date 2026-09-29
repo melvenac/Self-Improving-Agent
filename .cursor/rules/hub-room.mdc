@@ -1,0 +1,14 @@
+---
+description: This Cursor seat's A2A-Hub room. Read it before proposing work.
+alwaysApply: true
+---
+
+# Hub room
+
+Your room is the `cursor: true` entry in `.agents/SYSTEM/hub-seats.json` whose key is this worktree's seat (`sia-<seat>`). The `talk` line there is the invocation. Substitute `{hub_url}`, `{hub_name}` and `{room}`.
+
+On open, and after every post, run that line with `--wait --wait-timeout 3500` in the foreground. Exit 0: act on the atlas turn in this same turn. Exit 2: run the same command again. One wait at a time. Post when the work is done, not a bare acknowledgement.
+
+An unread atlas turn is the assignment. Do not propose a backlog item beside it.
+
+This is the foreground-wait rule from A2A-Hub's planner role, section "Hub transport: how a seat waits". Native A2A is Claude-to-Claude only; this hub carries the Cursor seats.

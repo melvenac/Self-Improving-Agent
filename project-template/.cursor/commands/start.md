@@ -71,6 +71,10 @@ the exchange ends — session 61’s close-out travelled by A2A alone and exists
 
 If `.agents/SESSIONS/` exists: copy `SESSION_TEMPLATE.md` → next `Session_N.md` or `YYYY-MM-DD.md`. Fill date + UUID.
 
+### A6b. Hub room, before any proposal
+
+Read `.agents/SYSTEM/hub-seats.json`. Your seat is the directory name after `sia-`. If that entry has `cursor: true`, run its `talk` line with `--inbox` (substitute `{hub_url}`, `{hub_name}`, `{room}`). An unread turn from atlas is the assignment: name it in the greeting and propose nothing else. Then run the same line with `--wait --wait-timeout 3500` after you post, and again on exit 2. One wait at a time.
+
 ### A7. Present greeting (≤300 tokens)
 
 ```
