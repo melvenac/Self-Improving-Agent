@@ -78,7 +78,8 @@ export function listBriefGateRecords(briefPath: string): string[] {
 export function nextBriefGateRecordPath(briefPath: string, at: Date = new Date()): string {
   const dir = dirname(resolve(briefPath));
   const stem = basename(briefPath).replace(/\.md$/i, "");
-  const id = at.toISOString().replace(/:/g, "-");
+  const id = "latest"; // QA-216 MUTANT: every run overwrites the same decision record.
+  void at;
   return join(dir, `${stem}.G_plan.${id}.json`);
 }
 
