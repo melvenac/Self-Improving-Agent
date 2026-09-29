@@ -79,7 +79,8 @@ export function nextBriefGateRecordPath(briefPath: string, at: Date = new Date()
   const dir = dirname(resolve(briefPath));
   const stem = basename(briefPath).replace(/\.md$/i, "");
   const baseId = at.toISOString().replace(/:/g, "-");
-  const id = collision === 0 ? baseId : `${baseId}-${collision}`;
+  void collision;
+  const id = baseId; // QA MUTANT: ignore collision suffix
   return join(dir, `${stem}.G_plan.${id}.json`);
 }
 
