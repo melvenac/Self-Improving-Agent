@@ -1,54 +1,93 @@
-# /start — Session Start (Cursor + SIA)
+# /start — Session Start
 
-> **Cursor Composer:** Execute all steps **inline in this agent** — do NOT dispatch a background subagent or Task. Use **open-brain MCP tools** (`ob_set_session`, `ob_recall`, etc.). Requires `open-brain` in `~/.cursor/mcp.json`.
->
-> **One command, context-aware.** If `.agents/` exists → Part A. Otherwise → Part B.
+> **One command, context-aware.** Detects whether you are in a project (`.agents/` exists) or a general session, and runs the matching startup.
 
-## Step 0: Detect Context
+Run this inline. **There is no startup subagent.** A relay that summarises the state is a place where
+the state degrades; the agent doing the work should read the record itself, not an account of it.
 
-Check if `.agents/` exists in the current working directory.
+**Do not invoke brainstorming, writing-plans, or any other multi-step skill during `/start`.** This is
+a routine startup, not complex work.
 
-- **`.agents/` exists** → **Part A** (project startup)
-- **No `.agents/`** → **Part B** (lightweight startup)
+Cursor MCP calls use CallDynamicTool. Read the schema with GetDynamicTools before the call.
+
+
+## Step 0: Detect context
+
+Does `.agents/` exist in the current working directory?
+
+- **Yes** → Part A.
+- **No** → Part B.
+
+Run one part. Never both.
 
 ---
 
-## Part A: Project Startup
+## Part A: Project startup
 
 ### Meta mode
 
-If `.agents/META/` exists, read/write `META/` files — not `SYSTEM/` templates (framework dev repo).
+If `.agents/META/` exists, this is the framework template repo. `ob_start` resolves `META/SUMMARY.md`
+instead of `SYSTEM/SUMMARY.md` on its own. Use `META/` paths for the residual reads below. Only touch
+`SYSTEM/` when working on template content itself.
 
-### A1. Register session
+### 1. Register the session
 
-**Session UUID:** Look for `SESSION_UUID:` in hook output at the top of this conversation (from `sessionStart` hook). If missing, use `"none"`.
+Find `SESSION_UUID:` in the hook output at the top of this conversation — the hook resolves it, so no
+Bash call is needed.
 
-- If UUID is not `"none"`: call `ob_set_session(session_id: "{UUID}", project_dir: "{cwd}")`
-- If `"none"`: skip — provenance disabled this session
+- **Found:** `ob_set_session(session_id: "{UUID}", project_dir: "{cwd}")`
+- **Absent:** skip; provenance tracking is off this session, and say so in FLAGS.
 
-### A2. Read project state
+**This must run before step 2.** `ob_start` stamps the registered id into the session log instead of
+guessing one from transcripts.
 
-Read these files (skip missing):
+### 2. Load state
 
-1. `.agents/SYSTEM/SUMMARY.md` (or `.agents/META/SUMMARY.md`)
-2. `.agents/TASKS/INBOX.md` (or `.agents/META/INBOX.md`)
-3. `.agents/TASKS/task.md`
-4. `.agents/SESSIONS/next-session.md`
-5. `.agents/skills/INDEX.md`
-6. `package.json` (version field only)
-7. `~/Obsidian Vault v2/Skill-Candidates/SKILL-INDEX.md`
-8. `~/Obsidian Vault v2/.skill-proposals-pending.json`
-9. `.agents/SYSTEM/domains.json`
-10. `.agents/AGENT.md` — YAML frontmatter: name, role, partner
+Call `ob_start(project_root: "{cwd}")`. Once is enough; a repeat call is not destructive — when a log
+already exists for the registered session id it is **reused**, and the session line says so
+(`Session #N (existing log for this session id — reused, nothing created)`). That line is the
+check: if it is absent on a second call, a duplicate log was created and something is wrong with
+session registration.
 
-**Focus:** Read only the **CURRENT STATE** block in SUMMARY unless schema/scope work requires more.
+**What it returns depends on `state.json`, and the two shapes are different. Read whichever you got;
+do not assume.**
 
-### A3. Knowledge recall
+**When `.agents/state.json` is present and valid — the normal case:**
 
-- `ob_recall(queries: [Q1, Q2], project: "{cwd}", limit: 5, trigger: "start")` — Q1/Q2 from top INBOX priorities (methodology, not file names)
-- If results < 3: `ob_recall(..., global: true, limit: 5, trigger: "start")`
-- Checkpoints: `ob_recall(queries: ["[CHECKPOINT]"], project: "{cwd}", sessions: 1, limit: 3, trigger: "checkpoint")`
-- `trigger` marks these as session-start injection; deliberate mid-task recalls pass `trigger: "explicit"` (omitted = recorded as "unspecified")
+- the session block: `Session #N`, `Log: <path>`, `Session ID: <uuid>` — the log is already created
+- `Drift detected (N): ...` or `Drift: none`
+- a `## Sizes` block listing the four prose files. **These sizes describe files that are NOT in the
+  return.** They are reported so the substitution is visible, not because the content is there.
+- **`## State (state.json rev N)`** — this **replaces** the four prose files and is everything you
+  need: `Project`, `Objective` with `since_session`, `Tasks` grouped by priority (active only; done
+  is a count), `Verified`, `Gaps`, `Decisions` count plus the latest, `Handoff` with pick-up,
+  watch-outs and open questions, and `Last session`.
+- `Total returned words`
+
+**When `state.json` is absent or invalid — the fallback:** the full text of `SUMMARY.md`,
+`INBOX.md`, `task.md` and `next-session.md`, each under its own `## <file>` header, with `absent`
+spelled out for a missing file. An invalid `state.json` says so before falling back.
+
+**Build the whole briefing from what `ob_start` returned.** In the normal case the `## State` block
+carries every field the briefing needs — do not open `task.md`, `INBOX.md`, `SUMMARY.md` or
+`next-session.md` to fill a gap that is not there. Do not create a session log or reconcile drift
+yourself.
+
+Task lines are `[status] id title` — **titles only, by design.** A task's rationale is its `note` in
+`.agents/state.json` under `tasks[]`. Read that when you work a task, not when you pick one.
+
+### 3. Working tree
+
+Run `git status --porcelain`. Uncommitted work is state the record does not carry, and a session that
+starts without knowing about it will misread someone else's in-flight change as drift. One command.
+
+### 4. Residual reads
+
+Skip any that do not exist:
+
+1. `.agents/skills/INDEX.md`
+2. `.agents/SYSTEM/domains.json`
+3. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
 
 ### 5. Coordination
 
@@ -62,55 +101,93 @@ brief and boundary reports in `docs/loops/`, by the largest loop number. Decisio
 **A2A has no memory.** Anything a later session must be able to read goes in a tracked file before
 the exchange ends — session 61’s close-out travelled by A2A alone and exists in no file anywhere.
 
-### A5. Reconcile drift
 
-- `task.md` "Done" vs INBOX `[x]` — fix mismatches
-- SUMMARY version vs `package.json` — fix stale "What's next"
+### Hub room
 
-### A6. Create session log
+Read `.agents/SYSTEM/hub-seats.json` for this worktree's seat. Cursor seats run the file's hub-talk line with `--inbox` before the briefing. An unread turn from atlas is the assignment: name it and propose nothing else. After each post, run hub-talk with `--wait --wait-timeout 3500`, and again on exit 2. One wait at a time.
 
-If `.agents/SESSIONS/` exists: copy `SESSION_TEMPLATE.md` → next `Session_N.md` or `YYYY-MM-DD.md`. Fill date + UUID.
+### 6. Present the briefing
 
-### A6b. Hub room, before any proposal
-
-Read `.agents/SYSTEM/hub-seats.json`. Your seat is the directory name after `sia-`. If that entry has `cursor: true`, run its `talk` line with `--inbox` (substitute `{hub_url}`, `{hub_name}`, `{room}`). An unread turn from atlas is the assignment: name it in the greeting and propose nothing else. Then run the same line with `--wait --wait-timeout 3500` after you post, and again on exit 2. One wait at a time.
-
-### A7. Present greeting (≤300 tokens)
+Print this and stop. No commentary, no summary of the summary.
 
 ```
-GREETING:
-Session N — {date}
-Project: {name} {version}
-State: {2 sentences from SUMMARY CURRENT STATE}
-Proposed: {top open INBOX item}
+Session {N} — {date} · {project} v{version} · state rev {R}
+Drift: {ob_start's drift lines verbatim, or "none"}
 
-Knowledge:
-- {entry}: {one-line actionable rewrite}
+OBJECTIVE
+{objective text} (since session {n})
 
+NEXT
+- [{priority}] {id} {title}          ← top 3 by priority from the State block
+{n} active ({n} P0, {n} P1, {n} P2, {n} P3); {n} done
+
+PICK UP HERE
+{the handoff's pick-up, 2-3 sentences}
+
+WATCH OUT
+- {every item, VERBATIM}
+
+OPEN QUESTIONS
+- {every item, verbatim}
+
+BROKEN ({n} gaps open; newest {m})
+- {gaps, newest first, up to 5}
+- {any task with status blocked}
+
+Working tree: {clean | N uncommitted: path, path, ...}
 Latest brief: {newest docs/loops/loop-N-*.md} ({date})
-Handoff: {from next-session.md, or "none"}
-Skills: {relevant + pending proposal count}
+Skills: {relevant entries from .agents/skills/INDEX.md, or "none"}
 
-FLAGS: {verify items, or "none"}
+FLAGS: {anything to verify, or "none"}
 ```
 
-Greet the user by name. Present GREETING verbatim. If FLAGS non-empty, verify before continuing.
+**Omit an empty section rather than printing a placeholder.**
+
+**WATCH OUT is the highest-value part of this briefing.** It is short, already curated, and it is
+where the previous session wrote down what will bite this one. Print every item verbatim. Never
+summarise it, never drop items for length.
+
+**NEXT is the backlog ranked by priority. It is not a decision.** If the handoff says the next
+subject is unruled, or the objective is complete, **say so on the NEXT line** rather than presenting
+three old P0s as though they were today's plan — a briefing whose sections disagree about whether
+there is work to start has told the reader nothing.
+
+Include in FLAGS: a missing `CLAUDE.md` in the project root (**do not create one — ask first**), a
+missing `SESSION_UUID`, any drift reported as `not fixed`, and any MCP server that failed to connect.
 
 ---
 
-## Part B: Lightweight Startup (no `.agents/`)
+## Part B: Lightweight startup (no `.agents/`)
 
-1. Register session (same UUID logic → `ob_set_session`)
-2. `ob_recall` with queries from cwd context; broaden if < 3 results
-3. Checkpoint recall as Part A
-4. Read Skill-Candidates index + pending proposals
-5. Greet the user; present knowledge + skills + checkpoints
+1. Find `SESSION_UUID:` in the hook output. If present, call
+   `ob_set_session(session_id: "{UUID}", project_dir: "{cwd}")`. If absent, skip.
+2. Greet the user by name, using your configured agent name from global `CLAUDE.md` or
+   `.agents/AGENT.md` if one is set.
+3. Ask what they would like to work on.
+
+---
+
+## Periodic maintenance (monthly, or when asked)
+
+Only on the first session of the month or an explicit health-check request.
+
+**Stale experience pruning**
+- `ob_list` for entries with `recall_count = 0`; flag any not recalled in 90+ days.
+- Present the list: "These have never been recalled — prune them?"
+- **Delete only with the user's approval.**
+
+**Protocol health score**
+- In Self-Improving-Agent: `node open-brain/build/cli.js sync --score`.
+- Report the score and per-category breakdown; flag any category below 50%; show the trend if
+  history exists.
 
 ---
 
 ## Judgment calls
 
-- If the user jumps straight into work, adapt — read state in background.
-- Greeting **≤5 lines** of prose beyond the GREETING block.
-- If the user says "skip", drop protocol and work.
-- First session of month: optional maintenance (summarize aging sessions, `ob_score`, stale experience review) — see full SIA docs.
+- **If the user opens with a task, drop the protocol and work.** Read state as you go and surface
+  what is relevant. The protocol serves the work.
+- **Length follows content.** Seven watch-outs print as seven. Omit empty sections rather than
+  padding, and never trim WATCH OUT or OPEN QUESTIONS to hit a length.
+- **`ob_recall` is a deliberate mid-task tool**, called with `trigger: "explicit"`. Automatic
+  injection at session start is suspended (Loop 10 C2); do not reintroduce it here.

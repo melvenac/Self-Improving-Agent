@@ -34,6 +34,7 @@ import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-stat
 import { checkRecordErasure } from "./record-erasure.js";
 import { checkWorktreeLayout } from "./worktree-layout.js";
 import { checkHubSeats } from "./hub-seats.js";
+import { checkCursorStartParity } from "./start-parity.js";
 import { checkCursorHookCompat } from "./cursor-hook-compat.js";
 
 export function runSync(input: SyncOptions): SyncResult {
@@ -102,6 +103,7 @@ export function runSync(input: SyncOptions): SyncResult {
   // T-193: registered worktrees are the main checkout or <project>-<seat>.
   checks.push(checkWorktreeLayout(options.projectRoot));
   checks.push(checkHubSeats(options.projectRoot));
+  checks.push(checkCursorStartParity(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
   // Loop 10 R1: the runtime label travels with the check, because the same code
   // passing in one process and failing in the other IS the signal.

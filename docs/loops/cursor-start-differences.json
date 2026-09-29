@@ -1,0 +1,13 @@
+{
+  "description": "Lines that may differ between project-template/.claude/commands/start.md and project-template/.cursor/commands/start.md. /sync check cursor-start-parity fails on any other difference. These phrases cannot waive a forbidden step (Proposed, hand-editing rendered views, or creating the session log by copying SESSION_TEMPLATE).",
+  "cursor_only": [
+    "CallDynamicTool",
+    "GetDynamicTools",
+    "Hub room",
+    "hub-seats.json",
+    "hub-talk",
+    "unread turn from atlas",
+    "--wait"
+  ],
+  "claude_only": []
+}
