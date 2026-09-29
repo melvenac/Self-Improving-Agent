@@ -182,39 +182,10 @@ function Resolve-CursorNode {
 
 function Invoke-Agent([string] $prompt, [string] $session, [string] $jsonl, [string] $err) {
   $env:CURSOR_INVOKED_AS = 'agent.cmd'
-  $bin = Resolve-CursorNode
-  $pieces = @(
-    (ConvertTo-WinArg $bin.index),
-    (ConvertTo-WinArg '-p'),
-    (ConvertTo-WinArg $prompt),
-    (ConvertTo-WinArg '--model'),
-    (ConvertTo-WinArg $model),
-    (ConvertTo-WinArg '--output-format'),
-    (ConvertTo-WinArg 'stream-json'),
-    (ConvertTo-WinArg '--trust'),
-    (ConvertTo-WinArg '--force'),
-    (ConvertTo-WinArg '--workspace'),
-    (ConvertTo-WinArg $tree)
-  )
-  if ($session) { $pieces += @((ConvertTo-WinArg '--resume'), (ConvertTo-WinArg $session)) }
-  $psi = New-Object System.Diagnostics.ProcessStartInfo
-  $psi.FileName = $bin.node
-  $psi.Arguments = ($pieces -join ' ')
-  $psi.WorkingDirectory = $tree
-  $psi.UseShellExecute = $false
-  $psi.CreateNoWindow = $true
-  $psi.RedirectStandardOutput = $true
-  $psi.RedirectStandardError = $true
-  $proc = [Diagnostics.Process]::Start($psi)
-  $stdoutTask = $proc.StandardOutput.ReadToEndAsync()
-  $stderrTask = $proc.StandardError.ReadToEndAsync()
-  $proc.WaitForExit()
-  [void]$stdoutTask.Wait()
-  [void]$stderrTask.Wait()
-  $utf8 = New-Object System.Text.UTF8Encoding $false
-  [IO.File]::WriteAllText($jsonl, $stdoutTask.Result, $utf8)
-  [IO.File]::WriteAllText($err, $stderrTask.Result, $utf8)
-  return $proc.ExitCode
+  $agentArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', $agent, '-p', $prompt, '--model', $model, '--output-format', 'stream-json', '--trust', '--force', '--workspace', $tree)
+  if ($session) { $agentArgs += @('--resume', $session) }
+  & $ps @agentArgs 1> $jsonl 2> $err
+  return $LASTEXITCODE
 }
 
 Install-Deny
