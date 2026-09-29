@@ -1,0 +1,202 @@
+{
+  "loop": "15-slice-3-c",
+  "candidate_git": {
+    "sha": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410",
+    "branch": "origin/loop/15-slice-3-candidate-c",
+    "frozen_at": "2026-09-28T16:22:47-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "tcm ci.yml run 36503871940: npx tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 9000,
+      "detail": "Typecheck step succeeded at exact product SHA 20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410."
+    },
+    "unit": {
+      "command": "tcm ci.yml run 36503871940: npm test -- --reporter=verbose",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 195430,
+      "detail": "132 test files passed; 1839 tests passed and 6 skipped. Windows job skipped."
+    }
+  },
+  "requirements": [
+    {
+      "id": "QA212-defect",
+      "status": "met",
+      "evidence": "Independent direct-call and CLI probes made 40 malformed-SHA attempts across candidate, criteria, merged, and replaced inputs; all refused before artifact or ledger writes.",
+      "severity": "info"
+    },
+    {
+      "id": "C204-regressions",
+      "status": "met",
+      "evidence": "The candidate's 62 targeted gate, policy, and spawn-site tests passed locally, and the exact candidate full suite passed on tcm.",
+      "severity": "info"
+    },
+    {
+      "id": "base-comparison",
+      "status": "met",
+      "evidence": "Base run 36503866082 and candidate run 36503871940 both succeeded; no candidate failure is new.",
+      "severity": "info"
+    },
+    {
+      "id": "qa-mutants",
+      "status": "met",
+      "evidence": "Two independent qa/c-r3-mut-* branches ran on tcm: criteria-SHA validation mutant 36504362637 failed as expected; ledger-hash mutant 36504366574 survived and exposes a missing assertion.",
+      "severity": "info"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "CC-0",
+      "status": "met",
+      "evidence": "The 11-file candidate diff is limited to the shadow gate, policy/schema, CLI, sync registration, procedure, handoffs, and tests; protected B/runtime files are unchanged and no tests were deleted or skipped.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-1",
+      "status": "partial",
+      "evidence": "Strict derived merge policy and fail-closed thresholds exist, but merge.json does not state that runtime_checks and E_t.acceptance are required verdict inputs."
+    },
+    {
+      "id": "CC-2",
+      "status": "partial",
+      "evidence": "The exported type has exactly three outcomes and tests exercise each, but the required named fixture files are absent."
+    },
+    {
+      "id": "CC-3",
+      "status": "met",
+      "evidence": "Valid matching evidence with green checks and shown plus attributed met rows returns would-merge.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-4",
+      "status": "met",
+      "evidence": "Assertions cover all five would-not-merge causes.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-5",
+      "status": "partial",
+      "evidence": "Causes 5.1 through 5.5 are asserted; the required 5.6 skipped-live-gate fixture is absent."
+    },
+    {
+      "id": "CC-6",
+      "status": "met",
+      "evidence": "The amended per-candidate path and input summaries hold. Function and CLI probes refuse malformed candidate and criteria SHAs before writes; valid full lowercase SHAs still write and read back.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-7",
+      "status": "met",
+      "evidence": "A second prepare is refused and complete artifact bytes stay unchanged.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-8",
+      "status": "met",
+      "evidence": "Prepare-before-decide order, strictly later decided_at, and immutable verdict behavior hold.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-9",
+      "status": "met",
+      "evidence": "A reachable merged SHA produces the required ledger fields and disagreement value; malformed candidate and merged SHA values refuse before writes.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-10",
+      "status": "met",
+      "evidence": "Declined and replaced actions are asserted; missing or malformed replacement SHAs refuse in the function and CLI before writes.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-11",
+      "status": "met",
+      "evidence": "Ledger-only summary derives disagreements, evaluated, undefined_count, and the required disclaimer.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-12",
+      "status": "met",
+      "evidence": "Undefined maps to null and is excluded from evaluated.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-13",
+      "status": "partial",
+      "evidence": "Ledger parsing, missing hashes, committed-line edits, and hash recomputation are implemented, but the check does not enumerate verdict artifacts with no matching ledger line."
+    },
+    {
+      "id": "CC-14",
+      "status": "met",
+      "evidence": "Pending returns undefined before fail-closed acceptance handling.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-15",
+      "status": "met",
+      "evidence": "Declared arrays remain separate and excluded rows do not block.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-16",
+      "status": "met",
+      "evidence": "In-scope not_evaluated blocks and criteria declarations control exclusions.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-17",
+      "status": "partial",
+      "evidence": "Attributed met counts and is named in reasons, but the expressly required all-attributed fixture is absent."
+    },
+    {
+      "id": "CC-18",
+      "status": "met",
+      "evidence": "Shape, loop/SHA matching, criteria failure, human-seat paths, and unreadable evidence behavior are supported.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-19",
+      "status": "met",
+      "evidence": "Prepare is the sole merge point and runLoop remains outside merging.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-20",
+      "status": "met",
+      "evidence": "Help and success paths exist; unknown flags, invalid gate mode, and malformed SHA flags are refused.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-21",
+      "status": "not_evaluated",
+      "evidence": "Cut by criteria section 8 P2 and declared out of scope."
+    },
+    {
+      "id": "CC-22",
+      "status": "met",
+      "evidence": "Exact candidate tcm run 36503871940 succeeded with 132 files, 1839 passed, and 6 skipped; exact base run 36503866082 also succeeded.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-29",
+      "status": "met",
+      "evidence": "Human-seat artifacts use docs/loops/shadow-merge and git check-ignore reports the default paths unignored.",
+      "order": "shown"
+    },
+    {
+      "id": "CC-30",
+      "status": "met",
+      "evidence": "The tracked procedure orders prepare before merge and decide after; unreachable or malformed merged SHAs are refused.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "CC-13.2 still does not enumerate verdict artifacts that lack a matching ledger line.",
+    "The qa/c-r3-mut-ledger mutant survived the full suite: no test isolates a present but incorrect line_hash."
+  ],
+  "notes": "QA 213 verdict: ACCEPT. QA 212's sole blocking CC-6 defect is closed; every row QA 212 scored met remains met. CC-1, CC-2, CC-5, CC-13, and CC-17 retain their previously reported partial limitations."
+}
