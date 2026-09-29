@@ -80,7 +80,7 @@ shapes are stable and worth knowing in advance:
 
 ## Talking to Cursor seats
 
-Native A2A is Claude-to-Claude only. Same-machine Cursor seats are on A2A-Hub. Their hub names, room ids and the `hub-talk` invocation are `.agents/SYSTEM/hub-seats.json`, not memory.
+Native A2A is Claude-to-Claude only. Same-machine Cursor seats are on A2A-Hub. Their hub names, room ids and the `hub-talk` invocation are the `seats` map in `.agents/SYSTEM/hub-partner-seats.json`, not memory. That is the same file `ob_start` reads for partner presence.
 
 `ob_start` prints this file in full. From that print, arm one foreground listener per `cursor: true` room:
 
