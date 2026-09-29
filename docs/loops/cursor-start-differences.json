@@ -1,13 +1,9 @@
 {
-  "description": "Lines that may differ between project-template/.claude/commands/start.md and project-template/.cursor/commands/start.md. /sync check cursor-start-parity fails on any other difference. These phrases cannot waive a forbidden step (Proposed, hand-editing rendered views, or creating the session log by copying SESSION_TEMPLATE).",
+  "description": "Complete lines that may differ between project-template/.claude/commands/start.md and project-template/.cursor/commands/start.md. /sync check cursor-start-parity waives a line only when it equals one entry. A phrase inside a longer line waives nothing, and one entry waives one line. These entries cannot waive a forbidden step (Proposed, hand-editing rendered views, or creating the session log by copying SESSION_TEMPLATE).",
   "cursor_only": [
-    "CallDynamicTool",
-    "GetDynamicTools",
-    "Hub room",
-    "hub-partner-seats.json",
-    "hub-talk",
-    "unread turn from atlas",
-    "--wait"
+    "Cursor MCP calls use CallDynamicTool. Read the schema with GetDynamicTools before the call.",
+    "### Hub room",
+    "Read `.agents/SYSTEM/hub-partner-seats.json` for this worktree's seat. Cursor seats run the file's hub-talk line with `--inbox` before the briefing. An unread turn from atlas is the assignment: name it and propose nothing else. After each post, run hub-talk with `--wait --wait-timeout 3500`, and again on exit 2. One wait at a time."
   ],
   "claude_only": []
 }

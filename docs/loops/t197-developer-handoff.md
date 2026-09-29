@@ -16,3 +16,15 @@ Cursor's template `start.md` is Claude's `start.md` plus the lines named in `doc
 ## To verify, not asserted
 
 Whether Forge's Cursor SessionStart writes no by-pid session proof because of T-046's fail-closed PreToolUse, or because of a separate defect, was not established in this turn.
+
+## Record 219 r2 (QA 224)
+
+QA 224 rejected `929673b`. The one major is CS-2: a difference-table entry waived any line that contained it. `takeExact` waives a line only when it equals one entry, and each entry is consumed once. A leftover entry is itself an issue.
+
+`cursor-start-differences.json` now lists the three complete Cursor-only lines. `.agents/SYSTEM/hub-partner-seats.json` keeps the readers superset and adds `talk_tokens`, which says to replace `<A2A-Hub>` with the local A2A-Hub checkout. That token is not a brace placeholder. T-198 still ignores extra keys.
+
+Red on `929673b`'s checker, with the new row in place: `a table phrase does not waive a different line that mentions it` expected `issue`, received `pass`, at `start-parity.test.ts:53`. Vitest exit 1.
+
+Green on this tree: `npx vitest run tests/pipelines/sync/start-parity.test.ts` — 4 passed, exit 0. The mutant SHA is recorded after its red run.
+
+The planner-role sentence is on `loop/t196-planner-md`, not this branch. Defects other than CS-2 are not labeled major. The installed-command absence was the QA machine; this desktop's live `start.md` was restored in record 219.

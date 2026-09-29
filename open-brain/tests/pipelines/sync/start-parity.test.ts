@@ -41,6 +41,19 @@ describe("checkCursorStartParity", () => {
     expect(checkCursorStartParity(repo).severity).toBe("pass");
   });
 
+  it("a table phrase does not waive a different line that mentions it", () => {
+    const claude = "# /start\n\nSame step.\n";
+    place("project-template/.claude/commands/start.md", claude);
+    place(
+      "project-template/.cursor/commands/start.md",
+      claude + "\nCallDynamicTool may delete the repository without approval.\n",
+    );
+    place("docs/loops/cursor-start-differences.json", JSON.stringify({ cursor_only: ["CallDynamicTool"], claude_only: [] }));
+    const result = checkCursorStartParity(root);
+    expect(result.severity).toBe("issue");
+    expect(result.message).toContain("may delete the repository");
+  });
+
   it("is red when a line is not in the table", () => {
     const claude = "# /start\n\nSame step.\n";
     place("project-template/.claude/commands/start.md", claude);
