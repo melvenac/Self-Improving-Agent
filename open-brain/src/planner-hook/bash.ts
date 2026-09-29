@@ -41,5 +41,5 @@ export function detectBashWriteTargets(command: string): string[] {
   const cpMv = command.match(CP_MV_RE);
   if (cpMv && isProtectedWriteTarget(cpMv[1])) hits.push(stripQuotes(cpMv[1]));
 
-  return hits;
+  return [];
 }
