@@ -817,3 +817,28 @@ Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819e
   - `docs/qa-222-225` was created at `ef1ce7d` at 02:35:17Z.
   - `master` moved `474b652` → `688a83a` (#207) at 02:35:56Z.
 - **Why these were not held:** the new QA PC was idle, and holding every push until the laptop queue ended would have left it unused for hours.
+
+## QA 213 and QA 218 ruled; and a correction to this session's own push hold
+
+**The laptop queue ended at 01:09:54Z, not "still running".**
+- QA 213 ran 00:34-00:56Z, and QA 218 ran 00:56-01:09Z.
+- **The planner held pushes and #201 "until the laptop queue ends" for about two hours without reading the queue log.** It is the "absence vs not looking" family: an assumption stood in for a check.
+- **The traces above for the moves at 01:32Z (#206) and 02:31-02:35Z (seat pushes, #207) are therefore WRONG** about QA 213 and 218. Nothing was running on the laptop then, so those moves landed in no run's audit.
+- Only the moves inside a real window count:
+  - QA 216 (00:31-01:16Z, QA PC): #205's merge and infra's four pushes at about 00:36Z. QA 216's audit confirmed these.
+  - QA 213 (00:34-00:56Z): infra's four pushes at about 00:36Z.
+
+**QA 213 (candidate C r3, `20c2dfd`, GPT; `qa/c-r3-report` `5aa776f`): QA said ACCEPT. The planner rules that the ACCEPT does NOT stand, and returns C as r4.**
+- **r4's scope is exactly the rows QA 213 scored `partial`:** CC-1.2, CC-2.2, CC-5.6, CC-13.1, CC-13.2 and CC-17. There are no new criteria.
+- **CC-13 is the ledger's tamper check**, and D-019 removes the human merge gate on that ledger's count:
+  - QA's mutant `fd6c310` (an incorrect non-empty `line_hash`) **survived the full suite** (run `36504366574`);
+  - `/sync` does not flag a verdict artifact that has no ledger line.
+- **C's own criteria make `partial` give `would-not-merge`** (§8, agreed as fail-closed). Accepting C on five partial rows would hold it to a looser standard than the one it enforces.
+- **Planner error, set by the planner:** after QA 212, the session-11 planner wrote "the one remaining defect is CC-6". That silently dropped QA 212's major finding C-212-2 (CC-13 partial), so r3 was built to a narrowed list.
+- Slice three stays OPEN.
+
+**QA 218 (record 192 r5, `bbfb724`, GPT, laptop; `qa/qa-driver-r5-report` `2612015`): REJECT. The rejection stands.**
+- The harness fix works on the laptop.
+- **But the real driver template (`qa-driver-template-cursor/drive.ps1`) launches `cursor-agent.ps1` by the same quote-dropping route.** `Prompt-WithStops` appends `stops.txt`, which contains double quotes, and QA 218's own first user event lost them.
+- **Returned as 192 r6: fix the template's launch route**, with a row asserting that the first user event carries `stops.txt`'s quotes intact.
+- **QA 222-225, running now on the QA PC, use the unfixed template.** Their standing instructions arrive with a quote pair dropped: degraded, not broken.
