@@ -506,12 +506,6 @@ export interface RunBriefDispatchResult {
  * Planner runs: `harness dispatch <brief.md> --say "..." [--repo <root>]`
  */
 export async function runBriefDispatch(options: RunBriefDispatchOptions): Promise<RunBriefDispatchResult> {
-  const repoRoot = resolve(options.repoRoot ?? process.cwd());
-  const briefAbs = resolve(options.briefPath);
-  const check = checkBriefDispatchReady(briefAbs, repoRoot);
-  if (!check.ok) {
-    return { ok: false, reasons: check.reasons, checked_sha: check.checked_sha };
-  }
   const transport = options.transport ?? {
     send(message: string): void {
       process.stdout.write(`${message}\n`);
