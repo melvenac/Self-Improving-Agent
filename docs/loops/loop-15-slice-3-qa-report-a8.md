@@ -589,9 +589,39 @@ Each item is what I would have asked, and what I did instead. None of them block
 6. **The two real-`claude` rows skip here** (§7.2). If CA-9's pin should be re-measured on this PC, the test needs to
    find `~/.local/bin/claude.exe`, or claude needs an npm-global install. Both are outside QA's authority.
 
-**Dispatch items, each done or written up:** 1 set-up (§0, §1); 2 every row re-run (§2); 3 R69's edges (§3.1); 4 R70's
-own mutant (§3.3); 5 R68 and R71 on both sides (§2, A8-1 to A8-3); 6 regressions (§3.4, §10); 7 one mutant per
-protection, and the developer's four checked (§4); 8 the full suite once, with processes (§5.1); 9 plain `sync` in a
-scratch clone, and `/sync --check` unrun because `gitnexus` is absent (§6). CI: 6 of 8 runs. No `/end` (T-163).
+## 16. Harness continuation (Cursor driver, qa-r6-quote-10152, 2026-09-29)
+
+This section records a headless continuation on the Cursor harness PC, not the original QA PC (D-045). The
+measurements in §§2–6 remain those of the first QA 99 run (Opus 5.5, 2026-09-25); this session bootstrapped a broken
+tree and re-checked what it could without repeating the full matrix.
+
+**Bootstrap.** At session start the tree held only `docs/loops/qa-99/stops.txt` on `master` (`b4bc801`); the dispatch
+file, `push-qa.mjs`, `open-brain` and every other path named in the dispatch were absent, and there was no `origin`
+remote. I added `origin` (`https://github.com/melvenac/Self-Improving-Agent.git`), fetched
+`origin/qa/loop-15-slice-3-a8-report`, and checked out `95727ef` (detached, then `qa/loop-15-slice-3-a8-report`).
+
+**Model and effort (this session).** The harness init line (`%USERPROFILE%\sia-qa99\run-0.jsonl`): `model: "Composer
+2.5"`, session `3ed323fb-fb16-4420-ac25-cdaa0b6f676e`, `permissionMode: "default"`. The driver did **not** launch
+`--model claude-opus-5-5 --effort high`; §0.1 documents the Opus run that produced §§2–6.
+
+**Re-checked this session (win32, git `2.55.0.windows.3`, Node v24.5.0):**
+- The dispatch's per-commit table against `d223d1d..9e2dd5d`: `e644c96` (seam ±22, links +86), `4e849a3` (configwatch
+  ±44), `d448bdd` (±14), `2052251` (±3), `270e601` (±21), `9e2dd5d` (handoff only) — matches row for row.
+- `origin/loop/15-slice-3-candidate-a8` still points at `9e2dd5d`.
+- `open-brain` on the report branch builds (`npm ci`, `npm run build`, exit 0), but its `src/harness/configwatch.ts` is
+  not the candidate blob; probe re-runs need a `git archive` at `9e2dd5d` (dispatch item 1), which this session did
+  not repeat.
+
+**Not re-run this session:** row probes, R69-edge mutants, developer mutants, CI dispatches, the full suite, plain
+`sync`, or `/sync --check`. Reasons: the harness tree arrived without the dispatch or candidate checkout; repeating the
+full matrix would duplicate §§2–6 without changing the verdict.
+
+**Harness-only observation:** `gitnexus` is on this PC (`where.exe gitnexus` → npm global). The original QA PC had none
+(§6, Open item 5). `/sync --check` remains unrun here because this session did not rebuild a scratch clone at A8.
+
+**Dispatch items, each done or written up:** 1 set-up (§0, §1, §16 bootstrap); 2 every row re-run (§2, prior session);
+3 R69's edges (§3.1); 4 R70's own mutant (§3.3); 5 R68 and R71 on both sides (§2, A8-1 to A8-3); 6 regressions (§3.4,
+§10); 7 one mutant per protection, and the developer's four checked (§4); 8 the full suite once, with processes (§5.1);
+9 plain `sync` in a scratch clone, and `/sync --check` unrun (§6, §16). CI: 6 of 8 runs. No `/end` (T-163).
 
 QA-99: REPORT COMPLETE
