@@ -259,7 +259,13 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     }
 
     if (result.session.logPath) {
-      lines.push(`\nSession #${result.session.sessionNumber}${result.session.reused ? " (existing log for this session id — reused, nothing created)" : ""}`);
+      const localNote =
+        result.session.sessionNumberSource === "local"
+          ? " (local — from this checkout's session logs; no valid state.json)"
+          : "";
+      lines.push(
+        `\nSession #${result.session.sessionNumber}${result.session.reused ? " (existing log for this session id — reused, nothing created)" : localNote}`,
+      );
       lines.push(`Log: ${result.session.logPath}`);
       lines.push(sessionIdLine);
     } else if (result.session.skippedReason) {

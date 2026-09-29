@@ -31,6 +31,7 @@ import {
   parseState,
   serializeState,
   compareFirstRev,
+  nextFreeSessionNumber,
   type Seat,
   type State,
   type Task,
@@ -258,6 +259,18 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   const checkout = options.checkout ?? basename(resolve(projectRoot));
   const today = options.today ?? localIsoDate();
   const mine = uuid === null ? undefined : next.sessions.find((s) => s.uuid === uuid);
+  // T-164 SC-2: the greeting number is provisional until this write. A different
+  // uuid cannot register a session n another uuid already holds.
+  if (uuid !== null && !mine) {
+    const taken = next.sessions.find((s) => s.n === options.session && s.uuid !== uuid);
+    if (taken) {
+      const free = nextFreeSessionNumber(next.sessions);
+      return refuse(
+        before,
+        `session number ${options.session} is already recorded for uuid ${taken.uuid}; next free number is ${free}`,
+      );
+    }
+  }
   // R2-D1: the proven uuid's recorded checkout, compared where the write
   // lands. Registration only checks that the id is this server's; it does
   // not compare checkouts. A null checkout (a legacy session record) is

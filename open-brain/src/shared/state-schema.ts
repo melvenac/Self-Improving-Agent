@@ -343,6 +343,14 @@ export function lastSession(state: Pick<State, "sessions">): SessionRecord | nul
   return best;
 }
 
+/** Lowest n not already used in sessions[] (T-164 SC-2 refusal text). */
+export function nextFreeSessionNumber(sessions: readonly Pick<SessionRecord, "n">[]): number {
+  const used = new Set(sessions.map((s) => s.n));
+  let n = 1;
+  while (used.has(n)) n++;
+  return n;
+}
+
 /**
  * The handoffs a reader is shown: the newest per (seat, checkout), which is one
  * per seat INSTANCE, newest by `first_rev`. Older entries stay in the record and
