@@ -283,8 +283,10 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   const noteChanges: string[] = [];
   // Loop 4 R3: an empty batch is a re-render, not a write.
   const renderOnly = options.ops.length === 0;
-  const citedGaps = renderOnly ? new Map<string, string[]>() : citedGapIds(projectRoot);
-  const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes, noteChanges, citedGaps };
+  const gapScan: GapCitationScan = renderOnly
+    ? { ok: true, cited: new Map() }
+    : citedGapIds(projectRoot);
+  const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes, noteChanges, gapScan };
 
   for (let i = 0; i < options.ops.length; i++) {
     const opName = (options.ops[i] as { op?: unknown } | null)?.op;
@@ -428,8 +430,8 @@ interface OpContext {
   removedGaps: string[];
   notes: string[];
   noteChanges: string[];
-  /** Gap ids cited in the tracked tree, excluding the record and its views. */
-  citedGaps: Map<string, string[]>;
+  /** Gap citations in the tracked tree. A failed scan refuses add_gap. */
+  gapScan: GapCitationScan;
 }
 
 /** The authors of a note after `add` is appended by `uuid`: unknown stays unknown. */
@@ -556,12 +558,22 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       return { ok: true, id: v.id };
     }
     case "add_gap": {
+      if (!ctx.gapScan.ok) {
+        return { ok: false, error: `citation scan could not run: ${ctx.gapScan.reason}` };
+      }
       const recordIds = s.gaps.map((g) => g.id);
       let id = op.id;
       if (id === undefined) {
-        const assigned = assignGapId(recordIds, ctx.citedGaps);
+        const assigned = assignGapId(recordIds, ctx.gapScan.cited);
         id = assigned.id;
         for (const skip of assigned.skipped) ctx.notes.push(`add_gap skipped ${skip.id}: ${skip.why}`);
+      } else {
+        const files = ctx.gapScan.cited.get(id);
+        if (files) {
+          const shown = files.slice(0, 3).join(", ");
+          const more = files.length > 3 ? ` +${files.length - 3} more` : "";
+          return { ok: false, error: `gap ${id} is cited in ${files.length} tracked file(s) and cannot be reused — ${shown}${more}` };
+        }
       }
       if (s.gaps.some((g) => g.id === id)) return { ok: false, error: `gap ${id} already exists` };
       s.gaps.push({ id, what: op.what, evidence: op.evidence, recommended_update: op.recommended_update, opened_session: session });
@@ -838,8 +850,29 @@ export function applyRetention(
  * make every live gap cite itself. G-046, G-047 and G-048 are cited only
  * outside the record; a scan that misses them is how a closed id gets reused.
  */
-export function citedGapIds(projectRoot: string): Map<string, string[]> {
-  return citedIds(projectRoot, "G-[0-9]+");
+export type GapCitationScan =
+  | { ok: true; cited: Map<string, string[]> }
+  | { ok: false; reason: string };
+
+/**
+ * Gap ids cited in the tracked tree. `git grep` exit 1 is no match and means
+ * none. Any other failure refuses `add_gap`; it is not an empty citation list.
+ */
+export function citedGapIds(projectRoot: string): GapCitationScan {
+  const grep = gitGrep(projectRoot, [
+    "grep", "--no-color", "-oI", "-E", "G-[0-9]+", "--", ".",
+    ":(exclude).agents/state.json",
+    ":(exclude).agents/TASKS/INBOX.md",
+    ":(exclude).agents/TASKS/task.md",
+    ":(exclude).agents/SESSIONS/next-session.md",
+    ":(exclude).agents/SYSTEM/SUMMARY.md",
+  ]);
+  if (grep.status === 1) return { ok: true, cited: new Map() };
+  if (grep.status !== 0) {
+    const detail = grep.detail ? `: ${grep.detail}` : "";
+    return { ok: false, reason: `git grep exited ${grep.status}${detail}` };
+  }
+  return { ok: true, cited: parseCitedLines(grep.text) };
 }
 
 export function citedTaskIds(projectRoot: string): Map<string, string[]> {
@@ -862,6 +895,10 @@ function citedIds(projectRoot: string, pattern: string): Map<string, string[]> {
     ":(exclude).agents/SYSTEM/SUMMARY.md",
   ]);
   if (out === null) return new Map();
+  return parseCitedLines(out);
+}
+
+function parseCitedLines(out: string): Map<string, string[]> {
   const cited = new Map<string, string[]>();
   for (const line of out.split(/\r?\n/)) {
     // `path:match`, and a Windows path can contain a drive-letter colon, so the
@@ -890,15 +927,26 @@ function citedIds(projectRoot: string, pattern: string): Map<string, string[]> {
  * no protection this write — which is the safe direction.
  */
 function gitOut(cwd: string, args: string[]): string | null {
+  const grep = gitGrep(cwd, args);
+  if (grep.status === 0) return grep.text;
+  if (grep.status === 1) return "";
+  return null;
+}
+
+function gitGrep(cwd: string, args: string[]): { status: number; text: string; detail: string } {
   try {
-    return execFileSync("git", args, {
+    const text = execFileSync("git", args, {
       cwd,
       encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
+      stdio: ["ignore", "pipe", "pipe"],
       maxBuffer: 32 * 1024 * 1024,
     });
-  } catch {
-    return null;
+    return { status: 0, text, detail: "" };
+  } catch (err) {
+    const e = err as { status?: number; stderr?: string; message?: string };
+    const status = typeof e.status === "number" ? e.status : -1;
+    const detail = (e.stderr || e.message || "").split(/\r?\n/).find((line) => line.trim()) ?? "";
+    return { status, text: "", detail };
   }
 }
 

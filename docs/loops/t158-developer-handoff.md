@@ -28,3 +28,11 @@ Tests  1 failed | 1755 passed | 78 skipped (1834)
 ```
 
 The one failure is `tests/harness/qa104-a9-probe2.test.ts` `R72-BEFORE-ABSENT-DANGLING`: `EPERM: operation not permitted, symlink`. The test title says it is not for merge. It does not call the gap writer. A default `npx vitest run` (5s timeout) also timed out nine other tests; those nine passed once the timeout was 60s.
+
+## Record 220 r2 (QA 223)
+
+QA 223 rejected `c9ba1db`. Two holes: an explicit `add_gap` id skipped the citation check, and a failed `git grep` was read as no citations. Exit 1 from `git grep` is still no match. Any other exit refuses `add_gap` and names `git grep exited N`.
+
+`tests/shared/state-writer.test.ts`: `an explicit cited id is refused, and an uncited one is not` and `a citation scan that cannot run refuses add_gap and names the failure`. On this tree, with the rest of that file: 45 passed, exit 0. `tsc --noEmit` exit 0.
+
+QA 223 is the red on `c9ba1db`: explicit `id: "G-046"` applied, and a scan with `git` off PATH assigned G-046. Mutant SHAs are recorded after those red runs.
