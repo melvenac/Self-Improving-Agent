@@ -559,7 +559,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       const recordIds = s.gaps.map((g) => g.id);
       let id = op.id;
       if (id === undefined) {
-        const assigned = assignGapId(recordIds, ctx.citedGaps);
+        const assigned = assignGapId(recordIds, new Map());
         id = assigned.id;
         for (const skip of assigned.skipped) ctx.notes.push(`add_gap skipped ${skip.id}: ${skip.why}`);
       }
