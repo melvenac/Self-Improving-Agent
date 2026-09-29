@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { readProjectState } from "./state-reader.js";
 import { discoverSessionUuid } from "./session-discovery.js";
 import { detectDrift } from "./drift-detector.js";
-import { findExistingSessionLog, createSessionLog, nextGreetingSessionNumber } from "./session-log.js";
+import { findExistingSessionLog, createSessionLog, findNextSessionNumber } from "./session-log.js";
 import { runHealthChecks } from "./health-checks.js";
 import type { SessionInfo, SessionStartOptions, SessionStartResult } from "./types.js";
 
@@ -31,7 +31,7 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
       if (existing) {
         session = { sessionId, ...existing, reused: true, skippedReason: null };
       } else {
-        const { sessionNumber, source } = nextGreetingSessionNumber(options.projectRoot, state.stateJson);
+        const sessionNumber = findNextSessionNumber(options.projectRoot);
         const date = new Date().toISOString().split("T")[0];
         const logPath = createSessionLog(options.projectRoot, sessionNumber, sessionId, date);
         session = {
@@ -40,7 +40,7 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
           logPath,
           reused: false,
           skippedReason: null,
-          sessionNumberSource: source,
+          sessionNumberSource: "local",
         };
       }
     }
