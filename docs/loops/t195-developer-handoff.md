@@ -44,4 +44,4 @@ Forge (Grok 4.7), worktree `C:\Users\melve\Worktrees\sia-forge`. Record 215 **r2
 | `npx vitest run tests/harness/spawn-sites.test.ts` | 0 | **8** passed |
 | `npx vitest run tests/harness/t195-plan-gate.test.ts` | 0 | **16** passed |
 | `npx vitest run tests/harness/policies.test.ts tests/harness/gate.test.ts tests/harness/b2-et.test.ts tests/harness/cli.test.ts` | 0 | **101** passed |
-| `npx vitest run` (full suite, `--maxWorkers=2`) | 0 | **Test Files 121 passed \| 3 failed \| 8 skipped (132)**; **Tests 1764 passed \| 4 failed \| 78 skipped (1846)** — failures are unrelated probes (`qa104-a9-probe2`, `t048-r3`, `state-import-r6`); **spawn-sites + T-195 rows green** |
+| `npx vitest run --maxWorkers=2` (full suite, unpiped) | **1** | **Test Files 1 failed \| 123 passed \| 8 skipped (132)**; **Tests 1 failed \| 1767 passed \| 78 skipped (1846)** |
