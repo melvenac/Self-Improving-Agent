@@ -10,7 +10,7 @@
  */
 
 import { createHash } from "node:crypto";
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, openSync, readFileSync, readdirSync, closeSync, writeSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import type { GateRecord } from "./artifacts.js";
 import { renderGateRecord } from "./artifacts.js";
@@ -75,11 +75,38 @@ export function listBriefGateRecords(briefPath: string): string[] {
 }
 
 /** Allocate the next never-overwritten record path beside the brief. */
-export function nextBriefGateRecordPath(briefPath: string, at: Date = new Date()): string {
+export function nextBriefGateRecordPath(briefPath: string, at: Date = new Date(), collision = 0): string {
   const dir = dirname(resolve(briefPath));
   const stem = basename(briefPath).replace(/\.md$/i, "");
-  const id = at.toISOString().replace(/:/g, "-");
+  const baseId = at.toISOString().replace(/:/g, "-");
+  const id = collision === 0 ? baseId : `${baseId}-${collision}`;
   return join(dir, `${stem}.G_plan.${id}.json`);
+}
+
+/** First unused path for `at`, bumping `-N` when two runs share a timestamp (DT-4). */
+export function allocateBriefGateRecordPath(briefPath: string, at: Date = new Date()): string {
+  for (let collision = 0; collision < 1000; collision += 1) {
+    const path = nextBriefGateRecordPath(briefPath, at, collision);
+    if (!existsSync(path)) return path;
+  }
+  throw new BriefPlanGateError(`cannot allocate gate record beside ${briefPath}`, 1);
+}
+
+function writeGateRecordExclusive(path: string, content: string): void {
+  try {
+    const fd = openSync(path, "wx");
+    try {
+      writeSync(fd, content, undefined, "utf-8");
+    } finally {
+      closeSync(fd);
+    }
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code === "EEXIST") {
+      throw new BriefPlanGateError(`gate record already exists: ${path}`, 1);
+    }
+    throw err;
+  }
 }
 
 export function policyFileHash(dir: string = policiesDir()): string {
@@ -270,7 +297,7 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
   };
   const env = options.env ?? process.env;
   const at = options.at ?? new Date();
-  const recordPath = nextBriefGateRecordPath(briefAbs, at);
+  const recordPath = allocateBriefGateRecordPath(briefAbs, at);
   const requestedAt = at.toISOString();
 
   const record: BriefGateRecord = {
@@ -312,7 +339,7 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
           : (err as Error).message;
     record.runtime_action = "refused — the plan gate could not be reached";
     record.note = message;
-    writeFileSync(recordPath, renderGateRecord(record), "utf-8");
+    writeGateRecordExclusive(recordPath, renderGateRecord(record));
     throw new BriefPlanGateError(message, 1);
   }
 
@@ -326,7 +353,7 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
   if (!answer.consulted || answer.answers === null) {
     record.runtime_action = "no decision — dry run or transport did not consult";
     record.note = answer.note;
-    writeFileSync(recordPath, renderGateRecord(record), "utf-8");
+    writeGateRecordExclusive(recordPath, renderGateRecord(record));
     return { recordPath, record, decision: null, exitCode: 0 };
   }
 
@@ -335,13 +362,13 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
   if (decision.verdict !== "proceed") {
     record.feedback = formatPlanGateFeedback(decision, answer.answers);
     record.runtime_action = `rejected by policy (${decision.verdict})`;
-    writeFileSync(recordPath, renderGateRecord(record), "utf-8");
+    writeGateRecordExclusive(recordPath, renderGateRecord(record));
     const out = record.feedback ?? decision.reasons.join("\n");
     throw new BriefPlanGateError(out, 1);
   }
 
   record.runtime_action = "proceeded — policy found no rule against it";
-  writeFileSync(recordPath, renderGateRecord(record), "utf-8");
+  writeGateRecordExclusive(recordPath, renderGateRecord(record));
   return { recordPath, record, decision, exitCode: 0 };
 }
 
@@ -456,9 +483,47 @@ export function checkBriefDispatchReady(briefPath: string, repoRoot: string = pr
   return { ok: reasons.length === 0, reasons, checked_sha: reach.sha };
 }
 
+/** Stub transport for tests; live hub send is T-194. */
+export interface BriefDispatchTransport {
+  send(message: string): void | Promise<void>;
+}
+
+export interface RunBriefDispatchOptions {
+  briefPath: string;
+  message: string;
+  repoRoot?: string;
+  transport?: BriefDispatchTransport;
+}
+
+export interface RunBriefDispatchResult {
+  ok: boolean;
+  reasons: string[];
+  checked_sha?: string;
+}
+
+/**
+ * DT-7 — planner dispatch path: refuse before any send when dispatch-check would fail.
+ * Planner runs: `harness dispatch <brief.md> --say "..." [--repo <root>]`
+ */
+export async function runBriefDispatch(options: RunBriefDispatchOptions): Promise<RunBriefDispatchResult> {
+  const repoRoot = resolve(options.repoRoot ?? process.cwd());
+  const briefAbs = resolve(options.briefPath);
+  const check = checkBriefDispatchReady(briefAbs, repoRoot);
+  if (!check.ok) {
+    return { ok: false, reasons: check.reasons, checked_sha: check.checked_sha };
+  }
+  const transport = options.transport ?? {
+    send(message: string): void {
+      process.stdout.write(`${message}\n`);
+    },
+  };
+  await transport.send(options.message);
+  return { ok: true, reasons: [] };
+}
+
 /** Parse a gate-record filename; exposed for tests. */
 export function parseBriefGateRecordName(name: string): { stem: string; id: string } | null {
-  const m = GATE_RECORD_RE.exec(name);
+  const m = name.match(GATE_RECORD_RE);
   if (!m) return null;
   return { stem: m[1]!, id: m[2]! };
 }

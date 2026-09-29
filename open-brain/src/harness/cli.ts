@@ -23,6 +23,7 @@ import { stubRoles } from "./roles.js";
 import {
   BriefPlanGateError,
   checkBriefDispatchReady,
+  runBriefDispatch,
   runBriefPlanGate,
   type BriefPlanGateMode,
 } from "./brief-plan-gate.js";
@@ -38,6 +39,7 @@ const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
   harness validate plan <file>
   harness plan-gate <D_t.json> [--brief <brief.md>] [--mode live|dry-run]
   harness dispatch-check <brief.md> [--repo <dir>]
+  harness dispatch <brief.md> --say <message> [--repo <dir>]
   harness help
 
 run options
@@ -289,6 +291,32 @@ function cmdDispatchCheck(argv: readonly string[]): number {
   return 1;
 }
 
+async function cmdDispatch(argv: readonly string[]): Promise<number> {
+  const flags = flagMap(argv);
+  for (const key of flags.keys()) {
+    if (key !== "repo" && key !== "say") throw new UsageError(`unrecognised flag "--${key}"`);
+  }
+  const say = flags.get("say");
+  if (say === undefined || say === true) {
+    throw new UsageError("usage: harness dispatch <brief.md> --say <message> [--repo <dir>]");
+  }
+  const positional = positionalArgs(argv, flags);
+  if (positional.length !== 1) throw new UsageError("usage: harness dispatch <brief.md> --say <message> [--repo <dir>]");
+  const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  const result = await runBriefDispatch({
+    briefPath: resolve(positional[0]!),
+    message: say,
+    repoRoot: repo,
+  });
+  if (result.ok) {
+    process.stdout.write("dispatch: sent\n");
+    return 0;
+  }
+  if (result.checked_sha) process.stderr.write(`dispatch: checked ${result.checked_sha} (origin/master)\n`);
+  for (const reason of result.reasons) process.stderr.write(`dispatch: ${reason}\n`);
+  return 1;
+}
+
 function cmdSchemas(argv: readonly string[]): number {
   let write = false;
   for (const arg of argv) {
@@ -372,6 +400,7 @@ export async function main(argv: readonly string[]): Promise<number> {
     if (sub === "validate") return cmdValidate(rest);
     if (sub === "plan-gate") return await cmdPlanGate(rest);
     if (sub === "dispatch-check") return cmdDispatchCheck(rest);
+    if (sub === "dispatch") return await cmdDispatch(rest);
     throw new UsageError(`unknown subcommand "${sub}"`);
   } catch (err) {
     if (err instanceof UsageError) {

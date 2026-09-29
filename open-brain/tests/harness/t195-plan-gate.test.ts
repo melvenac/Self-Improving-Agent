@@ -16,6 +16,7 @@ import {
   listBriefGateRecords,
   nextBriefGateRecordPath,
   policyFileHash,
+  runBriefDispatch,
   runBriefPlanGate,
 } from "../../src/harness/brief-plan-gate.js";
 import { decidePlanGate, loadPolicies, policiesDir } from "../../src/harness/policies.js";
@@ -182,6 +183,32 @@ describe("T-195 brief plan gate", { timeout: 120_000 }, () => {
       expect(rec.policy_hash).toBe(policyFileHash());
       expect(rec.model_resolved).toBe("jev-1.13.0");
     });
+
+    it("same timestamp allocates a second file instead of overwriting", async () => {
+      const { brief, dt } = writeBriefFixture(dir);
+      const at = new Date("2026-09-29T01:00:00.000Z");
+      const first = await runBriefPlanGate({
+        dtPath: dt,
+        briefPath: brief,
+        repoRoot: dir,
+        mode: "live",
+        transport: new TableTransport(),
+        env: {},
+        at,
+      });
+      const second = await runBriefPlanGate({
+        dtPath: dt,
+        briefPath: brief,
+        repoRoot: dir,
+        mode: "live",
+        transport: new TableTransport(),
+        env: {},
+        at,
+      });
+      expect(first.recordPath).not.toBe(second.recordPath);
+      expect(readFileSync(first.recordPath, "utf-8")).toContain('"sent": true');
+      expect(readFileSync(second.recordPath, "utf-8")).toContain('"sent": true');
+    });
   });
 
   describe("DT-5 feedback on rejection", () => {
@@ -234,7 +261,7 @@ describe("T-195 brief plan gate", { timeout: 120_000 }, () => {
     });
   });
 
-  describe("DT-7 dispatch-check", () => {
+  describe("DT-7 dispatch-check and dispatch", () => {
     it("refuses a brief without D_t or passing live gate record", async () => {
       requireGit();
       const repo = makeRepo("t195-dispatch-");
@@ -280,6 +307,58 @@ describe("T-195 brief plan gate", { timeout: 120_000 }, () => {
       repo.write("docs/loops/sample-brief.D_t.json", "{}\n");
       repo.commitAll("break D_t");
       expect(harness(["dispatch-check", brief, "--repo", repo.root], repo.root).status).toBe(1);
+
+      await repo.cleanup();
+    });
+
+    it("dispatch sends only after dispatch-check passes", async () => {
+      requireGit();
+      const repo = makeRepo("t195-dispatch-send-");
+      const brief = join(repo.root, "docs/loops/sample-brief.md");
+      const dt = briefDtPath(brief);
+      repo.write("docs/loops/sample-brief.md", "# Sample brief\n\nBuild the plan gate.\n");
+      repo.write("docs/loops/sample-brief.D_t.json", `${JSON.stringify(validPlan(), null, 2)}\n`);
+      repo.commitAll("add brief sidecar");
+      rawGit(repo.root, ["update-ref", "refs/remotes/origin/master", repo.sha()]);
+
+      let sent = false;
+      const blocked = await runBriefDispatch({
+        briefPath: brief,
+        message: "must not send",
+        repoRoot: repo.root,
+        transport: { send() { sent = true; } },
+      });
+      expect(blocked.ok).toBe(false);
+      expect(sent).toBe(false);
+
+      const cliBlocked = harness(["dispatch", brief, "--say", "nope", "--repo", repo.root], repo.root);
+      expect(cliBlocked.status).toBe(1);
+      expect(cliBlocked.stdout).not.toContain("dispatch: sent");
+
+      await runBriefPlanGate({
+        dtPath: dt,
+        briefPath: brief,
+        repoRoot: repo.root,
+        mode: "live",
+        transport: new TableTransport(),
+        env: {},
+        at: new Date("2026-09-28T14:00:00.000Z"),
+      });
+
+      sent = false;
+      const allowed = await runBriefDispatch({
+        briefPath: brief,
+        message: "hello hub",
+        repoRoot: repo.root,
+        transport: { send(m) { sent = true; expect(m).toBe("hello hub"); } },
+      });
+      expect(allowed.ok).toBe(true);
+      expect(sent).toBe(true);
+
+      const cliOk = harness(["dispatch", brief, "--say", "hello hub", "--repo", repo.root], repo.root);
+      expect(cliOk.status).toBe(0);
+      expect(cliOk.stdout).toContain("dispatch: sent");
+      expect(cliOk.stdout).toContain("hello hub");
 
       await repo.cleanup();
     });
