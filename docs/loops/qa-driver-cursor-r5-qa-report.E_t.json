@@ -1,0 +1,69 @@
+{
+  "loop": "192-qa-driver-r5",
+  "candidate_git": {
+    "sha": "bbfb7241387d261cf0ffb1cb80ffc1443bd335c7",
+    "branch": "origin/loop/qa-driver-cursor-r2",
+    "frozen_at": "2026-09-29T00:17:27Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "docs/loops/qa-driver-cursor-r2-harness.ps1 (candidate bbfb724; only developer-machine repo path adapted)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 97617,
+      "detail": "The ordinary laptop harness passed ref attribution, all three allowed push forms, and all three deny forms. The 9994 cmd /c row reported denial=False moved=True prompt_quotes_kept=True."
+    },
+    "unit": {
+      "command": "docs/loops/qa-driver-cursor-r2-harness.ps1 (QA quote-drop mutant 9cabe6f; only developer-machine repo path adapted)",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 46874,
+      "detail": "The QA-owned mutant restored the cursor-agent.ps1 forwarding route. It reached the 9994 row, reported denial=False moved=False, and failed with 'prompt_quotes_stripped: agent did not receive the sanctioned cmd /c route'."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "1",
+      "status": "met",
+      "evidence": "An equivalent PowerShell 5.1 $args forwarding wrapper delivered [\"-p\",\"cmd /c cd\",\".\",\"&&\",\"node\",\"docs/loops/qa-9992/push-qa.mjs\",\"qa/zz-probe-cd\"]. The candidate ProcessStartInfo quoting delivered [\"-p\",\"cmd /c \\\"cd . && node docs/loops/qa-9992/push-qa.mjs qa/zz-probe-cd\\\"\"] as one intact prompt argument.",
+      "order": "shown"
+    },
+    {
+      "id": "2",
+      "status": "met",
+      "evidence": "The ordinary bbfb724 harness exited 0 on this laptop. Plain, cmd /c, and PowerShell rows each reported denial=False moved=True; the cmd row also reported prompt_quotes_kept=True. All three deny rows reported denial=True moved=False.",
+      "order": "shown"
+    },
+    {
+      "id": "3",
+      "status": "met",
+      "evidence": "The quote-drop mutant 9cabe6f exited 1 at 'FAIL prompt_quotes_stripped: agent did not receive the sanctioned cmd /c route' after the cmd row reported denial=False moved=False.",
+      "order": "shown"
+    },
+    {
+      "id": "4",
+      "status": "unmet",
+      "evidence": "The unchanged real template driver invokes cursor-agent.ps1 through Windows PowerShell 5.1. QA-218's source stops.txt had two embedded double quotes, but this live driver's recorded first user event had zero: the source fragment '\"Open for the planner\"' arrived as 'Open for the planner'. First and resume prompts both append stops.txt and use this route."
+    },
+    {
+      "id": "5",
+      "status": "met",
+      "evidence": "git diff --exit-code d67c5e7 bbfb724 -- docs/loops/qa-driver-template-cursor/ exited 0 with no output. Completion, at-most-three resume, refusal, and denial handling are byte-unchanged.",
+      "order": "shown"
+    },
+    {
+      "id": "6",
+      "status": "met",
+      "evidence": "QA created and committed qa/qa-driver-r5-mut-quote at 9cabe6f714fd0716bb2240af4e70404bd8e5280e; its harness run was killed by the new 9994 quote-integrity check.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [
+    "The real Cursor QA driver still strips embedded double quotes from prompts on this laptop because the r5 fix is harness-only."
+  ],
+  "gaps": [
+    "The candidate does not provide argv-safe launching in docs/loops/qa-driver-template-cursor/drive.ps1, so a harness pass does not protect real headless QA instructions."
+  ],
+  "notes": "Verdict REJECT. Local Windows PowerShell evidence only; no CI. Host used Windows 10 19045, Windows PowerShell 5.1.19041.6456, Git 2.55.0.windows.3, and Node v24.5.0; Node v22 remains the repository's tested version."
+}
