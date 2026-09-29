@@ -82,7 +82,7 @@ shapes are stable and worth knowing in advance:
 
 Native A2A is Claude-to-Claude only. Same-machine Cursor seats are on A2A-Hub. Their hub names, room ids and the `hub-talk` invocation are the `seats` map in `.agents/SYSTEM/hub-partner-seats.json`, not memory. That is the same file `ob_start` reads for partner presence.
 
-`ob_start` prints this file in full. From that print, arm one foreground listener per `cursor: true` room:
+`ob_start` prints `planner.md` in full. From that print, arm one foreground listener per `cursor: true` room. Replace `<A2A-Hub>` with the local checkout that contains `scripts/hub-talk.mjs`:
 
 `HUB_URL={hub_url} node <A2A-Hub>/scripts/hub-talk.mjs --as atlas --session {room} --wait --wait-timeout 3500`
 
