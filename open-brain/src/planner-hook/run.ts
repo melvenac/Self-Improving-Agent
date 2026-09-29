@@ -102,6 +102,11 @@ function checkFileTool(
     return { decision: "deny", reason: "Planner hook: tool input has no target path — denied (fail closed)." };
   }
 
+  // MUTANT PH-4: wrongly denies the standing docs/loops brief path.
+  if (tool === "Write" && isAllowedDocsLoopsPath(rawPath)) {
+    return { decision: "deny", reason: "mutant ph4: docs/loops write denied" };
+  }
+
   if (isProtectedArtifactPath(rawPath)) {
     return {
       decision: "deny",
@@ -140,11 +145,6 @@ function checkFileTool(
         };
       }
     }
-  }
-
-  if (tool === "Write" && !isAllowedDocsLoopsPath(rawPath) && rawPath.replace(/\\/g, "/").startsWith("docs/")) {
-    // Other docs paths are allowed; only docs/loops/ is the standing brief path in PH-4,
-    // but any docs write outside PH-1 is fine for the planner.
   }
 
   return null;
