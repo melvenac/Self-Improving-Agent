@@ -737,3 +737,26 @@ Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819e
 - **Rev 149: T-194 (P0) and T-195 (P0) opened**, on Aaron's word relayed by a general session (`worktrees-d5`). The quote and both links are in T-194's note and in the brief. **Neither task is part of slice three, and D-036 is not amended.**
 - **Brief:** `docs/loops/t194-t195-dispatch.md`. **Record 214** (T-194, the planner seat hook) goes to `cursor-builder`; **record 215** (T-195, a D_t plus the plan gate for interactive briefs) goes to Forge. If QA 213 rejects C r3, C r4 takes precedence on Forge.
 - **A near-miss, recorded by family:** the planner first read the harness facts (`cli.ts` subcommands, gate exports) from this seat tree, which is 216 commits behind `origin/master`. There they showed no `validate` subcommand at all. The peer's claim that `validate evidence` exists was correct at `8467cb1`. The brief cites master only.
+
+## Planner session 149, later: three QA runs live, and every ref moved during them
+
+**Launches, on Aaron's word in the planner session:** "launch QA 216 on the QA PC  one at a time: the laptop queue (QA 213, then QA 218), #201, and #198". Aaron ran both launch lines himself with `!`, because the host refuses the planner.
+- **QA PC:** `-Queue 216 -Checkout 315b245`. The queue log shows `run.216=started` at 00:31:31Z.
+- **Laptop:** `-Queue 213,218 -Checkout 842375f`. The queue log shows `run.213=started` at 00:34:24Z.
+
+**Held by the planner until the queues end:** #201, then #198. A master merge mid-run lands in every running driver's `ref_violations`.
+
+**Ref-audit trace.** These refs moved after a queue started. **None is the QA seat's act. Do not charge QA 216 or QA 213 with them.**
+
+| Ref | Moved to | By | When |
+| --- | --- | --- | --- |
+| `refs/heads/docs/qa-213-to-master` | created at `a4205c9` | planner | after 00:31Z; before 213 started |
+| `refs/heads/master` | `334fee5` → `842375f` (#205's merge, docs-only) | planner | after 00:31Z; before 213 started |
+| `refs/heads/loop/t196-hub-knowledge` | `d75f152` | infra | about 00:36Z, during 216 and 213 |
+| `refs/heads/loop/t196-hub-knowledge-mutant` | `b8fd067` | infra | about 00:36Z, during 216 and 213 |
+| `refs/heads/loop/t196-planner-md` | `fcea0ad` | infra | about 00:36Z, during 216 and 213 |
+| `refs/heads/loop/t197-cursor-start-parity` | `d98438b` | infra | about 00:36Z, during 216 and 213 |
+
+- **The first two are the planner's:** they happened after QA 216 started.
+- **The last four are infra's.** Infra acted on the planner's push clearance (hub turn 70) before it read the hold (turn 71). Presence showed turn 71 unread at 00:36:10Z.
+- **The planner's own lesson:** the clearance at turn 70 went out while the planner had already decided to launch QA runs that evening. **Clear a push only once the machines are known to be idle for the push's whole window.**
