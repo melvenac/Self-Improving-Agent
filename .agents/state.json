@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 159,
+  "revision": 160,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3185,6 +3185,12 @@
       "title": "The record reaches seats through origin/master only: the planner lands record and brief changes on master (D-032/D-055 docs-only PR) before a dispatch cites them, and a dispatch cites an origin/master SHA; seats never read the planner's branch",
       "date": "2026-09-28",
       "note": "PLANNER RULING, session 149, asked for by Aaron through worktrees-d5 (Aaron -> worktrees-d5 -> Atlas, 'yes' to sending Forge's /start findings). EVIDENCE: Forge's Cursor /start (transcript c4995381, 22:52Z) read master's record at rev 140 while rev 149 (T-194/T-195, record 215, the new handoff) existed only on docs/session-100-qa99-dispatch; it reported #182 unmerged (merged) and C r3 as work to do (built, awaiting QA 213). The same branch also holds the D-061 change to .agents/roles/developer.md (e1351ab), so no developer seat has ever loaded 'developers never run CI' from its role file. WHY MASTER, NOT 'SEATS READ THE PLANNER BRANCH': every greeting already measures its tree against origin/master (the divergence line), so a second source of truth would be invisible to the one instrument that reports staleness; and a seat reading a branch it does not own inherits whatever that branch holds mid-edit. RULE: (1) record and brief changes go to master through a docs-only PR under D-032/D-055, merged by the planner at every dispatch; (2) a dispatch cites the origin/master SHA that holds its brief, never a branch SHA; (3) role-file and other non-allowlisted changes travel in their own PR to Aaron and never ride a record branch, because one unlisted path strands the whole record (as developer.md did); (4) the planner's record branch is short-lived: cut from origin/master per dispatch. ENFORCEMENT ROW: T-195's dispatch gate (DT-7) also refuses a brief not reachable from origin/master (appended to T-195's note). CATCH-UP: this branch's 82 paths include developer.md, so it goes to Aaron as one PR."
+    },
+    {
+      "id": "D-063",
+      "title": "tcm's hub is now A2A-Hub's TEST hub (the live hub will be Aaron's VPS); SIA's traffic on it is protected by a notice protocol: notice, GO or HOLD from the SIA planner (10 minutes of silence means wait), DONE plus presence before and after, no test traffic in SIA rooms, strict auth only after every SIA identity has its own key",
+      "date": "2026-09-29",
+      "note": "SOURCE: Aaron to Relay (A2A-Hub planner) directly, 2026-09-29, relayed verbatim by Relay to Atlas: 'redeploying tcm, changing its auth mode, and tagging releases are a go ahead from me, the only issue is with atlas using it for sia dev work. Atlas uses the tcm hub to communicate with cursor agents. The redeploy only lasts 10 seconds or so, hammer the tcm hub, let's break it, then fix it until it's something we can deploy live on my vps.' A2A-Hub recorded it as its D-031/D-032. PROTOCOL, agreed by the SIA planner (session 149) with amendments: (1) notice by native A2A to the SIA planner, with WHAT, WHEN, HOW LONG and SIA EFFECT; (2) GO or HOLD-until-X; 10 minutes of silence means the act waits; if no SIA planner session is live, Aaron's own word replaces the planner's, and nothing proceeds on silence; (3) a DONE line, one real send, and a PRESENCE check of cursor-builder, grok and cursor-infra before and after. The first redeploy measures whether a seat's hub-talk --wait survives a 10-second outage; until then, every redeploy is treated as possibly deafening all SIA seats (the planner re-arms its own listeners and asks Aaron to nudge the seats); (4) no test traffic in SIA rooms, and no test agent named atlas, grok, cursor-builder or cursor-infra; (5) outages longer than a redeploy only in a window the planner names; (6) no switch to AUTH_MODE=strict until each SIA identity has its own registered key, that key is in T-196's tracked seat file, and each has made one real authenticated send; the flip needs its own GO; (7) load tests only after checking what the rate limits key on, and never from this desktop's IP, which the SIA seats and the planner share."
     }
   ],
   "handoffs": [
@@ -3490,7 +3496,7 @@
     },
     {
       "n": 149,
-      "date": "2026-09-28",
+      "date": "2026-09-29",
       "uuid": "c407df9c-3dd7-4273-891b-798b4bd527f4",
       "seat": "planner",
       "checkout": "sia-planner",
