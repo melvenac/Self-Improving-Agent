@@ -786,3 +786,34 @@ Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819e
   - `refs/heads/docs/t158-t164-dispatch` was created at `f4cecd9` at 01:32:07Z;
   - `refs/heads/master` moved `842375f` → `474b652` (#206, docs-only) at 01:32:42Z.
 - **Why these were not held:** two seats were idle, and D-062 needs the brief on master first. The planner chose a traced move over leaving two seats idle for hours. "Trace them by SHA" is the sanctioned alternative to holding.
+
+## QA 222-225 prepared for the QA PC, and the ref trace for QA 213/218
+
+**The QA PC's drive has been swapped into a new machine.** The planner verified it on 2026-09-29:
+- **Hardware:** an i5-14500 with 20 threads (it was an i5-3570) and 7.7 GB of RAM.
+- **Unchanged:** the hostname DESKTOP-O4EGB1E and the Tailscale address 100.73.250.101.
+- **ssh:** the key works.
+- **Tooling:** the network profile is Private, Windows is licensed, the Defender exclusions are intact, node is v22.23.3 and git is 2.55, and `cursor-agent` is logged in.
+- **State:** the queue script is identical to master's, and the machine is idle.
+
+**QA 222-225 are dispatched on master (#207, `688a83a`), all on GPT:**
+
+| QA | Record | Task | Code SHA |
+| --- | --- | --- | --- |
+| 222 | 215 r2 | T-195 | `647cc74` |
+| 223 | 220 | T-158 | `c9ba1db` |
+| 224 | 219 | T-196 and T-197 combined | `929673b` |
+| 225 | 217 | T-198 | `231f501` |
+
+- **A collision QA 224 and QA 225 must settle:** records 217 and 219 both ADD `.agents/SYSTEM/hub-partner-seats.json`, with different blobs (`8a616f4` and `344bd46`).
+- **Forge's r2 suite result was corrected.** Its first post read "exit 0" with 4 failures, because the exit code came through a piped `tail`. Unpiped, it is exit 1, with one failure: the `qa104` EPERM, which also fails at the base on this desktop.
+
+**Ref-audit trace for QA 213 (and 218 if it had started).** These moves were cleared or made by the planner while the laptop queue ran. None is the QA seat's.
+
+- **Seat pushes cleared by the planner at 02:31:49Z (hub turns 232 and 80):**
+  - Forge: `loop/t195-dt-plan-gate`=`71810ea`, `-mut-threshold`=`c5da6ea`, `-mut-pass-on-error`=`908167a`, `-mut-dispatch-ok`=`b450ad5`, `-mut-dt9-ancestry`=`8d919d7`, `loop/t198-presence`=`231f501`, `-mut-swallow`=`bbf4b78`.
+  - Infra: `loop/t158-gap-tombstone`=`eeec97d`, `-mutant-splice`=`f8c3643`, `-mutant-scan`=`41fe1db`.
+- **The planner's own moves:**
+  - `docs/qa-222-225` was created at `ef1ce7d` at 02:35:17Z.
+  - `master` moved `474b652` → `688a83a` (#207) at 02:35:56Z.
+- **Why these were not held:** the new QA PC was idle, and holding every push until the laptop queue ended would have left it unused for hours.
