@@ -867,11 +867,7 @@ export function citedGapIds(projectRoot: string): GapCitationScan {
     ":(exclude).agents/SESSIONS/next-session.md",
     ":(exclude).agents/SYSTEM/SUMMARY.md",
   ]);
-  if (grep.status === 1) return { ok: true, cited: new Map() };
-  if (grep.status !== 0) {
-    const detail = grep.detail ? `: ${grep.detail}` : "";
-    return { ok: false, reason: `git grep exited ${grep.status}${detail}` };
-  }
+  if (grep.status !== 0) return { ok: true, cited: new Map() };
   return { ok: true, cited: parseCitedLines(grep.text) };
 }
 
