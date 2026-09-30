@@ -5,6 +5,22 @@ were not in any tracked file; they existed only in that session's chat. Planner 
 launch that Aaron could not read. **The commands live here now.** The planner is refused the launch by the host
 classifier, so Aaron runs it by typing these lines, with the leading `!`, into the planner's prompt.
 
+## Who launches (D-069, 2026-09-30)
+
+**The planner launches QA itself, over ssh.** Aaron, verbatim: "launch it yourself from now on, you can ask me but run
+it over ssh from now on". The lines below are what the planner runs; Aaron no longer pastes them. The rules still
+bind:
+- the dispatch is on master first (D-062);
+- launch only on an idle machine;
+- one run at a time per machine;
+- each launch is named in the record.
+
+**If the host classifier denies a launch, the planner tells Aaron and does not route around it.**
+
+Until 2026-10-03 QA runs headless on Opus (D-068), through `C:\Users\Aaron\headless-qa\launch-qa.ps1` on the laptop
+(`-Worktree C:\Users\Aaron\Worktrees\sia-qa -AddDir C:\qa-scratch,C:\qa-tmp -NoFetch -Model opus`), fed a tracked
+prompt copied out with `git show <sha>:<prompt> > C:\qa-tmp\<prompt>`.
+
 ## Which machine (standing, from 2026-09-30; D-065)
 
 - **The laptop (DESKTOP-0GV3HAD) is the default QA machine.**
