@@ -408,7 +408,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
     lines.push(
       ...renderAssignment(
         roles.seat?.role ?? null,
-        readAssignments(projectRoot, recordSource.kind === "master" ? recordSource.upstreamRef : null),
+        readAssignments(projectRoot, null),
       ),
     );
 
