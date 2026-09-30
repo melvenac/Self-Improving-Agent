@@ -11,6 +11,14 @@ on:
       - master
       - "loop/**"
       - "qa/**"
+      # T-207: a mutant ref is never evidence (D-061: QA re-applies mutants locally), and each
+      # push started a tcm run. On 2026-09-30 about 40 of them filled both runners and the TG-2
+      # master fix waited 20 minutes. Order matters: a negated pattern excludes what an earlier
+      # pattern matched. Covers `loop/<task>-mut-<x>` and `qa/<task>-mut-<x>`. It does NOT cover
+      # names such as `-redcheck` or `-mutant`, and it filters pushes only: workflow_dispatch and
+      # a pull request opened from a mutant branch still run.
+      - "!loop/**-mut-*"
+      - "!qa/**-mut-*"
   pull_request:
     # D-055: a PR that changes only docs or the README does not start CI.
     # Anything else, including .agents/state.json, still runs. push and

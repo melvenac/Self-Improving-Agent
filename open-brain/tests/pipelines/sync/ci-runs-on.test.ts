@@ -257,11 +257,11 @@ describe("ci.yml runs-on (T-192)", () => {
     expect(doc.on.pull_request == null || !("paths" in doc.on.pull_request)).toBe(true);
   });
 
-  it("push branches are master, loop/**, and qa/** (T-178)", () => {
+  it("push branches are master, loop/**, qa/**, minus mutant refs (T-178, T-207)", () => {
     const doc = parse(readFileSync(workflowPath, "utf-8")) as {
       on: { push?: { branches?: string[] } };
     };
-    expect(doc.on.push?.branches).toEqual(["master", "loop/**", "qa/**"]);
+    expect(doc.on.push?.branches).toEqual(["master", "loop/**", "qa/**", "!loop/**-mut-*", "!qa/**-mut-*"]);
   });
 
   it("a push has no paths filter, so master is not filtered, and a dispatch has none either (T-178)", () => {
