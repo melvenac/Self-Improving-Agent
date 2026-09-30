@@ -62,7 +62,7 @@ export function resolveRecordSource(projectRoot: string, upstreamRef = "origin/m
     line,
   });
   const unreadable = (cause: string) =>
-    local(cause, `record source: LOCAL (${upstreamRef} unreadable: ${cause}). Rendering this tree's own record, which may be older than master's.`);
+    local(cause, `record source: LOCAL (${upstreamRef} unreadable). Rendering this tree's own record, which may be older than master's.`);
 
   const sha = gitLine(projectRoot, ["rev-parse", "--verify", "--quiet", `${upstreamRef}^{commit}`]);
   if (!sha) {
