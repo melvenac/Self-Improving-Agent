@@ -42,7 +42,7 @@ export interface PlannerHookDeps {
   /** When set, used instead of reading SUMMARY.md from disk (tests). */
   summaryContent?: string | null;
   /** When set, answers gh pr merge allowlist checks (tests). */
-  prChangedPaths?: (prRef: string) => string[] | "fail" | { failed: string };
+  prChangedPaths?: (prRef: string) => string[] | "fail" | { failed: string; pending?: true };
 }
 
 const PH1_RULE = 'planner.md, "Authority"';
@@ -175,6 +175,9 @@ function checkBash(command: string, repoRoot: string, deps: PlannerHookDeps): Pl
     } else {
       const paths = deps.prChangedPaths(ref);
       if (typeof paths === "object" && !Array.isArray(paths)) {
+        // Pass one of runPlannerHookAsync: the list is not fetched yet, so decide nothing and
+        // touch no grant. A docs-only merge must never read or burn a code merge's grant.
+        if (paths.pending) return { decision: "deny", reason: "Planner hook: changed-file list pending" };
         mergeCause = paths.failed;
       } else if (paths === "fail") {
         mergeCause = "the changed-file list could not be read";
@@ -266,9 +269,9 @@ export function runPlannerHook(
 /**
  * The live entry point: `runPlannerHook` is synchronous, and the docs-only merge check needs a
  * network read. Pass one runs the policy with a recorder standing in for the file list; the
- * recorder is only reached when the role is planner and every earlier rule has passed. If pass
- * one already allowed (a matching grant), that stands. Otherwise the list is fetched — no child
- * process — and pass two decides with it. Any failure to fetch is a `{ failed }` list, which
+ * recorder is only reached when the role is planner and every earlier rule has passed, and it
+ * returns before the grant is read, so pass one never consumes one. The list is then fetched —
+ * no child process — and pass two decides with it. Any failure to fetch is a `{ failed }` list, which
  * the policy treats as grant-required and names.
  */
 export async function runPlannerHookAsync(
@@ -283,10 +286,10 @@ export async function runPlannerHookAsync(
     ...deps,
     prChangedPaths: (ref) => {
       pendingRef = ref;
-      return { failed: "the changed-file list was not fetched" };
+      return { failed: "the changed-file list was not fetched", pending: true };
     },
   });
-  if (pendingRef === undefined || first.decision === "allow") return first;
+  if (pendingRef === undefined) return first;
 
   const cwd = typeof payload.cwd === "string" ? payload.cwd : process.cwd();
   const listed = await fetchPrChangedPaths(pendingRef, resolveHookProjectDir(cwd), fetchDeps);

@@ -4,7 +4,7 @@
  * and the path check spawns nothing. Everything else is grant-required and the refusal names why.
  */
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync, readFileSync, readdirSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -109,6 +109,27 @@ describe("row 1 — an all-docs PR passes with no grant", () => {
     expect(r.decision).toBe("allow");
     expect(existsSync(grantPath(repo))).toBe(false);
     expect(calls[0]).toBe("https://api.github.com/repos/melvenac/Self-Improving-Agent/pulls/12");
+  });
+
+  it("a grant present for a CODE merge is neither read nor consumed by a docs-only merge (bytes and mtime unchanged)", async () => {
+    // "*" matches every command, so it matches this docs merge too: the grant a docs merge could burn.
+    const codeGrant = JSON.stringify({ command: "*" });
+    writeFileSync(grantPath(repo), codeGrant, "utf-8");
+    const before = statSync(grantPath(repo)).mtimeMs;
+    await new Promise((r) => setTimeout(r, 30));
+    const r = await runPlannerHookAsync(payload(CMD), {}, { env: TOKEN_ENV, home, fetchImpl: fakeFetch({ files: docs("docs/a.md") }) });
+    expect(r.decision).toBe("allow");
+    expect(existsSync(grantPath(repo))).toBe(true);
+    expect(readFileSync(grantPath(repo), "utf-8")).toBe(codeGrant);
+    expect(statSync(grantPath(repo)).mtimeMs).toBe(before);
+    // ...and the code merge it was written for still passes with it.
+    const code = await runPlannerHookAsync(
+      payload("gh pr merge 99 --merge"),
+      {},
+      { env: TOKEN_ENV, home, fetchImpl: fakeFetch({ files: docs("open-brain/src/x.ts") }) },
+    );
+    expect(code.decision).toBe("allow");
+    expect(existsSync(grantPath(repo))).toBe(false);
   });
 
   it("sends the GH_TOKEN value as the bearer token on every request (the env var is the one read)", async () => {
