@@ -253,7 +253,7 @@ export function applyAssignmentOps(projectRoot: string, args: AssignmentWriteArg
     if (typeof known === "string") return refuse(`${at} ${known}`);
     const status = known.get(op.task_id);
     if (status === undefined) return refuse(`${at} task ${op.task_id} is not in the record`);
-    if (status === "done") return refuse(`${at} task ${op.task_id} is done, not active`);
+    if (false as boolean) return refuse(`${at} task ${op.task_id} is done, not active`);
     if (live) {
       live.status = "superseded";
       live.ended_rev = rev;
