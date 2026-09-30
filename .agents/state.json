@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 178,
+  "revision": 179,
   "project": {
     "name": "self-improving-agent"
   },
@@ -777,7 +777,8 @@
       "opened_session": 100,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 100. MISSED, not deliberate: QA 99's report (section 5.1) recorded Windows Defender at 2h16m of CPU on desktop-o4egb1e, scanning the files the tests create, and said it had not measured the cost to the suite. The planner read that line when ruling and turned it into nothing, until Aaron asked through the home-directory session why exclusions had not been done. Design (sent to Aaron): the suite's about 60 mkdtemp prefixes all sit under os.tmpdir(), and excluding all of %TEMP% would be the broadest hole, so the tests' temp is moved to a dedicated folder instead. Node's os.tmpdir() follows TEMP/TMP. Aaron adds `Add-MpPreference -ExclusionPath 'C:\\qa-tmp','C:\\qa-scratch'` himself: a security setting, his machine. NOT process exclusions for node.exe or git.exe: they would cover npm install scripts from the internet. Risk kept visible: Defender scanning is a classic cause of EBUSY/EPERM on rename and delete, which SIA's product code does (state-writer's temp-then-rename; the importer's round-2 rollback), and users run Defender, hence the one full-suite control run with the default TEMP per candidate. The driver change goes into docs/loops/qa-99/drive.ps1's template via qa-driver-copy.mjs, for the next QA seat after 104 and 106.",
+      "note": "Session 100. MISSED, not deliberate: QA 99's report (section 5.1) recorded Windows Defender at 2h16m of CPU on desktop-o4egb1e, scanning the files the tests create, and said it had not measured the cost to the suite. The planner read that line when ruling and turned it into nothing, until Aaron asked through the home-directory session why exclusions had not been done. Design (sent to Aaron): the suite's about 60 mkdtemp prefixes all sit under os.tmpdir(), and excluding all of %TEMP% would be the broadest hole, so the tests' temp is moved to a dedicated folder instead. Node's os.tmpdir() follows TEMP/TMP. Aaron adds `Add-MpPreference -ExclusionPath 'C:\\qa-tmp','C:\\qa-scratch'` himself: a security setting, his machine. NOT process exclusions for node.exe or git.exe: they would cover npm install scripts from the internet. Risk kept visible: Defender scanning is a classic cause of EBUSY/EPERM on rename and delete, which SIA's product code does (state-writer's temp-then-rename; the importer's round-2 rollback), and users run Defender, hence the one full-suite control run with the default TEMP per candidate. The driver change goes into docs/loops/qa-99/drive.ps1's template via qa-driver-copy.mjs, for the next QA seat after 104 and 106. — MACHINE ROLES CHANGED, planner session 150 (D-065): the laptop is the default QA machine; the QA PC runs developer seats and is used for SIA QA only when no developer suite is running there. The TEMP/scratch rules here still apply on whichever machine runs QA. A 'quiet' lease (Clark's proposal) waits on Aaron.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -3265,6 +3266,12 @@
       "title": "The Cursor CLI default model stays composer-2.5; the brief's quality is the lever",
       "date": "2026-09-30",
       "note": "Aaron, verbatim: 'It does fine if the brief is well written.' Relayed Aaron -> worktrees-d5 (Clark) -> Atlas, planner session 150, about 05:50Z; passed to Relay (a2a-planner-9d) with the chain, and Relay confirmed the file already reads composer-2.5. Closes the cli-config.json question from Rivet's spike. For the planner: briefs to Composer seats are written out in full (scope, rows, mutants, fail-closed cases), never left to a task title."
+    },
+    {
+      "id": "D-065",
+      "title": "Machine roles: the laptop is the default SIA QA machine; the QA PC runs developer seats first and SIA QA only when no developer suite is running; the desktop runs planners and Clark",
+      "date": "2026-09-30",
+      "note": "Aaron's direction, relayed Aaron -> worktrees-d5 (Clark) -> Atlas, planner session 150. Aaron to the planner directly: 'let's push both qa work to the laptop' and 'we have a new agent on the qa machine working on a dashboard project, that machine won't be quiet'. The pilot is Chisel (developer of melvenac/agent-dashboard, Claude Code, C:\\Users\\Aaron Melven\\Worktrees\\dash-chisel), under the same 'Aaron Melven' profile as the queue. Chisel is told never to touch sia-qa-queue, qa-queue.ps1, C:\\qa-scratch, C:\\qa-tmp or the QA checkout; it has no hub key and no CI. Its load is about 60 small node:test tests. Forge and the builder may move to the QA PC later, on Aaron's call. Proposed by Clark, NOT approved: a lease file on the QA PC that a developer suite takes and qa-queue.ps1 checks before starting. docs/loops/qa-launch.md carries the machine roles. Consequence: SIA QA is serial on one machine (the laptop) until the lease exists."
     }
   ],
   "handoffs": [
