@@ -405,12 +405,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
     // T-201: what this seat is assigned, from the tracked sidecar (origin/master's when this tree
     // is behind it, like the record above). Developer and QA seats always get the block; another
     // seat gets one line naming the omission.
-    lines.push(
-      ...renderAssignment(
-        roles.seat?.role ?? null,
-        readAssignments(projectRoot, recordSource.kind === "master" ? recordSource.upstreamRef : null),
-      ),
-    );
+    // dropped
 
     // The role knowledge itself, last: it is reference material the seat reads
     // once and refers back to, not a briefing it reads top to bottom.
