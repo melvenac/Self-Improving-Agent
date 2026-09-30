@@ -60,13 +60,13 @@ After Aaron registers the snippet in the planner checkout: one denied `Edit` to 
 ## r2 (2026-09-30): docs-only `gh pr merge` needs no grant
 
 **Authority:** Aaron, 2026-09-30, relayed verbatim by the planner: *"docs only merge have my go-ahead"*. D-032/D-055 stand with no grant file. r1 (`f15f2cf`) had made `gh pr merge` grant-only, which contradicted it.
-**Branch:** `loop/t194-planner-hook`, built on `f15f2cf`. **Product:** `0d12a4f1`. **Local only, not pushed (D-061); no CI.**
+**Branch:** `loop/t194-planner-hook`, built on `f15f2cf`. **Product:** `699789e1` (r2b; `0d12a4f1` was r2). **No CI.**
 
 ### What r2 does
 
 - `open-brain/src/planner-hook/prfiles.ts` (new): reads the PR's changed files with `fetch` against `api.github.com`, no child process. Repo comes from a PR URL, else from `origin` in the git config file (worktree `commondir` followed). It pages `/pulls/N/files?per_page=100` and checks the count against the PR's `changed_files`.
 - `run.ts`: `runPlannerHookAsync` is the live entry (the CLI calls it). `runPlannerHook` stays synchronous, so every r1 row is untouched. Pass one runs the policy with a recorder standing in for the list; if it reaches the merge check and did not already allow (a matching grant), the list is fetched and pass two decides.
-- A docs-only PR is allowed with no grant. **Anything else falls through to the grant, and the refusal names the cause:** `unlisted path X`, `no GitHub token`, `HTTP 404`, `API unreachable (<error>)`, `file list is incomplete (n of m)`, `could not read a PR number`, `origin is not a github.com remote`, `changed_files` unreadable or empty, a rename with no `previous_filename`.
+- A docs-only PR is allowed with no grant, and **never reads or consumes one** (pass one returns before the grant; a grant is per-occasion authority for a code merge). **Anything else falls through to the grant, and the refusal names the cause:** `unlisted path X`, `no GitHub token`, `HTTP 404`, `API unreachable (<error>)`, `file list is incomplete (n of m)`, `could not read a PR number`, `origin is not a github.com remote`, `changed_files` unreadable or empty, a rename with no `previous_filename`.
 - A rename counts BOTH paths: moving a file out of `src/` into `docs/` touches `src/`.
 
 ### The limit, stated plainly
@@ -77,22 +77,23 @@ After Aaron registers the snippet in the planner checkout: one denied `Edit` to 
 
 ### Rows (tests/planner-hook/docs-merge.test.ts, 24 tests)
 
-| Row | Test(s) | Mutant (local branch) | Red |
-| --- | --- | --- | --- |
-| 1 all-docs passes, no grant | allowlist paths / paging / PR-URL repo / bearer = `GH_TOKEN` value | `m4-unlisted-allows` `cb93ed7d` | 2 failed |
-| 2 one unlisted path denied | unlisted named; rename-out named; rename with no previous_filename; grant still allows | `m2-drop-previous-filename` `f990886a` | 1 failed (rename-out) |
-| 3 unreadable list denied, cause named | network error, hang (timeout), 404, no token (keyring shape), truncated list, empty, non-list, bad ref, non-github origin | `m1-list-unreadable-allows` `df67011d` | 10 failed |
-| 3 (completeness) | truncated list | `m3-drop-completeness-guard` `8be340eb` | 1 failed (truncated) |
-| no spawn (CA-4b/R16) | AST walk of `src/planner-hook/*` + CLI for any `child_process` import, validated against four planted forms and a comment-only negative | n/a | n/a |
+| Row | Test(s) | Mutant branch | SHA | Red |
+| --- | --- | --- | --- | --- |
+| 1 all-docs passes, no grant | allowlist paths / paging / PR-URL repo / bearer = `GH_TOKEN` value | `loop/t194-r2-mut-m4` (unlisted allowed) | `16c9f340` | 4 failed |
+| 1 a docs merge burns no grant (Atlas ruling 1) | `"*"` grant present + all-docs PR: allow, grant bytes and mtime unchanged, the code merge still uses it | `loop/t194-r2-mut-m5` (docs path consumes the grant) | `2502592e` | 1 failed (this row); the row is also red at `0d12a4f1`, the product before r2b |
+| 2 one unlisted path denied | unlisted named; rename-out named; rename with no previous_filename; grant still allows | `loop/t194-r2-mut-m2` (drops previous_filename) | `4dc211a5` | 1 failed (rename-out) |
+| 3 unreadable list denied, cause named | network error, hang (timeout), 404, no token (keyring shape), truncated list, empty, non-list, bad ref, non-github origin | `loop/t194-r2-mut-m1` (unreadable list allows) | `c7376860` | 10 failed |
+| 3 completeness | truncated list | `loop/t194-r2-mut-m3` (drops the count guard) | `f212d277` | 1 failed (truncated) |
+| no spawn (CA-4b/R16) | AST walk of `src/planner-hook/*` + CLI for any `child_process` import, validated against four planted forms and a comment-only negative | n/a | n/a | n/a |
 
-Each mutant: branch `mutant/t194-r2-<name>`, one edit to the product, edit asserted as landed before the run, `tsc --noEmit` exit 0, then the test file exit 1 on the named row. **Never merge them.** Note: spawn-sites' own check (`tests/harness/spawn-sites.test.ts`) walks `src/harness/` only, so it never covered `src/planner-hook/`; the AST row above is what covers it.
+Each mutant: branch `mutant/t194-r2-<name>`, one edit to the product, edit asserted as landed before the run, `tsc --noEmit` exit 0, then the test file exit 1 on the named row. **Never merge them.** (The first set lived on `mutant/*`, outside the D-038 push prefixes, and was built on `0d12a4f1`; it was replaced by this set, rebuilt on `699789e1` under `loop/`.) Note: spawn-sites' own check (`tests/harness/spawn-sites.test.ts`) walks `src/harness/` only, so it never covered `src/planner-hook/`; the AST row above is what covers it.
 
-### Local proof (tree `0d12a4f1`, `open-brain/`)
+### Local proof (full-suite row: tree `0d12a4f1`, before r2b; r2b re-ran `tests/planner-hook` and `tsc` only)
 
 | Command | Result |
 | --- | --- |
 | `npx tsc --noEmit` | exit 0 |
-| `npx vitest run tests/planner-hook` | exit 0, 64 passed (40 r1 + 24 r2) |
+| `npx vitest run tests/planner-hook` | exit 0, 65 passed (40 r1 + 25 r2), at `699789e1` |
 | `npx vitest run` (full, unpiped, alone) | **exit 1**, 10 failed, 1807 passed, 78 skipped; 2 unhandled `onTaskUpdate` timeouts |
 
 ### The 10 failures, by name, and where each stands
