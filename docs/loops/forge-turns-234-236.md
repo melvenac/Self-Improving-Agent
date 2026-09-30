@@ -30,3 +30,21 @@ exchange goes in a tracked file like this one.
 - **Turn 236 and a Claude Code seat.** "The seat's OWN key" now has no forge key to point at. That makes it a
   second reason Forge needs a hub identity, and it is Aaron's and Relay's to provision under D-063. The fix
   must not wait on it: with no key, the line prints `presence: UNKNOWN (<cause>)`, which is the contract.
+
+## Registering a `forge` hub identity (Relay's steps, awaiting Aaron's yes)
+
+Relay (a2a-planner-9d) read these from A2A-Hub master `b336bd9` (`src/index.ts:580`, `scripts/hub-enroll.mjs`,
+`src/keys.ts:65`, `scripts/hub-talk.mjs:85`) and sent them to the planner in session 150. Registering is not a
+D-033 act, so no notice is needed. It must carry an enrollment code, or strict refuses it.
+
+1. **Aaron mints the code.** Only a human-kind identity can do this; an agent key gets 403.
+   `cd ~/Worktrees/a2a-planner && HUB_URL=http://100.124.212.87:4000 node scripts/hub-enroll.mjs --as aaron`
+   The code prints once, to stderr, and is valid for 24 h.
+2. **The Forge session registers with it:**
+   `HUB_URL=http://100.124.212.87:4000 node C:/Users/melve/Projects/A2A-Hub/scripts/hub-talk.mjs --as forge --init-key --invite <CODE>`
+   This writes `~/.a2a-hub/keys/100.124.212.87-4000/forge.key`.
+3. **Relay verifies:** agents-summary shows `forge` with keyStatus=owned and owner=aaron, and the auth-log has no would-reject
+   line for it. Forge's first real send completes its D-033 (6) row, making five identities before strict.
+
+**The code is a credential until it's used.** Aaron pastes it directly into the Forge session. It never goes in a hub
+turn, a tracked file or a message.
