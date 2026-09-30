@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 212,
+  "revision": 214,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3465,6 +3465,18 @@
       "title": "The planner launches QA runs itself over ssh (standing authority); it may ask Aaron first, but it no longer hands him launch lines",
       "date": "2026-09-30",
       "note": "Aaron, directly in the planner session, verbatim: 'launch it yourself from now on, you can ask me but run it over ssh from now on'. Context: his paste of the QA 232 line kept breaking; the planner launched QA 232 over ssh at 08:27:57Z, and the host classifier allowed it this time (planner 146 had been refused). SCOPE: launching dispatched QA jobs (the laptop headless launcher or qa-queue.ps1) on the QA machines over ssh, with the rules intact: the dispatch is on master first (D-062), launch only on an idle machine (check the log's last line, or the lease once T-204 ships), serial on one machine, and the launch is named in the record at the time it is used. NOT covered: merges, machine config, key or credential steps, or anything the host classifier denies (a denial is surfaced to Aaron, never routed around). docs/loops/qa-launch.md is updated to say the planner launches."
+    },
+    {
+      "id": "D-070",
+      "title": "Slice four: the slice-three close-out (with T-169) lands first; the TypeSafe key lives only in Aaron's local dev environment, and every SIA-adopting project needs its own access",
+      "date": "2026-09-30",
+      "note": "AARON, planner session 153, answering questions 1 and 3 of docs/loops/loop-15-slice-4-brief-draft.md section 4, verbatim in part. Q1: 'For question one, ... it's about slice three, then yes.' So the slice-three close-out, carrying T-169 (the PRD and README rewrite, the retirements.json fixes, and the dated Step-Back artifact part), lands BEFORE slice four's first dispatch. Q3: 'who gets the type safe API key? Well, it's going to run on SAI, so any project that adopts SAI will need to have access to the TypeSafe API. Obviously, just our local dev environment, not anyone else's.' READING: the key is provisioned in Aaron's own machines' environment (desktop, QA PC and laptop, as a user env var), never committed, never in a shared or CI secret, and never exposed to anyone else's environment. A project that adopts SIA brings its OWN TypeSafe access, so the template and README must say so (this is part of T-169). The live-call budget was not answered; the planner proposes one in the ruled brief. Q2 (what counts as a real diff) and Q4 (the key wording) are pending, with the planner's recommendations given to Aaron in the same session."
+    },
+    {
+      "id": "D-071",
+      "title": "Slice four: seat-built diffs are scored but PROVISIONAL only (source- and plan-provenance-tagged); 'calibrated' needs 5+ runtime-produced diffs with pre-work plans. The key must reach the Jev endpoint and nothing else, each with its own test",
+      "date": "2026-09-30",
+      "note": "AARON, planner session 153: 'Yes to both', accepting the planner's two recommendations on docs/loops/loop-15-slice-4-brief-draft.md section 4. Q2 (A6's 'real diffs'): score the ~8 merged Loop 15 seat-built diffs through the done gate in shadow. Tag each G_done record with its source (seat or runtime) and its plan provenance (a D_t reconstructed after the fact from the prose brief, versus one written before the work). They are PROVISIONAL starting data only, because a plan reconstructed by someone who knows the outcome inflates diff_matches_plan, which is close to A6's forbidden synthetic input. The word 'calibrated', and any threshold change justified as calibration, needs N of 5 or more RUNTIME-produced diffs whose D_t was written before the work. Q4 (the key wording): the brief's 'the key reaching nothing' and A6's 'the key reaching its endpoint' name two different properties, and BOTH are required, each with its own test: (a) the key reaches the Jev endpoint, proved by an authenticated response carrying the resolved model; (b) it reaches NOTHING else: no artifact, log, gate record or transcript contains it. With D-070 (close-out and T-169 first; the key only in Aaron's local dev environment), all four draft questions are ruled. The live-call budget is still to be proposed in the ruled brief."
     }
   ],
   "handoffs": [
