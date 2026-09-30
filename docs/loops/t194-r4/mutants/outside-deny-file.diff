@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/run.ts b/open-brain/src/planner-hook/run.ts
+index f1e220bf..8c8f44bd 100644
+--- a/open-brain/src/planner-hook/run.ts
++++ b/open-brain/src/planner-hook/run.ts
+@@ -115,7 +115,7 @@ function checkFileTool(
+   if (!resolved.ok) {
+     return { decision: "deny", reason: `Planner hook: denied — ${resolved.cause} (fail closed). Path: ${rawPath}` };
+   }
+-  if (resolved.outside) return null;
++  if (resolved.outside) return { decision: "deny", reason: "outside" };
+   const relPath = resolved.rel;
+   const ci = resolved.ci;
+ 

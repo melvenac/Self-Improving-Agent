@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/run.ts b/open-brain/src/planner-hook/run.ts
+index f1e220bf..8eae14bb 100644
+--- a/open-brain/src/planner-hook/run.ts
++++ b/open-brain/src/planner-hook/run.ts
+@@ -187,7 +187,7 @@ function checkBash(command: string, repoRoot: string, cwd: string, deps: Planner
+   if (isGhPrMerge(command) && deps.prChangedPaths) {
+     const ref = extractGhPrMergeRef(command);
+     // D2: the no-grant allow covers ONE `gh pr merge` invocation and nothing chained after it.
+-    if (!isSingleInvocation(command) || !startsWithGhPrMerge(command)) {
++    if (!isSingleInvocation(command)) {
+       mergeCause = "the command is not a single gh pr merge invocation (chained, piped, substituted or prefixed)";
+     } else if (ghRepoFlag(command)) {
+       // --repo would merge another repository's PR N; the list read is origin's PR N. Never mix them.

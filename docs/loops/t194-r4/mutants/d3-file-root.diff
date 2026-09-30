@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/run.ts b/open-brain/src/planner-hook/run.ts
+index f1e220bf..3d6de273 100644
+--- a/open-brain/src/planner-hook/run.ts
++++ b/open-brain/src/planner-hook/run.ts
+@@ -111,7 +111,7 @@ function checkFileTool(
+ 
+   // D1/D3: resolve against the tool's cwd, then make it repo-relative. A path outside the repo is
+   // not the hook's business; one whose location cannot be determined is denied, not waved through.
+-  const resolved = toRepoRelative(rawPath, repoRoot, cwd);
++  const resolved = toRepoRelative(rawPath, repoRoot);
+   if (!resolved.ok) {
+     return { decision: "deny", reason: `Planner hook: denied — ${resolved.cause} (fail closed). Path: ${rawPath}` };
+   }

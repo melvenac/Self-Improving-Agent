@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index 0907ab30..1becaec2 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -81,7 +81,7 @@ export const SUMMARY_PATH = ".agents/SYSTEM/SUMMARY.md";
+ /** PH-2: rendered views and state.json (SUMMARY handled separately). */
+ export function isRenderedViewPath(raw: string, ci = false): boolean {
+   const p = normalizeRelPath(raw);
+-  return ci ? RENDERED_VIEW_PATHS_CI.has(p.toLowerCase()) : RENDERED_VIEW_PATHS.has(p);
++  return ci ? RENDERED_VIEW_PATHS.has(p) : RENDERED_VIEW_PATHS.has(p);
+ }
+ 
+ /** True when `rel` is SUMMARY.md, matching case-insensitively when `ci`. */

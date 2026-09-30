@@ -1,0 +1,11 @@
+diff --git a/open-brain/src/planner-hook/grant.ts b/open-brain/src/planner-hook/grant.ts
+index dd96297f..b6d2d6ae 100644
+--- a/open-brain/src/planner-hook/grant.ts
++++ b/open-brain/src/planner-hook/grant.ts
+@@ -56,5 +56,5 @@ const squash = (s: string): string => s.trim().replace(/\s+/g, " ");
+  */
+ export function grantMatchesCommand(grant: OutwardGrant, command: string): boolean {
+   if (grant.command === "*") return true;
+-  return squash(command) === squash(grant.command);
++  return squash(command).startsWith(squash(grant.command));
+ }

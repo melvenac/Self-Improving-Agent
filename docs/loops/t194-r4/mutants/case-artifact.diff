@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index 0907ab30..3ede96e7 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -62,7 +62,7 @@ const ARTIFACT_PREFIXES = [
+ 
+ /** PH-1: source, tests, hooks, scripts, build output, package.json */
+ export function isProtectedArtifactPath(raw: string, ci = false): boolean {
+-  const p = ci ? normalizeRelPath(raw).toLowerCase() : normalizeRelPath(raw);
++  const p = normalizeRelPath(raw);
+   if (p === "package.json" || p.endsWith("/package.json")) return true;
+   return ARTIFACT_PREFIXES.some((pref) => p === pref.slice(0, -1) || p.startsWith(pref));
+ }

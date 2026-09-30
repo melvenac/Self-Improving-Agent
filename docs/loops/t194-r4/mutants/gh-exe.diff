@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 1300851c..c9db0d44 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -6,7 +6,7 @@ const PUSH_MASTER_RE = /\bgit\s+push\b[^;\n|&]*(?:\s(?:origin\s+)?master\b|:\s*m
+ const GIT_MERGE_RE = /\bgit\s+merge\b/;
+ const GIT_TAG_RE = /\bgit\s+tag\b/;
+ // `gh`, `gh.exe`, and either quoted (T-194 r4): the shell runs all of them as the same program.
+-const GH_PR_MERGE_RE = /(?<![\w-])["']?gh(?:\.exe)?["']?\s+pr\s+merge\b/;
++const GH_PR_MERGE_RE = /(?<![\w-])["']?gh["']?\s+pr\s+merge\b/;
+ const GH_PR_MERGE_START_RE = /^["']?gh(?:\.exe)?["']?\s+pr\s+merge\b/;
+ 
+ const STANDING_PUSH_BRANCH_RE =

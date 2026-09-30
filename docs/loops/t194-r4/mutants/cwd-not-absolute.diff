@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index 0907ab30..8daa0d50 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -39,7 +39,7 @@ export function toRepoRelative(raw: string, repoRoot: string, cwd: string = repo
+   let p = toFwd(raw, winRoot);
+   if (!p.startsWith("/") && !WIN_DRIVE_RE.test(p)) {
+     const base = toFwd(cwd, winRoot).replace(/\/+$/, "");
+-    if (!base.startsWith("/") && !WIN_DRIVE_RE.test(base)) {
++    if (false) {
+       return { ok: false, cause: `${raw} is relative and the working directory (${cwd}) is not an absolute path, so its location cannot be determined` };
+     }
+     p = `${base}/${p}`;

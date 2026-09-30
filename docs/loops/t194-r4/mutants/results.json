@@ -1,0 +1,98 @@
+[
+  {
+    "id": "d3-bash-root",
+    "row": "PH-6 D3",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  },
+  {
+    "id": "d3-file-root",
+    "row": "PH-1 D3",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  },
+  {
+    "id": "outside-deny-bash",
+    "row": "outside allowed",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  },
+  {
+    "id": "outside-deny-file",
+    "row": "outside allowed",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  },
+  {
+    "id": "case-artifact",
+    "row": "case",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  },
+  {
+    "id": "case-view",
+    "row": "case",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  },
+  {
+    "id": "prefix-half",
+    "row": "single-invocation prefix",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  },
+  {
+    "id": "grant-prefix",
+    "row": "exact grant",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  },
+  {
+    "id": "gh-exe",
+    "row": "gh.exe",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  },
+  {
+    "id": "gh-quote",
+    "row": "quoted gh",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  },
+  {
+    "id": "expansion-allowed",
+    "row": "undeterminable denied",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  },
+  {
+    "id": "cwd-not-absolute",
+    "row": "undeterminable denied",
+    "applied": true,
+    "tsc": 0,
+    "vitest": 1,
+    "red": true
+  }
+]
