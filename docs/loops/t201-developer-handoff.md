@@ -5,7 +5,7 @@ Brief: `docs/loops/t201-brief.md` (on `origin/docs/session-150-c`). Plan approve
 
 ## Dependencies (named, not merged into this work)
 
-- **T-200** (`loop/t200-record-from-master`, 5b9eab0a, QA pending): this branch is stacked on it. `ob_start` reads the sidecar from `origin/master` exactly when T-200's `resolveRecordSource` says the record comes from master.
+- **T-200** (`loop/t200-record-from-master`, now 424065cf after its role-source follow-up, QA pending): this branch is stacked on it. `ob_start` reads the sidecar from `origin/master` exactly when T-200's `resolveRecordSource` says the record comes from master.
 - **T-203** (Forge, `loop/t203-seat-by-checkout`, not merged): NOT re-implemented. The seat is `roles.seat.role` (AGENT.local.md), the source `ob_start` already uses. When T-203 lands, that lookup is the one to swap.
 - Overlaps NOT merged: T-199 (`state-render.ts` / `server.ts`), T-164. My `server.ts` edits are two additive blocks (one in `handleStart` before the role files, one at the top of `handleState`); expect a textual conflict, not a semantic one.
 
