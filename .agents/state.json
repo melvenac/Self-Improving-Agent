@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 169,
+  "revision": 170,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3458,6 +3458,53 @@
       "session_uuid": "c407df9c-3dd7-4273-891b-798b4bd527f4",
       "checkout": "sia-planner",
       "first_rev": 148
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Planner session 150 (2026-09-30), mid-session handoff, to be rewritten at roll. In flight: PR #218 (T-158, Aaron's direct yes, branch updated to e0a2e73; merge on CLEAN pinned, then read master's own run). PR #217 (docs-only, revs 166-169 + docs/loops/forge-turns-234-236.md; merge on CLEAN). QA 228 (laptop, started 05:33Z) not finished; rule on it with the rev 166 T-196 ruling (HB-2/HB-3 CLI-only). Forge (sia-forge-90, Claude Code, native A2A) is building C r4 on the rev 167 rulings, and is registering hub identity `forge` with Aaron's code (issued 05:51:27Z, valid 24 h); Relay verifies. Builder: turn 69 (T-194 r2 first; T-200 and T-199 get full briefs after, per D-064). Listeners: atlas --wait on the builder and infra rooms.",
+      "watch_out": [
+        "STANDING INSTRUCTION FROM AARON (relayed Aaron -> worktrees-d5 (Clark) -> Atlas, session 150): 'start reporting to you [Clark] when an item on the hoh checklist can be marked complete.' Checklist: C:\\Users\\melve\\Worktrees\\hoh-checklist.md, READ-ONLY for the planner (Clark edits it). When an item becomes completable, send worktrees-d5 ONE A2A line per item: the checklist's wording, then DONE, then DERIVED evidence (merge SHA plus master run id and conclusion, QA number and verdict, rev, turn). Also report an item that REGRESSES or becomes BLOCKED. Send as it happens; no batching; no reply for unchanged items. If worktrees-d5 is not in ListAgents, skip the send (Clark re-syncs from the record).",
+        "A code merge needs Aaron's yes IN THE PLANNER SESSION; a relay through worktrees-d5 is not enough for a merge (session 150 held #218 until Aaron typed it). Relays are fine for reversible acts; record the chain.",
+        "Forge's C r4 rulings (rev 167, T-155 note): CC-1.2 verdict path READS merge.json required_inputs; CC-13.2 merged-without-ledger = issue, pending = printed pass, limit stated. Check both when r4 comes back.",
+        "Hub enrollment codes are credentials: never in a hub turn, a tracked file or a message. Aaron pasted one into the planner session once; it is spent when Forge registers."
+      ],
+      "open_questions": [
+        "Forge: has it run --init-key as `forge` and posted its turn? Then ping Relay to verify (forge row owned by aaron, no enroll reject).",
+        "Aaron: executable files under docs/ (QA drivers): still docs-only for D-032? (on his checklist)"
+      ],
+      "session": 150,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#195 loop/15-slice-3-candidate-c (5f7c9a0)",
+            "qa_status": "rejected",
+            "note": "candidate C r3 rejected; r4 building with Forge on rev 167 rulings"
+          },
+          {
+            "ref": "#218 loop/t158-gap-tombstone (e0a2e73)",
+            "qa_status": "accepted",
+            "note": "T-158 ACCEPTED (QA 227); Aaron's direct yes; merge on CLEAN pinned"
+          },
+          {
+            "ref": "#217 docs/session-150-cli-surface-rulings (36e21d9)",
+            "qa_status": "not_required",
+            "note": "docs-only; merge on CLEAN"
+          }
+        ],
+        "frozen_sha": "3059ca9 (record 219 r2, QA 228)",
+        "questions_for_aaron": [
+          "Executable files under docs/ (QA drivers): still docs-only?"
+        ],
+        "rulings": [
+          "T-196 HB-2/HB-3 CLI-only; T-160 stop-hook superseded for Cursor (rev 166)",
+          "C r4 plan: CC-1.2 load-bearing field, CC-13.2 rule (rev 167)",
+          "T-158 ACCEPTED on QA 227 (rev 168)",
+          "D-064 composer-2.5 stays (rev 169)"
+        ]
+      },
+      "session_uuid": "e50107b1-ac67-452c-9da1-3fc4c3beda97",
+      "checkout": "sia-planner",
+      "first_rev": 166
     }
   ],
   "sessions": [
