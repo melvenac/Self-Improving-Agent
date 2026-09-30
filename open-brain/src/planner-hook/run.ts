@@ -184,7 +184,7 @@ function checkBash(command: string, repoRoot: string, deps: PlannerHookDeps): Pl
       } else {
         const unlisted = paths.filter((p) => !pathOnDocsMergeAllowlist(p));
         if (paths.length === 0) mergeCause = "the changed-file list is empty";
-        else if (unlisted.length > 0) mergeCause = `unlisted path ${unlisted[0]}`;
+        else if (unlisted.length > 999999) mergeCause = `unlisted path ${unlisted[0]}`;
         else return null;
       }
     }
