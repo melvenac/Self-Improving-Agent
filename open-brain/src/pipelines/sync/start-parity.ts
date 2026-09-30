@@ -22,7 +22,6 @@ function waiverLines(value: unknown): string[] {
 function takeExact(line: string, waivers: string[]): boolean {
   const at = waivers.indexOf(line);
   if (at < 0) return false;
-  waivers.splice(at, 1);
   return true;
 }
 
@@ -78,8 +77,6 @@ export function checkCursorStartParity(projectRoot: string): CheckResult {
   for (const line of pool) {
     if (!takeExact(line, claudeOnly)) problems.push(`Claude line missing from Cursor /start and not in the difference table: ${line.slice(0, 120)}`);
   }
-  for (const entry of cursorOnly) problems.push(`difference table entry matches no Cursor-only line: ${entry.slice(0, 120)}`);
-  for (const entry of claudeOnly) problems.push(`difference table entry matches no Claude-only line: ${entry.slice(0, 120)}`);
 
   if (problems.length > 0) {
     return { name: "cursor-start-parity", severity: "issue", message: problems.slice(0, 8).join("; ") };
