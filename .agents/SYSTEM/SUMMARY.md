@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 164 by open-brain v0.44.2 — do not edit; change state via ob_state -->
-> **Status:** v0.44.2 — Loop 15 slice three (D-033/D-036): closes when candidates A, B and C are ACCEPTED; Jev calibration is the next slice. A: A13 ACCEPTED and MERGED (#182, 677c1dd). B: part 1 (G-042 repair) MERGED (#165); part 2 (E_t schema, R10; 8c7769f) ACCEPTED by QA 189 and the planner, so B is ACCEPTED; PR #187 awaits Aaron's merge. C (T-155, the shadow merge gate): NEXT. It has no acceptance criteria yet: as B's were (QA 132), C's are written by a QA seat before any build, then ruled by the planner. Alongside, waiting for QA on the QA PC (laptop unavailable): 182 (T-048 r3), 183 (T-192), 161 (/bootstrap r4 reconciled), 178 (T-048 r2b).
+<!-- generated from .agents/state.json rev 165 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+> **Status:** v0.44.2 — Loop 15 slice three (D-033/D-036) closes when candidates A, B and C are ACCEPTED; Jev calibration is the next slice. A: ACCEPTED and MERGED (#182, 2026-09-27). B: ACCEPTED and MERGED (part 1 #165, part 2 #187, 2026-09-27). C (T-155, the shadow merge gate): OPEN. r3 (20c2dfd, PR #195) was QA 213 ACCEPT, overruled by the planner (session 149) for five partial rows including CC-13's ledger tamper check; r4 is with Forge, scoped exactly to CC-1.2, CC-2.2, CC-5.6, CC-13.1, CC-13.2 and CC-17. When C r4 is accepted: shadow-verdict prepare on its E_t BEFORE Aaron merges #195, decide after (C criteria section 8 P4), and slice three closes.
 
 ## What's working
 

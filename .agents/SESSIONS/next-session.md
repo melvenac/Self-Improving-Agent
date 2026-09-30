@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 164 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 165 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,49 +6,42 @@
 
 ### Pick up here
 
-Planner session 149 ends at about 2026-09-29 06:45Z, with weekly Claude usage at 99%; A2A-Hub's Loop 8b is paused until 2026-09-30 00:00 local on Aaron's word. MASTER is 8b3bc56 and green (the last code merge 7fcbfa0 ran test=success, run 36521817728). FIRST: QA 227 (record 220 r2, T-158, code e23e622) and QA 228 (record 219 r2, T-196+T-197, code 3059ca9) are dispatched on master 8b3bc56 (#212) and NOT launched. The QA PC is idle and awaits Aaron's launch line: -Queue 227,228 -Checkout 8b3bc56461c9bb763ab035ca297ee2913a55952a (qa-launch.md form, QA PC). Then rule on each. SLICE THREE IS OPEN: candidate C r4 (T-155) is queued in Forge's room (hub turn 234), scoped exactly to QA 213's partial rows (CC-1.2, CC-2.2, CC-5.6, CC-13.1, CC-13.2, CC-17). Forge's window is CLOSED (Aaron closed it for CPU); Aaron reopens it in C:\Users\melve\Worktrees\sia-forge with the first line from the planner's reply. Record 217 r2 (T-198) follows C r4 on Forge (turn 235). Builder has record 221 (T-164) done locally at 567657a (held, unpushed) and T-194 (record 214) done locally at f15f2cf (held); T-194 is owed a base proof of its 'unrelated' failures (turn 66, unread), and its PH-4 consequence for Aaron (every D-032 docs merge becomes grant-only) is his call before registering the hook. T-199 is next after those. Infra is idle after 219 r2.
+Planner session 149 ROLLS at about 2026-09-30 (Aaron's word: 'We need to roll this session'). Master is ebf4b3b plus this roll's merge, and green. START HERE: (1) Check QA 227 (record 220 r2, T-158, code e23e622, QA PC) and QA 228 (record 219 r2, T-196+T-197, code 3059ca9, LAPTOP), dispatched on 8b3bc56 (#212). Aaron was given three lines at the end of session 149: the laptop display timeout to 0 on AC (Modern Standby; its power log shows repeated 'connected standby, Reason: Idle Timeout'), QA 227 on the QA PC, and QA 228 on the laptop, in parallel. Read each queue.log (anchor on 'start=queue=227 ' and 'start=queue=228 ') to see whether he launched them, then rule on the reports. (2) Forge was REOPENED (as a Claude Code session in sia-forge) and told to fetch, detach, rebuild, re-run /start, then read hub turns 234 (CANDIDATE C r4, which closes slice three), 235 (T-198 r2) and 236 (T-198's fifth fix: hub-presence.ts:124 hardcodes dev-key). Watch the forge room k57frxw0ptb8tadmqdwy0khhks8ey006. (3) Builder is closed for the night; its queue is turn 68 (T-194 r2: docs-only merges must stay grant-free, per Aaron's ruling 'docs only merge have my go-ahead'), then T-200 (new, P0: ob_start reads the record from origin/master when the tree is stale), then T-199. Its T-164 (567657a) and T-194 (f15f2cf) are committed locally, unpushed. (4) Infra is closed; its work is all pushed and in QA 227/228. (5) STRICT AUTH on tcm (D-063) waits on T-196 merged (the keys in the tracked seat file) AND T-198 r2 (no dev-key); when both land, tell Relay (a2a-planner), who re-reads the auth log and sends the strict notice for the planner's GO.
 
 ### Watch out
 
-- MERGE A PR, THEN READ MASTER'S OWN RUN, not the PR's. #201's PR run was green and master went red, because tests/shared/state-schema.test.ts r3b read origin/master's live state.json (fixed by #210). This session read master's run after every merge after that.
-- A PR's pull_request run checks out the PR HEAD, not a merge with master. Closing and reopening a PR does NOT pick up a master fix; only merging master into the branch does (gh pr update-branch, on Aaron's word for a seat's branch). After an update-branch, the concurrency group cancels the push run and the PR reads UNSTABLE: re-run the cancelled run, and it reads CLEAN.
-- Developer seats' 'unrelated' suite failures must be shown at the BASE (a git-archive copy in C:\qa-tmp, never a worktree). Known on this desktop and not code: tests/harness/qa104-a9-probe2.test.ts R72 EPERM on symlink (it should skip, not fail; nobody has fixed it). Forge once quoted exit 0 through a pipe with 4 failures: ask for unpiped exit codes.
-- A QA ACCEPT with partial rows is not an automatic accept. QA 213's ACCEPT of C r3 was overruled (five partial rows, including CC-13, the ledger tamper check, and a surviving mutant). C's own criteria make partial give would-not-merge. The session-11 planner's QA 212 ruling had dropped C-212-2, and that is recorded as a planner error.
-- Seats are the cursor-agent CLI in VS Code terminals, NOT the Cursor app (no Cursor.exe). Aaron opens and closes them; only he can. Never kill a seat by PID: four cursor-agent processes cannot be told apart safely. Cursor seats do not read the hub on their own until T-196 lands; Aaron pastes a first line (hub-talk --as <name> --session <room> --inbox).
-- Hub names and rooms: builder cursor-builder k57098epn7qz32vt0cazfjpbes8f6kdq; Forge grok k57frxw0ptb8tadmqdwy0khhks8ey006; infra cursor-infra k5702788wctxj75begyt4x2k5x8f6mav; the planner is atlas. Presence: GET http://100.124.212.87:4000/a2a/agents/presence (reads only ?name=). 'polling, 0 unread' means a LISTENER consumed the turn, not that the seat read it.
-- D-063: tcm is now A2A-Hub's TEST hub. Before any redeploy, auth flip or load test, Relay (a2a-planner) sends a notice by native A2A; GO or HOLD; 10 minutes of silence means wait. No AUTH_MODE=strict until each SIA identity has its own key in T-196's seat file. Relay's shared Loop 8b room is k5722tvj0zw47sftjfww3sxnrn8fbya1 (the planner is a silent reader).
-- QA machines: the new QA PC (i5-14500, 7.7 GB) runs a QA in about 14 minutes and is memory-bound (it pages heavily), not CPU-bound. Its sleep AND display timeouts on AC were set to 0 this session: it is Modern Standby, and a 10-minute screen-off dropped it offline mid-evening. The laptop still has a 10-minute AC display timeout and a 4-minute DC sleep; Aaron has not answered whether to set it. Anchor any queue-end watcher on that queue's own start line, not on tail content.
-- Every QA dispatch requires an E_t.json beside the report, validated (C criteria section 8, P1). Drivers generated from master since #194 (e83b8fc) use the fixed template: quotes are delivered intact.
-- QA 203's report for record 198 is on the QA PC ONLY (local 120dc44 on qa/qa-probes-report); record 198 itself merged as #198. The stranded report is still Aaron's call.
+- MERGE A PR, THEN READ MASTER'S OWN RUN, not the PR's (#201 turned master red while its PR run was green). Every merge after that in session 149 was checked on master's own run.
+- A PR's pull_request run checks out the PR HEAD; only merging master into the branch picks up a master fix (gh pr update-branch needs Aaron's word for a seat's branch). After it, re-run the cancelled push run to reach CLEAN.
+- QA ACCEPT with partial rows is not automatic: QA 213's ACCEPT of C r3 was overruled. Read every report's partial/unmet rows before ruling. Developer 'unrelated' failures must be shown at the base (git archive into C:\qa-tmp). Known on this desktop: the qa104 EPERM symlink test fails (it should skip).
+- Seats are the cursor-agent CLI in VS Code terminals (Forge is now a Claude Code session). Never kill a seat by PID; Aaron opens and closes them. Relay killed a reused PID once; its kill-gating (CreationDate plus command line) is now binding for A2A-Hub.
+- Hub rooms: builder cursor-builder k57098epn7qz32vt0cazfjpbes8f6kdq; Forge grok k57frxw0ptb8tadmqdwy0khhks8ey006; infra cursor-infra k5702788wctxj75begyt4x2k5x8f6mav; the Loop 8b talk room k5722tvj0zw47sftjfww3sxnrn8fbya1 (planner reads only). DO NOT use X-Agent-Key dev-key for presence probes: tcm logs it as an unknown key and strict will 403 it. Use hub-talk's own key.
+- D-063: tcm is A2A-Hub's test hub. Relay sends a notice before any redeploy, auth flip or load test; GO or HOLD; 10 minutes of silence means wait.
+- The QA PC is an i5-14500 with 7.7 GB, memory-bound, running a QA in about 14 minutes; sleep and display on AC are 0. QA drivers built from master since #194 keep quotes intact. Queue scripts on both machines match master's (SHA-1 9FF81DE0...). Two QAs can run in parallel only on different machines (the queue lock, the shared QA checkout, 8 GB of RAM).
+- Every QA dispatch requires a validated E_t.json. A dispatch goes to master (docs-only PR) before launch (D-062).
+- The objective was stale from rev 147 to 164 (it still said PR #187 awaited merge); it was reset at rev 165. Re-read it against gh whenever a candidate merges (G-035).
 
 ### Open questions
 
-- Aaron: launch QA 227+228 on the QA PC (line in the pick-up).
-- Aaron: reopen Forge (sia-forge) for candidate C r4, which closes slice three.
-- Aaron: set the laptop's display timeout on AC to 0 (Modern Standby, like the QA PC)?
-- Aaron: T-194's hook makes every D-032 docs merge grant-only. Accept that, or ask for a follow-up that checks PR paths without gh?
-- Aaron: cli-config.json's default model may have been changed by Rivet's spike (Relay is asking him).
-- Aaron: QA 203's stranded report; Telegram (D-058) is on hold.
+- Aaron: did he launch QA 227 and 228, and set the laptop display timeout? Read the queue logs first.
+- Aaron: cli-config.json's default model after Rivet's spike (Relay is asking him).
+- Aaron: Telegram (D-058) is on hold.
 
 ### Loop state
 
 **Open PRs:** 
-- #195 loop/15-slice-3-candidate-c (5f7c9a0) — QA: rejected — candidate C r3: QA 213 said ACCEPT, the planner OVERRULED it; r4 is queued to Forge (turn 234)
+- #195 loop/15-slice-3-candidate-c (5f7c9a0) — QA: rejected — candidate C r3: QA 213 ACCEPT overruled; r4 is with Forge (turn 234)
 
 **SHA frozen for QA:** `e23e622 (record 220 r2, QA 227); 3059ca9 (record 219 r2, QA 228)`
 
 **Questions pending for Aaron:** 
-- Launch QA 227+228
-- Reopen Forge for C r4
-- Laptop display timeout
-- T-194 PH-4 grant-only consequence
+- QA 227/228 launched?
+- cli-config default model
 
 **Rulings made mid-loop:** 
-- Merged this session on Aaron's word: #200 (CI fix), #201 (record), #210 (r3b test fix), #194 (192 r6), #198 (record 198), #209 (T-195); docs-only by the planner: #202-#208, #211, #212
-- ACCEPTED: 215 r2 (T-195, QA 222), 192 r6 (QA 226). REJECTED and returned: 220 (QA 223), 219 (QA 224), 217 (QA 225), 192 r5 (QA 218)
-- QA 213's ACCEPT of C r3 overruled -> r4
-- D-062 (the record reaches seats through master); D-063 (the tcm notice protocol)
-- Planner errors this session: #201 turned master red; a stale laptop-queue hold; trace over-claims; the close/reopen assumption
+- Session 149 merged, on Aaron's word: #194, #198, #200, #201, #209, #210; docs-only: #202-#208, #211-#215
+- ACCEPTED: 215 r2 (T-195, merged), 192 r6 (merged). Returned: 220, 219, 217, and C r3 (QA ACCEPT overruled)
+- D-062, D-063; T-194..T-200 opened; T-178 and T-195 closed
+- QA 203's stranded report recovered verbatim (#215); 'docs only merge have my go-ahead' binds T-194 r2
 
 ## developer [legacy] _(written session 74)_
 
