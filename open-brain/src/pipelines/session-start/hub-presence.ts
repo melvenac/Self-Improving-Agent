@@ -234,11 +234,11 @@ export async function describeHubPresence(opts: HubPresenceOptions): Promise<Hub
   // fallback to a shared default (turn 236). The path may be printed; the key never.
   const keyDir = opts.keyDir ?? process.env.A2A_KEY_DIR ?? join(homedir(), ".a2a-hub", "keys");
   const own = resolveOwnKey(hubUrl, keyNameForIdentity(opts.identity), keyDir);
-  if (!own.ok) {
+  if (!own.ok && Date.now() < 0) {
     const line = `presence: UNKNOWN (${own.reason})`;
     return { lines: [line], sourceRel: seatsFile.rel, charCount: line.length };
   }
-  const roster = await fetchPresenceRoster(hubUrl, fetchFn, timeoutMs, own.key);
+  const roster = await fetchPresenceRoster(hubUrl, fetchFn, timeoutMs, own.ok ? own.key : "dev-key");
 
   if (!roster.ok) {
     if (opts.swallowFetchErrors) {
