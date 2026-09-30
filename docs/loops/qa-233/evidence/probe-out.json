@@ -1,0 +1,88 @@
+{
+ "P1 docs-only merge alone": {
+  "decision": "allow",
+  "fetches": [
+   "/pulls/1",
+   "/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "P2 code merge alone": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/2 --squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: unlisted path open-brain/src/cli.ts.",
+  "fetches": [
+   "/pulls/2",
+   "/pulls/2/files?per_page=100&page=1"
+  ]
+ },
+ "P3 docs merge && force push master": {
+  "decision": "allow",
+  "fetches": [
+   "/pulls/1",
+   "/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "P4 docs merge && code merge": {
+  "decision": "allow",
+  "fetches": [
+   "/pulls/1",
+   "/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "P5 docs merge ; git tag v9": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/1; git tag v9 && git push --tags gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: could not read a PR number from \"https://github.com/melvenac/Self-Improving-Agent/pull/1;\" (only a number, #number or a github.com pull URL).",
+  "fetches": []
+ },
+ "P6 D-066 assignments.json PR": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: unlisted path .agents/assignments.json.",
+  "fetches": [
+   "/pulls/3",
+   "/pulls/3/files?per_page=100&page=1"
+  ]
+ },
+ "P7 force push alone (control)": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git push --force origin master",
+  "fetches": []
+ },
+ "P8 docs merge with grant present": {
+  "decision": "allow",
+  "fetches": [
+   "/pulls/1",
+   "/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "P8 grant file": {
+  "unchanged": true
+ },
+ "P9 Edit absolute fwd-slash src": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "P10 Edit absolute backslash src": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "P11 Write absolute state.json": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "P12 Edit relative src (control)": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — planner.md, \"Authority\". Path: open-brain/src/cli.ts",
+  "fetches": []
+ },
+ "P13 CLI Edit absolute backslash src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "P14 CLI Edit relative src (control)": {
+  "exit": 2,
+  "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Planner hook: denied — planner.md, \\\"Authority\\\". Path: open-brain/src/cli.ts\"}}\n"
+ },
+ "P15 Bash redirect to absolute src": {
+  "decision": "allow",
+  "fetches": []
+ }
+}

@@ -1,0 +1,39 @@
+[
+ {
+  "id": "ph3-tc",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "branch": "qa/t194-r2-mut-ph3-tc",
+  "sha": "83af5b5c7ffca2313ce26ef046555c741015fabe",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "26 failed | 39 passed (65)",
+  "failed": [
+   "tests/planner-hook/docs-merge.test.ts > row 1 — an all-docs PR passes with no grant > allows when every path is on the allowlist, reading the API and no grant",
+   "tests/planner-hook/docs-merge.test.ts > row 1 — an all-docs PR passes with no grant > a grant present for a CODE merge is neither read nor consumed by a docs-only merge (bytes and mtime unchanged)",
+   "tests/planner-hook/docs-merge.test.ts > row 1 — an all-docs PR passes with no grant > sends the GH_TOKEN value as the bearer token on every request (the env var is the one read)",
+   "tests/planner-hook/docs-merge.test.ts > row 1 — an all-docs PR passes with no grant > takes owner/repo from a PR URL and makes no read of the origin remote",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > names the unlisted path and says a grant is required",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > a rename OUT of an unlisted path is denied naming the old path",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > a renamed file with no previous_filename is denied, not assumed docs-only",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > a matching grant still allows it, and is consumed",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > network error names the API as unreachable and carries the error",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > a hung API is cut off by the timeout and denied",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > HTTP 404 names the status",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > no token (env empty, hosts.yml has no oauth_token, as with a keyring-stored gh token) names the cause",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > a truncated list (fewer files than changed_files) is denied as incomplete",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > an empty changed_files or list is denied",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > a files endpoint that is not a list is denied",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > a ref that is not a PR number (a branch, or a flag where the ref should be) is denied",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > an origin that is not github.com is denied",
+   "tests/planner-hook/docs-merge.test.ts > scope — the check does not widen the hook > makes no network read for other restricted acts, which stay grant-only",
+   "tests/planner-hook/hook.test.ts > PH-3 — outward git acts need grant > denies git merge origin/master without grant and names D-038/D-032",
+   "tests/planner-hook/hook.test.ts > PH-3 — outward git acts need grant > denies git tag v1.0.0 without grant and names D-038/D-032",
+   "tests/planner-hook/hook.test.ts > PH-3 — outward git acts need grant > denies git push --tags without grant and names D-038/D-032",
+   "tests/planner-hook/hook.test.ts > PH-3 — outward git acts need grant > denies git push --force origin loop/x without grant and names D-038/D-032",
+   "tests/planner-hook/hook.test.ts > PH-3 — outward git acts need grant > denies git push origin master without grant and names D-038/D-032",
+   "tests/planner-hook/hook.test.ts > PH-3 — outward git acts need grant > denies gh pr merge 99 --merge without grant and names D-038/D-032",
+   "tests/planner-hook/hook.test.ts > PH-3 — outward git acts need grant > allows restricted command once when grant file exists, then consumes it",
+   "tests/planner-hook/hook.test.ts > PH-4 — allowed planner acts > gh pr merge without grant is denied on the live hook path"
+  ]
+ }
+]

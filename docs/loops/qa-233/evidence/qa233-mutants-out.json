@@ -1,0 +1,224 @@
+[
+ {
+  "id": "m1",
+  "kind": "dev-r2",
+  "applied": "clean",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "10 failed | 55 passed (65)",
+  "failed": [
+   "row 2 — one unlisted path is denied without a grant > a renamed file with no previous_filename is denied, not assumed docs-only 15ms",
+   "row 3 — an unreadable list is denied and says why > network error names the API as unreachable and carries the error 5ms",
+   "row 3 — an unreadable list is denied and says why > a hung API is cut off by the timeout and denied 69ms",
+   "row 3 — an unreadable list is denied and says why > HTTP 404 names the status 5ms",
+   "row 3 — an unreadable list is denied and says why > no token (env empty, hosts.yml has no oauth_token, as with a keyring-stored gh token) names the cause 17ms",
+   "row 3 — an unreadable list is denied and says why > a truncated list (fewer files than changed_files) is denied as incomplete 4ms",
+   "row 3 — an unreadable list is denied and says why > an empty changed_files or list is denied 4ms",
+   "row 3 — an unreadable list is denied and says why > a files endpoint that is not a list is denied 4ms",
+   "row 3 — an unreadable list is denied and says why > a ref that is not a PR number (a branch, or a flag where the ref should be) is denied 4ms",
+   "row 3 — an unreadable list is denied and says why > an origin that is not github.com is denied 5ms",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > a renamed file with no previous_filename is denied, not assumed docs-only",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > network error names the API as unreachable and carries the error",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > a hung API is cut off by the timeout and denied",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > HTTP 404 names the status",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > no token (env empty, hosts.yml has no oauth_token, as with a keyring-stored gh token) names the cause",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > a truncated list (fewer files than changed_files) is denied as incomplete",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > an empty changed_files or list is denied",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > a files endpoint that is not a list is denied",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > a ref that is not a PR number (a branch, or a flag where the ref should be) is denied",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > an origin that is not github.com is denied"
+  ]
+ },
+ {
+  "id": "m2",
+  "kind": "dev-r2",
+  "applied": "clean",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "1 failed | 64 passed (65)",
+  "failed": [
+   "row 2 — one unlisted path is denied without a grant > a rename OUT of an unlisted path is denied naming the old path 16ms",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > a rename OUT of an unlisted path is denied naming the old path"
+  ]
+ },
+ {
+  "id": "m3",
+  "kind": "dev-r2",
+  "applied": "clean",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "1 failed | 64 passed (65)",
+  "failed": [
+   "row 3 — an unreadable list is denied and says why > a truncated list (fewer files than changed_files) is denied as incomplete 16ms",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > a truncated list (fewer files than changed_files) is denied as incomplete"
+  ]
+ },
+ {
+  "id": "m4",
+  "kind": "dev-r2",
+  "applied": "clean",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "4 failed | 61 passed (65)",
+  "failed": [
+   "row 1 — an all-docs PR passes with no grant > a grant present for a CODE merge is neither read nor consumed by a docs-only merge (bytes and mtime unchanged) 58ms",
+   "row 2 — one unlisted path is denied without a grant > names the unlisted path and says a grant is required 6ms",
+   "row 2 — one unlisted path is denied without a grant > a rename OUT of an unlisted path is denied naming the old path 5ms",
+   "row 2 — one unlisted path is denied without a grant > a matching grant still allows it, and is consumed 6ms",
+   "tests/planner-hook/docs-merge.test.ts > row 1 — an all-docs PR passes with no grant > a grant present for a CODE merge is neither read nor consumed by a docs-only merge (bytes and mtime unchanged)",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > names the unlisted path and says a grant is required",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > a rename OUT of an unlisted path is denied naming the old path",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > a matching grant still allows it, and is consumed"
+  ]
+ },
+ {
+  "id": "m5",
+  "kind": "dev-r2",
+  "applied": "clean",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "1 failed | 64 passed (65)",
+  "failed": [
+   "row 1 — an all-docs PR passes with no grant > a grant present for a CODE merge is neither read nor consumed by a docs-only merge (bytes and mtime unchanged) 56ms",
+   "tests/planner-hook/docs-merge.test.ts > row 1 — an all-docs PR passes with no grant > a grant present for a CODE merge is neither read nor consumed by a docs-only merge (bytes and mtime unchanged)"
+  ]
+ },
+ {
+  "id": "ph1",
+  "kind": "dev-r1",
+  "applied": "clean",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 2,
+  "tscOut": "src/planner-hook/run.ts(106,40): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.\r\n  Type 'null' is not assignable to type 'string'.\r\n"
+ },
+ {
+  "id": "ph2",
+  "kind": "dev-r1",
+  "applied": "clean",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 2,
+  "tscOut": "src/planner-hook/run.ts(113,35): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.\r\n  Type 'null' is not assignable to type 'string'.\r\n"
+ },
+ {
+  "id": "ph3",
+  "kind": "dev-r1",
+  "applied": "3way",
+  "landed": false
+ },
+ {
+  "id": "ph4",
+  "kind": "dev-r1",
+  "applied": "FAILED: error: corrupt patch at C:/qa-tmp/qa233-ph4.patch:28\n",
+  "landed": false
+ },
+ {
+  "id": "ph5",
+  "kind": "dev-r1",
+  "applied": "clean",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "1 failed | 64 passed (65)",
+  "failed": [
+   "PH-5 — fail closed and non-planner passthrough > missing AGENT.local.md is denied 16ms",
+   "tests/planner-hook/hook.test.ts > PH-5 — fail closed and non-planner passthrough > missing AGENT.local.md is denied"
+  ]
+ },
+ {
+  "id": "ph6",
+  "kind": "dev-r1",
+  "applied": "clean",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "5 failed | 60 passed (65)",
+  "failed": [
+   "PH-6 — Bash write detection > denies echo x > open-brain/src/hit.ts and states the static limit 17ms",
+   "PH-6 — Bash write detection > denies sed -i s/a/b open-brain/src/hit.ts and states the static limit 3ms",
+   "PH-6 — Bash write detection > denies cat x | tee open-brain/src/hit.ts and states the static limit 2ms",
+   "PH-6 — Bash write detection > denies cp README.md open-brain/src/hit.ts and states the static limit 3ms",
+   "PH-6 — Bash write detection > denies mv README.md .agents/state.json and states the static limit 4ms",
+   "tests/planner-hook/hook.test.ts > PH-6 — Bash write detection > denies echo x > open-brain/src/hit.ts and states the static limit",
+   "tests/planner-hook/hook.test.ts > PH-6 — Bash write detection > denies sed -i s/a/b open-brain/src/hit.ts and states the static limit",
+   "tests/planner-hook/hook.test.ts > PH-6 — Bash write detection > denies cat x | tee open-brain/src/hit.ts and states the static limit",
+   "tests/planner-hook/hook.test.ts > PH-6 — Bash write detection > denies cp README.md open-brain/src/hit.ts and states the static limit",
+   "tests/planner-hook/hook.test.ts > PH-6 — Bash write detection > denies mv README.md .agents/state.json and states the static limit"
+  ]
+ },
+ {
+  "id": "ph7",
+  "kind": "dev-r1",
+  "applied": "FAILED: error: corrupt patch at C:/qa-tmp/qa233-ph7.patch:15\n",
+  "landed": false
+ },
+ {
+  "id": "ph8",
+  "kind": "dev-r1",
+  "applied": "clean",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "1 failed | 64 passed (65)",
+  "failed": [
+   "PH-8 — CLI deny contract and Windows paths > denied Edit exits 2 with permissionDecision deny on stdout 1879ms",
+   "tests/planner-hook/hook.test.ts > PH-8 — CLI deny contract and Windows paths > denied Edit exits 2 with permissionDecision deny on stdout"
+  ]
+ },
+ {
+  "id": "q1-spawn",
+  "kind": "qa",
+  "branch": "qa/t194-r2-mut-q1-spawn",
+  "sha": "926a00bfa1b549647d0bbfc3e99fe5d55e8aee90",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "1 failed | 64 passed (65)",
+  "failed": [
+   "no child process (CA-4b / R16) > walked the planner-hook sources, and none imports child_process 115ms",
+   "tests/planner-hook/docs-merge.test.ts > no child process (CA-4b / R16) > walked the planner-hook sources, and none imports child_process"
+  ]
+ },
+ {
+  "id": "q2-token-order",
+  "kind": "qa",
+  "branch": "qa/t194-r2-mut-q2-token-order",
+  "sha": "50232094188087724e8221fc7d245194668bfea3",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "1 failed | 64 passed (65)",
+  "failed": [
+   "helpers > readGhToken prefers GH_TOKEN, then GITHUB_TOKEN, then an oauth_token in hosts.yml 14ms",
+   "tests/planner-hook/docs-merge.test.ts > helpers > readGhToken prefers GH_TOKEN, then GITHUB_TOKEN, then an oauth_token in hosts.yml"
+  ]
+ },
+ {
+  "id": "q3-status-ignored",
+  "kind": "qa",
+  "branch": "qa/t194-r2-mut-q3-status-ignored",
+  "sha": "b0f4a87d7d0d6b53b3b824b1a10d5bfc40a10cf3",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "1 failed | 64 passed (65)",
+  "failed": [
+   "row 3 — an unreadable list is denied and says why > HTTP 404 names the status 22ms",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > HTTP 404 names the status"
+  ]
+ },
+ {
+  "id": "q4-rename-guard",
+  "kind": "qa",
+  "branch": "qa/t194-r2-mut-q4-rename-guard",
+  "sha": "1b372c88f96d717d0db0f642d8a7fb758d0ab68f",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "1 failed | 64 passed (65)",
+  "failed": [
+   "row 2 — one unlisted path is denied without a grant > a renamed file with no previous_filename is denied, not assumed docs-only 18ms",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > a renamed file with no previous_filename is denied, not assumed docs-only"
+  ]
+ }
+]

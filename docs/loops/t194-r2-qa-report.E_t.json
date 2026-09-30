@@ -1,0 +1,102 @@
+{
+  "loop": "t194",
+  "candidate_git": {
+    "sha": "699789e1a21763d1e7e4e15a6a501cbbf4756f83",
+    "branch": "origin/loop/t194-planner-hook",
+    "frozen_at": "2026-09-30T01:25:15-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit (open-brain/, candidate 699789e1, laptop DESKTOP-0GV3HAD)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 4577,
+      "detail": "Typecheck clean. npm run build also exit 0 locally (stamped 699789e)."
+    },
+    "unit": {
+      "command": "tcm CI run 36685909006 (qa/t194-r2-ci-candidate, headSha 699789e1a21763d1e7e4e15a6a501cbbf4756f83), job test 109793193324",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 216000,
+      "detail": "Run conclusion failure, test job failure: 1 failed | 1889 passed | 6 skipped (1896), 133 files. The one failure is tests/shared/state-schema.test.ts 'T-171 r3b: origin/master's real state.json parses, and a missing note_by is null'. Base run 36685915529 (qa/t194-r2-ci-base, headSha c933a4444f05ef241ca425fc22de460eaa37dd9b, test job 109793329454): conclusion failure, the SAME single test fails, 1 failed | 1824 passed | 6 skipped (1831), 131 files. No new failure. Locally tests/planner-hook: 65 passed, exit 0."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "PH-1",
+      "status": "unmet",
+      "evidence": "Relative targets are denied and the refusal names planner.md \"Authority\" and the path (hook.test PH-1; QA's typechecking ph1-tc mutant 20f1ba88 red, 5 failed). But an ABSOLUTE file_path, which is the form Claude Code's Edit/Write send, is ALLOWED: probe P9 (C:/qa-scratch/qa233-fx/open-brain/src/cli.ts) and P10 (backslash form) return allow, and through the real CLI P13 exits 0 with empty stdout. isProtectedArtifactPath never strips the repo root. Every PH-1 test uses a relative path. The developer's ph1 mutant does not typecheck on 699789e1 (TS2345), so it is invalid."
+    },
+    {
+      "id": "PH-2",
+      "status": "partial",
+      "evidence": "Relative rendered views and state.json are denied naming ob_state (hook.test PH-2; QA ph2-tc mutant 68e98392 red, 4 failed). The SUMMARY.md marked-region rows pass and use endsWith, so they hold for absolute paths too. An absolute .agents/state.json Write is ALLOWED (probe P11), which is the same root cause as PH-1. The developer's ph2 mutant does not typecheck on 699789e1 (TS2345)."
+    },
+    {
+      "id": "PH-3",
+      "status": "unmet",
+      "evidence": "Every act on its own is denied without a grant (hook.test PH-3; QA ph3-tc 83af5b5c red, 26 failed; probe P7 force push alone is denied). But a docs-only gh pr merge ALLOWS the whole command line with no grant: probe P3 'gh pr merge <docs PR> --squash && git push --force origin master' returns allow, and P4 'gh pr merge <docs PR> && gh pr merge <code PR>' returns allow after fetching only the first PR's files. checkBash returns null (allow) as soon as the first ref's list is docs-only. This is r2-introduced. The grant half holds: grant consumed after one use (tests). The developer's ph3 mutant does not typecheck on 699789e1 (TS2722/TS18048)."
+    },
+    {
+      "id": "PH-4",
+      "status": "met",
+      "order": "shown",
+      "evidence": "hook.test PH-4 (docs/loops Write, Read, git status/log/fetch/diff, a standing docs/* push) passes. ph4, re-applied by hand to 699789e1, is red: 2 failed. The hook verifies the allowlist itself (r2): probe P1 allows a docs-only PR with no grant, and the live GET shape matches the fixture."
+    },
+    {
+      "id": "PH-5",
+      "status": "met",
+      "order": "shown",
+      "evidence": "hook.test PH-5: a missing AGENT.local.md, a malformed frontmatter and malformed input each deny with the cause, and a non-planner role passes through. ph5 applied cleanly to 699789e1, tsc 0, red: 1 failed ('missing AGENT.local.md is denied')."
+    },
+    {
+      "id": "PH-6",
+      "status": "partial",
+      "evidence": "Relative redirect, sed -i, tee, cp and mv targets are denied, and the output states the static limit (hook.test PH-6; ph6 applied cleanly, red: 5 failed). An absolute redirect target is ALLOWED: probe P15 'echo x > C:/qa-scratch/qa233-fx/open-brain/src/cli.ts'. That is statically detectable, so it falls inside the row."
+    },
+    {
+      "id": "PH-7",
+      "status": "met",
+      "order": "shown",
+      "evidence": "cli-planner-hook.ts uses JSON.parse on stdin, and the policy reads fields rather than the text. ph7, re-applied by hand (malformed JSON exits 0), is red: 1 failed. ph8 (a deny exits 0) is a deny-to-allow mutant: applied cleanly, red, 1 failed."
+    },
+    {
+      "id": "PH-8",
+      "status": "partial",
+      "order": "shown",
+      "evidence": "Testable half: a CLI deny exits 2 with permissionDecision deny on stdout, a relative backslash path is denied, an allow exits 0 with empty stdout, and --print-registration works (hook.test PH-8; ph8 red). Live half (Claude Code on Windows with the context-mode PreToolUse hook): not evaluated, per dispatch. NOTE: the planned live check 'one denied Edit to open-brain/src/' is expected to FAIL, because Claude Code sends an absolute file_path (see PH-1)."
+    },
+    {
+      "id": "R2-1-docs-merge-no-grant-no-spawn",
+      "status": "partial",
+      "order": "shown",
+      "evidence": "A docs-only PR is allowed with no grant over REST fetch (docs-merge row 1; probe P1). m4 applied cleanly, red: 4 failed. No spawn: the AST row passes, and QA's planted spawn (q1-spawn 926a00bf, an import of execFileSync from node:child_process in prfiles.ts) is red: 1 failed, 'none imports child_process'. One real read of PR 219 through fetchPrChangedPaths returned ok with 15 paths, and the field names match the fixture (changed_files: number; entries: filename, status, previous_filename when renamed). PARTIAL because the allow covers the whole command line, not only the merge that was checked (PH-3, P3/P4)."
+    },
+    {
+      "id": "R2-2-fails-closed",
+      "status": "partial",
+      "order": "shown",
+      "evidence": "Each of these denies and names its cause: an unreadable list, a network error, a hang (timeout), HTTP 404, a short list, no token, an empty or non-list response, a bad ref, a non-github origin, one unlisted path, and a rename out of an unlisted path (docs-merge rows 2 and 3). Mutants red: m1 (10 failed), m2 (1), m3 (1), q3-status-ignored b0f4a87d (1), q4-rename-guard 1b372c88 (1). PARTIAL: a second, unlisted PR on the same command line is never checked (probe P4 allow)."
+    },
+    {
+      "id": "R2-3-docs-merge-never-touches-grant",
+      "status": "met",
+      "order": "shown",
+      "evidence": "docs-merge row 1 checks the grant's bytes and mtime. Probe P8, with a grant for a code PR present, allows the docs merge and leaves the grant file unchanged (bytes and mtime). m5 (consumes on a docs merge) applied cleanly, red: 1 failed."
+    },
+    {
+      "id": "R2-4-token-order-and-bearer",
+      "status": "met",
+      "order": "shown",
+      "evidence": "The token order is GH_TOKEN, then GITHUB_TOKEN, then hosts.yml oauth_token (helpers test). With GH_TOKEN set to a fixture value, every request carries 'Bearer <value>' (docs-merge row 1). A keyring-shaped machine denies with a named cause (row 3). QA's q2-token-order 50232094 is red: 1 failed. This machine (not scored): gh auth status shows a token stored in %APPDATA%\\GitHub CLI\\hosts.yml, not in the keyring, and GH_TOKEN and GITHUB_TOKEN are unset, so the hosts.yml route is readable here."
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "D-066: .agents/assignments.json is NOT on the candidate's allowlist (git.ts DOCS_MERGE_ALLOWLIST_EXACT). Probe P6 denies with 'unlisted path .agents/assignments.json'. This is an expected miss (the candidate predates D-066) and is not scored.",
+    "PH-8 live half not evaluated (dispatch rule).",
+    "Local full suite not run; the tcm runs stand for it."
+  ],
+  "notes": "QA 233, Claude Code on Opus 5.5 (claude-opus-5-5), laptop DESKTOP-0GV3HAD, headless. Dispatch commit c1296f2b1f1871e8bc032b92143a472174c05a2a. Verdict REJECT on two defects: D1, an absolute path bypasses PH-1/PH-2/PH-6 (from r1); D2, a docs-only gh pr merge allows the rest of a chained command (from r2)."
+}

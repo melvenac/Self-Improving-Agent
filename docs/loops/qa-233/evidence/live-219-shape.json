@@ -1,0 +1,86 @@
+{
+ "ok": true,
+ "pathCount": 15,
+ "requests": [
+  {
+   "path": "/repos/melvenac/Self-Improving-Agent/pulls/219",
+   "status": 200,
+   "authScheme": "Bearer",
+   "shape": {
+    "list": false,
+    "keys": [
+     "_links",
+     "active_lock_reason",
+     "additions",
+     "assignee",
+     "assignees",
+     "author_association",
+     "auto_merge",
+     "base",
+     "body",
+     "changed_files",
+     "closed_at",
+     "comments",
+     "comments_url",
+     "commits",
+     "commits_url",
+     "created_at",
+     "deletions",
+     "diff_url",
+     "draft",
+     "head",
+     "html_url",
+     "id",
+     "issue_url",
+     "labels",
+     "locked",
+     "maintainer_can_modify",
+     "merge_commit_sha",
+     "mergeable",
+     "mergeable_state",
+     "merged",
+     "merged_at",
+     "merged_by",
+     "milestone",
+     "node_id",
+     "number",
+     "patch_url",
+     "rebaseable",
+     "requested_reviewers",
+     "requested_teams",
+     "review_comment_url",
+     "review_comments",
+     "review_comments_url",
+     "state",
+     "statuses_url",
+     "title",
+     "updated_at",
+     "url",
+     "user"
+    ],
+    "changed_files_type": "number"
+   }
+  },
+  {
+   "path": "/repos/melvenac/Self-Improving-Agent/pulls/219/files?per_page=100&page=1",
+   "status": 200,
+   "authScheme": "Bearer",
+   "shape": {
+    "list": true,
+    "length": 15,
+    "entryKeys": [
+     "additions",
+     "blob_url",
+     "changes",
+     "contents_url",
+     "deletions",
+     "filename",
+     "patch",
+     "raw_url",
+     "sha",
+     "status"
+    ]
+   }
+  }
+ ]
+}

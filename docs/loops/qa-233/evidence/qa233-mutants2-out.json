@@ -1,0 +1,59 @@
+[
+ {
+  "id": "ph3",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 2,
+  "tscOut": "src/planner-hook/run.ts(176,21): error TS2722: Cannot invoke an object which is possibly 'undefined'.\r\nsrc/planner-hook/run.ts(176,21): error TS18048: 'deps.prChangedPaths' is possibly 'undefined'.\r\nsrc/planner-hook/run.ts(176,41): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.\r\n  Type 'null' is not assignable to type 'string'.\r\nsrc/planner-hook/run.ts(180,19): error TS2339: Property 'pending' does not exist on type 'string[] | { failed: string; pending?: true | undefined; } | \"fail\"'.\r\n  Property 'pending' does not exist on type 'string[]'.\r\nsrc/planner-hook/run.ts(181,28): error TS2339: Property 'failed' does not exist on type 'string[] | { failed: string; pending?: true | undefined; } | \"fail\"'.\r\n  Property 'failed' does not exist on type"
+ },
+ {
+  "id": "ph4",
+  "landed": " 1 file changed, 4 insertions(+)",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "2 failed | 63 passed (65)",
+  "failed": [
+   "tests/planner-hook/hook.test.ts > PH-4 — allowed planner acts > Write under docs/loops/ passes",
+   "tests/planner-hook/hook.test.ts > PH-8 — CLI deny contract and Windows paths > allowed docs/loops Write exits 0 with empty stdout"
+  ]
+ },
+ {
+  "id": "ph7",
+  "landed": " 1 file changed, 1 insertion(+), 2 deletions(-)",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "1 failed | 64 passed (65)",
+  "failed": [
+   "tests/planner-hook/hook.test.ts > PH-7 — JSON parser, not text matching > CLI denies malformed JSON with exit 2 and permissionDecision"
+  ]
+ },
+ {
+  "id": "ph1-tc",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "branch": "qa/t194-r2-mut-ph1-tc",
+  "sha": "20f1ba889a15a9696477e669957d6bca626fbfc0",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "5 failed | 60 passed (65)",
+  "failed": [
+   "tests/planner-hook/hook.test.ts > PH-1 — artifact writes denied > Edit to protected path is denied and names planner.md Authority",
+   "tests/planner-hook/hook.test.ts > PH-1 — artifact writes denied > Write to protected path is denied and names planner.md Authority",
+   "tests/planner-hook/hook.test.ts > PH-1 — artifact writes denied > NotebookEdit to protected path is denied and names planner.md Authority",
+   "tests/planner-hook/hook.test.ts > PH-8 — CLI deny contract and Windows paths > denied Edit exits 2 with permissionDecision deny on stdout"
+  ]
+ },
+ {
+  "id": "ph2-tc",
+  "landed": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "branch": "qa/t194-r2-mut-ph2-tc",
+  "sha": "68e9839260398fea67056e1d4b0a115919dabc2e",
+  "tsc": 0,
+  "vitestExit": 1,
+  "tests": "4 failed | 61 passed (65)",
+  "failed": [
+   "tests/planner-hook/hook.test.ts > PH-2 — rendered views and state.json denied > Edit .agents/TASKS/INBOX.md is denied and names ob_state",
+   "tests/planner-hook/hook.test.ts > PH-2 — rendered views and state.json denied > Edit .agents/TASKS/task.md is denied and names ob_state",
+   "tests/planner-hook/hook.test.ts > PH-2 — rendered views and state.json denied > Edit .agents/SESSIONS/next-session.md is denied and names ob_state",
+   "tests/planner-hook/hook.test.ts > PH-2 — rendered views and state.json denied > Edit .agents/state.json is denied and names ob_state"
+  ]
+ }
+]
