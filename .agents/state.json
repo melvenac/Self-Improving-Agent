@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 205,
+  "revision": 206,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1073,6 +1073,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "From Relay via Clark (A2A T-080), accepted by planner session 153. The check blamed Relay's session 20 (743b4fed) for 28 commits that are Rivet's. They share the git identity 'Aaron Melven' and carry no Claude-Session trailer, and docs/loops/rivet-handoff-session-20.md covers them. Attribute by the trailer; a commit without a trailer is UNATTRIBUTED, never assigned to the checkout's seat by identity.",
+      "note_by": [
+        "6e083614-965f-462b-ad59-62091a0be5e1"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-213",
+      "title": "Repoint the forge seat in hub-partner-seats.json to hub_name forge, room k571c0nz, and un-pin the tests from the live file",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 153,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Strict prep (A2A T-057, Relay's condition 3), planner session 153. Forge now talks to atlas as `forge` (key 95d5e360), but it is NOT a member of grok's room k57frxw0ptb8tadmqdwy0khhks8ey006, and the hub has no add-member route. The {atlas, forge} room k571c0nz7tq2e5g0qt8td094n18ers8v is the replacement: participants [atlas, forge]; the planner extended it from 64 to 500 turns (POST /extend +436, 200). The tracked .agents/SYSTEM/hub-partner-seats.json still maps seats.forge to hub_name grok, room k57frxw0, and readers.atlas and readers.grok follow. The planner tried the record edit (forge seat to {hub_name: forge, cursor: false, room: k571c0nz}, the atlas reader partner grok to forge, readers.grok to readers.forge) and it broke 5 tests that read the LIVE file: hub-presence.test.ts PR-1, PR-4 and both R5 key rows, plus greeting-size's T-198 presence bound. On the original file, 37/37 pass. That is the T-205 lesson again: a test pins live record data. The developer makes the edit and moves those tests onto a fixture seats file, in one PR. Until it merges, strict (D-063) is not safe for forge.",
       "note_by": [
         "6e083614-965f-462b-ad59-62091a0be5e1"
       ],
