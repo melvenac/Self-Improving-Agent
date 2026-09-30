@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { existsSync, mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync, execFileSync } from "node:child_process";
@@ -62,7 +63,7 @@ function baseInput(over: Record<string, unknown> = {}) {
     candidateSha: SHA_A,
     loop: "t001",
     criteriaText: EMPTY_CRITERIA,
-    policy: { require_plan_gate: false, require_done_gate: false },
+    policy: { required_inputs: ["runtime_checks", "E_t.acceptance"], require_plan_gate: false, require_done_gate: false },
     doneGate: null,
     planGate: null,
     gateMode: "skip",
@@ -121,7 +122,7 @@ describe("computeShadowMergeVerdict", () => {
   it("CC-4.5 a required gate reject is would-not-merge", async () => {
     const { computeShadowMergeVerdict } = await load();
     const r = computeShadowMergeVerdict(baseInput({
-      policy: { require_plan_gate: false, require_done_gate: true },
+      policy: { required_inputs: ["runtime_checks", "E_t.acceptance"], require_plan_gate: false, require_done_gate: true },
       doneGate: { verdict: "reject" },
       gateMode: "live",
     }));
@@ -157,7 +158,7 @@ describe("computeShadowMergeVerdict", () => {
   it("CC-5.5 a required gate that is missing is undefined", async () => {
     const { computeShadowMergeVerdict } = await load();
     const r = computeShadowMergeVerdict(baseInput({
-      policy: { require_plan_gate: false, require_done_gate: true },
+      policy: { required_inputs: ["runtime_checks", "E_t.acceptance"], require_plan_gate: false, require_done_gate: true },
       doneGate: "missing",
       gateMode: "live",
     }));
@@ -601,5 +602,264 @@ describe("record 201 r3", () => {
     } finally {
       rmSync(repo, { recursive: true, force: true });
     }
+  });
+});
+
+/**
+ * Record 217, candidate C r4. CC-2.2, CC-5.6, CC-13.1 and CC-17 were correct in
+ * the product at 5f7c9a0 and lacked an assertion: their red is the named mutant,
+ * not the base. CC-1.2 and CC-13.2 change the product and are red at the base.
+ */
+const FIXTURE_DIR = fileURLToPath(new URL("./fixtures/shadow-merge/", import.meta.url));
+
+interface ShadowFixture {
+  fixture: string;
+  policy: Record<string, unknown>;
+  criteriaText: string;
+  gateMode: string;
+  doneGate: unknown;
+  planGate: unknown;
+  evidence: Record<string, unknown>;
+  expected: { verdict: string; reason_includes: string };
+}
+
+function readFixture(name: string): ShadowFixture {
+  return JSON.parse(readFileSync(join(FIXTURE_DIR, `${name}.json`), "utf8")) as ShadowFixture;
+}
+
+function fixtureInput(f: ShadowFixture): Record<string, unknown> {
+  return {
+    evidence: f.evidence,
+    candidateSha: SHA_A,
+    loop: "t001",
+    criteriaText: f.criteriaText,
+    policy: f.policy,
+    doneGate: f.doneGate,
+    planGate: f.planGate,
+    gateMode: f.gateMode,
+  };
+}
+
+describe("record 217 r4", () => {
+  it("CC-2.2 the three outcome fixtures exist in fixtures/shadow-merge/", () => {
+    const files = readdirSync(FIXTURE_DIR).filter((n) => n.endsWith(".json")).sort();
+    for (const required of ["undefined.json", "would-merge.json", "would-not-merge.json"]) {
+      expect(files, `fixtures/shadow-merge/${required} is missing`).toContain(required);
+    }
+  });
+
+  it.each(["would-merge", "would-not-merge", "undefined"])(
+    "CC-2.2 fixtures/shadow-merge/%s.json returns its named outcome with a reason",
+    async (name) => {
+      const { computeShadowMergeVerdict } = await load();
+      const f = readFixture(name);
+      expect(f.expected.verdict).toBe(name);
+      const r = computeShadowMergeVerdict(fixtureInput(f));
+      expect(r.verdict).toBe(f.expected.verdict);
+      expect(r.reasons.join(" ")).toContain(f.expected.reason_includes);
+      if (name !== "would-merge") expect(r.reasons.length).toBeGreaterThan(0);
+    },
+  );
+
+  it("CC-5.6 fixtures/shadow-merge/skipped-required-live-gate.json: a required gate skipped is undefined, and says skip", async () => {
+    const { computeShadowMergeVerdict } = await load();
+    const f = readFixture("skipped-required-live-gate");
+    expect(f.policy.require_done_gate).toBe(true);
+    expect(f.gateMode).toBe("skip");
+    expect(f.doneGate).toBeNull();
+    const skipped = computeShadowMergeVerdict(fixtureInput(f));
+    expect(skipped.verdict).toBe("undefined");
+    expect(skipped.reasons.join(" ")).toContain(f.expected.reason_includes);
+    const live = computeShadowMergeVerdict({ ...fixtureInput(f), gateMode: "live" });
+    expect(live.verdict).toBe("undefined");
+    expect(live.reasons.join(" ")).toContain("required and missing");
+    expect(live.reasons.join(" ")).not.toContain("skip");
+  });
+
+  it("CC-17 fixtures/shadow-merge/all-attributed.json: every in-scope row attributed and green is would-merge, all named", async () => {
+    const { computeShadowMergeVerdict } = await load();
+    const f = readFixture("all-attributed");
+    const rows = f.evidence.acceptance as Array<{ id: string; order: string }>;
+    expect(rows.length).toBe(3);
+    expect(rows.every((row) => row.order === "attributed")).toBe(true);
+    const r = computeShadowMergeVerdict(fixtureInput(f));
+    expect(r.verdict).toBe("would-merge");
+    expect(r.reasons.filter((reason) => reason.includes("(attributed)")).length).toBe(3);
+    const fewer = computeShadowMergeVerdict(fixtureInput({ ...f, evidence: { ...f.evidence, acceptance: rows.slice(0, 2) } }));
+    expect(fewer.verdict).toBe("would-merge");
+  });
+
+  it("CC-13.1 a present, non-empty, INCORRECT line_hash is the only problem reported", async () => {
+    const { prepareShadowVerdict, decideShadowVerdict, checkShadowMergeLedger } = await load();
+    const repo = fixtureRepo();
+    try {
+      const criteriaSha = git(repo, ["rev-parse", "HEAD"]);
+      prepareShadowVerdict({
+        repo, loop: "t001", candidateSha: SHA_A, criteriaSha, criteriaPath: "docs/loops/criteria.md",
+        evidence: evidence(), gateMode: "skip",
+      });
+      const { line } = decideShadowVerdict({
+        repo, loop: "t001", candidateSha: SHA_A, action: "declined",
+      });
+      const ledger = join(repo, "docs", "loops", "shadow-merge", "ledger.jsonl");
+      expect(checkShadowMergeLedger(repo).severity).toBe("pass");
+      const wrong = "0".repeat(64);
+      expect(wrong).not.toBe(line.line_hash);
+      writeFileSync(ledger, `${JSON.stringify({ ...line, line_hash: wrong })}\n`);
+      const r = checkShadowMergeLedger(repo);
+      expect(r.severity).toBe("issue");
+      expect(r.message).toContain("line 1: line_hash does not match the line");
+      expect(r.message).not.toMatch(/empty line|missing line_hash|differs from the committed|no shadow_merge\.json/);
+    } finally {
+      rmSync(repo, { recursive: true, force: true });
+    }
+  });
+
+  it("CC-1.2 merge.json names runtime_checks and E_t.acceptance, the loader refuses a copy that drops one, and the derived schema carries the field", async () => {
+    const policies = await import("../../src/harness/policies.js");
+    const real = policies.loadMergePolicy();
+    expect(real.required_inputs).toContain("runtime_checks");
+    expect(real.required_inputs).toContain("E_t.acceptance");
+    const schema = policies.policyJsonSchemas().merge as { properties: Record<string, unknown> };
+    expect(schema.properties.required_inputs).toBeDefined();
+    const dir = mkdtempSync(join(tmpdir(), "shadow-policy-"));
+    try {
+      const shipped = JSON.parse(readFileSync(join(policies.policiesDir(), "merge.json"), "utf8")) as Record<string, unknown>;
+      for (const dropped of ["runtime_checks", "E_t.acceptance"]) {
+        const kept = (shipped.required_inputs as string[]).filter((n) => n !== dropped);
+        writeFileSync(join(dir, "merge.json"), JSON.stringify({ ...shipped, required_inputs: kept }));
+        expect(() => policies.loadMergePolicy(dir), `dropping ${dropped}`).toThrow(/required_inputs/);
+      }
+      writeFileSync(join(dir, "merge.json"), JSON.stringify({ ...shipped, required_inputs: [...(shipped.required_inputs as string[]), "E_t.requirements"] }));
+      expect(policies.loadMergePolicy(dir).required_inputs).toContain("E_t.requirements");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("CC-1.2 the verdict reads required_inputs from the policy: an extra required input that E_t lacks forces undefined", async () => {
+    const { computeShadowMergeVerdict } = await load();
+    const extra = { required_inputs: ["runtime_checks", "E_t.acceptance", "E_t.requirements"], require_plan_gate: false, require_done_gate: false };
+    const lacking = computeShadowMergeVerdict(baseInput({ policy: extra }));
+    expect(lacking.verdict).toBe("undefined");
+    expect(lacking.reasons.join(" ")).toContain("E_t.requirements");
+    const supplied = computeShadowMergeVerdict(baseInput({
+      policy: extra,
+      evidence: evidence({ requirements: [{ id: "R1", status: "met", evidence: "shown", severity: "info" }] }),
+    }));
+    expect(supplied.verdict).toBe("would-merge");
+    const shipped = computeShadowMergeVerdict(baseInput());
+    expect(shipped.verdict).toBe("would-merge");
+    const unknown = computeShadowMergeVerdict(baseInput({
+      policy: { required_inputs: ["runtime_checks", "E_t.acceptance", "E_t.bogus"], require_plan_gate: false, require_done_gate: false },
+    }));
+    expect(unknown.verdict).toBe("undefined");
+  });
+
+  describe("CC-13.2 the ledger check enumerates verdict artifacts", () => {
+    const CRITERIA = "docs/loops/criteria.md";
+    const LIMIT = /ancestry is read against this tree's HEAD, so a stale tree under-reports owed decides/;
+
+    async function prepare(repo: string, loop: string, sha: string): Promise<string> {
+      const { prepareShadowVerdict } = await load();
+      const criteriaSha = git(repo, ["rev-parse", "HEAD"]);
+      return prepareShadowVerdict({
+        repo, loop, candidateSha: sha, criteriaSha, criteriaPath: CRITERIA,
+        evidence: evidence({ loop, candidate_git: { sha, branch: "loop/c", frozen_at: "2026-09-28T00:00:00.000Z" } }),
+        gateMode: "skip",
+      }).path;
+    }
+
+    it("a decided artifact is matched, counted, and the limit is stated", async () => {
+      const { decideShadowVerdict, checkShadowMergeLedger } = await load();
+      const repo = fixtureRepo();
+      try {
+        await prepare(repo, "t001", SHA_A);
+        decideShadowVerdict({ repo, loop: "t001", candidateSha: SHA_A, action: "declined" });
+        const r = checkShadowMergeLedger(repo);
+        expect(r.severity).toBe("pass");
+        expect(r.message).toContain("1 verdict artifact(s) walked, 0 pending decide");
+        expect(r.message).toMatch(LIMIT);
+      } finally {
+        rmSync(repo, { recursive: true, force: true });
+      }
+    });
+
+    it("an artifact whose candidate is an ancestor of HEAD and has NO ledger line is an issue, with the ledger absent", async () => {
+      const { checkShadowMergeLedger } = await load();
+      const repo = fixtureRepo();
+      try {
+        const head = git(repo, ["rev-parse", "HEAD"]);
+        await prepare(repo, "15-slice-3", head);
+        expect(existsSync(join(repo, "docs", "loops", "shadow-merge", "ledger.jsonl"))).toBe(false);
+        const r = checkShadowMergeLedger(repo);
+        expect(r.severity).toBe("issue");
+        expect(r.message).toContain("no ledger line");
+        expect(r.message).toContain("decide is owed");
+        expect(r.message).toContain("1 verdict artifact(s) walked");
+        expect(r.message).toMatch(LIMIT);
+      } finally {
+        rmSync(repo, { recursive: true, force: true });
+      }
+    });
+
+    it("an owed decide is an issue when the ledger exists but holds a line for a different artifact", async () => {
+      const { decideShadowVerdict, checkShadowMergeLedger } = await load();
+      const repo = fixtureRepo();
+      try {
+        const head = git(repo, ["rev-parse", "HEAD"]);
+        await prepare(repo, "t001", SHA_A);
+        decideShadowVerdict({ repo, loop: "t001", candidateSha: SHA_A, action: "declined" });
+        await prepare(repo, "t002", head);
+        const r = checkShadowMergeLedger(repo);
+        expect(r.severity).toBe("issue");
+        expect(r.message).toContain(head);
+        expect(r.message).toContain("2 verdict artifact(s) walked");
+      } finally {
+        rmSync(repo, { recursive: true, force: true });
+      }
+    });
+
+    it("an undecided artifact whose candidate is not merged is pending: severity pass, count and SHA printed", async () => {
+      const { checkShadowMergeLedger } = await load();
+      const repo = fixtureRepo();
+      try {
+        await prepare(repo, "t001", SHA_B);
+        const r = checkShadowMergeLedger(repo);
+        expect(r.severity).toBe("pass");
+        expect(r.message).toContain("1 verdict artifact(s) walked, 1 pending decide");
+        expect(r.message).toContain(SHA_B);
+        expect(r.message).toMatch(LIMIT);
+      } finally {
+        rmSync(repo, { recursive: true, force: true });
+      }
+    });
+
+    it("a malformed artifact is an issue, never skipped", async () => {
+      const { checkShadowMergeLedger } = await load();
+      const repo = fixtureRepo();
+      try {
+        const path = await prepare(repo, "t001", SHA_A);
+        writeFileSync(path, "{ not json");
+        const r = checkShadowMergeLedger(repo);
+        expect(r.severity).toBe("issue");
+        expect(r.message).toContain("unreadable");
+        expect(r.message).toContain("1 verdict artifact(s) walked");
+      } finally {
+        rmSync(repo, { recursive: true, force: true });
+      }
+    });
+
+    it("a tree with no ledger and no artifacts says it walked 0", async () => {
+      const { checkShadowMergeLedger } = await load();
+      const repo = fixtureRepo();
+      try {
+        const r = checkShadowMergeLedger(repo);
+        expect(r.severity).toBe("pass");
+        expect(r.message).toContain("0 verdict artifacts walked");
+      } finally {
+        rmSync(repo, { recursive: true, force: true });
+      }
+    });
   });
 });
