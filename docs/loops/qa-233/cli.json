@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [],
+    "deny": [
+      "Shell(git:push*)",
+      "Shell(git:*push*)",
+      "Shell(git.exe:*push*)",
+      "Shell(git push)",
+      "Shell(git push *)",
+      "Shell(cmd:*git push*)",
+      "Shell(cmd:*git* push*)",
+      "Shell(powershell:*git push*)",
+      "Shell(powershell.exe:*git push*)",
+      "Shell(powershell*:*git push*)",
+      "Shell(bash:*git push*)",
+      "Shell(bash.exe:*git push*)",
+      "Shell(gh:pr*)",
+      "Shell(gh pr)",
+      "Shell(gh pr *)",
+      "Shell(gh:release*)",
+      "Shell(gh release)",
+      "Shell(gh release *)",
+      "Shell(gh:api*)",
+      "Shell(gh api)",
+      "Shell(gh api *)",
+      "Shell(gh:repo*)",
+      "Shell(gh repo)",
+      "Shell(gh repo *)",
+      "Write(**/.cursor/**)",
+      "Write(**/.cursor/cli.json)",
+      "Write(**\\\\.cursor\\\\**)",
+      "Write(.cursor/**)"
+    ]
+  }
+}
