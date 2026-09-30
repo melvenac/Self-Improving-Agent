@@ -1834,7 +1834,7 @@ export function composeGreeting(projectRoot: string, version: string): ComposedG
     .filter((f) => f.content !== null)
     .map((f) => `\n## ${f.rel}${f.commit ? ` @ ${f.commit.slice(0, 7)}` : ""}\n${(f.content as string).replace(/\s+$/, "")}`)
     .join("\n");
-  const text = [treeAndSeat, state, assignment, roleFiles].join("\n");
+  const text = [treeAndSeat, state, roleFiles].join("\n");
   return { text, parts: { treeAndSeat: treeAndSeat.length, state: state.length, assignment: assignment.length, roleFiles: roleFiles.length } };
 }
 
