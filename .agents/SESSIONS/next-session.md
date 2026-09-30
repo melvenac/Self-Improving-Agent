@@ -1,44 +1,42 @@
-<!-- generated from .agents/state.json rev 140 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 173 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 146)_
+## planner [sia-planner] _(written session 150)_
 
 ### Pick up here
 
-Read docs/loops/planner-session-146-notes.md, section 'HANDOFF TO THE NEXT PLANNER (session 146 rolls here)', first. T-179 r2 is merged and the record is v3. Verify which of PRs #172-#176 merged. Re-arm one hub listener per developer room. Then send the /bootstrap cli.ts reconciliation to cursor-builder, and follow the Cursor QA driver (record 175) to merge, so the seven waiting QA runs go to the laptop and QA PC.
+Planner session 150 (2026-09-30), mid-session handoff, to be rewritten at roll. In flight: PR #218 (T-158, Aaron's direct yes, branch updated to e0a2e73; merge on CLEAN pinned, then read master's own run). PR #217 (docs-only, revs 166-169 + docs/loops/forge-turns-234-236.md; merge on CLEAN). QA 228 (laptop, started 05:33Z) not finished; rule on it with the rev 166 T-196 ruling (HB-2/HB-3 CLI-only). Forge (sia-forge-90, Claude Code, native A2A) is building C r4 on the rev 167 rulings, and is registering hub identity `forge` with Aaron's code (issued 05:51:27Z, valid 24 h); Relay verifies. Builder: turn 69 (T-194 r2 first; T-200 and T-199 get full briefs after, per D-064). Listeners: atlas --wait on the builder and infra rooms.
 
 ### Watch out
 
-- QA runs ONLY on the laptop and QA PC (Aaron), headless via the Cursor QA driver once merged; never as chats on his desktop.
-- Dry-run every command on its target machine before giving it to Aaron: the QA PC's profile paths contain a space, and bash expands $env: before ssh.
-- Read a candidate's diffed code before ruling, not only its handoff.
-- Developer seats are Cursor (Grok 4.7), one hub room each. The planner must run a listener per room; cursor-builder needs Aaron's nudge to read its room.
-- Nothing was written to the record in session 146 except the v3 migration: the owed ob_state writes are listed in the handoff section.
+- STANDING INSTRUCTION FROM AARON (relayed Aaron -> worktrees-d5 (Clark) -> Atlas, session 150): 'start reporting to you [Clark] when an item on the hoh checklist can be marked complete.' Checklist: C:\Users\melve\Worktrees\hoh-checklist.md, READ-ONLY for the planner (Clark edits it). When an item becomes completable, send worktrees-d5 ONE A2A line per item: the checklist's wording, then DONE, then DERIVED evidence (merge SHA plus master run id and conclusion, QA number and verdict, rev, turn). Also report an item that REGRESSES or becomes BLOCKED. Send as it happens; no batching; no reply for unchanged items. If worktrees-d5 is not in ListAgents, skip the send (Clark re-syncs from the record).
+- A code merge needs Aaron's yes IN THE PLANNER SESSION; a relay through worktrees-d5 is not enough for a merge (session 150 held #218 until Aaron typed it). Relays are fine for reversible acts; record the chain.
+- Forge's C r4 rulings (rev 167, T-155 note): CC-1.2 verdict path READS merge.json required_inputs; CC-13.2 merged-without-ledger = issue, pending = printed pass, limit stated. Check both when r4 comes back.
+- Hub enrollment codes are credentials: never in a hub turn, a tracked file or a message. Aaron pasted one into the planner session once; it is spent when Forge registers.
 
 ### Open questions
 
-- Aaron: build Scout's Telegram approval (research 4)? If yes, token option (a) a separate Windows account, or (b) the same account?
-- Aaron: may the A2A-Hub main checkout take master (its D-005)?
+- Forge: has it run --init-key as `forge` and posted its turn? Then ping Relay to verify (forge row owned by aaron, no enroll reject).
+- Aaron: executable files under docs/ (QA drivers): still docs-only for D-032? (on his checklist)
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #195 loop/15-slice-3-candidate-c (5f7c9a0) — QA: rejected — candidate C r3 rejected; r4 building with Forge on rev 167 rulings
+- #218 loop/t158-gap-tombstone (e0a2e73) — QA: accepted — T-158 ACCEPTED (QA 227); Aaron's direct yes; merge on CLEAN pinned
+- #217 docs/session-150-cli-surface-rulings (36e21d9) — QA: not_required — docs-only; merge on CLEAN
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `3059ca9 (record 219 r2, QA 228)`
 
 **Questions pending for Aaron:** 
-- Build Scout's Telegram approval? Token option (a) or (b)?
-- May the A2A-Hub main checkout take master (D-005)?
+- Executable files under docs/ (QA drivers): still docs-only?
 
 **Rulings made mid-loop:** 
-- t179-t003-rulings-qa134-qa142 (T-179 r2 ACCEPTED; T-003 r2 brief)
-- t171-bootstrap-rulings-qa144-qa145 (R-BF-17..20)
-- bootstrap-r4-amend-and-queue-guard-brief (R-BF-21)
-- loop-15-slice-3-rulings-21 (A12 REJECTED; R95-R97)
-- t048-t171-rulings-qa157-qa158 plus addenda 1-2
-- importer-leftovers-rulings-qa138 (R5-1..4)
-- cal-a12-results (Composer 2.5 passes QA calibration)
+- T-196 HB-2/HB-3 CLI-only; T-160 stop-hook superseded for Cursor (rev 166)
+- C r4 plan: CC-1.2 load-bearing field, CC-13.2 rule (rev 167)
+- T-158 ACCEPTED on QA 227 (rev 168)
+- D-064 composer-2.5 stays (rev 169)
 
 ## developer [legacy] _(written session 74)_
 
@@ -89,6 +87,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
+_4 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+
 ## Last session
 
-Session 147 — 2026-09-27 — planner [sia-planner] — `4ed2836c-1dd1-43e5-8a06-c829d50548f3` (3 writing session(s) in the record)
+Session 150 — 2026-09-30 — planner [sia-planner] — `e50107b1-ac67-452c-9da1-3fc4c3beda97` (6 writing session(s) in the record)

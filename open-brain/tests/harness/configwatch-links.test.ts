@@ -17,12 +17,12 @@ import {
   readdirSync,
   readFileSync,
   renameSync,
-  symlinkSync,
   writeFileSync,
   linkSync,
   rmdirSync,
   unlinkSync,
 } from "node:fs";
+import { symlinkSyncOrSkip } from "./symlink-or-skip.js";
 import { join } from "node:path";
 import { runLoop, LoopRefused, type LoopConfig } from "../../src/harness/runtime.js";
 import { StubDeveloper, StubPlanner, StubQa } from "../../src/harness/roles.js";
@@ -84,7 +84,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const link = join(tmp.dir, "link");
     mkdirSync(victim);
     writeFileSync(canary, "CANARY-BYTES");
-    symlinkSync(victim, link, "junction");
+    symlinkSyncOrSkip(victim, link, "junction");
     rmdirSync(link);
     expect(() => lstatSync(link)).toThrow();
     expect(readFileSync(canary, "utf-8")).toBe("CANARY-BYTES");
@@ -104,7 +104,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     writeFileSync(canary, "INFO-CANARY");
     const beforeNames = namesOf(victim);
     renameSync(info, aside);
-    symlinkSync(victim, info, "junction");
+    symlinkSyncOrSkip(victim, info, "junction");
     const v = watch.closeAndRestore();
     expect(readFileSync(canary, "utf-8")).toBe("INFO-CANARY");
     expect(namesOf(victim)).toEqual(beforeNames);
@@ -137,10 +137,10 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
       const victim = join(tmp.dir, "victim-sym");
       writeFileSync(victim, "SYM-CANARY");
       renameSync(config, join(dirs.commonDir, "config-aside"));
-      symlinkSync(victim, config);
+      symlinkSyncOrSkip(victim, config);
       expect(lstatSync(config).isSymbolicLink(), "plant: config is a symlink").toBe(true);
       const probe = join(tmp.dir, "b1-probe");
-      symlinkSync(victim, probe);
+      symlinkSyncOrSkip(victim, probe);
       writeFileSync(probe, "through-link");
       expect(readFileSync(victim, "utf-8"), "control: a write through the link changes the victim").toBe("through-link");
       writeFileSync(victim, "SYM-CANARY");
@@ -163,10 +163,10 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
         mkdirSync(victim);
         writeFileSync(canary, "HOOKS-SYM-CANARY");
         renameSync(hooks, aside);
-        symlinkSync(victim, hooks);
+        symlinkSyncOrSkip(victim, hooks);
         expect(lstatSync(hooks).isSymbolicLink(), "plant: hooks is a symlink").toBe(true);
         const probe = join(tmp.dir, "b2-probe");
-        symlinkSync(victim, probe);
+        symlinkSyncOrSkip(victim, probe);
         writeFileSync(join(probe, "through.txt"), "through");
         expect(readFileSync(canary, "utf-8"), "control: a write through the link changes the victim").toBe("HOOKS-SYM-CANARY");
         expect(readFileSync(join(victim, "through.txt"), "utf-8")).toBe("through");
@@ -189,10 +189,10 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
       const beforeNames = namesOf(victim);
       const dot = join(repo.root, ".git");
       renameSync(dot, join(repo.root, ".git-aside"));
-      symlinkSync(victim, dot);
+      symlinkSyncOrSkip(victim, dot);
       expect(lstatSync(dot).isSymbolicLink(), "plant: .git is a symlink").toBe(true);
       const probe = join(tmp.dir, "b6-probe");
-      symlinkSync(victim, probe);
+      symlinkSyncOrSkip(victim, probe);
       writeFileSync(join(probe, "through.txt"), "through");
       expect(namesOf(victim), "control: a write through the link changes the victim").toContain("through.txt");
       unlinkSync(join(victim, "through.txt"));
@@ -216,7 +216,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     writeFileSync(canary, "HOOKS-CANARY");
     const beforeNames = namesOf(victim);
     renameSync(hooks, aside);
-    symlinkSync(victim, hooks, "junction");
+    symlinkSyncOrSkip(victim, hooks, "junction");
     const v = watch.closeAndRestore();
     expect(readFileSync(canary, "utf-8")).toBe("HOOKS-CANARY");
     expect(namesOf(victim)).toEqual(beforeNames);
@@ -238,7 +238,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     writeFileSync(canary, "ENTRY-CANARY");
     const beforeNames = namesOf(victim);
     const entry = join(dirs.commonDir, "hooks", "sub");
-    symlinkSync(victim, entry, "junction");
+    symlinkSyncOrSkip(victim, entry, "junction");
     watch.closeAndRestore();
     expect(readFileSync(canary, "utf-8")).toBe("ENTRY-CANARY");
     expect(namesOf(victim)).toEqual(beforeNames);
@@ -257,7 +257,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const dot = join(repo.root, ".git");
     const aside = join(repo.root, ".git-aside");
     renameSync(dot, aside);
-    symlinkSync(victim, dot, "junction");
+    symlinkSyncOrSkip(victim, dot, "junction");
     const v = watch.closeAndRestore();
     expect(readFileSync(canary, "utf-8")).toBe("GIT-CANARY");
     expect(namesOf(victim)).toEqual(beforeNames);
@@ -300,7 +300,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
               const deliverable = await new StubDeveloper().run(ctx);
               const dot = join(ctx.repoRoot, ".git");
               renameSync(dot, join(ctx.repoRoot, ".git-aside"));
-              symlinkSync(victim, dot, "junction");
+              symlinkSyncOrSkip(victim, dot, "junction");
               return deliverable;
             },
           },
@@ -325,7 +325,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     mkdirSync(victim);
     writeFileSync(join(victim, "canary.txt"), "BASE-CANARY");
     renameSync(hooks, aside);
-    symlinkSync(victim, hooks, "junction");
+    symlinkSyncOrSkip(victim, hooks, "junction");
     const head = repo.sha();
     let caught: unknown = null;
     try {
@@ -385,7 +385,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
             run: async (ctx) => {
               const deliverable = await new StubDeveloper().run(ctx);
               renameSync(gitDir, join(xdg, "git-aside"));
-              symlinkSync(victim, gitDir, "junction");
+              symlinkSyncOrSkip(victim, gitDir, "junction");
               return deliverable;
             },
           },
@@ -407,7 +407,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     mkdirSync(dot);
     writeFileSync(join(dot, "config"), "[user]\n\tname = base\n");
     mkdirSync(xdg);
-    symlinkSync(dot, join(xdg, "git"));
+    symlinkSyncOrSkip(dot, join(xdg, "git"));
     const env = {
       ...process.env,
       HOME: tmp.dir,
@@ -439,7 +439,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     mkdirSync(victim);
     writeFileSync(join(victim, "config"), "[user]\n\tname = VICTIM-R44\n");
     renameSync(gitDir, join(xdg, "git-aside"));
-    symlinkSync(victim, gitDir, "junction");
+    symlinkSyncOrSkip(victim, gitDir, "junction");
 
     const dev = watch.compare();
     expect(dev.some((f) => f.after.includes("not read"))).toBe(true);
@@ -471,7 +471,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const canary = join(victim, "canary.txt");
     mkdirSync(victim);
     writeFileSync(canary, "R45-CANARY");
-    symlinkSync(victim, info, "junction");
+    symlinkSyncOrSkip(victim, info, "junction");
 
     const v = watch.closeAndRestore();
     expect(v.ok).toBe(false);
@@ -496,7 +496,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const victim = join(tmp.dir, "r45-xdg-victim");
     mkdirSync(victim);
     writeFileSync(join(victim, "config"), "[user]\n\tname = VICTIM-R45\n");
-    symlinkSync(victim, gitDir, "junction");
+    symlinkSyncOrSkip(victim, gitDir, "junction");
 
     const found = watch.compare();
     expect(found).toHaveLength(1);
@@ -520,7 +520,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     mkdirSync(victim);
     writeFileSync(join(victim, "canary.txt"), "R46-HOOKS");
     renameSync(hooks, aside);
-    symlinkSync(victim, hooks, "junction");
+    symlinkSyncOrSkip(victim, hooks, "junction");
     const v = watch.closeAndRestore();
     const root = v.changes.find((c) => c.path === hooks);
     expect(root, v.message).toBeTruthy();
@@ -538,7 +538,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     mkdirSync(victim);
     writeFileSync(join(victim, "canary.txt"), "R46-ENTRY");
     const entry = join(dirs.commonDir, "hooks", "sub");
-    symlinkSync(victim, entry, "junction");
+    symlinkSyncOrSkip(victim, entry, "junction");
     const v = watch.closeAndRestore();
     const row = v.changes.find((c) => c.path === entry);
     expect(row, v.message).toBeTruthy();
@@ -555,7 +555,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     mkdirSync(victim);
     writeFileSync(join(victim, "config"), "[user]\n\tname = base\n");
     const gitDir = join(xdg, "git");
-    symlinkSync(victim, gitDir, "junction");
+    symlinkSyncOrSkip(victim, gitDir, "junction");
     const watch = new MachineConfigWatch([{ scope: "xdg", path: join(gitDir, "config"), source: "test" }]);
     const notes = watch.baseNotes();
     expect(notes.some((n) => n.includes(gitDir) && n.includes("type symlink") && n.includes(victim))).toBe(true);
@@ -632,7 +632,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     writeFileSync(join(dot, "config"), "[user]\n\tname = base-j\n");
     mkdirSync(xdg);
     const gitDir = join(xdg, "git");
-    symlinkSync(dot, gitDir, "junction");
+    symlinkSyncOrSkip(dot, gitDir, "junction");
     const watch = new MachineConfigWatch([{ scope: "xdg", path: join(gitDir, "config"), source: "test" }]);
     watch.begin("developer");
     const victim = join(tmp.dir, "r49-j-victim");
@@ -641,7 +641,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     writeFileSync(join(victim, "config"), bytes);
     const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
     renameSync(dot, join(tmp.dir, "r49-dot-j-aside"));
-    symlinkSync(victim, dot, "junction");
+    symlinkSyncOrSkip(victim, dot, "junction");
     const found = watch.compare();
     const blob = JSON.stringify(found);
     expect(blob, blob).not.toContain(victimHash);
@@ -657,7 +657,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     writeFileSync(baseCfg, "[user]\n\tname = base-h\n");
     mkdirSync(xdg);
     const gitDir = join(xdg, "git");
-    symlinkSync(dot, gitDir, "junction");
+    symlinkSyncOrSkip(dot, gitDir, "junction");
     const watch = new MachineConfigWatch([{ scope: "xdg", path: join(gitDir, "config"), source: "test" }]);
     watch.begin("developer");
     const victim = join(tmp.dir, "r49-h-victim");
@@ -716,7 +716,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     writeFileSync(victim, "chmod-victim");
     chmodSync(victim, 0o644);
     const probe = join(tmp.dir, "r52-chmod-probe");
-    symlinkSync(victim, probe);
+    symlinkSyncOrSkip(victim, probe);
     chmodSync(probe, 0o600);
     expect(lstatSync(victim).mode & 0o777, "the instrument can see a chmod through the link").toBe(0o600);
     chmodSync(victim, 0o644);
@@ -726,7 +726,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     watch.begin("developer");
     const config = join(dirs.commonDir, "config");
     renameSync(config, join(dirs.commonDir, "config-aside-r52"));
-    symlinkSync(victim, config);
+    symlinkSyncOrSkip(victim, config);
     watch.closeAndRestore();
     expect(lstatSync(victim).mode & 0o777).toBe(0o644);
     expect(readFileSync(victim, "utf-8")).toBe("chmod-victim");
@@ -744,10 +744,10 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     writeFileSync(victim, bytes);
     const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
     unlinkSync(cfg);
-    symlinkSync(victim, cfg);
+    symlinkSyncOrSkip(victim, cfg);
     expect(lstatSync(cfg).isSymbolicLink(), "plant: .gitconfig is a symlink").toBe(true);
     const probe = join(tmp.dir, "b4-probe");
-    symlinkSync(victim, probe);
+    symlinkSyncOrSkip(victim, probe);
     writeFileSync(probe, "[user]\n\tname = THROUGH\n");
     expect(readFileSync(victim, "utf-8"), "control: a write through the link changes the victim").toContain("THROUGH");
     writeFileSync(victim, bytes);
@@ -790,7 +790,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const victim = join(tmp.dir, "r52-write-victim");
     writeFileSync(victim, "before");
     const link = join(tmp.dir, "r52-write-link");
-    symlinkSync(victim, link);
+    symlinkSyncOrSkip(victim, link);
     writeFileSync(link, "after");
     expect(readFileSync(victim, "utf-8")).toBe("after");
 
@@ -798,7 +798,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     mkdirSync(plantedVictim);
     writeFileSync(join(plantedVictim, "canary.txt"), "PLANT");
     const planted = join(tmp.dir, "r52-planted");
-    symlinkSync(plantedVictim, planted);
+    symlinkSyncOrSkip(plantedVictim, planted);
     expect(readFileSync(join(plantedVictim, "canary.txt"), "utf-8")).toBe("PLANT");
     expect(namesOf(plantedVictim)).toEqual(["canary.txt"]);
   });
@@ -815,7 +815,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const target = join(dot, "gitconfig");
     writeFileSync(target, "[user]\n\tname = base\n");
     const cfg = join(home, ".gitconfig");
-    symlinkSync(join("dot", "gitconfig"), cfg);
+    symlinkSyncOrSkip(join("dot", "gitconfig"), cfg);
     expect(lstatSync(cfg).isSymbolicLink(), "plant: .gitconfig is a symlink").toBe(true);
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     watch.begin("developer");
@@ -834,7 +834,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const target = join(dot, "gitconfig");
     writeFileSync(target, "[user]\n\tname = base\n");
     const cfg = join(home, ".gitconfig");
-    symlinkSync(join("dot", "gitconfig"), cfg);
+    symlinkSyncOrSkip(join("dot", "gitconfig"), cfg);
     expect(lstatSync(cfg).isSymbolicLink(), "plant: .gitconfig is a symlink").toBe(true);
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     watch.begin("developer");
@@ -862,7 +862,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     mkdirSync(dot, { recursive: true });
     writeFileSync(join(dot, "gitconfig"), "[user]\n\tname = base\n");
     const cfg = join(home, ".gitconfig");
-    symlinkSync(join("dot", "gitconfig"), cfg);
+    symlinkSyncOrSkip(join("dot", "gitconfig"), cfg);
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     watch.begin("developer");
     const victim = join(tmp.dir, "r55-j-victim");
@@ -871,7 +871,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     writeFileSync(join(victim, "gitconfig"), bytes);
     const victimHash = createHash("sha256").update(bytes).digest("hex").slice(0, 16);
     renameSync(dot, `${dot}-aside`);
-    symlinkSync(victim, dot);
+    symlinkSyncOrSkip(victim, dot);
     expect(lstatSync(dot).isSymbolicLink(), "plant: dot is a symlink").toBe(true);
     const blob = JSON.stringify(watch.compare());
     expect(blob, blob).not.toContain(victimHash);
@@ -885,7 +885,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const target = join(dot, "gitconfig");
     writeFileSync(target, "[user]\n\tname = base\n");
     const cfg = join(home, ".gitconfig");
-    symlinkSync(join("dot", "gitconfig"), cfg);
+    symlinkSyncOrSkip(join("dot", "gitconfig"), cfg);
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     watch.begin("developer");
     const nb = "[user]\n\tname = NEW-FILE-R55\n";
@@ -964,7 +964,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     expect(snapMode, `snapshot ${snapMode.toString(8)} victim ${victimMode.toString(8)}`).not.toBe(victimMode);
 
     const probe = join(tmp.dir, "r58-b3-probe");
-    symlinkSync(victim, probe);
+    symlinkSyncOrSkip(victim, probe);
     writeFileSync(probe, "through-link");
     expect(readFileSync(victim, "utf-8"), "control: a write through the link changes the victim").toBe("through-link");
     writeFileSync(victim, "victim");
@@ -972,7 +972,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const watch = new ConfigWatch(dirs);
     watch.begin("developer");
     unlinkSync(hook);
-    symlinkSync(victim, hook);
+    symlinkSyncOrSkip(victim, hook);
     expect(lstatSync(hook).isSymbolicLink(), "plant: hook entry is a symlink").toBe(true);
     expect(readFileSync(victim, "utf-8"), "control: the plant itself leaves the victim").toBe("victim");
     watch.closeAndRestore();
@@ -992,7 +992,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     watch.begin("developer");
     unlinkSync(cfg);
-    symlinkSync(victim, cfg);
+    symlinkSyncOrSkip(victim, cfg);
     expect(lstatSync(cfg).isSymbolicLink(), "plant: .gitconfig is a link to the mode-000 victim").toBe(true);
     try {
       let code = "";
@@ -1026,7 +1026,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const target = join(dotfiles, "gitconfig");
     writeFileSync(target, "[user]\n\tname = base\n");
     const cfg = join(home, ".gitconfig");
-    symlinkSync(join("..", "r60-dotfiles", "gitconfig"), cfg);
+    symlinkSyncOrSkip(join("..", "r60-dotfiles", "gitconfig"), cfg);
     expect(lstatSync(cfg).isSymbolicLink(), "plant: stow link climbs out with ..").toBe(true);
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     const notes = watch.baseNotes().join("\n");
@@ -1045,7 +1045,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const target = join(real, "git", "config");
     writeFileSync(target, "[user]\n\tname = base\n");
     const xdg = join(tmp.dir, "r60-xdg-link");
-    symlinkSync(real, xdg);
+    symlinkSyncOrSkip(real, xdg);
     const cfg = join(xdg, "git", "config");
     expect(lstatSync(xdg).isSymbolicLink(), "plant: the config home is a link with two components after it").toBe(true);
     const watch = new MachineConfigWatch([{ scope: "xdg", path: cfg, source: "test" }]);
@@ -1065,7 +1065,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const target = join(dotfiles, "gitconfig");
     writeFileSync(target, "[user]\n\tname = base\n");
     const cfg = join(home, ".gitconfig");
-    symlinkSync(join("..", "r60-swap-dotfiles", "gitconfig"), cfg);
+    symlinkSyncOrSkip(join("..", "r60-swap-dotfiles", "gitconfig"), cfg);
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     watch.begin("developer");
     const victim = join(tmp.dir, "r60-swap-victim");
@@ -1091,7 +1091,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const home = join(tmp.dir, "r61-home");
     mkdirSync(home);
     const cfg = join(home, ".gitconfig");
-    symlinkSync("missing-r61-target", cfg);
+    symlinkSyncOrSkip("missing-r61-target", cfg);
     expect(lstatSync(cfg).isSymbolicLink(), "plant: dangling link").toBe(true);
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     const notes = watch.baseNotes().join("\n");
@@ -1138,7 +1138,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const hook = join(dest, "hooks", "post-commit");
     writeFileSync(hook, "#!/bin/sh\nexit 0\n");
     const link = join(tmp.dir, "r60-rest-link");
-    symlinkSync(dest, link);
+    symlinkSyncOrSkip(dest, link);
     expect(lstatSync(link).isSymbolicLink(), "plant: link with hooks/post-commit after it").toBe(true);
     const end = routeEnd(tmp.dir, join(link, "hooks", "post-commit"));
     expect(end, String(end)).toBe(hook);
@@ -1248,7 +1248,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const target = join(dot, "gitconfig");
     writeFileSync(target, "[user]\n\tname = base\n");
     const cfg = join(home, ".gitconfig");
-    symlinkSync(join("dot", "gitconfig"), cfg);
+    symlinkSyncOrSkip(join("dot", "gitconfig"), cfg);
     const watch = new MachineConfigWatch([{ scope: "global", path: cfg, source: "test" }]);
     watch.begin("developer");
     const nb = "[user]\n\tname = NEW-FILE-R67\n";
@@ -1286,7 +1286,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     watch.begin("developer");
     const real = join(home, "real-gitconfig");
     renameSync(cfg, real);
-    symlinkSync(real, cfg);
+    symlinkSyncOrSkip(real, cfg);
     const edited = "[user]\n\tname = aps-edited-through-the-new-link\n";
     writeFileSync(cfg, edited);
     expect(lstatSync(cfg).isSymbolicLink(), "plant: a link at the watched path").toBe(true);
@@ -1309,7 +1309,7 @@ describe("CA-15 — restore does not follow links", { timeout: 120_000 }, () => 
     const outsideFile = join(outside, "config");
     writeFileSync(outsideFile, secret);
     renameSync(join(xdg, "git"), join(xdg, "git-aside"));
-    symlinkSync(outside, join(xdg, "git"));
+    symlinkSyncOrSkip(outside, join(xdg, "git"));
     const nowIno = lstatSync(outsideFile).ino;
     const blob = JSON.stringify(watch.compare());
     expect(blob, blob).not.toContain(h16(secret));
