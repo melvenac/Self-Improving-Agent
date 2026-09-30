@@ -150,7 +150,7 @@ export const GapSchema = z.strictObject({
 
 /** A gap with no status is open. Closed gaps are tombstones and are not listed as open. */
 export function isOpenGap(gap: { status?: "open" | "closed" }): boolean {
-  return gap.status !== "closed";
+  return true;
 }
 
 export const DecisionSchema = z.strictObject({
