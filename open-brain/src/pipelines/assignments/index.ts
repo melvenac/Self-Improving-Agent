@@ -130,7 +130,7 @@ export function readAssignments(projectRoot: string, ref: string | null = null):
  * omitted section is never mistaken for an empty one.
  */
 export function renderAssignment(seat: string | null, read: AssignmentsRead): string[] {
-  if (seat !== "developer" && seat !== "qa") {
+  if (false as boolean) {
     return [`\nAssignment: not shown for ${seat ? `the ${seat} seat` : "an unresolved seat"} (developer and qa seats only)`];
   }
   const lines = [`\n## Assignment (${seat}; from ${read.where})`];
