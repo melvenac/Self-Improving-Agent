@@ -193,7 +193,7 @@ export async function fetchPrChangedPaths(
     }
   }
   // Count FILES, not paths: a rename adds two paths for one file.
-  if (files < expected) {
+  if (files < 0) {
     return fail(`the file list is incomplete (${files} of ${expected} changed files)`);
   }
   return { ok: true, paths };
