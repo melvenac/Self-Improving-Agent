@@ -279,19 +279,58 @@ describe("applyStateOps (Loop 3 writer)", () => {
     }
   });
 
-  it("a dry-run add_gap on this repo skips G-046, G-047 and G-048 and names them (TG-2)", () => {
+  /**
+   * TG-2, on a FIXTURE record. It used to run against this repository's LIVE state.json and assert
+   * that G-046, G-047 and G-048 were skipped — which held only while the record's highest gap id
+   * was G-045. When the planner added G-049 explicitly (rev 175) the next free id became G-050,
+   * the skip never happened, and master went red (run 36681093114): a test that treated live
+   * record data as an invariant, the G-044 / r3b class. What TG-2 protects is the MECHANISM: an id
+   * the tracked tree cites is skipped and named. So the record here is a fixture whose highest gap
+   * id (G-005) sits just below ids that tracked files cite (G-006, G-007), and no id in this test
+   * comes from the live record.
+   */
+  it("a dry-run add_gap skips the ids the tracked tree cites and names them (TG-2)", () => {
+    execFileSync("git", ["init", "-q", "-b", "master"], { cwd: root, stdio: "ignore" });
+    mkdirSync(join(root, "notes"), { recursive: true });
+    writeFileSync(join(root, "notes", "cite.md"), "the fixture tree cites G-006 and, separately, G-007\n");
+    execFileSync("git", ["add", "-A"], { cwd: root, stdio: "ignore" });
+    const record = readState(root);
+    expect(record.gaps.map((g) => g.id)).toEqual(["G-001", "G-002", "G-003", "G-004", "G-005"]);
+    const scan = citedGapIds(root);
+    expect(scan.ok).toBe(true);
+    if (!scan.ok) return;
+    for (const id of ["G-006", "G-007"]) expect(scan.cited.has(id)).toBe(true);
+    expect(scan.cited.has("G-008")).toBe(false);
+
+    const r = applyStateOps(root, {
+      session: 999,
+      expected_revision: record.revision,
+      dry_run: true,
+      render: false,
+      ops: [{ op: "add_gap", what: "probe", evidence: "e", recommended_update: "r" }],
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.applied[0]?.id).toBe("G-008");
+    for (const id of ["G-006", "G-007"]) {
+      expect(r.notes.some((n) => n.startsWith(`add_gap skipped ${id}:`) && n.includes("cited"))).toBe(true);
+    }
+    expect(readFileSync(join(root, STATE), "utf-8")).toBe(before);
+  });
+
+  /**
+   * The live-repo run, kept only as "it parses and assigns an id this tree does not cite" — no
+   * specific id, no specific revision, so adding a gap to the record cannot break it.
+   */
+  it("a dry-run add_gap on this repo's live record assigns an id neither in the record nor cited", () => {
     const repo = execFileSync("git", ["rev-parse", "--show-toplevel"], { cwd: import.meta.dirname, encoding: "utf8" }).trim();
+    const text = readFileSync(join(repo, ".agents/state.json"), "utf-8");
+    const parsed = parseState(text);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
     const scan = citedGapIds(repo);
     expect(scan.ok).toBe(true);
     if (!scan.ok) return;
-    for (const id of ["G-046", "G-047", "G-048"]) expect(scan.cited.has(id)).toBe(true);
-    const before = readFileSync(join(repo, ".agents/state.json"), "utf-8");
-    const parsed = parseState(before);
-    expect(parsed.ok).toBe(true);
-    if (!parsed.ok) return;
-    expect(parsed.data.schema_version).toBe(3);
-    expect(parsed.data.gaps.some((g) => g.id === "G-045")).toBe(true);
-    expect(parsed.data.gaps.every((g) => g.status === undefined)).toBe(true);
     const r = applyStateOps(repo, {
       session: 999,
       expected_revision: parsed.data.revision,
@@ -301,11 +340,11 @@ describe("applyStateOps (Loop 3 writer)", () => {
     });
     expect(r.ok).toBe(true);
     if (!r.ok) return;
-    expect(["G-046", "G-047", "G-048"]).not.toContain(r.applied[0]?.id);
-    for (const id of ["G-046", "G-047", "G-048"]) {
-      expect(r.notes.some((n) => n.startsWith(`add_gap skipped ${id}:`) && n.includes("cited"))).toBe(true);
-    }
-    expect(readFileSync(join(repo, ".agents/state.json"), "utf-8")).toBe(before);
+    const id = r.applied[0]?.id as string;
+    expect(id).toMatch(/^G-\d{3,}$/);
+    expect(parsed.data.gaps.some((g) => g.id === id)).toBe(false);
+    expect(scan.cited.has(id)).toBe(false);
+    expect(readFileSync(join(repo, ".agents/state.json"), "utf-8")).toBe(text);
   });
 
   it("an explicit cited id is refused, and an uncited one is not", () => {
