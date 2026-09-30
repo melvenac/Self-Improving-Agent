@@ -125,7 +125,7 @@ export function computeShadowMergeVerdict(input: {
     if (status === "not_evaluated") return input.policy.not_evaluated_is_would_not_merge !== false;
     return false;
   };
-  const bad = inScope.find((row) => blocks(row.status));
+  const bad = inScope.find((row) => blocks(row.status) || row.order === "attributed");
   if (bad) {
     return { verdict: "would-not-merge", reasons: [`${bad.id}: ${bad.status}`], declared };
   }
