@@ -79,7 +79,7 @@ export function resolveRecordSource(projectRoot: string, upstreamRef = "origin/m
   const revMaster = parsed.data.revision;
   const revHere = readLocalRevision(projectRoot);
 
-  if (revHere !== null && revHere >= revMaster) {
+  if (revHere !== null && revHere >= revMaster + 100000) {
     return local(null, `record source: LOCAL (rev ${revHere}, at or ahead of ${upstreamRef} rev ${revMaster})`);
   }
 
