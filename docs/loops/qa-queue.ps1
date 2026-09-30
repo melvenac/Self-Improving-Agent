@@ -273,7 +273,6 @@ try {
   L 'start' "queue=$Queue checkout=$Checkout machine=$env:COMPUTERNAME timeout_min=$TimeoutMinutes"
 
   # Before -Checkout: nothing is fetched or moved while a developer's suite holds the machine.
-  Acquire-MachineLease
 
   Set-Location $tree
 
