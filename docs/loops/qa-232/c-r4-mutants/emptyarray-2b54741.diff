@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/shadow-merge.ts b/open-brain/src/harness/shadow-merge.ts
+index 28707223..5dce611e 100644
+--- a/open-brain/src/harness/shadow-merge.ts
++++ b/open-brain/src/harness/shadow-merge.ts
+@@ -148,7 +148,7 @@ function missingRequiredInput(ev: Record<string, unknown>, required: readonly st
+     else if (name === "E_t.acceptance") value = ev.acceptance;
+     else if (name === "E_t.requirements") value = ev.requirements;
+     else return `required input ${name} is not one this gate can read`;
+-    const supplied = Array.isArray(value) ? value.length > 0 : isRecord(value);
++    const supplied = Array.isArray(value) ? true : isRecord(value); // QA 232 MUTANT: an empty array counts as supplied
+     if (!supplied) return `required input ${name} is missing from E_t`;
+   }
+   return null;

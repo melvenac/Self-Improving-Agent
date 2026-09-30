@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/shadow-merge.ts b/open-brain/src/harness/shadow-merge.ts
+index 28707223..db340c77 100644
+--- a/open-brain/src/harness/shadow-merge.ts
++++ b/open-brain/src/harness/shadow-merge.ts
+@@ -401,7 +401,7 @@ export function checkShadowMergeLedger(projectRoot: string): CheckResult {
+       continue;
+     }
+     if (decided.has(`${art.loop}\0${art.sha}`)) continue;
+-    if (isAncestor(projectRoot, art.sha, "HEAD")) {
++    if (isAncestor(projectRoot, art.sha, "HEAD") && existsSync(path)) { // QA 232 MUTANT: an owed decide is only an issue once a ledger exists
+       problems.push(`verdict artifact ${art.file}: no ledger line, and ${art.sha} is already an ancestor of HEAD (decide is owed)`);
+     } else {
+       pending.push(`${art.loop}/${art.sha}`);
