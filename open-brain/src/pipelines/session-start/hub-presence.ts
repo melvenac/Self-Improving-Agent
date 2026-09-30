@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { AgentIdentity } from "./agent-identity.js";
+import { resolveCheckoutSeat } from "./seat-map.js";
 
 /** Interim until T-196; allowlisted at `.agents/SYSTEM/hub-partner-seats.json`. */
 export const HUB_PARTNER_SEATS_REL = ".agents/SYSTEM/hub-partner-seats.json";
@@ -62,15 +63,6 @@ export interface HubPresenceBlock {
 /** A key shorter than this is refused, as hub-key.mjs does (KEY_FLOOR). */
 const KEY_FLOOR = 32;
 
-/**
- * The name of THIS seat's own key file: the reader's identity, lowercased. It is not
- * the readers-map name (`hubAsForIdentity`): Forge is looked up under `grok` there,
- * and grok.key belongs to another seat, so it must never be borrowed.
- */
-export function keyNameForIdentity(identity: AgentIdentity): string {
-  return identity.name.trim().toLowerCase().replace(/\s+/g, "-");
-}
-
 /** `<host>-<port>`, as hub-key.mjs names the per-hub key directory. */
 export function hubIdForUrl(hubUrl: string): string {
   const u = new URL(hubUrl);
@@ -96,12 +88,6 @@ export function resolveOwnKey(
     return { ok: false, reason: `hub key for ${keyName} at ${path} is shorter than ${KEY_FLOOR} characters` };
   }
   return { ok: true, key };
-}
-
-function hubAsForIdentity(identity: AgentIdentity): string {
-  if (identity.name === "Forge" && identity.role === "developer") return "grok";
-  if (identity.name === "Atlas" && identity.role === "planner") return "atlas";
-  return identity.name.trim().toLowerCase().replace(/\s+/g, "-");
 }
 
 export function readHubPartnerSeats(projectRoot: string): { ok: true; data: HubPartnerSeatsFile; rel: string } | { ok: false; reason: string } {
@@ -217,12 +203,22 @@ export async function describeHubPresence(opts: HubPresenceOptions): Promise<Hub
     return { lines: [line], sourceRel: null, charCount: line.length };
   }
 
-  if (!opts.identity) {
+  // T-203: the seat is the CHECKOUT's, from the tracked map. AGENT.local.md is not consulted,
+  // and a checkout the map does not list is said to be unknown, never guessed from an identity.
+  const seat = resolveCheckoutSeat(opts.projectRoot);
+  if (seat.kind === "seatless") {
+    const line = `presence: none (${seat.reason})`;
+    return { lines: [line], sourceRel: seatsFile.rel, charCount: line.length };
+  }
+  if (seat.kind === "unknown" || seat.kind === "unreadable") {
+    const line = `presence: UNKNOWN (${seat.kind === "unknown" ? `seat unknown for checkout ${seat.checkout}` : seat.reason})`;
+    return { lines: [line], sourceRel: seatsFile.rel, charCount: line.length };
+  }
+  if (seat.kind !== "seat" || !seat.hubName) {
     return { lines: [], sourceRel: seatsFile.rel, charCount: 0 };
   }
 
-  const readerHubAs = hubAsForIdentity(opts.identity);
-  const partners = seatsFile.data.readers[readerHubAs]?.partners;
+  const partners = seatsFile.data.readers[seat.hubName]?.partners;
   if (!partners?.length) {
     return { lines: [], sourceRel: seatsFile.rel, charCount: 0 };
   }
@@ -233,7 +229,7 @@ export async function describeHubPresence(opts: HubPresenceOptions): Promise<Hub
   // The seat's OWN key, or nothing: with no key the hub is not called and there is no
   // fallback to a shared default (turn 236). The path may be printed; the key never.
   const keyDir = opts.keyDir ?? process.env.A2A_KEY_DIR ?? join(homedir(), ".a2a-hub", "keys");
-  const own = resolveOwnKey(hubUrl, keyNameForIdentity(opts.identity), keyDir);
+  const own = resolveOwnKey(hubUrl, seat.hubName, keyDir);
   if (!own.ok) {
     const line = `presence: UNKNOWN (${own.reason})`;
     return { lines: [line], sourceRel: seatsFile.rel, charCount: line.length };
@@ -265,12 +261,13 @@ function presenceHeader(callerLabel: string, sourceRel: string): string {
  */
 export function presenceBlockUpperBound(
   projectRoot: string,
-  identity: AgentIdentity | null,
   callerLabel = "open-brain MCP server",
 ): { chars: number; lines: string[] } {
   const seatsFile = readHubPartnerSeats(projectRoot);
-  if (!seatsFile.ok || !identity) return { chars: 0, lines: [] };
-  const partners = seatsFile.data.readers[hubAsForIdentity(identity)]?.partners;
+  if (!seatsFile.ok) return { chars: 0, lines: [] };
+  const seat = resolveCheckoutSeat(projectRoot);
+  if (seat.kind !== "seat" || !seat.hubName) return { chars: 0, lines: [] };
+  const partners = seatsFile.data.readers[seat.hubName]?.partners;
   if (!partners?.length) return { chars: 0, lines: [] };
   const worst: PresenceAgent[] = partners.map((p) => ({
     name: p.hub_as,
