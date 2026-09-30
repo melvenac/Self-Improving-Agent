@@ -218,7 +218,7 @@ export async function describeHubPresence(opts: HubPresenceOptions): Promise<Hub
     return { lines: [], sourceRel: seatsFile.rel, charCount: 0 };
   }
 
-  const partners = seatsFile.data.readers[seat.hubName]?.partners;
+  const partners = seatsFile.data.readers[(opts.identity?.name ?? "").toLowerCase() || seat.hubName]?.partners;
   if (!partners?.length) {
     return { lines: [], sourceRel: seatsFile.rel, charCount: 0 };
   }
