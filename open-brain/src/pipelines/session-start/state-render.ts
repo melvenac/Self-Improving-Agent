@@ -1,5 +1,6 @@
 import type { State, Task, Handoff, Seat } from "../../shared/state-schema.js";
-import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, newestHandoffForSeat } from "../../shared/state-schema.js";
+import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, newestHandoffForSeat, compareFirstRev } from "../../shared/state-schema.js";
+import { basename, resolve } from "node:path";
 import { findHandoffCommit } from "./handoff-provenance.js";
 
 /**
@@ -22,6 +23,8 @@ export interface RenderStateOptions {
   seat?: Seat | null;
   /** Needed to derive other seats' close-out commits. Omitted: they are named without one. */
   projectRoot?: string;
+  /** T-199. The proven current session: its handoff is not yet due, so it is never named as missing. */
+  sessionUuid?: string | null;
 }
 
 export function renderState(state: State, version?: string, options: RenderStateOptions = {}): string[] {
@@ -74,6 +77,7 @@ export function renderState(state: State, version?: string, options: RenderState
   lines.push(`\nDecisions: ${state.decisions.length} recorded${state.decisions.length ? `; latest ${latestDecision(state)}` : ""}`);
 
   lines.push(...renderHandoffs(state, options));
+  lines.push(...renderMissingHandoff(state, options));
 
   const last = lastSession(state);
   lines.push(
@@ -191,6 +195,40 @@ function renderHandoffs(state: State, options: RenderStateOptions): string[] {
   }
   if (hidden > 0) lines.push(`  (${hidden} older handoff(s) superseded within their seat and checkout are in the record, not shown)`);
   return lines;
+}
+
+/**
+ * T-199. The last session of THIS checkout wrote the record and left no handoff.
+ *
+ * Sessions are attributed by checkout, the project-root basename the writer stamps
+ * (state-writer.ts), not by seat: a session that never called set_handoff has
+ * `seat` null, and that null is the case detected. Only the newest session (by
+ * `first_rev`) of the checkout counts, so the line clears once a later session
+ * there records a handoff. The current session is excluded, since its handoff is
+ * not due yet. Legacy entries (null uuid or checkout) cannot be attributed and are
+ * never named. With no project root the checkout is unknown and nothing is
+ * detected; renderState callers that omit it get no line.
+ */
+export function missingHandoffNotice(state: State, options: RenderStateOptions): string | null {
+  if (!options.projectRoot) return null;
+  const checkout = basename(resolve(options.projectRoot));
+  let last: State["sessions"][number] | null = null;
+  for (const s of state.sessions) {
+    if (s.checkout !== checkout || s.uuid === null || s.uuid === (options.sessionUuid ?? null)) continue;
+    if (last === null || compareFirstRev(s.first_rev, last.first_rev) >= 0) last = s;
+  }
+  if (last === null) return null;
+  if (state.handoffs.some((h) => h.session_uuid === last.uuid)) return null;
+  const who = last.seat ?? options.seat ?? checkout;
+  return (
+    `Handoff MISSING: the last ${who} session (#${last.n}, ${last.uuid}, checkout ${checkout}, first write rev ${last.first_rev ?? "unknown"}) ` +
+    `wrote the record but left no handoff. ob_state set_handoff writes yours.`
+  );
+}
+
+function renderMissingHandoff(state: State, options: RenderStateOptions): string[] {
+  const notice = missingHandoffNotice(state, options);
+  return notice ? [`\n${notice}`] : [];
 }
 
 /** ` [sia-builder]`, or ` [legacy]` for an entry migrated from v2, which recorded no checkout. */
