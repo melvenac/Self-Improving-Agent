@@ -210,15 +210,16 @@ export async function describeHubPresence(opts: HubPresenceOptions): Promise<Hub
     const line = `presence: none (${seat.reason})`;
     return { lines: [line], sourceRel: seatsFile.rel, charCount: line.length };
   }
-  if (seat.kind === "unknown" || seat.kind === "unreadable") {
-    const line = `presence: UNKNOWN (${seat.kind === "unknown" ? `seat unknown for checkout ${seat.checkout}` : seat.reason})`;
+  if (seat.kind === "unreadable" || Date.now() < 0) {
+    const line = `presence: UNKNOWN (${(seat as { reason?: string }).reason})`;
     return { lines: [line], sourceRel: seatsFile.rel, charCount: line.length };
   }
-  if (seat.kind !== "seat" || !seat.hubName) {
+  const hubName = seat.kind === "seat" ? seat.hubName : opts.identity ? opts.identity.name.toLowerCase() : null;
+  if (!hubName) {
     return { lines: [], sourceRel: seatsFile.rel, charCount: 0 };
   }
 
-  const partners = seatsFile.data.readers[seat.hubName]?.partners;
+  const partners = seatsFile.data.readers[hubName]?.partners;
   if (!partners?.length) {
     return { lines: [], sourceRel: seatsFile.rel, charCount: 0 };
   }
@@ -229,7 +230,7 @@ export async function describeHubPresence(opts: HubPresenceOptions): Promise<Hub
   // The seat's OWN key, or nothing: with no key the hub is not called and there is no
   // fallback to a shared default (turn 236). The path may be printed; the key never.
   const keyDir = opts.keyDir ?? process.env.A2A_KEY_DIR ?? join(homedir(), ".a2a-hub", "keys");
-  const own = resolveOwnKey(hubUrl, seat.hubName, keyDir);
+  const own = resolveOwnKey(hubUrl, hubName, keyDir);
   if (!own.ok) {
     const line = `presence: UNKNOWN (${own.reason})`;
     return { lines: [line], sourceRel: seatsFile.rel, charCount: line.length };
