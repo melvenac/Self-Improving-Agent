@@ -63,3 +63,16 @@ The 3 failures are all `Test timed out in 5000ms`, and all 15 tests in their thr
 - `findHandoffCommit` for master's handoffs resolves against the local object database; it rendered correctly in RM-1 (the fixture's commits exist locally after the fetch). A master commit the tree has not fetched cannot be resolved.
 - The `THIS TREE IS STALE` line above the record line still says "anything read from the record here describes an older state"; it is about the tree and is still true, and the record line beneath it says what was actually rendered.
 - Not measured: a Cursor `/start` run against this change. Nothing here was checked against T-197's parity rows.
+
+## Follow-up (2026-09-30, planner rev 190): the role-files row and the live-reader audit
+
+**Defect, real, found by the T-205 sibling audit:** `greeting-size.test.ts` 'the composed greeting carries the role files whole' asserted the greeting contained the WORKING TREE's `roles/shared.md` and one seat file. Since this task, `composeGreeting` renders role files from `origin/master` whenever the local record is behind it, so on a behind checkout whose role files differ from master's the row goes red with nothing wrong. It passed on the builder's tree only because the two copies were identical there.
+
+**Fix:** `tests/helpers/role-source.ts` (`roleFileFromGreetingSource`) asks `resolveRecordSource`, the function the composition asked, and reads the role file from that source; the row uses it. A new fixture (real git: bare origin, seed, clone; local rev 140, master rev 163, role text `LOCAL-ROLE` vs `MASTER-ROLE`) pins both directions: behind, the greeting carries master's role text and NOT the working tree's (which is exactly the old assertion, red on this fixture), and the helper reports `origin/master`; level, it carries the tree's own and reports `the working tree`.
+**Mutants** (local branches, NOT pushed: a `loop/**-mut-*` push starts a CI run until T-207 lands; QA re-applies them): `loop/t200-mut-role-src-always-tree` 9d07842f (helper never reads master) and `loop/t200-mut-role-src-always-master` d6708108 (helper always reads master) — each tsc-clean, edit asserted landed, each red on the behind-checkout row (1 failed, 9 passed).
+Proof: full suite unpiped, exit 0, 127 files passed / 7 skipped, on this machine only.
+
+**Two thin spots in `state-render.test.ts` T183-3, recorded and NOT changed** (neither is a routine record write):
+- 'walks a non-empty set of other-seat lines' needs at least two seat instances in the record; the count only grows.
+- 'walks a non-empty set of handoff items' needs at least one watch-out or open question among the newest handoff of each seat; three empty ones would fail it.
+Also noted, out of scope: the greeting-size sizing rows use the live objective unclipped (about 1.1 KB now; a 38 KB objective would break the negative row), and `seatFiles toHaveLength(1)` needs the checkout to declare a seat.
