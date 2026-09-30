@@ -20,7 +20,14 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runLoop, type GateMode } from "./runtime.js";
 import { stubRoles } from "./roles.js";
-import { jsonSchemas, serialiseSchema, validateEvidence, type DeliverableKind } from "./schema.js";
+import {
+  BriefPlanGateError,
+  checkBriefDispatchReady,
+  runBriefDispatch,
+  runBriefPlanGate,
+  type BriefPlanGateMode,
+} from "./brief-plan-gate.js";
+import { jsonSchemas, serialiseSchema, validateEvidence, validatePlan, type DeliverableKind } from "./schema.js";
 import { defaultChecks, type CheckSpec } from "./checks.js";
 import { policyJsonSchemas } from "./policies.js";
 import { decideShadowVerdict, isLowerHexSha, ledgerPath, prepareShadowVerdict, summariseLedger } from "./shadow-merge.js";
@@ -33,6 +40,10 @@ const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
   harness shadow-verdict prepare --loop <id> --candidate <sha> --criteria-sha <sha> --criteria <path> --evidence <file>
   harness shadow-verdict decide --loop <id> --candidate <sha> (--merged <sha> | --declined | --replaced <sha>)
   harness shadow-verdict summary
+  harness validate plan <file>
+  harness plan-gate <D_t.json> [--brief <brief.md>] [--mode live|dry-run]
+  harness dispatch-check <brief.md> [--repo <dir>]
+  harness dispatch <brief.md> --say <message> [--repo <dir>]
   harness help
 
 run options
@@ -172,10 +183,14 @@ export const policySchemaFileName = (kind: "plan" | "done" | "merge"): string =>
  * ids), and a seat that used one would accept a document the runtime refuses.
  */
 function cmdValidate(argv: readonly string[]): number {
-  if (argv.length !== 2 || argv[0] !== "evidence") {
-    throw new UsageError("usage: harness validate evidence <file>");
+  if (argv.length !== 2) {
+    throw new UsageError("usage: harness validate (evidence|plan) <file>");
   }
+  const kind = argv[0]!;
   const file = resolve(argv[1]!);
+  if (kind !== "evidence" && kind !== "plan") {
+    throw new UsageError("usage: harness validate (evidence|plan) <file>");
+  }
   let text: string;
   try {
     text = readFileSync(file, "utf-8");
@@ -189,17 +204,24 @@ function cmdValidate(argv: readonly string[]): number {
     process.stdout.write(`(root): not JSON: ${(err as Error).message}\n`);
     return 1;
   }
-  const result = validateEvidence(json);
+  const result = kind === "plan" ? validatePlan(json) : validateEvidence(json);
   if (result.ok) return 0;
   for (const problem of result.problems) process.stdout.write(`${problem}\n`);
   return 1;
 }
 
-function flagMap(argv: readonly string[]): Map<string, string | true> {
+/**
+ * Master's commands (plan-gate takes a positional file) skip positionals; the
+ * shadow-verdict rows pass strict=true and reject any stray positional.
+ */
+function flagMap(argv: readonly string[], strict = false): Map<string, string | true> {
   const flags = new Map<string, string | true>();
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]!;
-    if (!arg.startsWith("--")) throw new UsageError(`unrecognised argument "${arg}"`);
+    if (!arg.startsWith("--")) {
+      if (strict) throw new UsageError(`unrecognised argument "${arg}"`);
+      continue;
+    }
     const key = arg.slice(2);
     const next = argv[i + 1];
     if (next === undefined || next.startsWith("--")) flags.set(key, true);
@@ -234,7 +256,7 @@ function cmdShadow(argv: readonly string[]): number {
   if (action !== "prepare" && action !== "decide" && action !== "summary") {
     throw new UsageError("usage: harness shadow-verdict <prepare|decide|summary>");
   }
-  const flags = flagMap(rest);
+  const flags = flagMap(rest, true);
   const allowed: Record<typeof action, ReadonlySet<string>> = {
     summary: new Set(["repo"]),
     prepare: new Set(["repo", "loop", "candidate", "criteria-sha", "criteria", "evidence", "gate"]),
@@ -296,6 +318,105 @@ function cmdShadow(argv: readonly string[]): number {
   });
   process.stdout.write(`${JSON.stringify(result.line)}\n`);
   return 0;
+}
+
+const PLAN_GATE_MODES: readonly BriefPlanGateMode[] = ["live", "dry-run"];
+
+function positionalArgs(argv: readonly string[], flags: Map<string, string | true>): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]!;
+    if (!arg.startsWith("--")) {
+      out.push(arg);
+      continue;
+    }
+    const val = flags.get(arg.slice(2));
+    if (typeof val === "string") i += 1;
+  }
+  return out;
+}
+
+async function cmdPlanGate(argv: readonly string[]): Promise<number> {
+  const flags = flagMap(argv);
+  for (const key of flags.keys()) {
+    if (key !== "brief" && key !== "mode" && key !== "repo") {
+      throw new UsageError(`unrecognised flag "--${key}"`);
+    }
+  }
+  const positional = positionalArgs(argv, flags);
+  if (positional.length !== 1) throw new UsageError("usage: harness plan-gate <D_t.json> [--brief <brief.md>] [--mode live|dry-run]");
+  const modeRaw = flags.get("mode");
+  const mode: BriefPlanGateMode =
+    modeRaw === undefined ? "live" : modeRaw === true ? "live" : (modeRaw as BriefPlanGateMode);
+  if (!PLAN_GATE_MODES.includes(mode)) {
+    throw new UsageError(`--mode must be one of ${PLAN_GATE_MODES.join(", ")}, got "${String(modeRaw)}"`);
+  }
+  const brief = flags.get("brief");
+  if (brief === true) throw new UsageError("--brief requires a path");
+  const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  try {
+    const result = await runBriefPlanGate({
+      dtPath: resolve(positional[0]!),
+      briefPath: typeof brief === "string" ? resolve(brief) : null,
+      repoRoot: repo,
+      mode,
+    });
+    process.stdout.write(`${result.recordPath}\n`);
+    for (const [field, source] of Object.entries(result.record.sources)) {
+      process.stdout.write(`source ${field}: ${source}\n`);
+    }
+    return result.exitCode;
+  } catch (err) {
+    if (err instanceof BriefPlanGateError) {
+      process.stderr.write(`${err.message}\n`);
+      return err.exitCode;
+    }
+    throw err;
+  }
+}
+
+function cmdDispatchCheck(argv: readonly string[]): number {
+  const flags = flagMap(argv);
+  for (const key of flags.keys()) {
+    if (key !== "repo") throw new UsageError(`unrecognised flag "--${key}"`);
+  }
+  const positional = positionalArgs(argv, flags);
+  if (positional.length !== 1) throw new UsageError("usage: harness dispatch-check <brief.md> [--repo <dir>]");
+  const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  const check = checkBriefDispatchReady(resolve(positional[0]!), repo);
+  if (check.ok) {
+    process.stdout.write("dispatch-check: ok\n");
+    return 0;
+  }
+  if (check.checked_sha) process.stderr.write(`dispatch-check: checked ${check.checked_sha} (origin/master)\n`);
+  for (const reason of check.reasons) process.stderr.write(`dispatch-check: ${reason}\n`);
+  return 1;
+}
+
+async function cmdDispatch(argv: readonly string[]): Promise<number> {
+  const flags = flagMap(argv);
+  for (const key of flags.keys()) {
+    if (key !== "repo" && key !== "say") throw new UsageError(`unrecognised flag "--${key}"`);
+  }
+  const say = flags.get("say");
+  if (say === undefined || say === true) {
+    throw new UsageError("usage: harness dispatch <brief.md> --say <message> [--repo <dir>]");
+  }
+  const positional = positionalArgs(argv, flags);
+  if (positional.length !== 1) throw new UsageError("usage: harness dispatch <brief.md> --say <message> [--repo <dir>]");
+  const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  const result = await runBriefDispatch({
+    briefPath: resolve(positional[0]!),
+    message: say,
+    repoRoot: repo,
+  });
+  if (result.ok) {
+    process.stdout.write("dispatch: sent\n");
+    return 0;
+  }
+  if (result.checked_sha) process.stderr.write(`dispatch: checked ${result.checked_sha} (origin/master)\n`);
+  for (const reason of result.reasons) process.stderr.write(`dispatch: ${reason}\n`);
+  return 1;
 }
 
 function cmdSchemas(argv: readonly string[]): number {
@@ -380,6 +501,9 @@ export async function main(argv: readonly string[]): Promise<number> {
     if (sub === "schemas") return cmdSchemas(rest);
     if (sub === "validate") return cmdValidate(rest);
     if (sub === "shadow-verdict") return cmdShadow(rest);
+    if (sub === "plan-gate") return await cmdPlanGate(rest);
+    if (sub === "dispatch-check") return cmdDispatchCheck(rest);
+    if (sub === "dispatch") return await cmdDispatch(rest);
     throw new UsageError(`unknown subcommand "${sub}"`);
   } catch (err) {
     if (err instanceof UsageError) {

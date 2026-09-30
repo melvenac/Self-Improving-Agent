@@ -90,8 +90,24 @@ export function checkCursorHookCompat(home: string = homedir(), localAppData?: s
   for (const [id, raw] of Object.entries(parsed.plugins)) {
     const installs = Array.isArray(raw) ? raw : [raw];
     for (const inst of installs) {
-      if (!isRecord(inst) || typeof inst.installPath !== "string") continue;
+      if (!isRecord(inst)) continue;
       const version = typeof inst.version === "string" ? inst.version : "version unrecorded";
+      if (!Object.prototype.hasOwnProperty.call(inst, "installPath")) {
+        findings.push(`${id} ${version}: installPath missing — could not read hooks/hooks.json`);
+        continue;
+      }
+      if (typeof inst.installPath !== "string") {
+        findings.push(`${id} ${version}: installPath is not a string — could not read hooks/hooks.json`);
+        continue;
+      }
+      if (inst.installPath === "") {
+        findings.push(`${id} ${version}: installPath is empty — could not read hooks/hooks.json`);
+        continue;
+      }
+      if (!existsSync(inst.installPath)) {
+        findings.push(`${id} ${version}: installPath does not exist (${inst.installPath}) — could not read hooks/hooks.json`);
+        continue;
+      }
       const hooksPath = join(inst.installPath, "hooks", "hooks.json");
       if (!existsSync(hooksPath)) continue;
       let hooksJson: unknown;

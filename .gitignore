@@ -39,6 +39,7 @@ Thumbs.db
 !/.agents/SYSTEM/TESTING.md
 !/.agents/SYSTEM/domains.json
 !/.agents/SYSTEM/worktree-seats.json
+!/.agents/SYSTEM/hub-partner-seats.json
 # PRD/DECISIONS/ENTITIES: THE SCOPE LAYER TRAVELS. Tracked 2026-09-21 (session 77) after a
 # planner seat spent a whole session without knowing what the project is for. Everything
 # tracked above is HOW TO OPERATE; these three are WHAT THIS IS AND WHY, and they were the
