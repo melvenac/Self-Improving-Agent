@@ -214,7 +214,7 @@ export function missingHandoffNotice(state: State, options: RenderStateOptions):
   const checkout = basename(resolve(options.projectRoot));
   let last: State["sessions"][number] | null = null;
   for (const s of state.sessions) {
-    if (s.checkout !== checkout || s.uuid === null || s.uuid === (options.sessionUuid ?? null)) continue;
+    if (s.checkout !== checkout || s.uuid === null) continue;
     if (last === null || compareFirstRev(s.first_rev, last.first_rev) >= 0) last = s;
   }
   if (last === null) return null;
