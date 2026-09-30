@@ -12,8 +12,9 @@ classifier, so Aaron runs it by typing these lines, with the leading `!`, into t
   agent-dashboard's developer, under the same `Aaron Melven` profile). Use it for SIA QA **only when no developer
   suite is running there**, and ask the planner before any launch.
 - **The desktop** runs planners and Clark, never QA while Aaron or agents are working (see below).
-- **Proposed, not built:** a lease file on the QA PC that a developer's suite takes and `qa-queue.ps1` checks before it
-  starts, so "quiet" is checked mechanically. It waits on Aaron.
+- **Approved by Aaron, not built yet: T-204, the compute lease.** A developer's suite and `qa-queue.ps1` each take one
+  lease file before a run, so neither starts over the other. **Until T-204 ships, don't use the QA PC for SIA QA.**
+  After it ships, the QA PC takes QA whenever the lease is free.
 
 ## What is already on each machine
 

@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 179 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 180 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -64,6 +64,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-199** A seat session that wrote the record but left no handoff is DETECTED at that seat's next /start, and planner.md's stale 'one handoff slot, C2 unfixed' paragraph is corrected (the per-seat slot exists since schema v3)
 - [ ] **T-202** The planner learns when a seat comes online: each seat worktree's SessionStart reports seat, checkout SHA, record rev and runtime (Claude Code or Cursor CLI) to the planner seat, deterministically
 - [ ] **T-203** A seat is resolved by its CHECKOUT, not by AGENT.local.md's identity: one tracked map from worktree to seat, role and hub name, used by every per-seat lookup (presence key, readers row, handoff attribution, seat-online report)
+- [ ] **T-204** A compute lease on the QA PC: a developer suite and SIA's qa-queue.ps1 each take one lease file before a run, so QA never starts over a developer suite and a developer suite never starts over QA; stale leases (expired, or owner process gone) are reclaimed
 
 ## P2
 
