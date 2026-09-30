@@ -1815,7 +1815,6 @@ export function composeGreeting(projectRoot: string, version: string): ComposedG
   const seat = roles.seat ? SeatName.safeParse(roles.seat.role) : null;
   const treeAndSeat = [
     ...describeTreeCurrency(projectRoot).lines,
-    recordSource.line,
     roles.seat ? `Seat: ${roles.seat.name} (${roles.seat.role})` : "Seat: UNRESOLVED",
     ...roles.lines,
     ...roles.problems,
