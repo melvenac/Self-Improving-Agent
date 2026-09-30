@@ -49,13 +49,13 @@ function fixtureFetch(body: unknown, status = 200): { fetchFn: typeof fetch; cal
   return { fetchFn, calls };
 }
 
-function roster(over: Partial<Record<"grok" | "cursor-infra" | "cursor-builder", unknown>> = {}) {
+function roster(over: Partial<Record<"forge" | "cursor-infra" | "cursor-builder", unknown>> = {}) {
   const room = (sessionId: string, extra: Record<string, unknown> = {}) => ({
     sessionId, unread: 0, pollingNow: false, pollAgeMs: 0, ...extra,
   });
   return {
     agents: [
-      { name: "grok", rooms: [over.grok ?? room(ATLAS_ROOM)] },
+      { name: "forge", rooms: [over.forge ?? room(ATLAS_ROOM)] },
       { name: "cursor-infra", rooms: [over["cursor-infra"] ?? room(INFRA_ROOM)] },
       { name: "cursor-builder", rooms: [over["cursor-builder"] ?? room(BUILDER_ROOM)] },
     ],
@@ -65,6 +65,17 @@ function roster(over: Partial<Record<"grok" | "cursor-infra" | "cursor-builder",
 describe("T-198 hub presence at /start (r2)", () => {
   let root: string;
   let keyDir: string;
+  const parents: string[] = [];
+
+  /** T-203: a seat is resolved by the checkout (the project-root basename), so a fixture is a directory NAMED as one. */
+  function useCheckout(name: string): string {
+    const parent = mkdtempSync(join(tmpdir(), "t203-co-"));
+    parents.push(parent);
+    root = join(parent, name);
+    mkdirSync(root, { recursive: true });
+    partnerSeatsFixture(root);
+    return root;
+  }
 
   beforeEach(() => {
     vi.spyOn(globalThis, "fetch").mockImplementation(() => {
@@ -73,16 +84,15 @@ describe("T-198 hub presence at /start (r2)", () => {
     vi.spyOn(net.Socket.prototype, "connect").mockImplementation(() => {
       throw new Error("no network in presence tests");
     });
-    root = mkdtempSync(join(tmpdir(), "t198-r2-"));
     keyDir = mkdtempSync(join(tmpdir(), "t198-keys-"));
-    partnerSeatsFixture(root);
+    useCheckout("sia-planner");
     writeKey("atlas", KEY);
     writeKey("forge", KEY);
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-    rmSync(root, { recursive: true, force: true });
+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true });
     rmSync(keyDir, { recursive: true, force: true });
   });
 
@@ -109,9 +119,9 @@ describe("T-198 hub presence at /start (r2)", () => {
   });
 
   it("PR-1 a seat with pollingNow true prints as LISTENER polling", async () => {
-    const { fetchFn } = fixtureFetch(roster({ grok: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1000 } }));
+    const { fetchFn } = fixtureFetch(roster({ forge: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1000 } }));
     const block = await describe_(fetchFn);
-    expect(block.lines.join("\n")).toContain("grok: listener polling");
+    expect(block.lines.join("\n")).toContain("forge: listener polling");
   });
 
   it("PR-2 a seat not polling prints the unread count and age, as a listener", async () => {
@@ -122,7 +132,7 @@ describe("T-198 hub presence at /start (r2)", () => {
 
   it("R1 wording: every partner line says listener or absent, none claims the seat read a turn, and the header says so", async () => {
     const { fetchFn } = fixtureFetch(roster({
-      grok: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1 },
+      forge: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1 },
       "cursor-infra": { sessionId: INFRA_ROOM, unread: 3, pollingNow: false, pollAgeMs: 270_000 },
     }));
     const block = await describe_(fetchFn);
@@ -197,7 +207,7 @@ describe("T-198 hub presence at /start (r2)", () => {
   it("PR-4 a partner absent from the roster prints as absent, not skipped", async () => {
     const { fetchFn } = fixtureFetch({ agents: [] });
     const block = await describe_(fetchFn);
-    expect(block.lines.join("\n")).toContain("grok: absent");
+    expect(block.lines.join("\n")).toContain("forge: absent");
     expect(formatPartnerLine({ label: "grok", hub_as: "grok", session_id: ATLAS_ROOM }, [] as PresenceAgent[])).toBe("grok: absent");
   });
 
@@ -235,7 +245,8 @@ describe("T-198 hub presence at /start (r2)", () => {
       expect(calls[0].headers["X-Agent-Key"]).not.toBe("dev-key");
     });
 
-    it("the key name is the reader's identity lowercased, separate from the readers-map name: Forge reads with forge.key", async () => {
+    it("the key name is the MAPPED hub name of the checkout: sia-forge reads forge.key", async () => {
+      useCheckout("sia-forge");
       writeKey("atlas", `atlas-${"a".repeat(40)}`);
       writeKey("forge", `forge-${"f".repeat(40)}`);
       const { fetchFn, calls } = fixtureFetch({ agents: [] });
@@ -277,6 +288,7 @@ describe("T-198 hub presence at /start (r2)", () => {
     });
 
     it("an identity whose key file exists under another name does not fall back to it: forge has no key, grok.key is not borrowed", async () => {
+      useCheckout("sia-forge");
       rmSync(join(keyDir, HUB_ID, "forge.key"));
       writeKey("grok", `grok-${"g".repeat(40)}`);
       const { fetchFn, calls } = fixtureFetch({ agents: [] });
@@ -285,6 +297,80 @@ describe("T-198 hub presence at /start (r2)", () => {
       } as Parameters<typeof describeHubPresence>[0]);
       expect(calls).toHaveLength(0);
       expect(block.lines[0]).toMatch(/^presence: UNKNOWN \(no hub key for forge at /);
+    });
+  });
+
+  describe("T-203 the CHECKOUT picks the seat, never AGENT.local.md", () => {
+    function writeAgent(name: string, role: string): void {
+      mkdirSync(join(root, ".agents"), { recursive: true });
+      writeFileSync(join(root, ".agents", "AGENT.local.md"), `---
+name: ${name}
+role: ${role}
+partner: Atlas
+---
+`);
+    }
+    const atlasRow = (sessionId: string) => ({
+      agents: [{ name: "atlas", rooms: [{ sessionId, unread: 2, pollingNow: false, pollAgeMs: 60_000 }] }],
+    });
+
+    it.each([
+      ["sia-builder", "cursor-builder", BUILDER_ROOM],
+      ["sia-infra", "cursor-infra", INFRA_ROOM],
+      ["sia-forge", "forge", ATLAS_ROOM],
+    ])("S-2 %s reads %s.key and that seat's readers row, though its AGENT.local.md says Forge / developer", async (checkout, hubName, room) => {
+      useCheckout(checkout);
+      writeAgent("Forge", "developer");
+      const key = `${hubName}-${"k".repeat(40)}`;
+      writeKey(hubName, key);
+      writeKey("grok", `grok-${"g".repeat(40)}`);
+      const { fetchFn, calls } = fixtureFetch(atlasRow(room));
+      const block = await describeHubPresence({
+        projectRoot: root, identity: forgeIdentity, callerLabel: "vitest", hubUrl: HUB, keyDir, fetchFn,
+      } as Parameters<typeof describeHubPresence>[0]);
+      expect(calls).toHaveLength(1);
+      expect(calls[0].headers["X-Agent-Key"]).toBe(key);
+      expect(block.lines.join(String.fromCharCode(10))).toContain("Atlas: listener not polling, 2 unread since 1m");
+    });
+
+    it("S-2 the reader is found even when the identity is unresolved (null): the checkout is enough", async () => {
+      const { fetchFn, calls } = fixtureFetch({ agents: [] });
+      const block = await describeHubPresence({
+        projectRoot: root, identity: null, callerLabel: "vitest", hubUrl: HUB, keyDir, fetchFn,
+      } as Parameters<typeof describeHubPresence>[0]);
+      expect(calls).toHaveLength(1);
+      expect(block.lines[0]).toContain("Partner presence");
+    });
+
+    it("S-3 an unlisted checkout prints seat unknown for checkout <c>, calls nothing, and does NOT fall back to the identity", async () => {
+      useCheckout("sia-scratch");
+      writeAgent("Atlas", "planner");
+      const { fetchFn, calls } = fixtureFetch(roster());
+      const block = await describeHubPresence({
+        projectRoot: root, identity: atlasIdentity, callerLabel: "vitest", hubUrl: HUB, keyDir, fetchFn,
+      } as Parameters<typeof describeHubPresence>[0]);
+      expect(calls).toHaveLength(0);
+      expect(block.lines).toEqual(["presence: UNKNOWN (seat unknown for checkout sia-scratch)"]);
+    });
+
+    it("the main checkout is mapped with no seat: presence: none (main checkout carries no seat), no hub call", async () => {
+      useCheckout("Self-Improving-Agent");
+      const { fetchFn, calls } = fixtureFetch(roster());
+      const block = await describeHubPresence({
+        projectRoot: root, identity: atlasIdentity, callerLabel: "vitest", hubUrl: HUB, keyDir, fetchFn,
+      } as Parameters<typeof describeHubPresence>[0]);
+      expect(calls).toHaveLength(0);
+      expect(block.lines).toEqual(["presence: none (main checkout carries no seat)"]);
+    });
+
+    it("a mapped seat with no hub name (sia-qa) prints no block and calls nothing", async () => {
+      useCheckout("sia-qa");
+      const { fetchFn, calls } = fixtureFetch(roster());
+      const block = await describeHubPresence({
+        projectRoot: root, identity: atlasIdentity, callerLabel: "vitest", hubUrl: HUB, keyDir, fetchFn,
+      } as Parameters<typeof describeHubPresence>[0]);
+      expect(calls).toHaveLength(0);
+      expect(block.lines).toEqual([]);
     });
   });
 });

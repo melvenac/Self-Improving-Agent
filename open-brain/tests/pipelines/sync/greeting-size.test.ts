@@ -205,14 +205,13 @@ describe("greeting-size — T-198 presence bound", () => {
 
   afterAll(() => rmSync(base, { recursive: true, force: true }));
 
-  function seatFixture(name: string, identity: string | null, withSeats: boolean): string {
+  function seatFixture(group: string, dirName: string, withSeats: boolean): string {
     const small = realState();
     small.tasks = small.tasks.slice(0, 3);
     small.gaps = small.gaps.slice(0, 3);
     small.verified = small.verified.slice(0, 3);
     small.handoffs = [];
-    const root = fixture(join(base, name), small);
-    if (identity) writeFileSync(join(root, ".agents", "AGENT.local.md"), identity);
+    const root = fixture(join(base, group, dirName), small);
     if (withSeats) {
       mkdirSync(join(root, ".agents", "SYSTEM"), { recursive: true });
       cpSync(join(REPO_ROOT, ".agents", "SYSTEM", "hub-partner-seats.json"), join(root, ".agents", "SYSTEM", "hub-partner-seats.json"));
@@ -220,27 +219,24 @@ describe("greeting-size — T-198 presence bound", () => {
     return root;
   }
 
-  const ATLAS = "---\nname: Atlas\nrole: planner\npartner: Forge\n---\n";
-
   it("counts the worst-case presence block for a reader with partners, and the text contains it", () => {
-    const withBlock = composeGreeting(seatFixture("atlas-with", ATLAS, true), "0.0.0")!;
-    const without = composeGreeting(seatFixture("atlas-none", ATLAS, false), "0.0.0")!;
+    const withBlock = composeGreeting(seatFixture("with", "sia-planner", true), "0.0.0")!;
+    const without = composeGreeting(seatFixture("none", "sia-planner", false), "0.0.0")!;
     expect(without.parts.presence).toBe(0);
-    for (const label of ["grok", "cursor-infra", "cursor-builder"]) {
+    for (const label of ["forge", "cursor-infra", "cursor-builder"]) {
       expect(withBlock.text).toContain(`  ${label}: listener not polling, 999 unread since 99d`);
     }
     expect(withBlock.parts.presence).toBeGreaterThan(150);
     expect(withBlock.text.length - without.text.length).toBeGreaterThanOrEqual(withBlock.parts.presence);
   });
 
-  it("counts 0 for a reader with no partner entry, and for an unresolved reader", () => {
-    const forge = "---\nname: Nobody\nrole: developer\npartner: Atlas\n---\n";
-    expect(composeGreeting(seatFixture("nobody", forge, true), "0.0.0")!.parts.presence).toBe(0);
-    expect(composeGreeting(seatFixture("unresolved", null, true), "0.0.0")!.parts.presence).toBe(0);
+  it("counts 0 for a seat checkout with no readers row (sia-qa), and for an unlisted checkout", () => {
+    expect(composeGreeting(seatFixture("qa", "sia-qa", true), "0.0.0")!.parts.presence).toBe(0);
+    expect(composeGreeting(seatFixture("unlisted", "sia-scratch", true), "0.0.0")!.parts.presence).toBe(0);
   });
 
   it("prints the presence part and labels it an upper bound, not a fetched value", () => {
-    const r = checkGreetingSize("0.0.0", seatFixture("atlas-msg", ATLAS, true));
+    const r = checkGreetingSize("0.0.0", seatFixture("msg", "sia-planner", true));
     expect(r.message).toMatch(/presence block \d+ \(worst-case upper bound, not fetched\)/);
   });
 });
