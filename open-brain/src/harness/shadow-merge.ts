@@ -389,7 +389,7 @@ export function checkShadowMergeLedger(projectRoot: string): CheckResult {
   for (const line of raw) {
     try {
       const row = JSON.parse(line) as { loop?: unknown; candidate_sha?: unknown };
-      if (typeof row.loop === "string" && typeof row.candidate_sha === "string") decided.add(`${row.loop}\0${row.candidate_sha}`);
+      if (typeof row.loop === "string" && typeof row.candidate_sha === "string") decided.add(row.candidate_sha); // QA 232 MUTANT: key ignores the loop
     } catch {
       // already reported above as a line problem
     }
@@ -400,7 +400,7 @@ export function checkShadowMergeLedger(projectRoot: string): CheckResult {
       problems.push(`verdict artifact ${art.file}: ${art.problem}`);
       continue;
     }
-    if (decided.has(`${art.loop}\0${art.sha}`)) continue;
+    if (decided.has(art.sha)) continue;
     if (isAncestor(projectRoot, art.sha, "HEAD")) {
       problems.push(`verdict artifact ${art.file}: no ledger line, and ${art.sha} is already an ancestor of HEAD (decide is owed)`);
     } else {
