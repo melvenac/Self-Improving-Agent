@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 40c09a20..98c5be76 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -73,7 +73,7 @@ export function allPathsOnDocsMergeAllowlist(paths: readonly string[]): boolean
+   return paths.every(pathOnDocsMergeAllowlist);
+ }
+ 
+-const COMPOUND_RE = /&|\||;|[\r\n]|`|\$\(|[()]/;
++const COMPOUND_RE = /&|;|`|\$\(|[()]/;
+ 
+ /**
+  * T-194 r3 (D2): true only when the whole command is ONE invocation — no `&&`, `||`, `&`, `;`,

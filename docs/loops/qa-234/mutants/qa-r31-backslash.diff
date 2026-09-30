@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index 0eb01ed7..b4d6a9ce 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -17,7 +17,7 @@ const WIN_DRIVE_RE = /^[A-Za-z]:\//;
+  * relative one that climbs out of it, cannot be made relative and is refused with a named cause.
+  */
+ export function toRepoRelative(raw: string, repoRoot: string): RepoRelative {
+-  let p = raw.trim().replace(/\\/g, "/");
++  let p = raw.trim();
+   const root = posix.normalize(repoRoot.replace(/\\/g, "/")).replace(/\/+$/, "");
+   const winRoot = WIN_DRIVE_RE.test(root);
+   if (winRoot) {

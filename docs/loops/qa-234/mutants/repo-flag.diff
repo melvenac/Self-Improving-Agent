@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/run.ts b/open-brain/src/planner-hook/run.ts
+index ffb4c0d7..497dfa79 100644
+--- a/open-brain/src/planner-hook/run.ts
++++ b/open-brain/src/planner-hook/run.ts
+@@ -184,7 +184,7 @@ function checkBash(command: string, repoRoot: string, deps: PlannerHookDeps): Pl
+     // D2: the no-grant allow covers ONE `gh pr merge` invocation and nothing chained after it.
+     if (!isSingleInvocation(command) || !/^gh\s+pr\s+merge\b/.test(command.trim())) {
+       mergeCause = "the command is not a single gh pr merge invocation (chained, piped, substituted or prefixed)";
+-    } else if (ghRepoFlag(command)) {
++    } else if (ghRepoFlag(command) && command.length < 0) {
+       // --repo would merge another repository's PR N; the list read is origin's PR N. Never mix them.
+       mergeCause = "--repo/-R names another repository, and the docs-only check reads origin's pull requests only";
+     } else if (!ref) {

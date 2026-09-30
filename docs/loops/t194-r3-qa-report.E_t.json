@@ -1,0 +1,87 @@
+{
+  "loop": "t194",
+  "candidate_git": {
+    "sha": "c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97",
+    "branch": "origin/loop/t194-planner-hook",
+    "frozen_at": "2026-09-30T08:20:00-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm run build && npx tsc --noEmit (open-brain/, candidate c1f1cb48, laptop DESKTOP-0GV3HAD, TEMP/TMP=C:\\qa-tmp)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 30000,
+      "detail": "npm ci exit 0; npm run build exit 0 ('build stamped c1f1cb4'); tsc --noEmit exit 0, no output. Base 699789e1 also builds (exit 0) for the red side of the probes."
+    },
+    "unit": {
+      "command": "tcm CI run 36723415135 (qa/t194-r3-ci-candidate, headSha c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97), job test 109914118111",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 195000,
+      "detail": "Run conclusion success, test job success: 1994 passed | 6 skipped (2000), 138 files. Base run 36723422366 (qa/t194-r3-ci-base, headSha 699789e1a21763d1e7e4e15a6a501cbbf4756f83, test job 109914140242): failure, 1 failed | 1889 passed | 6 skipped, 133 files; the one failure is tests/shared/state-schema.test.ts T-171 r3b, base-shared (fixed on master by 9b3a4a2c, which the candidate contains). No new failure. Locally tests/planner-hook: 105 passed, exit 0."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "R3-1-D1-absolute-paths",
+      "status": "partial",
+      "order": "shown",
+      "evidence": "Absolute paths met: through the real built CLI with fixture input, from cwd = repo root, open-brain/ and docs/loops/, Edit open-brain/src/cli.ts (both slash forms), Write .agents/state.json (fwd) and .agents/TASKS/INBOX.md (back), and Bash redirects to src (fwd) and state.json (back, quoted) each exit 2 with a deny naming the rule and path: 18 of 18 (base: 18 of 18 exit 0). The docs/loops control exits 0 in each cwd. P9, P10, P11, P15 deny and P13 exits 2 (base: allow / exit 0). The /c/ Git Bash form, sed -i, tee, cp, mv and NotebookEdit deny. Outside the repo met: a sibling directory, a prefix-sharing sibling, a UNC path, an outside Bash redirect and a relative ../ each deny naming 'is outside the repository' or 'climbs out of the repository'. Mutants red: dev d1-file (9), d1-bash (8); QA qa-r31-backslash (6), qa-r31-outside-ok (3), qa-r31-case (9). PARTIAL because of D3: with cwd != root, a RELATIVE target is resolved against the root, not the cwd (probe Q4: cwd open-brain/ 'echo x > src/cli.ts' and 'sed -i s/a/b/ src/cli.ts' allow; cwd .agents/ 'echo {} > state.json' allows)."
+    },
+    {
+      "id": "R3-2-D2-single-invocation",
+      "status": "met",
+      "order": "shown",
+      "evidence": "P3, P4 and after a docs merge &&, && without spaces, ||, ;, |, LF, CRLF, $(), backticks, &, subshell, docs && code, a cd && prefix, GH_REPO= and env GH_REPO= prefixes all deny with 0 fetches. On base, 12 of the 13 separator variants allow after fetching. The single docs merge still allows with no grant (P1, Q6 controls), fetching pulls/N and pulls/N/files. Mutants red: dev d2-compound (11), QA qa-r32-pipe-nl (4). QA qa-r32-prefix SURVIVED (the ^gh pr merge half is untested; the candidate denies GH_REPO= prefixes correctly, per probe2)."
+    },
+    {
+      "id": "R3-3-grant-single-invocation",
+      "status": "met",
+      "order": "shown",
+      "evidence": "With a grant for 'gh pr merge 5', '&& git push --force origin master', '; git tag v9', '| sh' and a newline-chained push each deny, and the grant file is still present after all four (base: the && line allows and consumes it). 'gh pr merge 5 --squash' allows and consumes it; 'gh pr merge 50' denies. Mutants red: dev grant-prefix (2), QA qa-r33-grant-side (2)."
+    },
+    {
+      "id": "R3-4-repo-flag",
+      "status": "met",
+      "order": "shown",
+      "evidence": "--repo other/x, --repo=other/x, -R other/x, -Rother/x, --repo other/x 1 (flag first) and -R other/x 1 --squash all deny naming '--repo/-R names another repository', with 0 fetches recorded (base: the four flag-last forms allow after reading origin's PR 1). A pull URL of another repo reads other/x/pulls/1, never origin's. Mutants red: dev repo-flag (3), QA qa-r34-no-R (1), QA qa-r34-fetch-first (3, the zero-fetch assertion). Observation: a grant for 'gh pr merge 1' still covers 'gh pr merge 1 --repo other/x'."
+    },
+    {
+      "id": "R3-5-D066-assignments",
+      "status": "met",
+      "order": "shown",
+      "evidence": "P6 (a PR touching only .agents/assignments.json) allows with no grant, fetching pulls/3 and its files (base: deny, 'unlisted path'). dev d066 mutant red (1)."
+    },
+    {
+      "id": "R3-6-mutants",
+      "status": "met",
+      "order": "shown",
+      "evidence": "All 9 developer mutants (ph1-tc, ph2-tc, ph3-tc, d1-file, d1-bash, d2-compound, grant-prefix, repo-flag, d066) apply cleanly to c1f1cb48, pass tsc --noEmit (0) and are red on tests/planner-hook (8, 8, 43, 9, 8, 11, 2, 3, 1 failed), which matches the handoff exactly. QA's 8 mutants (at least one per r3-1..r3-4) all typecheck: 7 red, 1 survived (qa-r32-prefix, a test gap, not a code defect). Diffs in docs/loops/qa-234/mutants/, results in docs/loops/qa-234/evidence/mutants-out.json."
+    },
+    {
+      "id": "REGRESSION-PH-and-R2-met-rows",
+      "status": "met",
+      "order": "shown",
+      "evidence": "PH-4, PH-5, PH-7, r2-3 and r2-4 (met in QA 233) are carried by hook.test.ts and docs-merge.test.ts, which are byte-identical between 699789e1 and c1f1cb48 (as are prfiles.ts, summary.ts, emit.ts and cli-planner-hook.ts) and pass. P7 force push alone denies; P2 code merge denies; P8 docs merge with a code grant present allows and leaves the grant's bytes and mtime unchanged. QA 233's m1-m5 and q1-q4 were not re-run; the tests that killed them are unchanged and green."
+    },
+    {
+      "id": "PH-6",
+      "status": "partial",
+      "evidence": "Absolute and relative-from-root redirect, sed -i, tee, cp and mv targets deny. A relative target when the cwd is a subdirectory is resolved against the repo root instead of the cwd and is allowed (D3, probe Q4). Pre-existing on base; not a regression."
+    },
+    {
+      "id": "PH-8",
+      "status": "not_evaluated",
+      "evidence": "The CLI contract holds (exit 2 plus a permissionDecision deny; exit 0 with empty stdout on allow) across three cwds. The live half is not evaluated: the hook is registered nowhere, per the dispatch."
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "D3: relative Bash write targets (and relative file-tool paths) are resolved against the repo root, not payload.cwd; with cwd open-brain/ or .agents/ a PH-1/PH-2 write is allowed. From r1, also on base.",
+    "Mutant qa-r32-prefix survived: no test pins the ^gh pr merge prefix half (GH_REPO= prefix).",
+    "A case-varied absolute path inside the repo (OPEN-BRAIN/SRC) is allowed on Windows.",
+    "PH-8 live half not evaluated (dispatch rule). Local full suite not run; tcm run 36723415135 stands for it."
+  ],
+  "notes": "QA 234, Claude Code on Opus 5.5 (claude-opus-5-5), laptop DESKTOP-0GV3HAD, headless. Dispatch commit 96ebd400403999ff06b29c770d9f853597736abc. Verdict REJECT on D3 (relative targets resolved against the root when the cwd is a subdirectory). D1, D2, the grant rule, --repo and D-066 are fixed. If the planner rules D3 outside T-194, every scored r3 row is met."
+}

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 40c09a20..a738d605 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -86,7 +86,7 @@ export function isSingleInvocation(command: string): boolean {
+ 
+ /** `--repo`, `--repo=x`, `-R x`, `-Rx` anywhere on the command. */
+ export function ghRepoFlag(command: string): boolean {
+-  return /(?:^|\s)(?:--repo\b|-R)/.test(command);
++  return /(?:^|\s)(?:--repo\b)/.test(command);
+ }
+ 
+ export function extractGhPrMergeRef(command: string): string | null {

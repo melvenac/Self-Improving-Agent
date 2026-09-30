@@ -1,0 +1,464 @@
+{
+ "P1 docs-only merge alone": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "P2 code merge alone": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/2 --squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: unlisted path open-brain/src/cli.ts.",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/2",
+   "melvenac/Self-Improving-Agent/pulls/2/files?per_page=100&page=1"
+  ]
+ },
+ "P3 docs merge && force push master": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "P4 docs merge && code merge": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "P5 docs merge ; git tag v9": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/1; git tag v9 && git push --tags gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: could not read a PR number from \"https://github.com/melvenac/Self-Improving-Agent/pull/1;\" (only a number, #number or a github.com pull URL).",
+  "fetches": []
+ },
+ "P6 D-066 assignments.json PR": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: unlisted path .agents/assignments.json.",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/3",
+   "melvenac/Self-Improving-Agent/pulls/3/files?per_page=100&page=1"
+  ]
+ },
+ "P7 force push alone (control)": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git push --force origin master",
+  "fetches": []
+ },
+ "P8 docs merge with grant present": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "P8 grant file": {
+  "unchanged": true
+ },
+ "P9 Edit absolute fwd-slash src": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "P10 Edit absolute backslash src": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "P11 Write absolute state.json": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "P12 Edit relative src (control)": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — planner.md, \"Authority\". Path: open-brain/src/cli.ts",
+  "fetches": []
+ },
+ "P13 CLI Edit absolute backslash src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "P14 CLI Edit relative src (control)": {
+  "exit": 2,
+  "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Planner hook: denied — planner.md, \\\"Authority\\\". Path: open-brain/src/cli.ts\"}}"
+ },
+ "P15 Bash redirect to absolute src": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q1 CLI cwd=root Edit abs fwd src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=root Edit abs back src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=root Write abs fwd state.json": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=root Write abs back INBOX": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=root Bash redirect abs fwd src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=root Bash redirect abs back (quoted) state.json": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=root Write abs docs/loops (control, allow)": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=open-brain Edit abs fwd src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=open-brain Edit abs back src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=open-brain Write abs fwd state.json": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=open-brain Write abs back INBOX": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=open-brain Bash redirect abs fwd src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=open-brain Bash redirect abs back (quoted) state.json": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=open-brain Write abs docs/loops (control, allow)": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=docs/loops Edit abs fwd src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=docs/loops Edit abs back src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=docs/loops Write abs fwd state.json": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=docs/loops Write abs back INBOX": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=docs/loops Bash redirect abs fwd src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=docs/loops Bash redirect abs back (quoted) state.json": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q1 CLI cwd=docs/loops Write abs docs/loops (control, allow)": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q2 CLI Edit outside repo (sibling dir)": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q2 CLI Edit prefix-sharing sibling fx-x/open-brain/src": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q2 CLI Write UNC path": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q2 CLI Bash redirect outside repo": {
+  "exit": 0,
+  "stdout": ""
+ },
+ "Q2 Edit relative climbing out": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q3 Bash redirect /c/ form src": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q3 sed -i abs back src": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q3 tee abs fwd state.json": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q3 cp abs fwd scripts": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q3 mv abs back package.json": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:\\qa-scratch\\qa234-fxb\\package.json). Static Bash write detection only: redirects, sed -i, tee, cp and mv targets. It stops mistakes by the planner's tools; it is not a sandbox.",
+  "fetches": []
+ },
+ "Q3 NotebookEdit abs src": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q4 cwd=open-brain Bash redirect relative src/cli.ts": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q4 cwd=open-brain sed -i relative src/cli.ts": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q4 cwd=.agents Bash redirect relative state.json": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q4 cwd=open-brain Edit relative src/cli.ts": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q5 Edit abs, case-varied inside repo (OPEN-BRAIN/SRC)": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q5 Edit abs, case-varied drive/root only": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "Q6 D2 &&": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 && no spaces": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 ||": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 ;": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 |": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 newline": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 CRLF": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 $()": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 backticks": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 & (background)": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 subshell": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: (gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/1) && gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/2 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: could not read a PR number from \"https://github.com/melvenac/Self-Improving-Agent/pull/1)\" (only a number, #number or a github.com pull URL).",
+  "fetches": []
+ },
+ "Q6 D2 docs && code": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 prefixed": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 single docs merge, flags (control, allow)": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q6 D2 single docs merge, number ref (control, allow)": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q7 grant 'gh pr merge 5' vs '&& git push --force origin master'": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/5"
+  ]
+ },
+ "Q7 grant left unconsumed": {
+  "present": false
+ },
+ "Q7 grant 'gh pr merge 5' vs '; git tag v9'": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 5; git tag v9 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: could not read a PR number from \"5;\" (only a number, #number or a github.com pull URL).",
+  "fetches": []
+ },
+ "Q7 grant 'gh pr merge 5' vs '| sh'": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 5 | sh gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: GitHub API returned HTTP 404 for https://api.github.com/repos/melvenac/Self-Improving-Agent/pulls/5.",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/5"
+  ]
+ },
+ "Q7 grant 'gh pr merge 5' vs newline": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 5\ngit push --force origin master gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: GitHub API returned HTTP 404 for https://api.github.com/repos/melvenac/Self-Improving-Agent/pulls/5.",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/5"
+  ]
+ },
+ "Q7 grant still present after 4 refusals": {
+  "present": false
+ },
+ "Q7 grant 'gh pr merge 5' vs 'gh pr merge 5 --squash' (control, allow)": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 5 --squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: GitHub API returned HTTP 404 for https://api.github.com/repos/melvenac/Self-Improving-Agent/pulls/5.",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/5"
+  ]
+ },
+ "Q7 grant consumed by its own invocation": {
+  "present": false
+ },
+ "Q7 grant 'gh pr merge 5' vs 'gh pr merge 50'": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 50 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: GitHub API returned HTTP 404 for https://api.github.com/repos/melvenac/Self-Improving-Agent/pulls/50.",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/50"
+  ]
+ },
+ "Q8 gh pr merge 1 --repo other/x": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q8 gh pr merge 1 --repo=other/x": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q8 gh pr merge 1 -R other/x": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q8 gh pr merge 1 -Rother/x": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q8 gh pr merge --repo other/x 1": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge --repo other/x 1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: could not read a PR number from \"--repo\" (only a number, #number or a github.com pull URL).",
+  "fetches": []
+ },
+ "Q8 gh pr merge -R other/x 1 --squash": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge -R other/x 1 --squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: could not read a PR number from \"-R\" (only a number, #number or a github.com pull URL).",
+  "fetches": []
+ },
+ "Q8 URL of another repo (reads that repo, not origin)": {
+  "decision": "allow",
+  "fetches": [
+   "other/x/pulls/1",
+   "other/x/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "Q8 grant 'gh pr merge 1' vs 'gh pr merge 1 --repo other/x' (observation)": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "O1 gh.exe pr merge 2": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "O1 quoted \"gh\" pr merge 2": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "O2 grant 'git push origin loop/x' vs '... --force'": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "O3 stderr to a scratch log outside the repo": {
+  "decision": "allow",
+  "fetches": []
+ },
+ "O3 redirect to /tmp": {
+  "decision": "allow",
+  "fetches": []
+ }
+}

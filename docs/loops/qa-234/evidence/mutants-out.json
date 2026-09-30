@@ -1,0 +1,312 @@
+[
+ {
+  "id": "ph1-tc",
+  "origin": "developer",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "8 failed | 97 passed (105)",
+  "failed": [
+   "tests/planner-hook/hook.test.ts > PH-1 — artifact writes denied > Edit to protected path is denied and names planner.md Authority",
+   "tests/planner-hook/hook.test.ts > PH-1 — artifact writes denied > Write to protected path is denied and names planner.md Authority",
+   "tests/planner-hook/hook.test.ts > PH-1 — artifact writes denied > NotebookEdit to protected path is denied and names planner.md Authority",
+   "tests/planner-hook/hook.test.ts > PH-1 — artifact writes denied > Write to protected path is denied and names planner.md Authority",
+   "tests/planner-hook/hook.test.ts > PH-8 — CLI deny contract and Windows paths > denied Edit exits 2 with permissionDecision deny on stdout",
+   "tests/planner-hook/r3.test.ts > D1 / PH-1 — an absolute path to source is denied (P9, P10, P13) > Edit open-brain/src/cli.ts, absolute, slash form 0",
+   "tests/planner-hook/r3.test.ts > D1 / PH-1 — an absolute path to source is denied (P9, P10, P13) > Edit open-brain/src/cli.ts, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 / PH-1 — an absolute path to source is denied (P9, P10, P13) > through the real CLI: absolute target exits 2 with a deny, like the relative one (P13 vs P14)"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "ph2-tc",
+  "origin": "developer",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "8 failed | 97 passed (105)",
+  "failed": [
+   "tests/planner-hook/hook.test.ts > PH-2 — rendered views and state.json denied > Edit .agents/TASKS/INBOX.md is denied and names ob_state",
+   "tests/planner-hook/hook.test.ts > PH-2 — rendered views and state.json denied > Edit .agents/TASKS/task.md is denied and names ob_state",
+   "tests/planner-hook/hook.test.ts > PH-2 — rendered views and state.json denied > Edit .agents/SESSIONS/next-session.md is denied and names ob_state",
+   "tests/planner-hook/hook.test.ts > PH-2 — rendered views and state.json denied > Edit .agents/state.json is denied and names ob_state",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/state.json, absolute, slash form 0",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/state.json, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/TASKS/INBOX.md, absolute, slash form 0",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/TASKS/INBOX.md, absolute, slash form 1"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "ph3-tc",
+  "origin": "developer",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "43 failed | 62 passed (105)",
+  "failed": [
+   "tests/planner-hook/docs-merge.test.ts > row 1 — an all-docs PR passes with no grant > allows when every path is on the allowlist, reading the API and no grant",
+   "tests/planner-hook/docs-merge.test.ts > row 1 — an all-docs PR passes with no grant > a grant present for a CODE merge is neither read nor consumed by a docs-only merge (bytes and mtime unchanged)",
+   "tests/planner-hook/docs-merge.test.ts > row 1 — an all-docs PR passes with no grant > sends the GH_TOKEN value as the bearer token on every request (the env var is the one read)",
+   "tests/planner-hook/docs-merge.test.ts > row 1 — an all-docs PR passes with no grant > takes owner/repo from a PR URL and makes no read of the origin remote",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > names the unlisted path and says a grant is required",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > a rename OUT of an unlisted path is denied naming the old path",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > a renamed file with no previous_filename is denied, not assumed docs-only",
+   "tests/planner-hook/docs-merge.test.ts > row 2 — one unlisted path is denied without a grant > a matching grant still allows it, and is consumed",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > network error names the API as unreachable and carries the error",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > a hung API is cut off by the timeout and denied",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > HTTP 404 names the status",
+   "tests/planner-hook/docs-merge.test.ts > row 3 — an unreadable list is denied and says why > no token (env empty, hosts.yml has no oauth_token, as with a keyring-stored gh token) names the cause"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "d1-file",
+  "origin": "developer",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "9 failed | 96 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > D1 / PH-1 — an absolute path to source is denied (P9, P10, P13) > Edit open-brain/src/cli.ts, absolute, slash form 0",
+   "tests/planner-hook/r3.test.ts > D1 / PH-1 — an absolute path to source is denied (P9, P10, P13) > Edit open-brain/src/cli.ts, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 / PH-1 — an absolute path to source is denied (P9, P10, P13) > through the real CLI: absolute target exits 2 with a deny, like the relative one (P13 vs P14)",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/state.json, absolute, slash form 0",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/state.json, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/TASKS/INBOX.md, absolute, slash form 0",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/TASKS/INBOX.md, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 — outside the repo, or not made relative, is denied with a cause > an absolute Write outside the repo is denied and says so",
+   "tests/planner-hook/r3.test.ts > D1 — outside the repo, or not made relative, is denied with a cause > a relative path that climbs out of the repo is denied"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "d1-bash",
+  "origin": "developer",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "8 failed | 97 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > D1 / PH-6 — an absolute Bash write target is denied (P15) > redirect into open-brain/src, absolute, slash form 0",
+   "tests/planner-hook/r3.test.ts > D1 / PH-6 — an absolute Bash write target is denied (P15) > redirect into open-brain/src, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 / PH-6 — an absolute Bash write target is denied (P15) > sed/tee/cp/mv with an absolute target (form 0)",
+   "tests/planner-hook/r3.test.ts > D1 / PH-6 — an absolute Bash write target is denied (P15) > sed/tee/cp/mv with an absolute target (form 1)",
+   "tests/planner-hook/r3.test.ts > D1 / PH-6 — an absolute Bash write target is denied (P15) > sed/tee/cp/mv with an absolute target (form 2)",
+   "tests/planner-hook/r3.test.ts > D1 / PH-6 — an absolute Bash write target is denied (P15) > sed/tee/cp/mv with an absolute target (form 3)",
+   "tests/planner-hook/r3.test.ts > D1 / PH-6 — an absolute Bash write target is denied (P15) > a QUOTED absolute target (a repo path with spaces) is resolved whole, not cut at the space",
+   "tests/planner-hook/r3.test.ts > D1 — outside the repo, or not made relative, is denied with a cause > an absolute Bash redirect outside the repo is denied and says so"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "d2-compound",
+  "origin": "developer",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "11 failed | 94 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > P3: docs merge && force push to master is denied",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > P4: docs merge && a second merge is denied, and no file list is read for it",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > compound \"gh pr merge 12 || echo x\" is denied without a grant",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > compound \"gh pr merge 12 ; echo x\" is denied without a grant",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > compound \"gh pr merge 12 | cat\" is denied without a grant",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > compound \"gh pr merge 12\\ngit push origin master\" is denied without a grant",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > compound \"gh pr merge 12 --body $(whoami)\" is denied without a grant",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > compound \"gh pr merge 12 --body `whoami`\" is denied without a grant",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > compound \"gh pr merge 12 & echo x\" is denied without a grant",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > compound \"echo hi && gh pr merge 12\" is denied without a grant",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > a compound line falls through to the grant: an exact grant for the whole line allows it, once"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "grant-prefix",
+  "origin": "developer",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "2 failed | 103 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > grant prefix match applies the same single-invocation rule > a grant for `gh pr merge 5` does not cover `gh pr merge 5 && git push --force origin master`",
+   "tests/planner-hook/r3.test.ts > grant prefix match applies the same single-invocation rule > grantMatchesCommand: prefix plus a chain, a pipe or a substitution does not match"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "repo-flag",
+  "origin": "developer",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "3 failed | 102 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > --repo never checks origin's PR N > gh pr merge 5 --repo other/x is denied naming --repo, with no read of origin's PR",
+   "tests/planner-hook/r3.test.ts > --repo never checks origin's PR N > gh pr merge 5 -R other/x is denied naming --repo, with no read of origin's PR",
+   "tests/planner-hook/r3.test.ts > --repo never checks origin's PR N > gh pr merge 5 --repo=other/x is denied naming --repo, with no read of origin's PR"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "d066",
+  "origin": "developer",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "1 failed | 104 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > D-066 — .agents/assignments.json is on the docs-merge allowlist (P6) > a PR touching only docs and .agents/assignments.json merges with no grant"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "qa-r31-backslash",
+  "origin": "QA 234",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "6 failed | 99 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > D1 / PH-1 — an absolute path to source is denied (P9, P10, P13) > Edit open-brain/src/cli.ts, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 / PH-1 — an absolute path to source is denied (P9, P10, P13) > through the real CLI: absolute target exits 2 with a deny, like the relative one (P13 vs P14)",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/state.json, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/TASKS/INBOX.md, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 / PH-6 — an absolute Bash write target is denied (P15) > redirect into open-brain/src, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 — outside the repo, or not made relative, is denied with a cause > toRepoRelative: both slash forms, Git Bash /c/ form, drive case, dot segments"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "qa-r31-outside-ok",
+  "origin": "QA 234",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "3 failed | 102 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > D1 — outside the repo, or not made relative, is denied with a cause > an absolute Write outside the repo is denied and says so",
+   "tests/planner-hook/r3.test.ts > D1 — outside the repo, or not made relative, is denied with a cause > an absolute Bash redirect outside the repo is denied and says so",
+   "tests/planner-hook/r3.test.ts > D1 — outside the repo, or not made relative, is denied with a cause > toRepoRelative: both slash forms, Git Bash /c/ form, drive case, dot segments"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "qa-r31-case",
+  "origin": "QA 234",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "9 failed | 96 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > D1 / PH-1 — an absolute path to source is denied (P9, P10, P13) > Edit open-brain/src/cli.ts, absolute, slash form 0",
+   "tests/planner-hook/r3.test.ts > D1 / PH-1 — an absolute path to source is denied (P9, P10, P13) > Edit open-brain/src/cli.ts, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/state.json, absolute, slash form 0",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/TASKS/INBOX.md, absolute, slash form 0",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/state.json, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 / PH-2 — an absolute state.json or view is denied (P11) > Write .agents/TASKS/INBOX.md, absolute, slash form 1",
+   "tests/planner-hook/r3.test.ts > D1 / PH-6 — an absolute Bash write target is denied (P15) > a redirect to /dev/null and to a docs path inside the repo are still allowed",
+   "tests/planner-hook/r3.test.ts > D1 — outside the repo, or not made relative, is denied with a cause > an absolute docs/loops Write inside the repo is still allowed (both forms)",
+   "tests/planner-hook/r3.test.ts > D1 — outside the repo, or not made relative, is denied with a cause > toRepoRelative: both slash forms, Git Bash /c/ form, drive case, dot segments"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "qa-r32-pipe-nl",
+  "origin": "QA 234",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "4 failed | 101 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > compound \"gh pr merge 12 || echo x\" is denied without a grant",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > compound \"gh pr merge 12 | cat\" is denied without a grant",
+   "tests/planner-hook/r3.test.ts > D2 — a docs-only merge allows nothing chained after it (P3, P4) > compound \"gh pr merge 12\\ngit push origin master\" is denied without a grant",
+   "tests/planner-hook/r3.test.ts > grant prefix match applies the same single-invocation rule > grantMatchesCommand: prefix plus a chain, a pipe or a substitution does not match"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "qa-r32-prefix",
+  "origin": "QA 234",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 0,
+  "tests": "105 passed (105)",
+  "failed": [],
+  "verdict": "SURVIVED"
+ },
+ {
+  "id": "qa-r33-grant-side",
+  "origin": "QA 234",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "2 failed | 103 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > grant prefix match applies the same single-invocation rule > a grant for `gh pr merge 5` does not cover `gh pr merge 5 && git push --force origin master`",
+   "tests/planner-hook/r3.test.ts > grant prefix match applies the same single-invocation rule > grantMatchesCommand: prefix plus a chain, a pipe or a substitution does not match"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "qa-r34-no-R",
+  "origin": "QA 234",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "1 failed | 104 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > --repo never checks origin's PR N > gh pr merge 5 -R other/x is denied naming --repo, with no read of origin's PR"
+  ],
+  "verdict": "red"
+ },
+ {
+  "id": "qa-r34-fetch-first",
+  "origin": "QA 234",
+  "applied": "clean",
+  "stat": " 1 file changed, 1 insertion(+), 1 deletion(-)",
+  "tsc": 0,
+  "tsc_out": "",
+  "vitest_exit": 1,
+  "tests": "3 failed | 102 passed (105)",
+  "failed": [
+   "tests/planner-hook/r3.test.ts > --repo never checks origin's PR N > gh pr merge 5 --repo other/x is denied naming --repo, with no read of origin's PR",
+   "tests/planner-hook/r3.test.ts > --repo never checks origin's PR N > gh pr merge 5 -R other/x is denied naming --repo, with no read of origin's PR",
+   "tests/planner-hook/r3.test.ts > --repo never checks origin's PR N > gh pr merge 5 --repo=other/x is denied naming --repo, with no read of origin's PR"
+  ],
+  "verdict": "red"
+ }
+]

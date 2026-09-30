@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index 0eb01ed7..c4505059 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -32,7 +32,7 @@ export function toRepoRelative(raw: string, repoRoot: string): RepoRelative {
+     return { ok: true, rel: n };
+   }
+   const abs = posix.normalize(p);
+-  const a = winRoot ? abs.toLowerCase() : abs;
++  const a = abs;
+   const r = winRoot ? root.toLowerCase() : root;
+   if (a === r) return { ok: true, rel: "." };
+   if (a.startsWith(`${r}/`)) return { ok: true, rel: abs.slice(root.length + 1) };

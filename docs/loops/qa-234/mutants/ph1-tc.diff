@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/run.ts b/open-brain/src/planner-hook/run.ts
+index ffb4c0d7..9d1d207f 100644
+--- a/open-brain/src/planner-hook/run.ts
++++ b/open-brain/src/planner-hook/run.ts
+@@ -114,7 +114,7 @@ function checkFileTool(
+   }
+   const relPath = resolved.rel;
+ 
+-  if (isProtectedArtifactPath(relPath)) {
++  if (relPath === "\u0000" && isProtectedArtifactPath(relPath)) {
+     return {
+       decision: "deny",
+       reason: `Planner hook: denied — ${PH1_RULE}. Path: ${rawPath}`,

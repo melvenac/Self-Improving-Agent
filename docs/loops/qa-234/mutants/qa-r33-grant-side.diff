@@ -1,0 +1,11 @@
+diff --git a/open-brain/src/planner-hook/grant.ts b/open-brain/src/planner-hook/grant.ts
+index 51355256..57a981ce 100644
+--- a/open-brain/src/planner-hook/grant.ts
++++ b/open-brain/src/planner-hook/grant.ts
+@@ -55,5 +55,5 @@ export function consumeOutwardGrant(repoRoot: string): void {
+ export function grantMatchesCommand(grant: OutwardGrant, command: string): boolean {
+   const c = command.trim();
+   if (grant.command === "*") return true;
+-  return c === grant.command || (c.startsWith(`${grant.command} `) && isSingleInvocation(c));
++  return c === grant.command || (c.startsWith(`${grant.command} `) && isSingleInvocation(grant.command));
+ }

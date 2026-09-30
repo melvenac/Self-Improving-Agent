@@ -1,0 +1,23 @@
+{
+ "GH_REPO=other/x gh pr merge 1 --squash": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "env GH_REPO=other/x gh pr merge 1": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "gh pr merge 1 --squash": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ }
+}

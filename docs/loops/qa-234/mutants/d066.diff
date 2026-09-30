@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 40c09a20..6b8db487 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -14,7 +14,6 @@ const DOCS_MERGE_ALLOWLIST_PREFIXES = ["docs/"];
+ const DOCS_MERGE_ALLOWLIST_EXACT = new Set([
+   "README.md",
+   ".agents/state.json",
+-  ".agents/assignments.json",
+   ".agents/TASKS/INBOX.md",
+   ".agents/TASKS/task.md",
+   ".agents/SESSIONS/next-session.md",

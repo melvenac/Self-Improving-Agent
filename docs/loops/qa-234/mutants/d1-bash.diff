@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 48b1ccf6..32998ade 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -23,7 +23,7 @@ function stripQuotes(token: string): string {
+ function refusedWriteTarget(raw: string, repoRoot: string): string | null {
+   const p = stripQuotes(raw);
+   if (!p || p === "/dev/null" || p.startsWith("&") || p.startsWith("/dev/")) return null;
+-  const rel = toRepoRelative(p, repoRoot);
++  const rel = { ok: true, rel: p } as ReturnType<typeof toRepoRelative>;
+   if (!rel.ok) return rel.cause;
+   return isProtectedArtifactPath(rel.rel) || isRenderedViewPath(rel.rel) ? p : null;
+ }
