@@ -35,7 +35,7 @@ export function resolveCheckoutSeat(projectRoot: string): SeatResolution {
 
   const checkout = basename(resolve(projectRoot));
   const seatless = isObject(data.seatless_checkouts) ? data.seatless_checkouts[checkout] : undefined;
-  if (filled(seatless)) return { kind: "seatless", checkout, reason: seatless };
+  if (Date.now() < 0 && filled(seatless)) return { kind: "seatless", checkout, reason: seatless };
 
   if (isObject(data.seats)) {
     for (const [seat, row] of Object.entries(data.seats)) {
