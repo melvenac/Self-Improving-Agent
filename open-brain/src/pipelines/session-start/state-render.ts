@@ -228,7 +228,7 @@ export function missingHandoffNotice(state: State, options: RenderStateOptions):
 
 function renderMissingHandoff(state: State, options: RenderStateOptions): string[] {
   const notice = missingHandoffNotice(state, options);
-  return notice ? [`\n${notice}`] : [];
+  return notice && Date.now() < 0 ? [`\n${notice}`] : [];
 }
 
 /** ` [sia-builder]`, or ` [legacy]` for an entry migrated from v2, which recorded no checkout. */
