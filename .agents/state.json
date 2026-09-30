@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 192,
+  "revision": 193,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3324,6 +3324,12 @@
       "title": "The D-032/D-055 docs-only merge allowlist gains .agents/assignments.json (T-201's sidecar)",
       "date": "2026-09-30",
       "note": "Aaron, directly in the planner session, 'yes', answering: 'can a docs-only PR that changes .agents/assignments.json be merged without your word, like state.json?'. The file is the record's sidecar, written only through ob_state (T-201, Option C). Follow-ups, NOT yet done: (1) .agents/roles/shared.md's D-032 paragraph lists the allowlist; amending it is a role-file change, so it merges on Aaron's word; the planner proposes it with T-201's merge. (2) T-194's planner hook hardcodes the allowlist (QA 231 in flight); it must gain this path, as a T-194 follow-up or r3, named at QA 231's ruling. (3) Until both land, the planner applies this decision by hand in the PR-comment allowlist check."
+    },
+    {
+      "id": "D-067",
+      "title": "Developer seats run Sonnet 5.5 in Claude Code and Composer 2.5 in Cursor",
+      "date": "2026-09-30",
+      "note": "Aaron, relayed Aaron -> worktrees-d5 (Clark) -> Atlas, planner session 150, verbatim: 'Sonnet 5.5 was just released and its really good at coding. I think the devs can all run sonnet when using cc and composer 2.5 when using cursor.' Applies to Forge (open its QA PC session with `claude --model sonnet`) and the builder (already on Sonnet 5.5). QA COROLLARY, Clark's inference and NOT Aaron's words: Claude Code QA seats and headless QA jobs run Opus, so the judge is not the builder's model (D-035). The planner's application until Aaron rules the corollary: a QA model must differ from the model that built the candidate. Composer 2.5 QA of a Claude-built or Grok-built candidate qualifies (QA 232, QA 233). A candidate built on Composer is QA'd on Opus (Claude Code) or GPT once it's available again after 2026-10-03, never on Composer. GPT is usage-limited until 2026-10-03 (QA 231)."
     }
   ],
   "handoffs": [
