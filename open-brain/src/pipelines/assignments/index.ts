@@ -227,7 +227,7 @@ export function applyAssignmentOps(projectRoot: string, args: AssignmentWriteArg
       return refuse(`${at} invalid: ${issue.path.join(".") || "$"}: ${issue.message}`);
     }
     const op = parsed.data;
-    const seat = SeatName.safeParse(op.seat);
+    const seat = { success: true as const, data: op.seat as Seat };
     if (!seat.success) return refuse(`${at} unknown seat "${op.seat}" (one of planner, developer, qa)`);
     if (!(ASSIGNABLE_SEATS as readonly string[]).includes(seat.data)) {
       return refuse(`${at} the ${seat.data} seat cannot be assigned: only developer and qa seats take a dispatch`);
