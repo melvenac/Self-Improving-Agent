@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 201,
+  "revision": 202,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3580,45 +3580,41 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Planner session 150 (2026-09-30), mid-session handoff, to be rewritten at roll. In flight: PR #218 (T-158, Aaron's direct yes, branch updated to e0a2e73; merge on CLEAN pinned, then read master's own run). PR #217 (docs-only, revs 166-169 + docs/loops/forge-turns-234-236.md; merge on CLEAN). QA 228 (laptop, started 05:33Z) not finished; rule on it with the rev 166 T-196 ruling (HB-2/HB-3 CLI-only). Forge (sia-forge-90, Claude Code, native A2A) is building C r4 on the rev 167 rulings, and is registering hub identity `forge` with Aaron's code (issued 05:51:27Z, valid 24 h); Relay verifies. Builder: turn 69 (T-194 r2 first; T-200 and T-199 get full briefs after, per D-064). Listeners: atlas --wait on the builder and infra rooms.",
+      "pick_up": "Planner session 150 (2026-09-30), mid-session handoff (rewritten at roll). Seats: builder and Forge run on the QA PC as Claude Code Sonnet, reached by Remote Control names `sia-builder` and `sia-forge`; this planner session must have Remote Control on (it is `atlas`). In flight: QA 232 (C r4) running headless Opus on the laptop, launched by the planner over ssh 08:27:57Z (pid 3704, log C:\\qa-tmp\\qa-232.log, verdict = last log line); QA 233 (T-194 r2) next, the planner launches it (D-069). Builder: loop/t198-merge (T-198 r2 plus master, taking master's superset hub-partner-seats.json) then a new PR replacing #223; Aaron said merge. Forge: T-204 (QA PC lease) building on loop/t204-machine-lease; forge hub key registered by Relay (prefix 95d5e360), its first turn as forge is pending. Queued for QA after 232/233: T-200 (424065c), T-201 (8952266), T-207 (f3e64f1), T-203 (a5a1206), T-199 (621d49e). T-208 (P0, fetch at session start) for the builder after T-200 merges. Master green at 9bdca80.",
       "watch_out": [
-        "STANDING INSTRUCTION FROM AARON (relayed Aaron -> worktrees-d5 (Clark) -> Atlas, session 150): 'start reporting to you [Clark] when an item on the hoh checklist can be marked complete.' Checklist: C:\\Users\\melve\\Worktrees\\hoh-checklist.md, READ-ONLY for the planner (Clark edits it). When an item becomes completable, send worktrees-d5 ONE A2A line per item: the checklist's wording, then DONE, then DERIVED evidence (merge SHA plus master run id and conclusion, QA number and verdict, rev, turn). Also report an item that REGRESSES or becomes BLOCKED. Send as it happens; no batching; no reply for unchanged items. If worktrees-d5 is not in ListAgents, skip the send (Clark re-syncs from the record).",
-        "A code merge needs Aaron's yes IN THE PLANNER SESSION; a relay through worktrees-d5 is not enough for a merge (session 150 held #218 until Aaron typed it). Relays are fine for reversible acts; record the chain.",
-        "Forge's C r4 rulings (rev 167, T-155 note): CC-1.2 verdict path READS merge.json required_inputs; CC-13.2 merged-without-ledger = issue, pending = printed pass, limit stated. Check both when r4 comes back.",
-        "Hub enrollment codes are credentials: never in a hub turn, a tracked file or a message. Aaron pasted one into the planner session once; it is spent when Forge registers."
+        "STANDING REPORTING RULES FROM AARON (via Clark): (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\\Users\\melve\\Worktrees\\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 30 MINUTES while active, a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Session 150 ran it as a CronCreate job at :04 and :34; a new planner session re-creates it at /start. If `clark` is not in ListAgents, skip the send.",
+        "D-069: the planner LAUNCHES QA itself over ssh (Aaron: 'launch it yourself from now on, you can ask me but run it over ssh from now on'). Dispatch on master first, idle machine only, serial per machine, recorded. A classifier denial is surfaced, never routed around.",
+        "D-068 until 2026-10-03: planner Opus, devs Sonnet, QA Opus headless; Cursor is BLOCKED (usage limit), Composer included. QA runs via C:\\Users\\Aaron\\headless-qa\\launch-qa.ps1 on the laptop with -AddDir C:\\qa-scratch,C:\\qa-tmp -NoFetch -Model opus, fed a tracked prompt copied with git show. A claude -p log is empty until the job ends.",
+        "Master-red lesson (T-205): a record write can break a test that pins live record data. After every merge, read master's OWN run. Merge order for code: one at a time, master green between.",
+        "A code merge needs Aaron's yes IN THE PLANNER SESSION; relays are fine for reversible acts; record the chain. update-branch on a seat's branch rides on his merge word for that PR.",
+        "Every developer mutant-branch push starts a tcm run until T-207 merges; cancel loop/*-mut-* runs by hand when the queue backs up (never qa/* runs).",
+        "Stale refs: fetch with --prune before asserting a remote branch's existence or absence (the planner's T-207 probe misread, rev 196); T-208 fixes /start's version of it.",
+        "The serving MCP build (main tree) predates T-158: the first close_gap tombstone on master will blind unrebuilt builds (T-172 note). Choose explicit uncited gap ids (G-046..048 are cited)."
       ],
       "open_questions": [
-        "Forge: has it run --init-key as `forge` and posted its turn? Then ping Relay to verify (forge row owned by aaron, no enroll reject).",
-        "Aaron: executable files under docs/ (QA drivers): still docs-only for D-032? (on his checklist)"
+        "Aaron: none pending as of 08:35Z."
       ],
       "session": 150,
       "loop_state": {
         "open_prs": [
           {
-            "ref": "#195 loop/15-slice-3-candidate-c (5f7c9a0)",
-            "qa_status": "rejected",
-            "note": "candidate C r3 rejected; r4 building with Forge on rev 167 rulings"
+            "ref": "#195 loop/15-slice-3-candidate-c (0dc20ff)",
+            "qa_status": "in_progress",
+            "note": "C r4 in QA 232 (headless Opus, laptop)"
           },
           {
-            "ref": "#218 loop/t158-gap-tombstone (e0a2e73)",
+            "ref": "#223 loop/t198-presence (a40fc77)",
             "qa_status": "accepted",
-            "note": "T-158 ACCEPTED (QA 227); Aaron's direct yes; merge on CLEAN pinned"
-          },
-          {
-            "ref": "#217 docs/session-150-cli-surface-rulings (36e21d9)",
-            "qa_status": "not_required",
-            "note": "docs-only; merge on CLEAN"
+            "note": "QA 230 ACCEPT; conflicts with master in the seat file; to be replaced by the builder's loop/t198-merge PR; Aaron said merge"
           }
         ],
-        "frozen_sha": "3059ca9 (record 219 r2, QA 228)",
-        "questions_for_aaron": [
-          "Executable files under docs/ (QA drivers): still docs-only?"
-        ],
+        "frozen_sha": "c339427 (C r4, QA 232); 699789e1 (T-194 r2, QA 233 next)",
+        "questions_for_aaron": [],
         "rulings": [
-          "T-196 HB-2/HB-3 CLI-only; T-160 stop-hook superseded for Cursor (rev 166)",
-          "C r4 plan: CC-1.2 load-bearing field, CC-13.2 rule (rev 167)",
-          "T-158 ACCEPTED on QA 227 (rev 168)",
-          "D-064 composer-2.5 stays (rev 169)"
+          "Merged this session on Aaron's word: #218 (T-158), #222 (TG-2 fix), #220 (T-196+T-197); docs-only #217, #219, #221, #224",
+          "ACCEPTED: QA 227 (T-158), QA 228 (T-196/197), QA 230 (T-198 r2); QA 231 VOID (usage limit)",
+          "Opened: T-201..T-208; D-064..D-069; G-049",
+          "Seat moves: builder and Forge to the QA PC (docs/loops/seat-move-qa-pc.md)"
         ]
       },
       "session_uuid": "e50107b1-ac67-452c-9da1-3fc4c3beda97",
