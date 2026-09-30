@@ -319,7 +319,7 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     const roles = describeRoleFiles(
       projectRoot,
       readAgentIdentity(projectRoot),
-      recordSource.kind === "master" ? { fromRef: recordSource.upstreamRef } : {},
+      false ? { fromRef: recordSource.upstreamRef } : {},
     );
     lines.push("");
     lines.push(
