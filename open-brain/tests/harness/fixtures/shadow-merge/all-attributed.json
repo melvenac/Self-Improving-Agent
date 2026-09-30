@@ -1,0 +1,68 @@
+{
+  "fixture": "all-attributed",
+  "description": "CC-17: every in-scope row is met by attribution, checks green",
+  "policy": {
+    "required_inputs": [
+      "runtime_checks",
+      "E_t.acceptance"
+    ],
+    "require_plan_gate": false,
+    "require_done_gate": false
+  },
+  "criteriaText": "```qa-declared\n[unrunnable]\n[out-of-scope]\n```\n",
+  "gateMode": "skip",
+  "doneGate": null,
+  "planGate": null,
+  "evidence": {
+    "loop": "t001",
+    "candidate_git": {
+      "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "branch": "loop/c",
+      "frozen_at": "2026-09-28T00:00:00.000Z"
+    },
+    "runtime_checks": {
+      "build": {
+        "command": "npm test",
+        "exit_code": 0,
+        "passed": true,
+        "duration_ms": 1,
+        "detail": ""
+      },
+      "unit": {
+        "command": "npm test",
+        "exit_code": 0,
+        "passed": true,
+        "duration_ms": 1,
+        "detail": ""
+      }
+    },
+    "requirements": [],
+    "acceptance": [
+      {
+        "id": "A1",
+        "status": "met",
+        "evidence": "attributed",
+        "order": "attributed"
+      },
+      {
+        "id": "A2",
+        "status": "met",
+        "evidence": "attributed",
+        "order": "attributed"
+      },
+      {
+        "id": "A3",
+        "status": "met",
+        "evidence": "attributed",
+        "order": "attributed"
+      }
+    ],
+    "regressions": [],
+    "gaps": [],
+    "notes": ""
+  },
+  "expected": {
+    "verdict": "would-merge",
+    "reason_includes": "A1: met (attributed)"
+  }
+}
