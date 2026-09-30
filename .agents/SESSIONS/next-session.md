@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 165 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 166 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -96,4 +96,4 @@ _3 older handoff(s), superseded within their seat and checkout, are in state.jso
 
 ## Last session
 
-Session 149 — 2026-09-30 — planner [sia-planner] — `c407df9c-3dd7-4273-891b-798b4bd527f4` (5 writing session(s) in the record)
+Session 150 — 2026-09-30 — planner [sia-planner] — `e50107b1-ac67-452c-9da1-3fc4c3beda97` (6 writing session(s) in the record)
