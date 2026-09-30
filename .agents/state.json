@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 180,
+  "revision": 181,
   "project": {
     "name": "self-improving-agent"
   },
@@ -970,6 +970,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Opened planner session 150, 2026-09-30. Aaron approved the lease, relayed Aaron -> worktrees-d5 (Clark) -> Atlas, verbatim 'yes'. The ruling is the planner's. WHY: D-065 made the QA PC a developer machine first (pilot: Chisel, agent-dashboard), usable for SIA QA only when no developer suite runs; 'quiet' as a judgement is the thing that fails. SCOPE: (1) ONE helper script, tracked in SIA beside docs/loops/qa-queue.ps1 and copied to the QA PC's user folder the same way (never run from inside a checkout), with take / release / status. Other repos (agent-dashboard) call that copy; there are not two implementations. (2) The lease file lives outside every repo, in a fixed per-machine location, and holds {owner seat, session, pid, pid creation time, started, expires}. Taking it is ATOMIC (create-exclusive). (3) Stale-safe: a lease is reclaimable when expired, or when its pid is gone OR the pid's creation time differs (PID reuse; the gate Relay made binding for kills). (4) qa-queue.ps1 takes the lease for its whole run; while another live lease is held it waits and logs 'QA PC busy: <owner>' with a bounded wait, and never starts over it. (5) It fails closed: an unreadable or malformed lease file counts as HELD and says so, and is never silently ignored. ROWS: a held lease makes a queued QA wait and log the owner; a crashed holder (pid gone) is reclaimed, and so is a reused pid; two concurrent takers yield exactly one winner; a malformed file blocks with a named cause; a mutant with non-atomic take (check-then-write) loses the race row; a mutant that ignores the pid creation time loses the reuse row; the queue is red without the lease check and green with it. The queue-script change needs the machine copies re-copied (qa-launch.md). OUT OF SCOPE: agent-dashboard's own call site (Clark briefs Chisel once this exists). Seat: Forge, after T-203. Launch doc updated: the laptop is the default; the QA PC takes QA when the lease is free.",
+      "note_by": [
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-205",
+      "title": "MASTER IS RED: T-158's TG-2 test asserts specific gap ids against the LIVE record, and the planner's G-049 broke it; prove the citation skip on a fixture record instead",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 150,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner session 150, 2026-09-30. Master run 36681093114 at 9c60361 (the planner's docs-only #219 merge, which carried rev 175's explicit G-049) FAILS tests/shared/state-writer.test.ts 'a dry-run add_gap on this repo skips G-046, G-047 and G-048 and names them (TG-2)': expected false to be true. It is the only failure (1 of 1856). CAUSE (derived): the test runs add_gap against this repo's LIVE .agents/state.json. With G-049 present, the next generated id is G-050, so the skip of 046-048 never occurs. Same class as r3b (#210) and G-044: live record data asserted as an invariant. The TEST is the defect; the record is NOT reverted. FIX (builder, branch fix/tg2-fixture-record from origin/master): prove the citation skip on a FIXTURE record in a scratch repo whose tracked files cite the ids the fixture's next id would hit. A live-repo run, if any, asserts only 'the assigned id is not cited', never specific ids. Rows: red at 9c60361, green after; a mutant dropping the citation scan goes red on the fixture row; a sibling grep of the test tree for other assertions on specific live task, gap or decision ids, each named. Push cleared, PR, merge is Aaron's. PLANNER ERROR ENTRY: the planner's record write reached master and turned it red. Caught by reading master's own run after the merge. The planner had checked that G-049 was uncited in the tree but not whether a test pinned the next id. PR #220 is held until master is green again, so its merge is attributable.",
       "note_by": [
         "e50107b1-ac67-452c-9da1-3fc4c3beda97"
       ],

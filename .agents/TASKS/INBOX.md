@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 180 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 181 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -29,6 +29,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-198** ob_start prints one line per partner seat from the hub's presence endpoint (listening or not, unread turns and since when), and says so visibly when the hub is unreachable, never silently
 - [ ] **T-200** A seat started from a stale tree is briefed from STALE state: when the local record is older than origin/master's, ob_start renders the State block and the role files from origin/master (git show) and says so, so D-062 holds at every /start
 - [ ] **T-201** A developer or QA seat's /start names its assignment, read from the record, or says 'no assignment' explicitly; it never stops at the backlog
+- [ ] **T-205** MASTER IS RED: T-158's TG-2 test asserts specific gap ids against the LIVE record, and the planner's G-049 broke it; prove the citation skip on a fixture record instead
 
 ## P1
 
