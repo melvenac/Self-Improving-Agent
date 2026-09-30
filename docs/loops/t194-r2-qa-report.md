@@ -121,7 +121,10 @@ Each mutant was applied to **699789e1** in `C:/qa-scratch/qa233-mut`, checked as
 
 ## CI (tcm, D-061)
 
-I read QA 231's runs rather than pushing again (the QA 233 dispatch). **This QA dispatched 0 runs.**
+I read QA 231's runs rather than pushing again (the QA 233 dispatch). **This QA dispatched no candidate or base runs.** Pushing
+this report started one run by itself (T-178): **36713139744**, headSha `ef9d9725cc2cf573d8d583b3f523cb42d4eac444` (the
+report commit before this correction). Run conclusion **success**, `changed` success, `test` **success**, `test-windows` skipped.
+It proves nothing about the candidate. This correction's push will start one more run of the same kind.
 
 | Branch | Run id | headSha | Run conclusion | `test` job |
 | --- | --- | --- | --- | --- |
