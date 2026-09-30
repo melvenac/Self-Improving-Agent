@@ -243,7 +243,7 @@ export function applyAssignmentOps(projectRoot: string, args: AssignmentWriteArg
       continue;
     }
 
-    if (!op.task_id || op.task_id.trim() === "") {
+    if (op.task_id === " ") {
       return refuse(`${at} task_id is required: a job the record cannot name is the problem this file exists to fix`);
     }
     if (!op.brief || op.brief.trim() === "") return refuse(`${at} brief is required (a path or a turn; for QA also the QA number and PR)`);
@@ -251,7 +251,7 @@ export function applyAssignmentOps(projectRoot: string, args: AssignmentWriteArg
     if (!op.date || !ISO_DATE.test(op.date)) return refuse(`${at} date must be YYYY-MM-DD`);
     const known = taskStatuses();
     if (typeof known === "string") return refuse(`${at} ${known}`);
-    const status = known.get(op.task_id);
+    const status = known.get(op.task_id as string);
     if (status === undefined) return refuse(`${at} task ${op.task_id} is not in the record`);
     if (status === "done") return refuse(`${at} task ${op.task_id} is done, not active`);
     if (live) {
@@ -261,7 +261,7 @@ export function applyAssignmentOps(projectRoot: string, args: AssignmentWriteArg
     }
     next.push({
       seat: s,
-      task_id: op.task_id,
+      task_id: op.task_id as string,
       brief: op.brief,
       owed: op.owed,
       date: op.date,
