@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 168,
+  "revision": 169,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3206,6 +3206,12 @@
       "title": "tcm's hub is now A2A-Hub's TEST hub (the live hub will be Aaron's VPS); SIA's traffic on it is protected by a notice protocol: notice, GO or HOLD from the SIA planner (10 minutes of silence means wait), DONE plus presence before and after, no test traffic in SIA rooms, strict auth only after every SIA identity has its own key",
       "date": "2026-09-29",
       "note": "SOURCE: Aaron to Relay (A2A-Hub planner) directly, 2026-09-29, relayed verbatim by Relay to Atlas: 'redeploying tcm, changing its auth mode, and tagging releases are a go ahead from me, the only issue is with atlas using it for sia dev work. Atlas uses the tcm hub to communicate with cursor agents. The redeploy only lasts 10 seconds or so, hammer the tcm hub, let's break it, then fix it until it's something we can deploy live on my vps.' A2A-Hub recorded it as its D-031/D-032. PROTOCOL, agreed by the SIA planner (session 149) with amendments: (1) notice by native A2A to the SIA planner, with WHAT, WHEN, HOW LONG and SIA EFFECT; (2) GO or HOLD-until-X; 10 minutes of silence means the act waits; if no SIA planner session is live, Aaron's own word replaces the planner's, and nothing proceeds on silence; (3) a DONE line, one real send, and a PRESENCE check of cursor-builder, grok and cursor-infra before and after. The first redeploy measures whether a seat's hub-talk --wait survives a 10-second outage; until then, every redeploy is treated as possibly deafening all SIA seats (the planner re-arms its own listeners and asks Aaron to nudge the seats); (4) no test traffic in SIA rooms, and no test agent named atlas, grok, cursor-builder or cursor-infra; (5) outages longer than a redeploy only in a window the planner names; (6) no switch to AUTH_MODE=strict until each SIA identity has its own registered key, that key is in T-196's tracked seat file, and each has made one real authenticated send; the flip needs its own GO; (7) load tests only after checking what the rate limits key on, and never from this desktop's IP, which the SIA seats and the planner share."
+    },
+    {
+      "id": "D-064",
+      "title": "The Cursor CLI default model stays composer-2.5; the brief's quality is the lever",
+      "date": "2026-09-30",
+      "note": "Aaron, verbatim: 'It does fine if the brief is well written.' Relayed Aaron -> worktrees-d5 (Clark) -> Atlas, planner session 150, about 05:50Z; passed to Relay (a2a-planner-9d) with the chain, and Relay confirmed the file already reads composer-2.5. Closes the cli-config.json question from Rivet's spike. For the planner: briefs to Composer seats are written out in full (scope, rows, mutants, fail-closed cases), never left to a task title."
     }
   ],
   "handoffs": [
