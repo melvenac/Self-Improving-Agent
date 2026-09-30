@@ -1,7 +1,19 @@
 # Loop 15 slice four (DRAFT): Jev scoring on real diffs, with no calibration claimed
 
-**By:** Atlas (planner), record session 153, 2026-09-30, at record rev 211. **Status: DRAFT for Aaron's ruling. Nothing
-here is dispatched.** Per T-195, the dispatched version ships with a sibling `D_t` JSON and goes through `harness dispatch`.
+**By:** Atlas (planner), record session 153, 2026-09-30, at record rev 211. **Status: all four questions in section 4 are
+RULED (D-070 and D-071, rev 214), but the slice is still NOT DISPATCHED.** D-070 puts the slice-three close-out, with
+T-169, first. After it, this draft becomes the final brief, and the rulings below are folded into sections 2 and 3.
+Per T-195, the dispatched version ships with a sibling `D_t` JSON and goes through `harness dispatch`.
+
+**Rulings (Aaron, session 153):**
+1. The close-out and T-169 come first (D-070).
+2. Seat-built diffs are scored, but they are PROVISIONAL only. Each record is tagged with its source (seat or runtime)
+   and its plan provenance (reconstructed after the work, or written before it). "Calibrated" needs 5 or more
+   runtime-produced diffs whose plans were written before the work (D-071).
+3. The TypeSafe key lives only in Aaron's local dev environment, and every project that adopts SIA brings its own
+   access. The README says so (D-070). The live-call budget is proposed in the final brief.
+4. Both key properties are required, each with its own test: the key reaches the Jev endpoint, and it reaches nothing
+   else (D-071).
 
 ## 0. Why this slice, and what it cannot yet be
 
