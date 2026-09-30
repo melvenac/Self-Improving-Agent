@@ -1,44 +1,47 @@
-<!-- generated from .agents/state.json rev 140 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 165 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 146)_
+## planner [sia-planner] _(written session 149)_
 
 ### Pick up here
 
-Read docs/loops/planner-session-146-notes.md, section 'HANDOFF TO THE NEXT PLANNER (session 146 rolls here)', first. T-179 r2 is merged and the record is v3. Verify which of PRs #172-#176 merged. Re-arm one hub listener per developer room. Then send the /bootstrap cli.ts reconciliation to cursor-builder, and follow the Cursor QA driver (record 175) to merge, so the seven waiting QA runs go to the laptop and QA PC.
+Planner session 149 ROLLS at about 2026-09-30 (Aaron's word: 'We need to roll this session'). Master is ebf4b3b plus this roll's merge, and green. START HERE: (1) Check QA 227 (record 220 r2, T-158, code e23e622, QA PC) and QA 228 (record 219 r2, T-196+T-197, code 3059ca9, LAPTOP), dispatched on 8b3bc56 (#212). Aaron was given three lines at the end of session 149: the laptop display timeout to 0 on AC (Modern Standby; its power log shows repeated 'connected standby, Reason: Idle Timeout'), QA 227 on the QA PC, and QA 228 on the laptop, in parallel. Read each queue.log (anchor on 'start=queue=227 ' and 'start=queue=228 ') to see whether he launched them, then rule on the reports. (2) Forge was REOPENED (as a Claude Code session in sia-forge) and told to fetch, detach, rebuild, re-run /start, then read hub turns 234 (CANDIDATE C r4, which closes slice three), 235 (T-198 r2) and 236 (T-198's fifth fix: hub-presence.ts:124 hardcodes dev-key). Watch the forge room k57frxw0ptb8tadmqdwy0khhks8ey006. (3) Builder is closed for the night; its queue is turn 68 (T-194 r2: docs-only merges must stay grant-free, per Aaron's ruling 'docs only merge have my go-ahead'), then T-200 (new, P0: ob_start reads the record from origin/master when the tree is stale), then T-199. Its T-164 (567657a) and T-194 (f15f2cf) are committed locally, unpushed. (4) Infra is closed; its work is all pushed and in QA 227/228. (5) STRICT AUTH on tcm (D-063) waits on T-196 merged (the keys in the tracked seat file) AND T-198 r2 (no dev-key); when both land, tell Relay (a2a-planner), who re-reads the auth log and sends the strict notice for the planner's GO.
 
 ### Watch out
 
-- QA runs ONLY on the laptop and QA PC (Aaron), headless via the Cursor QA driver once merged; never as chats on his desktop.
-- Dry-run every command on its target machine before giving it to Aaron: the QA PC's profile paths contain a space, and bash expands $env: before ssh.
-- Read a candidate's diffed code before ruling, not only its handoff.
-- Developer seats are Cursor (Grok 4.7), one hub room each. The planner must run a listener per room; cursor-builder needs Aaron's nudge to read its room.
-- Nothing was written to the record in session 146 except the v3 migration: the owed ob_state writes are listed in the handoff section.
+- MERGE A PR, THEN READ MASTER'S OWN RUN, not the PR's (#201 turned master red while its PR run was green). Every merge after that in session 149 was checked on master's own run.
+- A PR's pull_request run checks out the PR HEAD; only merging master into the branch picks up a master fix (gh pr update-branch needs Aaron's word for a seat's branch). After it, re-run the cancelled push run to reach CLEAN.
+- QA ACCEPT with partial rows is not automatic: QA 213's ACCEPT of C r3 was overruled. Read every report's partial/unmet rows before ruling. Developer 'unrelated' failures must be shown at the base (git archive into C:\qa-tmp). Known on this desktop: the qa104 EPERM symlink test fails (it should skip).
+- Seats are the cursor-agent CLI in VS Code terminals (Forge is now a Claude Code session). Never kill a seat by PID; Aaron opens and closes them. Relay killed a reused PID once; its kill-gating (CreationDate plus command line) is now binding for A2A-Hub.
+- Hub rooms: builder cursor-builder k57098epn7qz32vt0cazfjpbes8f6kdq; Forge grok k57frxw0ptb8tadmqdwy0khhks8ey006; infra cursor-infra k5702788wctxj75begyt4x2k5x8f6mav; the Loop 8b talk room k5722tvj0zw47sftjfww3sxnrn8fbya1 (planner reads only). DO NOT use X-Agent-Key dev-key for presence probes: tcm logs it as an unknown key and strict will 403 it. Use hub-talk's own key.
+- D-063: tcm is A2A-Hub's test hub. Relay sends a notice before any redeploy, auth flip or load test; GO or HOLD; 10 minutes of silence means wait.
+- The QA PC is an i5-14500 with 7.7 GB, memory-bound, running a QA in about 14 minutes; sleep and display on AC are 0. QA drivers built from master since #194 keep quotes intact. Queue scripts on both machines match master's (SHA-1 9FF81DE0...). Two QAs can run in parallel only on different machines (the queue lock, the shared QA checkout, 8 GB of RAM).
+- Every QA dispatch requires a validated E_t.json. A dispatch goes to master (docs-only PR) before launch (D-062).
+- The objective was stale from rev 147 to 164 (it still said PR #187 awaited merge); it was reset at rev 165. Re-read it against gh whenever a candidate merges (G-035).
 
 ### Open questions
 
-- Aaron: build Scout's Telegram approval (research 4)? If yes, token option (a) a separate Windows account, or (b) the same account?
-- Aaron: may the A2A-Hub main checkout take master (its D-005)?
+- Aaron: did he launch QA 227 and 228, and set the laptop display timeout? Read the queue logs first.
+- Aaron: cli-config.json's default model after Rivet's spike (Relay is asking him).
+- Aaron: Telegram (D-058) is on hold.
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #195 loop/15-slice-3-candidate-c (5f7c9a0) — QA: rejected — candidate C r3: QA 213 ACCEPT overruled; r4 is with Forge (turn 234)
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `e23e622 (record 220 r2, QA 227); 3059ca9 (record 219 r2, QA 228)`
 
 **Questions pending for Aaron:** 
-- Build Scout's Telegram approval? Token option (a) or (b)?
-- May the A2A-Hub main checkout take master (D-005)?
+- QA 227/228 launched?
+- cli-config default model
 
 **Rulings made mid-loop:** 
-- t179-t003-rulings-qa134-qa142 (T-179 r2 ACCEPTED; T-003 r2 brief)
-- t171-bootstrap-rulings-qa144-qa145 (R-BF-17..20)
-- bootstrap-r4-amend-and-queue-guard-brief (R-BF-21)
-- loop-15-slice-3-rulings-21 (A12 REJECTED; R95-R97)
-- t048-t171-rulings-qa157-qa158 plus addenda 1-2
-- importer-leftovers-rulings-qa138 (R5-1..4)
-- cal-a12-results (Composer 2.5 passes QA calibration)
+- Session 149 merged, on Aaron's word: #194, #198, #200, #201, #209, #210; docs-only: #202-#208, #211-#215
+- ACCEPTED: 215 r2 (T-195, merged), 192 r6 (merged). Returned: 220, 219, 217, and C r3 (QA ACCEPT overruled)
+- D-062, D-063; T-194..T-200 opened; T-178 and T-195 closed
+- QA 203's stranded report recovered verbatim (#215); 'docs only merge have my go-ahead' binds T-194 r2
 
 ## developer [legacy] _(written session 74)_
 
@@ -89,6 +92,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
+_3 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+
 ## Last session
 
-Session 147 — 2026-09-27 — planner [sia-planner] — `4ed2836c-1dd1-43e5-8a06-c829d50548f3` (3 writing session(s) in the record)
+Session 149 — 2026-09-30 — planner [sia-planner] — `c407df9c-3dd7-4273-891b-798b4bd527f4` (5 writing session(s) in the record)

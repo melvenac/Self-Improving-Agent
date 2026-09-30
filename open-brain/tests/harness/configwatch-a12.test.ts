@@ -5,8 +5,9 @@
  */
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
 import {
-  appendFileSync, chmodSync, lstatSync, mkdirSync, readdirSync, rmSync, statSync, symlinkSync, writeFileSync,
+  appendFileSync, chmodSync, lstatSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync,
 } from "node:fs";
+import { symlinkSyncOrSkip } from "./symlink-or-skip.js";
 import { join } from "node:path";
 import { MachineConfigWatch, resolveGitDirs } from "../../src/harness/configwatch.js";
 import { runLoop, type LoopConfig, type LoopResult } from "../../src/harness/runtime.js";
@@ -121,7 +122,7 @@ describe("A12 R91 and R92 machine-side texts", () => {
     writeFileSync(file, "[user]\n\tname = r91\n");
     mkdirSync(xdg);
     const link = join(xdg, "git");
-    symlinkSync(target, link, "dir");
+    symlinkSyncOrSkip(target, link, "dir");
     const cfg = join(link, "config");
     const watch = new MachineConfigWatch([{ scope: "xdg", path: cfg, source: "r91" }]);
     watch.captureBase();
@@ -153,7 +154,7 @@ describe("A12 R91 and R92 machine-side texts", () => {
     mkdirSync(other);
     writeFileSync(join(other, "config"), "[user]\n\tname = r92\n");
     const link = join(xdg, "git");
-    symlinkSync(other, link, "dir");
+    symlinkSyncOrSkip(other, link, "dir");
     const linkIno = String(lstatSync(link, { bigint: true }).ino);
     const row = watch.compare().find((f) => f.path === cfg);
     expect(row?.changed, "the planted ancestor is a change").toBe(true);
@@ -241,7 +242,7 @@ describe("A12 R93 adopted rows", { timeout: 60_000 }, () => {
     writeFileSync(join(target, "config"), "[user]\n\tname = r93p\n");
     mkdirSync(xdg);
     const link = join(xdg, "git");
-    symlinkSync(target, link, "dir");
+    symlinkSyncOrSkip(target, link, "dir");
     const cfg = join(link, "config");
     const watch = new MachineConfigWatch([{ scope: "xdg", path: cfg, source: "r93p" }]);
     watch.captureBase();

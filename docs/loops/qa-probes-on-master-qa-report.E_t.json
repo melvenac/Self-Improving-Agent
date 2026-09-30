@@ -1,0 +1,60 @@
+{
+  "loop": "198-qa-probes",
+  "candidate_git": {
+    "sha": "dabc7fe2d448a3c6172897e0bf7e42d09163e80d",
+    "branch": "origin/loop/qa-probes-on-master",
+    "frozen_at": "2026-09-28T06:34:16Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc -p open-brain (CI Typecheck, run 36387130688)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 7000,
+      "detail": "tcm job test step Typecheck succeeded on loop/qa-probes-on-master headSha c02580065b00c272aeb96ebc3add1fdb13ae4604"
+    },
+    "unit": {
+      "command": "npm test in open-brain (CI Test, run 36387130688)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 190000,
+      "detail": "tcm job test step Test succeeded; full suite green on Linux"
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "R198-1",
+      "status": "met",
+      "order": "shown",
+      "evidence": "qa104-a9-probe2/3 deleted; qa122, qa135, qa138, qa142 kept with guard headers. rg under open-brain/tests: zero hits for the literal phrase."
+    },
+    {
+      "id": "R198-2",
+      "status": "met",
+      "order": "shown",
+      "evidence": "symlinkSyncOrSkip in tests/harness/symlink-or-skip.ts; rg finds no raw symlinkSync in harness *.ts except the helper. symlink-or-skip.test.ts 3/3 local; mut-eperm tcm run 36387139294 kills the injected EPERM row."
+    },
+    {
+      "id": "R198-3",
+      "status": "met",
+      "order": "shown",
+      "evidence": "checkProbeMarkers walks open-brain/tests; probe-markers.test.ts splits the phrase so the file is not self-matched (G-040). Fixture positive/negative rows pass; sync prints probe-markers [pass] Read 166 files. QA mutant selfphrase aac214d kills the checkout row locally."
+    },
+    {
+      "id": "R198-4",
+      "status": "met",
+      "order": "shown",
+      "evidence": "git diff bf33fe4..dabc7fe: only qa104 probes deleted under tests; qa122 4/4, qa135 7/7, qa138 10/10, qa142 6/6 local; tcm green run 36387130688."
+    },
+    {
+      "id": "R198-5",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Developer mut-phrase 6bff80c and mut-eperm c6af8d7 killed on tcm (runs 36387136434, 36387139294). QA mut-selfphrase aac214d and mut-symlink-bypass 3081527 killed locally (1 failed each on probe-markers and symlink-or-skip respectively)."
+    }
+  ],
+  "regressions": [],
+  "gaps": [],
+  "notes": "Scored product dabc7fe; handoff tip c025800. Red fc7f7a0 on qa/qa-probes-red. QA mutant branch pushes refused by permissions after qa/qa-probes-red succeeded; commits exist locally."
+}

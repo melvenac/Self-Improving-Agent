@@ -3,7 +3,8 @@
  * Rows from QA 104 that this ruling must turn green.
  */
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
-import { chmodSync, linkSync, lstatSync, mkdirSync, readFileSync, renameSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, linkSync, lstatSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
+import { symlinkSyncOrSkip } from "./symlink-or-skip.js";
 import { join } from "node:path";
 import { MachineConfigWatch } from "../../src/harness/configwatch.js";
 import { requireGit } from "./fixture.js";
@@ -82,14 +83,14 @@ describe("R79 sides carry what the runtime has", () => {
     const elsewhere = join(tmp.dir, "bbl-elsewhere");
     writeFileSync(elsewhere, "[user]\n\tname = elsewhere\n");
     unlinkSync(cfg);
-    symlinkSync(elsewhere, cfg);
+    symlinkSyncOrSkip(elsewhere, cfg);
     const q = watch.compare().find((x) => x.path === cfg)!;
     expect(q.before, "stage-start ino").toContain(`ino ${start.ino}`);
   });
 
   it.skipIf(isWin)("R73-DANGLING-STABLE: a dangling symlink untouched carries the link's lstat facts", () => {
     const cfg = home("dgl");
-    symlinkSync(join(tmp.dir, "dgl-missing"), cfg);
+    symlinkSyncOrSkip(join(tmp.dir, "dgl-missing"), cfg);
     const f = facts(cfg);
     const watch = one(cfg);
     watch.captureBase();
