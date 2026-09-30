@@ -2,6 +2,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, isAbsolute } from "node:path";
 import { execFileSync } from "node:child_process";
 import { parseState } from "../../shared/state-schema.js";
+import { gitShow } from "./git-read.js";
 
 /**
  * Is this checkout current with the remote, and is its record current with the
@@ -248,8 +249,10 @@ function readRevisionFromDisk(projectRoot: string): number | null {
 
 /** The same file's revision at a ref, or null when absent/unparseable there. */
 function readRevisionAtRef(projectRoot: string, ref: string): number | null {
-  const text = git(projectRoot, ["show", `${ref}:${STATE_REL}`]);
-  return text === null ? null : revisionOf(text);
+  // gitShow, not git(): a record past the default buffer is ENOBUFS, and git() turned that into
+  // null — an oversize record read as an absent one (T-200).
+  const shown = gitShow(projectRoot, ref, STATE_REL);
+  return shown.ok ? revisionOf(shown.text) : null;
 }
 
 /**
@@ -262,7 +265,7 @@ function readRevisionAtRef(projectRoot: string, ref: string): number | null {
  * revision for THIS comparison, so a bare numeric read is the fallback — but a
  * non-numeric or absent `revision` yields null, never a default.
  */
-function revisionOf(text: string): number | null {
+export function revisionOf(text: string): number | null {
   const parsed = parseState(text);
   if (parsed.ok) return parsed.data.revision;
   try {
@@ -280,7 +283,7 @@ function revisionOf(text: string): number | null {
  * the common dir. Every seat checkout in this repo is a linked worktree, so a
  * hardcoded `.git/FETCH_HEAD` would return null in exactly the trees this runs in.
  */
-function readLastFetchAt(projectRoot: string): string | null {
+export function readLastFetchAt(projectRoot: string): string | null {
   // TWO candidates, and the answer is the NEWER of them. Measured, because two
   // guesses in a row were wrong here:
   //

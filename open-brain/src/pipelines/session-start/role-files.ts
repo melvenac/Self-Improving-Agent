@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 import type { AgentIdentity } from "./agent-identity.js";
+import { gitShow } from "./git-read.js";
 
 /**
  * Loads the seat's role knowledge and says where it came from.
@@ -103,7 +104,21 @@ export interface RoleFilesResult {
 const ROLES_DIR = ".agents/roles";
 const SHARED_REL = `${ROLES_DIR}/shared.md`;
 
-export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | null): RoleFilesResult {
+export interface DescribeRoleFilesOptions {
+  /**
+   * Read every role file from this ref (`git show`) instead of the working copy (T-200). Set
+   * when the record is read from origin/master, so the rules a seat holds come from the same
+   * source as the state it is briefed on. Identity stays local: AGENT.local.md is untracked and
+   * is the seat's own.
+   */
+  fromRef?: string;
+}
+
+export function describeRoleFiles(
+  projectRoot: string,
+  seat: AgentIdentity | null,
+  options: DescribeRoleFilesOptions = {},
+): RoleFilesResult {
   const problems: string[] = [];
   const lines0: string[] = [];
   const inGit = git(projectRoot, ["rev-parse", "--is-inside-work-tree"]) === "true";
@@ -141,7 +156,10 @@ export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | nul
   // a session that cannot say who it is still has to obey the rules everyone has.
   wanted.push({ rel: SHARED_REL, owner: "shared" });
 
-  const files = wanted.map(({ rel, owner }) => readOne(projectRoot, rel, owner, inGit));
+  const fromRef = options.fromRef;
+  const files = wanted.map(({ rel, owner }) =>
+    fromRef ? readOneFromRef(projectRoot, rel, owner, fromRef) : readOne(projectRoot, rel, owner, inGit),
+  );
 
   for (const f of files) {
     if (!f.present) {
@@ -150,7 +168,7 @@ export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | nul
       // frogger F8). shared.md is still loaded when it is there.
       if (notASeat) continue;
       problems.push(
-        `ROLE FILE MISSING: ${f.rel} does not exist — the "${f.owner}" seat's rules are not in this checkout. ` +
+        `ROLE FILE MISSING: ${f.rel} does not exist ${fromRef ? `at ${fromRef}` : "— the \"" + f.owner + "\" seat's rules are not in this checkout"}${fromRef && f.note ? ` (${f.note})` : ""}. ` +
           `This is absence, not an empty ruleset.`
       );
       continue;
@@ -169,11 +187,13 @@ export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | nul
     }
   }
 
-  return { seat, files, lines: [...lines0, ...render(files, inGit, notASeat)], problems };
+  return { seat, files, lines: [...lines0, ...render(files, inGit, notASeat, fromRef)], problems };
 }
 
-function render(files: RoleFileReport[], inGit: boolean, notASeat: boolean): string[] {
-  const lines: string[] = [`Role knowledge loaded (${files.filter((f) => f.present).length} of ${files.length}):`];
+function render(files: RoleFileReport[], inGit: boolean, notASeat: boolean, fromRef?: string): string[] {
+  const lines: string[] = [
+    `Role knowledge loaded${fromRef ? ` from ${fromRef}` : ""} (${files.filter((f) => f.present).length} of ${files.length}):`,
+  ];
   for (const f of files) {
     if (!f.present) {
       lines.push(`  ${f.rel} — ABSENT (${f.owner}${notASeat ? "; not a seat, so none is expected" : ""})`);
@@ -191,6 +211,39 @@ function render(files: RoleFileReport[], inGit: boolean, notASeat: boolean): str
     lines.push(`  (not inside a git work tree — commits could not be resolved; this is not a claim that the files are current)`);
   }
   return lines;
+}
+
+/**
+ * A role file as `ref` holds it: content by `git show`, its commit from the log of that ref. The
+ * working-copy questions do not apply — it is tracked by construction, cannot differ from HEAD's
+ * blob, and there is no upstream to be behind — so those fields are fixed rather than derived.
+ * A file absent at the ref is ABSENT, with git's own reason in `note`.
+ */
+function readOneFromRef(projectRoot: string, rel: string, owner: string, ref: string): RoleFileReport {
+  const base: RoleFileReport = {
+    rel,
+    owner,
+    present: false,
+    tracked: true,
+    content: null,
+    commit: null,
+    commitDate: null,
+    stale: false,
+    behindUpstream: false,
+    note: null,
+  };
+  const shown = gitShow(projectRoot, ref, rel);
+  if (!shown.ok) return { ...base, note: shown.cause };
+  const log = git(projectRoot, ["log", "-1", "--format=%H%x00%cI", ref, "--", rel]);
+  const [commit, commitDate] = log ? log.split(" ") : [null, null];
+  return {
+    ...base,
+    present: true,
+    content: shown.text,
+    commit: commit || null,
+    commitDate: commitDate || null,
+    note: commit ? null : `no commit at ${ref} touches this path`,
+  };
 }
 
 function readOne(projectRoot: string, rel: string, owner: string, inGit: boolean): RoleFileReport {

@@ -4,11 +4,12 @@ import { homedir } from "node:os";
 import { execSync, execFileSync } from "node:child_process";
 import type { CheckResult, SyncRuntime } from "./types.js";
 import { parseSkillIndexRows } from "../../shared/skill-index.js";
-import { parseState, SeatName, schemaVersionAdvice } from "../../shared/state-schema.js";
+import { parseState, SeatName, schemaVersionAdvice, type State } from "../../shared/state-schema.js";
 import { renderState } from "../session-start/state-render.js";
 import { describeRoleFiles } from "../session-start/role-files.js";
 import { readAgentIdentity } from "../session-start/agent-identity.js";
 import { describeTreeCurrency } from "../session-start/tree-currency.js";
+import { resolveRecordSource } from "../session-start/record-source.js";
 import { checkSummaryFromState } from "./checks-state.js";
 
 /**
@@ -1792,20 +1793,34 @@ export interface ComposedGreeting {
  * stale. Null when there is no valid state.json to render.
  */
 export function composeGreeting(projectRoot: string, version: string): ComposedGreeting | null {
-  const statePath = join(projectRoot, ".agents", "state.json");
-  if (!existsSync(statePath)) return null;
-  const parsed = parseState(readFileSync(statePath, "utf-8"));
-  if (!parsed.ok) return null;
+  // T-200: the greeting renders master's record when this tree is behind it, so the size check
+  // composes from the same source — and counts the source line, which is part of the return.
+  const recordSource = resolveRecordSource(projectRoot);
+  let data: State;
+  if (recordSource.kind === "master") {
+    data = recordSource.state;
+  } else {
+    const statePath = join(projectRoot, ".agents", "state.json");
+    if (!existsSync(statePath)) return null;
+    const parsed = parseState(readFileSync(statePath, "utf-8"));
+    if (!parsed.ok) return null;
+    data = parsed.data;
+  }
 
-  const roles = describeRoleFiles(projectRoot, readAgentIdentity(projectRoot));
+  const roles = describeRoleFiles(
+    projectRoot,
+    readAgentIdentity(projectRoot),
+    recordSource.kind === "master" ? { fromRef: recordSource.upstreamRef } : {},
+  );
   const seat = roles.seat ? SeatName.safeParse(roles.seat.role) : null;
   const treeAndSeat = [
     ...describeTreeCurrency(projectRoot).lines,
+    recordSource.line,
     roles.seat ? `Seat: ${roles.seat.name} (${roles.seat.role})` : "Seat: UNRESOLVED",
     ...roles.lines,
     ...roles.problems,
   ].join("\n");
-  const state = renderState(parsed.data, version, {
+  const state = renderState(data, version, {
     seat: seat?.success ? seat.data : null,
     projectRoot,
   }).join("\n");
