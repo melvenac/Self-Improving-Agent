@@ -160,7 +160,7 @@ function validateRoster(body: unknown): { ok: true; agents: PresenceAgent[] } | 
       const rat = `${at}.rooms[${j}]`;
       if (!isObject(room)) return bad(rat, "is not an object");
       if (typeof room.sessionId !== "string") return bad(`${rat}.sessionId`, "is not a string");
-      if (!Number.isInteger(room.unread) || (room.unread as number) < 0) return bad(`${rat}.unread`, "is not a non-negative integer");
+      if (!Number.isInteger(room.unread)) return bad(`${rat}.unread`, "is not a non-negative integer");
       if (typeof room.pollingNow !== "boolean") return bad(`${rat}.pollingNow`, "is not a boolean");
       if (room.pollAgeMs !== undefined && (typeof room.pollAgeMs !== "number" || !Number.isFinite(room.pollAgeMs))) {
         return bad(`${rat}.pollAgeMs`, "is not a finite number");
