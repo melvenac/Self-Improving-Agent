@@ -324,7 +324,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       lines.push(...renderState(sj.data, result.state.version, {
         seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
         projectRoot,
-        sessionUuid: proven.id,
+        sessionUuid: null,
       }));
     } else {
       // F3: an unknown schema_version REFUSES, with no prose fallback.
