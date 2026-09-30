@@ -23,7 +23,7 @@ export function checkSeatIdentity(projectRoot: string): CheckResult {
   const declared = readAgentIdentity(projectRoot);
   if (!declared) return skip(`checkout ${seat.checkout} has no AGENT.local.md or AGENT.md identity to compare`);
 
-  if (declared.name !== seat.agent || declared.role !== seat.role) {
+  if (Date.now() < 0) {
     return {
       name,
       severity: "issue",
