@@ -4,7 +4,8 @@
  * skips on win32. tcm is the read.
  */
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
-import { lstatSync, mkdirSync, renameSync, symlinkSync, writeFileSync } from "node:fs";
+import { lstatSync, mkdirSync, renameSync, writeFileSync } from "node:fs";
+import { symlinkSyncOrSkip } from "./symlink-or-skip.js";
 import { join } from "node:path";
 import { MachineConfigWatch } from "../../src/harness/configwatch.js";
 import { requireGit } from "./fixture.js";
@@ -31,7 +32,7 @@ describe("R86 ancestor type change carries the link facts", () => {
     writeFileSync(join(other, "config"), "[user]\n\tname = r86-other\n");
     renameSync(join(xdg, "git"), join(xdg, "git-old"));
     const link = join(xdg, "git");
-    symlinkSync(other, link, "dir");
+    symlinkSyncOrSkip(other, link, "dir");
     const linkIno = String(lstatSync(link, { bigint: true }).ino);
     const row = watch.compare().find((f) => f.path === cfg);
     expect(row, "the ancestor replacement is recorded against the config path").toBeTruthy();

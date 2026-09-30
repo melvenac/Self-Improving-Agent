@@ -20,7 +20,8 @@ vi.mock("node:fs", async (importOriginal) => {
   return { ...m, default: { ...m, openSync }, openSync };
 });
 
-import { appendFileSync, linkSync, lstatSync, mkdirSync, mkdtempSync, realpathSync, renameSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
+import { appendFileSync, linkSync, lstatSync, mkdirSync, mkdtempSync, realpathSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { symlinkSyncOrSkip } from "./symlink-or-skip.js";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { MachineConfigWatch } from "../../src/harness/configwatch.js";
@@ -123,7 +124,7 @@ describe("R80 true words", () => {
     const elsewhere = join(dir, "elsewhere");
     writeFileSync(elsewhere, "[user]\n\tname = else\n");
     unlinkSync(cfg);
-    symlinkSync(elsewhere, cfg);
+    symlinkSyncOrSkip(elsewhere, cfg);
     const row = watch.compare().find((f) => f.path === cfg)!;
     const link = lstatSync(cfg, { bigint: true });
     const target = statSync(elsewhere, { bigint: true });
@@ -143,7 +144,7 @@ describe("R80 true words", () => {
     watch.begin("developer");
     const elsewhere = join(dir, "elsewhere");
     writeFileSync(elsewhere, "[user]\n\tname = else\n");
-    symlinkSync(elsewhere, cfg);
+    symlinkSyncOrSkip(elsewhere, cfg);
     const row = watch.compare().find((f) => f.path === cfg)!;
     const link = lstatSync(cfg, { bigint: true });
     const target = statSync(elsewhere, { bigint: true });

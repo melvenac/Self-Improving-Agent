@@ -64,11 +64,16 @@ wrong reason. Assert a wrong value first and watch it fail with the real message
 - **A red run is the FINAL rows run against the UNFIXED product,** each failing for the reason it names. A line
   written to fail (Composer's `"tcm-red-seed"`) makes any run red and proves nothing, and it reads as evidence,
   which makes it worse than none.
-- **A mutant is an edit to the PRODUCT, on its own branch,** run on CI, killing the row it names. A second function
+- **A mutant is an edit to the PRODUCT, on its own branch,** run locally, killing the row it names. A second function
   inside the test, or an option in the product that only a test flips, is not a mutant. Never commit a mutant into
   the candidate's history.
 - **A test must read the thing it claims to test.** An evaluator hard-coded to the answer passes whatever the file
   says. Nothing may exist in `src/` only so that a test can pass or fail.
+
+**A developer never runs CI (`D-061`, Aaron 2026-09-28).** Not tcm, not Windows, not a `workflow_dispatch` of
+any kind. Run the red, green and mutant rows locally, and quote each run's failing lines and exit code in the
+handoff. That output is shift-left evidence, not acceptance (`docs/hoh_jev.md`, Roles). CI is the runtime's step:
+it runs automatically on push once `T-178` lands, and until then the QA seat dispatches it on the frozen candidate.
 
 **Use a real fixture.** A test about worktrees creates a worktree.
 

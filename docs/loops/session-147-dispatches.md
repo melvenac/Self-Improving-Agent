@@ -328,3 +328,557 @@ This check makes it a rule. The record: T-193 (rev 140).
    `shared.md` says to read the dry run before every real call, and this one was skipped.
 - **Owed to Relay when T-193 is accepted:** the seat data file's path and format, so A2A-Hub can add `a2a-planner`,
   `a2a-rivet` and `a2a-qa` as a docs-only change (Relay's message, record session 147).
+
+## Incident: every Cursor CLI tool call blocked after context-mode 1.0.169 (fixed 10:59:55Z)
+
+- **Cause, measured:** Grok Build updated itself (09:46-09:57Z) and pulled context-mode to 1.0.169. At 10:28:27Z the
+  plugin registry moved to `…/context-mode/1.0.169`, whose `hooks/hooks.json` registers **PreToolUse for Bash, Read,
+  Grep, WebFetch, Agent and `mcp__`**. The April-trimmed copy had **no** PreToolUse. Cursor CLI imports Claude plugin
+  hooks, and it runs them through a PowerShell wrapper that is executed by bash (**T-046**), so every tool failed
+  closed: `Hook blocked with message: --: eval: line 1: syntax error near unexpected token '&'` (Rivet, and reproduced by
+  the planner with a headless `cursor-agent` started from PowerShell with no `SHELL` set, so `SHELL` is not the cause).
+- **Fix:** removed the 9 PreToolUse entries from `~/.claude/plugins/cache/context-mode/context-mode/1.0.169/hooks/hooks.json`
+  (backup: `hooks.json.1.0.169.bak` in the planner's scratchpad). Same test afterwards: `echo` runs,
+  result `hooktest-ok`. Also done: `context-mode upgrade` (bundled CLI) removed the duplicate context-mode entries
+  that the upgrade had re-added to `~/.claude/settings.json`.
+- **NOT durable:** the next context-mode update rewrites the plugin cache, and the block returns. **The durable fix is
+  T-046** (the hook wrapper under Cursor + Git Bash), or a deterministic re-strip, for example in
+  `~/.claude/hooks/context-mode-cache-heal.mjs`. **Until then, after any context-mode or Grok Build update, re-run the
+  test in this section.**
+- The one remaining doctor FAIL ("plugin cache integrity", `scripts/` missing) is upstream packaging: neither
+  install folder has `scripts/`.
+
+### Record 185 (Composer, `f590448`; mutant `3b63a93`): ACCEPTED at a planner boundary check, written 11:29:50Z
+
+**No QA seat could run** (launching QA needs Aaron, who was asleep), so the planner ran Composer's harness itself,
+from `origin/loop/qa-queue-restore`, against `origin/master`'s `qa-queue.ps1` (old), the candidate (new) and the mutant:
+- old: `restore_old_untracked_block_expect item2_on_shaA=False` (the bug reproduced);
+  `restore_old_locked_generation_expect no_run_and_failed=False`;
+- new: `item2_on_shaA=True`; `no_run_and_failed=True`, with `restore_failed=1 run9997=0`;
+- mutant (read-back removed): `no_run_and_failed=False`, with `restore_failed=0 run9997=1`. Killed.
+
+The product diff was read: `-Checkout` resolves the SHA, checks out with `-f` and reads HEAD back; the per-driver
+restore does `-f`, reads back, logs `restore_failed.<n>` with both SHAs and git's first error line, then aborts. **These
+match Composer's reported lines. Its first live round under D-060 had real evidence on first delivery.**
+
+**Two harness defects (round 185b, not blocking the product):**
+- **R185-1:** the harness exits 0 when an `_expect` line is False. The mutant run printed `no_run_and_failed=False`
+  and exited 0. Anything reading its exit status passes the mutant.
+- **R185-2:** `Get-Content` of `queue.log` races the detached queue, which still has the file open. The planner's
+  first run died with `IOException … being used by another process`; the second completed.
+
+**Morning:** re-copy `qa-queue.ps1` from `f590448` to both QA machines, clean both QA trees, and relaunch 161+178
+(laptop) and 182+183 (QA PC). Each line is Aaron's, dry-run first.
+
+### Record 186 (T-193, cursor-builder / Grok, product `683b61c`, PR #186): ACCEPTED by the planner, written 11:46:01Z
+
+- **Evidence checked:** red `36315913592` at `ea52b80`. Its product is a stub that passes every root, and its test file
+  is byte-identical to the final one, so the red is the final rows against the unfixed product. No seeded assertion.
+  Green `36316160629`. Mutants on their own branches: any-name `19d5c38` (`36316403690`, only the loop-named row) and
+  hard-coded seats `cbfee4a` (`36316497065`). All four conclusions read on GitHub.
+- **Code read:** a porcelain parser that refuses unknown keys, with `locked` and `prunable` known; the main checkout is
+  exempt; the seat file is `.agents/SYSTEM/worktree-seats.json` (allowlisted); no file is a SKIP; every message
+  carries the LIMIT line and the walked count.
+- **PR #186 awaits Aaron's merge** (code). On merge, close T-193, and T-149 against it. Relay has the path and format.
+- **Its first live run found four stray registered worktrees in SIA's repo**, all in old sessions' temp scratchpads, all
+  clean, with nothing unpushed: `…/sia-builder/6a780747…/scratchpad/tip`, `…/sia-infra/f18c4d9e…/scratchpad/tip`,
+  `…/sia-planner/9a149231…/scratchpad/wt-iso` and `%TEMP%/sia-r5-probe-e2f`. Removal needs Aaron's word (shared.md).
+  QA's second checkout is now `git archive`, never a worktree; seats' scratch probes should follow that too.
+- **185b (`78fd6ce`, harness only) ACCEPTED, re-run by the planner at 11:51:42Z:** mutant exit 1 with
+  `FAIL_EXPECT restore_new_locked_generation_expect no_run_and_failed=False`; candidate exit 0 (2 passed); old+new
+  exit 0 (4 passed, with the old role's reds counted as expected). No log-read IOException in three runs. R185-1 and
+  R185-2 are closed. **The QA relaunch copies `qa-queue.ps1` from `78fd6ce`** (the same script as `f590448`).
+
+### Record 187 (candidate B part 2, Grok, product `8c7769f`, PR #187): evidence checked, sent to QA 189, 12:06:53Z
+
+The red commit `043fb8b` adds only the tests to `677c1dd` (no `src/`), so the red is real. Five mutants are product
+edits on their own branches, all failed on tcm. Green: 1699 passed. The planner read the schema diff and one test
+edit: the shared fixture gained `order: "shown"` because a `met` row without it is now refused. That goes to QA
+as a BE-5 question, not ruled by the planner. **QA 189** (`docs/loops/loop-15-slice-3-b2-dispatch-qa.md`, Composer
+2.5, a different model from the builder) **launches in the morning with the others.** Laptop order: 189, 161, 178;
+QA PC: 182, 183.
+
+## The next day (21:11:36Z), on Aaron's word
+
+- **Merged:** #186 (T-193) as `a1fa4b1` and #188 (record 185/185b) as `b744e19`. The #188 head `ac683f4` adds only
+  the handoff over the verified `78fd6ce`. Master tcm CI `36350589982` dispatched. T-193 and T-149 closed (rev 143).
+- **Removed** the four stray scratch worktrees, each re-checked clean with nothing unpushed immediately before. SIA now
+  has only the main checkout and the six seat folders.
+- **QA relaunched on the QA PC only** (the laptop is in use): `qa-queue.ps1` copied from `b744e19` (15,068 bytes,
+  SHA-256 `40aea6e28954383c`, read back); queue `189,182,183,161,178` at `9a79ff1`, started 21:10:59Z. The launch
+  checkout moved a dirty tree to `9a79ff1`: the record-185 `-f` fix working on a real machine for the first time.
+- **The main checkout** (`~/Projects/Self-Improving-Agent`) is still at `ecd28dd`, far behind master. Hooks and the
+  MCP server run from it, and T-193 only reaches A2A-Hub once it is updated. Updating it is Aaron's word (T-172, D-050).
+
+### QA 189 (candidate B part 2): ACCEPTED; the planner rules candidate B ACCEPTED (21:20:33Z)
+
+- **QA 189** (Composer 2.5, QA PC, 21:11-21:18Z; `qa/b2-report` `75c2c95`, ending `QA-189: REPORT COMPLETE`): ACCEPTED,
+  BE-0 to BE-8 all PASS. On the dispatch's five items:
+  - **BE-5.2:** refusing a pre-B `met` row without `order` is what BE-5.2 names, and QA lists every producer and
+    fixture it affects.
+  - **mut-b** couples BE-2.2 and BE-7.1 by design.
+  - **mut-a's** empty and newline ids stay refused by the pattern.
+  - **BE-1.3's no-write path** was verified on disk.
+  - **BE-7** has no writer.
+- **Caveats, not blocking:**
+  - QA's own three mutants (`qa/b2-mut-*`) were run LOCALLY, not on tcm, so BE-8's tcm evidence is the developer's
+    green `36316975390`.
+  - The driver's post-run ref audit recorded `ref_violations=refs/heads/docs/session-100-qa99-dispatch`: a LOCAL
+    branch in the QA PC's tree changed, and it no longer exists there. **Origin is untouched** (`5c0af5b`, the planner's
+    own push, read back). The report does not say what did it. The audit caught it, as designed.
+- **Ruling:** with B part 1 (the G-042 repair) merged as #165, **candidate B is ACCEPTED.** PR #187 goes to Aaron for
+  merge. **C (T-155, the shadow merge gate) is next.**
+
+### QA 182 (T-048 r3, `b048df8`): ACCEPT; the planner rules T-048 r3 ACCEPTED (21:28:27Z)
+
+- `qa/t048-r3-report` `6092a99`, ending `QA-182: REPORT COMPLETE`. SILENT 4, SILENT 9 and T048-D1's server half hold,
+  and the preserves hold. QA's mutants: five run locally, two confirmed on tcm (`qa/t048-r3-mut-*`).
+- **Low, not blocking:** (1) `tests/t048-r3.test.ts` asserts only the corrupt and ran states on the two server score
+  routes, not missing or unreadable (the product shares one `invocationLogSuffix`; QA verified all four strings by
+  hand). A row per state closes it, in T-048's next touch. (2) The handoff said "server.ts only"; round 3 also
+  changes `score-line.ts` (the shared helper), inside scope.
+- **Merge order:** `loop/t048-r3` contains r2b (`822f398`), which QA 178 has not scored yet. The r3 PR waits for 178.
+- **Recurring ref flag, now a pattern:** QA 189 AND QA 182 both recorded
+  `ref_violations=refs/heads/docs/session-100-qa99-dispatch`, a LOCAL branch in the QA PC's tree. Origin is untouched.
+  Something in each run (the seat, or the queue's checkout) creates or moves a local branch named after the planner's
+  docs branch. **To trace before the next queue:** the QA tree's reflog for that ref, and whether the dispatches' `git
+  show origin/docs/...` reads are the trigger.
+- **RESOLVED (21:29:03Z): the ref flag was the PLANNER's own pushes.** The QA PC tree has no local
+  `refs/heads/docs/session-100-qa99-dispatch` (`git rev-parse --verify` finds nothing; `for-each-ref refs/heads/docs` is
+  empty). The driver's audit snapshots origin's ref list (`refs_counted=before=624 after=628`: the remote's branches, the
+  4 being the QA branches). The planner pushed `5c0af5b` (about 21:11Z) during QA 189 (21:11:17-21:18:35Z) and
+  `9a1bf1e`/`ce787ca` (about 21:22-21:24Z) during QA 182 (21:18:50-21:27:00Z). A true detection with the wrong
+  suspect. **Fix, either:** (a) the planner does not push to origin while a QA run is in flight, or (b) the audit names
+  WHO moved a ref (committer, or the seat's push log) before calling it a violation. Until (b) exists, (a) is the rule,
+  and an audit flag on a planner branch is checked against the planner's push times first.
+- **Also seen in the reflog:** QA 183 (running now) checked its candidate out IN the shared QA tree (`16:27:31` local, to
+  `a38ff92`, then `qa/t192-report`), as QA 177 did. The record-185 restore now handles it, but the dispatches' "separate
+  worktree / git archive" instruction is still not being followed.
+
+### QA 183 (T-192, `a38ff92`): ACCEPT; the planner rules T-192 ACCEPTED (21:34:37Z)
+
+- `qa/t192-report` `1bef8ea`, ending `QA-183: REPORT COMPLETE`. `runs-on`, `ci-status` never-started and the unread cases,
+  D-055's `paths-ignore`, and the preserves all hold. QA-only mutants killed on tcm: `36351923059` (`.agents/**` in
+  `paths-ignore`) and `36351924217` (egress `if` flipped).
+- **Low:** (1) the four-case `evalRunsOn` is enough for today's expression but would not notice new event-specific
+  terms. (2) **T192-D1:** when `gh run view` succeeds but the `test` job is absent or its `steps` field is missing (not
+  `[]`), `checkCiStatus` says plain `failure` without naming that the steps were not read. It is the 181b class, one
+  case further. **Composer's replay (record 184, `887ae4c`) names exactly this case** ("failure (job test absent in run
+  view)"). A small follow-up round, not a merge blocker: T-192 fixes the live billing block.
+- **PR and pushes held** until the QA queue finishes (the no-push-during-QA rule above). Then: open the T-192 PR for
+  Aaron, and push this file.
+
+### QA 161 (/bootstrap r4 reconciled, `d74c0e5`): ACCEPT; ruled ACCEPTED; record 190 sent (21:57:18Z)
+
+- `qa/bootstrap-fix-r4-report` `ac04e7d`, ending `QA-161: REPORT COMPLETE`. R-BF-17 to R-BF-21 hold; all four installs pass
+  with no manual fix; five mutants killed on tcm. QA 145's regression rows pass 13 of 15: the two failures pin the pre-r4
+  `Next:` wording that R-BF-19 replaced, covered by `bootstrap-fix-r4.test.ts`'s install-N row. Expected, not a defect.
+- **Conflicts with master again,** as predicted: importer r6 (#184) changed the same `cli.ts:535` import line. **Record 190**
+  (cursor-builder, hub turn after 26): merge `origin/master` into `loop/bootstrap-fix-r4-rec`, resolved to the union of
+  `inboxWarning`, `describeDecisionsUnreadable` and `describeLastSession`, proven on tcm. The planner verifies the `--cc`
+  hunk and the runs, then opens the PR for Aaron. The accepted behaviour is unchanged; this is mechanical.
+- **Record 190 ACCEPTED (22:07:50Z):** merge `d6fec6d` (parents `ade630d` and master `b744e19`), tip `bc738aa` (handoff only). tcm
+  `36353805123` success, 1736 passed, with bootstrap-fix-r4 11, state-import-r2 18, r5 22 and r6 3 named. The planner read
+  `git show --cc d6fec6d -- cli.ts`: the only `++` (hand-resolved) line is the import union; the draft-summary region is an
+  auto-merge with every line from one parent. Clean against `b744e19`. **PR held until QA 178 finishes.**
+
+### QA 178 (T-048 r2b, `822f398`): ACCEPT; the queue finished 22:08:24Z; PRs opened (22:09:54Z)
+
+- The report was committed on the QA PC but **not pushed**: `push-qa.mjs qa/t048-r2b-report` was refused by the Cursor deny
+  list ("Command blocked by permissions configuration"), although `push-qa.mjs` pushed the five `qa/t048-r2b-mut-*` branches
+  earlier in the same run. **The deny list refused its own sanctioned route**, a Cursor-driver defect for cursor-infra.
+  The planner read the report over ssh and saved it verbatim as `docs/loops/t048-r2b-qa-report.md`, with provenance.
+- **Verdict ACCEPT:** D1's cli half, D2 to D5 and the D3 survivors are fixed; the three survivors are killed on tcm; `server.ts`
+  is unchanged from r2. The planner rules **T-048 r2b ACCEPTED**, so `loop/t048-r3` (r2b + r3, both accepted) can merge.
+- This run's audit flag (`loop/bootstrap-fix-r4-rec`) was cursor-builder's record-190 push during the run: the same
+  false-positive class as the planner's pushes.
+- **Queue summary (QA PC):** 189 ACCEPT (B2), 182 ACCEPT (T-048 r3), 183 ACCEPT (T-192), 161 ACCEPT (/bootstrap r4 rec),
+  178 ACCEPT (T-048 r2b). Five of five.
+
+### All four merged; T-192 live; candidate C's criteria dispatched (23:19:02Z)
+
+- **Merged on Aaron's word, in his order:** #189 (T-192) as `2b121d9`, #187 (candidate B part 2) as `c9a7acc`, #190
+  (/bootstrap r3+r4) as `d0b63a3`, #191 (T-048 r2b+r3) as `bf33fe4`. Each was CLEAN, with test SUCCESS, and clean
+  against the master left by the one before.
+- **T-192's post-merge acceptance read:** master push runs now carry the `self-hosted,linux,tcm` labels. Run
+  `36358116586` (`2b121d9`) ran on **tcm-2**, and `36358133855` (`c9a7acc`) on **tcm-1**. Master's CI works again.
+- Aaron: "laptop and qa pc are available for ci". A `windows=true` run on master `bf33fe4` was dispatched to the laptop:
+  `36358221545`.
+- **QA 191, candidate C's criteria:** `docs/loops/loop-15-slice-3-c-criteria-dispatch-qa.md`, with its driver in `qa-191/`.
+  It carries B's Open 3 (does an attributed `met` count as met?), R10(c)/(d) as verdict rows, and R2's now-binding `E_t`
+  obligation. Launch on the QA PC.
+
+### The main checkout updated to master (T-172's step), on Aaron's word (23:21:49Z)
+
+- `~/Projects/Self-Improving-Agent`: clean, detached `ecd28dd` → `bf33fe4` (303 behind). Build stamped `bf33fe4`;
+  build-freshness PASS, worktree-layout PASS (7 worktrees, its first main-tree run), state-schema PASS. The recall-trigger
+  hook smoke test on the new build: rc 0.
+- **Trap, hit and recovered:** `npm ci` failed with `EPERM unlink …better-sqlite3/build/Release/better_sqlite3.node`. The
+  native module is LOCKED by every running open-brain MCP server (one per open Claude session), and `npm ci` had already
+  deleted most of `node_modules` (8 entries left). **For about 1 minute, hooks loading from the main tree could fail.**
+  Recovered with `npm install` (no wipe; the lockfile's better-sqlite3 was unchanged): 172 packages, then `npm run build`.
+  **Rule: in the main checkout, use `npm install`, never `npm ci`, while any Claude session is open.** It belongs in
+  T-172's "one refusing command".
+- **Running sessions still use their old in-memory MCP server** until `/mcp` reconnects open-brain. New sessions get the new
+  build.
+
+## Records 192-194: three follow-up rounds from today's findings (the common rules at the top of this file apply; the evidence rules in `.agents/roles/developer.md` bind every round)
+
+### Record 192, `cursor-infra` (Composer 2.5): two Cursor QA-driver defects
+
+**Branch** `loop/qa-driver-cursor-r2` from `origin/master`. Stubs only, on this desktop, hidden, local bare repo. Never touch
+a QA machine or `%USERPROFILE%\Worktrees\sia-qa`. Handoff: `docs/loops/qa-driver-cursor-r2-developer-handoff.md`.
+1. **The sanctioned push route was refused.** In QA 178 (QA PC, 2026-09-27 ~22:00Z), `node docs/loops/qa-178/push-qa.mjs
+   qa/t048-r2b-report` was denied, "Command blocked by permissions configuration" (drive.meta `denial=…`; report
+   `docs/loops/t048-r2b-qa-report.md`, "Report branch push"). Earlier in the same run, `push-qa.mjs` pushed five
+   `qa/t048-r2b-mut-*` branches. **Find which deny pattern matched which command form** (the seat's exact command is in
+   its stream-json transcript on the QA PC, but you cannot read it: reproduce the form with stubs). **Make the sanctioned
+   route pass in every form a seat plausibly uses** (plain, `cd … &&`, through PowerShell), while every push form stays
+   denied. Rows: each form, pass and deny, against the real `cli.json`.
+2. **The ref audit blames the QA seat for other seats' pushes.** `ref_violations` fired on the planner's branch (QA 189,
+   182) and on `loop/bootstrap-fix-r4-rec` (QA 178), all moved by OTHER seats' legitimate pushes mid-run (traced in this
+   file, "RESOLVED"). **Attribution rule to implement:** a QA seat can push only commits that exist in its own repository.
+   So a ref that moved on origin to a SHA the QA tree did not have before its own post-run fetch was moved by someone
+   else. Report it as `ref_moved_elsewhere`, not `ref_violations`. State the rule's limit in drive.meta. Rows: a stub
+   "other seat" push mid-run (not a violation), a stub seat push outside `qa/<prefix>-*` (a violation), and a mutant
+   that drops the attribution.
+
+### Record 193, `cursor-builder` (Grok 4.7): two small gaps QA found
+
+**Branch** `loop/t192-d1` from `origin/master`. tcm, at most 6 runs. Handoff: `docs/loops/t192-d1-developer-handoff.md`.
+1. **T192-D1** (QA 183): when `gh run view` succeeds but the `test` job is absent, or its `steps` field is missing (not
+   `[]`), `checkCiStatus` says plain `failure`. Name each case ("steps not read: job test absent" / "steps field
+   missing"). Record 184's replay already names "job test absent in run view"; match its wording where it fits.
+2. **T-048 r3 test gap** (QA 182): `tests/t048-r3.test.ts` asserts only the corrupt and ran states on the two
+   `server.ts` score routes (`handleSync`, `handleScore`). Add the missing and unreadable rows. Product unchanged unless a
+   row goes red; if one does, that is a finding: report it.
+Red first on the real rows against `origin/master`; one mutant per item on its own branch.
+
+### Record 194, Grok (`sia-forge`): T-046's detector, so this morning's incident announces itself
+
+**Why:** at 09:48Z a Grok Build self-update pulled context-mode 1.0.169, whose plugin `hooks/hooks.json` registers
+PreToolUse for Bash/Read/Grep/WebFetch/Agent/`mcp__`. Cursor CLI imports Claude plugin hooks and runs them through a
+PowerShell wrapper executed by bash (T-046), so every Cursor tool call failed closed. The fix (PreToolUse stripped from
+the plugin cache) is **not durable**, and nothing detects it coming back. This file, "Incident".
+**Do (branch `loop/t046-detector` from `origin/master`):** a `/sync` check, `cursor-hook-compat`:
+- Read `~/.claude/plugins/installed_plugins.json` (parser, never a pattern). For each installed plugin's `installPath`,
+  parse `hooks/hooks.json`.
+- If a `PreToolUse` entry exists AND Cursor CLI is installed (`%LOCALAPPDATA%\cursor-agent` exists), it is an ISSUE,
+  naming the plugin, the version, the matchers, and T-046, with the one-line remedy.
+- No registry, or no Cursor CLI: a SKIP that says why, never a PASS. State the limit: it checks config, not whether Cursor
+  actually runs the hook.
+- The check reads the real files under the user profile. Tests use a fixture home, never the real one (G-044).
+- Rows red against `origin/master`; mutants on their own branches: ignore PreToolUse; treat no-Cursor as PASS.
+- **Do not edit anything under `~/.claude` or `~/.cursor`.** This round is detection only. The preventer (the
+  cache-heal hook) is Aaron's config.
+tcm, at most 6 runs. Handoff: `docs/loops/t046-detector-developer-handoff.md`.
+
+## HANDOFF TO THE NEXT PLANNER (record session 147 rolls here, 2026-09-27T23:25Z). Read this section first.
+
+**Why it is here and not in the record's handoff slot:** Aaron reconnected `/mcp` onto the new build, and T-003 then
+correctly refused `set_handoff` and `ob_set_session` for this session. It started before the build, so its SessionStart
+hook wrote no session proof (`by-pid/15644.json` absent). The record's slot still holds rev 142's handoff; **this
+section supersedes it.** First act next session: `ob_set_session`, then write this handoff into the record.
+
+**State:**
+- **Loop 15 slice three:** A MERGED (#182); B MERGED (#187, QA 189 ACCEPTED). **C (T-155) is next:** QA 191 (C's criteria)
+  is written and dry-run on the QA PC, **awaiting Aaron's launch** (`-Queue 191 -Checkout d8166b6bbb1a6493a9e219096fa4b88bf68f6165`,
+  in `qa-launch.md`'s QA PC form). Then rule the criteria, then brief C's build.
+- **Merged today:** #186, #188, #189, #187, #190, #191. Master `bf33fe4`. **Master push CI runs on tcm** (T-192 verified on
+  tcm-2/tcm-1). **The main checkout is at `bf33fe4`, rebuilt**; build-freshness PASS.
+- **In flight:** record 192 (cursor-infra, Composer: the Cursor QA driver's push-route refusal and ref-audit attribution);
+  record 193 (cursor-builder, Grok: T192-D1 and T-048 r3's server rows; READ, working); record 194 (Grok/sia-forge: the
+  T-046 `cursor-hook-compat` detector). **At 23:24Z Grok had not read 193-194, and infra had not read 36-37;** Aaron has
+  nudge lines. Review every delivery's diff and failed logs (D-060).
+- **A `windows=true` CI run on master** (`36358221545`, laptop) was in progress. Read its result.
+
+**Watch out:**
+- **No planner push while a QA run is in flight** (the audit reads origin's refs). Record 192 fixes the attribution.
+- **Main checkout: `npm install`, never `npm ci`,** while sessions are open.
+- **After any context-mode or Grok Build update, re-test Cursor CLI** (T-046); record 194 is the detector.
+- **Pre-upgrade sessions** show a non-blocking "UserPromptSubmit hook error … 1.0.22/hooks/userpromptsubmit.mjs". A restart
+  or `/reload-plugins` fixes it.
+- **Cursor seats' `--wait` lapses after about 1 h.** Check `/a2a/agents/live` and `/reads` before asking Aaron to nudge.
+- **Derive every time and count from its source.**
+
+**Open:** Telegram approval (D-058) is on HOLD by Aaron. QA seats keep checking candidates out in the shared tree; a
+driver-level guard may be worth a round.
+- **Update 23:28Z: QA 191 LAUNCHED** by Aaron (QA PC pid 12704; queue `start=queue=191` at 23:27:51Z, `head=d8166b6`). All
+  three dev seats had read their turns (Grok 194, infra 37, builder 30) and were working. **This commit is LOCAL and
+  unpushed** (the no-push-during-QA rule). The next planner pushes it once QA 191's log shows `end=queue finished`.
+- **Windows CI on master `bf33fe4`** (`36358221545`, laptop-win): **1 failed**, 1723 passed. Linux on tcm-2: 1799 passed.
+  The failure is `tests/harness/qa104-a9-probe2.test.ts`, "QA 104 probe 2 (not for merge)":
+  `EPERM … symlink` under the runner's NetworkService account (no symlink privilege). **Two findings for the next
+  planner:** (1) a QA probe test marked "not for merge" reached master with candidate A's branch history. Find every
+  `qa*-probe*` / "not for merge" test on master, and decide to remove it or keep it as a real row. (2) Any symlink test
+  must skip on Windows `EPERM` or the runner needs the privilege. A small developer round (cursor-builder), and a `/sync`
+  check for "not for merge" test files is worth considering.
+- cursor-infra read record 192 (turn 37) and went idle without replying; Aaron was given an "act now" line.
+
+## Planner session 11 (worktree counter), hub round-up, 2026-09-28T00:09Z
+
+All three dev rounds were delivered over the hub. The planner read back each branch with ls-remote and each run id with gh run view. None is ruled. All three go to the QA queue.
+
+- **Record 194** (T-046 detector, Forge/sia-forge): PR #192. Product 3af41f5, tip 44d672a. Green run 36359225675, red run 36359225141, mutants 36359226699 and 36359228066.
+- **Record 193** (T192-D1 + T-048 r3, builder/sia-builder): PR #193. Product ecd378d, tip 9d449f4. Red run 36358778248, green run 36359004908, mutant run 36360002881 (routes). The builder named mut-score as too wide, and it does not count.
+- **Record 192** (Cursor QA driver r2, infra/sia-infra, Composer): PR #194. Tip 462403d; product unchanged since 997f2c7. The first delivery was sent back, because its mutant was run under a flag that flips the expectation (it printed PASS), its attribution red was asserted rather than run, and the source of the denial was unstated. The amendment adds FAIL with exit 1 for the ordinary harness on mutant e385f0d, FAIL with exit 1 on bf33fe4, and the denial read from real cursor-agent stream-json (session b64479fb).
+
+## Records 198-200: idle-seat rounds while QA 195-197 runs (2026-09-28, Aaron: "Is there anything the devs can do, they are idle")
+
+**Common to all three:** branch from `origin/master` (`bf33fe4`). The evidence rules in `.agents/roles/developer.md` bind every round (D-060): red on the real rows first, one mutant per item on its own branch, and quote the failing line and exit code of every red and mutant. **HOLD every push and every tcm dispatch until the planner posts that the QA 195-197 queue has ended.** The running QA drivers still charge any mid-run push by another seat to the QA seat as `ref_violations` (record 192 fixes this, but it is not in these drivers), and QA 196/197 need tcm. Build and test locally until then. Then push and run tcm, at most 6 runs. The planner rules on each delivery.
+
+### Record 198, `cursor-builder` (Grok 4.7): QA probe tests reached master
+
+The Windows CI run on master `bf33fe4` (`36358221545`) failed on `open-brain/tests/harness/qa104-a9-probe2.test.ts` with `EPERM … symlink` (the runner has no symlink privilege). That file, and `qa104-a9-probe3.test.ts`, are QA probes marked "not for merge" that arrived with candidate A's history. `open-brain/tests/pipelines/state-import-qa138.test.ts` is in the same family.
+1. For each QA-named test under `open-brain/tests/`: remove it, or keep it as a real row with a name and header that say what it guards, and say why. Nothing under `open-brain/tests/` may still say "not for merge".
+2. Every symlink-creating test skips on Windows `EPERM`, and says so in its skip reason (never a silent pass).
+3. A detector: a test or `/sync` check fails when a file under `open-brain/tests/` contains "not for merge". Validate it against a known positive (a fixture) and a known negative.
+`docs/loops/qa-scripts-*` are archives and are out of scope. Handoff: `docs/loops/qa-probes-on-master-developer-handoff.md`. Branch `loop/qa-probes-on-master`.
+
+### Record 199, Grok (`sia-forge`): T-150 + T-185, an unknown flag refuses
+
+`open-brain/build/cli.js` subcommands silently ignore an unrecognised flag, and some take the first non-`--` token as their directory, so a mistyped dry-run flag runs the MUTATING default (`sync --check-only`, `detach -dry-run`, `state migrate -dry-run`; see T-150 and T-185's notes, and `docs/loops/importer-fixes-r2-developer-handoff.md` for the list).
+1. Every subcommand refuses an unknown `-x` or `--xx` token before doing anything. It exits nonzero, names the token and lists the accepted flags. Tests fail if the command wrote anything at all.
+2. A positional that starts with `-` is never taken as a directory.
+3. Preserve: every documented flag and form works unchanged, and the existing tests stay green.
+Rows per subcommand: a `-dry-run`, a `--check-only` and a `--bogus`, each refused with no write. Mutants: accept unknown flags; take a `-` positional as a directory. Handoff: `docs/loops/t150-unknown-flags-developer-handoff.md`. Branch `loop/t150-unknown-flags`.
+
+### Record 200, `cursor-infra` (Composer 2.5): T-176, the index check measures one direction
+
+`/sync`'s `gitnexus-index` compares the indexed SHA to HEAD in one direction only, so an index built on a different line of history (neither an ancestor nor a descendant of HEAD) reads as current or near-current.
+1. Report ahead, behind and diverged distinctly. Diverged, and an indexed SHA that is not in this repository, are each an ISSUE that names both SHAs, never a PASS.
+2. Preserve: an index at HEAD is PASS; a tree with no `.gitnexus` stays SKIP with its reason; `--check` stays read-only.
+3. Tests build real throwaway git repos (never this repo's history), with a fixture `meta` for each case.
+Mutants: diverged read as behind; an unknown SHA read as PASS. Handoff: `docs/loops/t176-index-direction-developer-handoff.md`. Branch `loop/t176-index-direction`.
+
+## QA 195-197 ruled (queue ended 04:01:05Z; ruled 2026-09-28)
+
+The planner read the Step-Back artifact (claude.ai/artifact/3Kv8BuKYrj5vaKQgD8NKC7) before ruling, on Aaron's instruction. Its rule applies: QA validates the frozen commit against the requirements, never against the developer's claim.
+
+- **QA 196 (record 193, `ecd378d`): ACCEPT. The planner rules record 193 ACCEPTED.** `qa/t192-d1-report` `60c5d82`. Two low findings, not blocking: duplicate `test` jobs resolve with `.find()` (first match wins), and a non-empty `steps` of unreadable entries (`[null]`) reads plain `failure`. They go in the next `ci-status` touch. PR #193 is CLEAN at `9d449f4`, and goes to Aaron to merge.
+- **QA 197 (record 194, `3af41f5`): ACCEPT. The planner rules record 194 ACCEPTED.** `qa/t046-detector-report` `c3e5ce9`. Low finding D1: a registry entry with a missing `installPath` reads PASS without having read a hook file. A plugin with zero installs, or no `hooks.json`, is correctly a pass: nothing is there to register a hook. A missing `installPath` is unreadable input and should be a SKIP or an ISSUE (shared.md: "skip is not pass"). It is a follow-up row, not a blocker, because the incident shape is detected. PR #192 is CLEAN at `44d672a`, and goes to Aaron to merge. T-046 closes on merge.
+- **QA 195 (record 192, `462403d`, GPT-5.6 Sol): REJECT. The rejection stands.** `qa/qa-driver-r2-report` `dc9eee0`. This is the dangerous direction that dispatch item 4 asked QA to look for. `KnownShasAtStart` is snapshotted before the run, so a commit the QA seat creates DURING the run is unknown to it. If the seat moves a non-`qa/` ref to that commit, the move reads `ref_moved_elsewhere`, not `ref_violations`. QA reproduced this against the candidate's own `Audit-NonQaRefs`. The developer's seat row used the seed SHA, so it could not catch it. Also: the claimed `cd … &&` pass row is not in `$passForms`. It is returned to `cursor-infra` as record 192 r3, and PR #194 stays open and unmerged.
+
+## Records 205-207: overnight rounds (2026-09-28, Aaron going to bed: "any work we can send the devs before I do?")
+
+**Common to all three:** local only. **HOLD every push until the planner posts that QA 202-204 has ended**, because the running drivers still charge another seat's mid-run push to the QA seat. D-061: no CI of any kind; quote each local run's failing lines and exit codes. Mutants go on their own branches and pass `tsc --noEmit` first. Branch from `origin/master` `d1e8674`.
+
+### Record 205, `cursor-builder` (Grok 4.7): T-178 (P0), CI runs automatically on push to seat branches
+
+This is HoH's runtime step (D-061): a push to a seat's working branch runs the suite on tcm, so no seat dispatches CI by hand. Settle the two items in T-178's note: **(a) no double run** when a branch also has an open PR (a concurrency group per branch with cancel-in-progress, or any equivalent you can show); **(b) a docs-only push starts no run**, the same as D-055's `paths-ignore` for PRs. Cover `loop/**` and `qa/**` (QA mutant branches included). `master`, `workflow_dispatch` and its inputs are unchanged, and `windows` stays opt-in. **Evidence:** you cannot run GitHub's trigger locally. Extend the existing `ci-runs-on.test.ts` approach (a parsed `ci.yml`, never a regex) with rows for each trigger and filter, red against master's `ci.yml`, and one mutant per item. State the limit: the first real push after merge is the live test, and QA or the planner observes it. Handoff `docs/loops/t178-ci-on-push-developer-handoff.md`, branch `loop/t178-ci-on-push`.
+
+### Record 206, Forge (Grok 4.7, `sia-forge`): idea B scoping, READ-ONLY
+
+This does not start the module-boundary loop: that is Aaron's ruling, and the record's next slice after C is Jev calibration. It is the measurement that loop would need first (Step-Back idea B; T-154; G-030): **what happens when a stranger installs core with only Node and git.** In a temp directory with a throwaway `HOME`/`USERPROFILE` (never the real profile, `~/.claude` or any live DB), clone `origin/master`, follow README.md's install steps literally, and try `/start`'s path: the SessionStart hook (`cli-bootstrap`) and `ob_start`'s CLI equivalent, if one exists. Record every step that fails, needs something not in the README (Obsidian, a vault, an MCP server, a DB), or silently degrades. For each, name the file and line that causes it, and whether memory is the reason. **No product change.** Write `docs/loops/idea-b-stranger-install-probe.md` on branch `docs/idea-b-probe`.
+
+### Record 207, `cursor-infra` (Composer 2.5): QA 197's D1, `cursor-hook-compat` must not pass without reading
+
+A registry entry with a missing or empty `installPath` makes `cursor-hook-compat` report PASS without reading any hook file. Make that case a SKIP or an ISSUE that names the plugin and says the check could not read it. Zero installs, and an install whose `hooks/hooks.json` is absent, stay PASS: there is nothing that could register a hook. Rows: missing `installPath`, empty `installPath`, and an `installPath` that does not exist on disk, each red against master. Mutant: treat a missing `installPath` as PASS. Fixture home only (G-044). Handoff `docs/loops/t046-d1-developer-handoff.md`, branch `loop/t046-d1`. Record 200 stays committed locally and unpushed until the release.
+
+## Laptop queue 208-209, launched while QA 202-204 runs (2026-09-28, Aaron: both QA machines available; he waited to launch)
+
+- **Push exception, the planner's call:** infra pushed records 200 and 207, and the planner pushed this branch, while QA 202-204 was running on the QA PC. The running drivers (the old template, before 192 r3) may list these as `ref_violations`. They are traceable by SHA: `loop/t176-index-direction` `8d3143c` (mutants `08f9176`, `aca9911`), `loop/t046-d1` `a8adca0` (mutant `4686eee`), and this branch's own tip. Rule them out by those SHAs when ruling 202-204.
+- The laptop's `qa-queue.ps1` was re-copied from `b744e19` and read back: 15,068 bytes, SHA-256 prefix `40aea6e28954383c`, identical to the QA PC's copy. Its QA tree was at `fc8d8cd` with 11 dirty paths; the queue's record-185 checkout handles that.
+- **Record 205 (T-178) was returned to the builder:** its `push.paths-ignore` also filtered master, against D-055, and its cancel-in-progress also cancelled master runs. Master stays unchanged. It goes to QA in the morning.
+
+## QA 208-209 ruled (laptop queue ended 07:10:02Z)
+
+- **QA 208 (record 200, T-176, GPT): ACCEPT. Record 200 is ruled ACCEPTED.** `qa/t176-report` `9b56409`. The evidence file is present, and `validate evidence` exited 0. At HEAD is PASS, behind is WARN, and ahead, diverged or unknown is an ISSUE naming both SHAs. A dead recorded branch does not override a current SHA.
+- **QA 209 (record 207, T-046 D1, GPT): ACCEPT. Record 207 is ruled ACCEPTED.** `qa/t046-d1-report` `f41d310`. The evidence file is present and validated. QA split the developer's combined red into three independent rows (`qa/t046-d1-tests` `0081dab`), because the combined row stopped at its first assertion.
+- **The first two E_t.json files a QA seat has written** (C's criteria §8 P1). Infra opens the PRs, and Aaron merges.
+- **Record 205 r3** (T-178, `bc6c6d2`, local): it now fails closed (`git diff before..sha`, and any error runs the suite), and master is unchanged. It goes to QA in the morning.
+
+## QA 202-203 ruled (QA PC; 204 still running)
+
+- **QA 202 (record 192 r3, GPT): REJECT, which stands, on the EVIDENCE ONLY.** `qa/qa-driver-r3-report` `68ac9db`, E_t present. The product `d67c5e7` fix is confirmed: direct, amended, cherry-picked and other-worktree mid-run commits all read `ref_violations`, a different clone's push reads `ref_moved_elsewhere`, and every push form behaves correctly through real `cursor-agent`. The defect is in the harness: on Git 2.55 its bare fixture has no `HEAD` pointing at `refs/heads/seed`, a clone warning becomes fatal under `ErrorActionPreference=Stop`, and the mutant run exits 1 before the seat-new row, which is red for the wrong reason. Returned as **record 192 r4, harness only**.
+- **QA 203 (record 198, Composer): ACCEPT. Record 198 is ruled ACCEPTED**, read from the QA PC's LOCAL commit `120dc44` on `qa/qa-probes-report` (report plus E_t.json). **The QA seat's push through `push-qa.mjs` was refused** ("Command blocked by permissions configuration") after `qa/qa-probes-red` had pushed. That is the QA-178 defect record 192 fixes, reproduced on the old driver. Its report and its two mutant branches (`qa/qa-probes-mut-selfphrase` `aac214d`, `qa/qa-probes-mut-symlink-bypass` `3081527`) exist only on the QA PC. **The planner did not push them:** clearing another seat's permission denial by acting from outside is permission laundering. Aaron decides. QA 203's run also left the shared QA tree at `120dc44`, and the queue restored it before 204 (`head_moved.204`).
+
+## QA 204 ruled: candidate C REJECTED (the queue ended 07:12:16Z)
+
+- **QA 204 (candidate C `2035e89`, GPT): REJECT. The rejection stands.** `qa/c-report` `b16d5b5`, E_t present. Blockers: C-204-1 (CC-6: `inputs` omits the acceptance and gate summaries, no schema test, and the path differs); C-204-2 (CC-10: `--replaced` can record a null SHA, and a bare `--replaced` silently records `declined`); C-204-3 (CC-13: `{}` passes, `line_hash` is optional and removable, and only line counts are compared). Majors: C-204-4 (CC-18: an unreadable `--evidence` exits 1 instead of writing an `undefined` artifact) and C-204-5 (CC-20: `summary --bogus` exits 0, and an invalid `--gate` silently becomes `skip`). Rows with no asserting test: CC-0, CC-10, CC-13 and CC-19. CC-29 and CC-30 (§8) are met.
+- **Criteria §9 (P5)** corrects CC-6's path for the NEXT candidate only (`<loop>/<candidate_sha>/`). It does not reopen `2035e89`.
+- **Slice three stays open.** C goes back to Forge as record 201 r2.
+- **Record 192 r4** (harness only, `0f816bb`): the mutant now fails ON the seat-new row. It is queued for QA.
+
+## MORNING (supersedes the record handoff's launch line): three QA runs, two machines, checkout `1affe9d`
+
+Forge delivered **candidate C r2** overnight: product `8054f9f`, tip `09a517f`, and five mutants, one per C-204 finding. The QA 212 dispatch (GPT) is at `1affe9d`, and that commit also carries QA 210 and 211.
+- **QA PC: `-Queue 212`** (candidate C r2, which closes slice three).
+- **Laptop: `-Queue 210,211`** (192 r4 harness; 205 r3 CI on push).
+Both machines were idle at the last check. Both lines use `-Checkout 1affe9d819ebd59be6ea21630eb3edd2784562cf`.
+
+## Laptop queue 212, 210, 211 ruled (ended 21:11:13Z)
+
+- **QA 212 (candidate C r2 `8054f9f`, GPT): REJECT. The rejection stands.** `qa/c-r2-report` `2ffece8`, E_t present. All five C-204 findings are closed, and tcm is green. The one remaining defect is CC-6: `prepare` accepts a non-SHA candidate id and writes `artifacts/iterations/t001/bad/shadow_merge.json` with `candidate_sha: "bad"`. Returned as **record 201 r3**: validate every SHA input before any write.
+- **QA 210 (record 192 r4 `0f816bb`, GPT): REJECT. The rejection stands.** `qa/qa-driver-r4-report` `f94a79d`. The fixture repair works; but on the LAPTOP the sanctioned `cmd /c` route gave `denial=False moved=False` twice, where QA 202 on the QA PC saw it work. Returned as **record 192 r5**: diagnose whether the environment or the route is at fault, and state which.
+- **QA 211 (record 205 r3 `bc6c6d2`, Composer): ACCEPT. Record 205 (T-178) is ruled ACCEPTED.** `qa/t178-report` `2f222fc`, E_t present. The live pushes (`qa/t178-live-code` `05d31f6`, `qa/t178-live-docs` `1497149`) confirmed GitHub's trigger. The builder opens the PR, and Aaron merges.
+- The laptop was unreachable on port 22 once (a connect timeout, with Tailscale active and ping at 5 ms), and reachable a few minutes later. It was probably waking from sleep.
+
+## #196, #197 and #199 merged on Aaron's word ("merge all"); #199 broke master and PR CI
+
+- Merged, each CLEAN and pinned with `--match-head-commit`: #196 as `89ddb96`, #197 as `949a33b`, #199 as `8467cb1`. #198 is DIRTY (it conflicts with master); the builder merges `origin/master` into it and resolves.
+- **REGRESSION from #199 (record 205, T-178): master run `36485372110` (`8467cb1`, push) SKIPPED every job.** `test` has `needs: changed`, and `changed`'s `if` skips it on master and on `pull_request`. GitHub auto-skips a job whose needed job was skipped unless the dependent job's `if` contains a status function (`!cancelled()`, `always()`), so `test`'s own expression never runs. **Master and PR CI run no tests from `8467cb1` on**, until the fix merges.
+- **Why every instrument missed it:** the developer's rows evaluated the `if` expression in isolation; QA 211's live pushes were seat branches, where `changed` runs; and the planner's dispatch item 3 ("master unchanged") was checked by expression, never by a live master run. The class: a check that evaluates the configuration while the platform applies a rule the evaluator does not model. A live run on the path in question is the only instrument. The planner's dispatch named a live test for seat branches only, and that is the planner's miss.
+- **Fix:** record 205 r4 on `loop/t178-fix-needs`, proven by its own PR run showing `test` RUNNING before any merge.
+
+## STATE AT VS CODE RESTART (planner session 11 ends here; the next planner starts from this section)
+
+- **PR #200** (`loop/t178-fix-needs` `367936c`, record 205 r4): it fixes #199's master/PR skip (`test` gains `!cancelled()`). Its own PR run `36486143303` is **success, with `test` RUN**, the live proof. **Awaits Aaron's word to merge.** Until it merges, master and PR CI run no tests (from `8467cb1` on).
+- **PR #198** (record 198, ACCEPTED): conflict resolved by merge commit `1c2fbb1` (only `sync/index.ts`; both checks kept; the planner checked the diff). Merge it on Aaron's standing "merge all" AFTER #200 merges and #198's own PR run shows `test` ran green.
+- **QA 213** (candidate C r3, product `20c2dfd`, tip `5f7c9a0`, GPT): the dispatch is at `db8edc7`, awaiting Aaron's launch line (laptop: `-Queue 213 -Checkout db8edc74599802b97e3aef00f58419157f6dbe61`). If it ACCEPTs, slice three closes: run `shadow-verdict prepare` on QA 213's E_t BEFORE Aaron merges #195, and `decide` after (criteria §8 P4).
+- **Infra, record 192 r5** (diagnose the laptop `cmd /c` route, `denial=False moved=False`): in progress, and it will post in room `k5702788…` when done. The first `--wait` a new planner runs may deliver it.
+- **Forge and builder: idle.** Forge's last turn was C r3; the builder's was #200.
+- **Still open for Aaron:** QA 203's report stranded on the QA PC (local `120dc44`), and Telegram (D-058, on hold).
+- Listener PIDs and watchers die with the session. Re-arm one `hub-talk --as atlas --session <room> --wait --wait-timeout 3500` per room: builder `k57098epn7qz32vt0cazfjpbes8f6kdq`, forge `k57frxw0ptb8tadmqdwy0khhks8ey006`, infra `k5702788wctxj75begyt4x2k5x8f6mav`.
+
+## Planner session 149 (record number; the greeting showed #12): record caught up, T-194 and T-195 opened and dispatched
+
+- **Rev 148:** the handoff now carries the restart state above, plus three things found live. #199 means master/PR CI runs no tests. #200 is UNSTABLE, not CLEAN, because push run `36486110602` was CANCELLED; its PR run `36486143303` passed with `test` RUN. And the rev-147 handoff was older than this file.
+- **Rev 149: T-194 (P0) and T-195 (P0) opened**, on Aaron's word relayed by a general session (`worktrees-d5`). The quote and both links are in T-194's note and in the brief. **Neither task is part of slice three, and D-036 is not amended.**
+- **Brief:** `docs/loops/t194-t195-dispatch.md`. **Record 214** (T-194, the planner seat hook) goes to `cursor-builder`; **record 215** (T-195, a D_t plus the plan gate for interactive briefs) goes to Forge. If QA 213 rejects C r3, C r4 takes precedence on Forge.
+- **A near-miss, recorded by family:** the planner first read the harness facts (`cli.ts` subcommands, gate exports) from this seat tree, which is 216 commits behind `origin/master`. There they showed no `validate` subcommand at all. The peer's claim that `validate evidence` exists was correct at `8467cb1`. The brief cites master only.
+
+## Planner session 149, later: three QA runs live, and every ref moved during them
+
+**Launches, on Aaron's word in the planner session:** "launch QA 216 on the QA PC  one at a time: the laptop queue (QA 213, then QA 218), #201, and #198". Aaron ran both launch lines himself with `!`, because the host refuses the planner.
+- **QA PC:** `-Queue 216 -Checkout 315b245`. The queue log shows `run.216=started` at 00:31:31Z.
+- **Laptop:** `-Queue 213,218 -Checkout 842375f`. The queue log shows `run.213=started` at 00:34:24Z.
+
+**Held by the planner until the queues end:** #201, then #198. A master merge mid-run lands in every running driver's `ref_violations`.
+
+**Ref-audit trace.** These refs moved after a queue started. **None is the QA seat's act. Do not charge QA 216 or QA 213 with them.**
+
+| Ref | Moved to | By | When |
+| --- | --- | --- | --- |
+| `refs/heads/docs/qa-213-to-master` | created at `a4205c9` | planner | after 00:31Z; before 213 started |
+| `refs/heads/master` | `334fee5` → `842375f` (#205's merge, docs-only) | planner | after 00:31Z; before 213 started |
+| `refs/heads/loop/t196-hub-knowledge` | `d75f152` | infra | about 00:36Z, during 216 and 213 |
+| `refs/heads/loop/t196-hub-knowledge-mutant` | `b8fd067` | infra | about 00:36Z, during 216 and 213 |
+| `refs/heads/loop/t196-planner-md` | `fcea0ad` | infra | about 00:36Z, during 216 and 213 |
+| `refs/heads/loop/t197-cursor-start-parity` | `d98438b` | infra | about 00:36Z, during 216 and 213 |
+
+- **The first two are the planner's:** they happened after QA 216 started.
+- **The last four are infra's.** Infra acted on the planner's push clearance (hub turn 70) before it read the hold (turn 71). Presence showed turn 71 unread at 00:36:10Z.
+- **The planner's own lesson:** the clearance at turn 70 went out while the planner had already decided to launch QA runs that evening. **Clear a push only once the machines are known to be idle for the push's whole window.**
+- **Checked against QA 216's actual audit** (`drive.meta`, which ended 01:16:27Z): `ref_violations` lists exactly the four infra branches and `refs/heads/master`. **`docs/qa-213-to-master` is NOT in it.** The table above claimed one move more than the audit saw. It is the planner's own, and it was written before the audit was read. That branch was pushed and merged in the same minute, so it was probably never seen, or it was created and read inside one window. **Read the audit before writing its trace.**
+
+## QA 216 ruled: record 215 (T-195) REJECTED, and returned as r2
+
+- **QA 216** ran on GPT-5.6 Sol on the QA PC, 00:31-01:16Z. Its report is `origin/qa/t195-report` `73728dd`, with a valid E_t. **The rejection stands.**
+- **Met:** DT-1, 2, 3, 5, 6 and 8, and DT-9a to DT-9d. The content check is sound.
+- **Blocker, a full-suite regression, which the planner verified:**
+  - Candidate run `36503607220` has `test` = failure: 2 tests in `spawn-sites.test.ts` (CA-4b/R16) fail. `GATE_RECORD_RE.exec` is read as a child-process `exec`.
+  - Base run `36503973763` has `test` = success.
+  - Forge ran four named suites, never the full suite.
+- **Major:** DT-7 has no caller, so it is a tool, not a gate.
+- **Major:** DT-4 records overwrite each other at the same timestamp.
+- **Minor:** the DT-7 mutant `4e0cce9` does not typecheck.
+- **Returned as r2 at hub turn 228.** The return requires a local full-suite run. Blocking a planner's raw `hub-talk --say` that bypasses the dispatch path is named as T-194's job, not T-195's.
+
+## Records 220 and 221 dispatched while QA 213 runs, and their ref trace
+
+- **Dispatched, on Aaron's "Infra and builder are idle, anything to send them?"** Both are existing P0s; no new task was opened.
+  - **Record 220 (T-158, gap tombstones):** to `cursor-infra`, at hub turn 76.
+  - **Record 221 (T-164, the record session number):** to `cursor-builder`, at turn 59, after it posts T-194 with a full-suite run.
+  - **The brief** is `docs/loops/t158-t164-dispatch.md`, on master through #206.
+- **T-178 closed at rev 156.** Every one of its acceptance conditions was observed live, with run ids.
+- **Ref-audit trace for QA 213 (laptop, started 00:34:05Z).** The planner moved these refs during the run. They are not the QA seat's:
+  - `refs/heads/docs/t158-t164-dispatch` was created at `f4cecd9` at 01:32:07Z;
+  - `refs/heads/master` moved `842375f` → `474b652` (#206, docs-only) at 01:32:42Z.
+- **Why these were not held:** two seats were idle, and D-062 needs the brief on master first. The planner chose a traced move over leaving two seats idle for hours. "Trace them by SHA" is the sanctioned alternative to holding.
+
+## QA 222-225 prepared for the QA PC, and the ref trace for QA 213/218
+
+**The QA PC's drive has been swapped into a new machine.** The planner verified it on 2026-09-29:
+- **Hardware:** an i5-14500 with 20 threads (it was an i5-3570) and 7.7 GB of RAM.
+- **Unchanged:** the hostname DESKTOP-O4EGB1E and the Tailscale address 100.73.250.101.
+- **ssh:** the key works.
+- **Tooling:** the network profile is Private, Windows is licensed, the Defender exclusions are intact, node is v22.23.3 and git is 2.55, and `cursor-agent` is logged in.
+- **State:** the queue script is identical to master's, and the machine is idle.
+
+**QA 222-225 are dispatched on master (#207, `688a83a`), all on GPT:**
+
+| QA | Record | Task | Code SHA |
+| --- | --- | --- | --- |
+| 222 | 215 r2 | T-195 | `647cc74` |
+| 223 | 220 | T-158 | `c9ba1db` |
+| 224 | 219 | T-196 and T-197 combined | `929673b` |
+| 225 | 217 | T-198 | `231f501` |
+
+- **A collision QA 224 and QA 225 must settle:** records 217 and 219 both ADD `.agents/SYSTEM/hub-partner-seats.json`, with different blobs (`8a616f4` and `344bd46`).
+- **Forge's r2 suite result was corrected.** Its first post read "exit 0" with 4 failures, because the exit code came through a piped `tail`. Unpiped, it is exit 1, with one failure: the `qa104` EPERM, which also fails at the base on this desktop.
+
+**Ref-audit trace for QA 213 (and 218 if it had started).** These moves were cleared or made by the planner while the laptop queue ran. None is the QA seat's.
+
+- **Seat pushes cleared by the planner at 02:31:49Z (hub turns 232 and 80):**
+  - Forge: `loop/t195-dt-plan-gate`=`71810ea`, `-mut-threshold`=`c5da6ea`, `-mut-pass-on-error`=`908167a`, `-mut-dispatch-ok`=`b450ad5`, `-mut-dt9-ancestry`=`8d919d7`, `loop/t198-presence`=`231f501`, `-mut-swallow`=`bbf4b78`.
+  - Infra: `loop/t158-gap-tombstone`=`eeec97d`, `-mutant-splice`=`f8c3643`, `-mutant-scan`=`41fe1db`.
+- **The planner's own moves:**
+  - `docs/qa-222-225` was created at `ef1ce7d` at 02:35:17Z.
+  - `master` moved `474b652` → `688a83a` (#207) at 02:35:56Z.
+- **Why these were not held:** the new QA PC was idle, and holding every push until the laptop queue ended would have left it unused for hours.
+
+## QA 213 and QA 218 ruled; and a correction to this session's own push hold
+
+**The laptop queue ended at 01:09:54Z, not "still running".**
+- QA 213 ran 00:34-00:56Z, and QA 218 ran 00:56-01:09Z.
+- **The planner held pushes and #201 "until the laptop queue ends" for about two hours without reading the queue log.** It is the "absence vs not looking" family: an assumption stood in for a check.
+- **The traces above for the moves at 01:32Z (#206) and 02:31-02:35Z (seat pushes, #207) are therefore WRONG** about QA 213 and 218. Nothing was running on the laptop then, so those moves landed in no run's audit.
+- Only the moves inside a real window count:
+  - QA 216 (00:31-01:16Z, QA PC): #205's merge and infra's four pushes at about 00:36Z. QA 216's audit confirmed these.
+  - QA 213 (00:34-00:56Z): infra's four pushes at about 00:36Z.
+
+**QA 213 (candidate C r3, `20c2dfd`, GPT; `qa/c-r3-report` `5aa776f`): QA said ACCEPT. The planner rules that the ACCEPT does NOT stand, and returns C as r4.**
+- **r4's scope is exactly the rows QA 213 scored `partial`:** CC-1.2, CC-2.2, CC-5.6, CC-13.1, CC-13.2 and CC-17. There are no new criteria.
+- **CC-13 is the ledger's tamper check**, and D-019 removes the human merge gate on that ledger's count:
+  - QA's mutant `fd6c310` (an incorrect non-empty `line_hash`) **survived the full suite** (run `36504366574`);
+  - `/sync` does not flag a verdict artifact that has no ledger line.
+- **C's own criteria make `partial` give `would-not-merge`** (§8, agreed as fail-closed). Accepting C on five partial rows would hold it to a looser standard than the one it enforces.
+- **Planner error, set by the planner:** after QA 212, the session-11 planner wrote "the one remaining defect is CC-6". That silently dropped QA 212's major finding C-212-2 (CC-13 partial), so r3 was built to a narrowed list.
+- Slice three stays OPEN.
+
+**QA 218 (record 192 r5, `bbfb724`, GPT, laptop; `qa/qa-driver-r5-report` `2612015`): REJECT. The rejection stands.**
+- The harness fix works on the laptop.
+- **But the real driver template (`qa-driver-template-cursor/drive.ps1`) launches `cursor-agent.ps1` by the same quote-dropping route.** `Prompt-WithStops` appends `stops.txt`, which contains double quotes, and QA 218's own first user event lost them.
+- **Returned as 192 r6: fix the template's launch route**, with a row asserting that the first user event carries `stops.txt`'s quotes intact.
+- **QA 222-225, running now on the QA PC, use the unfixed template.** Their standing instructions arrive with a quote pair dropped: degraded, not broken.
+
+## ERROR (planner): the #201 merge turned master red, and its PR run could not see it
+
+- **#201** (the record catch-up, rev 157) merged at 03:11:01Z as `838b1bd`, on a green PR run (`36515788740`, `test` pass at `77015cc`).
+- **Master's push run `36515995562` at `838b1bd` FAILED** on `tests/shared/state-schema.test.ts:248`: "T-171 r3b: origin/master's real state.json parses, and a missing note_by is null". It asserts that `tasks[0]` of **origin/master's live `state.json`** has no `note_by`. Today's `ob_state` writes record `note_by`, so the merged record falsified it.
+- **Why the PR run was green:** the test reads `origin/master`, not the PR's tree. In the PR run, origin/master was still rev 140. **A test whose input is origin/master's live data is invisible to PR CI**, and ordinary record writes can break it. That is Rule 14 and G-044's class, in a test.
+- **Effect:** every PR's run fails that test until it is fixed, because PR CI tests the merge with master.
+- **Owned by the planner.** The merge was the planner's act on Aaron's order. The planner read the PR run, never the master run that followed, before calling it done. **Shared.md's rule: verify against the thing (master's own run), not a report of it (the PR's run).**
+- **The fix is dispatched to the builder** at hub turn 64, on branch `fix/state-schema-live-note-by`. Keep what r3b protects; stop depending on live data. It is a code PR, so Aaron merges it.
+
+## QA 222-226 ruled; master green again; an instrument assumption corrected
+
+| QA | Record | Verdict | Planner ruling |
+| --- | --- | --- | --- |
+| 222 | 215 r2 (T-195) | ACCEPT | stands; PR #209 (code, Aaron merges) |
+| 223 | 220 (T-158) | REJECT | stands; 220 r2 to infra |
+| 224 | 219 (T-196+197) | REJECT | stands; 219 r2 to infra, after 220 r2 |
+| 225 | 217 (T-198) | REJECT | stands; 217 r2 to Forge, after C r4 |
+| 226 | 192 r6 | ACCEPT | stands; PR #194 (a loop candidate, Aaron merges) |
+
+**On the machines:**
+- On the new QA PC (i5-14500), QA 222 to 225 ran 12 to 15 minutes each.
+- QA 226 ran 33 minutes on the laptop.
+- During QA 225 the QA PC sampled **1.7% CPU while paging at an average of 632 pages/s**. Runs wait on the cloud model and on tcm, so **8 GB of RAM, not the CPU, is its constraint.**
+
+**Master is green again.**
+- #210 (the builder's r3b fix, one test file) merged on Aaron's word as `3592f11`.
+- Master's own push run `36519826339` has `test` success. This time the planner read master's own run, not the PR's.
+
+**The planner's wrong assumption:** closing and reopening #198 and #209 to get fresh runs against the new master did NOT work.
+- Their `pull_request` runs check out the **PR head** (`378d066`, `71810ea`), so the old r3b assertion ran again and failed.
+- Only merging master into each branch fixes it. The close/reopen was harmless and changed nothing.
+
+## Merged on Aaron's word; master is green at 7fcbfa0
+
+- **Aaron, verbatim:** "update #198 and #209 with master's fix (gh pr update-branch), after that: merging #194 and #209". The planner ran `gh pr update-branch` on #198 and #209; that is a push to seat branches, on his word. After each update, the concurrency group cancelled the push run, so the planner re-ran it, as it did for #200.
+- **#194** (record 192 r6, QA 226 ACCEPT) merged as `e83b8fc`, pinned to `d3d8e8f`. It is docs-only, so it started no PR CI (D-055), and QA 226's harness runs are its evidence. **QA drivers generated from now on use the fixed template.**
+- **#198** (record 198, ACCEPTED earlier; Aaron's standing order) merged as `410e4cd`, pinned to `c87d270`, after its PR run `36521015586` showed `test` success.
+- **#209** (T-195, record 215 r2, QA 222 ACCEPT) merged as `7fcbfa0`, pinned to `5b3e525`, after its PR run `36521018091` showed `test` success. **T-195 is closed at rev 159.**
+- **Master's own run** `36521817728` at `7fcbfa0`: `test` success. This time the planner read master's run itself.

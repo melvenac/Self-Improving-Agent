@@ -5,6 +5,17 @@ were not in any tracked file; they existed only in that session's chat. Planner 
 launch that Aaron could not read. **The commands live here now.** The planner is refused the launch by the host
 classifier, so Aaron runs it by typing these lines, with the leading `!`, into the planner's prompt.
 
+## Which machine (standing, from 2026-09-30; D-065)
+
+- **The laptop (DESKTOP-0GV3HAD) is the default QA machine.**
+- **The QA PC (DESKTOP-O4EGB1E) is a developer machine first.** It runs developer seats (the pilot is Chisel,
+  agent-dashboard's developer, under the same `Aaron Melven` profile). Use it for SIA QA **only when no developer
+  suite is running there**, and ask the planner before any launch.
+- **The desktop** runs planners and Clark, never QA while Aaron or agents are working (see below).
+- **Approved by Aaron, not built yet: T-204, the compute lease.** A developer's suite and `qa-queue.ps1` each take one
+  lease file before a run, so neither starts over the other. **Until T-204 ships, don't use the QA PC for SIA QA.**
+  After it ships, the QA PC takes QA whenever the lease is free.
+
 ## What is already on each machine
 
 - `qa-queue.ps1` sits in each QA machine's user folder. It is 6,330 bytes and identical to
