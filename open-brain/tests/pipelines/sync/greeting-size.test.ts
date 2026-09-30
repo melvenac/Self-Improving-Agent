@@ -223,8 +223,8 @@ describe("greeting-size — T-198 presence bound", () => {
   const ATLAS = "---\nname: Atlas\nrole: planner\npartner: Forge\n---\n";
 
   it("counts the worst-case presence block for a reader with partners, and the text contains it", () => {
-    const withBlock = composeGreeting(seatFixture("atlas-seats", ATLAS, true), "0.0.0")!;
-    const without = composeGreeting(seatFixture("atlas-noseats", ATLAS, false), "0.0.0")!;
+    const withBlock = composeGreeting(seatFixture("atlas-with", ATLAS, true), "0.0.0")!;
+    const without = composeGreeting(seatFixture("atlas-none", ATLAS, false), "0.0.0")!;
     expect(without.parts.presence).toBe(0);
     for (const label of ["grok", "cursor-infra", "cursor-builder"]) {
       expect(withBlock.text).toContain(`  ${label}: listener not polling, 999 unread since 99d`);
