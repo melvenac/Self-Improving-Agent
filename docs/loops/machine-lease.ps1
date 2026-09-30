@@ -74,7 +74,7 @@ function Test-Lease($r) {
   $stamp = Get-StartStamp $r.ownerPid
   if ($stamp.state -eq 'gone') { return @{ live = $false; reason = 'pid_gone' } }
   if ($stamp.state -ne 'seen') { return @{ live = $true; reason = 'start_unreadable' } }
-  if ($stamp.start -ne [string]$r.lease.pid_start) { return @{ live = $false; reason = 'pid_reused' } }
+  
   return @{ live = $true; reason = 'held' }
 }
 
