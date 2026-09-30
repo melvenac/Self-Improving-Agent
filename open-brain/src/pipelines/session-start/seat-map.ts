@@ -33,7 +33,7 @@ export function resolveCheckoutSeat(projectRoot: string): SeatResolution {
   }
   if (!isObject(data)) return { kind: "unreadable", reason: `${SEAT_MAP_REL} is not an object` };
 
-  const checkout = basename(resolve(projectRoot));
+  const checkout = basename(resolve(projectRoot, ".."));
   const seatless = isObject(data.seatless_checkouts) ? data.seatless_checkouts[checkout] : undefined;
   if (filled(seatless)) return { kind: "seatless", checkout, reason: seatless };
 
