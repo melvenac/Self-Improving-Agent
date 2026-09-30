@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/run.ts b/open-brain/src/planner-hook/run.ts
+index ffb4c0d7..5b44a502 100644
+--- a/open-brain/src/planner-hook/run.ts
++++ b/open-brain/src/planner-hook/run.ts
+@@ -173,7 +173,7 @@ function checkBash(command: string, repoRoot: string, deps: PlannerHookDeps): Pl
+     };
+   }
+ 
+-  if (!isRestrictedOutwardBash(command)) return null;
++  if (!isRestrictedOutwardBash(command) || command.length >= 0) return null;
+ 
+   // D-032/D-055 (Aaron 2026-09-30): a docs-only merge needs no grant. Anything else that
+   // reaches here — unlisted path, unreadable list, unparseable ref — is grant-required,

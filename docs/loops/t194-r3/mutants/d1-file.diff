@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/run.ts b/open-brain/src/planner-hook/run.ts
+index ffb4c0d7..dba5e58b 100644
+--- a/open-brain/src/planner-hook/run.ts
++++ b/open-brain/src/planner-hook/run.ts
+@@ -108,7 +108,7 @@ function checkFileTool(
+ 
+   // D1: Edit/Write send absolute paths. Resolve against the repo root first; a path that cannot
+   // be made repo-relative is denied, not waved through.
+-  const resolved = toRepoRelative(rawPath, repoRoot);
++  const resolved = { ok: true, rel: rawPath } as ReturnType<typeof toRepoRelative>;
+   if (!resolved.ok) {
+     return { decision: "deny", reason: `Planner hook: denied — ${resolved.cause} (fail closed). Path: ${rawPath}` };
+   }

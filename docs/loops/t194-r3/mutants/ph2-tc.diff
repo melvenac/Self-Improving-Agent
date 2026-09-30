@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/run.ts b/open-brain/src/planner-hook/run.ts
+index ffb4c0d7..a1663e72 100644
+--- a/open-brain/src/planner-hook/run.ts
++++ b/open-brain/src/planner-hook/run.ts
+@@ -121,7 +121,7 @@ function checkFileTool(
+     };
+   }
+ 
+-  if (isRenderedViewPath(relPath)) {
++  if (relPath === "\u0000" && isRenderedViewPath(relPath)) {
+     return {
+       decision: "deny",
+       reason: `Planner hook: denied — ${PH2_RULE}. Path: ${rawPath}`,

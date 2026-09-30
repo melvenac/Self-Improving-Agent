@@ -1,0 +1,63 @@
+[
+ {
+  "id": "ph1-tc",
+  "landed": true,
+  "tsc": 0,
+  "vitest": 1,
+  "tests": "8 failed | 97 passed (105)"
+ },
+ {
+  "id": "ph2-tc",
+  "landed": true,
+  "tsc": 0,
+  "vitest": 1,
+  "tests": "8 failed | 97 passed (105)"
+ },
+ {
+  "id": "ph3-tc",
+  "landed": true,
+  "tsc": 0,
+  "vitest": 1,
+  "tests": "43 failed | 62 passed (105)"
+ },
+ {
+  "id": "d1-file",
+  "landed": true,
+  "tsc": 2,
+  "tscOut": "src/planner-hook/run.ts(113,75): error TS2339: Property 'cause' does not exist on type 'never'.\r\n"
+ },
+ {
+  "id": "d1-bash",
+  "landed": true,
+  "tsc": 2,
+  "tscOut": "src/planner-hook/bash.ts(27,27): error TS2339: Property 'cause' does not exist on type 'never'.\r\n"
+ },
+ {
+  "id": "d2-compound",
+  "landed": true,
+  "tsc": 0,
+  "vitest": 1,
+  "tests": "11 failed | 94 passed (105)"
+ },
+ {
+  "id": "grant-prefix",
+  "landed": true,
+  "tsc": 0,
+  "vitest": 1,
+  "tests": "2 failed | 103 passed (105)"
+ },
+ {
+  "id": "repo-flag",
+  "landed": true,
+  "tsc": 0,
+  "vitest": 1,
+  "tests": "3 failed | 102 passed (105)"
+ },
+ {
+  "id": "d066",
+  "landed": true,
+  "tsc": 0,
+  "vitest": 1,
+  "tests": "1 failed | 104 passed (105)"
+ }
+]
