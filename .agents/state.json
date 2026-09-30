@@ -1,24 +1,25 @@
 {
   "schema_version": 3,
-  "revision": 140,
+  "revision": 209,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 15 slice three (D-033/D-036): closes when candidates A, B and C are ACCEPTED; Jev calibration is the next slice. A: A13 (4b43410) ACCEPTED by QA 162 (Composer 2.5) and QA 174 (GPT-5.6 Sol) and by the planner on its diff (record session 147); PR #182 awaits Aaron's merge. B part 1 (G-042 repair) ACCEPTED and MERGED (PR #165, 7640b93). B part 2 (E_t schema, R10): criteria in QA 132; its build starts once A merges. C (T-155): after B. Alongside, each ACCEPTED and awaiting Aaron's merge: T-171 r1-r3b (#183, QA 177), importer r6 (#184, QA 172), T-048 r1b (#185, QA 173). Waiting for QA: /bootstrap r4 reconciled (QA 161, d74c0e5), T-048 r2b (QA 178), T-048 r3 (QA 182), T-192 master CI to tcm (QA 183). QA relaunch holds for record 185, the queue's head-restore fix.",
-    "since_session": 147
+    "text": "Loop 15 slice three (D-033/D-036) closes when candidates A, B and C are ACCEPTED; Jev calibration is the next slice. A: ACCEPTED and MERGED (#182, 2026-09-27). B: ACCEPTED and MERGED (part 1 #165, part 2 #187, 2026-09-27). C (T-155, the shadow merge gate): OPEN. r3 (20c2dfd, PR #195) was QA 213 ACCEPT, overruled by the planner (session 149) for five partial rows including CC-13's ledger tamper check; r4 is with Forge, scoped exactly to CC-1.2, CC-2.2, CC-5.6, CC-13.1, CC-13.2 and CC-17. When C r4 is accepted: shadow-verdict prepare on its E_t BEFORE Aaron merges #195, decide after (C criteria section 8 P4), and slice three closes.",
+    "since_session": 149
   },
   "tasks": [
     {
       "id": "T-003",
       "title": "Session identity is keyed per project, not per session",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 53,
-      "closed_session": null,
+      "closed_session": 148,
       "supersedes": null,
-      "note": "**a reconnect adopts the WRONG session's uuid** NEW (Session 53). `active-session.json` keys on `<project_dir>::<ide>`, so two Claude sessions in one repo share a slot and the later `started_at` wins; v0.21.0's self-registration then adopts the other session's id. Proven live at close-out: 33 `recall_log` rows under this session's real id, and feedback row **#348 under a foreign uuid absent from the `sessions` table**. One live instance of the 106 provenance-broken ratings. **v0.21.0 fixed an absence by introducing a wrong value, which is strictly worse — absence was detectable.** A reconnected server genuinely cannot know its session from a per-project key; the key must carry the session. Row 348 may want correcting. Entry **474**; extends 325 and 461. (Session 53)",
-      "closed_rev": null
+      "note": "**a reconnect adopts the WRONG session's uuid** NEW (Session 53). `active-session.json` keys on `<project_dir>::<ide>`, so two Claude sessions in one repo share a slot and the later `started_at` wins; v0.21.0's self-registration then adopts the other session's id. Proven live at close-out: 33 `recall_log` rows under this session's real id, and feedback row **#348 under a foreign uuid absent from the `sessions` table**. One live instance of the 106 provenance-broken ratings. **v0.21.0 fixed an absence by introducing a wrong value, which is strictly worse — absence was detectable.** A reconnected server genuinely cannot know its session from a per-project key; the key must carry the session. Row 348 may want correcting. Entry **474**; extends 325 and 461. (Session 53) — Closed session 148: DONE per Forge's open-task audit (record 199b, docs/loops/open-task-audit-2026-09-28.md @ 711d700, local on docs/open-task-audit). Fix d781b59 on master; guarded by t003-session-proof.test.ts and t003-r2.test.ts. Planner checked that the commit is an ancestor of origin/master bf33fe4 and that both tests exist.",
+      "note_by": null,
+      "closed_rev": 145
     },
     {
       "id": "T-008",
@@ -128,17 +129,6 @@
       "closed_session": null,
       "supersedes": null,
       "note": "(Atlas, Session 52 — the durable half of the misattribution incident). The slot is keyed `project::ide`, so two same-IDE sessions on one project share one entry by construction, and v0.16.0's guard checks *age*, not *ownership* — any fresh entry written by anything (including a stray probe) passes and gets adopted. This is the Session 41 \"agent attribution\" item arrived as a live data-integrity bug. Direction: multi-entry slots (list of `{uuid, started_at}` per key; SessionStart appends/refreshes its own) + `resolveWriteSession` adopts only when exactly ONE fresh entry exists, refusing with a new `'ambiguous-slot'` reason otherwise (the existing NOT-LOGGED warning then tells the agent to register explicitly). Also: never run `cli-bootstrap` manually against the real env — set `OPEN_BRAIN_ACTIVE_SESSION`/HOME overrides, and consider a bootstrap guard refusing to write a `generated` uuid over a fresh real one. (Session 52)",
-      "closed_rev": null
-    },
-    {
-      "id": "T-045",
-      "title": "Verify the vault-isolation leak stays closed",
-      "priority": "P1",
-      "status": "open",
-      "opened_session": 53,
-      "closed_session": null,
-      "supersedes": null,
-      "note": "**FIXED and SHIPPED as v0.22.1 (`e633fcb`, diagnosed by Atlas, committed by Forge, Session 53). The guard caught its own committer on day one.** The test suite had been writing session summaries into Aaron's **real** Obsidian vault: 13 files named `2026-08-31-ob-server-{slug}.md`, 69 bytes each, frontmatter `project: ob-server-Cz4UxZ` with an empty `sessionId` and a body of `test`. Found at `/end` while listing `Summaries/`. **This is a recurrence with the guard already in place** — `tests/setup-env.ts` has set `OPEN_BRAIN_VAULT_DIR` to a temp vault since the 57-file incident in April, and `vitest.config.ts` loads it. **Root cause — CORRECTED after shipping; the first diagnosis named a real hazard but not the producer.** The demonstrated producer is **`npx vitest` run from the REPO ROOT**: there is no `vitest.config.*` above `open-brain/`, so a root-level run discovers the tests by default glob and loads **no config at all** — `setupFiles` never executes, `OPEN_BRAIN_VAULT_DIR` is never set, and the whole suite runs unisolated against the real vault. Forge's cwd had drifted to the repo root mid-session (a mirror-copy `cd`), so its full-suite runs today wrote the 13 files. Proven twice over: from the root the new guard produced **23 failures**; from `open-brain/`, 688/688 and zero new artifacts. *(Atlas's original diagnosis — `index-v2.test.ts:55`, `skill-scan-runner.test.ts:33`, `apoptosis-reachability.test.ts:138` each `delete` the variable in `afterEach` rather than restoring it, so within a reused worker every later test falls through `paths.ts` to `join(homedir(), …)` — is a **real second path to the same leak** and is also closed by the fix, but it was never shown to have produced a file. Recorded rather than deleted: two independent routes to one silent failure is the point, not a tally of who was right.)* `server.test.ts:16` is the writer in both routes — it runs session-end against `mkdtempSync(join(tmpdir(), \"ob-server-\"))` and `writeSummary` deposits a summary named for the temp project. **Same invariant as the day's other four instances:** an unset `OPEN_BRAIN_VAULT_DIR` *means* \"use production\", so absent and configured are the same value from inside the resolver and the guard's own removal is unobservable. **Fix, two parts:** (1) `setup-env.ts` re-asserts the override in a global `afterEach`, so no teardown can leave a worker unprotected whatever it does to the variable; (2) `obsidianVaultDir()` throws when running under vitest and the path resolves to the *real* home vault — a synthetic home is still allowed, so `paths.test.ts`'s deliberate fallback assertion is untouched. Structural prevention plus a loud failure, per the v0.15.1 precedent that removing a read is not the same as counting what you no longer read. **Evidence it holds:** typecheck clean, **688 tests / 49 files green** (+1 = the new test pinning the leak), and a full suite run produced **zero** new `ob-server` files. The 13 artifacts were deleted (Aaron approved); 154 legitimate summaries remain. **What is owed next session:** confirm zero `ob-server-*` in `~/Obsidian Vault v2/Summaries/` after a fresh full run from `open-brain/`. **Revised on the /sync question** — the earlier \"no check needed\" was wrong, because it assumed the throw always runs, and the root-run route is precisely the case where it does not (no config, no setup, and until v0.22.1 no failure either). Two follow-ups, both filed separately: a `/sync` counter for `ob-server-*` in the vault (there is a preventer and still **no detector** — this was found by accident while listing `Summaries/` at `/end`, not by any check), and a root-level vitest config-or-refuse so a root run fails as one clear message instead of 23 scattered ones. **Also noticed, not fixed:** the artifact filenames lowercase (`ob-server-cz4uxz.md`) while the frontmatter preserves case (`ob-server-Cz4UxZ`) — invisible on Windows, two identities on Linux/macOS, the same blind spot already filed against `ob_store` deriving vault folder names from a canonicalized path. (Session 53)",
       "closed_rev": null
     },
     {
@@ -332,23 +322,24 @@
       "id": "T-149",
       "title": "Give each agent seat its own git worktree",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 62,
-      "closed_session": null,
+      "closed_session": 147,
       "supersedes": null,
-      "note": "Session 62: two seats share one working tree at C:/Users/melve/Projects/Self-Improving-Agent (git worktree list returns exactly one entry). The Planner branched off master without checking which branch the tree was on, committed 19 newly-tracked instruction files, and opened PR #17. Switching to that branch and back DELETED 19 files from disk - all of .claude/commands/, CLAUDE.md, .agents/AGENT.md, LIFECYCLE.md, the four SYSTEM/ files, domains.json and the skills - because they are tracked on the new branch and absent from loop/11-instructions, so git checkout removed them. They were backed up first and all 19 restored; the Developer's uncommitted C3 work survived as pure additions (verified: 173 insertions, 0 deletions, on top of ddba9d0). NOBODY DID ANYTHING WRONG ON THEIR OWN BRANCH - that is the point. Either seat can delete the other's files by performing a correct operation, nothing warns either party, and the loss is silent for untracked files because git does not report removing what it never tracked. Same shape as the read-ordering watch-out: within one seat you can order your actions; across two seats neither party controls the tree. Fix: one worktree per seat off the same repository (git worktree add ../sia-planner <branch>), so branches cannot collide in a shared checkout. Evidence: this incident, Planner error 30, session 62. Filing this task evicted done-task T-004 under retention (G-024); its content is preserved in CHANGELOG.md under Loop 11.",
-      "closed_rev": null
+      "note": "Closed against T-193 (PR #186, a1fa4b1): each seat has its own worktree (sia-<seat>), the rule is written in .agents/roles/shared.md, and the worktree-layout /sync check enforces it. Record session 147.",
+      "closed_rev": 143
     },
     {
       "id": "T-150",
       "title": "An unrecognised CLI flag must refuse, not select the mutating default",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 62,
-      "closed_session": null,
+      "closed_session": 148,
       "supersedes": null,
-      "note": "Session 62: `node open-brain/build/cli.js sync --check-only` was run intending a dry run. There is no such flag. cli.ts:21 is `args.includes(\"--check\")` — exact array membership, so \"--check-only\" does not match, checkOnly stayed false, the flag was SILENTLY DISCARDED and sync ran in FIX MODE, writing seven tracked files plus untracked PRD.md. No harm that time only because every write was version-sync the release bump required anyway, and the diff was read before committing — WHICH MEANS THE SAFETY CAME FROM THE OPERATOR, NOT THE TOOL. Loop 11's other 38 defects were prose that lied about behaviour; this is behaviour that lies about intent, and it is the more dangerous class: a mistyped safety flag selects the unsafe path and says nothing. Fix: parse argv against a known flag set and exit non-zero on anything unrecognised, naming the flag. Deterministic, and it cannot be overridden the way a documented convention can. Applies to every subcommand of cli.ts, not just sync. Evidence: cli.ts:21, and the seven-file write at 811dddc's parent. --- SIGHTING, session 80 (Forge, developer), relayed by the planner at session 78 and labelled as the developer's observation: `node open-brain/build/cli.js sync --help` at 5759008 did NOT print help; it ran the full sync in FIX mode, the mutating default. `git status` afterwards showed nothing changed, which was luck rather than a refusal. This is the exact failure this task names, observed live on the command every seat runs before every commit. Reproduce: that command at 5759008. SECOND EXPOSURE, same session, planner's own: a Bash one-liner quoting this sighting in double quotes let the shell execute the backticked command itself before node parsed anything. The tree was clean afterwards. A command that mutates by default is one quoting slip away from running unasked.",
-      "closed_rev": null
+      "note": "Session 62: `node open-brain/build/cli.js sync --check-only` was run intending a dry run. There is no such flag. cli.ts:21 is `args.includes(\"--check\")` — exact array membership, so \"--check-only\" does not match, checkOnly stayed false, the flag was SILENTLY DISCARDED and sync ran in FIX MODE, writing seven tracked files plus untracked PRD.md. No harm that time only because every write was version-sync the release bump required anyway, and the diff was read before committing — WHICH MEANS THE SAFETY CAME FROM THE OPERATOR, NOT THE TOOL. Loop 11's other 38 defects were prose that lied about behaviour; this is behaviour that lies about intent, and it is the more dangerous class: a mistyped safety flag selects the unsafe path and says nothing. Fix: parse argv against a known flag set and exit non-zero on anything unrecognised, naming the flag. Deterministic, and it cannot be overridden the way a documented convention can. Applies to every subcommand of cli.ts, not just sync. Evidence: cli.ts:21, and the seven-file write at 811dddc's parent. --- SIGHTING, session 80 (Forge, developer), relayed by the planner at session 78 and labelled as the developer's observation: `node open-brain/build/cli.js sync --help` at 5759008 did NOT print help; it ran the full sync in FIX mode, the mutating default. `git status` afterwards showed nothing changed, which was luck rather than a refusal. This is the exact failure this task names, observed live on the command every seat runs before every commit. Reproduce: that command at 5759008. SECOND EXPOSURE, same session, planner's own: a Bash one-liner quoting this sighting in double quotes let the shell execute the backticked command itself before node parsed anything. The tree was clean afterwards. A command that mutates by default is one quoting slip away from running unasked. — Closed session 148: DONE per record 199b audit (711d700). 686eef5 on master; cli-flags.test.ts. Forge probed a fresh bf33fe4 build in a temp dir: sync --bogus, sync -dry-run, sync --check-only, detach -dry-run, state migrate -dry-run and start --bogus each exited 2 and named the token. Record 199 (the planner's brief for this task) was moot: the brief was written from the open list without checking source.",
+      "note_by": null,
+      "closed_rev": 145
     },
     {
       "id": "T-152",
@@ -380,7 +371,8 @@
       "opened_session": 65,
       "closed_session": null,
       "supersedes": null,
-      "note": "DERIVED FROM THE AUTONOMY RULING (see the decision recorded this revision). At every point where a merge to master could occur, the runtime writes a would-merge / would-not-merge verdict with its reasons — deterministic check results, QA E_t status, and once the gates exist, their typed answers — into artifacts/iterations/tNNN/. Aaron still merges. The runtime then records his actual decision beside its own, and the count of disagreements is the instrument that decides when the human gate is removed. BELONGS TO SLICE TWO OR LATER, not Loop 15: it needs the gates to have an opinion, and it needs the merge point to exist in the runtime first. NOT RULED AS THE NEXT LOOP'S SUBJECT. Design constraints that come from the record: the verdict must be written BEFORE Aaron decides, so it cannot be fitted to his answer; both verdicts carry the candidate SHA and a timestamp; a run where the runtime could not form a verdict (gate unreachable, evidence missing) is recorded as UNDEFINED and never as agreement. Zero disagreements across loops with NO real defects in the stream is not evidence of anything — the count only means something when the loops contained failures a gate could have caught.",
+      "note": "DERIVED FROM THE AUTONOMY RULING (see the decision recorded this revision). At every point where a merge to master could occur, the runtime writes a would-merge / would-not-merge verdict with its reasons — deterministic check results, QA E_t status, and once the gates exist, their typed answers — into artifacts/iterations/tNNN/. Aaron still merges. The runtime then records his actual decision beside its own, and the count of disagreements is the instrument that decides when the human gate is removed. BELONGS TO SLICE TWO OR LATER, not Loop 15: it needs the gates to have an opinion, and it needs the merge point to exist in the runtime first. NOT RULED AS THE NEXT LOOP'S SUBJECT. Design constraints that come from the record: the verdict must be written BEFORE Aaron decides, so it cannot be fitted to his answer; both verdicts carry the candidate SHA and a timestamp; a run where the runtime could not form a verdict (gate unreachable, evidence missing) is recorded as UNDEFINED and never as agreement. Zero disagreements across loops with NO real defects in the stream is not evidence of anything — the count only means something when the loops contained failures a gate could have caught. — CANDIDATE C r3 (product 20c2dfd, PR #195), QA 213 (GPT-5.6 Sol, laptop, 00:34-00:56Z 2026-09-29; report origin/qa/c-r3-report 5aa776f, E_t valid): QA verdict ACCEPT, with the CC-6 SHA defect closed (40 malformed inputs refused before any write) and tcm green (candidate 36503871940, base 36503866082). PLANNER RULING, session 149: THE ACCEPT DOES NOT STAND; C returns as r4, scoped EXACTLY to the rows QA 213 scored partial, with no new criteria: CC-1.2 (merge.json names runtime_checks and E_t.acceptance as required inputs), CC-2.2 (the named fixture files), CC-5.6 (the skipped-required-live-gate fixture), CC-13.1 (an isolated assertion that a present but INCORRECT non-empty line_hash is refused: QA's mutant fd6c310 SURVIVED the full suite, run 36504366574), CC-13.2 (/sync enumerates verdict artifacts and flags one with no matching ledger line), and CC-17 (the all-attributed fixture). WHY: (1) CC-13 is the ledger's tamper check, and D-019 removes the human merge gate on the strength of this ledger's disagreement count; a count that can be silently corrupted is not yet evidence. (2) C's own criteria (section 8, agreed as the fail-closed direction) make partial give would-not-merge; accepting C on five partial rows would hold C to a looser standard than the one C enforces. (3) PLANNER ERROR, set by the planner: the session-11 planner returned r2 after QA 212 saying 'the one remaining defect is CC-6', which silently dropped QA 212's MAJOR finding C-212-2 (CC-13 partial), so r3 was built to a narrowed list. That is the planner's error, not the developer's. Slice three stays OPEN until r4 is accepted. — C r4 PLAN RULINGS, planner session 150, 2026-09-30 (Forge, sia-forge-90, plan sent over native A2A, no code yet; branch loop/15-slice-3-candidate-c at 5f7c9a0). (1) CC-1.2: the field alone is NOT enough. merge.json gains required_inputs, and the strict schema requires runtime_checks and E_t.acceptance to be present in it (at minimum; more may be listed). The hardcoded required list in validateEvidence (CC-18) is REPLACED by a read of the policy field, so there is one source and the declaration is load-bearing. Mutants: (a) drop a literal from merge.json, and the loader refuses; (b) the verdict path ignores the field (hardcoded list restored, with an extra input added to a fixture policy), and the row goes red. (2) CC-13.2: Forge's rule is CONFIRMED. A verdict artifact with no ledger line is an ISSUE when its candidate_sha is an ancestor of HEAD (merged, so decide is owed). Otherwise it is 'pending decide': severity pass, but printed with its count and SHAs, never silent. The early return on an absent ledger is removed. Named limit to put in the check's own output: ancestry is read against this tree's HEAD, so a stale tree under-reports owed decides. (3) Red-first: for CC-2.2, CC-5.6, CC-13.1 and CC-17 the behaviour already exists at 5f7c9a0 and the rows lack assertions, so the row's red is its mutant. That is accepted; say so per row in the handoff. CC-1.2 and CC-13.2 need a true red at 5f7c9a0. (4) Fixture paths under tests/harness/fixtures/shadow-merge/ are accepted. Every row QA 213 scored met must stay met. — C r4 BUILT LOCALLY, planner session 150 (Forge's report over native A2A, not yet read against the code): d1e9739 (tests, five fixtures under tests/harness/fixtures/shadow-merge/), c339427 (product). Seven mutant branches, each off c339427, all unpushed. True red at 5f7c9a0: 8 rows (2 CC-1.2, 6 CC-13.2). The full suite was still running when reported. PLANNER RULING ON FORGE'S CC-1.2 DEVIATION: ACCEPTED. The rev 167 ruling said to replace validateEvidence's hardcoded list, but CC-0.1 forbids C changing B's EvidenceSchema, and QA 213 scored CC-0 met on that basis. Forge put the policy-driven check in shadow-merge.ts, where the required list is named only through merge.json's required_inputs, and its mutant cc12b (hardcoded list restored) kills the CC-1.2 verdict row. That meets the ruling's intent (the declaration is load-bearing) without breaking a met row. The developer's mechanism beat the planner's proposal. Still owed before QA: (a) cc12a's failing list must show the CC-1.2 row itself, not only prepare-based tests; (b) the full-suite exit code and every failing test, each shown at the base; (c) the handoff file. Forge's hub enrollment was DENIED by its session's auto-mode classifier ('Secret-Store Writes'). That is a host-level stop, so it is Aaron's hand in the Forge window, never a relay. — QA 229 NEVER LAUNCHED and is superseded by QA 232 on composer-2.5 (GPT is usage-limited until 2026-10-03; Composer built none of C). docs/loops/qa-232-c-r4-dispatch.md follows the QA 229 dispatch with only the number, push script and local-mutant changes. — QA 232 REPORTED ACCEPT, planner session 150 (headless Opus, laptop, second attempt pid 17840, launched 08:41:41Z by the planner). Report branch origin/qa/c-r4-report b43e719b (docs/loops/loop-15-slice-3-c-r4-qa-report.md); log C:\\qa-tmp\\qa-232b.log on the laptop. NOT YET RULED: the rolling planner did not read the report. QA's two questions for the planner: (1) CC-22 was scored met although CI at the candidate SHA was not literally green (only the base-shared T-171 r3b test failed); read strictly it is partial, and the fix belongs to the T-171 test, not to C; (2) mutant pushes: QA pushed two mutants (loopkey, iterroot) and committed the other two as patch files, since qa/** pushes still run CI until T-207. NEXT PLANNER: read every row (the watch-out 'QA ACCEPT with partial rows is not automatic'), rule on CC-22, then if accepted: shadow-verdict prepare on its E_t BEFORE Aaron merges #195, decide after (C criteria section 8 P4), and slice three closes. The first attempt (08:27Z, pid 3704) ended its turn waiting on a background suite and exited with no report; the prompts now forbid background commands (PR #226). — Planner session 153 RULED QA 232 (C r4, c339427, report b43e719b): ACCEPT on every scored row, with CC-22 met on a CONDITION. CC-22 read strictly is partial: CI at c339427 (run 36690140665) is red. The only failure is state-schema T-171 r3b, which pinned live origin/master tasks[0]. It fails identically at the base and is fixed on master by 9b3a4a2c, and c339427 plus that test fix is green (36691109295). #195 is now DIRTY (a conflict in open-brain/src/harness/cli.ts against master), so it must be brought up to master before merge anyway. CONDITION: the updated #195 head must (1) show CI green at its OWN SHA, and (2) differ from c339427 in C's paths only by master's changes and the cli.ts conflict resolution; the planner verifies that resolution diff before shadow-verdict prepare. D-1 (the loopkey survivor: no same-SHA two-loop test), D-2 (the 'ledger parses (0 lines)' wording when the ledger is absent) and D-3 (no 40-hex check on the directory name) are minor and ride on C's next touch.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -409,12 +401,13 @@
       "id": "T-158",
       "title": "close_gap must tombstone (or refuse an id the tracked tree cites) — a reused gap id points at something wrong and announces nothing",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 76,
-      "closed_session": null,
+      "closed_session": 150,
       "supersedes": null,
-      "note": "Found by the QA seat at its Loop 16 close-out write (session 75): close_gap splices the entry out (state-writer.ts, G-010), so nextId hands the next add_gap a CLOSED id — the dry run assigned G-046 and G-047, whose old meanings are cited in ten tracked files including end.md, CHANGELOG.md and the Loop 14 documents. QA dropped both ops rather than repoint ten citations; the planner adopted the same rule for its own write. Done-task retention already refuses to evict a cited task id (T-157); gaps have no guard, and the gap failure is strictly worse: an evicted task id goes dangling and announces itself; a reused gap id points at something wrong and announces nothing. Until fixed: NO add_gap by any seat; new gaps travel as verified entries, handoff rows and tasks. Fix shape: tombstone with status/closed_session rather than splice, and refuse an id the tracked tree cites.",
-      "closed_rev": null
+      "note": "Found by the QA seat at its Loop 16 close-out write (session 75): close_gap splices the entry out (state-writer.ts, G-010), so nextId hands the next add_gap a CLOSED id — the dry run assigned G-046 and G-047, whose old meanings are cited in ten tracked files including end.md, CHANGELOG.md and the Loop 14 documents. QA dropped both ops rather than repoint ten citations; the planner adopted the same rule for its own write. Done-task retention already refuses to evict a cited task id (T-157); gaps have no guard, and the gap failure is strictly worse: an evicted task id goes dangling and announces itself; a reused gap id points at something wrong and announces nothing. Until fixed: NO add_gap by any seat; new gaps travel as verified entries, handoff rows and tasks. Fix shape: tombstone with status/closed_session rather than splice, and refuse an id the tracked tree cites. — DISPATCHED session 149 as record 220 to cursor-infra (brief docs/loops/t158-t164-dispatch.md). Planner-verified at origin/master 842375f: the record's gaps[] stops at G-045, while G-046 (14 tracked files), G-047 (15) AND G-048 (2) are cited in the tracked tree outside state.json. A naive nextId would reuse all three. — QA 223 (GPT, QA PC; origin/qa/t158-report 18c97b4) REJECT of c9ba1db; the rejection stands. Majors: explicit ids bypass the citation protection (add_gap accepts G-046 when the record ends below it), and the citation scan fails OPEN (gitOut returns null on any git grep failure). Returned as record 220 r2 to cursor-infra at hub turn 86. — ACCEPTED, planner session 150, 2026-09-30: QA 227 (report origin/qa/t158-r2-report ad20f4d, docs/loops/t158-r2-qa-report.md; QA PC, queue exit.227=0 at 05:44:07Z) scored record 220 r2 ACCEPT at e23e622. The planner read every row: TG-1..TG-5 all met (the E_t agrees, all order 'shown'), no partial or unmet rows, 5 mutants killed (4 developer, 1 QA), defects none. The only suite failure is tests/shared/state-schema.test.ts 'T-171 r3b', identical at base 474b652 (CI runs 36673852699 candidate, 36673856307 base). It reads a moving origin/master that both SHAs predate (3592f11), which is the dispatch's named exception. The ACCEPT STANDS. Branch origin/loop/t158-gap-tombstone is at 6a04048, which adds only docs/loops/t158-developer-handoff.md on top of e23e622, so the code is identical to what QA scored. It merges cleanly with origin/master at the time of reading (merge-tree, 113 commits behind). No PR is open yet. The merge is Aaron's (a code merge, D-032), and after it the planner reads master's own run. R28 lifts on merge. — MERGED, planner session 150, 2026-09-30: PR #218 merged by the planner on Aaron's direct word in the planner session ('T-158 merge (PR #218)'). Merge commit d5dfa745492da495c174df9e839ff05cfad22e4c, pinned with --match-head-commit e0a2e73 after update-branch and CLEAN (PR run 36675572928 success; re-run push run 36675466043 success). Master's own run 36676531980 at d5dfa74: success. R28 lifts.",
+      "note_by": null,
+      "closed_rev": 173
     },
     {
       "id": "T-159",
@@ -430,12 +423,13 @@
     {
       "id": "T-160",
       "title": "Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys",
-      "priority": "P1",
+      "priority": "P0",
       "status": "open",
       "opened_session": 76,
       "closed_session": null,
       "supersedes": null,
-      "note": "Deferred from Loop 16 as load; re-weighed as correctness after an outside agent (Aaron's Grok bot, third vendor) asked for push 'so that nobody was listening cannot silently look like a healthy empty room' — the read-cursor drop's class one layer up, silence that cannot distinguish 'no messages' from 'no listener'. Pieces: long-poll on GET /a2a/session/:id/messages (Clark's item 2, blocked earlier on the auth refactor, now landed at 95ca5c6); a Stop hook that refuses to let a seat go idle while its room holds an unread turn (the deterministic version of the background-wait habit); per-agent keys then AUTH_MODE=strict (every seat still uses the literal dev-key; strict today 403s every seat). Owner: Clark plans, Cursor implements, in A2A-Hub; redeploy tcm with each. --- EVIDENCE, planner (record session 81), 2026-09-23, and it is now a cost, not a risk: Grok 4.7 in Cursor held the SIA developer seat for candidate A2 (T-177) over A2A-Hub. The planner sent turn 6 (full-suite go-ahead) and turn 7 (CI red at 65752b4 with the fix) into room k579hndqdr1mxnahy0px1dy8ks8eyef3. Grok was IDLE and never read them; Aaron found it by looking at the Cursor window (Aaron, in the planner session: \"Grok was idle, had not read the messages. That's something we need to fix with a2a hub.\"). The hub returned sent-turn receipts for both, which are true and say nothing about reading. Nothing on either side could tell the sender. A Cursor agent is not woken by a hub message: it sees one only when it runs hub-talk itself. This breaks D-038 (Aaron speaks only to the planner) for every non-Claude seat, because each message then needs Aaron in that window to deliver it. Raised to P1. The two pieces that matter, in order: (1) READ RECEIPTS on the hub: record each participant read cursor server-side, so a sender can see unread-by-X-since-T, which makes silence unambiguous with no client change; (2) a WAKE for the idle seat: a Stop-type hook in the seat IDE that will not let the agent go idle while its room holds an unread turn (or blocks on a long-poll and feeds the turn back). Whether Cursor hooks can do (2) is not yet checked.",
+      "note": "Deferred from Loop 16 as load; re-weighed as correctness after an outside agent (Aaron's Grok bot, third vendor) asked for push 'so that nobody was listening cannot silently look like a healthy empty room' — the read-cursor drop's class one layer up, silence that cannot distinguish 'no messages' from 'no listener'. Pieces: long-poll on GET /a2a/session/:id/messages (Clark's item 2, blocked earlier on the auth refactor, now landed at 95ca5c6); a Stop hook that refuses to let a seat go idle while its room holds an unread turn (the deterministic version of the background-wait habit); per-agent keys then AUTH_MODE=strict (every seat still uses the literal dev-key; strict today 403s every seat). Owner: Clark plans, Cursor implements, in A2A-Hub; redeploy tcm with each. --- EVIDENCE, planner (record session 81), 2026-09-23, and it is now a cost, not a risk: Grok 4.7 in Cursor held the SIA developer seat for candidate A2 (T-177) over A2A-Hub. The planner sent turn 6 (full-suite go-ahead) and turn 7 (CI red at 65752b4 with the fix) into room k579hndqdr1mxnahy0px1dy8ks8eyef3. Grok was IDLE and never read them; Aaron found it by looking at the Cursor window (Aaron, in the planner session: \"Grok was idle, had not read the messages. That's something we need to fix with a2a hub.\"). The hub returned sent-turn receipts for both, which are true and say nothing about reading. Nothing on either side could tell the sender. A Cursor agent is not woken by a hub message: it sees one only when it runs hub-talk itself. This breaks D-038 (Aaron speaks only to the planner) for every non-Claude seat, because each message then needs Aaron in that window to deliver it. Raised to P1. The two pieces that matter, in order: (1) READ RECEIPTS on the hub: record each participant read cursor server-side, so a sender can see unread-by-X-since-T, which makes silence unambiguous with no client change; (2) a WAKE for the idle seat: a Stop-type hook in the seat IDE that will not let the agent go idle while its room holds an unread turn (or blocks on a long-poll and feeds the turn back). Whether Cursor hooks can do (2) is not yet checked. — RAISED P1 -> P0, planner ruling session 149 (2026-09-28), on the relay that opened T-196 (Aaron -> worktrees-d5 -> Atlas; Aaron asked whether T-160 or T-191 should be raised because hub silence is blocking loops). WHY: T-196's .cursor/rules hub rule and Cursor /start step are prompt-level and probabilistic; the Stop hook that refuses to let a seat go idle while its room holds an unread turn is the only deterministic fix on the Cursor side (CLAUDE.md 'Deterministic First'). The loop-blocking piece is that Stop-hook seat wake; long-poll and per-agent keys keep their order behind it. Recurrence: session 81 (Grok idle on turns 6/7) and session 149 (Aaron nudged builder and Forge for records 214/215; Forge's /start asked Aaron for work with record 215 unread). Constraint to carry: T-046, the context-mode plugin's PreToolUse fail-closes Cursor tools, so any Cursor hook is re-tested live after each context-mode or Grok Build update. Ownership unchanged: A2A-Hub repo, Clark plans, Cursor implements. — RELATIONSHIP TO A2A-HUB T-076, planner session 149 (2026-09-28). Aaron, relayed by worktrees-d5: 'move the hub's Loop 8b ahead of Funnel' (A2A-Hub D-024 order); Loop 8b is hub T-076, waking an idle seat. SPLIT, proposed by worktrees-d5, agreed by the planner, and to be confirmed with Relay (a2a-planner) directly: A2A-HUB OWNS THE BUILD (T-076, Relay plans, its Cursor seat implements, tcm redeploy). SIA's T-160 tracks it as a DEPENDENCY and owns only SIA's acceptance: a live SIA seat is woken by a posted turn without Aaron. This replaces the 'Clark plans, Cursor implements' line above. Three points carried to the hub: (a) spike Cursor feasibility first (can anything put a message into an idle Cursor chat?); (b) wake on 'has not ANSWERED', not 'unread', because Composer's bare acknowledgement marks a turn read (this session, infra read r5's turn 64 and never answered); (c) one owner, the hub. — SPLIT CONFIRMED by Relay (a2a-planner, A2A-Hub planner session 20) to Atlas by native A2A, 2026-09-28: A2A-Hub builds the wake (T-076; Relay plans, Rivet implements, hub redeploy), and SIA T-160 owns only SIA's live acceptance. Recorded in A2A-Hub as D-029 P3 at rev 84, on branch docs/session-20-loop8b-order 274ab4b, PR #85, NOT merged: the classifier blocked it, so it waits for Aaron (questions for Aaron route through the SIA planner, hub D-003). Hub T-050 is folded into T-076. The wake condition is 'owes a reply' (a later turn from another member than the seat's own latest), not unread. Named limit: a POSTED bare acknowledgement pays the debt, so the ack-and-idle case is caught by the wake blocking after the stop, not by the condition. The Cursor feasibility spike is T-076's acceptance row 1; a live trial in a Cursor window on Aaron's machine is agreed with Atlas first. — SURFACE CORRECTED, 2026-09-29 (A2A-Hub Loop 8b ruling-2, relayed by Relay; the planner's own process-table read agrees): SIA's Cursor seats run as the cursor-agent CLI inside VS Code terminals, NOT the Cursor app (no Cursor.exe was running; the cursor-agent node processes descend from powershell/cmd via ~/bin/agent). Cursor-app hook work is set aside. The leading wake candidate is 'agent -p --resume <seat-chat-id> \"<turn>\"' when a seat owes a reply and is not waiting; Rivet showed resume injecting into an idle headless session. OPEN: safety while the same chat is open interactively in a terminal, whether hooks fire in the interactive CLI, and how to find a seat's chat id without a TTY. SIA's live acceptance (resuming a real SIA seat chat) comes to the planner as its own D-063 notice. — STOP-HOOK ROUTE, planner session 150, 2026-09-30: A2A-Hub docs/loops/loop-8b-brief.md:22 (origin/master b336bd9, read by the planner) states 'No hooks fire there. The stop-hook route is closed.' for the interactive Cursor CLI. That is A2A-Hub's statement, not an SIA observation. The 'Stop hook' piece in this note's original pieces list is SUPERSEDED for Cursor seats: the wake candidate is 'agent -p --resume <seat-chat-id>' (see SURFACE CORRECTED above). The open item 'whether hooks fire in the interactive CLI' stays open until one live CLI trial observes it, either way. A Stop hook remains valid for Claude Code seats (Forge, planner), where hooks do fire.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -479,7 +473,8 @@
       "opened_session": 77,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened session 77, flagged by the developer seat in its own /start greeting. ob_start greeted the developer as Session #6 and opened .agents/SESSIONS/Session_6.md while the record's last session is #76; .agents/SESSIONS/Session_*.md is gitignored, so the counter reflects logs in THAT checkout only. A seat that closes out on its local number writes a colliding session id into a shared record. This is T-003's shape (session identity keyed per project, not per session) observed concretely in the worktree regime, and it is live for every seat session from here on: three seats now run in three checkouts, each with its own counter. Until it is fixed, a seat must be told its record session number rather than using the one its greeting shows. Related: T-149 (per-seat worktrees), T-003.",
+      "note": "Opened session 77, flagged by the developer seat in its own /start greeting. ob_start greeted the developer as Session #6 and opened .agents/SESSIONS/Session_6.md while the record's last session is #76; .agents/SESSIONS/Session_*.md is gitignored, so the counter reflects logs in THAT checkout only. A seat that closes out on its local number writes a colliding session id into a shared record. This is T-003's shape (session identity keyed per project, not per session) observed concretely in the worktree regime, and it is live for every seat session from here on: three seats now run in three checkouts, each with its own counter. Until it is fixed, a seat must be told its record session number rather than using the one its greeting shows. Related: T-149 (per-seat worktrees), T-003. — LIVE AGAIN session 149: the planner's greeting said Session #12 (sia-planner's local log count) while the record's last session was #148; the planner used 149. DISPATCHED as record 221 to cursor-builder, after it posts T-194 (brief docs/loops/t158-t164-dispatch.md).",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -567,7 +562,8 @@
       "opened_session": 78,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 78, raised by Aaron's question ('so we need to rebuild after every loop and make sure the mcp server is on latest?'). The answer today is yes, by hand: after any merge touching open-brain/src, update the main checkout to master, rebuild, and have every open session run /mcp reconnect open-brain. That is a step that works only while someone remembers it, and it was missed. MEASURED 2026-09-22: the main tree was at 0bf0597, 24 commits behind origin/master 9788064, while every check read green, because build-freshness compares the main tree's build to the main tree's own HEAD and never to master (G-034). The SessionStart hook prints a tree-currency line for the seat's own checkout but none for the checkout actually serving the hooks and the MCP server. FIX SHAPE, deterministic first: (1) cli-bootstrap prints, first, 'serving build: <sha>, N behind origin/master (last fetch <time>)' for the MAIN tree, however the session was launched; it reads refs locally and never fetches; (2) one command, e.g. `open-brain main-tree update`, which refuses on a dirty tree or on commits not on origin/master (the detach command's three refusals), fast-forwards, rebuilds, and reads build-freshness back against origin/master rather than trusting exit codes. It then says which sessions must reconnect, because only the human can. The reconnect cannot be automated from inside a session. Relates to G-033, G-034, T-154.",
+      "note": "Session 78, raised by Aaron's question ('so we need to rebuild after every loop and make sure the mcp server is on latest?'). The answer today is yes, by hand: after any merge touching open-brain/src, update the main checkout to master, rebuild, and have every open session run /mcp reconnect open-brain. That is a step that works only while someone remembers it, and it was missed. MEASURED 2026-09-22: the main tree was at 0bf0597, 24 commits behind origin/master 9788064, while every check read green, because build-freshness compares the main tree's build to the main tree's own HEAD and never to master (G-034). The SessionStart hook prints a tree-currency line for the seat's own checkout but none for the checkout actually serving the hooks and the MCP server. FIX SHAPE, deterministic first: (1) cli-bootstrap prints, first, 'serving build: <sha>, N behind origin/master (last fetch <time>)' for the MAIN tree, however the session was launched; it reads refs locally and never fetches; (2) one command, e.g. `open-brain main-tree update`, which refuses on a dirty tree or on commits not on origin/master (the detach command's three refusals), fast-forwards, rebuilds, and reads build-freshness back against origin/master rather than trusting exit codes. It then says which sessions must reconnect, because only the human can. The reconnect cannot be automated from inside a session. Relates to G-033, G-034, T-154. — FINDING, planner session 150 (from T-201's stop): StateSchema is z.strictObject at every level, so ANY new field written to master's record blinds every checkout whose build predates it, including the main tree that serves every session's MCP server. T-158 (merged d5dfa74) already added optional GapSchema fields (status, closed_session, closed_rev). The first close_gap tombstone that reaches master will therefore make every not-yet-rebuilt build fail to parse the record. It is dormant until then, and it is a real reason for this task: the serving build must be rebuilt when a schema-changing merge lands, and a refusing command must say so. Until it ships: rebuild the main tree (npm install, not npm ci) before the first close_gap after d5dfa74, and tell the QA PC's main checkout the same.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -596,12 +592,13 @@
       "id": "T-175",
       "title": "`state import` seeds SIA's own history (V-001..V-005, G-001..G-006) into EVERY project's record. Delete the seeds from the importer",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 78,
-      "closed_session": null,
+      "closed_session": 148,
       "supersedes": null,
-      "note": "Session 78. Found by the A2A-Hub planner seat during a `state import --draft` dry run on ~/Projects/A2A-Hub (write-up: A2A-Hub docs/loops/sia-migration-assessment.md), and VERIFIED by the SIA planner reading open-brain/src/pipelines/state-import/index.ts:353-378 at f673d5e: mk('V-001'..'V-005') with since_session 54, and G-001..G-006, which are SIA's Loop 1-4 history, are hardcoded into every import. They are false for any project but SIA, and verified[] has no delete op, so an imported project carries them permanently. SIA's own record already exists and the importer refuses a second run (V-009), so the seeds have no remaining use. FIX: DELETE them, and do not gate them behind a flag. Update the report's '## Seeds' line (index.ts:537) and any test that pins the seeded counts. This bears directly on the PRD's stranger-install goal (G-030, T-154): every stranger's first import would be seeded with SIA's history. WORKAROUND, given to the A2A-Hub seat so it need not wait: remove the eleven entries from the DRAFT with a parser (not a text edit), re-validate with parseState, and confirm first that --commit consumes the edited draft file. Sequenced after Loop 15 candidate A; it is not to interrupt the developer mid-candidate. ALSO NOTED, not a defect: the importer maps only ## P0-P3 sections (SECTION_RE, index.ts:96). Priority is a judgement the importer should not guess, so a project grouped by roadmap version restructures before importing. --- SECOND FINDING, same session, from the A2A-Hub planner seat after it prepared its draft (relayed and labelled as its observation; record in A2A-Hub docs/loops/sia-migration-assessment.md): EVERY PROSE INPUT THE IMPORTER READ WAS STALE. next-session.md was Session 13's handoff and would have recorded 'X-Agent-Key is never validated' into state as an open gap, although Session 14 had validated it (95ca5c6); INBOX predated Session 14 as well. The seat caught it by reading Session 14's own record and updated both inputs before re-drafting. THE CLASS: the importer has no way to know that an input is older than the newest SESSIONS/Session_N.md, so it faithfully imports a superseded account as current state, the record-layer version of 'a derived value inherits the question its derivation asks'. FIX SHAPE, the developer's to design: the --draft report compares each prose input's last-modified session (or git commit time) against the newest session log and says 'INPUT OLDER THAN LAST SESSION: <file>' as a warning the human sees at the review gate. It should not refuse, because the inputs may legitimately predate the last session. THE WORKAROUND WORKED, verified by that seat: runCommit re-reads and re-validates state.draft.json (index.ts:609-612) rather than re-deriving it, so a parser edit to the draft survives into --commit; but the report's Seeds counts are written at draft time and do not reflect such an edit.",
-      "closed_rev": null
+      "note": "Session 78. Found by the A2A-Hub planner seat during a `state import --draft` dry run on ~/Projects/A2A-Hub (write-up: A2A-Hub docs/loops/sia-migration-assessment.md), and VERIFIED by the SIA planner reading open-brain/src/pipelines/state-import/index.ts:353-378 at f673d5e: mk('V-001'..'V-005') with since_session 54, and G-001..G-006, which are SIA's Loop 1-4 history, are hardcoded into every import. They are false for any project but SIA, and verified[] has no delete op, so an imported project carries them permanently. SIA's own record already exists and the importer refuses a second run (V-009), so the seeds have no remaining use. FIX: DELETE them, and do not gate them behind a flag. Update the report's '## Seeds' line (index.ts:537) and any test that pins the seeded counts. This bears directly on the PRD's stranger-install goal (G-030, T-154): every stranger's first import would be seeded with SIA's history. WORKAROUND, given to the A2A-Hub seat so it need not wait: remove the eleven entries from the DRAFT with a parser (not a text edit), re-validate with parseState, and confirm first that --commit consumes the edited draft file. Sequenced after Loop 15 candidate A; it is not to interrupt the developer mid-candidate. ALSO NOTED, not a defect: the importer maps only ## P0-P3 sections (SECTION_RE, index.ts:96). Priority is a judgement the importer should not guess, so a project grouped by roadmap version restructures before importing. --- SECOND FINDING, same session, from the A2A-Hub planner seat after it prepared its draft (relayed and labelled as its observation; record in A2A-Hub docs/loops/sia-migration-assessment.md): EVERY PROSE INPUT THE IMPORTER READ WAS STALE. next-session.md was Session 13's handoff and would have recorded 'X-Agent-Key is never validated' into state as an open gap, although Session 14 had validated it (95ca5c6); INBOX predated Session 14 as well. The seat caught it by reading Session 14's own record and updated both inputs before re-drafting. THE CLASS: the importer has no way to know that an input is older than the newest SESSIONS/Session_N.md, so it faithfully imports a superseded account as current state, the record-layer version of 'a derived value inherits the question its derivation asks'. FIX SHAPE, the developer's to design: the --draft report compares each prose input's last-modified session (or git commit time) against the newest session log and says 'INPUT OLDER THAN LAST SESSION: <file>' as a warning the human sees at the review gate. It should not refuse, because the inputs may legitimately predate the last session. THE WORKAROUND WORKED, verified by that seat: runCommit re-reads and re-validates state.draft.json (index.ts:609-612) rather than re-deriving it, so a parser edit to the draft survives into --commit; but the report's Seeds counts are written at draft time and do not reflect such an edit. — Closed session 148: DONE per record 199b audit (711d700). 64901bf on master; state-import-seeds.test.ts. Planner checked ancestry and that the file exists.",
+      "note_by": null,
+      "closed_rev": 145
     },
     {
       "id": "T-176",
@@ -618,23 +615,25 @@
       "id": "T-177",
       "title": "Candidate A2 is blocked: the developer seat's responses were stopped twice by a host safety classifier, and slice three cannot close until A2 is built or re-planned",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 81,
-      "closed_session": null,
+      "closed_session": 148,
       "supersedes": null,
-      "note": "Recorded by the planner (record session 81), 2026-09-23, from the developer seat's two reports (Forge, record session 83; relayed to the planner by A2A, not seen first-hand). Dispatched A2 = rulings-6 R24 as amended by rulings-7 R30/R31 (D-A1 closed for a link at the watched path, an ancestor link and a hard link) plus D-A3. While reading harness source to design the repair, one developer response was stopped by a safety classifier; Aaron paused the build in that window. Aaron then restarted it ('A2 build started again', typed in the developer window before D-038 reached that seat), and the next response was stopped the same way; none of its tool calls ran. The seat did not retry and did not work around it. Which content trips it is unknown to both seats. STATE: local branch loop/15-slice-3-candidate-a2 at 4f752ca in ~/Worktrees/sia-forge (918a1c9 + the final criteria 6672e83 merged); no upstream, clean, no source or test change; nothing pushed; read back by the planner. BOUND: under shared.md's permission-laundering rule and D-038's limit, no other seat takes over the same work to get past the stop, and no seat rephrases around it. Only Aaron decides how A2 proceeds. CONSEQUENCE: D-033/D-036 close slice three at A, B and C in that order, and B's Step 0 runs at A2's accepted SHA, so the slice is blocked on this. --- UPDATE, planner (record session 81), 2026-09-23: Opus 4.8 was not selectable for Aaron. Aaron chose ONE ATTEMPT by Grok 4.7 in Cursor on this Windows machine, opened on ~/Worktrees/sia-forge, as the developer seat, RECORD SESSION 84 (Aaron in the planner session: \"We can hand it off to Grok 4.7. See if grok will do A2s work.\" and \"yes\" to Cursor on this PC). The Claude developer session 83 is closed. Dispatch: docs/loops/loop-15-slice-3-dispatch-a2-grok.md. Transport: A2A-Hub on tcm (native cross-session messaging does not reach Cursor). The same criteria (6672e83) and a fresh Claude QA seat judge the result, so the developer model changes nothing about acceptance. This is also the first real data point for T-165 (an alternate model in the developer seat). If this seat cannot build A2 either, the slice is re-planned; no further model is tried. --- RESULT, planner (record session 81), 2026-09-23: Grok built A2 at 2add792 (65752b4 plus a CI gating fix), with the Windows full suite exit 0 (1107 passed) and CI green. QA (Probe, record session 85) REJECTED it: docs/loops/loop-15-slice-3-qa-report-a2.md at 8cddfc7. The write/delete half of D-A1 is closed in 13 probe shapes; CA-15 fails on the read half (A2-1, A2-5), the record (A2-3, A2-4) and a silent pass (A2-2); CA-2.5 and CA-4c are not met because the planner's dispatch omitted D-A2 and D-A4. Rulings-9 scopes A3 (R43-R48), a new commit on 2add792. Because A3 is the same link-handling subject that drew the refusals, the planner recommends a fresh Grok session (record session 86) with docs/loops/loop-15-slice-3-a3-grok-brief.md; the builder is Aaron's to confirm. The first Grok session reached about 80% of its context and was not given A3. The hub-transport cost of a Cursor seat (no wake, needs Aaron to nudge it) is T-160. --- A3 RESULT, planner (record session 81), 2026-09-23: Grok (session 86) built A3 at 5010199: eight commits on 2add792, one per rulings-9 item; CI green with per-test lines. QA (session 87) REJECTED it: docs/loops/loop-15-slice-3-qa-report-a3.md at 9c8176f. Every A2 defect and D-A2/D-A4 are fixed, and 26 mutants are killed; CA-15 clause 3's read half fails on three shapes QA added (A3-1 absent-at-base hard link, A3-2 a link beyond a base dotfiles link, A3-3 a base hard link giving a false record). The planner's error: R43/R44 were instance rulings. Rulings-10 R49 states the principle (read only if the whole resolution is unchanged since base). A4 = R49-R52 on 5010199, to a fresh Grok session (record session 88) with docs/loops/loop-15-slice-3-a4-grok-brief.md; QA is 89. --- A4, planner (record session 81), 2026-09-23: Grok (session 88) built A4 and froze it at f9a1aa8, six commits on 5010199: R49 9788d32, R50 27c0e63, R51 403296d, R52 544cf15, R54 2db806a (after its first suite failed CA-4f on the planner's R44 wording; rulings-11), and the handoff f9a1aa8. Both of its full suites had every test passing at 2db806a, with exit 1 on the G-042 heartbeat only. QA 89 has NOT started. Its dispatch is the tracked file docs/loops/loop-15-slice-3-dispatch-qa-a4.md, because every seat rolls with a VS Code restart.",
-      "closed_rev": null
+      "note": "Recorded by the planner (record session 81), 2026-09-23, from the developer seat's two reports (Forge, record session 83; relayed to the planner by A2A, not seen first-hand). Dispatched A2 = rulings-6 R24 as amended by rulings-7 R30/R31 (D-A1 closed for a link at the watched path, an ancestor link and a hard link) plus D-A3. While reading harness source to design the repair, one developer response was stopped by a safety classifier; Aaron paused the build in that window. Aaron then restarted it ('A2 build started again', typed in the developer window before D-038 reached that seat), and the next response was stopped the same way; none of its tool calls ran. The seat did not retry and did not work around it. Which content trips it is unknown to both seats. STATE: local branch loop/15-slice-3-candidate-a2 at 4f752ca in ~/Worktrees/sia-forge (918a1c9 + the final criteria 6672e83 merged); no upstream, clean, no source or test change; nothing pushed; read back by the planner. BOUND: under shared.md's permission-laundering rule and D-038's limit, no other seat takes over the same work to get past the stop, and no seat rephrases around it. Only Aaron decides how A2 proceeds. CONSEQUENCE: D-033/D-036 close slice three at A, B and C in that order, and B's Step 0 runs at A2's accepted SHA, so the slice is blocked on this. --- UPDATE, planner (record session 81), 2026-09-23: Opus 4.8 was not selectable for Aaron. Aaron chose ONE ATTEMPT by Grok 4.7 in Cursor on this Windows machine, opened on ~/Worktrees/sia-forge, as the developer seat, RECORD SESSION 84 (Aaron in the planner session: \"We can hand it off to Grok 4.7. See if grok will do A2s work.\" and \"yes\" to Cursor on this PC). The Claude developer session 83 is closed. Dispatch: docs/loops/loop-15-slice-3-dispatch-a2-grok.md. Transport: A2A-Hub on tcm (native cross-session messaging does not reach Cursor). The same criteria (6672e83) and a fresh Claude QA seat judge the result, so the developer model changes nothing about acceptance. This is also the first real data point for T-165 (an alternate model in the developer seat). If this seat cannot build A2 either, the slice is re-planned; no further model is tried. --- RESULT, planner (record session 81), 2026-09-23: Grok built A2 at 2add792 (65752b4 plus a CI gating fix), with the Windows full suite exit 0 (1107 passed) and CI green. QA (Probe, record session 85) REJECTED it: docs/loops/loop-15-slice-3-qa-report-a2.md at 8cddfc7. The write/delete half of D-A1 is closed in 13 probe shapes; CA-15 fails on the read half (A2-1, A2-5), the record (A2-3, A2-4) and a silent pass (A2-2); CA-2.5 and CA-4c are not met because the planner's dispatch omitted D-A2 and D-A4. Rulings-9 scopes A3 (R43-R48), a new commit on 2add792. Because A3 is the same link-handling subject that drew the refusals, the planner recommends a fresh Grok session (record session 86) with docs/loops/loop-15-slice-3-a3-grok-brief.md; the builder is Aaron's to confirm. The first Grok session reached about 80% of its context and was not given A3. The hub-transport cost of a Cursor seat (no wake, needs Aaron to nudge it) is T-160. --- A3 RESULT, planner (record session 81), 2026-09-23: Grok (session 86) built A3 at 5010199: eight commits on 2add792, one per rulings-9 item; CI green with per-test lines. QA (session 87) REJECTED it: docs/loops/loop-15-slice-3-qa-report-a3.md at 9c8176f. Every A2 defect and D-A2/D-A4 are fixed, and 26 mutants are killed; CA-15 clause 3's read half fails on three shapes QA added (A3-1 absent-at-base hard link, A3-2 a link beyond a base dotfiles link, A3-3 a base hard link giving a false record). The planner's error: R43/R44 were instance rulings. Rulings-10 R49 states the principle (read only if the whole resolution is unchanged since base). A4 = R49-R52 on 5010199, to a fresh Grok session (record session 88) with docs/loops/loop-15-slice-3-a4-grok-brief.md; QA is 89. --- A4, planner (record session 81), 2026-09-23: Grok (session 88) built A4 and froze it at f9a1aa8, six commits on 5010199: R49 9788d32, R50 27c0e63, R51 403296d, R52 544cf15, R54 2db806a (after its first suite failed CA-4f on the planner's R44 wording; rulings-11), and the handoff f9a1aa8. Both of its full suites had every test passing at 2db806a, with exit 1 on the G-042 heartbeat only. QA 89 has NOT started. Its dispatch is the tracked file docs/loops/loop-15-slice-3-dispatch-qa-a4.md, because every seat rolls with a VS Code restart. — Closed session 148: the blocker is gone. A was rebuilt (A4 through A13) and A13 merged as #182 (677c1dd), so candidate A is ACCEPTED and MERGED per the objective. A2's classifier stop no longer gates slice three.",
+      "note_by": null,
+      "closed_rev": 147
     },
     {
       "id": "T-178",
       "title": "ci.yml runs on push to seat working branches (loop/*, qa/*, docs/*, chore/*), per D-040, so no seat has to dispatch CI by hand",
-      "priority": "P1",
-      "status": "open",
+      "priority": "P0",
+      "status": "done",
       "opened_session": 90,
-      "closed_session": null,
+      "closed_session": 149,
       "supersedes": null,
-      "note": "Opened record session 90 (planner), 2026-09-23, from D-040 on Aaron's word 'ci should run autonoumously'. Today ci.yml triggers on push to master, pull_request and workflow_dispatch only, so a working branch without a PR runs no CI unless someone dispatches it. D-040 part 1 makes dispatching standing in the meantime; this task removes the need for it. For the developer seat to decide HOW, with the planner ruling only on the result. Two things to settle there: (a) a branch with an open PR would run twice (push plus pull_request), so choose a de-duplication (e.g. a concurrency group, or push on qa/** only with PRs covering loop/**) rather than paying double; (b) docs/* and chore/* pushes touch no source, so paths-ignore may be right for them. ACCEPTANCE: a push to a fresh qa/* branch with no PR starts a CI run with no manual act, observed by run id; a push to master still runs; a PR still runs; and no branch runs twice for one push. ci.yml is outside D-032's allowlist, so the PR is Aaron's to merge. Sequencing: not slice-three scope. It can ride with B on the Claude developer seat if the planner scopes it in, otherwise it waits for the slice to close.",
-      "closed_rev": null
+      "note": "Opened record session 90 (planner), 2026-09-23, from D-040 on Aaron's word 'ci should run autonoumously'. Today ci.yml triggers on push to master, pull_request and workflow_dispatch only, so a working branch without a PR runs no CI unless someone dispatches it. D-040 part 1 makes dispatching standing in the meantime; this task removes the need for it. For the developer seat to decide HOW, with the planner ruling only on the result. Two things to settle there: (a) a branch with an open PR would run twice (push plus pull_request), so choose a de-duplication (e.g. a concurrency group, or push on qa/** only with PRs covering loop/**) rather than paying double; (b) docs/* and chore/* pushes touch no source, so paths-ignore may be right for them. ACCEPTANCE: a push to a fresh qa/* branch with no PR starts a CI run with no manual act, observed by run id; a push to master still runs; a PR still runs; and no branch runs twice for one push. ci.yml is outside D-032's allowlist, so the PR is Aaron's to merge. Sequencing: not slice-three scope. It can ride with B on the Claude developer seat if the planner scopes it in, otherwise it waits for the slice to close. — Session 148: raised to P0 by Aaron with D-061. Under HoH, automatic CI on push is the runtime's deterministic-test step; until it lands, QA dispatches CI by hand. — CLOSED by the planner, session 149 (2026-09-28). Accepted by QA 211 (record 205, qa/t178-report 2f222fc); merged as #199 (8467cb1); its one shipped defect (test skipped on master and PRs, needs-skip propagation) fixed by #200 (c933a44) on Aaron's word. Every acceptance condition observed LIVE by run id: a master push ran test (36494231337 at c933a44, test=success); a fresh qa/* branch push with no PR started CI with no manual act (36503607220, QA 216's qa/t195-ci-candidate); a PR runs (#201, 36502407979, test=success). No double run was ruled on in QA 211.",
+      "note_by": null,
+      "closed_rev": 156
     },
     {
       "id": "T-179",
@@ -651,12 +650,13 @@
       "id": "T-180",
       "title": "`state import` cannot tell that an input predates the latest Session_N.md: a stale handoff or INBOX is imported as current. Refuse or warn",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 100,
-      "closed_session": null,
+      "closed_session": 148,
       "supersedes": null,
-      "note": "Session 100. Reported by A2A-Hub's planner (Relay) to the SIA planner on 2026-09-22 during A2A-Hub's migration and never recorded until now: A2A-Hub's next-session.md was Session 13's although Session 14 had happened, and INBOX was last updated at Session 11, so the draft would have recorded claims Session 14 had falsified (e.g. 'X-Agent-Key is never validated'). Relay corrected them by hand. Source: ~/Projects/A2A-Hub/docs/loops/sia-migration-assessment.md, 'First draft: four problems' item 4 and 'Outcome'. Pair with T-175 as one short loop BEFORE any further project is adopted (docs/loops/adoption-plan-2026-09-25.md section 3): without both, every adoption repeats two hand clean-ups. Shape of the fix is the developer's; the protective requirement is that the importer never presents a file older than the newest session log as the project's current state without saying so.",
-      "closed_rev": null
+      "note": "Session 100. Reported by A2A-Hub's planner (Relay) to the SIA planner on 2026-09-22 during A2A-Hub's migration and never recorded until now: A2A-Hub's next-session.md was Session 13's although Session 14 had happened, and INBOX was last updated at Session 11, so the draft would have recorded claims Session 14 had falsified (e.g. 'X-Agent-Key is never validated'). Relay corrected them by hand. Source: ~/Projects/A2A-Hub/docs/loops/sia-migration-assessment.md, 'First draft: four problems' item 4 and 'Outcome'. Pair with T-175 as one short loop BEFORE any further project is adopted (docs/loops/adoption-plan-2026-09-25.md section 3): without both, every adoption repeats two hand clean-ups. Shape of the fix is the developer's; the protective requirement is that the importer never presents a file older than the newest session log as the project's current state without saying so. — Closed session 148: DONE per record 199b audit (711d700). bdf9ddb on master; state-import-staleness.test.ts. Planner checked ancestry and that the file exists.",
+      "note_by": null,
+      "closed_rev": 145
     },
     {
       "id": "T-181",
@@ -706,12 +706,13 @@
       "id": "T-185",
       "title": "Other open-brain subcommands take the first non-'--' token as their directory: `detach -dry-run` and `state migrate -dry-run` would do the REAL thing; sync and start share the shape. Refuse unknown '-' tokens everywhere",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 100,
-      "closed_session": null,
+      "closed_session": 148,
       "supersedes": null,
-      "note": "Session 100. Found by developer 105 while fixing state import's instance (QA 102's D4, importer round 2 R2-4), from reading cli.ts (:54, :166, :285, :369); NOT run. The dangerous ones are the two whose single-dash typo of a dry-run flag performs the mutation. The full list with exposure is in docs/loops/importer-fixes-r2-developer-handoff.md. T-150's rule, applied beyond the one command it was first applied to.",
-      "closed_rev": null
+      "note": "Session 100. Found by developer 105 while fixing state import's instance (QA 102's D4, importer round 2 R2-4), from reading cli.ts (:54, :166, :285, :369); NOT run. The dangerous ones are the two whose single-dash typo of a dry-run flag performs the mutation. The full list with exposure is in docs/loops/importer-fixes-r2-developer-handoff.md. T-150's rule, applied beyond the one command it was first applied to. — Closed session 148: DONE per record 199b audit (711d700). 686eef5 and 9b36ef0 on master; cli-flags.test.ts and cli-args.test.ts. The same probe as T-150.",
+      "note_by": null,
+      "closed_rev": 145
     },
     {
       "id": "T-186",
@@ -765,7 +766,8 @@
       "opened_session": 100,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 100. MISSED, not deliberate: QA 99's report (section 5.1) recorded Windows Defender at 2h16m of CPU on desktop-o4egb1e, scanning the files the tests create, and said it had not measured the cost to the suite. The planner read that line when ruling and turned it into nothing, until Aaron asked through the home-directory session why exclusions had not been done. Design (sent to Aaron): the suite's about 60 mkdtemp prefixes all sit under os.tmpdir(), and excluding all of %TEMP% would be the broadest hole, so the tests' temp is moved to a dedicated folder instead. Node's os.tmpdir() follows TEMP/TMP. Aaron adds `Add-MpPreference -ExclusionPath 'C:\\qa-tmp','C:\\qa-scratch'` himself: a security setting, his machine. NOT process exclusions for node.exe or git.exe: they would cover npm install scripts from the internet. Risk kept visible: Defender scanning is a classic cause of EBUSY/EPERM on rename and delete, which SIA's product code does (state-writer's temp-then-rename; the importer's round-2 rollback), and users run Defender, hence the one full-suite control run with the default TEMP per candidate. The driver change goes into docs/loops/qa-99/drive.ps1's template via qa-driver-copy.mjs, for the next QA seat after 104 and 106.",
+      "note": "Session 100. MISSED, not deliberate: QA 99's report (section 5.1) recorded Windows Defender at 2h16m of CPU on desktop-o4egb1e, scanning the files the tests create, and said it had not measured the cost to the suite. The planner read that line when ruling and turned it into nothing, until Aaron asked through the home-directory session why exclusions had not been done. Design (sent to Aaron): the suite's about 60 mkdtemp prefixes all sit under os.tmpdir(), and excluding all of %TEMP% would be the broadest hole, so the tests' temp is moved to a dedicated folder instead. Node's os.tmpdir() follows TEMP/TMP. Aaron adds `Add-MpPreference -ExclusionPath 'C:\\qa-tmp','C:\\qa-scratch'` himself: a security setting, his machine. NOT process exclusions for node.exe or git.exe: they would cover npm install scripts from the internet. Risk kept visible: Defender scanning is a classic cause of EBUSY/EPERM on rename and delete, which SIA's product code does (state-writer's temp-then-rename; the importer's round-2 rollback), and users run Defender, hence the one full-suite control run with the default TEMP per candidate. The driver change goes into docs/loops/qa-99/drive.ps1's template via qa-driver-copy.mjs, for the next QA seat after 104 and 106. — MACHINE ROLES CHANGED, planner session 150 (D-065): the laptop is the default QA machine; the QA PC runs developer seats and is used for SIA QA only when no developer suite is running there. The TEMP/scratch rules here still apply on whichever machine runs QA. A 'quiet' lease (Clark's proposal) waits on Aaron. — Lease APPROVED by Aaron (via worktrees-d5), and opened as its own task in session 150 (rev 180). Until it ships, the QA PC is not used for SIA QA.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -776,29 +778,319 @@
       "opened_session": 109,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 109, on Aaron's word ('Could the greeting be dynamic per seat depending on what context that agent needs' and then 'yes' to recording it, 2026-09-25, planner session). SEQUENCED AFTER T-183, which clips lines for everyone and is scored an honest no against 40,000 characters (T-183 brief amendment 1): per-seat profiles are the change that gets a non-planner greeting under. SHAPE (planner's, the developer designs): a zod-validated profile file, like the gate policies, mapping the seat (already known from AGENT.local.md at start) to its sections. Planner: everything. Developer: objective, own handoff, watch-outs, verified (count plus newest), gap ids and titles, role files. QA: verified and gaps in full, watch-outs, role files. RULE: every omitted section is PRINTED as omitted, with its count and the read-only command that shows it (G-032: a section a seat never sees is the failure). Per-seat WATCH-OUTS need a seats tag on each watch-out, a schema change, so that part waits for a migration window. NOT this task: task-aware selection (reading the brief to pick lines) or model-scored relevance. Aaron asked the same session whether each line could be scored; the planner's answer is recorded in docs/loops/planner-session-109-notes.md (exact-match rules first, a scorer only in shadow with a measured miss rate). Candidate seat: sia-builder, which touches only the render and sync code.",
+      "note": "Session 109, on Aaron's word ('Could the greeting be dynamic per seat depending on what context that agent needs' and then 'yes' to recording it, 2026-09-25, planner session). SEQUENCED AFTER T-183, which clips lines for everyone and is scored an honest no against 40,000 characters (T-183 brief amendment 1): per-seat profiles are the change that gets a non-planner greeting under. SHAPE (planner's, the developer designs): a zod-validated profile file, like the gate policies, mapping the seat (already known from AGENT.local.md at start) to its sections. Planner: everything. Developer: objective, own handoff, watch-outs, verified (count plus newest), gap ids and titles, role files. QA: verified and gaps in full, watch-outs, role files. RULE: every omitted section is PRINTED as omitted, with its count and the read-only command that shows it (G-032: a section a seat never sees is the failure). Per-seat WATCH-OUTS need a seats tag on each watch-out, a schema change, so that part waits for a migration window. NOT this task: task-aware selection (reading the brief to pick lines) or model-scored relevance. Aaron asked the same session whether each line could be scored; the planner's answer is recorded in docs/loops/planner-session-109-notes.md (exact-match rules first, a scorer only in shadow with a measured miss rate). Candidate seat: sia-builder, which touches only the render and sync code. — NOT RAISED, planner ruling session 149 (2026-09-28), on the relay that opened T-196. T-196's planner-side acceptance (HB-1: a fresh planner arms its listeners from what /start prints) does not need T-191: ob_start already prints planner.md in full, so a section there reaches the planner at /start today. T-196's data file is written so T-191 can later render each seat's rooms from it. T-191 stays P1, sequenced after T-183. It does not fix stale-record starts either: that is D-062's.",
+      "note_by": null,
       "closed_rev": null
     },
     {
       "id": "T-192",
       "title": "Master's push CI has not run since #171: GitHub refuses the ubuntu-latest job for billing, and /sync ci-status reports that as an ordinary 'failure'",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 147,
-      "closed_session": null,
+      "closed_session": 148,
       "supersedes": null,
-      "note": "Opened as a TASK, not a gap: add_gap would assign G-046, a closed id the tracked tree cites (T-158, V-071), so no seat uses add_gap until T-158 lands. Evidence: ci.yml:44 sends a master push to GitHub-hosted ubuntu-latest. Runs 36303132573 (ecd28dd, #171) to 36304185040 (e201baa, #177): job 'test' failure, zero steps, no log; the check-run annotation reads 'The job was not started because recent account payments have failed or your spending limit needs to be increased.' The planner dispatched the suite on e201baa to tcm: run 36305346883, success, 97/97 test files, so merged master is sound. Two halves: (1) Aaron decides whether to fix the billing or move master pushes to tcm (D-043 already runs dispatches there); (2) ci-status names a job that never started (zero steps, or the billing annotation) as its own state, not as a failure. Recorded 2026-09-27, record session 147 (planner).",
-      "closed_rev": null
+      "note": "Opened as a TASK, not a gap: add_gap would assign G-046, a closed id the tracked tree cites (T-158, V-071), so no seat uses add_gap until T-158 lands. Evidence: ci.yml:44 sends a master push to GitHub-hosted ubuntu-latest. Runs 36303132573 (ecd28dd, #171) to 36304185040 (e201baa, #177): job 'test' failure, zero steps, no log; the check-run annotation reads 'The job was not started because recent account payments have failed or your spending limit needs to be increased.' The planner dispatched the suite on e201baa to tcm: run 36305346883, success, 97/97 test files, so merged master is sound. Two halves: (1) Aaron decides whether to fix the billing or move master pushes to tcm (D-043 already runs dispatches there); (2) ci-status names a job that never started (zero steps, or the billing annotation) as its own state, not as a failure. Recorded 2026-09-27, record session 147 (planner). — Closed session 148: DONE. QA 183 ACCEPTED; 53d3638 and a38ff92 merged; ci-runs-on.test.ts; master push CI runs on tcm (session-147-dispatches.md). T192-D1, the follow-up, is record 193 (PR #193, in QA 196).",
+      "note_by": null,
+      "closed_rev": 145
     },
     {
       "id": "T-193",
       "title": "A /sync check that every git worktree is the main checkout or <project>-<known seat>, with the seat list as data; closes T-149 against it",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 147,
+      "closed_session": 147,
+      "supersedes": null,
+      "note": "Merged as PR #186 (a1fa4b1) on Aaron's word, record session 147. The worktree-layout /sync check, product 683b61c, accepted by the planner (red 36315913592, green 36316160629, mutants 36316403690 and 36316497065). Its first live run found four stray scratch worktrees in SIA's repo, removed on Aaron's word the same session.",
+      "closed_rev": 143
+    },
+    {
+      "id": "T-194",
+      "title": "Planner seat hook: a tracked PreToolUse hook mechanically refuses the planner's out-of-boundary acts (source/tests/hooks/build writes, hand edits to rendered views, git merge/push/tag without per-occasion authority), fails closed, and names the rule it enforces",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 149,
       "closed_session": null,
       "supersedes": null,
-      "note": "Record session 147, planner. Relay (A2A-Hub planner) traced A2A-Hub's six loop- and occupant-named worktrees (a2a-loop6-build, a2a-loop6-deploy, a2a-rivet-grok, a2a-client-v1.10.0, qa3-cand, qa3-old) to a gap in SIA: .agents/roles/shared.md said only 'Seat worktrees are detached at rest' and never stated one worktree per seat named <project>-<seat>. The planner confirmed it by grep (shared.md:211). The text was added to shared.md the same session (PR #181), including the occupant clause: a new model in a seat uses that seat's folder. Text alone is an intention; this check makes it a rule (deterministic first). Shape: walk `git worktree list --porcelain`; every entry is the main checkout or <project>-<seat> for a seat named in a tracked data file (not hard-coded); a branch-named or unregistered-seat folder is an ISSUE naming it. LIMIT to state in its output: it sees registered worktrees only. An orphan folder with no git registration (sia-qa2-gpt-cand was an empty directory on 2026-09-27) is not a worktree, so it is not seen. Built as record 186 by cursor-builder. When accepted, close T-149 against it.",
+      "note": "AUTHORITY: Aaron, relayed verbatim 2026-09-28 by a general Claude session (worktrees-d5, 'Clark'), to the planner (session 149): \"tell Atlas to go ahead with its steps (a) to (h), with (g), the record update, moved to the front, add the two new tasks: the planner seat hook, and the D_t file plus plan gate for interactive briefs. This needs to be done now sice it's causing issues running the loops.\" Two links: Aaron -> worktrees-d5 -> Atlas. PROBLEM: the planner's write boundary exists only as prose (.agents/roles/planner.md, 'Authority, stated as a boundary'); sia-planner/.claude/settings.local.json has no hooks key (checked session 149). A prose boundary is probabilistic (CLAUDE.md 'Deterministic First'). OBSERVABLE GOAL: in an interactive planner session, each of these is refused by the hook, and the refusal names the rule: (1) Edit/Write/NotebookEdit outside the planner allowlist (source, tests, hooks, builds); (2) a hand edit to a rendered view (INBOX.md, task.md, next-session.md, SUMMARY.md's marked region); (3) Bash git merge / push / tag (and gh pr merge) without per-occasion authority. Fails CLOSED (unparseable input, unknown seat, missing AGENT.local.md -> refuse, and say why). An allowed planner act (docs/loops writes, ob_state, read-only git, push of the planner's own docs/* branch under D-038) still passes. Suggested shape, for the developer to accept or beat: a tracked PreToolUse hook script keyed on the seat named in AGENT.local.md, registered per checkout (mechanism local, knowledge tracked). Deterministic, no Jev. Must also fire under the context-mode plugin's own PreToolUse hooks. REGISTRATION: adding the hook to sia-planner's settings.local.json changes the planner session's own permissions; it is Aaron's hand, not the planner's and not on a peer's relay. SEQUENCING (planner ruling, session 149): runs NOW, alongside slice three, outside it; D-036 is not amended. Seat: cursor-builder (idle since #200). — AARON'S RULING, 2026-09-30, in the planner session, verbatim: 'docs only merge have my go-ahead'. D-032/D-055 docs-only merges stay standing, with no grant file. REQUIRED FIX for T-194 r2: f15f2cf made 'gh pr merge' grant-only after dropping the live 'gh pr view' spawn (spawn-sites CA-4b/R16), so every D-032 docs merge would need Aaron's grant; that contradicts this ruling. r2 must let the planner merge a PR whose EVERY changed path is on the D-032/D-055 allowlist with no grant, and must check the paths WITHOUT a child-process spawn (for example GitHub's REST API over fetch, keyed with the user's gh token, or another route that passes spawn-sites). It FAILS CLOSED: an unreadable file list, a network error or one unlisted path means grant-required, and the refusal names the cause. Rows: an all-docs PR passes with no grant; a PR with one unlisted path is denied without a grant; an unreachable API is denied and says so; a mutant that allows a merge when the list is unreadable goes red. Plus the base proof still owed (turn 66). — r2 BUILT LOCALLY, planner session 150, 2026-09-30 (builder sia-builder-4f, Claude Code): product 0d12a4f1, handoff 0b8c347e on loop/t194-planner-hook (on f15f2cf). Four mutants, each red on its row. A new AST no-spawn row covers src/planner-hook and the CLI (spawn-sites.test.ts walks only src/harness/). Full suite exit 1, 10 failures, attributed per file at base abae5f92 (git archive); the handoff has the table. PLANNER RULINGS: (1) a docs-only merge must NOT read or consume a grant, even when one is present; add a row (grant present plus all-docs PR = allow, grant file unchanged) and a consuming mutant; (2) mutant branches are renamed loop/t194-r2-mut-* (mutant/* is outside D-038's push prefixes); (3) push cleared after (1) and (2), no PR. KEYRING LIMIT: this desktop's gh keeps its token in the keyring, so the hook denies docs merges until GH_TOKEN is set. The setup is a fine-grained token (this repo only, Pull requests: Read) as GH_TOKEN in sia-planner's settings.local.json env, placed by Aaron's hand at hook registration after QA. — QA 231 VOID, planner session 150: no report. Every attempt (run 0 and resumes 1-3, session c92832f8) ended with Cursor's 'ActionRequiredError: You've hit your usage limit ... resets when your monthly cycle ends on 10/3/2026' on gpt-5.6-sol-medium. Re-dispatched as QA 233 on composer-2.5 (Composer built none of T-194), docs/loops/qa-233-t194-r2-dispatch.md, with an added D-066 row (.agents/assignments.json on the allowlist; expected miss, reported, not scored). — Planner session 153 RULED QA 233 (T-194 r1+r2, candidate 699789e1, report d6b13423 on origin/qa/t194-r2-report): REJECT UPHELD. r3 is needed, from the developer. D1 (blocker, from r1): an ABSOLUTE file_path gets past PH-1, PH-2 and PH-6. The planner confirmed it in the code: paths.ts normalizeRelPath only swaps slashes and strips './'; it never removes the repo root, so an absolute path like C:/.../open-brain/src/cli.ts matches no ARTIFACT_PREFIXES entry. Claude Code's Edit and Write send absolute paths, so live, PH-1 denies nothing. Fix: resolve against resolveHookProjectDir, make the path relative, deny any absolute path that is outside the repo or cannot be made relative, and add absolute rows in both slash forms. D2 (blocker, from r2): a docs-only `gh pr merge` allows the WHOLE command line: P3 `… && git push --force origin master` and P4 `… && gh pr merge <code PR>` are both allowed. Fix: the no-grant allow applies only to a single `gh pr merge` invocation, with no &&, ||, ;, |, newline, subshell or backticks; anything compound falls through to the grant. Add P3 and P4 as rows. ALSO IN r3: grantMatchesCommand's prefix match gets the same single-invocation rule (minor, from r1); add .agents/assignments.json (D-066) to DOCS_MERGE_ALLOWLIST_EXACT; replace the three invalid r1 mutants ph1-ph3 (they fail tsc) with typechecking forms; `gh pr merge N --repo other/x` should check the named repo or deny. QA 233 pushed no mutant branches because qa/** pushes start CI (T-207); its SHAs are rebuildable from docs/loops/qa-233/evidence/qa233-mutants*.mjs. Its live read made four read-only GETs, not one; accepted and noted. The CI failure, state-schema T-171 r3b, is base-shared and fixed on master by 9b3a4a2c.",
+      "note_by": [
+        "c407df9c-3dd7-4273-891b-798b4bd527f4",
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97",
+        "6e083614-965f-462b-ad59-62091a0be5e1"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-195",
+      "title": "Every interactive planner brief ships a D_t JSON beside it, validated against plan.schema.json by a new `harness validate plan`, judged by the live plan gate (gate.ts, policies/plan-gate.json); a gate failure is fed back and blocks dispatch; decisions logged with the resolved model; fails closed when Jev is unreachable",
+      "priority": "P0",
+      "status": "done",
+      "opened_session": 149,
+      "closed_session": 149,
+      "supersedes": null,
+      "note": "AUTHORITY: same relay as T-194 (Aaron -> worktrees-d5 -> Atlas, 2026-09-28, planner session 149; quoted verbatim in T-194's note). PROBLEM: docs/loops holds prose briefs and zero D_t JSON, so the plan gate, built and ACCEPTED in slice two (HOH-JEV.md §7) and wired into the runtime (runtime.ts, index.ts import gate.js; policies.ts maps plan -> plan-gate.json), has never judged a real planner plan. QA's output carries E_t; the planner's carries no equivalent. `harness validate evidence` exists; `validate plan` does not. OBSERVABLE GOAL: (1) each new brief in docs/loops has a sibling D_t JSON that validates against open-brain/src/harness/schemas/plan.schema.json; (2) a `validate plan` command refuses an invalid one, naming the field; (3) the plan gate runs on the file per HOH-JEV §4 'Plan gate' with thresholds from policies/, never in a prompt; (4) a gate failure is written back to the planner and blocks the brief from dispatch; (5) each gate decision is logged with the resolved model per HOH-JEV §3; (6) Jev unreachable -> the brief is refused with that cause named, never passed. SEQUENCING (planner ruling, session 149): NOT part of slice three; D-036 is not amended and slice three still closes at A, B and C. It runs now, alongside, and its gate decisions on real briefs are the first real data the Jev calibration slice (D-033) needs. If QA 213 rejects candidate C r3, C r4 takes precedence on the building seat. Seat: Forge (sia-forge, Grok 4.7), which built candidate C and knows the harness schemas. — ROW ADDED, planner session 149, by D-062: DT-7's dispatch refusal also refuses a brief (and its D_t) that is not reachable from origin/master, naming the SHA it checked. A seat can only read what master holds (Forge read rev 140 while rev 149 sat on the planner branch). — QA 216 (GPT-5.6 Sol, QA PC, 00:31-01:16Z; report origin/qa/t195-report 73728dd, E_t valid): REJECT of 603be51, ruled by the planner session 149: the rejection stands. MET: DT-1/2/3/5/6/8 and DT-9a-d (the content check is sound). BLOCKERS: (1) a full-suite regression, verified by the planner: candidate run 36503607220 has test=failure, 2 tests in tests/harness/spawn-sites.test.ts (CA-4b/R16) because parseBriefGateRecordName calls GATE_RECORD_RE.exec, which the spawn-site guard reads as a child-process exec; base run 36503973763 has test=success. Forge's handoff ran four named suites, never the full one. (2) DT-7 partial: dispatch-check has no caller, so it is a tool, not a gate. (3) DT-4 partial: same-timestamp records overwrite (plain writeFileSync). (4) Forge's DT-7 mutant 4e0cce9 does not typecheck. Returned as record 215 r2 at hub turn 228, with a local full-suite run required. — ACCEPTED, planner ruling session 149: QA 222 (GPT, QA PC, 03:03-03:17Z; origin/qa/t195-r2-report 08c4e49) ACCEPT of r2 code 647cc74, with 0 partial/unmet rows and tcm test green on candidate 36515473117 and base 36515473106. All four QA 216 findings are closed. PR #209 was opened by the planner (Forge's window was closed); it is code, so Aaron merges. Its fresh PR run fails only the old state-schema r3b, because the branch predates #210's fix. The branch needs master merged in. — CLOSED session 149: merged as #209 (7fcbfa0) on Aaron's word, 2026-09-29, pinned to 5b3e525 (r2 code 647cc74 + master merged in via gh pr update-branch on his word). Master's own push run 36521817728 at 7fcbfa0: test=success. OPERATIONAL CONSEQUENCE: from the planner's next brief on, a dispatch carries a sibling D_t JSON and goes through 'harness dispatch' (DT-7), which needs the main checkout rebuilt and TYPESAFE_API_KEY present; the first live Jev call is the named limit, observed on that brief.",
+      "note_by": [
+        "c407df9c-3dd7-4273-891b-798b4bd527f4"
+      ],
+      "closed_rev": 159
+    },
+    {
+      "id": "T-196",
+      "title": "The hub procedure is tracked knowledge: each seat's hub room and hub-talk invocation in a tracked data file beside .agents/SYSTEM/worktree-seats.json; a short 'Talking to Cursor seats' section in planner.md (printed in full at /start) pointing at it; a tracked alwaysApply .cursor/rules hub rule; and Cursor's /start joins the seat's room and reads unread atlas turns before proposing anything",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 149,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "AUTHORITY: Aaron's 'yes', relayed 2026-09-28 by a general Claude session (worktrees-d5, 'Clark') to the planner (session 149), to worktrees-d5's proposal to send this as a third task after T-194/T-195 and to ask whether T-160 or T-191 should be raised because this is blocking loops; gap 1 folded in on a second relay the same session (Aaron's 'yes' to sending Forge's /start findings). Two links each: Aaron -> worktrees-d5 -> Atlas. PROBLEM (derived by the planner at origin/master c933a44, session 149): the planner's listener procedure exists only in Claude Code auto-memory (feedback_hub_listeners.md, reference_a2a_hub_tcm.md); .agents/roles/shared.md and planner.md have ZERO matches for hub-talk, --wait or listener; tracked hub-talk hits are only SUMMARY.md, state.json, docs/loops and test fixtures; there is no .cursor/ directory at the repo root on master; sia-forge's and sia-qa's AGENTS.md are untracked with no hub mention, and sia-builder and sia-infra have none. The Cursor seats' 'run --wait after posting' rule exists only as hub turns. GAP 1 (Forge's Cursor /start, transcript c4995381, 22:52Z): record 215 had sat in the forge room (turn 217) for about 20 minutes, and Forge asked Aaron for work instead; project-template/.cursor/commands/start.md, which the live ~/.cursor/commands/start.md matches byte-for-byte ignoring CR, has zero matches for hub, wait or room. SCOPE: (1) seat hub data (room id, hub URL, hub-talk invocation) in a tracked file beside or inside .agents/SYSTEM/worktree-seats.json, validated by /sync, readable by T-191 later; (2) a short planner.md section stating that the hub DOES carry same-machine Cursor seats (native A2A is Claude-to-Claude only) and pointing at the data file; ob_start already prints planner.md in full, so this reaches the planner at /start with no T-191 dependency; (3) a tracked .cursor/rules hub rule (alwaysApply): your room from the data file, run --wait on open and after every post, act on the next atlas turn; (4) GAP 1: Cursor's /start (the template, then installed) joins the seat's room and reads unread atlas turns BEFORE its greeting proposes anything, and an unread atlas turn is reported as the seat's assignment. ACCEPTANCE: HB-1 a fresh planner session in sia-planner arms one listener per seat room from what /start printed, with no memory read; HB-2 a fresh Cursor chat in each seat runs --wait after its first post without a nudge from Aaron (live, once per seat); HB-3 a fresh Cursor /start in sia-forge, with an unread atlas turn in its room, names that turn as its assignment and proposes nothing else (live); HB-4 /sync fails when the data file names a seat worktree-seats.json does not, or lacks a room for a Cursor seat. NOT THIS TASK: the Stop-hook seat wake (T-160, raised to P0), per-seat greeting profiles (T-191, not raised), and the rest of Cursor /start's parity (T-197). Aaron's memory file reference_a2a_hub_tcm.md says the hub is for cross-machine traffic only, which is wrong for Cursor seats; flagged to him, not edited on a relay. Seat: cursor-infra (Composer 2.5), after record 192 r5; T-197 follows on the same seat because both edit Cursor's start.md. — REUSE, planner session 149, per worktrees-d5: A2A-Hub already has a tracked hub-transport section (a2a-planner .agents/roles/shared.md:147-166) and a tracked root AGENTS.md for Cursor seats. T-196 points at or reuses them for the procedure text, and does not rewrite it. SIA's own contribution is the seat data file and the Cursor /start step. Presence display is T-198. — QA 224 (GPT, QA PC; origin/qa/t196-report cadc6d4) REJECT of the combined T-196+T-197 code 929673b; the rejection stands. CS-2 is unmet: the parity checker treats each difference-table entry as a SUBSTRING waiver. QA confirmed the add/add collision of .agents/SYSTEM/hub-partner-seats.json with T-198 in either merge order; the ruling is to keep record 219's superset blob. Returned as record 219 r2 to cursor-infra (hub turn 87), after 220 r2. — SURFACE CAVEAT, 2026-09-29: the seats are the cursor-agent CLI, not the Cursor app (T-160 note). T-196's .cursor/rules hub rule and its Cursor /start step work only if the CLI loads project rules and user slash commands (~/.cursor/commands). No row proves that for the CLI. HB-2 and HB-3 (live) must be observed in a CLI seat, and if the CLI does not load .cursor/rules, the rule is inert and the procedure must reach the seat another way (for example AGENTS.md, or the first line Aaron pastes). — RULING, planner session 150, 2026-09-30 (question raised by Clark/worktrees-d5, relaying Aaron's check): HB-2 and HB-3 count as met ONLY when observed live in a cursor-agent CLI seat. A Cursor-app observation, or file presence, is PARTIAL. QA 228 covers the static rows and cannot satisfy HB-2/HB-3, which were always live rows the planner observes after merge. HB-3 names sia-forge, but sia-forge is now a Claude Code session (Forge, sia-forge-90), so HB-3 is observed in a Cursor CLI seat instead (builder or infra); the row's intent is unchanged. If the CLI does not load .cursor/rules or ~/.cursor/commands, the hub rule is inert and T-196 is returned for a route the CLI does read (for example AGENTS.md) rather than accepted on the static rows. — QA 228 ACCEPT, planner session 150, 2026-09-30 (report origin/qa/t196-r2-report 58a91ef, docs/loops/t196-t197-r2-qa-report.md; laptop, exit.228=0 at 06:04:25Z). The planner read every row: HB-4, CS-1, CS-2 and CS-3 met (all order 'shown'); HB-1, HB-2, HB-3 and CS-4 not_evaluated as dispatched (live); defects none. Developer and QA mutants killed. The only CI failure is state-schema r3b, identical at base 334fee5 (runs 36674710808 and 36674715816). PLANNER RULING: the static ACCEPT STANDS for code 3059ca9. The live rows stay OPEN under the rev 166 ruling (observed only in a cursor-agent CLI seat). NOTE: as of this session no seat runs the Cursor CLI (builder and Forge are Claude Code), so the live rows wait for a Cursor seat, and T-196's hub rule may have no user until one exists; that is not a reason to hold the merge, because the seat file, planner.md section and hub knowledge serve the planner and D-063 now. MERGE BLOCKER: origin/loop/t197-cursor-start-parity (c8165f5) CONFLICTS with origin/master abae5f9 in open-brain/src/pipelines/sync/index.ts only. Both sides added checks: master added checkProbeMarkers (record 198), the candidate added checkHubSeats and checkCursorStartParity. The resolution is to keep both, and it goes to a developer seat on a new branch (loop/t196-t197-merge: candidate plus origin/master merged, union resolution, suite run), because the planner does not write source and the infra seat is closed. Then a PR from that branch, and the merge is Aaron's. planner.md role PR e21e71a (origin/loop/t196-planner-md) merges clean; QA 228 found it matches scope item 2; it is Aaron's, as its own PR. — MERGE BRANCH READY, planner session 150: PR #220 from loop/t196-t197-merge dde3cf5 (builder sia-builder-4f): c8165f5 with origin/master abae5f9 merged in; one conflict (sync/index.ts), both sides kept. Planner verified independently: `git diff origin/master..dde3cf5`, excluding sync/index.ts, is byte-identical (cmp) to `334fee5..c8165f5`, the QA'd candidate's own diff (13 files, +624/-59 both). Builder's suite: 5 failures, all 5000 ms timeouts, each passing alone, and a different set from the T-194 run (the timeouts move). tcm CI is the check. PLANNER ERROR ENTRY (reached a counterpart): the planner's instruction told the builder to compare `git diff c8165f5 origin/master`, which also contains the reversal of the candidate's own changes and so could never match. The builder caught it and used the merge-base, which is correct. The merge is Aaron's (a code merge). — MERGED, planner session 150: PR #220 merged by the planner on Aaron's direct word ('Merge PR #220 (T-196 + T-197) once its CI is CLEAN') as 066ed8c, pinned to dde3cf5 after master turned green (#222). MASTER'S OWN RUN 36689357214 at 066ed8c: success. The task STAYS OPEN for the live rows HB-1..HB-3 (observed only in a cursor-agent CLI seat, rev 166). Cursor is blocked until 2026-10-03 (D-068), so they wait. D-063 strict: T-196 is merged; still waiting on T-198 (#223, Aaron's word) and forge's key.",
+      "note_by": [
+        "c407df9c-3dd7-4273-891b-798b4bd527f4",
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-197",
+      "title": "Cursor's /start matches Claude Code's /start except for documented tool-call differences, and /sync fails on any other difference: it reads ob_start's State block, never hand-edits rendered views, lets ob_start create the session log, and presents NEXT as a ranked backlog rather than a proposal",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 149,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "AUTHORITY: Aaron's 'yes' to sending Forge's /start findings, relayed 2026-09-28 by worktrees-d5 to the planner (session 149). Two links: Aaron -> worktrees-d5 -> Atlas. THE DEFECT IS IN THE TRACKED TEMPLATE: project-template/.cursor/commands/start.md on origin/master is byte-identical (ignoring CR) to the live ~/.cursor/commands/start.md (112 lines), so it ships to every project that installs the template. Already recorded as G-001 (session 54, 'Cursor start.md/end.md copies are not on ob_start/ob_state') and G-009 (it writes .recalled-entries.json); this task implements and closes both. GAPS (Forge's Cursor /start, transcript c4995381, 22:52Z; planner-verified): GAP 2, step A7 'Proposed: {top open INBOX item}' made Forge propose T-003, a backlog P0 unrelated to its assignment, where Claude Code's /start says NEXT 'is not a decision'. GAP 4: A2 reads the four rendered prose files instead of ob_start's State block; A5 'Reconcile drift: task.md Done vs INBOX [x] - fix mismatches' instructs a HAND EDIT of rendered views (forbidden: planner.md, CLAUDE.md 'state changes go through ob_state'); A6 creates its own session log (ob_start does); A3 calls ob_recall with trigger 'start' although session-start injection is suspended (Loop 10 C2); the numbering (A1-A3, '5. Coordination', A5) shows a splice. WHY PARITY MISSED IT: checkMirrorParity (open-brain/src/pipelines/sync/checks.ts on master) compares ~/.cursor/commands only to project-template/.cursor/commands ('live<->template (.cursor)', required: false), never to Claude Code's /start. ACCEPTANCE: CS-1 Cursor's /start's steps equal Claude Code's /start's, with each difference listed in one tracked table (e.g. CallDynamicTool for MCP calls); CS-2 /sync fails on any difference not in that table, shown red against master's template; CS-3 no step instructs editing INBOX.md, task.md, next-session.md, SUMMARY.md's marked region or state.json by hand; CS-4 a live Cursor /start in a developer seat prints NEXT as a ranked backlog, not 'Proposed:'. ALSO TO VERIFY, NOT YET ASSERTED: Forge's Cursor SessionStart wrote no by-pid session proof, so its recalls are unlinked; this may be T-046's fail-closed PreToolUse or its own defect: establish which, and file it. Cursor's /start reads 39 pending skill proposals and the Obsidian skill index; CS-1 parity removes that, since Claude Code's /start does not. Seat: cursor-infra, after T-196 (same file). Priority P0: it made a seat propose the wrong work this session. — QA 228 ACCEPT, planner session 150: see T-196's note (same candidate 3059ca9, same report, same merge blocker in sync/index.ts). CS-4 (ranked NEXT, live) stays open. — MERGED with T-196 (PR #220, 066ed8c, master run 36689357214 success). CS-4 (live) stays open until a Cursor seat exists (D-068).",
+      "note_by": [
+        "c407df9c-3dd7-4273-891b-798b4bd527f4",
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-198",
+      "title": "ob_start prints one line per partner seat from the hub's presence endpoint (listening or not, unread turns and since when), and says so visibly when the hub is unreachable, never silently",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 149,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "AUTHORITY: Aaron's 'yes and move the hub's Loop 8b ahead of Funnel', relayed 2026-09-28 by worktrees-d5 to the planner (session 149). Two links: Aaron -> worktrees-d5 -> Atlas. PROBLEM: tracked text does not make a planner check its seats. A2A-Hub's tracked shared.md (a2a-planner .agents/roles/shared.md:147-166, per worktrees-d5) already says 'check presence before assuming a seat sees a turn', and Relay's /start still never checked. In SIA, builder and Forge sat on turns 57/217 for about an hour this session, and the planner learned it only from a listener's 'unread by' line. INSTRUMENT, verified by the planner 2026-09-28: GET http://100.124.212.87:4000/a2a/agents/presence (hub v1.13.0, hub T-077) returns 200 with agents[].{name, state, lastSeen, lastSeenAgeMs, rooms[].{sessionId, unread, pollingNow, pollAgeMs}}. It IGNORES an ?agents= filter (the whole roster came back), so the client must filter by name. GOAL: at /start, for each partner seat (names and rooms from T-196's tracked data file; until that exists, a named interim source), print '<seat>: polling|not polling, N unread since <time>'. A hub timeout, non-2xx or unparseable body prints a visible 'presence: UNKNOWN (<cause>)' line, never nothing (shared.md 'Skip is not pass'). Bounded timeout so /start never hangs. ROWS: PR-1 polling seat; PR-2 not polling with unread; PR-3 hub unreachable -> UNKNOWN line with its cause; PR-4 a seat absent from the presence roster is printed as absent, not skipped; PR-5 a mutant that swallows the fetch error goes red on PR-3. Fixture HTTP server only; no live hub in tests. RULING: its own task, not folded into T-191. T-191 is sequenced after T-183 and is about which sections a seat sees; this is a new instrument every planner needs now. It serves both projects' planners because both run SIA's ob_start. Seat: Forge (sia-forge), now that record 215 is in QA; candidate C r4 takes precedence if QA 213 rejects C r3. — CORRECTION from Relay, 2026-09-28: the presence route reads ONLY ?name=<one agent> (A2A-Hub src/index.ts:542-548 at 63ab401) and silently ignores any other parameter. Relay opened that as hub T-079 (P2). Until it is fixed, either call ?name= once per seat or fetch the roster and filter client-side. Both meet PR-1 to PR-4; say which one was chosen. — LIVE CASE, from A2A-Hub's Loop 8b spike (Relay to Atlas, 2026-09-28, 00:45Z; hub T-076 rev 88): a background hub-listen.sh started by Rivet's Cursor marked turn 111 read by writing it to a file, and presence showed 'polling, unread=0' while the agent itself had not seen the turn. So 'polling' means a LISTENER PROCESS is polling, and 0 unread means that process consumed the turn, not that the seat read it. T-198's line must not print 'polling' in a way a planner reads as 'the seat has seen my turn'. Word it as 'listener polling', or pair it with the seat's last POST (its latest turn number and time), which only the agent can produce. QA for record 217 should probe this case. — QA 225 (GPT, QA PC; origin/qa/t198-report a8a5612) REJECT of 231f501; the rejection stands. Majors: listener activity is presented as seat presence (the planner's note above, confirmed); structurally malformed bodies escape the UNKNOWN contract; the new block is missing from greeting-size; five fixture-server tests fail on tcm (no network egress in CI). Returned as record 217 r2 to Forge (hub turn 235), AFTER candidate C r4, adopting record 219's seat-file blob. — FIFTH REQUIRED FIX FOR r2, planner 2026-09-30, from A2A-Hub's D-033(6) strict-auth check (Relay read tcm's auth-log): the candidate HARDCODES the key: open-brain/src/pipelines/session-start/hub-presence.ts:124 sends headers { \"X-Agent-Key\": \"dev-key\" }. tcm holds dev-key for no agent (devKeyHeldByNone), so every presence read logs 'unknown X-Agent-Key on GET /agents/presence' and would get a 403 under AUTH_MODE=strict, so the presence line breaks silently. r2 must send the seat's OWN key (the one hub-talk uses from its key dir), and a missing or unreadable key must print presence UNKNOWN with that cause, never fall back to dev-key. Strict on tcm waits on this and on T-196 (the key in the tracked seat file). Also: the 8 unknown-key presence reads Relay found (2026-09-29 00:13-03:45Z) were the planner's own dev-key probes, plus QA 225's one permitted read-only call; the planner has stopped using dev-key. — r2 BUILT LOCALLY, planner session 150, 2026-09-30 (Forge, sia-forge-90): 6306ffe (red rows, T-196 superset seat file adopted unchanged), f172e28 (product), a40fc77 (handoff). Five mutants. Base red at 231f501 under a no-network tripwire: 5 failed, the same five QA 225 saw on tcm. Full suite: 2 failures, the same two as at 5f7c9a0. The greeting-size worst-case bound adds 194 characters. The tcm no-egress run is QA's row (D-061). Push cleared. FINDING -> G-049: builder and infra checkouts resolve to Forge's identity, so their presence keys are never looked up. — QA 230 ACCEPT, planner session 150 (report origin/qa/t198-r2-report 1cc2fe3, docs/loops/t198-r2-qa-report.md; laptop). The planner read every row: PR-1..PR-6 and R1..R5 met, no defects. R4 was shown on tcm: candidate run 36681338277 fails only T-171 r3b (the same at r1 36681343536 and base 36681349895), and all five r1 fixture-server failures pass. The live GET was skipped (the QA account has no hub key) and dev-key was never used. THE ACCEPT STANDS. The branch merges clean with master; a PR has been opened for Aaron's merge. D-063: strict auth waits on T-198 r2 and T-196 (#220) merged, plus forge's key; when both PRs are merged, tell Relay. — MERGE, planner session 150: Aaron, directly in the planner session: 'merging #223 (T-198 r2)'. update-branch REFUSED: a conflict in .agents/SYSTEM/hub-partner-seats.json (add/add). #220 merged master's superset copy (with talk_tokens), and T-198 carries the older blob 344bd46. Resolution: take master's copy, since the T-198 parser ignores extra keys (QA 228). The builder makes loop/t198-merge with a merge-base cmp check and a new PR; #223 closes in its favour. Aaron's word covers the identical code. Also: QA 232 (C r4) was LAUNCHED by the planner at Aaron's direction (his launch line failed to paste) at 08:27:57Z, laptop pid 3704, Opus headless; log C:\\qa-tmp\\qa-232.log. — Planner session 153: #227 (T-198 r2 merged with master) MERGED as c1296f2b on Aaron's 'merge' in the planner session. First update-branch to 304a24ad, whose code was cmp-identical to QA 230's b8a6004 (the diff outside docs/.agents was 0 bytes); the PR CI test job passed on 304a24ad. It showed UNSTABLE only because the push-event duplicate run is cancelled on every push. #223 auto-closed as merged, since its head a40fc77 is inside #227.",
+      "note_by": [
+        "c407df9c-3dd7-4273-891b-798b4bd527f4",
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97",
+        "6e083614-965f-462b-ad59-62091a0be5e1"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-199",
+      "title": "A seat session that wrote the record but left no handoff is DETECTED at that seat's next /start, and planner.md's stale 'one handoff slot, C2 unfixed' paragraph is corrected (the per-seat slot exists since schema v3)",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 149,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "AUTHORITY: same relay as T-198 (Aaron -> worktrees-d5 -> Atlas, 2026-09-28). FINDING, planner-derived session 149: the per-seat handoff the relay asked for ALREADY EXISTS. SIA's record is schema v3, with handoffs[] keyed by seat: qa@75, developer@74, planner@146 to 149. ob_state's set_handoff writes this session's own entry, and ob_start prints 'Your handoff - planner'. What is broken is two things around it. (1) planner.md still says 'There is one handoff slot and /end writes it; this seat does not run /end ... Loop 14's C2 and it is unfixed', which is false since schema v3 and tells a planner NOT to write one: a Rule 14 instance in a tracked role file. (2) Nothing notices a missing handoff. A2A-Hub's record (a2a-planner, schema 3, rev 83) holds only qa@19, and its planner Relay flagged 'This seat has no planner handoff in the record'. ROWS: HO-1 /start prints 'the last <seat> session (N, uuid) wrote the record but left no handoff' when that is so, shown red on a fixture record; HO-2 no line when the handoff exists; HO-3 planner.md's paragraph replaced by the set_handoff instruction (a role-file change: its own PR to Aaron, per D-062). WHY P1 AND NOT P0: in SIA the mechanism works and planners 146-149 used it. The retraining Aaron described is procedure knowledge (how to drive Cursor seats), which is T-196's (P0), not state. Relay can use set_handoff today; the planner tells it so directly. NOTE: T-163 (open, P0) proposed the seat-keyed list, which schema v3 appears to implement. Its /sync check ('no close-out removes another seat's uuid') has not been verified here; reconcile T-163 when this lands. Seat: builder, after T-194. — CORRECTION from Relay, 2026-09-28: A2A-Hub's .agents/roles/ does NOT contain the stale 'one handoff slot / C2 unfixed' text (Relay grepped: 0 hits). So the hub record's missing planner handoff had another cause, not that paragraph, and the stale text is SIA's planner.md alone. Relay wrote the hub's first planner handoff at rev 85. HO-1 (the detector) is still the fix that would have caught it. — BUILT, planner session 150, 2026-09-30 (Forge, sia-forge-90), on loop/t199-missing-handoff from abae5f9: bdc7420 (red rows), 3446892 (product HO-1/HO-2), 58aad85 (ROLE FILE planner.md, HO-3, own commit; Aaron's merge), 621d49e (handoff). Attribution by checkout (G-049). True red at base: 10 of 15 rows; the 5 HO-2 negative rows are mutant-only. Six mutants. Suite runs were noisy under load: tip run 1 had 7 failures, each passing alone; tip run 2 had 0 failed tests but exit 1 from an onTaskUpdate RPC timeout (the G-042 shape); the base run had 1 failure (detach --force). None was shown to be caused by the change; tcm is the authoritative run. Push cleared.",
+      "note_by": [
+        "c407df9c-3dd7-4273-891b-798b4bd527f4",
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-200",
+      "title": "A seat started from a stale tree is briefed from STALE state: when the local record is older than origin/master's, ob_start renders the State block and the role files from origin/master (git show) and says so, so D-062 holds at every /start",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 149,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "RULING by the planner, session 149 (2026-09-30), on Aaron's word relayed by worktrees-d5 ('send the findings to atlas, let atlas decide'). EVIDENCE: Forge's Claude Code /start (transcript 923463b3, about 05:11Z) printed 'THIS TREE IS STALE: 111 commits behind origin/master: record here rev 140, at origin/master rev 163' and flagged developer.md as behind, then briefed from rev 140 anyway: objective 'A13 ... PR #182 awaits merge' (merged 09-27), the handoff from session 74, and a role file without D-061. D-062 says the record reaches seats through origin/master; nothing makes a seat's /start READ master, so D-062 is defeated at every start from a stale tree. RULING: READ FROM MASTER, DO NOT REFUSE. A developer resuming on its own branch is legitimately behind master, and refusing to brief would block real work. When the local .agents/state.json revision is lower than origin/master's (from the last fetch), render the State block (objective, tasks, handoffs, decisions) and the role files from origin/master via git show, and print one line naming the source ('record read from origin/master <sha> rev N; this tree holds rev M; last fetch <time>'). ROWS: RM-1 a tree whose record is behind master renders master's objective and handoff (fixture: local rev 140, master rev 163); RM-2 a tree at or ahead of master renders its own record (the planner's own branch is often ahead); RM-3 origin/master unreadable (no remote, bad ref) prints a visible 'record source: LOCAL (origin/master unreadable: <cause>)' line and renders the local record, never silently; RM-4 the role files follow the same source as the state; RM-5 a mutant that always renders local goes red on RM-1. NOT THIS TASK: fetching (ob_start reports the last fetch time; a stale fetch is named, not fixed), and the build-freshness or gitnexus staleness also seen in that start. Seat: cursor-builder (it touches ob_start's session-start pipeline, as T-164 does), after T-194 r2 and before T-199. — REQUIRED BEFORE QA, planner session 150 (the builder's live-reader audit, reasoned from code, not reproduced): greeting-size.test.ts 'the composed greeting carries the role files whole' composes from REPO_ROOT and asserts the WORKING TREE's roles files byte for byte. T-200 makes composeGreeting read role files from origin/master whenever the local record is behind, so on any behind checkout whose role files differ from master's, the row goes red with nothing wrong, and developer branches are routinely behind. Fix it on loop/t200-record-from-master: the test compares against the SAME source the composition used (or builds its own level fixture). Show it red on a fixture where tree and master role files differ, green after, with a mutant. T-201 (stacked) rebases onto the fix. — Test fix pushed (the planner's read of origin, session 150): loop/t200-record-from-master is now 424065c (was 5b9eab0a), and loop/t201-assignment is rebased onto it at 8952266. The builder went offline before reporting either; the evidence (red/green, mutant) is to be read from its handoff before QA dispatch.",
+      "note_by": [
+        "c407df9c-3dd7-4273-891b-798b4bd527f4",
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-201",
+      "title": "A developer or QA seat's /start names its assignment, read from the record, or says 'no assignment' explicitly; it never stops at the backlog",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 150,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner session 150, 2026-09-30. Aaron approved, relayed Aaron -> worktrees-d5 (Clark) -> Atlas, verbatim 'Go ahead [and] add those items'; the ruling (task, priority, seat, sequencing) is the planner's. EVIDENCE: sia-builder-4f (Claude Code, transcript 2e6ed7b8) ran /start at 05:43Z, printed a briefing from rev 157 with NEXT = backlog P0s, and stopped as step 6 says. Its T-194 r2 dispatch sat in a Cursor hub room it never reads, and nothing told the planner the seat existed. PROBLEM: an assignment exists only in a transport (hub turn or native A2A). Native A2A has no memory, and a message sent before the session exists never reaches it, so a fresh seat cannot find its work. OBSERVABLE GOAL: a fresh Claude Code developer or QA seat opened with a pending assignment starts on it with no human prompt. SCOPE: (1) the planner's dispatch is durable in the record (for example a per-seat assignment the planner writes through ob_state: task id, brief path or turn, what is owed, the date); (2) ob_start, for a developer or QA seat, prints that assignment under its own header, or prints 'no assignment' explicitly; (3) the /start command for those seats names the assignment as the session's work instead of presenting NEXT as a plan. Mechanism is the developer's. It must read the record from origin/master when the tree is behind, so it is SEQUENCED AFTER T-200. Rows: a fixture with an assignment prints it, and one without prints 'no assignment'; a stale tree prints master's assignment, not the local one; a mutant that drops the assignment block goes red; the greeting-size check includes the block. RELATED, not duplicated: T-196 HB-3 and T-197 (the Cursor CLI side), T-199 (missing-handoff detection), T-191 (per-seat greeting profiles). Seat: builder, after T-194 r2 and T-200 (before T-199). — PLAN RULED, planner session 150 (the builder on the QA PC, via Clark's Remote Control relay; brief docs/loops/t201-brief.md): assignments[] as an OPTIONAL additive field with no schema_version bump (T-200 refuses an unknown version, and older builds read master); a set_assignment op replaces that seat's entry, older entries kept as superseded, a planner assignee refused; task_id REQUIRED and ACTIVE (a QA assignment names its candidate's task, with the QA number and PR in brief); stacked on loop/t200-record-from-master 5b9eab0a; no test asserts live-record values (T-205); the record-erasure check treats a replaced assignment like a superseded handoff. — RULING, planner session 150, on the builder's stop (via Clark): OPTION C, a tracked sidecar .agents/assignments.json written only through new ob_state ops (set_assignment / clear_assignment, with the same refusals, dry run first, its own revision counter, superseded entries kept). StateSchema is untouched. Reason (verified by the planner on origin/master): every object level of StateSchema is z.strictObject, so an additive field in state.json makes every build that predates it fail to parse master, which is the blinding (a) was meant to prevent. Accepted cost: an assignment write is not atomic with the record revision. The record-erasure row becomes 'a replaced assignment keeps its superseded entry in the sidecar'. The sidecar is read like state.json by ob_start and by T-200's master reader. OPEN FOR AARON: the D-032/D-055 docs-only allowlist names .agents/state.json and its four views, not .agents/assignments.json; until he adds it, a PR carrying an assignment write is his merge. — BUILT, planner session 150 (builder on the QA PC, direct over Remote Control): loop/t201-assignment 8bc849ae (code+tests b7636625, /start+handoff 9549fcc3), stacked on T-200 5b9eab0a. Option C: sidecar .agents/assignments.json, StateSchema untouched, set_assignment / clear_assignment with their own revision counter, a mixed batch with record ops refused. ob_start prints an Assignment block, 'no assignment', or 'UNREADABLE - cause'. 32 fixture-only tests; 10 mutants, each red on its row; full suite exit 0 on the QA PC (127 files, 1825 passed). Push cleared. The developer named these costs: not atomic with the record; a task later closed leaves a stale assignment; no /sync erasure check on the sidecar; the writer not restricted to the planner; seats sharing a role share one assignment until T-203. Planner rulings: the writer guard and the sidecar erasure check go to a follow-up task and do not block QA.",
+      "note_by": [
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-202",
+      "title": "The planner learns when a seat comes online: each seat worktree's SessionStart reports seat, checkout SHA, record rev and runtime (Claude Code or Cursor CLI) to the planner seat, deterministically",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 150,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner session 150, 2026-09-30, on the same approval as the task opened beside it (Aaron -> worktrees-d5 -> Atlas, 'Go ahead [and] add those items'). EVIDENCE: the planner learned that sia-builder-4f existed only because Clark read transcripts; the planner had dispatched to a hub room the seat's runtime does not read. PROBLEM: the planner cannot choose the right channel (native A2A for Claude Code, a hub room for the Cursor CLI) for a seat it does not know is up. OBSERVABLE GOAL: within one seat start, the planner has a line naming the seat, its checkout SHA, record rev and runtime, with no human relay. It must fail visibly: a report that cannot be delivered says so in the seat's own start output. Mechanism is the developer's (a hook cannot call SendMessage; a durable line the planner reads, for example a per-seat file or a hub post under the seat's own key, is the likely shape). It is deterministic, with no LLM step. SPLIT WITH A2A-HUB: Relay's T-076 waker is the Cursor half. Coordinate the split with Relay (a2a-planner-9d) before building, so no seat is reported twice or not at all. Priority P1, below its sibling: once a seat starts on its own assignment, the planner needs to know a seat is up for routing, not to keep it busy. Seat: infra, when it reopens; the Relay split is agreed first.",
+      "note_by": [
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-203",
+      "title": "A seat is resolved by its CHECKOUT, not by AGENT.local.md's identity: one tracked map from worktree to seat, role and hub name, used by every per-seat lookup (presence key, readers row, handoff attribution, seat-online report)",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 150,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner session 150, 2026-09-30, from G-049 (Forge's T-198 r2 finding): sia-builder, sia-infra and sia-forge all carry AGENT.local.md identity 'Forge / developer', so T-198's presence block resolves builder and infra to Forge's reader row and to forge.key; cursor-builder.key and cursor-infra.key are never looked up. T-199 already attributes sessions by checkout for the same reason. SCOPE: (1) one tracked source maps each seat worktree (by basename, as sessions[].checkout records it) to seat name, role and hub name; extend .agents/SYSTEM/worktree-seats.json or the T-196 seat file, whichever the developer shows is the single source, and never both; (2) T-198's key lookup and readers lookup resolve through it; (3) a checkout absent from the map prints a visible 'seat unknown for checkout <c>', never a fallback to the identity name; (4) /sync flags an AGENT.local.md whose identity disagrees with the map for its checkout. Rows: builder resolves to cursor-builder (or whatever the map names) and infra likewise; an unmapped checkout gives the visible line; the /sync check fires on the current builder/infra AGENT.local.md; a mutant that falls back to the identity name goes red. SEQUENCED AFTER T-198 r2 merges (it changes T-198's lookup); build on origin/loop/t198-presence until then and name the dependency. Seat: Forge. Closes G-049 when merged.",
+      "note_by": [
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-204",
+      "title": "A compute lease on the QA PC: a developer suite and SIA's qa-queue.ps1 each take one lease file before a run, so QA never starts over a developer suite and a developer suite never starts over QA; stale leases (expired, or owner process gone) are reclaimed",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 150,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner session 150, 2026-09-30. Aaron approved the lease, relayed Aaron -> worktrees-d5 (Clark) -> Atlas, verbatim 'yes'. The ruling is the planner's. WHY: D-065 made the QA PC a developer machine first (pilot: Chisel, agent-dashboard), usable for SIA QA only when no developer suite runs; 'quiet' as a judgement is the thing that fails. SCOPE: (1) ONE helper script, tracked in SIA beside docs/loops/qa-queue.ps1 and copied to the QA PC's user folder the same way (never run from inside a checkout), with take / release / status. Other repos (agent-dashboard) call that copy; there are not two implementations. (2) The lease file lives outside every repo, in a fixed per-machine location, and holds {owner seat, session, pid, pid creation time, started, expires}. Taking it is ATOMIC (create-exclusive). (3) Stale-safe: a lease is reclaimable when expired, or when its pid is gone OR the pid's creation time differs (PID reuse; the gate Relay made binding for kills). (4) qa-queue.ps1 takes the lease for its whole run; while another live lease is held it waits and logs 'QA PC busy: <owner>' with a bounded wait, and never starts over it. (5) It fails closed: an unreadable or malformed lease file counts as HELD and says so, and is never silently ignored. ROWS: a held lease makes a queued QA wait and log the owner; a crashed holder (pid gone) is reclaimed, and so is a reused pid; two concurrent takers yield exactly one winner; a malformed file blocks with a named cause; a mutant with non-atomic take (check-then-write) loses the race row; a mutant that ignores the pid creation time loses the reuse row; the queue is red without the lease check and green with it. The queue-script change needs the machine copies re-copied (qa-launch.md). OUT OF SCOPE: agent-dashboard's own call site (Clark briefs Chisel once this exists). Seat: Forge, after T-203. Launch doc updated: the laptop is the default; the QA PC takes QA when the lease is free. — ADDED TO SCOPE, planner session 150 (QA 231's evidence): qa-queue.ps1 logged 'exit.231=0' and 'done_marker.231=True' for a run whose driver recorded complete=False and wrote no report (every attempt refused on a usage limit). The queue log reads as success while the driver knew it failed, which is the fail-open shape. Since T-204 edits qa-queue.ps1 anyway: the queue reads the driver's drive.meta 'complete=' line and logs 'complete.N=False (<reason>)' explicitly, and a model refusal or usage limit in run-*.err is named in the queue log. Row: a fixture driver meta with complete=False yields a complete.N=False line, never a bare done_marker=True. — PLAN RULED, planner session 150 (Forge on the QA PC, full plan to be committed as docs/loops/t204-plan.md on loop/t204-machine-lease): one machine-agnostic helper docs/loops/machine-lease.ps1 (take/release/status/renew), copied to %USERPROFILE% like qa-queue.ps1; lease file %USERPROFILE%\\machine-lease\\lease.json (per-user location ACCEPTED, with the limit printed in status output); atomic take by writing a temp file then Move-without-overwrite; the owner is a long-lived -OwnerPid plus its creation time; stale when expired, pid gone or pid creation time differing; unreadable or malformed means HELD (exit 11); release only by the owner. qa-queue.ps1 takes the lease after its own lock, waits bounded, aborts rather than running over a held lease, releases in finally, and logs complete.N and refusal_err.N (QA 231). The laptop's headless launch-qa.ps1 (Clark's) REFUSES when the lease is held, and takes it itself with -OwnerPid = the created claude pid; no release, since pid-gone reclaims it. That one line is Clark's change after T-204 merges. Rows R1-R10 with mutants (ignore creation time; check-then-write). Aaron re-copies both scripts per machine after the merge; the queue refuses without the lease copy. Branch prefix corrected from feat/ to loop/ (D-038). — BUILT, planner session 150 (Forge on the QA PC, Sonnet): loop/t204-machine-lease d5b3623 from master 066ed8c; plan docs/loops/t204-plan.md; handoff docs/loops/t204-developer-handoff.md. Harness docs/loops/machine-lease-harness.ps1: 24 rows pass on the candidate; all 7 queue rows are RED against master's qa-queue.ps1 (R8: a driver started over a live lease; R9b: a bare done_marker=True). Mutants are local (non-atomic take loses R5 30/30; ignoring the creation time loses R3; the queue without the lease loses R8/R8c). ACCEPTED ADDITION: the launcher makes TWO calls: take -OwnerPid $PID before creating the job (refusing on exit 10 or 11), then renew -NewOwnerPid <claude pid> right after Create (rows R7c/R7d). The exact lines for Clark are in t204-plan.md. ACCEPTED DEVIATION: queue -SelfTest lease checks dropped; the harness exercises the helper with real processes. NOT COVERED: vitest (no TS touched), anything on the laptop, and launch-qa.ps1 itself. QA not yet dispatched. After the merge, Aaron re-copies qa-queue.ps1 and machine-lease.ps1 on each machine (the queue refuses without the helper). FORGE'S HUB TURN: denied by its classifier ('Unrequested Commit in a Connected App'); it is Aaron's to run with ! in the sia-forge window.",
+      "note_by": [
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-205",
+      "title": "MASTER IS RED: T-158's TG-2 test asserts specific gap ids against the LIVE record, and the planner's G-049 broke it; prove the citation skip on a fixture record instead",
+      "priority": "P0",
+      "status": "done",
+      "opened_session": 150,
+      "closed_session": 150,
+      "supersedes": null,
+      "note": "Opened planner session 150, 2026-09-30. Master run 36681093114 at 9c60361 (the planner's docs-only #219 merge, which carried rev 175's explicit G-049) FAILS tests/shared/state-writer.test.ts 'a dry-run add_gap on this repo skips G-046, G-047 and G-048 and names them (TG-2)': expected false to be true. It is the only failure (1 of 1856). CAUSE (derived): the test runs add_gap against this repo's LIVE .agents/state.json. With G-049 present, the next generated id is G-050, so the skip of 046-048 never occurs. Same class as r3b (#210) and G-044: live record data asserted as an invariant. The TEST is the defect; the record is NOT reverted. FIX (builder, branch fix/tg2-fixture-record from origin/master): prove the citation skip on a FIXTURE record in a scratch repo whose tracked files cite the ids the fixture's next id would hit. A live-repo run, if any, asserts only 'the assigned id is not cited', never specific ids. Rows: red at 9c60361, green after; a mutant dropping the citation scan goes red on the fixture row; a sibling grep of the test tree for other assertions on specific live task, gap or decision ids, each named. Push cleared, PR, merge is Aaron's. PLANNER ERROR ENTRY: the planner's record write reached master and turned it red. Caught by reading master's own run after the merge. The planner had checked that G-049 was uncited in the tree but not whether a test pinned the next id. PR #220 is held until master is green again, so its merge is attributable. — MERGE AUTHORITY, planner session 150: Aaron, directly in the planner session, verbatim: 'merging the TG-2 fix PR when the builder posts it'. It covers ONE PR: the builder's fix/tg2-fixture-record PR. The planner merges it only on MERGEABLE/CLEAN, pinned to its head, after reading the red/green and mutant evidence, then reads master's own run. It does not cover any other PR. — FIXED, planner session 150: PR #222 (fix/tg2-fixture-record a4d540c, builder) merged by the planner on Aaron's word ('merging the TG-2 fix PR when the builder posts it') as cdf079d, pinned; PR run 36684022227 success. MASTER'S OWN RUN 36687172648 at cdf079d: SUCCESS; master is green again. The builder's sibling audit found no other assertion a routine record write can break. It found one tree-behind fragility in greeting-size.test.ts, which is T-200's to fix before QA.",
+      "note_by": [
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": 194
+    },
+    {
+      "id": "T-206",
+      "title": "The assignments sidecar gets the record's protections: a /sync erasure check (no entry dropped by a hand edit or a merge resolution), a stale-assignment flag (the assigned task is no longer active), and a planner-only writer once T-203 resolves seats by checkout",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 150,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner session 150 from T-201's named costs (docs/loops/t201-developer-handoff.md on loop/t201-assignment). (1) Erasure check: compare the sidecar at HEAD with the last commit that touched it, the same baseline as CC-13 / T-163; a superseded or cleared entry must survive, and a dropped entry is an ISSUE naming it. (2) At /start and in /sync, a live assignment whose task is done or retired is flagged 'stale assignment', never shown as work. (3) The set_assignment / clear_assignment writer refuses unless the calling checkout resolves to the planner seat, through T-203's map; no identity fallback. SEQUENCED after T-201 and T-203 merge. Seat: whichever developer seat is free.",
+      "note_by": [
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-207",
+      "title": "CI must not run on developer mutant branches: a push to loop/*-mut-* (and other not-for-merge mutant refs) starts a tcm run that is never evidence and starves QA and PR runs",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 150,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner session 150, 2026-09-30, about 07:52Z. OBSERVED: 21 CI runs waiting on tcm, and both tcm runners busy with mutant-branch runs, one of them in progress for 44 minutes. 13 of the 21 were developer mutant branches pushed during the seat moves. The TG-2 master fix PR #222 had waited 20 minutes with its test job still queued. Under D-061 QA runs the CI, and QA re-applies each mutant to the candidate SHA on its own qa/*-mut-* branches, so a developer mutant branch's CI run is never evidence. ACTION TAKEN (the planner, reversible with gh run rerun): cancelled 25 runs on loop/*-mut-*, loop/t164-record-session-number and loop/t203-seat-by-checkout (the list is in this session's transcript); kept every qa/* run, fix/tg2-fixture-record (#222) and loop/t196-t197-merge (#220). FIX: .github/workflows/ci.yml skips push runs for mutant refs (for example branches-ignore on '**-mut-*' and '**/mutant/**'), with a row showing a mutant push starts no run and a candidate push still does. QA's own qa/*-mut-* runs: decide whether QA needs CI on them or runs mutants locally, and state it. Until the fix lands, the planner cancels developer mutant runs by hand. ci.yml is code: the merge is Aaron's. Seat: whichever developer seat is free. — PLAN RULED, planner session 150 (builder): negated push patterns in ci.yml for loop/**-mut-* AND qa/**-mut-* (QA runs its mutants locally; its CI covers the candidate and the base, per D-061). A parse-based matcher row over a fixture list of the real mutant ref names; the known positive and negative in the same test (T-156); a delete-the-negation mutant. LIVE PROBE APPROVED (one): push ONE throwaway mutant-named ref (loop/t207-probe-mut-x) pointing at the candidate commit, since a push event evaluates the workflow at the pushed commit, and observe that no run starts; the negative control is the candidate branch's own push, which must start a run. Then delete the probe ref. Name the limits: workflow_dispatch and PRs are unfiltered. Sequenced after the T-200 test fix. — BUILT AND PUSHED, planner session 150 (the builder, QA PC), found by the planner after the builder went offline WITHOUT a report: loop/t207-ci-skip-mutants f3e64f1 (ci.yml 7899db2 plus handoff docs/loops/t207-developer-handoff.md; ci-push-filter.test.ts added). LIVE PROBE, read by the planner from gh: loop/t207-probe-mut-x (7899db2) has NO runs, and loop/t207-ci-skip-mutants has push runs 36687403853 (7899db2, cancelled) and 36687694258 (f3e64f1, success). So the negation holds for the probe ref and the candidate still runs. The probe ref was NOT deleted; the builder must delete it (its own branch) when it is back. QA not yet dispatched. ci.yml is code: the merge is Aaron's. — CORRECTION, planner session 150: the probe ref WAS deleted. `git ls-remote origin 'refs/heads/loop/t207*'` lists only loop/t207-ci-skip-mutants. The planner's 'NOT deleted' above came from a stale remote-tracking ref, because its fetch did not prune. PLANNER ERROR ENTRY: a stale instrument read as a fact, and it reached the record and Clark. The builder's report (resent over Remote Control after its first send found the planner unreachable) states: candidate push 08:03:58Z started run 36687403853 in 2 s; the probe push at 08:04:51Z started nothing in 90 s; probe deleted. There are four local mutants (no-loop-negation, no-qa-negation, wrong-glob, negation-first), all red; the full suite is exit 0 (1789) at 7899db2. Limits: -redcheck and -mutant names are not covered (pinned by a test); dispatch and PR-from-mutant still run. The builder was NOT offline without reporting: its report failed to deliver once.",
+      "note_by": [
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-208",
+      "title": "A session start FETCHES before it judges currency: the SessionStart hook runs `git fetch --prune origin` (bounded timeout) before tree-currency and ob_start, says so visibly when it fails, and never calls a tree 'level' against a fetch it did not just make",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 150,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner session 150, 2026-09-30, on Aaron's approval ('send it to Atlas to rule on', relayed Aaron -> clark -> Atlas). EVIDENCE, two stale-fetch misreads within about an hour: (1) the planner read the T-207 probe ref as undeleted from an unpruned remote-tracking ref (rev 196's correction); (2) Forge's /start on the QA PC printed 'HEAD 9c603615, level with origin/master, state rev 178 level with origin/master rev 178' while origin/master was at about rev 194 (#221 7c925a6, #222 cdf079d, including Forge's own rev-183 handoff). ob_start compares against the LAST fetch and says so, but nothing makes the fetch happen, so T-200's 'brief from master' is only as fresh as a fetch nobody ran, and D-062 is defeated at /start again. RULING: DETERMINISTIC, not a prompt step. The SessionStart hook (cli-bootstrap), which already prints tree currency, runs `git fetch --prune origin` FIRST, with a bounded timeout (network), then computes currency. On failure it prints 'fetch FAILED: <cause>; currency is against a fetch from <time>' and the currency line never says 'level' unqualified. ob_start states the fetch time it compared against. The /start command text gets no fetch step, because the hook owns it. ROWS: a fixture with an origin that moved after the last fetch: before the change it reads 'level' (red), after it reads 'behind' (green); an unreachable origin prints the FAILED line and the old fetch time; the fetch is bounded (a hanging remote does not hang /start); a mutant that skips the fetch goes red on the first row; prune is proven (a deleted remote branch is gone after start). NOT THIS TASK: the Cursor copy (T-197 parity follows it). SEQUENCED AFTER T-200 merges (it touches tree-currency, which T-200 also changed). Seat: builder (it built T-200's record source and knows tree-currency).",
+      "note_by": [
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-209",
+      "title": "ob_start renders BROKEN gaps newest-first",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 153,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Clark startup audit (a), accepted by planner session 153. ob_start's State block lists gaps oldest-first (G-001..G-007), while /start's briefing says newest first, so session 153's briefing showed the five oldest of 40 gaps and hid G-049 and G-045..G-042. Fix it in the render, deterministically, not in the /start wording.",
+      "note_by": [
+        "6e083614-965f-462b-ad59-62091a0be5e1"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-210",
+      "title": "ob_start names the newest docs/loops brief by git commit date",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 153,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Clark startup audit (b), accepted by planner session 153. /start's rule 'the largest loop number in docs/loops' no longer fits task-named docs (t201-brief.md, qa-233-*). Session 153 picked loop-16-qa-report-4.md from 2026-09-20. ob_start should emit the newest brief itself, by git commit date, so the briefing does not guess.",
+      "note_by": [
+        "6e083614-965f-462b-ad59-62091a0be5e1"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-211",
+      "title": "Each seat's status-cron minutes live in seat data, and /start reads them",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 153,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Clark startup audit (d), accepted by planner session 153. The status-cron times exist only in handoff watch-outs, so they drift and collide: atlas :04/:34, relay :07/:37, the same minutes as Clark's own check. Put each seat's minutes in AGENT.local.md or roles data, and have /start print them so the seat creates the cron from data. (Clark's proposal (c), the AGENT.md/seat mismatch, was WITHDRAWN: AGENT.local.md overrides the tracked default by design.)",
+      "note_by": [
+        "6e083614-965f-462b-ad59-62091a0be5e1"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-212",
+      "title": "SessionStart missing-handoff check attributes commits by Claude-Session trailer, not git identity",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 153,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "From Relay via Clark (A2A T-080), accepted by planner session 153. The check blamed Relay's session 20 (743b4fed) for 28 commits that are Rivet's. They share the git identity 'Aaron Melven' and carry no Claude-Session trailer, and docs/loops/rivet-handoff-session-20.md covers them. Attribute by the trailer; a commit without a trailer is UNATTRIBUTED, never assigned to the checkout's seat by identity.",
+      "note_by": [
+        "6e083614-965f-462b-ad59-62091a0be5e1"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-213",
+      "title": "Repoint the forge seat in hub-partner-seats.json to hub_name forge, room k571c0nz, and un-pin the tests from the live file",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 153,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Strict prep (A2A T-057, Relay's condition 3), planner session 153. Forge now talks to atlas as `forge` (key 95d5e360), but it is NOT a member of grok's room k57frxw0ptb8tadmqdwy0khhks8ey006, and the hub has no add-member route. The {atlas, forge} room k571c0nz7tq2e5g0qt8td094n18ers8v is the replacement: participants [atlas, forge]; the planner extended it from 64 to 500 turns (POST /extend +436, 200). The tracked .agents/SYSTEM/hub-partner-seats.json still maps seats.forge to hub_name grok, room k57frxw0, and readers.atlas and readers.grok follow. The planner tried the record edit (forge seat to {hub_name: forge, cursor: false, room: k571c0nz}, the atlas reader partner grok to forge, readers.grok to readers.forge) and it broke 5 tests that read the LIVE file: hub-presence.test.ts PR-1, PR-4 and both R5 key rows, plus greeting-size's T-198 presence bound. On the original file, 37/37 pass. That is the T-205 lesson again: a test pins live record data. The developer makes the edit and moves those tests onto a fixture seats file, in one PR. Until it merges, strict (D-063) is not safe for forge. — CORRECTION, same session, after Relay's revision of condition (3) (via Clark): T-213 is WANTED (one identity per seat) but is NOT a strict prerequisite. The seat file routes the forge seat as `--as grok` into k57frxw0 (.cursor/rules/hub-room.mdc:8 says to talk as {hub_name} in {room}), and grok IS a k57 member: its 2026-09-29 ~02:32Z send logged no WOULD REJECT. Only (forge, k57) 403s, which was the 09:06:47Z hand send. Relay's condition (3) is now 'every configured (hub_name, room) pair is a member pair, and nobody sends --as forge to k57', and the current file meets it. The sentence above, 'Until it merges, strict (D-063) is not safe for forge', is WITHDRAWN. Priority lowered from P0 to P1.",
+      "note_by": [
+        "6e083614-965f-462b-ad59-62091a0be5e1"
+      ],
       "closed_rev": null
     }
   ],
@@ -2258,6 +2550,29 @@
       ],
       "since_session": 77,
       "status": "verified"
+    },
+    {
+      "id": "V-078",
+      "claim": "tcm's A2A hub has run AUTH_MODE=strict since 2026-09-30T12:32:42Z (D-063 / A2A D-033), and SIA's seats are reachable under it: atlas's own-key read of the {atlas, forge} room k571c0nz returned 200 at 12:34:05Z",
+      "evidence": [
+        {
+          "type": "report",
+          "path": "Relay's DONE line, A2A message to atlas, 2026-09-30 ~12:33Z",
+          "observation": "clark executed it from the desktop: only .env line 7 changed, force-recreate on the same image 5703b442c3ad, no build, no Convex deploy. The backup is ~/docker-compose/a2a-hub/.env.bak-prestrict-20260930T123224Z, and rollback = cp the backup + the same recreate. The read-only menu shows auth-mode strict and health ok. The new container's auth-log had 0 auth, authz or enroll lines at 12:33Z."
+        },
+        {
+          "type": "command",
+          "path": "planner session 153: GET http://100.124.212.87:4000/a2a/sessions with atlas's own key",
+          "observation": "status 200 at 2026-09-30T12:34:05Z; k571c0nz participants [atlas, forge], turnCount 60, maxTurns 500, isActive true"
+        },
+        {
+          "type": "report",
+          "path": "pre-flip gate, planner session 153 with Relay",
+          "observation": "forge's own-key send landed as turn 60 in k571c0nz: a headless Forge job on the QA PC, RESULT rc=0 turn=60, ~12:16:30Z. Relay's 12:17:13Z auth-log read showed no would-reject after 09:06:47Z. No installed SIA build sends dev-key: the desktop main-tree build bf33fe47 has no presence probe, and sia-forge's probe reads its own key."
+        }
+      ],
+      "since_session": 153,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -2533,6 +2848,13 @@
       "evidence": "Found by Probe (QA seat), report 2 at 1ee8346 section 5, withheld probe N(c), run against the built candidate 830af70 in the QA tree. A2's four cases and the control pass byte-for-byte; this is not a criteria row and neither seat widened the criteria after the verdict. Ruled by Atlas in loop-15-slice-2-closeout.md section 3 onto slice three, on the same grounds as D6 in slice one: the roles are stubs and no real role runs through this runtime before slice three.",
       "recommended_update": "Slice three's MANDATORY mechanical first repair, seen red first with the update-ref -d probe as its A1: the restore reads nothing from the repository until the snapshot is fully restored, and after HEAD's name is put back HEAD must resolve or the ref is restored from the snapshot before any read. Restore the deferred delta (the watch already holds before) before anything reads HEAD, not only inside the rollback. The open denominator stays open: index, hooks, config, submodules and reflog are unprobed channels.",
       "opened_session": 64
+    },
+    {
+      "id": "G-049",
+      "what": "Three seat checkouts share one hub identity: sia-builder, sia-infra and sia-forge all carry AGENT.local.md identity 'Forge / developer', so anything keyed on identity resolves all three to the same seat. Found by Forge (T-198 r2 handoff, derived from the key directory and each checkout's AGENT.local.md, planner session 150). T-198's presence block resolves builder and infra to the grok reader row and to forge.key, never to cursor-builder.key or cursor-infra.key, which exist but are never looked up. sia-qa and sia-research have no reader row and print no block. (Id chosen explicitly: G-046..G-048 are cited in 21/21/10 tracked files on origin/master abae5f9, and the serving MCP build predates T-158's citation guard.)",
+      "evidence": "Forge's T-198 r2 report over native A2A, 2026-09-30; docs/loops/t198-r2-developer-handoff.md at a40fc77 (local until pushed): the derived key-file mapping table.",
+      "recommended_update": "Resolve a seat by the CHECKOUT (the worktree-seats.json layout, keyed by worktree path), not by the identity name in AGENT.local.md; give each seat checkout its own hub name in the tracked seat file. Reconcile with T-196 (seat file), T-198 (presence key), T-202 (seat-online report) and T-164 (per-seat records). The planner decides where it lands; do not alias around it inside T-198.",
+      "opened_session": 150
     }
   ],
   "decisions": [
@@ -3075,6 +3397,60 @@
       "title": "sia-infra stays on Composer 2.5 for live developer work, with the evidence rules in every brief; sia-builder and sia-forge stay on Grok 4.7; Composer-built candidates get QA from a different model",
       "date": "2026-09-27",
       "note": "Aaron, planner session 147: 'yes', to the planner's 'Shall I keep sia-infra on Composer for live work, with those rules in its briefs?'. Basis: record 184, a replay of T-192 (record 181, Grok) by Composer 2.5 from the same base 7243fd5 (docs/loops/session-147-dispatches.md, 'Record 184'). Composer: four rounds, 09:33:10Z to about 09:58Z, 9 tcm runs. Rounds 1 and 2 delivered evidence with the right shape that could not fail: a hard-coded evaluator, a seeded red ('tcm-red-seed'), in-test and product-flag 'mutants'. Once the rule was stated plainly (184c), it met it, and 184d was clean on first delivery. Grok's evidence was real from its first delivery. The rules went into .agents/roles/developer.md, 'Building checks', for EVERY developer. Its old line 'Assert a wrong value first and watch it fail' could be read as inviting the seeded red. QA: a candidate Composer builds is scored by a different model (GPT-5.6 Sol), since QA seats run Composer 2.5. The planner reads every diff before accepting."
+    },
+    {
+      "id": "D-061",
+      "title": "Developers never run CI: local tests only (shift-left, not acceptance). CI is the runtime's deterministic step (T-178, now P0); until it lands, QA dispatches CI on the frozen candidate",
+      "date": "2026-09-28",
+      "note": "Aaron, planner session 148, 2026-09-28: 'yes and T-178 raised to P0', answering the planner's proposal. He had first said 'I thought we ruled that devs never run ci, that's qa work'. The planner found no such ruling in the record: D-040 had given every seat CI on its own branches, and developer.md:67 said a mutant runs on CI. Basis, docs/hoh_jev.md:89-112 and 174-190: the developer does 'implementation + local tests', which do not count as acceptance; the RUNTIME runs deterministic tests between developer and QA; QA may run tests on the frozen candidate. AMENDS D-040 for developer seats: a developer never dispatches tcm or Windows CI and reports local test output only. QA dispatches the red, green and mutant runs until T-178 makes CI automatic on push. First applied to records 198 and 200 (briefed with CI budgets before this ruling) and to every brief after it."
+    },
+    {
+      "id": "D-062",
+      "title": "The record reaches seats through origin/master only: the planner lands record and brief changes on master (D-032/D-055 docs-only PR) before a dispatch cites them, and a dispatch cites an origin/master SHA; seats never read the planner's branch",
+      "date": "2026-09-28",
+      "note": "PLANNER RULING, session 149, asked for by Aaron through worktrees-d5 (Aaron -> worktrees-d5 -> Atlas, 'yes' to sending Forge's /start findings). EVIDENCE: Forge's Cursor /start (transcript c4995381, 22:52Z) read master's record at rev 140 while rev 149 (T-194/T-195, record 215, the new handoff) existed only on docs/session-100-qa99-dispatch; it reported #182 unmerged (merged) and C r3 as work to do (built, awaiting QA 213). The same branch also holds the D-061 change to .agents/roles/developer.md (e1351ab), so no developer seat has ever loaded 'developers never run CI' from its role file. WHY MASTER, NOT 'SEATS READ THE PLANNER BRANCH': every greeting already measures its tree against origin/master (the divergence line), so a second source of truth would be invisible to the one instrument that reports staleness; and a seat reading a branch it does not own inherits whatever that branch holds mid-edit. RULE: (1) record and brief changes go to master through a docs-only PR under D-032/D-055, merged by the planner at every dispatch; (2) a dispatch cites the origin/master SHA that holds its brief, never a branch SHA; (3) role-file and other non-allowlisted changes travel in their own PR to Aaron and never ride a record branch, because one unlisted path strands the whole record (as developer.md did); (4) the planner's record branch is short-lived: cut from origin/master per dispatch. ENFORCEMENT ROW: T-195's dispatch gate (DT-7) also refuses a brief not reachable from origin/master (appended to T-195's note). CATCH-UP: this branch's 82 paths include developer.md, so it goes to Aaron as one PR."
+    },
+    {
+      "id": "D-063",
+      "title": "tcm's hub is now A2A-Hub's TEST hub (the live hub will be Aaron's VPS); SIA's traffic on it is protected by a notice protocol: notice, GO or HOLD from the SIA planner (10 minutes of silence means wait), DONE plus presence before and after, no test traffic in SIA rooms, strict auth only after every SIA identity has its own key",
+      "date": "2026-09-29",
+      "note": "SOURCE: Aaron to Relay (A2A-Hub planner) directly, 2026-09-29, relayed verbatim by Relay to Atlas: 'redeploying tcm, changing its auth mode, and tagging releases are a go ahead from me, the only issue is with atlas using it for sia dev work. Atlas uses the tcm hub to communicate with cursor agents. The redeploy only lasts 10 seconds or so, hammer the tcm hub, let's break it, then fix it until it's something we can deploy live on my vps.' A2A-Hub recorded it as its D-031/D-032. PROTOCOL, agreed by the SIA planner (session 149) with amendments: (1) notice by native A2A to the SIA planner, with WHAT, WHEN, HOW LONG and SIA EFFECT; (2) GO or HOLD-until-X; 10 minutes of silence means the act waits; if no SIA planner session is live, Aaron's own word replaces the planner's, and nothing proceeds on silence; (3) a DONE line, one real send, and a PRESENCE check of cursor-builder, grok and cursor-infra before and after. The first redeploy measures whether a seat's hub-talk --wait survives a 10-second outage; until then, every redeploy is treated as possibly deafening all SIA seats (the planner re-arms its own listeners and asks Aaron to nudge the seats); (4) no test traffic in SIA rooms, and no test agent named atlas, grok, cursor-builder or cursor-infra; (5) outages longer than a redeploy only in a window the planner names; (6) no switch to AUTH_MODE=strict until each SIA identity has its own registered key, that key is in T-196's tracked seat file, and each has made one real authenticated send; the flip needs its own GO; (7) load tests only after checking what the rate limits key on, and never from this desktop's IP, which the SIA seats and the planner share."
+    },
+    {
+      "id": "D-064",
+      "title": "The Cursor CLI default model stays composer-2.5; the brief's quality is the lever",
+      "date": "2026-09-30",
+      "note": "Aaron, verbatim: 'It does fine if the brief is well written.' Relayed Aaron -> worktrees-d5 (Clark) -> Atlas, planner session 150, about 05:50Z; passed to Relay (a2a-planner-9d) with the chain, and Relay confirmed the file already reads composer-2.5. Closes the cli-config.json question from Rivet's spike. For the planner: briefs to Composer seats are written out in full (scope, rows, mutants, fail-closed cases), never left to a task title."
+    },
+    {
+      "id": "D-065",
+      "title": "Machine roles: the laptop is the default SIA QA machine; the QA PC runs developer seats first and SIA QA only when no developer suite is running; the desktop runs planners and Clark",
+      "date": "2026-09-30",
+      "note": "Aaron's direction, relayed Aaron -> worktrees-d5 (Clark) -> Atlas, planner session 150. Aaron to the planner directly: 'let's push both qa work to the laptop' and 'we have a new agent on the qa machine working on a dashboard project, that machine won't be quiet'. The pilot is Chisel (developer of melvenac/agent-dashboard, Claude Code, C:\\Users\\Aaron Melven\\Worktrees\\dash-chisel), under the same 'Aaron Melven' profile as the queue. Chisel is told never to touch sia-qa-queue, qa-queue.ps1, C:\\qa-scratch, C:\\qa-tmp or the QA checkout; it has no hub key and no CI. Its load is about 60 small node:test tests. Forge and the builder may move to the QA PC later, on Aaron's call. Proposed by Clark, NOT approved: a lease file on the QA PC that a developer suite takes and qa-queue.ps1 checks before starting. docs/loops/qa-launch.md carries the machine roles. Consequence: SIA QA is serial on one machine (the laptop) until the lease exists."
+    },
+    {
+      "id": "D-066",
+      "title": "The D-032/D-055 docs-only merge allowlist gains .agents/assignments.json (T-201's sidecar)",
+      "date": "2026-09-30",
+      "note": "Aaron, directly in the planner session, 'yes', answering: 'can a docs-only PR that changes .agents/assignments.json be merged without your word, like state.json?'. The file is the record's sidecar, written only through ob_state (T-201, Option C). Follow-ups, NOT yet done: (1) .agents/roles/shared.md's D-032 paragraph lists the allowlist; amending it is a role-file change, so it merges on Aaron's word; the planner proposes it with T-201's merge. (2) T-194's planner hook hardcodes the allowlist (QA 231 in flight); it must gain this path, as a T-194 follow-up or r3, named at QA 231's ruling. (3) Until both land, the planner applies this decision by hand in the PR-comment allowlist check."
+    },
+    {
+      "id": "D-067",
+      "title": "Developer seats run Sonnet 5.5 in Claude Code and Composer 2.5 in Cursor",
+      "date": "2026-09-30",
+      "note": "Aaron, relayed Aaron -> worktrees-d5 (Clark) -> Atlas, planner session 150, verbatim: 'Sonnet 5.5 was just released and its really good at coding. I think the devs can all run sonnet when using cc and composer 2.5 when using cursor.' Applies to Forge (open its QA PC session with `claude --model sonnet`) and the builder (already on Sonnet 5.5). QA COROLLARY, Clark's inference and NOT Aaron's words: Claude Code QA seats and headless QA jobs run Opus, so the judge is not the builder's model (D-035). The planner's application until Aaron rules the corollary: a QA model must differ from the model that built the candidate. Composer 2.5 QA of a Claude-built or Grok-built candidate qualifies (QA 232, QA 233). A candidate built on Composer is QA'd on Opus (Claude Code) or GPT once it's available again after 2026-10-03, never on Composer. GPT is usage-limited until 2026-10-03 (QA 231)."
+    },
+    {
+      "id": "D-068",
+      "title": "Until the Cursor reset on 2026-10-03: planner on Opus, developers on Sonnet 5.5 (Claude Code), QA on Opus (Claude Code headless); Cursor is blocked entirely, Composer included",
+      "date": "2026-09-30",
+      "note": "Aaron, relayed Aaron -> worktrees-d5 (Clark) -> Atlas, planner session 150, verbatim: 'Cursor limits are blocked now until reset, oct 3rd. So planner:opus, devs:sonnet, qa:opus until then.' LAPSES at the Cursor reset on 2026-10-03, when Aaron re-rules. It supersedes D-067's unruled QA corollary for that period. Any Cursor seat (cursor-infra, cursor-builder) runs as Claude Code Sonnet until then. QA ROUTE (the planner's choice): the laptop's headless launcher C:\\Users\\Aaron\\headless-qa\\launch-qa.ps1 (a detached `claude -p` job with a fixed tool allowlist, -Model opus), fed a tracked, self-contained prompt copied out with git show. Each job works in its own scratch worktree at the dispatch commit. QA 232 and QA 233 run this way; their composer-2.5 driver sets are unused."
+    },
+    {
+      "id": "D-069",
+      "title": "The planner launches QA runs itself over ssh (standing authority); it may ask Aaron first, but it no longer hands him launch lines",
+      "date": "2026-09-30",
+      "note": "Aaron, directly in the planner session, verbatim: 'launch it yourself from now on, you can ask me but run it over ssh from now on'. Context: his paste of the QA 232 line kept breaking; the planner launched QA 232 over ssh at 08:27:57Z, and the host classifier allowed it this time (planner 146 had been refused). SCOPE: launching dispatched QA jobs (the laptop headless launcher or qa-queue.ps1) on the QA machines over ssh, with the rules intact: the dispatch is on master first (D-062), launch only on an idle machine (check the log's last line, or the lease once T-204 ships), serial on one machine, and the launch is named in the record at the time it is used. NOT covered: merges, machine config, key or credential steps, or anything the host classifier denies (a denial is surfaced to Aaron, never routed around). docs/loops/qa-launch.md is updated to say the planner launches."
     }
   ],
   "handoffs": [
@@ -3099,31 +3475,6 @@
         "IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided."
       ],
       "session": 75,
-      "loop_state": null,
-      "session_uuid": null,
-      "checkout": null,
-      "first_rev": null
-    },
-    {
-      "seat": "developer",
-      "pick_up": "LOOP 16 IS MERGED AND TAGGED: PR #83 at f075482, origin/master 579d894, v0.44.0. The recall trigger is live — it fired in a real session and the production store carries its fire rows. THE DURABLE ACCOUNT IS docs/loops/loop-16-developer-handoff.md: sections 1-16 for candidates 1 and 2, 17-21 for candidate 3, with section 5 and section 18 carrying what went wrong. The planner's close-out is docs/loops/loop-16-closeout.md at 579d894. THE RECORD'S OBJECTIVE IS STILL THE PRE-LOOP ONE ('NEXT LOOP: the G-039 recall trigger — not yet briefed') and G-039 is still open: both are the planner's to rule at its own close-out write, and this seat deliberately did not touch either. The next developer session is a FRESH seat for whatever is briefed next.",
-      "watch_out": [
-        "A DERIVED VALUE IS ONLY AS GOOD AS THE CHANNEL THE ASSERTION READS FROM. execFileSync returns ONLY STDOUT, so a harness that hardcoded stderr:'' made every expect(stderr).toBe('') pass without ever looking — on the exact observable a ruling had just been written to require. A mutant found it; no amount of reading would have. When a test asserts on a value, check the instrument actually carries that value to the assertion.",
-        "A THRESHOLD COMPARED AGAINST bm25 IS CORPUS-RELATIVE, AND A FIXTURE THAT DOES NOT RESEMBLE THE CORPUS CANNOT TEST IT. The same query scores about 5e-6 against three documents and 14.01 against 599. At the shipped floor a small store is silent for EVERY input, so 'the floor silenced the weak match' passes with the floor doing no work at all. floor.test.ts carries a row asserting its own corpus is still at production scale; if that row ever goes red, every floor assertion under it has gone vacuous rather than wrong.",
-        "A STACKED FIXTURE PROVES AS LITTLE AS A VACUOUS ONE — IT JUST FAILS IN THE FLATTERING DIRECTION. Decoys at 235-343 characters against a 566-character target reported rank 9; rebuilt at comparable length, rank 4. The wrong number was the one that made the problem someone else's, and I reported it before catching it.",
-        "A RULING CAN BE ASKED FOR, AGREED, REPORTED AS SETTLED, AND NEVER BUILT. R7 was the answer to my own question and produced no code and no test. Nothing between the ruling and QA's verdict could tell: 153 tests, tsc clean, sync clean, five boundary reports and a handoff checklist were all green. Loading a rule, agreeing with a rule, and applying a rule are three different things.",
-        "PER-INSERT TRANSACTIONS ON A FILE-BACKED SQLite FIXTURE ARE 20x SLOWER: 599 inserts is 599 fsyncs, 2999ms against 148ms wrapped. Survivable locally and over vitest's 10s HOOK timeout on CI, where the whole file then reports its tests SKIPPED — which reads like a missing suite rather than a slow one. :memory: fixtures are unaffected, which is why only one file went red.",
-        "A BULK EDIT THAT MATCHES `it(` DOES NOT MATCH `it.each([...])(`. Three rows kept vitest's default timeout and passed alone every single time, including in CI where an earlier failure hid them. PER-FILE GREEN IS NOT SUITE GREEN: run the full suite alone before calling a change done, including when the change is 'only tests'.",
-        "`git show <ref>:<path>` IS MANGLED BY MSYS IN THE BASH TOOL — it becomes a backslash path and git refuses it. Use PowerShell for ref:path reads. Every amendment and every cross-branch file in this loop was read that way.",
-        "THE HOOK RUNS THE BUILD ITS REGISTRATION POINTS AT, and ob_stats is the only honest test of which build is serving a session — the RECONNECT MESSAGE REPORTS SUCCESS EITHER WAY. Note the trap: the recall-trigger census value `hook` is visible from the OLD build too, because that query predates the loop; only the three FIRE COUNTS prove the new one."
-      ],
-      "open_questions": [
-        "IS THE FLOOR SET TOO HIGH? The first production numbers are 5 not-asked, 10 asked-silent, 1 injected — so ten recognised commands asked the store and got nothing. That is either a correctly conservative floor or a floor that will train seats to ignore a channel that never speaks. The fire table now makes it answerable; nobody has answered it.",
-        "DOES A SEAT ACT ON WHAT IS SURFACED? Unmeasured by design. This loop makes the store ask; whether the answer changes an error rate is the next loops' count, against the error table, by family.",
-        "IS THE 0.28s PER Bash CALL ACCEPTABLE? R22 kept the census's denominator for the evaluation period and put the cost to Aaron. The named follow-up is a cheap not-asked path that appends to the log the hook already writes and lets the session-end hook reconcile it into trigger_fires.",
-        "SHOULD THE RANKING BE REPAIRED, AND HOW? Entry 299 ranks 4 of 11 against ten same-topic competitors; the live store ranks it first only because five entries match all three terms. Key-column weighting moves it (x10 to first, by 0.56) but a weight chosen to make a test pass is tuning to the test."
-      ],
-      "session": 74,
       "loop_state": null,
       "session_uuid": null,
       "checkout": null,
@@ -3164,6 +3515,258 @@
       "session_uuid": "cd5e385d-865d-498e-bb8c-53ff4eee82ad",
       "checkout": "sia-planner",
       "first_rev": 135
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Read docs/loops/session-147-dispatches.md first (on origin/docs/session-100-qa99-dispatch; newest sections at the end). All three dev rounds are DELIVERED and ruled: record 185 (qa-queue restore + 185b fail-closed harness) ACCEPTED at a planner boundary check, PR #188; record 186 (T-193 worktree-layout check) ACCEPTED, PR #186; record 187 (candidate B part 2, 8c7769f) evidence checked, PR #187, goes to QA 189. MORNING, all Aaron's: (1) merge #186 and #188; (2) QA relaunch: copy qa-queue.ps1 from 78fd6ce to both QA machines, clean both QA trees (laptop stuck at fc8d8cd; QA PC at daec2b8, dirty), launch laptop 189,161,178 and QA PC 182,183 at a commit carrying qa-189 (80f3383 or later); dry-run every line on its target first; (3) his word to remove the four stray scratch worktrees T-193 found (listed in the record 186 section). Candidate A merged (677c1dd); master green on tcm.",
+      "watch_out": [
+        "After ANY context-mode or Grok Build update, re-test Cursor CLI (a headless cursor-agent -p 'echo x' in a scratch dir): context-mode 1.0.169's plugin PreToolUse hook fail-closes every Cursor tool (T-046). The fix (PreToolUse stripped from the plugin cache hooks.json) is NOT durable.",
+        "Cursor seats stop listening when --wait times out after ~1 h; check /a2a/agents/live + /a2a/session/<room>/reads before asking Aaron to nudge, and nudge only for a turn that is unread with no listener.",
+        "Composer (sia-infra, D-060) defaults to evidence with the right SHAPE that cannot fail; its first live rounds (185, 185b) were real, but read the failed log of every red and mutant anyway.",
+        "Master's push CI still runs on GitHub-hosted ubuntu (billing-blocked) until T-192 (a38ff92, QA 183 pending) merges; dispatch tcm CI on master by hand after every merge.",
+        "Derive every time and count in a tracked note from its source (date -u, run ids): three were written as guesses this session.",
+        "QA 189 must rule the BE-5 question: the B2 fixture gained order 'shown' because a met row without order is now refused. Do not rule it from the planner seat."
+      ],
+      "open_questions": [
+        "Aaron: Telegram approval for QA (D-058) is on HOLD by his choice; do not dispatch it until he decides."
+      ],
+      "session": 147,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#186 loop/t193-worktree-check (683b61c)",
+            "qa_status": "accepted",
+            "note": "T-193; planner-accepted; Aaron merges; then close T-193 and T-149"
+          },
+          {
+            "ref": "#187 loop/15-slice-3-candidate-b2 (8c7769f)",
+            "qa_status": "not_started",
+            "note": "candidate B part 2; QA 189 launches in the morning"
+          },
+          {
+            "ref": "#188 loop/qa-queue-restore (78fd6ce)",
+            "qa_status": "accepted",
+            "note": "record 185/185b; planner boundary check (no QA seat overnight); Aaron merges"
+          }
+        ],
+        "frozen_sha": "8c7769f (candidate B part 2, for QA 189)",
+        "questions_for_aaron": [
+          "Merge #186 and #188",
+          "Launch the QA relaunch lines (planner dry-runs them first)",
+          "Remove the four stray scratch worktrees?",
+          "Telegram approval (D-058): on hold until he decides"
+        ],
+        "rulings": [
+          "session-147-dispatches.md: rulings on QA 162/174/177/172/173 (all merged)",
+          "D-055, D-060",
+          "record 184 (Composer replay) result",
+          "record 185/185b ACCEPTED (planner boundary check)",
+          "record 186 (T-193) ACCEPTED"
+        ]
+      },
+      "session_uuid": "4ed2836c-1dd1-43e5-8a06-c829d50548f3",
+      "checkout": "sia-planner",
+      "first_rev": 136
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Read docs/loops/session-147-dispatches.md from 'Planner session 11' to the end (origin/docs/session-100-qa99-dispatch). Slice three is OPEN: candidate C (2035e89) was REJECTED by QA 204 (qa/c-report b16d5b5). Forge is building record 201 r2 against the criteria at 23ebd86 (§9 corrects CC-6's path). Accepted and waiting for Aaron's merge: #196 (record 200), #197 (record 207) and #198 (record 198). QA dispatches for 192 r4 (QA 210) and 205 r3 (QA 211) are pushed at b7f963a, awaiting Aaron's launch line. The QA PC and the laptop are both idle and available.",
+      "watch_out": [
+        "QA 203's report for record 198 is on the QA PC ONLY (local 120dc44 on qa/qa-probes-report, plus two mutant branches): its push-qa.mjs push was refused by Cursor's permission fence. That is the QA-178 defect record 192 fixes. The planner did not push it for the seat (that would be permission laundering). Aaron decides.",
+        "Every QA seat still runs the OLD driver template until #194 (record 192) merges: a sanctioned push can be refused, and another seat's mid-run push reads as ref_violations. Hold seat pushes during QA runs, or trace them by SHA.",
+        "D-061: developers NEVER run CI. QA dispatches it. Seats echo old briefs ('tcm at most 6'); correct them on sight.",
+        "Composer (sia-infra) ends its turn on a bare acknowledgement. Say 'do it in this turn; no acknowledgement'. Its hub --wait runs in the foreground of its chat, so a new turn wakes it without Aaron.",
+        "Every QA dispatch requires an E_t.json beside the report, validated (C criteria §8 P1). QA 204, 208, 209 and 202 produced one.",
+        "Candidate C's merge is the gate's first live episode (§8 P4): run shadow-verdict prepare before Aaron merges it, and decide after."
+      ],
+      "open_questions": [
+        "Aaron: push QA 203's stranded report from the QA PC (his hand), or wait until #194 lets a QA seat push it?",
+        "Aaron: Telegram approval for QA (D-058) is on HOLD by his choice."
+      ],
+      "session": 148,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#194 loop/qa-driver-cursor-r2 (0f816bb)",
+            "qa_status": "in_progress",
+            "note": "record 192 r4 (harness only); QA 210 awaits launch"
+          },
+          {
+            "ref": "#195 loop/15-slice-3-candidate-c (7099b20)",
+            "qa_status": "rejected",
+            "note": "candidate C; QA 204 REJECT; Forge building r2"
+          },
+          {
+            "ref": "#196 loop/t176-index-direction (8d3143c)",
+            "qa_status": "accepted",
+            "note": "record 200; Aaron merges"
+          },
+          {
+            "ref": "#197 loop/t046-d1 (a8adca0)",
+            "qa_status": "accepted",
+            "note": "record 207; Aaron merges"
+          },
+          {
+            "ref": "#198 loop/qa-probes-on-master (c025800)",
+            "qa_status": "accepted",
+            "note": "record 198; Aaron merges"
+          }
+        ],
+        "frozen_sha": null,
+        "questions_for_aaron": [
+          "Merge #196, #197, #198",
+          "Launch QA 210+211 (one line; dispatches at b7f963a)",
+          "QA 203's stranded report: push it yourself or wait for #194?"
+        ],
+        "rulings": [
+          "D-061 developers never run CI",
+          "C criteria accepted with §8 P1-P4; §9 P5",
+          "QA 195/202 reject record 192 r2/r3; QA 196/197/203/208/209 ACCEPT records 193/194/198/200/207",
+          "QA 204 REJECT candidate C"
+        ]
+      },
+      "session_uuid": "db06e512-6040-4764-b9b9-038e61d842ee",
+      "checkout": "sia-planner",
+      "first_rev": 145
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Planner session 149 ROLLS at about 2026-09-30 (Aaron's word: 'We need to roll this session'). Master is ebf4b3b plus this roll's merge, and green. START HERE: (1) Check QA 227 (record 220 r2, T-158, code e23e622, QA PC) and QA 228 (record 219 r2, T-196+T-197, code 3059ca9, LAPTOP), dispatched on 8b3bc56 (#212). Aaron was given three lines at the end of session 149: the laptop display timeout to 0 on AC (Modern Standby; its power log shows repeated 'connected standby, Reason: Idle Timeout'), QA 227 on the QA PC, and QA 228 on the laptop, in parallel. Read each queue.log (anchor on 'start=queue=227 ' and 'start=queue=228 ') to see whether he launched them, then rule on the reports. (2) Forge was REOPENED (as a Claude Code session in sia-forge) and told to fetch, detach, rebuild, re-run /start, then read hub turns 234 (CANDIDATE C r4, which closes slice three), 235 (T-198 r2) and 236 (T-198's fifth fix: hub-presence.ts:124 hardcodes dev-key). Watch the forge room k57frxw0ptb8tadmqdwy0khhks8ey006. (3) Builder is closed for the night; its queue is turn 68 (T-194 r2: docs-only merges must stay grant-free, per Aaron's ruling 'docs only merge have my go-ahead'), then T-200 (new, P0: ob_start reads the record from origin/master when the tree is stale), then T-199. Its T-164 (567657a) and T-194 (f15f2cf) are committed locally, unpushed. (4) Infra is closed; its work is all pushed and in QA 227/228. (5) STRICT AUTH on tcm (D-063) waits on T-196 merged (the keys in the tracked seat file) AND T-198 r2 (no dev-key); when both land, tell Relay (a2a-planner), who re-reads the auth log and sends the strict notice for the planner's GO.",
+      "watch_out": [
+        "MERGE A PR, THEN READ MASTER'S OWN RUN, not the PR's (#201 turned master red while its PR run was green). Every merge after that in session 149 was checked on master's own run.",
+        "A PR's pull_request run checks out the PR HEAD; only merging master into the branch picks up a master fix (gh pr update-branch needs Aaron's word for a seat's branch). After it, re-run the cancelled push run to reach CLEAN.",
+        "QA ACCEPT with partial rows is not automatic: QA 213's ACCEPT of C r3 was overruled. Read every report's partial/unmet rows before ruling. Developer 'unrelated' failures must be shown at the base (git archive into C:\\qa-tmp). Known on this desktop: the qa104 EPERM symlink test fails (it should skip).",
+        "Seats are the cursor-agent CLI in VS Code terminals (Forge is now a Claude Code session). Never kill a seat by PID; Aaron opens and closes them. Relay killed a reused PID once; its kill-gating (CreationDate plus command line) is now binding for A2A-Hub.",
+        "Hub rooms: builder cursor-builder k57098epn7qz32vt0cazfjpbes8f6kdq; Forge grok k57frxw0ptb8tadmqdwy0khhks8ey006; infra cursor-infra k5702788wctxj75begyt4x2k5x8f6mav; the Loop 8b talk room k5722tvj0zw47sftjfww3sxnrn8fbya1 (planner reads only). DO NOT use X-Agent-Key dev-key for presence probes: tcm logs it as an unknown key and strict will 403 it. Use hub-talk's own key.",
+        "D-063: tcm is A2A-Hub's test hub. Relay sends a notice before any redeploy, auth flip or load test; GO or HOLD; 10 minutes of silence means wait.",
+        "The QA PC is an i5-14500 with 7.7 GB, memory-bound, running a QA in about 14 minutes; sleep and display on AC are 0. QA drivers built from master since #194 keep quotes intact. Queue scripts on both machines match master's (SHA-1 9FF81DE0...). Two QAs can run in parallel only on different machines (the queue lock, the shared QA checkout, 8 GB of RAM).",
+        "Every QA dispatch requires a validated E_t.json. A dispatch goes to master (docs-only PR) before launch (D-062).",
+        "The objective was stale from rev 147 to 164 (it still said PR #187 awaited merge); it was reset at rev 165. Re-read it against gh whenever a candidate merges (G-035)."
+      ],
+      "open_questions": [
+        "Aaron: did he launch QA 227 and 228, and set the laptop display timeout? Read the queue logs first.",
+        "Aaron: cli-config.json's default model after Rivet's spike (Relay is asking him).",
+        "Aaron: Telegram (D-058) is on hold."
+      ],
+      "session": 149,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#195 loop/15-slice-3-candidate-c (5f7c9a0)",
+            "qa_status": "rejected",
+            "note": "candidate C r3: QA 213 ACCEPT overruled; r4 is with Forge (turn 234)"
+          }
+        ],
+        "frozen_sha": "e23e622 (record 220 r2, QA 227); 3059ca9 (record 219 r2, QA 228)",
+        "questions_for_aaron": [
+          "QA 227/228 launched?",
+          "cli-config default model"
+        ],
+        "rulings": [
+          "Session 149 merged, on Aaron's word: #194, #198, #200, #201, #209, #210; docs-only: #202-#208, #211-#215",
+          "ACCEPTED: 215 r2 (T-195, merged), 192 r6 (merged). Returned: 220, 219, 217, and C r3 (QA ACCEPT overruled)",
+          "D-062, D-063; T-194..T-200 opened; T-178 and T-195 closed",
+          "QA 203's stranded report recovered verbatim (#215); 'docs only merge have my go-ahead' binds T-194 r2"
+        ]
+      },
+      "session_uuid": "c407df9c-3dd7-4273-891b-798b4bd527f4",
+      "checkout": "sia-planner",
+      "first_rev": 148
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Planner session 150 ROLLED (2026-09-30, about 09:10Z; Aaron rolled atlas, relay and clark). Master c2a5eaa, green. START HERE: (1) QA 232 (C r4) REPORTED ACCEPT: origin/qa/c-r4-report b43e719b. It is NOT ruled; read the whole report, rule on CC-22 (QA asks met vs partial; the only CI failure is the base-shared T-171 r3b), then shadow-verdict prepare before Aaron merges #195 (T-155 note). (2) Launch QA 233 (T-194 r2) YOURSELF over ssh (D-069), with the same launcher as QA 232: git show <master>:docs/loops/qa-233-headless-prompt.md > C:\\qa-tmp\\qa-233-headless-prompt.md, then launch-qa.ps1 -Worktree C:\\Users\\Aaron\\Worktrees\\sia-qa -Prompt ... -Log C:\\qa-tmp\\qa-233.log -AddDir C:\\qa-scratch,C:\\qa-tmp -NoFetch -Model opus. The laptop is idle. Read the log's LAST line for the verdict. (3) PR #227 (T-198 r2 merged with master, b8a6004) REPLACES #223. Aaron's word 'merging #223 (T-198 r2)' covers it; the planner verified the code cmp-identical to QA 230's (comment on #227). Merge it on CLEAN, pinned (it was UNSTABLE at the roll with CI running), close #223, read master's own run. (4) Then QA for the queue, serial on the laptop: T-200 (424065c), T-201 (8952266), T-207 (f3e64f1), T-203 (a5a1206), T-199 (621d49e), T-204 (d5b3623); dispatches not written yet. Seats (QA PC, Claude Code Sonnet, via Remote Control): sia-builder is on standby (T-208 after T-200 merges); sia-forge was told to plan T-202 and was offline at the roll (the message is queued). Forge's hub turn as forge was DENIED by its classifier; it is Aaron's to run with ! in the sia-forge window. After it, tell Relay, and strict (D-063) waits only on that plus #227.",
+      "watch_out": [
+        "STANDING REPORTING RULES FROM AARON (via Clark): (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\\Users\\melve\\Worktrees\\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 30 MINUTES while active, a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Re-create the cadence at /start (CronCreate at :04 and :34). If `clark` is not in ListAgents, skip the send.",
+        "REMOTE CONTROL must be ON in the planner session (/remote-control, then /rename atlas). The QA PC seats are reached only by their Remote Control names (sia-builder, sia-forge); native A2A does not cross machines. Remote Control gives no read receipts: silence is unknown, not working. A seat's report can fail to deliver and be resent.",
+        "D-069: the planner LAUNCHES QA itself over ssh. Dispatch on master first, idle machine only, one QA job at a time on the laptop, recorded. A classifier denial is surfaced, never routed around.",
+        "D-068 until 2026-10-03: planner Opus, devs Sonnet, QA Opus headless; Cursor is BLOCKED (usage limit), Composer included. Headless `claude -p` QA: the model's turn IS the job; prompts must forbid background commands (QA 232's first attempt died of it). The log is empty until the job ends; the verdict is the last line.",
+        "QA PC CAPACITY (Clark, at the roll): 8 GB RAM, and SSH resets under load; run at most 3 seats there. The laptop takes one QA job at a time.",
+        "Master-red lesson (T-205): a record write can break a test that pins live record data. After every merge, read master's OWN run. Code merges one at a time, with master green in between.",
+        "A code merge needs Aaron's yes IN THE PLANNER SESSION; relays are fine for reversible acts. update-branch or a merge-branch replacement rides on his merge word for that PR, verified by a merge-base cmp against the QA'd code.",
+        "Until T-207 merges, every developer or QA mutant-branch push starts a tcm run; cancel loop/*-mut-* runs by hand when the queue backs up.",
+        "Fetch with --prune before asserting a remote branch exists or not (rev 196). T-208 fixes /start's stale-fetch 'level'.",
+        "The serving MCP build (main tree) predates T-158: the first close_gap tombstone on master blinds unrebuilt builds (T-172). Choose explicit uncited gap ids (G-046..048 are cited)."
+      ],
+      "open_questions": [
+        "Aaron: run Forge's hub turn with ! in the sia-forge window (its classifier denied it): HUB_URL=http://100.124.212.87:4000 node \"C:/Users/Aaron Melven/Projects/A2A-Hub/scripts/hub-talk.mjs\" --as forge --session k57frxw0ptb8tadmqdwy0khhks8ey006 --say \"Forge registered as forge from the QA PC\""
+      ],
+      "session": 150,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#195 loop/15-slice-3-candidate-c (0dc20ff)",
+            "qa_status": "in_progress",
+            "note": "QA 232 reported ACCEPT (b43e719b); planner ruling pending (CC-22)"
+          },
+          {
+            "ref": "#227 loop/t198-merge (b8a6004)",
+            "qa_status": "accepted",
+            "note": "replaces #223; Aaron's merge word; verified cmp-identical; merge on CLEAN"
+          },
+          {
+            "ref": "#223 loop/t198-presence (a40fc77)",
+            "qa_status": "accepted",
+            "note": "close when #227 merges"
+          }
+        ],
+        "frozen_sha": "c339427 (C r4, QA 232 done); 699789e1 (T-194 r2, QA 233 not launched)",
+        "questions_for_aaron": [
+          "Forge's hub turn (his ! in the sia-forge window)"
+        ],
+        "rulings": [
+          "Merged in session 150 on Aaron's word: #218 (T-158), #222 (TG-2), #220 (T-196+T-197); docs-only: #217, #219, #221, #224, #225, #226",
+          "ACCEPTED: QA 227, QA 228, QA 230; QA 231 VOID; QA 232 reported ACCEPT, not ruled",
+          "Opened T-201..T-208, D-064..D-069, G-049; seats moved to the QA PC"
+        ]
+      },
+      "session_uuid": "e50107b1-ac67-452c-9da1-3fc4c3beda97",
+      "checkout": "sia-planner",
+      "first_rev": 166
+    },
+    {
+      "seat": "developer",
+      "pick_up": "Forge (Claude Code, checkout sia-forge) is MOVING to the QA PC; the hub enrollment (forge.key) happens there and Aaron runs it. EVERYTHING IS PUSHED AND READ BACK, no branch is local-only that is mine. State of the work: C r4 (T-155) is on loop/15-slice-3-candidate-c at 0dc20ff with 7 loop/15-slice-3-candidate-c-r4-mut-* branches, docs/loops/loop-15-slice-3-c-r4-developer-handoff.md; T-198 r2 is on loop/t198-presence at a40fc77 with 5 loop/t198-presence-r2-mut-* branches, docs/loops/t198-r2-developer-handoff.md (QA 230 pending); T-199 is on loop/t199-missing-handoff at 621d49e with 6 mut branches, docs/loops/t199-developer-handoff.md, and its planner.md commit 58aad85 is a ROLE FILE that merges only on Aaron's word; T-203 (closes G-049) is on loop/t203-seat-by-checkout at a5a1206 with 6 loop/t203-seat-by-checkout-mut-* branches, built ON t198, docs/loops/t203-developer-handoff.md; merge order t198, then #220, then T-203. NEXT for the next Forge session: T-204 (P1, the QA PC compute lease, brief on origin/docs/session-150-c until PR #221 merges): plan per row to the planner BEFORE code, and the plan must include the re-copy step for docs/loops/qa-queue.ps1 on the QA machines, written for Aaron to run. Every branch above has a handoff file that states, per row, which red is a true base red and which is mutant-only.",
+      "watch_out": [
+        "git show ref:path is MANGLED by MSYS in the Bash tool (becomes a backslash path); use PowerShell for ref:path reads, or git -C with plumbing.",
+        "A node child_process.spawnSync of npx.cmd returns status null on this machine and a mutant run reported null for every mutant; call process.execPath on node_modules/typescript/bin/tsc and node_modules/vitest/vitest.mjs directly and REFUSE a null status. A mutant that fails tsc is not a mutant (mutant a of T-203 needed two rewrites).",
+        "The full suite on this desktop is load-noisy: exit 1 with 0 failed tests happens (a vitest-worker 'Timeout calling onTaskUpdate' error, the G-042 shape), and 5000 ms timeouts hit different files on different runs. Known failures: qa104-a9-probe2 R72 (EPERM symlink), state-schema T-171 r3b (moving origin/master). Report every run separately with its exit code and failing tests, and re-run a file alone before attributing a failure; do not call a load failure clean or caused.",
+        "Python on Windows rewrote a UTF-8 file with the wrong codec and CRLF endings (git file said 'data'); do not edit source with Python. Use the Edit tool, or node with explicit utf8. A node -e heredoc turns backslash-n in a template literal into a real newline; prefer the Edit tool for anything with escapes.",
+        "The auto-mode classifier DENIED the hub enrollment (--init-key --invite) as Secret-Store Writes and a detached ( ... ) & subshell as Unauthorized Persistence. Do not retry or route around either; run a background command with run_in_background and no subshell. The enrollment belongs to Aaron in his own window, on the QA PC. The one-time code Aaron pasted into the earlier window is in that transcript (expires 24 h); treat it as exposed.",
+        "An identity is not a seat: sia-builder and sia-infra AGENT.local.md say Forge / developer, which is why T-203 exists (the seat file is the single map, keyed by checkout basename). Do NOT edit another seat's untracked AGENT.local.md; each seat fixes its own once T-203 merges. The .git of this desktop is SHARED by every seat worktree: local branches of other seats (t194, t200, t164) are visible here and are not mine to push; push clearance is per branch.",
+        "A developer never runs CI (D-061), no push without the planner's clearance for those branches, no PR unless told, and every push is read back with git ls-remote. Aaron speaks only to the planner (D-038)."
+      ],
+      "open_questions": [
+        "T-203 set seats.forge.cursor to false in hub-partner-seats.json (the forge seat is Claude Code now); the planner accepted it (it is true now).",
+        "Session number 151 is used for this record write (the record's last session is 150 and this worktree's local counter would collide, T-164); the planner accepted it.",
+        "T-163's /sync check (no close-out removes another seat's uuid) was not verified; T-199's note asked for it to be reconciled when T-199 lands."
+      ],
+      "session": 151,
+      "loop_state": null,
+      "session_uuid": "923463b3-8bee-4047-b415-c9de589a0c5d",
+      "checkout": "sia-forge",
+      "first_rev": 183
+    },
+    {
+      "seat": "developer",
+      "pick_up": "Builder seat (Claude Code, desktop) is being moved to the QA PC. Every branch below is pushed to origin and read back with ls-remote. T-201 (P0, /start names the seat's assignment; builds on T-200) is NEXT, NOT STARTED, brief pending from Atlas. T-199 moved to Forge (loop/t199-missing-handoff). DONE and pushed, none merged (except PR 222 which Atlas merges on CLEAN), none CI-run (D-061): T-194 r2b on loop/t194-planner-hook 0f69e041 (product 699789e1; mutants loop/t194-r2-mut-m1..m5, old loop/t194-planner-hook-mut-ph1..8); T-200 on loop/t200-record-from-master 5b9eab0a (product 92f9cc0f; mutants loop/t200-mut-m1..m6); T-164 on loop/t164-record-session-number 567657af (mutant loop/t164-record-session-number-mut-sc4 956755d6); TG-2 fixture fix on fix/tg2-fixture-record a4d540cf, PR 222 (mutant loop/tg2-mut-drop-scan b4bc641b); T-196+T-197 merge on loop/t196-t197-merge dde3cf5d, PR 220. Handoffs in docs/loops/t194-developer-handoff.md and docs/loops/t200-developer-handoff.md. This write is the SECOND attempt (session 152, on rev 183); the first, docs/forge-session-t200-handoff 611d1721 on rev 178, is kept only as its record.",
+      "watch_out": [
+        "T-200 and T-199 OVERLAP IN server.ts handleStart, in different hunks. T-199 (Forge) adds sessionUuid: proven.id to the renderState call and a function after renderHandoffs in state-render.ts. T-200 leaves that call's argument list alone (it rebinds sj upstream of it). git merge-tree of loop/t200-record-from-master against origin/loop/t199-missing-handoff, loop/t164-record-session-number and origin/master was clean; whoever merges second rebases. T-164 (567657af) also touches server.ts and the session-log path.",
+        "T-194 r2 needs a token to work at all on a keyring-only machine: this desktop's gh stores its token in the keyring, so the hook cannot read it and every docs merge stays grant-required until GH_TOKEN (fine-grained, Pull requests: Read, scoped to melvenac/Self-Improving-Agent only) is in the planner seat's env block. That is Aaron's hand, at hook registration.",
+        "THE FULL SUITE EXITS 1 ON THE OVERLOADED DESKTOP WITH ZERO FAILED TESTS OR ONLY 5000ms TIMEOUTS. Every full run showed 3 unhandled [vitest-worker] Timeout calling onTaskUpdate errors, and a moving set of 3-14 tests timing out at the 5000ms default (state-import-r6, t048-r3, repo-root V6, role-files, runSync); all pass alone. The last run, on fix/tg2-fixture-record, had 0 failed tests and exit 1. Read the exit code AND the failure list, and re-run a failing file alone before calling it a regression.",
+        "Bash ref:path is mangled by MSYS: git show origin/master:path fails in the Bash tool. Use PowerShell, or MSYS_NO_PATHCONV=1 with quotes. A node -e script written through a heredoc silently turned backslash-n into a real newline and backslash-d into d in three files; use the Edit tool for anything with a backslash.",
+        "A diff check written as git diff c8165f5 origin/master cannot equal a merge's diff (it contains the reversal of the candidate). Compare each side against the merge-base. Atlas recorded that error as its own.",
+        "THE SESSION-NUMBER COLLISION HAPPENED TWICE ON THIS HANDOFF: the local counter said Session #13 while the record's last was 150 (T-164), then the first attempt took 151 which Forge also took, so this one is 152. Take the number from the record on the branch you are writing to, immediately before the write, and re-read it after a fetch."
+      ],
+      "open_questions": [
+        "Atlas to rule: docs/idea-b-probe a77e73d9, docs/loop-13-developer-testimony e68abdce and loop/7-injection e865f488 are older sessions' work, local-only in the desktop's shared .git. Atlas said not to push or retire them; they stay named here until it decides.",
+        "Sequencing: the developer handoff at session 152 lands with PR 221 (fast-forwarded to this branch, docs/builder-handoff-qa-move); docs/forge-session-t200-handoff 611d1721 (rev 178) is superseded and is not to be merged."
+      ],
+      "session": 152,
+      "loop_state": null,
+      "session_uuid": "2e6ed7b8-17e4-4c4b-860e-5d9fd6432801",
+      "checkout": "sia-builder",
+      "first_rev": 184
     }
   ],
   "sessions": [
@@ -3190,6 +3793,54 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 136
+    },
+    {
+      "n": 148,
+      "date": "2026-09-28",
+      "uuid": "db06e512-6040-4764-b9b9-038e61d842ee",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 145
+    },
+    {
+      "n": 149,
+      "date": "2026-09-30",
+      "uuid": "c407df9c-3dd7-4273-891b-798b4bd527f4",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 148
+    },
+    {
+      "n": 150,
+      "date": "2026-09-30",
+      "uuid": "e50107b1-ac67-452c-9da1-3fc4c3beda97",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 166
+    },
+    {
+      "n": 151,
+      "date": "2026-09-30",
+      "uuid": "923463b3-8bee-4047-b415-c9de589a0c5d",
+      "seat": "developer",
+      "checkout": "sia-forge",
+      "first_rev": 183
+    },
+    {
+      "n": 152,
+      "date": "2026-09-30",
+      "uuid": "2e6ed7b8-17e4-4c4b-860e-5d9fd6432801",
+      "seat": "developer",
+      "checkout": "sia-builder",
+      "first_rev": 184
+    },
+    {
+      "n": 153,
+      "date": "2026-09-30",
+      "uuid": "6e083614-965f-462b-ad59-62091a0be5e1",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 205
     }
   ]
 }

@@ -192,6 +192,20 @@ describe("renderState — T-183 clipped gaps and verified claims", () => {
     expect(line("G-002")).toEqual([`  G-002 — ${SHORT_GAP} (opened session 55)`]);
   });
 
+  it("a closed gap is not listed as open (TG-1)", () => {
+    const withTombstone = {
+      ...clipped,
+      gaps: [
+        ...clipped.gaps,
+        { id: "G-009", what: "closed text that must not render", evidence: "", recommended_update: "", opened_session: 1, status: "closed" as const, closed_session: 2, closed_rev: 3 },
+      ],
+    };
+    const text = renderState(withTombstone, "0.44.2").join("\n");
+    expect(text).toContain("Gaps (4):");
+    expect(text).not.toContain("G-009");
+    expect(text).not.toContain("closed text that must not render");
+  });
+
   it("a gap with a line break is still one line, and the break counts as a clip", () => {
     expect(line("G-004")).toEqual([`  G-004 — line one… (17 chars; full text: state.json gaps[G-004]) (opened session 57)`]);
     // No rendered line may begin with gap text: one gap, one line.

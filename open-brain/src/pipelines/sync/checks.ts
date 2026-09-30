@@ -8,6 +8,7 @@ import { parseState, SeatName, schemaVersionAdvice } from "../../shared/state-sc
 import { renderState } from "../session-start/state-render.js";
 import { describeRoleFiles } from "../session-start/role-files.js";
 import { readAgentIdentity } from "../session-start/agent-identity.js";
+import { presenceBlockUpperBound } from "../session-start/hub-presence.js";
 import { describeTreeCurrency } from "../session-start/tree-currency.js";
 import { checkSummaryFromState } from "./checks-state.js";
 
@@ -1777,7 +1778,7 @@ export const GREETING_LIMIT = 40_000;
 
 export interface ComposedGreeting {
   text: string;
-  parts: { treeAndSeat: number; state: number; roleFiles: number };
+  parts: { treeAndSeat: number; state: number; roleFiles: number; presence: number };
 }
 
 /**
@@ -1813,8 +1814,14 @@ export function composeGreeting(projectRoot: string, version: string): ComposedG
     .filter((f) => f.content !== null)
     .map((f) => `\n## ${f.rel}${f.commit ? ` @ ${f.commit.slice(0, 7)}` : ""}\n${(f.content as string).replace(/\s+$/, "")}`)
     .join("\n");
-  const text = [treeAndSeat, state, roleFiles].join("\n");
-  return { text, parts: { treeAndSeat: treeAndSeat.length, state: state.length, roleFiles: roleFiles.length } };
+  // T-198: the partner-presence block sits after the seat lines in handleStart. It is
+  // fetched live there; a check must not call the hub, so its WORST-CASE size is counted.
+  const presence = presenceBlockUpperBound(projectRoot, roles.seat).lines.join("\n");
+  const text = [treeAndSeat, ...(presence ? [presence] : []), state, roleFiles].join("\n");
+  return {
+    text,
+    parts: { treeAndSeat: treeAndSeat.length, state: state.length, roleFiles: roleFiles.length, presence: presence.length },
+  };
 }
 
 /**
@@ -1837,7 +1844,8 @@ export function checkGreetingSize(version: string, projectRoot: string, limit = 
   }
   const n = g.text.length;
   const detail =
-    `(state render ${g.parts.state}, role files ${g.parts.roleFiles}, tree and seat ${g.parts.treeAndSeat}). ` +
+    `(state render ${g.parts.state}, role files ${g.parts.roleFiles}, tree and seat ${g.parts.treeAndSeat}, ` +
+    `presence block ${g.parts.presence} (worst-case upper bound, not fetched)). ` +
     `LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted.`;
   return n > limit
     ? { name, severity: "issue", message: `greeting is ${n} characters, over the ${limit} limit ${detail}`, report: true }

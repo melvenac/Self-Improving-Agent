@@ -1,5 +1,5 @@
 import type { State, Task, Handoff, Seat } from "../../shared/state-schema.js";
-import { TaskPriority, lastSession, newestHandoffPerInstance, newestHandoffForSeat } from "../../shared/state-schema.js";
+import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, newestHandoffForSeat } from "../../shared/state-schema.js";
 import { findHandoffCommit } from "./handoff-provenance.js";
 
 /**
@@ -64,11 +64,12 @@ export function renderState(state: State, version?: string, options: RenderState
   }
   if (state.verified.length === 0) lines.push(`  (none)`);
 
-  lines.push(`\nGaps (${state.gaps.length}):`);
-  for (const g of state.gaps) {
+  const openGaps = state.gaps.filter(isOpenGap);
+  lines.push(`\nGaps (${openGaps.length}):`);
+  for (const g of openGaps) {
     lines.push(`  ${g.id} — ${clip(g.what, GAP_CLIP, `gaps[${g.id}]`)} (opened session ${g.opened_session})`);
   }
-  if (state.gaps.length === 0) lines.push(`  (none)`);
+  if (openGaps.length === 0) lines.push(`  (none)`);
 
   lines.push(`\nDecisions: ${state.decisions.length} recorded${state.decisions.length ? `; latest ${latestDecision(state)}` : ""}`);
 

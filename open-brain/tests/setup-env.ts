@@ -8,10 +8,15 @@
 // Redirecting here rather than per-test means no future test can reintroduce
 // the leak by forgetting to opt out.
 
-import { afterEach } from "vitest";
+import { afterEach, beforeEach } from "vitest";
 import { mkdtempSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
+import { bindSymlinkTest } from "./harness/symlink-or-skip.js";
+
+beforeEach((ctx) => {
+  bindSymlinkTest(ctx);
+});
 
 const stateDir = mkdtempSync(join(tmpdir(), "open-brain-test-state-"));
 

@@ -1,8 +1,9 @@
 /**
- * QA 135 (record session 135): the /bootstrap fix at 6543e8e, probed as a stranger would meet it.
- * Each `it` states what a stranger following bootstrap.md needs to be true. Those marked DEFECT are
- * expected RED on the candidate; they are evidence for the QA report
- * (docs/loops/bootstrap-fix-qa-report.md), not a proposed fix. The CONTROL rows must be green.
+ * Guards /bootstrap as a stranger following bootstrap.md meets it: a project
+ * with no package.json can draft its own record and does not draft a parent;
+ * check right after scaffold is not "not a fresh install"; a zero-byte
+ * state.json is not BOOTSTRAPPED; a second move-residue the same day does not
+ * nest. Kept because these are the rows for that path. They pass on bf33fe4.
  */
 import { describe, it, expect, afterEach } from "vitest";
 import { spawnSync, execFileSync } from "node:child_process";

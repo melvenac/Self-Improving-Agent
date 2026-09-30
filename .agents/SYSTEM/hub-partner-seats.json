@@ -1,0 +1,37 @@
+{
+  "description": "One seat hub file. ob_start reads readers for partner presence (T-198). /sync check hub-seats reads the same file: talk, seats, and readers (T-196). Room ids were read from hub-talk --as atlas --list --json on 2026-09-28. A Cursor seat's room is the session id that appears on both that hub name and atlas. grok also has other rooms; those are not this seat's room with the planner.",
+  "hub_url": "http://100.124.212.87:4000",
+  "talk": "HUB_URL={hub_url} node <A2A-Hub>/scripts/hub-talk.mjs --as {hub_name} --session {room}",
+  "talk_tokens": "Substitute {hub_url}, {hub_name}, and {room} only. Replace <A2A-Hub> with the absolute path of the local checkout of https://github.com/melvenac/A2A-Hub that contains scripts/hub-talk.mjs. The angle-bracket token is not filled from this file.",
+  "wait": "--wait --wait-timeout 3500",
+  "seats": {
+    "planner": { "hub_name": "atlas", "cursor": false },
+    "builder": { "hub_name": "cursor-builder", "cursor": true, "room": "k57098epn7qz32vt0cazfjpbes8f6kdq" },
+    "forge": { "hub_name": "grok", "cursor": true, "room": "k57frxw0ptb8tadmqdwy0khhks8ey006" },
+    "infra": { "hub_name": "cursor-infra", "cursor": true, "room": "k5702788wctxj75begyt4x2k5x8f6mav" }
+  },
+  "readers": {
+    "atlas": {
+      "partners": [
+        { "label": "grok", "hub_as": "grok", "session_id": "k57frxw0ptb8tadmqdwy0khhks8ey006" },
+        { "label": "cursor-infra", "hub_as": "cursor-infra", "session_id": "k5702788wctxj75begyt4x2k5x8f6mav" },
+        { "label": "cursor-builder", "hub_as": "cursor-builder", "session_id": "k57098epn7qz32vt0cazfjpbes8f6kdq" }
+      ]
+    },
+    "grok": {
+      "partners": [
+        { "label": "Atlas", "hub_as": "atlas", "session_id": "k57frxw0ptb8tadmqdwy0khhks8ey006" }
+      ]
+    },
+    "cursor-infra": {
+      "partners": [
+        { "label": "Atlas", "hub_as": "atlas", "session_id": "k5702788wctxj75begyt4x2k5x8f6mav" }
+      ]
+    },
+    "cursor-builder": {
+      "partners": [
+        { "label": "Atlas", "hub_as": "atlas", "session_id": "k57098epn7qz32vt0cazfjpbes8f6kdq" }
+      ]
+    }
+  }
+}

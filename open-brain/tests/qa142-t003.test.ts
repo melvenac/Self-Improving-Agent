@@ -7,9 +7,11 @@ import { byPidDir, processStartTime, writeProcessSession, proveSession } from ".
 import { deriveProjectKey } from "../src/pipelines/session-start/session-discovery.js";
 
 /**
- * QA 142 (record session 142) on T-003 candidate 706c029: rows for what QA found, run on tcm.
- * D-rows are EXPECTED RED on 706c029: each pins a defect in the QA report. G-rows are guards that held locally
- * on Windows and are here to be seen holding on Linux (/proc) as well.
+ * Guards ob_start's proof of who is running. No proof does not stamp another
+ * session's id. JSON null and other non-record bodies are a named refusal,
+ * not a throw. A proof under another pid is not read. Ids compare exactly.
+ * A reused pid whose start time is off by one tick is refused. Kept because
+ * these are the rows for that proof, on this platform's processStartTime.
  */
 const SELF = "5e1f5e1f-aaaa-4bbb-8ccc-000000005e1f";
 const OTHER = "0be70be7-dddd-4eee-8fff-000000000be7";

@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 140 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 209 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -8,7 +8,6 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 
 ## P0
 
-- [ ] **T-003** Session identity is keyed per project, not per session
 - [ ] **T-008** Add a `/sync` validator that stats every MCP command path in `~/.claude.json`
 - [ ] **T-014** Make point-of-use rating reachable
 - [ ] **T-022** Replace-on-write for `state` facts
@@ -20,17 +19,20 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-042** Vault pollution has a preventer but no detector
 - [ ] **T-044** The slot needs an OWNER, not just a timestamp
 - [ ] **T-046** Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
-- [ ] **T-149** Give each agent seat its own git worktree
-- [ ] **T-150** An unrecognised CLI flag must refuse, not select the mutating default
-- [ ] **T-158** close_gap must tombstone (or refuse an id the tracked tree cites) — a reused gap id points at something wrong and announces nothing
+- [ ] **T-160** Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [ ] **T-163** Close-outs must APPEND a per-seat record, not overwrite a shared slot — plus a /sync check that no close-out reduces the recorded seat-uuid count for an open loop
 - [ ] **T-164** The session counter is per-worktree, so a seat can close out on a number that collides with the record's sequence
 - [ ] **T-167** The scope layer did not travel: PRD/DECISIONS/ENTITIES were untracked, so no seat worktree had them — tracked at session 77; make prd-version an ISSUE, and render the problem statement at /start
-- [ ] **T-177** Candidate A2 is blocked: the developer seat's responses were stopped twice by a host safety classifier, and slice three cannot close until A2 is built or re-planned
+- [ ] **T-194** Planner seat hook: a tracked PreToolUse hook mechanically refuses the planner's out-of-boundary acts (source/tests/hooks/build writes, hand edits to rendered views, git merge/push/tag without per-occasion authority), fails closed, and names the rule it enforces
+- [ ] **T-196** The hub procedure is tracked knowledge: each seat's hub room and hub-talk invocation in a tracked data file beside .agents/SYSTEM/worktree-seats.json; a short 'Talking to Cursor seats' section in planner.md (printed in full at /start) pointing at it; a tracked alwaysApply .cursor/rules hub rule; and Cursor's /start joins the seat's room and reads unread atlas turns before proposing anything
+- [ ] **T-197** Cursor's /start matches Claude Code's /start except for documented tool-call differences, and /sync fails on any other difference: it reads ob_start's State block, never hand-edits rendered views, lets ob_start create the session log, and presents NEXT as a ranked backlog rather than a proposal
+- [ ] **T-198** ob_start prints one line per partner seat from the hub's presence endpoint (listening or not, unread turns and since when), and says so visibly when the hub is unreachable, never silently
+- [ ] **T-200** A seat started from a stale tree is briefed from STALE state: when the local record is older than origin/master's, ob_start renders the State block and the role files from origin/master (git show) and says so, so D-062 holds at every /start
+- [ ] **T-201** A developer or QA seat's /start names its assignment, read from the record, or says 'no assignment' explicitly; it never stops at the backlog
+- [ ] **T-208** A session start FETCHES before it judges currency: the SessionStart hook runs `git fetch --prune origin` (bounded timeout) before tree-currency and ob_start, says so visibly when it fails, and never calls a tree 'level' against a fetch it did not just make
 
 ## P1
 
-- [ ] **T-045** Verify the vault-isolation leak stays closed
 - [ ] **T-048** Audit remaining filters in `open-brain/src` for bare `continue`/`filter` drops (supersedes T-049)
 - [ ] **T-050** v0.15.1 made a foreign `.recalled-entries.json` writer unreachable *and* uncountable
 - [ ] **T-051** Add a `/sync` validator for the `.agents/skills/` frontmatter contract, asserting all three identity sources agree
@@ -46,7 +48,6 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-154** Give /start a memory-free documented route, and make the SessionStart hook installable by a stranger
 - [ ] **T-155** Shadow merge gate: the runtime records what it would have done at each merge, and disagreements with Aaron are counted
 - [ ] **T-159** The trigger's cheap not-asked path — record a not-asked fire without opening the store
-- [ ] **T-160** Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [ ] **T-161** /start must assert a transcript exists for the session's own uuid — the CLAUDE_CODE_CHILD_SESSION check would be a permanent false positive
 - [ ] **T-166** GitNexus impact() missed a call site on the exact path under repair while reporting epistemic 'exact' - the MUST-run-impact rule is only as good as the resolver
 - [ ] **T-168** 'Run the full suite alone' must become a check: assert peer idleness before the run and refuse or flag when a peer is busy
@@ -54,19 +55,21 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-170** Memory is LOOKUP by default and INJECTION only on a deterministic match against the act; fix the WRITE side first, so every stored lesson carries the key (command pattern, path or error string) that would have caught the mistake
 - [ ] **T-172** The main tree serves every session and nothing says when it is behind master: the greeting must print the SERVING build's distance from origin/master, and one refusing command must update, rebuild and verify it
 - [ ] **T-173** Per-stage effort chosen by a deterministic policy, with Jev in shadow. Sequenced AFTER candidate A (it needs ProcessRole)
-- [ ] **T-175** `state import` seeds SIA's own history (V-001..V-005, G-001..G-006) into EVERY project's record. Delete the seeds from the importer
 - [ ] **T-176** gitnexus-index measures distance in one direction only: an index on a different line of history reads as current
-- [ ] **T-178** ci.yml runs on push to seat working branches (loop/*, qa/*, docs/*, chore/*), per D-040, so no seat has to dispatch CI by hand
 - [ ] **T-179** Replace /end with a small 'store lessons' step: each session's lessons stored with the key that would have caught them (T-170); the record is written as work happens, and the rest of /end is cut
-- [ ] **T-180** `state import` cannot tell that an input predates the latest Session_N.md: a stale handoff or INBOX is imported as current. Refuse or warn
 - [ ] **T-181** Adopt Aaron's active projects onto SIA per docs/loops/adoption-plan-2026-09-25.md: frogger (fresh install) and co-op-mailer (import) as pilots, then Tarrant County Makerspace record-only BEFORE its cutover (D-048), then foundry and worth-it-window-washing
 - [ ] **T-182** The claude adapter passes --permission-prompts, which tcm's installed Claude Code lacks (2.1.282 on the QA PC has it): declare a minimum Claude Code version, make CA-9 name the installed and required versions, and decide whether tcm's claude is updated
 - [ ] **T-183** ob_start's greeting has grown about 7x since V-025 (2,142 words at rev 14; about 14,900 words, 92,131 characters, at rev 121) and no longer fits one tool result: render gaps and verified by TITLE, as tasks already are
-- [ ] **T-185** Other open-brain subcommands take the first non-'--' token as their directory: `detach -dry-run` and `state migrate -dry-run` would do the REAL thing; sync and start share the shape. Refuse unknown '-' tokens everywhere
 - [ ] **T-187** /sync rebuilds the GitNexus index when it is behind (D-049): plain /sync runs analyze where a .gitnexus exists and the indexed SHA is not HEAD, then verifies the new SHA; sync --check stays read-only; a tree with no index stays SKIP (never PASS)
 - [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
-- [ ] **T-192** Master's push CI has not run since #171: GitHub refuses the ubuntu-latest job for billing, and /sync ci-status reports that as an ordinary 'failure'
-- [ ] **T-193** A /sync check that every git worktree is the main checkout or <project>-<known seat>, with the seat list as data; closes T-149 against it
+- [ ] **T-199** A seat session that wrote the record but left no handoff is DETECTED at that seat's next /start, and planner.md's stale 'one handoff slot, C2 unfixed' paragraph is corrected (the per-seat slot exists since schema v3)
+- [ ] **T-202** The planner learns when a seat comes online: each seat worktree's SessionStart reports seat, checkout SHA, record rev and runtime (Claude Code or Cursor CLI) to the planner seat, deterministically
+- [ ] **T-203** A seat is resolved by its CHECKOUT, not by AGENT.local.md's identity: one tracked map from worktree to seat, role and hub name, used by every per-seat lookup (presence key, readers row, handoff attribution, seat-online report)
+- [ ] **T-204** A compute lease on the QA PC: a developer suite and SIA's qa-queue.ps1 each take one lease file before a run, so QA never starts over a developer suite and a developer suite never starts over QA; stale leases (expired, or owner process gone) are reclaimed
+- [ ] **T-207** CI must not run on developer mutant branches: a push to loop/*-mut-* (and other not-for-merge mutant refs) starts a tcm run that is never evidence and starves QA and PR runs
+- [ ] **T-209** ob_start renders BROKEN gaps newest-first
+- [ ] **T-212** SessionStart missing-handoff check attributes commits by Claude-Session trailer, not git identity
+- [ ] **T-213** Repoint the forge seat in hub-partner-seats.json to hub_name forge, room k571c0nz, and un-pin the tests from the live file
 
 ## P2
 
@@ -82,6 +85,9 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-184** state import: an input changed between --draft and --commit commits the DRAFT's content with no note (QA 102 PROBE-7): record each input's hash in the draft and have --commit refuse or say so when one differs
 - [ ] **T-186** state-views applySummaryRegion has the same startsWith('# ') blind spot as the importer's BOM defect: a SUMMARY.md with a leading BOM is misread
 - [ ] **T-190** QA PC speed without hiding Windows failures: the QA driver sets TEMP=TMP=C:\qa-tmp for probes and mutants, QA seats keep scratch in C:\qa-scratch (both Defender-excluded by Aaron), and each QA seat runs the full suite ONCE with the default TEMP as the Defender-on, user-like control
+- [ ] **T-206** The assignments sidecar gets the record's protections: a /sync erasure check (no entry dropped by a hand edit or a merge resolution), a stale-assignment flag (the assigned task is no longer active), and a planner-only writer once T-203 resolves seats by checkout
+- [ ] **T-210** ob_start names the newest docs/loops brief by git commit date
+- [ ] **T-211** Each seat's status-cron minutes live in seat data, and /start reads them
 
 ## P3
 
@@ -89,6 +95,4 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 
 ## Done (last 3 sessions)
 
-- [x] **T-056** `ob_store` derives the vault folder from a canonicalized path, so it lowercases the project name (session 109) — Session 109: already fixed in v0.14.2 (96c8d5e, 'derive vault folder names from the raw path'; server.ts uses projectDisplayName(project_dir)). Both named rows, #235 and #365, now point at Experiences/Self-Improving-Agent/ (read in knowledge_index). The three lowercase-path rows are filenames, not folders.
-- [x] **T-157** Retention evicts done tasks whose ids the tracked tree cites (G-024, twice in two writes): refuse to evict a cited id, or tombstone (session 71) — Done 2026-09-20, Loop 14. Retention now KEEPS a done task whose id is cited anywhere in the tracked tree, and the write's note names the citing files. Verified against the real repository rather than a fixture: T-151 and T-153 — the two tasks actually evicted at revs 48 and 49 — are both detected as cited, and 16 of 36 task ids are NOT cited, which is the half that matters, because a guard that keeps everything cannot fail and is not a guard. The scan excludes state.json and its four generated views; without that exclusion every task would cite itself. It matches the id PATTERN, so a mention in a test fixture counts (T-999 is 'cited' by state-writer.test.ts) — that errs toward keeping, which is visible in the record, rather than destroying, which is not, and the limit is stated in the function's own note. Mutation-checked: disabling the citation branch fails the suite.
-- [x] **T-189** The D-050 maintenance window: after importer round 2 hands back, upgrade GitNexus to 1.6.12, update and rebuild the SIA main checkout (T-172), reindex it fully, and reconnect /mcp in every open session (session 100) — Done 2026-09-25 by the planner (session 100) on D-050, with Aaron's added word 'stop the five idle GitNexus server processes and then run the upgrade'. Each step was read back before the next. (1) Relay confirmed no A2A-Hub seat was mid-call; the planner found 4 running gitnexus MCP processes (the fifth had exited) and stopped them; 0 remained. (2) npm 11.19.0 on node v22.23.2: `npm i -g gitnexus@1.6.12`, rc 0; read back `gitnexus --version` = 1.6.12. npm 11 SKIPPED the install scripts of the native packages (@ladybugdb/core, tree-sitter and its grammars, onnxruntime-node, protobufjs, and gitnexus's own build-tree-sitter-grammars postinstall). Each native module still `require`s cleanly (they ship prebuilds); non-TS grammars are untested. (3) Main checkout ~/Projects/Self-Improving-Agent: clean, f673d5e -> origin/master 9bc06e3 (v0.44.2; 111 commits). Only root package.json changed among the dependency files (the version line), so no npm ci, avoiding the Windows lock on better-sqlite3 held by every session's open-brain server. `npm run build` rc 0, stamped 9bc06e3; `sync --check` there: build-freshness PASS against 9bc06e3; 27 passed, 1 issue (the known ENTITIES.md retirements). (4) `gitnexus analyze --force --skip-agents-md --skip-skills`: 1.6.12 detected the schema change and recreated the database; indexed in 47.1s; meta.json lastCommit 9bc06e3 = HEAD; 7,123 nodes, 15,635 edges, 297 clusters, 173 flows; the tracked tree stayed clean. (5) OUTSTANDING, Aaron's: /mcp reconnect of open-brain and gitnexus in every open session. Until then those sessions run the OLD open-brain server code (v0.44.1) and have no gitnexus. A2A-Hub's own index is Relay's to rebuild. This closes the window, not T-172: that task's lasting fix (the greeting prints the serving build's distance; one refusing command updates it) is still open.
+- [x] **T-205** MASTER IS RED: T-158's TG-2 test asserts specific gap ids against the LIVE record, and the planner's G-049 broke it; prove the citation skip on a fixture record instead (session 150) — Opened planner session 150, 2026-09-30. Master run 36681093114 at 9c60361 (the planner's docs-only #219 merge, which carried rev 175's explicit G-049) FAILS tests/shared/state-writer.test.ts 'a dry-run add_gap on this repo skips G-046, G-047 and G-048 and names them (TG-2)': expected false to be true. It is the only failure (1 of 1856). CAUSE (derived): the test runs add_gap against this repo's LIVE .agents/state.json. With G-049 present, the next generated id is G-050, so the skip of 046-048 never occurs. Same class as r3b (#210) and G-044: live record data asserted as an invariant. The TEST is the defect; the record is NOT reverted. FIX (builder, branch fix/tg2-fixture-record from origin/master): prove the citation skip on a FIXTURE record in a scratch repo whose tracked files cite the ids the fixture's next id would hit. A live-repo run, if any, asserts only 'the assigned id is not cited', never specific ids. Rows: red at 9c60361, green after; a mutant dropping the citation scan goes red on the fixture row; a sibling grep of the test tree for other assertions on specific live task, gap or decision ids, each named. Push cleared, PR, merge is Aaron's. PLANNER ERROR ENTRY: the planner's record write reached master and turned it red. Caught by reading master's own run after the merge. The planner had checked that G-049 was uncited in the tree but not whether a test pinned the next id. PR #220 is held until master is green again, so its merge is attributable. — MERGE AUTHORITY, planner session 150: Aaron, directly in the planner session, verbatim: 'merging the TG-2 fix PR when the builder posts it'. It covers ONE PR: the builder's fix/tg2-fixture-record PR. The planner merges it only on MERGEABLE/CLEAN, pinned to its head, after reading the red/green and mutant evidence, then reads master's own run. It does not cover any other PR. — FIXED, planner session 150: PR #222 (fix/tg2-fixture-record a4d540c, builder) merged by the planner on Aaron's word ('merging the TG-2 fix PR when the builder posts it') as cdf079d, pinned; PR run 36684022227 success. MASTER'S OWN RUN 36687172648 at cdf079d: SUCCESS; master is green again. The builder's sibling audit found no other assertion a routine record write can break. It found one tree-behind fragility in greeting-size.test.ts, which is T-200's to fix before QA.
