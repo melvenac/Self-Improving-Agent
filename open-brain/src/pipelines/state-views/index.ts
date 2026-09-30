@@ -8,7 +8,7 @@
  * outside it is the project's own prose and is preserved byte for byte.
  */
 import type { State, Task, Handoff } from "../../shared/state-schema.js";
-import { TaskPriority, lastSession, newestHandoffPerInstance, compareFirstRev } from "../../shared/state-schema.js";
+import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, compareFirstRev } from "../../shared/state-schema.js";
 
 export interface ViewOptions {
   version: string;
@@ -206,8 +206,9 @@ export function renderSummaryRegion(state: State, o: ViewOptions): string {
 
   lines.push("## What's broken", "");
   const blocked = state.tasks.filter((t) => t.status === "blocked");
-  if (state.gaps.length === 0 && blocked.length === 0) lines.push("_Nothing open._");
-  for (const g of state.gaps) lines.push(`- Gap ${g.id}: ${g.what}`);
+  const openGaps = state.gaps.filter(isOpenGap);
+  if (openGaps.length === 0 && blocked.length === 0) lines.push("_Nothing open._");
+  for (const g of openGaps) lines.push(`- Gap ${g.id}: ${g.what}`);
   for (const t of blocked) lines.push(`- Blocked ${t.id}: ${t.title}${t.note ? ` — ${t.note}` : ""}`);
   lines.push("");
 

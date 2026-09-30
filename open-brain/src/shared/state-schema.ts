@@ -128,13 +128,30 @@ export const VerifiedSchema = z.strictObject({
   status: VerifiedStatus,
 });
 
+export const GapStatus = z.enum(["open", "closed"]);
+
+/**
+ * T-158. `status` is absent on every gap written before tombstones, including
+ * the live rev-156 record, and absent means open. Schema version stays 3:
+ * those records still parse, and the state-schema check does not ask for a
+ * migration. A closed gap stays in `gaps[]` with `closed_session` and
+ * `closed_rev` so its id cannot be handed out again.
+ */
 export const GapSchema = z.strictObject({
   id: z.string(),
   what: z.string(),
   evidence: z.string(),
   recommended_update: z.string(),
   opened_session: sessionNumber,
+  status: GapStatus.optional(),
+  closed_session: sessionNumber.nullable().optional(),
+  closed_rev: nonNegInt.nullable().optional(),
 });
+
+/** A gap with no status is open. Closed gaps are tombstones and are not listed as open. */
+export function isOpenGap(gap: { status?: "open" | "closed" }): boolean {
+  return gap.status !== "closed";
+}
 
 export const DecisionSchema = z.strictObject({
   id: z.string(),
@@ -417,7 +434,7 @@ const KEY_ORDER: Record<string, string[]> = {
   tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note", "note_by", "closed_rev"],
   verified: ["id", "claim", "evidence", "since_session", "status"],
   evidence: ["type", "path", "observation"],
-  gaps: ["id", "what", "evidence", "recommended_update", "opened_session"],
+  gaps: ["id", "what", "evidence", "recommended_update", "opened_session", "status", "closed_session", "closed_rev"],
   decisions: ["id", "title", "date", "note"],
   handoffs: ["seat", "pick_up", "watch_out", "open_questions", "session", "loop_state", "session_uuid", "checkout", "first_rev"],
   loop_state: ["open_prs", "frozen_sha", "questions_for_aaron", "rulings"],

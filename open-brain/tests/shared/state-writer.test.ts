@@ -1,10 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { execFileSync } from "node:child_process";
 import { mkdtempSync, cpSync, rmSync, readFileSync, existsSync, readdirSync, statSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, join, relative } from "node:path";
 import { tmpdir } from "node:os";
 import {
   applyStateOps,
   applyRetention,
+  assignGapId,
+  citedGapIds,
   nextId,
   validateResultState,
   DONE_RETENTION_SESSIONS,
@@ -235,17 +238,122 @@ describe("applyStateOps (Loop 3 writer)", () => {
     expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "reopen_verified", id: "V-404", evidence: ev }] }), /unknown verified V-404/);
   });
 
-  it("add_gap assigns G-NNN; close_gap removes it and reports the removal (V2)", () => {
+  it("close_gap keeps a tombstone and the views do not list it as open (TG-1)", () => {
+    execFileSync("git", ["init", "-q", "-b", "master"], { cwd: root, stdio: "ignore" });
+    execFileSync("git", ["-c", "user.email=qa@example.com", "-c", "user.name=qa", "commit", "-q", "--allow-empty", "-m", "init"], { cwd: root, stdio: "ignore" });
     const r = applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [
       { op: "add_gap", what: "w", evidence: "e", recommended_update: "r" },
       { op: "close_gap", id: "G-001" },
     ] });
+    expect(r.ok).toBe(true);
     expect(r.applied).toEqual([{ op: "add_gap", id: "G-006" }, { op: "close_gap", id: "G-001" }]);
-    expect(r.removed_gap_ids).toEqual(["G-001"]);
+    expect(r.removed_gap_ids).toEqual([]);
+    expect(r.notes.some((n) => n.includes("tombstone kept") && n.includes("G-001") && n.includes(`closed_session ${SESSION}`) && n.includes("closed_rev 8"))).toBe(true);
     const gaps = readState(root).gaps;
-    expect(gaps.map((g) => g.id)).toEqual(["G-002", "G-003", "G-004", "G-005", "G-006"]);
+    expect(gaps.map((g) => g.id)).toEqual(["G-001", "G-002", "G-003", "G-004", "G-005", "G-006"]);
+    expect(gaps.find((g) => g.id === "G-001")).toMatchObject({ status: "closed", closed_session: SESSION, closed_rev: 8 });
     expect(gaps.find((g) => g.id === "G-006")).toEqual({ id: "G-006", what: "w", evidence: "e", recommended_update: "r", opened_session: SESSION });
-    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "close_gap", id: "G-001" }] }), /unknown gap G-001/);
+    const summary = readFileSync(join(root, ".agents/SYSTEM/SUMMARY.md"), "utf-8");
+    expect(summary).not.toContain("Gap G-001:");
+    expect(summary).toContain("Gap G-002:");
+    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "close_gap", id: "G-001" }] }), /already closed/);
+  });
+
+  it("a cited fixture id is skipped and an uncited one is not (TG-3)", () => {
+    const repo = mkdtempSync(join(tmpdir(), "ob-gap-cite-"));
+    try {
+      execFileSync("git", ["init"], { cwd: repo, stdio: "ignore" });
+      writeFileSync(join(repo, "cite.txt"), "known citation G-040\n");
+      execFileSync("git", ["add", "cite.txt"], { cwd: repo, stdio: "ignore" });
+      const scan = citedGapIds(repo);
+      expect(scan.ok).toBe(true);
+      if (!scan.ok) return;
+      expect(scan.cited.has("G-040")).toBe(true);
+      expect(scan.cited.has("G-041")).toBe(false);
+      const assigned = assignGapId(["G-039"], scan.cited);
+      expect(assigned.skipped.map((s) => s.id)).toEqual(["G-040"]);
+      expect(assigned.skipped[0]?.why).toContain("cited");
+      expect(assigned.id).toBe("G-041");
+    } finally {
+      rmSync(repo, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+    }
+  });
+
+  it("a dry-run add_gap on this repo skips G-046, G-047 and G-048 and names them (TG-2)", () => {
+    const repo = execFileSync("git", ["rev-parse", "--show-toplevel"], { cwd: import.meta.dirname, encoding: "utf8" }).trim();
+    const scan = citedGapIds(repo);
+    expect(scan.ok).toBe(true);
+    if (!scan.ok) return;
+    for (const id of ["G-046", "G-047", "G-048"]) expect(scan.cited.has(id)).toBe(true);
+    const before = readFileSync(join(repo, ".agents/state.json"), "utf-8");
+    const parsed = parseState(before);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.data.schema_version).toBe(3);
+    expect(parsed.data.gaps.some((g) => g.id === "G-045")).toBe(true);
+    expect(parsed.data.gaps.every((g) => g.status === undefined)).toBe(true);
+    const r = applyStateOps(repo, {
+      session: 999,
+      expected_revision: parsed.data.revision,
+      dry_run: true,
+      render: false,
+      ops: [{ op: "add_gap", what: "probe", evidence: "e", recommended_update: "r" }],
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(["G-046", "G-047", "G-048"]).not.toContain(r.applied[0]?.id);
+    for (const id of ["G-046", "G-047", "G-048"]) {
+      expect(r.notes.some((n) => n.startsWith(`add_gap skipped ${id}:`) && n.includes("cited"))).toBe(true);
+    }
+    expect(readFileSync(join(repo, ".agents/state.json"), "utf-8")).toBe(before);
+  });
+
+  it("an explicit cited id is refused, and an uncited one is not", () => {
+    const repo = execFileSync("git", ["rev-parse", "--show-toplevel"], { cwd: import.meta.dirname, encoding: "utf8" }).trim();
+    const before = readFileSync(join(repo, ".agents/state.json"), "utf-8");
+    const parsed = parseState(before);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const scan = citedGapIds(repo);
+    expect(scan.ok).toBe(true);
+    if (!scan.ok) return;
+    const refused = applyStateOps(repo, {
+      session: 999,
+      expected_revision: parsed.data.revision,
+      dry_run: true,
+      render: false,
+      ops: [{ op: "add_gap", id: "G-046", what: "probe", evidence: "e", recommended_update: "r" }],
+    });
+    expect(refused.ok).toBe(false);
+    if (refused.ok) return;
+    expect(refused.error).toMatch(/G-046 is cited/);
+    let n = 900;
+    while (scan.cited.has(`G-${String(n).padStart(3, "0")}`)) n += 1;
+    const free = `G-${String(n).padStart(3, "0")}`;
+    const accepted = applyStateOps(repo, {
+      session: 999,
+      expected_revision: parsed.data.revision,
+      dry_run: true,
+      render: false,
+      ops: [{ op: "add_gap", id: free, what: "probe", evidence: "e", recommended_update: "r" }],
+    });
+    expect(accepted.ok).toBe(true);
+    if (!accepted.ok) return;
+    expect(accepted.applied[0]?.id).toBe(free);
+    expect(readFileSync(join(repo, ".agents/state.json"), "utf-8")).toBe(before);
+  });
+
+  it("a citation scan that cannot run refuses add_gap and names the failure", () => {
+    const r = applyStateOps(root, {
+      session: SESSION,
+      expected_revision: 7,
+      render: false,
+      ops: [{ op: "add_gap", what: "w", evidence: "e", recommended_update: "r" }],
+    });
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.error).toMatch(/citation scan could not run: git grep exited /);
+    expect(readFileSync(join(root, STATE), "utf-8")).toBe(before);
   });
 
   /**
