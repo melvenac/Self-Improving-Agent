@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 210 by open-brain v0.44.2 — do not edit; change state via ob_state -->
-> **Status:** v0.44.2 — Loop 15 slice three (D-033/D-036) closes when candidates A, B and C are ACCEPTED; Jev calibration is the next slice. A: ACCEPTED and MERGED (#182, 2026-09-27). B: ACCEPTED and MERGED (part 1 #165, part 2 #187, 2026-09-27). C (T-155, the shadow merge gate): OPEN. r3 (20c2dfd, PR #195) was QA 213 ACCEPT, overruled by the planner (session 149) for five partial rows including CC-13's ledger tamper check; r4 is with Forge, scoped exactly to CC-1.2, CC-2.2, CC-5.6, CC-13.1, CC-13.2 and CC-17. When C r4 is accepted: shadow-verdict prepare on its E_t BEFORE Aaron merges #195, decide after (C criteria section 8 P4), and slice three closes.
+<!-- generated from .agents/state.json rev 211 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+> **Status:** v0.44.2 — Loop 15 slice three (D-033/D-036) is CLOSED: A (#182), B (#165, #187) and C (#195, merged 2026-09-30 as ddd43526) are all ACCEPTED and merged. The shadow merge gate's ledger has line 1 (undefined, merged). The NEXT slice per D-033 is Jev calibration. It is NOT YET BRIEFED or ruled, so the next planner session writes its brief before any dispatch. In flight meanwhile: T-194 r3 (c1f1cb48) awaits QA 234 on the laptop; T-214 (declared.ts rejects a blank line, which made episode 1 undefined) is P1.
 
 ## What's working
 
