@@ -1,46 +1,44 @@
-<!-- generated from .agents/state.json rev 217 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 218 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 150)_
+## planner [sia-planner] _(written session 153)_
 
 ### Pick up here
 
-Planner session 150 ROLLED (2026-09-30, about 09:10Z; Aaron rolled atlas, relay and clark). Master c2a5eaa, green. START HERE: (1) QA 232 (C r4) REPORTED ACCEPT: origin/qa/c-r4-report b43e719b. It is NOT ruled; read the whole report, rule on CC-22 (QA asks met vs partial; the only CI failure is the base-shared T-171 r3b), then shadow-verdict prepare before Aaron merges #195 (T-155 note). (2) Launch QA 233 (T-194 r2) YOURSELF over ssh (D-069), with the same launcher as QA 232: git show <master>:docs/loops/qa-233-headless-prompt.md > C:\qa-tmp\qa-233-headless-prompt.md, then launch-qa.ps1 -Worktree C:\Users\Aaron\Worktrees\sia-qa -Prompt ... -Log C:\qa-tmp\qa-233.log -AddDir C:\qa-scratch,C:\qa-tmp -NoFetch -Model opus. The laptop is idle. Read the log's LAST line for the verdict. (3) PR #227 (T-198 r2 merged with master, b8a6004) REPLACES #223. Aaron's word 'merging #223 (T-198 r2)' covers it; the planner verified the code cmp-identical to QA 230's (comment on #227). Merge it on CLEAN, pinned (it was UNSTABLE at the roll with CI running), close #223, read master's own run. (4) Then QA for the queue, serial on the laptop: T-200 (424065c), T-201 (8952266), T-207 (f3e64f1), T-203 (a5a1206), T-199 (621d49e), T-204 (d5b3623); dispatches not written yet. Seats (QA PC, Claude Code Sonnet, via Remote Control): sia-builder is on standby (T-208 after T-200 merges); sia-forge was told to plan T-202 and was offline at the roll (the message is queued). Forge's hub turn as forge was DENIED by its classifier; it is Aaron's to run with ! in the sia-forge window. After it, tell Relay, and strict (D-063) waits only on that plus #227.
+Planner session 153 STOPPED at 2026-09-30 ~15:05Z on Aaron's word (account usage limit, resets 18:10Z); nothing new was launched after that. START HERE: (1) QA 235 (T-194 r4, candidate d37e09dc) was STILL RUNNING at the stop: laptop pid 21824, launched 14:47:42Z, log C:\qa-tmp\qa-235.log, which is 0 bytes until the job ends; the verdict is its LAST line. Read it over ssh (aaron@100.110.244.10), then read the report on origin/qa/t194-r4-report and RULE it against docs/loops/qa-235-t194-r4-dispatch.md (rows r4-1..r4-6 plus regression; the same-line `cd` limit is declared and unscored, so rule it after). If ACCEPT: open the PR for loop/t194-planner-hook, which is code, so Aaron merges; registering the hook in sia-planner's settings.local.json is Aaron's hand. (2) Then FINALISE slice four: docs/loops/loop-15-slice-4-brief-draft.md is RULED (D-070, D-071), so fold the rulings into its sections 2-3, propose the live-call budget (about 17 calls: 1 plan-gate + ~8 done-gate + ~8 qa-score), write the sibling D_t JSON (T-195), and bring it to Aaron before dispatch. T-214 is item 1. DONE THIS SESSION: #195 (candidate C) merged ddd43526, shadow ledger line 1 (undefined), slice three CLOSED; close-out docs/loops/loop-15-slice-3-closeout.md (#236); T-169 closed: PRD and README rewritten (#238), Step-Back Part 6 published at the same URL (v12); tcm hub AUTH_MODE=strict since 12:32:42Z (V-078); QA 232, 233 and 234 ruled; T-209..T-215 opened; D-070 and D-071 recorded.
 
 ### Watch out
 
-- STANDING REPORTING RULES FROM AARON (via Clark): (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\Users\melve\Worktrees\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 30 MINUTES while active, a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Re-create the cadence at /start (CronCreate at :04 and :34). If `clark` is not in ListAgents, skip the send.
-- REMOTE CONTROL must be ON in the planner session (/remote-control, then /rename atlas). The QA PC seats are reached only by their Remote Control names (sia-builder, sia-forge); native A2A does not cross machines. Remote Control gives no read receipts: silence is unknown, not working. A seat's report can fail to deliver and be resent.
-- D-069: the planner LAUNCHES QA itself over ssh. Dispatch on master first, idle machine only, one QA job at a time on the laptop, recorded. A classifier denial is surfaced, never routed around.
-- D-068 until 2026-10-03: planner Opus, devs Sonnet, QA Opus headless; Cursor is BLOCKED (usage limit), Composer included. Headless `claude -p` QA: the model's turn IS the job; prompts must forbid background commands (QA 232's first attempt died of it). The log is empty until the job ends; the verdict is the last line.
-- QA PC CAPACITY (Clark, at the roll): 8 GB RAM, and SSH resets under load; run at most 3 seats there. The laptop takes one QA job at a time.
-- Master-red lesson (T-205): a record write can break a test that pins live record data. After every merge, read master's OWN run. Code merges one at a time, with master green in between.
-- A code merge needs Aaron's yes IN THE PLANNER SESSION; relays are fine for reversible acts. update-branch or a merge-branch replacement rides on his merge word for that PR, verified by a merge-base cmp against the QA'd code.
-- Until T-207 merges, every developer or QA mutant-branch push starts a tcm run; cancel loop/*-mut-* runs by hand when the queue backs up.
-- Fetch with --prune before asserting a remote branch exists or not (rev 196). T-208 fixes /start's stale-fetch 'level'.
-- The serving MCP build (main tree) predates T-158: the first close_gap tombstone on master blinds unrebuilt builds (T-172). Choose explicit uncited gap ids (G-046..048 are cited).
+- SLOT BOOKING: before ANY launch on the laptop or the QA PC, ask clark for the slot and wait for its word (by hand until T-204's compute lease ships). Session 153 collided once with Rivet by launching on a free-memory reading.
+- MANUAL MODE: when the auto-mode classifier denies an action, do NOT retry or reroute. Send clark ONE line `MANUAL MODE → atlas: <exact action> (<why>)` AND say the same line in the planner session. Aaron switches the session to manual from his phone and approves there. His typed 'merge'/'yes' in the planner session is the merge word.
+- Headless jobs: the QA laptop uses C:\Users\Aaron\headless-qa\launch-qa.ps1 (claude.cmd); the QA PC uses C:\Users\Aaron Melven\headless\launch-job.ps1 (claude). Job allowlists refuse inline env-var prefixes (HUB_URL=..., TEMP=...), so put env setup in a node wrapper. Prompts must forbid background commands, and the verdict or RESULT is the log's last line.
+- A record write can break a test that pins live data (T-205, T-213): repointing forge in .agents/SYSTEM/hub-partner-seats.json broke 5 tests. Run the tests that read a file before editing it.
+- The status cron to clark (:04/:34) was STOPPED at the usage stop. Recreate it only when active work resumes (standing rule; CronCreate job, session-only).
+- Instructions are candidates too (slice-three finding): check a dispatch, ruling or criteria file against what it governs before a seat builds to it. The T-194 r3 wording caused D3, and a criteria blank line made shadow episode 1 undefined.
+- D-068 until 2026-10-03: planner Opus, devs Sonnet, QA Opus headless; Cursor BLOCKED. Re-rule models at the reset (close-out section 8).
 
 ### Open questions
 
-- Aaron: run Forge's hub turn with ! in the sia-forge window (its classifier denied it): HUB_URL=http://100.124.212.87:4000 node "C:/Users/Aaron Melven/Projects/A2A-Hub/scripts/hub-talk.mjs" --as forge --session k57frxw0ptb8tadmqdwy0khhks8ey006 --say "Forge registered as forge from the QA PC"
+- Aaron: propose an edit to ~/.claude/CLAUDE.md (your global file), which still describes the maturity lifecycle (Progenitor/Proven/Mature, apoptosis) as current?
+- Aaron: the release. Slice three's A, B and C merged with no CHANGELOG entry or version (package.json 0.44.2); CHANGELOG has an unreleased 0.45.0 section.
 
 ### Loop state
 
-**Open PRs:** 
-- #195 loop/15-slice-3-candidate-c (0dc20ff) — QA: in_progress — QA 232 reported ACCEPT (b43e719b); planner ruling pending (CC-22)
-- #227 loop/t198-merge (b8a6004) — QA: accepted — replaces #223; Aaron's merge word; verified cmp-identical; merge on CLEAN
-- #223 loop/t198-presence (a40fc77) — QA: accepted — close when #227 merges
+**Open PRs:** _None._
 
-**SHA frozen for QA:** `c339427 (C r4, QA 232 done); 699789e1 (T-194 r2, QA 233 not launched)`
+**SHA frozen for QA:** `d37e09dc (T-194 r4, QA 235 running at the stop)`
 
 **Questions pending for Aaron:** 
-- Forge's hub turn (his ! in the sia-forge window)
+- Propose an edit to ~/.claude/CLAUDE.md (still describes the maturity lifecycle)?
+- Release: A, B and C are merged with no version or CHANGELOG entry
 
 **Rulings made mid-loop:** 
-- Merged in session 150 on Aaron's word: #218 (T-158), #222 (TG-2), #220 (T-196+T-197); docs-only: #217, #219, #221, #224, #225, #226
-- ACCEPTED: QA 227, QA 228, QA 230; QA 231 VOID; QA 232 reported ACCEPT, not ruled
-- Opened T-201..T-208, D-064..D-069, G-049; seats moved to the QA PC
+- QA 232: C r4 ACCEPT, CC-22 met on condition; #195 merged ddd43526
+- QA 233: T-194 r2 REJECT (D1 absolute paths, D2 compound docs-merge)
+- QA 234: T-194 r3 REJECT (D3, caused by r3's dispatch wording); outside-repo deny reversed
+- D-070 and D-071: slice-four questions ruled
+- T-169 r2: R-011 referrers made honest; T-215 opened
 
 ## developer [sia-builder] _(written session 152)_
 
@@ -109,7 +107,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_4 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_5 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
