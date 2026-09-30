@@ -218,7 +218,7 @@ export function missingHandoffNotice(state: State, options: RenderStateOptions):
     if (last === null || compareFirstRev(s.first_rev, last.first_rev) >= 0) last = s;
   }
   if (last === null) return null;
-  if (state.handoffs.some((h) => h.session_uuid === last.uuid)) return null;
+  if (state.handoffs.some((h) => h.checkout === checkout)) return null;
   const who = last.seat ?? options.seat ?? checkout;
   return (
     `Handoff MISSING: the last ${who} session (#${last.n}, ${last.uuid}, checkout ${checkout}, first write rev ${last.first_rev ?? "unknown"}) ` +
