@@ -23,6 +23,7 @@ Thumbs.db
 !/.agents/AGENT.md
 !/.agents/LIFECYCLE.md
 !/.agents/retirements.json
+!/.agents/assignments.json
 !/.agents/TASKS/
 /.agents/TASKS/*
 !/.agents/TASKS/INBOX.md
