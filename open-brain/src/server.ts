@@ -24,6 +24,7 @@ import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/histo
 import { sessionStart, type StateFileSize, type StateJsonResult } from "./pipelines/session-start/index.js";
 import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
 import { resolveRecordSource, type RecordSource } from "./pipelines/session-start/record-source.js";
+import { applyAssignmentOps, classifyOps, readAssignments, renderAssignment } from "./pipelines/assignments/index.js";
 import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
 import { SeatName, schemaVersionAdvice, type Seat } from "./shared/state-schema.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
@@ -401,6 +402,16 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       }
     }
 
+    // T-201: what this seat is assigned, from the tracked sidecar (origin/master's when this tree
+    // is behind it, like the record above). Developer and QA seats always get the block; another
+    // seat gets one line naming the omission.
+    lines.push(
+      ...renderAssignment(
+        roles.seat?.role ?? null,
+        readAssignments(projectRoot, recordSource.kind === "master" ? recordSource.upstreamRef : null),
+      ),
+    );
+
     // The role knowledge itself, last: it is reference material the seat reads
     // once and refers back to, not a briefing it reads top to bottom.
     for (const f of roles.files) {
@@ -459,6 +470,37 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
     // op argument, so a batch cannot write under another session's uuid. The
     // checkout's declared seat labels the session record; set_handoff's own
     // seat overrides it.
+    // T-201: assignment ops write .agents/assignments.json, a sidecar with its own revision,
+    // and never touch state.json. A batch holds one kind or the other.
+    const kind = Array.isArray(args.ops) ? classifyOps(args.ops) : "other";
+    if (kind === "mixed") {
+      return {
+        content: [{ type: "text", text: "ob_state refused: set_assignment/clear_assignment cannot share a batch with record ops (they write a separate file with its own revision).\nNothing written." }],
+        isError: true,
+      };
+    }
+    if (kind === "assignment") {
+      const w = applyAssignmentOps(projectRoot, {
+        session: args.session,
+        expected_revision: args.expected_revision,
+        ops: args.ops,
+        dry_run: args.dry_run,
+      });
+      if (!w.ok) {
+        return {
+          content: [{ type: "text", text: `ob_state refused: ${w.error}\nAssignments revision: ${w.revision_before >= 0 ? `${w.revision_before} (unchanged)` : "unreadable file"}\nNothing written.` }],
+          isError: true,
+        };
+      }
+      const out = [
+        `ob_state ${w.dry_run ? "dry run — nothing written" : "applied"} (.agents/assignments.json; NOT the record, so state.json's revision is unchanged)`,
+        `Assignments revision: ${w.revision_before} → ${w.revision_after}`,
+        `Applied (${w.applied.length}):`,
+        ...w.applied.map((a) => `  ${a}`),
+        `Superseded: ${w.superseded.length ? w.superseded.join("; ") : "none"}`,
+      ];
+      return { content: [{ type: "text", text: out.join("\n") }] };
+    }
     const identity = readAgentIdentity(projectRoot);
     const stateSession = attributedSession(null);
     const r = applyStateOps(projectRoot, {

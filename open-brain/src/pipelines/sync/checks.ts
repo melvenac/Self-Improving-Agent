@@ -9,6 +9,7 @@ import { renderState } from "../session-start/state-render.js";
 import { describeRoleFiles } from "../session-start/role-files.js";
 import { readAgentIdentity } from "../session-start/agent-identity.js";
 import { describeTreeCurrency } from "../session-start/tree-currency.js";
+import { readAssignments, renderAssignment } from "../assignments/index.js";
 import { resolveRecordSource } from "../session-start/record-source.js";
 import { checkSummaryFromState } from "./checks-state.js";
 
@@ -1778,7 +1779,7 @@ export const GREETING_LIMIT = 40_000;
 
 export interface ComposedGreeting {
   text: string;
-  parts: { treeAndSeat: number; state: number; roleFiles: number };
+  parts: { treeAndSeat: number; state: number; assignment: number; roleFiles: number };
 }
 
 /**
@@ -1824,12 +1825,17 @@ export function composeGreeting(projectRoot: string, version: string): ComposedG
     seat: seat?.success ? seat.data : null,
     projectRoot,
   }).join("\n");
+  // T-201: the assignment block is part of the return, so the size check counts it.
+  const assignment = renderAssignment(
+    roles.seat?.role ?? null,
+    readAssignments(projectRoot, recordSource.kind === "master" ? recordSource.upstreamRef : null),
+  ).join("\n");
   const roleFiles = roles.files
     .filter((f) => f.content !== null)
     .map((f) => `\n## ${f.rel}${f.commit ? ` @ ${f.commit.slice(0, 7)}` : ""}\n${(f.content as string).replace(/\s+$/, "")}`)
     .join("\n");
-  const text = [treeAndSeat, state, roleFiles].join("\n");
-  return { text, parts: { treeAndSeat: treeAndSeat.length, state: state.length, roleFiles: roleFiles.length } };
+  const text = [treeAndSeat, state, assignment, roleFiles].join("\n");
+  return { text, parts: { treeAndSeat: treeAndSeat.length, state: state.length, assignment: assignment.length, roleFiles: roleFiles.length } };
 }
 
 /**
@@ -1852,7 +1858,7 @@ export function checkGreetingSize(version: string, projectRoot: string, limit = 
   }
   const n = g.text.length;
   const detail =
-    `(state render ${g.parts.state}, role files ${g.parts.roleFiles}, tree and seat ${g.parts.treeAndSeat}). ` +
+    `(state render ${g.parts.state}, assignment ${g.parts.assignment}, role files ${g.parts.roleFiles}, tree and seat ${g.parts.treeAndSeat}). ` +
     `LIMIT: composed from handleStart's parts, not by calling it; its mode, drift, session, warnings and sizes lines are not counted.`;
   return n > limit
     ? { name, severity: "issue", message: `greeting is ${n} characters, over the ${limit} limit ${detail}`, report: true }
