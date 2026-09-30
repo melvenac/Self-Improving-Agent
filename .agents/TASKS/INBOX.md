@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 164 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 165 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -28,6 +28,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-196** The hub procedure is tracked knowledge: each seat's hub room and hub-talk invocation in a tracked data file beside .agents/SYSTEM/worktree-seats.json; a short 'Talking to Cursor seats' section in planner.md (printed in full at /start) pointing at it; a tracked alwaysApply .cursor/rules hub rule; and Cursor's /start joins the seat's room and reads unread atlas turns before proposing anything
 - [ ] **T-197** Cursor's /start matches Claude Code's /start except for documented tool-call differences, and /sync fails on any other difference: it reads ob_start's State block, never hand-edits rendered views, lets ob_start create the session log, and presents NEXT as a ranked backlog rather than a proposal
 - [ ] **T-198** ob_start prints one line per partner seat from the hub's presence endpoint (listening or not, unread turns and since when), and says so visibly when the hub is unreachable, never silently
+- [ ] **T-200** A seat started from a stale tree is briefed from STALE state: when the local record is older than origin/master's, ob_start renders the State block and the role files from origin/master (git show) and says so, so D-062 holds at every /start
 
 ## P1
 
