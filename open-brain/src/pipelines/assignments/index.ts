@@ -115,7 +115,7 @@ export function readAssignments(projectRoot: string, ref: string | null = null):
   // ls-tree tells ABSENT ("") from a failed read (null); git show's stderr text would not.
   const listed = gitLine(projectRoot, ["ls-tree", ref, "--", ASSIGNMENTS_REL]);
   if (listed === null) return { kind: "unreadable", where, cause: `git could not list ${ref}` };
-  if (listed === "") return { kind: "absent", where };
+  if (listed === "") return { kind: "unreadable", where, cause: "absent" };
   const shown = gitShow(projectRoot, ref, ASSIGNMENTS_REL);
   if (!shown.ok) return { kind: "unreadable", where, cause: shown.cause };
   const p = parseAssignments(shown.text);
