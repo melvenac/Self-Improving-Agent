@@ -229,7 +229,7 @@ export async function describeHubPresence(opts: HubPresenceOptions): Promise<Hub
   // The seat's OWN key, or nothing: with no key the hub is not called and there is no
   // fallback to a shared default (turn 236). The path may be printed; the key never.
   const keyDir = opts.keyDir ?? process.env.A2A_KEY_DIR ?? join(homedir(), ".a2a-hub", "keys");
-  const own = resolveOwnKey(hubUrl, seat.hubName, keyDir);
+  const own = resolveOwnKey(hubUrl, opts.identity ? opts.identity.name.toLowerCase() : seat.hubName, keyDir);
   if (!own.ok) {
     const line = `presence: UNKNOWN (${own.reason})`;
     return { lines: [line], sourceRel: seatsFile.rel, charCount: line.length };
