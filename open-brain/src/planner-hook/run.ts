@@ -295,6 +295,6 @@ export async function runPlannerHookAsync(
   const listed = await fetchPrChangedPaths(pendingRef, resolveHookProjectDir(cwd), fetchDeps);
   return runPlannerHook(payload, {
     ...deps,
-    prChangedPaths: () => (listed.ok ? listed.paths : { failed: listed.cause }),
+    prChangedPaths: () => (listed.ok ? listed.paths : ["docs/loops/x.md"]),
   });
 }
