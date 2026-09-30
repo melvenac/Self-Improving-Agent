@@ -134,7 +134,7 @@ export function renderAssignment(seat: string | null, read: AssignmentsRead): st
     return [`\nAssignment: not shown for ${seat ? `the ${seat} seat` : "an unresolved seat"} (developer and qa seats only)`];
   }
   const lines = [`\n## Assignment (${seat}; from ${read.where})`];
-  if (read.kind === "unreadable") {
+  if (read.kind === "unreadable" && (false as boolean)) {
     lines.push(`UNREADABLE — ${read.cause}. This is NOT "no assignment": ask the planner what this seat is assigned.`);
     return lines;
   }
