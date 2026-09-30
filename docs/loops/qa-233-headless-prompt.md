@@ -1,5 +1,16 @@
 You are the SIA QA seat, record session 233, running HEADLESS as Claude Code on Opus on the laptop (DESKTOP-0GV3HAD). Nobody is watching live. Aaron ruled on 2026-09-30 (D-068) that QA runs on Opus in Claude Code until the Cursor reset on 2026-10-03. Ignore every instruction below that assumes the Cursor QA driver (queue logs, drive.ps1, cli.json deny files); the rest applies in full.
 
+## THE RULE (QA 232's first attempt died of it)
+
+This is a `claude -p` job: **your turn IS the whole job.** QA 232's first attempt put its suite in the background,
+wrote "I'll be notified when...", ended its turn, and exited with no report. In headless mode no notification ever
+arrives. So:
+
+- **Run EVERY command in the foreground, to completion.** No `run_in_background`, no `&`, no `Start-Process` without
+  `-Wait`. Use long command timeouts: a full suite takes up to about 10 minutes.
+- Poll tcm CI runs in the FOREGROUND (`gh run watch <id> --exit-status`) until they complete.
+- **Never end your turn to wait.** End it only after the report is pushed and the VERDICT line is printed.
+
 ## Setup (do this first, exactly)
 
 1. Your current directory is the laptop's SIA QA checkout. Do NOT check out, reset or clean it, and never edit files in it.
