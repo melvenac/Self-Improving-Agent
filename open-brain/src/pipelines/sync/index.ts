@@ -39,6 +39,7 @@ import { checkHubSeats } from "./hub-seats.js";
 import { checkCursorStartParity } from "./start-parity.js";
 import { checkProbeMarkers } from "./probe-markers.js";
 import { checkVaultPollution } from "./vault-pollution.js";
+import { checkSeatIdentity } from "./seat-identity.js";
 import { checkCursorHookCompat } from "./cursor-hook-compat.js";
 import { checkShadowMergeLedger } from "../../harness/shadow-merge.js";
 
@@ -110,6 +111,8 @@ export function runSync(input: SyncOptions): SyncResult {
   // T-193: registered worktrees are the main checkout or <project>-<seat>.
   checks.push(checkWorktreeLayout(options.projectRoot));
   checks.push(checkHubSeats(options.projectRoot));
+  // T-203: the checkout's AGENT.local.md against the seat map.
+  checks.push(checkSeatIdentity(options.projectRoot));
   checks.push(checkCursorStartParity(options.projectRoot));
   // Record 198: a file under open-brain/tests that says "not for merge" is an issue.
   checks.push(checkProbeMarkers(options.projectRoot));

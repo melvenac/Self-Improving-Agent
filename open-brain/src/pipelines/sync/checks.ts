@@ -2349,7 +2349,7 @@ export function composeGreeting(projectRoot: string, version: string): ComposedG
     .join("\n");
   // T-198: the partner-presence block sits after the seat lines in handleStart. It is
   // fetched live there; a check must not call the hub, so its WORST-CASE size is counted.
-  const presence = presenceBlockUpperBound(projectRoot, roles.seat).lines.join("\n");
+  const presence = presenceBlockUpperBound(projectRoot).lines.join("\n");
   const text = [treeAndSeat, ...(presence ? [presence] : []), state, roleFiles].join("\n");
   return {
     text,
