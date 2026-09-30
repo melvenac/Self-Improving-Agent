@@ -160,7 +160,7 @@ function requiredGateMissing(
   mode: string,
   name: string,
 ): string | null {
-  if (!required) return null;
+  if (!required || mode === "skip") return null;
   if (gate === "missing") return `${name} required and missing`;
   if (gate === null && mode === "skip") return `${name} required and the gate mode was skip`;
   if (gate === null) return `${name} required and missing`;
