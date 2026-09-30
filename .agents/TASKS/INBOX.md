@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 184 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 192 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -66,6 +66,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-202** The planner learns when a seat comes online: each seat worktree's SessionStart reports seat, checkout SHA, record rev and runtime (Claude Code or Cursor CLI) to the planner seat, deterministically
 - [ ] **T-203** A seat is resolved by its CHECKOUT, not by AGENT.local.md's identity: one tracked map from worktree to seat, role and hub name, used by every per-seat lookup (presence key, readers row, handoff attribution, seat-online report)
 - [ ] **T-204** A compute lease on the QA PC: a developer suite and SIA's qa-queue.ps1 each take one lease file before a run, so QA never starts over a developer suite and a developer suite never starts over QA; stale leases (expired, or owner process gone) are reclaimed
+- [ ] **T-207** CI must not run on developer mutant branches: a push to loop/*-mut-* (and other not-for-merge mutant refs) starts a tcm run that is never evidence and starves QA and PR runs
 
 ## P2
 
@@ -81,6 +82,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-184** state import: an input changed between --draft and --commit commits the DRAFT's content with no note (QA 102 PROBE-7): record each input's hash in the draft and have --commit refuse or say so when one differs
 - [ ] **T-186** state-views applySummaryRegion has the same startsWith('# ') blind spot as the importer's BOM defect: a SUMMARY.md with a leading BOM is misread
 - [ ] **T-190** QA PC speed without hiding Windows failures: the QA driver sets TEMP=TMP=C:\qa-tmp for probes and mutants, QA seats keep scratch in C:\qa-scratch (both Defender-excluded by Aaron), and each QA seat runs the full suite ONCE with the default TEMP as the Defender-on, user-like control
+- [ ] **T-206** The assignments sidecar gets the record's protections: a /sync erasure check (no entry dropped by a hand edit or a merge resolution), a stale-assignment flag (the assigned task is no longer active), and a planner-only writer once T-203 resolves seats by checkout
 
 ## P3
 
