@@ -109,6 +109,9 @@ Drift: {ob_start's drift lines verbatim, or "none"}
 OBJECTIVE
 {objective text} (since session {n})
 
+ASSIGNMENT                             ← developer and qa seats only; omit for the planner
+{ob_start's `## Assignment` block verbatim: task, brief, owed, date — or "no assignment"}
+
 NEXT
 - [{priority}] {id} {title}          ← top 3 by priority from the State block
 {n} active ({n} P0, {n} P1, {n} P2, {n} P3); {n} done
@@ -138,6 +141,13 @@ FLAGS: {anything to verify, or "none"}
 **WATCH OUT is the highest-value part of this briefing.** It is short, already curated, and it is
 where the previous session wrote down what will bite this one. Print every item verbatim. Never
 summarise it, never drop items for length.
+
+**ASSIGNMENT is the session's work, for a developer or QA seat (T-201).** `ob_start` prints a
+`## Assignment` block read from the tracked `.agents/assignments.json` (origin/master's copy when this
+tree is behind). Print it verbatim, and when it names a task, that task is what this session does; NEXT
+below it is context, not a plan. When the block says `no assignment`, say so on the ASSIGNMENT line and
+ask the planner what this seat is for — do not choose from NEXT. When it says `UNREADABLE`, that is not
+`no assignment`: put it in FLAGS. A planner seat sees one line saying the block is not shown; omit the section.
 
 **NEXT is the backlog ranked by priority. It is not a decision.** If the handoff says the next
 subject is unruled, or the objective is complete, **say so on the NEXT line** rather than presenting
