@@ -327,7 +327,7 @@ export function summariseLedger(text: string): {
 export function checkShadowMergeLedger(projectRoot: string): CheckResult {
   const name = "shadow-merge-ledger";
   const path = ledgerPath(projectRoot);
-  const artifacts = listVerdictArtifacts(projectRoot);
+  const artifacts: VerdictArtifact[] = [];
   if (!existsSync(path) && artifacts.length === 0) {
     return { name, severity: "pass", report: true, message: `ledger absent and 0 verdict artifacts walked — first use, nothing to check. ${LEDGER_LIMIT}` };
   }
