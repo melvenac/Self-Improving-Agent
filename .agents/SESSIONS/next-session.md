@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 218 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 219 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-Planner session 153 STOPPED at 2026-09-30 ~15:05Z on Aaron's word (account usage limit, resets 18:10Z); nothing new was launched after that. START HERE: (1) QA 235 (T-194 r4, candidate d37e09dc) was STILL RUNNING at the stop: laptop pid 21824, launched 14:47:42Z, log C:\qa-tmp\qa-235.log, which is 0 bytes until the job ends; the verdict is its LAST line. Read it over ssh (aaron@100.110.244.10), then read the report on origin/qa/t194-r4-report and RULE it against docs/loops/qa-235-t194-r4-dispatch.md (rows r4-1..r4-6 plus regression; the same-line `cd` limit is declared and unscored, so rule it after). If ACCEPT: open the PR for loop/t194-planner-hook, which is code, so Aaron merges; registering the hook in sia-planner's settings.local.json is Aaron's hand. (2) Then FINALISE slice four: docs/loops/loop-15-slice-4-brief-draft.md is RULED (D-070, D-071), so fold the rulings into its sections 2-3, propose the live-call budget (about 17 calls: 1 plan-gate + ~8 done-gate + ~8 qa-score), write the sibling D_t JSON (T-195), and bring it to Aaron before dispatch. T-214 is item 1. DONE THIS SESSION: #195 (candidate C) merged ddd43526, shadow ledger line 1 (undefined), slice three CLOSED; close-out docs/loops/loop-15-slice-3-closeout.md (#236); T-169 closed: PRD and README rewritten (#238), Step-Back Part 6 published at the same URL (v12); tcm hub AUTH_MODE=strict since 12:32:42Z (V-078); QA 232, 233 and 234 ruled; T-209..T-215 opened; D-070 and D-071 recorded.
+Planner session 153 STOPPED at 2026-09-30 ~15:05Z on Aaron's word (account usage limit, resets 18:10Z); nothing new was launched after that. START HERE, AFTER 18:10Z: (0) FIRST: Aaron said YES (via Clark, ~15:10Z) to proposing an update to ~/.claude/CLAUDE.md, where the maturity-lifecycle text (Progenitor/Proven/Mature, apoptosis, maturity boosts, success_rate) is stale since the Loop 10 cut. Write it as a PROPOSED DIFF for his approval, NOT a direct edit, and do it after the reset. Source the replacement from .agents/SYSTEM/PRD.md (#238) and R-011. (1) QA 235 (T-194 r4, candidate d37e09dc) was STILL RUNNING at the stop: laptop pid 21824, launched 14:47:42Z, log C:\qa-tmp\qa-235.log, which is 0 bytes until the job ends; the verdict is its LAST line. Read it over ssh (aaron@100.110.244.10), then read the report on origin/qa/t194-r4-report and RULE it against docs/loops/qa-235-t194-r4-dispatch.md (rows r4-1..r4-6 plus regression; the same-line `cd` limit is declared and unscored, so rule it after). If ACCEPT: open the PR for loop/t194-planner-hook, which is code, so Aaron merges; registering the hook in sia-planner's settings.local.json is Aaron's hand. (2) Then FINALISE slice four: docs/loops/loop-15-slice-4-brief-draft.md is RULED (D-070, D-071), so fold the rulings into its sections 2-3, propose the live-call budget (about 17 calls: 1 plan-gate + ~8 done-gate + ~8 qa-score), write the sibling D_t JSON (T-195), and bring it to Aaron before dispatch. T-214 is item 1. DONE THIS SESSION: #195 (candidate C) merged ddd43526, shadow ledger line 1 (undefined), slice three CLOSED; close-out docs/loops/loop-15-slice-3-closeout.md (#236); T-169 closed: PRD and README rewritten (#238), Step-Back Part 6 published at the same URL (v12); tcm hub AUTH_MODE=strict since 12:32:42Z (V-078); QA 232, 233 and 234 ruled; T-209..T-215 opened; D-070 and D-071 recorded.
 
 ### Watch out
 
@@ -20,7 +20,6 @@ Planner session 153 STOPPED at 2026-09-30 ~15:05Z on Aaron's word (account usage
 
 ### Open questions
 
-- Aaron: propose an edit to ~/.claude/CLAUDE.md (your global file), which still describes the maturity lifecycle (Progenitor/Proven/Mature, apoptosis) as current?
 - Aaron: the release. Slice three's A, B and C merged with no CHANGELOG entry or version (package.json 0.44.2); CHANGELOG has an unreleased 0.45.0 section.
 
 ### Loop state
@@ -30,7 +29,6 @@ Planner session 153 STOPPED at 2026-09-30 ~15:05Z on Aaron's word (account usage
 **SHA frozen for QA:** `d37e09dc (T-194 r4, QA 235 running at the stop)`
 
 **Questions pending for Aaron:** 
-- Propose an edit to ~/.claude/CLAUDE.md (still describes the maturity lifecycle)?
 - Release: A, B and C are merged with no version or CHANGELOG entry
 
 **Rulings made mid-loop:** 
@@ -39,6 +37,7 @@ Planner session 153 STOPPED at 2026-09-30 ~15:05Z on Aaron's word (account usage
 - QA 234: T-194 r3 REJECT (D3, caused by r3's dispatch wording); outside-repo deny reversed
 - D-070 and D-071: slice-four questions ruled
 - T-169 r2: R-011 referrers made honest; T-215 opened
+- Aaron YES: propose a ~/.claude/CLAUDE.md diff after the reset (not a direct edit)
 
 ## developer [sia-builder] _(written session 152)_
 
