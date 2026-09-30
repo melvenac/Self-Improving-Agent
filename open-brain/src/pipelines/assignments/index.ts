@@ -255,8 +255,7 @@ export function applyAssignmentOps(projectRoot: string, args: AssignmentWriteArg
     if (status === undefined) return refuse(`${at} task ${op.task_id} is not in the record`);
     if (status === "done") return refuse(`${at} task ${op.task_id} is done, not active`);
     if (live) {
-      live.status = "superseded";
-      live.ended_rev = rev;
+      next.splice(next.indexOf(live), 1);
       superseded.push(`${s} ${live.task_id}`);
     }
     next.push({
