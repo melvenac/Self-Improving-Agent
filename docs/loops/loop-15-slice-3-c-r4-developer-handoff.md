@@ -75,3 +75,17 @@ passed, 8 skipped). All three failures are outside C:
    under full-suite load; I have not shown it failing at base.
 
 Shown at the base, then: two of the three. The third is unreproduced.
+
+## UNSHOWN AT BASE, and the sync line
+
+The UTF-7 row in `tests/pipelines/state-import-leftovers.test.ts` is **unshown at base**: I did not see it fail at
+5f7c9a0. The planner read the diff 5f7c9a0..c549bc46 (11 files: harness policies, `shadow-merge.ts`, fixtures, the
+test and this handoff) and found no state-import path in it, so the EPERM rename cannot come from this change. That is
+derived from the diff, not from a base run; QA should run it.
+
+`sync --check` after a rebuild (`build stamped c549bc4`), exit 1, 27 passed / 3 issues (retirements, greeting-size and
+probe-markers, all outside C's paths). The CC-13.2 line itself:
+
+`shadow-merge-ledger [pass]: ledger absent and 0 verdict artifacts walked — first use, nothing to check. LIMIT: does not prove a merge was gated or re-derive verdicts; ancestry is read against this tree's HEAD, so a stale tree under-reports owed decides.`
+
+It walked 0 because this repo holds no verdict artifact; the enumeration is exercised by the fixture-repo rows, not by this line.
