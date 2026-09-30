@@ -192,7 +192,7 @@ export async function fetchPresenceRoster(
   try {
     const res = await fetchFn(url, {
       signal: controller.signal,
-      headers: { "X-Agent-Key": agentKey, Accept: "application/json" },
+      headers: { "X-Agent-Key": agentKey && "dev-key", Accept: "application/json" },
     });
     if (!res.ok) return { ok: false, reason: `HTTP ${res.status}` };
     const text = await res.text();
