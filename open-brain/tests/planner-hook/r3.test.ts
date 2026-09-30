@@ -120,16 +120,17 @@ describe("D1 / PH-2 — an absolute state.json or view is denied (P11)", () => {
 
 describe("D1 / PH-6 — an absolute Bash write target is denied (P15)", () => {
   it.each([0, 1])("redirect into open-brain/src, absolute, slash form %i", (i) => {
-    const r = runPlannerHook(bash(`echo x > ${slashForms("open-brain/src/hit.ts")[i]}`));
+    const r = runPlannerHook(bash(`echo x > "${slashForms("open-brain/src/hit.ts")[i]}"`));
     expect(r.decision).toBe("deny");
     expect(r.reason).toContain("not a sandbox");
   });
 
   it.each([
-    (t: string) => `sed -i s/a/b ${t}`,
-    (t: string) => `cat x | tee ${t}`,
-    (t: string) => `cp README.md ${t}`,
-    (t: string) => `mv README.md ${t}`,
+    // Quoted: the repo path may hold spaces, and an unquoted one is cut by the shell itself.
+    (t: string) => `sed -i s/a/b "${t}"`,
+    (t: string) => `cat x | tee "${t}"`,
+    (t: string) => `cp README.md "${t}"`,
+    (t: string) => `mv README.md "${t}"`,
   ])("sed/tee/cp/mv with an absolute target (form %#)", (mk) => {
     expect(runPlannerHook(bash(mk(slashForms("open-brain/src/hit.ts")[0]))).decision).toBe("deny");
     expect(runPlannerHook(bash(mk(`${fwd}/.agents/state.json`))).decision).toBe("deny");
@@ -142,7 +143,12 @@ describe("D1 / PH-6 — an absolute Bash write target is denied (P15)", () => {
 
   it("a QUOTED absolute target (a repo path with spaces) is resolved whole, not cut at the space", () => {
     const spaced = "/Users/A B/proj";
-    expect(toRepoRelative(`${spaced}/open-brain/src/a.ts`, spaced)).toEqual({ ok: true, rel: "open-brain/src/a.ts" });
+    expect(toRepoRelative(`${spaced}/open-brain/src/a.ts`, spaced)).toEqual({
+      ok: true,
+      outside: false,
+      rel: "open-brain/src/a.ts",
+      ci: false,
+    });
     for (const q of ['"', "'"]) {
       const cmd = `echo x > ${q}${fwd}/open-brain/src/hit.ts${q}`;
       expect(runPlannerHook(bash(cmd)).decision).toBe("deny");
@@ -151,25 +157,7 @@ describe("D1 / PH-6 — an absolute Bash write target is denied (P15)", () => {
   });
 });
 
-describe("D1 — outside the repo, or not made relative, is denied with a cause", () => {
-  it("an absolute Write outside the repo is denied and says so", () => {
-    const outside = `${dirname(fwd)}/elsewhere/x.md`;
-    const r = runPlannerHook(payload("Write", { file_path: outside, content: "x" }));
-    expect(r.decision).toBe("deny");
-    expect(r.reason).toContain("outside the repository");
-  });
-
-  it("a relative path that climbs out of the repo is denied", () => {
-    const r = runPlannerHook(payload("Write", { file_path: "../elsewhere/x.md", content: "x" }));
-    expect(r.decision).toBe("deny");
-    expect(r.reason).toContain("climbs out of the repository");
-  });
-
-  it("an absolute Bash redirect outside the repo is denied and says so", () => {
-    const r = runPlannerHook(bash(`echo x > ${dirname(fwd)}/elsewhere/x.txt`));
-    expect(r.decision).toBe("deny");
-    expect(r.reason).toContain("outside the repository");
-  });
+describe("D1 — paths (r4: outside the repo is allowed; see r4.test.ts)", () => {
 
   it("an absolute docs/loops Write inside the repo is still allowed (both forms)", () => {
     for (const file_path of slashForms("docs/loops/t194-brief.md")) {
@@ -178,14 +166,15 @@ describe("D1 — outside the repo, or not made relative, is denied with a cause"
   });
 
   it("toRepoRelative: both slash forms, Git Bash /c/ form, drive case, dot segments", () => {
-    expect(toRepoRelative("C:\\r\\open-brain\\src\\a.ts", "C:/r")).toEqual({ ok: true, rel: "open-brain/src/a.ts" });
-    expect(toRepoRelative("c:/R/open-brain/src/a.ts", "C:\\r")).toEqual({ ok: true, rel: "open-brain/src/a.ts" });
-    expect(toRepoRelative("/c/r/docs/x.md", "C:/r")).toEqual({ ok: true, rel: "docs/x.md" });
-    expect(toRepoRelative("C:/r/docs/../open-brain/src/a.ts", "C:/r")).toEqual({ ok: true, rel: "open-brain/src/a.ts" });
-    expect(toRepoRelative("./docs/x.md", "C:/r")).toEqual({ ok: true, rel: "docs/x.md" });
-    expect(toRepoRelative("C:/rx/docs/x.md", "C:/r").ok).toBe(false);
-    expect(toRepoRelative("C:/r/../other/x", "C:/r").ok).toBe(false);
-    expect(toRepoRelative("/tmp/repo/scripts/a.sh", "/tmp/repo")).toEqual({ ok: true, rel: "scripts/a.sh" });
+    const inside = (rel: string, ci = false) => ({ ok: true, outside: false, rel, ci });
+    expect(toRepoRelative("C:\\r\\open-brain\\src\\a.ts", "C:/r")).toEqual(inside("open-brain/src/a.ts", true));
+    expect(toRepoRelative("c:/R/open-brain/src/a.ts", "C:\\r")).toEqual(inside("open-brain/src/a.ts", true));
+    expect(toRepoRelative("/c/r/docs/x.md", "C:/r")).toEqual(inside("docs/x.md", true));
+    expect(toRepoRelative("C:/r/docs/../open-brain/src/a.ts", "C:/r")).toEqual(inside("open-brain/src/a.ts", true));
+    expect(toRepoRelative("./docs/x.md", "C:/r")).toEqual(inside("docs/x.md", true));
+    expect(toRepoRelative("C:/rx/docs/x.md", "C:/r")).toEqual({ ok: true, outside: true });
+    expect(toRepoRelative("C:/r/../other/x", "C:/r")).toEqual({ ok: true, outside: true });
+    expect(toRepoRelative("/tmp/repo/scripts/a.sh", "/tmp/repo")).toEqual(inside("scripts/a.sh"));
   });
 });
 
@@ -240,16 +229,16 @@ describe("grant prefix match applies the same single-invocation rule", () => {
     expect(readOutwardGrant(repo)).not.toBeNull(); // not consumed by the refused line
   });
 
-  it("the grant still covers its own invocation with flags, and is consumed", () => {
-    writeFileSync(grantPath(repo), JSON.stringify({ command: "gh pr merge 5" }), "utf-8");
-    expect(runPlannerHook(bash("gh pr merge 5 --squash")).decision).toBe("allow");
+  it("the grant covers its own exact invocation, and is consumed (r4: not a prefix)", () => {
+    writeFileSync(grantPath(repo), JSON.stringify({ command: "gh pr merge 5 --squash" }), "utf-8");
+    expect(runPlannerHook(bash("gh  pr merge 5   --squash")).decision).toBe("allow");
     expect(readOutwardGrant(repo)).toBeNull();
   });
 
   it("grantMatchesCommand: prefix plus a chain, a pipe or a substitution does not match", () => {
     const g = { command: "git push origin loop/x" };
     expect(grantMatchesCommand(g, "git push origin loop/x")).toBe(true);
-    expect(grantMatchesCommand(g, "git push origin loop/x --no-verify")).toBe(true);
+    expect(grantMatchesCommand(g, "git push origin loop/x --no-verify")).toBe(false);
     expect(grantMatchesCommand(g, "git push origin loop/x && rm -rf /")).toBe(false);
     expect(grantMatchesCommand(g, "git push origin loop/x | sh")).toBe(false);
     expect(grantMatchesCommand(g, "git push origin loop/x $(id)")).toBe(false);

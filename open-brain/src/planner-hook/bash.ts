@@ -20,24 +20,28 @@ function stripQuotes(token: string): string {
 }
 
 /** The text to report when the target is refused, or null when it is fine. */
-function refusedWriteTarget(raw: string, repoRoot: string): string | null {
+function refusedWriteTarget(raw: string, repoRoot: string, cwd: string): string | null {
   const p = stripQuotes(raw);
   if (!p || p === "/dev/null" || p.startsWith("&") || p.startsWith("/dev/")) return null;
-  const rel = toRepoRelative(p, repoRoot);
+  // A shell expands these before writing, so the static text does not say where the write lands.
+  if (/[$`]/.test(p)) return `${p} (contains a shell expansion, so its location cannot be determined)`;
+  const rel = toRepoRelative(p, repoRoot, cwd);
   if (!rel.ok) return rel.cause;
-  return isProtectedArtifactPath(rel.rel) || isRenderedViewPath(rel.rel) ? p : null;
+  if (rel.outside) return null;
+  return isProtectedArtifactPath(rel.rel, rel.ci) || isRenderedViewPath(rel.rel, rel.ci) ? p : null;
 }
 
 /**
  * PH-6: statically detected write targets that hit PH-1/PH-2 paths. Every target is resolved
- * against the repo root first (T-194 r3, D1), so an absolute path is checked as its relative
- * form, and one that resolves outside the repo is refused with its cause.
+ * against the shell's cwd (T-194 r4, D3) and made repo-relative, so an absolute path or a
+ * relative one from a subdirectory is checked as its repo-relative form. A path outside the
+ * repo is allowed; one whose location cannot be determined is refused with its cause.
  */
-export function detectBashWriteTargets(command: string, repoRoot: string): string[] {
+export function detectBashWriteTargets(command: string, repoRoot: string, cwd: string = repoRoot): string[] {
   const hits: string[] = [];
   const add = (target: string | undefined): void => {
     if (target === undefined) return;
-    const hit = refusedWriteTarget(target, repoRoot);
+    const hit = refusedWriteTarget(target, repoRoot, cwd);
     if (hit) hits.push(hit);
   };
 

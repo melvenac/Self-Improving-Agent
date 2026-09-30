@@ -5,7 +5,9 @@ const PUSH_TAGS_RE = /\bgit\s+push\b[^;\n|&]*--tags\b/;
 const PUSH_MASTER_RE = /\bgit\s+push\b[^;\n|&]*(?:\s(?:origin\s+)?master\b|:\s*master\b|HEAD:master\b)/;
 const GIT_MERGE_RE = /\bgit\s+merge\b/;
 const GIT_TAG_RE = /\bgit\s+tag\b/;
-const GH_PR_MERGE_RE = /\bgh\s+pr\s+merge\b/;
+// `gh`, `gh.exe`, and either quoted (T-194 r4): the shell runs all of them as the same program.
+const GH_PR_MERGE_RE = /(?<![\w-])["']?gh(?:\.exe)?["']?\s+pr\s+merge\b/;
+const GH_PR_MERGE_START_RE = /^["']?gh(?:\.exe)?["']?\s+pr\s+merge\b/;
 
 const STANDING_PUSH_BRANCH_RE =
   /\bgit\s+push\b[^;\n|&]*(?:origin\s+)?(?:loop\/|qa\/|docs\/|chore\/)[^\s;|&]*/;
@@ -89,7 +91,12 @@ export function ghRepoFlag(command: string): boolean {
   return /(?:^|\s)(?:--repo\b|-R)/.test(command);
 }
 
+/** The command line begins with the merge itself, not with a prefix such as `GH_REPO=x` or `env`. */
+export function startsWithGhPrMerge(command: string): boolean {
+  return GH_PR_MERGE_START_RE.test(command.trim());
+}
+
 export function extractGhPrMergeRef(command: string): string | null {
-  const m = command.match(/\bgh\s+pr\s+merge\s+(\S+)/);
+  const m = command.match(/(?<![\w-])["']?gh(?:\.exe)?["']?\s+pr\s+merge\s+(\S+)/);
   return m ? m[1] : null;
 }

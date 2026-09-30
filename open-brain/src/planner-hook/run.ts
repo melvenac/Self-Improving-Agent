@@ -14,11 +14,13 @@ import {
   isRestrictedOutwardBash,
   isSingleInvocation,
   pathOnDocsMergeAllowlist,
+  startsWithGhPrMerge,
 } from "./git.js";
 import {
   isAllowedDocsLoopsPath,
   isProtectedArtifactPath,
   isRenderedViewPath,
+  isSummaryPath,
   SUMMARY_PATH,
   toRepoRelative,
 } from "./paths.js";
@@ -97,6 +99,7 @@ function resolveRole(repoRoot: string, deps: PlannerHookDeps): string | "missing
 
 function checkFileTool(
   repoRoot: string,
+  cwd: string,
   tool: string,
   input: Record<string, unknown>,
   deps: PlannerHookDeps,
@@ -106,29 +109,31 @@ function checkFileTool(
     return { decision: "deny", reason: "Planner hook: tool input has no target path — denied (fail closed)." };
   }
 
-  // D1: Edit/Write send absolute paths. Resolve against the repo root first; a path that cannot
-  // be made repo-relative is denied, not waved through.
-  const resolved = toRepoRelative(rawPath, repoRoot);
+  // D1/D3: resolve against the tool's cwd, then make it repo-relative. A path outside the repo is
+  // not the hook's business; one whose location cannot be determined is denied, not waved through.
+  const resolved = toRepoRelative(rawPath, repoRoot, cwd);
   if (!resolved.ok) {
     return { decision: "deny", reason: `Planner hook: denied — ${resolved.cause} (fail closed). Path: ${rawPath}` };
   }
+  if (resolved.outside) return null;
   const relPath = resolved.rel;
+  const ci = resolved.ci;
 
-  if (isProtectedArtifactPath(relPath)) {
+  if (isProtectedArtifactPath(relPath, ci)) {
     return {
       decision: "deny",
       reason: `Planner hook: denied — ${PH1_RULE}. Path: ${rawPath}`,
     };
   }
 
-  if (isRenderedViewPath(relPath)) {
+  if (isRenderedViewPath(relPath, ci)) {
     return {
       decision: "deny",
       reason: `Planner hook: denied — ${PH2_RULE}. Path: ${rawPath}`,
     };
   }
 
-  if (relPath.endsWith(SUMMARY_PATH)) {
+  if (isSummaryPath(relPath, ci)) {
     const existing =
       deps.summaryContent !== undefined
         ? deps.summaryContent
@@ -162,8 +167,8 @@ function checkFileTool(
   return null;
 }
 
-function checkBash(command: string, repoRoot: string, deps: PlannerHookDeps): PlannerHookResult | null {
-  const writeTargets = detectBashWriteTargets(command, repoRoot);
+function checkBash(command: string, repoRoot: string, cwd: string, deps: PlannerHookDeps): PlannerHookResult | null {
+  const writeTargets = detectBashWriteTargets(command, repoRoot, cwd);
   if (writeTargets.length > 0) {
     return {
       decision: "deny",
@@ -182,7 +187,7 @@ function checkBash(command: string, repoRoot: string, deps: PlannerHookDeps): Pl
   if (isGhPrMerge(command) && deps.prChangedPaths) {
     const ref = extractGhPrMergeRef(command);
     // D2: the no-grant allow covers ONE `gh pr merge` invocation and nothing chained after it.
-    if (!isSingleInvocation(command) || !/^gh\s+pr\s+merge\b/.test(command.trim())) {
+    if (!isSingleInvocation(command) || !startsWithGhPrMerge(command)) {
       mergeCause = "the command is not a single gh pr merge invocation (chained, piped, substituted or prefixed)";
     } else if (ghRepoFlag(command)) {
       // --repo would merge another repository's PR N; the list read is origin's PR N. Never mix them.
@@ -261,7 +266,7 @@ export function runPlannerHook(
   }
 
   if (tool === "Edit" || tool === "Write" || tool === "NotebookEdit") {
-    const fileResult = checkFileTool(repoRoot, tool, input, deps);
+    const fileResult = checkFileTool(repoRoot, cwd, tool, input, deps);
     if (fileResult) return fileResult;
     if (tool === "Write") {
       const rawPath = toolPath(input);
@@ -276,7 +281,7 @@ export function runPlannerHook(
     if (!command.trim()) {
       return { decision: "deny", reason: "Planner hook: denied — empty Bash command (fail closed)." };
     }
-    const bashResult = checkBash(command, repoRoot, deps);
+    const bashResult = checkBash(command, repoRoot, cwd, deps);
     if (bashResult) return bashResult;
   }
 
