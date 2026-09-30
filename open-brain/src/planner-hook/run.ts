@@ -9,8 +9,10 @@ import {
 } from "./grant.js";
 import {
   extractGhPrMergeRef,
+  ghRepoFlag,
   isGhPrMerge,
   isRestrictedOutwardBash,
+  isSingleInvocation,
   pathOnDocsMergeAllowlist,
 } from "./git.js";
 import {
@@ -18,6 +20,7 @@ import {
   isProtectedArtifactPath,
   isRenderedViewPath,
   SUMMARY_PATH,
+  toRepoRelative,
 } from "./paths.js";
 import { fetchPrChangedPaths, type PrFilesDeps } from "./prfiles.js";
 import { editTouchesSummaryRegion, writeTouchesSummaryRegion } from "./summary.js";
@@ -103,21 +106,29 @@ function checkFileTool(
     return { decision: "deny", reason: "Planner hook: tool input has no target path — denied (fail closed)." };
   }
 
-  if (isProtectedArtifactPath(rawPath)) {
+  // D1: Edit/Write send absolute paths. Resolve against the repo root first; a path that cannot
+  // be made repo-relative is denied, not waved through.
+  const resolved = toRepoRelative(rawPath, repoRoot);
+  if (!resolved.ok) {
+    return { decision: "deny", reason: `Planner hook: denied — ${resolved.cause} (fail closed). Path: ${rawPath}` };
+  }
+  const relPath = resolved.rel;
+
+  if (isProtectedArtifactPath(relPath)) {
     return {
       decision: "deny",
       reason: `Planner hook: denied — ${PH1_RULE}. Path: ${rawPath}`,
     };
   }
 
-  if (isRenderedViewPath(rawPath)) {
+  if (isRenderedViewPath(relPath)) {
     return {
       decision: "deny",
       reason: `Planner hook: denied — ${PH2_RULE}. Path: ${rawPath}`,
     };
   }
 
-  if (rawPath.replace(/\\/g, "/").endsWith(SUMMARY_PATH)) {
+  if (relPath.endsWith(SUMMARY_PATH)) {
     const existing =
       deps.summaryContent !== undefined
         ? deps.summaryContent
@@ -152,7 +163,7 @@ function checkFileTool(
 }
 
 function checkBash(command: string, repoRoot: string, deps: PlannerHookDeps): PlannerHookResult | null {
-  const writeTargets = detectBashWriteTargets(command);
+  const writeTargets = detectBashWriteTargets(command, repoRoot);
   if (writeTargets.length > 0) {
     return {
       decision: "deny",
@@ -170,7 +181,13 @@ function checkBash(command: string, repoRoot: string, deps: PlannerHookDeps): Pl
   let mergeCause: string | null = null;
   if (isGhPrMerge(command) && deps.prChangedPaths) {
     const ref = extractGhPrMergeRef(command);
-    if (!ref) {
+    // D2: the no-grant allow covers ONE `gh pr merge` invocation and nothing chained after it.
+    if (!isSingleInvocation(command) || !/^gh\s+pr\s+merge\b/.test(command.trim())) {
+      mergeCause = "the command is not a single gh pr merge invocation (chained, piped, substituted or prefixed)";
+    } else if (ghRepoFlag(command)) {
+      // --repo would merge another repository's PR N; the list read is origin's PR N. Never mix them.
+      mergeCause = "--repo/-R names another repository, and the docs-only check reads origin's pull requests only";
+    } else if (!ref) {
       mergeCause = "could not parse the gh pr merge target";
     } else {
       const paths = deps.prChangedPaths(ref);

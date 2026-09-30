@@ -6,6 +6,39 @@ export function normalizeRelPath(raw: string): string {
   return n.startsWith("../") ? n : n;
 }
 
+export type RepoRelative = { ok: true; rel: string } | { ok: false; cause: string };
+
+const WIN_DRIVE_RE = /^[A-Za-z]:\//;
+
+/**
+ * T-194 r3 (D1): Claude Code's Edit/Write send ABSOLUTE paths, so every target is made relative
+ * to the repo root before the PH-1/PH-2 prefix checks. Accepts both slash forms and, when the
+ * root is a Windows path, Git Bash's `/c/...` form. An absolute path outside the root, or a
+ * relative one that climbs out of it, cannot be made relative and is refused with a named cause.
+ */
+export function toRepoRelative(raw: string, repoRoot: string): RepoRelative {
+  let p = raw.trim().replace(/\\/g, "/");
+  const root = posix.normalize(repoRoot.replace(/\\/g, "/")).replace(/\/+$/, "");
+  const winRoot = WIN_DRIVE_RE.test(root);
+  if (winRoot) {
+    const bash = p.match(/^\/([A-Za-z])(\/.*)?$/);
+    if (bash) p = `${bash[1]}:${bash[2] ?? "/"}`;
+  }
+  if (!p.startsWith("/") && !WIN_DRIVE_RE.test(p)) {
+    const n = posix.normalize(p).replace(/^\.\//, "");
+    if (n === ".." || n.startsWith("../")) {
+      return { ok: false, cause: `${raw} climbs out of the repository (${repoRoot}), so it cannot be made repo-relative` };
+    }
+    return { ok: true, rel: n };
+  }
+  const abs = posix.normalize(p);
+  const a = winRoot ? abs.toLowerCase() : abs;
+  const r = winRoot ? root.toLowerCase() : root;
+  if (a === r) return { ok: true, rel: "." };
+  if (a.startsWith(`${r}/`)) return { ok: true, rel: abs.slice(root.length + 1) };
+  return { ok: false, cause: `${raw} is outside the repository (${repoRoot}), so it cannot be made repo-relative` };
+}
+
 const ARTIFACT_PREFIXES = [
   "open-brain/src/",
   "open-brain/tests/",

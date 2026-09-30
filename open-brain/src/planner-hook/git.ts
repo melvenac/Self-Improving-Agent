@@ -14,6 +14,7 @@ const DOCS_MERGE_ALLOWLIST_PREFIXES = ["docs/"];
 const DOCS_MERGE_ALLOWLIST_EXACT = new Set([
   "README.md",
   ".agents/state.json",
+  ".agents/assignments.json",
   ".agents/TASKS/INBOX.md",
   ".agents/TASKS/task.md",
   ".agents/SESSIONS/next-session.md",
@@ -70,6 +71,22 @@ export function pathOnDocsMergeAllowlist(path: string): boolean {
 export function allPathsOnDocsMergeAllowlist(paths: readonly string[]): boolean {
   if (paths.length === 0) return false;
   return paths.every(pathOnDocsMergeAllowlist);
+}
+
+const COMPOUND_RE = /&|\||;|[\r\n]|`|\$\(|[()]/;
+
+/**
+ * T-194 r3 (D2): true only when the whole command is ONE invocation — no `&&`, `||`, `&`, `;`,
+ * `|`, newline, `$(...)`, subshell or backtick. An allow or a grant covers a single command line,
+ * never a second command chained after it.
+ */
+export function isSingleInvocation(command: string): boolean {
+  return !COMPOUND_RE.test(command);
+}
+
+/** `--repo`, `--repo=x`, `-R x`, `-Rx` anywhere on the command. */
+export function ghRepoFlag(command: string): boolean {
+  return /(?:^|\s)(?:--repo\b|-R)/.test(command);
 }
 
 export function extractGhPrMergeRef(command: string): string | null {

@@ -1,4 +1,5 @@
 import { readFileSync, unlinkSync, existsSync } from "node:fs";
+import { isSingleInvocation } from "./git.js";
 
 export interface OutwardGrant {
   command: string;
@@ -47,9 +48,12 @@ export function consumeOutwardGrant(repoRoot: string): void {
   }
 }
 
-/** Grant matches when the bash command equals the grant or starts with it (one line). */
+/**
+ * Grant matches when the bash command equals the grant, or starts with it and is still ONE
+ * invocation (T-194 r3): a grant for `gh pr merge 5` does not cover `gh pr merge 5 && git push ...`.
+ */
 export function grantMatchesCommand(grant: OutwardGrant, command: string): boolean {
   const c = command.trim();
   if (grant.command === "*") return true;
-  return c === grant.command || c.startsWith(`${grant.command} `);
+  return c === grant.command || (c.startsWith(`${grant.command} `) && isSingleInvocation(c));
 }
