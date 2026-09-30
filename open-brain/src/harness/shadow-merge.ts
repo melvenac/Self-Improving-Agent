@@ -427,7 +427,7 @@ interface VerdictArtifact {
 /** Walks docs/loops/shadow-merge/<loop>/<sha>/ and artifacts/iterations/<loop>/<sha>/ for shadow_merge.json. */
 function listVerdictArtifacts(projectRoot: string): VerdictArtifact[] {
   const found: VerdictArtifact[] = [];
-  const roots = [join(projectRoot, "docs", "loops", "shadow-merge"), join(projectRoot, "artifacts", "iterations")];
+  const roots = [join(projectRoot, "docs", "loops", "shadow-merge")]; // QA 232 MUTANT: the runtime layout artifacts/iterations is not walked
   for (const root of roots) {
     if (!existsSync(root)) continue;
     for (const loop of readdirSync(root, { withFileTypes: true })) {
