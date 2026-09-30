@@ -1,0 +1,162 @@
+{
+  "loop": "15-slice-3-c",
+  "candidate_sha": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+  "criteria_sha": "a4205c9cf2a559de0c3933f409ce30259e5262ca",
+  "verdict": "undefined",
+  "reasons": [
+    "criteria block refused: line is not `ID: text`: (blank)"
+  ],
+  "written_at": "2026-09-30T12:54:54.037Z",
+  "inputs": {
+    "runtime_checks": {
+      "build": {
+        "command": "local, C:/qa-scratch/qa232-cand/open-brain: npm run build; node node_modules/typescript/bin/tsc --noEmit",
+        "exit_code": 0,
+        "passed": true,
+        "duration_ms": 60000,
+        "detail": "Build exit 0, stamped c339427; tsc --noEmit exit 0. tcm run 36690140665 (headSha c339427) also built; its failure is in the test step only."
+      },
+      "unit": {
+        "command": "tcm ci.yml run 36690140665 (qa/c-r4-ci-candidate, headSha c33942725c73b1aa91ceb46458e6ea7d11c70dcd): npm test",
+        "exit_code": 1,
+        "passed": false,
+        "duration_ms": 163880,
+        "detail": "Run conclusion failure; test job failure: 1 failed | 1853 passed | 6 skipped (1860), 132 files. The one failure is tests/shared/state-schema.test.ts T-171 r3b, which reads the moving origin/master; base run 36690144823 (5f7c9a0) fails the same test with the same assertion (expected true to be false). tcm run 36691109295 at 9823d774 (c339427 plus one test-only commit to state-schema.test.ts, outside C) is success: 132 files, 1854 passed, 6 skipped."
+      }
+    },
+    "acceptance": [
+      {
+        "id": "CC-0",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-1",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-2",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-3",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-4",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-5",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-6",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-7",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-8",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-9",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-10",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-11",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-12",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-13",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-14",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-15",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-16",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-17",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-18",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-19",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-20",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-21",
+        "status": "not_evaluated"
+      },
+      {
+        "id": "CC-22",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-29",
+        "status": "met",
+        "order": "shown"
+      },
+      {
+        "id": "CC-30",
+        "status": "met",
+        "order": "shown"
+      }
+    ],
+    "gates": {
+      "plan": null,
+      "done": null
+    },
+    "declared": {
+      "unrunnable": [],
+      "outOfScope": []
+    }
+  }
+}
