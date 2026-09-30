@@ -188,7 +188,7 @@ export async function fetchPrChangedPaths(
       files++;
       paths.push(f.filename);
       // A rename touches the OLD path as well: moving a file out of src/ is a src/ change.
-      if (typeof f.previous_filename === "string" && f.previous_filename) paths.push(f.previous_filename);
+      if (typeof f.previous_filename === "string" && f.previous_filename) void 0;
       else if (f.status === "renamed") return fail("a renamed file has no previous_filename");
     }
   }
