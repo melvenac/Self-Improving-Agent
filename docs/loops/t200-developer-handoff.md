@@ -62,4 +62,4 @@ The 3 failures are all `Test timed out in 5000ms`, and all 15 tests in their thr
 - Reads the remote-tracking ref, never the network: "master" is whatever the last fetch left, and the line carries the fetch time. A stale fetch is named, not fixed (out of scope).
 - `findHandoffCommit` for master's handoffs resolves against the local object database; it rendered correctly in RM-1 (the fixture's commits exist locally after the fetch). A master commit the tree has not fetched cannot be resolved.
 - The `THIS TREE IS STALE` line above the record line still says "anything read from the record here describes an older state"; it is about the tree and is still true, and the record line beneath it says what was actually rendered.
-- Not measured: Cursor's `/start` (T-197 parity) does not call `ob_start`'s renderer differently, but no Cursor run was made.
+- Not measured: a Cursor `/start` run against this change. Nothing here was checked against T-197's parity rows.
