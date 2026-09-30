@@ -14,7 +14,7 @@ import { execFileSync } from "node:child_process";
  * mangles it in a shell), and a cause on every refusal. Callers that need to know the
  * content is a record parse it: this helper proves only that git returned all of it.
  */
-export const GIT_SHOW_MAX_BYTES = 256 * 1024 * 1024;
+export const GIT_SHOW_MAX_BYTES = 256 * 1024;
 
 export type GitShowResult = { ok: true; text: string } | { ok: false; cause: string };
 
