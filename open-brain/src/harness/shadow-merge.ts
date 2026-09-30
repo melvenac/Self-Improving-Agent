@@ -74,7 +74,7 @@ export function computeShadowMergeVerdict(input: {
     return { verdict: "undefined", reasons: ["E_t refused by validateEvidence"], declared: empty };
   }
   const ev = validated.value;
-  const missingInput = missingRequiredInput(ev, input.policy.required_inputs);
+  const missingInput = missingRequiredInput(ev, ["runtime_checks", "E_t.acceptance"]);
   if (missingInput) {
     return { verdict: "undefined", reasons: [missingInput], declared: empty };
   }
