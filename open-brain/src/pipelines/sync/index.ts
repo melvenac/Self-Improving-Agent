@@ -33,6 +33,8 @@ import {
 import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-state.js";
 import { checkRecordErasure } from "./record-erasure.js";
 import { checkWorktreeLayout } from "./worktree-layout.js";
+import { checkHubSeats } from "./hub-seats.js";
+import { checkCursorStartParity } from "./start-parity.js";
 import { checkProbeMarkers } from "./probe-markers.js";
 import { checkCursorHookCompat } from "./cursor-hook-compat.js";
 
@@ -101,6 +103,8 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkBuildFreshness(options.projectRoot));
   // T-193: registered worktrees are the main checkout or <project>-<seat>.
   checks.push(checkWorktreeLayout(options.projectRoot));
+  checks.push(checkHubSeats(options.projectRoot));
+  checks.push(checkCursorStartParity(options.projectRoot));
   // Record 198: a file under open-brain/tests that says "not for merge" is an issue.
   checks.push(checkProbeMarkers(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
