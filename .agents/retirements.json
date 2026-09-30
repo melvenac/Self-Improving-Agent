@@ -10,7 +10,6 @@
     ".agents/state.json",
     ".agents/SYSTEM/SUMMARY.md",
     ".agents/SYSTEM/DECISIONS.md",
-    ".agents/SYSTEM/PRD.md",
     ".agents/SYSTEM/mcp-tool-audit-2026-08-08.md",
     ".agents/TASKS/INBOX.md",
     "open-brain/tests/fixtures/",
@@ -138,6 +137,11 @@
           "path": "open-brain/tests/pipelines/sync/mirror-parity.test.ts",
           "class": "test",
           "why": "fixture proving an unexpected mirror copy is reported"
+        },
+        {
+          "path": ".agents/SYSTEM/PRD.md",
+          "class": "prose",
+          "why": "obituary — the PRD's 'Not in this product' list names the cut component"
         }
       ],
       "coverage_gap": "FOUND IN QA AT a3bcf2f, RECORDED RATHER THAN FIXED. The pattern `skill[-_]?scan` does not match \"the skill scan\" with a SPACE — verified: skill-scan, skill_scan and skillscan match; \"the skill scan\" does not. cli-session-end.ts:8 uses exactly that spelling, written by this loop's own C3 repair, so it PASSES BY SPELLING RATHER THAN BY RULE. The outcome is still correct — the file is an allowed referrer under the reflection-queue retirement — but a genuinely dangling \"the skill scan\" would pass too. THE FIX IS MEASURED AND CHEAP: widening the pattern to accept a space adds exactly two new referrers needing entries, open-brain/src/pipelines/session-end/index-v2.ts and open-brain/src/cli-session-end.ts, both obituaries; tests/fixtures-import is already historical and index-v2.test.ts is already listed. NOT APPLIED HERE because it changes shipped matching behaviour after sign-off, and a behaviour change after QA needs re-QA rather than a quiet amend."
@@ -212,6 +216,11 @@
           "path": "open-brain/src/cli-session-end.ts",
           "class": "prose",
           "why": "obituary in the pipeline header explaining why the stage numbering skips 5 and 6"
+        },
+        {
+          "path": ".agents/SYSTEM/PRD.md",
+          "class": "prose",
+          "why": "obituary — the PRD's 'Not in this product' list names the cut component"
         }
       ]
     },
@@ -439,15 +448,167 @@
           "why": "the describe block that pinned the gate now pins the cut"
         }
       ]
+    },
+    {
+      "id": "R-011",
+      "name": "maturity lifecycle",
+      "pattern": "maturity lifecycle|maturity boosts?|apoptosis|success_rate|\\bprogenitor\\b",
+      "ignore_case": true,
+      "event": "cut",
+      "classes": [
+        "symbol",
+        "schema-field",
+        "prose"
+      ],
+      "ruled": "2026-09-15",
+      "ruled_by": "Loop 10 C2",
+      "note": "Maturity boosts, Progenitor / Proven / Mature promotion, success_rate and apoptosis. Backfilled by T-169 after the record had declined to (see $declined). The BEHAVIOUR is cut: apoptosis never fired (0 rows archived), success_rate excluded neutral (72.5% of ratings) so it measured recall volume, and the boosts had sat at 1.0 since Loop 8. Deliberately NOT retired: the `maturity` column and the Maturity type in lifecycle.ts, which still display a label last written before Loop 10 and which nothing computes; the pattern therefore names the lifecycle, the boosts, apoptosis and success_rate, and the bare word 'progenitor' only as the stored label value.",
+      "allowed_referrers": [
+        {
+          "path": ".agents/SYSTEM/PRD.md",
+          "class": "prose",
+          "why": "obituary — the PRD's 'Not in this product' list names the cut lifecycle"
+        },
+        {
+          "path": ".agents/skills/self-improving-agent-guide/SKILL.md",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/scripts/backfill-success-rate.mjs",
+          "class": "code",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/scripts/dashboard.mjs",
+          "class": "code",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/scripts/shadow-backfill.mjs",
+          "class": "code",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/src/db-v2.ts",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/src/lifecycle.ts",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/src/pipelines/session-end/index-v2.ts",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/src/pipelines/session-end/recalled-ids.ts",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/src/pipelines/shadow/evaluate.ts",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/src/pipelines/shadow/index.ts",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/src/pipelines/store/index.ts",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/src/server.ts",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/src/shared/active-session.ts",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/src/vault-writer.ts",
+          "class": "prose",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/tests/db-v2.test.ts",
+          "class": "test",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/tests/index-upsert.test.ts",
+          "class": "test",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/tests/pipelines/session-end/index-v2.test.ts",
+          "class": "test",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/tests/pipelines/sync/scorer-integration.test.ts",
+          "class": "test",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/tests/ranking.test.ts",
+          "class": "test",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/tests/server.test.ts",
+          "class": "test",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/tests/setup-env.ts",
+          "class": "test",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/tests/shadow-strategies.test.ts",
+          "class": "test",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/tests/trigger/fires.test.ts",
+          "class": "test",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/tests/vault-archive.test.ts",
+          "class": "test",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        },
+        {
+          "path": "open-brain/tests/vault-writer.test.ts",
+          "class": "test",
+          "why": "names the cut lifecycle, success_rate or apoptosis as a rationale, obituary or pin of the cut; enumerated at backfill (T-169) by the check's own referrer list, not re-read one by one"
+        }
+      ]
     }
   ],
   "$declined": {
-    "note": "NOT backfilled, and the reason is a finding rather than an omission. Loop 10 is recorded as cutting success_rate, the maturity lifecycle and apoptosis — but open-brain/src/lifecycle.ts is still present, still exports LIFECYCLE_CONFIG, Maturity and Rating, and is imported by db-v2.ts, server.ts, pipelines/shadow/evaluate.ts and pipelines/shadow/strategies.ts. Ranking no longer reads maturity or success_rate, so the BEHAVIOUR was cut; the type, the vocabulary and the column were not. Whether that is a finished retirement is a question for Aaron, not something this record gets to assert. Recording them here as finished would make the check green on an unfinished retirement, which is the exact failure the Planner named: green would read as 'it is done'.",
+    "note": "RESOLVED by T-169. This block recorded why success_rate, the maturity lifecycle and apoptosis were not backfilled: open-brain/src/lifecycle.ts still exported the Maturity type and LIFECYCLE_CONFIG. Ranking reads neither maturity nor success_rate, so the behaviour was cut; R-011 now records it, with the surviving type, column and stored label named as deliberate referrers rather than as evidence the retirement is unfinished.",
     "names": [
       "success_rate",
       "maturity lifecycle",
       "apoptosis"
     ],
-    "evidence": "open-brain/src/lifecycle.ts:36 LIFECYCLE_CONFIG, :56 Maturity, :63 Rating; 4 importing modules"
+    "superseded_by": "R-011"
   }
 }
