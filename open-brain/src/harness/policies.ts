@@ -129,9 +129,22 @@ export const DoneGatePolicySchema = z
  * is not `undefined` unless the flag says it is required. The fail-closed
  * flags are the default; turning one off is a recorded decision, not a default.
  */
+/**
+ * CC-1.2. The E_t inputs a verdict other than `undefined` needs. The merge gate
+ * reads this list (shadow-merge.ts), so it cannot drift from behaviour. Both
+ * literals in MERGE_MINIMUM_INPUTS must stay listed; more may be added.
+ */
+export const MERGE_INPUT_NAMES = ["runtime_checks", "E_t.acceptance", "E_t.requirements"] as const;
+export const MERGE_MINIMUM_INPUTS = ["runtime_checks", "E_t.acceptance"] as const;
+
 export const MergePolicySchema = z
   .object({
     gate: z.literal("merge"),
+    required_inputs: z
+      .array(z.enum(MERGE_INPUT_NAMES))
+      .refine((names) => MERGE_MINIMUM_INPUTS.every((n) => names.includes(n)), {
+        message: `required_inputs must list at least ${MERGE_MINIMUM_INPUTS.join(" and ")}`,
+      }),
     require_plan_gate: z.boolean(),
     require_done_gate: z.boolean(),
     unmet_is_would_not_merge: z.boolean(),

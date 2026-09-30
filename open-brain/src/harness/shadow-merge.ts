@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, appendFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, appendFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseDeclared } from "./declared.js";
 import { git, gitTry, isAncestor } from "./git.js";
@@ -17,6 +17,8 @@ import type { CheckResult } from "../pipelines/sync/types.js";
 export type ShadowVerdict = "would-merge" | "would-not-merge" | "undefined";
 
 export interface MergePolicyFlags {
+  /** CC-1.2. Read from merge.json. An input named here that E_t lacks forces `undefined`. */
+  required_inputs: readonly string[];
   require_plan_gate: boolean;
   require_done_gate: boolean;
   unmet_is_would_not_merge?: boolean;
@@ -72,6 +74,10 @@ export function computeShadowMergeVerdict(input: {
     return { verdict: "undefined", reasons: ["E_t refused by validateEvidence"], declared: empty };
   }
   const ev = validated.value;
+  const missingInput = missingRequiredInput(ev, input.policy.required_inputs);
+  if (missingInput) {
+    return { verdict: "undefined", reasons: [missingInput], declared: empty };
+  }
   if (ev.loop !== input.loop) {
     return { verdict: "undefined", reasons: [`loop ${ev.loop} is not ${input.loop}`], declared: empty };
   }
@@ -128,6 +134,24 @@ export function computeShadowMergeVerdict(input: {
     row.status === "met" && row.order === "attributed" ? `${row.id}: met (attributed)` : `${row.id}: ${row.status}`,
   );
   return { verdict: "would-merge", reasons, declared };
+}
+
+/**
+ * CC-1.2. The policy names the E_t inputs the verdict needs; this is the only
+ * place that list is read. `validateEvidence` states the shape and is not
+ * changed (CC-0.1). An array input counts as supplied only when non-empty.
+ */
+function missingRequiredInput(ev: Record<string, unknown>, required: readonly string[]): string | null {
+  for (const name of required) {
+    let value: unknown;
+    if (name === "runtime_checks") value = ev.runtime_checks;
+    else if (name === "E_t.acceptance") value = ev.acceptance;
+    else if (name === "E_t.requirements") value = ev.requirements;
+    else return `required input ${name} is not one this gate can read`;
+    const supplied = Array.isArray(value) ? value.length > 0 : isRecord(value);
+    if (!supplied) return `required input ${name} is missing from E_t`;
+  }
+  return null;
 }
 
 function requiredGateMissing(
@@ -303,12 +327,13 @@ export function summariseLedger(text: string): {
 export function checkShadowMergeLedger(projectRoot: string): CheckResult {
   const name = "shadow-merge-ledger";
   const path = ledgerPath(projectRoot);
-  if (!existsSync(path)) {
-    return { name, severity: "pass", report: true, message: "ledger absent — first use, nothing to check. LIMIT: does not prove a merge was gated." };
+  const artifacts = listVerdictArtifacts(projectRoot);
+  if (!existsSync(path) && artifacts.length === 0) {
+    return { name, severity: "pass", report: true, message: `ledger absent and 0 verdict artifacts walked — first use, nothing to check. ${LEDGER_LIMIT}` };
   }
-  const text = readFileSync(path, "utf8");
+  const text = existsSync(path) ? readFileSync(path, "utf8") : "";
   const problems: string[] = [];
-  const raw = text.split(/\r?\n/);
+  const raw = text === "" ? [] : text.split(/\r?\n/);
   if (raw.length > 0 && raw[raw.length - 1] === "") raw.pop();
   const committed = gitTry(projectRoot, ["show", "HEAD:docs/loops/shadow-merge/ledger.jsonl"]);
   const committedLines = committed.ok ? committed.stdout.split(/\r?\n/) : [];
@@ -359,8 +384,70 @@ export function checkShadowMergeLedger(projectRoot: string): CheckResult {
       problems.push(`line ${i + 1}: ${(err as Error).message}`);
     }
   }
-  if (problems.length > 0) {
-    return { name, severity: "issue", report: true, message: problems.join("; ") };
+  // CC-13.2. Every verdict artifact needs a ledger line once its candidate is merged.
+  const decided = new Set<string>();
+  for (const line of raw) {
+    try {
+      const row = JSON.parse(line) as { loop?: unknown; candidate_sha?: unknown };
+      if (typeof row.loop === "string" && typeof row.candidate_sha === "string") decided.add(`${row.loop}\0${row.candidate_sha}`);
+    } catch {
+      // already reported above as a line problem
+    }
   }
-  return { name, severity: "pass", report: true, message: `ledger parses (${raw.length} lines). LIMIT: does not re-derive verdicts.` };
+  const pending: string[] = [];
+  for (const art of artifacts) {
+    if (art.problem) {
+      problems.push(`verdict artifact ${art.file}: ${art.problem}`);
+      continue;
+    }
+    if (decided.has(`${art.loop}\0${art.sha}`)) continue;
+    if (isAncestor(projectRoot, art.sha, "HEAD")) {
+      problems.push(`verdict artifact ${art.file}: no ledger line, and ${art.sha} is already an ancestor of HEAD (decide is owed)`);
+    } else {
+      pending.push(`${art.loop}/${art.sha}`);
+    }
+  }
+  const walked = `${artifacts.length} verdict artifact(s) walked, ${pending.length} pending decide${pending.length > 0 ? ` (${pending.join(", ")})` : ""}`;
+  if (problems.length > 0) {
+    return { name, severity: "issue", report: true, message: `${problems.join("; ")}. ${walked}. ${LEDGER_LIMIT}` };
+  }
+  return { name, severity: "pass", report: true, message: `ledger parses (${raw.length} lines); ${walked}. ${LEDGER_LIMIT}` };
+}
+
+const LEDGER_LIMIT =
+  "LIMIT: does not prove a merge was gated or re-derive verdicts; ancestry is read against this tree's HEAD, so a stale tree under-reports owed decides.";
+
+interface VerdictArtifact {
+  file: string;
+  loop: string;
+  sha: string;
+  problem?: string;
+}
+
+/** Walks docs/loops/shadow-merge/<loop>/<sha>/ and artifacts/iterations/<loop>/<sha>/ for shadow_merge.json. */
+function listVerdictArtifacts(projectRoot: string): VerdictArtifact[] {
+  const found: VerdictArtifact[] = [];
+  const roots = [join(projectRoot, "docs", "loops", "shadow-merge"), join(projectRoot, "artifacts", "iterations")];
+  for (const root of roots) {
+    if (!existsSync(root)) continue;
+    for (const loop of readdirSync(root, { withFileTypes: true })) {
+      if (!loop.isDirectory()) continue;
+      for (const sha of readdirSync(join(root, loop.name), { withFileTypes: true })) {
+        if (!sha.isDirectory()) continue;
+        const file = join(root, loop.name, sha.name, "shadow_merge.json");
+        if (!existsSync(file)) continue;
+        try {
+          const body = JSON.parse(readFileSync(file, "utf8")) as { loop?: unknown; candidate_sha?: unknown };
+          if (body.loop !== loop.name || body.candidate_sha !== sha.name) {
+            found.push({ file, loop: loop.name, sha: sha.name, problem: "loop or candidate_sha does not match its directory" });
+          } else {
+            found.push({ file, loop: loop.name, sha: sha.name });
+          }
+        } catch (err) {
+          found.push({ file, loop: loop.name, sha: sha.name, problem: `unreadable: ${(err as Error).message}` });
+        }
+      }
+    }
+  }
+  return found;
 }

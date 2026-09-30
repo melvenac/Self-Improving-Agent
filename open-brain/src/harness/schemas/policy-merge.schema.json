@@ -6,6 +6,17 @@
       "type": "string",
       "const": "merge"
     },
+    "required_inputs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "runtime_checks",
+          "E_t.acceptance",
+          "E_t.requirements"
+        ]
+      }
+    },
     "require_plan_gate": {
       "type": "boolean"
     },
@@ -30,6 +41,7 @@
   },
   "required": [
     "gate",
+    "required_inputs",
     "require_plan_gate",
     "require_done_gate",
     "unmet_is_would_not_merge",

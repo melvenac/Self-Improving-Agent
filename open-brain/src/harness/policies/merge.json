@@ -1,5 +1,6 @@
 {
   "gate": "merge",
+  "required_inputs": ["runtime_checks", "E_t.acceptance"],
   "require_plan_gate": false,
   "require_done_gate": false,
   "unmet_is_would_not_merge": true,
