@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 207 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 208 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 > **Status:** v0.44.2 — Loop 15 slice three (D-033/D-036) closes when candidates A, B and C are ACCEPTED; Jev calibration is the next slice. A: ACCEPTED and MERGED (#182, 2026-09-27). B: ACCEPTED and MERGED (part 1 #165, part 2 #187, 2026-09-27). C (T-155, the shadow merge gate): OPEN. r3 (20c2dfd, PR #195) was QA 213 ACCEPT, overruled by the planner (session 149) for five partial rows including CC-13's ledger tamper check; r4 is with Forge, scoped exactly to CC-1.2, CC-2.2, CC-5.6, CC-13.1, CC-13.2 and CC-17. When C r4 is accepted: shadow-verdict prepare on its E_t BEFORE Aaron merges #195, decide after (C criteria section 8 P4), and slice three closes.
 
 ## What's working
@@ -83,6 +83,7 @@
 - The G-045 ordering fix ALONE converts a loud crash into a silent pass: with HEAD readable, the commit boundary saw a branch that never moved and reported the stage COMPLETED after the role deleted the checked-out branch _(V-075, 3 evidence)_
 - G-042's signature did not reproduce at the SAME SHA with the SAME test count on an idle machine: eb14d09 ran 1031/1031 exit 0 idle, against 1030 passed / 1 failed exit 1 under concurrent seat activity _(V-076, 3 evidence)_
 - A correct detector was dismissed by BOTH seats that saw it, and severity alone would not have fixed it: 'pre-existing' was used as a reason to classify a finding as unrelated, when it is only a statement about WHEN it started _(V-077, 3 evidence)_
+- tcm's A2A hub has run AUTH_MODE=strict since 2026-09-30T12:32:42Z (D-063 / A2A D-033), and SIA's seats are reachable under it: atlas's own-key read of the {atlas, forge} room k571c0nz returned 200 at 12:34:05Z _(V-078, 3 evidence)_
 
 ## What's broken
 

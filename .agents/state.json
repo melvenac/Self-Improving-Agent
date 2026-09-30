@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 207,
+  "revision": 208,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2548,6 +2548,29 @@
         }
       ],
       "since_session": 77,
+      "status": "verified"
+    },
+    {
+      "id": "V-078",
+      "claim": "tcm's A2A hub has run AUTH_MODE=strict since 2026-09-30T12:32:42Z (D-063 / A2A D-033), and SIA's seats are reachable under it: atlas's own-key read of the {atlas, forge} room k571c0nz returned 200 at 12:34:05Z",
+      "evidence": [
+        {
+          "type": "report",
+          "path": "Relay's DONE line, A2A message to atlas, 2026-09-30 ~12:33Z",
+          "observation": "clark executed it from the desktop: only .env line 7 changed, force-recreate on the same image 5703b442c3ad, no build, no Convex deploy. The backup is ~/docker-compose/a2a-hub/.env.bak-prestrict-20260930T123224Z, and rollback = cp the backup + the same recreate. The read-only menu shows auth-mode strict and health ok. The new container's auth-log had 0 auth, authz or enroll lines at 12:33Z."
+        },
+        {
+          "type": "command",
+          "path": "planner session 153: GET http://100.124.212.87:4000/a2a/sessions with atlas's own key",
+          "observation": "status 200 at 2026-09-30T12:34:05Z; k571c0nz participants [atlas, forge], turnCount 60, maxTurns 500, isActive true"
+        },
+        {
+          "type": "report",
+          "path": "pre-flip gate, planner session 153 with Relay",
+          "observation": "forge's own-key send landed as turn 60 in k571c0nz: a headless Forge job on the QA PC, RESULT rc=0 turn=60, ~12:16:30Z. Relay's 12:17:13Z auth-log read showed no would-reject after 09:06:47Z. No installed SIA build sends dev-key: the desktop main-tree build bf33fe47 has no presence probe, and sia-forge's probe reads its own key."
+        }
+      ],
+      "since_session": 153,
       "status": "verified"
     }
   ],
