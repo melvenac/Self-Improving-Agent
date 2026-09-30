@@ -1,0 +1,56 @@
+{
+  "fixture": "skipped-required-live-gate",
+  "description": "CC-5.6: the policy requires the live done-gate, the mode was skip, and no record exists",
+  "policy": {
+    "required_inputs": [
+      "runtime_checks",
+      "E_t.acceptance"
+    ],
+    "require_plan_gate": false,
+    "require_done_gate": true
+  },
+  "criteriaText": "```qa-declared\n[unrunnable]\n[out-of-scope]\n```\n",
+  "gateMode": "skip",
+  "doneGate": null,
+  "planGate": null,
+  "evidence": {
+    "loop": "t001",
+    "candidate_git": {
+      "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "branch": "loop/c",
+      "frozen_at": "2026-09-28T00:00:00.000Z"
+    },
+    "runtime_checks": {
+      "build": {
+        "command": "npm test",
+        "exit_code": 0,
+        "passed": true,
+        "duration_ms": 1,
+        "detail": ""
+      },
+      "unit": {
+        "command": "npm test",
+        "exit_code": 0,
+        "passed": true,
+        "duration_ms": 1,
+        "detail": ""
+      }
+    },
+    "requirements": [],
+    "acceptance": [
+      {
+        "id": "A1",
+        "status": "met",
+        "evidence": "shown",
+        "order": "shown"
+      }
+    ],
+    "regressions": [],
+    "gaps": [],
+    "notes": ""
+  },
+  "expected": {
+    "verdict": "undefined",
+    "reason_includes": "the gate mode was skip"
+  }
+}
