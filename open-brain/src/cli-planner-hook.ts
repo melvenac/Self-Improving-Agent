@@ -14,7 +14,7 @@ import { join } from "node:path";
 import { resolveHookProjectDir } from "./shared/repo-root.js";
 import { formatDeny } from "./planner-hook/emit.js";
 import { formatRegistrationSnippet } from "./planner-hook/registration.js";
-import { runPlannerHook } from "./planner-hook/run.js";
+import { runPlannerHookAsync } from "./planner-hook/run.js";
 
 async function readStdin(): Promise<string> {
   const chunks: Buffer[] = [];
@@ -46,7 +46,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  const result = runPlannerHook(payload);
+  const result = await runPlannerHookAsync(payload);
 
   if (result.decision === "passthrough" || result.decision === "allow") {
     process.exit(0);

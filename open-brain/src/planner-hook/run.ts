@@ -8,10 +8,10 @@ import {
   readOutwardGrant,
 } from "./grant.js";
 import {
-  allPathsOnDocsMergeAllowlist,
   extractGhPrMergeRef,
   isGhPrMerge,
   isRestrictedOutwardBash,
+  pathOnDocsMergeAllowlist,
 } from "./git.js";
 import {
   isAllowedDocsLoopsPath,
@@ -19,6 +19,7 @@ import {
   isRenderedViewPath,
   SUMMARY_PATH,
 } from "./paths.js";
+import { fetchPrChangedPaths, type PrFilesDeps } from "./prfiles.js";
 import { editTouchesSummaryRegion, writeTouchesSummaryRegion } from "./summary.js";
 
 export type PlannerHookDecision = "allow" | "deny" | "passthrough";
@@ -41,7 +42,7 @@ export interface PlannerHookDeps {
   /** When set, used instead of reading SUMMARY.md from disk (tests). */
   summaryContent?: string | null;
   /** When set, answers gh pr merge allowlist checks (tests). */
-  prChangedPaths?: (prRef: string) => string[] | "fail";
+  prChangedPaths?: (prRef: string) => string[] | "fail" | { failed: string };
 }
 
 const PH1_RULE = 'planner.md, "Authority"';
@@ -163,22 +164,27 @@ function checkBash(command: string, repoRoot: string, deps: PlannerHookDeps): Pl
 
   if (!isRestrictedOutwardBash(command)) return null;
 
+  // D-032/D-055 (Aaron 2026-09-30): a docs-only merge needs no grant. Anything else that
+  // reaches here — unlisted path, unreadable list, unparseable ref — is grant-required,
+  // and the refusal names which.
+  let mergeCause: string | null = null;
   if (isGhPrMerge(command) && deps.prChangedPaths) {
     const ref = extractGhPrMergeRef(command);
     if (!ref) {
-      return {
-        decision: "deny",
-        reason: `Planner hook: denied — ${PH3_RULE}. Could not parse gh pr merge target.`,
-      };
+      mergeCause = "could not parse the gh pr merge target";
+    } else {
+      const paths = deps.prChangedPaths(ref);
+      if (typeof paths === "object" && !Array.isArray(paths)) {
+        mergeCause = paths.failed;
+      } else if (paths === "fail") {
+        mergeCause = "the changed-file list could not be read";
+      } else {
+        const unlisted = paths.filter((p) => !pathOnDocsMergeAllowlist(p));
+        if (paths.length === 0) mergeCause = "the changed-file list is empty";
+        else if (unlisted.length > 0) mergeCause = `unlisted path ${unlisted[0]}`;
+        else return null;
+      }
     }
-    const paths = deps.prChangedPaths(ref);
-    if (paths === "fail" || !allPathsOnDocsMergeAllowlist(paths)) {
-      return {
-        decision: "deny",
-        reason: `Planner hook: denied — ${PH3_RULE}. gh pr merge is not on the D-032 docs-only allowlist.`,
-      };
-    }
-    return null;
   }
 
   const grant = readOutwardGrant(repoRoot);
@@ -189,7 +195,11 @@ function checkBash(command: string, repoRoot: string, deps: PlannerHookDeps): Pl
 
   return {
     decision: "deny",
-    reason: `Planner hook: denied — ${PH3_RULE}. Command: ${command.trim()}`,
+    reason:
+      `Planner hook: denied — ${PH3_RULE}. Command: ${command.trim()}` +
+      (mergeCause
+        ? ` gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: ${mergeCause}.`
+        : ""),
   };
 }
 
@@ -251,4 +261,37 @@ export function runPlannerHook(
   }
 
   return { decision: "allow" };
+}
+
+/**
+ * The live entry point: `runPlannerHook` is synchronous, and the docs-only merge check needs a
+ * network read. Pass one runs the policy with a recorder standing in for the file list; the
+ * recorder is only reached when the role is planner and every earlier rule has passed. If pass
+ * one already allowed (a matching grant), that stands. Otherwise the list is fetched — no child
+ * process — and pass two decides with it. Any failure to fetch is a `{ failed }` list, which
+ * the policy treats as grant-required and names.
+ */
+export async function runPlannerHookAsync(
+  payload: PlannerHookPayload,
+  deps: PlannerHookDeps = {},
+  fetchDeps: PrFilesDeps = {},
+): Promise<PlannerHookResult> {
+  if (deps.prChangedPaths) return runPlannerHook(payload, deps);
+
+  let pendingRef: string | undefined;
+  const first = runPlannerHook(payload, {
+    ...deps,
+    prChangedPaths: (ref) => {
+      pendingRef = ref;
+      return { failed: "the changed-file list was not fetched" };
+    },
+  });
+  if (pendingRef === undefined || first.decision === "allow") return first;
+
+  const cwd = typeof payload.cwd === "string" ? payload.cwd : process.cwd();
+  const listed = await fetchPrChangedPaths(pendingRef, resolveHookProjectDir(cwd), fetchDeps);
+  return runPlannerHook(payload, {
+    ...deps,
+    prChangedPaths: () => (listed.ok ? listed.paths : { failed: listed.cause }),
+  });
 }
