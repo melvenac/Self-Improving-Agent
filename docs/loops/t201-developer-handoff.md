@@ -23,7 +23,7 @@ Brief: `docs/loops/t201-brief.md` (on `origin/docs/session-150-c`). Plan approve
 ## THE COST, NAMED: a sidecar write is not atomic with the record
 
 - It has its own revision counter. A batch cannot set an assignment and change a task together.
-- The task is validated as **active in the record at WRITE time only**. A task closed afterwards leaves a live assignment naming a done task; nothing flags it. The reader does not print the task's current status either (I said it would in the module header of an earlier draft; it does not, and the header now says only what it does).
+- The task is validated as **active in the record at WRITE time only**. A task closed afterwards leaves a live assignment naming a done task; nothing flags it. The reader does not print the task's current status either.
 - **No /sync check guards the sidecar against erasure.** Row (c) is met at the writer: replace supersedes, clear marks cleared, entries are never dropped, and tests pin it. A hand edit or a merge resolution that drops an entry is not detected (record-erasure reads state.json only). Follow-up if wanted.
 - **Who may write is not enforced.** Any seat's session can call `set_assignment`; the planner-only convention is not mechanical (T-194 territory).
 
