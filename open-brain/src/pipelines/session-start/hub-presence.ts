@@ -135,7 +135,7 @@ export function formatPartnerLine(partner: HubPartnerSeat, agents: PresenceAgent
   if (!room) return `${partner.label}: absent`;
   // The hub's pollingNow says a LISTENER process is polling this room. It does not say
   // the seat consumed the turn (QA 225), so every line says "listener".
-  if (room.pollingNow) return `${partner.label}: listener polling`;
+  if (room.pollingNow) return `${partner.label}: polling (seat has seen this turn)`;
   const unread = room.unread ?? 0;
   if (unread > 0) {
     const age = formatPollAge(room.pollAgeMs ?? 0);
