@@ -132,7 +132,8 @@ function Verb-Take {
   $announced = $false
   while ($true) {
     $tmp = Join-Path $LeaseDir ("lease.$([guid]::NewGuid().ToString('N')).tmp")
-    [System.IO.File]::WriteAllText($tmp, (New-LeaseJson $OwnerPid $stamp.start $null))
+    if (-not (Test-Path -LiteralPath $LeasePath)) { [System.IO.File]::WriteAllText($LeasePath, (New-LeaseJson $OwnerPid $stamp.start $null)); Out-Line "lease" "taken"; exit 0 }
+    [System.IO.File]::WriteAllText($tmp, "x")
     if (Try-Move $tmp) { Out-Line 'lease' "taken owner=$Seat pid=$OwnerPid"; exit 0 }
     Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
     $r = Read-Lease $LeasePath
