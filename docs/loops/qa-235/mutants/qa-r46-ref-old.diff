@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 1300851c..f91e16a0 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -97,6 +97,6 @@ export function startsWithGhPrMerge(command: string): boolean {
+ }
+ 
+ export function extractGhPrMergeRef(command: string): string | null {
+-  const m = command.match(/(?<![\w-])["']?gh(?:\.exe)?["']?\s+pr\s+merge\s+(\S+)/);
++  const m = command.match(/\bgh\s+pr\s+merge\s+(\S+)/);
+   return m ? m[1] : null;
+ }

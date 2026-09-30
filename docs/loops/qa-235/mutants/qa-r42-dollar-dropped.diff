@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index b43d82fa..755c03a7 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -24,7 +24,7 @@ function refusedWriteTarget(raw: string, repoRoot: string, cwd: string): string
+   const p = stripQuotes(raw);
+   if (!p || p === "/dev/null" || p.startsWith("&") || p.startsWith("/dev/")) return null;
+   // A shell expands these before writing, so the static text does not say where the write lands.
+-  if (/[$`]/.test(p)) return `${p} (contains a shell expansion, so its location cannot be determined)`;
++  if (/[`]/.test(p)) return `${p} (contains a shell expansion, so its location cannot be determined)`;
+   const rel = toRepoRelative(p, repoRoot, cwd);
+   if (!rel.ok) return rel.cause;
+   if (rel.outside) return null;

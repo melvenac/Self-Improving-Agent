@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 1300851c..cdbe1fe7 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -93,7 +93,7 @@ export function ghRepoFlag(command: string): boolean {
+ 
+ /** The command line begins with the merge itself, not with a prefix such as `GH_REPO=x` or `env`. */
+ export function startsWithGhPrMerge(command: string): boolean {
+-  return GH_PR_MERGE_START_RE.test(command.trim());
++  return GH_PR_MERGE_RE.test(command.trim());
+ }
+ 
+ export function extractGhPrMergeRef(command: string): string | null {

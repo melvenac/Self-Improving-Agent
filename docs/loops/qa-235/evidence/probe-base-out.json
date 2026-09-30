@@ -1,0 +1,627 @@
+{
+  "r4-1 cwd=open-brain Bash `echo x > src/cli.ts`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=open-brain Bash `sed -i s/a/b/ src/cli.ts`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=open-brain Edit relative src/cli.ts": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=open-brain Write relative src/cli.ts": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=.agents Bash `echo {} > state.json`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=.agents Bash `echo x > TASKS/INBOX.md`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=.agents Write relative state.json": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=open-brain Bash tee src/x.ts": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=open-brain Bash cp a tests/x.ts": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=open-brain Bash mv a package.json": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (package.json). Static Bash write detection only: redirects, sed -i, tee, cp and mv targets. It stops mistakes by the planner's tools; it is not a sandbox."
+  },
+  "r4-1 cwd=open-brain Bash 2>> src/x.log": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=open-brain/src Bash `echo x > cli.ts`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=open-brain (BACKSLASH form) Bash `echo x > src/cli.ts`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=open-brain (trailing slash) Bash `echo x > src/cli.ts`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 cwd=open-brain (Git Bash /c/ form) Bash `echo x > src/cli.ts`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "exit": 2,
+    "reason": "Planner hook: denied — .agents/AGENT.local.md is missing or unreadable (fail closed)."
+  },
+  "r4-1 ../ cwd=docs/loops Bash `echo x > ../../open-brain/src/cli.ts`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (../../open-brain/src/cli.ts climbs out of the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative). Static Bash write detection only: redirects, sed -i, tee, cp and mv target"
+  },
+  "r4-1 ../ cwd=docs Write ../.agents/state.json": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "exit": 2,
+    "reason": "Planner hook: denied — ../.agents/state.json climbs out of the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative (fail closed). Path: ../.agents/state.json"
+  },
+  "r4-1 ../ cwd=open-brain Bash `echo x > ../scripts/x.sh`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (../scripts/x.sh climbs out of the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative). Static Bash write detection only: redirects, sed -i, tee, cp and mv targets. It stops "
+  },
+  "r4-1 ../ cwd=open-brain/src Edit ../../package.json": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "exit": 2,
+    "reason": "Planner hook: denied — ../../package.json climbs out of the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative (fail closed). Path: ../../package.json"
+  },
+  "r4-1 control cwd=docs/loops Bash `echo x > src/cli.ts` (lands in docs/loops/src)": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 control cwd=scratch Bash `echo {} > state.json`": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 control cwd=open-brain Bash `echo x > notes.md`": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 control cwd=docs/loops Edit relative src/cli.ts": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-1 control cwd=root Write docs/loops/q.md": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "exit": 0,
+    "reason": ""
+  },
+  "LIMIT cwd=root `cd open-brain && echo x > src/cli.ts`": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "exit": 0,
+    "reason": ""
+  },
+  "LIMIT cwd=root `(cd open-brain; echo x > src/cli.ts)`": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-2 `npm test 2> C:/qa-tmp/log.txt`": {
+    "expect": "allow",
+    "got": "deny",
+    "pass": false,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/log.txt is outside the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative). Static Bash write detection only: redirects, sed -i, tee, cp and mv targets. It stops m"
+  },
+  "r4-2 cwd=open-brain `npm test 2> C:/qa-tmp/log.txt`": {
+    "expect": "allow",
+    "got": "deny",
+    "pass": false,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/log.txt is outside the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative). Static Bash write detection only: redirects, sed -i, tee, cp and mv targets. It stops m"
+  },
+  "r4-2 Bash redirect outside (fwd)": {
+    "expect": "allow",
+    "got": "deny",
+    "pass": false,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-scratch/qa235-outside/x.txt is outside the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative). Static Bash write detection only: redirects, sed -i, tee, cp and mv tar"
+  },
+  "r4-2 Bash redirect outside (back, quoted)": {
+    "expect": "allow",
+    "got": "deny",
+    "pass": false,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:\\qa-tmp\\x.txt is outside the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative). Static Bash write detection only: redirects, sed -i, tee, cp and mv targets. It stops mis"
+  },
+  "r4-2 Bash redirect /tmp": {
+    "expect": "allow",
+    "got": "deny",
+    "pass": false,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (/tmp/log.txt is outside the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative). Static Bash write detection only: redirects, sed -i, tee, cp and mv targets. It stops mistak"
+  },
+  "r4-2 Bash redirect relative ../ climbing out": {
+    "expect": "allow",
+    "got": "deny",
+    "pass": false,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (../qa235-outside/x.txt climbs out of the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative). Static Bash write detection only: redirects, sed -i, tee, cp and mv targets. It"
+  },
+  "r4-2 Write scratch outside (fwd)": {
+    "expect": "allow",
+    "got": "deny",
+    "pass": false,
+    "exit": 2,
+    "reason": "Planner hook: denied — C:/qa-scratch/qa235-outside/x.md is outside the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative (fail closed). Path: C:/qa-scratch/qa235-outside/x.md"
+  },
+  "r4-2 Write scratch outside (back)": {
+    "expect": "allow",
+    "got": "deny",
+    "pass": false,
+    "exit": 2,
+    "reason": "Planner hook: denied — C:\\qa-tmp\\x.md is outside the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative (fail closed). Path: C:\\qa-tmp\\x.md"
+  },
+  "r4-2 Edit outside look-alike …/open-brain/src/": {
+    "expect": "allow",
+    "got": "deny",
+    "pass": false,
+    "exit": 2,
+    "reason": "Planner hook: denied — C:/qa-scratch/qa235-outside/open-brain/src/cli.ts is outside the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative (fail closed). Path: C:/qa-scratch/qa235-outside/open-brain/src/cli.ts"
+  },
+  "r4-2 Write prefix-sharing sibling fx-x/open-brain/src (outside)": {
+    "expect": "allow",
+    "got": "deny",
+    "pass": false,
+    "exit": 2,
+    "reason": "Planner hook: denied — C:/qa-scratch/qa235-fx-base-x/open-brain/src/cli.ts is outside the repository (C:\\qa-scratch\\qa235-fx-base), so it cannot be made repo-relative (fail closed). Path: C:/qa-scratch/qa235-fx-base-x/open-brain/src/cli.ts"
+  },
+  "r4-2 undeterminable `echo x > $TMP/x.txt`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-2 undeterminable backtick target": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-2 undeterminable ${VAR}": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-2 undeterminable relative Write with non-absolute cwd": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-2 undeterminable relative Bash with non-absolute cwd": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-2 TILDE `echo x > ~/qa235-fx/open-brain/src/cli.ts` (HOME=C:/qa-scratch would land in PH-1)": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-2 TILDE control `echo x > $HOME/qa235-fx/open-brain/src/cli.ts`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-2 TILDE Write file_path ~/qa235-fx/open-brain/src/cli.ts": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-3 Edit abs OPEN-BRAIN/SRC/cli.ts": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-3 Edit abs back OPEN-BRAIN\\SRC\\cli.ts": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-3 Edit relative OPEN-BRAIN/SRC/cli.ts (cwd=root)": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-3 Bash redirect relative OPEN-BRAIN/SRC/cli.ts": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-3 Bash redirect abs OPEN-BRAIN/SRC/cli.ts": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-3 Write .AGENTS/STATE.JSON": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-3 Write .agents/tasks/inbox.md": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-3 Write Package.JSON (root)": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-3 Write SCRIPTS/x.sh": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-3 root case-varied C:/QA-SCRATCH/QA235-FX/open-brain/src/cli.ts": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\". Path: C:/QA-SCRATCH/QA235-FX-BASE/open-brain/src/cli.ts"
+  },
+  "r4-3 lower-case drive c:/…/open-brain/src/cli.ts": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\". Path: c:/qa-scratch/qa235-fx-base/open-brain/src/cli.ts"
+  },
+  "r4-3 cwd=OPEN-BRAIN Bash `echo x > SRC/cli.ts`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-3 SUMMARY upper-case Write (region absent → allow on both)": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "exit": 0,
+    "reason": ""
+  },
+  "r4-4 `GH_REPO=other/x gh pr merge 1 --squash`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 0,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH_REPO=other/x gh pr merge 1 --squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is not a single gh pr merge invocation (chained, pi"
+  },
+  "r4-4 `env GH_REPO=other/x gh pr merge 1`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 0,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: env GH_REPO=other/x gh pr merge 1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is not a single gh pr merge invocation (chained, piped, "
+  },
+  "r4-4 `GH_HOST=evil gh pr merge 1`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 0,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH_HOST=evil gh pr merge 1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is not a single gh pr merge invocation (chained, piped, substit"
+  },
+  "r4-4 `GH_REPO=other/x gh.exe pr merge 1`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "fetches": 0,
+    "reason": ""
+  },
+  "r4-4 `command gh pr merge 1`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 0,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: command gh pr merge 1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is not a single gh pr merge invocation (chained, piped, substituted "
+  },
+  "r4-4 control `gh pr merge 1 --squash` (docs-only, allow after reading)": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "fetches": 2,
+    "reason": ""
+  },
+  "r4-5 grant `gh pr merge 1` vs `gh pr merge 1 --repo other/x`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "fetches": 0,
+    "reason": "",
+    "grantPresentAfter": false
+  },
+  "r4-5 grant `gh pr merge 1` vs `gh pr merge 1 -R other/x`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 0,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 1 -R other/x gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: --repo/-R names another repository, and the docs-only check reads origin's pu",
+    "grantPresentAfter": false
+  },
+  "r4-5 grant `gh pr merge 1` vs `gh pr merge 12`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 1,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 12 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: GitHub API returned HTTP 404 for https://api.github.com/repos/melvenac/Self-Improving-A",
+    "grantPresentAfter": false
+  },
+  "r4-5 grant `git push origin loop/x` vs `… --force`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "fetches": 0,
+    "reason": "",
+    "grantPresentAfter": false
+  },
+  "r4-5 grant `git push origin loop/x` vs `… -f`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 0,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git push origin loop/x -f",
+    "grantPresentAfter": false
+  },
+  "r4-5 grant `git push origin loop/x` vs `… --force-with-lease`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 0,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git push origin loop/x --force-with-lease",
+    "grantPresentAfter": false
+  },
+  "r4-5 grant `git push origin loop/x` vs `… && git push --force origin master`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 0,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git push origin loop/x && git push --force origin master",
+    "grantPresentAfter": false
+  },
+  "r4-5 grant `gh pr merge 2 --squash` vs `  gh   pr merge 2\\t--squash ` (exact, whitespace)": {
+    "expect": "allow",
+    "got": "deny",
+    "pass": false,
+    "fetches": 2,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh   pr merge 2\t--squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: unlisted path open-brain/src/cli.ts.",
+    "grantPresentAfter": true
+  },
+  "r4-5 grant `git push --force origin loop/x` vs exact": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "fetches": 0,
+    "reason": "",
+    "grantPresentAfter": false
+  },
+  "r4-6 `gh.exe pr merge 2` (code PR)": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "fetches": 0,
+    "reason": ""
+  },
+  "r4-6 `\"gh\" pr merge 2` (code PR)": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "fetches": 0,
+    "reason": ""
+  },
+  "r4-6 `'gh' pr merge 2` (code PR)": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "fetches": 0,
+    "reason": ""
+  },
+  "r4-6 `\"gh.exe\" pr merge 2` (code PR)": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "fetches": 0,
+    "reason": ""
+  },
+  "r4-6 `gh.exe pr merge 1` (docs PR, allow after reading)": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "fetches": 0,
+    "reason": ""
+  },
+  "r4-6 `\"gh\" pr merge 1` (docs PR, allow after reading)": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "fetches": 0,
+    "reason": ""
+  },
+  "r4-6 `\"C:/Program Files/GitHub CLI/gh.exe\" pr merge 2` (full path)": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "fetches": 0,
+    "reason": ""
+  },
+  "r4-6 EXTRA `GH pr merge 2` (upper case; Git Bash on NTFS runs it)": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "fetches": 0,
+    "reason": ""
+  },
+  "r4-6 EXTRA `gh.EXE pr merge 2`": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "fetches": 0,
+    "reason": ""
+  },
+  "r4-6 EXTRA `gh -R other/x pr merge 1`? (flag before subcommand)": {
+    "expect": "deny",
+    "got": "allow",
+    "pass": false,
+    "fetches": 0,
+    "reason": ""
+  },
+  "REG r3-2 docs merge && force push": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 0,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 1 --squash && git push --force origin master gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is not a single gh pr merge invoc"
+  },
+  "REG r3-4 `gh pr merge 1 --repo=other/x`": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 0,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 1 --repo=other/x gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: --repo/-R names another repository, and the docs-only check reads origin'"
+  },
+  "REG P7 force push alone": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "fetches": 0,
+    "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git push --force origin master"
+  },
+  "REG standing push loop/x": {
+    "expect": "allow",
+    "got": "allow",
+    "pass": true,
+    "fetches": 0,
+    "reason": ""
+  },
+  "REG r3-1 Edit abs back src (cwd=root)": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\". Path: C:\\qa-scratch\\qa235-fx-base\\open-brain\\src\\cli.ts"
+  },
+  "REG r3-1 Bash redirect abs quoted back state.json (cwd=docs/loops)": {
+    "expect": "deny",
+    "got": "deny",
+    "pass": true,
+    "exit": 2,
+    "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:\\qa-scratch\\qa235-fx-base\\.agents\\state.json). Static Bash write detection only: redirects, sed -i, tee, cp and mv targets. It stops mistakes by the planner's tools; it is not a sandbox."
+  }
+}

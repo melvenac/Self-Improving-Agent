@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/run.ts b/open-brain/src/planner-hook/run.ts
+index f1e220bf..0e71707f 100644
+--- a/open-brain/src/planner-hook/run.ts
++++ b/open-brain/src/planner-hook/run.ts
+@@ -133,7 +133,7 @@ function checkFileTool(
+     };
+   }
+ 
+-  if (isSummaryPath(relPath, ci)) {
++  if (isSummaryPath(relPath)) {
+     const existing =
+       deps.summaryContent !== undefined
+         ? deps.summaryContent

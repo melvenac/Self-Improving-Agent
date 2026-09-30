@@ -1,0 +1,94 @@
+{
+  "loop": "t194",
+  "candidate_git": {
+    "sha": "d37e09dc4bd38cec0306e542773c3ab881602d6e",
+    "branch": "origin/loop/t194-planner-hook",
+    "frozen_at": "2026-09-30T09:47:00-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci && npm run build && npx tsc --noEmit (open-brain/, candidate d37e09dc, laptop DESKTOP-0GV3HAD, TEMP/TMP=C:\\qa-tmp)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "npm ci exit 0; npm run build exit 0; tsc --noEmit exit 0, no output; vitest run tests/planner-hook exit 0, 4 files, 129 passed. Base c1f1cb48 also builds (exit 0, 'build stamped c1f1cb4') for the red side of the probes."
+    },
+    "unit": {
+      "command": "tcm CI run 36731891365 (qa/t194-r4-ci-candidate, headSha d37e09dc4bd38cec0306e542773c3ab881602d6e), job test 109943476212",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 240000,
+      "detail": "Run conclusion success, test job success: 2061 passed | 7 skipped (2068), 140 files. Base run 36731900973 (qa/t194-r4-ci-base, headSha c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97, test job 109943507764): success, 1994 passed | 6 skipped (2000), 138 files. test-windows skipped in both; windows=true not used."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "R4-1-D3-cwd-relative",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Real built CLI, fixture stdin: from cwd open-brain/, 'echo x > src/cli.ts', 'sed -i s/a/b/ src/cli.ts', a relative Edit and a relative Write of src/cli.ts, tee src/x.ts, cp to tests/, mv to package.json and '2>> src/x.log' all exit 2. From cwd .agents/, 'echo {} > state.json', '> TASKS/INBOX.md' and a relative Write of state.json exit 2. cwd open-brain/src '> cli.ts', and the cwd in backslash, trailing-slash and Git Bash /c/ forms, all exit 2. Through ../ from docs/loops, docs, open-brain and open-brain/src (src, state.json, scripts, root package.json) exit 2. The controls (the same text from docs/loops or scratch, notes.md from open-brain) exit 0. Base: 13 of these allow. Mutants red: dev d3-bash-root (5 failed), d3-file-root (3); QA qa-r41-resolve-root (7), qa-r41-cwd-raw (14)."
+    },
+    {
+      "id": "R4-2-outside-allowed",
+      "status": "partial",
+      "order": "shown",
+      "evidence": "Outside allowed, met: 'npm test 2> C:/qa-tmp/log.txt' (cwd root and open-brain), redirects outside in both slash forms, /tmp, and a ../ climb out, and a Write or Edit outside (fwd, back, a look-alike .../open-brain/src/, and a prefix-sharing sibling) all exit 0 (base: all deny). Undeterminable, met: $TMP, ${HOME}, a backtick target, and a relative Bash or Write with a non-absolute cwd exit 2 with 'cannot be determined'. Mutants red: dev outside-deny-bash (1), outside-deny-file (2), expansion-allowed (1), cwd-not-absolute (2); QA qa-r42-outside-cause (4), qa-r42-dollar-dropped (1). PARTIAL because of D4: a ~ target is a shell expansion the hook neither expands nor refuses. It resolves '~/…' as '<cwd>/~/…', so 'echo x > ~/qa235-fx/open-brain/src/cli.ts' exits 0 while '$HOME/qa235-fx/open-brain/src/cli.ts' exits 2. The planner's checkout is ~/Worktrees/sia-planner (.agents/AGENT.md), so '~/Worktrees/sia-planner/open-brain/src/cli.ts' is a PH-1 write that is allowed. Base allows it too."
+    },
+    {
+      "id": "R4-3-case",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Real CLI: Edit of OPEN-BRAIN/SRC/cli.ts (absolute fwd, absolute back, and relative from root), Bash redirects to it (relative and absolute), .AGENTS/STATE.JSON, .agents/tasks/inbox.md, Package.JSON, SCRIPTS/x.sh, an upper-cased root, a lower-case drive letter, and cwd OPEN-BRAIN with '> SRC/cli.ts' all exit 2 (base: all exit 0 apart from the root and drive-letter forms). Mutants red: dev case-artifact (2), case-view (2); QA qa-r43-ci-off (4). QA qa-r43-summary-cs SURVIVED (129 passed): no test pins a case-varied SUMMARY.md region write. The candidate denies it (qa235-probe-summary.mjs), and base allows it."
+    },
+    {
+      "id": "R4-4-prefix-half",
+      "status": "met",
+      "order": "shown",
+      "evidence": "With a fetch recorder: 'GH_REPO=other/x gh pr merge 1 --squash', 'env GH_REPO=other/x gh pr merge 1', 'GH_HOST=evil gh pr merge 1', 'GH_REPO=other/x gh.exe pr merge 1' and 'command gh pr merge 1' are each denied with 0 fetches. The control 'gh pr merge 1 --squash' is allowed after 2 fetches. QA 234's qa-r32-prefix no longer applies as committed (r4 moved the check into startsWithGhPrMerge). Ported to that helper (qa234-qa-r32-prefix-port), it is red (2 failed), as are dev prefix-half (2) and QA qa-r44-env-prefix-ok (2)."
+    },
+    {
+      "id": "R4-5-exact-grant",
+      "status": "met",
+      "order": "shown",
+      "evidence": "A grant for 'gh pr merge 1' does not cover '--repo other/x' or '-R other/x' (deny, 0 fetches, grant still present), or 'gh pr merge 12'. A grant for 'git push origin loop/x' does not cover --force, -f, --force-with-lease, or '&& git push --force origin master' (deny, grant present). The exact command with extra spaces and a tab is allowed and consumes the grant; so does an exact force-push grant. Base: the --repo and --force lines allow and consume the grant. Mutants red: dev grant-prefix (5), QA qa-r45-no-squash (3)."
+    },
+    {
+      "id": "R4-6-gh-exe-quoted",
+      "status": "met",
+      "order": "shown",
+      "evidence": "gh.exe, \"gh\", 'gh' and \"gh.exe\" with pr merge 2 (a code PR) are each denied after reading the list. With PR 1 (docs only), gh.exe and \"gh\" are allowed after 2 fetches. A quoted full path to gh.exe is denied with 0 fetches. Base: all allow, with 0 fetches. Mutants red: dev gh-exe (4), gh-quote (3); QA qa-r46-ref-old (5), qa-r46-start-no-exe (3). D5 (not in the row as written): 'GH pr merge 2', 'gh.EXE pr merge 2' and 'gh --repo other/x pr merge 1' are allowed with 0 fetches. Git Bash resolves GH and gh.EXE to the same binary, and gh honours --repo before the subcommand (verified). Base allows them too."
+    },
+    {
+      "id": "R4-MUTANTS",
+      "status": "met",
+      "order": "shown",
+      "evidence": "All 12 developer mutants apply cleanly to d37e09dc, pass tsc (0) and are red on tests/planner-hook (failed counts: case-artifact 2, case-view 2, cwd-not-absolute 2, d3-bash-root 5, d3-file-root 3, expansion-allowed 1, gh-exe 4, gh-quote 3, grant-prefix 5, outside-deny-bash 1, outside-deny-file 2, prefix-half 2). QA 235 ran 11 of its own, with at least one per row and two each for r4-1 and r4-2. All typecheck: 10 red, 1 survived (qa-r43-summary-cs, a test gap). QA 234's qa-r32-prefix does not apply as committed; its port is red. Diffs are in docs/loops/qa-235/mutants/."
+    },
+    {
+      "id": "REGRESSION-R3-PH-R2",
+      "status": "met",
+      "order": "shown",
+      "evidence": "hook.test.ts, docs-merge.test.ts, prfiles.ts, summary.ts, emit.ts and cli-planner-hook.ts are unchanged between c1f1cb48 and d37e09dc (git diff --stat lists only bash.ts, git.ts, grant.ts, paths.ts, run.ts, r3.test.ts and r4.test.ts), and all pass. The r3.test.ts edits only drop the outside-repo deny rows (reversed by the ruling), turn the grant-prefix rows into exact-match rows (r4-5), and quote absolute Bash targets. Spot probes still hold: r3-1 (an absolute backslash Edit, and a quoted state.json redirect from docs/loops) deny; r3-2 (a docs merge && force push) denies with 0 fetches; r3-4 (--repo=) denies with 0 fetches; P7 force push denies; a standing push to loop/x is allowed. CI on the candidate is green."
+    },
+    {
+      "id": "LIMIT-cd-in-command",
+      "status": "not_evaluated",
+      "evidence": "Declared limit, reported and not scored: 'cd open-brain && echo x > src/cli.ts' and '(cd open-brain; echo x > src/cli.ts)' from cwd root exit 0. The refusal text (BASH_WRITE_LIMIT: 'Static Bash write detection only: redirects, sed -i, tee, cp and mv targets…') does not state it, and no doc outside the loop files does. Only the developer handoff states it."
+    },
+    {
+      "id": "PH-8",
+      "status": "not_evaluated",
+      "evidence": "The CLI contract holds: exit 2 with a permissionDecision deny, and exit 0 on allow. The live half is not evaluated: the hook is registered nowhere, per the dispatch."
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "D4: a ~ write target is not treated as an expansion. It resolves as <cwd>/~/… and is allowed, although the shell writes to $HOME/…. The planner's checkout is ~/Worktrees/sia-planner, so a PH-1 write through ~ is allowed. On base too.",
+    "D5: 'GH pr merge', 'gh.EXE pr merge' and 'gh --repo X pr merge' (a global flag before the subcommand) skip the merge check, with no grant and no fetch. On base too.",
+    "Mutant qa-r43-summary-cs survived: no test pins a case-varied SUMMARY.md marked-region write (the code is right).",
+    "Declared cd-in-command limit: stated only in the developer handoff, not in the refusal text or other docs.",
+    "PH-8 live half not evaluated (dispatch rule). The local full suite was not run; tcm run 36731891365 stands for it."
+  ],
+  "notes": "QA 235, Claude Code on Opus 5.5 (claude-opus-5-5), laptop DESKTOP-0GV3HAD, headless. Dispatch commit abd206d408164f4ed9a1fd410e3b895ae0ea2786. Verdict: REJECT on D4 (r4-2 partial: a ~ target is an undeterminable expansion that is allowed and can reach PH-1). D5 is the same class as r4-6. Both are from r1, not regressions. If the planner rules both outside T-194, every scored r4 row is met."
+}
