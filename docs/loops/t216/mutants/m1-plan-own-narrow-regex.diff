@@ -1,0 +1,11 @@
+--- a/open-brain/src/harness/schema.ts
++++ b/open-brain/src/harness/schema.ts
+@@ -98,7 +98,7 @@
+  */
+ export const PlanSchema = z
+   .strictObject({
+-    loop: z.string().regex(LOOP_ID_PATTERN, LOOP_ID_MESSAGE),
++    loop: z.string().regex(/^t\d{3,}$/, "loop must look like t001"),
+     objective: z.string().min(1),
+     tasks: z.array(z.string().min(1)).min(1),
+     out_of_scope: z.array(z.string().min(1)),

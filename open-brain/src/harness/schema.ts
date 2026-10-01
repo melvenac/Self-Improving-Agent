@@ -38,6 +38,23 @@ export const AcceptanceCriterionSchema = z.strictObject({
 });
 
 /**
+ * The ONE loop-id rule, shared by `D_t` (plan) and `E_t` (evidence) — T-216.
+ *
+ * Runtime loops are `t001`. A human-seat loop is the number the record uses,
+ * then one or more hyphenated lowercase segments: `15-slice-3`, `15-slice-3-b`.
+ * The form is `[0-9]+(?:-[a-z0-9]+)+`. No slash, backslash, dot or space: the
+ * id is a ledger key, and a value that can climb out of a directory is refused
+ * here even though a human-seat id never becomes a runtime path.
+ *
+ * **Two copies of this regex drift** — the plan kept `^t\d{3,}$` after evidence
+ * widened, and no planner brief's `D_t` could pass `harness validate plan`.
+ * `DeveloperReportSchema` and the runtime's `--loop` stay `tNNN`-only on purpose:
+ * they name a loop the runtime itself runs (branch, tag, artifacts directory).
+ */
+export const LOOP_ID_PATTERN = /^(?:t\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$/;
+export const LOOP_ID_MESSAGE = "loop must be a runtime id (t001) or a human-seat id (15-slice-3)";
+
+/**
  * `stop_ship` — the only escape from the "one new capability" rule.
  *
  * It is deliberately awkward: `requested` must be the literal `true` and the
@@ -81,7 +98,7 @@ export const StopShipSchema = z.strictObject({
  */
 export const PlanSchema = z
   .strictObject({
-    loop: z.string().regex(/^t\d{3,}$/, "loop must look like t001"),
+    loop: z.string().regex(LOOP_ID_PATTERN, LOOP_ID_MESSAGE),
     objective: z.string().min(1),
     tasks: z.array(z.string().min(1)).min(1),
     out_of_scope: z.array(z.string().min(1)),
@@ -170,22 +187,13 @@ export const AcceptanceFindingSchema = z.strictObject({
   order: z.enum(["shown", "attributed"]).optional(),
 });
 
-/**
- * Runtime loops stay `t001`. A human-seat loop is the number the record uses,
- * then one or more hyphenated lowercase segments: `15-slice-3`, `15-slice-3-b`.
- * The form is `[0-9]+(?:-[a-z0-9]+)+`. No slash, backslash, dot or space: the
- * id is a ledger key, and a value that can climb out of a directory is refused
- * here even though a human-seat id never becomes a runtime path.
- */
-export const EVIDENCE_LOOP_PATTERN = /^(?:t\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$/;
+/** Kept as the evidence schema's historical name for the shared loop-id rule. */
+export const EVIDENCE_LOOP_PATTERN = LOOP_ID_PATTERN;
 
 /** `E_t` — the evidence report for one loop, written by the QA seat. */
 export const EvidenceSchema = z
   .strictObject({
-    loop: z.string().regex(
-      EVIDENCE_LOOP_PATTERN,
-      "loop must be a runtime id (t001) or a human-seat id (15-slice-3)",
-    ),
+    loop: z.string().regex(LOOP_ID_PATTERN, LOOP_ID_MESSAGE),
     candidate_git: z.strictObject({
       sha: z.string().regex(/^[0-9a-f]{40}$/, "candidate sha must be a full 40-character sha"),
       branch: z.string().min(1),
