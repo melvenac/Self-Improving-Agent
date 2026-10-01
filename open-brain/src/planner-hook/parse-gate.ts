@@ -78,8 +78,7 @@ function gateBash(command: string, depth: number): string | null {
     const start = i;
     while (i < n) {
       const c = command[i];
-      if (c === " " || c === "\t" || c === ";" || c === "&" || c === "|" || c === ">" || c === "<") break;
-      if (c === "\n" || c === "\r") return refuse("newline outside quotes (use ; between commands)");
+      if (c === " " || c === "\t" || c === ";" || c === "&" || c === "|" || c === ">" || c === "<" || c === "\n" || c === "\r") break;
       if (c === "'") {
         bare = false;
         const e = command.indexOf("'", i + 1);
@@ -288,7 +287,7 @@ function gateSed(args: GWord[]): string | null {
   let hasExpr = false;
   for (let k = 0; k < args.length; k++) {
     const t = args[k].text;
-    if (t === "-f" || t === "--file" || t.startsWith("--file=")) return refuse("sed -f (a script read from a file)");
+    if (t === "--file" || t.startsWith("--file=")) return refuse("sed -f (a script read from a file)");
     if (t === "-e" || t === "--expression") {
       hasExpr = true;
       if (args[k + 1]) scripts.push(args[k + 1].text);
@@ -567,8 +566,7 @@ function gatePowerShell(command: string, depth: number): string | null {
     const start = i;
     while (i < n) {
       const c = command[i];
-      if (c === " " || c === "\t" || c === ";" || c === "|" || c === ">") break;
-      if (c === "\n" || c === "\r") return refuse("newline outside quotes (use ; between commands)");
+      if (c === " " || c === "\t" || c === ";" || c === "|" || c === ">" || c === "\n" || c === "\r") break;
       if (c === "'") {
         quoted = true;
         i++;

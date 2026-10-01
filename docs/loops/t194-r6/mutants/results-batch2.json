@@ -1,0 +1,98 @@
+[
+  {
+    "name": "r5-p2b-force-long-allowed",
+    "clause": "P2b force: --force*",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 19,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-force-short-cluster",
+    "clause": "P2b force: -f inside a short cluster (-fu)",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-plus-refspec-allowed",
+    "clause": "P2b force: +refspec",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-delete-refspec-allowed",
+    "clause": "P2b delete: :dst refspec",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-standing-prefix-off",
+    "clause": "P2b standing: only loop/ qa/ docs/ chore/ (and never master)",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 24,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-remote-any",
+    "clause": "P2b standing: remote must be origin",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-bare-push-allowed",
+    "clause": "P2b standing: a push naming no branch",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-tags-mirror-allowed",
+    "clause": "P2b tags, mirror, all, delete, prune",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-merge-tag-allowed",
+    "clause": "P2b merge and tag",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 14,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-nested-git-not-seen",
+    "clause": "P2b git inside bash -c / $( ) / backticks",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-expanded-subcommand-allowed",
+    "clause": "P2b a substituted subcommand",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "r5-p2b-expanded-git-word-allowed",
+    "clause": "P2b a substituted git word",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  }
+]

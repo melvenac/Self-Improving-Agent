@@ -8,6 +8,7 @@ import { MUTANTS as R5 } from "../../t194-r5/mutants/specs.mjs";
 const REBASED = {
   "p1-ntfs-dots-off": { find: "const abs = winRoot ? ntfsComponents(posix.normalize(toFwd(norm, true))) : norm;", replace: "const abs = winRoot ? posix.normalize(toFwd(norm, true)) : norm;" },
   "p1-cp-t-ignored": { find: "if (t >= 0) {\n            const attached", replace: "if (false) {\n            const attached" },
+  "p2b-leading-options-not-skipped": { find: 'while (i < rest.length && rest[i].text.startsWith("-")) {', replace: 'while (i < rest.length && rest[i].text.startsWith("-") && rest.length < 0) {' },
   "p3-param-prefix-off": { file: "parse-gate.ts", find: "const hits = Object.keys(table).filter((p) => p.startsWith(name));", replace: "const hits = Object.keys(table).filter((p) => p === name);" },
 };
 const r5 = R5.map((m) => ({ ...m, name: `r5-${m.name}`, ...(REBASED[m.name] ?? {}) }));
@@ -38,7 +39,7 @@ export const MUTANTS = [
   { name: "p0-sed-s-flags-allowed", clause: "P0 bash: sed s///w and s///e flags", file: "parse-gate.ts",
     find: 'if (s[i] === "w" || s[i] === "W") return refuse("sed w (writes a file)");', replace: "" },
   { name: "p0-sed-file-script-allowed", clause: "P0 bash: sed -f", file: "parse-gate.ts",
-    find: 'if (t === "-f" || t === "--file" || t.startsWith("--file=")) return refuse(', replace: 'if (false) return refuse(' },
+    find: 'if (t === "--file" || t.startsWith("--file=")) return refuse(', replace: 'if (false) return refuse(' },
   { name: "p0-dollar-allowed", clause: "P0 bash: $ ($'...', $VAR, $( ))", file: "parse-gate.ts",
     find: 'if (c === "$") return refuse("$ (variable, substitution or $\'...\' string)");', replace: "" },
   { name: "p0-dollar-in-dq-allowed", clause: "P0 bash: $ inside double quotes", file: "parse-gate.ts",
@@ -62,7 +63,7 @@ export const MUTANTS = [
   { name: "p0-inline-code-allowed", clause: "P0 bash: node -e, python -c, perl -e", file: "parse-gate.ts",
     find: "if (inline && args.some((a) => inline.test(a.text)))", replace: "if (false && inline && args.some((a) => inline.test(a.text)))" },
   { name: "p0-git-alias-allowed", clause: "P0 git: a subcommand that is not git's own (an alias)", file: "parse-gate.ts",
-    find: "if (!GIT_COMMANDS.has(sub.name)) return refuse(", replace: "if (false) return refuse(" },
+    find: "if (!GIT_COMMANDS.has(sub.name)) return refuse(", replace: "if (!GIT_COMMANDS.has(sub.name) && sub.name === '') return refuse(" },
   { name: "p0-gh-alias-allowed", clause: "P0 gh: a command that is not gh's own (an alias)", file: "parse-gate.ts",
     find: "if (!GH_COMMANDS.has(pos[0])) return refuse(", replace: "if (false) return refuse(" },
   { name: "p0-newline-allowed", clause: "P0 bash: an unquoted newline", file: "parse-gate.ts",

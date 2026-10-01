@@ -1,0 +1,98 @@
+[
+  {
+    "name": "r5-p1-mv-source-ignored",
+    "clause": "P1 targets: a move deletes its source",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p1-cp-t-ignored",
+    "clause": "P1 targets: cp -t DIR",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 8,
+    "killed": true
+  },
+  {
+    "name": "r5-p1-sed-e-files",
+    "clause": "P1 targets: sed -i -e SCRIPT FILE",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  },
+  {
+    "name": "r5-p1-nested-not-parsed",
+    "clause": "P1 targets: bash -c, $( ), backticks, eval",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  },
+  {
+    "name": "r5-p1-heredoc-body-parsed",
+    "clause": "P1 false refusals: heredoc bodies are data",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "r5-p2-gh-case-sensitive",
+    "clause": "P2 gh word: case",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 20,
+    "killed": true
+  },
+  {
+    "name": "r5-p2-gh-extension-kept",
+    "clause": "P2 gh word: .exe and any extension",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 23,
+    "killed": true
+  },
+  {
+    "name": "r5-p2-any-flag-allowed",
+    "clause": "P2 grammar: only the eight flags",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 8,
+    "killed": true
+  },
+  {
+    "name": "r5-p2-boundary-ignored",
+    "clause": "P2 grammar: one command, no boundary",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "r5-p2-redirect-allowed",
+    "clause": "P2 grammar: no redirect",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "r5-p2-substituted-name-not-gh",
+    "clause": "P2 merge: a substituted command word",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "r5-p2-nested-merge-not-seen",
+    "clause": "P2 merge: bash -c / $( ) / backticks",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  }
+]

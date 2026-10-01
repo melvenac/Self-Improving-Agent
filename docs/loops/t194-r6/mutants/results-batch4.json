@@ -1,0 +1,98 @@
+[
+  {
+    "name": "p0-sed-file-script-allowed",
+    "clause": "P0 bash: sed -f",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "p0-dollar-allowed",
+    "clause": "P0 bash: $ ($'...', $VAR, $( ))",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 11,
+    "killed": true
+  },
+  {
+    "name": "p0-dollar-in-dq-allowed",
+    "clause": "P0 bash: $ inside double quotes",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "p0-backtick-allowed",
+    "clause": "P0 bash: backtick",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "p0-brace-allowed",
+    "clause": "P0 bash: { } group and brace expansion",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 9,
+    "killed": true
+  },
+  {
+    "name": "p0-paren-allowed",
+    "clause": "P0 bash: ( ) subshell",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "p0-glob-allowed",
+    "clause": "P0 bash: * ? [",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 8,
+    "killed": true
+  },
+  {
+    "name": "p0-tilde-allowed",
+    "clause": "P0 bash: leading ~",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  },
+  {
+    "name": "p0-ps-tilde-allowed",
+    "clause": "P0 powershell: leading ~",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "p0-background-allowed",
+    "clause": "P0 bash: single &",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  },
+  {
+    "name": "p0-fd-redirect-allowed",
+    "clause": "P0 bash: only 2> and 2>&1 as fd redirects",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "p0-inline-code-allowed",
+    "clause": "P0 bash: node -e, python -c, perl -e",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 12,
+    "killed": true
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "name": "r5-p2-repo-flag-ignored",
+    "clause": "P2 grammar: --repo / -R named",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p2-subshell-callop",
+    "clause": "P2 PowerShell: & is the call operator",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "r5-p3-matcher-without-powershell",
+    "clause": "P3 matcher",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p3-powershell-tool-ignored",
+    "clause": "P3 PowerShell tool is checked",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 116,
+    "killed": true
+  },
+  {
+    "name": "r5-p3-tool-name-case",
+    "clause": "P3 tool name without case",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p3-dynamic-allowed",
+    "clause": "P3 Invoke-Expression / script block refused",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "r5-p3-param-prefix-off",
+    "clause": "P3 -Lit / -Dest parameter prefixes",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "r5-p3-move-source-ignored",
+    "clause": "P3 Move-Item source",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p3-newitem-name-ignored",
+    "clause": "P3 New-Item -Path DIR -Name FILE",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 2,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-git-case-sensitive",
+    "clause": "P2b git word: case, extension, quotes",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 8,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-global-option-values",
+    "clause": "P2b options between git and push: -C <dir>, -c k=v",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 11,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-leading-options-not-skipped",
+    "clause": "P2b options between git and push: --no-pager, --git-dir=",
+    "typecheckExit": 2,
+    "testExit": 1,
+    "failedTests": 24,
+    "killed": true
+  }
+]
