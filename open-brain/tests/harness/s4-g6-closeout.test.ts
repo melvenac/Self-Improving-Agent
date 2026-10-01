@@ -55,7 +55,7 @@ const done = (pr: number, scored: string, match: number, risk: number, over: Rec
     risk_of_regression: { score: risk, confidence: 0.9 },
   },
   pr,
-  merge_commit: sha("m"),
+  merge_commit: sha("c"),
   scored_sha: scored,
   base_sha: sha("0"),
   dt: { path: `docs/loops/loop-15-slice-4-records/pr-${pr}.D_t.json`, blob: "x" },

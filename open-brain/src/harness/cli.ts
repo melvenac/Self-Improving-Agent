@@ -33,6 +33,7 @@ import { policyJsonSchemas } from "./policies.js";
 import { NO_CHECKS, ShadowRunError, checksFromEvidence, runShadowDoneGate } from "./shadow-gates.js";
 import { gitTry } from "./git.js";
 import { runShadowQaGate } from "./shadow-qa.js";
+import { buildCloseoutTables } from "./closeout-tables.js";
 import {
   MAX_ATTEMPTS_TOTAL,
   SLICE_LEDGER_FILE,
@@ -58,6 +59,7 @@ const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
                       (--checks-e-t <E_t.json> | --checks none) [--mode live|dry-run] [--records <dir>] [--ledger <file>]
   harness shadow-qa --pr <n> --branch <qa/...> --commit <sha> --path <E_t path> [--mode live|dry-run]
                     [--records <dir>] [--ledger <file>]
+  harness closeout-tables [--records <dir>] [--check <report.md>] [--repo <dir>]
   harness plan-gate <D_t.json> [--brief <brief.md>] [--mode live|dry-run] [--ledger <file>]
   harness dispatch-check <brief.md> [--repo <dir>]
   harness dispatch <brief.md> --say <message> [--repo <dir>]
@@ -529,6 +531,33 @@ async function cmdShadowQa(argv: readonly string[]): Promise<number> {
   }
 }
 
+/**
+ * S4-5a. Print the close-out's threshold tables, built from the gate records. With `--check <file>`
+ * the regenerated tables are compared with that file and any difference exits 1, which is how QA
+ * checks that the report's tables were not typed by hand.
+ */
+function cmdCloseoutTables(argv: readonly string[]): number {
+  const flags = flagMap(argv, true);
+  for (const key of flags.keys()) if (key !== "records" && key !== "check" && key !== "repo") throw new UsageError(`unrecognised flag "--${key}"`);
+  const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  const records = typeof flags.get("records") === "string" ? resolve(flags.get("records") as string) : join(repo, SLICE_RECORDS_DIR);
+  const built = buildCloseoutTables({ recordsDir: records });
+  for (const r of built.refused) process.stderr.write(`refused record: ${r}\n`);
+  const check = flags.get("check");
+  if (check === true) throw new UsageError("--check requires a file");
+  if (typeof check === "string") {
+    const onDisk = readFileSync(resolve(check), "utf-8").replace(/\r\n/g, "\n");
+    if (!onDisk.includes(built.markdown)) {
+      process.stdout.write("closeout-tables: the report does not contain the regenerated tables verbatim\n");
+      return 1;
+    }
+    process.stdout.write("closeout-tables: the report contains the regenerated tables verbatim\n");
+    return built.refused.length === 0 ? 0 : 1;
+  }
+  process.stdout.write(built.markdown);
+  return built.refused.length === 0 ? 0 : 1;
+}
+
 function cmdDispatchCheck(argv: readonly string[]): number {
   const flags = flagMap(argv);
   for (const key of flags.keys()) {
@@ -679,6 +708,7 @@ export async function main(argv: readonly string[]): Promise<number> {
     if (sub === "count-attempts") return cmdCountAttempts(rest);
     if (sub === "shadow-done") return await cmdShadowDone(rest);
     if (sub === "shadow-qa") return await cmdShadowQa(rest);
+    if (sub === "closeout-tables") return cmdCloseoutTables(rest);
     if (sub === "dispatch") return await cmdDispatch(rest);
     throw new UsageError(`unknown subcommand "${sub}"`);
   } catch (err) {

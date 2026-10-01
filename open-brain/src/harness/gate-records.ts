@@ -392,7 +392,7 @@ export function readLedger(ledger: string): AttemptView[] {
 }
 
 /** Every gate record (`G_plan`, `G_done`, `G_qa`, with or without a stem) under `dir`, recursively. */
-function recordFiles(dir: string): string[] {
+export function recordFiles(dir: string): string[] {
   if (!existsSync(dir)) return [];
   const out: string[] = [];
   const walk = (d: string): void => {
