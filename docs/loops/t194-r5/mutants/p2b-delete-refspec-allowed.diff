@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
-index 474ec6c7..5af9b5d9 100644
+index 474ec6c7..fa4b0253 100644
 --- a/open-brain/src/planner-hook/git.ts
 +++ b/open-brain/src/planner-hook/git.ts
 @@ -52,7 +52,7 @@ function pushNeedsGrant(args: readonly { text: string; expands: boolean }[]): bo
@@ -7,7 +7,7 @@ index 474ec6c7..5af9b5d9 100644
    for (const spec of positional.slice(1)) {
      // `+src:dst` forces; `:dst` has no source and DELETES the remote branch.
 -    if (spec.startsWith("+") || spec.startsWith(":")) return true;
-+    if (spec.startsWith(":")) return true;
++    if (spec.startsWith("+")) return true;
      const dest = (spec.includes(":") ? (spec.split(":").pop() as string) : spec).replace(/^refs\/heads\//, "");
      // master and main are not under loop/, qa/, docs/ or chore/, so the standing test alone refuses them.
      if (dest === "" || !STANDING_BRANCH_RE.test(dest)) return true;
