@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index a99ce9c4..f52bafcf 100644
+index bc462609..7acb05f2 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
 @@ -479,7 +479,7 @@ export function ghPositionals(args: readonly string[]): string[] {

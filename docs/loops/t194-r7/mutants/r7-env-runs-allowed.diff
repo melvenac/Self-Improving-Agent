@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index a99ce9c4..ef55bd4b 100644
+index bc462609..3ec8d7c7 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
 @@ -60,7 +60,7 @@ const ENV_RUNS_RE = /^(?:PATH|HOME|USERPROFILE|XDG_CONFIG_HOME|APPDATA|NODE_OPTI

@@ -1,13 +1,13 @@
 diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
-index a007c6e3..a12a6150 100644
+index 9e45422f..dcff590b 100644
 --- a/open-brain/src/planner-hook/paths.ts
 +++ b/open-brain/src/planner-hook/paths.ts
 @@ -158,7 +158,7 @@ export function isNullSink(text: string): boolean {
   * ASCII (PowerShell 5.1 and the Windows file system read several lookalikes as something else).
   */
- export function pathShapeProblem(text: string): string | null {
+ export function pathShapeProblem(text: string, checkAscii = true): string | null {
 -  if (text.includes("::")) return "provider path (::)";
 +  
    if (/^[A-Za-z]:(?![\\/])./.test(text)) return "drive-relative path (C:name)";
+   if (!checkAscii) return null;
    for (let k = 0; k < text.length; ) {
-     const cp = text.codePointAt(k) as number;

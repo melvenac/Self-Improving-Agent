@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
-index a007c6e3..9b68edac 100644
+index 9e45422f..7b08d742 100644
 --- a/open-brain/src/planner-hook/paths.ts
 +++ b/open-brain/src/planner-hook/paths.ts
 @@ -25,7 +25,7 @@ const SHORT_NAME_RE = /(?:^|[\\/])[^\\/]*~\d[^\\/]*(?:[\\/]|$)/;

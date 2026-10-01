@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index a99ce9c4..50aaba25 100644
+index bc462609..1620004d 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
-@@ -661,7 +661,7 @@ function gatePowerShell(command: string, depth: number): string | null {
+@@ -662,7 +662,7 @@ function gatePowerShell(command: string, depth: number): string | null {
        if (c === "[" || c === "]") return refuse("[ ] (type literal, index or wildcard)");
        if (c === "*" || c === "?") return refuse("wildcard character (* ?)");
        if (c === "&") return refuse("& inside a word");

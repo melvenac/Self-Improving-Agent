@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index a99ce9c4..23a542f8 100644
+index bc462609..c4ec27cb 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
-@@ -655,7 +655,7 @@ function gatePowerShell(command: string, depth: number): string | null {
+@@ -656,7 +656,7 @@ function gatePowerShell(command: string, depth: number): string | null {
          return refuse("$ (variable or expression)");
        }
        if (c === "`") return refuse("backtick (PowerShell escape character)");

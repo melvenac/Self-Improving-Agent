@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index a99ce9c4..99b82023 100644
+index bc462609..a60941ff 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
-@@ -752,7 +752,7 @@ function gatePowerShell(command: string, depth: number): string | null {
+@@ -753,7 +753,7 @@ function gatePowerShell(command: string, depth: number): string | null {
      const head = words[0];
      const headLower = head.text.toLowerCase();
      const baseLower = commandBase(head.text);

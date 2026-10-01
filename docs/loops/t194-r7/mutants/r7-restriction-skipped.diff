@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index a99ce9c4..dd9c6898 100644
+index bc462609..5636d01d 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
 @@ -289,7 +289,6 @@ function checkBashSimples(simples: GSimple[], depth: number): string | null {

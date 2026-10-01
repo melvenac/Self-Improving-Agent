@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
-index a007c6e3..f13b5079 100644
+index 9e45422f..064e121e 100644
 --- a/open-brain/src/planner-hook/paths.ts
 +++ b/open-brain/src/planner-hook/paths.ts
-@@ -193,7 +193,7 @@ export function validateTarget(
+@@ -194,7 +194,7 @@ export function validateTarget(
      return { kind: "refused", cause: `${raw || "(empty)"} (no readable target, so its location cannot be determined)` };
    }
    if (isNullSink(text)) return { kind: "ok", outside: true };

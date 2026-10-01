@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index a99ce9c4..194c553d 100644
+index bc462609..ac2ab657 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
-@@ -737,8 +737,6 @@ function gatePowerShell(command: string, depth: number): string | null {
+@@ -738,8 +738,6 @@ function gatePowerShell(command: string, depth: number): string | null {
        continue;
      }
      if (t.text === "." && !t.quoted && cur.length === 0) return refuse("dot-sourcing (. file)");

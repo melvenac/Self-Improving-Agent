@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
-index a007c6e3..46ab20c3 100644
+index 9e45422f..c779f70a 100644
 --- a/open-brain/src/planner-hook/paths.ts
 +++ b/open-brain/src/planner-hook/paths.ts
 @@ -133,7 +133,7 @@ export function isAllowedDocsLoopsPath(raw: string): boolean {

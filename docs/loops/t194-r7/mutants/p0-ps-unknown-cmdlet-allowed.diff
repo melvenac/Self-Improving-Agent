@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index a99ce9c4..a76c5816 100644
+index bc462609..158e7c31 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
-@@ -774,7 +774,7 @@ function gatePowerShell(command: string, depth: number): string | null {
+@@ -775,7 +775,7 @@ function gatePowerShell(command: string, depth: number): string | null {
        }
        continue;
      }

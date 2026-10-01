@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index a99ce9c4..fd0dbeec 100644
+index bc462609..4726df92 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
 @@ -465,7 +465,7 @@ export function gitSubcommand(args: readonly string[]): { index: number; name: s

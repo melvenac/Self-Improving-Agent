@@ -1,9 +1,9 @@
 diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
-index a007c6e3..befcba50 100644
+index 9e45422f..e435fe33 100644
 --- a/open-brain/src/planner-hook/paths.ts
 +++ b/open-brain/src/planner-hook/paths.ts
-@@ -162,7 +162,7 @@ export function pathShapeProblem(text: string): string | null {
-   if (/^[A-Za-z]:(?![\\/])./.test(text)) return "drive-relative path (C:name)";
+@@ -163,7 +163,7 @@ export function pathShapeProblem(text: string, checkAscii = true): string | null
+   if (!checkAscii) return null;
    for (let k = 0; k < text.length; ) {
      const cp = text.codePointAt(k) as number;
 -    if (cp > 0x7e || cp < 0x20) return `non-ASCII character U+${cp.toString(16).toUpperCase().padStart(4, "0")}`;

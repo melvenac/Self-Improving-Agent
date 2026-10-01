@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index a99ce9c4..b09ae475 100644
+index bc462609..f02169fd 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
 @@ -59,7 +59,7 @@ const ENV_GITGH_RE = /^(?:GIT_[A-Za-z0-9_]*|GH_REPO|GH_HOST|GH_CONFIG_DIR|GH_TOK
