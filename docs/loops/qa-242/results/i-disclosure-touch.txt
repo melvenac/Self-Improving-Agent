@@ -1,0 +1,8 @@
+#182 (677c1dd5): named files touched: runtime.ts, schema.ts, artifacts.ts; overlap with pre-1da79279 edits: artifacts.ts, runtime.ts
+#165 (7640b935): named files touched: none; overlap with pre-1da79279 edits: none
+#187 (c9a7acc1): named files touched: runtime.ts, schema.ts, declared.ts, cli.ts; overlap with pre-1da79279 edits: cli.ts, runtime.ts
+#195 (ddd43526): named files touched: cli.ts, policies.ts; overlap with pre-1da79279 edits: cli.ts
+#209 (7fcbfa0e): named files touched: cli.ts, brief-plan-gate.ts, t195-plan-gate.test.ts; overlap with pre-1da79279 edits: brief-plan-gate.ts, cli.ts, t195-plan-gate.test.ts
+#227 (c1296f2b): named files touched: none; overlap with pre-1da79279 edits: none
+#220 (066ed8ca): named files touched: none; overlap with pre-1da79279 edits: none
+#218 (d5dfa745): named files touched: none; overlap with pre-1da79279 edits: none

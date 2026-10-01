@@ -1,0 +1,20 @@
+QA 242 batch A: QA 240's six (the builder's kept copies, byte-identical to QA 240's originals), each on SET =
+s4-g1-records, s4-g2-key, s4-g3-done, s4-g5-qa, s4-g6-closeout, s4-guards, policies, t195-plan-gate (130 tests),
+--testTimeout=120000, in ~/qa-scratch/qa242-cand at 779be4d6. Console output verbatim (the JSON write failed for a
+missing directory after the runs; the tool was then fixed to create it):
+
+qa240-q05-qa-source-inferred-from-loop-id.diff: tsc 0; vitest exit 1; 1 failed of 130; reverted clean true
+    RED: s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R9 a runtime-shaped loop id does not make the record a runtime record: source stays seat (S4-4a.5, r2 item 3)
+qa240-q06-done-source-inferred-from-loop-id.diff: tsc 0; vitest exit 1; 1 failed of 130; reverted clean true
+    RED: s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D9 a runtime-shaped loop id does not make the record a runtime record: source stays seat (S4-4a.5, r2 item 3)
+qa240-q10-retry-of-any-subject.diff: tsc 0; vitest exit 1; 1 failed of 130; reverted clean true
+    RED: s4-g1-records.test.ts :: S4-7a/7b — the counting command C7 a retry_of that names ANOTHER subject's record is refused (r2 item 4)
+qa240-q11-auth-made-retryable.diff: tsc 0; vitest exit 1; 1 failed of 130; reverted clean true
+    RED: s4-g1-records.test.ts :: S4-7a/7b — the counting command C8 a retry after auth is refused: it is not retryable, the item stops (r2 item 4)
+qa240-q12-fetch-failure-filed-unavailable.diff: tsc 0; vitest exit 1; 2 failed of 130; reverted clean true
+    RED: s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D8 a fetch that rejects is `transport`, counts as 1 attempt, and is not `unavailable` (r2 item 6)
+    RED: s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R10 a fetch that rejects is `transport`, counts as 1 attempt, and is not `unavailable` (r2 item 6)
+qa240-q13-literal-planted-in-shadow-qa-runner.diff: tsc 0; vitest exit 1; 3 failed of 130; reverted clean true
+    RED: policies.test.ts :: gate policies A6 half two — the scan covers the prompts and the gate context finds no threshold literal in any scanned region of the shipped source
+    RED: s4-g5-qa.test.ts :: S4-6a — qa-score.json, its schema, and the threshold-scan guard Q5 the threshold scan covers the QA prompts and the decision code, and finds nothing
+    RED: s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner Q8 a literal planted in the QA runner or the done runner is reported by the scan, and both files are scan targets (r2 item 5)

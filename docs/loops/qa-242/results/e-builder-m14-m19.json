@@ -1,0 +1,79 @@
+[
+  {
+    "name": "m14-literal-planted-in-qa-decision.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 126,
+    "failed": [
+      "policies.test.ts :: gate policies A6 half two — the scan covers the prompts and the gate context finds no threshold literal in any scanned region of the shipped source",
+      "policies.test.ts :: gate policies T-156 — no threshold hides in the decision code finds no threshold literal in the decision region of policies.ts",
+      "s4-g5-qa.test.ts :: S4-6a — qa-score.json, its schema, and the threshold-scan guard Q5 the threshold scan covers the QA prompts and the decision code, and finds nothing",
+      "s4-g5-qa.test.ts :: S4-6a — qa-score.json, its schema, and the threshold-scan guard Q7 the A6 property: the same answers give a different decision under a stricter qa-score.json, with no source change"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m15-literal-planted-in-qa-prompt.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 127,
+    "failed": [
+      "policies.test.ts :: gate policies A6 half two — the scan covers the prompts and the gate context finds no threshold literal in any scanned region of the shipped source",
+      "s4-g5-qa.test.ts :: S4-6a — qa-score.json, its schema, and the threshold-scan guard Q5 the threshold scan covers the QA prompts and the decision code, and finds nothing",
+      "s4-g5-qa.test.ts :: S4-6a — qa-score.json, its schema, and the threshold-scan guard Q6 a literal planted in a QA prompt, or in the QA decision code, is reported by the scan"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m16-label-typed-not-computed.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 129,
+    "failed": [
+      "s4-g6-closeout.test.ts :: G6 — the close-out tables T1 the label is computed from the records: N and the seat/runtime split come from `source`"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m17-no-e_t-diff-reported-scored.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 129,
+    "failed": [
+      "s4-g6-closeout.test.ts :: G6 — the close-out tables T4 a diff with no E_t is listed as `not scored: no E_t`, never dropped"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m18-done-record-not-redacted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 129,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m19-qa-record-not-redacted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 129,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  }
+]

@@ -1,0 +1,224 @@
+base-vitest.log:   ✓ harness runtime > A1 — end to end > completes, exits 0, and writes D_t.md, A_t.gitref and E_t.json  1597ms
+base-vitest.log:   ✓ harness runtime > A1 — end to end > fills runtime_checks from exit codes rather than from the role  1392ms
+base-vitest.log:   ✓ harness runtime > A2 — schema retry and the cap > writes FAILED.md, so the failure is an artifact and not just an exit code  463ms
+base-vitest.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > a role past its bound is killed with its tree; the windows still close and restore  6161ms
+base-vitest.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > a single child past its bound records only the kill that ran  3497ms
+base-vitest.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > CONTROL: under a bound it does not exceed, the role completes and its grandchild runs to completion  2182ms
+base-vitest.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > POSIX: a role that exits normally leaves no descendant alive, before the next runtime git call  3101ms
+base-vitest.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > POSIX: a role that exits with an error leaves no descendant alive, before the next runtime git call  3195ms
+base-vitest.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a missing R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1250ms
+base-vitest.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a garbage R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1184ms
+base-vitest.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a invalid R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1204ms
+base-vitest.log:   ✓ BE-0 scope guards > BE-1.2 harness run --loop 15-slice-3 still exits 2  1615ms
+base-vitest.log:   ✓ BE-7 validate evidence > BE-7.1 exits 0 on a valid file and prints every problem on an invalid one  3232ms
+base-vitest.log:   ✓ record-erasure recomputes retention by write order (R179-1) > KNOWN NEGATIVE: QA's A6 through the writer (1124 for 124) removes nothing — and the legacy handoff's exit is explained (R179-3)  482ms
+base-vitest.log:   ✓ BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project > the tracking check fires (known positive): an owner's `.agents/` rule shadows the template's, and scaffold exits 1 naming it  1798ms
+base-vitest.log:   ✓ T-195 brief plan gate > DT-1 validate plan > exits 0 on valid, 1 with every problem on invalid, 2 on usage error  4903ms
+base-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3275ms
+base-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3337ms
+base-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3381ms
+base-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3370ms
+base-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3404ms
+base-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3286ms
+base-vitest.log:A1(a) match set (2 of 11 documents): pipe-to-tail-masks-exit-code, exit-code-from-variable
+base-vitest.log:A1(b) entry 299 ranks 4 of 11 against ten same-topic competitors (top: migration-exit-code). RANK REPORTED, NOT ASSERTED — R26 / amendment 10. bm25 length normalisation is the cause; the live 599-entry store ranks 299 first only because five entries there match all three terms, which is a thin field rather than discrimination.
+base-vitest.log:   ✓ A6 — three failures, and the model hears none of them > a malformed payload is logged and dropped, NOT refused with a non-zero exit  2633ms
+base-vitest.log:   ✓ cli-bootstrap SESSION_UUID contract > F4: a MALFORMED payload refuses, writes nothing, and exits non-zero  1541ms
+base-vitest.log:   ✓ runCheck > carries a non-zero exit code through verbatim rather than normalising it  521ms
+base-vitest.log:   ✓ runDeterministicChecks > is green only when both checks exit 0  548ms
+base-vitest.log:   ✓ runDeterministicChecks > is red when build exits 1 and unit exits 0  533ms
+base-vitest.log:   ✓ runDeterministicChecks > is red when build exits 0 and unit exits 1  581ms
+base-vitest.log:   ✓ runDeterministicChecks > is red when build exits 1 and unit exits 1  544ms
+base-vitest.log:   ✓ the SessionEnd hook runs the guard and NEVER blocks (T179-2) > warns on stdout AND stderr, records the marker, and exits 0  1519ms
+base-vitest.log:   ✓ the SessionEnd hook runs the guard and NEVER blocks (T179-2) > outside a git repository it says NOT RUN and still exits 0  1407ms
+base-vitest.log:   ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > prints usage and exits non-zero with no subcommand  1510ms
+base-vitest.log:   ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > exits 0 for an explicit help request  1544ms
+base-vitest.log:   ✓ harness CLI > A1 — a full loop from the command line > exits 0 and writes the three artifacts  2853ms
+base-vitest.log:   ✓ harness CLI > A1 — a full loop from the command line > exits non-zero when a deterministic check is red, and says so  3073ms
+base-vitest.log:   ✓ QA 135: move-residue a second time on the same day > DEFECT D5: a move-residue that exits non-zero has moved nothing (or it exits 0 and nests nothing)  3091ms
+base-vitest.log:   ✓ T-216 shared loop-id rule > L5 validate plan exits 0 on the slice-four D_t, unedited  1489ms
+base-vitest.log:   ✓ spawnAsync > carries stdout, stderr, the exit status and stdin exactly as spawnSync does  606ms
+base-vitest.log:   ✓ spawnAsync > execAsync returns stdout and THROWS on a non-zero exit, naming the command and its stderr  673ms
+base-vitest.log:⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+base-vitest.log:Error: [vitest-worker]: Timeout calling "onTaskUpdate"
+base-vitest.log: Test Files  137 passed (137)
+base-vitest.log:      Tests  1940 passed | 5 skipped (1945)
+base-vitest.log:     Errors  1 error
+base-vitest.log:   Duration  454.16s (transform 6.26s, setup 5.91s, collect 29.95s, tests 753.07s, environment 98ms, prepare 24.64s)
+base-vitest-2.log:   ✓ BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project > the tracking check fires (known positive): an owner's `.agents/` rule shadows the template's, and scaffold exits 1 naming it  2073ms
+base-vitest-2.log:   ✓ harness runtime > A1 — end to end > completes, exits 0, and writes D_t.md, A_t.gitref and E_t.json  1483ms
+base-vitest-2.log:   ✓ harness runtime > A1 — end to end > fills runtime_checks from exit codes rather than from the role  1368ms
+base-vitest-2.log:   ✓ harness runtime > A2 — schema retry and the cap > writes FAILED.md, so the failure is an artifact and not just an exit code  465ms
+base-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > a role past its bound is killed with its tree; the windows still close and restore  6135ms
+base-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > a single child past its bound records only the kill that ran  3521ms
+base-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > CONTROL: under a bound it does not exceed, the role completes and its grandchild runs to completion  2384ms
+base-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > POSIX: a role that exits normally leaves no descendant alive, before the next runtime git call  3305ms
+base-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > POSIX: a role that exits with an error leaves no descendant alive, before the next runtime git call  3449ms
+base-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a missing R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1234ms
+base-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a garbage R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1286ms
+base-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a invalid R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1251ms
+base-vitest-2.log:   ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > prints usage and exits non-zero with no subcommand  1670ms
+base-vitest-2.log:   ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > exits 0 for an explicit help request  1811ms
+base-vitest-2.log:   ✓ harness CLI > A1 — a full loop from the command line > exits 0 and writes the three artifacts  2892ms
+base-vitest-2.log:   ✓ harness CLI > A1 — a full loop from the command line > exits non-zero when a deterministic check is red, and says so  2761ms
+base-vitest-2.log:   ✓ A6 — three failures, and the model hears none of them > a malformed payload is logged and dropped, NOT refused with a non-zero exit  3297ms
+base-vitest-2.log:   ✓ cli-bootstrap SESSION_UUID contract > F4: a MALFORMED payload refuses, writes nothing, and exits non-zero  1614ms
+base-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3298ms
+base-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3261ms
+base-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3174ms
+base-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3197ms
+base-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3161ms
+base-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3168ms
+base-vitest-2.log:   ✓ QA 135: move-residue a second time on the same day > DEFECT D5: a move-residue that exits non-zero has moved nothing (or it exits 0 and nests nothing)  3877ms
+base-vitest-2.log:   ✓ T-195 brief plan gate > DT-1 validate plan > exits 0 on valid, 1 with every problem on invalid, 2 on usage error  5344ms
+base-vitest-2.log:   ✓ record-erasure recomputes retention by write order (R179-1) > KNOWN NEGATIVE: QA's A6 through the writer (1124 for 124) removes nothing — and the legacy handoff's exit is explained (R179-3)  525ms
+base-vitest-2.log:   ✓ BE-0 scope guards > BE-1.2 harness run --loop 15-slice-3 still exits 2  1530ms
+base-vitest-2.log:   ✓ BE-7 validate evidence > BE-7.1 exits 0 on a valid file and prints every problem on an invalid one  3023ms
+base-vitest-2.log:   ✓ runCheck > fails on a non-zero exit  324ms
+base-vitest-2.log:   ✓ runCheck > carries a non-zero exit code through verbatim rather than normalising it  577ms
+base-vitest-2.log:   ✓ runDeterministicChecks > is green only when both checks exit 0  556ms
+base-vitest-2.log:   ✓ runDeterministicChecks > is red when build exits 1 and unit exits 0  558ms
+base-vitest-2.log:   ✓ runDeterministicChecks > is red when build exits 0 and unit exits 1  529ms
+base-vitest-2.log:   ✓ runDeterministicChecks > is red when build exits 1 and unit exits 1  538ms
+base-vitest-2.log:   ✓ the SessionEnd hook runs the guard and NEVER blocks (T179-2) > warns on stdout AND stderr, records the marker, and exits 0  1443ms
+base-vitest-2.log:   ✓ the SessionEnd hook runs the guard and NEVER blocks (T179-2) > outside a git repository it says NOT RUN and still exits 0  1302ms
+base-vitest-2.log:   ✓ T-216 shared loop-id rule > L5 validate plan exits 0 on the slice-four D_t, unedited  1447ms
+base-vitest-2.log:   ✓ spawnAsync > carries stdout, stderr, the exit status and stdin exactly as spawnSync does  529ms
+base-vitest-2.log:   ✓ spawnAsync > execAsync returns stdout and THROWS on a non-zero exit, naming the command and its stderr  564ms
+base-vitest-2.log:A1(a) match set (2 of 11 documents): pipe-to-tail-masks-exit-code, exit-code-from-variable
+base-vitest-2.log:A1(b) entry 299 ranks 4 of 11 against ten same-topic competitors (top: migration-exit-code). RANK REPORTED, NOT ASSERTED — R26 / amendment 10. bm25 length normalisation is the cause; the live 599-entry store ranks 299 first only because five entries there match all three terms, which is a thin field rather than discrimination.
+base-vitest-2.log:⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+base-vitest-2.log:Error: [vitest-worker]: Timeout calling "onTaskUpdate"
+base-vitest-2.log: Test Files  137 passed (137)
+base-vitest-2.log:      Tests  1940 passed | 5 skipped (1945)
+base-vitest-2.log:     Errors  1 error
+base-vitest-2.log:   Duration  441.69s (transform 5.90s, setup 5.90s, collect 29.33s, tests 732.30s, environment 92ms, prepare 23.82s)
+cand-vitest.log:   ✓ harness runtime > A1 — end to end > completes, exits 0, and writes D_t.md, A_t.gitref and E_t.json  1592ms
+cand-vitest.log:   ✓ harness runtime > A1 — end to end > fills runtime_checks from exit codes rather than from the role  1377ms
+cand-vitest.log:   ✓ harness runtime > A2 — schema retry and the cap > writes FAILED.md, so the failure is an artifact and not just an exit code  536ms
+cand-vitest.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > a role past its bound is killed with its tree; the windows still close and restore  6166ms
+cand-vitest.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > a single child past its bound records only the kill that ran  3509ms
+cand-vitest.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > CONTROL: under a bound it does not exceed, the role completes and its grandchild runs to completion  2376ms
+cand-vitest.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > POSIX: a role that exits normally leaves no descendant alive, before the next runtime git call  3297ms
+cand-vitest.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > POSIX: a role that exits with an error leaves no descendant alive, before the next runtime git call  3369ms
+cand-vitest.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a missing R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1226ms
+cand-vitest.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a garbage R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1229ms
+cand-vitest.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a invalid R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1152ms
+cand-vitest.log:   ✓ BE-0 scope guards > BE-1.2 harness run --loop 15-slice-3 still exits 2  1752ms
+cand-vitest.log:   ✓ BE-7 validate evidence > BE-7.1 exits 0 on a valid file and prints every problem on an invalid one  3567ms
+cand-vitest.log:   ✓ record-erasure recomputes retention by write order (R179-1) > KNOWN NEGATIVE: QA's A6 through the writer (1124 for 124) removes nothing — and the legacy handoff's exit is explained (R179-3)  581ms
+cand-vitest.log:   ✓ S4-6b/6c/6d — the runner > R7 the flip test: proceed and reject give exit code 0 both times, only new files appear, no tracked file moves, the E_t blob is unchanged  303ms
+cand-vitest.log:   ✓ BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project > the tracking check fires (known positive): an owner's `.agents/` rule shadows the template's, and scaffold exits 1 naming it  1860ms
+cand-vitest.log:   ✓ T-195 brief plan gate > DT-1 validate plan > exits 0 on valid, 1 with every problem on invalid, 2 on usage error  5494ms
+cand-vitest.log:   × S4-4a — provenance is required, by the writer and by the validator > P4 `harness validate gate-record` exits 0 on a good record and non-zero on a hand-written bad one 5558ms
+cand-vitest.log:     → Test timed out in 5000ms.
+cand-vitest.log:   ✓ S4-7a/7b — the counting command > C6 `harness count-attempts` exits 0 on the legal chain and 1 on a re-roll  4001ms
+cand-vitest.log:   ✓ G3 — the 4.3 shadow done-gate runner > D3 checks_source none means checksPassed false, and the exit codes come from a recorded source, never from Jev  370ms
+cand-vitest.log:   ✓ G3 — the 4.3 shadow done-gate runner > D5 the flip test: proceed and reject give the same exit code (0), the same files, and only a new record  426ms
+cand-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3914ms
+cand-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3711ms
+cand-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3630ms
+cand-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3481ms
+cand-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3518ms
+cand-vitest.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3371ms
+cand-vitest.log:A1(a) match set (2 of 11 documents): pipe-to-tail-masks-exit-code, exit-code-from-variable
+cand-vitest.log:A1(b) entry 299 ranks 4 of 11 against ten same-topic competitors (top: migration-exit-code). RANK REPORTED, NOT ASSERTED — R26 / amendment 10. bm25 length normalisation is the cause; the live 599-entry store ranks 299 first only because five entries there match all three terms, which is a thin field rather than discrimination.
+cand-vitest.log:   ✓ A6 — three failures, and the model hears none of them > a malformed payload is logged and dropped, NOT refused with a non-zero exit  3338ms
+cand-vitest.log:   ✓ cli-bootstrap SESSION_UUID contract > F4: a MALFORMED payload refuses, writes nothing, and exits non-zero  1705ms
+cand-vitest.log:   ✓ runCheck > carries a non-zero exit code through verbatim rather than normalising it  549ms
+cand-vitest.log:   ✓ runDeterministicChecks > is green only when both checks exit 0  599ms
+cand-vitest.log:   ✓ runDeterministicChecks > is red when build exits 1 and unit exits 0  596ms
+cand-vitest.log:   ✓ runDeterministicChecks > is red when build exits 0 and unit exits 1  566ms
+cand-vitest.log:   ✓ runDeterministicChecks > is red when build exits 1 and unit exits 1  556ms
+cand-vitest.log:   ✓ the SessionEnd hook runs the guard and NEVER blocks (T179-2) > warns on stdout AND stderr, records the marker, and exits 0  1544ms
+cand-vitest.log:   ✓ the SessionEnd hook runs the guard and NEVER blocks (T179-2) > outside a git repository it says NOT RUN and still exits 0  1332ms
+cand-vitest.log:   ✓ the eight reconstructed D_t files (S4-4b) > R6 `harness validate plan` exits 0 on all eight  12336ms
+cand-vitest.log:   ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > prints usage and exits non-zero with no subcommand  1673ms
+cand-vitest.log:   ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > exits 0 for an explicit help request  1700ms
+cand-vitest.log:   ✓ harness CLI > A1 — a full loop from the command line > exits 0 and writes the three artifacts  3162ms
+cand-vitest.log:   ✓ harness CLI > A1 — a full loop from the command line > exits non-zero when a deterministic check is red, and says so  3302ms
+cand-vitest.log:   ✓ QA 135: move-residue a second time on the same day > DEFECT D5: a move-residue that exits non-zero has moved nothing (or it exits 0 and nests nothing)  3414ms
+cand-vitest.log:   ✓ T-216 shared loop-id rule > L5 validate plan exits 0 on the slice-four D_t, unedited  1771ms
+cand-vitest.log:   ✓ spawnAsync > carries stdout, stderr, the exit status and stdin exactly as spawnSync does  558ms
+cand-vitest.log:   ✓ spawnAsync > execAsync returns stdout and THROWS on a non-zero exit, naming the command and its stderr  549ms
+cand-vitest.log:⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+cand-vitest.log: FAIL  tests/harness/s4-g1-records.test.ts > S4-4a — provenance is required, by the writer and by the validator > P4 `harness validate gate-record` exits 0 on a good record and non-zero on a hand-written bad one
+cand-vitest.log:Error: Test timed out in 5000ms.
+cand-vitest.log:    143|   it("P4 `harness validate gate-record` exits 0 on a good record and n…
+cand-vitest.log:⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+cand-vitest.log:Error: [vitest-worker]: Timeout calling "onTaskUpdate"
+cand-vitest.log: Test Files  1 failed | 143 passed (144)
+cand-vitest.log:      Tests  1 failed | 2072 passed | 5 skipped (2078)
+cand-vitest.log:     Errors  1 error
+cand-vitest.log:   Duration  502.37s (transform 7.59s, setup 6.52s, collect 35.46s, tests 831.03s, environment 172ms, prepare 27.49s)
+cand-vitest-2.log:   ✓ BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git project > the tracking check fires (known positive): an owner's `.agents/` rule shadows the template's, and scaffold exits 1 naming it  1853ms
+cand-vitest-2.log:   ✓ harness runtime > A1 — end to end > completes, exits 0, and writes D_t.md, A_t.gitref and E_t.json  1320ms
+cand-vitest-2.log:   ✓ harness runtime > A1 — end to end > fills runtime_checks from exit codes rather than from the role  1322ms
+cand-vitest-2.log:   ✓ harness runtime > A2 — schema retry and the cap > writes FAILED.md, so the failure is an artifact and not just an exit code  509ms
+cand-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > a role past its bound is killed with its tree; the windows still close and restore  6109ms
+cand-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > a single child past its bound records only the kill that ran  3561ms
+cand-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > CONTROL: under a bound it does not exceed, the role completes and its grandchild runs to completion  2485ms
+cand-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > POSIX: a role that exits normally leaves no descendant alive, before the next runtime git call  3181ms
+cand-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-6 — role-timeout, and the tree kill on every exit path > POSIX: a role that exits with an error leaves no descendant alive, before the next runtime git call  3186ms
+cand-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a missing R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1384ms
+cand-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a garbage R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1661ms
+cand-vitest-2.log:   ✓ candidate A — a role that is a real process > CA-7 — R_t is validated, compared, and never trusted > a invalid R_t goes through the capped retry and ends in FAILED.md with a non-zero exit  1350ms
+cand-vitest-2.log:   ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > prints usage and exits non-zero with no subcommand  1929ms
+cand-vitest-2.log:   ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > exits 0 for an explicit help request  1752ms
+cand-vitest-2.log:   ✓ harness CLI > A1 — a full loop from the command line > exits 0 and writes the three artifacts  2876ms
+cand-vitest-2.log:   ✓ harness CLI > A1 — a full loop from the command line > exits non-zero when a deterministic check is red, and says so  2753ms
+cand-vitest-2.log:   ✓ A6 — three failures, and the model hears none of them > a malformed payload is logged and dropped, NOT refused with a non-zero exit  2668ms
+cand-vitest-2.log:   ✓ cli-bootstrap SESSION_UUID contract > F4: a MALFORMED payload refuses, writes nothing, and exits non-zero  1537ms
+cand-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > Windows-1252 then PS 5.1 >> (cp-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3081ms
+cand-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 then PS 5.1 >> (u8-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3292ms
+cand-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with a BOM then PS 5.1 >> (u8bom-redirappend.md): could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3550ms
+cand-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-8 with one stray NUL at the end: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3403ms
+cand-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16LE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3276ms
+cand-vitest-2.log:   ✓ R4-1 (IF-21): an input the importer cannot read blocks a bare --commit like STALE, unless --accept-stale > UTF-16BE with no BOM: could not tell; bare --commit exits 1 with the tree identical, and names the NUL bytes; --accept-stale completes  3171ms
+cand-vitest-2.log:   ✓ QA 135: move-residue a second time on the same day > DEFECT D5: a move-residue that exits non-zero has moved nothing (or it exits 0 and nests nothing)  3148ms
+cand-vitest-2.log:   ✓ T-195 brief plan gate > DT-1 validate plan > exits 0 on valid, 1 with every problem on invalid, 2 on usage error  5606ms
+cand-vitest-2.log:   ✓ record-erasure recomputes retention by write order (R179-1) > KNOWN NEGATIVE: QA's A6 through the writer (1124 for 124) removes nothing — and the legacy handoff's exit is explained (R179-3)  418ms
+cand-vitest-2.log:   ✓ the eight reconstructed D_t files (S4-4b) > R6 `harness validate plan` exits 0 on all eight  12377ms
+cand-vitest-2.log:   ✓ BE-0 scope guards > BE-1.2 harness run --loop 15-slice-3 still exits 2  1731ms
+cand-vitest-2.log:   ✓ BE-7 validate evidence > BE-7.1 exits 0 on a valid file and prints every problem on an invalid one  3179ms
+cand-vitest-2.log:   × S4-4a — provenance is required, by the writer and by the validator > P4 `harness validate gate-record` exits 0 on a good record and non-zero on a hand-written bad one 5364ms
+cand-vitest-2.log:     → Test timed out in 5000ms.
+cand-vitest-2.log:   ✓ S4-7a/7b — the counting command > C6 `harness count-attempts` exits 0 on the legal chain and 1 on a re-roll  3316ms
+cand-vitest-2.log:   ✓ G3 — the 4.3 shadow done-gate runner > D3 checks_source none means checksPassed false, and the exit codes come from a recorded source, never from Jev  359ms
+cand-vitest-2.log:   ✓ G3 — the 4.3 shadow done-gate runner > D5 the flip test: proceed and reject give the same exit code (0), the same files, and only a new record  437ms
+cand-vitest-2.log:   ✓ runCheck > passes on exit 0  309ms
+cand-vitest-2.log:   ✓ runCheck > fails on exit 1 even when stdout says every test passed  307ms
+cand-vitest-2.log:   ✓ runCheck > carries a non-zero exit code through verbatim rather than normalising it  591ms
+cand-vitest-2.log:   ✓ runDeterministicChecks > is green only when both checks exit 0  646ms
+cand-vitest-2.log:   ✓ runDeterministicChecks > is red when build exits 1 and unit exits 0  501ms
+cand-vitest-2.log:   ✓ runDeterministicChecks > is red when build exits 0 and unit exits 1  541ms
+cand-vitest-2.log:   ✓ runDeterministicChecks > is red when build exits 1 and unit exits 1  508ms
+cand-vitest-2.log:   ✓ the SessionEnd hook runs the guard and NEVER blocks (T179-2) > warns on stdout AND stderr, records the marker, and exits 0  1394ms
+cand-vitest-2.log:   ✓ the SessionEnd hook runs the guard and NEVER blocks (T179-2) > outside a git repository it says NOT RUN and still exits 0  1346ms
+cand-vitest-2.log:   ✓ T-216 shared loop-id rule > L5 validate plan exits 0 on the slice-four D_t, unedited  1603ms
+cand-vitest-2.log:   ✓ spawnAsync > carries stdout, stderr, the exit status and stdin exactly as spawnSync does  607ms
+cand-vitest-2.log:   ✓ spawnAsync > execAsync returns stdout and THROWS on a non-zero exit, naming the command and its stderr  567ms
+cand-vitest-2.log:A1(a) match set (2 of 11 documents): pipe-to-tail-masks-exit-code, exit-code-from-variable
+cand-vitest-2.log:A1(b) entry 299 ranks 4 of 11 against ten same-topic competitors (top: migration-exit-code). RANK REPORTED, NOT ASSERTED — R26 / amendment 10. bm25 length normalisation is the cause; the live 599-entry store ranks 299 first only because five entries there match all three terms, which is a thin field rather than discrimination.
+cand-vitest-2.log:⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+cand-vitest-2.log: FAIL  tests/harness/s4-g1-records.test.ts > S4-4a — provenance is required, by the writer and by the validator > P4 `harness validate gate-record` exits 0 on a good record and non-zero on a hand-written bad one
+cand-vitest-2.log:Error: Test timed out in 5000ms.
+cand-vitest-2.log:    143|   it("P4 `harness validate gate-record` exits 0 on a good record and n…
+cand-vitest-2.log:⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+cand-vitest-2.log:Error: [vitest-worker]: Timeout calling "onTaskUpdate"
+cand-vitest-2.log: Test Files  1 failed | 143 passed (144)
+cand-vitest-2.log:      Tests  1 failed | 2072 passed | 5 skipped (2078)
+cand-vitest-2.log:     Errors  1 error
+cand-vitest-2.log:   Duration  471.06s (transform 6.53s, setup 7.17s, collect 31.91s, tests 776.99s, environment 119ms, prepare 26.76s)
+cand-set-control.log:   ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > prints usage and exits non-zero with no subcommand  1592ms
+cand-set-control.log:   ✓ harness CLI > argument handling refuses rather than defaulting — T-150 > exits 0 for an explicit help request  1609ms
+cand-set-control.log:   ✓ harness CLI > A1 — a full loop from the command line > exits 0 and writes the three artifacts  3134ms
+cand-set-control.log:   ✓ harness CLI > A1 — a full loop from the command line > exits non-zero when a deterministic check is red, and says so  3152ms
+cand-set-control.log:   ✓ T-195 brief plan gate > DT-1 validate plan > exits 0 on valid, 1 with every problem on invalid, 2 on usage error  4910ms
+cand-set-control.log:   ✓ G3 — the 4.3 shadow done-gate runner > D3 checks_source none means checksPassed false, and the exit codes come from a recorded source, never from Jev  354ms
+cand-set-control.log:   ✓ G3 — the 4.3 shadow done-gate runner > D5 the flip test: proceed and reject give the same exit code (0), the same files, and only a new record  397ms
+cand-set-control.log:   ✓ S4-4a — provenance is required, by the writer and by the validator > P4 `harness validate gate-record` exits 0 on a good record and non-zero on a hand-written bad one  4637ms
+cand-set-control.log:   ✓ S4-7a/7b — the counting command > C6 `harness count-attempts` exits 0 on the legal chain and 1 on a re-roll  2939ms
+cand-set-control.log: Test Files  10 passed (10)
+cand-set-control.log:      Tests  190 passed (190)
+cand-set-control.log:   Duration  73.91s (transform 1.45s, setup 520ms, collect 3.51s, tests 134.48s, environment 6ms, prepare 1.91s)

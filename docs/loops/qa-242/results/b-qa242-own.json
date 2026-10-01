@@ -1,0 +1,85 @@
+[
+  {
+    "name": "r01-done-gate-wired-in-cli-call.diff",
+    "files": "tests/harness/s4-guards.test.ts,tests/harness/shadow-merge.test.ts,tests/harness/cli.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g3-done.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 107,
+    "passed": 106,
+    "failed": [
+      "s4-guards.test.ts :: slice four guards S4-6d.3 neither shadow runner imports the shadow merge verdict, and the CLI's prepare passes no G_done or G_qa as a gate"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "r02-done-gate-wired-by-spread.diff",
+    "files": "tests/harness/s4-guards.test.ts,tests/harness/shadow-merge.test.ts,tests/harness/cli.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g3-done.test.ts",
+    "tsc_exit": 0,
+    "exit": 0,
+    "total": 107,
+    "passed": 107,
+    "failed": [],
+    "reverted_clean": true
+  },
+  {
+    "name": "r03-done-gate-wired-inside-prepare.diff",
+    "files": "tests/harness/s4-guards.test.ts,tests/harness/shadow-merge.test.ts,tests/harness/cli.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g3-done.test.ts",
+    "tsc_exit": 0,
+    "exit": 0,
+    "total": 107,
+    "passed": 107,
+    "failed": [],
+    "reverted_clean": true
+  },
+  {
+    "name": "r04-request-invalid-made-retryable.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 128,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C3 a non-first record with no retry_of fails, and so does a retry of a non-retryable outcome",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C8 a retry after request-invalid is refused: it is not retryable, the item stops (r2 item 4)"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "r05-unexpected-status-made-retryable.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 129,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C8 a retry after unexpected-status is refused: it is not retryable, the item stops (r2 item 4)"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "r06-malformed-response-made-retryable.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 129,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C8 a retry after malformed-response is refused: it is not retryable, the item stops (r2 item 4)"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "r07-literal-planted-in-shadow-gates-runner.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 127,
+    "failed": [
+      "policies.test.ts :: gate policies A6 half two — the scan covers the prompts and the gate context finds no threshold literal in any scanned region of the shipped source",
+      "s4-g5-qa.test.ts :: S4-6a — qa-score.json, its schema, and the threshold-scan guard Q5 the threshold scan covers the QA prompts and the decision code, and finds nothing",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner Q8 a literal planted in the QA runner or the done runner is reported by the scan, and both files are scan targets (r2 item 5)"
+    ],
+    "reverted_clean": true
+  }
+]

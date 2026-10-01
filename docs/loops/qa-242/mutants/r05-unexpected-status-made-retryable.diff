@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/gate-records.ts b/open-brain/src/harness/gate-records.ts
+index 8e598a4a..bbaee2ae 100644
+--- a/open-brain/src/harness/gate-records.ts
++++ b/open-brain/src/harness/gate-records.ts
+@@ -40,7 +40,7 @@ export const OUTCOME_CLASSES = [
+ export type OutcomeClass = (typeof OUTCOME_CLASSES)[number];
+ 
+ /** Only these three may be retried (S4-7b.2). The others are defects, and the item stops. */
+-export const RETRYABLE_OUTCOMES: readonly OutcomeClass[] = ["transport", "rate-limited", "overloaded"];
++export const RETRYABLE_OUTCOMES: readonly OutcomeClass[] = ["transport", "rate-limited", "overloaded", "unexpected-status"];
+ 
+ /** The one tracked directory slice four's records and its attempt ledger live in (ruling 3). */
+ export const SLICE_RECORDS_DIR = "docs/loops/loop-15-slice-4-records";

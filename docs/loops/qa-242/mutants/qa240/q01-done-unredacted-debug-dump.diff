@@ -1,0 +1,20 @@
+diff --git a/open-brain/src/harness/shadow-gates.ts b/open-brain/src/harness/shadow-gates.ts
+index 4714dfcd..155f6064 100644
+--- a/open-brain/src/harness/shadow-gates.ts
++++ b/open-brain/src/harness/shadow-gates.ts
+@@ -24,7 +24,7 @@
+  */
+ 
+ import { createHash, randomUUID } from "node:crypto";
+-import { existsSync, readFileSync } from "node:fs";
++import { existsSync, readFileSync, writeFileSync } from "node:fs";
+ import { join, relative, resolve } from "node:path";
+ import {
+   DONE_GATE_QUESTIONS,
+@@ -316,5 +316,6 @@ export async function runShadowDoneGate(options: RunShadowDoneOptions): Promise<
+ 
+   const safe = redact(record, env);
+   writeSliceRecord(recordPath, safe);
++  writeFileSync(`${recordPath}.debug.txt`, JSON.stringify(record));
+   return { recordPath, record: safe, decision, exitCode: result.error !== null ? 1 : 0 };
+ }

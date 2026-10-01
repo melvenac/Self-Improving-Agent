@@ -1,0 +1,51 @@
+{
+  "candidate": "779be4d657b0c84ebc7e5ea57044f1e9548f3607",
+  "back_at": "779be4d657b0c84ebc7e5ea57044f1e9548f3607",
+  "clean": true,
+  "results": [
+    {
+      "step": "plant it.skip( in a committed file",
+      "planted": [
+        "it.skip(\"qa242 planted\", () => {});"
+      ],
+      "scratch_commit": "136ed863259556fe5a45463502ef27ff792cbb79",
+      "vitest_exit": 1,
+      "s4_9_2": "failed",
+      "message": "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /home/agents/qa-scratch/qa242-cand/open-brain/tests/harness/s4-guards.test.ts:107:59\n    at file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)\n    at runTest (file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at runSuite (file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)\n    at runSuite (file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)"
+    },
+    {
+      "step": "a title that merely names skipIf / runIf / todo (not a call)",
+      "planted": [
+        "it(\"qa242 names skipIf, runIf, todo and skip in a title\", () => {});"
+      ],
+      "scratch_commit": "626e1fa79c9ed38f5996ce1db80ffd366228cdff",
+      "vitest_exit": 0,
+      "s4_9_2": "passed",
+      "message": ""
+    },
+    {
+      "step": "three call positions the builder did not list",
+      "planted": [
+        "test.only.skip(\"qa242 a\", () => {});",
+        "describe.skipIf(true)(\"qa242 b\", () => {});",
+        "it.concurrent.skip(\"qa242 c\", () => {});"
+      ],
+      "scratch_commit": "f5ee36961b7e9e90cbb9103d2fcb0e6fd5a7f665",
+      "vitest_exit": 1,
+      "s4_9_2": "failed",
+      "message": "AssertionError: expected [ …(3) ] to deeply equal []\n    at /home/agents/qa-scratch/qa242-cand/open-brain/tests/harness/s4-guards.test.ts:107:59\n    at file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)\n    at runTest (file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at runSuite (file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)\n    at runSuite (file:///home/agents/qa-scratch/qa242-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)"
+    },
+    {
+      "step": "three that the pattern misses (nested parens in each, bracket access, suite alias)",
+      "planted": [
+        "it.each([f(1)]).skip(\"qa242 d\", () => {});",
+        "it[\"skip\"](\"qa242 e\", () => {});",
+        "suite.skip(\"qa242 f\", () => {});"
+      ],
+      "scratch_commit": "768aee9271ea87887d31216624066e8d0a5117e7",
+      "vitest_exit": 0,
+      "s4_9_2": "passed",
+      "message": ""
+    }
+  ]
+}

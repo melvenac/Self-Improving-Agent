@@ -1,0 +1,16 @@
+diff --git a/open-brain/src/harness/cli.ts b/open-brain/src/harness/cli.ts
+index 5cda4ce4..2617ded0 100644
+--- a/open-brain/src/harness/cli.ts
++++ b/open-brain/src/harness/cli.ts
+@@ -307,9 +307,11 @@ function cmdShadow(argv: readonly string[]): number {
+     } catch (err) {
+       evidence = { error: `unreadable evidence: ${(err as Error).message}` };
+     }
++    const doneRecord = flags.get("done-record");
+     const result = prepareShadowVerdict({
+       repo,
+       loop,
++      doneGate: typeof doneRecord === "string" ? (JSON.parse(readFileSync(doneRecord, "utf8")) as { verdict: string }) : null,
+       candidateSha: candidate,
+       criteriaSha: requireCliSha("criteria-sha", requiredFlag(flags, "criteria-sha")),
+       criteriaPath: requiredFlag(flags, "criteria"),

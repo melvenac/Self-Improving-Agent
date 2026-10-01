@@ -1,0 +1,28 @@
+pattern: \b(it|test|describe)(\.\w+(\([^)]*\))?)*\.(skip|todo|skipIf|runIf)\b
+
+call position (a HIT is wanted):
+  HIT   test.only.skip("x", () => {})
+  HIT   describe.skipIf(x)("x", () => {})
+  HIT   it.concurrent.skip("x", () => {})
+  HIT   it.skipIf(process.env.CI)("x", fn)
+  HIT   describe.runIf(a)("x", fn)
+  HIT   test.todo("x")
+  HIT   it.each([[1, 2]]).skip("x", fn)
+  miss  it.each([{ a: f(1) }]).skip("x", fn)
+  miss  it.each([f(g(1))]).skip("x", fn)
+  miss  it.each`a`.skip("x", fn)
+  HIT   test.for([1]).skip("x", fn)
+  HIT   test.extend({}).skip("x", fn)
+  miss  it .skip("x", fn)
+  miss  it["skip"]("x", fn)
+  miss  suite.skip("x", fn)
+  miss  bench.skip("x", fn)
+  miss  xit("x", fn)
+  miss  it("x", (ctx) => { ctx.skip(); })
+  miss  it("x", ({ skip }) => { skip(); })
+  HIT   const s = it.skip; s("x", fn)
+not a call (a miss is wanted):
+  miss  it("S4-9.2 no skip, todo, skipIf or runIf is added, and no test file loses a test", () => {
+  miss  it("uses skipIf and runIf in its title", fn)
+  HIT   test("describe.skip is mentioned in a string", fn)
+  miss  it('x', () => {})

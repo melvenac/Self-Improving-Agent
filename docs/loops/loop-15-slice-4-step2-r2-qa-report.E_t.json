@@ -1,0 +1,97 @@
+{
+  "loop": "242-qa-s4-step2-r2",
+  "candidate_git": {
+    "sha": "779be4d657b0c84ebc7e5ea57044f1e9548f3607",
+    "branch": "origin/loop/15-slice-4-step2",
+    "frozen_at": "2026-10-01T00:00:00Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci && npm run build && tsc --noEmit in open-brain at 779be4d6 and at base 2448a6ea (Plumb, local, constructed env)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 32300,
+      "detail": "Candidate: npm ci 0 (7.5 s), npm run build 0 (14.0 s), tsc --noEmit 0 (10.8 s). Base: 0, 0, 0. No CI: gh is not installed on Plumb."
+    },
+    "unit": {
+      "command": "npx vitest run in open-brain (full suite), candidate 779be4d6 and base 2448a6ea, twice each",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 502370,
+      "detail": "Base (2 runs): exit 1; Test Files 137 passed (137); Tests 1940 passed | 5 skipped (1945); Errors 1: unhandled '[vitest-worker]: Timeout calling \"onTaskUpdate\"'. Candidate (2 runs): exit 1; Test Files 1 failed | 143 passed (144); Tests 1 failed | 2072 passed | 5 skipped (2078); Errors 1: the same RPC timeout. The added failure, in both runs: s4-g1-records.test.ts P4 'harness validate gate-record ...' timed out in 5000 ms (3 tsx spawns, no per-test timeout; 4489 ms isolated on an idle machine). hook.test.ts 12/12 at both (npm fix effective). s4-guards 11/11 and s4-g4-reconstruct 45/45 in both candidate runs."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "R2-1",
+      "status": "met",
+      "order": "shown",
+      "evidence": "D1: SKIPS is call-position only (08dab8f3). Scratch commits in a committed test file of the real tree: it.skip( -> S4-9.2 red (136ed863, 1 hit); a title naming skipIf/runIf/todo/skip -> green (626e1fa7); test.only.skip(, describe.skipIf(true)(, it.concurrent.skip( -> red, 3 hits (f5ee3696). Residual misses: nested parens in modifier arguments (it.each([f(1)]).skip), tagged-template each, 'it .skip', it[\"skip\"], suite.skip, in-body ctx.skip(); one false positive on a title containing 'describe.skip'. D1 and D1b green."
+    },
+    {
+      "id": "R2-2",
+      "status": "met",
+      "order": "shown",
+      "evidence": "R6 has 120_000 (s4-g4-reconstruct.test.ts:149). s4-g4 45/45 in both full candidate runs (12.5 s for the file)."
+    },
+    {
+      "id": "R2-3",
+      "status": "met",
+      "order": "shown",
+      "evidence": "q05 red on s4-g5 R9; q06 red on s4-g3 D9 (t195 loop asserts source seat in the result and on disk)."
+    },
+    {
+      "id": "R2-4",
+      "status": "met",
+      "order": "shown",
+      "evidence": "q10 red on C7; q11 red on C8(auth). QA 242 r04/r05/r06 (request-invalid, unexpected-status, malformed-response made retryable) each red on its own C8 case (r04 also C3). C9 confirms the retryable three still pass."
+    },
+    {
+      "id": "R2-5",
+      "status": "met",
+      "order": "shown",
+      "evidence": "shadow-gates.ts and shadow-qa.ts in THRESHOLD_SCAN_TARGETS; policies.test.ts list updated. q13 red on Q8, Q5 and policies A6 half two; QA 242 r07 (0.4 planted in shadow-gates.ts) red on the same three."
+    },
+    {
+      "id": "R2-6",
+      "status": "met",
+      "order": "shown",
+      "evidence": "q12 red on s4-g3 D8 and s4-g5 R10 with gate-live not in the run set: transport, fetch reached once, countAttempts total 1."
+    },
+    {
+      "id": "R2-7",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Re-derived (tools/qa242-touch.mjs): #182 runtime.ts, schema.ts, artifacts.ts, not gate.ts; #209 brief-plan-gate.ts, cli.ts, t195-plan-gate.test.ts; #195 policies.ts, cli.ts; the handoff matches. Residual: the handoff's #187 entry omits runtime.ts (touched by #187 and edited by the builder before 1da79279; disclosed under #182). #165, #227, #220, #218 overlap nothing: four/four stands."
+    },
+    {
+      "id": "S4-9",
+      "status": "unmet",
+      "evidence": "Clause 3 strict: base exits 1 on Plumb (unattributed vitest RPC timeout, all 1940 tests pass), so D-082 applies; the candidate adds a failure over the base: s4-g1-records P4 timed out at 5000 ms in 2 of 2 full runs. Clauses 1, 2, 4, 5 as QA 240; the S4-9.2 guard is now green."
+    },
+    {
+      "id": "REGRESSION",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Builder m01-m19: 19/19 red on SET (s4-g1, g2, g3, g5, g6, s4-guards, policies, t195-plan-gate; 130 tests), each on QA 240's recorded tests or a superset. QA 240 q01-q09: 9/9 red, including the two-layer K1(422) cases. Unmutated control 190/190. tsc 0 and a clean revert for every mutant."
+    },
+    {
+      "id": "S4-6d.3-TEST",
+      "status": "partial",
+      "evidence": "Optional test is static. r01 (doneGate inside the CLI call) red; r02 (passed by spread) and r03 (wired inside prepareShadowVerdict from the slice's G_done file) survive 107/107. A behavioural test (reject G_done present, prepare's verdict unchanged) would catch r03."
+    }
+  ],
+  "regressions": [
+    "s4-g1-records.test.ts P4 times out (5000 ms default) in the full suite on Plumb, 2 of 2 runs; added at r1, not touched at r2; passed in QA 240's run."
+  ],
+  "gaps": [
+    "S4-9.3: give P4 (and every slice-four tsx-spawning test) an explicit timeout; rerun on Plumb.",
+    "Base on Plumb exits 1 on an unattributed vitest RPC 'onTaskUpdate' timeout (2/2 runs), so 'exit 0' cannot be met on Plumb by any candidate yet.",
+    "S4-6d.3 test guards the CLI call text only (r02, r03 survive).",
+    "D1 pattern residual misses: nested parens in modifier args, suite alias, bracket access, in-body ctx.skip().",
+    "Disclosure: runtime.ts not listed under #187.",
+    "No CI runs: gh is not installed on Plumb."
+  ],
+  "notes": "QA 242, headless Claude Code Opus 5.5 on Plumb. Dispatch 321f3424 (launch line). Worktree qa242-wt at 321f3424a45536d927a1d7b7740e651ca51eb46f. Every command ran with a constructed env (no TYPESAFE_API_KEY); no live Jev call."
+}

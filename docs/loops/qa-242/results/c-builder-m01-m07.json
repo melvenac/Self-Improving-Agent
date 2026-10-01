@@ -1,0 +1,109 @@
+[
+  {
+    "name": "m01-source-optional.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 126,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P2 the writer refuses each field missing and each field out of set, and creates no file",
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P4 `harness validate gate-record` exits 0 on a good record and non-zero on a hand-written bad one",
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P6 the derived JSON Schema file matches what zod derives",
+      "s4-g6-closeout.test.ts :: G6 — the close-out tables T5 a record that is not live, not answered, or refused by the schema is not counted"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m02-provenance-defaulted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 127,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P2 the writer refuses each field missing and each field out of set, and creates no file",
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P4 `harness validate gate-record` exits 0 on a good record and non-zero on a hand-written bad one",
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P6 the derived JSON Schema file matches what zod derives"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m03-no-write-ahead.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 113,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-7a — the attempt is on disk before the request leaves W1 a request that never resolves still leaves its attempt, marked incomplete",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C1 a legal retry chain passes: transport, then rate-limited, then answered",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C2 a re-roll fails: a second answered record for the same subject",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C3 a non-first record with no retry_of fails, and so does a retry of a non-retryable outcome",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C4 more than 3 retries fails, and so does a 21st attempt",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C5 a refusal before any request (no key) is not a call, and a live record outside the ledger still counts",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C7 a retry_of that names ANOTHER subject's record is refused (r2 item 4)",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C8 a retry after auth is refused: it is not retryable, the item stops (r2 item 4)",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C8 a retry after request-invalid is refused: it is not retryable, the item stops (r2 item 4)",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C8 a retry after unexpected-status is refused: it is not retryable, the item stops (r2 item 4)",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C8 a retry after malformed-response is refused: it is not retryable, the item stops (r2 item 4)",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C9 each retryable outcome (transport, rate-limited, overloaded) IS allowed to be retried, so C8 is not refusing everything",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C6 `harness count-attempts` exits 0 on the legal chain and 1 on a re-roll",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D6 a transport failure is a retryable record; the retry links to it; a re-roll after an answer is caught",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D8 a fetch that rejects is `transport`, counts as 1 attempt, and is not `unavailable` (r2 item 6)",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D7 an unreachable gate (no key) is recorded as `unavailable`, which is not a call",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R10 a fetch that rejects is `transport`, counts as 1 attempt, and is not `unavailable` (r2 item 6)"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m04-reroll-not-flagged.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 128,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C2 a re-roll fails: a second answered record for the same subject",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D6 a transport failure is a retryable record; the retry links to it; a re-roll after an answer is caught"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m05-plan-record-not-redacted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 129,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m06-transport-redact-dropped.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 129,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K3 at the transport itself, a 422 that echoes the Authorization header leaves the canary out of the answer's error, message, detail and fields"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m07-version-compared-as-string.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 128,
+    "failed": [
+      "s4-g2-key.test.ts :: G2 — the key A3 the version comparator: numeric, field by field, and an unreported version fails",
+      "s4-g6-closeout.test.ts :: G6 — the close-out tables T7 a different model_resolved across records is said out loud, and one below the minimum is named"
+    ],
+    "reverted_clean": true
+  }
+]

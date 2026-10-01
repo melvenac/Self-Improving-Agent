@@ -1,0 +1,93 @@
+[
+  {
+    "name": "q01-done-unredacted-debug-dump.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 128,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D5 the flip test: proceed and reject give the same exit code (0), the same files, and only a new record",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q02-two-layer-transport-and-done-record.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 127,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K3 at the transport itself, a 422 that echoes the Authorization header leaves the canary out of the answer's error, message, detail and fields",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner K1 a hostile fake that echoes the Authorization header as a 422 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q03-two-layer-transport-and-qa-record.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 127,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K3 at the transport itself, a 422 that echoes the Authorization header leaves the canary out of the answer's error, message, detail and fields",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner K1 a hostile fake that echoes the Authorization header as a 422 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q04-two-layer-transport-and-plan-record.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 127,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output",
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K1 a hostile fake that echoes the Authorization header as a 422 leaves the canary in no output",
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K3 at the transport itself, a 422 that echoes the Authorization header leaves the canary out of the answer's error, message, detail and fields"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q07-fail-severity-defaulted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 129,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R3 a requirement Jev did not answer is untested and named under missing; a fail with no severity is named, never defaulted"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q08-unanswered-row-not-named-missing.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 129,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R3 a requirement Jev did not answer is untested and named under missing; a fail with no severity is named, never defaulted"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q09-qa-returns-exit-1-on-reject.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-guards.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 130,
+    "passed": 129,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R7 the flip test: proceed and reject give exit code 0 both times, only new files appear, no tracked file moves, the E_t blob is unchanged"
+    ],
+    "reverted_clean": true
+  }
+]
