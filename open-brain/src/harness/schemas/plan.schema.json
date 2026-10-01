@@ -89,6 +89,28 @@
         "justification"
       ],
       "additionalProperties": false
+    },
+    "reconstructed_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reconstructed_from": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blob": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      },
+      "required": [
+        "path",
+        "blob"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [

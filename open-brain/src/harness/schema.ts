@@ -107,8 +107,27 @@ export const PlanSchema = z
     repair_targets: z.array(z.string().min(1)),
     new_capability: z.string(),
     stop_ship: StopShipSchema.optional(),
+    /**
+     * S4-4b. Set only on a plan rebuilt AFTER the work, by a seat that did not build it: which
+     * seat, and the prose brief (path and blob) it worked from. A plan written before the work
+     * carries neither, and still validates.
+     */
+    reconstructed_by: z.string().min(1).optional(),
+    reconstructed_from: z
+      .strictObject({
+        path: z.string().min(1),
+        blob: z.string().regex(/^[0-9a-f]{40}$/, "blob must be a full 40-character sha"),
+      })
+      .optional(),
   })
   .superRefine((plan, ctx) => {
+    if ((plan.reconstructed_by === undefined) !== (plan.reconstructed_from === undefined)) {
+      ctx.addIssue({
+        code: "custom",
+        path: [plan.reconstructed_by === undefined ? "reconstructed_by" : "reconstructed_from"],
+        message: "reconstructed_by and reconstructed_from are set together: a seat with no source, or a source with no seat, proves nothing",
+      });
+    }
     if (plan.new_capability.trim() === "" && plan.stop_ship === undefined) {
       ctx.addIssue({
         code: "custom",
