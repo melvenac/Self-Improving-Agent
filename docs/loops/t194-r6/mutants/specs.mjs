@@ -6,7 +6,11 @@ import { MUTANTS as R5 } from "../../t194-r5/mutants/specs.mjs";
 
 // r5 mutants whose anchor text r6 changed. The CLAUSE is the same; only the line that carries it moved.
 const REBASED = {
-  "p1-nested-not-parsed": null, // still valid as is (bash.ts extractWrites)
+  "p1-ntfs-dots-off": { find: "const abs = winRoot ? ntfsComponents(posix.normalize(toFwd(norm, true))) : norm;", replace: "const abs = winRoot ? posix.normalize(toFwd(norm, true)) : norm;" },
+  "p1-cp-t-ignored": { find: "if (t >= 0) {
+            const attached", replace: "if (false) {
+            const attached" },
+  "p3-param-prefix-off": { file: "parse-gate.ts", find: "const hits = Object.keys(table).filter((p) => p.startsWith(name));", replace: "const hits = Object.keys(table).filter((p) => p === name);" },
 };
 const r5 = R5.map((m) => ({ ...m, name: `r5-${m.name}`, ...(REBASED[m.name] ?? {}) }));
 
@@ -51,6 +55,8 @@ export const MUTANTS = [
     find: 'if (c === "*" || c === "?" || c === "[" || c === "]") return refuse("glob character (* ? [ ])");', replace: "" },
   { name: "p0-tilde-allowed", clause: "P0 bash: leading ~", file: "parse-gate.ts",
     find: 'if (c === "~" && i === start) return refuse("tilde (home-directory expansion)");', replace: "" },
+  { name: "p0-ps-tilde-allowed", clause: "P0 powershell: leading ~", file: "parse-gate.ts",
+    find: 'if (c === "~" && i === start) return refuse("tilde (PowerShell home-directory expansion)");', replace: "" },
   { name: "p0-background-allowed", clause: "P0 bash: single &", file: "parse-gate.ts",
     find: 'return refuse("background & (use && or ;)");', replace: "endSimple();\n      i++;\n      continue;" },
   { name: "p0-fd-redirect-allowed", clause: "P0 bash: only 2> and 2>&1 as fd redirects", file: "parse-gate.ts",
@@ -124,5 +130,5 @@ export const MUTANTS = [
   { name: "r6-ps-param-table-type", clause: "D13: New-Item -Type", file: "parse-gate.ts",
     find: 'type: P(true), value: P(true), force: P(false) } },\n  "copy-item"', replace: 'value: P(true), force: P(false) } },\n  "copy-item"' },
   { name: "r6-limit-claims-caught-item", clause: "D17: the limit text names nothing the hook catches", file: "bash.ts",
-    find: "in Bash, other writing commands (rm, touch, dd, curl -o, git checkout);", replace: "in Bash, other writing commands (rm, touch, dd, curl -o, git checkout, perl -pi, awk -i);" },
+    find: '"checkout); symlinks and junctions;', replace: '"checkout, perl -pi, awk -i); symlinks and junctions;' },
 ];

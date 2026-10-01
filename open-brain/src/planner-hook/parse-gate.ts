@@ -626,7 +626,7 @@ function gatePowerShell(command: string, depth: number): string | null {
       if (c === "&") return refuse("& inside a word");
       if (c === "<") return refuse("< (redirect, block comment or here-string)");
       if (c === "#" && i === start) return refuse("comment (# at the start of a PowerShell word)");
-      if (c === "~" && i === start) return refuse("tilde (home-directory expansion)");
+      if (c === "~" && i === start) return refuse("tilde (PowerShell home-directory expansion)");
       text += c;
       i++;
     }
