@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 219 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 220 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 > **Status:** v0.44.2 — Loop 15 slice three (D-033/D-036) is CLOSED: A (#182), B (#165, #187) and C (#195, merged 2026-09-30 as ddd43526) are all ACCEPTED and merged. The shadow merge gate's ledger has line 1 (undefined, merged). The NEXT slice per D-033 is Jev calibration. It is NOT YET BRIEFED or ruled, so the next planner session writes its brief before any dispatch. In flight meanwhile: T-194 r3 (c1f1cb48) awaits QA 234 on the laptop; T-214 (declared.ts rejects a blank line, which made episode 1 undefined) is P1.
 
 ## What's working
