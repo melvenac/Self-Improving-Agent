@@ -7,20 +7,14 @@ import {
   grantMatchesCommand,
   readOutwardGrant,
 } from "./grant.js";
-import {
-  extractGhPrMergeRef,
-  ghRepoFlag,
-  isGhPrMerge,
-  isRestrictedOutwardBash,
-  isSingleInvocation,
-  pathOnDocsMergeAllowlist,
-  startsWithGhPrMerge,
-} from "./git.js";
+import { analyzeGhMerge, isRestrictedOutwardBash, pathOnDocsMergeAllowlist } from "./git.js";
+import type { Flavor } from "./shell-words.js";
 import {
   isAllowedDocsLoopsPath,
   isProtectedArtifactPath,
   isRenderedViewPath,
   isSummaryPath,
+  nonLiteralCause,
   SUMMARY_PATH,
   toRepoRelative,
 } from "./paths.js";
@@ -109,6 +103,16 @@ function checkFileTool(
     return { decision: "deny", reason: "Planner hook: tool input has no target path — denied (fail closed)." };
   }
 
+  // r5 P1: the same literal-path rule as a shell target. A file tool expands nothing, but a `~`, a
+  // pattern character or a brace is not a path the hook can locate, so it is refused with its cause.
+  const nonLiteral = nonLiteralCause(rawPath, false);
+  if (nonLiteral) {
+    return {
+      decision: "deny",
+      reason: `Planner hook: denied — ${rawPath} (${nonLiteral}, so its location cannot be determined) (fail closed).`,
+    };
+  }
+
   // D1/D3: resolve against the tool's cwd, then make it repo-relative. A path outside the repo is
   // not the hook's business; one whose location cannot be determined is denied, not waved through.
   const resolved = toRepoRelative(rawPath, repoRoot, cwd);
@@ -167,35 +171,45 @@ function checkFileTool(
   return null;
 }
 
-function checkBash(command: string, repoRoot: string, cwd: string, deps: PlannerHookDeps): PlannerHookResult | null {
-  const writeTargets = detectBashWriteTargets(command, repoRoot, cwd);
+function checkBash(
+  command: string,
+  repoRoot: string,
+  cwd: string,
+  deps: PlannerHookDeps,
+  flavor: Flavor = "bash",
+): PlannerHookResult | null {
+  const shell = flavor === "powershell" ? "PowerShell" : "Bash";
+  const writeTargets = detectBashWriteTargets(command, repoRoot, cwd, flavor);
   if (writeTargets.length > 0) {
     return {
       decision: "deny",
       reason:
-        `Planner hook: denied — ${PH1_RULE} / ${PH2_RULE} via Bash write (${writeTargets.join(", ")}). ` +
+        `Planner hook: denied — ${PH1_RULE} / ${PH2_RULE} via ${shell} write (${writeTargets.join(", ")}). ` +
         BASH_WRITE_LIMIT,
     };
   }
 
-  if (!isRestrictedOutwardBash(command)) return null;
+  if (!isRestrictedOutwardBash(command, flavor)) return null;
 
   // D-032/D-055 (Aaron 2026-09-30): a docs-only merge needs no grant. Anything else that
   // reaches here — unlisted path, unreadable list, unparseable ref — is grant-required,
-  // and the refusal names which.
+  // and the refusal names which. r5 P2: only ONE exact grammar is ever read as a docs-only merge.
   let mergeCause: string | null = null;
-  if (isGhPrMerge(command) && deps.prChangedPaths) {
-    const ref = extractGhPrMergeRef(command);
-    // D2: the no-grant allow covers ONE `gh pr merge` invocation and nothing chained after it.
-    if (!isSingleInvocation(command) || !startsWithGhPrMerge(command)) {
+  const gh = analyzeGhMerge(command, flavor);
+  if (gh.isMerge && deps.prChangedPaths) {
+    if (!gh.single) {
       mergeCause = "the command is not a single gh pr merge invocation (chained, piped, substituted or prefixed)";
-    } else if (ghRepoFlag(command)) {
+    } else if (gh.repoFlag) {
       // --repo would merge another repository's PR N; the list read is origin's PR N. Never mix them.
       mergeCause = "--repo/-R names another repository, and the docs-only check reads origin's pull requests only";
-    } else if (!ref) {
+    } else if (!gh.exact) {
+      mergeCause =
+        "the command is outside the one no-grant grammar: gh pr merge <number or origin pull URL>, optionally followed " +
+        "only by --squash, --merge, --rebase, --delete-branch, -s, -m, -r, -d";
+    } else if (!gh.exact.ref) {
       mergeCause = "could not parse the gh pr merge target";
     } else {
-      const paths = deps.prChangedPaths(ref);
+      const paths = deps.prChangedPaths(gh.exact.ref);
       if (typeof paths === "object" && !Array.isArray(paths)) {
         // Pass one of runPlannerHookAsync: the list is not fetched yet, so decide nothing and
         // touch no grant. A docs-only merge must never read or burn a code merge's grant.
@@ -276,13 +290,15 @@ export function runPlannerHook(
     }
   }
 
-  if (tool === "Bash") {
+  // r5 P3: every shell tool the seat has is checked, not only Bash. Tool names are compared without case.
+  const shellTool = tool.toLowerCase() === "bash" ? "Bash" : tool.toLowerCase() === "powershell" ? "PowerShell" : null;
+  if (shellTool) {
     const command = typeof input.command === "string" ? input.command : "";
     if (!command.trim()) {
-      return { decision: "deny", reason: "Planner hook: denied — empty Bash command (fail closed)." };
+      return { decision: "deny", reason: `Planner hook: denied — empty ${shellTool} command (fail closed).` };
     }
-    const bashResult = checkBash(command, repoRoot, cwd, deps);
-    if (bashResult) return bashResult;
+    const shellResult = checkBash(command, repoRoot, cwd, deps, shellTool === "PowerShell" ? "powershell" : "bash");
+    if (shellResult) return shellResult;
   }
 
   return { decision: "allow" };

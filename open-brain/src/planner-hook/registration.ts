@@ -10,7 +10,7 @@ export function plannerHookRegistration(openBrainDir: string): object {
     hooks: {
       PreToolUse: [
         {
-          matcher: "Edit|Write|NotebookEdit|Bash",
+          matcher: "Edit|Write|NotebookEdit|Bash|PowerShell",
           hooks: [{ type: "command", command, timeout: 10 }],
         },
       ],
