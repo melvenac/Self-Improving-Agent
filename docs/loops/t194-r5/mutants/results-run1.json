@@ -1,0 +1,402 @@
+[
+  {
+    "name": "p1-tilde-allowed",
+    "clause": "P1 non-literal: leading ~",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 7,
+    "killed": true
+  },
+  {
+    "name": "p1-glob-allowed",
+    "clause": "P1 non-literal: * ? [",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 9,
+    "killed": true
+  },
+  {
+    "name": "p1-brace-allowed",
+    "clause": "P1 non-literal: {",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "p1-dollar-backtick-allowed",
+    "clause": "P1 non-literal: $ and backtick",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p1-paren-allowed",
+    "clause": "P1 non-literal: process substitution",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "p1-cd-allowed",
+    "clause": "P1 cd: same-line cd with a write",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 10,
+    "killed": true
+  },
+  {
+    "name": "p1-cwd-ignored",
+    "clause": "P1 location: resolve against payload.cwd",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 31,
+    "killed": true
+  },
+  {
+    "name": "p1-case-folded-off",
+    "clause": "P1 location: case-insensitive on a Windows drive",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  },
+  {
+    "name": "p1-ntfs-dots-off",
+    "clause": "P1 location: NTFS trailing dots/spaces/streams",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p1-longpath-off",
+    "clause": "P1 location: \\\\?\\ prefix",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "p1-shortname-off",
+    "clause": "P1 location: 8.3 short name",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p1-filetool-literal-off",
+    "clause": "P1 one canonicaliser: file tools refuse non-literal paths",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "p1-tee-first-only",
+    "clause": "P1 targets: every tee file",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "p1-mv-source-ignored",
+    "clause": "P1 targets: a move deletes its source",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p1-cp-t-ignored",
+    "clause": "P1 targets: cp -t DIR",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "p1-sed-e-files",
+    "clause": "P1 targets: sed -i -e SCRIPT FILE",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "p1-nested-not-parsed",
+    "clause": "P1 targets: bash -c, $( ), backticks, eval",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 7,
+    "killed": true
+  },
+  {
+    "name": "p1-heredoc-body-parsed",
+    "clause": "P1 false refusals: heredoc bodies are data",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p2-gh-case-sensitive",
+    "clause": "P2 gh word: case",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 17,
+    "killed": true
+  },
+  {
+    "name": "p2-gh-extension-kept",
+    "clause": "P2 gh word: .exe and any extension",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 19,
+    "killed": true
+  },
+  {
+    "name": "p2-any-flag-allowed",
+    "clause": "P2 grammar: only the eight flags",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  },
+  {
+    "name": "p2-boundary-ignored",
+    "clause": "P2 grammar: one command, no boundary",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "p2-redirect-allowed",
+    "clause": "P2 grammar: no redirect",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 2,
+    "killed": true
+  },
+  {
+    "name": "p2-substituted-name-not-gh",
+    "clause": "P2 merge: a substituted command word",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "p2-nested-merge-not-seen",
+    "clause": "P2 merge: bash -c / $( ) / backticks",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "p2-repo-flag-ignored",
+    "clause": "P2 grammar: --repo / -R named",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p2-subshell-callop",
+    "clause": "P2 PowerShell: & is the call operator",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "p3-matcher-without-powershell",
+    "clause": "P3 matcher",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p3-powershell-tool-ignored",
+    "clause": "P3 PowerShell tool is checked",
+    "typecheckExit": 2,
+    "testExit": 1,
+    "failedTests": 58,
+    "killed": true
+  },
+  {
+    "name": "p3-tool-name-case",
+    "clause": "P3 tool name without case",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p3-dynamic-allowed",
+    "clause": "P3 Invoke-Expression / script block refused",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "p3-param-prefix-off",
+    "clause": "P3 -Lit / -Dest parameter prefixes",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "p3-move-source-ignored",
+    "clause": "P3 Move-Item source",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p3-newitem-name-ignored",
+    "clause": "P3 New-Item -Path DIR -Name FILE",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p2b-git-case-sensitive",
+    "clause": "P2b git word: case, extension, quotes",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 8,
+    "killed": true
+  },
+  {
+    "name": "p2b-global-option-values",
+    "clause": "P2b options between git and push: -C <dir>, -c k=v",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 12,
+    "killed": true
+  },
+  {
+    "name": "p2b-leading-options-not-skipped",
+    "clause": "P2b options between git and push: --no-pager, --git-dir=",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 15,
+    "killed": true
+  },
+  {
+    "name": "p2b-force-long-allowed",
+    "clause": "P2b force: --force*",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 16,
+    "killed": true
+  },
+  {
+    "name": "p2b-force-short-cluster",
+    "clause": "P2b force: -f inside a short cluster (-fu)",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "p2b-plus-refspec-allowed",
+    "clause": "P2b force: +refspec",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "p2b-delete-refspec-allowed",
+    "clause": "P2b delete: :dst refspec",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "p2b-standing-prefix-off",
+    "clause": "P2b standing: only loop/ qa/ docs/ chore/ (and never master)",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 26,
+    "killed": true
+  },
+  {
+    "name": "p2b-remote-any",
+    "clause": "P2b standing: remote must be origin",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "p2b-bare-push-allowed",
+    "clause": "P2b standing: a push naming no branch",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "p2b-tags-mirror-allowed",
+    "clause": "P2b tags, mirror, all, delete, prune",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "p2b-merge-tag-allowed",
+    "clause": "P2b merge and tag",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 13,
+    "killed": true
+  },
+  {
+    "name": "p2b-nested-git-not-seen",
+    "clause": "P2b git inside bash -c / $( ) / backticks",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "p2b-expanded-subcommand-allowed",
+    "clause": "P2b a substituted subcommand",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p2b-expanded-git-word-allowed",
+    "clause": "P2b a substituted git word",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p2b-expanded-push-arg-allowed",
+    "clause": "P2b a substituted push argument",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  }
+]

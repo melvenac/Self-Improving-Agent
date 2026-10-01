@@ -65,7 +65,7 @@ export const MUTANTS = [
   { name: "p3-matcher-without-powershell", clause: "P3 matcher", file: "registration.ts",
     find: 'matcher: "Edit|Write|NotebookEdit|Bash|PowerShell",', replace: 'matcher: "Edit|Write|NotebookEdit|Bash",' },
   { name: "p3-powershell-tool-ignored", clause: "P3 PowerShell tool is checked", file: "run.ts",
-    find: 'tool.toLowerCase() === "powershell" ? "PowerShell" : null', replace: "null" },
+    find: 'tool.toLowerCase() === "powershell" ? "PowerShell" : null', replace: 'tool.toLowerCase() === "powershell" && false ? "PowerShell" : null' },
   { name: "p3-tool-name-case", clause: "P3 tool name without case", file: "run.ts",
     find: 'tool.toLowerCase() === "bash" ? "Bash"', replace: 'tool === "Bash" ? "Bash"' },
   { name: "p3-dynamic-allowed", clause: "P3 Invoke-Expression / script block refused", file: "bash.ts",

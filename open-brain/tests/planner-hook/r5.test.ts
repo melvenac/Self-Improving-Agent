@@ -38,6 +38,8 @@ describe("P1 — a target that is not a literal path is refused, with its cause 
     ["a ? glob", "echo x > open-brain/sr?/cli.ts"],
     ["a [ ] glob", "echo x > open-brain/src/[c]li.ts"],
     ["a brace list", "echo x > open-brain/src/{a,b}.ts"],
+    ["a parenthesis in a quoted target", "echo x > 'docs/loops/a(1).md'"],
+    ["a parenthesis in a cp destination", "cp a.ts 'docs/b(2).md'"],
     ["process substitution", "echo x > >(cat)"],
     ["tee with a glob", "echo x | tee open-brain/src/*.ts"],
     ["cp to a brace list", "cp a.ts open-brain/src/{x,y}.ts"],
@@ -153,7 +155,7 @@ describe("P1 — the real write location, whatever the spelling (QA 233/234/235 
     allow(fx.bash("echo x > /tmp/log.txt"));
     // A sibling shares the root's own spelling (even an 8.3 profile name such as AARONM~1) up to the point it
     // leaves, so it is outside beyond doubt.
-    allow(fx.bash(`echo x > ${fx.fwd}-sibling/open-brain/src/cli.ts`));
+    allow(fx.bash(`echo x > "${fx.fwd}-sibling/open-brain/src/cli.ts"`));
   });
 
   it("an 8.3 short name outside the root prefix is refused, because it may be inside", () => {
@@ -191,8 +193,8 @@ describe("P1 — the real write location, whatever the spelling (QA 233/234/235 
     deny(fx.bash("echo x > open-brain/src/cli.ts:stream"));
     deny(fx.bash("echo x > 'open-brain/src /cli.ts'"));
     const drive = fx.fwd[0].toLowerCase();
-    deny(fx.bash(`echo x > /mnt/${drive}${fx.fwd.slice(2)}/open-brain/src/cli.ts`));
-    deny(fx.bash(`echo x > /cygdrive/${drive}${fx.fwd.slice(2)}/open-brain/src/cli.ts`));
+    deny(fx.bash(`echo x > "/mnt/${drive}${fx.fwd.slice(2)}/open-brain/src/cli.ts"`));
+    deny(fx.bash(`echo x > "/cygdrive/${drive}${fx.fwd.slice(2)}/open-brain/src/cli.ts"`));
   });
 });
 
@@ -420,6 +422,10 @@ describe("P2b — a git merge, tag or push is read by the same rule: git word, a
     "git push origin HEAD:refs/heads/master",
     "git push origin +loop/x",
     "git push origin :loop/x",
+    "git push origin +HEAD:loop/x",
+    "git push origin +loop/x:loop/y",
+    "git push origin loop/$BR",
+    "git push origin \"loop/$BR\"",
     "git push origin loop/x master",
     "git push origin feature/x",
     "git push origin loopx/x",

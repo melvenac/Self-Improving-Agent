@@ -2,7 +2,7 @@
  * Shared fixture for the T-194 r5 tests: a temporary checkout the hook resolves as the repo, a fake
  * GitHub that answers `pulls/N` from a table, and payload builders. Nothing here registers the hook.
  */
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { mkdtempSync, realpathSync, rmSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runPlannerHook, runPlannerHookAsync } from "../../src/planner-hook/run.js";
@@ -55,8 +55,10 @@ function fakeFetch(calls: string[]): FetchLike {
 }
 
 export function makeFixture(label: string): Fixture {
-  const repo = mkdtempSync(join(tmpdir(), `planner-${label}-`));
-  const home = mkdtempSync(join(tmpdir(), `planner-${label}-home-`));
+  // The long spelling: a temp dir under an 8.3 profile name (AARONM~1) would make every outside-path row also trip the
+  // short-name rule, and a row meant for the long-path prefix or the case fold could pass for that reason instead.
+  const repo = realpathSync.native(mkdtempSync(join(tmpdir(), `planner-${label}-`)));
+  const home = realpathSync.native(mkdtempSync(join(tmpdir(), `planner-${label}-home-`)));
   for (const d of DIRS) mkdirSync(join(repo, d), { recursive: true });
   writeFileSync(join(repo, "package.json"), '{"name":"fx"}\n', "utf-8");
   writeFileSync(join(repo, "open-brain", "package.json"), '{"name":"open-brain"}\n', "utf-8");

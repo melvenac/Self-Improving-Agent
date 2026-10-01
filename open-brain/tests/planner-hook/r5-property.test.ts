@@ -273,11 +273,14 @@ function genP1NonLiteral(count: number): Case[] {
       // A file tool has no shell; `$(pwd)` and a backtick still contain `$`/a backtick and are refused.
       out.push({ name: `edit ${decorated}`, run: () => fx.edit(decorated, cwd), expect: "deny", how: [...how, "edit"] });
     } else if (kind === "bash") {
-      const t = chance(rng, 0.3) ? `'${decorated}'` : chance(rng, 0.3) ? `"${decorated}"` : decorated;
+      let t = chance(rng, 0.3) ? `'${decorated}'` : chance(rng, 0.3) ? `"${decorated}"` : decorated;
+      // a path with a space (the profile folder is "Aaron Melven") must be quoted or the shell itself splits it
+      if (/\s/.test(t) && !/^["']/.test(t)) t = `"${t}"`;
       const cmd = pick(rng, CHAINS)(pick(rng, BASH_WRITERS)(t));
       out.push({ name: `bash ${cmd}`, run: () => fx.bash(cmd, cwd), expect: "deny", how: [...how, "bash"] });
     } else {
-      const cmd = pick(rng, PS_CHAINS)(pick(rng, PS_WRITERS)(decorated));
+      const quoted = /\s/.test(decorated) ? `"${decorated}"` : decorated;
+      const cmd = pick(rng, PS_CHAINS)(pick(rng, PS_WRITERS)(quoted));
       out.push({ name: `ps ${cmd}`, run: () => fx.ps(cmd, cwd), expect: "deny", how: [...how, "ps"] });
     }
   }
@@ -502,7 +505,7 @@ const STANDING_BRANCHES = ["loop/x", "loop/t194-planner-hook", "qa/y", "docs/z",
 const PUSH_FLAGS_OK = ["", "", "-u ", "--set-upstream ", "--no-verify ", "-v ", "--quiet "];
 const PUSH_NEEDS_GRANT = [
   "push", "push origin", "push origin master", "push origin main", "push origin HEAD:master", "push origin HEAD:refs/heads/master",
-  "push origin +loop/x", "push origin :loop/x", "push origin loop/x master", "push origin feature/x", "push origin loopx/x",
+  "push origin +loop/x", "push origin +HEAD:loop/x", "push origin +loop/x:loop/y", "push origin loop/$BR", "push origin :loop/x", "push origin loop/x master", "push origin feature/x", "push origin loopx/x",
   "push upstream loop/x", "push https://example.com/r.git loop/x", "push --force origin loop/x", "push origin loop/x --force",
   "push -f origin loop/x", "push -fu origin loop/x", "push -uf origin loop/x", "push --force-with-lease origin loop/x",
   "push --force-if-includes origin loop/x", "push --tags", "push --follow-tags origin loop/x", "push --mirror", "push --all",
