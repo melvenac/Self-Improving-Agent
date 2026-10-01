@@ -29,7 +29,7 @@ const FORBIDDEN_WORD = new RegExp(`\\b${"calibrat"}${"ed"}\\b`, "i");
 const JEV_MCP = new RegExp(`${"jev"}-${"mcp"}|${"mcp__"}${"jev"}`);
 // CALL POSITION only (r2, D1): a test function, optionally with modifiers, then the skipping modifier.
 // The r1 pattern matched the word anywhere, so a test TITLE containing it was a hit.
-const SKIPS = new RegExp(`\\b(it|test|describe)(\\.\\w+)*\\.(${"sk"}${"ip"}|${"to"}${"do"}|${"sk"}${"ipIf"}|${"run"}${"If"})\\b`);
+const SKIPS = new RegExp(`\\b(it|test|describe)(\\.\\w+(\\([^)]*\\))?)*\\.(${"sk"}${"ip"}|${"to"}${"do"}|${"sk"}${"ipIf"}|${"run"}${"If"})\\b`);
 
 const hits = (re: RegExp, lines: string[]): string[] => lines.filter((l) => re.test(l));
 
