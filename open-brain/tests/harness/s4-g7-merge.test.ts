@@ -165,6 +165,9 @@ describe("S4-6d.3 — the shadow merge verdict ignores the slice's G_done and G_
     for (const rel of [`${RECORDS}/${LOOP}.G_done.json`, `${RECORDS}/G_done.json`, `artifacts/iterations/${LOOP}/G_done.json`, `docs/loops/shadow-merge/${LOOP}/G_done.json`]) plant(rel, doneRec, "reject");
     for (const rel of [`${RECORDS}/${LOOP}.G_qa.json`, `${RECORDS}/G_qa.json`, `artifacts/iterations/${LOOP}/G_qa.json`, `docs/loops/shadow-merge/${LOOP}/G_qa.json`]) plant(rel, qaRec, "reject");
 
+    // The slice's records directory is tracked: a runner's record reaches HEAD. Read from git too, not only the tree.
+    repo.commitAll("commit the reject records, as a seat does");
+
     const withRecords = prepare("d".repeat(40));
     expect(withRecords.status, withRecords.stderr).toBe(0);
     expect(withRecords.json?.verdict).toBe(without.json?.verdict);
