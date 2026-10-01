@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 221,
+  "revision": 222,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1130,7 +1130,7 @@
       "opened_session": 153,
       "closed_session": null,
       "supersedes": null,
-      "note": "Found by the planner in session 153 (resumed) while finalising slice four. `harness validate plan docs/loops/loop-15-slice-4-brief.D_t.json` exits 1 with 'loop: loop must look like t001'. open-brain/src/harness/schema.ts:84 and :248 pin the plan's loop to /^t\\d{3,}$/, while the evidence schema already accepts human-seat loop ids through EVIDENCE_LOOP_PATTERN (:180: tNNN or N-word, e.g. 15-slice-3-c), as widened by candidate B (rulings-2 R10). T-195 (DT-1, DT-7) requires every interactive planner brief to ship a D_t that harness dispatch validates, so the rule cannot be met by any planner brief; its tests must have used tNNN fixtures. FIX: the plan schema accepts the same loop pattern as evidence (one shared constant, used by both), with a fixture row for a seat loop id (15-slice-4) and a mutant. Check whether brief-plan-gate.ts or the record-name regex also assumes tNNN. It BLOCKS slice four's dispatch (its D_t keeps its true id; it is not renamed to fit). Small code fix: a dev seat, QA, then Aaron merges. The slice-three finding applies: the instruction (T-195) and the schema it relies on disagreed, and nothing checked one against the other.",
+      "note": "Found by the planner in session 153 (resumed) while finalising slice four. `harness validate plan docs/loops/loop-15-slice-4-brief.D_t.json` exits 1 with 'loop: loop must look like t001'. open-brain/src/harness/schema.ts:84 and :248 pin the plan's loop to /^t\\d{3,}$/, while the evidence schema already accepts human-seat loop ids through EVIDENCE_LOOP_PATTERN (:180: tNNN or N-word, e.g. 15-slice-3-c), as widened by candidate B (rulings-2 R10). T-195 (DT-1, DT-7) requires every interactive planner brief to ship a D_t that harness dispatch validates, so the rule cannot be met by any planner brief; its tests must have used tNNN fixtures. FIX: the plan schema accepts the same loop pattern as evidence (one shared constant, used by both), with a fixture row for a seat loop id (15-slice-4) and a mutant. Check whether brief-plan-gate.ts or the record-name regex also assumes tNNN. It BLOCKS slice four's dispatch (its D_t keeps its true id; it is not renamed to fit). Small code fix: a dev seat, QA, then Aaron merges. The slice-three finding applies: the instruction (T-195) and the schema it relies on disagreed, and nothing checked one against the other. — Dispatch written: docs/loops/t216-dispatch.md. It goes to a new developer seat Aaron is starting at the shop, 2026-10-01. One shared loop-id constant for plan and evidence; GATE_RECORD_RE and loop-built paths audited; red then green on the unedited slice-four D_t; dry-run plan-gate. Machine: code now, no builds or tests on the QA PC until Rivet is done.",
       "note_by": [
         "6e083614-965f-462b-ad59-62091a0be5e1"
       ],
@@ -3506,6 +3506,12 @@
       "title": "Slice four: seat-built diffs are scored but PROVISIONAL only (source- and plan-provenance-tagged); 'calibrated' needs 5+ runtime-produced diffs with pre-work plans. The key must reach the Jev endpoint and nothing else, each with its own test",
       "date": "2026-09-30",
       "note": "AARON, planner session 153: 'Yes to both', accepting the planner's two recommendations on docs/loops/loop-15-slice-4-brief-draft.md section 4. Q2 (A6's 'real diffs'): score the ~8 merged Loop 15 seat-built diffs through the done gate in shadow. Tag each G_done record with its source (seat or runtime) and its plan provenance (a D_t reconstructed after the fact from the prose brief, versus one written before the work). They are PROVISIONAL starting data only, because a plan reconstructed by someone who knows the outcome inflates diff_matches_plan, which is close to A6's forbidden synthetic input. The word 'calibrated', and any threshold change justified as calibration, needs N of 5 or more RUNTIME-produced diffs whose D_t was written before the work. Q4 (the key wording): the brief's 'the key reaching nothing' and A6's 'the key reaching its endpoint' name two different properties, and BOTH are required, each with its own test: (a) the key reaches the Jev endpoint, proved by an authenticated response carrying the resolved model; (b) it reaches NOTHING else: no artifact, log, gate record or transcript contains it. With D-070 (close-out and T-169 first; the key only in Aaron's local dev environment), all four draft questions are ruled. The live-call budget is still to be proposed in the ruled brief."
+    },
+    {
+      "id": "D-072",
+      "title": "Slice four's live Jev call cap is 20, to start (1 plan-gate + 8 done-gate + 8 QA-score + 3 transport-only retries); revisit if it proves short",
+      "date": "2026-10-01",
+      "note": "AARON, planner session 153 (resumed): '20-call cap is fine to start, let's see if that's enough', on docs/loops/loop-15-slice-4-brief.md section 5. Re-running a call to get a different score is forbidden; the first answer is the observation. Above 20, the slice stops and asks. The count comes from gate records, not memory (acceptance S4-7). In the same message Aaron said 'apply' to the planner's proposed ~/.claude/CLAUDE.md diff, which the planner applied: lines 11, 13 and 15 now say the skill scan and reflection queue were cut, recall ranks by BM25 plus recency plus a failure boost, ob_feedback is instrumentation only, the recall trigger exists, the maturity lifecycle was cut in Loop 10 (R-011), and the dashboard's maturity columns are stale (T-215). He also said he would start a new developer seat at the shop for T-216; dispatch at docs/loops/t216-dispatch.md."
     }
   ],
   "handoffs": [
