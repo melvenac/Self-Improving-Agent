@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 220,
+  "revision": 221,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1117,6 +1117,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Found by T-169 r2 (branch docs/t169-prd-readme at ef2e3649, planner session 153). R-011 in .agents/retirements.json keeps each of these as an allowed referrer whose why begins 'LIVE REFERENCE, NOT AN OBITUARY — fix owed:'. Each entry names the file:line. Loop 12's rule: a deletion is not finished until nothing names the deleted thing. REAL DEFECTS: (1) open-brain/tests/ranking.test.ts:122-136 asserts success-rate demotion and mature-over-progenitor ordering. That contradicts the cut-pins in the same file, and it passes only on tie order. (2) open-brain/tests/index-upsert.test.ts compares success_rate as undefined to undefined, so it proves nothing. (3) open-brain/scripts/dashboard.mjs still reads and renders success_rate and maturity as live data. (4) open-brain/scripts/backfill-success-rate.mjs writes a column new databases no longer declare. Retire it or record it as historical. STALE COMMENTS, present tense: db-v2.ts, server.ts, recalled-ids.ts (:152 names formatApoptosisQueue, which no longer exists), active-session.ts, vault-writer.ts, and tests/trigger/fires.test.ts. DONE WHEN each file is fixed and its R-011 entry is deleted or reclassified with a true why, and the retirements check still passes. Per the slice-three finding, check this list against the files before building.",
+      "note_by": [
+        "6e083614-965f-462b-ad59-62091a0be5e1"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-216",
+      "title": "The plan schema accepts only runtime loop ids (tNNN), so no planner brief's D_t can pass harness validate plan / dispatch",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 153,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found by the planner in session 153 (resumed) while finalising slice four. `harness validate plan docs/loops/loop-15-slice-4-brief.D_t.json` exits 1 with 'loop: loop must look like t001'. open-brain/src/harness/schema.ts:84 and :248 pin the plan's loop to /^t\\d{3,}$/, while the evidence schema already accepts human-seat loop ids through EVIDENCE_LOOP_PATTERN (:180: tNNN or N-word, e.g. 15-slice-3-c), as widened by candidate B (rulings-2 R10). T-195 (DT-1, DT-7) requires every interactive planner brief to ship a D_t that harness dispatch validates, so the rule cannot be met by any planner brief; its tests must have used tNNN fixtures. FIX: the plan schema accepts the same loop pattern as evidence (one shared constant, used by both), with a fixture row for a seat loop id (15-slice-4) and a mutant. Check whether brief-plan-gate.ts or the record-name regex also assumes tNNN. It BLOCKS slice four's dispatch (its D_t keeps its true id; it is not renamed to fit). Small code fix: a dev seat, QA, then Aaron merges. The slice-three finding applies: the instruction (T-195) and the schema it relies on disagreed, and nothing checked one against the other.",
       "note_by": [
         "6e083614-965f-462b-ad59-62091a0be5e1"
       ],

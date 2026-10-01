@@ -1,0 +1,37 @@
+{
+  "loop": "15-slice-4",
+  "objective": "Collect the first real Jev observations on Loop 15's merged diffs, in shadow, under A6/R6: report N, SHAs and spread, label PROVISIONAL, and claim no calibration (D-033, D-070, D-071).",
+  "tasks": [
+    "4.1 T-214: the declared-block parser either tolerates a blank line between sections or refuses an unparseable qa-declared block at authoring; fixture row with a blank line; mutant",
+    "4.2 one live plan-gate call on this D_t through harness plan-gate; record G_plan with the resolved model; prove D-071 key properties (a) and (b)",
+    "4.3 live developer done-gate in shadow on the 8 merged Loop 15 seat-built diffs (#182, #165, #187, #195, #209, #227, #220, #218); D_t reconstructed after the work by a non-builder; report the spread as PROVISIONAL",
+    "4.4 the QA-score gate per HOH-JEV section 4 as data (policies/qa-score.json plus schema), shadow only, writing G_qa beside E_t; score the same 8 diffs",
+    "4.5 the F11 answer committed at an ancestor of any candidate that claims green, before the first green CI run"
+  ],
+  "out_of_scope": [
+    "turning any gate on or letting a gate decision change a runtime outcome, a QA verdict or a merge",
+    "changing any threshold file, or using the word calibrated (needs N >= 5 runtime-produced diffs with pre-work plans, D-071)",
+    "jev-mcp; all calls go through gate.ts",
+    "T-194, T-213 and T-215, which run alongside and are not part of this slice"
+  ],
+  "preserve": [
+    "the shadow merge gate's ledger is append-only and its first artifact (15-slice-3-c) is immutable; loop-15-slice-3-c-criteria.md is not edited",
+    "the TypeSafe key is read only from the environment and never appears in any artifact, log, gate record or transcript (G-044, D-070)",
+    "existing plan-gate.json and developer-done.json thresholds are unchanged",
+    "D-019: Aaron merges to master; no gate merges, pushes or tags"
+  ],
+  "acceptance": [
+    { "id": "S4-1", "observable": "A criteria file whose qa-declared block contains a blank line either parses or is refused at authoring with a named cause, before any candidate; a fixture row proves it and its mutant is red", "type": "whitebox" },
+    { "id": "S4-2", "observable": "Exactly one live plan-gate call on loop-15-slice-4-brief.D_t.json writes a G_plan record naming the resolved model at jev-1.13.0 or later", "type": "blackbox" },
+    { "id": "S4-3", "observable": "Key property (a): the authenticated Jev response is recorded; key property (b): a constructed-environment test shows the key value in no artifact, log or gate record; each has its own test", "type": "whitebox" },
+    { "id": "S4-4", "observable": "Eight G_done records exist, one per listed merged diff at its QA'd SHA, each carrying source and plan_provenance; a record without them is refused", "type": "blackbox" },
+    { "id": "S4-5", "observable": "The slice report gives N, the SHAs and the per-score spread, is labelled PROVISIONAL, and the word calibrated appears nowhere in it", "type": "blackbox" },
+    { "id": "S4-6", "observable": "policies/qa-score.json and its schema exist; the QA-score gate writes G_qa beside E_t in shadow; a mutant that lets a gate decision change an outcome goes red", "type": "whitebox" },
+    { "id": "S4-7", "observable": "Live Jev calls counted from gate records are at most 20, and no score was re-run to obtain a different answer", "type": "blackbox" },
+    { "id": "S4-8", "observable": "The F11 answer is committed at an ancestor of any candidate claiming green, and the first green CI run id postdates that commit", "type": "blackbox" }
+  ],
+  "repair_targets": [
+    "T-214: declared.ts rejects a blank line inside a qa-declared block, which made shadow episode 1 undefined"
+  ],
+  "new_capability": "Shadow QA scoring through Jev, recorded beside each QA's E_t with source and plan provenance, plus the first real N of done-gate observations on merged diffs, reported as PROVISIONAL."
+}
