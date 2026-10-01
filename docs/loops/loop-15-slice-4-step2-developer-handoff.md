@@ -71,7 +71,7 @@ run against the named test files, and reverted. Every one went red. None is comm
 
 ## Decisions and limits, stated rather than left to be found
 
-1. **"From the prose brief only" is not clean for four of the eight, and QA should weigh S4-4b with that in mind.** Before I wrote the reconstructions I had read, in this session, code that belongs to four of the diffs: `brief-plan-gate.ts` (T-195, #209); `runtime.ts` and `gate.ts` (shared with candidate A, #182); `EVIDENCE_LOOP_PATTERN` in `schema.ts` and `declared.ts` (B part 2, #187, R10 a and d); and `MergePolicySchema` in `policies.ts` (C, #195). Each `D_t` was still written from its brief's text, and I did not open the diffs themselves or any handoff. The other four were written without having read their code: B part 1 (#165), T-198 (#227), T-196/T-197 (#220) and T-158 (#218). The tracked mapping file is not in this branch (it is on PR #249), so S4-4b's check against it is the table in `s4-g4-reconstruct.test.ts`, copied from it.
+1. **"From the prose brief only" is not clean for four of the eight, and QA should weigh S4-4b with that in mind (corrected at r2 from QA 240 section 4).** Before I wrote the reconstructions I had read, in this session, code that belongs to four of the diffs: #182 (candidate A): `runtime.ts`, `schema.ts` and `artifacts.ts`; #187 (B part 2): `schema.ts` (`EVIDENCE_LOOP_PATTERN`), `declared.ts` and `cli.ts`; #195 (C): `policies.ts` (`MergePolicySchema`) and `cli.ts`; #209 (T-195): `brief-plan-gate.ts`, `cli.ts` and `t195-plan-gate.test.ts`. (r1 wrongly listed `gate.ts` for #182; it is not one of A's files.) Each `D_t` was still written from its brief's text, and I did not open the diffs themselves or any handoff. The other four were written without having read their code: #165, #227, #220 and #218. The four/four split stands. The tracked mapping file is not in this branch (it is on PR #249), so S4-4b's check against it is the table in `s4-g4-reconstruct.test.ts`, copied from it.
 2. **Row ids in the reconstructions.** Where a brief named its own rows (T-195's DT-1 to DT-8, T-198's PR-1 to PR-6, T-196/T-197's HB and CS rows, T-158's TG rows, B part 1's B-1, B-2, B-4, B-5) I used them. Where it did not, I gave rows new ids (`SM-` for C, `R10a` to `R10d` for B part 2, `A1` to `A3` for A) so they do not collide with QA's real criteria ids.
 3. **`unavailable` is an outcome class the spec does not list.** A refusal before any request (no key) is recorded `unavailable`, and the count does not treat it as a call. A dry run is also `unavailable`. Without it a missing key would spend budget.
 4. **`retry_of` is the repo-relative path of the earlier record.** The ledger and the records both carry it, so the count can be taken from either.
@@ -88,3 +88,20 @@ run against the named test files, and reverted. Every one went red. None is comm
 What did run, all exit 0 unless stated: `npm run build` 0 (stamped 818bef3, the policies directory carries `qa-score.json`); `tsc --noEmit` 0 at every green commit and under every mutant; the existing gate tests after G1 (t195-plan-gate, runtime, gate-live, policies, shadow-merge, cli, schema: 183 passed) and after G5 (policies, cli, schema, spawn-sites, gate-live: 88 passed); and each new test file green on its own (s4-g1 14, s4-g2 12, s4-g3 12, s4-g4 45 with schema, b2-et and t216, s4-g5 19, s4-g6 9, s4-guards 8).
 
 The full suite needs a run when the machine has memory, by whoever has the approval.
+
+## r2 (after QA 240 REJECTED r1 on S4-9.3 only)
+
+Branch `loop/15-slice-4-step2`, from `2d4cd863`. Test-side changes plus two scan targets; No full suite was run on the QA PC (QA runs it on Plumb). Single files only, one at a time, free RAM 1.16 to 1.88 GB (several mutant runs under the 1.5 GB bar).
+
+| r2 item | Change | Evidence |
+| --- | --- | --- |
+| 1 D1 | `s4-guards` skip scan is now call-position only (modifiers and call arguments allowed between the test function and the skipping modifier). New D1 plants a skip in a COMMITTED file of a temp repo and shows it fires, and shows an untracked one is invisible to `git diff` (why r1 looked green); D1b asserts no untracked file under `open-brain/tests`; G0 shows a test TITLE naming the words is not a hit | `s4-guards` 11 passed |
+| 2 D2 | R6 in `s4-g4-reconstruct` has a 120_000 timeout | `s4-g4` 45 passed |
+| 3 G3 | `s4-g3-done` D9 and `s4-g5-qa` R9: a `t195`-shaped loop id gives `source: seat` | q05 red on R9; q06 red on D9 |
+| 4 G4, G5 | `s4-g1-records` C7 (retry_of naming another subject's record is refused), C8 (a retry after auth, request-invalid, unexpected-status or malformed-response is refused), C9 (the three retryable outcomes still pass, so C8 is not refusing everything) | q10 red on C7; q11 red on C8 (auth) |
+| 5 G6 | `shadow-gates.ts` and `shadow-qa.ts` added to `THRESHOLD_SCAN_TARGETS`; `policies.test.ts` file list updated (the one existing assertion changed); `s4-g5-qa` Q8 plants a literal in each and shows the scan reports it | q13 red on Q8, Q5 and a `policies.test` test |
+| 6 G7 | `s4-g3-done` D8 and `s4-g5-qa` R10: a rejecting fetch with a key gives `transport`, counts 1 attempt; D7 (no key, unavailable, counts 0) already existed | q12 red on D8 and R10 |
+| 7 disclosure | corrected above (item 1 of the decisions list) | |
+| Open 4 (optional, S4-6d.3) | `s4-guards`: neither runner imports the shadow-merge verdict, and the CLI's `shadow-verdict prepare` call passes no `doneGate` or `planGate`; the scan is shown to fire on a planted string | passes |
+
+QA 240's six mutants are kept as `docs/loops/loop-15-slice-4/mutants/qa240-q*.diff` (copied from `origin/qa/s4-step2-report`). Each applied cleanly, passed `tsc --noEmit`, and went red on the tests named above. Single-file results: s4-g1 20, s4-g3 14, s4-g4 45, s4-g5 22, s4-guards 11, policies 26, all passed.
