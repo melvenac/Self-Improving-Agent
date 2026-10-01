@@ -1,0 +1,10 @@
+[
+  {
+    "name": "p1-longpath-off",
+    "clause": "P1 location: \\\\?\\ prefix",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  }
+]
