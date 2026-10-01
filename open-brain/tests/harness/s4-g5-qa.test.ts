@@ -314,6 +314,10 @@ describe("S4-6b/6c/6d — the runner", () => {
     expect([...afterFirst, ...afterSecond].every((l) => l.startsWith("?? "))).toBe(true);
     expect(hashes()).toEqual(before);
     expect(rawGit(repo.root, ["rev-parse", `${commit}:${ET_PATH}`])).toBe(etBlobBefore);
+    // The copy beside the records is the E_t's own bytes after both runs: a runner that wrote a
+    // result into the E_t's rows would change this blob.
+    expect(rawGit(repo.root, ["hash-object", first.copyPath])).toBe(etBlobBefore);
+    expect(rawGit(repo.root, ["hash-object", second.copyPath])).toBe(etBlobBefore);
     expect(readdirSync(POLICY_DIR).map((f) => `${f}:${sha(readFileSync(join(POLICY_DIR, f), "utf-8"))}`)).toEqual(policyBefore);
     // The immutable inputs named by S4-6d.1 were in the comparison.
     for (const f of ["docs/loops/qa-report.md", "docs/loops/shadow-merge/ledger.jsonl", "docs/loops/shadow-merge/c/shadow_merge.json"]) {
