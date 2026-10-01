@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 228,
+  "revision": 229,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1129,16 +1129,16 @@
       "id": "T-216",
       "title": "The plan schema accepts only runtime loop ids (tNNN), so no planner brief's D_t can pass harness validate plan / dispatch",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 153,
-      "closed_session": null,
+      "closed_session": 155,
       "supersedes": null,
-      "note": "Found by the planner in session 153 (resumed) while finalising slice four. `harness validate plan docs/loops/loop-15-slice-4-brief.D_t.json` exits 1 with 'loop: loop must look like t001'. open-brain/src/harness/schema.ts:84 and :248 pin the plan's loop to /^t\\d{3,}$/, while the evidence schema already accepts human-seat loop ids through EVIDENCE_LOOP_PATTERN (:180: tNNN or N-word, e.g. 15-slice-3-c), as widened by candidate B (rulings-2 R10). T-195 (DT-1, DT-7) requires every interactive planner brief to ship a D_t that harness dispatch validates, so the rule cannot be met by any planner brief; its tests must have used tNNN fixtures. FIX: the plan schema accepts the same loop pattern as evidence (one shared constant, used by both), with a fixture row for a seat loop id (15-slice-4) and a mutant. Check whether brief-plan-gate.ts or the record-name regex also assumes tNNN. It BLOCKS slice four's dispatch (its D_t keeps its true id; it is not renamed to fit). Small code fix: a dev seat, QA, then Aaron merges. The slice-three finding applies: the instruction (T-195) and the schema it relies on disagreed, and nothing checked one against the other. — Dispatch written: docs/loops/t216-dispatch.md. It goes to a new developer seat Aaron is starting at the shop, 2026-10-01. One shared loop-id constant for plan and evidence; GATE_RECORD_RE and loop-built paths audited; red then green on the unedited slice-four D_t; dry-run plan-gate. Machine: code now, no builds or tests on the QA PC until Rivet is done. — Session 155: QA 236 RULED ACCEPT by the planner after reading the report (origin/qa/t216-report a1960173) against docs/loops/qa-236-t216-dispatch.md. T216-1..5 and the regression all PASS; 21 probes, 0 schema disagreements; tcm CI candidate 36826245143 and base 36826249364 success. PR #245 opened at 9a0973f0; it is code, so Aaron merges. D1 (test strength: a plan-only regex copy with /i survives) moved to T-217 and does not block. After #245 merges, close this task and dispatch slice four.",
+      "note": "Found by the planner in session 153 (resumed) while finalising slice four. `harness validate plan docs/loops/loop-15-slice-4-brief.D_t.json` exits 1 with 'loop: loop must look like t001'. open-brain/src/harness/schema.ts:84 and :248 pin the plan's loop to /^t\\d{3,}$/, while the evidence schema already accepts human-seat loop ids through EVIDENCE_LOOP_PATTERN (:180: tNNN or N-word, e.g. 15-slice-3-c), as widened by candidate B (rulings-2 R10). T-195 (DT-1, DT-7) requires every interactive planner brief to ship a D_t that harness dispatch validates, so the rule cannot be met by any planner brief; its tests must have used tNNN fixtures. FIX: the plan schema accepts the same loop pattern as evidence (one shared constant, used by both), with a fixture row for a seat loop id (15-slice-4) and a mutant. Check whether brief-plan-gate.ts or the record-name regex also assumes tNNN. It BLOCKS slice four's dispatch (its D_t keeps its true id; it is not renamed to fit). Small code fix: a dev seat, QA, then Aaron merges. The slice-three finding applies: the instruction (T-195) and the schema it relies on disagreed, and nothing checked one against the other. — Dispatch written: docs/loops/t216-dispatch.md. It goes to a new developer seat Aaron is starting at the shop, 2026-10-01. One shared loop-id constant for plan and evidence; GATE_RECORD_RE and loop-built paths audited; red then green on the unedited slice-four D_t; dry-run plan-gate. Machine: code now, no builds or tests on the QA PC until Rivet is done. — Session 155: QA 236 RULED ACCEPT by the planner after reading the report (origin/qa/t216-report a1960173) against docs/loops/qa-236-t216-dispatch.md. T216-1..5 and the regression all PASS; 21 probes, 0 schema disagreements; tcm CI candidate 36826245143 and base 36826249364 success. PR #245 opened at 9a0973f0; it is code, so Aaron merges. D1 (test strength: a plan-only regex copy with /i survives) moved to T-217 and does not block. After #245 merges, close this task and dispatch slice four. — Session 155: PR #245 MERGED on Aaron's 'merge' (merge commit b3ab05ca). Verified on merged master (ec7138bb): `harness validate plan docs/loops/loop-15-slice-4-brief.D_t.json` exits 0 via tsx. Slice four's T-216 precondition is MET.",
       "note_by": [
         "6e083614-965f-462b-ad59-62091a0be5e1",
         "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
       ],
-      "closed_rev": null
+      "closed_rev": 229
     },
     {
       "id": "T-217",
