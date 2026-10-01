@@ -139,6 +139,8 @@ export const PS_REFUSED: Array<[string, string, string]> = [
   ["ForEach-Object", "1..2 | ForEach-Object Write-Output", "code-running"],
   ["a wildcard", "Remove-Item open-brain/src/*", "wildcard"],
   ["a tilde", "Set-Content ~/x.txt hi", "tilde"],
+  ["an ambiguous parameter prefix", "Get-ChildItem docs -F", "ambiguous parameter -F"],
+  ["a second ambiguous prefix", "Get-ChildItem docs -Fi", "ambiguous parameter -Fi"],
   ["a newline", `Get-Date${NL}Get-Date`, "newline"],
   ["&&", "Get-Date && Get-Date", "&&"],
   ["||", "Get-Date || Get-Date", "||"],

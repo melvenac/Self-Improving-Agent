@@ -119,7 +119,7 @@ export const MUTANTS = [
   { name: "r6-dev-dotdot-normalise-late", clause: "D4: the drive form is read again after ..", file: "paths.ts",
     find: "const abs = winRoot ? ntfsComponents(posix.normalize(toFwd(norm, true))) : norm;", replace: "const abs = winRoot ? ntfsComponents(norm) : norm;" },
   { name: "r6-cp-attached-t", clause: "D3: cp -tDIR and -vtDIR", file: "bash.ts",
-    find: 'if (attached) targetDir = { text: attached, raw: w.raw, expands: w.expands };', replace: "" },
+    find: 'if (attached) targetDir = { text: attached, raw: w.raw, expands: w.expands };', replace: "if (attached && false) targetDir = { text: attached, raw: w.raw, expands: w.expands };" },
   { name: "r6-cp-long-prefix", clause: "D3: cp --target (GNU prefix)", file: "bash.ts",
     find: 'if (long.length >= 3 && "--target-directory".startsWith(long)) {', replace: 'if (long === "--target-directory") {' },
   { name: "r6-install-ignored", clause: "QA 237 survivor: install is a writer", file: "bash.ts",

@@ -221,6 +221,16 @@ describe("D8, D9 — the PR reference", () => {
     expect(fx.calls).toEqual([]);
   });
 
+  it.each([
+    "gh pr merge https://github.com/other/Self-Improving-Agent/pull/3",
+    "gh pr merge https://github.com/melvenac/other-repo/pull/3",
+  ])("a URL that differs from origin in the owner ONLY, or the repository ONLY, needs a grant: %s", async (command) => {
+    const r = await fx.merge("Bash", command);
+    deny(r);
+    expect(r.reason).toContain("another repository needs a grant");
+    expect(fx.calls).toEqual([]);
+  });
+
   it("a pull URL of origin is read like a number, in either case", async () => {
     allow(await fx.merge("Bash", "gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/1"));
     expect(fx.calls.length).toBeGreaterThan(0);

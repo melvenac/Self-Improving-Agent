@@ -1,98 +1,18 @@
 [
   {
-    "name": "r5-p2b-expanded-push-arg-allowed",
-    "clause": "P2b a substituted push argument",
-    "typecheckExit": 0,
-    "testExit": 0,
-    "failedTests": 0,
-    "killed": false
-  },
-  {
-    "name": "p0-backslash-allowed",
-    "clause": "P0 bash: backslash outside single quotes",
+    "name": "r6-ps-param-table-type",
+    "clause": "D13: New-Item -Type",
     "typecheckExit": 0,
     "testExit": 1,
-    "failedTests": 10,
+    "failedTests": 3,
     "killed": true
   },
   {
-    "name": "p0-backslash-in-dq-allowed",
-    "clause": "P0 bash: backslash inside double quotes",
+    "name": "r6-limit-claims-caught-item",
+    "clause": "D17: the limit text names nothing the hook catches",
     "typecheckExit": 0,
     "testExit": 1,
-    "failedTests": 5,
-    "killed": true
-  },
-  {
-    "name": "p0-comment-allowed",
-    "clause": "P0 bash: # at the start of a word",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 12,
-    "killed": true
-  },
-  {
-    "name": "p0-reserved-word-allowed",
-    "clause": "P0 bash: reserved words",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 18,
-    "killed": true
-  },
-  {
-    "name": "p0-heredoc-allowed",
-    "clause": "P0 bash: heredoc and here-string",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 9,
-    "killed": true
-  },
-  {
-    "name": "p0-shell-stdin-allowed",
-    "clause": "P0 bash: code fed to a shell",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 13,
-    "killed": true
-  },
-  {
-    "name": "p0-wrapper-options-allowed",
-    "clause": "P0 bash: env/command/nohup with options",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 13,
-    "killed": true
-  },
-  {
-    "name": "p0-unlisted-wrapper-allowed",
-    "clause": "P0 bash: timeout, nice, xargs, sudo, eval...",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 23,
-    "killed": true
-  },
-  {
-    "name": "p0-sed-w-allowed",
-    "clause": "P0 bash: sed w",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 11,
-    "killed": true
-  },
-  {
-    "name": "p0-sed-e-allowed",
-    "clause": "P0 bash: sed e",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 5,
-    "killed": true
-  },
-  {
-    "name": "p0-sed-s-flags-allowed",
-    "clause": "P0 bash: sed s///w and s///e flags",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 5,
+    "failedTests": 1,
     "killed": true
   }
 ]

@@ -1,37 +1,5 @@
 [
   {
-    "name": "r5-p1-mv-source-ignored",
-    "clause": "P1 targets: a move deletes its source",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 1,
-    "killed": true
-  },
-  {
-    "name": "r5-p1-cp-t-ignored",
-    "clause": "P1 targets: cp -t DIR",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 8,
-    "killed": true
-  },
-  {
-    "name": "r5-p1-sed-e-files",
-    "clause": "P1 targets: sed -i -e SCRIPT FILE",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 6,
-    "killed": true
-  },
-  {
-    "name": "r5-p1-nested-not-parsed",
-    "clause": "P1 targets: bash -c, $( ), backticks, eval",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 6,
-    "killed": true
-  },
-  {
     "name": "r5-p1-heredoc-body-parsed",
     "clause": "P1 false refusals: heredoc bodies are data",
     "typecheckExit": 0,
@@ -40,59 +8,91 @@
     "killed": false
   },
   {
-    "name": "r5-p2-gh-case-sensitive",
-    "clause": "P2 gh word: case",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 20,
-    "killed": true
-  },
-  {
-    "name": "r5-p2-gh-extension-kept",
-    "clause": "P2 gh word: .exe and any extension",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 23,
-    "killed": true
-  },
-  {
-    "name": "r5-p2-any-flag-allowed",
-    "clause": "P2 grammar: only the eight flags",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 8,
-    "killed": true
-  },
-  {
     "name": "r5-p2-boundary-ignored",
     "clause": "P2 grammar: one command, no boundary",
     "typecheckExit": 0,
-    "testExit": 0,
-    "failedTests": 0,
-    "killed": false
-  },
-  {
-    "name": "r5-p2-redirect-allowed",
-    "clause": "P2 grammar: no redirect",
-    "typecheckExit": 0,
     "testExit": 1,
-    "failedTests": 3,
+    "failedTests": 1,
     "killed": true
   },
   {
     "name": "r5-p2-substituted-name-not-gh",
     "clause": "P2 merge: a substituted command word",
     "typecheckExit": 0,
-    "testExit": 0,
-    "failedTests": 0,
-    "killed": false
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
   },
   {
-    "name": "r5-p2-nested-merge-not-seen",
-    "clause": "P2 merge: bash -c / $( ) / backticks",
+    "name": "r5-p3-dynamic-allowed",
+    "clause": "P3 Invoke-Expression / script block refused",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-leading-options-not-skipped",
+    "clause": "P2b options between git and push: --no-pager, --git-dir=",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 24,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-expanded-subcommand-allowed",
+    "clause": "P2b a substituted subcommand",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-expanded-git-word-allowed",
+    "clause": "P2b a substituted git word",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-expanded-push-arg-allowed",
+    "clause": "P2b a substituted push argument",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "p0-sed-file-script-allowed",
+    "clause": "P0 bash: sed -f",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "p0-ps-tilde-allowed",
+    "clause": "P0 powershell: leading ~",
     "typecheckExit": 0,
     "testExit": 1,
     "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "p0-git-alias-allowed",
+    "clause": "P0 git: a subcommand that is not git's own (an alias)",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 11,
+    "killed": true
+  },
+  {
+    "name": "p0-newline-allowed",
+    "clause": "P0 bash: an unquoted newline",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
     "killed": true
   }
 ]

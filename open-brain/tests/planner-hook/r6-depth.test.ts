@@ -12,7 +12,8 @@ const ROOT = "/tmp/r6-depth-root";
 
 describe("P1 without the gate (bash.ts)", () => {
   it("a heredoc body is data, not commands", () => {
-    expect(detectBashWriteTargets("cat <<'EOF' > docs/loops/q.md\n> quoted **bold** $VAR\nEOF", ROOT)).toEqual([]);
+    // the body's "> **bold**" would be a redirect to a glob (refused) if the body were read as commands
+    expect(detectBashWriteTargets("cat <<'EOF' > docs/loops/q.md\n> **bold** $VAR\necho > ~/x\nEOF", ROOT)).toEqual([]);
     expect(detectBashWriteTargets("cat <<'EOF' > open-brain/src/x.ts\nbody\nEOF", ROOT)).not.toEqual([]);
   });
 

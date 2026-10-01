@@ -1,98 +1,98 @@
 [
   {
-    "name": "r5-p2b-force-long-allowed",
-    "clause": "P2b force: --force*",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 19,
-    "killed": true
-  },
-  {
-    "name": "r5-p2b-force-short-cluster",
-    "clause": "P2b force: -f inside a short cluster (-fu)",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 4,
-    "killed": true
-  },
-  {
-    "name": "r5-p2b-plus-refspec-allowed",
-    "clause": "P2b force: +refspec",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 4,
-    "killed": true
-  },
-  {
-    "name": "r5-p2b-delete-refspec-allowed",
-    "clause": "P2b delete: :dst refspec",
+    "name": "p0-ps-newline-allowed",
+    "clause": "P0 powershell: newline",
     "typecheckExit": 0,
     "testExit": 1,
     "failedTests": 3,
     "killed": true
   },
   {
-    "name": "r5-p2b-standing-prefix-off",
-    "clause": "P2b standing: only loop/ qa/ docs/ chore/ (and never master)",
+    "name": "r6-nonmerge-token-rule",
+    "clause": "Open 4: a merge is gh's first two positional words",
     "typecheckExit": 0,
     "testExit": 1,
-    "failedTests": 24,
+    "failedTests": 9,
     "killed": true
   },
   {
-    "name": "r5-p2b-remote-any",
-    "clause": "P2b standing: remote must be origin",
+    "name": "r6-nonmerge-global-flag-value",
+    "clause": "Open 4: gh's -R/--repo take a value",
     "typecheckExit": 0,
     "testExit": 1,
-    "failedTests": 5,
+    "failedTests": 7,
     "killed": true
   },
   {
-    "name": "r5-p2b-bare-push-allowed",
-    "clause": "P2b standing: a push naming no branch",
+    "name": "r6-git-c-keys-allowed",
+    "clause": "Open 5: git -c alias./remote./url./include./core.",
     "typecheckExit": 0,
     "testExit": 1,
-    "failedTests": 3,
+    "failedTests": 10,
     "killed": true
   },
   {
-    "name": "r5-p2b-tags-mirror-allowed",
-    "clause": "P2b tags, mirror, all, delete, prune",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 6,
-    "killed": true
-  },
-  {
-    "name": "r5-p2b-merge-tag-allowed",
-    "clause": "P2b merge and tag",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 14,
-    "killed": true
-  },
-  {
-    "name": "r5-p2b-nested-git-not-seen",
-    "clause": "P2b git inside bash -c / $( ) / backticks",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 3,
-    "killed": true
-  },
-  {
-    "name": "r5-p2b-expanded-subcommand-allowed",
-    "clause": "P2b a substituted subcommand",
+    "name": "r6-foreign-url-read",
+    "clause": "D9: a pull URL of another repository needs a grant",
     "typecheckExit": 0,
     "testExit": 0,
     "failedTests": 0,
     "killed": false
   },
   {
-    "name": "r5-p2b-expanded-git-word-allowed",
-    "clause": "P2b a substituted git word",
+    "name": "r6-foreign-url-repo-name",
+    "clause": "D9: the repository name is compared too",
     "typecheckExit": 0,
     "testExit": 0,
     "failedTests": 0,
     "killed": false
+  },
+  {
+    "name": "r6-dev-prefix-sink",
+    "clause": "D4: only the exact device names are sinks",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 2,
+    "killed": true
+  },
+  {
+    "name": "r6-dev-dotdot-normalise-late",
+    "clause": "D4: the drive form is read again after ..",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r6-cp-attached-t",
+    "clause": "D3: cp -tDIR and -vtDIR",
+    "typecheckExit": 2,
+    "testExit": 1,
+    "failedTests": 0,
+    "killed": true
+  },
+  {
+    "name": "r6-cp-long-prefix",
+    "clause": "D3: cp --target (GNU prefix)",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "r6-install-ignored",
+    "clause": "QA 237 survivor: install is a writer",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "r6-comma-quoted-split-off",
+    "clause": "QA 237 survivor: a quoted comma list is several targets",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 2,
+    "killed": true
   }
 ]
