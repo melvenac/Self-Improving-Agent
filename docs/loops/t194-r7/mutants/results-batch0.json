@@ -1,0 +1,34 @@
+[
+  {
+    "name": "r7-ps-nonascii-allowed",
+    "clause": "P0a: PowerShell refuses any non-ASCII character",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 15,
+    "killed": true
+  },
+  {
+    "name": "r7-bash-nonascii-allowed",
+    "clause": "P0a: Bash refuses non-ASCII outside quotes",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 8,
+    "killed": true
+  },
+  {
+    "name": "r7-nonascii-controls-allowed",
+    "clause": "P0a: control characters are refused too",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 2,
+    "killed": true
+  },
+  {
+    "name": "r7-nonascii-del-allowed",
+    "clause": "P0a: DEL (0x7F) is outside printable ASCII",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 2,
+    "killed": true
+  }
+]
