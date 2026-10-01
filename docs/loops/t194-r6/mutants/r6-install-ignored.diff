@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 4340d4a4..97ce2f18 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -64,7 +64,6 @@ function bashCommandTargets(name: string, args: readonly Word[], out: WriteTarge
+     }
+     case "cp":
+     case "mv":
+-    case "install":
+     case "ln": {
+       let targetDir: Word | null = null;
+       const pos: Word[] = [];

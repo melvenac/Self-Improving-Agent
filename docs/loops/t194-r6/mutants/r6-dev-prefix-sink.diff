@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index bd564c2a..c62e5385 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -146,7 +146,7 @@ export function isNullSink(text: string): boolean {
+   return (
+     /^\/dev\/(?:null|zero|stdin|stdout|stderr|tty|random|urandom)$/.test(t) ||
+     /^\/dev\/fd\/\d+$/.test(t) ||
+-    t === "$null" ||
++    t === "$null" || t.startsWith("/dev/") ||
+     t.toLowerCase() === "nul"
+   );
+ }

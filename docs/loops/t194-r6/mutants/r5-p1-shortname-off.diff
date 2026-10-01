@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index bd564c2a..6a5f5874 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -76,7 +76,7 @@ export function toRepoRelative(raw: string, repoRoot: string, cwd: string = repo
+   const rc = r.split("/");
+   let shared = 0;
+   while (shared < ac.length && shared < rc.length && ac[shared] === rc[shared]) shared++;
+-  if (ac.slice(shared).some((c) => SHORT_NAME_RE.test(c))) {
++  if (false) {
+     return { ok: false, cause: `${raw} contains an 8.3 short name, so its location cannot be determined` };
+   }
+   return { ok: true, outside: true };

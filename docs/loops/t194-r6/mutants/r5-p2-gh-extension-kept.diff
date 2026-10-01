@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/shell-words.ts b/open-brain/src/planner-hook/shell-words.ts
+index 45353f6f..724a0194 100644
+--- a/open-brain/src/planner-hook/shell-words.ts
++++ b/open-brain/src/planner-hook/shell-words.ts
+@@ -341,7 +341,7 @@ export function parseCommand(source: string, flavor: Flavor): Parsed {
+ export function commandBase(text: string): string {
+   const unq = text.replace(/^["']+|["']+$/g, "").replace(/\\/g, "/");
+   const last = unq.split("/").pop() ?? "";
+-  return last.replace(/\.[A-Za-z0-9]{1,4}$/, "").toLowerCase();
++  return last.toLowerCase();
+ }
+ 
+ const WRAPPERS = new Set([

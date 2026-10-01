@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index bd564c2a..63cb386f 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -25,7 +25,7 @@ const SHORT_NAME_RE = /(?:^|[\\/])[^\\/]*~\d[^\\/]*(?:[\\/]|$)/;
+ function toFwd(raw: string, winRoot: boolean): string {
+   // The long-path prefixes (backslash backslash ? backslash, and the dot form) name the same file as the plain
+   // drive path; left alone they read as an outside UNC path.
+-  const p = raw.trim().replace(/\\/g, "/").replace(/^\/\/[?.]\//, "");
++  const p = raw.trim().replace(/\\/g, "/");
+   const bash = winRoot ? p.match(/^(?:\/cygdrive|\/mnt)?\/([A-Za-z])(\/.*)?$/) : null;
+   return bash ? `${bash[1]}:${bash[2] ?? "/"}` : p;
+ }

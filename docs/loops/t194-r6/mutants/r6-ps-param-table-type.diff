@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index add27542..fdccbcf5 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -489,7 +489,7 @@ export const PS_CMDLETS: Record<string, PsCmdlet> = {
+   "clear-content": { kind: "write", params: { path: P(true, "path"), literalpath: P(true, "path"), force: P(false) } },
+   "out-file": { kind: "write", params: { filepath: P(true, "path"), literalpath: P(true, "path"), encoding: P(true), append: P(false), force: P(false), noclobber: P(false), width: P(true), inputobject: P(true) } },
+   "tee-object": { kind: "write", params: { filepath: P(true, "path"), literalpath: P(true, "path"), append: P(false), inputobject: P(true) } },
+-  "new-item": { kind: "new", params: { path: P(true, "path"), name: P(true, "name"), itemtype: P(true), type: P(true), value: P(true), force: P(false) } },
++  "new-item": { kind: "new", params: { path: P(true, "path"), name: P(true, "name"), itemtype: P(true), value: P(true), force: P(false) } },
+   "copy-item": { kind: "copy", params: { path: P(true, "path"), literalpath: P(true, "path"), destination: P(true, "dest"), recurse: P(false), force: P(false) } },
+   "move-item": { kind: "move", params: { path: P(true, "path"), literalpath: P(true, "path"), destination: P(true, "dest"), force: P(false) } },
+   "rename-item": { kind: "move", params: { path: P(true, "path"), literalpath: P(true, "path"), newname: P(true), force: P(false) } },

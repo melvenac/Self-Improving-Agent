@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 4340d4a4..a384dbcf 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -21,7 +21,7 @@ export const BASH_WRITE_LIMIT =
+   "Remove-Item (PowerShell). A target that is not a literal path is refused, and so is cd plus a write on one line (split " +
+   "them into two commands). OUT OF REACH, not caught: what a program the command runs does with its own arguments (node " +
+   "x.js or npm test writing a path it builds at runtime); in Bash, other writing commands (rm, touch, dd, curl -o, git " +
+-  "checkout); symlinks and junctions; and a merge through the GitHub API (curl, gh api). It stops mistakes by the " +
++  "checkout, perl -pi, awk -i); symlinks and junctions; and a merge through the GitHub API (curl, gh api). It stops mistakes by the " +
+   "planner's tools; it is not a sandbox.";
+ 
+ export interface WriteTarget {

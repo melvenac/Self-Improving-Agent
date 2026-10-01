@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 2cd57fc3..41e29d7d 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -155,7 +155,7 @@ export function analyzeGhMerge(command: string, flavor: Flavor = "bash"): GhMerg
+   const q = parseCommand(command, flavor);
+   // Nested code (`bash -c "gh pr merge 1"`, $( ... ), backticks) can only add merges, never an exact allow.
+   const nested = allParses(command, flavor).slice(1).map((p) => p.parsed);
+-  const isMerge = mergeIn(q) || nested.some(mergeIn);
++  const isMerge = mergeIn(q);
+   if (!isMerge) return { isMerge: false, single: false, repoFlag: false, exact: null };
+ 
+   const s = q.simples.length === 1 ? q.simples[0] : null;

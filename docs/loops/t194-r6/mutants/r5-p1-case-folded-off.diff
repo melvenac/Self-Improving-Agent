@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index bd564c2a..aea27288 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -67,7 +67,7 @@ export function toRepoRelative(raw: string, repoRoot: string, cwd: string = repo
+   const a = winRoot ? abs.toLowerCase() : abs;
+   const r = winRoot ? root.toLowerCase() : root;
+   if (a === r) return { ok: true, outside: false, rel: ".", ci: winRoot };
+-  if (a.startsWith(`${r}/`)) return { ok: true, outside: false, rel: abs.slice(root.length + 1), ci: winRoot };
++  if (a.startsWith(`${r}/`)) return { ok: true, outside: false, rel: abs.slice(root.length + 1), ci: false };
+   // A path that matched the root prefix was resolved above. One that did not, but carries a Windows 8.3 short
+   // name (PROGRA~1), may still be inside: the real directory name is on the disk, not in the text.
+   // Only a short name AFTER the point where the path leaves the root's own spelling counts: a sibling that shares

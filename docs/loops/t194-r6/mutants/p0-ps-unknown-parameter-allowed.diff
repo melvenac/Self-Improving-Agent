@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index add27542..a0476086 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -720,7 +720,7 @@ function gatePowerShell(command: string, depth: number): string | null {
+         if (a.quoted || !a.text.startsWith("-") || a.text.length < 2 || /^-\d/.test(a.text)) continue;
+         const colon = a.text.indexOf(":");
+         const p = resolvePsParam(canon, a.text);
+-        if (p === "unknown") return refuse(`unknown parameter ${colon > 0 ? a.text.slice(0, colon) : a.text} for ${canon}`);
++        if (false) return refuse(`unknown parameter ${colon > 0 ? a.text.slice(0, colon) : a.text} for ${canon}`);
+         if (p === "ambiguous") return refuse(`ambiguous parameter ${a.text} for ${canon}`);
+         const def = PS_CMDLETS[canon].params[p];
+         if (def.value && colon < 0) {

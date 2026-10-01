@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index add27542..d2c0aa12 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -396,7 +396,7 @@ export function sedScriptRefusal(s: string): string | null {
+         break;
+       }
+       case "w": case "W":
+-        return refuse("sed w (writes a file)");
++        break;
+       case "e":
+         return refuse("sed e (runs a command)");
+       case "r": case "R": case "a": case "i": case "c":

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index add27542..5b1e4cfa 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -158,7 +158,7 @@ function gateBash(command: string, depth: number): string | null {
+       continue;
+     }
+     if (c === "<") {
+-      if (command[i + 1] === "<") return refuse("heredoc or here-string");
++      
+       if (command[i + 1] === "(" || command[i + 1] === "&" || command[i + 1] === ">") return refuse("process substitution or fd redirect");
+       cur.redirs.push("<");
+       i++;

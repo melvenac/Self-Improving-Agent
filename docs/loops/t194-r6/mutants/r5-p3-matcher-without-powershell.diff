@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/registration.ts b/open-brain/src/planner-hook/registration.ts
+index 6a05eaf9..dd71b3a4 100644
+--- a/open-brain/src/planner-hook/registration.ts
++++ b/open-brain/src/planner-hook/registration.ts
+@@ -10,7 +10,7 @@ export function plannerHookRegistration(openBrainDir: string): object {
+     hooks: {
+       PreToolUse: [
+         {
+-          matcher: "Edit|Write|NotebookEdit|Bash|PowerShell",
++          matcher: "Edit|Write|NotebookEdit|Bash",
+           hooks: [{ type: "command", command, timeout: 10 }],
+         },
+       ],

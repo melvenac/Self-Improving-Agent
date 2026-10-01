@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index bd564c2a..bad563be 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -135,7 +135,7 @@ export function nonLiteralCause(text: string, shell: boolean): string | null {
+   if (/[$`]/.test(text)) return "contains a shell expansion";
+   if (/[*?[\]]/.test(text)) return "contains a glob pattern";
+   if (/[{}]/.test(text)) return "contains a brace expansion";
+-  if (shell && /[()]/.test(text)) return "contains a parenthesis (process substitution or subshell)";
++  
+   return null;
+ }
+ 

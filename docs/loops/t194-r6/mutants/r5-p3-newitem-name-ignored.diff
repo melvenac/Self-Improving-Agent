@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 4340d4a4..87cef7dc 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -211,7 +211,7 @@ function psCommandTargets(canon: string, args: readonly Word[], via: string, out
+   }
+   if (kind === "new") {
+     const base = pathVals.length > 0 ? pathVals : pos.slice(0, 1);
+-    if (names.length > 0 && base.length > 0) {
++    if (false) {
+       for (const b of base) {
+         for (const nm of names) {
+           add({ text: `${b.text}/${nm.text}`, raw: `${b.raw}/${nm.raw}`, expands: b.expands || nm.expands }, via);

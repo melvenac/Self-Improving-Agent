@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index bd564c2a..c65da96e 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -63,7 +63,7 @@ export function toRepoRelative(raw: string, repoRoot: string, cwd: string = repo
+   // Normalise FIRST, then read the Git Bash drive form again: `/dev/../c/x` is `/c/x` only after the `..` is applied
+   // (QA 237 D4), so the drive conversion in toFwd has to run on the normalised path as well.
+   const norm = posix.normalize(p);
+-  const abs = winRoot ? ntfsComponents(posix.normalize(toFwd(norm, true))) : norm;
++  const abs = winRoot ? ntfsComponents(norm) : norm;
+   const a = winRoot ? abs.toLowerCase() : abs;
+   const r = winRoot ? root.toLowerCase() : root;
+   if (a === r) return { ok: true, outside: false, rel: ".", ci: winRoot };

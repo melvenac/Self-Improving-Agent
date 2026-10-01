@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/run.ts b/open-brain/src/planner-hook/run.ts
+index ed17fe34..afc67a76 100644
+--- a/open-brain/src/planner-hook/run.ts
++++ b/open-brain/src/planner-hook/run.ts
+@@ -106,7 +106,7 @@ function checkFileTool(
+ 
+   // r5 P1: the same literal-path rule as a shell target. A file tool expands nothing, but a `~`, a
+   // pattern character or a brace is not a path the hook can locate, so it is refused with its cause.
+-  const nonLiteral = nonLiteralCause(rawPath, false);
++  const nonLiteral = null as string | null;
+   if (nonLiteral) {
+     return {
+       decision: "deny",

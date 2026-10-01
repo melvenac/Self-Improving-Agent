@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index add27542..3ebd80b1 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -453,7 +453,7 @@ export function ghPositionals(args: readonly string[]): string[] {
+   for (let i = 0; i < args.length; i++) {
+     const t = args[i];
+     if (t.startsWith("-") && t.length > 1) {
+-      if (GH_GLOBAL_WITH_VALUE.has(t)) i++;
++      
+       continue;
+     }
+     out.push(t);

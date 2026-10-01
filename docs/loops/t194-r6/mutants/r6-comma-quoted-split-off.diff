@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 4340d4a4..09106b56 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -161,7 +161,7 @@ function splitCommaWord(w: Word): Word[] {
+       q = c;
+       continue;
+     }
+-    if (c === ",") {
++    if (c === "," && false) {
+       pieces.push(cur);
+       cur = "";
+       continue;

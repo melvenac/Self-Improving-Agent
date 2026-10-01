@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index add27542..1165f6d4 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -104,7 +104,7 @@ function gateBash(command: string, depth: number): string | null {
+         continue;
+       }
+       if (c === "\\") return refuse("backslash");
+-      if (c === "$") return refuse("$ (variable, substitution or $'...' string)");
++      
+       if (c === "`") return refuse("backtick (command substitution)");
+       if (c === "(" || c === ")") return refuse("parenthesis (subshell, grouping or process substitution)");
+       if (c === "{" || c === "}") return refuse("brace ({ } group or brace expansion)");

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 4340d4a4..11a13164 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -225,7 +225,7 @@ function psCommandTargets(canon: string, args: readonly Word[], via: string, out
+   const src = pathVals.length > 0 ? pathVals : pos.slice(0, 1);
+   const dest = destVals.length > 0 ? destVals : pathVals.length > 0 ? pos.slice(0, 1) : pos.slice(1, 2);
+   for (const w of dest) add(w, via);
+-  if (kind === "move") for (const w of src) add(w, `${via} source`);
++  
+ }
+ 
+ function extractSimple(s: Simple, flavor: Flavor, targets: WriteTarget[], flags: { cd: boolean; dynamic: string | null }): void {

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index add27542..8e3edd66 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -645,7 +645,7 @@ function gatePowerShell(command: string, depth: number): string | null {
+       i++;
+       continue;
+     }
+-    if (c === "\n" || c === "\r") return refuse("newline outside quotes (use ; between commands)");
++    if (c === "\n" || c === "\r") { i++; flushStage(); continue; }
+     if (c === ";") {
+       i++;
+       flushStage();

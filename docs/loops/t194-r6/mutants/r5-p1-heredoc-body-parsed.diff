@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/shell-words.ts b/open-brain/src/planner-hook/shell-words.ts
+index 45353f6f..8b2c6916 100644
+--- a/open-brain/src/planner-hook/shell-words.ts
++++ b/open-brain/src/planner-hook/shell-words.ts
+@@ -260,7 +260,7 @@ export function parseCommand(source: string, flavor: Flavor): Parsed {
+     if (c === "\n" || c === "\r" || c === ";") {
+       endSimple();
+       i++;
+-      if (c === "\n" && pending.length > 0) skipHeredocBodies();
++      
+       continue;
+     }
+     if (c === "<" && src[i + 1] === "<" && src[i + 2] !== "<" && !ps) {

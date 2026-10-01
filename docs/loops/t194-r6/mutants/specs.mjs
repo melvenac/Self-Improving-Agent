@@ -7,9 +7,7 @@ import { MUTANTS as R5 } from "../../t194-r5/mutants/specs.mjs";
 // r5 mutants whose anchor text r6 changed. The CLAUSE is the same; only the line that carries it moved.
 const REBASED = {
   "p1-ntfs-dots-off": { find: "const abs = winRoot ? ntfsComponents(posix.normalize(toFwd(norm, true))) : norm;", replace: "const abs = winRoot ? posix.normalize(toFwd(norm, true)) : norm;" },
-  "p1-cp-t-ignored": { find: "if (t >= 0) {
-            const attached", replace: "if (false) {
-            const attached" },
+  "p1-cp-t-ignored": { find: "if (t >= 0) {\n            const attached", replace: "if (false) {\n            const attached" },
   "p3-param-prefix-off": { file: "parse-gate.ts", find: "const hits = Object.keys(table).filter((p) => p.startsWith(name));", replace: "const hits = Object.keys(table).filter((p) => p === name);" },
 };
 const r5 = R5.map((m) => ({ ...m, name: `r5-${m.name}`, ...(REBASED[m.name] ?? {}) }));

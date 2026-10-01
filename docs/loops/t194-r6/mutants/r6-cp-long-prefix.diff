@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 4340d4a4..ba6fa1a7 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -80,7 +80,7 @@ function bashCommandTargets(name: string, args: readonly Word[], out: WriteTarge
+           // (r6, QA 237 D3). `--no-target-directory` starts with `--no`, so it is not matched here.
+           const eq = w.text.indexOf("=");
+           const long = eq < 0 ? w.text : w.text.slice(0, eq);
+-          if (long.length >= 3 && "--target-directory".startsWith(long)) {
++          if (long === "--target-directory") {
+             if (eq >= 0) targetDir = { text: w.text.slice(eq + 1), raw: w.raw, expands: w.expands };
+             else if (args[k + 1]) {
+               targetDir = args[k + 1];

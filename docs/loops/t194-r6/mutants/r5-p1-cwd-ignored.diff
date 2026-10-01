@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index bd564c2a..f70cf2e0 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -58,7 +58,7 @@ export function toRepoRelative(raw: string, repoRoot: string, cwd: string = repo
+     if (!base.startsWith("/") && !WIN_DRIVE_RE.test(base)) {
+       return { ok: false, cause: `${raw} is relative and the working directory (${cwd}) is not an absolute path, so its location cannot be determined` };
+     }
+-    p = `${base}/${p}`;
++    p = `${root}/${p}`;
+   }
+   // Normalise FIRST, then read the Git Bash drive form again: `/dev/../c/x` is `/c/x` only after the `..` is applied
+   // (QA 237 D4), so the drive conversion in toFwd has to run on the normalised path as well.

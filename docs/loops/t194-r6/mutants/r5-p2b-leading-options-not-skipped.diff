@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 2cd57fc3..180687ba 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -69,7 +69,7 @@ function gitRestrictedIn(parsed: Parsed): boolean {
+       if (!(w.expands || commandBase(w.text) === "git")) continue;
+       const rest = s.words.slice(k + 1);
+       let i = 0;
+-      while (i < rest.length && rest[i].text.startsWith("-")) {
++      while (false) {
+         const o = rest[i].text;
+         // r6 (Open 5): an inline `-c key=value` whose key can redefine a command, a remote or what git runs needs a grant,
+         // whatever the subcommand.

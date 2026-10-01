@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 2cd57fc3..3267c720 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -142,7 +142,7 @@ function mergeAfterGh(words: readonly { text: string; expands: boolean }[]): boo
+     // r6 (Atlas ruling, Open 4): a merge is when gh's FIRST TWO POSITIONAL words, after its global flags, are
+     // `pr` `merge`. `gh pr comment 5 --body merge` and `gh pr list --label merge` are not merges.
+     const pos = ghPositionals(words.slice(k + 1).map((w) => w.text)).map((t) => t.toLowerCase());
+-    if (pos[0] === "pr" && pos[1] === "merge") return true;
++    if (pos.indexOf("pr") >= 0 && pos.indexOf("merge", pos.indexOf("pr") + 1) >= 0) return true;
+   }
+   return false;
+ }

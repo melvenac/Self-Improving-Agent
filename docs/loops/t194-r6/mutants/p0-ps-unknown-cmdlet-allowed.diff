@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index add27542..9a04c504 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -732,7 +732,7 @@ function gatePowerShell(command: string, depth: number): string | null {
+       }
+       continue;
+     }
+-    if (/^[A-Za-z]+-[A-Za-z]+$/.test(head.text)) return refuse(`unknown cmdlet (${head.text})`);
++    if (false) return refuse(`unknown cmdlet (${head.text})`);
+     if (baseLower === "git") {
+       const r = gateGit(words.slice(1).map((w) => w.text));
+       if (r) return r;

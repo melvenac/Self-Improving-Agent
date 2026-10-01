@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 4340d4a4..598b98a9 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -93,7 +93,7 @@ function bashCommandTargets(name: string, args: readonly Word[], out: WriteTarge
+           // a short cluster: `-t DIR`, `-tDIR`, `-vt DIR`, `-vtDIR`. Everything after a `t` in the cluster is its value.
+           const cluster = w.text.slice(1);
+           const t = cluster.indexOf("t");
+-          if (t >= 0) {
++          if (false) {
+             const attached = cluster.slice(t + 1);
+             if (attached) targetDir = { text: attached, raw: w.raw, expands: w.expands };
+             else if (args[k + 1]) {
