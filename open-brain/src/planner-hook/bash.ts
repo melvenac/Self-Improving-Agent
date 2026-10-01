@@ -16,7 +16,7 @@ import {
 export const BASH_WRITE_LIMIT =
   "Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the " +
   "PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target " +
-  "that is not a literal path, or a cd in the same command line, is refused. OUT OF REACH: a path a script builds " +
+  "that is not a literal path is refused, and so is cd plus a write on one line (split them into two commands). OUT OF REACH: a path a script builds " +
   "at runtime (node x.js writing src/), other write commands (rm, touch, dd, curl -o, git checkout), symlinks and " +
   "junctions, and a merge through the GitHub API (curl, gh api). It stops mistakes by the planner's tools; it is " +
   "not a sandbox.";
@@ -286,7 +286,7 @@ export function detectBashWriteTargets(
   if (ex.cd && fileTargets.length > 0) {
     push(
       `${fileTargets[0].word.text} (the command line changes directory with cd, pushd or Set-Location and also writes, ` +
-        "so where the write lands cannot be determined)",
+        "so where the write lands cannot be determined; split them into two commands)",
     );
   }
 

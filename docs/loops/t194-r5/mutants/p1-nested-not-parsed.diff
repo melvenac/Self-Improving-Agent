@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 3a6fb7ce..09d19d45 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -243,7 +243,7 @@ const PS_WRITE_WORD_RE =
+  * the top. Quoted prose and heredoc bodies are data and are never read as commands.
+  */
+ export function extractWrites(command: string, flavor: Flavor): Extracted {
+-  const all = allParses(command, flavor).map((p) => extractFromParsed(p.parsed, p.flavor));
++  const all = allParses(command, flavor).slice(0, 1).map((p) => extractFromParsed(p.parsed, p.flavor));
+   let dynamic: string | null = all.map((a) => a.dynamic).find((d) => d !== null) ?? null;
+   if (flavor === "powershell" && !dynamic) {
+     // A brace inside a quoted string is text (`-Value '{"a":1}'`); one outside quotes opens a script block.

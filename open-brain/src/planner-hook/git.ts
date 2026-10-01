@@ -1,15 +1,6 @@
 import { normalizeRelPath } from "./paths.js";
 import { allParses, commandBase, parseCommand, type Flavor, type Parsed } from "./shell-words.js";
 
-const FORCE_PUSH_RE = /\bgit\s+push\b[^;\n|&]*(?:--force|-f)\b/;
-const PUSH_TAGS_RE = /\bgit\s+push\b[^;\n|&]*--tags\b/;
-const PUSH_MASTER_RE = /\bgit\s+push\b[^;\n|&]*(?:\s(?:origin\s+)?master\b|:\s*master\b|HEAD:master\b)/;
-const GIT_MERGE_RE = /\bgit\s+merge\b/;
-const GIT_TAG_RE = /\bgit\s+tag\b/;
-
-const STANDING_PUSH_BRANCH_RE =
-  /\bgit\s+push\b[^;\n|&]*(?:origin\s+)?(?:loop\/|qa\/|docs\/|chore\/)[^\s;|&]*/;
-
 const DOCS_MERGE_ALLOWLIST_PREFIXES = ["docs/"];
 const DOCS_MERGE_ALLOWLIST_EXACT = new Set([
   "README.md",
@@ -24,42 +15,82 @@ const DOCS_MERGE_ALLOWLIST_EXACT = new Set([
   ".agents/SYSTEM/ENTITIES.md",
 ]);
 
-export function isForcePush(command: string): boolean {
-  return FORCE_PUSH_RE.test(command);
+/**
+ * T-194 r5, P2b: a command is a git merge, tag or push if a git word is followed, with ANY global options in
+ * between (`-C <dir>`, `-c k=v`, `--git-dir=...`, `--no-pager`), by that subcommand. The git word is read as
+ * the gh word is: file name, any case, any extension, quotes removed. Merge and tag always need a grant. A push
+ * needs a grant unless it is a STANDING push: remote `origin`, every refspec a plain branch under loop/, qa/,
+ * docs/ or chore/, and no force, tag, mirror, delete or master/main target. A grant matches exactly (r4-5).
+ */
+const GIT_GLOBAL_WITH_VALUE = new Set(["-C", "-c", "--git-dir", "--work-tree", "--namespace", "--super-prefix", "--config-env", "--exec-path"]);
+const PUSH_OPTION_WITH_VALUE = new Set(["--repo", "-o", "--push-option", "--receive-pack", "--exec", "--signed"]);
+const PUSH_ALWAYS_GRANT = new Set(["--tags", "--follow-tags", "--mirror", "--all", "--prune", "--delete", "-d"]);
+const STANDING_BRANCH_RE = /^(?:loop|qa|docs|chore)\/[^\s/][^\s]*$/;
+
+/** True when this push must be matched by a grant. `args` are the words after `push`. */
+function pushNeedsGrant(args: readonly { text: string; expands: boolean }[]): boolean {
+  const positional: string[] = [];
+  for (let k = 0; k < args.length; k++) {
+    const t = args[k].text;
+    if (args[k].expands) return true;
+    if (t === "--") {
+      for (const rest of args.slice(k + 1)) {
+        if (rest.expands) return true;
+        positional.push(rest.text);
+      }
+      break;
+    }
+    if (t.startsWith("-")) {
+      if (/^--force/.test(t) || (!t.startsWith("--") && /^-[A-Za-z]*f[A-Za-z]*$/.test(t))) return true;
+      if (PUSH_ALWAYS_GRANT.has(t)) return true;
+      if (PUSH_OPTION_WITH_VALUE.has(t)) k++;
+      continue;
+    }
+    positional.push(t);
+  }
+  if (positional.length < 2) return true;
+  if (positional[0] !== "origin") return true;
+  for (const spec of positional.slice(1)) {
+    if (spec.startsWith("+")) return true;
+    const dest = (spec.includes(":") ? (spec.split(":").pop() as string) : spec).replace(/^refs\/heads\//, "");
+    // master and main are not under loop/, qa/, docs/ or chore/, so the standing test alone refuses them.
+    if (dest === "" || !STANDING_BRANCH_RE.test(dest)) return true;
+  }
+  return false;
 }
 
-export function isPushTags(command: string): boolean {
-  return PUSH_TAGS_RE.test(command);
+function gitRestrictedIn(parsed: Parsed): boolean {
+  for (const s of parsed.simples) {
+    for (let k = 0; k < s.words.length; k++) {
+      const w = s.words[k];
+      if (!(w.expands || commandBase(w.text) === "git")) continue;
+      const rest = s.words.slice(k + 1);
+      let i = 0;
+      while (i < rest.length && rest[i].text.startsWith("-")) {
+        const o = rest[i].text;
+        i += GIT_GLOBAL_WITH_VALUE.has(o) ? 2 : 1;
+      }
+      if (i >= rest.length) continue;
+      const sub = rest[i];
+      if (sub.expands) return true;
+      const name = sub.text.toLowerCase();
+      if (name === "merge" || name === "tag") return true;
+      if (name === "push" && pushNeedsGrant(rest.slice(i + 1))) return true;
+    }
+  }
+  return false;
 }
 
-export function isPushToMaster(command: string): boolean {
-  return PUSH_MASTER_RE.test(command);
-}
-
-export function isGitMerge(command: string): boolean {
-  return GIT_MERGE_RE.test(command);
-}
-
-export function isGitTag(command: string): boolean {
-  return GIT_TAG_RE.test(command);
+export function isGitRestricted(command: string, flavor: Flavor = "bash"): boolean {
+  return allParses(command, flavor).some((p) => gitRestrictedIn(p.parsed));
 }
 
 export function isGhPrMerge(command: string, flavor: Flavor = "bash"): boolean {
   return analyzeGhMerge(command, flavor).isMerge;
 }
 
-/** PH-4 / D-038: standing push to own working branch without a grant. */
-export function isStandingBranchPush(command: string): boolean {
-  if (isForcePush(command) || isPushTags(command) || isPushToMaster(command)) return false;
-  return STANDING_PUSH_BRANCH_RE.test(command);
-}
-
 export function isRestrictedOutwardBash(command: string, flavor: Flavor = "bash"): boolean {
-  if (isGitMerge(command) || isGitTag(command) || isPushTags(command) || isForcePush(command)) return true;
-  if (isPushToMaster(command)) return true;
-  if (isGhPrMerge(command, flavor)) return true;
-  if (/\bgit\s+push\b/.test(command) && !isStandingBranchPush(command)) return true;
-  return false;
+  return isGitRestricted(command, flavor) || isGhPrMerge(command, flavor);
 }
 
 export function pathOnDocsMergeAllowlist(path: string): boolean {

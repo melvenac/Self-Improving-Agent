@@ -11,6 +11,8 @@
  */
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { posix, win32 } from "node:path";
+import { writeFileSync } from "node:fs";
+import { grantPath } from "../../src/planner-hook/grant.js";
 import { makeFixture, type Fixture } from "./r5-fixture.js";
 
 // ---------------------------------------------------------------- seeded generator
@@ -491,3 +493,115 @@ describe("P2 — a merge is `gh ... pr ... merge` in any spelling; one grammar n
     expect(wrong).toEqual([]);
   });
 });
+
+// ---------------------------------------------------------------- P2b: git merge, tag and push
+const GIT_BASH = ["git", "GIT", "Git", "gIt", "git.exe", "GIT.EXE", "Git.Exe", '"git"', "'git'", '"git.exe"', '"C:/Program Files/Git/cmd/git.exe"', "'C:\Program Files\Git\cmd\git.exe'"];
+const GIT_PS_EXTRA = [".\git.exe", "& git", '& "C:\Program Files\Git\cmd\git.exe"', "& 'git'"];
+const GIT_OPTS = ["", "", "-C docs ", "-C ../x ", "-c user.name=x ", "--git-dir=.git ", "--git-dir .git ", "--no-pager ", "--work-tree=. ", "-c a=b -C d --no-pager ", "--no-pager -c core.x=1 "];
+const STANDING_BRANCHES = ["loop/x", "loop/t194-planner-hook", "qa/y", "docs/z", "chore/w", "refs/heads/loop/q", "HEAD:loop/x", "HEAD:refs/heads/docs/n"];
+const PUSH_FLAGS_OK = ["", "", "-u ", "--set-upstream ", "--no-verify ", "-v ", "--quiet "];
+const PUSH_NEEDS_GRANT = [
+  "push", "push origin", "push origin master", "push origin main", "push origin HEAD:master", "push origin HEAD:refs/heads/master",
+  "push origin +loop/x", "push origin :loop/x", "push origin loop/x master", "push origin feature/x", "push origin loopx/x",
+  "push upstream loop/x", "push https://example.com/r.git loop/x", "push --force origin loop/x", "push origin loop/x --force",
+  "push -f origin loop/x", "push -fu origin loop/x", "push -uf origin loop/x", "push --force-with-lease origin loop/x",
+  "push --force-if-includes origin loop/x", "push --tags", "push --follow-tags origin loop/x", "push --mirror", "push --all",
+  "push --delete origin loop/x", "push -d origin loop/x", "push --prune origin loop/x",
+];
+const GIT_NON_RESTRICTED = ["status", "log --oneline -5", "log --grep push", "log --grep merge", "merge-base a b", "diff --stat", "fetch origin", "branch -D loop/old", "checkout --detach origin/master", 'commit -m "push origin master and git tag v1"'];
+const GIT_MERGE_TAG = ["merge origin/master", "merge --no-ff x", "MERGE x", "tag v1.0.0", "tag -a v1 -m x", "tag -d v1"];
+
+describe("P2b — a git merge, tag or push goes through the same grant check, in any spelling", () => {
+  interface GitCase {
+    command: string;
+    tool: "Bash" | "PowerShell";
+    restricted: boolean;
+    how: string[];
+  }
+  function genGit(count: number): GitCase[] {
+    const rng = mulberry32(SEED + 6);
+    const out: GitCase[] = [];
+    for (let n = 0; n < count; n++) {
+      const ps = chance(rng, 0.3);
+      const how: string[] = [ps ? "ps" : "bash"];
+      const gitWord = pick(rng, ps ? [...GIT_BASH, ...GIT_PS_EXTRA] : GIT_BASH);
+      const opts = pick(rng, GIT_OPTS);
+      if (opts) how.push("options");
+      if (gitWord !== "git") how.push("spelling");
+      const family = pick(rng, ["standing", "standing", "grant", "grant", "mergetag", "plain"] as const);
+      how.push(family);
+      let body: string;
+      let restricted: boolean;
+      if (family === "standing") {
+        const branches = chance(rng, 0.2) ? `${pick(rng, STANDING_BRANCHES)} ${pick(rng, STANDING_BRANCHES)}` : pick(rng, STANDING_BRANCHES);
+        body = `push ${pick(rng, PUSH_FLAGS_OK)}origin ${branches}`;
+        restricted = false;
+      } else if (family === "grant") {
+        body = pick(rng, PUSH_NEEDS_GRANT);
+        restricted = true;
+      } else if (family === "mergetag") {
+        body = pick(rng, GIT_MERGE_TAG);
+        restricted = true;
+      } else {
+        body = pick(rng, GIT_NON_RESTRICTED);
+        restricted = false;
+      }
+      let command = `${gitWord} ${opts}${body}`;
+      const wrap = pick(rng, ["none", "none", "none", "chain", "nested", "sub", "env"] as const);
+      if (wrap === "chain") {
+        command = ps ? `Get-Date; ${command}` : pick(rng, [`true && ${command}`, `${command}; true`, `(${command})`, `echo a | ${command}`]);
+        how.push("chain");
+      } else if (wrap === "nested") {
+        const inner = command.replace(/'/g, '"');
+        command = ps ? `powershell -Command "${inner.replace(/"/g, "'")}"` : `bash -c '${inner}'`;
+        how.push("nested");
+      } else if (wrap === "sub") {
+        command = ps ? `Write-Output $(${command})` : `echo $(${command})`;
+        how.push("substitution");
+      } else if (wrap === "env" && !ps) {
+        command = `env X=1 ${command}`;
+        how.push("env");
+      }
+      out.push({ command, tool: ps ? "PowerShell" : "Bash", restricted, how });
+    }
+    return out;
+  }
+
+  it("generates at least 300 cases and covers every dimension", () => {
+    const cs = genGit(300);
+    expect(cs.length).toBeGreaterThanOrEqual(300);
+    const seen = new Set(cs.flatMap((c) => c.how));
+    for (const d of ["ps", "bash", "options", "spelling", "standing", "grant", "mergetag", "plain", "chain", "nested", "substitution", "env"]) {
+      expect(seen.has(d), `no case varied ${d}`).toBe(true);
+    }
+    expect(cs.some((c) => c.restricted)).toBe(true);
+    expect(cs.some((c) => !c.restricted)).toBe(true);
+  });
+
+  it("every case matches the oracle: restricted = denied without a grant; everything else = allowed", () => {
+    const cs = genGit(300);
+    const wrong: string[] = [];
+    for (const c of cs) {
+      const r = c.tool === "Bash" ? fx.bash(c.command) : fx.ps(c.command);
+      const got = r.decision === "deny" ? "deny" : "allow";
+      const want = c.restricted ? "deny" : "allow";
+      if (got !== want) wrong.push(`${JSON.stringify(c.command)} [${c.tool}] expected ${want}, hook said ${r.decision}  [${c.how.join(",")}]`);
+    }
+    expect(wrong, `${wrong.length} of ${cs.length} disagree:\n${wrong.slice(0, 25).join("\n")}`).toEqual([]);
+  });
+
+  it("an exact grant allows the command it was written for, once, whatever its spelling", () => {
+    const rng = mulberry32(SEED + 7);
+    for (let n = 0; n < 40; n++) {
+      const command = `${pick(rng, GIT_BASH)} ${pick(rng, GIT_OPTS)}${pick(rng, PUSH_NEEDS_GRANT)}`;
+      writeGrant(command);
+      expect(fx.bash(command).decision, command).toBe("allow");
+      expect(fx.bash(command).decision, `${command} (second use, grant consumed)`).toBe("deny");
+      fx.resetGrant();
+    }
+  });
+});
+
+function writeGrant(command: string): void {
+  writeFileSync(grantPath(fx.repo), JSON.stringify({ command }), "utf-8");
+}

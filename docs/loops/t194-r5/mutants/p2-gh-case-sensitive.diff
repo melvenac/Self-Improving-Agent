@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index b61b27d8..700e8ea6 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -94,7 +94,7 @@ export interface GhMergeAnalysis {
+ }
+ 
+ /** A word is gh when its file name, with directory, quotes and extension removed, is `gh` in any case. */
+-const isGhWord = (w: { text: string; expands: boolean }): boolean => !w.expands && commandBase(w.text) === "gh";
++const isGhWord = (w: { text: string; expands: boolean }): boolean => !w.expands && w.text === "gh";
+ 
+ /** `pr` followed later by `merge` among the words after a gh word, flags allowed anywhere in between or before. */
+ function mergeAfterGh(words: readonly { text: string; expands: boolean }[]): boolean {

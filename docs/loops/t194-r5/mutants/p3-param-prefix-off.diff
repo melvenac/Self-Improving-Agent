@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 3a6fb7ce..69d10a00 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -136,7 +136,7 @@ function psParam(text: string): { name: string; inline: string | null } | null {
+ }
+ 
+ const psMatches = (name: string, full: readonly string[]): boolean =>
+-  name.length >= 2 && full.some((f) => f.startsWith(name));
++  full.includes(name);
+ 
+ /** A comma list written without quotes (`Remove-Item a,b`) is several targets. */
+ function splitCommaWord(w: Word): Word[] {

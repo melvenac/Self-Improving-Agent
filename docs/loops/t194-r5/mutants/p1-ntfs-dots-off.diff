@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index 9c835ffc..5c434050 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -60,7 +60,7 @@ export function toRepoRelative(raw: string, repoRoot: string, cwd: string = repo
+     }
+     p = `${base}/${p}`;
+   }
+-  const abs = winRoot ? ntfsComponents(posix.normalize(p)) : posix.normalize(p);
++  const abs = posix.normalize(p);
+   const a = winRoot ? abs.toLowerCase() : abs;
+   const r = winRoot ? root.toLowerCase() : root;
+   if (a === r) return { ok: true, outside: false, rel: ".", ci: winRoot };

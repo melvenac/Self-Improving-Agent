@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 3a6fb7ce..83340449 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -72,7 +72,7 @@ function bashCommandTargets(name: string, args: readonly Word[], out: WriteTarge
+           ended = true;
+           continue;
+         }
+-        if (!ended && (w.text === "-t" || w.text === "--target-directory")) {
++        if (false) {
+           const v = args[k + 1];
+           if (v) targetDir = v;
+           k++;

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 3a6fb7ce..345f3ecc 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -280,7 +280,7 @@ export function detectBashWriteTargets(
+     }
+   };
+ 
+-  if (ex.dynamic) push(`${ex.dynamic} (so its write location cannot be determined)`);
++  if (false) push(`${ex.dynamic} (so its write location cannot be determined)`);
+ 
+   const fileTargets = ex.targets.filter((t) => !isNullSink(t.word.text));
+   if (ex.cd && fileTargets.length > 0) {

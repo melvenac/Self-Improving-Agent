@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 3a6fb7ce..2aada129 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -88,7 +88,7 @@ function bashCommandTargets(name: string, args: readonly Word[], out: WriteTarge
+       if (targetDir) out.push({ word: targetDir, via: name });
+       else if (pos.length >= 2) out.push({ word: pos[pos.length - 1], via: name });
+       // A move deletes its sources, so a protected source is a protected write.
+-      if (name === "mv") for (const w of pos.slice(0, targetDir ? pos.length : pos.length - 1)) out.push({ word: w, via: "mv source" });
++      
+       return;
+     }
+     case "sed": {

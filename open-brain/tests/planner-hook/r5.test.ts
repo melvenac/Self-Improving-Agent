@@ -410,3 +410,115 @@ describe("the limit is stated in the refusal text, not only in a handoff", () =>
     expect(fx.ps("Set-Content open-brain/src/cli.ts x").reason).toContain("OUT OF REACH");
   });
 });
+
+describe("P2b — a git merge, tag or push is read by the same rule: git word, any options, then the subcommand", () => {
+  const needsGrant = [
+    "git merge origin/master",
+    "git merge --no-ff x",
+    "git tag v1.0.0",
+    "git tag -a v1 -m x",
+    "git push",
+    "git push origin",
+    "git push origin master",
+    "git push origin main",
+    "git push origin HEAD:master",
+    "git push origin HEAD:refs/heads/master",
+    "git push origin +loop/x",
+    "git push origin :loop/x",
+    "git push origin loop/x master",
+    "git push origin feature/x",
+    "git push origin loopx/x",
+    "git push upstream loop/x",
+    "git push https://example.com/r.git loop/x",
+    "git push --force origin loop/x",
+    "git push origin loop/x --force",
+    "git push -f origin loop/x",
+    "git push -fu origin loop/x",
+    "git push --force-with-lease origin loop/x",
+    "git push --force-if-includes origin loop/x",
+    "git push --tags",
+    "git push --follow-tags origin loop/x",
+    "git push --mirror",
+    "git push --all",
+    "git push --delete origin loop/x",
+    "git push -d origin loop/x",
+    "GIT push --force origin loop/x",
+    "Git.EXE push origin master",
+    "git.exe push --force origin loop/x",
+    '"git" push origin master',
+    "'git' push origin master",
+    '"C:/Program Files/Git/cmd/git.exe" push origin master',
+    "git -C docs push origin master",
+    "git -C ../x push --force origin loop/x",
+    "git -c user.name=x push origin master",
+    "git --git-dir=.git push origin master",
+    "git --git-dir .git push origin master",
+    "git --no-pager push origin master",
+    "git -c a=b -C d --no-pager push --tags",
+    "git -C docs merge origin/master",
+    "git --git-dir=.git tag v2",
+    "GIT -C docs MERGE x",
+    "true && git push origin master",
+    "git status; git push origin master",
+    "(git push origin master)",
+    "env X=1 git push --force origin loop/x",
+    "bash -c 'git push --force origin loop/x'",
+    'sh -c "git -C d push origin master"',
+    "echo $(git push origin master)",
+    "git $SUB origin loop/x",
+    "$GIT push origin master",
+    "git push $REMOTE loop/x",
+  ];
+  it.each(needsGrant)("`%s` needs a grant", (command) => {
+    const r = fx.bash(command);
+    deny(r);
+    expect(r.reason).toContain("D-038");
+  });
+
+  it.each([
+    "git push origin loop/x",
+    "git push -u origin loop/t194-planner-hook",
+    "git push --no-verify origin docs/my-branch",
+    "git push origin qa/t194-r5-report",
+    "git push origin chore/x",
+    "git push origin refs/heads/loop/x",
+    "git push origin HEAD:loop/x",
+    "git push origin loop/a loop/b",
+    "git -C docs push origin loop/x",
+    "git --no-pager push origin loop/x",
+    "GIT push origin loop/x",
+    "git.exe push origin loop/x",
+    '"git" push origin loop/x',
+    "git status",
+    "git log --oneline -5",
+    "git log --grep push",
+    "git log --grep merge",
+    "git merge-base a b",
+    'git commit -m "push origin master and git tag v1"',
+    "git -C docs status",
+    "git diff --stat",
+    "git fetch origin",
+    "git branch -D loop/old",
+    "git checkout --detach origin/master",
+  ])("`%s` is not restricted", (command) => {
+    allow(fx.bash(command));
+  });
+
+  it("PowerShell: the same rule", () => {
+    deny(fx.ps("git push --force origin loop/x"));
+    deny(fx.ps("& git -C docs push origin master"));
+    deny(fx.ps(".\git.exe push --tags"));
+    deny(fx.ps("git merge origin/master"));
+    allow(fx.ps("git push origin loop/x"));
+    allow(fx.ps("git log --oneline"));
+  });
+
+  it("a grant is matched exactly, a variant does not burn it", () => {
+    writeFileSync(grantPath(fx.repo), JSON.stringify({ command: "git push origin loop/x --force" }), "utf-8");
+    deny(fx.bash("git -C docs push origin loop/x --force"));
+    deny(fx.bash("git push origin loop/x --force && git push --tags"));
+    expect(readOutwardGrant(fx.repo)).not.toBeNull();
+    allow(fx.bash("git  push origin   loop/x --force"));
+    expect(readOutwardGrant(fx.repo)).toBeNull();
+  });
+});
