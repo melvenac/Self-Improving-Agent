@@ -8,6 +8,7 @@ import {
   readOutwardGrant,
 } from "./grant.js";
 import { analyzeGhMerge, isRestrictedOutwardBash, pathOnDocsMergeAllowlist } from "./git.js";
+import { NOT_PARSEABLE, parseGate } from "./parse-gate.js";
 import type { Flavor } from "./shell-words.js";
 import {
   isAllowedDocsLoopsPath,
@@ -179,6 +180,17 @@ function checkBash(
   flavor: Flavor = "bash",
 ): PlannerHookResult | null {
   const shell = flavor === "powershell" ? "PowerShell" : "Bash";
+  // r6, P0: the hook decides only about what it can fully parse. Everything else is refused, with the construct named.
+  const gate = parseGate(command, flavor);
+  if (gate) {
+    return {
+      decision: "deny",
+      reason:
+        `Planner hook: denied — ${NOT_PARSEABLE}: ${gate}. The ${shell} command is outside the grammar the hook can check, so it ` +
+        "is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). " +
+        BASH_WRITE_LIMIT,
+    };
+  }
   const writeTargets = detectBashWriteTargets(command, repoRoot, cwd, flavor);
   if (writeTargets.length > 0) {
     return {

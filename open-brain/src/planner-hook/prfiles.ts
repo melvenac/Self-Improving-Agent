@@ -132,13 +132,17 @@ export async function fetchPrChangedPaths(
   const parsed = parsePrRef(ref);
   if (!parsed) return fail(`could not read a PR number from "${ref}" (only a number, #number or a github.com pull URL)`);
 
-  let owner = parsed.owner;
-  let repo = parsed.repo;
-  if (!owner || !repo) {
-    const o = originRepo(repoRoot);
-    if (typeof o === "string") return fail(o);
-    owner = o.owner;
-    repo = o.repo;
+  // r6 (QA 237 D9): the no-grant grammar is <number | ORIGIN pull URL>. A URL that names another repository is not
+  // read at all: it needs a grant, exactly as the same merge spelled with --repo does.
+  const o = originRepo(repoRoot);
+  if (typeof o === "string") return fail(o);
+  const owner = o.owner;
+  const repo = o.repo;
+  if (
+    (parsed.owner !== undefined && parsed.owner.toLowerCase() !== owner.toLowerCase()) ||
+    (parsed.repo !== undefined && parsed.repo.toLowerCase() !== repo.toLowerCase())
+  ) {
+    return fail(`the pull URL names ${parsed.owner}/${parsed.repo}, not origin (${owner}/${repo}); another repository needs a grant`);
   }
 
   const token = readGhToken(deps.env ?? process.env, deps.home ?? homedir());

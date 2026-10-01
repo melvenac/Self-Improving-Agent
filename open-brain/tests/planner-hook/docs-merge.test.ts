@@ -158,15 +158,30 @@ describe("row 1 — an all-docs PR passes with no grant", () => {
     expect(r.decision).toBe("allow");
   });
 
-  it("takes owner/repo from a PR URL and makes no read of the origin remote", async () => {
+  // SUPERSEDED BY r6 (QA 237 D9, Atlas ruling): this row used to ALLOW a pull URL of another repository after reading
+  // that repository's PR. The no-grant grammar is <number | ORIGIN pull URL>, so a foreign URL now needs a grant and
+  // nothing is read from the other repository. An origin URL is still read.
+  it("a pull URL of another repository needs a grant and is not read (r6, D9)", async () => {
     const calls: string[] = [];
     const r = await runPlannerHookAsync(
       payload("gh pr merge https://github.com/other/thing/pull/7 --squash"),
       {},
       { env: TOKEN_ENV, home, fetchImpl: fakeFetch({ files: docs("docs/a.md") }, calls) },
     );
+    expect(r.decision).toBe("deny");
+    expect(r.reason).toContain("another repository needs a grant");
+    expect(calls).toEqual([]);
+  });
+
+  it("a pull URL of origin is read like a number", async () => {
+    const calls: string[] = [];
+    const r = await runPlannerHookAsync(
+      payload("gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/7 --squash"),
+      {},
+      { env: TOKEN_ENV, home, fetchImpl: fakeFetch({ files: docs("docs/a.md") }, calls) },
+    );
     expect(r.decision).toBe("allow");
-    expect(calls[0]).toBe("https://api.github.com/repos/other/thing/pulls/7");
+    expect(calls[0]).toBe("https://api.github.com/repos/melvenac/Self-Improving-Agent/pulls/7");
   });
 });
 

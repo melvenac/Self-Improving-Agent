@@ -1,4 +1,5 @@
 import { classifyTarget, isNullSink } from "./paths.js";
+import { PS_CMDLETS, psCanonical, resolvePsParam } from "./parse-gate.js";
 import {
   allParses,
   commandBase,
@@ -10,16 +11,18 @@ import {
 } from "./shell-words.js";
 
 /**
- * What the hook can and cannot see, said once (T-194 r5). The refusal text carries it, so nothing out
- * of reach is described only in a handoff.
+ * What the hook can and cannot see, said once (T-194 r5, rewritten for r6 / QA 237 D17). Under the parse gate most of
+ * r5's "out of reach" list is REFUSED, so this states only what is still true, and nothing it states is caught.
  */
 export const BASH_WRITE_LIMIT =
-  "Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the " +
-  "PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target " +
-  "that is not a literal path is refused, and so is cd plus a write on one line (split them into two commands). OUT OF REACH: a path a script builds " +
-  "at runtime (node x.js writing src/), other write commands (rm, touch, dd, curl -o, git checkout), symlinks and " +
-  "junctions, and a merge through the GitHub API (curl, gh api). It stops mistakes by the planner's tools; it is " +
-  "not a sandbox.";
+  "The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically " +
+  "parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of " +
+  "Set-Content, Add-Content, Clear-Content, Out-File, Tee-Object, New-Item, Copy-Item, Move-Item, Rename-Item and " +
+  "Remove-Item (PowerShell). A target that is not a literal path is refused, and so is cd plus a write on one line (split " +
+  "them into two commands). OUT OF REACH, not caught: what a program the command runs does with its own arguments (node " +
+  "x.js or npm test writing a path it builds at runtime); in Bash, other writing commands (rm, touch, dd, curl -o, git " +
+  "checkout); symlinks and junctions; and a merge through the GitHub API (curl, gh api). It stops mistakes by the " +
+  "planner's tools; it is not a sandbox.";
 
 export interface WriteTarget {
   word: Word;
@@ -72,17 +75,34 @@ function bashCommandTargets(name: string, args: readonly Word[], out: WriteTarge
           ended = true;
           continue;
         }
-        if (!ended && (w.text === "-t" || w.text === "--target-directory")) {
-          const v = args[k + 1];
-          if (v) targetDir = v;
-          k++;
+        if (!ended && w.text.startsWith("--")) {
+          // GNU long options accept any unambiguous prefix: `--t`, `--target`, `--target-dir` are all --target-directory
+          // (r6, QA 237 D3). `--no-target-directory` starts with `--no`, so it is not matched here.
+          const eq = w.text.indexOf("=");
+          const long = eq < 0 ? w.text : w.text.slice(0, eq);
+          if (long.length >= 3 && "--target-directory".startsWith(long)) {
+            if (eq >= 0) targetDir = { text: w.text.slice(eq + 1), raw: w.raw, expands: w.expands };
+            else if (args[k + 1]) {
+              targetDir = args[k + 1];
+              k++;
+            }
+          }
           continue;
         }
-        if (!ended && w.text.startsWith("--target-directory=")) {
-          targetDir = { text: w.text.slice("--target-directory=".length), raw: w.raw, expands: w.expands };
+        if (!ended && w.text.startsWith("-") && w.text.length > 1) {
+          // a short cluster: `-t DIR`, `-tDIR`, `-vt DIR`, `-vtDIR`. Everything after a `t` in the cluster is its value.
+          const cluster = w.text.slice(1);
+          const t = cluster.indexOf("t");
+          if (t >= 0) {
+            const attached = cluster.slice(t + 1);
+            if (attached) targetDir = { text: attached, raw: w.raw, expands: w.expands };
+            else if (args[k + 1]) {
+              targetDir = args[k + 1];
+              k++;
+            }
+          }
           continue;
         }
-        if (!ended && isOption(w)) continue;
         pos.push(w);
       }
       if (targetDir) out.push({ word: targetDir, via: name });
@@ -122,59 +142,62 @@ function bashCommandTargets(name: string, args: readonly Word[], out: WriteTarge
   }
 }
 
-// PowerShell: parameter names that carry a path. PowerShell accepts any unambiguous prefix of a parameter name.
-const PS_PATH_PARAMS = ["path", "literalpath", "filepath", "pspath"];
-const PS_DEST_PARAMS = ["destination"];
-const PS_VALUE_PARAMS = new Set([
-  "path", "literalpath", "filepath", "pspath", "destination", "value", "name", "itemtype", "encoding",
-  "erroraction", "stream", "width", "include", "exclude", "filter", "newname", "inputobject",
-]);
-
-function psParam(text: string): { name: string; inline: string | null } | null {
-  const m = text.match(/^-([A-Za-z]+)(?::(.*))?$/);
-  return m ? { name: m[1].toLowerCase(), inline: m[2] ?? null } : null;
-}
-
-const psMatches = (name: string, full: readonly string[]): boolean =>
-  name.length >= 2 && full.some((f) => f.startsWith(name));
-
-/** A comma list written without quotes (`Remove-Item a,b`) is several targets. */
+/**
+ * A comma list (`Remove-Item a,b`, `-Path 'x','y'`) is several targets. The comma is read OUTSIDE quotes in the word as
+ * written, so a quoted list is split too (r6, QA 237 D14), and each piece loses its own quotes.
+ */
 function splitCommaWord(w: Word): Word[] {
-  if (w.raw !== w.text || !w.text.includes(",")) return [w];
-  return w.text.split(",").filter((t) => t !== "").map((t) => ({ text: t, raw: t, expands: w.expands }));
+  const pieces: string[] = [];
+  let cur = "";
+  let q: string | null = null;
+  for (let k = 0; k < w.raw.length; k++) {
+    const c = w.raw[k];
+    if (q) {
+      if (c === q) q = null;
+      else cur += c;
+      continue;
+    }
+    if (c === "'" || c === '"') {
+      q = c;
+      continue;
+    }
+    if (c === ",") {
+      pieces.push(cur);
+      cur = "";
+      continue;
+    }
+    cur += c;
+  }
+  pieces.push(cur);
+  if (pieces.length === 1) return [w];
+  return pieces.filter((t) => t !== "").map((t) => ({ text: t, raw: t, expands: w.expands }));
 }
 
-type PsKind = "write" | "copy" | "move" | "remove" | "new";
-const PS_CMDLETS: Record<string, PsKind> = {
-  "set-content": "write", sc: "write", "add-content": "write", ac: "write", "out-file": "write",
-  "clear-content": "write", clc: "write", "tee-object": "write", tee: "write",
-  "new-item": "new", ni: "new",
-  "copy-item": "copy", cpi: "copy", copy: "copy", cp: "copy",
-  "move-item": "move", mi: "move", move: "move", mv: "move",
-  "rename-item": "move", rni: "move", ren: "move",
-  "remove-item": "remove", ri: "remove", rm: "remove", del: "remove", erase: "remove", rd: "remove", rmdir: "remove",
-};
-
-function psCommandTargets(kind: PsKind, args: readonly Word[], via: string, out: WriteTarget[]): void {
+function psCommandTargets(canon: string, args: readonly Word[], via: string, out: WriteTarget[]): void {
+  const def = PS_CMDLETS[canon];
+  const kind = def.kind;
   const pathVals: Word[] = [];
   const destVals: Word[] = [];
   const names: Word[] = [];
   const pos: Word[] = [];
   for (let k = 0; k < args.length; k++) {
     const w = args[k];
-    const p = psParam(w.text);
-    if (p && w.text.startsWith("-")) {
-      const takesValue = PS_VALUE_PARAMS.has(p.name) || [...PS_VALUE_PARAMS].some((f) => p.name.length >= 2 && f.startsWith(p.name));
+    const unquotedParam = w.raw.startsWith("-") && w.text.length > 1 && !/^-\d/.test(w.text);
+    if (unquotedParam) {
+      const colon = w.text.indexOf(":");
+      const p = resolvePsParam(canon, w.text);
+      const pd = def.params[p];
+      if (!pd) continue; // the parse gate has already refused an unknown parameter; nothing to read here
       let value: Word | null = null;
-      if (p.inline !== null) value = { text: p.inline, raw: p.inline, expands: w.expands };
-      else if (takesValue && args[k + 1]) {
+      if (colon > 0) value = { text: w.text.slice(colon + 1), raw: w.text.slice(colon + 1), expands: w.expands };
+      else if (pd.value && args[k + 1]) {
         value = args[k + 1];
         k++;
       }
       if (!value) continue;
-      if (psMatches(p.name, PS_DEST_PARAMS)) destVals.push(...splitCommaWord(value));
-      else if (psMatches(p.name, PS_PATH_PARAMS)) pathVals.push(...splitCommaWord(value));
-      else if (p.name === "name" || (p.name.length >= 2 && "name".startsWith(p.name))) names.push(value);
+      if (pd.role === "dest") destVals.push(...splitCommaWord(value));
+      else if (pd.role === "path") pathVals.push(...splitCommaWord(value));
+      else if (pd.role === "name") names.push(value);
       continue;
     }
     pos.push(...splitCommaWord(w));
@@ -197,6 +220,7 @@ function psCommandTargets(kind: PsKind, args: readonly Word[], via: string, out:
     } else for (const b of base) add(b, via);
     return;
   }
+  if (kind !== "copy" && kind !== "move") return; // read-only cmdlets write nothing
   // copy and move: the destination is written; a move also deletes its source.
   const src = pathVals.length > 0 ? pathVals : pos.slice(0, 1);
   const dest = destVals.length > 0 ? destVals : pathVals.length > 0 ? pos.slice(0, 1) : pos.slice(1, 2);
@@ -219,8 +243,8 @@ function extractSimple(s: Simple, flavor: Flavor, targets: WriteTarget[], flags:
     if (/^(?:invoke-expression|iex|invoke-command|icm)$/.test(name)) {
       flags.dynamic = `${nameWord.text} runs code the hook cannot read statically`;
     }
-    const kind = PS_CMDLETS[name];
-    if (kind) psCommandTargets(kind, args, name, targets);
+    const canon = psCanonical(name);
+    if (canon) psCommandTargets(canon, args, canon, targets);
     return;
   }
   bashCommandTargets(name, args, targets);

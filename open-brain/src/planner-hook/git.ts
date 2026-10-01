@@ -1,5 +1,6 @@
 import { normalizeRelPath } from "./paths.js";
 import { allParses, commandBase, parseCommand, type Flavor, type Parsed } from "./shell-words.js";
+import { ghPositionals } from "./parse-gate.js";
 
 const DOCS_MERGE_ALLOWLIST_PREFIXES = ["docs/"];
 const DOCS_MERGE_ALLOWLIST_EXACT = new Set([
@@ -22,6 +23,7 @@ const DOCS_MERGE_ALLOWLIST_EXACT = new Set([
  * needs a grant unless it is a STANDING push: remote `origin`, every refspec a plain branch under loop/, qa/,
  * docs/ or chore/, and no force, tag, mirror, delete or master/main target. A grant matches exactly (r4-5).
  */
+const GIT_RISKY_CONFIG_RE = /^(?:alias|remote|url|include|includeif|core)\./i;
 const GIT_GLOBAL_WITH_VALUE = new Set(["-C", "-c", "--git-dir", "--work-tree", "--namespace", "--super-prefix", "--config-env", "--exec-path"]);
 const PUSH_OPTION_WITH_VALUE = new Set(["--repo", "-o", "--push-option", "--receive-pack", "--exec", "--signed"]);
 const PUSH_ALWAYS_GRANT = new Set(["--tags", "--follow-tags", "--mirror", "--all", "--prune", "--delete", "-d"]);
@@ -69,6 +71,10 @@ function gitRestrictedIn(parsed: Parsed): boolean {
       let i = 0;
       while (i < rest.length && rest[i].text.startsWith("-")) {
         const o = rest[i].text;
+        // r6 (Open 5): an inline `-c key=value` whose key can redefine a command, a remote or what git runs needs a grant,
+        // whatever the subcommand.
+        const cfg = o === "-c" || o === "--config-env" ? rest[i + 1]?.text : o.startsWith("--config-env=") ? o.slice("--config-env=".length) : undefined;
+        if (cfg !== undefined && GIT_RISKY_CONFIG_RE.test(cfg.split("=")[0])) return true;
         i += GIT_GLOBAL_WITH_VALUE.has(o) ? 2 : 1;
       }
       if (i >= rest.length) continue;
@@ -128,14 +134,15 @@ export interface GhMergeAnalysis {
 /** A word is gh when its file name, with directory, quotes and extension removed, is `gh` in any case. */
 const isGhWord = (w: { text: string; expands: boolean }): boolean => !w.expands && commandBase(w.text) === "gh";
 
-/** `pr` followed later by `merge` among the words after a gh word, flags allowed anywhere in between or before. */
+/** `pr merge` as gh's first two positional words after a gh word. */
 function mergeAfterGh(words: readonly { text: string; expands: boolean }[]): boolean {
   for (let k = 0; k < words.length; k++) {
     // A word the shell will substitute could be gh; so it counts as gh.
     if (!isGhWord(words[k]) && !words[k].expands) continue;
-    const rest = words.slice(k + 1).map((w) => w.text.toLowerCase());
-    const pr = rest.indexOf("pr");
-    if (pr >= 0 && rest.indexOf("merge", pr + 1) >= 0) return true;
+    // r6 (Atlas ruling, Open 4): a merge is when gh's FIRST TWO POSITIONAL words, after its global flags, are
+    // `pr` `merge`. `gh pr comment 5 --body merge` and `gh pr list --label merge` are not merges.
+    const pos = ghPositionals(words.slice(k + 1).map((w) => w.text)).map((t) => t.toLowerCase());
+    if (pos[0] === "pr" && pos[1] === "merge") return true;
   }
   return false;
 }

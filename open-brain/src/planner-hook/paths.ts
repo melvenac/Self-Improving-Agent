@@ -60,7 +60,10 @@ export function toRepoRelative(raw: string, repoRoot: string, cwd: string = repo
     }
     p = `${base}/${p}`;
   }
-  const abs = winRoot ? ntfsComponents(posix.normalize(p)) : posix.normalize(p);
+  // Normalise FIRST, then read the Git Bash drive form again: `/dev/../c/x` is `/c/x` only after the `..` is applied
+  // (QA 237 D4), so the drive conversion in toFwd has to run on the normalised path as well.
+  const norm = posix.normalize(p);
+  const abs = winRoot ? ntfsComponents(posix.normalize(toFwd(norm, true))) : norm;
   const a = winRoot ? abs.toLowerCase() : abs;
   const r = winRoot ? root.toLowerCase() : root;
   if (a === r) return { ok: true, outside: false, rel: ".", ci: winRoot };
@@ -139,7 +142,13 @@ export function nonLiteralCause(text: string, shell: boolean): string | null {
 /** A target that writes to no file at all: the null device and descriptor sinks. */
 export function isNullSink(text: string): boolean {
   const t = text.trim();
-  return t === "/dev/null" || t.startsWith("/dev/") || t === "$null" || t.toLowerCase() === "nul";
+  // r6 (QA 237 D4): EXACT device names. `startsWith("/dev/")` let `/dev/../c/<repo>/open-brain/src/x.ts` through.
+  return (
+    /^\/dev\/(?:null|zero|stdin|stdout|stderr|tty|random|urandom)$/.test(t) ||
+    /^\/dev\/fd\/\d+$/.test(t) ||
+    t === "$null" ||
+    t.toLowerCase() === "nul"
+  );
 }
 
 export type TargetVerdict =
