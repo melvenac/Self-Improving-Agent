@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index add27542..75ae7cac 100644
+index 1abd2f03..2ccdacf3 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
-@@ -144,7 +144,9 @@ function gateBash(command: string, depth: number): string | null {
+@@ -143,7 +143,9 @@ function gateBash(command: string, depth: number): string | null {
          if (typeof t === "string") return t;
          continue;
        }

@@ -1,9 +1,9 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index add27542..31608a67 100644
+index 1abd2f03..af84dd1d 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
 @@ -694,7 +694,7 @@ function gatePowerShell(command: string, depth: number): string | null {
-       cur.push({ text: "\u0000>", quoted: false }, tgt);
+       cur.push({ text: "\u0000>", quoted: false, bare: true }, tgt);
        continue;
      }
 -    if (t.text === "." && !t.quoted && cur.length === 0) return refuse("dot-sourcing (. file)");

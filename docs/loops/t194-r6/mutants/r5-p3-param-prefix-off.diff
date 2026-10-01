@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index add27542..bfafa6d3 100644
+index 1abd2f03..8b6c0dee 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
-@@ -541,7 +541,7 @@ export function resolvePsParam(cmdlet: string, text: string): string {
+@@ -540,7 +540,7 @@ export function resolvePsParam(cmdlet: string, text: string): string {
    const name = text.replace(/^-/, "").replace(/:.*$/, "").toLowerCase();
    if (name === "") return "unknown";
    if (table[name]) return name;

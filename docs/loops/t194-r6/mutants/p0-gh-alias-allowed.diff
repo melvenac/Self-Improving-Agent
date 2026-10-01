@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index add27542..598a6df4 100644
+index 1abd2f03..c51edce3 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
-@@ -465,7 +465,7 @@ function gateGh(args: readonly string[]): string | null {
+@@ -464,7 +464,7 @@ function gateGh(args: readonly string[]): string | null {
    const pos = ghPositionals(args);
    if (pos.length === 0) return null;
    if (pos[0] === "alias" || pos[0] === "extension" || pos[0] === "ext") return refuse(`gh ${pos[0]} (defines or runs commands the hook cannot see)`);

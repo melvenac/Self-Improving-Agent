@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
-index add27542..37d7fc64 100644
+index 1abd2f03..a2e8b7e4 100644
 --- a/open-brain/src/planner-hook/parse-gate.ts
 +++ b/open-brain/src/planner-hook/parse-gate.ts
-@@ -252,7 +252,7 @@ function checkBashSimples(simples: GSimple[], depth: number): string | null {
+@@ -251,7 +251,7 @@ function checkBashSimples(simples: GSimple[], depth: number): string | null {
      const args = s.words.slice(k + 1);
      if (SHELLS.has(name)) {
        const ok = args.length === 2 && /^-[a-z]*c$/.test(args[0].text);
