@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 230,
+  "revision": 231,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1105,7 +1105,7 @@
       "opened_session": 153,
       "closed_session": null,
       "supersedes": null,
-      "note": "Found by the planner in session 153 at C's first live shadow-verdict prepare (T-155, CC-23 episode 1). loop-15-slice-3-c-criteria.md's ```qa-declared block has a blank line (line 340) between [unrunnable] and [out-of-scope]. parseDeclared refuses it with 'line is not `ID: text`: (blank)', so the verdict was undefined for a formatting reason. No fixture in B's or C's tests has a blank line in the block, so nothing caught it. Decide which rule holds: (a) the parser tolerates blank lines between sections (a natural markdown reading), or (b) the format forbids them and /sync or the criteria-authoring step rejects a criteria file whose block does not parse, BEFORE any candidate exists. Either way, add a fixture row with a blank line. Do not rewrite loop-15-slice-3-c-criteria.md after the fact: its prepared artifact is immutable. — Session 155: dispatched to sia-builder as slice four step 1 (docs/loops/loop-15-slice-4-dispatch.md), rule (a) per D-075. Branch loop/t214-declared-blank.",
+      "note": "Found by the planner in session 153 at C's first live shadow-verdict prepare (T-155, CC-23 episode 1). loop-15-slice-3-c-criteria.md's ```qa-declared block has a blank line (line 340) between [unrunnable] and [out-of-scope]. parseDeclared refuses it with 'line is not `ID: text`: (blank)', so the verdict was undefined for a formatting reason. No fixture in B's or C's tests has a blank line in the block, so nothing caught it. Decide which rule holds: (a) the parser tolerates blank lines between sections (a natural markdown reading), or (b) the format forbids them and /sync or the criteria-authoring step rejects a criteria file whose block does not parse, BEFORE any candidate exists. Either way, add a fixture row with a blank line. Do not rewrite loop-15-slice-3-c-criteria.md after the fact: its prepared artifact is immutable. — Session 155: dispatched to sia-builder as slice four step 1 (docs/loops/loop-15-slice-4-dispatch.md), rule (a) per D-075. Branch loop/t214-declared-blank. — Session 155: BUILT by sia-builder (Aaron approved runs in its window): loop/t214-declared-blank caebe8b6 (from ec7138bb); BLANK_RE /^[ \\t\\r]*$/ skip in parseItems; 240+30 CRLF blank variants, 60 junk; 5 mutants red; vitest tests/harness exit 0 (490 passed). Pushed SHA read back by the planner (ls-remote). QA 239 dispatch: docs/loops/qa-239-t214-dispatch.md (own generator, NBSP/\\f/\\v judgement, base refusal text captured, >=2 own mutants). Target: Plumb after QA 238.",
       "note_by": [
         "6e083614-965f-462b-ad59-62091a0be5e1",
         "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
