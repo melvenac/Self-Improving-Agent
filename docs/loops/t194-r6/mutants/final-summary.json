@@ -1,0 +1,847 @@
+{
+ "total": 105,
+ "killedAndTypecheck": 105,
+ "notValid": [],
+ "rows": [
+  {
+   "name": "r5-p1-tilde-allowed",
+   "clause": "P1 non-literal: leading ~",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-glob-allowed",
+   "clause": "P1 non-literal: * ? [",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 2,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-brace-allowed",
+   "clause": "P1 non-literal: {",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-dollar-backtick-allowed",
+   "clause": "P1 non-literal: $ and backtick",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-paren-allowed",
+   "clause": "P1 non-literal: process substitution",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 2,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-cd-allowed",
+   "clause": "P1 cd: same-line cd with a write",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 7,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-cwd-ignored",
+   "clause": "P1 location: resolve against payload.cwd",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 31,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-case-folded-off",
+   "clause": "P1 location: case-insensitive on a Windows drive",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 7,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-ntfs-dots-off",
+   "clause": "P1 location: NTFS trailing dots/spaces/streams",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-longpath-off",
+   "clause": "P1 location: \\\\?\\ prefix",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-shortname-off",
+   "clause": "P1 location: 8.3 short name",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-filetool-literal-off",
+   "clause": "P1 one canonicaliser: file tools refuse non-literal paths",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-tee-first-only",
+   "clause": "P1 targets: every tee file",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "mut6"
+  },
+  {
+   "name": "r5-p1-mv-source-ignored",
+   "clause": "P1 targets: a move deletes its source",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "b0"
+  },
+  {
+   "name": "r5-p1-cp-t-ignored",
+   "clause": "P1 targets: cp -t DIR",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 8,
+   "run": "b0"
+  },
+  {
+   "name": "r5-p1-sed-e-files",
+   "clause": "P1 targets: sed -i -e SCRIPT FILE",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 6,
+   "run": "b0"
+  },
+  {
+   "name": "r5-p1-nested-not-parsed",
+   "clause": "P1 targets: bash -c, $( ), backticks, eval",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 6,
+   "run": "b0"
+  },
+  {
+   "name": "r5-p1-heredoc-body-parsed",
+   "clause": "P1 false refusals: heredoc bodies are data",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "d0"
+  },
+  {
+   "name": "r5-p2-gh-case-sensitive",
+   "clause": "P2 gh word: case",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 20,
+   "run": "b0"
+  },
+  {
+   "name": "r5-p2-gh-extension-kept",
+   "clause": "P2 gh word: .exe and any extension",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 23,
+   "run": "b0"
+  },
+  {
+   "name": "r5-p2-any-flag-allowed",
+   "clause": "P2 grammar: only the eight flags",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 8,
+   "run": "b0"
+  },
+  {
+   "name": "r5-p2-boundary-ignored",
+   "clause": "P2 grammar: one command, no boundary",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "c0"
+  },
+  {
+   "name": "r5-p2-redirect-allowed",
+   "clause": "P2 grammar: no redirect",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "b0"
+  },
+  {
+   "name": "r5-p2-substituted-name-not-gh",
+   "clause": "P2 merge: a substituted command word",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "c0"
+  },
+  {
+   "name": "r5-p2-nested-merge-not-seen",
+   "clause": "P2 merge: bash -c / $( ) / backticks",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "b0"
+  },
+  {
+   "name": "r5-p2-repo-flag-ignored",
+   "clause": "P2 grammar: --repo / -R named",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "b1"
+  },
+  {
+   "name": "r5-p2-subshell-callop",
+   "clause": "P2 PowerShell: & is the call operator",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "b1"
+  },
+  {
+   "name": "r5-p3-matcher-without-powershell",
+   "clause": "P3 matcher",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "b1"
+  },
+  {
+   "name": "r5-p3-powershell-tool-ignored",
+   "clause": "P3 PowerShell tool is checked",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 116,
+   "run": "b1"
+  },
+  {
+   "name": "r5-p3-tool-name-case",
+   "clause": "P3 tool name without case",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "b1"
+  },
+  {
+   "name": "r5-p3-dynamic-allowed",
+   "clause": "P3 Invoke-Expression / script block refused",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "c0"
+  },
+  {
+   "name": "r5-p3-param-prefix-off",
+   "clause": "P3 -Lit / -Dest parameter prefixes",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "b1"
+  },
+  {
+   "name": "r5-p3-move-source-ignored",
+   "clause": "P3 Move-Item source",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "b1"
+  },
+  {
+   "name": "r5-p3-newitem-name-ignored",
+   "clause": "P3 New-Item -Path DIR -Name FILE",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 2,
+   "run": "b1"
+  },
+  {
+   "name": "r5-p2b-git-case-sensitive",
+   "clause": "P2b git word: case, extension, quotes",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 8,
+   "run": "b1"
+  },
+  {
+   "name": "r5-p2b-global-option-values",
+   "clause": "P2b options between git and push: -C <dir>, -c k=v",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 11,
+   "run": "b1"
+  },
+  {
+   "name": "r5-p2b-leading-options-not-skipped",
+   "clause": "P2b options between git and push: --no-pager, --git-dir=",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 24,
+   "run": "c0"
+  },
+  {
+   "name": "r5-p2b-force-long-allowed",
+   "clause": "P2b force: --force*",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 19,
+   "run": "b2"
+  },
+  {
+   "name": "r5-p2b-force-short-cluster",
+   "clause": "P2b force: -f inside a short cluster (-fu)",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "b2"
+  },
+  {
+   "name": "r5-p2b-plus-refspec-allowed",
+   "clause": "P2b force: +refspec",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "b2"
+  },
+  {
+   "name": "r5-p2b-delete-refspec-allowed",
+   "clause": "P2b delete: :dst refspec",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "b2"
+  },
+  {
+   "name": "r5-p2b-standing-prefix-off",
+   "clause": "P2b standing: only loop/ qa/ docs/ chore/ (and never master)",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 24,
+   "run": "b2"
+  },
+  {
+   "name": "r5-p2b-remote-any",
+   "clause": "P2b standing: remote must be origin",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "b2"
+  },
+  {
+   "name": "r5-p2b-bare-push-allowed",
+   "clause": "P2b standing: a push naming no branch",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "b2"
+  },
+  {
+   "name": "r5-p2b-tags-mirror-allowed",
+   "clause": "P2b tags, mirror, all, delete, prune",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 6,
+   "run": "b2"
+  },
+  {
+   "name": "r5-p2b-merge-tag-allowed",
+   "clause": "P2b merge and tag",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 14,
+   "run": "b2"
+  },
+  {
+   "name": "r5-p2b-nested-git-not-seen",
+   "clause": "P2b git inside bash -c / $( ) / backticks",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "b2"
+  },
+  {
+   "name": "r5-p2b-expanded-subcommand-allowed",
+   "clause": "P2b a substituted subcommand",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "c0"
+  },
+  {
+   "name": "r5-p2b-expanded-git-word-allowed",
+   "clause": "P2b a substituted git word",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "c0"
+  },
+  {
+   "name": "r5-p2b-expanded-push-arg-allowed",
+   "clause": "P2b a substituted push argument",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "c0"
+  },
+  {
+   "name": "p0-backslash-allowed",
+   "clause": "P0 bash: backslash outside single quotes",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 10,
+   "run": "b3"
+  },
+  {
+   "name": "p0-backslash-in-dq-allowed",
+   "clause": "P0 bash: backslash inside double quotes",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "b3"
+  },
+  {
+   "name": "p0-comment-allowed",
+   "clause": "P0 bash: # at the start of a word",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 12,
+   "run": "b3"
+  },
+  {
+   "name": "p0-reserved-word-allowed",
+   "clause": "P0 bash: reserved words",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 18,
+   "run": "b3"
+  },
+  {
+   "name": "p0-heredoc-allowed",
+   "clause": "P0 bash: heredoc and here-string",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 9,
+   "run": "b3"
+  },
+  {
+   "name": "p0-shell-stdin-allowed",
+   "clause": "P0 bash: code fed to a shell",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 13,
+   "run": "b3"
+  },
+  {
+   "name": "p0-wrapper-options-allowed",
+   "clause": "P0 bash: env/command/nohup with options",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 13,
+   "run": "b3"
+  },
+  {
+   "name": "p0-unlisted-wrapper-allowed",
+   "clause": "P0 bash: timeout, nice, xargs, sudo, eval...",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 23,
+   "run": "b3"
+  },
+  {
+   "name": "p0-sed-w-allowed",
+   "clause": "P0 bash: sed w",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 11,
+   "run": "b3"
+  },
+  {
+   "name": "p0-sed-e-allowed",
+   "clause": "P0 bash: sed e",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "b3"
+  },
+  {
+   "name": "p0-sed-s-flags-allowed",
+   "clause": "P0 bash: sed s///w and s///e flags",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "b3"
+  },
+  {
+   "name": "p0-sed-file-script-allowed",
+   "clause": "P0 bash: sed -f",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "c0"
+  },
+  {
+   "name": "p0-dollar-allowed",
+   "clause": "P0 bash: $ ($'...', $VAR, $( ))",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 11,
+   "run": "b4"
+  },
+  {
+   "name": "p0-dollar-in-dq-allowed",
+   "clause": "P0 bash: $ inside double quotes",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "b4"
+  },
+  {
+   "name": "p0-backtick-allowed",
+   "clause": "P0 bash: backtick",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "b4"
+  },
+  {
+   "name": "p0-brace-allowed",
+   "clause": "P0 bash: { } group and brace expansion",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 9,
+   "run": "b4"
+  },
+  {
+   "name": "p0-paren-allowed",
+   "clause": "P0 bash: ( ) subshell",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "b4"
+  },
+  {
+   "name": "p0-glob-allowed",
+   "clause": "P0 bash: * ? [",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 8,
+   "run": "b4"
+  },
+  {
+   "name": "p0-tilde-allowed",
+   "clause": "P0 bash: leading ~",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 6,
+   "run": "b4"
+  },
+  {
+   "name": "p0-ps-tilde-allowed",
+   "clause": "P0 powershell: leading ~",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "c0"
+  },
+  {
+   "name": "p0-background-allowed",
+   "clause": "P0 bash: single &",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 6,
+   "run": "b4"
+  },
+  {
+   "name": "p0-fd-redirect-allowed",
+   "clause": "P0 bash: only 2> and 2>&1 as fd redirects",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "b4"
+  },
+  {
+   "name": "p0-inline-code-allowed",
+   "clause": "P0 bash: node -e, python -c, perl -e",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 12,
+   "run": "b4"
+  },
+  {
+   "name": "p0-git-alias-allowed",
+   "clause": "P0 git: a subcommand that is not git's own (an alias)",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 11,
+   "run": "c0"
+  },
+  {
+   "name": "p0-gh-alias-allowed",
+   "clause": "P0 gh: a command that is not gh's own (an alias)",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "b5"
+  },
+  {
+   "name": "p0-newline-allowed",
+   "clause": "P0 bash: an unquoted newline",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "c0"
+  },
+  {
+   "name": "p0-ps-unknown-parameter-allowed",
+   "clause": "P0 powershell: a parameter the hook does not know",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 11,
+   "run": "c1"
+  },
+  {
+   "name": "p0-ps-ambiguous-parameter-allowed",
+   "clause": "P0 powershell: an ambiguous parameter prefix",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "d0"
+  },
+  {
+   "name": "p0-ps-unknown-cmdlet-allowed",
+   "clause": "P0 powershell: a cmdlet the hook has no table for",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "c1"
+  },
+  {
+   "name": "p0-ps-splat-allowed",
+   "clause": "P0 powershell: @ splat",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "c1"
+  },
+  {
+   "name": "p0-ps-paren-allowed",
+   "clause": "P0 powershell: ( ) and $( ) expressions",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 8,
+   "run": "c1"
+  },
+  {
+   "name": "p0-ps-script-block-allowed",
+   "clause": "P0 powershell: script block",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 2,
+   "run": "c1"
+  },
+  {
+   "name": "p0-ps-provider-path-allowed",
+   "clause": "P0 powershell: provider path ::",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "c1"
+  },
+  {
+   "name": "p0-ps-drive-relative-allowed",
+   "clause": "P0 powershell: drive-relative C:name",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "c1"
+  },
+  {
+   "name": "p0-ps-block-comment-allowed",
+   "clause": "P0 powershell: <# #>",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "c1"
+  },
+  {
+   "name": "p0-ps-type-literal-allowed",
+   "clause": "P0 powershell: [type]:: calls",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "b6"
+  },
+  {
+   "name": "p0-ps-dynamic-command-allowed",
+   "clause": "P0 powershell: Invoke-Expression, Start-Process, powershell...",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 17,
+   "run": "b6"
+  },
+  {
+   "name": "p0-ps-call-operator-allowed",
+   "clause": "P0 powershell: & on anything but gh",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "b6"
+  },
+  {
+   "name": "p0-ps-dot-source-allowed",
+   "clause": "P0 powershell: dot-sourcing",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "c1"
+  },
+  {
+   "name": "p0-ps-comment-allowed",
+   "clause": "P0 powershell: # comment",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "c1"
+  },
+  {
+   "name": "p0-ps-dollar-allowed",
+   "clause": "P0 powershell: $ variables",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 5,
+   "run": "c1"
+  },
+  {
+   "name": "p0-ps-newline-allowed",
+   "clause": "P0 powershell: newline",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "c2"
+  },
+  {
+   "name": "r6-nonmerge-token-rule",
+   "clause": "Open 4: a merge is gh's first two positional words",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 9,
+   "run": "c2"
+  },
+  {
+   "name": "r6-nonmerge-global-flag-value",
+   "clause": "Open 4: gh's -R/--repo take a value",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 7,
+   "run": "c2"
+  },
+  {
+   "name": "r6-git-c-keys-allowed",
+   "clause": "Open 5: git -c alias./remote./url./include./core.",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 10,
+   "run": "c2"
+  },
+  {
+   "name": "r6-foreign-url-read",
+   "clause": "D9: a pull URL of another repository needs a grant",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "d0"
+  },
+  {
+   "name": "r6-foreign-url-repo-name",
+   "clause": "D9: the repository name is compared too",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "d0"
+  },
+  {
+   "name": "r6-dev-prefix-sink",
+   "clause": "D4: only the exact device names are sinks",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 2,
+   "run": "c2"
+  },
+  {
+   "name": "r6-dev-dotdot-normalise-late",
+   "clause": "D4: the drive form is read again after ..",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "c2"
+  },
+  {
+   "name": "r6-cp-attached-t",
+   "clause": "D3: cp -tDIR and -vtDIR",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "d0"
+  },
+  {
+   "name": "r6-cp-long-prefix",
+   "clause": "D3: cp --target (GNU prefix)",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 4,
+   "run": "c2"
+  },
+  {
+   "name": "r6-install-ignored",
+   "clause": "QA 237 survivor: install is a writer",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "c2"
+  },
+  {
+   "name": "r6-comma-quoted-split-off",
+   "clause": "QA 237 survivor: a quoted comma list is several targets",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 2,
+   "run": "c2"
+  },
+  {
+   "name": "r6-ps-param-table-type",
+   "clause": "D13: New-Item -Type",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 3,
+   "run": "c3"
+  },
+  {
+   "name": "r6-limit-claims-caught-item",
+   "clause": "D17: the limit text names nothing the hook catches",
+   "verdict": "KILLED",
+   "tsc": 0,
+   "failedTests": 1,
+   "run": "c3"
+  }
+ ]
+}

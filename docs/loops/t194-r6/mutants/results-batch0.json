@@ -3,96 +3,40 @@
     "name": "r5-p1-heredoc-body-parsed",
     "clause": "P1 false refusals: heredoc bodies are data",
     "typecheckExit": 0,
-    "testExit": 0,
-    "failedTests": 0,
-    "killed": false
-  },
-  {
-    "name": "r5-p2-boundary-ignored",
-    "clause": "P2 grammar: one command, no boundary",
-    "typecheckExit": 0,
     "testExit": 1,
     "failedTests": 1,
     "killed": true
   },
   {
-    "name": "r5-p2-substituted-name-not-gh",
-    "clause": "P2 merge: a substituted command word",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 1,
-    "killed": true
-  },
-  {
-    "name": "r5-p3-dynamic-allowed",
-    "clause": "P3 Invoke-Expression / script block refused",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 1,
-    "killed": true
-  },
-  {
-    "name": "r5-p2b-leading-options-not-skipped",
-    "clause": "P2b options between git and push: --no-pager, --git-dir=",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 24,
-    "killed": true
-  },
-  {
-    "name": "r5-p2b-expanded-subcommand-allowed",
-    "clause": "P2b a substituted subcommand",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 1,
-    "killed": true
-  },
-  {
-    "name": "r5-p2b-expanded-git-word-allowed",
-    "clause": "P2b a substituted git word",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 1,
-    "killed": true
-  },
-  {
-    "name": "r5-p2b-expanded-push-arg-allowed",
-    "clause": "P2b a substituted push argument",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 1,
-    "killed": true
-  },
-  {
-    "name": "p0-sed-file-script-allowed",
-    "clause": "P0 bash: sed -f",
+    "name": "p0-ps-ambiguous-parameter-allowed",
+    "clause": "P0 powershell: an ambiguous parameter prefix",
     "typecheckExit": 0,
     "testExit": 1,
     "failedTests": 4,
     "killed": true
   },
   {
-    "name": "p0-ps-tilde-allowed",
-    "clause": "P0 powershell: leading ~",
+    "name": "r6-foreign-url-read",
+    "clause": "D9: a pull URL of another repository needs a grant",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r6-foreign-url-repo-name",
+    "clause": "D9: the repository name is compared too",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r6-cp-attached-t",
+    "clause": "D3: cp -tDIR and -vtDIR",
     "typecheckExit": 0,
     "testExit": 1,
     "failedTests": 3,
-    "killed": true
-  },
-  {
-    "name": "p0-git-alias-allowed",
-    "clause": "P0 git: a subcommand that is not git's own (an alias)",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 11,
-    "killed": true
-  },
-  {
-    "name": "p0-newline-allowed",
-    "clause": "P0 bash: an unquoted newline",
-    "typecheckExit": 0,
-    "testExit": 1,
-    "failedTests": 4,
     "killed": true
   }
 ]
