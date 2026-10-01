@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "gate": {
+      "type": "string",
+      "const": "qa-score"
+    },
+    "regression_of_validated_max": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "artifact_complete_enough_to_stop_min": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "fail_severity_reject_at_or_above": {
+      "type": "number"
+    },
+    "any_fail_is_reject": {
+      "type": "boolean"
+    },
+    "untested_is_reject": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "gate",
+    "regression_of_validated_max",
+    "artifact_complete_enough_to_stop_min",
+    "fail_severity_reject_at_or_above",
+    "any_fail_is_reject",
+    "untested_is_reject"
+  ],
+  "additionalProperties": false,
+  "title": "QA-score gate policy",
+  "description": "Thresholds for the QA-score gate, which runs in shadow and decides nothing about a verdict. Values are data and may be edited; the SHAPE is derived from open-brain/src/harness/policies.ts and this file must not be edited by hand. LIMIT: missing evidence is recorded untested by code and is never asked of the gate. PROVENANCE: docs/HOH-JEV.md section 4 gives the SHAPE of QA scoring and no thresholds at all; every number in the shipped qa-score.json is a starting position chosen without data, PROVISIONAL."
+}

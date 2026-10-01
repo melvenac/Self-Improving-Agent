@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/shadow-qa.ts b/open-brain/src/harness/shadow-qa.ts
+index b9f682a2..79d4a474 100644
+--- a/open-brain/src/harness/shadow-qa.ts
++++ b/open-brain/src/harness/shadow-qa.ts
+@@ -226,7 +226,7 @@ export async function runShadowQaGate(options: RunShadowQaOptions): Promise<RunS
+   if (existsSync(copyPath)) {
+     if (gitBlobSha(readFileSync(copyPath)) !== blob) throw new ShadowRunError(`${copyPath} exists and is not the E_t at ${options.evidence.commit}`, 1);
+   } else {
+-    writeFileSync(copyPath, text, { flag: "wx", encoding: "utf-8" });
++    writeFileSync(copyPath, text.replace('"met"', '"unmet"'), { flag: "wx", encoding: "utf-8" });
+   }
+   writeSliceRecord(recordPath, safe);
+   return { recordPath, copyPath, record: safe, decision, exitCode: result.error !== null ? 1 : 0 };

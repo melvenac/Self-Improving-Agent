@@ -1,0 +1,37 @@
+{
+  "loop": "15-t196-t197",
+  "objective": "Make the hub procedure tracked knowledge that Cursor seats read (T-196), then make Cursor's /start match Claude Code's /start (T-197), so a fresh seat joins its room and names an unread planner turn as its assignment instead of asking for work or hand-editing rendered views.",
+  "tasks": [
+    "T-196: add a tracked seat hub-data file beside or inside .agents/SYSTEM/worktree-seats.json holding each seat's hub name, room id and hub-talk invocation, verified against the hub's own records, and validated by /sync",
+    "T-196: add a short 'Talking to Cursor seats' section to planner.md pointing at the data file, as its own PR to Aaron (D-062)",
+    "T-196: add a tracked alwaysApply .cursor/rules hub rule: the seat's room from the data file, run --wait on open and after every post, act on the next atlas turn",
+    "T-196: make Cursor's /start join the seat's room and read unread atlas turns before its greeting proposes anything, reporting an unread atlas turn as the seat's assignment",
+    "T-197: make the Cursor /start steps equal Claude Code's /start steps, with every difference listed in one tracked table, and make /sync fail on any difference not in the table",
+    "T-197: remove every step that tells the seat to hand-edit INBOX.md, task.md, next-session.md, SUMMARY.md's marked region or state.json, and make NEXT a ranked backlog, not a proposal",
+    "establish whether Forge's Cursor SessionStart writing no by-pid session proof is T-046's fail-closed PreToolUse or a defect of its own, and report which"
+  ],
+  "out_of_scope": [
+    "any merge",
+    "the live checks HB-2, HB-3 and CS-4, which the planner observes in a live seat"
+  ],
+  "preserve": [
+    "the A2A-Hub's already-tracked hub-transport section and root AGENTS.md are reused or adapted, not rewritten",
+    "the role-file change stays its own branch and PR, separate from the rest"
+  ],
+  "acceptance": [
+    { "id": "HB-1", "observable": "A fresh planner session arms one listener per seat room from what /start printed, with no memory read", "type": "blackbox" },
+    { "id": "HB-2", "observable": "A fresh Cursor chat in each seat runs --wait after its first post with no nudge from Aaron, observed live once per seat", "type": "blackbox" },
+    { "id": "HB-3", "observable": "A fresh Cursor /start in sia-forge with an unread atlas turn names that turn as its assignment and proposes nothing else, observed live", "type": "blackbox" },
+    { "id": "HB-4", "observable": "/sync fails when the data file names a seat that worktree-seats.json does not, or lacks a room for a Cursor seat, shown red then green with a mutant", "type": "blackbox" },
+    { "id": "CS-1", "observable": "The Cursor /start steps equal Claude Code's /start steps and every difference is listed in one tracked table", "type": "whitebox" },
+    { "id": "CS-2", "observable": "/sync fails on any difference not in the table, shown red against master's template", "type": "blackbox" },
+    { "id": "CS-3", "observable": "No Cursor /start step tells the seat to hand-edit INBOX.md, task.md, next-session.md, SUMMARY.md's marked region or state.json", "type": "whitebox" },
+    { "id": "CS-4", "observable": "A live Cursor /start in a developer seat prints NEXT as a ranked backlog, not 'Proposed:'", "type": "blackbox" }
+  ],
+  "repair_targets": [
+    "the hub procedure exists nowhere a new seat reads, and Cursor's /start contradicts the tracked rules (G-001, G-009): it reads the four rendered prose files, tells the seat to hand-edit views, creates its own session log and presents the backlog as a decision"
+  ],
+  "new_capability": "Cursor seats learn the hub from tracked knowledge and run the same /start as Claude Code",
+  "reconstructed_by": "sia-builder",
+  "reconstructed_from": { "path": "docs/loops/t196-t197-dispatch.md", "blob": "cfcbed3d585f32f2ce01600293a5e97740ac3011" }
+}

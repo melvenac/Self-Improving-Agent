@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/shadow-gates.ts b/open-brain/src/harness/shadow-gates.ts
+index 4714dfcd..7ecaccc5 100644
+--- a/open-brain/src/harness/shadow-gates.ts
++++ b/open-brain/src/harness/shadow-gates.ts
+@@ -237,7 +237,7 @@ export async function runShadowDoneGate(options: RunShadowDoneOptions): Promise<
+   const { plan, bytes } = readDt(dtAbs);
+   const dtRel = toPosix(relative(repoRoot, dtAbs));
+ 
+-  const diffstat = committedPaths(repoRoot, options.baseSha, options.scoredSha);
++  const diffstat = committedPaths(repoRoot, options.baseSha, options.mergeCommit);
+   const checksPassed = options.checks.build_exit === 0 && options.checks.unit_exit === 0;
+   const pDir = options.policiesDir ?? policiesDir();
+   const policy = loadPolicies(pDir).done;

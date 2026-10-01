@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/closeout-tables.ts b/open-brain/src/harness/closeout-tables.ts
+index dd3e7f7d..ccfa81a2 100644
+--- a/open-brain/src/harness/closeout-tables.ts
++++ b/open-brain/src/harness/closeout-tables.ts
+@@ -206,7 +206,7 @@ export function buildCloseoutTables(input: CloseoutInput): CloseoutResult {
+   lines.push("### Diffs and what was scored", "", "| PR | 4.3 G_done | 4.4 G_qa |", "| --- | --- | --- |");
+   const doneSet = new Set(done.map((l) => prOf(l.rec, l.path)));
+   for (const pr of diffs) {
+-    lines.push(`| ${pr} | ${doneSet.has(pr) ? "scored" : "not scored"} | ${scored.has(pr) ? "scored" : hasCopy(pr) ? "not scored" : "not scored: no E_t"} |`);
++    lines.push(`| ${pr} | ${doneSet.has(pr) ? "scored" : "not scored"} | ${scored.has(pr) ? "scored" : hasCopy(pr) ? "not scored" : "scored"} |`);
+   }
+   lines.push("");
+ 

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/gate-records.ts b/open-brain/src/harness/gate-records.ts
+index 8e598a4a..5c81704d 100644
+--- a/open-brain/src/harness/gate-records.ts
++++ b/open-brain/src/harness/gate-records.ts
+@@ -265,7 +265,7 @@ function appendDurably(ledger: string, line: object): void {
+ 
+ /** Append the begin line. Call this BEFORE the request is made, so a call that dies leaves a trace. */
+ export function beginAttempt(ledger: string, begin: Omit<AttemptBegin, "event">): void {
+-  appendDurably(ledger, { event: "begin", ...begin });
++  void begin;
+ }
+ 
+ export function endAttempt(ledger: string, end: Omit<AttemptEnd, "event">): void {

@@ -1,0 +1,32 @@
+{
+  "loop": "15-slice-3-b1",
+  "objective": "Repair G-042: the full suite exits 1 on the vitest-worker Timeout calling onTaskUpdate under load with every test passing, by making the test files that never yield for 60 seconds or more yield.",
+  "tasks": [
+    "Bring in Step 0's tools (load-generator.mjs, eld-setup.ts, the vitest.config.ts hook, and ci.yml's step0 inputs and steps) byte-identical from the step-0 branch, as a commit of their own",
+    "See the failure red first on the base plus tools: R1 three times and RH once, before any fix",
+    "Fix the baseline step's threshold (E-4) as its own named commit, the only allowed change to the tools",
+    "Convert each long test file's blocking waits to yielding ones (for example spawnSync to an awaited spawn), file by file, one commit per file, so every file whose ELD row is at or over 30 seconds in any counted run comes under 30 seconds",
+    "Run R1 three times, RH three times, the ordinary laptop job at the candidate and at the base, and the tcm run, and record each run"
+  ],
+  "out_of_scope": [
+    "E_t's schema change (R10), which gets its own criteria later",
+    "the runtime yields of the design's Step 1(a)",
+    "a worker cap, a retry, a timeout change, a timer patch or a skipped test"
+  ],
+  "preserve": [
+    "Step 0's tools stay byte-identical except for the E-4 threshold fix",
+    "every existing test keeps passing and none is skipped or deleted"
+  ],
+  "acceptance": [
+    { "id": "B-1", "observable": "R1 run three times and RH run once at the base plus the tools are red before any fix; if R1 is not red three of three, the candidate cannot be scored on that base and the developer stops", "type": "blackbox" },
+    { "id": "B-4", "observable": "Every test file whose ELD row is at or over 30 seconds in any counted run comes under 30 seconds at the candidate, for the whole ELD table and not a named list", "type": "blackbox" },
+    { "id": "B-5", "observable": "Each converted file is one commit listed as a hunk, so reverting one file's hunk restores that file's blocking wait", "type": "whitebox" },
+    { "id": "B-2", "observable": "R1 three times, RH three times, the laptop job and the tcm run at the candidate no longer exit 1 with every test passing; a red counted run whose worst row is under 60 seconds is reported as evidence, not re-run away", "type": "blackbox" }
+  ],
+  "repair_targets": [
+    "G-042: the full suite exits 1 on [vitest-worker] Timeout calling \"onTaskUpdate\" under load, with every test passing, caused by test files that never yield for 60 seconds or more (tests/trigger/hook.test.ts worst, then staleness and cli-bootstrap)"
+  ],
+  "new_capability": "the full suite's exit code follows its tests under load instead of exiting 1 on a worker timeout",
+  "reconstructed_by": "sia-builder",
+  "reconstructed_from": { "path": "docs/loops/loop-15-slice-3-b-step1-brief.md", "blob": "ba6284528323086f2ceec409df5a72c972c49aa0" }
+}

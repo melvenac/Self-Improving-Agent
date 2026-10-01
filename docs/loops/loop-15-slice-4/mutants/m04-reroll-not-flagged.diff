@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/gate-records.ts b/open-brain/src/harness/gate-records.ts
+index 8e598a4a..a09be472 100644
+--- a/open-brain/src/harness/gate-records.ts
++++ b/open-brain/src/harness/gate-records.ts
+@@ -474,7 +474,7 @@ export function countAttempts(options: { ledger?: string; recordsDir?: string; m
+   for (const group of bySubject.values()) {
+     const label = `${group[0]!.subject.gate} ${group[0]!.subject.key}`;
+     const answered = group.filter((a) => a.outcome_class === "answered");
+-    if (answered.length > 1) {
++    if (answered.length > 99) {
+       violations.push(`${label}: ${answered.length} answered records; a second answered record is a re-roll`);
+     }
+     group.forEach((a, i) => {

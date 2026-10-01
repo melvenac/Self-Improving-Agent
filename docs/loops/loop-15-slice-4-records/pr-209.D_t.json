@@ -1,0 +1,39 @@
+{
+  "loop": "15-t195",
+  "objective": "Put a D_t beside every interactive brief and have the plan gate judge it: add harness validate plan, a command that runs the plan gate on a D_t file and records the decision beside the brief, and a dispatch refusal for a brief without a valid D_t and a passing decision record.",
+  "tasks": [
+    "add harness validate plan <file>, mirroring validate evidence: exit 0 when valid, exit 1 printing every problem with its field path when invalid, exit 2 on a usage error",
+    "add a command that runs the plan gate on a D_t file, with a payload following HOH-JEV section 4 (spec excerpt, plan summary, prior failures, validated behaviours, changed-area hints), each field from a named source that the decision record prints",
+    "take every threshold from policies/plan-gate.json only",
+    "write a decision record beside the brief on every gate run, never overwriting one: the verdict, the answer and confidence per question, the thresholds applied with the policy file's hash, the resolved model and the time",
+    "feed a failure back in a form the planner can act on: each failing question with its value and the threshold it missed",
+    "fail closed on a missing TYPESAFE_API_KEY, a network error, a non-2xx response or a malformed envelope, each with a refusal naming the cause and a non-zero exit",
+    "block dispatch of a brief without a valid D_t and a passing decision record, by a mechanism that does not rest on CI alone because CI skips docs-only pushes"
+  ],
+  "out_of_scope": [
+    "T-194, the planner seat hook, dispatched alongside",
+    "the first live Jev call on a real brief, observed after merge by the planner with Aaron's key",
+    "any merge: the candidate goes to QA and then to Aaron"
+  ],
+  "preserve": [
+    "the runtime's existing plan-gate path",
+    "harness validate evidence, the done-gate and both policy files, with their existing tests passing unchanged",
+    "tests never use a live key and assert inputs from a fixture environment, never from the inherited process environment (G-044)"
+  ],
+  "acceptance": [
+    { "id": "DT-1", "observable": "harness validate plan <file> exits 0 when valid, exits 1 printing every problem with its field path when invalid, and exits 2 on a usage error", "type": "blackbox" },
+    { "id": "DT-2", "observable": "A command runs the plan gate on a D_t file with the HOH-JEV section 4 payload, and the decision record prints the named source of each payload field", "type": "blackbox" },
+    { "id": "DT-3", "observable": "Thresholds come from policies/plan-gate.json only; a mutant that inlines a threshold or ignores the file is caught", "type": "blackbox" },
+    { "id": "DT-4", "observable": "Each gate run writes a decision record beside the brief with the verdict, answer and confidence per question, thresholds with the policy hash, the resolved model and the time; a second run adds a second record and none is overwritten", "type": "blackbox" },
+    { "id": "DT-5", "observable": "A rejected plan prints each failing question with its value and the threshold it missed, for example has_observable_acceptance 0.55 < 0.7", "type": "blackbox" },
+    { "id": "DT-6", "observable": "A missing key, a network error, a non-2xx response and a malformed envelope each refuse with a named cause and a non-zero exit, shown against a stub with no live key", "type": "blackbox" },
+    { "id": "DT-7", "observable": "A brief without a valid D_t and a passing decision record is refused at dispatch, by a mechanism that is shown refusing", "type": "blackbox" },
+    { "id": "DT-8", "observable": "The runtime's plan-gate path, validate evidence, the done-gate and both policy files are unchanged and their existing tests pass unchanged", "type": "whitebox" }
+  ],
+  "repair_targets": [
+    "docs/loops holds prose briefs and no D_t JSON, and the plan gate has never judged a plan a real planner wrote"
+  ],
+  "new_capability": "a planner's brief carries a machine plan that the plan gate judges, with a recorded decision, before it can be dispatched",
+  "reconstructed_by": "sia-builder",
+  "reconstructed_from": { "path": "docs/loops/t194-t195-dispatch.md", "blob": "a04da99d3b2693e77b8d48807101ece6f2ed4e64" }
+}

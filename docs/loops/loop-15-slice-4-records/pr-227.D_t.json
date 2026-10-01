@@ -1,0 +1,34 @@
+{
+  "loop": "15-t198",
+  "objective": "At /start (ob_start), print one line per partner seat saying whether that seat is listening, so a planner learns a seat is not polling instead of finding out from an unread-by line an hour later.",
+  "tasks": [
+    "read the hub's presence endpoint and filter the roster by seat name on the client, because the endpoint ignores an agents filter",
+    "print one line per partner seat: <seat>: polling | not polling, N unread since <time>",
+    "take the seat names and rooms from T-196's tracked data file once it exists, and until then from a named interim source, saying in the output which source was read",
+    "never fail silently: a timeout, a non-2xx response or an unparseable body prints presence: UNKNOWN (<cause>), with a bounded timeout so /start never hangs",
+    "say which process makes the call, because a check served through the MCP server cannot report that server's own staleness (G-033)"
+  ],
+  "out_of_scope": [
+    "replacing the interim source of seat names, which is T-196's step",
+    "any test that calls the live hub: tests use a fixture HTTP server only",
+    "any merge or CI run"
+  ],
+  "preserve": [
+    "every existing ob_start section and the tests that cover them, unchanged",
+    "the greeting-size limit is reported, not silently exceeded: the one new block is measured against it (T-183)"
+  ],
+  "acceptance": [
+    { "id": "PR-1", "observable": "A seat with pollingNow true in its room prints as polling", "type": "blackbox" },
+    { "id": "PR-2", "observable": "A seat that is not polling and has unread turns prints the count and the age", "type": "blackbox" },
+    { "id": "PR-3", "observable": "With the hub unreachable, non-2xx or malformed, one visible UNKNOWN line with its cause is printed, never nothing", "type": "blackbox" },
+    { "id": "PR-4", "observable": "A partner seat absent from the presence roster prints as absent, not skipped", "type": "blackbox" },
+    { "id": "PR-5", "observable": "A mutant that swallows the fetch error goes red on PR-3, on its own branch and clean under tsc --noEmit", "type": "blackbox" },
+    { "id": "PR-6", "observable": "Every existing ob_start section and its tests are unchanged, and the new block's size against the greeting limit is reported as a number", "type": "whitebox" }
+  ],
+  "repair_targets": [
+    "tracked text does not make a planner check its seats: builder and Forge sat on dispatches for about an hour and the planner learned it only from a listener's unread-by line"
+  ],
+  "new_capability": "ob_start shows whether each partner seat is listening, and says visibly when the hub cannot be reached",
+  "reconstructed_by": "sia-builder",
+  "reconstructed_from": { "path": "docs/loops/t198-presence-dispatch.md", "blob": "089a508f06f35e747ef4f034f51dfaa6c13b387c" }
+}

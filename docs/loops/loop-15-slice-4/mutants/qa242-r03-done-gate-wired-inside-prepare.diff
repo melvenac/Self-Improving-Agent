@@ -1,0 +1,25 @@
+diff --git a/open-brain/src/harness/shadow-merge.ts b/open-brain/src/harness/shadow-merge.ts
+index 28707223..74cb52b1 100644
+--- a/open-brain/src/harness/shadow-merge.ts
++++ b/open-brain/src/harness/shadow-merge.ts
+@@ -188,6 +188,11 @@ export function ledgerPath(repo: string): string {
+   return join(repo, "docs", "loops", "shadow-merge", "ledger.jsonl");
+ }
+ 
++function sliceDoneRecord(repo: string, loop: string): { verdict: string } | null {
++  const p = join(repo, "docs", "loops", "loop-15-slice-4-records", `${loop}.G_done.json`);
++  return existsSync(p) ? (JSON.parse(readFileSync(p, "utf8")) as { verdict: string }) : null;
++}
++
+ export function prepareShadowVerdict(input: {
+   repo: string;
+   loop: string;
+@@ -218,7 +223,7 @@ export function prepareShadowVerdict(input: {
+     loop: input.loop,
+     criteriaText,
+     policy: input.policy ?? loadMergePolicy(),
+-    doneGate: input.doneGate ?? null,
++    doneGate: input.doneGate ?? sliceDoneRecord(input.repo, input.loop),
+     planGate: input.planGate ?? null,
+     gateMode: input.gateMode,
+   });

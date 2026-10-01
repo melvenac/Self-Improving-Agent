@@ -1,0 +1,33 @@
+{
+  "loop": "15-t158",
+  "objective": "Make close_gap never let a gap id be reused: keep a closed gap as a tombstone, and make add_gap skip every id in the record and every gap id cited anywhere in the tracked tree, so a reused id cannot point at the wrong thing and announce nothing.",
+  "tasks": [
+    "make close_gap keep the entry as a tombstone with its status, closed_session and closing rev, instead of splicing it out, and make the rendered views not list a closed gap as open",
+    "make add_gap's next id skip every id that exists in the record, tombstones included, and every gap id cited anywhere in the tracked tree, and name the ids it skipped and why",
+    "prove the citation scan both ways (G-040): a known-cited fixture id is skipped and an uncited one is not",
+    "say whether the schema version changes if gaps[] gains a field, and how an existing rev-156 record reads",
+    "run the full suite locally before posting and quote the Test Files and Tests lines with the exit code"
+  ],
+  "out_of_scope": [
+    "T-164, the record session number, dispatched in the same file",
+    "any CI run: local tests only",
+    "pushing while a QA queue runs"
+  ],
+  "preserve": [
+    "done-task retention (T-157), close_task and the rendered views",
+    "the live record's state-schema check"
+  ],
+  "acceptance": [
+    { "id": "TG-1", "observable": "close_gap keeps the entry as a tombstone with its status, closed_session and closing rev, and the rendered views do not list a closed gap as open", "type": "blackbox" },
+    { "id": "TG-2", "observable": "On today's repo a dry-run add_gap is assigned an id that is none of G-046, G-047 or G-048, and the output names the ids it skipped and why", "type": "blackbox" },
+    { "id": "TG-3", "observable": "A test shows the citation scan skips a known-cited fixture id and does not skip an uncited one", "type": "blackbox" },
+    { "id": "TG-4", "observable": "A mutant that restores the splice and another that drops the citation scan each go red on their row", "type": "blackbox" },
+    { "id": "TG-5", "observable": "Done-task retention, close_task, the rendered views and the state-schema check are unchanged in behaviour", "type": "whitebox" }
+  ],
+  "repair_targets": [
+    "close_gap splices the entry out of gaps[], so nextId hands the next add_gap a closed id: G-046, G-047 and G-048 are cited in tracked files outside state.json and a naive next id would reuse all three"
+  ],
+  "new_capability": "a closed gap id is never reused, and add_gap names the ids it skipped",
+  "reconstructed_by": "sia-builder",
+  "reconstructed_from": { "path": "docs/loops/t158-t164-dispatch.md", "blob": "5aeb9c00fec2494050d63cf54414e8570adafc9d" }
+}

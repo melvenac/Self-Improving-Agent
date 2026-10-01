@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/gate-records.ts b/open-brain/src/harness/gate-records.ts
+index 8e598a4a..c408643a 100644
+--- a/open-brain/src/harness/gate-records.ts
++++ b/open-brain/src/harness/gate-records.ts
+@@ -484,7 +484,7 @@ export function countAttempts(options: { ledger?: string; recordsDir?: string; m
+       }
+       retries += 1;
+       const prior = a.retry_of === null ? undefined : byPath.get(a.retry_of);
+-      if (prior === undefined || !sameSubject(prior.subject, a.subject)) {
++      if (prior === undefined) {
+         violations.push(`${a.record_path}: retry_of ${String(a.retry_of)} does not name an earlier record for ${label}`);
+         return;
+       }

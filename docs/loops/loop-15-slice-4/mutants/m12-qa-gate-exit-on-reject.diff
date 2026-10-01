@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/harness/shadow-qa.ts b/open-brain/src/harness/shadow-qa.ts
+index b9f682a2..87d693c5 100644
+--- a/open-brain/src/harness/shadow-qa.ts
++++ b/open-brain/src/harness/shadow-qa.ts
+@@ -189,6 +189,7 @@ export async function runShadowQaGate(options: RunShadowQaOptions): Promise<RunS
+           policy,
+         );
+ 
++  if (decision !== null && decision.verdict !== "proceed") process.exitCode = 1;
+   const record: ShadowQaRecord = {
+     gate: "qa-score",
+     loop: ev.loop,

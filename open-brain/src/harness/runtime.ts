@@ -674,7 +674,10 @@ async function runLoopInner(
   const writeGateRecord = (kind: GateRecordKind, record: GateRecord): string => {
     const path = gateRecordPath(loop, kind);
     const write = makeWriter(repoRoot, new Allowlist([`${iterationDir(loop)}/`]), "planner");
-    write(path, renderGateRecord(record));
+    // S4-4a.4: the loop's own G_done says who wrote it and that its plan came first.
+    const stamped: GateRecord =
+      kind === "done" ? { ...record, source: "runtime", plan_provenance: "written-before" } : record;
+    write(path, renderGateRecord(stamped));
     gateRecordsWritten.add(kind);
     artifacts.push(path);
     return path;

@@ -1,0 +1,8 @@
+{
+  "gate": "qa-score",
+  "regression_of_validated_max": 0.5,
+  "artifact_complete_enough_to_stop_min": 0.5,
+  "fail_severity_reject_at_or_above": 2,
+  "any_fail_is_reject": true,
+  "untested_is_reject": true
+}

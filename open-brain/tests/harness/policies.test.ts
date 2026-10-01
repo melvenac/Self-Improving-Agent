@@ -295,7 +295,7 @@ describe("gate policies", { timeout: 60_000 }, () => {
   describe("A6 half two — the scan covers the prompts and the gate context", () => {
     it("names gate.ts and runtime.ts in its scope, not just policies.ts", () => {
       const files = THRESHOLD_SCAN_TARGETS.map((t) => t.file).sort();
-      expect(files).toEqual(["gate.ts", "policies.ts", "runtime.ts"]);
+      expect(files).toEqual(["gate.ts", "policies.ts", "runtime.ts", "shadow-gates.ts", "shadow-qa.ts"]);
       // policies.ts is scanned from the marker down; the other two whole.
       const policies = THRESHOLD_SCAN_TARGETS.find((t) => t.file === "policies.ts");
       expect(policies?.from).toBe("Applying a policy");

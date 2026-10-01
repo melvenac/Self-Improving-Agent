@@ -1,0 +1,35 @@
+{
+  "loop": "15-slice-3-a",
+  "objective": "Repair G-045 mechanically before any real role is pointed at the runtime, then run a real model-backed role through the harness end to end, so the runtime survives the repository states a real role produces and, when it fails, says so.",
+  "tasks": [
+    "Observe the G-045 crash red first: run the update-ref -d probe against the built candidate and see no LoopResult, no FAILED.md and an unresolvable HEAD",
+    "Repair the restore so it reads nothing from the repository until the snapshot is restored: after HEAD's name is put back, HEAD resolves or the ref is restored from the snapshot before any read, and the deferred delta is restored ahead of anything that reads HEAD, not only inside rollBack",
+    "Point a real, model-backed role at the runtime and run it end to end (the roles are stubs today)",
+    "State what the repair leaves open: the channel denominator (index, hooks, config, submodules, reflog) is unprobed, and a green G-045 row is one named case closed, not 'the runtime is safe'"
+  ],
+  "out_of_scope": [
+    "the ranking gap (G-026)",
+    "T-159, the trigger's cheap not-asked path, and the census price",
+    "registering the recall trigger for production",
+    "the transcript-loss mechanism (T-161)",
+    "G-042 on a second machine and the build-freshness fix shape",
+    "T-165, evaluating an alternate harness as the developer seat",
+    "QA scoring through Jev and F11, the later items in the brief's order"
+  ],
+  "preserve": [
+    "the refusals slices one and two built: a stage write outside the allowlist, a moved SHA, a dirty tree, an exhausted retry cap, and a check that prints success while exiting 1",
+    "a failure is an artifact: every refusal leaves a LoopResult and a FAILED.md",
+    "D-019: the runtime stops at a candidate commit and local tags and never merges or pushes"
+  ],
+  "acceptance": [
+    { "id": "A1", "observable": "The update-ref -d refs/heads/main probe, first seen producing the crash against the unfixed product, then run against the built candidate, leaves a LoopResult, a FAILED.md and a resolvable HEAD", "type": "blackbox" },
+    { "id": "A2", "observable": "A real, model-backed role runs through the harness end to end, and a failure of that run is recorded as a LoopResult and FAILED.md rather than a crash", "type": "blackbox" },
+    { "id": "A3", "observable": "The handoff names the unprobed channels (index, hooks, config, submodules, reflog) and does not describe G-045 as the runtime being safe against repository states", "type": "whitebox" }
+  ],
+  "repair_targets": [
+    "G-045: update-ref -d on the checked-out branch crashes runLoop before rollBack, with no LoopResult, no FAILED.md, an unresolvable HEAD, main gone and the tree staged"
+  ],
+  "new_capability": "the harness runs a real role end to end and survives the repository states a real role produces",
+  "reconstructed_by": "sia-builder",
+  "reconstructed_from": { "path": "docs/loops/loop-15-slice-3-brief.md", "blob": "e4855ddd9b5a5b8264ac7463176ce03256847da0" }
+}

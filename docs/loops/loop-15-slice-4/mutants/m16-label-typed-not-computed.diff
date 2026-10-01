@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/closeout-tables.ts b/open-brain/src/harness/closeout-tables.ts
+index dd3e7f7d..a942bce1 100644
+--- a/open-brain/src/harness/closeout-tables.ts
++++ b/open-brain/src/harness/closeout-tables.ts
+@@ -89,7 +89,7 @@ const prOf = (rec: ShadowDoneRecord | ShadowQaRecord, path: string): number => {
+ export function provisionalLabel(records: readonly { source: string }[]): string {
+   const seat = records.filter((r) => r.source === "seat").length;
+   const runtime = records.filter((r) => r.source === "runtime").length;
+-  return `PROVISIONAL (N=${seat} seat-built, ${runtime} runtime)`;
++  return "PROVISIONAL (N=8 seat-built, 0 runtime)";
+ }
+ 
+ function modelLine(records: readonly Loaded[]): string {

@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/harness/shadow-qa.ts b/open-brain/src/harness/shadow-qa.ts
+index b9f682a2..6c99e762 100644
+--- a/open-brain/src/harness/shadow-qa.ts
++++ b/open-brain/src/harness/shadow-qa.ts
+@@ -176,6 +176,7 @@ export async function runShadowQaGate(options: RunShadowQaOptions): Promise<RunS
+   }
+   const regression = numberAt(answers?.[QA_REGRESSION_QUESTION_ID], "noul");
+   const complete = numberAt(answers?.[QA_COMPLETE_QUESTION_ID], "noul");
++  if (complete !== null && complete < 0.6) missing.push(QA_COMPLETE_QUESTION_ID);
+   const decision =
+     answers === null
+       ? null

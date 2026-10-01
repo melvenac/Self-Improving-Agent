@@ -1,0 +1,15 @@
+diff --git a/open-brain/src/harness/gate.ts b/open-brain/src/harness/gate.ts
+index 39c7f513..30b72969 100644
+--- a/open-brain/src/harness/gate.ts
++++ b/open-brain/src/harness/gate.ts
+@@ -547,9 +547,7 @@ export class JevTransport implements GateTransport {
+         signal: AbortSignal.timeout(this.timeoutMs),
+       });
+     } catch (err) {
+-      throw new GateCallFailed(
+-        "transport",
+-        null,
++      throw new GateUnavailable(
+         `gate "${payload.gate}": the request to ${this.endpoint} did not complete: ` +
+           `${redact((err as Error).message, this.env)}`,
+       );

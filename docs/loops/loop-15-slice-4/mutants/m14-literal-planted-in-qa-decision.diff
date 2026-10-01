@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/policies.ts b/open-brain/src/harness/policies.ts
+index fe071a54..7f55092e 100644
+--- a/open-brain/src/harness/policies.ts
++++ b/open-brain/src/harness/policies.ts
+@@ -579,7 +579,7 @@ export function decideQaScore(input: QaScoreInput, policy: QaScorePolicy): GateD
+   };
+   const missing = [...input.missing];
+   if (input.regressionOfValidated === null) missing.push("regression_of_validated");
+-  else if (input.regressionOfValidated > policy.regression_of_validated_max) {
++  else if (input.regressionOfValidated > 0.6) {
+     reasons.push(
+       `regression_of_validated ${input.regressionOfValidated} is above the permitted ${policy.regression_of_validated_max}`,
+     );

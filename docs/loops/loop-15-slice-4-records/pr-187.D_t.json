@@ -1,0 +1,37 @@
+{
+  "loop": "15-slice-3-b2",
+  "objective": "Change E_t's schema as ruled in R10 (a) to (d), so that a verdict is not widened or narrowed by the schema instead of by the evidence: human-seat loop ids, an attribution field on acceptance rows, a distinct pending status, and out-of-scope ids declared beside the unrunnable ones.",
+  "tasks": [
+    "(a) widen the loop id pattern to admit human-seat ids; the exact form is the developer's",
+    "(b) add no new status value; record attribution as an order field on the acceptance row, order: shown | attributed, required on met rows and failing closed",
+    "(c) make pending its own status, so a verdict row with any pending item is undefined and never would-not-merge",
+    "(d) declare out-of-scope ids in the same parseable block as R3's unrunnable ids, at the criteria SHA, before any candidate, excluded from the verdict, with the two lists kept separate",
+    "keep BE-1.3 in this part: the runtime refuses an E_t whose loop is not the run's",
+    "supply the validator the QA seat runs, not a writer: the QA seat writes E_t"
+  ],
+  "out_of_scope": [
+    "a writer for E_t (BE-7: the QA seat writes it)",
+    "the shadow merge gate, which keys on what this makes recordable",
+    "B part 1, the G-042 repair, which is already merged"
+  ],
+  "preserve": [
+    "candidate A's accepted behaviour, including the configwatch R95 and R96 rows, and R77 stopping before git",
+    "B part 1's G-042 repair",
+    "every existing E_t consumer, each named with how it reads the new fields",
+    "backward compatibility (BE-5): an existing E_t still validates"
+  ],
+  "acceptance": [
+    { "id": "R10a", "observable": "A human-seat loop id validates as an E_t loop, and the runtime refuses an E_t whose loop is not the run's loop (BE-1.3)", "type": "blackbox" },
+    { "id": "R10b", "observable": "A met acceptance row without order is refused, and no new status value exists", "type": "blackbox" },
+    { "id": "R10c", "observable": "A verdict computed from a row with a pending item is undefined and never would-not-merge", "type": "blackbox" },
+    { "id": "R10d", "observable": "Out-of-scope ids parse from the same block as the unrunnable ids, stay a separate list, and are excluded from the verdict; merging the two lists is caught by a mutant", "type": "blackbox" },
+    { "id": "R10-compat", "observable": "An E_t written before this change still validates", "type": "blackbox" },
+    { "id": "R10-scope", "observable": "The diff touches only the schema change's scope, checked first", "type": "whitebox" }
+  ],
+  "repair_targets": [
+    "E_t's schema cannot say what the QA seat observed in four places, so a verdict can be widened or narrowed by the schema instead of by the evidence (R10 a to d)"
+  ],
+  "new_capability": "E_t can record human-seat loop ids, attribution, a pending status and declared out-of-scope ids",
+  "reconstructed_by": "sia-builder",
+  "reconstructed_from": { "path": "docs/loops/loop-15-slice-3-b2-brief.md", "blob": "41df27ad27622b632f9aa096c78d545dbcaa335e" }
+}

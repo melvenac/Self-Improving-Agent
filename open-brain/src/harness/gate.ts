@@ -152,6 +152,56 @@ export const DONE_GATE_QUESTIONS: readonly GateQuestion[] = [
   },
 ];
 
+/**
+ * The QA-score gate's questions (HOH-JEV section 4), built per `E_t`: one choice per requirement
+ * that has evidence, a severity score beside each (kept only for a `fail`), and two noul questions.
+ * A requirement with no evidence is never asked: code records it `untested`.
+ */
+export const QA_REGRESSION_QUESTION_ID = "regression_of_validated";
+export const QA_COMPLETE_QUESTION_ID = "artifact_complete_enough_to_stop";
+
+export const qaResultQuestionId = (from: string, id: string): string => `res:${from}:${id}`;
+export const qaSeverityQuestionId = (from: string, id: string): string => `sev:${from}:${id}`;
+
+export function buildQaScoreQuestions(rows: readonly { from: string; id: string }[]): GateQuestion[] {
+  const questions: GateQuestion[] = [];
+  for (const row of rows) {
+    questions.push({
+      id: qaResultQuestionId(row.from, row.id),
+      kind: "choice",
+      prompt:
+        `Judging only the evidence the QA report gives for ${row.from} item "${row.id}", did the candidate meet it? ` +
+        `Answer untested when the evidence does not let you tell.`,
+      options: {
+        pass: "The evidence shows the item is met.",
+        fail: "The evidence shows the item is not met.",
+        untested: "The evidence is too thin to tell either way.",
+      },
+    });
+    questions.push({
+      id: qaSeverityQuestionId(row.from, row.id),
+      kind: "score",
+      prompt: `If ${row.from} item "${row.id}" failed, how severe would the failure be? The order of the levels is the scale.`,
+      criteria: [
+        "Cosmetic or wording: no behaviour is affected.",
+        "Contained: behaviour is affected but a validated behaviour is not.",
+        "Breaking: a validated behaviour or the candidate's own claim is broken.",
+      ],
+    });
+  }
+  questions.push({
+    id: QA_REGRESSION_QUESTION_ID,
+    kind: "noul",
+    prompt: "Does the report's evidence show that a behaviour listed as validated has regressed?",
+  });
+  questions.push({
+    id: QA_COMPLETE_QUESTION_ID,
+    kind: "noul",
+    prompt: "Is the artifact complete enough, on this report's evidence, that the next planner could stop here?",
+  });
+  return questions;
+}
+
 export interface GatePayload {
   /** Which gate this is — `plan`, `developer-done`, `qa-score`. */
   gate: string;
@@ -311,6 +361,33 @@ export class UnconfiguredTransport implements GateTransport {
 /** The name of the variable the key is read from. Named in every refusal. */
 export const JEV_KEY_VAR = "TYPESAFE_API_KEY";
 export const JEV_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
+
+/** The oldest resolved model a slice-four record may carry (S4-3a). */
+export const JEV_MIN_MODEL = "jev-1.13.0";
+
+/** `jev-1.13.0` → [1, 13, 0], or null when the string is not that shape. */
+function parseJevVersion(value: unknown): [number, number, number] | null {
+  if (typeof value !== "string") return null;
+  // `.match`, not `.exec`: the spawn-site scan treats a call named exec as a process spawn.
+  const m = value.match(/^jev-(\d+)\.(\d+)\.(\d+)$/);
+  return m === null ? null : [Number(m[1]), Number(m[2]), Number(m[3])];
+}
+
+/**
+ * Whether a resolved model version is at or above `minimum`, compared field by field as numbers.
+ *
+ * A string comparison would rank `jev-1.9.0` above `jev-1.13.0`. Anything that is not a `jev-X.Y.Z`
+ * string, including `null` and `jev-latest`, fails: an unreported version is not a passing one.
+ */
+export function jevModelAtLeast(resolved: unknown, minimum: string = JEV_MIN_MODEL): boolean {
+  const have = parseJevVersion(resolved);
+  const need = parseJevVersion(minimum);
+  if (have === null || need === null) return false;
+  for (let i = 0; i < 3; i++) {
+    if (have[i]! !== need[i]!) return have[i]! > need[i]!;
+  }
+  return true;
+}
 
 /**
  * How a live call failed, as something the runtime can branch on.

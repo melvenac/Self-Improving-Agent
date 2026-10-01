@@ -155,7 +155,31 @@ export const MergePolicySchema = z
   })
   .strict();
 
+/**
+ * 4.4. The QA-score gate, in shadow: what the gate would have decided about one `E_t`. The values
+ * are a starting position chosen without data (HOH-JEV section 9), and the gate decides nothing
+ * about a verdict: its decision is a field in a record.
+ */
+export const QaScorePolicySchema = z
+  .object({
+    gate: z.literal("qa-score"),
+    /** Reject when `regression_of_validated` is above this. */
+    regression_of_validated_max: probability,
+    /** Reject when `artifact_complete_enough_to_stop` is below this. */
+    artifact_complete_enough_to_stop_min: probability,
+    /** Reject when any `fail` carries a severity at or above this. */
+    fail_severity_reject_at_or_above: z.number(),
+    /** Reject when any requirement is `fail`. */
+    any_fail_is_reject: z.boolean(),
+    /** Reject when any requirement is `untested`: missing evidence is not approval. */
+    untested_is_reject: z.boolean(),
+  })
+  .strict();
+
+export const QA_SCORE_POLICY_FILE = "qa-score.json";
+
 export type PlanGatePolicy = z.infer<typeof PlanGatePolicySchema>;
+export type QaScorePolicy = z.infer<typeof QaScorePolicySchema>;
 export type DoneGatePolicy = z.infer<typeof DoneGatePolicySchema>;
 export type MergePolicy = z.infer<typeof MergePolicySchema>;
 
@@ -237,9 +261,38 @@ export function loadMergePolicy(dir: string = policiesDir()): MergePolicy {
   return r.data;
 }
 
+/** The QA-score policy is loaded on its own, like the merge policy: `loadPolicies` stays plan + done. */
+export function loadQaScorePolicy(dir: string = policiesDir()): QaScorePolicy {
+  const path = join(dir, QA_SCORE_POLICY_FILE);
+  if (!existsSync(path)) throw new PolicyUnreadable(`policy file missing: ${path}`);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(path, "utf-8"));
+  } catch (err) {
+    throw new PolicyUnreadable(`policy file ${path} is not valid JSON: ${(err as Error).message}`);
+  }
+  const r = QaScorePolicySchema.safeParse(parsed);
+  if (!r.success) {
+    const problems = r.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`);
+    throw new PolicyUnreadable(`policy file ${path} does not match the policy schema: ${problems.join("; ")}`);
+  }
+  return r.data;
+}
+
 /** The derived JSON Schema files, one per policy. `D-021`'s shape. */
-export function policyJsonSchemas(): Record<"plan" | "done" | "merge", Record<string, unknown>> {
+export function policyJsonSchemas(): Record<"plan" | "done" | "merge" | "qa", Record<string, unknown>> {
   return {
+    qa: {
+      ...(z.toJSONSchema(QaScorePolicySchema, { io: "input" }) as Record<string, unknown>),
+      title: "QA-score gate policy",
+      description:
+        "Thresholds for the QA-score gate, which runs in shadow and decides nothing about a verdict. " +
+        "Values are data and may be edited; the SHAPE is derived from open-brain/src/harness/policies.ts " +
+        "and this file must not be edited by hand. " +
+        "LIMIT: missing evidence is recorded untested by code and is never asked of the gate. " +
+        "PROVENANCE: docs/HOH-JEV.md section 4 gives the SHAPE of QA scoring and no thresholds at all; " +
+        "every number in the shipped qa-score.json is a starting position chosen without data, PROVISIONAL.",
+    },
     plan: {
       ...(z.toJSONSchema(PlanGatePolicySchema, { io: "input" }) as Record<string, unknown>),
       title: "Plan gate policy",
@@ -497,6 +550,65 @@ export function decideDoneGate(
 
   return {
     gate: "developer-done",
+    verdict: reasons.length > 0 ? "reject" : "proceed",
+    reasons,
+    applied,
+    missing,
+    notApplicable: [],
+  };
+}
+
+export interface QaScoreInput {
+  /** One per requirement or acceptance row, already reduced from the gate's answers. */
+  results: readonly { id: string; result: "pass" | "fail" | "untested"; severity: number | null }[];
+  regressionOfValidated: number | null;
+  artifactCompleteEnoughToStop: number | null;
+  /** Ids the gate did not answer. Any one of these forces a reject. */
+  missing: readonly string[];
+}
+
+/** Apply the QA-score policy. No number in this function; see {@link decidePlanGate}. */
+export function decideQaScore(input: QaScoreInput, policy: QaScorePolicy): GateDecision {
+  const reasons: string[] = [];
+  const applied: Record<string, number | boolean> = {
+    regression_of_validated_max: policy.regression_of_validated_max,
+    artifact_complete_enough_to_stop_min: policy.artifact_complete_enough_to_stop_min,
+    fail_severity_reject_at_or_above: policy.fail_severity_reject_at_or_above,
+    any_fail_is_reject: policy.any_fail_is_reject,
+    untested_is_reject: policy.untested_is_reject,
+  };
+  const missing = [...input.missing];
+  if (input.regressionOfValidated === null) missing.push("regression_of_validated");
+  else if (input.regressionOfValidated > policy.regression_of_validated_max) {
+    reasons.push(
+      `regression_of_validated ${input.regressionOfValidated} is above the permitted ${policy.regression_of_validated_max}`,
+    );
+  }
+  if (input.artifactCompleteEnoughToStop === null) missing.push("artifact_complete_enough_to_stop");
+  else if (input.artifactCompleteEnoughToStop < policy.artifact_complete_enough_to_stop_min) {
+    reasons.push(
+      `artifact_complete_enough_to_stop ${input.artifactCompleteEnoughToStop} is below the required ` +
+        `${policy.artifact_complete_enough_to_stop_min}`,
+    );
+  }
+  const failed = input.results.filter((r) => r.result === "fail");
+  if (policy.any_fail_is_reject && failed.length > 0) {
+    reasons.push(`${failed.length} requirement(s) failed: ${failed.map((r) => r.id).join(", ")}`);
+  }
+  for (const f of failed) {
+    if (f.severity !== null && f.severity >= policy.fail_severity_reject_at_or_above) {
+      reasons.push(`${f.id} failed at severity ${f.severity}, at or above ${policy.fail_severity_reject_at_or_above}`);
+    }
+  }
+  const untested = input.results.filter((r) => r.result === "untested");
+  if (policy.untested_is_reject && untested.length > 0) {
+    reasons.push(`${untested.length} requirement(s) untested: ${untested.map((r) => r.id).join(", ")} — missing evidence is not approval`);
+  }
+  if (missing.length > 0) {
+    reasons.push(`the gate did not answer: ${missing.join(", ")} — missing evidence is not approval`);
+  }
+  return {
+    gate: "qa-score",
     verdict: reasons.length > 0 ? "reject" : "proceed",
     reasons,
     applied,

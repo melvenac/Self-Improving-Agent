@@ -1,0 +1,33 @@
+{
+  "loop": "15-slice-3-c",
+  "objective": "Before a loop candidate merges to master, have the runtime record what it WOULD have done, and after Aaron's decision record in one ledger line whether the two disagreed. Nothing is automated and the runtime still never merges.",
+  "tasks": [
+    "Record a verdict before the merge: would-merge, would-not-merge or undefined",
+    "After Aaron's decision, append one ledger line recording whether the verdict and the decision disagreed",
+    "Build every row of the criteria CC-0 to CC-22 except CC-21, which is cut, plus CC-29 and CC-30, with the amendments in section 8 overriding section 1 where they differ",
+    "Run every red row against the unfixed base and every green row on the candidate, locally",
+    "Build the gate so a shadow developer can be pointed at it (T-165 is gated on this)"
+  ],
+  "out_of_scope": [
+    "the declared rows of the criteria section 2",
+    "CC-21, which was cut",
+    "automating any merge: the runtime still never merges",
+    "turning on any gate as a requirement"
+  ],
+  "preserve": [
+    "candidates A and B as merged",
+    "section 8's preserve list, each item held or broken in the handoff",
+    "no test touches this repository, the real knowledge database or a live state.json: every git-touching test builds a throwaway repo (G-044)"
+  ],
+  "acceptance": [
+    { "id": "SM-1", "observable": "Before a candidate merges, the runtime records exactly one of would-merge, would-not-merge or undefined for it", "type": "blackbox" },
+    { "id": "SM-2", "observable": "After Aaron's decision, one ledger line records whether the recorded verdict and the decision agreed", "type": "blackbox" },
+    { "id": "SM-3", "observable": "A mutant that counts undefined as agreement goes red", "type": "blackbox" },
+    { "id": "SM-4", "observable": "A mutant in which a pending row gives would-not-merge, or in which the two declared lists are merged into one, goes red", "type": "blackbox" },
+    { "id": "SM-5", "observable": "A mutant in which prepare overwrites an existing verdict, or decide --merged accepts a sha that is not on origin/master, goes red", "type": "blackbox" }
+  ],
+  "repair_targets": [],
+  "new_capability": "a shadow merge gate: the runtime records what it would have done at each merge and counts disagreements with Aaron",
+  "reconstructed_by": "sia-builder",
+  "reconstructed_from": { "path": "docs/loops/loop-15-slice-3-c-brief.md", "blob": "b4967b97ad6a35433d5a1f167e975fe2541691e4" }
+}

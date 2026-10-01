@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/shadow-gates.ts b/open-brain/src/harness/shadow-gates.ts
+index 4714dfcd..6c4e8331 100644
+--- a/open-brain/src/harness/shadow-gates.ts
++++ b/open-brain/src/harness/shadow-gates.ts
+@@ -314,7 +314,7 @@ export async function runShadowDoneGate(options: RunShadowDoneOptions): Promise<
+     diffstat,
+   };
+ 
+-  const safe = redact(record, env);
++  const safe = record;
+   writeSliceRecord(recordPath, safe);
+   return { recordPath, record: safe, decision, exitCode: result.error !== null ? 1 : 0 };
+ }
