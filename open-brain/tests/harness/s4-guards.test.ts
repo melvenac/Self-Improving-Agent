@@ -14,6 +14,19 @@ import { join, resolve } from "node:path";
 const REPO = resolve(__dirname, "../../..");
 const BASE = "2448a6ea";
 
+/**
+ * The paths each diff-based guard reads, in ONE table (r5). A guard reads only what its row names,
+ * so a later planner or QA document on master (which may STATE the forbidden-word rule, and so
+ * contain the word) can never fail it. S4-5b covers the candidate's code and tests, the gate
+ * records, and the close-out once it exists; it does not cover planner or QA documents.
+ */
+export const SCOPES = {
+  forbiddenWord: ["open-brain", "docs/loops/loop-15-slice-4-records", "docs/loops/loop-15-slice-4-closeout.md"],
+  jevMcp: ["open-brain/src"],
+  skips: ["open-brain/tests"],
+  policies: ["open-brain/src/harness/policies"],
+} as const;
+
 const git = (args: string[]): string => execFileSync("git", args, { cwd: REPO, encoding: "utf-8", shell: false, maxBuffer: 256 * 1024 * 1024 });
 
 /** Added lines (without the leading plus) of `git diff <base> -- <paths>` in `cwd`, working tree included. */
@@ -30,6 +43,9 @@ const JEV_MCP = new RegExp(`${"jev"}-${"mcp"}|${"mcp__"}${"jev"}`);
 // CALL POSITION only (r2, D1): a test function, optionally with modifiers, then the skipping modifier.
 // The r1 pattern matched the word anywhere, so a test TITLE containing it was a hit.
 const SKIPS = new RegExp(`\\b(it|test|describe|suite)(\\.\\w+(\\((?:[^()]|\\((?:[^()]|\\([^()]*\\))*\\))*\\))?)*\\.(${"sk"}${"ip"}|${"to"}${"do"}|${"sk"}${"ipIf"}|${"run"}${"If"})\\b`);
+
+/** Added lines inside one guard's scope. */
+const scopedAdded = (scope: keyof typeof SCOPES, cwd: string = REPO, base: string = BASE): string[] => addedLines([...SCOPES[scope]], cwd, base);
 
 const hits = (re: RegExp, lines: string[]): string[] => lines.filter((l) => re.test(l));
 
@@ -101,20 +117,71 @@ describe("slice four guards", { timeout: 120_000 }, () => {
     expect(/\.\.\./.test("prepareShadowVerdict({ a, b, });")).toBe(false);
   });
 
+  it("F1 S4-5b's scope: fires on a committed plant in open-brain/ and in the records directory, and does NOT fire on one in a QA or planner document (r5)", () => {
+    const dir = mkdtempSync(join(tmpdir(), "s4scope-"));
+    const run = (args: string[]): string => execFileSync("git", args, { cwd: dir, encoding: "utf-8", shell: false }).trim();
+    run(["init", "--initial-branch=main"]);
+    run(["config", "user.email", "g@example.invalid"]);
+    run(["config", "user.name", "g"]);
+    run(["config", "commit.gpgsign", "false"]);
+    mkdirSync(join(dir, "open-brain/src"), { recursive: true });
+    mkdirSync(join(dir, "docs/loops/loop-15-slice-4-records"), { recursive: true });
+    writeFileSync(join(dir, "open-brain/src/a.ts"), "export const a = 1;\n");
+    run(["add", "-A"]);
+    run(["commit", "-q", "-m", "base"]);
+    const base = run(["rev-parse", "HEAD"]);
+    const word = `the values are ${"calibrat"}${"ed"}\n`;
+
+    // A rule-stating QA or planner document names the word, as master's later docs do: not a hit.
+    writeFileSync(join(dir, "docs/loops/qa-238-criteria.md"), word);
+    writeFileSync(join(dir, "docs/loops/loop-15-slice-4-step2-dispatch.md"), word);
+    run(["add", "-A"]);
+    run(["commit", "-q", "-m", "docs that state the rule"]);
+    expect(hits(FORBIDDEN_WORD, scopedAdded("forbiddenWord", dir, base))).toEqual([]);
+    // The same plants ARE visible to an unscoped diff, so the empty result above is the scope's doing.
+    expect(hits(FORBIDDEN_WORD, addedLines(["."], dir, base))).toHaveLength(2);
+
+    // Committed in open-brain/: fires.
+    writeFileSync(join(dir, "open-brain/src/b.ts"), `// ${word}`);
+    run(["add", "-A"]);
+    run(["commit", "-q", "-m", "plant in code"]);
+    expect(hits(FORBIDDEN_WORD, scopedAdded("forbiddenWord", dir, base))).toHaveLength(1);
+
+    // Committed in the records directory: fires too.
+    writeFileSync(join(dir, "docs/loops/loop-15-slice-4-records/pr-1.G_done.x.json"), `{"note": "${word.trim()}"}\n`);
+    run(["add", "-A"]);
+    run(["commit", "-q", "-m", "plant in a record"]);
+    expect(hits(FORBIDDEN_WORD, scopedAdded("forbiddenWord", dir, base))).toHaveLength(2);
+
+    // And the close-out, once it exists.
+    writeFileSync(join(dir, "docs/loops/loop-15-slice-4-closeout.md"), word);
+    run(["add", "-A"]);
+    run(["commit", "-q", "-m", "plant in the close-out"]);
+    expect(hits(FORBIDDEN_WORD, scopedAdded("forbiddenWord", dir, base))).toHaveLength(3);
+  });
+
+  it("F2 every diff-based guard reads only the paths its row names: each scope is inside open-brain/ or the slice's own records, never a bare docs path", () => {
+    for (const [name, paths] of Object.entries(SCOPES)) {
+      for (const p of paths) {
+        expect(p === "open-brain" || p.startsWith("open-brain/") || p.startsWith("docs/loops/loop-15-slice-4-"), `${name}: ${p}`).toBe(true);
+      }
+    }
+  });
+
   it("S4-5b no added line, anywhere in the slice's diff, contains the forbidden word (whole word, any case)", () => {
-    const lines = addedLines([".", ":(exclude).agents"]);
+    const lines = scopedAdded("forbiddenWord");
     expect(lines.length).toBeGreaterThan(500);
     expect(hits(FORBIDDEN_WORD, lines)).toEqual([]);
   });
 
   it("S4-9.1 no added line in open-brain/src references the other Jev client", () => {
-    expect(hits(JEV_MCP, addedLines(["open-brain/src"]))).toEqual([]);
+    expect(hits(JEV_MCP, scopedAdded("jevMcp"))).toEqual([]);
   });
 
   it("S4-9.2 no skip, todo, skipIf or runIf is added, and no test file loses a test", () => {
-    expect(hits(SKIPS, addedLines(["open-brain/tests"]))).toEqual([]);
-    expect(git(["diff", "--diff-filter=D", "--name-only", BASE, "--", "open-brain/tests"]).trim()).toBe("");
-    const changed = git(["diff", "--diff-filter=M", "--name-only", BASE, "--", "open-brain/tests"])
+    expect(hits(SKIPS, scopedAdded("skips"))).toEqual([]);
+    expect(git(["diff", "--diff-filter=D", "--name-only", BASE, "--", ...SCOPES.skips]).trim()).toBe("");
+    const changed = git(["diff", "--diff-filter=M", "--name-only", BASE, "--", ...SCOPES.skips])
       .split("\n")
       .filter((f) => /\.test\.ts$/.test(f));
     const count = (text: string): number => (text.match(/^\s*(?:it|test)(?:\.each\([^)]*\))?\(/gm) ?? []).length;
@@ -128,7 +195,7 @@ describe("slice four guards", { timeout: 120_000 }, () => {
   it("S4-5c.1 the three policy files are unchanged, and qa-score.json is the one added policy", () => {
     const three = ["developer-done.json", "plan-gate.json", "merge.json"].map((f) => `open-brain/src/harness/policies/${f}`);
     expect(git(["diff", "--name-only", BASE, "--", ...three]).trim()).toBe("");
-    const added = git(["diff", "--diff-filter=A", "--name-only", BASE, "--", "open-brain/src/harness/policies"]).trim();
+    const added = git(["diff", "--diff-filter=A", "--name-only", BASE, "--", ...SCOPES.policies]).trim();
     expect(added).toBe("open-brain/src/harness/policies/qa-score.json");
   });
 
