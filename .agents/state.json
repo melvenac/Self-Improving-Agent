@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 252,
+  "revision": 253,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3629,6 +3629,12 @@
       "title": "Aaron, session 155: merge all PRs, send T-194 r7 to Forge now, grant the read-only GitHub token for Plumb. The planner merged #253 but HELD #254: its pull_request CI (run 36899820391) fails s4-guards S4-5b, whose fixed-base scan reads master's later rule-stating docs (5 hits: QA 238's criteria, the step-2 dispatch); r5 scopes the slice guards to the paths their rows name",
       "date": "2026-10-01",
       "note": "Aaron's words: 'Merge all PRs. Send T194R7 to Forge now. Grant the GitHub token to Plum. Type safe API key probably is not on the laptop.' #254's push-event CI on the branch alone was green (36897157311); merging would put the red guard on master. r5 dispatch: docs/loops/loop-15-slice-4-step2-r5-dispatch.md. Step 4 needs the key on the machine making the live calls (D-070): Aaron says it is probably not on the laptop; where it is decides the step-4 seat/machine."
+    },
+    {
+      "id": "D-087",
+      "title": "Step 4 (slice four live Jev calls) runs on the LAPTOP by the QA seat (D-074) after Aaron sets TYPESAFE_API_KEY there as a user env var by his own hand; the key is currently set on the desktop (user scope) only",
+      "date": "2026-10-01",
+      "note": "Aaron, planner session 155, answering the planner's question (recommended option). D-070 holds: the key is never committed, never sent through an agent, never a CI secret. Before launching step 4 the planner checks only that the variable EXISTS on the laptop (never its value). Correction to D-086: Aaron's 'Merge all PRs...' was typed at 20:17:42Z (clark verified in the transcript), not ~19:30Z. Dev slots on that order: sia-forge r7 and sia-builder step 2 r5 (2 of 2), GO from clark."
     }
   ],
   "handoffs": [
