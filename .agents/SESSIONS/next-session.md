@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 238 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 239 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,12 +6,12 @@
 
 ### Pick up here
 
-Planner session 155 (ob_start numbered it #16, per-worktree counter T-164), 2026-10-01 from ~08:30Z. USAGE-LIMITED (D-077): no new launches or dispatches until 10:50Z; afterwards at most ONE dev job and ONE QA job across all machines. STATE: T-216 merged (#245) and closed. Slice four DISPATCHED (D-074 seats, D-075 T-214 rule); criteria by QA 238 ADOPTED with rulings (D-076; docs/loops/loop-15-slice-4-criteria-rulings.md; F11 already answered by LOOP_LIMITS at 3b192871, so step 3 removed; 4.4 N=5; budget <=14 calls + <=3 retries). T-214 built (caebe8b6), QA 239 ACCEPT (d4993796), PR #250 OPEN: code, Aaron merges, then close T-214. Step 2 (G1-G6, docs/loops/loop-15-slice-4-step2-dispatch.md) dispatched to sia-builder on loop/15-slice-4-step2, no SHA yet; its heavy runs need Aaron's approval. QA 237 (T-194 r5, candidate 7a3a4441) RUNNING on the laptop: pid 17748, launched by the planner 09:18:27Z, log C:\qa-tmp\qa-237.log (verdict is the LAST line); if it died at the usage limit, re-run after 10:50Z with the same staged prompt. NEXT IN ORDER: (a) read QA 237's report on origin/qa/t194-r5-report and RULE it against docs/loops/qa-237-t194-r5-dispatch.md; (b) when sia-builder pushes step 2, write its QA dispatch (Plumb is Linux-safe for harness code; launch with launch-job.sh --dispatch-sha); (c) after the step-2 merge, step 4: the QA seat's live calls (laptop, Aaron's key). OPEN PR: #250 (T-214, code, Aaron merges). State rev 234-235 is on origin/docs/session-155e: open its PR (records only).
+Planner session 155 (ob_start numbered it #16, per-worktree counter T-164), 2026-10-01 from ~08:30Z. STATE: T-216 merged (#245), T-214 merged (#250); both closed. Slice four: criteria by QA 238 ADOPTED with rulings (D-076; docs/loops/loop-15-slice-4-criteria-rulings.md; F11 already answered by LOOP_LIMITS at 3b192871, so step 3 removed; 4.4 N=5; budget <=14 calls + <=3 retries). Step 2 (G1-G6, docs/loops/loop-15-slice-4-step2-dispatch.md) with sia-builder on loop/15-slice-4-step2: G1-G4 pushed (3451588e at 09:36Z), G5 in progress at 11:15Z, then G6 and the handoff; it is D-078's one dev job. QA 237 (T-194 r5, candidate 7a3a4441): attempt 1 died at the usage limit; RE-RUN running on the laptop, pid 27960, launched 10:58:39Z, log C:\qa-tmp\qa-237r.log (verdict is the LAST line); it is the one QA job; tell clark [9f38ff] when it ends (slot goes to dashboard QA-007). NEXT IN ORDER: (a) read QA 237's report on origin/qa/t194-r5-report and RULE it against docs/loops/qa-237-t194-r5-dispatch.md; (b) when sia-builder pushes the step-2 handoff, write its QA dispatch (by hand, not sed) and book a QA slot with clark once the QA slot is free (Plumb is Linux-safe for harness code: launch-job.sh --dispatch-sha); (c) after the step-2 merge, step 4: the QA seat's live calls (laptop, Aaron's key). Records rev 237-239 on origin/docs/session-155f: open its PR (records only).
 
 ### Watch out
 
-- USAGE LIMIT (D-077, Aaron via Clark, 2026-10-01 ~09:40Z): across ALL machines at most ONE developer job and ONE QA job at a time; close idle seats; NO new launches or dispatches until 10:50Z on 2026-10-01. The weekly limit was on pace to run out Saturday, before Wednesday's reset. Chisel (agent-dashboard dev, QA PC) and sia-builder (slice four step 2) are BOTH developer jobs: which runs is Aaron's call.
-- SLOT BOOKING via clark for the QA PC AND the laptop before ANY launch (by hand until T-204). At session 155's last write: the LAPTOP is held by QA 237 (pid 17748, since 09:18:27Z); Plumb (Linux QA seat on the VPS, no gh, so 0 CI runs there) is FREE; the QA PC is a DEVELOPER machine (Chisel, sia-builder) and takes no QA. Plumb's launch-job.sh takes --dispatch-sha and stamps the SHA as the prompt's first line; on the laptop the planner stages the prompt with that line itself (git show <sha>:<prompt>, via cmd /c) and launches with launch-qa.ps1 (docs/loops/qa-launch.md).
+- USAGE LIMIT (D-077, amended by D-079): across ALL machines at most ONE developer job and ONE QA job RUNNING at a time. Rule change from Aaron (~11:20Z): keep every agent OPEN. He's remote and can't restart or exit seats. The usage rule now limits RUNNING jobs only (1 dev + 1 QA); idle seats stay open. Don't ask him to close seats, and don't have seats exit. Remote Control's "idle" only means between turns; confirm work from commits or a reply. The weekly limit was on pace to run out Saturday, before Wednesday's reset.
+- SLOT BOOKING via clark (now clark [9f38ff]; address it by ref while the retired clark 76cf17 is still listed) for the QA PC AND the laptop before ANY launch (by hand until T-204). At session 155's last write: the LAPTOP is held by the QA 237 re-run (pid 27960, since 10:58:39Z); Plumb (Linux QA seat on the VPS, no gh, so 0 CI runs there) is idle but D-077 allows only one QA job; the QA PC is a DEVELOPER machine (Chisel, sia-builder) and takes no QA. Plumb's launch-job.sh takes --dispatch-sha and stamps the SHA as the prompt's first line; on the laptop the planner stages the prompt with that line itself (git show <sha>:<prompt>, via cmd /c) and launches with launch-qa.ps1 (docs/loops/qa-launch.md).
 - STANDING REPORTING RULES FROM AARON (via Clark), RESTORED at session 154 after being dropped at the session-153 roll (present in session 150's handoff, absent from 153's), CADENCE CHANGED at session 155 by D-077: (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\Users\melve\Worktrees\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 60 MINUTES while active (was 30), a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Re-create the cadence at /start (CronCreate at :04 only). If `clark` is not in ListAgents, skip the send. Completions and blocks are reported as they happen. Until T-211 puts the minutes in seat data, CARRY THIS ITEM FORWARD VERBATIM at every roll.
 - MANUAL MODE: on any classifier denial, do not retry or reroute. Send clark ONE line `MANUAL MODE → <seat>: <exact action> (<why>)` and say the same line in the planner session. Aaron approves from his phone.
 - PEER-INITIATED HEAVY RUNS ARE REFUSED by dev seats' own classifiers (Forge: 'Interfere With Workloads'). A planner 'go' is a peer message, not Aaron's approval. Plan for Aaron's approval in the seat's window. It worked for r5.
@@ -23,26 +23,25 @@ Planner session 155 (ob_start numbered it #16, per-worktree counter T-164), 2026
 
 ### Open questions
 
-- Which developer job runs under D-077's one-dev-job rule: sia-builder (SIA slice four step 2) or Chisel (agent-dashboard)?
+_None._
 
 ### Loop state
 
 **Open PRs:** _None._
 
-**SHA frozen for QA:** `7a3a4441 (T-194 r5, QA 237 running on the laptop); caebe8b6 (T-214, ACCEPTED, PR #250)`
+**SHA frozen for QA:** `7a3a4441 (T-194 r5, QA 237 re-run on the laptop, pid 27960)`
 
-**Questions pending for Aaron:** 
-- Merge #250 (T-214, code)
-- sia-builder's run approvals
-- D-077: which dev job runs, sia-builder or Chisel
+**Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
 - QA 236: T-216 ACCEPT; #245 merged; D1 to T-217
 - D-074: slice-four seats (sia-builder builds; QA seat makes live calls)
 - D-075: T-214 rule (a), P-blank
 - D-076: QA 238 criteria adopted with seven rulings (F11 already answered; N=5; budget <=14+3)
-- QA 239: T-214 ACCEPT; PR #250; G1 to T-218
+- QA 239: T-214 ACCEPT; #250 merged; G1 to T-218
 - D-077: usage limit, one dev + one QA job, 60-min status
+- D-078: sia-builder is the running dev job
+- D-079: keep every agent open; the limit is on running jobs only
 
 ## developer [sia-builder] _(written session 152)_
 
