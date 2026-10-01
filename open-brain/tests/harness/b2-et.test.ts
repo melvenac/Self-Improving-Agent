@@ -13,7 +13,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { jsonSchemas, validateDeveloperReport, validateEvidence, validatePlan } from "../../src/harness/schema.js";
+import { LOOP_ID_PATTERN, jsonSchemas, validateDeveloperReport, validateEvidence, validatePlan } from "../../src/harness/schema.js";
 import { runLoop, type LoopConfig } from "../../src/harness/runtime.js";
 import { StubDeveloper, StubPlanner, StubQa, type RoleContext, type RoleSession } from "../../src/harness/roles.js";
 import { exitingChecks, makeRepo, requireGit, type RepoFixture } from "./fixture.js";
@@ -126,9 +126,9 @@ const validPlan = () => ({
 });
 
 describe("BE-0 scope guards", () => {
-  it("BE-0.1 PlanSchema keeps ^t\\d{3,}$", () => {
+  it("BE-0.1 PlanSchema shares the evidence loop-id rule (superseded by T-216)", () => {
     const r = validatePlan({ ...validPlan(), loop: HUMAN_LOOP });
-    expect(r.ok, r.ok ? "ACCEPTED" : r.problems.join(" | ")).toBe(false);
+    expect(r.ok, r.ok ? "ACCEPTED" : r.problems.join(" | ")).toBe(true);
   });
 
   it("BE-0.1 DeveloperReportSchema keeps ^t\\d{3,}$", () => {
@@ -142,9 +142,9 @@ describe("BE-0 scope guards", () => {
     expect(r.ok, r.ok ? "ACCEPTED" : r.problems.join(" | ")).toBe(false);
   });
 
-  it("BE-0.1 plan.schema.json loop pattern is unchanged", () => {
+  it("BE-0.1 plan.schema.json loop pattern is the shared loop-id pattern (T-216)", () => {
     const plan = JSON.parse(readFileSync(PLAN_SCHEMA, "utf-8")) as { properties: { loop: { pattern: string } } };
-    expect(plan.properties.loop.pattern).toBe("^t\\d{3,}$");
+    expect(plan.properties.loop.pattern).toBe(LOOP_ID_PATTERN.source);
   });
 
   it("BE-1.2 harness run --loop 15-slice-3 still exits 2", () => {

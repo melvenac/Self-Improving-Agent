@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 220 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 236 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 15 slice three (D-033/D-036) is CLOSED: A (#182), B (#165, #187) and C (#195, merged 2026-09-30 as ddd43526) are all ACCEPTED and merged. The shadow merge gate's ledger has line 1 (undefined, merged). The NEXT slice per D-033 is Jev calibration. It is NOT YET BRIEFED or ruled, so the next planner session writes its brief before any dispatch. In flight meanwhile: T-194 r3 (c1f1cb48) awaits QA 234 on the laptop; T-214 (declared.ts rejects a blank line, which made episode 1 undefined) is P1. _(since session 153)_
+Loop 15 slice FOUR (Jev scoring on real diffs, in shadow, no calibration claimed) is DISPATCHED and its criteria ADOPTED (QA 238 dd7b1c39; rulings D-076, docs/loops/loop-15-slice-4-criteria-rulings.md). Step 1: T-214 built (caebe8b6), QA 239 re-running on Plumb. Step 2: sia-builder builds G1-G6 per docs/loops/loop-15-slice-4-step2-dispatch.md on loop/15-slice-4-step2. Step 3 (F11) removed: answered by LOOP_LIMITS at 3b192871. Step 4: the QA seat makes <=14 live calls (+<=3 retries) and the close-out. In flight alongside: T-194 r5 (QA 237 booked on the laptop after Gauge Loop 7 r1), T-215, T-213, T-217. _(since session 155)_
 
 ## Top tasks
 

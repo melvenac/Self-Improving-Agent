@@ -19,6 +19,7 @@ export {
   PlanSchema,
   EvidenceSchema,
   EVIDENCE_LOOP_PATTERN,
+  LOOP_ID_PATTERN,
   AcceptanceCriterionSchema,
   CheckOutcomeSchema,
   validatePlan,

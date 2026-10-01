@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/harness/declared.ts b/open-brain/src/harness/declared.ts
+index b40aaa87..94eb7cbb 100644
+--- a/open-brain/src/harness/declared.ts
++++ b/open-brain/src/harness/declared.ts
+@@ -96,6 +96,7 @@ export function parseDeclared(text: string): DeclaredBlock {
+   }
+   const kind = blocks[0]![1]!;
+   const lines = linesOf(blocks[0]![2]!);
++  if (lines.every((l) => BLANK_RE.test(l.replace(/\r$/, "")))) return { present: false };
+   const parsed =
+     kind === "qa-unrunnable"
+       ? parseItems(lines, () => "unrunnable", false)
