@@ -25,6 +25,7 @@ import { GateUnavailable, JEV_KEY_VAR } from "../../src/harness/gate.js";
 import { runLoop } from "../../src/harness/runtime.js";
 import { StubDeveloper, StubPlanner, StubQa } from "../../src/harness/roles.js";
 import { exitingChecks, makeRepo, rawGit, requireGit } from "./fixture.js";
+import { harnessEnv } from "./s4-canary.js";
 
 const TSX = resolve(__dirname, "../../node_modules/tsx/dist/cli.mjs");
 const CLI = resolve(__dirname, "../../src/harness/cli.ts");
@@ -77,7 +78,8 @@ function harness(args: readonly string[], cwd: string, env: NodeJS.ProcessEnv = 
     encoding: "utf-8",
     shell: false,
     timeout: 120_000,
-    env: { ...process.env, ...env },
+    // Ruling 6 (G-044): a constructed env, never the whole process environment.
+    env: harnessEnv(env as Record<string, string>),
   });
   if (r.error) throw r.error;
   return { status: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "" };
