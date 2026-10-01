@@ -1,0 +1,303 @@
+{
+ "changed": 32,
+ "total": 33,
+ "rows": [
+  {
+   "id": "bash \"timeout 9 cp -f -- C:/qa-tmp/src.txt ../open-brain/src/planner-hook/run.ts\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/planner-hook/run.ts",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"echo x >| ../.agents/T\\\\\\nASKS/INBOX.md # done\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": null,
+   "after": "x\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"for i in 1; do echo x 2>C:/qa-scratch/qa237-fx/o\\\\\\npen-brain/tests/t.test.ts; done\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/tests/t.test.ts",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"for i in 1; do sed -i -e s/a/b/ C:/qa-scratch/qa237-fx/open-brain/tests/zz/../t.test.ts; done\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/tests/t.test.ts",
+   "changed": true,
+   "before": "a\n",
+   "after": "b\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"timeout 9 cp C:/qa-tmp/src.txt \\\\open-brain/tests/t.test.ts\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/tests/t.test.ts",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"(echo x | tee C:/QA-SCRATCH/qa237-fx\\\\\\n/open-brain/build/b.JS)\" @open-brain/src",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/build/b.JS",
+   "changed": true,
+   "before": null,
+   "after": "x\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"time sed -i -e s/a/b/ C:/QA\\\\-SCRATCH/qa237-fx/.AGENTS/TASKS/INBOX.md\" @scratch",
+   "lands": "C:/qa-scratch/qa237-fx/.AGENTS/TASKS/INBOX.md",
+   "changed": true,
+   "before": "a\n",
+   "after": "b\n",
+   "exit": 0,
+   "stderr": "\nreal\t0m0.025s\nuser\t0m0.000s\nsys\t0m0.030s\n"
+  },
+  {
+   "id": "bash \"false || sed -i'' s/a/b/ C:/qa-scratch/qa2\\\\\\n37-fx/package.json\" @open-brain/src",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": "a\n",
+   "after": "b\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"for i in 1; do sed -i'' s/a/b/ ./../te\\\"sts\\\"/t.test.ts; done\" @open-brain/src",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/tests/t.test.ts",
+   "changed": true,
+   "before": "a\n",
+   "after": "b\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"{ echo x >| \\\\planner-hook/run.ts; }\" @open-brain/src",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/planner-hook/run.ts",
+   "changed": true,
+   "before": null,
+   "after": "x\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"for i in 1; do install -m 644 C:/qa-tmp/src.txt '..\\\\scripts\\\\s.sh'; done\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.sh",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"for i in 1; do cp -f -- C:/qa-tmp/src.txt C:/\\\\qa-scratch/qa237-fx/open-brain/src/a.ts; done\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"timeout 9 echo x >> open-brai\\\\\\nn/src/a.ts\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "x\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"ls; sed -i -e s/a/b/ \\\\tests/t.test.ts\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/tests/t.test.ts",
+   "changed": true,
+   "before": "a\n",
+   "after": "b\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"! sed -i -e s/a/b/ \\\"C:/qa-scratch/qa237-fx/open-brain/build/b.js\\\"\" @open-brain/src",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/build/b.js",
+   "changed": true,
+   "before": "a\n",
+   "after": "b\n",
+   "exit": 1,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"{ cp C:/qa-tmp/src.txt \\\"C:/QA-SCRATCH/qa237-fx/scripts/s.SH\\\"; }\" @open-brain/src",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.SH",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"! echo x | tee ./open-brai\\\\\\nn/build/b.js\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/build/b.js",
+   "changed": true,
+   "before": null,
+   "after": "x\n",
+   "exit": 1,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"{ echo x &>> C:/QA-SCRATCH/qa2\\\\\\n37-fx/package.json; }\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "x\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"if true; then sed -i -e s/a/b/ ../te\\\"sts\\\"/t.test.ts; fi\" @open-brain/src",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/tests/t.test.ts",
+   "changed": true,
+   "before": "a\n",
+   "after": "b\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"if true; then install -m 644 C:/qa-tmp/src.txt C:/QA\\\\-SCRATCH/qa237-fx/scripts/s.SH; fi\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.SH",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"cat README.md | echo x | tee -a C:/qa-tmp/o2.txt C:/qa-scratch/qa237-\\\\\\nfx/.agents/state.json\" @open-brain/src",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "x\n",
+   "exit": 0,
+   "stderr": "cat: README.md: No such file or directory\n"
+  },
+  {
+   "id": "bash \"! mv C:/qa-tmp/src.txt s'tate.json'\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 1,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"if true; then cp -f -- C:/qa-tmp/src.txt 'C:/qa-scratch/qa237-fx/hooks/h.js'; fi\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"! sed -i -e s/a/b/ \\\"../../.agents/SESSIONS/next-session.md\\\"\" @open-brain/src",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/SESSIONS/next-session.md",
+   "changed": true,
+   "before": "a\n",
+   "after": "b\n",
+   "exit": 1,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"! install -m 644 C:/qa-tmp/src.txt ./../package.json\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 1,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"if true; then cp -f -- C:/qa-tmp/src.txt \\\".agents/state.json\\\"; fi\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"! mv C:/qa-tmp/src.txt C:/q'a-scratch'/qa237-fx/.agents/TASKS/INBOX.md\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 1,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"! cp -f -- C:/qa-tmp/src.txt C:/qa-scratch/qa237-fx/.agents/TASKS/zz/../task.md\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/task.md",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 1,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"{ sed -i'' s/a/b/ /c/qa-scratch/qa237-fx/open-brain/src/planner-hook/run.ts; }\" @open-brain/src",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/planner-hook/run.ts",
+   "changed": true,
+   "before": "a\n",
+   "after": "b\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"for i in 1; do cp C:/qa-tmp/src.txt ../o'pen-brain'/tests/t.test.ts; done\" @scratch",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/tests/t.test.ts",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"! mv C:/qa-tmp/src.txt TASKS/zz/../task.md\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/task.md",
+   "changed": false,
+   "before": null,
+   "after": null,
+   "exit": 0,
+   "stderr": "mv: cannot move 'C:/qa-tmp/src.txt' to 'TASKS/zz/../task.md': No such file or directory\n"
+  },
+  {
+   "id": "bash \"! mv C:/qa-tmp/src.txt \\\"../.agents/TASKS/INBOX.md\\\"\" @scratch",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 1,
+   "stderr": ""
+  },
+  {
+   "id": "bash \"timeout 9 install -m 644 C:/qa-tmp/src.txt \\\"C:/qa-scratch/qa237-fx/open-brain/zz/../package.json\\\"\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/package.json",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  }
+ ]
+}

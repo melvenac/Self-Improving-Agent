@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 474ec6c7..68c23856 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -24,7 +24,7 @@ const DOCS_MERGE_ALLOWLIST_EXACT = new Set([
+  */
+ const GIT_GLOBAL_WITH_VALUE = new Set(["-C", "-c", "--git-dir", "--work-tree", "--namespace", "--super-prefix", "--config-env", "--exec-path"]);
+ const PUSH_OPTION_WITH_VALUE = new Set(["--repo", "-o", "--push-option", "--receive-pack", "--exec", "--signed"]);
+-const PUSH_ALWAYS_GRANT = new Set(["--tags", "--follow-tags", "--mirror", "--all", "--prune", "--delete", "-d"]);
++const PUSH_ALWAYS_GRANT = new Set(["--tags", "--follow-tags", "--mirror", "--all", "--delete", "-d"]);
+ const STANDING_BRANCH_RE = /^(?:loop|qa|docs|chore)\/[^\s/][^\s]*$/;
+ 
+ /** True when this push must be matched by a grant. `args` are the words after `push`. */

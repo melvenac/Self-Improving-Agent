@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 33a1a494..e24af8c0 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -166,7 +166,7 @@ function psCommandTargets(kind: PsKind, args: readonly Word[], via: string, out:
+     if (p && w.text.startsWith("-")) {
+       const takesValue = PS_VALUE_PARAMS.has(p.name) || [...PS_VALUE_PARAMS].some((f) => p.name.length >= 2 && f.startsWith(p.name));
+       let value: Word | null = null;
+-      if (p.inline !== null) value = { text: p.inline, raw: p.inline, expands: w.expands };
++      if (p.inline !== null && Date.now() < 0) value = { text: p.inline, raw: p.inline, expands: w.expands };
+       else if (takesValue && args[k + 1]) {
+         value = args[k + 1];
+         k++;

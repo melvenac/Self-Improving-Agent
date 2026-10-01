@@ -1,0 +1,40 @@
+QA233: 8 same, 8 differ
+  P3 docs merge && force push master: then=allow now=deny | Planner hook: denied — shared.md, "Each outward-facing act needs authority for THAT act" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-
+  P4 docs merge && code merge: then=allow now=deny | Planner hook: denied — shared.md, "Each outward-facing act needs authority for THAT act" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-
+  P6 D-066 assignments.json PR: then=deny now=allow
+  P9 Edit absolute fwd-slash src: then=allow now=deny | Planner hook: denied — planner.md, "Authority". Path: C:/qa-scratch/qa237-fx233-cand2/open-brain/src/cli.ts
+  P10 Edit absolute backslash src: then=allow now=deny | Planner hook: denied — planner.md, "Authority". Path: C:\qa-scratch\qa237-fx233-cand2\open-brain\src\cli.ts
+  P11 Write absolute state.json: then=allow now=deny | Planner hook: denied — state changes go through `ob_state`. Path: C:\qa-scratch\qa237-fx233-cand2\.agents\state.json
+  P13 CLI Edit absolute backslash src: then=allow now=deny
+  P15 Bash redirect to absolute src: then=allow now=deny | Planner hook: denied — planner.md, "Authority" / state changes go through `ob_state` via Bash write (C:/qa-scratch/qa237-fx233-cand2/open-brain/src/cli.ts). Sta
+QA234: 74 same, 17 differ
+  Q2 CLI Edit outside repo (sibling dir): then=deny now=allow
+  Q2 CLI Edit prefix-sharing sibling fx-x/open-brain/src: then=deny now=allow
+  Q2 CLI Bash redirect outside repo: then=deny now=allow
+  Q2 Edit relative climbing out: then=deny now=allow
+  Q4 cwd=open-brain Bash redirect relative src/cli.ts: then=allow now=deny | Planner hook: denied — planner.md, "Authority" / state changes go through `ob_state` via Bash write (src/cli.ts). Static write detection only (Bash and PowerShe
+  Q4 cwd=open-brain sed -i relative src/cli.ts: then=allow now=deny | Planner hook: denied — planner.md, "Authority" / state changes go through `ob_state` via Bash write (src/cli.ts). Static write detection only (Bash and PowerShe
+  Q4 cwd=.agents Bash redirect relative state.json: then=allow now=deny | Planner hook: denied — planner.md, "Authority" / state changes go through `ob_state` via Bash write (state.json). Static write detection only (Bash and PowerShe
+  Q4 cwd=open-brain Edit relative src/cli.ts: then=allow now=deny | Planner hook: denied — planner.md, "Authority". Path: src/cli.ts
+  Q5 Edit abs, case-varied inside repo (OPEN-BRAIN/SRC): then=allow now=deny | Planner hook: denied — planner.md, "Authority". Path: C:/qa-scratch/qa237-fx234-cand2/OPEN-BRAIN/SRC/cli.ts
+  Q7 grant 'gh pr merge 5' vs 'gh pr merge 5 --squash' (control, allow): then=allow now=deny | Planner hook: denied — shared.md, "Each outward-facing act needs authority for THAT act" (D-038 / D-032). Command: gh pr merge 5 --squash gh pr merge is not on 
+  Q7 grant consumed by its own invocation: then={"present":false} now={"present":true}
+  Q8 grant 'gh pr merge 1' vs 'gh pr merge 1 --repo other/x' (observation): then=allow now=deny | Planner hook: denied — shared.md, "Each outward-facing act needs authority for THAT act" (D-038 / D-032). Command: gh pr merge 1 --repo other/x gh pr merge is n
+  O1 gh.exe pr merge 2: then=allow now=deny | Planner hook: denied — shared.md, "Each outward-facing act needs authority for THAT act" (D-038 / D-032). Command: gh.exe pr merge 2 --squash gh pr merge is not
+  O1 quoted "gh" pr merge 2: then=allow now=deny | Planner hook: denied — shared.md, "Each outward-facing act needs authority for THAT act" (D-038 / D-032). Command: "gh" pr merge 2 --squash gh pr merge is not o
+  O2 grant 'git push origin loop/x' vs '... --force': then=allow now=deny | Planner hook: denied — shared.md, "Each outward-facing act needs authority for THAT act" (D-038 / D-032). Command: git push origin loop/x --force
+  O3 stderr to a scratch log outside the repo: then=deny now=allow
+  O3 redirect to /tmp: then=deny now=allow
+QA234b: 3 same, 0 differ
+QA235: 80 same, 11 differ
+  LIMIT cwd=root `cd open-brain && echo x > src/cli.ts`: then=allow now=deny | Planner hook: denied — planner.md, "Authority" / state changes go through `ob_state` via Bash write (src/cli.ts (the command line changes directory with cd, pus
+  LIMIT cwd=root `(cd open-brain; echo x > src/cli.ts)`: then=allow now=deny | Planner hook: denied — planner.md, "Authority" / state changes go through `ob_state` via Bash write (src/cli.ts (the command line changes directory with cd, pus
+  r4-2 TILDE `echo x > ~/qa235-fx/open-brain/src/cli.ts` (HOME=C:/qa-scratch would land in PH-1): then=allow now=undefined
+  r4-2 TILDE control `echo x > $HOME/qa235-fx/open-brain/src/cli.ts`: then=deny now=undefined
+  r4-2 TILDE Write file_path ~/qa235-fx/open-brain/src/cli.ts: then=allow now=undefined
+  r4-6 EXTRA `GH pr merge 2` (upper case; Git Bash on NTFS runs it): then=allow now=deny | Planner hook: denied — shared.md, "Each outward-facing act needs authority for THAT act" (D-038 / D-032). Command: GH pr merge 2 gh pr merge is not on the D-032
+  r4-6 EXTRA `gh.EXE pr merge 2`: then=allow now=deny | Planner hook: denied — shared.md, "Each outward-facing act needs authority for THAT act" (D-038 / D-032). Command: gh.EXE pr merge 2 gh pr merge is not on the D
+  r4-6 EXTRA `gh -R other/x pr merge 1`? (flag before subcommand): then=allow now=deny | Planner hook: denied — shared.md, "Each outward-facing act needs authority for THAT act" (D-038 / D-032). Command: gh --repo other/x pr merge 1 gh pr merge is n
+  r4-2 TILDE `echo x > ~/qa237-fx235-cand2/open-brain/src/cli.ts` (HOME=C:/qa-scratch would land in PH-1): then=undefined now=deny | Planner hook: denied — planner.md, "Authority" / state changes go through `ob_state` via Bash write (~/qa237-fx235-cand2/open-brain/src/cli.ts (starts with ~, w
+  r4-2 TILDE control `echo x > $HOME/qa237-fx235-cand2/open-brain/src/cli.ts`: then=undefined now=deny | Planner hook: denied — planner.md, "Authority" / state changes go through `ob_state` via Bash write ($HOME/qa237-fx235-cand2/open-brain/src/cli.ts (contains a s
+  r4-2 TILDE Write file_path ~/qa237-fx235-cand2/open-brain/src/cli.ts: then=undefined now=deny | Planner hook: denied — ~/qa237-fx235-cand2/open-brain/src/cli.ts (starts with ~, which a shell expands to a home directory, so its location cannot be determined

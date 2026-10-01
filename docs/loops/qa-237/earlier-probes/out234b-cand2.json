@@ -1,0 +1,19 @@
+{
+ "GH_REPO=other/x gh pr merge 1 --squash": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH_REPO=other/x gh pr merge 1 --squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is not a single gh pr merge invocation (chained, piped, substituted or prefixed).",
+  "fetches": []
+ },
+ "env GH_REPO=other/x gh pr merge 1": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: env GH_REPO=other/x gh pr merge 1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is not a single gh pr merge invocation (chained, piped, substituted or prefixed).",
+  "fetches": []
+ },
+ "gh pr merge 1 --squash": {
+  "decision": "allow",
+  "fetches": [
+   "melvenac/Self-Improving-Agent/pulls/1",
+   "melvenac/Self-Improving-Agent/pulls/1/files?per_page=100&page=1"
+  ]
+ }
+}

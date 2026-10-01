@@ -1,0 +1,870 @@
+{
+ "changed": 83,
+ "total": 96,
+ "rows": [
+  {
+   "id": "ps \"New-Item -Path (Join-Path 'C:/qa-scratch/qa237-fx' 'scripts/s.ps1') -ItemType File\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { sc -Pa C:/qa-scratch/qa237-fx/open-brain/src/a.ts -Value x }\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": false,
+   "before": null,
+   "after": null,
+   "exit": 1,
+   "stderr": "Set-Content : Parameter cannot be processed because the parameter name 'Pa' is ambiguous. Possible matches include: \r\n-PassThru -Path.\r\nAt line:1 char:17\r\n+ if ($true) { sc -Pa C:/qa-scratch/qa237-fx/"
+  },
+  {
+   "id": "ps \"Copy-Item C:\\\\qa-tmp\\\\src.txt (Join-Path 'C:/qa-scratch/qa237-fx' '.agents/state.json')\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { move C:\\\\qa-tmp\\\\src.txt -Destination:\\\"../../package.json\\\" }\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"ri -OutBuffer 1 -Path (Join-Path 'C:/qa-scratch/qa237-fx' 'README.md')\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/README.md",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"del (Join-Path 'C:/qa-scratch/qa237-fx' 'docs/loops/q.md')\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/docs/loops/q.md",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { ni -Path \\\"C:/qa-scratch/qa237-fx/hooks/h.js\\\" -ItemType File }\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"ac -Force -LiteralPath (Join-Path 'C:/qa-scratch/qa237-fx' 'open-brain/tests/t.ts') -Value x\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/tests/t.ts",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-scratch/qa237-fx/docs/loops/q.md'); Set-Content @a -Value x\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/docs/loops/q.md",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-scratch/qa237-fx/scripts/s.ps1'); Add-Content @a -Value x\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('../package.json'); Move-Item @a\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": false,
+   "before": "a\n",
+   "after": "a\n",
+   "exit": 1,
+   "stderr": "Move-Item : Cannot create a file when that file already exists.\r\nAt line:1 char:28\r\n+ $a = @('../package.json'); Move-Item @a\r\n+                            ~~~~~~~~~~~~\r\n    + CategoryInfo          : "
+  },
+  {
+   "id": "ps \"'x' | Out-File (Join-Path 'C:/qa-scratch/qa237-fx' 'docs/loops/q.md')\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/docs/loops/q.md",
+   "changed": true,
+   "before": null,
+   "after": "��x\u0000\r\u0000\n\u0000",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"'x' | Tee-Object -InfA 0 (Join-Path 'C:/qa-scratch/qa237-fx' 'open-brain/src/a.ts')\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "��x\u0000\r\u0000\n\u0000",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Set-Content -OV o -LP .\\\\scripts\\\\s.ps1 -Value x\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": false,
+   "before": null,
+   "after": null,
+   "exit": 1,
+   "stderr": "Set-Content : A parameter cannot be found that matches parameter name 'LP'.\r\nAt line:1 char:19\r\n+ Set-Content -OV o -LP .\\scripts\\s.ps1 -Value x\r\n+                   ~~~\r\n    + CategoryInfo          :"
+  },
+  {
+   "id": "ps \"Get-Date\\nmove -InformationAction 0 C:\\\\qa-tmp\\\\src.txt C:/qa-scratch/qa237-fx/open-brain/tests/t.ts\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/tests/t.ts",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { ni -OV o \\\"../package.json\\\" -ItemType File }\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-scratch/qa237-fx/.agents/state.json'); sc @a -Value x\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Set-Content -OutBuffer 1 C:\\\\qa-scratch\\\\qa237-fx\\\\.agents\\\\TASKS\\\\INBOX.md x\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Add-Content -InfA 0 C:/qa-scratch/qa237-fx/open-brain/src/a.ts x\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Get-Date\\nac -PV p '../package.json' x\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"'x' | Tee-Object (Join-Path 'C:/qa-scratch/qa237-fx' 'open-brain/src/a.ts')\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "��x\u0000\r\u0000\n\u0000",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-scratch/qa237-fx/hooks/h.js'); copy @a\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": false,
+   "before": null,
+   "after": null,
+   "exit": 1,
+   "stderr": "copy : Cannot find path 'C:\\qa-scratch\\qa237-fx\\hooks\\h.js' because it does not exist.\r\nAt line:1 char:46\r\n+ $a = @('C:/qa-scratch/qa237-fx/hooks/h.js'); copy @a\r\n+                                    "
+  },
+  {
+   "id": "ps \"Get-Date; move -ErrorVariable e C:\\\\qa-tmp\\\\src.txt C:\\\\qa-scratch\\\\qa237-fx\\\\hooks\\\\h.js\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"'x' | Out-File -FileP (Join-Path 'C:/qa-scratch/qa237-fx' '.agents/state.json')\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "��x\u0000\r\u0000\n\u0000",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"'x' | Out-File -ErrorAction Stop -LP (Join-Path 'C:/qa-scratch/qa237-fx' 'scripts/s.ps1')\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": false,
+   "before": null,
+   "after": null,
+   "exit": 1,
+   "stderr": "Out-File : A parameter cannot be found that matches parameter name 'LP'.\r\nAt line:1 char:34\r\n+ 'x' | Out-File -ErrorAction Stop -LP (Join-Path 'C:/qa-scratch/qa237- ...\r\n+                             "
+  },
+  {
+   "id": "ps \"Get-Date; 'x' | Out-File -OutBuffer 1 '../package.json'\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "��x\u0000\r\u0000\n\u0000",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('open-brain/src/a.ts'); Tee-Object @a\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "��",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"copy -EV e C:\\\\qa-tmp\\\\src.txt C:/qa-scratch/qa237-fx/package.json | Out-Null\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"mi -EA 0 C:\\\\qa-tmp\\\\src.txt -Dest (Join-Path 'C:/qa-scratch/qa237-fx' 'open-brain/tests/t.ts')\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/tests/t.ts",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"del (Join-Path 'C:/qa-scratch/qa237-fx' 'hooks/h.js')\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { copy -WarningAction 0 C:\\\\qa-tmp\\\\src.txt \\\"C:/qa-scratch/qa237-fx/open-brain/src/a.ts\\\" }\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"ac -Encoding utf8 (Join-Path 'C:/qa-scratch/qa237-fx' 'open-brain/src/a.ts') x\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "﻿x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { mi -PV p C:\\\\qa-tmp\\\\src.txt -Destination 'C:/qa-scratch/qa237-fx/.agents/state.json' }\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-tmp/o.txt'); cpi @a\" @.agents",
+   "lands": "C:/qa-tmp/o.txt",
+   "changed": false,
+   "before": null,
+   "after": null,
+   "exit": 1,
+   "stderr": "cpi : Cannot find path 'C:\\qa-tmp\\o.txt' because it does not exist.\r\nAt line:1 char:28\r\n+ $a = @('C:/qa-tmp/o.txt'); cpi @a\r\n+                            ~~~~~~\r\n    + CategoryInfo          : ObjectNo"
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md'); mi @a\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-tmp/open-brain/src/a.ts'); New-Item @a\" @docs/loops",
+   "lands": "C:/qa-tmp/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"ri -Path (Join-Path 'C:/qa-scratch/qa237-fx' 'README.md')\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/README.md",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"'x' | Tee-Object -OB 1 (Join-Path 'C:/qa-scratch/qa237-fx' 'open-brain/src/a.ts')\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "��x\u0000\r\u0000\n\u0000",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Remove-Item -Path (Join-Path 'C:/qa-scratch/qa237-fx' 'hooks/h.js')\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { sc C:\\\\qa-scratch\\\\qa237-fx\\\\package.json x }\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Get-Date; sc -WA 0 '.agents/TASKS/INBOX.md' x\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { move -ErrorVariable e C:\\\\qa-tmp\\\\src.txt C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md }\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-scratch/qa237-fx/scripts/s.ps1'); del @a\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { cpi -OutVariable o C:\\\\qa-tmp\\\\src.txt -Dest:\\\"C:/qa-scratch/qa237-fx/hooks/h.js\\\" }\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Get-Date; ni -OutBuffer 1 '../../open-brain/src/a.ts' -Type File\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"'x' | Out-File -ErrorAction Stop (Join-Path 'C:/qa-scratch/qa237-fx' 'README.md')\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/README.md",
+   "changed": true,
+   "before": null,
+   "after": "��x\u0000\r\u0000\n\u0000",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-tmp/open-brain/src/a.ts'); ni @a\" @.",
+   "lands": "C:/qa-tmp/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { ri open-brain/src/a.ts }\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('../.agents/TASKS/INBOX.md'); Out-File @a\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": null,
+   "after": "��",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('.agents/state.json'); move @a\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"mi C:\\\\qa-tmp\\\\src.txt -Dest (Join-Path 'C:/qa-scratch/qa237-fx' '../../qa-tmp/open-brain/src/a.ts')\" @.",
+   "lands": "C:/qa-tmp/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md'); Out-File @a\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": null,
+   "after": "��",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Get-Date\\nac -OB 1 ../../hooks/h.js x\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Copy-Item C:\\\\qa-tmp\\\\src.txt -Dest (Join-Path 'C:/qa-scratch/qa237-fx' '.agents/state.json')\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-scratch/qa237-fx/.agents/state.json'); New-Item @a\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"ni -Path (Join-Path 'C:/qa-scratch/qa237-fx' 'open-brain/src/a.ts') -Type File\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { ni TASKS/INBOX.md -Force }\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Set-Content -InfA 0 -Lit (Join-Path 'C:/qa-scratch/qa237-fx' 'package.json') -Value x\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"ac -ErrorVariable e (Join-Path 'C:/qa-scratch/qa237-fx' '../../qa-tmp/open-brain/src/a.ts') x\" @.",
+   "lands": "C:/qa-tmp/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"ni -Encoding utf8 -Path (Join-Path 'C:/qa-scratch/qa237-fx' '.agents/state.json') -Force\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": false,
+   "before": null,
+   "after": null,
+   "exit": 1,
+   "stderr": "New-Item : A parameter cannot be found that matches parameter name 'Encoding'.\r\nAt line:1 char:4\r\n+ ni -Encoding utf8 -Path (Join-Path 'C:/qa-scratch/qa237-fx' '.agents/ ...\r\n+    ~~~~~~~~~\r\n    + Cat"
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-tmp/o.txt'); Add-Content @a -Value x\" @open-brain",
+   "lands": "C:/qa-tmp/o.txt",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-tmp/o.txt'); mi @a\" @open-brain",
+   "lands": "C:/qa-tmp/o.txt",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"move C:\\\\qa-tmp\\\\src.txt (Join-Path 'C:/qa-scratch/qa237-fx' '.agents/state.json')\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { ni C:/qa-scratch/qa237-fx/.agents/state.json }\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-tmp/open-brain/src/a.ts'); cpi @a\" @.",
+   "lands": "C:/qa-tmp/open-brain/src/a.ts",
+   "changed": false,
+   "before": null,
+   "after": null,
+   "exit": 1,
+   "stderr": "cpi : Cannot find path 'C:\\qa-tmp\\open-brain\\src\\a.ts' because it does not exist.\r\nAt line:1 char:42\r\n+ $a = @('C:/qa-tmp/open-brain/src/a.ts'); cpi @a\r\n+                                          ~~~~"
+  },
+  {
+   "id": "ps \"ri -OB 1 (Join-Path 'C:/qa-scratch/qa237-fx' 'hooks/h.js')\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Get-Date\\ncpi -OutVariable o C:\\\\qa-tmp\\\\src.txt .\\\\..\\\\.agents\\\\state.json\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('../.agents/state.json'); Tee-Object @a\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "��",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Set-Content -Pa (Join-Path 'C:/qa-scratch/qa237-fx' '../../qa-tmp/o.txt') -Value x\" @.agents",
+   "lands": "C:/qa-tmp/o.txt",
+   "changed": false,
+   "before": null,
+   "after": null,
+   "exit": 1,
+   "stderr": "Set-Content : Parameter cannot be processed because the parameter name 'Pa' is ambiguous. Possible matches include: \r\n-PassThru -Path.\r\nAt line:1 char:13\r\n+ Set-Content -Pa (Join-Path 'C:/qa-scratch/q"
+  },
+  {
+   "id": "ps \"if ($true) { del -LiteralPath \\\"C:/qa-scratch/qa237-fx/docs/loops/q.md\\\" }\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/docs/loops/q.md",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"cpi -OutBuffer 1 C:\\\\qa-tmp\\\\src.txt C:/qa-scratch/qa237-fx/scripts/s.ps1\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Get-Date; Add-Content -LP:'C:/qa-scratch/qa237-fx/scripts/s.ps1' -Value x\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": false,
+   "before": null,
+   "after": null,
+   "exit": 1,
+   "stderr": "Add-Content : A parameter cannot be found that matches parameter name 'LP'.\r\nAt line:1 char:23\r\n+ Get-Date; Add-Content -LP:'C:/qa-scratch/qa237-fx/scripts/s.ps1' -Val ...\r\n+                       ~~~"
+  },
+  {
+   "id": "ps \"if ($true) { ac -OutVariable o \\\"C:/qa-tmp/open-brain/src/a.ts\\\" x }\" @.agents",
+   "lands": "C:/qa-tmp/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Get-Date\\nsc -OB 1 C:/qa-scratch/qa237-fx/scripts/s.ps1 x\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Set-Content -EA 0 -PSPath (Join-Path 'C:/qa-scratch/qa237-fx' 'package.json') -Value x\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"del -ErrorVariable e -LP (Join-Path 'C:/qa-scratch/qa237-fx' '.agents/state.json')\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": false,
+   "before": "a\n",
+   "after": "a\n",
+   "exit": 1,
+   "stderr": "Remove-Item : A parameter cannot be found that matches parameter name 'LP'.\r\nAt line:1 char:22\r\n+ del -ErrorVariable e -LP (Join-Path 'C:/qa-scratch/qa237-fx' '.agents ...\r\n+                      ~~~\r"
+  },
+  {
+   "id": "ps \"if ($true) { ac -InformationAction 0 -Path C:/qa-scratch/qa237-fx/README.md -Value x }\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/README.md",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('hooks/h.js'); del @a\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"ri -ErrorVariable e (Join-Path 'C:/qa-scratch/qa237-fx' 'hooks/h.js')\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"sc -LP (Join-Path 'C:/qa-scratch/qa237-fx' 'scripts/s.ps1') -Value x\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": false,
+   "before": null,
+   "after": null,
+   "exit": 1,
+   "stderr": "Set-Content : A parameter cannot be found that matches parameter name 'LP'.\r\nAt line:1 char:4\r\n+ sc -LP (Join-Path 'C:/qa-scratch/qa237-fx' 'scripts/s.ps1') -Value x\r\n+    ~~~\r\n    + CategoryInfo     "
+  },
+  {
+   "id": "ps \"$a = @('../../open-brain/tests/t.ts'); del @a\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/tests/t.ts",
+   "changed": true,
+   "before": "a\n",
+   "after": null,
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Add-Content -EV e \\\"C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md\\\" x\" @.agents",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-scratch/qa237-fx/hooks/h.js'); Add-Content @a -Value x\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { mi -OV o C:\\\\qa-tmp\\\\src.txt -Destination C:/qa-scratch/qa237-fx/scripts/s.ps1 }\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-tmp/open-brain/src/a.ts'); Tee-Object @a\" @.",
+   "lands": "C:/qa-tmp/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "��",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"if ($true) { mi -OutBuffer 1 C:\\\\qa-tmp\\\\src.txt -Destination:docs\\\\loops\\\\q.md }\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/docs/loops/q.md",
+   "changed": true,
+   "before": null,
+   "after": "src\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"$a = @('C:/qa-tmp/o.txt'); move @a\" @open-brain",
+   "lands": "C:/qa-tmp/o.txt",
+   "changed": false,
+   "before": "a\n",
+   "after": "a\n",
+   "exit": 1,
+   "stderr": "move : Cannot create a file when that file already exists.\r\nAt line:1 char:28\r\n+ $a = @('C:/qa-tmp/o.txt'); move @a\r\n+                            ~~~~~~~\r\n    + CategoryInfo          : WriteError: (C:"
+  },
+  {
+   "id": "ps \"ni -Pa (Join-Path 'C:/qa-scratch/qa237-fx' '.agents/state.json') -ItemType File\" @open-brain",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/state.json",
+   "changed": true,
+   "before": null,
+   "after": "",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Get-Date\\n'x' | Out-File -InfA 0 \\\".agents/TASKS/INBOX.md\\\"\" @.",
+   "lands": "C:/qa-scratch/qa237-fx/.agents/TASKS/INBOX.md",
+   "changed": true,
+   "before": null,
+   "after": "��x\u0000\r\u0000\n\u0000",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps \"Get-Date; sc -WA 0 .\\\\..\\\\..\\\\package.json x\" @docs/loops",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps-dyn#7 \"powershell -NoProfile Set-Content C:/qa-scratch/qa237-fx/hooks/h.js x\"",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps-dyn#7 \"powershell -NoProfile Set-Content C:/qa-scratch/qa237-fx/scripts/s.ps1 x\"",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps-dyn#5 \"[scriptblock]::Create('Set-Content C:/qa-scratch/qa237-fx/open-brain/src/a.ts x').Invoke()\"",
+   "lands": "C:/qa-scratch/qa237-fx/open-brain/src/a.ts",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps-dyn#7 \"powershell -NoProfile Set-Content C:/qa-scratch/qa237-fx/package.json x\"",
+   "lands": "C:/qa-scratch/qa237-fx/package.json",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps-dyn#7 \"powershell -NoProfile Set-Content C:/qa-scratch/qa237-fx/scripts/s.ps1 x\"",
+   "lands": "C:/qa-scratch/qa237-fx/scripts/s.ps1",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  },
+  {
+   "id": "ps-dyn#7 \"powershell -NoProfile Set-Content C:/qa-scratch/qa237-fx/hooks/h.js x\"",
+   "lands": "C:/qa-scratch/qa237-fx/hooks/h.js",
+   "changed": true,
+   "before": null,
+   "after": "x\r\n",
+   "exit": 0,
+   "stderr": ""
+  }
+ ]
+}

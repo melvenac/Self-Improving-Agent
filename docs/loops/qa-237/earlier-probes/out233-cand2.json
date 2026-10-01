@@ -1,0 +1,87 @@
+{
+ "P1 docs-only merge alone": {
+  "decision": "allow",
+  "fetches": [
+   "/pulls/1",
+   "/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "P2 code merge alone": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/2 --squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: unlisted path open-brain/src/cli.ts.",
+  "fetches": [
+   "/pulls/2",
+   "/pulls/2/files?per_page=100&page=1"
+  ]
+ },
+ "P3 docs merge && force push master": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/1 --squash && git push --force origin master gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is not a single gh pr merge invocation (chained, piped, substituted or prefixed).",
+  "fetches": []
+ },
+ "P4 docs merge && code merge": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/1 && gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/2 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is not a single gh pr merge invocation (chained, piped, substituted or prefixed).",
+  "fetches": []
+ },
+ "P5 docs merge ; git tag v9": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/1; git tag v9 && git push --tags gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is not a single gh pr merge invocation (chained, piped, substituted or prefixed).",
+  "fetches": []
+ },
+ "P6 D-066 assignments.json PR": {
+  "decision": "allow",
+  "fetches": [
+   "/pulls/3",
+   "/pulls/3/files?per_page=100&page=1"
+  ]
+ },
+ "P7 force push alone (control)": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git push --force origin master",
+  "fetches": []
+ },
+ "P8 docs merge with grant present": {
+  "decision": "allow",
+  "fetches": [
+   "/pulls/1",
+   "/pulls/1/files?per_page=100&page=1"
+  ]
+ },
+ "P8 grant file": {
+  "unchanged": true
+ },
+ "P9 Edit absolute fwd-slash src": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — planner.md, \"Authority\". Path: C:/qa-scratch/qa237-fx233-cand2/open-brain/src/cli.ts",
+  "fetches": []
+ },
+ "P10 Edit absolute backslash src": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — planner.md, \"Authority\". Path: C:\\qa-scratch\\qa237-fx233-cand2\\open-brain\\src\\cli.ts",
+  "fetches": []
+ },
+ "P11 Write absolute state.json": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — state changes go through `ob_state`. Path: C:\\qa-scratch\\qa237-fx233-cand2\\.agents\\state.json",
+  "fetches": []
+ },
+ "P12 Edit relative src (control)": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — planner.md, \"Authority\". Path: open-brain/src/cli.ts",
+  "fetches": []
+ },
+ "P13 CLI Edit absolute backslash src": {
+  "exit": 2,
+  "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Planner hook: denied — planner.md, \\\"Authority\\\". Path: C:\\\\qa-scratch\\\\qa237-fx233-cand2\\\\open-brain\\\\src\\\\cli.ts\"}}\n"
+ },
+ "P14 CLI Edit relative src (control)": {
+  "exit": 2,
+  "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Planner hook: denied — planner.md, \\\"Authority\\\". Path: open-brain/src/cli.ts\"}}\n"
+ },
+ "P15 Bash redirect to absolute src": {
+  "decision": "deny",
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-scratch/qa237-fx233-cand2/open-brain/src/cli.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target that is not a literal path is refused, and so is cd plus a write on one line (split them into two commands). OUT OF REACH: a path a script builds at runtime (node x.js writing src/), other write commands (rm, touch, dd, curl -o, git checkout), symlinks and junctions, and a merge through the GitHub API (curl, gh api). It stops mistakes by the planner's tools; it is not a sandbox.",
+  "fetches": []
+ }
+}

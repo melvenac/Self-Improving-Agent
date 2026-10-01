@@ -1,0 +1,87 @@
+{
+  "loop": "t194",
+  "candidate_git": {
+    "sha": "7a3a444135aa9f3049c40f17f8519421ccb4458b",
+    "branch": "origin/loop/t194-planner-hook",
+    "frozen_at": "2026-10-01T06:00:00-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci && npm run build && npx tsc --noEmit (open-brain/, candidate 7a3a4441, laptop DESKTOP-0GV3HAD, TEMP/TMP=C:\\qa-tmp)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 90000,
+      "detail": "Chained with &&, exit 0; 'build stamped 7a3a444'. vitest run tests/planner-hook exit 0, 6 files, 431 passed. r5 tests against the r4 product (planner-hook src checked out from d37e09dc): exit 1, 147 failed / 155 passed (302). git diff d37e09dc 7a3a4441 on hook.test.ts, docs-merge.test.ts, r3.test.ts and r4.test.ts is empty."
+    },
+    "unit": {
+      "command": "tcm CI run 36857667379 (qa/t194-r5-ci-candidate, headSha 7a3a444135aa9f3049c40f17f8519421ccb4458b), job test 110353999146",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 240000,
+      "detail": "Run conclusion success, test job success on tcm-2 (Linux x64): 142 files, 2362 passed | 8 skipped (2370); planner-hook 429 passed, 2 Windows-only skipped, so the POSIX oracle branch ran. Base run 36857695715 (qa/t194-r5-ci-base, headSha d37e09dc4bd38cec0306e542773c3ab881602d6e, test job 110354076639): success on tcm-1, 140 files, 2061 passed | 7 skipped (2068). test-windows skipped in both; windows=true not used; 2 of 4 runs."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "R5-P1-if",
+      "status": "unmet",
+      "evidence": "gen-p1.mjs (own oracle: path.win32.resolve + own protected regexes), 400 cases: 33 fail-open, 32 confirmed in real Git Bash (truth-p1-cand.json). probe-holes.mjs/probe-holes2.mjs add 21 fail-open spellings, all confirmed in real bash: shell keywords then/do/!/{ } and timeout, nice -n, env -u, find -exec (D1); backslash before an ordinary character and backslash-newline (D2); cp -tDIR, -vt DIR, --target DIR (D3); /dev/../<repo>/open-brain/src (D4); env --chdir / env -C (D5); heredoc fed to bash, pipe to sh, sed w, a comment opening a fake heredoc (D6)."
+    },
+    {
+      "id": "R5-P1-only-if",
+      "status": "unmet",
+      "evidence": "128 generated allow-cases: 1 denied with no named cause (a trailing '# done' read as tee targets resolves into open-brain/src). Probes: 'echo x # > open-brain/src/x.ts' (writes nothing) and unquoted 'echo x > open-brain\\src\\x.ts' (bash writes open-brainsrcx.ts in the root) are both denied as PH-1 writes with no stated cause (D7)."
+    },
+    {
+      "id": "R5-P1-non-literal",
+      "status": "met",
+      "order": "shown",
+      "evidence": "80 of 80 generated non-literal targets (~, ~user, $, ${}, $( ), backtick, * ? [, { }, $TMPDIR, 8 contexts) refused with a named cause. Edit/Write: 54 of 54 agree with the oracle."
+    },
+    {
+      "id": "R5-P2-gh-merge",
+      "status": "unmet",
+      "evidence": "gen-p2.mjs, 380 cases: 9 fail-open (5 foreign pull URLs, 4 '#N' refs), 45 fail-closed (38 non-merges with the word merge swept in, 7 exact merges with a trailing comment). probe-merge-async.mjs (fake fetch, all PRs docs-only): 'gh pr merge #2' allowed after reading PR 2 though bash and PowerShell drop #2 and gh merges the current branch's PR (D8); 'gh pr merge https://github.com/other/repo/pull/3' fetched from other/repo and allowed (D9). Allowed with no read: gh pr m\\erge 2, gh pr \\<newline>merge 2, gh pr $'merge' 2, gh pr {merge,} 2, X=merge; gh pr $X 2, gh $(echo pr) merge 2; real bash hands gh [pr, merge, 2] each time (D10). PowerShell '& gh' and '.\\gh.exe' are read (met)."
+    },
+    {
+      "id": "R5-P2b-git",
+      "status": "unmet",
+      "evidence": "gen-p2b.mjs, 316 cases: 9 fail-open, all inline -c alias.X=merge|tag|'push --force origin master' (real git ran the merge) (D11); 6 fail-closed (trailing comment). Grant exactness 16 of 16. probe-holes2.mjs: git mer\\ge, git {merge,}, git \\<newline>merge, git pu\\sh --force origin master allowed; real bash runs merge / push --force (D12)."
+    },
+    {
+      "id": "R5-P3-powershell",
+      "status": "unmet",
+      "evidence": "Matcher Edit|Write|NotebookEdit|Bash|PowerShell (met). gen-p3.mjs, 360 cases: 96 fail-open, 83 confirmed in real PowerShell 5.1 (truth-p3-cand.json; the 13 others are oracle errors on -LP/-Pa or setup). Classes: common parameters taking a value (-EA, -OV, -OB, -InfA, -PV, -EV, -WA) and the alias -Type (D13); ( ... ) targets, splatting, quoted comma list (D14); FileSystem:: provider paths and drive-relative C:path (D15); <##>, [scriptblock]::Create, positional powershell, -EncodedCommand, -Comman, [IO.File]::WriteAllText, alias inside a script block (D16)."
+    },
+    {
+      "id": "R5-limit",
+      "status": "unmet",
+      "evidence": "BASH_WRITE_LIMIT omits four handoff 'Out of reach' items: perl -pi, awk -i, bash -c nested beyond four levels (confirmed: a depth-5 write is allowed and lands), and Rename-Item's second argument. It calls rm out of reach for Bash and PowerShell, but PowerShell rm is caught. The D6/D16 classes and Export-Csv are neither caught nor stated (D17)."
+    },
+    {
+      "id": "R5-regression",
+      "status": "met",
+      "order": "shown",
+      "evidence": "QA 233/234/235 probe scripts (byte-identical to origin) re-run unmodified bar fixture paths: QA233 8 same / 8 differ, QA234 74/17, QA234b 3/0, QA235 80/11. Every difference is a fixed earlier defect, QA 233's assignments.json recommendation, r4's outside-allowed and exact grant, ruling 1, or the handoff's Supersedes list. No regression. r4 test files unchanged."
+    },
+    {
+      "id": "R5-mutants",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Forge's 50 diffs in one sequential pass: 50 typecheck, 50 killed (mutants-forge-out.json). Forge run 1's typecheck failure was p3-powershell-tool-ignored (fixed in e96a289c). QA's 6: 4 killed by Forge's tests; qa-p1-install-ignored and qa-p3-comma-list-off survive Forge's 431 tests (test gaps) and are killed by gen-p1 (366 -> 352) and probe-comma.mjs (deny -> allow)."
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "D1-D6: P1 fail-open classes (command position, bash quote removal and line continuation, cp -t spellings, /dev/.., env --chdir, code fed to a shell on stdin or by sed w).",
+    "D7: comments read as words; three denials name no stated cause.",
+    "D8-D10: P2 '#N' comment ref, foreign pull URL, and shell-rewritten pr/merge words allowed with no grant.",
+    "D11-D12: P2b inline -c aliases and rewritten subcommands allowed with no grant.",
+    "D13-D16: P3 unknown parameters, non-literal targets, provider and drive-relative paths, and dynamic code not refused.",
+    "D17: BASH_WRITE_LIMIT omits four handoff 'Out of reach' items and misstates rm for PowerShell.",
+    "Non-merge gh commands containing the word merge need a grant (r5 token rule vs. its headline); for the planner.",
+    "Test gaps: install as a writer and the unquoted comma list are not pinned by any test (two QA mutants survive)."
+  ],
+  "notes": "QA 237 RE-RUN (the first attempt died at the usage limit at 09:37Z with no report or push; its trees and helpers were reused and every cited output re-run). Claude Code on Opus 5.5 (claude-opus-5-5), laptop DESKTOP-0GV3HAD, headless. Dispatch commit efd9cf15ab2c351524c25c8209758b9182f51e7d. Verdict: REJECT. No live GitHub call; the hook is registered nowhere."
+}

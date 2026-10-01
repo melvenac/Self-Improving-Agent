@@ -1,0 +1,104 @@
+[
+ {
+  "name": "qa-p1-install-ignored",
+  "source": "QA 237",
+  "typecheckExit": 0,
+  "testExit": 0,
+  "failedTests": 0,
+  "totalTests": 431,
+  "killedByForgeTests": false,
+  "buildExit": 0,
+  "qaGenerator": {
+   "gen": "gen-p1.mjs",
+   "agreeOnCandidate": 366,
+   "agreeOnMutant": 352,
+   "killed": true
+  },
+  "seconds": 78
+ },
+ {
+  "name": "qa-p1-outside-refused",
+  "source": "QA 237",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 4,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "buildExit": 0,
+  "qaGenerator": {
+   "gen": "gen-p1.mjs",
+   "agreeOnCandidate": 366,
+   "agreeOnMutant": 315,
+   "killed": true
+  },
+  "seconds": 80
+ },
+ {
+  "name": "qa-p2-one-unchecked-word",
+  "source": "QA 237",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 5,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "buildExit": 0,
+  "qaGenerator": {
+   "gen": "gen-p2.mjs",
+   "agreeOnCandidate": 326,
+   "agreeOnMutant": 322,
+   "killed": true
+  },
+  "seconds": 75
+ },
+ {
+  "name": "qa-p2b-prune-allowed",
+  "source": "QA 237",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 2,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "buildExit": 0,
+  "qaGenerator": {
+   "gen": "gen-p2b.mjs",
+   "agreeOnCandidate": 301,
+   "agreeOnMutant": 299,
+   "killed": true
+  },
+  "seconds": 72
+ },
+ {
+  "name": "qa-p3-colon-inline-off",
+  "source": "QA 237",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "buildExit": 0,
+  "qaGenerator": {
+   "gen": "gen-p3.mjs",
+   "agreeOnCandidate": 264,
+   "agreeOnMutant": 237,
+   "killed": true
+  },
+  "seconds": 71
+ },
+ {
+  "name": "qa-p3-comma-list-off",
+  "source": "QA 237",
+  "typecheckExit": 0,
+  "testExit": 0,
+  "failedTests": 0,
+  "totalTests": 431,
+  "killedByForgeTests": false,
+  "buildExit": 0,
+  "qaGenerator": {
+   "gen": "gen-p3.mjs",
+   "agreeOnCandidate": 264,
+   "agreeOnMutant": 264,
+   "killed": false
+  },
+  "seconds": 74
+ }
+]

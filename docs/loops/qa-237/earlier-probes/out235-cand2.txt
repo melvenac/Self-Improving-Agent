@@ -1,0 +1,89 @@
+PASS  r4-1 cwd=open-brain Bash `echo x > src/cli.ts`  → deny
+PASS  r4-1 cwd=open-brain Bash `sed -i s/a/b/ src/cli.ts`  → deny
+PASS  r4-1 cwd=open-brain Edit relative src/cli.ts  → deny
+PASS  r4-1 cwd=open-brain Write relative src/cli.ts  → deny
+PASS  r4-1 cwd=.agents Bash `echo {} > state.json`  → deny
+PASS  r4-1 cwd=.agents Bash `echo x > TASKS/INBOX.md`  → deny
+PASS  r4-1 cwd=.agents Write relative state.json  → deny
+PASS  r4-1 cwd=open-brain Bash tee src/x.ts  → deny
+PASS  r4-1 cwd=open-brain Bash cp a tests/x.ts  → deny
+PASS  r4-1 cwd=open-brain Bash mv a package.json  → deny
+PASS  r4-1 cwd=open-brain Bash 2>> src/x.log  → deny
+PASS  r4-1 cwd=open-brain/src Bash `echo x > cli.ts`  → deny
+PASS  r4-1 cwd=open-brain (BACKSLASH form) Bash `echo x > src/cli.ts`  → deny
+PASS  r4-1 cwd=open-brain (trailing slash) Bash `echo x > src/cli.ts`  → deny
+PASS  r4-1 cwd=open-brain (Git Bash /c/ form) Bash `echo x > src/cli.ts`  → deny
+PASS  r4-1 ../ cwd=docs/loops Bash `echo x > ../../open-brain/src/cli.ts`  → deny
+PASS  r4-1 ../ cwd=docs Write ../.agents/state.json  → deny
+PASS  r4-1 ../ cwd=open-brain Bash `echo x > ../scripts/x.sh`  → deny
+PASS  r4-1 ../ cwd=open-brain/src Edit ../../package.json  → deny
+PASS  r4-1 control cwd=docs/loops Bash `echo x > src/cli.ts` (lands in docs/loops/src)  → allow
+PASS  r4-1 control cwd=scratch Bash `echo {} > state.json`  → allow
+PASS  r4-1 control cwd=open-brain Bash `echo x > notes.md`  → allow
+PASS  r4-1 control cwd=docs/loops Edit relative src/cli.ts  → allow
+PASS  r4-1 control cwd=root Write docs/loops/q.md  → allow
+FAIL  LIMIT cwd=root `cd open-brain && echo x > src/cli.ts`  → deny
+FAIL  LIMIT cwd=root `(cd open-brain; echo x > src/cli.ts)`  → deny
+PASS  r4-2 `npm test 2> C:/qa-tmp/log.txt`  → allow
+PASS  r4-2 cwd=open-brain `npm test 2> C:/qa-tmp/log.txt`  → allow
+PASS  r4-2 Bash redirect outside (fwd)  → allow
+PASS  r4-2 Bash redirect outside (back, quoted)  → allow
+PASS  r4-2 Bash redirect /tmp  → allow
+PASS  r4-2 Bash redirect relative ../ climbing out  → allow
+PASS  r4-2 Write scratch outside (fwd)  → allow
+PASS  r4-2 Write scratch outside (back)  → allow
+PASS  r4-2 Edit outside look-alike …/open-brain/src/  → allow
+PASS  r4-2 Write prefix-sharing sibling fx-x/open-brain/src (outside)  → allow
+PASS  r4-2 undeterminable `echo x > $TMP/x.txt`  → deny
+PASS  r4-2 undeterminable backtick target  → deny
+PASS  r4-2 undeterminable ${VAR}  → deny
+PASS  r4-2 undeterminable relative Write with non-absolute cwd  → deny
+PASS  r4-2 undeterminable relative Bash with non-absolute cwd  → deny
+PASS  r4-2 TILDE `echo x > ~/qa237-fx235-cand2/open-brain/src/cli.ts` (HOME=C:/qa-scratch would land in PH-1)  → deny
+PASS  r4-2 TILDE control `echo x > $HOME/qa237-fx235-cand2/open-brain/src/cli.ts`  → deny
+PASS  r4-2 TILDE Write file_path ~/qa237-fx235-cand2/open-brain/src/cli.ts  → deny
+PASS  r4-3 Edit abs OPEN-BRAIN/SRC/cli.ts  → deny
+PASS  r4-3 Edit abs back OPEN-BRAIN\SRC\cli.ts  → deny
+PASS  r4-3 Edit relative OPEN-BRAIN/SRC/cli.ts (cwd=root)  → deny
+PASS  r4-3 Bash redirect relative OPEN-BRAIN/SRC/cli.ts  → deny
+PASS  r4-3 Bash redirect abs OPEN-BRAIN/SRC/cli.ts  → deny
+PASS  r4-3 Write .AGENTS/STATE.JSON  → deny
+PASS  r4-3 Write .agents/tasks/inbox.md  → deny
+PASS  r4-3 Write Package.JSON (root)  → deny
+PASS  r4-3 Write SCRIPTS/x.sh  → deny
+PASS  r4-3 root case-varied C:/QA-SCRATCH/QA235-FX/open-brain/src/cli.ts  → deny
+PASS  r4-3 lower-case drive c:/…/open-brain/src/cli.ts  → deny
+PASS  r4-3 cwd=OPEN-BRAIN Bash `echo x > SRC/cli.ts`  → deny
+PASS  r4-3 SUMMARY upper-case Write (region absent → allow on both)  → allow
+PASS  r4-4 `GH_REPO=other/x gh pr merge 1 --squash`  → deny fetches=0
+PASS  r4-4 `env GH_REPO=other/x gh pr merge 1`  → deny fetches=0
+PASS  r4-4 `GH_HOST=evil gh pr merge 1`  → deny fetches=0
+PASS  r4-4 `GH_REPO=other/x gh.exe pr merge 1`  → deny fetches=0
+PASS  r4-4 `command gh pr merge 1`  → deny fetches=0
+PASS  r4-4 control `gh pr merge 1 --squash` (docs-only, allow after reading)  → allow fetches=2
+PASS  r4-5 grant `gh pr merge 1` vs `gh pr merge 1 --repo other/x`  → deny fetches=0 grant=true
+PASS  r4-5 grant `gh pr merge 1` vs `gh pr merge 1 -R other/x`  → deny fetches=0 grant=true
+PASS  r4-5 grant `gh pr merge 1` vs `gh pr merge 12`  → deny fetches=1 grant=true
+PASS  r4-5 grant `git push origin loop/x` vs `… --force`  → deny fetches=0 grant=true
+PASS  r4-5 grant `git push origin loop/x` vs `… -f`  → deny fetches=0 grant=true
+PASS  r4-5 grant `git push origin loop/x` vs `… --force-with-lease`  → deny fetches=0 grant=true
+PASS  r4-5 grant `git push origin loop/x` vs `… && git push --force origin master`  → deny fetches=0 grant=true
+PASS  r4-5 grant `gh pr merge 2 --squash` vs `  gh   pr merge 2\t--squash ` (exact, whitespace)  → allow fetches=2 grant=false
+PASS  r4-5 grant `git push --force origin loop/x` vs exact  → allow fetches=0 grant=false
+PASS  r4-6 `gh.exe pr merge 2` (code PR)  → deny fetches=2
+PASS  r4-6 `"gh" pr merge 2` (code PR)  → deny fetches=2
+PASS  r4-6 `'gh' pr merge 2` (code PR)  → deny fetches=2
+PASS  r4-6 `"gh.exe" pr merge 2` (code PR)  → deny fetches=2
+PASS  r4-6 `gh.exe pr merge 1` (docs PR, allow after reading)  → allow fetches=2
+PASS  r4-6 `"gh" pr merge 1` (docs PR, allow after reading)  → allow fetches=2
+PASS  r4-6 `"C:/Program Files/GitHub CLI/gh.exe" pr merge 2` (full path)  → deny fetches=2
+PASS  r4-6 EXTRA `GH pr merge 2` (upper case; Git Bash on NTFS runs it)  → deny fetches=2
+PASS  r4-6 EXTRA `gh.EXE pr merge 2`  → deny fetches=2
+PASS  r4-6 EXTRA `gh -R other/x pr merge 1`? (flag before subcommand)  → deny fetches=0
+PASS  REG r3-2 docs merge && force push  → deny fetches=0
+PASS  REG r3-4 `gh pr merge 1 --repo=other/x`  → deny fetches=0
+PASS  REG P7 force push alone  → deny fetches=0
+PASS  REG standing push loop/x  → allow fetches=0
+PASS  REG r3-1 Edit abs back src (cwd=root)  → deny
+PASS  REG r3-1 Bash redirect abs quoted back state.json (cwd=docs/loops)  → deny
+86/88 as expected

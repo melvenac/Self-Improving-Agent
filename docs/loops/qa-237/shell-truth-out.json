@@ -1,0 +1,240 @@
+{
+ "keyword then": {
+  "shell": "bash",
+  "command": "if true; then cp a.ts open-brain/src/x.ts; fi",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "keyword do": {
+  "shell": "bash",
+  "command": "for f in a; do cp a.ts open-brain/src/x.ts; done",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "keyword !": {
+  "shell": "bash",
+  "command": "! cp a.ts open-brain/src/x.ts",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 1
+ },
+ "timeout 5 cp": {
+  "shell": "bash",
+  "command": "timeout 5 cp a.ts open-brain/src/x.ts",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "find -exec cp": {
+  "shell": "bash",
+  "command": "find . -maxdepth 1 -name a.ts -exec cp {} open-brain/src/x.ts \\;",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "cp -tDIR": {
+  "shell": "bash",
+  "command": "cp -topen-brain/src a.ts",
+  "wroteUnderSrc": [
+   "a.ts"
+  ],
+  "exit": 0
+ },
+ "cp -vt DIR": {
+  "shell": "bash",
+  "command": "cp -vt open-brain/src a.ts",
+  "wroteUnderSrc": [
+   "a.ts"
+  ],
+  "exit": 0
+ },
+ "cp --target DIR": {
+  "shell": "bash",
+  "command": "cp --target open-brain/src a.ts",
+  "wroteUnderSrc": [
+   "a.ts"
+  ],
+  "exit": 0
+ },
+ "backslash-newline in target": {
+  "shell": "bash",
+  "command": "echo x > open-brain/sr\\\nc/x.ts",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "backslash-newline between words": {
+  "shell": "bash",
+  "command": "cp a.ts \\\nopen-brain/src/x.ts",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "comment fake heredoc": {
+  "shell": "bash",
+  "command": "echo hi # <<EOF\ncp a.ts open-brain/src/x.ts\nEOF",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 127
+ },
+ "heredoc to bash": {
+  "shell": "bash",
+  "command": "bash <<'EOF'\necho x > open-brain/src/x.ts\nEOF",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "pipe to sh": {
+  "shell": "bash",
+  "command": "echo 'echo x > open-brain/src/x.ts' | sh",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "sed w": {
+  "shell": "bash",
+  "command": "sed -n 'w open-brain/src/x.ts' a.txt",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "commented-out write (expect NO write)": {
+  "shell": "bash",
+  "command": "echo x # > open-brain/src/x.ts",
+  "wroteUnderSrc": [],
+  "exit": 0
+ },
+ "depth-5 bash -c": {
+  "shell": "bash",
+  "command": "bash -c \"bash -c 'bash -c \\\"bash -c \\\\\\\"bash -c \\\\\\\\\\\\\\\"echo x > open-brain/src/x.ts\\\\\\\\\\\\\\\"\\\\\\\"\\\"'\"",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "New-Item -Type File": {
+  "shell": "ps",
+  "command": "New-Item -Type File open-brain/src/x.ts | Out-Null",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "Set-Content -EA": {
+  "shell": "ps",
+  "command": "Set-Content -EA SilentlyContinue open-brain/src/x.ts x",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "Set-Content -OutVariable": {
+  "shell": "ps",
+  "command": "Set-Content -OutVariable o open-brain/src/x.ts x",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "Copy-Item -EA 0": {
+  "shell": "ps",
+  "command": "Copy-Item -EA 0 a.ts open-brain/src/x.ts",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "Set-Content x -LP": {
+  "shell": "ps",
+  "command": "Set-Content x -LP open-brain/src/x.ts",
+  "wroteUnderSrc": [],
+  "exit": 1
+ },
+ "Set-Content -Path (Join-Path)": {
+  "shell": "ps",
+  "command": "Set-Content -Path (Join-Path open-brain src/x.ts) -Value x",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "splat array": {
+  "shell": "ps",
+  "command": "$a = 'open-brain/src/x.ts','x'; Set-Content @a",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "splat hashtable New-Object": {
+  "shell": "ps",
+  "command": "$h = New-Object Hashtable; $h.Path = 'open-brain/src/x.ts'; $h.Value = 'x'; Set-Content @h",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "<##> block comment": {
+  "shell": "ps",
+  "command": "<##> Set-Content open-brain/src/x.ts x",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "[scriptblock]::Create": {
+  "shell": "ps",
+  "command": "[scriptblock]::Create('Set-Content open-brain/src/x.ts x').Invoke()",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "powershell positional": {
+  "shell": "ps",
+  "command": "powershell -NoProfile Set-Content open-brain/src/x.ts x",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "powershell -EncodedCommand": {
+  "shell": "ps",
+  "command": "powershell -NoProfile -EncodedCommand UwBlAHQALQBDAG8AbgB0AGUAbgB0ACAAbwBwAGUAbgAtAGIAcgBhAGkAbgAvAHMAcgBjAC8AeAAuAHQAcwAgAHgA",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "[IO.File]::WriteAllText": {
+  "shell": "ps",
+  "command": "[IO.File]::WriteAllText((Join-Path (Get-Location) 'open-brain/src/x.ts'), 'x')",
+  "wroteUnderSrc": [
+   "x.ts"
+  ],
+  "exit": 0
+ },
+ "gh pr merge #2 argv": {
+  "argvSeenByProgram": "[gh][pr][merge]"
+ },
+ "PS gh pr merge #2 argv": {
+  "argvSeenByProgram": "pr|merge"
+ },
+ "git -c alias.m=merge m feature": {
+  "exit": 0,
+  "masterTipAfter": "e02b289 on feature"
+ }
+}

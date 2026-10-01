@@ -1,0 +1,502 @@
+[
+ {
+  "name": "p1-brace-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 4,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p1-case-folded-off",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 6,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p1-cd-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 10,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 26
+ },
+ {
+  "name": "p1-cp-t-ignored",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 3,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 27
+ },
+ {
+  "name": "p1-cwd-ignored",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 31,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p1-dollar-backtick-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p1-filetool-literal-off",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 5,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 27
+ },
+ {
+  "name": "p1-glob-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 9,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p1-heredoc-body-parsed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 27
+ },
+ {
+  "name": "p1-longpath-off",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 24
+ },
+ {
+  "name": "p1-mv-source-ignored",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 26
+ },
+ {
+  "name": "p1-nested-not-parsed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 7,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 28
+ },
+ {
+  "name": "p1-ntfs-dots-off",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p1-paren-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 2,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p1-sed-e-files",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 5,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 27
+ },
+ {
+  "name": "p1-shortname-off",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p1-tee-first-only",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 3,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p1-tilde-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 7,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 27
+ },
+ {
+  "name": "p2-any-flag-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 6,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 24
+ },
+ {
+  "name": "p2-boundary-ignored",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 3,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p2-gh-case-sensitive",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 17,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 28
+ },
+ {
+  "name": "p2-gh-extension-kept",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 19,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 26
+ },
+ {
+  "name": "p2-nested-merge-not-seen",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 3,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 26
+ },
+ {
+  "name": "p2-redirect-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 2,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 28
+ },
+ {
+  "name": "p2-repo-flag-ignored",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p2-subshell-callop",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 5,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 26
+ },
+ {
+  "name": "p2-substituted-name-not-gh",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 3,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 28
+ },
+ {
+  "name": "p2b-bare-push-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 3,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 24
+ },
+ {
+  "name": "p2b-delete-refspec-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 3,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 26
+ },
+ {
+  "name": "p2b-expanded-git-word-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 27
+ },
+ {
+  "name": "p2b-expanded-push-arg-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 4,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p2b-expanded-subcommand-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p2b-force-long-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 16,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 29
+ },
+ {
+  "name": "p2b-force-short-cluster",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 3,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p2b-git-case-sensitive",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 8,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 28
+ },
+ {
+  "name": "p2b-global-option-values",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 12,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 41
+ },
+ {
+  "name": "p2b-leading-options-not-skipped",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 15,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p2b-merge-tag-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 13,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p2b-nested-git-not-seen",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 3,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 28
+ },
+ {
+  "name": "p2b-plus-refspec-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 4,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 27
+ },
+ {
+  "name": "p2b-remote-any",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 4,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 24
+ },
+ {
+  "name": "p2b-standing-prefix-off",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 26,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 26
+ },
+ {
+  "name": "p2b-tags-mirror-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 5,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 28
+ },
+ {
+  "name": "p3-dynamic-allowed",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 5,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 24
+ },
+ {
+  "name": "p3-matcher-without-powershell",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p3-move-source-ignored",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 28
+ },
+ {
+  "name": "p3-newitem-name-ignored",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 25
+ },
+ {
+  "name": "p3-param-prefix-off",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 5,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 26
+ },
+ {
+  "name": "p3-powershell-tool-ignored",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 58,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 27
+ },
+ {
+  "name": "p3-tool-name-case",
+  "source": "Forge",
+  "typecheckExit": 0,
+  "testExit": 1,
+  "failedTests": 1,
+  "totalTests": 431,
+  "killedByForgeTests": true,
+  "seconds": 24
+ }
+]

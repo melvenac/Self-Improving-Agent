@@ -1,0 +1,44 @@
+{
+ "`gh pr merge #2` (bash)": {
+  "decision": "allow",
+  "fetched": [
+   "melvenac/Self-Improving-Agent/pulls/2",
+   "melvenac/Self-Improving-Agent/pulls/2/files?per_page=100&page=1"
+  ],
+  "note": "bash drops `#2` as a comment: gh merges the CURRENT BRANCH's PR, not PR 2",
+  "reason": ""
+ },
+ "`gh pr merge #2` (PowerShell)": {
+  "decision": "allow",
+  "fetched": [
+   "melvenac/Self-Improving-Agent/pulls/2",
+   "melvenac/Self-Improving-Agent/pulls/2/files?per_page=100&page=1"
+  ],
+  "note": "PowerShell drops `#2` as a comment too",
+  "reason": ""
+ },
+ "`gh pr merge https://github.com/other/repo/pull/3`": {
+  "decision": "allow",
+  "fetched": [
+   "other/repo/pulls/3",
+   "other/repo/pulls/3/files?per_page=100&page=1"
+  ],
+  "note": "the grammar is <N | ORIGIN pull URL>; this merges another repository's PR",
+  "reason": ""
+ },
+ "control `gh pr merge 2`": {
+  "decision": "allow",
+  "fetched": [
+   "melvenac/Self-Improving-Agent/pulls/2",
+   "melvenac/Self-Improving-Agent/pulls/2/files?per_page=100&page=1"
+  ],
+  "note": "exact grammar, docs-only: allow after reading",
+  "reason": ""
+ },
+ "control `gh pr merge --repo other/repo 3`": {
+  "decision": "deny",
+  "fetched": [],
+  "note": "the same other-repo merge spelled with --repo: refused",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge --repo other/repo 3 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: --repo/-R names another repository, and the docs-only check reads orig"
+ }
+}

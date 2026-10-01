@@ -1,0 +1,386 @@
+{
+ "P1 keyword `then`": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 keyword `do`": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 keyword `!`": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 brace group `{ tee ...; }`": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src/x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target that is not a literal path is refused, and so is cd plus "
+ },
+ "P1 runner `timeout 5 cp`": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 runner `find -exec cp`": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 control `cp` plain": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src/x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target that is not a literal path is refused, and so is cd plus "
+ },
+ "P1 cp attached -tDIR": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 cp cluster -vt DIR": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 cp long-option prefix --target DIR": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 tee long --append": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src/x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target that is not a literal path is refused, and so is cd plus "
+ },
+ "P1 backslash-newline inside target": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 backslash-newline between words": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 comment opens a fake heredoc": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 heredoc fed to bash": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 code piped to sh": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1 `bash -c` control": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src/x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target that is not a literal path is refused, and so is cd plus "
+ },
+ "P1 sed w command (no -i)": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P1-only-if outside quoted space": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P1-only-if outside UNC": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P1-only-if comment after write outside": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P1-only-if commented-out write": {
+  "expect": "allow",
+  "got": "deny",
+  "pass": false,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src/x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target that is not a literal path is refused, and so is cd plus "
+ },
+ "P1-only-if fd dup 2>&1 outside": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2 comment eats the PR number `gh pr merge #2`": {
+  "expect": "deny-grammar",
+  "got": "deny-token",
+  "pass": false,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge #2 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has no oauth_token — a keyring-stored gh token cannot be read here)."
+ },
+ "P2 other-repo pull URL": {
+  "expect": "deny-grammar",
+  "got": "deny-token",
+  "pass": false,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/evil/x/pull/1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has no oauth_token — a keyring-stored gh token cannot be read here)."
+ },
+ "P2 exact control `gh pr merge 1 --squash`": {
+  "expect": "deny-token",
+  "got": "deny-token",
+  "pass": true,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 1 --squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has no oauth_token — a keyring-stored gh token cannot be read here)."
+ },
+ "P2 origin URL control": {
+  "expect": "deny-token",
+  "got": "deny-token",
+  "pass": true,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has no oauth_token — a keyring-stored gh token can"
+ },
+ "P2 non-merge `gh pr comment 5 --body merge`": {
+  "expect": "allow",
+  "got": "deny-grammar",
+  "pass": false,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origin pull URL>, optionally followed only by --squash, --merge, --rebase, --delete-branch, -s, -m, -"
+ },
+ "P2 non-merge `gh pr list --label merge`": {
+  "expect": "allow",
+  "got": "deny-grammar",
+  "pass": false,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origin pull URL>, optionally followed only by --squash, --merge, --rebase, --delete-branch, -s, -m, -r, -"
+ },
+ "P2 non-merge `gh pr create --title merge`": {
+  "expect": "allow",
+  "got": "deny-grammar",
+  "pass": false,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr create --title merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origin pull URL>, optionally followed only by --squash, --merge, --rebase, --delete-branch, -s, -m, -r,"
+ },
+ "P2 non-merge `gh pr view 5`": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2 gh alias defined inline then used": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P2 PS `& gh pr merge 1`": {
+  "expect": "deny",
+  "got": "deny-token",
+  "pass": true,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: & gh pr merge 1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has no oauth_token — a keyring-stored gh token cannot be read here)."
+ },
+ "P2 PS `.\\gh.exe pr merge 1`": {
+  "expect": "deny",
+  "got": "deny-token",
+  "pass": true,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: .\\gh.exe pr merge 1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has no oauth_token — a keyring-stored gh token cannot be read here)."
+ },
+ "P2b inline alias force push": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P2b inline alias merge": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P2b standing control": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2b git merge-base not merge": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2b push with --no-verify standing": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2b push -u standing": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2b push --force-if-includes": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git push --force-if-includes origin loop/x"
+ },
+ "P2b push in for loop": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: for b in x; do git push --force origin master; done"
+ },
+ "P3 New-Item -Type File (alias)": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 New-Item -ItemType File control": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (open-brain/src/x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target that is not a literal path is refused, and so is cd"
+ },
+ "P3 Set-Content -EA (common-param alias)": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 Set-Content -OutVariable": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 Copy-Item -EA 0": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 Set-Content -LP after a positional": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P3 Set-Content -Path (Join-Path ...)": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 splat array": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 splat hashtable via New-Object": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 block comment hides cmdlet `<##>`": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 [scriptblock]::Create": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 powershell positional command": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 powershell -EncodedCommand": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 [IO.File]::WriteAllText": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "P3 Out-File control": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (open-brain/src/x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target that is not a literal path is refused, and so is cd"
+ },
+ "P3 Set-Content -Path: control": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (open-brain/src/x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target that is not a literal path is refused, and so is cd"
+ },
+ "P3 PS `rm` alias (limit text calls rm out of reach)": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (open-brain/src/x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target that is not a literal path is refused, and so is cd"
+ },
+ "P3 only-if: Set-Content outside": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P3 only-if: New-Item -Type File outside": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P3 cwd=open-brain Set-Content src/x.ts": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (src/x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, Copy-Item, Move-Item, Remove-Item. A target that is not a literal path is refused, and so is cd plus a wri"
+ },
+ "LIMIT nesting depth 5 bash -c": {
+  "expect": "deny",
+  "got": "allow",
+  "pass": false,
+  "reason": ""
+ },
+ "LIMIT Rename-Item second argument": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ }
+}

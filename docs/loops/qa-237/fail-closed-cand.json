@@ -1,0 +1,134 @@
+[
+ {
+  "id": "cd then redirect outside",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/out.txt (the command line changes directory with cd, pushd or Set-Location and also writes, so where the write lands cannot be determined; split them into two commands))."
+ },
+ {
+  "id": "cd then tee outside",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/vt.log (the command line changes directory with cd, pushd or Set-Location and also writes, so where the write lands cannot be determined; split them into two commands))."
+ },
+ {
+  "id": "redirect to $TMPDIR",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write ($TMPDIR/x (contains a shell expansion, so its location cannot be determined))."
+ },
+ {
+  "id": "redirect to ~/notes",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (~/notes.txt (starts with ~, which a shell expands to a home directory, so its location cannot be determined))."
+ },
+ {
+  "id": "redirect, target with ( )",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/a (1).txt (contains a parenthesis (process substitution or subshell), so its location cannot be determined))."
+ },
+ {
+  "id": "redirect, target with { }",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/{a}.txt (contains a brace expansion, so its location cannot be determined))."
+ },
+ {
+  "id": "redirect, target with [ ]",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/a[1].txt (contains a glob pattern, so its location cannot be determined))."
+ },
+ {
+  "id": "Program Files (x86) target",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/Program Files (x86)/x/a.txt (contains a parenthesis (process substitution or subshell), so its location cannot be determined))."
+ },
+ {
+  "id": "8.3 short-name outside",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/PROGRA~1/x.txt contains an 8.3 short name, so its location cannot be determined)."
+ },
+ {
+  "id": "trailing comment after an outside write",
+  "decision": "allow",
+  "namedCause": null,
+  "reason": ""
+ },
+ {
+  "id": "commented-out write (writes nothing)",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src/x.ts)."
+ },
+ {
+  "id": "unquoted backslashes (bash writes open-brainsrcx.ts in the root)",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain\\src\\x.ts)."
+ },
+ {
+  "id": "gh comment whose body is the word merge",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origin pull URL>, optionally followed only by --squash, --merge, --rebase, --delete-branch, -s, -m, -"
+ },
+ {
+  "id": "gh pr list --label merge",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origin pull URL>, optionally followed only by --squash, --merge, --rebase, --delete-branch, -s, -m, -r, -"
+ },
+ {
+  "id": "standing push with a trailing comment",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git push origin loop/x # push the slice"
+ },
+ {
+  "id": "PS -LiteralPath with [ ]",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (C:/qa-tmp/a[1].txt (contains a glob pattern, so its location cannot be determined))."
+ },
+ {
+  "id": "PS ForEach-Object script block writing outside",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (a script block that writes, whose target the hook cannot read statically (so its write location cannot be determined), C:/qa-tmp/o$_.txt (contains a shell expansion, so its location cannot be determined))."
+ },
+ {
+  "id": "PS Set-Location then redirect outside",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (C:/qa-tmp/ls.txt (the command line changes directory with cd, pushd or Set-Location and also writes, so where the write lands cannot be determined; split them into two commands))."
+ },
+ {
+  "id": "PS $env:TEMP target",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write ($env:TEMP/x.txt (contains a shell expansion, so its location cannot be determined))."
+ },
+ {
+  "id": "Write tool, path with [ ]",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — C:/qa-tmp/a[1].md (contains a glob pattern, so its location cannot be determined) (fail closed)."
+ },
+ {
+  "id": "control: cd with no write",
+  "decision": "allow",
+  "namedCause": null,
+  "reason": ""
+ },
+ {
+  "id": "control: cd with output to /dev/null",
+  "decision": "allow",
+  "namedCause": null,
+  "reason": ""
+ }
+]

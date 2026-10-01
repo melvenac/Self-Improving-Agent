@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index 8c23b6f6..71ce5df7 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -169,7 +169,7 @@ export function classifyTarget(
+   if (nl) return { kind: "refused", cause: `${text} (${nl}, so its location cannot be determined)` };
+   const rel = toRepoRelative(text, repoRoot, cwd);
+   if (!rel.ok) return { kind: "refused", cause: rel.cause };
+-  if (rel.outside) return { kind: "ok" };
++  if (rel.outside) return { kind: "refused", cause: `${text} (outside)` };
+   return isProtectedArtifactPath(rel.rel, rel.ci) || isRenderedViewPath(rel.rel, rel.ci)
+     ? { kind: "protected", rel: rel.rel }
+     : { kind: "ok" };

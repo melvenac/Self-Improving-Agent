@@ -1,0 +1,4630 @@
+{
+ "summary": {
+  "cases": 380,
+  "merges": 260,
+  "nonMerges": 120,
+  "agree": 326,
+  "disagree": 54,
+  "failOpen": 9,
+  "failClosed": 45,
+  "failuresByTag": {
+   "ref:other-url": 5,
+   "ctx:plain": 7,
+   "ref:comment": 4,
+   "ref:42": 2,
+   "ctx:comment": 7,
+   "ctx:ps": 2,
+   "ref:1": 2,
+   "ref:#7": 2,
+   "ref:origin-url": 1,
+   "non-merge": 38,
+   "word:merge": 38
+  }
+ },
+ "disagreements": [
+  {
+   "id": "bash 'gh' 'pr' merge https://github.com/other/repo/pull/3 --merge -d",
+   "how": [
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' 'pr' merge https://github.com/other/repo/pull/3 --merge -d gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spa"
+  },
+  {
+   "id": "bash 'gh' pr merge #5 --merge",
+   "how": [
+    "ref:comment",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr merge #5 --merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hos"
+  },
+  {
+   "id": "bash \"gh\" pr merge 42 # merge it",
+   "how": [
+    "ref:42",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"gh\" pr merge 42 # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or or"
+  },
+  {
+   "id": "bash g'h' pr merge https://github.com/other/repo/pull/3",
+   "how": [
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr merge https://github.com/other/repo/pull/3 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/"
+  },
+  {
+   "id": "ps \\gh pr merge https://github.com/other/repo/pull/3 -m",
+   "how": [
+    "ref:other-url",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/other/repo/pull/3 -m gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN"
+  },
+  {
+   "id": "ps gh pr merge #5",
+   "how": [
+    "ref:comment",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge #5 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has"
+  },
+  {
+   "id": "bash \"gh\" pr merge #5",
+   "how": [
+    "ref:comment",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"gh\" pr merge #5 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml h"
+  },
+  {
+   "id": "bash Gh.Exe pr merge 42 # merge it",
+   "how": [
+    "ref:42",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: Gh.Exe pr merge 42 # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or "
+  },
+  {
+   "id": "bash 'gh' pr merge 1 # merge it",
+   "how": [
+    "ref:1",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr merge 1 # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash gh pr merge \"#7\" --delete-branch # merge it",
+   "how": [
+    "ref:#7",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge \"#7\" --delete-branch # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr mer"
+  },
+  {
+   "id": "bash \"gh\" 'pr' merge #5",
+   "how": [
+    "ref:comment",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"gh\" 'pr' merge #5 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml"
+  },
+  {
+   "id": "bash GH pr merge https://github.com/other/repo/pull/3 --delete-branch",
+   "how": [
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr merge https://github.com/other/repo/pull/3 --delete-branch gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a sp"
+  },
+  {
+   "id": "bash \\gh pr merge \"#7\" -s -s # merge it",
+   "how": [
+    "ref:#7",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr merge \"#7\" -s -s # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <numbe"
+  },
+  {
+   "id": "bash g'h' pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --squash -r # merge it",
+   "how": [
+    "ref:origin-url",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --squash -r # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the comma"
+  },
+  {
+   "id": "bash GH pr merge 1 # merge it",
+   "how": [
+    "ref:1",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr merge 1 # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origi"
+  },
+  {
+   "id": "bash GH pr merge https://github.com/other/repo/pull/3",
+   "how": [
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr merge https://github.com/other/repo/pull/3 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GI"
+  },
+  {
+   "id": "bash gh.exe pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh.exe pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <nu"
+  },
+  {
+   "id": "bash GH pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origi"
+  },
+  {
+   "id": "bash Gh.Exe pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: Gh.Exe pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number "
+  },
+  {
+   "id": "bash \"gh\" pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"gh\" pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or"
+  },
+  {
+   "id": "bash g'h' pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash gh pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or o"
+  },
+  {
+   "id": "ps \\gh pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origi"
+  },
+  {
+   "id": "bash gh pr edit 5 --title merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr edit 5 --title merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash \\gh pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or "
+  },
+  {
+   "id": "bash gh.exe pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh.exe pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number "
+  },
+  {
+   "id": "bash GH pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or o"
+  },
+  {
+   "id": "bash gh pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origi"
+  },
+  {
+   "id": "bash gh.exe pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh.exe pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <nu"
+  },
+  {
+   "id": "bash 'gh' pr edit 5 --title merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr edit 5 --title merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or o"
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"C:/Program Files/GitHub CLI/gh.exe\" pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant gra"
+  },
+  {
+   "id": "ps 'gh' pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash gh.exe pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh.exe pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <nu"
+  },
+  {
+   "id": "bash g'h' pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <numb"
+  },
+  {
+   "id": "bash \\gh pr create --title merge --body x",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr create --title merge --body x gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <num"
+  },
+  {
+   "id": "bash 'gh' pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or"
+  },
+  {
+   "id": "bash g'h' pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "ps Gh.Exe pr create --title merge --body x",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: Gh.Exe pr create --title merge --body x gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <"
+  },
+  {
+   "id": "ps GH pr edit 5 --title merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr edit 5 --title merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash Gh.Exe pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: Gh.Exe pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <nu"
+  },
+  {
+   "id": "bash \\gh pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <numbe"
+  },
+  {
+   "id": "bash \\gh pr create --title merge --body x",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr create --title merge --body x gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <num"
+  },
+  {
+   "id": "bash GH pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or o"
+  },
+  {
+   "id": "bash 'gh' pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or"
+  },
+  {
+   "id": "bash GH pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number"
+  },
+  {
+   "id": "bash gh pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origi"
+  },
+  {
+   "id": "bash g'h' pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or"
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant"
+  },
+  {
+   "id": "ps \"C:/Program Files/GitHub CLI/gh.exe\" pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"C:/Program Files/GitHub CLI/gh.exe\" pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant gra"
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant"
+  },
+  {
+   "id": "bash \\gh pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or orig"
+  },
+  {
+   "id": "ps \"gh\" pr edit 5 --title merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"gh\" pr edit 5 --title merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or o"
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant"
+  },
+  {
+   "id": "bash g'h' pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  }
+ ],
+ "all": [
+  {
+   "id": "ps gh.exe pr merge '#7'",
+   "how": [
+    "ref:#7",
+    "ctx:ps"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" 'pr' --repo o/x merge '#7' --rebase --rebase # merge it",
+   "how": [
+    "mid-flag",
+    "ref:#7",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe 'pr' merge #5 # merge it",
+   "how": [
+    "ref:comment",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps g'h' 'pr' -R o/x merge 1 --merge --auto",
+   "how": [
+    "mid-flag",
+    "ref:1",
+    "other-flag",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x 'gh' pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3",
+   "how": [
+    "ref:origin-url",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x gh pr merge \"#7\" -s",
+   "how": [
+    "ref:#7",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x 'gh' pr -R o/x merge https://github.com/melvenac/Self-Improving-Agent/pull/3 -b x",
+   "how": [
+    "mid-flag",
+    "ref:origin-url",
+    "other-flag",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh --repo o/x pr merge https://github.com/other/repo/pull/3 -m && echo ok",
+   "how": [
+    "pre-flag",
+    "ref:other-url",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then \\gh pr merge 1; fi",
+   "how": [
+    "ref:1",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps \\gh pr --repo o/x merge --auto -d",
+   "how": [
+    "mid-flag",
+    "ref:none",
+    "other-flag",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh --repo=o/x pr merge feature-branch -s -d",
+   "how": [
+    "pre-flag",
+    "ref:branch",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps Gh.Exe pr merge \"#7\"",
+   "how": [
+    "ref:#7",
+    "ctx:ps"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr merge feature-branch # merge it",
+   "how": [
+    "ref:branch",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" --repo o/x pr merge \"#7\"",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe --repo o/x pr merge 1 --squash --merge",
+   "how": [
+    "pre-flag",
+    "ref:1",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' -R o/x pr --repo o/x merge 42 -b x --squash | cat",
+   "how": [
+    "pre-flag",
+    "mid-flag",
+    "ref:42",
+    "other-flag",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr merge '#7' -m -b x > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:#7",
+    "other-flag",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh -R o/x pr merge https://github.com/other/repo/pull/3 --delete-branch -s > C:/qa-tmp/o.txt",
+   "how": [
+    "pre-flag",
+    "ref:other-url",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then gh.exe --repo=o/x pr merge feature-branch --squash; fi",
+   "how": [
+    "pre-flag",
+    "ref:branch",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr merge \"#7\"",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr merge -r",
+   "how": [
+    "ref:none",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" --repo=o/x pr merge https://github.com/other/repo/pull/3 | cat",
+   "how": [
+    "pre-flag",
+    "ref:other-url",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" pr merge \"#7\"",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr merge 1 --rebase",
+   "how": [
+    "ref:1",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "ps g'h' pr merge \"#7\"",
+   "how": [
+    "ref:#7",
+    "ctx:ps"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe 'pr' merge \"#7\"",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "ps GH pr merge",
+   "how": [
+    "ref:none",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr \"merge\" #5 && echo ok",
+   "how": [
+    "ref:comment",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' 'pr' merge https://github.com/other/repo/pull/3 --merge -d",
+   "how": [
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' 'pr' merge https://github.com/other/repo/pull/3 --merge -d gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spa"
+  },
+  {
+   "id": "bash GH_REPO=o/x \\gh --repo o/x pr -R o/x merge #5",
+   "how": [
+    "pre-flag",
+    "mid-flag",
+    "ref:comment",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x gh pr merge https://github.com/other/repo/pull/3",
+   "how": [
+    "ref:other-url",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" -R o/x pr merge \"#7\" > C:/qa-tmp/o.txt",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 -sd && echo ok",
+   "how": [
+    "ref:origin-url",
+    "other-flag",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge #5 --merge",
+   "how": [
+    "ref:comment",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr merge #5 --merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hos"
+  },
+  {
+   "id": "bash \\gh pr merge",
+   "how": [
+    "ref:none",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" pr merge 42 # merge it",
+   "how": [
+    "ref:42",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"gh\" pr merge 42 # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or or"
+  },
+  {
+   "id": "bash g'h' pr merge https://github.com/other/repo/pull/3",
+   "how": [
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr merge https://github.com/other/repo/pull/3 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/"
+  },
+  {
+   "id": "bash \\gh 'pr' merge 1 --admin --merge && echo ok",
+   "how": [
+    "ref:1",
+    "other-flag",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh 'pr' --repo o/x merge #5 # merge it",
+   "how": [
+    "mid-flag",
+    "ref:comment",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' 'pr' merge 42 --auto # merge it",
+   "how": [
+    "ref:42",
+    "other-flag",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' -R o/x 'pr' merge \"#7\" && echo ok",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH --repo o/x pr merge -d > C:/qa-tmp/o.txt",
+   "how": [
+    "pre-flag",
+    "ref:none",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr --repo o/x merge https://github.com/other/repo/pull/3 -s -m && echo ok",
+   "how": [
+    "mid-flag",
+    "ref:other-url",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr merge 42 --merge -d && echo ok",
+   "how": [
+    "ref:42",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh 'pr' merge 42 -r",
+   "how": [
+    "ref:42",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "ps GH -R o/x pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --delete-branch",
+   "how": [
+    "pre-flag",
+    "ref:origin-url",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr merge 42 -s > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:42",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then Gh.Exe --repo=o/x pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 -r -sd; fi",
+   "how": [
+    "pre-flag",
+    "ref:origin-url",
+    "other-flag",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" -Ro/x 'pr' merge \"#7\" -m # merge it",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr -R o/x merge #5 --body=x && echo ok",
+   "how": [
+    "mid-flag",
+    "ref:comment",
+    "other-flag",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH --repo o/x pr merge https://github.com/other/repo/pull/3 --delete-branch # merge it",
+   "how": [
+    "pre-flag",
+    "ref:other-url",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe -Ro/x pr merge https://github.com/other/repo/pull/3 -sd | cat",
+   "how": [
+    "pre-flag",
+    "ref:other-url",
+    "other-flag",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then Gh.Exe pr merge #5; fi",
+   "how": [
+    "ref:comment",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then \\gh pr -R o/x merge #5; fi",
+   "how": [
+    "mid-flag",
+    "ref:comment",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr \"merge\" 42 --match-head-commit abc --admin # merge it",
+   "how": [
+    "ref:42",
+    "other-flag",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x \"C:/Program Files/GitHub CLI/gh.exe\" pr merge \"#7\"",
+   "how": [
+    "ref:#7",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe --repo o/x pr merge feature-branch --merge --squash # merge it",
+   "how": [
+    "pre-flag",
+    "ref:branch",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh -Ro/x pr merge https://github.com/other/repo/pull/3 --squash -r && echo ok",
+   "how": [
+    "pre-flag",
+    "ref:other-url",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps \\gh pr merge https://github.com/other/repo/pull/3 -m",
+   "how": [
+    "ref:other-url",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/other/repo/pull/3 -m gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN"
+  },
+  {
+   "id": "bash GH --repo=o/x pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 > C:/qa-tmp/o.txt",
+   "how": [
+    "pre-flag",
+    "ref:origin-url",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe --repo o/x pr merge feature-branch --squash > C:/qa-tmp/o.txt",
+   "how": [
+    "pre-flag",
+    "ref:branch",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then \\gh pr merge 1 --merge; fi",
+   "how": [
+    "ref:1",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps gh pr merge #5",
+   "how": [
+    "ref:comment",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge #5 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has"
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" -R o/x pr merge '#7' -r -s > C:/qa-tmp/o.txt",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge feature-branch -d # merge it",
+   "how": [
+    "ref:branch",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge '#7' -s | cat",
+   "how": [
+    "ref:#7",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge #5 > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:comment",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps \"gh\" pr merge feature-branch -s --subject s",
+   "how": [
+    "ref:branch",
+    "other-flag",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then \"C:/Program Files/GitHub CLI/gh.exe\" pr merge #5 --delete-branch -r; fi",
+   "how": [
+    "ref:comment",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x gh pr merge 1 --squash",
+   "how": [
+    "ref:1",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps 'gh' --repo o/x 'pr' merge feature-branch -b x -m",
+   "how": [
+    "pre-flag",
+    "ref:branch",
+    "other-flag",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe -Ro/x pr merge 42 --admin --rebase",
+   "how": [
+    "pre-flag",
+    "ref:42",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 && echo ok",
+   "how": [
+    "ref:origin-url",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then \\gh pr merge \"#7\" -s; fi",
+   "how": [
+    "ref:#7",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" -Ro/x pr merge 42 --merge | cat",
+   "how": [
+    "pre-flag",
+    "ref:42",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe --repo o/x pr merge feature-branch --body=x -b x > C:/qa-tmp/o.txt",
+   "how": [
+    "pre-flag",
+    "ref:branch",
+    "other-flag",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe --repo o/x pr merge \"#7\" --rebase -sd # merge it",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "other-flag",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh 'pr' merge https://github.com/melvenac/Self-Improving-Agent/pull/3 | cat",
+   "how": [
+    "ref:origin-url",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr \"merge\" \"#7\" --merge --auto > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:#7",
+    "other-flag",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x \\gh --repo=o/x pr merge feature-branch --rebase -d",
+   "how": [
+    "pre-flag",
+    "ref:branch",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps GH 'pr' --repo o/x merge https://github.com/other/repo/pull/3 --merge",
+   "how": [
+    "mid-flag",
+    "ref:other-url",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge #5 --body=x -s && echo ok",
+   "how": [
+    "ref:comment",
+    "other-flag",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" pr merge '#7' -b x > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:#7",
+    "other-flag",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" --repo=o/x pr merge && echo ok",
+   "how": [
+    "pre-flag",
+    "ref:none",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" pr merge #5",
+   "how": [
+    "ref:comment",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"gh\" pr merge #5 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml h"
+  },
+  {
+   "id": "bash if true; then \\gh pr merge -d -r; fi",
+   "how": [
+    "ref:none",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr \"merge\" 42",
+   "how": [
+    "ref:42",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then \"C:/Program Files/GitHub CLI/gh.exe\" -R o/x 'pr' merge '#7'; fi",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then \\gh pr merge 42 --rebase; fi",
+   "how": [
+    "ref:42",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x \"gh\" pr \"merge\" --disable-auto --match-head-commit abc",
+   "how": [
+    "ref:none",
+    "other-flag",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr merge \"#7\"",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" pr merge #5 -b x --merge # merge it",
+   "how": [
+    "ref:comment",
+    "other-flag",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' -R o/x pr merge https://github.com/other/repo/pull/3",
+   "how": [
+    "pre-flag",
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps \\gh pr merge '#7'",
+   "how": [
+    "ref:#7",
+    "ctx:ps"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge 42 --merge --squash",
+   "how": [
+    "ref:42",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr \"merge\" #5 --merge --subject s && echo ok",
+   "how": [
+    "ref:comment",
+    "other-flag",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then gh pr merge --squash; fi",
+   "how": [
+    "ref:none",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge \"#7\" --delete-branch --delete-branch",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "ps gh pr merge --match-head-commit abc",
+   "how": [
+    "ref:none",
+    "other-flag",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then \"gh\" pr merge \"#7\" -d; fi",
+   "how": [
+    "ref:#7",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr -R o/x merge --rebase -r",
+   "how": [
+    "mid-flag",
+    "ref:none",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge --admin && echo ok",
+   "how": [
+    "ref:none",
+    "other-flag",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x g'h' --repo o/x pr merge 42 --delete-branch --squash",
+   "how": [
+    "pre-flag",
+    "ref:42",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" --repo=o/x pr merge #5 -s --merge && echo ok",
+   "how": [
+    "pre-flag",
+    "ref:comment",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then \"gh\" pr merge feature-branch --match-head-commit abc; fi",
+   "how": [
+    "ref:branch",
+    "other-flag",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x gh pr merge '#7' -d -r",
+   "how": [
+    "ref:#7",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge feature-branch --delete-branch | cat",
+   "how": [
+    "ref:branch",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then gh pr merge '#7'; fi",
+   "how": [
+    "ref:#7",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr merge https://github.com/other/repo/pull/3 -sd",
+   "how": [
+    "ref:other-url",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr merge '#7' && echo ok",
+   "how": [
+    "ref:#7",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr merge 1 -m -r > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:1",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh -Ro/x pr merge 1 -sd",
+   "how": [
+    "pre-flag",
+    "ref:1",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" pr merge https://github.com/other/repo/pull/3 | cat",
+   "how": [
+    "ref:other-url",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps \"gh\" pr merge '#7' --auto",
+   "how": [
+    "ref:#7",
+    "other-flag",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x \\gh 'pr' merge '#7'",
+   "how": [
+    "ref:#7",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps GH pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --rebase --auto",
+   "how": [
+    "ref:origin-url",
+    "other-flag",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh -R o/x pr merge https://github.com/other/repo/pull/3",
+   "how": [
+    "pre-flag",
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" 'pr' merge -r -d > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:none",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr merge https://github.com/other/repo/pull/3 | cat",
+   "how": [
+    "ref:other-url",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe 'pr' merge https://github.com/melvenac/Self-Improving-Agent/pull/3",
+   "how": [
+    "ref:origin-url",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr merge #5 --subject s -r",
+   "how": [
+    "ref:comment",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --delete-branch",
+   "how": [
+    "ref:origin-url",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge 42 # merge it",
+   "how": [
+    "ref:42",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: Gh.Exe pr merge 42 # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or "
+  },
+  {
+   "id": "bash GH_REPO=o/x Gh.Exe pr --repo o/x merge #5 --merge",
+   "how": [
+    "mid-flag",
+    "ref:comment",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --auto --rebase && echo ok",
+   "how": [
+    "ref:origin-url",
+    "other-flag",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x Gh.Exe pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3",
+   "how": [
+    "ref:origin-url",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr merge -r # merge it",
+   "how": [
+    "ref:none",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps GH pr merge",
+   "how": [
+    "ref:none",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" -Ro/x 'pr' merge \"#7\" -r && echo ok",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps gh.exe pr --repo o/x merge #5 --merge --squash",
+   "how": [
+    "mid-flag",
+    "ref:comment",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr merge \"#7\"",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh --repo o/x pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 -r # merge it",
+   "how": [
+    "pre-flag",
+    "ref:origin-url",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr merge 1 | cat",
+   "how": [
+    "ref:1",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x \\gh --repo=o/x pr merge #5 --merge --auto",
+   "how": [
+    "pre-flag",
+    "ref:comment",
+    "other-flag",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh -R o/x pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3",
+   "how": [
+    "pre-flag",
+    "ref:origin-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' 'pr' merge 1",
+   "how": [
+    "ref:1",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr --repo o/x merge https://github.com/other/repo/pull/3 --squash -r",
+   "how": [
+    "mid-flag",
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge '#7' --subject s -sd # merge it",
+   "how": [
+    "ref:#7",
+    "other-flag",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --admin -b x > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:origin-url",
+    "other-flag",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then gh pr --repo o/x merge '#7' --merge --auto; fi",
+   "how": [
+    "mid-flag",
+    "ref:#7",
+    "other-flag",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr -R o/x \"merge\" 42",
+   "how": [
+    "mid-flag",
+    "ref:42",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge '#7' --subject s --squash",
+   "how": [
+    "ref:#7",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge \"#7\" -s --disable-auto > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:#7",
+    "other-flag",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge '#7' --merge | cat",
+   "how": [
+    "ref:#7",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge 1 # merge it",
+   "how": [
+    "ref:1",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr merge 1 # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash gh pr merge \"#7\" -m --rebase",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" --repo=o/x pr merge #5 --rebase | cat",
+   "how": [
+    "pre-flag",
+    "ref:comment",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr merge 42",
+   "how": [
+    "ref:42",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "ps GH pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --squash -s",
+   "how": [
+    "ref:origin-url",
+    "ctx:ps"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe 'pr' merge https://github.com/other/repo/pull/3 --squash -b x > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:other-url",
+    "other-flag",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr \"merge\" https://github.com/other/repo/pull/3 -s --delete-branch && echo ok",
+   "how": [
+    "ref:other-url",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH -Ro/x pr merge -s -b x",
+   "how": [
+    "pre-flag",
+    "ref:none",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then 'gh' pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 -r; fi",
+   "how": [
+    "ref:origin-url",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x \"gh\" -Ro/x pr merge https://github.com/other/repo/pull/3",
+   "how": [
+    "pre-flag",
+    "ref:other-url",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge \"#7\" | cat",
+   "how": [
+    "ref:#7",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x gh.exe pr merge 1",
+   "how": [
+    "ref:1",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge -m > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:none",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr merge \"#7\" --delete-branch # merge it",
+   "how": [
+    "ref:#7",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge \"#7\" --delete-branch # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr mer"
+  },
+  {
+   "id": "bash GH pr merge https://github.com/other/repo/pull/3 --delete-branch # merge it",
+   "how": [
+    "ref:other-url",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' --repo=o/x pr \"merge\" \"#7\" | cat",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" 'pr' merge #5",
+   "how": [
+    "ref:comment",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"gh\" 'pr' merge #5 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml"
+  },
+  {
+   "id": "bash g'h' pr merge -s > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:none",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps g'h' --repo=o/x pr merge 1 -s",
+   "how": [
+    "pre-flag",
+    "ref:1",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps 'gh' pr merge \"#7\"",
+   "how": [
+    "ref:#7",
+    "ctx:ps"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "ps \"C:/Program Files/GitHub CLI/gh.exe\" pr \"merge\" -r --rebase",
+   "how": [
+    "ref:none",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge 42 --rebase",
+   "how": [
+    "ref:42",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge '#7' --merge",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr \"merge\" https://github.com/melvenac/Self-Improving-Agent/pull/3 -s --merge | cat",
+   "how": [
+    "ref:origin-url",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge '#7' -m && echo ok",
+   "how": [
+    "ref:#7",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh --repo=o/x pr merge '#7' -r -d > C:/qa-tmp/o.txt",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x \"gh\" 'pr' merge https://github.com/other/repo/pull/3",
+   "how": [
+    "ref:other-url",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr \"merge\" 42 && echo ok",
+   "how": [
+    "ref:42",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge \"#7\" --rebase",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x Gh.Exe pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 -m",
+   "how": [
+    "ref:origin-url",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps gh pr -R o/x merge #5",
+   "how": [
+    "mid-flag",
+    "ref:comment",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr merge '#7'",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3",
+   "how": [
+    "ref:origin-url",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "ps gh pr merge -sd --body=x",
+   "how": [
+    "ref:none",
+    "other-flag",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge \"#7\"",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr merge 42 -d",
+   "how": [
+    "ref:42",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x gh.exe pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3",
+   "how": [
+    "ref:origin-url",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" pr merge 42",
+   "how": [
+    "ref:42",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr merge '#7' -d",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x \"gh\" pr \"merge\" 42 -b x --merge",
+   "how": [
+    "ref:42",
+    "other-flag",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr merge 1 -d -m",
+   "how": [
+    "ref:1",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr \"merge\" 1 --admin --delete-branch | cat",
+   "how": [
+    "ref:1",
+    "other-flag",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" --repo o/x pr \"merge\" https://github.com/other/repo/pull/3 # merge it",
+   "how": [
+    "pre-flag",
+    "ref:other-url",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then \"C:/Program Files/GitHub CLI/gh.exe\" --repo=o/x 'pr' --repo o/x merge 42 --body=x --subject s; fi",
+   "how": [
+    "pre-flag",
+    "mid-flag",
+    "ref:42",
+    "other-flag",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then GH pr merge feature-branch --body=x; fi",
+   "how": [
+    "ref:branch",
+    "other-flag",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe --repo=o/x pr merge '#7' --auto",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge \"#7\" -d --auto && echo ok",
+   "how": [
+    "ref:#7",
+    "other-flag",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" --repo o/x pr merge feature-branch -d",
+   "how": [
+    "pre-flag",
+    "ref:branch",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr merge \"#7\"",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then 'gh' pr merge https://github.com/other/repo/pull/3 -d; fi",
+   "how": [
+    "ref:other-url",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr --repo o/x merge \"#7\" --auto -d # merge it",
+   "how": [
+    "mid-flag",
+    "ref:#7",
+    "other-flag",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 -r -d",
+   "how": [
+    "ref:origin-url",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge",
+   "how": [
+    "ref:none",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr merge 42 > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:42",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH -Ro/x pr merge feature-branch",
+   "how": [
+    "pre-flag",
+    "ref:branch",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr merge https://github.com/other/repo/pull/3 --delete-branch",
+   "how": [
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr merge https://github.com/other/repo/pull/3 --delete-branch gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a sp"
+  },
+  {
+   "id": "bash GH_REPO=o/x \\gh pr merge --subject s",
+   "how": [
+    "ref:none",
+    "other-flag",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr merge #5 -m | cat",
+   "how": [
+    "ref:comment",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr merge #5 --auto --auto > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:comment",
+    "other-flag",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr merge feature-branch -d",
+   "how": [
+    "ref:branch",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr merge 42 | cat",
+   "how": [
+    "ref:42",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge 1 --body=x | cat",
+   "how": [
+    "ref:1",
+    "other-flag",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr -R o/x merge #5 --auto --match-head-commit abc | cat",
+   "how": [
+    "mid-flag",
+    "ref:comment",
+    "other-flag",
+    "ctx:pipe"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr --repo o/x merge feature-branch -s",
+   "how": [
+    "mid-flag",
+    "ref:branch",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh -Ro/x pr merge # merge it",
+   "how": [
+    "pre-flag",
+    "ref:none",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge '#7' --rebase",
+   "how": [
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' -R o/x pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --merge",
+   "how": [
+    "pre-flag",
+    "ref:origin-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then GH pr merge \"#7\"; fi",
+   "how": [
+    "ref:#7",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then 'gh' pr merge --subject s; fi",
+   "how": [
+    "ref:none",
+    "other-flag",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr merge \"#7\" -s -s # merge it",
+   "how": [
+    "ref:#7",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr merge \"#7\" -s -s # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <numbe"
+  },
+  {
+   "id": "bash \"gh\" pr merge feature-branch -r && echo ok",
+   "how": [
+    "ref:branch",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x g'h' --repo o/x pr \"merge\" feature-branch -s",
+   "how": [
+    "pre-flag",
+    "ref:branch",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps 'gh' pr merge 1 -sd",
+   "how": [
+    "ref:1",
+    "other-flag",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --squash -r # merge it",
+   "how": [
+    "ref:origin-url",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --squash -r # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the comma"
+  },
+  {
+   "id": "bash if true; then \\gh pr merge 42 --merge --squash; fi",
+   "how": [
+    "ref:42",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr merge 1 # merge it",
+   "how": [
+    "ref:1",
+    "ctx:comment"
+   ],
+   "expect": "read",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr merge 1 # merge it gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origi"
+  },
+  {
+   "id": "bash \"gh\" -R o/x pr merge -sd",
+   "how": [
+    "pre-flag",
+    "ref:none",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then \"gh\" --repo=o/x pr merge '#7'; fi",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe 'pr' merge 1 -r --delete-branch && echo ok",
+   "how": [
+    "ref:1",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" pr merge \"#7\" -s --body=x",
+   "how": [
+    "ref:#7",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr merge \"#7\" --subject s",
+   "how": [
+    "ref:#7",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe --repo=o/x pr \"merge\" '#7' -s && echo ok",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr merge -s # merge it",
+   "how": [
+    "ref:none",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge 1 --match-head-commit abc --squash",
+   "how": [
+    "ref:1",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x 'gh' pr merge -r",
+   "how": [
+    "ref:none",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge 1 -d > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:1",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then gh pr merge feature-branch --squash; fi",
+   "how": [
+    "ref:branch",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x \"gh\" pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 -d -d",
+   "how": [
+    "ref:origin-url",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe 'pr' \"merge\" #5 --rebase -sd > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:comment",
+    "other-flag",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3",
+   "how": [
+    "ref:origin-url",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash GH -Ro/x pr -R o/x merge '#7' -m",
+   "how": [
+    "pre-flag",
+    "mid-flag",
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr merge https://github.com/other/repo/pull/3",
+   "how": [
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "read",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr merge https://github.com/other/repo/pull/3 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GI"
+  },
+  {
+   "id": "bash \\gh -Ro/x pr \"merge\" 42 --squash -d",
+   "how": [
+    "pre-flag",
+    "ref:42",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH -R o/x pr merge \"#7\" --merge -s && echo ok",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr merge 1 -sd --disable-auto",
+   "how": [
+    "ref:1",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr --repo o/x merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --squash",
+   "how": [
+    "mid-flag",
+    "ref:origin-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x \\gh pr merge",
+   "how": [
+    "ref:none",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps 'gh' pr merge 42 --rebase --auto",
+   "how": [
+    "ref:42",
+    "other-flag",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then GH pr merge 1 -m; fi",
+   "how": [
+    "ref:1",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr merge --rebase",
+   "how": [
+    "ref:none",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps \\gh -R o/x pr merge",
+   "how": [
+    "pre-flag",
+    "ref:none",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr \"merge\" https://github.com/other/repo/pull/3 -s && echo ok",
+   "how": [
+    "ref:other-url",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh -R o/x pr merge \"#7\" --rebase --rebase",
+   "how": [
+    "pre-flag",
+    "ref:#7",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge \"#7\" -r > C:/qa-tmp/o.txt",
+   "how": [
+    "ref:#7",
+    "ctx:redirect"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr merge https://github.com/melvenac/Self-Improving-Agent/pull/3 --squash -m",
+   "how": [
+    "ref:origin-url",
+    "ctx:plain"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash gh --repo=o/x pr merge https://github.com/other/repo/pull/3 -d -r",
+   "how": [
+    "pre-flag",
+    "ref:other-url",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr merge 42 --auto --squash",
+   "how": [
+    "ref:42",
+    "other-flag",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps g'h' pr merge feature-branch --delete-branch",
+   "how": [
+    "ref:branch",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe -Ro/x pr --repo o/x merge 1 -s -m # merge it",
+   "how": [
+    "pre-flag",
+    "mid-flag",
+    "ref:1",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps g'h' pr merge \"#7\" --rebase",
+   "how": [
+    "ref:#7",
+    "ctx:ps"
+   ],
+   "expect": "read",
+   "got": "read",
+   "pass": true
+  },
+  {
+   "id": "bash if true; then GH pr merge \"#7\" -sd --subject s; fi",
+   "how": [
+    "ref:#7",
+    "other-flag",
+    "ctx:keyword"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' -Ro/x pr merge --rebase --rebase",
+   "how": [
+    "pre-flag",
+    "ref:none",
+    "ctx:plain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "ps \"gh\" pr --repo o/x merge --delete-branch -m",
+   "how": [
+    "mid-flag",
+    "ref:none",
+    "ctx:ps"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge && echo ok",
+   "how": [
+    "ref:none",
+    "ctx:chain"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash GH_REPO=o/x gh.exe --repo o/x pr merge 1",
+   "how": [
+    "pre-flag",
+    "ref:1",
+    "ctx:env"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr merge feature-branch # merge it",
+   "how": [
+    "ref:branch",
+    "ctx:comment"
+   ],
+   "expect": "grant",
+   "got": "grant",
+   "pass": true
+  },
+  {
+   "id": "bash gh api repos/o/x/pulls",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh issue list --search 'pr merge'",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr ready 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh.exe pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <nu"
+  },
+  {
+   "id": "bash GH pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origi"
+  },
+  {
+   "id": "bash Gh.Exe pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: Gh.Exe pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number "
+  },
+  {
+   "id": "bash \"gh\" pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"gh\" pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or"
+  },
+  {
+   "id": "ps 'gh' pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe search prs merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr view 5 --json mergeable",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr status",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr status",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' api repos/o/x/pulls",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr checks 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr view 5 --comments",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr diff 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash GH issue list --search 'pr merge'",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or o"
+  },
+  {
+   "id": "ps GH pr ready 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr ready 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr diff 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr checks 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh api repos/o/x/pulls",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr view 5 --comments",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "ps \\gh pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origi"
+  },
+  {
+   "id": "bash g'h' pr view 5 --comments",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr edit 5 --title merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr edit 5 --title merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash g'h' api repos/o/x/pulls",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "ps gh search prs merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr status",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or "
+  },
+  {
+   "id": "bash gh.exe pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh.exe pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number "
+  },
+  {
+   "id": "bash 'gh' pr view 5 --comments",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or o"
+  },
+  {
+   "id": "bash gh pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origi"
+  },
+  {
+   "id": "bash g'h' pr view 5 --json mergeable",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh.exe pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <nu"
+  },
+  {
+   "id": "ps \"gh\" api repos/o/x/pulls",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "ps Gh.Exe pr ready 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr list --state merged",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr edit 5 --title merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr edit 5 --title merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or o"
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr view 5 --json mergeable",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"C:/Program Files/GitHub CLI/gh.exe\" pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant gra"
+  },
+  {
+   "id": "ps 'gh' pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash gh.exe pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh.exe pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <nu"
+  },
+  {
+   "id": "bash gh pr view 5 --comments",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <numb"
+  },
+  {
+   "id": "bash \\gh pr create --title merge --body x",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr create --title merge --body x gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <num"
+  },
+  {
+   "id": "bash Gh.Exe pr list --state merged",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or"
+  },
+  {
+   "id": "bash g'h' pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash 'gh' pr checks 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr status",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "ps Gh.Exe pr create --title merge --body x",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: Gh.Exe pr create --title merge --body x gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <"
+  },
+  {
+   "id": "ps gh.exe pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr ready 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh search prs merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "ps Gh.Exe pr status",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "ps GH pr edit 5 --title merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr edit 5 --title merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash \\gh pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: Gh.Exe pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <nu"
+  },
+  {
+   "id": "bash \\gh pr list --state merged",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <numbe"
+  },
+  {
+   "id": "bash 'gh' pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh issue list --search 'pr merge'",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr create --title merge --body x",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr create --title merge --body x gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <num"
+  },
+  {
+   "id": "bash GH pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or o"
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr ready 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr list --state merged",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash GH issue list --search 'pr merge'",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "ps gh.exe pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \"gh\" search prs merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe issue list --search 'pr merge'",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr list --state merged",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr view 5 --comments",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: 'gh' pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or"
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr view 5 --comments",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr review 5 --comment -b merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: GH pr review 5 --comment -b merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number"
+  },
+  {
+   "id": "bash g'h' pr view 5 --json mergeable",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "ps gh issue list --search 'pr merge'",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr view 5 --json mergeable",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' api repos/o/x/pulls",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' api repos/o/x/pulls",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr status",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or origi"
+  },
+  {
+   "id": "bash g'h' pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or"
+  },
+  {
+   "id": "bash 'gh' search prs merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash 'gh' pr ready 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant"
+  },
+  {
+   "id": "ps \"C:/Program Files/GitHub CLI/gh.exe\" pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"C:/Program Files/GitHub CLI/gh.exe\" pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant gra"
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr status",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe pr view 5 --json mergeable",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash GH pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe api repos/o/x/pulls",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr checks 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant"
+  },
+  {
+   "id": "ps Gh.Exe pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash GH api repos/o/x/pulls",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \\gh pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or orig"
+  },
+  {
+   "id": "bash GH pr view 5 --json mergeable",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash GH issue list --search 'pr merge'",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh.exe pr checks 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr status",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash Gh.Exe search prs merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \\gh api repos/o/x/pulls",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr view 5 --json mergeable",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "ps g'h' pr view 5 --json mergeable",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash gh pr ready 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "ps \"gh\" pr edit 5 --title merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"gh\" pr edit 5 --title merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or o"
+  },
+  {
+   "id": "bash GH api repos/o/x/pulls",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: \"C:/Program Files/GitHub CLI/gh.exe\" pr comment 5 --body merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant"
+  },
+  {
+   "id": "ps 'gh' pr diff 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "ps 'gh' pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  },
+  {
+   "id": "bash g'h' pr list --label merge",
+   "how": [
+    "non-merge",
+    "word:merge"
+   ],
+   "expect": "allow",
+   "got": "grant",
+   "pass": false,
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: g'h' pr list --label merge gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the command is outside the one no-grant grammar: gh pr merge <number or ori"
+  },
+  {
+   "id": "bash \"C:/Program Files/GitHub CLI/gh.exe\" pr view 5",
+   "how": [
+    "non-merge",
+    "no-merge-word"
+   ],
+   "expect": "allow",
+   "got": "allow",
+   "pass": true
+  }
+ ]
+}

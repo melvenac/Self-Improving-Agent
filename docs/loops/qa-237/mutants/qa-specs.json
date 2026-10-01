@@ -1,0 +1,26 @@
+[
+ {
+  "name": "qa-p1-outside-refused",
+  "clause": "P1 'only if': a write landing outside the repo is allowed"
+ },
+ {
+  "name": "qa-p1-install-ignored",
+  "clause": "P1 targets: install (named in BASH_WRITE_LIMIT as covered)"
+ },
+ {
+  "name": "qa-p2-one-unchecked-word",
+  "clause": "P2 exact grammar: every word after the ref is an allowed flag"
+ },
+ {
+  "name": "qa-p2b-prune-allowed",
+  "clause": "P2b ruling 2: --prune needs a grant"
+ },
+ {
+  "name": "qa-p3-comma-list-off",
+  "clause": "P3 targets: an unquoted comma list is several targets"
+ },
+ {
+  "name": "qa-p3-colon-inline-off",
+  "clause": "P3 targets: -Path:value"
+ }
+]
