@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/run.ts b/open-brain/src/planner-hook/run.ts
-index cf6c344a..29aa305c 100644
+index cf6c344a..3bf5b893 100644
 --- a/open-brain/src/planner-hook/run.ts
 +++ b/open-brain/src/planner-hook/run.ts
 @@ -291,7 +291,7 @@ export function runPlannerHook(
@@ -7,7 +7,7 @@ index cf6c344a..29aa305c 100644
  
    // r5 P3: every shell tool the seat has is checked, not only Bash. Tool names are compared without case.
 -  const shellTool = tool.toLowerCase() === "bash" ? "Bash" : tool.toLowerCase() === "powershell" ? "PowerShell" : null;
-+  const shellTool = tool.toLowerCase() === "bash" ? "Bash" : null;
++  const shellTool = tool.toLowerCase() === "bash" ? "Bash" : tool.toLowerCase() === "powershell" && false ? "PowerShell" : null;
    if (shellTool) {
      const command = typeof input.command === "string" ? input.command : "";
      if (!command.trim()) {
