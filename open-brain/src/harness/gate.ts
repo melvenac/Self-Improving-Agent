@@ -312,6 +312,33 @@ export class UnconfiguredTransport implements GateTransport {
 export const JEV_KEY_VAR = "TYPESAFE_API_KEY";
 export const JEV_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
 
+/** The oldest resolved model a slice-four record may carry (S4-3a). */
+export const JEV_MIN_MODEL = "jev-1.13.0";
+
+/** `jev-1.13.0` → [1, 13, 0], or null when the string is not that shape. */
+function parseJevVersion(value: unknown): [number, number, number] | null {
+  if (typeof value !== "string") return null;
+  // `.match`, not `.exec`: the spawn-site scan treats a call named exec as a process spawn.
+  const m = value.match(/^jev-(\d+)\.(\d+)\.(\d+)$/);
+  return m === null ? null : [Number(m[1]), Number(m[2]), Number(m[3])];
+}
+
+/**
+ * Whether a resolved model version is at or above `minimum`, compared field by field as numbers.
+ *
+ * A string comparison would rank `jev-1.9.0` above `jev-1.13.0`. Anything that is not a `jev-X.Y.Z`
+ * string, including `null` and `jev-latest`, fails: an unreported version is not a passing one.
+ */
+export function jevModelAtLeast(resolved: unknown, minimum: string = JEV_MIN_MODEL): boolean {
+  const have = parseJevVersion(resolved);
+  const need = parseJevVersion(minimum);
+  if (have === null || need === null) return false;
+  for (let i = 0; i < 3; i++) {
+    if (have[i]! !== need[i]!) return have[i]! > need[i]!;
+  }
+  return true;
+}
+
 /**
  * How a live call failed, as something the runtime can branch on.
  *

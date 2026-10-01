@@ -36,6 +36,7 @@ import {
 } from "./policies.js";
 import { validatePlan, type Plan } from "./schema.js";
 import { gitTry } from "./git.js";
+import { gitBlobSha, openAttempt, outcomeOfError, toPosix, type OutcomeClass, type Subject } from "./gate-records.js";
 
 export class BriefPlanGateError extends Error {
   readonly exitCode: number;
@@ -199,6 +200,13 @@ export interface BriefGateRecord extends GateRecord {
   policy_hash: string;
   sources: BriefPlanGateSources;
   feedback?: string;
+  /** S4-7b. Present when the run was given an attempt ledger (a live run for the slice's budget). */
+  attempt_id?: string;
+  subject?: Subject;
+  attempt?: number;
+  retry_of?: string | null;
+  outcome_class?: OutcomeClass;
+  attempted_at?: string | null;
 }
 
 export type BriefPlanGateMode = "live" | "dry-run";
@@ -211,6 +219,13 @@ export interface RunBriefPlanGateOptions {
   transport?: GateTransport;
   env?: NodeJS.ProcessEnv;
   at?: Date;
+  /**
+   * Append-only attempt ledger (S4-7a). When set on a live run, the attempt is written BEFORE the
+   * request, so a call that dies in flight still leaves a trace and still counts.
+   */
+  ledgerPath?: string;
+  /** Injected so a test can hold the request open. Used only when no `transport` is given. */
+  fetchImpl?: typeof fetch;
 }
 
 export interface RunBriefPlanGateResult {
@@ -325,7 +340,39 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
     options.transport ??
     (options.mode === "dry-run"
       ? new DryRunTransport(() => {}, env)
-      : new JevTransport({ env, log: () => {} }));
+      : new JevTransport({ env, fetchImpl: options.fetchImpl, log: () => {} }));
+
+  // The record is redacted as it is written: an answer, a note or a model string that echoes the
+  // key is a record that leaks it, and the transport only redacts what it puts in an error.
+  const persist = (): void => writeGateRecordExclusive(recordPath, renderGateRecord(redact(record, env)));
+
+  // S4-7a: the attempt goes on disk BEFORE the request leaves.
+  const attempt =
+    options.ledgerPath !== undefined && options.mode === "live"
+      ? openAttempt(options.ledgerPath, {
+          gate: "plan",
+          subject: {
+            gate: "plan",
+            key: toPosix(relative(repoRoot, dtPath)),
+            blob: gitBlobSha(readFileSync(dtPath)),
+          },
+          recordPath: toPosix(relative(repoRoot, recordPath)),
+          mode: options.mode,
+          at,
+        })
+      : null;
+  if (attempt !== null) {
+    record.attempt_id = attempt.attempt_id;
+    record.subject = {
+      gate: "plan",
+      key: toPosix(relative(repoRoot, dtPath)),
+      blob: gitBlobSha(readFileSync(dtPath)),
+    } satisfies Subject;
+    record.attempt = attempt.attempt;
+    record.retry_of = attempt.retry_of;
+    record.attempted_at = attempt.attempted_at;
+    record.outcome_class = "transport";
+  }
 
   let answer: GateAnswer;
   try {
@@ -339,10 +386,18 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
           : (err as Error).message;
     record.runtime_action = "refused — the plan gate could not be reached";
     record.note = message;
-    writeGateRecordExclusive(recordPath, renderGateRecord(record));
-    throw new BriefPlanGateError(message, 1);
+    if (attempt !== null) {
+      record.outcome_class = outcomeOfError(err);
+      attempt.finish(record.outcome_class);
+    }
+    persist();
+    throw new BriefPlanGateError(redact(message, env), 1);
   }
 
+  if (attempt !== null) {
+    record.outcome_class = answer.consulted && answer.answers !== null ? "answered" : "transport";
+    attempt.finish(record.outcome_class);
+  }
   record.sent = answer.consulted;
   record.answered_at = new Date().toISOString();
   record.answer = answer.answers;
@@ -353,7 +408,7 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
   if (!answer.consulted || answer.answers === null) {
     record.runtime_action = "no decision — dry run or transport did not consult";
     record.note = answer.note;
-    writeGateRecordExclusive(recordPath, renderGateRecord(record));
+    persist();
     return { recordPath, record, decision: null, exitCode: 0 };
   }
 
@@ -362,13 +417,13 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
   if (decision.verdict !== "proceed") {
     record.feedback = formatPlanGateFeedback(decision, answer.answers);
     record.runtime_action = `rejected by policy (${decision.verdict})`;
-    writeGateRecordExclusive(recordPath, renderGateRecord(record));
+    persist();
     const out = record.feedback ?? decision.reasons.join("\n");
-    throw new BriefPlanGateError(out, 1);
+    throw new BriefPlanGateError(redact(out, env), 1);
   }
 
   record.runtime_action = "proceeded — policy found no rule against it";
-  writeGateRecordExclusive(recordPath, renderGateRecord(record));
+  persist();
   return { recordPath, record, decision, exitCode: 0 };
 }
 

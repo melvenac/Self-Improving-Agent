@@ -26,10 +26,12 @@ export const evidencePath = (loop: string): string => `${iterationDir(loop)}/E_t
 export const failurePath = (loop: string): string => `${iterationDir(loop)}/FAILED.md`;
 
 /** Which gate a record belongs to. The file name follows the gate, not the stage. */
-export type GateRecordKind = "plan" | "done";
+export type GateRecordKind = "plan" | "done" | "qa";
+
+const GATE_RECORD_FILE: Readonly<Record<GateRecordKind, string>> = { plan: "G_plan", done: "G_done", qa: "G_qa" };
 
 export const gateRecordPath = (loop: string, kind: GateRecordKind): string =>
-  `${iterationDir(loop)}/${kind === "plan" ? "G_plan" : "G_done"}.json`;
+  `${iterationDir(loop)}/${GATE_RECORD_FILE[kind]}.json`;
 
 /**
  * One gate's whole story: what was asked, what came back, which thresholds were
@@ -64,6 +66,13 @@ export interface GateRecord {
   /** What the runtime did as a result, in its own words. Never inferred by a reader. */
   runtime_action: string;
   note: string;
+  /**
+   * Who produced the record (S4-4a): the loop's own runtime, or a seat running a gate out of
+   * loop. Never inferred from the loop id: a seat-built `t195` matches the runtime pattern.
+   */
+  source?: "seat" | "runtime";
+  /** Whether the plan was written before the work (`written-before`) or rebuilt from the diff afterwards. */
+  plan_provenance?: "reconstructed-after" | "written-before";
 }
 
 export const renderGateRecord = (record: GateRecord): string => `${JSON.stringify(record, null, 2)}\n`;

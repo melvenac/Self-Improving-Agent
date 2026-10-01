@@ -1,0 +1,738 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "gate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "loop": {
+          "type": "string",
+          "pattern": "^(?:t\\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$"
+        },
+        "mode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sent": {
+          "type": "boolean"
+        },
+        "requested_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "answered_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model_requested": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model_resolved": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "request": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "answer": {
+          "anyOf": [
+            {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "usage": {
+          "anyOf": [
+            {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "runtime_action": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "seat",
+            "runtime"
+          ]
+        },
+        "plan_provenance": {
+          "type": "string",
+          "enum": [
+            "reconstructed-after",
+            "written-before"
+          ]
+        }
+      },
+      "required": [
+        "gate",
+        "loop",
+        "mode",
+        "sent",
+        "requested_at",
+        "answered_at",
+        "model_requested",
+        "model_resolved",
+        "request",
+        "answer",
+        "usage",
+        "decision",
+        "runtime_action",
+        "note",
+        "source",
+        "plan_provenance"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "gate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "loop": {
+          "type": "string",
+          "pattern": "^(?:t\\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$"
+        },
+        "mode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sent": {
+          "type": "boolean"
+        },
+        "requested_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "answered_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model_requested": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model_resolved": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "request": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "answer": {
+          "anyOf": [
+            {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "usage": {
+          "anyOf": [
+            {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "runtime_action": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "seat",
+            "runtime"
+          ]
+        },
+        "plan_provenance": {
+          "type": "string",
+          "enum": [
+            "reconstructed-after",
+            "written-before"
+          ]
+        },
+        "attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject": {
+          "type": "object",
+          "properties": {
+            "gate": {
+              "type": "string",
+              "minLength": 1
+            },
+            "key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "blob": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "gate",
+            "key",
+            "blob"
+          ],
+          "additionalProperties": false
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "retry_of": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outcome_class": {
+          "type": "string",
+          "enum": [
+            "answered",
+            "auth",
+            "request-invalid",
+            "rate-limited",
+            "overloaded",
+            "unexpected-status",
+            "transport",
+            "malformed-response",
+            "unavailable"
+          ]
+        },
+        "attempted_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "policy_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "pr": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "merge_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "scored_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "dt": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "blob": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "path",
+            "blob"
+          ],
+          "additionalProperties": false
+        },
+        "checks_source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checks_passed": {
+          "type": "boolean"
+        },
+        "diffstat": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "gate",
+        "loop",
+        "mode",
+        "sent",
+        "requested_at",
+        "answered_at",
+        "model_requested",
+        "model_resolved",
+        "request",
+        "answer",
+        "usage",
+        "decision",
+        "runtime_action",
+        "note",
+        "source",
+        "plan_provenance",
+        "attempt_id",
+        "subject",
+        "attempt",
+        "retry_of",
+        "outcome_class",
+        "attempted_at",
+        "policy_hash",
+        "pr",
+        "merge_commit",
+        "scored_sha",
+        "base_sha",
+        "dt",
+        "checks_source",
+        "checks_passed",
+        "diffstat"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "gate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "loop": {
+          "type": "string",
+          "pattern": "^(?:t\\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$"
+        },
+        "mode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sent": {
+          "type": "boolean"
+        },
+        "requested_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "answered_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model_requested": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model_resolved": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "request": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "answer": {
+          "anyOf": [
+            {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "usage": {
+          "anyOf": [
+            {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "runtime_action": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "seat",
+            "runtime"
+          ]
+        },
+        "plan_provenance": {
+          "type": "string",
+          "enum": [
+            "reconstructed-after",
+            "written-before"
+          ]
+        },
+        "attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject": {
+          "type": "object",
+          "properties": {
+            "gate": {
+              "type": "string",
+              "minLength": 1
+            },
+            "key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "blob": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "gate",
+            "key",
+            "blob"
+          ],
+          "additionalProperties": false
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "retry_of": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outcome_class": {
+          "type": "string",
+          "enum": [
+            "answered",
+            "auth",
+            "request-invalid",
+            "rate-limited",
+            "overloaded",
+            "unexpected-status",
+            "transport",
+            "malformed-response",
+            "unavailable"
+          ]
+        },
+        "attempted_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "policy_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "e_t_ref": {
+          "type": "object",
+          "properties": {
+            "branch": {
+              "type": "string",
+              "minLength": 1
+            },
+            "commit": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "blob": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "branch",
+            "commit",
+            "path",
+            "blob"
+          ],
+          "additionalProperties": false
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "from": {
+                "type": "string",
+                "enum": [
+                  "requirements",
+                  "acceptance"
+                ]
+              },
+              "result": {
+                "type": "string",
+                "enum": [
+                  "pass",
+                  "fail",
+                  "untested"
+                ]
+              },
+              "decided_by": {
+                "type": "string",
+                "enum": [
+                  "jev",
+                  "code"
+                ]
+              },
+              "severity": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "from",
+              "result",
+              "decided_by",
+              "severity"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "missing": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "regression_of_validated": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "artifact_complete_enough_to_stop": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "gate",
+        "loop",
+        "mode",
+        "sent",
+        "requested_at",
+        "answered_at",
+        "model_requested",
+        "model_resolved",
+        "request",
+        "answer",
+        "usage",
+        "decision",
+        "runtime_action",
+        "note",
+        "source",
+        "plan_provenance",
+        "attempt_id",
+        "subject",
+        "attempt",
+        "retry_of",
+        "outcome_class",
+        "attempted_at",
+        "policy_hash",
+        "e_t_ref",
+        "results",
+        "missing",
+        "regression_of_validated",
+        "artifact_complete_enough_to_stop"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "title": "G_done / G_qa gate record",
+  "description": "A gate record: the loop's own G_done (runtime), a shadow G_done for one merged diff, or a shadow G_qa for one E_t. source and plan_provenance are required on all three. LIMIT: rules that span records (at most one answered record per subject, a valid retry_of, at most 3 retries, at most 20 attempts) are enforced by `harness count-attempts` and are not expressible here. Derived from open-brain/src/harness/gate-records.ts; do not edit by hand."
+}

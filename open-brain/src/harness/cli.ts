@@ -30,6 +30,14 @@ import {
 import { jsonSchemas, serialiseSchema, validateEvidence, validatePlan, type DeliverableKind } from "./schema.js";
 import { defaultChecks, type CheckSpec } from "./checks.js";
 import { policyJsonSchemas } from "./policies.js";
+import {
+  MAX_ATTEMPTS_TOTAL,
+  SLICE_LEDGER_FILE,
+  SLICE_RECORDS_DIR,
+  countAttempts,
+  gateRecordJsonSchema,
+  validateGateRecord,
+} from "./gate-records.js";
 import { decideShadowVerdict, isLowerHexSha, ledgerPath, prepareShadowVerdict, summariseLedger } from "./shadow-merge.js";
 
 const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
@@ -41,7 +49,9 @@ const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
   harness shadow-verdict decide --loop <id> --candidate <sha> (--merged <sha> | --declined | --replaced <sha>)
   harness shadow-verdict summary
   harness validate plan <file>
-  harness plan-gate <D_t.json> [--brief <brief.md>] [--mode live|dry-run]
+  harness validate gate-record <file>
+  harness count-attempts [--ledger <file>] [--records <dir>] [--max <n>] [--repo <dir>]
+  harness plan-gate <D_t.json> [--brief <brief.md>] [--mode live|dry-run] [--ledger <file>]
   harness dispatch-check <brief.md> [--repo <dir>]
   harness dispatch <brief.md> --say <message> [--repo <dir>]
   harness help
@@ -184,12 +194,12 @@ export const policySchemaFileName = (kind: "plan" | "done" | "merge"): string =>
  */
 function cmdValidate(argv: readonly string[]): number {
   if (argv.length !== 2) {
-    throw new UsageError("usage: harness validate (evidence|plan) <file>");
+    throw new UsageError("usage: harness validate (evidence|plan|gate-record) <file>");
   }
   const kind = argv[0]!;
   const file = resolve(argv[1]!);
-  if (kind !== "evidence" && kind !== "plan") {
-    throw new UsageError("usage: harness validate (evidence|plan) <file>");
+  if (kind !== "evidence" && kind !== "plan" && kind !== "gate-record") {
+    throw new UsageError("usage: harness validate (evidence|plan|gate-record) <file>");
   }
   let text: string;
   try {
@@ -204,7 +214,7 @@ function cmdValidate(argv: readonly string[]): number {
     process.stdout.write(`(root): not JSON: ${(err as Error).message}\n`);
     return 1;
   }
-  const result = kind === "plan" ? validatePlan(json) : validateEvidence(json);
+  const result = kind === "plan" ? validatePlan(json) : kind === "gate-record" ? validateGateRecord(json) : validateEvidence(json);
   if (result.ok) return 0;
   for (const problem of result.problems) process.stdout.write(`${problem}\n`);
   return 1;
@@ -339,7 +349,7 @@ function positionalArgs(argv: readonly string[], flags: Map<string, string | tru
 async function cmdPlanGate(argv: readonly string[]): Promise<number> {
   const flags = flagMap(argv);
   for (const key of flags.keys()) {
-    if (key !== "brief" && key !== "mode" && key !== "repo") {
+    if (key !== "brief" && key !== "mode" && key !== "repo" && key !== "ledger") {
       throw new UsageError(`unrecognised flag "--${key}"`);
     }
   }
@@ -354,12 +364,18 @@ async function cmdPlanGate(argv: readonly string[]): Promise<number> {
   const brief = flags.get("brief");
   if (brief === true) throw new UsageError("--brief requires a path");
   const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  const ledgerFlag = flags.get("ledger");
+  if (ledgerFlag === true) throw new UsageError("--ledger requires a path");
+  // S4-7a: a live call is written to the ledger before the request leaves.
+  const ledger =
+    mode === "live" ? (typeof ledgerFlag === "string" ? resolve(ledgerFlag) : join(repo, SLICE_RECORDS_DIR, SLICE_LEDGER_FILE)) : undefined;
   try {
     const result = await runBriefPlanGate({
       dtPath: resolve(positional[0]!),
       briefPath: typeof brief === "string" ? resolve(brief) : null,
       repoRoot: repo,
       mode,
+      ledgerPath: ledger,
     });
     process.stdout.write(`${result.recordPath}\n`);
     for (const [field, source] of Object.entries(result.record.sources)) {
@@ -373,6 +389,35 @@ async function cmdPlanGate(argv: readonly string[]): Promise<number> {
     }
     throw err;
   }
+}
+
+/**
+ * S4-7a. Count the live attempts from the ledger and the records, and check S4-7b's three rules.
+ * Exit 0 only when every rule holds and the total is within the ceiling; prints the count and the
+ * files scanned, never a value from the environment.
+ */
+function cmdCountAttempts(argv: readonly string[]): number {
+  const flags = flagMap(argv, true);
+  for (const key of flags.keys()) {
+    if (key !== "ledger" && key !== "records" && key !== "repo" && key !== "max") throw new UsageError(`unrecognised flag "--${key}"`);
+  }
+  const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  const ledger = typeof flags.get("ledger") === "string" ? resolve(flags.get("ledger") as string) : join(repo, SLICE_RECORDS_DIR, SLICE_LEDGER_FILE);
+  const records = typeof flags.get("records") === "string" ? resolve(flags.get("records") as string) : join(repo, "docs/loops");
+  const maxFlag = flags.get("max");
+  const max = typeof maxFlag === "string" ? Number.parseInt(maxFlag, 10) : MAX_ATTEMPTS_TOTAL;
+  if (!Number.isInteger(max) || max < 1) throw new UsageError("--max must be a positive integer");
+  const report = countAttempts({ ledger, recordsDir: records, max, repoRoot: repo });
+  process.stdout.write(`attempts: ${report.total}\n`);
+  process.stdout.write(`retries: ${report.retries}\n`);
+  process.stdout.write(`answered: ${report.answered}\n`);
+  process.stdout.write(`incomplete: ${report.incomplete}\n`);
+  process.stdout.write(`files scanned: ledger lines ${report.files_scanned.ledger}, records ${report.files_scanned.records}\n`);
+  for (const a of report.attempts) {
+    process.stdout.write(`  ${a.record_path} [${a.subject?.gate ?? "?"} ${a.subject?.key ?? "?"}] attempt ${a.attempt} ${a.outcome_class ?? "incomplete"}\n`);
+  }
+  for (const v of report.violations) process.stdout.write(`VIOLATION: ${v}\n`);
+  return report.violations.length === 0 ? 0 : 1;
 }
 
 function cmdDispatchCheck(argv: readonly string[]): number {
@@ -419,6 +464,11 @@ async function cmdDispatch(argv: readonly string[]): Promise<number> {
   return 1;
 }
 
+/** The derived schema files slice four adds, with the file each is written to. */
+export function sliceFourSchemas(): [string, Record<string, unknown>][] {
+  return [["gate-record.schema.json", gateRecordJsonSchema()]];
+}
+
 function cmdSchemas(argv: readonly string[]): number {
   let write = false;
   for (const arg of argv) {
@@ -451,6 +501,17 @@ function cmdSchemas(argv: readonly string[]): number {
     const text = serialiseSchema(schemas[kind]);
     if (write) {
       const target = join(schemaDir(), schemaFileName(kind));
+      writeFileSync(target, text, "utf-8");
+      process.stdout.write(`wrote ${target}\n`);
+    } else {
+      process.stdout.write(text);
+    }
+  }
+  // Slice four's derived files (S4-4a, S4-6a), written the same way.
+  for (const [file, schema] of sliceFourSchemas()) {
+    const text = serialiseSchema(schema);
+    if (write) {
+      const target = join(schemaDir(), file);
       writeFileSync(target, text, "utf-8");
       process.stdout.write(`wrote ${target}\n`);
     } else {
@@ -503,6 +564,7 @@ export async function main(argv: readonly string[]): Promise<number> {
     if (sub === "shadow-verdict") return cmdShadow(rest);
     if (sub === "plan-gate") return await cmdPlanGate(rest);
     if (sub === "dispatch-check") return cmdDispatchCheck(rest);
+    if (sub === "count-attempts") return cmdCountAttempts(rest);
     if (sub === "dispatch") return await cmdDispatch(rest);
     throw new UsageError(`unknown subcommand "${sub}"`);
   } catch (err) {
