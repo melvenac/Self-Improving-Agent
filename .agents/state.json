@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 249,
+  "revision": 250,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3617,6 +3617,12 @@
       "title": "QA 241 (T-194 r6, 9cf8c7eb) RULED REJECT: P0 holds against every QA 237 spelling but the inversion stopped at constructs; r7 extends it to CHARACTERS (PowerShell: any non-ASCII refused; Bash: non-ASCII only inside ASCII quotes), ONE target validator for every source, a Bash COMMAND-WORD allow-list (node only with a script file), GIT_*/GH_REPO/GH_HOST env assignments refused, New-Item -Name without -Path read, and CI green on Linux",
       "date": "2026-10-01",
       "note": "Planner session 155 after reading origin/qa/t194-r6-report 8d69bed5. Met: QA 237's D1-D17 0 fail-open across 1,456 generated cases + probes; 105/105 mutants killed in one pass; QA's own 337 refused / 170 accepted P0 cases correct; D8, D9, non-merge, git -c rulings met. Fail-open, confirmed in real PowerShell 5.1 / Git Bash: D-A PS redirect targets skip :: and drive-relative checks; D-B Unicode whitespace/dash/smart quotes; D-C New-Item -Name alone; D-D node --eval=, perl -e'..'; D-E awk, trap, mapfile, sort -o, find -fprint; D-F GIT_CONFIG_* env injection. CI test job RED on Linux (run 36867744673): r6-qa237 rows carry Windows case-insensitive expectations. Dispatch: docs/loops/t194-r7-dispatch.md."
+    },
+    {
+      "id": "D-085",
+      "title": "QA 243 (step 2 r3, 36a0fc28) RULED REJECT on R3-2 only: 'a path a runner writes to' includes the runner's records path read from the committed tree (s04), since the records directory is tracked and prepareShadowVerdict already reads criteria via git show; r4 = commit V1's planted records before the second prepare (QA 243's diff); QA 244 is narrow",
+      "date": "2026-10-01",
+      "note": "Planner session 155 after reading origin/qa/s4-step2-r3-report 81881bb5 (a re-run after the usage-limit death). Met: S4-9.3 on Plumb (0 failed tests at base and candidate in all runs; the vitest RPC error stays environmental), R3-1, R3-3, regression. Dispatches: docs/loops/loop-15-slice-4-step2-r4-dispatch.md and docs/loops/qa-244-s4-step2-r4-dispatch.md."
     }
   ],
   "handoffs": [
