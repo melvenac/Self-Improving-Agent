@@ -1,0 +1,66 @@
+[
+  {
+    "id": "M1-builder-m1-narrow-tNNN",
+    "regen": false,
+    "exit": 1,
+    "counts": "passed=63 failed=5 skipped=0",
+    "killed": true,
+    "failed": [
+      "b2-et.test.ts :: BE-0.1 PlanSchema shares the evidence loop-id rule (superseded by T-216)",
+      "schema.test.ts :: plan.schema.json matches what the zod schema derives",
+      "t216-loop-id.test.ts :: L1 plan accepts a seat id and a runtime id",
+      "t216-loop-id.test.ts :: L5 validate plan exits 0 on the slice-four D_t, unedited",
+      "t216-loop-id.test.ts :: L6 plan-gate dry-run reaches the gate on the slice-four D_t without a loop-id refusal"
+    ]
+  },
+  {
+    "id": "M2-narrow-t3to6-norgen",
+    "regen": false,
+    "exit": 1,
+    "counts": "passed=67 failed=1 skipped=0",
+    "killed": true,
+    "failed": [
+      "schema.test.ts :: plan.schema.json matches what the zod schema derives"
+    ]
+  },
+  {
+    "id": "M3-narrow-t3to6-regen",
+    "regen": true,
+    "exit": 1,
+    "counts": "passed=66 failed=2 skipped=0",
+    "killed": true,
+    "failed": [
+      "b2-et.test.ts :: BE-0.1 plan.schema.json loop pattern is the shared loop-id pattern (T-216)",
+      "t216-loop-id.test.ts :: L3 plan and evidence use the same exported constant"
+    ]
+  },
+  {
+    "id": "M4-widen-uppercase-norgen",
+    "regen": false,
+    "exit": 1,
+    "counts": "passed=67 failed=1 skipped=0",
+    "killed": true,
+    "failed": [
+      "schema.test.ts :: plan.schema.json matches what the zod schema derives"
+    ]
+  },
+  {
+    "id": "M5-widen-uppercase-regen",
+    "regen": true,
+    "exit": 1,
+    "counts": "passed=66 failed=2 skipped=0",
+    "killed": true,
+    "failed": [
+      "b2-et.test.ts :: BE-0.1 plan.schema.json loop pattern is the shared loop-id pattern (T-216)",
+      "t216-loop-id.test.ts :: L3 plan and evidence use the same exported constant"
+    ]
+  },
+  {
+    "id": "M6-identical-literal-copy-regen",
+    "regen": true,
+    "exit": 0,
+    "counts": "passed=68 failed=0 skipped=0",
+    "killed": false,
+    "failed": []
+  }
+]

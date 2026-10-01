@@ -1,0 +1,75 @@
+{
+  "loop": "236-qa-t216",
+  "candidate_git": {
+    "sha": "9a0973f0d330b3b85a4ce5e23f8a0ef583de2070",
+    "branch": "origin/loop/t216-plan-loop-id",
+    "frozen_at": "2026-10-01T06:40:00Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci && npm run build && npx tsc --noEmit in open-brain at 9a0973f0 (laptop); CI Typecheck in tcm run 36826245143",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "local: npm ci 0, build 0 (stamped 9a0973f), tsc --noEmit 0, tree clean after build. tcm run 36826245143 headSha 9a0973f0 conclusion success, test job success."
+    },
+    "unit": {
+      "command": "npm test in open-brain on tcm (run 36826245143 candidate, run 36826249364 base c204d1d4); local vitest run tests/harness",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 290000,
+      "detail": "tcm candidate: 137 files, 1939 passed, 6 skipped; base: 136 files, 1933 passed, 6 skipped (+6 = t216-loop-id). Local tests/harness: 483 passed, 75 skipped, 0 failed; vitest exit 1 from one unhandled worker RPC timeout (onTaskUpdate), not a test failure."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "T216-1",
+      "status": "met",
+      "order": "shown",
+      "evidence": "validate plan docs/loops/loop-15-slice-4-brief.D_t.json: base c204d1d4 exit 1 'loop: loop must look like t001'; candidate exit 0 (tsx and built CLI). D_t blob 21bc4487 identical at base, candidate and master 0ca2c3b4."
+    },
+    {
+      "id": "T216-2",
+      "status": "met",
+      "order": "shown",
+      "evidence": "21 probes x 5 surfaces (plan zod field, validatePlan, evidence zod field, plan.schema.json, evidence.schema.json): candidate 0 disagreements, 0 off-spec; base 2 disagreements (15-slice-4, 15-slice-3-c). One constant: EVIDENCE_LOOP_PATTERN === LOOP_ID_PATTERN, both schemas use LOOP_ID_PATTERN. Plan-own-copy mutants M1-M5 and M8 killed; M7 (own copy + /i flag) SURVIVES every test, see defect D1."
+    },
+    {
+      "id": "T216-3",
+      "status": "met",
+      "order": "shown",
+      "evidence": "npx tsx src/harness/cli.ts schemas --write at the candidate rewrote all five schema files; git status/diff empty, so the hand-edited plan.schema.json is byte-identical to the generated one. Existing drift guard schema.test.ts:198 also holds. Blind spot: zod's JSON emission drops regex flags (M7)."
+    },
+    {
+      "id": "T216-4",
+      "status": "met",
+      "order": "shown",
+      "evidence": "grep t\\d{3 / t001 / tNNN in open-brain/src: cli.ts:143 --loop (runtime-only: branch, tag, iteration dir), schema.ts:256 DeveloperReportSchema (R_t written by the runtime's own developer stage), runtime.ts:309 loopNumber (runtime tag), comments. No planner-brief path reaches a kept tNNN. GATE_RECORD_RE keys on the brief stem; plan.loop only copied into the record."
+    },
+    {
+      "id": "T216-5",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Built CLI plan-gate --mode dry-run on a temp copy (C:/qa-tmp) of the slice-4 D_t and brief, under a --import tripwire refusing net/tls/http/https/fetch/dns/dgram with canary TYPESAFE_API_KEY set: exit 0, G_plan record written (loop 15-slice-4, mode dry-run, sent false, decision null), 0 network attempts, 0 child processes; positive control caught 3 of 3. Base: exit 1 loop-id refusal, no record."
+    },
+    {
+      "id": "REG-b2-et-BE-0.1",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Inverted rows were B's diff-scope guards (plan not widened by B), not evidence guarantees. Evidence regex source byte-identical to base, evidence.schema.json no diff, BE-1.1 evidence accept/refuse rows unchanged and green; DeveloperReportSchema and --loop guards (BE-0.1, BE-1.2) kept and green."
+    }
+  ],
+  "regressions": [
+    "b2-et BE-1.1 evidence loop-id accepts and refusals: unchanged and green at the candidate (local and tcm).",
+    "DeveloperReportSchema stays tNNN (BE-0.1, L4) and harness run --loop 15-slice-3 exits 2 (BE-1.2): green.",
+    "Full suite on tcm: candidate 1939 passed / 6 skipped vs base 1933 / 6; no new failure."
+  ],
+  "gaps": [
+    "D1: a plan-only copy of the regex with the /i flag (mutant M7) survives the full local tests/harness run (483 passed, 0 failed, 75 skipped) and makes plan accept T001 and 15-Slice while evidence and plan.schema.json refuse them. The one-constant property is not test-guarded at the zod level; L3 checks EVIDENCE_LOOP_PATTERN vs LOOP_ID_PATTERN, not what PlanSchema uses.",
+    "D2 (equivalent, info): an identical literal copy in PlanSchema (M6) survives; harmless until it changes, at which point only a flag-only change escapes (D1).",
+    "Not run: /sync on the candidate (the handoff also did not run it).",
+    "Observation outside scope: runtime.ts:1278 validates a runtime planner's D_t but never checks plan.loop against the run's --loop (pre-existing; E_t has that check at :1535). The accepted set is now wider."
+  ],
+  "notes": "QA 236, headless Claude Code Opus on DESKTOP-0GV3HAD. Dispatch SHA 0ca2c3b45ec990081c547921f4f7c90ef7a6b278. Product ef7a1ce7, candidate tip 9a0973f0. Mutants local, diffs in docs/loops/qa-236/mutants/. Two tcm runs used, windows not set. No live Jev call, no settings changes."
+}

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/schema.ts b/open-brain/src/harness/schema.ts
+index c32eab6e..bd4e4181 100644
+--- a/open-brain/src/harness/schema.ts
++++ b/open-brain/src/harness/schema.ts
+@@ -98,7 +98,7 @@ export const StopShipSchema = z.strictObject({
+  */
+ export const PlanSchema = z
+   .strictObject({
+-    loop: z.string().regex(LOOP_ID_PATTERN, LOOP_ID_MESSAGE),
++    loop: z.string().regex(/^(?:t\d{3,6}|[0-9]+(?:-[a-z0-9]+)+)$/, LOOP_ID_MESSAGE),
+     objective: z.string().min(1),
+     tasks: z.array(z.string().min(1)).min(1),
+     out_of_scope: z.array(z.string().min(1)),

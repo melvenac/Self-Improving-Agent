@@ -1,0 +1,28 @@
+[
+  {
+    "id": "M7-widen-i-flag-regen",
+    "regen": true,
+    "exit": 0,
+    "counts": "passed=68 failed=0 skipped=0",
+    "killed": false,
+    "failed": []
+  },
+  {
+    "id": "M8-widen-m-flag-regen",
+    "regen": true,
+    "exit": 1,
+    "counts": "passed=67 failed=1 skipped=0",
+    "killed": true,
+    "failed": [
+      "t216-loop-id.test.ts :: L2 plan refuses an empty id, a slash, ../x, a bare number, a dot and a space"
+    ]
+  },
+  {
+    "id": "M7b-widen-i-flag-norgen",
+    "regen": false,
+    "exit": 0,
+    "counts": "passed=68 failed=0 skipped=0",
+    "killed": false,
+    "failed": []
+  }
+]
