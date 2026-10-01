@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
-index ae60e64e..cd2e1b35 100644
+index 474ec6c7..8f92b599 100644
 --- a/open-brain/src/planner-hook/git.ts
 +++ b/open-brain/src/planner-hook/git.ts
 @@ -42,7 +42,7 @@ function pushNeedsGrant(args: readonly { text: string; expands: boolean }[]): bo

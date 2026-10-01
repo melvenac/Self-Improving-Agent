@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
-index ae60e64e..60166afa 100644
+index 474ec6c7..c2cb71e7 100644
 --- a/open-brain/src/planner-hook/git.ts
 +++ b/open-brain/src/planner-hook/git.ts
-@@ -74,7 +74,7 @@ function gitRestrictedIn(parsed: Parsed): boolean {
+@@ -75,7 +75,7 @@ function gitRestrictedIn(parsed: Parsed): boolean {
        const sub = rest[i];
        if (sub.expands) return true;
        const name = sub.text.toLowerCase();

@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/shell-words.ts b/open-brain/src/planner-hook/shell-words.ts
-index c26a65ae..b761143d 100644
+index 45353f6f..00397c2f 100644
 --- a/open-brain/src/planner-hook/shell-words.ts
 +++ b/open-brain/src/planner-hook/shell-words.ts
-@@ -272,10 +272,6 @@ export function parseCommand(source: string, flavor: Flavor): Parsed {
+@@ -292,10 +292,6 @@ export function parseCommand(source: string, flavor: Flavor): Parsed {
          continue;
        }
        // PowerShell: a lone `&` is the call operator (`& gh ...`), not a boundary.

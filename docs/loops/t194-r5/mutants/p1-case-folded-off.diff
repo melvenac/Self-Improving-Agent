@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
-index 9c835ffc..7ef4c7f7 100644
+index 8c23b6f6..dee9c84c 100644
 --- a/open-brain/src/planner-hook/paths.ts
 +++ b/open-brain/src/planner-hook/paths.ts
 @@ -64,7 +64,7 @@ export function toRepoRelative(raw: string, repoRoot: string, cwd: string = repo
@@ -10,4 +10,4 @@ index 9c835ffc..7ef4c7f7 100644
 +  if (a.startsWith(`${r}/`)) return { ok: true, outside: false, rel: abs.slice(root.length + 1), ci: false };
    // A path that matched the root prefix was resolved above. One that did not, but carries a Windows 8.3 short
    // name (PROGRA~1), may still be inside: the real directory name is on the disk, not in the text.
-   if (SHORT_NAME_RE.test(raw)) {
+   // Only a short name AFTER the point where the path leaves the root's own spelling counts: a sibling that shares

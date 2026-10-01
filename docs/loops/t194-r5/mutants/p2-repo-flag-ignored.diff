@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
-index ae60e64e..eae1c1a4 100644
+index 474ec6c7..f0f4cc87 100644
 --- a/open-brain/src/planner-hook/git.ts
 +++ b/open-brain/src/planner-hook/git.ts
-@@ -153,7 +153,7 @@ export function analyzeGhMerge(command: string, flavor: Flavor = "bash"): GhMerg
+@@ -154,7 +154,7 @@ export function analyzeGhMerge(command: string, flavor: Flavor = "bash"): GhMerg
    const s = q.simples.length === 1 ? q.simples[0] : null;
    const single = s !== null && q.separators === 0 && s.redirs.length === 0 && s.words.length > 0 && isGhWord(s.words[0]);
    const ghArgs = s ? s.words.slice(1) : [];

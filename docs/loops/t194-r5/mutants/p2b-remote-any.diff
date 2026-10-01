@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
-index ae60e64e..6a73004c 100644
+index 474ec6c7..84432f78 100644
 --- a/open-brain/src/planner-hook/git.ts
 +++ b/open-brain/src/planner-hook/git.ts
 @@ -49,7 +49,7 @@ function pushNeedsGrant(args: readonly { text: string; expands: boolean }[]): bo
@@ -9,5 +9,5 @@ index ae60e64e..6a73004c 100644
 -  if (positional[0] !== "origin") return true;
 +  
    for (const spec of positional.slice(1)) {
-     if (spec.startsWith("+")) return true;
-     const dest = (spec.includes(":") ? (spec.split(":").pop() as string) : spec).replace(/^refs\/heads\//, "");
+     // `+src:dst` forces; `:dst` has no source and DELETES the remote branch.
+     if (spec.startsWith("+") || spec.startsWith(":")) return true;

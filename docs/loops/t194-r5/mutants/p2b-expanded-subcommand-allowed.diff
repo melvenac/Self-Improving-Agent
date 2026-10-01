@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
-index ae60e64e..4b988bb1 100644
+index 474ec6c7..2a5667e1 100644
 --- a/open-brain/src/planner-hook/git.ts
 +++ b/open-brain/src/planner-hook/git.ts
-@@ -72,7 +72,7 @@ function gitRestrictedIn(parsed: Parsed): boolean {
+@@ -73,7 +73,7 @@ function gitRestrictedIn(parsed: Parsed): boolean {
        }
        if (i >= rest.length) continue;
        const sub = rest[i];
