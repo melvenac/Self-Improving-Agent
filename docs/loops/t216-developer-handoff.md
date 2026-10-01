@@ -2,11 +2,14 @@
 
 **By:** Builder (developer seat), 2026-10-01. **Branch:** `loop/t216-plan-loop-id` from origin/master `c204d1d4`.
 
-## NOT RUN — read this first
+## Run on the QA PC, sequentially (2026-10-01, product ef7a1ce)
 
-**Nothing below has been executed.** The QA PC was under a compute hold (Rivet's run) when this was written: no
-`npm ci`, build, `tsc` or vitest. Every "red" and "green" cell is therefore **PENDING**, not a result. `/sync` was also
-not run before the commit, for the same reason. The seat that runs them owns those columns.
+`npm ci` exit 0; `npm run build` exit 0 (stamped ef7a1ce); `tsc --noEmit` exit 0; `vitest run tests/harness` exit 0
+(29 files passed, 7 skipped; 483 tests passed, 75 skipped). `schema.ts` has no importer outside `tests/harness`.
+`validate plan` on slice-four D_t: exit 0 fixed. `plan-gate --mode dry-run` (temp copy, no Jev call): exit 0.
+**Red** was taken with mutant m1 applied, which narrows the plan back to `^t\d{3,}$` (the pre-fix plan rule):
+`validate plan` exit 1 (`loop: loop must look like t001`); vitest on t216-loop-id + b2-et exit 1, 4 failed. Mutant reverted.
+`/sync` NOT run.
 
 ## Change
 
@@ -30,14 +33,12 @@ not run before the commit, for the same reason. The seat that runs them owns tho
 
 | Row | Test | Red (unfixed) | Green |
 |---|---|---|---|
-| seat id `15-slice-4` and `t001` accepted | `t216-loop-id` L1 | PENDING | PENDING |
-| empty, `15/slice`, `../x`, `15` refused | L2 | PENDING | PENDING |
-| plan and evidence share one constant | L3 | PENDING | PENDING |
-| developer report stays `tNNN` | L4 | PENDING | PENDING |
-| `validate plan` on slice-four `D_t` exits 0 | L5 | PENDING (expected exit 1) | PENDING |
-| `plan-gate --mode dry-run` reaches the gate | L6 | PENDING | PENDING |
-| mutant: plan gets its own narrow regex | `mutants/m1-plan-own-narrow-regex.diff` | — | must turn L1/L3/L5 red: PENDING |
+| seat id `15-slice-4` and `t001` accepted | `t216-loop-id` L1 | red (m1) | green |
+| empty, `15/slice`, `../x`, `15` refused | L2 | not red under m1 (refusals hold either way) | green |
+| plan and evidence share one constant | L3 | NOT red under m1 (m1 leaves both constants equal; guards drift in the JSON pattern only) | green |
+| developer report stays `tNNN` | L4 | n/a (unchanged behaviour) | green |
+| `validate plan` on slice-four `D_t` exits 0 | L5 | exit 1 (m1) | exit 0 |
+| `plan-gate --mode dry-run` reaches the gate | L6 | red (m1) | green |
+| mutant: plan gets its own narrow regex | `mutants/m1-plan-own-narrow-regex.diff` | — | red: L1, L5, L6, b2-et BE-0.1 (4 failed); L3 stays green |
 
 `b2-et.test.ts` BE-0.1 rows that pinned the old plan behaviour are inverted (superseded by T-216).
-Files touching `schema.ts` beyond `tests/harness` were not enumerated by running; grep for importers before trusting
-the vitest scope.
