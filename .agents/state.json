@@ -1,11 +1,11 @@
 {
   "schema_version": 3,
-  "revision": 222,
+  "revision": 223,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 15 slice three (D-033/D-036) is CLOSED: A (#182), B (#165, #187) and C (#195, merged 2026-09-30 as ddd43526) are all ACCEPTED and merged. The shadow merge gate's ledger has line 1 (undefined, merged). The NEXT slice per D-033 is Jev calibration. It is NOT YET BRIEFED or ruled, so the next planner session writes its brief before any dispatch. In flight meanwhile: T-194 r3 (c1f1cb48) awaits QA 234 on the laptop; T-214 (declared.ts rejects a blank line, which made episode 1 undefined) is P1.",
+    "text": "Loop 15 slice FOUR (Jev scoring on real diffs, in shadow, no calibration claimed) is briefed and RULED: docs/loops/loop-15-slice-4-brief.md plus its D_t (D-070, D-071, D-072 with a 20-call cap). It is NOT dispatched. BLOCKER: T-216 (the plan schema accepts only tNNN loop ids, so the slice-four D_t fails `harness validate plan`), being built by sia-builder (loop/t216-plan-loop-id, ef7a1ce7, local runs on the QA PC now). After T-216 is accepted and merged, dispatch slice four. In flight alongside: T-194 r5 (Forge; defined by property, plus a generator), T-215, T-213. Slice three is CLOSED (A #182, B #165/#187, C #195; shadow ledger line 1 undefined).",
     "since_session": 153
   },
   "tasks": [
@@ -1018,9 +1018,10 @@
       "opened_session": 150,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened planner session 150, 2026-09-30, on Aaron's approval ('send it to Atlas to rule on', relayed Aaron -> clark -> Atlas). EVIDENCE, two stale-fetch misreads within about an hour: (1) the planner read the T-207 probe ref as undeleted from an unpruned remote-tracking ref (rev 196's correction); (2) Forge's /start on the QA PC printed 'HEAD 9c603615, level with origin/master, state rev 178 level with origin/master rev 178' while origin/master was at about rev 194 (#221 7c925a6, #222 cdf079d, including Forge's own rev-183 handoff). ob_start compares against the LAST fetch and says so, but nothing makes the fetch happen, so T-200's 'brief from master' is only as fresh as a fetch nobody ran, and D-062 is defeated at /start again. RULING: DETERMINISTIC, not a prompt step. The SessionStart hook (cli-bootstrap), which already prints tree currency, runs `git fetch --prune origin` FIRST, with a bounded timeout (network), then computes currency. On failure it prints 'fetch FAILED: <cause>; currency is against a fetch from <time>' and the currency line never says 'level' unqualified. ob_start states the fetch time it compared against. The /start command text gets no fetch step, because the hook owns it. ROWS: a fixture with an origin that moved after the last fetch: before the change it reads 'level' (red), after it reads 'behind' (green); an unreachable origin prints the FAILED line and the old fetch time; the fetch is bounded (a hanging remote does not hang /start); a mutant that skips the fetch goes red on the first row; prune is proven (a deleted remote branch is gone after start). NOT THIS TASK: the Cursor copy (T-197 parity follows it). SEQUENCED AFTER T-200 merges (it touches tree-currency, which T-200 also changed). Seat: builder (it built T-200's record source and knows tree-currency).",
+      "note": "Opened planner session 150, 2026-09-30, on Aaron's approval ('send it to Atlas to rule on', relayed Aaron -> clark -> Atlas). EVIDENCE, two stale-fetch misreads within about an hour: (1) the planner read the T-207 probe ref as undeleted from an unpruned remote-tracking ref (rev 196's correction); (2) Forge's /start on the QA PC printed 'HEAD 9c603615, level with origin/master, state rev 178 level with origin/master rev 178' while origin/master was at about rev 194 (#221 7c925a6, #222 cdf079d, including Forge's own rev-183 handoff). ob_start compares against the LAST fetch and says so, but nothing makes the fetch happen, so T-200's 'brief from master' is only as fresh as a fetch nobody ran, and D-062 is defeated at /start again. RULING: DETERMINISTIC, not a prompt step. The SessionStart hook (cli-bootstrap), which already prints tree currency, runs `git fetch --prune origin` FIRST, with a bounded timeout (network), then computes currency. On failure it prints 'fetch FAILED: <cause>; currency is against a fetch from <time>' and the currency line never says 'level' unqualified. ob_start states the fetch time it compared against. The /start command text gets no fetch step, because the hook owns it. ROWS: a fixture with an origin that moved after the last fetch: before the change it reads 'level' (red), after it reads 'behind' (green); an unreachable origin prints the FAILED line and the old fetch time; the fetch is bounded (a hanging remote does not hang /start); a mutant that skips the fetch goes red on the first row; prune is proven (a deleted remote branch is gone after start). NOT THIS TASK: the Cursor copy (T-197 parity follows it). SEQUENCED AFTER T-200 merges (it touches tree-currency, which T-200 also changed). Seat: builder (it built T-200's record source and knows tree-currency). — ACCEPTANCE ROW ADDED, planner session 153 (resumed after a desktop reboot), 2026-10-01, on clark's restart audit (hoh-startup-audit.md): 'fires on SessionStart resume as well as startup, and prints tree currency and drift in one line'. WHY: the planner resumed after hours of downtime. The SessionStart:resume hook did fire and print tree currency (against the last fetch), but nothing ran a fresh fetch or the drift check. The planner fetched by hand (06:28Z) and ran the drift check only when asked: ob_start at 06:3x showed 'Drift: none', level with origin/master rev 222, session log reused. T-208's ruling named 'the SessionStart hook' without naming the event, so resume was implied but not pinned.",
       "note_by": [
-        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97",
+        "6e083614-965f-462b-ad59-62091a0be5e1"
       ],
       "closed_rev": null
     },
@@ -3932,7 +3933,7 @@
     },
     {
       "n": 153,
-      "date": "2026-09-30",
+      "date": "2026-10-01",
       "uuid": "6e083614-965f-462b-ad59-62091a0be5e1",
       "seat": "planner",
       "checkout": "sia-planner",
