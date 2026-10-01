@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..dd9c6898 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -289,7 +289,6 @@ function checkBashSimples(simples: GSimple[], depth: number): string | null {
+     if (/[\\/]/.test(cmd.text)) return refuse(`command not allowed: ${cmd.text} (a path, not a bare command name)`);
+     if (!Object.prototype.hasOwnProperty.call(BASH_ALLOWED_COMMANDS, name)) return refuse(`command not allowed: ${name}`);
+     const restricted = commandRestriction(name, args.map((a) => a.text));
+-    if (restricted) return refuse(restricted);
+     if (name === "sed") {
+       const r = gateSed(args);
+       if (r) return r;

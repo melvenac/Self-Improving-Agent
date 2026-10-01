@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 9c94f1f0..ce916932 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -227,7 +227,7 @@ function psCommandTargets(canon: string, args: readonly Word[], via: string, out
+           add({ text: `${b.text}/${nm.text}`, raw: `${b.raw}/${nm.raw}`, expands: b.expands || nm.expands }, via);
+         }
+       }
+-    } else if (names.length > 0) {
++    } else if (false) {
+       // r7 D-C (QA 241): -Name with no -Path creates the item in the current directory; the name IS the target
+       for (const nm of names) add(nm, via);
+     } else for (const b of base) add(b, via);

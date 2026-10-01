@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..194c553d 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -737,8 +737,6 @@ function gatePowerShell(command: string, depth: number): string | null {
+       continue;
+     }
+     if (t.text === "." && !t.quoted && cur.length === 0) return refuse("dot-sourcing (. file)");
+-    const shape = psPathShapeProblem(t.text);
+-    if (shape) return shape;
+     if (call && cur.length === 0) {
+       if (commandBase(t.text) !== "gh") return refuse("& call of anything but gh");
+     }

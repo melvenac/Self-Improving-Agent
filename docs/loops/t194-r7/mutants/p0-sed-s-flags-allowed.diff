@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..9b3446e9 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -409,7 +409,7 @@ export function sedScriptRefusal(s: string): string | null {
+         if (!d || d === "\\" || d === "\n") return refuse("sed script not parseable (s delimiter)");
+         if (!readDelimited(d) || !readDelimited(d)) return refuse("sed script not parseable (unterminated s command)");
+         while (i < n && !/[;\n}]/.test(s[i])) {
+-          if (s[i] === "w" || s[i] === "W") return refuse("sed w (writes a file)");
++          
+           if (s[i] === "e") return refuse("sed e (runs a command)");
+           i++;
+         }

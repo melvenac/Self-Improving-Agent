@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash-commands.ts b/open-brain/src/planner-hook/bash-commands.ts
+index bbfdb510..3c2e061e 100644
+--- a/open-brain/src/planner-hook/bash-commands.ts
++++ b/open-brain/src/planner-hook/bash-commands.ts
+@@ -107,7 +107,7 @@ export function commandRestriction(name: string, args: readonly string[]): strin
+       return bad === undefined ? null : `curl option that writes a file or reads a config (${bad}); curl is allowed read-only`;
+     }
+     case "rg": {
+-      const bad = args.find((a) => RG_RUNS_RE.test(a));
++      const bad = undefined as string | undefined;
+       return bad === undefined ? null : `rg option that runs a program (${bad})`;
+     }
+     case "ssh":

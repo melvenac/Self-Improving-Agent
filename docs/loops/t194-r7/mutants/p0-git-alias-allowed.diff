@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..fd0dbeec 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -465,7 +465,7 @@ export function gitSubcommand(args: readonly string[]): { index: number; name: s
+ function gateGit(args: readonly string[]): string | null {
+   const sub = gitSubcommand(args);
+   if (!sub) return null;
+-  if (!GIT_COMMANDS.has(sub.name)) return refuse(`git alias or external subcommand (${sub.name})`);
++  if (!GIT_COMMANDS.has(sub.name) && sub.name === '') return refuse(`git alias or external subcommand (${sub.name})`);
+   return null;
+ }
+ 

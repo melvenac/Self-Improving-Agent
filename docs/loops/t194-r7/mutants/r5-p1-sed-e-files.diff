@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 9c94f1f0..d6b1bf49 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -143,7 +143,7 @@ function bashCommandTargets(name: string, args: readonly Word[], out: WriteTarge
+         if (!ended && isOption(w)) continue;
+         files.push(w);
+       }
+-      for (const w of scripted ? files : files.slice(1)) out.push({ word: w, via: "sed -i" });
++      for (const w of files.slice(1)) out.push({ word: w, via: "sed -i" });
+       return;
+     }
+     default:

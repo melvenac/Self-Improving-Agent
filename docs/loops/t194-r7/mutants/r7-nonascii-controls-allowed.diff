@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..a4762013 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -68,7 +68,7 @@ function envAssignmentProblem(raw: string): string | null {
+ function nonAscii(text: string, from = 0): string | null {
+   for (let k = from; k < text.length; ) {
+     const cp = text.codePointAt(k) as number;
+-    if (cp > 0x7e || (cp < 0x20 && cp !== 0x09 && cp !== 0x0a && cp !== 0x0d)) {
++    if (cp > 0x7e) {
+       return refuse(`non-ASCII character U+${cp.toString(16).toUpperCase().padStart(4, "0")}`);
+     }
+     k += cp > 0xffff ? 2 : 1;

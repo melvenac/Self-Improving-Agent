@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..8bda21c5 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -204,7 +204,7 @@ function gateBash(command: string, depth: number): string | null {
+     const w = readWord();
+     if (typeof w === "string") return w;
+     if (/^\d+$/.test(w.text) && w.bare && command[i] === ">") {
+-      if (w.text !== "2") return refuse("file-descriptor redirect other than 2>");
++      
+       if (command[i + 1] === "&") {
+         if (command[i + 2] !== "1" || /[^\s;&|]/.test(command[i + 3] ?? " ")) return refuse("fd redirect other than 2>&1");
+         cur.redirs.push("2>&1");

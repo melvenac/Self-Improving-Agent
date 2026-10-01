@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..1fa626db 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -97,7 +97,7 @@ function gateBash(command: string, depth: number): string | null {
+       if (c === " " || c === "\t" || c === ";" || c === "&" || c === "|" || c === ">" || c === "<" || c === "\n" || c === "\r") break;
+       {
+         const na = nonAscii(command.slice(i, i + 2));
+-        if (na && (c.charCodeAt(0) > 0x7e || c.charCodeAt(0) < 0x20)) return na;
++        
+       }
+       if (c === "'") {
+         bare = false;

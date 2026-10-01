@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index a007c6e3..38ad09cb 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -159,7 +159,7 @@ export function isNullSink(text: string): boolean {
+  */
+ export function pathShapeProblem(text: string): string | null {
+   if (text.includes("::")) return "provider path (::)";
+-  if (/^[A-Za-z]:(?![\\/])./.test(text)) return "drive-relative path (C:name)";
++  if (/^[a-z]:(?![\\/])./.test(text)) return "drive-relative path (C:name)";
+   for (let k = 0; k < text.length; ) {
+     const cp = text.codePointAt(k) as number;
+     if (cp > 0x7e || cp < 0x20) return `non-ASCII character U+${cp.toString(16).toUpperCase().padStart(4, "0")}`;

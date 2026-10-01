@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 9c94f1f0..3f82b1d7 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -112,7 +112,7 @@ function bashCommandTargets(name: string, args: readonly Word[], out: WriteTarge
+       if (name === "mv") for (const w of pos.slice(0, targetDir ? pos.length : pos.length - 1)) out.push({ word: w, via: "mv source" });
+       return;
+     }
+-    case "scp": {
++    case "scp-ignored": {
+       // the LOCAL end of a copy is a write target: the last operand, unless it names a remote host (`host:path`, `user@host:path`)
+       const pos = positionals(args);
+       const last = pos[pos.length - 1];

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash-commands.ts b/open-brain/src/planner-hook/bash-commands.ts
+index bbfdb510..c9546a87 100644
+--- a/open-brain/src/planner-hook/bash-commands.ts
++++ b/open-brain/src/planner-hook/bash-commands.ts
+@@ -112,7 +112,7 @@ export function commandRestriction(name: string, args: readonly string[]): strin
+     }
+     case "ssh":
+     case "scp": {
+-      const bad = args.find((a, k) => a === "-F" || /^-F./.test(a) || (SSH_RUNS_RE.test(a)) || (a === "-o" && SSH_RUNS_RE.test(args[k + 1] ?? "")));
++      const bad = args.find((a, k) => false && a === "-F" || /^-F./.test(a) || (SSH_RUNS_RE.test(a)) || (a === "-o" && SSH_RUNS_RE.test(args[k + 1] ?? "")));
+       return bad === undefined ? null : `${name} option that runs a local program or reads a config (${bad})`;
+     }
+     default:

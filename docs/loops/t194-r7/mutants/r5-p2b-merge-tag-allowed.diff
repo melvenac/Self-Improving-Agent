@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 2cd57fc3..c4604198 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -81,7 +81,7 @@ function gitRestrictedIn(parsed: Parsed): boolean {
+       const sub = rest[i];
+       if (sub.expands) return true;
+       const name = sub.text.toLowerCase();
+-      if (name === "merge" || name === "tag") return true;
++      
+       if (name === "push" && pushNeedsGrant(rest.slice(i + 1))) return true;
+     }
+   }

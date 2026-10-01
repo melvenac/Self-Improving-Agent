@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 9c94f1f0..a99aa9f1 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -328,6 +328,7 @@ export function detectBashWriteTargets(
+   }
+ 
+   for (const t of ex.targets) {
++    if (t.via === "scp") continue;
+     const v = validateTarget(t.word.text, t.word.raw, t.word.expands, repoRoot, cwd, true);
+     if (v.kind === "refused") push(v.cause);
+     else if (v.kind === "protected") push(t.word.text);

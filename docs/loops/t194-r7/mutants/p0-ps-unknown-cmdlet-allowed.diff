@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..a76c5816 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -774,7 +774,7 @@ function gatePowerShell(command: string, depth: number): string | null {
+       }
+       continue;
+     }
+-    if (/^[A-Za-z]+-[A-Za-z]+$/.test(head.text)) return refuse(`unknown cmdlet (${head.text})`);
++    if (false) return refuse(`unknown cmdlet (${head.text})`);
+     // PowerShell hands a native command (git, gh, node...) an unquoted `a,b` as TWO arguments; the hook would read one.
+     const comma = words.slice(1).find((w) => !w.quoted && w.text.includes(","));
+     if (comma) return refuse(`comma list as an argument to a native command (${head.text}); PowerShell passes it as an array`);

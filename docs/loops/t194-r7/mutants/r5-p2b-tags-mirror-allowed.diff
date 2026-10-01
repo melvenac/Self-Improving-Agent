@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 2cd57fc3..cf25c86a 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -44,7 +44,7 @@ function pushNeedsGrant(args: readonly { text: string; expands: boolean }[]): bo
+     }
+     if (t.startsWith("-")) {
+       if (/^--force/.test(t) || (!t.startsWith("--") && /^-[A-Za-z]*f[A-Za-z]*$/.test(t))) return true;
+-      if (PUSH_ALWAYS_GRANT.has(t)) return true;
++      
+       if (PUSH_OPTION_WITH_VALUE.has(t)) k++;
+       continue;
+     }

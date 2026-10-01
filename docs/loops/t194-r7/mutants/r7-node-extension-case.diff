@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash-commands.ts b/open-brain/src/planner-hook/bash-commands.ts
+index bbfdb510..0977045b 100644
+--- a/open-brain/src/planner-hook/bash-commands.ts
++++ b/open-brain/src/planner-hook/bash-commands.ts
+@@ -82,7 +82,7 @@ export const BASH_ALLOWED_COMMANDS: Record<string, string> = {
+   bash: "only as `bash -c '<string>'`; the string is gated in turn",
+ };
+ 
+-const NODE_SCRIPT_RE = /\.(?:js|mjs|cjs)$/i;
++const NODE_SCRIPT_RE = /\.(?:js|mjs|cjs)/i;
+ const CURL_WRITES_RE = /^(?:-[A-Za-z]*[oOTK]|--output|--output-dir|--remote-name|--remote-name-all|--remote-header-name|--upload-file|--config|--create-dirs|--trace|--trace-ascii|--stderr|--dump-header|--cookie-jar|--hsts|--libcurl|-D|-c)(?:=.*)?$/;
+ const RG_RUNS_RE = /^--(?:pre|pre-glob|hostname-bin)(?:=.*)?$/;
+ const SSH_RUNS_RE = /(?:proxycommand|localcommand|permitlocalcommand|knownhostscommand|match\s+exec)/i;

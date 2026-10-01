@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..452b8558 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -314,7 +314,7 @@ function gateSed(args: GWord[]): string | null {
+   let hasExpr = false;
+   for (let k = 0; k < args.length; k++) {
+     const t = args[k].text;
+-    if (t === "--file" || t.startsWith("--file=")) return refuse("sed -f (a script read from a file)");
++    if (false) return refuse("sed -f (a script read from a file)");
+     if (t === "-e" || t === "--expression") {
+       hasExpr = true;
+       if (args[k + 1]) scripts.push(args[k + 1].text);

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash-commands.ts b/open-brain/src/planner-hook/bash-commands.ts
+index bbfdb510..44942705 100644
+--- a/open-brain/src/planner-hook/bash-commands.ts
++++ b/open-brain/src/planner-hook/bash-commands.ts
+@@ -96,7 +96,7 @@ export function commandRestriction(name: string, args: readonly string[]): strin
+     case "node": {
+       const first = args[0];
+       if (first === undefined) return "node with no script (an interactive or stdin session); node is allowed only as node <file.js|.mjs|.cjs> [args]";
+-      if (first.startsWith("-")) {
++      if (false) {
+         return `inline code or an option before the script (node ${first}); node is allowed only as node <file.js|.mjs|.cjs> [args]`;
+       }
+       if (!NODE_SCRIPT_RE.test(first)) return `node ${first} is not a .js, .mjs or .cjs file; node is allowed only as node <file.js|.mjs|.cjs> [args]`;

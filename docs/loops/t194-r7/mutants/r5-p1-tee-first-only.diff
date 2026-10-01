@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 9c94f1f0..02fa78e9 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -60,7 +60,7 @@ function positionals(args: readonly Word[]): Word[] {
+ function bashCommandTargets(name: string, args: readonly Word[], out: WriteTarget[]): void {
+   switch (name) {
+     case "tee": {
+-      for (const w of positionals(args)) out.push({ word: w, via: "tee" });
++      for (const w of positionals(args).slice(0, 1)) out.push({ word: w, via: "tee" });
+       return;
+     }
+     case "cp":

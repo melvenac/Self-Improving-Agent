@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..305271f5 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -278,7 +278,7 @@ function checkBashSimples(simples: GSimple[], depth: number): string | null {
+     if (REFUSED_COMMANDS.has(name)) return refuse(`wrapper, shell or code-running command (${name})`);
+     const args = s.words.slice(k + 1);
+     if (SHELLS.has(name)) {
+-      const ok = args.length === 2 && args[0].text === "-c";
++      const ok = args.length === 2 && /^-[a-z]*c$/.test(args[0].text);
+       if (!ok) return refuse(`${name} is only parseable as: ${name} -c '<string>'`);
+       if (depth >= 3) return refuse("shell strings nested deeper than 3");
+       const inner = gateBash(args[1].text, depth + 1);

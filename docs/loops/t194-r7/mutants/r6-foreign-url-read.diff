@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/prfiles.ts b/open-brain/src/planner-hook/prfiles.ts
+index 2545a226..789d2b29 100644
+--- a/open-brain/src/planner-hook/prfiles.ts
++++ b/open-brain/src/planner-hook/prfiles.ts
+@@ -139,7 +139,7 @@ export async function fetchPrChangedPaths(
+   const owner = o.owner;
+   const repo = o.repo;
+   if (
+-    (parsed.owner !== undefined && parsed.owner.toLowerCase() !== owner.toLowerCase()) ||
++    false ||
+     (parsed.repo !== undefined && parsed.repo.toLowerCase() !== repo.toLowerCase())
+   ) {
+     return fail(`the pull URL names ${parsed.owner}/${parsed.repo}, not origin (${owner}/${repo}); another repository needs a grant`);

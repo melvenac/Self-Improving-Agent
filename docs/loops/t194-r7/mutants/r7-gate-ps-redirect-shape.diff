@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..60566f52 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -709,8 +709,6 @@ function gatePowerShell(command: string, depth: number): string | null {
+       const t = readTok();
+       if (typeof t === "string") return t;
+       // D-A (QA 241): a redirect target gets the SAME shape check as any other word that names a path
+-      const targetShape = psPathShapeProblem(t.text);
+-      if (targetShape) return targetShape;
+       cur.push({ text: "\u0000>", quoted: false, bare: true }, t);
+       continue;
+     }

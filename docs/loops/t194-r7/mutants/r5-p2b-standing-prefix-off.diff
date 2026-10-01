@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 2cd57fc3..cff886aa 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -57,7 +57,7 @@ function pushNeedsGrant(args: readonly { text: string; expands: boolean }[]): bo
+     if (spec.startsWith("+") || spec.startsWith(":")) return true;
+     const dest = (spec.includes(":") ? (spec.split(":").pop() as string) : spec).replace(/^refs\/heads\//, "");
+     // master and main are not under loop/, qa/, docs/ or chore/, so the standing test alone refuses them.
+-    if (dest === "" || !STANDING_BRANCH_RE.test(dest)) return true;
++    if (dest === "") return true;
+   }
+   return false;
+ }

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..199fb6a7 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -663,7 +663,7 @@ function gatePowerShell(command: string, depth: number): string | null {
+       if (c === "&") return refuse("& inside a word");
+       if (c === "<") return refuse("< (redirect, block comment or here-string)");
+       if (c === "#" && i === start) return refuse("comment (# at the start of a PowerShell word)");
+-      if (c === "~" && i === start) return refuse("tilde (PowerShell home-directory expansion)");
++      
+       text += c;
+       i++;
+     }

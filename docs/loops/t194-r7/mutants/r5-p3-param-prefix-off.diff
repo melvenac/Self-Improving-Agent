@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..1423cd7b 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -567,7 +567,7 @@ export function resolvePsParam(cmdlet: string, text: string): string {
+   const name = text.replace(/^-/, "").replace(/:.*$/, "").toLowerCase();
+   if (name === "") return "unknown";
+   if (table[name]) return name;
+-  const hits = Object.keys(table).filter((p) => p.startsWith(name));
++  const hits = Object.keys(table).filter((p) => p === name);
+   if (hits.length === 1) return hits[0];
+   return hits.length === 0 ? "unknown" : "ambiguous";
+ }

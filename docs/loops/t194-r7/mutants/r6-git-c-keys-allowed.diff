@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index 2cd57fc3..44925713 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -74,7 +74,7 @@ function gitRestrictedIn(parsed: Parsed): boolean {
+         // r6 (Open 5): an inline `-c key=value` whose key can redefine a command, a remote or what git runs needs a grant,
+         // whatever the subcommand.
+         const cfg = o === "-c" || o === "--config-env" ? rest[i + 1]?.text : o.startsWith("--config-env=") ? o.slice("--config-env=".length) : undefined;
+-        if (cfg !== undefined && GIT_RISKY_CONFIG_RE.test(cfg.split("=")[0])) return true;
++        
+         i += GIT_GLOBAL_WITH_VALUE.has(o) ? 2 : 1;
+       }
+       if (i >= rest.length) continue;

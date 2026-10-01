@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..3d41c85c 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -264,7 +264,6 @@ function checkBashSimples(simples: GSimple[], depth: number): string | null {
+         k++;
+         while (k < s.words.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(s.words[k].raw)) {
+           const env = envAssignmentProblem(s.words[k].raw);
+-          if (env) return env;
+           k++;
+         }
+         continue;

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
+index 9c94f1f0..1b9ee1a8 100644
+--- a/open-brain/src/planner-hook/bash.ts
++++ b/open-brain/src/planner-hook/bash.ts
+@@ -219,7 +219,7 @@ function psCommandTargets(canon: string, args: readonly Word[], via: string, out
+   }
+   if (kind === "new") {
+     const base = pathVals.length > 0 ? pathVals : pos.slice(0, 1);
+-    if (names.length > 0 && base.length > 0) {
++    if (false) {
+       // the name is a path FRAGMENT: joined it can hide a shape problem (`docs/C:name`), so it is checked on its own as well
+       for (const nm of names) if (pathShapeProblem(nm.text)) add(nm, via);
+       for (const b of base) {

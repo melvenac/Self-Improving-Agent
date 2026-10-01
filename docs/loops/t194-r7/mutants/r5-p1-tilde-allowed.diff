@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index a007c6e3..52902979 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -131,7 +131,7 @@ export function isAllowedDocsLoopsPath(raw: string): boolean {
+  * `shell` also refuses parentheses (process substitution, subshell); a file tool's path has no shell around it.
+  */
+ export function nonLiteralCause(text: string, shell: boolean): string | null {
+-  if (text.startsWith("~")) return "starts with ~, which a shell expands to a home directory";
++  
+   if (/[$`]/.test(text)) return "contains a shell expansion";
+   if (/[*?[\]]/.test(text)) return "contains a glob pattern";
+   if (/[{}]/.test(text)) return "contains a brace expansion";

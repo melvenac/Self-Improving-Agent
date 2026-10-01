@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/paths.ts b/open-brain/src/planner-hook/paths.ts
+index a007c6e3..1535f1c7 100644
+--- a/open-brain/src/planner-hook/paths.ts
++++ b/open-brain/src/planner-hook/paths.ts
+@@ -195,7 +195,7 @@ export function validateTarget(
+   if (isNullSink(text)) return { kind: "ok", outside: true };
+   const nl = (expands ? "contains a shell expansion" : null) ?? nonLiteralCause(text, shell) ?? nonLiteralCause(raw, shell);
+   if (nl) return { kind: "refused", cause: `${text} (${nl}, so its location cannot be determined)` };
+-  const shape = pathShapeProblem(text);
++  const shape = shell ? pathShapeProblem(text) : null;
+   if (shape) return { kind: "refused", cause: `${text} (${shape}, so its location cannot be determined)` };
+   const rel = toRepoRelative(text, repoRoot, cwd);
+   if (!rel.ok) return { kind: "refused", cause: rel.cause };

@@ -1,0 +1,15 @@
+diff --git a/open-brain/src/planner-hook/parse-gate.ts b/open-brain/src/planner-hook/parse-gate.ts
+index a99ce9c4..a313cc5a 100644
+--- a/open-brain/src/planner-hook/parse-gate.ts
++++ b/open-brain/src/planner-hook/parse-gate.ts
+@@ -163,7 +163,9 @@ function gateBash(command: string, depth: number): string | null {
+         if (typeof t === "string") return t;
+         continue;
+       }
+-      return refuse("background & (use && or ;)");
++      endSimple();
++      i++;
++      continue;
+     }
+     if (c === "|") {
+       if (command[i + 1] === "|") {
