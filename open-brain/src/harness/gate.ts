@@ -152,6 +152,56 @@ export const DONE_GATE_QUESTIONS: readonly GateQuestion[] = [
   },
 ];
 
+/**
+ * The QA-score gate's questions (HOH-JEV section 4), built per `E_t`: one choice per requirement
+ * that has evidence, a severity score beside each (kept only for a `fail`), and two noul questions.
+ * A requirement with no evidence is never asked: code records it `untested`.
+ */
+export const QA_REGRESSION_QUESTION_ID = "regression_of_validated";
+export const QA_COMPLETE_QUESTION_ID = "artifact_complete_enough_to_stop";
+
+export const qaResultQuestionId = (from: string, id: string): string => `res:${from}:${id}`;
+export const qaSeverityQuestionId = (from: string, id: string): string => `sev:${from}:${id}`;
+
+export function buildQaScoreQuestions(rows: readonly { from: string; id: string }[]): GateQuestion[] {
+  const questions: GateQuestion[] = [];
+  for (const row of rows) {
+    questions.push({
+      id: qaResultQuestionId(row.from, row.id),
+      kind: "choice",
+      prompt:
+        `Judging only the evidence the QA report gives for ${row.from} item "${row.id}", did the candidate meet it? ` +
+        `Answer untested when the evidence does not let you tell.`,
+      options: {
+        pass: "The evidence shows the item is met.",
+        fail: "The evidence shows the item is not met.",
+        untested: "The evidence is too thin to tell either way.",
+      },
+    });
+    questions.push({
+      id: qaSeverityQuestionId(row.from, row.id),
+      kind: "score",
+      prompt: `If ${row.from} item "${row.id}" failed, how severe would the failure be? The order of the levels is the scale.`,
+      criteria: [
+        "Cosmetic or wording: no behaviour is affected.",
+        "Contained: behaviour is affected but a validated behaviour is not.",
+        "Breaking: a validated behaviour or the candidate's own claim is broken.",
+      ],
+    });
+  }
+  questions.push({
+    id: QA_REGRESSION_QUESTION_ID,
+    kind: "noul",
+    prompt: "Does the report's evidence show that a behaviour listed as validated has regressed?",
+  });
+  questions.push({
+    id: QA_COMPLETE_QUESTION_ID,
+    kind: "noul",
+    prompt: "Is the artifact complete enough, on this report's evidence, that the next planner could stop here?",
+  });
+  return questions;
+}
+
 export interface GatePayload {
   /** Which gate this is — `plan`, `developer-done`, `qa-score`. */
   gate: string;

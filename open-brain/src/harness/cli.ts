@@ -32,6 +32,7 @@ import { defaultChecks, type CheckSpec } from "./checks.js";
 import { policyJsonSchemas } from "./policies.js";
 import { NO_CHECKS, ShadowRunError, checksFromEvidence, runShadowDoneGate } from "./shadow-gates.js";
 import { gitTry } from "./git.js";
+import { runShadowQaGate } from "./shadow-qa.js";
 import {
   MAX_ATTEMPTS_TOTAL,
   SLICE_LEDGER_FILE,
@@ -55,6 +56,8 @@ const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
   harness count-attempts [--ledger <file>] [--records <dir>] [--max <n>] [--repo <dir>]
   harness shadow-done --pr <n> --merge-commit <sha> --scored-sha <sha> [--base-sha <sha>] --dt <D_t.json>
                       (--checks-e-t <E_t.json> | --checks none) [--mode live|dry-run] [--records <dir>] [--ledger <file>]
+  harness shadow-qa --pr <n> --branch <qa/...> --commit <sha> --path <E_t path> [--mode live|dry-run]
+                    [--records <dir>] [--ledger <file>]
   harness plan-gate <D_t.json> [--brief <brief.md>] [--mode live|dry-run] [--ledger <file>]
   harness dispatch-check <brief.md> [--repo <dir>]
   harness dispatch <brief.md> --say <message> [--repo <dir>]
@@ -486,6 +489,46 @@ async function cmdShadowDone(argv: readonly string[]): Promise<number> {
   }
 }
 
+/**
+ * 4.4. Score one E_t, read from its commit, through the QA-score gate, in shadow. One batched
+ * request; the E_t is copied beside the record; the original is never written.
+ */
+async function cmdShadowQa(argv: readonly string[]): Promise<number> {
+  const flags = flagMap(argv, true);
+  const allowed = new Set(["pr", "branch", "commit", "path", "mode", "records", "ledger", "repo"]);
+  for (const key of flags.keys()) if (!allowed.has(key)) throw new UsageError(`unrecognised flag "--${key}"`);
+  const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  const pr = Number.parseInt(requiredFlag(flags, "pr"), 10);
+  if (!Number.isInteger(pr) || pr < 1) throw new UsageError("--pr must be a positive integer");
+  const commit = requireCliSha("commit", requiredFlag(flags, "commit"));
+  const modeRaw = flags.get("mode");
+  const mode = modeRaw === undefined ? "dry-run" : modeRaw;
+  if (mode !== "live" && mode !== "dry-run") throw new UsageError(`--mode must be live or dry-run, got "${String(modeRaw)}"`);
+  const ledgerFlag = flags.get("ledger");
+  const ledger =
+    mode === "live" ? (typeof ledgerFlag === "string" ? resolve(ledgerFlag) : join(repo, SLICE_RECORDS_DIR, SLICE_LEDGER_FILE)) : undefined;
+  const recordsFlag = flags.get("records");
+  try {
+    const result = await runShadowQaGate({
+      repoRoot: repo,
+      evidence: { branch: requiredFlag(flags, "branch"), commit, path: requiredFlag(flags, "path") },
+      stem: `pr-${pr}`,
+      mode,
+      recordsDir: typeof recordsFlag === "string" ? resolve(recordsFlag) : undefined,
+      ledgerPath: ledger,
+    });
+    process.stdout.write(`${result.recordPath}\n`);
+    process.stdout.write(`decision: ${result.decision?.verdict ?? "none"} (shadow: recorded only)\n`);
+    return result.exitCode;
+  } catch (err) {
+    if (err instanceof ShadowRunError) {
+      process.stderr.write(`${err.message}\n`);
+      return err.exitCode;
+    }
+    throw err;
+  }
+}
+
 function cmdDispatchCheck(argv: readonly string[]): number {
   const flags = flagMap(argv);
   for (const key of flags.keys()) {
@@ -532,7 +575,10 @@ async function cmdDispatch(argv: readonly string[]): Promise<number> {
 
 /** The derived schema files slice four adds, with the file each is written to. */
 export function sliceFourSchemas(): [string, Record<string, unknown>][] {
-  return [["gate-record.schema.json", gateRecordJsonSchema()]];
+  return [
+    ["gate-record.schema.json", gateRecordJsonSchema()],
+    ["policy-qa-score.schema.json", policyJsonSchemas().qa],
+  ];
 }
 
 function cmdSchemas(argv: readonly string[]): number {
@@ -632,6 +678,7 @@ export async function main(argv: readonly string[]): Promise<number> {
     if (sub === "dispatch-check") return cmdDispatchCheck(rest);
     if (sub === "count-attempts") return cmdCountAttempts(rest);
     if (sub === "shadow-done") return await cmdShadowDone(rest);
+    if (sub === "shadow-qa") return await cmdShadowQa(rest);
     if (sub === "dispatch") return await cmdDispatch(rest);
     throw new UsageError(`unknown subcommand "${sub}"`);
   } catch (err) {
