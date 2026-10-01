@@ -238,6 +238,32 @@ describe("G3 — the 4.3 shadow done-gate runner", () => {
     expect(countAttempts({ ledger, recordsDir: join(repo.root, "docs/loops"), repoRoot: repo.root }).violations.join("\n")).toContain("re-roll");
   });
 
+  it("D9 a runtime-shaped loop id does not make the record a runtime record: source stays seat (S4-4a.5, r2 item 3)", async () => {
+    const plan = JSON.parse(readFileSync(join(repo.root, DT), "utf-8")) as Record<string, unknown>;
+    // `t195` is the seat-built diff whose id matches the runtime pattern.
+    writeFileSync(join(repo.root, "docs/loops/t195-shaped.D_t.json"), JSON.stringify({ ...plan, loop: "t195" }));
+    const r = await run({ dtPath: join(repo.root, "docs/loops/t195-shaped.D_t.json"), ledgerPath: join(side, "t195.jsonl") });
+    expect(r.record.loop).toBe("t195");
+    expect(r.record.source).toBe("seat");
+    expect(JSON.parse(readFileSync(r.recordPath, "utf-8")).source).toBe("seat");
+  });
+
+  it("D8 a fetch that rejects is `transport`, counts as 1 attempt, and is not `unavailable` (r2 item 6)", async () => {
+    const ledger = join(side, "reject.jsonl");
+    let reached = 0;
+    const rejecting = (async () => {
+      reached += 1;
+      throw new Error("ECONNRESET");
+    }) as unknown as typeof fetch;
+    const r = await run({ transport: undefined, fetchImpl: rejecting, ledgerPath: ledger, env: harnessEnv({ [JEV_KEY_VAR]: makeCanary() }) });
+    expect(reached).toBe(1);
+    expect(r.record.outcome_class).toBe("transport");
+    expect(r.exitCode).toBe(1);
+    const c = countAttempts({ ledger, recordsDir: join(repo.root, "docs/loops"), repoRoot: repo.root });
+    expect(c.total).toBe(1);
+    expect(c.violations).toEqual([]);
+  });
+
   it("D7 an unreachable gate (no key) is recorded as `unavailable`, which is not a call", async () => {
     const ledger = join(side, "nokey.jsonl");
     const noKey = harnessEnv();

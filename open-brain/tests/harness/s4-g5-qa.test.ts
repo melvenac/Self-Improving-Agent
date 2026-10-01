@@ -325,6 +325,41 @@ describe("S4-6b/6c/6d — the runner", () => {
     }
   });
 
+  it("R9 a runtime-shaped loop id does not make the record a runtime record: source stays seat (S4-4a.5, r2 item 3)", async () => {
+    setup(evidence({ loop: "t195" }));
+    const r = await run({});
+    expect(r.record.loop).toBe("t195");
+    expect(r.record.source).toBe("seat");
+    expect(JSON.parse(readFileSync(r.recordPath, "utf-8")).source).toBe("seat");
+  });
+
+  it("R10 a fetch that rejects is `transport`, counts as 1 attempt, and is not `unavailable` (r2 item 6)", async () => {
+    setup(FULL());
+    const ledger = join(side, "reject.jsonl");
+    let reached = 0;
+    const rejecting = (async () => {
+      reached += 1;
+      throw new Error("ECONNRESET");
+    }) as unknown as typeof fetch;
+    const r = await run({ transport: undefined, fetchImpl: rejecting, ledgerPath: ledger });
+    expect(reached).toBe(1);
+    expect(r.record.outcome_class).toBe("transport");
+    expect(r.exitCode).toBe(1);
+    const c = (await import("../../src/harness/gate-records.js")).countAttempts({ ledger, repoRoot: repo.root });
+    expect(c.total).toBe(1);
+  });
+
+  it("Q8 a literal planted in the QA runner or the done runner is reported by the scan, and both files are scan targets (r2 item 5)", () => {
+    const regions = thresholdScanRegions().map((r) => r.file);
+    expect(regions).toContain("shadow-qa.ts");
+    expect(regions).toContain("shadow-gates.ts");
+    for (const f of ["shadow-qa.ts", "shadow-gates.ts"]) {
+      const text = readFileSync(join(SRC, f), "utf-8");
+      expect(thresholdLiterals(text), `${f} already holds a literal`).toEqual([]);
+      expect(thresholdLiterals(`${text}\nconst planted = 0.6;`)).toContain("0.6");
+    }
+  });
+
   it("R8 a 422 from the one batched request stops the item: one request, a request-invalid record, no second call", async () => {
     setup(FULL());
     const seen: SeenRequest[] = [];

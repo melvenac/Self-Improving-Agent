@@ -61,6 +61,10 @@ export const THRESHOLD_SCAN_TARGETS: readonly ThresholdScanTarget[] = [
   { file: "gate.ts", from: null },
   // Where the state each gate judges is assembled.
   { file: "runtime.ts", from: null },
+  // Slice four's runners assemble what each shadow gate's decision receives (QA 240 G6): a literal
+  // here is a threshold, the same as one in a prompt.
+  { file: "shadow-gates.ts", from: null },
+  { file: "shadow-qa.ts", from: null },
 ];
 
 /** Strip block and line comments. **This scan is about code.** */

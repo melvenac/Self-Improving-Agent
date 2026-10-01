@@ -7,16 +7,18 @@
 
 import { describe, it, expect } from "vitest";
 import { execFileSync } from "node:child_process";
-import { resolve } from "node:path";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 
 const REPO = resolve(__dirname, "../../..");
 const BASE = "2448a6ea";
 
 const git = (args: string[]): string => execFileSync("git", args, { cwd: REPO, encoding: "utf-8", shell: false, maxBuffer: 256 * 1024 * 1024 });
 
-/** Added lines (without the leading plus) of `git diff BASE -- <paths>`, working tree included. */
-function addedLines(paths: string[]): string[] {
-  return git(["diff", "--unified=0", BASE, "--", ...paths])
+/** Added lines (without the leading plus) of `git diff <base> -- <paths>` in `cwd`, working tree included. */
+function addedLines(paths: string[], cwd: string = REPO, base: string = BASE): string[] {
+  return execFileSync("git", ["diff", "--unified=0", base, "--", ...paths], { cwd, encoding: "utf-8", shell: false, maxBuffer: 256 * 1024 * 1024 })
     .split("\n")
     .filter((l) => l.startsWith("+") && !l.startsWith("+++"))
     .map((l) => l.slice(1));
@@ -25,7 +27,9 @@ function addedLines(paths: string[]): string[] {
 // Spelled in pieces so this file does not contain what it scans for.
 const FORBIDDEN_WORD = new RegExp(`\\b${"calibrat"}${"ed"}\\b`, "i");
 const JEV_MCP = new RegExp(`${"jev"}-${"mcp"}|${"mcp__"}${"jev"}`);
-const SKIPS = new RegExp(`\\.(${"sk"}${"ip"}|${"to"}${"do"})\\b|${"sk"}${"ipIf"}|${"run"}${"If"}`);
+// CALL POSITION only (r2, D1): a test function, optionally with modifiers, then the skipping modifier.
+// The r1 pattern matched the word anywhere, so a test TITLE containing it was a hit.
+const SKIPS = new RegExp(`\\b(it|test|describe)(\\.\\w+)*\\.(${"sk"}${"ip"}|${"to"}${"do"}|${"sk"}${"ipIf"}|${"run"}${"If"})\\b`);
 
 const hits = (re: RegExp, lines: string[]): string[] => lines.filter((l) => re.test(l));
 
@@ -36,9 +40,57 @@ describe("slice four guards", () => {
     expect(hits(JEV_MCP, [`import x from "${"jev"}-${"mcp"}"`])).toHaveLength(1);
     expect(hits(JEV_MCP, ["import x from 'gate.js'"])).toHaveLength(0);
     expect(hits(SKIPS, [`it.${"sk"}${"ip"}("x", () => {})`])).toHaveLength(1);
+    expect(hits(SKIPS, [`describe.each([1]).${"sk"}${"ip"}("x", () => {})`])).toHaveLength(1);
+    expect(hits(SKIPS, [`test.${"run"}${"If"}(cond)("x", () => {})`])).toHaveLength(1);
     expect(hits(SKIPS, ["it('x', () => {})"])).toHaveLength(0);
+    // The r1 false positive: a TITLE that names the thing is not a call.
+    expect(hits(SKIPS, [`it("S4-9.2 no ${"sk"}${"ip"}, ${"to"}${"do"}, ${"sk"}${"ipIf"} or ${"run"}${"If"} is added", () => {`])).toHaveLength(0);
     // And the diff reader really returns added lines: this very file is one of them once it is committed or staged.
     expect(addedLines(["open-brain/src/harness/gate-records.ts"]).length).toBeGreaterThan(50);
+  });
+
+  it("D1 the skip scan fires on a planted skip in a COMMITTED file, and not on one in an untracked file (why r1 looked green)", () => {
+    const dir = mkdtempSync(join(tmpdir(), "s4guards-"));
+    const run = (args: string[]): string => execFileSync("git", args, { cwd: dir, encoding: "utf-8", shell: false }).trim();
+    run(["init", "--initial-branch=main"]);
+    run(["config", "user.email", "g@example.invalid"]);
+    run(["config", "user.name", "g"]);
+    run(["config", "commit.gpgsign", "false"]);
+    mkdirSync(join(dir, "open-brain/tests"), { recursive: true });
+    writeFileSync(join(dir, "open-brain/tests/a.test.ts"), "it('a', () => {});\n");
+    run(["add", "-A"]);
+    run(["commit", "-q", "-m", "base"]);
+    const base = run(["rev-parse", "HEAD"]);
+    // Untracked: `git diff <base>` does not see it, which is exactly how r1's guard stayed quiet.
+    writeFileSync(join(dir, "open-brain/tests/untracked.test.ts"), `it.${"sk"}${"ip"}('u', () => {});\n`);
+    expect(hits(SKIPS, addedLines(["open-brain/tests"], dir, base))).toEqual([]);
+    // Committed: the same line is an added line and the scan fires.
+    writeFileSync(join(dir, "open-brain/tests/b.test.ts"), `it.${"sk"}${"ip"}('b', () => {});\nit('fine', () => {});\n`);
+    run(["add", "open-brain/tests/b.test.ts"]);
+    run(["commit", "-q", "-m", "plant"]);
+    expect(hits(SKIPS, addedLines(["open-brain/tests"], dir, base))).toHaveLength(1);
+  });
+
+  it("D1b the real tree has no untracked file under open-brain/tests, so the diff-based scans see every test", () => {
+    const untracked = git(["ls-files", "--others", "--exclude-standard", "--", "open-brain/tests"]).trim();
+    expect(untracked).toBe("");
+  });
+
+  it("S4-6d.3 neither shadow runner imports the shadow merge verdict, and the CLI's prepare passes no G_done or G_qa as a gate", () => {
+    const read = (p: string): string => readFileSync(resolve(REPO, p), "utf-8");
+    const importsMerge = (src: string): boolean => /from\s+["']\.\/shadow-merge\.js["']/.test(src);
+    expect(importsMerge(`import { x } from "./shadow-merge.js";`)).toBe(true);
+    expect(importsMerge(`import { x } from "./gate.js";`)).toBe(false);
+    for (const f of ["shadow-gates.ts", "shadow-qa.ts", "gate-records.ts", "closeout-tables.ts"]) {
+      expect(importsMerge(read(`open-brain/src/harness/${f}`)), f).toBe(false);
+    }
+    const cli = read("open-brain/src/harness/cli.ts");
+    const at = cli.indexOf("prepareShadowVerdict({");
+    expect(at).toBeGreaterThan(0);
+    const call = cli.slice(at, cli.indexOf("});", at));
+    expect(call.length).toBeGreaterThan(100);
+    expect(call).not.toMatch(/doneGate|planGate/);
+    expect(/doneGate/.test("prepareShadowVerdict({ doneGate: x });")).toBe(true);
   });
 
   it("S4-5b no added line, anywhere in the slice's diff, contains the forbidden word (whole word, any case)", () => {

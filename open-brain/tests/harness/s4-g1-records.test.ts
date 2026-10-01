@@ -365,6 +365,38 @@ describe("S4-7a/7b — the counting command", () => {
     expect(r.files_scanned).toEqual({ ledger: 1, records: 1 });
   });
 
+  it("C7 a retry_of that names ANOTHER subject's record is refused (r2 item 4)", () => {
+    const other = attempt("sA", "transport");
+    attempt("sB", "transport");
+    // sB's second record claims to retry sA's record, which is retryable but is not sB's.
+    attempt("sB", "answered", { retryOf: other, attempt: 2 });
+    const r = countAttempts({ ledger, repoRoot: dir });
+    expect(r.violations.join("\n")).toContain("does not name an earlier record for developer-done sB");
+  });
+
+  for (const outcome of ["auth", "request-invalid", "unexpected-status", "malformed-response"] as const) {
+    it(`C8 a retry after ${outcome} is refused: it is not retryable, the item stops (r2 item 4)`, () => {
+      const first = attempt("sC", outcome);
+      attempt("sC", "answered", { retryOf: first, attempt: 2 });
+      const r = countAttempts({ ledger, repoRoot: dir });
+      expect(r.violations.join("\n")).toContain(`whose outcome is ${outcome}`);
+    });
+  }
+
+  it("C9 each retryable outcome (transport, rate-limited, overloaded) IS allowed to be retried, so C8 is not refusing everything", () => {
+    for (const outcome of ["transport", "rate-limited", "overloaded"] as const) {
+      const d = mkdtempSync(join(tmpdir(), "s4g1-c9-"));
+      const l = join(d, "a.jsonl");
+      const put = (id: string, o: string, retryOf: string | null, rp: string) => {
+        beginAttempt(l, { attempt_id: id, gate: "x", subject: subject("s9"), attempt: 1, retry_of: retryOf, record_path: rp, attempted_at: "t", mode: "live" });
+        endAttempt(l, { attempt_id: id, outcome_class: o as never, completed_at: "t" });
+      };
+      put("a", outcome, null, "r/a.json");
+      put("b", "answered", "r/a.json", "r/b.json");
+      expect(countAttempts({ ledger: l, repoRoot: d }).violations, outcome).toEqual([]);
+    }
+  });
+
   it("C6 `harness count-attempts` exits 0 on the legal chain and 1 on a re-roll", () => {
     const a = attempt("s1", "transport");
     attempt("s1", "answered", { retryOf: a, attempt: 2 });

@@ -145,5 +145,6 @@ describe("the eight reconstructed D_t files (S4-4b)", () => {
       if (r.error) throw r.error;
       expect(r.status, `${row.pr}: ${r.stdout}${r.stderr}`).toBe(0);
     }
-  });
+    // Eight spawns of tsx: the default 5 s timeout is not enough on a loaded machine (QA 240 D2).
+  }, 120_000);
 });
