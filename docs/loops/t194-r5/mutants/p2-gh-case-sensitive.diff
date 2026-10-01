@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
-index b61b27d8..700e8ea6 100644
+index ae60e64e..29cd5a4f 100644
 --- a/open-brain/src/planner-hook/git.ts
 +++ b/open-brain/src/planner-hook/git.ts
-@@ -94,7 +94,7 @@ export interface GhMergeAnalysis {
+@@ -125,7 +125,7 @@ export interface GhMergeAnalysis {
  }
  
  /** A word is gh when its file name, with directory, quotes and extension removed, is `gh` in any case. */

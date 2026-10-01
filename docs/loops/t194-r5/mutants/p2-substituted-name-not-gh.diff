@@ -1,8 +1,8 @@
 diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
-index b61b27d8..fcb16fae 100644
+index ae60e64e..bc2f31ba 100644
 --- a/open-brain/src/planner-hook/git.ts
 +++ b/open-brain/src/planner-hook/git.ts
-@@ -100,7 +100,7 @@ const isGhWord = (w: { text: string; expands: boolean }): boolean => !w.expands
+@@ -131,7 +131,7 @@ const isGhWord = (w: { text: string; expands: boolean }): boolean => !w.expands
  function mergeAfterGh(words: readonly { text: string; expands: boolean }[]): boolean {
    for (let k = 0; k < words.length; k++) {
      // A word the shell will substitute could be gh; so it counts as gh.

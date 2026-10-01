@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index ae60e64e..b96c9bb3 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -68,7 +68,7 @@ function gitRestrictedIn(parsed: Parsed): boolean {
+       let i = 0;
+       while (i < rest.length && rest[i].text.startsWith("-")) {
+         const o = rest[i].text;
+-        i += GIT_GLOBAL_WITH_VALUE.has(o) ? 2 : 1;
++        i += 1;
+       }
+       if (i >= rest.length) continue;
+       const sub = rest[i];

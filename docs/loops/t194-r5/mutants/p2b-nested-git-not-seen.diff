@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index ae60e64e..8d942e46 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -82,7 +82,7 @@ function gitRestrictedIn(parsed: Parsed): boolean {
+ }
+ 
+ export function isGitRestricted(command: string, flavor: Flavor = "bash"): boolean {
+-  return allParses(command, flavor).some((p) => gitRestrictedIn(p.parsed));
++  return allParses(command, flavor).slice(0, 1).some((p) => gitRestrictedIn(p.parsed));
+ }
+ 
+ export function isGhPrMerge(command: string, flavor: Flavor = "bash"): boolean {

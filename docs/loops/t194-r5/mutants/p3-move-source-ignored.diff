@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
-index 3a6fb7ce..c6c84713 100644
+index 33a1a494..bec17ae1 100644
 --- a/open-brain/src/planner-hook/bash.ts
 +++ b/open-brain/src/planner-hook/bash.ts
 @@ -201,7 +201,7 @@ function psCommandTargets(kind: PsKind, args: readonly Word[], via: string, out:

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/planner-hook/git.ts b/open-brain/src/planner-hook/git.ts
+index ae60e64e..a9ab9de9 100644
+--- a/open-brain/src/planner-hook/git.ts
++++ b/open-brain/src/planner-hook/git.ts
+@@ -32,7 +32,7 @@ function pushNeedsGrant(args: readonly { text: string; expands: boolean }[]): bo
+   const positional: string[] = [];
+   for (let k = 0; k < args.length; k++) {
+     const t = args[k].text;
+-    if (args[k].expands) return true;
++    
+     if (t === "--") {
+       for (const rest of args.slice(k + 1)) {
+         if (rest.expands) return true;

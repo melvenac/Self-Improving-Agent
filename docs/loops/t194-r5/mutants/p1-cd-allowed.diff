@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
-index 3a6fb7ce..5c1aa8d4 100644
+index 33a1a494..208599e0 100644
 --- a/open-brain/src/planner-hook/bash.ts
 +++ b/open-brain/src/planner-hook/bash.ts
 @@ -283,7 +283,7 @@ export function detectBashWriteTargets(
@@ -10,4 +10,4 @@ index 3a6fb7ce..5c1aa8d4 100644
 +  if (false) {
      push(
        `${fileTargets[0].word.text} (the command line changes directory with cd, pushd or Set-Location and also writes, ` +
-         "so where the write lands cannot be determined)",
+         "so where the write lands cannot be determined; split them into two commands)",

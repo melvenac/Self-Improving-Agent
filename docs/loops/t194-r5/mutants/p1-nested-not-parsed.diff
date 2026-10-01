@@ -1,5 +1,5 @@
 diff --git a/open-brain/src/planner-hook/bash.ts b/open-brain/src/planner-hook/bash.ts
-index 3a6fb7ce..09d19d45 100644
+index 33a1a494..d33060c7 100644
 --- a/open-brain/src/planner-hook/bash.ts
 +++ b/open-brain/src/planner-hook/bash.ts
 @@ -243,7 +243,7 @@ const PS_WRITE_WORD_RE =
