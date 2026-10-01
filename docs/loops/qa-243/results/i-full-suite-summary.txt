@@ -1,0 +1,36 @@
+== base-1: files 524 (failed 0); tests 1945: passed 1940, failed 0, skipped/pending 5; success true
+== cand-1: files 557 (failed 0); tests 2082: passed 2077, failed 0, skipped/pending 5; success true
+  s4-g1-records.test.ts: 20/20 passed; 10.8 s; >2s: P4 `harness validate gate-record` exits  4964ms; C6 `harness count-attempts` exits 0 on t 3354ms
+  s4-g2-key.test.ts: 12/12 passed; 1.6 s; >2s: -
+  s4-g3-done.test.ts: 14/14 passed; 9.4 s; >2s: C1 the CLI refuses a bad sha and a missi 3594ms
+  s4-g4-reconstruct.test.ts: 45/45 passed; 13.0 s; >2s: R6 `harness validate plan` exits 0 on al 12859ms
+  s4-g5-qa.test.ts: 22/22 passed; 4.3 s; >2s: -
+  s4-g6-closeout.test.ts: 9/9 passed; 3.4 s; >2s: C1 `harness closeout-tables --check` pas 3076ms
+  s4-g7-merge.test.ts: 2/2 passed; 3.7 s; >2s: V1 with a reject G_done and a reject G_q 3536ms
+  s4-guards.test.ts: 11/11 passed; 0.4 s; >2s: -
+  s4-timeouts.test.ts: 2/2 passed; 0.0 s; >2s: -
+== cand-2: files 557 (failed 0); tests 2082: passed 2077, failed 0, skipped/pending 5; success true
+  s4-g1-records.test.ts: 20/20 passed; 9.9 s; >2s: P4 `harness validate gate-record` exits  4768ms; C6 `harness count-attempts` exits 0 on t 3163ms
+  s4-g2-key.test.ts: 12/12 passed; 1.8 s; >2s: -
+  s4-g3-done.test.ts: 14/14 passed; 9.8 s; >2s: K2 the spawned CLI, with a constructed e 2055ms; C1 the CLI refuses a bad sha and a missi 4062ms
+  s4-g4-reconstruct.test.ts: 45/45 passed; 13.6 s; >2s: R6 `harness validate plan` exits 0 on al 13478ms
+  s4-g5-qa.test.ts: 22/22 passed; 4.7 s; >2s: -
+  s4-g6-closeout.test.ts: 9/9 passed; 3.7 s; >2s: C1 `harness closeout-tables --check` pas 3341ms
+  s4-g7-merge.test.ts: 2/2 passed; 3.7 s; >2s: V1 with a reject G_done and a reject G_q 3463ms
+  s4-guards.test.ts: 11/11 passed; 0.4 s; >2s: -
+  s4-timeouts.test.ts: 2/2 passed; 0.0 s; >2s: -
+/home/agents/qa-tmp/qa243-full-base-1.log:[2m Test Files [22m [1m[32m137 passed[39m[22m[90m (137)[39m
+/home/agents/qa-tmp/qa243-full-base-1.log:[2m      Tests [22m [1m[32m1940 passed[39m[22m[2m | [22m[33m5 skipped[39m[90m (1945)[39m
+/home/agents/qa-tmp/qa243-full-base-1.log:[2m     Errors [22m [1m[31m1 error[39m[22m
+/home/agents/qa-tmp/qa243-full-base-1.log:[2m   Duration [22m 485.48s[2m (transform 7.13s, setup 6.27s, collect 33.13s, tests 807.31s, environment 105ms, prepare 25.99s)[22m
+/home/agents/qa-tmp/qa243-full-cand-1.log:[2m Test Files [22m [1m[32m146 passed[39m[22m[90m (146)[39m
+/home/agents/qa-tmp/qa243-full-cand-1.log:[2m      Tests [22m [1m[32m2077 passed[39m[22m[2m | [22m[33m5 skipped[39m[90m (2082)[39m
+/home/agents/qa-tmp/qa243-full-cand-1.log:[2m     Errors [22m [1m[31m1 error[39m[22m
+/home/agents/qa-tmp/qa243-full-cand-1.log:[2m   Duration [22m 473.45s[2m (transform 6.80s, setup 6.60s, collect 32.51s, tests 780.26s, environment 110ms, prepare 26.83s)[22m
+/home/agents/qa-tmp/qa243-full-cand-2.log:[2m Test Files [22m [1m[32m146 passed[39m[22m[90m (146)[39m
+/home/agents/qa-tmp/qa243-full-cand-2.log:[2m      Tests [22m [1m[32m2077 passed[39m[22m[2m | [22m[33m5 skipped[39m[90m (2082)[39m
+/home/agents/qa-tmp/qa243-full-cand-2.log:[2m     Errors [22m [1m[31m1 error[39m[22m
+/home/agents/qa-tmp/qa243-full-cand-2.log:[2m   Duration [22m 492.82s[2m (transform 7.10s, setup 6.32s, collect 33.30s, tests 814.86s, environment 100ms, prepare 26.77s)[22m
+exit codes (qa243-run): base-1 1 (487.3 s); cand-1 1 (475.4 s); cand-2 1 (495.0 s)
+build: cand npm ci 0 (8.3 s), build 0 (14.6 s), tsc 0 (12.1 s); base npm ci 0 (9.2 s), build 0 (14.1 s), tsc 0 (10.4 s)
+load average at start: base 3.38; cand-1 3.19; cand-2 3.63

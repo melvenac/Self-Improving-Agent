@@ -1,0 +1,168 @@
+[
+  {
+    "name": "q01-done-unredacted-debug-dump.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 132,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D5 the flip test: proceed and reject give the same exit code (0), the same files, and only a new record",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q02-two-layer-transport-and-done-record.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 131,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K3 at the transport itself, a 422 that echoes the Authorization header leaves the canary out of the answer's error, message, detail and fields",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner K1 a hostile fake that echoes the Authorization header as a 422 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q03-two-layer-transport-and-qa-record.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 131,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K3 at the transport itself, a 422 that echoes the Authorization header leaves the canary out of the answer's error, message, detail and fields",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner K1 a hostile fake that echoes the Authorization header as a 422 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q04-two-layer-transport-and-plan-record.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 131,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output",
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K1 a hostile fake that echoes the Authorization header as a 422 leaves the canary in no output",
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K3 at the transport itself, a 422 that echoes the Authorization header leaves the canary out of the answer's error, message, detail and fields"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q05-qa-source-inferred-from-loop-id.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R9 a runtime-shaped loop id does not make the record a runtime record: source stays seat (S4-4a.5, r2 item 3)"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q06-done-source-inferred-from-loop-id.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D9 a runtime-shaped loop id does not make the record a runtime record: source stays seat (S4-4a.5, r2 item 3)"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q07-fail-severity-defaulted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R3 a requirement Jev did not answer is untested and named under missing; a fail with no severity is named, never defaulted"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q08-unanswered-row-not-named-missing.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R3 a requirement Jev did not answer is untested and named under missing; a fail with no severity is named, never defaulted"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q09-qa-returns-exit-1-on-reject.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R7 the flip test: proceed and reject give exit code 0 both times, only new files appear, no tracked file moves, the E_t blob is unchanged"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q10-retry-of-any-subject.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C7 a retry_of that names ANOTHER subject's record is refused (r2 item 4)"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q11-auth-made-retryable.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C8 a retry after auth is refused: it is not retryable, the item stops (r2 item 4)"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q12-fetch-failure-filed-unavailable.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 132,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D8 a fetch that rejects is `transport`, counts as 1 attempt, and is not `unavailable` (r2 item 6)",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R10 a fetch that rejects is `transport`, counts as 1 attempt, and is not `unavailable` (r2 item 6)"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q13-literal-planted-in-shadow-qa-runner.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 131,
+    "failed": [
+      "policies.test.ts :: gate policies A6 half two — the scan covers the prompts and the gate context finds no threshold literal in any scanned region of the shipped source",
+      "s4-g5-qa.test.ts :: S4-6a — qa-score.json, its schema, and the threshold-scan guard Q5 the threshold scan covers the QA prompts and the decision code, and finds nothing",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner Q8 a literal planted in the QA runner or the done runner is reported by the scan, and both files are scan targets (r2 item 5)"
+    ],
+    "reverted_clean": true
+  }
+]

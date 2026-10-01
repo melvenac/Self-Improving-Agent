@@ -1,0 +1,49 @@
+control (no mutant) | tsc 0 | 0/134 failed | green | 
+m01-source-optional | tsc 0 | 4/134 failed | red | s4-g1-records:P2, s4-g1-records:P4, s4-g1-records:P6, s4-g6-closeout:T5
+m02-provenance-defaulted | tsc 0 | 3/134 failed | red | s4-g1-records:P2, s4-g1-records:P4, s4-g1-records:P6
+m03-no-write-ahead | tsc 0 | 17/134 failed | red | s4-g1-records:W1, s4-g1-records:C1, s4-g1-records:C2, s4-g1-records:C3, s4-g1-records:C4, s4-g1-records:C5, s4-g1-records:C7, s4-g1-records:C8, s4-g1-records:C8, s4-g1-records:C8, s4-g1-records:C8, s4-g1-records:C9, s4-g1-records:C6, s4-g3-done:D6, s4-g3-done:D8, s4-g3-done:D7, s4-g5-qa:R10
+m04-reroll-not-flagged | tsc 0 | 2/134 failed | red | s4-g1-records:C2, s4-g3-done:D6
+m05-plan-record-not-redacted | tsc 0 | 1/134 failed | red | s4-g2-key:K1
+m06-transport-redact-dropped | tsc 0 | 1/134 failed | red | s4-g2-key:K3
+m07-version-compared-as-string | tsc 0 | 2/134 failed | red | s4-g2-key:A3, s4-g6-closeout:T7
+m08-done-gate-exit-on-reject | tsc 0 | 1/134 failed | red | s4-g3-done:D5
+m09-diffstat-from-merge | tsc 0 | 1/134 failed | red | s4-g3-done:D2
+m10-checks-assumed-green | tsc 0 | 1/134 failed | red | s4-g3-done:D3
+m11-qa-takes-jevs-choice-for-missing-evidence | tsc 0 | 3/134 failed | red | s4-g5-qa:R1, s4-g5-qa:R2, s4-g5-qa:R4
+m12-qa-gate-exit-on-reject | tsc 0 | 1/134 failed | red | s4-g5-qa:R7
+m13-qa-result-written-into-et-row | tsc 0 | 3/134 failed | red | s4-g5-qa:R3, s4-g5-qa:R5, s4-g5-qa:R7
+m14-literal-planted-in-qa-decision | tsc 0 | 4/134 failed | red | policies:A6, policies:gate policies T-156 — no threshold hides in the de, s4-g5-qa:Q5, s4-g5-qa:Q7
+m15-literal-planted-in-qa-prompt | tsc 0 | 3/134 failed | red | policies:A6, s4-g5-qa:Q5, s4-g5-qa:Q6
+m16-label-typed-not-computed | tsc 0 | 1/134 failed | red | s4-g6-closeout:T1
+m17-no-e_t-diff-reported-scored | tsc 0 | 1/134 failed | red | s4-g6-closeout:T4
+m18-done-record-not-redacted | tsc 0 | 1/134 failed | red | s4-g3-done:K1
+m19-qa-record-not-redacted | tsc 0 | 1/134 failed | red | s4-g5-qa:K1
+q01-done-unredacted-debug-dump | tsc 0 | 2/134 failed | red | s4-g3-done:D5, s4-g3-done:K1
+q02-two-layer-transport-and-done-record | tsc 0 | 3/134 failed | red | s4-g2-key:K3, s4-g3-done:K1, s4-g3-done:K1
+q03-two-layer-transport-and-qa-record | tsc 0 | 3/134 failed | red | s4-g2-key:K3, s4-g5-qa:K1, s4-g5-qa:K1
+q04-two-layer-transport-and-plan-record | tsc 0 | 3/134 failed | red | s4-g2-key:K1, s4-g2-key:K1, s4-g2-key:K3
+q05-qa-source-inferred-from-loop-id | tsc 0 | 1/134 failed | red | s4-g5-qa:R9
+q06-done-source-inferred-from-loop-id | tsc 0 | 1/134 failed | red | s4-g3-done:D9
+q07-fail-severity-defaulted | tsc 0 | 1/134 failed | red | s4-g5-qa:R3
+q08-unanswered-row-not-named-missing | tsc 0 | 1/134 failed | red | s4-g5-qa:R3
+q09-qa-returns-exit-1-on-reject | tsc 0 | 1/134 failed | red | s4-g5-qa:R7
+q10-retry-of-any-subject | tsc 0 | 1/134 failed | red | s4-g1-records:C7
+q11-auth-made-retryable | tsc 0 | 1/134 failed | red | s4-g1-records:C8
+q12-fetch-failure-filed-unavailable | tsc 0 | 2/134 failed | red | s4-g3-done:D8, s4-g5-qa:R10
+q13-literal-planted-in-shadow-qa-runner | tsc 0 | 3/134 failed | red | policies:A6, s4-g5-qa:Q5, s4-g5-qa:Q8
+r01-done-gate-wired-in-cli-call | tsc 0 | 1/134 failed | red | s4-guards:slice four guards S4-6d.3 neither shadow runner im
+r04-request-invalid-made-retryable | tsc 0 | 2/134 failed | red | s4-g1-records:C3, s4-g1-records:C8
+r05-unexpected-status-made-retryable | tsc 0 | 1/134 failed | red | s4-g1-records:C8
+r06-malformed-response-made-retryable | tsc 0 | 1/134 failed | red | s4-g1-records:C8
+r07-literal-planted-in-shadow-gates-runner | tsc 0 | 3/134 failed | red | policies:A6, s4-g5-qa:Q5, s4-g5-qa:Q8
+control (no mutant) | tsc 0 | 0/73 failed | green | 
+r01-done-gate-wired-in-cli-call | tsc 0 | 1/73 failed | red | s4-guards:slice four guards S4-6d.3 neither shadow runner im
+r02-done-gate-wired-by-spread | tsc 0 | 1/73 failed | red | s4-guards:slice four guards S4-6d.3 neither shadow runner im
+r03-done-gate-wired-inside-prepare | tsc 0 | 1/73 failed | red | s4-g7-merge:V1
+s01-done-gate-read-from-loop-named-records-dir | tsc 0 | 0/73 failed | SURVIVES | 
+s02-done-gate-glob-over-docs-loops | tsc 0 | 1/73 failed | red | s4-g7-merge:V1
+s03-done-gate-runner-named-records-only | tsc 0 | 1/73 failed | red | s4-g7-merge:V1
+s04-done-gate-read-from-committed-records | tsc 0 | 0/73 failed | SURVIVES | 
+control (no mutant) | tsc 0 | 0/2 failed | green | 
+s01-done-gate-read-from-loop-named-records-dir | tsc 0 | 1/2 failed | red | qa243-probe-g7:V1
+s04-done-gate-read-from-committed-records | tsc 0 | 1/2 failed | red | qa243-probe-g7:V1

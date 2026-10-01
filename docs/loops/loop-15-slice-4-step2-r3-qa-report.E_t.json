@@ -1,0 +1,66 @@
+{
+  "loop": "243-qa-s4-step2-r3",
+  "candidate_git": {
+    "sha": "36a0fc282e328d8bb32ffb4ccd6e875c95d3dd8d",
+    "branch": "origin/loop/15-slice-4-step2",
+    "frozen_at": "2026-10-01T00:00:00Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci && npm run build && tsc --noEmit in open-brain at 36a0fc28 and at base 2448a6ea (Plumb, local, constructed env)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 35000,
+      "detail": "Candidate: npm ci 0 (8.3 s), npm run build 0 (14.6 s), tsc --noEmit 0 (12.1 s). Base: 0 (9.2 s), 0 (14.1 s), 0 (10.4 s). No CI: gh is not installed on Plumb."
+    },
+    "unit": {
+      "command": "node node_modules/vitest/vitest.mjs run in open-brain (full suite): base 2448a6ea once, candidate 36a0fc28 twice",
+      "exit_code": 1,
+      "passed": true,
+      "duration_ms": 495000,
+      "detail": "Exit 1 in all three runs, from one unattributed unhandled error '[vitest-worker]: Timeout calling \"onTaskUpdate\"' which also occurs at the base (environmental under D-083). Base: Test Files 137 passed (137); Tests 1940 passed | 5 skipped (1945); 0 failed. Candidate run 1 and run 2: Test Files 146 passed (146); Tests 2077 passed | 5 skipped (2082); 0 failed. No failed test at the candidate. s4-g1 P4 passed in 4964 ms and 4768 ms under the describe-level 120 s timeout."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "R3-1",
+      "status": "met",
+      "order": "shown",
+      "evidence": "All 17 top-level describes in the nine s4-*.test.ts files carry { timeout: 120_000 }. Committed plant in s4-g6-closeout.test.ts (scratch f0eaaa14): T1 red. Residual misses (T1 green): spawn via imported helper (f1429142), inner it lowering the timeout to 1 (8985ca37), describe.concurrent (7345bace), aliased spawnSync import (c7d60cfa), top-level it (f6416bb8). Timeout only on inner it: T1 red (stricter than required). Multi-line describe( with a timeout: false positive (01ae5947)."
+    },
+    {
+      "id": "R3-2",
+      "status": "unmet",
+      "order": "shown",
+      "evidence": "QA 242 r02 red on s4-guards S4-6d.3 (spread refused); r03 red on s4-g7 V1; r01 red. QA 243 limit mutants: s02 (glob over docs/loops/**/*G_done*) red; s03 (runner-named files in the runner's default dir, working tree) red; s01 (loop-named records dir) survives 73/73: a gap; s04 (the runner's own records path read from the committed tree at HEAD) survives 73/73. Both survivors are live (an untracked probe that also plants at s01's path and commits the records turns each red; green unmutated). s04 is a path a runner writes to and the records dir is tracked, so by the dispatch's rule it blocks. Fix: commit V1's planted records before the second prepare (fix-v1-commit-the-records.diff: s04 red, r03 red, control green)."
+    },
+    {
+      "id": "R3-3",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Handoff limit 1 now lists #187: schema.ts, declared.ts, cli.ts and runtime.ts. Only that line changed in the existing text; four/four split unchanged."
+    },
+    {
+      "id": "S4-9.3",
+      "status": "met",
+      "order": "shown",
+      "evidence": "D-083 reading on Plumb: 0 failed tests at the candidate in 2 of 2 full runs (2077 passed) against 0 at the base (1940 passed); the only error in all three runs is the environmental unattributed vitest RPC timeout. The tcm CI half not exercised: gh not installed, 0 runs."
+    },
+    {
+      "id": "REGRESSION",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Sequential on SET (s4-g1, g2, g3, g5, g6, g7, s4-guards, s4-timeouts, policies, t195-plan-gate; 134 tests, control 134/134): builder m01-m19 19/19 red; QA 240 q01-q13 13/13 red; QA 242 r01, r04-r07 5/5 red. tsc 0 and a clean revert for every mutant. git diff 779be4d6 36a0fc28 -- open-brain/src is empty."
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "R3-2: s04 (G_done read from the committed slice records directory) survives V1; V1 never commits its planted records.",
+    "R3-2: s01 (records directory under a loop-specific name) survives V1; not a runner default path.",
+    "R3-1 guard misses: imported spawn helper, describe.concurrent, aliased spawnSync, top-level it, inner it lowering the timeout; false positive on a multi-line describe(.",
+    "Base on Plumb still exits 1 on the unattributed vitest RPC 'onTaskUpdate' timeout (ruled environmental, D-083).",
+    "No CI runs: gh is not installed on Plumb."
+  ],
+  "notes": "QA 243 (re-run after the first attempt died at the usage limit), headless Claude Code Opus 5.5 on Plumb. Dispatch d54a5e2d (launch line). Worktree qa243-wt at d54a5e2de52e8baf6e24229156ac2080cec2d718. Every command ran with a constructed env (no TYPESAFE_API_KEY); no live Jev call."
+}

@@ -1,0 +1,36 @@
+[
+  {
+    "name": "control (no mutant)",
+    "files": "tests/harness/qa243-probe-g7.test.ts",
+    "tsc_exit": 0,
+    "exit": 0,
+    "total": 2,
+    "passed": 2,
+    "failed": [],
+    "reverted_clean": true
+  },
+  {
+    "name": "s01-done-gate-read-from-loop-named-records-dir.diff",
+    "files": "tests/harness/qa243-probe-g7.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 2,
+    "passed": 1,
+    "failed": [
+      "qa243-probe-g7.test.ts :: QA 243 PROBE S4-6d.3 — the shadow merge verdict ignores the slice's G_done and G_qa V1 with a reject G_done and a reject G_qa on disk, prepare gives the same verdict, reasons and artifact bytes as without them"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "s04-done-gate-read-from-committed-records.diff",
+    "files": "tests/harness/qa243-probe-g7.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 2,
+    "passed": 1,
+    "failed": [
+      "qa243-probe-g7.test.ts :: QA 243 PROBE S4-6d.3 — the shadow merge verdict ignores the slice's G_done and G_qa V1 with a reject G_done and a reject G_qa on disk, prepare gives the same verdict, reasons and artifact bytes as without them"
+    ],
+    "reverted_clean": true
+  }
+]

@@ -1,0 +1,101 @@
+[
+  {
+    "name": "m05-plan-record-not-redacted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m06-transport-redact-dropped.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K3 at the transport itself, a 422 that echoes the Authorization header leaves the canary out of the answer's error, message, detail and fields"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m07-version-compared-as-string.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 132,
+    "failed": [
+      "s4-g2-key.test.ts :: G2 — the key A3 the version comparator: numeric, field by field, and an unreported version fails",
+      "s4-g6-closeout.test.ts :: G6 — the close-out tables T7 a different model_resolved across records is said out loud, and one below the minimum is named"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m08-done-gate-exit-on-reject.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D5 the flip test: proceed and reject give the same exit code (0), the same files, and only a new record"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m09-diffstat-from-merge.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D2 the diffstat is recomputed from base_sha..scored_sha, not read from the merge"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m10-checks-assumed-green.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D3 checks_source none means checksPassed false, and the exit codes come from a recorded source, never from Jev"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m11-qa-takes-jevs-choice-for-missing-evidence.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 131,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R1 question kinds are asserted on the PAYLOAD: a three-option choice and a >=2-level score per asked row, two noul",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R2 missing evidence is untested by code, whatever Jev answers for a row that was not asked",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R4 an evidence-less row gets no question at all; with no askable row only the two noul questions go"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m12-qa-gate-exit-on-reject.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/s4-g7-merge.test.ts,tests/harness/s4-guards.test.ts,tests/harness/s4-timeouts.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "tsc_exit": 0,
+    "exit": 1,
+    "total": 134,
+    "passed": 133,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R7 the flip test: proceed and reject give exit code 0 both times, only new files appear, no tracked file moves, the E_t blob is unchanged"
+    ],
+    "reverted_clean": true
+  }
+]

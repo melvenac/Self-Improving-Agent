@@ -1,0 +1,32 @@
+diff --git a/open-brain/src/harness/shadow-merge.ts b/open-brain/src/harness/shadow-merge.ts
+index 28707223..07e641fa 100644
+--- a/open-brain/src/harness/shadow-merge.ts
++++ b/open-brain/src/harness/shadow-merge.ts
+@@ -188,6 +188,18 @@ export function ledgerPath(repo: string): string {
+   return join(repo, "docs", "loops", "shadow-merge", "ledger.jsonl");
+ }
+ 
++const verdictOf = (rec: { verdict?: string; decision?: { verdict?: string } | null }): string | undefined => rec.verdict ?? rec.decision?.verdict ?? undefined;
++function sliceDoneRecord(repo: string, _loop: string): { verdict: string } | null {
++  // only the 4.3 runner's own file names (<stem>.G_done.<timestamp>.json) in its default directory, read from the working tree
++  const dir = join(repo, "docs", "loops", "loop-15-slice-4-records");
++  const files = existsSync(dir) ? readdirSync(dir).filter((f) => /^pr-\d+\.G_done\.\d{4}-.*\.json$/.test(f)) : [];
++  for (const f of files) {
++    const v = verdictOf(JSON.parse(readFileSync(join(dir, f), "utf8")));
++    if (v === "reject" || v === "halt") return { verdict: v };
++  }
++  return null;
++}
++
+ export function prepareShadowVerdict(input: {
+   repo: string;
+   loop: string;
+@@ -218,7 +230,7 @@ export function prepareShadowVerdict(input: {
+     loop: input.loop,
+     criteriaText,
+     policy: input.policy ?? loadMergePolicy(),
+-    doneGate: input.doneGate ?? null,
++    doneGate: input.doneGate ?? sliceDoneRecord(input.repo, input.loop),
+     planGate: input.planGate ?? null,
+     gateMode: input.gateMode,
+   });

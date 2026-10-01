@@ -1,0 +1,188 @@
+{
+  "candidate": "36a0fc282e328d8bb32ffb4ccd6e875c95d3dd8d",
+  "back_at": "36a0fc282e328d8bb32ffb4ccd6e875c95d3dd8d",
+  "clean": true,
+  "results": [
+    {
+      "step": "A: top-level describe with no timeout, direct spawnSync, appended to the committed s4-g6-closeout.test.ts",
+      "files": [
+        "open-brain/tests/harness/s4-g6-closeout.test.ts"
+      ],
+      "scratch_commit": "f0eaaa145680b4cb5bbbe81bc22be7b05d3b2160",
+      "vitest_exit": 1,
+      "T1": {
+        "status": "failed",
+        "message": "AssertionError: s4-g6-closeout.test.ts spawns and has a describe with no explicit timeout: expected [ Array(1) ] to deeply equal [] |     at /home/agents/qa-scratch/qa243-cand/open-brain/tests/harness/s4-timeouts.test.ts:54:104 |     at file:///home/agents/qa-scratch/qa243-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11"
+      },
+      "tests": {
+        "T0 the guard fires on a planted spawn with no timeout, and stays quiet with one or without a spawn": {
+          "status": "passed",
+          "message": ""
+        },
+        "T1 every spawning s4 test file puts an explicit timeout on each top-level describe": {
+          "status": "failed",
+          "message": "AssertionError: s4-g6-closeout.test.ts spawns and has a describe with no explicit timeout: expected [ Array(1) ] to deeply equal [] |     at /home/agents/qa-scratch/qa243-cand/open-brain/tests/harness/s4-timeouts.test.ts:54:104 |     at file:///home/agents/qa-scratch/qa243-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11"
+        }
+      }
+    },
+    {
+      "step": "B: spawn through an imported helper (new committed helper + s4 file), describe with no timeout",
+      "files": [
+        "open-brain/tests/harness/qa243-helper.ts",
+        "open-brain/tests/harness/s4-qa243-b.test.ts"
+      ],
+      "scratch_commit": "f14291428f3f0a450d3e88afbb492d3844071ca5",
+      "vitest_exit": 0,
+      "T1": {
+        "status": "passed",
+        "message": ""
+      },
+      "tests": {
+        "b": {
+          "status": "passed",
+          "message": ""
+        },
+        "T0 the guard fires on a planted spawn with no timeout, and stays quiet with one or without a spawn": {
+          "status": "passed",
+          "message": ""
+        },
+        "T1 every spawning s4 test file puts an explicit timeout on each top-level describe": {
+          "status": "passed",
+          "message": ""
+        }
+      }
+    },
+    {
+      "step": "C: timeout given only on the inner it (120_000), describe with none",
+      "files": [
+        "open-brain/tests/harness/s4-qa243-c.test.ts"
+      ],
+      "scratch_commit": "b66361f873f8b0247862e0e12598b09c841de95b",
+      "vitest_exit": 1,
+      "T1": {
+        "status": "failed",
+        "message": "AssertionError: s4-qa243-c.test.ts spawns and has a describe with no explicit timeout: expected [ Array(1) ] to deeply equal [] |     at /home/agents/qa-scratch/qa243-cand/open-brain/tests/harness/s4-timeouts.test.ts:54:104 |     at file:///home/agents/qa-scratch/qa243-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11"
+      },
+      "tests": {
+        "T0 the guard fires on a planted spawn with no timeout, and stays quiet with one or without a spawn": {
+          "status": "passed",
+          "message": ""
+        },
+        "T1 every spawning s4 test file puts an explicit timeout on each top-level describe": {
+          "status": "failed",
+          "message": "AssertionError: s4-qa243-c.test.ts spawns and has a describe with no explicit timeout: expected [ Array(1) ] to deeply equal [] |     at /home/agents/qa-scratch/qa243-cand/open-brain/tests/harness/s4-timeouts.test.ts:54:104 |     at file:///home/agents/qa-scratch/qa243-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11"
+        }
+      }
+    },
+    {
+      "step": "C2: describe carries 120_000 but the spawning inner it overrides it down to 1 ms",
+      "files": [
+        "open-brain/tests/harness/s4-qa243-c2.test.ts"
+      ],
+      "scratch_commit": "8985ca37a68c721d86b35ab237c8fcbd2110cdf0",
+      "vitest_exit": 0,
+      "T1": {
+        "status": "passed",
+        "message": ""
+      },
+      "tests": {
+        "T0 the guard fires on a planted spawn with no timeout, and stays quiet with one or without a spawn": {
+          "status": "passed",
+          "message": ""
+        },
+        "T1 every spawning s4 test file puts an explicit timeout on each top-level describe": {
+          "status": "passed",
+          "message": ""
+        }
+      }
+    },
+    {
+      "step": "D: top-level describe.concurrent with no timeout, direct spawnSync",
+      "files": [
+        "open-brain/tests/harness/s4-qa243-d.test.ts"
+      ],
+      "scratch_commit": "7345bace2077f4ce7f82f76dc7ae472e6c4771c5",
+      "vitest_exit": 0,
+      "T1": {
+        "status": "passed",
+        "message": ""
+      },
+      "tests": {
+        "T0 the guard fires on a planted spawn with no timeout, and stays quiet with one or without a spawn": {
+          "status": "passed",
+          "message": ""
+        },
+        "T1 every spawning s4 test file puts an explicit timeout on each top-level describe": {
+          "status": "passed",
+          "message": ""
+        }
+      }
+    },
+    {
+      "step": "E: aliased import (spawnSync as run), describe with no timeout",
+      "files": [
+        "open-brain/tests/harness/s4-qa243-e.test.ts"
+      ],
+      "scratch_commit": "c7d60cfa856d2a45257f6763e3b20e7bd3572ab2",
+      "vitest_exit": 0,
+      "T1": {
+        "status": "passed",
+        "message": ""
+      },
+      "tests": {
+        "T0 the guard fires on a planted spawn with no timeout, and stays quiet with one or without a spawn": {
+          "status": "passed",
+          "message": ""
+        },
+        "T1 every spawning s4 test file puts an explicit timeout on each top-level describe": {
+          "status": "passed",
+          "message": ""
+        }
+      }
+    },
+    {
+      "step": "F: a top-level it with no describe at all, direct spawnSync",
+      "files": [
+        "open-brain/tests/harness/s4-qa243-f.test.ts"
+      ],
+      "scratch_commit": "f6416bb86de00b2a3815b1a1d93ee02b3580707e",
+      "vitest_exit": 0,
+      "T1": {
+        "status": "passed",
+        "message": ""
+      },
+      "tests": {
+        "T0 the guard fires on a planted spawn with no timeout, and stays quiet with one or without a spawn": {
+          "status": "passed",
+          "message": ""
+        },
+        "T1 every spawning s4 test file puts an explicit timeout on each top-level describe": {
+          "status": "passed",
+          "message": ""
+        }
+      }
+    },
+    {
+      "step": "G: multi-line describe( whose options are on the next line (false-positive probe)",
+      "files": [
+        "open-brain/tests/harness/s4-qa243-g.test.ts"
+      ],
+      "scratch_commit": "01ae5947498cba8ff09c12b8b272c367063a32ee",
+      "vitest_exit": 1,
+      "T1": {
+        "status": "failed",
+        "message": "AssertionError: s4-qa243-g.test.ts spawns and has a describe with no explicit timeout: expected [ 'describe(' ] to deeply equal [] |     at /home/agents/qa-scratch/qa243-cand/open-brain/tests/harness/s4-timeouts.test.ts:54:104 |     at file:///home/agents/qa-scratch/qa243-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11"
+      },
+      "tests": {
+        "T0 the guard fires on a planted spawn with no timeout, and stays quiet with one or without a spawn": {
+          "status": "passed",
+          "message": ""
+        },
+        "T1 every spawning s4 test file puts an explicit timeout on each top-level describe": {
+          "status": "failed",
+          "message": "AssertionError: s4-qa243-g.test.ts spawns and has a describe with no explicit timeout: expected [ 'describe(' ] to deeply equal [] |     at /home/agents/qa-scratch/qa243-cand/open-brain/tests/harness/s4-timeouts.test.ts:54:104 |     at file:///home/agents/qa-scratch/qa243-cand/open-brain/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+diff --git a/open-brain/src/harness/shadow-merge.ts b/open-brain/src/harness/shadow-merge.ts
+index 28707223..323e62a5 100644
+--- a/open-brain/src/harness/shadow-merge.ts
++++ b/open-brain/src/harness/shadow-merge.ts
+@@ -188,6 +188,21 @@ export function ledgerPath(repo: string): string {
+   return join(repo, "docs", "loops", "shadow-merge", "ledger.jsonl");
+ }
+ 
++const verdictOf = (rec: { verdict?: string; decision?: { verdict?: string } | null }): string | undefined => rec.verdict ?? rec.decision?.verdict ?? undefined;
++function sliceDoneRecord(repo: string, _loop: string): { verdict: string } | null {
++  // the runner's own directory, read from the COMMITTED tree (HEAD), as the criteria are read from git
++  const dir = "docs/loops/loop-15-slice-4-records";
++  const ls = gitTry(repo, ["ls-tree", "--name-only", "HEAD", `${dir}/`]);
++  if (!ls.ok) return null;
++  for (const p of ls.stdout.split("\n").filter((l) => /\.G_done\./.test(l))) {
++    const shown = gitTry(repo, ["show", `HEAD:${p}`]);
++    if (!shown.ok) continue;
++    const v = verdictOf(JSON.parse(shown.stdout));
++    if (v === "reject" || v === "halt") return { verdict: v };
++  }
++  return null;
++}
++
+ export function prepareShadowVerdict(input: {
+   repo: string;
+   loop: string;
+@@ -218,7 +233,7 @@ export function prepareShadowVerdict(input: {
+     loop: input.loop,
+     criteriaText,
+     policy: input.policy ?? loadMergePolicy(),
+-    doneGate: input.doneGate ?? null,
++    doneGate: input.doneGate ?? sliceDoneRecord(input.repo, input.loop),
+     planGate: input.planGate ?? null,
+     gateMode: input.gateMode,
+   });
