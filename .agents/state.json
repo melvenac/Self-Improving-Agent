@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 233,
+  "revision": 236,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1105,7 +1105,7 @@
       "opened_session": 153,
       "closed_session": null,
       "supersedes": null,
-      "note": "Found by the planner in session 153 at C's first live shadow-verdict prepare (T-155, CC-23 episode 1). loop-15-slice-3-c-criteria.md's ```qa-declared block has a blank line (line 340) between [unrunnable] and [out-of-scope]. parseDeclared refuses it with 'line is not `ID: text`: (blank)', so the verdict was undefined for a formatting reason. No fixture in B's or C's tests has a blank line in the block, so nothing caught it. Decide which rule holds: (a) the parser tolerates blank lines between sections (a natural markdown reading), or (b) the format forbids them and /sync or the criteria-authoring step rejects a criteria file whose block does not parse, BEFORE any candidate exists. Either way, add a fixture row with a blank line. Do not rewrite loop-15-slice-3-c-criteria.md after the fact: its prepared artifact is immutable. — Session 155: dispatched to sia-builder as slice four step 1 (docs/loops/loop-15-slice-4-dispatch.md), rule (a) per D-075. Branch loop/t214-declared-blank. — Session 155: BUILT by sia-builder (Aaron approved runs in its window): loop/t214-declared-blank caebe8b6 (from ec7138bb); BLANK_RE /^[ \\t\\r]*$/ skip in parseItems; 240+30 CRLF blank variants, 60 junk; 5 mutants red; vitest tests/harness exit 0 (490 passed). Pushed SHA read back by the planner (ls-remote). QA 239 dispatch: docs/loops/qa-239-t214-dispatch.md (own generator, NBSP/\\f/\\v judgement, base refusal text captured, >=2 own mutants). Target: Plumb after QA 238.",
+      "note": "Found by the planner in session 153 at C's first live shadow-verdict prepare (T-155, CC-23 episode 1). loop-15-slice-3-c-criteria.md's ```qa-declared block has a blank line (line 340) between [unrunnable] and [out-of-scope]. parseDeclared refuses it with 'line is not `ID: text`: (blank)', so the verdict was undefined for a formatting reason. No fixture in B's or C's tests has a blank line in the block, so nothing caught it. Decide which rule holds: (a) the parser tolerates blank lines between sections (a natural markdown reading), or (b) the format forbids them and /sync or the criteria-authoring step rejects a criteria file whose block does not parse, BEFORE any candidate exists. Either way, add a fixture row with a blank line. Do not rewrite loop-15-slice-3-c-criteria.md after the fact: its prepared artifact is immutable. — Session 155: dispatched to sia-builder as slice four step 1 (docs/loops/loop-15-slice-4-dispatch.md), rule (a) per D-075. Branch loop/t214-declared-blank. — Session 155: BUILT by sia-builder (Aaron approved runs in its window): loop/t214-declared-blank caebe8b6 (from ec7138bb); BLANK_RE /^[ \\t\\r]*$/ skip in parseItems; 240+30 CRLF blank variants, 60 junk; 5 mutants red; vitest tests/harness exit 0 (490 passed). Pushed SHA read back by the planner (ls-remote). QA 239 dispatch: docs/loops/qa-239-t214-dispatch.md (own generator, NBSP/\\f/\\v judgement, base refusal text captured, >=2 own mutants). Target: Plumb after QA 238. — Session 155: QA 239 (Plumb, second attempt after a launcher --add-dir fault) RULED ACCEPT by the planner after reading the report (origin/qa/t214-report d4993796) against docs/loops/qa-239-t214-dispatch.md. P-blank: 6,196 independent variants, 0 disagreements (3,920 at base); T214-2..4 met; NBSP/\\f/\\v/ZWSP refused = matches D-075 (QA's reasoning adopted: P-blank names its members, the rest stays strict); 10/10 mutants red; regression 1 environmental failure identical at base (checks.test.ts D4 on Plumb). 0 tcm runs (no gh on Plumb): PR #250's CI is the candidate's first CI. PR #250 opened; code, Aaron merges. G1 to T-218.",
       "note_by": [
         "6e083614-965f-462b-ad59-62091a0be5e1",
         "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
@@ -1150,6 +1150,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "QA 236 D1 (report a1960173). Mutant M7 gives PlanSchema.loop its own copy of LOOP_ID_PATTERN with the /i flag: 68/68 target tests and the full tests/harness run stay green, because zod's JSON emission keeps the regex source and drops flags, so plan.schema.json does not move and the drift test, L3 and BE-0.1 cannot see it. Under M7 validatePlan accepts T001 and 15-Slice while evidence refuses them. Cheap kills: assert PlanSchema.shape.loop's regex IS LOOP_ID_PATTERN by identity (also kills the equivalent M6), and/or add T001 and 15-Slice-4 to L2's refusals. ALSO record, not fix (QA 236 open item 2): runtime.ts:1278 validates a runtime planner's D_t but never checks plan.loop against the run's --loop (E_t does, at :1535). Predates T-216; the accepted set is now wider. plan.loop builds no path, so not a safety issue; recorded so nobody inherits it as settled.",
+      "note_by": [
+        "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-218",
+      "title": "T-214's test lacks a leading-whitespace row: QA 239 mutant q5 (strip leading spaces/tabs before matching) survives the builder's test",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 155,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "QA 239 G1 (report d4993796). The candidate code refuses ' [unrunnable]' and '  A-1: x', and QA's generator (docs/loops/qa-239/t214-gen.mts, G4 differential) kills q5, but t214-declared-blank.test.ts's JUNK list and J2 have no leading-whitespace row although T214-2 names it. Fix: add leading-whitespace rows to J1/J2, or commit QA's G4 differential as a test. Same shape as T-217 (a guard the property needs but the tests don't hold).",
       "note_by": [
         "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
       ],
@@ -3555,6 +3569,12 @@
       "title": "Slice-four criteria (QA 238, dd7b1c39) ADOPTED with seven rulings: live rows scored at close-out; 4.4 N=5 (no E_t for A, B1, B2; budget <=14+3); records in docs/loops/loop-15-slice-4-records/; F11 already answered by LOOP_LIMITS at 3b192871 so step 3 is removed and S4-8 is a guard; t195 helper env fix in step 2; a 4.2 reject does not pause step 4",
       "date": "2026-10-01",
       "note": "Planner session 155. Full text: docs/loops/loop-15-slice-4-criteria-rulings.md. Reconstruction map (S4-4b.1): docs/loops/loop-15-slice-4-reconstruction-map.md — none of the 8 diffs was built in the sia-builder checkout, so sia-builder reconstructs all eight. Step-2 dispatch: docs/loops/loop-15-slice-4-step2-dispatch.md (groups G1-G6)."
+    },
+    {
+      "id": "D-077",
+      "title": "Usage limit: across ALL machines at most ONE developer job and ONE QA job at a time; close idle seats; planner status to clark every 60 min (:04); no new launches or dispatches until the 5-hour window resets at 10:50Z on 2026-10-01",
+      "date": "2026-10-01",
+      "note": "Aaron via Clark (TOLD, relayed), planner session 155, ~09:40Z: the 5-hour window was at 97% (reset 10:50Z) and at that pace the WEEKLY limit runs out Saturday, before Wednesday's reset. QA 237 (laptop, pid 17748) keeps running; if it dies at the limit, re-run it after the reset. The standing part (one dev + one QA job across all machines, idle seats closed, 60-min status) holds until Aaron re-rules. NOTE for whoever applies it: Chisel (agent-dashboard developer, on the QA PC) and sia-builder (SIA slice four step 2) are both developer jobs; which one runs is Aaron's call."
     }
   ],
   "handoffs": [
@@ -3938,6 +3958,46 @@
       "session_uuid": "54064a65-6810-4df0-8748-ee932cc7f5bd",
       "checkout": "sia-planner",
       "first_rev": 226
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Planner session 155 (ob_start numbered it #16, per-worktree counter T-164), 2026-10-01 from ~08:30Z. USAGE-LIMITED (D-077): no new launches or dispatches until 10:50Z; afterwards at most ONE dev job and ONE QA job across all machines. STATE: T-216 merged (#245) and closed. Slice four DISPATCHED (D-074 seats, D-075 T-214 rule); criteria by QA 238 ADOPTED with rulings (D-076; docs/loops/loop-15-slice-4-criteria-rulings.md; F11 already answered by LOOP_LIMITS at 3b192871, so step 3 removed; 4.4 N=5; budget <=14 calls + <=3 retries). T-214 built (caebe8b6), QA 239 ACCEPT (d4993796), PR #250 OPEN: code, Aaron merges, then close T-214. Step 2 (G1-G6, docs/loops/loop-15-slice-4-step2-dispatch.md) dispatched to sia-builder on loop/15-slice-4-step2, no SHA yet; its heavy runs need Aaron's approval. QA 237 (T-194 r5, candidate 7a3a4441) RUNNING on the laptop: pid 17748, launched by the planner 09:18:27Z, log C:\\qa-tmp\\qa-237.log (verdict is the LAST line); if it died at the usage limit, re-run after 10:50Z with the same staged prompt. NEXT IN ORDER: (a) read QA 237's report on origin/qa/t194-r5-report and RULE it against docs/loops/qa-237-t194-r5-dispatch.md; (b) when sia-builder pushes step 2, write its QA dispatch (Plumb is Linux-safe for harness code; launch with launch-job.sh --dispatch-sha); (c) after the step-2 merge, step 4: the QA seat's live calls (laptop, Aaron's key). OPEN PR: #250 (T-214, code, Aaron merges). State rev 234-235 is on origin/docs/session-155e: open its PR (records only).",
+      "watch_out": [
+        "USAGE LIMIT (D-077, Aaron via Clark, 2026-10-01 ~09:40Z): across ALL machines at most ONE developer job and ONE QA job at a time; close idle seats; NO new launches or dispatches until 10:50Z on 2026-10-01. The weekly limit was on pace to run out Saturday, before Wednesday's reset. Chisel (agent-dashboard dev, QA PC) and sia-builder (slice four step 2) are BOTH developer jobs: which runs is Aaron's call.",
+        "SLOT BOOKING via clark for the QA PC AND the laptop before ANY launch (by hand until T-204). At session 155's last write: the LAPTOP is held by QA 237 (pid 17748, since 09:18:27Z); Plumb (Linux QA seat on the VPS, no gh, so 0 CI runs there) is FREE; the QA PC is a DEVELOPER machine (Chisel, sia-builder) and takes no QA. Plumb's launch-job.sh takes --dispatch-sha and stamps the SHA as the prompt's first line; on the laptop the planner stages the prompt with that line itself (git show <sha>:<prompt>, via cmd /c) and launches with launch-qa.ps1 (docs/loops/qa-launch.md).",
+        "STANDING REPORTING RULES FROM AARON (via Clark), RESTORED at session 154 after being dropped at the session-153 roll (present in session 150's handoff, absent from 153's), CADENCE CHANGED at session 155 by D-077: (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\\Users\\melve\\Worktrees\\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 60 MINUTES while active (was 30), a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Re-create the cadence at /start (CronCreate at :04 only). If `clark` is not in ListAgents, skip the send. Completions and blocks are reported as they happen. Until T-211 puts the minutes in seat data, CARRY THIS ITEM FORWARD VERBATIM at every roll.",
+        "MANUAL MODE: on any classifier denial, do not retry or reroute. Send clark ONE line `MANUAL MODE → <seat>: <exact action> (<why>)` and say the same line in the planner session. Aaron approves from his phone.",
+        "PEER-INITIATED HEAVY RUNS ARE REFUSED by dev seats' own classifiers (Forge: 'Interfere With Workloads'). A planner 'go' is a peer message, not Aaron's approval. Plan for Aaron's approval in the seat's window. It worked for r5.",
+        "T-208 RESUME: on any resume, run `git fetch --prune` and a drift check (MCP ob_start) before trusting the record. The local CLI in sia-planner is a stale build (a010557); use the MCP tools.",
+        "Instructions are candidates (slice-three finding): define a rule by PROPERTY and require a generator. Enumerating spellings caused T-194's r2-r4 rejects. Check a dispatch or criteria file against what it governs before a seat builds to it. Session 155: derive QA prompts and push helpers by hand, not by sed: a sed copy left QA 238's push regex pointing at QA 237's branches and garbled a QA 239 verdict line; both caught only by testing the helper and re-reading.",
+        "A record write can break a test that pins live data (T-205, T-213). Run the tests that read a file before editing it.",
+        "D-068 until 2026-10-03: planner Opus, devs Sonnet, QA Opus headless; Cursor BLOCKED. Re-rule at the reset.",
+        "RELEASE (D-073): no version for slice three alone. Cut ONE release covering slice three (A, B, C) AND slice four once slice four lands, with the CHANGELOG entry and package.json bump together."
+      ],
+      "open_questions": [
+        "Which developer job runs under D-077's one-dev-job rule: sia-builder (SIA slice four step 2) or Chisel (agent-dashboard)?"
+      ],
+      "session": 155,
+      "loop_state": {
+        "open_prs": [],
+        "frozen_sha": "7a3a4441 (T-194 r5, QA 237 running on the laptop); caebe8b6 (T-214, ACCEPTED, PR #250)",
+        "questions_for_aaron": [
+          "Merge #250 (T-214, code)",
+          "sia-builder's run approvals",
+          "D-077: which dev job runs, sia-builder or Chisel"
+        ],
+        "rulings": [
+          "QA 236: T-216 ACCEPT; #245 merged; D1 to T-217",
+          "D-074: slice-four seats (sia-builder builds; QA seat makes live calls)",
+          "D-075: T-214 rule (a), P-blank",
+          "D-076: QA 238 criteria adopted with seven rulings (F11 already answered; N=5; budget <=14+3)",
+          "QA 239: T-214 ACCEPT; PR #250; G1 to T-218",
+          "D-077: usage limit, one dev + one QA job, 60-min status"
+        ]
+      },
+      "session_uuid": "6ed7ada0-65ef-43fe-83a5-1fd42c871777",
+      "checkout": "sia-planner",
+      "first_rev": 228
     }
   ],
   "sessions": [
