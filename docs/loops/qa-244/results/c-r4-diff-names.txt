@@ -1,0 +1,3 @@
+M	docs/loops/loop-15-slice-4-step2-developer-handoff.md
+A	docs/loops/loop-15-slice-4/mutants/qa243-s04.diff
+M	open-brain/tests/harness/s4-g7-merge.test.ts

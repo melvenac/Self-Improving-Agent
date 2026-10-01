@@ -1,0 +1,52 @@
+{
+  "loop": "244-qa-s4-step2-r4",
+  "candidate_git": {
+    "sha": "8a6cfb2db4f33787c09721c97a095ad8430fcf82",
+    "branch": "origin/loop/15-slice-4-step2",
+    "frozen_at": "2026-10-01T00:00:00Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci && npm run build && tsc --noEmit in open-brain at 8a6cfb2d (Plumb, local, constructed env)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 30200,
+      "detail": "npm ci 0 (7.8 s), npm run build 0 (12.8 s), tsc --noEmit 0 (9.6 s). No CI: gh is not installed on Plumb."
+    },
+    "unit": {
+      "command": "node node_modules/vitest/vitest.mjs run in open-brain (full suite), candidate 8a6cfb2d, once",
+      "exit_code": 1,
+      "passed": true,
+      "duration_ms": 471500,
+      "detail": "Test Files 146 passed (146); Tests 2077 passed | 5 skipped (2082); 0 failed; JSON success true. Exit 1 only from one unattributed unhandled error '[vitest-worker]: Timeout calling \"onTaskUpdate\"' (environmental, D-083). Counts identical to QA 243's r3 candidate runs."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "ROW-1-CONFINED",
+      "status": "met",
+      "order": "shown",
+      "evidence": "git diff --name-status 36a0fc28 8a6cfb2d: M handoff, A docs/loops/loop-15-slice-4/mutants/qa243-s04.diff, M open-brain/tests/harness/s4-g7-merge.test.ts. Test diff blob range 82144d82..5f021f30 identical to QA 243's fix-v1-commit-the-records.diff; kept s04, r02, r03 byte-identical to the QA report branches. 36a0fc28 is an ancestor (not forced)."
+    },
+    {
+      "id": "R3-2",
+      "status": "met",
+      "order": "shown",
+      "evidence": "s4-g7-merge alone: control 2/2 green; s04 red (V1); r03 red (V1). On s4-g7-merge + s4-guards + shadow-merge + cli (73 tests, control 73/73): r02 red (s4-guards S4-6d.3), r03 red (V1), s01 survives (gap, as at r3), s02 red (V1), s03 red (V1), s04 red (V1). tsc 0 and clean revert for every mutant."
+    },
+    {
+      "id": "S4-9.3",
+      "status": "met",
+      "order": "shown",
+      "evidence": "One full run on Plumb at the candidate: 0 failed tests (2077 passed, 5 skipped, 2082), 146/146 files; exit 1 from the environmental unattributed vitest RPC timeout only (D-083). tcm CI half not exercised: gh not installed, 0 runs."
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "R3-2: s01 (records directory under a loop-specific name) still survives V1; ruled a gap, not a runner default path.",
+    "Plumb full suite still exits 1 on the unattributed vitest RPC 'onTaskUpdate' timeout (environmental, D-083).",
+    "No CI runs: gh is not installed on Plumb."
+  ],
+  "notes": "QA 244, headless Claude Code Opus 5.5 on Plumb. Dispatch 09022b66 (launch line). Worktree qa244-wt at 09022b661b269c24cb1518555ab3813676a827f6. Every command ran with a constructed env (no TYPESAFE_API_KEY); no live Jev call."
+}

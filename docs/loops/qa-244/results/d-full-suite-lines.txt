@@ -1,0 +1,8 @@
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Unhandled Errors [49m[22m[31m⎯⎯⎯⎯⎯⎯[39m
+[31m[1mError[22m: [vitest-worker]: Timeout calling "onTaskUpdate"[39m
+[2m Test Files [22m [1m[32m146 passed[39m[22m[90m (146)[39m
+[2m      Tests [22m [1m[32m2077 passed[39m[22m[2m | [22m[33m5 skipped[39m[90m (2082)[39m
+[2m     Errors [22m [1m[31m1 error[39m[22m
+[2m   Duration [22m 469.82s[2m (transform 6.63s, setup 6.11s, collect 32.38s, tests 778.31s, environment 99ms, prepare 25.50s)[22m
+{"files":557,"failedSuites":0,"tests":2082,"passed":2077,"failed":0,"pending":5,"success":true}
+qa244-run exit 1 (471.5 s); npm ci 0 (7.8 s), build 0 (12.8 s), tsc --noEmit 0 (9.6 s); load avg at start 3.98
