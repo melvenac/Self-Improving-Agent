@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 223 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 224 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,38 +6,38 @@
 
 ### Pick up here
 
-Planner session 153 STOPPED at 2026-09-30 ~15:05Z on Aaron's word (account usage limit, resets 18:10Z); nothing new was launched after that. START HERE, AFTER 18:10Z: (0) FIRST: Aaron said YES (via Clark, ~15:10Z) to proposing an update to ~/.claude/CLAUDE.md, where the maturity-lifecycle text (Progenitor/Proven/Mature, apoptosis, maturity boosts, success_rate) is stale since the Loop 10 cut. Write it as a PROPOSED DIFF for his approval, NOT a direct edit, and do it after the reset. Source the replacement from .agents/SYSTEM/PRD.md (#238) and R-011. (1) QA 235 (T-194 r4, candidate d37e09dc) was STILL RUNNING at the stop: laptop pid 21824, launched 14:47:42Z, log C:\qa-tmp\qa-235.log, which is 0 bytes until the job ends; the verdict is its LAST line. Read it over ssh (aaron@100.110.244.10), then read the report on origin/qa/t194-r4-report and RULE it against docs/loops/qa-235-t194-r4-dispatch.md (rows r4-1..r4-6 plus regression; the same-line `cd` limit is declared and unscored, so rule it after). If ACCEPT: open the PR for loop/t194-planner-hook, which is code, so Aaron merges; registering the hook in sia-planner's settings.local.json is Aaron's hand. (2) Then FINALISE slice four: docs/loops/loop-15-slice-4-brief-draft.md is RULED (D-070, D-071), so fold the rulings into its sections 2-3, propose the live-call budget (about 17 calls: 1 plan-gate + ~8 done-gate + ~8 qa-score), write the sibling D_t JSON (T-195), and bring it to Aaron before dispatch. T-214 is item 1. DONE THIS SESSION: #195 (candidate C) merged ddd43526, shadow ledger line 1 (undefined), slice three CLOSED; close-out docs/loops/loop-15-slice-3-closeout.md (#236); T-169 closed: PRD and README rewritten (#238), Step-Back Part 6 published at the same URL (v12); tcm hub AUTH_MODE=strict since 12:32:42Z (V-078); QA 232, 233 and 234 ruled; T-209..T-215 opened; D-070 and D-071 recorded.
+Planner session 153 ROLLED 2026-10-01 ~06:50Z on Aaron's word (via clark, 24% context left). No launches after the roll. PICK UP IN ORDER: (a) QA 236 (T-216, candidate 9a0973f0, product ef7a1ce7) was RUNNING at the roll: laptop pid 7336, launched 06:41:53Z, log C:\qa-tmp\qa-236.log (0 bytes until the job ends; the verdict is the LAST line), over ssh aaron@100.110.244.10. Read the report on origin/qa/t216-report and RULE it against docs/loops/qa-236-t216-dispatch.md (T216-1..5 plus regression; Builder flagged that its L3 test doesn't kill a mutant, so check QA's split-regex mutant). If ACCEPT: open the PR for loop/t216-plan-loop-id; it is code, so Aaron merges. (b) T-194 r5 (Forge, sia-forge on the QA PC) is BLOCKED on Aaron's MANUAL MODE approval in sia-forge's window: Forge's classifier denied `npm ci` as 'Interfere With Workloads' because the go came from a peer. r5 is written but unrun and unpushed (local t194-r5-work at 491d8a70; origin still d37e09dc). It covers P1, P2, P2b (git push/merge/tag spellings, ruled in) and P3, with a property generator and 49 mutants; mv/Move-Item source checks are beyond the dispatch, accepted. Once Aaron approves: npm ci, build, tsc, vitest tests/planner-hook, then check RAM >= 1.5 GB, then the mutants ONCE, sequential; handoff; push. Then QA 237 on the laptop (book via clark). (c) Slice four (docs/loops/loop-15-slice-4-brief.md + D_t, RULED: D-070, D-071, D-072 cap 20 calls) dispatches ONLY after T-216 is accepted and merged. DONE THIS SESSION (153, incl. the resume): #195 (C) merged ddd43526, slice three CLOSED (close-out #236), T-169 closed (PRD/README #238, Step-Back Part 6 v12), tcm hub strict (V-078); QA 232-235 ruled (T-194 r5 redefined BY PROPERTY after three rejects caused by spelling-list dispatches); D-070/D-071/D-072; T-209..T-216 opened; ~/.claude/CLAUDE.md maturity text replaced on Aaron's 'apply'; T-208 gained the resume acceptance row.
 
 ### Watch out
 
-- SLOT BOOKING: before ANY launch on the laptop or the QA PC, ask clark for the slot and wait for its word (by hand until T-204's compute lease ships). Session 153 collided once with Rivet by launching on a free-memory reading.
-- MANUAL MODE: when the auto-mode classifier denies an action, do NOT retry or reroute. Send clark ONE line `MANUAL MODE → atlas: <exact action> (<why>)` AND say the same line in the planner session. Aaron switches the session to manual from his phone and approves there. His typed 'merge'/'yes' in the planner session is the merge word.
-- Headless jobs: the QA laptop uses C:\Users\Aaron\headless-qa\launch-qa.ps1 (claude.cmd); the QA PC uses C:\Users\Aaron Melven\headless\launch-job.ps1 (claude). Job allowlists refuse inline env-var prefixes (HUB_URL=..., TEMP=...), so put env setup in a node wrapper. Prompts must forbid background commands, and the verdict or RESULT is the log's last line.
-- A record write can break a test that pins live data (T-205, T-213): repointing forge in .agents/SYSTEM/hub-partner-seats.json broke 5 tests. Run the tests that read a file before editing it.
-- The status cron to clark (:04/:34) was STOPPED at the usage stop. Recreate it only when active work resumes (standing rule; CronCreate job, session-only).
-- Instructions are candidates too (slice-three finding): check a dispatch, ruling or criteria file against what it governs before a seat builds to it. The T-194 r3 wording caused D3, and a criteria blank line made shadow episode 1 undefined.
-- D-068 until 2026-10-03: planner Opus, devs Sonnet, QA Opus headless; Cursor BLOCKED. Re-rule models at the reset (close-out section 8).
+- SLOT BOOKING via clark for the QA PC AND the laptop before ANY launch (by hand until T-204). Laptop queue at the roll: QA 236, then Gauge Loop 7 QA r1. The QA PC has about 1.3 GB free with 5 sessions resident: run sequentially, and check RAM >= 1.5 GB before mutant runs.
+- MANUAL MODE: on any classifier denial, do not retry or reroute. Send clark ONE line `MANUAL MODE → <seat>: <exact action> (<why>)` and say the same line in the planner session. Aaron approves from his phone.
+- PEER-INITIATED HEAVY RUNS ARE REFUSED by dev seats' own classifiers (Forge: 'Interfere With Workloads'). A planner 'go' is a peer message, not Aaron's approval. Plan for Aaron's approval in the seat's window, or have Aaron start the run.
+- T-208 RESUME: on any resume, run `git fetch --prune` and a drift check (MCP ob_start) before trusting the record. Session 153's resume skipped the drift check until clark's audit asked. The local CLI in sia-planner is a stale build (a010557); use the MCP tools.
+- Instructions are candidates (slice-three finding): define a rule by PROPERTY and require a generator. Enumerating spellings caused T-194's r2-r4 rejects. Check a dispatch or criteria file against what it governs before a seat builds to it.
+- A record write can break a test that pins live data (T-205, T-213). Run the tests that read a file before editing it.
+- D-068 until 2026-10-03: planner Opus, devs Sonnet, QA Opus headless; Cursor BLOCKED. Re-rule at the reset.
 
 ### Open questions
 
-- Aaron: the release. Slice three's A, B and C merged with no CHANGELOG entry or version (package.json 0.44.2); CHANGELOG has an unreleased 0.45.0 section.
+- Aaron: the release. Slice three's A, B and C are merged with no CHANGELOG entry or version (package.json 0.44.2).
 
 ### Loop state
 
 **Open PRs:** _None._
 
-**SHA frozen for QA:** `d37e09dc (T-194 r4, QA 235 running at the stop)`
+**SHA frozen for QA:** `9a0973f0 (T-216, QA 236 running); r5 unpushed (local 491d8a70)`
 
 **Questions pending for Aaron:** 
-- Release: A, B and C are merged with no version or CHANGELOG entry
+- MANUAL MODE approval in sia-forge's window for the T-194 r5 runs
+- Release: A, B and C merged without a version
 
 **Rulings made mid-loop:** 
-- QA 232: C r4 ACCEPT, CC-22 met on condition; #195 merged ddd43526
-- QA 233: T-194 r2 REJECT (D1 absolute paths, D2 compound docs-merge)
-- QA 234: T-194 r3 REJECT (D3, caused by r3's dispatch wording); outside-repo deny reversed
-- D-070 and D-071: slice-four questions ruled
-- T-169 r2: R-011 referrers made honest; T-215 opened
-- Aaron YES: propose a ~/.claude/CLAUDE.md diff after the reset (not a direct edit)
+- QA 235: T-194 r4 REJECT; r5 by property (P1/P2/P2b/P3) plus a generator
+- Forge's four r5 points: cd+write refused; P2b git spellings IN; mv source check accepted
+- D-072: slice-four live-call cap 20
+- T-216 opened and built (plan schema loop ids)
+- T-208 resume acceptance row added
 
 ## developer [sia-builder] _(written session 152)_
 
