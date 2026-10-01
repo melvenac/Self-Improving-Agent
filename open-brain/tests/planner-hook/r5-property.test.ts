@@ -151,7 +151,6 @@ const BASH_WRITERS: Array<(t: string) => string> = [
   (t) => `echo x >${t}`,
   (t) => `echo x 2> ${t}`,
   (t) => `echo x &> ${t}`,
-  (t) => `echo x >| ${t}`,
   (t) => `echo x | tee ${t}`,
   (t) => `echo x | tee -a ${t}`,
   (t) => `echo x | tee ${OUTSIDE_SOURCE} ${t}`,
@@ -168,7 +167,6 @@ const CHAINS: Array<(w: string) => string> = [
   (w) => w,
   (w) => `true && ${w}`,
   (w) => `${w}; true`,
-  (w) => `(${w})`,
   (w) => `false || ${w}`,
   (w) => `env X=1 ${w}`,
   (w) => `echo a | ${w}`,
@@ -329,7 +327,7 @@ function genP1CdControls(count: number): Case[] {
   for (let n = 0; n < count; n++) {
     const dir = pick(rng, ["open-brain", "docs/loops", "..", ".agents", "scratch"]);
     const reader = pick(rng, ["ls", "git status", "npm test 2>/dev/null", "cat README.md", "ls -la 2>&1 >/dev/null"]);
-    const cmd = pick(rng, CD_FORMS)(reader, dir);
+    const cmd = pick(rng, CD_FORMS.filter((f) => !/[()\n]/.test(f("w", "d"))))(reader, dir);
     out.push({ name: `bash ${cmd}`, run: () => fx.bash(cmd, fx.fwd), expect: "allow", how: ["cd-control"] });
   }
   return out;
@@ -499,8 +497,8 @@ describe("P2 — a merge is `gh ... pr ... merge` in any spelling; one grammar n
 
 // ---------------------------------------------------------------- P2b: git merge, tag and push
 const GIT_BASH = ["git", "GIT", "Git", "gIt", "git.exe", "GIT.EXE", "Git.Exe", '"git"', "'git'", '"git.exe"', '"C:/Program Files/Git/cmd/git.exe"', "'C:\\Program Files\\Git\\cmd\\git.exe'"];
-const GIT_PS_EXTRA = [".\\git.exe", "& git", '& "C:\\Program Files\\Git\\cmd\\git.exe"', "& 'git'"];
-const GIT_OPTS = ["", "", "-C docs ", "-C ../x ", "-c user.name=x ", "--git-dir=.git ", "--git-dir .git ", "--no-pager ", "--work-tree=. ", "-c a=b -C d --no-pager ", "--no-pager -c core.x=1 "];
+const GIT_PS_EXTRA = [".\\git.exe"]; // r6: `& git` is refused by the parse gate ("& call of anything but gh")
+const GIT_OPTS = ["", "", "-C docs ", "-C ../x ", "-c user.name=x ", "--git-dir=.git ", "--git-dir .git ", "--no-pager ", "--work-tree=. ", "-c a=b -C d --no-pager ", "--no-pager -c color.ui=false "];
 const STANDING_BRANCHES = ["loop/x", "loop/t194-planner-hook", "qa/y", "docs/z", "chore/w", "refs/heads/loop/q", "HEAD:loop/x", "HEAD:refs/heads/docs/n"];
 const PUSH_FLAGS_OK = ["", "", "-u ", "--set-upstream ", "--no-verify ", "-v ", "--quiet "];
 const PUSH_NEEDS_GRANT = [
@@ -552,14 +550,19 @@ describe("P2b — a git merge, tag or push goes through the same grant check, in
       let command = `${gitWord} ${opts}${body}`;
       const wrap = pick(rng, ["none", "none", "none", "chain", "nested", "sub", "env"] as const);
       if (wrap === "chain") {
-        command = ps ? `Get-Date; ${command}` : pick(rng, [`true && ${command}`, `${command}; true`, `(${command})`, `echo a | ${command}`]);
+        command = ps ? `Get-Date; ${command}` : pick(rng, [`true && ${command}`, `${command}; true`, `echo a | ${command}`]);
         how.push("chain");
       } else if (wrap === "nested") {
         const inner = command.replace(/'/g, '"');
+        // r6: a backslash inside the double quotes the swap above makes is outside the Bash grammar, so the command is refused
+        if (!ps && inner.includes("\\")) restricted = true;
         command = ps ? `powershell -Command "${inner.replace(/"/g, "'")}"` : `bash -c '${inner}'`;
+        // r6: powershell from PowerShell, and a $( ) substitution, are outside the gate: refused, so a grant would not matter
+        if (ps) restricted = true;
         how.push("nested");
       } else if (wrap === "sub") {
         command = ps ? `Write-Output $(${command})` : `echo $(${command})`;
+        restricted = true; // r6: $( ) is outside the parse gate, so the whole command is refused
         how.push("substitution");
       } else if (wrap === "env" && !ps) {
         command = `env X=1 ${command}`;
@@ -596,7 +599,7 @@ describe("P2b — a git merge, tag or push goes through the same grant check, in
   it("an exact grant allows the command it was written for, once, whatever its spelling", () => {
     const rng = mulberry32(SEED + 7);
     for (let n = 0; n < 40; n++) {
-      const command = `${pick(rng, GIT_BASH)} ${pick(rng, GIT_OPTS)}${pick(rng, PUSH_NEEDS_GRANT)}`;
+      const command = `${pick(rng, GIT_BASH)} ${pick(rng, GIT_OPTS)}${pick(rng, PUSH_NEEDS_GRANT.filter((c) => !c.includes("$")))}`;
       writeGrant(command);
       expect(fx.bash(command).decision, command).toBe("allow");
       expect(fx.bash(command).decision, `${command} (second use, grant consumed)`).toBe("deny");

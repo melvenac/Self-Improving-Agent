@@ -147,3 +147,6 @@ export const PS_REFUSED: Array<[string, string, string]> = [
   ["a gh alias", "gh mm 2", "gh alias"],
 ];
 
+
+/** The start of the gate's refusal (the P1 refusal text also MENTIONS the phrase, inside the limit text). */
+export const GATE_PREFIX = "denied — not statically parseable: ";

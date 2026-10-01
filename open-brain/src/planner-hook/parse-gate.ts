@@ -487,7 +487,7 @@ export const PS_CMDLETS: Record<string, PsCmdlet> = {
   "set-content": { kind: "write", params: { path: P(true, "path"), literalpath: P(true, "path"), value: P(true), encoding: P(true), nonewline: P(false), force: P(false), stream: P(true) } },
   "add-content": { kind: "write", params: { path: P(true, "path"), literalpath: P(true, "path"), value: P(true), encoding: P(true), nonewline: P(false), force: P(false), stream: P(true) } },
   "clear-content": { kind: "write", params: { path: P(true, "path"), literalpath: P(true, "path"), force: P(false) } },
-  "out-file": { kind: "write", params: { filepath: P(true, "path"), literalpath: P(true, "path"), encoding: P(true), append: P(false), force: P(false), noclobber: P(false), width: P(true), inputobject: P(true) } },
+  "out-file": { kind: "write", params: { filepath: P(true, "path"), path: P(true, "path"), literalpath: P(true, "path"), encoding: P(true), append: P(false), force: P(false), noclobber: P(false), width: P(true), inputobject: P(true) } },
   "tee-object": { kind: "write", params: { filepath: P(true, "path"), literalpath: P(true, "path"), append: P(false), inputobject: P(true) } },
   "new-item": { kind: "new", params: { path: P(true, "path"), name: P(true, "name"), itemtype: P(true), type: P(true), value: P(true), force: P(false) } },
   "copy-item": { kind: "copy", params: { path: P(true, "path"), literalpath: P(true, "path"), destination: P(true, "dest"), recurse: P(false), force: P(false) } },
@@ -549,6 +549,8 @@ export function resolvePsParam(cmdlet: string, text: string): string {
 interface PsTok {
   text: string;
   quoted: boolean;
+  /** The token does not START with a quote: `-Path:"x"` is a parameter although part of it is quoted. */
+  bare: boolean;
 }
 
 function gatePowerShell(command: string, depth: number): string | null {
@@ -630,7 +632,7 @@ function gatePowerShell(command: string, depth: number): string | null {
       text += c;
       i++;
     }
-    return { text, quoted };
+    return { text, quoted, bare: command[start] !== "'" && command[start] !== '"' };
   };
 
   const flushStage = (): void => {
@@ -671,7 +673,7 @@ function gatePowerShell(command: string, depth: number): string | null {
       if (i >= n || /[;|>\n]/.test(command[i])) return refuse("redirect without a target");
       const t = readTok();
       if (typeof t === "string") return t;
-      cur.push({ text: "\u0000>", quoted: false }, t);
+      cur.push({ text: "\u0000>", quoted: false, bare: true }, t);
       continue;
     }
     const t = readTok();
@@ -691,7 +693,7 @@ function gatePowerShell(command: string, depth: number): string | null {
       while (i < n && (command[i] === " " || command[i] === "\t")) i++;
       const tgt = readTok();
       if (typeof tgt === "string") return tgt;
-      cur.push({ text: "\u0000>", quoted: false }, tgt);
+      cur.push({ text: "\u0000>", quoted: false, bare: true }, tgt);
       continue;
     }
     if (t.text === "." && !t.quoted && cur.length === 0) return refuse("dot-sourcing (. file)");
@@ -717,7 +719,7 @@ function gatePowerShell(command: string, depth: number): string | null {
       const args = words.slice(1);
       for (let k = 0; k < args.length; k++) {
         const a = args[k];
-        if (a.quoted || !a.text.startsWith("-") || a.text.length < 2 || /^-\d/.test(a.text)) continue;
+        if (!a.bare || !a.text.startsWith("-") || a.text.length < 2 || /^-\d/.test(a.text)) continue;
         const colon = a.text.indexOf(":");
         const p = resolvePsParam(canon, a.text);
         if (p === "unknown") return refuse(`unknown parameter ${colon > 0 ? a.text.slice(0, colon) : a.text} for ${canon}`);
@@ -733,6 +735,9 @@ function gatePowerShell(command: string, depth: number): string | null {
       continue;
     }
     if (/^[A-Za-z]+-[A-Za-z]+$/.test(head.text)) return refuse(`unknown cmdlet (${head.text})`);
+    // PowerShell hands a native command (git, gh, node...) an unquoted `a,b` as TWO arguments; the hook would read one.
+    const comma = words.slice(1).find((w) => !w.quoted && w.text.includes(","));
+    if (comma) return refuse(`comma list as an argument to a native command (${head.text}); PowerShell passes it as an array`);
     if (baseLower === "git") {
       const r = gateGit(words.slice(1).map((w) => w.text));
       if (r) return r;

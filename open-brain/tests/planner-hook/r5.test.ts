@@ -47,7 +47,8 @@ describe("P1 — a target that is not a literal path is refused, with its cause 
   ])("%s", (_name, command) => {
     const r = fx.bash(command);
     deny(r);
-    expect(r.reason).toContain("cannot be determined");
+    // r6: P0 now refuses most of these first (the construct is named); either refusal names why it cannot be located.
+    expect(r.reason).toMatch(/cannot be determined|denied — not statically parseable/);
   });
 
   it.each(["~/x/open-brain/src/cli.ts", "~/.agents/state.json", "open-brain/src/*.ts", "open-brain/src/{a,b}.ts"])(
@@ -55,13 +56,13 @@ describe("P1 — a target that is not a literal path is refused, with its cause 
     (file_path) => {
       for (const r of [fx.edit(file_path), fx.write(file_path)]) {
         deny(r);
-        expect(r.reason).toContain("cannot be determined");
+        expect(r.reason).toMatch(/cannot be determined|denied — not statically parseable/);
       }
     },
   );
 
   it("a literal path that merely contains the same characters outside the target is still allowed", () => {
-    allow(fx.bash('git commit -m "fix: ~ a -> b *x* {y} $5" -- docs/loops/q.md'));
+    allow(fx.bash("git commit -m 'fix: ~ a -> b *x* {y} $5' -- docs/loops/q.md"));
     allow(fx.bash("echo '$HOME ~ *' > docs/loops/q.md"));
   });
 });
@@ -79,7 +80,7 @@ describe("P1 — a cd in the same command line as a write is refused as undeterm
   ])("%s", (command) => {
     const r = fx.bash(command);
     deny(r);
-    expect(r.reason).toMatch(/changes directory|cannot be determined/);
+    expect(r.reason).toMatch(/changes directory|cannot be determined|denied — not statically parseable/);
   });
 
   it("a cd with no write, and a write with no cd, are not refused", () => {
@@ -117,7 +118,7 @@ describe("P1 — the real write location, whatever the spelling (QA 233/234/235 
     ["open-brain", "echo x 1>src/x.ts"],
     ["open-brain", 'echo x > "src"/\'cli.ts\''],
     ["open-brain/src", "echo x > cli.ts"],
-    [".agents", "echo {} > state.json"],
+    [".agents", "echo '{}' > state.json"],
     [".agents", "echo x > TASKS/INBOX.md"],
     ["docs/loops", "echo x > ../../open-brain/src/cli.ts"],
     ["open-brain", "echo x > ../scripts/x.sh"],
@@ -137,7 +138,7 @@ describe("P1 — the real write location, whatever the spelling (QA 233/234/235 
 
   it.each([
     ["docs/loops", "echo x > src/cli.ts"],
-    ["scratch", "echo {} > state.json"],
+    ["scratch", "echo '{}' > state.json"],
     ["open-brain", "echo x > notes.md"],
     ["", "echo x > docs/loops/q.md"],
     ["", "cp open-brain/src/cli.ts docs/loops/copy.ts"],
@@ -164,14 +165,12 @@ describe("P1 — the real write location, whatever the spelling (QA 233/234/235 
     expect(r.reason).toContain("8.3 short name");
   });
 
-  it("heredoc bodies and quoted prose are data: a commit message with > ` * $ is not a write", () => {
-    allow(
-      fx.bash(
-        "git commit -m \"$(cat <<'EOF'\nfix: a -> b `code` *x* $5 > y\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\"",
-      ),
-    );
-    allow(fx.bash("cat <<'EOF' > docs/loops/q.md\n> quoted **bold** $VAR `x`\nEOF"));
-    deny(fx.bash("cat <<'EOF' > open-brain/src/cli.ts\nbody\nEOF"));
+  // SUPERSEDED BY r6: a heredoc is outside the parse gate's grammar, so the r5 "heredoc bodies are data" rows are now refused
+  // by P0 (see r6.test.ts). Quoted prose stays data: that is what these rows keep.
+  it("quoted prose is data: a commit message with > ` * $ is not a write", () => {
+    allow(fx.bash("git commit -m 'fix: a -> b `code` *x* $5 > y' -m 'Co-Authored-By: Claude <noreply@anthropic.com>'"));
+    allow(fx.bash("echo '> quoted **bold** $VAR `x`' > docs/loops/q.md"));
+    deny(fx.bash("echo 'body' > open-brain/src/cli.ts"));
   });
 
   it("the file tools resolve the same way", () => {
@@ -477,7 +476,7 @@ describe("P2b — a git merge, tag or push is read by the same rule: git word, a
   it.each(needsGrant)("`%s` needs a grant", (command) => {
     const r = fx.bash(command);
     deny(r);
-    expect(r.reason).toContain("D-038");
+    expect(r.reason).toMatch(/D-038|denied — not statically parseable/);
   });
 
   it.each([

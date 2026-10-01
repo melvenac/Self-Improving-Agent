@@ -78,7 +78,7 @@ describe("D3 — a relative target resolves against payload.cwd (QA 234 Q4)", ()
   });
 
   it("cwd .agents/: `echo {} > state.json` is denied", () => {
-    expect(runPlannerHook(bashAt(sub(".agents"), "echo {} > state.json")).decision).toBe("deny");
+    expect(runPlannerHook(bashAt(sub(".agents"), "echo '{}' > state.json")).decision).toBe("deny");
   });
 
   it("cwd open-brain/: a relative Edit of src/cli.ts is denied", () => {
@@ -89,7 +89,7 @@ describe("D3 — a relative target resolves against payload.cwd (QA 234 Q4)", ()
 
   it("the same relative text from a cwd where it is NOT protected is allowed (the cwd is what decides)", () => {
     expect(runPlannerHook(bashAt(sub("docs/loops"), "echo x > src/cli.ts")).decision).toBe("allow");
-    expect(runPlannerHook(bashAt(sub("scratch"), "echo {} > state.json")).decision).toBe("allow");
+    expect(runPlannerHook(bashAt(sub("scratch"), "echo '{}' > state.json")).decision).toBe("allow");
   });
 
   it("a protected path reached through ../ from a subdirectory cwd is still denied", () => {
@@ -127,11 +127,12 @@ describe("outside the repo is allowed; only an undeterminable path is denied (na
     expect(runPlannerHook(at(repo, "Write", { file_path: `${dirname(fwd)}/other/open-brain/src/a.ts`, content: "x" })).decision).toBe("allow");
   });
 
+  // r6: the same commands are now refused by the P0 parse gate before P1 reads the target; the refusal still names the construct.
   it("a Bash target with a shell expansion is denied, naming the cause", () => {
     for (const cmd of ["echo x > $HOME/x.txt", "echo x > `pwd`/x.txt"]) {
       const r = runPlannerHook(bashAt(repo, cmd));
       expect(r.decision).toBe("deny");
-      expect(r.reason).toContain("cannot be determined");
+      expect(r.reason).toMatch(/cannot be determined|denied — not statically parseable/);
     }
   });
 

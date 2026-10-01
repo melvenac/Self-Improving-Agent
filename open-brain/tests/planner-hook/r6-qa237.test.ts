@@ -13,6 +13,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { makeFixture, type Fixture } from "./r5-fixture.js";
+import { GATE_PREFIX } from "./r6-cases.js";
 
 interface Row {
   source: string;
@@ -37,6 +38,12 @@ beforeEach(() => fx.resetGrant());
 
 /** QA 237's fixture root, in the spellings its rows use, replaced by this fixture's root in the same spelling. */
 function relocate(text: string): string {
+  // QA's generators sometimes quote INSIDE the root (C:/q'a-scratch'/qa237-fx); the whole relocated root is then quoted.
+  text = text.replace(/[A-Za-z]:[\\/]q['"]?a['"]?-['"]?s['"]?c['"]?r['"]?a['"]?t['"]?c['"]?h['"]?[\\/]qa237-fx/gi, (m) => {
+    if (!/['"]/.test(m)) return m; // no quote inside the root: the plain replacement below handles it
+    const root = m.includes("\\") ? fx.repo : fx.fwd;
+    return `"${m === m.toUpperCase() ? root.toUpperCase() : root}"`;
+  });
   const gitBash = fx.windows ? fx.fwd.replace(/^([A-Za-z]):/, (_m, d: string) => `/${d.toLowerCase()}`) : fx.fwd;
   return text
     .replace(/\/c\/qa-scratch\/qa237-fx/gi, (m) => (m === m.toUpperCase() ? gitBash.toUpperCase() : gitBash))
@@ -64,16 +71,22 @@ async function run(row: Row): Promise<Outcome> {
   return { decision: r.decision, reason: r.reason ?? "", fetches: fx.calls.length };
 }
 
-const isP0 = (o: Outcome): boolean => o.decision === "deny" && o.reason.includes(NOT_PARSEABLE);
+const isP0 = (o: Outcome): boolean => o.decision === "deny" && o.reason.includes(GATE_PREFIX);
 
 function judge(row: Row, o: Outcome): string | null {
   const want = row.expect;
   if (isP0(o)) return null; // superseded by P0 (a refusal with a named construct)
+  // Open 5 (Atlas ruling): git -c core./alias./remote./url./include. needs a grant, so QA's r5-era "standing push" rows that carry
+  // such a key are superseded: a refusal naming the grant is the r6 answer.
+  if (want === "allow" && o.decision === "deny" && /\s-c\s+(?:core|alias|remote|url|include|includeif)\./i.test(row.command ?? "") && /D-038/.test(o.reason)) return null;
   switch (want) {
     case "deny":
     case "deny-named":
     case "deny-grammar":
     case "deny-token":
+      // QA 237 drove the CLI with no GitHub token, so an exact-grammar control was refused for want of a read. Here a fake
+      // GitHub answers, so the same control is allowed after a read: that is the control working, not a hole.
+      if (/control|exact|origin URL|& gh pr merge 1|gh\.exe pr merge 1/i.test(row.id) && o.decision === "allow" && o.fetches > 0) return null;
       return o.decision === "deny" ? null : `expected deny, got ${o.decision}`;
     case "allow":
       return o.decision === "allow" ? null : `expected allow, got ${o.decision} (${o.reason.slice(0, 120)})`;

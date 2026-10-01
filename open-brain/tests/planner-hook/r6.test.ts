@@ -12,7 +12,7 @@ import { grantPath } from "../../src/planner-hook/grant.js";
 import { BASH_WRITE_LIMIT } from "../../src/planner-hook/bash.js";
 import { parseGate, sedScriptRefusal } from "../../src/planner-hook/parse-gate.js";
 import { makeFixture, type Fixture } from "./r5-fixture.js";
-import { BASH_REFUSED, PS_REFUSED } from "./r6-cases.js";
+import { BASH_REFUSED, PS_REFUSED, GATE_PREFIX } from "./r6-cases.js";
 
 let fx: Fixture;
 beforeAll(() => {
@@ -30,7 +30,7 @@ describe("P0 — Bash: what the hook cannot fully parse is refused, and the cons
   it.each(BASH_REFUSED)("%s", (_name, command, named) => {
     const r = fx.bash(command);
     deny(r);
-    expect(r.reason).toContain(NOT_PARSEABLE);
+    expect(r.reason).toContain(GATE_PREFIX);
     expect(r.reason).toContain(named);
   });
 
@@ -91,7 +91,7 @@ describe("P0 — Bash: the accepted grammar parses, and P1-P3 then decide as in 
     ]) {
       const r = fx.bash(command);
       deny(r);
-      expect(r.reason, command).not.toContain(NOT_PARSEABLE);
+      expect(r.reason, command).not.toContain(GATE_PREFIX);
       expect(r.reason, command).toContain("Authority");
     }
   });
@@ -106,7 +106,7 @@ describe("P0 — PowerShell: unknown parameters, expressions, dynamic code and p
   it.each(PS_REFUSED)("%s", (_name, command, named) => {
     const r = fx.ps(command);
     deny(r);
-    expect(r.reason).toContain(NOT_PARSEABLE);
+    expect(r.reason).toContain(GATE_PREFIX);
     expect(r.reason).toContain(named);
   });
 

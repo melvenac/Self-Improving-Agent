@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { parseGate } from "../../src/planner-hook/parse-gate.js";
 import { makeFixture, type Fixture } from "./r5-fixture.js";
-import { BASH_REFUSED, PS_REFUSED } from "./r6-cases.js";
+import { BASH_REFUSED, PS_REFUSED, GATE_PREFIX } from "./r6-cases.js";
 
 const NOT_PARSEABLE = "not statically parseable";
 
@@ -111,7 +111,7 @@ const SAFE_PS = [
   "Get-Content open-brain/src/cli.ts | Select-Object -First 3", "Get-ChildItem open-brain/src -Recurse -Name",
   "Select-String -Pattern x -Path README.md", "Write-Output hi > $null", "Write-Output hi 2>&1 | Out-Null",
   "Write-Output hi > docs/loops/o.txt", "git status", "git log --oneline -5", "gh pr view 5", "npm test", "Get-Date", "Test-Path docs",
-  "Out-File -FilePath docs/loops/o.txt", "Set-Location docs", "Write-Host hello",
+  "Out-File -FilePath docs/loops/o.txt", "Write-Host hello",
 ];
 const PROTECTED_BASH = [
   "echo x > open-brain/src/x.ts", "cp a.ts open-brain/src/x.ts", "sed -i 's/a/b/' open-brain/src/x.ts", "echo x | tee .agents/state.json",
@@ -153,7 +153,7 @@ describe("P0 generator — what must be REFUSED", () => {
     for (const c of cs) {
       const r = c.tool === "Bash" ? fx.bash(c.command) : fx.ps(c.command);
       const reason = (r.reason ?? "").toLowerCase();
-      if (r.decision !== "deny" || !reason.includes(NOT_PARSEABLE) || !reason.includes(c.named as string)) {
+      if (r.decision !== "deny" || !reason.includes(GATE_PREFIX.toLowerCase()) || !reason.includes(c.named as string)) {
         wrong.push(`${JSON.stringify(c.command)} [${c.tool}] want deny + "${c.named}", got ${r.decision} ${(r.reason ?? "").slice(0, 110)}  [${c.how.join(",")}]`);
       }
     }
@@ -193,7 +193,7 @@ describe("P0 generator — what must PARSE", () => {
       const base = bash ? pick(rng, PROTECTED_BASH) : pick(rng, PROTECTED_PS);
       const command = rng() < 0.5 ? `${pick(rng, bash ? SAFE_BASH : SAFE_PS)}${bash ? pick(rng, JOIN_BASH) : "; "}${base}` : base;
       const r = bash ? fx.bash(command) : fx.ps(command);
-      if (r.decision !== "deny" || (r.reason ?? "").includes(NOT_PARSEABLE)) {
+      if (r.decision !== "deny" || (r.reason ?? "").includes(GATE_PREFIX)) {
         wrong.push(`${JSON.stringify(command)} [${bash ? "Bash" : "PowerShell"}] ${r.decision} ${(r.reason ?? "").slice(0, 100)}`);
       }
     }

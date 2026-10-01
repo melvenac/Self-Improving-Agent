@@ -44,7 +44,8 @@ function fakeFetch(calls: string[]): FetchLike {
   return async (url) => {
     calls.push(url);
     const m = url.match(/pulls\/(\d+)(\/files)?/);
-    const files = m ? PRS[m[1]] : undefined;
+    // PR 1 and 2 are the two named fixtures; any other number is docs-only, as QA 237's fake GitHub made every PR.
+    const files = m ? (PRS[m[1]] ?? ["docs/loops/x.md"]) : undefined;
     if (!files) return { ok: false, status: 404, json: async () => ({}) };
     if (m && m[2]) {
       const page = Number(new URL(url).searchParams.get("page") ?? "1");
