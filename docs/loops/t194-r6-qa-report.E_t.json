@@ -1,0 +1,97 @@
+{
+  "loop": "t194",
+  "candidate_git": {
+    "sha": "9cf8c7eb427f732022c23baefa8092571d94daca",
+    "branch": "origin/loop/t194-planner-hook",
+    "frozen_at": "2026-10-01T08:00:00-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci; npm run build; npx tsc --noEmit (open-brain/, candidate 9cf8c7eb, laptop DESKTOP-0GV3HAD, TEMP/TMP=C:\\qa-tmp)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 90000,
+      "detail": "npm ci exit 0 (185 pkgs); npm run build exit 0, 'build stamped 9cf8c7e'; npx tsc --noEmit exit 0. vitest run tests/planner-hook exit 0, 10 files, 813 passed. The 3 r6 test files + r6-depth against the r5 product (git checkout 7a3a4441 -- open-brain/src/planner-hook; parse-gate.ts absent at r5): exit 1, 180 failed / 201 passed, 3 of 4 files red (red confirmed). git diff 7a3a4441 9cf8c7eb on hook.test.ts and r3.test.ts is empty."
+    },
+    "unit": {
+      "command": "tcm CI run 36867744673 (qa/t194-r6-ci-candidate, headSha 9cf8c7eb427f732022c23baefa8092571d94daca), job test 110387471896",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 115000,
+      "detail": "Run conclusion FAILURE. test job 110387471896 FAILURE on tcm-1 (Linux x64): 1 file failed / 147 passed (148); 1 test failed / 2756 passed / 8 skipped (2765). The failure is tests/planner-hook/r6-qa237.test.ts > gen-p1, 8 upper/mixed-case path-variant rows (PACKAGE.json, ../HOOKS/H.js, ../SCRIPTS/s.sh, ../TESTS/T.test.ts, ../O'PEN-brain'/src/A.ts) each 'expected deny, got allow' — case-insensitive expectations baked from QA 237's Windows run, failing on a case-sensitive FS where the hook correctly allows them. changed job success; test-windows skipped. 1 of 2 tcm runs used; windows=true not used."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "R6-P0-gate",
+      "status": "unmet",
+      "evidence": "gen-p0.mjs (own generator from the dispatch's refused/accepted lists): 337 refused cases, each 'not statically parseable' with the construct named; 170 accepted cases, each proceeds to P1-P3 (162 allow, 8 deny), 0 wrongly gated. The inversion property still breaks for PowerShell: the gate mis-tokenises inputs it believes it parsed and allows a write. Six fail-open classes confirmed in a real shell (D-A..D-F): PS redirect targets skip the ::/drive-relative checks (parse-gate.ts:667,684 vs :698-699); PS Unicode lookalikes (NBSP U+00A0, ideographic U+3000, en/em-dash U+2013/2014, curly quotes U+2018/2019/201C/201D); New-Item -Name with no -Path (bash.ts psCommandTargets 'new', base empty); Bash node --eval= and perl -e'...' attached inline code; Bash awk print>/system(), trap, mapfile -C, sort -o, find -fprint; git config via GIT_CONFIG_*/GIT_CONFIG_PARAMETERS env to a foreign push URL. Each wrote open-brain/src/x.ts in real PS 5.1 or Git Bash with the hook allowing it."
+    },
+    {
+      "id": "R6-ruling-D8",
+      "status": "met",
+      "order": "shown",
+      "evidence": "gh pr merge #7 refused by P0 (comment); quoted '#7' reads PR 7 (grant without a token)."
+    },
+    {
+      "id": "R6-ruling-D9",
+      "status": "met",
+      "order": "shown",
+      "evidence": "gh pr merge https://github.com/other/repo/pull/3 needs a grant, nothing read; prfiles.ts compares owner+repo case-insensitively before any fetch (probe-merge-async, r6-foreign-url mutants killed)."
+    },
+    {
+      "id": "R6-ruling-nonmerge",
+      "status": "met",
+      "order": "shown",
+      "evidence": "A merge is gh's first two positional words pr merge. gh pr comment 5 --body merge, gh pr list --label merge, gh pr create --title merge, gh pr view 5 all allowed (probe-holes, gen-p2)."
+    },
+    {
+      "id": "R6-ruling-git-c-keys",
+      "status": "met",
+      "order": "shown",
+      "evidence": "alias. remote. url. include. includeIf. core. each needs a grant, any subcommand, case-insensitive, via -c / --config-env= / --config-env <k> (probe-r6-cand.json). git alias (git st) refused by P0. user.name stays allowed."
+    },
+    {
+      "id": "R6-ruling-limit-text",
+      "status": "partial",
+      "evidence": "Every named out-of-reach item is present and none is caught (gen-p0, probes). But the text omits the D-D/D-E fail-open families (inline-code attached spellings; awk/sort/find/trap/mapfile), so in the 'nothing out of reach is unstated' direction it is not true."
+    },
+    {
+      "id": "R6-qa237-rows",
+      "status": "met",
+      "order": "shown",
+      "evidence": "QA 237's gen-p1/p2/p2b/p3 + probe-holes(2) + probe-merge-async + probe-comma + fail-closed re-run unmodified bar paths: 0 fail-open across 1,456 generated cases plus the probes. Every D1-D17 refused by P0 or decided correctly. The two QA 237 survivors (qa-p1-install-ignored, qa-p3-comma-list-off) are now pinned (r6-install-ignored, r6-comma-quoted-split-off, both killed)."
+    },
+    {
+      "id": "R6-fail-closed-cost",
+      "status": "met",
+      "order": "shown",
+      "evidence": "cost-list.txt's 31 rows reproduce against the built hook; each rewrite is accepted. Extra costs: the D-D/D-E commands that SHOULD be refused are the inverse (silent allow)."
+    },
+    {
+      "id": "R6-mutants",
+      "status": "met",
+      "order": "shown",
+      "evidence": "All 105 mutants in one sequential pass (6 back-to-back slices, same tree, ~27s each): 105 killed, 0 survivors, 0 typecheck failures (mutants-out.json). Free RAM checked first (~2.6 GB). My own 6 per-family mutants (qa-mutants.mjs): all killed (qa-bash-backslash 10, qa-bash-reserved 18, qa-bash-wrappers 23, qa-bash-shell-stdin 13, qa-ps-unknown-param 11, qa-ps-dynamic 17)."
+    },
+    {
+      "id": "R6-regression",
+      "status": "unmet",
+      "evidence": "hook.test.ts and r3.test.ts byte-identical to r5; r5's met rows (non-literal, file tools, standing push, exact grant) hold; every changed earlier test follows a ruling (handoff Supersedes, checked). BUT the candidate's suite is RED on Linux in CI (r6-qa237 gen-p1, 8 case-variant rows), so r5's 'CI green on Linux' property regresses."
+    }
+  ],
+  "regressions": [
+    "CI test job is RED on Linux (tcm-1): tests/planner-hook/r6-qa237.test.ts gen-p1 fails 8 case-variant rows. r5 had CI green on Linux; r6 does not."
+  ],
+  "gaps": [
+    "D-A: PowerShell redirect targets (> and 2>) bypass the gate's provider-path (::) and drive-relative (C:rel) checks; FileSystem::<abs>, Microsoft.PowerShell.Core\\FileSystem::<abs>, >> and C:open-brain/... all write in real PS 5.1 and are allowed. QA 237 D15 reopened.",
+    "D-B: PowerShell Unicode lookalikes the gate reads as word chars: NBSP (U+00A0) and ideographic space (U+3000) separators, en/em-dash (U+2013/2014) parameter dashes, curly quotes (U+2018/2019/201C/201D); each mis-tokenised, a write allowed and confirmed in real PS 5.1.",
+    "D-C: New-Item -Name <path> with no -Path writes to the cwd and is uncaught (bash.ts psCommandTargets 'new', base empty); confirmed in real PS 5.1. Only the -Path+-Name pair is tested/pinned.",
+    "D-D: Bash inline-code runners in the attached/--eval= spellings escape the INLINE_CODE table: node --eval=<code> and perl -e'<code>' write in real Git Bash and are allowed. Dispatch: a silent allow of inline code writing a protected file is a defect.",
+    "D-E: Bash code-running/writing commands with no allow-list: awk 'BEGIN{print>file}' and awk system(), trap 'code' EXIT, mapfile -C 'code', sort -o file, find -fprint file all write in real Git Bash and are allowed. Dispatch explicitly names awk system.",
+    "D-F: git config injected through the environment (GIT_CONFIG_COUNT/KEY_n/VALUE_n, GIT_CONFIG_PARAMETERS) redirects a standing push to a foreign repo with no grant; real git lists the foreign URL as a second push URL. The Open-5 ruling (-c remote. needs a grant) reopened through the environment.",
+    "Limit text omits D-D/D-E; CI red on Linux must be fixed (case-aware or Windows-only rows)."
+  ],
+  "notes": "QA 241, record session 241. Claude Code on Opus (claude-opus-4-8), laptop DESKTOP-0GV3HAD, headless (D-068). Dispatch commit e4a3327f2d887ae226b1619e68b9872d828ca559. Verdict: REJECT — six fail-open classes writing a protected repo file (all confirmed in real PowerShell 5.1 / Git Bash), several in classes the dispatch directed me to probe (Unicode lookalikes, inline-code incl. awk system); the P0 inversion property is false for PowerShell; and CI is red on Linux. No live GitHub call; the hook is registered nowhere; a fake fetch drives async rows."
+}

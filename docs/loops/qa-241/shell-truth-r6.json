@@ -1,0 +1,210 @@
+[
+ {
+  "kind": "ps",
+  "command": "Set-Content open-brain/src/x.ts x",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "ps",
+  "command": "Copy-Item C:/qa-tmp/a.txt open-brain/src/x.ts",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "ps",
+  "command": "Set-Content　open-brain/src/x.ts x",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "ps",
+  "command": "Set-Content –Value x open-brain/src/x.ts",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "ps",
+  "command": "Set-Content —Value x open-brain/src/x.ts",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "ps",
+  "command": "Set-Content –EA 0 open-brain/src/x.ts x",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "ps",
+  "command": "Set-Content ‘open-brain/src/x.ts’ x",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "ps",
+  "command": "Set-Content “open-brain/src/x.ts” x",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "ps",
+  "command": "New-Item -Name open-brain/src/x.ts -ItemType File",
+  "written": true,
+  "stdout": "Directory: C:\\qa-scratch\\qa241-shell\\open-brain\\src\r\n\r\n\r\nMode                 LastWriteTime         Length Name                                                                 \r\n----                 -------------         ------ ----                                                                 \r\n-",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "ps-cwd-src",
+  "command": "New-Item -Name x.ts -ItemType File",
+  "written": true,
+  "stdout": "Directory: C:\\qa-scratch\\qa241-shell\\open-brain\\src\r\n\r\n\r\nMode                 LastWriteTime         Length Name                                                                 \r\n----                 -------------         ------ ----                                                                 \r\n-",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "ps-argv",
+  "command": "node C:/qa-tmp/qa241-argv.js pr “merge” 2",
+  "written": null,
+  "stdout": "[\"pr\",\"merge\",\"2\"]",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "ps-argv",
+  "command": "node C:/qa-tmp/qa241-argv.js pr ‘merge’ 2",
+  "written": null,
+  "stdout": "[\"pr\",\"merge\",\"2\"]",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "bash",
+  "command": "node --eval=\"require('fs').writeFileSync('open-brain/src/x.ts','x')\"",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "bash",
+  "command": "node -e\"require('fs').writeFileSync('open-brain/src/x.ts','x')\"",
+  "written": false,
+  "stdout": "",
+  "stderr": "C:\\Program Files\\nodejs\\node.exe: bad option: -erequire('fs').writeFileSync('open-brain/src/x.ts','x')",
+  "status": 9
+ },
+ {
+  "kind": "bash",
+  "command": "python -c\"open('open-brain/src/x.ts','w').write('x')\"",
+  "written": false,
+  "stdout": "",
+  "stderr": "Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.",
+  "status": 49
+ },
+ {
+  "kind": "bash",
+  "command": "python -Ic \"open('open-brain/src/x.ts','w').write('x')\"",
+  "written": false,
+  "stdout": "",
+  "stderr": "Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.",
+  "status": 49
+ },
+ {
+  "kind": "bash",
+  "command": "perl -e'open(F,\">open-brain/src/x.ts\")'",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "bash",
+  "command": "ruby -e'File.write(\"open-brain/src/x.ts\",\"x\")'",
+  "written": false,
+  "stdout": "",
+  "stderr": "/usr/bin/bash: line 1: ruby: command not found",
+  "status": 127
+ },
+ {
+  "kind": "bash",
+  "command": "awk 'BEGIN{print \"x\" > \"open-brain/src/x.ts\"}'",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "bash",
+  "command": "awk 'BEGIN{system(\"echo x > open-brain/src/x.ts\")}'",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "bash",
+  "command": "trap 'echo x > open-brain/src/x.ts' EXIT",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "bash",
+  "command": "mapfile -C 'echo x > open-brain/src/x.ts;:' -c 1 < README.md",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "bash",
+  "command": "sort -o open-brain/src/x.ts README.md",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "bash",
+  "command": "find . -maxdepth 0 -fprint open-brain/src/x.ts",
+  "written": true,
+  "stdout": "",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "bash-git",
+  "command": "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=remote.origin.url GIT_CONFIG_VALUE_0=https://github.com/evil/x git remote get-url origin",
+  "written": null,
+  "stdout": "https://github.com/melvenac/Self-Improving-Agent.git",
+  "stderr": "",
+  "status": 0
+ },
+ {
+  "kind": "bash-git",
+  "command": "GIT_CONFIG_PARAMETERS=\"'remote.origin.url'='https://github.com/evil/x'\" git remote get-url origin",
+  "written": null,
+  "stdout": "https://github.com/melvenac/Self-Improving-Agent.git",
+  "stderr": "",
+  "status": 0
+ }
+]

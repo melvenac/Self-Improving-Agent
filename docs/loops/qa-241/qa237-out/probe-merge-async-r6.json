@@ -1,0 +1,35 @@
+{
+ "`gh pr merge #2` (bash)": {
+  "decision": "deny",
+  "fetched": [],
+  "note": "bash drops `#2` as a comment: gh merges the CURRENT BRANCH's PR, not PR 2",
+  "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a word). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it "
+ },
+ "`gh pr merge #2` (PowerShell)": {
+  "decision": "deny",
+  "fetched": [],
+  "note": "PowerShell drops `#2` as a comment too",
+  "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a PowerShell word). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks o"
+ },
+ "`gh pr merge https://github.com/other/repo/pull/3`": {
+  "decision": "deny",
+  "fetched": [],
+  "note": "the grammar is <N | ORIGIN pull URL>; this merges another repository's PR",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/other/repo/pull/3 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the pull URL names other/repo, not origin (melvenac/S"
+ },
+ "control `gh pr merge 2`": {
+  "decision": "allow",
+  "fetched": [
+   "melvenac/Self-Improving-Agent/pulls/2",
+   "melvenac/Self-Improving-Agent/pulls/2/files?per_page=100&page=1"
+  ],
+  "note": "exact grammar, docs-only: allow after reading",
+  "reason": ""
+ },
+ "control `gh pr merge --repo other/repo 3`": {
+  "decision": "deny",
+  "fetched": [],
+  "note": "the same other-repo merge spelled with --repo: refused",
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge --repo other/repo 3 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: --repo/-R names another repository, and the docs-only check reads orig"
+ }
+}

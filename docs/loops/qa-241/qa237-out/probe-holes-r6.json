@@ -1,0 +1,386 @@
+{
+ "P1 keyword `then`": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: reserved word (if). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar i"
+ },
+ "P1 keyword `do`": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: reserved word (for). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar "
+ },
+ "P1 keyword `!`": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: reserved word (!). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it"
+ },
+ "P1 brace group `{ tee ...; }`": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Ins"
+ },
+ "P1 runner `timeout 5 cp`": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (timeout). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically par"
+ },
+ "P1 runner `find -exec cp`": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Ins"
+ },
+ "P1 control `cp` plain": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src/x.ts). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Content, Ou"
+ },
+ "P1 cp attached -tDIR": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Content, Out-Fil"
+ },
+ "P1 cp cluster -vt DIR": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Content, Out-Fil"
+ },
+ "P1 cp long-option prefix --target DIR": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Content, Out-Fil"
+ },
+ "P1 tee long --append": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src/x.ts). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Content, Ou"
+ },
+ "P1 backslash-newline inside target": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads r"
+ },
+ "P1 backslash-newline between words": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads r"
+ },
+ "P1 comment opens a fake heredoc": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a word). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Insid"
+ },
+ "P1 heredoc fed to bash": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: heredoc or here-string. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that gramm"
+ },
+ "P1 code piped to sh": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: sh is only parseable as: sh -c '<string>'. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'"
+ },
+ "P1 `bash -c` control": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (open-brain/src/x.ts). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Content, Ou"
+ },
+ "P1 sed w command (no -i)": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: sed w (writes a file). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that gramma"
+ },
+ "P1-only-if outside quoted space": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P1-only-if outside UNC": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P1-only-if comment after write outside": {
+  "expect": "allow",
+  "got": "deny",
+  "pass": false,
+  "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a word). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Insid"
+ },
+ "P1-only-if commented-out write": {
+  "expect": "allow",
+  "got": "deny",
+  "pass": false,
+  "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a word). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Insid"
+ },
+ "P1-only-if fd dup 2>&1 outside": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2 comment eats the PR number `gh pr merge #2`": {
+  "expect": "deny-grammar",
+  "got": "deny",
+  "pass": false,
+  "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a word). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Insid"
+ },
+ "P2 other-repo pull URL": {
+  "expect": "deny-grammar",
+  "got": "deny",
+  "pass": false,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/evil/x/pull/1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: the pull URL names evil/x, not origin (melvenac/Self-Improving-Agent); another repository needs a grant."
+ },
+ "P2 exact control `gh pr merge 1 --squash`": {
+  "expect": "deny-token",
+  "got": "deny-token",
+  "pass": true,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 1 --squash gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has no oauth_token — a keyring-stored gh token cannot be read here)."
+ },
+ "P2 origin URL control": {
+  "expect": "deny-token",
+  "got": "deny-token",
+  "pass": true,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has no oauth_token — a keyring-stored gh token can"
+ },
+ "P2 non-merge `gh pr comment 5 --body merge`": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2 non-merge `gh pr list --label merge`": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2 non-merge `gh pr create --title merge`": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2 non-merge `gh pr view 5`": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2 gh alias defined inline then used": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: gh alias (defines or runs commands the hook cannot see). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statica"
+ },
+ "P2 PS `& gh pr merge 1`": {
+  "expect": "deny",
+  "got": "deny-token",
+  "pass": true,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: & gh pr merge 1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has no oauth_token — a keyring-stored gh token cannot be read here)."
+ },
+ "P2 PS `.\\gh.exe pr merge 1`": {
+  "expect": "deny",
+  "got": "deny-token",
+  "pass": true,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: .\\gh.exe pr merge 1 gh pr merge is not on the D-032/D-055 docs-only allowlist, so a grant is required: no GitHub token readable without a spawn (GH_TOKEN/GITHUB_TOKEN unset and hosts.yml has no oauth_token — a keyring-stored gh token cannot be read here)."
+ },
+ "P2b inline alias force push": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: git alias or external subcommand (fp). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. In"
+ },
+ "P2b inline alias merge": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: git alias or external subcommand (m). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Ins"
+ },
+ "P2b standing control": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2b git merge-base not merge": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2b push with --no-verify standing": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2b push -u standing": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P2b push --force-if-includes": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git push --force-if-includes origin loop/x"
+ },
+ "P2b push in for loop": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: reserved word (for). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar "
+ },
+ "P3 New-Item -Type File (alias)": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (open-brain/src/x.ts). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Conte"
+ },
+ "P3 New-Item -ItemType File control": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (open-brain/src/x.ts). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Conte"
+ },
+ "P3 Set-Content -EA (common-param alias)": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: unknown parameter -EA for set-content. The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseabl"
+ },
+ "P3 Set-Content -OutVariable": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: unknown parameter -OutVariable for set-content. The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically"
+ },
+ "P3 Copy-Item -EA 0": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: unknown parameter -EA for copy-item. The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'"
+ },
+ "P3 Set-Content -LP after a positional": {
+  "expect": "allow",
+  "got": "deny",
+  "pass": false,
+  "reason": "Planner hook: denied — not statically parseable: unknown parameter -LP for set-content. The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseabl"
+ },
+ "P3 Set-Content -Path (Join-Path ...)": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: parenthesis (expression or sub-expression). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically par"
+ },
+ "P3 splat array": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside "
+ },
+ "P3 splat hashtable via New-Object": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside "
+ },
+ "P3 block comment hides cmdlet `<##>`": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: < (redirect, block comment or here-string). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically par"
+ },
+ "P3 [scriptblock]::Create": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: [ ] (type literal, index or wildcard). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseabl"
+ },
+ "P3 powershell positional command": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (powershell). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically p"
+ },
+ "P3 powershell -EncodedCommand": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (powershell). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically p"
+ },
+ "P3 [IO.File]::WriteAllText": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: [ ] (type literal, index or wildcard). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseabl"
+ },
+ "P3 Out-File control": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (open-brain/src/x.ts). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Conte"
+ },
+ "P3 Set-Content -Path: control": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (open-brain/src/x.ts). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Conte"
+ },
+ "P3 PS `rm` alias (limit text calls rm out of reach)": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (open-brain/src/x.ts). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Conte"
+ },
+ "P3 only-if: Set-Content outside": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P3 only-if: New-Item -Type File outside": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ },
+ "P3 cwd=open-brain Set-Content src/x.ts": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (src/x.ts). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of Set-Content, Add-Content, Clear-Content, Out-Fil"
+ },
+ "LIMIT nesting depth 5 bash -c": {
+  "expect": "deny",
+  "got": "deny",
+  "pass": true,
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Inside that grammar it reads r"
+ },
+ "LIMIT Rename-Item second argument": {
+  "expect": "allow",
+  "got": "allow",
+  "pass": true,
+  "reason": ""
+ }
+}
