@@ -51,7 +51,8 @@ function pushNeedsGrant(args: readonly { text: string; expands: boolean }[]): bo
   if (positional.length < 2) return true;
   if (positional[0] !== "origin") return true;
   for (const spec of positional.slice(1)) {
-    if (spec.startsWith("+")) return true;
+    // `+src:dst` forces; `:dst` has no source and DELETES the remote branch.
+    if (spec.startsWith("+") || spec.startsWith(":")) return true;
     const dest = (spec.includes(":") ? (spec.split(":").pop() as string) : spec).replace(/^refs\/heads\//, "");
     // master and main are not under loop/, qa/, docs/ or chore/, so the standing test alone refuses them.
     if (dest === "" || !STANDING_BRANCH_RE.test(dest)) return true;

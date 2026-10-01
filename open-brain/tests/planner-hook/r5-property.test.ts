@@ -495,8 +495,8 @@ describe("P2 — a merge is `gh ... pr ... merge` in any spelling; one grammar n
 });
 
 // ---------------------------------------------------------------- P2b: git merge, tag and push
-const GIT_BASH = ["git", "GIT", "Git", "gIt", "git.exe", "GIT.EXE", "Git.Exe", '"git"', "'git'", '"git.exe"', '"C:/Program Files/Git/cmd/git.exe"', "'C:\Program Files\Git\cmd\git.exe'"];
-const GIT_PS_EXTRA = [".\git.exe", "& git", '& "C:\Program Files\Git\cmd\git.exe"', "& 'git'"];
+const GIT_BASH = ["git", "GIT", "Git", "gIt", "git.exe", "GIT.EXE", "Git.Exe", '"git"', "'git'", '"git.exe"', '"C:/Program Files/Git/cmd/git.exe"', "'C:\\Program Files\\Git\\cmd\\git.exe'"];
+const GIT_PS_EXTRA = [".\\git.exe", "& git", '& "C:\\Program Files\\Git\\cmd\\git.exe"', "& 'git'"];
 const GIT_OPTS = ["", "", "-C docs ", "-C ../x ", "-c user.name=x ", "--git-dir=.git ", "--git-dir .git ", "--no-pager ", "--work-tree=. ", "-c a=b -C d --no-pager ", "--no-pager -c core.x=1 "];
 const STANDING_BRANCHES = ["loop/x", "loop/t194-planner-hook", "qa/y", "docs/z", "chore/w", "refs/heads/loop/q", "HEAD:loop/x", "HEAD:refs/heads/docs/n"];
 const PUSH_FLAGS_OK = ["", "", "-u ", "--set-upstream ", "--no-verify ", "-v ", "--quiet "];

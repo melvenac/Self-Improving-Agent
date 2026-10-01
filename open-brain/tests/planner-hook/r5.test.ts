@@ -151,10 +151,9 @@ describe("P1 — the real write location, whatever the spelling (QA 233/234/235 
   it("a write outside the repo is allowed; the hook protects the repo's artifacts and is not a sandbox", () => {
     allow(fx.bash("echo x > C:/qa-tmp/log.txt"));
     allow(fx.bash("echo x > /tmp/log.txt"));
-    // A temp directory under an 8.3 profile name (AARONM~1) cannot be shown to be outside: refused, with the cause.
-    const sibling = fx.bash(`echo x > ${fx.fwd}-sibling/open-brain/src/cli.ts`);
-    if (/~\d/.test(fx.fwd)) expect(sibling.decision).toBe("deny");
-    else allow(sibling);
+    // A sibling shares the root's own spelling (even an 8.3 profile name such as AARONM~1) up to the point it
+    // leaves, so it is outside beyond doubt.
+    allow(fx.bash(`echo x > ${fx.fwd}-sibling/open-brain/src/cli.ts`));
   });
 
   it("an 8.3 short name outside the root prefix is refused, because it may be inside", () => {
@@ -180,9 +179,7 @@ describe("P1 — the real write location, whatever the spelling (QA 233/234/235 
     deny(fx.edit(`${fx.fwd}/open-brain/./src/../src/cli.ts`));
     allow(fx.edit("src/cli.ts", fx.sub("docs/loops")));
     allow(fx.write("docs/loops/q.md"));
-    const sibling = fx.write(`${fx.fwd}-sibling/open-brain/src/cli.ts`);
-    if (/~\d/.test(fx.fwd)) expect(sibling.decision).toBe("deny");
-    else allow(sibling);
+    allow(fx.write(`${fx.fwd}-sibling/open-brain/src/cli.ts`));
   });
 
   it.skipIf(process.platform !== "win32")("Windows: case, long-path prefix, NTFS dots/streams and the /mnt, /cygdrive forms", () => {
@@ -201,8 +198,6 @@ describe("P1 — the real write location, whatever the spelling (QA 233/234/235 
 
 describe("P2 — a merge is `gh ... pr ... merge` in any spelling; one exact grammar needs no grant (QA 235 D5)", () => {
   const notExact = [
-    "GH pr merge 2",
-    "gh.EXE pr merge 2",
     "Gh Pr Merge 2",
     "gh --repo other/x pr merge 1",
     "gh --repo=other/x pr merge 1",
@@ -265,7 +260,7 @@ describe("P2 — a merge is `gh ... pr ... merge` in any spelling; one exact gra
     expect(fx.calls.length).toBeGreaterThan(0);
   });
 
-  it.each(["gh pr merge 2", "gh.exe pr merge 2 --squash", '"gh" pr merge 2'])("`%s` with a code PR is denied after reading the list", async (command) => {
+  it.each(["gh pr merge 2", "GH pr merge 2", "gh.EXE pr merge 2", "gh.exe pr merge 2 --squash", '"gh" pr merge 2'])("`%s` with a code PR is denied after reading the list", async (command) => {
     const r = await fx.merge("Bash", command);
     deny(r);
     expect(r.reason).toContain("unlisted path");
@@ -507,7 +502,7 @@ describe("P2b — a git merge, tag or push is read by the same rule: git word, a
   it("PowerShell: the same rule", () => {
     deny(fx.ps("git push --force origin loop/x"));
     deny(fx.ps("& git -C docs push origin master"));
-    deny(fx.ps(".\git.exe push --tags"));
+    deny(fx.ps(".\\git.exe push --tags"));
     deny(fx.ps("git merge origin/master"));
     allow(fx.ps("git push origin loop/x"));
     allow(fx.ps("git log --oneline"));

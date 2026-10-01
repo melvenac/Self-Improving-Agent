@@ -221,12 +221,32 @@ export function parseCommand(source: string, flavor: Flavor): Parsed {
     // `>&2`, `>&-`, `2>&1`: a descriptor, not a file. `>&file` writes the file.
     if (src[i] === "&") {
       i++;
-      const w = readWord(true);
+      const w = readWord(false);
       if (w && /^(?:\d+|-)$/.test(w.text)) dup = true;
       else target = w;
     } else {
       while (i < n && (src[i] === " " || src[i] === "\t")) i++;
-      target = readWord(true);
+      if (src[i] === "(") {
+        // `>(cmd)` is process substitution: the target is a command, not a path. A `)` that closes an enclosing
+        // subshell is a boundary, so it must never be read as part of an ordinary target (QA-style `(echo x > f)`).
+        const start = i;
+        let depth = 0;
+        while (i < n) {
+          if (src[i] === "(") depth++;
+          else if (src[i] === ")") {
+            depth--;
+            if (depth === 0) {
+              i++;
+              break;
+            }
+          }
+          i++;
+        }
+        const t = src.slice(start, i);
+        target = { text: t, raw: t, expands: true };
+      } else {
+        target = readWord(false);
+      }
     }
     cur.redirs.push({ op, target, dup });
   };

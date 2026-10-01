@@ -67,7 +67,13 @@ export function toRepoRelative(raw: string, repoRoot: string, cwd: string = repo
   if (a.startsWith(`${r}/`)) return { ok: true, outside: false, rel: abs.slice(root.length + 1), ci: winRoot };
   // A path that matched the root prefix was resolved above. One that did not, but carries a Windows 8.3 short
   // name (PROGRA~1), may still be inside: the real directory name is on the disk, not in the text.
-  if (SHORT_NAME_RE.test(raw)) {
+  // Only a short name AFTER the point where the path leaves the root's own spelling counts: a sibling that shares
+  // the root's (short-named) ancestors is outside beyond doubt.
+  const ac = a.split("/");
+  const rc = r.split("/");
+  let shared = 0;
+  while (shared < ac.length && shared < rc.length && ac[shared] === rc[shared]) shared++;
+  if (ac.slice(shared).some((c) => SHORT_NAME_RE.test(c))) {
     return { ok: false, cause: `${raw} contains an 8.3 short name, so its location cannot be determined` };
   }
   return { ok: true, outside: true };
