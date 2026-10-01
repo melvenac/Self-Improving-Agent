@@ -1,12 +1,12 @@
 {
   "schema_version": 3,
-  "revision": 228,
+  "revision": 230,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 15 slice FOUR (Jev scoring on real diffs, in shadow, no calibration claimed) is briefed and RULED: docs/loops/loop-15-slice-4-brief.md plus its D_t (D-070, D-071, D-072 with a 20-call cap). It is NOT dispatched. BLOCKER: T-216 (the plan schema accepts only tNNN loop ids, so the slice-four D_t fails `harness validate plan`), being built by sia-builder (loop/t216-plan-loop-id, ef7a1ce7, local runs on the QA PC now). After T-216 is accepted and merged, dispatch slice four. In flight alongside: T-194 r5 (Forge; defined by property, plus a generator), T-215, T-213. Slice three is CLOSED (A #182, B #165/#187, C #195; shadow ledger line 1 undefined).",
-    "since_session": 153
+    "text": "Loop 15 slice FOUR (Jev scoring on real diffs, in shadow, no calibration claimed) is DISPATCHED (docs/loops/loop-15-slice-4-dispatch.md; seats D-074; T-214 rule D-075). Step 1: sia-builder builds T-214 (4.1) on loop/t214-declared-blank; in parallel QA 238 writes the slice-four criteria (qa-238-s4-criteria-dispatch.md). Step 2 (4.4 + 4.3 reconstructions) dispatches after the planner rules the criteria; step 3 F11's answer (planner); step 4 the live calls (QA seat, cap 20). T-216 is merged (#245). In flight alongside: T-194 r5 (QA 237 booked on the laptop after Gauge Loop 7 r1), T-215, T-213.",
+    "since_session": 155
   },
   "tasks": [
     {
@@ -1105,9 +1105,10 @@
       "opened_session": 153,
       "closed_session": null,
       "supersedes": null,
-      "note": "Found by the planner in session 153 at C's first live shadow-verdict prepare (T-155, CC-23 episode 1). loop-15-slice-3-c-criteria.md's ```qa-declared block has a blank line (line 340) between [unrunnable] and [out-of-scope]. parseDeclared refuses it with 'line is not `ID: text`: (blank)', so the verdict was undefined for a formatting reason. No fixture in B's or C's tests has a blank line in the block, so nothing caught it. Decide which rule holds: (a) the parser tolerates blank lines between sections (a natural markdown reading), or (b) the format forbids them and /sync or the criteria-authoring step rejects a criteria file whose block does not parse, BEFORE any candidate exists. Either way, add a fixture row with a blank line. Do not rewrite loop-15-slice-3-c-criteria.md after the fact: its prepared artifact is immutable.",
+      "note": "Found by the planner in session 153 at C's first live shadow-verdict prepare (T-155, CC-23 episode 1). loop-15-slice-3-c-criteria.md's ```qa-declared block has a blank line (line 340) between [unrunnable] and [out-of-scope]. parseDeclared refuses it with 'line is not `ID: text`: (blank)', so the verdict was undefined for a formatting reason. No fixture in B's or C's tests has a blank line in the block, so nothing caught it. Decide which rule holds: (a) the parser tolerates blank lines between sections (a natural markdown reading), or (b) the format forbids them and /sync or the criteria-authoring step rejects a criteria file whose block does not parse, BEFORE any candidate exists. Either way, add a fixture row with a blank line. Do not rewrite loop-15-slice-3-c-criteria.md after the fact: its prepared artifact is immutable. — Session 155: dispatched to sia-builder as slice four step 1 (docs/loops/loop-15-slice-4-dispatch.md), rule (a) per D-075. Branch loop/t214-declared-blank.",
       "note_by": [
-        "6e083614-965f-462b-ad59-62091a0be5e1"
+        "6e083614-965f-462b-ad59-62091a0be5e1",
+        "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
       ],
       "closed_rev": null
     },
@@ -1129,16 +1130,16 @@
       "id": "T-216",
       "title": "The plan schema accepts only runtime loop ids (tNNN), so no planner brief's D_t can pass harness validate plan / dispatch",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 153,
-      "closed_session": null,
+      "closed_session": 155,
       "supersedes": null,
-      "note": "Found by the planner in session 153 (resumed) while finalising slice four. `harness validate plan docs/loops/loop-15-slice-4-brief.D_t.json` exits 1 with 'loop: loop must look like t001'. open-brain/src/harness/schema.ts:84 and :248 pin the plan's loop to /^t\\d{3,}$/, while the evidence schema already accepts human-seat loop ids through EVIDENCE_LOOP_PATTERN (:180: tNNN or N-word, e.g. 15-slice-3-c), as widened by candidate B (rulings-2 R10). T-195 (DT-1, DT-7) requires every interactive planner brief to ship a D_t that harness dispatch validates, so the rule cannot be met by any planner brief; its tests must have used tNNN fixtures. FIX: the plan schema accepts the same loop pattern as evidence (one shared constant, used by both), with a fixture row for a seat loop id (15-slice-4) and a mutant. Check whether brief-plan-gate.ts or the record-name regex also assumes tNNN. It BLOCKS slice four's dispatch (its D_t keeps its true id; it is not renamed to fit). Small code fix: a dev seat, QA, then Aaron merges. The slice-three finding applies: the instruction (T-195) and the schema it relies on disagreed, and nothing checked one against the other. — Dispatch written: docs/loops/t216-dispatch.md. It goes to a new developer seat Aaron is starting at the shop, 2026-10-01. One shared loop-id constant for plan and evidence; GATE_RECORD_RE and loop-built paths audited; red then green on the unedited slice-four D_t; dry-run plan-gate. Machine: code now, no builds or tests on the QA PC until Rivet is done. — Session 155: QA 236 RULED ACCEPT by the planner after reading the report (origin/qa/t216-report a1960173) against docs/loops/qa-236-t216-dispatch.md. T216-1..5 and the regression all PASS; 21 probes, 0 schema disagreements; tcm CI candidate 36826245143 and base 36826249364 success. PR #245 opened at 9a0973f0; it is code, so Aaron merges. D1 (test strength: a plan-only regex copy with /i survives) moved to T-217 and does not block. After #245 merges, close this task and dispatch slice four.",
+      "note": "Found by the planner in session 153 (resumed) while finalising slice four. `harness validate plan docs/loops/loop-15-slice-4-brief.D_t.json` exits 1 with 'loop: loop must look like t001'. open-brain/src/harness/schema.ts:84 and :248 pin the plan's loop to /^t\\d{3,}$/, while the evidence schema already accepts human-seat loop ids through EVIDENCE_LOOP_PATTERN (:180: tNNN or N-word, e.g. 15-slice-3-c), as widened by candidate B (rulings-2 R10). T-195 (DT-1, DT-7) requires every interactive planner brief to ship a D_t that harness dispatch validates, so the rule cannot be met by any planner brief; its tests must have used tNNN fixtures. FIX: the plan schema accepts the same loop pattern as evidence (one shared constant, used by both), with a fixture row for a seat loop id (15-slice-4) and a mutant. Check whether brief-plan-gate.ts or the record-name regex also assumes tNNN. It BLOCKS slice four's dispatch (its D_t keeps its true id; it is not renamed to fit). Small code fix: a dev seat, QA, then Aaron merges. The slice-three finding applies: the instruction (T-195) and the schema it relies on disagreed, and nothing checked one against the other. — Dispatch written: docs/loops/t216-dispatch.md. It goes to a new developer seat Aaron is starting at the shop, 2026-10-01. One shared loop-id constant for plan and evidence; GATE_RECORD_RE and loop-built paths audited; red then green on the unedited slice-four D_t; dry-run plan-gate. Machine: code now, no builds or tests on the QA PC until Rivet is done. — Session 155: QA 236 RULED ACCEPT by the planner after reading the report (origin/qa/t216-report a1960173) against docs/loops/qa-236-t216-dispatch.md. T216-1..5 and the regression all PASS; 21 probes, 0 schema disagreements; tcm CI candidate 36826245143 and base 36826249364 success. PR #245 opened at 9a0973f0; it is code, so Aaron merges. D1 (test strength: a plan-only regex copy with /i survives) moved to T-217 and does not block. After #245 merges, close this task and dispatch slice four. — Session 155: PR #245 MERGED on Aaron's 'merge' (merge commit b3ab05ca). Verified on merged master (ec7138bb): `harness validate plan docs/loops/loop-15-slice-4-brief.D_t.json` exits 0 via tsx. Slice four's T-216 precondition is MET.",
       "note_by": [
         "6e083614-965f-462b-ad59-62091a0be5e1",
         "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
       ],
-      "closed_rev": null
+      "closed_rev": 229
     },
     {
       "id": "T-217",
@@ -3536,6 +3537,18 @@
       "title": "Release slice three and slice four together: no version for slice three alone; one release (CHANGELOG entry plus package.json bump) once slice four lands",
       "date": "2026-10-01",
       "note": "AARON, planner session 154, in this session, answering the open question 'the release: slice three A, B and C are merged with no CHANGELOG entry or version (package.json 0.44.2)': 'wait until slice four lands and release both together' (verbatim). Until then master carries merged code above v0.44.2 with no version; that is deliberate, not drift."
+    },
+    {
+      "id": "D-074",
+      "title": "Slice four seats: sia-builder builds (4.1, 4.4, 4.3 reconstructions except diffs it built); the QA seat makes every live Jev call",
+      "date": "2026-10-01",
+      "note": "Aaron, planner session 155, answering the planner's two questions after T-216 merged. Build seat: sia-builder (Recommended). Live calls: the QA seat (Recommended; slice two's close-out), headless Opus on the laptop with Aaron's TYPESAFE_API_KEY in that machine's user env only (D-070). Dispatch: docs/loops/loop-15-slice-4-dispatch.md."
+    },
+    {
+      "id": "D-075",
+      "title": "T-214 rule (a): a whitespace-only line inside a declared block is not content; the parse is invariant under inserting or removing such lines anywhere, and nothing else loosens",
+      "date": "2026-10-01",
+      "note": "Planner ruling, session 155, so the developer does not choose the rule (slice-three finding: instructions are candidates). Option (b), an authoring-time refusal, is not built; the slice-four criteria carry their own parse-check row instead. Stated as property P-blank with a generator (>=200 blank-insertion variants, >=50 junk-line variants still refused). C's prepared shadow artifact and ledger are immutable and are not re-run."
     }
   ],
   "handoffs": [
