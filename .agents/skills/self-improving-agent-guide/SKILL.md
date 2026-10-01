@@ -56,7 +56,7 @@ Write authority is split (ADR-005); retrieval is federated across all three.
 `/start` registers the session and pulls relevant prior knowledge:
 
 1. **`ob_set_session`** — binds the session UUID to the project directory, so everything stored this session carries provenance.
-2. **`ob_recall(queries, project)`** — federated search over the knowledge base, ranked by relevance and maturity. Broadens to `global: true` when project-scoped results are thin.
+2. **`ob_recall(queries, project)`** — federated search over the knowledge base, ranked by relevance, recency and the `failure` tag (maturity is not a ranking input). Broadens to `global: true` when project-scoped results are thin.
 
 At most **3 experiences + 2 skills** are surfaced, as non-prescriptive guidance.
 
@@ -193,7 +193,7 @@ The key insight: Obsidian provides storage *and* visualization, while SQLite pro
 ## Verification Checklist
 
 - [ ] Start a session — verify `SESSION_UUID` is emitted exactly once
-- [ ] `ob_recall` on a known topic — verify results carry maturity data
+- [ ] `ob_recall` on a known topic — verify relevant entries come back (ranking is relevance, recency and the `failure` tag; there is no maturity signal)
 - [ ] End a session — verify a new note appears in `~/Obsidian Vault v2/Summaries/`
 - [ ] `open-brain sync` — verify 0 issues
 - [ ] Open the dashboard — verify sessions, chunks, and knowledge render

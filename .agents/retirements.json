@@ -10,7 +10,6 @@
     ".agents/state.json",
     ".agents/SYSTEM/SUMMARY.md",
     ".agents/SYSTEM/DECISIONS.md",
-    ".agents/SYSTEM/PRD.md",
     ".agents/SYSTEM/mcp-tool-audit-2026-08-08.md",
     ".agents/TASKS/INBOX.md",
     "open-brain/tests/fixtures/",
@@ -138,6 +137,11 @@
           "path": "open-brain/tests/pipelines/sync/mirror-parity.test.ts",
           "class": "test",
           "why": "fixture proving an unexpected mirror copy is reported"
+        },
+        {
+          "path": ".agents/SYSTEM/PRD.md",
+          "class": "prose",
+          "why": "obituary — the PRD's 'Not in this product' list names the cut component"
         }
       ],
       "coverage_gap": "FOUND IN QA AT a3bcf2f, RECORDED RATHER THAN FIXED. The pattern `skill[-_]?scan` does not match \"the skill scan\" with a SPACE — verified: skill-scan, skill_scan and skillscan match; \"the skill scan\" does not. cli-session-end.ts:8 uses exactly that spelling, written by this loop's own C3 repair, so it PASSES BY SPELLING RATHER THAN BY RULE. The outcome is still correct — the file is an allowed referrer under the reflection-queue retirement — but a genuinely dangling \"the skill scan\" would pass too. THE FIX IS MEASURED AND CHEAP: widening the pattern to accept a space adds exactly two new referrers needing entries, open-brain/src/pipelines/session-end/index-v2.ts and open-brain/src/cli-session-end.ts, both obituaries; tests/fixtures-import is already historical and index-v2.test.ts is already listed. NOT APPLIED HERE because it changes shipped matching behaviour after sign-off, and a behaviour change after QA needs re-QA rather than a quiet amend."
@@ -212,6 +216,11 @@
           "path": "open-brain/src/cli-session-end.ts",
           "class": "prose",
           "why": "obituary in the pipeline header explaining why the stage numbering skips 5 and 6"
+        },
+        {
+          "path": ".agents/SYSTEM/PRD.md",
+          "class": "prose",
+          "why": "obituary — the PRD's 'Not in this product' list names the cut component"
         }
       ]
     },
@@ -439,15 +448,167 @@
           "why": "the describe block that pinned the gate now pins the cut"
         }
       ]
+    },
+    {
+      "id": "R-011",
+      "name": "maturity lifecycle",
+      "pattern": "maturity lifecycle|maturity boosts?|apoptosis|success_rate|\\bprogenitor\\b",
+      "ignore_case": true,
+      "event": "cut",
+      "classes": [
+        "symbol",
+        "schema-field",
+        "prose"
+      ],
+      "ruled": "2026-09-15",
+      "ruled_by": "Loop 10 C2",
+      "note": "Maturity boosts, Progenitor / Proven / Mature promotion, success_rate and apoptosis. Backfilled by T-169 after the record had declined to (see $declined). The BEHAVIOUR is cut: apoptosis never fired (0 rows archived), success_rate excluded neutral (72.5% of ratings) so it measured recall volume, and the boosts had sat at 1.0 since Loop 8. Deliberately NOT retired: the `maturity` column and the Maturity type in lifecycle.ts, which still display a label last written before Loop 10 and which nothing computes; the pattern therefore names the lifecycle, the boosts, apoptosis and success_rate, and the bare word 'progenitor' only as the stored label value.",
+      "allowed_referrers": [
+        {
+          "path": ".agents/SYSTEM/PRD.md",
+          "class": "prose",
+          "why": "obituary — the PRD's 'Not in this product' list names the cut lifecycle"
+        },
+        {
+          "path": ".agents/skills/self-improving-agent-guide/SKILL.md",
+          "class": "prose",
+          "why": "Lines 75-81 say the lifecycle and apoptosis were cut in Loop 10 and the columns are inert, and line 188 is the v0.4.0 history entry annotated as cut; the two lines that presented maturity as a live ranking input (59, 196) were rewritten in T-169 r2."
+        },
+        {
+          "path": "open-brain/scripts/backfill-success-rate.mjs",
+          "class": "code",
+          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the whole script (header 3-14, SELECT 53, UPDATE 105) recomputes and writes `success_rate` and reports rows \"below the apoptosis threshold\" (87-92) as if the column and threshold existed; new databases do not declare the column (db-v2.ts:130), so it would throw. Delete the script."
+        },
+        {
+          "path": "open-brain/scripts/dashboard.mjs",
+          "class": "code",
+          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: reads `success_rate` from the row query (52), buckets by maturity (248), offers a Progenitor filter (571-582), colours maturity badges (469, 748-758) and renders a \"Success Rate\" column and detail line (884, 932) as live data; the column is no longer written, so it shows frozen pre-Loop-10 values as current."
+        },
+        {
+          "path": "open-brain/scripts/shadow-backfill.mjs",
+          "class": "code",
+          "why": "Line 14 is the \"REPAIRED IN LOOP 6\" comment recording that maturity/success_rate used to be read as-of-today; a record of a past repair. (Its `coverage` branch at 80-86 reads a ReplayCoverage that no longer exists and is dead, but is not matched by the pattern.)"
+        },
+        {
+          "path": "open-brain/src/db-v2.ts",
+          "class": "prose",
+          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the comment at 66-67 says ratings \"move success_rate, which gates apoptosis and boosts ranking\" in the present tense, and the doc at 526 says \"Retire an entry by apoptosis\" for the archive helper `ob_forget` also uses. Lines 19, 130-133, 396-399, 425, 499-511, 628-632, 867-870, 968 are obituaries and 126/444 are the retained maturity label default."
+        },
+        {
+          "path": "open-brain/src/lifecycle.ts",
+          "class": "prose",
+          "why": "The header block at 4-34 is the Loop 10 C2 obituary (apoptosis never fired, success_rate cannot discriminate, boosts already 1.0) with the reviving observation and the recovery SHA; 56 and 60 name the retained `Maturity` type and the cut `success_rate` while stating nothing computes them."
+        },
+        {
+          "path": "open-brain/src/pipelines/session-end/index-v2.ts",
+          "class": "prose",
+          "why": "Line 33 explains, in the past tense, that the heuristic rating arm cut in R-010 left `harmful` unreachable and made the apoptosis threshold unsatisfiable; line 114 records that the pre-feedback lifecycle capture is gone because ranking no longer reads maturity or success_rate."
+        },
+        {
+          "path": "open-brain/src/pipelines/session-end/recalled-ids.ts",
+          "class": "prose",
+          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the header at 14-16 says \"Since v0.15.0 the same ratings move `success_rate`, which gates apoptosis and feeds `maturityBoost` ranking\" in the present tense, and 152 points at `formatApoptosisQueue`, which no longer exists."
+        },
+        {
+          "path": "open-brain/src/pipelines/shadow/evaluate.ts",
+          "class": "prose",
+          "why": "Lines 106-111 record that the lifecycle-snapshot substitution (E9b) that JOINed maturity and success_rate overrides is gone because `recallRankExpr` no longer reads either column."
+        },
+        {
+          "path": "open-brain/src/pipelines/shadow/index.ts",
+          "class": "prose",
+          "why": "Lines 145-149 record that the `snapshot` input of lifecycle values is gone because ranking no longer reads maturity or success_rate, and name the trigger that would restore it."
+        },
+        {
+          "path": "open-brain/src/pipelines/store/index.ts",
+          "class": "prose",
+          "why": "Line 66 stamps the constant label `maturity: 'progenitor'` on a new entry's frontmatter; that is the retained stored label R-011's note deliberately did not retire (nothing computes or promotes it), not the cut lifecycle behaviour."
+        },
+        {
+          "path": "open-brain/src/pipelines/sync/checks.ts",
+          "class": "prose",
+          "why": "Lines 827-828 cite Loop 11's finding that `ob_feedback` was falsely described as driving maturity promotion and apoptosis after the Loop 10 cuts, as the worked example of what the check cannot catch."
+        },
+        {
+          "path": "open-brain/src/server.ts",
+          "class": "prose",
+          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the comment at 1063 says vault_path is selected \"for the apoptosis branch\" of ob_feedback, a branch that no longer exists (1093 says so), and 1266 says a supplied x harmful cell is \"the only combination that can ever make an apoptosis threshold satisfiable\" in the present tense. Lines 1077, 1093, 1117, 1309 are obituaries, 566 is history, and 1222, 1279, 1368-1370, 1460 read or write the retained maturity label."
+        },
+        {
+          "path": "open-brain/src/shared/active-session.ts",
+          "class": "prose",
+          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the doc comment at 180 says \"the maturity lifecycle rates entries with no idea what produced them\", presenting the cut lifecycle as a running consumer of the model field."
+        },
+        {
+          "path": "open-brain/src/vault-writer.ts",
+          "class": "prose",
+          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the doc comment at 107 says \"apoptosis fires automatically\" as the reason archiveVaultNote moves rather than unlinks; apoptosis is cut and nothing fires automatically. Line 11 is the retained maturity label in the frontmatter type."
+        },
+        {
+          "path": "open-brain/tests/db-v2.test.ts",
+          "class": "test",
+          "why": "Line 146 asserts the stored maturity column still defaults to 'progenitor', pinning the retained label value R-011 deliberately kept."
+        },
+        {
+          "path": "open-brain/tests/index-upsert.test.ts",
+          "class": "test",
+          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: lines 96 and 132 assert `after.success_rate` equals `before.success_rate` (and 126 passes `successRate: 1.0`), but new databases do not declare the column, so both sides are undefined and the assertions are vacuous; they read a cut column as if live."
+        },
+        {
+          "path": "open-brain/tests/pipelines/session-end/index-v2.test.ts",
+          "class": "test",
+          "why": "Lines 152-157 are the \"Loop 7 R2\" comment recording why the heuristic-arm tests were written (a success_rate corpus mean of 0.311 against a 0.3 apoptosis threshold), above a describe block already titled \"CUT in Loop 12 (R-010)\"."
+        },
+        {
+          "path": "open-brain/tests/pipelines/sync/scorer-integration.test.ts",
+          "class": "test",
+          "why": "Lines 78-84 assert `getStalenessStats().lowSuccessCount` is 0 because success_rate no longer exists, so a reinstatement has to argue with a failing test."
+        },
+        {
+          "path": "open-brain/tests/ranking.test.ts",
+          "class": "test",
+          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: lines 122-128 assert an entry with success rate 0.1 is demoted below one at 0.9 and 130-136 assert a mature entry outranks an older progenitor, both presenting cut behaviour as live and contradicting the pins at 98-120 and 166-178 (they pass only by tie-order, `successRate` is not stored); 75-96 still say \"while the boost is suspended\". Lines 80-120 and 166-178 are legitimate pins."
+        },
+        {
+          "path": "open-brain/tests/server.test.ts",
+          "class": "test",
+          "why": "Line 192 is a task-title fixture string (\"Choose an apoptosis threshold with a defensible gate\") asserted in ob_start blocked-task output; it is a title from the state record, not a claim about behaviour."
+        },
+        {
+          "path": "open-brain/tests/setup-env.ts",
+          "class": "test",
+          "why": "Line 49 names an \"apoptosis-reachability\" suite in a comment recording which suites reset OPEN_BRAIN_VAULT_DIR on 2026-08-31; the suite no longer exists and the line records that incident."
+        },
+        {
+          "path": "open-brain/tests/shadow-strategies.test.ts",
+          "class": "test",
+          "why": "Lines 80-99 assert that two entries differing only in maturity score identically and no override can change that (maturity is not a ranking input); 32 and 81 are the retained-label fixture values that test uses."
+        },
+        {
+          "path": "open-brain/tests/trigger/fires.test.ts",
+          "class": "test",
+          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the comment at 125 says ratings in recall_log \"move success_rate, which gates apoptosis\" in the present tense, as the reason a silent fire must not reach the rated set; neither exists now."
+        },
+        {
+          "path": "open-brain/tests/vault-archive.test.ts",
+          "class": "test",
+          "why": "Line 78 is a fixture object whose `maturity: \"progenitor\"` fills the retained stored label required by the frontmatter type; it exercises archiving, not the lifecycle."
+        },
+        {
+          "path": "open-brain/tests/vault-writer.test.ts",
+          "class": "test",
+          "why": "Lines 66 and 117 are fixture objects whose `maturity: \"progenitor\"` fills the retained stored label required by the frontmatter type; they exercise note writing, not the lifecycle."
+        }
+      ]
     }
   ],
   "$declined": {
-    "note": "NOT backfilled, and the reason is a finding rather than an omission. Loop 10 is recorded as cutting success_rate, the maturity lifecycle and apoptosis — but open-brain/src/lifecycle.ts is still present, still exports LIFECYCLE_CONFIG, Maturity and Rating, and is imported by db-v2.ts, server.ts, pipelines/shadow/evaluate.ts and pipelines/shadow/strategies.ts. Ranking no longer reads maturity or success_rate, so the BEHAVIOUR was cut; the type, the vocabulary and the column were not. Whether that is a finished retirement is a question for Aaron, not something this record gets to assert. Recording them here as finished would make the check green on an unfinished retirement, which is the exact failure the Planner named: green would read as 'it is done'.",
+    "note": "RESOLVED by T-169. This block recorded why success_rate, the maturity lifecycle and apoptosis were not backfilled: open-brain/src/lifecycle.ts still exported the Maturity type and LIFECYCLE_CONFIG. Ranking reads neither maturity nor success_rate, so the behaviour was cut; R-011 now records it, with the surviving type, column and stored label named as deliberate referrers rather than as evidence the retirement is unfinished.",
     "names": [
       "success_rate",
       "maturity lifecycle",
       "apoptosis"
     ],
-    "evidence": "open-brain/src/lifecycle.ts:36 LIFECYCLE_CONFIG, :56 Maturity, :63 Rating; 4 importing modules"
+    "superseded_by": "R-011"
   }
 }
