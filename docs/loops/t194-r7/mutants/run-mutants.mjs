@@ -35,7 +35,7 @@ for (const m of MUTANTS) {
   try {
     git("apply", "--", diff);
     const tsc = run(["tsc", "--noEmit"]);
-    const tests = run(["vitest", "run", "tests/planner-hook", "--reporter=json"]);
+    const tests = run(["vitest", "run", "tests/planner-hook", "--reporter=json", "--pool=forks", "--maxWorkers=1"]);
     let failed = null;
     try {
       const j = JSON.parse(tests.stdout.slice(tests.stdout.indexOf("{")));

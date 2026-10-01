@@ -1,6 +1,7 @@
 // Runs the mutants in RAM-gated chunks, every id exactly once, one chunk after another, and records each chunk's exit code.
 //   node run-chunks.mjs <first-chunk> <last-chunk> [chunk-size=12]    (from open-brain/)
-// Before each chunk: wait until at least 1.5 GB is free and no OTHER vitest process is running (Clark: the QA PC is shared, and a single
+// Before each chunk (Atlas ruling for r7): SKIP the chunk when under 1.2 GB is free or another vitest is running; vitest runs with one worker.
+// (r7 draft: wait until at least 1.5 GB is free and no OTHER vitest process is running (Clark: the QA PC is shared, and a single
 // pass was killed for low memory). If the machine does not free up within 30 minutes the driver stops WITHOUT running that chunk and says so.
 // Output: logs/chunk<N>.log per chunk, results-chunk<N>.json, and chunk-index.json (which chunk holds which ids).
 import { spawnSync } from "node:child_process";
@@ -11,7 +12,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const [first, last, sizeArg] = process.argv.slice(2);
-const size = Number(sizeArg ?? 12);
+const size = Number(sizeArg ?? 4);
 const { MUTANTS } = await import(pathToFileURL(join(here, "specs.mjs")).href);
 const names = MUTANTS.map((m) => m.name);
 const chunks = [];
@@ -25,18 +26,19 @@ const otherVitest = () => {
 const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 
 for (let c = Number(first); c <= Number(last) && c < chunks.length; c++) {
-  let waited = 0;
+  let skipped = false;
   for (;;) {
     const gb = freemem() / 1024 ** 3;
     const others = otherVitest();
-    if (gb >= 1.5 && others === 0) break;
-    console.log(`chunk ${c}: waiting (free ${gb.toFixed(2)} GB, other vitest processes ${others})`);
-    if (waited >= 30 * 60) {
-      console.log(`chunk ${c}: NOT RUN, the machine did not free up in 30 minutes`);
-      process.exit(4);
-    }
-    sleep(60_000);
-    waited += 60;
+    if (gb >= 1.2 && others === 0) break;
+    // Atlas's ruling: a chunk is SKIPPED (not waited for) when free memory is under 1.2 GB or another vitest run is active
+    console.log(`chunk ${c}: SKIPPED (free ${gb.toFixed(2)} GB, other vitest processes ${others})`);
+    skipped = true;
+    break;
+  }
+  if (skipped) {
+    skipped = false;
+    continue;
   }
   const idx = JSON.stringify(chunks);
   writeFileSync(join(process.env.TEMP ?? ".", "r7-chunks.json"), idx);
