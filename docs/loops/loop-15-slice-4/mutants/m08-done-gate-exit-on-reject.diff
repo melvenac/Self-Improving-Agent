@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/harness/shadow-gates.ts b/open-brain/src/harness/shadow-gates.ts
+index 4714dfcd..a7ac3c2b 100644
+--- a/open-brain/src/harness/shadow-gates.ts
++++ b/open-brain/src/harness/shadow-gates.ts
+@@ -280,6 +280,7 @@ export async function runShadowDoneGate(options: RunShadowDoneOptions): Promise<
+ 
+   const answers = result.answer?.answers ?? null;
+   const decision = answers === null ? null : decideDoneGate(answers, policy, { checksPassed });
++  if (decision !== null && decision.verdict !== "proceed") process.exitCode = 1;
+   const record: ShadowDoneRecord = {
+     gate: "developer-done",
+     loop: plan.loop,

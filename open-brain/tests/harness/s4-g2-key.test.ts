@@ -174,6 +174,28 @@ describe("S4-3b.1 — the key reaches nothing else: runBriefPlanGate", () => {
     });
   }
 
+  for (const status of [200, 422] as const) {
+    it(`K3 at the transport itself, a ${status} that echoes the Authorization header leaves the canary out of the answer's error, message, detail and fields`, async () => {
+      const canary = makeCanary();
+      const seen: SeenRequest[] = [];
+      const env = harnessEnv({ [JEV_KEY_VAR]: canary });
+      // The record writer redacts too, so a mutant that drops the transport's own redaction is
+      // hidden from the record-level tests above. This one looks at the transport's output directly.
+      let surfaced = "";
+      try {
+        const a = await new JevTransport({ env, fetchImpl: hostileFetch(status, seen) }).dispatch(payload());
+        surfaced = `${a.note} ${a.resolvedModel ?? ""}`;
+      } catch (err) {
+        const e = err as { message: string; detail?: string; fields?: string[] };
+        surfaced = `${e.message} ${e.detail ?? ""} ${(e.fields ?? []).join(" ")}`;
+      }
+      expect(seen).toHaveLength(1);
+      expect(surfaced.length).toBeGreaterThan(20);
+      if (status === 422) expect(surfaced).toContain("REDACTED");
+      expect(surfaced).not.toContain(canary);
+    });
+  }
+
   it("K2 the spawned CLI, with a constructed env that holds the canary, prints and writes none of it", () => {
     const canary = makeCanary();
     const dir = mkdtempSync(join(tmpdir(), "s4g2-cli-"));

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/gate.ts b/open-brain/src/harness/gate.ts
+index 39c7f513..794993f8 100644
+--- a/open-brain/src/harness/gate.ts
++++ b/open-brain/src/harness/gate.ts
+@@ -384,7 +384,7 @@ export function jevModelAtLeast(resolved: unknown, minimum: string = JEV_MIN_MOD
+   const need = parseJevVersion(minimum);
+   if (have === null || need === null) return false;
+   for (let i = 0; i < 3; i++) {
+-    if (have[i]! !== need[i]!) return have[i]! > need[i]!;
++    if (have[i]! !== need[i]!) return String(have[i]) > String(need[i]);
+   }
+   return true;
+ }

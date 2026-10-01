@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/shadow-qa.ts b/open-brain/src/harness/shadow-qa.ts
+index b9f682a2..d5b44079 100644
+--- a/open-brain/src/harness/shadow-qa.ts
++++ b/open-brain/src/harness/shadow-qa.ts
+@@ -77,7 +77,7 @@ const SHA_RE = /^[0-9a-f]{40}$/;
+ /** Statuses that mean the QA seat did not observe the item. Code, not Jev, decides these are untested. */
+ const UNOBSERVED_STATUSES: readonly string[] = ["not_evaluated", "pending"];
+ 
+-const hasEvidence = (r: EvidenceRow): boolean => !UNOBSERVED_STATUSES.includes(r.status) && r.evidence.trim() !== "";
++const hasEvidence = (r: EvidenceRow): boolean => r.status.length > 0;
+ 
+ /** Read the E_t at its commit, and prove the bytes are the blob that path has there. */
+ function readEvidenceBytes(repoRoot: string, ref: EvidenceRef): { text: string; blob: string } {

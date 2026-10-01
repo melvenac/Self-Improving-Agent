@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/brief-plan-gate.ts b/open-brain/src/harness/brief-plan-gate.ts
+index bb3bddf2..473b04d1 100644
+--- a/open-brain/src/harness/brief-plan-gate.ts
++++ b/open-brain/src/harness/brief-plan-gate.ts
+@@ -344,7 +344,7 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
+ 
+   // The record is redacted as it is written: an answer, a note or a model string that echoes the
+   // key is a record that leaks it, and the transport only redacts what it puts in an error.
+-  const persist = (): void => writeGateRecordExclusive(recordPath, renderGateRecord(redact(record, env)));
++  const persist = (): void => writeGateRecordExclusive(recordPath, renderGateRecord(record));
+ 
+   // S4-7a: the attempt goes on disk BEFORE the request leaves.
+   const attempt =

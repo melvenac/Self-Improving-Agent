@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/gate-records.ts b/open-brain/src/harness/gate-records.ts
+index 8e598a4a..67c8bfe5 100644
+--- a/open-brain/src/harness/gate-records.ts
++++ b/open-brain/src/harness/gate-records.ts
+@@ -78,7 +78,7 @@ const common = {
+   note: z.string(),
+   /** S4-4a. Required, never defaulted, never optional. */
+   source: z.enum(RECORD_SOURCES),
+-  plan_provenance: z.enum(PLAN_PROVENANCES),
++  plan_provenance: z.enum(PLAN_PROVENANCES).default("reconstructed-after"),
+ };
+ 
+ /** S4-7b: what makes a retry tell apart from a re-roll. Required on every slice-four record. */

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/shadow-qa.ts b/open-brain/src/harness/shadow-qa.ts
+index b9f682a2..165ec3c1 100644
+--- a/open-brain/src/harness/shadow-qa.ts
++++ b/open-brain/src/harness/shadow-qa.ts
+@@ -220,7 +220,7 @@ export async function runShadowQaGate(options: RunShadowQaOptions): Promise<RunS
+     artifact_complete_enough_to_stop: complete,
+   };
+ 
+-  const safe = redact(record, env);
++  const safe = record;
+   // The copy goes down first, exclusively: a record is never written beside an E_t that is not there.
+   mkdirSync(recordsDir, { recursive: true });
+   if (existsSync(copyPath)) {
