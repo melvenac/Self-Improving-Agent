@@ -189,6 +189,10 @@ describe("P1 — the real write location, whatever the spelling (QA 233/234/235 
     deny(fx.bash("echo x > OPEN-BRAIN/SRC/cli.ts"));
     deny(fx.bash(`echo x > '\\\\?\\${fx.repo}\\open-brain\\src\\cli.ts'`));
     deny(fx.edit(`//?/${fx.fwd}/open-brain/src/cli.ts`));
+    // The device form has no `?`, so only the prefix rule (not the glob rule) can resolve it.
+    deny(fx.bash(`echo x > '\\\\.\\${fx.repo}\\open-brain\\src\\cli.ts'`));
+    deny(fx.edit(`//./${fx.fwd}/open-brain/src/cli.ts`));
+    deny(fx.write(`\\\\.\\${fx.repo}\\.agents\\state.json`));
     deny(fx.bash("echo x > open-brain/src./cli.ts"));
     deny(fx.bash("echo x > open-brain/src/cli.ts:stream"));
     deny(fx.bash("echo x > 'open-brain/src /cli.ts'"));

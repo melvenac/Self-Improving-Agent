@@ -1,0 +1,42 @@
+[
+  {
+    "name": "p1-paren-allowed",
+    "clause": "P1 non-literal: process substitution",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 2,
+    "killed": true
+  },
+  {
+    "name": "p1-longpath-off",
+    "clause": "P1 location: \\\\?\\ prefix",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "p3-powershell-tool-ignored",
+    "clause": "P3 PowerShell tool is checked",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 58,
+    "killed": true
+  },
+  {
+    "name": "p2b-plus-refspec-allowed",
+    "clause": "P2b force: +refspec",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "p2b-expanded-push-arg-allowed",
+    "clause": "P2b a substituted push argument",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  }
+]
