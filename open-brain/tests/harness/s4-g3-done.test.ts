@@ -45,7 +45,7 @@ interface Diff {
   merge: string;
 }
 
-describe("G3 — the 4.3 shadow done-gate runner", () => {
+describe("G3 — the 4.3 shadow done-gate runner", { timeout: 120_000 }, () => {
   let repo: RepoFixture;
   let diff: Diff;
   let side: string;

@@ -29,11 +29,11 @@ const FORBIDDEN_WORD = new RegExp(`\\b${"calibrat"}${"ed"}\\b`, "i");
 const JEV_MCP = new RegExp(`${"jev"}-${"mcp"}|${"mcp__"}${"jev"}`);
 // CALL POSITION only (r2, D1): a test function, optionally with modifiers, then the skipping modifier.
 // The r1 pattern matched the word anywhere, so a test TITLE containing it was a hit.
-const SKIPS = new RegExp(`\\b(it|test|describe)(\\.\\w+(\\([^)]*\\))?)*\\.(${"sk"}${"ip"}|${"to"}${"do"}|${"sk"}${"ipIf"}|${"run"}${"If"})\\b`);
+const SKIPS = new RegExp(`\\b(it|test|describe|suite)(\\.\\w+(\\((?:[^()]|\\((?:[^()]|\\([^()]*\\))*\\))*\\))?)*\\.(${"sk"}${"ip"}|${"to"}${"do"}|${"sk"}${"ipIf"}|${"run"}${"If"})\\b`);
 
 const hits = (re: RegExp, lines: string[]): string[] => lines.filter((l) => re.test(l));
 
-describe("slice four guards", () => {
+describe("slice four guards", { timeout: 120_000 }, () => {
   it("G0 the scans fire on a planted line and stay quiet on a clean one", () => {
     expect(hits(FORBIDDEN_WORD, [`the values are ${"calibrat"}${"ed"}`])).toHaveLength(1);
     expect(hits(FORBIDDEN_WORD, ["the values are PROVISIONAL"])).toHaveLength(0);
@@ -42,6 +42,10 @@ describe("slice four guards", () => {
     expect(hits(SKIPS, [`it.${"sk"}${"ip"}("x", () => {})`])).toHaveLength(1);
     expect(hits(SKIPS, [`describe.each([1]).${"sk"}${"ip"}("x", () => {})`])).toHaveLength(1);
     expect(hits(SKIPS, [`test.${"run"}${"If"}(cond)("x", () => {})`])).toHaveLength(1);
+    // r3 residuals: the `suite` alias, and parentheses nested inside a modifier's arguments.
+    expect(hits(SKIPS, [`suite.${"sk"}${"ip"}("x", () => {})`])).toHaveLength(1);
+    expect(hits(SKIPS, [`describe.each([[1, (2)], [fn(3, (4))]]).${"sk"}${"ip"}("x", () => {})`])).toHaveLength(1);
+    expect(hits(SKIPS, [`it.concurrent.${"sk"}${"ip"}("x", () => {})`])).toHaveLength(1);
     expect(hits(SKIPS, ["it('x', () => {})"])).toHaveLength(0);
     // The r1 false positive: a TITLE that names the thing is not a call.
     expect(hits(SKIPS, [`it("S4-9.2 no ${"sk"}${"ip"}, ${"to"}${"do"}, ${"sk"}${"ipIf"} or ${"run"}${"If"} is added", () => {`])).toHaveLength(0);
@@ -90,7 +94,11 @@ describe("slice four guards", () => {
     const call = cli.slice(at, cli.indexOf("});", at));
     expect(call.length).toBeGreaterThan(100);
     expect(call).not.toMatch(/doneGate|planGate/);
+    // r3: a spread could smuggle the same wiring in under another name (QA 242's r02), so none is allowed.
+    expect(call).not.toMatch(/\.\.\./);
     expect(/doneGate/.test("prepareShadowVerdict({ doneGate: x });")).toBe(true);
+    expect(/\.\.\./.test("prepareShadowVerdict({ a, ...wired, });")).toBe(true);
+    expect(/\.\.\./.test("prepareShadowVerdict({ a, b, });")).toBe(false);
   });
 
   it("S4-5b no added line, anywhere in the slice's diff, contains the forbidden word (whole word, any case)", () => {

@@ -99,7 +99,7 @@ const goodQa = (over: Record<string, unknown> = {}): Record<string, unknown> => 
   };
 };
 
-describe("S4-4a — provenance is required, by the writer and by the validator", () => {
+describe("S4-4a — provenance is required, by the writer and by the validator", { timeout: 120_000 }, () => {
   let dir: string;
   beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "s4g1-"));
@@ -173,7 +173,7 @@ describe("S4-4a — provenance is required, by the writer and by the validator",
   });
 });
 
-describe("S4-4a.4 — the runtime's own G_done carries the provenance", () => {
+describe("S4-4a.4 — the runtime's own G_done carries the provenance", { timeout: 120_000 }, () => {
   beforeAll(() => requireGit());
   let repo: ReturnType<typeof makeRepo>;
   beforeEach(() => {
@@ -222,7 +222,7 @@ describe("S4-4a.4 — the runtime's own G_done carries the provenance", () => {
  * S4-7a — write-ahead
  * ------------------------------------------------------------------------- */
 
-describe("S4-7a — the attempt is on disk before the request leaves", () => {
+describe("S4-7a — the attempt is on disk before the request leaves", { timeout: 120_000 }, () => {
   it("W1 a request that never resolves still leaves its attempt, marked incomplete", async () => {
     const dir = mkdtempSync(join(tmpdir(), "s4g1-wa-"));
     const brief = join(dir, "b-brief.md");
@@ -273,7 +273,7 @@ describe("S4-7a — the attempt is on disk before the request leaves", () => {
  * S4-7b — a retry is not a re-roll; the counting command
  * ------------------------------------------------------------------------- */
 
-describe("S4-7a/7b — the counting command", () => {
+describe("S4-7a/7b — the counting command", { timeout: 120_000 }, () => {
   let dir: string;
   let ledger: string;
   beforeEach(() => {

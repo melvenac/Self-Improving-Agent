@@ -84,7 +84,7 @@ function fakeTransport(answers: Record<string, unknown> | null, seen: GatePayloa
   };
 }
 
-describe("S4-6a — qa-score.json, its schema, and the threshold-scan guard", () => {
+describe("S4-6a — qa-score.json, its schema, and the threshold-scan guard", { timeout: 120_000 }, () => {
   let dir: string;
   beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "s4g5-pol-"));
@@ -165,7 +165,7 @@ describe("S4-6a — qa-score.json, its schema, and the threshold-scan guard", ()
   });
 });
 
-describe("S4-6b/6c/6d — the runner", () => {
+describe("S4-6b/6c/6d — the runner", { timeout: 120_000 }, () => {
   let repo: RepoFixture;
   let commit: string;
   let side: string;

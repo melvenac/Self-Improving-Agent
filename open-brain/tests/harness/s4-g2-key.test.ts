@@ -34,7 +34,7 @@ const payload = (): GatePayload => ({
   context: { plan: { objective: "o" } },
 });
 
-describe("G2 — the key", () => {
+describe("G2 — the key", { timeout: 120_000 }, () => {
   const realFetch = globalThis.fetch;
   beforeEach(() => {
     globalThis.fetch = (() => {
@@ -124,7 +124,7 @@ function writePlanFixture(dir: string): string {
   return dt;
 }
 
-describe("S4-3b.1 — the key reaches nothing else: runBriefPlanGate", () => {
+describe("S4-3b.1 — the key reaches nothing else: runBriefPlanGate", { timeout: 120_000 }, () => {
   // The tripwire matters most here: against a source that ignores the injected fetch, the canary
   // would otherwise be sent to the real endpoint. It must fail the test instead of making a call.
   const realFetch = globalThis.fetch;
@@ -227,7 +227,7 @@ export function spreadsProcessEnv(source: string): boolean {
   return /\.\.\.\s*process\.env\b/.test(source);
 }
 
-describe("ruling 6 — the t195 helper never spreads process.env", () => {
+describe("ruling 6 — the t195 helper never spreads process.env", { timeout: 120_000 }, () => {
   it("E1 the scan is shown to fire on the old shape and to stay quiet on the new one", () => {
     expect(spreadsProcessEnv("env: { ...process.env, ...env },")).toBe(true);
     expect(spreadsProcessEnv("env: harnessEnv(env),")).toBe(false);

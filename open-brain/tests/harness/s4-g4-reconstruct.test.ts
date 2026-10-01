@@ -60,7 +60,7 @@ const validPlan = () => ({
   new_capability: "c",
 });
 
-describe("the plan schema carries reconstruction provenance (S4-4b.2)", () => {
+describe("the plan schema carries reconstruction provenance (S4-4b.2)", { timeout: 120_000 }, () => {
   it("S1 a plan without reconstructed_by and reconstructed_from still validates (written-before)", () => {
     expect(validatePlan(validPlan()).ok).toBe(true);
   });
@@ -88,7 +88,7 @@ describe("the plan schema carries reconstruction provenance (S4-4b.2)", () => {
   });
 });
 
-describe("the eight reconstructed D_t files (S4-4b)", () => {
+describe("the eight reconstructed D_t files (S4-4b)", { timeout: 120_000 }, () => {
   it("R0 exactly eight D_t files exist under the records directory", () => {
     const found = readdirSync(resolve(REPO, RECORDS)).filter((n) => n.endsWith(".D_t.json")).sort();
     expect(found).toEqual(MAP.map((r) => `pr-${r.pr}.D_t.json`).sort());

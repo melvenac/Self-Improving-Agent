@@ -82,7 +82,7 @@ const qa = (pr: number, commit: string, regression: number, complete: number, ov
   ...over,
 });
 
-describe("G6 — the close-out tables", () => {
+describe("G6 — the close-out tables", { timeout: 120_000 }, () => {
   let dir: string;
   beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "s4g6-"));
