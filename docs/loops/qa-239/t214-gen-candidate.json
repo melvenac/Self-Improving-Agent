@@ -1,0 +1,39 @@
+{
+  "total": 6196,
+  "bad": 0,
+  "counts": {
+    "G1 valid blocks equal at base and candidate": {
+      "n": 22,
+      "bad": 0
+    },
+    "G2 one blank at every position (LF)": {
+      "n": 637,
+      "bad": 0
+    },
+    "G2 one blank at every position (CRLF)": {
+      "n": 637,
+      "bad": 0
+    },
+    "G3 random multi-blank insertion": {
+      "n": 1600,
+      "bad": 0
+    },
+    "G4 differential, with blanks": {
+      "n": 1860,
+      "bad": 0
+    },
+    "G4 differential, blank-free (base == cand)": {
+      "n": 1140,
+      "bad": 0
+    },
+    "G5 one junk line + blanks still refused": {
+      "n": 300,
+      "bad": 0
+    }
+  },
+  "g4": {
+    "parsed": 700,
+    "refused": 2300
+  },
+  "failures": []
+}

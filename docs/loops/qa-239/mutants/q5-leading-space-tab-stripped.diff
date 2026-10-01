@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/declared.ts b/open-brain/src/harness/declared.ts
+index b40aaa87..8eb7a586 100644
+--- a/open-brain/src/harness/declared.ts
++++ b/open-brain/src/harness/declared.ts
+@@ -67,7 +67,7 @@ function parseItems(
+   };
+ 
+   for (const raw of lines) {
+-    const line = raw.replace(/\r$/, "");
++    const line = raw.replace(/\r$/, "").replace(/^[ \t]+/, "");
+     // P-blank (T-214): a whitespace-only line is not content. Spaces, tabs and a lone \r only —
+     // not every Unicode space, so nothing else loosens.
+     if (BLANK_RE.test(line)) continue;

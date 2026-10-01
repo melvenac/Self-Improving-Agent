@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/declared.ts b/open-brain/src/harness/declared.ts
+index b40aaa87..0f4795b4 100644
+--- a/open-brain/src/harness/declared.ts
++++ b/open-brain/src/harness/declared.ts
+@@ -36,7 +36,7 @@ export type DeclaredBlock =
+ 
+ const ITEM_RE = /^([A-Za-z][A-Za-z0-9-]*)\s*:\s*(\S.*)$/;
+ const HEADER_RE = /^\[(unrunnable|out-of-scope)]$/;
+-const BLANK_RE = /^[ \t\r]*$/;
++const BLANK_RE = /^[ \r]*$/;
+ 
+ function linesOf(body: string): string[] {
+   const trimmed = body.endsWith("\n") ? body.slice(0, -1) : body;

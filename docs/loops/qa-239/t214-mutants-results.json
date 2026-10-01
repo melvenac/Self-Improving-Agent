@@ -1,0 +1,191 @@
+[
+  {
+    "name": "m1-blank-only-before-header",
+    "by": "builder",
+    "applied": true,
+    "builderTest": "RED",
+    "builderFailed": [
+      "B1",
+      "B2",
+      "B3",
+      "E1"
+    ],
+    "qaGen": "RED",
+    "qaGenRows": [
+      "G2 one blank at every position (LF): 637 variants, 464 disagreements",
+      "G2 one blank at every position (CRLF): 637 variants, 466 disagreements",
+      "G3 random multi-blank insertion: 1600 variants, 1445 disagreements",
+      "G4 differential, with blanks: 1860 variants, 887 disagreements",
+      "G5 one junk line + blanks still refused: 300 variants, 192 disagreements",
+      "TOTAL 6196 variants, 3454 disagreements"
+    ]
+  },
+  {
+    "name": "m2-whitespace-only-not-blank",
+    "by": "builder",
+    "applied": true,
+    "builderTest": "RED",
+    "builderFailed": [
+      "B1",
+      "B2",
+      "B3",
+      "E1"
+    ],
+    "qaGen": "RED",
+    "qaGenRows": [
+      "G2 one blank at every position (LF): 637 variants, 490 disagreements",
+      "G2 one blank at every position (CRLF): 637 variants, 539 disagreements",
+      "G3 random multi-blank insertion: 1600 variants, 1440 disagreements",
+      "G4 differential, with blanks: 1860 variants, 809 disagreements",
+      "G5 one junk line + blanks still refused: 300 variants, 192 disagreements",
+      "TOTAL 6196 variants, 3470 disagreements"
+    ]
+  },
+  {
+    "name": "m3-junk-accepted",
+    "by": "builder",
+    "applied": true,
+    "builderTest": "RED",
+    "builderFailed": [
+      "J1",
+      "J2"
+    ],
+    "qaGen": "RED",
+    "qaGenRows": [
+      "G4 differential, with blanks: 1860 variants, 1411 disagreements",
+      "G4 differential, blank-free (base == cand): 1140 variants, 627 disagreements",
+      "G5 one junk line + blanks still refused: 300 variants, 600 disagreements",
+      "TOTAL 6196 variants, 2638 disagreements"
+    ]
+  },
+  {
+    "name": "m4-qa-unrunnable-not-covered",
+    "by": "builder",
+    "applied": true,
+    "builderTest": "RED",
+    "builderFailed": [
+      "B1",
+      "B2",
+      "E1"
+    ],
+    "qaGen": "RED",
+    "qaGenRows": [
+      "G2 one blank at every position (LF): 637 variants, 102 disagreements",
+      "G2 one blank at every position (CRLF): 637 variants, 103 disagreements",
+      "G3 random multi-blank insertion: 1600 variants, 434 disagreements",
+      "G4 differential, with blanks: 1860 variants, 283 disagreements",
+      "G5 one junk line + blanks still refused: 300 variants, 54 disagreements",
+      "TOTAL 6196 variants, 976 disagreements"
+    ]
+  },
+  {
+    "name": "m5-blank-only-block-absent",
+    "by": "builder",
+    "applied": true,
+    "builderTest": "RED",
+    "builderFailed": [
+      "E1"
+    ],
+    "qaGen": "RED",
+    "qaGenRows": [
+      "G1 valid blocks equal at base and candidate: 22 variants, 4 disagreements",
+      "G2 one blank at every position (LF): 637 variants, 26 disagreements",
+      "G2 one blank at every position (CRLF): 637 variants, 26 disagreements",
+      "G3 random multi-blank insertion: 1600 variants, 310 disagreements",
+      "G4 differential, with blanks: 1860 variants, 226 disagreements",
+      "G4 differential, blank-free (base == cand): 1140 variants, 390 disagreements",
+      "TOTAL 6196 variants, 982 disagreements"
+    ]
+  },
+  {
+    "name": "q1-blank-class-is-backslash-s",
+    "by": "qa239",
+    "applied": true,
+    "builderTest": "RED",
+    "builderFailed": [
+      "J2"
+    ],
+    "qaGen": "RED",
+    "qaGenRows": [
+      "G4 differential, with blanks: 1860 variants, 541 disagreements",
+      "G4 differential, blank-free (base == cand): 1140 variants, 227 disagreements",
+      "G5 one junk line + blanks still refused: 300 variants, 188 disagreements",
+      "TOTAL 6196 variants, 956 disagreements"
+    ]
+  },
+  {
+    "name": "q2-blank-class-drops-tab",
+    "by": "qa239",
+    "applied": true,
+    "builderTest": "RED",
+    "builderFailed": [
+      "B1",
+      "B2",
+      "B3",
+      "E1"
+    ],
+    "qaGen": "RED",
+    "qaGenRows": [
+      "G2 one blank at every position (LF): 637 variants, 343 disagreements",
+      "G2 one blank at every position (CRLF): 637 variants, 343 disagreements",
+      "G3 random multi-blank insertion: 1600 variants, 1292 disagreements",
+      "G4 differential, with blanks: 1860 variants, 573 disagreements",
+      "G5 one junk line + blanks still refused: 300 variants, 155 disagreements",
+      "TOTAL 6196 variants, 2706 disagreements"
+    ]
+  },
+  {
+    "name": "q3-blank-refused-before-first-header",
+    "by": "qa239",
+    "applied": true,
+    "builderTest": "RED",
+    "builderFailed": [
+      "B1",
+      "B2",
+      "B3",
+      "E1"
+    ],
+    "qaGen": "RED",
+    "qaGenRows": [
+      "G2 one blank at every position (LF): 637 variants, 102 disagreements",
+      "G2 one blank at every position (CRLF): 637 variants, 103 disagreements",
+      "G3 random multi-blank insertion: 1600 variants, 551 disagreements",
+      "G4 differential, with blanks: 1860 variants, 611 disagreements",
+      "G5 one junk line + blanks still refused: 300 variants, 85 disagreements",
+      "TOTAL 6196 variants, 1452 disagreements"
+    ]
+  },
+  {
+    "name": "q4-blank-resets-section",
+    "by": "qa239",
+    "applied": true,
+    "builderTest": "RED",
+    "builderFailed": [
+      "B1",
+      "B2",
+      "B3"
+    ],
+    "qaGen": "RED",
+    "qaGenRows": [
+      "G2 one blank at every position (LF): 637 variants, 260 disagreements",
+      "G2 one blank at every position (CRLF): 637 variants, 260 disagreements",
+      "G3 random multi-blank insertion: 1600 variants, 631 disagreements",
+      "G5 one junk line + blanks still refused: 300 variants, 56 disagreements",
+      "TOTAL 6196 variants, 1207 disagreements"
+    ]
+  },
+  {
+    "name": "q5-leading-space-tab-stripped",
+    "by": "qa239",
+    "applied": true,
+    "builderTest": "green",
+    "builderFailed": [],
+    "qaGen": "RED",
+    "qaGenRows": [
+      "G4 differential, with blanks: 1860 variants, 377 disagreements",
+      "G4 differential, blank-free (base == cand): 1140 variants, 171 disagreements",
+      "G5 one junk line + blanks still refused: 300 variants, 114 disagreements",
+      "TOTAL 6196 variants, 662 disagreements"
+    ]
+  }
+]

@@ -1,0 +1,72 @@
+{
+  "loop": "239-qa-t214",
+  "candidate_git": {
+    "sha": "caebe8b6ecaa32db8defaf979e19df435a5b60f3",
+    "branch": "origin/loop/t214-declared-blank",
+    "frozen_at": "2026-10-01T09:30:00Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci && npm run build && npx tsc --noEmit in open-brain at caebe8b6 (Plumb, local)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "npm ci 0, npm run build 0 (stamped caebe8b), tsc --noEmit 0. No CI: gh not installed on Plumb."
+    },
+    "unit": {
+      "command": "npx vitest run tests/harness/b2-et.test.ts tests/harness/shadow-merge.test.ts tests/harness/t214-declared-blank.test.ts; npx vitest run tests/harness",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 180000,
+      "detail": "declared/shadow-merge/t214: exit 0, 91 passed. Full tests/harness: 560 passed, 1 failed, 4 skipped (exit 1); the one failure, checks.test.ts D4 default BUILD check ('npm could not determine executable to run'), fails identically at base ec7138bb, so it is environmental."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "T214-1",
+      "status": "met",
+      "order": "shown",
+      "evidence": "QA 239's own generator docs/loops/qa-239/t214-gen.mts, oracle cand(x) == base(strip(x)): 6196 variants (every position x 13 blank kinds x 11 blocks, LF and CRLF; random multi-insertion and removal; differential), 0 disagreements at the candidate, 3920 at the base."
+    },
+    {
+      "id": "T214-2",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Junk, item before header, id in both, id twice (both fences), two blocks, header/item with leading space or tab, header in qa-unrunnable: all refused at the candidate with blanks adjacent. 1140 blank-free random bodies: candidate == base exactly. NBSP, \\f, \\v, ZWSP, BOM and U+3000 lines are refused as junk; judged consistent with D-075, not a gap (P-blank enumerates the members; refusal fails closed)."
+    },
+    {
+      "id": "T214-3",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Blank-only qa-declared (LF and CRLF) and qa-unrunnable give present:true with empty lists; no block and a different fence give present:false. Base refused every blank-only block."
+    },
+    {
+      "id": "T214-4",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Base ec7138bb: DeclaredParseError: line is not `ID: text`: (blank). Candidate: unrunnable CC-23,24,25; out-of-scope CC-26,27,28,21. Criteria c7ac9bdb, C's shadow_merge.json b42edce4 and ledger.jsonl 7fc74105 identical at base and candidate."
+    },
+    {
+      "id": "T214-MUT",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Builder m1-m5 red on the builder's test and on QA 239's generator. QA 239 q1 (BLANK_RE as \\s) and q2 (class drops \\t) target the class; q3, q4, q5 also red on the generator. q5 (leading space/tab stripped) survives the builder's test: gap G1."
+    },
+    {
+      "id": "T214-REG",
+      "status": "met",
+      "order": "shown",
+      "evidence": "b2-et (41) and shadow-merge (43) unchanged and green at the candidate; tests/harness 560 passed with one environmental failure identical at base."
+    }
+  ],
+  "regressions": [
+    "None. b2-et and shadow-merge tests unchanged and green; checks.test.ts D4 fails at base and candidate alike (environment)."
+  ],
+  "gaps": [
+    "G1: the builder's t214 test has no leading-whitespace refusal row; mutant q5 (strip leading spaces/tabs) survives it. The candidate code refuses such lines; QA 239's generator kills q5.",
+    "G2: /sync not run on the candidate (handoff also did not run it).",
+    "No CI runs: gh is not installed on Plumb; red side shown by git grep at origin/master 2448a6ea."
+  ],
+  "notes": "QA 239 second attempt, headless Claude Code Opus on Plumb. Dispatch 5a8b5fbb (no launch-line SHA given; found on origin/docs/session-155c). Downstream (report only): blank lines change shadow verdicts only from undefined (blank refusal) to the blank-free verdict; prepare refuses to rewrite C's existing artifact. No live Jev call."
+}
