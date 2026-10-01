@@ -1,0 +1,34 @@
+[
+  {
+    "name": "p0-tilde-allowed",
+    "clause": "P0 bash: leading ~",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 7,
+    "killed": true
+  },
+  {
+    "name": "p0-ps-tilde-allowed",
+    "clause": "P0 powershell: leading ~",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "p0-background-allowed",
+    "clause": "P0 bash: single &",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 7,
+    "killed": true
+  },
+  {
+    "name": "p0-fd-redirect-allowed",
+    "clause": "P0 bash: only 2> and 2>&1 as fd redirects",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  }
+]

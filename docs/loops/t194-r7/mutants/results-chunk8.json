@@ -1,0 +1,34 @@
+[
+  {
+    "name": "r5-p3-move-source-ignored",
+    "clause": "P3 Move-Item source",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p3-newitem-name-ignored",
+    "clause": "P3 New-Item -Path DIR -Name FILE",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-git-case-sensitive",
+    "clause": "P2b git word: case, extension, quotes",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 7,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-global-option-values",
+    "clause": "P2b options between git and push: -C <dir>, -c k=v",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 11,
+    "killed": true
+  }
+]

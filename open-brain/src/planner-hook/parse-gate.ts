@@ -581,7 +581,8 @@ interface PsTok {
 
 /** The one shape check for a PowerShell word that names a path: used for every token AND every redirect target (r7, D-A). */
 export function psPathShapeProblem(text: string): string | null {
-  const p = pathShapeProblem(text);
+  // characters are P0a's job and are checked on the whole command first; this is the path-shape half only
+  const p = pathShapeProblem(text, false);
   return p ? refuse(p) : null;
 }
 

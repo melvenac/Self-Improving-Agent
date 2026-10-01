@@ -1,0 +1,34 @@
+[
+  {
+    "name": "p0-inline-code-allowed",
+    "clause": "P0 bash: node -e, python -c, perl -e",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "p0-git-alias-allowed",
+    "clause": "P0 git: a subcommand that is not git's own (an alias)",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 12,
+    "killed": true
+  },
+  {
+    "name": "p0-gh-alias-allowed",
+    "clause": "P0 gh: a command that is not gh's own (an alias)",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  },
+  {
+    "name": "p0-newline-allowed",
+    "clause": "P0 bash: an unquoted newline",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  }
+]

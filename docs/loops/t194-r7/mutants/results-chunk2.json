@@ -1,0 +1,34 @@
+[
+  {
+    "name": "r5-p1-ntfs-dots-off",
+    "clause": "P1 location: NTFS trailing dots/spaces/streams",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p1-longpath-off",
+    "clause": "P1 location: \\\\?\\ prefix",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p1-shortname-off",
+    "clause": "P1 location: 8.3 short name",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p1-filetool-literal-off",
+    "clause": "P1 one canonicaliser: file tools refuse non-literal paths",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  }
+]

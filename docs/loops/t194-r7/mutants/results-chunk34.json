@@ -1,0 +1,26 @@
+[
+  {
+    "name": "r7-env-after-wrapper-skipped",
+    "clause": "P0d: an assignment after env is checked",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "r7-new-item-name-alone",
+    "clause": "D-C: New-Item -Name with no -Path targets the current directory",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  },
+  {
+    "name": "r7-scp-target-ignored",
+    "clause": "P0b: scp's local end is a write target",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 7,
+    "killed": true
+  }
+]

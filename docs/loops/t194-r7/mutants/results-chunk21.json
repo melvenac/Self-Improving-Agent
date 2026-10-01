@@ -1,0 +1,34 @@
+[
+  {
+    "name": "p0-ps-block-comment-allowed",
+    "clause": "P0 powershell: <# #>",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  },
+  {
+    "name": "p0-ps-type-literal-allowed",
+    "clause": "P0 powershell: [type]:: calls",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "p0-ps-dynamic-command-allowed",
+    "clause": "P0 powershell: Invoke-Expression, Start-Process, powershell...",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 18,
+    "killed": true
+  },
+  {
+    "name": "p0-ps-call-operator-allowed",
+    "clause": "P0 powershell: & on anything but gh",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  }
+]

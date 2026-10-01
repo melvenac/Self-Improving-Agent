@@ -1,0 +1,34 @@
+[
+  {
+    "name": "r5-p2b-delete-refspec-allowed",
+    "clause": "P2b delete: :dst refspec",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-standing-prefix-off",
+    "clause": "P2b standing: only loop/ qa/ docs/ chore/ (and never master)",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 25,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-remote-any",
+    "clause": "P2b standing: remote must be origin",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "r5-p2b-bare-push-allowed",
+    "clause": "P2b standing: a push naming no branch",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 3,
+    "killed": true
+  }
+]

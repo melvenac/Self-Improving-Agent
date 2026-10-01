@@ -53,6 +53,12 @@ describe("P0a — characters", () => {
     expect(parseGate("Get-Date\tGet-Date", "powershell")).toBeNull();
   });
 
+  it("Bash: a control character outside quotes is refused, naming it", () => {
+    expect(parseGate("echo a\u0001b", "bash")).toContain("non-ASCII character U+0001");
+    expect(parseGate("echo a\u007fb", "bash")).toContain("non-ASCII character U+007F");
+    expect(parseGate("echo 'a\u0001b'", "bash")).toBeNull();
+  });
+
   it.each([
     ["NBSP between words", "echo a\u00a0b"],
     ["in the command word", "ec\u00e9ho x"],
@@ -122,6 +128,15 @@ describe("P0b — one target validator, every write source", () => {
     allow(fx.bash("scp a.txt host:/tmp/open-brain/src/x.ts"));
     allow(fx.bash("scp a.txt user@host:open-brain/src/x.ts"));
     deny(fx.bash("scp host:/tmp/a.txt C:open-brain/src/x.ts"));
+  });
+});
+
+describe("D-A — every PowerShell redirect target gets the provider-path and drive-relative checks in the GATE", () => {
+  it.each([">", ">>", "2>", "2>>", "1>", "3>", "6>"])("%s", (op) => {
+    for (const target of ["FileSystem::C:/x/open-brain/src/x.ts", "Microsoft.PowerShell.Core\\FileSystem::C:/x/y.ts", "C:open-brain/src/x.ts"]) {
+      const g = parseGate(`Write-Output x ${op} ${target}`, "powershell");
+      expect(g, `${op} ${target}`).toMatch(/provider path|drive-relative/);
+    }
   });
 });
 

@@ -157,9 +157,10 @@ export function isNullSink(text: string): boolean {
  * drive-relative path (`C:name`, which is relative to the current directory ON THAT DRIVE), and a character outside printable
  * ASCII (PowerShell 5.1 and the Windows file system read several lookalikes as something else).
  */
-export function pathShapeProblem(text: string): string | null {
+export function pathShapeProblem(text: string, checkAscii = true): string | null {
   if (text.includes("::")) return "provider path (::)";
   if (/^[A-Za-z]:(?![\\/])./.test(text)) return "drive-relative path (C:name)";
+  if (!checkAscii) return null;
   for (let k = 0; k < text.length; ) {
     const cp = text.codePointAt(k) as number;
     if (cp > 0x7e || cp < 0x20) return `non-ASCII character U+${cp.toString(16).toUpperCase().padStart(4, "0")}`;

@@ -1,0 +1,34 @@
+[
+  {
+    "name": "p0-backtick-allowed",
+    "clause": "P0 bash: backtick",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "p0-brace-allowed",
+    "clause": "P0 bash: { } group and brace expansion",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 10,
+    "killed": true
+  },
+  {
+    "name": "p0-paren-allowed",
+    "clause": "P0 bash: ( ) subshell",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 5,
+    "killed": true
+  },
+  {
+    "name": "p0-glob-allowed",
+    "clause": "P0 bash: * ? [",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 9,
+    "killed": true
+  }
+]

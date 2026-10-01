@@ -1,0 +1,34 @@
+[
+  {
+    "name": "r7-gate-ps-redirect-shape",
+    "clause": "P0b/D-A: PowerShell > target shape in the gate",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "r7-gate-ps-2redirect-shape",
+    "clause": "P0b/D-A: PowerShell 2> target shape in the gate",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "r7-gate-ps-token-shape",
+    "clause": "P0b: PowerShell word shape in the gate",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 7,
+    "killed": true
+  },
+  {
+    "name": "r7-allowlist-off",
+    "clause": "P0c: a Bash command word must be on the allow-list",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 28,
+    "killed": true
+  }
+]

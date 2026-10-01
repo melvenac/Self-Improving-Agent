@@ -1,0 +1,34 @@
+[
+  {
+    "name": "r6-limit-claims-caught-item",
+    "clause": "D17: the limit text names nothing the hook catches",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 2,
+    "killed": true
+  },
+  {
+    "name": "r7-ps-nonascii-allowed",
+    "clause": "P0a: PowerShell refuses any non-ASCII character",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  },
+  {
+    "name": "r7-bash-nonascii-allowed",
+    "clause": "P0a: Bash refuses non-ASCII outside quotes",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 7,
+    "killed": true
+  },
+  {
+    "name": "r7-nonascii-controls-allowed",
+    "clause": "P0a: control characters are refused too",
+    "typecheckExit": 0,
+    "testExit": 0,
+    "failedTests": 0,
+    "killed": false
+  }
+]

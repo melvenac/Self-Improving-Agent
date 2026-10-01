@@ -1,0 +1,34 @@
+[
+  {
+    "name": "r5-p1-tee-first-only",
+    "clause": "P1 targets: every tee file",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 4,
+    "killed": true
+  },
+  {
+    "name": "r5-p1-mv-source-ignored",
+    "clause": "P1 targets: a move deletes its source",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  },
+  {
+    "name": "r5-p1-cp-t-ignored",
+    "clause": "P1 targets: cp -t DIR",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 8,
+    "killed": true
+  },
+  {
+    "name": "r5-p1-sed-e-files",
+    "clause": "P1 targets: sed -i -e SCRIPT FILE",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  }
+]

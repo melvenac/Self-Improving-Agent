@@ -1,0 +1,34 @@
+[
+  {
+    "name": "r6-nonmerge-token-rule",
+    "clause": "Open 4: a merge is gh's first two positional words",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 10,
+    "killed": true
+  },
+  {
+    "name": "r6-nonmerge-global-flag-value",
+    "clause": "Open 4: gh's -R/--repo take a value",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 6,
+    "killed": true
+  },
+  {
+    "name": "r6-git-c-keys-allowed",
+    "clause": "Open 5: git -c alias./remote./url./include./core.",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 11,
+    "killed": true
+  },
+  {
+    "name": "r6-foreign-url-read",
+    "clause": "D9: a pull URL of another repository needs a grant",
+    "typecheckExit": 0,
+    "testExit": 1,
+    "failedTests": 1,
+    "killed": true
+  }
+]
