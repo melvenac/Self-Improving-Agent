@@ -36,6 +36,8 @@ const JUNK = [
   "A-9:",
   "9-bad: id starts with a digit",
   "[unrunnable] trailing",
+  "[ unrunnable ]",
+  "A-9 :  ",
 ];
 
 /** Small seeded PRNG (mulberry32): the generator is deterministic, so a failure reproduces. */

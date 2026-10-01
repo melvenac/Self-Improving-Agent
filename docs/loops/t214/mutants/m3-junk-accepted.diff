@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/harness/declared.ts b/open-brain/src/harness/declared.ts
+index b40aaa87..63f08074 100644
+--- a/open-brain/src/harness/declared.ts
++++ b/open-brain/src/harness/declared.ts
+@@ -78,6 +78,7 @@ function parseItems(
+     const section = sectionFor(header);
+     // `.match`, not `.exec`: the spawn-site scan treats a call named exec as a process spawn.
+     const item = line.match(ITEM_RE);
++    if (item === null) continue;
+     if (section === null || item === null) {
+       throw new DeclaredParseError(`line is not \`ID: text\`: ${line === "" ? "(blank)" : line}`);
+     }
