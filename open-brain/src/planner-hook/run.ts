@@ -15,9 +15,8 @@ import {
   isProtectedArtifactPath,
   isRenderedViewPath,
   isSummaryPath,
-  nonLiteralCause,
   SUMMARY_PATH,
-  toRepoRelative,
+  validateTarget,
 } from "./paths.js";
 import { fetchPrChangedPaths, type PrFilesDeps } from "./prfiles.js";
 import { editTouchesSummaryRegion, writeTouchesSummaryRegion } from "./summary.js";
@@ -104,25 +103,15 @@ function checkFileTool(
     return { decision: "deny", reason: "Planner hook: tool input has no target path — denied (fail closed)." };
   }
 
-  // r5 P1: the same literal-path rule as a shell target. A file tool expands nothing, but a `~`, a
-  // pattern character or a brace is not a path the hook can locate, so it is refused with its cause.
-  const nonLiteral = nonLiteralCause(rawPath, false);
-  if (nonLiteral) {
-    return {
-      decision: "deny",
-      reason: `Planner hook: denied — ${rawPath} (${nonLiteral}, so its location cannot be determined) (fail closed).`,
-    };
+  // r7 P0b: the file tools use the SAME validator as every shell write source: literal, shape (provider path, drive-relative,
+  // non-ASCII), location, and the protected-path test, once.
+  const v = validateTarget(rawPath, rawPath, false, repoRoot, cwd, false);
+  if (v.kind === "refused") {
+    return { decision: "deny", reason: `Planner hook: denied — ${v.cause} (fail closed). Path: ${rawPath}` };
   }
-
-  // D1/D3: resolve against the tool's cwd, then make it repo-relative. A path outside the repo is
-  // not the hook's business; one whose location cannot be determined is denied, not waved through.
-  const resolved = toRepoRelative(rawPath, repoRoot, cwd);
-  if (!resolved.ok) {
-    return { decision: "deny", reason: `Planner hook: denied — ${resolved.cause} (fail closed). Path: ${rawPath}` };
-  }
-  if (resolved.outside) return null;
-  const relPath = resolved.rel;
-  const ci = resolved.ci;
+  if (v.kind === "ok" && v.outside) return null;
+  const relPath = v.rel;
+  const ci = v.ci;
 
   if (isProtectedArtifactPath(relPath, ci)) {
     return {

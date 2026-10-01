@@ -32,9 +32,9 @@ export const BASH_REFUSED: Array<[string, string, string]> = [
   ["a shell -c with extra arguments", "bash -c 'ls' extra", "bash is only parseable"],
   ["node reading stdin", "echo 'x' | node -", "inline code"],
   ["node -e", "node -e 'process.exit(0)'", "inline code"],
-  ["python -c", "python -c 'print(1)'", "inline code"],
-  ["python reading stdin", "echo x | python -", "inline code"],
-  ["perl -e", "perl -e 'print 1'", "inline code"],
+  ["python -c", "python -c 'print(1)'", "command not allowed: python"],
+  ["python reading stdin", "echo x | python -", "command not allowed: python"],
+  ["perl -e", "perl -e 'print 1'", "command not allowed: perl"],
   ["pipe into pwsh", "echo Get-Date | pwsh", "code-running"],
   ["powershell from bash", "powershell -Command Get-Date", "code-running"],
   ["timeout wrapper", "timeout 5 cp a.ts open-brain/src/x.ts", "timeout"],
@@ -49,7 +49,7 @@ export const BASH_REFUSED: Array<[string, string, string]> = [
   ["exec", "exec ls", "exec"],
   ["eval", "eval 'ls'", "eval"],
   ["source", "source ./x.sh", "source"],
-  ["find -exec", "find . -name a.ts -exec cp a.ts open-brain/src/x.ts ';'", "find -exec"],
+  ["find -exec", "find . -name a.ts -exec cp a.ts open-brain/src/x.ts ';'", "command not allowed: find"],
   ["sed w command", "sed -n 'w open-brain/src/x.ts' a.txt", "sed w"],
   ["sed s///w", "sed 's/a/b/w open-brain/src/x.ts' a.txt", "sed w"],
   ["sed s///e", "sed 's/a/b/e' a.txt", "sed e"],
@@ -94,7 +94,8 @@ export const BASH_REFUSED: Array<[string, string, string]> = [
   ["a gh alias", "gh mm 2", "gh alias"],
   ["gh alias set", "gh alias set mm 'pr merge'", "gh alias"],
   ["gh extension", "gh extension install x", "gh extension"],
-  ["awk -i", "awk -i inplace '{print}' a.txt", "awk -i"],
+  ["awk -i", "awk -i inplace '{print}' a.txt", "command not allowed: awk"],
+  ["bash -lc", "bash -lc 'ls'", "bash is only parseable"],
 ];
 
 

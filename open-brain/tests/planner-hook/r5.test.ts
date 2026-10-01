@@ -256,7 +256,6 @@ describe("P2 — a merge is `gh ... pr ... merge` in any spelling; one exact gra
     "GH.EXE pr merge 1 --rebase",
     '"gh" pr merge 1',
     "'gh' pr merge 1",
-    '"C:/Program Files/GitHub CLI/gh.exe" pr merge 1',
     "gh pr merge https://github.com/melvenac/Self-Improving-Agent/pull/1",
     "  gh   pr  merge   1  --squash ",
   ])("`%s` with a docs-only PR is allowed, after reading the list", async (command) => {
@@ -282,8 +281,10 @@ describe("P2 — a merge is `gh ... pr ... merge` in any spelling; one exact gra
   it("a refusal names why: a shape outside the grammar, a repo flag, or a chain", async () => {
     expect((await fx.merge("Bash", "gh pr merge 1 --admin")).reason).toContain("no-grant grammar");
     expect((await fx.merge("Bash", "gh pr merge 1 --repo=o/x")).reason).toContain("--repo");
-    expect((await fx.merge("Bash", "gh pr merge 1 && x")).reason).toContain("not a single gh pr merge invocation");
-    expect((await fx.merge("Bash", "env GH_REPO=o/x gh pr merge 1")).reason).toContain("not a single gh pr merge invocation");
+    expect((await fx.merge("Bash", "gh pr merge 1 && echo x")).reason).toContain("not a single gh pr merge invocation");
+    // r7 P0d: GH_REPO in the environment is refused by the parse gate before P2 reads the merge
+    expect((await fx.merge("Bash", "env GH_REPO=o/x gh pr merge 1")).reason).toContain("git/gh config through the environment");
+    expect((await fx.merge("Bash", "env FOO=1 gh pr merge 1")).reason).toContain("not a single gh pr merge invocation");
   });
 
   it("a grant covers exactly its own command, and a refused shape does not burn it", async () => {

@@ -391,6 +391,8 @@ function genMerge(count: number): MergeCase[] {
     let eligible = true;
     const ghForm = pick(rng, ps ? GH_PS : GH_BASH);
     how.push(`gh:${ghForm}`);
+    // r7 P0c: a Bash command word that is a path (not a bare name) is refused, so such a merge is never the exact no-grant form
+    if (!ps && /[\\/]/.test(ghForm)) eligible = false;
     let command = ghForm;
     let prefix = "";
     if (chance(rng, 0.25)) {
@@ -568,6 +570,8 @@ describe("P2b — a git merge, tag or push goes through the same grant check, in
         command = `env X=1 ${command}`;
         how.push("env");
       }
+      // r7 P0c: a Bash command word that is a path is refused outright, whatever it would have been
+      if (!ps && /[\\/]/.test(gitWord)) restricted = true;
       out.push({ command, tool: ps ? "PowerShell" : "Bash", restricted, how });
     }
     return out;
@@ -599,7 +603,8 @@ describe("P2b — a git merge, tag or push goes through the same grant check, in
   it("an exact grant allows the command it was written for, once, whatever its spelling", () => {
     const rng = mulberry32(SEED + 7);
     for (let n = 0; n < 40; n++) {
-      const command = `${pick(rng, GIT_BASH)} ${pick(rng, GIT_OPTS)}${pick(rng, PUSH_NEEDS_GRANT.filter((c) => !c.includes("$")))}`;
+      // r7 P0c: a path as the command word is refused outright, so a grant cannot cover it
+      const command = `${pick(rng, GIT_BASH.filter((g) => !/[\\/]/.test(g)))} ${pick(rng, GIT_OPTS)}${pick(rng, PUSH_NEEDS_GRANT.filter((c) => !c.includes("$")))}`;
       writeGrant(command);
       expect(fx.bash(command).decision, command).toBe("allow");
       expect(fx.bash(command).decision, `${command} (second use, grant consumed)`).toBe("deny");

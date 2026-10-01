@@ -151,18 +151,37 @@ export function isNullSink(text: string): boolean {
   );
 }
 
+/**
+ * The shape problems any write target can have, whatever wrote it. ONE function, used by the parse gate (for PowerShell words and
+ * redirect targets) and by validateTarget (for every target the hook reads): a provider path (`FileSystem::C:\...`), a
+ * drive-relative path (`C:name`, which is relative to the current directory ON THAT DRIVE), and a character outside printable
+ * ASCII (PowerShell 5.1 and the Windows file system read several lookalikes as something else).
+ */
+export function pathShapeProblem(text: string): string | null {
+  if (text.includes("::")) return "provider path (::)";
+  if (/^[A-Za-z]:(?![\\/])./.test(text)) return "drive-relative path (C:name)";
+  for (let k = 0; k < text.length; ) {
+    const cp = text.codePointAt(k) as number;
+    if (cp > 0x7e || cp < 0x20) return `non-ASCII character U+${cp.toString(16).toUpperCase().padStart(4, "0")}`;
+    k += cp > 0xffff ? 2 : 1;
+  }
+  return null;
+}
+
 export type TargetVerdict =
   | { kind: "refused"; cause: string }
-  | { kind: "protected"; rel: string }
-  | { kind: "ok" };
+  | { kind: "protected"; rel: string; ci: boolean }
+  | { kind: "ok"; outside: true }
+  | { kind: "ok"; outside: false; rel: string; ci: boolean };
 
 /**
- * THE canonicaliser (P1). Every caller - Bash and PowerShell redirects, sed/tee/cp/mv, the PowerShell
- * cmdlets, and the Edit/Write file tools - gets its verdict here, from the location the tool will
- * actually write to: resolved against `cwd`, slashes normalised, `.`/`..` applied, case folded on a
- * Windows drive, and only then compared with the protected paths.
+ * THE target validator (P0b, r7; P1's canonicaliser since r5). EVERY write target the hook reads goes through here, from every source:
+ * Bash redirects, PowerShell `>` `>>` `2>`, tee, cp, mv, install, sed -i, scp, the PowerShell cmdlets' -Path/-LiteralPath/-FilePath/
+ * -Destination/positionals, New-Item -Name, and the Edit/Write/NotebookEdit file tools. It applies, in this order: not empty; a null
+ * device is no file; literal (no expansion, glob, brace, tilde); shape (provider path, drive-relative, non-ASCII); then the real location
+ * (resolved against `cwd`, slashes, `.`/`..`, case folded on a Windows drive, 8.3 names) compared with the protected paths.
  */
-export function classifyTarget(
+export function validateTarget(
   text: string,
   raw: string,
   expands: boolean,
@@ -173,13 +192,15 @@ export function classifyTarget(
   if (text === "") {
     return { kind: "refused", cause: `${raw || "(empty)"} (no readable target, so its location cannot be determined)` };
   }
-  if (isNullSink(text)) return { kind: "ok" };
+  if (isNullSink(text)) return { kind: "ok", outside: true };
   const nl = (expands ? "contains a shell expansion" : null) ?? nonLiteralCause(text, shell) ?? nonLiteralCause(raw, shell);
   if (nl) return { kind: "refused", cause: `${text} (${nl}, so its location cannot be determined)` };
+  const shape = pathShapeProblem(text);
+  if (shape) return { kind: "refused", cause: `${text} (${shape}, so its location cannot be determined)` };
   const rel = toRepoRelative(text, repoRoot, cwd);
   if (!rel.ok) return { kind: "refused", cause: rel.cause };
-  if (rel.outside) return { kind: "ok" };
+  if (rel.outside) return { kind: "ok", outside: true };
   return isProtectedArtifactPath(rel.rel, rel.ci) || isRenderedViewPath(rel.rel, rel.ci)
-    ? { kind: "protected", rel: rel.rel }
-    : { kind: "ok" };
+    ? { kind: "protected", rel: rel.rel, ci: rel.ci }
+    : { kind: "ok", outside: false, rel: rel.rel, ci: rel.ci };
 }

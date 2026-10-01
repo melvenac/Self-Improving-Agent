@@ -23,6 +23,7 @@ interface Row {
   file_path: string | null;
   cwd: string;
   expect: string | null;
+  extra?: { how?: string[] };
 }
 
 const ROWS: Row[] = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../../../docs/loops/t194-r6/qa237-rows.json"), "utf8"));
@@ -76,6 +77,9 @@ const isP0 = (o: Outcome): boolean => o.decision === "deny" && o.reason.includes
 function judge(row: Row, o: Outcome): string | null {
   const want = row.expect;
   if (isP0(o)) return null; // superseded by P0 (a refusal with a named construct)
+  // r7, CI on Linux: QA 237 generated these on a case-INSENSITIVE Windows file system, where `PACKAGE.json` IS the protected package.json.
+  // On a case-sensitive file system it is a different file, and the hook correctly allows it, so the expectation is Windows-only.
+  if (!fx.windows && row.extra?.how?.includes("case") && want !== null && want.startsWith("deny")) return null;
   // Open 5 (Atlas ruling): git -c core./alias./remote./url./include. needs a grant, so QA's r5-era "standing push" rows that carry
   // such a key are superseded: a refusal naming the grant is the r6 answer.
   if (want === "allow" && o.decision === "deny" && /\s-c\s+(?:core|alias|remote|url|include|includeif)\./i.test(row.command ?? "") && /D-038/.test(o.reason)) return null;

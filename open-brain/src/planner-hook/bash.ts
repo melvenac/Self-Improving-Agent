@@ -1,4 +1,4 @@
-import { classifyTarget, isNullSink } from "./paths.js";
+import { isNullSink, pathShapeProblem, validateTarget } from "./paths.js";
 import { PS_CMDLETS, psCanonical, resolvePsParam } from "./parse-gate.js";
 import {
   allParses,
@@ -16,13 +16,14 @@ import {
  */
 export const BASH_WRITE_LIMIT =
   "The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically " +
-  "parseable'. Inside that grammar it reads redirects and the targets of tee, cp, mv, install and sed -i (Bash), and of " +
-  "Set-Content, Add-Content, Clear-Content, Out-File, Tee-Object, New-Item, Copy-Item, Move-Item, Rename-Item and " +
-  "Remove-Item (PowerShell). A target that is not a literal path is refused, and so is cd plus a write on one line (split " +
-  "them into two commands). OUT OF REACH, not caught: what a program the command runs does with its own arguments (node " +
-  "x.js or npm test writing a path it builds at runtime); in Bash, other writing commands (rm, touch, dd, curl -o, git " +
-  "checkout); symlinks and junctions; and a merge through the GitHub API (curl, gh api). It stops mistakes by the " +
-  "planner's tools; it is not a sandbox.";
+  "parseable'. PowerShell must be printable ASCII; Bash may carry other characters only inside quotes; a Bash command word " +
+  "must be on the allow-list (BASH_ALLOWED_COMMANDS). Inside that grammar it reads redirects and the targets of tee, cp, mv, " +
+  "install, sed -i and scp's local end (Bash), and of Set-Content, Add-Content, Clear-Content, Out-File, Tee-Object, New-Item, " +
+  "Copy-Item, Move-Item, Rename-Item and Remove-Item (PowerShell). A target that is not a literal path is refused, and so is " +
+  "cd plus a write on one line (split them into two commands). OUT OF REACH, not caught: a program named on the allow-list does " +
+  "what its own arguments say (node x.js or npm test writing a path it builds at runtime); the remote side of ssh and scp " +
+  "(D-019); in Bash, rm, touch, mkdir and git checkout; symlinks and junctions; and a merge through the GitHub API (curl, gh " +
+  "api). It stops mistakes by the planner's tools; it is not a sandbox.";
 
 export interface WriteTarget {
   word: Word;
@@ -109,6 +110,13 @@ function bashCommandTargets(name: string, args: readonly Word[], out: WriteTarge
       else if (pos.length >= 2) out.push({ word: pos[pos.length - 1], via: name });
       // A move deletes its sources, so a protected source is a protected write.
       if (name === "mv") for (const w of pos.slice(0, targetDir ? pos.length : pos.length - 1)) out.push({ word: w, via: "mv source" });
+      return;
+    }
+    case "scp": {
+      // the LOCAL end of a copy is a write target: the last operand, unless it names a remote host (`host:path`, `user@host:path`)
+      const pos = positionals(args);
+      const last = pos[pos.length - 1];
+      if (last && pos.length >= 2 && !/^(?:[^\s@/\\:]+@)?[^\s@/\\:]{2,}:/.test(last.text)) out.push({ word: last, via: "scp" });
       return;
     }
     case "sed": {
@@ -212,11 +220,16 @@ function psCommandTargets(canon: string, args: readonly Word[], via: string, out
   if (kind === "new") {
     const base = pathVals.length > 0 ? pathVals : pos.slice(0, 1);
     if (names.length > 0 && base.length > 0) {
+      // the name is a path FRAGMENT: joined it can hide a shape problem (`docs/C:name`), so it is checked on its own as well
+      for (const nm of names) if (pathShapeProblem(nm.text)) add(nm, via);
       for (const b of base) {
         for (const nm of names) {
           add({ text: `${b.text}/${nm.text}`, raw: `${b.raw}/${nm.raw}`, expands: b.expands || nm.expands }, via);
         }
       }
+    } else if (names.length > 0) {
+      // r7 D-C (QA 241): -Name with no -Path creates the item in the current directory; the name IS the target
+      for (const nm of names) add(nm, via);
     } else for (const b of base) add(b, via);
     return;
   }
@@ -315,7 +328,7 @@ export function detectBashWriteTargets(
   }
 
   for (const t of ex.targets) {
-    const v = classifyTarget(t.word.text, t.word.raw, t.word.expands, repoRoot, cwd, true);
+    const v = validateTarget(t.word.text, t.word.raw, t.word.expands, repoRoot, cwd, true);
     if (v.kind === "refused") push(v.cause);
     else if (v.kind === "protected") push(t.word.text);
   }

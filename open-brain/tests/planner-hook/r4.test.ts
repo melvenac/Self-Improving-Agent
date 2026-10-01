@@ -173,7 +173,8 @@ describe("the prefix half of the single-invocation check (QA 234 qa-r32-prefix)"
     const calls: string[] = [];
     const r = await runAsync(command, ["docs/a.md"], calls);
     expect(r.decision).toBe("deny");
-    expect(r.reason).toContain("not a single gh pr merge invocation");
+    // r7: an env assignment of GH_REPO is refused by P0d before P2 reads the merge; the chain/prefix shapes are still refused by P2
+    expect(r.reason).toMatch(/not a single gh pr merge invocation|git\/gh config through the environment/);
     expect(calls).toEqual([]);
   });
 });
