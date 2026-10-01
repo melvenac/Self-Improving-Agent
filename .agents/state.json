@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 233,
+  "revision": 234,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1105,7 +1105,7 @@
       "opened_session": 153,
       "closed_session": null,
       "supersedes": null,
-      "note": "Found by the planner in session 153 at C's first live shadow-verdict prepare (T-155, CC-23 episode 1). loop-15-slice-3-c-criteria.md's ```qa-declared block has a blank line (line 340) between [unrunnable] and [out-of-scope]. parseDeclared refuses it with 'line is not `ID: text`: (blank)', so the verdict was undefined for a formatting reason. No fixture in B's or C's tests has a blank line in the block, so nothing caught it. Decide which rule holds: (a) the parser tolerates blank lines between sections (a natural markdown reading), or (b) the format forbids them and /sync or the criteria-authoring step rejects a criteria file whose block does not parse, BEFORE any candidate exists. Either way, add a fixture row with a blank line. Do not rewrite loop-15-slice-3-c-criteria.md after the fact: its prepared artifact is immutable. — Session 155: dispatched to sia-builder as slice four step 1 (docs/loops/loop-15-slice-4-dispatch.md), rule (a) per D-075. Branch loop/t214-declared-blank. — Session 155: BUILT by sia-builder (Aaron approved runs in its window): loop/t214-declared-blank caebe8b6 (from ec7138bb); BLANK_RE /^[ \\t\\r]*$/ skip in parseItems; 240+30 CRLF blank variants, 60 junk; 5 mutants red; vitest tests/harness exit 0 (490 passed). Pushed SHA read back by the planner (ls-remote). QA 239 dispatch: docs/loops/qa-239-t214-dispatch.md (own generator, NBSP/\\f/\\v judgement, base refusal text captured, >=2 own mutants). Target: Plumb after QA 238.",
+      "note": "Found by the planner in session 153 at C's first live shadow-verdict prepare (T-155, CC-23 episode 1). loop-15-slice-3-c-criteria.md's ```qa-declared block has a blank line (line 340) between [unrunnable] and [out-of-scope]. parseDeclared refuses it with 'line is not `ID: text`: (blank)', so the verdict was undefined for a formatting reason. No fixture in B's or C's tests has a blank line in the block, so nothing caught it. Decide which rule holds: (a) the parser tolerates blank lines between sections (a natural markdown reading), or (b) the format forbids them and /sync or the criteria-authoring step rejects a criteria file whose block does not parse, BEFORE any candidate exists. Either way, add a fixture row with a blank line. Do not rewrite loop-15-slice-3-c-criteria.md after the fact: its prepared artifact is immutable. — Session 155: dispatched to sia-builder as slice four step 1 (docs/loops/loop-15-slice-4-dispatch.md), rule (a) per D-075. Branch loop/t214-declared-blank. — Session 155: BUILT by sia-builder (Aaron approved runs in its window): loop/t214-declared-blank caebe8b6 (from ec7138bb); BLANK_RE /^[ \\t\\r]*$/ skip in parseItems; 240+30 CRLF blank variants, 60 junk; 5 mutants red; vitest tests/harness exit 0 (490 passed). Pushed SHA read back by the planner (ls-remote). QA 239 dispatch: docs/loops/qa-239-t214-dispatch.md (own generator, NBSP/\\f/\\v judgement, base refusal text captured, >=2 own mutants). Target: Plumb after QA 238. — Session 155: QA 239 (Plumb, second attempt after a launcher --add-dir fault) RULED ACCEPT by the planner after reading the report (origin/qa/t214-report d4993796) against docs/loops/qa-239-t214-dispatch.md. P-blank: 6,196 independent variants, 0 disagreements (3,920 at base); T214-2..4 met; NBSP/\\f/\\v/ZWSP refused = matches D-075 (QA's reasoning adopted: P-blank names its members, the rest stays strict); 10/10 mutants red; regression 1 environmental failure identical at base (checks.test.ts D4 on Plumb). 0 tcm runs (no gh on Plumb): PR #250's CI is the candidate's first CI. PR #250 opened; code, Aaron merges. G1 to T-218.",
       "note_by": [
         "6e083614-965f-462b-ad59-62091a0be5e1",
         "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
@@ -1150,6 +1150,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "QA 236 D1 (report a1960173). Mutant M7 gives PlanSchema.loop its own copy of LOOP_ID_PATTERN with the /i flag: 68/68 target tests and the full tests/harness run stay green, because zod's JSON emission keeps the regex source and drops flags, so plan.schema.json does not move and the drift test, L3 and BE-0.1 cannot see it. Under M7 validatePlan accepts T001 and 15-Slice while evidence refuses them. Cheap kills: assert PlanSchema.shape.loop's regex IS LOOP_ID_PATTERN by identity (also kills the equivalent M6), and/or add T001 and 15-Slice-4 to L2's refusals. ALSO record, not fix (QA 236 open item 2): runtime.ts:1278 validates a runtime planner's D_t but never checks plan.loop against the run's --loop (E_t does, at :1535). Predates T-216; the accepted set is now wider. plan.loop builds no path, so not a safety issue; recorded so nobody inherits it as settled.",
+      "note_by": [
+        "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-218",
+      "title": "T-214's test lacks a leading-whitespace row: QA 239 mutant q5 (strip leading spaces/tabs before matching) survives the builder's test",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 155,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "QA 239 G1 (report d4993796). The candidate code refuses ' [unrunnable]' and '  A-1: x', and QA's generator (docs/loops/qa-239/t214-gen.mts, G4 differential) kills q5, but t214-declared-blank.test.ts's JUNK list and J2 have no leading-whitespace row although T214-2 names it. Fix: add leading-whitespace rows to J1/J2, or commit QA's G4 differential as a test. Same shape as T-217 (a guard the property needs but the tests don't hold).",
       "note_by": [
         "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
       ],

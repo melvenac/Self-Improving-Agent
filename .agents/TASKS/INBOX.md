@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 233 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 234 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -93,6 +93,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 ## P3
 
 - [ ] **T-188** sync's ci-status check reads gh's 'gh auth login' hint in a clone whose origin is not GitHub as 'gh is not authenticated'
+- [ ] **T-218** T-214's test lacks a leading-whitespace row: QA 239 mutant q5 (strip leading spaces/tabs before matching) survives the builder's test
 
 ## Done (last 3 sessions)
 
