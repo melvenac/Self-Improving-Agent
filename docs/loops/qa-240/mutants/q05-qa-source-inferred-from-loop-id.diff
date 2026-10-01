@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/shadow-qa.ts b/open-brain/src/harness/shadow-qa.ts
+index b9f682a2..f27a1221 100644
+--- a/open-brain/src/harness/shadow-qa.ts
++++ b/open-brain/src/harness/shadow-qa.ts
+@@ -204,7 +204,7 @@ export async function runShadowQaGate(options: RunShadowQaOptions): Promise<RunS
+     decision: decision === null ? null : ({ ...decision } as unknown as Record<string, unknown>),
+     runtime_action: SHADOW_RUNTIME_ACTION,
+     note: result.error !== null ? failureNote(result.error) : (result.answer?.note ?? ""),
+-    source: "seat",
++    source: /^t\d{3,}$/.test(ev.loop) ? "runtime" : "seat",
+     plan_provenance: options.planProvenance ?? "reconstructed-after",
+     attempt_id: result.attempt_id,
+     subject,

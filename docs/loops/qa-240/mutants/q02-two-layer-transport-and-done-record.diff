@@ -1,0 +1,26 @@
+diff --git a/open-brain/src/harness/gate.ts b/open-brain/src/harness/gate.ts
+index 39c7f513..f524798c 100644
+--- a/open-brain/src/harness/gate.ts
++++ b/open-brain/src/harness/gate.ts
+@@ -556,7 +556,7 @@ export class JevTransport implements GateTransport {
+     }
+ 
+     const raw = await response.text().catch(() => "");
+-    const safe = redact(raw, this.env).slice(0, 2000);
++    const safe = raw.slice(0, 2000);
+ 
+     if (!response.ok) throw classifyStatus(payload.gate, response.status, safe);
+ 
+diff --git a/open-brain/src/harness/shadow-gates.ts b/open-brain/src/harness/shadow-gates.ts
+index 4714dfcd..6c4e8331 100644
+--- a/open-brain/src/harness/shadow-gates.ts
++++ b/open-brain/src/harness/shadow-gates.ts
+@@ -314,7 +314,7 @@ export async function runShadowDoneGate(options: RunShadowDoneOptions): Promise<
+     diffstat,
+   };
+ 
+-  const safe = redact(record, env);
++  const safe = record;
+   writeSliceRecord(recordPath, safe);
+   return { recordPath, record: safe, decision, exitCode: result.error !== null ? 1 : 0 };
+ }

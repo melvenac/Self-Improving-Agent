@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/harness/shadow-qa.ts b/open-brain/src/harness/shadow-qa.ts
+index b9f682a2..7966056c 100644
+--- a/open-brain/src/harness/shadow-qa.ts
++++ b/open-brain/src/harness/shadow-qa.ts
+@@ -164,7 +164,6 @@ export async function runShadowQaGate(options: RunShadowQaOptions): Promise<RunS
+     if (choice !== "pass" && choice !== "fail" && choice !== "untested") {
+       // Not answered: untested, and named. Never a default pass.
+       results.push({ id: row.id, from: row.from, result: "untested", decided_by: "code", severity: null });
+-      if (answers !== null) missing.push(qaResultQuestionId(row.from, row.id));
+       continue;
+     }
+     let severity: number | null = null;

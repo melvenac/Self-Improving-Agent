@@ -1,0 +1,11 @@
+[
+  {
+    "name": "q12-fetch-failure-filed-unavailable.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 0,
+    "total": 108,
+    "passed": 108,
+    "failed": [],
+    "reverted_clean": true
+  }
+]

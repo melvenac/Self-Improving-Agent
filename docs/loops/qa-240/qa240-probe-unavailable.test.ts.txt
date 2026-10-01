@@ -1,0 +1,39 @@
+// QA 240 probe (local only, never committed to the candidate): ruling 3. A request that reached
+// fetch must never be counted as `unavailable`; a refusal before fetch must be.
+import { it, expect } from "vitest";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { runBriefPlanGate } from "../../src/harness/brief-plan-gate.js";
+import { countAttempts, readLedger } from "../../src/harness/gate-records.js";
+
+const DT = {
+  loop: "15-b", objective: "o", tasks: ["t"], out_of_scope: ["x"], preserve: ["p"],
+  acceptance: [{ id: "A1", observable: "o", type: "blackbox" }], repair_targets: ["r"], new_capability: "c",
+};
+const env = (key?: string) => ({ PATH: process.env.PATH ?? "", HOME: process.env.HOME ?? "", ...(key ? { TYPESAFE_API_KEY: key } : {}) });
+
+async function once(key: string | undefined) {
+  const dir = mkdtempSync(join(tmpdir(), "qa240-unavail-"));
+  writeFileSync(join(dir, "b-brief.md"), "# b\n");
+  writeFileSync(join(dir, "b-brief.D_t.json"), JSON.stringify(DT));
+  const ledger = join(dir, "attempts.jsonl");
+  let reached = 0;
+  const rejecting = (async () => { reached += 1; throw new Error("ECONNRESET"); }) as unknown as typeof fetch;
+  await runBriefPlanGate({ dtPath: join(dir, "b-brief.D_t.json"), repoRoot: dir, mode: "live", env: env(key), fetchImpl: rejecting, ledgerPath: ledger } as never).catch(() => undefined);
+  return { reached, ledger: readLedger(ledger), count: countAttempts({ ledger, repoRoot: dir }) };
+}
+
+it("QA240-U1 a request that reached fetch and failed is counted, and is not `unavailable`", async () => {
+  const r = await once("S4CANARY-0123456789abcdef01234567");
+  expect(r.reached).toBe(1);
+  expect(r.ledger.map((a) => a.outcome_class)).toEqual(["transport"]);
+  expect(r.count.total).toBe(1);
+});
+
+it("QA240-U2 a refusal before fetch (no key) is `unavailable` and is not counted", async () => {
+  const r = await once(undefined);
+  expect(r.reached).toBe(0);
+  expect(r.ledger.map((a) => a.outcome_class)).toEqual(["unavailable"]);
+  expect(r.count.total).toBe(0);
+});

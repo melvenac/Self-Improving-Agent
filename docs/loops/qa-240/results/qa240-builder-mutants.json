@@ -1,0 +1,235 @@
+[
+  {
+    "name": "m01-source-optional.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 104,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P2 the writer refuses each field missing and each field out of set, and creates no file",
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P4 `harness validate gate-record` exits 0 on a good record and non-zero on a hand-written bad one",
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P6 the derived JSON Schema file matches what zod derives",
+      "s4-g6-closeout.test.ts :: G6 — the close-out tables T5 a record that is not live, not answered, or refused by the schema is not counted"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m02-provenance-defaulted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 105,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P2 the writer refuses each field missing and each field out of set, and creates no file",
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P4 `harness validate gate-record` exits 0 on a good record and non-zero on a hand-written bad one",
+      "s4-g1-records.test.ts :: S4-4a — provenance is required, by the writer and by the validator P6 the derived JSON Schema file matches what zod derives"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m03-no-write-ahead.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 99,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-7a — the attempt is on disk before the request leaves W1 a request that never resolves still leaves its attempt, marked incomplete",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C1 a legal retry chain passes: transport, then rate-limited, then answered",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C2 a re-roll fails: a second answered record for the same subject",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C3 a non-first record with no retry_of fails, and so does a retry of a non-retryable outcome",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C4 more than 3 retries fails, and so does a 21st attempt",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C5 a refusal before any request (no key) is not a call, and a live record outside the ledger still counts",
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C6 `harness count-attempts` exits 0 on the legal chain and 1 on a re-roll",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D6 a transport failure is a retryable record; the retry links to it; a re-roll after an answer is caught",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D7 an unreachable gate (no key) is recorded as `unavailable`, which is not a call"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m04-reroll-not-flagged.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 106,
+    "failed": [
+      "s4-g1-records.test.ts :: S4-7a/7b — the counting command C2 a re-roll fails: a second answered record for the same subject",
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D6 a transport failure is a retryable record; the retry links to it; a re-roll after an answer is caught"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m05-plan-record-not-redacted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m06-transport-redact-dropped.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g2-key.test.ts :: S4-3b.1 — the key reaches nothing else: runBriefPlanGate K3 at the transport itself, a 422 that echoes the Authorization header leaves the canary out of the answer's error, message, detail and fields"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m07-version-compared-as-string.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 106,
+    "failed": [
+      "s4-g2-key.test.ts :: G2 — the key A3 the version comparator: numeric, field by field, and an unreported version fails",
+      "s4-g6-closeout.test.ts :: G6 — the close-out tables T7 a different model_resolved across records is said out loud, and one below the minimum is named"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m08-done-gate-exit-on-reject.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D5 the flip test: proceed and reject give the same exit code (0), the same files, and only a new record"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m09-diffstat-from-merge.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D2 the diffstat is recomputed from base_sha..scored_sha, not read from the merge"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m10-checks-assumed-green.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner D3 checks_source none means checksPassed false, and the exit codes come from a recorded source, never from Jev"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m11-qa-takes-jevs-choice-for-missing-evidence.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 105,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R1 question kinds are asserted on the PAYLOAD: a three-option choice and a >=2-level score per asked row, two noul",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R2 missing evidence is untested by code, whatever Jev answers for a row that was not asked",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R4 an evidence-less row gets no question at all; with no askable row only the two noul questions go"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m12-qa-gate-exit-on-reject.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R7 the flip test: proceed and reject give exit code 0 both times, only new files appear, no tracked file moves, the E_t blob is unchanged"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m13-qa-result-written-into-et-row.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 105,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R3 a requirement Jev did not answer is untested and named under missing; a fail with no severity is named, never defaulted",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R5 the record sits beside a COPY of the E_t that is byte-identical, with e_t_ref naming the original",
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R7 the flip test: proceed and reject give exit code 0 both times, only new files appear, no tracked file moves, the E_t blob is unchanged"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m14-literal-planted-in-qa-decision.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 104,
+    "failed": [
+      "policies.test.ts :: gate policies A6 half two — the scan covers the prompts and the gate context finds no threshold literal in any scanned region of the shipped source",
+      "policies.test.ts :: gate policies T-156 — no threshold hides in the decision code finds no threshold literal in the decision region of policies.ts",
+      "s4-g5-qa.test.ts :: S4-6a — qa-score.json, its schema, and the threshold-scan guard Q5 the threshold scan covers the QA prompts and the decision code, and finds nothing",
+      "s4-g5-qa.test.ts :: S4-6a — qa-score.json, its schema, and the threshold-scan guard Q7 the A6 property: the same answers give a different decision under a stricter qa-score.json, with no source change"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m15-literal-planted-in-qa-prompt.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 105,
+    "failed": [
+      "policies.test.ts :: gate policies A6 half two — the scan covers the prompts and the gate context finds no threshold literal in any scanned region of the shipped source",
+      "s4-g5-qa.test.ts :: S4-6a — qa-score.json, its schema, and the threshold-scan guard Q5 the threshold scan covers the QA prompts and the decision code, and finds nothing",
+      "s4-g5-qa.test.ts :: S4-6a — qa-score.json, its schema, and the threshold-scan guard Q6 a literal planted in a QA prompt, or in the QA decision code, is reported by the scan"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m16-label-typed-not-computed.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g6-closeout.test.ts :: G6 — the close-out tables T1 the label is computed from the records: N and the seat/runtime split come from `source`"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m17-no-e_t-diff-reported-scored.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g6-closeout.test.ts :: G6 — the close-out tables T4 a diff with no E_t is listed as `not scored: no E_t`, never dropped"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m18-done-record-not-redacted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g3-done.test.ts :: G3 — the 4.3 shadow done-gate runner K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "m19-qa-record-not-redacted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner K1 a hostile fake that echoes the Authorization header as a 200 leaves the canary in no output"
+    ],
+    "reverted_clean": true
+  }
+]

@@ -1,0 +1,147 @@
+{
+  "loop": "240-qa-s4-step2",
+  "candidate_git": {
+    "sha": "2d4cd863ca159d737a1ee2efed02b9b85be26770",
+    "branch": "origin/loop/15-slice-4-step2",
+    "frozen_at": "2026-10-01T00:00:00Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci && npm run build && npx tsc --noEmit in open-brain at 2d4cd863 (Plumb, local, constructed env)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 90000,
+      "detail": "npm ci 0, npm run build 0, tsc --noEmit 0 at the candidate; the same three exit 0 at base 2448a6ea. No CI: gh is not installed on Plumb."
+    },
+    "unit": {
+      "command": "npx vitest run in open-brain (full suite), candidate 2d4cd863 and base 2448a6ea",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 477830,
+      "detail": "Candidate: exit 1; Test Files 3 failed | 141 passed (144); Tests 11 failed | 2048 passed | 5 skipped (2064). Base: exit 1; Test Files 1 failed | 136 passed (137); Tests 9 failed | 1931 passed | 5 skipped (1945). The 9 hook.test.ts failures are identical at base and candidate (npm warns 'Unknown builtin config globalignorefile' into stderr on Plumb): environmental. The 2 extra failures are the candidate's own: s4-guards.test.ts 'S4-9.2 ...' (its SKIPS scan matches its own it() title once the file is committed; deterministic on any checkout) and s4-g4-reconstruct.test.ts R6 (8 sequential tsx spawns, 11.7-14.2 s, under vitest's default 5 s timeout; passes with --testTimeout=120000)."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "S4-1",
+      "status": "met",
+      "order": "shown",
+      "evidence": "parseDeclared from origin/master 8b712591 (declared.ts b40aaa87, post T-214) on the criteria file (blob 416ac134, same at master and at 90a7282d): present true, unrunnable S4-20..24, out-of-scope S4-30..35, the same block QA 238 recorded. Exactly one fence. Known positive: a second fence throws DeclaredParseError 'more than one declared block'. At master a blank line no longer changes the result (T-214), which is S4-1.2."
+    },
+    {
+      "id": "S4-2",
+      "status": "not_evaluated",
+      "evidence": "Declared unrunnable at the step-2 candidate (S4-20; rulings 1). Scored at the step-4 close-out."
+    },
+    {
+      "id": "S4-3a",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Step-2 half: s4-g2-key A1 (one request, url === JEV_ENDPOINT, Bearer canary, POST), A2 (deleted variable: zero requests, GateUnavailable, compared with the keyed case), A3 (comparator table incl. jev-1.9.0 false, null/jev-latest false). Builder m07 (string compare) red on A3 and T7. gate-live.test.ts unchanged. Live half (S4-3a.2) is S4-20."
+    },
+    {
+      "id": "S4-3b",
+      "status": "met",
+      "order": "shown",
+      "evidence": "K0/K1(200,422)/K2 in s4-g2 (runBriefPlanGate), s4-g3 (shadow-done), s4-g5 (shadow-qa), plus K3 at the transport. Every scan walks the fixture dirs with walkFiles (not listed paths) and asserts filesRead > 0; each file has a known positive (scanKnownPositive == 1). Builder m05, m06, m18, m19 red. QA q01 (unredacted debug dump beside the record) red on D5 and K1. Two-layer: q02 (m06+m18) turns K1(422) red in s4-g3 where m18 alone left it green; q03 (m06+m19) same in s4-g5; q04 (m06+m05) same in s4-g2. Spawned-CLI K2 cases are dry-run only (no fetch can be injected into the CLI). Live half S4-3b.2 is S4-20."
+    },
+    {
+      "id": "S4-4",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Step-2 deliverable: shadow-done runner. D1 (pr, merge_commit, scored_sha, base_sha, D_t path+blob, one batched request, developer-done policy_hash), D2 diffstat from base..scored (m09 red), D3 checks_source none -> checksPassed false (m10 red), D4 runtime_action fixed text. K2 shows base_sha computed by merge-base. S4-4.1 (eight live records) needs the live run: see Open."
+    },
+    {
+      "id": "S4-4a",
+      "status": "met",
+      "order": "shown",
+      "evidence": "P1-P6 (strict schema, writer refuses missing/out-of-set and creates no file, validator CLI exit codes, derived schema drift), R1 runtime G_done source runtime / written-before, P5 at the writer. Builder m01, m02 red. QA q05 and q06 (runners infer source from a tNNN loop id) SURVIVE: gap G3. Four of the five real E_ts carry runtime-shaped loop ids (t195, t198, t196, t158)."
+    },
+    {
+      "id": "S4-4b",
+      "status": "met",
+      "order": "shown",
+      "evidence": "All eight D_t carry reconstructed_by sia-builder and reconstructed_from (brief path + blob; every brief blob identical at base and candidate). s4-g4 MAP matches the master map's checkout+model for all eight; no building seat is sia-builder. Commit 1da79279 Co-Authored-By Claude Sonnet 5.5. harness validate plan exits 0 on all eight (R6 with a 120 s timeout). Disclosure (rulings 1): the four/four split holds: #165, #227, #220, #218 touch no file the builder edited before 1da79279; the handoff's read-list is incomplete for the other four (gate.ts is not touched by #182; artifacts.ts #182, cli.ts #187/#195/#209 and t195-plan-gate.test.ts #209 also overlap)."
+    },
+    {
+      "id": "S4-5a",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Step-2 deliverable: closeout-tables generator and --check. s4-g6 T1-T8, C1. Builder m16 (typed label) red on T1, m17 red on T4. The generated tables themselves are scored at the close-out."
+    },
+    {
+      "id": "S4-5b",
+      "status": "met",
+      "order": "shown",
+      "evidence": "QA's own whole-word, case-insensitive scan over 5125 added lines of git diff 2448a6ea 2d4cd863 (excluded paths per the row): 0 hits. Known positive: the regex matches a planted line and not 'miscalibration'."
+    },
+    {
+      "id": "S4-5c",
+      "status": "met",
+      "order": "shown",
+      "evidence": "git diff --exit-code 2448a6ea 2d4cd863 on plan-gate.json, developer-done.json, merge.json: no output. qa-score.json is the one added policy (s4-guards S4-5c.1). merge.json keeps both require_* false."
+    },
+    {
+      "id": "S4-6a",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Q1-Q7; builder m14 (literal in decideQaScore) and m15 (literal in a QA prompt) red. Ruling 4 verified: gate.ts is scanned whole (buildQaScoreQuestions inside) and policies.ts from its last 'Applying a policy' marker at char 15665, after which decideQaScore (line 571) sits; both regions hold 0 literals. QA q13 (literal planted in shadow-qa.ts, which is not a scan target) SURVIVES: gap G6."
+    },
+    {
+      "id": "S4-6b",
+      "status": "met",
+      "order": "shown",
+      "evidence": "R1 payload kinds, R2/R4 evidence-less rows untested by code and not asked, R3 unanswered row and missing severity named under missing, R8 one batched request on 422. Builder m11 red. QA q07 (fail severity defaulted) and q08 (unanswered row not named in missing) red on R3. S4-6b.4 computed in T4."
+    },
+    {
+      "id": "S4-6c",
+      "status": "met",
+      "order": "shown",
+      "evidence": "R5 copy beside the record is byte-identical (hash-object) with e_t_ref; R6 second write refused; R7 E_t blob unchanged. Builder m13 red. S4-6c.4 by implication (identical blob), not by a separate test."
+    },
+    {
+      "id": "S4-6d",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Flip tests D5 and R7: exit 0 both times, only new records, tracked files byte-identical. Builder m08, m12, m13 red; QA q09 (QA runner returns exit 1 on reject through its result, the value the CLI uses) red on R7. runtime.test.ts unchanged and green. S4-6d.3: shadow-merge.ts unchanged and the CLI never passes a doneGate, so no record can reach computeShadowMergeVerdict; shown by inspection, not by a test."
+    },
+    {
+      "id": "S4-7a",
+      "status": "met",
+      "order": "shown",
+      "evidence": "W1 (never-resolving fetch leaves an incomplete attempt), C1-C6 count from ledger and records. Builder m03 red. Ruling 3: GateUnavailable is thrown only before fetch (gate.ts 521-534). QA q12 (fetch failure filed as GateUnavailable) is red on gate-live A3 and on QA's probe QA240-U1 (runBriefPlanGate with a rejecting fetch: ledger outcome transport, counted 1); it survives every s4-* test: gap G7. Live count is for the close-out."
+    },
+    {
+      "id": "S4-7b",
+      "status": "met",
+      "order": "shown",
+      "evidence": "C1 legal chain passes, C2 re-roll fails, C3 missing retry_of and a retry of request-invalid fail, C4 retry and attempt ceilings, D6 through the runner. Builder m04 red. QA q10 (retry_of may name another subject's record) and q11 (auth made retryable) SURVIVE: gaps G4, G5."
+    },
+    {
+      "id": "S4-8",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Guard as amended (rulings 4). 3b192871 is an ancestor of 2d4cd863; LOOP_LIMITS (1862 chars) byte-identical base to candidate (QA's own extract and s4-guards S4-8.3). Clauses 2 and 4 need CI run ids: close-out (gh not installed)."
+    },
+    {
+      "id": "S4-9",
+      "status": "unmet",
+      "evidence": "9.1 met (0 jev-mcp lines in 2584 added src lines). 9.2: QA's scan finds no skip/todo/skipIf/runIf in a call position, no deleted test file, t195-plan-gate 16 -> 16 tests; but the candidate's own guard test for 9.2 is red. 9.3 UNMET: full vitest exit 1 at the candidate with 2 candidate-introduced failures (s4-guards S4-9.2 self-match, deterministic; s4-g4 R6 5 s timeout) beyond the 9 environmental hook.test failures shared with base. Passed 2048 >= base 1931. 9.4 met (C criteria, shadow_merge.json, ledger.jsonl unchanged). 9.5 met by inspection."
+    }
+  ],
+  "regressions": [
+    "None in pre-existing tests: the only failures shared with base are the 9 environmental hook.test.ts failures. Two new candidate tests fail: s4-guards S4-9.2 and s4-g4 R6."
+  ],
+  "gaps": [
+    "D1 (defect): s4-guards.test.ts:54 title contains 'skipIf or runIf', so the SKIPS scan over committed added lines matches the guard itself; red on every committed checkout, CI included.",
+    "D2 (defect): s4-g4-reconstruct.test.ts R6 has no per-test timeout for 8 sequential tsx spawns; 11.7-14.2 s on Plumb against the 5 s default.",
+    "G3: q05/q06 survive: no runner test uses a runtime-shaped loop id, while 4 of 5 real E_ts are t195/t198/t196/t158.",
+    "G4: q10 survives: no fixture has retry_of naming another subject's record.",
+    "G5: q11 survives: only request-invalid is tested as non-retryable; auth, unexpected-status and malformed-response are not.",
+    "G6: q13 survives: shadow-qa.ts is not a threshold-scan target (consistent with ruling 4 as written).",
+    "G7: q12 is caught only by pre-existing gate-live A3; no slice-four test drives a fetch failure through a runner into the count.",
+    "No CI runs: gh is not installed on Plumb."
+  ],
+  "notes": "QA 240, headless Claude Code Opus 5.5 on Plumb. Dispatch 90a7282d (launch line). Worktree qa240-wt at 90a7282d505c798f4abaebf0b52e398e27b6cbde. Every command ran with a constructed env (no TYPESAFE_API_KEY); no live Jev call."
+}

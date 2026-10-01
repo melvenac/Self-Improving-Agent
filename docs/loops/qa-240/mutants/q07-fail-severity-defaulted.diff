@@ -1,0 +1,14 @@
+diff --git a/open-brain/src/harness/shadow-qa.ts b/open-brain/src/harness/shadow-qa.ts
+index b9f682a2..7f465f80 100644
+--- a/open-brain/src/harness/shadow-qa.ts
++++ b/open-brain/src/harness/shadow-qa.ts
+@@ -169,8 +169,7 @@ export async function runShadowQaGate(options: RunShadowQaOptions): Promise<RunS
+     }
+     let severity: number | null = null;
+     if (choice === "fail") {
+-      severity = numberAt(answers?.[qaSeverityQuestionId(row.from, row.id)], "score");
+-      if (severity === null) missing.push(qaSeverityQuestionId(row.from, row.id));
++      severity = numberAt(answers?.[qaSeverityQuestionId(row.from, row.id)], "score") ?? 0;
+     }
+     results.push({ id: row.id, from: row.from, result: choice, decided_by: "jev", severity });
+   }

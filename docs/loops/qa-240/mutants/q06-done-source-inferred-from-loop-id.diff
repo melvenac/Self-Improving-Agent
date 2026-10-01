@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/harness/shadow-gates.ts b/open-brain/src/harness/shadow-gates.ts
+index 4714dfcd..81a9e096 100644
+--- a/open-brain/src/harness/shadow-gates.ts
++++ b/open-brain/src/harness/shadow-gates.ts
+@@ -295,7 +295,7 @@ export async function runShadowDoneGate(options: RunShadowDoneOptions): Promise<
+     decision: decision === null ? null : ({ ...decision } as unknown as Record<string, unknown>),
+     runtime_action: SHADOW_RUNTIME_ACTION,
+     note: result.error !== null ? failureNote(result.error) : (result.answer?.note ?? ""),
+-    source: "seat",
++    source: /^t\d{3,}$/.test(plan.loop) ? "runtime" : "seat",
+     plan_provenance: options.planProvenance ?? "reconstructed-after",
+     attempt_id: result.attempt_id,
+     subject,

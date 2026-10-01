@@ -1,0 +1,11 @@
+diff --git a/open-brain/src/harness/shadow-qa.ts b/open-brain/src/harness/shadow-qa.ts
+index b9f682a2..a8115aec 100644
+--- a/open-brain/src/harness/shadow-qa.ts
++++ b/open-brain/src/harness/shadow-qa.ts
+@@ -229,5 +229,5 @@ export async function runShadowQaGate(options: RunShadowQaOptions): Promise<RunS
+     writeFileSync(copyPath, text, { flag: "wx", encoding: "utf-8" });
+   }
+   writeSliceRecord(recordPath, safe);
+-  return { recordPath, copyPath, record: safe, decision, exitCode: result.error !== null ? 1 : 0 };
++  return { recordPath, copyPath, record: safe, decision, exitCode: result.error !== null || (decision !== null && decision.verdict !== "proceed") ? 1 : 0 };
+ }

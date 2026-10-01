@@ -1,0 +1,64 @@
+[
+  {
+    "name": "q07-fail-severity-defaulted.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R3 a requirement Jev did not answer is untested and named under missing; a fail with no severity is named, never defaulted"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q08-unanswered-row-not-named-missing.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R3 a requirement Jev did not answer is untested and named under missing; a fail with no severity is named, never defaulted"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q09-qa-returns-exit-1-on-reject.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 1,
+    "total": 108,
+    "passed": 107,
+    "failed": [
+      "s4-g5-qa.test.ts :: S4-6b/6c/6d — the runner R7 the flip test: proceed and reject give exit code 0 both times, only new files appear, no tracked file moves, the E_t blob is unchanged"
+    ],
+    "reverted_clean": true
+  },
+  {
+    "name": "q10-retry-of-any-subject.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 0,
+    "total": 108,
+    "passed": 108,
+    "failed": [],
+    "reverted_clean": true
+  },
+  {
+    "name": "q11-auth-made-retryable.diff",
+    "files": "tests/harness/s4-g1-records.test.ts,tests/harness/s4-g2-key.test.ts,tests/harness/s4-g3-done.test.ts,tests/harness/s4-g5-qa.test.ts,tests/harness/s4-g6-closeout.test.ts,tests/harness/policies.test.ts,tests/harness/t195-plan-gate.test.ts",
+    "exit": 0,
+    "total": 108,
+    "passed": 108,
+    "failed": [],
+    "reverted_clean": true
+  },
+  {
+    "name": "q12-fetch-failure-filed-unavailable.diff",
+    "files": "SET,tests/harness/gate-live.test.ts",
+    "exit": 1,
+    "total": 20,
+    "passed": 19,
+    "failed": [
+      "gate-live.test.ts :: JevTransport A3 — the key is read from the environment only keeps the key out of the error text when the transport itself fails"
+    ],
+    "reverted_clean": true
+  }
+]

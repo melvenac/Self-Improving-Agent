@@ -1,0 +1,13 @@
+[
+  {
+    "name": "q12-fetch-failure-filed-unavailable.diff",
+    "files": "tests/harness/qa240-probe-unavailable.test.ts",
+    "exit": 1,
+    "total": 2,
+    "passed": 1,
+    "failed": [
+      "qa240-probe-unavailable.test.ts :: QA240-U1 a request that reached fetch and failed is counted, and is not `unavailable`"
+    ],
+    "reverted_clean": true
+  }
+]
