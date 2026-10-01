@@ -30,6 +30,8 @@ import {
 import { jsonSchemas, serialiseSchema, validateEvidence, validatePlan, type DeliverableKind } from "./schema.js";
 import { defaultChecks, type CheckSpec } from "./checks.js";
 import { policyJsonSchemas } from "./policies.js";
+import { NO_CHECKS, ShadowRunError, checksFromEvidence, runShadowDoneGate } from "./shadow-gates.js";
+import { gitTry } from "./git.js";
 import {
   MAX_ATTEMPTS_TOTAL,
   SLICE_LEDGER_FILE,
@@ -51,6 +53,8 @@ const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
   harness validate plan <file>
   harness validate gate-record <file>
   harness count-attempts [--ledger <file>] [--records <dir>] [--max <n>] [--repo <dir>]
+  harness shadow-done --pr <n> --merge-commit <sha> --scored-sha <sha> [--base-sha <sha>] --dt <D_t.json>
+                      (--checks-e-t <E_t.json> | --checks none) [--mode live|dry-run] [--records <dir>] [--ledger <file>]
   harness plan-gate <D_t.json> [--brief <brief.md>] [--mode live|dry-run] [--ledger <file>]
   harness dispatch-check <brief.md> [--repo <dir>]
   harness dispatch <brief.md> --say <message> [--repo <dir>]
@@ -420,6 +424,68 @@ function cmdCountAttempts(argv: readonly string[]): number {
   return report.violations.length === 0 ? 0 : 1;
 }
 
+/**
+ * 4.3. Score one merged diff through the developer done-gate, out of loop and in shadow. The
+ * decision is a field in the record. The exit code is 0 whenever the runner did its job, whether
+ * the gate said proceed or reject (S4-6d), and non-zero only when it could not.
+ */
+async function cmdShadowDone(argv: readonly string[]): Promise<number> {
+  const flags = flagMap(argv, true);
+  const allowed = new Set(["pr", "merge-commit", "scored-sha", "base-sha", "dt", "checks-e-t", "checks", "mode", "records", "ledger", "repo"]);
+  for (const key of flags.keys()) if (!allowed.has(key)) throw new UsageError(`unrecognised flag "--${key}"`);
+  const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  const pr = Number.parseInt(requiredFlag(flags, "pr"), 10);
+  if (!Number.isInteger(pr) || pr < 1) throw new UsageError("--pr must be a positive integer");
+  const mergeCommit = requireCliSha("merge-commit", requiredFlag(flags, "merge-commit"));
+  const scoredSha = requireCliSha("scored-sha", requiredFlag(flags, "scored-sha"));
+  let baseSha: string;
+  if (flags.has("base-sha")) {
+    baseSha = requireCliSha("base-sha", requiredFlag(flags, "base-sha"));
+  } else {
+    // The diff's base: where the scored head left the line the merge went onto.
+    const found = gitTry(repo, ["merge-base", scoredSha, `${mergeCommit}^1`]);
+    if (!found.ok) throw new UsageError(`cannot compute base_sha: git merge-base ${scoredSha} ${mergeCommit}^1 failed`);
+    baseSha = found.stdout;
+  }
+  const modeRaw = flags.get("mode");
+  const mode = modeRaw === undefined ? "dry-run" : modeRaw;
+  if (mode !== "live" && mode !== "dry-run") throw new UsageError(`--mode must be live or dry-run, got "${String(modeRaw)}"`);
+  const checksE = flags.get("checks-e-t");
+  const checksNone = flags.get("checks");
+  if ((checksE === undefined) === (checksNone === undefined)) {
+    throw new UsageError("name the test exit codes' source: exactly one of --checks-e-t <E_t.json> or --checks none");
+  }
+  if (checksNone !== undefined && checksNone !== "none") throw new UsageError('--checks takes only "none"');
+  const checks = typeof checksE === "string" ? checksFromEvidence(resolve(checksE)) : NO_CHECKS;
+  const ledgerFlag = flags.get("ledger");
+  const ledger =
+    mode === "live" ? (typeof ledgerFlag === "string" ? resolve(ledgerFlag) : join(repo, SLICE_RECORDS_DIR, SLICE_LEDGER_FILE)) : undefined;
+  const recordsFlag = flags.get("records");
+  try {
+    const result = await runShadowDoneGate({
+      repoRoot: repo,
+      pr,
+      mergeCommit,
+      scoredSha,
+      baseSha,
+      dtPath: resolve(requiredFlag(flags, "dt")),
+      checks,
+      mode,
+      recordsDir: typeof recordsFlag === "string" ? resolve(recordsFlag) : undefined,
+      ledgerPath: ledger,
+    });
+    process.stdout.write(`${result.recordPath}\n`);
+    process.stdout.write(`decision: ${result.decision?.verdict ?? "none"} (shadow: recorded only)\n`);
+    return result.exitCode;
+  } catch (err) {
+    if (err instanceof ShadowRunError) {
+      process.stderr.write(`${err.message}\n`);
+      return err.exitCode;
+    }
+    throw err;
+  }
+}
+
 function cmdDispatchCheck(argv: readonly string[]): number {
   const flags = flagMap(argv);
   for (const key of flags.keys()) {
@@ -565,6 +631,7 @@ export async function main(argv: readonly string[]): Promise<number> {
     if (sub === "plan-gate") return await cmdPlanGate(rest);
     if (sub === "dispatch-check") return cmdDispatchCheck(rest);
     if (sub === "count-attempts") return cmdCountAttempts(rest);
+    if (sub === "shadow-done") return await cmdShadowDone(rest);
     if (sub === "dispatch") return await cmdDispatch(rest);
     throw new UsageError(`unknown subcommand "${sub}"`);
   } catch (err) {
