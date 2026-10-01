@@ -16,9 +16,11 @@
  *   `ef2a8a7`). Every line is `ID: text` and is unrunnable. There is no
  *   out-of-scope list.
  *
- * Absent (no block) and present-but-empty are different results. A line that
- * is not a header or `ID: text`, an id in both lists, an id twice in one list,
- * and more than one block are refused.
+ * Absent (no block) and present-but-empty are different results. A
+ * whitespace-only line is not content (P-blank, T-214): inserting or removing
+ * one anywhere never changes the result, and a block of only blank lines is
+ * present and empty. A non-blank line that is not a header or `ID: text`, an
+ * id in both lists, an id twice in one list, and more than one block are refused.
  */
 
 export class DeclaredParseError extends Error {
@@ -34,6 +36,7 @@ export type DeclaredBlock =
 
 const ITEM_RE = /^([A-Za-z][A-Za-z0-9-]*)\s*:\s*(\S.*)$/;
 const HEADER_RE = /^\[(unrunnable|out-of-scope)]$/;
+const BLANK_RE = /^[ \t\r]*$/;
 
 function linesOf(body: string): string[] {
   const trimmed = body.endsWith("\n") ? body.slice(0, -1) : body;
@@ -65,6 +68,9 @@ function parseItems(
 
   for (const raw of lines) {
     const line = raw.replace(/\r$/, "");
+    // P-blank (T-214): a whitespace-only line is not content. Spaces, tabs and a lone \r only —
+    // not every Unicode space, so nothing else loosens.
+    if (BLANK_RE.test(line)) continue;
     if (allowHeaders && HEADER_RE.test(line)) {
       header = line;
       continue;
