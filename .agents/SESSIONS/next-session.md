@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 251 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 255 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,20 +6,20 @@
 
 ### Pick up here
 
-Planner session 155 (ob_start numbered it #16, per-worktree counter T-164), 2026-10-01 from ~08:30Z. STATE: T-216 (#245) and T-214 (#250) merged and closed. Slice four: criteria ADOPTED (D-076); step 2 BUILT by sia-builder (loop/15-slice-4-step2 2d4cd863; full suite not run on the QA PC for RAM); QA 240 RUNNING on Plumb since 11:49:59Z (clark's unit plumb-20261001T114959Z, log ~/jobs/qa-240.log, DISPATCH_SHA 90a7282d; it runs the full suite). T-194: QA 237 re-run REJECTED r5 (1a658b39); Aaron chose r6 by INVERSION (D-081); dispatch docs/loops/t194-r6-dispatch.md, to Forge (sia-forge, built r5) once clark books a dev slot. NEXT IN ORDER: (a) read QA 240's report on origin/qa/s4-step2-report and RULE it against docs/loops/qa-240-s4-step2-dispatch.md; if ACCEPT open the code PR for loop/15-slice-4-step2 (Aaron merges), then step 4: the QA seat's live calls on the laptop with Aaron's key (<=14 + <=3 retries), then the close-out, which reports the 4.3 values for #209/#182/#187/#195 (reconstructed after reading shared code) separately from #165/#227/#220/#218; (b) when Forge pushes r6, write QA 241's dispatch by hand. Records rev 237-242 on origin/docs/session-155f, PR #252.
+Planner session 155 (ob_start numbered it #16, per-worktree counter T-164), 2026-10-01 ~08:30Z to ~21:00Z. MERGED this session: #245 (T-216), #250 (T-214), #254 (slice-four step 2, after QA 240/242/243 rejects and QA 244 ACCEPT plus r5's guard scoping), and the records PRs up to #253. Slice four: step 4 is READY but PARKED. Its dispatch is docs/loops/qa-245-s4-step4-dispatch.md (+ qa-245-headless-prompt.md, qa-245/push-qa.mjs): the QA seat on the LAPTOP (D-087) makes <=14 live calls (+<=3 transport retries), then writes the close-out with 4.3 reported three ways. BLOCKED on Aaron, who is remote until he is back at the makerspace: (1) TYPESAFE_API_KEY as a user env var on the laptop (checked ~20:45Z: NOT SET; it is set on the desktop, user scope). He sets it by his own hand (D-070); the planner never moves it. Before launch, check EXISTENCE only, and that a WMI-launched job sees it. (2) The read-only GitHub token for Plumb's gh (clark installs the binary; Aaron creates the PAT). T-194: r7 (docs/loops/t194-r7-dispatch.md, D-084) is with Forge (sia-forge), the one SIA dev job; when it pushes, write QA 246's dispatch by hand (the laptop, for real shells) and book with clark. Records rev 254-255 on origin/docs/session-155i: open its PR.
 
 ### Watch out
 
-- USAGE RULE (D-077, amended by D-079 and D-080): Rule change from Aaron (~11:50Z): the USAGE RULE is now at most TWO dev jobs and TWO QA jobs running across all machines (was 1+1). Rule change from Aaron (~11:20Z): keep every agent OPEN. He's remote and can't restart or exit seats. The usage rule now limits RUNNING jobs only; idle seats stay open. Don't ask him to close seats, and don't have seats exit. Remote Control's "idle" only means between turns; confirm work from commits or a reply. The weekly limit was on pace to run out Saturday, before Wednesday's reset.
-- SLOT BOOKING via clark (now clark [9f38ff]; address it by ref while the retired clark 76cf17 is still listed) for every QA and dev job before ANY launch (by hand until T-204). At session 155's last write: QA 240 on Plumb (QA slot 1); the laptop released to dashboard QA-007 (QA slot 2); dev slots 0/2 SIA. Plumb's launch-job.sh takes --dispatch-sha and stamps the SHA as the prompt's first line; on the laptop the planner stages the prompt with that line itself (git show <sha>:<prompt>, via cmd /c) and launches with launch-qa.ps1 (docs/loops/qa-launch.md). The QA PC is a DEVELOPER machine (Chisel, sia-builder) with ~1.3-1.5 GB free: no full suites there.
+- USAGE RULE (D-077, amended by D-079 and D-080): Rule change from Aaron (~11:50Z): the USAGE RULE is now at most TWO dev jobs and TWO QA jobs running across all machines (was 1+1). Rule change from Aaron (~11:20Z): keep every agent OPEN. He's remote and can't restart or exit seats. The usage rule now limits RUNNING jobs only; idle seats stay open. Don't ask him to close seats, and don't have seats exit. Remote Control's "idle" only means between turns; confirm work from commits or a reply. The 2+2 pace burned the 5-hour window in about 3h on 2026-10-01 (QA 237 and QA 243 died at the limit and were re-run). A job that dies at the limit is re-run after the reset, REUSING its trees after a clean check and treating its outputs as unverified.
+- SLOT BOOKING via clark (clark [9f38ff]; address it by ref while the retired clark 76cf17 is listed) for every QA and dev job before ANY launch (by hand until T-204). Plumb's launch-job.sh takes --dispatch-sha and stamps the SHA as the prompt's first line; on the laptop the planner stages the prompt with that line itself (git show <sha>:<prompt>, via cmd /c) and launches with launch-qa.ps1 (docs/loops/qa-launch.md). The QA PC is a DEVELOPER machine with ~1.2-1.8 GB free: no full suites there; full suites run on Plumb (npm fixed by clark 12:58Z; an unattributed vitest 'onTaskUpdate' RPC timeout there is environmental, D-083). Plumb has no gh until Aaron's token: CI then comes from the PR's own runs, and a PR's pull_request run tests the MERGED ref (that is how #254's fixed-base guard was caught).
 - STANDING REPORTING RULES FROM AARON (via Clark), RESTORED at session 154 after being dropped at the session-153 roll (present in session 150's handoff, absent from 153's), CADENCE CHANGED at session 155 by D-077: (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\Users\melve\Worktrees\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 60 MINUTES while active (was 30), a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Re-create the cadence at /start (CronCreate at :04 only). If `clark` is not in ListAgents, skip the send. Completions and blocks are reported as they happen. Until T-211 puts the minutes in seat data, CARRY THIS ITEM FORWARD VERBATIM at every roll.
 - MANUAL MODE: on any classifier denial, do not retry or reroute. Send clark ONE line `MANUAL MODE → <seat>: <exact action> (<why>)` and say the same line in the planner session. Aaron approves from his phone.
-- PEER-INITIATED HEAVY RUNS ARE REFUSED by dev seats' own classifiers (Forge: 'Interfere With Workloads'). A planner 'go' is a peer message, not Aaron's approval. Plan for Aaron's approval in the seat's window. It worked for r5.
+- PEER-INITIATED HEAVY RUNS ARE REFUSED by dev seats' own classifiers (Forge: 'Interfere With Workloads'). A planner 'go' is a peer message, not Aaron's approval. Plan for Aaron's approval in the seat's window, or relay his verbatim words labelled as his (it worked for r6). Dev seats send clark a MANUAL MODE line when they need it.
 - T-208 RESUME: on any resume, run `git fetch --prune` and a drift check (MCP ob_start) before trusting the record. The local CLI in sia-planner is a stale build (a010557); use the MCP tools.
-- Instructions are candidates (slice-three finding): define a rule by PROPERTY and require a generator. Enumerating spellings caused T-194's r2-r4 rejects, and r5's property generator still had edges (QA 237): r6 inverts the default instead (D-081). Check a dispatch or criteria file against what it governs before a seat builds to it. Session 155: derive QA prompts and push helpers by hand, not by sed: a sed copy left QA 238's push regex pointing at QA 237's branches and garbled a QA 239 verdict line; both caught only by testing the helper and re-reading.
-- A record write can break a test that pins live data (T-205, T-213). Run the tests that read a file before editing it.
+- Instructions are candidates (slice-three finding): define a rule by PROPERTY and require a generator. T-194: enumerating spellings caused r2-r4 rejects; a property generator still had edges (QA 237); inverting the default for constructs (r6) still left characters and command words (QA 241), so r7 allow-lists those too (D-084). Check a dispatch or criteria file against what it governs before a seat builds to it. Derive QA prompts and push helpers by hand, not by sed, and test the helper's refusal before committing.
+- A record write can break a test that pins live data (T-205, T-213). Run the tests that read a file before editing it. Corollary from #254: a guard that diffs from a FIXED base reads everything merged after that base; scope every guard to the paths its row names.
 - D-068 until 2026-10-03: planner Opus, devs Sonnet, QA Opus headless; Cursor BLOCKED. Re-rule at the reset.
-- RELEASE (D-073): no version for slice three alone. Cut ONE release covering slice three (A, B, C) AND slice four once slice four lands, with the CHANGELOG entry and package.json bump together.
+- RELEASE (D-073): no version for slice three alone. Cut ONE release covering slice three (A, B, C) AND slice four once slice four lands (after step 4's close-out), with the CHANGELOG entry and package.json bump together.
 
 ### Open questions
 
@@ -29,18 +29,18 @@ _None._
 
 **Open PRs:** _None._
 
-**SHA frozen for QA:** `2d4cd863 (slice four step 2, QA 240 on Plumb); 7a3a4441 (T-194 r5, REJECTED by QA 237)`
+**SHA frozen for QA:** `17767aac (master with slice-four step 2, the code step 4 uses); 9cf8c7eb (T-194 r6, REJECTED; r7 in build)`
 
 **Questions pending for Aaron:** 
-- Merge #252 (records + QA 240 dispatch)
+- Set TYPESAFE_API_KEY on the laptop (back at the makerspace)
+- Create the read-only GitHub token for Plumb
 
 **Rulings made mid-loop:** 
-- QA 236: T-216 ACCEPT; #245 merged; D1 to T-217
-- D-074 slice-four seats; D-075 T-214 rule; D-076 criteria adopted
-- QA 239: T-214 ACCEPT; #250 merged; G1 to T-218
-- D-077/D-079/D-080 usage rule (now 2 dev + 2 QA running; all agents stay open)
-- D-078 sia-builder was the dev job for step 2
-- QA 237: T-194 r5 REJECT; D-081 r6 by inversion
+- D-074..D-076 slice-four seats, T-214 rule, criteria
+- D-077/079/080 usage rule (2 dev + 2 QA running; all agents open)
+- D-081 T-194 r6 by inversion; D-084 r7 extends it to characters and command words
+- D-082/083/085 step 2 r1-r3 REJECT rulings; QA 244 ACCEPT; #254 merged after r5
+- D-086 Aaron: merge all, r7 to Forge, Plumb token; D-087 step 4 on the laptop after Aaron sets the key
 
 ## developer [sia-builder] _(written session 152)_
 
