@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 222 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 223 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 15 slice three (D-033/D-036) is CLOSED: A (#182), B (#165, #187) and C (#195, merged 2026-09-30 as ddd43526) are all ACCEPTED and merged. The shadow merge gate's ledger has line 1 (undefined, merged). The NEXT slice per D-033 is Jev calibration. It is NOT YET BRIEFED or ruled, so the next planner session writes its brief before any dispatch. In flight meanwhile: T-194 r3 (c1f1cb48) awaits QA 234 on the laptop; T-214 (declared.ts rejects a blank line, which made episode 1 undefined) is P1. _(since session 153)_
+Loop 15 slice FOUR (Jev scoring on real diffs, in shadow, no calibration claimed) is briefed and RULED: docs/loops/loop-15-slice-4-brief.md plus its D_t (D-070, D-071, D-072 with a 20-call cap). It is NOT dispatched. BLOCKER: T-216 (the plan schema accepts only tNNN loop ids, so the slice-four D_t fails `harness validate plan`), being built by sia-builder (loop/t216-plan-loop-id, ef7a1ce7, local runs on the QA PC now). After T-216 is accepted and merged, dispatch slice four. In flight alongside: T-194 r5 (Forge; defined by property, plus a generator), T-215, T-213. Slice three is CLOSED (A #182, B #165/#187, C #195; shadow ledger line 1 undefined). _(since session 153)_
 
 ## Top tasks
 
