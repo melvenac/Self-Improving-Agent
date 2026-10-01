@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 246,
+  "revision": 247,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3605,6 +3605,12 @@
       "title": "QA 240 (slice four step 2, 2d4cd863) RULED REJECT on S4-9.3 only (D1 guard matches its own title; D2 R6 timeout); r2 also closes QA gaps G3-G7; S4-9.3 is read as 'no failure added over base on the same machine AND PR CI on tcm green' (Plumb's hook.test.ts 9/12 is environmental)",
       "date": "2026-10-01",
       "note": "Planner session 155 after reading origin/qa/s4-step2-report aca2f399. Every other step-2 row met: canary walk real (q01 finds an unlisted file), two-layer redaction pairs red, 19/19 builder mutants red, independence met 8/8 with the four/four split holding (disclosure list incomplete: #182 is runtime.ts+schema.ts not gate.ts; add artifacts.ts, cli.ts, t195-plan-gate.test.ts). G6 ruled IN: shadow-qa.ts and shadow-gates.ts become threshold-scan targets. Live clauses (S4-4.1, S4-4a.6 live, S4-5a tables, S4-6b.4/6c.1 live, S4-8.2/.4) are scored at the step-4 close-out. Dispatch: docs/loops/loop-15-slice-4-step2-r2-dispatch.md."
+    },
+    {
+      "id": "D-083",
+      "title": "QA 242 (step 2 r2, 779be4d6) RULED REJECT on S4-9.3: P4 times out at vitest's 5 s default under full-suite load (2/2); r3 fixes timeouts by class with a guard, and the behavioural S4-6d.3 test becomes REQUIRED; Plumb's unattributed vitest 'onTaskUpdate' RPC timeout is environmental",
+      "date": "2026-10-01",
+      "note": "Planner session 155 after reading origin/qa/s4-step2-r2-report bd18167f. All seven r2 items met; 19 builder + QA 240 q01-q13 + QA 242 r01/r04-r07 mutants red. Clark's npm fix holds (hook.test.ts 12/12). Base on Plumb: 1940/1940 tests pass but vitest exits 1 on an unattributed worker RPC timeout, also at candidate: environmental, not a failed test. S4-9.3 = no failed test added over base on the same machine AND PR CI on tcm green. QA 242 r03 (prepareShadowVerdict defaulting doneGate to the slice's G_done) and r02 (spread) survive the static S4-6d.3 test, so the behavioural test is required. Dispatch: docs/loops/loop-15-slice-4-step2-r3-dispatch.md."
     }
   ],
   "handoffs": [
