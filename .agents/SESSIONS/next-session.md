@@ -1,16 +1,17 @@
-<!-- generated from .agents/state.json rev 225 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 226 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 153)_
+## planner [sia-planner] _(written session 154)_
 
 ### Pick up here
 
-Planner session 153 ROLLED 2026-10-01 ~06:55Z on Aaron's word (via clark, 24% context left). No launches after the roll. PICK UP IN ORDER: (a) QA 236 (T-216, candidate 9a0973f0, product ef7a1ce7) was RUNNING at the roll: laptop pid 7336, launched 06:41:53Z, log C:\qa-tmp\qa-236.log (0 bytes until the end; the verdict is the LAST line), over ssh aaron@100.110.244.10. Read the report on origin/qa/t216-report and RULE it against docs/loops/qa-236-t216-dispatch.md (T216-1..5 plus regression; check QA's split-regex mutant, since Builder's L3 test doesn't kill one). If ACCEPT: open the PR for loop/t216-plan-loop-id; it is code, so Aaron merges. (b) T-194 r5 is BUILT and PUSHED: loop/t194-planner-hook 7a3a4441 (product 8bd1541d), handoff docs/loops/t194-r5-developer-handoff.md, 431 tests green, mutants 50 (6 re-run after test fixes, disclosed). WRITE the QA 237 dispatch (score P1, P2, P2b and P3 by PROPERTY plus regression; include the 6 re-run mutants and the uncovered QA 233/234 probe scripts; QA must build its OWN generator families, not only re-run Forge's) and launch it on the laptop AFTER QA 236, booked via clark. (c) Slice four (docs/loops/loop-15-slice-4-brief.md + D_t, RULED: D-070, D-071, D-072 cap 20) dispatches ONLY after T-216 is accepted and merged. DONE THIS SESSION: #195 (C) merged ddd43526, slice three CLOSED (#236), T-169 closed (#238; Step-Back v12), tcm hub strict (V-078), QA 232-235 ruled (T-194 r5 redefined by property), D-070/071/072, T-209..T-216, ~/.claude/CLAUDE.md maturity text replaced on Aaron's 'apply', T-208 resume row.
+Planner session 154 (ob_start numbered it #15 from the per-worktree counter, T-164) opened 2026-10-01 on /start. Carried forward from session 153 except: QA 236 has EXITED with ACCEPT per clark (TOLD, not yet read by this seat); origin/qa/t216-report is at a1960173 (READ, ls-remote). Status cron to clark recreated (session job 072d182f, :04/:34). SESSION 153's TEXT FOLLOWS. Planner session 153 ROLLED 2026-10-01 ~06:55Z on Aaron's word (via clark, 24% context left). No launches after the roll. PICK UP IN ORDER: (a) QA 236 (T-216, candidate 9a0973f0, product ef7a1ce7) was RUNNING at the roll: laptop pid 7336, launched 06:41:53Z, log C:\qa-tmp\qa-236.log (0 bytes until the end; the verdict is the LAST line), over ssh aaron@100.110.244.10. Read the report on origin/qa/t216-report and RULE it against docs/loops/qa-236-t216-dispatch.md (T216-1..5 plus regression; check QA's split-regex mutant, since Builder's L3 test doesn't kill one). If ACCEPT: open the PR for loop/t216-plan-loop-id; it is code, so Aaron merges. (b) T-194 r5 is BUILT and PUSHED: loop/t194-planner-hook 7a3a4441 (product 8bd1541d), handoff docs/loops/t194-r5-developer-handoff.md, 431 tests green, mutants 50 (6 re-run after test fixes, disclosed). WRITE the QA 237 dispatch (score P1, P2, P2b and P3 by PROPERTY plus regression; include the 6 re-run mutants and the uncovered QA 233/234 probe scripts; QA must build its OWN generator families, not only re-run Forge's) and launch it on the laptop AFTER QA 236, booked via clark. (c) Slice four (docs/loops/loop-15-slice-4-brief.md + D_t, RULED: D-070, D-071, D-072 cap 20) dispatches ONLY after T-216 is accepted and merged. DONE THIS SESSION: #195 (C) merged ddd43526, slice three CLOSED (#236), T-169 closed (#238; Step-Back v12), tcm hub strict (V-078), QA 232-235 ruled (T-194 r5 redefined by property), D-070/071/072, T-209..T-216, ~/.claude/CLAUDE.md maturity text replaced on Aaron's 'apply', T-208 resume row.
 
 ### Watch out
 
-- SLOT BOOKING via clark for the QA PC AND the laptop before ANY launch (by hand until T-204). Laptop queue at the roll: QA 236 (running), then Gauge Loop 7 QA r1, then QA 237 (book it). The QA PC is FREE at the roll (Forge done). It has about 1.3-2.8 GB free: run sequentially, and check RAM >= 1.5 GB before mutant runs.
+- SLOT BOOKING via clark for the QA PC AND the laptop before ANY launch (by hand until T-204). Laptop queue at session 154 start (per clark, TOLD): QA 236 EXITED ACCEPT (report a1960173); Gauge Loop 7 r1 running (pid 27660, since 07:03Z, 60-90 min); QA 237 booked after it. The QA PC is FREE at the roll (Forge done). It has about 1.3-2.8 GB free: run sequentially, and check RAM >= 1.5 GB before mutant runs.
+- STANDING REPORTING RULES FROM AARON (via Clark), RESTORED at session 154 after being dropped at the session-153 roll (present in session 150's handoff, absent from 153's): (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\Users\melve\Worktrees\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 30 MINUTES while active, a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Re-create the cadence at /start (CronCreate at :04 and :34). If `clark` is not in ListAgents, skip the send. Completions and blocks are reported as they happen. Until T-211 puts the minutes in seat data, CARRY THIS ITEM FORWARD VERBATIM at every roll.
 - MANUAL MODE: on any classifier denial, do not retry or reroute. Send clark ONE line `MANUAL MODE → <seat>: <exact action> (<why>)` and say the same line in the planner session. Aaron approves from his phone.
 - PEER-INITIATED HEAVY RUNS ARE REFUSED by dev seats' own classifiers (Forge: 'Interfere With Workloads'). A planner 'go' is a peer message, not Aaron's approval. Plan for Aaron's approval in the seat's window. It worked for r5.
 - T-208 RESUME: on any resume, run `git fetch --prune` and a drift check (MCP ob_start) before trusting the record. The local CLI in sia-planner is a stale build (a010557); use the MCP tools.
@@ -26,7 +27,7 @@ Planner session 153 ROLLED 2026-10-01 ~06:55Z on Aaron's word (via clark, 24% co
 
 **Open PRs:** _None._
 
-**SHA frozen for QA:** `9a0973f0 (T-216, QA 236 running); 7a3a4441 (T-194 r5, QA 237 not yet dispatched)`
+**SHA frozen for QA:** `9a0973f0 (T-216, QA 236 EXITED ACCEPT per clark, report a1960173 not yet ruled); 7a3a4441 (T-194 r5, QA 237 booked after Gauge Loop 7 r1)`
 
 **Questions pending for Aaron:** 
 - Release: A, B and C merged without a version
@@ -105,8 +106,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_5 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_6 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
-Session 153 — 2026-10-01 — planner [sia-planner] — `6e083614-965f-462b-ad59-62091a0be5e1` (9 writing session(s) in the record)
+Session 154 — 2026-10-01 — planner [sia-planner] — `54064a65-6810-4df0-8748-ee932cc7f5bd` (10 writing session(s) in the record)
