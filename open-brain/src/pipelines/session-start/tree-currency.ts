@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, isAbsolute } from "node:path";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { parseState } from "../../shared/state-schema.js";
 
 /**
@@ -86,11 +86,79 @@ export interface TreeCurrency {
 export interface TreeCurrencyOptions {
   /** Defaults to `origin/master`. */
   upstreamRef?: string;
+  /**
+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).
+   * Only the SessionStart hook fetches; ob_start and /sync compare against
+   * whatever fetch is on disk and say so. When this is a failure, no line below
+   * says `level` without the FAILED qualifier in front of it.
+   */
+  fetch?: FetchResult;
+}
+
+export interface FetchResult {
+  ok: boolean;
+  /** ISO time the fetch finished. */
+  at: string;
+  /** Why it failed; null when ok. */
+  cause: string | null;
+}
+
+/** Bounded: a fetch that cannot finish must not hold up a session start. */
+export const FETCH_TIMEOUT_MS = 15_000;
+
+/**
+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed
+ * "level with origin/master" against a ref nobody had refreshed, while master
+ * was 16 revisions ahead. The hook owns the fetch so the comparison is made
+ * against a fetch that just happened, or says that it did not. --prune is part
+ * of the contract: an unpruned remote-tracking ref reads a deleted branch as
+ * present. Never throws; GIT_TERMINAL_PROMPT=0 so a credential prompt cannot
+ * hang it.
+ */
+export function fetchOrigin(projectRoot: string, timeoutMs: number = FETCH_TIMEOUT_MS): FetchResult {
+  const r = spawnSync("git", ["fetch", "--prune", "origin"], {
+    cwd: projectRoot,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+    timeout: timeoutMs,
+    killSignal: "SIGKILL",
+    env: { ...process.env, GIT_TERMINAL_PROMPT: "0" },
+  });
+  const at = new Date().toISOString();
+  if (r.error) {
+    const timedOut = (r.error as NodeJS.ErrnoException).code === "ETIMEDOUT";
+    return { ok: false, at, cause: timedOut ? `timed out after ${timeoutMs} ms` : r.error.message };
+  }
+  if (r.status !== 0) {
+    const detail = (r.stderr ?? "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean).slice(-1)[0];
+    return { ok: false, at, cause: detail ?? `git fetch exited ${r.status}` };
+  }
+  return { ok: true, at, cause: null };
 }
 
 const STATE_REL = ".agents/state.json";
 
 export function describeTreeCurrency(projectRoot: string, options: TreeCurrencyOptions = {}): TreeCurrency {
+  const result = compare(projectRoot, options);
+  const f = options.fetch;
+  if (f === undefined || f.ok) return result;
+  // A failed fetch: the comparison is against an OLD ref. The FAILED line leads,
+  // and a "level" verdict is replaced by wording that cannot be read as current
+  // (T-208: never 'level' unqualified).
+  const failed = `fetch FAILED: ${f.cause}; currency is against a fetch from ${result.lastFetchAt ?? "an unknown time"}`;
+  const rev = (n: number | null) => (n === null ? "no record" : `rev ${n}`);
+  const body =
+    result.severity === "current"
+      ? [
+          `Tree currency: no difference seen against ${result.upstreamRef} (record here ${rev(result.recordRevisionHere)}, ` +
+            `at ${result.upstreamRef} ${rev(result.recordRevisionUpstream)}) as of that old fetch, and not confirmed since. ` +
+            `Not the drift line: drift compares the rendered views to ${STATE_REL} within this tree.`,
+        ]
+      : result.lines;
+  return { ...result, lines: [failed, ...body] };
+}
+
+function compare(projectRoot: string, options: TreeCurrencyOptions): TreeCurrency {
   const upstreamRef = options.upstreamRef ?? "origin/master";
 
   const skip = (skipReason: string): TreeCurrency => ({

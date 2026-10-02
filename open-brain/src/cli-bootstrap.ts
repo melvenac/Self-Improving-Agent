@@ -15,7 +15,7 @@ import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
 import { describeDerivedArtifacts } from "./pipelines/session-start/derived-artifacts.js";
-import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
+import { describeTreeCurrency, fetchOrigin } from "./pipelines/session-start/tree-currency.js";
 import {
   resolveSessionId,
   writeActiveSession,
@@ -155,7 +155,10 @@ if (hasAgents) {
 // derived-artifacts.ts states about itself: two copies of a freshness rule
 // drift, and the drift is silent.
 if (hasAgents) {
-  for (const line of describeTreeCurrency(cwd).lines) lines.push(line);
+  // T-208: fetch FIRST (bounded, pruning), on every SessionStart event: the hook
+  // is registered without a matcher, so startup and resume take this one path.
+  // The outcome rides into the currency lines, which say so when it failed.
+  for (const line of describeTreeCurrency(cwd, { fetch: fetchOrigin(cwd) }).lines) lines.push(line);
 }
 
 // Session UUID — emit so /start can pick it up and call ob_set_session.
