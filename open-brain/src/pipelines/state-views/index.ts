@@ -92,7 +92,7 @@ export function renderInbox(state: State, o: ViewOptions): string {
     "",
     "Legend: `[ ]` open · `[~]` in_progress · `[!]` blocked",
     "",
-    "Titles only. Full rationale for a task is its `note` in `.agents/state.json` under `tasks[]` — read it when you work the task, not when you pick one.",
+    "Titles only. Full rationale for a task is its `note` in `.agents/state.json` under `tasks[]` — read it before you rule on, work or retire a task, not when you merely pick one.",
     "",
   ];
   const active = state.tasks.filter((t) => t.status !== "done");

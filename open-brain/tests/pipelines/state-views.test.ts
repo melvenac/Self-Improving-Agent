@@ -37,6 +37,8 @@ describe("state views (Loop 3 C3)", () => {
     // what made the backlog unscannable. The note stays in state.json, and the
     // legend points there.
     expect(text).toContain("Titles only. Full rationale for a task is its `note` in `.agents/state.json`");
+    // T-148: the legend covers ruling on and retiring a task, not only working one.
+    expect(text).toContain("read it before you rule on, work or retire a task, not when you merely pick one.");
     expect(text).not.toContain("— Loop 2 capability half");
     expect(text).not.toContain("— Loop 3; blocked on Loop 2 acceptance");
     expect(text).toContain("## Done (last 3 sessions)\n\n- [x] **T-001** ob_start returns state, drift and session instead of booleans (session 54) — Loop 1, v0.28.0");

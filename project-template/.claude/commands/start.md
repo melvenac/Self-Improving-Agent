@@ -71,7 +71,7 @@ carries every field the briefing needs — do not open `task.md`, `INBOX.md`, `S
 yourself.
 
 Task lines are `[status] id title` — **titles only, by design.** A task's rationale is its `note` in
-`.agents/state.json` under `tasks[]`. Read that when you work a task, not when you pick one.
+`.agents/state.json` under `tasks[]`. Read that before you rule on, work or retire a task, not when you merely pick one.
 
 ### 3. Working tree
 
