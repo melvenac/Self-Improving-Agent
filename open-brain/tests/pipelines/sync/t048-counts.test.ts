@@ -128,19 +128,27 @@ describe("T-048 sync counts", () => {
       expect(checkHookConfigs(settings({ hooks: { A: [group(`bash "${fwd(join(scripts, "boot.js"))}"`)] } })).severity).toBe("pass");
     });
 
-    it("a bare non-launching command (echo) is skipped and counted, and the legacy flat shape is still read", () => {
+    it("a bare echo is a named SKIP inside a passing result, and the legacy flat shape is still read", () => {
       const p = settings({
         hooks: {
-          A: [{ command: `node ${fwd(join(scripts, "boot.js"))}` }, "a string, not an object", { type: "x" }, { command: "echo hi" }, group("echo nested")],
+          A: [{ command: `node ${fwd(join(scripts, "boot.js"))}` }, { command: "echo hi" }, group("echo nested")],
         },
       });
       const r = checkHookConfigs(p);
       expect(r.severity, r.message).toBe("pass");
-      expect(r.message).toContain("1 hook command file(s) checked; skipped 4");
-      expect(r.message).toContain("1 not an object");
-      expect(r.message).toContain("1 with no command string");
-      expect(r.message).toContain("2 not a command that launches a file");
-      expect(r.message).toContain("of 5 entries");
+      expect(r.message).toContain("1 hook command file(s) checked; skipped 2 (2 not a command that launches a file); 0 not checked");
+      expect(r.message).toContain("of 3 entries");
+    });
+
+    it("B2: a MALFORMED entry (no command string, or not an object) beside a good one is WARN not checked, never pass", () => {
+      const good = { command: `node ${fwd(join(scripts, "boot.js"))}` };
+      const noCommand = checkHookConfigs(settings({ hooks: { A: [good, { type: "x" }] } }));
+      expect(noCommand.severity, noCommand.message).toBe("warn");
+      expect(noCommand.message).toContain("entry has no command string");
+      expect(noCommand.message).toContain("1 hook command file(s) checked");
+      const notObject = checkHookConfigs(settings({ hooks: { A: [good, "a string, not an object"] } }));
+      expect(notObject.severity, notObject.message).toBe("warn");
+      expect(notObject.message).toContain("entry is not an object");
     });
 
     it("nothing readable at all is 'not checked', not a pass", () => {

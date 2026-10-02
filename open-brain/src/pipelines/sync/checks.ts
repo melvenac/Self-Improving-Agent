@@ -262,15 +262,17 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
   // T-048: every entry that is not stat'ed is counted by WHY, and the verdict says how many were
   // read. A zero here used to print "All hook command files exist".
   let checked = 0;
-  const skipped = { notAnObject: 0, noCommand: 0, otherCommand: 0 };
+  // A malformed entry (not an object, or no command string) was not examined: not checked, capped at warn
+  // (B2 ruling). A bare head with no path (echo, a builtin, a PATH name) is a named SKIP: nothing to stat.
+  const skipped = { otherCommand: 0 };
   for (const hook of hooks) {
     if (!hook || typeof hook !== "object") {
-      skipped.notAnObject++;
+      notChecked.push(`${JSON.stringify(hook) ?? String(hook)} (entry is not an object)`);
       continue;
     }
     const h = hook as Record<string, unknown>;
     if (typeof h.command !== "string") {
-      skipped.noCommand++;
+      notChecked.push(`${JSON.stringify(hook)} (entry has no command string)`);
       continue;
     }
     const target = hookCommandTarget(h.command);
@@ -285,10 +287,8 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
     checked++;
     if (!existsSync(target.path)) missing.push(target.path);
   }
-  const skippedCount = skipped.notAnObject + skipped.noCommand + skipped.otherCommand;
+  const skippedCount = skipped.otherCommand;
   const why = [
-    skipped.notAnObject ? `${skipped.notAnObject} not an object` : "",
-    skipped.noCommand ? `${skipped.noCommand} with no command string` : "",
     skipped.otherCommand ? `${skipped.otherCommand} not a command that launches a file` : "",
   ].filter(Boolean).join(", ");
   const counts =
