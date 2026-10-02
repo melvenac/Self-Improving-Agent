@@ -129,6 +129,15 @@ describe("checkMcpCommandPaths (T-008)", () => {
     expect(r.message).toContain("z (global): no command and no url");
   });
 
+  it("QA 260: a NON-OBJECT or null mcpServers entry beside a good one is WARN, and names the server key", () => {
+    for (const bad of [null, "a string", 7]) {
+      config({ mcpServers: { broken: bad, good: { command: onPath("goodserver") } } });
+      const r = checkMcpCommandPaths(home, env());
+      expect(r.severity, r.message).toBe("warn");
+      expect(r.message).toContain("Not checked 1: broken (global): entry is not an object");
+    }
+  });
+
   it("a url server beside a good command is still a pass: it has no command to stat, by design", () => {
     config({ mcpServers: { remote: { url: "https://example.invalid/mcp" }, good: { command: onPath("goodserver") } } });
     const r = checkMcpCommandPaths(home, env());

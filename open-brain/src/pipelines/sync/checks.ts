@@ -862,7 +862,11 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}):
   let checked = 0;
   for (const { scope, servers } of scopes) {
     for (const [server, def] of Object.entries(servers)) {
-      if (!def || typeof def !== "object") continue;
+      // A non-object (or null) entry is malformed input, not an empty one: not checked, and it names its key (QA 260).
+      if (!def || typeof def !== "object") {
+        notChecked.push(`${server} (${scope}): entry is not an object`);
+        continue;
+      }
       if (typeof def.command !== "string" || def.command === "") {
         if (typeof def.url === "string") skipped.push(`${server} (${scope}): url server, no command to stat`);
         else notChecked.push(`${server} (${scope}): no command and no url`);
