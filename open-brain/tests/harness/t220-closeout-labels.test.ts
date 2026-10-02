@@ -32,7 +32,9 @@ function fixture(withCriteria: boolean, prs: number[]): { root: string; records:
   return { root, records };
 }
 
-const row = (md: string, pr: number): string => md.split("\n").find((l) => l.startsWith(`| ${pr} |`)) ?? "";
+/** The row for `pr` in the "Diffs and what was scored" table (an earlier table also has per-PR rows). */
+const row = (md: string, pr: number): string =>
+  md.slice(md.indexOf("### Diffs and what was scored")).split("\n").find((l) => l.startsWith(`| ${pr} |`)) ?? "";
 
 describe("T-220 F2: the E_t label", { timeout: 120_000 }, () => {
   it("L1 with no G_qa at all, a diff that has an E_t reads `not called` and one that has none reads `not scored: no E_t`", () => {
