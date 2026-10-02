@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 259,
+  "revision": 261,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1145,29 +1145,29 @@
       "id": "T-217",
       "title": "Guard T-216's one-constant property at the zod level: a plan-only loop regex with a flag (e.g. /i) survives every test",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 155,
-      "closed_session": null,
+      "closed_session": 155,
       "supersedes": null,
-      "note": "QA 236 D1 (report a1960173). Mutant M7 gives PlanSchema.loop its own copy of LOOP_ID_PATTERN with the /i flag: 68/68 target tests and the full tests/harness run stay green, because zod's JSON emission keeps the regex source and drops flags, so plan.schema.json does not move and the drift test, L3 and BE-0.1 cannot see it. Under M7 validatePlan accepts T001 and 15-Slice while evidence refuses them. Cheap kills: assert PlanSchema.shape.loop's regex IS LOOP_ID_PATTERN by identity (also kills the equivalent M6), and/or add T001 and 15-Slice-4 to L2's refusals. ALSO record, not fix (QA 236 open item 2): runtime.ts:1278 validates a runtime planner's D_t but never checks plan.loop against the run's --loop (E_t does, at :1535). Predates T-216; the accepted set is now wider. plan.loop builds no path, so not a safety issue; recorded so nobody inherits it as settled. — Session 155: built by sia-builder (loop/t217-t218-guards 1a38e3f2, with T-218); QA 247 ACCEPT (f138bc6e; 5/5 mutants incl. QA's new RegExp(source) mutant; suite 0 failed; first Plumb CI run 36948923624 success). PR #256 open, Aaron merges.",
+      "note": "QA 236 D1 (report a1960173). Mutant M7 gives PlanSchema.loop its own copy of LOOP_ID_PATTERN with the /i flag: 68/68 target tests and the full tests/harness run stay green, because zod's JSON emission keeps the regex source and drops flags, so plan.schema.json does not move and the drift test, L3 and BE-0.1 cannot see it. Under M7 validatePlan accepts T001 and 15-Slice while evidence refuses them. Cheap kills: assert PlanSchema.shape.loop's regex IS LOOP_ID_PATTERN by identity (also kills the equivalent M6), and/or add T001 and 15-Slice-4 to L2's refusals. ALSO record, not fix (QA 236 open item 2): runtime.ts:1278 validates a runtime planner's D_t but never checks plan.loop against the run's --loop (E_t does, at :1535). Predates T-216; the accepted set is now wider. plan.loop builds no path, so not a safety issue; recorded so nobody inherits it as settled. — Session 155: built by sia-builder (loop/t217-t218-guards 1a38e3f2, with T-218); QA 247 ACCEPT (f138bc6e; 5/5 mutants incl. QA's new RegExp(source) mutant; suite 0 failed; first Plumb CI run 36948923624 success). PR #256 open, Aaron merges. — Session 155: PR #256 merged (1dc71dbe) on Aaron's word.",
       "note_by": [
         "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
       ],
-      "closed_rev": null
+      "closed_rev": 260
     },
     {
       "id": "T-218",
       "title": "T-214's test lacks a leading-whitespace row: QA 239 mutant q5 (strip leading spaces/tabs before matching) survives the builder's test",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 155,
-      "closed_session": null,
+      "closed_session": 155,
       "supersedes": null,
-      "note": "QA 239 G1 (report d4993796). The candidate code refuses ' [unrunnable]' and '  A-1: x', and QA's generator (docs/loops/qa-239/t214-gen.mts, G4 differential) kills q5, but t214-declared-blank.test.ts's JUNK list and J2 have no leading-whitespace row although T214-2 names it. Fix: add leading-whitespace rows to J1/J2, or commit QA's G4 differential as a test. Same shape as T-217 (a guard the property needs but the tests don't hold). — Session 155: built with T-217 (1a38e3f2); QA 247 ACCEPT (q5 and QA's tab-only mutant red on J3). PR #256 open, Aaron merges.",
+      "note": "QA 239 G1 (report d4993796). The candidate code refuses ' [unrunnable]' and '  A-1: x', and QA's generator (docs/loops/qa-239/t214-gen.mts, G4 differential) kills q5, but t214-declared-blank.test.ts's JUNK list and J2 have no leading-whitespace row although T214-2 names it. Fix: add leading-whitespace rows to J1/J2, or commit QA's G4 differential as a test. Same shape as T-217 (a guard the property needs but the tests don't hold). — Session 155: built with T-217 (1a38e3f2); QA 247 ACCEPT (q5 and QA's tab-only mutant red on J3). PR #256 open, Aaron merges. — Session 155: PR #256 merged (1dc71dbe) on Aaron's word.",
       "note_by": [
         "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
       ],
-      "closed_rev": null
+      "closed_rev": 260
     }
   ],
   "verified": [
@@ -3641,6 +3641,18 @@
       "title": "QA 246 (T-194 r7, 71ea3101) RULED REJECT: r7's properties hold (CI green on Linux, 139/139 mutants in one pass) but three sets are still enumerated; r8 allow-lists each listed word's OPTIONS (words without a safe complete list come off: uniq, ssh, scp, npx, curl; npm narrowed), limits PowerShell native commands to git/gh, allow-lists ENV names, and grant-gates every git config write",
       "date": "2026-10-02",
       "note": "Planner session 155 after reading origin/qa/t194-r7-report 513a3f38. Defects A-G: A PS native commands unrestricted (node -e, npx -c, awk, sed, robocopy, git --output); B npm/npx -c/exec/--call/pkg; C curl attached/cluster/-w %output/--etag-save; D sed --expr= w/e, -ne cluster, --in abbreviation; E uniq 2nd operand, git --output, ssh -E; F git config core.fsmonitor / remote.origin.pushurl persisted; G env deny-list misses GH_BROWSER/BROWSER/EDITOR/npm_config_*. Rulings on QA 246 opens: F yes (git config writes need a grant); G yes (env allow-list). Dispatch: docs/loops/t194-r8-dispatch.md. Also: T-217+T-218 dispatch docs/loops/t217-t218-dispatch.md. Step 4 (QA 245, live Jev) LAUNCHED on the laptop 2026-10-02T00:44:13Z, pid 32956, DISPATCH_SHA c34866d3, after the planner verified the key exists in user scope and a WMI-launched process sees it (value never read)."
+    },
+    {
+      "id": "D-089",
+      "title": "T-194 design: Aaron chose option 3 then 2 (GitHub-side merge/push guarantee first, r7 as courtesy layer, sparse planner checkout later). BLOCKER found: the repo is private on a free personal account, so rulesets and branch protection return 403 ('Upgrade to GitHub Pro or make this repository public'); and every agent acts as Aaron's own account, so a required review cannot separate planner from Aaron",
+      "date": "2026-10-02",
+      "note": "Aaron, planner session 155: 'Merge PR #256, 3, then 2'. #256 merged (1dc71dbe). Planner checked via gh api: GET rulesets and GET branches/master/protection both 403 on plan grounds. Option 3's step needs (i) GitHub Pro (or public repo) and (ii) a separate agent identity (bot account or GitHub App) if approvals are to mean anything. Without (ii), Pro still allows: block force push and deletion on master, require a PR, require CI 'test' to pass before merge (would have caught #254's red pull_request run deterministically). r8 stays held; r7 is the courtesy layer per option 3."
+    },
+    {
+      "id": "D-090",
+      "title": "SIA repo made PUBLIC on Aaron's word ('turn it back to public'), which enables rulesets; ruleset 24343321 on master: no deletion, no force push, PR required (0 approvals), CI 'test' check required. Option 3's GitHub-side guard is LIVE in its checks-only form; approvals stay in chat",
+      "date": "2026-10-02",
+      "note": "Planner session 155. Before flipping: credential scan of origin/master tree (2 hits, both fake: a placeholder in loop-15-qa-report.md:291 and a test sentinel in process-role.test.ts:334) and of master's history with git log -G for token/key patterns (0 hits). Ruleset created via gh api with Aaron's token. Effect: a PR whose 'test' check is red cannot be merged into master, by anyone (would have stopped #254 deterministically); force push and deletion of master are refused server-side. No separate agent identity: approvals remain Aaron's word in chat (D-089). Remaining from option 3: r7 as the courtesy layer (merge r7? it is REJECTED by QA 246 on fail-opens unrelated to merges; ruling pending); then option 2's sparse planner checkout."
     }
   ],
   "handoffs": [
