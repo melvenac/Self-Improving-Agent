@@ -42,3 +42,38 @@ Files touched: `pipelines/session-start/tree-currency.ts`, `cli-bootstrap.ts`, `
 ## T-221
 
 If #274 is still unmerged, the push and PR runs of each branch may cancel each other; ask atlas-sia to re-run.
+
+---
+
+## Round 2 (QA 254: T-208 REJECT, T-212 ACCEPT; atlas-sia's dispatch of session 157)
+
+| Branch | Head | Notes |
+| --- | --- | --- |
+| `loop/t208-fetch-first` | `9e928f7a` (code `6be66530`, mutant diffs on top) | T-208 r2, on top of `e442b955`; not rebased onto master |
+| `loop/t212-trailer-attribution` | rebased onto `origin/master` `9f6d20df`; code `9b076970` (content of `626f7d13`), tip is this handoff | **no longer stacked on T-208**: it carries none of the T-208 commits and merges alone |
+
+### T-208 r2 (`tree-currency.ts` only, plus its test file)
+
+- **The last fetch is the last SUCCESSFUL fetch.** Cause measured by QA: `git fetch` truncates `FETCH_HEAD` even when it fails. `fetchOrigin` now passes `--no-write-fetch-head`, and writes `sia-fetch-ok` in the git common dir on success. `readLastFetchAt` takes the newest of the `FETCH_HEAD` candidates and that marker, and skips a zero-size `FETCH_HEAD` (a manual failed fetch truncates it too).
+- **ob_start and /sync cannot say `level` after a failed start fetch.** A failure writes `sia-fetch-failed` (`{at, cause}`); a success removes it. `describeTreeCurrency` uses `options.fetch` when given, else that persisted failure when it is newer than the last successful fetch. So the exact call at `server.ts:242` and `checks.ts:1804` now leads with `fetch FAILED: ...; currency is against a fetch from <the success time>`. A later successful fetch, from the hook or by hand, clears it. Markers are best effort: a write error degrades to the old behaviour.
+- **Wording after a failure for the non-current severities** (QA 3b-edge): `record-behind` says "although the commits show no difference from" and `ahead` says "Not confirmed against a fresh fetch; local work is not yet on master". Neither contains `level` or `Not stale`.
+- **The cause** is the first `fatal:` or `error:` stderr line (`informativeLine`), falling back to the last non-empty line. For a missing path it is now `fatal: '<path>' does not appear to be a git repository`.
+- **Tests** (`tree-currency-fetch.test.ts`, 12 rows, was 7): `r2 row 3b/5` for startup and resume (hook run after a good fetch with origin moved and then unreachable; the FAILED line ends with the pre-failure success time, 1.2 s earlier; `describeTreeCurrency(clone)` with no fetch option then has the same time, leads with FAILED, no `level with`); a later success clears the failure; record-behind and ahead lines; the `fatal:` cause (SSH-style stderr by `informativeLine`, missing path through the real fetch).
+- **Red** (same file against the `e442b955` source): 5 failed: both `r2 row 3b/5` rows (`...from 2026-10-02T11:56:46.761Z vs 2026-10-02T11:56:44.592Z: expected false to be true`, the failed attempt's time), the clears-the-failure row (`expected 'Tree currency: level with origin/mast…' to match /^fetch FAILED: /`), the record-behind/ahead row (`not to contain 'level'`), and the `fatal:` row. **Green:** 12 passed, `tsc --noEmit` 0.
+- **Mutants** (`docs/loops/t208/mutants/`, each `tsc --noEmit` 0, both reverted):
+  - `fetch-head-mtime.diff` (drop `--no-write-fetch-head` and the empty-`FETCH_HEAD` skip, i.e. FETCH_HEAD's mtime is the last fetch again): 2 failed, both `r2 row 3b/5` rows.
+  - `last-stderr-line.diff` (cause is the last stderr line): 1 failed, the `fatal:` row (`expected 'and the repository exists.' to be 'fatal: Could not read from remote repository.'`).
+  - The earlier `skip-fetch.diff` is unchanged.
+
+### Not done, for the planner
+
+- QA's note that the hook prints no drift (T-208's acceptance row "prints tree currency and drift in one line") is **not addressed**; it is a ruling, not a defect in this round.
+- `loop/t208-fetch-first` is 19+ commits behind master and was not rebased; its files do not overlap the master commits seen (`git merge-tree` not run).
+
+### T-212 rebase
+
+`git rebase --onto origin/master e442b955` on `loop/t212-trailer-attribution`: two commits replayed (`626f7d13` as `9b076970`, handoff and mutant diff as the tip), no conflicts. `git diff --stat origin/master` shows only the handoff, the mutant diff, `cli-session-end.ts`, `handoff-guard.ts` and its test. After the rebase: `tsc --noEmit` 0; `tests/shared/handoff-guard.test.ts` run alone, result in the report to atlas-sia.
+
+### Runs
+
+Single files only, one per vitest run: `tree-currency-fetch.test.ts` (12 passed), `handoff-guard.test.ts`. Not run: the full suite (CI), `/sync` (this checkout's build is stale).
