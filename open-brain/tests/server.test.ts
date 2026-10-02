@@ -196,7 +196,9 @@ describe("server handlers", () => {
       expect(text).toContain("Verified (8):");
       expect(text).toContain("  V-002 — readOptional does not truncate by default; a budget cut is flagged per file (2 evidence)");
       expect(text).toContain("(1 evidence) [REOPENED]");
-      expect(text).toContain("Gaps (5):\n  G-001 — Cursor start.md copies");
+      // T-209: newest first. All five fixture gaps were opened in session 54, so the id breaks the tie, highest first.
+      expect(text).toContain("Gaps (5):\n  G-005 — vault-index-parity warns on one unindexed Checkpoints note");
+      expect(text.indexOf("  G-005 — ")).toBeLessThan(text.indexOf("  G-001 — "));
       // R2 (Loop 3): decisions are append-ordered; latest is the last element, not the newest date.
       expect(text).toContain("Decisions: 6 recorded; latest D-006 (2026-08-31) Lifecycle evaluation stays out of the session-end sweep");
       // The fixture's single v1 handoff migrated to seat "developer". handleStart

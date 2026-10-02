@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { renderState, VERIFIED_FULL_TEXT, GAP_CLIP } from "../../../src/pipelines/session-start/state-render.js";
+import { renderState, newestGapFirst, VERIFIED_FULL_TEXT, GAP_CLIP } from "../../../src/pipelines/session-start/state-render.js";
 import { newestHandoffPerInstance, newestHandoffForSeat } from "../../../src/shared/state-schema.js";
 import type { State } from "../../../src/shared/state-schema.js";
 import { readRepoRecord } from "../../helpers/repo-record.js";
@@ -398,5 +398,21 @@ describe("renderState — T-209 gaps newest-first", () => {
     const text = renderState(withClosed, "x").join("\n");
     expect(text).toContain("Gaps (6):");
     expect(text).not.toContain("G-999");
+  });
+
+  it("T209-4: ids tie-break by NUMBER, not by text: G-100 before G-99 in one session", () => {
+    const s: State = { ...state, gaps: [gap("G-99", 70), gap("G-100", 70), gap("G-98", 70)] } as unknown as State;
+    expect(renderState(s, "x").filter((l) => /^ {2}G-\d+ — /.test(l)).map((l) => /^ {2}(G-\d+)/.exec(l)![1])).toEqual(["G-100", "G-99", "G-98"]);
+  });
+
+  it("T209-5: G-10, G-9 and G-2 in one session render 10, 9, 2 (text order would give 9, 2, 10)", () => {
+    const s: State = { ...state, gaps: [gap("G-2", 70), gap("G-10", 70), gap("G-9", 70)] } as unknown as State;
+    expect(renderState(s, "x").filter((l) => /^ {2}G-\d+ — /.test(l)).map((l) => /^ {2}(G-\d+)/.exec(l)![1])).toEqual(["G-10", "G-9", "G-2"]);
+  });
+
+  it("T209-6: the comparator itself, so a fixture where text and number order differ is in the candidate's own tests", () => {
+    const ids = ["G-9", "G-100", "G-2", "G-10", "G-99"].map((id) => ({ id, opened_session: 5 }));
+    expect([...ids].sort(newestGapFirst).map((g) => g.id)).toEqual(["G-100", "G-99", "G-10", "G-9", "G-2"]);
+    expect(newestGapFirst({ id: "G-1", opened_session: 9 }, { id: "G-999", opened_session: 8 })).toBeLessThan(0);
   });
 });
