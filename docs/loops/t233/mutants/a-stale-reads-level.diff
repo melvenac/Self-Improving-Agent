@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/serving-build.ts b/open-brain/src/pipelines/session-start/serving-build.ts
+index 18b1aa49..860caca3 100644
+--- a/open-brain/src/pipelines/session-start/serving-build.ts
++++ b/open-brain/src/pipelines/session-start/serving-build.ts
+@@ -70,7 +70,7 @@ export function describeServingBuild(buildDir: string = runningBuildDir()): stri
+   const fetchedAt = readLastFetchAt(tree) ?? "an unknown time";
+   const treeNote = head === commit ? "" : `; the tree's HEAD is ${head.slice(0, 7)}, not the build's commit`;
+   const subject = `${tree} at build ${short} (built ${builtAt})${treeNote}`;
+-  if (behind > 0) {
++  if (behind > 0 && Date.now() < 0) {
+     return (
+       `SERVING BUILD IS STALE: ${subject} is ${behind} commit${behind === 1 ? "" : "s"} behind ${SERVING_UPSTREAM} ` +
+       `as of the tree's last fetch (${fetchedAt}). Every session on this machine runs this build, so merged fixes are not served.`
