@@ -10,7 +10,7 @@ carried the rulings and has no memory.
 | --- | --- | --- | --- | --- |
 | #289 | T-208 (r1 to r3) | `loop/t208-fetch-first` | `be32de21` | QA 258 ACCEPTED; waits for Aaron's morning word (B4 is outside his overnight pre-approval) |
 | #290 | T-212 | `loop/t212-trailer-attribution` | `f707a09c` | QA 258 ACCEPTED; same wait. Rebased onto master without T-208, merges alone |
-| #294 | T-215 | `loop/t215-maturity-cut` | `39c3cca7` | QA 258 ACCEPTED; DIRTY against master after B3 (#305, #313). Rebase requested by atlas-sia; see "Next" |
+| #294 | T-215 | `loop/t215-maturity-cut` | `26f62934` | QA 258 ACCEPTED at `39c3cca7`; rebased onto master 50700414 after B3 (one fixture conflict in `tests/trigger/fires.test.ts`, no behaviour change), CI green, CLEAN. atlas-sia reviews the range-diff (sent) |
 | #295 | T-008 | `loop/t008-mcp-paths` | `7312a292` | B2 round 2; awaits QA 260 |
 | #298 | T-008b | `loop/t008b-mcp-sources` | `7afd7f1b` | B2 round 2; stacked on #295; awaits QA 260 |
 | #306 | T-048 counts | `loop/t048-sync-counts` | `3f30e825` | B2 round 2; awaits QA 260 |
@@ -24,7 +24,7 @@ They reach master with their PRs.
 ## Next
 
 1. **QA 260** re-checks B2 round 2 (#295, #298, #306, #309). If it rejects one, atlas-sia sends the round.
-2. **#294 rebase** onto `origin/master` (atlas-sia's request): resolve with no behaviour change, `--force-with-lease`, wait for CI, send `git range-diff <old-base>..39c3cca7 origin/master..<new-head>` with each non-`=` commit's resolution in a line, and say whether #305's merge lets `typecheck:tests` reach 0 with the branch. If this file lists #294 at `39c3cca7`, the rebase has not happened yet.
+2. **#294** is rebased and green (range-diff sent to atlas-sia). `typecheck:tests` has 3 errors, all PRE-EXISTING on master (R-011 residue: `maturityBoost` import and `successRate` fixture fields in `tests/ranking.test.ts` and `tests/shadow-strategies.test.ts`); not fixed, awaiting atlas-sia's word on a follow-up.
 3. After that, nothing: park until a dispatch from atlas-sia. Aaron merges B4 (#289, #290, #294) on his word.
 
 ## Rulings in force (from atlas-sia, session 157)
