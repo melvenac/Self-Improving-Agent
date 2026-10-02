@@ -1,0 +1,22 @@
+diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts
+index 58ebedd5..d25b5e85 100644
+--- a/open-brain/src/pipelines/session-start/tree-currency.ts
++++ b/open-brain/src/pipelines/session-start/tree-currency.ts
+@@ -119,7 +119,7 @@ export function fetchOrigin(projectRoot: string, timeoutMs: number = FETCH_TIMEO
+   // --no-write-fetch-head: git truncates FETCH_HEAD even when a fetch FAILS, which
+   // made the failed attempt's time read as "the last fetch" (QA 254 rows 3b, 5).
+   // The last SUCCESSFUL fetch is recorded by markFetch below instead.
+-  const r = spawnSync("git", ["fetch", "--prune", "--no-write-fetch-head", "origin"], {
++  const r = spawnSync("git", ["fetch", "--prune", "origin"], {
+     cwd: projectRoot,
+     encoding: "utf8",
+     stdio: ["ignore", "pipe", "pipe"],
+@@ -445,7 +445,7 @@ function readLastFetchAt(projectRoot: string): string | null {
+     try {
+       const st = statSync(c);
+       // An EMPTY FETCH_HEAD is a failed fetch's truncation, not a fetch (QA 254 3b).
+-      if (st.size === 0) continue;
++      
+       if (newest === null || st.mtimeMs > newest) newest = st.mtimeMs;
+     } catch {
+       /* a candidate that does not exist is not an error: none is required */

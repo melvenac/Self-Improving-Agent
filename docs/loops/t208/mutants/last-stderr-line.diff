@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts
+index 58ebedd5..64a0fa0b 100644
+--- a/open-brain/src/pipelines/session-start/tree-currency.ts
++++ b/open-brain/src/pipelines/session-start/tree-currency.ts
+@@ -148,7 +148,7 @@ export function fetchOrigin(projectRoot: string, timeoutMs: number = FETCH_TIMEO
+  */
+ export function informativeLine(stderr: string): string | null {
+   const lines = stderr.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+-  return lines.find((l) => /^(fatal|error):/i.test(l)) ?? lines[lines.length - 1] ?? null;
++  return lines[lines.length - 1] ?? null;
+ }
+ 
+ const OK_MARKER = "sia-fetch-ok";

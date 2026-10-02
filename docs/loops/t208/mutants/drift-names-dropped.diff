@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/drift-line.ts b/open-brain/src/pipelines/session-start/drift-line.ts
+index b1c52613..9c2d6be7 100644
+--- a/open-brain/src/pipelines/session-start/drift-line.ts
++++ b/open-brain/src/pipelines/session-start/drift-line.ts
+@@ -16,7 +16,7 @@ export function describeDriftLine(projectRoot: string): string {
+     const drift = detectDrift(state);
+     if (drift.length === 0) return "Drift: none";
+     const items = drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? " (fixed)" : " (not fixed)"}`);
+-    return `Drift detected (${drift.length}): ${items.join("; ")}`;
++    return `Drift detected (${drift.length})`;
+   } catch (err) {
+     return `Drift: not checked (${err instanceof Error ? err.message : String(err)})`;
+   }

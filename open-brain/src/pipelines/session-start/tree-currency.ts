@@ -1,6 +1,6 @@
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync, rmSync } from "node:fs";
 import { join, isAbsolute } from "node:path";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { parseState } from "../../shared/state-schema.js";
 
 /**
@@ -86,11 +86,143 @@ export interface TreeCurrency {
 export interface TreeCurrencyOptions {
   /** Defaults to `origin/master`. */
   upstreamRef?: string;
+  /**
+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).
+   * Only the SessionStart hook fetches; ob_start and /sync compare against
+   * whatever fetch is on disk and say so. When this is a failure, no line below
+   * says `level` without the FAILED qualifier in front of it.
+   */
+  fetch?: FetchResult;
+}
+
+export interface FetchResult {
+  ok: boolean;
+  /** ISO time the fetch finished. */
+  at: string;
+  /** Why it failed; null when ok. */
+  cause: string | null;
+}
+
+/** Bounded: a fetch that cannot finish must not hold up a session start. */
+export const FETCH_TIMEOUT_MS = 15_000;
+
+/**
+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed
+ * "level with origin/master" against a ref nobody had refreshed, while master
+ * was 16 revisions ahead. The hook owns the fetch so the comparison is made
+ * against a fetch that just happened, or says that it did not. --prune is part
+ * of the contract: an unpruned remote-tracking ref reads a deleted branch as
+ * present. Never throws; GIT_TERMINAL_PROMPT=0 so a credential prompt cannot
+ * hang it.
+ */
+export function fetchOrigin(projectRoot: string, timeoutMs: number = FETCH_TIMEOUT_MS): FetchResult {
+  // --no-write-fetch-head: git truncates FETCH_HEAD even when a fetch FAILS, which
+  // made the failed attempt's time read as "the last fetch" (QA 254 rows 3b, 5).
+  // The last SUCCESSFUL fetch is recorded by markFetch below instead.
+  const r = spawnSync("git", ["fetch", "--prune", "--no-write-fetch-head", "origin"], {
+    cwd: projectRoot,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+    timeout: timeoutMs,
+    killSignal: "SIGKILL",
+    env: { ...process.env, GIT_TERMINAL_PROMPT: "0" },
+  });
+  const at = new Date().toISOString();
+  let result: FetchResult;
+  if (r.error) {
+    const timedOut = (r.error as NodeJS.ErrnoException).code === "ETIMEDOUT";
+    result = { ok: false, at, cause: timedOut ? `timed out after ${timeoutMs} ms` : r.error.message };
+  } else if (r.status !== 0) {
+    result = { ok: false, at, cause: informativeLine(r.stderr ?? "") ?? `git fetch exited ${r.status}` };
+  } else {
+    result = { ok: true, at, cause: null };
+  }
+  markFetch(projectRoot, result);
+  return result;
+}
+
+/**
+ * The cause of a failed fetch. git's LAST stderr line is "and the repository
+ * exists." for every SSH failure and a missing path alike, which names nothing;
+ * the informative line is the first `fatal:` or `error:` one.
+ */
+export function informativeLine(stderr: string): string | null {
+  const lines = stderr.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  return lines.find((l) => /^(fatal|error):/i.test(l)) ?? lines[lines.length - 1] ?? null;
+}
+
+const OK_MARKER = "sia-fetch-ok";
+const FAILED_MARKER = "sia-fetch-failed";
+
+function commonDirOf(projectRoot: string): string | null {
+  const d = git(projectRoot, ["rev-parse", "--git-common-dir"]);
+  return d === null ? null : isAbsolute(d) ? d : join(projectRoot, d);
+}
+
+/**
+ * Persist the outcome so ob_start and /sync, which do not fetch, can tell that the
+ * LAST start fetch failed. Success writes the ok marker (its mtime is the last
+ * successful fetch) and clears the failure; failure writes only the failure.
+ * Best effort: a marker that cannot be written degrades to the old behaviour,
+ * never to a crash.
+ */
+function markFetch(projectRoot: string, f: FetchResult): void {
+  const dir = commonDirOf(projectRoot);
+  if (dir === null) return;
+  try {
+    if (f.ok) {
+      writeFileSync(join(dir, OK_MARKER), f.at + "\n");
+      rmSync(join(dir, FAILED_MARKER), { force: true });
+    } else {
+      writeFileSync(join(dir, FAILED_MARKER), JSON.stringify({ at: f.at, cause: f.cause }) + "\n");
+    }
+  } catch {
+    /* see above */
+  }
+}
+
+/** The last start fetch's failure, if it is newer than the last successful fetch. */
+function readPersistedFailure(projectRoot: string, lastFetchAt: string | null): FetchResult | null {
+  const dir = commonDirOf(projectRoot);
+  if (dir === null) return null;
+  try {
+    const raw = JSON.parse(readFileSync(join(dir, FAILED_MARKER), "utf8")) as { at?: unknown; cause?: unknown };
+    if (typeof raw.at !== "string" || typeof raw.cause !== "string") return null;
+    if (lastFetchAt !== null && lastFetchAt >= raw.at) return null; // a later fetch succeeded
+    return { ok: false, at: raw.at, cause: raw.cause };
+  } catch {
+    return null;
+  }
 }
 
 const STATE_REL = ".agents/state.json";
 
 export function describeTreeCurrency(projectRoot: string, options: TreeCurrencyOptions = {}): TreeCurrency {
+  const result = compare(projectRoot, options);
+  // The caller's own fetch wins; callers that do not fetch (ob_start, /sync) still
+  // learn that the last start fetch FAILED from the persisted marker.
+  const f = options.fetch ?? readPersistedFailure(projectRoot, result.lastFetchAt);
+  if (f === null || f.ok) return result;
+  // A failed fetch: the comparison is against an OLD ref. The FAILED line leads,
+  // and nothing below may read as current (T-208: never 'level' unqualified).
+  const failed = `fetch FAILED: ${f.cause}; currency is against a fetch from ${result.lastFetchAt ?? "an unknown time"}`;
+  const rev = (n: number | null) => (n === null ? "no record" : `rev ${n}`);
+  const body =
+    result.severity === "current"
+      ? [
+          `Tree currency: no difference seen against ${result.upstreamRef} (record here ${rev(result.recordRevisionHere)}, ` +
+            `at ${result.upstreamRef} ${rev(result.recordRevisionUpstream)}) as of that old fetch, and not confirmed since. ` +
+            `Not the drift line: drift compares the rendered views to ${STATE_REL} within this tree.`,
+        ]
+      : result.lines.map((l) =>
+          l
+            .replace("although the commits are level with", "although the commits show no difference from")
+            .replace("Not stale; local work is not yet on master.", "Not confirmed against a fresh fetch; local work is not yet on master.")
+        );
+  return { ...result, lines: [failed, ...body] };
+}
+
+function compare(projectRoot: string, options: TreeCurrencyOptions): TreeCurrency {
   const upstreamRef = options.upstreamRef ?? "origin/master";
 
   const skip = (skipReason: string): TreeCurrency => ({
@@ -305,13 +437,18 @@ function readLastFetchAt(projectRoot: string): string | null {
   const commonDir = git(projectRoot, ["rev-parse", "--git-common-dir"]);
   if (commonDir !== null) candidates.push(join(isAbsolute(commonDir) ? commonDir : join(projectRoot, commonDir), "FETCH_HEAD"));
 
+  // The success marker (written by fetchOrigin) is a third candidate.
+  if (commonDir !== null) candidates.push(join(isAbsolute(commonDir) ? commonDir : join(projectRoot, commonDir), OK_MARKER));
+
   let newest: number | null = null;
   for (const c of candidates) {
     try {
-      const t = statSync(c).mtimeMs;
-      if (newest === null || t > newest) newest = t;
+      const st = statSync(c);
+      // An EMPTY FETCH_HEAD is a failed fetch's truncation, not a fetch (QA 254 3b).
+      if (st.size === 0) continue;
+      if (newest === null || st.mtimeMs > newest) newest = st.mtimeMs;
     } catch {
-      /* a candidate that does not exist is not an error: neither is required */
+      /* a candidate that does not exist is not an error: none is required */
     }
   }
   return newest === null ? null : new Date(newest).toISOString();
