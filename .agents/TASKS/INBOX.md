@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 278 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 279 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -91,12 +91,14 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-210** ob_start names the newest docs/loops brief by git commit date
 - [ ] **T-211** Each seat's status-cron minutes live in seat data, and /start reads them
 - [ ] **T-222** count-attempts exits 1 on an attempt chained to an unanswered auth record (QA 248 F5); plus done-gate reason text for checks 'none', repo-relative checks_source, 4.4 'E_t commit' column (F6-F8)
+- [ ] **T-225** Jev calibration 2 prerequisites: G_qa request with requirement statuses stripped, a run with real deterministic checks, a held-out set, and score.mjs matching the current gate reason text
 
 ## P3
 
 - [ ] **T-188** sync's ci-status check reads gh's 'gh auth login' hint in a clone whose origin is not GitHub as 'gh is not authenticated'
 - [ ] **T-223** Pin the event in the PR concurrency group in ci-runs-on.test.ts so QA 250's M-push-only mutant dies
 - [ ] **T-224** Standing-cron reader says 'status_to is missing' for an unfilled <placeholder>; say 'unfilled placeholder' or tell the template reader to replace <...> values
+- [ ] **T-226** /start text still says 'largest loop number' for the brief; point it at ob_start's new Latest brief line (T-210) in .claude/commands/start.md, the project template and the Cursor mirror
 
 ## Done (last 3 sessions)
 
