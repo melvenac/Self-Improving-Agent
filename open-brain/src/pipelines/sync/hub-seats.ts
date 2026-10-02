@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {
     return issue("hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked");
   }
   let known: string[];
+  let ignoredSeatNames = 0;
   try {
     const seats = JSON.parse(readFileSync(seatsPath, "utf-8")) as SeatFile;
     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === "string") : [];
+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.
+    ignoredSeatNames = Array.isArray(seats.seats) ? seats.seats.length - known.length : 0;
   } catch (error) {
     return issue(`worktree-seats.json did not parse: ${error instanceof Error ? error.message : String(error)}`);
   }
@@ -57,6 +60,7 @@ export function checkHubSeats(projectRoot: string): CheckResult {
   }
 
   const problems: string[] = [];
+  if (ignoredSeatNames > 0) problems.push(`worktree-seats.json has ${ignoredSeatNames} seat name(s) that are not strings and were ignored`);
   if (!hub.readers || typeof hub.readers !== "object" || Array.isArray(hub.readers)) {
     problems.push("no readers map (ob_start reads readers)");
   } else {

@@ -114,6 +114,8 @@ export interface WorkspaceResolution {
   dir_source: string;
   /** Usable roots the payload offered. Zero alongside a present key is the fault. */
   root_count: number;
+  /** T-048: entries of workspace_roots that were present but could not be used. 0 when the key is absent or empty. */
+  unusable_roots: number;
 }
 
 /**
@@ -145,22 +147,24 @@ export function describeWorkspaceDir(
 
   const present = "workspace_roots" in payload || "workspaceRoots" in payload;
   const roots = payload.workspace_roots ?? payload.workspaceRoots;
-  const candidates = Array.isArray(roots) ? roots : [roots];
+  const candidates = Array.isArray(roots) ? roots : roots === undefined ? [] : [roots];
 
   let chosen: string | null = null;
   let usable = 0;
+  let unusable = 0;
   for (const candidate of candidates) {
     const found = pick(candidate);
-    if (!found) continue;
+    if (!found) { unusable++; continue; }
     usable++;
     if (!chosen) chosen = found;
   }
 
-  if (chosen) return { dir: chosen, dir_source: "workspace_roots", root_count: usable };
+  if (chosen) return { dir: chosen, dir_source: "workspace_roots", root_count: usable, unusable_roots: unusable };
   return {
     dir: fallback,
     dir_source: present ? "fallback:empty_roots" : "fallback:absent",
     root_count: 0,
+    unusable_roots: unusable,
   };
 }
 

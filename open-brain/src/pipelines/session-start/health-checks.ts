@@ -61,12 +61,13 @@ export function runHealthChecks(homePath: string): HealthCheckResult {
     try {
       let newestSession: string | null = null;
       let newestMtime = 0;
+      let unreadableDirs = 0;
       for (const projectDir of readdirSync(transcriptsDir)) {
         const full = join(transcriptsDir, projectDir);
         let files: string[];
         try {
           files = readdirSync(full).filter((f) => f.endsWith(".jsonl"));
-        } catch { continue; }
+        } catch { unreadableDirs++; continue; }
         for (const f of files) {
           const s = statSync(join(full, f));
           if (s.mtimeMs > newestMtime) {
@@ -74,6 +75,14 @@ export function runHealthChecks(homePath: string): HealthCheckResult {
             newestSession = f.replace(/\.jsonl$/, "");
           }
         }
+      }
+
+      // T-048: the newest-transcript judgement below rests on the directories that WERE readable.
+      if (unreadableDirs > 0) {
+        warnings.push({
+          category: "pipeline",
+          message: `${unreadableDirs} transcript director${unreadableDirs === 1 ? "y" : "ies"} under ${transcriptsDir} could not be read; the newest-transcript check covers only the rest.`,
+        });
       }
 
       const hoursStale = (Date.now() - newestMtime) / (1000 * 60 * 60);

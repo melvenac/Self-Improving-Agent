@@ -65,7 +65,7 @@ interface SessionEndV2Result {
     /** Ratings whose feedback_log write threw (SILENT 16). */
     notWritten?: Array<{ id: number; reason: string }>;
   };
-  invocations: { logged: number; skippedSessions: number };
+  invocations: { logged: number; skippedSessions: number; unreadableSessions: number; appendFailures: number };
   topics: { written: number; removed: number; orphans: number };
   shadow: ShadowStageResult;
 }
@@ -188,7 +188,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   // clustered over are untouched — the scan was derived, not a store.
 
   // ── Stage 3: Invocation logging ──────────────────────────────────────────────
-  const invocationResult = dryRun ? { logged: 0, skippedSessions: 0 } : logInvocations();
+  const invocationResult = dryRun ? { logged: 0, skippedSessions: 0, unreadableSessions: 0, appendFailures: 0 } : logInvocations();
 
   // ── Stage 4: Shadow recall ──────────────────────────────────────────────────
   // Must run after Stage 2 so this session's own relevance labels already exist:
@@ -262,6 +262,7 @@ export function formatSessionEndLines(result: SessionEndV2Result): string[] {
         .join(", ")}`,
     );
   }
-  lines.push(`Invocations: ${result.invocations.logged} logged`);
+  const inv = result.invocations;
+  lines.push(`Invocations: ${inv.logged} logged (${inv.skippedSessions} already logged, ${inv.unreadableSessions} unreadable, ${inv.appendFailures} append failed)`);
   return lines;
 }

@@ -595,7 +595,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     return {
       content: [{
         type: "text",
-        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Invocations: ${result.invocations.logged} logged\n${shadowLine}\n\n${shadowReport}`,
+        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Invocations: ${result.invocations.logged} logged (${result.invocations.skippedSessions} already logged, ${result.invocations.unreadableSessions} unreadable, ${result.invocations.appendFailures} append failed)\n${shadowLine}\n\n${shadowReport}`,
       }],
     };
   } catch (err) {

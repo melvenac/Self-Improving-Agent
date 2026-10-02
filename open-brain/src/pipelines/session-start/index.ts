@@ -27,7 +27,15 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
       // Absent is not silent: the caller prints this instead of a blank block.
       session.skippedReason = "no .agents/SESSIONS/ dir — log not created";
     } else {
-      const existing = findExistingSessionLog(options.projectRoot, sessionId);
+      const unreadableLogs: string[] = [];
+      const existing = findExistingSessionLog(options.projectRoot, sessionId, (name) => unreadableLogs.push(name));
+      // T-048: a log that could not be read may have been this session's own; say so rather than mint a duplicate in silence.
+      if (unreadableLogs.length > 0) {
+        health.warnings.push({
+          category: "session-log",
+          message: `${unreadableLogs.length} session log(s) in .agents/SESSIONS could not be read (${unreadableLogs.join(", ")}); the search for this session's existing log skipped them.`,
+        });
+      }
       if (existing) {
         session = { sessionId, ...existing, reused: true, skippedReason: null };
       } else {

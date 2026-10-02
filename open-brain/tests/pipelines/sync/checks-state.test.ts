@@ -304,7 +304,7 @@ describe("merge-markers (Loop 4 R7)", () => {
     writeFileSync(join(root, "bin", "blob.bin"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));
     git("add", "-A");
     const r = checkMergeMarkers(root);
-    expect(r).toEqual({ name: "merge-markers", report: true, severity: "pass", message: "0 conflict markers in 2 tracked text files" });
+    expect(r).toEqual({ name: "merge-markers", report: true, severity: "pass", message: "0 conflict markers in 2 tracked text files; 1 tracked file not scanned (0 deleted, 0 unreadable, 1 binary)" });
   });
 
   it("fails (issue) naming file and lines when a tracked file carries markers; untracked files are not scanned", () => {
@@ -314,7 +314,7 @@ describe("merge-markers (Loop 4 R7)", () => {
     git("add", "CHANGELOG.md", "clean.md");
     const r = checkMergeMarkers(root);
     expect(r.severity).toBe("issue");
-    expect(r.message).toBe("3 conflict marker line(s) in 1 of 2 tracked text files: CHANGELOG.md:2,4,6");
+    expect(r.message).toBe("3 conflict marker line(s) in 1 of 2 tracked text files: CHANGELOG.md:2,4,6; 0 tracked files not scanned (0 deleted, 0 unreadable, 0 binary)");
   });
 
   it("skips with the reason outside a git repository", () => {
