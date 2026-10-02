@@ -5,5 +5,9 @@
     "### Hub room",
     "Read `.agents/SYSTEM/hub-partner-seats.json` for this worktree's seat. Cursor seats run the file's hub-talk line with `--inbox` before the briefing. An unread turn from atlas is the assignment: name it and propose nothing else. After each post, run hub-talk with `--wait --wait-timeout 3500`, and again on exit 2. One wait at a time."
   ],
-  "claude_only": []
+  "claude_only": [
+    "### 5b. Standing cron",
+    "`ob_start` prints one `Standing cron:` line in the seat block, read from `.agents/AGENT.local.md` (then `.agents/AGENT.md`). When it reads `Standing cron: <cron> → status to <agent> (rule: <path>). Create it with CronCreate before the briefing ends.`, create that cron now with `CronCreate`: the cron expression as printed, and a prompt that reads the rule file and sends the status to that agent. Do it once, before the briefing. `Standing cron: none in seat data.` needs nothing. `Standing cron: INVALID in <file>: <why>` creates nothing and goes in FLAGS.",
+    "Also include in FLAGS, verbatim, any `Standing cron: INVALID` line."
+  ]
 }

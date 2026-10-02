@@ -123,8 +123,10 @@ describe("T-211 standing cron in seat data", { timeout: 120_000 }, () => {
       const seatAt = lb.findIndex((l) => l.startsWith("Seat: "));
       expect(seatAt).toBeGreaterThanOrEqual(0);
       expect(lb[seatAt + 1]).toMatch(/^Standing cron: /);
-      // Nothing else differs.
-      expect(lb.filter((l) => !l.startsWith("Standing cron:"))).toEqual(la.filter((l) => !l.startsWith("Standing cron:")));
+      // Nothing else differs. The word count line counts the words of the added line, so it is excluded by name.
+      const rest = (ls: string[]): string[] => ls.filter((l) => !l.startsWith("Standing cron:") && !l.startsWith("Total returned words:"));
+      expect(rest(lb)).toEqual(rest(la));
+      expect(rest(la).length).toBeGreaterThan(20);
     } finally {
       rmSync(bare, { recursive: true, force: true });
       rmSync(keyed, { recursive: true, force: true });
