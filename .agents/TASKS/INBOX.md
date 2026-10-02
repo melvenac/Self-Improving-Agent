@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 269 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 270 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -90,6 +90,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-206** The assignments sidecar gets the record's protections: a /sync erasure check (no entry dropped by a hand edit or a merge resolution), a stale-assignment flag (the assigned task is no longer active), and a planner-only writer once T-203 resolves seats by checkout
 - [ ] **T-210** ob_start names the newest docs/loops brief by git commit date
 - [ ] **T-211** Each seat's status-cron minutes live in seat data, and /start reads them
+- [ ] **T-222** count-attempts exits 1 on an attempt chained to an unanswered auth record (QA 248 F5); plus done-gate reason text for checks 'none', repo-relative checks_source, 4.4 'E_t commit' column (F6-F8)
 
 ## P3
 
