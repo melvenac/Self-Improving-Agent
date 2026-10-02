@@ -352,6 +352,88 @@ export function checkSkillIndex(vaultPath: string): CheckResult {
 }
 
 /**
+ * `.agents/skills/` has three identities per skill and nothing used to check they agree
+ * (T-051): the directory name, the `name` in SKILL.md's frontmatter, and the row in
+ * `.agents/skills/INDEX.md`. Prime's loader found three directories and loaded two
+ * different ones than the index registered; a 192-line guide had no frontmatter at all and
+ * never loaded, for months. Neither reader was wrong about its own file.
+ *
+ * Every disagreement is one finding naming all three sources. A directory without a
+ * SKILL.md, a SKILL.md without frontmatter or a `name`, a name that is not the directory,
+ * a directory with no INDEX row, an INDEX row whose Skill or Directory cell is not the
+ * directory, and an INDEX row naming a directory that does not exist, are all findings.
+ * Absent `.agents/skills/` is SKIP: nothing was looked at, and that is not a pass.
+ */
+export function checkSkillsContract(projectRoot: string): CheckResult {
+  const name = "skills-contract";
+  const skillsDir = join(projectRoot, ".agents", "skills");
+  if (!existsSync(skillsDir)) {
+    return { name, severity: "skip", message: "not checked: .agents/skills/ does not exist in this checkout. This is not a pass." };
+  }
+
+  const dirs = readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
+
+  // INDEX.md: the table rows, whichever heading they sit under. Header and separator rows are structure.
+  const indexPath = join(skillsDir, "INDEX.md");
+  const indexRows: Array<{ skill: string; directory: string }> = [];
+  let indexNote: string | null = null;
+  if (!existsSync(indexPath)) {
+    indexNote = "INDEX.md does not exist";
+  } else {
+    try {
+      for (const line of readFileSync(indexPath, "utf-8").replace(/^﻿/, "").split(/\r?\n/)) {
+        if (!line.trim().startsWith("|")) continue;
+        const cells = line.split("|").map((c) => c.trim());
+        const filled = cells.filter(Boolean);
+        if (filled.length === 0 || filled.every((c) => /^:?-+:?$/.test(c))) continue;
+        if (cells[1]?.toLowerCase() === "skill") continue;
+        indexRows.push({ skill: (cells[1] ?? "").replace(/`/g, ""), directory: (cells[2] ?? "").replace(/`/g, "").replace(/[\\/]+$/, "") });
+      }
+    } catch (e) {
+      indexNote = `INDEX.md could not be read (${(e as Error).message.split("\n")[0]})`;
+    }
+  }
+
+  const findings: string[] = [];
+  const describe = (dir: string | null, fm: string, row: string): string =>
+    `directory ${dir ?? "absent"}; SKILL.md name ${fm}; INDEX.md ${row}`;
+  const rowFor = (dir: string) => indexRows.filter((r) => r.directory === dir);
+
+  for (const dir of dirs) {
+    const skillMd = join(skillsDir, dir, "SKILL.md");
+    let fm: string;
+    if (!existsSync(skillMd)) {
+      fm = "none (no SKILL.md)";
+    } else {
+      const text = readFileSync(skillMd, "utf-8").replace(/^﻿/, "");
+      const block = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+      if (!block) fm = "none (no frontmatter)";
+      else {
+        const m = block[1]!.match(/^name\s*:\s*(.+?)\s*$/m);
+        fm = m ? m[1]!.replace(/^["']|["']$/g, "") : "none (frontmatter has no name)";
+      }
+    }
+    const rows = rowFor(dir);
+    const rowText = indexNote !== null ? `unreadable (${indexNote})` : rows.length === 0 ? "no row" : rows.map((r) => `row "${r.skill}" -> ${r.directory}/`).join(", ");
+    const bad =
+      fm !== dir ||
+      (indexNote === null && (rows.length !== 1 || rows[0]!.skill !== dir));
+    if (bad) findings.push(describe(dir, fm === dir ? `"${fm}"` : fm.startsWith("none") ? fm : `"${fm}"`, rowText));
+  }
+  if (indexNote === null) {
+    for (const r of indexRows) {
+      if (!dirs.includes(r.directory)) findings.push(describe(null, "none (no directory)", `row "${r.skill}" -> ${r.directory || "(empty)"}/`));
+    }
+  }
+  if (indexNote !== null && dirs.length > 0) findings.push(`${dirs.length} skill director${dirs.length === 1 ? "y" : "ies"} but ${indexNote}`);
+
+  if (findings.length > 0) {
+    return { name, severity: "issue", message: `${findings.length} skill(s) disagree across directory, SKILL.md frontmatter and INDEX.md — ${findings.join(" | ")}` };
+  }
+  return { name, severity: "pass", message: `${dirs.length} skill(s): directory, SKILL.md name and INDEX.md row agree for each` };
+}
+
+/**
  * Personal identity leaking into the distributable template.
  *
  * project-template/ ships to strangers, and it shipped with "Aaron" in ~20
