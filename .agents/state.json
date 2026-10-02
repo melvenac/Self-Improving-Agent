@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 293,
+  "revision": 294,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4061,67 +4061,6 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Read docs/loops/session-147-dispatches.md from 'Planner session 11' to the end (origin/docs/session-100-qa99-dispatch). Slice three is OPEN: candidate C (2035e89) was REJECTED by QA 204 (qa/c-report b16d5b5). Forge is building record 201 r2 against the criteria at 23ebd86 (§9 corrects CC-6's path). Accepted and waiting for Aaron's merge: #196 (record 200), #197 (record 207) and #198 (record 198). QA dispatches for 192 r4 (QA 210) and 205 r3 (QA 211) are pushed at b7f963a, awaiting Aaron's launch line. The QA PC and the laptop are both idle and available.",
-      "watch_out": [
-        "QA 203's report for record 198 is on the QA PC ONLY (local 120dc44 on qa/qa-probes-report, plus two mutant branches): its push-qa.mjs push was refused by Cursor's permission fence. That is the QA-178 defect record 192 fixes. The planner did not push it for the seat (that would be permission laundering). Aaron decides.",
-        "Every QA seat still runs the OLD driver template until #194 (record 192) merges: a sanctioned push can be refused, and another seat's mid-run push reads as ref_violations. Hold seat pushes during QA runs, or trace them by SHA.",
-        "D-061: developers NEVER run CI. QA dispatches it. Seats echo old briefs ('tcm at most 6'); correct them on sight.",
-        "Composer (sia-infra) ends its turn on a bare acknowledgement. Say 'do it in this turn; no acknowledgement'. Its hub --wait runs in the foreground of its chat, so a new turn wakes it without Aaron.",
-        "Every QA dispatch requires an E_t.json beside the report, validated (C criteria §8 P1). QA 204, 208, 209 and 202 produced one.",
-        "Candidate C's merge is the gate's first live episode (§8 P4): run shadow-verdict prepare before Aaron merges it, and decide after."
-      ],
-      "open_questions": [
-        "Aaron: push QA 203's stranded report from the QA PC (his hand), or wait until #194 lets a QA seat push it?",
-        "Aaron: Telegram approval for QA (D-058) is on HOLD by his choice."
-      ],
-      "session": 148,
-      "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#194 loop/qa-driver-cursor-r2 (0f816bb)",
-            "qa_status": "in_progress",
-            "note": "record 192 r4 (harness only); QA 210 awaits launch"
-          },
-          {
-            "ref": "#195 loop/15-slice-3-candidate-c (7099b20)",
-            "qa_status": "rejected",
-            "note": "candidate C; QA 204 REJECT; Forge building r2"
-          },
-          {
-            "ref": "#196 loop/t176-index-direction (8d3143c)",
-            "qa_status": "accepted",
-            "note": "record 200; Aaron merges"
-          },
-          {
-            "ref": "#197 loop/t046-d1 (a8adca0)",
-            "qa_status": "accepted",
-            "note": "record 207; Aaron merges"
-          },
-          {
-            "ref": "#198 loop/qa-probes-on-master (c025800)",
-            "qa_status": "accepted",
-            "note": "record 198; Aaron merges"
-          }
-        ],
-        "frozen_sha": null,
-        "questions_for_aaron": [
-          "Merge #196, #197, #198",
-          "Launch QA 210+211 (one line; dispatches at b7f963a)",
-          "QA 203's stranded report: push it yourself or wait for #194?"
-        ],
-        "rulings": [
-          "D-061 developers never run CI",
-          "C criteria accepted with §8 P1-P4; §9 P5",
-          "QA 195/202 reject record 192 r2/r3; QA 196/197/203/208/209 ACCEPT records 193/194/198/200/207",
-          "QA 204 REJECT candidate C"
-        ]
-      },
-      "session_uuid": "db06e512-6040-4764-b9b9-038e61d842ee",
-      "checkout": "sia-planner",
-      "first_rev": 145
-    },
-    {
-      "seat": "planner",
       "pick_up": "Planner session 149 ROLLS at about 2026-09-30 (Aaron's word: 'We need to roll this session'). Master is ebf4b3b plus this roll's merge, and green. START HERE: (1) Check QA 227 (record 220 r2, T-158, code e23e622, QA PC) and QA 228 (record 219 r2, T-196+T-197, code 3059ca9, LAPTOP), dispatched on 8b3bc56 (#212). Aaron was given three lines at the end of session 149: the laptop display timeout to 0 on AC (Modern Standby; its power log shows repeated 'connected standby, Reason: Idle Timeout'), QA 227 on the QA PC, and QA 228 on the laptop, in parallel. Read each queue.log (anchor on 'start=queue=227 ' and 'start=queue=228 ') to see whether he launched them, then rule on the reports. (2) Forge was REOPENED (as a Claude Code session in sia-forge) and told to fetch, detach, rebuild, re-run /start, then read hub turns 234 (CANDIDATE C r4, which closes slice three), 235 (T-198 r2) and 236 (T-198's fifth fix: hub-presence.ts:124 hardcodes dev-key). Watch the forge room k57frxw0ptb8tadmqdwy0khhks8ey006. (3) Builder is closed for the night; its queue is turn 68 (T-194 r2: docs-only merges must stay grant-free, per Aaron's ruling 'docs only merge have my go-ahead'), then T-200 (new, P0: ob_start reads the record from origin/master when the tree is stale), then T-199. Its T-164 (567657a) and T-194 (f15f2cf) are committed locally, unpushed. (4) Infra is closed; its work is all pushed and in QA 227/228. (5) STRICT AUTH on tcm (D-063) waits on T-196 merged (the keys in the tracked seat file) AND T-198 r2 (no dev-key); when both land, tell Relay (a2a-planner), who re-reads the auth log and sends the strict notice for the planner's GO.",
       "watch_out": [
         "MERGE A PR, THEN READ MASTER'S OWN RUN, not the PR's (#201 turned master red while its PR run was green). Every merge after that in session 149 was checked on master's own run.",
@@ -4479,6 +4418,39 @@
       "session_uuid": "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
       "checkout": "sia-planner",
       "first_rev": 276
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Planner session 158 (started ~21:15Z 2026-10-02 after the 157 roll). This is an INTERIM handoff written mid-session at clark's request, to put the /START AUDIT GAPS watch-out back into the record; it was dropped at rev 287. State at writing: no PRs open; master 5749a7b4 (#338, D-111) with push CI green on 7bfe22f2, 66accdec and 5749a7b4; #295/#298 merged under D-109. The D-110 dev dispatch (objective items a-e) is HELD: slots.json usageLevel 'RED + WEEKLY95' (5h 87%, 7d 95%, set 21:09Z), and weekly >=95% means no new QA, tasks or dispatches. Dispatch only after clark announces the weekly reset (Aaron's one-time reset, or the 10-07 window). sia-forge is offline (QA PC network drop; Aaron must relaunch it); sia-builder is on Aaron's /clear list. Each needs a re-brief by message after its /start (G-049/T-203). The status cron was created at /start (job c7008754, :04 hourly).",
+      "watch_out": [
+        "USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = small LIGHT tasks only, QA cap 2; RED (>=85% of 5-hour) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks). Roll points: devs 50% context left, planners 40%, clark 30%; a roll needs the handoff MERGED or in the record, then READY TO ROLL to clark, then Aaron runs /clear + /start.",
+        "BATCH QA + BACKLOG GATE + ONE APPROVAL PER BATCH (Aaron, standing): 4-6 related code PRs per QA run, with a scratch merge-order row; devs open NO new code PRs while 6 or more await QA; one AskUserQuestion per accepted batch naming every PR, then merge each pinned with --match-head-commit after re-checking head == QA'd SHA, CI green and not DIRTY. An approval comes from Aaron in the planner's window, or in clark's window recorded first-hand by clark (the D-103/D-108 route), and covers only the PRs and SHAs it names.",
+        "A HEAD THAT MOVED AFTER QA is not what QA accepted: review `git range-diff <old-base>..<qa'd> <new-base>..<new>`. '=' commits plus a trivial conflict line may go on as reviewed (#294, #302 did); anything else gets a narrow re-QA. A moved head needs a fresh approval if Aaron's word pinned the old SHA (#295 now).",
+        "CI (T-227, #310): GitHub-hosted ubuntu-latest, fetch-depth 0, a few minutes per run; push runs ONLY on master; a branch without a PR gets no CI unless `gh workflow run CI --ref <branch>`; per-PR concurrency cancels only superseded commits; tcm self-hosted is an opt-in (tcm=true).",
+        "STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned; check scope with `git diff --name-only origin/master...<head>` (gh pr diff fails over 20,000 lines). A test, script, package.json or config file takes it out of scope. Send clark a one-line D-063 notice per merge. Open seats' docs-only handoff branches as PRs yourself and merge them (the roll rule).",
+        "QA DISPATCHES: the DISPATCH_SHA must contain every file (git cat-file -e); each QA number gets its own push helper EDITED BY HAND, with all five refusals tested; any dispatch reading real config forbids copying values (G-051); a batch merge-order row names the real conflicting import line (it was node:fs, not node:path, in B2).",
+        "RULINGS IN FORCE for /sync checks (D-104, D-106, D-107): any input not checked caps the result at WARN; malformed entries in every source are not-checked; named skips inside a pass are legitimate only for url servers, an absent settings.json (named), bare builtin heads, and non-command hook types; containers are T-231.",
+        "STANDING REPORTING RULES FROM AARON (via Clark), RESTORED at session 154 after being dropped at the session-153 roll (present in session 150's handoff, absent from 153's), CADENCE CHANGED at session 155 by D-077: (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\\Users\\melve\\Worktrees\\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 60 MINUTES while active (was 30), a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Re-create the cadence at /start (CronCreate at :04 only). If `clark` is not in ListAgents, skip the send. Completions and blocks are reported as they happen. Until T-211 puts the minutes in seat data, CARRY THIS ITEM FORWARD VERBATIM at every roll. (T-211 merged as #272 in session 157: check whether the standing-cron line now prints at start before dropping this item.)",
+        "DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.",
+        "VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.",
+        "JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first.",
+        "/START AUDIT GAPS (clark's HoH audits of sessions 156 and 158's starts, ~/Worktrees/hoh-startup-audit.md; do NOT repeat; CARRY VERBATIM AT EVERY ROLL — dropping it after session 157 is why items 1-3 regressed at 158): (1) CREATE THE STATUS CRON during /start (CronCreate at :04), before the briefing ends — not as a FLAG. (2) The session number is the RECORD's next session (last n + 1), not ob_start's per-checkout 'Session #N' (T-164; the serving MCP build is stale, T-172, so state it yourself). (3) 'Latest brief' is the newest *brief* by DATE (ls -t docs/loops/*brief*), not by loop number or sort -V; a developer handoff is not a brief (T-210). (4) Read C:\\Users\\melve\\slots.json usageLevel at /start (home root, NOT ~/Worktrees; also the dashboard slots panel; live numbers are quota.claude in http://100.124.212.87:4100/api/sessions) and state the level in the OBJECTIVE line — e.g. RED + weekly 95% means the dispatch is held. (5) git fetch BEFORE the greeting when the tree is behind origin/master. (6) Do not print answered open questions. (7) Do every residual read, including .agents/SYSTEM/domains.json. (8) Count gaps from state.json gaps[], not a truncated render. (9) ob_start returns ~50 KB here (T-183): extract the State block to the scratchpad and read it in parts."
+      ],
+      "open_questions": [],
+      "session": 158,
+      "loop_state": {
+        "open_prs": [],
+        "frozen_sha": null,
+        "questions_for_aaron": [],
+        "rulings": [
+          "D-109 #295/#298 merged",
+          "D-110 dev greeting trim",
+          "D-111 auto-merge enabled"
+        ]
+      },
+      "session_uuid": "ae490afb-211a-42c7-b82e-292e88d0a9f4",
+      "checkout": "sia-planner",
+      "first_rev": 294
     }
   ],
   "sessions": [
@@ -4489,14 +4461,6 @@
       "seat": "planner",
       "checkout": null,
       "first_rev": null
-    },
-    {
-      "n": 148,
-      "date": "2026-09-28",
-      "uuid": "db06e512-6040-4764-b9b9-038e61d842ee",
-      "seat": "planner",
-      "checkout": "sia-planner",
-      "first_rev": 145
     },
     {
       "n": 149,
@@ -4577,6 +4541,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 276
+    },
+    {
+      "n": 158,
+      "date": "2026-10-02",
+      "uuid": "ae490afb-211a-42c7-b82e-292e88d0a9f4",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 294
     }
   ]
 }

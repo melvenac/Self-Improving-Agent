@@ -1,12 +1,12 @@
-<!-- generated from .agents/state.json rev 293 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 294 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 157)_
+## planner [sia-planner] _(written session 158)_
 
 ### Pick up here
 
-Planner session 157 ROLLING about 18:4xZ 2026-10-02 at 37% context (roll point 40%). DONE today: 31 code PRs merged with QA (B1, B3, B4, B5, B2 r2 and #302, plus the earlier ones), CI moved to hosted runners (#310), Jev calibration 1 complete (D-100), the backlog audit closed 20 stale tasks, decisions D-097..D-108. OPEN NOW: (1) master push CI on 19b79b39 was running at the roll, so check it. (2) #295 and #298: Aaron said merge both at 931998db and 3b485b7c, but #295 is DIRTY (node:fs import vs the merged #309). sia-forge is rebasing (union import only, then #298 on top). Review both range-diffs, ask Aaron ONE AskUserQuestion naming #295 and #298 at the new heads, merge pinned. (3) The gate is open (fewer than 6 code PRs await QA): dispatch sia-forge and sia-builder (sia-builder is on the /clear list at 31%; re-brief it by message after its /start) with the objective's list. Every rolled dev seat needs a re-brief by message (G-049/T-203).
+Planner session 158 (started ~21:15Z 2026-10-02 after the 157 roll). This is an INTERIM handoff written mid-session at clark's request, to put the /START AUDIT GAPS watch-out back into the record; it was dropped at rev 287. State at writing: no PRs open; master 5749a7b4 (#338, D-111) with push CI green on 7bfe22f2, 66accdec and 5749a7b4; #295/#298 merged under D-109. The D-110 dev dispatch (objective items a-e) is HELD: slots.json usageLevel 'RED + WEEKLY95' (5h 87%, 7d 95%, set 21:09Z), and weekly >=95% means no new QA, tasks or dispatches. Dispatch only after clark announces the weekly reset (Aaron's one-time reset, or the 10-07 window). sia-forge is offline (QA PC network drop; Aaron must relaunch it); sia-builder is on Aaron's /clear list. Each needs a re-brief by message after its /start (G-049/T-203). The status cron was created at /start (job c7008754, :04 hourly).
 
 ### Watch out
 
@@ -21,6 +21,7 @@ Planner session 157 ROLLING about 18:4xZ 2026-10-02 at 37% context (roll point 4
 - DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.
 - VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.
 - JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first.
+- /START AUDIT GAPS (clark's HoH audits of sessions 156 and 158's starts, ~/Worktrees/hoh-startup-audit.md; do NOT repeat; CARRY VERBATIM AT EVERY ROLL — dropping it after session 157 is why items 1-3 regressed at 158): (1) CREATE THE STATUS CRON during /start (CronCreate at :04), before the briefing ends — not as a FLAG. (2) The session number is the RECORD's next session (last n + 1), not ob_start's per-checkout 'Session #N' (T-164; the serving MCP build is stale, T-172, so state it yourself). (3) 'Latest brief' is the newest *brief* by DATE (ls -t docs/loops/*brief*), not by loop number or sort -V; a developer handoff is not a brief (T-210). (4) Read C:\Users\melve\slots.json usageLevel at /start (home root, NOT ~/Worktrees; also the dashboard slots panel; live numbers are quota.claude in http://100.124.212.87:4100/api/sessions) and state the level in the OBJECTIVE line — e.g. RED + weekly 95% means the dispatch is held. (5) git fetch BEFORE the greeting when the tree is behind origin/master. (6) Do not print answered open questions. (7) Do every residual read, including .agents/SYSTEM/domains.json. (8) Count gaps from state.json gaps[], not a truncated render. (9) ob_start returns ~50 KB here (T-183): extract the State block to the scratchpad and read it in parts.
 
 ### Open questions
 
@@ -28,18 +29,16 @@ _None._
 
 ### Loop state
 
-**Open PRs:** 
-- #295 (rebasing) + #298 — QA: accepted — QA 262 ACCEPT at 931998db/3b485b7c; Aaron approved those SHAs; #295 DIRTY after #309, so rebase, review the range-diff, re-confirm with Aaron
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** 
-- Merge #295 and #298 at their rebased heads (after the planner's range-diff review)?
+**Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- D-106 QA 260/261
-- D-107 QA 262
-- D-108 the 10 merges
+- D-109 #295/#298 merged
+- D-110 dev greeting trim
+- D-111 auto-merge enabled
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -115,4 +114,4 @@ _8 older handoff(s), superseded within their seat and checkout, are in state.jso
 
 ## Last session
 
-Session 157 — 2026-10-02 — planner [sia-planner] — `39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff` (12 writing session(s) in the record)
+Session 158 — 2026-10-02 — planner [sia-planner] — `ae490afb-211a-42c7-b82e-292e88d0a9f4` (12 writing session(s) in the record)
