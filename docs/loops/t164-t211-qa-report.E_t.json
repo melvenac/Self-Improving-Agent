@@ -1,0 +1,51 @@
+{
+  "loop": "t164-t211",
+  "candidate_git": {
+    "sha": "9f6fcea4abf42c1a98219aec639be5d6f10f63ed",
+    "branch": "origin/loop/t211-standing-cron",
+    "frozen_at": "2026-10-02T00:10:00Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci, then tsc --noEmit (open-brain/), at fbf94ae6 and 9f6fcea4",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 0,
+      "detail": "npm ci exit 0 (184 packages) in both trees; tsc --noEmit exit 0 at both candidates and under both QA mutants. Duration not measured."
+    },
+    "unit": {
+      "command": "vitest run (open-brain/) at 9f6fcea4, clean tree",
+      "exit_code": 1,
+      "passed": true,
+      "duration_ms": 484150,
+      "detail": "Full suite: 150 files passed of 150; 2110 tests passed, 5 skipped, 0 failed. Exit 1 is from one unattributed vitest RPC error ('Timeout calling onTaskUpdate'), environmental per D-083. CI run 36968685032 (push, headSha 9f6fcea4) conclusion success; job test success."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "R1-confined", "status": "met", "evidence": "Only source files in the listed set are touched. Outside the lists, all docs-only: docs/loops/t164-developer-handoff.md, docs/loops/t164-port/mutants/sc4-local-count-restored.diff, docs/loops/t211/mutants/sr5a-line-dropped.diff, docs/loops/t211/mutants/sr5b-reads-only-agent-md.diff.", "order": "shown" },
+    { "id": "R2-port-faithful", "status": "met", "evidence": "git range-diff 38417eb3~1..567657af bea385b2..ea44fca2: both commits differ only by the cherry-picked-from line; 9dfa6300 (old-handoff SHA fill, docs) not ported.", "order": "shown" },
+    { "id": "SC-1", "status": "met", "evidence": "record-session-number.test.ts: local 6, record 76 greet 77 and create Session_77.md.", "order": "shown" },
+    { "id": "SC-2", "status": "not_met", "evidence": "QA's own test docs/loops/qa-249/tests/qa249-t164.test.ts: two fixture checkouts both greet N; A's write registers N; B's write is refused. Contiguous record 1..5: refusal names 7 (green). Record 76,147..155 (live shape): refusal says 'next free number is 1', not 157 (red at fbf94ae6 and 9f6fcea4). nextFreeSessionNumber returns lowest unused n; the live record is sparse (76,147..156) and already holds two n=156.", "order": "shown" },
+    { "id": "SC-3", "status": "met", "evidence": "No state.json: greeting 7 with the '(local — from this checkout's session logs; no valid state.json)' note.", "order": "shown" },
+    { "id": "SC-4", "status": "met", "evidence": "sc4-local-count-restored.diff: SC-1 red (expected 7 to be 77), live case red (expected 17 to be 156).", "order": "shown" },
+    { "id": "SC-5", "status": "met", "evidence": "Second ob_start in the same session prints 'Session #156 (existing log for this session id — reused, nothing created)'; log list unchanged.", "order": "shown" },
+    { "id": "live-case", "status": "met", "evidence": "16 local logs, record last 155: handleStart greets 'Session #156', creates Session_156.md, no Session_17.md.", "order": "shown" },
+    { "id": "SR-1", "status": "met", "evidence": "standing-cron.test.ts SR-1 green.", "order": "shown" },
+    { "id": "SR-2", "status": "met", "evidence": "SR-2 green. QA mutant (a) (status_to-only local file no longer shadows AGENT.md) survives every SR row.", "order": "shown" },
+    { "id": "SR-3", "status": "met", "evidence": "SR-3 green.", "order": "shown" },
+    { "id": "SR-4", "status": "met", "evidence": "SR-4/SR-4b green. QA mutant (b) (minute accepts 60) survives every SR row; behaviour on the candidate is correct (QA probe: 60 INVALID, 59 accepted).", "order": "shown" },
+    { "id": "SR-5", "status": "met", "evidence": "sr5a red on SR-6 only; sr5b red on SR-1, SR-2, SR-4, SR-4b, SR-6.", "order": "shown" },
+    { "id": "SR-6", "status": "met", "evidence": "SR-6 green; fbf94ae6..9f6fcea4 does not touch the numbering files; live case still greets 156 at 9f6fcea4.", "order": "shown" }
+  ],
+  "regressions": [],
+  "gaps": [
+    "F1 (blocking): SC-2 refusal names the lowest unused session n (1 on the live-shaped record), not max(n)+1.",
+    "F2: QA mutant (a) status_to-only local file not shadowing AGENT.md survives all SR rows.",
+    "F3: QA mutant (b) minute field accepting 60 survives all SR rows.",
+    "F4: the template AGENT.md example copied with its inline comment prints INVALID (11 fields).",
+    "F5: SR-5a is caught only by SR-6, not SR-1/SR-2 as the SR-5 row reads.",
+    "TMPDIR could not be set; vitest fixtures went to /tmp and were removed."
+  ],
+  "notes": "QA-249: REJECT on F1. Port faithful; full suite 0 failed; CI run 36968685032 success at 9f6fcea4. Report: docs/loops/t164-t211-qa-report.md."
+}
