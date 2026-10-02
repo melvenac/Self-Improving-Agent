@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 276,
+  "revision": 277,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3765,6 +3765,12 @@
       "title": "QA 250 ACCEPT: T-221 (#274 9ab021fd) and T-222 (#277 7b42ed6f); pair ACCEPT",
       "date": "2026-10-02",
       "note": "Read origin/qa/t221-t222-report 75d7ec48 (docs/loops/t221-t222-qa-report.md) myself and re-derived its load-bearing claims at session 157: ci.yml@9ab021fd lines 59-61 carry the per-event group and master-false cancel expression as reported; gh run view 36970268385/36969848539/36969845163 = success on 9ab021fd and 36968787919 = success on 7b42ed6f; git diff origin/master 7b42ed6f -- docs/loops/loop-15-slice-4-records is empty. T-221 row 6 gap (mutant M-push-only survives: the PR group's event is not pinned) is non-blocking and opened as T-223. #277's push run 36968774375 was cancelled by the old shared group (the T-221 defect) and re-run by the planner after its PR run finished. Both PRs touch code/CI: a merge needs Aaron's typed word naming the PR."
+    },
+    {
+      "id": "D-098",
+      "title": "Jev calibration 1 rulings-2: freeze 3a8d2891 verified; balance OVERRULED (headline uses all 44 eligible, 26/18, with per-class rates and balanced accuracy, re-freeze before any call); builder's five calls confirmed/accepted",
+      "date": "2026-10-02",
+      "note": "docs/loops/jev-calibration-1-rulings-2.md. Planner re-derived at 3a8d2891: MANIFEST sha256 d0c61d66...093b, counts (pool 75 = 36/31/8 ambiguous; headline 18/18 from 26/18 eligible; leak 23; 70 qa + 5 dev dispatch), inputs.mjs reads only dispatches.json + dispatch blobs, branch diff only docs/loops/jev-calibration-1/** + handoff. The brief orders N>=50 before balance; balancing 44 to 36 reversed that. Calls: bootstrap-fix REJECT confirmed; importer-fixes-r2 ambiguous hold-out confirmed; builder's per-question confidence accepted as method of record (labelled as the builder's operationalisation); 5 dev-dispatch D_t accepted with a source_kind split; env/unrelated/superseded tags detector-only, stated as a limitation. Zero Jev calls so far."
     }
   ],
   "handoffs": [
