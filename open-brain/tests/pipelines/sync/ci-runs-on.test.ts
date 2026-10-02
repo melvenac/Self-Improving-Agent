@@ -1,7 +1,7 @@
 /**
  * T-192: a master push runs on tcm. `evalRunsOn` is the small evaluator for the
  * one `runs-on` expression. `&&` binds tighter than `||`, and each returns the
- * value rather than a boolean, as GitHub's expression language does.
+ * value rather than a boolean, as GitHub's expression language does. T-221: it also reads github.head_ref, ref_name and run_id, and format() (third commit).
  */
 import { describe, it, expect } from "vitest";
 import { execFileSync } from "node:child_process";
@@ -20,6 +20,10 @@ type Ctx = {
   commits?: unknown;
   changedResult?: string;
   changedSkip?: string;
+  /** T-221: github.head_ref (set on a pull_request only), github.ref_name and github.run_id, for the concurrency group. */
+  headRef?: string;
+  refName?: string;
+  runId?: string;
 };
 
 function truthy(v: unknown): boolean {
@@ -112,6 +116,7 @@ export function evalRunsOn(runsOn: string, ctx: Ctx): unknown {
       if (m[0] === "cancelled") return false;
       if (m[0] === "fromJSON") return JSON.parse(String(args[0]));
       if (m[0] === "toJSON") return JSON.stringify(args[0] ?? null);
+      if (m[0] === "format") return String(args[0] ?? "").replace(/\{(\d+)\}/g, (_, n) => String(args[Number(n) + 1] ?? ""));
       if (m[0] === "contains") return String(args[0] ?? "").includes(String(args[1] ?? ""));
       throw new Error(`evalRunsOn: unknown call ${m[0]}`);
     }
@@ -120,6 +125,9 @@ export function evalRunsOn(runsOn: string, ctx: Ctx): unknown {
     if (m[0] === "null") return null;
     if (m[0] === "github.event_name") return ctx.event;
     if (m[0] === "github.ref") return ctx.ref;
+    if (m[0] === "github.head_ref") return ctx.headRef ?? "";
+    if (m[0] === "github.ref_name") return ctx.refName ?? ctx.ref.replace("refs/heads/", "");
+    if (m[0] === "github.run_id") return ctx.runId ?? "1";
     if (m[0] === "github.event.commits") return ctx.commits ?? null;
     if (m[0] === "needs.changed.result") return ctx.changedResult ?? "";
     if (m[0] === "needs.changed.outputs.skip") return ctx.changedSkip ?? "";
@@ -334,6 +342,33 @@ describe("ci.yml runs-on (T-192)", () => {
     expect(truthy(evalRunsOn(cancel, { event: "workflow_dispatch", ref: "refs/heads/loop/x", hosted: null }))).toBe(false);
     expect(truthy(evalRunsOn(cancel, { event: "push", ref: "refs/heads/loop/x", hosted: null }))).toBe(true);
     expect(truthy(evalRunsOn(cancel, { event: "pull_request", ref: "refs/pull/1/merge", hosted: null }))).toBe(true);
+  });
+
+  it("a branch's push run and its pull request run are in different concurrency groups, and each event still cancels its own older run (T-221, D-094)", () => {
+    const doc = workflow();
+    const group = String(doc.concurrency?.group ?? "");
+    const cancel = String(doc.concurrency?.["cancel-in-progress"] ?? "");
+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) =>
+      String(evalRunsOn(group, { hosted: null, ...ctx }));
+    for (const branch of ["loop/t221-x", "qa/t221-ci-candidate"]) {
+      const push = grp({ event: "push", ref: `refs/heads/${branch}` });
+      const pr = grp({ event: "pull_request", ref: "refs/pull/7/merge", headRef: branch });
+      expect(push, `${branch}: the push group`).not.toBe(pr);
+      // a newer push shares the older push's group (so it cancels it), and a newer PR commit shares the older PR run's
+      expect(grp({ event: "push", ref: `refs/heads/${branch}` })).toBe(push);
+      expect(grp({ event: "pull_request", ref: "refs/pull/7/merge", headRef: branch })).toBe(pr);
+      // another branch never joins it
+      expect(grp({ event: "push", ref: "refs/heads/loop/other" })).not.toBe(push);
+    }
+    // a dispatch keeps its own group per run, and joins neither
+    const d1 = grp({ event: "workflow_dispatch", ref: "refs/heads/loop/t221-x", runId: "11" });
+    const d2 = grp({ event: "workflow_dispatch", ref: "refs/heads/loop/t221-x", runId: "12" });
+    expect(d1).not.toBe(d2);
+    expect(d1).not.toBe(grp({ event: "push", ref: "refs/heads/loop/t221-x" }));
+    // each event's older run is still cancelled by a newer one (T-178's purpose), master's is not
+    expect(truthy(evalRunsOn(cancel, { event: "push", ref: "refs/heads/loop/t221-x", hosted: null }))).toBe(true);
+    expect(truthy(evalRunsOn(cancel, { event: "pull_request", ref: "refs/pull/7/merge", hosted: null }))).toBe(true);
+    expect(truthy(evalRunsOn(cancel, { event: "push", ref: "refs/heads/master", hosted: null }))).toBe(false);
   });
 
   it("a master push whose only path is under docs still runs the test job (T-178)", () => {
