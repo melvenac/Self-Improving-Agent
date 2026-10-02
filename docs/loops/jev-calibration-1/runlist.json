@@ -130,6 +130,16 @@
     "scored_sha": "bbf9d07e81a6ebbc9363586c79b846dfdc4980da"
   },
   {
+    "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+    "case_id": "importer-leftovers",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/019-importer-leftovers.D_t.json",
+    "group": "headline",
+    "merge_commit": "d500730953db3f69ef528f431474477149757383",
+    "pr": 19,
+    "scored_sha": "d500730953db3f69ef528f431474477149757383"
+  },
+  {
     "base_sha": "3c0bfdcf917a5bfbc4fd56072a1735020b289189",
     "case_id": "t179-r2",
     "checks": "none",
@@ -138,6 +148,16 @@
     "merge_commit": "16465675d0d146e00ef29fe8e31ed92216fc3695",
     "pr": 20,
     "scored_sha": "16465675d0d146e00ef29fe8e31ed92216fc3695"
+  },
+  {
+    "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+    "case_id": "t171",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/022-t171.D_t.json",
+    "group": "headline",
+    "merge_commit": "b3711763a4b9f5624803e8992234c51e793872ef",
+    "pr": 22,
+    "scored_sha": "b3711763a4b9f5624803e8992234c51e793872ef"
   },
   {
     "base_sha": "6543e8e8b1f7b67076d6996974cdeb775a2414b5",
@@ -168,6 +188,26 @@
     "merge_commit": "5b9a40322d0b05de00ce201e60977f9bc5b68bea",
     "pr": 26,
     "scored_sha": "5b9a40322d0b05de00ce201e60977f9bc5b68bea"
+  },
+  {
+    "base_sha": "b3711763a4b9f5624803e8992234c51e793872ef",
+    "case_id": "t171-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/028-t171-r2.D_t.json",
+    "group": "headline",
+    "merge_commit": "a78a883a08fe7b898addbe32f623de4aa71d98a3",
+    "pr": 28,
+    "scored_sha": "a78a883a08fe7b898addbe32f623de4aa71d98a3"
+  },
+  {
+    "base_sha": "706c029ea749c6e3ec24895fb6fef619554a5c73",
+    "case_id": "t003-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/029-t003-r2.D_t.json",
+    "group": "headline",
+    "merge_commit": "d781b595fd2ee6ee3e1047d9c3a40a75c5728417",
+    "pr": 29,
+    "scored_sha": "d781b595fd2ee6ee3e1047d9c3a40a75c5728417"
   },
   {
     "base_sha": "ebda33d5a31629ebc7bdf2028cc94af7f83a8c29",
@@ -281,6 +321,16 @@
   },
   {
     "base_sha": "bf33fe47c7410c5aa9ef14f59010cc8a1b06b331",
+    "case_id": "t192-d1",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/041-t192-d1.D_t.json",
+    "group": "headline",
+    "merge_commit": "ecd378d676e9d1b702c58a5359e4c4d2c4aec020",
+    "pr": 41,
+    "scored_sha": "ecd378d676e9d1b702c58a5359e4c4d2c4aec020"
+  },
+  {
+    "base_sha": "bf33fe47c7410c5aa9ef14f59010cc8a1b06b331",
     "case_id": "t046-detector",
     "checks": "none",
     "dt": "docs/loops/jev-calibration-1/inputs/042-t046-detector.D_t.json",
@@ -298,6 +348,16 @@
     "merge_commit": "d67c5e7044df129d61deba68c489f9f89cdb87fc",
     "pr": 43,
     "scored_sha": "d67c5e7044df129d61deba68c489f9f89cdb87fc"
+  },
+  {
+    "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+    "case_id": "t176-index-direction",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/044-t176-index-direction.D_t.json",
+    "group": "headline",
+    "merge_commit": "6adc07ef34e9021765adacb7816bc0f213806a3c",
+    "pr": 44,
+    "scored_sha": "6adc07ef34e9021765adacb7816bc0f213806a3c"
   },
   {
     "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
@@ -328,6 +388,16 @@
     "merge_commit": "8054f9fd35394eb77a639206611bf3320983527d",
     "pr": 47,
     "scored_sha": "8054f9fd35394eb77a639206611bf3320983527d"
+  },
+  {
+    "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+    "case_id": "t178-ci-on-push",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/048-t178-ci-on-push.D_t.json",
+    "group": "headline",
+    "merge_commit": "bc6c6d206a6b3261b43cccc3972fff23b5d86791",
+    "pr": 48,
+    "scored_sha": "bc6c6d206a6b3261b43cccc3972fff23b5d86791"
   },
   {
     "base_sha": "8054f9fd35394eb77a639206611bf3320983527d",
@@ -398,6 +468,16 @@
     "merge_commit": "231f501f99b217fd65ab496139cb0d11feba8eb1",
     "pr": 55,
     "scored_sha": "231f501f99b217fd65ab496139cb0d11feba8eb1"
+  },
+  {
+    "base_sha": "bf33fe47c7410c5aa9ef14f59010cc8a1b06b331",
+    "case_id": "qa-probes-on-master",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/056-qa-probes-on-master.D_t.json",
+    "group": "headline",
+    "merge_commit": "dabc7fe2d448a3c6172897e0bf7e42d09163e80d",
+    "pr": 56,
+    "scored_sha": "dabc7fe2d448a3c6172897e0bf7e42d09163e80d"
   },
   {
     "base_sha": "c9ba1dbf9bf14240ba4ddbe6c96d4cc335461720",

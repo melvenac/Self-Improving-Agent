@@ -1320,14 +1320,14 @@
       "ambiguous-verdict": 8
     },
     "headline": {
-      "ACCEPT": 18,
+      "ACCEPT": 26,
       "REJECT": 18,
-      "meets_50": false,
-      "n": 36,
-      "pool_before_balance": {
+      "eligible_pool": {
         "accept": 26,
         "reject": 18
-      }
+      },
+      "meets_50": false,
+      "n": 44
     },
     "labelled_not_excluded": {
       "ACCEPT": 36,
@@ -1341,7 +1341,7 @@
     },
     "pool_cases": 75,
     "reports_found": 95,
-    "scored_total": 59,
+    "scored_total": 67,
     "source_kind": {
       "dev-dispatch": 5,
       "qa-dispatch": 70
@@ -1474,8 +1474,8 @@
       "dispatches.json": "0dd3109dfae32b6160485abc136f04049180837c94bd8c1e2ad7a7a91fe31475",
       "inputs.json": "a4c5ba0bb3e23aa079d0e7858591b62ffaa6a88e3c5b022471fd4f1c408ff284",
       "labels.json": "d43e627f1ef7b5632ce70e16dc5e13dd5cfc5a97dfdc0a9cd0301c11facad7c2",
-      "runlist.json": "33111c935f87410985229315b5d898142d2db6930c29de4730bf91234b485657",
-      "sample.json": "3fc44dadd186d767fb6fd2d86869101aabe1b1c657447f9bc3cbb735371f05c9"
+      "runlist.json": "5be38e8eefd342faf04e3cb463a561ec73dcb95aee07f2079893eecef2986842",
+      "sample.json": "e7f0ddb77888bd6675041ffaab694692d9679695faf18344d1f241b507e930cd"
     },
     "inputs": {
       "inputs/001-loop-15-slice-3.D_t.json": "6f6e27d5640ca6584e4ba91e21fcee501a055eef22a0d69094433e32f07cfda7",
@@ -1559,9 +1559,9 @@
       "inputs.mjs": "e0c0f9c0ea9b665e82368cfb4102c4edf3fd6756fb6ca5f8c2bcff0e6830ef34",
       "labels.mjs": "d7e11962811195c8f7936b89acf848e359c4665f3a3b3aaf9f37eaa000d2669e",
       "lib.mjs": "4753f4f005051eede8ca538dc27422fc8267b4a9b280be7093eca1952e185a97",
-      "manifest.mjs": "79cbe463c472e01ba217e46aaf6e6b5740cbb7cb0cf515bd585bfc96719f1ac4",
-      "sample.mjs": "a18001b1f03dfb152e5ff3059a1604f202a983e80f645e33afa7ce281cfa9915",
-      "score.mjs": "cb637c7e241afad18d1d0e8fd6ab847f775453e79a91f1063a0e1778956b5746"
+      "manifest.mjs": "60bd43e5a7f3e90a776dc1ae0f5c84d85b46b34d58be578267c76f78d51b8c01",
+      "sample.mjs": "1f379166a88341986b3b9eea3442293230b9879788e6646c5b210e3ea4526953",
+      "score.mjs": "916d858838858a34bbc991e4db5421d1dea8e058ce9a9cc0ac9b9fac58bb0341"
     }
   },
   "must_include": {
@@ -1672,7 +1672,7 @@
       }
     ]
   },
-  "note_on_headline_n": "The headline set is 36, below the brief's 50: rulings-1 item 5 excludes leak-wording D_t from the headline and says to report the real N. The rule is not relaxed and no text was edited.",
+  "note_on_headline_n": "The headline set is 44, below the brief's 50: rulings-1 item 5 excludes leak-wording D_t from the headline and says to report the real N. The rule is not relaxed and no text was edited.",
   "ref_tips_note": "refs_sha256 is the sha256 of the sorted 'ref sha' lines of every origin/qa/* ref and origin/master used.",
   "seed": 20261002
 }

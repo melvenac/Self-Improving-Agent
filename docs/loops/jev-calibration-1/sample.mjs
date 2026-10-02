@@ -1,15 +1,15 @@
 // sample.mjs: draw the scored set. Reads labels.json, inputs.json and the D_t files; writes sample.json.
 //
 // Groups (rulings-1 item 5):
-//   headline    a labelled, non-excluded case whose D_t carries NO verdict wording. Balanced ACCEPT/REJECT by a
-//               seeded draw; every must-include that qualifies is forced in. This is the set the headline uses.
+//   headline    a labelled, non-excluded case whose D_t carries NO verdict wording. ALL of them (rulings-2:
+//               N outranks balance; the ACCEPT/REJECT split is whatever the pool is). The set the headline uses.
 //   leak_group  a labelled, non-excluded case whose D_t carries verdict wording (a re-dispatch written after a
 //               REJECT quotes it). Scored in full, as its own group; the report compares it with the headline.
 // The wording rule is not relaxed and the text is not edited. If the headline set is under 50, the real N is
 // what sample.json says and what the report must print.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { HERE, SEED, readJson, rng, writeJson } from "./lib.mjs";
+import { HERE, SEED, readJson, writeJson } from "./lib.mjs";
 
 /** Verdict wording in a D_t VALUE (keys are skipped, so the field name "acceptance" never counts). Case-insensitive; "accept-stale", "acceptance" and "acceptable" do not match. */
 const LEAK_RE = /(?<![-\w])(reject(?:ed|s|ion)?|accept(?:ed|s)?|accept)(?![-\w])/i;
@@ -53,23 +53,11 @@ function strings(v, out = []) {
   });
 
   const pool = rows.filter((r) => r.status === "headline-pool");
-  const required = new Set(Object.values(MUST_INCLUDE).flat());
   const side = (lab) => pool.filter((r) => r.label === lab);
   const acc = side("ACCEPT");
   const rej = side("REJECT");
-  const small = acc.length <= rej.length ? acc : rej;
-  const large = small === acc ? rej : acc;
-  const rand = rng(SEED);
-  // Fisher-Yates over the case_id-sorted list, so the draw depends on the seed and the pool only.
-  const shuffled = [...large].sort((a, b) => a.case_id.localeCompare(b.case_id));
-  for (let i = shuffled.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(rand() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  const forced = shuffled.filter((r) => required.has(r.case_id));
-  const rest = shuffled.filter((r) => !required.has(r.case_id));
-  const drawn = [...forced, ...rest].slice(0, Math.max(small.length, forced.length));
-  const headline = [...small, ...drawn].map((r) => r.case_id).sort();
+  // Rulings-2 (D-098): N >= 50 outranks balance, so the headline is EVERY eligible case. No draw, no seed use.
+  const headline = pool.map((r) => r.case_id).sort();
 
   const leak_group = rows.filter((r) => r.status === "leak-wording" && r.label).map((r) => r.case_id).sort();
   const status_of = (id) => rows.find((r) => r.case_id === id)?.status ?? null;

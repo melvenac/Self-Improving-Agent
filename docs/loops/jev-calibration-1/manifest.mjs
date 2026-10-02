@@ -125,7 +125,7 @@ writeJson("MANIFEST.json", {
     labelled_not_excluded: { total: inPool.length, ACCEPT: inPool.filter((l) => l.label === "ACCEPT").length, REJECT: inPool.filter((l) => l.label === "REJECT").length },
     excluded_by_reason: countBy(labels.filter((l) => l.excluded), (l) => l.excluded),
     d_t_with_verdict_wording_all_cases: cases.filter((c) => c.verdict_words_in_dt > 0).length,
-    headline: { n: sample.headline_n, ACCEPT: sample.headline_accept, REJECT: sample.headline_reject, meets_50: sample.headline_meets_minimum, pool_before_balance: sample.headline_pool_unsampled },
+    headline: { n: sample.headline_n, ACCEPT: sample.headline_accept, REJECT: sample.headline_reject, meets_50: sample.headline_meets_minimum, eligible_pool: sample.headline_pool_unsampled },
     leak_wording_group: { n: sample.leak_group_n, ACCEPT: sample.leak_group_accept, REJECT: sample.leak_group_reject },
     scored_total: sample.headline_n + sample.leak_group_n,
     source_kind: countBy(cases, (c) => c.source_kind),
