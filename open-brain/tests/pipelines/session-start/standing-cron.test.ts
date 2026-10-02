@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { readStandingCron } from "../../../src/pipelines/session-start/agent-identity.js";
@@ -47,6 +47,12 @@ describe("T-211 standing cron in seat data", { timeout: 120_000 }, () => {
     );
   });
 
+  it("SR-2b a local file carrying ONLY status_to still wins over a full AGENT.md, and is INVALID (QA 249 F2, mutant a)", () => {
+    seatFile(root, "AGENT.md", [...IDENTITY, ...KEYS("7,37 * * * *", "clark", "docs/rule.md")]);
+    seatFile(root, "AGENT.local.md", [...IDENTITY, "status_to: atlas-sia"]);
+    expect(readStandingCron(root)).toBe("Standing cron: INVALID in .agents/AGENT.local.md: status_cron is missing");
+  });
+
   it("SR-3 with neither file carrying them it says none in seat data", () => {
     seatFile(root, "AGENT.md", IDENTITY);
     expect(readStandingCron(root)).toBe("Standing cron: none in seat data.");
@@ -66,6 +72,11 @@ describe("T-211 standing cron in seat data", { timeout: 120_000 }, () => {
     expect(readStandingCron(root)).toBe("Standing cron: INVALID in .agents/AGENT.local.md: status_cron has 3 fields, expected 5");
     seatFile(root, "AGENT.local.md", [...IDENTITY, ...KEYS("61 * * * *")]);
     expect(readStandingCron(root)).toBe('Standing cron: INVALID in .agents/AGENT.local.md: status_cron minute field "61" is out of range 0-59');
+    // The boundary itself: 60 is out (QA 249 F3, mutant b), 59 is in.
+    seatFile(root, "AGENT.local.md", [...IDENTITY, ...KEYS("60 * * * *")]);
+    expect(readStandingCron(root)).toBe('Standing cron: INVALID in .agents/AGENT.local.md: status_cron minute field "60" is out of range 0-59');
+    seatFile(root, "AGENT.local.md", [...IDENTITY, ...KEYS("59 * * * *")]);
+    expect(readStandingCron(root)).toContain("Standing cron: 59 * * * * ");
     seatFile(root, "AGENT.local.md", [...IDENTITY, ...KEYS("0 24 * * *")]);
     expect(readStandingCron(root)).toContain('hour field "24" is out of range 0-23');
     seatFile(root, "AGENT.local.md", [...IDENTITY, ...KEYS("0 0 32 * *")]);
@@ -91,6 +102,19 @@ describe("T-211 standing cron in seat data", { timeout: 120_000 }, () => {
     expect(readStandingCron(root)).toBe("Standing cron: INVALID in .agents/AGENT.local.md: status_rule is missing");
     seatFile(root, "AGENT.local.md", [...IDENTITY, "status_to: clark", "status_rule: x.md"]);
     expect(readStandingCron(root)).toBe("Standing cron: INVALID in .agents/AGENT.local.md: status_cron is missing");
+  });
+
+  it("SR-7 the template's documented example, taken from the template file itself, prints the present-shape line (QA 249 F4)", () => {
+    const template = readFileSync(join(import.meta.dirname, "../../../../project-template/.agents/AGENT.md"), "utf-8");
+    const block = template.match(/```\n(status_cron:[\s\S]*?)```/);
+    expect(block, "the template documents the three keys in a fenced block").not.toBeNull();
+    // Only the placeholders are filled in; every other character is the template's.
+    const example = block![1]!.replace("<agent-name>", "clark").replace("<role>", "planner").split("\n").filter((l) => l.trim() !== "");
+    expect(example).toHaveLength(3);
+    seatFile(root, "AGENT.local.md", [...IDENTITY, ...example]);
+    expect(readStandingCron(root)).toBe(
+      "Standing cron: */20 * * * * → status to clark (rule: .agents/roles/planner.md). Create it with CronCreate before the briefing ends.",
+    );
   });
 
   it("SR-6 ob_start prints the line in the seat block, and every other greeting line is unchanged by it", async () => {
