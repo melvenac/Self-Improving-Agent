@@ -51,7 +51,9 @@ describe("resolvePaths", () => {
 
   it("resolves home-relative paths", () => {
     const paths = resolvePaths(process.cwd());
-    expect(paths.knowledgeDb).toContain("knowledge.db");
+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.
+    expect(Object.keys(paths)).not.toContain("know" + "ledgeDb");
+    expect(paths.knowledgeV2Db).toContain("knowledge-v2.db");
     expect(paths.scoreHistory).toContain("score-history.jsonl");
     expect(paths.settingsJson).toContain("settings.json");
   });
