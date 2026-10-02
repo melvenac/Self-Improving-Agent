@@ -1,11 +1,11 @@
 {
   "schema_version": 3,
-  "revision": 291,
+  "revision": 292,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "FIRST: check master push CI on 19b79b39 (after 10 merges). THEN finish #295 (T-008) and #298 (T-008b): sia-forge is rebasing #295 onto master (node:fs import union only) and #298 onto it; review both range-diffs; ask Aaron ONE re-confirm naming both at the new heads; merge pinned. THEN, with the backlog gate open, dispatch the seats: T-152 (fix the 3 residual typecheck:tests errors, then put the check in CI), T-229, T-230, T-231, G-052 rows, and the backlog-audit top-10 items not yet done (T-182, T-156, T-168, T-225 item 4). Weekly usage ~91%: at 95% no new QA, tasks or dispatches.",
+    "text": "FIRST: check master push CI (green through b67949f9; the 7bfe22f2 records run was in progress at the roll). Dispatch the dev seats (the gate is open; no SIA code PRs open): (a) T-191 dev greeting profile plus T-203 seat-by-checkout, per D-110; (b) a docs-only PROPOSAL splitting .agents/roles/shared.md (rules verbatim, provenance to a linked file), which goes to Aaron for review before merge (D-110); (c) T-152's last 3 typecheck errors plus CI enforcement; (d) T-229, T-230, T-231, T-232, G-052 rows; (e) the remaining backlog-audit top-10 (T-182, T-156, T-168, T-225 item 4). Batch QA by area; weekly usage ~91% (95% = no new QA or dispatches).",
     "since_session": 157
   },
   "tasks": [
@@ -1380,6 +1380,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "QA 262 gap 4 (docs/loops/t008r3-qa-report.md), carried from QA 260 gap 1. Lands after #295 and #298 merge. Also pin the unreadable-settings 'no absent note' row (QA mutant B survives).",
+      "note_by": [
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-232",
+      "title": "ob_state write output prints ~22 'KEPT despite retention' NOTE lines (~4k chars) on EVERY write even when retention changed nothing; print one summary line (count kept, how to list them) unless a task's retention status changed in this write",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 157,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Observed on every ob_state call in planner session 157. The per-id NOTE lines repeat unchanged; their information is only new when a task crosses the retention boundary.",
       "note_by": [
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
@@ -4004,6 +4018,12 @@
       "title": "#295 and #298 MERGED at their rebased heads on Aaron's AskUserQuestion answer in the planner's window ('Merge #295 then #298'): #295 04312e8a -> 37fd9dfb, #298 e6bdd29a -> b67949f9. Planner-reviewed range-diffs: #295 commit 1 differs only in import and hunk context from master (#309's node:path line, #306's hook-registration message), commits 2-5 '='; #298 all 5 '='. All 12 PRs on the morning list are merged. HANDOFF ITEM (2) IS DONE: the next planner starts at item (1), master CI, then (3), dispatching the seats.",
       "date": "2026-10-02",
       "note": "Supersedes the 'OPEN NOW (2)' in the rev-290 planner handoff. Master push CI was green through 19b79b39 before these two merges."
+    },
+    {
+      "id": "D-110",
+      "title": "Dev start-greeting trim (Aaron 'yes' in the planner's window, ~20:1xZ): dispatch T-191 (per-seat greeting profiles; the dev profile drops Verified, the Sizes block and stale other-seat handoffs, and shows the seat's assignment plus task counts instead of the P0/P1 list, naming every section it omits) and T-203 (resolve the seat by checkout, so a dev never sees another seat's handoff; G-049). AND have a shared.md split PROPOSED: every rule statement stays verbatim in .agents/roles/shared.md, and the provenance and war-story paragraphs move to a linked tracked file. That PR is docs-only, but it goes to AARON for review before merge despite the standing docs-only rule, because it edits the rules text every seat reads.",
+      "date": "2026-10-02",
+      "note": "Measured basis (sia-builder, docs/loops/session-157-builder-2-handoff.md, rev 278, about 40.7k chars): role files 23.5k (55%; shared.md 17,643 bytes at master), tasks 6.2k, your handoff 3.6k, verified 1.8k, other handoffs 1.0k, sizes 0.5k. The easy cuts are ~9.5k (~23%) without touching the rules. Also opened T-232 for ob_state write-output noise."
     }
   ],
   "handoffs": [

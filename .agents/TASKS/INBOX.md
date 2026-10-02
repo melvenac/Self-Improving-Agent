@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 291 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 292 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -64,6 +64,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-229** The callers' readFile wrapper for .recalled-entries.json turns ANY error (EISDIR, EACCES, EBUSY) into 'no file', so the foreign-writer detector reports 'none present' for a path it could not read; report non-ENOENT errors as 'not checked (<code>)'
 - [ ] **T-230** Pin that ob_start PRINTS the T-048 zero lines: a server.test.ts row asserting 'Session logs unreadable: 0' and 'Transcript directories unreadable: 0' in handleStart output (QA 261's surviving mutant Q1)
 - [ ] **T-231** mcp-command-paths: a malformed CONTAINER (project mcpServers not an object, a .mcp.json that is an array or scalar) beside a good server passes silently; make it not-checked, which caps the result at WARN, like a malformed entry (D-106)
+- [ ] **T-232** ob_state write output prints ~22 'KEPT despite retention' NOTE lines (~4k chars) on EVERY write even when retention changed nothing; print one summary line (count kept, how to list them) unless a task's retention status changed in this write
 
 ## Done (last 3 sessions)
 
