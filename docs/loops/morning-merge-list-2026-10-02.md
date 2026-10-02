@@ -42,8 +42,26 @@ These two reports came after the morning list was first written. Both are outsid
 | #309 | T-048: hook-configs, nested and typed hooks | `f1c2a338` | ACCEPT (QA 260) | Merge **after** #306. #295 and #309 conflict on the `node:path` import line; the second to merge rebases |
 | #302 | T-048: dropped counts printed at zero (round 2) | QA'd at `7e92b6f6`; **now `9fe22be5`** | ACCEPT (QA 261, `f395ee84`) | CLEAN, and CI passed (run 37039170029). **The planner reviewed the range-diff:** commits 1, 2 and 4 are `=`. Commit 3 differs only in hunk context: its `formatScanCounts` import now sits after master's `describeLatestBrief` import, and the patch is unchanged. **Merge it pinned to `9fe22be5`.** QA's mutant Q1 follow-up is T-230 |
 
-## Still not accepted
+## Added at 18:2xZ: QA 262 (#295 and #298, round 3, report `f201665d`, `docs/loops/t008r3-qa-report.md`)
 
-- **#295 (T-008) and #298 (T-008b):** QA 260 REJECTED both. #295 lets a non-object `mcpServers` entry pass silently.
-  #298 does not name the skip for an absent `settings.json`. **Round 3 is pushed:** #295 is at `931998db` and #298 is
-  at `3b485b7c`; both are CLEAN and CI is green. QA 262 is the narrow re-check.
+| PR | Task | QA'd head | Verdict | State and order |
+|---|---|---|---|---|
+| #295 | T-008: MCP command paths | `931998db` | ACCEPT | CLEAN; CI green. Merge **before** #298 |
+| #298 | T-008b: `.mcp.json` and plugin sources | `3b485b7c` | ACCEPT | CLEAN; based on #295 |
+
+**B2 merge order, as a set:** #295, then #298, then #306, then #309. QA 262 row 8 merged all four on a scratch branch.
+The only conflict was the `node:fs` import line between #295 and #309, resolved by taking #295's line, which contains
+every name #309 needs. **Whichever of #295 or #309 merges second needs that one-line rebase.** The rest were clean,
+and 179 tests passed with `tsc` at 0.
+
+Follow-up, not blocking: a malformed CONTAINER still passes silently. A project's `mcpServers: "oops"` or a `.mcp.json`
+of `[1,2]`, either one beside a good server, gives `pass`. That is T-231.
+
+## Total for the morning question: 12 PRs
+
+| Batch | PRs, in merge order |
+|---|---|
+| B4 | #290, #289, #294 @ `26f62934`, #299 |
+| B5 | #293, #292, #320 |
+| B2 | #295, #298, #306, #309 |
+| T-048 | #302 @ `9fe22be5` |

@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 288,
+  "revision": 289,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1360,6 +1360,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "QA 261 (docs/loops/t048r2-qa-report.md row 4): deleting lines.push(...formatScanCounts(...)) from handleStart in server.ts leaves every committed test green; QA's own demo row kills it. Lands after #302 merges.",
+      "note_by": [
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-231",
+      "title": "mcp-command-paths: a malformed CONTAINER (project mcpServers not an object, a .mcp.json that is an array or scalar) beside a good server passes silently; make it not-checked, which caps the result at WARN, like a malformed entry (D-106)",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 157,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "QA 262 gap 4 (docs/loops/t008r3-qa-report.md), carried from QA 260 gap 1. Lands after #295 and #298 merge. Also pin the unreadable-settings 'no absent note' row (QA mutant B survives).",
       "note_by": [
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
@@ -3966,6 +3980,12 @@
       "title": "QA 260 (B2 r2): #306 #309 ACCEPT, #295 #298 REJECT. Ruling: the rejects stand. A non-object or null entry is malformed input in EVERY source (mcpServers too, not only hooks), so not-checked gives WARN; the skip for an absent settings.json must be NAMED in a passing result. QA 261: #302 r2 ACCEPT, needing a rebase (one server.ts import adjacency with master; keep both imports). sia-forge does round 3 and the #302 rebase. Accepted PRs are added to docs/loops/morning-merge-list-2026-10-02.md.",
       "date": "2026-10-02",
       "note": "Reports: 0f53d867 (docs/loops/b2r2-sync-qa-report.md), f395ee84 (docs/loops/t048r2-qa-report.md). QA 261's mutant Q1 (removing formatScanCounts from handleStart) survived every committed test; behaviour verified correct by QA's own row; opened as T-230. None of these is under D-103."
+    },
+    {
+      "id": "D-107",
+      "title": "QA 262: #295 (931998db) and #298 (3b485b7c) ACCEPT on D-106's scope (malformed ENTRIES in every source give WARN; an absent settings.json is a named skip). The B2 set (#295, #298, #306, #309) merges clean on a scratch branch apart from the known node:fs import-line union. Added to the morning list, which is now 12 PRs. QA's gap 4, a malformed CONTAINER (a project mcpServers that is a string, or a .mcp.json that is an array) passing silently, is the same false-pass class and opens as T-231 rather than a fourth round.",
+      "date": "2026-10-02",
+      "note": "Report f201665d (docs/loops/t008r3-qa-report.md). Heads verified == QA'd SHAs, CLEAN, CI green. Other non-deciding gaps: an unreadable settings.json carrying no absent note is untested (mutant B survives); an array entry is worded 'no command and no url'. The QA 260/262 dispatches named the wrong import line (node:path; it is node:fs)."
     }
   ],
   "handoffs": [
