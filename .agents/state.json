@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 264,
+  "revision": 265,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1168,6 +1168,20 @@
         "6ed7ada0-65ef-43fe-83a5-1fd42c871777"
       ],
       "closed_rev": 260
+    },
+    {
+      "id": "T-219",
+      "title": "ci.yml: docs-only PRs report 'test' as Skipped instead of no check (D-091)",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 156,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Per D-091. Edit .github/workflows/ci.yml only (plus a test if ci-seat-skip.mjs gains PR args). Live acceptance: docs-only PR -> test Skipped + mergeable; code PR -> suite runs; master push -> suite runs. Unblocks #259 and every future docs-only PR under ruleset 24343321. Needs a dev slot booked via clark.",
+      "note_by": [
+        "83f0e630-9247-40d4-adcd-7f4292a16ddb"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
@@ -3653,6 +3667,12 @@
       "title": "SIA repo made PUBLIC on Aaron's word ('turn it back to public'), which enables rulesets; ruleset 24343321 on master: no deletion, no force push, PR required (0 approvals), CI 'test' check required. Option 3's GitHub-side guard is LIVE in its checks-only form; approvals stay in chat",
       "date": "2026-10-02",
       "note": "Planner session 155. Before flipping: credential scan of origin/master tree (2 hits, both fake: a placeholder in loop-15-qa-report.md:291 and a test sentinel in process-role.test.ts:334) and of master's history with git log -G for token/key patterns (0 hits). Ruleset created via gh api with Aaron's token. Effect: a PR whose 'test' check is red cannot be merged into master, by anyone (would have stopped #254 deterministically); force push and deletion of master are refused server-side. No separate agent identity: approvals remain Aaron's word in chat (D-089). Remaining from option 3: r7 as the courtesy layer (merge r7? it is REJECTED by QA 246 on fail-opens unrelated to merges; ruling pending); then option 2's sparse planner checkout."
+    },
+    {
+      "id": "D-091",
+      "title": "D-055 amended under D-090: a docs-only PR must still REPORT the required 'test' check. Drop pull_request paths-ignore; the existing `changed` job also runs on pull_request and gates `test`, so a docs-only PR gets test=skipped (passes the ruleset) instead of no check at all (blocks forever)",
+      "date": "2026-10-02",
+      "note": "Planner session 156, ruling the defect clark reported on SIA #259 (Forge handoff, docs/loops/ only, BLOCKED). Cause: ci.yml pull_request has paths-ignore docs/** + README.md (D-055), so a docs-only PR starts no workflow; ruleset 24343321 (D-090) requires 'test'; a check that never reports never passes. Every docs-only PR hits it, including the planner's own close-out PRs. Fix is structural and reuses T-178's mechanism: (1) remove paths-ignore from pull_request; (2) widen `changed`'s if to github.event_name == 'pull_request' as well as non-master push, passing github.event.pull_request.base.sha and github.event.pull_request.head.sha to ci-seat-skip.mjs on a PR; (3) `test` is unchanged: skip=true -> job-level skip -> required check reports Skipped. NOT chosen: a second always-pass workflow with a job named 'test' (two checks of one name on a mixed PR; a green stub could satisfy the gate while the real suite fails). Acceptance needs LIVE runs on both paths (feedback: live run on the path): a docs-only PR must show 'test' Skipped and become mergeable; a PR touching open-brain/ must run the suite; a master push still runs the suite. Assumption to verify live, not from docs: the ruleset accepts Skipped as satisfying a required check. #259 itself: not admin-bypassed by the planner; Aaron's call via clark. Aaron's 'merge' (all that are clear) did not cover #259, r7 (QA 246 REJECT, courtesy ruling pending) or QA 245 (unruled)."
     }
   ],
   "handoffs": [
@@ -3681,42 +3701,6 @@
       "session_uuid": null,
       "checkout": null,
       "first_rev": null
-    },
-    {
-      "seat": "planner",
-      "pick_up": "Read docs/loops/planner-session-146-notes.md, section 'HANDOFF TO THE NEXT PLANNER (session 146 rolls here)', first. T-179 r2 is merged and the record is v3. Verify which of PRs #172-#176 merged. Re-arm one hub listener per developer room. Then send the /bootstrap cli.ts reconciliation to cursor-builder, and follow the Cursor QA driver (record 175) to merge, so the seven waiting QA runs go to the laptop and QA PC.",
-      "watch_out": [
-        "QA runs ONLY on the laptop and QA PC (Aaron), headless via the Cursor QA driver once merged; never as chats on his desktop.",
-        "Dry-run every command on its target machine before giving it to Aaron: the QA PC's profile paths contain a space, and bash expands $env: before ssh.",
-        "Read a candidate's diffed code before ruling, not only its handoff.",
-        "Developer seats are Cursor (Grok 4.7), one hub room each. The planner must run a listener per room; cursor-builder needs Aaron's nudge to read its room.",
-        "Nothing was written to the record in session 146 except the v3 migration: the owed ob_state writes are listed in the handoff section."
-      ],
-      "open_questions": [
-        "Aaron: build Scout's Telegram approval (research 4)? If yes, token option (a) a separate Windows account, or (b) the same account?",
-        "Aaron: may the A2A-Hub main checkout take master (its D-005)?"
-      ],
-      "session": 146,
-      "loop_state": {
-        "open_prs": [],
-        "frozen_sha": "",
-        "questions_for_aaron": [
-          "Build Scout's Telegram approval? Token option (a) or (b)?",
-          "May the A2A-Hub main checkout take master (D-005)?"
-        ],
-        "rulings": [
-          "t179-t003-rulings-qa134-qa142 (T-179 r2 ACCEPTED; T-003 r2 brief)",
-          "t171-bootstrap-rulings-qa144-qa145 (R-BF-17..20)",
-          "bootstrap-r4-amend-and-queue-guard-brief (R-BF-21)",
-          "loop-15-slice-3-rulings-21 (A12 REJECTED; R95-R97)",
-          "t048-t171-rulings-qa157-qa158 plus addenda 1-2",
-          "importer-leftovers-rulings-qa138 (R5-1..4)",
-          "cal-a12-results (Composer 2.5 passes QA calibration)"
-        ]
-      },
-      "session_uuid": "cd5e385d-865d-498e-bb8c-53ff4eee82ad",
-      "checkout": "sia-planner",
-      "first_rev": 135
     },
     {
       "seat": "planner",
@@ -4106,14 +4090,6 @@
       "first_rev": null
     },
     {
-      "n": 146,
-      "date": "2026-09-27",
-      "uuid": "cd5e385d-865d-498e-bb8c-53ff4eee82ad",
-      "seat": "planner",
-      "checkout": "sia-planner",
-      "first_rev": 135
-    },
-    {
       "n": 147,
       "date": "2026-09-27",
       "uuid": "4ed2836c-1dd1-43e5-8a06-c829d50548f3",
@@ -4192,6 +4168,14 @@
       "seat": "developer",
       "checkout": "sia-builder",
       "first_rev": 263
+    },
+    {
+      "n": 156,
+      "date": "2026-10-01",
+      "uuid": "83f0e630-9247-40d4-adcd-7f4292a16ddb",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 265
     }
   ]
 }
