@@ -79,3 +79,21 @@ It must work for **Relay's /start** too: one shared renderer, no per-runtime cop
 T-172 first, then 1 + 3 (renderer and skill), then 4 and 6, then 7 on Aaron's word. One QA batch
 by area (the greeting). Read-only for real config: copy no values (G-051). Merge on Aaron's word
 naming each PR, pinned with `--match-head-commit`.
+
+## Amendment 1 — rev 297, session 158 (~22:05Z)
+
+- **T-172 step 1 is done on the DESKTOP only (D-113).** Clark updated `~/Projects/Self-Improving-Agent`
+  to `ba1edf70` and refreshed `~/.claude/commands/start.md` from master, on Aaron's word. The planner
+  read it back: 0 behind, clean, and the build contains `describeLatestBrief`.
+- **The QA PC is still stale.** Read by the planner over SSH: its serving tree
+  `C:/Users/AARONM~1/Projects/Self-Improving-Agent` is at `9c603615`, **429 behind**. sia-builder is 86
+  behind, sia-forge 14. The developer's first act is to ask (through the planner) for the QA PC's
+  serving tree to be updated. Until then, do NOT trust a greeting produced there.
+  **The loop's deploy step updates EVERY machine's serving tree** (desktop, QA PC, laptop) and reads
+  each one back (HEAD + build SHA).
+- **Item 7 is ruled (D-113):** the hourly cadence is dropped. What remains for the code is removing
+  `status_cron` from the planner's seat data, and the dashboard planner rows if they are absent.
+- **Rescope before building:** the planner checks a SERVED desktop greeting after `/mcp` reconnect and
+  narrows items 1-6 to what is still missing. Expected to remain: 1 (the whole briefing rendered in
+  code), 4 (Usage line), 6 (`resolvedBy`), 3's `*brief*` glob, and T-172's guard so a serving tree
+  cannot drift 599 commits again unnoticed.
