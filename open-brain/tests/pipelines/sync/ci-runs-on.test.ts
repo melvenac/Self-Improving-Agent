@@ -1,7 +1,7 @@
 /**
  * T-192: a master push runs on tcm. `evalRunsOn` is the small evaluator for the
  * one `runs-on` expression. `&&` binds tighter than `||`, and each returns the
- * value rather than a boolean, as GitHub's expression language does. T-221: it also reads github.head_ref, ref_name and run_id, and format().
+ * value rather than a boolean, as GitHub's expression language does. T-221: it also reads github.head_ref, ref_name and run_id, and format() (third commit).
  */
 import { describe, it, expect } from "vitest";
 import { execFileSync } from "node:child_process";
