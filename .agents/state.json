@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 294,
+  "revision": 295,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1396,6 +1396,20 @@
       "note": "Observed on every ob_state call in planner session 157. The per-id NOTE lines repeat unchanged; their information is only new when a task crosses the retention boundary.",
       "note_by": [
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-233",
+      "title": "Deterministic /start greeting: ob_start renders the whole briefing and /start prints it verbatim; the record's session number; Latest brief by commit date; a Usage line from slots.json; open questions carry resolvedBy; the status cron replaced by dashboard reads — and FIRST make master's fixes reach the session (T-172: the serving main tree is 597 commits behind)",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 158,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Session 158, on Aaron's word relayed by clark (~21:3xZ 'Have atlas prioritise the fix'; ~21:4xZ 'have atlas start it, once session and weekly limits hit I will use the one time reset to keep going'). Brief: docs/loops/start-greeting-deterministic-brief.md. EVIDENCE measured by the planner 2026-10-02 ~21:40Z: the serving main tree ~/Projects/Self-Improving-Agent is detached at bf33fe47 (2026-09-27), 597 commits behind origin/master, so T-164/T-208/T-210/T-211 are merged but not served; this session's /start text matched the stale ~/.claude/commands/start.md (2026-09-17, 'largest loop number', no Standing cron step), not the worktree's master-equal copy; and the SessionStart hook said the main checkout's build is 'unaffected' when it was the stale one (G-034's shape). Sequencing: T-172 first. Item 7 (dropping the status cron) amends D-077 and needs Aaron's own word. Retire the /START AUDIT GAPS watch-out once a SERVED greeting passes items 1-6.",
+      "note_by": [
+        "ae490afb-211a-42c7-b82e-292e88d0a9f4"
       ],
       "closed_rev": null
     }
@@ -4030,6 +4044,12 @@
       "title": "Repo auto-merge ENABLED (Aaron 'yes to auto merge' in the planner's window, ~20:2xZ): allow_auto_merge=true, read back from the REST API. Use `gh pr merge <n> --merge --auto --match-head-commit <sha>` instead of polling CI and then merging. Auto-merge changes NOTHING about authority: docs-only PRs still merge on the standing rule; code PRs still need QA and Aaron's word naming the PR first; --match-head-commit still pins the approved SHA.",
       "date": "2026-10-02",
       "note": "Context: the ruleset (D-090) requires 'test' on every PR. Pure docs PRs only run 'changed' (~10 s) and report test Skipped (D-091); records PRs (.agents/state.json) run the full suite on purpose, because tests read the live record (T-205, T-213)."
+    },
+    {
+      "id": "D-112",
+      "title": "The deterministic /start greeting is P0 and the first loop, dispatched now: Aaron lifted the weekly-95% hold for this loop only",
+      "date": "2026-10-02",
+      "note": "Aaron, relayed by clark (told, not read by the planner): ~21:3xZ 'Have atlas prioritise the fix'; ~21:4xZ 'have atlas start it, once session and weekly limits hit I will use the one time reset to keep going'. The weekly-95% hold is lifted for THIS loop only; D-110's queue stays held. The 5-hour STOP (>=90%) still parks work until its reset. Seat: sia-builder after its roll (sia-forge offline). Merge needs batch QA and Aaron's word naming the PRs."
     }
   ],
   "handoffs": [

@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 294 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 295 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -21,6 +21,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-197** Cursor's /start matches Claude Code's /start except for documented tool-call differences, and /sync fails on any other difference: it reads ob_start's State block, never hand-edits rendered views, lets ob_start create the session log, and presents NEXT as a ranked backlog rather than a proposal
 - [ ] **T-200** A seat started from a stale tree is briefed from STALE state: when the local record is older than origin/master's, ob_start renders the State block and the role files from origin/master (git show) and says so, so D-062 holds at every /start
 - [ ] **T-201** A developer or QA seat's /start names its assignment, read from the record, or says 'no assignment' explicitly; it never stops at the backlog
+- [ ] **T-233** Deterministic /start greeting: ob_start renders the whole briefing and /start prints it verbatim; the record's session number; Latest brief by commit date; a Usage line from slots.json; open questions carry resolvedBy; the status cron replaced by dashboard reads — and FIRST make master's fixes reach the session (T-172: the serving main tree is 597 commits behind)
 
 ## P1
 
