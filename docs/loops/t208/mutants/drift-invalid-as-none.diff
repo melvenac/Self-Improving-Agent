@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/drift-line.ts b/open-brain/src/pipelines/session-start/drift-line.ts
+index b1c52613..828c9842 100644
+--- a/open-brain/src/pipelines/session-start/drift-line.ts
++++ b/open-brain/src/pipelines/session-start/drift-line.ts
+@@ -11,7 +11,7 @@ export function describeDriftLine(projectRoot: string): string {
+   try {
+     const state = readProjectState(projectRoot);
+     if (state.stateJson.present && !state.stateJson.valid) {
+-      return `Drift: not checked (.agents/state.json is unreadable or invalid: ${state.stateJson.error ?? "no detail"})`;
++      return "Drift: none";
+     }
+     const drift = detectDrift(state);
+     if (drift.length === 0) return "Drift: none";
