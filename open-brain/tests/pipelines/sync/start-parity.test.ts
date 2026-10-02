@@ -80,18 +80,20 @@ describe("T-226 the briefing takes the brief from ob_start's Latest brief line",
       expect(t).not.toContain("loop-N-*.md");
     });
 
-    it(`${rel}: the briefing line is ob_start's own, verbatim, and is omitted when ob_start printed none`, () => {
+    // T-233 B: the briefing is rendered by ob_start in code, so the copies no longer carry a `Latest brief:` template line;
+    // they still say where the brief comes from (step 5), and that the rendered block is printed verbatim.
+    it(`${rel}: the brief comes from ob_start's own line, and the rendered briefing is printed verbatim`, () => {
       const t = text(rel);
-      expect(t).toContain('Latest brief: {the "Latest brief:" line ob_start printed, verbatim}');
-      expect(t).toContain("The `Latest brief:` line is omitted when `ob_start` printed none.");
       expect(t).toContain("`ob_start` names for you on its `Latest brief: <path> (<date>)` line");
+      expect(t).toContain("latest brief and skills, all built from the record by one function");
+      expect(t).toContain("## End Briefing");
     });
   }
 
   it("the Claude and Cursor template copies carry the same sentences about the brief (the parity table is not stretched to cover it)", () => {
     const grab = (rel: string): string[] =>
       text(rel).split("\n").filter((l) => /Latest brief|brief, which|\*brief\*|no brief to read|boundary report/.test(l));
-    expect(grab("project-template/.claude/commands/start.md").length).toBeGreaterThanOrEqual(5);
+    expect(grab("project-template/.claude/commands/start.md").length).toBeGreaterThanOrEqual(3);
     expect(grab("project-template/.cursor/commands/start.md")).toEqual(grab("project-template/.claude/commands/start.md"));
   });
 });

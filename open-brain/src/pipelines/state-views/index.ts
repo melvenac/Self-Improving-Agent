@@ -8,7 +8,7 @@
  * outside it is the project's own prose and is preserved byte for byte.
  */
 import type { State, Task, Handoff } from "../../shared/state-schema.js";
-import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, compareFirstRev } from "../../shared/state-schema.js";
+import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, compareFirstRev, questionText, questionResolvedBy } from "../../shared/state-schema.js";
 
 export interface ViewOptions {
   version: string;
@@ -162,7 +162,8 @@ export function renderNextSession(state: State, o: ViewOptions): string {
       for (const w of h.watch_out) lines.push(`- ${w}`);
       lines.push("", "### Open questions", "");
       if (h.open_questions.length === 0) lines.push("_None._");
-      for (const q of h.open_questions) lines.push(`- ${q}`);
+      // The view is the record: a resolved question stays listed here, marked. Only the greeting omits it.
+      for (const q of h.open_questions) lines.push(`- ${questionText(q)}${questionResolvedBy(q) ? ` _(resolved by ${questionResolvedBy(q)})_` : ""}`);
       lines.push("");
       if (h.loop_state) {
         const l = h.loop_state;

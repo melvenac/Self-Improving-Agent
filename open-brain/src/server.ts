@@ -30,6 +30,7 @@ import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { describeServingBuild } from "./pipelines/session-start/serving-build.js";
+import { renderBriefing, describeUsage, describeWorkingTree, describeSkills } from "./pipelines/session-start/briefing.js";
 import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
 import { formatScanCounts } from "./pipelines/session-start/scan-counts.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
@@ -206,6 +207,8 @@ export interface StartArgs {
   project_root?: string;
   /** Per-file line budget for the state files. Omitted = whole files. */
   state_budget_lines?: number;
+  /** Test seam, deliberately NOT in the tool schema: the build directory describeServingBuild reads. Default: the running build. */
+  serving_build_dir?: string;
 }
 
 /** Display names for the four state files, keyed as in StateFileSize.file. */
@@ -243,7 +246,8 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     // reader seeing it above `Drift: none` cannot take either as the other's
     // confirmation. See pipelines/session-start/tree-currency.ts.
     // T-233 A: the SERVING build comes before even that, because it is the code producing this greeting.
-    lines.push(describeServingBuild());
+    const serving = describeServingBuild(args.serving_build_dir);
+    lines.push(serving);
     lines.push(...describeTreeCurrency(projectRoot).lines);
     lines.push("");
 
@@ -353,6 +357,21 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       lines.push(...renderState(sj.data, result.state.version, {
         seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
         projectRoot,
+      }));
+      // T-233 B: the whole briefing, rendered here, so /start prints it instead of assembling it.
+      lines.push("", ...renderBriefing({
+        serving,
+        state: sj.data,
+        version: result.state.version,
+        seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
+        sessionNumber: result.session.logPath ? result.session.sessionNumber : null,
+        sessionNote: result.session.skippedReason,
+        date: new Date().toISOString().slice(0, 10),
+        drift: result.drift,
+        usage: describeUsage(projectRoot),
+        latestBrief,
+        workingTree: describeWorkingTree(projectRoot),
+        skills: describeSkills(projectRoot),
       }));
     } else {
       // F3: an unknown schema_version REFUSES, with no prose fallback.

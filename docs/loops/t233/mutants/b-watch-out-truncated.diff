@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/briefing.ts b/open-brain/src/pipelines/session-start/briefing.ts
+index cafb4ae1..fc716eda 100644
+--- a/open-brain/src/pipelines/session-start/briefing.ts
++++ b/open-brain/src/pipelines/session-start/briefing.ts
+@@ -71,7 +71,7 @@ export function renderBriefing(i: BriefingInput): string[] {
+ 
+   if (own && own.watch_out.length > 0) {
+     out.push("", "WATCH OUT");
+-    for (const w of own.watch_out) out.push(`- ${w}`);
++    for (const w of own.watch_out.slice(0, 1)) out.push(`- ${w}`);
+   }
+ 
+   if (own) {

@@ -65,26 +65,24 @@ do not assume.**
 `INBOX.md`, `task.md` and `next-session.md`, each under its own `## <file>` header, with `absent`
 spelled out for a missing file. An invalid `state.json` says so before falling back.
 
-**Build the whole briefing from what `ob_start` returned.** In the normal case the `## State` block
-carries every field the briefing needs — do not open `task.md`, `INBOX.md`, `SUMMARY.md` or
-`next-session.md` to fill a gap that is not there. Do not create a session log or reconcile drift
-yourself.
+**The briefing is rendered by `ob_start`, in code (T-233).** In the normal case the output ends its State content with a block that opens at the
+`## Briefing` line and closes at `## End Briefing`: usage, session line, drift, objective, next, pick-up, watch-outs, open questions, broken, working tree,
+latest brief and skills, all built from the record by one function that every runtime shares. Do not rebuild, reorder, summarise or trim it, and do not open
+`task.md`, `INBOX.md`, `SUMMARY.md` or `next-session.md` to fill a gap that is not there. Do not create a session log or reconcile drift yourself.
 
 Task lines are `[status] id title` — **titles only, by design.** A task's rationale is its `note` in
 `.agents/state.json` under `tasks[]`. Read that before you rule on, work or retire a task, not when you merely pick one.
 
 ### 3. Working tree
 
-Run `git status --porcelain`. Uncommitted work is state the record does not carry, and a session that
-starts without knowing about it will misread someone else's in-flight change as drift. One command.
+The briefing's `Working tree:` line already ran `git status --porcelain`. Run it yourself only when `ob_start` returned no Briefing block.
 
 ### 4. Residual reads
 
-Skip any that do not exist:
+Skip any that do not exist. The briefing's `Skills:` line already read `.agents/skills/INDEX.md`.
 
-1. `.agents/skills/INDEX.md`
-2. `.agents/SYSTEM/domains.json`
-3. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
+1. `.agents/SYSTEM/domains.json`
+2. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
 
 ### 5. Coordination
 
@@ -102,49 +100,16 @@ the exchange ends — session 61’s close-out travelled by A2A alone and exists
 
 ### 6. Present the briefing
 
-Print this and stop. No commentary, no summary of the summary.
+Print the lines from `## Briefing` down to and including `## End Briefing` from `ob_start`'s output, **verbatim**. No commentary, no summary of the summary, no
+reordering. Then print one more line:
 
 ```
-Session {N} — {date} · {project} v{version} · state rev {R}
-Drift: {ob_start's drift lines verbatim, or "none"}
-
-OBJECTIVE
-{objective text} (since session {n})
-
-NEXT
-- [{priority}] {id} {title}          ← top 3 by priority from the State block
-{n} active ({n} P0, {n} P1, {n} P2, {n} P3); {n} done
-
-PICK UP HERE
-{the handoff's pick-up, 2-3 sentences}
-
-WATCH OUT
-- {every item, VERBATIM}
-
-OPEN QUESTIONS
-- {every item, verbatim}
-
-BROKEN ({n} gaps open; newest {m})
-- {gaps, newest first, up to 5}
-- {any task with status blocked}
-
-Working tree: {clean | N uncommitted: path, path, ...}
-Latest brief: {the "Latest brief:" line ob_start printed, verbatim}
-Skills: {relevant entries from .agents/skills/INDEX.md, or "none"}
-
 FLAGS: {anything to verify, or "none"}
 ```
 
-**Omit an empty section rather than printing a placeholder.** The `Latest brief:` line is omitted when `ob_start` printed none.
-
-**WATCH OUT is the highest-value part of this briefing.** It is short, already curated, and it is
-where the previous session wrote down what will bite this one. Print every item verbatim. Never
-summarise it, never drop items for length.
-
-**NEXT is the backlog ranked by priority. It is not a decision.** If the handoff says the next
-subject is unruled, or the objective is complete, **say so on the NEXT line** rather than presenting
-three old P0s as though they were today's plan — a briefing whose sections disagree about whether
-there is work to start has told the reader nothing.
+The block is the briefing: WATCH OUT is every item the previous session wrote down, OPEN QUESTIONS omits the ones already resolved and counts them, and
+NEXT is the backlog by priority, not a decision. If `ob_start` returned **no Briefing block** (`state.json` absent or invalid: the fallback text), say so
+in FLAGS and build nothing from the prose files yourself.
 
 Include in FLAGS: a missing `CLAUDE.md` in the project root (**do not create one — ask first**), a
 missing `SESSION_UUID`, any drift reported as `not fixed`, and any MCP server that failed to connect.
