@@ -139,7 +139,7 @@ describe("T163-1: a close-out can only add its own record", () => {
   // session numbers (R179-1 as amended): `others(k)` writes k sessions in
   // checkouts of their own, each its instance's only entry.
   const others = (k: number) => {
-    for (let i = 0; i < k; i++) handoff(root, 1, `cccccccc-3333-4333-8333-${String(i).padStart(12, "0")}`, `other ${i}`, `other-${i}`, "qa");
+    for (let i = 0; i < k; i++) handoff(root, 42 + i, `cccccccc-3333-4333-8333-${String(i).padStart(12, "0")}`, `other ${i}`, `other-${i}`, "qa");
   };
 
   it("retention drops a superseded entry of the SAME seat and checkout once more than 10 sessions have written since", () => {

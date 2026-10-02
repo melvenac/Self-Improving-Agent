@@ -214,8 +214,9 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     expect(w.dropped_task_ids).toEqual([]);
     let rev = 1;
     let last = w;
+    let sessionN = 55;
     for (const u of ["s-1", "s-2", "s-3"]) {
-      last = applyStateOps(root, { session: 55, expected_revision: rev++, session_uuid: u, ops: [{ op: "set_objective", text: u }], version: "0.30.0" });
+      last = applyStateOps(root, { session: sessionN++, expected_revision: rev++, session_uuid: u, ops: [{ op: "set_objective", text: u }], version: "0.30.0" });
       expect(last.ok, last.error).toBe(true);
       if (u !== "s-3") expect(last.dropped_task_ids).toEqual([]);
     }

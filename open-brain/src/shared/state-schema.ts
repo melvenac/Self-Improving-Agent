@@ -361,6 +361,15 @@ export function lastSession(state: Pick<State, "sessions">): SessionRecord | nul
 }
 
 /**
+ * The number a new session takes: max(n)+1 over sessions[], 1 for an empty record.
+ * One function for the greeting AND the SC-2 refusal text, so the two cannot
+ * disagree (QA 249 F1).
+ */
+export function nextSessionNumber(sessions: readonly Pick<SessionRecord, "n">[]): number {
+  return sessions.length === 0 ? 1 : Math.max(...sessions.map((s) => s.n)) + 1;
+}
+
+/**
  * The handoffs a reader is shown: the newest per (seat, checkout), which is one
  * per seat INSTANCE, newest by `first_rev`. Older entries stay in the record and
  * are not rendered, so the greeting does not grow with the array (the planner's

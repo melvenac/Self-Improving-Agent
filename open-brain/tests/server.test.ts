@@ -121,7 +121,7 @@ describe("server handlers", () => {
       expect(text).toContain("summary-version: expected 2.0.0, got 1.9.0 (not fixed)");
 
       // Session block.
-      expect(text).toMatch(/Session #1\nLog: .*Session_1\.md\nSession ID: /);
+      expect(text).toMatch(/Session #1( \(local — from this checkout's session logs; no valid state\.json\))?\nLog: .*Session_1\.md\nSession ID: /);
 
       // Size block: one line per file, absent spelled out, truncated: no.
       expect(text).toContain("## Sizes (tokens estimated as chars/4)");
@@ -246,11 +246,11 @@ describe("server handlers", () => {
     });
 
     /** Loop 2 V3(c) / P1: no state.json → no State section, no fallback line, no fifth size entry. */
-    it("leaves v0.28.0 output untouched when state.json is absent", async () => {
+    it("leaves v0.28.0 prose output untouched when state.json is absent, and marks the session number local (T-164 SC-3)", async () => {
       proseProject(tmp);
       const text = getText(await handleStart({ project_root: tmp }));
-      expect(text).not.toContain("state.json");
       expect(text).not.toContain("## State (");
+      expect(text).toContain("Session #1 (local — from this checkout's session logs; no valid state.json)");
       expect(text).toContain("## SUMMARY.md\n# Summary\nPROSE-SUMMARY-MARKER alpha beta");
       expect(text).toContain("## next-session.md\n# Handoff\nPROSE-NEXT-MARKER");
     });
@@ -378,7 +378,7 @@ describe("server handlers", () => {
       expect(getText(reg)).toContain(`[via process proof: parent ${process.ppid}]`);
 
       const first = getText(await handleStart({ project_root: tmp }));
-      expect(first).toMatch(new RegExp(`Session #1\\nLog: .*Session_1\\.md\\nSession ID: ${id}`));
+      expect(first).toMatch(new RegExp(`Session #1( \\(local — from this checkout's session logs; no valid state\\.json\\))?\\nLog: .*Session_1\\.md\\nSession ID: ${id}`));
       const log = readFileSync(join(tmp, ".agents", "SESSIONS", "Session_1.md"), "utf-8");
       expect(log).toContain(`> **Session ID:** ${id}`);
 

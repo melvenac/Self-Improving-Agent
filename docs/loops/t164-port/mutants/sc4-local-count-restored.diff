@@ -1,0 +1,23 @@
+diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts
+index b5e1deb0..db75af77 100644
+--- a/open-brain/src/pipelines/session-start/index.ts
++++ b/open-brain/src/pipelines/session-start/index.ts
+@@ -3,7 +3,7 @@ import { join } from "node:path";
+ import { readProjectState } from "./state-reader.js";
+ import { discoverSessionUuid } from "./session-discovery.js";
+ import { detectDrift } from "./drift-detector.js";
+-import { findExistingSessionLog, createSessionLog, nextGreetingSessionNumber } from "./session-log.js";
++import { findExistingSessionLog, createSessionLog, findNextSessionNumber } from "./session-log.js";
+ import { runHealthChecks } from "./health-checks.js";
+ import type { SessionInfo, SessionStartOptions, SessionStartResult } from "./types.js";
+ 
+@@ -31,7 +31,8 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
+       if (existing) {
+         session = { sessionId, ...existing, reused: true, skippedReason: null };
+       } else {
+-        const { sessionNumber, source } = nextGreetingSessionNumber(options.projectRoot, state.stateJson);
++        const sessionNumber = findNextSessionNumber(options.projectRoot);
++        const source = "local" as const;
+         const date = new Date().toISOString().split("T")[0];
+         const logPath = createSessionLog(options.projectRoot, sessionNumber, sessionId, date);
+         session = {

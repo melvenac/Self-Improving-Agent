@@ -1,7 +1,25 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { nextSessionNumber } from "../../shared/state-schema.js";
+import type { StateJsonResult } from "./types.js";
 
 const SESSION_FILE = /^Session_(\d+)\.md$/;
+
+export type SessionNumberSource = "record" | "local";
+
+/**
+ * T-164: the greeting's session number comes from the record when state.json
+ * is present and valid; otherwise from this checkout's Session_N.md files.
+ */
+export function nextGreetingSessionNumber(
+  projectRoot: string,
+  stateJson: StateJsonResult,
+): { sessionNumber: number; source: SessionNumberSource } {
+  if (stateJson.present && stateJson.valid && stateJson.data) {
+    return { sessionNumber: nextSessionNumber(stateJson.data.sessions), source: "record" };
+  }
+  return { sessionNumber: findNextSessionNumber(projectRoot), source: "local" };
+}
 const SESSION_ID_LINE = /^>\s*\*\*Session ID:\*\*\s*(\S+)\s*$/m;
 
 export function findNextSessionNumber(projectRoot: string): number {
