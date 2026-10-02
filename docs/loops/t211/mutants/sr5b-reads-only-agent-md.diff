@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/agent-identity.ts b/open-brain/src/pipelines/session-start/agent-identity.ts
+index 5216bbff..0e606003 100644
+--- a/open-brain/src/pipelines/session-start/agent-identity.ts
++++ b/open-brain/src/pipelines/session-start/agent-identity.ts
+@@ -136,7 +136,7 @@ function readStatusKeys(path: string): StatusKeys | null {
+  * a present, an absent and a malformed answer each have their own line.
+  */
+ export function readStandingCron(cwd: string): string {
+-  for (const file of ["AGENT.local.md", "AGENT.md"]) {
++  for (const file of ["AGENT.md"]) {
+     const keys = readStatusKeys(join(cwd, ".agents", file));
+     if (keys === null) continue;
+     const where = `.agents/${file}`;
