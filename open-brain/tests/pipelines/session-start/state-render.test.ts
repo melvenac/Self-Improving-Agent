@@ -359,12 +359,15 @@ describe("renderState — T183-3 the real record's handoffs are verbatim", () =>
     expect(visible.length).toBeGreaterThan(1);
   });
 
-  it("leaves the objective and every active task title unchanged", () => {
+  // D-100 changed this row on purpose: it used to require every title whole. A title over 100 characters is now
+  // cut to its first 100 plus an ellipsis (stated here independently of the renderer); every other title is whole.
+  it("leaves the objective unchanged and every active task title whole, or cut at 100 with an ellipsis (D-100)", () => {
     const text = renderState(real, "x").join("\n");
     if (real.objective) expect(text).toContain(`Objective: ${real.objective.text} (since session ${real.objective.since_session})`);
-    const active = real.tasks.filter((t) => t.status !== "done");
+    // P2 and P3 render as count lines (D-100 follow-up), so only P0 and P1 titles are asserted.
+    const active = real.tasks.filter((t) => t.status !== "done" && (t.priority === "P0" || t.priority === "P1"));
     expect(active.length).toBeGreaterThan(0);
-    for (const t of active) expect(text).toContain(`${t.id} ${t.title}`);
+    for (const t of active) expect(text).toContain(`${t.id} ${t.title.length > 100 ? `${t.title.slice(0, 100).trimEnd()}…` : t.title}`);
   });
 });
 
@@ -414,5 +417,108 @@ describe("renderState — T-209 gaps newest-first", () => {
     const ids = ["G-9", "G-100", "G-2", "G-10", "G-99"].map((id) => ({ id, opened_session: 5 }));
     expect([...ids].sort(newestGapFirst).map((g) => g.id)).toEqual(["G-100", "G-99", "G-10", "G-9", "G-2"]);
     expect(newestGapFirst({ id: "G-1", opened_session: 9 }, { id: "G-999", opened_session: 8 })).toBeLessThan(0);
+  });
+});
+
+/**
+ * T-183 cut (D-100): the greeting shows the newest 10 open gaps and a count line, and clips task titles at 100
+ * characters. The count comes from gaps[], never from what was rendered, so a clip cannot make it lie.
+ */
+describe("renderState — T-183 gaps cap and task-title clip (D-100)", () => {
+  const gap = (n: number, opened_session: number, extra: object = {}) => ({
+    id: `G-${String(n).padStart(3, "0")}`, what: `gap ${n}`, evidence: "", recommended_update: "", opened_session, ...extra,
+  });
+  const many = (open: number, closed = 0): State =>
+    ({
+      ...state,
+      gaps: [
+        ...Array.from({ length: open }, (_, i) => gap(i + 1, 50 + i)),
+        ...Array.from({ length: closed }, (_, i) => gap(900 + i, 200, { status: "closed", closed_session: 201, closed_rev: 3 })),
+      ],
+    }) as unknown as State;
+  const gapLines = (s: State) => renderState(s, "x").filter((l) => /^ {2}G-\d+ — /.test(l));
+
+  it("C183-1: 40 open gaps render exactly 10 lines, the newest, and a count line with the true totals", () => {
+    const out = renderState(many(40, 3), "x");
+    const lines = out.filter((l) => /^ {2}G-\d+ — /.test(l));
+    expect(lines).toHaveLength(10);
+    expect(lines[0]).toContain("G-040");
+    expect(lines[9]).toContain("G-031");
+    expect(out).toContain("  … and 30 older open gaps (40 open in all): state.json gaps[]");
+    expect(out.join("\n")).toContain("Gaps (40):");
+  });
+
+  it("C183-2: 10 or fewer open gaps have no count line", () => {
+    for (const n of [0, 1, 10]) {
+      const text = renderState(many(n, 2), "x").join("\n");
+      expect(text, `${n} open`).not.toContain("older open gap");
+    }
+    expect(gapLines(many(10))).toHaveLength(10);
+  });
+
+  it("C183-2b: 11 open gaps render 10 and say there is 1 older (singular is still counted, not omitted)", () => {
+    const out = renderState(many(11), "x");
+    expect(out.filter((l) => /^ {2}G-\d+ — /.test(l))).toHaveLength(10);
+    expect(out).toContain("  … and 1 older open gaps (11 open in all): state.json gaps[]");
+  });
+
+  it("C183-3: a 250-character task title renders as its first 100 characters plus an ellipsis, id and status intact", () => {
+    const title = `${"t".repeat(99)}X${"u".repeat(150)}`;
+    expect(title).toHaveLength(250);
+    const long = { ...state, tasks: [{ ...state.tasks[0], id: "T-777", status: "blocked", title }] } as unknown as State;
+    const line = renderState(long, "x").find((l) => l.includes("T-777"))!;
+    expect(line).toBe(`    [blocked] T-777 ${"t".repeat(99)}X…`);
+    expect(line).not.toContain("u");
+  });
+
+  it("C183-3b: a title of exactly 100 characters, and a short one, are not touched", () => {
+    const hundred = "h".repeat(100);
+    const s = { ...state, tasks: [{ ...state.tasks[0], id: "T-778", title: hundred }, { ...state.tasks[1], id: "T-779", title: "short" }] } as unknown as State;
+    const out = renderState(s, "x");
+    expect(out).toContain(`    [open] T-778 ${hundred}`);
+    expect(out).toContain("    [in_progress] T-779 short (supersedes T-099)");
+  });
+});
+
+/**
+ * T-183 (D-100 follow-up): P0 and P1 titles render; P2 and P3 render as ONE count line each. NEXT only ever needs the
+ * top items, and INBOX.md keeps the full list. The counts come from tasks[], never from the rendered lines.
+ */
+describe("renderState — T-183 P2/P3 as count lines", () => {
+  const task = (id: string, priority: string, status = "open") => ({
+    id, title: `title of ${id}`, priority, status, opened_session: 1, closed_session: null, supersedes: null, note: null,
+  });
+  const withTasks = (tasks: object[]): State => ({ ...state, tasks }) as unknown as State;
+  const fixture = withTasks([
+    task("T-001", "P0"), task("T-002", "P0"), task("T-003", "P1", "in_progress"),
+    task("T-004", "P2"), task("T-005", "P2", "blocked"), task("T-006", "P2"), task("T-007", "P3"),
+    task("T-008", "P2", "done"), task("T-009", "P3", "done"),
+  ]);
+  const out = renderState(fixture, "x");
+
+  it("P3-1: P0 and P1 titles render in full; P2 and P3 titles do not", () => {
+    for (const id of ["T-001", "T-002", "T-003"]) expect(out.join("\n")).toContain(`${id} title of ${id}`);
+    for (const id of ["T-004", "T-005", "T-006", "T-007"]) expect(out.join("\n")).not.toContain(id);
+    expect(out).toContain("  P0:");
+    expect(out).toContain("  P1:");
+  });
+
+  it("P3-2: one count line per lower priority, counted from tasks[] (done ones excluded, blocked included)", () => {
+    expect(out).toContain("  [P2] 3 active: INBOX.md");
+    expect(out).toContain("  [P3] 1 active: INBOX.md");
+    expect(out.filter((l) => /^ {2}\[P[23]\] /.test(l))).toHaveLength(2);
+    expect(out.join("\n")).toContain("Tasks (7 active; done: 2):");
+  });
+
+  it("P3-3: a record with no P2 tasks has no P2 line (and none for P3 when P3 is empty)", () => {
+    const text = renderState(withTasks([task("T-001", "P0"), task("T-007", "P3")]), "x").join("\n");
+    expect(text).not.toContain("[P2]");
+    expect(text).toContain("[P3] 1 active: INBOX.md");
+    expect(renderState(withTasks([task("T-001", "P1")]), "x").join("\n")).not.toMatch(/\[P[23]\]/);
+  });
+
+  it("P3-4: the full list is still in the record, not dropped: the count is the number of P2 tasks, not a number of lines", () => {
+    const big = withTasks(Array.from({ length: 25 }, (_, i) => task(`T-${100 + i}`, "P2")));
+    expect(renderState(big, "x")).toContain("  [P2] 25 active: INBOX.md");
   });
 });

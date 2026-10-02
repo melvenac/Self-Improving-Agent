@@ -189,7 +189,11 @@ describe("server handlers", () => {
       expect(text).toContain("Tasks (16 active; done: 11):");
       expect(text).toContain("  P0:\n    [in_progress] T-005 state.json strict schema module");
       expect(text).toContain("[blocked] T-012 /end writes state.json");
-      expect(text).toContain("[blocked] T-024 Choose an apoptosis threshold with a defensible gate (supersedes T-023)");
+      // D-100 follow-up: P2 and P3 tasks render as one count line each (T-024 is P2, so its title is not listed).
+      expect(text).toContain("[blocked] T-013 ");
+      expect(text).toContain("  [P2] 4 active: INBOX.md");
+      expect(text).toContain("  [P3] 1 active: INBOX.md");
+      expect(text).not.toContain("T-024 Choose an apoptosis threshold");
       expect(text).not.toContain("T-001 ob_start returns state");   // done — count only
       expect(text).not.toMatch(/\[done\]/);
       // Verified: one line each with an evidence count; reopened is flagged.
