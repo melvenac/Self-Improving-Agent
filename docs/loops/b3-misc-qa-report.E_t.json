@@ -1,0 +1,52 @@
+{
+  "loop": "qa-257-b3-misc",
+  "candidate_git": {
+    "sha": "65eb9e947cff92cf0e03fc8ba2d42e20bc6043a6",
+    "branch": "origin/loop/t186-summary-bom",
+    "frozen_at": "2026-10-02T12:34:58Z"
+  },
+  "candidates": [
+    { "task": "T-186", "sha": "65eb9e947cff92cf0e03fc8ba2d42e20bc6043a6", "branch": "origin/loop/t186-summary-bom", "pr": 308, "verdict": "ACCEPT" },
+    { "task": "T-163", "sha": "11c183e478e513dc4e026d8ea47b19de37e47515", "branch": "origin/loop/t163-closeout-append", "pr": 301, "verdict": "ACCEPT" },
+    { "task": "T-065", "sha": "1c865761d7feb33cd95dc449c4e57742b1c38bd9", "branch": "origin/loop/t065-drop-knowledgedb", "pr": 313, "verdict": "ACCEPT" },
+    { "task": "T-042", "sha": "b20d99a46269739fcac4d6b8a0ea31eb89bbec43", "branch": "origin/loop/t042-vault-pollution", "pr": 314, "verdict": "ACCEPT" },
+    { "task": "T-152", "sha": "84e756180e400cccba92e4d66ddbcf12ed15ec0c", "branch": "origin/loop/t152-typecheck-tests", "pr": 305, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit on the batch merge (qa257-merge 00ee96d4); npm run typecheck:tests there and on 84e75618",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 30000,
+      "detail": "tsc --noEmit exit 0 on the merge. typecheck:tests exits 2 with exactly the 4 category-B errors (index-upsert:126, ranking:4, ranking:32, shadow-strategies:33), the expected state until #294. CI test job green on every head (push and PR runs)."
+    },
+    "unit": {
+      "command": "npx vitest run <file>, one file per invocation: 25 touched test files on the batch merge",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 120000,
+      "detail": "LIGHT job, no local full suite. 25/25 files exit 0 on the merge. CI full suite green: #301 36981718634/36981727241, #305 36983944706/36983949651, #308 36984617953/36984624995, #313 36985993303/36985998243, #314 36986187135/36986192184."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q257-1", "status": "met", "order": "shown", "evidence": "diff origin/master...head: #301 handoff+2 mutant diffs+closeout-append.test; #305 handoff, package.json +1, tsconfig.tests.json, 18 test files; #308 handoff, mutant, state-views/index.ts +4, 2 tests; #313 handoff, paths.ts -6, paths.test.ts; #314 handoff, sync/index.ts +3, vault-pollution.ts, its test." },
+    { "id": "Q257-2", "status": "met", "order": "red-first", "evidence": "#305 base 40 errors -> head 4; #308 base state-views 1 failed/16, summary-bom 1 failed/1 -> 17/17, 2/2; #313 base paths 1 failed -> 13 passed+1 win32 skip; #314 base module not found -> 5/5; #301 verify-first, green on base, red via seat-keyed mutant." },
+    { "id": "Q257-3", "status": "partial", "order": "shown", "evidence": "Dev mutants killed: #301 seat-keyed-slot, #308 bom-dropped-on-write, #314 no-descend (3 failed), #313 base field present, #305 reverted fix gives 5 errors. QA mutants killed: #301 seat-keyed sessions[], #305 hasPriorFailures ignored (2 failed), #308 BOM lost with markers, #314 no pre-check (VP-3). Survived: #313 knowledgeV2Db default repointed (masked by setup-env.ts:35 override); #314 any-file counts (near-equivalent)." },
+    { "id": "Q257-4", "status": "met", "order": "shown", "evidence": "gh pr checks: changed pass, test pass, test-windows skipping for all five; push and PR runs on the pinned headSha, success." },
+    { "id": "Q257-5", "status": "met", "order": "shown", "evidence": "closeout-append runs applyStateOps render:true; A's handoff and uuid survive B's two close-outs; seat-keyed mutant red. record-erasure on qa257-pr301: pass, 0 erasures since schema v3; walked 1682 commits, 455 state.json changes (222 at v3+)." },
+    { "id": "Q257-6", "status": "met", "order": "shown", "evidence": "typecheck:tests exactly 4 category-B errors at the named files; git diff master...84e75618 -- open-brain/src empty; policies, handoff-provenance, state-schema, checks, rating-method quoted as type-only; hasPriorFailures: true at policies.test.ts:367 and :376." },
+    { "id": "Q257-7", "status": "met", "order": "shown", "evidence": "applyStateOps ops [] render true (as checks-state.ts:85): (a) no BOM, master==head byte-identical, .agents diff -r empty; (b) BOM+markers, BOM at 0 only, title at 1; (c) BOM no markers, head BOM at 0, title 1, region 20; master region at 0, BOM at 56621." },
+    { "id": "Q257-8", "status": "met", "order": "shown", "evidence": "git grep -n knowledgeDb over open-brain/src, tests, scripts, scripts/, .claude excluding fixtures-import: no output, exit 1." },
+    { "id": "Q257-9", "status": "met", "order": "shown", "evidence": "Via obsidianVaultDir() (OPEN_BRAIN_VAULT_DIR to scratch): seeded ob-server-x.md warns '1 ob-server-* file(s) ... ob-server-x.md'; clean passes; absent skip 'not checked ... (ENOENT)'. vault-pollution.ts:61 dir = vaultDir ?? obsidianVaultDir(); paths.ts:60 'Obsidian Vault v2'." },
+    { "id": "Q257-10", "status": "met", "order": "shown", "evidence": "origin/master 50700414 + #308, #301, #313, #314, #305 --no-ff: 5 clean merges, 00ee96d4. tsc --noEmit 0; typecheck:tests 4; 25 touched files one per invocation, 0 failures." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "#313: paths.test.ts knowledgeV2Db assertion reads the setup-env.ts:35 override, so a repointed default survives; non-blocking.",
+    "#314: no test row reaches the default obsidianVaultDir() path (every row passes vaultDir); the .md count and the (^|-) anchor are unpinned; non-blocking.",
+    "#301: verify-first; the new test is green on base and its red is mutant-only.",
+    "#305: no developer mutant diff; gate.test.ts drops a request legend that the type does not have (handoff finding 1)."
+  ],
+  "notes": "QA 257, dispatch tree 507004147df01ec665ff5970257ee400534720ef. candidate_git names #308 (first in merge order, HIGH impact); all five are in candidates[]. No live Jev call, no live state.json, DB or vault touched. Batch verdict ACCEPT."
+}
