@@ -475,16 +475,6 @@
           "why": "Lines 75-81 say the lifecycle and apoptosis were cut in Loop 10 and the columns are inert, and line 188 is the v0.4.0 history entry annotated as cut; the two lines that presented maturity as a live ranking input (59, 196) were rewritten in T-169 r2."
         },
         {
-          "path": "open-brain/scripts/backfill-success-rate.mjs",
-          "class": "code",
-          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the whole script (header 3-14, SELECT 53, UPDATE 105) recomputes and writes `success_rate` and reports rows \"below the apoptosis threshold\" (87-92) as if the column and threshold existed; new databases do not declare the column (db-v2.ts:130), so it would throw. Delete the script."
-        },
-        {
-          "path": "open-brain/scripts/dashboard.mjs",
-          "class": "code",
-          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: reads `success_rate` from the row query (52), buckets by maturity (248), offers a Progenitor filter (571-582), colours maturity badges (469, 748-758) and renders a \"Success Rate\" column and detail line (884, 932) as live data; the column is no longer written, so it shows frozen pre-Loop-10 values as current."
-        },
-        {
           "path": "open-brain/scripts/shadow-backfill.mjs",
           "class": "code",
           "why": "Line 14 is the \"REPAIRED IN LOOP 6\" comment recording that maturity/success_rate used to be read as-of-today; a record of a past repair. (Its `coverage` branch at 80-86 reads a ReplayCoverage that no longer exists and is dead, but is not matched by the pattern.)"
@@ -492,7 +482,7 @@
         {
           "path": "open-brain/src/db-v2.ts",
           "class": "prose",
-          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the comment at 66-67 says ratings \"move success_rate, which gates apoptosis and boosts ranking\" in the present tense, and the doc at 526 says \"Retire an entry by apoptosis\" for the archive helper `ob_forget` also uses. Lines 19, 130-133, 396-399, 425, 499-511, 628-632, 867-870, 968 are obituaries and 126/444 are the retained maturity label default."
+          "why": "Obituaries and the retained label. The two present-tense comments (the trigger table at 66-67, the archive helper at 526) were rewritten in T-215. Lines 19, 131-134, 426, 500-512, 528, 630-631, 869-872, 970 say what was cut and when; 127 and 445 are the retained maturity label default and CHECK; 400 is the optional `success_rate` field on the index input type, ignored by the insert."
         },
         {
           "path": "open-brain/src/lifecycle.ts",
@@ -507,7 +497,7 @@
         {
           "path": "open-brain/src/pipelines/session-end/recalled-ids.ts",
           "class": "prose",
-          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the header at 14-16 says \"Since v0.15.0 the same ratings move `success_rate`, which gates apoptosis and feeds `maturityBoost` ranking\" in the present tense, and 152 points at `formatApoptosisQueue`, which no longer exists."
+          "why": "Line 14 and the doc at 152-154 name the cut success_rate, apoptosis and apoptosis review queue in the past tense; the present-tense header and the dangling `formatApoptosisQueue` pointer were rewritten in T-215."
         },
         {
           "path": "open-brain/src/pipelines/shadow/evaluate.ts",
@@ -532,17 +522,12 @@
         {
           "path": "open-brain/src/server.ts",
           "class": "prose",
-          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the comment at 1063 says vault_path is selected \"for the apoptosis branch\" of ob_feedback, a branch that no longer exists (1093 says so), and 1266 says a supplied x harmful cell is \"the only combination that can ever make an apoptosis threshold satisfiable\" in the present tense. Lines 1077, 1093, 1117, 1309 are obituaries, 566 is history, and 1222, 1279, 1368-1370, 1460 read or write the retained maturity label."
-        },
-        {
-          "path": "open-brain/src/shared/active-session.ts",
-          "class": "prose",
-          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the doc comment at 180 says \"the maturity lifecycle rates entries with no idea what produced them\", presenting the cut lifecycle as a running consumer of the model field."
+          "why": "Obituaries and the retained label. The two present-tense comments (the vault_path select in ob_feedback, the supplied x harmful census) were rewritten in T-215, as comment lines only. Lines 574, 1072, 1084, 1100, 1124, 1273, 1316-1317 record what was cut; 1229 and 1467 read and write the retained maturity label."
         },
         {
           "path": "open-brain/src/vault-writer.ts",
           "class": "prose",
-          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the doc comment at 107 says \"apoptosis fires automatically\" as the reason archiveVaultNote moves rather than unlinks; apoptosis is cut and nothing fires automatically. Line 11 is the retained maturity label in the frontmatter type."
+          "why": "Line 108 names apoptosis in the past tense as a former caller of the archive helper (rewritten in T-215); line 11 is the retained maturity label in the frontmatter type."
         },
         {
           "path": "open-brain/tests/db-v2.test.ts",
@@ -552,7 +537,7 @@
         {
           "path": "open-brain/tests/index-upsert.test.ts",
           "class": "test",
-          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: lines 96 and 132 assert `after.success_rate` equals `before.success_rate` (and 126 passes `successRate: 1.0`), but new databases do not declare the column, so both sides are undefined and the assertions are vacuous; they read a cut column as if live."
+          "why": "Lines 96-99 and 134 assert that the cut `success_rate` column is absent from the stored row (T-215 replaced the two undefined === undefined comparisons with these)."
         },
         {
           "path": "open-brain/tests/pipelines/session-end/index-v2.test.ts",
@@ -567,7 +552,7 @@
         {
           "path": "open-brain/tests/ranking.test.ts",
           "class": "test",
-          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: lines 122-128 assert an entry with success rate 0.1 is demoted below one at 0.9 and 130-136 assert a mature entry outranks an older progenitor, both presenting cut behaviour as live and contradicting the pins at 98-120 and 166-178 (they pass only by tie-order, `successRate` is not stored); 75-96 still say \"while the boost is suspended\". Lines 80-120 and 166-178 are legitimate pins."
+          "why": "Pins that maturity and success_rate are not ranking inputs: the exact-tie rows (80-120), the success-rate tie row (122-130, T-215 inverted the demotion assertion that passed only on insertion order and deleted the mature-over-older-progenitor one, which was recency) and the SQL absence pin (163-173). Line 31 and the progenitor fixtures use the retained stored label."
         },
         {
           "path": "open-brain/tests/server.test.ts",
@@ -587,7 +572,7 @@
         {
           "path": "open-brain/tests/trigger/fires.test.ts",
           "class": "test",
-          "why": "LIVE REFERENCE, NOT AN OBITUARY — fix owed: the comment at 125 says ratings in recall_log \"move success_rate, which gates apoptosis\" in the present tense, as the reason a silent fire must not reach the rated set; neither exists now."
+          "why": "Lines 125-126 name success_rate and apoptosis in the past tense as ratings once moved by the rated set (rewritten in T-215)."
         },
         {
           "path": "open-brain/tests/vault-archive.test.ts",

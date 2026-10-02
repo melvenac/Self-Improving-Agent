@@ -122,7 +122,8 @@ describe('the fire record — three states, one row each', () => {
   it('A8: only INJECTED entries are rateable — a looked-at entry never enters recall_log', () => {
     // The constraint R5 is built to make structural. A silent fire consulted
     // the store and touched rows; none of them may reach the rated set,
-    // because ratings there move success_rate, which gates apoptosis.
+    // because ratings there are written for every id in it (success_rate and
+    // apoptosis, which they once also moved, are cut).
     const highFloor: TriggerPolicy = { relevance_floor: 1e9, max_injected: 1, deadline_ms: 2000, provenance: 'test fixture' };
     const outcome = runTrigger({ db, sessionUuid: SESSION, command: G039, policy: highFloor });
 

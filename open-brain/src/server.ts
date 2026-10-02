@@ -1074,9 +1074,8 @@ export async function handleFeedback(args: { id: number; rating: "helpful" | "ha
   const { id, rating } = args;
     const v2db = getV2Db();
     const entry = v2db.prepare(
-      // vault_path is selected for the apoptosis branch: the note has to be
-      // archived before the row goes, and after the DELETE there is nothing
-      // left to look it up from.
+      // vault_path is still selected, though nothing in this handler reads it: the
+      // apoptosis branch that archived the note before deleting the row is cut.
       "SELECT id, key, content, tags, source, helpful, harmful, neutral, maturity, vault_path FROM knowledge_index WHERE id = ?"
     ).get(id) as {
       id: number; key: string | null; content: string; tags: string | null; source: string;
@@ -1276,8 +1275,8 @@ server.tool(
     // census the lifecycle work is blocked on. The `heuristic` arm that would
     // have skewed it was CUT in Loop 12 (R-010) having never written a row, so
     // every row here came from a judgment rather than a topic-mention detector. Crossed rather than
-    // summed because the interesting cell is `supplied` x `harmful` — the only
-    // combination that can ever make an apoptosis threshold satisfiable.
+    // summed because the interesting cell is `supplied` x `harmful` (the
+    // apoptosis threshold it once fed is cut).
     const methodCensus = v2db.prepare(
       `SELECT COALESCE(rating_method, '(pre-column)') as m, rating as r, COUNT(*) as count
        FROM feedback_log GROUP BY m, r ORDER BY m, r`

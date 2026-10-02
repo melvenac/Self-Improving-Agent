@@ -63,8 +63,9 @@ export function initTriggerFires(db: Database.Database): void {
     -- A SIBLING TABLE RATHER THAN MORE ROWS IN recall_log, for a reason that
     -- is structural and not stylistic. recall_log means "this entry reached
     -- the agent": getSessionRecalledIds treats it as the authoritative rated
-    -- set at /end, and those ratings move success_rate, which gates
-    -- apoptosis and boosts ranking. An entry the trigger LOOKED AT and did not
+    -- set at /end, and those ratings are written to feedback_log and the
+    -- entry's counters (success_rate and apoptosis were cut in Loop 10). An
+    -- entry the trigger LOOKED AT and did not
     -- surface was never in front of anyone, so a looked-at row in recall_log
     -- would write ratings for entries nobody read. Keeping fires here means
     -- that cannot happen BY CONSTRUCTION rather than by a filter someone must
@@ -523,7 +524,8 @@ export function updateFeedbackV2(db: Database.Database, vaultPath: string, ratin
 }
 
 /**
- * Retire an entry by apoptosis without destroying it.
+ * Archive an entry's note and drop its index row, without destroying the note
+ * (the helper `ob_forget` uses; apoptosis, which once also called it, is cut).
  *
  * Replaces the `DELETE FROM knowledge_index` this path used to run. The delete
  * was unsafe for a reason the schema makes structural: neither `feedback_log`

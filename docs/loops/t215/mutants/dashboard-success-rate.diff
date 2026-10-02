@@ -1,0 +1,13 @@
+diff --git a/open-brain/scripts/dashboard.mjs b/open-brain/scripts/dashboard.mjs
+index 56eee981..f4256849 100644
+--- a/open-brain/scripts/dashboard.mjs
++++ b/open-brain/scripts/dashboard.mjs
+@@ -49,7 +49,7 @@ try {
+              helpful  AS helpful_count,
+              harmful  AS harmful_count,
+              neutral  AS neutral_count,
+-             archived_into, vault_path
++             success_rate, archived_into, vault_path
+       FROM knowledge_index`);
+   }
+ 

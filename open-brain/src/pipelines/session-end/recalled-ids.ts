@@ -11,9 +11,10 @@ import { getSessionRecalledIds } from "../../db-v2.js";
  * session 2fb67133 from 2026-08-07, two sessions back; it does not self-heal.
  *
  * That was survivable while auto-feedback only bumped a counter nobody read.
- * Since v0.15.0 the same ratings move `success_rate`, which gates apoptosis and
- * feeds `maturityBoost` ranking — so mis-attributed ratings now write wrong
- * numbers into a column that decides what gets pruned and what ranks first.
+ * v0.15.0 made the same ratings drive `success_rate`, apoptosis and
+ * `maturityBoost` ranking, which made mis-attributed ratings costly; Loop 10
+ * cut all three, so today a wrong rating lands in feedback_log and the
+ * counters, which is still wrong data.
  *
  * The fix is structural rather than a validity check bolted onto the file:
  * `recall_log` already records every `ob_recall` hit against the live session
@@ -149,8 +150,8 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS
 /**
  * Render the recalled-ids resolution as report lines — **including at zero**.
  *
- * The same shape as `formatApoptosisQueue`: absence must not be
- * indistinguishable from success. Before this, a session that resolved nothing
+ * Absence must not be indistinguishable from success (the same rule the
+ * apoptosis review queue followed before it was cut). Before this, a session that resolved nothing
  * rated nothing and the only visible trace was `Feedback: 0 entries`, which
  * reads identically whether there was nothing to rate, the session id was
  * missing, or a file belonging to another session was refused.

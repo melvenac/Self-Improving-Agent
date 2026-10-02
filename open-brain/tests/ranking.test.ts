@@ -72,12 +72,12 @@ describe('recall ranking', () => {
   });
 
   /**
-   * Loop 8 R1: the maturity boost is suspended (both multipliers 1.0), so
-   * maturity no longer moves an entry in the ranking. Asserted as an exact tie
+   * Loop 8 R1 suspended the maturity boost and Loop 10 C2 removed it, so
+   * maturity does not move an entry in the ranking. Asserted as an exact tie
    * rather than as an order, because with equal scores the returned order is
    * whatever SQLite happens to emit and asserting on it would pin noise.
    */
-  it('does not rank a mature entry above a progenitor while the boost is suspended', () => {
+  it('does not rank a mature entry above a progenitor (maturity is not a ranking input)', () => {
     add('progenitor.md', { ageDays: 30 });
     add('mature.md', { ageDays: 30, maturity: 'mature' });
 
@@ -86,7 +86,7 @@ describe('recall ranking', () => {
     expect(rows[0].weighted_rank).toBeCloseTo(rows[1].weighted_rank, 10);
   });
 
-  it('does not rank a proven entry above a progenitor while the boost is suspended', () => {
+  it('does not rank a proven entry above a progenitor (maturity is not a ranking input)', () => {
     add('progenitor.md', { ageDays: 30 });
     add('proven.md', { ageDays: 30, maturity: 'proven' });
 
@@ -119,20 +119,17 @@ describe('recall ranking', () => {
     expect(rows[1].weighted_rank).toBeCloseTo(rows[2].weighted_rank, 10);
   });
 
-  it('demotes an entry whose success rate is below the apoptosis threshold', () => {
+  // T-215: this used to assert that success rate 0.1 is demoted below 0.9. success_rate is
+  // cut and not stored, so the assertion passed only on insertion (tie) order: swapped, it
+  // failed with "expected 'failing.md' to be 'healthy.md'". Inverted to the contract that
+  // holds: it is not an input, so the two entries tie exactly.
+  it('does not rank by success rate: it is not a ranking input', () => {
     add('healthy.md', { ageDays: 30, successRate: 0.9 });
     add('failing.md', { ageDays: 30, successRate: 0.1 });
 
-    expect(ranked()[0]).toBe('healthy.md');
-    expect(ranked()[1]).toBe('failing.md');
-  });
-
-  it('keeps a mature entry ahead of a progenitor that is moderately older', () => {
-    // Regression guard: the age term must not be strong enough to bury maturity.
-    add('old-progenitor.md', { ageDays: 60 });
-    add('new-mature.md', { ageDays: 0, maturity: 'mature' });
-
-    expect(ranked()[0]).toBe('new-mature.md');
+    const rows = rankRows();
+    expect(rows).toHaveLength(2);
+    expect(rows[0].weighted_rank).toBeCloseTo(rows[1].weighted_rank, 10);
   });
 
   it('boosts entries tagged failure above equally-relevant peers', () => {

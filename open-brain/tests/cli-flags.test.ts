@@ -350,19 +350,3 @@ describe("inScratch refuses an argument outside the temp dir (R185-8)", () => {
     expect(() => inScratch(root, ["inside.json", join(root, "inside.json"), "no-such-thing", "--check", "sync"])).not.toThrow();
   });
 });
-
-describe("scripts/backfill-success-rate.mjs", () => {
-  it("--aply refuses before the database is opened", () => {
-    const db = join(root, "knowledge-v2.db");
-    const r = spawnSync(process.execPath, [join(import.meta.dirname, "../scripts/backfill-success-rate.mjs"), "--aply"], {
-      cwd: root,
-      encoding: "utf8",
-      env: { ...process.env, KNOWLEDGE_V2_DB: db },
-      timeout: 60_000,
-    });
-    expect(r.status, `${r.stdout}\n${r.stderr}`).toBe(2);
-    expect(r.stderr).toContain('unrecognised argument(s) "--aply"');
-    // better-sqlite3 creates the file on open, so its absence is the proof.
-    expect(existsSync(db)).toBe(false);
-  }, 120_000);
-});
