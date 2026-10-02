@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 289 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 290 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Clear the remaining session-157 code PRs. FIRST, at Aaron's morning word: the merge list in docs/loops/morning-merge-list-2026-10-02.md (B4 #290, #289, #294@26f62934, #299; B5 #293, #292, #320) via ONE AskUserQuestion naming every PR; re-check each head == the QA'd SHA (#294's reviewed rebase head is 26f62934), CI green, not DIRTY; merge pinned; send relay-a2a T-228's (#320) merge SHA. THEN rule QA 260 (B2 r2: #295 #298 #306 #309) and QA 261 (#302 r2) when they report. Then T-152's last 3 typecheck errors plus CI enforcement, T-229, G-052, and the D-073 release (Aaron's, D-019). _(since session 157)_
+FIRST: check master push CI on 19b79b39 (after 10 merges). THEN finish #295 (T-008) and #298 (T-008b): sia-forge is rebasing #295 onto master (node:fs import union only) and #298 onto it; review both range-diffs; ask Aaron ONE re-confirm naming both at the new heads; merge pinned. THEN, with the backlog gate open, dispatch the seats: T-152 (fix the 3 residual typecheck:tests errors, then put the check in CI), T-229, T-230, T-231, G-052 rows, and the backlog-audit top-10 items not yet done (T-182, T-156, T-168, T-225 item 4). Weekly usage ~91%: at 95% no new QA, tasks or dispatches. _(since session 157)_
 
 ## Top tasks
 

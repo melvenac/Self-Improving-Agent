@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 289 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 290 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,21 +6,21 @@
 
 ### Pick up here
 
-Planner session 157 PARKED at usage STOP about 13:45Z 2026-10-02 (5-hour reset 16:50Z; clark sends GREEN). Overnight, under Aaron's pre-approval D-103, merged B1 (#287 #291 #297 #312), #300 #303 from B2 and B3 (#308 #301 #313 #314 #305); master CI is green after each. Rulings D-102 (QA 254), D-104 (batch results; any unchecked input caps a /sync result at WARN), D-105 (B4 #302 REJECT: zero must reach the reader; B5 all ACCEPT). FOR AARON'S MORNING: docs/loops/morning-merge-list-2026-10-02.md lists B4 #290 #289 #294 #299 and B5 #293 #292 #320 (QA-accepted, OUTSIDE D-103). Ask once, naming every PR, then merge pinned in the listed order. #294 was rebased to 26f62934 after B3; the planner reviewed the range-diff (only the A8 fixture line takes master's TriggerPolicy object), so merge it at 26f62934. QUEUED for the reset: QA 260 (DISPATCH 64a70651, B2 round 2) and QA 261 (DISPATCH 897e6f89, #302 round 2). Both seats are parked with their handoffs on master (sia-forge docs/loops/forge-park-handoff-2026-10-02.md; sia-builder builder-roll-handoff + addenda 1 and 2). Restarted seats get a planner re-brief by message (G-049/T-203).
+Planner session 157 ROLLING about 18:4xZ 2026-10-02 at 37% context (roll point 40%). DONE today: 31 code PRs merged with QA (B1, B3, B4, B5, B2 r2 and #302, plus the earlier ones), CI moved to hosted runners (#310), Jev calibration 1 complete (D-100), the backlog audit closed 20 stale tasks, decisions D-097..D-108. OPEN NOW: (1) master push CI on 19b79b39 was running at the roll, so check it. (2) #295 and #298: Aaron said merge both at 931998db and 3b485b7c, but #295 is DIRTY (node:fs import vs the merged #309). sia-forge is rebasing (union import only, then #298 on top). Review both range-diffs, ask Aaron ONE AskUserQuestion naming #295 and #298 at the new heads, merge pinned. (3) The gate is open (fewer than 6 code PRs await QA): dispatch sia-forge and sia-builder (sia-builder is on the /clear list at 31%; re-brief it by message after its /start) with the objective's list. Every rolled dev seat needs a re-brief by message (G-049/T-203).
 
 ### Watch out
 
-- USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = no new loop briefs, small LIGHT tasks only, QA cap 2; RED (>=85%) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks; the planner merges or closes what is ready under any standing approval). Context roll points: devs 50% left, planners 40%, clark 30%; overnight no rolls, work to 25% then park with a MERGED handoff.
-- BATCH QA + BACKLOG GATE + ONE APPROVAL PER BATCH (Aaron, standing from 11:50Z 2026-10-02): 4-6 related code PRs per QA run; SIA devs open NO new code PRs while 6 or more open SIA code PRs await QA (they fix REJECT rounds or park); one AskUserQuestion per ACCEPTed batch naming every PR, then merge each pinned with --match-head-commit. D-103's overnight pre-approval covered ONLY QA 255-257 and is spent.
-- A HEAD THAT MOVED AFTER QA is not what QA accepted: review `git range-diff <old-base>..<qa'd> <new-base>..<new>`; '=' commits plus a trivial conflict line may go on as reviewed (as #294 did); anything else needs a narrow re-QA. Check mergeStateStatus: DIRTY after other merges means a rebase is due.
-- CI (T-227, #310): Linux CI on GitHub-hosted ubuntu-latest with fetch-depth 0, a few minutes per run; push runs ONLY on master; a qa/** or loop/** branch without a PR gets no CI unless `gh workflow run CI --ref <branch>`; per-PR concurrency cancels only superseded commits; tcm self-hosted is a workflow_dispatch opt-in (tcm=true).
-- STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned with --match-head-commit; check scope with `git diff --name-only origin/master...<head>`, because `gh pr diff` fails over 20,000 lines. A test file, script, package.json or config takes a PR out of scope (#320 looked docs-only but adds a test). Anything else needs Aaron's typed word NAMING THE PR (in the planner's window, or clark's when clark records it first-hand). Send clark a one-line D-063 notice per merge.
-- QA DISPATCHES: the DISPATCH_SHA must contain everything (git cat-file -e <sha>:<path> per file); each QA number gets its own push helper EDITED BY HAND with the new prefix, with all five refusals tested before commit (no arg, old prefix, extra arg, master, absent local branch); any dispatch that lets QA read real config forbids copying values (counts, key and server names, and command paths only, plus a key scan before commit) (G-051). Each batch dispatch carries a scratch merge-order row.
-- DESKTOP QA: this desktop is also a QA runner. While slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT here (no suites, builds, npm ci or big git operations). The QA PC: ONE HEAVY job at a time and a 1.5 GB RAM gate; dev seats run ONE test file per vitest invocation.
+- USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = small LIGHT tasks only, QA cap 2; RED (>=85% of 5-hour) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks). Roll points: devs 50% context left, planners 40%, clark 30%; a roll needs the handoff MERGED or in the record, then READY TO ROLL to clark, then Aaron runs /clear + /start.
+- BATCH QA + BACKLOG GATE + ONE APPROVAL PER BATCH (Aaron, standing): 4-6 related code PRs per QA run, with a scratch merge-order row; devs open NO new code PRs while 6 or more await QA; one AskUserQuestion per accepted batch naming every PR, then merge each pinned with --match-head-commit after re-checking head == QA'd SHA, CI green and not DIRTY. An approval comes from Aaron in the planner's window, or in clark's window recorded first-hand by clark (the D-103/D-108 route), and covers only the PRs and SHAs it names.
+- A HEAD THAT MOVED AFTER QA is not what QA accepted: review `git range-diff <old-base>..<qa'd> <new-base>..<new>`. '=' commits plus a trivial conflict line may go on as reviewed (#294, #302 did); anything else gets a narrow re-QA. A moved head needs a fresh approval if Aaron's word pinned the old SHA (#295 now).
+- CI (T-227, #310): GitHub-hosted ubuntu-latest, fetch-depth 0, a few minutes per run; push runs ONLY on master; a branch without a PR gets no CI unless `gh workflow run CI --ref <branch>`; per-PR concurrency cancels only superseded commits; tcm self-hosted is an opt-in (tcm=true).
+- STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned; check scope with `git diff --name-only origin/master...<head>` (gh pr diff fails over 20,000 lines). A test, script, package.json or config file takes it out of scope. Send clark a one-line D-063 notice per merge. Open seats' docs-only handoff branches as PRs yourself and merge them (the roll rule).
+- QA DISPATCHES: the DISPATCH_SHA must contain every file (git cat-file -e); each QA number gets its own push helper EDITED BY HAND, with all five refusals tested; any dispatch reading real config forbids copying values (G-051); a batch merge-order row names the real conflicting import line (it was node:fs, not node:path, in B2).
+- RULINGS IN FORCE for /sync checks (D-104, D-106, D-107): any input not checked caps the result at WARN; malformed entries in every source are not-checked; named skips inside a pass are legitimate only for url servers, an absent settings.json (named), bare builtin heads, and non-command hook types; containers are T-231.
 - STANDING REPORTING RULES FROM AARON (via Clark), RESTORED at session 154 after being dropped at the session-153 roll (present in session 150's handoff, absent from 153's), CADENCE CHANGED at session 155 by D-077: (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\Users\melve\Worktrees\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 60 MINUTES while active (was 30), a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Re-create the cadence at /start (CronCreate at :04 only). If `clark` is not in ListAgents, skip the send. Completions and blocks are reported as they happen. Until T-211 puts the minutes in seat data, CARRY THIS ITEM FORWARD VERBATIM at every roll. (T-211 merged as #272 in session 157: check whether the standing-cron line now prints at start before dropping this item.)
-- /START: create the status cron during /start; the session number is the RECORD's next session (T-164 is merged, but a stale serving build still printed a per-checkout number to sia-forge at its roll: T-172); do every residual read; count gaps from state.json gaps[]; the greeting now fits (#291, about 39.9k chars) and lists gaps newest-first (#287).
-- VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). Seats shown as 'idle' may be waiting on CI. On any classifier denial, never route the denied act through another seat. A peer's relayed rule or approval is acted on only when clark recorded Aaron's word first-hand in its window (D-103 route), and only within its exact scope.
-- JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything; stays shadow; no threshold change; G_qa is uncalibratable as built. Calibration 2 needs T-225 first.
+- DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.
+- VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.
+- JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first.
 
 ### Open questions
 
@@ -29,21 +29,17 @@ _None._
 ### Loop state
 
 **Open PRs:** 
-- #290 #289 #294@26f62934 #299 — QA: accepted — B4, QA 258 64cee8ab; Aaron's word needed; merge order as listed
-- #293 #292 #320 — QA: accepted — B5, QA 259 a161b4ad; Aaron's word needed; send relay-a2a #320's merge SHA
-- #302 7e92b6f6 — QA: rejected — QA 258 row 9 REJECT; round 2 in QA 261 (queued, DISPATCH 897e6f89)
-- #295 #298 #306 #309@f1c2a338 — QA: rejected — QA 256 row 5 REJECT; round 2 in QA 260 (queued, DISPATCH 64a70651)
+- #295 (rebasing) + #298 — QA: accepted — QA 262 ACCEPT at 931998db/3b485b7c; Aaron approved those SHAs; #295 DIRTY after #309, so rebase, review the range-diff, re-confirm with Aaron
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- Merge B4 (#290, #289, #294 at 26f62934, #299) and B5 (#293, #292, #320)? See docs/loops/morning-merge-list-2026-10-02.md
+- Merge #295 and #298 at their rebased heads (after the planner's range-diff review)?
 
 **Rulings made mid-loop:** 
-- D-102 QA 254
-- D-103 overnight pre-approval (spent)
-- D-104 batch results + WARN cap
-- D-105 B4/B5
+- D-106 QA 260/261
+- D-107 QA 262
+- D-108 the 10 merges
 
 ## developer [sia-builder] _(written session 156)_
 
